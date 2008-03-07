@@ -1,0 +1,7 @@
+# the a_ and z_ prefixes are for ordering:
+# any hooks which can veto an action (require-singlehead) should be run before
+# hooks which make permanent logs (record-changeset-info)
+
+[hooks]
+pretxnchangegroup.a_singlehead = hg_require_single_head
+pretxnchangegroup.z_linearhistory = hg_record_changeset_info
