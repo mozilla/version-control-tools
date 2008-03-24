@@ -28,8 +28,6 @@ def newchanges(ui, repo, oldrev, newrev='tip'):
             top = p1
 
     def processtip(tip):
-        print "Processing tip: %s" % hex(tip)
-
         (base, p1, p2) = repo.branches([tip])[0][1:]
 
         ancestor = repo.changelog.ancestor(base, oldrev)
@@ -42,7 +40,6 @@ def newchanges(ui, repo, oldrev, newrev='tip'):
 
         bt = between(tip, base)
         for c in bt:
-            print "Between: %s" % repo.changelog.rev(c)
             if c in reachable:
                 break
 
@@ -54,8 +51,6 @@ def newchanges(ui, repo, oldrev, newrev='tip'):
         for c in (p1, p2):
             if not isancestor(c, oldrev):
                 processtip(c)
-
-        print "Done processing tip %s" % hex(tip)
 
     processtip(newrev)
 
