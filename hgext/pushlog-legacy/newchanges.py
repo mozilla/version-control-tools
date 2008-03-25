@@ -1,6 +1,5 @@
 from mercurial import hg, cmdutil, util
 from mercurial.node import hex, bin, nullid
-import traceback
 
 def newchanges(ui, repo, oldrev, newrev='tip'):
     def isancestor(node, child):
