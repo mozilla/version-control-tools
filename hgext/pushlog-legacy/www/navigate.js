@@ -25,6 +25,18 @@ function short(node)
     return node.slice(0, 12);
 }
 
+/**
+ * Limit a string to len characters... if it is too long, add an ellipsis.
+ */
+function limit(str, len)
+{
+    if (str.length < len) {
+        return str;
+    }
+
+    return str.slice(0, len) + "…";
+}
+
 function measure(r, prop)
 {
     return Number(r.css(prop).replace('px', ''));
@@ -161,6 +173,10 @@ function drawContext(data)
     var center = makeRev(data.context);
     center.css('left', (measure($('#inside-scrolling'), 'width') - REVWIDTH) / 2);
     center.css('top', 200 - measure(center, 'height') / 2);
+
+    document.title = $('#select-repo')[0].value + " revision " +
+        revs[data.context].rev + ": " +
+        limit(revs[data.context].description, 60);
 
     rootContext = data.context;
 
