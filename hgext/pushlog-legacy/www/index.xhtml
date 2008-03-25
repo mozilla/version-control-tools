@@ -9,8 +9,11 @@
       padding: 0px;
       font-family: sans-serif;
       font-size: 10px;
+      overflow: hidden;
     }
     #topnav {
+      position: absolute;
+      width: 100%;
       text-align: right;
       background-color: black;
       color: white;
@@ -22,24 +25,12 @@
     input, select {
       border: 1px solid #888;
     }
-    #outside-scrolling {
-      position: relative;
-      background-color: grey;
-      padding: 0px;
-    }
-    #arrows {
+    #arrows, #inside-scrolling {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 400px;
-    }
-    #inside-scrolling {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 400px;
+      height: 100%;
     }
     .revision {
       position: absolute;
@@ -63,6 +54,32 @@
   <script type="text/javascript" src="navigate.js" />
 </head>
 <body onload="init()">
+  <svg id="arrows" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowhead"
+	      viewBox="0 0 10 10" refX="10" refY="5"
+	      markerUnits="strokeWidth"
+	      markerWidth="6"
+	      markerHeight="4"
+	      orient="auto">
+	<path d="M 0 0 L 10 5 L 0 10 z" />
+      </marker>
+      <line id="arrow-template" class="arrow"
+	    x1="500" y1="350" x2="200" y2="300" />
+    </defs>
+    <g id="scroller" transform="translate(0,0)">
+    </g>
+  </svg>
+  <div id="inside-scrolling" />
+
+  <div id="revision-template"
+       class="revision">
+    <div class="node">{Node}</div>
+    <div class="user">{User}</div>
+    <div class="date">{Date}</div>
+    <div class="desc">{Description}</div>
+  </div>
+
   <div id="topnav">
     <select id="select-repo">
       <option value="mozilla-central">mozilla-central</option>
@@ -73,36 +90,6 @@
       type="text" id="node-input" value="tip"
       title="Enter a revision, node ID or tag to navigate to that changeset." />
     <input type="button" value="Go" id="node-choose" />
-  </div>
-
-  <div id="outside-scrolling">
-    <svg id="arrows" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-	<marker id="arrowhead"
-		viewBox="0 0 10 10" refX="10" refY="5"
-		markerUnits="strokeWidth"
-		markerWidth="6"
-		markerHeight="4"
-		orient="auto">
-	  <path d="M 0 0 L 10 5 L 0 10 z" />
-	</marker>
-	<line id="arrow-template" class="arrow"
-	      x1="500" y1="350" x2="200" y2="300" />
-      </defs>
-      <!-- <rect x="0" y="0" width="800" height="400" stroke="red" stroke-width="7" fill="none" /> -->
-      <g id="scroller" transform="translate(0,0)">
-	<!--<rect x="0" y="0" width="800" height="400" stroke="blue" stroke-width="5" fill="none" />-->
-      </g>
-    </svg>
-    <div id="inside-scrolling" />
-  </div>
-
-  <div id="revision-template"
-       class="revision">
-    <div class="node">{Node}</div>
-    <div class="user">{User}</div>
-    <div class="date">{Date}</div>
-    <div class="desc">{Description}</div>
   </div>
 </body>
 </html>
