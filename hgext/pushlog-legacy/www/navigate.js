@@ -6,12 +6,6 @@ const HSPACING = 40;
 const VSPACING = 30;
 
 /**
- * The nodeid of the "center" of the graph... mainly used for smart resizing
- * behavior.
- */
-var rootContext;
-
-/**
  * map from long node strings to the JSON data.
  * The following mappings are added to the JSON:
  *   .element from the node to the element
@@ -178,8 +172,6 @@ function drawContext(data)
         revs[data.context].rev + ": " +
         limit(revs[data.context].description, 60);
 
-    rootContext = data.context;
-
     drawRelations(data.context, 'parents', 2);
     drawRelations(data.context, 'children', 2);
 }
@@ -199,8 +191,6 @@ function startContext(hash)
         $('#select-repo')[0].value = repo;
         $('#node-input')[0].value = context;
     }
-
-    rootContext = null;
 
     /* Clear out lots of everything */
     for (var rev in revs) {
