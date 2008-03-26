@@ -39,14 +39,15 @@
       width: 250px;
       text-align: center;
       max-height: 250px;
-    }
-    #revision-template {
-      display: none;
+      visibility: hidden;
     }
     .arrow {
       stroke: black;
       stroke-width: 1.5px;
       marker-end: url(#arrowhead);
+    }
+    .arrow.ambiguous {
+      stroke-dasharray: 4,4;
     }
   </style>
   <script type="text/javascript" src="jquery-1.2.3.js" />
@@ -65,7 +66,8 @@
 	<path d="M 0 0 L 10 5 L 0 10 z" />
       </marker>
       <line id="arrow-template" class="arrow"
-	    x1="500" y1="350" x2="200" y2="300" />
+	    x1="500" y1="350" x2="200" y2="300"
+            visibility="hidden" />
     </defs>
     <g id="scroller" transform="translate(0,0)">
     </g>
