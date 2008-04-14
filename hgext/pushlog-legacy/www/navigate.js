@@ -1,9 +1,58 @@
-const BASEURL = '/hgwebdir.cgi/';
+/* -*- Mode: Java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+
+const BASEURL = 'http://hg.mozilla.org/';
 const SVGNS = 'http://www.w3.org/2000/svg';
 
 const REVWIDTH = 254;
 const HSPACING = 40;
 const VSPACING = 30;
+const TEXTSTYLE = '12px sans-serif';
+
+let gWidth, gHeight, gContext, gPendingRequest;
+
+function getCX()
+{
+  let cx = $('#drawcanvas')[0].getContext('2d');
+  cx.mozTextStyle = TEXTSTYLE;
+  return cx;
+}
+
+function measure(t, cx)
+{
+  if (!cx)
+    cx = getCX();
+
+  return cx.mozMeasureText(t);
+}
+
+/**
+ * Take a string of text. Split it into up to as many as three lines. Yield
+ * each line.
+ */
+function splitText(t, cx)
+{
+  if (!cx)
+    cx = getCX();
+
+  var syllables = t.split(' ');
+  var unplaced = 0;
+
+  for (var i = 0; i < 3 && unplaced < syllables.length; ++i) {
+    for (var placed = unplaced + 2; placed < syllables.length; ++placed) {
+      if (measure(syllables.slice(unplaced, placed).join(' '), cx) >
+          REVWIDTH) {
+        --placed;
+        break;
+      }
+    }
+    var str = syllables.slice(unplaced, placed).join(" ");
+    if (i == 2 && placed < syllables.length)
+      str += "…";
+
+    yield str;
+    unplaced = placed;
+  }
+}
 
 /**
  * map from long node strings to Revision objects
@@ -17,347 +66,354 @@ const VSPACING = 30;
 
 var revs = {};
 
-function Revision(data)
+function getRevision(node)
 {
-    var i, d, a;
+  if (!(node in revs)) {
+    revs[node] = new Revision(node);
+  }
+  return revs[node];
+}
 
-    this.node = data.node;
-    this.rev = data.rev;
-    this.user = data.user;
-    this.date = data.date
-    this.description = data.description;
-    this.children = data.children;
-    this.parents = data.parents;
-
-    d = $('#revision-template').clone();
-    d.attr('id', 'rev' + shortrev(this.node));
-    $('.node', d).text(this.rev + ": " + shortrev(this.node));
-    $('.user', d).text(this.user);
-    $('.date', d).text(this.date);
-    $('.desc', d).text(this.description);
-
-    this.element = d[0];
-
-    d.appendTo('#inside-scrolling');
-    d.click(navTo);
-    this.height = measure($(d), 'height');
-
-    this.childArrows = {};
-    this.parentArrows = {};
-
-    for (i in this.children) {
-        if (revs[this.children[i]]) {
-            a = revs[this.children[i]].parentArrows[this.node];
-            this.childArrows[this.children[i]] = a;
-        }
-        else {
-            // We haven't met this child yet... make an arrow for it
-            a = $('#arrow-template').clone();
-            a.attr('id', 'ar' + shortrev(this.node) + ':' + shortrev(this.children[i]));
-            a.appendTo('#scroller');
-            this.childArrows[this.children[i]] = a[0];
-        }
-    }
-
-    for (i in this.parents) {
-        if (revs[this.parents[i]]) {
-            var a = revs[this.parents[i]].childArrows[this.node];
-            this.parentArrows[this.parents[i]] = a;
-        }
-        else {
-            // We haven't met this parent yet... make an arrow for it
-            a = $('#arrow-template').clone();
-            a.attr('id', 'ar' + shortrev(this.parents[i] + ':' + shortrev(this.node)));
-            a.appendTo('#scroller');
-            this.parentArrows[this.parents[i]] = a[0];
-        }
-    }
-
-    revs[this.node] = this;
+function Revision(node)
+{
+  this.node = node;
+  this.revnode = "??: " + this.shortnode();
+  this.revnodelen = measure(this.revnode);
 }
 
 Revision.prototype = {
-  visible: function r_visible() {
-    return $(this.element).css('visibility') != 'hidden';
+  parents: [],
+  children: [],
+  _position: null,
+
+  loaded: function r_loaded()
+  {
+    return 'rev' in this;
   },
 
-  x: function r_x() {
-    if (!this.visible())
-      throw Error("Revision " + this.node + " is not visible.");
+  update: function r_update(data)
+  {
+    if (data.node != this.node)
+      throw Error("node doesn't match in Revision.update\nthis.node: " +
+                  this.node + "\ndata.node: " + data.node);
 
-    return measure($(this.element), 'left');
+    let cx = getCX();
+
+    this.rev = data.rev;
+
+    this.revnode = this.rev + ": " + this.shortnode();
+    this.revnodelen = measure(this.revnode, cx);
+
+    this.userlen = measure(data.user, cx);
+    this.user = data.user;
+
+    this.date = data.date;
+    this.datelen = measure(data.date, cx);
+
+    this.description = data.description;
+    this.descSplit = [line for (line in splitText(data.description))];
+
+    this.children = [getRevision(node) for each (node in data.children)];
+    this.parents = [getRevision(node) for each (node in data.parents)];
+  },
+
+  /* x and y are the center of the revision */
+  x: function r_x() {
+    if (!this._position)
+      throw Error("Revision " + this.node + " is not positioned.");
+
+    return this._position.x;
   },
 
   y: function r_y() {
-    if (!this.visible())
-      throw Error("Revision " + this.node + " is not visible.");
+    if (!this._position)
+      throw Error("Revision " + this.node + " is not positioned.");
 
-    return measure($(this.element), 'top');
+    return this._position.y;
   },
 
-  center: function r_center() {
-    if (!this.visible())
-      throw Error("Revision " + this.node + " is not visible.");
+  /* height */
+  height: function r_height() {
+    if (this.loaded()) {
+      return 12 * (3 + this.descSplit.length) + 4;
+    }
     
-    return {x: this.x() + REVWIDTH / 2,
-            y: this.y() + this.height / 2};
+    return 12 + 4;
   },
 
-  parentPoint: function r_parentPoint() {
-    if (!this.visible())
-      throw Error("Revision " + this.node + " is not visible.");
-
-    return {x: this.x(),
-            y: this.y() + this.height / 2 };
-  },
-  
-  childPoint: function r_childPoint() {
-    if (!this.visible())
-      throw Error("Revision " + this.node + " is not visible.");
-
-    var e = $(this.element);
-    return {x: this.x() + REVWIDTH,
-            y: this.y() + this.height / 2 };
-  },
-  
   /**
    * Move the center of the box to this point
    */
-  moveTo: function r_move(point) {
-    var e, child, parent, p, a;
-    
-    e = $(this.element);
-    e.css('visibility', 'visible');
-    e.css('left', point.x - REVWIDTH / 2);
-    e.css('top', point.y - this.height / 2);
-    
-    p = this.childPoint();
-    for each (child in this.children) {
-      a = $(this.childArrows[child]);
-      a.attr('x1', p.x);
-      a.attr('y1', p.y);
-      if (!(child in revs)) {
-        a.attr('x2', p.x + 25);
-        a.attr('y2', p.y);
-      }
-      a.css('visibility', 'visible');
-    }
-    
-    p = this.parentPoint();
-    for each (parent in this.parents) {
-      a = $(this.parentArrows[parent]);
-      a.attr('x2', p.x);
-      a.attr('y2', p.y);
-      if (!(parent in revs)) {
-        a.attr('x1', p.x - 25);
-        a.attr('y1', p.y);
-      }
-      a.css('visibility', 'visible');
-    }
+  moveTo: function r_move(x, y) {
+    if (isNaN(x))
+      throw Error("x is NaN");
+
+    if (isNaN(y))
+      throw Error("y is NaN");
+
+    this._position = {'x': x, 'y': y};
   },
-  
-  /**
-   * Hide gc'ed revisions, set arrow visibility, and move the other end of unbounded arrows.
-   * Each node is responsible for all its parent arrows, as well as child arrows pointing to unknown revisions.
-   */
-  cleanLayout: function r_moveArrows()
+
+  shortnode: function r_shortnode()
   {
-    var child, parent, p, a, i;
+    return this.node.slice(0, 12);
+  },
 
-    if (!this.gc) {
-      $(this.element).css('visibility', 'hidden');
+  hittest: function r_hittest(x, y)
+  {
+    if (!this.gc)
+      return false;
 
-      for each (child in this.children) {
-        if (!(child in revs)) {
-          $(this.childArrows[child]).css('visibility', 'hidden');
-        }
-      }
-      
-      for each (parent in this.parents) {
-        if (!(parent in revs) || !(revs[parent].gc)) {
-          $(this.parentArrows[parent]).css('visibility', 'hidden');
-        }
-      }
-    }
-    else {
-      // We've already been positioned and are visible; all we need is to position the "other" end
-      // of arrows that point to offscreen revisions
-      p = this.childPoint();
-      for (i in this.children) {
-        child = this.children[i];
-        
-        if (!(child in revs) || !revs[child].gc) {
-          this.childArrows[child].setAttribute('class', 'arrow ambiguous');
-          a = $(this.childArrows[child]);
-          a.attr('x2', p.x + 25);
-          a.attr('y2', this.y() + (Number(i) + 0.5) * (this.height / this.children.length));
-        }
-      }
+    let tx = this.x();
+    let ty = this.y();
+    let th = this.height();
 
-      p = this.parentPoint();
-      for (i in this.parents) {
-        parent = this.parents[i];
-        
-        if (!(parent in revs) || !revs[parent].gc) {
-          this.parentArrows[parent].setAttribute('class', 'arrow ambiguous');
-          a = $(this.parentArrows[parent]);
-          a.attr('x1', p.x - 25);
-          a.attr('y1', this.y() + (Number(i) + 0.5) * (this.height / this.parents.length));
-        }
-        else {
-          this.parentArrows[parent].setAttribute('class', 'arrow');
-        }
-      }
-    }
+    if (tx - REVWIDTH / 2 <= x &&
+        tx + REVWIDTH / 2 >= x &&
+        ty - th / 2 <= y &&
+        ty + th / 2 >= y)
+      return true;
+
+    return false;
+  },
+
+  toString: function r_toString()
+  {
+    return "Revision:" +
+    "\nnode: " + this.node +
+    "\nposition: " + uneval(this._position) +
+    "\ndescSplit: " + uneval(this.descSplit);
   }
 };
 
-function shortrev(node)
-{
-    return node.slice(0, 12);
-}
-
-/**
- * Limit a string to len characters... if it is too long, add an ellipsis.
- */
 function limit(str, len)
 {
-    if (str.length < len) {
-        return str;
-    }
+  if (str.length < len)
+    return str;
 
-    return str.slice(0, len) + "…";
+  return str.slice(0, len) + "…";
 }
 
-function measure(r, prop)
+function doLayout()
 {
-    return Number(r.css(prop).replace('px', ''));
-}
-
-function doLayout(node)
-{
-  var contextrev, rev, i, loadMore;
+  let loadMore = [];
+  let bottompositions = [];
   
-  loadMore = [];
-  
-  function drawChildren(rev)
+  function drawChildren(rev, position)
   {
-    var p, child, totalHeight, avgHeight, c, childrev;
-  
     if (rev.children.length == 0)
       return;
     
-    totalHeight = 0;
-    c = 0;
+    let totalHeight = (rev.children.length - 1) * VSPACING;
     
     for each (child in rev.children) {
-      if (child in revs) {
-        totalHeight += revs[child].height;
-        revs[child].gc = true;
-        ++c;
-      }
+      totalHeight += child.height();
+      child.gc = true;
     }
+
+    totalHeight -= rev.children[0].height() / 2;
+    totalHeight -= rev.children[rev.children.length - 1].height() / 2;
   
-    avgHeight = totalHeight / c;
+    let x = rev.x();
+    let y = rev.y();
+    x += REVWIDTH + HSPACING;
+    y -= totalHeight / 2;
+
+    if (bottompositions[position]) {
+      let p = bottompositions[position];
+      let miny = p.y() + p.height() / 2 +
+        rev.children[0].height() / 2 + VSPACING;
+      if (y < miny)
+        y = miny;
+    }
+
+    if (isNaN(y)) {
+      throw ("y is NaN");
+    }
     
-    p = new Object(rev.center());
-    p.x += REVWIDTH + HSPACING;
-    p.y -= (totalHeight - avgHeight) / 2;
-    
-    var rightEdge = measure($('#inside-scrolling'), 'left') + measure($('#inside-scrolling'), 'width');
-    
-    for each (child in rev.children) {
-      if (child in revs) {
-        childrev = revs[child];
-        childrev.moveTo(p);
-        p.y += childrev.height + VSPACING;
+    let rightEdge = gWidth; // XXX won't be true if we introduce scaling
+
+    for each (let child in rev.children) {
+      child.moveTo(x, y);
+      y += child.height() + VSPACING;
   
-        if (p.x < rightEdge) {
-          drawChildren(childrev);
-        }
+      if (x < rightEdge) {
+        drawChildren(child, position + 1);
       }
-      else {
+
+      if (!child.loaded())
         loadMore.push(child);
-      }
+
+      bottompositions[position] = child;
     }
   }
   
-  function drawParents(rev)
+  function drawParents(rev, position)
   {
-    var p, parent, totalHeight, avgHeight, c, parentrev;
-    
     if (rev.parents.length == 0)
       return;
     
-    totalHeight = 0;
-    c = 0;
-    
-    for each (parent in rev.parents) {
-      if (parent in revs) {
-        totalHeight += revs[parent].height;
-        revs[parent].gc = true;
-        ++c;
-      }
+    let totalHeight = 0;
+
+    for each (let parent in rev.parents) {
+      totalHeight += parent.height();
+      parent.gc = true;
     }
     
-    avgHeight = totalHeight / c;
+    totalHeight -= rev.parents[0].height() / 2;
+    totalHeight -= rev.parents[rev.parents.length - 1].height() / 2;
+  
+    let x = rev.x();
+    let y = rev.y();
+    x -= REVWIDTH + HSPACING;
+    y -= totalHeight / 2;
+
+    if (bottompositions[position]) {
+      let p = bottompositions[position];
+      let miny = p.y() + p.height() / 2 +
+        rev.parents[0].height() / 2 + VSPACING;
+      if (y < miny)
+        y = miny;
+    }
     
-    p = new Object(rev.center());
-    p.x -= REVWIDTH + HSPACING;
-    p.y -= (totalHeight - avgHeight) / 2;
+    var leftEdge = 0;
     
-    var leftEdge = measure($('#inside-scrolling'), 'left');
-    
-    for each (parent in rev.parents) {
-      if (parent in revs) {
-        parentrev = revs[parent];
-        parentrev.moveTo(p);
-        p.y += parentrev.height + VSPACING;
+    for each (let parent in rev.parents) {
+      parent.moveTo(x, y);
+      y += parent.height() + VSPACING;
         
-        if (p.x > leftEdge) {
-          drawParents(parentrev);
-        }
+      if (x > leftEdge) {
+        drawParents(parent, position - 1);
       }
-      else {
+      if (!parent.loaded())
         loadMore.push(parent);
-      }
+
+      bottompositions[position] = parent;
     }
   }  
-  
-  contextrev = revs[node];
-    
-  document.title = $('#select-repo')[0].value + " revision " +
-    contextrev.rev + ": " +
-    limit(contextrev.description, 60);
 
-  // All the nodes which have .gc = false at the end will be hidden
-  for each (rev in revs)
+  let contextrev = revs[gContext];
+  
+  if (contextrev.loaded()) {
+    document.title = $('#select-repo')[0].value + " revision " +
+      contextrev.rev + ": " +
+      limit(contextrev.description, 60);
+  }
+  else {
+    document.title = $('#select-repo')[0].value + " node " + contextrev.node;
+  }
+
+  // All the nodes which have .gc = false at the end are offscreen and can
+  // be ignored
+  for each (let rev in revs)
     rev.gc = false;
 
   contextrev.gc = true;
-  i = $('#inside-scrolling');
-  contextrev.moveTo({x: measure(i, 'width') / 2,
-                     y: measure(i, 'height') / 2});
+  contextrev.moveTo(gWidth / 2,
+                    gHeight / 2);
   
-  drawChildren(contextrev);
-  drawParents(contextrev);
+  drawChildren(contextrev, 1);
+  drawParents(contextrev, -1);
   
-  for each (rev in revs)
-    rev.cleanLayout();
+  redraw();
 }
 
+function redraw()
+{
+  var cx = getCX();
 
+  /**
+   * Draw some text. Advance the translation down by 12px
+   */
+  function drawText(t, xoffset)
+  {
+    if (xoffset < 2)
+      xoffset = 2;
+
+    cx.translate(0, 12);
+    cx.save();
+    cx.translate(xoffset, 0);
+    cx.mozDrawText(t);
+    cx.restore();
+  }
+
+  function drawRev(r)
+  {
+    let h = r.height();
+    let left = r.x() - REVWIDTH / 2;
+    let top = r.y() - h / 2;
+
+    cx.save();
+    // clip the text to the box
+    cx.beginPath();
+    cx.rect(left, top, REVWIDTH, h);
+    cx.stroke();
+    cx.clip();
+
+    cx.save();
+    cx.fillStyle = "white";
+    cx.fill();
+    cx.restore();
+
+    if (!r.loaded())
+      cx.fillStyle = "#900";
+
+    cx.translate(left, top);
+    drawText(r.revnode, (REVWIDTH - r.revnodelen) / 2);
+    if (r.loaded()) {
+      drawText(r.user, (REVWIDTH - r.userlen) / 2);
+      drawText(r.date, (REVWIDTH - r.datelen) / 2);
+      for each (let line in r.descSplit) {
+        drawText(line, 2);
+      }
+    }
+    cx.restore();
+  }
+
+  function drawArrows(r)
+  {
+    /* draw all arrows from this rev */
+    for each (let child in r.children) {
+      let childx = r.x() + 100;
+      let childy = r.y();
+      if (child.gc) {
+        childx = child.x() - REVWIDTH / 2;
+        childy = child.y();
+      }
+      cx.beginPath();
+      cx.moveTo(r.x(), r.y());
+      cx.lineTo(childx, childy);
+      cx.stroke();
+    }
+  }
+
+  cx.clearRect(0, 0, gWidth, gHeight);
+
+  cx.save();
+  cx.lineWidth = 2;
+  for each (let rev in revs) {
+    if (rev.gc)
+      drawArrows(rev);
+  }
+  cx.restore();
+
+  for each (let rev in revs) {
+    if (rev.gc)
+      drawRev(rev);
+  }
+  return;
+}
 
 function processContextData(data)
 {
-  for each (var node in data.nodes) {
-      if (node.node in revs)
-          continue;
-
-      new Revision(node);
+  for each (var nodeObj in data.nodes) {
+      getRevision(nodeObj.node).update(nodeObj);
   }
 
-  doLayout(data.context);
+  if (this.changeContext)
+    gContext = data.context;
+
+  doLayout();
 }
 
 function startContext(hash)
@@ -376,20 +432,29 @@ function startContext(hash)
         $('#node-input')[0].value = context;
     }
 
-    $.ajax({'url': BASEURL + repo + "/jsonfamily?node=" + context,
-            'type': 'GET',
-            'dataType': 'json',
-            error: function(xhr, textStatus) {
-                alert("Request failed: " + textStatus);
-            },
-            success: processContextData
-           });
+    gPendingOptions =
+      {'url': BASEURL + repo + "/index.cgi/jsonfamily?node=" + context,
+       'type': 'GET',
+       'dataType': 'json',
+       error: function(xhr, textStatus) {
+          alert("Request failed: " + textStatus);
+        },
+       success: processContextData,
+       changeContext: true
+      };
+
+    $.ajax(gPendingOptions);
 }
 
-function navTo()
+function navTo(node)
 {
-    $('#node-input')[0].value = this.id.replace('rev', '');
-    setHash();
+  $('#node-input')[0].value = node;
+  gContext = node;
+  if (gPendingOptions)
+    gPendingOptions.changeContext = false;
+
+  doLayout();
+  setHash();
 }
 
 function setHash()
@@ -397,9 +462,42 @@ function setHash()
     $.history.load($('#select-repo')[0].value + ':' + $('#node-input')[0].value)
 }
 
+function doResize()
+{
+  var w = $(window);
+  var c = $('#drawcanvas');
+
+  gWidth = w.width();
+  gHeight = w.height() - $('#topnav').height();
+
+  c.attr('width', gWidth);
+  c.attr('height', gHeight);
+
+  if (gContext)
+    doLayout();
+}
+
+function clickCanvas(e)
+{
+  let o = $(this).offset();
+  let canvasX = e.clientX - o.left;
+  let canvasY = e.clientY - o.top;
+
+  for each (let rev in revs) {
+    if (rev.hittest(canvasX, canvasY)) {
+      navTo(rev.node);
+      break;
+    }
+  }
+}
+
 function init()
 {
-    $('#select-repo').change(setHash);
-    $('#node-choose').click(setHash);
-    $.history.init(startContext);
+  $('#drawcanvas').click(clickCanvas);
+  $('#select-repo').change(setHash);
+  $('#node-choose').click(setHash);
+  $.history.init(startContext);
+
+  $(window).resize(doResize);
+  doResize();
 }

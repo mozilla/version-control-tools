@@ -12,12 +12,12 @@
       overflow: hidden;
     }
     #topnav {
-      position: absolute;
-      width: 100%;
       text-align: right;
       background-color: black;
       color: white;
-      padding: 3px;
+    }
+    #topnav-inside {
+      padding: 2px;
     }
     #select-repo {
       float: left;
@@ -25,74 +25,26 @@
     input, select {
       border: 1px solid #888;
     }
-    #arrows, #inside-scrolling {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-    .revision {
-      position: absolute;
-      border: 1px solid black;
-      padding: 1px;
-      width: 250px;
-      text-align: center;
-      max-height: 250px;
-      visibility: hidden;
-      cursor: pointer;
-    }
-    .arrow {
-      stroke: black;
-      stroke-width: 1.5px;
-      marker-end: url(#arrowhead);
-    }
-    .arrow.ambiguous {
-      stroke-dasharray: 4,4;
+    #drawcanvas {
+      overflow: hidden;
     }
   </style>
-  <script type="text/javascript" src="jquery-1.2.3.js" />
+  <script type="text/javascript;" src="jquery-1.2.3.js" />
   <script type="text/javascript" src="jquery.history.js" />
-  <script type="text/javascript" src="navigate.js" />
+  <script type="application/javascript;version=1.7" src="navigate.js" />
 </head>
 <body onload="init()">
-  <svg id="arrows" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <marker id="arrowhead"
-	      viewBox="0 0 10 10" refX="10" refY="5"
-	      markerUnits="strokeWidth"
-	      markerWidth="6"
-	      markerHeight="4"
-	      orient="auto">
-	<path d="M 0 0 L 10 5 L 0 10 z" />
-      </marker>
-      <line id="arrow-template" class="arrow"
-	    x1="500" y1="350" x2="200" y2="300"
-            visibility="hidden" />
-    </defs>
-    <g id="scroller" transform="translate(0,0)">
-    </g>
-  </svg>
-  <div id="inside-scrolling" />
-
-  <div id="revision-template"
-       class="revision">
-    <div class="node">{Node}</div>
-    <div class="user">{User}</div>
-    <div class="date">{Date}</div>
-    <div class="desc">{Description}</div>
-  </div>
-
-  <div id="topnav">
+  <div id="topnav"><div id="topnav-inside">
     <select id="select-repo">
       <option value="mozilla-central">mozilla-central</option>
-      <option value="mercurial-crew">mercurial-crew</option>
+      <option value="actionmonkey">actionmonkey</option>
     </select>
 
     <input
       type="text" id="node-input" value="tip"
       title="Enter a revision, node ID or tag to navigate to that changeset." />
     <input type="button" value="Go" id="node-choose" />
-  </div>
+  </div></div>
+  <canvas id="drawcanvas"></canvas>
 </body>
 </html>
