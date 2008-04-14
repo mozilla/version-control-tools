@@ -4,8 +4,8 @@ const BASEURL = '/hgwebdir.cgi/%REPO%/';
 const SVGNS = 'http://www.w3.org/2000/svg';
 
 const REVWIDTH = 254;
-const HSPACING = 40;
-const VSPACING = 30;
+const HSPACING = 30;
+const VSPACING = 20;
 const TEXTSTYLE = '12px sans-serif';
 const MISSING = "#900";
 
@@ -275,49 +275,53 @@ function limit(str, len)
 function doLayout()
 {
   let loadMore = [];
-  let bottompositions = [];
+  let leftpositions = [];
   
   function drawChildren(rev, position)
   {
     if (rev.children.length == 0)
       return;
     
-    let totalHeight = (rev.children.length - 1) * VSPACING;
+    let realChildren = 0;
+    let maxHeight = 0;
     
-    for each (child in rev.children) {
-      totalHeight += child.height();
+    for each (let child in rev.children) {
+      if (!child.gc)
+        ++realChildren;
+
+      if (child.height() > maxHeight)
+        maxHeight = child.height();
     }
 
-    totalHeight -= rev.children[0].height() / 2;
-    totalHeight -= rev.children[rev.children.length - 1].height() / 2;
+    let totalWidth = (realChildren - 1) * (REVWIDTH + HSPACING);
   
     let x = rev.x();
     let y = rev.y();
-    x += REVWIDTH + HSPACING;
-    y -= totalHeight / 2;
 
-    if (bottompositions[position]) {
-      let p = bottompositions[position];
-      let miny = p.y() + p.height() / 2 +
-        rev.children[0].height() / 2 + VSPACING;
-      if (y < miny)
-        y = miny;
+    x -= totalWidth / 2;
+    y += (maxHeight + rev.height()) / 2 + VSPACING;
+
+    if (leftpositions[position]) {
+      let p = leftpositions[position];
+      let minx = p.x() + REVWIDTH + HSPACING;
+      if (x < minx)
+        x = minx;
     }
 
-    let rightEdge = gWidth; // XXX won't be true if we introduce scaling
+    let bottom = gHeight;
 
     for each (let child in rev.children) {
       if (!child.gc) {
         child.gc = true;
         child.moveTo(x, y);
-        y += child.height() + VSPACING;
-        if (x < rightEdge) {
+        x += REVWIDTH + HSPACING;
+        if (y < bottom) {
           drawChildren(child, position + 1);
         }
         if (!child.loaded())
           loadMore.push(child);
 
-        bottompositions[position] = child;
+        leftpositions[position] = child;
       }
     }
   }
@@ -327,43 +331,47 @@ function doLayout()
     if (rev.parents.length == 0)
       return;
     
-    let totalHeight = 0;
+    let realParents = 0;
+    let maxHeight = 0;
 
     for each (let parent in rev.parents) {
-      totalHeight += parent.height();
+      if (!parent.gc)
+        ++realParents;
+
+      if (parent.height() > maxHeight)
+        maxHeight = parent.height();
     }
     
-    totalHeight -= rev.parents[0].height() / 2;
-    totalHeight -= rev.parents[rev.parents.length - 1].height() / 2;
+    let totalWidth = (realParents - 1) * (REVWIDTH + HSPACING);
   
     let x = rev.x();
     let y = rev.y();
-    x -= REVWIDTH + HSPACING;
-    y -= totalHeight / 2;
 
-    if (bottompositions[position]) {
-      let p = bottompositions[position];
-      let miny = p.y() + p.height() / 2 +
-        rev.parents[0].height() / 2 + VSPACING;
-      if (y < miny)
-        y = miny;
+    x -= totalWidth / 2;
+    y -= (maxHeight + rev.height()) / 2 + VSPACING; 
+
+    if (leftpositions[position]) {
+      let p = leftpositions[position];
+      let minx = p.x() + REVWIDTH + HSPACING;
+      if (x < minx)
+        x = minx;
     }
     
-    var leftEdge = 0;
+    var top = 0;
     
     for each (let parent in rev.parents) {
       if (!parent.gc) {
         parent.gc = true;
         parent.moveTo(x, y);
-        y += parent.height() + VSPACING;
+        x += REVWIDTH + VSPACING;
         
-        if (x > leftEdge) {
+        if (y > top) {
           drawParents(parent, position - 1);
         }
         if (!parent.loaded())
           loadMore.push(parent);
 
-        bottompositions[position] = parent;
+        leftpositions[position] = parent;
       }
     }
   }  
@@ -481,7 +489,13 @@ function redraw()
 
     /* draw arrow here! */
     cx.save();
+    let rise = y2 - y1;
+    let run = x2 - x1;
+
     let angle = Math.atan((y2 - y1) / (x2 - x1));
+    if (run < 0)
+      angle += Math.PI;
+
     cx.translate(x2, y2);
     cx.rotate(angle);
     cx.beginPath();
@@ -500,16 +514,16 @@ function redraw()
       cx.save();
       let childx, childy;
       if (child.gc) {
-        childx = child.ax() - REVWIDTH / 2;
-        childy = child.ay();
+        childx = child.ax();
+        childy = child.ay() - child.height() / 2;
       }
       else {
         cx.strokeStyle = MISSING;
         cx.fillStyle = MISSING;
-        childx = r.ax() + REVWIDTH / 2 + HSPACING / 2;
-        childy = r.ay();
+        childx = r.ax();
+        childy = r.ay() + r.height() / 2 + VSPACING / 2;
       }
-      drawLine(r.ax() + REVWIDTH / 2, r.ay(),
+      drawLine(r.ax(), r.ay() + r.height() / 2,
                childx, childy);
       cx.restore();
     }
@@ -521,17 +535,17 @@ function redraw()
         cx.save();
         let parentx, parenty;
         if (parent.gc) {
-          parentx = parent.ax() + REVWIDTH / 2;
-          parenty = parent.ay();
+          parentx = parent.ax();
+          parenty = parent.ay() + parent.height() / 2;
         }
         else {
           cx.strokeStyle = MISSING;
           cx.fillStyle = MISSING;
-          parentx = r.ax() - REVWIDTH / 2 - HSPACING / 2;
-          parenty = r.ay();
+          parentx = r.ax();
+          parenty = r.ay() - r.height() / 2 - VSPACING / 2;
         }
         drawLine(parentx, parenty,
-                 r.ax() - REVWIDTH / 2, r.ay());
+                 r.ax(), r.ay() - r.height() / 2);
         cx.restore();
       }
     }
@@ -589,8 +603,13 @@ function startContext(hash)
         $('#node-input')[0].value = context;
     }
 
+    let limit = 2;
+    if (gHeight / 40 > 2) {
+      limit = Math.ceil(gHeight / 40);
+    }
+
     gPendingRequest =
-      {'url': BASEURL.replace('%REPO%', repo) + "jsonfamily?node=" + context,
+      {'url': BASEURL.replace('%REPO%', repo) + "jsonfamily?node=" + context + "&limit=" + limit,
        'type': 'GET',
        'dataType': 'json',
        error: function(xhr, textStatus) {
