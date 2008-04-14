@@ -313,7 +313,7 @@ function doLayout()
     for each (let child in rev.children) {
       if (!child.gc) {
         child.gc = true;
-        child.moveTo(x, y);
+        child.moveTo(x, y, rev);
         x += REVWIDTH + HSPACING;
         if (y < bottom) {
           drawChildren(child, position + 1);
@@ -362,7 +362,7 @@ function doLayout()
     for each (let parent in rev.parents) {
       if (!parent.gc) {
         parent.gc = true;
-        parent.moveTo(x, y);
+        parent.moveTo(x, y, rev);
         x += REVWIDTH + VSPACING;
         
         if (y > top) {
