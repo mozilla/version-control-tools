@@ -7,6 +7,7 @@ const REVWIDTH = 254;
 const HSPACING = 40;
 const VSPACING = 30;
 const TEXTSTYLE = '12px sans-serif';
+const MISSING = "#900";
 
 const ANIMLENGTH = 500; /* milliseconds */
 const ANIMINTERVAL = 75;
@@ -452,7 +453,7 @@ function redraw()
     cx.restore();
 
     if (!r.loaded())
-      cx.fillStyle = "#900";
+      cx.fillStyle = MISSING;
 
     cx.translate(left, top);
     drawText(r.revnode, (REVWIDTH - r.revnodelen) / 2);
@@ -466,36 +467,67 @@ function redraw()
     cx.restore();
   }
 
+  function drawLine(x1, y1, x2, y2)
+  {
+    cx.beginPath();
+    cx.moveTo(x1, y1);
+    cx.lineTo(x2, y2);
+    cx.stroke();
+
+    /* draw arrow here! */
+    cx.save();
+    let angle = Math.atan((y2 - y1) / (x2 - x1));
+    cx.translate(x2, y2);
+    cx.rotate(angle);
+    cx.beginPath();
+    cx.moveTo(-8, -4);
+    cx.lineTo(0, 0);
+    cx.lineTo(-8, 4);
+    cx.fill();
+
+    cx.restore();
+  }
+
   function drawArrows(r)
   {
     /* draw all arrows from this rev */
     for each (let child in r.children) {
-      let childx = r.ax() + 100;
-      let childy = r.ay();
+      cx.save();
+      let childx, childy;
       if (child.gc) {
         childx = child.ax() - REVWIDTH / 2;
         childy = child.ay();
       }
-      cx.beginPath();
-      cx.moveTo(r.ax(), r.ay());
-      cx.lineTo(childx, childy);
-      cx.stroke();
+      else {
+        cx.strokeStyle = MISSING;
+        cx.fillStyle = MISSING;
+        childx = r.ax() + REVWIDTH / 2 + HSPACING / 2;
+        childy = r.ay();
+      }
+      drawLine(r.ax() + REVWIDTH / 2, r.ay(),
+               childx, childy);
+      cx.restore();
     }
 
     /* draw arrows to this revision from nodes which aren't loaded yet,
      and therefore don't have a usable "children" property */
     for each (let parent in r.parents) {
       if (!parent.loaded()) {
-        let parentx = r.ax() - 100;
-        let parenty = r.ay();
+        cx.save();
+        let parentx, parenty;
         if (parent.gc) {
           parentx = parent.ax() + REVWIDTH / 2;
           parenty = parent.ay();
         }
-        cx.beginPath();
-        cx.moveTo(parentx, parenty);
-        cx.lineTo(r.ax(), r.ay());
-        cx.stroke();
+        else {
+          cx.strokeStyle = MISSING;
+          cx.fillStyle = MISSING;
+          parentx = r.ax() - REVWIDTH / 2 - HSPACING / 2;
+          parenty = r.ay();
+        }
+        drawLine(parentx, parenty,
+                 r.ax() - REVWIDTH / 2, r.ay());
+        cx.restore();
       }
     }
   }
