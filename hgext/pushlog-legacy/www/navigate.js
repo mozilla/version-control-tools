@@ -1,6 +1,6 @@
 /* -*- Mode: Java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-const BASEURL = 'http://hg.mozilla.org/';
+const BASEURL = 'http://hg.mozilla.org/%REPO%/index.cgi/';
 const SVGNS = 'http://www.w3.org/2000/svg';
 
 const REVWIDTH = 254;
@@ -8,7 +8,32 @@ const HSPACING = 40;
 const VSPACING = 30;
 const TEXTSTYLE = '12px sans-serif';
 
+const ANIMLENGTH = 500; /* milliseconds */
+
 let gWidth, gHeight, gContext, gPendingRequest;
+let gAnimating = false;
+
+function startAnimating()
+{
+  if (!gAnimating) {
+    gAnimating = true;
+    setInterval(doAnimate, 50);
+  }
+}
+
+function doAnimate()
+{
+  redraw();
+
+  let now = new Date().getTime();
+
+  /* Clear our interval if there's nothing more to animate */
+  for each (let rev in revs) {
+    if (rev._atime != null && rev._atime < now)
+      return;
+  }
+  clearInterval(doAnimate);
+}
 
 function getCX()
 {
@@ -86,8 +111,9 @@ Revision.prototype = {
   children: [],
   _x: null,
   _y: null,
+  gc: false,
 
-  _atime: null,
+  _atime: null, /* the start time of an animation */
   /* constraint: _ax and _ay are meaningless unless _atime is set */
 
   loaded: function r_loaded()
@@ -137,18 +163,34 @@ Revision.prototype = {
   },
 
   /* current animated position */
-  ax: function r_ax() {
-    if (this._atime == null)
-      return this.x();
 
-    return this._ax;
+  /* from 0 to 1, how far are we through the animation? */
+  easing: function r_easing()
+  {
+    let m = (new Date().getTime() - this._atime) / ANIMLENGTH;
+    if (m >= 1) {
+      this._atime = null;
+      return 1;
+    }
+    return m;
+  },
+
+  ax: function r_ax() {
+    let x = this.x();
+    if (this._atime == null)
+      return x;
+
+    let e = this.easing();
+    return x + (this._ax - x) * (1 - e);
   },
 
   ay: function r_ay() {
+    let y = this.y();
     if (this._atime == null)
-      return this.y();
+      return y;
   
-    return this._ay;
+    let e = this.easing();
+    return y + (this._ay - y) * (1 - e);
   },
 
   /* height */
@@ -162,16 +204,34 @@ Revision.prototype = {
 
   /**
    * Move the center of the box to this point
+   * context is optional: it specifies an already positioned revision
+   * which we can animate against if we are not currently positioned.
    */
-  moveTo: function r_move(x, y) {
+  moveTo: function r_move(x, y, context) {
     if (isNaN(x))
       throw Error("x is NaN");
 
     if (isNaN(y))
       throw Error("y is NaN");
 
+    if (this._x += null) {
+      this.animStart(this._x, this._y);
+    }
+    else if (context) {
+      this.animStart(x + context.ax() - context.x(),
+                     y + context.ay() - context.y());
+    }
+
     this._x = x;
     this._y = y;
+  },
+
+  animStart: function r_animStart(x, y)
+  {
+    startAnimating();
+    this._atime = new Date().getTime();
+    this._ax = x;
+    this._ay = y;
   },
 
   shortnode: function r_shortnode()
@@ -228,7 +288,6 @@ function doLayout()
     
     for each (child in rev.children) {
       totalHeight += child.height();
-      child.gc = true;
     }
 
     totalHeight -= rev.children[0].height() / 2;
@@ -254,17 +313,18 @@ function doLayout()
     let rightEdge = gWidth; // XXX won't be true if we introduce scaling
 
     for each (let child in rev.children) {
-      child.moveTo(x, y);
-      y += child.height() + VSPACING;
-  
-      if (x < rightEdge) {
-        drawChildren(child, position + 1);
+      if (!child.gc) {
+        child.gc = true;
+        child.moveTo(x, y);
+        y += child.height() + VSPACING;
+        if (x < rightEdge) {
+          drawChildren(child, position + 1);
+        }
+        if (!child.loaded())
+          loadMore.push(child);
+
+        bottompositions[position] = child;
       }
-
-      if (!child.loaded())
-        loadMore.push(child);
-
-      bottompositions[position] = child;
     }
   }
   
@@ -277,7 +337,6 @@ function doLayout()
 
     for each (let parent in rev.parents) {
       totalHeight += parent.height();
-      parent.gc = true;
     }
     
     totalHeight -= rev.parents[0].height() / 2;
@@ -299,16 +358,19 @@ function doLayout()
     var leftEdge = 0;
     
     for each (let parent in rev.parents) {
-      parent.moveTo(x, y);
-      y += parent.height() + VSPACING;
+      if (!parent.gc) {
+        parent.gc = true;
+        parent.moveTo(x, y);
+        y += parent.height() + VSPACING;
         
-      if (x > leftEdge) {
-        drawParents(parent, position - 1);
-      }
-      if (!parent.loaded())
-        loadMore.push(parent);
+        if (x > leftEdge) {
+          drawParents(parent, position - 1);
+        }
+        if (!parent.loaded())
+          loadMore.push(parent);
 
-      bottompositions[position] = parent;
+        bottompositions[position] = parent;
+      }
     }
   }  
 
@@ -334,12 +396,18 @@ function doLayout()
   
   drawChildren(contextrev, 1);
   drawParents(contextrev, -1);
+
+  for each (let rev in revs) {
+    if (!rev.gc)
+      rev._x = null;
+  }
   
   redraw();
 }
 
 function redraw()
 {
+  try {
   var cx = getCX();
 
   /**
@@ -421,7 +489,10 @@ function redraw()
     if (rev.gc)
       drawRev(rev);
   }
-  return;
+  }
+  catch (e) {
+    alert(e + "\nstack: " + e.stack);
+  }
 }
 
 function processContextData(data)
@@ -452,8 +523,8 @@ function startContext(hash)
         $('#node-input')[0].value = context;
     }
 
-    gPendingOptions =
-      {'url': BASEURL + repo + "/index.cgi/jsonfamily?node=" + context,
+    gPendingRequest =
+      {'url': BASEURL.replace('%REPO%', repo) + "jsonfamily?node=" + context,
        'type': 'GET',
        'dataType': 'json',
        error: function(xhr, textStatus) {
@@ -463,15 +534,15 @@ function startContext(hash)
        changeContext: true
       };
 
-    $.ajax(gPendingOptions);
+    $.ajax(gPendingRequest);
 }
 
 function navTo(node)
 {
   $('#node-input')[0].value = node;
   gContext = node;
-  if (gPendingOptions)
-    gPendingOptions.changeContext = false;
+  if (gPendingRequest)
+    gPendingRequest.changeContext = false;
 
   doLayout();
   setHash();
