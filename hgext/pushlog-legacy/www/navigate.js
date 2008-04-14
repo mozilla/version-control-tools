@@ -484,27 +484,18 @@ function redraw()
   {
     cx.beginPath();
     cx.moveTo(x1, y1);
-    cx.lineTo(x2, y2);
+    cx.bezierCurveTo(x1, y1 + VSPACING / 2,
+                     x2, y2 - VSPACING,
+                     x2, y2);
     cx.stroke();
 
     /* draw arrow here! */
-    cx.save();
-    let rise = y2 - y1;
-    let run = x2 - x1;
 
-    let angle = Math.atan((y2 - y1) / (x2 - x1));
-    if (run < 0)
-      angle += Math.PI;
-
-    cx.translate(x2, y2);
-    cx.rotate(angle);
     cx.beginPath();
-    cx.moveTo(-8, -4);
-    cx.lineTo(0, 0);
-    cx.lineTo(-8, 4);
+    cx.moveTo(x2 + 4, y2 - 4);
+    cx.lineTo(x2 - 4, y2 - 4);
+    cx.lineTo(x2, y2);
     cx.fill();
-
-    cx.restore();
   }
 
   function drawArrows(r)
