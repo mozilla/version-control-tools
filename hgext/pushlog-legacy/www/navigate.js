@@ -1,6 +1,6 @@
 /* -*- Mode: Java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-const BASEURL = 'http://hg.mozilla.org/%REPO%/index.cgi/';
+const BASEURL = '/hgwebdir.cgi/%REPO%/';
 const SVGNS = 'http://www.w3.org/2000/svg';
 
 const REVWIDTH = 254;
@@ -9,6 +9,7 @@ const VSPACING = 30;
 const TEXTSTYLE = '12px sans-serif';
 
 const ANIMLENGTH = 500; /* milliseconds */
+const ANIMINTERVAL = 75;
 
 let gWidth, gHeight, gContext, gPendingRequest;
 let gAnimating = false;
@@ -17,7 +18,7 @@ function startAnimating()
 {
   if (!gAnimating) {
     gAnimating = true;
-    setInterval(doAnimate, 50);
+    setTimeout(doAnimate, ANIMINTERVAL);
   }
 }
 
@@ -29,10 +30,12 @@ function doAnimate()
 
   /* Clear our interval if there's nothing more to animate */
   for each (let rev in revs) {
-    if (rev._atime != null && rev._atime < now)
+    if (rev._atime != null && rev._atime + ANIMLENGTH > now) {
+      setTimeout(doAnimate, ANIMINTERVAL);
       return;
+    }
   }
-  clearInterval(doAnimate);
+  gAnimating = false;
 }
 
 function getCX()
@@ -306,10 +309,6 @@ function doLayout()
         y = miny;
     }
 
-    if (isNaN(y)) {
-      throw ("y is NaN");
-    }
-    
     let rightEdge = gWidth; // XXX won't be true if we introduce scaling
 
     for each (let child in rev.children) {
@@ -407,7 +406,6 @@ function doLayout()
 
 function redraw()
 {
-  try {
   var cx = getCX();
 
   /**
@@ -488,10 +486,6 @@ function redraw()
   for each (let rev in revs) {
     if (rev.gc)
       drawRev(rev);
-  }
-  }
-  catch (e) {
-    alert(e + "\nstack: " + e.stack);
   }
 }
 
