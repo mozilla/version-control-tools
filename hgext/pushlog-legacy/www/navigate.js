@@ -448,7 +448,12 @@ function redraw()
     cx.clip();
 
     cx.save();
-    cx.fillStyle = "white";
+    if (gContext == r.node) {
+      cx.fillStyle = "#FFE";
+    }
+    else {
+      cx.fillStyle = "white";
+    }
     cx.fill();
     cx.restore();
 
