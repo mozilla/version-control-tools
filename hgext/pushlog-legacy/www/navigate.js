@@ -402,6 +402,22 @@ function doLayout()
   }
   
   redraw();
+
+  if (loadMore.length) {
+    /* Load the unloaded nodes */
+    let repo = $('#select-repo')[0].value;
+    $.ajax(
+      {'url': BASEURL.replace('%REPO%', repo) + "jsoninfo?" +
+                ["node=" + rev.node for each (rev in loadMore)].join('&'),
+       'type': 'GET',
+       'dataType': 'json',
+       error: function(xhr, textStatus) {
+         alert("Request failed: " + textStatus + "\nurl: " + this.url);
+       },
+       success: processInfoData,
+      }
+    );
+  }
 }
 
 function redraw()
@@ -492,12 +508,20 @@ function redraw()
 function processContextData(data)
 {
   for each (var nodeObj in data.nodes) {
-      getRevision(nodeObj.node).update(nodeObj);
+    getRevision(nodeObj.node).update(nodeObj);
   }
 
   if (this.changeContext)
     gContext = data.context;
 
+  doLayout();
+}
+
+function processInfoData(data)
+{
+  for each (var infoNode in data) {
+    getRevision(infoNode.node).update(infoNode);
+  }
   doLayout();
 }
 
