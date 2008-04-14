@@ -115,3 +115,16 @@ def family(web, req):
     req.write(resp)
 
 addwebcommand(family, 'jsonfamily')    
+
+def info(web, req):
+    """Get JSON information about the specified nodes."""
+    e = HGJSONEncoder(web.repo)
+    d = {}
+    for node in req.form['node']:
+        d[node] = web.repo.changectx(node)
+
+    resp = e.encode(d)
+    req.respond(HTTP_OK, JSON_MIMETYPE, length=len(resp))
+    req.write(resp)
+
+addwebcommand(info, 'jsoninfo')
