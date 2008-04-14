@@ -84,7 +84,8 @@ function Revision(node)
 Revision.prototype = {
   parents: [],
   children: [],
-  _position: null,
+  _x: null,
+  _y: null,
 
   loaded: function r_loaded()
   {
@@ -119,17 +120,17 @@ Revision.prototype = {
 
   /* x and y are the center of the revision */
   x: function r_x() {
-    if (!this._position)
+    if (this._x == null)
       throw Error("Revision " + this.node + " is not positioned.");
 
-    return this._position.x;
+    return this._x;
   },
 
   y: function r_y() {
-    if (!this._position)
+    if (this._y == null)
       throw Error("Revision " + this.node + " is not positioned.");
 
-    return this._position.y;
+    return this._y;
   },
 
   /* height */
@@ -151,7 +152,8 @@ Revision.prototype = {
     if (isNaN(y))
       throw Error("y is NaN");
 
-    this._position = {'x': x, 'y': y};
+    this._x = x;
+    this._y = y;
   },
 
   shortnode: function r_shortnode()
@@ -181,7 +183,7 @@ Revision.prototype = {
   {
     return "Revision:" +
     "\nnode: " + this.node +
-    "\nposition: " + uneval(this._position) +
+    "\nposition: " + this._x + ", " + this._y +
     "\ndescSplit: " + uneval(this.descSplit);
   }
 };
