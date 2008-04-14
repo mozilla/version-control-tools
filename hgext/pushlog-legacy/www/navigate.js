@@ -84,12 +84,6 @@ function splitText(t, cx)
 
 /**
  * map from long node strings to Revision objects
- * The following mappings are added to the JSON:
- *   .element from the node to the element
- *   .parentArrows is a map of arrows pointing to this element, keyed on
- *                 parent node
- *   .childArrows  is a map of arrows pointing from this element, keyed on
- *                 child node
  */
 
 var revs = {};
@@ -486,6 +480,23 @@ function redraw()
       cx.moveTo(r.ax(), r.ay());
       cx.lineTo(childx, childy);
       cx.stroke();
+    }
+
+    /* draw arrows to this revision from nodes which aren't loaded yet,
+     and therefore don't have a usable "children" property */
+    for each (let parent in r.parents) {
+      if (!parent.loaded()) {
+        let parentx = r.ax() - 100;
+        let parenty = r.ay();
+        if (parent.gc) {
+          parentx = parent.ax() + REVWIDTH / 2;
+          parenty = parent.ay();
+        }
+        cx.beginPath();
+        cx.moveTo(parentx, parenty);
+        cx.lineTo(r.ax(), r.ay());
+        cx.stroke();
+      }
     }
   }
 
