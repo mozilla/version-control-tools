@@ -87,6 +87,9 @@ Revision.prototype = {
   _x: null,
   _y: null,
 
+  _atime: null,
+  /* constraint: _ax and _ay are meaningless unless _atime is set */
+
   loaded: function r_loaded()
   {
     return 'rev' in this;
@@ -131,6 +134,21 @@ Revision.prototype = {
       throw Error("Revision " + this.node + " is not positioned.");
 
     return this._y;
+  },
+
+  /* current animated position */
+  ax: function r_ax() {
+    if (this._atime == null)
+      return this.x();
+
+    return this._ax;
+  },
+
+  ay: function r_ay() {
+    if (this._atime == null)
+      return this.y();
+  
+    return this._ay;
   },
 
   /* height */
@@ -342,8 +360,8 @@ function redraw()
   function drawRev(r)
   {
     let h = r.height();
-    let left = r.x() - REVWIDTH / 2;
-    let top = r.y() - h / 2;
+    let left = r.ax() - REVWIDTH / 2;
+    let top = r.ay() - h / 2;
 
     cx.save();
     // clip the text to the box
@@ -376,14 +394,14 @@ function redraw()
   {
     /* draw all arrows from this rev */
     for each (let child in r.children) {
-      let childx = r.x() + 100;
-      let childy = r.y();
+      let childx = r.ax() + 100;
+      let childy = r.ay();
       if (child.gc) {
-        childx = child.x() - REVWIDTH / 2;
-        childy = child.y();
+        childx = child.ax() - REVWIDTH / 2;
+        childy = child.ay();
       }
       cx.beginPath();
-      cx.moveTo(r.x(), r.y());
+      cx.moveTo(r.ax(), r.ay());
       cx.lineTo(childx, childy);
       cx.stroke();
     }
