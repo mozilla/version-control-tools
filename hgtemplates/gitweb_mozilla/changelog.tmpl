@@ -4,11 +4,23 @@
    href="{url}atom-log" title="Atom feed for #repo|escape#"/>
 <link rel="alternate" type="application/rss+xml"
    href="{url}rss-log" title="RSS feed for #repo|escape#"/>
+
+<style type="text/css">
+div.log_link {
+  width: 80px;
+  background-color: white;
+}
+
+div.log_body {
+  padding-left: 96px;
+}
+</style>
+
 </head>
 <body>
 
 <div class="page_header">
-<a href="http://www.selenic.com/mercurial/" title="Mercurial" style="float: right;">Mercurial</a><a href="{url}summary{sessionvars%urlparameter}">#repo|escape#</a> / changelog
+<a href="http://developer.mozilla.org/en/docs/Mercurial" title="Mercurial" style="float: right;">Mercurial</a><a href="{url}summary{sessionvars%urlparameter}">#repo|escape#</a> - changelog
 </div>
 
 <form action="{url}log">

@@ -8,7 +8,8 @@
 <body>
 
 <div class="page_header">
-<a href="http://www.selenic.com/mercurial/" title="Mercurial" style="float: right;">Mercurial</a><a href="{url}summary{sessionvars%urlparameter}">#repo|escape#</a> / summary
+<a href="http://developer.mozilla.org/en/docs/Mercurial" title="Mercurial" style="float: right;">Mercurial</a>
+<a href="{url}summary{sessionvars%urlparameter}">#repo|escape#</a> - summary
 
 <form action="{url}log">
 {sessionvars%hiddenformentry}
@@ -29,8 +30,8 @@ summary |
 
 <div class="title">&nbsp;</div>
 <table cellspacing="0">
-<tr><td>description</td><td>#desc#</td></tr>
-<tr><td>owner</td><td>#owner|obfuscate#</td></tr>
+<!--<tr><td>description</td><td>#desc#</td></tr>
+<tr><td>owner</td><td>#owner|obfuscate#</td></tr>-->
 <tr><td>last change</td><td>#lastchange|rfc822date#</td></tr>
 </table>
 

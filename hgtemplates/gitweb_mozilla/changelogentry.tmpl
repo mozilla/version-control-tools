@@ -1,11 +1,12 @@
-<div>
-<a class="title" href="{url}rev/#node|short#{sessionvars%urlparameter}"><span class="age">at #date|date#</span>#desc|strip|firstline|escape#<span class="logtags"> {inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}</span></a>
+<div class="title">
+#node|short#: #desc|strip|firstline|escape#<span class="logtags"> {inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}</span>
 </div>
 <div class="title_text">
 <div class="log_link">
-<a href="{url}rev/#node|short#{sessionvars%urlparameter}">changeset</a><br/>
+<a href="{url}rev/#node|short#{sessionvars%urlparameter}">diff</a><br/>
+<a href="{url}file/#node|short#{sessionvars%urlparameter}">browse</a>
 </div>
-<i>#author|obfuscate# [#date|rfc822date#] rev #rev#</i><br/>
+<cite>#author|obfuscate#</cite> - #date|rfc822date# - rev #rev#<br/>
 </div>
 <div class="log_body">
 #desc|strip|escape|addbreaks#
