@@ -1,3 +1,0 @@
-#!/bin/sh
-
-printf "\"%s\"\t\"%s\"\t\"%s\"\n" "$(hg log --template '{node}' -r tip)" "$USER" "$(date -R)" >> .hg/pushlog

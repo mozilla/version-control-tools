@@ -4,4 +4,4 @@
 
 [hooks]
 pretxnchangegroup.a_singlehead = hg_require_single_head
-pretxnchangegroup.z_linearhistory = hg_record_changeset_info
+pretxnchangegroup.z_linearhistory = python:mozhghooks.pushlog.log
