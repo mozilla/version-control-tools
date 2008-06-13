@@ -5,7 +5,11 @@ from mercurial.node import short, bin
 import os.path
 import re
 import time
-import sqlite3 as sqlite
+
+try:
+    import sqlite3 as sqlite
+except ImportError:
+    from pysqlite2 import dbapi2 as sqlite
 
 def addwebcommand(f, name):
     setattr(hgwebprotocol, name, f)
