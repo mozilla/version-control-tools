@@ -1,4 +1,8 @@
-import sqlite3 as sqlite
+try:
+    import sqlite3 as sqlite
+except ImportError:
+    from pysqlite2 import dbapi2 as sqlite
+
 import sys
 import os.path
 import re

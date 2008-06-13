@@ -4,7 +4,11 @@
 # run `python setup.py install` to install the module in the proper place,
 # and then modify the repository's hgrc as per example-hgrc.
 
-import sqlite3 as sqlite
+try:
+    import sqlite3 as sqlite
+except ImportError:
+    from pysqlite2 import dbapi2 as sqlite
+
 from datetime import datetime
 import os
 import os.path
