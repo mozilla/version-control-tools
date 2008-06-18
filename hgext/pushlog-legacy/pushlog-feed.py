@@ -2,14 +2,17 @@ import mercurial.hgweb.protocol as hgwebprotocol
 from mercurial.templatefilters import xmlescape
 from mercurial.hgweb.common import HTTP_OK, HTTP_NOT_FOUND, HTTP_SERVER_ERROR
 from mercurial.node import short, bin
+from mercurial import demandimport
 import os.path
 import re
 import time
 
+demandimport.disable()
 try:
     import sqlite3 as sqlite
 except ImportError:
     from pysqlite2 import dbapi2 as sqlite
+demandimport.enable()
 
 def addwebcommand(f, name):
     setattr(hgwebprotocol, name, f)
