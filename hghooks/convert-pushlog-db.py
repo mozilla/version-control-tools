@@ -22,9 +22,10 @@ pushlog = os.path.abspath(pushlog)
 pushdb = pushlog + ".db"
 
 conn = sqlite.connect(pushdb)
-conn.execute("CREATE TABLE pushlog (node text, user text, date text)")
-conn.execute("CREATE INDEX pushlog_date ON pushlog (date)")
-conn.execute("CREATE INDEX pushlog_user ON pushlog (user)")
+conn.execute("CREATE TABLE IF NOT EXISTS pushlog (node text, user text, date text)")
+conn.execute("CREATE INDEX IF NOT EXISTS pushlog_date ON pushlog (date)")
+conn.execute("CREATE INDEX IF NOT EXISTS pushlog_user ON pushlog (user)")
+conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS pushlog_node ON pushlog (node)")
 
 reader = re.compile(r'^"([a-f0-9]{40})"\t"([^\t]*)"\t"([^\t]*)"$')
 
@@ -41,6 +42,7 @@ def readlog(logfile):
     return entries
 
 entries = readlog(pushlog)
-conn.executemany("INSERT INTO pushlog (node, user, date) values(?,?,?)",
+# ignore duplicate entries
+conn.executemany("INSERT OR IGNORE INTO pushlog (node, user, date) values(?,?,?)",
                  entries)
 conn.commit()
