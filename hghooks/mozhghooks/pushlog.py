@@ -4,10 +4,14 @@
 # run `python setup.py install` to install the module in the proper place,
 # and then modify the repository's hgrc as per example-hgrc.
 
+from mercurial import demandimport
+
+demandimport.disable()
 try:
     import sqlite3 as sqlite
 except ImportError:
     from pysqlite2 import dbapi2 as sqlite
+demandimport.enable()
 
 from datetime import datetime
 import os
