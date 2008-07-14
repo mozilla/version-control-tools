@@ -13,25 +13,37 @@ except ImportError:
     from pysqlite2 import dbapi2 as sqlite
 demandimport.enable()
 
-from datetime import datetime
+import time
 import os
 import os.path
+from mercurial.node import hex
 
 def createpushdb(conn):
-    conn.execute("CREATE TABLE pushlog (node text, user text, date text)")
-    conn.execute("CREATE INDEX pushlog_date ON pushlog (date)")
-    conn.execute("CREATE INDEX pushlog_user ON pushlog (user)")
+    conn.execute("CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)")
+    conn.execute("CREATE TABLE IF NOT EXISTS pushlog (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, date INTEGER)")
+    conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS changeset_node ON changesets (node)")
+    conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS changeset_rev ON changesets (rev)")
+    conn.execute("CREATE INDEX IF NOT EXISTS pushlog_date ON pushlog (date)")
+    conn.execute("CREATE INDEX IF NOT EXISTS pushlog_user ON pushlog (user)")
     conn.commit()
 
 def log(ui, repo, node, **kwargs):
-    pushdb = os.path.join(repo.path, 'pushlog.db')
+    pushdb = os.path.join(repo.path, 'pushlog2.db')
     createdb = False
     if not os.path.exists(pushdb):
         createdb = True
     conn = sqlite.connect(pushdb)
     if createdb:
         createpushdb(conn)
-    d = datetime.utcnow().replace(microsecond=0)
-    conn.execute("INSERT INTO pushlog (node, user, date) values(?,?,?)",
-                 (node, os.environ['USER'], d.isoformat()+"Z"))
+    t = int(time.time())
+    res = conn.execute("INSERT INTO pushlog (user, date) values(?,?)",
+                       (os.environ['USER'], t))
+    pushid = res.lastrowid
+    # all changesets from node to 'tip' inclusive are part of this push
+    rev = repo.changectx(node).rev()
+    tip = repo.changectx('tip').rev()
+    for i in range(rev, tip+1):
+        ctx = repo.changectx(i)
+        conn.execute("INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
+                     (pushid, ctx.rev(), hex(ctx.node())))
     conn.commit()
