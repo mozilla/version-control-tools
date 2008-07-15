@@ -76,7 +76,7 @@ hg push -R $CLONE $REPO
 
 # finally two more together
 echo "checkin 9" >> $CLONE/testfile
-hg ci -R $CLONE -m "checkin 6"
+hg ci -R $CLONE -m "checkin 9"
 
 echo "checkin 10" >> $CLONE/testfile
 hg ci -R $CLONE -m "checkin 10"
