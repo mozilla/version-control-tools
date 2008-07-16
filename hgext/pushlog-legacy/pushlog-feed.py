@@ -1,3 +1,4 @@
+import mercurial.hgweb.protocol as hgwebprotocol
 import mercurial.hgweb.webcommands as hgwebcommands
 from mercurial.templatefilters import xmlescape
 from mercurial.hgweb.common import HTTP_OK, HTTP_NOT_FOUND, HTTP_SERVER_ERROR, paritygen
@@ -17,6 +18,10 @@ except ImportError:
 demandimport.enable()
 
 PUSHES_PER_PAGE = 10
+
+def addcommand(f, name):
+    setattr(hgwebprotocol, name, f)
+    hgwebprotocol.__all__.append(name)
 
 def addwebcommand(f, name):
     setattr(hgwebcommands, name, f)
@@ -68,7 +73,7 @@ def pushlogSetup(web, req):
     urlbase = '%s://%s%s' % (proto, req.env['SERVER_NAME'], port)
     return (e, urlbase, reponame, total, start)
     
-def pushlogFeed(web, req, tmpl):
+def pushlogFeed(web, req):
     (e, urlbase, reponame, total, page) = pushlogSetup(web, req)
 
     resp = ["""<?xml version="1.0" encoding="UTF-8"?>
@@ -187,7 +192,7 @@ def pushlogHTML(web, req, tmpl):
                 archives=web.archivelist("tip"))
 
 
-addwebcommand(pushlogFeed, 'pushlog')
+addcommand(pushlogFeed, 'pushlog')
 addwebcommand(pushlogHTML, 'pushloghtml')
 
 cmdtable = {}
