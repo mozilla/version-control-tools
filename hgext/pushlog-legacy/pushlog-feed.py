@@ -58,6 +58,7 @@ def pushlogSetup(web, req):
         start = int(req.form['node'][0])
     else:
         start = 0
+
     e = getpushlogentries(conn, start * PUSHES_PER_PAGE, 10)
     total = gettotalpushlogentries(conn)
     proto = req.env.get('wsgi.url_scheme')
@@ -152,29 +153,30 @@ def pushlogHTML(web, req, tmpl):
     def changelist(limit=0, **map):
         allentries = []
         lastid = None
-        lastparity = 0
+        ch = None
         l = []
         for id, user, date, node in entries:
-            ctx = web.repo.changectx(node)
-            if id == lastid:
-                p = lastparity
-            else:
-                p = parity.next()
-                lastparity = p
+            if id != lastid:
                 lastid = id
+                l.append({"parity": parity.next(),
+                          "user": user,
+                          "date": (date, 0),
+                          'numchanges': 0,
+                          "changes": []})
+                ch = l[-1]['changes']
+            ctx = web.repo.changectx(node)
             n = ctx.node()
-            l.append({"parity": p,
-                      "author": user,
-                      "desc": ctx.description(),
-                      "date": (date, 0),
-                      "files": web.listfilediffs(tmpl, ctx.files(), n),
-                      "rev": ctx.rev(),
-                      "node": hex(n),
-                      "tags": nodetagsdict(web.repo, n),
-                      "branches": nodebranchdict(web.repo, ctx),
-                      "inbranch": nodeinbranch(web.repo, ctx)
-                      })
-
+            ch.append({"author": ctx.user(),
+                       "desc": ctx.description(),
+                       "files": web.listfilediffs(tmpl, ctx.files(), n),
+                       "rev": ctx.rev(),
+                       "node": hex(n),
+                       "tags": nodetagsdict(web.repo, n),
+                       "branches": nodebranchdict(web.repo, ctx),
+                       "inbranch": nodeinbranch(web.repo, ctx),
+                       "parity": l[-1]["parity"]
+                       })
+            l[-1]['numchanges'] += 1
 
         if limit > 0:
             l = l[:limit]
