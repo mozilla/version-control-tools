@@ -16,6 +16,7 @@ demandimport.enable()
 import time
 import os
 import os.path
+import stat
 from mercurial.node import hex
 
 def createpushdb(conn):
@@ -35,6 +36,8 @@ def log(ui, repo, node, **kwargs):
     conn = sqlite.connect(pushdb)
     if createdb:
         createpushdb(conn)
+        st = os.stat(pushdb)
+        os.chmod(pushdb, st.st_mode | stat.S_IWGRP)
     t = int(time.time())
     res = conn.execute("INSERT INTO pushlog (user, date) values(?,?)",
                        (os.environ['USER'], t))

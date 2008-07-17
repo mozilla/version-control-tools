@@ -66,4 +66,11 @@ else
     exit 1;
 fi
 
+if [[ `stat -f %Sp $REPO/.hg/pushlog2.db | sed -e "s/^....\(..\).*$/\1/"` != "rw" ]]; then
+    echo "FAIL: pushlog db is not group writeable!"
+    exit 1;
+else
+    echo "PASS: pushlog db is group writeable!"
+fi
+
 echo "Passed all tests!"
