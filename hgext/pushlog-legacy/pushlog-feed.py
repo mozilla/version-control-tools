@@ -56,11 +56,11 @@ def pushlogSetup(web, req):
     conn = sqlite.connect(pushdb)
 
     if 'node' in req.form:
-        start = int(req.form['node'][0])
+        page = int(req.form['node'][0])
     else:
-        start = 0
+        page = 1
 
-    e = getpushlogentries(conn, start * PUSHES_PER_PAGE, 10)
+    e = getpushlogentries(conn, (page - 1) * PUSHES_PER_PAGE, 10)
     total = gettotalpushlogentries(conn)
     proto = req.env.get('wsgi.url_scheme')
     if proto == 'https':
@@ -73,7 +73,7 @@ def pushlogSetup(web, req):
     port = port != default_port and (":" + port) or ""
 
     urlbase = '%s://%s%s' % (proto, req.env['SERVER_NAME'], port)
-    return (e, urlbase, reponame, total, start)
+    return (e, urlbase, reponame, total, page)
     
 def pushlogFeed(web, req):
     (e, urlbase, reponame, total, page) = pushlogSetup(web, req)
@@ -138,17 +138,17 @@ def pushlogHTML(web, req, tmpl):
     def changenav():
         nav = []
         numpages = int(ceil(total / float(PUSHES_PER_PAGE)))
-        start = max(0, page - PUSHES_PER_PAGE/2)
-        end = min(numpages, page + PUSHES_PER_PAGE/2)
-        if page != 0:
-            nav.append({'page': 0, 'label': "First"})
+        start = max(1, page - PUSHES_PER_PAGE/2)
+        end = min(numpages + 1, page + PUSHES_PER_PAGE/2)
+        if page != 1:
+            nav.append({'page': 1, 'label': "First"})
             nav.append({'page': page - 1, 'label': "Prev"})
         for i in range(start, end):
-            nav.append({'page': i, 'label': str(i+1)})
+            nav.append({'page': i, 'label': str(i)})
         
-        if page != numpages - 1:
+        if page != numpages:
             nav.append({'page': page + 1, 'label': "Next"})
-            nav.append({'page': numpages - 1, 'label': "Last"})
+            nav.append({'page': numpages, 'label': "Last"})
         return nav
     
     def localdate(ts):
