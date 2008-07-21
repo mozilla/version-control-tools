@@ -7,6 +7,7 @@ from mercurial import demandimport
 
 import sys, os.path, re
 from datetime import datetime
+import time
 from math import ceil
 import sys
 
@@ -150,6 +151,13 @@ def pushlogHTML(web, req, tmpl):
             nav.append({'page': numpages - 1, 'label': "Last"})
         return nav
     
+    def localdate(ts):
+        t = time.localtime(ts)
+        offset = time.timezone
+        if t[8] == 1:
+            offset = time.altzone
+        return (ts, offset)
+
     def changelist(limit=0, **map):
         allentries = []
         lastid = None
@@ -160,7 +168,7 @@ def pushlogHTML(web, req, tmpl):
                 lastid = id
                 l.append({"parity": parity.next(),
                           "user": user,
-                          "date": (date, 0),
+                          "date": localdate(date),
                           'numchanges': 0,
                           "changes": []})
                 ch = l[-1]['changes']
