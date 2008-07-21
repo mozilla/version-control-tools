@@ -1,5 +1,6 @@
 #!/bin/sh
 # This script tests the pushlog hook. I've only run it on OS X, so be warned.
+# This is mostly just to generate a repo for testing the pushlog web output.
 
 export PYTHONPATH=`dirname $0`
 
@@ -21,33 +22,20 @@ EOF
 # now clone it, then commit and push some things
 hg clone $REPO $CLONE
 
-# push two changes together first
+# push lots of changes
 echo "checkin 1" > $CLONE/testfile
 hg add -R $CLONE $CLONE/testfile
 hg ci -R $CLONE -m "checkin 1"
+hg push -R $CLONE $REPO;
 
-echo "checkin 2" >> $CLONE/testfile
-hg ci -R $CLONE -m "checkin 2"
-hg push -R $CLONE $REPO
-
-# then one separately
-echo "checkin 3" >> $CLONE/testfile
-hg ci -R $CLONE -m "checkin 3"
-hg push -R $CLONE $REPO
-
-# then three together
-echo "checkin 4" >> $CLONE/testfile
-hg ci -R $CLONE -m "checkin 4"
-
-echo "checkin 5" >> $CLONE/testfile
-hg ci -R $CLONE -m "checkin 5"
-
-echo "checkin 6" >> $CLONE/testfile
-hg ci -R $CLONE -m "checkin 6"
-hg push -R $CLONE $REPO
+for ((i=2; $i<=50; i++)); do
+  echo "checkin $i" >> $CLONE/testfile;
+  hg ci -R $CLONE -m "checkin $i";
+  hg push -R $CLONE $REPO;
+done
 
 # Test total push count
-EXPECTED_PUSHCOUNT=3
+EXPECTED_PUSHCOUNT=50
 PUSHCOUNT=`echo "SELECT COUNT(*) FROM pushlog;" | sqlite3 $REPO/.hg/pushlog2.db`
 if [[ "$PUSHCOUNT" != "$EXPECTED_PUSHCOUNT" ]]; then
     echo "FAIL: push count $PUSHCOUNT != $EXPECTED_PUSHCOUNT";
@@ -65,13 +53,6 @@ if diff /tmp/hg-log-output /tmp/pushlog-output >/dev/null; then
 else
     echo "FAIL: hg log and pushlog changesets differ!";
     exit 1;
-fi
-
-if [[ `stat -f %Sp $REPO/.hg/pushlog2.db | sed -e "s/^....\(..\).*$/\1/"` != "rw" ]]; then
-    echo "FAIL: pushlog db is not group writeable!"
-    exit 1;
-else
-    echo "PASS: pushlog db is group writeable!"
 fi
 
 echo "Passed all tests!"
