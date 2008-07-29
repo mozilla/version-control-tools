@@ -6,7 +6,7 @@
 import re
 from mercurial import templatefilters
 
-bugzilla = r'<a href="https://bugzilla.mozilla.org/show_bug.cgi=\2">\1</a>'
+bugzilla = r'<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1</a>'
 bug_re = re.compile(r'((?:bug|b=|(?=#?\d{4,}))(?:\s*#?)(\d+))', re.I)
 
 def buglink(x):
