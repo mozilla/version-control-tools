@@ -35,25 +35,34 @@ def addwebcommand(f, name):
 
 ATOM_MIMETYPE = 'application/atom+xml'
 
-def getpushlogentries(conn, start, count):
+def getpushlogentries(conn, start, count, tipsonly):
     """Get entries from the push log. Select |count| pushes starting at offset
     |start|, in reverse chronological order, and then return all changes
     pushed in these pushes. Returns a list of tuples of
-    (pushid, user, date, node)."""
+    (pushid, user, date, node). If |tipsonly| is True, return only the tip
+    changeset from each push."""
     entries = []
     res = conn.execute("SELECT id, user, date FROM pushlog ORDER BY date DESC LIMIT ? OFFSET ?", (count,start))
     for (id,user,date) in res:
-        res2 = conn.execute("SELECT node FROM changesets WHERE pushid = ? ORDER BY rev DESC", (id,))
+        limit = ""
+        if tipsonly:
+            limit = " LIMIT 1"
+        res2 = conn.execute("SELECT node FROM changesets WHERE pushid = ? ORDER BY rev DESC" + limit, (id,))
         for node, in res2:
             entries.append((id,user,date,node))
     return entries
 
-def getpushlogentriesbydate(conn, startdate, enddate):
-    """Get entries in the push log in a date range."""
+def getpushlogentriesbydate(conn, startdate, enddate, tipsonly):
+    """Get entries in the push log in a date range. If |tipsonly| is True,
+    return only the tip changeset from each push."""
     entries = []
     res = conn.execute("SELECT id, user, date, node FROM pushlog LEFT JOIN changesets ON id = pushid WHERE date > ? AND date < ? ORDER BY date DESC, rev DESC", (startdate, enddate))
+    lastid = None
     for (id, user, date, node) in res:
+        if tipsonly and id == lastid:
+            continue
         entries.append((id,user,date,node))
+        lastid = id
     return entries
 
 def gettotalpushlogentries(conn):
@@ -87,17 +96,19 @@ def pushlogSetup(web, req):
     else:
         page = 1
 
+    tipsonly = False
+    if 'tipsonly' in req.form and req.form['tipsonly'][0] == '1':
+        tipsonly = True
     dates = []
     if 'startdate' in req.form and 'enddate' in req.form:
         startdate = doParseDate(req.form['startdate'][0])
         enddate = doParseDate(req.form['enddate'][0])
-        print "startdate, enddate: %d, %d" % (startdate, enddate)
         dates = [{'startdate':localdate(startdate), 'enddate':localdate(enddate)}]
         page = 1
         total = 1
-        e = getpushlogentriesbydate(conn, startdate, enddate)
+        e = getpushlogentriesbydate(conn, startdate, enddate, tipsonly)
     else:
-        e = getpushlogentries(conn, (page - 1) * PUSHES_PER_PAGE, 10)
+        e = getpushlogentries(conn, (page - 1) * PUSHES_PER_PAGE, 10, tipsonly)
         total = gettotalpushlogentries(conn)
     proto = req.env.get('wsgi.url_scheme')
     if proto == 'https':
