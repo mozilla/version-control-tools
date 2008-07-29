@@ -11,13 +11,18 @@ import time
 from math import ceil
 import sys
 
+sys.path.append(os.path.dirname(__file__))
+
 demandimport.disable()
+from parsedatetime import parsedatetime as pdt
+
 try:
     import sqlite3 as sqlite
 except ImportError:
     from pysqlite2 import dbapi2 as sqlite
 demandimport.enable()
 
+cal = pdt.Calendar()
 PUSHES_PER_PAGE = 10
 
 def addcommand(f, name):
@@ -43,9 +48,31 @@ def getpushlogentries(conn, start, count):
             entries.append((id,user,date,node))
     return entries
 
+def getpushlogentriesbydate(conn, startdate, enddate):
+    """Get entries in the push log in a date range."""
+    entries = []
+    res = conn.execute("SELECT id, user, date, node FROM pushlog LEFT JOIN changesets ON id = pushid WHERE date > ? AND date < ? ORDER BY date DESC, rev DESC", (startdate, enddate))
+    for (id, user, date, node) in res:
+        entries.append((id,user,date,node))
+    return entries
+
 def gettotalpushlogentries(conn):
     """Return the total number of pushes logged in the pushlog."""
     return conn.execute("SELECT COUNT(*) FROM pushlog").fetchone()[0]
+
+def localdate(ts):
+    t = time.localtime(ts)
+    offset = time.timezone
+    if t[8] == 1:
+        offset = time.altzone
+    return (ts, offset)
+
+def doParseDate(datestring):
+    try:
+        date = time.strptime(datestring, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        date, x = cal.parse(datestring)
+    return time.mktime(date)
 
 def pushlogSetup(web, req):
     repopath = os.path.dirname(web.repo.path)
@@ -60,8 +87,18 @@ def pushlogSetup(web, req):
     else:
         page = 1
 
-    e = getpushlogentries(conn, (page - 1) * PUSHES_PER_PAGE, 10)
-    total = gettotalpushlogentries(conn)
+    dates = []
+    if 'startdate' in req.form and 'enddate' in req.form:
+        startdate = doParseDate(req.form['startdate'][0])
+        enddate = doParseDate(req.form['enddate'][0])
+        print "startdate, enddate: %d, %d" % (startdate, enddate)
+        dates = [{'startdate':localdate(startdate), 'enddate':localdate(enddate)}]
+        page = 1
+        total = 1
+        e = getpushlogentriesbydate(conn, startdate, enddate)
+    else:
+        e = getpushlogentries(conn, (page - 1) * PUSHES_PER_PAGE, 10)
+        total = gettotalpushlogentries(conn)
     proto = req.env.get('wsgi.url_scheme')
     if proto == 'https':
         proto = 'https'
@@ -73,10 +110,10 @@ def pushlogSetup(web, req):
     port = port != default_port and (":" + port) or ""
 
     urlbase = '%s://%s%s' % (proto, req.env['SERVER_NAME'], port)
-    return (e, urlbase, reponame, total, page)
+    return (e, urlbase, reponame, total, page, dates)
     
 def pushlogFeed(web, req):
-    (e, urlbase, reponame, total, page) = pushlogSetup(web, req)
+    (e, urlbase, reponame, total, page, dates) = pushlogSetup(web, req)
 
     resp = ["""<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -112,7 +149,7 @@ def pushlogFeed(web, req):
     req.write(resp)
 
 def pushlogHTML(web, req, tmpl):
-    (entries, urlbase, reponame, total, page) = pushlogSetup(web, req)
+    (entries, urlbase, reponame, total, page, dates) = pushlogSetup(web, req)
 
     # these three functions are in webutil in newer hg, but not in hg 1.0
     def nodetagsdict(repo, node):
@@ -150,13 +187,6 @@ def pushlogHTML(web, req, tmpl):
             nav.append({'page': page + 1, 'label': "Next"})
             nav.append({'page': numpages, 'label': "Last"})
         return nav
-    
-    def localdate(ts):
-        t = time.localtime(ts)
-        offset = time.timezone
-        if t[8] == 1:
-            offset = time.altzone
-        return (ts, offset)
 
     def changelist(limit=0, **map):
         allentries = []
@@ -194,11 +224,20 @@ def pushlogHTML(web, req, tmpl):
 
     parity = paritygen(web.stripecount)
 
+    if 'startdate' in req.form and 'enddate' in req.form:
+        startdate = req.form['startdate']
+        enddate = req.form['enddate']
+    else:
+        startdate = "1 week ago"
+        enddate = "now"
     return tmpl('pushlog',
                 changenav=changenav(),
                 rev=0,
                 entries=lambda **x: changelist(limit=0,**x),
                 latestentry=lambda **x: changelist(limit=1,**x),
+                startdate=startdate,
+                enddate=enddate,
+                query=dates,
                 archives=web.archivelist("tip"))
 
 
