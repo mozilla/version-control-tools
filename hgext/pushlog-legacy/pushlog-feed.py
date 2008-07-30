@@ -65,6 +65,36 @@ def getpushlogentriesbydate(conn, startdate, enddate, tipsonly):
         lastid = id
     return entries
 
+def getpushlogentriesbychangeset(conn, fromchange, tochange, tipsonly):
+    """Get entries in the push log between two changesets. Return changesets
+    pushed after |fromchange|, up to and including |tochange|.
+    If |tipsonly| is True, return only the tip changeset from each push."""
+    entries = []
+    # find the changeset before the first changeset
+    fromchange += "%"
+    e = conn.execute("SELECT pushid FROM changesets WHERE node LIKE ?", (fromchange,)).fetchone()
+    if e is None:
+        return []
+    fromid = e[0]
+    # find the last changeset
+    tochange += "%"
+    e = conn.execute("SELECT pushid FROM changesets WHERE node LIKE ?", (tochange,)).fetchone()
+    if e is None:
+        return []
+    toid = e[0]
+    if fromid >= toid:
+        return []
+    # now get all the changesets from right after fromchange, up to and
+    # including tochange
+    res = conn.execute("SELECT id, user, date, node FROM pushlog LEFT JOIN changesets ON id = pushid WHERE id > ? AND id <= ? ORDER BY date DESC, rev DESC", (fromid, toid))
+    lastid = None
+    for (id, user, date, node) in res:
+        if tipsonly and id == lastid:
+            continue
+        entries.append((id,user,date,node))
+        lastid = id
+    return entries
+
 def gettotalpushlogentries(conn):
     """Return the total number of pushes logged in the pushlog."""
     return conn.execute("SELECT COUNT(*) FROM pushlog").fetchone()[0]
@@ -107,6 +137,12 @@ def pushlogSetup(web, req):
         page = 1
         total = 1
         e = getpushlogentriesbydate(conn, startdate, enddate, tipsonly)
+    elif 'fromchange' in req.form and 'tochange' in req.form:
+        fromchange = req.form['fromchange'][0]
+        tochange = req.form['tochange'][0]
+        page = 1
+        total = 1
+        e = getpushlogentriesbychangeset(conn, fromchange, tochange, tipsonly)
     else:
         e = getpushlogentries(conn, (page - 1) * PUSHES_PER_PAGE, 10, tipsonly)
         total = gettotalpushlogentries(conn)
