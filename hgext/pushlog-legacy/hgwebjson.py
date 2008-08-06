@@ -76,6 +76,9 @@ def family(web, req, tmpl):
     """Get all the changesets related to a particular node, both children and
     parents, by walking backwards/forwards to a limit."""
 
+    if 'node' not in req.form:
+        return tmpl('error', error={'error': "missing parameter 'node'"})
+
     node = req.form['node'][0]
     ctx = web.repo.changectx(node)
 
@@ -108,6 +111,8 @@ addwebcommand(family, 'family')
 
 def info(web, req, tmpl):
     """Get JSON information about the specified nodes."""
+    if 'node' not in req.form:
+        return tmpl('error', error={'error': "missing parameter 'node'"})
     nodes = dict((n, web.repo.changectx(n)) for n in req.form['node'])
     return tmpl('info', nodes=nodes)
 
