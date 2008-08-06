@@ -11,8 +11,7 @@ demandimport.enable()
 isodate = lambda x: util.datestr(x, '%Y-%m-%d %H:%M %1%2')
 
 class HGJSONEncoder(simplejson.JSONEncoder):
-    def __init__(self, repo):
-        self.repo = repo
+    def __init__(self):
         simplejson.JSONEncoder.__init__(self, indent=1)
 
     def default(self, v):
@@ -24,11 +23,10 @@ class HGJSONEncoder(simplejson.JSONEncoder):
                     'description': v.description(),
                     'branch':      v.branch(),
                     'tags':        v.tags(),
-                    'parents':     [hex(n) for n in
-                                    self.repo.changelog.parents(v.node())
+                    'parents':     [hex(n.node()) for n in v.parents()
                                     if n != nullid],
-                    'children':    [hex(n) for n in
-                                    self.repo.changelog.children(v.node())],
+                    'children':    [hex(n.node()) for n in v.children()
+                                    if n != nullid],
                     'files':       v.files(),
                     }
         
@@ -60,7 +58,7 @@ def addwebcommand(f, name):
 JSON_MIMETYPE = 'application/json'
 
 def heads(web, req):
-    e = HGJSONEncoder(web.repo)
+    e = HGJSONEncoder()
     resp = e.encode([web.repo.changectx(n) for n in web.repo.heads()])
     req.respond(HTTP_OK, JSON_MIMETYPE, length=len(resp))
     req.write(resp)
@@ -69,7 +67,7 @@ addwebcommand(heads, 'jsonheads')
 
 def tags(web, req):
     tags = web.repo.tagslist()
-    e = HGJSONEncoder(web.repo)
+    e = HGJSONEncoder()
     resp = e.encode([{'tag': tag,
                       'changeset': web.repo.changectx(node)}
                      for tag, node in tags])
@@ -118,7 +116,7 @@ addwebcommand(family, 'jsonfamily')
 
 def info(web, req):
     """Get JSON information about the specified nodes."""
-    e = HGJSONEncoder(web.repo)
+    e = HGJSONEncoder()
     d = {}
     for node in req.form['node']:
         d[node] = web.repo.changectx(node)
