@@ -194,7 +194,7 @@ def pushlogFeed(web, req):
                 'user': xmlescape(user),
                 'urlbase': urlbase,
                 'url': req.url,
-                'files': '</li><li>'.join(ctx.files())})
+                'files': '</li><li class="file">'.join(ctx.files())})
 
     resp.append("</feed>")
 
