@@ -161,6 +161,7 @@ def pushlogSetup(web, req):
     
 def pushlogFeed(web, req):
     (e, urlbase, reponame, total, page, dates) = pushlogSetup(web, req)
+    isotime = lambda x: datetime.utcfromtimestamp(x).isoformat() + 'Z'
 
     resp = ["""<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -170,9 +171,10 @@ def pushlogFeed(web, req):
  <title>%(reponame)s Pushlog</title>""" % {'urlbase': urlbase,
                               'url': req.url,
                               'reponame': reponame,
-                              'date': e[0][2]}];
+                              'date': isotime(e[0][2])}];
 
     for id, user, date, node in e:
+        ctx = web.repo.changectx(node)
         resp.append("""
  <entry>
   <title>Changeset %(node)s</title>
@@ -182,11 +184,17 @@ def pushlogFeed(web, req):
   <author>
    <name>%(user)s</name>
   </author>
+  <content type="xhtml">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      <ul class="filelist"><li class="file">%(files)s</li></ul>
+    </div>
+  </content>
  </entry>""" % {'node': node,
-                'date': datetime.utcfromtimestamp(date).isoformat()+"Z",
+                'date': isotime(date),
                 'user': xmlescape(user),
                 'urlbase': urlbase,
-                'url': req.url})
+                'url': req.url,
+                'files': '</li><li>'.join(ctx.files())})
 
     resp.append("</feed>")
 
