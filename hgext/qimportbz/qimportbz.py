@@ -28,8 +28,9 @@ def isGoodAttachment(a):
 def importPatch(p):
   data64 = p.find('data').text
   data = base64.b64decode(data64)
-  attachid = p.find('attachid').text
-  args = ["hg", "qimport", "-n", "bug%s_%s" % (bugnum, attachid), "-"]
+  desc = p.find('desc').text
+  patchname = "bug%s_%s" % (bugnum, desc.replace(' ', '_'))
+  args = ["hg", "qimport", "-n", patchname, "-"]
   hg = Popen(args, stdin=PIPE)
   hg.stdin.write(data)
   hg.stdin.close()
