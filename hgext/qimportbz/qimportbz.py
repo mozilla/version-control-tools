@@ -4,10 +4,6 @@ import sys, os
 import urllib2
 import base64
 from xml.etree.ElementTree import fromstring as xmlfromstring
-try:
-  from msvcrt import getche as get_input
-except ImportError:
-  get_input = raw_input
 from subprocess import Popen, PIPE
 import pdb
 
@@ -65,7 +61,7 @@ def multiplePatchChoose(patches):
     print "%s: %s %s" % (i+1, desc, flags)
   choicestr = raw_input("Which patches do you want to import? ")
   choices = [cleanChoice(s) for s in choicestr.split()]
-  #choicestr = get_input("Import as separate patches (y/n)? ")
+  #choicestr = raw_input("Import as separate patches (y/n)? ")
   #separatePatches = 'y' in choicestr.lower()
   for choice in choices:
     importPatch(patches[choice-1])
