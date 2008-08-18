@@ -3,5 +3,5 @@
 # hooks which make permanent logs (record-changeset-info)
 
 [hooks]
-pretxnchangegroup.a_singlehead = hg_require_single_head
+pretxnchangegroup.a_singlehead = python:mozhghooks.single_head_per_branch.hook
 pretxnchangegroup.z_linearhistory = python:mozhghooks.pushlog.log
