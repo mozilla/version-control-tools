@@ -326,7 +326,7 @@ class Import(BaseCommand):
 if __name__ == '__main__':
 
   if len(sys.argv) < 2:
-    printUsage()
+    print "Try passing --help"
     sys.exit(-2)
 
   command = sys.argv[1]
@@ -334,7 +334,7 @@ if __name__ == '__main__':
 
   if len(command) > 0 and command[0] == '-':
     args.insert(0, command)
-    command = ''
+    command = 'import'
 
   try:
     int(command)
