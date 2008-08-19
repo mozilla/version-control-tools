@@ -90,6 +90,40 @@ def findAttacher(p):
       break
   return attacher_name, attacher_email
 
+def generateCommitMessageDefault(p, desc, bugnum, flags):
+  bug = p.attrib['bug']
+  if options.desc:
+    desc = options.desc
+  else:
+    descbits = []
+    if options.attachdesc:
+      descbits.append(p.find('desc').text)
+    if options.bugtitle or not descbits:
+      descbits.append(p.attrib['bug'].find('bug/short_desc').text)
+    desc = ' '.join(descbits)
+  flags = getFlagDesc(p, True)
+  bugnum = bug.find('bug/bug_id').text
+  return "%s - bug %s %s" % (desc, bugnum, flags)
+
+def generateCommitMessageReed(p):
+  bug = p.attrib['bug']
+  bugnum = bug.find('bug/bug_id').text
+  title = p.attrib['bug'].find('bug/short_desc').text
+  attachdesc = p.find('desc').text
+  flags = getFlagDesc(p, True)
+  if options.attachdesc:
+    return 'Bug %s - "%s" (%s) [%s]' % (bugnum, title, attachdesc, flags)
+  else:
+    return 'Bug %s - "%s" [%s]' % (bugnum, title, flags)
+
+commit_formats = {
+  'default' : generateCommitMessageDefault,
+  'reed' : generateCommitMessageReed,
+}
+
+def generateCommitMessage(p):
+  return commit_formats.get(options.commitfmt,'default')(p)
+
 def importPatch(p, patchname):
   bug = p.attrib['bug']
   patchname = cleanPatchName(patchname)
@@ -100,14 +134,7 @@ def importPatch(p, patchname):
     if options.message:
       msg = options.message
     else:
-      if options.desc:
-        desc = options.desc
-      elif options.bugtitle:
-        desc = p.attrib['bug'].find('bug/short_desc').text 
-      else:
-        desc = p.find('desc').text
-      flags = getFlagDesc(p, True)
-      msg = "%s - bug %s %s" % (desc, bug.find('bug/bug_id').text, flags)
+      msg = generateCommitMessage(p)
   if not user:
     username, useremail = findAttacher(p)
     if username and useremail:
@@ -180,11 +207,13 @@ class Help(BaseCommand):
 class Import(BaseCommand):
   options = [
     make_option("-t", "--bug-title", action="store_true", dest="bugtitle", help="Use the bug title to generate a commit message"),
-    make_option("-a", "--attachment-desc", action="store_false", dest="bugtitle", help="Use the attachment's description to generate a commit message"),
-    make_option("-m", "--message", dest="message", help="commit message"),
-    make_option("-d", "--description", dest="desc", help="patch description"),
-    make_option("-n", "--patch-name", dest="patchname", help="patch name"),
-    make_option("-u", "--use-attach-desc", action="store_true", dest="useattachdesc", help="use the attachment description in the patch name")
+    make_option("-a", "--attachment-desc", action="store_true", dest="attachdesc", help="Use the attachment's description to generate a commit message"),
+    make_option("-m", "--message", dest="message", help="Commit message"),
+    make_option("-d", "--description", dest="desc", help="Patch description"),
+    make_option("-n", "--patch-name", dest="patchname", help="Patch name"),
+    make_option("-u", "--use-attach-desc", action="store_true", dest="useattachdesc", help="Use the attachment description in the patch name"),
+    make_option("-f", "--format", dest="commitfmt", help="Specify commit format. Possible values are: %s" % ', '.join(commit_formats.keys())),
+    make_option("--reed", action="store_const", dest="commitfmt", const="reed", help="Use reed's commit format")
   ]
   defaults = {
     "bugtitle" : True,
