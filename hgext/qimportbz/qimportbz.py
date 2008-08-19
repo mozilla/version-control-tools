@@ -189,11 +189,18 @@ def getFlagDesc(p,commitfmt=False):
   def getSetter(f):
     setter = f.attrib['setter']
     return setter[:setter.index('@')]
+  flagorder = [ 'r', 'sr', 'ui-r', 'a']
+  def flagcmp(f1,f2):
+    a1 = f1['abbrev']
+    a2 = f2['abbrev']
+    return cmp(flagorder.index(a1),flagorder.index(a2))
   flagdata = [{ 'abbrev' : flagAbbrev(f),
                 'name' : f.attrib['name'],
                 'status' : f.attrib['status'],
                 'setter' : getSetter(f)
               } for f in p.findall('flag') if isKnownFlag(f)]
+
+  flagdata.sort(cmp=flagcmp)
   if commitfmt:
     setteridx = {}
     for f in flagdata:
