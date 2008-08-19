@@ -21,7 +21,18 @@ def isGoodAttachment(a):
     return False
   return True
 
+def cleanPatchName(patchname):
+  replacements = {
+    '_' : [' ', ':'],
+    '' : ['"', "'", '<', '>', '*']
+  }
+  for replacement,items in replacements.items():
+    for char in items:
+      patchname = patchname.replace(r,k)
+  return patchname
+
 def importPatch(p, patchname):
+  patchname = cleanPatchName(patchname)
   data64 = p.find('data').text
   data = base64.b64decode(data64)
   args = ["hg", "qimport", "-n", patchname, "-"]
@@ -93,7 +104,7 @@ class Import(BaseCommand):
 
     def getPatchName(p):
       desc = p.find('desc').text
-      return "bug%s_%s" % (bugnum, desc.replace(' ', '_'))
+      return "bug%s_%s" % (bugnum, desc)
 
     if len(patches) == 1:
       patch = patches[0]
