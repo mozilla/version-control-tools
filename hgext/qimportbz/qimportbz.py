@@ -173,14 +173,19 @@ def getFlagDesc(p,commitfmt=False):
   descs = []
   def isKnownFlag(f):
     name = f.attrib['name']
-    if name in ('review','superreview') or name.startswith('approval'):
+    if name in ('review','superreview','ui-review') or name.startswith('approval'):
       return f.attrib['status'] == '+' if commitfmt else True
     elif options.verbose:
       print "Unhandled flag %s" % name
     return False
   def flagAbbrev(f):
     name = f.attrib['name']
-    return 'sr' if name == 'superreview' else name[0]
+    if name == 'superreview':
+      return 'sr'
+    elif name == 'ui-review':
+      return 'ui-r'
+    else:
+      return name[0]
   def getSetter(f):
     setter = f.attrib['setter']
     return setter[:setter.index('@')]
