@@ -5,8 +5,8 @@ import urllib2
 import base64
 from xml.etree.ElementTree import fromstring as xmlfromstring
 from subprocess import Popen, PIPE
-import pdb
 from optparse import OptionParser, make_option
+import pdb
 
 def isGoodAttachment(a):
   if "0" == a.attrib['ispatch']: return False
@@ -28,13 +28,105 @@ def cleanPatchName(patchname):
   }
   for replacement,items in replacements.items():
     for char in items:
-      patchname = patchname.replace(r,k)
+      patchname = patchname.replace(char,replacement)
   return patchname
 
+def parsePatch(data):
+  user = ''
+  date = ''
+  msg = []
+  subject = ''
+  # Based on mq.py
+  format = None
+  diffstart = 0
+  lines = data.splitlines()
+  for i,line in enumerate(lines):
+    line = line.rstrip()
+    if line.startswith('diff ') or line.startswith('--- ') or \
+       line.startswith('+++ '):
+      diffstart = i
+      break
+    if line == '# HG changeset patch':
+      format = 'hgpatch'
+    elif format == 'hgpatch':
+      if line.startswith("# User "):
+        user = line[7:]
+      elif line.startswith("# Date "):
+        date = line[7:]
+      elif not line.startswith("# ") and line:
+        msg.append(line)
+        format = None
+    elif format != "tagdone" and line.lower().startswith("subject: "):
+      subject = line[9:]
+      format = "tag"
+    elif format != "tagdone" and line.lower().startswith("from: "):
+      user = line[6:]
+      format = "tag"
+    elif format == "tag" and line == "":
+      format = "tagdone"
+    elif msg or line:
+      msg.append(line)
+
+  if format and format.startswith("tag") and subject:
+    message.insert(0, '')
+    message.insert(0, subject)
+
+  diff = '\n'.join(lines[diffstart:])+'\n'
+  return ('\n'.join(msg), user, date, diff)
+
+def findAttacher(p):
+  bug = p.attrib['bug']
+  # Remove the timezone from the patch date
+  patchdate = p.find('date').text[:-4]
+  attacher_name = ''
+  attacher_email = ''
+  for post in reversed(bug.findall('bug/long_desc')):
+    # remove the timezone and seconds from the post date
+    postdate = post.find('bug_when').text[:-7]
+    if postdate == patchdate:
+      who = post.find('who')
+      attacher_name = who.attrib['name']
+      attacher_email = who.text
+      break
+  return attacher_name, attacher_email
+
 def importPatch(p, patchname):
+  bug = p.attrib['bug']
   patchname = cleanPatchName(patchname)
   data64 = p.find('data').text
   data = base64.b64decode(data64)
+  msg, user, date, diff = parsePatch(data)
+  if not msg:
+    if options.message:
+      msg = options.message
+    else:
+      if options.desc:
+        desc = options.desc
+      elif options.bugtitle:
+        desc = p.attrib['bug'].find('bug/short_desc').text 
+      else:
+        desc = p.find('desc').text
+      flags = getFlagDesc(p, True)
+      msg = "%s - bug %s %s" % (desc, bug.find('bug/bug_id').text, flags)
+  if not user:
+    username, useremail = findAttacher(p)
+    if username and useremail:
+      user = "%s <%s>" % (username, useremail)
+  # strip the date
+  date = ''
+
+  dataparts = []
+  if user:
+    dataparts.append('From: %s' % user)
+  elif options.verbose:
+    print "Warning: no user!"
+  if msg:
+    dataparts.append(msg)
+  else:
+    print "Warning: no commit message!"
+  dataparts.append(diff)
+  data = '\n\n'.join(dataparts)
+  print msg
   args = ["hg", "qimport", "-n", patchname, "-"]
   if options.verbose:
     print "Running %s" % ' '.join(args)
@@ -46,19 +138,23 @@ def importPatch(p, patchname):
   if hg.returncode:
     sys.exit(-2)
 
-def getFlagDesc(p):
+def getFlagDesc(p,commitfmt=False):
   descs = []
   for f in p.findall('flag'):
     name = f.attrib['name']
     status = f.attrib['status']
     setter = f.attrib['setter']
 
-    if name == 'review':
+    if name in ('review','superreview') or name.startswith('approval'):
+      abbrev = 'sr' if name == 'superreview' else name[0]
       settername = setter[:setter.index('@')]
-      descs.append('%s: r%s' % (settername, status))
+      if commitfmt:
+        descs.append('%s=%s' % (abbrev,settername))
+      else:
+        descs.append('%s: r%s' % (settername, status))
     elif options.verbose:
       print "Unhandled flag %s" % name
-  return ', '.join(descs)
+  return (' ' if commitfmt else ', ').join(descs)
 
 def cleanChoice(c):
   return int(c.strip().strip(',').strip())
@@ -82,8 +178,21 @@ class Help(BaseCommand):
     parser.print_help()
 
 class Import(BaseCommand):
-  options = []
-  defaults = {}
+  options = [
+    make_option("-t", "--bug-title", action="store_true", dest="bugtitle", help="Use the bug title to generate a commit message"),
+    make_option("-a", "--attachment-desc", action="store_false", dest="bugtitle", help="Use the attachment's description to generate a commit message"),
+    make_option("-m", "--message", dest="message", help="commit message"),
+    make_option("-d", "--description", dest="desc", help="patch description"),
+    make_option("-n", "--patch-name", dest="patchname", help="patch name"),
+    make_option("-u", "--use-attach-desc", action="store_true", dest="useattachdesc", help="use the attachment description in the patch name")
+  ]
+  defaults = {
+    "bugtitle" : True,
+    "message" : '',
+    "desc" : '',
+    "patchname" : '',
+    "useattachdesc" : False
+  }
   usage = "%prog import [options] bugnumber [bugnumber...]"
   def do_bug(self, bugnum):
     url = "https://%s/show_bug.cgi?ctype=xml&id=%s" % (options.bugzilla, bugnum)
@@ -101,10 +210,17 @@ class Import(BaseCommand):
       print "\bdone"
     attachments = xml.findall("bug/attachment")
     patches = [a for a in attachments if isGoodAttachment(a)]
+    for patch in patches:
+      patch.attrib['bug'] = xml
 
     def getPatchName(p):
-      desc = p.find('desc').text
-      return "bug%s_%s" % (bugnum, desc)
+      if options.patchname:
+        return options.patchname
+      if options.useattachdesc:
+        desc = p.find('desc').text
+        return "bug%s_%s" % (bugnum, desc)
+      else:
+        return "bug%s" % bugnum
 
     if len(patches) == 1:
       patch = patches[0]
@@ -163,8 +279,8 @@ if __name__ == '__main__':
 #    make_option("-h", "--help", action="help"),
     make_option("-v", "--verbose", action="store_true", dest="verbose"),
     make_option("-q", "--quiet", action="store_false", dest="verbose"),
-    make_option("-r", "--dry-run", action="store_true", dest="readonly"),
-    make_option("-b", "--bugzilla", dest="bugzilla")
+    make_option("-r", "--dry-run", action="store_true", dest="readonly", help="Don't actually operate on the hg repo"),
+    make_option("-b", "--bugzilla", dest="bugzilla", help="specify the bugzilla repository to use")
   ]
 
   global_defaults = {
