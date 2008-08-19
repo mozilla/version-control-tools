@@ -43,7 +43,7 @@ def parsePatch(data):
   for i,line in enumerate(lines):
     line = line.rstrip()
     if line.startswith('diff ') or line.startswith('--- ') or \
-       line.startswith('+++ '):
+       line.startswith('+++ ') or line.startswith("Index: "):
       diffstart = i
       break
     if line == '# HG changeset patch':
@@ -90,7 +90,7 @@ def findAttacher(p):
       break
   return attacher_name, attacher_email
 
-def generateCommitMessageDefault(p, desc, bugnum, flags):
+def generateCommitMessageDefault(p):
   bug = p.attrib['bug']
   if options.desc:
     desc = options.desc
@@ -122,7 +122,7 @@ commit_formats = {
 }
 
 def generateCommitMessage(p):
-  return commit_formats.get(options.commitfmt,'default')(p)
+  return commit_formats.get(options.commitfmt,generateCommitMessageDefault)(p)
 
 def importPatch(p, patchname):
   bug = p.attrib['bug']
@@ -167,21 +167,42 @@ def importPatch(p, patchname):
 
 def getFlagDesc(p,commitfmt=False):
   descs = []
-  for f in p.findall('flag'):
+  def isKnownFlag(f):
     name = f.attrib['name']
-    status = f.attrib['status']
-    setter = f.attrib['setter']
-
     if name in ('review','superreview') or name.startswith('approval'):
-      abbrev = 'sr' if name == 'superreview' else name[0]
-      settername = setter[:setter.index('@')]
-      if commitfmt:
-        descs.append('%s=%s' % (abbrev,settername))
-      else:
-        descs.append('%s: r%s' % (settername, status))
+      return f.attrib['status'] == '+' if commitfmt else True
     elif options.verbose:
       print "Unhandled flag %s" % name
-  return (' ' if commitfmt else ', ').join(descs)
+    return False
+  def flagAbbrev(f):
+    name = f.attrib['name']
+    return 'sr' if name == 'superreview' else name[0]
+  def getSetter(f):
+    setter = f.attrib['setter']
+    return setter[:setter.index('@')]
+  flagdata = [{ 'abbrev' : flagAbbrev(f),
+                'name' : f.attrib['name'],
+                'status' : f.attrib['status'],
+                'setter' : getSetter(f)
+              } for f in p.findall('flag') if isKnownFlag(f)]
+  if commitfmt:
+    setteridx = {}
+    for f in flagdata:
+      setter = f['setter']
+      if setter in setteridx:
+        setteridx[setter].append(f)
+      else:
+        setteridx[setter] = [f]
+    for f in flagdata:
+      fs = setteridx.pop(f['setter'],None)
+      if fs:
+        flagnames = [f['abbrev'] for f in fs]
+        descs.append('%s=%s' % ('+'.join(flagnames), fs[0]['setter']))
+    return ' '.join(descs)
+  else:
+    for f in flagdata:
+      descs.append('%s: %s%s' % (f['setter'], f['name'], f['status']))
+    return ', '.join(descs)
 
 def cleanChoice(c):
   return int(c.strip().strip(',').strip())
@@ -217,10 +238,12 @@ class Import(BaseCommand):
   ]
   defaults = {
     "bugtitle" : True,
+    "attachdesc" : False,
     "message" : '',
     "desc" : '',
     "patchname" : '',
-    "useattachdesc" : False
+    "useattachdesc" : False,
+    "commitfm" : "default"
   }
   usage = "%prog import [options] bugnumber [bugnumber...]"
   def do_bug(self, bugnum):
