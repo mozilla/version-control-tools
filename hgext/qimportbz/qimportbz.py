@@ -6,6 +6,7 @@ import base64
 from xml.etree.ElementTree import fromstring as xmlfromstring
 from subprocess import Popen, PIPE
 from optparse import OptionParser, make_option
+import re
 import pdb
 
 def isGoodAttachment(a):
@@ -30,6 +31,9 @@ def cleanPatchName(patchname):
     for char in items:
       patchname = patchname.replace(char,replacement)
   return patchname
+
+def cleanUserName(username):
+  return re.sub("\(.*\)","", re.sub("\[:\w+\]|\(:\w+\)","",username)).strip()
 
 def parsePatch(data):
   user = ''
@@ -138,7 +142,7 @@ def importPatch(p, patchname):
   if not user:
     username, useremail = findAttacher(p)
     if username and useremail:
-      user = "%s <%s>" % (username, useremail)
+      user = "%s <%s>" % (cleanUserName(username), useremail)
   # strip the date
   date = ''
 
@@ -205,7 +209,7 @@ def getFlagDesc(p,commitfmt=False):
     return ', '.join(descs)
 
 def cleanChoice(c):
-  return int(c.strip().strip(',').strip())
+  return int(c.strip())
 
 def multiplePatchChoose(patches):
   for i,p in enumerate(patches):
@@ -213,7 +217,7 @@ def multiplePatchChoose(patches):
     flags = getFlagDesc(p)
     print "%s: %s %s" % (i+1, desc, flags)
   choicestr = raw_input("Which patches do you want to import? ")
-  return [cleanChoice(s)-1 for s in choicestr.split()]
+  return [cleanChoice(s)-1 for t in choicestr.split(',') for s in t.split()]
 
 class BaseCommand(object):
   options = []
