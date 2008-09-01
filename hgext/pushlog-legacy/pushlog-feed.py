@@ -69,29 +69,23 @@ def getpushlogentriesbychangeset(conn, fromchange, tochange, tipsonly):
     """Get entries in the push log between two changesets. Return changesets
     pushed after |fromchange|, up to and including |tochange|.
     If |tipsonly| is True, return only the tip changeset from each push."""
-    entries = []
-    # find the changeset before the first changeset
-    fromchange += "%"
-    e = conn.execute("SELECT pushid FROM changesets WHERE node LIKE ?", (fromchange,)).fetchone()
-    if e is None:
-        return []
-    fromid = e[0]
-    # find the last changeset
-    tochange += "%"
-    e = conn.execute("SELECT pushid FROM changesets WHERE node LIKE ?", (tochange,)).fetchone()
-    if e is None:
-        return []
-    toid = e[0]
-    if fromid >= toid:
+    csets = []
+    for cset in (fromchange, tochange):
+        e = conn.execute("SELECT pushid FROM changesets WHERE node = ?", (cset,)).fetchone()
+        if e is None:
+            return []
+        csets.append(e[0])
+    if csets[0] >= csets[1]:
         return []
     # now get all the changesets from right after fromchange, up to and
     # including tochange
-    res = conn.execute("SELECT id, user, date, node FROM pushlog LEFT JOIN changesets ON id = pushid WHERE id > ? AND id <= ? ORDER BY date DESC, rev DESC", (fromid, toid))
+    res = conn.execute("SELECT id, user, date, node FROM pushlog LEFT JOIN changesets ON id = pushid WHERE id > ? AND id <= ? ORDER BY date DESC, rev DESC", (csets[0], csets[1]))
     lastid = None
+    entries = []
     for (id, user, date, node) in res:
         if tipsonly and id == lastid:
             continue
-        entries.append((id,user,date,node))
+        entries.append((id, user, date, node))
         lastid = id
     return entries
 
@@ -114,11 +108,12 @@ def doParseDate(datestring):
     return time.mktime(date)
 
 def pushlogSetup(web, req):
-    repopath = os.path.dirname(web.repo.path)
+    repo = web.repo
+    repopath = os.path.dirname(repo.path)
     reponame = os.path.basename(repopath)
     if reponame == '.hg':
         reponame = os.path.basename(os.path.dirname(repopath))
-    pushdb = os.path.join(web.repo.path, "pushlog2.db")
+    pushdb = os.path.join(repo.path, "pushlog2.db")
     conn = sqlite.connect(pushdb)
 
     if 'node' in req.form:
@@ -137,15 +132,17 @@ def pushlogSetup(web, req):
         page = 1
         total = 1
         e = getpushlogentriesbydate(conn, startdate, enddate, tipsonly)
-    elif 'fromchange' in req.form and 'tochange' in req.form:
-        fromchange = req.form['fromchange'][0]
-        tochange = req.form['tochange'][0]
+    elif 'fromchange' in req.form:
+        fromchange = hex(repo.lookup(req.form.get('fromchange', ['null'])[0]))
+        tochange = hex(repo.lookup(req.form.get('tochange', ['default'])[0]))
         page = 1
         total = 1
         e = getpushlogentriesbychangeset(conn, fromchange, tochange, tipsonly)
     else:
         e = getpushlogentries(conn, (page - 1) * PUSHES_PER_PAGE, 10, tipsonly)
         total = gettotalpushlogentries(conn)
+
+    # figure out the urlbase
     proto = req.env.get('wsgi.url_scheme')
     if proto == 'https':
         proto = 'https'
@@ -162,6 +159,11 @@ def pushlogSetup(web, req):
 def pushlogFeed(web, req):
     (e, urlbase, reponame, total, page, dates) = pushlogSetup(web, req)
     isotime = lambda x: datetime.utcfromtimestamp(x).isoformat() + 'Z'
+    
+    if e:
+        dt = isotime(e[0][2])
+    else:
+        dt = datetime.utcnow().isoformat().split('.', 1)[0] + 'Z'
 
     resp = ["""<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -171,7 +173,7 @@ def pushlogFeed(web, req):
  <title>%(reponame)s Pushlog</title>""" % {'urlbase': urlbase,
                               'url': req.url,
                               'reponame': reponame,
-                              'date': isotime(e[0][2])}];
+                              'date': dt}];
 
     for id, user, date, node in e:
         ctx = web.repo.changectx(node)
