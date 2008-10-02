@@ -297,8 +297,48 @@ def pushlogHTML(web, req, tmpl):
                 query=dates,
                 archives=web.archivelist("tip"))
 
+def pushes_worker(basepath, startID=0, endID=None):
+    stmt = 'SELECT id, user, date, rev, node from pushlog INNER JOIN changesets ON id = pushid WHERE id > ? %s ORDER BY id ASC, rev ASC'
+
+    args = (startID,)
+    if endID is not None:
+        stmt = stmt % 'and id <= ?'
+        args = (startID, endID)
+    else:
+        stmt = stmt % ""
+    if os.path.basename(basepath) != '.hg':
+        basepath = os.path.join(basepath, '.hg')
+    conn = sqlite.connect(os.path.join(basepath, 'pushlog2.db'))
+    pushes = {}
+    for id, user, date, rev, node in conn.execute(stmt, args):
+        if id in pushes:
+            pushes[id]['changesets'].append(node)
+        else:
+            pushes[id] = {'user': user,
+                          'date': date,
+                          'changesets': [node]
+                          }
+    return pushes
+
+def pushes(web, req, tmpl):
+    repopath = web.repo.path
+    startID = 'startID' in req.form and req.form['startID'][0] or 0
+    endID = 'endID' in req.form and req.form['endID'][0] or None
+    data = pushes_worker(repopath, startID, endID)
+    return tmpl('pushes', data=data)
+
+def printpushlog(ui, repo, *args):
+    from hgwebjson import HGJSONEncoder
+    e = HGJSONEncoder()
+    startID = len(args) and args[0] or 0
+    endID = len(args) > 1 and args[1] or None
+    print e.encode(pushes_worker(repo.path, startID, endID))
+
 
 addcommand(pushlogFeed, 'pushlog')
 addwebcommand(pushlogHTML, 'pushloghtml')
+addwebcommand(pushes, 'pushes')
 
-cmdtable = {}
+cmdtable = {
+    'printpushlog': (printpushlog, [], "hg printpushlog [startID [endID]]"),
+}
