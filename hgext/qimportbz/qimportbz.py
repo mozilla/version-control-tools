@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 # Imports patches from bugzilla into the hg repo in the current working directory
 import sys, os
 import urllib2
