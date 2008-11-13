@@ -78,8 +78,31 @@ echo "checkin 6" >> $CLONE/testfile
 hg ci -R $CLONE -m "checkin 6"
 hg push -R $CLONE $REPO
 
+# More branch checkins
+echo "checkin 6" > $BRANCH/testfile2
+hg ci -R $BRANCH -m "branch checkin 6"
+
+echo "checkin 7" > $BRANCH/testfile2
+hg ci -R $BRANCH -m "branch checkin 7"
+
+echo "checkin 8" > $BRANCH/testfile2
+hg ci -R $BRANCH -m "branch checkin 8"
+
+echo "checkin 9" > $BRANCH/testfile2
+hg ci -R $BRANCH -m "branch checkin 9"
+
+echo "checkin 10" > $BRANCH/testfile2
+hg ci -R $BRANCH -m "branch checkin 10"
+
+# Now merge from branch
+hg pull -R $CLONE $BRANCH
+hg update -R $CLONE
+hg merge -R $CLONE
+hg ci -R $CLONE -m "merge from hg-test-branch"
+hg push -R $CLONE $REPO
+
 # Test total push count
-EXPECTED_PUSHCOUNT=5
+EXPECTED_PUSHCOUNT=6
 PUSHCOUNT=`echo "SELECT COUNT(*) FROM pushlog;" | sqlite3 $REPO/.hg/pushlog2.db`
 if [[ "$PUSHCOUNT" != "$EXPECTED_PUSHCOUNT" ]]; then
     echo "FAIL: push count $PUSHCOUNT != $EXPECTED_PUSHCOUNT";

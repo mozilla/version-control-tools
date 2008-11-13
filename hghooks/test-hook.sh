@@ -24,20 +24,20 @@ hg clone $REPO $CLONE
 # push two changes together first
 echo "checkin 1" > $CLONE/testfile
 hg add -R $CLONE $CLONE/testfile
-hg ci -R $CLONE -m "checkin 1"
+hg ci -R $CLONE -m "checkin 1 bug 12345"
 
 echo "checkin 2" >> $CLONE/testfile
-hg ci -R $CLONE -m "checkin 2"
+hg ci -R $CLONE -m "checkin 2 b=123456"
 hg push -R $CLONE $REPO
 
 # then one separately
 echo "checkin 3" >> $CLONE/testfile
-hg ci -R $CLONE -m "checkin 3"
+hg ci -R $CLONE -m "checkin 3 - bug345664"
 hg push -R $CLONE $REPO
 
 # then three together
 echo "checkin 4" >> $CLONE/testfile
-hg ci -R $CLONE -m "checkin 4"
+hg ci -R $CLONE -m "checkin 4 b=111111"
 
 echo "checkin 5" >> $CLONE/testfile
 hg ci -R $CLONE -m "checkin 5"
