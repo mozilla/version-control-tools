@@ -119,5 +119,23 @@ class TestPushlog(unittest.TestCase):
         expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-changeset-query-data.xml"))
         self.assertEqualFeeds(testfeed, expectedfeed)
 
+    def testtipsonlyatom(self):
+        """Get only the tips as ATOM data from pushlog?tipsonly=1."""
+        testfeed = feedparser.parse("http://localhost:8000/pushlog?tipsonly=1")
+        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-tipsonly-data.xml"))
+        self.assertEqualFeeds(testfeed, expectedfeed)
+
+    def testpartialdatequerytipsonlyatom(self):
+        """Get some tipsonly ATOM data via pushlog date query."""
+        testfeed = feedparser.parse("http://localhost:8000/pushlog?startdate=2008-11-20%2010:52:25&enddate=2008-11-20%2010:53:25&tipsonly=1")
+        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-date-query-tipsonly-data.xml"))
+        self.assertEqualFeeds(testfeed, expectedfeed)
+
+    def testchangesetquerytipsonlyatom(self):
+        """Get some tipsonly ATOM data via pushlog changeset query."""
+        testfeed = feedparser.parse("http://localhost:8000/pushlog?fromchange=4ccee53e18ac&tochange=a79451771352&tipsonly=1")
+        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-changeset-query-tipsonly-data.xml"))
+        self.assertEqualFeeds(testfeed, expectedfeed)
+
 if __name__ == '__main__':
     unittest.main()
