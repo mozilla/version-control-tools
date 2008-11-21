@@ -37,30 +37,28 @@ ATOM_MIMETYPE = 'application/atom+xml'
 
 # just an enum
 class QueryType:
-    DATE = 0
-    CHANGESET = 1
-    PUSHID = 2
-    COUNT = 3
+    DATE, CHANGESET, PUSHID, COUNT = range(4)
 
 class PushlogQuery:
-    def __init__(self, urlbase='', repo=None, dbconn=None, tipsonly=False, reponame='', page=1, dates=[]):
+    page = 1
+    dates = []
+    entries = []
+    totalentries = 1
+    # by default, we return the last 10 pushes
+    querystart = QueryType.COUNT
+    querystart_value = PUSHES_PER_PAGE
+    # don't need a default here, since by default
+    # we'll get everything newer than whatever your start
+    # query is
+    queryend = None
+    queryend_value = None
+
+    def __init__(self, repo, dbconn, urlbase='', tipsonly=False, reponame=''):
         self.repo = repo
         self.conn = dbconn
         self.urlbase = urlbase
         self.tipsonly = tipsonly
         self.reponame = reponame
-        self.page = page
-        self.dates = dates
-        self.entries = []
-        self.totalentries = 1
-        # by default, we return the last 10 pushes
-        self.querystart = QueryType.COUNT
-        self.querystart_value = PUSHES_PER_PAGE
-        # don't need a default here, since by default
-        # we'll get everything newer than whatever your start
-        # query is
-        self.queryend = QueryType.COUNT
-        self.queryend_value = 0
 
     def DoQuery(self):
         """Figure out what the query parameters are, and query the database
@@ -123,6 +121,26 @@ class PushlogQuery:
                 # likely just an empty db, so return an empty result
                 pass
 
+    def description(self):
+        if self.querystart == QueryType.COUNT:
+            return ''
+        bits = []
+        isotime = lambda x: datetime.utcfromtimestamp(x).isoformat(' ')
+        if self.querystart == QueryType.DATE:
+            bits.append('after %s' % isotime(self.querystart_value))
+        elif self.querystart == QueryType.CHANGESET:
+            bits.append('after changeset %s' % self.querystart_value)
+        elif self.querystart == QueryType.PUSHID:
+            bits.append('after push ID %s' % self.querystart_value)
+
+        if self.queryend == QueryType.DATE:
+            bits.append('before %s' % isotime(self.queryend_value))
+        elif self.queryend == QueryType.CHANGESET:
+            bits.append('up to and including changeset %s' % self.queryend_value)
+        elif self.queryend == QueryType.PUSHID:
+            bits.append('up to and including push ID %s' % self.queryend_value)
+        return 'Changes pushed ' + ', '.join(bits)
+
 def localdate(ts):
     """Given a timestamp, return a (timestamp, tzoffset) tuple,
     which is what Mercurial works with. Attempts to get DST
@@ -180,16 +198,14 @@ def pushlogSetup(repo, req):
                          repo=repo,
                          dbconn=conn,
                          tipsonly=tipsonly,
-                         reponame=reponame,
-                         page=page)
+                         reponame=reponame)
+    query.page = page
 
     # find start component
     if 'startdate' in req.form:
         startdate = doParseDate(req.form['startdate'][0])
         query.querystart = QueryType.DATE
         query.querystart_value = startdate
-        #TODO: figure out how to make this not suck
-        #query.dates = [{'startdate':localdate(startdate)}]
     elif 'fromchange' in req.form:
         query.querystart = QueryType.CHANGESET
         query.querystart_value = req.form.get('fromchange', ['null'])[0]
@@ -205,8 +221,6 @@ def pushlogSetup(repo, req):
         enddate = doParseDate(req.form['enddate'][0])
         query.queryend = QueryType.DATE
         query.queryend_value = enddate
-        #XXX: breaks if not using startdate!
-        #query.dates['enddate'] =  localdate(enddate)
     elif 'tochange' in req.form:
         query.queryend = QueryType.CHANGESET
         query.queryend_value = req.form.get('tochange', ['default'])[0]
@@ -344,20 +358,14 @@ def pushlogHTML(web, req, tmpl):
 
     parity = paritygen(web.stripecount)
 
-    if 'startdate' in req.form and 'enddate' in req.form:
-        startdate = req.form['startdate']
-        enddate = req.form['enddate']
-    else:
-        startdate = "1 week ago"
-        enddate = "now"
     return tmpl('pushlog',
                 changenav=changenav(),
                 rev=0,
                 entries=lambda **x: changelist(limit=0,**x),
                 latestentry=lambda **x: changelist(limit=1,**x),
-                startdate=startdate,
-                enddate=enddate,
-                query=query.dates,
+                startdate='startdate' in req.form and req.form['startdate'] or '1 week ago',
+                enddate='enddate' in req.form and req.form['enddate'] or 'now',
+                querydescription=query.description(),
                 archives=web.archivelist("tip"))
 
 def pushes_worker(query):
