@@ -57,8 +57,8 @@ class TestPushlog(unittest.TestCase):
         f.close()
         # now run hg serve on it
         self.hgwebprocess = Popen(["hg", "-R", repodir, "serve"], stdout=devnull, stderr=STDOUT)
-        # give it a few seconds to be ready
-        sleep(2)
+        # give it a second to be ready
+        sleep(1)
         os.environ['TZ'] = "America/New_York"
 
     def tearDown(self):
@@ -135,6 +135,12 @@ class TestPushlog(unittest.TestCase):
         """Get some tipsonly ATOM data via pushlog changeset query."""
         testfeed = feedparser.parse("http://localhost:8000/pushlog?fromchange=4ccee53e18ac&tochange=a79451771352&tipsonly=1")
         expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-changeset-query-tipsonly-data.xml"))
+        self.assertEqualFeeds(testfeed, expectedfeed)
+
+    def testdatequerytrailingspaceatom(self):
+        """Dates with leading/trailing spaces should work properly."""
+        testfeed = feedparser.parse("http://localhost:8000/pushlog?startdate=%202008-11-20%2010:52:25%20&enddate=%202008-11-20%2010:53:25%20&foo=bar")
+        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-date-query-data.xml"))
         self.assertEqualFeeds(testfeed, expectedfeed)
 
 if __name__ == '__main__':

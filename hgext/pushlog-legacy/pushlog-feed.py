@@ -101,6 +101,7 @@ def localdate(ts):
     return (ts, offset)
 
 def doParseDate(datestring):
+    datestring = datestring.strip()
     try:
         date = time.strptime(datestring, "%Y-%m-%d %H:%M:%S")
     except ValueError:
