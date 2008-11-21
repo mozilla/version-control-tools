@@ -35,65 +35,98 @@ def addwebcommand(f, name):
 
 ATOM_MIMETYPE = 'application/atom+xml'
 
-def getpushlogentries(conn, start, count, tipsonly):
-    """Get entries from the push log. Select |count| pushes starting at offset
-    |start|, in reverse chronological order, and then return all changes
-    pushed in these pushes. Returns a list of tuples of
-    (pushid, user, date, node). If |tipsonly| is True, return only the tip
-    changeset from each push."""
-    entries = []
-    res = conn.execute("SELECT id, user, date FROM pushlog ORDER BY date DESC LIMIT ? OFFSET ?", (count,start))
-    for (id,user,date) in res:
-        limit = ""
-        if tipsonly:
-            limit = " LIMIT 1"
-        res2 = conn.execute("SELECT node FROM changesets WHERE pushid = ? ORDER BY rev DESC" + limit, (id,))
-        for node, in res2:
-            entries.append((id,user,date,node))
-    return entries
+# just an enum
+class QueryType:
+    DATE = 0
+    CHANGESET = 1
+    PUSHID = 2
+    COUNT = 3
 
-def getpushlogentriesbydate(conn, startdate, enddate, tipsonly):
-    """Get entries in the push log in a date range. If |tipsonly| is True,
-    return only the tip changeset from each push."""
-    entries = []
-    res = conn.execute("SELECT id, user, date, node FROM pushlog LEFT JOIN changesets ON id = pushid WHERE date > ? AND date < ? ORDER BY date DESC, rev DESC", (startdate, enddate))
-    lastid = None
-    for (id, user, date, node) in res:
-        if tipsonly and id == lastid:
-            continue
-        entries.append((id,user,date,node))
-        lastid = id
-    return entries
+class PushlogQuery:
+    def __init__(self, urlbase='', repo=None, dbconn=None, tipsonly=False, reponame='', page=1, dates=[]):
+        self.repo = repo
+        self.conn = dbconn
+        self.urlbase = urlbase
+        self.tipsonly = tipsonly
+        self.reponame = reponame
+        self.page = page
+        self.dates = dates
+        self.entries = []
+        self.totalentries = 1
+        # by default, we return the last 10 pushes
+        self.querystart = QueryType.COUNT
+        self.querystart_value = PUSHES_PER_PAGE
+        # don't need a default here, since by default
+        # we'll get everything newer than whatever your start
+        # query is
+        self.queryend = QueryType.COUNT
+        self.queryend_value = 0
 
-def getpushlogentriesbychangeset(conn, fromchange, tochange, tipsonly):
-    """Get entries in the push log between two changesets. Return changesets
-    pushed after |fromchange|, up to and including |tochange|.
-    If |tipsonly| is True, return only the tip changeset from each push."""
-    csets = []
-    for cset in (fromchange, tochange):
-        e = conn.execute("SELECT pushid FROM changesets WHERE node = ?", (cset,)).fetchone()
-        if e is None:
-            return []
-        csets.append(e[0])
-    if csets[0] >= csets[1]:
-        return []
-    # now get all the changesets from right after fromchange, up to and
-    # including tochange
-    res = conn.execute("SELECT id, user, date, node FROM pushlog LEFT JOIN changesets ON id = pushid WHERE id > ? AND id <= ? ORDER BY date DESC, rev DESC", (csets[0], csets[1]))
-    lastid = None
-    entries = []
-    for (id, user, date, node) in res:
-        if tipsonly and id == lastid:
-            continue
-        entries.append((id, user, date, node))
-        lastid = id
-    return entries
+    def DoQuery(self):
+        """Figure out what the query parameters are, and query the database
+        using those parameters."""
+        self.entries = []
+        if self.querystart == QueryType.COUNT:
+            # Get entries from self.page, using self.querystart_value as
+            # the number of pushes per page.
+            try:
+                res = self.conn.execute("SELECT id, user, date FROM pushlog ORDER BY date DESC LIMIT ? OFFSET ?",
+                                        (self.querystart_value,
+                                         (self.page - 1) * self.querystart_value))
+                for (id,user,date) in res:
+                    limit = ""
+                    if self.tipsonly:
+                        limit = " LIMIT 1"
+                    res2 = self.conn.execute("SELECT node FROM changesets WHERE pushid = ? ORDER BY rev DESC" + limit, (id,))
+                    for node, in res2:
+                        self.entries.append((id,user,date,node))
+                # get count of pushes
+                self.totalentries = self.conn.execute("SELECT COUNT(*) FROM pushlog").fetchone()[0]
+            except sqlite.OperationalError:
+                # likely just an empty db, so return an empty result
+                pass
+        else:
+            # for all other queries we'll build the query piece by piece
+            basequery = "SELECT id, user, date, node from pushlog LEFT JOIN changesets ON id = pushid WHERE "
+            where = []
+            params = {}
+            if self.querystart == QueryType.DATE:
+                where.append("date > :start_date")
+                params['start_date'] = self.querystart_value
+            elif self.querystart == QueryType.CHANGESET:
+                where.append("id > (select c.pushid from changesets c where c.node = :start_node)")
+                params['start_node'] = hex(self.repo.lookup(self.querystart_value))
+            elif self.querystart == QueryType.PUSHID:
+                where.append("id > :start_id")
+                params['start_id'] = self.querystart_value
 
-def gettotalpushlogentries(conn):
-    """Return the total number of pushes logged in the pushlog."""
-    return conn.execute("SELECT COUNT(*) FROM pushlog").fetchone()[0]
+            if self.queryend == QueryType.DATE:
+                where.append("date < :end_date ")
+                params['end_date'] = self.queryend_value
+            elif self.queryend == QueryType.CHANGESET:
+                where.append("id <= (select c.pushid from changesets c where c.node = :end_node)")
+                params['end_node'] = hex(self.repo.lookup(self.queryend_value))
+            elif self.queryend == QueryType.PUSHID:
+                where.append("id <= :end_id ")
+                params['end_id'] = self.queryend_value
+            
+            query = basequery + ' AND '.join(where) + ' ORDER BY id DESC, rev DESC'
+            try:
+                res = self.conn.execute(query, params)
+                lastid = None
+                for (id, user, date, node) in res:
+                    if self.tipsonly and id == lastid:
+                        continue
+                    self.entries.append((id,user,date,node))
+                    lastid = id
+            except sqlite.OperationalError:
+                # likely just an empty db, so return an empty result
+                pass
 
 def localdate(ts):
+    """Given a timestamp, return a (timestamp, tzoffset) tuple,
+    which is what Mercurial works with. Attempts to get DST
+    correct as well."""
     t = time.localtime(ts)
     offset = time.timezone
     if t[8] == 1:
@@ -101,6 +134,9 @@ def localdate(ts):
     return (ts, offset)
 
 def doParseDate(datestring):
+    """Given a date string, try to parse it as an ISO 8601 date.
+    If that fails, try parsing it with the parsedatetime module,
+    which can handle relative dates in natural language."""
     datestring = datestring.strip()
     try:
         date = time.strptime(datestring, "%Y-%m-%d %H:%M:%S")
@@ -108,8 +144,11 @@ def doParseDate(datestring):
         date, x = cal.parse(datestring)
     return time.mktime(date)
 
-def pushlogSetup(web, req):
-    repo = web.repo
+def pushlogSetup(repo, req):
+    """Given a repository object and a hgweb request object,
+    build a PushlogQuery object and populate it with data from the request.
+    The returned query object will have its query already run, and
+    its entries member can be read."""
     repopath = os.path.dirname(repo.path)
     reponame = os.path.basename(repopath)
     if reponame == '.hg':
@@ -122,27 +161,6 @@ def pushlogSetup(web, req):
     else:
         page = 1
 
-    tipsonly = False
-    if 'tipsonly' in req.form and req.form['tipsonly'][0] == '1':
-        tipsonly = True
-    dates = []
-    if 'startdate' in req.form and 'enddate' in req.form:
-        startdate = doParseDate(req.form['startdate'][0])
-        enddate = doParseDate(req.form['enddate'][0])
-        dates = [{'startdate':localdate(startdate), 'enddate':localdate(enddate)}]
-        page = 1
-        total = 1
-        e = getpushlogentriesbydate(conn, startdate, enddate, tipsonly)
-    elif 'fromchange' in req.form:
-        fromchange = hex(repo.lookup(req.form.get('fromchange', ['null'])[0]))
-        tochange = hex(repo.lookup(req.form.get('tochange', ['default'])[0]))
-        page = 1
-        total = 1
-        e = getpushlogentriesbychangeset(conn, fromchange, tochange, tipsonly)
-    else:
-        e = getpushlogentries(conn, (page - 1) * PUSHES_PER_PAGE, 10, tipsonly)
-        total = gettotalpushlogentries(conn)
-
     # figure out the urlbase
     proto = req.env.get('wsgi.url_scheme')
     if proto == 'https':
@@ -154,15 +172,58 @@ def pushlogSetup(web, req):
     port = req.env["SERVER_PORT"]
     port = port != default_port and (":" + port) or ""
 
-    urlbase = '%s://%s%s' % (proto, req.env['SERVER_NAME'], port)
-    return (e, urlbase, reponame, total, page, dates)
+    tipsonly = False
+    if 'tipsonly' in req.form and req.form['tipsonly'][0] == '1':
+        tipsonly = True
+
+    query = PushlogQuery(urlbase='%s://%s%s' % (proto, req.env['SERVER_NAME'], port),
+                         repo=repo,
+                         dbconn=conn,
+                         tipsonly=tipsonly,
+                         reponame=reponame,
+                         page=page)
+
+    # find start component
+    if 'startdate' in req.form:
+        startdate = doParseDate(req.form['startdate'][0])
+        query.querystart = QueryType.DATE
+        query.querystart_value = startdate
+        #TODO: figure out how to make this not suck
+        #query.dates = [{'startdate':localdate(startdate)}]
+    elif 'fromchange' in req.form:
+        query.querystart = QueryType.CHANGESET
+        query.querystart_value = req.form.get('fromchange', ['null'])[0]
+    elif 'startID' in req.form:
+        query.querystart = QueryType.PUSHID
+        query.querystart_value = req.form.get('startID', ['0'])[0]
+    else:
+        # default is last 10 pushes
+        query.querystart = QueryType.COUNT
+        query.querystart_value = PUSHES_PER_PAGE
+
+    if 'enddate' in req.form:
+        enddate = doParseDate(req.form['enddate'][0])
+        query.queryend = QueryType.DATE
+        query.queryend_value = enddate
+        #XXX: breaks if not using startdate!
+        #query.dates['enddate'] =  localdate(enddate)
+    elif 'tochange' in req.form:
+        query.queryend = QueryType.CHANGESET
+        query.queryend_value = req.form.get('tochange', ['default'])[0]
+    elif 'endID' in req.form:
+        query.queryend = QueryType.PUSHID
+        query.queryend_value = req.form.get('endID', [None])[0]
+
+    query.DoQuery()
+    return query
     
 def pushlogFeed(web, req):
-    (e, urlbase, reponame, total, page, dates) = pushlogSetup(web, req)
+    """WebCommand for producing the ATOM feed of the pushlog."""
+    query = pushlogSetup(web.repo, req)
     isotime = lambda x: datetime.utcfromtimestamp(x).isoformat() + 'Z'
     
-    if e:
-        dt = isotime(e[0][2])
+    if query.entries:
+        dt = isotime(query.entries[0][2])
     else:
         dt = datetime.utcnow().isoformat().split('.', 1)[0] + 'Z'
 
@@ -171,12 +232,12 @@ def pushlogFeed(web, req):
  <id>%(urlbase)s%(url)spushlog</id>
  <link rel="self" href="%(urlbase)s%(url)spushlog" />
  <updated>%(date)s</updated>
- <title>%(reponame)s Pushlog</title>""" % {'urlbase': urlbase,
+ <title>%(reponame)s Pushlog</title>""" % {'urlbase': query.urlbase,
                               'url': req.url,
-                              'reponame': reponame,
+                              'reponame': query.reponame,
                               'date': dt}];
 
-    for id, user, date, node in e:
+    for id, user, date, node in query.entries:
         ctx = web.repo.changectx(node)
         resp.append("""
  <entry>
@@ -195,7 +256,7 @@ def pushlogFeed(web, req):
  </entry>""" % {'node': node,
                 'date': isotime(date),
                 'user': xmlescape(user),
-                'urlbase': urlbase,
+                'urlbase': query.urlbase,
                 'url': req.url,
                 'files': '</li><li class="file">'.join(ctx.files())})
 
@@ -207,7 +268,8 @@ def pushlogFeed(web, req):
     req.write(resp)
 
 def pushlogHTML(web, req, tmpl):
-    (entries, urlbase, reponame, total, page, dates) = pushlogSetup(web, req)
+    """WebCommand for producing the HTML view of the pushlog."""
+    query = pushlogSetup(web.repo, req)
 
     # these three functions are in webutil in newer hg, but not in hg 1.0
     def nodetagsdict(repo, node):
@@ -232,17 +294,17 @@ def pushlogHTML(web, req, tmpl):
 
     def changenav():
         nav = []
-        numpages = int(ceil(total / float(PUSHES_PER_PAGE)))
-        start = max(1, page - PUSHES_PER_PAGE/2)
-        end = min(numpages + 1, page + PUSHES_PER_PAGE/2)
-        if page != 1:
+        numpages = int(ceil(query.totalentries / float(PUSHES_PER_PAGE)))
+        start = max(1, query.page - PUSHES_PER_PAGE/2)
+        end = min(numpages + 1, query.page + PUSHES_PER_PAGE/2)
+        if query.page != 1:
             nav.append({'page': 1, 'label': "First"})
-            nav.append({'page': page - 1, 'label': "Prev"})
+            nav.append({'page': query.page - 1, 'label': "Prev"})
         for i in range(start, end):
             nav.append({'page': i, 'label': str(i)})
         
-        if page != numpages:
-            nav.append({'page': page + 1, 'label': "Next"})
+        if query.page != numpages:
+            nav.append({'page': query.page + 1, 'label': "Next"})
             nav.append({'page': numpages, 'label': "Last"})
         return nav
 
@@ -251,7 +313,7 @@ def pushlogHTML(web, req, tmpl):
         lastid = None
         ch = None
         l = []
-        for id, user, date, node in entries:
+        for id, user, date, node in query.entries:
             if id != lastid:
                 lastid = id
                 l.append({"parity": parity.next(),
@@ -295,25 +357,17 @@ def pushlogHTML(web, req, tmpl):
                 latestentry=lambda **x: changelist(limit=1,**x),
                 startdate=startdate,
                 enddate=enddate,
-                query=dates,
+                query=query.dates,
                 archives=web.archivelist("tip"))
 
-def pushes_worker(basepath, startID=0, endID=None):
-    stmt = 'SELECT id, user, date, rev, node from pushlog INNER JOIN changesets ON id = pushid WHERE id > ? %s ORDER BY id ASC, rev ASC'
-
-    args = (startID,)
-    if endID is not None:
-        stmt = stmt % 'and id <= ?'
-        args = (startID, endID)
-    else:
-        stmt = stmt % ""
-    if os.path.basename(basepath) != '.hg':
-        basepath = os.path.join(basepath, '.hg')
-    conn = sqlite.connect(os.path.join(basepath, 'pushlog2.db'))
+def pushes_worker(query):
+    """Given a PushlogQuery, return a data structure mapping push IDs
+    to a map of data about the push."""
     pushes = {}
-    for id, user, date, rev, node in conn.execute(stmt, args):
+    for id, user, date, node in query.entries:
         if id in pushes:
-            pushes[id]['changesets'].append(node)
+            # we get the pushes in reverse order
+            pushes[id]['changesets'].insert(0, node)
         else:
             pushes[id] = {'user': user,
                           'date': date,
@@ -322,19 +376,25 @@ def pushes_worker(basepath, startID=0, endID=None):
     return pushes
 
 def pushes(web, req, tmpl):
-    repopath = web.repo.path
-    startID = 'startID' in req.form and req.form['startID'][0] or 0
-    endID = 'endID' in req.form and req.form['endID'][0] or None
-    data = pushes_worker(repopath, startID, endID)
-    return tmpl('pushes', data=data)
+    """WebCommand to return a data structure containing pushes."""
+    query = pushlogSetup(web.repo, req)
+    return tmpl('pushes', data=pushes_worker(query))
 
 def printpushlog(ui, repo, *args):
+    """HG Command to print the pushlog data in JSON format."""
     from hgwebjson import HGJSONEncoder
     e = HGJSONEncoder()
     startID = len(args) and args[0] or 0
     endID = len(args) > 1 and args[1] or None
-    print e.encode(pushes_worker(repo.path, startID, endID))
-
+    conn = sqlite.connect(os.path.join(repo.path, 'pushlog2.db'))
+    query = PushlogQuery(repo=repo, dbconn=conn)
+    query.querystart = QueryType.PUSHID
+    query.querystart_value = startID
+    if endID is not None:
+        query.queryend = QueryType.PUSHID
+        query.queryend_value = endID
+    query.DoQuery()
+    print e.encode(pushes_worker(query))
 
 addcommand(pushlogFeed, 'pushlog')
 addwebcommand(pushlogHTML, 'pushloghtml')

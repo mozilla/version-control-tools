@@ -37,6 +37,35 @@ def ensure_templates():
     # make sure it's updated
     check_call(["hg","-R",templatepath,"pull","-u"], stdout=devnull, stderr=STDOUT)
 
+class TestEmptyRepo(unittest.TestCase):
+    hgwebprocess = None
+    def setUp(self):
+        # create an empty repo
+        repodir = "/tmp/hg-empty-repo/"
+        check_call(["rm", "-rf", repodir])
+        os.mkdir(repodir)
+        check_call(["hg","init",repodir])
+        write_hgrc(repodir)
+        ensure_templates()
+        # now run hg serve on it
+        self.hgwebprocess = Popen(["hg", "-R", repodir, "serve"], stdout=devnull, stderr=STDOUT)
+        # give it a second to be ready
+        sleep(1)
+
+    def tearDown(self):
+        # kill hgweb process
+        if self.hgwebprocess is not None:
+            os.kill(self.hgwebprocess.pid, SIGTERM)
+            self.hgwebprocess = None
+
+    def testemptyrepo(self):
+        # just GET /pushlog and verify that it's 200 OK
+        conn = HTTPConnection("localhost", 8000)
+        conn.request("GET", "/pushlog")
+        r = conn.getresponse()
+        conn.close()
+        self.assertEqual(r.status, 200, "empty pushlog should not error (got HTTP status %d, expected 200)" % r.status)
+
 class TestPushlog(unittest.TestCase):
     hgwebprocess = None
 
