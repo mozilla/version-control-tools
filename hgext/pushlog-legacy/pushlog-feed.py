@@ -54,6 +54,8 @@ class PushlogQuery:
     queryend_value = None
     # Allow query-by-user
     userquery = []
+    # Allow query-by-individual-changeset
+    changesetquery = []
 
     def __init__(self, repo, dbconn, urlbase='', tipsonly=False, reponame=''):
         self.repo = repo
@@ -66,7 +68,7 @@ class PushlogQuery:
         """Figure out what the query parameters are, and query the database
         using those parameters."""
         self.entries = []
-        if self.querystart == QueryType.COUNT and not self.userquery:
+        if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
             # Get entries from self.page, using self.querystart_value as
             # the number of pushes per page.
             try:
@@ -118,6 +120,15 @@ class PushlogQuery:
                     params['user%d' % i] = u
                     i += 1
                 where.append('(' + ' OR '.join(subquery) + ')')
+
+            if self.changesetquery:
+                i = 0
+                subquery = []
+                for c in self.changesetquery:
+                    subquery.append("id = (select c.pushid from changesets c where c.node = :node%s)" % i)
+                    params['node%d' % i] = hex(self.repo.lookup(c))
+                    i += 1
+                where.append('(' + ' OR '.join(subquery) + ')')
             
             query = basequery + ' AND '.join(where) + ' ORDER BY id DESC, rev DESC'
             #print "query: %s" % query
@@ -135,7 +146,7 @@ class PushlogQuery:
                 pass
 
     def description(self):
-        if self.querystart == QueryType.COUNT and self.userquery is None:
+        if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
             return ''
         bits = []
         isotime = lambda x: datetime.utcfromtimestamp(x).isoformat(' ')
@@ -153,8 +164,11 @@ class PushlogQuery:
         elif self.queryend == QueryType.PUSHID:
             bits.append('up to and including push ID %s' % self.queryend_value)
 
-        if self.userquery is not None:
+        if self.userquery:
             bits.append('by user %s' % ' or '.join(self.userquery))
+
+        if self.changesetquery:
+            bits.append('with changeset %s' % ' and '.join(self.changesetquery))
 
         return 'Changes pushed ' + ', '.join(bits)
 
@@ -247,6 +261,10 @@ def pushlogSetup(repo, req):
 
     if 'user' in req.form:
         query.userquery = req.form.get('user', [])
+
+    #TODO: use rev here, switch page to ?page=foo ?
+    if 'changeset' in req.form:
+        query.changesetquery = req.form.get('changeset', [])
 
     query.DoQuery()
     return query

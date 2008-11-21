@@ -218,6 +218,18 @@ class TestPushlog(unittest.TestCase):
         expectedjson = loadjsonfile("testdata/test-repo-startdate-tochange-query.json")
         self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
+    def testsinglechangesetquery(self):
+        """Query for a single changeset."""        
+        testjson = loadjsonurl("http://localhost:8000/json-pushes?changeset=91826025c77c")
+        expectedjson = loadjsonfile("testdata/test-repo-changeset-query.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
+
+    def testmultichangesetquery(self):
+        """Query for two changesets at once."""
+        testjson = loadjsonurl("http://localhost:8000/json-pushes?changeset=91826025c77c&changeset=a79451771352")
+        expectedjson = loadjsonfile("testdata/test-repo-multi-changeset-query.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
+
 class TestPushlogUserQueries(unittest.TestCase):
     hgwebprocess = None
     repodir = ''
@@ -269,11 +281,19 @@ class TestPushlogUserQueries(unittest.TestCase):
         """Query for a user and a startdate."""
         testjson = loadjsonurl("http://localhost:8000/json-pushes?user=luser&startdate=2008-11-21%2011:36:40")
         expectedjson = loadjsonfile("testdata/test-repo-user-luser-startdate.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
     def testuserstartdateenddatequery(self):
         """Query for a user with a startdate and an enddate."""
         testjson = loadjsonurl("http://localhost:8000/json-pushes?user=luser&startdate=2008-11-21%2011:36:40&enddate=2008-11-21%2011:37:10")
         expectedjson = loadjsonfile("testdata/test-repo-user-luser-startdate-enddate.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
+
+    def testchangesetsanduserquery(self):
+        """Query for multiple changesets and a user, should be the same as just querying for the one changeset, as only one changeset was pushed by this user."""
+        testjson = loadjsonurl("http://localhost:8000/json-pushes?changeset=edd2698e8172&changeset=4eb202ea0252&user=luser")
+        expectedjson = loadjsonurl("http://localhost:8000/json-pushes?changeset=edd2698e8172")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
 if __name__ == '__main__':
     unittest.main()
