@@ -28,12 +28,17 @@ def createpushdb(conn):
     conn.execute("CREATE INDEX IF NOT EXISTS pushlog_user ON pushlog (user)")
     conn.commit()
 
+def schemaexists(conn):
+    return 1 == conn.execute("SELECT COUNT(*) FROM SQLITE_MASTER WHERE name='pushlog'").fetchone()[0]
+
 def log(ui, repo, node, **kwargs):
     pushdb = os.path.join(repo.path, 'pushlog2.db')
     createdb = False
     if not os.path.exists(pushdb):
         createdb = True
     conn = sqlite.connect(pushdb)
+    if not createdb and not schemaexists(conn):
+        createdb = True
     if createdb:
         createpushdb(conn)
         st = os.stat(pushdb)

@@ -74,4 +74,17 @@ else
     echo "PASS: pushlog db is group writeable!"
 fi
 
+# Test that an empty db file doesn't break the hook - bug 466149
+rm $REPO/.hg/pushlog2.db
+touch $REPO/.hg/pushlog2.db
+
+echo "another checkin" >> $CLONE/testfile
+hg ci -R $CLONE -m "another checkin"
+if hg push -R $CLONE $REPO; then
+    echo "PASS: push to empty db succeeded"
+else
+    echo "FAIL: failed to push to repo with empty db"
+    exit 1;
+fi
+
 echo "Passed all tests!"
