@@ -52,6 +52,8 @@ class PushlogQuery:
     # query is
     queryend = None
     queryend_value = None
+    # Allow query-by-user
+    userquery = []
 
     def __init__(self, repo, dbconn, urlbase='', tipsonly=False, reponame=''):
         self.repo = repo
@@ -64,7 +66,7 @@ class PushlogQuery:
         """Figure out what the query parameters are, and query the database
         using those parameters."""
         self.entries = []
-        if self.querystart == QueryType.COUNT:
+        if self.querystart == QueryType.COUNT and not self.userquery:
             # Get entries from self.page, using self.querystart_value as
             # the number of pushes per page.
             try:
@@ -107,8 +109,19 @@ class PushlogQuery:
             elif self.queryend == QueryType.PUSHID:
                 where.append("id <= :end_id ")
                 params['end_id'] = self.queryend_value
+
+            if self.userquery:
+                i = 0
+                subquery = []
+                for u in self.userquery:
+                    subquery.append("user = :user%d" % i)
+                    params['user%d' % i] = u
+                    i += 1
+                where.append('(' + ' OR '.join(subquery) + ')')
             
             query = basequery + ' AND '.join(where) + ' ORDER BY id DESC, rev DESC'
+            #print "query: %s" % query
+            #print "params: %s" % params
             try:
                 res = self.conn.execute(query, params)
                 lastid = None
@@ -122,7 +135,7 @@ class PushlogQuery:
                 pass
 
     def description(self):
-        if self.querystart == QueryType.COUNT:
+        if self.querystart == QueryType.COUNT and self.userquery is None:
             return ''
         bits = []
         isotime = lambda x: datetime.utcfromtimestamp(x).isoformat(' ')
@@ -139,6 +152,10 @@ class PushlogQuery:
             bits.append('up to and including changeset %s' % self.queryend_value)
         elif self.queryend == QueryType.PUSHID:
             bits.append('up to and including push ID %s' % self.queryend_value)
+
+        if self.userquery is not None:
+            bits.append('by user %s' % ' or '.join(self.userquery))
+
         return 'Changes pushed ' + ', '.join(bits)
 
 def localdate(ts):
@@ -227,6 +244,9 @@ def pushlogSetup(repo, req):
     elif 'endID' in req.form:
         query.queryend = QueryType.PUSHID
         query.queryend_value = req.form.get('endID', [None])[0]
+
+    if 'user' in req.form:
+        query.userquery = req.form.get('user', [])
 
     query.DoQuery()
     return query
