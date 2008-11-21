@@ -68,8 +68,8 @@ class TestEmptyRepo(unittest.TestCase):
 
 class TestPushlog(unittest.TestCase):
     hgwebprocess = None
-
     repodir = ''
+
     def setUp(self):
         "Untar the test repo and add the pushlog extension to it."
         # unpack the test repo
@@ -80,10 +80,6 @@ class TestPushlog(unittest.TestCase):
         check_call(["tar", "xjf", repoarchive], cwd="/tmp")
         write_hgrc(repodir)
         ensure_templates()
-        # read our expected json data
-        f = file(os.path.join(mydir, "testdata/test-repo-data.json"))
-        self.expectedjson = simplejson.loads(''.join(f.readlines()))
-        f.close()
         # now run hg serve on it
         self.hgwebprocess = Popen(["hg", "-R", repodir, "serve"], stdout=devnull, stderr=STDOUT)
         # give it a second to be ready
@@ -96,17 +92,31 @@ class TestPushlog(unittest.TestCase):
             os.kill(self.hgwebprocess.pid, SIGTERM)
             self.hgwebprocess = None
 
-    def testalljsonpushes(self):
-        """Get all json data from json-pushes."""
-        u = urlopen("http://localhost:8000/json-pushes?startID=0")
+    def loadjsonurl(self, url):
+        """Load JSON from a URL into an object."""
+        u = urlopen(url)
         j = simplejson.loads(''.join(u.readlines()))
         u.close()
-        self.assertEqual(j, self.expectedjson, "json-pushes did not yield expected json data!")
+        return j
+
+    def loadjsonfile(self, f):
+        """Given a file path relative to the srcdir, load the file as a JSON object."""
+        f = file(os.path.join(mydir, f))
+        j = simplejson.loads(''.join(f.readlines()))
+        f.close()
+        return j
+        
+    def testalljsonpushes(self):
+        """Get all json data from json-pushes."""
+        testjson = self.loadjsonurl("http://localhost:8000/json-pushes?startID=0")
+        expectedjson = self.loadjsonfile("testdata/test-repo-data.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
     def testprintpushlog(self):
         """Get all json data via 'hg printpushlog'."""
-        j = simplejson.loads(Popen(["hg", "-R", self.repodir, "printpushlog"], stdout=PIPE).communicate()[0])
-        self.assertEqual(j, self.expectedjson, "printpushlog did not yield expected json data!")
+        testjson = simplejson.loads(Popen(["hg", "-R", self.repodir, "printpushlog"], stdout=PIPE).communicate()[0])
+        expectedjson = self.loadjsonfile("testdata/test-repo-data.json")
+        self.assertEqual(testjson, expectedjson, "printpushlog did not yield expected json data!")
 
     def assertEqualFeeds(self, a, b):
         self.assertEqual(a.feed.title, b.feed.title, "not the same title, %s != %s" % (a.feed.title, b.feed.title))
@@ -171,6 +181,42 @@ class TestPushlog(unittest.TestCase):
         testfeed = feedparser.parse("http://localhost:8000/pushlog?startdate=%202008-11-20%2010:52:25%20&enddate=%202008-11-20%2010:53:25%20&foo=bar")
         expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-date-query-data.xml"))
         self.assertEqualFeeds(testfeed, expectedfeed)
+
+    def teststartidtoenddatequery(self):
+        """Query with a startID and an enddate."""
+        testjson = self.loadjsonurl("http://localhost:8000/json-pushes?startID=5&enddate=2008-11-20%2010:53:25")
+        expectedjson = self.loadjsonfile("testdata/test-repo-startid-enddate-query.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
+
+    def teststartdatetoendidquery(self):
+        """Query with a startdate and an endID."""
+        testjson = self.loadjsonurl("http://localhost:8000/json-pushes?startdate=2008-11-20%2010:52:25&endID=15")
+        expectedjson = self.loadjsonfile("testdata/test-repo-startdate-endid-query.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
+
+    def testfromchangetoendidquery(self):
+        """Query with fromchange and an endID."""
+        testjson = self.loadjsonurl("http://localhost:8000/json-pushes?fromchange=cc07cc0e87f8&endID=15")
+        expectedjson = self.loadjsonfile("testdata/test-repo-fromchange-endid-query.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
+
+    def teststartidtochangequery(self):
+        """Query with a startID and tochange."""
+        testjson = self.loadjsonurl("http://localhost:8000/json-pushes?startID=5&tochange=af5fb85d9324")
+        expectedjson = self.loadjsonfile("testdata/test-repo-startid-tochange-query.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
+
+    def testfromchangetoenddatequery(self):
+        """Query with fromchange and an enddate."""
+        testjson = self.loadjsonurl("http://localhost:8000/json-pushes?fromchange=cc07cc0e87f8&enddate=2008-11-20%2010:52:56")
+        expectedjson = self.loadjsonfile("testdata/test-repo-fromchange-enddate-query.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
+
+    def teststartdatetochangequery(self):
+        """Query with a startdate and tochange."""
+        testjson = self.loadjsonurl("http://localhost:8000/json-pushes?startdate=2008-11-20%2010:52:25&tochange=af5fb85d9324")
+        expectedjson = self.loadjsonfile("testdata/test-repo-startdate-tochange-query.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
 if __name__ == '__main__':
     unittest.main()
