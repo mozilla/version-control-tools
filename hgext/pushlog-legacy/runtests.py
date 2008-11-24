@@ -230,6 +230,18 @@ class TestPushlog(unittest.TestCase):
         expectedjson = loadjsonfile("testdata/test-repo-multi-changeset-query.json")
         self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
+    def testdateparsing(self):
+        """Test that we can parse partial dates, missing seconds, minutes, hours."""
+        testjson = loadjsonurl("http://localhost:8000/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-20%2010:53:00")
+        expectedjson = loadjsonurl("http://localhost:8000/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-20%2010:53")
+        self.assertEqual(testjson, expectedjson, "Failed to parse date with missing seconds")
+        testjson = loadjsonurl("http://localhost:8000/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-20%2011:00:00")
+        expectedjson = loadjsonurl("http://localhost:8000/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-20%2011")
+        self.assertEqual(testjson, expectedjson, "Failed to parse date with missing seconds and minutes")
+        testjson = loadjsonurl("http://localhost:8000/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-21%2000:00:00")
+        expectedjson = loadjsonurl("http://localhost:8000/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-21")
+        self.assertEqual(testjson, expectedjson, "Failed to parse date with missing seconds, minutes, hours")
+
 class TestPushlogUserQueries(unittest.TestCase):
     hgwebprocess = None
     repodir = ''

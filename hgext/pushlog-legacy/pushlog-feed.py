@@ -149,7 +149,7 @@ class PushlogQuery:
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
             return ''
         bits = []
-        isotime = lambda x: datetime.utcfromtimestamp(x).isoformat(' ')
+        isotime = lambda x: datetime.fromtimestamp(x).isoformat(' ')
         if self.querystart == QueryType.DATE:
             bits.append('after %s' % isotime(self.querystart_value))
         elif self.querystart == QueryType.CHANGESET:
@@ -187,9 +187,18 @@ def doParseDate(datestring):
     If that fails, try parsing it with the parsedatetime module,
     which can handle relative dates in natural language."""
     datestring = datestring.strip()
-    try:
-        date = time.strptime(datestring, "%Y-%m-%d %H:%M:%S")
-    except ValueError:
+    # This is sort of awful. Match YYYY-MM-DD hh:mm:ss, with the time parts all being optional
+    m = re.match("^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)(?: (?P<hour>\d\d)(?::(?P<minute>\d\d)(?::(?P<second>\d\d))?)?)?$", datestring)
+    if m:
+        date = (int(m.group("year")), int(m.group("month")), int(m.group("day")),
+                m.group("hour") and int(m.group("hour")) or 0,
+                m.group("minute") and int(m.group("minute")) or 0,
+                m.group("second") and int(m.group("second")) or 0,
+                0, # weekday
+                0, # yearday
+                -1) # isdst
+    else:
+        # fall back to parsedatetime
         date, x = cal.parse(datestring)
     return time.mktime(date)
 
