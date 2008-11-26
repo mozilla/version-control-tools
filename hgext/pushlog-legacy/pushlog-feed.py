@@ -68,6 +68,9 @@ class PushlogQuery:
         """Figure out what the query parameters are, and query the database
         using those parameters."""
         self.entries = []
+        if not self.conn:
+            # we didn't get a connection to the database, return empty
+            return
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
             # Get entries from self.page, using self.querystart_value as
             # the number of pushes per page.
@@ -212,7 +215,10 @@ def pushlogSetup(repo, req):
     if reponame == '.hg':
         reponame = os.path.basename(os.path.dirname(repopath))
     pushdb = os.path.join(repo.path, "pushlog2.db")
-    conn = sqlite.connect(pushdb)
+    try:
+        conn = sqlite.connect(pushdb)
+    except sqlite.OperationalError:
+        conn = None
 
     if 'node' in req.form:
         page = int(req.form['node'][0])
@@ -441,7 +447,10 @@ def printpushlog(ui, repo, *args):
     e = HGJSONEncoder()
     startID = len(args) and args[0] or 0
     endID = len(args) > 1 and args[1] or None
-    conn = sqlite.connect(os.path.join(repo.path, 'pushlog2.db'))
+    try:
+        conn = sqlite.connect(os.path.join(repo.path, 'pushlog2.db'))
+    except sqlite.OperationalError:
+        conn = None
     query = PushlogQuery(repo=repo, dbconn=conn)
     query.querystart = QueryType.PUSHID
     query.querystart_value = startID

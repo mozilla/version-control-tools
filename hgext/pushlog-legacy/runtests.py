@@ -5,6 +5,7 @@ import unittest
 import os.path
 from subprocess import check_call, Popen, STDOUT, PIPE
 import os
+import stat
 from signal import SIGTERM
 from httplib import HTTPConnection
 from urllib import urlopen
@@ -65,6 +66,7 @@ class TestEmptyRepo(unittest.TestCase):
         self.hgwebprocess = Popen(["hg", "-R", repodir, "serve"], stdout=devnull, stderr=STDOUT)
         # give it a second to be ready
         sleep(1)
+        self.repodir = repodir
 
     def tearDown(self):
         # kill hgweb process
@@ -78,6 +80,25 @@ class TestEmptyRepo(unittest.TestCase):
         conn.request("GET", "/pushlog")
         r = conn.getresponse()
         conn.close()
+        self.assertEqual(r.status, 200, "empty pushlog should not error (got HTTP status %d, expected 200)" % r.status)
+
+    def testemptyreporeadonly(self):
+        # just GET /pushlog and verify that it's 200 OK
+        def rchmod(canWrite = False):
+            w = 0
+            if canWrite:
+                w = stat.S_IWRITE
+            for dir, subdirs, files in os.walk(self.repodir):
+                os.chmod(dir, stat.S_IREAD + stat.S_IEXEC + w)
+                for f in files:
+                    os.chmod(os.path.join(dir, f), stat.S_IREAD)
+            pass
+        rchmod()
+        conn = HTTPConnection("localhost", 8000)
+        conn.request("GET", "/pushlog")
+        r = conn.getresponse()
+        conn.close()
+        rchmod(True)
         self.assertEqual(r.status, 200, "empty pushlog should not error (got HTTP status %d, expected 200)" % r.status)
 
 class TestPushlog(unittest.TestCase):
