@@ -1,0 +1,14 @@
+ <entry>
+  <title>Changeset {node}</title>
+  <id>http://www.selenic.com/mercurial/#changeset-{node}</id>
+  <link href="{urlbase}{url}rev/{node}"/>
+  <updated>{date}</updated>
+  <author>
+   <name>{user|xmlescape}</name>
+  </author>
+  <content type="xhtml">
+   <div xmlns="http://www.w3.org/1999/xhtml">
+    <ul class="filelist">{files%pushlogfile}</ul>
+   </div>
+  </content>
+ </entry>

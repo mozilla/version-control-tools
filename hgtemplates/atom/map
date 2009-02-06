@@ -8,3 +8,6 @@ filelog = filelog.tmpl
 filelogentry = filelogentry.tmpl
 tags = tags.tmpl
 tagentry = tagentry.tmpl
+pushlog = pushlog.tmpl
+pushlogentry = pushlogentry.tmpl
+pushlogfile = '<li class="file">{name}</li>'
