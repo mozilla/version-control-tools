@@ -283,9 +283,12 @@ def pushlogSetup(repo, req):
 
     query.DoQuery()
     return query
-    
-def pushlogFeed(web, req):
+
+def pushlogFeed(web, req, tmpl):
     """WebCommand for producing the ATOM feed of the pushlog."""
+    
+    req.form['style'] = ['atom']
+    tmpl = web.templater(req)
     query = pushlogSetup(web.repo, req)
     isotime = lambda x: datetime.utcfromtimestamp(x).isoformat() + 'Z'
     
@@ -294,45 +297,28 @@ def pushlogFeed(web, req):
     else:
         dt = datetime.utcnow().isoformat().split('.', 1)[0] + 'Z'
 
-    resp = ["""<?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
- <id>%(urlbase)s%(url)spushlog</id>
- <link rel="self" href="%(urlbase)s%(url)spushlog" />
- <updated>%(date)s</updated>
- <title>%(reponame)s Pushlog</title>""" % {'urlbase': query.urlbase,
-                              'url': req.url,
-                              'reponame': query.reponame,
-                              'date': dt}];
+    data = {
+        'urlbase': query.urlbase,
+        'url': req.url,
+        'repo': query.reponame,
+        'date': dt,
+        'entries': [],
+    }
 
+    entries = data['entries']
     for id, user, date, node in query.entries:
         ctx = web.repo.changectx(node)
-        resp.append("""
- <entry>
-  <title>Changeset %(node)s</title>
-  <id>http://www.selenic.com/mercurial/#changeset-%(node)s</id>
-  <link href="%(urlbase)s%(url)srev/%(node)s" />
-  <updated>%(date)s</updated>
-  <author>
-   <name>%(user)s</name>
-  </author>
-  <content type="xhtml">
-    <div xmlns="http://www.w3.org/1999/xhtml">
-      <ul class="filelist"><li class="file">%(files)s</li></ul>
-    </div>
-  </content>
- </entry>""" % {'node': node,
-                'date': isotime(date),
-                'user': xmlescape(user),
-                'urlbase': query.urlbase,
-                'url': req.url,
-                'files': '</li><li class="file">'.join(ctx.files())})
+        entries.append({
+            'node': node,
+            'date': isotime(date),
+            'user': xmlescape(user),
+            'urlbase': query.urlbase,
+            'url': req.url,
+            'files': [{'name': fn} for fn in ctx.files()],
+        })
 
-    resp.append("</feed>")
-
-    resp = "".join(resp)
-
-    req.respond(HTTP_OK, ATOM_MIMETYPE, length=len(resp))
-    req.write(resp)
+    req.respond(HTTP_OK, ATOM_MIMETYPE)
+    return tmpl('pushlog', **data)
 
 def pushlogHTML(web, req, tmpl):
     """WebCommand for producing the HTML view of the pushlog."""
@@ -460,7 +446,7 @@ def printpushlog(ui, repo, *args):
     query.DoQuery()
     print e.encode(pushes_worker(query))
 
-addcommand(pushlogFeed, 'pushlog')
+addwebcommand(pushlogFeed, 'pushlog')
 addwebcommand(pushlogHTML, 'pushloghtml')
 addwebcommand(pushes, 'pushes')
 
