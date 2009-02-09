@@ -402,8 +402,8 @@ def pushlogHTML(web, req, tmpl):
                 rev=0,
                 entries=lambda **x: changelist(limit=0,**x),
                 latestentry=lambda **x: changelist(limit=1,**x),
-                startdate='startdate' in req.form and req.form['startdate'] or '1 week ago',
-                enddate='enddate' in req.form and req.form['enddate'] or 'now',
+                startdate='startdate' in req.form and req.form['startdate'][0] or '1 week ago',
+                enddate='enddate' in req.form and req.form['enddate'][0] or 'now',
                 querydescription=query.description(),
                 archives=web.archivelist("tip"))
 
