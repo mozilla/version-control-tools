@@ -38,9 +38,9 @@ function setup()
 <form action="{url}pushloghtml">
 <div class="search">
 From:
-<input type="text" name="startdate"  value="#startdate#"/>
+<input type="text" name="startdate"  value="#startdate|escape#"/>
 To:
-<input type="text" name="enddate"  value="#enddate#"/>
+<input type="text" name="enddate"  value="#enddate|escape#"/>
 <input type="submit" value="Search"/>
 </div>
 </form>
