@@ -77,3 +77,30 @@ span.logtags span.inbranchtag {
 	background-color: #d5dde6;
 	border-color: #e3ecf4 #9398f4 #9398f4 #e3ecf4;
 }
+div.codeauthor { 
+    display:inline-block; 
+    min-width:16ch;
+    text-align: right; 
+    color:#999999; 
+    text-decoration:none;
+} 
+a.codeline { 
+    color:#999999; 
+	text-decoration:none; 
+	margin:0 10px; 
+}                                   
+div.l0 {
+    background-color:#f6f6f0;
+}                                                                    
+div.l0, div.l1 { 
+    display:block; 
+}
+pre.completecodeline { 
+    font-size:12px; 
+	line-height:1.4em; 
+}
+a.codeline:hover,
+a.codeline:visited,
+a.codeline:active {
+    color: #880000;
+}
