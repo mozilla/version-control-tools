@@ -6,7 +6,7 @@ import re
 hgNameToTinderboxURL = {
     'mozilla-central': 'http://tinderbox.mozilla.org/Firefox/',
     'comm-central'   : 'http://tinderbox.mozilla.org/Thunderbird/',
-    'mozilla-1.9.1'  : 'http://tinderbox.mozilla.org/Firefox3.1/',
+    'mozilla-1.9.1'  : 'http://tinderbox.mozilla.org/Firefox3.5/',
     'mobile-browser' : 'http://tinderbox.mozilla.org/Mobile/'
 }
 
