@@ -3,33 +3,40 @@
 <link rel="alternate" type="application/atom+xml"
    href="{url}pushlog" title="Atom feed for #repo|escape# pushlog"/>
 <style type="text/css">
-#localize {
+#localize, .expand {
   font-size: x-small;
 }
 </style>
+<script type="text/javascript" src="{staticurl}jquery-1.2.6.min.js"></script>
 <script type="text/javascript">// <![CDATA
-function localizeDates()
-{
-  var dates = document.getElementsByClassName("date");
-  for (var i=0; i<dates.length; i++) {
-    dates[i].textContent = new Date(dates[i].textContent).toLocaleString();
-  }
-  document.getElementById("localize").style.display = 'none';
-  return false;
-}
-
-function setup()
-{
-  if ('getElementsByClassName' in document) {
-    var l = document.getElementById("localize");
-    l.style.display = "";
-    l.onclick = localizeDates;
-  }
-}
+$(document).ready(function () {
+  // add click handler to the localize dates link
+  $('#localize').show().click(function () {
+     $(this).hide();
+     $('.date').each(function (i) {
+       $(this).text(new Date($(this).text()).toLocaleString());
+     });
+     return false;
+  });
+  // hide things that should be hidden
+  $('.hidden').hide();
+  // add click handler to unhide hidden things
+  $('.expand').click(function () {
+    if ($(this).text() == "[Expand]")
+      $(this).text("[Collapse]");
+    else
+      $(this).text("[Expand]");
+    
+    var pushid = $(this).attr("class");
+    pushid = '.' + pushid.match(/id\d+/);
+    $(pushid).nextAll(pushid).toggle();
+    return false;
+  });
+});
 // ]]>
 </script>
 </head>
-<body onload="setup()">
+<body>
 
 <div class="page_header">
 <a href="http://developer.mozilla.org/en/docs/Mercurial" title="Mercurial" style="float: right;">Mercurial</a><a href="{url}summary{sessionvars%urlparameter}">#repo|escape#</a> - pushlog
