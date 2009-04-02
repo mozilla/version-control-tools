@@ -3,7 +3,7 @@ import mercurial.hgweb.webcommands as hgwebcommands
 import mercurial.hgweb.webutil as webutil
 from mercurial.templatefilters import xmlescape
 from mercurial.hgweb.common import HTTP_OK, HTTP_NOT_FOUND, HTTP_SERVER_ERROR, paritygen
-from mercurial.node import short, bin, hex
+from mercurial.node import short, bin, hex, nullid
 from mercurial import demandimport
 
 import sys, os.path, re
@@ -363,39 +363,53 @@ def pushlogHTML(web, req, tmpl):
         return nav
 
     def changelist(limit=0, **map):
+        # useless fallback
+        listfilediffs = lambda a,b,c: []
+        if hasattr(webutil, 'listfilediffs'):
+            listfilediffs = lambda a,b,c: webutil.listfilediffs(a,b,c, len(b))
+        elif hasattr(web, 'listfilediffs'):
+            listfilediffs = web.listfilediffs
+
         allentries = []
         lastid = None
         ch = None
         l = []
+        mergehidden = ""
+        p = 0
+        currentpush = None
         for id, user, date, node in query.entries:
-            if id != lastid:
-                lastid = id
-                l.append({"parity": parity.next(),
-                          "user": user,
-                          "date": localdate(date),
-                          'numchanges': 0,
-                          "changes": []})
-                ch = l[-1]['changes']
             ctx = web.repo.changectx(node)
             n = ctx.node()
-            # useless fallback
-            listfilediffs = lambda a,b,c: []
-            if hasattr(webutil, 'listfilediffs'):
-                listfilediffs = lambda a,b,c: webutil.listfilediffs(a,b,c, len(b))
-            elif hasattr(web, 'listfilediffs'):
-                listfilediffs = web.listfilediffs
-
-            ch.append({"author": ctx.user(),
-                       "desc": ctx.description(),
-                       "files": listfilediffs(tmpl, ctx.files(), n),
-                       "rev": ctx.rev(),
-                       "node": hex(n),
-                       "tags": nodetagsdict(web.repo, n),
-                       "branches": nodebranchdict(web.repo, ctx),
-                       "inbranch": nodeinbranch(web.repo, ctx),
-                       "parity": l[-1]["parity"]
-                       })
-            l[-1]['numchanges'] += 1
+            entry = {"author": ctx.user(),
+                     "desc": ctx.description(),
+                     "files": listfilediffs(tmpl, ctx.files(), n),
+                     "rev": ctx.rev(),
+                     "node": hex(n),
+                     "tags": nodetagsdict(web.repo, n),
+                     "branches": nodebranchdict(web.repo, ctx),
+                     "inbranch": nodeinbranch(web.repo, ctx),
+                     "hidden": "",
+                     "push": [],
+                     "mergerollup": [],
+                     "id": id
+                     }
+            if id != lastid:
+                lastid = id
+                p = parity.next()
+                entry["push"] = [{"user": user,
+                                  "date": localdate(date)}]
+                if len([c for c in ctx.parents() if c.node() != nullid]) > 1:
+                    mergehidden = "hidden"
+                    entry["mergerollup"] = [{"count": 0}]
+                else:
+                    mergehidden = ""
+                currentpush = entry
+            else:
+                entry["hidden"] = mergehidden
+                if mergehidden:
+                    currentpush["mergerollup"][0]["count"] += 1
+            entry["parity"] = p
+            l.append(entry)
 
         if limit > 0:
             l = l[:limit]
