@@ -126,6 +126,16 @@ class TestPushlog(unittest.TestCase):
         if self.hgwebprocess is not None:
             os.kill(self.hgwebprocess.pid, SIGTERM)
             self.hgwebprocess = None
+
+    def testpushloghtml(self):
+        """Sanity check the html output."""
+        u = urlopen("http://localhost:8000/pushloghtml")
+        data = ''.join(u.readlines())
+        u.close()
+        # ensure we didn't hit a server error in the middle
+        self.assertEqual(data.find("Internal Server Error"), -1, "should not get an internal server error in the html output")
+        # crap test, but I don't want to parse html
+        self.assertNotEqual(data.find("427bfb5defee"), -1, "should have the latest changeset in the html output")
         
     def testalljsonpushes(self):
         """Get all json data from json-pushes."""

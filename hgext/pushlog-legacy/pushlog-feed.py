@@ -1,5 +1,6 @@
 import mercurial.hgweb.protocol as hgwebprotocol
 import mercurial.hgweb.webcommands as hgwebcommands
+import mercurial.hgweb.webutil as webutil
 from mercurial.templatefilters import xmlescape
 from mercurial.hgweb.common import HTTP_OK, HTTP_NOT_FOUND, HTTP_SERVER_ERROR, paritygen
 from mercurial.node import short, bin, hex
@@ -377,9 +378,16 @@ def pushlogHTML(web, req, tmpl):
                 ch = l[-1]['changes']
             ctx = web.repo.changectx(node)
             n = ctx.node()
+            # useless fallback
+            listfilediffs = lambda a,b,c: []
+            if hasattr(webutil, 'listfilediffs'):
+                listfilediffs = lambda a,b,c: webutil.listfilediffs(a,b,c, len(b))
+            elif hasattr(web, 'listfilediffs'):
+                listfilediffs = web.listfilediffs
+
             ch.append({"author": ctx.user(),
                        "desc": ctx.description(),
-                       "files": web.listfilediffs(tmpl, ctx.files(), n),
+                       "files": listfilediffs(tmpl, ctx.files(), n),
                        "rev": ctx.rev(),
                        "node": hex(n),
                        "tags": nodetagsdict(web.repo, n),
