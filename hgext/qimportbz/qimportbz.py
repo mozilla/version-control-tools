@@ -274,6 +274,9 @@ class Import(BaseCommand):
     if options.verbose:
       print "Parsing bug...",
     xml = xmlfromstring(data)
+    bug = xml.find("bug")
+    if bug.get("error") == "NotPermitted":
+        print "Not allowed to access bug.  (Perhaps it is marked with a security group?)"
     if options.verbose:
       print "\bdone"
     attachments = xml.findall("bug/attachment")
