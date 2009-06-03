@@ -10,7 +10,7 @@ joinstr = string to join flags for commit messages (default is ' ')
 patch_format = Formatting string used to create patch names automatically
 msg_format = Formatting string used to create commit messages automatically
 
-Formatting strings are the standard python format strings where a dictionary is used to supply the data. There are 5 pieces of patch metadata available for use:
+Formatting strings are the standard python format strings where a dictionary is used to supply the data. Any % characters must be escaped since Python's configuration parser will try to interpret them. There are 5 pieces of patch metadata available for use:
 
       "bugnum" : the bug number
       "id" : the patch id (internal bugzilla number)
