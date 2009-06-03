@@ -88,40 +88,42 @@ def importPatch(ui, repo, p, opts):
     print e
     return
 
-def qimportbz(ui, repo, bugnum, **opts):
+def qimportbz(ui, repo, *bugnums, **opts):
   """Imports a patch from a bug into the mercurial queue"""
-  ui.status("Importing bug %s\n" % bugnum)
   bzbase = ui.config('qimportbz', 'bugzilla',
                      os.environ.get('BUGZILLA',"bugzilla.mozilla.org"))
-  bug = bz.Bug(ui, bzbase, bugnum)
-  patches = [patch for patch in bug.patches if not patch.obsolete]
-  if len(patches) == 0:
-    patches = bug.patches
+  for bugnum in bugnums:
+    ui.status("Importing bug %s\n" % bugnum)
+    bug = bz.Bug(ui, bzbase, bugnum)
+    patches = [patch for patch in bug.patches if not patch.obsolete]
     if len(patches) == 0:
-      raise util.Abort("No patches found for this bug")
-    elif len(patches) > 1:
-      ui.warn("Only obsolete patches found")
-    else:
-      if 'y' != ui.prompt("Only found one patch and it is obsolete. Import anyways? (y/n)"):
-        return
-  if len(patches) == 1:
-    importPatch(ui, repo, patches[0], opts)
-  elif len(patches) > 0:
-    for i,p in enumerate(patches):
-      ui.write("%s: %s %s\n" % (i+1, p.desc, p.joinFlags()))
-    choicestr = ui.prompt("Which patches do you want to import?", pat = '\d+((,\w*|\w+)\d+)*', default="1")
-    for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
-      try:
-        patch = patches[int(choice)-1]
-      except (ValueError, IndexError):
-        ui.warn("Invalid patch # %d" % choice)
+      patches = bug.patches
+      if len(patches) == 0:
+        ui.warn("No patches found for this bug")
         continue
-      importPatch(ui, repo, patch, opts)
+      elif len(patches) > 1:
+        ui.warn("Only obsolete patches found")
+      else:
+        if 'y' != ui.prompt("Only found one patch and it is obsolete. Import anyways? (y/n)"):
+          return
+    if len(patches) == 1:
+      importPatch(ui, repo, patches[0], opts)
+    elif len(patches) > 0:
+      for i,p in enumerate(patches):
+        ui.write("%s: %s %s\n" % (i+1, p.desc, p.joinFlags()))
+      choicestr = ui.prompt("Which patches do you want to import?", pat = '\d+((,\w*|\w+)\d+)*', default="1")
+      for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
+        try:
+          patch = patches[int(choice)-1]
+        except (ValueError, IndexError):
+          ui.warn("Invalid patch # %d" % choice)
+          continue
+        importPatch(ui, repo, patch, opts)
 
 cmdtable = {
   "qimportbz" : (qimportbz,
                  [('r', 'dry-run', False, "Perform a dry run - the patch queue will remain unchanged"),
                   ('p', 'preview', False, "Preview commit message"),
-                  ('n', 'patch-name', None, "Override patch name")],
-                 "[options] BUG#")
+                  ('n', 'patch-name', '', "Override patch name")],
+                 "hg qimportbz [-r] [-p] [-n NAME] BUG#")
 }
