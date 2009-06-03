@@ -116,7 +116,7 @@ def qimportbz(ui, repo, bugnum, **opts):
       except (ValueError, IndexError):
         ui.warn("Invalid patch # %d" % choice)
         continue
-      importPatch(ui, repo, p, opts)
+      importPatch(ui, repo, patch, opts)
 
 cmdtable = {
   "qimportbz" : (qimportbz,
