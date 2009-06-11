@@ -79,7 +79,7 @@ def importPatch(ui, repo, p, opts):
     if not opts['dry_run']:
       f = file(patchpath, 'wb')
       f.truncate(0)
-      f.write(sb.getvalue().encode('utf-8'))
+      f.write(patchcontents)
       f.flush()
       f.close()
       q.qimport(repo, [patchpath], patchname=name, existing=True, rev=[])
