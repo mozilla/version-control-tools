@@ -9,6 +9,7 @@ error = error.tmpl
 notfound = notfound.tmpl
 naventry = '<a href="{url}log/{node|short}{sessionvars%urlparameter}">{label|escape}</a> '
 navshortentry = '<a href="{url}shortlog/{node|short}{sessionvars%urlparameter}">{label|escape}</a> '
+navgraphentry = '<a href="{url}graph/{node|short}{sessionvars%urlparameter}">{label|escape}</a> '
 navpushentry = '<a href="{url}pushloghtml/{page}{sessionvars%urlparameter}">{label|escape}</a> '
 filenaventry = '<a href="{url}log/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{label|escape}</a> '
 filedifflink = '<a href="{url}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{file|escape}</a> '
@@ -68,3 +69,5 @@ indexarchiveentry = ' <a href="{url}archive/{node|short}{extension}">{type|escap
 index = index.tmpl
 urlparameter = '{separator}{name}={value|urlescape}'
 hiddenformentry = '<input type="hidden" name="{name}" value="{value|escape}" />'
+
+graph = graph.tmpl
