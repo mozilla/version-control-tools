@@ -1,7 +1,7 @@
-#header#
-<title>#repo|escape#: pushlog</title>
+{header}
+<title>{repo|escape}: pushlog</title>
 <link rel="alternate" type="application/atom+xml"
-   href="{url}pushlog" title="Atom feed for #repo|escape# pushlog"/>
+   href="{url}pushlog" title="Atom feed for {repo|escape} pushlog"/>
 <style type="text/css">
 #localize, .expand {
   font-size: x-small;
@@ -39,15 +39,15 @@ $(document).ready(function () {
 <body>
 
 <div class="page_header">
-<a href="http://developer.mozilla.org/en/docs/Mercurial" title="Mercurial" style="float: right;">Mercurial</a><a href="{url}summary{sessionvars%urlparameter}">#repo|escape#</a> - pushlog
+<a href="http://developer.mozilla.org/en/docs/Mercurial" title="Mercurial" style="float: right;">Mercurial</a><a href="{url}summary{sessionvars%urlparameter}">{repo|escape}</a> - pushlog
 </div>
 
 <form action="{url}pushloghtml">
 <div class="search">
 From:
-<input type="text" name="startdate"  value="#startdate|escape#"/>
+<input type="text" name="startdate"  value="{startdate|escape}"/>
 To:
-<input type="text" name="enddate"  value="#enddate|escape#"/>
+<input type="text" name="enddate"  value="{enddate|escape}"/>
 <input type="submit" value="Search"/>
 </div>
 </form>
@@ -55,19 +55,19 @@ To:
 <a href="{url}summary{sessionvars%urlparameter}">summary</a> |
 pushlog |
 <a href="{url}tags{sessionvars%urlparameter}">tags</a> |
-<a href="{url}file/tip{sessionvars%urlparameter}">files</a>#archives%archiveentry#
+<a href="{url}file/tip{sessionvars%urlparameter}">files</a>{archives%archiveentry}
 <br/>
-Page #changenav%navpushentry#<br/>
+Page {changenav%navpushentry}<br/>
 </div>
 
-<div class="title">#querydescription#</div>
+<div class="title">{querydescription}</div>
 <table cellspacing="0">
 <tr><th>User<br/>Push date <a href="#" id="localize" style="display:none">[To Local]</a></th><th>Changeset</th><th>Patch author &mdash; Commit message</th></tr>
-#entries%pushlogentry#
+{entries%pushlogentry}
 </table>
 
 <div class="page_nav">
-Page #changenav%navpushentry#
+Page {changenav%navpushentry}
 </div>
 
-#footer#
+{footer}

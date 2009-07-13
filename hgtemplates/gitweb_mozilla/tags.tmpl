@@ -1,12 +1,12 @@
-#header#
-<title>#repo|escape#: Tags</title>
+{header}
+<title>{repo|escape}: Tags</title>
 <link rel="alternate" type="application/atom+xml"
-   href="{url}atom-tags" title="Atom feed for #repo|escape#: tags"/>
+   href="{url}atom-tags" title="Atom feed for {repo|escape}: tags"/>
 </head>
 <body>
 
 <div class="page_header">
-<a href="http://developer.mozilla.org/en/docs/Mercurial" title="Mercurial" style="float: right;">Mercurial</a><a href="{url}summary{sessionvars%urlparameter}">#repo|escape#</a> - tags
+<a href="http://developer.mozilla.org/en/docs/Mercurial" title="Mercurial" style="float: right;">Mercurial</a><a href="{url}summary{sessionvars%urlparameter}">{repo|escape}</a> - tags
 </div>
 
 <div class="page_nav">
@@ -14,13 +14,13 @@
 <a href="{url}shortlog{sessionvars%urlparameter}">shortlog</a> |
 <a href="{url}log{sessionvars%urlparameter}">changelog</a> |
 tags |
-<a href="{url}file/#node|short#{sessionvars%urlparameter}">files</a>
+<a href="{url}file/{node|short}{sessionvars%urlparameter}">files</a>
 <br/>
 </div>
 
 <div class="title">&nbsp;</div>
 <table cellspacing="0">
-#entries%tagentry#
+{entries%tagentry}
 </table>
 
-#footer#
+{footer}
