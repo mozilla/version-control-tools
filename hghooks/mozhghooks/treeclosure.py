@@ -7,7 +7,11 @@ hgNameToTinderboxURL = {
     'mozilla-central': 'http://tinderbox.mozilla.org/Firefox/',
     'comm-central'   : 'http://tinderbox.mozilla.org/Thunderbird/',
     'mozilla-1.9.1'  : 'http://tinderbox.mozilla.org/Firefox3.5/',
-    'mobile-browser' : 'http://tinderbox.mozilla.org/Mobile/'
+    'mozilla-1.9.2'  : 'http://tinderbox.mozilla.org/Firefox3.6/',
+    'mobile-browser' : 'http://tinderbox.mozilla.org/Mobile/',
+    'places'         : 'http://tinderbox.mozilla.org/Places/',
+    'electrolysis'   : 'http://tinderbox.mozilla.org/Electrolysis/',
+    'tracemonkey'    : 'http://tinderbox.mozilla.org/TraceMonkey/'
 }
 
 magicwords = "CLOSED TREE"
