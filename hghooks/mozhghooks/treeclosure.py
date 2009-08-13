@@ -30,12 +30,20 @@ def hook(ui, repo, **kwargs):
             print "Tree %s is CLOSED! (%s)" % (name, url)
             
             # Block the push unless they know the magic words
-            if repo.changectx('tip').description().find(magicwords) < 0:
+            if repo.changectx('tip').description().find(magicwords) == -1:
                 print "To push despite the closed tree, include \"%s\" in your push comment" % magicwords
                 return 1
             else:
                 print "But you included the magic words.  Hope you had permission!"
                 return 0
+        elif re.compile('<span id="treestatus".*APPROVAL REQUIRED.*<span id="extended-status">').search(text) :
+            # Block the push unless they have approval
+            if repo.changectx('tip').description().lower().find('a=') == -1:
+                print "Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=..."
+                return 1
+            else:
+                return 0
+            
     except IOError, (err):
         # fail open, I guess. no sense making hg unavailable
         # if the wiki is down
