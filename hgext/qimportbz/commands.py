@@ -24,9 +24,13 @@ def importPatch(ui, repo, p, opts):
     if username and useremail:
       user = "%s <%s>" % (cleanUserName(username), useremail)
   patchpath = q.join(name)
+  # Newer versions of mercurial have promptchoice but the latest release (1.3.1) does not seem to
+  prompter = ui.promptchoice if hasattr(ui, 'promptchoice') else ui.prompt
   try:
     while os.path.exists(patchpath):
-      choice = ui.prompt("The patch already seems to exist in your patch directory. Rename (r)/overwrite (o)/cancel (c)?", pat = "r|o|c", default="o")
+      choice = prompter("The patch already seems to exist in your patch directory. Rename (r)/overwrite (o)/cancel (c)?",
+                        choices = ("&readonly", "&overwrite", "&cancel"),
+                        default='o')
       if choice == 'c':
         return
       elif choice == 'r':
@@ -96,7 +100,7 @@ def qimportbz(ui, repo, *bugnums, **opts):
     elif len(patches) > 0:
       for i,p in enumerate(patches):
         ui.write("%s: %s %s\n" % (i+1, p.desc, p.joinFlags()))
-      choicestr = ui.prompt("Which patches do you want to import?", pat = '\d+((,\w*|\w+)\d+)*', default="1")
+      choicestr = ui.prompt("Which patches do you want to import?", default="1")
       for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
         try:
           patch = patches[int(choice)-1]
