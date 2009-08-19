@@ -58,7 +58,6 @@ def importPatch(ui, repo, p, opts):
     if name in q.series:
       if q.isapplied(name):
         ui.warn("Patch was already applied. Changes will not take effect until the patch is reapplied.")
-      return
 
     # Write patch to disk and import
     if not opts['dry_run']:
@@ -67,8 +66,10 @@ def importPatch(ui, repo, p, opts):
       f.write(patchcontents)
       f.flush()
       f.close()
-      q.qimport(repo, [patchpath], patchname=name, existing=True, rev=[])
-      q.save_dirty()
+      # If we're not overwriting, inform mercurial of the new patch
+      if not name in q.series:
+        q.qimport(repo, [patchpath], patchname=name, existing=True, rev=[])
+        q.save_dirty()
   except OSError, e:
     print e
     return
