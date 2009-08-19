@@ -1,6 +1,7 @@
 import urllib2
 import base64
 from xml.etree.ElementTree import fromstring as xmlfromstring
+import commands
 
 class Attachment(object):
   def __init__(self, bug, node):
@@ -19,7 +20,7 @@ class Flag(object):
   def __init__(self, bug, node):
     self.name = node.attrib['name']
     if self.name not in ('review', 'superreview', 'ui-review') and not self.name.startswith('approval'):
-      bug.ui.warn("Unknown flag %s" % self.name)
+      commands.hgui.warn("Unknown flag %s" % self.name)
     setter = node.attrib['setter']
     self.setter = setter[:setter.index('@')]
     self.status = node.attrib['status']
@@ -59,7 +60,7 @@ class Patch(Attachment):
 
   @property
   def name(self):
-    fmt = self.bug.ui.config('qimportbz', 'patch_format', "bug-%(bugnum)s")
+    fmt = commands.hgui.config('qimportbz', 'patch_format', "bug-%(bugnum)s")
 
     patchname = fmt % self.metadata
     
@@ -75,7 +76,7 @@ class Patch(Attachment):
 
   @property
   def commit_message(self):
-    fmt = self.bug.ui.config('qimportbz', 'msg_format',
+    fmt = commands.hgui.config('qimportbz', 'msg_format',
                              'Bug %(bugnum)s - "%(title)s" [%(flags)s]')
     return fmt % self.metadata
 
@@ -98,7 +99,7 @@ class Patch(Attachment):
           flagnames = [f.abbrev for f in fs]
           flags.append('%s=%s' % ('+'.join(flagnames), fs[0].setter))
 
-      joinstr = self.bug.ui.config('qimportbz', 'joinstr', ' ')
+      joinstr = commands.hgui.config('qimportbz', 'joinstr', ' ')
       return joinstr.join(flags)
     else:
       return ', '.join('%s: %s%s' % (f.setter, f.name, f.status) for f in self.flags)
@@ -121,9 +122,9 @@ class Comment(object):
     self.text = node.find('thetext').text
 
 class Bug(object):
-  def __init__(self, ui, base, num):
-    self.ui = ui
+  def __init__(self, base, num):
     self.num = num
+    ui = commands.hgui
     url = "https://%s/show_bug.cgi?ctype=xml&id=%s" % (base, num)
     ui.status("Fetching %s..." % url)
     stream = urllib2.urlopen(url)
