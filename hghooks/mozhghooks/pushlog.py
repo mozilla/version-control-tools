@@ -55,3 +55,4 @@ def log(ui, repo, node, **kwargs):
         conn.execute("INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
                      (pushid, ctx.rev(), hex(ctx.node())))
     conn.commit()
+    conn.close()
