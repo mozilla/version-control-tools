@@ -20,7 +20,7 @@ class Flag(object):
   def __init__(self, bug, node):
     self.name = node.attrib['name']
     if self.name not in ('review', 'superreview', 'ui-review') and not self.name.startswith('approval'):
-      commands.hgui.warn("Unknown flag %s" % self.name)
+      commands.hgui.warn("Unknown flag %s\n" % self.name)
     setter = node.attrib['setter']
     self.setter = setter[:setter.index('@')]
     self.status = node.attrib['status']
