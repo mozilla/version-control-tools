@@ -1,34 +1,18 @@
 from mercurial import util
 import bz
 from StringIO import StringIO
-import patch
 import os
 import re
-import mercurial.commands
-
-# Global so that I don't have to pass around this to everything
-hgui = None
-hgopts = {}
-
-def cleanUserName(username):
-  return re.sub("\(.*\)","", re.sub("\[:\w+\]|\(:\w+\)","",username)).strip()
 
 def importPatch(ui, repo, p, opts):
   name = opts['patch_name'] or p.name
   q = repo.mq
-  msg, user, date, diff = patch.parse(unicode(p.data,'utf-8'))
-  if not msg:
-    msg = p.commit_message
-  if not user:
-    username, useremail = p.attacher.who, p.attacher.who_email
-    if username and useremail:
-      user = "%s <%s>" % (cleanUserName(username), useremail)
   patchpath = q.join(name)
   # Newer versions of mercurial have promptchoice but the latest release (1.3.1) does not seem to
   prompter = ui.promptchoice if hasattr(ui, 'promptchoice') else ui.prompt
   try:
     while os.path.exists(patchpath):
-      prompt = "A patch for bug %d already seems to exist in your patch directory. Rename %s '%s' (%d) (r)/overwrite (o)/cancel (c)?" % \
+      prompt = "A patch for bug %d already seems to exist in your patch directory. Rename %s '%s' (%d) (r)/overwrite (o)/cancel (c)?" %
                (int(p.bug.num), 'patch' if isinstance(p, bz.Patch) else 'attachment', p.desc, int(p.id))
       choice = prompter(prompt,
                         choices = ("&readonly", "&overwrite", "&cancel"),
@@ -59,7 +43,7 @@ def importPatch(ui, repo, p, opts):
     # Check if the patch is already in the queue
     if name in q.series:
       if q.isapplied(name):
-        ui.warn("Patch was already applied. Changes will not take effect until the patch is reapplied.\n")
+        ui.warn("Patch was already applied. Changes will not take effect until the patch is reapplied.")
 
     # Write patch to disk and import
     if not opts['dry_run']:
@@ -75,40 +59,3 @@ def importPatch(ui, repo, p, opts):
   except OSError, e:
     print e
     return
-
-def qimportbz(ui, repo, *bugnums, **opts):
-  """Imports a patch from a bug into the mercurial queue"""
-  global hgui, hgopts
-  hgui = ui
-  hgopts = opts
-
-  bzbase = ui.config('qimportbz', 'bugzilla',
-                     os.environ.get('BUGZILLA',"bugzilla.mozilla.org"))
-  for bugnum in bugnums:
-    ui.status("Importing bug %s\n" % bugnum)
-    bug = bz.Bug(bzbase, bugnum)
-    patches = [patch for patch in bug.patches if not patch.obsolete]
-    if len(patches) == 0:
-      patches = bug.patches
-      if len(patches) == 0:
-        ui.warn("No patches found for this bug\n")
-        continue
-      elif len(patches) > 1:
-        ui.warn("Only obsolete patches found\n")
-      else:
-        if 'y' != ui.prompt("Only found one patch and it is obsolete. Import anyways? (y/n)", default='y'):
-          continue
-    if len(patches) == 1:
-      importPatch(ui, repo, patches[0], opts)
-    elif len(patches) > 0:
-      for i,p in enumerate(patches):
-        ui.write("%s: %s %s\n" % (i+1, p.desc, p.joinFlags()))
-      choicestr = ui.prompt("Which patches do you want to import?", default="1")
-      for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
-        try:
-          patch = patches[int(choice)-1]
-        except (ValueError, IndexError):
-          ui.warn("Invalid patch # %d\n" % choice)
-          continue
-        importPatch(ui, repo, patch, opts)
-
