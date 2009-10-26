@@ -25,7 +25,7 @@ The default values are:
 patch_format = bug-%(bugnum)s
 msg_format = Bug %(bugnum)s - "%(title)s" [%(flags)s]
 """
-from mercurial import commands, cmdutil, extensions
+from mercurial import commands, cmdutil, extensions, url
 
 import re
 import os
@@ -34,13 +34,12 @@ import bz
 import bzhandler
 
 def extsetup():
+  # insert preview flag into qimport
   qimport_cmd = cmdutil.findcmd("qimport", commands.table)
   qimport_cmd[1][1].append(('p', 'preview', False, "Preview commit message"))
 
-  # Now we hook qimport
+  # re to match our url syntax
   bz_matcher = re.compile("bz:(?://)?(\d+)(?:/(\w+))?")
-  def isbzurl(url):
-    return bz_matcher.search(url) is not None
   def makeurl(num, attachid):
       return "bz://%s%s" % (num, "/" + attachid if attachid else "")
   def fixuppath(path):
@@ -50,28 +49,49 @@ def extsetup():
       path = makeurl(bug, attachment)
     return path
 
-  def checkpatchname(ui, repo, patch):
-    q = repo.mq
-    name = patch.name
-    # Newer versions of mercurial have promptchoice but the latest release
-    # (1.3.1) does not
-    prompter = ui.promptchoice if hasattr(ui, 'promptchoice') else ui.prompt
-    while os.path.exists(q.join(name)):
-      prompt = "A patch for bug %d already seems to exist in your patch directory. Rename %s '%s' (%d) (r)/overwrite (o)?" % \
-               (int(patch.bug.num),
-                'patch' if isinstance(patch, bz.Patch) else 'attachment',
-                patch.desc, int(patch.id))
-      choice = prompter(prompt,
-                        choices = ("&readonly", "&overwrite", "&cancel"),
-                        default='o')
-      if choice == 'r':
-        name = ui.prompt("Enter the new patch name (old one was %s):" % name)
-      else: # overwrite
-        break;
-    return name
 
-  # and more monkey patching to hook the mq import so we can fixup the patchname
+  # hook the mq import so we can fixup the patchname and handle multiple
+  # patches per url
   def qimporthook(orig, ui, repo, *files, **opts):
+    q = repo.mq
+
+    # checks for an unused patch name. prompts if the patch already exists and
+    # returns the corrected name.
+    def checkpatchname(patch):
+      name = patch.name
+      # Newer versions of mercurial have promptchoice but the latest release
+      # (1.3.1) does not.
+      prompter = ui.promptchoice if hasattr(ui, 'promptchoice') else ui.prompt
+      while os.path.exists(q.join(name)):
+        prompt = "A patch for bug %d already seems to exist in your patch directory. Rename %s '%s' (%d) (r)/overwrite (o)?" % \
+                 (int(patch.bug.num),
+                  'patch' if isinstance(patch, bz.Patch) else 'attachment',
+                  patch.desc, int(patch.id))
+        choice = prompter(prompt,
+                          choices = ("&readonly", "&overwrite", "&cancel"),
+                          default='o')
+        if choice == 'r':
+          name = ui.prompt("Enter the new patch name (old one was %s):" % name)
+        else: # overwrite
+          break;
+      if name in q.series and q.isapplied(name):
+        ui.warn("Patch was already applied. Changes will not take effect until the patch is reapplied.")
+      return name
+
+    # hook for url.open which lets the user edit the returned 
+    def previewopen(orig, ui, path):
+      fp = orig(ui, path)
+
+      class PreviewReader(object):
+        def read(self):
+          return ui.edit(fp.read(), ui.username())
+      return PreviewReader()
+
+    # Install the preview hook if necessary. This will preview non-bz:// bugs
+    # and that's OK.
+    if opts['preview']:
+      extensions.wrapfunction(url, "open", previewopen)
+
     # mercurial's url.search_re includes the // and that doesn't match what we
     # want which is bz:dddddd(/ddddd)?
     files = map(fixuppath, files)
@@ -82,21 +102,28 @@ def extsetup():
     # patch name *after* download.
     orig(ui, repo, *files, **opts)
 
+    # cache the lookup of the name. findcmd is not fast.
     qrename = cmdutil.findcmd("qrename", commands.table)[1][0]
+
     # For all the already imported patches, rename them
     for (patch,path) in list(bzhandler.imported_patches):
       # This mimcks the mq code to pick a filename
       oldpatchname = os.path.normpath(os.path.basename(path))
-      newpatchname = checkpatchname(ui, repo, patch)
+      newpatchname = checkpatchname(patch)
 
       qrename(ui, repo, oldpatchname, patch.name)
 
     # now process the delayed imports
+
+    # these opts are invariant for all patches
     newopts = {}
     newopts.update(opts)
     newopts['force'] = True
+
+    # loop through the Patches and import them by calculating their url. The
+    # bz:// handler will have cached the lookup so we don't hit the network here
     for patch in bzhandler.delayed_imports:
-      newopts['name'] = checkpatchname(ui, repo, patch)
+      newopts['name'] = checkpatchname(patch)
       path = makeurl(patch.bug.num, patch.id)
 
       orig(ui, repo, path, **newopts)
@@ -105,13 +132,3 @@ def extsetup():
 
 def reposetup(ui, repo):
   bzhandler.registerHandler(ui, repo)
-
-cmdtable = {}
-
-#cmdtable = {
-#  "qimportbz" : (qimportbz,
-#                 [('r', 'dry-run', False, "Perform a dry run - the patch queue will remain unchanged"),
-#                  ('p', 'preview', False, "Preview commit message"),
-#                  ('n', 'patch-name', '', "Override patch name")],
-#                 "hg qimportbz [-v] [-r] [-p] [-n NAME] BUG#")
-#}
