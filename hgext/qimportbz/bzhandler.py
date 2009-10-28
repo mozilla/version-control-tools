@@ -21,7 +21,7 @@ class ObjectResponse(object):
   def read(self):
     return self.obj
 
-class BzProcessor(urllib2.BaseHandler):
+class Handler(urllib2.BaseHandler):
   def __init__(self, ui, passmgr):
     self.ui = ui
     self.passmgr = passmgr
@@ -116,18 +116,3 @@ class PatchResponse(object):
 
   def fileno(self):
     return None
-
-def registerHandler(ui, repo):
-  from mercurial import url, extensions
-
-  # Mercurial 1.4 has an easy way to do this for bz://dddddd urls
-  if hasattr(url, 'handlerfuncs'):
-    url.handlerfuncs.append(BzProcessor)
-  else: # monkey patching for 1.3.1 :(
-    # patch bz://dddddd urls...
-    def bzopener(orig, ui, authinfo=None):
-      result = orig(ui, authinfo)
-      result.add_handler(BzProcessor(ui, authinfo))
-      return result
-    extensions.wrapfunction(url, "opener", bzopener)
-

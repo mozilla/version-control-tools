@@ -32,6 +32,7 @@ import os
 
 import bz
 import bzhandler
+import pb
 
 def extsetup():
   # insert preview flag into qimport
@@ -40,13 +41,20 @@ def extsetup():
 
   # re to match our url syntax
   bz_matcher = re.compile("bz:(?://)?(\d+)(?:/(\w+))?")
-  def makeurl(num, attachid):
-      return "bz://%s%s" % (num, "/" + attachid if attachid else "")
+  pb_matcher = re.compile("pb:(?://)?(\d+)")
+  def makebzurl(num, attachid):
+    return "bz://%s%s" % (num, "/" + attachid if attachid else "")
+  def makepburl(num):
+    return "pb://%s" % (num,)
   def fixuppath(path):
     m = bz_matcher.search(path)
     if m:
       bug, attachment = m.groups()
-      path = makeurl(bug, attachment)
+      path = makebzurl(bug, attachment)
+    m = pb_matcher.search(path)
+    if m:
+      num, = m.groups()
+      path = makepburl(num)
     return path
 
 
@@ -124,11 +132,24 @@ def extsetup():
     # bz:// handler will have cached the lookup so we don't hit the network here
     for patch in bzhandler.delayed_imports:
       newopts['name'] = checkpatchname(patch)
-      path = makeurl(patch.bug.num, patch.id)
+      path = makebzurl(patch.bug.num, patch.id)
 
       orig(ui, repo, path, **newopts)
 
   extensions.wrapcommand(commands.table, 'qimport', qimporthook)
 
-def reposetup(ui, repo):
-  bzhandler.registerHandler(ui, repo)
+  # Here we setup the protocol handlers
+  processors = [bzhandler.Handler, pb.Handler]
+
+  # Mercurial 1.4 has an easy way to do this for bz://dddddd urls
+  if hasattr(url, 'handlerfuncs'):
+    for p in processors:
+      url.handlerfuncs.append(p)
+  else: # monkey patching for 1.3.1 :(
+    # patch in bz: and pb: url support
+    def bzopener(orig, ui, authinfo=None):
+      result = orig(ui, authinfo)
+      for p in processors:
+        result.add_handler(p(ui, authinfo))
+      return result
+    extensions.wrapfunction(url, "opener", bzopener)
