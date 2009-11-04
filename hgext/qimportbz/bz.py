@@ -37,7 +37,7 @@ class Attachment(object):
 class Flag(object):
   def __init__(self, bug, node):
     self.name = node.attrib['name']
-    if self.name not in ('review', 'superreview', 'ui-review') and not self.name.startswith('approval'):
+    if self.name not in ('review', 'superreview', 'ui-review', 'checked-in') and not self.name.startswith('approval'):
       bug.settings.ui.warn("Unknown flag %s\n" % self.name)
     setter = node.attrib['setter']
     setter_idx = setter.index('@')
@@ -55,7 +55,7 @@ class Flag(object):
 
   # Compare by flag name
   def __cmp__(self, other):
-    flagorder = [ 'r', 'sr', 'ui-r', 'a']
+    flagorder = ['r', 'sr', 'ui-r', 'a', 'c']
     return cmp(flagorder.index(self.abbrev),flagorder.index(other.abbrev))
 
 class Patch(Attachment):
