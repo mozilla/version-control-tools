@@ -69,7 +69,7 @@ class Patch(Attachment):
     # for some reason, patch.extract writes a temporary file with the diff hunks
     if filename:
       fp = file(filename)
-      self.data = fp.read()
+      self.data = fp.read().decode('utf-8')
       fp.close()
       os.remove(filename)
     else:
