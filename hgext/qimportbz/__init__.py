@@ -119,16 +119,18 @@ def extsetup():
     # patch name *after* download.
     orig(ui, repo, *files, **opts)
 
-    # cache the lookup of the name. findcmd is not fast.
-    qrename = cmdutil.findcmd("qrename", commands.table)[1][0]
+    # If the user passed a name, then mq used that so we don't need to rename
+    if not opts['name']:
+      # cache the lookup of the name. findcmd is not fast.
+      qrename = cmdutil.findcmd("qrename", commands.table)[1][0]
 
-    # For all the already imported patches, rename them
-    for (patch,path) in list(bzhandler.imported_patches):
-      # This mimcks the mq code to pick a filename
-      oldpatchname = os.path.normpath(os.path.basename(path))
-      newpatchname = checkpatchname(patch)
+      # For all the already imported patches, rename them
+      for (patch,path) in list(bzhandler.imported_patches):
+        # This mimcks the mq code to pick a filename
+        oldpatchname = os.path.normpath(os.path.basename(path))
+        newpatchname = checkpatchname(patch)
 
-      qrename(ui, repo, oldpatchname, patch.name)
+        qrename(ui, repo, oldpatchname, patch.name)
 
     # now process the delayed imports
 
