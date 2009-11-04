@@ -29,10 +29,12 @@ from mercurial import commands, cmdutil, extensions, url
 
 import re
 import os
+import urllib
 
 import bz
 import bzhandler
 import pb
+import scp
 
 def extsetup():
   # insert preview flag into qimport
@@ -42,19 +44,26 @@ def extsetup():
   # re to match our url syntax
   bz_matcher = re.compile("bz:(?://)?(\d+)(?:/(\w+))?")
   pb_matcher = re.compile("pb:(?://)?(\d+)")
+  scp_matcher= re.compile(r"scp:(?://)?(.*)")
   def makebzurl(num, attachid):
     return "bz://%s%s" % (num, "/" + attachid if attachid else "")
   def makepburl(num):
     return "pb://%s" % (num,)
+  def makescpurl(path):
+    return "scp://%s" % (urllib.pathname2url(path),)
   def fixuppath(path):
     m = bz_matcher.search(path)
     if m:
       bug, attachment = m.groups()
-      path = makebzurl(bug, attachment)
+      return makebzurl(bug, attachment)
     m = pb_matcher.search(path)
     if m:
       num, = m.groups()
-      path = makepburl(num)
+      return makepburl(num)
+    m = scp_matcher.search(path)
+    if m:
+      scppath, = m.groups()
+      return makescpurl(scppath)
     return path
 
 
@@ -139,7 +148,7 @@ def extsetup():
   extensions.wrapcommand(commands.table, 'qimport', qimporthook)
 
   # Here we setup the protocol handlers
-  processors = [bzhandler.Handler, pb.Handler]
+  processors = [bzhandler.Handler, pb.Handler, scp.Handler]
 
   # Mercurial 1.4 has an easy way to do this for bz://dddddd urls
   if hasattr(url, 'handlerfuncs'):
