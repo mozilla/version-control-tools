@@ -18,6 +18,7 @@ imported_patches = []
 class ObjectResponse(object):
   def __init__(self, obj):
     self.obj = obj
+
   def read(self):
     return self.obj
 
@@ -38,8 +39,8 @@ class Handler(urllib2.BaseHandler):
       attachid = req.get_selector()[1:]
       if attachid:
         return ObjectResponse(bug.get_patch(attachid))
-      else:
-        return ObjectResponse(bug)
+
+      return ObjectResponse(bug)
 
     # Normal case, return a stream of text
     url = "https://%s/show_bug.cgi?ctype=xml&id=%s" % (self.base, num)
@@ -77,7 +78,8 @@ class Handler(urllib2.BaseHandler):
         if len(patches) == 0:
           self.ui.warn("No patches found for this bug\n")
           return
-        elif len(patches) > 1:
+
+        if len(patches) > 1:
           self.ui.warn("Only obsolete patches found\n")
         else:
           if 'y' != self.ui.prompt("Only found one patch and it is obsolete. Import anyways? (y/n)", default='y'):

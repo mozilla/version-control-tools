@@ -27,11 +27,13 @@ class Attachment(object):
     self.obsolete = node.attrib['isobsolete'] == "1"
     self.id = node.find('attachid').text
     self.desc = node.find('desc').text
+
   def parse(bug, node):
     ctor = Attachment
     if node.attrib['ispatch'] == "1":
       ctor = Patch
     return ctor(bug, node)
+
   parse = staticmethod(parse)
 
 class Flag(object):
@@ -48,10 +50,11 @@ class Flag(object):
   def abbrev(self):
     if self.name == 'ui-review':
       return 'ui-r'
-    elif self.name == 'superreview':
+
+    if self.name == 'superreview':
       return 'sr'
-    else:
-      return self.name[0]
+
+    return self.name[0]
 
   # Compare by flag name
   def __cmp__(self, other):
@@ -60,6 +63,7 @@ class Flag(object):
 
 class Patch(Attachment):
   _name = None
+
   def __init__(self, bug, node):
     Attachment.__init__(self, bug, node)
     self.flags = list(sorted(Flag(bug, n) for n in node.findall('flag')))
@@ -145,8 +149,8 @@ class Patch(Attachment):
           flags.append('%s=%s' % ('+'.join(flagnames), fs[0].setter))
 
       return self.bug.settings.joinstr.join(flags)
-    else:
-      return ', '.join('%s: %s%s' % (f.setter, f.name, f.status) for f in self.flags)
+
+    return ', '.join('%s: %s%s' % (f.setter, f.name, f.status) for f in self.flags)
 
   @property
   def attacher(self):
@@ -179,10 +183,12 @@ class Bug(object):
 
     # Add to cache so we can avoid network lookup later in this process
     cache[self.num] = self
+
   def get_patch(self, attachid):
     for attachment in self.attachments:
       if attachment.id == attachid:
         return attachment
+
     return None
 
   @property

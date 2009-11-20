@@ -45,27 +45,33 @@ def extsetup():
   bz_matcher = re.compile("bz:(?://)?(\d+)(?:/(\w+))?")
   pb_matcher = re.compile("pb:(?://)?(\d+)")
   scp_matcher= re.compile(r"scp:(?://)?(.*)")
+
   def makebzurl(num, attachid):
     return "bz://%s%s" % (num, "/" + attachid if attachid else "")
+
   def makepburl(num):
     return "pb://%s" % num
+
   def makescpurl(path):
     return "scp://%s" % urllib.pathname2url(path)
+
   def fixuppath(path):
     m = bz_matcher.search(path)
     if m:
       bug, attachment = m.groups()
       return makebzurl(bug, attachment)
+
     m = pb_matcher.search(path)
     if m:
       num, = m.groups()
       return makepburl(num)
+
     m = scp_matcher.search(path)
     if m:
       scppath, = m.groups()
       return makescpurl(scppath)
-    return path
 
+    return path
 
   # hook the mq import so we can fixup the patchname and handle multiple
   # patches per url
@@ -102,6 +108,7 @@ def extsetup():
       class PreviewReader(object):
         def read(self):
           return ui.edit(fp.read(), ui.username())
+
       return PreviewReader()
 
     # Install the preview hook if necessary. This will preview non-bz:// bugs
@@ -163,4 +170,5 @@ def extsetup():
       for p in processors:
         result.add_handler(p(ui, authinfo))
       return result
+
     extensions.wrapfunction(url, "opener", bzopener)

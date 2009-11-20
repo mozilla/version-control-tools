@@ -6,10 +6,11 @@ import urllib
 import urllib2
 
 class StringResponse(object):
-    def __init__(self, s):
-        self.string = s
-    def read(self):
-        return self.string
+  def __init__(self, s):
+    self.string = s
+
+  def read(self):
+    return self.string
 
 class Handler(urllib2.BaseHandler):
   def __init__(self, ui, passmgr):
