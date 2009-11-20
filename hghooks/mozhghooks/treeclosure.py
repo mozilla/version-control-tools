@@ -38,8 +38,8 @@ def hook(ui, repo, **kwargs):
                 return 0
         elif re.compile('<span id="treestatus".*APPROVAL REQUIRED.*<span id="extended-status">').search(text) :
             # Block the push unless they have approval
-            if repo.changectx('tip').description().lower().find('a=') == -1:
-                print "Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=..."
+            if re.search('a\S*=', repo.changectx('tip').description().lower()) :
+                print "Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)"
                 return 1
             else:
                 return 0
