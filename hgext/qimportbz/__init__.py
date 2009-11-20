@@ -39,7 +39,7 @@ import scp
 def extsetup():
   # insert preview flag into qimport
   qimport_cmd = cmdutil.findcmd("qimport", commands.table)
-  qimport_cmd[1][1].append(('p', 'preview', False, "Preview commit message"))
+  qimport_cmd[1][1].append(('p', 'preview', False, "preview commit message"))
 
   # re to match our url syntax
   bz_matcher = re.compile("bz:(?://)?(\d+)(?:/(\w+))?")
