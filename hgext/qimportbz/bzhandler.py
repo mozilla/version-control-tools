@@ -88,7 +88,7 @@ class Handler(urllib2.BaseHandler):
         patch = patches[0]
       elif len(patches) > 0:
         for i, p in enumerate(patches):
-          self.ui.write("%s: %s %s\n" % (i+1, p.desc, p.joinFlags()))
+          self.ui.write("%s: %s %s\n" % (i+1, p.desc, p.joinFlags(False)))
         choicestr = self.ui.prompt("Which patches do you want to import?", default="1")
         for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
           try:

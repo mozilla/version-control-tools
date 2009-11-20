@@ -114,7 +114,7 @@ class Patch(Attachment):
       "id" : self.id,
       "title" : self.bug.title,
       "desc" : self.desc,
-      "flags" : self.joinFlags(True)
+      "flags" : self.joinFlags()
     }
 
   @property
@@ -131,28 +131,30 @@ class Patch(Attachment):
         patchname = patchname.replace(char, replacement)
     return patchname
 
-  def joinFlags(self, commitfmt=False):
-    """Join any flags together that have the same setter, returning a string in sorted order"""
+  def joinFlags(self, commitfmt=True):
+    """Join any flags together that have the same setter, returning a string in sorted order.
+    If commitfmt is False, simply list all flags.
+    """
+    if not commitfmt:
+      return ', '.join('%s: %s%s' % (f.setter, f.name, f.status) for f in self.flags)
+
     flags = []
-    if commitfmt:
-      setteridx = {}
+    setteridx = {}
 
-      for f in self.flags:
-        setter = f.setter
-        if setter in setteridx:
-          setteridx[setter].append(f)
-        else:
-          setteridx[setter] = [f]
+    for f in self.flags:
+      setter = f.setter
+      if setter in setteridx:
+        setteridx[setter].append(f)
+      else:
+        setteridx[setter] = [f]
 
-      for f in self.flags:
-        fs = setteridx.pop(f.setter, None)
-        if fs:
-          flagnames = [f.abbrev for f in fs]
-          flags.append('%s=%s' % ('+'.join(flagnames), fs[0].setter))
+    for f in self.flags:
+      fs = setteridx.pop(f.setter, None)
+      if fs:
+        flagnames = [f.abbrev for f in fs]
+        flags.append('%s=%s' % ('+'.join(flagnames), fs[0].setter))
 
-      return self.bug.settings.joinstr.join(flags)
-
-    return ', '.join('%s: %s%s' % (f.setter, f.name, f.status) for f in self.flags)
+    return self.bug.settings.joinstr.join(flags)
 
   @property
   def attacher(self):
