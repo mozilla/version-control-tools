@@ -58,15 +58,15 @@ class Handler(urllib2.BaseHandler):
     elif isinstance(data, bz.Patch):
       patch = data
     else: # network read
-      self.ui.status("done\n")
+      self.ui.status(" done\n")
       self.ui.status("Parsing...")
       try:
         bug = bz.Bug(self.ui, data)
       # TODO: update syntax when mercurial requires Python 2.6
       except bz.PermissionError, e:
-        self.ui.warn(e.msg + "\n")
+        self.ui.warn(" %s\n" % e.msg)
         return
-      self.ui.status("done\n")
+      self.ui.status(" done\n")
 
     if not patch and req.get_selector():
       patch = bug.get_patch(req.get_selector())
@@ -82,14 +82,14 @@ class Handler(urllib2.BaseHandler):
         if len(patches) > 1:
           self.ui.warn("Only obsolete patches found\n")
         else:
-          if 'y' != self.ui.prompt("Only found one patch and it is obsolete. Import anyways? (y/n)", default='y'):
+          if 'y' != self.ui.prompt("Only found one patch and it is obsolete. Import anyways? [Default is 'y']", default='y'):
             return
       if len(patches) == 1:
         patch = patches[0]
       elif len(patches) > 0:
         for i, p in enumerate(patches):
           self.ui.write("%s: %s\n%s\n" % (i + 1, p.desc, p.joinFlags(False)))
-        choicestr = self.ui.prompt("Which patches do you want to import?", default="1")
+        choicestr = self.ui.prompt("Which patches do you want to import? [Default is '1']", default="1")
         for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
           try:
             p = patches[int(choice) - 1]
