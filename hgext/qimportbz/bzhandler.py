@@ -92,9 +92,11 @@ class Handler(urllib2.BaseHandler):
         choicestr = self.ui.prompt("Which patches do you want to import? [Default is '1']", default="1")
         for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
           try:
+            if int(choice) <= 0:
+              raise IndexError()
             p = patches[int(choice) - 1]
           except (ValueError, IndexError):
-            self.ui.warn("Invalid patch # %d\n" % choice)
+            self.ui.warn("Invalid patch number = '%s'\n" % choice)
             continue
           if not patch:
             patch = p
