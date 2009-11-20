@@ -38,6 +38,8 @@ class Attachment(object):
 
 class Flag(object):
   def __init__(self, bug, node):
+    # Ignored node attributes: 'id' and 'type_id'.
+
     self.name = node.attrib['name']
     if self.name not in ('review', 'superreview', 'ui-review', 'checked-in') and not self.name.startswith('approval'):
       bug.settings.ui.warn("Unknown flag %s\n" % self.name)
@@ -47,6 +49,8 @@ class Flag(object):
     self.setter = setter if setter_idx < 0 else setter[:setter_idx]
 
     self.status = node.attrib['status']
+
+    self.requestee = node.attrib['requestee'] if 'requestee' in node.attrib else None
 
   @property
   def abbrev(self):
@@ -136,7 +140,7 @@ class Patch(Attachment):
     If commitfmt is False, simply list all flags.
     """
     if not commitfmt:
-      return ', '.join('%s: %s%s' % (f.setter, f.name, f.status) for f in self.flags)
+      return ', '.join('%s: %s%s%s' % (f.setter, f.name, f.status, " (%s)" % f.requestee if f.requestee else "") for f in self.flags)
 
     flags = []
     setteridx = {}
