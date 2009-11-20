@@ -41,9 +41,11 @@ class Flag(object):
     self.name = node.attrib['name']
     if self.name not in ('review', 'superreview', 'ui-review', 'checked-in') and not self.name.startswith('approval'):
       bug.settings.ui.warn("Unknown flag %s\n" % self.name)
+
     setter = node.attrib['setter']
-    setter_idx = setter.index('@')
+    setter_idx = setter.find('@')
     self.setter = setter if setter_idx < 0 else setter[:setter_idx]
+
     self.status = node.attrib['status']
 
   @property
