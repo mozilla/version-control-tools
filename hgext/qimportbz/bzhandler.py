@@ -27,7 +27,7 @@ class Handler(urllib2.BaseHandler):
     self.passmgr = passmgr
 
     self.base = ui.config('qimportbz', 'bugzilla',
-                          os.environ.get('BUGZILLA',"bugzilla.mozilla.org"))
+                          os.environ.get('BUGZILLA', "bugzilla.mozilla.org"))
 
   # Change the request to the https for the bug XML
   def bz_open(self, req):
@@ -85,7 +85,7 @@ class Handler(urllib2.BaseHandler):
       if len(patches) == 1:
         patch = patches[0]
       elif len(patches) > 0:
-        for i,p in enumerate(patches):
+        for i, p in enumerate(patches):
           self.ui.write("%s: %s %s\n" % (i+1, p.desc, p.joinFlags()))
         choicestr = self.ui.prompt("Which patches do you want to import?", default="1")
         for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):

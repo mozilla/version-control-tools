@@ -12,7 +12,7 @@ class Handler(urllib2.BaseHandler):
     self.passmgr = passmgr
 
     self.base = ui.config('qimportbz', 'pastebin',
-                          os.environ.get('PASTEBIN',"pastebin.mozilla.org"))
+                          os.environ.get('PASTEBIN', "pastebin.mozilla.org"))
 
   # Change the request to the http to fetch the raw text
   def pb_open(self, req):

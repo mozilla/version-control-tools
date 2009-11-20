@@ -56,7 +56,7 @@ class Flag(object):
   # Compare by flag name
   def __cmp__(self, other):
     flagorder = ['r', 'sr', 'ui-r', 'a', 'c']
-    return cmp(flagorder.index(self.abbrev),flagorder.index(other.abbrev))
+    return cmp(flagorder.index(self.abbrev), flagorder.index(other.abbrev))
 
 class Patch(Attachment):
   _name = None
@@ -85,7 +85,7 @@ class Patch(Attachment):
         if post.date == self.date:
           self.author = "%s <%s>" % (
             # scrub the :cruft from the username
-            re.sub("\(.*\)","", re.sub("\[:\w+\]|\(:\w+\)|:\w+","", post.who)).strip(),
+            re.sub("\(.*\)", "", re.sub("\[:\w+\]|\(:\w+\)|:\w+", "", post.who)).strip(),
             post.who_email)
           break
     self.commit_message = message.strip() or \
@@ -120,9 +120,9 @@ class Patch(Attachment):
       '_' : [' ', ':'],
       '' : ['"', "'", '<', '>', '*']
     }
-    for replacement,items in replacements.items():
+    for replacement, items in replacements.items():
       for char in items:
-        patchname = patchname.replace(char,replacement)
+        patchname = patchname.replace(char, replacement)
     return patchname
 
   def joinFlags(self, commitfmt=False):
@@ -139,7 +139,7 @@ class Patch(Attachment):
           setteridx[setter] = [f]
 
       for f in self.flags:
-        fs = setteridx.pop(f.setter,None)
+        fs = setteridx.pop(f.setter, None)
         if fs:
           flagnames = [f.abbrev for f in fs]
           flags.append('%s=%s' % ('+'.join(flagnames), fs[0].setter))
@@ -187,7 +187,7 @@ class Bug(object):
 
   @property
   def patches(self):
-    return [attachment for attachment in self.attachments if isinstance(attachment,Patch)]
+    return [attachment for attachment in self.attachments if isinstance(attachment, Patch)]
 
 class PermissionError(Exception):
   def __init__(self, msg):

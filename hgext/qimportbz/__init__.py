@@ -48,9 +48,9 @@ def extsetup():
   def makebzurl(num, attachid):
     return "bz://%s%s" % (num, "/" + attachid if attachid else "")
   def makepburl(num):
-    return "pb://%s" % (num,)
+    return "pb://%s" % num
   def makescpurl(path):
-    return "scp://%s" % (urllib.pathname2url(path),)
+    return "scp://%s" % urllib.pathname2url(path)
   def fixuppath(path):
     m = bz_matcher.search(path)
     if m:
@@ -125,7 +125,7 @@ def extsetup():
       qrename = cmdutil.findcmd("qrename", commands.table)[1][0]
 
       # For all the already imported patches, rename them
-      for (patch,path) in list(bzhandler.imported_patches):
+      for (patch, path) in list(bzhandler.imported_patches):
         # This mimcks the mq code to pick a filename
         oldpatchname = os.path.normpath(os.path.basename(path))
         newpatchname = checkpatchname(patch)
