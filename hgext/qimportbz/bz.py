@@ -38,19 +38,24 @@ class Attachment(object):
 
 class Flag(object):
   def __init__(self, bug, node):
+    def removeDomain(emailAddress):
+      """Removes domain from email address if (old) Bugzilla didn't do it."""
+      # Bugzilla v3.2.1+: "Email Addresses Hidden From Logged-Out Users For Oracle Users"
+      # Bugzilla v3.4.1+: "Email Addresses Hidden From Logged-Out Users"
+      at_idx = emailAddress.find('@')
+      return emailAddress if at_idx < 0 else emailAddress[:at_idx]
+
     # Ignored node attributes: 'id' and 'type_id'.
 
     self.name = node.attrib['name']
     if self.name not in ('review', 'superreview', 'ui-review', 'checked-in') and not self.name.startswith('approval'):
       bug.settings.ui.warn("Unknown flag %s\n" % self.name)
 
-    setter = node.attrib['setter']
-    setter_idx = setter.find('@')
-    self.setter = setter if setter_idx < 0 else setter[:setter_idx]
+    self.setter = removeDomain(node.attrib['setter'])
 
     self.status = node.attrib['status']
 
-    self.requestee = node.attrib['requestee'] if 'requestee' in node.attrib else None
+    self.requestee = removeDomain(node.attrib['requestee']) if 'requestee' in node.attrib else None
 
   @property
   def abbrev(self):
