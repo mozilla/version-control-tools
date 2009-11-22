@@ -90,8 +90,9 @@ class Patch(Attachment):
     else:
       self.data = ''
 
-    # Remove the timezone from the patch date
-    self.date = date or node.find('date').text[:-4]
+    # Remove seconds (which are always ':00') and timezone from the patch date:
+    # keep 'yyyy-mm-dd hh:mn' only.
+    self.date = date or node.find('date').text[:16]
 
     if user:
       self.author = user
@@ -178,8 +179,11 @@ class Comment(object):
     who = node.find('who')
     self.who = who.attrib['name']
     self.who_email = who.text
-    # remove the timezone and seconds from the post date
-    self.date = node.find('bug_when').text[:-7]
+
+    # Remove seconds and timezone from the post date:
+    # keep 'yyyy-mm-dd hh:mn' only.
+    self.date = node.find('bug_when').text[:16]
+
     self.text = node.find('thetext').text
 
 class Bug(object):
