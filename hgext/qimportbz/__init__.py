@@ -74,7 +74,7 @@ def extsetup(ui=None):
     return "pb://%s" % num
 
   def makescpurl(path):
-    return "scp://%s" % urllib.pathname2url(path)
+    return "scp://%s" % urllib.quote(path, safe='')
 
   def fixuppath(path):
     m = bz_matcher.search(path)
