@@ -25,7 +25,8 @@ The default values are:
 patch_format = bug-%(bugnum)s
 msg_format = Bug %(bugnum)s - "%(title)s" [%(flags)s]
 """
-from mercurial import commands, cmdutil, extensions, url
+from mercurial import commands, cmdutil, extensions, url, error
+from hgext import mq
 
 import re
 import os
@@ -36,9 +37,28 @@ import bzhandler
 import pb
 import scp
 
-def extsetup():
-  # insert preview flag into qimport
-  qimport_cmd = cmdutil.findcmd("qimport", commands.table)
+def extsetup(ui=None):
+  # "Mercurial version 8e6019b16a7d and later (that is post-1.3.1) will pass a
+  # ui argument to extsetup."
+  # 'None': support pre/post Hg v1.3.1 versions.
+
+  # Insert preview flag into qimport:
+  # For HG 1.3.1 and earlier, commands.table has the commands for mq
+  # For HG 1.4, commands.table does not have the commands for mq so we
+  #   use mq.cmdtable
+  #
+  # Note that we cannot just use mq.cmdtable always because each command entry
+  # is a tuple so wrapping the qimport function will not update the right
+  # table
+  #
+  # Hence our strategy is to try commands.table and fall back to mq.cmdtable
+  # rather than do an explicit version check.
+  try:
+    qimport_cmd = cmdutil.findcmd("qimport", commands.table)
+    cmdtable = commands.table
+  except error.UnknownCommand:
+    qimport_cmd = cmdutil.findcmd("qimport", mq.cmdtable)
+    cmdtable = mq.cmdtable
   qimport_cmd[1][1].append(('p', 'preview', False, "preview commit message"))
 
   # re to match our url syntax
@@ -154,7 +174,7 @@ def extsetup():
 
       orig(ui, repo, path, **newopts)
 
-  extensions.wrapcommand(commands.table, 'qimport', qimporthook)
+  extensions.wrapcommand(cmdtable, 'qimport', qimporthook)
 
   # Here we setup the protocol handlers
   processors = [bzhandler.Handler, pb.Handler, scp.Handler]
