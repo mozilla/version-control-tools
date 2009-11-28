@@ -73,8 +73,6 @@ class Flag(object):
     return cmp(flagorder.index(self.abbrev), flagorder.index(other.abbrev))
 
 class Patch(Attachment):
-  _name = None
-
   def __init__(self, bug, node):
     Attachment.__init__(self, bug, node)
     self.flags = list(sorted(Flag(bug, n) for n in node.findall('flag')))
@@ -165,14 +163,6 @@ class Patch(Attachment):
         flags.append('%s=%s' % ('+'.join(flagnames), fs[0].setter))
 
     return self.bug.settings.joinstr.join(flags)
-
-  @property
-  def attacher(self):
-    attacher_name = ''
-    attacher_email = ''
-    for post in reversed(self.bug.comments):
-      if post.date == self.date:
-        return post
 
 class Comment(object):
   def __init__(self, node):
