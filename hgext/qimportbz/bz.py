@@ -27,6 +27,7 @@ class Attachment(object):
     self.obsolete = node.attrib['isobsolete'] == "1"
     self.id = node.find('attachid').text
     self.desc = node.find('desc').text
+    self.filename = node.find('filename').text
 
   def parse(bug, node):
     ctor = Attachment
@@ -122,12 +123,18 @@ class Patch(Attachment):
       "id" : self.id,
       "title" : self.bug.title,
       "desc" : self.desc,
-      "flags" : self.joinFlags()
+      "flags" : self.joinFlags(),
+      "filename" : self.filename,
     }
 
   @property
   def name(self):
-    patchname = self.bug.settings.patch_format % self.metadata
+    if self.bug.settings.patch_format:
+      # Create new patch name.
+      patchname = self.bug.settings.patch_format % self.metadata
+    else:
+      # Use filename from bug attachment.
+      patchname = self.filename
 
     # The patch name might have some illegal characters so we need to scrub those
     replacements = {
@@ -137,6 +144,7 @@ class Patch(Attachment):
     for replacement, items in replacements.items():
       for char in items:
         patchname = patchname.replace(char, replacement)
+
     return patchname
 
   def joinFlags(self, commitfmt=True):
