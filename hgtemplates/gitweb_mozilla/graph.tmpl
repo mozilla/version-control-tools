@@ -62,7 +62,7 @@ graph.edge = function(x0, y0, x1, y1, color) {
 var revlink = '<li style="_STYLE"><span class="desc">';
 revlink += '<a class="list" href="{url}rev/_NODEID{sessionvars%urlparameter}" title="_NODEID"><b>_DESC</b></a>';
 revlink += '</span> _TAGS';
-revlink += '<span class="info">_DATE ago, by _USER</span></li>';
+revlink += '<span class="info">Changeset _NODEID: _DATE ago, by _USER</span></li>';
 
 graph.vertex = function(x, y, color, parity, cur) {
 	
@@ -74,13 +74,12 @@ graph.vertex = function(x, y, color, parity, cur) {
 	var bg = '<li class="bg parity' + parity + '"></li>';
 	var left = (this.columns + 1) * this.bg_height;
 	var nstyle = 'padding-left: ' + left + 'px;';
-	var item = revlink.replace(/_STYLE/, nstyle);
-	item = item.replace(/_PARITY/, 'parity' + parity);
-	item = item.replace(/_NODEID/, cur[0]);
-	item = item.replace(/_NODEID/, cur[0]);
-	item = item.replace(/_DESC/, cur[3]);
-	item = item.replace(/_USER/, cur[4]);
-	item = item.replace(/_DATE/, cur[5]);
+	var item = revlink.replace(/_STYLE/g, nstyle);
+	item = item.replace(/_PARITY/g, 'parity' + parity);
+	item = item.replace(/_NODEID/g, cur[0]);
+	item = item.replace(/_DESC/g, cur[3]);
+	item = item.replace(/_USER/g, cur[4]);
+	item = item.replace(/_DATE/g, cur[5]);
 	
 	var tagspan = '';
 	if (cur[7].length || (cur[6][0] != 'default' || cur[6][1])) {
