@@ -100,7 +100,8 @@ class Patch(Attachment):
         if post.date == self.date:
           self.author = "%s <%s>" % (
             # scrub the :cruft from the username
-            re.sub("\(.*\)", "", re.sub("\[:\w+\]|\(:\w+\)|:\w+", "", post.who)).strip(),
+            # Scrub any '[...]' or '(...)' too.
+            re.sub("\[.*?\]|\(.*?\)|:\S+", "", post.who).strip(),
             post.who_email)
           break
     self.commit_message = message.strip() or \
