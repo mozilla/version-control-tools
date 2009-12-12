@@ -58,20 +58,27 @@ class Flag(object):
 
     self.requestee = removeDomain(node.attrib['requestee']) if 'requestee' in node.attrib else None
 
-  @property
-  def abbrev(self):
-    if self.name == 'ui-review':
-      return 'ui-r'
+  # detailedApproval: False = first letter only, True = more explicit abbrev.
+  def abbrev(self, detailedApproval=False):
+    name = self.name
 
-    if self.name == 'superreview':
-      return 'sr'
+    if name == "superreview":
+      return "sr"
 
-    return self.name[0]
+    if name == "ui-review":
+      return "ui-r"
+
+    if detailedApproval and name.startswith("approval"):
+      # Keep the additional part, Add a "-" if there is not one yet.
+      return "a-%s" % (name[8:] if name[8] != "-" else name[9:],)
+
+    # Just use the first letter of the other flags.
+    return name[0]
 
   # Compare by flag name
   def __cmp__(self, other):
     flagorder = ['r', 'sr', 'ui-r', 'a', 'c']
-    return cmp(flagorder.index(self.abbrev), flagorder.index(other.abbrev))
+    return cmp(flagorder.index(self.abbrev()), flagorder.index(other.abbrev()))
 
 class Patch(Attachment):
   def __init__(self, bug, node):
@@ -168,7 +175,7 @@ class Patch(Attachment):
     for f in self.flags:
       fs = setteridx.pop(f.setter, None)
       if fs:
-        flagnames = [f.abbrev for f in fs]
+        flagnames = [f.abbrev(True) for f in fs]
         flags.append('%s=%s' % ('+'.join(flagnames), fs[0].setter))
 
     return self.bug.settings.joinstr.join(flags)
