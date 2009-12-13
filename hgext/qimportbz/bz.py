@@ -105,7 +105,7 @@ class Patch(Attachment):
     else:
       for post in reversed(self.bug.comments):
         if post.date == self.date:
-          self.author = "%s <%s>" % (
+          self.author = u"%s <%s>" % (
             # scrub the :cruft from the username
             # Scrub any '[...]' or '(...)' too.
             re.sub("\[.*?\]|\(.*?\)|:\S+", "", post.who).strip(),
@@ -115,8 +115,8 @@ class Patch(Attachment):
                           (self.bug.settings.msg_format % self.metadata)
 
   def __unicode__(self):
-    return u"""
-# vim: se ft=diff :
+    return u"""# vim: se ft=diff :
+# HG changeset patch
 # User %s
 # Date %s
 %s
