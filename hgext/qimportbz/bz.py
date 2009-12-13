@@ -105,7 +105,7 @@ class Patch(Attachment):
     else:
       for post in reversed(self.bug.comments):
         if post.date == self.date:
-          self.author = u"%s <%s>" % (
+          self.author = "%s <%s>" % (
             # scrub the :cruft from the username
             # Scrub any '[...]' or '(...)' too.
             re.sub("\[.*?\]|\(.*?\)|:\S+", "", post.who).strip(),
