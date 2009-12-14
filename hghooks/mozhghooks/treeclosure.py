@@ -33,16 +33,16 @@ def hook(ui, repo, **kwargs):
             if repo.changectx('tip').description().find(magicwords) == -1:
                 print "To push despite the closed tree, include \"%s\" in your push comment" % magicwords
                 return 1
-            else:
-                print "But you included the magic words.  Hope you had permission!"
-                return 0
+
+            print "But you included the magic words.  Hope you had permission!"
+            return 0
         elif re.compile('<span id="treestatus".*APPROVAL REQUIRED.*<span id="extended-status">').search(text) :
             # Block the push unless they have approval
             if re.search('a\S*=', repo.changectx('tip').description().lower()) :
                 return 0
-            else:
-                print "Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)"
-                return 1
+
+            print "Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)"
+            return 1
             
     except IOError, (err):
         # fail open, I guess. no sense making hg unavailable
