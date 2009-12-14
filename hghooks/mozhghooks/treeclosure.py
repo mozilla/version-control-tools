@@ -39,10 +39,10 @@ def hook(ui, repo, **kwargs):
         elif re.compile('<span id="treestatus".*APPROVAL REQUIRED.*<span id="extended-status">').search(text) :
             # Block the push unless they have approval
             if re.search('a\S*=', repo.changectx('tip').description().lower()) :
+                return 0
+            else:
                 print "Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)"
                 return 1
-            else:
-                return 0
             
     except IOError, (err):
         # fail open, I guess. no sense making hg unavailable
