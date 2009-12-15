@@ -103,14 +103,23 @@ class Patch(Attachment):
     if user:
       self.author = user
     else:
-      for post in reversed(self.bug.comments):
-        if post.date == self.date:
-          self.author = "%s <%s>" % (
-            # scrub the :cruft from the username
-            # Scrub any '[...]' or '(...)' too.
-            re.sub("\[.*?\]|\(.*?\)|:\S+", "", post.who).strip(),
-            post.who_email)
-          break
+      # Bugzilla v3.4.1+: "Email Addresses Hidden From Logged-Out Users"
+      patchAttacherEmail = node.find('attacher').text
+      # 'patchAttacherEmail' may not be enough, compare date too to be as precise as possible...
+      posts = [p for p in self.bug.comments if p.date == self.date and p.who_email == patchAttacherEmail]
+      who = posts[0].who
+      for p in posts:
+        if p.who == who:
+          continue
+        print "Warning: could not figure out exact author (multiple names for same date and email address)!"
+        who = ""
+        break
+      # Email domain may need to be retrieved/added manually...
+      self.author = "%s <%s>" % (
+        # Scrub the :cruft and any '[...]' or '(...)' too from the username.
+        re.sub("\[.*?\]|\(.*?\)|:\S+", "", who).strip(),
+        patchAttacherEmail)
+
     self.commit_message = message.strip() or \
                           (self.bug.settings.msg_format % self.metadata)
 
