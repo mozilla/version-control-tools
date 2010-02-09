@@ -97,7 +97,7 @@ def hook(ui, repo, node, **kwargs):
 
         if apps['thunderbird']:
             if not thunderbirdTrees.has_key(repoName):
-                print "Unrecognized tree!  I don't know how to check closed status for %s." % name
+                print "Unrecognized tree!  I don't know how to check closed status for %s and Thunderbird... allowing push, but you should report this!" % (repoName)
             else:
                 status = checkTreeState(repo, repoName, 'Thunderbird', thunderbirdTrees[repoName])
                 if status == 1:
@@ -105,7 +105,7 @@ def hook(ui, repo, node, **kwargs):
 
         if apps['seamonkey']:
             if not seamonkeyTrees.has_key(repoName):
-                print "Unrecognized tree!  I don't know how to check closed status for %s." % name
+                print "Unrecognized tree!  I don't know how to check closed status for %s and SeaMonkey... allowing push, but you should report this!" % (repoName)
             else:
                 status = checkTreeState(repo, repoName, 'SeaMonkey', seamonkeyTrees[repoName])
                 if status == 1:
@@ -113,7 +113,7 @@ def hook(ui, repo, node, **kwargs):
 
         if apps['calendar']:
             if not calendarTrees.has_key(repoName):
-                print "Unrecognized tree!  I don't know how to check closed status for %s." % name
+                print "Unrecognized tree!  I don't know how to check closed status for %s and Calendar... allowing push, but you should report this!" % (repoName)
             else:
                  status = checkTreeState(repo, repoName, 'Calendar', calendarTrees[repoName])
 
