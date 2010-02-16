@@ -104,19 +104,25 @@ def extsetup(ui=None):
     # returns the corrected name.
     def checkpatchname(patch):
       name = patch.name
-      # Newer versions of mercurial have promptchoice but the latest release
-      # (1.3.1) does not.
-      prompter = ui.promptchoice if hasattr(ui, 'promptchoice') else ui.prompt
+      # Hg v1.4+: "ui.prompt is now a simple prompt and does not accept a list of choices. Use ui.promptchoice instead.".
+      hasPromptchoice = hasattr(ui, 'promptchoice')
       while os.path.exists(q.join(name)):
-        prompt = "A patch for bug %d already seems to exist in your patch directory. Rename %s '%s' (%d) (r)/overwrite (o)?" % \
-                 (int(patch.bug.num),
+        prompt = "A patch file named '%s' already exists in your patch directory. Rename %s '%s' (%d) (r)/overwrite (o)?" % \
+                 (name,
                   'patch' if isinstance(patch, bz.Patch) else 'attachment',
-                  patch.desc, int(patch.id))
-        choice = prompter(prompt,
-                          choices = ("&readonly", "&overwrite", "&cancel"),
-                          default='o')
+                  patch.desc,
+                  int(patch.id))
+        if hasPromptchoice:
+          choice = ui.promptchoice(prompt,
+                                   ("&readonly", "&overwrite"),
+                                   0)
+          choice = ["r", "o"][choice]
+        else:
+          choice = ui.prompt(prompt,
+                             ("&readonly", "&overwrite"),
+                             "r")
         if choice == 'r':
-          name = ui.prompt("Enter the new patch name (old one was %s):" % name)
+          name = ui.prompt("Enter the new patch name (old one was '%s'):" % name)
         else: # overwrite
           break;
       if name in q.series and q.isapplied(name):
@@ -155,11 +161,11 @@ def extsetup(ui=None):
 
       # For all the already imported patches, rename them
       for (patch, path) in list(bzhandler.imported_patches):
-        # This mimcks the mq code to pick a filename
+        # This mimicks the mq code to pick a filename.
         oldpatchname = os.path.normpath(os.path.basename(path))
         newpatchname = checkpatchname(patch)
-
-        qrename(ui, repo, oldpatchname, patch.name)
+        if newpatchname != oldpatchname:
+          qrename(ui, repo, oldpatchname, newpatchname)
 
     # now process the delayed imports
 
