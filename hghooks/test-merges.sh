@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # This script tests the pushlog hook. I've only run it on OS X, so be warned.
 
 export PYTHONPATH=`dirname $0`

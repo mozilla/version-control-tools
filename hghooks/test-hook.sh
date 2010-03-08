@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 # This script tests the pushlog hook. I've only run it on OS X, so be warned.
+#TODO: port this + the other test scripts to Python using unittest
 
 export PYTHONPATH=`dirname $0`
 
@@ -67,11 +68,23 @@ else
     exit 1;
 fi
 
-if [[ `stat -f %Sp $REPO/.hg/pushlog2.db | sed -e "s/^....\(..\).*$/\1/"` != "rw" ]]; then
-    echo "FAIL: pushlog db is not group writeable!"
-    exit 1;
-else
-    echo "PASS: pushlog db is group writeable!"
+# crummy non-portable stat stuff
+case `uname` in
+  Linux):
+        STATARGS='--format=%A'
+        ;;
+  Darwin):
+        STATARGS='-f %Sp'
+        ;;
+esac
+
+if test -n "$STATARGS"; then
+    if [[ `stat $STATARGS $REPO/.hg/pushlog2.db | sed -e "s/^....\(..\).*$/\1/"` != "rw" ]]; then
+        echo "FAIL: pushlog db is not group writeable!"
+        exit 1;
+    else
+        echo "PASS: pushlog db is group writeable!"
+    fi
 fi
 
 # Test that an empty db file doesn't break the hook - bug 466149

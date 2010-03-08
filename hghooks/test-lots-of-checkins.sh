@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # This script tests the pushlog hook. I've only run it on OS X, so be warned.
 # This is mostly just to generate a repo for testing the pushlog web output.
 
@@ -28,11 +28,14 @@ hg add -R $CLONE $CLONE/testfile
 hg ci -R $CLONE -m "checkin 1"
 hg push -R $CLONE $REPO;
 
+printf "Adding changes"
 for ((i=2; $i<=200; i++)); do
   echo "checkin $i" >> $CLONE/testfile;
-  hg ci -R $CLONE -m "checkin $i";
-  hg push -R $CLONE $REPO;
+  hg ci -R $CLONE -m "checkin $i" >/dev/null;
+  hg push -R $CLONE $REPO >/dev/null;
+  printf "."
 done
+echo "Done"
 
 # Test total push count
 EXPECTED_PUSHCOUNT=200
