@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from mercurial import ui, hg, commands
+from mercurial import ui, hg, commands, util
 from mercurial.commands import add, clone, commit, init, push
 from mercurial.node import hex
 from tempfile import mkdtemp
@@ -144,6 +144,31 @@ class TestHook(unittest.TestCase):
     p = getPushesFromDB(self.repo)
     self.assertEqual(len(p), 1)
     self.assertEqual(len(p[0]['changes']), 1)
+
+  def testDBLocking(self):
+    """bug 508863 - Lock the DB and try to push, check that the error doesn't suck so much."""
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1 bug 12345")
+    push(u, self.clonerepo, dest=self.repodir)
+
+    # open the repo and insert something to lock it
+    conn = sqlite.connect(join(self.repo.root, '.hg', 'pushlog2.db'))
+    conn.execute("INSERT INTO pushlog (user, date) VALUES('user', 0)")
+
+    appendFile(join(self.clonedir, "testfile"), "checkin 2")
+    commit(u, self.clonerepo, message="checkin 2 bug 23456")
+    sawError = False
+    try:
+      push(u, self.clonerepo, dest=self.repodir)
+    except util.Abort:
+      sawError = True
+    self.assert_(sawError, "Push was aborted due to db being locked.")
+    conn.commit()
+    # this one should succeed
+    push(u, self.clonerepo, dest=self.repodir)
+    conn.close()
 
 if __name__ == '__main__':
   unittest.main()

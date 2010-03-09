@@ -62,15 +62,22 @@ def log(ui, repo, node, **kwargs):
         st = os.stat(pushdb)
         os.chmod(pushdb, st.st_mode | stat.S_IWGRP)
     t = int(time.time())
-    res = conn.execute("INSERT INTO pushlog (user, date) values(?,?)",
-                       (os.environ['USER'], t))
-    pushid = res.lastrowid
-    # all changesets from node to 'tip' inclusive are part of this push
-    rev = repo.changectx(node).rev()
-    tip = repo.changectx('tip').rev()
-    for i in range(rev, tip+1):
-        ctx = repo.changectx(i)
-        conn.execute("INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
-                     (pushid, ctx.rev(), hex(ctx.node())))
-    conn.commit()
+    retval = 1
+    print "Trying to insert into pushlog..."
+    try:
+        res = conn.execute("INSERT INTO pushlog (user, date) values(?,?)",
+                           (os.environ['USER'], t))
+        pushid = res.lastrowid
+        # all changesets from node to 'tip' inclusive are part of this push
+        rev = repo.changectx(node).rev()
+        tip = repo.changectx('tip').rev()
+        for i in range(rev, tip+1):
+            ctx = repo.changectx(i)
+            conn.execute("INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
+                         (pushid, ctx.rev(), hex(ctx.node())))
+        conn.commit()
+        retval = 0
+    except sqlite.OperationalError:
+        print "Pushlog database is locked. Please retry your push."
     conn.close()
+    return retval
