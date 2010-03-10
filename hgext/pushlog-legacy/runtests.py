@@ -1,8 +1,11 @@
-#!/usr/bin/python
-# I'm sure this all only works on my mac, but that's ok for now.
+#!/usr/bin/env python
+# Unit tests for pushlog / json-pushes
 
 import unittest
 import os.path
+from os.path import join, isdir
+from mercurial import ui, hg, commands, util
+from mercurial.commands import add, clone, commit, init, push
 from subprocess import check_call, Popen, STDOUT, PIPE
 import os
 import stat
@@ -10,33 +13,29 @@ from signal import SIGTERM
 from httplib import HTTPConnection
 from urllib import urlopen
 from time import sleep
+from tempfile import mkdtemp
 import simplejson
 import feedparser
+import shutil
 
 mydir = os.path.abspath(os.path.dirname(__file__))
-# where to store needed hg templates repo
-templatepath = "/tmp/hg_templates"
 devnull = file("/dev/null", "w")
 
 def write_hgrc(repodir):
-    f = open(repodir + ".hg/hgrc", "w")
-    f.write("""[extensions]
+    with open(join(repodir, ".hg", "hgrc"), "w") as f:
+        f.write("""[extensions]
 pushlog-feed=%s/pushlog-feed.py
 buglink=%s/buglink.py
 hgwebjson=%s/hgwebjson.py
 [web]
 templates=%s
 style=gitweb_mozilla
-""" % (mydir, mydir, mydir, templatepath))
-    f.close()
+""" % (mydir, mydir, mydir, os.environ['HG_TEMPLATES']))
 
-def ensure_templates():
+def pull_templates(path):
+    """Clone the hg_templates repo to |path|."""
     # need to grab the moz hg templates
-    if not os.path.isdir(templatepath):
-        check_call(["hg", "clone", "http://hg.mozilla.org/hg_templates/",
-                    templatepath], stdout=devnull, stderr=STDOUT)
-    # make sure it's updated
-    check_call(["hg","-R",templatepath,"pull","-u"], stdout=devnull, stderr=STDOUT)
+    clone(ui.ui(), "http://hg.mozilla.org/hg_templates/", path);
 
 def loadjsonurl(url):
     """Load JSON from a URL into an object."""
@@ -56,25 +55,23 @@ class TestEmptyRepo(unittest.TestCase):
     hgwebprocess = None
     def setUp(self):
         # create an empty repo
-        repodir = "/tmp/hg-empty-repo/"
-        check_call(["rm", "-rf", repodir])
-        os.mkdir(repodir)
-        check_call(["hg","init",repodir])
-        write_hgrc(repodir)
-        ensure_templates()
+        self.repodir = mkdtemp()
+        init(ui.ui(), dest=self.repodir)
+        write_hgrc(self.repodir)
         # now run hg serve on it
-        self.hgwebprocess = Popen(["hg", "-R", repodir, "serve"], stdout=devnull, stderr=STDOUT)
+        self.hgwebprocess = Popen(["hg", "-R", self.repodir, "serve"], stdout=devnull, stderr=STDOUT)
         # give it a second to be ready
         sleep(1)
-        self.repodir = repodir
 
     def tearDown(self):
         # kill hgweb process
         if self.hgwebprocess is not None:
             os.kill(self.hgwebprocess.pid, SIGTERM)
             self.hgwebprocess = None
+        shutil.rmtree(self.repodir)
 
     def testemptyrepo(self):
+        """Accessing /pushlog on a repo without a pushlog db should succeed"""
         # just GET /pushlog and verify that it's 200 OK
         conn = HTTPConnection("localhost", 8000)
         conn.request("GET", "/pushlog")
@@ -83,6 +80,7 @@ class TestEmptyRepo(unittest.TestCase):
         self.assertEqual(r.status, 200, "empty pushlog should not error (got HTTP status %d, expected 200)" % r.status)
 
     def testemptyreporeadonly(self):
+        """Accessing /pushlog on a read-only empty repo should succeed."""
         # just GET /pushlog and verify that it's 200 OK
         def rchmod(canWrite = False):
             w = 0
@@ -109,14 +107,11 @@ class TestPushlog(unittest.TestCase):
         "Untar the test repo and add the pushlog extension to it."
         # unpack the test repo
         repoarchive = os.path.join(mydir, "testdata/test-repo.tar.bz2")
-        repodir = "/tmp/hg-test/"
-        self.repodir = repodir
-        check_call(["rm", "-rf", repodir])
-        check_call(["tar", "xjf", repoarchive], cwd="/tmp")
-        write_hgrc(repodir)
-        ensure_templates()
+        self.repodir = mkdtemp()
+        check_call(["tar", "xjf", repoarchive], cwd=self.repodir)
+        write_hgrc(self.repodir)
         # now run hg serve on it
-        self.hgwebprocess = Popen(["hg", "-R", repodir, "serve"], stdout=devnull, stderr=STDOUT)
+        self.hgwebprocess = Popen(["hg", "-R", self.repodir, "serve"], stdout=devnull, stderr=STDOUT)
         # give it a second to be ready
         sleep(1)
         os.environ['TZ'] = "America/New_York"
@@ -126,6 +121,7 @@ class TestPushlog(unittest.TestCase):
         if self.hgwebprocess is not None:
             os.kill(self.hgwebprocess.pid, SIGTERM)
             self.hgwebprocess = None
+        shutil.rmtree(self.repodir)
 
     def testpushloghtml(self):
         """Sanity check the html output."""
@@ -168,7 +164,6 @@ class TestPushlog(unittest.TestCase):
         self.assertEqual(h, "*", "/json-pushes should send Access-Control-Allow-Origin")
 
     def assertEqualFeeds(self, a, b):
-        self.assertEqual(a.feed.title, b.feed.title, "not the same title, %s != %s" % (a.feed.title, b.feed.title))
         self.assertEqual(a.feed.updated, b.feed.updated, "not the same updated time, %s != %s" % (a.feed.updated, b.feed.updated))
         self.assertEqual(len(a.entries), len(b.entries), "not the same number of entries, %d != %d" % (len(a.entries), len(b.entries)))
         for ae, be in zip(a.entries, b.entries):
@@ -299,14 +294,11 @@ class TestPushlogUserQueries(unittest.TestCase):
         "Untar the test repo and add the pushlog extension to it."
         # unpack the test repo
         repoarchive = os.path.join(mydir, "testdata/test-repo-users.tar.bz2")
-        repodir = "/tmp/hg-test/"
-        self.repodir = repodir
-        check_call(["rm", "-rf", repodir])
-        check_call(["tar", "xjf", repoarchive], cwd="/tmp")
-        write_hgrc(repodir)
-        ensure_templates()
+        self.repodir = mkdtemp()
+        check_call(["tar", "xjf", repoarchive], cwd=self.repodir)
+        write_hgrc(self.repodir)
         # now run hg serve on it
-        self.hgwebprocess = Popen(["hg", "-R", repodir, "serve"], stdout=devnull, stderr=STDOUT)
+        self.hgwebprocess = Popen(["hg", "-R", self.repodir, "serve"], stdout=devnull, stderr=STDOUT)
         # give it a second to be ready
         sleep(1)
         os.environ['TZ'] = "America/New_York"
@@ -357,4 +349,13 @@ class TestPushlogUserQueries(unittest.TestCase):
         self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
 if __name__ == '__main__':
+    if 'HG_TEMPLATES' not in os.environ or not isdir(os.environ['HG_TEMPLATES']):
+        os.environ['HG_TEMPLATES'] = mkdtemp()
+        pull_templates(os.environ['HG_TEMPLATES'])
+        madeTemplatePath = True
+    else:
+        madeTemplatePath = False
+
     unittest.main()
+    if madeTemplatePath:
+        shutil.rmtree(os.environ['HG_TEMPLATES'])
