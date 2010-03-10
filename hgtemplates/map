@@ -1,57 +1,27 @@
-default = 'shortlog'
-mimetype = 'text/html; charset={encoding}'
-header = header.tmpl
-footer = footer.tmpl
-search = search.tmpl
-changelog = changelog.tmpl
-shortlog = shortlog.tmpl
-shortlogentry = shortlogentry.tmpl
-naventry = '<a href="{url}log/{node|short}{sessionvars%urlparameter}">{label|escape}</a> '
-navshortentry = '<a href="{url}shortlog/{node|short}{sessionvars%urlparameter}">{label|escape}</a> '
-filenaventry = '<a href="{url}log/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{label|escape}</a> '
-filedifflink = '<a href="#url#diff/#node|short#/#file|urlescape#{sessionvars%urlparameter}">#file|escape#</a> '
-filenodelink = '<a href="#url#file/#node|short#/#file|urlescape#{sessionvars%urlparameter}">#file|escape#</a> '
-fileellipses = '...'
-changelogentry = changelogentry.tmpl
-searchentry = changelogentry.tmpl
+mimetype = 'text/plain; charset={encoding}'
+header = ''
+footer = ''
 changeset = changeset.tmpl
-manifest = manifest.tmpl
-direntry = '<tr class="parity#parity#"><td><tt>drwxr-xr-x</tt>&nbsp;<td>&nbsp;<td>&nbsp;<td><a href="#url#file/#node|short##path|urlescape#{sessionvars%urlparameter}">#basename|escape#/</a>'
-fileentry = '<tr class="parity#parity#"><td><tt>#permissions|permissions#</tt>&nbsp;<td align=right><tt class="date">#date|isodate#</tt>&nbsp;<td align=right><tt>#size#</tt>&nbsp;<td><a href="#url#file/#node|short#/#file|urlescape#{sessionvars%urlparameter}">#basename|escape#</a>'
-filerevision = filerevision.tmpl
-fileannotate = fileannotate.tmpl
+difflineplus = '{line}'
+difflineminus = '{line}'
+difflineat = '{line}'
+diffline = '{line}'
+changesetparent = '# Parent  {node}'
+changesetchild = '# Child   {node}'
+filenodelink = ''
+fileline = '{line}'
+diffblock = '{lines}'
 filediff = filediff.tmpl
-filelog = filelog.tmpl
-fileline = '<div class="parity#parity#"><a class="lineno" href="##lineid#" id="#lineid#">#linenumber#</a>#line|escape#</div>'
-filelogentry = filelogentry.tmpl
-annotateline = '<tr class="parity#parity#"><td class="annotate"><a href="#url#annotate/#node|short#/#file|urlescape#{sessionvars%urlparameter}#l{targetline}">#author|obfuscate#@#rev#</a></td><td><a class="lineno" href="##lineid#" id="#lineid#">#linenumber#</a></td><td><pre>#line|escape#</pre></td></tr>'
-difflineplus = '<span class="plusline"><a class="lineno" href="##lineid#" id="#lineid#">#linenumber#</a>#line|escape#</span>'
-difflineminus = '<span class="minusline"><a class="lineno" href="##lineid#" id="#lineid#">#linenumber#</a>#line|escape#</span>'
-difflineat = '<span class="atline"><a class="lineno" href="##lineid#" id="#lineid#">#linenumber#</a>#line|escape#</span>'
-diffline = '<a class="lineno" href="##lineid#" id="#lineid#">#linenumber#</a>#line|escape#'
-changelogparent = '<tr><th class="parent">parent #rev#:</th><td class="parent"><a href="#url#rev/#node|short#{sessionvars%urlparameter}">#node|short#</a></td></tr>'
-changesetparent = '<tr><th class="parent">parent #rev#:</th><td class="parent"><a href="#url#rev/#node|short#{sessionvars%urlparameter}">#node|short#</a></td></tr>'
-filerevparent = '<tr><td class="metatag">parent:</td><td><a href="{url}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{rename%filerename}{node|short}</a></td></tr>'
-filerename = '{file|escape}@'
-filelogrename = '<tr><th>base:</th><td><a href="#url#file/#node|short#/#file|urlescape#{sessionvars%urlparameter}">#file|escape#@#node|short#</a></td></tr>'
-fileannotateparent = '<tr><td class="metatag">parent:</td><td><a href="{url}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{rename%filerename}{node|short}</a></td></tr>'
-changesetchild = '<tr><th class="child">child #rev#:</th><td class="child"><a href="#url#rev/#node|short#{sessionvars%urlparameter}">#node|short#</a></td></tr>'
-changelogchild = '<tr><th class="child">child #rev#:</th><td class="child"><a href="#url#rev/#node|short#{sessionvars%urlparameter}">#node|short#</a></td></tr>'
-filerevchild = '<tr><td class="metatag">child:</td><td><a href="#url#file/#node|short#/#file|urlescape#{sessionvars%urlparameter}">#node|short#</a></td></tr>'
-fileannotatechild = '<tr><td class="metatag">child:</td><td><a href="#url#annotate/#node|short#/#file|urlescape#{sessionvars%urlparameter}">#node|short#</a></td></tr>'
-tags = tags.tmpl
-tagentry = '<li class="tagEntry parity#parity#"><tt class="node">#node#</tt> <a href="#url#rev/#node|short#{sessionvars%urlparameter}">#tag|escape#</a></li>'
-diffblock = '<pre class="parity#parity#">#lines#</pre>'
-changelogtag = '<tr><th class="tag">tag:</th><td class="tag">#tag|escape#</td></tr>'
-changesettag = '<tr><th class="tag">tag:</th><td class="tag">#tag|escape#</td></tr>'
-filediffparent = '<tr><th class="parent">parent #rev#:</th><td class="parent"><a href="#url#rev/#node|short#{sessionvars%urlparameter}">#node|short#</a></td></tr>'
-filelogparent = '<tr><th>parent #rev#:</th><td><a href="#url#file/#node|short#/#file|urlescape#{sessionvars%urlparameter}">#node|short#</a></td></tr>'
-filediffchild = '<tr><th class="child">child #rev#:</th><td class="child"><a href="#url#rev/#node|short#{sessionvars%urlparameter}">#node|short#</a></td></tr>'
-filelogchild = '<tr><th>child #rev#:</th><td><a href="#url#file/#node|short#/#file|urlescape#{sessionvars%urlparameter}">#node|short#</a></td></tr>'
-indexentry = '<tr class="parity#parity#"><td><a href="#url#{sessionvars%urlparameter}">#name|escape#</a></td><td>#description#</td><td>#contact|obfuscate#</td><td class="age">#lastchange|age# ago</td><td class="indexlinks"><a href="#url#rss-log">RSS</a> <a href="#url#atom-log">Atom</a> #archives%archiveentry#</td></tr>'
+fileannotate = fileannotate.tmpl
+annotateline = '{author|user}@{rev}: {line}'
+manifest = manifest.tmpl
+direntry = 'drwxr-xr-x {basename}\n'
+fileentry = '{permissions|permissions} {size} {basename}\n'
 index = index.tmpl
-archiveentry = '<a href="#url#archive/#node|short##extension|urlescape#">#type|escape#</a> '
 notfound = notfound.tmpl
 error = error.tmpl
-urlparameter = '#separator##name#=#value|urlescape#'
-hiddenformentry = '<input type="hidden" name="#name#" value="#value|escape#" />'
+indexentry = '{url}\n'
+tags = '{entries%tagentry}'
+tagentry = '{tag}	{node}\n'
+branches = '{entries%branchentry}'
+branchentry = '{branch}	{node}	{status}\n'
