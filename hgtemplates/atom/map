@@ -6,6 +6,9 @@ changelog = changelog.tmpl
 changelogentry = changelogentry.tmpl
 filelog = filelog.tmpl
 filelogentry = filelogentry.tmpl
+pushlog = pushlog.tmpl
+pushlogentry = pushlogentry.tmpl
+pushlogfile = '<li class="file">{name}</li>'
 tags = tags.tmpl
 tagentry = tagentry.tmpl
 error = error.tmpl
