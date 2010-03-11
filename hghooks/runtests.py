@@ -162,11 +162,8 @@ class TestPushlogHook(unittest.TestCase):
     appendFile(join(self.clonedir, "testfile"), "checkin 2")
     commit(u, self.clonerepo, message="checkin 2 bug 23456")
     sawError = False
-    try:
-      push(u, self.clonerepo, dest=self.repodir)
-    except util.Abort:
-      sawError = True
-    self.assert_(sawError, "Push was aborted due to db being locked.")
+    #TODO: would be nice if we could lower the timeout
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
     conn.commit()
     # this one should succeed
     push(u, self.clonerepo, dest=self.repodir)
@@ -178,7 +175,7 @@ class TestTreeClosureHook(unittest.TestCase):
     self.ui.quiet = True
     self.ui.verbose = False
     self.repodirbase = mkdtemp(prefix="hg-test")
-    #XXX: sucks
+    #XXX: sucks, but tests can rename it if they'd like to test something else
     self.repodir = join(self.repodirbase, "mozilla-central")
     init(self.ui, dest=self.repodir)
     addHook(self.repodir, "treeclosure.hook")
@@ -261,6 +258,57 @@ class TestTreeClosureHook(unittest.TestCase):
     commit(u, self.clonerepo, message="checkin 1")
     appendFile(join(self.clonedir, "testfile"), "checkin 2")
     commit(u, self.clonerepo, message="checkin 2 CLOSED TREE")
+
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+  def testApprovalRequired(self):
+    """Pushing to an APPROVAL REQUIRED tree should fail."""
+    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+                         '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
+    # pushing something should now fail
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1")
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+  def testApprovalRequiredMagicWords(self):
+    """
+    Pushing to an APPROVAL REQUIRED tree with a=foo
+    in the commit message should succeed.
+    """
+    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+                         '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1 a=someone")
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+    # also check that approval of the form a1.2=foo works
+    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+                         '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
+    appendFile(join(self.clonedir, "testfile"), "checkin 2")
+    commit(u, self.clonerepo, message="checkin 2 a1.2=someone")
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 2)
+
+  def testApprovalRequiredMagicWordsTip(self):
+    """
+    Pushing to an APPROVAL REQUIRED tree with a=foo
+    in the commit message of the tip changeset should succeed.
+    """
+    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+                         '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1")
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    commit(u, self.clonerepo, message="checkin 2 a=someone")
 
     push(u, self.clonerepo, dest=self.repodir)
     self.assertEqual(self.director.opened, 1)
