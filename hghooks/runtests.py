@@ -11,12 +11,14 @@ from os.path import join
 import sqlite3 as sqlite
 from getpass import getuser
 from time import time
+import urllib2
+from StringIO import StringIO
 
-def addHook(repodir):
+def addHook(repodir, hook):
   with open(join(repodir, '.hg', 'hgrc'), 'w') as f:
     f.write("""[hooks]
-pretxnchangegroup.z_linearhistory = python:mozhghooks.pushlog.log
-""")
+pretxnchangegroup.z_linearhistory = python:mozhghooks.%s
+""" % hook)
 
 def appendFile(filename, content):
   with open(filename, 'a') as f:
@@ -37,14 +39,14 @@ def getPushesFromDB(repo):
     pushes[-1]['changes'].append({'rev':row[3], 'node':row[4]})
   return pushes
 
-class TestHook(unittest.TestCase):
+class TestPushlogHook(unittest.TestCase):
   def setUp(self):
     self.ui = ui.ui()
     self.ui.quiet = True
     self.ui.verbose = False
     self.repodir = mkdtemp(prefix="hg-test")
     init(self.ui, dest=self.repodir)
-    addHook(self.repodir)
+    addHook(self.repodir, "pushlog.log")
     self.repo = hg.repository(self.ui, self.repodir)
     self.clonedir = mkdtemp(prefix="hg-test")
     clone(self.ui, self.repo, self.clonedir)
@@ -169,6 +171,99 @@ class TestHook(unittest.TestCase):
     # this one should succeed
     push(u, self.clonerepo, dest=self.repodir)
     conn.close()
+
+class TestTreeClosureHook(unittest.TestCase):
+  def setUp(self):
+    self.ui = ui.ui()
+    self.ui.quiet = True
+    self.ui.verbose = False
+    self.repodirbase = mkdtemp(prefix="hg-test")
+    #XXX: sucks
+    self.repodir = join(self.repodirbase, "mozilla-central")
+    init(self.ui, dest=self.repodir)
+    addHook(self.repodir, "treeclosure.hook")
+    self.repo = hg.repository(self.ui, self.repodir)
+    self.clonedir = mkdtemp(prefix="hg-test")
+    clone(self.ui, self.repo, self.clonedir)
+    self.clonerepo = hg.repository(self.ui, self.clonedir)
+    # add a urllib OpenerDirector so we can intercept urlopen
+    class MyDirector:
+      expected = []
+      opened = 0
+      def open(self, url, data=None, timeout=None):
+        expectedURL, sendData = self.expected.pop()
+        if expectedURL != url:
+          raise Exception("Incorrect URL, got %s expected %s!" % (url, expectedURL))
+        self.opened += 1
+        return StringIO(sendData)
+      def expect(self, url, data):
+        """
+        Indicate that the next url opened should be |url|, and should return
+        |data| as its contents.
+        """
+        self.expected.append((url, data))
+    self.director = MyDirector()
+    urllib2.install_opener(self.director)
+
+  def tearDown(self):
+    shutil.rmtree(self.repodirbase)
+    shutil.rmtree(self.clonedir)
+    urllib2.install_opener(urllib2.OpenerDirector())
+
+  def testOpen(self):
+    """Pushing to an OPEN tree should succeed."""
+    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+                         '<span id="treestatus">OPEN</span><span id="extended-status">')
+    # pushing something should now succeed
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1")
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+  def testClosed(self):
+    """Pushing to a CLOSED tree should fail."""
+    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+                         '<span id="treestatus">CLOSED</span><span id="extended-status">')
+    # pushing something should now fail
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1")
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+  def testClosedMagicWords(self):
+    """
+    Pushing to a CLOSED tree with 'CLOSED TREE' in the commit message
+    should succeed.
+    """
+    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+                         '<span id="treestatus">CLOSED</span><span id="extended-status">')
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1 CLOSED TREE")
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+  def testClosedMagicWordsTip(self):
+    """
+    Pushing multiple changesets to a CLOSED tree with 'CLOSED TREE'
+    in the commit message of the tip changeset should succeed.
+    """
+    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+                         '<span id="treestatus">CLOSED</span><span id="extended-status">')
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1")
+    appendFile(join(self.clonedir, "testfile"), "checkin 2")
+    commit(u, self.clonerepo, message="checkin 2 CLOSED TREE")
+
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
 
 if __name__ == '__main__':
   unittest.main()
