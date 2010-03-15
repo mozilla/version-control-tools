@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import with_statement
 import unittest
 from mercurial import ui, hg, commands, util
 from mercurial.commands import add, clone, commit, init, push
@@ -169,26 +170,21 @@ class TestPushlogHook(unittest.TestCase):
     push(u, self.clonerepo, dest=self.repodir)
     conn.close()
 
-class TestTreeClosureHook(unittest.TestCase):
+class ClosureHookTestHelpers:
+  """A mixin that provides a director class so we can intercept urlopen and
+     change the result for our tests."""
   def setUp(self):
-    self.ui = ui.ui()
-    self.ui.quiet = True
-    self.ui.verbose = False
-    self.repodirbase = mkdtemp(prefix="hg-test")
-    #XXX: sucks, but tests can rename it if they'd like to test something else
-    self.repodir = join(self.repodirbase, "mozilla-central")
-    init(self.ui, dest=self.repodir)
-    addHook(self.repodir, "treeclosure.hook")
-    self.repo = hg.repository(self.ui, self.repodir)
-    self.clonedir = mkdtemp(prefix="hg-test")
-    clone(self.ui, self.repo, self.clonedir)
-    self.clonerepo = hg.repository(self.ui, self.clonedir)
     # add a urllib OpenerDirector so we can intercept urlopen
     class MyDirector:
       expected = []
       opened = 0
       def open(self, url, data=None, timeout=None):
         expectedURL, sendData = self.expected.pop()
+        """
+        If this is ever changed so that more than one url are allowed, then
+        the comm-central tests must be re-evaluated as they currently rely
+        on it.
+        """
         if expectedURL != url:
           raise Exception("Incorrect URL, got %s expected %s!" % (url, expectedURL))
         self.opened += 1
@@ -203,14 +199,37 @@ class TestTreeClosureHook(unittest.TestCase):
     urllib2.install_opener(self.director)
 
   def tearDown(self):
+    urllib2.install_opener(urllib2.OpenerDirector())
+
+  def redirect(self, url, data):
+    self.director.expect(url, data)
+
+class TestTreeClosureHook(ClosureHookTestHelpers, unittest.TestCase):
+  def setUp(self):
+    self.ui = ui.ui()
+    self.ui.quiet = True
+    self.ui.verbose = False
+    self.repodirbase = mkdtemp(prefix="hg-test")
+    #XXX: sucks, but tests can rename it if they'd like to test something else
+    self.repodir = join(self.repodirbase, "mozilla-central")
+    init(self.ui, dest=self.repodir)
+    addHook(self.repodir, "treeclosure.hook")
+    self.repo = hg.repository(self.ui, self.repodir)
+    self.clonedir = mkdtemp(prefix="hg-test")
+    clone(self.ui, self.repo, self.clonedir)
+    self.clonerepo = hg.repository(self.ui, self.clonedir)
+    ClosureHookTestHelpers.setUp(self)
+
+  def tearDown(self):
     shutil.rmtree(self.repodirbase)
     shutil.rmtree(self.clonedir)
-    urllib2.install_opener(urllib2.OpenerDirector())
+    ClosureHookTestHelpers.tearDown(self)
 
   def testOpen(self):
     """Pushing to an OPEN tree should succeed."""
-    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
-                         '<span id="treestatus">OPEN</span><span id="extended-status">')
+    self.redirect("http://tinderbox.mozilla.org/Firefox/",
+                  '<span id="treestatus">OPEN</span><span id="extended-status">')
+
     # pushing something should now succeed
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
@@ -221,7 +240,7 @@ class TestTreeClosureHook(unittest.TestCase):
 
   def testClosed(self):
     """Pushing to a CLOSED tree should fail."""
-    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+    self.redirect("http://tinderbox.mozilla.org/Firefox/",
                          '<span id="treestatus">CLOSED</span><span id="extended-status">')
     # pushing something should now fail
     u = self.ui
@@ -236,7 +255,7 @@ class TestTreeClosureHook(unittest.TestCase):
     Pushing to a CLOSED tree with 'CLOSED TREE' in the commit message
     should succeed.
     """
-    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+    self.redirect("http://tinderbox.mozilla.org/Firefox/",
                          '<span id="treestatus">CLOSED</span><span id="extended-status">')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
@@ -250,7 +269,7 @@ class TestTreeClosureHook(unittest.TestCase):
     Pushing multiple changesets to a CLOSED tree with 'CLOSED TREE'
     in the commit message of the tip changeset should succeed.
     """
-    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+    self.redirect("http://tinderbox.mozilla.org/Firefox/",
                          '<span id="treestatus">CLOSED</span><span id="extended-status">')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
@@ -264,7 +283,7 @@ class TestTreeClosureHook(unittest.TestCase):
 
   def testApprovalRequired(self):
     """Pushing to an APPROVAL REQUIRED tree should fail."""
-    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+    self.redirect("http://tinderbox.mozilla.org/Firefox/",
                          '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
     # pushing something should now fail
     u = self.ui
@@ -279,7 +298,7 @@ class TestTreeClosureHook(unittest.TestCase):
     Pushing to an APPROVAL REQUIRED tree with a=foo
     in the commit message should succeed.
     """
-    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+    self.redirect("http://tinderbox.mozilla.org/Firefox/",
                          '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
@@ -289,7 +308,7 @@ class TestTreeClosureHook(unittest.TestCase):
     self.assertEqual(self.director.opened, 1)
 
     # also check that approval of the form a1.2=foo works
-    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+    self.redirect("http://tinderbox.mozilla.org/Firefox/",
                          '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
     appendFile(join(self.clonedir, "testfile"), "checkin 2")
     commit(u, self.clonerepo, message="checkin 2 a1.2=someone")
@@ -301,7 +320,7 @@ class TestTreeClosureHook(unittest.TestCase):
     Pushing to an APPROVAL REQUIRED tree with a=foo
     in the commit message of the tip changeset should succeed.
     """
-    self.director.expect("http://tinderbox.mozilla.org/Firefox/",
+    self.redirect("http://tinderbox.mozilla.org/Firefox/",
                          '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
@@ -309,6 +328,137 @@ class TestTreeClosureHook(unittest.TestCase):
     commit(u, self.clonerepo, message="checkin 1")
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
     commit(u, self.clonerepo, message="checkin 2 a=someone")
+
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
+  def setUp(self):
+    self.ui = ui.ui()
+    self.ui.quiet = True
+    self.ui.verbose = False
+    self.repodirbase = mkdtemp(prefix="hg-test")
+    #XXX: sucks, but tests can rename it if they'd like to test something else
+    self.repodir = join(self.repodirbase, "comm-central")
+    init(self.ui, dest=self.repodir)
+    addHook(self.repodir, "treeclosure_comm_central.hook")
+    self.repo = hg.repository(self.ui, self.repodir)
+    self.clonedir = mkdtemp(prefix="hg-test")
+    clone(self.ui, self.repo, self.clonedir)
+    self.clonerepo = hg.repository(self.ui, self.clonedir)
+    ClosureHookTestHelpers.setUp(self)
+
+  def tearDown(self):
+    shutil.rmtree(self.repodirbase)
+    shutil.rmtree(self.clonedir)
+    ClosureHookTestHelpers.tearDown(self)
+
+  def actualTestCCOpen(self, treeName, fileInfo):
+    """Pushing to an OPEN CC tree should succeed."""
+    # If this tests attempts to pull something that isn't treeName, then the
+    # re-director should fail for us. Hence we know that the hook is only
+    # pulling the predefined tree and nothing else.
+    self.redirect("http://tinderbox.mozilla.org/" + treeName + "/",
+                         '<span id="tree-status">OPEN</span><span id="extended-status">')
+
+    # pushing something should now succeed
+    u = self.ui
+
+    fileName = fileInfo.pop()
+    fileLoc = self.clonedir
+    for dir in fileInfo:
+      fileLoc = join(fileLoc, dir)
+      os.mkdir(fileLoc)
+
+    fileLoc = join(fileLoc, fileName)
+
+    appendFile(fileLoc, "checkin 1")
+    add(u, self.clonerepo, fileLoc)
+    commit(u, self.clonerepo, message="checkin 1")
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+ 
+  def testCCOpenThunderbird(self):
+    self.actualTestCCOpen("Thunderbird", ["testfile"])
+
+  def testCCOpenSeaMonkey(self):
+    self.actualTestCCOpen("SeaMonkey", ["suite", "build", "test"])
+
+  def testCCOpenCalendar1(self):
+    self.actualTestCCOpen("Sunbird", ["calendar", "app", "test"])
+
+  def testCCOpenCalendar2(self):
+    self.actualTestCCOpen("Sunbird", ["other-licenses", "branding", "sunbird", "test"])
+
+  def actualTestCCClosed(self, treeName, fileInfo):
+    """Pushing to a CLOSED Thunderbird tree should fail."""
+    # If this tests attempts to pull something that isn't treeName, then the
+    # re-director should fail for us. Hence we know that the hook is only
+    # pulling the predefined tree and nothing else.
+    self.redirect("http://tinderbox.mozilla.org/" + treeName + "/",
+                         '<span id="tree-status">CLOSED</span><span id="extended-status">')
+
+    # pushing something should now fail
+    u = self.ui
+
+    fileName = fileInfo.pop()
+    fileLoc = self.clonedir
+    for dir in fileInfo:
+      fileLoc = join(fileLoc, dir)
+      os.mkdir(fileLoc)
+
+    fileLoc = join(fileLoc, fileName)
+
+    appendFile(fileLoc, "checkin 1")
+    add(u, self.clonerepo, fileLoc)
+    commit(u, self.clonerepo, message="checkin 1")
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+  def testCCClosedThunderbird(self):
+    self.actualTestCCClosed("Thunderbird", ["testfile"])
+
+  def testCCClosedSeaMonkey(self):
+    self.actualTestCCClosed("SeaMonkey", ["suite", "build", "test"])
+
+  def testCCClosedCalendar1(self):
+    self.actualTestCCClosed("Sunbird", ["calendar", "app", "test"])
+
+  def testCCClosedCalendar2(self):
+    self.actualTestCCClosed("Sunbird", ["other-licenses", "branding", "sunbird", "test"])
+
+  # In theory adding CLOSED TREE is the same code-path for all projects,
+  # so just checking for one project
+  def testCCClosedThunderbirdMagicWords(self):
+    """
+    Pushing to a CLOSED Thunderbird tree with 'CLOSED TREE' in the commit message
+    should succeed.
+    """
+    self.redirect("http://tinderbox.mozilla.org/Thunderbird/",
+                         '<span id="tree-status">CLOSED</span><span id="extended-status">')
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1 CLOSED TREE")
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+  # In theory adding CLOSED TREE is the same code-path for all projects,
+  # so just checking for one project
+  def testCCClosedThunderbirdMagicWordsTip(self):
+    """
+    Pushing multiple changesets to a CLOSED Thunderbird tree with 'CLOSED TREE'
+    in the commit message of the tip changeset should succeed.
+    """
+    self.redirect("http://tinderbox.mozilla.org/Thunderbird/",
+                         '<span id="tree-status">CLOSED</span><span id="extended-status">')
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1")
+    appendFile(join(self.clonedir, "testfile"), "checkin 2")
+    commit(u, self.clonerepo, message="checkin 2 CLOSED TREE")
 
     push(u, self.clonerepo, dest=self.repodir)
     self.assertEqual(self.director.opened, 1)

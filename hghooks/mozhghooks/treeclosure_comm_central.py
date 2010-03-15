@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from urllib import urlopen
+from urllib2 import urlopen
 import os.path
 import re
 
@@ -70,6 +70,14 @@ def checkTreeState(repo, repoName, treeName, treeUrl):
         print "But you included the magic words.  Hope you had permission!"
         return 0
 
+    return 0
+
+def isOwned(changedFile, ownerArray):
+    for dir in ownerArray:
+        if os.path.commonprefix([changedFile, dir]) == dir:
+            return True
+
+    return False
 
 def hook(ui, repo, node, **kwargs):
     try:
@@ -84,10 +92,10 @@ def hook(ui, repo, node, **kwargs):
         for i in range(rev, tip+1):
             ctx = repo.changectx(i)
             for changedFile in ctx.files():
-                if os.path.dirname(changedFile) in calendarOwns:
-                    apps['calendar'] = True
-                elif os.path.dirname(changedFile) in seamonkeyOwns:
+                if isOwned(changedFile, seamonkeyOwns):
                     apps['seamonkey'] = True
+                elif isOwned(changedFile, calendarOwns):
+                    apps['calendar'] = True
                 else:
                     apps['thunderbird'] = True
 
