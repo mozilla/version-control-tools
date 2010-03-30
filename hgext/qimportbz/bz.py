@@ -1,12 +1,13 @@
-import os
-import urllib2
 import base64
+import os
+import re
+import sys
+import urllib2
 from xml.etree.ElementTree import fromstring as xmlfromstring
 try:
   import cStringIO as StringIO
 except ImportError:
   import StringIO
-import re
 
 from mercurial import patch
 
@@ -90,7 +91,16 @@ class Patch(Attachment):
     # for some reason, patch.extract writes a temporary file with the diff hunks
     if filename:
       fp = file(filename)
-      self.data = fp.read().decode('utf-8')
+      try:
+        self.data = fp.read().decode('utf-8')
+      except UnicodeDecodeError:
+        bug.settings.ui.warn("Patch id=%s desc=\"%s\" file was discarded:\n" % (self.id, self.desc))
+        # Print the exception without its traceback.
+        sys.excepthook(sys.exc_info()[0], sys.exc_info()[1], None)
+        # Can't do better than discard data:
+        # trying |.decode('utf-8', 'replace')| as a fallback would be too risky
+        #   if user imports the result then forgets to fix it.
+        self.data = ''
       fp.close()
       os.remove(filename)
     else:
