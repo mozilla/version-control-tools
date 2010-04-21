@@ -62,14 +62,16 @@ if __name__ == '__main__':
             sys.exit("blacklisted changeid found")
 
     # Look for blacklisted bugs
-    blacklist = [548077,548842,547258,548098,441280,550269,535446,524263,517679,507624,520912,525521,537979,542383]
-    bl_re = None # bl_re will be bug numbers concated together with | as sep
-    for bug in blacklist:
-            if bl_re:
-                bl_re += "|%s" % bug
-            else:
-                bl_re = "%s" % bug
-    bugs = re.compile('(%s)' % bl_re)
+    blacklist = [
+        548077,548842,547258,548098,441280,550269,535446,524263,517679,507624,
+        520912,525521,537979,542383,555540,558175,555446,552192,556543,545652,
+        555052,551051,550269,555059,507624,520912,525521,535446,537979,542383,
+        521270,524263,555097,503358,548842,517679,547258,510070,548098,491355,
+        555608,441280,548077,482278,551170,519269,477891,481162,481934,553648,
+        'Bug 555610: Add regression testcase'
+        ]
+
+    bugs = re.compile('(%s)' % '|'.join([str(bug) for bug in blacklist]))
     status, descs = commands.getstatusoutput("hg log -r %s:tip --template '{desc}\n'" % HG_NODE)
     # if hg log fails, exit but do not block the commit
     if status != 0:
