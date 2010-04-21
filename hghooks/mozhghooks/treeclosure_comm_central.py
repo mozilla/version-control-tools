@@ -48,6 +48,7 @@ seamonkeyTrees = {
 calendarTrees = {
   'comm-central': 'http://tinderbox.mozilla.org/Sunbird/',
   'comm-1.9.1'  : 'http://tinderbox.mozilla.org/Calendar1.0/',
+  'comm-1.9.2'  : 'http://tinderbox.mozilla.org/Calendar1.0/',
 }
 
 
