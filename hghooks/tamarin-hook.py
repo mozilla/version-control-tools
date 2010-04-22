@@ -38,29 +38,51 @@
 #
 #  Hook script used by tamarin team on tamarin-redux and tamarin-central.
 #
+# For documentation on hook scripts see:
+#   http://hgbook.red-bean.com/read/handling-repository-events-with-hooks.html
+#   http://mercurial.selenic.com/wiki/MercurialApi
 
-if __name__ == '__main__':
-    import os, sys, commands, re, platform
 
-    HG_NODE=''
-    if os.environ.has_key("HG_NODE"):
-        HG_NODE = os.environ["HG_NODE"]
-    if HG_NODE == '':
-        print("ERROR: unknown HG_NODE")
-        sys.exit(1)
+import sys, re
+from mercurial import hg, ui, commands, node
 
-    # Look for known unwanted changeids
-    status, nodes = commands.getstatusoutput("hg log -r %s:tip --template '{node}\n'" % HG_NODE)
-    # if hg log fails, exit but do not block the commit
-    if status != 0:
-        print("hg log failed, hook exiting")
-        sys.exit(0)
-    for node in nodes.split():
-        if node.startswith("126c6ef95f51"):
-            sys.exit("blacklisted changeid found")
-        if node.startswith("66eb823ce125"):
-            sys.exit("blacklisted changeid found")
 
+# _quiet function from hghooklib by Johann Duscher
+# http://code.google.com/p/hghooklib/
+def _quiet(ui, fn):
+    oldQuiet = ui.quiet
+    ui.quiet = True
+    result = fn()
+    ui.quiet = oldQuiet
+    return result
+
+def master_hook(ui, repo, **kwargs):
+    ui.debug('running tamarin master_hook\n')
+    ui.debug('kwargs: %s\n' % kwargs)
+    # The mercurial hook script expects the equivalent of an exit code back from
+    # this call:
+    #   False = 0 = No Error : allow push
+    #   True = 1 = Error : abort push
+    error = False
+    error = security_check(ui, repo, **kwargs) or error
+    return error
+
+def security_check(ui, repo, **kwargs):
+    ui.debug('running security_check\n')
+    error = False
+    
+    ui.pushbuffer()
+    _quiet(ui, lambda: commands.log(ui, repo, rev=['%s:tip' % kwargs['node']],
+                                    template='{node}\n', date=None, user=None,
+                                    logfile=None))
+    nodes = ui.popbuffer().split('\n')
+    
+    
+    for node in nodes:
+        if node.startswith('126c6ef95f51') or node.startswith('66eb823ce125'):
+            ui.warn('blacklisted changeid found: node %s is blacklisted\n' % node)
+            error = True   # fail the push
+    
     # Look for blacklisted bugs
     blacklist = [
         548077,548842,547258,548098,441280,550269,535446,524263,517679,507624,
@@ -70,15 +92,18 @@ if __name__ == '__main__':
         555608,441280,548077,482278,551170,519269,477891,481162,481934,553648,
         'Bug 555610: Add regression testcase'
         ]
-
-    bugs = re.compile('(%s)' % '|'.join([str(bug) for bug in blacklist]))
-    status, descs = commands.getstatusoutput("hg log -r %s:tip --template '{desc}\n'" % HG_NODE)
-    # if hg log fails, exit but do not block the commit
-    if status != 0:
-        print("hg log failed, hook exiting")
-        sys.exit(0)
-    for line in descs.split('\n'):
-        if bugs.search(line):
-            sys.exit("blacklisted bug found")
     
-    sys.exit(0)
+    bugs = re.compile('(%s)' % '|'.join([str(bug) for bug in blacklist]))
+    
+    ui.pushbuffer()
+    _quiet(ui, lambda: commands.log(ui, repo, rev=['%s:tip' % kwargs['node']],
+                                    template='{desc}', date=None, user=None,
+                                    logfile=None))
+    descs = ui.popbuffer()
+    
+    searchDescs = bugs.search(descs)
+    if searchDescs:
+        ui.warn('blacklisted bug found: %s\n' % searchDescs.groups()[0])
+        error = True
+    
+    return error
