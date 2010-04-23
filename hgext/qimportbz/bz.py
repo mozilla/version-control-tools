@@ -86,15 +86,17 @@ class Patch(Attachment):
     Attachment.__init__(self, bug, node)
     self.flags = list(sorted(Flag(bug, n) for n in node.findall('flag')))
     rawtext = base64.b64decode(node.find('data').text)
-    data = StringIO.StringIO(rawtext)
-    filename, message, user, date, branch, nodeid, p1, p2 = patch.extract(bug.settings.ui, data)
+    filename, message, user, date, branch, nodeid, p1, p2 = \
+        patch.extract(bug.settings.ui, StringIO.StringIO(rawtext))
     # for some reason, patch.extract writes a temporary file with the diff hunks
     if filename:
       fp = file(filename)
       try:
+        # BugZilla is not explicit about patch encoding. We need to check it's utf-8.
+        # utf-8: convert from 8-bit encoding to internal (16/32-bit) Unicode.
         self.data = fp.read().decode('utf-8')
       except UnicodeDecodeError:
-        bug.settings.ui.warn("Patch id=%s desc=\"%s\" file was discarded:\n" % (self.id, self.desc))
+        bug.settings.ui.warn("Patch id=%s desc=\"%s\" diff data were discarded:\n" % (self.id, self.desc))
         # Print the exception without its traceback.
         sys.excepthook(sys.exc_info()[0], sys.exc_info()[1], None)
         # Can't do better than discard data:
@@ -111,8 +113,14 @@ class Patch(Attachment):
     self.date = date or node.find('date').text[:16]
 
     if user:
-      self.author = user
-    else:
+      try:
+        # See previous self.data block about utf-8 handling.
+        self.author = user.decode('utf-8')
+      except UnicodeDecodeError:
+        bug.settings.ui.warn("Patch id=%s desc=\"%s\" user data were discarded:\n" % (self.id, self.desc))
+        sys.excepthook(sys.exc_info()[0], sys.exc_info()[1], None)
+        user = None
+    if not user:
       # Bugzilla v3.4.1+: "Email Addresses Hidden From Logged-Out Users"
       patchAttacherEmail = node.find('attacher').text
       # 'patchAttacherEmail' may not be enough, compare date too to be as precise as possible...

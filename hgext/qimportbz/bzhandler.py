@@ -113,11 +113,12 @@ class Handler(urllib2.BaseHandler):
 class PatchResponse(object):
   def __init__(self, p):
     self.patch = p
-    data = unicode(p)
-    self.fp = fp = StringIO.StringIO(data.encode("utf-8"))
-    self.read = fp.read
-    self.readline = fp.readline
-    self.close = fp.close
+    # utf-8: convert from internal (16/32-bit) Unicode to 8-bit encoding.
+    # NB: Easier output to deal with, as most (code) patches are ASCII only.
+    self.fp = StringIO.StringIO(unicode(p).encode('utf-8'))
+    self.read = self.fp.read
+    self.readline = self.fp.readline
+    self.close = self.fp.close
 
   def fileno(self):
     return None
