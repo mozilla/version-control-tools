@@ -43,6 +43,10 @@ thunderbirdTrees = {
 seamonkeyTrees = {
   'comm-central': 'http://tinderbox.mozilla.org/SeaMonkey/',
   'comm-1.9.1'  : 'http://tinderbox.mozilla.org/SeaMonkey2.0/',
+   # SeaMonkey doesn't support 1.9.2. So therefore just point it at the
+   # Thunderbird tree so that if cross-app patches get pushed, we don't get
+   # the annoying message saying that the SeaMonkey tree can't be found.
+  'comm-1.9.2'  : 'http://tinderbox.mozilla.org/Thunderbird3.1/'
 }
 # Calendar tinderbox trees
 calendarTrees = {
