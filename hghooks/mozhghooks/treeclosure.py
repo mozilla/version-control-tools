@@ -26,7 +26,7 @@ hgNameToTinderboxURL = {
     'mozilla-1.9.1'  : 'http://tinderbox.mozilla.org/Firefox3.5/',
     'mozilla-1.9.2'  : 'http://tinderbox.mozilla.org/Firefox3.6/',
     'mobile-browser' : 'http://tinderbox.mozilla.org/Mobile/',
-    'mobile-1.1'     : 'http://tinderbox.mozilla.org/Mobile/',
+    'mobile-1.1'     : 'http://tinderbox.mozilla.org/Mobile1.1/',
     'places'         : 'http://tinderbox.mozilla.org/Places/',
     'electrolysis'   : 'http://tinderbox.mozilla.org/Electrolysis/',
     'tracemonkey'    : 'http://tinderbox.mozilla.org/TraceMonkey/',
