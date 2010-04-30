@@ -96,6 +96,7 @@ class Patch(Attachment):
         # utf-8: convert from 8-bit encoding to internal (16/32-bit) Unicode.
         self.data = fp.read().decode('utf-8')
       except UnicodeDecodeError:
+        # Ftr, this could be due to the (included) message part: see later message block.
         bug.settings.ui.warn("Patch id=%s desc=\"%s\" diff data were discarded:\n" % (self.id, self.desc))
         # Print the exception without its traceback.
         sys.excepthook(sys.exc_info()[0], sys.exc_info()[1], None)
@@ -138,8 +139,17 @@ class Patch(Attachment):
         re.sub("\[.*?\]|\(.*?\)|:\S+", "", who).strip(),
         patchAttacherEmail)
 
-    self.commit_message = message.strip() or \
-                          (self.bug.settings.msg_format % self.metadata)
+    if message:
+      try:
+        # See previous self.data block about utf-8 handling.
+        self.commit_message = message.decode('utf-8') \
+                                     .strip()
+      except UnicodeDecodeError:
+        bug.settings.ui.warn("Patch id=%s desc=\"%s\" message data were discarded too:\n" % (self.id, self.desc))
+        sys.excepthook(sys.exc_info()[0], sys.exc_info()[1], None)
+        message = None
+    if not message:
+      self.commit_message = self.bug.settings.msg_format % self.metadata
 
   def __unicode__(self):
     return u"""# vim: se ft=diff :
