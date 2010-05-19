@@ -50,7 +50,7 @@ class Flag(object):
     # Ignored node attributes: 'id' and 'type_id'.
 
     self.name = node.attrib['name']
-    if self.name not in ('review', 'superreview', 'ui-review', 'checked-in') and not self.name.startswith('approval'):
+    if self.name not in ('review', 'superreview', 'ui-review', 'feedback', 'checked-in') and not self.name.startswith('approval'):
       bug.settings.ui.warn("Unknown flag %s\n" % self.name)
 
     self.setter = removeDomain(node.attrib['setter'])
@@ -78,7 +78,7 @@ class Flag(object):
 
   # Compare by flag name
   def __cmp__(self, other):
-    flagorder = ['r', 'sr', 'ui-r', 'a', 'c']
+    flagorder = ['r', 'sr', 'ui-r', 'a', 'c', 'f']
     return cmp(flagorder.index(self.abbrev()), flagorder.index(other.abbrev()))
 
 class Patch(Attachment):
