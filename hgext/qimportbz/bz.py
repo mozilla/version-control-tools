@@ -139,16 +139,19 @@ class Patch(Attachment):
         re.sub("\[.*?\]|\(.*?\)|:\S+", "", who).strip(),
         patchAttacherEmail)
 
+    # (Mercurial v1.4.3(-!?)) "No message" is extracted as '\n' :-/
+    # Want to strip the message anyway.
     if message:
       try:
         # See previous self.data block about utf-8 handling.
         self.commit_message = message.decode('utf-8') \
                                      .strip()
       except UnicodeDecodeError:
+        self.commit_message = None
         bug.settings.ui.warn("Patch id=%s desc=\"%s\" message data were discarded too:\n" % (self.id, self.desc))
         sys.excepthook(sys.exc_info()[0], sys.exc_info()[1], None)
         message = None
-    if not message:
+    if not self.commit_message:
       self.commit_message = self.bug.settings.msg_format % self.metadata
 
   def __unicode__(self):
