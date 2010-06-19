@@ -1,0 +1,15 @@
+<div class="title">
+{node|short}: {desc|strip|firstline|escape}<span class="logtags"> {inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}</span>
+</div>
+<div class="title_text">
+<div class="log_link">
+<a href="{url}rev/{node|short}{sessionvars%urlparameter}">diff</a><br/>
+<a href="{url}file/{node|short}{sessionvars%urlparameter}">browse</a>
+</div>
+<cite>{author|obfuscate}</cite> - {date|rfc822date} - rev {rev}<br/>
+</div>
+<div class="log_body">
+{desc|strip|escape|addbreaks|buglink}
+<br/>
+<br/>
+</div>
