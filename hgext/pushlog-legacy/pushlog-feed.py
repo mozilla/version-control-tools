@@ -380,6 +380,8 @@ def pushlogHTML(web, req, tmpl):
         p = 0
         currentpush = None
         for id, user, date, node in query.entries:
+            if isinstance(node, unicode):
+                node = node.encode('utf-8')
             ctx = web.repo.changectx(node)
             n = ctx.node()
             entry = {"author": ctx.user(),
