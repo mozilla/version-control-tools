@@ -63,7 +63,8 @@ def log(ui, repo, node, **kwargs):
         os.chmod(pushdb, st.st_mode | stat.S_IWGRP)
     t = int(time.time())
     retval = 1
-    print "Trying to insert into pushlog..."
+    print "Trying to insert into pushlog."
+    print "Please do not interrupt..."
     try:
         res = conn.execute("INSERT INTO pushlog (user, date) values(?,?)",
                            (os.environ['USER'], t))
@@ -77,6 +78,7 @@ def log(ui, repo, node, **kwargs):
                          (pushid, ctx.rev(), hex(ctx.node())))
         conn.commit()
         retval = 0
+        print "Inserted into the pushlog db sucessfully."
     except sqlite.OperationalError:
         print "Pushlog database is locked. Please retry your push."
     conn.close()
