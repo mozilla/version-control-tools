@@ -8,9 +8,5 @@
   </author>
   <updated>{date|rfc3339date}</updated>
   <published>{date|rfc3339date}</published>
-  <content type="xhtml">
-   <div xmlns="http://www.w3.org/1999/xhtml">
-    <pre xml:space="preserve">{desc|escape|nonempty}</pre>
-   </div>
-  </content>
+  <content type="html">{desc|escape|addbreaks|xmlescape|nonempty}</content>
  </entry>
