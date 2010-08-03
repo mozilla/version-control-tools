@@ -2,6 +2,10 @@
 
 Imports patches from bugzilla to your mercurial queue
 
+Example:
+
+  hg qimport bz://1234567
+
 Configuration section is entirely optional but potentially useful::
 
   [qimportbz]
