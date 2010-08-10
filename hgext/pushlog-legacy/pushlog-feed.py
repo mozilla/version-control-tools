@@ -434,11 +434,21 @@ def pushlogHTML(web, req, tmpl):
                 querydescription=query.description(),
                 archives=web.archivelist("tip"))
 
-def pushes_worker(query):
+def pushes_worker(query, web = None):
     """Given a PushlogQuery, return a data structure mapping push IDs
     to a map of data about the push."""
     pushes = {}
     for id, user, date, node in query.entries:
+        if web:
+            ctx = web.repo.changectx(node)
+            n = ctx.node()
+            node = {"node": hex(n),
+                    "author": ctx.user(),
+                    "desc": ctx.description(),
+                    "branch": ctx.branch(),
+                    "tags": ctx.tags(),
+                    "files": ctx.files()
+                   }
         if id in pushes:
             # we get the pushes in reverse order
             pushes[id]['changesets'].insert(0, node)
@@ -453,7 +463,7 @@ def pushes(web, req, tmpl):
     """WebCommand to return a data structure containing pushes."""
     query = pushlogSetup(web.repo, req)
     req.header([ACL_HEADER])
-    return tmpl('pushes', data=pushes_worker(query))
+    return tmpl('pushes', data=pushes_worker(query, 'full' in req.form and web))
 
 def printpushlog(ui, repo, *args):
     """HG Command to print the pushlog data in JSON format."""

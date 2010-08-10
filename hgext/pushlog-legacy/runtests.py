@@ -161,6 +161,12 @@ class TestPushlog(HGWebTest, unittest.TestCase):
         expectedjson = loadjsonfile("testdata/test-repo-data.json")
         self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
+    def testjsonpushdetails(self):
+        """Get all json data from json-pushes with details."""
+        testjson = self.loadjsonurl("/json-pushes?startID=0&full=1")
+        expectedjson = loadjsonfile("testdata/test-repo-data-full.json")
+        self.assertEqual(testjson, expectedjson, "json-pushes?full=1 did not yield expected json data!")
+
     def testprintpushlog(self):
         """Get all json data via 'hg printpushlog'."""
         testjson = simplejson.loads(Popen(["hg", "-R", self.repodir, "printpushlog"], stdout=PIPE).communicate()[0])
