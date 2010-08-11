@@ -77,20 +77,22 @@ def security_check(ui, repo, **kwargs):
                                     logfile=None))
     nodes = ui.popbuffer().split('\n')
     
-    
+    # reenable this code if we need to blacklist a node
+    '''
     for node in nodes:
-        if node.startswith('126c6ef95f51') or node.startswith('66eb823ce125'):
+        if node.startswith('126c6ef95f51'):
             ui.warn('blacklisted changeid found: node %s is blacklisted\n' % node)
             error = True   # fail the push
+    '''
     
     # Look for blacklisted bugs
     blacklist = [
-        548077,548842,547258,441280,550269,535446,524263,517679,507624,
-        520912,525521,537979,542383,555540,558175,555446,556543,545652,
-        555052,551051,550269,555059,507624,520912,525521,535446,537979,542383,
-        521270,524263,555097,503358,548842,517679,547258,510070,491355,
-        555608,441280,548077,482278,551170,519269,477891,481162,481934,553648,
-        'Bug 555610: Add regression testcase'
+        # crush bugs
+        567930,
+        # salt bugs
+        548842,
+        # serrano bugs
+        554521,
         ]
     
     bugs = re.compile('(%s)' % '|'.join([str(bug) for bug in blacklist]))
