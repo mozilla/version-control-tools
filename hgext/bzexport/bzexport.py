@@ -14,6 +14,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+"""
+bzexport
+
+Attach a patch from a HG repository to a bugzilla bug.
+
+To enable this extension, edit your ~/.hgrc (or %APPDATA%/Mercurial.ini)
+and add:
+[extensions]
+bzexport = /path/to/bzexport.py
+
+You can then use it like so:
+hg bzexport REV BUG
+
+Where REV is any local revision, and BUG is a bug number on
+bugzilla.mozilla.org. The extension is tuned to work best with MQ
+changesets (it can only currently work with applied patches).
+
+"""
 from mercurial.i18n import _
 from mercurial import commands, cmdutil, hg, node, util
 from hgext import mq
