@@ -37,10 +37,9 @@ for a bug number to use.
 
 """
 from mercurial.i18n import _
-from mercurial import commands, cmdutil, hg, node, util
+from mercurial import commands, config, cmdutil, hg, node, util
 from hgext import mq
 import base64
-from ConfigParser import SafeConfigParser
 from cStringIO import StringIO
 import json
 import os
@@ -109,15 +108,14 @@ def find_profile(ui):
     elif platform.system() == "Windows":
         # Use SHGetFolderPath
         import ctypes
-        from ctypes import wintypes
         SHGetFolderPath = ctypes.windll.shell32.SHGetFolderPathW
-        SHGetFolderPath.argtypes = [ctypes.wintypes.HWND,
+        SHGetFolderPath.argtypes = [ctypes.c_void_p,
                                     ctypes.c_int,
-                                    ctypes.wintypes.HANDLE,
-                                    ctypes.wintypes.DWORD,
-                                    ctypes.wintypes.LPCWSTR]
+                                    ctypes.c_void_p,
+                                    ctypes.c_int32,
+                                    ctypes.c_wchar_p]
         CSIDL_APPDATA = 26
-        path_buf = ctypes.wintypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
+        path_buf = ctypes.create_unicode_buffer(1024)
         if SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, path_buf) == 0:
             path = os.path.join(path_buf.value, "Mozilla", "Firefox")
     else: # Assume POSIX
@@ -128,16 +126,15 @@ def find_profile(ui):
         return None
 
     profileini = os.path.join(path, "profiles.ini")
-    parser = SafeConfigParser()
-    parser.read(profileini)
+    c = config.config()
+    c.read(profileini)
     profile = None
-    for section in parser.sections():
+    for section in c.sections():
         if section == "General":
             continue
-        if parser.has_option(section, "Default") or profile is None:
-            profile = parser.get(section, "Path")
-            if parser.has_option(section, "IsRelative") and \
-                 parser.getint(section, "IsRelative") == 1:
+        if c.get(section, "Default", None) is not None or profile is None:
+            profile = c.get(section, "Path", None)
+            if c.get(section, "IsRelative", "0") == "1":
                 profile = os.path.join(path, profile)
     if profile is None:
         ui.write_err("Couldn't find a Firefox profile\n")
@@ -171,8 +168,9 @@ def get_cookies_from_profile(ui, profile, bugzilla):
             login = login.encode("utf-8")
             cookie = cookie.encode("utf-8")
         return login, cookie
-    except:
-        ui.write_err("Failed to get bugzilla login cookies from Firefox profile\n")
+    except Exception, e:
+        ui.write_err("Failed to get bugzilla login cookies from "
+                     "Firefox profile: %s\n" % str(e))
         return None, None
     finally:
         if tempdir:
