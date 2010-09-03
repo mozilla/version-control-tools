@@ -31,6 +31,10 @@ Where REV is any local revision, and BUG is a bug number on
 bugzilla.mozilla.org. The extension is tuned to work best with MQ
 changesets (it can only currently work with applied patches).
 
+If no revision is specified, it will default to 'tip'. If no
+bug is specified, the changeset commit message will be scanned
+for a bug number to use.
+
 """
 from mercurial.i18n import _
 from mercurial import commands, cmdutil, hg, node, util
@@ -174,7 +178,7 @@ def get_cookies_from_profile(ui, profile, bugzilla):
         if tempdir:
             shutil.rmtree(tempdir)
 
-def bzexport(ui, repo, rev, bug, **opts):
+def bzexport(ui, repo, *args, **opts):
     """
     Export changesets to bugzilla attachments.
 
@@ -191,16 +195,45 @@ def bzexport(ui, repo, rev, bug, **opts):
         ui.write_err("Couldn't find bugzilla login cookies\n")
         return
 
+    rev = None
+    bug = None
+    if len(args) < 2:
+        # We need to guess at some args.
+        if len(args) == 1:
+            # Just one arg. Could be a revision or a bug number.
+            # Check this first, because a series of digits
+            # can be a revision number, but it's unlikely a user
+            # would use it to mean a revision here.
+            if not args[0].isdigit() and args[0] in repo:
+                # Looks like a changeset
+                rev = args[0]
+            else:
+                # Don't do any validation here, to allow
+                # users to use bug aliases. The BzAPI call
+                # will fail with bad bug numbers.
+                bug = args[0]
+
+        # With zero args we'll guess at both, and if we fail we'll
+        # fail later.
+    elif len(args) > 2:
+        ui.write_error("Too many arguments to bzexport!\n")
+        return
+    else:
+        # Just right.
+        rev, bug = args
+
+    if rev is None:
+        # Default to 'tip'
+        rev = 'tip'
+        # But look for a nicer name in the MQ.
+        if hasattr(repo, 'mq') and repo.mq.applied:
+            rev = repo.mq.applied[-1].name
+
     contents = StringIO()
     cmdutil.export(repo, [rev], fp=contents)
 
-    # See if this is an MQ changeset, and if so use the patch name
-    # as the filename.
-    filename = 'changeset-%s' % rev
-    if hasattr(repo, 'mq'):
-        q = repo.mq
-        if rev in q.series:
-            filename = rev
+    # Just always use the rev name as the patch name. Doesn't matter much.
+    filename = rev
 
     #TODO: support --description= arg
     desc = repo[rev].description()
@@ -208,9 +241,20 @@ def bzexport(ui, repo, rev, bug, **opts):
         desc = ui.prompt(_("Patch description:"), default=filename)
     else:
         # Lightly reformat changeset messages into attachment descriptions.
-        # First, strip off any leading "bug NNN" or "b=NNN"
-        #TODO: use this as bug number if not provided
-        desc = bug_re.sub('', desc)
+        # First, strip off any leading "bug NNN" or "b=NNN",
+        # but save it in case a bug number was not provided.
+        bzexport.newbug = None
+        def dosub(m):
+            bzexport.newbug = m.group(2)
+            return ''
+        desc = bug_re.sub(dosub, desc)
+        if bzexport.newbug:
+            if bug and bug != bzexport.newbug:
+                ui.warn("Warning: Bug number %s from commandline doesn't match "
+                        "bug number %s from changeset description\n"
+                        % (bug, bzexport.newbug))
+            else:
+                bug = bzexport.newbug
 
         # Next strip any remaining leading dash with whitespace,
         # if the original was "bug NNN - "
@@ -228,6 +272,11 @@ def bzexport(ui, repo, rev, bug, **opts):
         #TODO: add really long changeset messages as comments?
         if '\n' in desc:
             desc = desc.split('\n')[0]
+
+    if bug is None:
+        ui.write_err("Error: no bug number specified and no bug number "
+                     "listed in changeset message!\n")
+        return
 
     #TODO: support a --new argument for filing a new bug with a patch
     #TODO: support a --review=reviewers argument
@@ -247,5 +296,5 @@ def bzexport(ui, repo, rev, bug, **opts):
 cmdtable = {
     'bzexport':
         (bzexport, [],
-        _('hg bzexport REV BUG')),
+        _('hg bzexport [REV] [BUG]')),
 }
