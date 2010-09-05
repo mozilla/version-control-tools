@@ -67,7 +67,34 @@ bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                      )''', re.I | re.X)
 review_re = re.compile(r'r[=?]([^ ]+)')
 
-def create_attachment(api_server, userid, cookie, bug,
+class bzAuth:
+    """
+    A helper class to abstract away authentication details.  There are two
+    allowable types of authentication: userid/cookie and username/password.
+    We encapsulate it here so that functions that interact with bugzilla
+    need only call the 'auth' method on the token to get a correct URL.
+    """
+    typeCookie = 1
+    typeExplicit = 2
+    def __init__(self, userid, cookie, username, password):
+        assert (userid and cookie) or (username and password)
+        assert not ((userid or cookie) and (username or password))
+        if userid:
+            self._type = self.typeCookie
+            self._userid = userid
+            self._cookie = cookie
+        else:
+            self._type = self.typeExplicit
+            self._username = username
+            self._password = password
+
+    def auth(self):
+        if self._type == self.typeCookie:
+            return "userid=%s&cookie=%s" % (self._userid, self._cookie)
+        else:
+            return "username=%s&password=%s" % (self._username, self._password)
+
+def create_attachment(api_server, token, bug,
                       attachment_contents, description="attachment",
                       filename="attachment"):
     """
@@ -75,7 +102,8 @@ def create_attachment(api_server, userid, cookie, bug,
 
     """
     attachment = base64.b64encode(attachment_contents)
-    url = api_server + "bug/%s/attachment?userid=%s&cookie=%s" % (bug, userid, cookie)
+    url = api_server + "bug/%s/attachment?%s" % (bug, token.auth())
+    
     # 'comments': [{'text': '...'}]
     # 'flags': [...]
     attachment_json = json.dumps({'data': attachment,
@@ -183,15 +211,23 @@ def bzexport(ui, repo, *args, **opts):
     """
     api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/0.6.1/")
     bugzilla = ui.config("bzexport", "bugzilla", "https://bugzilla.mozilla.org/")
+    username = ui.config("bzexport", "username", None)
+    password = ui.config("bzexport", "password", None)
+    userid = None
+    cookie = None
     #TODO: allow overriding profile location via config
     #TODO: cache cookies?
-    profile = find_profile(ui)
-    if profile is None:
-        return
-    userid, cookie = get_cookies_from_profile(ui, profile, bugzilla)
-    if userid is None or cookie is None:
-        ui.write_err("Couldn't find bugzilla login cookies\n")
-        return
+    if not username:
+        profile = find_profile(ui)
+        if profile is None:
+            return
+
+        userid, cookie = get_cookies_from_profile(ui, profile, bugzilla)
+        if userid is None or cookie is None:
+            ui.write_err("Couldn't find bugzilla login cookies\n")
+            return
+
+    auth = bzAuth(userid, cookie, username, password)
 
     rev = None
     bug = None
@@ -281,7 +317,7 @@ def bzexport(ui, repo, *args, **opts):
     #TODO: support adding a comment along with the patch
     #TODO: support obsoleting old attachments (maybe intelligently?)
     try:
-        result = json.loads(create_attachment(api_server, userid, cookie,
+        result = json.loads(create_attachment(api_server, auth,
                                               bug, contents.getvalue(),
                                               filename=filename,
                                               description=desc))
