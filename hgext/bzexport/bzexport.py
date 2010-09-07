@@ -212,7 +212,7 @@ def bzexport(ui, repo, *args, **opts):
     Export changesets to bugzilla attachments.
 
     """
-    api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/0.6.1/")
+    api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/latest/")
     bugzilla = ui.config("bzexport", "bugzilla", "https://bugzilla.mozilla.org/")
     username = ui.config("bzexport", "username", None)
     password = ui.config("bzexport", "password", None)

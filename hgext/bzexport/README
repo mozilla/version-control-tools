@@ -41,5 +41,5 @@ password = secret
 bugzilla = http://bugzilla.example.com/
 
 # URL to the BzAPI server to use. The default is
-# https://api-dev.bugzilla.mozilla.org/0.6.1/
+# https://api-dev.bugzilla.mozilla.org/latest/
 api_server = http://bzapi.example.com/latest/
