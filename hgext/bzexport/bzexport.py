@@ -193,8 +193,8 @@ def get_cookies_from_profile(ui, profile, bugzilla):
         tempcookies = os.path.join(tempdir, "cookies.sqlite")
         shutil.copyfile(cookies, tempcookies)
         conn = sqlite3.connect(tempcookies)
-        login = conn.execute("select value from moz_cookies where name = 'Bugzilla_login' and host = ?", (host,)).fetchone()[0]
-        cookie = conn.execute("select value from moz_cookies where name = 'Bugzilla_logincookie' and host = ?", (host,)).fetchone()[0]
+        login = conn.execute("select value from moz_cookies where name = 'Bugzilla_login' and (host = ? or host = ?)", (host, "." + host)).fetchone()[0]
+        cookie = conn.execute("select value from moz_cookies where name = 'Bugzilla_logincookie' and (host = ? or host= ?)", (host, "." + host)).fetchone()[0]
         if isinstance(login, unicode):
             login = login.encode("utf-8")
             cookie = cookie.encode("utf-8")
