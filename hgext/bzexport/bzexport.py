@@ -37,7 +37,7 @@ for a bug number to use.
 
 """
 from mercurial.i18n import _
-from mercurial import commands, config, cmdutil, hg, node, util
+from mercurial import commands, config, cmdutil, hg, node, util, patch
 from hgext import mq
 import base64
 from cStringIO import StringIO
@@ -267,7 +267,11 @@ def bzexport(ui, repo, *args, **opts):
             rev = repo.mq.applied[-1].name
 
     contents = StringIO()
-    cmdutil.export(repo, [rev], fp=contents)
+    if hasattr(cmdutil, "export"):
+        cmdutil.export(repo, [rev], fp=contents)
+    else:
+        # Support older hg versions
+        patch.export(repo, [rev], fp=contents)
 
     # Just always use the rev name as the patch name. Doesn't matter much.
     filename = rev
