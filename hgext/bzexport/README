@@ -1,0 +1,45 @@
+bzexport: a Mercurial extension for attaching patches from a
+  Mercurial repository to bugzilla from the command line.
+
+INSTALLING
+----------
+
+1) Clone this repository somewhere on your local machine:
+   hg clone http://hg.mozilla.org/users/tmielczarek_mozilla.com/bzexport/
+2) Edit your ~/.hgrc and add the following to enable the extension:
+   [extensions]
+   bzexport = /path/to/bzexport/bzexport.py
+
+NOTE FOR WINDOWS USERS
+----------------------
+
+bzexport attempts to be clever and borrow your Bugzilla login cookies
+from your Firefox profile. This does not work on the windows binary
+releases of Mercurial, as shipped with MozillaBuild, so you'll need
+to add your username and password to your .hgrc as described below.
+(The technical reason is that the binary Mercurial releases use
+py2exe to freeze a Python install into the hg binary, which leaves
+out modules that aren't used, including the sqlite3 module which
+bzexport needs to read cookies.sqlite.)
+
+EDITING OPTIONS
+---------------
+
+bzexport options can be added in a [bzexport] section in your .hgrc.
+Currently supported options are:
+[bzexport]
+# Your bugzilla login, only necessary if bzexport can't locate
+# your Firefox profile, or if you're on Windows using
+# a binary Mercurial release.
+username = username@example.com
+
+# Your bugzilla password, see above.
+password = secret
+
+# URL to the Bugzilla server to use. The default is
+# https://bugzilla.mozilla.org.
+bugzilla = http://bugzilla.example.com/
+
+# URL to the BzAPI server to use. The default is
+# https://api-dev.bugzilla.mozilla.org/0.6.1/
+api_server = http://bzapi.example.com/latest/
