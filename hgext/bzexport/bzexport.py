@@ -134,7 +134,7 @@ def find_profile(ui):
         pathref = Folder.FSFindFolder(Folders.kUserDomain,
                                       Folders.kApplicationSupportFolderType,
                                       Folders.kDontCreateFolder)
-        basepath = path.FSRefMakePath()
+        basepath = pathref.FSRefMakePath()
         path = os.path.join(basepath, "Firefox")
     elif platform.system() == "Windows":
         # Use SHGetFolderPath
