@@ -96,7 +96,7 @@ class bzAuth:
 
 def create_attachment(api_server, token, bug,
                       attachment_contents, description="attachment",
-                      filename="attachment"):
+                      filename="attachment", comment=""):
     """
     Post an attachment to a bugzilla bug using BzAPI.
 
@@ -104,14 +104,17 @@ def create_attachment(api_server, token, bug,
     attachment = base64.b64encode(attachment_contents)
     url = api_server + "bug/%s/attachment?%s" % (bug, token.auth())
     
-    # 'comments': [{'text': '...'}]
     # 'flags': [...]
-    attachment_json = json.dumps({'data': attachment,
-                                  'encoding': 'base64',
-                                  'file_name': filename,
-                                  'description': description,
-                                  'is_patch': True,
-                                  'content_type': 'text/plain'})
+    json_data = {'data': attachment,
+                 'encoding': 'base64',
+                 'file_name': filename,
+                 'description': description,
+                 'is_patch': True,
+                 'content_type': 'text/plain'}
+    if comment:
+        json_data["comments"] = [{'text': comment}]
+
+    attachment_json = json.dumps(json_data)
     req = urllib2.Request(url, attachment_json,
                           {"Accept": "application/json",
                            "Content-Type": "application/json"})
@@ -269,8 +272,7 @@ def bzexport(ui, repo, *args, **opts):
     # Just always use the rev name as the patch name. Doesn't matter much.
     filename = rev
 
-    #TODO: support --description= arg
-    desc = repo[rev].description()
+    desc = opts['description'] or repo[rev].description()
     if desc.startswith('[mq]'):
         desc = ui.prompt(_("Patch description:"), default=filename)
     else:
@@ -312,15 +314,24 @@ def bzexport(ui, repo, *args, **opts):
                      "listed in changeset message!\n")
         return
 
+    comment = ""
+    if opts["comment"]:
+        comment = "HG: Enter a comment, lines starting with HG: will be stripped\n"
+        comment = ui.edit(comment, ui.username())
+        comment = re.sub("(?m)^HG:.*\n", "", comment)
+        if not comment.strip():
+            ui.write_err("Error: empty comment specified!\n")
+            return
+
     #TODO: support a --new argument for filing a new bug with a patch
     #TODO: support a --review=reviewers argument
-    #TODO: support adding a comment along with the patch
     #TODO: support obsoleting old attachments (maybe intelligently?)
     try:
         result = json.loads(create_attachment(api_server, auth,
                                               bug, contents.getvalue(),
                                               filename=filename,
-                                              description=desc))
+                                              description=desc,
+                                              comment=comment))
         attachment_url = urlparse.urljoin(bugzilla,
                                           "attachment.cgi?id=" + result["id"] + "&action=edit")
         print "%s uploaded as %s" % (rev, attachment_url)
@@ -329,6 +340,8 @@ def bzexport(ui, repo, *args, **opts):
 
 cmdtable = {
     'bzexport':
-        (bzexport, [],
-        _('hg bzexport [REV] [BUG]')),
+        (bzexport,
+         [('d', 'description', '', 'Bugzilla attachment description'),
+          ('c', 'comment', None, 'Comment to add with the attachment')],
+        _('hg bzexport [options] [REV] [BUG]')),
 }
