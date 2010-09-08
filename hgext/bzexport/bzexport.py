@@ -253,7 +253,7 @@ def bzexport(ui, repo, *args, **opts):
         # With zero args we'll guess at both, and if we fail we'll
         # fail later.
     elif len(args) > 2:
-        ui.write_error("Too many arguments to bzexport!\n")
+        ui.write_err("Too many arguments to bzexport!\n")
         return
     else:
         # Just right.
