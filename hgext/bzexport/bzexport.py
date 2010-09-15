@@ -266,6 +266,12 @@ def bzexport(ui, repo, *args, **opts):
         if hasattr(repo, 'mq') and repo.mq.applied:
             rev = repo.mq.applied[-1].name
 
+    if repo[rev] == repo["tip"]:
+        m, a, r, d = repo.status()[:4]
+        if (m or a or r or d):
+            ui.write_err("Local changes found; refresh first.\n");
+            return
+
     contents = StringIO()
     if hasattr(cmdutil, "export"):
         cmdutil.export(repo, [rev], fp=contents)
