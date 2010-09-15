@@ -65,7 +65,7 @@ bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                         )
                         (?:\s*\#?)(\d+)
                      )''', re.I | re.X)
-review_re = re.compile(r'r[=?]([^ ]+)')
+review_re = re.compile(r'[ra][=?]([^ ]+)')
 
 class bzAuth:
     """
@@ -308,7 +308,7 @@ def bzexport(ui, repo, *args, **opts):
         if desc[0] == '-':
             desc = desc[1:].lstrip()
 
-        # Next strip off review annotations
+        # Next strip off review and approval annotations
         #TODO: auto-convert these into review requests? Probably not
         # very helpful unless a unique string is provided.
         desc = review_re.sub('', desc).rstrip()
