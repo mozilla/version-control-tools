@@ -207,6 +207,45 @@ def get_cookies_from_profile(ui, profile, bugzilla):
         if tempdir:
             shutil.rmtree(tempdir)
 
+class PUTRequest(urllib2.Request):
+    def get_method(self):
+        return "PUT"
+
+def obsolete_old_patches(ui, api_server, token, bug, filename):
+    url = api_server + "bug/%s/attachment?%s" % (bug, token.auth()) 
+    req = urllib2.Request(url, None,
+                          {"Accept": "application/json",
+                           "Content-Type": "application/json"})
+    conn = urllib2.urlopen(req)
+    try:
+        bug = json.loads(conn.read())
+    except Exception, e:
+        ui.write_err("Error: couldn't load info for bug " + bug + ": %s\n" % str(e))
+        return False
+
+    patches = [p for p in bug["attachments"] if p["is_patch"] and not p["is_obsolete"] and p["file_name"] == filename]
+    if not len(patches):
+        return True
+
+    for p in patches:
+        #TODO: "?last_change_time=" + p["last_change_time"] to avoid conflicts?
+        url = api_server + "attachment/%s?%s" % (str(p["id"]), token.auth())
+
+        attachment_data = p
+        attachment_data["is_obsolete"] = True
+        attachment_json = json.dumps(attachment_data)
+        req = PUTRequest(url, attachment_json,
+                         {"Accept": "application/json",
+                          "Content-Type": "application/json"})
+        conn = urllib2.urlopen(req)
+        try:
+            result = json.loads(conn.read())
+        except Exception, e:
+            ui.write_err("Error: couldn't update attachment " + p["id"] + ": %s\n" % e)
+            return False
+
+    return True
+    
 def bzexport(ui, repo, *args, **opts):
     """
     Export changesets to bugzilla attachments.
@@ -262,15 +301,17 @@ def bzexport(ui, repo, *args, **opts):
     if rev is None:
         # Default to 'tip'
         rev = 'tip'
-        # But look for a nicer name in the MQ.
-        if hasattr(repo, 'mq') and repo.mq.applied:
-            rev = repo.mq.applied[-1].name
 
     if repo[rev] == repo["tip"]:
         m, a, r, d = repo.status()[:4]
         if (m or a or r or d):
             ui.write_err("Local changes found; refresh first.\n");
             return
+
+    if rev in ["tip", "qtip"]:
+        # Look for a nicer name in the MQ.
+        if hasattr(repo, 'mq') and repo.mq.applied:
+            rev = repo.mq.applied[-1].name
 
     contents = StringIO()
     if hasattr(cmdutil, "export"):
@@ -335,9 +376,11 @@ def bzexport(ui, repo, *args, **opts):
             ui.write_err("Error: empty comment specified!\n")
             return
 
+    if not obsolete_old_patches(ui, api_server, auth, bug, filename):
+        return
+
     #TODO: support a --new argument for filing a new bug with a patch
     #TODO: support a --review=reviewers argument
-    #TODO: support obsoleting old attachments (maybe intelligently?)
     try:
         result = json.loads(create_attachment(api_server, auth,
                                               bug, contents.getvalue(),
