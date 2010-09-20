@@ -78,7 +78,7 @@ def log(ui, repo, node, **kwargs):
                          (pushid, ctx.rev(), hex(ctx.node())))
         conn.commit()
         retval = 0
-        print "Inserted into the pushlog db sucessfully."
+        print "Inserted into the pushlog db successfully."
     except sqlite.OperationalError:
         print "Pushlog database is locked. Please retry your push."
     conn.close()
