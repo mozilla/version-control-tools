@@ -274,10 +274,12 @@ def bzexport(ui, repo, *args, **opts):
 
     contents = StringIO()
     if hasattr(cmdutil, "export"):
-        cmdutil.export(repo, [rev], fp=contents)
+        cmdutil.export(repo, [rev], fp=contents,
+                       opts=patch.diffopts(ui, opts))
     else:
         # Support older hg versions
-        patch.export(repo, [rev], fp=contents)
+        patch.export(repo, [rev], fp=contents,
+                     opts=patch.diffopts(ui, opts))
 
     # Just always use the rev name as the patch name. Doesn't matter much.
     filename = rev
