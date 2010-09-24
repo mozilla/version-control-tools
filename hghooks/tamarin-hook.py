@@ -78,12 +78,10 @@ def security_check(ui, repo, **kwargs):
     nodes = ui.popbuffer().split('\n')
     
     # reenable this code if we need to blacklist a node
-    '''
     for node in nodes:
-        if node.startswith('126c6ef95f51'):
+        if node.startswith('8555e8551203') or node.startswith('e09bb3ece6c7'):
             ui.warn('blacklisted changeid found: node %s is blacklisted\n' % node)
             error = True   # fail the push
-    '''
     
     # Look for blacklisted bugs
     blacklist = [
@@ -92,7 +90,7 @@ def security_check(ui, repo, **kwargs):
         # salt bugs
         548842,
         # serrano bugs
-        554521,
+        554521, 563803,
         ]
     
     bugs = re.compile('(%s)' % '|'.join([str(bug) for bug in blacklist]))
