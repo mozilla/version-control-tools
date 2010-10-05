@@ -345,10 +345,10 @@ def bzexport(ui, repo, *args, **opts):
             else:
                 bug = bzexport.newbug
 
-        # Next strip any remaining leading dash with whitespace,
-        # if the original was "bug NNN - "
+        # Next strip any remaining leading separator with whitespace,
+        # if the original was something like "bug NNN - "
         desc = desc.lstrip()
-        if desc[0] == '-':
+        if desc[0] in ['-', ':', '.']:
             desc = desc[1:].lstrip()
 
         # Next strip off review and approval annotations
