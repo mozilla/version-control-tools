@@ -337,6 +337,10 @@ def bzexport(ui, repo, *args, **opts):
             bzexport.newbug = m.group(2)
             return ''
         desc = bug_re.sub(dosub, desc, 1)
+        if not bzexport.newbug:
+            # Try to find it in the original revision description, if
+            # it wasn't found in desc.
+            bug_re.sub(dosub, repo[rev].description(), 1)
         if bzexport.newbug:
             if bug and bug != bzexport.newbug:
                 ui.warn("Warning: Bug number %s from commandline doesn't match "
