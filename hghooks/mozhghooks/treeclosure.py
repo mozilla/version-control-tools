@@ -22,7 +22,6 @@ import re
 
 hgNameToTinderboxURL = {
     'mozilla-central': 'http://tinderbox.mozilla.org/Firefox/',
-    'comm-central'   : 'http://tinderbox.mozilla.org/Thunderbird/',
     'mozilla-1.9.1'  : 'http://tinderbox.mozilla.org/Firefox3.5/',
     'mozilla-1.9.2'  : 'http://tinderbox.mozilla.org/Firefox3.6/',
     'mobile-browser' : 'http://tinderbox.mozilla.org/Mobile/',
@@ -31,6 +30,7 @@ hgNameToTinderboxURL = {
     'electrolysis'   : 'http://tinderbox.mozilla.org/Electrolysis/',
     'tracemonkey'    : 'http://tinderbox.mozilla.org/TraceMonkey/',
     'try'            : 'http://tinderbox.mozilla.org/MozillaTry/',
+    'try-comm-central': 'http://tinderbox.mozilla.org/ThunderbirdTry/',
     'shadow-central' : 'http://tinderbox.mozilla.org/Shadow-Central/',
 }
 
