@@ -30,6 +30,8 @@ class Handler(urllib2.BaseHandler):
     self.base = ui.config('qimportbz', 'bugzilla',
                           os.environ.get('BUGZILLA', "bugzilla.mozilla.org"))
 
+    self.autoChoose = ui.config('qimportbz', 'auto_choose_all', False)
+
   # Change the request to the https for the bug XML
   def bz_open(self, req):
     num = int(req.get_host())
@@ -68,8 +70,9 @@ class Handler(urllib2.BaseHandler):
         return
       self.ui.status(" done\n")
 
-    if not patch and req.get_selector():
-      patch = bug.get_patch(req.get_selector())
+    attachid = req.get_selector()[1:]
+    if not patch and attachid:
+      patch = bug.get_patch(attachid)
 
     if not patch:
       patches = [p for p in bug.patches if not p.obsolete]
@@ -90,7 +93,8 @@ class Handler(urllib2.BaseHandler):
         for i, p in enumerate(patches):
           flags = p.joinFlags(False)
           self.ui.write("%s: %s%s\n" % (i + 1, p.desc, "\n%s" % flags if flags else ""))
-        choicestr = self.ui.prompt("Which patches do you want to import? [Default is '1']", default="1")
+        choicestr = ' '.join([str(n) for n in xrange(1,len(patches)+1)])
+        choicestr = choicestr if self.autoChoose else self.ui.prompt("Which patches do you want to import? [Default is '1']", default="1")
         for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
           try:
             if int(choice) <= 0:

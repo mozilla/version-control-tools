@@ -173,6 +173,7 @@ class Patch(Attachment):
       "desc" : self.desc,
       "flags" : self.joinFlags(),
       "filename" : self.filename,
+      "bugdesc" : self.bug.desc
     }
 
   @property
@@ -240,6 +241,7 @@ class Bug(object):
     self.num = int(bug.find('bug_id').text)
     self.title = bug.find('short_desc').text
     self.comments = [Comment(n) for n in xml.findall("bug/long_desc")]
+    self.desc = self.comments[0].text if len(self.comments)>0 else ""
     self.attachments = [Attachment.parse(self, a) for a in xml.findall("bug/attachment")]
     if bug.get("error") == "NotPermitted":
       raise PermissionError("Not allowed to access bug.  (Perhaps it is marked with a security group?)")

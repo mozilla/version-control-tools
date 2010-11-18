@@ -13,11 +13,12 @@ Configuration section is entirely optional but potentially useful::
   joinstr = string to join flags for commit messages (default is ' ')
   patch_format = Formatting string used to create patch names automatically. Set it to empty to use the initial filename.
   msg_format = Formatting string used to create commit messages automatically
+  auto_choose_all = If multiple patches associated with a bug choose them all without prompting (default is False)
 
 Formatting strings are the standard python format strings where a dictionary is used to supply the data.
 For users of Mercurial 1.2: any % characters must be escaped since Python's configuration parser will try to interpret them.
 
-There are 6 pieces of patch metadata available for use::
+There are 7 pieces of patch metadata available for use::
 
   "bugnum" : the bug number
   "id" : the patch id (internal bugzilla number)
@@ -25,6 +26,7 @@ There are 6 pieces of patch metadata available for use::
   "desc" : the patch description
   "flags" : all the flags
   "filename" : the initial patch filename
+  "bugdesc" : the bug description
 
 The default values are::
 
