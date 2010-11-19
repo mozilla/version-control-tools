@@ -83,6 +83,7 @@ class bzAuth:
             self._type = self.typeCookie
             self._userid = userid
             self._cookie = cookie
+            self._username = None
         else:
             self._type = self.typeExplicit
             self._username = username
@@ -94,9 +95,46 @@ class bzAuth:
         else:
             return "username=%s&password=%s" % (self._username, self._password)
 
-def create_attachment(api_server, token, bug,
+    def username(self, ui, api_server):
+        # This returns and caches the email-address-like username of the user's ID
+        if self._type == self.typeCookie and self._username is None:
+            url = api_server + "user/%s?%s" % (self._userid, self.auth())
+            req = urllib2.Request(url, None,
+                                  {"Accept": "application/json",
+                                   "Content-Type": "application/json"})
+            conn = urllib2.urlopen(req)
+            try:
+                user = json.loads(conn.read())
+            except Exception, e:
+                pass
+            if user and user["name"]:
+                return user["name"]
+            else:
+                ui.write_err("Error: couldn't get your username: %s\n" % str(e))
+                return None
+        else:
+            return self._username
+
+def review_flag_type_id(ui, api_server):
+    url = api_server + "configuration";
+    req = urllib2.Request(url, None,
+                          {"Accept": "application/json",
+                           "Content-Type": "application/json"})
+    conn = urllib2.urlopen(req)
+    try:
+        configuration = json.loads(conn.read())
+    except Exception, e:
+        pass
+    if configuration and configuration["flag_type"]:
+        for flag_id, flag in configuration["flag_type"].iteritems():
+            if flag["name"] == "review":
+                return flag_id
+    ui.write_err("Error: couldn't find review flag id: %s\n" % str(e))
+    return None
+
+def create_attachment(ui, api_server, token, bug,
                       attachment_contents, description="attachment",
-                      filename="attachment", comment=""):
+                      filename="attachment", comment="", reviewers=None):
     """
     Post an attachment to a bugzilla bug using BzAPI.
 
@@ -104,13 +142,21 @@ def create_attachment(api_server, token, bug,
     attachment = base64.b64encode(attachment_contents)
     url = api_server + "bug/%s/attachment?%s" % (bug, token.auth())
     
-    # 'flags': [...]
     json_data = {'data': attachment,
                  'encoding': 'base64',
                  'file_name': filename,
                  'description': description,
                  'is_patch': True,
                  'content_type': 'text/plain'}
+    if reviewers is not None:
+        flag_type_id = review_flag_type_id(ui, api_server)
+        flags = []
+        flags.append({"name": "review",
+                      "requestee": {"name": ", ".join(reviewers)},
+                      "setter": {"name": token.username(ui, api_server)},
+                      "status": "?",
+                      "type_id": flag_type_id})
+        json_data["flags"] = flags
     if comment:
         json_data["comments"] = [{'text': comment}]
 
@@ -153,7 +199,7 @@ def find_profile(ui):
         # Pretty simple in comparison, eh?
         path = os.path.expanduser("~/.mozilla/firefox")
     if path is None:
-        ui.write_err("Couldn't find a Firefox profile\n")
+        ui.write_err("Error: couldn't find a Firefox profile.\n")
         return None
 
     profileini = os.path.join(path, "profiles.ini")
@@ -168,7 +214,7 @@ def find_profile(ui):
             if c.get(section, "IsRelative", "0") == "1":
                 profile = os.path.join(path, profile)
     if profile is None:
-        ui.write_err("Couldn't find a Firefox profile\n")
+        ui.write_err("Error: couldn't find a Firefox profile.\n")
         return None
     return profile
 
@@ -200,7 +246,7 @@ def get_cookies_from_profile(ui, profile, bugzilla):
             cookie = cookie.encode("utf-8")
         return login, cookie
     except Exception, e:
-        ui.write_err("Failed to get bugzilla login cookies from "
+        ui.write_err("Error: failed to get bugzilla login cookies from "
                      "Firefox profile: %s\n" % str(e))
         return None, None
     finally:
@@ -246,6 +292,30 @@ def obsolete_old_patches(ui, api_server, token, bug, filename):
 
     return True
     
+def find_reviewers(ui, api_server, token, search_strings):
+    search_results = []
+    for search_string in search_strings:
+        url = api_server + "user?match=%s&%s" % (search_string, token.auth()) 
+        try:
+            req = urllib2.Request(url, None,
+                                  {"Accept": "application/json",
+                                   "Content-Type": "application/json"})
+            conn = urllib2.urlopen(req)
+            users = json.loads(conn.read())
+            error = None
+            name = None
+            real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"]) if user["real_name"] else user["email"], users["users"])
+            names = map(lambda user: user["name"], users["users"])
+            search_results.append({"search_string": search_string,
+                                   "names": names,
+                                   "real_names": real_names})
+        except Exception, e:
+            search_results.append({"search_string": search_string,
+                                   "error": str(e),
+                                   "real_names": None})
+            raise
+    return search_results
+
 def bzexport(ui, repo, *args, **opts):
     """
     Export changesets to bugzilla attachments.
@@ -266,7 +336,7 @@ def bzexport(ui, repo, *args, **opts):
 
         userid, cookie = get_cookies_from_profile(ui, profile, bugzilla)
         if userid is None or cookie is None:
-            ui.write_err("Couldn't find bugzilla login cookies\n")
+            ui.write_err("Error: couldn't find bugzilla login cookies.\n")
             return
 
     auth = bzAuth(userid, cookie, username, password)
@@ -305,7 +375,7 @@ def bzexport(ui, repo, *args, **opts):
     if repo[rev] == repo["tip"]:
         m, a, r, d = repo.status()[:4]
         if (m or a or r or d):
-            ui.write_err("Local changes found; refresh first.\n");
+            ui.write_err("Local changes found; refresh first!\n");
             return
 
     if rev in ["tip", "qtip"]:
@@ -371,7 +441,7 @@ def bzexport(ui, repo, *args, **opts):
             desc = desc.split('\n')[0]
 
     if bug is None:
-        ui.write_err("Error: no bug number specified and no bug number "
+        ui.write_err("No bug number specified and no bug number "
                      "listed in changeset message!\n")
         return
 
@@ -381,20 +451,55 @@ def bzexport(ui, repo, *args, **opts):
         comment = ui.edit(comment, ui.username())
         comment = re.sub("(?m)^HG:.*\n", "", comment)
         if not comment.strip():
-            ui.write_err("Error: empty comment specified!\n")
+            ui.write_err("Empty comment specified, aborting!\n")
             return
 
     if not obsolete_old_patches(ui, api_server, auth, bug, filename):
         return
 
     #TODO: support a --new argument for filing a new bug with a patch
-    #TODO: support a --review=reviewers argument
+    reviewers = None
+    if opts["review"]:
+        reviewers = []
+        search_strings = opts["review"].split(",")
+        search_results = find_reviewers(ui, api_server, auth, search_strings)
+        search_failed = False
+        for search_result in search_results:
+            if search_result["real_names"] is None:
+                ui.write_err("Error: couldn't search for user with search string \"%s\": %s\n" % (search_result["search_string"], search_result["error"]))
+                search_failed = True
+            elif len(search_result["real_names"]) > 5:
+                ui.write_err("Error: too many bugzilla users matching \"%s\":\n\n" % search_result["search_string"])
+                for real_name in search_result["real_names"]:
+                    ui.write_err("  %s\n" % real_name.encode('ascii', 'replace'))
+                search_failed = True
+            elif len(search_result["real_names"]) > 1:
+                prompts = []
+                message = "Multiple bugzilla users matching \"%s\":\n\n" % search_result["search_string"]
+                for i in range(len(search_result["real_names"])):
+                    prompts.append("&%d" % (i + 1))
+                    message += "  %d. %s\n" % (i + 1, search_result["real_names"][i].encode('ascii', 'replace'))
+                prompts.append("&abort")
+                message += "  a. Abort\n\nSelect reviewer:"
+                choice = ui.promptchoice(message, prompts, len(prompts) - 1)
+                if choice == len(prompts) - 1:
+                    search_failed = True
+                else:
+                    reviewers.append(search_result["names"][choice])
+            elif len(search_result["real_names"]) == 1:
+                reviewers.append(search_result["names"][0])
+            else:
+                ui.write_err("Couldn't find a bugzilla user matching \"%s\"!\n" % search_result["search_string"])
+                search_failed = True
+        if search_failed:
+            return
     try:
-        result = json.loads(create_attachment(api_server, auth,
+        result = json.loads(create_attachment(ui, api_server, auth,
                                               bug, contents.getvalue(),
                                               filename=filename,
                                               description=desc,
-                                              comment=comment))
+                                              comment=comment,
+                                              reviewers=reviewers))
         attachment_url = urlparse.urljoin(bugzilla,
                                           "attachment.cgi?id=" + result["id"] + "&action=edit")
         print "%s uploaded as %s" % (rev, attachment_url)
@@ -405,6 +510,7 @@ cmdtable = {
     'bzexport':
         (bzexport,
          [('d', 'description', '', 'Bugzilla attachment description'),
-          ('c', 'comment', None, 'Comment to add with the attachment')],
+          ('c', 'comment', None, 'Comment to add with the attachment'),
+          ('r', 'review', '', 'List of users to request review from (comma-separated search strings)')],
         _('hg bzexport [options] [REV] [BUG]')),
 }
