@@ -48,6 +48,7 @@ import re
 import shutil
 import sqlite3
 import tempfile
+import urllib
 import urllib2
 import urlparse
 
@@ -324,7 +325,11 @@ def bzexport(ui, repo, *args, **opts):
     api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/latest/")
     bugzilla = ui.config("bzexport", "bugzilla", "https://bugzilla.mozilla.org/")
     username = ui.config("bzexport", "username", None)
+    if username:
+        username = urllib.quote(username)
     password = ui.config("bzexport", "password", None)
+    if password:
+        password = urllib.quote(password)
     userid = None
     cookie = None
     #TODO: allow overriding profile location via config
