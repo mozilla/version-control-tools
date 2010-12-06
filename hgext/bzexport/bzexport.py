@@ -452,11 +452,17 @@ def bzexport(ui, repo, *args, **opts):
 
     comment = ""
     if opts["comment"]:
-        comment = "HG: Enter a comment, lines starting with HG: will be stripped\n"
+        comment = opts["comment"]
+    elif opts["edit_comment"]:
+        comment = """
+
+HG: Enter a comment to add to the bug with the attachment.
+HG: Lines starting with 'HG:' will be removed.
+"""
         comment = ui.edit(comment, ui.username())
         comment = re.sub("(?m)^HG:.*\n", "", comment)
         if not comment.strip():
-            ui.write_err("Empty comment specified, aborting!\n")
+            ui.write_err("Empty comment specified. Aborting!\n")
             return
 
     if not obsolete_old_patches(ui, api_server, auth, bug, filename):
@@ -515,7 +521,10 @@ cmdtable = {
     'bzexport':
         (bzexport,
          [('d', 'description', '', 'Bugzilla attachment description'),
-          ('c', 'comment', None, 'Comment to add with the attachment'),
-          ('r', 'review', '', 'List of users to request review from (comma-separated search strings)')],
+          ('c', 'comment', '', 'Comment to add with the attachment'),
+          ('e', 'edit-comment', None,
+           'Open a text editor to specify a comment to add with the attachment.'),
+          ('r', 'review', '',
+           'List of users to request review from (comma-separated search strings)')],
         _('hg bzexport [options] [REV] [BUG]')),
 }
