@@ -280,6 +280,7 @@ def qdelete_wrapper(self, repo, *patches, **opts):
 def wrap_mq_function(orig, wrapper, newparams):
     for key,info in mq.cmdtable.iteritems():
         if info[0] == orig:
+            wrapper.__doc__ = info[0].__doc__
             mq.cmdtable[key] = (wrapper, info[1] + newparams, info[2])
             return
 
