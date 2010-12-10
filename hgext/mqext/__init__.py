@@ -237,7 +237,8 @@ def qimport_wrapper(self, repo, *filename, **opts):
         r = q.qrepo()
         if r is None:
             raise util.Abort("no patch repository found when using -Q option")
-        mqmessage = mqmessage.replace("%p", patchfn)
+        fname = os.path.basename(filename[0]) # FIXME - can be multiple
+        mqmessage = mqmessage.replace("%p", fname)
         mqmessage = mqmessage.replace("%a", 'IMPORT')
         commands.commit(r.ui, r, message=mqmessage)
 
