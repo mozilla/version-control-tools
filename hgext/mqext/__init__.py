@@ -8,13 +8,17 @@ Commands added:
   qexport - Write all patches to an output directory, with minor renaming
   qtouched - See what patches modify which files
 
-The following commands are modified to add options that autocommit any
+Commands not related to mq:
+  lineage - Dump out the revision history leading up to a particular revision
+
+The following mq commands are modified to add options that autocommit any
 changes made to your patch queue to the queue repository
 (a la hg commit --mq):
   qrefresh
   qnew
   qrename
   qdelete
+  qimport
 The expected usage is to add the -Q option to all relevant commands in your
 ~/.hgrc so that all changes are autocommitted:
 
@@ -23,9 +27,7 @@ The expected usage is to add the -Q option to all relevant commands in your
   qrefresh = -Q
   qrename = -Q
   qdelete = -Q
-
-Commands not related to mq:
-  lineage - Dump out the revision history leading up to a particular revision
+  qimport = -Q
 '''
 
 # TODO:
@@ -223,6 +225,22 @@ def qnew_wrapper(self, repo, patchfn, *pats, **opts):
         mqmessage = mqmessage.replace("%a", 'NEW')
         commands.commit(r.ui, r, message=mqmessage)
 
+# Monkeypatch qnew in mq command table
+def qimport_wrapper(self, repo, *filename, **opts):
+    mqcommit = opts.pop('mqcommit', None)
+    mqmessage = opts.pop('mqmessage', None)
+
+    mq.qimport(self, repo, *filename, **opts)
+
+    if mqcommit:
+        q = repo.mq
+        r = q.qrepo()
+        if r is None:
+            raise util.Abort("no patch repository found when using -Q option")
+        mqmessage = mqmessage.replace("%p", patchfn)
+        mqmessage = mqmessage.replace("%a", 'IMPORT')
+        commands.commit(r.ui, r, message=mqmessage)
+
 # Monkeypatch qrename in mq command table
 def qrename_wrapper(self, repo, patch, name=None, **opts):
     mqcommit = opts.pop('mqcommit', None)
@@ -293,6 +311,11 @@ wrap_mq_function(mq.new,
                  qnew_wrapper,
                  [('Q', 'mqcommit', None, 'commit change to patch queue'),
                   ('M', 'mqmessage', '%a: %p', 'commit message for patch creation')])
+
+wrap_mq_function(mq.qimport,
+                 qimport_wrapper,
+                 [('Q', 'mqcommit', None, 'commit change to patch queue'),
+                  ('M', 'mqmessage', 'IMPORT: %p', 'commit message for patch import')])
 
 wrap_mq_function(mq.delete,
                  qdelete_wrapper,

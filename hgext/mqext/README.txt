@@ -9,13 +9,17 @@ Commands added:
   qexport - Write all patches to an output directory, with minor renaming
   qtouched - See what patches modify which files
 
-The following commands are modified to add options that autocommit any
+Commands not related to mq:
+  lineage - Dump out the revision history leading up to a particular revision
+
+The following mq commands are modified to add options that autocommit any
 changes made to your patch queue to the queue repository
 (a la hg commit --mq):
   qrefresh
   qnew
   qrename
   qdelete
+  qimport
 The expected usage is to add the -Q option to all relevant commands in your
 ~/.hgrc so that all changes are autocommitted:
 
@@ -24,6 +28,4 @@ The expected usage is to add the -Q option to all relevant commands in your
   qrefresh = -Q
   qrename = -Q
   qdelete = -Q
-
-Commands not related to mq:
-  lineage - Dump out the revision history leading up to a particular revision
+  qimport = -Q
