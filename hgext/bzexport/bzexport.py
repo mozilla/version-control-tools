@@ -121,7 +121,7 @@ class bzAuth:
                                    "Content-Type": "application/json"})
             conn = urlopen(ui, req)
             try:
-                user = json.loads(conn.read())
+                user = json.load(conn)
             except Exception, e:
                 pass
             if user and user["name"]:
@@ -139,7 +139,7 @@ def review_flag_type_id(ui, api_server):
                            "Content-Type": "application/json"})
     conn = urlopen(ui, req)
     try:
-        configuration = json.loads(conn.read())
+        configuration = json.load(conn)
     except Exception, e:
         pass
     if configuration and configuration["flag_type"]:
@@ -182,7 +182,7 @@ def create_attachment(ui, api_server, token, bug,
                           {"Accept": "application/json",
                            "Content-Type": "application/json"})
     conn = urlopen(ui, req)
-    return conn.read()
+    return conn
 
 def find_profile(ui):
     """
@@ -281,7 +281,7 @@ def obsolete_old_patches(ui, api_server, token, bug, filename):
                            "Content-Type": "application/json"})
     conn = urlopen(ui, req)
     try:
-        bug = json.loads(conn.read())
+        bug = json.load(conn)
     except Exception, e:
         ui.write_err("Error: couldn't load info for bug " + bug + ": %s\n" % str(e))
         return False
@@ -302,7 +302,7 @@ def obsolete_old_patches(ui, api_server, token, bug, filename):
                           "Content-Type": "application/json"})
         conn = urlopen(ui, req)
         try:
-            result = json.loads(conn.read())
+            result = json.load(conn)
         except Exception, e:
             ui.write_err("Error: couldn't update attachment " + p["id"] + ": %s\n" % e)
             return False
@@ -318,7 +318,7 @@ def find_reviewers(ui, api_server, token, search_strings):
                                   {"Accept": "application/json",
                                    "Content-Type": "application/json"})
             conn = urlopen(ui, req)
-            users = json.loads(conn.read())
+            users = json.load(conn)
             error = None
             name = None
             real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"]) if user["real_name"] else user["email"], users["users"])
@@ -521,12 +521,12 @@ HG: Lines starting with 'HG:' will be removed.
         if search_failed:
             return
     try:
-        result = json.loads(create_attachment(ui, api_server, auth,
-                                              bug, contents.getvalue(),
-                                              filename=filename,
-                                              description=desc,
-                                              comment=comment,
-                                              reviewers=reviewers))
+        result = json.load(create_attachment(ui, api_server, auth,
+                                             bug, contents.getvalue(),
+                                             filename=filename,
+                                             description=desc,
+                                             comment=comment,
+                                             reviewers=reviewers))
         attachment_url = urlparse.urljoin(bugzilla,
                                           "attachment.cgi?id=" + result["id"] + "&action=edit")
         print "%s uploaded as %s" % (rev, attachment_url)
