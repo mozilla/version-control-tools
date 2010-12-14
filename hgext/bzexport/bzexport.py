@@ -68,6 +68,22 @@ bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                      )''', re.I | re.X)
 review_re = re.compile(r'[ra][=?]([^ ]+)')
 
+def urlopen(ui, req):
+    """Wraps urllib2.urlopen() to provide error handling."""
+    ui.debug('Requesting %s\n' % req.get_full_url())
+    try:
+        return urllib2.urlopen(req)
+    except urllib2.HTTPError, e:
+        try:
+            err = json.load(e)
+            msg = err['message']
+        except:
+            pass
+
+        if msg:
+            ui.warn('Error: %s\n' % msg)
+        raise
+
 class bzAuth:
     """
     A helper class to abstract away authentication details.  There are two
@@ -103,7 +119,7 @@ class bzAuth:
             req = urllib2.Request(url, None,
                                   {"Accept": "application/json",
                                    "Content-Type": "application/json"})
-            conn = urllib2.urlopen(req)
+            conn = urlopen(ui, req)
             try:
                 user = json.loads(conn.read())
             except Exception, e:
@@ -121,7 +137,7 @@ def review_flag_type_id(ui, api_server):
     req = urllib2.Request(url, None,
                           {"Accept": "application/json",
                            "Content-Type": "application/json"})
-    conn = urllib2.urlopen(req)
+    conn = urlopen(ui, req)
     try:
         configuration = json.loads(conn.read())
     except Exception, e:
@@ -142,7 +158,7 @@ def create_attachment(ui, api_server, token, bug,
     """
     attachment = base64.b64encode(attachment_contents)
     url = api_server + "bug/%s/attachment?%s" % (bug, token.auth())
-    
+
     json_data = {'data': attachment,
                  'encoding': 'base64',
                  'file_name': filename,
@@ -165,7 +181,7 @@ def create_attachment(ui, api_server, token, bug,
     req = urllib2.Request(url, attachment_json,
                           {"Accept": "application/json",
                            "Content-Type": "application/json"})
-    conn = urllib2.urlopen(req)
+    conn = urlopen(ui, req)
     return conn.read()
 
 def find_profile(ui):
@@ -263,7 +279,7 @@ def obsolete_old_patches(ui, api_server, token, bug, filename):
     req = urllib2.Request(url, None,
                           {"Accept": "application/json",
                            "Content-Type": "application/json"})
-    conn = urllib2.urlopen(req)
+    conn = urlopen(ui, req)
     try:
         bug = json.loads(conn.read())
     except Exception, e:
@@ -284,7 +300,7 @@ def obsolete_old_patches(ui, api_server, token, bug, filename):
         req = PUTRequest(url, attachment_json,
                          {"Accept": "application/json",
                           "Content-Type": "application/json"})
-        conn = urllib2.urlopen(req)
+        conn = urlopen(ui, req)
         try:
             result = json.loads(conn.read())
         except Exception, e:
@@ -292,7 +308,7 @@ def obsolete_old_patches(ui, api_server, token, bug, filename):
             return False
 
     return True
-    
+
 def find_reviewers(ui, api_server, token, search_strings):
     search_results = []
     for search_string in search_strings:
@@ -301,7 +317,7 @@ def find_reviewers(ui, api_server, token, search_strings):
             req = urllib2.Request(url, None,
                                   {"Accept": "application/json",
                                    "Content-Type": "application/json"})
-            conn = urllib2.urlopen(req)
+            conn = urlopen(ui, req)
             users = json.loads(conn.read())
             error = None
             name = None
