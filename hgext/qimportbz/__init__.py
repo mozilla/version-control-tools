@@ -167,11 +167,12 @@ def extsetup(ui=None):
 
       # For all the already imported patches, rename them
       for (patch, path) in list(bzhandler.imported_patches):
-        # This mimicks the mq code to pick a filename.
-        oldpatchname = os.path.normpath(os.path.basename(path))
+        oldpatchname = patch.id or patch.bug.num
         newpatchname = checkpatchname(patch)
         if newpatchname != oldpatchname:
           qrename(ui, repo, oldpatchname, newpatchname)
+          if ui.verbose:
+            ui.write("Renamed %s -> %s\n" % (oldpatchname, newpatchname))
 
     # now process the delayed imports
 
