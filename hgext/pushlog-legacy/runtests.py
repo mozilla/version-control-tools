@@ -4,10 +4,12 @@
 import sys
 import unittest
 import os.path
+import inspect
 from os.path import join, isdir
 from mercurial import ui, hg, commands, util
 from mercurial.commands import add, clone, commit, init, push
 from mercurial.hgweb import server
+import mercurial.hgweb as hgweb
 from subprocess import check_call, Popen, STDOUT, PIPE
 import os
 import stat
@@ -41,7 +43,7 @@ style=gitweb_mozilla
 def pull_templates(path):
     """Clone the hg_templates repo to |path|."""
     # need to grab the moz hg templates
-    clone(ui.ui(), "http://hg.mozilla.org/hg_templates/", path);
+    clone(ui.ui(), "http://hg.mozilla.org/hgcustom/hg_templates/", path);
 
 def loadjsonfile(f):
     """Given a file path relative to the srcdir, load the file as a JSON object."""
@@ -73,7 +75,20 @@ class HGWebTest:
         self.setUpRepo()
         write_hgrc(self.repodir)
         self.repo = hg.repository(self.ui, self.repodir)
-        self.server = server.create_server(self.ui, self.repo)
+        # At some point create_server changed to take a hgweb.hgweb
+        # as the second param instead of a repo. I don't know of a clean
+        # way to feature test this, and this is just a unit test, so
+        # the hacky way seems okay.
+        argname = inspect.getargspec(server.create_server).args[1]
+        arg = None
+        if argname == "app":
+            arg = hgweb.hgweb(self.repo.root, baseui=self.ui)
+        elif argname == "repo":
+            arg = self.repo
+        if arg is None:
+            # error, something unknown
+            raise SystemExit("Don't know how to run hgweb in this Mercurial version!")
+        self.server = server.create_server(self.ui, arg)
         _, self.port = self.server.socket.getsockname()
         # run the server on a background thread so we can interrupt it
         threading.Thread(target=self.server.serve_forever).start()
