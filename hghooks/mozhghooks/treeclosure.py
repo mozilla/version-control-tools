@@ -21,17 +21,17 @@ import os.path
 import re
 
 hgNameToTinderboxURL = {
-    'mozilla-central': 'http://tinderbox.mozilla.org/Firefox/',
-    'mozilla-1.9.1'  : 'http://tinderbox.mozilla.org/Firefox3.5/',
-    'mozilla-1.9.2'  : 'http://tinderbox.mozilla.org/Firefox3.6/',
-    'mobile-browser' : 'http://tinderbox.mozilla.org/Mobile/',
-    'mobile-1.1'     : 'http://tinderbox.mozilla.org/Mobile1.1/',
-    'places'         : 'http://tinderbox.mozilla.org/Places/',
-    'electrolysis'   : 'http://tinderbox.mozilla.org/Electrolysis/',
-    'tracemonkey'    : 'http://tinderbox.mozilla.org/TraceMonkey/',
-    'try'            : 'http://tinderbox.mozilla.org/MozillaTry/',
-    'try-comm-central': 'http://tinderbox.mozilla.org/ThunderbirdTry/',
-    'shadow-central' : 'http://tinderbox.mozilla.org/Shadow-Central/',
+    'mozilla-central': 'http://tinderbox.mozilla.org/Firefox/status.html',
+    'mozilla-1.9.1'  : 'http://tinderbox.mozilla.org/Firefox3.5/status.html',
+    'mozilla-1.9.2'  : 'http://tinderbox.mozilla.org/Firefox3.6/status.html',
+    'mobile-browser' : 'http://tinderbox.mozilla.org/Mobile/status.html',
+    'mobile-1.1'     : 'http://tinderbox.mozilla.org/Mobile1.1/status.html',
+    'places'         : 'http://tinderbox.mozilla.org/Places/status.html',
+    'electrolysis'   : 'http://tinderbox.mozilla.org/Electrolysis/status.html',
+    'tracemonkey'    : 'http://tinderbox.mozilla.org/TraceMonkey/status.html',
+    'try'            : 'http://tinderbox.mozilla.org/MozillaTry/status.html',
+    'try-comm-central': 'http://tinderbox.mozilla.org/ThunderbirdTry/status.html',
+    'shadow-central' : 'http://tinderbox.mozilla.org/Shadow-Central/status.html',
 }
 
 magicwords = "CLOSED TREE"
