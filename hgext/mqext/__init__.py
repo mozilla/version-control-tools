@@ -202,7 +202,7 @@ def qrefresh_wrapper(self, repo, *pats, **opts):
 
     mq.refresh(self, repo, *pats, **opts)
 
-    if mqcommit:
+    if mqcommit and len(q.applied) > 0:
         patch = q.applied[-1].name
         if r is None:
             raise util.Abort("no patch repository found when using -Q option")
