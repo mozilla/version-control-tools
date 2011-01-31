@@ -168,7 +168,12 @@ def touched(ui, repo, sourcefile=None, **opts):
 
     q = repo.mq
 
-    if opts['applied']:
+    if opts['patch'] and opts['applied']:
+        raise util.Abort(_('Cannot use both -a and -p options'))
+
+    if opts['patch']:
+        patches = [ q.lookup(opts['patch']) ]
+    elif opts['applied']:
         patches = [ p.name for p in q.applied ]
     else:
         patches = q.series
@@ -377,7 +382,8 @@ cmdtable = {
 
     'qtouched':
         (touched,
-         [('a', 'applied', None, 'Only consider applied patches')
+         [('a', 'applied', None, 'Only consider applied patches'),
+          ('p', 'patch', '', 'Restrict to given patch')
           ],
-         ('hg touched [-p PATCH] [FILE]')),
+         ('hg touched [-a] [-p PATCH] [FILE]')),
 }
