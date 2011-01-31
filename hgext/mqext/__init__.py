@@ -19,6 +19,7 @@ changes made to your patch queue to the queue repository
   qrename
   qdelete
   qimport
+  qfinish
 The expected usage is to add the -Q option to all relevant commands in your
 ~/.hgrc so that all changes are autocommitted:
 
@@ -28,6 +29,7 @@ The expected usage is to add the -Q option to all relevant commands in your
   qrename = -Q
   qdelete = -Q
   qimport = -Q
+  qfinish = -Q
 '''
 
 # TODO:
@@ -225,7 +227,7 @@ def qnew_wrapper(self, repo, patchfn, *pats, **opts):
         mqmessage = mqmessage.replace("%a", 'NEW')
         commands.commit(r.ui, r, message=mqmessage)
 
-# Monkeypatch qnew in mq command table
+# Monkeypatch qimport in mq command table
 def qimport_wrapper(self, repo, *filename, **opts):
     mqcommit = opts.pop('mqcommit', None)
     mqmessage = opts.pop('mqmessage', None)
@@ -237,7 +239,10 @@ def qimport_wrapper(self, repo, *filename, **opts):
         r = q.qrepo()
         if r is None:
             raise util.Abort("no patch repository found when using -Q option")
-        fname = os.path.basename(filename[0]) # FIXME - can be multiple
+        if len(filename) == 0:
+            fname = q.full_series[0] # FIXME - can be multiple
+        else:
+            fname = filename[0] # FIXME - can be multiple
         mqmessage = mqmessage.replace("%p", fname)
         mqmessage = mqmessage.replace("%a", 'IMPORT')
         commands.commit(r.ui, r, message=mqmessage)
@@ -296,6 +301,20 @@ def qdelete_wrapper(self, repo, *patches, **opts):
             mqmessage = "\n".join([ mqmessage.replace("%p", p) for p in patchnames ])
         commands.commit(r.ui, r, message=mqmessage)
 
+# Monkeypatch qnew in mq command table
+def qfinish_wrapper(self, repo, *revrange, **opts):
+    mqcommit = opts.pop('mqcommit', None)
+    mqmessage = opts.pop('mqmessage', None)
+
+    mq.finish(self, repo, *revrange, **opts)
+
+    if mqcommit:
+        q = repo.mq
+        r = q.qrepo()
+        if r is None:
+            raise util.Abort("no patch repository found when using -Q option")
+        commands.commit(r.ui, r, message=mqmessage)
+
 def wrap_mq_function(orig, wrapper, newparams):
     for key,info in mq.cmdtable.iteritems():
         if info[0] == orig:
@@ -327,6 +346,11 @@ wrap_mq_function(mq.rename,
                  qrename_wrapper,
                  [('Q', 'mqcommit', None, 'commit change to patch queue'),
                   ('M', 'mqmessage', '%a: %p -> %n', 'commit message for patch rename')])
+
+wrap_mq_function(mq.finish,
+                 qfinish_wrapper,
+                 [('Q', 'mqcommit', None, 'commit change to patch queue'),
+                  ('M', 'mqmessage', 'FINISHED', 'commit message for patch finishing')])
 
 cmdtable = {
     'qshow': (qshow,
