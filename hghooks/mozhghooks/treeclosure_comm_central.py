@@ -64,7 +64,7 @@ def checkTreeState(repo, repoName, treeName, treeUrl):
     u = urlopen(treeUrl)
     text = ''.join(u.readlines()).strip()
 
-    if re.compile('<span id="tree-status".*CLOSED.*<span id="extended-status">').search(text) :
+    if re.compile('<span id="tree-?status".*CLOSED.*<span id="extended-status">').search(text) :
         print "Tree %s is CLOSED! (%s, %s)" % (treeName, repoName, treeUrl)
         print repo.changectx('tip').description()
         # Block the push unless they know the magic words

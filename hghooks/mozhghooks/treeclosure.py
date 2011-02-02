@@ -46,7 +46,7 @@ def hook(ui, repo, **kwargs):
         url = hgNameToTinderboxURL[name];
         u = urlopen(url)
         text = ''.join(u.readlines()).strip()
-        if re.compile('<span id="treestatus".*CLOSED.*<span id="extended-status">').search(text) :
+        if re.compile('<span id="tree-?status".*CLOSED.*<span id="extended-status">').search(text) :
             print "Tree %s is CLOSED! (%s)" % (name, url)
             
             # Block the push unless they know the magic words
