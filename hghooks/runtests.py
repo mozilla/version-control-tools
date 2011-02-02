@@ -358,7 +358,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     # If this tests attempts to pull something that isn't treeName, then the
     # re-director should fail for us. Hence we know that the hook is only
     # pulling the predefined tree and nothing else.
-    self.redirect("http://tinderbox.mozilla.org/" + treeName + "/",
+    self.redirect("http://tinderbox.mozilla.org/" + treeName + "/status.html",
                          '<span id="tree-status">OPEN</span><span id="extended-status">')
 
     # pushing something should now succeed
@@ -396,7 +396,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     # If this tests attempts to pull something that isn't treeName, then the
     # re-director should fail for us. Hence we know that the hook is only
     # pulling the predefined tree and nothing else.
-    self.redirect("http://tinderbox.mozilla.org/" + treeName + "/",
+    self.redirect("http://tinderbox.mozilla.org/" + treeName + "/status.html",
                          '<span id="tree-status">CLOSED</span><span id="extended-status">')
 
     # pushing something should now fail
@@ -435,7 +435,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     Pushing to a CLOSED Thunderbird tree with 'CLOSED TREE' in the commit message
     should succeed.
     """
-    self.redirect("http://tinderbox.mozilla.org/Thunderbird/",
+    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
                          '<span id="tree-status">CLOSED</span><span id="extended-status">')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
@@ -451,7 +451,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     Pushing multiple changesets to a CLOSED Thunderbird tree with 'CLOSED TREE'
     in the commit message of the tip changeset should succeed.
     """
-    self.redirect("http://tinderbox.mozilla.org/Thunderbird/",
+    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
                          '<span id="tree-status">CLOSED</span><span id="extended-status">')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
