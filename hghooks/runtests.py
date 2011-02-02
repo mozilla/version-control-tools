@@ -463,5 +463,57 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     push(u, self.clonerepo, dest=self.repodir)
     self.assertEqual(self.director.opened, 1)
 
+  def testCCApprovalRequired(self):
+    """Pushing to an APPROVAL REQUIRED tree should fail."""
+    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
+                         '<span id="tree-status">APPROVAL REQUIRED</span><span id="extended-status">')
+    # pushing something should now fail
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1")
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+  def testCCApprovalRequiredMagicWords(self):
+    """
+    Pushing to an APPROVAL REQUIRED tree with a=foo
+    in the commit message should succeed.
+    """
+    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
+                         '<span id="tree-status">APPROVAL REQUIRED</span><span id="extended-status">')
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1 a=someone")
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+    # also check that approval of the form a1.2=foo works
+    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
+                         '<span id="tree-status">APPROVAL REQUIRED</span><span id="extended-status">')
+    appendFile(join(self.clonedir, "testfile"), "checkin 2")
+    commit(u, self.clonerepo, message="checkin 2 a1.2=someone")
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 2)
+
+  def testCCApprovalRequiredMagicWordsTip(self):
+    """
+    Pushing to an APPROVAL REQUIRED tree with a=foo
+    in the commit message of the tip changeset should succeed.
+    """
+    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
+                         '<span id="tree-status">APPROVAL REQUIRED</span><span id="extended-status">')
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(u, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(u, self.clonerepo, message="checkin 1")
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    commit(u, self.clonerepo, message="checkin 2 a=someone")
+
+    push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(self.director.opened, 1)
+
+
 if __name__ == '__main__':
   unittest.main()

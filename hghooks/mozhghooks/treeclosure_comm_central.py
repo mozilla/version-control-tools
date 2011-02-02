@@ -61,20 +61,46 @@ magicwords = "CLOSED TREE"
 # This function actually does the checking to see if a tree is closed or set
 # to approval required.
 def checkTreeState(repo, repoName, treeName, treeUrl):
-    u = urlopen(treeUrl)
+    # Get the tree state from tinderbox
+    try:
+        u = urlopen(treeUrl)
+    except IOError, e:
+        # If tinderbox is down, allow pushes
+        print "Tinderbox may be down, allowing your push, but you'd better check!"
+        return 0
+
     text = ''.join(u.readlines()).strip()
 
     if re.compile('<span id="tree-?status".*CLOSED.*<span id="extended-status">').search(text) :
+        # The tree is closed
+
+        # Tell the pusher
         print "Tree %s is CLOSED! (%s, %s)" % (treeName, repoName, treeUrl)
         print repo.changectx('tip').description()
-        # Block the push unless they know the magic words
+
+        # Block the push if no magic words
         if repo.changectx('tip').description().find(magicwords) == -1:
             print "To push despite the closed tree, include \"%s\" in your push comment" % magicwords
             return 1
 
+        # Otherwise let them push
         print "But you included the magic words.  Hope you had permission!"
         return 0
 
+    elif re.compile('<span id="tree-?status".*APPROVAL REQUIRED.*<span id="extended-status">').search(text) :
+        # The tree needs approval
+
+        # If they've specified an approval, let them push 
+        if re.search('a\S*=', repo.changectx('tip').description().lower()) :
+            return 0
+
+        # Otherwise tell them about the rule
+        print "Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)"
+
+        # And block the push
+        return 1
+
+    # By default the tree is open
     return 0
 
 def isOwned(changedFile, ownerArray):
