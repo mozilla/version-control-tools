@@ -274,7 +274,7 @@ class PUTRequest(urllib2.Request):
     def get_method(self):
         return "PUT"
 
-def obsolete_old_patches(ui, api_server, token, bug, filename):
+def obsolete_old_patches(ui, api_server, token, bug, filename, ignore_id):
     url = api_server + "bug/%s/attachment?%s" % (bug, token.auth()) 
     req = urllib2.Request(url, None,
                           {"Accept": "application/json",
@@ -286,7 +286,7 @@ def obsolete_old_patches(ui, api_server, token, bug, filename):
         ui.write_err("Error: couldn't load info for bug " + bug + ": %s\n" % str(e))
         return False
 
-    patches = [p for p in bug["attachments"] if p["is_patch"] and not p["is_obsolete"] and p["file_name"] == filename]
+    patches = [p for p in bug["attachments"] if p["is_patch"] and not p["is_obsolete"] and p["file_name"] == filename and int(p["id"]) != int(ignore_id)]
     if not len(patches):
         return True
 
@@ -481,9 +481,6 @@ HG: Lines starting with 'HG:' will be removed.
             ui.write_err("Empty comment specified. Aborting!\n")
             return
 
-    if not obsolete_old_patches(ui, api_server, auth, bug, filename):
-        return
-
     #TODO: support a --new argument for filing a new bug with a patch
     reviewers = None
     if opts["review"]:
@@ -520,6 +517,8 @@ HG: Lines starting with 'HG:' will be removed.
                 search_failed = True
         if search_failed:
             return
+
+    result_id = None
     try:
         result = json.load(create_attachment(ui, api_server, auth,
                                              bug, contents.getvalue(),
@@ -530,8 +529,13 @@ HG: Lines starting with 'HG:' will be removed.
         attachment_url = urlparse.urljoin(bugzilla,
                                           "attachment.cgi?id=" + result["id"] + "&action=edit")
         print "%s uploaded as %s" % (rev, attachment_url)
+        result_id = result["id"]
+
     except Exception, e:
         ui.write_err(_("Error sending patch: %s\n" % str(e)))
+
+    if not result_id or not obsolete_old_patches(ui, api_server, auth, bug, filename, result_id):
+        return
 
 cmdtable = {
     'bzexport':
