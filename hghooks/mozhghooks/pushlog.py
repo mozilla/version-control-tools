@@ -42,6 +42,7 @@ def createpushdb(conn):
     conn.execute("CREATE TABLE IF NOT EXISTS pushlog (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, date INTEGER)")
     conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS changeset_node ON changesets (node)")
     conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS changeset_rev ON changesets (rev)")
+    conn.execute("CREATE INDEX IF NOT EXISTS changeset_pushid ON changesets (pushid)")
     conn.execute("CREATE INDEX IF NOT EXISTS pushlog_date ON pushlog (date)")
     conn.execute("CREATE INDEX IF NOT EXISTS pushlog_user ON pushlog (user)")
     conn.commit()
