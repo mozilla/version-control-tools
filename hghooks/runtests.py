@@ -380,16 +380,16 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
 
  
   def testCCOpenThunderbird(self):
-    self.actualTestCCOpen("Thunderbird", ["testfile"])
+    self.actualTestCCOpen("Miramar", ["testfile"])
 
   def testCCOpenSeaMonkey(self):
-    self.actualTestCCOpen("SeaMonkey", ["suite", "build", "test"])
+    self.actualTestCCOpen("SeaMonkey2.1", ["suite", "build", "test"])
 
   def testCCOpenCalendar1(self):
-    self.actualTestCCOpen("Sunbird", ["calendar", "app", "test"])
+    self.actualTestCCOpen("Calendar1.0", ["calendar", "app", "test"])
 
   def testCCOpenCalendar2(self):
-    self.actualTestCCOpen("Sunbird", ["other-licenses", "branding", "sunbird", "test"])
+    self.actualTestCCOpen("Calendar1.0", ["other-licenses", "branding", "sunbird", "test"])
 
   def actualTestCCClosed(self, treeName, fileInfo):
     """Pushing to a CLOSED Thunderbird tree should fail."""
@@ -417,16 +417,16 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     self.assertEqual(self.director.opened, 1)
 
   def testCCClosedThunderbird(self):
-    self.actualTestCCClosed("Thunderbird", ["testfile"])
+    self.actualTestCCClosed("Miramar", ["testfile"])
 
   def testCCClosedSeaMonkey(self):
-    self.actualTestCCClosed("SeaMonkey", ["suite", "build", "test"])
+    self.actualTestCCClosed("SeaMonkey2.1", ["suite", "build", "test"])
 
   def testCCClosedCalendar1(self):
-    self.actualTestCCClosed("Sunbird", ["calendar", "app", "test"])
+    self.actualTestCCClosed("Calendar1.0", ["calendar", "app", "test"])
 
   def testCCClosedCalendar2(self):
-    self.actualTestCCClosed("Sunbird", ["other-licenses", "branding", "sunbird", "test"])
+    self.actualTestCCClosed("Calendar1.0", ["other-licenses", "branding", "sunbird", "test"])
 
   # In theory adding CLOSED TREE is the same code-path for all projects,
   # so just checking for one project
@@ -435,7 +435,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     Pushing to a CLOSED Thunderbird tree with 'CLOSED TREE' in the commit message
     should succeed.
     """
-    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
+    self.redirect("http://tinderbox.mozilla.org/Miramar/status.html",
                          '<span id="tree-status">CLOSED</span><span id="extended-status">')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
@@ -451,7 +451,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     Pushing multiple changesets to a CLOSED Thunderbird tree with 'CLOSED TREE'
     in the commit message of the tip changeset should succeed.
     """
-    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
+    self.redirect("http://tinderbox.mozilla.org/Miramar/status.html",
                          '<span id="tree-status">CLOSED</span><span id="extended-status">')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
@@ -465,7 +465,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
 
   def testCCApprovalRequired(self):
     """Pushing to an APPROVAL REQUIRED tree should fail."""
-    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
+    self.redirect("http://tinderbox.mozilla.org/Miramar/status.html",
                          '<span id="tree-status">APPROVAL REQUIRED</span><span id="extended-status">')
     # pushing something should now fail
     u = self.ui
@@ -480,7 +480,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     Pushing to an APPROVAL REQUIRED tree with a=foo
     in the commit message should succeed.
     """
-    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
+    self.redirect("http://tinderbox.mozilla.org/Miramar/status.html",
                          '<span id="tree-status">APPROVAL REQUIRED</span><span id="extended-status">')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
@@ -490,7 +490,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     self.assertEqual(self.director.opened, 1)
 
     # also check that approval of the form a1.2=foo works
-    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
+    self.redirect("http://tinderbox.mozilla.org/Miramar/status.html",
                          '<span id="tree-status">APPROVAL REQUIRED</span><span id="extended-status">')
     appendFile(join(self.clonedir, "testfile"), "checkin 2")
     commit(u, self.clonerepo, message="checkin 2 a1.2=someone")
@@ -502,7 +502,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     Pushing to an APPROVAL REQUIRED tree with a=foo
     in the commit message of the tip changeset should succeed.
     """
-    self.redirect("http://tinderbox.mozilla.org/Thunderbird/status.html",
+    self.redirect("http://tinderbox.mozilla.org/Miramar/status.html",
                          '<span id="tree-status">APPROVAL REQUIRED</span><span id="extended-status">')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")

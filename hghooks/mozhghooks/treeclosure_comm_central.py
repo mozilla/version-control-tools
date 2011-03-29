@@ -35,24 +35,25 @@ seamonkeyOwns = [
 
 # Thunderbird tinderbox trees
 thunderbirdTrees = {
-  'comm-central': 'http://tinderbox.mozilla.org/Thunderbird/status.html',
-  'comm-1.9.1'  : 'http://tinderbox.mozilla.org/Thunderbird3.0/status.html',
-  'comm-1.9.2'  : 'http://tinderbox.mozilla.org/Thunderbird3.1/status.html'
+  'comm-central': 'http://tinderbox.mozilla.org/Miramar/status.html',
+  'comm-1.9.2'  : 'http://tinderbox.mozilla.org/Thunderbird3.1/status.html',
+  # Point at SeaMonkey as we don't use this one any more.
+  'comm-1.9.1'  : 'http://tinderbox.mozilla.org/SeaMonkey2.0/status.html',
 }
 # SeaMonkey tinderbox trees
 seamonkeyTrees = {
-  'comm-central': 'http://tinderbox.mozilla.org/SeaMonkey/status.html',
+  'comm-central': 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
   'comm-1.9.1'  : 'http://tinderbox.mozilla.org/SeaMonkey2.0/status.html',
-   # SeaMonkey doesn't support 1.9.2. So therefore just point it at the
-   # Thunderbird tree so that if cross-app patches get pushed, we don't get
-   # the annoying message saying that the SeaMonkey tree can't be found.
+  # Point at Thunderbird as SeaMonkey doesn't use this.
   'comm-1.9.2'  : 'http://tinderbox.mozilla.org/Thunderbird3.1/status.html'
 }
 # Calendar tinderbox trees
 calendarTrees = {
-  'comm-central': 'http://tinderbox.mozilla.org/Sunbird/status.html',
-  'comm-1.9.1'  : 'http://tinderbox.mozilla.org/Calendar1.0/status.html',
-  'comm-1.9.2'  : 'http://tinderbox.mozilla.org/Calendar1.0/status.html',
+  'comm-central': 'http://tinderbox.mozilla.org/Calendar1.0/status.html',
+  # Point at Thunderbird as Calendar doesn't use this
+  'comm-1.9.2'  : 'http://tinderbox.mozilla.org/Thunderbird3.1/status.html',
+  # Point at SeaMonkey as Calendar doesn't use this.
+  'comm-1.9.1'  : 'http://tinderbox.mozilla.org/SeaMonkey2.0/status.html',
 }
 
 
