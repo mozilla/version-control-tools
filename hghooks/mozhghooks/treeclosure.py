@@ -22,9 +22,12 @@ import re
 
 hgNameToTinderboxURL = {
     'mozilla-central': 'http://tinderbox.mozilla.org/Firefox/status.html',
+    'mozilla-2.1'    : 'http://tinderbox.mozilla.org/Mobile2.0/status.html',
+    'mozilla-2.0'    : 'http://tinderbox.mozilla.org/Firefox4.0/status.html',
     'mozilla-1.9.1'  : 'http://tinderbox.mozilla.org/Firefox3.5/status.html',
     'mozilla-1.9.2'  : 'http://tinderbox.mozilla.org/Firefox3.6/status.html',
     'mobile-browser' : 'http://tinderbox.mozilla.org/Mobile/status.html',
+    'mobile-2.0'     : 'http://tinderbox.mozilla.org/Mobile2.0/status.html',
     'mobile-1.1'     : 'http://tinderbox.mozilla.org/Mobile1.1/status.html',
     'places'         : 'http://tinderbox.mozilla.org/Places/status.html',
     'electrolysis'   : 'http://tinderbox.mozilla.org/Electrolysis/status.html',
