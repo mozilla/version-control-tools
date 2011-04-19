@@ -383,7 +383,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     self.actualTestCCOpen("Miramar", ["testfile"])
 
   def testCCOpenSeaMonkey(self):
-    self.actualTestCCOpen("SeaMonkey2.1", ["suite", "build", "test"])
+    self.actualTestCCOpen("SeaMonkey", ["suite", "build", "test"])
 
   def testCCOpenCalendar1(self):
     self.actualTestCCOpen("Calendar1.0", ["calendar", "app", "test"])
@@ -420,7 +420,7 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     self.actualTestCCClosed("Miramar", ["testfile"])
 
   def testCCClosedSeaMonkey(self):
-    self.actualTestCCClosed("SeaMonkey2.1", ["suite", "build", "test"])
+    self.actualTestCCClosed("SeaMonkey", ["suite", "build", "test"])
 
   def testCCClosedCalendar1(self):
     self.actualTestCCClosed("Calendar1.0", ["calendar", "app", "test"])

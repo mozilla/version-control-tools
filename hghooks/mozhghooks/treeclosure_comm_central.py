@@ -36,13 +36,16 @@ seamonkeyOwns = [
 # Thunderbird tinderbox trees
 thunderbirdTrees = {
   'comm-central': 'http://tinderbox.mozilla.org/Miramar/status.html',
+  # Point at SeaMonkey as we don't use this one
+  'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
   'comm-1.9.2'  : 'http://tinderbox.mozilla.org/Thunderbird3.1/status.html',
   # Point at SeaMonkey as we don't use this one any more.
   'comm-1.9.1'  : 'http://tinderbox.mozilla.org/SeaMonkey2.0/status.html',
 }
 # SeaMonkey tinderbox trees
 seamonkeyTrees = {
-  'comm-central': 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
+  'comm-central': 'http://tinderbox.mozilla.org/SeaMonkey/status.html',
+  'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
   'comm-1.9.1'  : 'http://tinderbox.mozilla.org/SeaMonkey2.0/status.html',
   # Point at Thunderbird as SeaMonkey doesn't use this.
   'comm-1.9.2'  : 'http://tinderbox.mozilla.org/Thunderbird3.1/status.html'
@@ -50,6 +53,8 @@ seamonkeyTrees = {
 # Calendar tinderbox trees
 calendarTrees = {
   'comm-central': 'http://tinderbox.mozilla.org/Calendar1.0/status.html',
+  # Point at SeaMonkey as Calendar don't use this one
+  'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
   # Point at Thunderbird as Calendar doesn't use this
   'comm-1.9.2'  : 'http://tinderbox.mozilla.org/Thunderbird3.1/status.html',
   # Point at SeaMonkey as Calendar doesn't use this.
