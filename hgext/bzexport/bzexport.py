@@ -264,7 +264,7 @@ def get_cookies_from_profile(ui, profile, bugzilla):
         return login, cookie
     except Exception, e:
         ui.write_err("Error: failed to get bugzilla login cookies from "
-                     "Firefox profile: %s\n" % str(e))
+                     "Firefox profile at %s: %s\n" % (profile, str(e)))
         return None, None
     finally:
         if tempdir:
