@@ -66,7 +66,7 @@ bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                         )
                         (?:\s*\#?)(\d+)
                      )''', re.I | re.X)
-review_re = re.compile(r'[ra][=?]([^ ]+)')
+review_re = re.compile(r'[ra][=?]+([^ ]+)')
 
 def urlopen(ui, req):
     """Wraps urllib2.urlopen() to provide error handling."""
