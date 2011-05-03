@@ -60,6 +60,12 @@ def TryParser(message):
 
     return options
 
+def any(iterable):
+    for element in iterable:
+        if element:
+            return True
+    return False
+
 def hook(ui, repo, **kwargs):
     name = os.path.basename(repo.root)
     if name != "try":
