@@ -36,6 +36,8 @@ seamonkeyOwns = [
 # Thunderbird tinderbox trees
 thunderbirdTrees = {
   'comm-central': 'http://tinderbox.mozilla.org/ThunderbirdTrunk/status.html',
+  'comm-aurora' : 'http://tinderbox.mozilla.org/Thunderbird-Aurora/status.html',
+  'comm-beta'   : 'http://tinderbox.mozilla.org/Thunderbird-Beta/status.html',
   'comm-miramar': 'http://tinderbox.mozilla.org/Miramar/status.html',
   # Point at SeaMonkey as we don't use this one
   'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
@@ -46,6 +48,8 @@ thunderbirdTrees = {
 # SeaMonkey tinderbox trees
 seamonkeyTrees = {
   'comm-central': 'http://tinderbox.mozilla.org/SeaMonkey/status.html',
+  'comm-aurora' : 'http://tinderbox.mozilla.org/SeaMonkey-Aurora/status.html',
+  'comm-beta'   : 'http://tinderbox.mozilla.org/SeaMonkey-Beta/status.html',
   # Point at Mirmar as SeaMonkey doesn't use this
   'comm-miramar': 'http://tinderbox.mozilla.org/Miramar/status.html',
   'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
@@ -56,6 +60,10 @@ seamonkeyTrees = {
 # Calendar tinderbox trees
 calendarTrees = {
   'comm-central': 'http://tinderbox.mozilla.org/CalendarTrunk/status.html',
+  # Point at Thunderbird for now
+  'comm-aurora' : 'http://tinderbox.mozilla.org/Thunderbird-Aurora/status.html',
+  # Point at Thunderbird for now
+  'comm-beta'   : 'http://tinderbox.mozilla.org/Thunderbird-Beta/status.html',
   'comm-miramar': 'http://tinderbox.mozilla.org/Calendar1.0/status.html',
   # Point at SeaMonkey as Calendar don't use this one
   'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
