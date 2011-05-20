@@ -126,7 +126,8 @@ def lineage(ui, repo, rev='.', limit=None, stop=None, **opts):
     log = repo.changelog
     n = 0
 
-    print("rev=%s limit=%s stop=%s\n" % (rev,limit,stop))
+    if ui.verbose:
+        ui.write("rev=%s limit=%s stop=%s\n" % (rev,limit,stop))
 
     # TODO: If no limit is given, ask after 100 or so whether to continue
     if limit is None or limit == '':
@@ -135,8 +136,9 @@ def lineage(ui, repo, rev='.', limit=None, stop=None, **opts):
         limit = int(limit)
 
     if not (stop is None or stop == ''):
-        print("stop = %r\n" % (stop,))
         stop = repo.lookup(stop)
+        if ui.verbose:
+            ui.write("  stop = %s\n" % hex(stop))
     
     current = repo.lookup(rev)
     while n < limit or limit == 0:
