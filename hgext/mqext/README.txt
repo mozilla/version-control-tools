@@ -17,8 +17,10 @@ changes made to your patch queue to the queue repository
 (a la hg commit --mq):
   qrefresh
   qnew
+  qimport
   qrename
   qdelete
+  qfinish
 
 The expected usage is to add the 'mqcommit=auto' option to the 'mqext' section
 of your ~/.hgrc so that all changes are autocommitted if you are using a
