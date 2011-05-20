@@ -45,7 +45,7 @@ import os
 from subprocess import call, check_call
 import errno
 from mercurial.node import hex, nullrev, nullid, short
-from mercurial import commands, util, cmdutil, mdiff
+from mercurial import commands, util, cmdutil, mdiff, error
 from mercurial.patch import diffstatdata
 from hgext import mq
 import StringIO
@@ -186,15 +186,42 @@ def touched(ui, repo, sourcefile=None, **opts):
             elif sourcefile == filename:
                 ui.write(patch + "\n")
 
+def mqcommit_info(ui, repo, opts):
+    mqcommit = opts.pop('mqcommit', None)
+
+    try:
+        auto = ui.configbool('mqext', 'qcommit', None)
+        if auto is None:
+            raise error.ConfigError()
+    except error.ConfigError:
+        auto = ui.config('mqext', 'qcommit', 'auto').lower()
+
+    if mqcommit is None and auto:
+        if auto == 'auto':
+            if repo.mq and repo.mq.qrepo():
+                mqcommit = True
+        else:
+            mqcommit = True
+
+    if mqcommit is None:
+        return (None, None, None)
+
+    q = repo.mq
+    if q is None:
+        raise util.Abort("-Q option given but mq extension not installed")
+    r = q.qrepo()
+    if r is None:
+        raise util.Abort("-Q option given but patch directory is not versioned")
+
+    return mqcommit, q, r
+
 # Monkeypatch qrefresh in mq command table
 def qrefresh_wrapper(self, repo, *pats, **opts):
-    mqcommit = opts.pop('mqcommit', None)
     mqmessage = opts.pop('mqmessage', None)
+    mqcommit, q, r = mqcommit_info(self, repo, opts)
 
     diffstat = ""
-    if mqcommit:
-        q = repo.mq
-        r = q.qrepo()
+    if mqcommit and mqmessage:
         if mqmessage.find("%s") != -1:
             buffer = StringIO.StringIO()
             m = cmdutil.match(repo, None, {})
@@ -218,32 +245,24 @@ def qrefresh_wrapper(self, repo, *pats, **opts):
 
 # Monkeypatch qnew in mq command table
 def qnew_wrapper(self, repo, patchfn, *pats, **opts):
-    mqcommit = opts.pop('mqcommit', None)
     mqmessage = opts.pop('mqmessage', None)
+    mqcommit, q, r = mqcommit_info(self, repo, opts)
 
     mq.new(self, repo, patchfn, *pats, **opts)
 
-    if mqcommit:
-        q = repo.mq
-        r = q.qrepo()
-        if r is None:
-            raise util.Abort("no patch repository found when using -Q option")
+    if mqcommit and mqmessage:
         mqmessage = mqmessage.replace("%p", patchfn)
         mqmessage = mqmessage.replace("%a", 'NEW')
         commands.commit(r.ui, r, message=mqmessage)
 
 # Monkeypatch qimport in mq command table
 def qimport_wrapper(self, repo, *filename, **opts):
-    mqcommit = opts.pop('mqcommit', None)
     mqmessage = opts.pop('mqmessage', None)
+    mqcommit, q, r = mqcommit_info(self, repo, opts)
 
     mq.qimport(self, repo, *filename, **opts)
 
-    if mqcommit:
-        q = repo.mq
-        r = q.qrepo()
-        if r is None:
-            raise util.Abort("no patch repository found when using -Q option")
+    if mqcommit and mqmessage:
         if len(filename) == 0:
             fname = q.full_series[0] # FIXME - can be multiple
         else:
@@ -254,19 +273,15 @@ def qimport_wrapper(self, repo, *filename, **opts):
 
 # Monkeypatch qrename in mq command table
 def qrename_wrapper(self, repo, patch, name=None, **opts):
-    mqcommit = opts.pop('mqcommit', None)
     mqmessage = opts.pop('mqmessage', None)
+    mqcommit, q, r = mqcommit_info(self, repo, opts)
 
     mq.rename(self, repo, patch, name, **opts)
 
-    if mqcommit:
-        q = repo.mq
+    if mqcommit and mqmessage:
         if not name:
             name = patch
             patch = q.lookup('qtip')
-        r = q.qrepo()
-        if r is None:
-            raise util.Abort("no patch repository found when using -Q option")
         mqmessage = mqmessage.replace("%p", patch)
         mqmessage = mqmessage.replace("%n", name)
         mqmessage = mqmessage.replace("%a", 'RENAME')
@@ -283,19 +298,15 @@ def qdelete_wrapper(self, repo, *patches, **opts):
     probably would have been cleaner to give two formats, one for the
     header and one for the per-patch lines.'''
 
-    mqcommit = opts.pop('mqcommit', None)
     mqmessage = opts.pop('mqmessage', None)
+    mqcommit, q, r = mqcommit_info(self, repo, opts)
 
-    if mqcommit:
-        q = repo.mq
-        r = q.qrepo()
-        if r is None:
-            raise util.Abort("no patch repository found when using -Q option")
+    if mqcommit and mqmessage:
         patchnames = [ q.lookup(p) for p in patches ]
 
     mq.delete(self, repo, *patches, **opts)
 
-    if mqcommit:
+    if mqcommit and mqmessage:
         mqmessage = mqmessage.replace("%a", 'DELETE')
         if (len(patches) > 1) and (mqmessage.find("%m") != -1):
             rep_message = mqmessage.replace("%m", "")
@@ -308,16 +319,12 @@ def qdelete_wrapper(self, repo, *patches, **opts):
 
 # Monkeypatch qnew in mq command table
 def qfinish_wrapper(self, repo, *revrange, **opts):
-    mqcommit = opts.pop('mqcommit', None)
     mqmessage = opts.pop('mqmessage', None)
+    mqcommit, q, r = mqcommit_info(self, repo, opts)
 
     mq.finish(self, repo, *revrange, **opts)
 
-    if mqcommit:
-        q = repo.mq
-        r = q.qrepo()
-        if r is None:
-            raise util.Abort("no patch repository found when using -Q option")
+    if mqcommit and mqmessage:
         commands.commit(r.ui, r, message=mqmessage)
 
 def wrap_mq_function(orig, wrapper, newparams):

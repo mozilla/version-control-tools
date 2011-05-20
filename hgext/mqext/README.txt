@@ -19,13 +19,13 @@ changes made to your patch queue to the queue repository
   qnew
   qrename
   qdelete
-  qimport
-The expected usage is to add the -Q option to all relevant commands in your
-~/.hgrc so that all changes are autocommitted:
 
-  [defaults]
-  qnew = -Q
-  qrefresh = -Q
-  qrename = -Q
-  qdelete = -Q
-  qimport = -Q
+The expected usage is to add the 'mqcommit=auto' option to the 'mqext' section
+of your ~/.hgrc so that all changes are autocommitted if you are using a
+versioned patch queue, and to do nothing if not:
+
+  [mqext]
+  mqcommit = auto
+
+You could also set it to 'yes' to force it to try to commit all changes, and
+error out if you don't have (or have forgotten to create) a patch repository.
