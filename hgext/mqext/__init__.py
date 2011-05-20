@@ -154,6 +154,9 @@ def lineage(ui, repo, rev='.', limit=None, stop=None, **opts):
         if current == stop:
             break
 
+        if len(parents) == 0:
+            break
+
         current = parents[0]
         n += 1
  
@@ -381,7 +384,7 @@ cmdtable = {
 
     'lineage':
         (lineage,
-         [('r', 'rev', '', 'Revision to start at', 'REV'),
+         [('r', 'rev', '.', 'Revision to start at', 'REV'),
           ('l', 'limit', '', 'Max revisions to display', 'LIMIT'),
           ('s', 'stop', '', 'Stop at this revision', 'REV'),
           ],
