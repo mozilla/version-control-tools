@@ -74,6 +74,7 @@ def urlopen(ui, req):
     try:
         return urllib2.urlopen(req)
     except urllib2.HTTPError, e:
+        msg = ''
         try:
             err = json.load(e)
             msg = err['message']
