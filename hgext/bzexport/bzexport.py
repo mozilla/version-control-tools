@@ -79,6 +79,7 @@ def urlopen(ui, req):
             err = json.load(e)
             msg = err['message']
         except:
+            msg = e
             pass
 
         if msg:
