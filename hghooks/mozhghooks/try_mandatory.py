@@ -16,7 +16,7 @@ Thank you for helping to reduce CPU cyles by asking for exactly what you need.""
         return 1
     else:
         print """Looks like you used try syntax, going ahead with the push.
-If you don't get what you expected, check %s for help build your trychooser request.
-Thanks for helping save resources, you're the best!"""
+If you don't get what you expected, check %s for help with building your trychooser request.
+Thanks for helping save resources, you're the best!""" % chooserUrl
         return 0
 
