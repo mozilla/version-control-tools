@@ -134,7 +134,7 @@ class bzAuth:
         else:
             return self._username
 
-def review_flag_type_id(ui, api_server):
+def review_flag_type_id(ui, api_server, bug_num):
     url = api_server + "configuration";
     req = urllib2.Request(url, None,
                           {"Accept": "application/json",
@@ -144,12 +144,51 @@ def review_flag_type_id(ui, api_server):
         configuration = json.load(conn)
     except Exception, e:
         pass
-    if configuration and configuration["flag_type"]:
-        for flag_id, flag in configuration["flag_type"].iteritems():
-            if flag["name"] == "review":
-                return flag_id
-    ui.write_err("Error: couldn't find review flag id: %s\n" % str(e))
+
+    if not configuration or not configuration["flag_type"]:
+        ui.write_err("Error: couldn't find configuration object\n");
+        return None
+
+    flag_ids = []
+    for flag_id, flag in configuration["flag_type"].iteritems():
+        if flag["name"] == "review":
+            flag_ids += flag_id
+    if not flag_ids:
+        ui.write_err("Error: couldn't find review flag id\n")
+        return None
+
+    # They come as strings
+    flag_ids = map(lambda x: int(x), flag_ids)
+
+    url = api_server + "bug/" + str(bug_num)
+    req = urllib2.Request(url, None,
+                          {"Accept": "application/json",
+                           "Content-Type": "application/json"})
+    conn = urlopen(ui, req)
+    try:
+        bug = json.load(conn)
+    except Exception, e:
+        ui.write_err("Error: couldn't determine bug component: %s\n" % str(e))
+        return None
+
+    # Let's see how many levels of indentation we need to figure out which review flag
+    # the owning component uses!
+    needle = bug["component"]
+    for _, product in configuration["product"].iteritems():
+        for name, component in product["component"].iteritems():
+            if name != needle:
+                continue
+
+            for flag_id in flag_ids:
+                if flag_id in component["flag_type"]:
+                    return flag_id
+
+            ui.write_err("Error: couldn't determine review flag id\n");
+            return None
+
+    ui.write_err("Error: couldn't determine owning bug component\n");
     return None
+                    
 
 def create_attachment(ui, api_server, token, bug,
                       attachment_contents, description="attachment",
@@ -168,7 +207,8 @@ def create_attachment(ui, api_server, token, bug,
                  'is_patch': True,
                  'content_type': 'text/plain'}
     if reviewers is not None:
-        flag_type_id = review_flag_type_id(ui, api_server)
+        flag_type_id = review_flag_type_id(ui, api_server, bug)
+        
         flags = []
         flags.append({"name": "review",
                       "requestee": {"name": ", ".join(reviewers)},
