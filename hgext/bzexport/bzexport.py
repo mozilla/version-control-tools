@@ -158,7 +158,7 @@ def review_flag_type_id(ui, api_server, bug_num):
         return None
 
     # They come as strings
-    flag_ids = map(lambda x: int(x), flag_ids)
+    flag_ids = set(map(lambda x: int(x), flag_ids))
 
     url = api_server + "bug/" + str(bug_num)
     req = urllib2.Request(url, None,
@@ -171,24 +171,30 @@ def review_flag_type_id(ui, api_server, bug_num):
         ui.write_err("Error: couldn't determine bug component: %s\n" % str(e))
         return None
 
-    # Let's see how many levels of indentation we need to figure out which review flag
-    # the owning component uses!
-    needle = bug["component"]
-    for _, product in configuration["product"].iteritems():
-        for name, component in product["component"].iteritems():
-            if name != needle:
-                continue
+    try:
+        product = configuration["product"][bug["product"]]
+    except KeyError:
+        ui.write_err("Error: Configuration does not contain product %s\n" % product)
+        return None
 
-            for flag_id in flag_ids:
-                if flag_id in component["flag_type"]:
-                    return flag_id
+    try:
+        component = product["component"][bug["component"]]
+    except KeyError:
+        ui.write_err("Error: Configuration does not contain "
+                     "product/component %s/%s\n" % (product, component))
+        return None
 
-            ui.write_err("Error: couldn't determine review flag id\n");
-            return None
+    review_flags = flag_ids.intersection(component["flag_type"])
+    if not review_flags:
+        ui.warn("Error: Couldn't determine review flag id "
+                "for product/component %s/%s\n" % (product, component))
+        return None
+    if len(review_flags) > 1:
+        ui.debug("More than one review flag id for product/component "
+                 "%s/%s.  Picking one arbitrarily." %
+                 (product, component))
 
-    ui.write_err("Error: couldn't determine owning bug component\n");
-    return None
-                    
+    return review_flags.pop()
 
 def create_attachment(ui, api_server, token, bug,
                       attachment_contents, description="attachment",
