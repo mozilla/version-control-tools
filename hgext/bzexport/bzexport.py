@@ -134,7 +134,7 @@ class bzAuth:
         else:
             return self._username
 
-def review_flag_type_id(ui, api_server, bug_num):
+def review_flag_type_id(ui, api_server):
     url = api_server + "configuration";
     req = urllib2.Request(url, None,
                           {"Accept": "application/json",
@@ -157,44 +157,7 @@ def review_flag_type_id(ui, api_server, bug_num):
         ui.write_err("Error: couldn't find review flag id\n")
         return None
 
-    # They come as strings
-    flag_ids = set(map(lambda x: int(x), flag_ids))
-
-    url = api_server + "bug/" + str(bug_num)
-    req = urllib2.Request(url, None,
-                          {"Accept": "application/json",
-                           "Content-Type": "application/json"})
-    conn = urlopen(ui, req)
-    try:
-        bug = json.load(conn)
-    except Exception, e:
-        ui.write_err("Error: couldn't determine bug component: %s\n" % str(e))
-        return None
-
-    try:
-        product = configuration["product"][bug["product"]]
-    except KeyError:
-        ui.write_err("Error: Configuration does not contain product %s\n" % product)
-        return None
-
-    try:
-        component = product["component"][bug["component"]]
-    except KeyError:
-        ui.write_err("Error: Configuration does not contain "
-                     "product/component %s/%s\n" % (product, component))
-        return None
-
-    review_flags = flag_ids.intersection(component["flag_type"])
-    if not review_flags:
-        ui.warn("Error: Couldn't determine review flag id "
-                "for product/component %s/%s\n" % (product, component))
-        return None
-    if len(review_flags) > 1:
-        ui.debug("More than one review flag id for product/component "
-                 "%s/%s.  Picking one arbitrarily." %
-                 (product, component))
-
-    return review_flags.pop()
+    return flag_ids
 
 def create_attachment(ui, api_server, token, bug,
                       attachment_contents, description="attachment",
@@ -213,14 +176,15 @@ def create_attachment(ui, api_server, token, bug,
                  'is_patch': True,
                  'content_type': 'text/plain'}
     if reviewers is not None:
-        flag_type_id = review_flag_type_id(ui, api_server, bug)
+        flag_ids = review_flag_type_id(ui, api_server)
         
         flags = []
-        flags.append({"name": "review",
-                      "requestee": {"name": ", ".join(reviewers)},
-                      "setter": {"name": token.username(ui, api_server)},
-                      "status": "?",
-                      "type_id": flag_type_id})
+        for flag_type_id in flag_ids:
+            flags.append({"name": "review",
+                          "requestee": {"name": ", ".join(reviewers)},
+                          "setter": {"name": token.username(ui, api_server)},
+                          "status": "?",
+                          "type_id": flag_type_id})
         json_data["flags"] = flags
     if comment:
         json_data["comments"] = [{'text': comment}]
