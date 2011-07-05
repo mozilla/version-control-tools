@@ -135,7 +135,7 @@ class bzAuth:
             return self._username
 
 def review_flag_type_id(ui, api_server):
-    url = api_server + "configuration";
+    url = api_server + "configuration?cached_ok=1";
     req = urllib2.Request(url, None,
                           {"Accept": "application/json",
                            "Content-Type": "application/json"})
