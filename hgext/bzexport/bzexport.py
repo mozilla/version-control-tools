@@ -196,6 +196,21 @@ def create_attachment(ui, api_server, token, bug,
     conn = urlopen(ui, req)
     return conn
 
+def win_get_folder_path(folder):
+    # Use SHGetFolderPath
+    import ctypes
+    SHGetFolderPath = ctypes.windll.shell32.SHGetFolderPathW
+    SHGetFolderPath.argtypes = [ctypes.c_void_p,
+                                ctypes.c_int,
+                                ctypes.c_void_p,
+                                ctypes.c_int32,
+                                ctypes.c_wchar_p]
+    path_buf = ctypes.create_unicode_buffer(1024)
+    if SHGetFolderPath(0, folder, 0, 0, path_buf) != 0:
+        return None
+
+    return path_buf.value
+
 def find_profile(ui):
     """
     Find the default Firefox profile location. Returns None
@@ -212,18 +227,10 @@ def find_profile(ui):
         basepath = pathref.FSRefMakePath()
         path = os.path.join(basepath, "Firefox")
     elif platform.system() == "Windows":
-        # Use SHGetFolderPath
-        import ctypes
-        SHGetFolderPath = ctypes.windll.shell32.SHGetFolderPathW
-        SHGetFolderPath.argtypes = [ctypes.c_void_p,
-                                    ctypes.c_int,
-                                    ctypes.c_void_p,
-                                    ctypes.c_int32,
-                                    ctypes.c_wchar_p]
         CSIDL_APPDATA = 26
-        path_buf = ctypes.create_unicode_buffer(1024)
-        if SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, path_buf) == 0:
-            path = os.path.join(path_buf.value, "Mozilla", "Firefox")
+        path = win_get_folder_path(CSIDL_APPDATA)
+        if path:
+            path = os.path.join(path, "Mozilla", "Firefox")
     else: # Assume POSIX
         # Pretty simple in comparison, eh?
         path = os.path.expanduser("~/.mozilla/firefox")
@@ -321,9 +328,48 @@ def obsolete_old_patches(ui, api_server, token, bug, filename, ignore_id):
 
     return True
 
+def get_cache_path():
+    path = None
+    if platform.system() == "Windows":
+        CSIDL_PERSONAL = 5
+        path = win_get_folder_path(CSIDL_PERSONAL)
+    else:
+        path = os.path.expanduser("~")
+    if path:
+        path = os.path.join(path, ".bzexport")
+    return path
+
+def store_user_cache(cache):
+    user_cache = get_cache_path()
+    fp = open(user_cache, "wb")
+    for section in cache.sections():
+        fp.write("[" + section + "]\n")
+        for (user, name) in cache.items(section):
+            fp.write(user + " = " + name + "\n")
+        fp.write("\n")
+    fp.close()
+
 def find_reviewers(ui, api_server, token, search_strings):
+    user_cache = get_cache_path()
+    section = api_server
+
+    c = config.config()
+
+    # Ensure that the cache exists before attempting to use it
+    fp = open(user_cache, "a");
+    fp.close()
+
+    c.read(user_cache)
+
     search_results = []
     for search_string in search_strings:
+        name = c.get(section, search_string)
+        if name:
+            search_results.append({"search_string": search_string,
+                                   "names": [name],
+                                   "real_names": ["not_a_real_name"]})
+            continue
+
         url = api_server + "user?match=%s&%s" % (search_string, token.auth()) 
         try:
             req = urllib2.Request(url, None,
@@ -338,11 +384,14 @@ def find_reviewers(ui, api_server, token, search_strings):
             search_results.append({"search_string": search_string,
                                    "names": names,
                                    "real_names": real_names})
+            if len(real_names) == 1:
+                c.set(section, search_string, names[0])
         except Exception, e:
             search_results.append({"search_string": search_string,
                                    "error": str(e),
                                    "real_names": None})
             raise
+    store_user_cache(c)
     return search_results
 
 def bzexport(ui, repo, *args, **opts):
