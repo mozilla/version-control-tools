@@ -62,9 +62,9 @@ def reap_children(children, verbose=False):
             children.remove(child)
     return children
 
-# Different repositories might get mirrored to different hosts.  For a given repository,
-# return a list of hosts that should receive push notifications.  For the moment, this is
-# hardcoded
+# Different repositories might get mirrored to different hosts.  For a
+# given repository, return a list of hosts that should receive push
+# notifications.  For the moment, this is hardcoded
 def get_hosts_for_repo(repo):
     hosts = [ 'hg1.build.scl1.mozilla.com', 'hg1.build.scl1.mozilla.com' ]
     return hosts
