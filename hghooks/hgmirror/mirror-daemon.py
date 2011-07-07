@@ -22,6 +22,7 @@ from subprocess import Popen, PIPE, STDOUT
 from time import sleep
 import urllib
 import shlex
+import yaml
 
 maxchildren = 3
 random.seed()
