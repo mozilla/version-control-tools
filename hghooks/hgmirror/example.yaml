@@ -1,0 +1,4 @@
+/mozilla-central:
+  mirrors:
+    - mirror1.build.scl1.mozilla.org
+    - mirror2.build.scl1.mozilla.org
