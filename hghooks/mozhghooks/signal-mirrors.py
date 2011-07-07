@@ -27,6 +27,8 @@ repo_toplevel="/repo/hg/mozilla"
 workdir="/dev/shm/hg_pushes"
 
 def hook(ui, repo, **kwargs):
+    if not os.path.isdir(workdir):
+        os.mkdir(workdir)
     repo_name = os.path.basename(repo.root)
     url_path = re.sub('^%s' % repo_toplevel, '', repo.root)
     # Escape '/' characters in url path, so we can store this
