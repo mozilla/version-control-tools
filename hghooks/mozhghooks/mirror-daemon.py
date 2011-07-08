@@ -86,12 +86,12 @@ def get_more_commands(directory, config, verbose=False):
         print "Looking for files in %s" % directory
     dirh = os.listdir(directory)
     for f in dirh:
-        f = "%s/%s" % (directory, f)
-        lck = getlock(f, verbose)
+        fullpath = "%s/%s" % (directory, f)
+        lck = getlock(fullpath, verbose)
         if lck:
-            fh = file(f, 'r')
-            os.unlink(f)
-            unlock(f, lck, verbose)
+            fh = file(fullpath, 'r')
+            os.unlink(fullpath)
+            unlock(fullpath, lck, verbose)
             for host in get_hosts_for_repo(urllib.unquote(f), config):
                 cmnds.append(make_command(host, 
                                           urllib.unquote(f), 
@@ -102,7 +102,7 @@ def get_more_commands(directory, config, verbose=False):
                     print "qlen: %i" % len(cmnds)
             fh.close()
         else:
-            print "Couldn't lock %s" % f
+            print "Couldn't lock %s" % fullpath
     return cmnds
 
 # Read the config file. Returns a dictionary object, which may be empty
