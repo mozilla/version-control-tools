@@ -74,7 +74,7 @@ def get_hosts_for_repo(repo, config):
     return hosts
 
 def make_command(host, url_path, config, fh):
-    if config.has_key('daemon') and config['daemon'].has_key['ssh-id']:
+    if config.has_key('daemon') and config['daemon'].has_key('ssh-id'):
         id_str = "-i%s" % config['daemon']['ssh-id']
     else:
         id_str = ""
