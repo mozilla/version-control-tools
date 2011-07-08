@@ -25,6 +25,7 @@ import shlex
 import yaml
 
 maxchildren = 3
+configfile = "/etc/mercurial/repo-mirrors.yaml"
 random.seed()
 
 # Spawn a child process for the given command
@@ -66,25 +67,20 @@ def reap_children(children, verbose=False):
 # Different repositories might get mirrored to different hosts.  For a
 # given repository, return a list of hosts that should receive push
 # notifications.  For the moment, this is hardcoded
-def get_hosts_for_repo(repo):
+def get_hosts_for_repo(repo, config):
     hosts = []
-    cfg = "/etc/hg/repo-mirrors.yaml"
-    try:
-        f = file(cfg)
-    except IOError, e:
-        print "WARNING: mirror config %s: %s" % (cfg, e)
-        return []
-    y = yaml.load(f)
-    close(f)
-    if(y.has_key(repo)):
-        hosts = y[repo]['mirrors']
+    if(config.has_key(repo)):
+        hosts = config[repo]['mirrors']
     return hosts
 
-def make_command(host, url_path, fh):
-    return "sleep %i" % random.randint(5, 15)
-    #return "/usr/bin/ssh %s mirror-pull %s" % (host, url_path)
+def make_command(host, url_path, config, fh):
+    if config.has_key('daemon') and config['daemon'].has_key['ssh-id']:
+        id_str = "-i%s" % config['daemon']['ssh-id']
+    else:
+        id_str = ""
+    return "/usr/bin/ssh %s %s mirror-pull %s" % (id_str, host, url_path)
 
-def get_more_commands(directory, verbose=False):
+def get_more_commands(directory, config, verbose=False):
     cmnds = []
     if verbose:
         print "Looking for files in %s" % directory
@@ -98,20 +94,37 @@ def get_more_commands(directory, verbose=False):
             unlock(f, lck, verbose)
             if verbose:
                 print "Spawning a command..."
-            for host in get_hosts_for_repo(urllib.unquote(f)):
-                cmnds.append(make_command(host, urllib.unquote(f), fh))
+            for host in get_hosts_for_repo(urllib.unquote(f), config):
+                cmnds.append(make_command(host, 
+                                          urllib.unquote(f), 
+                                          config,
+                                          fh))
             fh.close()
         else:
             print "Couldn't lock %s" % f
     return cmnds
+
+# Read the config file. Returns a dictionary object, which may be empty
+def read_config():
+    try:
+        f = file(configfile)
+    except IOError, e:
+        print "WARNING: mirror config %s: %s" % (configfile, e)
+        return {}
+    y = yaml.load(f)
+    close(f)
+    if y == None:
+        y = {}
+    return y
 
 def main():
     verbose  = True
     children = []
     commands = []
     dir = "/dev/shm/hg_pushes"
+    cfg = read_cfg()
     while True:
-        commands = commands + get_more_commands(dir, verbose)
+        commands = commands + get_more_commands(dir, cfg, verbose)
         children = reap_children(children, verbose)
         children = children + spawn_children(commands, 
                                   maxchildren - len(children), 
