@@ -1,3 +1,15 @@
+# Daemon configuration
+daemon:
+  ssh-id: /etc/mercurial/ssh/id_rsa
+
+# A wildcard setting, for hosts that should get all repo changes.
+# XXX Not currently implemented.
+*:
+  mirrors:
+    - hg-backups.mozilla.org
+
+# For each repository, a list of mirrors.  Repo is given relative
+# to the hgweb url root.
 /mozilla-central:
   mirrors:
     - mirror1.build.scl1.mozilla.org
