@@ -92,13 +92,14 @@ def get_more_commands(directory, config, verbose=False):
             fh = file(f, 'r')
             os.unlink(f)
             unlock(f, lck, verbose)
-            if verbose:
-                print "Spawning a command..."
             for host in get_hosts_for_repo(urllib.unquote(f), config):
                 cmnds.append(make_command(host, 
                                           urllib.unquote(f), 
                                           config,
                                           fh))
+                if verbose:
+                    print "Appended a command to the queue. ",
+                    print "qlen: %i" % len(cmnds)
             fh.close()
         else:
             print "Couldn't lock %s" % f
