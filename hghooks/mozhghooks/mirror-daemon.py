@@ -113,7 +113,7 @@ def read_config():
         print "WARNING: mirror config %s: %s" % (configfile, e)
         return {}
     y = yaml.load(f)
-    close(f)
+    f.close()
     if y == None:
         y = {}
     return y

@@ -4,7 +4,7 @@ daemon:
 
 # A wildcard setting, for hosts that should get all repo changes.
 # XXX Not currently implemented.
-*:
+all:
   mirrors:
     - hg-backups.mozilla.org
 
