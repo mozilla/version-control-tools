@@ -67,7 +67,17 @@ def reap_children(children, verbose=False):
 # given repository, return a list of hosts that should receive push
 # notifications.  For the moment, this is hardcoded
 def get_hosts_for_repo(repo):
-    hosts = [ 'hg1.build.scl1.mozilla.com', 'hg1.build.scl1.mozilla.com' ]
+    hosts = []
+    cfg = "/etc/hg/repo-mirrors.yaml"
+    try:
+        f = file(cfg)
+    except IOError, e:
+        print "WARNING: mirror config %s: %s" % (cfg, e)
+        return []
+    y = yaml.load(f)
+    close(f)
+    if(y.has_key(repo)):
+        hosts = y[repo]['mirrors']
     return hosts
 
 def make_command(host, url_path, fh):
