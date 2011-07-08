@@ -122,7 +122,7 @@ def main():
     children = []
     commands = []
     dir = "/dev/shm/hg_pushes"
-    cfg = read_cfg()
+    cfg = read_config()
     while True:
         commands = commands + get_more_commands(dir, cfg, verbose)
         children = reap_children(children, verbose)
