@@ -20,7 +20,7 @@ else
     repo="$1"
 fi
 
-repo=`echo "$repo" | sed 's#[^_-/[:alnum:]]##g'`
+repo=`echo "$repo" | sed 's#[^\._-/[:alnum:]]##g'`
 test -z "$repo" && die "need a repo to clone, relative to /repo/hg/mozilla" 
 
 GLOBAL_HG_OPTS="--config hooks.pretxnchangegroup.z_linearhistory= --config hooks.pretxnchangegroup.z_loghistory="
