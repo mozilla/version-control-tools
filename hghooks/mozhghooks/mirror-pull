@@ -35,8 +35,9 @@ if [ -d "$name" ]; then
     cd $name
     hg pull $GLOBAL_HG_OPTS 
 elif [ \! -e $name ]; then
+    mkdir -p `dirname $name` 
     echo "$name does not yet exist, cloning"
-    hg clone $GLOBAL_HG_OPTS -U -v "$src"
+    hg clone $GLOBAL_HG_OPTS -U -v "$src" $name
 else
     die "WTF is $REPO_TARGET/$name"
 fi
