@@ -2,10 +2,16 @@
 
 die() {
     echo "$1" 1>&2
-    exit ${1:-1}
+    exit ${2:1}
 }
 
-REPO_ROOT=http://hg/
+if [ -z "$REPO_ROOT" ]; then
+    REPO_ROOT=http://hg/
+fi
+
+if [ -z "$REPO_TARGET" ]; then
+    REPO_TARGET=/repo/hg/mozilla
+fi
 
 if [ -n "$SSH_ORIGINAL_COMMAND" ]; then
     # We're running under ssh; the repository is given in the third field
@@ -15,14 +21,14 @@ else
 fi
 
 repo=`echo "$repo" | sed 's#[^-/[:alnum:]]##g'`
-test -z "$repo" && { echo "need a repo to clone, relative to /repo/hg/mozilla" 1>&2 ; exit 1; }
+test -z "$repo" && die "need a repo to clone, relative to /repo/hg/mozilla" 
 
 GLOBAL_HG_OPTS="--config hooks.pretxnchangegroup.z_linearhistory= --config hooks.pretxnchangegroup.z_loghistory="
-tgt=/repo/hg/mozilla
+REPO_TARGET=/repo/hg/mozilla
 name=`echo $repo | sed 's#^/*##'`
 src=${REPO_ROOT}/$name
 
-cd $tgt || die "$tgt does not exist, cannot create repositories there"
+cd $REPO_TARGET || die "$REPO_TARGET does not exist, cannot create repositories there"
 
 if [ -d "$name" ]; then
     echo "$name already exists, pulling"
@@ -32,7 +38,7 @@ elif [ \! -e $name ]; then
     echo "$name does not yet exist, cloning"
     hg clone $GLOBAL_HG_OPTS -U -v "$src"
 else
-    die "WTF is $tgt/$name"
+    die "WTF is $REPO_TARGET/$name"
 fi
 
 
