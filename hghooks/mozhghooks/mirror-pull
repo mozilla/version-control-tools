@@ -1,0 +1,43 @@
+#!/bin/sh
+
+die() {
+    echo "$1" 1>&2
+    exit ${1:-1}
+}
+
+REPO_ROOT=http://hg/
+
+if [ -n "$SSH_ORIGINAL_COMMAND" ]; then
+    # We're running under ssh; the repository is given in the third field
+    repo=`echo $SSH_ORIGINAL_COMMAND | cut -d ' ' -f 3`
+else
+    repo="$1"
+fi
+
+repo=`echo "$repo" | sed 's#[^-/[:alnum:]]##g'`
+test -z "$repo" && { echo "need a repo to clone, relative to /repo/hg/mozilla" 1>&2 ; exit 1; }
+
+GLOBAL_HG_OPTS="--config hooks.pretxnchangegroup.z_linearhistory= --config hooks.pretxnchangegroup.z_loghistory="
+tgt=/repo/hg/mozilla
+name=`echo $repo | sed 's#^/*##'`
+src=${REPO_ROOT}/$name
+
+cd $tgt || die "$tgt does not exist, cannot create repositories there"
+
+if [ -d "$name" ]; then
+    echo "$name already exists, pulling"
+    cd $name
+    hg pull $GLOBAL_HG_OPTS 
+elif [ \! -e $name ]; then
+    echo "$name does not yet exist, cloning"
+    hg clone $GLOBAL_HG_OPTS -U -v "$src"
+else
+    die "WTF is $tgt/$name"
+fi
+
+
+# Local variables:
+# mode: shell-script
+# tab-width: 4
+# indent-tabs-mode: nil
+# end:
