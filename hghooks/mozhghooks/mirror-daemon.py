@@ -78,7 +78,7 @@ def make_command(host, url_path, config, fh):
         id_str = "-i%s" % config['daemon']['ssh-id']
     else:
         id_str = ""
-    return "/usr/bin/ssh %s %s hg pull %s" % (id_str, host, url_path)
+    return "/usr/bin/ssh -n %s %s hg pull %s" % (id_str, host, url_path)
 
 def get_more_commands(directory, config, verbose=False):
     cmnds = []
