@@ -2,16 +2,47 @@
 
 die() {
     echo "$1" 1>&2
-    exit ${2:1}
+    exit ${2:-1}
 }
 
-if [ -z "$REPO_ROOT" ]; then
-    REPO_ROOT=http://hg/
+usage() {
+    echo "USAGE"
+    echo " $0 [-r source_repo_root] [-t target_directory] <repository>"
+    echo
+}
+
+TEMP=`getopt --options hr:t: --long help,root:,target: \
+    -n 'mirror-pull' -- "$@"`
+if [ $? != 0 ]; then
+    die "getopt barfed"
 fi
 
-if [ -z "$REPO_TARGET" ]; then
-    REPO_TARGET=/repo/hg/mozilla
-fi
+eval set -- "$TEMP"
+
+# defaults:
+REPO_ROOT=http://hg.mozilla.org
+REPO_TARGET=/repo/hg/mozilla
+
+while true; do
+    case "$1" in 
+        -r|--root)
+            REPO_ROOT="$2" ; shift 2
+            ;;
+        -t|--target)
+            REPO_TARGET="$2" ; shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift ; break
+            ;;
+        *)
+            die "I don't know what happened."
+            ;;
+    esac
+done
 
 if [ -n "$SSH_ORIGINAL_COMMAND" ]; then
     # We're running under ssh; the repository is given in the third field
