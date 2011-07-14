@@ -36,7 +36,7 @@ hgNameToTinderboxURL = {
     'mobile-5.0'     : 'http://tinderbox.mozilla.org/Mobile5.0/status.html',
     'mobile-6.0'     : 'http://tinderbox.mozilla.org/Mobile6.0/status.html',
     'mozilla-mobile-6.0'     : 'http://tinderbox.mozilla.org/Mobile6.0/status.html',
-    'mozilla-mobile-2.0' : 'http://tinderbox.mozilla.org/Mobile5.0/status.html',
+    'mozilla-mobile-5.0' : 'http://tinderbox.mozilla.org/Mobile5.0/status.html',
     'places'         : 'http://tinderbox.mozilla.org/Places/status.html',
     'electrolysis'   : 'http://tinderbox.mozilla.org/Electrolysis/status.html',
     'tracemonkey'    : 'http://tinderbox.mozilla.org/TraceMonkey/status.html',
