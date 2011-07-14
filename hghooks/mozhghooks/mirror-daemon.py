@@ -13,7 +13,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
 
 import random
 import os
@@ -66,13 +67,16 @@ def reap_children(children, verbose=False):
 
 # Different repositories might get mirrored to different hosts.  For a
 # given repository, return a list of hosts that should receive push
-# notifications.  For the moment, this is hardcoded
+# notifications.
 def get_hosts_for_repo(repo, config):
     hosts = []
     if(config.has_key(repo)):
         hosts = config[repo]['mirrors']
     return hosts
 
+# Given a host and path to clone, return the command used to trigger a
+# pull. config object and trigger filehandle are also available to
+# this function.
 def make_command(host, url_path, config, fh):
     if config.has_key('daemon') and config['daemon'].has_key('ssh-id'):
         id_str = "-i%s" % config['daemon']['ssh-id']
@@ -80,6 +84,9 @@ def make_command(host, url_path, config, fh):
         id_str = ""
     return "/usr/bin/ssh -n %s %s hg pull %s" % (id_str, host, url_path)
 
+# Look for repositories that have been updated. Return a list of
+# commands to run to notify the appropriate mirrors that they should
+# update.
 def get_more_commands(directory, config, verbose=False):
     cmnds = []
     if verbose:
