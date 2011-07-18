@@ -11,7 +11,7 @@ usage() {
     echo
 }
 
-TEMP=`getopt --options hr:t: --long help,root:,target: \
+TEMP=`getopt --options hr:t:l: --long help,root:,target:lock-retries: \
     -n 'mirror-pull' -- "$@"`
 if [ $? != 0 ]; then
     die "getopt barfed"
@@ -22,6 +22,7 @@ eval set -- "$TEMP"
 # defaults:
 REPO_ROOT=http://hg.mozilla.org
 REPO_TARGET=/repo/hg/mozilla
+LOCK_RETRIES=15 # every 8 seconds for 2 minutes
 
 while true; do
     case "$1" in 
@@ -30,6 +31,9 @@ while true; do
             ;;
         -t|--target)
             REPO_TARGET="$2" ; shift 2
+            ;;
+        -l|--lock-retries)
+            LOCK_RETRIES="$2" ; shift 2
             ;;
         -h|--help)
             usage
@@ -63,12 +67,18 @@ cd $REPO_TARGET || die "$REPO_TARGET does not exist, cannot create repositories 
 
 if [ -d "$name" ]; then
     echo "$name already exists, pulling"
+    lockf="${PWD}/${name}.lck"
+    lockfile -r $LOCK_RETRIES $lockf || die "Could not lock destination"
     cd $name
     hg pull $GLOBAL_HG_OPTS 
+    rm -f $lockf
 elif [ \! -e $name ]; then
     mkdir -p `dirname $name` 
     echo "$name does not yet exist, cloning"
+    lockf="${PWD}/${name}.lck" || die "Could not lock destination"
+    lockfile -r $LOCK_RETRIES $lockf
     hg clone $GLOBAL_HG_OPTS -U -v "$src" $name
+    rm -f $lockf
 else
     die "WTF is $REPO_TARGET/$name"
 fi
