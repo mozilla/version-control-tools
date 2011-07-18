@@ -68,14 +68,14 @@ cd $REPO_TARGET || die "$REPO_TARGET does not exist, cannot create repositories 
 if [ -d "$name" ]; then
     echo "$name already exists, pulling"
     lockf="${PWD}/${name}.lck"
-    lockfile -r $LOCK_RETRIES $lockf
+    lockfile -r $LOCK_RETRIES $lockf || die "Could not lock destination"
     cd $name
     hg pull $GLOBAL_HG_OPTS 
     rm -f $lockf
 elif [ \! -e $name ]; then
     mkdir -p `dirname $name` 
     echo "$name does not yet exist, cloning"
-    lockf="${PWD}/${name}.lck"
+    lockf="${PWD}/${name}.lck" || die "Could not lock destination"
     lockfile -r $LOCK_RETRIES $lockf
     hg clone $GLOBAL_HG_OPTS -U -v "$src" $name
     rm -f $lockf
