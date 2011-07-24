@@ -1,4 +1,4 @@
-Modify Mercurial's MQ extension by altering several commands and adding a few more. Install it by pointing your ~/.hgrc at it, eg:
+Modify Mercurial's MQ extension by altering several commands and adding a few more. Install it by pointing your ~/.hgrc at it, eg::
 
   [extensions]
   mq =
