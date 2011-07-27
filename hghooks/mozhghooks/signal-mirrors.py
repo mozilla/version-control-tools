@@ -29,6 +29,9 @@ workdir="/dev/shm/hg_pushes"
 def hook(ui, repo, **kwargs):
     if not os.path.isdir(workdir):
         os.mkdir(workdir)
+        # mode 0777 is unfortunate, but we don't have a more appropriate
+        # group at this time...
+        os.chmod(workdir, 0777)
     repo_name = os.path.basename(repo.root)
     url_path = re.sub('^%s' % repo_toplevel, '', repo.root)
     # Escape '/' characters in url path, so we can store this
