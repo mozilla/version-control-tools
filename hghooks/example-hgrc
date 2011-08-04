@@ -1,7 +1,7 @@
-# the a_ and z_ prefixes are for ordering:
+# hooks are run in the order in which they appear:
 # any hooks which can veto an action (require-singlehead) should be run before
 # hooks which make permanent logs (record-changeset-info)
 
 [hooks]
-pretxnchangegroup.a_singlehead = python:mozhghooks.single_head_per_branch.hook
-pretxnchangegroup.z_linearhistory = python:mozhghooks.pushlog.log
+pretxnchangegroup.singlehead = python:mozhghooks.single_head_per_branch.hook
+pretxnchangegroup.linearhistory = python:mozhghooks.pushlog.log
