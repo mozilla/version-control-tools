@@ -12,6 +12,7 @@ Commands added:
 Commands not related to mq:
 
   :lineage: Dump out the revision history leading up to a particular revision
+  :reviewers: Suggest potential reviewers for a patch
 
 Autocommit:
 
@@ -67,6 +68,8 @@ from mercurial import commands, util, cmdutil, mdiff, error
 from mercurial.patch import diffstatdata
 from hgext import mq
 import StringIO
+import re
+from collections import Counter
 
 def qshow(ui, repo, patch=None, **opts):
     '''display a patch
@@ -88,8 +91,8 @@ def qshow(ui, repo, patch=None, **opts):
     except:
         pass
 
-    # This should probably dispatch to export, so that all of its
-    # options could be used.
+    # This should probably dispatch to export, so that all of its options could
+    # be used. (Unapplied patches would still be a problem...)
     if opts['stat']:
         check_call(["diffstat", "-p1", q.join(patch)])
     else:
@@ -179,6 +182,91 @@ def lineage(ui, repo, rev='.', limit=None, stop=None, **opts):
 
         current = parents[0]
         n += 1
+
+fileRe = re.compile(r"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
+suckerRe = re.compile(r"[^s-]r=(\w+)")
+supersuckerRe = re.compile(r"sr=(\w+)")
+
+def reviewers(ui, repo, patchfile=None, **opts):
+    '''Suggest a reviewer for a patch
+
+    Scan through the last LIMIT commits to find candidate reviewers for a
+    patch (or set of files).
+
+    Written by Blake Winton http://weblog.latte.ca/blake/
+    '''
+
+    def canon(reviewer):
+        reviewer = reviewer.lower()
+        return ui.config('reviewers', reviewer, reviewer)
+
+    changes = {}
+
+    if 'filename' in opts:
+        changedFiles = opts['filename']
+    else:
+        if patchfile is None:
+            # we should use the current diff, or if that is empty, the top
+            # applied patch in the patch queue
+            ui.pushbuffer()
+            commands.diff(ui, repo, git=True)
+            diff = ui.popbuffer()
+            changedFiles = fileRe.findall(diff)
+            if len(changedFiles) > 0:
+                source = "current diff"
+            elif q and q.qrepo():
+                source = "top patch in mq queue"
+                ui.pushbuffer()
+                commands.diff(ui, repo, change="qtip", git=True)
+                diff = ui.popbuffer()
+            else:
+                raise util.Abort("no changes found")
+        else:
+            diff = url.open(ui, patchfile).read()
+            source = "patch file %s" % patchfile
+
+        changedFiles = fileRe.findall(diff)
+        if ui.verbose:
+            ui.write("Patch source: %s\n" % source)
+
+    for changedFile in changedFiles:
+        changes[changedFile] = []
+
+    limit = opts['limit']
+    if limit == 0 or len(repo) < limit:
+        start = 1
+    else:
+        start = len(repo) - limit
+
+    for revNum in xrange(start, len(repo)):
+        ui.progress("scanning revisions", revNum - start, item=revNum,
+                    total=len(repo) - start)
+        rev = repo[revNum]
+        for file in changedFiles:
+            if file in rev.files():
+                changes[file].append(rev)
+
+    suckers = Counter()
+    supersuckers = Counter()
+    for file in changes:
+        for change in changes[file]:
+            suckers.update(canon(x) for x in suckerRe.findall(change.description()))
+            supersuckers.update(canon(x) for x in supersuckerRe.findall(change.description()))
+
+    ui.write("Potential reviewers:\n")
+    if (len(suckers) == 0):
+        ui.write("  none found in range (try higher --limit?)\n")
+    else:
+        for (reviewer, count) in suckers.most_common(10):
+            ui.write("  %s: %d\n" % (reviewer, count))
+    ui.write("\n")
+
+    ui.write("Potential super-reviewers:\n")
+    if (len(supersuckers) == 0):
+        ui.write("  none found in range (try higher --limit?)\n")
+    else:
+        for (reviewer, count) in supersuckers.most_common(10):
+            ui.write("  %s: %d\n" % (reviewer, count))
  
 def touched(ui, repo, sourcefile=None, **opts):
     '''Show what files are touched by what patches
@@ -409,6 +497,13 @@ cmdtable = {
           ('s', 'stop', '', 'Stop at this revision', 'REV'),
           ],
          ('hg lineage -r REV [-l LIMIT] [-s REV]')),
+
+    'reviewers':
+        (reviewers,
+         [('f', 'file', [], 'See reviewers for FILE', 'FILE'),
+          ('l', 'limit', 10000, 'How many revisions back to scan', 'LIMIT')
+          ],
+         ('hg reviewers [-f FILE1 -f FILE2...] [-l LIMIT]')),
 
     'qtouched':
         (touched,
