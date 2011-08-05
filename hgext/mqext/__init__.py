@@ -193,6 +193,16 @@ def reviewers(ui, repo, patchfile=None, **opts):
     Scan through the last LIMIT commits to find candidate reviewers for a
     patch (or set of files).
 
+    The patch may be given as a file or a URL. If no patch is specified,
+    the changes in the working directory will be used. If there are no
+    changes, the topmost applied patch in your mq repository will be used.
+
+    Alternatively, the -f option may be used to pass in one or more files
+    that will be used to infer the reviewers instead.
+
+    The [reviewers] section of your .hgrc may be used to specify reviewer
+    aliases in case reviewers are specified multiple ways.
+
     Written by Blake Winton http://weblog.latte.ca/blake/
     '''
 
@@ -503,7 +513,7 @@ cmdtable = {
          [('f', 'file', [], 'See reviewers for FILE', 'FILE'),
           ('l', 'limit', 10000, 'How many revisions back to scan', 'LIMIT')
           ],
-         ('hg reviewers [-f FILE1 -f FILE2...] [-l LIMIT]')),
+         ('hg reviewers [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
     'qtouched':
         (touched,
