@@ -224,7 +224,7 @@ def reviewers(ui, repo, patchfile=None, **opts):
             changedFiles = fileRe.findall(diff)
             if len(changedFiles) > 0:
                 source = "current diff"
-            elif q and q.qrepo():
+            elif repo.mq and repo.mq.qrepo():
                 source = "top patch in mq queue"
                 ui.pushbuffer()
                 commands.diff(ui, repo, change="qtip", git=True)
