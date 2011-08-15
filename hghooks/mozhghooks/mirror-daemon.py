@@ -33,6 +33,8 @@ class MirrorJob:
     def __init__(self, host, path, config, fh, verbose=False):
         self.host = host
         self.path = path
+        self.config = config
+        self.verbose = verbose
         self.child = None
         self.command = self.make_command()
 
@@ -56,9 +58,8 @@ class MirrorJob:
 def spawn_children(commands, max_children, verbose=False):
     procs = []
     while len(procs) < max_children and len(commands) > 0:
-        p = spawn_child(commands[0], verbose)
         commands[0].spawn_child()
-        procs.appends(commands[0])
+        procs.append(commands[0])
         del commands[0]
     if verbose:
         print "Spawned %i processes, %i pending" % ( len(procs), len(commands) )
@@ -80,7 +81,7 @@ def reap_children(jobs, verbose=False):
             if verbose:
                 if output:
                     print "Output: %s" % output[0]
-            jobs.remove(child)
+            jobs.remove(job)
     return jobs
 
 # Different repositories might get mirrored to different hosts.  For a
