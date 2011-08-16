@@ -147,7 +147,6 @@ def get_config_key(config, path):
         return None
 
 def main():
-    verbose      = True
     running_jobs = []
     pending_jobs = []
     configfile = "/etc/mercurial/repo-mirrors.yaml"
@@ -155,6 +154,7 @@ def main():
 
     # Read some global values from the config file, filling in
     # some sane-ish defaults for missing values.
+    verbose = get_config_key(cfg, ['daemon', 'verbose'])
     dir = get_config_key(cfg, ['daemon', 'watch-dir'])
     if not dir:
         dir = "/dev/shm/hg_pushes"
