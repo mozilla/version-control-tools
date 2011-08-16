@@ -45,7 +45,7 @@ class MirrorJob:
             id_str = "-i%s" % self.config['daemon']['ssh-id']
         else:
             id_str = ""
-        return "/usr/bin/ssh -n %s %s hg pull %s" % (id_str, self.host, self.url_path)
+        return "/usr/bin/ssh -n %s %s hg pull %s" % (id_str, self.host, self.path)
 
     # Spawn a child process for the given command
     def spawn_child(self):
