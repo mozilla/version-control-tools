@@ -42,7 +42,7 @@ class MirrorJob:
     # pull.
     def make_command(self):
         if self.config.has_key('daemon') and self.config['daemon'].has_key('ssh-id'):
-            id_str = "-i%s" % config['daemon']['ssh-id']
+            id_str = "-i%s" % self.config['daemon']['ssh-id']
         else:
             id_str = ""
         return "/usr/bin/ssh -n %s %s hg pull %s" % (id_str, self.host, self.url_path)
