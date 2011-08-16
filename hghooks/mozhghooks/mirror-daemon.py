@@ -25,8 +25,6 @@ import urllib
 import shlex
 import yaml
 
-maxchildren = 3
-configfile = "/etc/mercurial/repo-mirrors.yaml"
 random.seed()
 
 class MirrorJob:
@@ -41,8 +39,9 @@ class MirrorJob:
     # Given a host and path to clone, return the command used to trigger a
     # pull.
     def make_command(self):
-        if self.config.has_key('daemon') and self.config['daemon'].has_key('ssh-id'):
-            id_str = "-i%s" % self.config['daemon']['ssh-id']
+        ssh_id = get_config_key(self.config, ['daemon', 'ssh-id'])
+        if ssh_id:
+            id_str = "-i%s" % ssh_id
         else:
             id_str = ""
         return "/usr/bin/ssh -n %s %s hg pull %s" % (id_str, self.host, self.path)
@@ -88,10 +87,11 @@ def reap_children(jobs, verbose=False):
 # given repository, return a list of hosts that should receive push
 # notifications.
 def get_hosts_for_repo(repo, config):
-    hosts = []
-    if(config.has_key(repo)):
-        hosts = config[repo]['mirrors']
-    return hosts
+    hosts = get_config_key(config, [repo, 'mirrors'])
+    if hosts:
+        return hosts
+    else:
+        return []
 
 # Look for repositories that have been updated. Return a list of
 # commands to run to notify the appropriate mirrors that they should
@@ -122,7 +122,7 @@ def get_more_commands(directory, config, verbose=False):
     return cmnds
 
 # Read the config file. Returns a dictionary object, which may be empty
-def read_config():
+def read_config(configfile):
     try:
         f = file(configfile)
     except IOError, e:
@@ -134,12 +134,34 @@ def read_config():
         y = {}
     return y
 
+# get the config value specified by the given path array.
+# Returns the requested value or None if it's not present.
+def get_config_key(config, path):
+    try:
+        if len(path) == 0:
+            return config
+        current = path[0]
+        del path[0]
+        return get_config_key(config[current], path)
+    except KeyError:
+        return None
+
 def main():
     verbose      = True
     running_jobs = []
     pending_jobs = []
-    dir = "/dev/shm/hg_pushes"
-    cfg = read_config()
+    configfile = "/etc/mercurial/repo-mirrors.yaml"
+    cfg = read_config(configfile)
+
+    # Read some global values from the config file, filling in
+    # some sane-ish defaults for missing values.
+    dir = get_config_key(cfg, ['daemon', 'watch-dir'])
+    if not dir:
+        dir = "/dev/shm/hg_pushes"
+    maxchildren = get_config_key(cfg, ['daemon', 'maxchildren'])
+    if not maxchildren:
+        maxchildren = 3
+
     while True:
         pending_jobs = pending_jobs + get_more_commands(dir, cfg, verbose)
         running_jobs = reap_children(running_jobs, verbose)
