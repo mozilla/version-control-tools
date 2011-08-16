@@ -1,6 +1,8 @@
 # Daemon configuration
 daemon:
   ssh-id: /etc/mercurial/ssh/id_rsa
+  watch-dir: /dev/shm/hg_pushes
+  maxchildren: 3
 
 # A wildcard setting, for hosts that should get all repo changes.
 # XXX Not currently implemented.
