@@ -50,7 +50,7 @@ class MirrorJob:
     def spawn_child(self):
         self.child = Popen(shlex.split(self.command), stdout=PIPE, stderr=STDOUT)
         if self.verbose:
-            print "Spawned [%s] as pid %i" % (self.command, self.proc.pid)
+            print "Spawned [%s] as pid %i" % (self.command, self.child.pid)
         
 # Spawn subprocesses for each of the given commands, up to
 # max_children.  Return a list of subprocess.Popen objects
