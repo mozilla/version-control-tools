@@ -54,7 +54,7 @@ while True:
   if rcode != None:
     output = job.child.communicate()
     print "Job finished with code %i. Output follows:" % rcode
-    print output
+    print output[0]
     break
   else:
     sleep(1)
