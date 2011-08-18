@@ -53,16 +53,32 @@ class MirrorJob:
             print "Spawned [%s] as pid %i" % (self.command, self.child.pid)
         
 # Spawn subprocesses for each of the given commands, up to
-# max_children.  Return a list of subprocess.Popen objects
-def spawn_children(commands, max_children, verbose=False):
-    procs = []
-    while len(procs) < max_children and len(commands) > 0:
-        commands[0].spawn_child()
-        procs.append(commands[0])
-        del commands[0]
+# max_children.  Returns two lists of MirrorJob objects, one
+# containing the running jobs, and one containing jobs that
+# were not spawned for some reason.
+def spawn_children(commands, running_jobs, max_children, verbose=False):
+    procs = running_jobs
+    skipped_jobs = []
+    # while len(procs) < max_children and len(commands) > 0:
+    for i in range(0, len(commands)):
+        if(len(procs) >= max_children or
+           check_dup_jobs(commands[i], running_jobs)):
+               skipped_jobs.append(commands[i])
+        else:
+            commands[i].spawn_child()
+            procs.append(commands[i])
     if verbose:
-        print "Spawned %i processes, %i pending" % ( len(procs), len(commands) )
-    return procs
+        print "Spawned %i processes, %i pending" % ( len(procs), len(skipped_jobs) )
+    return (procs, skipped_jobs)
+
+# Check to see if a running job already exists for the
+# given host/repo pair.  Returns boolean
+def check_dup_jobs(job, running_jobs):
+    for cur in running_jobs:
+        if(job.host == cur.host and
+           job.path == cur.path):
+            return True
+    return False
 
 # check each child process, gather any output, 
 def reap_children(jobs, verbose=False):
@@ -165,9 +181,9 @@ def main():
     while True:
         pending_jobs = pending_jobs + get_more_commands(dir, cfg, verbose)
         running_jobs = reap_children(running_jobs, verbose)
-        running_jobs = running_jobs + spawn_children(pending_jobs, 
-                                                     maxchildren - len(running_jobs), 
-                                                     verbose)
+        (running_jobs, pending_jobs) = spawn_children(pending_jobs, running_jobs,
+                                                                     maxchildren - len(running_jobs), 
+                                                                     verbose)
         sleep(1)
 
 if __name__ == "__main__":
