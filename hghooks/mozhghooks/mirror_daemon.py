@@ -166,7 +166,7 @@ def get_config_key(config, path):
         return None
 
 def main():
-    exit_requested = False
+    global exit_requested
     running_jobs = []
     pending_jobs = []
     configfile = "/etc/mercurial/repo-mirrors.yaml"
