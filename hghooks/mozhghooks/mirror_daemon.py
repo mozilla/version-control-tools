@@ -24,8 +24,11 @@ from time import sleep
 import urllib
 import shlex
 import yaml
+import signal
 
 random.seed()
+# Set by signal handlers:
+exit_requested = False
 
 class MirrorJob:
     def __init__(self, host, path, config, fh, verbose=False):
@@ -163,6 +166,7 @@ def get_config_key(config, path):
         return None
 
 def main():
+    exit_requested = False
     running_jobs = []
     pending_jobs = []
     configfile = "/etc/mercurial/repo-mirrors.yaml"
@@ -178,13 +182,30 @@ def main():
     if not maxchildren:
         maxchildren = 3
 
+    def sighandler(signum, frame):
+        print "Caught signal %i" % signum
+        global exit_requested
+        exit_requested = True
+        if(len(running_jobs) > 0 or len(pending_jobs) > 0):
+            print "WARNING: There are %i running jobs and %i queued jobs" % (len(running_jobs), 
+                                                                             len(pending_jobs))
+            print "WARNING: To ensure a clean exit, will terminate after the queue is emptied"
+
+    signal.signal(signal.SIGTERM, sighandler)
+
     while True:
-        pending_jobs = pending_jobs + get_more_commands(dir, cfg, verbose)
+        if not exit_requested:
+            pending_jobs = pending_jobs + get_more_commands(dir, cfg, verbose)
         running_jobs = reap_children(running_jobs, verbose)
         (running_jobs, pending_jobs) = spawn_children(pending_jobs, running_jobs,
-                                                                     maxchildren - len(running_jobs), 
-                                                                     verbose)
+                                                      maxchildren - len(running_jobs), 
+                                                      verbose)
+        if(exit_requested and
+           len(running_jobs) == 0 and 
+           len(pending_jobs) == 0):
+            break
         sleep(1)
+    print "Exiting..."
 
 if __name__ == "__main__":
     main()
