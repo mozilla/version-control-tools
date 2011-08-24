@@ -38,6 +38,7 @@ thunderbirdTrees = {
   'comm-central': 'http://tinderbox.mozilla.org/ThunderbirdTrunk/status.html',
   'comm-aurora' : 'http://tinderbox.mozilla.org/Thunderbird-Aurora/status.html',
   'comm-beta'   : 'http://tinderbox.mozilla.org/Thunderbird-Beta/status.html',
+  'comm-release': 'http://tinderbox.mozilla.org/Thunderbird-Release/status.html',
   'comm-miramar': 'http://tinderbox.mozilla.org/Miramar/status.html',
   # Point at SeaMonkey as we don't use this one
   'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
