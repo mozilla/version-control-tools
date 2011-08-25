@@ -274,6 +274,13 @@ def get_cookies_from_profile(ui, profile, bugzilla):
         tempdir = tempfile.mkdtemp()
         tempcookies = os.path.join(tempdir, "cookies.sqlite")
         shutil.copyfile(cookies, tempcookies)
+        # Firefox uses sqlite's WAL feature, which bumps the sqlite
+        # version number. Older sqlites will refuse to open the db,
+        # but the actual format is the same (just the journalling is different).
+        # Patch the file to give it an older version number so we can open it.
+        with open(tempcookies, 'r+b') as f:
+            f.seek(18, 0)
+            f.write("\x01\x01")
         conn = sqlite3.connect(tempcookies)
         login = conn.execute("select value from moz_cookies where name = 'Bugzilla_login' and (host = ? or host = ?)", (host, "." + host)).fetchone()[0]
         cookie = conn.execute("select value from moz_cookies where name = 'Bugzilla_logincookie' and (host = ? or host= ?)", (host, "." + host)).fetchone()[0]
