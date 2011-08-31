@@ -65,12 +65,14 @@ src=${REPO_ROOT}/$name
 
 cd $REPO_TARGET || die "$REPO_TARGET does not exist, cannot create repositories there"
 
+exit_code=0
 if [ -d "$name" ]; then
     echo "$name already exists, pulling"
     lockf="${PWD}/${name}.lck"
     lockfile -r $LOCK_RETRIES $lockf || die "Could not lock destination"
     cd $name
     hg pull $GLOBAL_HG_OPTS 
+    exit_code=$?
     rm -f $lockf
 elif [ \! -e $name ]; then
     mkdir -p `dirname $name` 
@@ -78,11 +80,13 @@ elif [ \! -e $name ]; then
     lockf="${PWD}/${name}.lck" || die "Could not lock destination"
     lockfile -r $LOCK_RETRIES $lockf
     hg clone $GLOBAL_HG_OPTS -U -v "$src" $name
+    exit_code=$?
     rm -f $lockf
 else
     die "WTF is $REPO_TARGET/$name"
 fi
 
+exit $exit_code
 
 # Local variables:
 # mode: shell-script
