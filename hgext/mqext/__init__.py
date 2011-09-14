@@ -64,7 +64,7 @@ import os
 from subprocess import call, check_call
 import errno
 from mercurial.node import hex, nullrev, nullid, short
-from mercurial import commands, util, cmdutil, mdiff, error
+from mercurial import commands, util, cmdutil, mdiff, error, url
 from mercurial.patch import diffstatdata
 from hgext import mq
 import StringIO
