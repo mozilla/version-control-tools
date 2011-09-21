@@ -68,12 +68,15 @@ def hook(ui, repo, **kwargs):
 
             print "But you included the magic words.  Hope you had permission!"
             return 0
-        elif re.compile('<span id="treestatus".*APPROVAL REQUIRED.*<span id="extended-status">').search(text) :
+        elif re.compile('<span id="tree-?status".*APPROVAL REQUIRED.*<span id="extended-status">').search(text) :
             # Block the push unless they have approval
             if re.search('a\S*=', repo.changectx('tip').description().lower()) :
                 return 0
 
             print "Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)"
+            return 1
+        elif not re.compile('<span id="tree-?status".*<span id="extended-status">').search(text):
+            print "The extended status span must be on the same line as the treestatus."
             return 1
             
     except IOError, (err):

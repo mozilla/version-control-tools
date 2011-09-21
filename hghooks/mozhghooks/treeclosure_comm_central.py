@@ -119,6 +119,10 @@ def checkTreeState(repo, repoName, treeName, treeUrl):
         # And block the push
         return 1
 
+    elif not re.compile('<span id="tree-?status".*<span id="extended-status">').search(text):
+        print "The extended status span must be on the same line as the treestatus."
+        return 1
+
     # By default the tree is open
     return 0
 
