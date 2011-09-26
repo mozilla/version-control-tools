@@ -62,9 +62,9 @@ seamonkeyTrees = {
 calendarTrees = {
   'comm-central': 'http://tinderbox.mozilla.org/CalendarTrunk/status.html',
   # Point at Thunderbird for now
-  'comm-aurora' : 'http://tinderbox.mozilla.org/Thunderbird-Aurora/status.html',
+  'comm-aurora' : 'http://tinderbox.mozilla.org/Calendar-Aurora/status.html',
   # Point at Thunderbird for now
-  'comm-beta'   : 'http://tinderbox.mozilla.org/Thunderbird-Beta/status.html',
+  'comm-beta'   : 'http://tinderbox.mozilla.org/Calendar-Beta/status.html',
   'comm-miramar': 'http://tinderbox.mozilla.org/Calendar1.0/status.html',
   # Point at SeaMonkey as Calendar don't use this one
   'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
