@@ -12,6 +12,8 @@ Commands not related to mq:
 
   :lineage: Dump out the revision history leading up to a particular revision
   :reviewers: Suggest potential reviewers for a patch
+  :bugs: Display the bugs that have touched the same files as a patch
+  :components: Suggest a potential component for a patch
 
 Autocommit:
 
@@ -65,6 +67,10 @@ from hgext import mq
 import StringIO
 import re
 from collections import Counter
+import json
+import urllib2
+
+bugzilla_jsonrpc_url = "https://bugzilla.mozilla.org/jsonrpc.cgi"
 
 def qshow(ui, repo, patch=None, **opts):
     '''display a patch
@@ -138,6 +144,80 @@ def lineage(ui, repo, rev='.', limit=None, stop=None, **opts):
         current = parents[0]
         n += 1
 
+def patch_changes(ui, repo, patchfile=None, **opts):
+    '''Given a patch, look at what files it changes, and map a function over
+    the changesets that touch overlapping files.
+
+    Scan through the last LIMIT commits to find the relevant changesets
+
+    The patch may be given as a file or a URL. If no patch is specified,
+    the changes in the working directory will be used. If there are no
+    changes, the topmost applied patch in your mq repository will be used.
+
+    Alternatively, the -f option may be used to pass in one or more files
+    that will be used directly.
+    '''
+
+    changes = {}
+
+    if 'filename' in opts:
+        changedFiles = opts['filename']
+    else:
+        if patchfile is None:
+            # we should use the current diff, or if that is empty, the top
+            # applied patch in the patch queue
+            ui.pushbuffer()
+            commands.diff(ui, repo, git=True)
+            diff = ui.popbuffer()
+            changedFiles = fileRe.findall(diff)
+            if len(changedFiles) > 0:
+                source = "current diff"
+            elif repo.mq and repo.mq.qrepo():
+                source = "top patch in mq queue"
+                ui.pushbuffer()
+                commands.diff(ui, repo, change="qtip", git=True)
+                diff = ui.popbuffer()
+            else:
+                raise util.Abort("no changes found")
+        else:
+            try:
+                diff = url.open(ui, patchfile).read()
+                source = "patch file %s" % patchfile
+            except IOError, e:
+                q = repo.mq
+                if q:
+                    diff = url.open(ui, q.join(patchfile)).read()
+                    source = "mq patch %s" % patchfile
+                else:
+                    pass
+
+        changedFiles = fileRe.findall(diff)
+        if ui.verbose:
+            ui.write("Patch source: %s\n" % source)
+
+    for changedFile in changedFiles:
+        changes[changedFile] = []
+
+    limit = opts['limit']
+    if limit == 0 or len(repo) < limit:
+        start = 1
+    else:
+        start = len(repo) - limit
+
+    for revNum in xrange(start, len(repo)):
+        ui.progress("scanning revisions", revNum - start, item=revNum,
+                    total=len(repo) - start)
+        rev = repo[revNum]
+        for file in changedFiles:
+            if file in rev.files():
+                changes[file].append(rev)
+
+    ui.progress("scanning revisions", None)
+
+    for file in changes:
+        for change in changes[file]:
+            yield change
+
 fileRe = re.compile(r"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
 suckerRe = re.compile(r"[^s-]r=(\w+)")
 supersuckerRe = re.compile(r"sr=(\w+)")
@@ -165,58 +245,11 @@ def reviewers(ui, repo, patchfile=None, **opts):
         reviewer = reviewer.lower()
         return ui.config('reviewers', reviewer, reviewer)
 
-    changes = {}
-
-    if 'filename' in opts:
-        changedFiles = opts['filename']
-    else:
-        if patchfile is None:
-            # we should use the current diff, or if that is empty, the top
-            # applied patch in the patch queue
-            ui.pushbuffer()
-            commands.diff(ui, repo, git=True)
-            diff = ui.popbuffer()
-            changedFiles = fileRe.findall(diff)
-            if len(changedFiles) > 0:
-                source = "current diff"
-            elif repo.mq and repo.mq.qrepo():
-                source = "top patch in mq queue"
-                ui.pushbuffer()
-                commands.diff(ui, repo, change="qtip", git=True)
-                diff = ui.popbuffer()
-            else:
-                raise util.Abort("no changes found")
-        else:
-            diff = url.open(ui, patchfile).read()
-            source = "patch file %s" % patchfile
-
-        changedFiles = fileRe.findall(diff)
-        if ui.verbose:
-            ui.write("Patch source: %s\n" % source)
-
-    for changedFile in changedFiles:
-        changes[changedFile] = []
-
-    limit = opts['limit']
-    if limit == 0 or len(repo) < limit:
-        start = 1
-    else:
-        start = len(repo) - limit
-
-    for revNum in xrange(start, len(repo)):
-        ui.progress("scanning revisions", revNum - start, item=revNum,
-                    total=len(repo) - start)
-        rev = repo[revNum]
-        for file in changedFiles:
-            if file in rev.files():
-                changes[file].append(rev)
-
     suckers = Counter()
     supersuckers = Counter()
-    for file in changes:
-        for change in changes[file]:
-            suckers.update(canon(x) for x in suckerRe.findall(change.description()))
-            supersuckers.update(canon(x) for x in supersuckerRe.findall(change.description()))
+    for change in patch_changes(ui, repo, patchfile, **opts):
+        suckers.update(canon(x) for x in suckerRe.findall(change.description()))
+        supersuckers.update(canon(x) for x in supersuckerRe.findall(change.description()))
 
     ui.write("Potential reviewers:\n")
     if (len(suckers) == 0):
@@ -233,6 +266,126 @@ def reviewers(ui, repo, patchfile=None, **opts):
         for (reviewer, count) in supersuckers.most_common(10):
             ui.write("  %s: %d\n" % (reviewer, count))
  
+# This is stolen from bzexport.py, which stole it from buglink.py
+# Tweaked slightly to avoid grabbing bug numbers from the beginning of SHA-1s
+bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
+                        # a standalone sequence of numbers
+                     (
+                        (?:
+                          bug |
+                          b= |
+                          # a sequence of 5+ numbers preceded by whitespace
+                          (?=\b\#?\d{5,}\b) |
+                          # numbers at the very beginning
+                          ^(?=\d+\b)
+                        )
+                        (?:\s*\#?)(\d+)
+                     )''', re.I | re.X)
+
+def fetch_bugs(url, ui, bugs):
+    data = json.dumps({
+            "method": "Bug.get",
+            "id": 1,
+            "permissive": True,
+            "include_fields": ["id", "url", "summary", "component", "product" ],
+            "params": [{ "ids": list(bugs) }]
+    })
+
+    req = urllib2.Request(url,
+                          data,
+                          { "Accept": "application/json",
+                           "Content-Type": "application/json"})
+
+    conn = urllib2.urlopen(req)
+    if ui.verbose:
+        ui.write("fetched %s for bugs %s\n" % (conn.geturl(), ",".join(bugs)))
+    try:
+        buginfo = json.load(conn)
+    except Exception, e:
+        pass
+
+    if buginfo.get('result', None) is None:
+        if 'error' in buginfo:
+            m = re.search(r'Bug #(\d+) does not exist', buginfo['error']['message'])
+            if m:
+                if ui.verbose:
+                    ui.write("  dropping out nonexistent bug %s\n" % m.group(1))
+                bugs.remove(m.group(1))
+                return fetch_bugs(url, ui, bugs)
+
+        ui.write("Failed to retrieve bugs\n")
+        ui.write("buginfo: %r\n" % buginfo)
+        return
+
+    return buginfo['result']['bugs']
+
+def bzcomponent(ui, repo, patchfile=None, **opts):
+    '''Suggest a bugzilla product and component for a patch
+
+    Scan through the last LIMIT commits to find bug product/components that
+    touch the same files.
+
+    The patch may be given as a file or a URL. If no patch is specified,
+    the changes in the working directory will be used. If there are no
+    changes, the topmost applied patch in your mq repository will be used.
+
+    Alternatively, the -f option may be used to pass in one or more files
+    that will be used to infer the component instead.
+    '''
+
+    bugs = set()
+    for change in patch_changes(ui, repo, patchfile, **opts):
+        m = bug_re.search(change.description())
+        if m:
+            bugs.add(m.group(2))
+
+    components = Counter()
+    url = ui.config('bugzilla', 'jsonrpc-url', None)
+    if url is None:
+        url = ui.config('bugzilla', 'url', None)
+        if url is None:
+            url = bugzilla_jsonrpc_url
+        else:
+            url = "%s/jsonrpc.cgi" % url
+
+    for b in fetch_bugs(url, ui, bugs):
+        comp = "%s/%s" % (b['product'], b['component'])
+        if ui.verbose:
+            ui.write("bug %s: %s\n" % (b['id'], comp))
+        components.update([comp])
+
+    ui.write("Potential components:\n")
+    if len(components) == 0:
+        ui.write("  none found in range (try higher --limit?)\n")
+    else:
+        for (comp, count) in components.most_common(5):
+            ui.write("  %s: %d\n" % (comp, count))
+
+def bzbugs(ui, repo, patchfile=None, **opts):
+    '''List the bugs that have modified the files in a patch
+
+    Scan through the last LIMIT commits to find bugs that touch the same files.
+
+    The patch may be given as a file or a URL. If no patch is specified,
+    the changes in the working directory will be used. If there are no
+    changes, the topmost applied patch in your mq repository will be used.
+
+    Alternatively, the -f option may be used to pass in one or more files
+    that will be used instead.
+    '''
+
+    bugs = set()
+    for change in patch_changes(ui, repo, patchfile, **opts):
+        m = bug_re.search(change.description())
+        if m:
+            bugs.add(m.group(2))
+
+    if bugs:
+        for bug in bugs:
+            ui.write("bug %s\n" % bug)
+    else:
+        ui.write("No bugs found\n")
+
 def touched(ui, repo, sourcefile=None, **opts):
     '''Show what files are touched by what patches
 
@@ -460,6 +613,20 @@ cmdtable = {
           ('l', 'limit', 10000, 'How many revisions back to scan', 'LIMIT')
           ],
          ('hg reviewers [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
+
+    'bugs':
+        (bzbugs,
+         [('f', 'file', [], 'See components for FILE', 'FILE'),
+          ('l', 'limit', 10000, 'How many revisions back to scan', 'LIMIT')
+          ],
+         ('hg bugs [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
+
+    'components':
+        (bzcomponent,
+         [('f', 'file', [], 'See components for FILE', 'FILE'),
+          ('l', 'limit', 10000, 'How many revisions back to scan', 'LIMIT')
+          ],
+         ('hg components [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
     'qtouched':
         (touched,

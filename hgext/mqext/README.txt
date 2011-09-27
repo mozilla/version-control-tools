@@ -13,6 +13,8 @@ Commands not related to mq:
 
   :lineage: Dump out the revision history leading up to a particular revision
   :reviewers: Suggest potential reviewers for a patch
+  :bugs: Display the bugs that have touched the same files as a patch
+  :components: Suggest a potential component for a patch
 
 Autocommit:
 
