@@ -7,7 +7,6 @@ Modify Mercurial's MQ extension by altering several commands and adding a few mo
 Commands added:
 
   :qshow: Display a single patch (similar to 'export')
-  :qexport: Write all patches to an output directory, with minor renaming
   :qtouched: See what patches modify which files
 
 Commands not related to mq:
