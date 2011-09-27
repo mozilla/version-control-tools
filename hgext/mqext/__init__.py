@@ -6,7 +6,6 @@ upstream project. I just haven't gotten around to it.
 Commands added:
 
   :qshow: Display a single patch (similar to 'export')
-  :qexport: Write all patches to an output directory, with minor renaming
   :qtouched: See what patches modify which files
 
 Commands not related to mq:
@@ -55,10 +54,6 @@ the -Q option to all relevant commands in your ~/.hgrc::
 # [ ] Make 'show' dispatch to export?diff? for eg --stat
 #     - Hmm. No. export is all about generating a patch from adjacent revisions
 #       We already have a patch.
-# [ ] Make qexport rediff with new options (eg -U 8)
-#     - For this, dispatching to export would make a lot of sense, but I guess
-#       I'd have to restrict it to applied patches then (b/c I don't really
-#       want to construct the revs to feed to export by applying patches...)
 
 import os
 from subprocess import call, check_call
@@ -100,46 +95,6 @@ def qshow(ui, repo, patch=None, **opts):
             ui.write(file(q.join(patch)).read())
         except:
             ui.write("Invalid patch name '%s'\n" % (patch,))
-
-# TODO: I would really like to be able to export with a different
-# amount of context than is stored in the patch. (I'd like to store
-# less context so that the patches are more likely to apply, but
-# export with more context to make reviews easier)
-#
-# Without that feature, I'm not sure this command is useful. Your
-# patches are already stored in a directory.
-def qexport(ui, repo, outdir, **opts):
-    '''Save all applied patches into a directory'''
-
-    try:
-        os.mkdir(outdir)
-    except OSError, inst:
-        if inst.errno != errno.EEXIST:
-            raise
-
-    suffix = ''
-    if opts['extension']:
-        suffix += '.' + opts['extension']
-    if opts['patch']:
-        suffix += '.patch'
-
-    q = repo.mq
-
-    n = 0
-    numlen = len(str(len(q.applied)))
-
-    for p in q.applied:
-        stem = p.name + suffix
-        if opts['numbered']:
-            stem = (('%0' + str(numlen) + 'd-') % n) + stem
-        n += 1
-        filename = os.path.join(outdir, stem)
-
-        # This should really call p.export(...) instead of writing the
-        # file directly...
-        open(filename, 'w').write(file(q.join(p.name)).read())
-        if ui.verbose:
-            ui.write("Wrote %s\n" % filename)
 
 def lineage(ui, repo, rev='.', limit=None, stop=None, **opts):
     '''Show ancestors of a revision'''
@@ -490,15 +445,6 @@ cmdtable = {
               [('', 'stat', None, 'output diffstat-style summary of changes'),
                ],
               ('hg qshow [patch]')),
-
-    'qexport':
-        (qexport,
-         [('p', 'patch', None, 'add .patch suffix to exported patches'),
-          ('e', 'extension', '', 'append .EXTENSION to exported patches'),
-          ('n', 'numbered', None, 'prefix patch names with order numbers'),
-          ('d', 'outdir', '/tmp/patches', 'directory to write patches into'),
-          ],
-         ('hg qexport [-p] [-e EXTENSION] [-n]')),
 
     'lineage':
         (lineage,
