@@ -551,6 +551,123 @@ class TestTryMandatoryHook(ClosureHookTestHelpers, unittest.TestCase):
     self.assertEqual(result, 0)
 
 
+class TestCommitMessageHook(unittest.TestCase):
+  def setUp(self):
+    self.ui = ui.ui()
+    self.ui.quiet = True
+    self.ui.verbose = False
+    self.repodir = mkdtemp(prefix="hg-TestCommitMessageHook")
+    init(self.ui, dest=self.repodir)
+    addHook(self.repodir, "commit-message.hook")
+    self.repo = hg.repository(self.ui, self.repodir)
+    self.clonedir = mkdtemp(prefix="hg-test")
+    clone(self.ui, self.repo, self.clonedir)
+    self.clonerepo = hg.repository(self.ui, self.clonedir)
+    
+  def tearDown(self):
+    shutil.rmtree(self.repodir)
+    shutil.rmtree(self.clonedir)
+    
+  def testWithBug(self):
+    """ Every test should have bug # like "Bug 111", "Bug #111" or "b=111". """
+
+    ui = self.ui
+    messages = [
+      "Bug 603517 - Enable mochitest to optionally run in loops without restarting the browser r=ctalbert",
+      "Bug #123456 - add test",
+      "b=630117, rename typed array slice() -> subset(); r=jwalden, a=block"
+      "ARM assembler tweaks. (b=588021, r=cdleary)"
+    ]
+
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(ui, self.clonerepo, join(self.clonedir, "testfile"))
+    for message in messages:
+      commit(ui, self.clonerepo, message=message)
+
+    result = push(ui, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+
+  def testBackout(self):
+    """ Test different ways of spelling backout (and revert). """
+
+    ui = self.ui
+    messages = [
+      "Backed out changeset 593d94e9492e",
+      "Backout changesets 9e4ab3907b29, 3abc0dbbf710 due to m-oth permaorange",
+      "Backout of 35a679df430b due to bustage",
+      "backout 68941:5b8ade677818", # including the local numeric ID is silly but harmless
+      
+      # we do not have a lot of reverts "hg log | grep revert" without a bug #
+      "Revert to changeset a87ee7550f6a due to incomplete backout" 
+    ]
+    
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(ui, self.clonerepo, join(self.clonedir, "testfile"))
+    for message in messages:
+      commit(ui, self.clonerepo, message=message)
+    result = push(ui, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+    
+  def testSpecial(self):
+    """ Test some special stuff like "no bug", "add tag" or "update nanojit-import-rev stamp". """
+
+    ui = self.ui
+    messages = [
+      "Added tag AURORA_BASE_20110412 for changeset a95d42642281",
+      "Fix typo in comment within nsFrame.cpp (no bug) rs=dbaron DONTBUILD",
+      "Fix ARM assert (no bug, r=cdleary).",
+      "Backout 3b59c196aaf9 - no bug # in commit message"
+    ]
+
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(ui, self.clonerepo, join(self.clonedir, "testfile"))
+    for message in messages:
+      commit(ui, self.clonerepo, message=message)
+    result = push(ui, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+
+  bad = [
+    "Mass revert m-i to the last known good state",
+    "update revision of Add-on SDK tests to latest tip; test-only",
+    "Fix stupid bug in foo::bar()",
+    "First line does not have a bug number\n\nbug 123456",
+    "imported patch phishingfixes",
+    "imported patch 441197-1",
+    "Back out Dao's push because of build bustage",
+    "Bump mozilla-central version numbers for the next release on a CLOSED TREE.",
+    "Bump Sync version to 1.9.0. r=me",
+    "checkin 1 try: -b do -p all"
+  ]
+
+  def testShouldFail(self):
+    """ Some commit messages that should explicitly not pass anymore. """
+
+    ui = self.ui
+    
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(ui, self.clonerepo, join(self.clonedir, "testfile"))
+    
+    for message in self.bad:
+      appendFile(join(self.clonedir, "testfile"), "checkin 1")
+      commit(ui, self.clonerepo, message=message)
+      self.assertRaises(util.Abort, push, ui, self.clonerepo, dest=self.repodir)
+      
+  def testIgnore(self):
+    """ Test that IGNORE BAD COMMIT MESSAGES works """
+    ui = self.ui
+    
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(ui, self.clonerepo, join(self.clonedir, "testfile"))
+    
+    for message in self.bad:
+      appendFile(join(self.clonedir, "testfile"), "checkin 1")
+      commit(ui, self.clonerepo, message=message)
+    
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    commit(ui, self.clonerepo, message="IGNORE BAD COMMIT MESSAGES")
+
+    result = push(ui, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
 
 if __name__ == '__main__':
   unittest.main()
