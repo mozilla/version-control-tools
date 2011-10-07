@@ -92,6 +92,12 @@ def qshow(ui, repo, patch=None, **opts):
     except:
         pass
 
+# Problem 1: topmost applied patch has no children; want . instead
+# Problem 2: unapplied patches
+#    opts['revs'] = '"%s":children("%s")' % (patch, patch)
+#    ui.write("Running diff(ui,repo,%r)\n" % opts)
+#    commands.diff(ui, repo, **opts)
+
     # This should probably dispatch to export, so that all of its options could
     # be used. (Unapplied patches would still be a problem...)
     if opts['stat']:
@@ -160,8 +166,8 @@ def patch_changes(ui, repo, patchfile=None, **opts):
 
     changes = {}
 
-    if 'filename' in opts:
-        changedFiles = opts['filename']
+    if opts['file']:
+        changedFiles = opts['file']
     else:
         if patchfile is None:
             # we should use the current diff, or if that is empty, the top
@@ -194,9 +200,18 @@ def patch_changes(ui, repo, patchfile=None, **opts):
         changedFiles = fileRe.findall(diff)
         if ui.verbose:
             ui.write("Patch source: %s\n" % source)
+        if len(changedFiles) == 0:
+            ui.write("Warning: no modified files found in patch. Did you mean to use the -f option?\n")
+
+    if ui.verbose:
+        ui.write("Using files:\n")
+        if len(changedFiles) == 0:
+            ui.write("  (none)\n")
 
     for changedFile in changedFiles:
         changes[changedFile] = []
+        if ui.verbose:
+            ui.write("  %s\n" % changedFile)
 
     limit = opts['limit']
     if limit == 0 or len(repo) < limit:
@@ -319,7 +334,7 @@ def fetch_bugs(url, ui, bugs):
 
     return buginfo['result']['bugs']
 
-def bzcomponent(ui, repo, patchfile=None, **opts):
+def bzcomponents(ui, repo, patchfile=None, **opts):
     '''Suggest a bugzilla product and component for a patch
 
     Scan through the last LIMIT commits to find bug product/components that
@@ -622,7 +637,7 @@ cmdtable = {
          ('hg bugs [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
     'components':
-        (bzcomponent,
+        (bzcomponents,
          [('f', 'file', [], 'See components for FILE', 'FILE'),
           ('l', 'limit', 10000, 'How many revisions back to scan', 'LIMIT')
           ],
