@@ -64,7 +64,6 @@ from mercurial.node import hex, nullrev, nullid, short
 from mercurial import commands, util, cmdutil, mdiff, error, url
 from mercurial.patch import diffstatdata
 from hgext import mq
-import StringIO
 import re
 from collections import Counter
 import json
@@ -467,14 +466,14 @@ def qrefresh_wrapper(self, repo, *pats, **opts):
     diffstat = ""
     if mqcommit and mqmessage:
         if mqmessage.find("%s") != -1:
-            buffer = StringIO.StringIO()
-            m = cmdutil.match(repo, None, {})
-            diffopts = mdiff.diffopts()
-            cmdutil.diffordiffstat(self, repo, diffopts,
+            self.pushbuffer()
+            m = cmdutil.matchmod.match(repo.root, repo.getcwd(), [],
+                                       opts.get('include'), opts.get('exclude'),
+                                       'relpath', auditor=repo.auditor)
+            cmdutil.diffordiffstat(self, repo, mdiff.diffopts(),
                                    repo.dirstate.parents()[0], None, m,
-                                   stat=True, fp = buffer)
-            diffstat = buffer.getvalue()
-            buffer.close()
+                                   stat=True)
+            diffstat = self.popbuffer()
 
     mq.refresh(self, repo, *pats, **opts)
 
