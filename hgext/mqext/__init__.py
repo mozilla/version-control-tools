@@ -61,8 +61,7 @@ import os
 from subprocess import call, check_call
 import errno
 from mercurial.node import hex, nullrev, nullid, short
-from mercurial import commands, util, cmdutil, mdiff, error, url
-from mercurial.patch import diffstatdata
+from mercurial import commands, util, cmdutil, mdiff, error, url, patch
 from hgext import mq
 import re
 from collections import Counter
@@ -71,41 +70,28 @@ import urllib2
 
 bugzilla_jsonrpc_url = "https://bugzilla.mozilla.org/jsonrpc.cgi"
 
-def qshow(ui, repo, patch=None, **opts):
+def qshow(ui, repo, patchspec=None, **opts):
     '''display a patch
 
     If no patch is given, the top of the applied stack is shown.'''
     q = repo.mq
 
-    if patch is None:
-        try:
-            patch = q.applied[-1].name
-        except:
-            ui.write("No patches in series\n");
-            return
+    p = q.lookup(patchspec or 'qtip')
+    patchf = q.opener(p, "r")
 
-    # Try to interpret the patch as an index into the full stack
-    try:
-        idx = int(patch)
-        patch = q.series[idx]
-    except:
-        pass
-
-# Problem 1: topmost applied patch has no children; want . instead
-# Problem 2: unapplied patches
-#    opts['revs'] = '"%s":children("%s")' % (patch, patch)
-#    ui.write("Running diff(ui,repo,%r)\n" % opts)
-#    commands.diff(ui, repo, **opts)
-
-    # This should probably dispatch to export, so that all of its options could
-    # be used. (Unapplied patches would still be a problem...)
     if opts['stat']:
-        check_call(["diffstat", "-p1", q.join(patch)])
+        del opts['stat']
+        lines = patch.diffstatui(patchf, **opts)
     else:
-        try:
-            ui.write(file(q.join(patch)).read())
-        except:
-            ui.write("Invalid patch name '%s'\n" % (patch,))
+        s = patch.split(patchf)
+        def singlefile(*a, **b):
+            return patchf
+        lines = patch.difflabel(singlefile, **opts)
+
+    for chunk, label in lines:
+        ui.write(chunk, label=label)
+
+    patchf.close()
 
 def lineage(ui, repo, rev='.', limit=None, stop=None, **opts):
     '''Show ancestors of a revision'''
@@ -191,7 +177,7 @@ def patch_changes(ui, repo, patchfile=None, **opts):
             except IOError, e:
                 q = repo.mq
                 if q:
-                    diff = url.open(ui, q.join(patchfile)).read()
+                    diff = url.open(ui, q.lookup(patchfile)).read()
                     source = "mq patch %s" % patchfile
                 else:
                     pass
@@ -421,13 +407,13 @@ def touched(ui, repo, sourcefile=None, **opts):
     else:
         patches = q.series
 
-    for patch in [ q.lookup(p) for p in patches ]:
-        lines = file(q.join(patch)).read().splitlines()
-        for filename, adds, removes, isbinary in diffstatdata(lines):
+    for patchname in [ q.lookup(p) for p in patches ]:
+        lines = q.opener(patchname)
+        for filename, adds, removes, isbinary in patch.diffstatdata(lines):
             if sourcefile is None:
-                ui.write(patch + "\t" + filename + "\n")
+                ui.write(patchname + "\t" + filename + "\n")
             elif sourcefile == filename:
-                ui.write(patch + "\n")
+                ui.write(patchname + "\n")
 
 def mqcommit_info(ui, repo, opts):
     mqcommit = opts.pop('mqcommit', None)
