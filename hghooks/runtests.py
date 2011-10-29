@@ -550,7 +550,6 @@ class TestTryMandatoryHook(ClosureHookTestHelpers, unittest.TestCase):
     result = push(u, self.clonerepo, dest=self.repodir)
     self.assertEqual(result, 0)
 
-
 class TestCommitMessageHook(unittest.TestCase):
   def setUp(self):
     self.ui = ui.ui()
@@ -650,6 +649,7 @@ class TestCommitMessageHook(unittest.TestCase):
     for message in self.bad:
       appendFile(join(self.clonedir, "testfile"), "checkin 1")
       commit(ui, self.clonerepo, message=message)
+      print message
       self.assertRaises(util.Abort, push, ui, self.clonerepo, dest=self.repodir)
       
   def testIgnore(self):

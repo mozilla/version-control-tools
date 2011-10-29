@@ -22,7 +22,7 @@ from mercurial.node import hex
 
 # Before enabling this hook on mozilla-central (and feeder repos), this should be
 # set to a date in the near future.
-DATE_HOOK_ENABLED = time.mktime(datetime.datetime(2011, 3, 1).timetuple()) # March 2011 (CHANGE ME)
+DATE_HOOK_ENABLED = time.mktime(datetime.datetime(2011, 10, 01).timetuple()) # October 2011 (CHANGE ME)
 
 goodMessage = [re.compile(x, re.I) for x in [
     r'bug\s+\#?[0-9]+',
@@ -37,7 +37,8 @@ goodMessage = [re.compile(x, re.I) for x in [
 
 def isGoodMessage(c):
     def message(fmt):
-        print fmt.format(rev = hex(c.node())[:12])
+        #print fmt.format(rev = hex(c.node())[:12]) Disabled for python 2.4
+        print fmt.replace('{rev}', hex(c.node())[:12])
         print c.user()
         print c.description()
         print ""
@@ -96,6 +97,6 @@ def hook(ui, repo, node, hooktype, **kwargs):
     # We want to allow using this hook locally
     if hooktype == "pretxnchangegroup":
         return 1
-    
+
     print "This changeset would have been rejected!"
     return 0 # to fail not warn change to 1
