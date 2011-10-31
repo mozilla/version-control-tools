@@ -21,6 +21,7 @@ import os.path
 import re
 
 hgNameToTinderboxURL = {
+    'birch'          : 'http://tinderbox.mozilla.org/Birch/status.html',
     'mozilla-aurora'  : 'http://tinderbox.mozilla.org/Mozilla-Aurora/status.html',
     'mozilla-beta'  : 'http://tinderbox.mozilla.org/Mozilla-Beta/status.html',
     'mozilla-release'  : 'http://tinderbox.mozilla.org/Mozilla-Release/status.html',
