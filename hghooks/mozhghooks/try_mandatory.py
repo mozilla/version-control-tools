@@ -2,7 +2,7 @@
 
 import re
 
-chooserUrl = 'http://people.mozilla.org/~lsblakk/trychooser/'
+chooserUrl = 'http://trychooser.pub.build.mozilla.org/'
 infoUrl = 'https://wiki.mozilla.org/Build:TryChooser'
 
 def hook(ui, repo, **kwargs):
