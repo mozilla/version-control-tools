@@ -68,6 +68,12 @@ from collections import Counter
 import json
 import urllib2
 
+try:
+    # hg 1.9+
+    from mercurial.scmutil import canonpath
+except:
+    from mercurial.util import canonpath
+
 bugzilla_jsonrpc_url = "https://bugzilla.mozilla.org/jsonrpc.cgi"
 
 def qshow(ui, repo, patchspec=None, **opts):
@@ -135,6 +141,10 @@ def lineage(ui, repo, rev='.', limit=None, stop=None, **opts):
         current = parents[0]
         n += 1
 
+def fullpaths(ui, repo, paths):
+    cwd = os.getcwd()
+    return [ canonpath(repo.root, cwd, path) for path in paths ]
+
 def patch_changes(ui, repo, patchfile=None, **opts):
     '''Given a patch, look at what files it changes, and map a function over
     the changesets that touch overlapping files.
@@ -152,7 +162,7 @@ def patch_changes(ui, repo, patchfile=None, **opts):
     changes = {}
 
     if opts['file']:
-        changedFiles = opts['file']
+        changedFiles = fullpaths(ui, repo, opts['file'])
     else:
         if patchfile is None:
             # we should use the current diff, or if that is empty, the top
