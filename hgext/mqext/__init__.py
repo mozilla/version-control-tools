@@ -455,8 +455,10 @@ def mqcommit_info(ui, repo, opts):
     return mqcommit, q, r
 
 # Monkeypatch qrefresh in mq command table
+# Oddity: The default value of the parameter is moved to here because it
+# contains a newline, which messes up the formatting of the help message
 def qrefresh_wrapper(self, repo, *pats, **opts):
-    mqmessage = opts.pop('mqmessage', None)
+    mqmessage = opts.pop('mqmessage', '%a: %p\n%s')
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
     diffstat = ""
@@ -576,7 +578,7 @@ def wrap_mq_function(orig, wrapper, newparams):
 wrap_mq_function(mq.refresh,
                  qrefresh_wrapper,
                  [('Q', 'mqcommit', None, 'commit change to patch queue'),
-                  ('M', 'mqmessage', '%a: %p\n%s', 'commit message for patch update')])
+                  ('M', 'mqmessage', None, 'commit message for patch update')])
 
 wrap_mq_function(mq.new,
                  qnew_wrapper,
