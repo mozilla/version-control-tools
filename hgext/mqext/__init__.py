@@ -458,7 +458,7 @@ def mqcommit_info(ui, repo, opts):
 # Oddity: The default value of the parameter is moved to here because it
 # contains a newline, which messes up the formatting of the help message
 def qrefresh_wrapper(self, repo, *pats, **opts):
-    mqmessage = opts.pop('mqmessage', '%a: %p\n%s')
+    mqmessage = opts.pop('mqmessage', '') or '%a: %p\n%s'
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
     diffstat = ""
