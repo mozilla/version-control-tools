@@ -578,7 +578,7 @@ def wrap_mq_function(orig, wrapper, newparams):
 wrap_mq_function(mq.refresh,
                  qrefresh_wrapper,
                  [('Q', 'mqcommit', None, 'commit change to patch queue'),
-                  ('M', 'mqmessage', None, 'commit message for patch update')])
+                  ('M', 'mqmessage', '', 'commit message for patch update')])
 
 wrap_mq_function(mq.new,
                  qnew_wrapper,
