@@ -173,7 +173,7 @@ def patch_changes(ui, repo, patchfile=None, **opts):
             changedFiles = fileRe.findall(diff)
             if len(changedFiles) > 0:
                 source = "current diff"
-            elif repo.mq and repo.mq.qrepo():
+            elif repo.mq:
                 source = "top patch in mq queue"
                 ui.pushbuffer()
                 commands.diff(ui, repo, change="qtip", git=True)
