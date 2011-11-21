@@ -176,7 +176,10 @@ def patch_changes(ui, repo, patchfile=None, **opts):
             elif repo.mq:
                 source = "top patch in mq queue"
                 ui.pushbuffer()
-                commands.diff(ui, repo, change="qtip", git=True)
+                try:
+                    commands.diff(ui, repo, change="qtip", git=True)
+                except error.RepoLookupError, e:
+                    raise util.Abort("no current diff, no mq patch to use")
                 diff = ui.popbuffer()
             else:
                 raise util.Abort("no changes found")
