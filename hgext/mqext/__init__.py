@@ -7,6 +7,7 @@ Commands added:
 
   :qshow: Display a single patch (similar to 'export')
   :qtouched: See what patches modify which files
+  :qbackout: Queue up a backout of a set of changesets
 
 Commands not related to mq:
 
@@ -60,8 +61,13 @@ the -Q option to all relevant commands in your ~/.hgrc::
 import os
 from subprocess import call, check_call
 import errno
+from mercurial.i18n import _
 from mercurial.node import hex, nullrev, nullid, short
 from mercurial import commands, util, cmdutil, mdiff, error, url, patch
+
+# For qbackout
+from mercurial import scmutil
+
 from hgext import mq
 import re
 from collections import Counter
@@ -399,6 +405,75 @@ def bzbugs(ui, repo, patchfile=None, **opts):
     else:
         ui.write("No bugs found\n")
 
+def qbackout(ui, repo, rev, **opts):
+    """backout a change or set of changes
+
+    qbackout creates a new patch or patches on top of any currently-applied
+    patches. If the -s/--single option is set, then all backed-out changesets
+    will be rolled up into a single backout changeset. Otherwise, there will
+    be one backout changeset queued up for each backed-out changeset.
+    """
+    q = repo.mq
+    if not opts.get('force'):
+        ui.status('checking for uncommitted changes\n')
+        cmdutil.bailifchanged(repo)
+
+    rev = scmutil.revrange(repo, rev)
+    if len(rev) == 0:
+        raise util.Abort('at least one revision required')
+
+    csets = map(lambda r: scmutil.revsingle(repo, r), rev)
+    csets.sort(reverse=True, key=lambda cset: cset.rev())
+
+    if opts.get('single') and opts.get('name') and len(rev) > 1:
+        raise util.Abort('option "-n" not valid when backing out multiple changes')
+
+    revert_opts = { 'date': None,
+                    'all': True,
+                    'no_backup': None,
+                  }
+    new_opts = opts.copy()
+    mq.setupheaderopts(ui, new_opts)
+
+    def bugs_suffix(bugs):
+        if len(bugs) == 0:
+            return ''
+        elif len(bugs) == 1:
+            return ' (bug ' + bugs.pop() + ')'
+        else:
+            return ' (' + ', '.join(map(lambda b: 'bug %s' % b, bugs)) + ')'
+
+    allbugs = set()
+    messages = []
+    for cset in csets:
+        bugs = set()
+        m = bug_re.search(cset.description())
+        if m:
+            bugs.add(m.group(2))
+        allbugs.update(bugs)
+        shortnode = short(cset.node())
+        ui.status('backing out %s\n' % shortnode)
+        p1, p2 = repo.changelog.parents(cset.node())
+        if p2 != nullid:
+            raise util.Abort('cannot backout a merge changeset')
+        revert_opts['rev'] = shortnode
+        commands.revert(ui, repo, **revert_opts)
+        msg = ('Backed out changeset %s' % shortnode) + bugs_suffix(bugs)
+        messages.append(msg)
+        if not opts.get('single'):
+            new_opts['message'] = messages[-1]
+            patchname = opts.get('name') or 'backout-%s' % shortnode
+            mq.new(ui, repo, patchname, **new_opts)
+            if ui.verbose:
+                ui.write("queued up patch %s\n" % patchname)
+
+    msg = ('Backed out %d changesets' % len(rev)) + bugs_suffix(allbugs) + '\n'
+    messages.insert(0, msg)
+    new_opts['message'] = "\n".join(messages)
+    if opts.get('single'):
+        patchname = opts.get('name') or 'backout-%d-changesets' % len(rev)
+        mq.new(ui, repo, patchname, **new_opts)
+
 def touched(ui, repo, sourcefile=None, **opts):
     '''Show what files are touched by what patches
 
@@ -616,37 +691,54 @@ cmdtable = {
 
     'lineage':
         (lineage,
-         [('r', 'rev', '.', 'Revision to start at', 'REV'),
-          ('l', 'limit', '', 'Max revisions to display', 'LIMIT'),
-          ('s', 'stop', '', 'Stop at this revision', 'REV'),
+         [('r', 'rev', '.', 'revision to start at', 'REV'),
+          ('l', 'limit', '', 'max revisions to display', 'LIMIT'),
+          ('s', 'stop', '', 'stop at this revision', 'REV'),
           ],
          ('hg lineage -r REV [-l LIMIT] [-s REV]')),
 
     'reviewers':
         (reviewers,
-         [('f', 'file', [], 'See reviewers for FILE', 'FILE'),
-          ('l', 'limit', 10000, 'How many revisions back to scan', 'LIMIT')
+         [('f', 'file', [], 'see reviewers for FILE', 'FILE'),
+          ('l', 'limit', 10000, 'how many revisions back to scan', 'LIMIT')
           ],
          ('hg reviewers [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
     'bugs':
         (bzbugs,
-         [('f', 'file', [], 'See components for FILE', 'FILE'),
-          ('l', 'limit', 10000, 'How many revisions back to scan', 'LIMIT')
+         [('f', 'file', [], 'see components for FILE', 'FILE'),
+          ('l', 'limit', 10000, 'how many revisions back to scan', 'LIMIT')
           ],
          ('hg bugs [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
     'components':
         (bzcomponents,
-         [('f', 'file', [], 'See components for FILE', 'FILE'),
-          ('l', 'limit', 10000, 'How many revisions back to scan', 'LIMIT')
+         [('f', 'file', [], 'see components for FILE', 'FILE'),
+          ('l', 'limit', 10000, 'how many revisions back to scan', 'LIMIT')
           ],
          ('hg components [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
     'qtouched':
         (touched,
-         [('a', 'applied', None, 'Only consider applied patches'),
-          ('p', 'patch', '', 'Restrict to given patch')
+         [('a', 'applied', None, 'only consider applied patches'),
+          ('p', 'patch', '', 'restrict to given patch')
           ],
          ('hg touched [-a] [-p PATCH] [FILE]')),
+
+    'qbackout':
+        (qbackout,
+         [('r', 'rev', [], _('revisions to backout')),
+          ('n', 'name', '', _('name of patch file'), _('NAME')),
+          ('s', 'single', None, _('fold all backed out changes into a single changeset')),
+          ('f', 'force', None, _('skip check for outstanding uncommitted changes')),
+          ('e', 'edit', None, _('edit commit messages')),
+          ('m', 'message', '', _('use text as commit message'), _('TEXT')),
+          ('U', 'currentuser', None, _('add "From: <current user>" to patch')),
+          ('u', 'user', '',
+           _('add "From: <USER>" to patch'), _('USER')),
+          ('D', 'currentdate', None, _('add "Date: <current date>" to patch')),
+          ('d', 'date', '',
+           _('add "Date: <DATE>" to patch'), _('DATE')),
+          ],
+         ('hg qbackout -r REVS [-f] [-n NAME] [qnew options]')),
 }
