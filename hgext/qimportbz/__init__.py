@@ -154,6 +154,13 @@ def extsetup(ui=None):
     # want which is bz:dddddd(/ddddd)?
     files = map(fixuppath, files)
 
+    # Remember where the next patch will be inserted into the series
+    try:
+      # hg 1.9+
+      insert = q.fullseriesend()
+    except:
+      insert = q.full_series_end()
+
     # Do the import as normal. The first patch of any bug is actually imported
     # and the rest are stored in the global delayed_imports. The imported
     # patches have dumb filenames because there's no way to tell mq to pick the
@@ -165,14 +172,25 @@ def extsetup(ui=None):
       # cache the lookup of the name. findcmd is not fast.
       qrename = cmdutil.findcmd("qrename", commands.table)[1][0]
 
-      # For all the already imported patches, rename them
+      # For all the already imported patches, rename them. Except there will
+      # only be one, since if the url resolves to multiple patches then
+      # everything but the first will go into bzhandler.delayed_imports.
       for (patch, path) in list(bzhandler.imported_patches):
-        oldpatchname = patch.id or patch.bug.num
+        # Find where qimport will have inserted the initial patch
+        try:
+          # hg 1.9+
+          oldpatchname = q.fullseries[insert]
+        except:
+          oldpatchname = q.full_series[insert]
+        insert += 1
         newpatchname = checkpatchname(patch)
         if newpatchname != oldpatchname:
           qrename(ui, repo, oldpatchname, newpatchname)
-          if ui.verbose:
-            ui.write("Renamed %s -> %s\n" % (oldpatchname, newpatchname))
+          # mq always reports the original name, which is confusing so we'll
+          # report the rename. But if ui.verbose is on, qrename will have
+          # already reported it.
+          if not ui.verbose:
+            ui.write("renamed %s -> %s\n" % (oldpatchname, newpatchname))
 
     # now process the delayed imports
 
