@@ -613,6 +613,8 @@ cmdtable = {
           ('e', 'edit-comment', None,
            'Open a text editor to specify a comment to add with the attachment.'),
           ('r', 'review', '',
-           'List of users to request review from (comma-separated search strings)')],
+           'List of users to request review from (comma-separated search strings)'),
+          # The following option is passed through directly to patch.diffopts
+          ('w', 'ignore_all_space', False, 'Generate a diff that ignores whitespace changes')],
         _('hg bzexport [options] [REV] [BUG]')),
 }
