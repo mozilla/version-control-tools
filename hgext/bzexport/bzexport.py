@@ -485,8 +485,12 @@ def bzexport(ui, repo, *args, **opts):
         patch.export(repo, [rev], fp=contents,
                      opts=diffopts)
 
-    # Just always use the rev name as the patch name. Doesn't matter much.
+    # Just always use the rev name as the patch name. Doesn't matter much,
+    # unless you want to avoid obsoleting existing patches when uploading a
+    # version that doesn't include whitespace changes.
     filename = rev
+    if opts['ignore_all_space']:
+        filename += "_ws"
 
     desc = opts['description'] or repo[rev].description()
     if desc.startswith('[mq]'):
