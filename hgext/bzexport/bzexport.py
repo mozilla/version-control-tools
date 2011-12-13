@@ -71,6 +71,7 @@ review_re = re.compile(r'[ra][=?]+([^ ]+)')
 def urlopen(ui, req):
     """Wraps urllib2.urlopen() to provide error handling."""
     ui.debug('Requesting %s\n' % req.get_full_url())
+    #ui.debug("%s %s\n" % (req.get_method(), req.get_data()))
     try:
         return urllib2.urlopen(req)
     except urllib2.HTTPError, e:
@@ -158,6 +159,25 @@ def review_flag_type_id(ui, api_server):
         return None
 
     return flag_ids
+
+def create_bug(ui, api_server, token, product, component, version, title, description):
+    """
+    Create a bugzilla bug using BzAPI.
+    """
+    url = api_server + "bug?%s" % (token.auth(),)
+    json_data = {'product'  : product,
+                 'component': component,
+                 'summary'  : title,
+                 'version'  : version,
+                 'comments' : [{ 'text': description }],
+                 'op_sys'   : 'All',
+                 'platform' : 'All',
+                 }
+
+    req = urllib2.Request(url, json.dumps(json_data),
+                          {"Accept": "application/json",
+                           "Content-Type": "application/json"})
+    return urlopen(ui, req)
 
 def create_attachment(ui, api_server, token, bug,
                       attachment_contents, description="attachment",
@@ -416,6 +436,29 @@ def find_reviewers(ui, api_server, token, search_strings):
     store_user_cache(c)
     return search_results
 
+def edit_value(ui, value, desc):
+    value = (value or '') + "\nHG: Enter %s.\nHG: Lines starting with 'HG:' will be removed.\n" % desc
+    value = ui.edit(value, ui.username())
+    value = re.sub("(?m)^HG:.*\n", "", value)
+    if not value.strip():
+        raise util.Abort("Empty value: %s" % desc)
+    return value
+
+# attachment name (filename)
+#  - revision, possibly with _ws appended
+#  - used for obsolete check??
+# attachment description
+#  - first line of patch description with bug numbers etc. removed
+#  - if patch description has [mq], then prompt
+# attachment comment
+#  - if not creating a new bug, use lines 2+ of the patch comment, if any
+#  - if creating a new bug, do not use an attachment comment unless --attachment-comment or --edit-attachment-comment are given (in this case, the comment will go to the bug instead of the attachment)
+# bug title
+#  - same as attachment description unless --title given
+# bug description (first comment)
+#  - --bug-description if given
+#  - otherwise, grab it from lines 2+ of the patch comment
+#  - otherwise, open an editor and demand that it be entered
 def bzexport(ui, repo, *args, **opts):
     """
     Export changesets to bugzilla attachments.
@@ -507,8 +550,9 @@ def bzexport(ui, repo, *args, **opts):
     if opts['ignore_all_space']:
         filename += "_ws"
 
+    patch_comment = None
     desc = opts['description'] or repo[rev].description()
-    if desc.startswith('[mq]'):
+    if not desc or desc.startswith('[mq]'):
         desc = ui.prompt(_("Patch description:"), default=filename)
     else:
         # Lightly reformat changeset messages into attachment descriptions.
@@ -542,33 +586,63 @@ def bzexport(ui, repo, *args, **opts):
         # very helpful unless a unique string is provided.
         desc = review_re.sub('', desc).rstrip()
 
-        # Finally, just take the first line in case there's a really long
-        # changeset message.
-        #TODO: add really long changeset messages as comments?
-        if '\n' in desc:
-            desc = desc.split('\n')[0]
+        # Finally, just take the first line in case. If there is more than one
+        # line, use it as a comment.
+        m = re.match(r'([^\n]*)\n+(.*)', desc, re.DOTALL)
+        if m:
+            desc = m.group(1)
+            patch_comment = m.group(2)
 
-    if bug is None:
-        ui.write_err("No bug number specified and no bug number "
-                     "listed in changeset message!\n")
-        return
+    attachment_comment = opts['comment']
+    bug_comment = opts['bug_description']
 
-    comment = ""
-    if opts["comment"]:
-        comment = opts["comment"]
-    elif opts["edit_comment"]:
-        comment = """
+    if not attachment_comment:
+        # New bugs get first shot at the patch comment
+        if not opts['new']:
+            attachment_comment = patch_comment
+        elif bug_comment:
+            attachment_comment = patch_comment
 
-HG: Enter a comment to add to the bug with the attachment.
-HG: Lines starting with 'HG:' will be removed.
-"""
-        comment = ui.edit(comment, ui.username())
-        comment = re.sub("(?m)^HG:.*\n", "", comment)
-        if not comment.strip():
-            ui.write_err("Empty comment specified. Aborting!\n")
-            return
+    if not bug_comment:
+        if opts['new']:
+            bug_comment = patch_comment
 
-    #TODO: support a --new argument for filing a new bug with a patch
+    if opts['edit_comment'] or (opts['edit'] and not opts['comment']):
+        attachment_comment = edit_value(ui, attachment_comment, 'a comment to add to the attachment')
+
+    if opts["new"]:
+        if bug is not None:
+            raise util.Abort("Bug %s listed in changeset message but "
+                             "creation of new bug requested!" % bug)
+
+        product = opts.get('product', '') or ui.config("bzexport", "product", None) or ui.prompt(_("Product:"))
+        component = opts.get('component', '') or ui.config("bzexport", "component", None) or ui.prompt(_("Component:"))
+        version = opts.get('prodversion', '') or ui.config("bzexport", "prodversion", 'unspecified') or ui.prompt(_("Product version:"))
+        title = opts['title'] or desc
+
+        if opts['edit_bug_description'] or not bug_comment:
+            bug_comment = edit_value(ui, bug_comment, 'description of new bug')
+
+        try:
+            if not product or not component or not version:
+                raise util.Abort("The product, component, and product version must all be specified for new bugs")
+
+            response = create_bug(ui, api_server, auth,
+                                  product=product,
+                                  component=component,
+                                  version=version,
+                                  title=title,
+                                  description=bug_comment)
+            result = json.load(response)
+            bug = result['id']
+            ui.write("Created bug %s at %s\n" % (bug, urlparse.urljoin(bugzilla, "/show_bug.cgi?id=" + bug)))
+        except Exception, e:
+            raise util.Abort(_("Error creating bug: %s\n" % str(e)))
+    else:
+        if bug is None:
+            raise util.Abort(_("No bug number specified and no bug number "
+                               "listed in changeset message!"))
+
     reviewers = None
     if opts["review"]:
         reviewers = []
@@ -611,7 +685,7 @@ HG: Lines starting with 'HG:' will be removed.
                                              bug, contents.getvalue(),
                                              filename=filename,
                                              description=desc,
-                                             comment=comment,
+                                             comment=attachment_comment,
                                              reviewers=reviewers))
         attachment_url = urlparse.urljoin(bugzilla,
                                           "attachment.cgi?id=" + result["id"] + "&action=edit")
@@ -629,10 +703,26 @@ cmdtable = {
         (bzexport,
          [('d', 'description', '', 'Bugzilla attachment description'),
           ('c', 'comment', '', 'Comment to add with the attachment'),
-          ('e', 'edit-comment', None,
-           'Open a text editor to specify a comment to add with the attachment.'),
+          ('', 'edit-comment', None,
+           'Open a text editor to specify a comment to add with the attachment'),
+          ('e', 'edit', False,
+           'Open a text editor to enter or modify all comments not given on the command line'),
           ('r', 'review', '',
            'List of users to request review from (comma-separated search strings)'),
+          ('', 'new', False,
+           'Create a new bug'),
+          ('', 'title', '',
+           'New bug title'),
+          ('', 'product', '',
+           'New bug product'),
+          ('', 'component', '',
+           'New bug component'),
+          ('', 'prodversion', '',
+           'New bug product version'),
+          ('', 'bug-description', '',
+           'New bug description (aka comment 0)'),
+          ('', 'edit-bug-description', False,
+           'Open a text editor to specify a description to add with a new bug'),
           # The following option is passed through directly to patch.diffopts
           ('w', 'ignore_all_space', False, 'Generate a diff that ignores whitespace changes')],
         _('hg bzexport [options] [REV] [BUG]')),
