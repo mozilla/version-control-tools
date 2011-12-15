@@ -509,10 +509,14 @@ def qimport_wrapper(self, repo, *filename, **opts):
     mq.qimport(self, repo, *filename, **opts)
 
     if mqcommit and mqmessage:
+        # FIXME - can be multiple
         if len(filename) == 0:
-            fname = q.full_series[0] # FIXME - can be multiple
+            try:
+                fname = q.fullseries[0]
+            except:
+                fname = q.full_series[0]
         else:
-            fname = filename[0] # FIXME - can be multiple
+            fname = filename[0]
         mqmessage = mqmessage.replace("%p", fname)
         mqmessage = mqmessage.replace("%a", 'IMPORT')
         commands.commit(r.ui, r, message=mqmessage)
