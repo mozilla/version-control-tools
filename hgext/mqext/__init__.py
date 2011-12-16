@@ -10,7 +10,6 @@ Commands added:
 
 Commands not related to mq:
 
-  :lineage: Dump out the revision history leading up to a particular revision
   :reviewers: Suggest potential reviewers for a patch
   :bugs: Display the bugs that have touched the same files as a patch
   :components: Suggest a potential component for a patch
@@ -100,46 +99,6 @@ def qshow(ui, repo, patchspec=None, **opts):
         ui.write(chunk, label=label)
 
     patchf.close()
-
-def lineage(ui, repo, rev='.', limit=None, stop=None, **opts):
-    '''Show ancestors of a revision'''
-
-    log = repo.changelog
-    n = 0
-
-    ui.debug("rev=%s limit=%s stop=%s\n" % (rev,limit,stop))
-
-    # TODO: If no limit is given, ask after 100 or so whether to continue
-    if limit is None or limit == '':
-        limit = 100
-    else:
-        limit = int(limit)
-
-    if not (stop is None or stop == ''):
-        stop = repo.lookup(stop)
-        ui.debug("  stop = %s\n" % hex(stop))
-    
-    current = repo.lookup(rev)
-    while n < limit or limit == 0:
-        ctx = repo.changectx(current)
-        parents = [ p for p in log.parents(current) if p != nullid ]
-        header = short(current)
-        if len(parents) != 1:
-            header += " (%d parents)" % len(parents)
-        desc = ctx.description().strip()
-        desc = desc.replace("\n", " ")
-        ui.write("%s: %s\n" % (header, desc))
-        if len(parents) > 2:
-            break
-
-        if current == stop:
-            break
-
-        if len(parents) == 0:
-            break
-
-        current = parents[0]
-        n += 1
 
 def fullpaths(ui, repo, paths):
     cwd = os.getcwd()
@@ -631,14 +590,6 @@ cmdtable = {
               [('', 'stat', None, 'output diffstat-style summary of changes'),
                ],
               ('hg qshow [patch]')),
-
-    'lineage':
-        (lineage,
-         [('r', 'rev', '.', 'revision to start at', 'REV'),
-          ('l', 'limit', '', 'max revisions to display', 'LIMIT'),
-          ('s', 'stop', '', 'stop at this revision', 'REV'),
-          ],
-         ('hg lineage -r REV [-l LIMIT] [-s REV]')),
 
     'reviewers':
         (reviewers,
