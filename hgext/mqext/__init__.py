@@ -107,8 +107,7 @@ def lineage(ui, repo, rev='.', limit=None, stop=None, **opts):
     log = repo.changelog
     n = 0
 
-    if ui.verbose:
-        ui.write("rev=%s limit=%s stop=%s\n" % (rev,limit,stop))
+    ui.debug("rev=%s limit=%s stop=%s\n" % (rev,limit,stop))
 
     # TODO: If no limit is given, ask after 100 or so whether to continue
     if limit is None or limit == '':
@@ -118,8 +117,7 @@ def lineage(ui, repo, rev='.', limit=None, stop=None, **opts):
 
     if not (stop is None or stop == ''):
         stop = repo.lookup(stop)
-        if ui.verbose:
-            ui.write("  stop = %s\n" % hex(stop))
+        ui.debug("  stop = %s\n" % hex(stop))
     
     current = repo.lookup(rev)
     while n < limit or limit == 0:
@@ -312,8 +310,7 @@ def fetch_bugs(url, ui, bugs):
                            "Content-Type": "application/json"})
 
     conn = urllib2.urlopen(req)
-    if ui.verbose:
-        ui.write("fetched %s for bugs %s\n" % (conn.geturl(), ",".join(bugs)))
+    ui.debug("fetched %s for bugs %s\n" % (conn.geturl(), ",".join(bugs)))
     try:
         buginfo = json.load(conn)
     except Exception, e:
@@ -381,8 +378,7 @@ def bzcomponents(ui, repo, patchfile=None, **opts):
 
     for b in fetch_bugs(url, ui, bugs):
         comp = "%s/%s" % (b['product'], b['component'])
-        if ui.verbose:
-            ui.write("bug %s: %s\n" % (b['id'], comp))
+        ui.debug("bug %s: %s\n" % (b['id'], comp))
         components.update([comp])
 
     ui.write("Potential components:\n")
