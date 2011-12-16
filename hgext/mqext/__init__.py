@@ -320,17 +320,33 @@ def fetch_bugs(url, ui, bugs):
         pass
 
     if buginfo.get('result', None) is None:
+        # Error handling: bugzilla will report a single error if any of the
+        # retrieved bugs was problematic, so drop that bug and retry with two
+        # remaining halves (it'll still do one fetch per failure in the bug
+        # range, but presumably fetching N/2 bugs is faster than fetching N so
+        # the total time will be less)
         if 'error' in buginfo:
+            badbug = None
             m = re.search(r'Bug #(\d+) does not exist', buginfo['error']['message'])
             if m:
                 if ui.verbose:
-                    ui.write("  dropping out nonexistent bug %s\n" % m.group(1))
-                bugs.remove(m.group(1))
-                return fetch_bugs(url, ui, bugs)
+                    ui.write("  dropping nonexistent bug %s\n" % m.group(1))
+                badbug = m.group(1)
+            m = re.search(r'You are not authorized to access bug #(\d+)', buginfo['error']['message'])
+            if m:
+                if ui.verbose:
+                    ui.write("  dropping inaccessible bug %s\n" % m.group(1))
+                badbug = m.group(1)
+            bugs.remove(badbug)
+            nparts = 2
+            if len(bugs) < nparts:
+                parts = [ bugs ]
+            else:
+                bs = list(bugs)
+                parts = [ bs[i:len(bugs):nparts] for i in range(0,nparts) ]
+            return reduce(lambda bs,p: bs + fetch_bugs(url, ui, p), parts, [])
 
-        ui.write("Failed to retrieve bugs\n")
-        ui.write("buginfo: %r\n" % buginfo)
-        return
+        raise util.Abort("Failed to retrieve bugs, last buginfo=%r" % (buginfo,))
 
     return buginfo['result']['bugs']
 
