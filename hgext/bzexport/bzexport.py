@@ -43,6 +43,7 @@ import base64
 from cStringIO import StringIO
 import json
 import os
+import time
 import platform
 import re
 import shutil
@@ -52,6 +53,10 @@ import urllib
 import urllib2
 import urlparse
 import pkg_resources
+try:
+  from cPickle import dump as pickle_dump, load as pickle_load
+except:
+  from pickle import dump as pickle_dump, load as pickle_load
 
 # This is stolen from buglink.py
 bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
@@ -68,6 +73,11 @@ bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                         (?:\s*\#?)(\d+)
                      )''', re.I | re.X)
 review_re = re.compile(r'[ra][=?]+([^ ]+)')
+
+BINARY_CACHE_FILENAME = ".bzexport.cache"
+INI_CACHE_FILENAME = ".bzexport"
+
+global_cache = None
 
 def urlopen(ui, req):
     """Wraps urllib2.urlopen() to provide error handling."""
@@ -136,7 +146,66 @@ class bzAuth:
         else:
             return self._username
 
-def review_flag_type_id(ui, api_server):
+def get_global_path(filename):
+    path = None
+    if platform.system() == "Windows":
+        CSIDL_PERSONAL = 5
+        path = win_get_folder_path(CSIDL_PERSONAL)
+    else:
+        path = os.path.expanduser("~")
+    if path:
+        path = os.path.join(path, filename)
+    return path
+
+def store_global_cache():
+    fp = open(get_global_path(BINARY_CACHE_FILENAME), "wb")
+    pickle_dump(global_cache, fp)
+    fp.close()
+
+def load_global_cache(ui, api_server):
+    global global_cache
+    cache_file = get_global_path(BINARY_CACHE_FILENAME)
+
+    try:
+        fp = open(cache_file, "rb");
+        global_cache = pickle_load(fp)
+    except IOError, e:
+        global_cache = { api_server: { 'real_names': {} } }
+    except Exception, e:
+        raise util.Abort("Error loading user cache: " + str(e))
+
+    return global_cache
+
+def store_user_cache(cache):
+    user_cache = get_global_path(INI_CACHE_FILENAME)
+    fp = open(user_cache, "wb")
+    for section in cache.sections():
+        fp.write("[" + section + "]\n")
+        for (user, name) in cache.items(section):
+            fp.write(user + " = " + name + "\n")
+        fp.write("\n")
+    fp.close()
+
+def load_user_cache(ui, api_server):
+    user_cache = get_global_path(INI_CACHE_FILENAME)
+    section = api_server
+
+    c = config.config()
+
+    # Ensure that the cache exists before attempting to use it
+    fp = open(user_cache, "a");
+    fp.close()
+
+    c.read(user_cache)
+    return c
+
+def load_configuration(ui, api_server):
+    cache = load_global_cache(ui, api_server).get(api_server)
+    now = time.time()
+    if 'configuration' in cache and now - cache['configuration_timestamp'] < 24*60*60*7:
+        return cache['configuration']
+
+    ui.write("Refreshing configuration cache for " + api_server + "\n")
     url = api_server + "configuration?cached_ok=1";
     req = urllib2.Request(url, None,
                           {"Accept": "application/json",
@@ -145,8 +214,15 @@ def review_flag_type_id(ui, api_server):
     try:
         configuration = json.load(conn)
     except Exception, e:
-        pass
+        raise util.Abort("Error loading bugzilla configuration: " + str(e))
 
+    cache['configuration'] = configuration
+    cache['configuration_timestamp'] = now
+    store_global_cache()
+    return configuration
+
+def review_flag_type_id(ui, api_server):
+    configuration = load_configuration(ui, api_server)
     if not configuration or not configuration["flag_type"]:
         ui.write_err("Error: couldn't find configuration object\n");
         return None
@@ -371,47 +447,9 @@ def obsolete_old_patches(ui, api_server, token, bug, filename, ignore_id):
 
     return True
 
-def get_cache_path():
-    path = None
-    if platform.system() == "Windows":
-        CSIDL_PERSONAL = 5
-        path = win_get_folder_path(CSIDL_PERSONAL)
-    else:
-        path = os.path.expanduser("~")
-    if path:
-        path = os.path.join(path, ".bzexport")
-    return path
-
-def store_user_cache(cache):
-    user_cache = get_cache_path()
-    fp = open(user_cache, "wb")
-    for section in cache.sections():
-        fp.write("[" + section + "]\n")
-        for (user, name) in cache.items(section):
-            fp.write(user + " = " + name + "\n")
-        fp.write("\n")
-    fp.close()
-
-# Copied from savecommitmessage in localrepo.py (but with variable filename)
-def savefile(repo, basename, text):
-    fp = repo.opener(basename, 'wb')
-    try:
-        fp.write(text)
-    finally:
-        fp.close()
-    return repo.pathto(fp.name[len(repo.root)+1:])
-
 def find_reviewers(ui, api_server, token, search_strings):
-    user_cache = get_cache_path()
+    c = load_user_cache(ui, api_server)
     section = api_server
-
-    c = config.config()
-
-    # Ensure that the cache exists before attempting to use it
-    fp = open(user_cache, "a");
-    fp.close()
-
-    c.read(user_cache)
 
     search_results = []
     for search_string in search_strings:
@@ -492,6 +530,15 @@ def validate_reviewers(ui, api_server, auth, search_strings, multi_callback):
     if search_failed:
         return
     return reviewers
+
+# Copied from savecommitmessage in localrepo.py (but with variable filename)
+def savefile(repo, basename, text):
+    fp = repo.opener(basename, 'wb')
+    try:
+        fp.write(text)
+    finally:
+        fp.close()
+    return repo.pathto(fp.name[len(repo.root)+1:])
 
 # Sure sign of a poor developer: they implement their own half-assed, one-off
 # templating engine instead of reusing an existing one.
@@ -840,7 +887,7 @@ def bzexport(ui, repo, *args, **opts):
         result_id = result["id"]
 
     except Exception, e:
-        ui.write_err(_("Error sending patch: %s\n" % str(e)))
+        raise util.Abort("Error sending patch: %s\n" % str(e))
 
     if not result_id or not obsolete_old_patches(ui, api_server, auth, bug, filename, result_id):
         return
