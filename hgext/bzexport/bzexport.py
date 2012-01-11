@@ -51,6 +51,7 @@ import tempfile
 import urllib
 import urllib2
 import urlparse
+import pkg_resources
 
 # This is stolen from buglink.py
 bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
@@ -70,7 +71,7 @@ review_re = re.compile(r'[ra][=?]+([^ ]+)')
 
 def urlopen(ui, req):
     """Wraps urllib2.urlopen() to provide error handling."""
-    ui.debug('Requesting %s\n' % req.get_full_url())
+    ui.progress('Accessing bugzilla server', None, item=req.get_full_url())
     #ui.debug("%s %s\n" % (req.get_method(), req.get_data()))
     try:
         return urllib2.urlopen(req)
@@ -391,6 +392,15 @@ def store_user_cache(cache):
         fp.write("\n")
     fp.close()
 
+# Copied from savecommitmessage in localrepo.py (but with variable filename)
+def savefile(repo, basename, text):
+    fp = repo.opener(basename, 'wb')
+    try:
+        fp.write(text)
+    finally:
+        fp.close()
+    return repo.pathto(fp.name[len(repo.root)+1:])
+
 def find_reviewers(ui, api_server, token, search_strings):
     user_cache = get_cache_path()
     section = api_server
@@ -435,6 +445,132 @@ def find_reviewers(ui, api_server, token, search_strings):
             raise
     store_user_cache(c)
     return search_results
+
+def multi_reviewer_prompt(ui, search_result):
+    prompts = []
+    message = "Multiple bugzilla users matching \"%s\":\n\n" % search_result["search_string"]
+    for i in range(len(search_result["real_names"])):
+        prompts.append("&%d" % (i + 1))
+        message += "  %d. %s\n" % (i + 1, search_result["real_names"][i].encode('ascii', 'replace'))
+    prompts.append("&none")
+    message += "  n. None\n"
+    prompts.append("&abort")
+    message += "  a. Abort\n\n"
+    message += "Select reviewer:"
+
+    choice = ui.promptchoice(message, prompts, len(prompts) - 1)
+    if choice == len(prompts) - 2:
+        return None
+    if choice == len(prompts) - 1:
+        raise util.Abort("User requested abort while choosing reviewer")
+    else:
+        return search_result["names"][choice]
+
+
+def validate_reviewers(ui, api_server, auth, search_strings, multi_callback):
+    search_results = find_reviewers(ui, api_server, auth, search_strings)
+    search_failed = False
+    reviewers = []
+    for search_result in search_results:
+        if search_result["real_names"] is None:
+            ui.write_err("Error: couldn't find user with search string \"%s\": %s\n" % (search_result["search_string"], search_result["error"]))
+            search_failed = True
+        elif len(search_result["real_names"]) > 10:
+            ui.write_err("Error: too many bugzilla users matching \"%s\":\n\n" % search_result["search_string"])
+            for real_name in search_result["real_names"]:
+                ui.write_err("  %s\n" % real_name.encode('ascii', 'replace'))
+            search_failed = True
+        elif len(search_result["real_names"]) > 1:
+            reviewer = multi_callback(ui, search_result)
+            if reviewer is not None:
+                reviewers.append(reviewer)
+        elif len(search_result["real_names"]) == 1:
+            reviewers.append(search_result["names"][0])
+        else:
+            ui.write_err("Couldn't find a bugzilla user matching \"%s\"!\n" % search_result["search_string"])
+            search_failed = True
+    if search_failed:
+        return
+    return reviewers
+
+# Sure sign of a poor developer: they implement their own half-assed, one-off
+# templating engine instead of reusing an existing one.
+
+# Simple templating engine: scan a template for @KEYWORDS@ (keywords surrounded
+# in @ signs). First, replace them with corresponding values in the 'fields'
+# dictionary and show the result to the user. Allow user to edit. Then convert
+# the whole template into a regex with /(.*?)/ in place of each keyword and
+# match the edited output against that. Pull out the possibly-updated field
+# values.
+templates = { 'new_bug_template': '''Title: @BUGTITLE@
+Product: @PRODUCT@
+Component: @COMPONENT@
+Version: @PRODVERSION@
+
+Bug Description (aka comment 0):
+
+@BUGCOMMENT0@
+
+--- END Bug Description ---
+
+Attachment Filename: @ATTACHMENT_FILENAME@
+Attachment Description: @ATTACHMENT_DESCRIPTION@
+Reviewer: @REVIEWER_1@
+Reviewer: @REVIEWER_2@
+Attachment Comment (appears as a regular comment on the bug):
+
+@ATTACHCOMMENT@
+
+---- END Attachment Comment ----
+''',
+              'existing_bug_template': '''Bug: @BUGNUM@
+
+Attachment Filename: @ATTACHMENT_FILENAME@
+Attachment Description: @ATTACHMENT_DESCRIPTION@
+Reviewer: @REVIEWER_1@
+Reviewer: @REVIEWER_2@
+Attachment Comment (appears as a regular comment on the bug):
+
+@ATTACHCOMMENT@
+
+---- END Attachment Comment ----
+''' }
+
+field_re = re.compile(r'@([^@]+)@')
+def edit_form(ui, repo, fields, template_name):
+    template_fields = []
+    def substitute_field(m):
+        field_name = m.group(1)
+        template_fields.append(field_name)
+        return fields[field_name] or '<none>'
+
+    # Fill in a template with the passed-in fields
+    template = templates[template_name]
+    orig = field_re.sub(substitute_field, template)
+
+    # Convert "template with @KEYWORD1@ and @KEYWORD2@" into
+    # "template with (.*?) and (.*?)"
+    pattern = re.sub(r'[^\w@]', lambda m: '\\' + m.group(0), template)
+    pattern = re.compile(field_re.sub('(.*?)', pattern), re.S)
+
+    # Allow user to edit the form
+    new = ui.edit(orig, ui.username())
+
+    ui.write("saved edited form in " + savefile(repo, "last_bzexport.txt", new) + "\n")
+
+    # Use the previously-created pattern to pull out the new keyword values
+    m = pattern.match(new)
+
+    new_fields = fields.copy()
+    for field, value in zip(template_fields, m.groups()):
+        if value == '<required>':
+            raise util.Abort("Required field %s not filled in" % (field,))
+        elif value == '<none>':
+            new_fields[field] = None
+        else:
+            new_fields[field] = value
+
+    return new_fields
 
 def edit_value(ui, value, desc):
     value = (value or '') + "\nHG: Enter %s.\nHG: Lines starting with 'HG:' will be removed.\n" % desc
@@ -551,9 +687,10 @@ def bzexport(ui, repo, *args, **opts):
         filename += "_ws"
 
     patch_comment = None
+    reviewers = []
     desc = opts['description'] or repo[rev].description()
     if not desc or desc.startswith('[mq]'):
-        desc = ui.prompt(_("Patch description:"), default=filename)
+        desc = '<required>'
     else:
         # Lightly reformat changeset messages into attachment descriptions.
         # First, strip off any leading "bug NNN" or "b=NNN",
@@ -582,9 +719,10 @@ def bzexport(ui, repo, *args, **opts):
             desc = desc[1:].lstrip()
 
         # Next strip off review and approval annotations
-        #TODO: auto-convert these into review requests? Probably not
-        # very helpful unless a unique string is provided.
-        desc = review_re.sub('', desc).rstrip()
+        def grab_reviewer(m):
+            reviewers.append(m.group(1))
+            return ''
+        desc = review_re.sub(grab_reviewer, desc).rstrip()
 
         # Finally, just take the first line in case. If there is more than one
         # line, use it as a comment.
@@ -607,35 +745,75 @@ def bzexport(ui, repo, *args, **opts):
         if opts['new']:
             bug_comment = patch_comment
 
-    if opts['edit_comment'] or (opts['edit'] and not opts['comment']):
-        attachment_comment = edit_value(ui, attachment_comment, 'a comment to add to the attachment')
+    if opts["review"]:
+        search_strings = opts["review"].split(",")
+        reviewers = validate_reviewers(ui, api_server, auth, search_strings, multi_reviewer_prompt)
+    elif len(reviewers) > 0:
+        # Pulled reviewers out of commit message
+        reviewers = validate_reviewers(ui, api_server, auth, reviewers, multi_reviewer_prompt)
+
+    if reviewers is None:
+        raise util.Abort("Invalid reviewers")
+
+    values = { 'BUGNUM': bug,
+               'BUGTITLE': opts['title'] or desc,
+               'PRODUCT': opts.get('product', '') or ui.config("bzexport", "product", None),
+               'COMPONENT': opts.get('component', '') or ui.config("bzexport", "component", None),
+               'PRODVERSION': opts.get('prodversion', '') or ui.config("bzexport", "prodversion", 'unspecified'),
+               'BUGCOMMENT0': bug_comment,
+               'ATTACHMENT_FILENAME': filename,
+               'ATTACHMENT_DESCRIPTION': desc,
+               'ATTACHCOMMENT': attachment_comment,
+               }
+    try:
+        values['REVIEWER_1'] = reviewers[0]
+    except:
+        values['REVIEWER_1'] = '<none>'
+    try:
+        values['REVIEWER_2'] = reviewers[1]
+    except:
+        values['REVIEWER_2'] = '<none>'
+
+    if opts['edit']:
+        if opts['new']:
+            values = edit_form(ui, repo, values, 'new_bug_template')
+        else:
+            values = edit_form(ui, repo, values, 'existing_bug_template')
+            if bug != values['BUGNUM']:
+                raise util.Abort("Modifying bug number is not supported")
+
+        search_strings = [r for r in [values['REVIEWER_1'], values['REVIEWER_2']]
+                            if r is not None ]
+        reviewers = validate_reviewers(ui, api_server, auth, search_strings, multi_reviewer_prompt)
+        if reviewers is None:
+            raise util.Abort("Invalid reviewers")
+    else:
+        desc = values['ATTACHMENT_DESCRIPTION']
+        if not desc or desc == '<required>':
+            values['ATTACHMENT_DESCRIPTION'] = ui.prompt(_("Patch description:"), default=filename)
 
     if opts["new"]:
         if bug is not None:
             raise util.Abort("Bug %s listed in changeset message but "
                              "creation of new bug requested!" % bug)
 
-        product = opts.get('product', '') or ui.config("bzexport", "product", None) or ui.prompt(_("Product:"))
-        component = opts.get('component', '') or ui.config("bzexport", "component", None) or ui.prompt(_("Component:"))
-        version = opts.get('prodversion', '') or ui.config("bzexport", "prodversion", 'unspecified') or ui.prompt(_("Product version:"))
-        title = opts['title'] or desc
-
-        if opts['edit_bug_description'] or not bug_comment:
-            bug_comment = edit_value(ui, bug_comment, 'description of new bug')
-
         try:
-            if not product or not component or not version:
-                raise util.Abort("The product, component, and product version must all be specified for new bugs")
+            for key,desc in [('PRODUCT', 'Product'),
+                             ('COMPONENT', 'Component'),
+                             ('PRODVERSION', 'Version')]:
+                values[key] = values[key] or ui.prompt(_(desc + " (required):"))
+                if values[key] is None:
+                    raise util.Abort(desc + " must be specified for new bugs")
 
             response = create_bug(ui, api_server, auth,
-                                  product=product,
-                                  component=component,
-                                  version=version,
-                                  title=title,
-                                  description=bug_comment)
+                                  product = values['PRODUCT'],
+                                  component = values['COMPONENT'],
+                                  version = values['PRODVERSION'],
+                                  title = values['BUGTITLE'],
+                                  description = values['BUGCOMMENT0'])
             result = json.load(response)
             bug = result['id']
-            ui.write("Created bug %s at %s\n" % (bug, urlparse.urljoin(bugzilla, "/show_bug.cgi?id=" + bug)))
+            ui.write("Created bug %s at %s\n" % (bug, bugzilla + "/show_bug.cgi?id=" + bug))
         except Exception, e:
             raise util.Abort(_("Error creating bug: %s\n" % str(e)))
     else:
@@ -643,50 +821,19 @@ def bzexport(ui, repo, *args, **opts):
             raise util.Abort(_("No bug number specified and no bug number "
                                "listed in changeset message!"))
 
-    reviewers = None
-    if opts["review"]:
-        reviewers = []
-        search_strings = opts["review"].split(",")
-        search_results = find_reviewers(ui, api_server, auth, search_strings)
-        search_failed = False
-        for search_result in search_results:
-            if search_result["real_names"] is None:
-                ui.write_err("Error: couldn't search for user with search string \"%s\": %s\n" % (search_result["search_string"], search_result["error"]))
-                search_failed = True
-            elif len(search_result["real_names"]) > 5:
-                ui.write_err("Error: too many bugzilla users matching \"%s\":\n\n" % search_result["search_string"])
-                for real_name in search_result["real_names"]:
-                    ui.write_err("  %s\n" % real_name.encode('ascii', 'replace'))
-                search_failed = True
-            elif len(search_result["real_names"]) > 1:
-                prompts = []
-                message = "Multiple bugzilla users matching \"%s\":\n\n" % search_result["search_string"]
-                for i in range(len(search_result["real_names"])):
-                    prompts.append("&%d" % (i + 1))
-                    message += "  %d. %s\n" % (i + 1, search_result["real_names"][i].encode('ascii', 'replace'))
-                prompts.append("&abort")
-                message += "  a. Abort\n\nSelect reviewer:"
-                choice = ui.promptchoice(message, prompts, len(prompts) - 1)
-                if choice == len(prompts) - 1:
-                    search_failed = True
-                else:
-                    reviewers.append(search_result["names"][choice])
-            elif len(search_result["real_names"]) == 1:
-                reviewers.append(search_result["names"][0])
-            else:
-                ui.write_err("Couldn't find a bugzilla user matching \"%s\"!\n" % search_result["search_string"])
-                search_failed = True
-        if search_failed:
-            return
+    if len(reviewers) > 0:
+        for reviewer in reviewers:
+            ui.write("Requesting review from " + reviewer + "\n")
 
     result_id = None
     try:
-        result = json.load(create_attachment(ui, api_server, auth,
-                                             bug, contents.getvalue(),
-                                             filename=filename,
-                                             description=desc,
-                                             comment=attachment_comment,
-                                             reviewers=reviewers))
+        attach = create_attachment(ui, api_server, auth,
+                                   bug, contents.getvalue(),
+                                   filename=values['ATTACHMENT_FILENAME'],
+                                   description=values['ATTACHMENT_DESCRIPTION'],
+                                   comment=values['ATTACHCOMMENT'],
+                                   reviewers=reviewers)
+        result = json.load(attach)
         attachment_url = urlparse.urljoin(bugzilla,
                                           "attachment.cgi?id=" + result["id"] + "&action=edit")
         print "%s uploaded as %s" % (rev, attachment_url)
@@ -703,10 +850,8 @@ cmdtable = {
         (bzexport,
          [('d', 'description', '', 'Bugzilla attachment description'),
           ('c', 'comment', '', 'Comment to add with the attachment'),
-          ('', 'edit-comment', None,
-           'Open a text editor to specify a comment to add with the attachment'),
           ('e', 'edit', False,
-           'Open a text editor to enter or modify all comments not given on the command line'),
+           'Open a text editor to modify bug fields'),
           ('r', 'review', '',
            'List of users to request review from (comma-separated search strings)'),
           ('', 'new', False,
