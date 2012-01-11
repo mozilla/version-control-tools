@@ -21,15 +21,18 @@ Attach a patch from a HG repository to a bugzilla bug.
 
 To enable this extension, edit your ~/.hgrc (or %APPDATA%/Mercurial.ini)
 and add:
-[extensions]
-bzexport = /path/to/bzexport.py
+
+    [extensions]
+
+    bzexport = /path/to/bzexport.py
 
 You can then use it like so:
-hg bzexport REV BUG
+hg bzexport [-e] REV BUG
 
 Where REV is any local revision, and BUG is a bug number on
-bugzilla.mozilla.org. The extension is tuned to work best with MQ
-changesets (it can only currently work with applied patches).
+bugzilla.mozilla.org or the option '--new' to create a new bug. The extension
+is tuned to work best with MQ changesets (it can only currently work with
+applied patches).
 
 If no revision is specified, it will default to 'tip'. If no
 bug is specified, the changeset commit message will be scanned
@@ -492,26 +495,46 @@ def find_reviewers(ui, api_server, token, search_strings):
     store_user_cache(c)
     return search_results
 
-def multi_reviewer_prompt(ui, search_result):
+def prompt_menu(ui, name, values, readable_values = None, message = '', allow_none=False):
     prompts = []
-    message = "Multiple bugzilla users matching \"%s\":\n\n" % search_result["search_string"]
-    for i in range(len(search_result["real_names"])):
+    for i in range(0, len(values)):
         prompts.append("&%d" % (i + 1))
-        message += "  %d. %s\n" % (i + 1, search_result["real_names"][i].encode('ascii', 'replace'))
-    prompts.append("&none")
-    message += "  n. None\n"
+        value = (readable_values or values)[i]
+        message += "  %d. %s\n" % ((i + 1), value.encode('utf-8', 'replace'))
+    if allow_none:
+        prompts.append("&none")
+        message += "  n. None\n\n"
     prompts.append("&abort")
     message += "  a. Abort\n\n"
-    message += "Select reviewer:"
+    message += _("Select %s:") % name
 
     choice = ui.promptchoice(message, prompts, len(prompts) - 1)
-    if choice == len(prompts) - 2:
+    if allow_none and choice == len(prompts) - 2:
         return None
     if choice == len(prompts) - 1:
-        raise util.Abort("User requested abort while choosing reviewer")
+        raise util.Abort("User requested abort while choosing %s" % name)
     else:
-        return search_result["names"][choice]
+        return values[choice]
 
+def product_menu(ui, api_version):
+    c = load_configuration(ui, api_version)
+    return prompt_menu(ui, 'product', c['product'].keys(), message = "Products available:\n")
+
+def component_menu(ui, api_version, product):
+    c = load_configuration(ui, api_version)
+    components = c['product'].get(product, {}).get('component', {}).keys()
+    if len(components) == 0:
+        raise util.Abort("Invalid product '%s' (has no components)" % product)
+    return prompt_menu(ui, 'component', components,
+                       message = "Components of product %s:\n" % product)
+
+def multi_reviewer_prompt(ui, search_result):
+    for n in search_results['real_names']:
+        ui.write("Encoding %s...\n" % n)
+    return prompt_menu(ui, 'reviewer', search_results['names'],
+                       readable_values = search_results['real_names'],
+                       message = "Multiple bugzilla users matching \"%s\":\n\n" % search_result["search_string"],
+                       allow_none = True)
 
 def validate_reviewers(ui, api_server, auth, search_strings, multi_callback):
     search_results = find_reviewers(ui, api_server, auth, search_strings)
@@ -635,25 +658,17 @@ def edit_value(ui, value, desc):
         raise util.Abort("Empty value: %s" % desc)
     return value
 
-# attachment name (filename)
-#  - revision, possibly with _ws appended
-#  - used for obsolete check??
-# attachment description
-#  - first line of patch description with bug numbers etc. removed
-#  - if patch description has [mq], then prompt
-# attachment comment
-#  - if not creating a new bug, use lines 2+ of the patch comment, if any
-#  - if creating a new bug, do not use an attachment comment unless --attachment-comment or --edit-attachment-comment are given (in this case, the comment will go to the bug instead of the attachment)
-# bug title
-#  - same as attachment description unless --title given
-# bug description (first comment)
-#  - --bug-description if given
-#  - otherwise, grab it from lines 2+ of the patch comment
-#  - otherwise, open an editor and demand that it be entered
 def bzexport(ui, repo, *args, **opts):
     """
     Export changesets to bugzilla attachments.
 
+    When the --new option is used, a menu will be displayed for the product and
+    component unless a default has been set in the [bzexport] of the config
+    file (keys are 'product' and 'component'), or if something has been
+    specified on the command line.
+
+    Also, the -e option may be used to bring up an editor that will allow
+    editing all fields of the attachment and bug (if creating one).
     """
     api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/latest/")
     bugzilla = ui.config("bzexport", "bugzilla", "https://bugzilla.mozilla.org/")
@@ -812,8 +827,8 @@ def bzexport(ui, repo, *args, **opts):
 
     values = { 'BUGNUM': bug,
                'BUGTITLE': opts['title'] or desc,
-               'PRODUCT': opts.get('product', '') or ui.config("bzexport", "product", None),
-               'COMPONENT': opts.get('component', '') or ui.config("bzexport", "component", None),
+               'PRODUCT': opts.get('product', '') or ui.config("bzexport", "product", '<choose-from-menu>'),
+               'COMPONENT': opts.get('component', '') or ui.config("bzexport", "component", '<choose-from-menu>'),
                'PRODVERSION': opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>'),
                'BUGCOMMENT0': bug_comment,
                'ATTACHMENT_FILENAME': filename,
@@ -831,7 +846,7 @@ def bzexport(ui, repo, *args, **opts):
 
     if opts['edit']:
         if opts['new']:
-            if values['PRODVERSION'] == '<default>' and values['PRODUCT'] is not None:
+            if values['PRODVERSION'] == '<default>' and values['PRODUCT'] not in [None, '<choose-from-menu>']:
                 values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
             values = edit_form(ui, repo, values, 'new_bug_template')
         else:
@@ -845,25 +860,22 @@ def bzexport(ui, repo, *args, **opts):
         if reviewers is None:
             raise util.Abort("Invalid reviewers")
     else:
-        desc = values['ATTACHMENT_DESCRIPTION']
-        if not desc or desc == '<required>':
+        if not values['ATTACHMENT_DESCRIPTION']:
             values['ATTACHMENT_DESCRIPTION'] = ui.prompt(_("Patch description:"), default=filename)
 
     if opts["new"]:
         if bug is not None:
             raise util.Abort("Bug %s given but creation of new bug requested!" % bug)
 
+        if values['PRODUCT'] in [None, '<choose-from-menu>']:
+            values['PRODUCT'] = product_menu(ui, api_server)
+        if values['COMPONENT'] in [None, '<choose-from-menu>']:
+            values['COMPONENT'] = component_menu(ui, api_server, values['PRODUCT'])
+        if values['PRODVERSION'] in [None, '<default>']:
+            values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
+            ui.write("Using default version %s of product %s\n" % (values['PRODVERSION'], values['PRODUCT']))
+
         try:
-            for key,desc in [('PRODUCT', 'Product'),
-                             ('COMPONENT', 'Component'),
-                             ('PRODVERSION', 'Version')]:
-                values[key] = values[key] or ui.prompt(_("%s (required):") % desc)
-                if values[key] is None:
-                    raise util.Abort(_("%s must be specified for new bugs") % desc)
-
-            if values['PRODVERSION'] == '<default>':
-                values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
-
             response = create_bug(ui, api_server, auth,
                                   product = values['PRODUCT'],
                                   component = values['COMPONENT'],
