@@ -408,6 +408,14 @@ def get_cookies_from_profile(ui, profile, bugzilla):
         if tempdir:
             shutil.rmtree(tempdir)
 
+def get_default_version(ui, api_server, product):
+    c = load_configuration(ui, api_server)
+    versions = c['product'].get(product, {}).get('version')
+    if versions is None:
+        raise util.Abort(_("Product %s has no versions") % product)
+    if versions:
+        return versions[-1]
+
 class PUTRequest(urllib2.Request):
     def get_method(self):
         return "PUT"
@@ -806,7 +814,7 @@ def bzexport(ui, repo, *args, **opts):
                'BUGTITLE': opts['title'] or desc,
                'PRODUCT': opts.get('product', '') or ui.config("bzexport", "product", None),
                'COMPONENT': opts.get('component', '') or ui.config("bzexport", "component", None),
-               'PRODVERSION': opts.get('prodversion', '') or ui.config("bzexport", "prodversion", 'unspecified'),
+               'PRODVERSION': opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>'),
                'BUGCOMMENT0': bug_comment,
                'ATTACHMENT_FILENAME': filename,
                'ATTACHMENT_DESCRIPTION': desc,
@@ -823,6 +831,8 @@ def bzexport(ui, repo, *args, **opts):
 
     if opts['edit']:
         if opts['new']:
+            if values['PRODVERSION'] == '<default>' and values['PRODUCT'] is not None:
+                values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
             values = edit_form(ui, repo, values, 'new_bug_template')
         else:
             values = edit_form(ui, repo, values, 'existing_bug_template')
@@ -841,16 +851,18 @@ def bzexport(ui, repo, *args, **opts):
 
     if opts["new"]:
         if bug is not None:
-            raise util.Abort("Bug %s listed in changeset message but "
-                             "creation of new bug requested!" % bug)
+            raise util.Abort("Bug %s given but creation of new bug requested!" % bug)
 
         try:
             for key,desc in [('PRODUCT', 'Product'),
                              ('COMPONENT', 'Component'),
                              ('PRODVERSION', 'Version')]:
-                values[key] = values[key] or ui.prompt(_(desc + " (required):"))
+                values[key] = values[key] or ui.prompt(_("%s (required):") % desc)
                 if values[key] is None:
-                    raise util.Abort(desc + " must be specified for new bugs")
+                    raise util.Abort(_("%s must be specified for new bugs") % desc)
+
+            if values['PRODVERSION'] == '<default>':
+                values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
 
             response = create_bug(ui, api_server, auth,
                                   product = values['PRODUCT'],
