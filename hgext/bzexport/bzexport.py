@@ -685,24 +685,9 @@ def bugzilla_info(ui):
 
     return (auth, api_server, bugzilla)
 
-def bzexport(ui, repo, *args, **opts):
-    """
-    Export changesets to bugzilla attachments.
-
-    When the --new option is used, a menu will be displayed for the product and
-    component unless a default has been set in the [bzexport] of the config
-    file (keys are 'product' and 'component'), or if something has been
-    specified on the command line.
-
-    Also, the -e option may be used to bring up an editor that will allow
-    editing all fields of the attachment and bug (if creating one).
-    """
-    auth, api_server, bugzilla = bugzilla_info(ui)
-
-    if opts['no_attachment'] and not opts['new']:
-        raise util.Abort(_("--no-attachment requires --new"))
-    if opts['no_attachment'] and opts['review']:
-        raise util.Abort(_("--reviewers not allowed with --no-attachment"))
+def infer_arguments(ui, repo, args, opts):
+    if opts['no_attachment']:
+        return (None, None)
 
     rev = None
     bug = None
@@ -725,8 +710,7 @@ def bzexport(ui, repo, *args, **opts):
         # With zero args we'll guess at both, and if we fail we'll
         # fail later.
     elif len(args) > 2:
-        ui.write_err("Too many arguments to bzexport!\n")
-        return
+        raise util.Abort(_("Too many arguments!"))
     else:
         # Just right.
         rev, bug = args
@@ -746,18 +730,40 @@ def bzexport(ui, repo, *args, **opts):
         if hasattr(repo, 'mq') and repo.mq.applied:
             rev = repo.mq.applied[-1].name
 
+    return (rev, bug)
+
+def bzexport(ui, repo, *args, **opts):
+    """
+    Export changesets to bugzilla attachments.
+
+    When the --new option is used, a menu will be displayed for the product and
+    component unless a default has been set in the [bzexport] of the config
+    file (keys are 'product' and 'component'), or if something has been
+    specified on the command line.
+
+    Also, the -e option may be used to bring up an editor that will allow
+    editing all fields of the attachment and bug (if creating one).
+    """
+    auth, api_server, bugzilla = bugzilla_info(ui)
+
+    if opts['no_attachment'] and not opts['new']:
+        raise util.Abort(_("--no-attachment requires --new"))
+    if opts['no_attachment'] and opts['review']:
+        raise util.Abort(_("--reviewers not allowed with --no-attachment"))
+
+    rev, bug = infer_arguments(ui, repo, args, opts)
+
     contents = StringIO()
     diffopts = patch.diffopts(ui, opts)
     context = ui.config("bzexport", "unified", None)
     if context:
         diffopts.context = int(context)
-    if hasattr(cmdutil, "export"):
-        cmdutil.export(repo, [rev], fp=contents,
-                       opts=diffopts)
-    else:
-        # Support older hg versions
-        patch.export(repo, [rev], fp=contents,
-                     opts=diffopts)
+    if not opts['no_attachment']:
+        if hasattr(cmdutil, "export"):
+            cmdutil.export(repo, [rev], fp=contents, opts=diffopts)
+        else:
+            # Support older hg versions
+            patch.export(repo, [rev], fp=contents, opts=diffopts)
 
     # Just always use the rev name as the patch name. Doesn't matter much,
     # unless you want to avoid obsoleting existing patches when uploading a
@@ -816,14 +822,11 @@ def bzexport(ui, repo, *args, **opts):
 
     if not attachment_comment:
         # New bugs get first shot at the patch comment
-        if not opts['new']:
-            attachment_comment = patch_comment
-        elif bug_comment:
+        if not opts['new'] or bug_comment:
             attachment_comment = patch_comment
 
-    if not bug_comment:
-        if opts['new']:
-            bug_comment = patch_comment
+    if not bug_comment and opts['new']:
+        bug_comment = patch_comment
 
     if opts["review"]:
         search_strings = opts["review"].split(",")
@@ -884,6 +887,8 @@ def bzexport(ui, repo, *args, **opts):
         if values['PRODVERSION'] in [None, '<default>']:
             values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
             ui.write("Using default version %s of product %s\n" % (values['PRODVERSION'], values['PRODUCT']))
+        if values['BUGTITLE'] in [None, '<required>']:
+            values['BUGTITLE'] = ui.prompt(_("Bug title:"))
 
         try:
             response = create_bug(ui, api_server, auth,
