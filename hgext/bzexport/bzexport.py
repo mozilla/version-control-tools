@@ -658,18 +658,7 @@ def edit_value(ui, value, desc):
         raise util.Abort("Empty value: %s" % desc)
     return value
 
-def bzexport(ui, repo, *args, **opts):
-    """
-    Export changesets to bugzilla attachments.
-
-    When the --new option is used, a menu will be displayed for the product and
-    component unless a default has been set in the [bzexport] of the config
-    file (keys are 'product' and 'component'), or if something has been
-    specified on the command line.
-
-    Also, the -e option may be used to bring up an editor that will allow
-    editing all fields of the attachment and bug (if creating one).
-    """
+def bugzilla_info(ui):
     api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/latest/")
     bugzilla = ui.config("bzexport", "bugzilla", "https://bugzilla.mozilla.org/")
     username = ui.config("bzexport", "username", None)
@@ -693,6 +682,27 @@ def bzexport(ui, repo, *args, **opts):
             return
 
     auth = bzAuth(userid, cookie, username, password)
+
+    return (auth, api_server, bugzilla)
+
+def bzexport(ui, repo, *args, **opts):
+    """
+    Export changesets to bugzilla attachments.
+
+    When the --new option is used, a menu will be displayed for the product and
+    component unless a default has been set in the [bzexport] of the config
+    file (keys are 'product' and 'component'), or if something has been
+    specified on the command line.
+
+    Also, the -e option may be used to bring up an editor that will allow
+    editing all fields of the attachment and bug (if creating one).
+    """
+    auth, api_server, bugzilla = bugzilla_info(ui)
+
+    if opts['no_attachment'] and not opts['new']:
+        raise util.Abort(_("--no-attachment requires --new"))
+    if opts['no_attachment'] and opts['review']:
+        raise util.Abort(_("--reviewers not allowed with --no-attachment"))
 
     rev = None
     bug = None
@@ -860,7 +870,7 @@ def bzexport(ui, repo, *args, **opts):
         if reviewers is None:
             raise util.Abort("Invalid reviewers")
     else:
-        if not values['ATTACHMENT_DESCRIPTION']:
+        if not opts['no_attachment'] and not values['ATTACHMENT_DESCRIPTION']:
             values['ATTACHMENT_DESCRIPTION'] = ui.prompt(_("Patch description:"), default=filename)
 
     if opts["new"]:
@@ -891,6 +901,9 @@ def bzexport(ui, repo, *args, **opts):
         if bug is None:
             raise util.Abort(_("No bug number specified and no bug number "
                                "listed in changeset message!"))
+
+    if opts['no_attachment']:
+        return
 
     if len(reviewers) > 0:
         for reviewer in reviewers:
@@ -937,6 +950,8 @@ cmdtable = {
            'New bug product version'),
           ('', 'bug-description', '',
            'New bug description (aka comment 0)'),
+          ('', 'no-attachment', False,
+           'Do not attach anything to the bug (requires --new)'),
           # The following option is passed through directly to patch.diffopts
           ('w', 'ignore_all_space', False, 'Generate a diff that ignores whitespace changes')],
         _('hg bzexport [options] [REV] [BUG]')),
