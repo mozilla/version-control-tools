@@ -866,8 +866,6 @@ cmdtable = {
            'New bug product version'),
           ('', 'bug-description', '',
            'New bug description (aka comment 0)'),
-          ('', 'edit-bug-description', False,
-           'Open a text editor to specify a description to add with a new bug'),
           # The following option is passed through directly to patch.diffopts
           ('w', 'ignore_all_space', False, 'Generate a diff that ignores whitespace changes')],
         _('hg bzexport [options] [REV] [BUG]')),
