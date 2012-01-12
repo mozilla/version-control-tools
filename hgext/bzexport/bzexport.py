@@ -38,6 +38,8 @@ If no revision is specified, it will default to 'tip'. If no
 bug is specified, the changeset commit message will be scanned
 for a bug number to use.
 
+This extension also adds a 'newbug' command.
+
 """
 from mercurial.i18n import _
 from mercurial import commands, config, cmdutil, hg, node, util, patch
@@ -580,7 +582,7 @@ def savefile(repo, basename, text):
 # the whole template into a regex with /(.*?)/ in place of each keyword and
 # match the edited output against that. Pull out the possibly-updated field
 # values.
-templates = { 'new_bug_template': '''Title: @BUGTITLE@
+templates = { 'new_both_template': '''Title: @BUGTITLE@
 Product: @PRODUCT@
 Component: @COMPONENT@
 Version: @PRODVERSION@
@@ -600,6 +602,17 @@ Attachment Comment (appears as a regular comment on the bug):
 @ATTACHCOMMENT@
 
 ---- END Attachment Comment ----
+''',
+              'new_bug_template': '''Title: @BUGTITLE@
+Product: @PRODUCT@
+Component: @COMPONENT@
+Version: @PRODVERSION@
+
+Bug Description (aka comment 0):
+
+@BUGCOMMENT0@
+
+--- END Bug Description ---
 ''',
               'existing_bug_template': '''Bug: @BUGNUM@
 
@@ -686,9 +699,6 @@ def bugzilla_info(ui):
     return (auth, api_server, bugzilla)
 
 def infer_arguments(ui, repo, args, opts):
-    if opts['no_attachment']:
-        return (None, None)
-
     rev = None
     bug = None
     if len(args) < 2:
@@ -732,24 +742,61 @@ def infer_arguments(ui, repo, args, opts):
 
     return (rev, bug)
 
+def fill_values(values, ui, api_server, reviewers = None, finalize = False):
+    if reviewers is not None:
+        values['REVIEWER_1'] = '<none>'
+        values['REVIEWER_2'] = '<none>'
+        if (len(reviewers) > 0):
+            values['REVIEWER_1'] = reviewers[0]
+        if (len(reviewers) > 1):
+            values['REVIEWER_2'] = reviewers[1]
+
+    if 'PRODVERSION' in values:
+        if values['PRODVERSION'] == '<default>' and values['PRODUCT'] not in [None, '<choose-from-menu>']:
+            values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
+            ui.write("Using default version %s of product %s\n" % (values['PRODVERSION'], values['PRODUCT']))
+
+    # 'finalize' means we need the final values. (finalize will be set to false
+    # for prepopulating fields that will be displayed in a form)
+    if not finalize:
+        return values
+
+    if 'PRODUCT' in values:
+        if values['PRODUCT'] in [None, '<choose-from-menu>']:
+            values['PRODUCT'] = product_menu(ui, api_server)
+
+    if 'COMPONENT' in values:
+        if values['COMPONENT'] in [None, '<choose-from-menu>']:
+            values['COMPONENT'] = component_menu(ui, api_server, values['PRODUCT'])
+
+    if 'PRODVERSION' in values:
+        if values['PRODVERSION'] in [None, '<default>']:
+            values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
+            ui.write("Using default version %s of product %s\n" % (values['PRODVERSION'], values['PRODUCT']))
+
+    if 'BUGTITLE' in values:
+        if values['BUGTITLE'] in [None, '<required>']:
+            values['BUGTITLE'] = ui.prompt(_("Bug title:"))
+
+    if 'ATTACHMENT_DESCRIPTION' in values:
+        if not values['ATTACHMENT_DESCRIPTION']:
+            values['ATTACHMENT_DESCRIPTION'] = ui.prompt(_("Patch description:"), default=filename)
+
+    return values
+
 def bzexport(ui, repo, *args, **opts):
     """
     Export changesets to bugzilla attachments.
 
     When the --new option is used, a menu will be displayed for the product and
-    component unless a default has been set in the [bzexport] of the config
-    file (keys are 'product' and 'component'), or if something has been
+    component unless a default has been set in the [bzexport] section of the
+    config file (keys are 'product' and 'component'), or if something has been
     specified on the command line.
 
     Also, the -e option may be used to bring up an editor that will allow
     editing all fields of the attachment and bug (if creating one).
     """
     auth, api_server, bugzilla = bugzilla_info(ui)
-
-    if opts['no_attachment'] and not opts['new']:
-        raise util.Abort(_("--no-attachment requires --new"))
-    if opts['no_attachment'] and opts['review']:
-        raise util.Abort(_("--reviewers not allowed with --no-attachment"))
 
     rev, bug = infer_arguments(ui, repo, args, opts)
 
@@ -758,12 +805,11 @@ def bzexport(ui, repo, *args, **opts):
     context = ui.config("bzexport", "unified", None)
     if context:
         diffopts.context = int(context)
-    if not opts['no_attachment']:
-        if hasattr(cmdutil, "export"):
-            cmdutil.export(repo, [rev], fp=contents, opts=diffopts)
-        else:
-            # Support older hg versions
-            patch.export(repo, [rev], fp=contents, opts=diffopts)
+    if hasattr(cmdutil, "export"):
+        cmdutil.export(repo, [rev], fp=contents, opts=diffopts)
+    else:
+        # Support older hg versions
+        patch.export(repo, [rev], fp=contents, opts=diffopts)
 
     # Just always use the rev name as the patch name. Doesn't matter much,
     # unless you want to avoid obsoleting existing patches when uploading a
@@ -839,57 +885,38 @@ def bzexport(ui, repo, *args, **opts):
         raise util.Abort("Invalid reviewers")
 
     values = { 'BUGNUM': bug,
-               'BUGTITLE': opts['title'] or desc,
-               'PRODUCT': opts.get('product', '') or ui.config("bzexport", "product", '<choose-from-menu>'),
-               'COMPONENT': opts.get('component', '') or ui.config("bzexport", "component", '<choose-from-menu>'),
-               'PRODVERSION': opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>'),
-               'BUGCOMMENT0': bug_comment,
                'ATTACHMENT_FILENAME': filename,
                'ATTACHMENT_DESCRIPTION': desc,
                'ATTACHCOMMENT': attachment_comment,
                }
-    try:
-        values['REVIEWER_1'] = reviewers[0]
-    except:
-        values['REVIEWER_1'] = '<none>'
-    try:
-        values['REVIEWER_2'] = reviewers[1]
-    except:
-        values['REVIEWER_2'] = '<none>'
+
+    if opts['new']:
+        values['BUGTITLE'] = opts['title'] or desc
+        values['PRODUCT'] = opts.get('product', '') or ui.config("bzexport", "product", '<choose-from-menu>')
+        values['COMPONENT'] = opts.get('component', '') or ui.config("bzexport", "component", '<choose-from-menu>')
+        values['PRODVERSION'] = opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>')
+        values['BUGCOMMENT0'] = bug_comment
+
+    values = fill_values(values, ui, api_server, reviewers = reviewers, finalize = False)
 
     if opts['edit']:
         if opts['new']:
-            if values['PRODVERSION'] == '<default>' and values['PRODUCT'] not in [None, '<choose-from-menu>']:
-                values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
-            values = edit_form(ui, repo, values, 'new_bug_template')
+            values = edit_form(ui, repo, values, 'new_both_template')
         else:
             values = edit_form(ui, repo, values, 'existing_bug_template')
-            if bug != values['BUGNUM']:
-                raise util.Abort("Modifying bug number is not supported")
+            bug = values['BUGNUM']
 
-        search_strings = [r for r in [values['REVIEWER_1'], values['REVIEWER_2']]
-                            if r is not None ]
+        search_strings = [values[r] for r in ['REVIEWER_1', 'REVIEWER_2']
+                            if values[r] is not None ]
         reviewers = validate_reviewers(ui, api_server, auth, search_strings, multi_reviewer_prompt)
         if reviewers is None:
             raise util.Abort("Invalid reviewers")
-    else:
-        if not opts['no_attachment'] and not values['ATTACHMENT_DESCRIPTION']:
-            values['ATTACHMENT_DESCRIPTION'] = ui.prompt(_("Patch description:"), default=filename)
+
+    values = fill_values(values, ui, api_server, finalize = True)
 
     if opts["new"]:
         if bug is not None:
             raise util.Abort("Bug %s given but creation of new bug requested!" % bug)
-
-        if values['PRODUCT'] in [None, '<choose-from-menu>']:
-            values['PRODUCT'] = product_menu(ui, api_server)
-        if values['COMPONENT'] in [None, '<choose-from-menu>']:
-            values['COMPONENT'] = component_menu(ui, api_server, values['PRODUCT'])
-        if values['PRODVERSION'] in [None, '<default>']:
-            values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
-            ui.write("Using default version %s of product %s\n" % (values['PRODVERSION'], values['PRODUCT']))
-        if values['BUGTITLE'] in [None, '<required>']:
-            values['BUGTITLE'] = ui.prompt(_("Bug title:"))
-
         try:
             response = create_bug(ui, api_server, auth,
                                   product = values['PRODUCT'],
@@ -906,9 +933,6 @@ def bzexport(ui, repo, *args, **opts):
         if bug is None:
             raise util.Abort(_("No bug number specified and no bug number "
                                "listed in changeset message!"))
-
-    if opts['no_attachment']:
-        return
 
     if len(reviewers) > 0:
         for reviewer in reviewers:
@@ -934,6 +958,45 @@ def bzexport(ui, repo, *args, **opts):
     if not result_id or not obsolete_old_patches(ui, api_server, auth, bug, filename, result_id):
         return
 
+def newbug(ui, repo, *args, **opts):
+    """
+    Create a new bug in bugzilla
+
+    A menu will be displayed for the product and component unless a default has
+    been set in the [bzexport] section of the config file (keys are 'product'
+    and 'component'), or if something has been specified on the command line.
+
+    Also, the -e option may be used to bring up an editor that will allow
+    editing all handled fields of bug.
+    """
+    auth, api_server, bugzilla = bugzilla_info(ui)
+
+    bug_comment = opts['comment']
+
+    values = { 'BUGTITLE': opts['title'] or '<required>',
+               'PRODUCT': opts.get('product', '') or ui.config("bzexport", "product", '<choose-from-menu>'),
+               'COMPONENT': opts.get('component', '') or ui.config("bzexport", "component", '<choose-from-menu>'),
+               'PRODVERSION': opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>'),
+               'BUGCOMMENT0': bug_comment,
+               }
+
+    fill_values(values, ui, api_server, finalize = False)
+
+    if opts['edit']:
+        values = edit_form(ui, repo, values, 'new_bug_template')
+
+    fill_values(values, ui, api_server, finalize = True)
+
+    response = create_bug(ui, api_server, auth,
+                          product = values['PRODUCT'],
+                          component = values['COMPONENT'],
+                          version = values['PRODVERSION'],
+                          title = values['BUGTITLE'],
+                          description = values['BUGCOMMENT0'])
+    result = json.load(response)
+    bug = result['id']
+    ui.write("Created bug %s at %s\n" % (bug, bugzilla + "/show_bug.cgi?id=" + bug))
+
 cmdtable = {
     'bzexport':
         (bzexport,
@@ -955,9 +1018,23 @@ cmdtable = {
            'New bug product version'),
           ('', 'bug-description', '',
            'New bug description (aka comment 0)'),
-          ('', 'no-attachment', False,
-           'Do not attach anything to the bug (requires --new)'),
           # The following option is passed through directly to patch.diffopts
           ('w', 'ignore_all_space', False, 'Generate a diff that ignores whitespace changes')],
         _('hg bzexport [options] [REV] [BUG]')),
+
+    'newbug':
+        (newbug,
+         [('c', 'comment', '', 'Comment to add with the bug'),
+          ('e', 'edit', False,
+           'Open a text editor to modify bug fields'),
+          ('t', 'title', '',
+           'New bug title'),
+          ('', 'product', '',
+           'New bug product'),
+          ('', 'component', '',
+           'New bug component'),
+          ('', 'prodversion', '',
+           'New bug product version'),
+          ],
+         _('hg newbug [-e] [-t TITLE] [-c COMMENT]')),
 }
