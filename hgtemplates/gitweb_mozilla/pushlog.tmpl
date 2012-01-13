@@ -3,17 +3,17 @@
 <link rel="alternate" type="application/atom+xml"
    href="{url}pushlog" title="Atom feed for {repo|escape} pushlog"/>
 <style type="text/css">
-#localize, .expand {
+#localize, .expand \{
   font-size: x-small;
 }
 </style>
 <script type="text/javascript" src="{staticurl}jquery-1.2.6.min.js"></script>
 <script type="text/javascript">// <![CDATA
-$(document).ready(function () {
+$(document).ready(function () \{
   // add click handler to the localize dates link
-  $('#localize').show().click(function () {
+  $('#localize').show().click(function () \{
      $(this).hide();
-     $('.date').each(function (i) {
+     $('.date').each(function (i) \{
        $(this).text(new Date($(this).text()).toLocaleString());
      });
      return false;
@@ -21,7 +21,7 @@ $(document).ready(function () {
   // hide things that should be hidden
   $('.hidden').hide();
   // add click handler to unhide hidden things
-  $('.expand').click(function () {
+  $('.expand').click(function () \{
     if ($(this).text() == "[Expand]")
       $(this).text("[Collapse]");
     else
