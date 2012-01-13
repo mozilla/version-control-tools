@@ -673,14 +673,6 @@ def edit_form(ui, repo, fields, template_name):
 
     return new_fields
 
-def edit_value(ui, value, desc):
-    value = (value or '') + "\nHG: Enter %s.\nHG: Lines starting with 'HG:' will be removed.\n" % desc
-    value = ui.edit(value, ui.username())
-    value = re.sub("(?m)^HG:.*\n", "", value)
-    if not value.strip():
-        raise util.Abort("Empty value: %s" % desc)
-    return value
-
 def bugzilla_info(ui):
     api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/latest/")
     bugzilla = ui.config("bzexport", "bugzilla", "https://bugzilla.mozilla.org/")
