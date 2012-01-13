@@ -205,7 +205,7 @@ def load_user_cache(ui, api_server):
     return c
 
 def load_configuration(ui, api_server):
-    cache = load_global_cache(ui, api_server).get(api_server)
+    cache = load_global_cache(ui, api_server).get(api_server, {})
     now = time.time()
     if 'configuration' in cache and now - cache['configuration_timestamp'] < 24*60*60*7:
         return cache['configuration']
@@ -939,21 +939,17 @@ def bzexport(ui, repo, *args, **opts):
             ui.write("Requesting review from " + reviewer + "\n")
 
     result_id = None
-    try:
-        attach = create_attachment(ui, api_server, auth,
-                                   bug, contents.getvalue(),
-                                   filename=values['ATTACHMENT_FILENAME'],
-                                   description=values['ATTACHMENT_DESCRIPTION'],
-                                   comment=values['ATTACHCOMMENT'],
-                                   reviewers=reviewers)
-        result = json.load(attach)
-        attachment_url = urlparse.urljoin(bugzilla,
-                                          "attachment.cgi?id=" + result["id"] + "&action=edit")
-        print "%s uploaded as %s" % (rev, attachment_url)
-        result_id = result["id"]
-
-    except Exception, e:
-        raise util.Abort("Error sending patch: %s\n" % str(e))
+    attach = create_attachment(ui, api_server, auth,
+                               bug, contents.getvalue(),
+                               filename=values['ATTACHMENT_FILENAME'],
+                               description=values['ATTACHMENT_DESCRIPTION'],
+                               comment=values['ATTACHCOMMENT'],
+                               reviewers=reviewers)
+    result = json.load(attach)
+    attachment_url = urlparse.urljoin(bugzilla,
+                                      "attachment.cgi?id=" + result["id"] + "&action=edit")
+    print "%s uploaded as %s" % (rev, attachment_url)
+    result_id = result["id"]
 
     if not result_id or not obsolete_old_patches(ui, api_server, auth, bug, filename, result_id):
         return
