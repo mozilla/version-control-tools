@@ -647,10 +647,13 @@ def edit_form(ui, repo, fields, template_name):
     # Allow user to edit the form
     new = ui.edit(orig, ui.username())
 
-    ui.write("saved edited form in " + savefile(repo, "last_bzexport.txt", new) + "\n")
+    saved = savefile(repo, "last_bzexport.txt", new)
+    ui.write("saved edited form in %s\n" % saved)
 
     # Use the previously-created pattern to pull out the new keyword values
     m = pattern.match(new)
+    if not m:
+        raise util.Abort("Edited form %s has invalid format" % saved)
 
     new_fields = fields.copy()
     for field, value in zip(template_fields, m.groups()):
