@@ -639,10 +639,17 @@ def edit_form(ui, repo, fields, template_name):
     template = templates[template_name]
     orig = field_re.sub(substitute_field, template)
 
-    # Convert "template with @KEYWORD1@ and @KEYWORD2@" into
-    # "template with (.*?) and (.*?)"
-    pattern = re.sub(r'[^\w@]', lambda m: '\\' + m.group(0), template)
-    pattern = re.compile(field_re.sub('(.*?)', pattern), re.S)
+    # Convert "template with @KEYWORD1@ and @KEYWORD2@" into "template with
+    # (.*?) and (.*?)". But also allow simple fields (eg "Product: @PRODUCT@")
+    # to have the space after the colon omitted, to handle the case where you
+    # set a default for the field in your .hgrc and you want to clear it out
+    # and be prompted instead. (The regex will end up being /Product\: *(.*?)/s
+    # instead.)
+    pattern = template
+    pattern = re.sub(r'[^\w@]', lambda m: '\\' + m.group(0), pattern)
+    pattern = re.sub(r'\\:\\ ', '\\: *', pattern)
+    pattern = field_re.sub('(.*?)', pattern)
+    pattern = re.compile(pattern, re.S)
 
     # Allow user to edit the form
     new = ui.edit(orig, ui.username())
@@ -659,7 +666,7 @@ def edit_form(ui, repo, fields, template_name):
     for field, value in zip(template_fields, m.groups()):
         if value == '<required>':
             raise util.Abort("Required field %s not filled in" % (field,))
-        elif value == '<none>':
+        elif value == '<none>' or value == '':
             new_fields[field] = None
         else:
             new_fields[field] = value
