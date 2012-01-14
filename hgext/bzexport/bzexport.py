@@ -277,7 +277,7 @@ def create_attachment(ui, api_server, token, bug,
                  'description': description,
                  'is_patch': True,
                  'content_type': 'text/plain'}
-    if reviewers is not None:
+    if reviewers:
         flag_ids = review_flag_type_id(ui, api_server)
         
         flags = []
