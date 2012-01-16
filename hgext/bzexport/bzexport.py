@@ -34,11 +34,11 @@ bugzilla.mozilla.org or the option '--new' to create a new bug. The extension
 is tuned to work best with MQ changesets (it can only currently work with
 applied patches).
 
-If no revision is specified, it will default to 'tip'. If no
-bug is specified, the changeset commit message will be scanned
-for a bug number to use.
+If no revision is specified, it will default to 'tip'. If no bug is specified,
+the changeset commit message will be scanned for a bug number to use.
 
-This extension also adds a 'newbug' command.
+This extension also adds a 'newbug' command for creating a new bug without
+attaching anything to it.
 
 """
 from mercurial.i18n import _
@@ -498,6 +498,8 @@ def find_reviewers(ui, api_server, token, search_strings):
     return search_results
 
 def prompt_menu(ui, name, values, readable_values = None, message = '', allow_none=False):
+    if message and not message.endswith('\n'):
+        message += "\n"
     prompts = []
     for i in range(0, len(values)):
         prompts.append("&%d" % (i + 1))
@@ -518,17 +520,19 @@ def prompt_menu(ui, name, values, readable_values = None, message = '', allow_no
     else:
         return values[choice]
 
-def product_menu(ui, api_version):
-    c = load_configuration(ui, api_version)
-    return prompt_menu(ui, 'product', c['product'].keys(), message = "Products available:\n")
+def filter_strings(collection, substring):
+    substring = substring.lower()
+    return [ v for v in collection if v.lower().find(substring) != -1 ]
 
-def component_menu(ui, api_version, product):
-    c = load_configuration(ui, api_version)
-    components = c['product'].get(product, {}).get('component', {}).keys()
-    if len(components) == 0:
-        raise util.Abort("Invalid product '%s' (has no components)" % product)
-    return prompt_menu(ui, 'component', components,
-                       message = "Components of product %s:\n" % product)
+def choose_value(ui, desc, options, message = "", usemenu = True):
+    if len(options) == 0:
+        return None
+    elif len(options) == 1:
+        return options.pop()
+    elif usemenu:
+        return prompt_menu(ui, desc, options, message = message)
+    else:
+        return None
 
 def multi_reviewer_prompt(ui, search_result):
     for n in search_results['real_names']:
@@ -744,6 +748,83 @@ def infer_arguments(ui, repo, args, opts):
 
     return (rev, bug)
 
+def choose_prodcomponent(ui, c, orig_product, orig_component, finalize = False):
+    def canon(v):
+        if not v or v == '<choose-from-menu>':
+            return None
+        return v
+
+    product = canon(orig_product)
+    component = canon(orig_component)
+
+    all_products = c.get('product', {}).keys()
+
+    if component is not None:
+        slash = component.find('/')
+        if product is None and slash != -1:
+            product = component[0:slash]
+            component = component[slash+1:]
+
+    products_info = c.get('product', {})
+
+    # 'products' and 'components' will be the set of valid products/components
+    # remaining after filtering by the 'product' and 'component' passed in
+    products = all_products
+    components = set()
+
+    if product is None:
+        if component is None:
+            product = choose_value(ui, 'product', all_products,
+                                   message = "Possible Products:",
+                                   usemenu = finalize)
+            if product is not None:
+                products = [ product ]
+        else:
+            # Inverted lookup: find products matching the given component (or
+            # substring of a component)
+            products = []
+            for p in all_products:
+                if len(filter_strings(products_info[p]['component'].keys(), component)) > 0:
+                    products.append(p)
+    else:
+        products = filter_strings(all_products, product)
+
+    for p in products:
+        components.update(products_info[p]['component'].keys())
+    if component is not None:
+        components = filter_strings(components, component)
+
+    # Now choose a final product/component (unless finalize is false, in which
+    # case if there are multiple possibilities, the passed-in value will be
+    # preserved)
+
+    if len(products) == 0:
+        product = None
+    elif len(products) == 1:
+        product = products.pop()
+    else:
+        product = choose_value(ui, 'product', products,
+                               message = "Select from these products:",
+                               usemenu = finalize)
+        if product is not None:
+            prodcomponents = products_info[product]['component'].keys()
+            components = set(components).intersection(prodcomponents)
+        else:
+            product = orig_product
+
+    if len(components) == 0:
+        component = None
+    elif len(components) == 1:
+        component = components.pop()
+    else:
+        component = choose_value(ui, 'component', components,
+                                 message = "Select from these components:",
+                                 usemenu = finalize)
+        if component is None:
+            component = orig_component
+
+    return (product, component)
+
 def fill_values(values, ui, api_server, reviewers = None, finalize = False):
     if reviewers is not None:
         values['REVIEWER_1'] = '<none>'
@@ -752,6 +833,11 @@ def fill_values(values, ui, api_server, reviewers = None, finalize = False):
             values['REVIEWER_1'] = reviewers[0]
         if (len(reviewers) > 1):
             values['REVIEWER_2'] = reviewers[1]
+
+    c = load_configuration(ui, api_server)
+
+    if 'PRODUCT' in values:
+        values['PRODUCT'], values['COMPONENT'] = choose_prodcomponent(ui, c, values['PRODUCT'], values['COMPONENT'], finalize = finalize)
 
     if 'PRODVERSION' in values:
         if values['PRODVERSION'] == '<default>' and values['PRODUCT'] not in [None, '<choose-from-menu>']:
@@ -762,19 +848,6 @@ def fill_values(values, ui, api_server, reviewers = None, finalize = False):
     # for prepopulating fields that will be displayed in a form)
     if not finalize:
         return values
-
-    if 'PRODUCT' in values:
-        if values['PRODUCT'] in [None, '<choose-from-menu>']:
-            values['PRODUCT'] = product_menu(ui, api_server)
-
-    if 'COMPONENT' in values:
-        if values['COMPONENT'] in [None, '<choose-from-menu>']:
-            values['COMPONENT'] = component_menu(ui, api_server, values['PRODUCT'])
-
-    if 'PRODVERSION' in values:
-        if values['PRODVERSION'] in [None, '<default>']:
-            values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
-            ui.write("Using default version %s of product %s\n" % (values['PRODVERSION'], values['PRODUCT']))
 
     if 'BUGTITLE' in values:
         if values['BUGTITLE'] in [None, '<required>']:
@@ -790,13 +863,11 @@ def bzexport(ui, repo, *args, **opts):
     """
     Export changesets to bugzilla attachments.
 
-    When the --new option is used, a menu will be displayed for the product and
-    component unless a default has been set in the [bzexport] section of the
-    config file (keys are 'product' and 'component'), or if something has been
-    specified on the command line.
+    The -e option may be used to bring up an editor that will allow editing all
+    fields of the attachment and bug (if creating one).
 
-    Also, the -e option may be used to bring up an editor that will allow
-    editing all fields of the attachment and bug (if creating one).
+    The --new option may be used to create a new bug rather than using an
+    existing bug. See the newbug command for details.
     """
     auth, api_server, bugzilla = bugzilla_info(ui)
 
@@ -968,8 +1039,15 @@ def newbug(ui, repo, *args, **opts):
     been set in the [bzexport] section of the config file (keys are 'product'
     and 'component'), or if something has been specified on the command line.
 
-    Also, the -e option may be used to bring up an editor that will allow
-    editing all handled fields of bug.
+    The -e option brings up an editor that will allow editing all handled
+    fields of the bug.
+
+    The product and/or component given on the command line or the edited form
+    may be case-insensitive substrings rather than exact matches of valid
+    values. Ambiguous matches will be resolved with a menu. The -C
+    (--component) option may be used to set both the product and component by
+    separating them with a forward slash ('/'), though usually just giving the
+    component should be sufficient.
     """
     auth, api_server, bugzilla = bugzilla_info(ui)
 
@@ -1014,7 +1092,7 @@ cmdtable = {
            'New bug title'),
           ('', 'product', '',
            'New bug product'),
-          ('', 'component', '',
+          ('C', 'component', '',
            'New bug component'),
           ('', 'prodversion', '',
            'New bug product version'),
@@ -1033,7 +1111,7 @@ cmdtable = {
            'New bug title'),
           ('', 'product', '',
            'New bug product'),
-          ('', 'component', '',
+          ('C', 'component', '',
            'New bug component'),
           ('', 'prodversion', '',
            'New bug product version'),
