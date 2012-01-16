@@ -852,11 +852,15 @@ def bzexport(ui, repo, *args, **opts):
         if desc[0] in ['-', ':', '.']:
             desc = desc[1:].lstrip()
 
-        # Next strip off review and approval annotations
+        # Next strip off review and approval annotations, grabbing the
+        # reviewers from the patch comments only if -r auto was given
         def grab_reviewer(m):
-            reviewers.append(m.group(1))
+            if opts['review'] == 'auto':
+                reviewers.append(m.group(1))
             return ''
         desc = review_re.sub(grab_reviewer, desc).rstrip()
+        if len(reviewers) > 0:
+            del opts['review']
 
         # Finally, just take the first line in case. If there is more than one
         # line, use it as a comment.
@@ -1003,7 +1007,7 @@ cmdtable = {
           ('e', 'edit', False,
            'Open a text editor to modify bug fields'),
           ('r', 'review', '',
-           'List of users to request review from (comma-separated search strings)'),
+           'List of users to request review from (comma-separated search strings), or "auto" to parse the reviewers out of the patch comment'),
           ('', 'new', False,
            'Create a new bug'),
           ('', 'title', '',
