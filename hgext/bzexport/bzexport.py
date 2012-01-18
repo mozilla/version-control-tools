@@ -530,7 +530,7 @@ def choose_value(ui, desc, options, message = "", usemenu = True):
     elif len(options) == 1:
         return options.pop()
     elif usemenu:
-        return prompt_menu(ui, desc, options, message = message)
+        return prompt_menu(ui, desc, list(options), message = message)
     else:
         return None
 
