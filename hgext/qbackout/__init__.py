@@ -42,6 +42,18 @@ def qbackout(ui, repo, rev, **opts):
     patches. If the -s/--single option is set, then all backed-out changesets
     will be rolled up into a single backout changeset. Otherwise, there will
     be one backout changeset queued up for each backed-out changeset.
+
+    Examples:
+      hg qbackout -r 20 -r 30    # backout revisions 20 and 30
+
+      hg qbackout -r 20+30       # backout revisions 20 and 30
+
+      hg qbackout -r 20+30:32    # backout revisions 20, 30, 31, and 32
+
+      hg qbackout -r a3a81775    # the usual revision syntax is available
+
+    See "hg help revisions" and "hg help revsets" for more about specifying
+    revisions.
     """
     q = repo.mq
     if not opts.get('force'):
