@@ -205,7 +205,12 @@ def load_user_cache(ui, api_server):
     return c
 
 def load_configuration(ui, api_server):
-    cache = load_global_cache(ui, api_server).get(api_server, {})
+    global_cache = load_global_cache(ui, api_server)
+    cache = {}
+    try:
+        cache = global_cache[api_server]
+    except:
+        global_cache[api_server] = cache
     now = time.time()
     if 'configuration' in cache and now - cache['configuration_timestamp'] < 24*60*60*7:
         return cache['configuration']
