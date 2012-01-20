@@ -430,7 +430,7 @@ class PUTRequest(urllib2.Request):
     def get_method(self):
         return "PUT"
 
-def obsolete_old_patches(ui, api_server, token, bug, filename, ignore_id):
+def obsolete_old_patches(ui, api_server, token, bug, filename, ignore_id, interactive = False):
     url = api_server + "bug/%s/attachment?%s" % (bug, token.auth()) 
     req = urllib2.Request(url, None,
                           {"Accept": "application/json",
@@ -449,6 +449,9 @@ def obsolete_old_patches(ui, api_server, token, bug, filename, ignore_id):
     for p in patches:
         #TODO: "?last_change_time=" + p["last_change_time"] to avoid conflicts?
         url = api_server + "attachment/%s?%s" % (str(p["id"]), token.auth())
+
+        if interactive and ui.prompt(_("Obsolete patch %s (%s) - %s") % (url, p["file_name"], p["description"])) != 'y':
+          continue
 
         attachment_data = p
         attachment_data["is_obsolete"] = True
@@ -1033,7 +1036,7 @@ def bzexport(ui, repo, *args, **opts):
     print "%s uploaded as %s" % (rev, attachment_url)
     result_id = result["id"]
 
-    if not result_id or not obsolete_old_patches(ui, api_server, auth, bug, filename, result_id):
+    if not result_id or not obsolete_old_patches(ui, api_server, auth, bug, filename, result_id, opts['interactive']):
         return
 
 def newbug(ui, repo, *args, **opts):
@@ -1093,6 +1096,8 @@ cmdtable = {
            'List of users to request review from (comma-separated search strings), or "auto" to parse the reviewers out of the patch comment'),
           ('', 'new', False,
            'Create a new bug'),
+          ('i', 'interactive', False,
+           'Interactive -- request confirmation before obsoleting patches'),
           ('', 'title', '',
            'New bug title'),
           ('', 'product', '',
