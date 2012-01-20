@@ -146,8 +146,7 @@ class bzAuth:
             if user and user["name"]:
                 return user["name"]
             else:
-                ui.write_err("Error: couldn't get your username: %s\n" % str(e))
-                return None
+                raise util.Abort(_("Unable to get username: %s") % str(e))
         else:
             return self._username
 
@@ -234,16 +233,14 @@ def load_configuration(ui, api_server):
 def review_flag_type_id(ui, api_server):
     configuration = load_configuration(ui, api_server)
     if not configuration or not configuration["flag_type"]:
-        ui.write_err("Error: couldn't find configuration object\n");
-        return None
+      raise util.Abort(_("Could not find configuration object"))
 
     flag_ids = []
     for flag_id, flag in configuration["flag_type"].iteritems():
         if flag["name"] == "review":
             flag_ids += flag_id
     if not flag_ids:
-        ui.write_err("Error: couldn't find review flag id\n")
-        return None
+        raise util.Abort(_("Could not find review flag id"))
 
     return flag_ids
 
@@ -342,8 +339,7 @@ def find_profile(ui):
         # Pretty simple in comparison, eh?
         path = os.path.expanduser("~/.mozilla/firefox")
     if path is None:
-        ui.write_err("Error: couldn't find a Firefox profile.\n")
-        return None
+        raise util.Abort(_("Could not find a Firefox profile"))
 
     profileini = os.path.join(path, "profiles.ini")
     c = config.config()
@@ -357,8 +353,7 @@ def find_profile(ui):
             if c.get(section, "IsRelative", "0") == "1":
                 profile = os.path.join(path, profile)
     if profile is None:
-        ui.write_err("Error: couldn't find a Firefox profile.\n")
-        return None
+        raise util.Abort(_("Could not find a Firefox profile"))
     return profile
 
 # Choose the cookie to use based on how much of its path matches the URL.
@@ -411,9 +406,8 @@ def get_cookies_from_profile(ui, profile, bugzilla):
             cookie = cookie.encode("utf-8")
         return login, cookie
     except Exception, e:
-        ui.write_err("Error: failed to get bugzilla login cookies from "
-                     "Firefox profile at %s: %s\n" % (profile, str(e)))
-        return None, None
+        raise util.Abort(_("Failed to get bugzilla login cookies from "
+                           "Firefox profile at %s: %s") % (profile, str(e)))
     finally:
         if tempdir:
             shutil.rmtree(tempdir)
@@ -439,8 +433,7 @@ def obsolete_old_patches(ui, api_server, token, bug, filename, ignore_id, intera
     try:
         bug = json.load(conn)
     except Exception, e:
-        ui.write_err("Error: couldn't load info for bug " + bug + ": %s\n" % str(e))
-        return False
+        raise util.Abort(_("Could not load info for bug %s: %s") % (bug, str(e)))
 
     patches = [p for p in bug["attachments"] if p["is_patch"] and not p["is_obsolete"] and p["file_name"] == filename and int(p["id"]) != int(ignore_id)]
     if not len(patches):
@@ -463,8 +456,7 @@ def obsolete_old_patches(ui, api_server, token, bug, filename, ignore_id, intera
         try:
             result = json.load(conn)
         except Exception, e:
-            ui.write_err("Error: couldn't update attachment " + p["id"] + ": %s\n" % e)
-            return False
+            raise util.Abort(_("Could not update attachment %s: %s") % (p["id"], str(e)))
 
     return True
 
@@ -704,9 +696,6 @@ def bugzilla_info(ui):
             return
 
         userid, cookie = get_cookies_from_profile(ui, profile, bugzilla)
-        if userid is None or cookie is None:
-            ui.write_err("Error: couldn't find bugzilla login cookies.\n")
-            return
 
     auth = bzAuth(userid, cookie, username, password)
 
@@ -746,8 +735,7 @@ def infer_arguments(ui, repo, args, opts):
     if repo[rev] == repo["tip"]:
         m, a, r, d = repo.status()[:4]
         if (m or a or r or d):
-            ui.write_err("Local changes found; refresh first!\n");
-            return
+            raise util.Abort(_("Local changes found; refresh first!"))
 
     if rev in ["tip", "qtip"]:
         # Look for a nicer name in the MQ.
