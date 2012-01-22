@@ -522,6 +522,9 @@ def prompt_menu(ui, name, values, readable_values = None, message = '', allow_no
 
 def filter_strings(collection, substring):
     substring = substring.lower()
+    ret = [ s for s in collection if s.lower() == substring ]
+    if ret:
+        return ret
     return [ v for v in collection if v.lower().find(substring) != -1 ]
 
 def choose_value(ui, desc, options, message = "", usemenu = True):
