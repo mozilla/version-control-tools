@@ -993,6 +993,11 @@ def bzexport(ui, repo, *args, **opts):
     if opts["new"]:
         if bug is not None:
             raise util.Abort("Bug %s given but creation of new bug requested!" % bug)
+
+        if opts['interactive'] and ui.prompt(_("Create bug in %s/%s (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
+            ui.write(_("Exiting without creating bug\n"))
+            return
+
         try:
             response = create_bug(ui, api_server, auth,
                                   product = values['PRODUCT'],
@@ -1013,6 +1018,10 @@ def bzexport(ui, repo, *args, **opts):
     if len(reviewers) > 0:
         for reviewer in reviewers:
             ui.write("Requesting review from " + reviewer + "\n")
+
+    if opts['interactive'] and ui.prompt(_("Attach patch? ")) != 'y':
+      ui.write(_("Exiting without creating attachment\n"))
+      return
 
     result_id = None
     attach = create_attachment(ui, api_server, auth,
@@ -1066,6 +1075,10 @@ def newbug(ui, repo, *args, **opts):
 
     fill_values(values, ui, api_server, finalize = True)
 
+    if opts['interactive'] and ui.prompt(_("Create bug in %s/%s (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
+      ui.write(_("Exiting without creating bug\n"))
+      return
+
     response = create_bug(ui, api_server, auth,
                           product = values['PRODUCT'],
                           component = values['COMPONENT'],
@@ -1088,7 +1101,7 @@ cmdtable = {
           ('', 'new', False,
            'Create a new bug'),
           ('i', 'interactive', False,
-           'Interactive -- request confirmation before obsoleting patches'),
+           'Interactive -- request confirmation before any permanent action'),
           ('', 'title', '',
            'New bug title'),
           ('', 'product', '',
@@ -1108,6 +1121,8 @@ cmdtable = {
          [('c', 'comment', '', 'Comment to add with the bug'),
           ('e', 'edit', False,
            'Open a text editor to modify bug fields'),
+          ('i', 'interactive', False,
+           'Interactive -- request confirmation before any permanent action'),
           ('t', 'title', '',
            'New bug title'),
           ('', 'product', '',
