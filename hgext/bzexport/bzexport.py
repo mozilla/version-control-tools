@@ -1019,7 +1019,7 @@ def bzexport(ui, repo, *args, **opts):
         for reviewer in reviewers:
             ui.write("Requesting review from " + reviewer + "\n")
 
-    if opts['interactive'] and ui.prompt(_("Attach patch? ")) != 'y':
+    if opts['interactive'] and ui.prompt(_("Attach patch (y/n)?")) != 'y':
       ui.write(_("Exiting without creating attachment\n"))
       return
 
