@@ -20,7 +20,7 @@ class Settings(object):
     self.msg_format = ui.config('qimportbz', 'msg_format',
                                 'Bug %(bugnum)s - "%(title)s" [%(flags)s]')
     self.joinstr = ui.config('qimportbz', 'joinstr', ' ')
-    self.patch_format = ui.config('qimportbz', 'patch_format', "bug-%(bugnum)s.diff")
+    self.patch_format = ui.config('qimportbz', 'patch_format', "%(filename)s")
 
 class Attachment(object):
   def __init__(self, bug, node):

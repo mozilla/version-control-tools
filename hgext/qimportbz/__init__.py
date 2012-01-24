@@ -30,7 +30,7 @@ There are 7 pieces of patch metadata available for use::
 
 The default values are::
 
-  patch_format = bug-%(bugnum)s.diff
+  patch_format = %(filename)s
   msg_format = Bug %(bugnum)s - "%(title)s" [%(flags)s]
 """
 from mercurial import commands, cmdutil, extensions, url, error
