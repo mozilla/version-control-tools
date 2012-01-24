@@ -930,7 +930,7 @@ def bzexport(ui, repo, *args, **opts):
             return ''
         desc = review_re.sub(grab_reviewer, desc).rstrip()
         if len(reviewers) > 0:
-            del opts['review']
+            opts['review'] = ''
 
         # Finally, just take the first line in case. If there is more than one
         # line, use it as a comment.
