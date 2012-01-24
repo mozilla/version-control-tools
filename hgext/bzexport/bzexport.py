@@ -745,6 +745,12 @@ def infer_arguments(ui, repo, args, opts):
         if hasattr(repo, 'mq') and repo.mq.applied:
             rev = repo.mq.applied[-1].name
 
+    # Check for bug number in the patch filename
+    if bug is None:
+        m = re.match(r'bug[_\-]?(\d+)', rev)
+        if m:
+            bug = m.group(1)
+
     return (rev, bug)
 
 def choose_prodcomponent(ui, c, orig_product, orig_component, finalize = False):
