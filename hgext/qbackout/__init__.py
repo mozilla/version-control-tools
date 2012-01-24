@@ -4,7 +4,7 @@ This is a port of mak's mercurial backout script from
 https://wiki.mozilla.org/User:Mak77 to a mercurial extension.'''
 
 import mercurial
-from mercurial import scmutil, commands, cmdutil, patch
+from mercurial import scmutil, commands, cmdutil, patch, mdiff
 from mercurial.i18n import _
 from mercurial.node import hex, nullid, short
 from hgext import mq
@@ -97,11 +97,13 @@ def qbackout(ui, repo, rev, **opts):
         if p2 != nullid:
             raise util.Abort('cannot backout a merge changeset')
 
+        opts = mdiff.defaultopts
+        opts.git = True
         rpatch = StringIO.StringIO()
-        for chunk in patch.diff(repo, node1=node, node2=p1):
+        for chunk in patch.diff(repo, node1=node, node2=p1, opts=opts):
             rpatch.write(chunk)
         rpatch.seek(0)
-        
+
         save_fin = ui.fin
         ui.fin = rpatch
         commands.import_(ui, repo, '-',
