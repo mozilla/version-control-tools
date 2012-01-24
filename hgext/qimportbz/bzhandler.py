@@ -5,6 +5,7 @@ try:
 except ImportError:
   import StringIO
 import os
+import re
 
 # qimportbz modules
 import bz
@@ -92,21 +93,23 @@ class Handler(urllib2.BaseHandler):
       elif len(patches) > 0:
         for i, p in enumerate(patches):
           flags = p.joinFlags(False)
-          self.ui.write("%s: %s%s\n" % (i + 1, p.desc, "\n%s" % flags if flags else ""))
+          self.ui.write("%s: %s%s\n" % (i + 1, p.desc, "\n  %s" % flags if flags else ""))
         choicestr = ' '.join([str(n) for n in xrange(1,len(patches)+1)])
-        choicestr = choicestr if self.autoChoose else self.ui.prompt("Which patches do you want to import? [Default is '1']", default="1")
+        choicestr = choicestr if self.autoChoose else self.ui.prompt("Which patches do you want to import? [Default is '1', use '1-%d' for all]" % len(patches), default="1")
         for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
           try:
-            if int(choice) <= 0:
-              raise IndexError()
-            p = patches[int(choice) - 1]
+            m = re.match(r'(\d+)-(\d+)$', choice)
+            if m:
+              delayed_imports.extend([ patches[p] for p in xrange(int(m.group(1)) - 1, int(m.group(2))) ])
+            else:
+              if int(choice) <= 0:
+                raise IndexError()
+              delayed_imports.append(patches[int(choice) - 1])
           except (ValueError, IndexError):
             self.ui.warn("Invalid patch number = '%s'\n" % choice)
             continue
-          if not patch:
-            patch = p
-          else:
-            delayed_imports.append(p)
+        if not patch and len(delayed_imports) > 0:
+          patch = delayed_imports.pop(0)
 
     # and finally return the response
     if patch:
