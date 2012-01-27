@@ -315,7 +315,7 @@ def win_get_folder_path(folder):
 
     return path_buf.value
 
-def find_profile(ui):
+def find_profile(ui, profileName):
     """
     Find the default Firefox profile location. Returns None
     if no profile could be located.
@@ -344,16 +344,24 @@ def find_profile(ui):
     profileini = os.path.join(path, "profiles.ini")
     c = config.config()
     c.read(profileini)
-    profile = None
-    for section in c.sections():
-        if section == "General":
-            continue
-        if c.get(section, "Default", None) is not None or profile is None:
-            profile = c.get(section, "Path", None)
-            if c.get(section, "IsRelative", "0") == "1":
-                profile = os.path.join(path, profile)
-    if profile is None:
+
+    if profileName is not None:
+        sections = [ s for s in c.sections() if profileName in [ s, c.get(s, "Name", None) ] ]
+    else:
+        sections = [ s for s in c.sections() if c.get(s, "Default", None) ]
+        if len(sections) == 0:
+            sections = c.sections()
+
+    sections = [ s for s in sections if c.get(s, "Path", None) is not None ]
+    if len(sections) == 0:
         raise util.Abort(_("Could not find a Firefox profile"))
+
+    section = sections.pop(0)
+    profile = c[section].get("Path")
+    if c.get(section, "IsRelative", "0") == "1":
+        profile = os.path.join(path, profile)
+    import pdb
+    pdb.set_trace()
     return profile
 
 # Choose the cookie to use based on how much of its path matches the URL.
@@ -680,7 +688,7 @@ def edit_form(ui, repo, fields, template_name):
 
     return new_fields
 
-def bugzilla_info(ui):
+def bugzilla_info(ui, profile):
     api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/latest/")
     bugzilla = ui.config("bzexport", "bugzilla", "https://bugzilla.mozilla.org/")
     username = ui.config("bzexport", "username", None)
@@ -694,7 +702,7 @@ def bugzilla_info(ui):
     #TODO: allow overriding profile location via config
     #TODO: cache cookies?
     if not username:
-        profile = find_profile(ui)
+        profile = find_profile(ui, profile)
         if profile is None:
             return
 
@@ -874,7 +882,7 @@ def bzexport(ui, repo, *args, **opts):
     The --new option may be used to create a new bug rather than using an
     existing bug. See the newbug command for details.
     """
-    auth, api_server, bugzilla = bugzilla_info(ui)
+    auth, api_server, bugzilla = bugzilla_info(ui, opts.get('profile'))
 
     rev, bug = infer_arguments(ui, repo, args, opts)
 
@@ -1063,7 +1071,7 @@ def newbug(ui, repo, *args, **opts):
     separating them with a forward slash ('/'), though usually just giving the
     component should be sufficient.
     """
-    auth, api_server, bugzilla = bugzilla_info(ui)
+    auth, api_server, bugzilla = bugzilla_info(ui, opts.get('profile'))
 
     bug_comment = opts['comment']
 
@@ -1118,6 +1126,8 @@ cmdtable = {
            'New bug product version'),
           ('', 'bug-description', '',
            'New bug description (aka comment 0)'),
+          ('', 'ffprofile', '',
+           'Name of Firefox profile to pull bugzilla cookies from'),
           # The following option is passed through directly to patch.diffopts
           ('w', 'ignore_all_space', False, 'Generate a diff that ignores whitespace changes')],
         _('hg bzexport [options] [REV] [BUG]')),
@@ -1137,6 +1147,8 @@ cmdtable = {
            'New bug component'),
           ('', 'prodversion', '',
            'New bug product version'),
+          ('', 'profile', '',
+           'Name of Firefox profile to pull bugzilla cookies from'),
           ],
          _('hg newbug [-e] [-t TITLE] [-c COMMENT]')),
 }
