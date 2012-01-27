@@ -360,8 +360,6 @@ def find_profile(ui, profileName):
     profile = c[section].get("Path")
     if c.get(section, "IsRelative", "0") == "1":
         profile = os.path.join(path, profile)
-    import pdb
-    pdb.set_trace()
     return profile
 
 # Choose the cookie to use based on how much of its path matches the URL.
