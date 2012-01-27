@@ -504,39 +504,49 @@ def find_reviewers(ui, api_server, token, search_strings):
     store_user_cache(c)
     return search_results
 
-def prompt_menu(ui, name, values, readable_values = None, message = '', allow_none=False):
+# ui.promptchoice only allows single-character responses. If we have more than
+# 10 options, that won't work, so fall back to ui.prompt.
+def prompt_manychoice(ui, message, prompts):
+    seen = set()
+    found_multi = False
+    for p in prompts:
+        pos = p.index('&')
+        if pos >= 0:
+            if p[pos+1] in seen:
+                found_multi = True
+            else:
+                seen.add(p[pos+1])
+
+    while found_multi:
+        choice = ui.prompt(message, 'default')
+        if choice == 'default':
+            return 0
+        choice = '&' + choice
+        if choice in prompts:
+            return prompts.index(choice)
+        ui.write("unrecognized response\n")
+
+    return ui.promptchoice(message, prompts, len(prompts)-1)
+
+def prompt_menu(ui, name, values,
+                readable_values = None,
+                message = '',
+                allow_none=False):
     if message and not message.endswith('\n'):
         message += "\n"
     prompts = []
     for i in range(0, len(values)):
+        prompts.append("&" + str(i + 1))
         value = (readable_values or values)[i]
         message += "  %d. %s\n" % ((i + 1), value.encode('utf-8', 'replace'))
-
-    use_promptchoice = True
-    if len(values) < 10:
-        for i in range(0, len(values)):
-            prompts.append("&" + chr(ord('0') + i + 1))
-    else:
-        use_promptchoice = False
     if allow_none:
-        prompts.append("&none")
+        prompts.append("&n")
         message += "  n. None\n\n"
-    prompts.append("&abort")
+    prompts.append("&a")
     message += "  a. Abort\n\n"
     message += _("Select %s:") % name
 
-    if use_promptchoice:
-        choice = ui.promptchoice(message, prompts, len(prompts) - 1)
-    else:
-        # Awful hack because ui.promptchoice requires a single-character
-        # response
-        choice = ui.prompt(message, 'n')
-        if allow_none and choice == 'n':
-            choice = len(prompts)-2
-        elif choice == 'a':
-            choice = len(prompts)-1
-        else:
-            choice = int(choice) - 1
+    choice = prompt_manychoice(ui, message, prompts)
 
     if allow_none and choice == len(prompts) - 2:
         return None
