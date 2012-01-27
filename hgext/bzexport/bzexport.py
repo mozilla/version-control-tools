@@ -414,8 +414,9 @@ def get_cookies_from_profile(ui, profile, bugzilla):
             cookie = cookie.encode("utf-8")
         return login, cookie
     except Exception, e:
+        s = ("no bugzilla cookie found" if isinstance(e, IndexError) else str(e))
         raise util.Abort(_("Failed to get bugzilla login cookies from "
-                           "Firefox profile at %s: %s") % (profile, str(e)))
+                           "Firefox profile at %s: %s") % (profile, s))
     finally:
         if tempdir:
             shutil.rmtree(tempdir)
