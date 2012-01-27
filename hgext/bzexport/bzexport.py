@@ -509,9 +509,15 @@ def prompt_menu(ui, name, values, readable_values = None, message = '', allow_no
         message += "\n"
     prompts = []
     for i in range(0, len(values)):
-        prompts.append("&%d" % (i + 1))
         value = (readable_values or values)[i]
         message += "  %d. %s\n" % ((i + 1), value.encode('utf-8', 'replace'))
+
+    use_promptchoice = True
+    if len(values) < 10:
+        for i in range(0, len(values)):
+            prompts.append("&" + chr(ord('0') + i + 1))
+    else:
+        use_promptchoice = False
     if allow_none:
         prompts.append("&none")
         message += "  n. None\n\n"
@@ -519,7 +525,19 @@ def prompt_menu(ui, name, values, readable_values = None, message = '', allow_no
     message += "  a. Abort\n\n"
     message += _("Select %s:") % name
 
-    choice = ui.promptchoice(message, prompts, len(prompts) - 1)
+    if use_promptchoice:
+        choice = ui.promptchoice(message, prompts, len(prompts) - 1)
+    else:
+        # Awful hack because ui.promptchoice requires a single-character
+        # response
+        choice = ui.prompt(message, 'n')
+        if allow_none and choice == 'n':
+            choice = len(prompts)-2
+        elif choice == 'a':
+            choice = len(prompts)-1
+        else:
+            choice = int(choice) - 1
+
     if allow_none and choice == len(prompts) - 2:
         return None
     if choice == len(prompts) - 1:
