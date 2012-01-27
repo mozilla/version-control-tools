@@ -881,7 +881,7 @@ def bzexport(ui, repo, *args, **opts):
     The --new option may be used to create a new bug rather than using an
     existing bug. See the newbug command for details.
     """
-    auth, api_server, bugzilla = bugzilla_info(ui, opts.get('profile'))
+    auth, api_server, bugzilla = bugzilla_info(ui, opts.get('ffprofile'))
 
     rev, bug = infer_arguments(ui, repo, args, opts)
 
@@ -1070,7 +1070,7 @@ def newbug(ui, repo, *args, **opts):
     separating them with a forward slash ('/'), though usually just giving the
     component should be sufficient.
     """
-    auth, api_server, bugzilla = bugzilla_info(ui, opts.get('profile'))
+    auth, api_server, bugzilla = bugzilla_info(ui, opts.get('ffprofile'))
 
     bug_comment = opts['comment']
 
@@ -1146,7 +1146,7 @@ cmdtable = {
            'New bug component'),
           ('', 'prodversion', '',
            'New bug product version'),
-          ('', 'profile', '',
+          ('', 'ffprofile', '',
            'Name of Firefox profile to pull bugzilla cookies from'),
           ],
          _('hg newbug [-e] [-t TITLE] [-c COMMENT]')),
