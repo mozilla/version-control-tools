@@ -899,6 +899,42 @@ def fill_values(values, ui, api_server, reviewers = None, finalize = False):
 
     return values
 
+def update_patch(ui, repo, rev, update, interactive):
+    update_patch = False
+    rename_patch = False
+    if update is not None:
+        update_patch = update
+        rename_patch = update
+    else:
+        update_patch = ui.configbool("bzexport", "update-patch", False)
+        rename_patch = ui.configbool("bzexport", "rename-patch", False)
+
+    q = repo.mq
+    try:
+        rev = q.lookup(rev)
+    except mercurial.error.Abort, e:
+        update_patch = False
+        rename_patch = False
+
+    if update_patch or rename_patch:
+        if interactive and ui.prompt(_("Update patch name/description (y/n)?")) != 'y':
+            ui.write(_("Exiting without updating patch\n"))
+            return
+
+    if rename_patch:
+        newname = "bug-%s-%s" % (bug, re.sub(r'^bug-\d+-', '', rev))
+        if newname != rev:
+            mq.rename(ui, repo, rev, newname)
+            rev = newname
+
+    if update_patch:
+        # Add "Bug nnnn - " to the beginning of the description
+        ph = mq.patchheader(q.join(rev), q.plainmode)
+        msg = ph.message
+        msg[0] = "Bug %s - %s" % (bug, msg[0])
+        opts = { 'git': True, 'message': '\n'.join(msg) }
+        mq.refresh(ui, repo, *[rev], **opts)
+
 def bzexport(ui, repo, *args, **opts):
     """
     Export changesets to bugzilla attachments.
@@ -908,6 +944,9 @@ def bzexport(ui, repo, *args, **opts):
 
     The --new option may be used to create a new bug rather than using an
     existing bug. See the newbug command for details.
+
+    The -u (--update) option is equivalent to setting both 'update-patch'
+    and 'rename-patch' to True in the [bzexport] section of your config file.
     """
     auth, api_server, bugzilla = bugzilla_info(ui, opts.get('ffprofile'))
 
@@ -1060,6 +1099,9 @@ def bzexport(ui, repo, *args, **opts):
         for reviewer in reviewers:
             ui.write("Requesting review from " + reviewer + "\n")
 
+    if opts['new']:
+        update_patch(ui, repo, rev, opts['update'], opts['interactive'])
+
     if opts['interactive'] and ui.prompt(_("Attach patch (y/n)?")) != 'y':
       ui.write(_("Exiting without creating attachment\n"))
       return
@@ -1155,6 +1197,8 @@ cmdtable = {
            'New bug description (aka comment 0)'),
           ('', 'ffprofile', '',
            'Name of Firefox profile to pull bugzilla cookies from'),
+          ('u', 'update', None,
+           'Update patch name and description to include bug number (only valid with --new)'),
           # The following option is passed through directly to patch.diffopts
           ('w', 'ignore_all_space', False, 'Generate a diff that ignores whitespace changes')],
         _('hg bzexport [options] [REV] [BUG]')),
