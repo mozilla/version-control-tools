@@ -39,6 +39,7 @@ thunderbirdTrees = {
   'comm-aurora' : 'http://tinderbox.mozilla.org/Thunderbird-Aurora/status.html',
   'comm-beta'   : 'http://tinderbox.mozilla.org/Thunderbird-Beta/status.html',
   'comm-release': 'http://tinderbox.mozilla.org/Thunderbird-Release/status.html',
+  'comm-esr10'  : 'http://tinderbox.mozilla.org/Thunderbird-Esr10/status.html',
   'comm-miramar': 'http://tinderbox.mozilla.org/Miramar/status.html',
   # Point at SeaMonkey as we don't use this one
   'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
@@ -52,6 +53,7 @@ seamonkeyTrees = {
   'comm-aurora' : 'http://tinderbox.mozilla.org/SeaMonkey-Aurora/status.html',
   'comm-beta'   : 'http://tinderbox.mozilla.org/SeaMonkey-Beta/status.html',
   'comm-release': 'http://tinderbox.mozilla.org/SeaMonkey-Release/status.html',
+  'comm-esr10'  : 'http://tinderbox.mozilla.org/Thunderbird-Esr10/status.html',
   # Point at Mirmar as SeaMonkey doesn't use this
   'comm-miramar': 'http://tinderbox.mozilla.org/Miramar/status.html',
   'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
@@ -67,6 +69,7 @@ calendarTrees = {
   # Point at Thunderbird for now
   'comm-beta'   : 'http://tinderbox.mozilla.org/Calendar-Beta/status.html',
   'comm-release': 'http://tinderbox.mozilla.org/Calendar-Release/status.html',
+  'comm-esr10'  : 'http://tinderbox.mozilla.org/Thunderbird-Esr10/status.html',
   'comm-miramar': 'http://tinderbox.mozilla.org/Calendar1.0/status.html',
   # Point at SeaMonkey as Calendar don't use this one
   'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
