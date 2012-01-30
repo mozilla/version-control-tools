@@ -25,6 +25,7 @@ hgNameToTinderboxURL = {
     'mozilla-aurora'  : 'http://tinderbox.mozilla.org/Mozilla-Aurora/status.html',
     'mozilla-beta'  : 'http://tinderbox.mozilla.org/Mozilla-Beta/status.html',
     'mozilla-release'  : 'http://tinderbox.mozilla.org/Mozilla-Release/status.html',
+    'mozilla-esr10'  : 'http://tinderbox.mozilla.org/Mozilla-Esr10/status.html',
     'mozilla-central': 'http://tinderbox.mozilla.org/Firefox/status.html',
     'mozilla-inbound': 'http://tinderbox.mozilla.org/Mozilla-Inbound/status.html',
     'mozilla-2.1'    : 'http://tinderbox.mozilla.org/Mobile2.0/status.html',
