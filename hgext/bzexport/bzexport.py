@@ -450,7 +450,7 @@ def obsolete_old_patches(ui, api_server, token, bug, filename, ignore_id, intera
         #TODO: "?last_change_time=" + p["last_change_time"] to avoid conflicts?
         url = api_server + "attachment/%s?%s" % (str(p["id"]), token.auth())
 
-        if interactive and ui.prompt(_("Obsolete patch %s (%s) - %s") % (url, p["file_name"], p["description"])) != 'y':
+        if interactive and ui.prompt(_("Obsolete patch %s (%s) - %s (y/n)?") % (url, p["file_name"], p["description"])) != 'y':
           continue
 
         attachment_data = p
