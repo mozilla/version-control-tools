@@ -345,7 +345,7 @@ def find_profile(ui, profileName):
     c = config.config()
     c.read(profileini)
 
-    if profileName is not None:
+    if profileName:
         sections = [ s for s in c.sections() if profileName in [ s, c.get(s, "Name", None) ] ]
     else:
         sections = [ s for s in c.sections() if c.get(s, "Default", None) ]
@@ -1218,7 +1218,7 @@ cmdtable = {
            'New bug component'),
           ('', 'prodversion', '',
            'New bug product version'),
-          ('', 'ffprofile', '',
+          ('P', 'ffprofile', '',
            'Name of Firefox profile to pull bugzilla cookies from'),
           ],
          _('hg newbug [-e] [-t TITLE] [-c COMMENT]')),
