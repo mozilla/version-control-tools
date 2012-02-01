@@ -422,10 +422,16 @@ def get_cookies_from_profile(ui, profile, bugzilla):
 def get_default_version(ui, api_server, product):
     c = load_configuration(ui, api_server)
     versions = c['product'].get(product, {}).get('version')
-    if versions is None:
+    if not versions:
         raise util.Abort(_("Product %s has no versions") % product)
-    if versions:
-        return versions[-1]
+    # Ugh! /configuration returns the versions in sorted order, which makes it
+    # impossible to determine the default. If there's something like
+    # "unspecified" in the list, prefer that for now, until bzapi gets fixed.
+    # https://bugzilla.mozilla.org/show_bug.cgi?id=723170
+    uns = [ v for v in versions if v.startswith("un") ]
+    if uns:
+        return uns[-1]
+    return versions[-1]
 
 class PUTRequest(urllib2.Request):
     def get_method(self):
