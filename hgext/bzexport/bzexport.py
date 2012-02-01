@@ -820,7 +820,7 @@ def choose_prodcomponent(ui, c, orig_product, orig_component, finalize = False):
 
     if product is None:
         if component is None:
-            product = choose_value(ui, 'product', all_products,
+            product = choose_value(ui, 'product', sorted(all_products),
                                    message = "Possible Products:",
                                    usemenu = finalize)
             if product is not None:
@@ -849,7 +849,7 @@ def choose_prodcomponent(ui, c, orig_product, orig_component, finalize = False):
     elif len(products) == 1:
         product = products.pop()
     else:
-        product = choose_value(ui, 'product', products,
+        product = choose_value(ui, 'product', sorted(products),
                                message = "Select from these products:",
                                usemenu = finalize)
         if product is not None:
@@ -863,7 +863,7 @@ def choose_prodcomponent(ui, c, orig_product, orig_component, finalize = False):
     elif len(components) == 1:
         component = components.pop()
     else:
-        component = choose_value(ui, 'component', components,
+        component = choose_value(ui, 'component', sorted(components),
                                  message = "Select from these components:",
                                  usemenu = finalize)
         if component is None:
