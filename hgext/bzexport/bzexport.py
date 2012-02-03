@@ -905,7 +905,7 @@ def fill_values(values, ui, api_server, reviewers = None, finalize = False):
 
     return values
 
-def update_patch(ui, repo, rev, update, interactive):
+def update_patch(ui, repo, rev, bug, update, interactive):
     update_patch = False
     rename_patch = False
     if update is not None:
@@ -1106,7 +1106,7 @@ def bzexport(ui, repo, *args, **opts):
             ui.write("Requesting review from " + reviewer + "\n")
 
     if opts['new']:
-        update_patch(ui, repo, rev, opts['update'], opts['interactive'])
+        update_patch(ui, repo, rev, bug, opts['update'], opts['interactive'])
 
     if opts['interactive'] and ui.prompt(_("Attach patch (y/n)?")) != 'y':
       ui.write(_("Exiting without creating attachment\n"))
