@@ -414,10 +414,13 @@ def get_cookies_from_profile(ui, profile, bugzilla):
             login = login.encode("utf-8")
             cookie = cookie.encode("utf-8")
         return login, cookie
+
     except Exception, e:
-        s = ("no bugzilla cookie found" if isinstance(e, IndexError) else str(e))
-        raise util.Abort(_("Failed to get bugzilla login cookies from "
-                           "Firefox profile at %s: %s") % (profile, s))
+        if not isinstance(e, IndexError):
+            ui.write_err(_("Failed to get bugzilla login cookies from "
+                           "Firefox profile at %s: %s") % (profile, str(e)))
+        pass
+
     finally:
         if tempdir:
             shutil.rmtree(tempdir)
@@ -737,12 +740,22 @@ def bugzilla_info(ui, profile):
     cookie = None
     #TODO: allow overriding profile location via config
     #TODO: cache cookies?
-    if not username:
+    if not password:
         profile = find_profile(ui, profile)
-        if profile is None:
-            return
+        if profile:
+            try:
+                userid, cookie = get_cookies_from_profile(ui, profile, bugzilla)
+            except:
+                pass
 
-        userid, cookie = get_cookies_from_profile(ui, profile, bugzilla)
+        if cookie:
+            username = None # might not match userid
+        else:
+            ui.write("No bugzilla login cookies found in profile.\n")
+            if not username:
+                username = ui.prompt("Enter username for %s:" % bugzilla)
+            if not password:
+                password = ui.getpass("Enter password for %s: " % username)
 
     auth = bzAuth(userid, cookie, username, password)
 
