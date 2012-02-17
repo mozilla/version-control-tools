@@ -938,7 +938,7 @@ def update_patch(ui, repo, rev, bug, update, interactive):
         ph = mq.patchheader(q.join(rev), q.plainmode)
         msg = ph.message
         msg[0] = "Bug %s - %s" % (bug, msg[0])
-        opts = { 'git': True, 'message': '\n'.join(msg) }
+        opts = { 'git': True, 'message': '\n'.join(msg), 'include': ["re:."] }
         mq.refresh(ui, repo, *[rev], **opts)
 
 def bzexport(ui, repo, *args, **opts):
