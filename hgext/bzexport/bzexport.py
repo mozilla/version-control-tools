@@ -244,7 +244,7 @@ def review_flag_type_id(ui, api_server):
 
     return flag_ids
 
-def create_bug(ui, api_server, token, product, component, version, title, description):
+def create_bug(ui, api_server, token, product, component, version, title, description, take_bug):
     """
     Create a bugzilla bug using BzAPI.
     """
@@ -257,6 +257,9 @@ def create_bug(ui, api_server, token, product, component, version, title, descri
                  'op_sys'   : 'All',
                  'platform' : 'All',
                  }
+
+    if take_bug:
+        json_data['assigned_to'] = {"name": token.username(ui, api_server)}
 
     req = urllib2.Request(url, json.dumps(json_data),
                           {"Accept": "application/json",
@@ -1090,7 +1093,8 @@ def bzexport(ui, repo, *args, **opts):
                                   component = values['COMPONENT'],
                                   version = values['PRODVERSION'],
                                   title = values['BUGTITLE'],
-                                  description = values['BUGCOMMENT0'])
+                                  description = values['BUGCOMMENT0'],
+                                  take_bug = not opts['no_take_bug'])
             result = json.load(response)
             bug = result['id']
             ui.write("Created bug %s at %s\n" % (bug, bugzilla + "/show_bug.cgi?id=" + bug))
@@ -1173,7 +1177,8 @@ def newbug(ui, repo, *args, **opts):
                           component = values['COMPONENT'],
                           version = values['PRODVERSION'],
                           title = values['BUGTITLE'],
-                          description = values['BUGCOMMENT0'])
+                          description = values['BUGCOMMENT0'],
+                          take_bug = opts['take_bug'])
     result = json.load(response)
     bug = result['id']
     ui.write("Created bug %s at %s\n" % (bug, bugzilla + "/show_bug.cgi?id=" + bug))
@@ -1191,6 +1196,8 @@ cmdtable = {
            'Create a new bug'),
           ('i', 'interactive', False,
            'Interactive -- request confirmation before any permanent action'),
+          ('', 'no-take-bug', False,
+           'Do not assign bug to myself'),
           ('', 'title', '',
            'New bug title'),
           ('', 'product', '',
@@ -1216,6 +1223,8 @@ cmdtable = {
            'Open a text editor to modify bug fields'),
           ('i', 'interactive', False,
            'Interactive -- request confirmation before any permanent action'),
+          ('', 'take-bug', False,
+           'Assign bug to myself'),
           ('t', 'title', '',
            'New bug title'),
           ('', 'product', '',
