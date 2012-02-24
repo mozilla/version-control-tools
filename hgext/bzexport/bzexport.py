@@ -584,12 +584,12 @@ def choose_value(ui, desc, options, message = "", usemenu = True):
     else:
         return None
 
-def multi_reviewer_prompt(ui, search_result):
+def multi_reviewer_prompt(ui, search_results):
     for n in search_results['real_names']:
         ui.write("Encoding %s...\n" % n)
     return prompt_menu(ui, 'reviewer', search_results['names'],
                        readable_values = search_results['real_names'],
-                       message = "Multiple bugzilla users matching \"%s\":\n\n" % search_result["search_string"],
+                       message = "Multiple bugzilla users matching \"%s\":\n\n" % search_results["search_string"],
                        allow_none = True)
 
 def validate_reviewers(ui, api_server, auth, search_strings, multi_callback):
