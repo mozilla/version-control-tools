@@ -960,6 +960,8 @@ def update_patch(ui, repo, rev, bug, update, interactive):
         opts = { 'git': True, 'message': '\n'.join(msg), 'include': ["re:."] }
         mq.refresh(ui, repo, **opts)
 
+    return rev
+
 def bzexport(ui, repo, *args, **opts):
     """
     Export changesets to bugzilla attachments.
@@ -1126,7 +1128,9 @@ def bzexport(ui, repo, *args, **opts):
             ui.write("Requesting review from " + reviewer + "\n")
 
     if opts['new']:
-        update_patch(ui, repo, rev, bug, opts['update'], opts['interactive'])
+        newname = update_patch(ui, repo, rev, bug, opts['update'], opts['interactive'])
+        if filename == rev:
+            filename = newname
 
     if opts['interactive'] and ui.prompt(_("Attach patch (y/n)?")) != 'y':
       ui.write(_("Exiting without creating attachment\n"))
@@ -1135,7 +1139,7 @@ def bzexport(ui, repo, *args, **opts):
     result_id = None
     attach = create_attachment(ui, api_server, auth,
                                bug, contents.getvalue(),
-                               filename=values['ATTACHMENT_FILENAME'],
+                               filename=filename,
                                description=values['ATTACHMENT_DESCRIPTION'],
                                comment=values['ATTACHCOMMENT'],
                                reviewers=reviewers)
