@@ -953,7 +953,10 @@ def update_patch(ui, repo, rev, bug, update, interactive):
         # Add "Bug nnnn - " to the beginning of the description
         ph = mq.patchheader(q.join(rev), q.plainmode)
         msg = ph.message
-        msg[0] = "Bug %s - %s" % (bug, msg[0])
+        if not msg:
+          msg = ["Bug %s patch"]
+        else:
+          msg[0] = "Bug %s - %s" % (bug, msg[0])
         opts = { 'git': True, 'message': '\n'.join(msg), 'include': ["re:."] }
         mq.refresh(ui, repo, *[rev], **opts)
 
