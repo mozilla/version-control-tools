@@ -958,7 +958,7 @@ def update_patch(ui, repo, rev, bug, update, interactive):
         else:
           msg[0] = "Bug %s - %s" % (bug, msg[0])
         opts = { 'git': True, 'message': '\n'.join(msg), 'include': ["re:."] }
-        mq.refresh(ui, repo, *[rev], **opts)
+        mq.refresh(ui, repo, **opts)
 
 def bzexport(ui, repo, *args, **opts):
     """
