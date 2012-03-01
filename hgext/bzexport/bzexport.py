@@ -819,15 +819,30 @@ def choose_prodcomponent(ui, c, orig_product, orig_component, finalize = False):
     product = canon(orig_product)
     component = canon(orig_component)
 
-    all_products = c.get('product', {}).keys()
-
-    if component is not None:
-        slash = component.find('/')
-        if product is None and slash != -1:
-            product = component[0:slash]
-            component = component[slash+1:]
-
     products_info = c.get('product', {})
+    all_products = products_info.keys()
+
+    def products_with_component_match(component):
+        products = []
+        for p in all_products:
+            if len(filter_strings(products_info[p]['component'].keys(), component)) > 0:
+                products.append(p)
+        return products
+
+    # Tricky case: components can legitimately contain '/'. If the user
+    # specified such a component with no product, then we will have generated a
+    # bogus list of candidate products and a bogus list of candidate components
+    # (one of which is the correct one, since it contains the substring.)
+    # Restrict to just that component.
+    if component and not product:
+        slash = component.find('/')
+        if slash != -1:
+            all_components = set()
+            for p in all_products:
+                all_components.update(products_info[p]['component'].keys())
+            if component.lower() not in [ c.lower() for c in all_components ]:
+                product = component[0:slash]
+                component = component[slash+1:]
 
     # 'products' and 'components' will be the set of valid products/components
     # remaining after filtering by the 'product' and 'component' passed in
@@ -844,10 +859,7 @@ def choose_prodcomponent(ui, c, orig_product, orig_component, finalize = False):
         else:
             # Inverted lookup: find products matching the given component (or
             # substring of a component)
-            products = []
-            for p in all_products:
-                if len(filter_strings(products_info[p]['component'].keys(), component)) > 0:
-                    products.append(p)
+            products = products_with_component_match(component)
     else:
         products = filter_strings(all_products, product)
 
@@ -1101,7 +1113,7 @@ def bzexport(ui, repo, *args, **opts):
         if bug is not None:
             raise util.Abort("Bug %s given but creation of new bug requested!" % bug)
 
-        if opts['interactive'] and ui.prompt(_("Create bug in %s/%s (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
+        if opts['interactive'] and ui.prompt(_("Create bug in '%s'/'%s' (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
             ui.write(_("Exiting without creating bug\n"))
             return
 
@@ -1189,7 +1201,7 @@ def newbug(ui, repo, *args, **opts):
 
     fill_values(values, ui, api_server, finalize = True)
 
-    if opts['interactive'] and ui.prompt(_("Create bug in %s/%s (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
+    if opts['interactive'] and ui.prompt(_("Create bug in '%s'/'%s' (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
       ui.write(_("Exiting without creating bug\n"))
       return
 
