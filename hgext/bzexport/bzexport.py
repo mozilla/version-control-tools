@@ -916,8 +916,8 @@ def fill_values(values, ui, api_server, reviewers = None, finalize = False):
             values['BUGTITLE'] = ui.prompt(_("Bug title:"))
 
     if 'ATTACHMENT_DESCRIPTION' in values:
-        if not values['ATTACHMENT_DESCRIPTION']:
-            values['ATTACHMENT_DESCRIPTION'] = ui.prompt(_("Patch description:"), default=filename)
+        if values['ATTACHMENT_DESCRIPTION'] in [None, '<required>']:
+            values['ATTACHMENT_DESCRIPTION'] = ui.prompt(_("Patch description:"), default=values['ATTACHMENT_FILENAME'])
 
     return values
 
