@@ -797,7 +797,7 @@ def infer_arguments(ui, repo, args, opts):
         if (m or a or r or d):
             raise util.Abort(_("Local changes found; refresh first!"))
 
-    if rev in ["tip", "qtip"]:
+    if rev in ["tip", "qtip", "default"]:
         # Look for a nicer name in the MQ.
         if hasattr(repo, 'mq') and repo.mq.applied:
             rev = repo.mq.applied[-1].name
@@ -946,7 +946,8 @@ def update_patch(ui, repo, rev, bug, update, interactive):
     q = repo.mq
     try:
         rev = q.lookup(rev)
-    except mercurial.error.Abort, e:
+    except util.error.Abort, e:
+        # If the patch is not coming from mq, don't complain that the name is not found
         update_patch = False
         rename_patch = False
 
