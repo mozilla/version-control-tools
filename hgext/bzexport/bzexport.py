@@ -1128,9 +1128,10 @@ def bzexport(ui, repo, *args, **opts):
             ui.write("Requesting review from " + reviewer + "\n")
 
     if opts['new']:
-        newname = update_patch(ui, repo, rev, bug, opts['update'], opts['interactive'])
-        if filename == rev:
-            filename = newname
+        if not opts['no_update']:
+            newname = update_patch(ui, repo, rev, bug, opts['update'], opts['interactive'])
+            if filename == rev:
+                filename = newname
 
     if opts['interactive'] and ui.prompt(_("Attach patch (y/n)?")) != 'y':
       ui.write(_("Exiting without creating attachment\n"))
@@ -1232,6 +1233,8 @@ cmdtable = {
            'Name of Firefox profile to pull bugzilla cookies from'),
           ('u', 'update', None,
            'Update patch name and description to include bug number (only valid with --new)'),
+          ('', 'no-update', None,
+           'Suppress patch name/description update (override config file)'),
           # The following option is passed through directly to patch.diffopts
           ('w', 'ignore_all_space', False, 'Generate a diff that ignores whitespace changes')],
         _('hg bzexport [options] [REV] [BUG]')),
