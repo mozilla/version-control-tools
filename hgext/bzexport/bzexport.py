@@ -492,7 +492,8 @@ def find_reviewers(ui, api_server, token, search_strings):
                                    "real_names": ["not_a_real_name"]})
             continue
 
-        url = api_server + "user?match=%s&%s" % (search_string, token.auth()) 
+        url = urlparse.urljoin(api_server,
+                               "user?match=%s&%s" % (urllib.quote(search_string), token.auth()))
         try:
             req = urllib2.Request(url, None,
                                   {"Accept": "application/json",
