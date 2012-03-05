@@ -32,6 +32,7 @@ The following commands are modified:
   - qdelete
   - qimport
   - qfinish
+  - qfold
 
 The expected usage is to add the 'mqcommit=auto' option to the 'mqext' section
 of your ~/.hgrc so that all changes are autocommitted if you are using a
@@ -571,6 +572,21 @@ def qfinish_wrapper(self, repo, *revrange, **opts):
     if mqcommit and mqmessage:
         commands.commit(r.ui, r, message=mqmessage)
 
+# Monkeypatch qfold in mq command table
+def qfold_wrapper(self, repo, *files, **opts):
+    mqmessage = opts.pop('mqmessage', None)
+    mqcommit, q, r = mqcommit_info(self, repo, opts)
+
+    patchnames = [ q.lookup(p) or p for p in files ]
+
+    mq.fold(self, repo, *files, **opts)
+
+    if mqcommit and mqmessage:
+        mqmessage = mqmessage.replace("%a", 'FOLD')
+        mqmessage = mqmessage.replace("%n", ", ".join(patchnames))
+        mqmessage = mqmessage.replace("%p", q.lookup('qtip'))
+        commands.commit(r.ui, r, message=mqmessage)
+
 def wrap_mq_function(orig, wrapper, newparams):
     for key,info in mq.cmdtable.iteritems():
         if info[0] == orig:
@@ -607,6 +623,11 @@ wrap_mq_function(mq.finish,
                  qfinish_wrapper,
                  [('Q', 'mqcommit', None, 'commit change to patch queue'),
                   ('M', 'mqmessage', 'FINISHED', 'commit message for patch finishing')])
+
+wrap_mq_function(mq.fold,
+                 qfold_wrapper,
+                 [('Q', 'mqcommit', None, 'commit change to patch queue'),
+                  ('M', 'mqmessage', '%a: %p <- %n', 'commit message for patch folding')])
 
 cmdtable = {
     'qshow': (qshow,
