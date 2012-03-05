@@ -13,6 +13,7 @@ Commands not related to mq:
   :reviewers: Suggest potential reviewers for a patch
   :bugs: Display the bugs that have touched the same files as a patch
   :components: Suggest a potential component for a patch
+  :urls: Guess revision urls for pushed changes
 
 Autocommit:
 
@@ -538,7 +539,29 @@ def qdelete_wrapper(self, repo, *patches, **opts):
             mqmessage = "\n".join([ mqmessage.replace("%p", p) for p in patchnames ])
         commands.commit(r.ui, r, message=mqmessage)
 
-# Monkeypatch qnew in mq command table
+def urls(ui, repo, *paths, **opts):
+    '''Display a list of urls for the last several commits.
+    These are merely heuristic guesses and are intended for pasting into
+    bugs after landing. If that makes no sense to you, then you are probably
+    not the intended audience. It's mainly a Mozilla thing.'''
+
+    opts['template'] = '{node|short} {desc|firstline}\n'
+    ui.pushbuffer()
+    commands.log(ui, repo, **opts)
+    lines = ui.popbuffer()
+    if len(paths) == 0:
+        paths = ['default']
+    ui.pushbuffer()
+    commands.paths(ui, repo, *paths)
+    url = ui.popbuffer().rstrip()
+    url = re.sub(r'^\w+', 'http', url)
+    url = re.sub(r'\w+\@', '', url) # Remove usernames
+    for line in lines.split('\n'):
+        if len(line) > 0:
+            rev, desc = line.split(' ', 1)
+            ui.write(url + '/rev/' + rev + '\n  ' + desc + '\n\n')
+
+# Monkeypatch qfinish in mq command table
 def qfinish_wrapper(self, repo, *revrange, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
@@ -618,4 +641,12 @@ cmdtable = {
           ('p', 'patch', '', 'restrict to given patch')
           ],
          ('hg touched [-a] [-p PATCH] [FILE]')),
+
+    'urls':
+        (urls,
+         [('d', 'date', '', _('show revisions matching date spec'), _('DATE')),
+          ('r', 'rev', [], _('show the specified revision or range'), _('REV')),
+          ('u', 'user', [], _('revisions committed by user'), _('USER')),
+          ] + commands.logopts,
+         ('hg urls [-l LIMIT] [NAME]')),
 }
