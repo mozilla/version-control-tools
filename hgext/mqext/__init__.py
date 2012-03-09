@@ -577,7 +577,8 @@ def qfold_wrapper(self, repo, *files, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
-    patchnames = [ q.lookup(p) or p for p in files ]
+    if mqcommit and mqmessage:
+        patchnames = [ q.lookup(p) or p for p in files ]
 
     mq.fold(self, repo, *files, **opts)
 
