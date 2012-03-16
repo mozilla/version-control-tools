@@ -20,10 +20,6 @@ import time
 import datetime
 from mercurial.node import hex
 
-# Before enabling this hook on mozilla-central (and feeder repos), this should be
-# set to a date in the near future.
-DATE_HOOK_ENABLED = time.mktime(datetime.datetime(2011, 10, 01).timetuple()) # October 2011 (CHANGE ME)
-
 goodMessage = [re.compile(x, re.I) for x in [
     r'bug\s+\#?[0-9]+',
     r'b=[0-9]+',
@@ -80,9 +76,6 @@ def hook(ui, repo, node, hooktype, **kwargs):
     for i in reversed(xrange(rev, tip + 1)):
         c = repo.changectx(i)
 
-        if c.date()[0] < DATE_HOOK_ENABLED:
-            continue
-        
         if "IGNORE BAD COMMIT MESSAGES" in c.description(): 
             # Ignore commit messages for all earlier revs in this push.
             break
