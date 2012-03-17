@@ -968,7 +968,7 @@ def update_patch(ui, repo, rev, bug, update, interactive):
         ph = mq.patchheader(q.join(rev), q.plainmode)
         msg = ph.message
         if not msg:
-          msg = ["Bug %s patch"]
+          msg = ["Bug %s patch" % bug]
         else:
           msg[0] = "Bug %s - %s" % (bug, msg[0])
         opts = { 'git': True, 'message': '\n'.join(msg), 'include': ["re:."] }
