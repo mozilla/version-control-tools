@@ -86,9 +86,11 @@ def security_check(ui, repo, **kwargs):
     # Look for blacklisted bugs
     blacklist = [
         # Serrano
-        563795, 567107, 570049, 580489, 604354,
+        580489, 604354,
         # Wasabi
-        507624, 618215, 628834,
+        507624,
+        # Cyril
+        570049, 628834,
         ]
     
     bugs = re.compile('(%s)' % '|'.join([str(bug) for bug in blacklist]))
