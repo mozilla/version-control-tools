@@ -77,7 +77,7 @@ bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                         )
                         (?:\s*\#?)(\d+)
                      )''', re.I | re.X)
-review_re = re.compile(r'[ra][=?]+([^ ]+)')
+review_re = re.compile(r'[ra][=?]+(\w[^ ]+)')
 
 BINARY_CACHE_FILENAME = ".bzexport.cache"
 INI_CACHE_FILENAME = ".bzexport"
