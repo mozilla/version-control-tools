@@ -43,7 +43,7 @@ hgNameToTinderboxURL = {
     'electrolysis'   : 'http://tinderbox.mozilla.org/Electrolysis/status.html',
     'tracemonkey'    : 'http://tinderbox.mozilla.org/TraceMonkey/status.html',
     'try'            : 'http://tinderbox.mozilla.org/Try/status.html',
-    'try-comm-central': 'http://tinderbox.mozilla.org/ThunderbirdTry/status.html',
+    'try-comm-central': 'http://tinderbox.mozilla.org/Thunderbird-Try/status.html',
     'services-central': 'http://tinderbox.mozilla.org/Services-Central/status.html',
     'shadow-central' : 'http://tinderbox.mozilla.org/Shadow-Central/status.html',
 }
