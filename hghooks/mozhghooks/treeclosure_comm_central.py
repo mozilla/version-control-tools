@@ -35,7 +35,7 @@ seamonkeyOwns = [
 
 # Thunderbird tinderbox trees
 thunderbirdTrees = {
-  'comm-central': 'http://tinderbox.mozilla.org/ThunderbirdTrunk/status.html',
+  'comm-central': 'http://tinderbox.mozilla.org/Thunderbird-Trunk/status.html',
   'comm-aurora' : 'http://tinderbox.mozilla.org/Thunderbird-Aurora/status.html',
   'comm-beta'   : 'http://tinderbox.mozilla.org/Thunderbird-Beta/status.html',
   'comm-release': 'http://tinderbox.mozilla.org/Thunderbird-Release/status.html',
