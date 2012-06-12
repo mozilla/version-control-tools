@@ -8,6 +8,14 @@ hgNameToRevURL = {
     'mozilla-central' : 'mozilla-central/',
     'mozilla-inbound' : 'integration/mozilla-inbound/',
     'try'             : 'try/',
+    'mozilla-aurora'  : 'releases/mozilla-aurora/',
+    'mozilla-beta'    : 'releases/mozilla-beta/',
+    'mozilla-release' : 'releases/mozilla-release/',
+    'mozilla-esr10'   : 'releases/mozilla-esr10/',
+    'comm-aurora'     : 'releases/comm-aurora/',
+    'comm-beta'       : 'releases/comm-beta/',
+    'comm-release'    : 'releases/comm-release/',
+    'comm-esr10'      : 'releases/comm-esr10/',
 }
 
 
