@@ -28,6 +28,13 @@ def hook(ui, repo, node, hooktype, **kwargs):
     rev = repo.changectx(node).rev()
     tip = repo.changectx('tip').rev()
 
+    # For try, print out a TBPL url rather than the pushlog
+    if repo_name == 'try':
+        tip_node = short(repo.changectx(tip).node())
+        print 'You can view the progress of your build at the following URL:'
+        print '  https://tbpl.mozilla.org/?tree=Try&rev=%s' % tip_node
+        return 0
+
     num_changes = tip + 1 - rev
     url = 'https://hg.mozilla.org/' + hgNameToRevURL[repo_name]
 
