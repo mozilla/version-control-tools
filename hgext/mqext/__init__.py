@@ -79,7 +79,7 @@ from subprocess import call, check_call
 import errno
 from mercurial.i18n import _
 from mercurial.node import hex, nullrev, nullid, short
-from mercurial import commands, util, cmdutil, mdiff, error, url, patch
+from mercurial import commands, util, cmdutil, mdiff, error, url, patch, extensions
 
 from hgext import mq
 import re
@@ -488,7 +488,7 @@ def mqmessage_listrep(message, repo, values):
 #
 # Note: The default value of the parameter is set here because it contains a
 # newline, which messes up the formatting of the help message
-def qrefresh_wrapper(self, repo, *pats, **opts):
+def qrefresh_wrapper(orig, self, repo, *pats, **opts):
     mqmessage = opts.pop('mqmessage', '') or '%a: %p\n%s%Q'
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
@@ -504,7 +504,7 @@ def qrefresh_wrapper(self, repo, *pats, **opts):
                                    stat=True)
             diffstat = self.popbuffer()
 
-    mq.refresh(self, repo, *pats, **opts)
+    orig(self, repo, *pats, **opts)
 
     if mqcommit and len(q.applied) > 0:
         patch = q.applied[-1].name
@@ -516,11 +516,11 @@ def qrefresh_wrapper(self, repo, *pats, **opts):
         commands.commit(r.ui, r, message=mqmessage)
 
 # Monkeypatch qnew in mq command table
-def qnew_wrapper(self, repo, patchfn, *pats, **opts):
+def qnew_wrapper(orig, self, repo, patchfn, *pats, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
-    mq.new(self, repo, patchfn, *pats, **opts)
+    orig(self, repo, patchfn, *pats, **opts)
 
     if mqcommit and mqmessage:
         mqmessage = substitute_mqmessage(mqmessage, repo, { 'p': patchfn,
@@ -528,11 +528,11 @@ def qnew_wrapper(self, repo, patchfn, *pats, **opts):
         commands.commit(r.ui, r, message=mqmessage)
 
 # Monkeypatch qimport in mq command table
-def qimport_wrapper(self, repo, *filename, **opts):
+def qimport_wrapper(orig, self, repo, *filename, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
-    mq.qimport(self, repo, *filename, **opts)
+    orig(self, repo, *filename, **opts)
 
     if mqcommit and mqmessage:
         # FIXME - can be multiple
@@ -548,11 +548,11 @@ def qimport_wrapper(self, repo, *filename, **opts):
         commands.commit(r.ui, r, message=mqmessage)
 
 # Monkeypatch qrename in mq command table
-def qrename_wrapper(self, repo, patch, name=None, **opts):
+def qrename_wrapper(orig, self, repo, patch, name=None, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
-    mq.rename(self, repo, patch, name, **opts)
+    orig(self, repo, patch, name, **opts)
 
     if mqcommit and mqmessage:
         if not name:
@@ -567,14 +567,14 @@ def qrename_wrapper(self, repo, patch, name=None, **opts):
 #
 # Note: The default value of the parameter is set here because it contains a
 # newline, which messes up the formatting of the help message
-def qdelete_wrapper(self, repo, *patches, **opts):
+def qdelete_wrapper(orig, self, repo, *patches, **opts):
     mqmessage = opts.pop('mqmessage', '') or '%a: %P\n\n[%a: %p\n]%Q'
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
     if mqcommit and mqmessage:
         patchnames = [ q.lookup(p) for p in patches ]
 
-    mq.delete(self, repo, *patches, **opts)
+    orig(self, repo, *patches, **opts)
 
     if mqcommit and mqmessage:
         mqmessage = substitute_mqmessage(mqmessage, repo,
@@ -606,25 +606,25 @@ def urls(ui, repo, *paths, **opts):
             ui.write(url + '/rev/' + rev + '\n  ' + desc + '\n\n')
 
 # Monkeypatch qfinish in mq command table
-def qfinish_wrapper(self, repo, *revrange, **opts):
+def qfinish_wrapper(orig, self, repo, *revrange, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
-    mq.finish(self, repo, *revrange, **opts)
+    orig(self, repo, *revrange, **opts)
 
     if mqcommit and mqmessage:
         mqmessage = substitute_mqmessage(mqmessage, repo, { })
         commands.commit(r.ui, r, message=mqmessage)
 
 # Monkeypatch qfold in mq command table
-def qfold_wrapper(self, repo, *files, **opts):
+def qfold_wrapper(orig, self, repo, *files, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
     if mqcommit and mqmessage:
         patchnames = [ q.lookup(p) or p for p in files ]
 
-    mq.fold(self, repo, *files, **opts)
+    orig(self, repo, *files, **opts)
 
     if mqcommit and mqmessage:
         mqmessage = substitute_mqmessage(mqmessage, repo, { 'a': 'FOLD',
@@ -632,47 +632,8 @@ def qfold_wrapper(self, repo, *files, **opts):
                                                             'p': q.lookup('qtip') })
         commands.commit(r.ui, r, message=mqmessage)
 
-def wrap_mq_function(orig, wrapper, newparams):
-    for key,info in mq.cmdtable.iteritems():
-        if info[0] == orig:
-            wrapper.__doc__ = info[0].__doc__
-            mq.cmdtable[key] = (wrapper, info[1] + newparams, info[2])
-            return
 
-wrap_mq_function(mq.refresh,
-                 qrefresh_wrapper,
-                 [('Q', 'mqcommit', None, 'commit change to patch queue'),
-                  ('M', 'mqmessage', '', 'commit message for patch update')])
 
-wrap_mq_function(mq.new,
-                 qnew_wrapper,
-                 [('Q', 'mqcommit', None, 'commit change to patch queue'),
-                  ('M', 'mqmessage', '%a: %p%Q', 'commit message for patch creation')])
-
-wrap_mq_function(mq.qimport,
-                 qimport_wrapper,
-                 [('Q', 'mqcommit', None, 'commit change to patch queue'),
-                  ('M', 'mqmessage', 'IMPORT: %p%Q', 'commit message for patch import')])
-
-wrap_mq_function(mq.delete,
-                 qdelete_wrapper,
-                 [('Q', 'mqcommit', None, 'commit change to patch queue'),
-                  ('M', 'mqmessage', '', 'commit message for patch deletion')])
-
-wrap_mq_function(mq.rename,
-                 qrename_wrapper,
-                 [('Q', 'mqcommit', None, 'commit change to patch queue'),
-                  ('M', 'mqmessage', '%a: %p -> %n%Q', 'commit message for patch rename')])
-
-wrap_mq_function(mq.finish,
-                 qfinish_wrapper,
-                 [('Q', 'mqcommit', None, 'commit change to patch queue'),
-                  ('M', 'mqmessage', 'FINISHED%Q', 'commit message for patch finishing')])
-
-wrap_mq_function(mq.fold,
-                 qfold_wrapper,
-                 [('Q', 'mqcommit', None, 'commit change to patch queue'),
-                  ('M', 'mqmessage', '%a: %p <- %n%Q', 'commit message for patch folding')])
 
 cmdtable = {
     'qshow': (qshow,
@@ -716,3 +677,37 @@ cmdtable = {
           ] + commands.logopts,
          ('hg urls [-l LIMIT] [NAME]')),
 }
+
+def extsetup():
+    try:
+        mq = extensions.find('mq')
+    except KeyError:
+        return
+
+    entry = extensions.wrapcommand(mq.cmdtable, 'qrefresh', qrefresh_wrapper)
+    entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
+                     ('M', 'mqmessage', '', 'commit message for patch update')])
+
+    entry = extensions.wrapcommand(mq.cmdtable, 'qnew', qnew_wrapper)
+    entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
+                     ('M', 'mqmessage', '%a: %p%Q', 'commit message for patch creation')])
+
+    entry = extensions.wrapcommand(mq.cmdtable, 'qimport', qimport_wrapper)
+    entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
+                     ('M', 'mqmessage', 'IMPORT: %p%Q', 'commit message for patch import')])
+
+    entry = extensions.wrapcommand(mq.cmdtable, 'qdelete', qdelete_wrapper)
+    entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
+                     ('M', 'mqmessage', '', 'commit message for patch deletion')])
+
+    entry = extensions.wrapcommand(mq.cmdtable, 'qrename', qrename_wrapper)
+    entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
+                     ('M', 'mqmessage', '%a: %p -> %n%Q', 'commit message for patch rename')])
+
+    entry = extensions.wrapcommand(mq.cmdtable, 'qfinish', qfinish_wrapper)
+    entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
+                     ('M', 'mqmessage', 'FINISHED%Q', 'commit message for patch finishing')])
+
+    entry = extensions.wrapcommand(mq.cmdtable, 'qfold', qfold_wrapper)
+    entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
+                     ('M', 'mqmessage', '%a: %p <- %n%Q', 'commit message for patch folding')])
