@@ -53,11 +53,6 @@ the -Q option to all relevant commands in your ~/.hgrc::
   qimport = -Q
 '''
 
-# TODO:
-# [ ] Make 'show' dispatch to export?diff? for eg --stat
-#     - Hmm. No. export is all about generating a patch from adjacent revisions
-#       We already have a patch.
-
 import os
 from subprocess import call, check_call
 import errno
