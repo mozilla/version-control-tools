@@ -92,7 +92,6 @@ def qshow(ui, repo, patchspec=None, **opts):
         del opts['stat']
         lines = patch.diffstatui(patchf, **opts)
     else:
-        s = patch.split(patchf)
         def singlefile(*a, **b):
             return patchf
         lines = patch.difflabel(singlefile, **opts)
