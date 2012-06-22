@@ -54,6 +54,7 @@ The following commands are modified:
   - qimport
   - qfinish
   - qfold
+  - qcrecord (from the crecord extension)
 
 The expected usage is to add the 'mqcommit=auto' option to the 'mqext' section
 of your ~/.hgrc so that all changes are autocommitted if you are using a
@@ -632,8 +633,17 @@ def qfold_wrapper(orig, self, repo, *files, **opts):
                                                             'p': q.lookup('qtip') })
         commands.commit(r.ui, r, message=mqmessage)
 
+# Monkeypatch qcrecord in mq command table (note that this comes from the crecord extension)
+def qcrecord_wrapper(orig, self, repo, patchfn, *pats, **opts):
+    mqmessage = opts.pop('mqmessage', None)
+    mqcommit, q, r = mqcommit_info(self, repo, opts)
 
+    orig(self, repo, patchfn, *pats, **opts)
 
+    if mqcommit and mqmessage:
+        mqmessage = substitute_mqmessage(mqmessage, repo, { 'p': patchfn,
+                                                            'a': 'NEW' })
+        commands.commit(r.ui, r, message=mqmessage)
 
 cmdtable = {
     'qshow': (qshow,
@@ -678,12 +688,30 @@ cmdtable = {
          ('hg urls [-l LIMIT] [NAME]')),
 }
 
-def extsetup():
+def uisetup(ui):
     try:
         mq = extensions.find('mq')
     except KeyError:
+        return # mq not loaded at all
+
+    # check whether mq is loaded before mqext. If not, do a nasty hack to set
+    # it up first so that mqext can modify what it does and not have the
+    # modifications get clobbered. Mercurial really needs to implement
+    # inter-extension dependencies.
+
+    aliases, entry = cmdutil.findcmd('init', commands.table)
+    if not [ e for e in entry[1] if e[1] == 'mq' ]:
+        orig = mq.uisetup
+        mq.uisetup = lambda ui: deferred_uisetup(orig, ui, mq)
         return
 
+    uisetup_post_mq(ui, mq)
+
+def deferred_uisetup(orig, ui, mq):
+    orig(ui)
+    uisetup_post_mq(ui, mq)
+
+def uisetup_post_mq(ui, mq):
     entry = extensions.wrapcommand(mq.cmdtable, 'qrefresh', qrefresh_wrapper)
     entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
                      ('M', 'mqmessage', '', 'commit message for patch update')])
@@ -711,3 +739,31 @@ def extsetup():
     entry = extensions.wrapcommand(mq.cmdtable, 'qfold', qfold_wrapper)
     entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
                      ('M', 'mqmessage', '%a: %p <- %n%Q', 'commit message for patch folding')])
+
+def extsetup():
+    try:
+        crecord_ext = extensions.find('crecord')
+    except KeyError:
+        return # crecord not loaded at all
+
+    # check whether qcrecord is loaded before mqext. If not, do a nasty hack to
+    # set it up first so that mqext can modify what it does and not have the
+    # modifications get clobbered. Mercurial really needs to implement
+    # inter-extension dependencies.
+
+    if 'qcrecord' not in crecord_ext.cmdtable:
+        orig = crecord_ext.extsetup
+        crecord_ext.extsetup = lambda: deferred_extsetup(orig)
+        return
+
+    extsetup_post_crecord()
+
+def deferred_extsetup(orig):
+    orig()
+    extsetup_post_crecord()
+
+def extsetup_post_crecord():
+    crecord_ext = extensions.find('crecord')
+    entry = extensions.wrapcommand(crecord_ext.cmdtable, 'qcrecord', qcrecord_wrapper)
+    entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
+                     ('M', 'mqmessage', '%a: %p%Q', 'commit message for patch creation')])
