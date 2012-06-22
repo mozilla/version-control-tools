@@ -588,7 +588,12 @@ def urls(ui, repo, *paths, **opts):
     '''Display a list of urls for the last several commits.
     These are merely heuristic guesses and are intended for pasting into
     bugs after landing. If that makes no sense to you, then you are probably
-    not the intended audience. It's mainly a Mozilla thing.'''
+    not the intended audience. It's mainly a Mozilla thing.
+
+    Note that this will display the URL for your default repo, which may very
+    well be something local. So you may need to give your outbound repo as
+    an argument.
+'''
 
     opts['template'] = '{node|short} {desc|firstline}\n'
     ui.pushbuffer()
@@ -600,7 +605,7 @@ def urls(ui, repo, *paths, **opts):
     commands.paths(ui, repo, *paths)
     url = ui.popbuffer().rstrip()
     url = re.sub(r'^\w+', 'http', url)
-    url = re.sub(r'\w+\@', '', url) # Remove usernames
+    url = re.sub(r'(\w|\%|\.|-)+\@', '', url) # Remove usernames
     for line in lines.split('\n'):
         if len(line) > 0:
             rev, desc = line.split(' ', 1)
