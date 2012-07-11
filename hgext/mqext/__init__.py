@@ -705,10 +705,16 @@ def uisetup(ui):
     # inter-extension dependencies.
 
     aliases, entry = cmdutil.findcmd('init', commands.table)
-    if not [ e for e in entry[1] if e[1] == 'mq' ]:
-        orig = mq.uisetup
-        mq.uisetup = lambda ui: deferred_uisetup(orig, ui, mq)
-        return
+    try:
+        if not [ e for e in entry[1] if e[1] == 'mq' ]:
+            orig = mq.uisetup
+            mq.uisetup = lambda ui: deferred_uisetup(orig, ui, mq)
+            return
+    except AttributeError:
+        # argh! Latest mq does not use uisetup anymore. Now it does its stuff
+        # in extsetup (phase 2). Fortunately, it now installs its commands
+        # early enough that the order no longer matters.
+        pass
 
     uisetup_post_mq(ui, mq)
 
