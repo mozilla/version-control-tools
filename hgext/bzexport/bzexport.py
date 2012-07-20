@@ -27,7 +27,7 @@ and add:
     bzexport = /path/to/bzexport.py
 
 You can then use it like so:
-hg bzexport [-e] REV BUG
+hg bzexport [-e] [REV] [BUG|--new]
 
 Where REV is any local revision, and BUG is a bug number on
 bugzilla.mozilla.org or the option '--new' to create a new bug. The extension
