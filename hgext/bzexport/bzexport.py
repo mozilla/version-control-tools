@@ -960,7 +960,15 @@ def update_patch(ui, repo, rev, bug, update, interactive):
     if rename_patch:
         newname = "bug-%s-%s" % (bug, re.sub(r'^bug-\d+-', '', rev))
         if newname != rev:
-            mq.rename(ui, repo, rev, newname)
+            try:
+                mq.rename(ui, repo, rev, newname)
+            except:
+                # mq.rename has a tendency to leave things in an inconsistent
+                # state. Fix things up.
+                q.invalidate()
+                if os.path.exists(q.join(newname)) and newname not in q.fullseries:
+                    os.rename(q.join(newname), q.join(rev))
+                raise
             rev = newname
 
     if update_patch:
