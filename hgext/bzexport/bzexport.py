@@ -958,7 +958,7 @@ def update_patch(ui, repo, rev, bug, update, interactive):
             return
 
     if rename_patch:
-        newname = "bug-%s-%s" % (bug, re.sub(r'^bug-\d+-', '', rev))
+        newname = str("bug-%s-%s" % (bug, re.sub(r'^bug-\d+-', '', rev)))
         if newname != rev:
             try:
                 mq.rename(ui, repo, rev, newname)
