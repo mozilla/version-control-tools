@@ -969,7 +969,7 @@ def update_patch(ui, repo, rev, bug, update, interactive):
         msg = ph.message
         if not msg:
           msg = ["Bug %s patch" % bug]
-        else:
+        elif not bug_re.match(msg[0]):
           msg[0] = "Bug %s - %s" % (bug, msg[0])
         opts = { 'git': True, 'message': '\n'.join(msg), 'include': ["re:."] }
         mq.refresh(ui, repo, **opts)
@@ -1141,11 +1141,10 @@ def bzexport(ui, repo, *args, **opts):
         for reviewer in reviewers:
             ui.write("Requesting review from " + reviewer + "\n")
 
-    if opts['new']:
-        if not opts['no_update']:
-            newname = update_patch(ui, repo, rev, bug, opts['update'], opts['interactive'])
-            if filename == rev:
-                filename = newname
+    if not opts['no_update']:
+        newname = update_patch(ui, repo, rev, bug, opts['update'], opts['interactive'])
+        if filename == rev:
+            filename = newname
 
     if opts['interactive'] and ui.prompt(_("Attach patch (y/n)?")) != 'y':
       ui.write(_("Exiting without creating attachment\n"))
