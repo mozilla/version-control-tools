@@ -227,8 +227,8 @@ class TestTreeClosureHook(ClosureHookTestHelpers, unittest.TestCase):
 
   def testOpen(self):
     """Pushing to an OPEN tree should succeed."""
-    self.redirect("http://tinderbox.mozilla.org/Firefox/status.html",
-                  '<span id="treestatus">OPEN</span><span id="extended-status">')
+    self.redirect("https://treestatus.mozilla.org/mozilla-central?format=json",
+                '{"status": "open", "reason": null}')
 
     # pushing something should now succeed
     u = self.ui
@@ -240,8 +240,8 @@ class TestTreeClosureHook(ClosureHookTestHelpers, unittest.TestCase):
 
   def testClosed(self):
     """Pushing to a CLOSED tree should fail."""
-    self.redirect("http://tinderbox.mozilla.org/Firefox/status.html",
-                         '<span id="treestatus">CLOSED</span><span id="extended-status">')
+    self.redirect("https://treestatus.mozilla.org/mozilla-central?format=json",
+                '{"status": "closed", "reason": "splines won\'t reticulate"}')
     # pushing something should now fail
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
@@ -255,8 +255,8 @@ class TestTreeClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     Pushing to a CLOSED tree with 'CLOSED TREE' in the commit message
     should succeed.
     """
-    self.redirect("http://tinderbox.mozilla.org/Firefox/status.html",
-                         '<span id="treestatus">CLOSED</span><span id="extended-status">')
+    self.redirect("https://treestatus.mozilla.org/mozilla-central?format=json",
+                '{"status": "closed", "reason": "too many widgets"}')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
     add(u, self.clonerepo, join(self.clonedir, "testfile"))
@@ -269,8 +269,8 @@ class TestTreeClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     Pushing multiple changesets to a CLOSED tree with 'CLOSED TREE'
     in the commit message of the tip changeset should succeed.
     """
-    self.redirect("http://tinderbox.mozilla.org/Firefox/status.html",
-                         '<span id="treestatus">CLOSED</span><span id="extended-status">')
+    self.redirect("https://treestatus.mozilla.org/mozilla-central?format=json",
+                '{"status": "closed", "reason": "the end of the world as we know it"}')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
     add(u, self.clonerepo, join(self.clonedir, "testfile"))
@@ -283,8 +283,8 @@ class TestTreeClosureHook(ClosureHookTestHelpers, unittest.TestCase):
 
   def testApprovalRequired(self):
     """Pushing to an APPROVAL REQUIRED tree should fail."""
-    self.redirect("http://tinderbox.mozilla.org/Firefox/status.html",
-                         '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
+    self.redirect("https://treestatus.mozilla.org/mozilla-central?format=json",
+                '{"status": "approval required", "reason": "be verrrry careful"}')
     # pushing something should now fail
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
@@ -298,8 +298,8 @@ class TestTreeClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     Pushing to an APPROVAL REQUIRED tree with a=foo
     in the commit message should succeed.
     """
-    self.redirect("http://tinderbox.mozilla.org/Firefox/status.html",
-                         '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
+    self.redirect("https://treestatus.mozilla.org/mozilla-central?format=json",
+                '{"status": "approval required", "reason": "trees are fragile"}')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
     add(u, self.clonerepo, join(self.clonedir, "testfile"))
@@ -308,8 +308,8 @@ class TestTreeClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     self.assertEqual(self.director.opened, 1)
 
     # also check that approval of the form a1.2=foo works
-    self.redirect("http://tinderbox.mozilla.org/Firefox/status.html",
-                         '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
+    self.redirect("https://treestatus.mozilla.org/mozilla-central?format=json",
+                '{"status": "approval required", "reason": "like they\'re made of glass"}')
     appendFile(join(self.clonedir, "testfile"), "checkin 2")
     commit(u, self.clonerepo, message="checkin 2 a1.2=someone")
     push(u, self.clonerepo, dest=self.repodir)
@@ -320,8 +320,8 @@ class TestTreeClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     Pushing to an APPROVAL REQUIRED tree with a=foo
     in the commit message of the tip changeset should succeed.
     """
-    self.redirect("http://tinderbox.mozilla.org/Firefox/status.html",
-                         '<span id="treestatus">APPROVAL REQUIRED</span><span id="extended-status">')
+    self.redirect("https://treestatus.mozilla.org/mozilla-central?format=json",
+                '{"status": "approval required", "reason": "stained glass"}')
     u = self.ui
     appendFile(join(self.clonedir, "testfile"), "checkin 1")
     add(u, self.clonerepo, join(self.clonedir, "testfile"))
