@@ -673,21 +673,21 @@ cmdtable = {
     'reviewers':
         (reviewers,
          [('f', 'file', [], 'see reviewers for FILE', 'FILE'),
-          ('l', 'limit', 10000, 'how many revisions back to scan', 'LIMIT')
+          ('l', 'limit', 100000, 'how many revisions back to scan', 'LIMIT')
           ],
          ('hg reviewers [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
     'bugs':
         (bzbugs,
          [('f', 'file', [], 'see components for FILE', 'FILE'),
-          ('l', 'limit', 10000, 'how many revisions back to scan', 'LIMIT')
+          ('l', 'limit', 100000, 'how many revisions back to scan', 'LIMIT')
           ],
          ('hg bugs [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
     'components':
         (bzcomponents,
          [('f', 'file', [], 'see components for FILE', 'FILE'),
-          ('l', 'limit', 10000, 'how many revisions back to scan', 'LIMIT')
+          ('l', 'limit', 100000, 'how many revisions back to scan', 'LIMIT')
           ],
          ('hg components [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
