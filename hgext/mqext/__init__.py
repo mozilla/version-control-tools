@@ -102,8 +102,22 @@ def qshow(ui, repo, patchspec=None, **opts):
     If no patch is given, the top of the applied stack is shown.'''
     q = repo.mq
 
-    p = q.lookup(patchspec or 'qtip')
-    patchf = q.opener(p, "r")
+    patchf = None
+    if patchspec is None:
+        p = q.lookup("qtip")
+        patchf = q.opener(p, "r")
+    else:
+        try:
+            p = q.lookup(patchspec)
+            patchf = q.opener(p, "r")
+        except util.Abort, e:
+            try:
+                patchf = file(patchspec, "r")
+            except Exception, e:
+                # commands.diff has bad error message
+                if patchspec in repo:
+                    return commands.diff(ui, repo, change=patchspec, date=None)
+                raise util.Abort(_("Unknown patch '%s'") % patchspec)
 
     if opts['stat']:
         del opts['stat']
