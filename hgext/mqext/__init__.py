@@ -5,7 +5,7 @@ upstream project. I just haven't gotten around to it.
 
 Commands added:
 
-  :qshow: Display a single patch (similar to 'export')
+  :qshow: Display a single patch (similar to 'export' or 'diff -c')
   :qtouched: See what patches modify which files
 
 Commands not related to mq:
