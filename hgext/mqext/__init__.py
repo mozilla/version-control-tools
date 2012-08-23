@@ -76,17 +76,16 @@ the -Q option to all relevant commands in your ~/.hgrc::
 '''
 
 import os
-from subprocess import call, check_call
-import errno
+import re
+import json
+import urllib2
+
 from mercurial.i18n import _
 from mercurial.node import hex, nullrev, nullid, short
 from mercurial import commands, util, cmdutil, mdiff, error, url, patch, extensions
 
 from hgext import mq
-import re
 from collections import Counter
-import json
-import urllib2
 
 try:
     # hg 1.9+
