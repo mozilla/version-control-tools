@@ -43,6 +43,14 @@ def qbackout(ui, repo, rev, **opts):
     will be rolled up into a single backout changeset. Otherwise, there will
     be one backout changeset queued up for each backed-out changeset.
 
+    The --apply option will reapply a patch instead of backing it out, which
+    can be useful when you (or someone else) has backed your patch out and
+    you want to try again.
+
+    Normally, qbackout will error out if the patch (backout or application)
+    fails to apply. The --broken option may be used to leave the patch in your
+    queue so you can fix the conflicts manually.
+
     Examples:
       hg qbackout -r 20 -r 30    # backout revisions 20 and 30
 
@@ -59,6 +67,18 @@ def qbackout(ui, repo, rev, **opts):
     if not opts.get('force'):
         ui.status('checking for uncommitted changes\n')
         cmdutil.bailifchanged(repo)
+    backout = False if opts.get('apply') else True
+    desc = { 'action': 'backout',
+             'Actioned': 'Backed out',
+             'actioning': 'backing out',
+             'name': 'backout'
+             }
+    if not backout:
+        desc = { 'action': 'apply',
+                 'Actioned': 'Reapplied',
+                 'actioning': 'Reapplying',
+                 'name': 'patch'
+                 }
 
     rev = scmutil.revrange(repo, rev)
     if len(rev) == 0:
@@ -92,15 +112,16 @@ def qbackout(ui, repo, rev, **opts):
             bugs.add(m.group(2))
         return bugs
 
-    def apply_reverse_change(node):
+    def apply_change(node, reverse):
         p1, p2 = repo.changelog.parents(node)
         if p2 != nullid:
-            raise util.Abort('cannot backout a merge changeset')
+            raise util.Abort('cannot %s a merge changeset' % desc['action'])
 
         opts = mdiff.defaultopts
         opts.git = True
         rpatch = StringIO.StringIO()
-        for chunk in patch.diff(repo, node1=node, node2=p1, opts=opts):
+        orig, mod = (node, p1) if reverse else (p1, node)
+        for chunk in patch.diff(repo, node1=orig, node2=mod, opts=opts):
             rpatch.write(chunk)
         rpatch.seek(0)
 
@@ -129,22 +150,28 @@ def qbackout(ui, repo, rev, **opts):
         allbugs.update(bugs)
         node = cset.node()
         shortnode = short(node)
-        ui.status('backing out %s\n' % shortnode)
-        apply_reverse_change(node)
+        ui.status('%s %s\n' % (desc['actioning'], shortnode))
+        done = False
+        try:
+            apply_change(node, backout)
+        except:
+            if not opts.get('broken'):
+                raise
         msg = ('Backed out changeset %s' % shortnode) + bugs_suffix(bugs)
+        msg = ('%s changeset %s' % (desc['Actioned'], shortnode)) + bugs_suffix(bugs)
         messages.append(msg)
         if not opts.get('single'):
             new_opts['message'] = messages[-1]
-            patchname = opts.get('name') or 'backout-%s' % shortnode
+            patchname = opts.get('name') or '%s-%s' % (desc['name'], shortnode)
             mq.new(ui, repo, patchname, **new_opts)
             if ui.verbose:
                 ui.write("queued up patch %s\n" % patchname)
 
-    msg = ('Backed out %d changesets' % len(rev)) + bugs_suffix(allbugs) + '\n'
+    msg = ('%s %d changesets' % (desc['Actioned'], len(rev))) + bugs_suffix(allbugs) + '\n'
     messages.insert(0, msg)
     new_opts['message'] = "\n".join(messages)
     if opts.get('single'):
-        patchname = opts.get('name') or 'backout-%d-changesets' % len(rev)
+        patchname = opts.get('name') or '%s-%d-changesets' % (desc['name'], len(rev))
         mq.new(ui, repo, patchname, **new_opts)
 
 
@@ -163,6 +190,8 @@ cmdtable = {
           ('D', 'currentdate', None, _('add "Date: <current date>" to patch')),
           ('d', 'date', '',
            _('add "Date: <DATE>" to patch'), _('DATE')),
+          ('', 'apply', None, _('re-apply a change instead of backing out')),
+          ('', 'broken', None, _('backout even if patch does not fully apply')),
           ],
          ('hg qbackout -r REVS [-f] [-n NAME] [qnew options]')),
 }
