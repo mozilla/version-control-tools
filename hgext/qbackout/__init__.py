@@ -64,7 +64,7 @@ def qbackout(ui, repo, rev, **opts):
     if len(rev) == 0:
         raise util.Abort('at least one revision required')
 
-    csets = map(lambda r: scmutil.revsingle(repo, r), rev)
+    csets = [ repo[r] for r in rev ]
     csets.sort(reverse=True, key=lambda cset: cset.rev())
 
     if opts.get('single') and opts.get('name') and len(rev) > 1:
@@ -104,14 +104,23 @@ def qbackout(ui, repo, rev, **opts):
             rpatch.write(chunk)
         rpatch.seek(0)
 
-        save_fin = ui.fin
-        ui.fin = rpatch
+        saved_stdin = None
+        try:
+            save_fin = ui.fin
+            ui.fin = rpatch
+        except:
+            # Old versions of hg did not use the ui.fin mechanism
+            saved_stdin = sys.stdin
+            sys.stdin = rpatch
         commands.import_(ui, repo, '-',
                          force=True,
                          no_commit=True,
                          strip=1,
                          base='')
-        ui.fin = save_fin
+        if saved_stdin is None:
+            ui.fin = save_fin
+        else:
+            sys.stdin = saved_stdin
 
     allbugs = set()
     messages = []
