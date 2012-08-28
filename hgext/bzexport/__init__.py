@@ -839,6 +839,18 @@ def bzexport(ui, repo, *args, **opts):
 
     obsolete_old_patches(ui, api_server, auth, bug, bugzilla, filename, result['id'], pre_hook = pre_obsolete)
 
+    # If attaching to an existing bug (and not suppressed on the command line), take the bug
+    if not opts['new'] and not opts['no_take_bug']:
+        req = bz.get_bug(api_server, auth, bug, include_fields=[ 'assigned_to' ])
+        result = json.load(urlopen(ui, req))
+        taker = auth.username(api_server)
+        if result['assigned_to']['name'] != taker:
+            result['assigned_to'] = { 'name': taker }
+            req = bz.update_bug(api_server, auth, result)
+            result = json.load(urlopen(ui, req))
+            if not result.get('ok', None):
+                raise util.Abort(_("Error when updating bug %s: %s") % (bug, result))
+
 def newbug(ui, repo, *args, **opts):
     """
     Create a new bug in bugzilla

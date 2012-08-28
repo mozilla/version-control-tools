@@ -110,3 +110,21 @@ def get_user(api_server, bzauth):
 def get_configuration(api_server):
     url = make_url(api_server, None, 'configuration', { 'cached_ok': 1 })
     return urllib2.Request(url, None, JSON_HEADERS)
+
+def get_bug(api_server, token, bug, **opts):
+    """
+    Retrieve an existing bug
+    """
+    args = {}
+    if 'include_fields' in opts:
+        args['include_fields'] = ",".join(set(opts['include_fields'] + ['id','ref','token','last_change_time','update_token']))
+    url = make_url(api_server, token, 'bug/%s' % str(bug), args)
+    return urllib2.Request(url, None, JSON_HEADERS)
+
+def update_bug(api_server, token, bugdata):
+    """
+    Update an existing bug. Must pass in an existing bug as a data structure.
+    Mid-air collisions are possible.
+    """
+    url = make_url(api_server, token, 'bug/%s' % str(bugdata['id']))
+    return PUTRequest(url, json.dumps(bugdata), JSON_HEADERS)
