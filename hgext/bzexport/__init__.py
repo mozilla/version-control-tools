@@ -859,6 +859,16 @@ def newbug(ui, repo, *args, **opts):
     """
     auth, api_server, bugzilla = bugzilla_info(ui, opts.get('ffprofile'))
 
+    if args:
+        args = list(args)
+
+    if args and not opts['title']:
+        opts['title'] = args.pop(0)
+    if args and not opts['comment']:
+        opts['comment'] = args.pop(0)
+    if args:
+        raise util.Abort(_("Too many arguments to newbug command (only title and comment may be given)"))
+
     bug_comment = opts['comment']
 
     values = { 'BUGTITLE': opts['title'] or '<required>',
@@ -949,5 +959,5 @@ cmdtable = {
           ('P', 'ffprofile', '',
            'Name of Firefox profile to pull bugzilla cookies from'),
           ],
-         _('hg newbug [-e] [-t TITLE] [-c COMMENT]')),
+         _('hg newbug [-e] [[-t] TITLE] [[-c] COMMENT]' )),
 }
