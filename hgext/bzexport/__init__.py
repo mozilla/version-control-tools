@@ -44,24 +44,16 @@ attaching anything to it.
 from mercurial.i18n import _
 from mercurial import commands, config, cmdutil, hg, node, util, patch
 from hgext import mq
-import base64
 from cStringIO import StringIO
 import json
 import os
-import time
-import platform
 import re
-import shutil
-import sqlite3
-import tempfile
 import urllib
 import urllib2
 import urlparse
 import pkg_resources
-try:
-  from cPickle import dump as pickle_dump, load as pickle_load
-except:
-  from pickle import dump as pickle_dump, load as pickle_load
+import bzauth
+import bz
 
 # This is stolen from buglink.py
 bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
@@ -82,351 +74,8 @@ review_re = re.compile(r'[ra][=?]+(\w[^ ]+)')
 BINARY_CACHE_FILENAME = ".bzexport.cache"
 INI_CACHE_FILENAME = ".bzexport"
 
-global_cache = None
-
-def urlopen(ui, req):
-    """Wraps urllib2.urlopen() to provide error handling."""
-    ui.progress('Accessing bugzilla server', None, item=req.get_full_url())
-    #ui.debug("%s %s\n" % (req.get_method(), req.get_data()))
-    try:
-        return urllib2.urlopen(req)
-    except urllib2.HTTPError, e:
-        msg = ''
-        try:
-            err = json.load(e)
-            msg = err['message']
-        except:
-            msg = e
-            pass
-
-        if msg:
-            ui.warn('Error: %s\n' % msg)
-        raise
-
-class bzAuth:
-    """
-    A helper class to abstract away authentication details.  There are two
-    allowable types of authentication: userid/cookie and username/password.
-    We encapsulate it here so that functions that interact with bugzilla
-    need only call the 'auth' method on the token to get a correct URL.
-    """
-    typeCookie = 1
-    typeExplicit = 2
-    def __init__(self, userid, cookie, username, password):
-        assert (userid and cookie) or (username and password)
-        assert not ((userid or cookie) and (username or password))
-        if userid:
-            self._type = self.typeCookie
-            self._userid = userid
-            self._cookie = cookie
-            self._username = None
-        else:
-            self._type = self.typeExplicit
-            self._username = username
-            self._password = password
-
-    def auth(self):
-        if self._type == self.typeCookie:
-            return "userid=%s&cookie=%s" % (self._userid, self._cookie)
-        else:
-            return "username=%s&password=%s" % (self._username, self._password)
-
-    def username(self, ui, api_server):
-        # This returns and caches the email-address-like username of the user's ID
-        if self._type == self.typeCookie and self._username is None:
-            url = api_server + "user/%s?%s" % (self._userid, self.auth())
-            req = urllib2.Request(url, None,
-                                  {"Accept": "application/json",
-                                   "Content-Type": "application/json"})
-            conn = urlopen(ui, req)
-            try:
-                user = json.load(conn)
-            except Exception, e:
-                pass
-            if user and user["name"]:
-                return user["name"]
-            else:
-                raise util.Abort(_("Unable to get username: %s") % str(e))
-        else:
-            return self._username
-
-def get_global_path(filename):
-    path = None
-    if platform.system() == "Windows":
-        CSIDL_PERSONAL = 5
-        path = win_get_folder_path(CSIDL_PERSONAL)
-    else:
-        path = os.path.expanduser("~")
-    if path:
-        path = os.path.join(path, filename)
-    return path
-
-def store_global_cache():
-    fp = open(get_global_path(BINARY_CACHE_FILENAME), "wb")
-    pickle_dump(global_cache, fp)
-    fp.close()
-
-def load_global_cache(ui, api_server):
-    global global_cache
-    cache_file = get_global_path(BINARY_CACHE_FILENAME)
-
-    try:
-        fp = open(cache_file, "rb");
-        global_cache = pickle_load(fp)
-    except IOError, e:
-        global_cache = { api_server: { 'real_names': {} } }
-    except Exception, e:
-        raise util.Abort("Error loading user cache: " + str(e))
-
-    return global_cache
-
-def store_user_cache(cache):
-    user_cache = get_global_path(INI_CACHE_FILENAME)
-    fp = open(user_cache, "wb")
-    for section in cache.sections():
-        fp.write("[" + section + "]\n")
-        for (user, name) in cache.items(section):
-            fp.write(user + " = " + name + "\n")
-        fp.write("\n")
-    fp.close()
-
-def load_user_cache(ui, api_server):
-    user_cache = get_global_path(INI_CACHE_FILENAME)
-    section = api_server
-
-    c = config.config()
-
-    # Ensure that the cache exists before attempting to use it
-    fp = open(user_cache, "a");
-    fp.close()
-
-    c.read(user_cache)
-    return c
-
-def load_configuration(ui, api_server):
-    global_cache = load_global_cache(ui, api_server)
-    cache = {}
-    try:
-        cache = global_cache[api_server]
-    except:
-        global_cache[api_server] = cache
-    now = time.time()
-    if 'configuration' in cache and now - cache['configuration_timestamp'] < 24*60*60*7:
-        return cache['configuration']
-
-    ui.write("Refreshing configuration cache for " + api_server + "\n")
-    url = api_server + "configuration?cached_ok=1";
-    req = urllib2.Request(url, None,
-                          {"Accept": "application/json",
-                           "Content-Type": "application/json"})
-    conn = urlopen(ui, req)
-    try:
-        configuration = json.load(conn)
-    except Exception, e:
-        raise util.Abort("Error loading bugzilla configuration: " + str(e))
-
-    cache['configuration'] = configuration
-    cache['configuration_timestamp'] = now
-    store_global_cache()
-    return configuration
-
-def review_flag_type_id(ui, api_server):
-    configuration = load_configuration(ui, api_server)
-    if not configuration or not configuration["flag_type"]:
-      raise util.Abort(_("Could not find configuration object"))
-
-    flag_ids = []
-    for flag_id, flag in configuration["flag_type"].iteritems():
-        if flag["name"] == "review":
-            flag_ids += flag_id
-    if not flag_ids:
-        raise util.Abort(_("Could not find review flag id"))
-
-    return flag_ids
-
-def create_bug(ui, api_server, token, product, component, version, title, description, take_bug):
-    """
-    Create a bugzilla bug using BzAPI.
-    """
-    url = api_server + "bug?%s" % (token.auth(),)
-    json_data = {'product'  : product,
-                 'component': component,
-                 'summary'  : title,
-                 'version'  : version,
-                 'comments' : [{ 'text': description }],
-                 'op_sys'   : 'All',
-                 'platform' : 'All',
-                 }
-
-    if take_bug:
-        json_data['assigned_to'] = {"name": token.username(ui, api_server)}
-
-    req = urllib2.Request(url, json.dumps(json_data),
-                          {"Accept": "application/json",
-                           "Content-Type": "application/json"})
-    return urlopen(ui, req)
-
-def create_attachment(ui, api_server, token, bug,
-                      attachment_contents, description="attachment",
-                      filename="attachment", comment="", reviewers=None):
-    """
-    Post an attachment to a bugzilla bug using BzAPI.
-
-    """
-    attachment = base64.b64encode(attachment_contents)
-    url = api_server + "bug/%s/attachment?%s" % (bug, token.auth())
-
-    json_data = {'data': attachment,
-                 'encoding': 'base64',
-                 'file_name': filename,
-                 'description': description,
-                 'is_patch': True,
-                 'content_type': 'text/plain'}
-    if reviewers:
-        flag_ids = review_flag_type_id(ui, api_server)
-        
-        flags = []
-        for flag_type_id in flag_ids:
-            flags.append({"name": "review",
-                          "requestee": {"name": ", ".join(reviewers)},
-                          "setter": {"name": token.username(ui, api_server)},
-                          "status": "?",
-                          "type_id": flag_type_id})
-        json_data["flags"] = flags
-    if comment:
-        json_data["comments"] = [{'text': comment}]
-
-    attachment_json = json.dumps(json_data)
-    req = urllib2.Request(url, attachment_json,
-                          {"Accept": "application/json",
-                           "Content-Type": "application/json"})
-    conn = urlopen(ui, req)
-    return conn
-
-def win_get_folder_path(folder):
-    # Use SHGetFolderPath
-    import ctypes
-    SHGetFolderPath = ctypes.windll.shell32.SHGetFolderPathW
-    SHGetFolderPath.argtypes = [ctypes.c_void_p,
-                                ctypes.c_int,
-                                ctypes.c_void_p,
-                                ctypes.c_int32,
-                                ctypes.c_wchar_p]
-    path_buf = ctypes.create_unicode_buffer(1024)
-    if SHGetFolderPath(0, folder, 0, 0, path_buf) != 0:
-        return None
-
-    return path_buf.value
-
-def find_profile(ui, profileName):
-    """
-    Find the default Firefox profile location. Returns None
-    if no profile could be located.
-
-    """
-    path = None
-    if platform.system() == "Darwin":
-        # Use FSFindFolder
-        from Carbon import Folder, Folders
-        pathref = Folder.FSFindFolder(Folders.kUserDomain,
-                                      Folders.kApplicationSupportFolderType,
-                                      Folders.kDontCreateFolder)
-        basepath = pathref.FSRefMakePath()
-        path = os.path.join(basepath, "Firefox")
-    elif platform.system() == "Windows":
-        CSIDL_APPDATA = 26
-        path = win_get_folder_path(CSIDL_APPDATA)
-        if path:
-            path = os.path.join(path, "Mozilla", "Firefox")
-    else: # Assume POSIX
-        # Pretty simple in comparison, eh?
-        path = os.path.expanduser("~/.mozilla/firefox")
-    if path is None:
-        raise util.Abort(_("Could not find a Firefox profile"))
-
-    profileini = os.path.join(path, "profiles.ini")
-    c = config.config()
-    c.read(profileini)
-
-    if profileName:
-        sections = [ s for s in c.sections() if profileName in [ s, c.get(s, "Name", None) ] ]
-    else:
-        sections = [ s for s in c.sections() if c.get(s, "Default", None) ]
-        if len(sections) == 0:
-            sections = c.sections()
-
-    sections = [ s for s in sections if c.get(s, "Path", None) is not None ]
-    if len(sections) == 0:
-        raise util.Abort(_("Could not find a Firefox profile"))
-
-    section = sections.pop(0)
-    profile = c[section].get("Path")
-    if c.get(section, "IsRelative", "0") == "1":
-        profile = os.path.join(path, profile)
-    return profile
-
-# Choose the cookie to use based on how much of its path matches the URL.
-# Useful if you happen to have cookies for both
-# https://landfill.bugzilla.org/bzapi_sandbox/ and
-# https://landfill.bugzilla.org/bugzilla-3.6-branch/, for example.
-def matching_path_len(cookie_path, url_path):
-    return len(cookie_path) if url_path.startswith(cookie_path) else 0
-
-def get_cookies_from_profile(ui, profile, bugzilla):
-    """
-    Given a Firefox profile, try to find the login cookies
-    for the given bugzilla URL.
-
-    """
-    cookies = os.path.join(profile, "cookies.sqlite")
-    if not os.path.exists(cookies):
-        return None, None
-
-    # Get bugzilla hostname
-    host = urlparse.urlparse(bugzilla).hostname
-    path = urlparse.urlparse(bugzilla).path
-
-    # Firefox locks this file, so if we can't open it (browser is running)
-    # then copy it somewhere else and try to open it.
-    tempdir = None
-    try:
-        tempdir = tempfile.mkdtemp()
-        tempcookies = os.path.join(tempdir, "cookies.sqlite")
-        shutil.copyfile(cookies, tempcookies)
-        # Firefox uses sqlite's WAL feature, which bumps the sqlite
-        # version number. Older sqlites will refuse to open the db,
-        # but the actual format is the same (just the journalling is different).
-        # Patch the file to give it an older version number so we can open it.
-        with open(tempcookies, 'r+b') as f:
-            f.seek(18, 0)
-            f.write("\x01\x01")
-        conn = sqlite3.connect(tempcookies)
-        logins = conn.execute("select value, path from moz_cookies where name = 'Bugzilla_login' and (host = ? or host = ?)", (host, "." + host)).fetchall()
-        row = sorted(logins, key = lambda row: -matching_path_len(row[1], path))[0]
-        login = row[0]
-        cookie = conn.execute("select value from moz_cookies "
-                              "where name = 'Bugzilla_logincookie' "
-                              " and (host = ? or host= ?) "
-                              " and path = ?",
-                              (host, "." + host, row[1])).fetchone()[0]
-        ui.debug("host=%s path=%s login=%s cookie=%s\n" % (host, row[1], login, cookie))
-        if isinstance(login, unicode):
-            login = login.encode("utf-8")
-            cookie = cookie.encode("utf-8")
-        return login, cookie
-
-    except Exception, e:
-        if not isinstance(e, IndexError):
-            ui.write_err(_("Failed to get bugzilla login cookies from "
-                           "Firefox profile at %s: %s") % (profile, str(e)))
-        pass
-
-    finally:
-        if tempdir:
-            shutil.rmtree(tempdir)
-
 def get_default_version(ui, api_server, product):
-    c = load_configuration(ui, api_server)
+    c = bzauth.load_configuration(ui, api_server, BINARY_CACHE_FILENAME)
     versions = c['product'].get(product, {}).get('version')
     if not versions:
         raise util.Abort(_("Product %s has no versions") % product)
@@ -438,84 +87,6 @@ def get_default_version(ui, api_server, product):
     if uns:
         return uns[-1]
     return versions[-1]
-
-class PUTRequest(urllib2.Request):
-    def get_method(self):
-        return "PUT"
-
-def obsolete_old_patches(ui, api_server, token, bug, filename, ignore_id, interactive = False):
-    url = api_server + "bug/%s/attachment?%s" % (bug, token.auth()) 
-    req = urllib2.Request(url, None,
-                          {"Accept": "application/json",
-                           "Content-Type": "application/json"})
-    conn = urlopen(ui, req)
-    try:
-        bug = json.load(conn)
-    except Exception, e:
-        raise util.Abort(_("Could not load info for bug %s: %s") % (bug, str(e)))
-
-    patches = [p for p in bug["attachments"] if p["is_patch"] and not p["is_obsolete"] and p["file_name"] == filename and int(p["id"]) != int(ignore_id)]
-    if not len(patches):
-        return True
-
-    for p in patches:
-        #TODO: "?last_change_time=" + p["last_change_time"] to avoid conflicts?
-        url = api_server + "attachment/%s?%s" % (str(p["id"]), token.auth())
-
-        if interactive and ui.prompt(_("Obsolete patch %s (%s) - %s (y/n)?") % (url, p["file_name"], p["description"])) != 'y':
-          continue
-
-        attachment_data = p
-        attachment_data["is_obsolete"] = True
-        attachment_json = json.dumps(attachment_data)
-        req = PUTRequest(url, attachment_json,
-                         {"Accept": "application/json",
-                          "Content-Type": "application/json"})
-        conn = urlopen(ui, req)
-        try:
-            result = json.load(conn)
-        except Exception, e:
-            raise util.Abort(_("Could not update attachment %s: %s") % (p["id"], str(e)))
-
-    return True
-
-def find_reviewers(ui, api_server, token, search_strings):
-    c = load_user_cache(ui, api_server)
-    section = api_server
-
-    search_results = []
-    for search_string in search_strings:
-        name = c.get(section, search_string)
-        if name:
-            search_results.append({"search_string": search_string,
-                                   "names": [name],
-                                   "real_names": ["not_a_real_name"]})
-            continue
-
-        url = urlparse.urljoin(api_server,
-                               "user?match=%s&%s" % (urllib.quote(search_string), token.auth()))
-        try:
-            req = urllib2.Request(url, None,
-                                  {"Accept": "application/json",
-                                   "Content-Type": "application/json"})
-            conn = urlopen(ui, req)
-            users = json.load(conn)
-            error = None
-            name = None
-            real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"]) if user["real_name"] else user["email"], users["users"])
-            names = map(lambda user: user["name"], users["users"])
-            search_results.append({"search_string": search_string,
-                                   "names": names,
-                                   "real_names": real_names})
-            if len(real_names) == 1:
-                c.set(section, search_string, names[0])
-        except Exception, e:
-            search_results.append({"search_string": search_string,
-                                   "error": str(e),
-                                   "real_names": None})
-            raise
-    store_user_cache(c)
-    return search_results
 
 # ui.promptchoice only allows single-character responses. If we have more than
 # 10 options, that won't work, so fall back to ui.prompt.
@@ -594,7 +165,7 @@ def multi_reviewer_prompt(ui, search_results):
                        allow_none = True)
 
 def validate_reviewers(ui, api_server, auth, search_strings, multi_callback):
-    search_results = find_reviewers(ui, api_server, auth, search_strings)
+    search_results = find_reviewers(ui, api_server, INI_CACHE_FILENAME, auth, search_strings)
     search_failed = False
     reviewers = []
     for search_result in search_results:
@@ -737,30 +308,28 @@ def bugzilla_info(ui, profile):
     password = ui.config("bzexport", "password", None)
     if password:
         password = urllib.quote(password)
-    userid = None
-    cookie = None
-    #TODO: allow overriding profile location via config
-    #TODO: cache cookies?
-    if not password:
-        profile = find_profile(ui, profile)
-        if profile:
-            try:
-                userid, cookie = get_cookies_from_profile(ui, profile, bugzilla)
-            except:
-                pass
 
-        if cookie:
-            username = None # might not match userid
-        else:
-            ui.write("No bugzilla login cookies found in profile.\n")
-            if not username:
-                username = ui.prompt("Enter username for %s:" % bugzilla)
-            if not password:
-                password = ui.getpass("Enter password for %s: " % username)
-
-    auth = bzAuth(userid, cookie, username, password)
-
+    auth = bzauth.get_auth(ui, bugzilla, profile, username, password)
     return (auth, api_server, bugzilla)
+
+def urlopen(ui, req):
+    """Wraps urllib2.urlopen() to provide error handling."""
+    ui.progress('Accessing bugzilla server', None, item=req.get_full_url())
+    #ui.debug("%s %s\n" % (req.get_method(), req.get_data()))
+    try:
+        return urllib2.urlopen(req)
+    except urllib2.HTTPError, e:
+        msg = ''
+        try:
+            err = json.load(e)
+            msg = err['message']
+        except:
+            msg = e
+            pass
+
+        if msg:
+            ui.warn('Error: %s\n' % msg)
+        raise
 
 def infer_arguments(ui, repo, args, opts):
     rev = None
@@ -909,7 +478,7 @@ def fill_values(values, ui, api_server, reviewers = None, finalize = False):
         if (len(reviewers) > 1):
             values['REVIEWER_2'] = reviewers[1]
 
-    c = load_configuration(ui, api_server)
+    c = bzauth.load_configuration(ui, api_server, BINARY_CACHE_FILENAME)
 
     if 'PRODUCT' in values:
         values['PRODUCT'], values['COMPONENT'] = choose_prodcomponent(ui, c, values['PRODUCT'], values['COMPONENT'], finalize = finalize)
@@ -983,6 +552,97 @@ def update_patch(ui, repo, rev, bug, update, interactive):
         mq.refresh(ui, repo, **opts)
 
     return rev
+
+def obsolete_old_patches(ui, api_server, token, bugid, bugzilla, filename, ignore_id, pre_hook = None):
+    bug = None
+    req = bz.get_attachments(api_server, token, bugid)
+    try:
+        bug = json.load(urlopen(ui, req))
+    except Exception, e:
+        raise util.Abort(_("Could not load info for bug %s: %s") % (bug, str(e)))
+
+    patches = [p for p in bug["attachments"] if p["is_patch"] and not p["is_obsolete"] and p["file_name"] == filename and int(p["id"]) != int(ignore_id)]
+    if not len(patches):
+        return True
+
+    for p in patches:
+        #TODO: "?last_change_time=" + p["last_change_time"] to avoid conflicts?
+        attachment_url = urlparse.urljoin(bugzilla, "attachment.cgi?id=%s" % (p['id']))
+        if pre_hook and not pre_hook(url = attachment_url, filename = p['file_name'], description = p["description"]):
+            continue
+
+        req = bz.obsolete_attachment(api_server, token, p)
+        try:
+            result = json.load(urlopen(ui, req))
+        except Exception, e:
+            raise util.Abort(_("Could not update attachment %s: %s") % (p["id"], str(e)))
+
+    return True
+
+def find_reviewers(ui, api_server, user_cache_filename, token, search_strings):
+    c = bzauth.load_user_cache(ui, api_server, user_cache_filename)
+    section = api_server
+
+    search_results = []
+    for search_string in search_strings:
+        name = c.get(section, search_string)
+        if name:
+            search_results.append({"search_string": search_string,
+                                   "names": [name],
+                                   "real_names": ["not_a_real_name"]})
+            continue
+
+        try:
+            users = json.load(urlopen(ui, bz.find_users(api_server, token, search_string)))
+            error = None
+            name = None
+            real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"]) if user["real_name"] else user["email"], users["users"])
+            names = map(lambda user: user["name"], users["users"])
+            search_results.append({"search_string": search_string,
+                                   "names": names,
+                                   "real_names": real_names})
+            if len(real_names) == 1:
+                c.set(section, search_string, names[0])
+        except Exception, e:
+            search_results.append({"search_string": search_string,
+                                   "error": str(e),
+                                   "real_names": None})
+            raise
+    bzauth.store_user_cache(c, user_cache_filename)
+    return search_results
+
+def review_flag_type_id(ui, api_server, config_cache_filename):
+    """
+    Look up the numeric type id for the 'review' flag from the given bugzilla server
+    """
+    configuration = bzauth.load_configuration(ui, api_server, config_cache_filename)
+    if not configuration or not configuration["flag_type"]:
+      raise util.Abort(_("Could not find configuration object"))
+
+    flag_ids = []
+    for flag_id, flag in configuration["flag_type"].iteritems():
+        if flag["name"] == "review":
+            flag_ids += flag_id
+    if not flag_ids:
+        raise util.Abort(_("Could not find review flag id"))
+
+    return flag_ids
+
+def create_attachment(ui, api_server, token, bug,
+                      config_cache_filename,
+                      attachment_contents, description="attachment",
+                      filename="attachment", comment="", reviewers=None):
+
+    opts = {}
+    if reviewers:
+        opts['review_flag_ids'] = review_flag_type_id(ui, api_server, config_cache_filename)
+        opts['username'] = token.username(api_server)
+        opts['reviewers'] = reviewers
+
+    req = bz.create_attachment(api_server, token, bug, attachment_contents,
+                               description=description, filename=filename, comment=comment,
+                               **opts)
+    return json.load(urlopen(ui, req))
 
 def bzexport(ui, repo, *args, **opts):
     """
@@ -1087,7 +747,7 @@ def bzexport(ui, repo, *args, **opts):
         reviewers = validate_reviewers(ui, api_server, auth, reviewers, multi_reviewer_prompt)
 
     if reviewers is None:
-        raise util.Abort("Invalid reviewers")
+        raise util.Abort(_("Invalid reviewers"))
 
     values = { 'BUGNUM': bug,
                'ATTACHMENT_FILENAME': filename,
@@ -1128,14 +788,17 @@ def bzexport(ui, repo, *args, **opts):
             return
 
         try:
-            response = create_bug(ui, api_server, auth,
-                                  product = values['PRODUCT'],
-                                  component = values['COMPONENT'],
-                                  version = values['PRODVERSION'],
-                                  title = values['BUGTITLE'],
-                                  description = values['BUGCOMMENT0'],
-                                  take_bug = not opts['no_take_bug'])
-            result = json.load(response)
+            create_opts = {}
+            if not opts['no_take_bug']:
+                create_opts['assign_to'] = auth.username(api_server)
+            req = bz.create_bug(api_server, auth,
+                                product = values['PRODUCT'],
+                                component = values['COMPONENT'],
+                                version = values['PRODVERSION'],
+                                title = values['BUGTITLE'],
+                                description = values['BUGCOMMENT0'],
+                                **create_opts)
+            result = json.load(urlopen(ui, req))
             bug = result['id']
             ui.write("Created bug %s at %s\n" % (bug, bugzilla + "/show_bug.cgi?id=" + bug))
         except Exception, e:
@@ -1158,21 +821,23 @@ def bzexport(ui, repo, *args, **opts):
       ui.write(_("Exiting without creating attachment\n"))
       return
 
-    result_id = None
-    attach = create_attachment(ui, api_server, auth,
-                               bug, contents.getvalue(),
+    result = create_attachment(ui, api_server, auth,
+                               bug, BINARY_CACHE_FILENAME, contents.getvalue(),
                                filename=filename,
                                description=values['ATTACHMENT_DESCRIPTION'],
                                comment=values['ATTACHCOMMENT'],
                                reviewers=reviewers)
-    result = json.load(attach)
     attachment_url = urlparse.urljoin(bugzilla,
                                       "attachment.cgi?id=" + result["id"] + "&action=edit")
     print "%s uploaded as %s" % (rev, attachment_url)
-    result_id = result["id"]
 
-    if not result_id or not obsolete_old_patches(ui, api_server, auth, bug, filename, result_id, opts['interactive']):
-        return
+    def pre_obsolete(**kwargs):
+        if not opts['interactive']:
+            return True
+        url, filename, description = [ kwargs[k] for k in ['url', 'filename', 'description' ] ]
+        return ui.prompt(_("Obsolete patch %s (%s) - %s (y/n)?") % (url, filename, description)) != 'y'
+
+    obsolete_old_patches(ui, api_server, auth, bug, bugzilla, filename, result['id'], pre_hook = pre_obsolete)
 
 def newbug(ui, repo, *args, **opts):
     """
@@ -1214,14 +879,18 @@ def newbug(ui, repo, *args, **opts):
       ui.write(_("Exiting without creating bug\n"))
       return
 
-    response = create_bug(ui, api_server, auth,
-                          product = values['PRODUCT'],
-                          component = values['COMPONENT'],
-                          version = values['PRODVERSION'],
-                          title = values['BUGTITLE'],
-                          description = values['BUGCOMMENT0'],
-                          take_bug = opts['take_bug'])
-    result = json.load(response)
+    create_opts = {}
+    if opts['take_bug']:
+        create_opts['assign_to'] = auth.username(api_server)
+
+    req = bz.create_bug(api_server, auth,
+                        product = values['PRODUCT'],
+                        component = values['COMPONENT'],
+                        version = values['PRODVERSION'],
+                        title = values['BUGTITLE'],
+                        description = values['BUGCOMMENT0'],
+                        **create_opts)
+    result = json.load(urlopen(ui, req))
     bug = result['id']
     ui.write("Created bug %s at %s\n" % (bug, bugzilla + "/show_bug.cgi?id=" + bug))
 
