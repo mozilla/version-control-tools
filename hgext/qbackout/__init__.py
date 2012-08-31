@@ -101,7 +101,7 @@ def qbackout(ui, repo, rev, **opts):
         if len(bugs) == 0:
             return ''
         elif len(bugs) == 1:
-            return ' (bug ' + bugs.pop() + ')'
+            return ' (bug ' + bugs[0] + ')'
         else:
             return ' (' + ', '.join(map(lambda b: 'bug %s' % b, bugs)) + ')'
 
@@ -157,7 +157,6 @@ def qbackout(ui, repo, rev, **opts):
         except:
             if not opts.get('broken'):
                 raise
-        msg = ('Backed out changeset %s' % shortnode) + bugs_suffix(bugs)
         msg = ('%s changeset %s' % (desc['Actioned'], shortnode)) + bugs_suffix(bugs)
         messages.append(msg)
         if not opts.get('single'):
