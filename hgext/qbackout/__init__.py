@@ -101,7 +101,7 @@ def qbackout(ui, repo, rev, **opts):
         if len(bugs) == 0:
             return ''
         elif len(bugs) == 1:
-            return ' (bug ' + bugs[0] + ')'
+            return ' (bug ' + list(bugs)[0] + ')'
         else:
             return ' (' + ', '.join(map(lambda b: 'bug %s' % b, bugs)) + ')'
 
