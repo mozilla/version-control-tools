@@ -432,6 +432,48 @@ def touched(ui, repo, sourcefile=None, **opts):
             elif sourcefile == filename:
                 ui.write(patchname + "\n")
 
+qparent_re = re.compile('^qparent: (\S+)$', re.M)
+top_re = re.compile('^top: (\S+)$', re.M)
+
+def qrevert(ui, repo, rev, **opts):
+    '''
+    Revert to a past mq state. This updates both the main checkout as well as
+    the patch directory, and leaves either or both at a non-head revision.
+    '''
+    q = repo.mq
+    if not q or not q.qrepo():
+        raise util.Abort(_("No revisioned patch queue found"))
+    p = q.qrepo()[q.qrepo().lookup(rev)]
+
+    desc = p.description()
+    m = qparent_re.search(desc)
+    if not m:
+        raise util.Abort(_("mq commit is missing needed metadata in comment"))
+    qparent = m.group(1)
+    m = top_re.search(desc)
+    if not m:
+        raise util.Abort(_("mq commit is missing needed metadata in comment"))
+    top = m.group(1)
+
+    # Check the main checkout before updating the mq checkout
+    if repo[None].dirty(merge=False, branch=False):
+        raise util.Abort(_("uncommitted local changes"))
+
+    # Pop everything first
+    q.pop(repo, None, force=False, all=True, nobackup=True, keepchanges=False)
+
+    # Update the mq checkout
+    commands.update(ui, q.qrepo(), rev=rev, check=True)
+    # Update the main checkout
+    commands.update(ui, repo, rev=qparent, check=False)
+
+    # Push until reaching the correct patch
+    if top != "(none)":
+        mq.goto(ui, repo, top)
+
+    # Needed?
+    q.savedirty()
+
 def mqcommit_info(ui, repo, opts):
     mqcommit = opts.pop('mqcommit', None)
 
@@ -704,6 +746,11 @@ cmdtable = {
           ('u', 'user', [], _('revisions committed by user'), _('USER')),
           ] + commands.logopts,
          ('hg urls [-l LIMIT] [NAME]')),
+
+    'qrevert':
+        (qrevert,
+         [],
+         ('hg qrevert REV')),
 }
 
 def uisetup(ui):
