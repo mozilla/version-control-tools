@@ -278,7 +278,7 @@ def edit_form(ui, repo, fields, template_name):
     pattern = re.compile(pattern, re.S)
 
     # Allow user to edit the form
-    new = ui.edit(orig, ui.username())
+    new = ui.edit(orig.encode('utf-8'), ui.username()).decode('utf-8')
 
     saved = savefile(repo, "last_bzexport.txt", new)
     ui.write("saved edited form in %s\n" % saved)
@@ -543,12 +543,12 @@ def update_patch(ui, repo, rev, bug, update, interactive):
     if update_patch:
         # Add "Bug nnnn - " to the beginning of the description
         ph = mq.patchheader(q.join(rev), q.plainmode)
-        msg = ph.message
+        msg = [ s.decode('utf-8') for s in ph.message ]
         if not msg:
           msg = ["Bug %s patch" % bug]
         elif not bug_re.match(msg[0]):
           msg[0] = "Bug %s - %s" % (bug, msg[0])
-        opts = { 'git': True, 'message': '\n'.join(msg), 'include': ["re:."] }
+        opts = { 'git': True, 'message': '\n'.join(msg).encode('utf-8'), 'include': ["re:."] }
         mq.refresh(ui, repo, **opts)
 
     return rev
@@ -681,7 +681,7 @@ def bzexport(ui, repo, *args, **opts):
 
     patch_comment = None
     reviewers = []
-    desc = opts['description'] or repo[rev].description()
+    desc = opts['description'] or repo[rev].description().decode('utf-8')
     if not desc or desc.startswith('[mq]'):
         desc = '<required>'
     else:
@@ -696,7 +696,7 @@ def bzexport(ui, repo, *args, **opts):
         if not bzexport.newbug:
             # Try to find it in the original revision description, if
             # it wasn't found in desc.
-            bug_re.sub(dosub, repo[rev].description(), 1)
+            bug_re.sub(dosub, repo[rev].description().decode('utf-8'), 1)
         if bzexport.newbug:
             if bug and bug != bzexport.newbug:
                 ui.warn("Warning: Bug number %s from commandline doesn't match "
