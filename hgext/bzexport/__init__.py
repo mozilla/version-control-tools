@@ -190,11 +190,11 @@ def validate_reviewers(ui, api_server, auth, search_strings, multi_callback):
         return
     return reviewers
 
-# Copied from savecommitmessage in localrepo.py (but with variable filename)
+# Copied from savecommitmessage in localrepo.py (but with variable filename and unicode)
 def savefile(repo, basename, text):
     fp = repo.opener(basename, 'wb')
     try:
-        fp.write(text)
+        fp.write(text.encode('utf-8'))
     finally:
         fp.close()
     return repo.pathto(fp.name[len(repo.root)+1:])
