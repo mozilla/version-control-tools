@@ -546,7 +546,7 @@ def update_patch(ui, repo, rev, bug, update, interactive):
         msg = [ s.decode('utf-8') for s in ph.message ]
         if not msg:
           msg = ["Bug %s patch" % bug]
-        elif not bug_re.match(msg[0]):
+        elif not bug_re.search(msg[0]):
           msg[0] = "Bug %s - %s" % (bug, msg[0])
         opts = { 'git': True, 'message': '\n'.join(msg).encode('utf-8'), 'include': ["re:."] }
         mq.refresh(ui, repo, **opts)
