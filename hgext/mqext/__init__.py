@@ -113,10 +113,23 @@ def qshow(ui, repo, patchspec=None, **opts):
             try:
                 patchf = file(patchspec, "r")
             except Exception, e:
-                # commands.diff has bad error message
-                if patchspec in repo:
-                    return commands.diff(ui, repo, change=patchspec, date=None)
-                raise util.Abort(_("Unknown patch '%s'") % patchspec)
+                # commands.diff has a bad error message
+                if patchspec not in repo:
+                    raise util.Abort(_("Unknown patch '%s'") % patchspec)
+
+                # the built-in export command does not label the diff for color
+                # output, and the patch header generation is not reusable
+                # independently
+                def empty_diff(*args, **kwargs):
+                    return []
+                temp = patch.diff
+                try:
+                    patch.diff = empty_diff
+                    cmdutil.export(repo, [ patchspec ], fp=ui)
+                finally:
+                    patch.diff = temp
+
+                return commands.diff(ui, repo, change=patchspec, date=None)
 
     if opts['stat']:
         del opts['stat']
