@@ -46,6 +46,7 @@ from mercurial import commands, config, cmdutil, hg, node, util, patch
 from hgext import mq
 from cStringIO import StringIO
 import json
+import sys
 import os
 import re
 import urllib
@@ -289,6 +290,7 @@ def edit_form(ui, repo, fields, template_name):
         raise util.Abort("Edited form %s has invalid format" % saved)
 
     new_fields = fields.copy()
+    marker_found = False
     for field, value in zip(template_fields, m.groups()):
         if value == '<required>':
             raise util.Abort("Required field %s not filled in" % (field,))
@@ -296,6 +298,12 @@ def edit_form(ui, repo, fields, template_name):
             new_fields[field] = None
         else:
             new_fields[field] = value
+            if value == '<choose-from-menu>':
+                marker_found = True
+
+    if new == orig and not marker_found:
+        if ui.prompt(_("No changes made; continue with current values (y/n)?")) != 'y':
+            sys.exit(0)
 
     return new_fields
 
