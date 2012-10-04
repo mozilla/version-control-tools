@@ -3,7 +3,7 @@
 from __future__ import with_statement
 import unittest
 from mercurial import ui, hg, commands, util
-from mercurial.commands import add, clone, commit, init, push
+from mercurial.commands import add, clone, commit, init, push, rename
 from mercurial.node import hex
 from tempfile import mkdtemp
 import shutil
@@ -22,6 +22,10 @@ pretxnchangegroup.z_linearhistory = python:mozhghooks.%s
 """ % hook)
 
 def appendFile(filename, content):
+  try:
+    os.makedirs(os.path.dirname(filename))
+  except:
+    pass
   with open(filename, 'a') as f:
     f.write(content)
 
@@ -677,6 +681,70 @@ class TestCommitMessageHook(unittest.TestCase):
 
     result = push(ui, self.clonerepo, dest=self.repodir)
     self.assertEqual(result, 0)
+
+class TestCaseOnlyRenameHook(unittest.TestCase):
+  def setUp(self):
+    self.ui = ui.ui()
+    self.ui.quiet = True
+    self.ui.verbose = False
+    self.repodir = mkdtemp(prefix="hg-TestCaseOnlyRenameHook")
+    init(self.ui, dest=self.repodir)
+    addHook(self.repodir, "prevent_case_only_renames.hook")
+    self.repo = hg.repository(self.ui, self.repodir)
+    self.clonedir = mkdtemp(prefix="hg-test")
+    clone(self.ui, self.repo, self.clonedir)
+    self.clonerepo = hg.repository(self.ui, self.clonedir)
+
+  def tearDown(self):
+    shutil.rmtree(self.repodir)
+    shutil.rmtree(self.clonedir)
+
+  def testTipShouldFail(self):
+    """ Test that a case-only rename in tip should fail. """
+
+    ui = self.ui
+
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(ui, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(ui, self.clonerepo, message="checkin 1")
+    rename(ui, self.clonerepo,
+           join(self.clonedir, "testfile"),
+           join(self.clonedir, "TESTFILE"));
+    commit(ui, self.clonerepo, message="checkin 2")
+    self.assertRaises(util.Abort, push, ui, self.clonerepo, dest=self.repodir)
+
+  def testTipDirRenameShouldFail(self):
+    """ Test that a case-only directory rename in tip should fail. """
+
+    ui = self.ui
+
+    appendFile(join(self.clonedir, "testdir/testfile"), "checkin 1")
+    add(ui, self.clonerepo, join(self.clonedir, "testdir/testfile"))
+    commit(ui, self.clonerepo, message="checkin 1")
+    rename(ui, self.clonerepo,
+           join(self.clonedir, "testdir/testfile"),
+           join(self.clonedir, "TESTDIR/testfile"));
+    commit(ui, self.clonerepo, message="checkin 2")
+    self.assertRaises(util.Abort, push, ui, self.clonerepo, dest=self.repodir)
+
+  def testPreviousShouldFail(self):
+    """ Test that a case-only rename that's not tip should fail. """
+
+    ui = self.ui
+
+    appendFile(join(self.clonedir, "testfile"), "checkin 1")
+    add(ui, self.clonerepo, join(self.clonedir, "testfile"))
+    commit(ui, self.clonerepo, message="checkin 1")
+
+    rename(ui, self.clonerepo,
+           join(self.clonedir, "testfile"),
+           join(self.clonedir, "TESTFILE"));
+    commit(ui, self.clonerepo, message="checkin 2")
+
+    appendFile(join(self.clonedir, "TESTFILE"), "checkin 3")
+    commit(ui, self.clonerepo, message="checkin 3")
+
+    self.assertRaises(util.Abort, push, ui, self.clonerepo, dest=self.repodir)
 
 if __name__ == '__main__':
   unittest.main()
