@@ -217,10 +217,13 @@ def pushlogSetup(repo, req):
     if reponame == '.hg':
         reponame = os.path.basename(os.path.dirname(repopath))
     pushdb = os.path.join(repo.path, "pushlog2.db")
-    try:
-        conn = sqlite.connect(pushdb)
-    except sqlite.OperationalError:
-        conn = None
+    # If the database doesn't already exist, don't try to open it.
+    conn = None
+    if os.path.isfile(pushdb):
+        try:
+            conn = sqlite.connect(pushdb)
+        except sqlite.OperationalError:
+            pass
 
     if 'node' in req.form:
         page = int(req.form['node'][0])

@@ -5,7 +5,7 @@ import sys
 import unittest
 import os.path
 import inspect
-from os.path import join, isdir
+from os.path import join, isdir, isfile
 from mercurial import ui, hg, commands, util
 from mercurial.commands import add, clone, commit, init, push
 from mercurial.hgweb import server
@@ -129,6 +129,9 @@ class TestEmptyRepo(HGWebTest, unittest.TestCase):
         r = conn.getresponse()
         conn.close()
         self.assertEqual(r.status, 200, "empty pushlog should not error (got HTTP status %d, expected 200)" % r.status)
+        # The webcommand should not create pushlog2.db, it should simply
+        # return no data and allow the db to be created by the hook.
+        self.assertFalse(isfile(join(self.repodir, ".hg", "pushlog2.db")))
 
     def testemptyreporeadonly(self):
         """Accessing /pushlog on a read-only empty repo should succeed."""
