@@ -294,5 +294,17 @@ def get_username(api_server, token):
     try:
         user = json.load(urllib2.urlopen(req))
         return user["name"]
+    except urllib2.HTTPError, e:
+        msg = ''
+        try:
+            err = json.load(e)
+            msg = err['message']
+        except:
+            msg = e
+            pass
+
+        if msg:
+            raise util.Abort('Unable to get username: %s\n' % msg)
+        raise
     except Exception, e:
         raise util.Abort(_("Unable to get username: %s") % str(e))
