@@ -492,7 +492,7 @@ def fill_values(values, ui, api_server, reviewers = None, finalize = False):
     if 'PRODVERSION' in values:
         if values['PRODVERSION'] == '<default>' and values['PRODUCT'] not in [None, '<choose-from-menu>']:
             values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
-            ui.write("Using default version '%s' of product %s\n" % (values['PRODVERSION'], values['PRODUCT']))
+            ui.write("Using default version '%s' of product %s\n" % (values['PRODVERSION'].encode('utf-8'), values['PRODUCT'].encode('utf-8')))
 
     # 'finalize' means we need the final values. (finalize will be set to false
     # for prepopulating fields that will be displayed in a form)
