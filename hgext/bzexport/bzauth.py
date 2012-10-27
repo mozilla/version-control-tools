@@ -26,9 +26,9 @@ import json
 from mercurial import config, util
 from mercurial.i18n import _
 try:
-  from cPickle import dump as pickle_dump, load as pickle_load
+  import cPickle as pickle
 except:
-  from pickle import dump as pickle_dump, load as pickle_load
+  import pickle
 import bz
 
 global_cache = None
@@ -81,7 +81,7 @@ def get_global_path(filename):
 
 def store_global_cache(filename):
     fp = open(get_global_path(filename), "wb")
-    pickle_dump(global_cache, fp)
+    pickle.dump(global_cache, fp)
     fp.close()
 
 def load_global_cache(ui, api_server, filename):
@@ -90,7 +90,7 @@ def load_global_cache(ui, api_server, filename):
 
     try:
         fp = open(cache_file, "rb");
-        global_cache = pickle_load(fp)
+        global_cache = pickle.load(fp)
     except IOError, e:
         global_cache = { api_server: { 'real_names': {} } }
     except Exception, e:
@@ -110,14 +110,12 @@ def store_user_cache(cache, filename):
 
 def load_user_cache(ui, api_server, filename):
     user_cache = get_global_path(filename)
-    section = api_server
-
-    c = config.config()
 
     # Ensure that the cache exists before attempting to use it
     fp = open(user_cache, "a");
     fp.close()
 
+    c = config.config()
     c.read(user_cache)
     return c
 

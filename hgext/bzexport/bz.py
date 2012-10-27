@@ -20,8 +20,6 @@ import urllib2
 import urlparse
 import json
 
-import bzauth
-
 JSON_HEADERS = {"Accept": "application/json",
                 "Content-Type": "application/json"}
 

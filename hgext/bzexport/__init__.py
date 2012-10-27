@@ -42,7 +42,7 @@ attaching anything to it.
 
 """
 from mercurial.i18n import _
-from mercurial import commands, config, cmdutil, hg, node, util, patch
+from mercurial import commands, cmdutil, util, patch
 from hgext import mq
 from cStringIO import StringIO
 import json
@@ -52,7 +52,6 @@ import re
 import urllib
 import urllib2
 import urlparse
-import pkg_resources
 import bzauth
 import bz
 
@@ -522,7 +521,7 @@ def update_patch(ui, repo, rev, bug, update, interactive):
     q = repo.mq
     try:
         rev = q.lookup(rev)
-    except util.error.Abort, e:
+    except util.error.Abort:
         # If the patch is not coming from mq, don't complain that the name is not found
         update_patch = False
         rename_patch = False
@@ -579,7 +578,7 @@ def obsolete_old_patches(ui, api_server, token, bugid, bugzilla, filename, ignor
 
         req = bz.obsolete_attachment(api_server, token, p)
         try:
-            result = json.load(urlopen(ui, req))
+            json.load(urlopen(ui, req))
         except Exception, e:
             raise util.Abort(_("Could not update attachment %s: %s") % (p["id"], str(e)))
 
@@ -600,7 +599,6 @@ def find_reviewers(ui, api_server, user_cache_filename, token, search_strings):
 
         try:
             users = json.load(urlopen(ui, bz.find_users(api_server, token, search_string)))
-            error = None
             name = None
             real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"]) if user["real_name"] else user["email"], users["users"])
             names = map(lambda user: user["name"], users["users"])
