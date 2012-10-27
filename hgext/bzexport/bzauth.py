@@ -86,6 +86,9 @@ def store_global_cache(filename):
 
 def load_global_cache(ui, api_server, filename):
     global global_cache
+    if global_cache:
+      return global_cache
+
     cache_file = get_global_path(filename)
 
     try:
