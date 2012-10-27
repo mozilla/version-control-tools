@@ -36,10 +36,8 @@ username = username@example.com
 # Your bugzilla password, see above.
 password = secret
 
-# URL to the Bugzilla server to use. The default is
-# https://bugzilla.mozilla.org.
-bugzilla = http://bugzilla.example.com/
+# URL of the Bugzilla server
+bugzilla = https://bugzilla.mozilla.org
 
-# URL to the BzAPI server to use. The default is
-# https://api-dev.bugzilla.mozilla.org/latest/
-api_server = http://bzapi.example.com/latest/
+# URL of the corresponding BzAPI server
+api_server = https://api-dev.bugzilla.mozilla.org/latest/
