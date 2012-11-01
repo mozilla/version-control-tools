@@ -21,12 +21,6 @@ import os.path
 import re
 import json
 
-# Array of which directories Calendar exclusively controls in comm-central
-calendarOwns = [
-  'calendar',
-  'other-licenses/branding/sunbird'
-]
-
 # Array of which directories SeaMonkey exclusively controls in comm-central
 seamonkeyOwns = [
   'suite'
@@ -47,24 +41,6 @@ seamonkeyTrees = {
   # Point at Thunderbird as SeaMonkey doesn't use this.
   'comm-1.9.2'  : None,
 }
-# Calendar tinderbox trees
-calendarTrees = {
-  'comm-central': 'http://tinderbox.mozilla.org/CalendarTrunk/status.html',
-  # Point at Thunderbird for now
-  'comm-aurora' : 'http://tinderbox.mozilla.org/Calendar-Aurora/status.html',
-  # Point at Thunderbird for now
-  'comm-beta'   : 'http://tinderbox.mozilla.org/Calendar-Beta/status.html',
-  'comm-release': 'http://tinderbox.mozilla.org/Calendar-Release/status.html',
-  'comm-esr10'  : None,
-  'comm-miramar': None,
-  # Point at SeaMonkey as Calendar don't use this one
-  'comm-2.0'    : None,
-  # Point at Thunderbird as Calendar doesn't use this
-  'comm-1.9.2'  : None,
-  # Point at SeaMonkey as Calendar doesn't use this.
-  'comm-1.9.1'  : None,
-}
-
 
 magicwords = "CLOSED TREE"
 
@@ -178,8 +154,7 @@ def hook(ui, repo, node, **kwargs):
     try:
         # First find out which trees are affected
         apps = { 'thunderbird' : False,
-                 'seamonkey' : False,
-                 'calendar' : False }
+                 'seamonkey' : False }
 
         # all changesets from node to 'tip' inclusive are part of this push
         rev = repo.changectx(node).rev()
@@ -189,8 +164,6 @@ def hook(ui, repo, node, **kwargs):
             for changedFile in ctx.files():
                 if isOwned(changedFile, seamonkeyOwns):
                     apps['seamonkey'] = True
-                elif isOwned(changedFile, calendarOwns):
-                    apps['calendar'] = True
                 else:
                     apps['thunderbird'] = True
 
@@ -213,14 +186,7 @@ def hook(ui, repo, node, **kwargs):
                 if status == 1:
                     return 1
 
-        if apps['calendar']:
-            if not calendarTrees.has_key(repoName):
-                print "Unrecognized tree!  I don't know how to check closed status for %s and Calendar... allowing push, but you should report this!" % (repoName)
-            else:
-                 status = checkTreeState(repo, repoName, 'Calendar', calendarTrees[repoName])
-
         return status;
-        
             
     except IOError, (err):
         # fail open, I guess. no sense making hg unavailable

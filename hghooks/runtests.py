@@ -394,11 +394,9 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
   def testCCOpenSeaMonkey(self):
     self.actualTestCCOpen("SeaMonkey", ["suite", "build", "test"])
 
-  def testCCOpenCalendar1(self):
-    self.actualTestCCOpen("CalendarTrunk", ["calendar", "app", "test"])
-
-  def testCCOpenCalendar2(self):
-    self.actualTestCCOpen("CalendarTrunk", ["other-licenses", "branding", "sunbird", "test"])
+  def testCCOpenCalendar(self):
+    # Calendar is now built alongside Thunderbird
+    self.actualTestCCOpen("Thunderbird", ["calendar", "app", "test"])
 
   def actualTestCCClosed(self, treeName, fileInfo):
     """Pushing to a CLOSED CC tree should fail."""
@@ -435,11 +433,9 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
   def testCCClosedSeaMonkey(self):
     self.actualTestCCClosed("SeaMonkey", ["suite", "build", "test"])
 
-  def testCCClosedCalendar1(self):
-    self.actualTestCCClosed("CalendarTrunk", ["calendar", "app", "test"])
-
-  def testCCClosedCalendar2(self):
-    self.actualTestCCClosed("CalendarTrunk", ["other-licenses", "branding", "sunbird", "test"])
+  def testCCClosedCalendar(self):
+    # Calendar is now built alongside Thunderbird
+    self.actualTestCCClosed("Thunderbird", ["calendar", "app", "test"])
 
   # In theory adding CLOSED TREE is the same code-path for all projects,
   # so just checking for one project
