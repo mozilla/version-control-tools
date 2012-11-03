@@ -615,7 +615,7 @@ def find_reviewers(ui, api_server, user_cache_filename, token, search_strings):
     bzauth.store_user_cache(c, user_cache_filename)
     return search_results
 
-def review_flag_type_id(ui, api_server, config_cache_filename):
+def flag_type_id(ui, api_server, config_cache_filename, flag_name, product, component):
     """
     Look up the numeric type id for the 'review' flag from the given bugzilla server
     """
@@ -623,24 +623,29 @@ def review_flag_type_id(ui, api_server, config_cache_filename):
     if not configuration or not configuration["flag_type"]:
       raise util.Abort(_("Could not find configuration object"))
 
-    flag_ids = []
-    for flag_id, flag in configuration["flag_type"].iteritems():
-        if flag["name"] == "review":
-            flag_ids += flag_id
-    if not flag_ids:
-        raise util.Abort(_("Could not find review flag id"))
+    # Get the set of flag ids used for this product/component
+    prodflags = configuration['product'][product]['component'][component]['flag_type']
+    flagdefs = configuration['flag_type']
 
-    return flag_ids
+    flag_ids = [ id for id in prodflags if flagdefs[str(id)]['name'] == flag_name ]
+
+    if len(flag_ids) != 1:
+        raise util.Abort(_("Could not find unique %s flag id") % flag_name)
+
+    return flag_ids[0]
+
+def review_flag_type_id(ui, api_server, config_cache_filename, product, component):
+    return flag_type_id(ui, api_server, config_cache_filename, 'review', product, component)
 
 def create_attachment(ui, api_server, token, bug,
                       config_cache_filename,
                       attachment_contents, description="attachment",
-                      filename="attachment", comment="", reviewers=None):
+                      filename="attachment", comment="",
+                      reviewers=None, product=None, component=None):
 
     opts = {}
     if reviewers:
-        opts['review_flag_ids'] = review_flag_type_id(ui, api_server, config_cache_filename)
-        opts['username'] = token.username(api_server)
+        opts['review_flag_id'] = review_flag_type_id(ui, api_server, config_cache_filename, product, component)
         opts['reviewers'] = reviewers
 
     req = bz.create_attachment(api_server, token, bug, attachment_contents,
@@ -825,12 +830,23 @@ def bzexport(ui, repo, *args, **opts):
       ui.write(_("Exiting without creating attachment\n"))
       return
 
+    extra_args = {}
+    if reviewers:
+        extra_args['reviewers'] = reviewers
+        if 'PRODUCT' in values and 'COMPONENT' in values:
+            extra_args['product'] = values['PRODUCT']
+            extra_args['component'] = values['COMPONENT']
+        else:
+            buginfo = json.load(urlopen(ui, bz.get_bug(api_server, auth, bug, include_fields = ['product', 'component'])))
+            extra_args['product'] = buginfo['product']
+            extra_args['component'] = buginfo['component']
+
     result = create_attachment(ui, api_server, auth,
                                bug, BINARY_CACHE_FILENAME, contents.getvalue(),
                                filename=filename,
                                description=values['ATTACHMENT_DESCRIPTION'],
                                comment=values['ATTACHCOMMENT'],
-                               reviewers=reviewers)
+                               **extra_args)
     attachment_url = urlparse.urljoin(bugzilla,
                                       "attachment.cgi?id=" + result["id"] + "&action=edit")
     print "%s uploaded as %s" % (rev, attachment_url)

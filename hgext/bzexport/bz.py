@@ -54,7 +54,7 @@ def create_bug(api_server, token, product, component, version, title, descriptio
 def create_attachment(api_server, token, bug, contents,
                       description="attachment",
                       filename="attachment", comment="",
-                      reviewers=None, review_flag_ids = [], username = None):
+                      reviewers = None, review_flag_id = None):
     """
     Post an attachment to a bugzilla bug using BzAPI.
     """
@@ -69,12 +69,11 @@ def create_attachment(api_server, token, bug, contents,
                  'content_type': 'text/plain'}
     if reviewers:
         flags = []
-        for flag_type_id in review_flag_ids:
-            flags.append({"name": "review",
-                          "requestee": {"name": ", ".join(reviewers)},
-                          "setter": {"name": username},
-                          "status": "?",
-                          "type_id": flag_type_id})
+        assert review_flag_id
+        flags.append({"name": "review",
+                      "requestee": {"name": ", ".join(reviewers)},
+                      "status": "?",
+                      "type_id": review_flag_id})
         json_data["flags"] = flags
     if comment:
         json_data["comments"] = [{'text': comment}]
