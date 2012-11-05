@@ -12,10 +12,12 @@ hgNameToRevURL = {
     'mozilla-beta'    : 'releases/mozilla-beta/',
     'mozilla-release' : 'releases/mozilla-release/',
     'mozilla-esr10'   : 'releases/mozilla-esr10/',
+    'mozilla-esr17'   : 'releases/mozilla-esr17/',
     'comm-aurora'     : 'releases/comm-aurora/',
     'comm-beta'       : 'releases/comm-beta/',
     'comm-release'    : 'releases/comm-release/',
     'comm-esr10'      : 'releases/comm-esr10/',
+    'comm-esr17'      : 'releases/comm-esr17/',
 }
 
 

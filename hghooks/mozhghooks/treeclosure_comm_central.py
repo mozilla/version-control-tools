@@ -34,6 +34,7 @@ seamonkeyTrees = {
   'comm-beta'   : 'http://tinderbox.mozilla.org/SeaMonkey-Beta/status.html',
   'comm-release': 'http://tinderbox.mozilla.org/SeaMonkey-Release/status.html',
   'comm-esr10'  : None,
+  'comm-esr17'  : None,
   # Point at Mirmar as SeaMonkey doesn't use this
   'comm-miramar': None,
   'comm-2.0'    : 'http://tinderbox.mozilla.org/SeaMonkey2.1/status.html',
@@ -82,7 +83,7 @@ def checkTreeState(repo, repoName, treeName, treeUrl):
     elif re.compile('<span id="tree-?status".*APPROVAL REQUIRED.*<span id="extended-status">').search(text) :
         # The tree needs approval
 
-        # If they've specified an approval, let them push 
+        # If they've specified an approval, let them push
         if re.search('a\S*=', repo.changectx('tip').description().lower()) :
             return 0
 
@@ -125,7 +126,7 @@ def checkJsonTreeState(repo, repoName, appName):
         elif data['status'] == 'approval required':
             # The tree needs approval
 
-            # If they've specified an approval, let them push 
+            # If they've specified an approval, let them push
             if re.search('a\S*=', repo.changectx('tip').description().lower()) :
                 return 0
 
@@ -141,7 +142,7 @@ def checkJsonTreeState(repo, repoName, appName):
 
     # By default the tree is open
     return 0
-        
+
 
 def isOwned(changedFile, ownerArray):
     for dir in ownerArray:
@@ -187,7 +188,7 @@ def hook(ui, repo, node, **kwargs):
                     return 1
 
         return status;
-            
+
     except IOError, (err):
         # fail open, I guess. no sense making hg unavailable
         # if the wiki is down
