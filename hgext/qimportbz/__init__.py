@@ -33,7 +33,7 @@ The default values are::
   patch_format = %(filename)s
   msg_format = Bug %(bugnum)s - "%(title)s" [%(flags)s]
 """
-from mercurial import commands, cmdutil, extensions, url, error
+from mercurial import hg, commands, cmdutil, extensions, url, error, httppeer
 from hgext import mq
 
 import re
@@ -210,12 +210,17 @@ def extsetup(ui=None):
   extensions.wrapcommand(cmdtable, 'qimport', qimporthook)
 
   # Here we setup the protocol handlers
-  processors = [bzhandler.Handler, pb.Handler, scp.Handler]
+  processors = {
+    'bz' : bzhandler.Handler,
+    'pb' : pb.Handler,
+    'scp' : scp.Handler
+  }
 
   # Mercurial 1.4 has an easy way to do this for bz://dddddd urls
-  if hasattr(url, 'handlerfuncs'):
-    for p in processors:
+  if hasattr(url, 'handlerfuncs') and hasattr(hg, 'schemes'):
+    for s, p in processors.items():
       url.handlerfuncs.append(p)
+      hg.schemes[s] = httppeer
   else: # monkey patching for 1.3.1 :(
     # patch in bz: and pb: url support
     def bzopener(orig, ui, authinfo=None):
