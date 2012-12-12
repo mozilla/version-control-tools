@@ -3,7 +3,7 @@
 from __future__ import with_statement
 import unittest
 from mercurial import ui, hg, commands, util
-from mercurial.commands import add, clone, commit, init, push, rename
+from mercurial.commands import add, clone, commit, init, push, rename, remove
 from mercurial.node import hex
 from tempfile import mkdtemp
 import shutil
@@ -28,6 +28,36 @@ def appendFile(filename, content):
     pass
   with open(filename, 'a') as f:
     f.write(content)
+
+def removeFromFile(filename, content):
+  try:
+    os.makedirs(os.path.dirname(filename))
+  except:
+    pass
+  newlines = []
+  with open(filename, 'r') as f:
+    lines = f.readlines()
+    for line in lines:
+        if line != content:
+            newlines.append(line)
+  with open(filename, 'a') as f:
+    f.write(''.join(newlines))
+
+def editFile(filename, original, updated):
+  try:
+    os.makedirs(os.path.dirname(filename))
+  except:
+    pass
+  newlines = []
+  with open(filename, 'r') as f:
+    lines = f.readlines()
+    for line in lines:
+        if line == original:
+            newlines.append(updated)
+        else:
+            newlines.append(line)
+  with open(filename, 'a') as f:
+    f.write(''.join(newlines))
 
 def getPushesFromDB(repo):
   conn = sqlite.connect(join(repo.root, '.hg', 'pushlog2.db'))
@@ -741,6 +771,108 @@ class TestCaseOnlyRenameHook(unittest.TestCase):
     commit(ui, self.clonerepo, message="checkin 3")
 
     self.assertRaises(util.Abort, push, ui, self.clonerepo, dest=self.repodir)
+
+class TestPreventUUIDHook(unittest.TestCase):
+  def setUp(self):
+    self.ui = ui.ui()
+    self.ui.quiet = True
+    self.ui.verbose = False
+    self.repodir = mkdtemp(prefix="hg-TestPreventUUIDHook")
+    init(self.ui, dest=self.repodir)
+    addHook(self.repodir, "prevent_uuid_changes.hook")
+    self.repo = hg.repository(self.ui, self.repodir)
+    self.clonedir = mkdtemp(prefix="hg-test")
+    clone(self.ui, self.repo, self.clonedir)
+    self.clonerepo = hg.repository(self.ui, self.clonedir)
+    # Create a pre-existing repo with a file that contains UUID
+    appendFile(join(self.clonedir, "original.idl"), "uuid(abc123)")
+    add(self.ui, self.clonerepo, join(self.clonedir, "original.idl"))
+    commit(self.ui, self.clonerepo, message="original repo commit ba=me")
+    push(self.ui, self.clonerepo, dest=self.repodir)
+    print "===== In method", self._testMethodName, " ======="
+
+  def tearDown(self):
+    shutil.rmtree(self.repodir)
+    shutil.rmtree(self.clonedir)
+
+  def testUUIDEditExistingShouldFail(self):
+    """ Test that editing .idl file with 'uuid(' and no 'ba=' should fail  """
+    u = self.ui
+    editFile(join(self.clonedir, "original.idl"), "uuid(abc123)", "uuid(def456)")
+    commit(u, self.clonerepo, message="checkin 1 bug 12345")
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
+
+  def testUUIDEditExistingShouldPass(self):
+    """ Test that editing .idl file with 'uuid(' with ba=... should pass """
+    u = self.ui
+    editFile(join(self.clonedir, "original.idl"), "uuid(abc123)", "uuid(def456)")
+    commit(u, self.clonerepo, message="checkin 1 bug 12345 ba=me")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+
+  def testUUIDMultiplePushShouldFail(self):
+    """ Test that adding .idl file with uuid with other files and no 'ba=' should fail  """
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile1.idl"), "uuid(something here)")
+    add(u, self.clonerepo, join(self.clonedir, "testfile1.idl"))
+    commit(u, self.clonerepo, message="checkin 1 bug 12345")
+    appendFile(join(self.clonedir, "testfile2.txt"), "checkin2")
+    add(u, self.clonerepo, join(self.clonedir, "testfile2.txt"))
+    commit(u, self.clonerepo, message="checkin 2 bug 12345")
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
+
+  def testUUIDMultiplePushShouldPass(self):
+    """ Test that changeset with 'uuid(' change in .idl should pass if 'ba=...' is in the push comment """
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile3.idl"), "uuid(something here)")
+    add(u, self.clonerepo, join(self.clonedir, "testfile3.idl"))
+    commit(u, self.clonerepo, message="checkin 3 bug 12345")
+    appendFile(join(self.clonedir, "testfile2.txt"), "checkin2")
+    add(u, self.clonerepo, join(self.clonedir, "testfile2.txt"))
+    commit(u, self.clonerepo, message="checkin 2 bug 12345 ba=approver")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+
+  def testUUIDNonIDLShouldPass(self):
+    """ Test that changeset with 'uuid(' change in a file not ending in .idl should pass """
+    u = self.ui
+    appendFile(join(self.clonedir, "testfile1.txt"), "uuid(something here)")
+    add(u, self.clonerepo, join(self.clonedir, "testfile1.txt"))
+    commit(u, self.clonerepo, message="checkin 1 bug 12345")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+
+  def testUUIDRemoveUUIDNoApprovalShouldFail(self):
+    """ Test that changeset with 'uuid(' removed from file ending in .idl should fail """
+    u = self.ui
+    appendFile(join(self.clonedir, "original.idl"), "line of text")
+    removeFromFile(join(self.clonedir, "original.idl"), "uuid(abc123)")
+    commit(u, self.clonerepo, message="checkin removed uuid bug 12345")
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
+
+  def testUUIDRemoveUUIDWithApprovalShouldPass(self):
+    """ Test that changeset with 'uuid(' removed from file ending in .idl should pass with ba=... """
+    u = self.ui
+    appendFile(join(self.clonedir, "original.idl"), "line of text")
+    removeFromFile(join(self.clonedir, "original.idl"), "uuid(abc123)")
+    commit(u, self.clonerepo, message="checkin removed uuid bug 12345 ba=me")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+
+  def testUUIDDeletedIDLApproveShouldPass(self):
+    """ Test that changeset with .idl file removed should pass with ba= approval """
+    u = self.ui
+    remove(u, self.clonerepo, join(self.clonedir, "original.idl"))
+    commit(u, self.clonerepo, message="checkin 2 removed idl file ba=approver")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+
+  def testUUIDDeletedIDLNoApproveShouldFail(self):
+    """ Test that changeset with .idl file removed should fail without approval"""
+    u = self.ui
+    remove(u, self.clonerepo, join(self.clonedir, "original.idl"))
+    commit(u, self.clonerepo, message="checkin 2 removed idl file ")
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
 
 if __name__ == '__main__':
   unittest.main()
