@@ -135,10 +135,12 @@ def checkJsonTreeState(repo, repoName, appName):
             return 1
 
     except IOError, (err):
-        # fail open, I guess. no sense making hg unavailable
-        # if treestatus is down
-        print "Error: %s" % err, url
-        pass
+        # fail closed if treestatus is down, unless the magic words have been used
+        print "Error accessing %s: %s" % (url, err)
+        print "Unable to check if the tree is open - treating as if CLOSED."
+        if repo.changectx('tip').description().find(magicwords) == -1:
+            print "To push despite treestatus being unavailable, include \"%s\" in your push comment" % magicwords
+            return 1
 
     # By default the tree is open
     return 0
@@ -168,7 +170,6 @@ def hook(ui, repo, node, **kwargs):
                 else:
                     apps['thunderbird'] = True
 
-        affectedTrees = []
         repoName = os.path.basename(repo.root)
         status = 0
 
