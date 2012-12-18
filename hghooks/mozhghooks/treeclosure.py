@@ -42,8 +42,9 @@ def hook(ui, repo, **kwargs):
             print "But you included the magic words.  Hope you had permission!"
             return 0
         elif data['status'] == 'approval required':
-            # Block the push unless they have approval
-            if re.search('a\S*=', repo.changectx('tip').description().lower()) :
+            # Block the push unless they have approval or are backing out
+            dlower = repo.changectx('tip').description().lower()
+            if re.search('a\S*=', dlower) or dlower.startswith('back') or dlower.startswith('revert'):
                 return 0
 
             print "Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)"

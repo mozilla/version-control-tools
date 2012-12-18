@@ -83,8 +83,9 @@ def checkTreeState(repo, repoName, treeName, treeUrl):
     elif re.compile('<span id="tree-?status".*APPROVAL REQUIRED.*<span id="extended-status">').search(text) :
         # The tree needs approval
 
-        # If they've specified an approval, let them push
-        if re.search('a\S*=', repo.changectx('tip').description().lower()) :
+        # If they've specified an approval or are backing out, let them push
+        dlower = repo.changectx('tip').description().lower()
+        if re.search('a\S*=', dlower) or dlower.startswith('back') or dlower.startswith('revert'):
             return 0
 
         # Otherwise tell them about the rule
@@ -126,8 +127,9 @@ def checkJsonTreeState(repo, repoName, appName):
         elif data['status'] == 'approval required':
             # The tree needs approval
 
-            # If they've specified an approval, let them push
-            if re.search('a\S*=', repo.changectx('tip').description().lower()) :
+            # If they've specified an approval or are backing out, let them push
+            dlower = repo.changectx('tip').description().lower()
+            if re.search('a\S*=', dlower) or dlower.startswith('back') or dlower.startswith('revert'):
                 return 0
 
             # Otherwise tell them about the rule
