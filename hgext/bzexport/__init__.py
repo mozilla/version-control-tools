@@ -695,17 +695,20 @@ def bzexport(ui, repo, *args, **opts):
         desc = '<required>'
     else:
         # Lightly reformat changeset messages into attachment descriptions.
-        # First, strip off any leading "bug NNN" or "b=NNN",
-        # but save it in case a bug number was not provided.
+        # First, strip off a "bug NNN" or "b=NNN" in the first line, but save
+        # it in case a bug number was not provided.
         bzexport.newbug = None
-        def dosub(m):
+        def grab_bug(m):
             bzexport.newbug = m.group(2)
             return ''
-        desc = bug_re.sub(dosub, desc, 1)
+        parts = desc.split('\n', 1)
+        parts[0] = bug_re.sub(grab_bug, parts[0], 1)
+        desc = ''.join(parts)
         if not bzexport.newbug:
             # Try to find it in the original revision description, if
             # it wasn't found in desc.
-            bug_re.sub(dosub, repo[rev].description().decode('utf-8'), 1)
+            orig_desc = repo[rev].description().decode('utf-8')
+            bug_re.sub(grab_bug, orig_desc.split('\n', 1)[0], 1)
         if bzexport.newbug:
             if bug and bug != bzexport.newbug:
                 ui.warn("Warning: Bug number %s from commandline doesn't match "
