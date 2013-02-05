@@ -1,22 +1,29 @@
 #!/usr/bin/env python
 
-import re
-
 chooserUrl = 'http://trychooser.pub.build.mozilla.org/'
 infoUrl = 'https://wiki.mozilla.org/Build:TryChooser'
 
 def hook(ui, repo, **kwargs):
     # Block the push unless they use the try_syntax
     # 'try: ' is enough to activate try_parser and get the default set
-    if "try: " not in repo.changectx('tip').description():
+    comment = repo.changectx('tip').description()
+    info = { 'chooserUrl': chooserUrl, 'infoUrl': infoUrl }
+    if "try: " not in comment:
         print """To push to try you must use try syntax in the push comment of the *last* change 
-See %s to build your syntax
-For assistance using the syntax and %s for more information.
-Thank you for helping to reduce CPU cyles by asking for exactly what you need.""" % (chooserUrl, infoUrl)
+See %(chooserUrl)s to build your syntax
+For assistance using the syntax, see %(infoUrl)s.
+Thank you for helping to reduce CPU cyles by asking for exactly what you need.""" % info
+        return 1
+    elif "-p none" in comment:
+        print """**** NOTICE ******
+Your try syntax contains '-p none', which would not trigger any jobs.
+Please try try again. If you *intended* to push without triggering
+any jobs, use -p any_invalid_syntax. For assistance with try server
+syntax, see %(infoUrl)s.""" % info
         return 1
     else:
         print """Looks like you used try syntax, going ahead with the push.
-If you don't get what you expected, check %s for help with building your trychooser request.
-Thanks for helping save resources, you're the best!""" % chooserUrl
+If you don't get what you expected, check %(chooserUrl)s
+for help with building your trychooser request.
+Thanks for helping save resources, you're the best!""" % info
         return 0
-
