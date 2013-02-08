@@ -3,10 +3,9 @@
 This is a port of mak's mercurial backout script from
 https://wiki.mozilla.org/User:Mak77 to a mercurial extension.'''
 
-import mercurial
 from mercurial import scmutil, commands, cmdutil, patch, mdiff, util
 from mercurial.i18n import _
-from mercurial.node import hex, nullid, short
+from mercurial.node import nullid, short
 from hgext import mq
 
 import StringIO
@@ -63,7 +62,6 @@ def qbackout(ui, repo, rev, **opts):
     See "hg help revisions" and "hg help revsets" for more about specifying
     revisions.
     """
-    q = repo.mq
     if not opts.get('force'):
         ui.status('checking for uncommitted changes\n')
         cmdutil.bailifchanged(repo)
@@ -90,10 +88,6 @@ def qbackout(ui, repo, rev, **opts):
     if opts.get('single') and opts.get('name') and len(rev) > 1:
         raise util.Abort('option "-n" not valid when backing out multiple changes')
 
-    revert_opts = { 'date': None,
-                    'all': True,
-                    'no_backup': None,
-                  }
     new_opts = opts.copy()
     mq.setupheaderopts(ui, new_opts)
 
@@ -151,7 +145,6 @@ def qbackout(ui, repo, rev, **opts):
         node = cset.node()
         shortnode = short(node)
         ui.status('%s %s\n' % (desc['actioning'], shortnode))
-        done = False
         try:
             apply_change(node, backout)
         except:
