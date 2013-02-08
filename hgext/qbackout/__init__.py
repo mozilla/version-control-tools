@@ -4,7 +4,7 @@ This is a port of mak's mercurial backout script from
 https://wiki.mozilla.org/User:Mak77 to a mercurial extension.'''
 
 import mercurial
-from mercurial import scmutil, commands, cmdutil, patch, mdiff
+from mercurial import scmutil, commands, cmdutil, patch, mdiff, util
 from mercurial.i18n import _
 from mercurial.node import hex, nullid, short
 from hgext import mq
