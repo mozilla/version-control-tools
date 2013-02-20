@@ -240,7 +240,7 @@ class Bug(object):
     bug = xml.find("bug")
     self.num = int(bug.find('bug_id').text)
     sdesc = bug.find('short_desc')
-    self.title = sdesc.text if sdesc else "[empty]"
+    self.title = sdesc.text if sdesc is not None else "[empty]"
     self.comments = [Comment(n) for n in xml.findall("bug/long_desc")]
     self.desc = self.comments[0].text if len(self.comments)>0 else ""
     self.attachments = [Attachment.parse(self, a) for a in xml.findall("bug/attachment")]
