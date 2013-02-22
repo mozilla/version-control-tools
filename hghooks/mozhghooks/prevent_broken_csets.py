@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 '''This hook detects csets which hit hg bug 3833 [1] and break our hg blame.
 
-An example of one such bad commit is e8f8a3f6f1f6 in mozilla-central.
+An example of one such bad commit is dad25c17ccc7 in mozilla-central.
 
 This hook should be used as a pre-commit hook on all trees except try.
 
@@ -83,9 +83,11 @@ def hook(ui, repo, hooktype, node, **kwargs):
             blame [1].
 
             Please upgrade to hg 2.5.1 or newer (2.5 contains known bugs),
-            qimport your changes, and re-commit them.  You might do:
+            qimport your changes, then qpop, qpush, and qfinish them.  You
+            might do:
 
-              $ hg qimport --rev 'outgoing()' && hg qfinish -a
+              $ hg qimport --rev 'outgoing()'
+              $ hg qpop -a && hg qpush -a && hg qfinish -a
 
             If this doesn't solve the problem, or if you're sure that these
             commits were generated using hg 2.5 or newer, please ask someone in
