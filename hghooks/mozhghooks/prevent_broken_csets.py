@@ -24,6 +24,7 @@ This hook should be used as a pre-commit hook on all trees except try.
 '''
 
 from __future__ import print_function
+import os
 import sys
 import traceback
 import textwrap
@@ -64,6 +65,13 @@ class BrokenCsetException(Exception):
         return 'Broken changeset: %s' % str(self.cset)
 
 def hook(ui, repo, hooktype, node, **kwargs):
+    # We don't want to apply this hook to try or user repos.  (repo.root seems
+    # to be a normalized, absolute path, but there's no harm in being sure.)
+    repo_path = os.path.normpath(os.path.abspath(repo.root))
+    if repo_path == '/repo/hg/mozilla/try' or \
+       repo_path.startswith('/repo/hg/mozilla/users'):
+        return 0
+
     if repo.changectx('tip').description().find(magicwords) != -1:
         print(dedent_and_fill('''\
             Not checking this push for broken changesets because the tip cset
