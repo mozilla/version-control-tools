@@ -392,13 +392,8 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     # If this tests attempts to pull something that isn't treeName, then the
     # re-director should fail for us. Hence we know that the hook is only
     # pulling the predefined tree and nothing else.
-    if "Thunderbird" in treeName:
-        self.redirect("https://treestatus.mozilla.org/comm-central-" + treeName.lower() + "?format=json",
-                      '{"status": "open", "reason": null}')
-    else:
-        self.redirect("http://tinderbox.mozilla.org/" + treeName + "/status.html",
-                      '<span id="tree-status">OPEN</span><span id="extended-status">')
-
+    self.redirect("https://treestatus.mozilla.org/comm-central-" + treeName.lower() + "?format=json",
+                  '{"status": "open", "reason": null}')
 
     # pushing something should now succeed
     u = self.ui
@@ -433,12 +428,8 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     # If this tests attempts to pull something that isn't treeName, then the
     # re-director should fail for us. Hence we know that the hook is only
     # pulling the predefined tree and nothing else.
-    if "Thunderbird" in treeName:
-        self.redirect("https://treestatus.mozilla.org/comm-central-" + treeName.lower() + "?format=json",
-                      '{"status": "closed", "reason": null}')
-    else:
-        self.redirect("http://tinderbox.mozilla.org/" + treeName + "/status.html",
-                      '<span id="tree-status">CLOSED</span><span id="extended-status">')
+    self.redirect("https://treestatus.mozilla.org/comm-central-" + treeName.lower() + "?format=json",
+                  '{"status": "closed", "reason": null}')
 
     # pushing something should now fail
     u = self.ui
