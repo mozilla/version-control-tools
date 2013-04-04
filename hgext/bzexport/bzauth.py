@@ -20,7 +20,6 @@ import time
 import tempfile
 import shutil
 import urlparse
-import sqlite3
 import urllib2
 import json
 from mercurial import config, util
@@ -42,7 +41,7 @@ class bzAuth:
     """
     typeCookie = 1
     typeExplicit = 2
-    def __init__(self, userid, cookie, username, password):
+    def __init__(self, userid=None, cookie=None, username=None, password=None):
         assert (userid and cookie) or (username and password)
         assert not ((userid or cookie) and (username or password))
         if userid:
@@ -218,6 +217,12 @@ def get_cookies_from_profile(ui, profile, bugzilla):
     for the given bugzilla URL.
 
     """
+    try:
+        import sqlite3
+    except:
+        ui.write("Import of sqlite3 failed - this is expected if on Windows (see README).\n")
+        return None, None
+
     cookies = os.path.join(profile, "cookies.sqlite")
     if not os.path.exists(cookies):
         return None, None
@@ -258,7 +263,7 @@ def get_cookies_from_profile(ui, profile, bugzilla):
     except Exception, e:
         if not isinstance(e, IndexError):
             ui.write_err(_("Failed to get bugzilla login cookies from "
-                           "Firefox profile at %s: %s") % (profile, str(e)))
+                           "Firefox profile at %s: %s\n") % (profile, str(e)))
         pass
 
     finally:
@@ -266,10 +271,11 @@ def get_cookies_from_profile(ui, profile, bugzilla):
             shutil.rmtree(tempdir)
 
 def get_auth(ui, bugzilla, profile, username, password):
-    userid = None
-    cookie = None
-
     if not password:
+        # If the password wasn't specified in the hgrc, then see if the
+        # credentials can be retrieved from Bugzilla cookies
+        userid = None
+        cookie = None
         profile = find_profile(ui, profile)
         if profile:
             try:
@@ -277,17 +283,16 @@ def get_auth(ui, bugzilla, profile, username, password):
             except Exception, e:
                 print("Warning: " + str(e))
                 pass
+        if userid and cookie:
+            return bzAuth(userid=userid, cookie=cookie)
+        ui.write("Credentials not found in .hgrc & unable to retrieve bugzilla login cookies.\n")
 
-        if cookie:
-            username = None # might not match userid
-        else:
-            ui.write("No bugzilla login cookies found in profile.\n")
-            if not username:
-                username = ui.prompt("Enter username for %s:" % bugzilla)
-            if not password:
-                password = ui.getpass("Enter password for %s: " % username)
+    if not username:
+        username = ui.prompt("Enter username for %s:" % bugzilla)
+    if not password:
+        password = ui.getpass("Enter password for %s: " % username)
 
-    return bzAuth(userid, cookie, username, password)
+    return bzAuth(username=username, password=password)
 
 def get_username(api_server, token):
     req = bz.get_user(api_server, token)
