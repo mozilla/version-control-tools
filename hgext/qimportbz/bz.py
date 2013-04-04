@@ -161,8 +161,7 @@ class Patch(Attachment):
 # Date %s
 %s
 
-%s
-""" % (self.author, self.date, self.commit_message, self.data)
+%s""" % (self.author, self.date, self.commit_message, self.data)
 
   @property
   def metadata(self):
