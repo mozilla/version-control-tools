@@ -23,6 +23,30 @@ hgNameToRevURL = {
     'comm-esr17'      : 'releases/comm-esr17/',
 }
 
+# Build/ repos
+hgNameToRevURL.update({
+    'autoland': 'build/autoland/',
+    'braindump': 'build/braindump/',
+    'buildapi': 'build/buildapi/',
+    'buildbot': 'build/buildbot/',
+    'buildbot-configs': 'build/buildbot-configs/',
+    'buildbotcustom': 'build/buildbotcustom/',
+    'cloud-tools': 'build/cloud-tools/',
+    'compare-locales': 'build/compare-locales/',
+    'fork-hg-git': 'build/fork-hg-git/',
+    'mozharness': 'build/mozharness/',
+    'mozpool': 'build/mozpool/',
+    'opsi-package-sources': 'build/opsi-package-sources/',
+    'partner-repacks': 'build/partner-repacks/',
+    'preproduction': 'build/preproduction/',
+    'puppet': 'build/puppet/',
+    'puppet-manifests': 'build/puppet-manifests/',
+    'rpm-sources': 'build/rpm-sources/',
+    'talos': 'build/talos/',
+    'tools': 'build/tools/',
+    'twisted': 'build/twisted/',
+})
+
 
 def hook(ui, repo, node, hooktype, **kwargs):
     repo_name = os.path.basename(repo.root)
