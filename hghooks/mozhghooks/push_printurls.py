@@ -3,25 +3,32 @@ import os.path
 from mercurial.node import short
 
 hgNameToRevURL = {
-    'comm-central'    : 'comm-central/',
-    'fx-team'         : 'integration/fx-team/',
-    'mozilla-central' : 'mozilla-central/',
-    'mozilla-inbound' : 'integration/mozilla-inbound/',
-    'try'             : 'try/',
-    'mozilla-aurora'  : 'releases/mozilla-aurora/',
-    'mozilla-beta'    : 'releases/mozilla-beta/',
-    'mozilla-release' : 'releases/mozilla-release/',
-    'mozilla-esr10'   : 'releases/mozilla-esr10/',
-    'mozilla-esr17'   : 'releases/mozilla-esr17/',
-    'mozilla-b2g18'   : 'releases/mozilla-b2g18/',
-    'mozilla-b2g18_v1_0_0'   : 'releases/mozilla-b2g18_v1_0_0/',
-    'mozilla-b2g18_v1_0_1'   : 'releases/mozilla-b2g18_v1_0_1/',
-    'comm-aurora'     : 'releases/comm-aurora/',
-    'comm-beta'       : 'releases/comm-beta/',
-    'comm-release'    : 'releases/comm-release/',
-    'comm-esr10'      : 'releases/comm-esr10/',
-    'comm-esr17'      : 'releases/comm-esr17/',
+    'comm-central':     'comm-central/',
+    'fx-team':          'integration/fx-team/',
+    'mozilla-central':  'mozilla-central/',
+    'mozilla-inbound':  'integration/mozilla-inbound/',
+    'try':              'try/',
+    'mozilla-aurora':   'releases/mozilla-aurora/',
+    'mozilla-beta':     'releases/mozilla-beta/',
+    'mozilla-release':  'releases/mozilla-release/',
+    'mozilla-esr10':    'releases/mozilla-esr10/',
+    'mozilla-esr17':    'releases/mozilla-esr17/',
+    'mozilla-b2g18':    'releases/mozilla-b2g18/',
+    'mozilla-b2g18_v1_0_0':    'releases/mozilla-b2g18_v1_0_0/',
+    'mozilla-b2g18_v1_0_1':    'releases/mozilla-b2g18_v1_0_1/',
+    'comm-aurora':      'releases/comm-aurora/',
+    'comm-beta':        'releases/comm-beta/',
+    'comm-release':     'releases/comm-release/',
+    'comm-esr10':       'releases/comm-esr10/',
+    'comm-esr17':       'releases/comm-esr17/',
 }
+
+# bug 860588 - support some project branches during b2g work week
+hgNameToRevURL.update({
+    'birch':    'projects/birch',
+    'cypress':  'projects/cypress',
+})
+
 
 # Build/ repos
 hgNameToRevURL.update({
@@ -75,8 +82,8 @@ def hook(ui, repo, node, hooktype, **kwargs):
             node = short(repo.changectx(i).node())
             print '  %srev/%s' % (url, node)
     else:
-       tip_node = short(repo.changectx(tip).node())
-       print 'You can view the pushlog for your changes at the following URL:'
-       print '  %spushloghtml?changeset=%s' % (url, tip_node)
+        tip_node = short(repo.changectx(tip).node())
+        print 'You can view the pushlog for your changes at the following URL:'
+        print '  %spushloghtml?changeset=%s' % (url, tip_node)
 
     return 0
