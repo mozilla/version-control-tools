@@ -508,15 +508,9 @@ def fill_values(values, ui, api_server, reviewers = None, finalize = False):
 
     return values
 
-def update_patch(ui, repo, rev, bug, update, interactive):
-    update_patch = False
-    rename_patch = False
-    if update is not None:
-        update_patch = update
-        rename_patch = update
-    else:
-        update_patch = ui.configbool("bzexport", "update-patch", False)
-        rename_patch = ui.configbool("bzexport", "rename-patch", False)
+def update_patch(ui, repo, rev, bug, update, rename, interactive):
+    update_patch = update if update is not None else ui.configbool("bzexport", "update-patch", False)
+    rename_patch = rename if rename is not None else ui.configbool("bzexport", "rename-patch", False)
 
     q = repo.mq
     try:
@@ -825,7 +819,9 @@ def bzexport(ui, repo, *args, **opts):
             ui.write("Requesting review from " + reviewer + "\n")
 
     if not opts['no_update']:
-        newname = update_patch(ui, repo, rev, bug, opts['update'], opts['interactive'])
+        update = opts['update'] or opts['new']
+        rename = opts['update']
+        newname = update_patch(ui, repo, rev, bug, update, rename, opts['interactive'])
         if filename == rev:
             filename = newname
 
