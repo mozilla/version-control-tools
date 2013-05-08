@@ -66,6 +66,12 @@ class myui(ui.ui):
               return "/dev/null"
       return ui.ui.config(self, section, name, default, untrusted)
 
+# We seem to trigger "connection reset by peer" in a lot of our tests,
+# which doesn't seem harmful but does litter the test output with
+# tracebacks.
+def handle_error(request, client_address):
+    pass
+
 class HGWebTest:
     """A mixin that starts a hgweb server and other niceties."""
     def setUp(self):
@@ -89,6 +95,7 @@ class HGWebTest:
             # error, something unknown
             raise SystemExit("Don't know how to run hgweb in this Mercurial version!")
         self.server = server.create_server(self.ui, arg)
+        self.server.handle_error = handle_error
         _, self.port = self.server.socket.getsockname()
         # run the server on a background thread so we can interrupt it
         threading.Thread(target=self.server.serve_forever).start()
