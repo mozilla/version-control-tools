@@ -6,7 +6,9 @@
 import re
 from mercurial import templatefilters
 
-bugzilla = r'<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1</a>'
+bugzilla_link_templ = r'<a href="%s\2">\1</a>'
+bugzilla_link = ""
+bugzilla = "https://bugzilla.mozilla.org/show_bug.cgi?id="
 bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                         # a standalone sequence of numbers
                      (
@@ -22,9 +24,15 @@ bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                      )''', re.I | re.X)
 
 def buglink(x):
-    return bug_re.sub(bugzilla, x)
+    return bug_re.sub(bugzilla_link, x)
 
 templatefilters.filters["buglink"] = buglink
+
+def reposetup(ui, repo):
+    global bugzilla
+    global bugzilla_link
+    bugzilla = ui.config("buglink", "bugzilla", bugzilla)
+    bugzilla_link = bugzilla_link_templ % bugzilla
 
 if __name__ == '__main__':
     import unittest
@@ -51,7 +59,5 @@ if __name__ == '__main__':
                     resulttext = '%s<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=%s">%s</a>%s' % (pretext, bugid, text, posttext)
 
                 self.assertEqual(resulttext, buglink(str))
-
-    
 
     unittest.main()
