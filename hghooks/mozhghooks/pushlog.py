@@ -38,13 +38,14 @@ import stat
 from mercurial.node import hex
 
 def createpushdb(conn):
-    conn.execute("CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)")
-    conn.execute("CREATE TABLE IF NOT EXISTS pushlog (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, date INTEGER)")
-    conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS changeset_node ON changesets (node)")
-    conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS changeset_rev ON changesets (rev)")
-    conn.execute("CREATE INDEX IF NOT EXISTS changeset_pushid ON changesets (pushid)")
-    conn.execute("CREATE INDEX IF NOT EXISTS pushlog_date ON pushlog (date)")
-    conn.execute("CREATE INDEX IF NOT EXISTS pushlog_user ON pushlog (user)")
+    cur = conn.cursor()
+    cur.execute("CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)")
+    cur.execute("CREATE TABLE IF NOT EXISTS pushlog (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, date INTEGER)")
+    cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS changeset_node ON changesets (node)")
+    cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS changeset_rev ON changesets (rev)")
+    cur.execute("CREATE INDEX IF NOT EXISTS changeset_pushid ON changesets (pushid)")
+    cur.execute("CREATE INDEX IF NOT EXISTS pushlog_date ON pushlog (date)")
+    cur.execute("CREATE INDEX IF NOT EXISTS pushlog_user ON pushlog (user)")
     conn.commit()
 
 def schemaexists(conn):
@@ -55,7 +56,20 @@ def log(ui, repo, node, **kwargs):
     createdb = False
     if not os.path.exists(pushdb):
         createdb = True
-    conn = sqlite.connect(pushdb)
+
+    conn = sqlite.connect(pushdb, isolation_level='DEFERRED')
+
+    # The truncate journal mode should be faster than the default DELETE mode
+    # since truncates don't have to update directory entries.
+    conn.execute('PRAGMA JOURNAL_MODE=TRUNCATE')
+
+    # The default mode is FULL, which performs excessive fsyncs and flushing.
+    # NORMAL is almost always good enough, especially if the hardware is
+    # reliable and if there are good backups. The same flushing should occur
+    # at the end of each transaction anyway, so FULL doesn't really buy us
+    # anything.
+    conn.execute('PRAGMA SYNCHRONOUS=NORMAL')
+
     if not createdb and not schemaexists(conn):
         createdb = True
     if createdb:
@@ -67,16 +81,24 @@ def log(ui, repo, node, **kwargs):
     print "Trying to insert into pushlog."
     print "Please do not interrupt..."
     try:
-        res = conn.execute("INSERT INTO pushlog (user, date) values(?,?)",
-                           (os.environ['USER'], t))
+        cur = conn.cursor()
+        res = cur.execute("INSERT INTO pushlog (user, date) values(?,?)",
+                          (os.environ['USER'], t))
         pushid = res.lastrowid
         # all changesets from node to 'tip' inclusive are part of this push
         rev = repo.changectx(node).rev()
         tip = repo.changectx('tip').rev()
+
+        # Collect parameters and execute a single statement to reduce round
+        # trips and processing overhead.
+        params = []
         for i in range(rev, tip+1):
             ctx = repo.changectx(i)
-            conn.execute("INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
-                         (pushid, ctx.rev(), hex(ctx.node())))
+            params.append((pushid, ctx.rev(), hex(ctx.node())))
+
+        res.executemany('INSERT INTO changesets (pushid, rev, node) '
+            'VALUES (?, ?, ?)', params)
+
         conn.commit()
         retval = 0
         print "Inserted into the pushlog db successfully."
