@@ -21,6 +21,7 @@ hgNameToRevURL = {
     'comm-release':     'releases/comm-release/',
     'comm-esr10':       'releases/comm-esr10/',
     'comm-esr17':       'releases/comm-esr17/',
+    'services-central': 'services/services-central/',
 }
 
 # bug 860588 - support some project branches during b2g work week
