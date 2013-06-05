@@ -29,7 +29,7 @@ def hook(ui, repo, hooktype, node, **kwargs):
         # Loop through each file for the current changeset
         for file in repo[change_id].files():
             # Only Check IDL Files
-            if file.endswith('idl'):
+            if file.endswith('.idl'):
                 if not re.search('ba\S*=', repo.changectx('tip').description().lower()):
                         error += "IDL file %s altered in this changeset" % file
     # Check if an error occured in any of the files that were changed
