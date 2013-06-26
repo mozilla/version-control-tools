@@ -16,8 +16,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import re
-import time
-import datetime
 from mercurial.node import hex
 
 goodMessage = [re.compile(x, re.I) for x in [
@@ -27,7 +25,6 @@ goodMessage = [re.compile(x, re.I) for x in [
 
     r'^(back(ing|ed)?\s+out|backout).*(\s+|\:)[0-9a-f]{12}',
     r'^(revert(ed|ing)?).*(\s+|\:)[0-9a-f]{12}',
-    r'^update nanojit-import-rev stamp\.',
     r'^add(ed|ing)? tag'
 ]]
 
@@ -40,7 +37,7 @@ def isGoodMessage(c):
         print ""
 
     desc = c.description()
-    if c.user() in ["ffxbld", "seabld", "tbirdbld", "cltbld"]:
+    if c.user() in ["ffxbld", "seabld", "tbirdbld", "cltbld", "Gaia Pushbot <release+gaiajson@mozilla.com>"]:
         return True
     
     if "try: " in desc:
