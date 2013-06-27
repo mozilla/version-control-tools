@@ -34,6 +34,9 @@ bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                         (?:\s*\#?)(\d+)
                      )''', re.I | re.X)
 
+backout_re = re.compile(r'[bB]ack(?:ed)?(?: ?out) (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})')
+reapply_re = re.compile(r'Reapplied (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})')
+
 def qbackout(ui, repo, rev, **opts):
     """backout a change or set of changes
 
@@ -65,7 +68,7 @@ def qbackout(ui, repo, rev, **opts):
     if not opts.get('force'):
         ui.status('checking for uncommitted changes\n')
         cmdutil.bailifchanged(repo)
-    backout = False if opts.get('apply') else True
+    backout = not opts.get('apply')
     desc = { 'action': 'backout',
              'Actioned': 'Backed out',
              'actioning': 'backing out',
@@ -140,6 +143,26 @@ def qbackout(ui, repo, rev, **opts):
     allbugs = set()
     messages = []
     for cset in csets:
+        # Hunt down original description if we might want to use it
+        orig_desc = None
+        orig_desc_cset = None
+        r = cset
+        while len(csets) == 1 or not opts.get('single'):
+            ui.debug("Parsing message for %s\n" % short(r.node()))
+            m = backout_re.match(r.description())
+            if m:
+                ui.debug("  looks like a backout of %s\n" % m.group(1))
+            else:
+                m = reapply_re.match(r.description())
+                if m:
+                    ui.debug("  looks like a reapply of %s\n" % m.group(1))
+                else:
+                    ui.debug("  looks like the original description\n")
+                    orig_desc = r.description()
+                    orig_desc_cset = r
+                    break
+            r = repo[m.group(1)]
+
         bugs = parse_bugs(cset.description())
         allbugs.update(bugs)
         node = cset.node()
@@ -151,6 +174,16 @@ def qbackout(ui, repo, rev, **opts):
             if not opts.get('broken'):
                 raise
         msg = ('%s changeset %s' % (desc['Actioned'], shortnode)) + bugs_suffix(bugs)
+
+        if backout:
+            # If backing out a backout, reuse the original commit message.
+            if orig_desc_cset is not None and orig_desc_cset != cset:
+                msg = orig_desc
+        else:
+            # If reapplying the original change, reuse the original commit message
+            if orig_desc_cset is not None and orig_desc_cset == cset:
+                msg = orig_desc
+
         messages.append(msg)
         if not opts.get('single'):
             new_opts['message'] = messages[-1]
@@ -182,7 +215,7 @@ cmdtable = {
           ('D', 'currentdate', None, _('add "Date: <current date>" to patch')),
           ('d', 'date', '',
            _('add "Date: <DATE>" to patch'), _('DATE')),
-          ('', 'apply', None, _('re-apply a change instead of backing out')),
+          ('', 'apply', False, _('re-apply a change instead of backing out')),
           ('', 'broken', None, _('backout even if patch does not fully apply')),
           ],
          ('hg qbackout -r REVS [-f] [-n NAME] [qnew options]')),
