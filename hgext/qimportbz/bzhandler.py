@@ -109,7 +109,7 @@ class Handler(urllib2.BaseHandler):
             self.ui.warn("Invalid patch number = '%s'\n" % choice)
             continue
         if not patch and len(delayed_imports) > 0:
-          patch = delayed_imports.pop(0)
+          patch = delayed_imports.pop()
 
     # and finally return the response
     if patch:

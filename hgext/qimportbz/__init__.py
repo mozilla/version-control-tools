@@ -200,8 +200,11 @@ def extsetup(ui=None):
     newopts['force'] = True
 
     # loop through the Patches and import them by calculating their url. The
-    # bz:// handler will have cached the lookup so we don't hit the network here
-    for patch in bzhandler.delayed_imports:
+    # bz:// handler will have cached the lookup so we don't hit the network
+    # here. Each one of these pushes an unapplied patch onto the beginning of
+    # the queue, and unapplied patches are ignored when importing them, so do
+    # these in reverse order.
+    for patch in reversed(list(bzhandler.delayed_imports)):
       newopts['name'] = checkpatchname(patch)
       path = makebzurl(patch.bug.num, patch.id)
 
