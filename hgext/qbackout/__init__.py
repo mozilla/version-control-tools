@@ -86,7 +86,7 @@ def qbackout(ui, repo, rev, **opts):
         raise util.Abort('at least one revision required')
 
     csets = [ repo[r] for r in rev ]
-    csets.sort(reverse=True, key=lambda cset: cset.rev())
+    csets.sort(reverse=backout, key=lambda cset: cset.rev())
 
     if opts.get('single') and opts.get('name') and len(rev) > 1:
         raise util.Abort('option "-n" not valid when backing out multiple changes')
