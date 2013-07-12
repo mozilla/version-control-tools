@@ -42,7 +42,7 @@ attaching anything to it.
 
 """
 from mercurial.i18n import _
-from mercurial import commands, cmdutil, util, patch
+from mercurial import cmdutil, util, patch
 from hgext import mq
 from cStringIO import StringIO
 import json
@@ -380,7 +380,7 @@ def infer_arguments(ui, repo, args, opts):
 
     return (rev, bug)
 
-def choose_prodcomponent(ui, c, orig_product, orig_component, finalize = False):
+def choose_prodcomponent(ui, cache, orig_product, orig_component, finalize = False):
     def canon(v):
         if not v or v == '<choose-from-menu>':
             return None
@@ -389,7 +389,7 @@ def choose_prodcomponent(ui, c, orig_product, orig_component, finalize = False):
     product = canon(orig_product)
     component = canon(orig_component)
 
-    products_info = c.get('product', {})
+    products_info = cache.get('product', {})
     all_products = products_info.keys()
 
     def products_with_component_match(component):
@@ -478,10 +478,10 @@ def fill_values(values, ui, api_server, reviewers = None, finalize = False):
         if (len(reviewers) > 1):
             values['REVIEWER_2'] = reviewers[1]
 
-    c = bzauth.load_configuration(ui, api_server, BINARY_CACHE_FILENAME)
+    cache = bzauth.load_configuration(ui, api_server, BINARY_CACHE_FILENAME)
 
     if 'PRODUCT' in values:
-        values['PRODUCT'], values['COMPONENT'] = choose_prodcomponent(ui, c, values['PRODUCT'], values['COMPONENT'], finalize = finalize)
+        values['PRODUCT'], values['COMPONENT'] = choose_prodcomponent(ui, cache, values['PRODUCT'], values['COMPONENT'], finalize = finalize)
 
     if 'PRODVERSION' in values:
         if values['PRODVERSION'] == '<default>' and values['PRODUCT'] not in [None, '<choose-from-menu>']:
@@ -574,12 +574,12 @@ def obsolete_old_patches(ui, api_server, token, bugid, bugzilla, filename, ignor
     return True
 
 def find_reviewers(ui, api_server, user_cache_filename, token, search_strings):
-    c = bzauth.load_user_cache(ui, api_server, user_cache_filename)
+    cache = bzauth.load_user_cache(ui, api_server, user_cache_filename)
     section = api_server
 
     search_results = []
     for search_string in search_strings:
-        name = c.get(section, search_string)
+        name = cache.get(section, search_string)
         if name:
             search_results.append({"search_string": search_string,
                                    "names": [name],
@@ -595,13 +595,13 @@ def find_reviewers(ui, api_server, user_cache_filename, token, search_strings):
                                    "names": names,
                                    "real_names": real_names})
             if len(real_names) == 1:
-                c.set(section, search_string, names[0])
+                cache.set(section, search_string, names[0])
         except Exception, e:
             search_results.append({"search_string": search_string,
                                    "error": str(e),
                                    "real_names": None})
             raise
-    bzauth.store_user_cache(c, user_cache_filename)
+    bzauth.store_user_cache(cache, user_cache_filename)
     return search_results
 
 def flag_type_id(ui, api_server, config_cache_filename, flag_name, product, component):
