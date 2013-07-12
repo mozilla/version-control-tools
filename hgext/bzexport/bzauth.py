@@ -20,6 +20,7 @@ import time
 import tempfile
 import shutil
 import urlparse
+import urllib
 import urllib2
 import json
 from mercurial import config, util
@@ -58,7 +59,7 @@ class bzAuth:
         if self._type == self.typeCookie:
             return "userid=%s&cookie=%s" % (self._userid, self._cookie)
         else:
-            return "username=%s&password=%s" % (self._username, self._password)
+            return "username=%s&password=%s" % (urllib.quote(self._username), urllib.quote(self._password))
 
     def username(self, api_server):
         # This returns and caches the email-address-like username of the user's ID

@@ -49,7 +49,6 @@ import json
 import sys
 import os
 import re
-import urllib
 import urllib2
 import urlparse
 import bzauth
@@ -308,11 +307,7 @@ def bugzilla_info(ui, profile):
     api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/latest/")
     bugzilla = ui.config("bzexport", "bugzilla", "https://bugzilla.mozilla.org/")
     username = ui.config("bzexport", "username", None)
-    if username:
-        username = urllib.quote(username)
     password = ui.config("bzexport", "password", None)
-    if password:
-        password = urllib.quote(password)
 
     auth = bzauth.get_auth(ui, bugzilla, profile, username, password)
     return (auth, api_server, bugzilla)
