@@ -801,7 +801,7 @@ def bzexport(ui, repo, *args, **opts):
                                 **create_opts)
             result = json.load(urlopen(ui, req))
             bug = result['id']
-            ui.write("Created bug %s at %s\n" % (bug, bugzilla + "/show_bug.cgi?id=" + bug))
+            ui.write("Created bug %s at %s\n" % (bug, bugzilla + "show_bug.cgi?id=" + bug))
         except Exception, e:
             raise util.Abort(_("Error creating bug: %s\n" % str(e)))
     else:
@@ -930,7 +930,7 @@ def newbug(ui, repo, *args, **opts):
                         **create_opts)
     result = json.load(urlopen(ui, req))
     bug = result['id']
-    ui.write("Created bug %s at %s\n" % (bug, bugzilla + "/show_bug.cgi?id=" + bug))
+    ui.write("Created bug %s at %s\n" % (bug, bugzilla + "show_bug.cgi?id=" + bug))
 
 cmdtable = {
     'bzexport':
