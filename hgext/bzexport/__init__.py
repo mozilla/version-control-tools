@@ -866,8 +866,10 @@ def bzexport(ui, repo, *args, **opts):
         if result['assigned_to']['name'] != taker:
             result['assigned_to'] = { 'name': taker }
             req = bz.update_bug(api_server, auth, result)
-            result = json.load(urlopen(ui, req))
-            if not result.get('ok', None):
+            try:
+                result = json.load(urlopen(ui, req))
+                assert result.get('ok', None)
+            except Exception, e:
                 raise util.Abort(_("Error when updating bug %s: %s") % (bug, result))
 
 def newbug(ui, repo, *args, **opts):
