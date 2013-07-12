@@ -317,7 +317,7 @@ def urlopen(ui, req):
     ui.progress('Accessing bugzilla server', None, item=req.get_full_url())
     #ui.debug("%s %s\n" % (req.get_method(), req.get_data()))
     try:
-        return urllib2.urlopen(req)
+        return urllib2.urlopen(req, timeout=30)
     except urllib2.HTTPError, e:
         msg = ''
         try:
