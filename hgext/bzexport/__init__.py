@@ -849,7 +849,7 @@ def bzexport(ui, repo, *args, **opts):
         if not opts['interactive']:
             return True
         url, filename, description = [ kwargs[k] for k in ['url', 'filename', 'description' ] ]
-        return ui.prompt(_("Obsolete patch %s (%s) - %s (y/n)?") % (url, filename, description)) != 'y'
+        return ui.prompt(_("Obsolete patch %s (%s) - %s (y/n)?") % (url, filename, description)) == 'y'
 
     obsolete_old_patches(ui, api_server, auth, bug, bugzilla, filename, result['id'], pre_hook = pre_obsolete)
 
