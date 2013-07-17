@@ -3,6 +3,8 @@
 This is a port of mak's mercurial backout script from
 https://wiki.mozilla.org/User:Mak77 to a mercurial extension.'''
 
+testedwith = '2.5.2'
+
 from mercurial import scmutil, commands, cmdutil, patch, mdiff, util
 from mercurial.i18n import _
 from mercurial.node import nullid, short
