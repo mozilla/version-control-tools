@@ -146,6 +146,7 @@ def qbackout(ui, repo, rev, **opts):
         # Hunt down original description if we might want to use it
         orig_desc = None
         orig_desc_cset = None
+        orig_author = None
         r = cset
         while len(csets) == 1 or not opts.get('single'):
             ui.debug("Parsing message for %s\n" % short(r.node()))
@@ -160,6 +161,7 @@ def qbackout(ui, repo, rev, **opts):
                     ui.debug("  looks like the original description\n")
                     orig_desc = r.description()
                     orig_desc_cset = r
+                    orig_author = r.user()
                     break
             r = repo[m.group(1)]
 
@@ -174,20 +176,26 @@ def qbackout(ui, repo, rev, **opts):
             if not opts.get('broken'):
                 raise
         msg = ('%s changeset %s' % (desc['Actioned'], shortnode)) + bugs_suffix(bugs)
+        user = None
 
         if backout:
-            # If backing out a backout, reuse the original commit message.
+            # If backing out a backout, reuse the original commit message & author.
             if orig_desc_cset is not None and orig_desc_cset != cset:
                 msg = orig_desc
+                user = orig_author
         else:
-            # If reapplying the original change, reuse the original commit message
+            # If reapplying the original change, reuse the original commit message & author.
             if orig_desc_cset is not None and orig_desc_cset == cset:
                 msg = orig_desc
+                user = orig_author
 
         messages.append(msg)
         if not opts.get('single'):
             new_opts['message'] = messages[-1]
             patchname = opts.get('name') or '%s-%s' % (desc['name'], shortnode)
+            # Override the user to that of the original patch author in the case of --apply
+            if user is not None:
+                new_opts['user'] = user
             mq.new(ui, repo, patchname, **new_opts)
             if ui.verbose:
                 ui.write("queued up patch %s\n" % patchname)
