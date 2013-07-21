@@ -1,0 +1,10 @@
+This repository contains a Mercurial extension (and supplementary libraries)
+that provides Mozilla-specific functionality to make developing on Gecko and
+derived applications (like Firefox) easier.
+
+To activate the extension, place the following in your .hgrc:
+
+  [extensions]
+  mozext = /path/to/this/directory
+
+Once activated, run `hg help mozext` for information about this extension.
