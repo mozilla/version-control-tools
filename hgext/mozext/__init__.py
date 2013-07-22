@@ -212,7 +212,12 @@ def pushtree(ui, repo, tree=None, rev=None, **opts):
     if not tree:
         raise util.Abort(_('A tree must be specified.'))
 
-    return push(ui, repo, rev=rev, dest=tree)
+    tree, uri = resolve_trees_to_uris([tree], write_access=True)[0]
+
+    if not uri:
+        raise util.Abort("Don't know about tree: %s" % tree)
+
+    return push(ui, repo, rev=rev, dest=uri)
 
 
 @command('treestatus', [], _('hg treestatus [TREE] ...'))
