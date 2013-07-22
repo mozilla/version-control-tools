@@ -119,6 +119,19 @@ def resolve_trees_to_uris(trees, write_access=False):
     return uris
 
 
+def resolve_uri_to_tree(uri):
+    """Try to resolve a URI back to a known tree."""
+
+    for tree, path in REPOS.items():
+        if uri.startswith('%s%s' % (BASE_READ_URI, path)):
+            return tree
+
+        if uri.startswith('%s%s' % (BASE_WRITE_URI, path)):
+            return tree
+
+    return None
+
+
 class PushInfo(object):
     """Represents an entry from the repository pushlog."""
 
