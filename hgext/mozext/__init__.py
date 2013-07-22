@@ -102,6 +102,8 @@ from mercurial import (
 )
 
 from mozautomation.repository import (
+    MercurialRepository,
+    resolve_trees_to_official,
     resolve_trees_to_uris,
     resolve_uri_to_tree,
 )
@@ -245,6 +247,42 @@ def treestatus(ui, *trees, **opts):
                 s.reason))
         else:
             ui.write('%s: %s\n' % (tree.rjust(longest), s.status))
+
+
+@command('tbpl', [], _('hg tbpl [TREE] [REV]'))
+def tbpl(ui, repo, tree=None, rev=None, **opts):
+    """Open TBPL showing build status for the specified revision.
+
+    The command receives a tree name and a revision to query. The tree is
+    required because a revision/changeset may existing in multiple
+    repositories.
+    """
+    if not tree:
+        raise util.Abort('A tree must be specified.')
+
+    if not rev:
+        raise util.Abort('A revision must be specified.')
+
+    tree, repo_url = resolve_trees_to_uris([tree])[0]
+    if not repo_url:
+        raise util.Abort("Don't know about tree: %s" % tree)
+
+    r = MercurialRepository(repo_url)
+    node = repo[rev].hex()
+    push = r.push_info_for_changeset(node)
+
+    if not push:
+        raise util.Abort("Could not find push info for changeset %s" % node)
+
+    push_node = push.last_node
+    tree_official = resolve_trees_to_official([tree])[0]
+    tree_official = '-'.join(s.title() for s in tree_official.split('-'))
+
+    url = 'https://tbpl.mozilla.org/?tree=%s&rev=%s' % (tree_official,
+        push_node[0:12])
+
+    import webbrowser
+    webbrowser.get('firefox').open(url)
 
 
 class remoterefs(dict):

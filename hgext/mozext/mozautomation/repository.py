@@ -83,6 +83,7 @@ OFFICIAL_MAP = {
     'release': 'mozilla-release',
     'aurora': 'mozilla-aurora',
     'beta': 'mozilla-beta',
+    'build': 'build-system',
     'esr17': 'mozilla-esr17',
 }
 
