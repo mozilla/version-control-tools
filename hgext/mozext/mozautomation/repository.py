@@ -28,8 +28,10 @@ TREE_ALIASES = {
     'mozilla-release': ('release',),
     'mozilla-aurora': ('aurora',),
     'mozilla-beta': ('beta',),
+    'mozilla-b2g18': ('b2g18',),
+    'b2g-inbound': ('b2ginbound',),
 
-    'releases': ('esr17', 'release', 'beta', 'aurora', 'central'),
+    'releases': ('esr17', 'b2g18', 'release', 'beta', 'aurora', 'central'),
 }
 
 BASE_READ_URI = 'https://hg.mozilla.org/'
@@ -42,8 +44,10 @@ REPOS = {
     'beta': 'releases/mozilla-beta',
     'release': 'releases/mozilla-release',
     'esr17': 'releases/mozilla-esr17',
+    'b2g18': 'releases/mozilla-b2g18',
 
     # Integration repositories.
+    'b2ginbound': 'integration/b2g-inbound',
     'build': 'projects/build-system',
     'fx-team': 'integration/fx-team',
     'graphics': 'projects/graphics',

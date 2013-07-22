@@ -177,9 +177,10 @@ def cloneunified(ui, dest='gecko', **opts):
     success = False
 
     try:
-        for tree in ('esr17', 'release', 'beta', 'aurora', 'central',
+        for tree in ('esr17', 'b2g18', 'release', 'beta', 'aurora', 'central',
             'inbound'):
             peer = hg.peer(ui, {}, tree)
+            ui.warn('Pulling from %s.\n' % peer.url())
             result = repo.pull(peer)
         res = update(ui, repo, rev='central/default')
         success = True
