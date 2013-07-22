@@ -37,8 +37,22 @@ cloneunified`.
 Once you have a unified repository, you can pull changesets from repositories
 by running `hg pulltree`. e.g. `hg pulltree central fx-team` will pull from
 mozilla-central and fx-team.
+
+Remote References
+=================
+
+When pulling from known Gecko repositories, this extension automatically
+creates references to branches on the remote. These can be referenced via
+the revision <tree>/<name>. e.g. 'central/default'. This makes it possible to
+update to revisions on the remote. e.g. `hg up central/default`.
+
+Remote refs are read-only and are updated automatically during repository pull
+and push operations.
+
+This feature is similar to Git remote refs.
 """
 
+import errno
 import os
 import sys
 
@@ -50,10 +64,22 @@ from mercurial.commands import (
     pull,
     push,
 )
+from mercurial.localrepo import (
+    repofilecache,
+)
+from mercurial.node import (
+    bin,
+    hex,
+)
 from mercurial import (
     cmdutil,
+    encoding,
     hg,
     util,
+)
+
+from mozautomation.repository import (
+    resolve_uri_to_tree,
 )
 
 
@@ -148,8 +174,9 @@ def pulltree(ui, repo, *trees, **opts):
     """Pull changesets from a Mozilla repository into this repository.
 
     Trees can be specified by their common name or aliases (see |hg moztrees|).
-    When a tree is pulled, a bookmark is created with the common name of the
-    tree. This allows updating to specified trees via e.g. |hg up central|.
+    When a tree is pulled, a reference to the current remote heads is created.
+    This allows updating to revisions of remote trees via e.g.
+    |hg up remote/central|.
 
     If no arguments are specified, the main landing trees (central and inbound)
     will be pulled.
@@ -161,8 +188,6 @@ def pulltree(ui, repo, *trees, **opts):
 
     uris = resolve_trees_to_uris(trees)
 
-    bms = {}
-
     for tree, uri in uris:
         if uri is None:
             ui.warn('Unknown Mozilla repository: %s\n' % tree)
@@ -171,11 +196,6 @@ def pulltree(ui, repo, *trees, **opts):
         if pull(ui, repo, uri):
             ui.warn('Error pulling from %s\n' % uri)
             continue
-
-        peer = hg.peer(repo, {}, uri)
-        default = peer.lookup('default')
-
-        bookmark(ui, repo, rev=default, force=True, mark=tree)
 
 
 @command('pushtree',
@@ -205,3 +225,111 @@ def pushtree(ui, repo, tree=None, rev=None, **opts):
         raise util.Abort("Don't know about tree %s" % tree)
 
     return push(ui, repo, rev=rev, dest=uri)
+
+
+class remoterefs(dict):
+    """Represents a remote refs file."""
+
+    def __init__(self, repo):
+        dict.__init__(self)
+        self._repo = repo
+
+        try:
+            for line in repo.vfs('remoterefs'):
+                line = line.strip()
+                if not line:
+                    continue
+
+                sha, ref = line.split(None, 1)
+                ref = encoding.tolocal(ref)
+                try:
+                    self[ref] = repo.changelog.lookup(sha)
+                except LookupError:
+                    pass
+
+        except IOError as e:
+            if e.errno != errno.ENOENT:
+                raise
+
+    def write(self):
+        f = self._repo.vfs('remoterefs', 'w', atomictemp=True)
+        for ref in sorted(self):
+            f.write('%s %s\n' % (hex(self[ref]), encoding.fromlocal(ref)))
+        f.close()
+
+
+def reposetup(ui, repo):
+    """Custom repository implementation.
+
+    Our custom repository class tracks remote tree references so users can
+    reference specific revisions on remotes.
+    """
+
+    if not repo.local():
+        return
+
+    orig_findtags = repo._findtags
+    orig_lookup = repo.lookup
+    orig_pull = repo.pull
+    orig_push = repo.push
+
+    class remotestrackingrepo(repo.__class__):
+        @repofilecache('remoterefs')
+        def remoterefs(self):
+            return remoterefs(self)
+
+        # Resolve remote ref symbols. For some reason, we need both lookup
+        # and findtags implemented.
+        def lookup(self, key):
+            try:
+                key = self.remoterefs[key]
+            except KeyError, TypeError:
+                pass
+
+            return orig_lookup(key)
+
+        def _findtags(self):
+            tags, tagtypes = orig_findtags()
+            tags.update(self.remoterefs)
+
+            return tags, tagtypes
+
+        def pull(self, remote, *args, **kwargs):
+            # Pulls from known repositories will automatically update our
+            # remote tracking references.
+            res = orig_pull(remote, *args, **kwargs)
+            lock = self.wlock()
+            try:
+                tree = resolve_uri_to_tree(remote.url())
+
+                if tree:
+                    self._update_remote_refs(remote, tree)
+
+            finally:
+                lock.release()
+
+            return res
+
+        def push(self, remote, *args, **kwargs):
+            res = orig_push(remote, *args, **kwargs)
+            lock = self.wlock()
+            try:
+                tree = resolve_uri_to_tree(remote.url())
+
+                if tree:
+                    self._update_remote_refs(remote, tree)
+
+            finally:
+                lock.release()
+
+            return res
+
+        def _update_remote_refs(self, remote, tree):
+            for branch, nodes in remote.branchmap().items():
+                for node in nodes:
+                    self.remoterefs['%s/%s' % (tree, branch)] = node
+
+            self.remoterefs.write()
+
+    repo.__class__ = remotestrackingrepo
+
