@@ -75,13 +75,13 @@ This feature is similar to Git remote refs.
 
 import errno
 import os
+import shutil
 import sys
 
 import mercurial.commands as commands
 
 from mercurial.i18n import _
 from mercurial.commands import (
-    bookmark,
     pull,
     push,
 )
@@ -171,14 +171,22 @@ def cloneunified(ui, dest='gecko', **opts):
     However, due to the way Mercurial internally stores data, it is recommended
     to run this command to ensure optimal storage of data.
     """
-    repo = hg.repository(ui, ui.expandpath(dest), create=True)
+    path = ui.expandpath(dest)
+    repo = hg.repository(ui, path, create=True)
 
-    for r in ('esr17', 'release', 'beta', 'aurora', 'central', 'inbound'):
-        tree, uri = resolve_trees_to_uris([r])[0]
-        ui.warn('Pulling changesets from %s\n' % uri)
-        peer = hg.peer(ui, {}, uri)
-        result = repo.pull(peer)
-        ui.write('%s\n' % result)
+    success = False
+
+    try:
+        for tree in ('esr17', 'release', 'beta', 'aurora', 'central',
+            'inbound'):
+            peer = hg.peer(ui, {}, tree)
+            result = repo.pull(peer)
+        res = update(ui, repo, rev='central/default')
+        success = True
+        return res
+    finally:
+        if not success:
+            shutil.rmtree(path)
 
 
 @command('pushtree',
@@ -195,8 +203,8 @@ def pushtree(ui, repo, tree=None, rev=None, **opts):
     difference from that command.
 
     If you would like to push a non-active head, specify it with -r REV. For
-    example, if you are currently on mozilla-central but wish to push the
-    inbound bookmark to mozilla-inbound, run  |hg pushtree -r inbound inbound|.
+    example, if you are currently on mozilla-central but wish to push inbound
+    to mozilla-inbound, run `hg pushtree -r inbound/default inbound`.
     """
     if not tree:
         raise util.Abort(_('A tree must be specified.'))
