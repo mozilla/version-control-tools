@@ -109,7 +109,7 @@ def cloneunified(ui, dest='gecko', **opts):
         tree, uri = resolve_trees_to_uris([r])[0]
         ui.warn('Pulling changesets from %s\n' % uri)
         peer = hg.peer(ui, {}, uri)
-        result = repo.pull(peer, heads=[peer.lookup('default')])
+        result = repo.pull(peer)
         ui.write('%s\n' % result)
 
 
