@@ -12,12 +12,20 @@ Included are commands that interface with Mozilla's automation infrastructure.
 These allow developers to quickly check the status of repositories and builds
 without having to leave the comfort of the terminal.
 
-Repository Aliases
-==================
+Known Mozilla Repositories
+==========================
 
-This extension installs aliases for common repository and tree names. Any time
-a command is looking for a tree or repository name, you can specify the
-canonical repository name, the common name, or any number of aliases.
+This extension teaches Mercurial about known Mozilla repositories.
+
+Each main mozilla-central clone is given a common name. e.g. "mozilla-central"
+becomes "central" and "mozilla-inbound" becomes "inbound." In addition,
+repositories have short aliases to quickly refer to them. e.g.
+"mozilla-central" is can be references by "m-c" or "mc."
+
+The mechanism to resolve a repository string to a repository instance is
+supplemented with these known aliases. For example, to pull from
+mozilla-central, you can simply run `hg pull central`. There is no need to set
+up the [paths] section in your hgrc!
 
 To view the list of known repository aliases, run `hg moztrees`.
 
@@ -32,19 +40,32 @@ This extension provides mechanisms to create and maintain a single Mercurial
 repository that contains changesets from multiple "upstream" repositories.
 
 The recommended method to create a unified repository is to run `hg
-cloneunified`.
+cloneunified`. This will pull changesets from all major release branches and
+mozilla-inbound.
 
 Once you have a unified repository, you can pull changesets from repositories
-by running `hg pulltree`. e.g. `hg pulltree central fx-team` will pull from
-mozilla-central and fx-team.
+by using `hg pull`, likely by specifying one of the tree aliases (see `hg
+moztrees`).
+
+One needs to be careful when pushing changesets when operating a unified
+repository. By default, `hg push` will attempt to push all local changesets not
+in a remote. This is obviously not desired (you wouldn't want to push
+mozilla-central to mozilla-beta)! Instead, you'll want to limit outgoing
+changesets to a specific head or revision. You can specify `hg push -r REV`.
+Or, for your convenience, the `hg pushtree` is made available. By default, this
+command will push the current "tip" revision to the tree specified. e.g. if you
+have patches on the current tip that need to land in inbound, you can run
+`hg pushtree inbound`.
+
+You can also get creative and push a "remote tracking revision" to another
+repository. e.g. `hg pushtree -r central/default inbound`.
 
 Remote References
 =================
 
 When pulling from known Gecko repositories, this extension automatically
 creates references to branches on the remote. These can be referenced via
-the revision <tree>/<name>. e.g. 'central/default'. This makes it possible to
-update to revisions on the remote. e.g. `hg up central/default`.
+the revision <tree>/<name>. e.g. 'central/default'.
 
 Remote refs are read-only and are updated automatically during repository pull
 and push operations.
@@ -64,11 +85,13 @@ from mercurial.commands import (
     pull,
     push,
 )
+from mercurial.error import (
+    RepoError,
+)
 from mercurial.localrepo import (
     repofilecache,
 )
 from mercurial.node import (
-    bin,
     hex,
 )
 from mercurial import (
@@ -79,6 +102,7 @@ from mercurial import (
 )
 
 from mozautomation.repository import (
+    resolve_trees_to_uris,
     resolve_uri_to_tree,
 )
 
@@ -92,6 +116,26 @@ colortable = {
     'buildstatus.failed': 'red',
     'buildstatus.testfailed': 'cyan',
 }
+
+
+# Override peer path lookup such that common names magically get resolved to
+# known URIs.
+old_peerorrepo = hg._peerorrepo
+def peerorrepo(ui, path, *args, **kwargs):
+    # Always try the old mechanism first. That way if there is a local
+    # path that shares the name of a magic remote the local path is accessible.
+    try:
+        return old_peerorrepo(ui, path, *args, **kwargs)
+    except RepoError:
+        tree, uri = resolve_trees_to_uris([path])[0]
+
+        if not uri:
+            raise
+
+        path = uri
+        return old_peerorrepo(ui, path, *args, **kwargs)
+
+hg._peerorrepo = peerorrepo
 
 
 @command('moztrees', [], _('hg moztrees'))
@@ -127,8 +171,6 @@ def cloneunified(ui, dest='gecko', **opts):
     However, due to the way Mercurial internally stores data, it is recommended
     to run this command to ensure optimal storage of data.
     """
-    from mozautomation.repository import resolve_trees_to_uris
-
     repo = hg.repository(ui, ui.expandpath(dest), create=True)
 
     for r in ('esr17', 'release', 'beta', 'aurora', 'central', 'inbound'):
@@ -137,6 +179,29 @@ def cloneunified(ui, dest='gecko', **opts):
         peer = hg.peer(ui, {}, uri)
         result = repo.pull(peer)
         ui.write('%s\n' % result)
+
+
+@command('pushtree',
+    [('r', 'rev', 'tip', _('revision'), _('REV'))],
+    _('hg pushtree [-r REV] TREE'))
+def pushtree(ui, repo, tree=None, rev=None, **opts):
+    """Push changesets to a Mozilla repository.
+
+    If only the tree argument is defined, we will attempt to push the current
+    tip to the repository specified. This may fail due to pushed mq patches,
+    local changes, etc. Please note we only attempt to push the current tip and
+    it's ancestors, not all changesets not in the remote repository. This is
+    different from the default behavior of |hg push| and is the distinguishing
+    difference from that command.
+
+    If you would like to push a non-active head, specify it with -r REV. For
+    example, if you are currently on mozilla-central but wish to push the
+    inbound bookmark to mozilla-inbound, run  |hg pushtree -r inbound inbound|.
+    """
+    if not tree:
+        raise util.Abort(_('A tree must be specified.'))
+
+    return push(ui, repo, rev=rev, dest=tree)
 
 
 @command('treestatus', [], _('hg treestatus [TREE] ...'))
@@ -167,64 +232,6 @@ def treestatus(ui, *trees, **opts):
     for tree in sorted(status):
         s = status[tree]
         ui.write('%s: %s\n' % (tree.rjust(longest), s.status))
-
-
-@command('pulltree', [], _('hg pulltree [TREE] ...'))
-def pulltree(ui, repo, *trees, **opts):
-    """Pull changesets from a Mozilla repository into this repository.
-
-    Trees can be specified by their common name or aliases (see |hg moztrees|).
-    When a tree is pulled, a reference to the current remote heads is created.
-    This allows updating to revisions of remote trees via e.g.
-    |hg up remote/central|.
-
-    If no arguments are specified, the main landing trees (central and inbound)
-    will be pulled.
-    """
-    from mozautomation.repository import resolve_trees_to_uris
-
-    if not trees:
-        trees = ['central', 'inbound']
-
-    uris = resolve_trees_to_uris(trees)
-
-    for tree, uri in uris:
-        if uri is None:
-            ui.warn('Unknown Mozilla repository: %s\n' % tree)
-            continue
-
-        if pull(ui, repo, uri):
-            ui.warn('Error pulling from %s\n' % uri)
-            continue
-
-
-@command('pushtree',
-    [('r', 'rev', 'tip', _('revision'), _('REV'))],
-    _('hg pushtree [-r REV] TREE'))
-def pushtree(ui, repo, tree=None, rev=None, **opts):
-    """Push changesets to a Mozilla repository.
-
-    If only the tree argument is defined, we will attempt to push the current
-    tip to the repository specified. This may fail due to pushed mq patches,
-    local changes, etc. Please note we only attempt to push the current tip and
-    it's ancestors, not all changesets not in the remote repository. This is
-    different from the default behavior of |hg push|.
-
-    If you would like to push a non-active head, specify it with -r REV. For
-    example, if you are currently on mozilla-central but wish to push the
-    inbound bookmark to mozilla-inbound, run  |hg pushtree -r inbound inbound|.
-    """
-    if not tree:
-        raise util.Abort(_('A tree must be specified.'))
-
-    from mozautomation.repository import resolve_trees_to_uris
-
-    tree, uri = resolve_trees_to_uris([tree], write_access=True)[0]
-
-    if not uri:
-        raise util.Abort("Don't know about tree %s" % tree)
-
-    return push(ui, repo, rev=rev, dest=uri)
 
 
 class remoterefs(dict):
