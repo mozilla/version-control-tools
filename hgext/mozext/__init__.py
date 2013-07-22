@@ -184,7 +184,7 @@ def cloneunified(ui, dest='gecko', **opts):
             peer = hg.peer(ui, {}, tree)
             ui.warn('Pulling from %s.\n' % peer.url())
             result = repo.pull(peer)
-        res = update(ui, repo, rev='central/default')
+        res = hg.update(repo, repo.lookup('central/default'))
         success = True
         return res
     finally:
