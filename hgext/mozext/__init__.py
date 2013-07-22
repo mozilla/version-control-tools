@@ -240,7 +240,11 @@ def treestatus(ui, *trees, **opts):
 
     for tree in sorted(status):
         s = status[tree]
-        ui.write('%s: %s\n' % (tree.rjust(longest), s.status))
+        if s.status == 'closed':
+            ui.write('%s: %s (%s)\n' % (tree.rjust(longest), s.status,
+                s.reason))
+        else:
+            ui.write('%s: %s\n' % (tree.rjust(longest), s.status))
 
 
 class remoterefs(dict):
