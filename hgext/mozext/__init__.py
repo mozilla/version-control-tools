@@ -348,6 +348,11 @@ def tbpl(ui, repo, tree=None, rev=None, **opts):
     _('hg critic [REV]')
 )
 def critic(ui, repo, rev='.', entire=False, **opts):
+    """Perform a critique of a changeset.
+
+    This will perform static analysis on a given changeset and report any
+    issues found.
+    """
     critique(ui, repo, node=rev, entire=entire, **opts)
 
 
