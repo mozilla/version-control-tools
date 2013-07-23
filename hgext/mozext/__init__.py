@@ -97,7 +97,6 @@ import mercurial.commands as commands
 
 from mercurial.i18n import _
 from mercurial.commands import (
-    pull,
     push,
 )
 from mercurial.error import (
@@ -139,6 +138,8 @@ colortable = {
 # Override peer path lookup such that common names magically get resolved to
 # known URIs.
 old_peerorrepo = hg._peerorrepo
+
+
 def peerorrepo(ui, path, *args, **kwargs):
     # Always try the old mechanism first. That way if there is a local
     # path that shares the name of a magic remote the local path is accessible.
@@ -206,7 +207,8 @@ def moztrees(ui, **opts):
             if targets[0] == name:
                 aliases.append(alias)
 
-        ui.write('%s: %s\n' % (name.rjust(longest), ', '.join(sorted(aliases))))
+        ui.write('%s: %s\n' % (name.rjust(longest),
+            ', '.join(sorted(aliases))))
 
 
 @command('cloneunified', [], _('hg cloneunified [DEST]'))
@@ -232,7 +234,7 @@ def cloneunified(ui, dest='gecko', **opts):
             'inbound'):
             peer = hg.peer(ui, {}, tree)
             ui.warn('Pulling from %s.\n' % peer.url())
-            result = repo.pull(peer)
+            repo.pull(peer)
         res = hg.update(repo, repo.lookup('central/default'))
         success = True
         return res
@@ -281,7 +283,6 @@ def treestatus(ui, *trees, **opts):
     If trees are closed, you shouldn't push unless you are fixing the reason
     the tree is closed.
     """
-    from mozautomation.repository import resolve_trees_to_official
     from mozautomation.treestatus import TreeStatusClient
 
     client = TreeStatusClient()
@@ -411,7 +412,7 @@ def reposetup(ui, repo):
         def lookup(self, key):
             try:
                 key = self.remoterefs[key]
-            except KeyError, TypeError:
+            except (KeyError, TypeError):
                 pass
 
             return orig_lookup(key)
