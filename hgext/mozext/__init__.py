@@ -71,6 +71,21 @@ Remote refs are read-only and are updated automatically during repository pull
 and push operations.
 
 This feature is similar to Git remote refs.
+
+Static Analysis
+===============
+
+This extension provides static analysis to patches. Currently, only Python
+style checking is performed.
+
+To perform style checking for a single patch, run `hg critic`. By default,
+this will analyze the current working directory. If the working directory is
+clean, the tip changeset will be analyzed. By default, only changed lines are
+reported on.
+
+Static analysis is also performed automatically during qrefresh and commit
+operations. To disable this behavior, add "noautocritic = True" to the
+[mozext] section in your hgrc.
 """
 
 import errno
@@ -96,6 +111,7 @@ from mercurial.node import (
 )
 from mercurial import (
     cmdutil,
+    demandimport,
     encoding,
     hg,
     util,
@@ -138,6 +154,39 @@ def peerorrepo(ui, path, *args, **kwargs):
         return old_peerorrepo(ui, path, *args, **kwargs)
 
 hg._peerorrepo = peerorrepo
+
+
+def critique(ui, repo, entire=False, node=None, **kwargs):
+    """Perform a critique of a changeset."""
+    demandimport.disable()
+
+    try:
+        from flake8.engine import get_style_guide
+    except ImportError:
+        our_dir = os.path.dirname(__file__)
+        for p in ('flake8', 'mccabe', 'pep8', 'pyflakes'):
+            sys.path.insert(0, os.path.join(our_dir, p))
+
+    from flake8.engine import get_style_guide
+    from pep8 import DiffReport, parse_udiff
+
+    style = get_style_guide(parse_argv=False)
+
+    if not entire:
+        diff = ''.join(repo[node].diff())
+        style.options.selected_lines = {}
+        for k, v in parse_udiff(diff).items():
+            if k.startswith('./'):
+                k = k[2:]
+
+            style.options.selected_lines[k] = v
+
+        style.options.report = DiffReport(style.options)
+
+    files = [f for f in repo[node].files() if f.endswith('.py')]
+    style.check_files(files)
+
+    demandimport.enable()
 
 
 @command('moztrees', [], _('hg moztrees'))
@@ -290,6 +339,22 @@ def tbpl(ui, repo, tree=None, rev=None, **opts):
     webbrowser.get('firefox').open(url)
 
 
+@command('critic',
+    [('e', 'entire', False,
+        _('Report on entire file content, not just changed parts'),
+        ''
+    )],
+    _('hg critic [REV]')
+)
+def critic(ui, repo, rev='.', entire=False, **opts):
+    critique(ui, repo, node=rev, entire=entire, **opts)
+
+
+def critic_hook(ui, repo, node=None, **opts):
+    critique(ui, repo, node=node, **opts)
+    return 0
+
+
 class remoterefs(dict):
     """Represents a remote refs file."""
 
@@ -395,4 +460,6 @@ def reposetup(ui, repo):
             self.remoterefs.write()
 
     repo.__class__ = remotestrackingrepo
-
+    if not ui.configbool('mozext', 'noautocritic'):
+        ui.setconfig('hooks', 'commit.critic', critic_hook)
+        ui.setconfig('hooks', 'qrefresh.critic', critic_hook)
