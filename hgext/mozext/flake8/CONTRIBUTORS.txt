@@ -1,0 +1,21 @@
+Project created by Tarek Ziadé.
+
+Contributors (by order of appearance) :
+
+- Tamás Gulácsi
+- Nicolas Dumazet
+- Stefan Scherfke
+- Chris Adams
+- Ben Bass
+- Ask Solem
+- Steven Kryskalla
+- Gustavo Picon
+- Jannis Leidel
+- Miki Tebeka
+- David Cramer
+- Peter Teichman
+- Ian Cordasco
+- Oleg Broytman
+- Marc Labbé
+- Bruno Miguel Custódio
+- Florent Xicluna
