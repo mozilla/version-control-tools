@@ -7,6 +7,7 @@ hgNameToRevURL = {
     'fx-team':          'integration/fx-team/',
     'mozilla-central':  'mozilla-central/',
     'mozilla-inbound':  'integration/mozilla-inbound/',
+    'b2g-inbound':      'integration/b2g-inbound/',
     'try':              'try/',
     'mozilla-aurora':   'releases/mozilla-aurora/',
     'mozilla-beta':     'releases/mozilla-beta/',
