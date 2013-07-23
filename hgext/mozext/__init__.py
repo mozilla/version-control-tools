@@ -171,7 +171,7 @@ def critique(ui, repo, entire=False, node=None, **kwargs):
     from flake8.engine import get_style_guide
     from pep8 import DiffReport, parse_udiff
 
-    style = get_style_guide(parse_argv=False)
+    style = get_style_guide(parse_argv=False, ignore='E128')
 
     if not entire:
         diff = ''.join(repo[node].diff())
