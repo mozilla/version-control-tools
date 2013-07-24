@@ -111,6 +111,7 @@ from mercurial import (
     cmdutil,
     demandimport,
     encoding,
+    extensions,
     hg,
     util,
 )
@@ -122,6 +123,10 @@ from mozautomation.repository import (
     resolve_uri_to_tree,
 )
 
+import bzauth
+import bz
+
+bz_available = False
 
 commands.norepo += ' cloneunified moztrees treestatus'
 cmdtable = {}
@@ -389,6 +394,15 @@ class remoterefs(dict):
         for ref in sorted(self):
             f.write('%s %s\n' % (hex(self[ref]), encoding.fromlocal(ref)))
         f.close()
+
+
+def extsetup(ui):
+    global bz_available
+    try:
+        extensions.find('bzexport')
+        bz_available = True
+    except KeyError:
+        pass
 
 
 def reposetup(ui, repo):
