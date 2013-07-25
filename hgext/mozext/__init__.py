@@ -419,13 +419,30 @@ def changesetpushes(ui, repo, rev, all=False, **opts):
 
     ui.write(ctx.rev(), ':', str(ctx), ' ', ctx.description(), '\n')
 
-    ui.write('Tree'.ljust(longest_tree), 'Date'.ljust(20),
+    ui.write('Release ', 'Tree'.ljust(longest_tree), 'Date'.ljust(20),
             'Username'.ljust(longest_user), 'Build Info\n')
     for tree, push_id, when, user, head_changeset in pushes:
+        releases = set()
+        release = ''
+        versions = {}
+
+        if tree == 'beta':
+            versions = repo._beta_releases()
+        elif tree == 'release':
+            versions = repo._release_releases()
+
+        for version, e in versions.items():
+            vctx = repo[e[0]]
+            if ctx.descendant(vctx):
+                releases.add(version)
+
+        if len(releases):
+            release = sorted(releases)[0]
+
         tbpl = tbpl_url(tree, head_changeset[0:12])
         date = datetime.datetime.fromtimestamp(when)
-        ui.write(tree.ljust(longest_tree), date.isoformat(), ' ',
-            user.ljust(longest_user), tbpl or '', '\n')
+        ui.write(release.ljust(8), tree.ljust(longest_tree), date.isoformat(),
+            ' ', user.ljust(longest_user), tbpl or '', '\n')
 
 
 def critic_hook(ui, repo, node=None, **opts):
@@ -566,6 +583,47 @@ def reposetup(ui, repo):
                 m[ctx.node()] = lines[0]
 
             return m
+
+        def _beta_releases(self):
+            """Obtain information for each beta release."""
+            return self._release_versions('beta/')
+
+        def _release_releases(self):
+            return self._release_versions('release/')
+
+        def _release_versions(self, prefix):
+            d = {}
+
+            for key, node in self.remoterefs.items():
+                if not key.startswith(prefix):
+                    continue
+
+                key = key[len(prefix):]
+
+                if not key.startswith('GECKO') or not key.endswith('RELBRANCH'):
+                    continue
+
+                version, date, _relbranch = key.split('_')
+                version = version[5:]
+                after = ''
+                marker = ''
+
+                if 'b' in version:
+                    marker = 'b'
+                    version, after = version.split('b')
+
+                if len(version) > 2:
+                    major, minor = version[0:2], version[2:]
+                else:
+                    major, minor = version
+
+                version = '%s.%s' % (major, minor)
+                if marker:
+                    version += '%s%s' % (marker, after)
+
+                d[version] = (key, node, major, minor, marker or None, after or None)
+
+            return d
 
     repo.__class__ = remotestrackingrepo
     if not ui.configbool('mozext', 'noautocritic'):
