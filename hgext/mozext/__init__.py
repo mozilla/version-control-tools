@@ -85,6 +85,19 @@ reported on.
 Static analysis is also performed automatically during qrefresh and commit
 operations. To disable this behavior, add "noautocritic = True" to the
 [mozext] section in your hgrc.
+
+Pushlog Data
+============
+
+This extension supports downloading pushlog data from Mozilla's repositories.
+Pushlog data records who pushed changesets where and when.
+
+To use this functionality, you'll need to sync pushlog data from the server to
+the local machine. This facilitates rapid data lookup and can be done by
+running `hg pushlogsync`.
+
+Once pushlog data is synced, you can use `hg changesetpushes` to look up push
+information for a specific changeset.
 """
 
 import datetime
@@ -128,6 +141,7 @@ from mozautomation.repository import (
     resolve_trees_to_official,
     resolve_trees_to_uris,
     resolve_uri_to_tree,
+    tbpl_url,
 )
 
 import bzauth
@@ -343,11 +357,8 @@ def tbpl(ui, repo, tree=None, rev=None, **opts):
         raise util.Abort("Could not find push info for changeset %s" % node)
 
     push_node = push.last_node
-    tree_official = resolve_trees_to_official([tree])[0]
-    tree_official = '-'.join(s.title() for s in tree_official.split('-'))
 
-    url = 'https://tbpl.mozilla.org/?tree=%s&rev=%s' % (tree_official,
-        push_node[0:12])
+    url = tbpl_url(tree, push_node[0:12])
 
     import webbrowser
     webbrowser.get('firefox').open(url)
@@ -404,13 +415,16 @@ def changesetpushes(ui, repo, rev, all=False, **opts):
     pushes = [p for p in tracker.pushes_for_changeset(node) if all or p[0] in
         RELEASE_TREES]
     longest_tree = max(len(p[0]) for p in pushes) + 2
+    longest_user = max(len(p[3]) for p in pushes) + 2
 
     ui.write(ctx.rev(), ':', str(ctx), ' ', ctx.description(), '\n')
 
     ui.write('Tree'.ljust(longest_tree), 'Date'.ljust(19), ' Username\n')
     for tree, push_id, when, user, head_changeset in pushes:
+        tbpl = tbpl_url(tree, head_changeset[0:12])
         date = datetime.datetime.fromtimestamp(when)
-        ui.write(tree.ljust(longest_tree), date.isoformat(), ' ', user, '\n')
+        ui.write(tree.ljust(longest_tree), date.isoformat(), ' ',
+            user.ljust(longest_user), tbpl or '', '\n')
 
 
 def critic_hook(ui, repo, node=None, **opts):
