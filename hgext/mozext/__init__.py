@@ -87,6 +87,7 @@ operations. To disable this behavior, add "noautocritic = True" to the
 [mozext] section in your hgrc.
 """
 
+import datetime
 import errno
 import os
 import shutil
@@ -116,8 +117,14 @@ from mercurial import (
     util,
 )
 
+from mozautomation.changetracker import (
+    ChangeTracker,
+)
+
 from mozautomation.repository import (
     MercurialRepository,
+    RELEASE_TREES,
+    REPOS,
     resolve_trees_to_official,
     resolve_trees_to_uris,
     resolve_uri_to_tree,
@@ -362,6 +369,50 @@ def critic(ui, repo, rev='.', entire=False, **opts):
     critique(ui, repo, node=rev, entire=entire, **opts)
 
 
+@command('pushlogsync', [], _('hg pushlogsync'))
+def syncpushinfo(ui, repo, tree=None, **opts):
+    """Synchronize the pushlog information for all known Gecko trees.
+
+    The pushlog info contains who, when, and where individual changesets were
+    pushed.
+
+    After running this command, you can query for push information for specific
+    changesets.
+    """
+    tracker = ChangeTracker(repo.join('changetracker.db'))
+
+    for i, tree in enumerate(sorted(REPOS)):
+        tracker.load_pushlog(tree)
+        ui.progress('pushlogsync', i, total=len(REPOS))
+
+    ui.progress('pushlogsync', None)
+
+
+@command('changesetpushes',
+    [('a', 'all', False, _('Show all trees, not just release trees.'), '')],
+    _('hg changesetpushes REV'))
+def changesetpushes(ui, repo, rev, all=False, **opts):
+    """Display pushlog information for a changeset.
+
+    This command prints pushlog entries for a given changeset. It is used to
+    answer the question: how did a changeset propagate to all the trees.
+    """
+    ctx = repo[rev]
+    node = ctx.hex()
+
+    tracker = ChangeTracker(repo.join('changetracker.db'))
+    pushes = [p for p in tracker.pushes_for_changeset(node) if all or p[0] in
+        RELEASE_TREES]
+    longest_tree = max(len(p[0]) for p in pushes) + 2
+
+    ui.write(ctx.rev(), ':', str(ctx), ' ', ctx.description(), '\n')
+
+    ui.write('Tree'.ljust(longest_tree), 'Date'.ljust(19), ' Username\n')
+    for tree, push_id, when, user, head_changeset in pushes:
+        date = datetime.datetime.fromtimestamp(when)
+        ui.write(tree.ljust(longest_tree), date.isoformat(), ' ', user, '\n')
+
+
 def critic_hook(ui, repo, node=None, **opts):
     critique(ui, repo, node=node, **opts)
     return 0
@@ -479,6 +530,27 @@ def reposetup(ui, repo):
                     self.remoterefs['%s/%s' % (tree, branch)] = node
 
             self.remoterefs.write()
+
+        def _milestone_changesets(self):
+            """Look up Gecko milestone changes.
+
+            Returns a mapping of changeset node to milestone text.
+            """
+            m = {}
+
+            for rev in self.file('config/milestone.txt'):
+                ctx = self.filectx('config/milestone.txt', fileid=rev)
+
+                lines = ctx.data().splitlines()
+                lines = [l for l in lines if not l.startswith('#') and
+                    l.strip()]
+
+                if len(lines) != 1:
+                    continue
+
+                m[ctx.node()] = lines[0]
+
+            return m
 
     repo.__class__ = remotestrackingrepo
     if not ui.configbool('mozext', 'noautocritic'):

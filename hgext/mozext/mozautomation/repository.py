@@ -87,6 +87,8 @@ OFFICIAL_MAP = {
     'esr17': 'mozilla-esr17',
 }
 
+RELEASE_TREES = set(['central', 'aurora', 'beta', 'release', 'b2g18', 'esr17'])
+
 
 def resolve_trees_to_official(trees):
     mapped = []
@@ -187,3 +189,17 @@ class MercurialRepository(object):
 
         push_id = o.keys()[0]
         return PushInfo(push_id, o[push_id])
+
+    def push_info(self, full=False, start_id=0):
+        """Obtain all pushlog info for a repository."""
+
+        url = '%s/json-pushes?startID=%d' % (self.url, start_id)
+        if full:
+            url += '&full=1'
+        request = urllib2.Request(url)
+
+        response = self._opener.open(request)
+        pushes = json.load(response)
+
+        for push_id in sorted(int(k) for k in pushes):
+            yield push_id, pushes[str(push_id)]
