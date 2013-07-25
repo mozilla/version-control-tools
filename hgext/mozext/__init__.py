@@ -419,7 +419,8 @@ def changesetpushes(ui, repo, rev, all=False, **opts):
 
     ui.write(ctx.rev(), ':', str(ctx), ' ', ctx.description(), '\n')
 
-    ui.write('Tree'.ljust(longest_tree), 'Date'.ljust(19), ' Username\n')
+    ui.write('Tree'.ljust(longest_tree), 'Date'.ljust(20),
+            'Username'.ljust(longest_user), 'Build Info\n')
     for tree, push_id, when, user, head_changeset in pushes:
         tbpl = tbpl_url(tree, head_changeset[0:12])
         date = datetime.datetime.fromtimestamp(when)
