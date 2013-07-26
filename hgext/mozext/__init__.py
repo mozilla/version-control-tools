@@ -609,6 +609,7 @@ def reposetup(ui, repo):
 
                 if tree:
                     self._update_remote_refs(remote, tree)
+                    self.changetracker.load_pushlog(tree)
 
                 # Sync bug info.
                 for rev in self.changelog.revs(old_rev + 1):
