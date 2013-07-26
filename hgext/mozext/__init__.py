@@ -116,8 +116,6 @@ import sys
 
 from operator import methodcaller
 
-import mercurial.commands as commands
-
 from mercurial.i18n import _
 from mercurial.commands import (
     push,
@@ -132,6 +130,7 @@ from mercurial.node import (
     hex,
 )
 from mercurial import (
+    commands,
     cmdutil,
     demandimport,
     encoding,
@@ -503,6 +502,17 @@ def critic_hook(ui, repo, node=None, **opts):
     return 0
 
 
+def pullexpand(orig, ui, repo, source, **opts):
+    """Wraps built-in pull command to expand aliases to multiple sources."""
+    for tree, uri in resolve_trees_to_uris([source]):
+        result = orig(ui, repo, uri or tree, **opts)
+
+        if result:
+            return result
+
+    return 0
+
+
 class remoterefs(dict):
     """Represents a remote refs file."""
 
@@ -541,6 +551,8 @@ def extsetup(ui):
         bz_available = True
     except KeyError:
         pass
+
+    extensions.wrapcommand(commands.table, 'pull', pullexpand)
 
 
 def reposetup(ui, repo):
