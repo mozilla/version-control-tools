@@ -4,6 +4,8 @@
 
 from __future__ import unicode_literals
 
+import binascii
+import os
 import sqlite3
 
 from .repository import (
@@ -16,15 +18,29 @@ class ChangeTracker(object):
     """Data store for tracking changes and bugs and repository events."""
 
     def __init__(self, path):
+        self.path = path
+        self.created = False
+        if not os.path.exists(path):
+            self.created = True
+
         self._db = sqlite3.connect(path)
 
-        if not self._schema_current():
-            self._create_schema()
+        # We don't care about data loss because all data can be reconstructed
+        # relatively easily.
+        self._db.execute('PRAGMA SYNCHRONOUS=OFF')
+        self._db.execute('PRAGMA JOURNAL_MODE=WAL')
 
-    def _schema_current(self):
-        return self._db.execute('PRAGMA user_version').fetchone()[0] == 1
+        self._create_schema(self._schema_version)
 
-    def _create_schema(self):
+    @property
+    def _schema_version(self):
+        return self._db.execute('PRAGMA user_version').fetchone()[0]
+
+    def _create_schema(self, existing):
+        if existing < 2 and not self.created:
+            raise Exception("Incompatible local database detected. Delete "
+                "database file and try again: %s" % self.path)
+
         with self._db:
             self._db.execute('CREATE TABLE IF NOT EXISTS trees ('
                 'id INTEGER PRIMARY KEY AUTOINCREMENT, '
@@ -41,14 +57,23 @@ class ChangeTracker(object):
                 ')')
 
             self._db.execute('CREATE TABLE IF NOT EXISTS changeset_pushes ('
-                'changeset TEXT, '
-                'head_changeset TEXT, '
+                'changeset BLOB, '
+                'head_changeset BLOB, '
                 'push_id INTEGER, '
                 'tree_id INTEGER, '
                 'UNIQUE (changeset, tree_id) '
                 ')')
 
-            self._db.execute('PRAGMA user_version=1')
+            self._db.execute('CREATE TABLE IF NOT EXISTS bug_changesets ('
+                'bug INTEGER, '
+                'changeset BLOB, '
+                'UNIQUE (bug, changeset) '
+                ')')
+
+            self._db.execute('CREATE INDEX IF NOT EXISTS i_bug_changesets_bug '
+                'ON bug_changesets (bug)')
+
+            self._db.execute('PRAGMA user_version=2')
 
     def tree_id(self, tree, url=None):
         with self._db:
@@ -81,11 +106,12 @@ class ChangeTracker(object):
                 'user) VALUES (?, ?, ?, ?)', [push_id, tree_id, push['date'],
                     push['user']])
 
-                head = push['changesets'][0]
+                head = buffer(binascii.unhexlify(push['changesets'][0]))
 
-                for changeset in push['changesets']:
-                    self._db.execute('INSERT INTO changeset_pushes VALUES '
-                        '(?, ?, ?, ?)', [changeset, head, push_id, tree_id])
+                params = [(buffer(binascii.unhexlify(c)), head, push_id,
+                    tree_id) for c in push['changesets']]
+                self._db.executemany('INSERT INTO changeset_pushes VALUES '
+                    '(?, ?, ?, ?)', params)
 
     def pushes_for_changeset(self, changeset):
         for row in self._db.execute('SELECT trees.name, pushes.push_id, '
@@ -94,5 +120,23 @@ class ChangeTracker(object):
             'WHERE pushes.push_id = changeset_pushes.push_id AND '
             'pushes.tree_id = changeset_pushes.tree_id AND '
             'trees.id = pushes.tree_id AND changeset_pushes.changeset=? '
-            'ORDER BY pushes.time ASC', [changeset]):
+            'ORDER BY pushes.time ASC', [buffer(changeset)]):
             yield row
+
+    def associate_bugs_with_changeset(self, bugs, changeset):
+        """Associate a numeric bug number with a changeset.
+
+        This facilitates rapidly looking up changesets associated with
+        bugs.
+        """
+        if len(changeset) != 20:
+            raise ValueError('Expected binary changesets, not hex.')
+
+        with self._db:
+            self._db.executemany('INSERT OR REPLACE INTO bug_changesets '
+                'VALUES (?, ?)', [(bug, buffer(changeset)) for bug in bugs])
+
+    def changesets_with_bug(self, bug):
+        for row in self._db.execute('SELECT changeset FROM bug_changesets WHERE '
+            'bug = ?', [bug]):
+            yield str(row[0])

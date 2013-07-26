@@ -98,13 +98,23 @@ running `hg pushlogsync`.
 
 Once pushlog data is synced, you can use `hg changesetpushes` to look up push
 information for a specific changeset.
+
+Bug Info
+========
+
+Information about bugs is extracted from commit messages via the `hg bugsync`
+command. Once information about bugs is extracted, you can look up information
+about specific bugs via `hg buginfo`.
 """
 
 import datetime
 import errno
 import os
+import re
 import shutil
 import sys
+
+from operator import methodcaller
 
 import mercurial.commands as commands
 
@@ -390,30 +400,23 @@ def syncpushinfo(ui, repo, tree=None, **opts):
     After running this command, you can query for push information for specific
     changesets.
     """
-    tracker = ChangeTracker(repo.join('changetracker.db'))
-
     for i, tree in enumerate(sorted(REPOS)):
-        tracker.load_pushlog(tree)
+        repo.changetracker.load_pushlog(tree)
         ui.progress('pushlogsync', i, total=len(REPOS))
 
     ui.progress('pushlogsync', None)
 
 
-@command('changesetpushes',
-    [('a', 'all', False, _('Show all trees, not just release trees.'), '')],
-    _('hg changesetpushes REV'))
-def changesetpushes(ui, repo, rev, all=False, **opts):
-    """Display pushlog information for a changeset.
-
-    This command prints pushlog entries for a given changeset. It is used to
-    answer the question: how did a changeset propagate to all the trees.
-    """
+def print_changeset_pushes(ui, repo, rev, all=False):
     ctx = repo[rev]
-    node = ctx.hex()
+    node = ctx.node()
 
-    tracker = ChangeTracker(repo.join('changetracker.db'))
-    pushes = [p for p in tracker.pushes_for_changeset(node) if all or p[0] in
-        RELEASE_TREES]
+    pushes = repo.changetracker.pushes_for_changeset(node)
+    pushes = [p for p in pushes if all or p[0] in RELEASE_TREES]
+    if not pushes:
+        ui.warn('No pushes recorded for changeset: ', str(ctx), '\n')
+        return 1
+
     longest_tree = max(len(p[0]) for p in pushes) + 2
     longest_user = max(len(p[3]) for p in pushes) + 2
 
@@ -421,7 +424,7 @@ def changesetpushes(ui, repo, rev, all=False, **opts):
 
     ui.write('Release ', 'Tree'.ljust(longest_tree), 'Date'.ljust(20),
             'Username'.ljust(longest_user), 'Build Info\n')
-    for tree, push_id, when, user, head_changeset in pushes:
+    for tree, push_id, when, user, head_node in pushes:
         releases = set()
         release = ''
         versions = {}
@@ -439,10 +442,60 @@ def changesetpushes(ui, repo, rev, all=False, **opts):
         if len(releases):
             release = sorted(releases)[0]
 
-        tbpl = tbpl_url(tree, head_changeset[0:12])
+        tbpl = tbpl_url(tree, hex(head_node)[0:12])
         date = datetime.datetime.fromtimestamp(when)
         ui.write(release.ljust(8), tree.ljust(longest_tree), date.isoformat(),
             ' ', user.ljust(longest_user), tbpl or '', '\n')
+
+
+@command('changesetpushes',
+    [('a', 'all', False, _('Show all trees, not just release trees.'), '')],
+    _('hg changesetpushes REV'))
+def changesetpushes(ui, repo, rev, all=False, **opts):
+    """Display pushlog information for a changeset.
+
+    This command prints pushlog entries for a given changeset. It is used to
+    answer the question: how did a changeset propagate to all the trees.
+    """
+    print_changeset_pushes(ui, repo, rev, all=all)
+
+
+@command('bugsync', [], 'hg bugsync')
+def syncbuginfo(ui, repo, **opts):
+    """Synchronize bug info with the local database.
+
+    This command must be performed before `hg buginfo` to ensure the data is up
+    to date.
+    """
+    for rev in repo:
+        ui.progress('changeset', rev, total=len(repo))
+        ctx = repo[rev]
+
+        bugs = repo._bugs_in_description(ctx.description())
+        if not bugs:
+            continue
+        repo.changetracker.associate_bugs_with_changeset(bugs, ctx.node())
+
+    ui.progress('changeset', None)
+
+
+@command('buginfo',
+    [('a', 'all', False, _('Show all trees, not just release trees.'), '')],
+    _('hg buginfo [BUG] ...'))
+def buginfo(ui, repo, *bugs, **opts):
+    tracker = ChangeTracker(repo.join('changetracker.db'))
+
+    nodes = set()
+    for bug in bugs:
+        nodes |= set(tracker.changesets_with_bug(bug))
+
+    # Sorting by topological order would probably be preferred. This is quick
+    # and easy.
+    contexts = sorted([repo[node] for node in nodes], key=methodcaller('rev'))
+
+    for ctx in contexts:
+        print_changeset_pushes(ui, repo, ctx.rev(), all=opts['all'])
+        ui.write('\n')
 
 
 def critic_hook(ui, repo, node=None, **opts):
@@ -510,6 +563,13 @@ def reposetup(ui, repo):
         def remoterefs(self):
             return remoterefs(self)
 
+        @util.propertycache
+        def changetracker(self):
+            try:
+                return ChangeTracker(self.join('changetracker.db'))
+            except Exception as e:
+                raise util.Abort(e.message)
+
         # Resolve remote ref symbols. For some reason, we need both lookup
         # and findtags implemented.
         def lookup(self, key):
@@ -529,6 +589,7 @@ def reposetup(ui, repo):
         def pull(self, remote, *args, **kwargs):
             # Pulls from known repositories will automatically update our
             # remote tracking references.
+            old_rev = len(self)
             res = orig_pull(remote, *args, **kwargs)
             lock = self.wlock()
             try:
@@ -536,6 +597,14 @@ def reposetup(ui, repo):
 
                 if tree:
                     self._update_remote_refs(remote, tree)
+
+                # Sync bug info.
+                for rev in self.changelog.revs(old_rev + 1):
+                    ctx = self[rev]
+                    bugs = self._bugs_in_description(ctx.description())
+                    if bugs:
+                        self.changetracker.associate_bugs_with_changeset(bugs,
+                            ctx.node())
 
             finally:
                 lock.release()
@@ -624,6 +693,23 @@ def reposetup(ui, repo):
                 d[version] = (key, node, major, minor, marker or None, after or None)
 
             return d
+
+        BUG_RE = re.compile(r'''# bug followed by any sequence of numbers, or
+                                # a standalone sequence of numbers
+                             (
+                               (?:
+                                 bug |
+                                 b= |
+                                 # a sequence of 5+ numbers preceded by whitespace
+                                 (?=\b\#?\d{5,}) |
+                                 # numbers at the very beginning
+                                 ^(?=\d)
+                               )
+                               (?:\s*\#?)(\d+)
+                             )''', re.I | re.X)
+
+        def _bugs_in_description(self, desc):
+            return [int(m[1]) for m in self.BUG_RE.findall(desc)]
 
     repo.__class__ = remotestrackingrepo
     if not ui.configbool('mozext', 'noautocritic'):
