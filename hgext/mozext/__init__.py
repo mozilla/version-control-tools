@@ -502,7 +502,7 @@ def critic_hook(ui, repo, node=None, **opts):
     return 0
 
 
-def pullexpand(orig, ui, repo, source, **opts):
+def pullexpand(orig, ui, repo, source='default', **opts):
     """Wraps built-in pull command to expand aliases to multiple sources."""
     for tree, uri in resolve_trees_to_uris([source]):
         result = orig(ui, repo, uri or tree, **opts)
