@@ -22,18 +22,17 @@ class ChangeTracker(object):
             self._create_schema()
 
     def _schema_current(self):
-        return self._db.execute('SELECT COUNT(*) FROM SQLITE_MASTER WHERE '
-            'name="trees"').fetchone()[0] == 1
+        return self._db.execute('PRAGMA user_version').fetchone()[0] == 1
 
     def _create_schema(self):
         with self._db:
-            self._db.execute('CREATE TABLE trees ('
+            self._db.execute('CREATE TABLE IF NOT EXISTS trees ('
                 'id INTEGER PRIMARY KEY AUTOINCREMENT, '
                 'name TEXT, '
                 'url TEXT '
                 ')')
 
-            self._db.execute('CREATE TABLE pushes ('
+            self._db.execute('CREATE TABLE IF NOT EXISTS pushes ('
                 'push_id INTEGER, '
                 'tree_id INTEGER, '
                 'time INTEGER, '
@@ -41,13 +40,15 @@ class ChangeTracker(object):
                 'PRIMARY KEY (push_id, tree_id) '
                 ')')
 
-            self._db.execute('CREATE TABLE changeset_pushes ('
+            self._db.execute('CREATE TABLE IF NOT EXISTS changeset_pushes ('
                 'changeset TEXT, '
                 'head_changeset TEXT, '
                 'push_id INTEGER, '
                 'tree_id INTEGER, '
                 'UNIQUE (changeset, tree_id) '
                 ')')
+
+            self._db.execute('PRAGMA user_version=1')
 
     def tree_id(self, tree, url=None):
         with self._db:
