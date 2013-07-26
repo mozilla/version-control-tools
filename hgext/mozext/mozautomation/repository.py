@@ -32,6 +32,7 @@ TREE_ALIASES = {
     'b2g-inbound': ('b2ginbound',),
 
     'releases': ('esr17', 'b2g18', 'release', 'beta', 'aurora', 'central'),
+    'integration': ('inbound', 'fx-team', 'services', 'build', 'b2ginbound'),
 }
 
 BASE_READ_URI = 'https://hg.mozilla.org/'
