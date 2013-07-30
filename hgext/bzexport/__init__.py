@@ -855,11 +855,13 @@ def bzexport(ui, repo, *args, **opts):
 
     # If attaching to an existing bug (and not suppressed on the command line), take the bug
     if not opts['new'] and not opts['no_take_bug']:
-        req = bz.get_bug(api_server, auth, bug, include_fields=[ 'assigned_to' ])
+        req = bz.get_bug(api_server, auth, bug, include_fields=[ 'assigned_to', 'status' ])
         result = json.load(urlopen(ui, req))
         taker = auth.username(api_server)
         if result['assigned_to']['name'] != taker:
             result['assigned_to'] = { 'name': taker }
+            if result['status'] != 'RESOLVED':
+                result['status'] = 'ASSIGNED'
             req = bz.update_bug(api_server, auth, result)
             try:
                 result = json.load(urlopen(ui, req))

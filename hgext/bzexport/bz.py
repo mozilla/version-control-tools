@@ -48,6 +48,7 @@ def create_bug(api_server, token, product, component, version, title, descriptio
 
     if assign_to:
         json_data['assigned_to'] = {"name": assign_to}
+        json_data['status'] = 'ASSIGNED'
 
     return urllib2.Request(url, json.dumps(json_data), JSON_HEADERS)
 
