@@ -102,9 +102,9 @@ information for a specific changeset.
 Bug Info
 ========
 
-Information about bugs is extracted from commit messages via the `hg bugsync`
-command. Once information about bugs is extracted, you can look up information
-about specific bugs via `hg buginfo`.
+Information about bugs is extracted from commit messages as changesets are
+introduced into the repository. You can look up information about specific
+bugs via `hg buginfo`.
 """
 
 import datetime
@@ -460,29 +460,20 @@ def changesetpushes(ui, repo, rev, all=False, **opts):
     print_changeset_pushes(ui, repo, rev, all=all)
 
 
-@command('bugsync', [], 'hg bugsync')
-def syncbuginfo(ui, repo, **opts):
-    """Synchronize bug info with the local database.
-
-    This command must be performed before `hg buginfo` to ensure the data is up
-    to date.
-    """
-    for rev in repo:
-        ui.progress('changeset', rev, total=len(repo))
-        ctx = repo[rev]
-
-        bugs = repo._bugs_in_description(ctx.description())
-        if not bugs:
-            continue
-        repo.changetracker.associate_bugs_with_changeset(bugs, ctx.node())
-
-    ui.progress('changeset', None)
-
-
-@command('buginfo',
-    [('a', 'all', False, _('Show all trees, not just release trees.'), '')],
-    _('hg buginfo [BUG] ...'))
+@command('buginfo', [
+    ('a', 'all', False, _('Show all trees, not just release trees.'), ''),
+    ('', 'reset', False, _('Wipe and repopulate the bug database.'), ''),
+    ('', 'sync', False, _('Synchronize the bug database.'), ''),
+    ], _('hg buginfo [BUG] ...'))
 def buginfo(ui, repo, *bugs, **opts):
+    if opts['sync']:
+        repo.sync_bug_database()
+        return
+
+    if opts['reset']:
+        repo.reset_bug_database()
+        return
+
     tracker = ChangeTracker(repo.join('changetracker.db'))
 
     nodes = set()
@@ -707,6 +698,21 @@ def reposetup(ui, repo):
                 d[version] = (key, node, major, minor, marker or None, after or None)
 
             return d
+
+        def reset_bug_database(self):
+            self.changetracker.wipe_bugs()
+            self.sync_bug_database()
+
+        def sync_bug_database(self):
+            for rev in self:
+                ui.progress('changeset', rev, total=len(self))
+                ctx = self[rev]
+                bugs = self._bugs_in_description(ctx.description())
+                if bugs:
+                    self.changetracker.associate_bugs_with_changeset(bugs,
+                        ctx.node())
+
+            ui.progress('changeset', None)
 
         BUG_RE = re.compile(r'''# bug followed by any sequence of numbers, or
                                 # a standalone sequence of numbers

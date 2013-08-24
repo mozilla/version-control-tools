@@ -140,3 +140,7 @@ class ChangeTracker(object):
         for row in self._db.execute('SELECT changeset FROM bug_changesets WHERE '
             'bug = ?', [bug]):
             yield str(row[0])
+
+    def wipe_bugs(self):
+        with self._db:
+            self._db.execute('DELETE FROM bug_changesets')
