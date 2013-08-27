@@ -712,6 +712,13 @@ def bzexport(ui, repo, *args, **opts):
         if desc[0] in ['-', ':', '.']:
             desc = desc[1:].lstrip()
 
+        # Next, just take the first line in case. If there is more than one
+        # line, use it as a comment.
+        m = re.match(r'([^\n]*)\n+(.*)', desc, re.DOTALL)
+        if m:
+            desc = m.group(1)
+            patch_comment = m.group(2)
+
         # Next strip off review and approval annotations, grabbing the
         # reviewers from the patch comments only if -r auto was given
         def grab_reviewer(m):
@@ -721,13 +728,6 @@ def bzexport(ui, repo, *args, **opts):
         desc = review_re.sub(grab_reviewer, desc).rstrip()
         if len(reviewers) > 0:
             opts['review'] = ''
-
-        # Finally, just take the first line in case. If there is more than one
-        # line, use it as a comment.
-        m = re.match(r'([^\n]*)\n+(.*)', desc, re.DOTALL)
-        if m:
-            desc = m.group(1)
-            patch_comment = m.group(2)
 
     attachment_comment = opts['comment']
     bug_comment = opts['bug_description']
