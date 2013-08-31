@@ -573,7 +573,9 @@ def qrefresh_wrapper(orig, self, repo, *pats, **opts):
                                    stat=True)
             diffstat = self.popbuffer()
 
-    orig(self, repo, *pats, **opts)
+    ret = orig(self, repo, *pats, **opts)
+    if ret:
+        return ret
 
     if mqcommit and len(q.applied) > 0:
         patch = q.applied[-1].name
@@ -589,7 +591,9 @@ def qnew_wrapper(orig, self, repo, patchfn, *pats, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
-    orig(self, repo, patchfn, *pats, **opts)
+    ret = orig(self, repo, patchfn, *pats, **opts)
+    if ret:
+        return ret
 
     if mqcommit and mqmessage:
         mqmessage = substitute_mqmessage(mqmessage, repo, { 'p': patchfn,
@@ -601,7 +605,9 @@ def qimport_wrapper(orig, self, repo, *filename, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
-    orig(self, repo, *filename, **opts)
+    ret = orig(self, repo, *filename, **opts)
+    if ret:
+        return ret
 
     if mqcommit and mqmessage:
         # FIXME - can be multiple
@@ -621,7 +627,9 @@ def qrename_wrapper(orig, self, repo, patch, name=None, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
-    orig(self, repo, patch, name, **opts)
+    ret = orig(self, repo, patch, name, **opts)
+    if ret:
+        return ret
 
     if mqcommit and mqmessage:
         if not name:
@@ -643,7 +651,9 @@ def qdelete_wrapper(orig, self, repo, *patches, **opts):
     if mqcommit and mqmessage:
         patchnames = [ q.lookup(p) for p in patches ]
 
-    orig(self, repo, *patches, **opts)
+    ret = orig(self, repo, *patches, **opts)
+    if ret:
+        return ret
 
     if mqcommit and mqmessage:
         mqmessage = substitute_mqmessage(mqmessage, repo,
@@ -684,7 +694,9 @@ def qfinish_wrapper(orig, self, repo, *revrange, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
-    orig(self, repo, *revrange, **opts)
+    ret = orig(self, repo, *revrange, **opts)
+    if ret:
+        return ret
 
     if mqcommit and mqmessage:
         mqmessage = substitute_mqmessage(mqmessage, repo, { })
@@ -698,7 +710,9 @@ def qfold_wrapper(orig, self, repo, *files, **opts):
     if mqcommit and mqmessage:
         patchnames = [ q.lookup(p) or p for p in files ]
 
-    orig(self, repo, *files, **opts)
+    ret = orig(self, repo, *files, **opts)
+    if ret:
+        return ret
 
     if mqcommit and mqmessage:
         mqmessage = substitute_mqmessage(mqmessage, repo, { 'a': 'FOLD',
@@ -711,7 +725,9 @@ def qcrecord_wrapper(orig, self, repo, patchfn, *pats, **opts):
     mqmessage = opts.pop('mqmessage', None)
     mqcommit, q, r = mqcommit_info(self, repo, opts)
 
-    orig(self, repo, patchfn, *pats, **opts)
+    ret = orig(self, repo, patchfn, *pats, **opts)
+    if ret:
+        return ret
 
     if mqcommit and mqmessage:
         mqmessage = substitute_mqmessage(mqmessage, repo, { 'p': patchfn,
