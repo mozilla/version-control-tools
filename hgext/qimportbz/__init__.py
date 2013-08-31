@@ -165,7 +165,9 @@ def extsetup(ui=None):
     # and the rest are stored in the global delayed_imports. The imported
     # patches have dumb filenames because there's no way to tell mq to pick the
     # patch name *after* download.
-    orig(ui, repo, *files, **opts)
+    ret = orig(ui, repo, *files, **opts)
+    if ret:
+      return ret
 
     # If the user passed a name, then mq used that so we don't need to rename
     if not opts['name']:
@@ -208,7 +210,9 @@ def extsetup(ui=None):
       newopts['name'] = checkpatchname(patch)
       path = makebzurl(patch.bug.num, patch.id)
 
-      orig(ui, repo, path, **newopts)
+      ret = orig(ui, repo, path, **newopts)
+      if ret:
+        return ret
 
   extensions.wrapcommand(cmdtable, 'qimport', qimporthook)
 
