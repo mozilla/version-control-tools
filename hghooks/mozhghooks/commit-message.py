@@ -30,11 +30,11 @@ goodMessage = [re.compile(x, re.I) for x in [
 
 def isGoodMessage(c):
     def message(fmt):
-        #print fmt.format(rev = hex(c.node())[:12]) Disabled for python 2.4
-        print fmt.replace('{rev}', hex(c.node())[:12])
+        print "\n\n************************** ERROR ****************************"
+        print fmt.format(rev = hex(c.node())[:12])
         print c.user()
         print c.description()
-        print ""
+        print "*************************************************************\n\n"
 
     desc = c.description()
     if c.user() in ["ffxbld", "seabld", "tbirdbld", "cltbld", "Gaia Pushbot <release+gaiajson@mozilla.com>"]:

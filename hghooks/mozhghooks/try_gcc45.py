@@ -78,9 +78,11 @@ def hook(ui, repo, **kwargs):
             if repo.changectx('tip').ancestor(base) != base:
                 raise
         except:
-            print "WARNING: You are pushing a changeset that is likely to fail to build"
+            print "\n\n************************* WARNING ***************************"
+            print "You are pushing a changeset that is likely to fail to build"
             print "on Linux bots if you haven't done something about it."
             print "Please see https://wiki.mozilla.org/ReleaseEngineering/TryServer#Using_older_GCC"
             print "for more details."
+            print "*************************************************************\n\n"
 
     return 0

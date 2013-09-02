@@ -25,6 +25,11 @@ magicwords = "CLOSED TREE"
 
 treestatus_base_url = "https://treestatus.mozilla.org"
 
+def printError(message):
+    print "\n\n************************** ERROR ****************************"
+    print message
+    print "*************************************************************\n\n"
+
 def hook(ui, repo, **kwargs):
     name = os.path.basename(repo.root)
     url = "%s/%s?format=json" % (treestatus_base_url, name)
@@ -36,7 +41,7 @@ def hook(ui, repo, **kwargs):
 
             # Block the push unless they know the magic words
             if repo.changectx('tip').description().find(magicwords) == -1:
-                print "To push despite the closed tree, include \"%s\" in your push comment" % magicwords
+                printError("To push despite the closed tree, include \"%s\" in your push comment" % magicwords)
                 return 1
 
             print "But you included the magic words.  Hope you had permission!"
@@ -47,14 +52,15 @@ def hook(ui, repo, **kwargs):
             if re.search('a\S*=', dlower) or dlower.startswith('back') or dlower.startswith('revert'):
                 return 0
 
-            print "Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)"
+            printError("Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)")
             return 1
 
     except (ValueError, IOError), (err):
         # fail closed if treestatus is down, unless the magic words have been used
-        print "Error accessing %s: %s" % (url, err)
-        print "Unable to check if the tree is open - treating as if CLOSED."
+        printError("Error accessing %s :\n"
+                   "%s\n"
+                   "Unable to check if the tree is open - treating as if CLOSED.\n"
+                   "To push regardless, include \"%s\" in your push comment." % (url, err, magicwords))
         if repo.changectx('tip').description().find(magicwords) == -1:
-            print "To push despite treestatus being unavailable, include \"%s\" in your push comment" % magicwords
             return 1
     return 0

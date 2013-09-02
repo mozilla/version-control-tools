@@ -34,5 +34,7 @@ def hook(ui, repo, node, hooktype, **kwargs):
                 continue
             if f.lower() == r[0].lower():
                 rejecting = True
-                print "Error: file rename in changeset %s only changes file case! (%s to %s)" % (short(hex(ctx.node())), r[0], f)
+                print "\n\n************************** ERROR ****************************"
+                print "File rename in changeset %s only changes file case! (%s to %s)" % (short(hex(ctx.node())), r[0], f)
+                print "*************************************************************\n\n"
     return 1 if rejecting else 0

@@ -31,6 +31,11 @@ magicwords = "CLOSED TREE"
 
 treestatus_base_url = "https://treestatus.mozilla.org"
 
+def printError(message):
+    print "\n\n************************** ERROR ****************************"
+    print message
+    print "*************************************************************\n\n"
+
 # This function actually does the checking to see if a tree is closed or set
 # to approval required.
 def checkJsonTreeState(repo, repoName, appName):
@@ -49,7 +54,7 @@ def checkJsonTreeState(repo, repoName, appName):
 
             # Block the push if no magic words
             if repo.changectx('tip').description().find(magicwords) == -1:
-                print "To push despite the closed tree, include \"%s\" in your push comment" % magicwords
+                printError("To push despite the closed tree, include \"%s\" in your push comment" % magicwords)
                 return 1
 
             # Otherwise let them push
@@ -65,15 +70,16 @@ def checkJsonTreeState(repo, repoName, appName):
                 return 0
 
             # Otherwise tell them about the rule
-            print "Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)"
+            printError("Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)")
             return 1
 
-    except IOError, (err):
+    except (ValueError, IOError), (err):
         # fail closed if treestatus is down, unless the magic words have been used
-        print "Error accessing %s: %s" % (url, err)
-        print "Unable to check if the tree is open - treating as if CLOSED."
+        printError("Error accessing %s :\n"
+                   "%s\n"
+                   "Unable to check if the tree is open - treating as if CLOSED.\n"
+                   "To push regardless, include \"%s\" in your push comment." % (url, err, magicwords))
         if repo.changectx('tip').description().find(magicwords) == -1:
-            print "To push despite treestatus being unavailable, include \"%s\" in your push comment" % magicwords
             return 1
 
     # By default the tree is open
@@ -116,6 +122,7 @@ def hook(ui, repo, node, **kwargs):
         return status;
 
     except IOError, (err):
+        #TODO: Below obsolete?
         # fail open, I guess. no sense making hg unavailable
         # if the wiki is down
         print "IOError: %s" % err
