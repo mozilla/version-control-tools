@@ -167,23 +167,22 @@ def extsetup(ui=None):
       # cache the lookup of the name. findcmd is not fast.
       qrename = cmdutil.findcmd("qrename", commands.table)[1][0]
 
-      # For all the already imported patches, rename them. Except there will
-      # only be one, since if the url resolves to multiple patches then
-      # everything but the first will go into bzhandler.delayed_imports.
-      for (patch, path) in list(bzhandler.imported_patches):
-        try:
-          # hg 1.9+
-          oldpatchname = q.fullseries[q.fullseriesend()]
-        except:
-          oldpatchname = q.full_series[q.full_series_end()]
-        newpatchname = checkpatchname(patch)
-        if newpatchname != oldpatchname:
-          qrename(ui, repo, oldpatchname, newpatchname)
-          # mq always reports the original name, which is confusing so we'll
-          # report the rename. But if ui.verbose is on, qrename will have
-          # already reported it.
-          if not ui.verbose:
-            ui.write("renamed %s -> %s\n" % (oldpatchname, newpatchname))
+      # Rename the already imported patch. If there are multiple patches, the
+      # rest will be in bzhandler.delayed_imports, which we'll name correctly
+      # in the first place.
+      try:
+        # hg 1.9+
+        oldpatchname = q.fullseries[q.fullseriesend()]
+      except:
+        oldpatchname = q.full_series[q.full_series_end()]
+      newpatchname = checkpatchname(bzhandler.last_imported_patch())
+      if newpatchname != oldpatchname:
+        qrename(ui, repo, oldpatchname, newpatchname)
+        # mq always reports the original name, which is confusing so we'll
+        # report the rename. But if ui.verbose is on, qrename will have already
+        # reported it.
+        if not ui.verbose:
+          ui.write("renamed %s -> %s\n" % (oldpatchname, newpatchname))
 
     # now process the delayed imports
 
