@@ -14,6 +14,7 @@ hgNameToRevURL = {
     'mozilla-release':  'releases/mozilla-release/',
     'mozilla-esr10':    'releases/mozilla-esr10/',
     'mozilla-esr17':    'releases/mozilla-esr17/',
+    'mozilla-esr24':    'releases/mozilla-esr24/',
     'mozilla-b2g18':    'releases/mozilla-b2g18/',
     'mozilla-b2g18_v1_0_0':    'releases/mozilla-b2g18_v1_0_0/',
     'mozilla-b2g18_v1_0_1':    'releases/mozilla-b2g18_v1_0_1/',
@@ -23,6 +24,7 @@ hgNameToRevURL = {
     'comm-release':     'releases/comm-release/',
     'comm-esr10':       'releases/comm-esr10/',
     'comm-esr17':       'releases/comm-esr17/',
+    'comm-esr24':       'releases/comm-esr24/',
     'services-central': 'services/services-central/',
 }
 
