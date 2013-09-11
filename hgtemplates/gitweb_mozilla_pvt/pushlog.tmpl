@@ -18,9 +18,7 @@ $(document).ready(function () \{
      });
      return false;
   });
-  // hide things that should be hidden
-  $('.hidden').hide();
-  // add click handler to unhide hidden things
+  // add click handler to toggle collapsible sections
   $('.expand').click(function () \{
     if ($(this).text() == "[Expand]")
       $(this).text("[Collapse]");
@@ -63,7 +61,7 @@ Page {changenav%navpushentry}<br/>
 
 <div class="title">{querydescription}</div>
 <table cellspacing="0">
-<tr><th>User<br/>Push date <a href="#" id="localize" style="display:none">[To Local]</a></th><th>Changeset</th><th>Patch author &mdash; Commit message</th></tr>
+<tr><th>User<br/>Push date <a href="#" id="localize">[To Local]</a></th><th>Changeset</th><th>Patch author &mdash; Commit message</th></tr>
 {entries%pushlogentry}
 </table>
 
