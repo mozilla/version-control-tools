@@ -35,7 +35,6 @@ def addwebcommand(f, name):
     hgwebcommands.__all__.append(name)
 
 ATOM_MIMETYPE = 'application/atom+xml'
-ACL_HEADER = 'Access-Control-Allow-Origin', '*'
 
 # just an enum
 class QueryType:
@@ -322,7 +321,6 @@ def pushlogFeed(web, req, tmpl):
             'files': [{'name': fn} for fn in ctx.files()],
         })
 
-    req.headers.append(ACL_HEADER)
     req.respond(HTTP_OK, ATOM_MIMETYPE)
     return tmpl('pushlog', **data)
 
@@ -426,7 +424,6 @@ def pushlogHTML(web, req, tmpl):
 
     parity = paritygen(web.stripecount)
 
-    req.headers.append(ACL_HEADER)
     return tmpl('pushlog',
                 changenav=changenav(),
                 rev=0,
@@ -465,7 +462,6 @@ def pushes_worker(query, web = None):
 def pushes(web, req, tmpl):
     """WebCommand to return a data structure containing pushes."""
     query = pushlogSetup(web.repo, req)
-    req.headers.append(ACL_HEADER)
     return tmpl('pushes', data=pushes_worker(query, 'full' in req.form and web))
 
 def printpushlog(ui, repo, *args):

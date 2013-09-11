@@ -198,24 +198,6 @@ class TestPushlog(HGWebTest, unittest.TestCase):
         expectedjson = loadjsonfile("testdata/test-repo-data.json")
         self.assertEqual(testjson, expectedjson, "printpushlog did not yield expected json data!")
 
-    def testaccesscontrolatom(self):
-        """Ensure that /pushlog feed sends Access-Control-Allow-Origin headers."""
-        conn = HTTPConnection("localhost", self.port)
-        conn.request("GET", "/pushlog")
-        r = conn.getresponse()
-        conn.close()
-        h = r.getheader("Access-Control-Allow-Origin", None)
-        self.assertEqual(h, "*", "/pushlog should send Access-Control-Allow-Origin")
-
-    def testaccesscontroljson(self):
-        """Ensure that /json-pushes sends Access-Control-Allow-Origin headers."""
-        conn = HTTPConnection("localhost", self.port)
-        conn.request("GET", "/json-pushes")
-        r = conn.getresponse()
-        conn.close()
-        h = r.getheader("Access-Control-Allow-Origin", None)
-        self.assertEqual(h, "*", "/json-pushes should send Access-Control-Allow-Origin")
-
     def assertEqualFeeds(self, a, b):
         self.assertEqual(a.feed.updated, b.feed.updated, "not the same updated time, %s != %s" % (a.feed.updated, b.feed.updated))
         self.assertEqual(len(a.entries), len(b.entries), "not the same number of entries, %d != %d" % (len(a.entries), len(b.entries)))
