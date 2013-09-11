@@ -95,6 +95,16 @@ class Patch(Attachment):
         # BugZilla is not explicit about patch encoding. We need to check it's utf-8.
         # utf-8: convert from 8-bit encoding to internal (16/32-bit) Unicode.
         self.data = fp.read().decode('utf-8')
+        # Attempt to detect the start of the diff. Borrowed from:
+        # http://selenic.com/hg/file/79e5de2bfa8c/mercurial/patch.py#l163
+        diffre = re.compile(r'^(?:Index:[ \t]|diff[ \t]|RCS file: |'
+                            r'retrieving revision [0-9]+(\.[0-9]+)*$|'
+                            r'---[ \t].*?^\+\+\+[ \t]|'
+                            r'\*\*\*[ \t].*?^---[ \t])', re.MULTILINE|re.DOTALL)
+        m = diffre.search(self.data)
+        if m:
+          # Remove the patch header, since we'll be re-adding a cleaned up version later.
+          self.data = self.data[m.start(0):]
       except UnicodeDecodeError:
         # Ftr, this could be due to the (included) message part: see later message block.
         bug.settings.ui.warn("Patch id=%s desc=\"%s\" diff data were discarded:\n" % (self.id, self.desc))
