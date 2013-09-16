@@ -31,7 +31,7 @@ TREE_ALIASES = {
     'mozilla-b2g18': ('b2g18',),
     'b2g-inbound': ('b2ginbound',),
 
-    'releases': ('esr17', 'b2g18', 'release', 'beta', 'aurora', 'central'),
+    'releases': ('esr17', 'b2g18', 'esr24', 'release', 'beta', 'aurora', 'central'),
     'integration': ('inbound', 'fx-team', 'services', 'build', 'b2ginbound'),
 }
 
@@ -44,7 +44,9 @@ REPOS = {
     'aurora': 'releases/mozilla-aurora',
     'beta': 'releases/mozilla-beta',
     'release': 'releases/mozilla-release',
+    'esr10': 'releases/mozilla-esr10',
     'esr17': 'releases/mozilla-esr17',
+    'est24': 'releases/mozilla-esr24',
     'b2g18': 'releases/mozilla-b2g18',
 
     # Integration repositories.
