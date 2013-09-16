@@ -159,7 +159,7 @@ def extsetup(ui=None):
     # patches have dumb filenames because there's no way to tell mq to pick the
     # patch name *after* download.
     ret = orig(ui, repo, *files, **opts)
-    if ret:
+    if ret or bzhandler.last_imported_patch() is None:
       return ret
 
     # If the user passed a name, then mq used that so we don't need to rename
