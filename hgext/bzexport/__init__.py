@@ -513,6 +513,10 @@ def fill_values(values, ui, api_server, reviewers=None, finalize=False):
         if values['BUGTITLE'] in [None, '<required>']:
             values['BUGTITLE'] = ui.prompt(_("Bug title:"))
 
+    if 'BUGCOMMENT0' in values:
+        if values['BUGCOMMENT0'] in [None, '<required>']:
+            values['BUGCOMMENT0'] = ui.prompt(_("Bug description:"))
+
     if 'ATTACHMENT_DESCRIPTION' in values:
         if values['ATTACHMENT_DESCRIPTION'] in [None, '<required>']:
             values['ATTACHMENT_DESCRIPTION'] = ui.prompt(_("Patch description:"), default=values['ATTACHMENT_FILENAME'])
@@ -931,7 +935,7 @@ def newbug(ui, repo, *args, **opts):
     if args:
         raise util.Abort(_("Too many arguments to newbug command (only title and comment may be given)"))
 
-    bug_comment = opts['comment']
+    bug_comment = opts['comment'] or '<required>'
 
     values = { 'BUGTITLE': opts['title'] or '<required>',
                'PRODUCT': opts.get('product', '') or ui.config("bzexport", "product", '<choose-from-menu>'),
