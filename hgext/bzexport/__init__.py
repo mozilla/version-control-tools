@@ -870,10 +870,14 @@ def bzexport(ui, repo, *args, **opts):
             extra_args['product'] = buginfo['product']
             extra_args['component'] = buginfo['component']
 
+    description = values['ATTACHMENT_DESCRIPTION']
+    if opts['number']:
+        description = "Patch " + opts['number'] + " - " + description
+
     result = create_attachment(ui, api_server, auth,
                                bug, BINARY_CACHE_FILENAME, contents.getvalue(),
                                filename=filename,
-                               description=values['ATTACHMENT_DESCRIPTION'],
+                               description=description,
                                comment=values['ATTACHCOMMENT'],
                                **extra_args)
     attachment_url = urlparse.urljoin(bugzilla,
@@ -1001,6 +1005,8 @@ cmdtable = {
            'Update patch name and description to include bug number (only valid with --new)'),
           ('', 'no-update', None,
            'Suppress patch name/description update (override config file)'),
+          ('', 'number', '',
+           'When posting, prefix the patch description with "Patch <number> - "'),
           # The following option is passed through directly to patch.diffopts
           ('w', 'ignore_all_space', False, 'Generate a diff that ignores whitespace changes')],
          _('hg bzexport [options] [REV] [BUG]')),
