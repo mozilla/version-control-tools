@@ -46,7 +46,7 @@ REPOS = {
     'release': 'releases/mozilla-release',
     'esr10': 'releases/mozilla-esr10',
     'esr17': 'releases/mozilla-esr17',
-    'est24': 'releases/mozilla-esr24',
+    'esr24': 'releases/mozilla-esr24',
     'b2g18': 'releases/mozilla-b2g18',
 
     # Integration repositories.
@@ -90,7 +90,15 @@ OFFICIAL_MAP = {
     'esr17': 'mozilla-esr17',
 }
 
-RELEASE_TREES = set(['central', 'aurora', 'beta', 'release', 'b2g18', 'esr17'])
+RELEASE_TREES = {
+    'central',
+    'aurora',
+    'beta',
+    'release',
+    'b2g18',
+    'esr17',
+    'esr24',
+}
 
 
 def resolve_trees_to_official(trees):
