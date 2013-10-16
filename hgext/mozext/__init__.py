@@ -499,7 +499,7 @@ def critic_hook(ui, repo, node=None, **opts):
 
 
 def reject_repo_names_hook(ui, repo, namespace=None, key=None, old=None,
-        new=None):
+        new=None, **kwargs):
     """prepushkey hook that prevents changes to reserved names.
 
     Names that begin with the name of a repository identifier are rejected.
