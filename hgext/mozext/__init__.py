@@ -71,6 +71,10 @@ and push operations.
 
 This feature is similar to Git remote refs.
 
+If the config bool ``refs_as_bookmarks`` is True, remote references will be
+stored in the repo's bookmarks file. This is useful for hosted unified
+repositories.
+
 Static Analysis
 ===============
 
@@ -631,11 +635,21 @@ def reposetup(ui, repo):
             return res
 
         def _update_remote_refs(self, remote, tree):
+            mb = self.ui.configbool('mozext', 'refs_as_bookmarks',
+                default=False)
+
             for branch, nodes in remote.branchmap().items():
                 for node in nodes:
-                    self.remoterefs['%s/%s' % (tree, branch)] = node
+                    ref = '%s/%s' % (tree, branch)
+                    self.remoterefs[ref] = node
+
+                    if mb:
+                        self._bookmarks[ref] = node
 
             self.remoterefs.write()
+
+            if mb:
+                self._bookmarks.write()
 
         def _milestone_changesets(self):
             """Look up Gecko milestone changes.
