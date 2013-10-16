@@ -498,6 +498,20 @@ def critic_hook(ui, repo, node=None, **opts):
     return 0
 
 
+def reject_repo_names_hook(ui, repo, namespace=None, key=None, old=None,
+        new=None):
+    """prepushkey hook that prevents changes to reserved names.
+
+    Names that begin with the name of a repository identifier are rejected.
+    """
+    if key.lower().startswith(REPOS.keys()):
+        ui.warn('You are not allowed to push tags or bookmarks that share '
+            'names with official Mozilla repositories: %s' % key)
+        return True
+
+    return False
+
+
 def pullexpand(orig, ui, repo, source='default', **opts):
     """Wraps built-in pull command to expand aliases to multiple sources."""
     for tree, uri in resolve_trees_to_uris([source]):
@@ -749,3 +763,7 @@ def reposetup(ui, repo):
     if not ui.configbool('mozext', 'noautocritic'):
         ui.setconfig('hooks', 'commit.critic', critic_hook)
         ui.setconfig('hooks', 'qrefresh.critic', critic_hook)
+
+    if ui.configbool('mozext', 'reject_pushes_with_repo_names', default=False):
+        ui.setconfig('hooks', 'prepushkey.reject_repo_names',
+            reject_repo_names_hook)
