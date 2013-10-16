@@ -504,7 +504,7 @@ def reject_repo_names_hook(ui, repo, namespace=None, key=None, old=None,
 
     Names that begin with the name of a repository identifier are rejected.
     """
-    if key.lower().startswith(REPOS.keys()):
+    if key.lower().startswith(tuple(REPOS.keys())):
         ui.warn('You are not allowed to push tags or bookmarks that share '
             'names with official Mozilla repositories: %s' % key)
         return True
