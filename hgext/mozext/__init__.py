@@ -155,6 +155,7 @@ from mozautomation.repository import (
     resolve_trees_to_uris,
     resolve_uri_to_tree,
     tbpl_url,
+    TREE_ALIASES,
 )
 
 import bzauth
@@ -652,13 +653,41 @@ def reposetup(ui, repo):
             mb = self.ui.configbool('mozext', 'refs_as_bookmarks',
                 default=False)
 
+            existing_refs = set()
+            incoming_refs = set()
+
+            for ref in self.remoterefs:
+                if ref.startswith('%s/' % tree):
+                    existing_refs.add(ref)
+
             for branch, nodes in remote.branchmap().items():
+                # Don't store RELBRANCH refs for non-release trees, as they are
+                # meaningless and cruft from yesteryear.
+                if branch.endswith('RELBRANCH') and \
+                    tree not in TREE_ALIASES['releases']:
+                    continue
+
+                ref = '%s/%s' % (tree, branch)
+                incoming_refs.add(ref)
+
                 for node in nodes:
-                    ref = '%s/%s' % (tree, branch)
                     self.remoterefs[ref] = node
 
                     if mb:
                         self._bookmarks[ref] = node
+
+            # Prune old refs.
+            for ref in existing_refs - incoming_refs:
+                try:
+                    del self.remoterefs[ref]
+                except KeyError:
+                    pass
+
+                if mb:
+                    try:
+                        del self._bookmarks[ref]
+                    except KeyError:
+                        pass
 
             self.remoterefs.write()
 
