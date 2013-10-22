@@ -1,0 +1,6 @@
+To enable this extension, create an entry for it in your hgrc, like this:
+
+[extensions]
+qbackout = ~/mozilla/qbackout
+
+For more information, see http://mercurial.selenic.com/wiki/UsingExtensions
