@@ -19,6 +19,7 @@ hgNameToRevURL = {
     'mozilla-b2g18_v1_0_0':    'releases/mozilla-b2g18_v1_0_0/',
     'mozilla-b2g18_v1_0_1':    'releases/mozilla-b2g18_v1_0_1/',
     'mozilla-b2g18_v1_0_1_hd': 'releases/mozilla-b2g18_v1_0_1_hd/',
+    'mozilla-b2g26_v1_2': 'releases/mozilla-b2g26_v1_2/',
     'comm-aurora':      'releases/comm-aurora/',
     'comm-beta':        'releases/comm-beta/',
     'comm-release':     'releases/comm-release/',
