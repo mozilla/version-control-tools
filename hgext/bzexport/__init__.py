@@ -1081,6 +1081,21 @@ def newbug(ui, repo, *args, **opts):
     bug = result['id']
     ui.write("Created bug %s at %s\n" % (bug, bugzilla + "show_bug.cgi?id=" + bug))
 
+newbug_opts = [
+    ('t', 'title', '',
+     'New bug title'),
+    ('', 'product', '',
+     'New bug product'),
+    ('C', 'component', '',
+     'New bug component'),
+    ('', 'prodversion', '',
+     'New bug product version'),
+    ('', 'cc', '',
+     'List of users to CC on the bug (comma-separated search strings)'),
+    ('P', 'ffprofile', '',
+     'Name of Firefox profile to pull bugzilla cookies from'),
+]
+
 cmdtable = {
     'bzexport':
         (bzexport,
@@ -1100,18 +1115,8 @@ cmdtable = {
            'Interactive -- request confirmation before any permanent action'),
           ('', 'no-take-bug', False,
            'Do not assign bug to myself'),
-          ('', 'title', '',
-           'New bug title'),
-          ('', 'product', '',
-           'New bug product'),
-          ('C', 'component', '',
-           'New bug component'),
-          ('', 'prodversion', '',
-           'New bug product version'),
           ('', 'bug-description', '',
            'New bug description (aka comment 0)'),
-          ('', 'ffprofile', '',
-           'Name of Firefox profile to pull bugzilla cookies from'),
           ('u', 'update', None,
            'Update patch name and description to include bug number (only valid with --new)'),
           ('', 'no-update', None,
@@ -1119,7 +1124,9 @@ cmdtable = {
           ('', 'number', '',
            'When posting, prefix the patch description with "Patch <number> - "'),
           # The following option is passed through directly to patch.diffopts
-          ('w', 'ignore_all_space', False, 'Generate a diff that ignores whitespace changes')],
+          ('w', 'ignore_all_space', False,
+           'Generate a diff that ignores whitespace changes'),
+          ] + newbug_opts,
          _('hg bzexport [options] [REV] [BUG]')),
 
     'newbug':
@@ -1131,18 +1138,6 @@ cmdtable = {
            'Interactive -- request confirmation before any permanent action'),
           ('', 'take-bug', False,
            'Assign bug to myself'),
-          ('t', 'title', '',
-           'New bug title'),
-          ('', 'product', '',
-           'New bug product'),
-          ('C', 'component', '',
-           'New bug component'),
-          ('', 'prodversion', '',
-           'New bug product version'),
-          ('', 'cc', '',
-           'List of users to CC on the bug (comma-separated search strings)'),
-          ('P', 'ffprofile', '',
-           'Name of Firefox profile to pull bugzilla cookies from'),
-          ],
+          ] + newbug_opts,
          _('hg newbug [-e] [[-t] TITLE] [[-c] COMMENT]' )),
 }
