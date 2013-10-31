@@ -32,7 +32,7 @@ def make_url(api_server, auth, command, args = {}):
     return url + "?" + '&'.join(params)
 
 def create_bug(api_server, token, product, component, version, title, description,
-               assign_to=None, cc=[]):
+               assign_to=None, cc=[], depends=[], blocks=[]):
     """
     Create a bugzilla bug using BzAPI.
     """
@@ -44,6 +44,8 @@ def create_bug(api_server, token, product, component, version, title, descriptio
                  'comments' : [{ 'text': description }],
                  'op_sys'   : 'All',
                  'platform' : 'All',
+                 'depends_on' : depends,
+                 'blocks'   : blocks,
                  'cc'       : [ {'name': u} for u in cc ],
                  }
 

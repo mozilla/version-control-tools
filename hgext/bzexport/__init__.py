@@ -261,6 +261,8 @@ Product: @PRODUCT@
 Component: @COMPONENT@
 Version: @PRODVERSION@
 CC: @CC@
+Depends: @DEPENDS@
+Blocks: @BLOCKS@
 
 Bug Description (aka comment 0):
 
@@ -283,6 +285,8 @@ Product: @PRODUCT@
 Component: @COMPONENT@
 Version: @PRODVERSION@
 CC: @CC@
+Depends: @DEPENDS@
+Blocks: @BLOCKS@
 
 Bug Description (aka comment 0):
 
@@ -751,8 +755,10 @@ def bzexport(ui, repo, *args, **opts):
 
     rev, bug = infer_arguments(ui, repo, args, opts)
 
-    if opts['cc'] and not opts['new']:
-        ui.write("Warning: ignoring --cc option when not creating a bug\n")
+    if not opts['new']:
+        for o in ('cc', 'depends', 'blocks'):
+            if opts[o]:
+                ui.write("Warning: ignoring --%s option when not creating a bug\n" % o)
 
     contents = StringIO()
     diffopts = patch.diffopts(ui, opts)
@@ -864,6 +870,8 @@ def bzexport(ui, repo, *args, **opts):
                }
 
     cc = []
+    depends = opts["depends"].split(",")
+    blocks = opts["blocks"].split(",")
     if opts['new']:
         if opts["cc"]:
             search_strings = opts["cc"].split(",")
@@ -876,6 +884,8 @@ def bzexport(ui, repo, *args, **opts):
         values['PRODVERSION'] = opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>')
         values['BUGCOMMENT0'] = bug_comment
         values['CC'] = cc
+        values['BLOCKS'] = blocks
+        values['DEPENDS'] = depends
 
     values = fill_values(values, ui, api_server, finalize=False)
 
@@ -898,6 +908,10 @@ def bzexport(ui, repo, *args, **opts):
             reviewers = select_users(users, values['REVIEWERS'])
         if 'CC' in values:         # Only when opts['new']
             cc = select_users(users, values['CC'])
+        if 'BLOCKS' in values:     # Only when opts['new']
+            blocks = values['BLOCKS']
+        if 'DEPENDS' in values:    # Only when opts['new'] 
+           depends = values['DEPENDS']
         if 'FEEDBACK' in values:   # Always true
             feedback = select_users(users, values['FEEDBACK'])
 
@@ -921,6 +935,9 @@ def bzexport(ui, repo, *args, **opts):
                                 version=values['PRODVERSION'],
                                 title=values['BUGTITLE'],
                                 description=values['BUGCOMMENT0'],
+                                cc=cc,
+                                depends=depends,
+                                blocks=blocks,
                                 **create_opts)
             result = json.load(urlopen(ui, req))
             bug = result['id']
@@ -1047,6 +1064,8 @@ def newbug(ui, repo, *args, **opts):
                'PRODVERSION': opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>'),
                'BUGCOMMENT0': bug_comment,
                'CC': [],
+               'DEPENDS': opts["depends"].split(","),
+               'BLOCKS': opts["blocks"].split(","),
                }
 
     fill_values(values, ui, api_server, finalize=False)
@@ -1076,6 +1095,8 @@ def newbug(ui, repo, *args, **opts):
                         title=values['BUGTITLE'],
                         description=values['BUGCOMMENT0'],
                         cc=cc,
+                        depends=values['DEPENDS'],
+                        blocks=values['BLOCKS'],
                         **create_opts)
     result = json.load(urlopen(ui, req))
     bug = result['id']
@@ -1092,6 +1113,10 @@ newbug_opts = [
      'New bug product version'),
     ('', 'cc', '',
      'List of users to CC on the bug (comma-separated search strings)'),
+    ('D', 'depends', '',
+     'Make new bug depend on given bug number'),
+    ('B', 'blocks', '',
+     'Comma-separated list of bugs that should depend on this one'),
     ('P', 'ffprofile', '',
      'Name of Firefox profile to pull bugzilla cookies from'),
 ]
