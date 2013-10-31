@@ -32,7 +32,7 @@ def make_url(api_server, auth, command, args = {}):
     return url + "?" + '&'.join(params)
 
 def create_bug(api_server, token, product, component, version, title, description,
-               assign_to = None):
+               assign_to=None, cc=[]):
     """
     Create a bugzilla bug using BzAPI.
     """
@@ -44,6 +44,7 @@ def create_bug(api_server, token, product, component, version, title, descriptio
                  'comments' : [{ 'text': description }],
                  'op_sys'   : 'All',
                  'platform' : 'All',
+                 'cc'       : [ {'name': u} for u in cc ],
                  }
 
     if assign_to:
@@ -55,7 +56,8 @@ def create_bug(api_server, token, product, component, version, title, descriptio
 def create_attachment(api_server, token, bug, contents,
                       description="attachment",
                       filename="attachment", comment="",
-                      reviewers = None, review_flag_id = None):
+                      reviewers=None, review_flag_id=None,
+                      feedback=None, feedback_flag_id=None):
     """
     Post an attachment to a bugzilla bug using BzAPI.
     """
@@ -67,7 +69,8 @@ def create_attachment(api_server, token, bug, contents,
                  'file_name': filename,
                  'description': description,
                  'is_patch': True,
-                 'content_type': 'text/plain'}
+                 'content_type': 'text/plain',
+                 'flags': []}
     if reviewers:
         flags = []
         assert review_flag_id
@@ -75,7 +78,17 @@ def create_attachment(api_server, token, bug, contents,
                       "requestee": {"name": ", ".join(reviewers)},
                       "status": "?",
                       "type_id": review_flag_id})
-        json_data["flags"] = flags
+        json_data["flags"].extend(flags)
+
+    if feedback:
+        flags = []
+        assert feedback_flag_id
+        flags.append({"name": "feedback",
+                      "requestee": {"name": ", ".join(feedback)},
+                      "status": "?",
+                      "type_id": feedback_flag_id})
+        json_data["flags"].extend(flags)
+
     if comment:
         json_data["comments"] = [{'text': comment}]
 

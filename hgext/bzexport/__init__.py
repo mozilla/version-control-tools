@@ -161,17 +161,51 @@ def choose_value(ui, desc, options, message="", usemenu=True):
         return None
 
 
-def multi_reviewer_prompt(ui, search_results):
-    return prompt_menu(ui, 'reviewer', search_results['names'],
+def multi_user_prompt(ui, desc, search_results):
+    return prompt_menu(ui, desc, search_results['names'],
                        readable_values=search_results['real_names'],
                        message="Multiple bugzilla users matching \"%s\":\n\n" % search_results["search_string"],
                        allow_none=True)
 
 
-def validate_reviewers(ui, api_server, auth, search_strings, multi_callback):
-    search_results = find_reviewers(ui, api_server, INI_CACHE_FILENAME, auth, search_strings)
+# Returns [ { search_string: original, names: [ str ], real_names: [ str ] } ]
+def find_users(ui, api_server, user_cache_filename, token, search_strings):
+    c = bzauth.load_user_cache(ui, api_server, user_cache_filename)
+    section = api_server
+
+    search_results = []
+    for search_string in search_strings:
+        name = c.get(section, search_string)
+        if name:
+            search_results.append({"search_string": search_string,
+                                   "names": [name],
+                                   "real_names": ["not_a_real_name"]})
+            continue
+
+        try:
+            users = json.load(urlopen(ui, bz.find_users(api_server, token, search_string)))
+            name = None
+            real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"]) if user["real_name"] else user["email"], users["users"])
+            names = map(lambda user: user["name"], users["users"])
+            search_results.append({"search_string": search_string,
+                                   "names": names,
+                                   "real_names": real_names})
+            if len(real_names) == 1:
+                c.set(section, search_string, names[0])
+        except Exception, e:
+            search_results.append({"search_string": search_string,
+                                   "error": str(e),
+                                   "real_names": None})
+            raise
+    bzauth.store_user_cache(c, user_cache_filename)
+    return search_results
+
+
+# search_strings is a simple list of strings
+def validate_users(ui, api_server, auth, search_strings, multi_callback, multi_desc):
+    search_results = find_users(ui, api_server, INI_CACHE_FILENAME, auth, search_strings)
     search_failed = False
-    reviewers = []
+    results = {}
     for search_result in search_results:
         if search_result["real_names"] is None:
             ui.write_err("Error: couldn't find user with search string \"%s\": %s\n" % (search_result["search_string"], search_result["error"]))
@@ -182,17 +216,26 @@ def validate_reviewers(ui, api_server, auth, search_strings, multi_callback):
                 ui.write_err("  %s\n" % real_name.encode('ascii', 'replace'))
             search_failed = True
         elif len(search_result["real_names"]) > 1:
-            reviewer = multi_callback(ui, search_result)
-            if reviewer is not None:
-                reviewers.append(reviewer)
+            user = multi_callback(ui, multi_desc, search_result)
+            if user is not None:
+                results[search_result['search_string']] = [ user ]
         elif len(search_result["real_names"]) == 1:
-            reviewers.append(search_result["names"][0])
+            results[search_result['search_string']] = search_result['names']
         else:
             ui.write_err("Couldn't find a bugzilla user matching \"%s\"!\n" % search_result["search_string"])
             search_failed = True
     if search_failed:
         return
-    return reviewers
+    return results
+
+
+def select_users(valid, keys):
+    if valid is None:
+        return None
+    users = []
+    for key in keys:
+        users.extend(valid[key])
+    return users
 
 
 # Copied from savecommitmessage in localrepo.py (but with variable filename and unicode)
@@ -217,6 +260,7 @@ templates = { 'new_both_template': '''Title: @BUGTITLE@
 Product: @PRODUCT@
 Component: @COMPONENT@
 Version: @PRODVERSION@
+CC: @CC@
 
 Bug Description (aka comment 0):
 
@@ -226,8 +270,8 @@ Bug Description (aka comment 0):
 
 Attachment Filename: @ATTACHMENT_FILENAME@
 Attachment Description: @ATTACHMENT_DESCRIPTION@
-Reviewer: @REVIEWER_1@
-Reviewer: @REVIEWER_2@
+Reviewers: @REVIEWERS@
+Feedback: @FEEDBACK@
 Attachment Comment (appears as a regular comment on the bug):
 
 @ATTACHCOMMENT@
@@ -238,6 +282,7 @@ Attachment Comment (appears as a regular comment on the bug):
 Product: @PRODUCT@
 Component: @COMPONENT@
 Version: @PRODVERSION@
+CC: @CC@
 
 Bug Description (aka comment 0):
 
@@ -249,8 +294,8 @@ Bug Description (aka comment 0):
 
 Attachment Filename: @ATTACHMENT_FILENAME@
 Attachment Description: @ATTACHMENT_DESCRIPTION@
-Reviewer: @REVIEWER_1@
-Reviewer: @REVIEWER_2@
+Reviewers: @REVIEWERS@
+Feedback: @FEEDBACK@
 Attachment Comment (appears as a regular comment on the bug):
 
 @ATTACHCOMMENT@
@@ -267,7 +312,13 @@ def edit_form(ui, repo, fields, template_name):
     def substitute_field(m):
         field_name = m.group(1)
         template_fields.append(field_name)
-        return fields[field_name] or '<none>'
+        value = fields[field_name]
+        if not value:
+            return '<none>'
+        elif isinstance(value, list):
+            return ', '.join(value)
+        else:
+            return value or '<none>'
 
     # Fill in a template with the passed-in fields
     template = templates[template_name]
@@ -302,11 +353,19 @@ def edit_form(ui, repo, fields, template_name):
         if value == '<required>':
             raise util.Abort("Required field %s not filled in" % (field,))
         elif value == '<none>' or value == '':
-            new_fields[field] = None
+            if isinstance(fields[field], list):
+                new_fields[field] = []
+            else:
+                new_fields[field] = None
         else:
-            new_fields[field] = value
             if value == '<choose-from-menu>':
                 marker_found = True
+                new_fields[field] = value
+            else:
+                if isinstance(fields[field], list):
+                    new_fields[field] = re.split(', *', value)
+                else:
+                    new_fields[field] = value
 
     if new == orig and not marker_found:
         if ui.prompt(_("No changes made; continue with current values (y/n)?")) != 'y':
@@ -485,15 +544,7 @@ def choose_prodcomponent(ui, cache, orig_product, orig_component, finalize=False
     return (product, component)
 
 
-def fill_values(values, ui, api_server, reviewers=None, finalize=False):
-    if reviewers is not None:
-        values['REVIEWER_1'] = '<none>'
-        values['REVIEWER_2'] = '<none>'
-        if (len(reviewers) > 0):
-            values['REVIEWER_1'] = reviewers[0]
-        if (len(reviewers) > 1):
-            values['REVIEWER_2'] = reviewers[1]
-
+def fill_values(values, ui, api_server, finalize=False):
     cache = bzauth.load_configuration(ui, api_server, BINARY_CACHE_FILENAME)
 
     if 'PRODUCT' in values:
@@ -657,16 +708,25 @@ def review_flag_type_id(ui, api_server, config_cache_filename, product, componen
     return flag_type_id(ui, api_server, config_cache_filename, 'review', product, component)
 
 
+def feedback_flag_type_id(ui, api_server, config_cache_filename, product, component):
+    return flag_type_id(ui, api_server, config_cache_filename,
+                        [ 'feedback' ], product, component)
+
+
 def create_attachment(ui, api_server, token, bug,
                       config_cache_filename,
                       attachment_contents, description="attachment",
                       filename="attachment", comment="",
-                      reviewers=None, product=None, component=None):
+                      reviewers=None, feedback=None, product=None, component=None):
 
     opts = {}
     if reviewers:
         opts['review_flag_id'] = review_flag_type_id(ui, api_server, config_cache_filename, product, component)
         opts['reviewers'] = reviewers
+
+    if feedback:
+        opts['feedback_flag_id'] = feedback_flag_type_id(ui, api_server, config_cache_filename, product, component)
+        opts['feedback'] = feedback
 
     req = bz.create_attachment(api_server, token, bug, attachment_contents,
                                description=description, filename=filename, comment=comment,
@@ -690,6 +750,9 @@ def bzexport(ui, repo, *args, **opts):
     auth, api_server, bugzilla = bugzilla_info(ui, opts.get('ffprofile'))
 
     rev, bug = infer_arguments(ui, repo, args, opts)
+
+    if opts['cc'] and not opts['new']:
+        ui.write("Warning: ignoring --cc option when not creating a bug\n")
 
     contents = StringIO()
     diffopts = patch.diffopts(ui, opts)
@@ -776,28 +839,45 @@ def bzexport(ui, repo, *args, **opts):
 
     if opts["review"]:
         search_strings = opts["review"].split(",")
-        reviewers = validate_reviewers(ui, api_server, auth, search_strings, multi_reviewer_prompt)
+        valid_users = validate_users(ui, api_server, auth, search_strings, multi_user_prompt, 'reviewer')
+        reviewers = select_users(valid_users, search_strings)
     elif len(reviewers) > 0:
         # Pulled reviewers out of commit message
-        reviewers = validate_reviewers(ui, api_server, auth, reviewers, multi_reviewer_prompt)
+        valid_users = validate_users(ui, api_server, auth, reviewers, multi_user_prompt, 'reviewer')
+        reviewers = select_users(valid_users, search_strings)
 
     if reviewers is None:
         raise util.Abort(_("Invalid reviewers"))
+
+    feedback = []
+    if opts["feedback"]:
+        search_strings = opts["feedback"].split(",")
+        valid_users = validate_users(ui, api_server, auth, search_strings, multi_user_prompt, 'feedback from')
+        feedback = select_users(valid_users, search_strings)
 
     values = { 'BUGNUM': bug,
                'ATTACHMENT_FILENAME': filename,
                'ATTACHMENT_DESCRIPTION': desc,
                'ATTACHCOMMENT': attachment_comment,
+               'REVIEWERS': reviewers,
+               'FEEDBACK': feedback,
                }
 
+    cc = []
     if opts['new']:
+        if opts["cc"]:
+            search_strings = opts["cc"].split(",")
+            valid_users = validate_users(ui, api_server, auth, search_strings, multi_user_prompt, 'CC')
+            cc = select_users(valid_users, search_strings)
+
         values['BUGTITLE'] = opts['title'] or desc
         values['PRODUCT'] = opts.get('product', '') or ui.config("bzexport", "product", '<choose-from-menu>')
         values['COMPONENT'] = opts.get('component', '') or ui.config("bzexport", "component", '<choose-from-menu>')
         values['PRODVERSION'] = opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>')
         values['BUGCOMMENT0'] = bug_comment
+        values['CC'] = cc
 
-    values = fill_values(values, ui, api_server, reviewers=reviewers, finalize=False)
+    values = fill_values(values, ui, api_server, finalize=False)
 
     if opts['edit']:
         if opts['new']:
@@ -806,12 +886,20 @@ def bzexport(ui, repo, *args, **opts):
             values = edit_form(ui, repo, values, 'existing_bug_template')
             bug = values['BUGNUM']
 
-        search_strings = [values[r]
-                          for r in ['REVIEWER_1', 'REVIEWER_2']
-                          if values[r] is not None]
-        reviewers = validate_reviewers(ui, api_server, auth, search_strings, multi_reviewer_prompt)
-        if reviewers is None:
-            raise util.Abort("Invalid reviewers")
+        search_strings = []
+        for key in ('REVIEWERS', 'CC', 'FEEDBACK'):
+            # TODO: Handle <choose-from-menu>
+            search_strings.extend(values.get(key, []))
+        users = validate_users(ui, api_server, auth, search_strings, multi_user_prompt, 'reviewer')
+        if users is None:
+            raise util.Abort("Invalid users")
+
+        if 'REVIEWERS' in values:  # Always true
+            reviewers = select_users(users, values['REVIEWERS'])
+        if 'CC' in values:         # Only when opts['new']
+            cc = select_users(users, values['CC'])
+        if 'FEEDBACK' in values:   # Always true
+            feedback = select_users(users, values['FEEDBACK'])
 
     values = fill_values(values, ui, api_server, finalize=True)
 
@@ -847,6 +935,12 @@ def bzexport(ui, repo, *args, **opts):
     if len(reviewers) > 0:
         for reviewer in reviewers:
             ui.write("Requesting review from " + reviewer + "\n")
+    if len(cc) > 0:
+        for user in cc:
+            ui.write("CC'ing %s\n" % user)
+    if len(feedback) > 0:
+        for user in feedback:
+            ui.write("Requesting feedback from %s\n" % user)
 
     if not opts['no_update']:
         update = opts['update'] or opts['new']
@@ -860,8 +954,14 @@ def bzexport(ui, repo, *args, **opts):
         return
 
     extra_args = {}
+    if feedback:
+        extra_args['feedback'] = feedback
+
     if reviewers:
         extra_args['reviewers'] = reviewers
+
+    if feedback or reviewers:
+        # Need product and component to get the right flag id
         if 'PRODUCT' in values and 'COMPONENT' in values:
             extra_args['product'] = values['PRODUCT']
             extra_args['component'] = values['COMPONENT']
@@ -946,6 +1046,7 @@ def newbug(ui, repo, *args, **opts):
                'COMPONENT': opts.get('component', '') or ui.config("bzexport", "component", '<choose-from-menu>'),
                'PRODVERSION': opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>'),
                'BUGCOMMENT0': bug_comment,
+               'CC': [],
                }
 
     fill_values(values, ui, api_server, finalize=False)
@@ -954,6 +1055,11 @@ def newbug(ui, repo, *args, **opts):
         values = edit_form(ui, repo, values, 'new_bug_template')
 
     fill_values(values, ui, api_server, finalize=True)
+
+    cc = validate_users(ui, api_server, auth, values['CC'], multi_user_prompt, 'reviewer')
+    if cc is None:
+        raise util.Abort("Invalid users")
+    cc = select_users(cc, values['CC'])
 
     if opts['interactive'] and ui.prompt(_("Create bug in '%s'/'%s' (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
         ui.write(_("Exiting without creating bug\n"))
@@ -969,6 +1075,7 @@ def newbug(ui, repo, *args, **opts):
                         version=values['PRODVERSION'],
                         title=values['BUGTITLE'],
                         description=values['BUGCOMMENT0'],
+                        cc=cc,
                         **create_opts)
     result = json.load(urlopen(ui, req))
     bug = result['id']
@@ -983,6 +1090,10 @@ cmdtable = {
            'Open a text editor to modify bug fields'),
           ('r', 'review', '',
            'List of users to request review from (comma-separated search strings), or "auto" to parse the reviewers out of the patch comment'),
+          ('F', 'feedback', '',
+           'List of users to request feedback from (comma-separated search strings)'),
+          ('', 'cc', '',
+           'List of users to CC on the bug (comma-separated search strings)'),
           ('', 'new', False,
            'Create a new bug'),
           ('i', 'interactive', False,
@@ -1028,6 +1139,8 @@ cmdtable = {
            'New bug component'),
           ('', 'prodversion', '',
            'New bug product version'),
+          ('', 'cc', '',
+           'List of users to CC on the bug (comma-separated search strings)'),
           ('P', 'ffprofile', '',
            'Name of Firefox profile to pull bugzilla cookies from'),
           ],
