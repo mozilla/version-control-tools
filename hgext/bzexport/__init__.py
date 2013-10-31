@@ -34,8 +34,9 @@ bugzilla.mozilla.org or the option '--new' to create a new bug. The extension
 is tuned to work best with MQ changesets (it can only currently work with
 applied patches).
 
-If no revision is specified, it will default to 'tip'. If no bug is specified,
-the changeset commit message will be scanned for a bug number to use.
+If no revision is specified, it will default to '.' (the revision your checkout
+is based on). If no bug is specified, the changeset commit message will be
+scanned for a bug number to use.
 
 This extension also adds a 'newbug' command for creating a new bug without
 attaching anything to it.
@@ -436,15 +437,15 @@ def infer_arguments(ui, repo, args, opts):
         rev, bug = args
 
     if rev is None:
-        # Default to 'tip'
-        rev = 'tip'
+        # Default to '.'
+        rev = '.'
 
-    if repo[rev] == repo["tip"]:
+    if repo[rev] == repo["."]:
         m, a, r, d = repo.status()[:4]
         if (m or a or r or d):
             raise util.Abort(_("Local changes found; refresh first!"))
 
-    if rev in ["tip", "qtip", "default"]:
+    if rev in [".", "tip", "qtip", "default"]:
         # Look for a nicer name in the MQ.
         if hasattr(repo, 'mq') and repo.mq.applied:
             rev = repo.mq.applied[-1].name
