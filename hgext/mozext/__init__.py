@@ -109,6 +109,45 @@ Bug Info
 Information about bugs is extracted from commit messages as changesets are
 introduced into the repository. You can look up information about specific
 bugs via `hg buginfo`.
+
+Config Options
+==============
+
+This extension consults the following config options.
+
+mozext.headless
+   Indicates that this extension is running in *headless* mode. *headless*
+   mode is intended for server operation, not local development.
+
+mozext.ircnick
+   Your Mozilla IRC nickname. This string value will be used to look for
+   your reviews and patches.
+
+mozext.noautocritic
+   When this boolean flag is true, the code critic hook will not run
+   during commit and qrefresh operations.
+
+mozext.reject_pushes_with_repo_names
+   This boolean is used to enable a ``prepushkey`` hook that prevents
+   pushes to keys (bookmarks, tags, etc) whose name is prefixed with that
+   of an official Mozilla repository.
+
+   This hook is useful for servers exposing a monolithic repository where
+   each separate Mozilla repository is exposed through bookmarks and where
+   the server does not want to allow external users from changing the
+   *canonical* refs.
+
+   For example, with this flag set, pushes to bookmarks ``central/default``
+   and ``inbound/foobar`` will be rejected because they begin with the names
+   of official Mozilla repositories. However, pushes to the bookmark
+   ``gps/test`` will be allowed.
+
+mozext.refs_as_bookmarks
+   If enabled, this boolean flag will cause remote keys to be added to
+   the local repository's bookmarks during push and pull operations. This
+   is most useful on servers, as remote keys/refs are typically only
+   created dynamically at run-time via a mechanism independent of
+   bookmarks.
 """
 
 import datetime
@@ -789,6 +828,11 @@ def reposetup(ui, repo):
             return [int(m[1]) for m in self.BUG_RE.findall(desc)]
 
     repo.__class__ = remotestrackingrepo
+    headless = ui.configbool('mozext', 'headless')
+    if not ui.config('mozext', 'ircnick') and not headless:
+        raise util.Abort(_('Set "[mozext] ircnick" in your hgrc to your '
+            'Mozilla IRC nickname to enable additional functionality.'))
+
     if not ui.configbool('mozext', 'noautocritic'):
         ui.setconfig('hooks', 'commit.critic', critic_hook)
         ui.setconfig('hooks', 'qrefresh.critic', critic_hook)
