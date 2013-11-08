@@ -695,15 +695,44 @@ def revset_tree(repo, subset, x):
     return [r for r in subset if r in ancestors]
 
 
-def template_bug(repo, ctx, templ, **args):
+def template_bug(repo, ctx, **args):
     """:bug: String. The bug this changeset is most associated with."""
     bugs = parse_bugs(ctx.description())
     return bugs[0] if bugs else None
 
 
-def template_bugs(repo, ctx, templ, **args):
+def template_bugs(repo, ctx, **args):
     """:bugs: List of ints. The bugs associated with this changeset."""
     return parse_bugs(ctx.description())
+
+
+def _compute_first_version(repo, ctx, what, cache):
+    rev = ctx.rev()
+    cache_key = '%s_ancestors' % what
+
+    if cache_key not in cache:
+        versions = getattr(repo, '_%s_releases' % what)()
+        cache[cache_key] = repo._earliest_version_ancestors(versions)
+
+    for version, ancestors in cache[cache_key].items():
+        if rev in ancestors:
+            return version
+
+    return None
+
+
+def template_firstrelease(repo, ctx, **args):
+    """:firstrelease: String. The version of the first release channel
+    release with this changeset.
+    """
+    return _compute_first_version(repo, ctx, 'release', args['cache'])
+
+def template_firstbeta(repo, ctx, **args):
+    """:firstbeta: String. The version of the first beta release with this
+    changeset.
+    """
+    return _compute_first_version(repo, ctx, 'beta', args['cache'])
+
 
 
 def extsetup(ui):
@@ -722,6 +751,8 @@ def extsetup(ui):
 
     templatekw.keywords['bug'] = template_bug
     templatekw.keywords['bugs'] = template_bugs
+    templatekw.keywords['firstrelease'] = template_firstrelease
+    templatekw.keywords['firstbeta'] = template_firstbeta
 
 
 def reposetup(ui, repo):
@@ -911,6 +942,30 @@ def reposetup(ui, repo):
                     version += '%s%s' % (marker, after)
 
                 d[version] = (key, node, major, minor, marker or None, after or None)
+
+            return d
+
+        def _earliest_version_ancestors(self, versions):
+            """Take a set of versions and generate earliest version ancestors.
+
+            This function takes the output of _release_versions as an input
+            and calculates the set of revisions corresponding to each version's
+            introduced ancestors. Put another way, it returns a dict of version
+            to revision set where each set is disjoint and presence in a
+            version's set indicates that particular version introduced that
+            revision.
+
+            This computation is computational expensive. Callers are encouraged
+            to cache it.
+            """
+            d = {}
+            seen = set()
+            for version, e in sorted(versions.items()):
+                version_rev = self[e[1]].rev()
+                ancestors = set(self.changelog.findmissingrevs(
+                    common=seen, heads=[version_rev]))
+                d[version] = ancestors
+                seen |= ancestors
 
             return d
 
