@@ -616,7 +616,11 @@ def revset_bug(repo, subset, x):
     except Exception:
         raise ParseError(err)
 
-    return repo.changetracker.changesets_with_bug(n)
+    nodes = repo.changetracker.changesets_with_bug(n)
+    revs = [repo[node].rev() for node in nodes]
+
+    return [r for r in revs if r in subset]
+
 
 def extsetup(ui):
     global bz_available
