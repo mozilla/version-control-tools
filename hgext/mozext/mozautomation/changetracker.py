@@ -106,7 +106,7 @@ class ChangeTracker(object):
                 'user) VALUES (?, ?, ?, ?)', [push_id, tree_id, push['date'],
                     push['user']])
 
-                head = buffer(binascii.unhexlify(push['changesets'][0]))
+                head = buffer(binascii.unhexlify(push['changesets'][-1]))
 
                 params = [(buffer(binascii.unhexlify(c)), head, push_id,
                     tree_id) for c in push['changesets']]
@@ -122,6 +122,18 @@ class ChangeTracker(object):
             'trees.id = pushes.tree_id AND changeset_pushes.changeset=? '
             'ORDER BY pushes.time ASC', [buffer(changeset)]):
             yield row
+
+    def tree_push_heads(self, tree):
+        """Obtain all pushes on a given tree."""
+        for name, pid, t, user, head in self._db.execute(
+            'SELECT trees.name, pushes.push_id, '
+            'pushes.time, pushes.user, changeset_pushes.head_changeset '
+            'FROM trees, pushes, changeset_pushes '
+            'WHERE pushes.push_id = changeset_pushes.push_id AND '
+            'pushes.tree_id = changeset_pushes.tree_id AND '
+            'trees.id = pushes.tree_id AND trees.name=? '
+            'ORDER BY pushes.time ASC', [tree]):
+            yield name, pid, t, user, str(head)
 
     def associate_bugs_with_changeset(self, bugs, changeset):
         """Associate a numeric bug number with a changeset.

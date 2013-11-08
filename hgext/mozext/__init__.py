@@ -131,6 +131,9 @@ me()
 nobug()
    Retrieve changesets that don't reference a bug in the commit message.
 
+pushhead(TREE)
+   Retrieve changesets that are push heads for a given tree.
+
 firstpushtree(TREE)
    Retrieve changesets that initially landed on the specified tree.
 
@@ -781,6 +784,26 @@ def revset_firstpushtree(repo, subset, x):
             yield rev
 
 
+def revset_pushhead(repo, subset, x):
+    """``pushhead(TREE)``
+    Changesets that are push heads.
+
+    A push head is a changeset that was a head when it was pushed to a
+    repository. In other words, the automation infrastructure likely
+    kicked off a build using this changeset.
+    """
+    tree = revset.getstring(x, _('pushhead() requires a string argument.'))
+    tree, uri = resolve_trees_to_uris([tree])[0]
+
+    if not uri:
+        raise util.Abort(_("Don't know about tree: %s") % tree)
+
+    heads = set(repo[r[4]].rev() for r in
+        repo.changetracker.tree_push_heads(tree))
+
+    return [r for r in subset if r in heads]
+
+
 def template_bug(repo, ctx, **args):
     """:bug: String. The bug this changeset is most associated with."""
     bugs = parse_bugs(ctx.description())
@@ -965,6 +988,7 @@ def extsetup(ui):
     revset.symbols['dontbuild'] = revset_dontbuild
     revset.symbols['me'] = revset_me
     revset.symbols['nobug'] = revset_nobug
+    revset.symbols['pushhead'] = revset_pushhead
     revset.symbols['tree'] = revset_tree
     revset.symbols['firstpushtree'] = revset_firstpushtree
 
