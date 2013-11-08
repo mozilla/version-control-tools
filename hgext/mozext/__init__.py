@@ -133,6 +133,9 @@ nobug()
 pushhead([TREE])
    Retrieve changesets that are push heads.
 
+firstpushdate(DATE)
+   Retrieve changesets that were first pushed according to the date spec.
+
 firstpushtree(TREE)
    Retrieve changesets that initially landed on the specified tree.
 
@@ -780,6 +783,25 @@ def revset_tree(repo, subset, x):
     return [r for r in subset if r in ancestors]
 
 
+def revset_firstpushdate(repo, subset, x):
+    """``firstpushdate(DATE)``
+    Changesets that were initially pushed according to the date spec provided.
+    """
+    ds = revset.getstring(x, _('firstpushdate() requires a string'))
+    dm = util.matchdate(ds)
+
+    for rev in subset:
+        pushes = list(repo.changetracker.pushes_for_changeset(repo[rev].node()))
+
+        if not pushes:
+            continue
+
+        when = pushes[0][2]
+
+        if dm(when):
+            yield rev
+
+
 def revset_firstpushtree(repo, subset, x):
     """``firstpushtree(X)``
     Changesets that were initially pushed to tree X.
@@ -1062,6 +1084,7 @@ def extsetup(ui):
     revset.symbols['reviewer'] = revset_reviewer
     revset.symbols['reviewed'] = revset_reviewed
     revset.symbols['tree'] = revset_tree
+    revset.symbols['firstpushdate'] = revset_firstpushdate
     revset.symbols['firstpushtree'] = revset_firstpushtree
 
     templatekw.keywords['bug'] = template_bug
