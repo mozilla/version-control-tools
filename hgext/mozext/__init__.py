@@ -124,9 +124,8 @@ dontbuild()
 me()
    Retrieve changesets that you are involved with.
 
-   Currently, this only retrieves changesets you authored (via ui.username).
-   In the future, this extension will index review syntax in commit messages
-   and return changesets that you reviewed.
+   This retrieves changesets you authored (via ui.username) as well as
+   changesets you reviewed (via mozext.ircnick).
 
 nobug()
    Retrieve changesets that don't reference a bug in the commit message.
@@ -136,6 +135,12 @@ pushhead([TREE])
 
 firstpushtree(TREE)
    Retrieve changesets that initially landed on the specified tree.
+
+reviewer(REVIEWER)
+   Retrieve changesets there were reviewed by the specified person.
+
+   The reviewer string matches the *r=* string specified in the commit. In
+   the future, we may consult a database of known aliases, etc.
 
 tree(TREE)
    Retrieve changesets that are currently in the specified tree.
@@ -280,7 +285,10 @@ from mozautomation.changetracker import (
     ChangeTracker,
 )
 
-from mozautomation.commitparser import parse_bugs
+from mozautomation.commitparser import (
+    parse_bugs,
+    parse_reviewers,
+)
 
 from mozautomation.repository import (
     MercurialRepository,
@@ -724,15 +732,21 @@ def revset_me(repo, subset, x):
     if not me:
         raise util.Abort(_('"[ui] username" must be set to use me()'))
 
+    ircnick = repo.ui.config('mozext', 'ircnick')
+
     n = encoding.lower(me)
     kind, pattern, matcher = revset._substringmatcher(n)
 
     for r in subset:
-        if matcher(encoding.lower(repo[r].user())):
+        ctx = repo[r]
+        if matcher(encoding.lower(ctx.user())):
             yield r
             continue
 
-        # TODO check reviewer blocks.
+        if ircnick:
+            if ircnick in parse_reviewers(ctx.description()):
+                yield r
+                continue
 
 
 def revset_nobug(repo, subset, x):
@@ -826,6 +840,15 @@ def revset_pushhead(repo, subset, x):
                 break
 
 
+def revset_reviewer(repo, subset, x):
+    """``reviewer(REVIEWER)``
+    Changesets reviewed by a specific person.
+    """
+    n = revset.getstring(x, _('reviewer() requires a string argument.'))
+
+    return [r for r in subset if n in parse_reviewers(repo[r].description())]
+
+
 def template_bug(repo, ctx, **args):
     """:bug: String. The bug this changeset is most associated with."""
     bugs = parse_bugs(ctx.description())
@@ -835,6 +858,18 @@ def template_bug(repo, ctx, **args):
 def template_bugs(repo, ctx, **args):
     """:bugs: List of ints. The bugs associated with this changeset."""
     return parse_bugs(ctx.description())
+
+
+def template_reviewer(repo, ctx, **args):
+    """:reviewer: String. The first reviewer of this changeset."""
+    reviewers = parse_reviewers(ctx.description())
+    return reviewers[0] if reviewers else None
+
+
+def template_reviewers(repo, ctx, **args):
+    """:reviewers: List of strings. The reviewers associated with tis
+    changeset."""
+    return parse_reviewers(ctx.description())
 
 
 def _compute_first_version(repo, ctx, what, cache):
@@ -1011,11 +1046,14 @@ def extsetup(ui):
     revset.symbols['me'] = revset_me
     revset.symbols['nobug'] = revset_nobug
     revset.symbols['pushhead'] = revset_pushhead
+    revset.symbols['reviewer'] = revset_reviewer
     revset.symbols['tree'] = revset_tree
     revset.symbols['firstpushtree'] = revset_firstpushtree
 
     templatekw.keywords['bug'] = template_bug
     templatekw.keywords['bugs'] = template_bugs
+    templatekw.keywords['reviewer'] = template_reviewer
+    templatekw.keywords['reviewers'] = template_reviewers
     templatekw.keywords['firstrelease'] = template_firstrelease
     templatekw.keywords['firstbeta'] = template_firstbeta
     templatekw.keywords['firstaurora'] = template_firstaurora

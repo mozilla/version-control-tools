@@ -6,6 +6,9 @@
 
 import re
 
+# These regular expressions are not very robust. Specifically, they fail to
+# handle lists well.
+
 BUG_RE = re.compile(
     r'''# bug followed by any sequence of numbers, or
         # a standalone sequence of numbers
@@ -21,5 +24,14 @@ BUG_RE = re.compile(
            (?:\s*\#?)(\d+)
          )''', re.I | re.X)
 
+REVIEW_RE = re.compile(r'[ra][=?]+(\w[^ ]+)')
+
+LIST_RE = re.compile(r'[;\.,\+\/\\]')
+
 def parse_bugs(s):
     return [int(m[1]) for m in BUG_RE.findall(s)]
+
+def parse_reviewers(s):
+    for r in REVIEW_RE.findall(s):
+        for part in LIST_RE.split(r):
+            yield part.strip('[](){}')
