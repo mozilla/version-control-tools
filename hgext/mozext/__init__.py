@@ -186,6 +186,8 @@ from mozautomation.changetracker import (
     ChangeTracker,
 )
 
+from mozautomation.commitparser import parse_bugs
+
 from mozautomation.repository import (
     MercurialRepository,
     RELEASE_TREES,
@@ -664,7 +666,7 @@ def reposetup(ui, repo):
                 # Sync bug info.
                 for rev in self.changelog.revs(old_rev + 1):
                     ctx = self[rev]
-                    bugs = self._bugs_in_description(ctx.description())
+                    bugs = parse_bugs(ctx.description())
                     if bugs:
                         self.changetracker.associate_bugs_with_changeset(bugs,
                             ctx.node())
@@ -803,29 +805,13 @@ def reposetup(ui, repo):
             for rev in self:
                 ui.progress('changeset', rev, total=len(self))
                 ctx = self[rev]
-                bugs = self._bugs_in_description(ctx.description())
+                bugs = parse_bugs(ctx.description())
                 if bugs:
                     self.changetracker.associate_bugs_with_changeset(bugs,
                         ctx.node())
 
             ui.progress('changeset', None)
 
-        BUG_RE = re.compile(r'''# bug followed by any sequence of numbers, or
-                                # a standalone sequence of numbers
-                             (
-                               (?:
-                                 bug |
-                                 b= |
-                                 # a sequence of 5+ numbers preceded by whitespace
-                                 (?=\b\#?\d{5,}) |
-                                 # numbers at the very beginning
-                                 ^(?=\d)
-                               )
-                               (?:\s*\#?)(\d+)
-                             )''', re.I | re.X)
-
-        def _bugs_in_description(self, desc):
-            return [int(m[1]) for m in self.BUG_RE.findall(desc)]
 
     repo.__class__ = remotestrackingrepo
     headless = ui.configbool('mozext', 'headless')
