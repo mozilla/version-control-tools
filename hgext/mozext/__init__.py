@@ -118,6 +118,13 @@ This extension adds the following revision set selectors functions.
 bug(BUG)
    Retreive changesets that reference a specific bug. e.g. ``bug(784841)``.
 
+me()
+   Retrieve changesets that you are involved with.
+
+   Currently, this only retrieves changesets you authored (via ui.username).
+   In the future, this extension will index review syntax in commit messages
+   and return changesets that you reviewed.
+
 tree(TREE)
    Retrieve changesets that are currently in the specified tree.
 
@@ -631,6 +638,28 @@ def revset_bug(repo, subset, x):
     return [r for r in subset if r in revs]
 
 
+def revset_me(repo, subset, x):
+    """``me()``
+    Changesets that you are involved in.
+    """
+    if x:
+        raise ParseError(_('me() does not take any arguments'))
+
+    me = repo.ui.config('ui', 'username')
+    if not me:
+        raise util.Abort(_('"[ui] username" must be set to use me()'))
+
+    n = encoding.lower(me)
+    kind, pattern, matcher = revset._substringmatcher(n)
+
+    for r in subset:
+        if matcher(encoding.lower(repo[r].user())):
+            yield r
+            continue
+
+        # TODO check reviewer blocks.
+
+
 def revset_tree(repo, subset, x):
     """``tree(X)``
     Changesets currently in the specified Mozilla tree.
@@ -663,6 +692,7 @@ def extsetup(ui):
     extensions.wrapcommand(commands.table, 'pull', pullexpand)
 
     revset.symbols['bug'] = revset_bug
+    revset.symbols['me'] = revset_me
     revset.symbols['tree'] = revset_tree
 
 
