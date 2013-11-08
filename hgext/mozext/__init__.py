@@ -110,6 +110,14 @@ Information about bugs is extracted from commit messages as changesets are
 introduced into the repository. You can look up information about specific
 bugs via `hg buginfo`.
 
+Revisions Sets
+==============
+
+This extension adds the following revision set selectors functions.
+
+bug(BUG)
+   Query changesets that reference a specific bug. e.g. ``bug(784841)``.
+
 Config Options
 ==============
 
@@ -159,11 +167,14 @@ import sys
 
 from operator import methodcaller
 
+from mercurial import revset
+
 from mercurial.i18n import _
 from mercurial.commands import (
     push,
 )
 from mercurial.error import (
+    ParseError,
     RepoError,
 )
 from mercurial.localrepo import (
@@ -520,7 +531,7 @@ def buginfo(ui, repo, *bugs, **opts):
         repo.reset_bug_database()
         return
 
-    tracker = ChangeTracker(repo.join('changetracker.db'))
+    tracker = repo.changetracker
 
     nodes = set()
     for bug in bugs:
@@ -596,6 +607,20 @@ class remoterefs(dict):
         f.close()
 
 
+def revset_bug(repo, subset, x):
+    """``bug(N)```
+    Changesets referencing a specified Bugzilla bug. e.g. bug(123456).
+    """
+    err = _('bug() requires an integer argument.')
+    n = revset.getstring(x, err)
+
+    try:
+        n = int(n)
+    except Exception:
+        raise ParseError(err)
+
+    return repo.changetracker.changesets_with_bug(n)
+
 def extsetup(ui):
     global bz_available
     try:
@@ -605,6 +630,8 @@ def extsetup(ui):
         pass
 
     extensions.wrapcommand(commands.table, 'pull', pullexpand)
+
+    revset.symbols['bug'] = revset_bug
 
 
 def reposetup(ui, repo):
