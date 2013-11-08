@@ -116,7 +116,16 @@ Revisions Sets
 This extension adds the following revision set selectors functions.
 
 bug(BUG)
-   Query changesets that reference a specific bug. e.g. ``bug(784841)``.
+   Retreive changesets that reference a specific bug. e.g. ``bug(784841)``.
+
+tree(TREE)
+   Retrieve changesets that are currently in the specified tree.
+
+   Trees are specified with a known alias. e.g. ``tree(central)``.
+
+   It's possible to see which changesets are in some tree but not others.
+   e.g. to find changesets in *inbound* that haven't merged to *central*
+   yet, do ``tree(inbound) - tree(central)``.
 
 Config Options
 ==============
@@ -617,9 +626,30 @@ def revset_bug(repo, subset, x):
         raise ParseError(err)
 
     nodes = repo.changetracker.changesets_with_bug(n)
-    revs = [repo[node].rev() for node in nodes]
+    revs = set(repo[node].rev() for node in nodes)
 
-    return [r for r in revs if r in subset]
+    return [r for r in subset if r in revs]
+
+
+def revset_tree(repo, subset, x):
+    """``tree(X)``
+    Changesets currently in the specified Mozilla tree.
+
+    A tree is the name of a repository. e.g. ``central``.
+    """
+    err = _('tree() requires a string argument.')
+    tree = revset.getstring(x, err)
+
+    tree, uri = resolve_trees_to_uris([tree])[0]
+    if not uri:
+        raise util.Abort(_("Don't know about tree: %s") % tree)
+
+    ref = '%s/default' % tree
+
+    head = repo[ref].rev()
+    ancestors = set(repo.changelog.ancestors([head], inclusive=True))
+
+    return [r for r in subset if r in ancestors]
 
 
 def extsetup(ui):
@@ -633,6 +663,7 @@ def extsetup(ui):
     extensions.wrapcommand(commands.table, 'pull', pullexpand)
 
     revset.symbols['bug'] = revset_bug
+    revset.symbols['tree'] = revset_tree
 
 
 def reposetup(ui, repo):
