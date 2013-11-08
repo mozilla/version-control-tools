@@ -189,6 +189,9 @@ firstpushuser
 firstpushtree
    The name of the first tree this changeset was pushed to.
 
+firstpushtbpl
+   The URL of the TBPL results for the first push of this changeset.
+
 Config Options
 ==============
 
@@ -925,6 +928,19 @@ def template_firstpushtree(repo, ctx, **args):
     return pushes[0][0]
 
 
+def template_firstpushtbpl(repo, ctx, **args):
+    """:firstpushtbpl: String. TBPL URL for the first push of this changeset.
+    """
+    pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
+    if not pushes:
+        return None
+
+    push = pushes[0]
+    tree, node = push[0], push[4]
+
+    return tbpl_url(tree, hex(node)[0:12])
+
+
 def extsetup(ui):
     global bz_available
     try:
@@ -951,6 +967,7 @@ def extsetup(ui):
     templatekw.keywords['nightlydate'] = template_nightlydate
     templatekw.keywords['firstpushuser'] = template_firstpushuser
     templatekw.keywords['firstpushtree'] = template_firstpushtree
+    templatekw.keywords['firstpushtbpl'] = template_firstpushtbpl
 
 
 def reposetup(ui, repo):
