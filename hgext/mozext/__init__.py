@@ -131,8 +131,8 @@ me()
 nobug()
    Retrieve changesets that don't reference a bug in the commit message.
 
-pushhead(TREE)
-   Retrieve changesets that are push heads for a given tree.
+pushhead([TREE])
+   Retrieve changesets that are push heads.
 
 firstpushtree(TREE)
    Retrieve changesets that initially landed on the specified tree.
@@ -785,23 +785,45 @@ def revset_firstpushtree(repo, subset, x):
 
 
 def revset_pushhead(repo, subset, x):
-    """``pushhead(TREE)``
+    """``pushhead([TREE])``
     Changesets that are push heads.
 
     A push head is a changeset that was a head when it was pushed to a
     repository. In other words, the automation infrastructure likely
     kicked off a build using this changeset.
+
+    If an argument is given, we limit ourselves to pushes on the specified
+    tree.
+
+    If no argument is given, we return all push heads for all trees. Note that
+    a changeset can be a push head multiple times. This function doesn't care
+    where the push was made if no argument was given.
     """
-    tree = revset.getstring(x, _('pushhead() requires a string argument.'))
-    tree, uri = resolve_trees_to_uris([tree])[0]
+    # We have separate code paths because the single tree path uses a single
+    # query and is faster.
+    if x:
+        tree = revset.getstring(x, _('pushhead() requires a string argument.'))
+        tree, uri = resolve_trees_to_uris([tree])[0]
 
-    if not uri:
-        raise util.Abort(_("Don't know about tree: %s") % tree)
+        if not uri:
+            raise util.Abort(_("Don't know about tree: %s") % tree)
 
-    heads = set(repo[r[4]].rev() for r in
-        repo.changetracker.tree_push_heads(tree))
+        heads = set(repo[r[4]].rev() for r in
+            repo.changetracker.tree_push_heads(tree))
 
-    return [r for r in subset if r in heads]
+        for r in subset:
+            if r in heads:
+                yield r
+
+        return
+
+    for r in subset:
+        node = repo[r].node()
+
+        for push in repo.changetracker.pushes_for_changeset(node):
+            if str(push[4]) == node:
+                yield r
+                break
 
 
 def template_bug(repo, ctx, **args):
