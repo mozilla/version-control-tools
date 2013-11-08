@@ -153,6 +153,14 @@ firstbeta
    The version number of the first beta channel release a changeset was
    present in.
 
+firstaurora
+   The version number of the first aurora channel release a changeset was
+   present in.
+
+firstnightly
+   The version number of the first nightly channel release a changeset was
+   present in.
+
 auroradate
    The date of the first Aurora a changeset was likely present in.
 
@@ -760,6 +768,33 @@ def template_firstbeta(repo, ctx, **args):
     return _compute_first_version(repo, ctx, 'beta', args['cache'])
 
 
+def _calculate_push_milestone(repo, ctx, tree):
+    # This function appears to be slow. Consider caching results.
+    pushes = repo.changetracker.pushes_for_changeset(ctx.node())
+    pushes = [p for p in pushes if p[0] == tree]
+
+    if not pushes:
+        return None
+
+    push = pushes[0]
+
+    return repo._revision_milestone(str(push[4]))
+
+
+def template_firstaurora(repo, ctx, **args):
+    """:firstaurora: String. The version of the first aurora release with
+    this changeset.
+    """
+    return _calculate_push_milestone(repo, ctx, 'aurora')
+
+
+def template_firstnightly(repo, ctx, **args):
+    """:firstnightly: String. The version of the first nightly release
+    with this changeset.
+    """
+    return _calculate_push_milestone(repo, ctx, 'central')
+
+
 def _calculate_next_daily_release(repo, ctx, tree):
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
     pushes = [p for p in pushes if p[0] == tree]
@@ -846,6 +881,8 @@ def extsetup(ui):
     templatekw.keywords['bugs'] = template_bugs
     templatekw.keywords['firstrelease'] = template_firstrelease
     templatekw.keywords['firstbeta'] = template_firstbeta
+    templatekw.keywords['firstaurora'] = template_firstaurora
+    templatekw.keywords['firstnightly'] = template_firstnightly
     templatekw.keywords['auroradate'] = template_auroradate
     templatekw.keywords['nightlydate'] = template_nightlydate
 
@@ -978,26 +1015,16 @@ def reposetup(ui, repo):
             if mb:
                 self._bookmarks.write()
 
-        def _milestone_changesets(self):
-            """Look up Gecko milestone changes.
+        def _revision_milestone(self, rev):
+            """Look up the Gecko milestone of a revision."""
+            fctx = self.filectx('config/milestone.txt', changeid=rev)
+            lines = fctx.data().splitlines()
+            lines = [l for l in lines if not l.startswith('#') and l.strip()]
 
-            Returns a mapping of changeset node to milestone text.
-            """
-            m = {}
+            if not lines:
+                return None
 
-            for rev in self.file('config/milestone.txt'):
-                ctx = self.filectx('config/milestone.txt', fileid=rev)
-
-                lines = ctx.data().splitlines()
-                lines = [l for l in lines if not l.startswith('#') and
-                    l.strip()]
-
-                if len(lines) != 1:
-                    continue
-
-                m[ctx.node()] = lines[0]
-
-            return m
+            return lines[0]
 
         def _beta_releases(self):
             """Obtain information for each beta release."""
