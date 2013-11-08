@@ -125,6 +125,9 @@ me()
    In the future, this extension will index review syntax in commit messages
    and return changesets that you reviewed.
 
+firstpushtree(TREE)
+   Retrieve changesets that initially landed on the specified tree.
+
 tree(TREE)
    Retrieve changesets that are currently in the specified tree.
 
@@ -176,6 +179,12 @@ nightlydate
    The date of the first Nightly a changeset was likely present in.
 
    See auroradate for accuracy information.
+
+firstpushuser
+   The username of the first person who pushed this changeset.
+
+firstpushtree
+   The name of the first tree this changeset was pushed to.
 
 Config Options
 ==============
@@ -728,6 +737,27 @@ def revset_tree(repo, subset, x):
     return [r for r in subset if r in ancestors]
 
 
+def revset_firstpushtree(repo, subset, x):
+    """``firstpushtree(X)``
+    Changesets that were initially pushed to tree X.
+    """
+    tree = revset.getstring(x, _('firstpushtree() requires a string argument.'))
+
+    tree, uri = resolve_trees_to_uris([tree])[0]
+    if not uri:
+        raise util.Abort(_("Don't know about tree: %s") % tree)
+
+    for rev in subset:
+        pushes = list(repo.changetracker.pushes_for_changeset(
+            repo[rev].node()))
+
+        if not pushes:
+            continue
+
+        if pushes[0][0] == tree:
+            yield rev
+
+
 def template_bug(repo, ctx, **args):
     """:bug: String. The bug this changeset is most associated with."""
     bugs = parse_bugs(ctx.description())
@@ -863,6 +893,28 @@ def template_nightlydate(repo, ctx, **args):
     return _calculate_next_daily_release(repo, ctx, 'central')
 
 
+def template_firstpushuser(repo, ctx, **args):
+    """:firstpushuser: String. The first person who pushed this changeset.
+    """
+    pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
+
+    if not pushes:
+        return None
+
+    return pushes[0][3]
+
+
+def template_firstpushtree(repo, ctx, **args):
+    """:firstpushtree: String. The first tree this changeset was pushed to.
+    """
+    pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
+
+    if not pushes:
+        return None
+
+    return pushes[0][0]
+
+
 def extsetup(ui):
     global bz_available
     try:
@@ -876,6 +928,7 @@ def extsetup(ui):
     revset.symbols['bug'] = revset_bug
     revset.symbols['me'] = revset_me
     revset.symbols['tree'] = revset_tree
+    revset.symbols['firstpushtree'] = revset_firstpushtree
 
     templatekw.keywords['bug'] = template_bug
     templatekw.keywords['bugs'] = template_bugs
@@ -885,6 +938,8 @@ def extsetup(ui):
     templatekw.keywords['firstnightly'] = template_firstnightly
     templatekw.keywords['auroradate'] = template_auroradate
     templatekw.keywords['nightlydate'] = template_nightlydate
+    templatekw.keywords['firstpushuser'] = template_firstpushuser
+    templatekw.keywords['firstpushtree'] = template_firstpushtree
 
 
 def reposetup(ui, repo):
