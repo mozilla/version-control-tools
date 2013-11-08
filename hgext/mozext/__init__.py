@@ -161,7 +161,6 @@ mozext.refs_as_bookmarks
 import datetime
 import errno
 import os
-import re
 import shutil
 import sys
 
@@ -287,8 +286,6 @@ def critique(ui, repo, entire=False, node=None, **kwargs):
 @command('moztrees', [], _('hg moztrees'))
 def moztrees(ui, **opts):
     """Show information about Mozilla source trees."""
-    from mozautomation.repository import TREE_ALIASES, REPOS
-
     longest = max(len(tree) for tree in REPOS.keys())
     ui.write('%s  %s\n' % (_('Repo').rjust(longest), _('Aliases')))
 
