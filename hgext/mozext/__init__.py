@@ -118,6 +118,9 @@ This extension adds the following revision set selectors functions.
 bug(BUG)
    Retreive changesets that reference a specific bug. e.g. ``bug(784841)``.
 
+dontbuild()
+   Retrieve changesets that are marked as DONTBUILD.
+
 me()
    Retrieve changesets that you are involved with.
 
@@ -694,6 +697,13 @@ def revset_bug(repo, subset, x):
     return [r for r in subset if r in revs]
 
 
+def revset_dontbuild(repo, subset, x):
+    if x:
+        raise ParseError(_('dontbuild() does not take any arguments'))
+
+    return [r for r in subset if 'DONTBUILD' in repo[r].description()]
+
+
 def revset_me(repo, subset, x):
     """``me()``
     Changesets that you are involved in.
@@ -926,6 +936,7 @@ def extsetup(ui):
     extensions.wrapcommand(commands.table, 'pull', pullexpand)
 
     revset.symbols['bug'] = revset_bug
+    revset.symbols['dontbuild'] = revset_dontbuild
     revset.symbols['me'] = revset_me
     revset.symbols['tree'] = revset_tree
     revset.symbols['firstpushtree'] = revset_firstpushtree
