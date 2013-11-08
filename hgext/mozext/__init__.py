@@ -209,6 +209,12 @@ firstpushtree
 firstpushtbpl
    The URL of the TBPL results for the first push of this changeset.
 
+trees
+   The list of trees a changeset has landed in.
+
+reltrees
+   The list of release trees a changeset has landed in.
+
 Config Options
 ==============
 
@@ -1066,6 +1072,18 @@ def template_firstpushtbpl(repo, ctx, **args):
     return tbpl_url(tree, hex(node)[0:12])
 
 
+def template_trees(repo, ctx, **args):
+    """:trees: List of strings. Trees this changeset has landed in.
+    """
+    return [p[0] for p in repo.changetracker.pushes_for_changeset(ctx.node())]
+
+
+def template_reltrees(repo, ctx, **args):
+    """:reltrees: List of strings. Release trees this changeset has landed in.
+    """
+    return [t for t in template_trees(repo, ctx, **args) if t in RELEASE_TREES]
+
+
 def extsetup(ui):
     global bz_available
     try:
@@ -1100,6 +1118,8 @@ def extsetup(ui):
     templatekw.keywords['firstpushuser'] = template_firstpushuser
     templatekw.keywords['firstpushtree'] = template_firstpushtree
     templatekw.keywords['firstpushtbpl'] = template_firstpushtbpl
+    templatekw.keywords['trees'] = template_trees
+    templatekw.keywords['reltrees'] = template_reltrees
 
 
 def reposetup(ui, repo):
