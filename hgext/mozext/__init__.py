@@ -142,6 +142,9 @@ reviewer(REVIEWER)
    The reviewer string matches the *r=* string specified in the commit. In
    the future, we may consult a database of known aliases, etc.
 
+reviewed()
+   Retrieve changesets that have a reviewer marked.
+
 tree(TREE)
    Retrieve changesets that are currently in the specified tree.
 
@@ -849,6 +852,16 @@ def revset_reviewer(repo, subset, x):
     return [r for r in subset if n in parse_reviewers(repo[r].description())]
 
 
+def revset_reviewed(repo, subset, x):
+    """``reviewed()``
+    Changesets that were reviewed.
+    """
+    if x:
+        raise ParseError(_('reviewed() does not take an argument'))
+
+    return [r for r in subset if list(parse_reviewers(repo[r].description()))]
+
+
 def template_bug(repo, ctx, **args):
     """:bug: String. The bug this changeset is most associated with."""
     bugs = parse_bugs(ctx.description())
@@ -1047,6 +1060,7 @@ def extsetup(ui):
     revset.symbols['nobug'] = revset_nobug
     revset.symbols['pushhead'] = revset_pushhead
     revset.symbols['reviewer'] = revset_reviewer
+    revset.symbols['reviewed'] = revset_reviewed
     revset.symbols['tree'] = revset_tree
     revset.symbols['firstpushtree'] = revset_firstpushtree
 
