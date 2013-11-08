@@ -134,6 +134,17 @@ tree(TREE)
    e.g. to find changesets in *inbound* that haven't merged to *central*
    yet, do ``tree(inbound) - tree(central)``.
 
+Templates
+=========
+
+This extension provides keywords that can used with templates.
+
+bug
+   The bug primarily associated with a changeset.
+
+bugs
+   All the bugs associated with a changeset.
+
 Config Options
 ==============
 
@@ -182,7 +193,10 @@ import sys
 
 from operator import methodcaller
 
-from mercurial import revset
+from mercurial import (
+    revset,
+    templatekw,
+)
 
 from mercurial.i18n import _
 from mercurial.commands import (
@@ -681,6 +695,17 @@ def revset_tree(repo, subset, x):
     return [r for r in subset if r in ancestors]
 
 
+def template_bug(repo, ctx, templ, **args):
+    """:bug: String. The bug this changeset is most associated with."""
+    bugs = parse_bugs(ctx.description())
+    return bugs[0] if bugs else None
+
+
+def template_bugs(repo, ctx, templ, **args):
+    """:bugs: List of ints. The bugs associated with this changeset."""
+    return parse_bugs(ctx.description())
+
+
 def extsetup(ui):
     global bz_available
     try:
@@ -694,6 +719,9 @@ def extsetup(ui):
     revset.symbols['bug'] = revset_bug
     revset.symbols['me'] = revset_me
     revset.symbols['tree'] = revset_tree
+
+    templatekw.keywords['bug'] = template_bug
+    templatekw.keywords['bugs'] = template_bugs
 
 
 def reposetup(ui, repo):
