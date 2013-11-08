@@ -128,6 +128,9 @@ me()
    In the future, this extension will index review syntax in commit messages
    and return changesets that you reviewed.
 
+nobug()
+   Retrieve changesets that don't reference a bug in the commit message.
+
 firstpushtree(TREE)
    Retrieve changesets that initially landed on the specified tree.
 
@@ -729,6 +732,13 @@ def revset_me(repo, subset, x):
         # TODO check reviewer blocks.
 
 
+def revset_nobug(repo, subset, x):
+    if x:
+        raise ParseError(_('nobug() does not take any arguments'))
+
+    return [r for r in subset if not parse_bugs(repo[r].description())]
+
+
 def revset_tree(repo, subset, x):
     """``tree(X)``
     Changesets currently in the specified Mozilla tree.
@@ -954,6 +964,7 @@ def extsetup(ui):
     revset.symbols['bug'] = revset_bug
     revset.symbols['dontbuild'] = revset_dontbuild
     revset.symbols['me'] = revset_me
+    revset.symbols['nobug'] = revset_nobug
     revset.symbols['tree'] = revset_tree
     revset.symbols['firstpushtree'] = revset_firstpushtree
 
