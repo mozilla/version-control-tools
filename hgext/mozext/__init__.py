@@ -290,6 +290,7 @@ from mercurial import (
     encoding,
     extensions,
     hg,
+    scmutil,
     util,
 )
 
@@ -540,12 +541,13 @@ def tbpl(ui, repo, tree=None, rev=None, **opts):
     _('hg critic [REV]')
 )
 def critic(ui, repo, rev='.', entire=False, **opts):
-    """Perform a critique of a changeset.
+    """Perform a critique of changeset(s).
 
-    This will perform static analysis on a given changeset and report any
-    issues found.
+    This will perform static analysis on changeset(s) and report any issues
+    found.
     """
-    critique(ui, repo, node=rev, entire=entire, **opts)
+    for r in scmutil.revrange(repo, [rev]):
+        critique(ui, repo, node=r, entire=entire, **opts)
 
 
 @command('pushlogsync', [], _('hg pushlogsync'))
