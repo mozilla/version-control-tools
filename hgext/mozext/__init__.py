@@ -751,16 +751,20 @@ def revset_me(repo, subset, x):
     n = encoding.lower(me)
     kind, pattern, matcher = revset._substringmatcher(n)
 
+    revs = []
+
     for r in subset:
         ctx = repo[r]
         if matcher(encoding.lower(ctx.user())):
-            yield r
+            revs.append(r)
             continue
 
         if ircnick:
             if ircnick in parse_reviewers(ctx.description()):
-                yield r
+                revs.append(r)
                 continue
+
+    return revs
 
 
 def revset_nobug(repo, subset, x):
@@ -798,6 +802,8 @@ def revset_firstpushdate(repo, subset, x):
     ds = revset.getstring(x, _('firstpushdate() requires a string'))
     dm = util.matchdate(ds)
 
+    revs = []
+
     for rev in subset:
         pushes = list(repo.changetracker.pushes_for_changeset(repo[rev].node()))
 
@@ -807,7 +813,9 @@ def revset_firstpushdate(repo, subset, x):
         when = pushes[0][2]
 
         if dm(when):
-            yield rev
+            revs.append(rev)
+
+    return revs
 
 
 def revset_firstpushtree(repo, subset, x):
@@ -820,6 +828,8 @@ def revset_firstpushtree(repo, subset, x):
     if not uri:
         raise util.Abort(_("Don't know about tree: %s") % tree)
 
+    revs = []
+
     for rev in subset:
         pushes = list(repo.changetracker.pushes_for_changeset(
             repo[rev].node()))
@@ -828,7 +838,9 @@ def revset_firstpushtree(repo, subset, x):
             continue
 
         if pushes[0][0] == tree:
-            yield rev
+            revs.append(rev)
+
+    return revs
 
 
 def revset_pushhead(repo, subset, x):
@@ -858,19 +870,19 @@ def revset_pushhead(repo, subset, x):
         heads = set(repo[r[4]].rev() for r in
             repo.changetracker.tree_push_heads(tree))
 
-        for r in subset:
-            if r in heads:
-                yield r
+        return [r for r in subset if r in heads]
 
-        return
+    revs = []
 
     for r in subset:
         node = repo[r].node()
 
         for push in repo.changetracker.pushes_for_changeset(node):
             if str(push[4]) == node:
-                yield r
+                revs.append(r)
                 break
+
+    return revs
 
 
 def revset_reviewer(repo, subset, x):
