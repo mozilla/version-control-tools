@@ -252,6 +252,10 @@ mozext.noautocritic
    When this boolean flag is true, the code critic hook will not run
    during commit and qrefresh operations.
 
+mozext.critic_merges
+   When this boolean flag is true, the code critic hook will run on merges.
+   By default, the hook does not run on merges.
+
 mozext.reject_pushes_with_repo_names
    This boolean is used to enable a ``prepushkey`` hook that prevents
    pushes to keys (bookmarks, tags, etc) whose name is prefixed with that
@@ -672,6 +676,10 @@ def buginfo(ui, repo, *bugs, **opts):
 
 
 def critic_hook(ui, repo, node=None, **opts):
+    # By default, don't run hook on merges.
+    if len(ctx.parents()) > 1 and not ui.configbool('mozext', 'critic_merges'):
+        return 0
+
     critique(ui, repo, node=node, **opts)
     return 0
 
