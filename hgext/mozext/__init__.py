@@ -677,6 +677,7 @@ def buginfo(ui, repo, *bugs, **opts):
 
 def critic_hook(ui, repo, node=None, **opts):
     # By default, don't run hook on merges.
+    ctx = repo[node]
     if len(ctx.parents()) > 1 and not ui.configbool('mozext', 'critic_merges'):
         return 0
 
