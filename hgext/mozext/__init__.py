@@ -209,6 +209,9 @@ firstpushtree
 firstpushtbpl
    The URL of the TBPL results for the first push of this changeset.
 
+firstpushdate
+   The date of the first push of this changeset.
+
 trees
    The list of trees a changeset has landed in.
 
@@ -1086,6 +1089,16 @@ def template_firstpushtbpl(repo, ctx, **args):
     return tbpl_url(tree, hex(node)[0:12])
 
 
+def template_firstpushdate(repo, ctx, **args):
+    """:firstpushdate: Date information. The date of the first push of this
+    changeset."""
+    pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
+    if not pushes:
+        return None
+
+    return util.makedate(pushes[0][2])
+
+
 def template_trees(repo, ctx, **args):
     """:trees: List of strings. Trees this changeset has landed in.
     """
@@ -1132,6 +1145,7 @@ def extsetup(ui):
     templatekw.keywords['firstpushuser'] = template_firstpushuser
     templatekw.keywords['firstpushtree'] = template_firstpushtree
     templatekw.keywords['firstpushtbpl'] = template_firstpushtbpl
+    templatekw.keywords['firstpushdate'] = template_firstpushdate
     templatekw.keywords['trees'] = template_trees
     templatekw.keywords['reltrees'] = template_reltrees
 
