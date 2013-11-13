@@ -397,8 +397,10 @@ def critique(ui, repo, entire=False, node=None, **kwargs):
 
     style = get_style_guide(parse_argv=False, ignore='E128')
 
+    ctx = repo[node]
+
     if not entire:
-        diff = ''.join(repo[node].diff())
+        diff = ''.join(ctx.diff())
         style.options.selected_lines = {}
         for k, v in parse_udiff(diff).items():
             if k.startswith('./'):
@@ -408,7 +410,8 @@ def critique(ui, repo, entire=False, node=None, **kwargs):
 
         style.options.report = DiffReport(style.options)
 
-    files = [f for f in repo[node].files() if f.endswith('.py')]
+    deleted = repo.status(ctx.p1().node(), ctx.node())[2]
+    files = [f for f in ctx.files() if f.endswith('.py') and f not in deleted]
     style.check_files(files)
 
     demandimport.enable()
