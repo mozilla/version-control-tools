@@ -212,11 +212,28 @@ firstpushtbpl
 firstpushdate
    The date of the first push of this changeset.
 
+pushdates
+   The list of dates a changeset was pushed.
+
+pushheaddates
+   The list of dates a changeset was pushed as a push head.
+
 trees
    The list of trees a changeset has landed in.
 
 reltrees
    The list of release trees a changeset has landed in.
+
+This extension provides the following template functions:
+
+dates(VALUES, [format, [sep]])
+   Format a list of dates.
+
+   If the second argument is defined, the specified date formatting
+   string will be used. Else, it defaults to '%Y-%m-%d'.
+
+   If the third argument is defined, elements will be separated by the
+   specified string. Else, ',' is used.
 
 Config Options
 ==============
@@ -269,7 +286,9 @@ from operator import methodcaller
 
 from mercurial import (
     revset,
+    templatefilters,
     templatekw,
+    templater,
 )
 
 from mercurial.i18n import _
@@ -1099,6 +1118,23 @@ def template_firstpushdate(repo, ctx, **args):
     return util.makedate(pushes[0][2])
 
 
+def template_pushdates(repo, ctx, **args):
+    """:pushdates: List of date information. The dates this changeset was
+    pushed to various trees."""
+    pushes = repo.changetracker.pushes_for_changeset(ctx.node())
+
+    return [util.makedate(p[2]) for p in pushes]
+
+
+def template_pushheaddates(repo, ctx, **args):
+    """:pushheaddates: List of date information. The dates this changeset
+    was pushed to various trees as a push head."""
+    node = ctx.node()
+    pushes = repo.changetracker.pushes_for_changeset(ctx.node())
+
+    return [util.makedate(p[2]) for p in pushes if str(p[4]) == node]
+
+
 def template_trees(repo, ctx, **args):
     """:trees: List of strings. Trees this changeset has landed in.
     """
@@ -1110,6 +1146,27 @@ def template_reltrees(repo, ctx, **args):
     """
     return [t for t in template_trees(repo, ctx, **args) if t in RELEASE_TREES]
 
+
+# [gps] This function may not be necessary. However, I was unable to figure out
+# how to do the equivalent with regular template syntax. Yes, I tried the
+# list operator.
+def template_dates(context, mapping, args):
+    """:dates(VALUES, [fmt, [sep]]): Format a list of dates."""
+    if not (1 <= len(args) <= 3):
+        raise ParseError(_("dates expects one, two, or three arguments"))
+
+    fmt = '%Y-%m-%d'
+    sep = ','
+
+    if len(args) > 1:
+        fmt = templatefilters.stringify(args[1][0](context, mapping,
+            args[1][1]))
+    if len(args) > 2:
+        sep = templatefilters.stringify(args[2][0](context, mapping,
+            args[2][1]))
+
+    return sep.join(util.datestr(d, fmt) for d in args[0][0](context, mapping,
+        args[0][1]))
 
 def extsetup(ui):
     global bz_available
@@ -1146,8 +1203,12 @@ def extsetup(ui):
     templatekw.keywords['firstpushtree'] = template_firstpushtree
     templatekw.keywords['firstpushtbpl'] = template_firstpushtbpl
     templatekw.keywords['firstpushdate'] = template_firstpushdate
+    templatekw.keywords['pushdates'] = template_pushdates
+    templatekw.keywords['pushheaddates'] = template_pushheaddates
     templatekw.keywords['trees'] = template_trees
     templatekw.keywords['reltrees'] = template_reltrees
+
+    templater.funcs['dates'] = template_dates
 
 
 def reposetup(ui, repo):
