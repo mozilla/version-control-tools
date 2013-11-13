@@ -104,6 +104,7 @@ RELEASE_TREES = {
     'b2g18',
     'esr17',
     'esr24',
+    'b2g26',
 }
 
 
