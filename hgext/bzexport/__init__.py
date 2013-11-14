@@ -913,6 +913,8 @@ def bzexport(ui, repo, *args, **opts):
            depends = values['DEPENDS']
         if 'FEEDBACK' in values:   # Always true
             feedback = select_users(users, values['FEEDBACK'])
+        if 'ATTACHMENT_FILENAME' in values:
+            filename = values['ATTACHMENT_FILENAME']
 
     values = fill_values(values, ui, api_server, finalize=True)
 
