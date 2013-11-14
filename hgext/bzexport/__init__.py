@@ -714,9 +714,7 @@ def review_flag_type_id(ui, api_server, config_cache_filename, product, componen
 
 
 def feedback_flag_type_id(ui, api_server, config_cache_filename, product, component):
-    return flag_type_id(ui, api_server, config_cache_filename,
-                        [ 'feedback' ], product, component)
-
+    return flag_type_id(ui, api_server, config_cache_filename, 'feedback', product, component)
 
 def create_attachment(ui, api_server, token, bug,
                       config_cache_filename,
