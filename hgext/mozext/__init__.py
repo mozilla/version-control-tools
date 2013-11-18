@@ -759,10 +759,7 @@ def revset_bug(repo, subset, x):
     except Exception:
         raise ParseError(err)
 
-    nodes = repo.changetracker.changesets_with_bug(n)
-    revs = set(repo[node].rev() for node in nodes)
-
-    return [r for r in subset if r in revs]
+    return [r for r in subset if n in parse_bugs(repo[r].description())]
 
 
 def revset_dontbuild(repo, subset, x):
