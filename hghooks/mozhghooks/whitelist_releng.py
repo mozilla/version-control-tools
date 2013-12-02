@@ -24,13 +24,14 @@
 import os
 
 ALLOWED_USERS = set([
+    'Callek@gmail.com',
     'armenzg@mozilla.com',
     'arich@mozilla.com',
     'asasaki@mozilla.com',
     'bhearsum@mozilla.com',
     'catlee@mozilla.com',
     'coop@mozilla.com',
-    'dustin@mozilla.com',
+    'dmitchell@mozilla.com',
     'hwine@mozilla.com',
     'jarmstrong@mozilla.com',
     'jhopkins@mozilla.com',
