@@ -1479,3 +1479,9 @@ def reposetup(ui, repo):
     if ui.configbool('mozext', 'reject_pushes_with_repo_names', default=False):
         ui.setconfig('hooks', 'prepushkey.reject_repo_names',
             reject_repo_names_hook)
+
+    # Set up a specially named path so reviewboard resolves this repo to
+    # mozilla-central.
+    if not ui.config('paths', 'reviewboard'):
+        uri = resolve_trees_to_uris(['central'])[0][1]
+        ui.setconfig('paths', 'reviewboard', uri)
