@@ -18,8 +18,7 @@
 This hook is to prevent changes to IID or UUID in pushes to trees where such changes could cause critical issues (eg: beta, release).
 """
 
-import os,re
-from mercurial import ui
+import re
 
 def hook(ui, repo, hooktype, node, **kwargs):
     error = ""
@@ -30,6 +29,7 @@ def hook(ui, repo, hooktype, node, **kwargs):
         for file in repo[change_id].files():
             # Only Check IDL Files
             if file.endswith('.idl'):
+                bc = True
                 if not re.search('ba\S*=', repo.changectx('tip').description().lower()):
                         error += "IDL file %s altered in this changeset" % file
     # Check if an error occured in any of the files that were changed
