@@ -215,7 +215,11 @@ def patch_changes(ui, repo, patchfile=None, **opts):
             ui.write("  %s\n" % changedFile)
 
     matchfn = scmutil.matchfiles(repo, changedFiles)
+    left = opts['limit']
     for ctx in cmdutil.walkchangerevs(repo, matchfn, opts, lambda a,b: None):
+        if left == 0:
+            break
+        left -= 1
         yield repo[ctx.rev()]
 
 fileRe = re.compile(r"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
@@ -744,22 +748,22 @@ cmdtable = {
     'reviewers':
         (reviewers,
          [('f', 'file', [], 'see reviewers for FILE', 'FILE'),
-          ('l', 'limit', 100000, 'how many revisions back to scan', 'LIMIT'),
+          ('l', 'limit', 1000, 'how many revisions back to scan', 'LIMIT'),
           ('', 'brief', False, 'shorter output'),
           ],
          ('hg reviewers [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
     'bugs':
         (bzbugs,
-         [('f', 'file', [], 'see components for FILE', 'FILE'),
-          ('l', 'limit', 100000, 'how many revisions back to scan', 'LIMIT')
+         [('f', 'file', [], 'see bugs for FILE', 'FILE'),
+          ('l', 'limit', 100, 'how many revisions back to scan', 'LIMIT')
           ],
          ('hg bugs [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
     'components':
         (bzcomponents,
          [('f', 'file', [], 'see components for FILE', 'FILE'),
-          ('l', 'limit', 100000, 'how many revisions back to scan', 'LIMIT'),
+          ('l', 'limit', 25, 'how many revisions back to scan', 'LIMIT'),
           ('', 'brief', False, 'shorter output'),
           ],
          ('hg components [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
