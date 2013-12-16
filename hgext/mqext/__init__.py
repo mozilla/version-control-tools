@@ -82,7 +82,7 @@ import urllib2
 
 from mercurial.i18n import _
 from mercurial.node import short
-from mercurial import commands, util, cmdutil, mdiff, error, url, patch, extensions
+from mercurial import commands, util, cmdutil, mdiff, error, url, patch, extensions, scmutil
 
 from hgext import mq
 from collections import Counter
@@ -214,25 +214,9 @@ def patch_changes(ui, repo, patchfile=None, **opts):
         if ui.verbose:
             ui.write("  %s\n" % changedFile)
 
-    limit = opts['limit']
-    if limit == 0 or len(repo) < limit:
-        start = 1
-    else:
-        start = len(repo) - limit
-
-    for revNum in xrange(start, len(repo)):
-        ui.progress("scanning revisions", revNum - start, item=revNum,
-                    total=len(repo) - start)
-        rev = repo[revNum]
-        for file in changedFiles:
-            if file in rev.files():
-                changes[file].append(rev)
-
-    ui.progress("scanning revisions", None)
-
-    for file in changes:
-        for change in changes[file]:
-            yield change
+    matchfn = scmutil.matchfiles(repo, changedFiles)
+    for ctx in cmdutil.walkchangerevs(repo, matchfn, opts, lambda a,b: None):
+        yield repo[ctx.rev()]
 
 fileRe = re.compile(r"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
 suckerRe = re.compile(r"[^s-]r=(\w+)")
