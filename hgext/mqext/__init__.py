@@ -162,8 +162,6 @@ def patch_changes(ui, repo, patchfile=None, **opts):
     that will be used directly.
     '''
 
-    changes = {}
-
     if opts['file']:
         changedFiles = fullpaths(ui, repo, opts['file'])
     else:
@@ -208,13 +206,11 @@ def patch_changes(ui, repo, patchfile=None, **opts):
         ui.write("Using files:\n")
         if len(changedFiles) == 0:
             ui.write("  (none)\n")
+        else:
+            for changedFile in changedFiles:
+                ui.write("  %s\n" % changedFile)
 
-    for changedFile in changedFiles:
-        changes[changedFile] = []
-        if ui.verbose:
-            ui.write("  %s\n" % changedFile)
-
-    matchfn = scmutil.matchfiles(repo, changedFiles)
+    matchfn = scmutil.match(repo[None], changedFiles, default='relglob')
     left = opts['limit']
     for ctx in cmdutil.walkchangerevs(repo, matchfn, opts, lambda a,b: None):
         if left == 0:
@@ -366,6 +362,9 @@ def bzcomponents(ui, repo, patchfile=None, **opts):
         m = bug_re.search(change.description())
         if m:
             bugs.add(m.group(2))
+    if len(bugs) == 0:
+        ui.write("No bugs found\n")
+        return
 
     components = Counter()
     url = ui.config('bugzilla', 'jsonrpc-url', None)
