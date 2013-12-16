@@ -81,7 +81,7 @@ import json
 import urllib2
 
 from mercurial.i18n import _
-from mercurial.node import hex, nullrev, nullid, short
+from mercurial.node import short
 from mercurial import commands, util, cmdutil, mdiff, error, url, patch, extensions
 
 from hgext import mq
@@ -265,7 +265,16 @@ def reviewers(ui, repo, patchfile=None, **opts):
     supersuckers = Counter()
     for change in patch_changes(ui, repo, patchfile, **opts):
         suckers.update(canon(x) for x in suckerRe.findall(change.description()))
-        supersuckers.update(canon(x) for x in supersuckerRe.findall(change.description()))
+        if not opts.get('brief'):
+            supersuckers.update(canon(x) for x in supersuckerRe.findall(change.description()))
+
+    if opts.get('brief'):
+        if len(suckers) == 0:
+            ui.write("no reviewers found in range\n")
+        else:
+            r = [ "%s x %d" % (reviewer, count) for reviewer, count in suckers.most_common(3) ]
+            ui.write(", ".join(r) + "\n")
+        return
 
     ui.write("Potential reviewers:\n")
     if (len(suckers) == 0):
@@ -380,9 +389,17 @@ def bzcomponents(ui, repo, patchfile=None, **opts):
             url = "%s/jsonrpc.cgi" % url
 
     for b in fetch_bugs(url, ui, bugs):
-        comp = "%s/%s" % (b['product'], b['component'])
+        comp = "%s :: %s" % (b['product'], b['component'])
         ui.debug("bug %s: %s\n" % (b['id'], comp))
         components.update([comp])
+
+    if opts.get('brief'):
+        if len(components) == 0:
+            ui.write("no components found\n")
+        else:
+            r = [ "%s x %d" % (comp, count) for comp, count in components.most_common(3) ]
+            ui.write(", ".join(r) + "\n")
+        return
 
     ui.write("Potential components:\n")
     if len(components) == 0:
@@ -743,7 +760,8 @@ cmdtable = {
     'reviewers':
         (reviewers,
          [('f', 'file', [], 'see reviewers for FILE', 'FILE'),
-          ('l', 'limit', 100000, 'how many revisions back to scan', 'LIMIT')
+          ('l', 'limit', 100000, 'how many revisions back to scan', 'LIMIT'),
+          ('', 'brief', False, 'shorter output'),
           ],
          ('hg reviewers [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
@@ -757,7 +775,8 @@ cmdtable = {
     'components':
         (bzcomponents,
          [('f', 'file', [], 'see components for FILE', 'FILE'),
-          ('l', 'limit', 100000, 'how many revisions back to scan', 'LIMIT')
+          ('l', 'limit', 100000, 'how many revisions back to scan', 'LIMIT'),
+          ('', 'brief', False, 'shorter output'),
           ],
          ('hg components [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
 
