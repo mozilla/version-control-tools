@@ -747,7 +747,7 @@ cmdtable = {
     'reviewers':
         (reviewers,
          [('f', 'file', [], 'see reviewers for FILE', 'FILE'),
-          ('l', 'limit', 1000, 'how many revisions back to scan', 'LIMIT'),
+          ('l', 'limit', 200, 'how many revisions back to scan', 'LIMIT'),
           ('', 'brief', False, 'shorter output'),
           ],
          ('hg reviewers [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
