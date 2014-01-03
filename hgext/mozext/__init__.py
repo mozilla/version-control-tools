@@ -343,7 +343,6 @@ from mozautomation.repository import (
     TREE_ALIASES,
 )
 
-import bzauth
 import bz
 
 bz_available = False
