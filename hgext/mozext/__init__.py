@@ -259,6 +259,10 @@ mozext.critic_merges
    When this boolean flag is true, the code critic hook will run on merges.
    By default, the hook does not run on merges.
 
+mozext.disable_local_database
+   When this boolean flag is true, the local SQLite database indexing
+   useful lookups (such as bugs and pushlog info) is not enabled.
+
 mozext.reject_pushes_with_repo_names
    This boolean is used to enable a ``prepushkey`` hook that prevents
    pushes to keys (bookmarks, tags, etc) whose name is prefixed with that
@@ -590,6 +594,10 @@ def syncpushinfo(ui, repo, tree=None, **opts):
     After running this command, you can query for push information for specific
     changesets.
     """
+    if not repo.changetracker:
+        ui.warn('Local database appears to be disabled.')
+        return 1
+
     for i, tree in enumerate(sorted(REPOS)):
         repo.changetracker.load_pushlog(tree)
         ui.progress('pushlogsync', i, total=len(REPOS))
@@ -598,6 +606,10 @@ def syncpushinfo(ui, repo, tree=None, **opts):
 
 
 def print_changeset_pushes(ui, repo, rev, all=False):
+    if not repo.changetracker:
+        ui.warn('Local database appears to be disabled.')
+        return 1
+
     ctx = repo[rev]
     node = ctx.node()
 
@@ -656,6 +668,10 @@ def changesetpushes(ui, repo, rev, all=False, **opts):
     ('', 'sync', False, _('Synchronize the bug database.'), ''),
     ], _('hg buginfo [BUG] ...'))
 def buginfo(ui, repo, *bugs, **opts):
+    if not repo.changetracker:
+        ui.warning('Local database appears to be disabled')
+        return 1
+
     if opts['sync']:
         repo.sync_bug_database()
         return
@@ -1266,6 +1282,8 @@ def reposetup(ui, repo):
 
         @util.propertycache
         def changetracker(self):
+            if ui.configbool('mozext', 'disable_local_database'):
+                return None
             try:
                 return ChangeTracker(self.join('changetracker.db'))
             except Exception as e:
@@ -1298,13 +1316,14 @@ def reposetup(ui, repo):
 
                 if tree:
                     self._update_remote_refs(remote, tree)
-                    self.changetracker.load_pushlog(tree)
+                    if self.changetracker:
+                        self.changetracker.load_pushlog(tree)
 
                 # Sync bug info.
                 for rev in self.changelog.revs(old_rev + 1):
                     ctx = self[rev]
                     bugs = parse_bugs(ctx.description())
-                    if bugs:
+                    if bugs and self.changetracker:
                         self.changetracker.associate_bugs_with_changeset(bugs,
                             ctx.node())
 
@@ -1449,10 +1468,16 @@ def reposetup(ui, repo):
             return d
 
         def reset_bug_database(self):
+            if not self.changetracker:
+                return
+
             self.changetracker.wipe_bugs()
             self.sync_bug_database()
 
         def sync_bug_database(self):
+            if not self.changetracker:
+                return
+
             for rev in self:
                 ui.progress('changeset', rev, total=len(self))
                 ctx = self[rev]
