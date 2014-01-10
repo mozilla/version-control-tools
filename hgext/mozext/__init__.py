@@ -1230,32 +1230,36 @@ def extsetup(ui):
     revset.symbols['dontbuild'] = revset_dontbuild
     revset.symbols['me'] = revset_me
     revset.symbols['nobug'] = revset_nobug
-    revset.symbols['pushhead'] = revset_pushhead
     revset.symbols['reviewer'] = revset_reviewer
     revset.symbols['reviewed'] = revset_reviewed
-    revset.symbols['tree'] = revset_tree
-    revset.symbols['firstpushdate'] = revset_firstpushdate
-    revset.symbols['firstpushtree'] = revset_firstpushtree
-    revset.symbols['pushdate'] = revset_pushdate
+
+    if not ui.configbool('mozext', 'disable_local_database'):
+        revset.symbols['pushhead'] = revset_pushhead
+        revset.symbols['tree'] = revset_tree
+        revset.symbols['firstpushdate'] = revset_firstpushdate
+        revset.symbols['firstpushtree'] = revset_firstpushtree
+        revset.symbols['pushdate'] = revset_pushdate
 
     templatekw.keywords['bug'] = template_bug
     templatekw.keywords['bugs'] = template_bugs
     templatekw.keywords['reviewer'] = template_reviewer
     templatekw.keywords['reviewers'] = template_reviewers
-    templatekw.keywords['firstrelease'] = template_firstrelease
-    templatekw.keywords['firstbeta'] = template_firstbeta
-    templatekw.keywords['firstaurora'] = template_firstaurora
-    templatekw.keywords['firstnightly'] = template_firstnightly
-    templatekw.keywords['auroradate'] = template_auroradate
-    templatekw.keywords['nightlydate'] = template_nightlydate
-    templatekw.keywords['firstpushuser'] = template_firstpushuser
-    templatekw.keywords['firstpushtree'] = template_firstpushtree
-    templatekw.keywords['firstpushtbpl'] = template_firstpushtbpl
-    templatekw.keywords['firstpushdate'] = template_firstpushdate
-    templatekw.keywords['pushdates'] = template_pushdates
-    templatekw.keywords['pushheaddates'] = template_pushheaddates
-    templatekw.keywords['trees'] = template_trees
-    templatekw.keywords['reltrees'] = template_reltrees
+
+    if not ui.configbool('mozext', 'disable_local_database'):
+        templatekw.keywords['firstrelease'] = template_firstrelease
+        templatekw.keywords['firstbeta'] = template_firstbeta
+        templatekw.keywords['firstaurora'] = template_firstaurora
+        templatekw.keywords['firstnightly'] = template_firstnightly
+        templatekw.keywords['auroradate'] = template_auroradate
+        templatekw.keywords['nightlydate'] = template_nightlydate
+        templatekw.keywords['firstpushuser'] = template_firstpushuser
+        templatekw.keywords['firstpushtree'] = template_firstpushtree
+        templatekw.keywords['firstpushtbpl'] = template_firstpushtbpl
+        templatekw.keywords['firstpushdate'] = template_firstpushdate
+        templatekw.keywords['pushdates'] = template_pushdates
+        templatekw.keywords['pushheaddates'] = template_pushheaddates
+        templatekw.keywords['trees'] = template_trees
+        templatekw.keywords['reltrees'] = template_reltrees
 
     templater.funcs['dates'] = template_dates
 
