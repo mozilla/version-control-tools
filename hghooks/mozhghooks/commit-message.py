@@ -37,9 +37,11 @@ def isGoodMessage(c):
         print "*************************************************************\n\n"
 
     desc = c.description()
-    if c.user() in ["ffxbld", "seabld", "tbirdbld", "cltbld", "Gaia Pushbot <release+gaiajson@mozilla.com>"]:
+    if c.user() in ["ffxbld", "seabld", "tbirdbld", "cltbld",
+                    "Gaia Pushbot <release+gaiajson@mozilla.com>",
+                    "B2G Bumper Bot <release+b2gbumper@mozilla.com>"]:
         return True
-    
+
     if "try: " in desc:
         message("Rev {rev} uses try syntax. (Did you mean to push to Try instead?)")
         return False
@@ -47,7 +49,7 @@ def isGoodMessage(c):
     for r in goodMessage:
         if r.search(desc):
             return True
-    
+
     dlower = desc.lower()
     if dlower.startswith("merge") or dlower.startswith("merging") or dlower.startswith("automated merge"):
         if len(c.parents()) == 2:
@@ -73,14 +75,14 @@ def hook(ui, repo, node, hooktype, **kwargs):
     for i in reversed(xrange(rev, tip + 1)):
         c = repo.changectx(i)
 
-        if "IGNORE BAD COMMIT MESSAGES" in c.description(): 
+        if "IGNORE BAD COMMIT MESSAGES" in c.description():
             # Ignore commit messages for all earlier revs in this push.
             break
-        
+
         if not isGoodMessage(c):
             # Keep looping so the pusher sees all commits they need to fix.
             rejecting = True
-    
+
     if not rejecting:
       return 0
 
