@@ -29,7 +29,8 @@ REVIEW_RE = re.compile(r'[ra][=?]+(\w[^ ]+)')
 LIST_RE = re.compile(r'[;\.,\+\/\\]')
 
 def parse_bugs(s):
-    return [int(m[1]) for m in BUG_RE.findall(s)]
+    bugs = [int(m[1]) for m in BUG_RE.findall(s)]
+    return [bug for bug in bugs if bug < 100000000]
 
 def parse_reviewers(s):
     for r in REVIEW_RE.findall(s):
