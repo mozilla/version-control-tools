@@ -38,6 +38,7 @@ def hook(ui, repo, node, hooktype, **kwargs):
     # that the pusher can see all of the commits that need fixing in one go.
     for i in reversed(changesets):
         c = repo.changectx(i)
+
         desc = c.description()
 
         if "OVERRIDE HOOK" in desc:
@@ -46,6 +47,10 @@ def hook(ui, repo, node, hooktype, **kwargs):
 
         if "australis" in desc.lower():
             # This commit is labelled correctly, proceed to the next.
+            continue
+
+        if len(c.parents()) > 1:
+            # Skip merge changesets
             continue
 
         for file in c.files():
