@@ -580,10 +580,7 @@ def fill_values(values, ui, api_server, finalize=False):
     return values
 
 
-def update_patch(ui, repo, rev, bug, update, rename, interactive):
-    update_patch = update if update is not None else ui.configbool("bzexport", "update-patch", False)
-    rename_patch = rename if rename is not None else ui.configbool("bzexport", "rename-patch", False)
-
+def update_patch(ui, repo, rev, bug, update_patch, rename_patch, interactive):
     q = repo.mq
     try:
         rev = q.lookup(rev)
@@ -592,8 +589,13 @@ def update_patch(ui, repo, rev, bug, update, rename, interactive):
         update_patch = False
         rename_patch = False
 
-    if update_patch or rename_patch:
-        if interactive and ui.prompt(_("Update patch name/description (y/n)?")) != 'y':
+    todo = []
+    if rename_patch:
+        todo.append("name")
+    if update_patch:
+        todo.append("description")
+    if todo:
+        if interactive and ui.prompt("Update patch " + " and ".join(todo) + " (y/n)?") != 'y':
             ui.write(_("Exiting without updating patch\n"))
             return
 
@@ -961,8 +963,18 @@ def bzexport(ui, repo, *args, **opts):
             ui.write("Requesting feedback from %s\n" % user)
 
     if not opts['no_update']:
-        update = opts['update'] or opts['new']
-        rename = opts['update']
+        if opts['update']:
+            update = True
+        elif opts['new']:
+            update = ui.configbool("bzexport", "update-patch", True)
+        else:
+            update = ui.configbool("bzexport", "update-patch", False)
+
+        if opts['update']:
+            rename = opts['update']
+        else:
+            rename = ui.configbool("bzexport", "rename-patch", False)
+
         newname = update_patch(ui, repo, rev, bug, update, rename, opts['interactive'])
         if filename == rev:
             filename = newname
