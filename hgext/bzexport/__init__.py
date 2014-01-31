@@ -90,20 +90,11 @@ def get_default_version(ui, api_server, product):
     return versions[-1]
 
 
-# ui.promptchoice only allows single-character responses. If we have more than
-# 10 options, that won't work, so fall back to ui.prompt.
+# ui.promptchoice only allows single-character responses and was changed in
+# 2.7.1 to not be backwards compatible. So ignore it completely and just use
+# ui.prompt.
 def prompt_manychoice(ui, message, prompts):
-    seen = set()
-    found_multi = False
-    for p in prompts:
-        pos = p.index('&')
-        if pos >= 0:
-            if p[pos + 1] in seen:
-                found_multi = True
-            else:
-                seen.add(p[pos + 1])
-
-    while found_multi:
+    while True:
         choice = ui.prompt(message, 'default')
         if choice == 'default':
             return 0
@@ -111,9 +102,6 @@ def prompt_manychoice(ui, message, prompts):
         if choice in prompts:
             return prompts.index(choice)
         ui.write("unrecognized response\n")
-
-    return ui.promptchoice(message, prompts, len(prompts) - 1)
-
 
 def prompt_menu(ui, name, values,
                 readable_values=None,
