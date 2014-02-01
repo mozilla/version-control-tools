@@ -428,7 +428,8 @@ def infer_arguments(ui, repo, args, opts):
         # Default to '.'
         rev = '.'
 
-    if repo[rev] == repo["."]:
+    # If no revision or '.' was given, complain about local changes
+    if rev == '.' and not opts['force']:
         m, a, r, d = repo.status()[:4]
         if (m or a or r or d):
             raise util.Abort(_("Local changes found; refresh first!"))
@@ -1159,6 +1160,8 @@ cmdtable = {
           # The following option is passed through directly to patch.diffopts
           ('w', 'ignore_all_space', False,
            'Generate a diff that ignores whitespace changes'),
+          ('f', 'force', False,
+           'Proceed even if the working directory contains changes'),
           ] + newbug_opts,
          _('hg bzexport [options] [REV] [BUG]')),
 
@@ -1169,6 +1172,8 @@ cmdtable = {
            'Open a text editor to modify bug fields'),
           ('i', 'interactive', False,
            'Interactive -- request confirmation before any permanent action'),
+          ('f', 'force', False,
+           'Proceed even if the working directory contains changes'),
           ('', 'take-bug', False,
            'Assign bug to myself'),
           ] + newbug_opts,
