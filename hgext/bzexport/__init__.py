@@ -471,15 +471,22 @@ def choose_prodcomponent(ui, cache, orig_product, orig_component, finalize=False
     # bogus list of candidate products and a bogus list of candidate components
     # (one of which is the correct one, since it contains the substring.)
     # Restrict to just that component.
+    #
+    # Note that using a '/' as a separator is deprecated. If you use '::',
+    # there is no ambiguity.
     if component and not product:
+        doublecolon = component.find('::')
         slash = component.find('/')
-        if slash != -1:
+        if doublecolon != -1:
+            product = component[0:doublecolon].rstrip()
+            component = component[doublecolon + 2:].lstrip()
+        elif slash != -1:
             all_components = set()
             for p in all_products:
                 all_components.update(products_info[p]['component'].keys())
             if component.lower() not in [ c.lower() for c in all_components ]:
-                product = component[0:slash]
-                component = component[slash + 1:]
+                product = component[0:slash].rstrip()
+                component = component[slash + 1:].lstrip()
 
     # 'products' and 'components' will be the set of valid products/components
     # remaining after filtering by the 'product' and 'component' passed in
@@ -505,7 +512,7 @@ def choose_prodcomponent(ui, cache, orig_product, orig_component, finalize=False
     if component is not None:
         components = filter_strings(components, component)
 
-    # Now choose a final product/component (unless finalize is false, in which
+    # Now choose a final product::component (unless finalize is false, in which
     # case if there are multiple possibilities, the passed-in value will be
     # preserved)
 
@@ -687,7 +694,7 @@ def flag_type_id(ui, api_server, config_cache_filename, flag_name, product, comp
     if not configuration or not configuration["flag_type"]:
         raise util.Abort(_("Could not find configuration object"))
 
-    # Get the set of flag ids used for this product/component
+    # Get the set of flag ids used for this product::component
     prodflags = configuration['product'][product]['component'][component]['flag_type']
     flagdefs = configuration['flag_type']
 
@@ -912,7 +919,7 @@ def bzexport(ui, repo, *args, **opts):
         if bug is not None:
             raise util.Abort("Bug %s given but creation of new bug requested!" % bug)
 
-        if opts['interactive'] and ui.prompt(_("Create bug in '%s'/'%s' (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
+        if opts['interactive'] and ui.prompt(_("Create bug in '%s' :: '%s' (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
             ui.write(_("Exiting without creating bug\n"))
             return
 
@@ -1042,7 +1049,7 @@ def newbug(ui, repo, *args, **opts):
     may be case-insensitive substrings rather than exact matches of valid
     values. Ambiguous matches will be resolved with a menu. The -C
     (--component) option may be used to set both the product and component by
-    separating them with a forward slash ('/'), though usually just giving the
+    separating them with a double colon ('::'), though usually just giving the
     component should be sufficient.
     """
     auth, api_server, bugzilla = bugzilla_info(ui, opts.get('ffprofile'))
@@ -1081,7 +1088,7 @@ def newbug(ui, repo, *args, **opts):
         raise util.Abort("Invalid users")
     cc = select_users(cc, values['CC'])
 
-    if opts['interactive'] and ui.prompt(_("Create bug in '%s'/'%s' (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
+    if opts['interactive'] and ui.prompt(_("Create bug in '%s' :: '%s' (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
         ui.write(_("Exiting without creating bug\n"))
         return
 
