@@ -3,64 +3,77 @@ import os.path
 from mercurial.node import short
 
 hgNameToRevURL = {
-    'comm-central':     'comm-central/',
+    # Gecko trunk / integration branches
+    'b2g-inbound':      'integration/b2g-inbound/',
+    'build-system':     'projects/build-system',
     'fx-team':          'integration/fx-team/',
     'mozilla-central':  'mozilla-central/',
     'mozilla-inbound':  'integration/mozilla-inbound/',
-    'b2g-inbound':      'integration/b2g-inbound/',
-    'try':              'try/',
-    'mozilla-aurora':   'releases/mozilla-aurora/',
-    'mozilla-beta':     'releases/mozilla-beta/',
-    'mozilla-release':  'releases/mozilla-release/',
-    'mozilla-esr10':    'releases/mozilla-esr10/',
-    'mozilla-esr17':    'releases/mozilla-esr17/',
-    'mozilla-esr24':    'releases/mozilla-esr24/',
-    'mozilla-b2g18':    'releases/mozilla-b2g18/',
-    'mozilla-b2g18_v1_0_0':    'releases/mozilla-b2g18_v1_0_0/',
-    'mozilla-b2g18_v1_0_1':    'releases/mozilla-b2g18_v1_0_1/',
-    'mozilla-b2g18_v1_0_1_hd': 'releases/mozilla-b2g18_v1_0_1_hd/',
-    'mozilla-b2g26_v1_2': 'releases/mozilla-b2g26_v1_2/',
-    'mozilla-b2g26_v1_2f': 'releases/mozilla-b2g26_v1_2f/',
-    'comm-aurora':      'releases/comm-aurora/',
-    'comm-beta':        'releases/comm-beta/',
-    'comm-release':     'releases/comm-release/',
-    'comm-esr10':       'releases/comm-esr10/',
-    'comm-esr17':       'releases/comm-esr17/',
-    'comm-esr24':       'releases/comm-esr24/',
     'services-central': 'services/services-central/',
+    # Gecko release branches
+    'mozilla-aurora':  'releases/mozilla-aurora/',
+    'mozilla-beta':    'releases/mozilla-beta/',
+    'mozilla-release': 'releases/mozilla-release/',
+    'mozilla-esr24':   'releases/mozilla-esr24/',
+    # Gecko B2G branches
+    'mozilla-b2g28_v1_3':      'releases/mozilla-b2g28_v1_3/',
+    'mozilla-b2g28_v1_3t':     'releases/mozilla-b2g28_v1_3t/',
+    'mozilla-b2g26_v1_2':      'releases/mozilla-b2g26_v1_2/',
+    'mozilla-b2g26_v1_2f':     'releases/mozilla-b2g26_v1_2f/',
+    'mozilla-b2g18':           'releases/mozilla-b2g18/',
+    'mozilla-b2g18_v1_1_0_hd': 'releases/mozilla-b2g18_v1_1_0_hd/',
+    # Thunderbird branches
+    'comm-central': 'comm-central/',
+    'comm-aurora':  'releases/comm-aurora/',
+    'comm-beta':    'releases/comm-beta/',
+    'comm-release': 'releases/comm-release/',
+    'comm-esr24':   'releases/comm-esr24/',
+    # Try repos
+    'try':              'try/',
+    'try-comm-central': 'try-comm-central/',
 }
 
-# bug 860588 - support some project branches during b2g work week
+# Project branches that are in active use
 hgNameToRevURL.update({
-    'birch':    'projects/birch',
-    'cypress':  'projects/cypress',
+    'alder':   'projects/alder',
+    'ash':     'projects/ash',
+    'birch':   'projects/birch',
+    'cedar':   'projects/cedar',
+    'cypress': 'projects/cypress',
+    'date':    'projects/date',
+    'gum':     'projects/gum',
+    'holly':   'projects/holly',
+    'jamun':   'projects/jamun',
+    'maple':   'projects/maple',
+    'oak':     'projects/oak',
+    'pine':    'projects/pine',
 })
 
-
-# Build/ repos
+# RelEng repos
 hgNameToRevURL.update({
-    'autoland': 'build/autoland/',
-    'braindump': 'build/braindump/',
-    'buildapi': 'build/buildapi/',
-    'buildbot': 'build/buildbot/',
-    'buildbot-configs': 'build/buildbot-configs/',
-    'buildbotcustom': 'build/buildbotcustom/',
-    'cloud-tools': 'build/cloud-tools/',
-    'compare-locales': 'build/compare-locales/',
-    'fork-hg-git': 'build/fork-hg-git/',
-    'mozharness': 'build/mozharness/',
-    'mozpool': 'build/mozpool/',
+    'autoland':             'build/autoland/',
+    'braindump':            'build/braindump/',
+    'buildapi':             'build/buildapi/',
+    'buildbot':             'build/buildbot/',
+    'buildbot-configs':     'build/buildbot-configs/',
+    'buildbotcustom':       'build/buildbotcustom/',
+    'cloud-tools':          'build/cloud-tools/',
+    'compare-locales':      'build/compare-locales/',
+    'fork-hg-git':          'build/fork-hg-git/',
+    'hghooks':              'hgcustom/hghooks/',
+    'mozharness':           'build/mozharness/',
+    'mozpool':              'build/mozpool/',
     'opsi-package-sources': 'build/opsi-package-sources/',
-    'partner-repacks': 'build/partner-repacks/',
-    'preproduction': 'build/preproduction/',
-    'puppet': 'build/puppet/',
-    'puppet-manifests': 'build/puppet-manifests/',
-    'rpm-sources': 'build/rpm-sources/',
-    'talos': 'build/talos/',
-    'tools': 'build/tools/',
-    'twisted': 'build/twisted/',
+    'partner-repacks':      'build/partner-repacks/',
+    'preproduction':        'build/preproduction/',
+    'puppet':               'build/puppet/',
+    'puppet-manifests':     'build/puppet-manifests/',
+    'rpm-sources':          'build/rpm-sources/',
+    'talos':                'build/talos/',
+    'tbpl':                 'webtools/tbpl/',
+    'tools':                'build/tools/',
+    'twisted':              'build/twisted/',
 })
-
 
 def hook(ui, repo, node, hooktype, **kwargs):
     repo_name = os.path.basename(repo.root)
@@ -76,6 +89,13 @@ def hook(ui, repo, node, hooktype, **kwargs):
         tip_node = short(repo.changectx(tip).node())
         print 'You can view the progress of your build at the following URL:'
         print '  https://tbpl.mozilla.org/?tree=Try&rev=%s' % tip_node
+        return 0
+
+    # For try-comm-central, print out a TBPL url rather than the pushlog
+    if repo_name == 'try-comm-central':
+        tip_node = short(repo.changectx(tip).node())
+        print 'You can view the progress of your build at the following URL:'
+        print '  https://tbpl.mozilla.org/?tree=Thunderbird-Try&rev=%s' % tip_node
         return 0
 
     num_changes = tip + 1 - rev
