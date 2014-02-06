@@ -1,14 +1,22 @@
 bzexport: a Mercurial extension for attaching patches from a
   Mercurial repository to bugzilla from the command line.
 
+Original author: Ted Mielczarek
+
 INSTALLING
 ----------
 
+Run
+
+  ./mach mercurial-setup
+
+Or to install manually:
+
 1) Clone this repository somewhere on your local machine:
-   hg clone http://hg.mozilla.org/users/tmielczarek_mozilla.com/bzexport/
+   hg clone https://hg.mozilla.org/hgcustom/version-control-tools
 2) Edit your ~/.hgrc and add the following to enable the extension:
    [extensions]
-   bzexport = /path/to/bzexport/bzexport.py
+   bzexport = /path/to/version-control-tools/hgext/bzexport/
 
 NOTE FOR WINDOWS USERS
 ----------------------
