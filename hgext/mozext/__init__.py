@@ -394,8 +394,10 @@ def critique(ui, repo, entire=False, node=None, **kwargs):
         from flake8.engine import get_style_guide
     except ImportError:
         our_dir = os.path.dirname(__file__)
+        repo_root = os.path.normpath(os.path.join(our_dir, '..', '..'))
+        pylib = os.path.join(repo_root, 'pylib')
         for p in ('flake8', 'mccabe', 'pep8', 'pyflakes'):
-            sys.path.insert(0, os.path.join(our_dir, p))
+            sys.path.insert(0, os.path.join(pylib, p))
 
     from flake8.engine import get_style_guide
     from pep8 import DiffReport, parse_udiff
