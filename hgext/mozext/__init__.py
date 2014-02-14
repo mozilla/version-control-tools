@@ -350,7 +350,7 @@ from mozautomation.repository import (
 
 bz_available = False
 
-testedwith = '2.6.1 2.6.2 2.6.3 2.7.0 2.7.1 2.7.2'
+testedwith = '2.6.1 2.6.2 2.6.3 2.7.0 2.7.1 2.7.2 2.8 2.8.1 2.9'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Other%20Applications&component=mozext'
 
 commands.norepo += ' cloneunified moztrees treestatus'
