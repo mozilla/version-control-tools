@@ -210,7 +210,11 @@ def patch_changes(ui, repo, patchfile=None, **opts):
             for changedFile in changedFiles:
                 ui.write("  %s\n" % changedFile)
 
+    # Expand files out to their current full paths
     matchfn = scmutil.match(repo[None], changedFiles, default='relglob')
+    exactFiles = repo.walk(matchfn)
+
+    matchfn = scmutil.match(repo[None], exactFiles, default='path')
     left = opts['limit']
     for ctx in cmdutil.walkchangerevs(repo, matchfn, opts, lambda a,b: None):
         if left == 0:
