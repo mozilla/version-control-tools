@@ -768,14 +768,18 @@ def revset_bug(repo, subset, x):
     Changesets referencing a specified Bugzilla bug. e.g. bug(123456).
     """
     err = _('bug() requires an integer argument.')
-    n = revset.getstring(x, err)
+    bugstring = revset.getstring(x, err)
 
     try:
-        n = int(n)
+        bug = int(bugstring)
     except Exception:
         raise ParseError(err)
 
-    return [r for r in subset if n in parse_bugs(repo[r].description())]
+    # We do a simple string test first because avoiding regular expressions
+    # is good for performance.
+    return [r for r in subset
+            if bugstring in repo[r].description() and
+                bug in parse_bugs(repo[r].description())]
 
 
 def revset_dontbuild(repo, subset, x):
