@@ -2,15 +2,16 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from rbbz.auth import BugzillaBackend
+from reviewboard.accounts.backends import get_auth_backends
+
+
 class BugzillaCookieAuthMiddleware(object):
     """Set Bugzilla login cookies from auth backend."""
 
     def process_response(self, request, response):
-        print '************************ bugzilla cookie middleware'
-        return response
-        #if ('reviewboard.accounts.backends.BugzillaBackend'
-        #    not in settings.AUTHENTICATION_BACKENDS):
-        #    return response
+        if BugzillaBackend not in [x.__class__ for x in get_auth_backends()]:
+            return response
 
         if not request.user.is_authenticated():
             for key in ('Bugzilla_login', 'Bugzilla_logincookie'):

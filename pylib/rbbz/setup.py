@@ -5,7 +5,7 @@ VERSION = '0.1'
 
 setup(name=PACKAGE,
       version=VERSION,
-      description='Bugzilla authentication for ReviewBoard',
+      description='Bugzilla user database and authentication',
       author='Mark Cote',
       author_email='mcote@mozilla.com',
       license='MPL 2.0',
