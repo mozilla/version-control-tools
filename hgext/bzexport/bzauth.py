@@ -71,8 +71,10 @@ class bzAuth:
 def get_global_path(filename):
     path = None
     if platform.system() == "Windows":
-        CSIDL_PERSONAL = 5
-        path = win_get_folder_path(CSIDL_PERSONAL)
+        # The Windows user profile directory, eg: C:\Users\username
+        # From http://msdn.microsoft.com/en-us/library/windows/desktop/bb762494%28v=vs.85%29.aspx
+        CSIDL_PROFILE = 40
+        path = win_get_folder_path(CSIDL_PROFILE)
     else:
         path = os.path.expanduser("~")
     if path:
@@ -174,6 +176,7 @@ def find_profile(ui, profileName):
         basepath = pathref.FSRefMakePath()
         path = os.path.join(basepath, "Firefox")
     elif platform.system() == "Windows":
+        # From http://msdn.microsoft.com/en-us/library/windows/desktop/bb762494%28v=vs.85%29.aspx
         CSIDL_APPDATA = 26
         path = win_get_folder_path(CSIDL_APPDATA)
         if path:
