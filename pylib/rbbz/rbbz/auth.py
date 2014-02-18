@@ -11,6 +11,7 @@ from django.utils.translation import ugettext as _
 from djblets.siteconfig.models import SiteConfiguration
 from reviewboard.accounts.backends import AuthBackend
 
+from rbbz.forms import BugzillaAuthSettingsForm
 from rbbz.models import get_or_create_bugzilla_users
 from rbbz.transports import bugzilla_transport
 
@@ -19,7 +20,9 @@ class BugzillaBackend(AuthBackend):
     """
     Authenticate a user via Bugzilla XMLRPC.
     """
+
     name = _('Bugzilla')
+    settings_form = BugzillaAuthSettingsForm
 
     def bz_error_response(self, request):
         logout(request)
@@ -29,6 +32,10 @@ class BugzillaBackend(AuthBackend):
         username = username.strip()
         siteconfig = SiteConfiguration.objects.get_current()
         xmlrpc_url = siteconfig.get('auth_bz_xmlrpc_url')
+
+        if not xmlrpc_url:
+            return None
+
         transport = bugzilla_transport(xmlrpc_url)
         proxy = xmlrpclib.ServerProxy(xmlrpc_url, transport)
 
@@ -72,6 +79,10 @@ class BugzillaBackend(AuthBackend):
         username = username.strip()
         siteconfig = SiteConfiguration.objects.get_current()
         xmlrpc_url = siteconfig.get('auth_bz_xmlrpc_url')
+
+        if not xmlrpc_url:
+            return None
+
         transport = bugzilla_transport(xmlrpc_url)
 
         if not transport.set_bugzilla_cookies_from_request(request):
