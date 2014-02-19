@@ -22,6 +22,7 @@ class BugzillaBackend(AuthBackend):
     """
 
     name = _('Bugzilla')
+    login_instructions = _('using your Bugzilla credentials.')
     settings_form = BugzillaAuthSettingsForm
 
     def bz_error_response(self, request):
