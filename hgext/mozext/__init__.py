@@ -315,6 +315,7 @@ from mercurial.localrepo import (
 )
 from mercurial.node import (
     hex,
+    short,
 )
 from mercurial import (
     commands,
@@ -695,6 +696,32 @@ def buginfo(ui, repo, *bugs, **opts):
     for ctx in contexts:
         print_changeset_pushes(ui, repo, ctx.rev(), all=opts['all'])
         ui.write('\n')
+
+
+@command('mybookmarks', [], _('hg mybookmarks'))
+def mybookmarks(ui, repo):
+    """Show bookmarks that belong to me.
+
+    A common developer workflow involves creating bookmarks to track
+    feature work. A busy repository may have bookmarks belonging to many
+    people. This command provides a mechanism to easily query for bookmarks
+    belonging to you.
+
+    A bookmark belonging to you is one whose name begins with your configured
+    IRC nick or has you as the author of the bookmark's changeset.
+    """
+    nick = ui.config('mozext', 'ircnick')
+    prefix = '%s/' % nick
+    me = ui.config('ui', 'username')
+
+    for bookmark, node in sorted(repo._bookmarks.iteritems()):
+        user = repo[node].user()
+
+        if user != me and not bookmark.startswith(prefix):
+            continue
+
+        ui.write('%-50s %d:%s\n' % (
+            bookmark, repo[node].rev(), short(node)))
 
 
 def critic_hook(ui, repo, node=None, **opts):
