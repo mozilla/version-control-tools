@@ -19,7 +19,8 @@ def get_or_create_bugzilla_users(user_data):
             user_db = User.objects.get(username=username)
         except User.DoesNotExist:
             user_db = User(username=username, password='!',
-                           first_name=real_name, is_active=can_login)
+                           first_name=real_name, email=username,
+                           is_active=can_login)
             modified = True
         else:
             if user_db.first_name != real_name:
