@@ -1,6 +1,21 @@
-To enable this extension, create an entry for it in your hgrc, like this:
+qbackout: A Mercurial extension for backing out a series of changesets.
 
-[extensions]
-qbackout = ~/mozilla/qbackout
+Original author: Steve Fink
 
-For more information, see http://mercurial.selenic.com/wiki/UsingExtensions
+This extension is a port of mak's mercurial backout script from
+https://wiki.mozilla.org/User:Mak77
+
+INSTALLING
+----------
+
+Run
+
+  ./mach mercurial-setup
+
+Or to install manually:
+
+1) Clone this repository somewhere on your local machine:
+   hg clone https://hg.mozilla.org/hgcustom/version-control-tools
+2) Edit your ~/.hgrc and add the following to enable the extension:
+   [extensions]
+   qbackout = /path/to/version-control-tools/hgext/qbackout/
