@@ -110,32 +110,26 @@ def extsetup(ui=None):
     # returns the corrected name.
     def checkpatchname(patch):
       name = patch.name
-      # Hg v1.4+: "ui.prompt is now a simple prompt and does not accept a list of choices. Use ui.promptchoice instead.".
-      hasPromptchoice = hasattr(ui, 'promptchoice')
       while os.path.exists(q.join(name)):
         prompt = "A patch file named '%s' already exists in your patch directory. Rename %s '%s' (%d) (r)/overwrite (o)?" % \
                  (name,
                   'patch' if isinstance(patch, bz.Patch) else 'attachment',
                   patch.desc,
                   int(patch.id))
-        if hasPromptchoice:
-          choice = ui.promptchoice(prompt,
-                                   ("&readonly", "&overwrite"),
-                                   0)
-          choice = ["r", "o"][choice]
+        if name in q.series and q.isapplied(name):
+          ui.write("A patch file named '%s' is already applied.\n")
+          choice = 'r'
         else:
-          choice = ui.prompt(prompt,
-                             ("&readonly", "&overwrite"),
-                             "r")
+          choice = ui.prompt(prompt, "r")
         if choice == 'r':
           name = ui.prompt("Enter the new patch name (old one was '%s'):" % name)
         else: # overwrite
           break;
       if name in q.series and q.isapplied(name):
-        ui.warn("Patch was already applied. Changes will not take effect until the patch is reapplied.")
+        ui.fatal("Patch with that name is already applied.")
       return name
 
-    # hook for url.open which lets the user edit the returned 
+    # hook for url.open which lets the user edit the returned patch name
     def previewopen(orig, ui, path):
       fp = orig(ui, path)
 
@@ -177,6 +171,8 @@ def extsetup(ui=None):
         oldpatchname = q.full_series[q.full_series_end()]
       newpatchname = checkpatchname(bzhandler.last_imported_patch())
       if newpatchname != oldpatchname:
+        if newpatchname in q.series:
+          q.delete(repo, [ newpatchname ], {})
         qrename(ui, repo, oldpatchname, newpatchname)
         # mq always reports the original name, which is confusing so we'll
         # report the rename. But if ui.verbose is on, qrename will have already
