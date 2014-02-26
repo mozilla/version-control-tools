@@ -1,0 +1,19 @@
+qimportbz: A Mercurial extension to import patches from Bugzilla
+  into your mercurial queue.
+
+Original author: Rob Arnold
+
+INSTALLING
+----------
+
+Run
+
+  ./mach mercurial-setup
+
+Or to install manually:
+
+1) Clone this repository somewhere on your local machine:
+   hg clone https://hg.mozilla.org/hgcustom/version-control-tools
+2) Edit your ~/.hgrc and add the following to enable the extension:
+   [extensions]
+   qimportbz = /path/to/version-control-tools/hgext/qimportbz/
