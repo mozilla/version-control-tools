@@ -95,7 +95,7 @@ def get_default_version(ui, api_server, product):
 # ui.prompt.
 def prompt_manychoice(ui, message, prompts):
     while True:
-        choice = ui.prompt(message, 'default')
+        choice = ui.prompt(message, default='default')
         if choice == 'default':
             return 0
         choice = '&' + choice
@@ -563,11 +563,11 @@ def fill_values(values, ui, api_server, finalize=False):
 
     if 'BUGTITLE' in values:
         if values['BUGTITLE'] in [None, '<required>']:
-            values['BUGTITLE'] = ui.prompt(_("Bug title:"))
+            values['BUGTITLE'] = ui.prompt(_("Bug title:"), default='')
 
     if 'BUGCOMMENT0' in values:
         if values['BUGCOMMENT0'] in [None, '<required>']:
-            values['BUGCOMMENT0'] = ui.prompt(_("Bug description:"))
+            values['BUGCOMMENT0'] = ui.prompt(_("Bug description:"), default='')
 
     if 'ATTACHMENT_DESCRIPTION' in values:
         if values['ATTACHMENT_DESCRIPTION'] in [None, '<required>']:

@@ -292,7 +292,7 @@ def get_auth(ui, bugzilla, profile, username, password):
         ui.write("Credentials not found in .hgrc & unable to retrieve bugzilla login cookies.\n")
 
     if not username:
-        username = ui.prompt("Enter username for %s:" % bugzilla)
+        username = ui.prompt("Enter username for %s:" % bugzilla, default='')
     if not password:
         password = ui.getpass("Enter password for %s: " % username)
 
