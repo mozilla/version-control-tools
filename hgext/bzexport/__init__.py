@@ -853,7 +853,7 @@ def bzexport(ui, repo, *args, **opts):
     elif len(reviewers) > 0:
         # Pulled reviewers out of commit message
         valid_users = validate_users(ui, api_server, auth, reviewers, multi_user_prompt, 'reviewer')
-        reviewers = select_users(valid_users, search_strings)
+        reviewers = select_users(valid_users, reviewers)
 
     if reviewers is None:
         raise util.Abort(_("Invalid reviewers"))
