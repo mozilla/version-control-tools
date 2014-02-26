@@ -826,6 +826,12 @@ def bzexport(ui, repo, *args, **opts):
                 reviewers.append(m.group(1))
             return ''
         desc = review_re.sub(grab_reviewer, desc).rstrip()
+
+        # Strip any trailing separators, if the original was something like:
+        # "Desc; r=foo" or "Desc. r=foo"
+        if desc[-1] in [';', '.']:
+            desc = desc[:-1].rstrip()
+
         if len(reviewers) > 0:
             opts['review'] = ''
 
