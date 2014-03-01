@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from setuptools import setup
 
 PACKAGE = 'rbbz'
@@ -6,7 +8,7 @@ VERSION = '0.1'
 setup(name=PACKAGE,
       version=VERSION,
       description='Bugzilla user database and authentication',
-      author='Mark Cote',
+      author='Mark Côté',
       author_email='mcote@mozilla.com',
       license='MPL 2.0',
       packages=['rbbz'],
