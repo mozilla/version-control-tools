@@ -3,14 +3,15 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rbbz.auth import BugzillaBackend
-from reviewboard.accounts.backends import get_auth_backends
+from reviewboard.accounts.backends import get_enabled_auth_backends
 
 
 class BugzillaCookieAuthMiddleware(object):
     """Set Bugzilla login cookies from auth backend."""
 
     def process_response(self, request, response):
-        if BugzillaBackend not in [x.__class__ for x in get_auth_backends()]:
+        if BugzillaBackend not in [x.__class__ for
+                                   x in get_enabled_auth_backends()]:
             return response
 
         if not request.user.is_authenticated():

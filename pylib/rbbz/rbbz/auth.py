@@ -21,6 +21,7 @@ class BugzillaBackend(AuthBackend):
     Authenticate a user via Bugzilla XMLRPC.
     """
 
+    backend_id = _('bugzilla')
     name = _('Bugzilla')
     login_instructions = _('using your Bugzilla credentials.')
     settings_form = BugzillaAuthSettingsForm
