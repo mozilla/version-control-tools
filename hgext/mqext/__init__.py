@@ -213,6 +213,8 @@ def patch_changes(ui, repo, patchfile=None, **opts):
     # Expand files out to their current full paths
     matchfn = scmutil.match(repo[None], changedFiles, default='relglob')
     exactFiles = repo.walk(matchfn)
+    if len(exactFiles) == 0:
+        return
 
     matchfn = scmutil.match(repo[None], exactFiles, default='path')
     left = opts['limit']
@@ -251,10 +253,16 @@ def reviewers(ui, repo, patchfile=None, **opts):
 
     suckers = Counter()
     supersuckers = Counter()
+    changeCount = 0
     for change in patch_changes(ui, repo, patchfile, **opts):
+        changeCount += 1
         suckers.update(canon(x) for x in suckerRe.findall(change.description()))
         if not opts.get('brief'):
             supersuckers.update(canon(x) for x in supersuckerRe.findall(change.description()))
+
+    if changeCount == 0:
+        ui.write("no matching files found\n")
+        return
 
     if opts.get('brief'):
         if len(suckers) == 0:
