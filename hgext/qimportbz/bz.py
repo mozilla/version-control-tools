@@ -197,7 +197,8 @@ class Patch(Attachment):
     # The patch name might have some illegal characters so we need to scrub those
     replacements = {
       '_' : [' ', ':'],
-      '' : ['"', "'", '<', '>', '[', ']', '(', ')', '*']
+      '' : ['"', "'", '<', '>', '[', ']', '(', ')', '*'],
+      '_slash_' : ['/', '\\'],
     }
     for replacement, items in replacements.items():
       for char in items:
