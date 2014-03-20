@@ -782,10 +782,10 @@ def bzexport(ui, repo, *args, **opts):
         desc = '<required>'
     else:
         # Lightly reformat changeset messages into attachment descriptions.
-        bzexport.newbug = None
+        bzexport.desc_bug_number = None
 
         def grab_bug(m):
-            bzexport.newbug = m.group(2)
+            bzexport.desc_bug_number = m.group(2)
             return ''
 
         # Only use the first line of the provided description for our actual
@@ -797,18 +797,19 @@ def bzexport(ui, repo, *args, **opts):
         if len(parts) == 2:
             patch_comment = parts[1].strip()
 
-        if not bzexport.newbug:
+        if not bzexport.desc_bug_number:
             # Try to find it in the commit description, if it wasn't found in
             # the description passed on the command line.
             commit_desc = repo[rev].description().decode('utf-8')
             bug_re.sub(grab_bug, commit_desc.split('\n', 1)[0], 1)
-        if bzexport.newbug:
-            if bug and bug != bzexport.newbug:
+
+        if bzexport.desc_bug_number:
+            if bug and bug != bzexport.desc_bug_number:
                 ui.warn("Warning: Bug number %s from commandline doesn't match "
                         "bug number %s from changeset description\n"
-                        % (bug, bzexport.newbug))
+                        % (bug, bzexport.desc_bug_number))
             else:
-                bug = bzexport.newbug
+                bug = bzexport.desc_bug_number
 
         # Strip any remaining leading separator and whitespace,
         # if the original was something like "bug NNN - "
