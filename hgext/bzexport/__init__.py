@@ -782,17 +782,21 @@ def bzexport(ui, repo, *args, **opts):
         desc = '<required>'
     else:
         # Lightly reformat changeset messages into attachment descriptions.
-        # First, strip off a "bug NNN" or "b=NNN" in the first line, but save
-        # it in case a bug number was not provided.
         bzexport.newbug = None
 
         def grab_bug(m):
             bzexport.newbug = m.group(2)
             return ''
 
+        # Only use the first line of the provided description for our actual
+        # description - use the rest for the patch/bug comment.
+        # Also strip the bug number from the description, but save it in case
+        # a bug number was not provided.
         parts = orig_desc.split('\n', 1)
-        parts[0] = bug_re.sub(grab_bug, parts[0], 1)
-        desc = ''.join(parts)
+        desc = bug_re.sub(grab_bug, parts[0], 1)
+        if len(parts) == 2:
+            patch_comment = parts[1].strip()
+
         if not bzexport.newbug:
             # Try to find it in the commit description, if it wasn't found in
             # the description passed on the command line.
@@ -811,13 +815,6 @@ def bzexport(ui, repo, *args, **opts):
         desc = desc.lstrip()
         if desc[0] in ['-', ':', '.']:
             desc = desc[1:].lstrip()
-
-        # Next, just take the first line in case. If there is more than one
-        # line, use it as a comment.
-        m = re.match(r'([^\n]*)\n+(.*)', desc, re.DOTALL)
-        if m:
-            desc = m.group(1)
-            patch_comment = m.group(2)
 
         # Next strip off review and approval annotations, grabbing the
         # reviewers from the patch comments only if -r auto was given
