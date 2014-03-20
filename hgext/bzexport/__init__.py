@@ -442,6 +442,17 @@ def infer_arguments(ui, repo, args, opts):
     return (rev, bug)
 
 
+def extract_bug_num_and_desc(desc):
+    # Given a commit description, attempt to return a bug number (if found),
+    # and the description with that bug number string removed.
+    bug = None
+    m = bug_re.search(desc)
+    if m:
+        bug = m.group(2)
+        desc = desc[:m.start()] + desc[m.end():]
+    return (bug, desc.strip())
+
+
 def choose_prodcomponent(ui, cache, orig_product, orig_component, finalize=False):
     def canon(v):
         if not v or v == '<choose-from-menu>':
@@ -780,34 +791,30 @@ def bzexport(ui, repo, *args, **opts):
         desc = '<required>'
     else:
         # Lightly reformat changeset messages into attachment descriptions.
-        bzexport.desc_bug_number = None
-
-        def grab_bug(m):
-            bzexport.desc_bug_number = m.group(2)
-            return ''
-
         # Only use the first line of the provided description for our actual
         # description - use the rest for the patch/bug comment.
-        # Also strip the bug number from the description, but save it in case
-        # a bug number was not provided.
         parts = orig_desc.split('\n', 1)
-        desc = bug_re.sub(grab_bug, parts[0], 1).strip()
+        firstline = parts[0]
         if len(parts) == 2:
             patch_comment = parts[1].strip()
 
-        if not bzexport.desc_bug_number:
-            # Try to find it in the commit description, if it wasn't found in
-            # the description passed on the command line.
-            commit_desc = repo[rev].description().decode('utf-8')
-            bug_re.sub(grab_bug, commit_desc.split('\n', 1)[0], 1)
+        # Attempt to split the firstline into a bug number, and strip()ed
+        # description with that bug number string removed.
+        desc_bug_number, desc = extract_bug_num_and_desc(firstline)
 
-        if bzexport.desc_bug_number:
-            if bug and bug != bzexport.desc_bug_number:
+        # Failing that try looking in the commit description for a bug number,
+        # since orig_desc could have come from the command line instead.
+        if not desc_bug_number:
+            commit_firstline = repo[rev].description().decode('utf-8').split('\n', 1)[0]
+            desc_bug_number, __ = extract_bug_num_and_desc(commit_firstline)
+
+        if desc_bug_number:
+            if bug and bug != desc_bug_number:
                 ui.warn("Warning: Bug number %s from commandline doesn't match "
                         "bug number %s from changeset description\n"
-                        % (bug, bzexport.desc_bug_number))
+                        % (bug, desc_bug_number))
             else:
-                bug = bzexport.desc_bug_number
+                bug = desc_bug_number
 
         # Strip any remaining leading separator and whitespace,
         # if the original was something like "bug NNN - "
