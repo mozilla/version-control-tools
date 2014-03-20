@@ -84,7 +84,7 @@ def get_default_version(ui, api_server, product):
     # impossible to determine the default. If there's something like
     # "unspecified" in the list, prefer that for now, until bzapi gets fixed.
     # https://bugzilla.mozilla.org/show_bug.cgi?id=723170
-    uns = [ v for v in versions if v.startswith("un") ]
+    uns = [v for v in versions if v.startswith("un")]
     if uns:
         return uns[-1]
     return versions[-1]
@@ -102,6 +102,7 @@ def prompt_manychoice(ui, message, prompts):
         if choice in prompts:
             return prompts.index(choice)
         ui.write("unrecognized response\n")
+
 
 def prompt_menu(ui, name, values,
                 readable_values=None,
@@ -133,10 +134,10 @@ def prompt_menu(ui, name, values,
 
 def filter_strings(collection, substring):
     substring = substring.lower()
-    ret = [ s for s in collection if s.lower() == substring ]
+    ret = [s for s in collection if s.lower() == substring]
     if ret:
         return ret
-    return [ v for v in collection if v.lower().find(substring) != -1 ]
+    return [v for v in collection if v.lower().find(substring) != -1]
 
 
 def choose_value(ui, desc, options, message="", usemenu=True):
@@ -174,7 +175,8 @@ def find_users(ui, api_server, user_cache_filename, token, search_strings):
         try:
             users = json.load(urlopen(ui, bz.find_users(api_server, token, search_string)))
             name = None
-            real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"]) if user["real_name"] else user["email"], users["users"])
+            real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"])
+                             if user["real_name"] else user["email"], users["users"])
             names = map(lambda user: user["name"], users["users"])
             search_results.append({"search_string": search_string,
                                    "names": names,
@@ -197,7 +199,8 @@ def validate_users(ui, api_server, auth, search_strings, multi_callback, multi_d
     results = {}
     for search_result in search_results:
         if search_result["real_names"] is None:
-            ui.write_err("Error: couldn't find user with search string \"%s\": %s\n" % (search_result["search_string"], search_result["error"]))
+            ui.write_err("Error: couldn't find user with search string \"%s\": %s\n" %
+                         (search_result["search_string"], search_result["error"]))
             search_failed = True
         elif len(search_result["real_names"]) > 10:
             ui.write_err("Error: too many bugzilla users matching \"%s\":\n\n" % search_result["search_string"])
@@ -207,7 +210,7 @@ def validate_users(ui, api_server, auth, search_strings, multi_callback, multi_d
         elif len(search_result["real_names"]) > 1:
             user = multi_callback(ui, multi_desc, search_result)
             if user is not None:
-                results[search_result['search_string']] = [ user ]
+                results[search_result['search_string']] = [user]
         elif len(search_result["real_names"]) == 1:
             results[search_result['search_string']] = search_result['names']
         else:
@@ -245,7 +248,7 @@ def savefile(repo, basename, text):
 # the whole template into a regex with /(.*?)/ in place of each keyword and
 # match the edited output against that. Pull out the possibly-updated field
 # values.
-templates = { 'new_both_template': '''Title: @BUGTITLE@
+templates = {'new_both_template': '''Title: @BUGTITLE@
 Product: @PRODUCT@
 Component: @COMPONENT@
 Version: @PRODVERSION@
@@ -269,7 +272,7 @@ Attachment Comment (appears as a regular comment on the bug):
 
 ---- END Attachment Comment ----
 ''',
-              'new_bug_template': '''Title: @BUGTITLE@
+             'new_bug_template': '''Title: @BUGTITLE@
 Product: @PRODUCT@
 Component: @COMPONENT@
 Version: @PRODVERSION@
@@ -283,7 +286,7 @@ Bug Description (aka comment 0):
 
 --- END Bug Description ---
 ''',
-              'existing_bug_template': '''Bug: @BUGNUM@
+             'existing_bug_template': '''Bug: @BUGNUM@
 
 Attachment Filename: @ATTACHMENT_FILENAME@
 Attachment Description: @ATTACHMENT_DESCRIPTION@
@@ -294,7 +297,7 @@ Attachment Comment (appears as a regular comment on the bug):
 @ATTACHCOMMENT@
 
 ---- END Attachment Comment ----
-''' }
+'''}
 
 field_re = re.compile(r'@([^@]+)@')
 
@@ -485,7 +488,7 @@ def choose_prodcomponent(ui, cache, orig_product, orig_component, finalize=False
             all_components = set()
             for p in all_products:
                 all_components.update(products_info[p]['component'].keys())
-            if component.lower() not in [ c.lower() for c in all_components ]:
+            if component.lower() not in [c.lower() for c in all_components]:
                 product = component[0:slash].rstrip()
                 component = component[slash + 1:].lstrip()
 
@@ -500,7 +503,7 @@ def choose_prodcomponent(ui, cache, orig_product, orig_component, finalize=False
                                    message="Possible Products:",
                                    usemenu=finalize)
             if product is not None:
-                products = [ product ]
+                products = [product]
         else:
             # Inverted lookup: find products matching the given component (or
             # substring of a component)
@@ -549,12 +552,14 @@ def fill_values(values, ui, api_server, finalize=False):
     cache = bzauth.load_configuration(ui, api_server, BINARY_CACHE_FILENAME)
 
     if 'PRODUCT' in values:
-        values['PRODUCT'], values['COMPONENT'] = choose_prodcomponent(ui, cache, values['PRODUCT'], values['COMPONENT'], finalize=finalize)
+        values['PRODUCT'], values['COMPONENT'] = choose_prodcomponent(ui, cache, values['PRODUCT'],
+                                                                      values['COMPONENT'], finalize=finalize)
 
     if 'PRODVERSION' in values:
         if values['PRODVERSION'] == '<default>' and values['PRODUCT'] not in [None, '<choose-from-menu>']:
             values['PRODVERSION'] = get_default_version(ui, api_server, values['PRODUCT'])
-            ui.write("Using default version '%s' of product %s\n" % (values['PRODVERSION'].encode('utf-8'), values['PRODUCT'].encode('utf-8')))
+            ui.write("Using default version '%s' of product %s\n" %
+                     (values['PRODVERSION'].encode('utf-8'), values['PRODUCT'].encode('utf-8')))
 
     # 'finalize' means we need the final values. (finalize will be set to false
     # for prepopulating fields that will be displayed in a form)
@@ -612,12 +617,12 @@ def update_patch(ui, repo, rev, bug, update_patch, rename_patch, interactive):
     if update_patch:
         # Add "Bug nnnn - " to the beginning of the description
         ph = mq.patchheader(q.join(rev), q.plainmode)
-        msg = [ s.decode('utf-8') for s in ph.message ]
+        msg = [s.decode('utf-8') for s in ph.message]
         if not msg:
             msg = ["Bug %s patch" % bug]
         elif not bug_re.search(msg[0]):
             msg[0] = "Bug %s - %s" % (bug, msg[0])
-        opts = { 'git': True, 'message': '\n'.join(msg).encode('utf-8'), 'include': ["re:."] }
+        opts = {'git': True, 'message': '\n'.join(msg).encode('utf-8'), 'include': ["re:."]}
         mq.refresh(ui, repo, **opts)
 
     return rev
@@ -633,10 +638,10 @@ def obsolete_old_patches(ui, api_server, token, bugid, bugzilla, filename, ignor
 
     patches = [p
                for p in bug["attachments"]
-               if p["is_patch"]
-                  and not p["is_obsolete"]
-                  and p["file_name"] == filename
-                  and int(p["id"]) != int(ignore_id)]
+               if (p["is_patch"]
+                   and not p["is_obsolete"]
+                   and p["file_name"] == filename
+                   and int(p["id"]) != int(ignore_id))]
     if not len(patches):
         return True
 
@@ -671,7 +676,8 @@ def find_reviewers(ui, api_server, user_cache_filename, token, search_strings):
         try:
             users = json.load(urlopen(ui, bz.find_users(api_server, token, search_string)))
             name = None
-            real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"]) if user["real_name"] else user["email"], users["users"])
+            real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"])
+                             if user["real_name"] else user["email"], users["users"])
             names = map(lambda user: user["name"], users["users"])
             search_results.append({"search_string": search_string,
                                    "names": names,
@@ -699,7 +705,7 @@ def flag_type_id(ui, api_server, config_cache_filename, flag_name, product, comp
     prodflags = configuration['product'][product]['component'][component]['flag_type']
     flagdefs = configuration['flag_type']
 
-    flag_ids = [ id for id in prodflags if flagdefs[str(id)]['name'] == flag_name ]
+    flag_ids = [id for id in prodflags if flagdefs[str(id)]['name'] == flag_name]
 
     if len(flag_ids) != 1:
         raise util.Abort(_("Could not find unique %s flag id") % flag_name)
@@ -713,6 +719,7 @@ def review_flag_type_id(ui, api_server, config_cache_filename, product, componen
 
 def feedback_flag_type_id(ui, api_server, config_cache_filename, product, component):
     return flag_type_id(ui, api_server, config_cache_filename, 'feedback', product, component)
+
 
 def create_attachment(ui, api_server, token, bug,
                       config_cache_filename,
@@ -861,13 +868,13 @@ def bzexport(ui, repo, *args, **opts):
         valid_users = validate_users(ui, api_server, auth, search_strings, multi_user_prompt, 'feedback from')
         feedback = select_users(valid_users, search_strings)
 
-    values = { 'BUGNUM': bug,
-               'ATTACHMENT_FILENAME': filename,
-               'ATTACHMENT_DESCRIPTION': desc,
-               'ATTACHCOMMENT': attachment_comment,
-               'REVIEWERS': reviewers,
-               'FEEDBACK': feedback,
-               }
+    values = {'BUGNUM': bug,
+              'ATTACHMENT_FILENAME': filename,
+              'ATTACHMENT_DESCRIPTION': desc,
+              'ATTACHCOMMENT': attachment_comment,
+              'REVIEWERS': reviewers,
+              'FEEDBACK': feedback,
+              }
 
     cc = []
     depends = opts["depends"].split(",")
@@ -910,8 +917,8 @@ def bzexport(ui, repo, *args, **opts):
             cc = select_users(users, values['CC'])
         if 'BLOCKS' in values:     # Only when opts['new']
             blocks = values['BLOCKS']
-        if 'DEPENDS' in values:    # Only when opts['new'] 
-           depends = values['DEPENDS']
+        if 'DEPENDS' in values:    # Only when opts['new']
+            depends = values['DEPENDS']
         if 'FEEDBACK' in values:   # Always true
             feedback = select_users(users, values['FEEDBACK'])
         if 'ATTACHMENT_FILENAME' in values:
@@ -923,7 +930,8 @@ def bzexport(ui, repo, *args, **opts):
         if bug is not None:
             raise util.Abort("Bug %s given but creation of new bug requested!" % bug)
 
-        if opts['interactive'] and ui.prompt(_("Create bug in '%s' :: '%s' (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
+        if opts['interactive'] and ui.prompt(_("Create bug in '%s' :: '%s' (y/n)?") %
+                                             (values['PRODUCT'], values['COMPONENT'])) != 'y':
             ui.write(_("Exiting without creating bug\n"))
             return
 
@@ -1016,18 +1024,18 @@ def bzexport(ui, repo, *args, **opts):
     def pre_obsolete(**kwargs):
         if not opts['interactive']:
             return True
-        url, filename, description = [ kwargs[k] for k in ['url', 'filename', 'description' ] ]
+        url, filename, description = [kwargs[k] for k in ['url', 'filename', 'description']]
         return ui.prompt(_("Obsolete patch %s (%s) - %s (y/n)?") % (url, filename, description)) == 'y'
 
     obsolete_old_patches(ui, api_server, auth, bug, bugzilla, filename, result['id'], pre_hook=pre_obsolete)
 
     # If attaching to an existing bug (and not suppressed on the command line), take the bug
     if not opts['new'] and not opts['no_take_bug']:
-        req = bz.get_bug(api_server, auth, bug, include_fields=[ 'assigned_to', 'status' ])
+        req = bz.get_bug(api_server, auth, bug, include_fields=['assigned_to', 'status'])
         result = json.load(urlopen(ui, req))
         taker = auth.username(api_server)
         if result['assigned_to']['name'] != taker:
-            result['assigned_to'] = { 'name': taker }
+            result['assigned_to'] = {'name': taker}
             if result['status'] != 'RESOLVED':
                 result['status'] = 'ASSIGNED'
             req = bz.update_bug(api_server, auth, result)
@@ -1070,15 +1078,15 @@ def newbug(ui, repo, *args, **opts):
 
     bug_comment = opts['comment'] or '<required>'
 
-    values = { 'BUGTITLE': opts['title'] or '<required>',
-               'PRODUCT': opts.get('product', '') or ui.config("bzexport", "product", '<choose-from-menu>'),
-               'COMPONENT': opts.get('component', '') or ui.config("bzexport", "component", '<choose-from-menu>'),
-               'PRODVERSION': opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>'),
-               'BUGCOMMENT0': bug_comment,
-               'CC': [],
-               'DEPENDS': opts["depends"].split(","),
-               'BLOCKS': opts["blocks"].split(","),
-               }
+    values = {'BUGTITLE': opts['title'] or '<required>',
+              'PRODUCT': opts.get('product', '') or ui.config("bzexport", "product", '<choose-from-menu>'),
+              'COMPONENT': opts.get('component', '') or ui.config("bzexport", "component", '<choose-from-menu>'),
+              'PRODVERSION': opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>'),
+              'BUGCOMMENT0': bug_comment,
+              'CC': [],
+              'DEPENDS': opts["depends"].split(","),
+              'BLOCKS': opts["blocks"].split(","),
+              }
 
     fill_values(values, ui, api_server, finalize=False)
 
@@ -1092,7 +1100,8 @@ def newbug(ui, repo, *args, **opts):
         raise util.Abort("Invalid users")
     cc = select_users(cc, values['CC'])
 
-    if opts['interactive'] and ui.prompt(_("Create bug in '%s' :: '%s' (y/n)?") % (values['PRODUCT'], values['COMPONENT'])) != 'y':
+    if opts['interactive'] and ui.prompt(_("Create bug in '%s' :: '%s' (y/n)?") %
+                                         (values['PRODUCT'], values['COMPONENT'])) != 'y':
         ui.write(_("Exiting without creating bug\n"))
         return
 
@@ -1135,50 +1144,51 @@ newbug_opts = [
 
 cmdtable = {
     'bzexport':
-        (bzexport,
-         [('d', 'description', '', 'Bugzilla attachment description'),
-          ('c', 'comment', '', 'Comment to add with the attachment'),
-          ('e', 'edit', False,
-           'Open a text editor to modify bug fields'),
-          ('r', 'review', '',
-           'List of users to request review from (comma-separated search strings), or "auto" to parse the reviewers out of the patch comment'),
-          ('F', 'feedback', '',
-           'List of users to request feedback from (comma-separated search strings)'),
-          ('', 'cc', '',
-           'List of users to CC on the bug (comma-separated search strings)'),
-          ('', 'new', False,
-           'Create a new bug'),
-          ('i', 'interactive', False,
-           'Interactive -- request confirmation before any permanent action'),
-          ('', 'no-take-bug', False,
-           'Do not assign bug to myself'),
-          ('', 'bug-description', '',
-           'New bug description (aka comment 0)'),
-          ('u', 'update', None,
-           'Update patch name and description to include bug number (only valid with --new)'),
-          ('', 'no-update', None,
-           'Suppress patch name/description update (override config file)'),
-          ('', 'number', '',
-           'When posting, prefix the patch description with "Patch <number> - "'),
-          # The following option is passed through directly to patch.diffopts
-          ('w', 'ignore_all_space', False,
-           'Generate a diff that ignores whitespace changes'),
-          ('f', 'force', False,
-           'Proceed even if the working directory contains changes'),
-          ] + newbug_opts,
-         _('hg bzexport [options] [REV] [BUG]')),
+    (bzexport,
+        [('d', 'description', '', 'Bugzilla attachment description'),
+         ('c', 'comment', '', 'Comment to add with the attachment'),
+         ('e', 'edit', False,
+          'Open a text editor to modify bug fields'),
+         ('r', 'review', '',
+          'List of users to request review from (comma-separated search strings),'
+          'or "auto" to parse the reviewers out of the patch comment'),
+         ('F', 'feedback', '',
+          'List of users to request feedback from (comma-separated search strings)'),
+         ('', 'cc', '',
+          'List of users to CC on the bug (comma-separated search strings)'),
+         ('', 'new', False,
+          'Create a new bug'),
+         ('i', 'interactive', False,
+          'Interactive -- request confirmation before any permanent action'),
+         ('', 'no-take-bug', False,
+          'Do not assign bug to myself'),
+         ('', 'bug-description', '',
+          'New bug description (aka comment 0)'),
+         ('u', 'update', None,
+          'Update patch name and description to include bug number (only valid with --new)'),
+         ('', 'no-update', None,
+          'Suppress patch name/description update (override config file)'),
+         ('', 'number', '',
+          'When posting, prefix the patch description with "Patch <number> - "'),
+         # The following option is passed through directly to patch.diffopts
+         ('w', 'ignore_all_space', False,
+          'Generate a diff that ignores whitespace changes'),
+         ('f', 'force', False,
+          'Proceed even if the working directory contains changes'),
+         ] + newbug_opts,
+        _('hg bzexport [options] [REV] [BUG]')),
 
     'newbug':
-        (newbug,
-         [('c', 'comment', '', 'Comment to add with the bug'),
-          ('e', 'edit', False,
-           'Open a text editor to modify bug fields'),
-          ('i', 'interactive', False,
-           'Interactive -- request confirmation before any permanent action'),
-          ('f', 'force', False,
-           'Proceed even if the working directory contains changes'),
-          ('', 'take-bug', False,
-           'Assign bug to myself'),
-          ] + newbug_opts,
-         _('hg newbug [-e] [[-t] TITLE] [[-c] COMMENT]' )),
+    (newbug,
+        [('c', 'comment', '', 'Comment to add with the bug'),
+         ('e', 'edit', False,
+          'Open a text editor to modify bug fields'),
+         ('i', 'interactive', False,
+          'Interactive -- request confirmation before any permanent action'),
+         ('f', 'force', False,
+          'Proceed even if the working directory contains changes'),
+         ('', 'take-bug', False,
+          'Assign bug to myself'),
+         ] + newbug_opts,
+        _('hg newbug [-e] [[-t] TITLE] [[-c] COMMENT]')),
 }

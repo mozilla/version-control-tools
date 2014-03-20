@@ -26,12 +26,13 @@ import json
 from mercurial import config, util
 from mercurial.i18n import _
 try:
-  import cPickle as pickle
+    import cPickle as pickle
 except:
-  import pickle
+    import pickle
 import bz
 
 global_cache = None
+
 
 class bzAuth:
     """
@@ -42,6 +43,7 @@ class bzAuth:
     """
     typeCookie = 1
     typeExplicit = 2
+
     def __init__(self, userid=None, cookie=None, username=None, password=None):
         assert (userid and cookie) or (username and password)
         assert not ((userid or cookie) and (username or password))
@@ -68,6 +70,7 @@ class bzAuth:
         else:
             return self._username
 
+
 def get_global_path(filename):
     path = None
     if platform.system() == "Windows":
@@ -81,27 +84,30 @@ def get_global_path(filename):
         path = os.path.join(path, filename)
     return path
 
+
 def store_global_cache(filename):
     fp = open(get_global_path(filename), "wb")
     pickle.dump(global_cache, fp)
     fp.close()
 
+
 def load_global_cache(ui, api_server, filename):
     global global_cache
     if global_cache:
-      return global_cache
+        return global_cache
 
     cache_file = get_global_path(filename)
 
     try:
-        fp = open(cache_file, "rb");
+        fp = open(cache_file, "rb")
         global_cache = pickle.load(fp)
     except IOError, e:
-        global_cache = { api_server: { 'real_names': {} } }
+        global_cache = {api_server: {'real_names': {}}}
     except Exception, e:
         raise util.Abort("Error loading user cache: " + str(e))
 
     return global_cache
+
 
 def store_user_cache(cache, filename):
     user_cache = get_global_path(filename)
@@ -113,16 +119,18 @@ def store_user_cache(cache, filename):
         fp.write("\n")
     fp.close()
 
+
 def load_user_cache(ui, api_server, filename):
     user_cache = get_global_path(filename)
 
     # Ensure that the cache exists before attempting to use it
-    fp = open(user_cache, "a");
+    fp = open(user_cache, "a")
     fp.close()
 
     c = config.config()
     c.read(user_cache)
     return c
+
 
 def load_configuration(ui, api_server, filename):
     global_cache = load_global_cache(ui, api_server, filename)
@@ -145,6 +153,7 @@ def load_configuration(ui, api_server, filename):
     store_global_cache(filename)
     return cache['configuration']
 
+
 def win_get_folder_path(folder):
     # Use SHGetFolderPath
     import ctypes
@@ -159,6 +168,7 @@ def win_get_folder_path(folder):
         return None
 
     return path_buf.value
+
 
 def find_profile(ui, profileName):
     """
@@ -181,7 +191,8 @@ def find_profile(ui, profileName):
         path = win_get_folder_path(CSIDL_APPDATA)
         if path:
             path = os.path.join(path, "Mozilla", "Firefox")
-    else: # Assume POSIX
+    else:
+        # Assume POSIX
         # Pretty simple in comparison, eh?
         path = os.path.expanduser("~/.mozilla/firefox")
     if path is None:
@@ -192,13 +203,13 @@ def find_profile(ui, profileName):
     c.read(profileini)
 
     if profileName:
-        sections = [ s for s in c.sections() if profileName in [ s, c.get(s, "Name", None) ] ]
+        sections = [s for s in c.sections() if profileName in [s, c.get(s, "Name", None)]]
     else:
-        sections = [ s for s in c.sections() if c.get(s, "Default", None) ]
+        sections = [s for s in c.sections() if c.get(s, "Default", None)]
         if len(sections) == 0:
             sections = c.sections()
 
-    sections = [ s for s in sections if c.get(s, "Path", None) is not None ]
+    sections = [s for s in sections if c.get(s, "Path", None) is not None]
     if len(sections) == 0:
         raise util.Abort(_("Could not find a Firefox profile"))
 
@@ -208,12 +219,14 @@ def find_profile(ui, profileName):
         profile = os.path.join(path, profile)
     return profile
 
+
 # Choose the cookie to use based on how much of its path matches the URL.
 # Useful if you happen to have cookies for both
 # https://landfill.bugzilla.org/bzapi_sandbox/ and
 # https://landfill.bugzilla.org/bugzilla-3.6-branch/, for example.
 def matching_path_len(cookie_path, url_path):
     return len(cookie_path) if url_path.startswith(cookie_path) else 0
+
 
 def get_cookies_from_profile(ui, profile, bugzilla):
     """
@@ -250,8 +263,10 @@ def get_cookies_from_profile(ui, profile, bugzilla):
             f.seek(18, 0)
             f.write("\x01\x01")
         conn = sqlite3.connect(tempcookies)
-        logins = conn.execute("select value, path from moz_cookies where name = 'Bugzilla_login' and (host = ? or host = ?)", (host, "." + host)).fetchall()
-        row = sorted(logins, key = lambda row: -matching_path_len(row[1], path))[0]
+        logins = conn.execute("select value, path from moz_cookies "
+                              "where name = 'Bugzilla_login' and (host = ? or host = ?)",
+                              (host, "." + host)).fetchall()
+        row = sorted(logins, key=lambda row: -matching_path_len(row[1], path))[0]
         login = row[0]
         cookie = conn.execute("select value from moz_cookies "
                               "where name = 'Bugzilla_logincookie' "
@@ -273,6 +288,7 @@ def get_cookies_from_profile(ui, profile, bugzilla):
     finally:
         if tempdir:
             shutil.rmtree(tempdir)
+
 
 def get_auth(ui, bugzilla, profile, username, password):
     if not password:
@@ -297,6 +313,7 @@ def get_auth(ui, bugzilla, profile, username, password):
         password = ui.getpass("Enter password for %s: " % username)
 
     return bzAuth(username=username, password=password)
+
 
 def get_username(api_server, token):
     req = bz.get_user(api_server, token)
