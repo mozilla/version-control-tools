@@ -793,7 +793,7 @@ def bzexport(ui, repo, *args, **opts):
         # Also strip the bug number from the description, but save it in case
         # a bug number was not provided.
         parts = orig_desc.split('\n', 1)
-        desc = bug_re.sub(grab_bug, parts[0], 1)
+        desc = bug_re.sub(grab_bug, parts[0], 1).strip()
         if len(parts) == 2:
             patch_comment = parts[1].strip()
 
@@ -810,9 +810,8 @@ def bzexport(ui, repo, *args, **opts):
             else:
                 bug = bzexport.newbug
 
-        # Next strip any remaining leading separator with whitespace,
+        # Strip any remaining leading separator and whitespace,
         # if the original was something like "bug NNN - "
-        desc = desc.lstrip()
         if desc[0] in ['-', ':', '.']:
             desc = desc[1:].lstrip()
 
