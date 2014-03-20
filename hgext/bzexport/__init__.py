@@ -85,9 +85,7 @@ def get_default_version(ui, api_server, product):
     # "unspecified" in the list, prefer that for now, until bzapi gets fixed.
     # https://bugzilla.mozilla.org/show_bug.cgi?id=723170
     uns = [v for v in versions if v.startswith("un")]
-    if uns:
-        return uns[-1]
-    return versions[-1]
+    return uns[-1] if uns else versions[-1]
 
 
 # ui.promptchoice only allows single-character responses and was changed in
@@ -128,16 +126,13 @@ def prompt_menu(ui, name, values,
         return None
     if choice == len(prompts) - 1:
         raise util.Abort("User requested abort while choosing %s" % name)
-    else:
-        return values[choice]
+    return values[choice]
 
 
 def filter_strings(collection, substring):
     substring = substring.lower()
     ret = [s for s in collection if s.lower() == substring]
-    if ret:
-        return ret
-    return [v for v in collection if v.lower().find(substring) != -1]
+    return ret or [v for v in collection if v.lower().find(substring) != -1]
 
 
 def choose_value(ui, desc, options, message="", usemenu=True):
@@ -147,8 +142,7 @@ def choose_value(ui, desc, options, message="", usemenu=True):
         return options.pop()
     elif usemenu:
         return prompt_menu(ui, desc, list(options), message=message)
-    else:
-        return None
+    return None
 
 
 def multi_user_prompt(ui, desc, search_results):
@@ -216,9 +210,7 @@ def validate_users(ui, api_server, auth, search_strings, multi_callback, multi_d
         else:
             ui.write_err("Couldn't find a bugzilla user matching \"%s\"!\n" % search_result["search_string"])
             search_failed = True
-    if search_failed:
-        return
-    return results
+    return None if search_failed else results
 
 
 def select_users(valid, keys):
@@ -313,8 +305,7 @@ def edit_form(ui, repo, fields, template_name):
             return '<none>'
         elif isinstance(value, list):
             return ', '.join(value)
-        else:
-            return value or '<none>'
+        return value
 
     # Fill in a template with the passed-in fields
     template = templates[template_name]
