@@ -33,7 +33,7 @@ TREE_ALIASES = {
     'comm-central': ('comm',),
     'c-c': ('comm',),
 
-    'releases': ('esr17', 'b2g18', 'esr24', 'b2g26', 'release', 'beta', 'aurora', 'central'),
+    'releases': ('esr17', 'b2g18', 'esr24', 'b2g26', 'b2g28', 'release', 'beta', 'aurora', 'central'),
     'integration': ('inbound', 'fx-team', 'services', 'build', 'b2ginbound'),
     'twigs': ('alder', 'ash', 'birch', 'cedar', 'cypress', 'date', 'elm',
         'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine'),
@@ -53,6 +53,7 @@ REPOS = {
     'esr24': 'releases/mozilla-esr24',
     'b2g18': 'releases/mozilla-b2g18',
     'b2g26': 'releases/mozilla-b2g26_v1_2',
+    'b2g28': 'releases/mozilla-b2g28_v1_3',
 
     # Integration repositories.
     'b2ginbound': 'integration/b2g-inbound',
@@ -105,6 +106,7 @@ RELEASE_TREES = {
     'esr17',
     'esr24',
     'b2g26',
+    'b2g28',
 }
 
 
