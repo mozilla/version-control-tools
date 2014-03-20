@@ -777,8 +777,8 @@ def bzexport(ui, repo, *args, **opts):
 
     patch_comment = None
     reviewers = []
-    desc = opts['description'] or repo[rev].description().decode('utf-8')
-    if not desc or desc.startswith('[mq]'):
+    orig_desc = opts['description'] or repo[rev].description().decode('utf-8')
+    if not orig_desc or orig_desc.startswith('[mq]'):
         desc = '<required>'
     else:
         # Lightly reformat changeset messages into attachment descriptions.
@@ -790,14 +790,14 @@ def bzexport(ui, repo, *args, **opts):
             bzexport.newbug = m.group(2)
             return ''
 
-        parts = desc.split('\n', 1)
+        parts = orig_desc.split('\n', 1)
         parts[0] = bug_re.sub(grab_bug, parts[0], 1)
         desc = ''.join(parts)
         if not bzexport.newbug:
-            # Try to find it in the original revision description, if
-            # it wasn't found in desc.
-            orig_desc = repo[rev].description().decode('utf-8')
-            bug_re.sub(grab_bug, orig_desc.split('\n', 1)[0], 1)
+            # Try to find it in the commit description, if it wasn't found in
+            # the description passed on the command line.
+            commit_desc = repo[rev].description().decode('utf-8')
+            bug_re.sub(grab_bug, commit_desc.split('\n', 1)[0], 1)
         if bzexport.newbug:
             if bug and bug != bzexport.newbug:
                 ui.warn("Warning: Bug number %s from commandline doesn't match "
