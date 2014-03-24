@@ -284,6 +284,10 @@ mozext.refs_as_bookmarks
    is most useful on servers, as remote keys/refs are typically only
    created dynamically at run-time via a mechanism independent of
    bookmarks.
+
+mozext.skip_relbranch_bookmarks
+   If enabled, this boolean flag will cause refs_as_bookmarks to ignore
+   "release branches" from creeping into bookmarks.
 """
 
 import calendar
@@ -722,6 +726,18 @@ def mybookmarks(ui, repo):
 
         ui.write('%-50s %d:%s\n' % (
             bookmark, repo[node].rev(), short(node)))
+
+
+@command('prunerelbranches', [], _('hg prunerelbranches'))
+def prunerelbranches(ui, repo):
+    """Prune release branch references from the local repo.
+
+    Old repos with mozext.refs_as_bookmarks but not
+    mozext.skip_relbranch_bookmarks may have undesired bookmarks pointed to
+    release branches. Running this command will prune release branch bookmarks
+    from this repository.
+    """
+    repo.prune_relbranch_refs()
 
 
 def critic_hook(ui, repo, node=None, **opts):
@@ -1386,6 +1402,8 @@ def reposetup(ui, repo):
         def _update_remote_refs(self, remote, tree):
             mb = self.ui.configbool('mozext', 'refs_as_bookmarks',
                 default=False)
+            ignore_relbranch = self.ui.configbool('mozext',
+                'skip_relbranch_bookmarks', default=False)
 
             existing_refs = set()
             incoming_refs = set()
@@ -1397,9 +1415,9 @@ def reposetup(ui, repo):
             for branch, nodes in remote.branchmap().items():
                 # Don't store RELBRANCH refs for non-release trees, as they are
                 # meaningless and cruft from yesteryear.
-                if branch.endswith('RELBRANCH') and \
-                    tree not in TREE_ALIASES['releases']:
-                    continue
+                if branch.endswith('RELBRANCH'):
+                    if ignore_relbranch or tree not in TREE_ALIASES['releases']:
+                        continue
 
                 ref = '%s/%s' % (tree, branch)
                 incoming_refs.add(ref)
@@ -1524,6 +1542,23 @@ def reposetup(ui, repo):
                         ctx.node())
 
             ui.progress('changeset', None)
+
+        def prune_relbranch_refs(self):
+            todelete = [bm for bm in self._bookmarks.keys()
+                        if bm.endswith('RELBRANCH')]
+            for bm in todelete:
+                ui.warn('Removing bookmark %s\n' % bm)
+                del self._bookmarks[bm]
+
+            self._bookmarks.write()
+
+            todelete = [ref for ref in self.remoterefs.keys()
+                        if ref.endswith('RELBRANCH')]
+            for ref in todelete:
+                del self.remoterefs[ref]
+
+            self.remoterefs.write()
+
 
 
     repo.__class__ = remotestrackingrepo
