@@ -335,7 +335,7 @@ from mercurial import (
 OUR_DIR = os.path.dirname(__file__)
 REPO_ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
 PYLIB = os.path.join(REPO_ROOT, 'pylib')
-for p in ('flake8', 'mccabe', 'mozautomation', 'pep8', 'pyflake'):
+for p in ('flake8', 'mccabe', 'mozautomation', 'pep8', 'pyflakes'):
     sys.path.insert(0, os.path.join(PYLIB, p))
 
 
@@ -400,6 +400,8 @@ hg._peerorrepo = peerorrepo
 
 def critique(ui, repo, entire=False, node=None, **kwargs):
     """Perform a critique of a changeset."""
+    demandimport.disable()
+
     from flake8.engine import get_style_guide
     from pep8 import DiffReport, parse_udiff
 
