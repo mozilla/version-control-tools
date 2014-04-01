@@ -1034,7 +1034,7 @@ def template_bugs(repo, ctx, **args):
 
 def template_reviewer(repo, ctx, **args):
     """:reviewer: String. The first reviewer of this changeset."""
-    reviewers = parse_reviewers(ctx.description())
+    reviewers = list(parse_reviewers(ctx.description()))
     return reviewers[0] if reviewers else None
 
 
