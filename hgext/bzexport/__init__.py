@@ -392,23 +392,37 @@ def urlopen(ui, req):
 
 
 def infer_arguments(ui, repo, args, opts):
-    rev = None
-    bug = None
+    '''Try to figure out which argument is a revision and which is a bug number'''
+    rev = bug = None
     if len(args) < 2:
         # We need to guess at some args.
         if len(args) == 1:
             # Just one arg. Could be a revision or a bug number.
-            # Check this first, because a series of digits
-            # can be a revision number, but it's unlikely a user
-            # would use it to mean a revision here.
-            if not args[0].isdigit() and args[0] in repo:
-                # Looks like a changeset
-                rev = args[0]
-            else:
-                # Don't do any validation here, to allow
-                # users to use bug aliases. The BzAPI call
-                # will fail with bad bug numbers.
+
+            if args[0].isdigit() and len(args[0]) <= 8:
+                # If it a short numeric value, assume a bug number (even if it
+                # happens to match the beginning part of a revision). bzexport
+                # doesn't support using revision *numbers*. This only allows
+                # for 99 million bugs.
                 bug = args[0]
+                ui.debug("interpreting numeric %s as a bug number" % bug)
+            elif args[0] in repo:
+                # Now it could be a bugzilla bug alias or a revision. If it is
+                # in the repo, it's almost certainly a revision. (This covers
+                # revision hashes as well as branches and 'tip' etc.)
+                rev = args[0]
+                ui.debug("interpreting '%s' as a revision since it is in the repo" % rev)
+            elif hasattr(repo, 'mq') and args[0] in repo.mq.series:
+                # If it matches the name of an mq patch, it's a revision.
+                # Applied patches will have already been found in the repo, but
+                # unapplied patches will be found here.
+                rev = args[0]
+                ui.debug("interpreting '%s' as an (unapplied) mq patch")
+            else:
+                # Assume it's a bug alias. The REST API will fail with bad bug
+                # numbers.
+                bug = args[0]
+                ui.debug("interpreting '%s' as a bug alias. Fingers crossed.")
 
         # With zero args we'll guess at both, and if we fail we'll
         # fail later.
@@ -771,11 +785,17 @@ def bzexport(ui, repo, *args, **opts):
     context = ui.config("bzexport", "unified", None)
     if context:
         diffopts.context = int(context)
-    if hasattr(cmdutil, "export"):
-        cmdutil.export(repo, [rev], fp=contents, opts=diffopts)
+    if rev in repo:
+        description_from_patch = repo[rev].description().decode('utf-8')
+        if hasattr(cmdutil, "export"):
+            cmdutil.export(repo, [rev], fp=contents, opts=diffopts)
+        else:
+            # Support older hg versions
+            patch.export(repo, [rev], fp=contents, opts=diffopts)
     else:
-        # Support older hg versions
-        patch.export(repo, [rev], fp=contents, opts=diffopts)
+        q = repo.mq
+        contents = q.opener(q.lookup(rev), "r")
+        description_from_patch = '\n'.join(mq.patchheader(q.join(rev), q.plainmode).message)
 
     # Just always use the rev name as the patch name. Doesn't matter much,
     # unless you want to avoid obsoleting existing patches when uploading a
@@ -786,7 +806,7 @@ def bzexport(ui, repo, *args, **opts):
 
     patch_comment = None
     reviewers = []
-    orig_desc = opts['description'] or repo[rev].description().decode('utf-8')
+    orig_desc = opts['description'] or description_from_patch
     if not orig_desc or orig_desc.startswith('[mq]'):
         desc = '<required>'
     else:
@@ -805,7 +825,7 @@ def bzexport(ui, repo, *args, **opts):
         # Failing that try looking in the commit description for a bug number,
         # since orig_desc could have come from the command line instead.
         if not desc_bug_number:
-            commit_firstline = repo[rev].description().decode('utf-8').split('\n', 1)[0]
+            commit_firstline = description_from_patch.split('\n', 1)[0]
             desc_bug_number, __ = extract_bug_num_and_desc(commit_firstline)
 
         if desc_bug_number:
@@ -1009,8 +1029,9 @@ def bzexport(ui, repo, *args, **opts):
     if opts['number']:
         description = "Patch " + opts['number'] + " - " + description
 
+    contents.seek(0)
     result = create_attachment(ui, api_server, auth,
-                               bug, BINARY_CACHE_FILENAME, contents.getvalue(),
+                               bug, BINARY_CACHE_FILENAME, contents.read(),
                                filename=filename,
                                description=description,
                                comment=values['ATTACHCOMMENT'],
