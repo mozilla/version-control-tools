@@ -52,8 +52,8 @@ def qbackout(ui, repo, rev, **opts):
     you want to try again.
 
     Normally, qbackout will error out if the patch (backout or application)
-    fails to apply. The --broken option may be used to leave the patch in your
-    queue so you can fix the conflicts manually.
+    fails to apply. The --nopush option may be used to leave the patch in your
+    queue without pushing it so you can fix the conflicts manually.
 
     Examples:
       hg qbackout -r 20 -r 30    # backout revisions 20 and 30
@@ -88,7 +88,10 @@ def qbackout(ui, repo, rev, **opts):
         raise util.Abort('at least one revision required')
 
     csets = [ repo[r] for r in rev ]
-    csets.sort(reverse=backout, key=lambda cset: cset.rev())
+    reverse_order = backout
+    if opts.get('nopush'):
+        reverse_order = not reverse_order
+    csets.sort(reverse=reverse_order, key=lambda cset: cset.rev())
 
     if opts.get('single') and opts.get('name') and len(rev) > 1:
         raise util.Abort('option "-n" not valid when backing out multiple changes')
@@ -111,7 +114,7 @@ def qbackout(ui, repo, rev, **opts):
             bugs.add(m.group(2))
         return bugs
 
-    def apply_change(node, reverse):
+    def apply_change(node, reverse, push_patch=True, name=None):
         p1, p2 = repo.changelog.parents(node)
         if p2 != nullid:
             raise util.Abort('cannot %s a merge changeset' % desc['action'])
@@ -132,11 +135,16 @@ def qbackout(ui, repo, rev, **opts):
             # Old versions of hg did not use the ui.fin mechanism
             saved_stdin = sys.stdin
             sys.stdin = rpatch
-        commands.import_(ui, repo, '-',
-                         force=True,
-                         no_commit=True,
-                         strip=1,
-                         base='')
+
+        if push_patch:
+            commands.import_(ui, repo, '-',
+                             force=True,
+                             no_commit=True,
+                             strip=1,
+                             base='')
+        else:
+            mq.qimport(ui, repo, '-', name=name, rev=[], git=True)
+
         if saved_stdin is None:
             ui.fin = save_fin
         else:
@@ -172,11 +180,12 @@ def qbackout(ui, repo, rev, **opts):
         node = cset.node()
         shortnode = short(node)
         ui.status('%s %s\n' % (desc['actioning'], shortnode))
-        try:
-            apply_change(node, backout)
-        except:
-            if not opts.get('broken'):
-                raise
+        if opts.get('nopush') and opts.get('single'):
+            ui.fatal("--single not supported with --nopush")
+        patchname = None
+        if not opts.get('single'):
+            patchname = opts.get('name') or '%s-%s' % (desc['name'], shortnode)
+        apply_change(node, backout, push_patch=(not opts.get('nopush')), name=patchname)
         msg = ('%s changeset %s' % (desc['Actioned'], shortnode)) + bugs_suffix(bugs)
         user = None
 
@@ -192,9 +201,8 @@ def qbackout(ui, repo, rev, **opts):
                 user = orig_author
 
         messages.append(msg)
-        if not opts.get('single'):
+        if not opts.get('single') and not opts.get('nopush'):
             new_opts['message'] = messages[-1]
-            patchname = opts.get('name') or '%s-%s' % (desc['name'], shortnode)
             # Override the user to that of the original patch author in the case of --apply
             if user is not None:
                 new_opts['user'] = user
@@ -226,7 +234,7 @@ cmdtable = {
           ('d', 'date', '',
            _('add "Date: <DATE>" to patch'), _('DATE')),
           ('', 'apply', False, _('re-apply a change instead of backing out')),
-          ('', 'broken', None, _('backout even if patch does not fully apply')),
+          ('', 'nopush', False, _('do not push patches (useful when they do not apply properly)')),
           ],
          ('hg qbackout -r REVS [-f] [-n NAME] [qnew options]')),
 }
