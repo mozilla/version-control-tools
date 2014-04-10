@@ -14,9 +14,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+# USA.
 
-# This script implements a whitelist containing people from the releng and relops teams.
+# This script implements a whitelist containing people from the releng and
+# relops teams.
 #
 # run `python setup.py install` to install the module in the proper place,
 # and then modify the repository's hgrc as per example-hgrc.
@@ -25,22 +27,21 @@ import os
 
 ALLOWED_USERS = set([
     'Callek@gmail.com',
-    'armenzg@mozilla.com',
     'arich@mozilla.com',
+    'armenzg@mozilla.com',
     'asasaki@mozilla.com',
     'bhearsum@mozilla.com',
     'catlee@mozilla.com',
     'coop@mozilla.com',
     'dmitchell@mozilla.com',
     'hwine@mozilla.com',
-    'jarmstrong@mozilla.com',
     'jhopkins@mozilla.com',
     'jlund@mozilla.com',
-    'joduinn@mozilla.com',
     'jwatkins@mozilla.com',
     'jwood@mozilla.com',
     'kmoir@mozilla.com',
     'mcornmesser@mozilla.com',
+    'mgerva@mozilla.com',
     'mshal@mozilla.com',
     'mtabara@mozilla.com',
     'nthomas@mozilla.com',
@@ -50,11 +51,13 @@ ALLOWED_USERS = set([
     'sbruno@mozilla.com',
 ])
 
+
 def hook(ui, repo, node=None, **kwargs):
     rev = repo[node].rev()
     tip = repo['tip'].rev()
-    branches = set(repo.changectx(i).branch() for i in range(rev, tip+1))
+    branches = set(repo.changectx(i).branch() for i in range(rev, tip + 1))
     if 'production' in branches and os.environ['USER'] not in ALLOWED_USERS:
-        print "** you (%s) are not allowed to push to the production branch" % (os.environ['USER'],)
+        print "** you (%s) are not allowed to push to the production branch" \
+            % (os.environ['USER'],)
         return 1
     return 0
