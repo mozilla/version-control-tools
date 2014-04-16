@@ -7,6 +7,7 @@ import xmlrpclib
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 from djblets.siteconfig.models import SiteConfiguration
 from reviewboard.accounts.backends import AuthBackend
@@ -121,8 +122,20 @@ class BugzillaBackend(AuthBackend):
             raise PermissionDenied
 
         proxy = xmlrpclib.ServerProxy(xmlrpc_url, transport)
+        params = {'match': [query],
+                  'include_fields': ['email', 'real_name', 'can_login']}
 
         try:
-            get_or_create_bugzilla_users(proxy.User.get({'match': [query]}))
+            get_or_create_bugzilla_users(proxy.User.get(params))
         except xmlrpclib.Fault:
             raise PermissionDenied
+
+    def search_users(self, query, request):
+        """Search anywhere in name to support BMO :irc_nick convention."""
+        q = Q(username__icontains=query)
+
+        if request.GET.get('fullname', None):
+            q = q | (Q(first_name__icontains=query) |
+                     Q(last_name__icontains=query))
+
+        return q
