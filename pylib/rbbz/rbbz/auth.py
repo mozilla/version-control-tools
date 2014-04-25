@@ -2,8 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import xmlrpclib
-
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
@@ -12,9 +10,10 @@ from django.utils.translation import ugettext as _
 from djblets.siteconfig.models import SiteConfiguration
 from reviewboard.accounts.backends import AuthBackend
 
+from rbbz.bugzilla import Bugzilla
+from rbbz.errors import BugzillaAuthError, BugzillaError
 from rbbz.forms import BugzillaAuthSettingsForm
 from rbbz.models import get_or_create_bugzilla_users
-from rbbz.transports import bugzilla_transport
 
 
 class BugzillaBackend(AuthBackend):
@@ -39,27 +38,10 @@ class BugzillaBackend(AuthBackend):
         if not xmlrpc_url:
             return None
 
-        transport = bugzilla_transport(xmlrpc_url)
-        proxy = xmlrpclib.ServerProxy(xmlrpc_url, transport)
+        bugzilla = Bugzilla(xmlrpc_url)
+        user_data = bugzilla.log_in(username, password, cookie)
 
-        if cookie:
-            # Username and password are actually bugzilla cookies.
-            transport.set_bugzilla_cookies(username, password)
-            user_id = username
-        else:
-            transport.remove_bugzilla_cookies()
-
-            try:
-                result = proxy.User.login({'login': username,
-                                           'password': password})
-            except xmlrpclib.Fault:
-                return None
-
-            user_id = result['id']
-
-        try:
-            user_data = proxy.User.get({'ids': [user_id]})
-        except xmlrpclib.Fault:
+        if not user_data:
             return None
 
         users = get_or_create_bugzilla_users(user_data)
@@ -73,7 +55,7 @@ class BugzillaBackend(AuthBackend):
             return None
 
         if not cookie:
-            (user.bzlogin, user.bzcookie) = transport.bugzilla_cookies()
+            (user.bzlogin, user.bzcookie) = bugzilla.cookies()
 
         return user
 
@@ -86,16 +68,14 @@ class BugzillaBackend(AuthBackend):
         if not xmlrpc_url:
             return None
 
-        transport = bugzilla_transport(xmlrpc_url)
-
-        if not transport.set_bugzilla_cookies_from_request(request):
-            raise self.bz_error_response(request)
-
-        proxy = xmlrpclib.ServerProxy(xmlrpc_url, transport)
-
         try:
-            user_data = proxy.User.get({'names': [username]})
-        except xmlrpclib.Fault:
+            bugzilla = Bugzilla(xmlrpc_url, request.session)
+        except BugzillaAuthError:
+            raise PermissionDenied
+
+        user_data = bugzilla.get_user(username)
+
+        if not user_data:
             raise self.bz_error_response(request)
 
         # Just store the results.
@@ -116,18 +96,14 @@ class BugzillaBackend(AuthBackend):
         if not xmlrpc_url:
             return None
 
-        transport = bugzilla_transport(xmlrpc_url)
-
-        if not transport.set_bugzilla_cookies_from_request(request):
+        try:
+            bugzilla = Bugzilla(xmlrpc_url, request.session)
+        except BugzillaAuthError:
             raise PermissionDenied
 
-        proxy = xmlrpclib.ServerProxy(xmlrpc_url, transport)
-        params = {'match': [query],
-                  'include_fields': ['email', 'real_name', 'can_login']}
-
         try:
-            get_or_create_bugzilla_users(proxy.User.get(params))
-        except xmlrpclib.Fault:
+            get_or_create_bugzilla_users(bugzilla.query_users(query))
+        except BugzillaError:
             raise PermissionDenied
 
     def search_users(self, query, request):

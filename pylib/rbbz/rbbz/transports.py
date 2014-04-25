@@ -94,10 +94,10 @@ class BugzillaTransportMixin(CookieTransportMixin):
         self.cookies.append('%s=%s' % (self.LOGIN, login))
         self.cookies.append('%s=%s' % (self.LOGIN_COOKIE, login_cookie))
 
-    def set_bugzilla_cookies_from_request(self, request):
+    def set_bugzilla_cookies_from_session(self, session):
         try:
-            bzlogin = request.session['Bugzilla_login']
-            bzcookie = request.session['Bugzilla_logincookie']
+            bzlogin = session['Bugzilla_login']
+            bzcookie = session['Bugzilla_logincookie']
         except KeyError:
             return False
 
