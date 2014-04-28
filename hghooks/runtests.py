@@ -865,5 +865,49 @@ class TestPreventUUIDHook(unittest.TestCase):
     commit(u, self.clonerepo, message="checkin 2 removed idl file ")
     self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
 
+class TestPreventWebIDLHook(unittest.TestCase):
+  def setUp(self):
+    self.ui = ui.ui()
+    self.ui.quiet = True
+    self.ui.verbose = False
+    self.repodir = mkdtemp(prefix="hg-TestPreventWebIDLHook")
+    init(self.ui, dest=self.repodir)
+    addHook(self.repodir, "prevent_webidl_changes.hook")
+    self.repo = hg.repository(self.ui, self.repodir)
+    self.clonedir = mkdtemp(prefix="hg-test")
+    clone(self.ui, self.repo, self.clonedir)
+    self.clonerepo = hg.repository(self.ui, self.clonedir)
+    # Create a pre-existing repo with a file that contains UUID
+    appendFile(join(self.clonedir, "original.webidl"), "interface Foo{};")
+    add(self.ui, self.clonerepo, join(self.clonedir, "original.webidl"))
+    commit(self.ui, self.clonerepo, message="original repo commit r=jst")
+    push(self.ui, self.clonerepo, dest=self.repodir)
+
+  def tearDown(self):
+    shutil.rmtree(self.repodir)
+    shutil.rmtree(self.clonedir)
+
+  def testWebIDLEditWithoutReviewShouldFail(self):
+    """ Test that editing .webidl file without review should fail """
+    u = self.ui
+    editFile(join(self.clonedir, "original.webidl"), "interface Foo{};", "interface Bar{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 12345")
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
+
+  def testWebIDLEditWithoutProperReviewShouldFail(self):
+    """ Test that editing .webidl file without proper DOM peer review should fail """
+    u = self.ui
+    editFile(join(self.clonedir, "original.webidl"), "interface Foo{};", "interface Bar{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 12345; r=foobar")
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
+
+  def testWebIDLEditWithProperReviewShouldPass(self):
+    """ Test that editing .webidl file with proper DOM peer review should pass """
+    u = self.ui
+    editFile(join(self.clonedir, "original.webidl"), "interface Foo{};", "interface Bar{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 12345; r=foobar,jst")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+
 if __name__ == '__main__':
   unittest.main()
