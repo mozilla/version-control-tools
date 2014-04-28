@@ -9,6 +9,14 @@ from reviewboard.accounts.backends import get_enabled_auth_backends
 class BugzillaCookieAuthMiddleware(object):
     """Set Bugzilla login cookies from auth backend."""
 
+    def process_request(self, request):
+        if BugzillaBackend not in [x.__class__ for
+                                   x in get_enabled_auth_backends()]:
+            return
+
+        request.user.bzlogin = request.session.get('Bugzilla_login')
+        request.user.bzcookie = request.session.get('Bugzilla_logincookie')
+
     def process_response(self, request, response):
         if BugzillaBackend not in [x.__class__ for
                                    x in get_enabled_auth_backends()]:

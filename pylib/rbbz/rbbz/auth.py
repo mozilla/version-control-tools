@@ -7,11 +7,10 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.utils.translation import ugettext as _
-from djblets.siteconfig.models import SiteConfiguration
 from reviewboard.accounts.backends import AuthBackend
 
 from rbbz.bugzilla import Bugzilla
-from rbbz.errors import BugzillaAuthError, BugzillaError
+from rbbz.errors import BugzillaAuthError, BugzillaError, BugzillaUrlError
 from rbbz.forms import BugzillaAuthSettingsForm
 from rbbz.models import get_or_create_bugzilla_users
 
@@ -32,13 +31,12 @@ class BugzillaBackend(AuthBackend):
 
     def authenticate(self, username, password, cookie=False):
         username = username.strip()
-        siteconfig = SiteConfiguration.objects.get_current()
-        xmlrpc_url = siteconfig.get('auth_bz_xmlrpc_url')
 
-        if not xmlrpc_url:
+        try:
+            bugzilla = Bugzilla()
+        except BugzillaUrlError:
             return None
 
-        bugzilla = Bugzilla(xmlrpc_url)
         user_data = bugzilla.log_in(username, password, cookie)
 
         if not user_data:
@@ -62,14 +60,11 @@ class BugzillaBackend(AuthBackend):
     def get_or_create_user(self, username, request):
         """Always check Bugzilla for updates."""
         username = username.strip()
-        siteconfig = SiteConfiguration.objects.get_current()
-        xmlrpc_url = siteconfig.get('auth_bz_xmlrpc_url')
-
-        if not xmlrpc_url:
-            return None
 
         try:
-            bugzilla = Bugzilla(xmlrpc_url, request.session)
+            bugzilla = Bugzilla(*self._session_cookies(request.session))
+        except BugzillaUrlError:
+            return None
         except BugzillaAuthError:
             raise PermissionDenied
 
@@ -90,14 +85,10 @@ class BugzillaBackend(AuthBackend):
         if not query:
             return
 
-        siteconfig = SiteConfiguration.objects.get_current()
-        xmlrpc_url = siteconfig.get('auth_bz_xmlrpc_url')
-
-        if not xmlrpc_url:
-            return None
-
         try:
-            bugzilla = Bugzilla(xmlrpc_url, request.session)
+            bugzilla = Bugzilla(*self._session_cookies(request.session))
+        except BugzillaUrlError:
+            return None
         except BugzillaAuthError:
             raise PermissionDenied
 
@@ -115,3 +106,7 @@ class BugzillaBackend(AuthBackend):
                      Q(last_name__icontains=query))
 
         return q
+
+    def _session_cookies(self, session):
+        return (session.get('Bugzilla_login'),
+                session.get('Bugzilla_logincookie'))

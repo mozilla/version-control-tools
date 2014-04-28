@@ -2,15 +2,38 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from rbbz.errors import BugNotFoundError
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+from djblets.siteconfig.models import SiteConfiguration
 from reviewboard.reviews.signals import (review_request_publishing,
                                          review_publishing, reply_publishing)
+from reviewboard.site.urlresolvers import local_site_reverse
 
-def publish_review_request(user, review_request, **kwargs):
-    print 'user %s is trying to publish a review request: %s' % (user,
-                                                                 review_request)
-    raise BugNotFoundError(1234)
+from rbbz.bugzilla import Bugzilla
+from rbbz.errors import InvalidBugIdError, InvalidReviewerError
+
+def publish_review_request(user, review_request_draft, **kwargs):
+    try:
+        bug_id = int(review_request_draft.get_bug_list()[0])
+    except (IndexError, TypeError, ValueError):
+        raise InvalidBugIdError
+
+    reviewer = review_request_draft.target_people.first()
+    if reviewer is None:
+        raise InvalidReviewerError
+
+    site = Site.objects.get_current()
+    siteconfig = SiteConfiguration.objects.get_current()
+
+    url = '%s://%s%s%s' % (
+        siteconfig.get('site_domain_method'), site.domain,
+        local_site_reverse('root').rstrip('/'),
+        review_request_draft.get_review_request().get_absolute_url())
+
+    b = Bugzilla(user.bzlogin, user.bzcookie)
+    b.post_rb_url(review_request_draft.summary, bug_id, url,
+                  reviewer.get_username())
+
 
 review_request_publishing.connect(publish_review_request)
 
