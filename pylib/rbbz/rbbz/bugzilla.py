@@ -88,8 +88,7 @@ class Bugzilla(object):
         try:
             return self.proxy.Bug.add_comment(params)
         except xmlrpclib.Fault:
-            raise
-            #raise BugzillaError
+            raise BugzillaError
 
     def post_rb_url(self, summary, bug_id, url, reviewer):
         params = {
