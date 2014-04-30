@@ -38,12 +38,12 @@ def publish_review_request(user, review_request_draft, **kwargs):
 review_request_publishing.connect(publish_review_request)
 
 def publish_review(user, review, **kwargs):
-    print 'user %s it trying to publish a review: %s' % (user, review)
+    pass
 
 review_publishing.connect(publish_review)
 
 def publish_reply(user, reply, **kwargs):
-    print 'user %s is trying to publish a reply: %s' % (user, reply)
+    pass
 
 reply_publishing.connect(publish_reply)
 
