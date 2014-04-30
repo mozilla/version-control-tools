@@ -6,7 +6,7 @@ import xmlrpclib
 
 from djblets.siteconfig.models import SiteConfiguration
 
-from rbbz.errors import BugzillaAuthError, BugzillaError, BugzillaUrlError
+from rbbz.errors import BugzillaError, BugzillaUrlError
 from rbbz.transports import bugzilla_transport
 
 
@@ -26,7 +26,7 @@ class Bugzilla(object):
         self.xmlrpc_url = siteconfig.get('auth_bz_xmlrpc_url')
 
         if not self.xmlrpc_url:
-            raise BugzillaUrlError
+            raise BugzillaUrlError('no XMLRPC URL')
 
         self._transport = None
         self._proxy = None
@@ -71,8 +71,8 @@ class Bugzilla(object):
 
         try:
             return self.proxy.User.get(params)
-        except xmlrpclib.Fault:
-            raise BugzillaError
+        except xmlrpclib.Fault as e:
+            raise BugzillaError(e.faultString)
 
     def query_users(self, query):
         params = {'match': [query],
@@ -80,8 +80,8 @@ class Bugzilla(object):
 
         try:
             return self.proxy.User.get(params)
-        except xmlrpclib.Fault:
-            raise BugzillaError
+        except xmlrpclib.Fault as e:
+            raise BugzillaError(e.faultString)
 
     def post_comment(self, bug_id, comment):
         params = {
@@ -91,8 +91,8 @@ class Bugzilla(object):
 
         try:
             return self.proxy.Bug.add_comment(params)
-        except xmlrpclib.Fault:
-            raise BugzillaError
+        except xmlrpclib.Fault as e:
+            raise BugzillaError(e.faultString)
 
     def post_rb_url(self, summary, bug_id, url, reviewer):
         params = {
@@ -108,8 +108,8 @@ class Bugzilla(object):
 
         try:
             return self.proxy.Bug.add_attachment(params)
-        except xmlrpclib.Fault:
-            raise BugzillaError
+        except xmlrpclib.Fault as e:
+            raise BugzillaError(e.faultString)
 
     @property
     def transport(self):

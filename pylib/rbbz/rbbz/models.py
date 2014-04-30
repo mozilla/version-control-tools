@@ -5,12 +5,13 @@
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from djblets.siteconfig.models import SiteConfiguration
+from reviewboard.reviews.errors import PublishError
 from reviewboard.reviews.signals import (review_request_publishing,
                                          review_publishing, reply_publishing)
 from reviewboard.site.urlresolvers import local_site_reverse
 
 from rbbz.bugzilla import Bugzilla
-from rbbz.errors import InvalidBugIdError, InvalidReviewerError
+from rbbz.errors import BugzillaError, InvalidBugIdError, InvalidReviewerError
 
 def publish_review_request(user, review_request_draft, **kwargs):
     try:
@@ -30,9 +31,12 @@ def publish_review_request(user, review_request_draft, **kwargs):
         local_site_reverse('root').rstrip('/'),
         review_request_draft.get_review_request().get_absolute_url())
 
-    b = Bugzilla(user.bzlogin, user.bzcookie)
-    b.post_rb_url(review_request_draft.summary, bug_id, url,
-                  reviewer.get_username())
+    try:
+        b = Bugzilla(user.bzlogin, user.bzcookie)
+        b.post_rb_url(review_request_draft.summary, bug_id, url,
+                      reviewer.get_username())
+    except BugzillaError as e:
+        raise PublishError(e.msg)
 
 
 review_request_publishing.connect(publish_review_request)
