@@ -6,7 +6,7 @@ import xmlrpclib
 
 from djblets.siteconfig.models import SiteConfiguration
 
-from rbbz.errors import BugzillaError, BugzillaUrlError
+from rbbz.errors import BugzillaAuthError, BugzillaError, BugzillaUrlError
 from rbbz.transports import bugzilla_transport
 
 
@@ -37,7 +37,7 @@ class Bugzilla(object):
     def cookies(self):
         return self.transport.bugzilla_cookies()
 
-    def log_in(self, username, password, cookie):
+    def log_in(self, username, password, cookie=False):
         if cookie:
             # Username and password are actually bugzilla cookies.
             self.transport.set_bugzilla_cookies(username, password)
@@ -48,8 +48,12 @@ class Bugzilla(object):
             try:
                 result = self.proxy.User.login({'login': username,
                                                 'password': password})
-            except xmlrpclib.Fault:
-                return None
+
+            except xmlrpclib.Fault as e:
+                if e.faultCode == 300 or e.faultCode == 301:
+                    # Invalid username/password or account disabled
+                    return None
+                raise BugzillaError(e.faultString)
 
             user_id = result['id']
 
@@ -58,8 +62,8 @@ class Bugzilla(object):
 
         try:
             return self.proxy.User.get(params)
-        except xmlrpclib.Fault:
-            return None
+        except xmlrpclib.Fault as e:
+            raise BugzillaError(e.faultString)
 
     def get_user(self, username):
         params = {'names': [username],
