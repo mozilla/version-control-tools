@@ -6,6 +6,7 @@ VERSION = '0.1.1'
 setup(name=PACKAGE,
       version=VERSION,
       description='Review Board extension for Bugzilla support',
+      url='https://github.com/mozilla/rbbz',
       author='Mark Cote',
       author_email='mcote@mozilla.com',
       license='MPL 2.0',
