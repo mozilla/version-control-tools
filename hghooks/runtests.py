@@ -3,8 +3,8 @@
 from __future__ import with_statement
 import unittest
 from mercurial import ui, hg, commands, util
-from mercurial.commands import add, clone, commit, init, push, rename, remove
-from mercurial.node import hex
+from mercurial.commands import add, clone, commit, init, push, rename, remove, update, merge
+from mercurial.node import hex, short
 from tempfile import mkdtemp
 import shutil
 import os, stat
@@ -880,6 +880,8 @@ class TestPreventWebIDLHook(unittest.TestCase):
     # Create a pre-existing repo with a file that contains UUID
     appendFile(join(self.clonedir, "original.webidl"), "interface Foo{};")
     add(self.ui, self.clonerepo, join(self.clonedir, "original.webidl"))
+    appendFile(join(self.clonedir, "dummy"), "foo")
+    add(self.ui, self.clonerepo, join(self.clonedir, "dummy"))
     commit(self.ui, self.clonerepo, message="original repo commit r=jst")
     push(self.ui, self.clonerepo, dest=self.repodir)
 
@@ -906,6 +908,20 @@ class TestPreventWebIDLHook(unittest.TestCase):
     u = self.ui
     editFile(join(self.clonedir, "original.webidl"), "interface Foo{};", "interface Bar{};")
     commit(u, self.clonerepo, message="checkin 1 bug 12345; r=foobar,jst")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+
+  def testWebIDLEditWithProperReviewDuringMergeShouldPass(self):
+    """ Test that editing .webidl file with proper DOM peer review should pass """
+    u = self.ui
+    parentrev = short(self.clonerepo.changectx('tip').node())
+    editFile(join(self.clonedir, "original.webidl"), "interface Foo{};", "interface Bar{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 12345; r=foobar,jst")
+    update(u, self.clonerepo, rev=parentrev)
+    editFile(join(self.clonedir, "dummy"), "foo", "bar")
+    commit(u, self.clonerepo, message="dummy")
+    merge(u, self.clonerepo)
+    commit(u, self.clonerepo, message="merge")
     result = push(u, self.clonerepo, dest=self.repodir)
     self.assertEqual(result, 0)
 

@@ -19,6 +19,7 @@ This hook is to prevent changes to .webidl files in pushes without proper DOM pe
 """
 
 import re
+from mercurial.node import short
 
 def hook(ui, repo, hooktype, node, **kwargs):
     DOM_peers = [
@@ -38,13 +39,20 @@ def hook(ui, repo, hooktype, node, **kwargs):
     error = ""
     webidlReviewed = False
     # Loop through each changeset being added to the repository
-    for change_id in xrange(repo[node].rev(), len(repo)):
+    changesets = list(repo.changelog.revs(repo[node].rev()))
+    for i in reversed(changesets):
+        c = repo.changectx(i)
+
+        if len(c.parents()) > 1:
+            # Skip merge changesets
+            continue
+
         # Loop through each file for the current changeset
-        for file in repo[change_id].files():
+        for file in c.files():
             # Only Check WebIDL Files
             if file.endswith('.webidl'):
                 webidlReviewed = True
-                match = re.search('\Wr\s*=\s*(\w+(?:,\w+)*)', repo.changectx('tip').description().lower())
+                match = re.search('\Wr\s*=\s*(\w+(?:,\w+)*)', c.description().lower())
                 validReview = False
                 if match:
                     for reviewer in match.group(1).split(','):
@@ -52,7 +60,7 @@ def hook(ui, repo, hooktype, node, **kwargs):
                             validReview = True
                             break
                 if not validReview:
-                        error += "WebIDL file %s altered in this changeset without DOM peer review" % file
+                        error += "WebIDL file %s altered in changeset %s without DOM peer review" % (file, short(c.node()))
     # Check if an error occured in any of the files that were changed
     if error != "":
         print "\n\n************************** ERROR ****************************"
