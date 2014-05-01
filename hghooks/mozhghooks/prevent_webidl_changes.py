@@ -60,11 +60,11 @@ def hook(ui, repo, hooktype, node, **kwargs):
                             validReview = True
                             break
                 if not validReview:
-                        error += "WebIDL file %s altered in changeset %s without DOM peer review" % (file, short(c.node()))
+                        error += "WebIDL file %s altered in changeset %s without DOM peer review\n" % (file, short(c.node()))
     # Check if an error occured in any of the files that were changed
     if error != "":
         print "\n\n************************** ERROR ****************************"
-        ui.warn("\n\r*** " + error + "***\n\r")
+        ui.warn("\n" + error + "\n")
         print "\n\rChanges to WebIDL files in this repo require review from a DOM peer in the form of r=...\n\rThis is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..\n\r"
         print "*************************************************************\n\n"
         # Reject the changesets
