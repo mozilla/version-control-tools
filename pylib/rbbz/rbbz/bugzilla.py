@@ -5,9 +5,22 @@
 import xmlrpclib
 
 from djblets.siteconfig.models import SiteConfiguration
+from djblets.util.decorators import simple_decorator
 
 from rbbz.errors import BugzillaError, BugzillaUrlError
 from rbbz.transports import bugzilla_transport
+
+
+ATTACHMENT_SUMMARY_PREFIX = '[RB] '
+
+@simple_decorator
+def xmlrpc_to_bugzilla_errors(func):
+    def _transform_errors(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except xmlrpclib.Fault as e:
+            raise BugzillaError(e.faultString)
+    return _transform_errors
 
 
 class Bugzilla(object):
@@ -37,6 +50,7 @@ class Bugzilla(object):
     def cookies(self):
         return self.transport.bugzilla_cookies()
 
+    @xmlrpc_to_bugzilla_errors
     def log_in(self, username, password, cookie=False):
         if cookie:
             # Username and password are actually bugzilla cookies.
@@ -53,63 +67,91 @@ class Bugzilla(object):
                 if e.faultCode == 300 or e.faultCode == 301:
                     # Invalid username/password or account disabled
                     return None
-                raise BugzillaError(e.faultString)
+                raise
 
             user_id = result['id']
 
         params = {'ids': [user_id],
                   'include_fields': ['email', 'real_name', 'can_login']}
 
-        try:
-            return self.proxy.User.get(params)
-        except xmlrpclib.Fault as e:
-            raise BugzillaError(e.faultString)
+        return self.proxy.User.get(params)
 
+    @xmlrpc_to_bugzilla_errors
     def get_user(self, username):
         params = {'names': [username],
                   'include_fields': ['email', 'real_name', 'can_login']}
+        return self.proxy.User.get(params)
 
-        try:
-            return self.proxy.User.get(params)
-        except xmlrpclib.Fault as e:
-            raise BugzillaError(e.faultString)
-
+    @xmlrpc_to_bugzilla_errors
     def query_users(self, query):
         params = {'match': [query],
                   'include_fields': ['email', 'real_name', 'can_login']}
+        return self.proxy.User.get(params)
 
-        try:
-            return self.proxy.User.get(params)
-        except xmlrpclib.Fault as e:
-            raise BugzillaError(e.faultString)
-
+    @xmlrpc_to_bugzilla_errors
     def post_comment(self, bug_id, comment):
         params = {
             'id': bug_id,
             'comment': comment
         }
+        return self.proxy.Bug.add_comment(params)
 
-        try:
-            return self.proxy.Bug.add_comment(params)
-        except xmlrpclib.Fault as e:
-            raise BugzillaError(e.faultString)
-
+    @xmlrpc_to_bugzilla_errors
     def post_rb_url(self, summary, bug_id, url, reviewer):
         params = {
             'ids': [bug_id],
             'data': url,
             'file_name': summary,
-            'summary': summary,
+            'summary': '%s%s' % (ATTACHMENT_SUMMARY_PREFIX, summary),
             'content_type': 'text/plain',
             'flags': [{'name': 'review',
                        'status': '?',
                        'requestee': reviewer}]
         }
+        return self.proxy.Bug.add_attachment(params)
 
-        try:
-            return self.proxy.Bug.add_attachment(params)
-        except xmlrpclib.Fault as e:
-            raise BugzillaError(e.faultString)
+    @xmlrpc_to_bugzilla_errors
+    def get_rb_attachments(self, bug_id):
+        rb_attachments = []
+        params = {
+            'ids': [bug_id],
+            'include_fields': ['id', 'data', 'summary', 'is_obsolete',
+                               'flags']
+        }
+        attachments = self.proxy.Bug.attachments(params)
+
+        for a in attachments['bugs'][str(bug_id)]:
+            if (a['is_obsolete']
+                or not a['summary'].startswith(ATTACHMENT_SUMMARY_PREFIX)
+                or not a['flags']):
+                continue
+
+            reviewer = None
+
+            for f in a['flags']:
+                if f['name'] == 'review' and 'requestee' in f:
+                    reviewer = f['requestee']
+                    break
+
+            if not reviewer:
+                continue
+
+            rb_attachments.append({
+                    'id': a['id'],
+                    'url': a['data'].data,
+                    'reviewer': reviewer
+            })
+
+        return rb_attachments
+
+    @xmlrpc_to_bugzilla_errors
+    def r_plus_attachment(self, attachment_id):
+        params = {
+            'ids': [attachment_id],
+            'flags': [{'name': 'review', 'status': '+'}]
+        }
+
+        self.proxy.Bug.update_attachment(params)
 
     @property
     def transport(self):

@@ -5,6 +5,7 @@
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from djblets.siteconfig.models import SiteConfiguration
+from djblets.util.decorators import simple_decorator
 from reviewboard.reviews.errors import PublishError
 from reviewboard.reviews.signals import (review_request_publishing,
                                          review_publishing, reply_publishing)
@@ -13,6 +14,30 @@ from reviewboard.site.urlresolvers import local_site_reverse
 from rbbz.bugzilla import Bugzilla
 from rbbz.errors import BugzillaError, InvalidBugIdError, InvalidReviewerError
 
+def review_request_url(review_request, site=None, siteconfig=None):
+    if not site:
+        site = Site.objects.get_current()
+
+    if not siteconfig:
+        siteconfig = SiteConfiguration.objects.get_current()
+
+    return '%s://%s%s%s' % (
+        siteconfig.get('site_domain_method'), site.domain,
+        local_site_reverse('root').rstrip('/'),
+        review_request.get_absolute_url())
+
+
+@simple_decorator
+def bugzilla_to_publish_errors(func):
+    def _transform_errors(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except BugzillaError as e:
+            raise PublishError(e.msg)
+    return _transform_errors
+
+
+@bugzilla_to_publish_errors
 def publish_review_request(user, review_request_draft, **kwargs):
     try:
         bug_id = int(review_request_draft.get_bug_list()[0])
@@ -23,32 +48,39 @@ def publish_review_request(user, review_request_draft, **kwargs):
     if reviewer is None:
         raise InvalidReviewerError
 
-    site = Site.objects.get_current()
-    siteconfig = SiteConfiguration.objects.get_current()
+    b = Bugzilla(user.bzlogin, user.bzcookie)
+    b.post_rb_url(review_request_draft.summary, bug_id,
+                  review_request_url(review_request_draft.get_review_request()),
+                  reviewer.get_username())
 
-    url = '%s://%s%s%s' % (
-        siteconfig.get('site_domain_method'), site.domain,
-        local_site_reverse('root').rstrip('/'),
-        review_request_draft.get_review_request().get_absolute_url())
-
-    try:
-        b = Bugzilla(user.bzlogin, user.bzcookie)
-        b.post_rb_url(review_request_draft.summary, bug_id, url,
-                      reviewer.get_username())
-    except BugzillaError as e:
-        raise PublishError(e.msg)
-
-
-review_request_publishing.connect(publish_review_request)
 
 def publish_review(user, review, **kwargs):
-    pass
+    if review.ship_it:
+        try:
+            bug_id = int(review.review_request.get_bug_list()[0])
+        except (IndexError, TypeError, ValueError):
+            return
 
-review_publishing.connect(publish_review)
+        site = Site.objects.get_current()
+        siteconfig = SiteConfiguration.objects.get_current()
+
+        b = Bugzilla(user.bzlogin, user.bzcookie)
+        attachments = b.get_rb_attachments(bug_id)
+
+        for a in attachments:
+            if (a['reviewer'] == review.user.username and
+                a['url'] == review_request_url(review.review_request, site,
+                                               siteconfig)):
+                b.r_plus_attachment(a['id'])
+                break
+
 
 def publish_reply(user, reply, **kwargs):
     pass
 
+
+review_request_publishing.connect(publish_review_request)
+review_publishing.connect(publish_review)
 reply_publishing.connect(publish_reply)
 
 
