@@ -12,7 +12,8 @@ from reviewboard.reviews.signals import (review_request_publishing,
 from reviewboard.site.urlresolvers import local_site_reverse
 
 from rbbz.bugzilla import Bugzilla
-from rbbz.errors import BugzillaError, InvalidBugIdError, InvalidReviewerError
+from rbbz.errors import (BugzillaError, InvalidBugsError, InvalidBugIdError,
+                         InvalidReviewersError)
 
 def review_request_url(review_request, site=None, siteconfig=None):
     if not site:
@@ -33,21 +34,29 @@ def bugzilla_to_publish_errors(func):
         try:
             return func(*args, **kwargs)
         except BugzillaError as e:
-            raise PublishError(e.msg)
+            raise PublishError('Bugzilla error: %s' % e.msg)
     return _transform_errors
 
 
 @bugzilla_to_publish_errors
 def publish_review_request(user, review_request_draft, **kwargs):
+    bugs = review_request_draft.get_bug_list()
+
+    if len(bugs) == 0 or len(bugs) > 1:
+        raise InvalidBugsError
+
     try:
-        bug_id = int(review_request_draft.get_bug_list()[0])
-    except (IndexError, TypeError, ValueError):
-        raise InvalidBugIdError
+        bug_id = int(bugs[0])
+    except (TypeError, ValueError):
+        raise InvalidBugIdError(bugs[0])
 
-    reviewer = review_request_draft.target_people.first()
-    if reviewer is None:
-        raise InvalidReviewerError
+    reviewers = review_request_draft.target_people
+    num_reviewers = reviewers.count()
 
+    if num_reviewers == 0 or num_reviewers > 1:
+        raise InvalidReviewersError
+
+    reviewer = reviewers.first()
     b = Bugzilla(user.bzlogin, user.bzcookie)
     b.post_rb_url(review_request_draft.summary, bug_id,
                   review_request_url(review_request_draft.get_review_request()),
@@ -56,11 +65,7 @@ def publish_review_request(user, review_request_draft, **kwargs):
 
 def publish_review(user, review, **kwargs):
     if review.ship_it:
-        try:
-            bug_id = int(review.review_request.get_bug_list()[0])
-        except (IndexError, TypeError, ValueError):
-            return
-
+        bug_id = int(review.review_request.get_bug_list()[0])
         site = Site.objects.get_current()
         siteconfig = SiteConfiguration.objects.get_current()
 

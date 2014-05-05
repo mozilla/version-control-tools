@@ -1,33 +1,33 @@
 from reviewboard.reviews.errors import PublishError
 
+#
+# Review request errors.
+#
+class InvalidBugsError(PublishError):
+    def __init__(self):
+        PublishError.__init__(self, 'Exactly one bug ID must be provided.')
+
+
 class InvalidBugIdError(PublishError):
-    def __init__(self):
-        PublishError.__init__(self, 'invalid bug ID')
-
-
-class BugNotFoundError(PublishError):
     def __init__(self, bug_id):
-        PublishError.__init__(self, 'bug %d not found' % bug_id)
+        PublishError.__init__(self, 'Invalid bug ID "%s".' % bug_id)
 
 
-class NoBugError(PublishError):
+class InvalidReviewersError(PublishError):
     def __init__(self):
-        PublishError.__init__(self, 'no bug ID provided')
+        PublishError.__init__(self, 'There must be exactly one reviewer '
+                              'given in the "People" field.')
 
 
-class InvalidReviewerError(PublishError):
-    def __init__(self):
-        PublishError.__init__(self, 'invalid reviewer')
-
-
+#
+# Bugzilla errors.
+#
 class BugzillaError(Exception):
     def __init__(self, msg):
         self.msg = msg
 
 
-class BugzillaAuthError(BugzillaError):
-    pass
-
-
 class BugzillaUrlError(BugzillaError):
-    pass
+    def __init__(self):
+        BugzillaError.__init__(self, 'No Bugzilla URL provided in rbbz '
+                               'configuration.')

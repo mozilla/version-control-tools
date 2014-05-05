@@ -8,9 +8,10 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 from reviewboard.accounts.backends import AuthBackend
+from reviewboard.accounts.errors import UserQueryError
 
 from rbbz.bugzilla import Bugzilla
-from rbbz.errors import BugzillaAuthError, BugzillaError, BugzillaUrlError
+from rbbz.errors import BugzillaError, BugzillaUrlError
 from rbbz.forms import BugzillaAuthSettingsForm
 from rbbz.models import get_or_create_bugzilla_users
 
@@ -65,7 +66,7 @@ class BugzillaBackend(AuthBackend):
             bugzilla = Bugzilla(*self._session_cookies(request.session))
         except BugzillaUrlError:
             return None
-        except BugzillaAuthError:
+        except BugzillaError:
             raise PermissionDenied
 
         user_data = bugzilla.get_user(username)
@@ -87,15 +88,13 @@ class BugzillaBackend(AuthBackend):
 
         try:
             bugzilla = Bugzilla(*self._session_cookies(request.session))
-        except BugzillaUrlError:
-            return None
-        except BugzillaAuthError:
-            raise PermissionDenied
+        except BugzillaError as e:
+            raise UserQueryError('Bugzilla error: %s' % e.msg)
 
         try:
             get_or_create_bugzilla_users(bugzilla.query_users(query))
-        except BugzillaError:
-            raise PermissionDenied
+        except BugzillaError as e:
+            raise UserQueryError('Bugzilla error: %s' % e.msg)
 
     def search_users(self, query, request):
         """Search anywhere in name to support BMO :irc_nick convention."""
