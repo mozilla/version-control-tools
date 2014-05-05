@@ -925,5 +925,25 @@ class TestPreventWebIDLHook(unittest.TestCase):
     result = push(u, self.clonerepo, dest=self.repodir)
     self.assertEqual(result, 0)
 
+  def testWebIDLEditsInBackoutsWithoutProperReviewShouldPass(self):
+    """ Test that editing .webidl file without proper DOM peer review in backouts should pass """
+    u = self.ui
+    # Copied from testBackout above.
+    messages = [
+      "Backed out changeset 593d94e9492e",
+      "Backout changesets 9e4ab3907b29, 3abc0dbbf710 due to m-oth permaorange",
+      "Backout of 35a679df430b due to bustage",
+      "backout 68941:5b8ade677818", # including the local numeric ID is silly but harmless
+      # we do not have a lot of reverts "hg log | grep revert" without a bug #
+      "Revert to changeset a87ee7550f6a due to incomplete backout" 
+    ]
+    for message in messages:
+      name = "new%d.webidl" % len(message)
+      appendFile(join(self.clonedir, name), "interface Test{};")
+      add(u, self.clonerepo, join(self.clonedir, name))
+      commit(u, self.clonerepo, message=message)
+      result = push(u, self.clonerepo, dest=self.repodir)
+      self.assertEqual(result, 0)
+
 if __name__ == '__main__':
   unittest.main()
