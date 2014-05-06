@@ -5,10 +5,10 @@ import unittest
 from mercurial import ui, hg, commands, util
 from mercurial.commands import add, clone, commit, init, push, rename, remove, update, merge
 from mercurial.node import hex, short
-from tempfile import mkdtemp
+from tempfile import mkdtemp, mkstemp
 import shutil
 import os, stat
-from os.path import join
+from os.path import join, exists
 import sqlite3 as sqlite
 from getpass import getuser
 from time import time
@@ -732,6 +732,11 @@ class TestCaseOnlyRenameHook(unittest.TestCase):
 
   def testTipDirRenameShouldFail(self):
     """ Test that a case-only directory rename in tip should fail. """
+
+    # Disable the test on case insensitive filesystems
+    tmphandle, tmppath = mkstemp()
+    if exists(tmppath.upper()):
+      return
 
     ui = self.ui
 
