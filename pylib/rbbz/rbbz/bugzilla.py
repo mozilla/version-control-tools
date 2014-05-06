@@ -34,9 +34,14 @@ class Bugzilla(object):
     exceptions.
     """
 
-    def __init__(self, login=None, logincookie=None):
-        siteconfig = SiteConfiguration.objects.get_current()
-        self.xmlrpc_url = siteconfig.get('auth_bz_xmlrpc_url')
+    user_fields = ['id', 'email', 'real_name', 'can_login']
+
+    def __init__(self, login=None, logincookie=None, xmlrpc_url=None):
+        if xmlrpc_url:
+            self.xmlrpc_url = xmlrpc_url
+        else:
+            siteconfig = SiteConfiguration.objects.get_current()
+            self.xmlrpc_url = siteconfig.get('auth_bz_xmlrpc_url')
 
         if not self.xmlrpc_url:
             raise BugzillaUrlError('no XMLRPC URL')
@@ -71,21 +76,18 @@ class Bugzilla(object):
 
             user_id = result['id']
 
-        params = {'ids': [user_id],
-                  'include_fields': ['email', 'real_name', 'can_login']}
+        params = {'ids': [user_id], 'include_fields': self.user_fields}
 
         return self.proxy.User.get(params)
 
     @xmlrpc_to_bugzilla_errors
     def get_user(self, username):
-        params = {'names': [username],
-                  'include_fields': ['email', 'real_name', 'can_login']}
+        params = {'names': [username], 'include_fields': self.user_fields}
         return self.proxy.User.get(params)
 
     @xmlrpc_to_bugzilla_errors
     def query_users(self, query):
-        params = {'match': [query],
-                  'include_fields': ['email', 'real_name', 'can_login']}
+        params = {'match': [query], 'include_fields': self.user_fields}
         return self.proxy.User.get(params)
 
     @xmlrpc_to_bugzilla_errors
@@ -95,6 +97,19 @@ class Bugzilla(object):
             'comment': comment
         }
         return self.proxy.Bug.add_comment(params)
+
+    @xmlrpc_to_bugzilla_errors
+    def is_bug_confidential(self, bug_id):
+        params = {'ids': [bug_id], 'include_fields': ['groups']}
+
+        try:
+            groups = self.proxy.Bug.get(params)['bugs'][0]['groups']
+        except xmlrpclib.Fault as e:
+            if e.faultCode == 102:
+                return True
+            raise
+
+        return bool(groups)
 
     @xmlrpc_to_bugzilla_errors
     def post_rb_url(self, summary, bug_id, url, reviewer):
