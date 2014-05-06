@@ -12,8 +12,8 @@ from reviewboard.reviews.signals import (review_request_publishing,
 from reviewboard.site.urlresolvers import local_site_reverse
 
 from rbbz.bugzilla import Bugzilla
-from rbbz.errors import (BugzillaError, InvalidBugsError, InvalidBugIdError,
-                         InvalidReviewersError)
+from rbbz.errors import (BugzillaError, ConfidentialBugError, InvalidBugsError,
+                         InvalidBugIdError, InvalidReviewersError)
 
 def review_request_url(review_request, site=None, siteconfig=None):
     if not site:
@@ -50,6 +50,11 @@ def publish_review_request(user, review_request_draft, **kwargs):
     except (TypeError, ValueError):
         raise InvalidBugIdError(bugs[0])
 
+    b = Bugzilla(user.bzlogin, user.bzcookie)
+
+    if b.is_bug_confidential(bug_id):
+        raise ConfidentialBugError
+
     reviewers = review_request_draft.target_people
     num_reviewers = reviewers.count()
 
@@ -57,8 +62,10 @@ def publish_review_request(user, review_request_draft, **kwargs):
         raise InvalidReviewersError
 
     reviewer = reviewers.first()
-    b = Bugzilla(user.bzlogin, user.bzcookie)
-    b.post_rb_url(review_request_draft.summary, bug_id,
+    b.post_rb_url(bug_id,
+                  review_request_draft.get_review_request().id,
+                  review_request_draft.summary,
+                  review_request_draft.description,
                   review_request_url(review_request_draft.get_review_request()),
                   reviewer.get_username())
 

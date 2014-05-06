@@ -19,6 +19,12 @@ class InvalidReviewersError(PublishError):
                               'given in the "People" field.')
 
 
+class ConfidentialBugError(PublishError):
+    def __init__(self):
+        PublishError.__init__(self, 'This bug is confidential; please attach '
+                              'the patch directly to the bug.')
+
+
 #
 # Bugzilla errors.
 #

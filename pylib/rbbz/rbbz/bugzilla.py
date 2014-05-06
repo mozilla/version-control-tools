@@ -11,8 +11,6 @@ from rbbz.errors import BugzillaError, BugzillaUrlError
 from rbbz.transports import bugzilla_transport
 
 
-ATTACHMENT_SUMMARY_PREFIX = '[RB] '
-
 @simple_decorator
 def xmlrpc_to_bugzilla_errors(func):
     def _transform_errors(*args, **kwargs):
@@ -112,12 +110,14 @@ class Bugzilla(object):
         return bool(groups)
 
     @xmlrpc_to_bugzilla_errors
-    def post_rb_url(self, summary, bug_id, url, reviewer):
+    def post_rb_url(self, bug_id, review_id, summary, description, url,
+                    reviewer):
         params = {
             'ids': [bug_id],
             'data': url,
-            'file_name': summary,
-            'summary': '%s%s' % (ATTACHMENT_SUMMARY_PREFIX, summary),
+            'file_name': 'reviewboard-%d.url' % review_id,
+            'summary': summary,
+            'comment': description,
             'content_type': 'text/plain',
             'flags': [{'name': 'review',
                        'status': '?',
@@ -130,14 +130,14 @@ class Bugzilla(object):
         rb_attachments = []
         params = {
             'ids': [bug_id],
-            'include_fields': ['id', 'data', 'summary', 'is_obsolete',
+            'include_fields': ['id', 'data', 'content_type', 'is_obsolete',
                                'flags']
         }
         attachments = self.proxy.Bug.attachments(params)
 
         for a in attachments['bugs'][str(bug_id)]:
             if (a['is_obsolete']
-                or not a['summary'].startswith(ATTACHMENT_SUMMARY_PREFIX)
+                or a['content_type'] != 'text/x-review-board-request'
                 or not a['flags']):
                 continue
 
