@@ -915,6 +915,14 @@ class TestPreventWebIDLHook(unittest.TestCase):
     commit(u, self.clonerepo, message="checkin 1 bug 12345; r=foobar,jst")
     result = push(u, self.clonerepo, dest=self.repodir)
     self.assertEqual(result, 0)
+    editFile(join(self.clonedir, "original.webidl"), "interface Bar{};", "interface Baz{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 67890; r=foobar r=jst")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+    editFile(join(self.clonedir, "original.webidl"), "interface Baz{};", "interface Bizarre{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 123456; r=foobar r=lumpy,jst")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
 
   def testWebIDLEditWithProperReviewDuringMergeShouldPass(self):
     """ Test that editing .webidl file with proper DOM peer review should pass """

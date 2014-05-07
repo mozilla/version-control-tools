@@ -64,15 +64,15 @@ def hook(ui, repo, hooktype, node, **kwargs):
             # Only Check WebIDL Files
             if file.endswith('.webidl'):
                 message = c.description().lower()
-                match = re.search('\Wr\s*=\s*(\w+(?:,\w+)*)', message)
-                validReview = False
-                if match:
-                    for reviewer in match.group(1).split(','):
-                        if reviewer in DOM_peers:
-                            validReview = True
-                            break
-                webidlReviewed = validReview
-                if not validReview and not isBackout(message):
+                def search():
+                  matches = re.findall('\Wr\s*=\s*(\w+(?:,\w+)*)', message)
+                  for match in matches:
+                      for reviewer in match.split(','):
+                          if reviewer in DOM_peers:
+                              return True
+                  return False
+                webidlReviewed = search()
+                if not webidlReviewed and not isBackout(message):
                         error += "WebIDL file %s altered in changeset %s without DOM peer review\n" % (file, short(c.node()))
     # Check if an error occured in any of the files that were changed
     if error != "":
