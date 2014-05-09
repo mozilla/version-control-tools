@@ -4,6 +4,7 @@
 
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.db import models
 from djblets.siteconfig.models import SiteConfiguration
 from djblets.util.decorators import simple_decorator
 from reviewboard.reviews.errors import PublishError
@@ -96,36 +97,51 @@ review_publishing.connect(publish_review)
 reply_publishing.connect(publish_reply)
 
 
+class BugzillaUserMap(models.Model):
+    user = models.OneToOneField(User)
+    bugzilla_user_id = models.IntegerField(unique=True, db_index=True)
+
+
 def get_or_create_bugzilla_users(user_data):
     # All users will have a stored password of "!", which Django uses to
     # indicate an invalid password.
-    users_db = []
+    users = []
 
     for user in user_data['users']:
-        username = user['email']
+        bz_user_id = user['id']
+        email = user['email']
         real_name = user['real_name']
         can_login = user['can_login']
-        modified = False
 
         try:
-            user_db = User.objects.get(username=username)
-        except User.DoesNotExist:
-            user_db = User(username=username, password='!',
-                           first_name=real_name, email=username,
-                           is_active=can_login)
-            modified = True
+            bugzilla_user_map = BugzillaUserMap.objects.get(
+                bugzilla_user_id=bz_user_id)
+        except BugzillaUserMap.DoesNotExist:
+            user = User(username=email, password='!', first_name=real_name,
+                        email=email, is_active=can_login)
+            user.save()
+            bugzilla_user_map = BugzillaUserMap(user=user,
+                                                bugzilla_user_id=bz_user_id)
+            bugzilla_user_map.save()
         else:
-            if user_db.first_name != real_name:
-                user_db.first_name = real_name
+            modified = False
+            user = bugzilla_user_map.user
+
+            if user.username != email:
+                user.username = email
+                user.email = email
                 modified = True
 
-            if user_db.is_active != can_login:
-                user_db.is_active = can_login
+            if user.first_name != real_name:
+                user.first_name = real_name
                 modified = True
 
-        if modified:
-            user_db.save()
+            if user.is_active != can_login:
+                user.is_active = can_login
+                modified = True
 
-        users_db.append(user_db)
-    return users_db
+            if modified:
+                user.save()
 
+        users.append(user)
+    return users
