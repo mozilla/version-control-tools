@@ -16,4 +16,4 @@ Or to install manually:
    hg clone https://hg.mozilla.org/hgcustom/version-control-tools
 2) Edit your ~/.hgrc and add the following to enable the extension:
    [extensions]
-   qimportbz = /path/to/version-control-tools/hgext/qimportbz/
+   qimportbz = /path/to/version-control-tools/hgext/qimportbz

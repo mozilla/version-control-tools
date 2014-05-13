@@ -16,7 +16,7 @@ Or to install manually:
    hg clone https://hg.mozilla.org/hgcustom/version-control-tools
 2) Edit your ~/.hgrc and add the following to enable the extension:
    [extensions]
-   bzexport = /path/to/version-control-tools/hgext/bzexport/
+   bzexport = /path/to/version-control-tools/hgext/bzexport
 
 NOTE FOR WINDOWS USERS
 ----------------------

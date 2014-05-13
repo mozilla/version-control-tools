@@ -18,4 +18,4 @@ Or to install manually:
    hg clone https://hg.mozilla.org/hgcustom/version-control-tools
 2) Edit your ~/.hgrc and add the following to enable the extension:
    [extensions]
-   qbackout = /path/to/version-control-tools/hgext/qbackout/
+   qbackout = /path/to/version-control-tools/hgext/qbackout
