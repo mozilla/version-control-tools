@@ -53,6 +53,12 @@ hgNameToRevURL.update({
     'pine':    'projects/pine',
 })
 
+# QA repos
+hgNameToRevURL.update({
+    'mozmill-tests':        'qa/mozmill-tests',
+    'testcase-data':        'qa/testcase-data',
+})
+
 # RelEng repos
 hgNameToRevURL.update({
     'autoland':             'build/autoland/',
