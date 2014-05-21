@@ -21,10 +21,9 @@ This hook is to prevent changes to .webidl files in pushes without proper DOM pe
 import re
 from mercurial.node import short
 
-# Stolen from commit-message.py
 backoutMessage = [re.compile(x) for x in [
-    r'^(back(ing|ed)?\s+out|backout).*(\s+|\:)[0-9a-f]{12}',
-    r'^(revert(ed|ing)?).*(\s+|\:)[0-9a-f]{12}'
+    r'^(back(ing|ed)?\s+out|backout)',
+    r'^(revert(ed|ing)?)'
 ]]
 
 def isBackout(message):

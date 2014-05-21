@@ -948,7 +948,8 @@ class TestPreventWebIDLHook(unittest.TestCase):
       "Backout of 35a679df430b due to bustage",
       "backout 68941:5b8ade677818", # including the local numeric ID is silly but harmless
       # we do not have a lot of reverts "hg log | grep revert" without a bug #
-      "Revert to changeset a87ee7550f6a due to incomplete backout" 
+      "Revert to changeset a87ee7550f6a due to incomplete backout",
+      "Backed out 7 changesets (bug 824717) for bustage."
     ]
     for message in messages:
       name = "new%d.webidl" % len(message)
