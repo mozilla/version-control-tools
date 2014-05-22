@@ -922,6 +922,17 @@ class TestPreventWebIDLHook(unittest.TestCase):
     editFile(join(self.clonedir, "original.webidl"), "interface Baz{};", "interface Bizarre{};")
     commit(u, self.clonerepo, message="checkin 1 bug 123456; r=foobar r=lumpy,jst")
     result = push(u, self.clonerepo, dest=self.repodir)
+    editFile(join(self.clonedir, "original.webidl"), "interface Bizarre{};", "interface Bar{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 123450; sr=foobar,jst")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+    editFile(join(self.clonedir, "original.webidl"), "interface Bar{};", "interface Baz{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 678900; sr=foobar sr=jst")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+    editFile(join(self.clonedir, "original.webidl"), "interface Baz{};", "interface Bizarre{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 1234560; sr=foobar sr=lumpy,jst")
+    result = push(u, self.clonerepo, dest=self.repodir)
     self.assertEqual(result, 0)
 
   def testWebIDLEditWithProperReviewDuringMergeShouldPass(self):

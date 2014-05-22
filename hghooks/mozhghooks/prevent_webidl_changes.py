@@ -64,7 +64,7 @@ def hook(ui, repo, hooktype, node, **kwargs):
             if file.endswith('.webidl'):
                 message = c.description().lower()
                 def search():
-                  matches = re.findall('\Wr\s*=\s*(\w+(?:,\w+)*)', message)
+                  matches = re.findall('\Ws?r\s*=\s*(\w+(?:,\w+)*)', message)
                   for match in matches:
                       for reviewer in match.split(','):
                           if reviewer in DOM_peers:
