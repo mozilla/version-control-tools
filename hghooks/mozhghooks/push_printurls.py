@@ -36,27 +36,27 @@ hgNameToRevURL = {
 
 # Project branches that are in active use
 hgNameToRevURL.update({
-    'alder':   'projects/alder',
-    'ash':     'projects/ash',
-    'birch':   'projects/birch',
-    'cedar':   'projects/cedar',
-    'cypress': 'projects/cypress',
-    'date':    'projects/date',
-    'elm':     'projects/elm',
-    'fig':     'projects/fig',
-    'gum':     'projects/gum',
-    'holly':   'projects/holly',
-    'jamun':   'projects/jamun',
-    'larch':   'projects/larch',
-    'maple':   'projects/maple',
-    'oak':     'projects/oak',
-    'pine':    'projects/pine',
+    'alder':   'projects/alder/',
+    'ash':     'projects/ash/',
+    'birch':   'projects/birch/',
+    'cedar':   'projects/cedar/',
+    'cypress': 'projects/cypress/',
+    'date':    'projects/date/',
+    'elm':     'projects/elm/',
+    'fig':     'projects/fig/',
+    'gum':     'projects/gum/',
+    'holly':   'projects/holly/',
+    'jamun':   'projects/jamun/',
+    'larch':   'projects/larch/',
+    'maple':   'projects/maple/',
+    'oak':     'projects/oak/',
+    'pine':    'projects/pine/',
 })
 
 # QA repos
 hgNameToRevURL.update({
-    'mozmill-tests':        'qa/mozmill-tests',
-    'testcase-data':        'qa/testcase-data',
+    'mozmill-tests':        'qa/mozmill-tests/',
+    'testcase-data':        'qa/testcase-data/',
 })
 
 # RelEng repos
