@@ -13,6 +13,7 @@ from reviewboard.reviews.signals import (review_request_publishing,
 from reviewboard.site.urlresolvers import local_site_reverse
 
 from rbbz.bugzilla import Bugzilla
+from rbbz.diffs import build_plaintext_review
 from rbbz.errors import (BugzillaError, ConfidentialBugError, InvalidBugsError,
                          InvalidBugIdError, InvalidReviewersError)
 
@@ -72,12 +73,15 @@ def publish_review_request(user, review_request_draft, **kwargs):
 
 
 def publish_review(user, review, **kwargs):
-    if review.ship_it:
-        bug_id = int(review.review_request.get_bug_list()[0])
-        site = Site.objects.get_current()
-        siteconfig = SiteConfiguration.objects.get_current()
+    bug_id = int(review.review_request.get_bug_list()[0])
+    site = Site.objects.get_current()
+    siteconfig = SiteConfiguration.objects.get_current()
 
-        b = Bugzilla(user.bzlogin, user.bzcookie)
+    b = Bugzilla(user.bzlogin, user.bzcookie)
+    b.post_comment(bug_id, build_plaintext_review(review, {"user": user}))
+
+    if review.ship_it:
+
         attachments = b.get_rb_attachments(bug_id)
 
         for a in attachments:

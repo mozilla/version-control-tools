@@ -12,10 +12,10 @@ setup(name=PACKAGE,
       license='MPL 2.0',
       packages=['rbbz'],
       entry_points={
-        'reviewboard.extensions':
-            '%s = rbbz.extension:BugzillaExtension' % PACKAGE,
-        'reviewboard.auth_backends': [
-            'bugzilla = rbbz.auth:BugzillaBackend',
-        ],
+          'reviewboard.extensions':
+              '%s = rbbz.extension:BugzillaExtension' % PACKAGE,
+          'reviewboard.auth_backends': [
+              'bugzilla = rbbz.auth:BugzillaBackend',
+          ],
       }
 )
