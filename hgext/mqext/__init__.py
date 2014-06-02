@@ -75,6 +75,8 @@ the -Q option to all relevant commands in your ~/.hgrc::
   qimport = -Q
 '''
 
+testedwith = '2.8.1 3.0.1 3.2 3.3.2 3.3.3 3.4'
+
 import os
 import re
 import json
@@ -229,6 +231,7 @@ def patch_changes(ui, repo, patchfile=None, **opts):
 
     matchfn = scmutil.match(repo[None], exactFiles, default='path')
     left = opts['limit']
+    opts['rev'] = None
     for ctx in cmdutil.walkchangerevs(repo, matchfn, opts, lambda a,b: None):
         if left == 0:
             break
@@ -799,7 +802,11 @@ cmdtable = {
 def uisetup(ui):
     try:
         mq = extensions.find('mq')
+        if mq is None:
+            ui.warn("mqext extension is mostly disabled when mq is disabled")
+            return
     except KeyError:
+        ui.warn("mqext extension is mostly disabled when mq is not installed")
         return # mq not loaded at all
 
     # check whether mq is loaded before mqext. If not, do a nasty hack to set
@@ -857,13 +864,18 @@ def uisetup_post_mq(ui, mq):
 def extsetup():
     try:
         crecord_ext = extensions.find('crecord')
+        if crecord_ext is None:
+            return  # crecord is not enabled; no need to handle qcrecord
     except KeyError:
-        return # crecord not loaded at all
+        return  # crecord not loaded at all; no need to handle qcrecord
 
     # check whether qcrecord is loaded before mqext. If not, do a nasty hack to
     # set it up first so that mqext can modify what it does and not have the
     # modifications get clobbered. Mercurial really needs to implement
     # inter-extension dependencies.
+
+    if not hasattr(crecord_ext, 'cmdtable'):
+        raise Exception("mercurial version is too old")
 
     if 'qcrecord' not in crecord_ext.cmdtable:
         orig = crecord_ext.extsetup
