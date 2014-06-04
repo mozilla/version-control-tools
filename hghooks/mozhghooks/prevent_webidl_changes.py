@@ -49,8 +49,11 @@ def hook(ui, repo, hooktype, node, **kwargs):
     ]
     error = ""
     webidlReviewed = False
-    # Loop through each changeset being added to the repository
     changesets = list(repo.changelog.revs(repo[node].rev()))
+    if 'a=release' in repo.changectx(changesets[-1]).description().lower():
+        # Accept the entire push for code uplifts.
+        return 0
+    # Loop through each changeset being added to the repository
     for i in reversed(changesets):
         c = repo.changectx(i)
 

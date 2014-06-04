@@ -908,6 +908,27 @@ class TestPreventWebIDLHook(unittest.TestCase):
     commit(u, self.clonerepo, message="checkin 1 bug 12345; r=foobar")
     self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
 
+  def testWebIDLEditWithoutProperReviewInReleaseMergeShouldPass(self):
+    """ Test that editing .webidl file without proper DOM peer review when doing a code uplift should pass """
+    u = self.ui
+    editFile(join(self.clonedir, "original.webidl"), "interface Foo{};", "interface Bar{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 12345; r=foobar")
+    appendFile(join(self.clonedir, "dummy"), "foo")
+    add(u, self.clonerepo, join(self.clonedir, "dummy"))
+    commit(u, self.clonerepo, message="Doing the code uplift, a=release")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+
+  def testWebIDLEditWithoutProperReviewInNonReleaseMergeButWithAEqualsReleaseShouldFail(self):
+    """ Test that editing .webidl file without proper DOM peer review when doing a code uplift should pass """
+    u = self.ui
+    appendFile(join(self.clonedir, "dummy"), "foo")
+    add(u, self.clonerepo, join(self.clonedir, "dummy"))
+    commit(u, self.clonerepo, message="Doing the code uplift, a=release")
+    editFile(join(self.clonedir, "original.webidl"), "interface Foo{};", "interface Bar{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 12345; r=foobar")
+    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
+
   def testWebIDLEditWithProperReviewShouldPass(self):
     """ Test that editing .webidl file with proper DOM peer review should pass """
     u = self.ui
