@@ -111,59 +111,102 @@ class Bugzilla(object):
 
     @xmlrpc_to_bugzilla_errors
     def post_rb_url(self, bug_id, review_id, summary, description, url,
-                    reviewer):
-        params = {
-            'ids': [bug_id],
-            'data': url,
-            'file_name': 'reviewboard-%d.url' % review_id,
-            'summary': summary,
-            'comment': description,
-            'content_type': 'text/plain',
-            'flags': [{'name': 'review',
-                       'status': '?',
-                       'requestee': reviewer}]
-        }
-        return self.proxy.Bug.add_attachment(params)
+                    reviewers):
+        """Posts a new attachment containing a review-request URL, or updates
+           an existing one."""
+
+        reviewers = set(reviewers)
+        params = {}
+        flags = []
+        rb_attachment = None
+        attachments = self.get_rb_attachments(bug_id)
+
+        # Find the associated attachment, then go through the review flags,
+        # updating the flag if the requestee is still in the given reviewers,
+        # and deleting if not.
+
+        for a in attachments:
+            if a['data'] == url:
+                rb_attachment = a
+                for f in a.get('flags', []):
+                    if not 'requestee' in f:
+                        continue
+                    if f['requestee'] in reviewers:
+                        flags.append({'id': f['id'], 'name': 'review',
+                                      'status': '?',
+                                      'requestee': f['requestee']})
+                        reviewers.remove(f['requestee'])
+                    else:
+                        flags.append({'id': f['id'], 'status': 'X'})
+                break
+
+        # Add flags for new reviewers.
+
+        for r in reviewers:
+            flags.append({'name': 'review', 'status': '?', 'requestee': r,
+                          'new': True})
+
+        if rb_attachment:
+            params['ids'] = [rb_attachment['id']]
+        else:
+            params['ids'] = [bug_id]
+            params['data'] = url
+            params['content_type'] = 'text/plain'
+
+        params['file_name'] = 'reviewboard-%d-url.txt' % review_id
+        params['summary'] = summary
+        params['comment'] = description
+        params['flags'] = flags
+
+        if rb_attachment:
+            self.proxy.Bug.update_attachment(params)
+        else:
+            self.proxy.Bug.add_attachment(params)
 
     @xmlrpc_to_bugzilla_errors
     def get_rb_attachments(self, bug_id):
-        rb_attachments = []
+        """Get all attachments that contain review-request URLs."""
+
         params = {
             'ids': [bug_id],
             'include_fields': ['id', 'data', 'content_type', 'is_obsolete',
                                'flags']
         }
-        attachments = self.proxy.Bug.attachments(params)
 
-        for a in attachments['bugs'][str(bug_id)]:
-            if (a['is_obsolete']
-                or a['content_type'] != 'text/x-review-board-request'
-                or not a['flags']):
-                continue
-
-            reviewer = None
-
-            for f in a['flags']:
-                if f['name'] == 'review' and 'requestee' in f:
-                    reviewer = f['requestee']
-                    break
-
-            if not reviewer:
-                continue
-
-            rb_attachments.append({
-                    'id': a['id'],
-                    'url': a['data'].data,
-                    'reviewer': reviewer
-            })
-
-        return rb_attachments
+        return [a for a
+                in self.proxy.Bug.attachments(params)['bugs'][str(bug_id)]
+                if not a['is_obsolete'] and
+                a['content_type'] == 'text/x-review-board-request']
 
     @xmlrpc_to_bugzilla_errors
-    def r_plus_attachment(self, attachment_id):
+    def r_plus_attachment(self, bug_id, reviewer, rb_url):
+        """Set a review flag to "+"."""
+
+        rb_attachment = None
+        attachments = self.get_rb_attachments(bug_id)
+
+        for a in attachments:
+            if a.get('data') == rb_url:
+                rb_attachment = a
+                break
+
+        if not rb_attachment:
+            return
+
+        flags = rb_attachment.get('flags', [])
+        new_flag = {'name': 'review', 'status': '+'}
+
+        for f in flags:
+            if f['name'] == 'review' and f.get('requestee') == reviewer:
+                new_flag['id'] = f['id']
+                break
+        else:
+            new_flag['new'] = True
+            new_flag['requestee'] = reviewer
+
         params = {
-            'ids': [attachment_id],
-            'flags': [{'name': 'review', 'status': '+'}]
+            'ids': [rb_attachment['id']],
+            'flags': [new_flag]
         }
 
         self.proxy.Bug.update_attachment(params)

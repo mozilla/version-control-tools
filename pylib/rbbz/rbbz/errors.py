@@ -13,12 +13,6 @@ class InvalidBugIdError(PublishError):
         PublishError.__init__(self, 'Invalid bug ID "%s".' % bug_id)
 
 
-class InvalidReviewersError(PublishError):
-    def __init__(self):
-        PublishError.__init__(self, 'There must be exactly one reviewer '
-                              'given in the "People" field.')
-
-
 class ConfidentialBugError(PublishError):
     def __init__(self):
         PublishError.__init__(self, 'This bug is confidential; please attach '

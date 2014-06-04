@@ -15,7 +15,7 @@ from reviewboard.site.urlresolvers import local_site_reverse
 from rbbz.bugzilla import Bugzilla
 from rbbz.diffs import build_plaintext_review
 from rbbz.errors import (BugzillaError, ConfidentialBugError, InvalidBugsError,
-                         InvalidBugIdError, InvalidReviewersError)
+                         InvalidBugIdError)
 
 def review_request_url(review_request, site=None, siteconfig=None):
     if not site:
@@ -57,19 +57,15 @@ def publish_review_request(user, review_request_draft, **kwargs):
     if b.is_bug_confidential(bug_id):
         raise ConfidentialBugError
 
-    reviewers = review_request_draft.target_people
-    num_reviewers = reviewers.count()
+    reviewers = [x.get_username() for x in
+                 review_request_draft.target_people.all()]
 
-    if num_reviewers == 0 or num_reviewers > 1:
-        raise InvalidReviewersError
-
-    reviewer = reviewers.first()
     b.post_rb_url(bug_id,
                   review_request_draft.get_review_request().id,
                   review_request_draft.summary,
                   review_request_draft.description,
                   review_request_url(review_request_draft.get_review_request()),
-                  reviewer.get_username())
+                  reviewers)
 
 
 def publish_review(user, review, **kwargs):
@@ -81,15 +77,9 @@ def publish_review(user, review, **kwargs):
     b.post_comment(bug_id, build_plaintext_review(review, {"user": user}))
 
     if review.ship_it:
-
-        attachments = b.get_rb_attachments(bug_id)
-
-        for a in attachments:
-            if (a['reviewer'] == review.user.username and
-                a['url'] == review_request_url(review.review_request, site,
-                                               siteconfig)):
-                b.r_plus_attachment(a['id'])
-                break
+        b.r_plus_attachment(bug_id, review.user.username,
+                            review_request_url(review.review_request, site,
+                                               siteconfig))
 
 
 def publish_reply(user, reply, **kwargs):
