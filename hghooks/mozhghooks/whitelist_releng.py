@@ -36,6 +36,7 @@ ALLOWED_USERS = set([
     'dmitchell@mozilla.com',
     'hwine@mozilla.com',
     'jlund@mozilla.com',
+    'jozeller@mozilla.com',
     'jwatkins@mozilla.com',
     'jwood@mozilla.com',
     'kmoir@mozilla.com',
