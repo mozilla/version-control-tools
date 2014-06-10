@@ -121,24 +121,32 @@ class Bugzilla(object):
         rb_attachment = None
         attachments = self.get_rb_attachments(bug_id)
 
-        # Find the associated attachment, then go through the review flags,
-        # updating the flag if the requestee is still in the given reviewers,
-        # and deleting if not.
+        # Find the associated attachment, then go through the review flags.
+        # If a review flag status is '?' and the requestee is still in the
+        # given reviewers, then update the flag.
+        # If the review flag status is other than '?', or if it is a feedback
+        # flag, clear it.
 
         for a in attachments:
-            if a['data'] == url:
-                rb_attachment = a
-                for f in a.get('flags', []):
-                    if not 'requestee' in f:
-                        continue
-                    if f['requestee'] in reviewers:
-                        flags.append({'id': f['id'], 'name': 'review',
-                                      'status': '?',
-                                      'requestee': f['requestee']})
-                        reviewers.remove(f['requestee'])
-                    else:
-                        flags.append({'id': f['id'], 'status': 'X'})
-                break
+            if a['data'] != url:
+                continue
+
+            rb_attachment = a
+
+            for f in a.get('flags', []):
+                if f['name'] != 'review' and f['name'] != 'feedback':
+                    continue
+
+                if (f['name'] == 'review' and 'requestee' in f
+                    and f['requestee'] in reviewers):
+                    flags.append({'id': f['id'], 'name': 'review',
+                                  'status': '?',
+                                  'requestee': f['requestee']})
+                    reviewers.remove(f['requestee'])
+                else:
+                    flags.append({'id': f['id'], 'status': 'X'})
+
+            break
 
         # Add flags for new reviewers.
 

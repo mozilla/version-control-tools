@@ -42,6 +42,10 @@ def bugzilla_to_publish_errors(func):
 
 @bugzilla_to_publish_errors
 def publish_review_request(user, review_request_draft, **kwargs):
+    # Don't publish anything for child requests.
+    if review_request_draft.depends_on.count():
+        return
+
     bugs = review_request_draft.get_bug_list()
 
     if len(bugs) == 0 or len(bugs) > 1:
@@ -72,18 +76,21 @@ def publish_review(user, review, **kwargs):
     bug_id = int(review.review_request.get_bug_list()[0])
     site = Site.objects.get_current()
     siteconfig = SiteConfiguration.objects.get_current()
-
     b = Bugzilla(user.bzlogin, user.bzcookie)
+
     b.post_comment(bug_id, build_plaintext_review(review, {"user": user}))
 
-    if review.ship_it:
+    if review.ship_it and not review.review_request.depends_on.count():
         b.r_plus_attachment(bug_id, review.user.username,
                             review_request_url(review.review_request, site,
                                                siteconfig))
 
 
 def publish_reply(user, reply, **kwargs):
-    pass
+    bug_id = int(reply.review_request.get_bug_list()[0])
+    b = Bugzilla(user.bzlogin, user.bzcookie)
+
+    b.post_comment(bug_id, build_plaintext_review(reply, {"user": user}))
 
 
 review_request_publishing.connect(publish_review_request)

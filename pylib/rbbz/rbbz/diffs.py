@@ -1,12 +1,11 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 import HTMLParser
 
-from django.contrib.sites.models import Site
-from django.template.loader import render_to_string
-
-from djblets.siteconfig.models import SiteConfiguration
 from reviewboard.diffviewer.diffutils import (get_diff_files,
                                               populate_diff_chunks)
-from reviewboard.diffviewer.views import exception_traceback_string
 
 
 def get_file_chunks_in_range_custom(context, filediff, interfilediff,
@@ -267,16 +266,36 @@ def render_comment_plain(comment, context):
             for line in chunk['lines']:
                 lines.append("> +%s" % parser.unescape(line[5]))
 
-    lines.append("%s" % comment)
+    lines.append("")
+
+    comments = []
+    c = comment
+    depth = 0
+
+    while True:
+        if depth:
+            prefix = '%s ' % ('>' * depth,)
+        else:
+            prefix = ''
+
+        comments.append("%s%s" % (prefix, c))
+
+        if c.reply_to:
+            c = c.reply_to
+            depth += 1
+        else:
+            break
+
+    comments.reverse()
+
+    lines.extend(comments)
 
     return "\n".join(lines)
 
 
 def build_plaintext_review(review, context):
     """Create a plaintext patch style representation of a review"""
-    comment_entries = []
     review_text = []
-    siteconfig = SiteConfiguration.objects.get_current()
 
     if review.body_top:
         review_text.append(review.body_top)
