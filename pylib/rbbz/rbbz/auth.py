@@ -38,7 +38,10 @@ class BugzillaBackend(AuthBackend):
         except BugzillaUrlError:
             return None
 
-        user_data = bugzilla.log_in(username, password, cookie)
+        try:
+            user_data = bugzilla.log_in(username, password, cookie)
+        except BugzillaError:
+            return None
 
         if not user_data:
             return None
