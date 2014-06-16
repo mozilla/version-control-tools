@@ -43,7 +43,11 @@ def bugzilla_to_publish_errors(func):
 @bugzilla_to_publish_errors
 def publish_review_request(user, review_request_draft, **kwargs):
     # Don't publish anything for child requests.
-    if review_request_draft.get_blocks():
+    # FIXME: There should be a better way to determine if this is a
+    # child review request of a pushed review request, since the following
+    # means that a review request created outside of the push framework
+    # normally won't be mirrored to Bugzilla.
+    if not review_request_draft.depends_on.count():
         return
 
     bugs = review_request_draft.get_bug_list()
