@@ -43,7 +43,7 @@ def bugzilla_to_publish_errors(func):
 @bugzilla_to_publish_errors
 def publish_review_request(user, review_request_draft, **kwargs):
     # Don't publish anything for child requests.
-    if review_request_draft.depends_on.count():
+    if review_request_draft.get_blocks():
         return
 
     bugs = review_request_draft.get_bug_list()
