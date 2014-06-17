@@ -1,7 +1,7 @@
 from setuptools import setup
 
 PACKAGE = 'rbbz'
-VERSION = '0.1.11'
+VERSION = '0.1.12'
 
 setup(name=PACKAGE,
       version=VERSION,
