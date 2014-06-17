@@ -22,6 +22,9 @@ class BugzillaCookieAuthMiddleware(object):
                                    x in get_enabled_auth_backends()]:
             return response
 
+        if not hasattr(request, 'user'):
+            return response
+
         if not request.user.is_authenticated():
             for key in ('Bugzilla_login', 'Bugzilla_logincookie'):
                 try:
