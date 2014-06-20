@@ -18,9 +18,6 @@ EXTDIR = os.path.join(HERE, 'hgext')
 sys.path.insert(0, os.path.join(HERE, 'pylib', 'mercurial-support'))
 runtestsmod = imp.load_source('runtests', RUNTESTS)
 
-checktools = runtestsmod.checktools
-runtests = runtestsmod.runtests
-
 
 def find_test_files():
     """Find all test files in this repository."""
@@ -41,5 +38,6 @@ def find_test_files():
 
 
 if __name__ == '__main__':
+    runner = runtestsmod.TestRunner()
     sys.argv.extend(find_test_files())
-    runtestsmod.main()
+    sys.exit(runner.run(sys.argv[1:]))
