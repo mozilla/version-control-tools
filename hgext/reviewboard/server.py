@@ -17,86 +17,38 @@ url is commonly defined in the global hgrc whereas repoid is repository
 local.
 """
 
-import urllib
-from StringIO import StringIO
+import os
+import sys
 
+from mercurial import demandimport
 from mercurial import extensions
-from mercurial import mdiff
-from mercurial import patch
 from mercurial import util
 from mercurial import wireproto
 from mercurial.i18n import _
 
+OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 
-def wireproto_reviewboard(repo, proto, *args, **kwargs):
-    # Send output to client.
-    proto.redirect()
-    fp = StringIO()
-    proto.getfile(fp)
-    lines = fp.getvalue().split('\n')
-    fp.close()
+demandimport.disable()
+try:
+    import hgrb.shared
+except ImportError:
+    sys.path.insert(0, OUR_DIR)
+    import hgrb.shared
+demandimport.enable()
 
-    if len(lines) != 4:
-        return 'Unexpected payload\n'
-        # TODO this hangs due to draining.
-        return wireproto.pusherr('Unexpected payload to reviewboard command.')
-
-    username, password, nodes, identifier = lines
-    username = urllib.unquote(username)
-    password = urllib.unquote(password)
-    nodes = nodes.split()
-    identifier = urllib.unquote(identifier)
-
-    diffopts = mdiff.diffopts(context=8, showfunc=True, git=False)
-
-    commits = {
-        'individual': [],
-        'squashed': {}
-    }
-
-    parent_node = repo[nodes[0]].p1().node()
-    for i, node in enumerate(nodes):
-        p1 = repo[node].p1().node()
-        diff = None
-        parent_diff = None
-
-        diff = ''.join(patch.diff(repo, node1=p1, node2=node, opts=diffopts))
-        if i != 0:
-            parent_diff = ''.join(patch.diff(repo, node1=parent_node,
-                node2=nodes[i-1], opts=diffopts))
-
-        commits['individual'].append({
-            'id': node[0:12],
-            'diff': diff,
-            'parent_diff': parent_diff,
-        })
-
-    commits['squashed']['diff'] = ''.join(patch.diff(repo, node1=parent_node,
-        node2=nodes[-1], opts=diffopts))
-
-    rburl = repo.ui.config('reviewboard', 'url', None)
-    rbid = repo.ui.configint('reviewboard', 'repoid', None)
-
-    # TODO hook up to actual RB API
-    # post_reviews(rb_url, username, password, rbid, identifier, commits)
-    return 'This will get printed on the client\n'
-
+testedwith = '3.0.1'
 
 def capabilities(orig, repo, proto):
-    """Wraps wireproto.capabilities to advertise reviewboard support."""
+    """Wraps wireproto._capabilities to advertise reviewboard support."""
     caps = orig(repo, proto)
-    caps += ' reviewboard'
+
+    if repo.ui.configint('reviewboard', 'repoid', None):
+        caps.append('reviewboard')
+
     return caps
 
-
 def extsetup(ui):
-    oldcap, args = wireproto.commands['capabilities']
-    def newcapabilities(repo, proto):
-        return capabilities(oldcap, repo, proto)
-    wireproto.commands['capabilities'] = (newcapabilities, args)
-
-    wireproto.commands['reviewboard'] = (wireproto_reviewboard, '')
-
+    extensions.wrapfunction(wireproto, '_capabilities', capabilities)
 
 def reposetup(ui, repo):
     if not repo.local():

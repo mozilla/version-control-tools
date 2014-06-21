@@ -24,6 +24,7 @@ import sys
 import urllib
 
 from mercurial import commands
+from mercurial import demandimport
 from mercurial import exchange
 from mercurial import extensions
 from mercurial import hg
@@ -31,20 +32,29 @@ from mercurial import util
 from mercurial import wireproto
 from mercurial.i18n import _
 
-OUR_DIR = os.path.dirname(__file__)
+OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 REPO_ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
 PYLIB = os.path.join(REPO_ROOT, 'pylib')
-sys.path.insert(0, os.path.join(PYLIB, 'mozautomation'))
 
-from mozautomation.commitparser import parse_bugs
+demandimport.disable()
+try:
+    from mozautomation.commitparser import parse_bugs
+    import hgrb.shared
+except ImportError:
+    sys.path.insert(0, os.path.join(PYLIB, 'mozautomation'))
+    sys.path.insert(0, OUR_DIR)
 
+    from mozautomation.commitparser import parse_bugs
+    import hgrb.shared
+demandimport.enable()
+
+testedwith = '3.0.1'
 
 def pushcommand(orig, ui, repo, *args, **kwargs):
     repo.noreviewboardpush = kwargs['noreview']
     repo.reviewid = kwargs['reviewid']
 
     return orig(ui, repo, *args, **kwargs)
-
 
 def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
     if not remote.capable('reviewboard'):
@@ -56,7 +66,6 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
             'that you would like reviewed.'))
 
     return orig(repo, remote, force=force, revs=revs, newbranch=newbranch)
-
 
 def wrappedpushbookmark(orig, pushop):
     result = orig(pushop)
@@ -88,7 +97,6 @@ def wrappedpushbookmark(orig, pushop):
     doreview(repo, ui, pushop.remote, reviewnode)
 
     return result
-
 
 def doreview(repo, ui, remote, reviewnode):
     """Do the work of submitting a review to a remote repo.
@@ -143,15 +151,25 @@ def doreview(repo, ui, remote, reviewnode):
     ui.write(_('Review identifier: %s\n') % identifier)
 
     lines = [
+        '1',
         urllib.quote(username),
         urllib.quote(password),
         ' '.join(nodes),
         urllib.quote(identifier),
     ]
 
-    ret = remote._call('reviewboard', data='\n'.join(lines))
-    ui.write(ret)
+    res = remote._call('reviewboard', data='\n'.join(lines))
+    lines = res.split('\n')
+    if len(lines) < 1:
+        raise util.Abort(_('Unknown response from server.'))
 
+    version = int(lines[0])
+    if version != 1:
+        raise util.Abort(_('Do not know how to handle response.'))
+
+    for line in lines[1:]:
+        if line.startswith('display:'):
+            ui.write('%s\n' % line[8:])
 
 def extsetup(ui):
     extensions.wrapfunction(exchange, 'push', wrappedpush)
@@ -163,8 +181,7 @@ def extsetup(ui):
     entry = extensions.wrapcommand(commands.table, 'push', pushcommand)
     entry[1].append(('', 'noreview', False,
                      _('Do not perform a review on push.')))
-    entry[1].append(('', 'reviewid', None, _('Review identifier')))
-
+    entry[1].append(('', 'reviewid', '', _('Review identifier')))
 
 def reposetup(ui, repo):
     if not repo.local():
