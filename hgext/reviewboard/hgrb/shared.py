@@ -7,6 +7,10 @@ from mercurial import mdiff
 from mercurial import patch
 from mercurial import wireproto
 
+# TODO import this from final location so the symbol is defined.
+def post_reviews(url, username, password, rbid, identifier, commits):
+    pass
+
 @wireproto.wireprotocommand('reviewboard', '*')
 def reviewboard(repo, proto, args=None):
     proto.redirect()
@@ -52,17 +56,20 @@ def reviewboard(repo, proto, args=None):
         'squashed': {}
     }
 
-    parent_node = repo[nodes[0]].p1().node()
+    # Note patch.diff() is appears to accept anything that can be fed into
+    # repo[]. However, it blindly does a hex() on the argument as opposed
+    # to the changectx, so we need to pass in the binary node.
+    base_parent_node = repo[nodes[0]].p1().node()
     for i, node in enumerate(nodes):
         ctx = repo[node]
         p1 = ctx.p1().node()
         diff = None
         parent_diff = None
 
-        diff = ''.join(patch.diff(repo, node1=p1, node2=node, opts=diffopts))
-        if i != 0:
-            parent_diff = ''.join(patch.diff(repo, node1=parent_node,
-                node2=nodes[i-1], opts=diffopts))
+        diff = ''.join(patch.diff(repo, node1=p1, node2=ctx.node(), opts=diffopts))
+        if i:
+            parent_diff = ''.join(patch.diff(repo, node1=base_parent_node,
+                node2=repo[nodes[i-1]].node(), opts=diffopts))
 
         commits['individual'].append({
             'id': node[0:12],
@@ -71,15 +78,16 @@ def reviewboard(repo, proto, args=None):
             'parent_diff': parent_diff,
         })
 
-    commits['squashed']['diff'] = ''.join(patch.diff(repo, node1=parent_node,
-        node2=nodes[-1], opts=diffopts))
+    commits['squashed']['diff'] = ''.join(patch.diff(repo, node1=base_parent_node,
+        node2=repo[nodes[-1]].node(), opts=diffopts))
 
     rburl = repo.ui.config('reviewboard', 'url', None)
     rbid = repo.ui.configint('reviewboard', 'repoid', None)
 
-    # TODO hook up to actual RB API
-    # post_reviews(rb_url, username, password, rbid, identifier, commits)
+    result = post_reviews(repo.ui.config('reviewboard', 'url'), username,
+                          password, rbid, identifier, commits)
     return '\n'.join([
         '1',
         'display:This will get printed on the client',
+        'reviewid:%s' % identifier,
     ])

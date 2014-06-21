@@ -41,3 +41,5 @@ prefixes are supported:
 
 ``display:``
    These lines should be displayed on the client.
+``reviewid:``
+   The identifier of the main Review Board review for this push.

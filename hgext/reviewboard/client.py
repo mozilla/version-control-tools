@@ -28,6 +28,7 @@ from mercurial import demandimport
 from mercurial import exchange
 from mercurial import extensions
 from mercurial import hg
+from mercurial import phases
 from mercurial import util
 from mercurial import wireproto
 from mercurial.i18n import _
@@ -51,12 +52,14 @@ demandimport.enable()
 testedwith = '3.0.1'
 
 def pushcommand(orig, ui, repo, *args, **kwargs):
+    """Wraps commands.push to read the --reviewid argument."""
     repo.noreviewboardpush = kwargs['noreview']
     repo.reviewid = kwargs['reviewid']
 
     return orig(ui, repo, *args, **kwargs)
 
 def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
+    """Wraps exchange.push to enforce restrictions for review pushes."""
     if not remote.capable('reviewboard'):
         return orig(repo, remote, force=force, revs=revs, newbranch=newbranch)
 
@@ -68,6 +71,7 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
     return orig(repo, remote, force=force, revs=revs, newbranch=newbranch)
 
 def wrappedpushbookmark(orig, pushop):
+    """Wraps exchange._pushbookmark to also push a review."""
     result = orig(pushop)
 
     if not pushop.remote.capable('reviewboard'):
@@ -118,9 +122,9 @@ def doreview(repo, ui, remote, reviewnode):
     # A solution that works most of the time is to find all non-public
     # ancestors of that node.
     nodes = [repo[reviewnode].hex()]
-    for rev in repo[reviewnode].ancestors():
-        ctx = repo[rev]
-        if ctx.phasestr() == 'public':
+    for node in repo[reviewnode].ancestors():
+        ctx = repo[node]
+        if ctx.phase() == phases.public:
             break
         nodes.insert(0, ctx.hex())
 
@@ -128,18 +132,27 @@ def doreview(repo, ui, remote, reviewnode):
 
     identifier = None
 
-    # Our default identifier comes from the first referenced bug number
-    # of the earliest commit.
-    # TODO consider making the default the active bookmark.
-    for node in nodes:
-        ctx = repo[node]
-        bugs = parse_bugs(ctx.description())
-        if bugs:
-            identifier = str(bugs[0])
-            break
+    # The review identifier can come from a number of places. In order of
+    # priority:
+    # 1. --reviewid argument passed to push command
+    # 2. The active bookmark
+    # 3. The active branch (if it isn't default)
+    # 4. A bug number extracted from commit messages
 
     if repo.reviewid:
         identifier = repo.reviewid
+    elif repo._bookmarkcurrent:
+        identifier = repo._bookmarkcurrent
+    elif repo.dirstate.branch() != 'default':
+        identifier = repo.dirstate.branch()
+
+    if not identifier:
+        for node in nodes:
+            ctx = repo[node]
+            bugs = parse_bugs(ctx.description())
+            if bugs:
+                identifier = 'bug%s' % bugs[0]
+                break
 
     if not identifier:
         ui.write(_('Unable to determine review identifier. Review '
