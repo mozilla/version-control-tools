@@ -9,7 +9,11 @@ from mercurial import wireproto
 
 # TODO import this from final location so the symbol is defined.
 def post_reviews(url, username, password, rbid, identifier, commits):
-    pass
+    reviewmap = {}
+    for i, commit in enumerate(commits['individual']):
+        reviewmap[commit['id']] = i + 1
+
+    return 1, reviewmap
 
 @wireproto.wireprotocommand('reviewboard', '*')
 def reviewboard(repo, proto, args=None):
@@ -72,7 +76,7 @@ def reviewboard(repo, proto, args=None):
                 node2=repo[nodes[i-1]].node(), opts=diffopts))
 
         commits['individual'].append({
-            'id': node[0:12],
+            'id': node,
             'message': ctx.description(),
             'diff': diff,
             'parent_diff': parent_diff,
@@ -84,10 +88,18 @@ def reviewboard(repo, proto, args=None):
     rburl = repo.ui.config('reviewboard', 'url', None)
     rbid = repo.ui.configint('reviewboard', 'repoid', None)
 
-    result = post_reviews(repo.ui.config('reviewboard', 'url'), username,
-                          password, rbid, identifier, commits)
-    return '\n'.join([
+    parentrid, commitmap = post_reviews(repo.ui.config('reviewboard', 'url'),
+                                        username, password, rbid, identifier,
+                                        commits)
+
+    lines = [
         '1',
-        'display:This will get printed on the client',
-        'reviewid:%s' % identifier,
-    ])
+        'display This will get printed on the client',
+        'reviewid %s' % identifier,
+        'parentrid %s' % parentrid,
+    ]
+
+    for node, rid in commitmap.items():
+        lines.append('nodereview %s %s' % (node, rid))
+
+    return '\n'.join(lines)

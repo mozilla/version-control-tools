@@ -39,7 +39,9 @@ Response Version 1
 The lines of the response are prefixed with a line type. The following
 prefixes are supported:
 
-``display:``
+``display``
    These lines should be displayed on the client.
-``reviewid:``
+``reviewid``
    The identifier of the main Review Board review for this push.
+``nodereview``
+   Maps a submitted node to a review identifier.

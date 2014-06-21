@@ -23,6 +23,7 @@ def post_reviews(original, url, username, password, rbid, identifier, commits):
         'identifier: %s' % identifier,
     ]
 
+    reviewmap = {}
     for i, commit in enumerate(commits['individual']):
         lines.extend([
             str(i),
@@ -31,13 +32,14 @@ def post_reviews(original, url, username, password, rbid, identifier, commits):
             commit['diff'],
             commit['parent_diff'] or 'NO PARENT DIFF'
         ])
+        reviewmap[commit['id']] = i + 2
 
     lines.append('SQUASHED')
     lines.append(commits['squashed']['diff'])
 
     REPO.vfs.write('post_reviews', '%s\n' % '\n'.join(lines))
 
-    # TODO return something.
+    return 1, reviewmap
 
 def extsetup(ui):
     extensions.wrapfunction(hgrb.shared, 'post_reviews', post_reviews)

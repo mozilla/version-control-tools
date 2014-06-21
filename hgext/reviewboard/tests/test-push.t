@@ -1,28 +1,8 @@
+  $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ hg init client
   $ hg init server
-
-  $ cat >> server/.hg/hgrc <<EOF
-  > [phases]
-  > publish = False
-  > [web]
-  > push_ssl = False
-  > allow_push = *
-  > [reviewboard]
-  > url = http://dummy
-  > repoid = 1
-  > [extensions]
-  > EOF
-  $ echo "reviewboard=$(echo $TESTDIR)/hgext/reviewboard/server.py" >> server/.hg/hgrc
-
-  $ cat >> client/.hg/hgrc <<EOF
-  > [ui]
-  > ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
-  > [reviewboard]
-  > username = user
-  > password = pass
-  > [extensions]
-  > EOF
-  $ echo "reviewboard=$(echo $TESTDIR)/hgext/reviewboard/client.py" >> client/.hg/hgrc
+  $ serverconfig server/.hg/hgrc
+  $ clientconfig client/.hg/hgrc
 
   $ hg serve -R server -d -p $HGPORT --pid-file hg.pid
   $ cat hg.pid >> $DAEMON_PIDS
@@ -178,7 +158,7 @@ Monkeypatch post_reviews and test that single diff is generated properly
   rbid: 1
   identifier: test-bookmark
   0
-  d13acea7b96a
+  d13acea7b96af75314566a40192806bd60cc37f0
   added bar file
   diff -r a1fab71d1635 -r d13acea7b96a bar
   --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
@@ -218,7 +198,7 @@ Now add another commit and verify parent and squashed diffs cover the range
   rbid: 1
   identifier: test-bookmark
   0
-  d13acea7b96a
+  d13acea7b96af75314566a40192806bd60cc37f0
   added bar file
   diff -r a1fab71d1635 -r d13acea7b96a bar
   --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
@@ -228,7 +208,7 @@ Now add another commit and verify parent and squashed diffs cover the range
   
   NO PARENT DIFF
   1
-  ceb74824040a
+  ceb74824040a52b911078e9670d5682e55684c24
   adding baz file
   diff -r d13acea7b96a -r ceb74824040a baz
   --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
