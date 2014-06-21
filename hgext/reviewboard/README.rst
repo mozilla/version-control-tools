@@ -23,12 +23,20 @@ protocol version.
 Request Version 1
 -----------------
 
-The lines of the request message are as follows:
+The lines of the request are prefixed with a line type. The following
+prefixes are supported:
 
-* Bugzilla username (%XX encoded)
-* Bugzilla password (%XX encoded)
-* Space delimited list of hex nodes that should be reviewed
-* Review identifier (%XX encoded)
+``bzusername``
+  Bugzilla username (%XX encoded)
+``bzpassword``
+  Bugzilla password (%XX encoded)
+``reviewidentifier``
+  Primary review identifier (%XX encoded)
+``csetreview``
+  Describes a changeset to review.
+
+  Consists of a 40 digit hex node of the changeset followed by an optional
+  review id to update.
 
 The server will create a review of the changesets specified using
 review identifier specified to track the review.

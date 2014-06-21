@@ -62,7 +62,6 @@ Attempt to push while not configured will result in a warning
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  Attempting to create a code review...
   Review Board extension not properly configured: missing authentication credentials. Please define "username" and "password" in the [reviewboard] section of your hgrc.
 
 Pushing again will result in unclear changeset since none were transferred
@@ -70,7 +69,6 @@ Pushing again will result in unclear changeset since none were transferred
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
-  Attempting to create a code review...
   Unable to determine what to review. Please invoke with -r to specify what to review.
   [1]
 
@@ -83,6 +81,5 @@ Unknown review identifier
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
-  Attempting to create a code review...
   Unable to determine what to review. Please invoke with -r to specify what to review.
   [1]

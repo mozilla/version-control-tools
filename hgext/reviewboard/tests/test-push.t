@@ -4,6 +4,14 @@
   $ serverconfig server/.hg/hgrc
   $ clientconfig client/.hg/hgrc
 
+  $ cat > obs.py << EOF
+  > import mercurial.obsolete
+  > mercurial.obsolete._enabled = True
+  > EOF
+
+  $ echo "server_monkeypatch = ${TESTDIR}/hgext/reviewboard/tests/dummy_rbpost.py" >> server/.hg/hgrc
+  $ echo "rebase=" >> client/.hg/hgrc
+
   $ hg serve -R server -d -p $HGPORT --pid-file hg.pid
   $ cat hg.pid >> $DAEMON_PIDS
 
@@ -11,9 +19,44 @@ Set up the repo
 
   $ cd client
   $ echo 'foo' > foo
-  $ hg commit -A -m 'first commit'
+  $ hg commit -A -m 'root commit'
   adding foo
-  $ hg push --noreview http://localhost:$HGPORT
+  $ echo 'anonymous head' > foo
+  $ hg commit -m 'anonymous head'
+  $ hg up -r 0
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ echo 'with parseable id' > foo
+  $ hg commit -m 'Bug 123 - Test identifier'
+  created new head
+  $ hg up -r 0
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg bookmark bookmark-1
+  $ echo 'bookmark-1' > foo
+  $ hg commit -m 'bookmark with single commit'
+  created new head
+  $ hg up -r 0
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (leaving bookmark bookmark-1)
+  $ hg bookmark bookmark-2
+  $ echo 'bookmark-2a' > foo
+  $ hg commit -m 'bookmark with 2 commits, 1st'
+  created new head
+  $ echo 'bookmark-2b' > foo
+  $ hg commit -m 'bookmark with 2 commits, 2nd'
+  $ hg up -r 0
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (leaving bookmark bookmark-2)
+  $ hg branch test-branch
+  marked working directory as branch test-branch
+  (branches are permanent and global, did you want a bookmark?)
+  $ echo 'branch' > foo
+  $ hg commit -m 'branch with single commit'
+  $ hg up -r 0
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+
+Seed the root changeset on the server
+
+  $ hg push -r 0 --noreview http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   remote: adding changesets
@@ -22,215 +65,225 @@ Set up the repo
   remote: added 1 changesets with 1 changes to 1 files
   $ hg phase --public -r .
 
-Pushing a single changeset will initiate a review against that one
+Pushing a single changeset will initiate a single review (no children)
 
-  $ echo 'bar' > foo
-  $ hg commit -m 'Bug 123 - second commit'
-  $ hg push http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid testid http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  Attempting to create a code review...
-  Identified 1 changesets for review
-  Review identifier: bug123
-  This will get printed on the client
+  identified 1 changesets for review
+  review identifier: testid
+  created review request: 1
 
-Pushing no changesets will do a review if -r is given
+Pushing no changesets will do a re-review if -r is given.
+Since nothing has changed, we should recycle the old review.
 
-  $ hg push -r tip http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid testid http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
-  Attempting to create a code review...
-  Identified 1 changesets for review
-  Review identifier: bug123
-  This will get printed on the client
+  identified 1 changesets for review
+  review identifier: testid
+  updated review request: 1
   [1]
 
-Custom identifier works
+Custom identifier will create a new review from same changesets.
+TODO should the server dedupe reviews automatically?
 
-  $ hg push -r tip --reviewid foo http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid testid2 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
-  Attempting to create a code review...
-  Identified 1 changesets for review
-  Review identifier: foo
-  This will get printed on the client
+  identified 1 changesets for review
+  review identifier: testid2
+  created review request: 2
   [1]
 
 SSH works
 
-  $ hg push -r tip ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  no changes found
-  Attempting to create a code review...
-  Identified 1 changesets for review
-  Review identifier: bug123
-  This will get printed on the client
-  [1]
-
-Active bookmark is used as identifier
-
-  $ echo 'testing bookmark' > foo
-  $ hg commit -m 'testing a bookmark'
-  $ hg bookmark test-bookmark
-  $ hg push ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
-  Attempting to create a code review...
-  Identified 2 changesets for review
-  Review identifier: test-bookmark
-  This will get printed on the client
-
-Deactivate bookmark and ensure identifier has reset
-
-  $ hg phase --public -r 1
-  $ hg up tip
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  (leaving bookmark test-bookmark)
-  $ hg push -r tip ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  no changes found
-  Attempting to create a code review...
-  Unable to determine review identifier.* (glob)
-  [1]
-
-A non-default branch will be used as the identifier
-
-  $ hg phase --public -r 2
-  $ hg branch test-branch
-  marked working directory as branch test-branch
-  (branches are permanent and global, did you want a bookmark?)
-  $ echo 'testing branch' > foo
-  $ hg commit -m 'testing a branch'
-  $ hg push --new-branch ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
-  Attempting to create a code review...
-  Identified 1 changesets for review
-  Review identifier: test-branch
-  This will get printed on the client
-
-  $ hg up default
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-
-  $ echo 'bar file' > bar
-  $ hg commit -A -m 'added bar file'
-  adding bar
-
-Monkeypatch post_reviews and test that single diff is generated properly
-
-  $ hg up tip
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  $ hg bookmark test-bookmark
-  moving bookmark 'test-bookmark' forward from a1fab71d1635
-
-  $ echo "server_monkeypatch = $(echo $TESTDIR)/hgext/reviewboard/tests/dummy_rbpost.py" >> ../server/.hg/hgrc
-  $ hg push -r . ssh://user@dummy/$TESTTMP/server
+  $ hg push -r 2 -f ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  Attempting to create a code review...
-  Identified 1 changesets for review
-  Review identifier: test-bookmark
-  This will get printed on the client
-  $ cat ../server/.hg/post_reviews
-  url: http://dummy
-  username: user
-  password: pass
-  rbid: 1
-  identifier: test-bookmark
-  0
-  d13acea7b96af75314566a40192806bd60cc37f0
-  added bar file
-  diff -r a1fab71d1635 -r d13acea7b96a bar
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/bar	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +bar file
-  
-  NO PARENT DIFF
-  SQUASHED
-  diff -r a1fab71d1635 -r d13acea7b96a bar
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/bar	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +bar file
-  
+  identified 1 changesets for review
+  review identifier: bug123
+  created review request: 3
 
-Now add another commit and verify parent and squashed diffs cover the range
+Active bookmark is used as identifier
 
-  $ echo "baz file" > baz
-  $ hg commit -A -m "adding baz file"
-  adding baz
-  $ hg push -r . ssh://user@dummy/$TESTTMP/server
+  $ hg up bookmark-1
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (activating bookmark bookmark-1)
+  $ hg push -B bookmark-1 ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
-  Attempting to create a code review...
-  Identified 2 changesets for review
-  Review identifier: test-bookmark
-  This will get printed on the client
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  identified 1 changesets for review
+  review identifier: bookmark-1
+  created review request: 4
+  exporting bookmark bookmark-1
+
+Deactivate bookmark and ensure identifier has reset
+TODO should we pick up the bookmark attached to this node?
+
+  $ hg up -r 3
+  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (leaving bookmark bookmark-1)
+  $ hg push -r . ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  Unable to determine review identifier.* (glob)
+  [1]
+
+A non-default branch will be used as the identifier
+
+  $ hg up test-branch
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg push --new-branch -r . ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  identified 1 changesets for review
+  review identifier: test-branch
+  created review request: 5
+
+Test that single diff is generated properly
+
+  $ hg up bookmark-1
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (activating bookmark bookmark-1)
+  $ hg push -r . ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  identified 1 changesets for review
+  review identifier: bookmark-1
+  updated review request: 4
+  [1]
   $ cat ../server/.hg/post_reviews
   url: http://dummy
   username: user
   password: pass
   rbid: 1
-  identifier: test-bookmark
+  identifier: bookmark-1
   0
-  d13acea7b96af75314566a40192806bd60cc37f0
-  added bar file
-  diff -r a1fab71d1635 -r d13acea7b96a bar
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/bar	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +bar file
+  afef2b530106d00832a59244a852230bd88a70a7
+  bookmark with single commit
+  diff -r 3a9f6899ef84 -r afef2b530106 foo
+  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
+  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
+  @@ -1,1 +1,1 @@
+  -foo
+  +bookmark-1
+  
+  NO PARENT DIFF
+  SQUASHED
+  diff -r 3a9f6899ef84 -r afef2b530106 foo
+  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
+  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
+  @@ -1,1 +1,1 @@
+  -foo
+  +bookmark-1
+  
+
+Test that multiple changesets result in parent diffs
+
+  $ hg up bookmark-2
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (activating bookmark bookmark-2)
+  $ hg push -B bookmark-2 ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 2 changesets with 2 changes to 1 files (+1 heads)
+  identified 2 changesets for review
+  review identifier: bookmark-2
+  created review request: 6
+  created changeset review: 7
+  created changeset review: 8
+  exporting bookmark bookmark-2
+  $ cat ../server/.hg/post_reviews
+  url: http://dummy
+  username: user
+  password: pass
+  rbid: 1
+  identifier: bookmark-2
+  0
+  773ae5edc39985853a8f396765fd5b65e951cbc4
+  bookmark with 2 commits, 1st
+  diff -r 3a9f6899ef84 -r 773ae5edc399 foo
+  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
+  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
+  @@ -1,1 +1,1 @@
+  -foo
+  +bookmark-2a
   
   NO PARENT DIFF
   1
-  ceb74824040a52b911078e9670d5682e55684c24
-  adding baz file
-  diff -r d13acea7b96a -r ceb74824040a baz
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/baz	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +baz file
+  659bcc59ed36f1a82f17545c97d0322b16422d5b
+  bookmark with 2 commits, 2nd
+  diff -r 773ae5edc399 -r 659bcc59ed36 foo
+  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
+  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
+  @@ -1,1 +1,1 @@
+  -bookmark-2a
+  +bookmark-2b
   
-  diff -r a1fab71d1635 -r d13acea7b96a bar
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/bar	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +bar file
+  diff -r 3a9f6899ef84 -r 773ae5edc399 foo
+  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
+  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
+  @@ -1,1 +1,1 @@
+  -foo
+  +bookmark-2a
   
   SQUASHED
-  diff -r a1fab71d1635 -r ceb74824040a bar
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/bar	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +bar file
-  diff -r a1fab71d1635 -r ceb74824040a baz
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/baz	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +baz file
+  diff -r 3a9f6899ef84 -r 659bcc59ed36 foo
+  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
+  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
+  @@ -1,1 +1,1 @@
+  -foo
+  +bookmark-2b
   
+
+Identify successor changesets via obsolescence
+
+  $ echo "obs=$TESTTMP/obs.py" >> .hg/hgrc
+  $ hg up -r 0
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (leaving bookmark bookmark-2)
+  $ echo 'new head' > bar
+  $ hg commit -A -m 'adding new head'
+  adding bar
+  created new head
+  $ hg phase --public -r .
+  $ hg rebase -b bookmark-1 -d .
+  $ hg up bookmark-1
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (activating bookmark bookmark-1)
+  $ hg push -B bookmark-1 ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 2 changesets with 1 changes to 1 files (+1 heads)
+  updating bookmark bookmark-1
+  identified 1 changesets for review
+  review identifier: bookmark-1
+  updated review request: 4
+  exporting bookmark bookmark-1

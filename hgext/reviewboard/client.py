@@ -24,16 +24,19 @@ import os
 import sys
 import urllib
 
+from mercurial import cmdutil
 from mercurial import commands
 from mercurial import demandimport
 from mercurial import exchange
 from mercurial import extensions
 from mercurial import hg
 from mercurial import localrepo
+from mercurial import obsolete
 from mercurial import phases
 from mercurial import util
 from mercurial import wireproto
 from mercurial.i18n import _
+from mercurial.node import bin, hex
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 REPO_ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
@@ -85,8 +88,6 @@ def wrappedpushbookmark(orig, pushop):
     if repo.noreviewboardpush:
         return result
 
-    ui.write(_('Attempting to create a code review...\n'))
-
     reviewnode = None
     if pushop.revs:
         assert len(pushop.revs) == 1
@@ -123,12 +124,12 @@ def doreview(repo, ui, remote, reviewnode):
     # Given a tip node, we need to find all changesets to review.
     # A solution that works most of the time is to find all non-public
     # ancestors of that node.
-    nodes = [repo[reviewnode].hex()]
+    nodes = [reviewnode]
     for node in repo[reviewnode].ancestors():
         ctx = repo[node]
         if ctx.phase() == phases.public:
             break
-        nodes.insert(0, ctx.hex())
+        nodes.insert(0, ctx.node())
 
     # TODO need ability to manually override review nodes.
 
@@ -162,16 +163,32 @@ def doreview(repo, ui, remote, reviewnode):
             'Try to begin one of your commit messages with "Bug XXXXXX -"\n'))
         return
 
-    ui.write(_('Identified %d changesets for review\n') % len(nodes))
-    ui.write(_('Review identifier: %s\n') % identifier)
-
     lines = [
         '1',
-        urllib.quote(username),
-        urllib.quote(password),
-        ' '.join(nodes),
-        urllib.quote(identifier),
+        'bzusername %s' % urllib.quote(username),
+        'bzpassword %s' % urllib.quote(password),
+        'reviewidentifier %s' % urllib.quote(identifier),
     ]
+
+    reviews = repo.reviews
+    oldparentid = reviews.findparentreview(identifier=identifier)
+    oldreviews = {}
+    for node in nodes:
+        rid = reviews.findnodereview(node)
+        data = hex(node)
+        if rid:
+            data += ' %s' % rid
+            oldreviews[rid] = node
+        lines.append('csetreview %s' % data)
+
+    displayer = cmdutil.show_changeset(ui, repo, {
+        'template': '{label("log.changeset", rev)}'
+                    '{label("log.changeset", ":")}'
+                    '{label("log.changeset", node|short)} '
+                    '{label("log.summary", firstline(desc))}\n'})
+
+    ui.write(_('identified %d changesets for review\n') % len(nodes))
+    ui.write(_('review identifier: %s\n') % identifier)
 
     res = remote._call('reviewboard', data='\n'.join(lines))
     lines = res.split('\n')
@@ -182,18 +199,40 @@ def doreview(repo, ui, remote, reviewnode):
     if version != 1:
         raise util.Abort(_('Do not know how to handle response.'))
 
-    reviews = repo.reviews
+    newreviews = {}
+    newparentid = None
 
     for line in lines[1:]:
         t, d = line.split(' ', 1)
 
         if t == 'display':
             ui.write('%s\n' % d)
-        elif t == 'nodereview':
-            reviews.addnodereview(*d.split(' ', 1))
+        elif t == 'csetreview':
+            node, rid = d.split(' ', 1)
+            reviews.addnodereview(bin(node), rid)
+            newreviews[rid] = bin(node)
+        elif t == 'parentreview':
+            newparentid = d
+            reviews.addparentreview(identifier, newparentid)
 
     reviews.write()
 
+    if not oldparentid:
+        ui.write(_('created review request: %s\n' % newparentid))
+    elif newparentid != oldparentid:
+        assert 'This should never happen.'
+    else:
+        ui.write(_('updated review request: %s\n' % newparentid))
+
+    if len(nodes) > 1:
+        for rid, node in sorted(newreviews.iteritems()):
+            ctx = repo[node]
+            #displayer.show(ctx)
+
+            if rid not in oldreviews:
+                ui.write(_('created changeset review: %s\n') % rid)
+            elif oldreviews[rid] != node:
+                ui.write(_('updated changeset review: %s\n') % rid)
 
 class reviewstore(object):
     """Holds information about ongoing reviews.
@@ -213,6 +252,8 @@ class reviewstore(object):
 
         # Maps nodes to review ids.
         self._nodes = {}
+        # Maps identifiers to parent ids.
+        self._parents = {}
 
         try:
             for line in repo.vfs('reviews'):
@@ -229,9 +270,13 @@ class reviewstore(object):
                 t, d = fields
 
                 # Node to review id
-                if t == 'n':
+                if t == 'c':
                     node, rid = d.split(' ', 1)
-                    self._nodes[node] = rid
+                    assert len(node) == 40
+                    self._nodes[bin(node)] = rid
+                elif t == 'p':
+                    ident, rid = d.split(' ', 1)
+                    self._parents[ident] = rid
 
         except IOError as inst:
             if inst.errno != errno.ENOENT:
@@ -244,18 +289,54 @@ class reviewstore(object):
         wlock = repo.wlock()
         try:
             f = repo.vfs('reviews', 'w', atomictemp=True)
+
+            for ident, rid in sorted(self._parents.iteritems()):
+                f.write('p %s %s\n' % (ident, rid))
             for node, rid in sorted(self._nodes.iteritems()):
-                f.write('n %s %s\n' % (node, rid))
+                f.write('c %s %s\n' % (hex(node), rid))
 
             f.close()
         finally:
             wlock.release()
 
+    def addparentreview(self, identifier, rid):
+        """Record the existence of a parent review."""
+        self._parents[identifier] = rid
+
     def addnodereview(self, node, rid):
         """Record the existence of a review against a single node."""
-        assert len(node) == 40
-
+        assert len(node) == 20
         self._nodes[node] = rid
+
+    def findnodereview(self, node):
+        """Attempt to find a review for the specified changeset.
+
+        We look for both direct review associations as well as obsolescence
+        data to find reviews associated with precursor changesets.
+        """
+        assert len(node) == 20
+
+        rid = self._nodes.get(node)
+        if rid:
+            return rid
+
+        obstore = self._repo.obsstore
+        for pnode in obsolete.allprecursors(obstore, [node]):
+            rid = self._nodes.get(pnode, None)
+            if rid:
+                return rid
+
+        return None
+
+    def findparentreview(self, identifier=None):
+        """Find a parent review given some data."""
+
+        if identifier:
+            rid = self._parents.get(identifier, None)
+            if rid:
+                return rid
+
+        return None
 
 
 def extsetup(ui):

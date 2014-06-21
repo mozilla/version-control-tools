@@ -43,15 +43,26 @@ def reviewboard(repo, proto, args=None):
             'what the server supports. Please downgrade to a compatible '
             'version.'))
 
-    if len(lines) != 5:
-        return wireproto.pusherr(_('Unexpected payload to reviewboard '
-            'command.'))
+    bzusername = None
+    bzpassword = None
+    identifier = None
+    nodes = []
 
-    version, username, password, nodes, identifier = lines
-    username = urllib.unquote(username)
-    password = urllib.unquote(password)
-    nodes = nodes.split()
-    identifier = urllib.unquote(identifier)
+    for line in lines[1:]:
+        t, d = line.split(' ', 1)
+
+        if t == 'bzusername':
+            bzusername = urllib.unquote(d)
+        elif t == 'bzpassword':
+            bzpassword = urllib.unquote(d)
+        elif t == 'reviewidentifier':
+            identifier = urllib.unquote(d)
+        elif t == 'csetreview':
+            fields = d.split(' ', 1)
+            if len(fields) > 1:
+                nodes.append(tuple(fields))
+            else:
+                nodes.append((d, None))
 
     diffopts = mdiff.diffopts(context=8, showfunc=True)
 
@@ -63,8 +74,8 @@ def reviewboard(repo, proto, args=None):
     # Note patch.diff() is appears to accept anything that can be fed into
     # repo[]. However, it blindly does a hex() on the argument as opposed
     # to the changectx, so we need to pass in the binary node.
-    base_parent_node = repo[nodes[0]].p1().node()
-    for i, node in enumerate(nodes):
+    base_parent_node = repo[nodes[0][0]].p1().node()
+    for i, (node, rid) in enumerate(nodes):
         ctx = repo[node]
         p1 = ctx.p1().node()
         diff = None
@@ -73,33 +84,33 @@ def reviewboard(repo, proto, args=None):
         diff = ''.join(patch.diff(repo, node1=p1, node2=ctx.node(), opts=diffopts))
         if i:
             parent_diff = ''.join(patch.diff(repo, node1=base_parent_node,
-                node2=repo[nodes[i-1]].node(), opts=diffopts))
+                node2=repo[nodes[i-1][0]].node(), opts=diffopts))
 
         commits['individual'].append({
             'id': node,
+            'rid': rid,
             'message': ctx.description(),
             'diff': diff,
             'parent_diff': parent_diff,
         })
 
     commits['squashed']['diff'] = ''.join(patch.diff(repo, node1=base_parent_node,
-        node2=repo[nodes[-1]].node(), opts=diffopts))
+        node2=repo[nodes[-1][0]].node(), opts=diffopts))
 
     rburl = repo.ui.config('reviewboard', 'url', None)
     rbid = repo.ui.configint('reviewboard', 'repoid', None)
 
     parentrid, commitmap = post_reviews(repo.ui.config('reviewboard', 'url'),
-                                        username, password, rbid, identifier,
-                                        commits)
+                                        bzusername, bzpassword, rbid,
+                                        identifier, commits)
 
     lines = [
         '1',
-        'display This will get printed on the client',
         'reviewid %s' % identifier,
-        'parentrid %s' % parentrid,
+        'parentreview %s' % parentrid,
     ]
 
     for node, rid in commitmap.items():
-        lines.append('nodereview %s %s' % (node, rid))
+        lines.append('csetreview %s %s' % (node, rid))
 
     return '\n'.join(lines)

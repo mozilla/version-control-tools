@@ -32,10 +32,10 @@ Pushing a review will create the reviews file
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
-  Attempting to create a code review...
-  Identified 1 changesets for review
-  Review identifier: test-bookmark
-  This will get printed on the client
+  identified 1 changesets for review
+  review identifier: test-bookmark
+  created review request: 1
 
   $ cat .hg/reviews
-  n a287f990367776cdfa5c7351f71304450e4822b4 2
+  p test-bookmark 1
+  c a287f990367776cdfa5c7351f71304450e4822b4 1

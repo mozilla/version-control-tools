@@ -15,13 +15,27 @@ import hgrb.shared
 REPO = None
 
 def post_reviews(original, url, username, password, rbid, identifier, commits):
-    lines = [
+    reviews = []
+    if REPO.vfs.exists('DUMMY_REVIEWS'):
+        for i, line in enumerate(REPO.vfs('DUMMY_REVIEWS')):
+            line = line.strip()
+            reviews.append(line)
+
+    lines = []
+    parentid = None
+    try:
+        parentid = str(reviews.index(identifier) + 1)
+    except ValueError:
+        reviews.append(identifier)
+        parentid = str(len(reviews))
+
+    lines.extend([
         'url: %s' % url,
         'username: %s' % username,
         'password: %s' % password,
         'rbid: %s' % rbid,
         'identifier: %s' % identifier,
-    ]
+    ])
 
     reviewmap = {}
     for i, commit in enumerate(commits['individual']):
@@ -32,14 +46,23 @@ def post_reviews(original, url, username, password, rbid, identifier, commits):
             commit['diff'],
             commit['parent_diff'] or 'NO PARENT DIFF'
         ])
-        reviewmap[commit['id']] = i + 2
+
+        if len(commits['individual']) <= 1:
+            reviewmap[commit['id']] = parentid
+            continue
+
+        if not commit['rid']:
+            reviews.append(commit['id'])
+
+        reviewmap[commit['id']] = commit['rid'] or str(len(reviews))
 
     lines.append('SQUASHED')
     lines.append(commits['squashed']['diff'])
 
     REPO.vfs.write('post_reviews', '%s\n' % '\n'.join(lines))
+    REPO.vfs.write('DUMMY_REVIEWS', '\n'.join(reviews))
 
-    return 1, reviewmap
+    return parentid, reviewmap
 
 def extsetup(ui):
     extensions.wrapfunction(hgrb.shared, 'post_reviews', post_reviews)
