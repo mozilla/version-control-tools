@@ -73,7 +73,11 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
             '-r arguments. Specify a single revision - the tip revision - '
             'that you would like reviewed.'))
 
-    return orig(repo, remote, force=force, revs=revs, newbranch=newbranch)
+    # We always do force push because we don't want users to need to
+    # specify it. The big danger here is pushing multiple heads or
+    # branches or mq patches. We check the former above and we don't
+    # want to limit user choice on the latter two.
+    return orig(repo, remote, force=True, revs=revs, newbranch=newbranch)
 
 def wrappedpushbookmark(orig, pushop):
     """Wraps exchange._pushbookmark to also push a review."""
@@ -162,6 +166,14 @@ def doreview(repo, ui, remote, reviewnode):
             'identifiers are extracted from commit messages automatically. '
             'Try to begin one of your commit messages with "Bug XXXXXX -"\n'))
         return
+
+    if hasattr(repo, 'mq'):
+        for patch in repo.mq.applied:
+            if patch.node in nodes:
+                ui.warn(_('You are using mq to develop patches. mq is '
+                          'deprecated. Please develop with bookmarks or '
+                          'use the shelve extension instead.\n'))
+                break
 
     lines = [
         '1',
@@ -376,5 +388,11 @@ def reposetup(ui, repo):
         def reviews(self):
             return reviewstore(self)
 
-
     repo.__class__ = reviewboardrepo
+
+    def prepushoutgoinghook(local, remote, outgoing):
+        if len(outgoing.missingheads) > 1:
+            raise util.Abort(_('cannot push multiple heads to remote. Limit '
+                               'pushed revisions using the -r argument.'))
+
+    repo.prepushoutgoinghooks.add('reviewboard', prepushoutgoinghook)

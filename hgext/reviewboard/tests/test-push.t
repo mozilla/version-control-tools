@@ -10,7 +10,10 @@
   > EOF
 
   $ echo "server_monkeypatch = ${TESTDIR}/hgext/reviewboard/tests/dummy_rbpost.py" >> server/.hg/hgrc
-  $ echo "rebase=" >> client/.hg/hgrc
+  $ cat >> client/.hg/hgrc << EOF
+  > mq=
+  > rebase=
+  > EOF
 
   $ hg serve -R server -d -p $HGPORT --pid-file hg.pid
   $ cat hg.pid >> $DAEMON_PIDS
@@ -90,6 +93,22 @@ Since nothing has changed, we should recycle the old review.
   updated review request: 1
   [1]
 
+Pushing patches from mq will result in a warning
+
+  $ echo 'mq patch' > foo
+  $ hg qnew -m 'mq patch' -d '0 0' patch1
+  $ hg push -r . --reviewid mq-test http://localhost:$HGPORT
+  pushing to http://localhost:$HGPORT/
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  You are using mq to develop patches. * (glob)
+  identified 1 changesets for review
+  review identifier: mq-test
+  created review request: 2
+
 Custom identifier will create a new review from same changesets.
 TODO should the server dedupe reviews automatically?
 
@@ -99,7 +118,7 @@ TODO should the server dedupe reviews automatically?
   no changes found
   identified 1 changesets for review
   review identifier: testid2
-  created review request: 2
+  created review request: 3
   [1]
 
 SSH works
@@ -113,7 +132,7 @@ SSH works
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   identified 1 changesets for review
   review identifier: bug123
-  created review request: 3
+  created review request: 4
 
 Active bookmark is used as identifier
 
@@ -129,7 +148,7 @@ Active bookmark is used as identifier
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   identified 1 changesets for review
   review identifier: bookmark-1
-  created review request: 4
+  created review request: 5
   exporting bookmark bookmark-1
 
 Deactivate bookmark and ensure identifier has reset
@@ -158,7 +177,7 @@ A non-default branch will be used as the identifier
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   identified 1 changesets for review
   review identifier: test-branch
-  created review request: 5
+  created review request: 6
 
 Test that single diff is generated properly
 
@@ -171,7 +190,7 @@ Test that single diff is generated properly
   no changes found
   identified 1 changesets for review
   review identifier: bookmark-1
-  updated review request: 4
+  updated review request: 5
   [1]
   $ cat ../server/.hg/post_reviews
   url: http://dummy
@@ -213,9 +232,9 @@ Test that multiple changesets result in parent diffs
   remote: added 2 changesets with 2 changes to 1 files (+1 heads)
   identified 2 changesets for review
   review identifier: bookmark-2
-  created review request: 6
-  created changeset review: 7
+  created review request: 7
   created changeset review: 8
+  created changeset review: 9
   exporting bookmark bookmark-2
   $ cat ../server/.hg/post_reviews
   url: http://dummy
@@ -285,5 +304,23 @@ Identify successor changesets via obsolescence
   updating bookmark bookmark-1
   identified 1 changesets for review
   review identifier: bookmark-1
-  updated review request: 4
+  updated review request: 5
   exporting bookmark bookmark-1
+
+Test pushing multiple heads is rejected
+
+  $ hg phase --public -r .
+  $ echo 'head1' > foo
+  $ hg commit -m 'head1'
+  $ hg up -r .^
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (leaving bookmark bookmark-1)
+  $ echo 'head2' > foo
+  $ hg commit -m 'head2'
+  created new head
+
+  $ hg push ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  abort: Cannot push multiple heads to remote. Limit pushed revisions using the -r argument.
+  [255]
