@@ -31,7 +31,7 @@ Set up the repo
   remote: added 2 changesets with 2 changes to 1 files
   identified 1 changesets for review
   review identifier: bz://123
-  created review request: 1
+  review url: http://dummy/r/1
   
   changeset:  1:c3480b3f6944
   summary:    foo2
@@ -57,7 +57,7 @@ Now create a new head and push a rebase
   remote: added 2 changesets with 1 changes to 1 files (+1 heads)
   identified 2 changesets for review
   review identifier: bz://123
-  updated review request: 1
+  review url: http://dummy/r/1
   
   changeset:  3:5003cd557db3
   summary:    foo2

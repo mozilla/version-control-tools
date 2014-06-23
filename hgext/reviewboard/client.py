@@ -276,12 +276,7 @@ def doreview(repo, ui, remote, reviewnode):
 
     reviews.write()
 
-    if not oldparentid:
-        ui.write(_('created review request: %s\n' % newparentid))
-    elif newparentid != oldparentid:
-        assert 'This should never happen.'
-    else:
-        ui.write(_('updated review request: %s\n' % newparentid))
+    ui.write(_('review url: %s\n') % reviews.parentreviewurl(identifier))
 
     for rid, node in sorted(newreviews.iteritems()):
         ui.write('\n')
@@ -409,8 +404,16 @@ class reviewstore(object):
 
         return None
 
+    def parentreviewurl(self, identifier):
+        """Obtain the URL associated with the review for an identifier."""
+        rid = self._parents.get(identifier, None)
+        if not rid:
+            return None
+
+        return '%s/r/%s' % (self.baseurl, rid)
+
     def reviewurl(self, node):
-        """Obtain the URL associated with the review for a changectx."""
+        """Obtain the URL associated with the review for a node."""
 
         rid = self.findnodereview(node)
         if not rid or not self.baseurl:

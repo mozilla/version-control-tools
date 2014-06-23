@@ -33,7 +33,7 @@ Pushing a review will create the reviews file
   remote: added 2 changesets with 2 changes to 1 files
   identified 1 changesets for review
   review identifier: bz://456
-  created review request: 1
+  review url: http://dummy/r/1
   
   changeset:  1:7f387c765e68
   summary:    Bug 456 - second commit

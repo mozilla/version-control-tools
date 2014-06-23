@@ -79,7 +79,7 @@ Pushing a single changeset will initiate a single review (no children)
   remote: added 1 changesets with 1 changes to 1 files
   identified 1 changesets for review
   review identifier: bz://345
-  created review request: 1
+  review url: http://dummy/r/1
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
@@ -99,7 +99,7 @@ Pushing no changesets will do a re-review
   no changes found
   identified 1 changesets for review
   review identifier: bz://345
-  updated review request: 1
+  review url: http://dummy/r/1
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
@@ -122,7 +122,7 @@ Pushing patches from mq will result in a warning
   You are using mq to develop patches. * (glob)
   identified 1 changesets for review
   review identifier: bz://784841
-  created review request: 1
+  review url: http://dummy/r/1
   
   changeset:  7:7458cff9569f
   summary:    mq patch
@@ -141,7 +141,7 @@ TODO should the server dedupe reviews automatically?
   no changes found
   identified 1 changesets for review
   review identifier: bz://3452
-  created review request: 3
+  review url: http://dummy/r/3
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
@@ -161,7 +161,7 @@ SSH works
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   identified 1 changesets for review
   review identifier: bz://123
-  created review request: 1
+  review url: http://dummy/r/1
   
   changeset:  2:a21bef69f0d4
   summary:    Bug 123 - Test identifier
@@ -183,7 +183,7 @@ A single diff is generated properly
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   identified 1 changesets for review
   review identifier: bz://789213
-  created review request: 1
+  review url: http://dummy/r/1
   
   changeset:  3:afef2b530106
   summary:    bookmark with single commit
@@ -231,7 +231,7 @@ Test that multiple changesets result in parent diffs
   remote: added 2 changesets with 2 changes to 1 files (+1 heads)
   identified 2 changesets for review
   review identifier: bz://567
-  created review request: 1
+  review url: http://dummy/r/1
   
   changeset:  4:773ae5edc399
   summary:    bookmark with 2 commits, 1st
@@ -293,7 +293,7 @@ Specifying multiple -r for the same head works
   no changes found
   identified 1 changesets for review
   review identifier: bz://50000
-  created review request: 4
+  review url: http://dummy/r/4
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
