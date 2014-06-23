@@ -83,3 +83,18 @@ Bad review identifier
   $ hg push --reviewid foobar
   abort: review identifier must be a bug number.
   [255]
+
+Pushing multiple heads is rejected
+
+  $ echo 'head 1' > foo
+  $ hg commit -m 'head 1'
+  $ hg up .^
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ echo 'head 2' > foo
+  $ hg commit -m 'head 2'
+  created new head
+  $ hg push -r 0:tip --reviewid bz://784841 http://localhost:$HGPORT
+  pushing to http://localhost:$HGPORT/
+  searching for changes
+  abort: cannot push multiple heads to remote; limit pushed revisions using the -r argument.
+  [255]

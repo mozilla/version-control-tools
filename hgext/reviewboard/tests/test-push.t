@@ -264,24 +264,6 @@ Identify successor changesets via obsolescence
   updated review request: 5
   exporting bookmark bookmark-1
 
-Test pushing multiple heads is rejected
-
-  $ hg phase --public -r .
-  $ echo 'head1' > foo
-  $ hg commit -m 'head1'
-  $ hg up -r .^
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  (leaving bookmark bookmark-1)
-  $ echo 'head2' > foo
-  $ hg commit -m 'head2'
-  created new head
-
-  $ hg push -r 0:tip ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  abort: cannot push multiple heads to remote; limit pushed revisions using the -r argument.
-  [255]
-
 Specifying multiple -r for the same head works
 
   $ hg push -r 0 -r 1 --reviewid 50000 ssh://user@dummy/$TESTTMP/server
