@@ -264,13 +264,13 @@ def doreview(repo, ui, remote, reviewnode):
 
         if t == 'display':
             ui.write('%s\n' % d)
-        elif t == 'csetreview':
-            node, rid = d.split(' ', 1)
-            reviews.addnodereview(bin(node), rid)
-            newreviews[rid] = bin(node)
         elif t == 'parentreview':
             newparentid = d
             reviews.addparentreview(identifier, newparentid)
+        elif t == 'csetreview':
+            node, rid = d.split(' ', 1)
+            reviews.addnodereview(bin(node), rid, newparentid)
+            newreviews[rid] = bin(node)
         elif t == 'rburl':
             reviews.baseurl = d
 
@@ -305,9 +305,9 @@ class reviewstore(object):
     def __init__(self, repo):
         self._repo = repo
 
-        # Maps nodes to review ids.
+        # Maps nodes to (review requests, parent requests set) tuples.
         self._nodes = {}
-        # Maps identifiers to parent ids.
+        # Maps review identifiers to parent review requests.
         self._parents = {}
 
         self.baseurl = None
@@ -326,14 +326,20 @@ class reviewstore(object):
 
                 t, d = fields
 
-                # Node to review id
-                if t == 'c':
-                    node, rid = d.split(' ', 1)
-                    assert len(node) == 40
-                    self._nodes[bin(node)] = rid
-                elif t == 'p':
+                # Identifier to parent review ID.
+                if t == 'p':
                     ident, rid = d.split(' ', 1)
                     self._parents[ident] = rid
+                # Node to review id.
+                elif t == 'c':
+                    node, rid = d.split(' ', 1)
+                    assert len(node) == 40
+                    self._nodes[bin(node)] = (rid, set())
+                # Node to parent id.
+                elif t == 'pc':
+                    node, pid = d.split(' ', 1)
+                    assert len(node) == 40
+                    self._nodes[bin(node)][1].add(pid)
                 elif t == 'u':
                     self.baseurl = d
 
@@ -354,8 +360,10 @@ class reviewstore(object):
 
             for ident, rid in sorted(self._parents.iteritems()):
                 f.write('p %s %s\n' % (ident, rid))
-            for node, rid in sorted(self._nodes.iteritems()):
+            for node, (rid, pids) in sorted(self._nodes.iteritems()):
                 f.write('c %s %s\n' % (hex(node), rid))
+                for pid in sorted(pids):
+                    f.write('pc %s %s\n' % (hex(node), pid))
 
             f.close()
         finally:
@@ -365,10 +373,11 @@ class reviewstore(object):
         """Record the existence of a parent review."""
         self._parents[identifier] = rid
 
-    def addnodereview(self, node, rid):
+    def addnodereview(self, node, rid, pid):
         """Record the existence of a review against a single node."""
         assert len(node) == 20
-        self._nodes[node] = rid
+        assert pid
+        self._nodes.setdefault(node, (rid, set()))[1].add(pid)
 
     def findnodereview(self, node):
         """Attempt to find a review for the specified changeset.
@@ -378,13 +387,13 @@ class reviewstore(object):
         """
         assert len(node) == 20
 
-        rid = self._nodes.get(node)
+        rid = self._nodes.get(node, (None, None))[0]
         if rid:
             return rid
 
         obstore = self._repo.obsstore
         for pnode in obsolete.allprecursors(obstore, [node]):
-            rid = self._nodes.get(pnode, None)
+            rid = self._nodes.get(pnode, (None, None))[0]
             if rid:
                 return rid
 
