@@ -29,6 +29,11 @@ def review_request_url(review_request, site=None, siteconfig=None):
         local_site_reverse('root').rstrip('/'),
         review_request.get_absolute_url())
 
+def is_review_request_pushed(review_request):
+    return str(review_request.extra_data.get('p2rb', False)) == "True"
+
+def is_review_request_squashed(review_request):
+    return str(review_request.extra_data.get('p2rb.is_squashed', False)) == "True"
 
 @simple_decorator
 def bugzilla_to_publish_errors(func):
@@ -45,7 +50,7 @@ def publish_review_request(user, review_request_draft, **kwargs):
     review_request = review_request_draft.get_review_request()
 
     # skip review requests that were not pushed
-    if str(review_request.extra_data.get('p2rb', False)) == "False":
+    if not is_review_request_pushed(review_request):
         return
 
     # The reviewid passed through p2rb is, for Mozilla's instance anyway, also
@@ -79,7 +84,7 @@ def publish_review_request(user, review_request_draft, **kwargs):
     # Don't make attachments for child review requests, otherwise,
     # Bugzilla gets inundatated with lots of patches, and the squashed
     # one is the only one we want to post there.
-    if str(review_request.extra_data.get('p2rb.is_squashed', False)) == "True":
+    if is_review_request_squashed(review_request):
         b.post_rb_url(bug_id,
                       review_request.id,
                       review_request_draft.summary,
@@ -87,12 +92,11 @@ def publish_review_request(user, review_request_draft, **kwargs):
                       review_request_url(review_request),
                       reviewers)
 
-
 def publish_review(user, review, **kwargs):
     review_request = review.review_request
 
     # skip review requests that were not pushed
-    if str(review_request.extra_data.get('p2rb', False)) == "False":
+    if not is_review_request_pushed(review_request):
         return
 
     bug_id = int(review_request.get_bug_list()[0])
@@ -112,7 +116,7 @@ def publish_reply(user, reply, **kwargs):
     review_request = reply.review_request
 
     # skip review requests that were not pushed
-    if str(review_request.extra_data.get('p2rb', False)) == "False":
+    if not is_review_request_pushed(review_request):
         return
 
     bug_id = int(review_request.get_bug_list()[0])
