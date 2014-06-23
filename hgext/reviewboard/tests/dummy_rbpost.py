@@ -14,7 +14,9 @@ import hgrb.shared
 
 REPO = None
 
-def post_reviews(original, url, username, password, rbid, identifier, commits):
+def post_reviews(original, url, rbid, identifier, commits,
+                 bzusername=None, bzpassword=None, bzuserid=None,
+                 bzcookie=None):
     reviews = []
     if REPO.vfs.exists('DUMMY_REVIEWS'):
         for i, line in enumerate(REPO.vfs('DUMMY_REVIEWS')):
@@ -31,8 +33,8 @@ def post_reviews(original, url, username, password, rbid, identifier, commits):
 
     lines.extend([
         'url: %s' % url,
-        'username: %s' % username,
-        'password: %s' % password,
+        'username: %s' % bzusername,
+        'password: %s' % bzpassword,
         'rbid: %s' % rbid,
         'identifier: %s' % identifier,
     ])

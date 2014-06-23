@@ -8,7 +8,8 @@ from mercurial import patch
 from mercurial import wireproto
 
 # TODO import this from final location so the symbol is defined.
-def post_reviews(url, username, password, rbid, identifier, commits):
+def post_reviews(url, rbid, identifier, commits, bzusername=None,
+                 bzpassword=None, bzuserid=None, bzcookie=None):
     reviewmap = {}
     for i, commit in enumerate(commits['individual']):
         reviewmap[commit['id']] = i + 1
@@ -45,6 +46,8 @@ def reviewboard(repo, proto, args=None):
 
     bzusername = None
     bzpassword = None
+    bzuserid = None
+    bzcookie = None
     identifier = None
     nodes = []
 
@@ -55,6 +58,10 @@ def reviewboard(repo, proto, args=None):
             bzusername = urllib.unquote(d)
         elif t == 'bzpassword':
             bzpassword = urllib.unquote(d)
+        elif t == 'bzuserid':
+            bzuserid = urllib.unquote(d)
+        elif t == 'bzcookie':
+            bzcookie = urllib.unquote(d)
         elif t == 'reviewidentifier':
             identifier = urllib.unquote(d)
         elif t == 'csetreview':
@@ -101,8 +108,11 @@ def reviewboard(repo, proto, args=None):
     rbid = repo.ui.configint('reviewboard', 'repoid', None)
 
     parentrid, commitmap = post_reviews(repo.ui.config('reviewboard', 'url'),
-                                        bzusername, bzpassword, rbid,
-                                        identifier, commits)
+                                        rbid, identifier, commits,
+                                        bzusername=bzusername,
+                                        bzpassword=bzpassword,
+                                        bzuserid=bzuserid,
+                                        bzcookie=bzcookie)
 
     lines = [
         '1',
