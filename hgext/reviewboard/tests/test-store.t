@@ -21,10 +21,9 @@ Pushing a review will create the reviews file
   $ hg commit -A -m 'initial commit'
   adding foo
   $ hg phase --public -r .
-  $ hg bookmark test-bookmark
 
   $ echo "foo" >> foo
-  $ hg commit -m 'second commit'
+  $ hg commit -m 'Bug 456 - second commit'
   $ hg push
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
@@ -33,9 +32,9 @@ Pushing a review will create the reviews file
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
   identified 1 changesets for review
-  review identifier: test-bookmark
+  review identifier: bz://456
   created review request: 1
 
   $ cat .hg/reviews
-  p test-bookmark 1
-  c a287f990367776cdfa5c7351f71304450e4822b4 1
+  p bz://456 1
+  c 7f387c765e685da95d7a4ffab2ccf06548c06fcf 1

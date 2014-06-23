@@ -56,8 +56,24 @@ demandimport.enable()
 
 testedwith = '3.0.1'
 
+def ensurereviewid(rid):
+    """Ensure and nornalize a review id, aborting if necessary."""
+    if not rid:
+        return None
+
+    # Assume digits are Bugzilla bugs.
+    if rid.isdigit():
+        rid = 'bz://%s' % rid
+
+    if rid and (not rid.startswith('bz://') or not rid[5:].isdigit()):
+        raise util.Abort(_('review identifier must be a bug number.'))
+
+    return rid
+
 def pushcommand(orig, ui, repo, *args, **kwargs):
     """Wraps commands.push to read the --reviewid argument."""
+
+    rid = ensurereviewid(kwargs['reviewid'])
 
     # There isn't a good way to send custom arguments to the push api. So, we
     # inject some temporary values on the repo. This may fail in many
@@ -159,18 +175,23 @@ def doreview(repo, ui, remote, reviewnode):
 
     if repo.reviewid:
         identifier = repo.reviewid
-    elif repo._bookmarkcurrent:
-        identifier = repo._bookmarkcurrent
-    elif repo.dirstate.branch() != 'default':
-        identifier = repo.dirstate.branch()
+
+    # TODO The server currently requires a bug number for the identifier.
+    # Pull bookmark and branch names in once allowed.
+    #elif repo._bookmarkcurrent:
+    #    identifier = repo._bookmarkcurrent
+    #elif repo.dirstate.branch() != 'default':
+    #    identifier = repo.dirstate.branch()
 
     if not identifier:
         for node in nodes:
             ctx = repo[node]
             bugs = parse_bugs(ctx.description())
             if bugs:
-                identifier = 'bug%s' % bugs[0]
+                identifier = 'bz://%s' % bugs[0]
                 break
+
+    identifier = ensurereviewid(identifier)
 
     if not identifier:
         ui.write(_('Unable to determine review identifier. Review '

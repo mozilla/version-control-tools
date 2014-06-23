@@ -70,3 +70,9 @@ Unknown review identifier
   no changes found
   Unable to determine review identifier. Review identifiers are extracted * (glob)
   [1]
+
+Bad review identifier
+
+  $ hg push --reviewid foobar
+  abort: review identifier must be a bug number.
+  [255]

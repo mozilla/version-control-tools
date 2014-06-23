@@ -70,7 +70,7 @@ Seed the root changeset on the server
 
 Pushing a single changeset will initiate a single review (no children)
 
-  $ hg push -r 1 --reviewid testid http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid 345 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   remote: adding changesets
@@ -78,18 +78,18 @@ Pushing a single changeset will initiate a single review (no children)
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   identified 1 changesets for review
-  review identifier: testid
+  review identifier: bz://345
   created review request: 1
 
 Pushing no changesets will do a re-review if -r is given.
 Since nothing has changed, we should recycle the old review.
 
-  $ hg push -r 1 --reviewid testid http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid 345 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
   identified 1 changesets for review
-  review identifier: testid
+  review identifier: bz://345
   updated review request: 1
   [1]
 
@@ -97,7 +97,7 @@ Pushing patches from mq will result in a warning
 
   $ echo 'mq patch' > foo
   $ hg qnew -m 'mq patch' -d '0 0' patch1
-  $ hg push -r . --reviewid mq-test http://localhost:$HGPORT
+  $ hg push -r . --reviewid 784841 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   remote: adding changesets
@@ -106,18 +106,18 @@ Pushing patches from mq will result in a warning
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   You are using mq to develop patches. * (glob)
   identified 1 changesets for review
-  review identifier: mq-test
+  review identifier: bz://784841
   created review request: 2
 
 Custom identifier will create a new review from same changesets.
 TODO should the server dedupe reviews automatically?
 
-  $ hg push -r 1 --reviewid testid2 http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid 457 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
   identified 1 changesets for review
-  review identifier: testid2
+  review identifier: bz://457
   created review request: 3
   [1]
 
@@ -131,73 +131,31 @@ SSH works
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   identified 1 changesets for review
-  review identifier: bug123
+  review identifier: bz://123
   created review request: 4
-
-Active bookmark is used as identifier
-
-  $ hg up bookmark-1
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  (activating bookmark bookmark-1)
-  $ hg push -B bookmark-1 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  identified 1 changesets for review
-  review identifier: bookmark-1
-  created review request: 5
-  exporting bookmark bookmark-1
-
-Deactivate bookmark and ensure identifier has reset
-TODO should we pick up the bookmark attached to this node?
-
-  $ hg up -r 3
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  (leaving bookmark bookmark-1)
-  $ hg push -r . ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  no changes found
-  Unable to determine review identifier.* (glob)
-  [1]
-
-A non-default branch will be used as the identifier
-
-  $ hg up test-branch
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  $ hg push --new-branch -r . ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  identified 1 changesets for review
-  review identifier: test-branch
-  created review request: 6
 
 Test that single diff is generated properly
 
   $ hg up bookmark-1
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   (activating bookmark bookmark-1)
-  $ hg push -r . ssh://user@dummy/$TESTTMP/server
+  $ hg push --reviewid bz://789213 ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
-  no changes found
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   identified 1 changesets for review
-  review identifier: bookmark-1
-  updated review request: 5
-  [1]
+  review identifier: bz://789213
+  created review request: 5
+
   $ cat ../server/.hg/post_reviews
   url: http://dummy
   username: user
   password: pass
   rbid: 1
-  identifier: bookmark-1
+  identifier: bz://789213
   0
   afef2b530106d00832a59244a852230bd88a70a7
   bookmark with single commit
@@ -223,7 +181,7 @@ Test that multiple changesets result in parent diffs
   $ hg up bookmark-2
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   (activating bookmark bookmark-2)
-  $ hg push -B bookmark-2 ssh://user@dummy/$TESTTMP/server
+  $ hg push -B bookmark-2 --reviewid 567 ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
   remote: adding changesets
@@ -231,17 +189,17 @@ Test that multiple changesets result in parent diffs
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files (+1 heads)
   identified 2 changesets for review
-  review identifier: bookmark-2
-  created review request: 7
+  review identifier: bz://567
+  created review request: 6
+  created changeset review: 7
   created changeset review: 8
-  created changeset review: 9
   exporting bookmark bookmark-2
   $ cat ../server/.hg/post_reviews
   url: http://dummy
   username: user
   password: pass
   rbid: 1
-  identifier: bookmark-2
+  identifier: bz://567
   0
   773ae5edc39985853a8f396765fd5b65e951cbc4
   bookmark with 2 commits, 1st
@@ -294,16 +252,15 @@ Identify successor changesets via obsolescence
   $ hg up bookmark-1
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   (activating bookmark bookmark-1)
-  $ hg push -B bookmark-1 ssh://user@dummy/$TESTTMP/server
+  $ hg push -B bookmark-1 --reviewid bz://789213 ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 1 changes to 1 files (+1 heads)
-  updating bookmark bookmark-1
   identified 1 changesets for review
-  review identifier: bookmark-1
+  review identifier: bz://789213
   updated review request: 5
   exporting bookmark bookmark-1
 
@@ -327,11 +284,11 @@ Test pushing multiple heads is rejected
 
 Specifying multiple -r for the same head works
 
-  $ hg push -r 0 -r 1 --reviewid 123 ssh://user@dummy/$TESTTMP/server
+  $ hg push -r 0 -r 1 --reviewid 50000 ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
   no changes found
   identified 1 changesets for review
-  review identifier: 123
-  created review request: 10
+  review identifier: bz://50000
+  created review request: 9
   [1]
