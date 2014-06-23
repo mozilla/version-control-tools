@@ -20,4 +20,14 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
     ],
+    entry_points={
+        'reviewboard.extensions':
+            '%s = rbmozui.extension:RBMozUI' % PACKAGE_NAME,
+    },
+    package_data={
+        'rbmozui': [
+            'templates/rbmozui/*.txt',
+            'templates/rbmozui/*.html',
+        ],
+    }
 )
