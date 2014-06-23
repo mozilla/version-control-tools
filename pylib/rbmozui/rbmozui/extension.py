@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.conf.urls import patterns, include
+
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import TemplateHook
 from reviewboard.reviews.builtin_fields import TestingDoneField
