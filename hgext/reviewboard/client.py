@@ -392,7 +392,7 @@ def reposetup(ui, repo):
 
     def prepushoutgoinghook(local, remote, outgoing):
         if len(outgoing.missingheads) > 1:
-            raise util.Abort(_('cannot push multiple heads to remote. Limit '
+            raise util.Abort(_('cannot push multiple heads to remote; limit '
                                'pushed revisions using the -r argument.'))
 
     repo.prepushoutgoinghooks.add('reviewboard', prepushoutgoinghook)

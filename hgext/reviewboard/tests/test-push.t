@@ -322,5 +322,5 @@ Test pushing multiple heads is rejected
   $ hg push ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
-  abort: Cannot push multiple heads to remote. Limit pushed revisions using the -r argument.
+  abort: cannot push multiple heads to remote; limit pushed revisions using the -r argument.
   [255]
