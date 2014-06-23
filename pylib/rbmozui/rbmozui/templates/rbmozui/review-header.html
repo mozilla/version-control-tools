@@ -1,0 +1,11 @@
+<ul class="new-navbar">
+  <li><a href="{{review_request.get_absolute_url}}"
+    {% if request.resolver_match.url_name == 'review-request-detail' %}
+    class="active"
+    {% endif %}
+  >Reviews</a></li>
+  <li><a href="{{review_request.get_absolute_url}}diff/"
+  {% if request.resolver_match.url_name == 'view-diff' %}
+    class="active"
+  {% endif %}>Diff</a></li>
+</ul>

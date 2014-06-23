@@ -9,7 +9,8 @@ from reviewboard.extensions.hooks import TemplateHook
 from reviewboard.reviews.builtin_fields import TestingDoneField
 from reviewboard.reviews.fields import (get_review_request_field,
                                         get_review_request_fieldset)
-from reviewboard.urls import review_request_url_names
+from reviewboard.urls import (diffviewer_url_names,
+                              review_request_url_names)
 
 
 class RBMozUI(Extension):
@@ -22,7 +23,10 @@ class RBMozUI(Extension):
             'source_filenames': ['css/common.css'],
         },
         'review': {
-            'source_filenames': ['css/review.css'],
+            'source_filenames': ['css/review.less'],
+        },
+        'viewdiff': {
+            'source_filenames': ['css/viewdiff.less'],
         },
     }
 
@@ -36,6 +40,10 @@ class RBMozUI(Extension):
         # All of our review request styling is injected via review-stylings-css,
         # which in turn loads the review.css static bundle.
         TemplateHook(self, 'base-css', 'rbmozui/review-stylings-css.html',
+                     apply_to=review_request_url_names)
+        TemplateHook(self, 'base-css', 'rbmozui/viewdiff-stylings-css.html',
+                     apply_to=diffviewer_url_names)
+        TemplateHook(self, 'base-before-content', 'rbmozui/review-header.html',
                      apply_to=review_request_url_names)
 
     def shutdown(self):
