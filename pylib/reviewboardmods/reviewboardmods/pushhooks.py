@@ -1,3 +1,13 @@
+"""Push commits to Review Board.
+
+This module contains code for taking commits from version control (Git,
+Mercurial, etc) and adding them to Review Board.
+
+It is intended for this module to be generic and applicable to any
+Review Board install. Please abstract away Mozilla implementation
+details.
+"""
+
 import json
 
 from rbtools.api.client import RBClient
