@@ -34,7 +34,10 @@ Pushing a review will create the reviews file
   identified 1 changesets for review
   review identifier: bz://456
   created review request: 1
-  created changeset review: 2
+  
+  changeset:  1:7f387c765e68
+  summary:    Bug 456 - second commit
+  review:     http://dummy/r/2
 
   $ cat .hg/reviews
   u http://dummy

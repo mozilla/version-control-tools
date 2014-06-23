@@ -80,7 +80,10 @@ Pushing a single changeset will initiate a single review (no children)
   identified 1 changesets for review
   review identifier: bz://345
   created review request: 1
-  created changeset review: 2
+  
+  changeset:  1:6f06b4ac6efe
+  summary:    anonymous head
+  review:     http://dummy/r/2
 
 {reviewurl} template works
 
@@ -97,6 +100,10 @@ Pushing no changesets will do a re-review
   identified 1 changesets for review
   review identifier: bz://345
   updated review request: 1
+  
+  changeset:  1:6f06b4ac6efe
+  summary:    anonymous head
+  review:     http://dummy/r/2
   [1]
 
   $ removeserverstate ../server
@@ -116,7 +123,10 @@ Pushing patches from mq will result in a warning
   identified 1 changesets for review
   review identifier: bz://784841
   created review request: 1
-  created changeset review: 2
+  
+  changeset:  7:7458cff9569f
+  summary:    mq patch
+  review:     http://dummy/r/2
 
   $ hg qpop
   popping patch1
@@ -132,6 +142,10 @@ TODO should the server dedupe reviews automatically?
   identified 1 changesets for review
   review identifier: bz://3452
   created review request: 3
+  
+  changeset:  1:6f06b4ac6efe
+  summary:    anonymous head
+  review:     http://dummy/r/2
   [1]
 
   $ removeserverstate ../server
@@ -148,7 +162,10 @@ SSH works
   identified 1 changesets for review
   review identifier: bz://123
   created review request: 1
-  created changeset review: 2
+  
+  changeset:  2:a21bef69f0d4
+  summary:    Bug 123 - Test identifier
+  review:     http://dummy/r/2
 
   $ removeserverstate ../server
 
@@ -167,7 +184,10 @@ A single diff is generated properly
   identified 1 changesets for review
   review identifier: bz://789213
   created review request: 1
-  created changeset review: 2
+  
+  changeset:  3:afef2b530106
+  summary:    bookmark with single commit
+  review:     http://dummy/r/2
 
   $ cat ../server/.hg/post_reviews
   url: http://dummy
@@ -212,9 +232,16 @@ Test that multiple changesets result in parent diffs
   identified 2 changesets for review
   review identifier: bz://567
   created review request: 1
-  created changeset review: 2
-  created changeset review: 3
+  
+  changeset:  4:773ae5edc399
+  summary:    bookmark with 2 commits, 1st
+  review:     http://dummy/r/2
+  
+  changeset:  5:659bcc59ed36
+  summary:    bookmark with 2 commits, 2nd
+  review:     http://dummy/r/3
   exporting bookmark bookmark-2
+
   $ cat ../server/.hg/post_reviews
   url: http://dummy
   username: user
@@ -267,4 +294,8 @@ Specifying multiple -r for the same head works
   identified 1 changesets for review
   review identifier: bz://50000
   created review request: 4
+  
+  changeset:  1:6f06b4ac6efe
+  summary:    anonymous head
+  review:     http://dummy/r/2
   [1]

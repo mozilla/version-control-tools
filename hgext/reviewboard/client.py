@@ -228,11 +228,18 @@ def doreview(repo, ui, remote, reviewnode):
             oldreviews[rid] = node
         lines.append('csetreview %s' % data)
 
+    # TODO can we define a new named template with the API so people can
+    # customize this?
     displayer = cmdutil.show_changeset(ui, repo, {
-        'template': '{label("log.changeset", rev)}'
+        'template': '{label("log.changeset", "changeset:  ")}'
+                    '{label("log.changeset", rev)}'
                     '{label("log.changeset", ":")}'
-                    '{label("log.changeset", node|short)} '
-                    '{label("log.summary", firstline(desc))}\n'})
+                    '{label("log.changeset", node|short)}\n'
+                    '{label("log.summary", "summary:    ")}'
+                    '{label("log.summary", firstline(desc))}\n'
+                    '{label("log.reviewurl", "review:     ")}'
+                    '{label("log.reviewurl", reviewurl)}\n'
+         })
 
     ui.write(_('identified %d changesets for review\n') % len(nodes))
     ui.write(_('review identifier: %s\n') % identifier)
@@ -274,13 +281,10 @@ def doreview(repo, ui, remote, reviewnode):
         ui.write(_('updated review request: %s\n' % newparentid))
 
     for rid, node in sorted(newreviews.iteritems()):
+        ui.write('\n')
         ctx = repo[node]
-        #displayer.show(ctx)
+        displayer.show(ctx)
 
-        if rid not in oldreviews:
-            ui.write(_('created changeset review: %s\n') % rid)
-        elif oldreviews[rid] != node:
-            ui.write(_('updated changeset review: %s\n') % rid)
 
 class reviewstore(object):
     """Holds information about ongoing reviews.

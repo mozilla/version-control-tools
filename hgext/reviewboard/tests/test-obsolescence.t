@@ -32,7 +32,10 @@ Set up the repo
   identified 1 changesets for review
   review identifier: bz://123
   created review request: 1
-  created changeset review: 2
+  
+  changeset:  1:c3480b3f6944
+  summary:    foo2
+  review:     http://dummy/r/2
 
 Now create a new head and push a rebase
 
@@ -55,4 +58,11 @@ Now create a new head and push a rebase
   identified 2 changesets for review
   review identifier: bz://123
   updated review request: 1
-  created changeset review: 3
+  
+  changeset:  3:5003cd557db3
+  summary:    foo2
+  review:     http://dummy/r/2
+  
+  changeset:  2:e7315a409763
+  summary:    bar
+  review:     http://dummy/r/3
