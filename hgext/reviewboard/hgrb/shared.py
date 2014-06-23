@@ -71,6 +71,9 @@ def reviewboard(repo, proto, args=None):
             else:
                 nodes.append((d, None))
 
+    if not identifier:
+        return wirerepo.pusherr(_('no review identifier in request'))
+
     diffopts = mdiff.diffopts(context=8, showfunc=True)
 
     commits = {
