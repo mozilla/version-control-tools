@@ -49,10 +49,6 @@ def post_reviews(original, url, rbid, identifier, commits,
             commit['parent_diff'] or 'NO PARENT DIFF'
         ])
 
-        if len(commits['individual']) <= 1:
-            reviewmap[commit['id']] = parentid
-            continue
-
         if not commit['rid']:
             reviews.append(commit['id'])
 

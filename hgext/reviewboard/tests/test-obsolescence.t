@@ -32,6 +32,7 @@ Set up the repo
   identified 1 changesets for review
   review identifier: bz://123
   created review request: 1
+  created changeset review: 2
 
 Now create a new head and push a rebase
 
@@ -54,4 +55,4 @@ Now create a new head and push a rebase
   identified 2 changesets for review
   review identifier: bz://123
   updated review request: 1
-  created changeset review: 2
+  created changeset review: 3

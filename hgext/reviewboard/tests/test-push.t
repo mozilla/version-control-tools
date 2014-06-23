@@ -80,6 +80,7 @@ Pushing a single changeset will initiate a single review (no children)
   identified 1 changesets for review
   review identifier: bz://345
   created review request: 1
+  created changeset review: 2
 
 Pushing no changesets will do a re-review
 
@@ -109,6 +110,7 @@ Pushing patches from mq will result in a warning
   identified 1 changesets for review
   review identifier: bz://784841
   created review request: 1
+  created changeset review: 2
 
   $ hg qpop
   popping patch1
@@ -123,7 +125,7 @@ TODO should the server dedupe reviews automatically?
   no changes found
   identified 1 changesets for review
   review identifier: bz://3452
-  created review request: 2
+  created review request: 3
   [1]
 
   $ removeserverstate ../server
@@ -140,6 +142,7 @@ SSH works
   identified 1 changesets for review
   review identifier: bz://123
   created review request: 1
+  created changeset review: 2
 
   $ removeserverstate ../server
 
@@ -158,6 +161,7 @@ A single diff is generated properly
   identified 1 changesets for review
   review identifier: bz://789213
   created review request: 1
+  created changeset review: 2
 
   $ cat ../server/.hg/post_reviews
   url: http://dummy

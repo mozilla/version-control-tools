@@ -34,7 +34,8 @@ Pushing a review will create the reviews file
   identified 1 changesets for review
   review identifier: bz://456
   created review request: 1
+  created changeset review: 2
 
   $ cat .hg/reviews
   p bz://456 1
-  c 7f387c765e685da95d7a4ffab2ccf06548c06fcf 1
+  c 7f387c765e685da95d7a4ffab2ccf06548c06fcf 2

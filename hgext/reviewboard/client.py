@@ -270,15 +270,14 @@ def doreview(repo, ui, remote, reviewnode):
     else:
         ui.write(_('updated review request: %s\n' % newparentid))
 
-    if len(nodes) > 1:
-        for rid, node in sorted(newreviews.iteritems()):
-            ctx = repo[node]
-            #displayer.show(ctx)
+    for rid, node in sorted(newreviews.iteritems()):
+        ctx = repo[node]
+        #displayer.show(ctx)
 
-            if rid not in oldreviews:
-                ui.write(_('created changeset review: %s\n') % rid)
-            elif oldreviews[rid] != node:
-                ui.write(_('updated changeset review: %s\n') % rid)
+        if rid not in oldreviews:
+            ui.write(_('created changeset review: %s\n') % rid)
+        elif oldreviews[rid] != node:
+            ui.write(_('updated changeset review: %s\n') % rid)
 
 class reviewstore(object):
     """Holds information about ongoing reviews.
