@@ -106,8 +106,7 @@ def wrappedpushbookmark(orig, pushop):
 
     reviewnode = None
     if pushop.revs:
-        assert len(pushop.revs) == 1
-        reviewnode = repo[pushop.revs[0]].node()
+        reviewnode = repo[pushop.revs[-1]].node()
     elif pushop.outgoing.missing:
         reviewnode = pushop.outgoing.missing[-1]
     else:

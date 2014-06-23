@@ -324,3 +324,14 @@ Test pushing multiple heads is rejected
   searching for changes
   abort: cannot push multiple heads to remote; limit pushed revisions using the -r argument.
   [255]
+
+Specifying multiple -r for the same head works
+
+  $ hg push -r 0 -r 1 --reviewid 123 ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  identified 1 changesets for review
+  review identifier: 123
+  created review request: 10
+  [1]
