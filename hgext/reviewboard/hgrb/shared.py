@@ -7,14 +7,11 @@ from mercurial import mdiff
 from mercurial import patch
 from mercurial import wireproto
 
-# TODO import this from final location so the symbol is defined.
-def post_reviews(url, repoid, identifier, commits, username=None,
-                 password=None, cookie=None):
-    reviewmap = {}
-    for i, commit in enumerate(commits['individual']):
-        reviewmap[commit['id']] = i + 1
-
-    return 1, reviewmap
+# Wrap post_reviews because we don't want to require the clients to
+# import rbtools.
+def post_reviews(*args, **kwargs):
+    from reviewboardmods.pushhooks import post_reviews as pr
+    return pr(*args, **kwargs)
 
 @wireproto.wireprotocommand('reviewboard', '*')
 def reviewboard(repo, proto, args=None):

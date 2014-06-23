@@ -27,11 +27,13 @@ from mercurial import wireproto
 from mercurial.i18n import _
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
+REPO_ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
 
 demandimport.disable()
 try:
     import hgrb.shared
 except ImportError:
+    sys.path.insert(0, os.path.join(REPO_ROOT, 'pylib', 'reviewboardmods'))
     sys.path.insert(0, OUR_DIR)
     import hgrb.shared
 demandimport.enable()
