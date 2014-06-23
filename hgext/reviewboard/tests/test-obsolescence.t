@@ -29,13 +29,14 @@ Set up the repo
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
-  identified 1 changesets for review
-  review identifier: bz://123
-  review url: http://dummy/r/1
+  submitting 1 changesets for review
   
   changeset:  1:c3480b3f6944
   summary:    foo2
   review:     http://dummy/r/2
+  
+  review id:  bz://123
+  review url: http://dummy/r/1
 
 Now create a new head and push a rebase
 
@@ -55,9 +56,7 @@ Now create a new head and push a rebase
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 1 changes to 1 files (+1 heads)
-  identified 2 changesets for review
-  review identifier: bz://123
-  review url: http://dummy/r/1
+  submitting 2 changesets for review
   
   changeset:  2:e7315a409763
   summary:    bar
@@ -66,4 +65,6 @@ Now create a new head and push a rebase
   changeset:  3:5003cd557db3
   summary:    foo2
   review:     http://dummy/r/2
-
+  
+  review id:  bz://123
+  review url: http://dummy/r/1

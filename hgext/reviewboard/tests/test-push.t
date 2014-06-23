@@ -77,13 +77,14 @@ Pushing a single changeset will initiate a single review (no children)
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  identified 1 changesets for review
-  review identifier: bz://345
-  review url: http://dummy/r/1
+  submitting 1 changesets for review
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
   review:     http://dummy/r/2
+  
+  review id:  bz://345
+  review url: http://dummy/r/1
 
 {reviewurl} template works
 
@@ -97,15 +98,15 @@ Pushing no changesets will do a re-review
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
-  identified 1 changesets for review
-  review identifier: bz://345
-  review url: http://dummy/r/1
+  submitting 1 changesets for review
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
   review:     http://dummy/r/2
+  
+  review id:  bz://345
+  review url: http://dummy/r/1
   [1]
-
   $ removeserverstate ../server
 
 Pushing patches from mq will result in a warning
@@ -120,32 +121,33 @@ Pushing patches from mq will result in a warning
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   You are using mq to develop patches. * (glob)
-  identified 1 changesets for review
-  review identifier: bz://784841
-  review url: http://dummy/r/1
+  submitting 1 changesets for review
   
   changeset:  7:7458cff9569f
   summary:    mq patch
   review:     http://dummy/r/2
+  
+  review id:  bz://784841
+  review url: http://dummy/r/1
 
   $ hg qpop
   popping patch1
   patch queue now empty
 
 Custom identifier will create a new review from same changesets.
-TODO should the server dedupe reviews automatically?
 
   $ hg push -r 1 --reviewid 3452 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
-  identified 1 changesets for review
-  review identifier: bz://3452
-  review url: http://dummy/r/3
+  submitting 1 changesets for review
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
   review:     http://dummy/r/2
+  
+  review id:  bz://3452
+  review url: http://dummy/r/3
   [1]
 
   $ removeserverstate ../server
@@ -159,14 +161,14 @@ SSH works
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  identified 1 changesets for review
-  review identifier: bz://123
-  review url: http://dummy/r/1
+  submitting 1 changesets for review
   
   changeset:  2:a21bef69f0d4
   summary:    Bug 123 - Test identifier
   review:     http://dummy/r/2
-
+  
+  review id:  bz://123
+  review url: http://dummy/r/1
   $ removeserverstate ../server
 
 A single diff is generated properly
@@ -181,13 +183,14 @@ A single diff is generated properly
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  identified 1 changesets for review
-  review identifier: bz://789213
-  review url: http://dummy/r/1
+  submitting 1 changesets for review
   
   changeset:  3:afef2b530106
   summary:    bookmark with single commit
   review:     http://dummy/r/2
+  
+  review id:  bz://789213
+  review url: http://dummy/r/1
 
   $ cat ../server/.hg/post_reviews
   url: http://dummy
@@ -229,9 +232,7 @@ Test that multiple changesets result in parent diffs
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files (+1 heads)
-  identified 2 changesets for review
-  review identifier: bz://567
-  review url: http://dummy/r/1
+  submitting 2 changesets for review
   
   changeset:  4:773ae5edc399
   summary:    bookmark with 2 commits, 1st
@@ -240,6 +241,9 @@ Test that multiple changesets result in parent diffs
   changeset:  5:659bcc59ed36
   summary:    bookmark with 2 commits, 2nd
   review:     http://dummy/r/3
+  
+  review id:  bz://567
+  review url: http://dummy/r/1
   exporting bookmark bookmark-2
 
   $ cat ../server/.hg/post_reviews
@@ -291,11 +295,12 @@ Specifying multiple -r for the same head works
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
   no changes found
-  identified 1 changesets for review
-  review identifier: bz://50000
-  review url: http://dummy/r/4
+  submitting 1 changesets for review
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
   review:     http://dummy/r/2
+  
+  review id:  bz://50000
+  review url: http://dummy/r/4
   [1]

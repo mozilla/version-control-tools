@@ -242,8 +242,7 @@ def doreview(repo, ui, remote, reviewnode):
                     '{label("log.reviewurl", reviewurl)}\n'
          })
 
-    ui.write(_('identified %d changesets for review\n') % len(nodes))
-    ui.write(_('review identifier: %s\n') % identifier)
+    ui.write(_('submitting %d changesets for review\n') % len(nodes))
 
     res = remote._call('reviewboard', data='\n'.join(lines))
     lines = res.split('\n')
@@ -274,12 +273,14 @@ def doreview(repo, ui, remote, reviewnode):
 
     reviews.write()
 
-    ui.write(_('review url: %s\n') % reviews.parentreviewurl(identifier))
-
+    ui.write('\n')
     for node in nodes:
-        ui.write('\n')
         ctx = repo[node]
         displayer.show(ctx)
+        ui.write('\n')
+
+    ui.write(_('review id:  %s\n') % identifier)
+    ui.write(_('review url: %s\n') % reviews.parentreviewurl(identifier))
 
 
 class reviewstore(object):
