@@ -48,10 +48,6 @@ def publish_review_request(user, review_request_draft, **kwargs):
     if str(review_request.extra_data.get('p2rb', False)) == "False":
         return
 
-    # skip child review requests
-    if str(review_request.extra_data.get('squashed', False)) == "False":
-        return
-
     # The reviewid passed through p2rb is, for Mozilla's instance anyway, also
     # the bug ID.
     bug_id = review_request_draft.extra_data.get('p2rb.identifier', None)
@@ -80,12 +76,16 @@ def publish_review_request(user, review_request_draft, **kwargs):
     reviewers = [x.get_username() for x in
                  review_request_draft.target_people.all()]
 
-    b.post_rb_url(bug_id,
-                  review_request.id,
-                  review_request_draft.summary,
-                  review_request_draft.description,
-                  review_request_url(review_request),
-                  reviewers)
+    # Don't make attachments for child review requests, otherwise,
+    # Bugzilla gets inundatated with lots of patches, and the squashed
+    # one is the only one we want to post there.
+    if str(review_request.extra_data.get('p2rb.is_squashed', False)) == "True":
+        b.post_rb_url(bug_id,
+                      review_request.id,
+                      review_request_draft.summary,
+                      review_request_draft.description,
+                      review_request_url(review_request),
+                      reviewers)
 
 
 def publish_review(user, review, **kwargs):
@@ -93,10 +93,6 @@ def publish_review(user, review, **kwargs):
 
     # skip review requests that were not pushed
     if str(review_request.extra_data.get('p2rb', False)) == "False":
-        return
-
-    # skip child review requests
-    if str(review_request.extra_data.get('squashed', False)) == "False":
         return
 
     bug_id = int(review_request.get_bug_list()[0])
@@ -117,10 +113,6 @@ def publish_reply(user, reply, **kwargs):
 
     # skip review requests that were not pushed
     if str(review_request.extra_data.get('p2rb', False)) == "False":
-        return
-
-    # skip child review requests
-    if str(review_request.extra_data.get('squashed', False)) == "False":
         return
 
     bug_id = int(review_request.get_bug_list()[0])
@@ -182,3 +174,36 @@ def get_or_create_bugzilla_users(user_data):
 
         users.append(user)
     return users
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
