@@ -31,3 +31,9 @@ reviewboard = $TESTDIR/hgext/reviewboard/client.py
 
 EOF
 }
+
+removeserverstate() {
+  rm $1/.hg/DUMMY_REVIEWS
+  rm $1/.hg/post_reviews
+
+}

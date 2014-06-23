@@ -81,8 +81,7 @@ Pushing a single changeset will initiate a single review (no children)
   review identifier: bz://345
   created review request: 1
 
-Pushing no changesets will do a re-review if -r is given.
-Since nothing has changed, we should recycle the old review.
+Pushing no changesets will do a re-review
 
   $ hg push -r 1 --reviewid 345 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
@@ -92,6 +91,8 @@ Since nothing has changed, we should recycle the old review.
   review identifier: bz://345
   updated review request: 1
   [1]
+
+  $ removeserverstate ../server
 
 Pushing patches from mq will result in a warning
 
@@ -107,23 +108,29 @@ Pushing patches from mq will result in a warning
   You are using mq to develop patches. * (glob)
   identified 1 changesets for review
   review identifier: bz://784841
-  created review request: 2
+  created review request: 1
+
+  $ hg qpop
+  popping patch1
+  patch queue now empty
 
 Custom identifier will create a new review from same changesets.
 TODO should the server dedupe reviews automatically?
 
-  $ hg push -r 1 --reviewid 457 http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid 3452 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
   identified 1 changesets for review
-  review identifier: bz://457
-  created review request: 3
+  review identifier: bz://3452
+  created review request: 2
   [1]
+
+  $ removeserverstate ../server
 
 SSH works
 
-  $ hg push -r 2 -f ssh://user@dummy/$TESTTMP/server
+  $ hg push -r 2 ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
   remote: adding changesets
@@ -132,9 +139,11 @@ SSH works
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   identified 1 changesets for review
   review identifier: bz://123
-  created review request: 4
+  created review request: 1
 
-Test that single diff is generated properly
+  $ removeserverstate ../server
+
+A single diff is generated properly
 
   $ hg up bookmark-1
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -148,7 +157,7 @@ Test that single diff is generated properly
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   identified 1 changesets for review
   review identifier: bz://789213
-  created review request: 5
+  created review request: 1
 
   $ cat ../server/.hg/post_reviews
   url: http://dummy
@@ -176,6 +185,8 @@ Test that single diff is generated properly
   +bookmark-1
   
 
+  $ removeserverstate ../server
+
 Test that multiple changesets result in parent diffs
 
   $ hg up bookmark-2
@@ -190,9 +201,9 @@ Test that multiple changesets result in parent diffs
   remote: added 2 changesets with 2 changes to 1 files (+1 heads)
   identified 2 changesets for review
   review identifier: bz://567
-  created review request: 6
-  created changeset review: 7
-  created changeset review: 8
+  created review request: 1
+  created changeset review: 2
+  created changeset review: 3
   exporting bookmark bookmark-2
   $ cat ../server/.hg/post_reviews
   url: http://dummy
@@ -237,33 +248,6 @@ Test that multiple changesets result in parent diffs
   +bookmark-2b
   
 
-Identify successor changesets via obsolescence
-
-  $ echo "obs=$TESTTMP/obs.py" >> .hg/hgrc
-  $ hg up -r 0
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  (leaving bookmark bookmark-2)
-  $ echo 'new head' > bar
-  $ hg commit -A -m 'adding new head'
-  adding bar
-  created new head
-  $ hg phase --public -r .
-  $ hg rebase -b bookmark-1 -d .
-  $ hg up bookmark-1
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  (activating bookmark bookmark-1)
-  $ hg push -B bookmark-1 --reviewid bz://789213 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 2 changesets with 1 changes to 1 files (+1 heads)
-  identified 1 changesets for review
-  review identifier: bz://789213
-  updated review request: 5
-  exporting bookmark bookmark-1
-
 Specifying multiple -r for the same head works
 
   $ hg push -r 0 -r 1 --reviewid 50000 ssh://user@dummy/$TESTTMP/server
@@ -272,5 +256,5 @@ Specifying multiple -r for the same head works
   no changes found
   identified 1 changesets for review
   review identifier: bz://50000
-  created review request: 9
+  created review request: 4
   [1]
