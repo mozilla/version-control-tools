@@ -8,8 +8,8 @@ from mercurial import patch
 from mercurial import wireproto
 
 # TODO import this from final location so the symbol is defined.
-def post_reviews(url, rbid, identifier, commits, bzusername=None,
-                 bzpassword=None, bzuserid=None, bzcookie=None):
+def post_reviews(url, repoid, identifier, commits, username=None,
+                 password=None, cookie=None):
     reviewmap = {}
     for i, commit in enumerate(commits['individual']):
         reviewmap[commit['id']] = i + 1
@@ -105,13 +105,12 @@ def reviewboard(repo, proto, args=None):
         node2=repo[nodes[-1][0]].node(), opts=diffopts))
 
     rburl = repo.ui.config('reviewboard', 'url', None).rstrip('/')
-    rbid = repo.ui.configint('reviewboard', 'repoid', None)
+    repoid = repo.ui.configint('reviewboard', 'repoid', None)
 
-    parentrid, commitmap = post_reviews(rburl, rbid, identifier, commits,
-                                        bzusername=bzusername,
-                                        bzpassword=bzpassword,
-                                        bzuserid=bzuserid,
-                                        bzcookie=bzcookie)
+    parentrid, commitmap = post_reviews(rburl, repoid, identifier, commits,
+                                        username=bzusername,
+                                        password=bzpassword,
+                                        cookie=bzcookie)
 
     lines = [
         '1',

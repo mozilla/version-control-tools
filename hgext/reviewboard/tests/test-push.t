@@ -167,7 +167,7 @@ A single diff is generated properly
   url: http://dummy
   username: user
   password: pass
-  rbid: 1
+  repoid: 1
   identifier: bz://789213
   0
   afef2b530106d00832a59244a852230bd88a70a7
@@ -213,7 +213,7 @@ Test that multiple changesets result in parent diffs
   url: http://dummy
   username: user
   password: pass
-  rbid: 1
+  repoid: 1
   identifier: bz://567
   0
   773ae5edc39985853a8f396765fd5b65e951cbc4
