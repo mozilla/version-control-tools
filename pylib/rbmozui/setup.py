@@ -1,23 +1,23 @@
-from reviewboard.extensions.packaging import setup
+#!/usr/bin/env python
+from setuptools import find_packages, setup
+
+from rbmozui import get_package_version
 
 
-PACKAGE = "rbmozui"
-VERSION = "0.1"
+PACKAGE_NAME = "rbmozui"
+
 
 setup(
-    name=PACKAGE,
-    version=VERSION,
+    name=PACKAGE_NAME,
+    version=get_package_version(),
+    license="MIT",
     description="UI tweaks to Review Board for Mozilla",
-    author="Mike Conley",
-    packages=["rbmozui"],
-    entry_points={
-        'reviewboard.extensions':
-            '%s = rbmozui.extension:RBMozUI' % PACKAGE,
-    },
-    package_data={
-        'rbmozui': [
-            'templates/rbmozui/*.txt',
-            'templates/rbmozui/*.html',
-        ],
-    }
+    packages=find_packages(),
+    install_requires=[
+        'ReviewBoard>=2.0.2',
+    ],
+    classifiers=[
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+    ],
 )
