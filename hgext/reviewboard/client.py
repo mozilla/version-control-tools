@@ -76,11 +76,6 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
     if not remote.capable('reviewboard'):
         return orig(repo, remote, force=force, revs=revs, newbranch=newbranch)
 
-    if revs and len(revs) > 1:
-        raise util.Abort(_('Cannot push to a Review Board repo with multiple '
-            '-r arguments. Specify a single revision - the tip revision - '
-            'that you would like reviewed.'))
-
     # We always do force push because we don't want users to need to
     # specify it. The big danger here is pushing multiple heads or
     # branches or mq patches. We check the former above and we don't

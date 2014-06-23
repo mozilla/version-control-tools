@@ -46,15 +46,9 @@ Server should complain if the extension is not configured
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
 
-Attempting to push multiple revs will abort immediately
+Attempt to push while not configured will result in a warning
   $ echo "bar" > foo
   $ hg commit -m 'second commit'
-  $ hg push -r 0 -r 1 http://localhost:$HGPORT
-  pushing to http://localhost:$HGPORT/
-  abort: Cannot push to a Review Board repo with multiple -r arguments. Specify a single revision - the tip revision - that you would like reviewed.
-  [255]
-
-Attempt to push while not configured will result in a warning
   $ hg push http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
