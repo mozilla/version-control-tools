@@ -58,10 +58,18 @@ testedwith = '3.0.1'
 
 def pushcommand(orig, ui, repo, *args, **kwargs):
     """Wraps commands.push to read the --reviewid argument."""
+
+    # There isn't a good way to send custom arguments to the push api. So, we
+    # inject some temporary values on the repo. This may fail in many
+    # scenarios, most of them related to server operation.
     repo.noreviewboardpush = kwargs['noreview']
     repo.reviewid = kwargs['reviewid']
 
-    return orig(ui, repo, *args, **kwargs)
+    try:
+        return orig(ui, repo, *args, **kwargs)
+    finally:
+        repo.noreviewboardpush = None
+        repo.reviewid = None
 
 def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
     """Wraps exchange.push to enforce restrictions for review pushes."""
