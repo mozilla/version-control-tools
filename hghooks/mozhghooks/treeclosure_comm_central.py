@@ -25,6 +25,10 @@ import json
 seamonkeyOwns = [
   'suite'
 ]
+# Array of which directories Instantbird exclusively controls in comm-central
+instantbirdOwns = [
+  'im'
+]
 # Everything else is assumed to be controlled by Thunderbird.
 
 magicwords = "CLOSED TREE"
@@ -107,6 +111,8 @@ def hook(ui, repo, node, **kwargs):
             for changedFile in ctx.files():
                 if isOwned(changedFile, seamonkeyOwns):
                     apps['seamonkey'] = True
+                elif isOwned(changedFile, instantbirdOwns):
+                    pass  # ignore Instantbird for tree closure reasons
                 else:
                     apps['thunderbird'] = True
 
