@@ -245,6 +245,7 @@ def doreview(repo, ui, remote, reviewnode):
     if version != 1:
         raise util.Abort(_('Do not know how to handle response.'))
 
+    rburl = None
     newreviews = {}
     newparentid = None
 
@@ -260,6 +261,8 @@ def doreview(repo, ui, remote, reviewnode):
         elif t == 'parentreview':
             newparentid = d
             reviews.addparentreview(identifier, newparentid)
+        elif t == 'rburl':
+            rburl = d
 
     reviews.write()
 

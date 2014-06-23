@@ -104,11 +104,10 @@ def reviewboard(repo, proto, args=None):
     commits['squashed']['diff'] = ''.join(patch.diff(repo, node1=base_parent_node,
         node2=repo[nodes[-1][0]].node(), opts=diffopts))
 
-    rburl = repo.ui.config('reviewboard', 'url', None)
+    rburl = repo.ui.config('reviewboard', 'url', None).rstrip('/')
     rbid = repo.ui.configint('reviewboard', 'repoid', None)
 
-    parentrid, commitmap = post_reviews(repo.ui.config('reviewboard', 'url'),
-                                        rbid, identifier, commits,
+    parentrid, commitmap = post_reviews(rburl, rbid, identifier, commits,
                                         bzusername=bzusername,
                                         bzpassword=bzpassword,
                                         bzuserid=bzuserid,
@@ -116,6 +115,7 @@ def reviewboard(repo, proto, args=None):
 
     lines = [
         '1',
+        'rburl %s' % rburl,
         'reviewid %s' % identifier,
         'parentreview %s' % parentrid,
     ]
