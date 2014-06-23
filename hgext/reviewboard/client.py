@@ -33,6 +33,7 @@ from mercurial import hg
 from mercurial import localrepo
 from mercurial import obsolete
 from mercurial import phases
+from mercurial import templatekw
 from mercurial import util
 from mercurial import wireproto
 from mercurial.i18n import _
@@ -245,7 +246,6 @@ def doreview(repo, ui, remote, reviewnode):
     if version != 1:
         raise util.Abort(_('Do not know how to handle response.'))
 
-    rburl = None
     newreviews = {}
     newparentid = None
 
@@ -262,7 +262,7 @@ def doreview(repo, ui, remote, reviewnode):
             newparentid = d
             reviews.addparentreview(identifier, newparentid)
         elif t == 'rburl':
-            rburl = d
+            reviews.baseurl = d
 
     reviews.write()
 
@@ -303,6 +303,8 @@ class reviewstore(object):
         # Maps identifiers to parent ids.
         self._parents = {}
 
+        self.baseurl = None
+
         try:
             for line in repo.vfs('reviews'):
                 line = line.strip()
@@ -325,6 +327,8 @@ class reviewstore(object):
                 elif t == 'p':
                     ident, rid = d.split(' ', 1)
                     self._parents[ident] = rid
+                elif t == 'u':
+                    self.baseurl = d
 
         except IOError as inst:
             if inst.errno != errno.ENOENT:
@@ -337,6 +341,9 @@ class reviewstore(object):
         wlock = repo.wlock()
         try:
             f = repo.vfs('reviews', 'w', atomictemp=True)
+
+            if self.baseurl:
+                f.write('u %s\n' % self.baseurl)
 
             for ident, rid in sorted(self._parents.iteritems()):
                 f.write('p %s %s\n' % (ident, rid))
@@ -386,6 +393,18 @@ class reviewstore(object):
 
         return None
 
+    def reviewurl(self, node):
+        """Obtain the URL associated with the review for a changectx."""
+
+        rid = self.findnodereview(node)
+        if not rid or not self.baseurl:
+            return None
+
+        return '%s/r/%s' % (self.baseurl, rid)
+
+def template_reviewurl(repo, ctx, **args):
+    """:reviewurl: String. The URL of the review for this changeset."""
+    return repo.reviews.reviewurl(ctx.node())
 
 def extsetup(ui):
     extensions.wrapfunction(exchange, 'push', wrappedpush)
@@ -398,6 +417,8 @@ def extsetup(ui):
     entry[1].append(('', 'noreview', False,
                      _('Do not perform a review on push.')))
     entry[1].append(('', 'reviewid', '', _('Review identifier')))
+
+    templatekw.keywords['reviewurl'] = template_reviewurl
 
 def reposetup(ui, repo):
     if not repo.local():

@@ -82,6 +82,12 @@ Pushing a single changeset will initiate a single review (no children)
   created review request: 1
   created changeset review: 2
 
+{reviewurl} template works
+
+  $ hg log -r 0::1 --template '{node|short} {reviewurl}\n'
+  3a9f6899ef84 
+  6f06b4ac6efe http://dummy/r/2
+
 Pushing no changesets will do a re-review
 
   $ hg push -r 1 --reviewid 345 http://localhost:$HGPORT
