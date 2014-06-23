@@ -319,7 +319,7 @@ Test pushing multiple heads is rejected
   $ hg commit -m 'head2'
   created new head
 
-  $ hg push ssh://user@dummy/$TESTTMP/server
+  $ hg push -r 0:tip ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
   abort: cannot push multiple heads to remote; limit pushed revisions using the -r argument.

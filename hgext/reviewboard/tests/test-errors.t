@@ -58,22 +58,15 @@ Attempt to push while not configured will result in a warning
   remote: added 1 changesets with 1 changes to 1 files
   Review Board extension not properly configured: missing authentication credentials. Please define "username" and "password" in the [reviewboard] section of your hgrc.
 
-Pushing again will result in unclear changeset since none were transferred
-  $ hg push http://localhost:$HGPORT
-  pushing to http://localhost:$HGPORT/
-  searching for changes
-  no changes found
-  Unable to determine what to review. Please invoke with -r to specify what to review.
-  [1]
-
 Configure authentication
   $ echo "username = user" >> .hg/hgrc
   $ echo "password = pass" >> .hg/hgrc
 
 Unknown review identifier
+
   $ hg push http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
-  Unable to determine what to review. Please invoke with -r to specify what to review.
+  Unable to determine review identifier. Review identifiers are extracted * (glob)
   [1]

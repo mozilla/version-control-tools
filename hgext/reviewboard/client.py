@@ -76,6 +76,15 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
     if not remote.capable('reviewboard'):
         return orig(repo, remote, force=force, revs=revs, newbranch=newbranch)
 
+    # If no arguments are specified to push, Mercurial will try to push all
+    # non-remote changesets by default. This can result in unexpected behavior,
+    # especially for people doing multi-headed development.
+    #
+    # Since we reject pushes with multiple heads anyway, default to pushing
+    # the working copy.
+    if not revs:
+        revs = [repo['.'].node()]
+
     # We always do force push because we don't want users to need to
     # specify it. The big danger here is pushing multiple heads or
     # branches or mq patches. We check the former above and we don't
