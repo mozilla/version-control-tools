@@ -59,10 +59,11 @@ Now create a new head and push a rebase
   review identifier: bz://123
   review url: http://dummy/r/1
   
-  changeset:  3:5003cd557db3
-  summary:    foo2
-  review:     http://dummy/r/2
-  
   changeset:  2:e7315a409763
   summary:    bar
   review:     http://dummy/r/3
+  
+  changeset:  3:5003cd557db3
+  summary:    foo2
+  review:     http://dummy/r/2
+

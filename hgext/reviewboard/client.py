@@ -222,13 +222,11 @@ def doreview(repo, ui, remote, reviewnode):
 
     reviews = repo.reviews
     oldparentid = reviews.findparentreview(identifier=identifier)
-    oldreviews = {}
     for node in nodes:
         rid = reviews.findnodereview(node)
         data = hex(node)
         if rid:
             data += ' %s' % rid
-            oldreviews[rid] = node
         lines.append('csetreview %s' % data)
 
     # TODO can we define a new named template with the API so people can
@@ -256,7 +254,7 @@ def doreview(repo, ui, remote, reviewnode):
     if version != 1:
         raise util.Abort(_('Do not know how to handle response.'))
 
-    newreviews = {}
+    nodereviews = {}
     newparentid = None
 
     for line in lines[1:]:
@@ -270,7 +268,7 @@ def doreview(repo, ui, remote, reviewnode):
         elif t == 'csetreview':
             node, rid = d.split(' ', 1)
             reviews.addnodereview(bin(node), rid, newparentid)
-            newreviews[rid] = bin(node)
+            nodereviews[bin(node)] = rid
         elif t == 'rburl':
             reviews.baseurl = d
 
@@ -278,7 +276,7 @@ def doreview(repo, ui, remote, reviewnode):
 
     ui.write(_('review url: %s\n') % reviews.parentreviewurl(identifier))
 
-    for rid, node in sorted(newreviews.iteritems()):
+    for node in nodes:
         ui.write('\n')
         ctx = repo[node]
         displayer.show(ctx)
