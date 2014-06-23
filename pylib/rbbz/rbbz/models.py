@@ -42,12 +42,14 @@ def bugzilla_to_publish_errors(func):
 
 @bugzilla_to_publish_errors
 def publish_review_request(user, review_request_draft, **kwargs):
-    # Don't publish anything for child requests.
-    # FIXME: There should be a better way to determine if this is a
-    # child review request of a pushed review request, since the following
-    # means that a review request created outside of the push framework
-    # normally won't be mirrored to Bugzilla.
-    if not review_request_draft.depends_on.count():
+    review_request = review_request_draft.get_review_request()
+
+    # skip review requests that were not pushed
+    if str(review_request.extra_data.get('p2rb', False)) == "False":
+        return
+
+    # skip child review requests
+    if str(review_request.extra_data.get('squashed', False)) == "False":
         return
 
     bugs = review_request_draft.get_bug_list()
@@ -69,29 +71,49 @@ def publish_review_request(user, review_request_draft, **kwargs):
                  review_request_draft.target_people.all()]
 
     b.post_rb_url(bug_id,
-                  review_request_draft.get_review_request().id,
+                  review_request.id,
                   review_request_draft.summary,
                   review_request_draft.description,
-                  review_request_url(review_request_draft.get_review_request()),
+                  review_request_url(review_request),
                   reviewers)
 
 
 def publish_review(user, review, **kwargs):
-    bug_id = int(review.review_request.get_bug_list()[0])
+    review_request = review.review_request
+
+    # skip review requests that were not pushed
+    if str(review_request.extra_data.get('p2rb', False)) == "False":
+        return
+
+    # skip child review requests
+    if str(review_request.extra_data.get('squashed', False)) == "False":
+        return
+
+    bug_id = int(review_request.get_bug_list()[0])
     site = Site.objects.get_current()
     siteconfig = SiteConfiguration.objects.get_current()
     b = Bugzilla(user.bzlogin, user.bzcookie)
 
     b.post_comment(bug_id, build_plaintext_review(review, {"user": user}))
 
-    if review.ship_it and not review.review_request.depends_on.count():
+    if review.ship_it and not review_request.depends_on.count():
         b.r_plus_attachment(bug_id, review.user.username,
-                            review_request_url(review.review_request, site,
+                            review_request_url(review_request, site,
                                                siteconfig))
 
 
 def publish_reply(user, reply, **kwargs):
-    bug_id = int(reply.review_request.get_bug_list()[0])
+    review_request = reply.review_request
+
+    # skip review requests that were not pushed
+    if str(review_request.extra_data.get('p2rb', False)) == "False":
+        return
+
+    # skip child review requests
+    if str(review_request.extra_data.get('squashed', False)) == "False":
+        return
+
+    bug_id = int(review_request.get_bug_list()[0])
     b = Bugzilla(user.bzlogin, user.bzcookie)
 
     b.post_comment(bug_id, build_plaintext_review(reply, {"user": user}))
