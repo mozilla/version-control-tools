@@ -52,20 +52,30 @@ def publish_review_request(user, review_request_draft, **kwargs):
     if str(review_request.extra_data.get('squashed', False)) == "False":
         return
 
-    bugs = review_request_draft.get_bug_list()
-
-    if len(bugs) == 0 or len(bugs) > 1:
-        raise InvalidBugsError
+    # The reviewid passed through p2rb is, for Mozilla's instance anyway, also
+    # the bug ID.
+    bug_id = review_request_draft.extra_data.get('p2rb.identifier', None)
 
     try:
-        bug_id = int(bugs[0])
+        bug_id = int(bug_id)
     except (TypeError, ValueError):
-        raise InvalidBugIdError(bugs[0])
+        raise InvalidBugIdError(bug_id)
 
     b = Bugzilla(user.bzlogin, user.bzcookie)
 
-    if b.is_bug_confidential(bug_id):
-        raise ConfidentialBugError
+    try:
+        if b.is_bug_confidential(bug_id):
+            raise ConfidentialBugError
+    except xmlrpclib.Fault as e:
+        # 100: Invalid Bug Alias
+        # 101: Bug does not exist
+        if e.faultCode == 100 or e.faultCode == 101:
+            raise InvalidBugIdError(bug_id)
+        raise
+
+    # At this point, we know that the bug ID that we've got
+    # is valid and accessible.
+    review_request_draft.bugs_closed = str(bug_id)
 
     reviewers = [x.get_username() for x in
                  review_request_draft.target_people.all()]
