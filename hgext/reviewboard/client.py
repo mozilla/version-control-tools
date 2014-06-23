@@ -48,11 +48,14 @@ try:
     import hgrb.shared
 except ImportError:
     sys.path.insert(0, os.path.join(PYLIB, 'mozautomation'))
+    sys.path.insert(0, os.path.join(PYLIB, 'mozhg'))
     sys.path.insert(0, OUR_DIR)
 
     from mozautomation.commitparser import parse_bugs
     import hgrb.shared
 demandimport.enable()
+
+from mozhg.auth import getbugzillaauth
 
 testedwith = '3.0.1'
 
@@ -144,12 +147,9 @@ def doreview(repo, ui, remote, reviewnode):
     """
     assert remote.capable('reviewboard')
 
-    username, password = repo.reviewboardauth()
-    if not username or not password:
-        ui.write(_('Review Board extension not properly configured: '
-            'missing authentication credentials. Please define '
-            '"username" and "password" in the [reviewboard] section of '
-            'your hgrc.\n'))
+    bzauth = getbugzillaauth(ui)
+    if not bzauth:
+        ui.warn(_('Bugzilla credentials not available. Not submitting review.\n'))
         return
 
     # Given a tip node, we need to find all changesets to review.
@@ -209,10 +209,12 @@ def doreview(repo, ui, remote, reviewnode):
 
     lines = [
         '1',
-        'bzusername %s' % urllib.quote(username),
-        'bzpassword %s' % urllib.quote(password),
         'reviewidentifier %s' % urllib.quote(identifier),
     ]
+
+    for p in ('username', 'password', 'userid', 'cookie'):
+        if getattr(bzauth, p, None):
+            lines.append('bz%s %s' % (p, urllib.quote(getattr(bzauth, p))))
 
     reviews = repo.reviews
     oldparentid = reviews.findparentreview(identifier=identifier)
@@ -405,16 +407,6 @@ def reposetup(ui, repo):
 
             self.noreviewboardpush = False
             self.reviewid = None
-
-        def reviewboardauth(self):
-            """Obtain the credentials to authenticate with ReviewBoard."""
-
-            # TODO attempt to grab these from Firefox profile automatically.
-            # See code in bzexport that does that.
-            username = ui.config('reviewboard', 'username', None)
-            password = ui.config('reviewboard', 'password', None)
-
-            return username, password
 
         @localrepo.repofilecache('reviews')
         def reviews(self):

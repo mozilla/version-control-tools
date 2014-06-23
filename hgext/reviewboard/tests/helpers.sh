@@ -22,7 +22,7 @@ clientconfig() {
 [ui]
 ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
 
-[reviewboard]
+[bugzilla]
 username = user
 password = pass
 

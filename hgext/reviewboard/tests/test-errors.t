@@ -47,6 +47,7 @@ Server should complain if the extension is not configured
   remote: added 1 changesets with 1 changes to 1 files
 
 Attempt to push while not configured will result in a warning
+
   $ echo "bar" > foo
   $ hg commit -m 'second commit'
   $ hg push http://localhost:$HGPORT
@@ -56,11 +57,17 @@ Attempt to push while not configured will result in a warning
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  Review Board extension not properly configured: missing authentication credentials. Please define "username" and "password" in the [reviewboard] section of your hgrc.
+  tip: to not prompt for Bugzilla credentials in the future, * (glob)
+  Bugzilla username None
+  Bugzilla credentials not available. Not submitting review.
 
 Configure authentication
-  $ echo "username = user" >> .hg/hgrc
-  $ echo "password = pass" >> .hg/hgrc
+
+  $ cat >> .hg/hgrc << EOF
+  > [bugzilla]
+  > username = user
+  > password = pass
+  > EOF
 
 Unknown review identifier
 
