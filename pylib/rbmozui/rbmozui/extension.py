@@ -46,6 +46,8 @@ class RBMozUI(Extension):
                      apply_to=diffviewer_url_names)
         TemplateHook(self, 'base-before-content', 'rbmozui/review-header.html',
                      apply_to=review_request_url_names)
+        TemplateHook(self, 'base-scripts-post', 'rbmozui/review-header-workaround.html',
+                     apply_to=review_request_url_names)
 
     def shutdown(self):
         # We have to put the TestingDone field back before we shut down

@@ -1,6 +1,6 @@
 {% load rbmozui %}
 
-<ul class="new-navbar">
+<ul id="new-navbar" style="display:none;">
   <li><a href="{{review_request.get_absolute_url}}"
     {% if request.resolver_match.url_name == 'review-request-detail' %}
     class="active"
