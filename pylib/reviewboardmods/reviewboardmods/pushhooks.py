@@ -76,92 +76,120 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
 
     squashed_rr.get_diffs().upload_diff(commits["squashed"]["diff"])
 
+    def update_review(rid, commit):
+        rr = api_root.get_review_request(review_request_id=rid)
+        draft = rr.get_or_create_draft(
+            commit_id=commit['id'],
+            summary=commit['message'].splitlines()[0],
+            description=commit['message'])
+        rr.get_diffs().upload_diff(commit['diff'],
+                                   parent_diff=commit['parent_diff'])
+
     previous_commits = get_previous_commits(squashed_rr)
+    remaining_nodes = {t[0]: t[1] for i, t in enumerate(previous_commits)}
+    unclaimed_rids = [t[1] for t in previous_commits]
+    processed_nodes = set()
+    node_to_rid = {}
 
-    # Create/update the individual commit review requests. Currently
-    # we will update them in push order, with no thought to history
-    # rewrites which reordered, squashed, or deleted commits.
-    #
-    # TODO: Handle rebasing using information provided to us. This
-    # most likely requires some sort of extra UI or calculations
-    # on the callers part, along with more intelligence when updating
-    # the review requests
-    reviewmap = {}
-    draft_rrs = []
-    commits_list = []
-    new_commits = []
-    individuals = commits['individual']
-    np = len(previous_commits)
-    ni = len(individuals)
-    i = 0
+    # Do a pass and find all commits that map cleanly to old reviews.
+    for commit in commits['individual']:
+        node = commit['id']
 
-    for i in range(max(np, ni)):
-        pcid, rid = previous_commits[i] if i < np else (None, None)
-        commit = individuals[i] if i < ni else None
-        rr = None
+        # If the commit appears in an old review, by definition of commits
+        # deriving from content, the commit has not changed and there
+        # is nothing to update.
+        # TODO handle the review ID of the commit changing. Can this happen?
+        if node in remaining_nodes:
+            rid = remaining_nodes[node]
+            del remaining_nodes[node]
+            unclaimed_rids.remove(rid)
+            processed_nodes.add(node)
+            node_to_rid[node] = rid
+            continue
 
-        if pcid is not None and commit is not None:
-            # We have a previous commit and a new commit to
-            # update it with.
-            rr = api_root.get_review_request(review_request_id=rid)
-            draft = rr.get_or_create_draft(**{
-                "commit_id": commit["id"],
-                "summary": commit['message'].rsplit("\n", 1)[0],
-                "description": commit['message'],
-            })
-            rr.get_diffs().upload_diff(commit["diff"],
-                                       parent_diff=commit["parent_diff"])
+        # We haven't seen this commit before.
 
-        elif pcid is not None and commit is None:
-            # We have a previous commit but no new commit. We need
-            # to discard this now-unused review request.
-            rr = api_root.get_review_request(review_request_id=rid)
-            rr.update(status="discarded")
-        else:
-            # There is no previous commit so we need to create one
-            # from scratch.
-            data = {
-                "extra_data.p2rb": "True",
-                "extra_data.p2rb.is_squashed": "False",
-                "extra_data.p2rb.identifier": identifier,
-                "commit_id": commit["id"],
-                "repository": repoid,
-            }
+        # The client may tell us what review it is associated with. If so,
+        # listen to the client, for they are always right.
+        if commit['rid']:
+            for n, rid in remaining_nodes.items():
+                if rid == commit['rid']:
+                    del remaining_nodes[n]
+                    unclaimed_rids.remove(rid)
+                    break
 
-            rr = rrs.create(data=data)
-            rr.get_diffs().upload_diff(commit["diff"],
-                                       parent_diff=commit["parent_diff"])
+            update_review(commit['rid'], commit)
+            processed_nodes.add(node)
+            node_to_rid[node] = commit['rid']
+            continue
 
-            draft = rr.get_or_create_draft(**{
-                "summary": commit['message'].rsplit("\n", 1)[0],
-                "description": commit['message']
-            })
+    # Now do a pass over the commits that didn't map cleanly.
+    for commit in commits['individual']:
+        node = commit['id']
+        if node in processed_nodes:
+            continue
 
+        # We haven't seen this commit before *and* the client doesn't know
+        # where it belongs.
 
-        if commit is not None:
-            reviewmap[commit['id']] = rr.id
-            commits_list.append((commit['id'], rr.id))
-            draft_rrs.append(draft)
+        # This is where things could get complicated. We could involve
+        # heuristic based matching (comparing commit messages, changes
+        # files, etc). We may do that in the future.
 
+        # For now, match the commit up against the next one in the index.
+        if unclaimed_rids:
+            assumed_old_rid = unclaimed_rids[0]
+            unclaimed_rids.pop(0)
+            update_review(assumed_old_rid, commit)
+            processed_nodes.add(commit['id'])
+            node_to_rid[node] = assumed_old_rid
+            continue
+
+        # There are no more unclaimed review IDs. This means we have more
+        # commits than before. Create new reviews as appropriate.
+        rr = rrs.create(data={
+            'extra_data.p2rb': 'True',
+            'extra_data.p2rb.is_squashed': 'False',
+            'extra_data.p2rb.identifier': identifier,
+            'commit_id': commit['id'],
+            'repository': repoid,
+        })
+        rr.get_diffs().upload_diff(commit['diff'],
+                                   parent_diff=commit['parent_diff'])
+        draft = rr.get_or_create_draft(
+            summary=commit['message'].splitlines()[0],
+            description=commit['message'])
+        processed_nodes.add(commit['id'])
+        node_to_rid[node] = rr.id
+
+    # At this point every incoming commit has been accounted for.
+    # If there are any remaining reviews, they must belong to deleted
+    # commits. (Or, we made a mistake and updated the wrong review.)
+    for rid in unclaimed_rids:
+        rr = api_root.get_review_request(review_request_id=rid)
+        rr.update(status='discared')
 
     squashed_description = []
-    for rr in draft_rrs:
-        squashed_description.append(
-            "/r/%s - %s" % (rr.id, rr.summary))
+    for commit in commits['individual']:
+        squashed_description.append('/r/%s - %s' % (
+            node_to_rid[commit['id']],
+            commit['message'].splitlines()[0]))
 
+    depends = ','.join(str(i) for i in sorted(node_to_rid.values()))
+    squashed_draft = squashed_rr.get_or_create_draft(
+        summary='Review for review ID: %s' % identifier,
+        description='%s\n' % '\n'.join(squashed_description),
+        depends_on=depends)
 
-    squashed_draft = squashed_rr.get_or_create_draft(**{
-        "summary": "Review for review ID: %s" % identifier,
-        "description": "%s\n" % ("\n".join(squashed_description)),
-        "depends_on": ",".join([str(rr.id) for rr in draft_rrs]),
-    })
+    commit_list = []
+    for commit in commits['individual']:
+        node = commit['id']
+        commit_list.append([node, node_to_rid[node]])
+
     squashed_rr.update(data={
-        "extra_data.p2rb.commits": json.dumps([
-            (draft.commit_id, draft.id) for draft in draft_rrs
-        ])})
+        'extra_data.p2rb.commits': json.dumps(commit_list)})
 
-    return squashed_rr.id, reviewmap
-
+    return squashed_rr.id, node_to_rid
 
 def get_previous_commits(squashed_rr):
     """Retrieve the previous commits from a squashed review request.
@@ -177,6 +205,5 @@ def get_previous_commits(squashed_rr):
     extra_data = squashed_rr.extra_data
     commits = (
         extra_data["p2rb.commits"] if "p2rb.commits" in extra_data else "[]")
-    print commits
     return json.loads(commits)
 

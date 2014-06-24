@@ -3,12 +3,15 @@ serverconfig() {
 [phases]
 publish = False
 
+[ui]
+ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
+
 [web]
 push_ssl = False
 allow_push = *
 
 [reviewboard]
-url = http://dummy
+url = http://localhost:$2
 repoid = 1
 
 [extensions]
@@ -23,8 +26,8 @@ clientconfig() {
 ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
 
 [bugzilla]
-username = user
-password = pass
+username = testadmin
+password = password
 
 [extensions]
 reviewboard = $TESTDIR/hgext/reviewboard/client.py
@@ -32,8 +35,6 @@ reviewboard = $TESTDIR/hgext/reviewboard/client.py
 EOF
 }
 
-removeserverstate() {
-  rm $1/.hg/DUMMY_REVIEWS
-  rm $1/.hg/post_reviews
-
+rbmanage() {
+  python $TESTDIR/hgext/reviewboard/tests/rbmanage.py $1 $2 $3 $4 $5
 }

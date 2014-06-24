@@ -1,8 +1,14 @@
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ hg init client
   $ hg init server
-  $ serverconfig server/.hg/hgrc
+  $ rbmanage rbserver create
+  $ rbmanage rbserver repo test-repo http://localhost:$HGPORT2/
+  $ rbmanage rbserver start $HGPORT
+  $ cat rbserver/server.pid >> $DAEMON_PIDS
+  $ serverconfig server/.hg/hgrc $HGPORT
   $ clientconfig client/.hg/hgrc
+  $ hg serve -R server -d -p $HGPORT2 --pid-file hg.pid
+  $ cat hg.pid >> $DAEMON_PIDS
 
   $ cat > obs.py << EOF
   > import mercurial.obsolete
@@ -11,7 +17,6 @@
 
   $ echo "rebase=" >> client/.hg/hgrc
   $ echo "obs=$TESTTMP/obs.py" >> client/.hg/hgrc
-  $ echo "server_monkeypatch = ${TESTDIR}/hgext/reviewboard/tests/dummy_rbpost.py" >> server/.hg/hgrc
 
 Set up the repo
 
@@ -33,10 +38,10 @@ Set up the repo
   
   changeset:  1:c3480b3f6944
   summary:    foo2
-  review:     http://dummy/r/2
+  review:     http://localhost:$HGPORT/r/2
   
   review id:  bz://123
-  review url: http://dummy/r/1
+  review url: http://localhost:$HGPORT/r/1
 
 Now create a new head and push a rebase
 
@@ -60,11 +65,11 @@ Now create a new head and push a rebase
   
   changeset:  2:e7315a409763
   summary:    bar
-  review:     http://dummy/r/3
+  review:     http://localhost:$HGPORT/r/3
   
   changeset:  3:5003cd557db3
   summary:    foo2
-  review:     http://dummy/r/2
+  review:     http://localhost:$HGPORT/r/2
   
   review id:  bz://123
-  review url: http://dummy/r/1
+  review url: http://localhost:$HGPORT/r/1

@@ -1,0 +1,25 @@
+--find-links http://downloads.reviewboard.org/releases/Djblets/0.8/
+--find-links http://downloads.reviewboard.org/releases/django-evolution/0.7/
+git+git://github.com/mozilla/rbbz.git@master#egg=rbbz
+Django==1.6.5
+Markdown==2.4.1
+Pillow==2.4.0
+Pygments==1.6
+RBTools==0.6.1
+Whoosh==2.6.0
+django-evolution==0.7.2
+django-haystack==2.1.0
+django-pipeline==1.3.24
+docutils==0.11
+ecdsa==0.11
+feedparser==5.1.3
+futures==2.1.6
+mercurial==3.0.1
+mimeparse==0.1.3
+paramiko==1.14.0
+pillowfight==0.2
+pycrypto==2.6.1
+python-dateutil==1.5
+python-memcached==1.53
+pytz==2014.4
+recaptcha-client==1.0.6

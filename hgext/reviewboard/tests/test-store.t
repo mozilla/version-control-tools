@@ -1,18 +1,15 @@
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ hg init client
   $ hg init server
+  $ rbmanage rbserver create
+  $ rbmanage rbserver repo test-repo http://localhost:$HGPORT1
+  $ rbmanage rbserver start $HGPORT
+  $ cat rbserver/server.pid >> $DAEMON_PIDS
+  $ hg serve -R server -d -p $HGPORT1 --pid-file hg.pid
+  $ cat hg.pid >> $DAEMON_PIDS
 
-  $ serverconfig server/.hg/hgrc
-  $ cat >> server/.hg/hgrc << EOF
-  > server_monkeypatch = $TESTDIR/hgext/reviewboard/tests/dummy_rbpost.py
-  > EOF
-
+  $ serverconfig server/.hg/hgrc $HGPORT
   $ clientconfig client/.hg/hgrc
-
-  $ cat >> client/.hg/hgrc << EOF
-  > [paths]
-  > default-push = ssh://user@dummy/$TESTTMP/server
-  > EOF
 
 Pushing a review will create the reviews file
 
@@ -24,7 +21,7 @@ Pushing a review will create the reviews file
 
   $ echo "foo" >> foo
   $ hg commit -m 'Bug 456 - second commit'
-  $ hg push
+  $ hg push ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
   remote: adding changesets
@@ -35,13 +32,13 @@ Pushing a review will create the reviews file
   
   changeset:  1:7f387c765e68
   summary:    Bug 456 - second commit
-  review:     http://dummy/r/2
+  review:     http://localhost:$HGPORT/r/2
   
   review id:  bz://456
-  review url: http://dummy/r/1
+  review url: http://localhost:$HGPORT/r/1
 
   $ cat .hg/reviews
-  u http://dummy
+  u http://localhost:$HGPORT
   p bz://456 1
   c 7f387c765e685da95d7a4ffab2ccf06548c06fcf 2
   pc 7f387c765e685da95d7a4ffab2ccf06548c06fcf 1

@@ -44,3 +44,17 @@ If you are looking to turn Mercurial into a more powerful query tool or
 want to maintain a unified repository, *mozext* is very valuable.
 
 This extension lives under ``hgext/mozext``.
+
+Testing
+=======
+
+Testing requires a Python virtualenv because some extensions launch
+actual servers instead of mocking. To create the virtualenv::
+
+  $ virtualenv env
+  $ source env/bin/activate
+  $ pip install -r test-requirements.txt
+  $ easy_install ReviewBoard==2.0.2
+
+(Yes, we need to use ``easy_install`` because ReviewBoard doesn't play
+nice with pip.)

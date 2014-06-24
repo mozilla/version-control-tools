@@ -38,6 +38,13 @@ def find_test_files():
 
 
 if __name__ == '__main__':
+    if not hasattr(sys, 'real_prefix'):
+        raise Exception('You are not running inside the virtualenv. Please '
+                'create one and `pip install -r test-requirements.txt`')
+
+    hg = os.path.join(os.path.dirname(sys.executable), 'hg')
+    sys.argv.extend(['--with-hg', hg])
+
     runner = runtestsmod.TestRunner()
     sys.argv.extend(find_test_files())
     sys.exit(runner.run(sys.argv[1:]))

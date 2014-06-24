@@ -1,3 +1,4 @@
+  $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ hg init client
   $ hg init server
 
@@ -9,7 +10,7 @@
   > EOF
   $ echo "reviewboard=$(echo $TESTDIR)/hgext/reviewboard/server.py" >> server/.hg/hgrc
 
-Server should complain if the extension is not configured
+Sserver should complain if the extension is not configured
 
   $ hg -R server identify
   abort: Please set reviewboard.url to the URL of the Review Board instance to talk to.

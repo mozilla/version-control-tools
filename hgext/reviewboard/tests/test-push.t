@@ -1,7 +1,11 @@
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ hg init client
   $ hg init server
-  $ serverconfig server/.hg/hgrc
+  $ rbmanage rbserver create
+  $ rbmanage rbserver repo test-repo http://localhost:$HGPORT/
+  $ rbmanage rbserver start $HGPORT1
+  $ cat rbserver/server.pid >> $DAEMON_PIDS
+  $ serverconfig server/.hg/hgrc $HGPORT1
   $ clientconfig client/.hg/hgrc
 
   $ cat > obs.py << EOF
@@ -9,7 +13,6 @@
   > mercurial.obsolete._enabled = True
   > EOF
 
-  $ echo "server_monkeypatch = ${TESTDIR}/hgext/reviewboard/tests/dummy_rbpost.py" >> server/.hg/hgrc
   $ cat >> client/.hg/hgrc << EOF
   > mq=
   > rebase=
@@ -39,7 +42,6 @@ Set up the repo
   created new head
   $ hg up -r 0
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  (leaving bookmark bookmark-1)
   $ hg bookmark bookmark-2
   $ echo 'bookmark-2a' > foo
   $ hg commit -m 'bookmark with 2 commits, 1st'
@@ -48,7 +50,6 @@ Set up the repo
   $ hg commit -m 'bookmark with 2 commits, 2nd'
   $ hg up -r 0
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  (leaving bookmark bookmark-2)
   $ hg branch test-branch
   marked working directory as branch test-branch
   (branches are permanent and global, did you want a bookmark?)
@@ -81,16 +82,16 @@ Pushing a single changeset will initiate a single review (no children)
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://dummy/r/2
+  review:     http://localhost:$HGPORT1/r/2
   
   review id:  bz://345
-  review url: http://dummy/r/1
+  review url: http://localhost:$HGPORT1/r/1
 
 {reviewurl} template works
 
   $ hg log -r 0::1 --template '{node|short} {reviewurl}\n'
   3a9f6899ef84 
-  6f06b4ac6efe http://dummy/r/2
+  6f06b4ac6efe http://localhost:$HGPORT1/r/2
 
 Pushing no changesets will do a re-review
 
@@ -102,12 +103,11 @@ Pushing no changesets will do a re-review
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://dummy/r/2
+  review:     http://localhost:$HGPORT1/r/2
   
   review id:  bz://345
-  review url: http://dummy/r/1
+  review url: http://localhost:$HGPORT1/r/1
   [1]
-  $ removeserverstate ../server
 
 Pushing patches from mq will result in a warning
 
@@ -125,10 +125,10 @@ Pushing patches from mq will result in a warning
   
   changeset:  7:7458cff9569f
   summary:    mq patch
-  review:     http://dummy/r/2
+  review:     http://localhost:$HGPORT1/r/4
   
   review id:  bz://784841
-  review url: http://dummy/r/1
+  review url: http://localhost:$HGPORT1/r/3
 
   $ hg qpop
   popping patch1
@@ -144,13 +144,11 @@ Custom identifier will create a new review from same changesets.
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://dummy/r/2
+  review:     http://localhost:$HGPORT1/r/2
   
   review id:  bz://3452
-  review url: http://dummy/r/3
+  review url: http://localhost:$HGPORT1/r/5
   [1]
-
-  $ removeserverstate ../server
 
 SSH works
 
@@ -165,17 +163,15 @@ SSH works
   
   changeset:  2:a21bef69f0d4
   summary:    Bug 123 - Test identifier
-  review:     http://dummy/r/2
+  review:     http://localhost:$HGPORT1/r/7
   
   review id:  bz://123
-  review url: http://dummy/r/1
-  $ removeserverstate ../server
+  review url: http://localhost:$HGPORT1/r/6
 
 A single diff is generated properly
 
   $ hg up bookmark-1
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  (activating bookmark bookmark-1)
   $ hg push --reviewid bz://789213 ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
@@ -187,44 +183,15 @@ A single diff is generated properly
   
   changeset:  3:afef2b530106
   summary:    bookmark with single commit
-  review:     http://dummy/r/2
+  review:     http://localhost:$HGPORT1/r/9
   
   review id:  bz://789213
-  review url: http://dummy/r/1
-
-  $ cat ../server/.hg/post_reviews
-  url: http://dummy
-  username: user
-  password: pass
-  repoid: 1
-  identifier: bz://789213
-  0
-  afef2b530106d00832a59244a852230bd88a70a7
-  bookmark with single commit
-  diff -r 3a9f6899ef84 -r afef2b530106 foo
-  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
-  @@ -1,1 +1,1 @@
-  -foo
-  +bookmark-1
-  
-  NO PARENT DIFF
-  SQUASHED
-  diff -r 3a9f6899ef84 -r afef2b530106 foo
-  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
-  @@ -1,1 +1,1 @@
-  -foo
-  +bookmark-1
-  
-
-  $ removeserverstate ../server
+  review url: http://localhost:$HGPORT1/r/8
 
 Test that multiple changesets result in parent diffs
 
   $ hg up bookmark-2
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  (activating bookmark bookmark-2)
   $ hg push -B bookmark-2 --reviewid 567 ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
@@ -236,58 +203,15 @@ Test that multiple changesets result in parent diffs
   
   changeset:  4:773ae5edc399
   summary:    bookmark with 2 commits, 1st
-  review:     http://dummy/r/2
+  review:     http://localhost:$HGPORT1/r/11
   
   changeset:  5:659bcc59ed36
   summary:    bookmark with 2 commits, 2nd
-  review:     http://dummy/r/3
+  review:     http://localhost:$HGPORT1/r/12
   
   review id:  bz://567
-  review url: http://dummy/r/1
+  review url: http://localhost:$HGPORT1/r/10
   exporting bookmark bookmark-2
-
-  $ cat ../server/.hg/post_reviews
-  url: http://dummy
-  username: user
-  password: pass
-  repoid: 1
-  identifier: bz://567
-  0
-  773ae5edc39985853a8f396765fd5b65e951cbc4
-  bookmark with 2 commits, 1st
-  diff -r 3a9f6899ef84 -r 773ae5edc399 foo
-  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
-  @@ -1,1 +1,1 @@
-  -foo
-  +bookmark-2a
-  
-  NO PARENT DIFF
-  1
-  659bcc59ed36f1a82f17545c97d0322b16422d5b
-  bookmark with 2 commits, 2nd
-  diff -r 773ae5edc399 -r 659bcc59ed36 foo
-  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
-  @@ -1,1 +1,1 @@
-  -bookmark-2a
-  +bookmark-2b
-  
-  diff -r 3a9f6899ef84 -r 773ae5edc399 foo
-  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
-  @@ -1,1 +1,1 @@
-  -foo
-  +bookmark-2a
-  
-  SQUASHED
-  diff -r 3a9f6899ef84 -r 659bcc59ed36 foo
-  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
-  @@ -1,1 +1,1 @@
-  -foo
-  +bookmark-2b
-  
 
 Specifying multiple -r for the same head works
 
@@ -299,8 +223,8 @@ Specifying multiple -r for the same head works
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://dummy/r/2
+  review:     http://localhost:$HGPORT1/r/2
   
   review id:  bz://50000
-  review url: http://dummy/r/4
+  review url: http://localhost:$HGPORT1/r/13
   [1]
