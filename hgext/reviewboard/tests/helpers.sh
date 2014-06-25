@@ -29,6 +29,9 @@ ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
 username = testadmin
 password = password
 
+[paths]
+default-push = ssh://user@dummy/$TESTTMP/server
+
 [extensions]
 reviewboard = $TESTDIR/hgext/reviewboard/client.py
 
@@ -37,4 +40,16 @@ EOF
 
 rbmanage() {
   python $TESTDIR/hgext/reviewboard/tests/rbmanage.py $1 $2 $3 $4 $5
+}
+
+commonenv() {
+  hg init client
+  hg init server
+  rbmanage rbserver create
+  rbmanage rbserver repo test-repo http://localhost:$HGPORT/
+  rbmanage rbserver start $HGPORT1
+  serverconfig server/.hg/hgrc $HGPORT1
+  clientconfig client/.hg/hgrc
+  hg serve -R server -d -p $HGPORT --pid-file hg.pid
+  cat hg.pid >> $DAEMON_PIDS
 }

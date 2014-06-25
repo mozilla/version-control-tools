@@ -158,5 +158,52 @@ def main(args):
 
         sys.exit(0)
 
+    elif action == 'dumpreview':
+        port, rid = args[2:]
+
+        from rbtools.api.client import RBClient
+        c = RBClient('http://localhost:%s/' % port, username='testadmin',
+                password='password')
+        root = c.get_root()
+
+        r = root.get_review_request(review_request_id=rid)
+
+        # TODO Figure out depends_on dumping.
+        print('Review: %s' % r.id)
+        print('  Status: %s' % r.status)
+        if r.bugs_closed:
+            print('  Bugs: %s' % ' '.join(r.bugs_closed))
+        print('  Commit ID: %s' % r.commit_id)
+        if r.summary:
+            print('  Summary: %s' % r.summary)
+        if r.description:
+            print('  Description:\n    %s' % r.description.replace('\n', '\n    '))
+        print('  Extra:')
+        for k, v in sorted(r.extra_data.iteritems()):
+            print ('    %s: %s' % (k, v))
+
+
+        d = r.get_or_create_draft()
+        print('Draft: %s' % d.id)
+        if d.bugs_closed:
+            print('  Bugs: %s' % ' '.join(d.bugs_closed))
+        print('  Commit ID: %s' % d.commit_id)
+        if d.summary:
+            print('  Summary: %s' % d.summary)
+        if d.description:
+            print('  Description:\n    %s' % d.description.replace('\n', '\n    '))
+        print('  Extra:')
+        for k, v in sorted(d.extra_data.iteritems()):
+            print('    %s: %s' % (k, v))
+
+        dds = d.get_draft_diffs()
+        for diff in dds:
+            print('Diff: %s' % diff.id)
+            print('  Revision: %s' % diff.revision)
+            if diff.base_commit_id:
+                print('  Base Commit: %s' % diff.base_commit_id)
+            patch = diff.get_patch()
+            print(patch.data)
+
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

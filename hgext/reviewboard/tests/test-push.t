@@ -167,51 +167,6 @@ SSH works
   review id:  bz://123
   review url: http://localhost:$HGPORT1/r/6
 
-A single diff is generated properly
-
-  $ hg up bookmark-1
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  $ hg push --reviewid bz://789213 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  submitting 1 changesets for review
-  
-  changeset:  3:afef2b530106
-  summary:    bookmark with single commit
-  review:     http://localhost:$HGPORT1/r/9
-  
-  review id:  bz://789213
-  review url: http://localhost:$HGPORT1/r/8
-
-Test that multiple changesets result in parent diffs
-
-  $ hg up bookmark-2
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  $ hg push -B bookmark-2 --reviewid 567 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 2 changesets with 2 changes to 1 files (+1 heads)
-  submitting 2 changesets for review
-  
-  changeset:  4:773ae5edc399
-  summary:    bookmark with 2 commits, 1st
-  review:     http://localhost:$HGPORT1/r/11
-  
-  changeset:  5:659bcc59ed36
-  summary:    bookmark with 2 commits, 2nd
-  review:     http://localhost:$HGPORT1/r/12
-  
-  review id:  bz://567
-  review url: http://localhost:$HGPORT1/r/10
-  exporting bookmark bookmark-2
-
 Specifying multiple -r for the same head works
 
   $ hg push -r 0 -r 1 --reviewid 50000 ssh://user@dummy/$TESTTMP/server
@@ -225,5 +180,5 @@ Specifying multiple -r for the same head works
   review:     http://localhost:$HGPORT1/r/2
   
   review id:  bz://50000
-  review url: http://localhost:$HGPORT1/r/13
+  review url: http://localhost:$HGPORT1/r/8
   [1]
