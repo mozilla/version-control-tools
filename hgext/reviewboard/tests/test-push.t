@@ -4,7 +4,6 @@
   $ rbmanage rbserver create
   $ rbmanage rbserver repo test-repo http://localhost:$HGPORT/
   $ rbmanage rbserver start $HGPORT1
-  $ cat rbserver/server.pid >> $DAEMON_PIDS
   $ serverconfig server/.hg/hgrc $HGPORT1
   $ clientconfig client/.hg/hgrc
 

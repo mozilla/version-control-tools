@@ -4,7 +4,6 @@
   $ rbmanage rbserver create
   $ rbmanage rbserver repo test-repo http://localhost:$HGPORT1
   $ rbmanage rbserver start $HGPORT
-  $ cat rbserver/server.pid >> $DAEMON_PIDS
   $ hg serve -R server -d -p $HGPORT1 --pid-file hg.pid
   $ cat hg.pid >> $DAEMON_PIDS
 

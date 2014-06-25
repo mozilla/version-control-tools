@@ -6,6 +6,7 @@ import os
 import subprocess
 import sys
 import time
+import urllib
 
 SETTINGS_LOCAL = """
 from __future__ import unicode_literals
@@ -107,17 +108,28 @@ def main(args):
 
         env['HOME'] = path
         f = open(os.devnull, 'w')
-        proc = subprocess.Popen(manage + ['runserver', port],
+        # --noreload prevents process for forking. If we don't do this,
+        # our written pid is not correct.
+        proc = subprocess.Popen(manage + ['runserver', '--noreload', port],
             cwd=path, env=env, stderr=f, stdout=f)
 
-        with open(os.path.join(path, 'server.pid'), 'wb') as fh:
+        with open(env['DAEMON_PIDS'], 'ab') as fh:
             fh.write('%d\n' % proc.pid)
 
         # There is a race condition between us exiting and the tests
-        # querying the server before it is ready.
-        # TODO poll instead.
-        time.sleep(5)
+        # querying the server before it is ready. So, we wait on the
+        # server before proceeding.
+        while True:
+            try:
+                urllib.urlopen('http://localhost:%s/' % port)
+                break
+            except IOError:
+                time.sleep(0.1)
 
+        # We need to go through the double fork and session leader foo
+        # to get this process to detach from the shell the process runs
+        # under otherwise this process will keep it alive and the Mercurial
+        # test runner will think the test is still running. Oy.
         pid = os.fork()
         if pid > 0:
             sys.exit(0)
