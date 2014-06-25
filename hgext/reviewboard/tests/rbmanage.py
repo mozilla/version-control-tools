@@ -57,6 +57,13 @@ def main(args):
         os.mkdir(path)
     os.chdir(path)
 
+    # Some Django operations put things in TMP. This messages with
+    # concurrent test execution.
+    tmpdir = os.path.join(path, 'tmp')
+    if not os.path.exists(tmpdir):
+        os.mkdir(tmpdir)
+    env['TMPDIR'] = tmpdir
+
     if action == 'create':
         with open(os.path.join(path, 'settings_local.py'), 'wb') as fh:
             fh.write(SETTINGS_LOCAL)
