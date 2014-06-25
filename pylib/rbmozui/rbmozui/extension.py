@@ -3,10 +3,10 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.conf.urls import patterns, include
+from django.conf.urls import include, patterns, url
 
 from reviewboard.extensions.base import Extension
-from reviewboard.extensions.hooks import TemplateHook
+from reviewboard.extensions.hooks import (TemplateHook, URLHook)
 from reviewboard.reviews.builtin_fields import TestingDoneField
 from reviewboard.reviews.fields import (get_review_request_field,
                                         get_review_request_fieldset)
@@ -48,6 +48,10 @@ class RBMozUI(Extension):
                      apply_to=review_request_url_names)
         TemplateHook(self, 'base-scripts-post', 'rbmozui/review-header-workaround.html',
                      apply_to=review_request_url_names)
+
+        urlpatterns = patterns('',
+            url(r'^rbmozui/', include('rbmozui.urls')))
+        URLHook(self, urlpatterns)
 
     def shutdown(self):
         # We have to put the TestingDone field back before we shut down
