@@ -15,6 +15,7 @@ hgNameToRevURL = {
     'mozilla-beta':    'releases/mozilla-beta/',
     'mozilla-release': 'releases/mozilla-release/',
     'mozilla-esr24':   'releases/mozilla-esr24/',
+    'mozilla-esr31':   'releases/mozilla-esr31/',
     # Gecko B2G branches
     'mozilla-b2g30_v1_4':      'releases/mozilla-b2g30_v1_4/',
     'mozilla-b2g28_v1_3':      'releases/mozilla-b2g28_v1_3/',
@@ -29,6 +30,7 @@ hgNameToRevURL = {
     'comm-beta':    'releases/comm-beta/',
     'comm-release': 'releases/comm-release/',
     'comm-esr24':   'releases/comm-esr24/',
+    'comm-esr31':   'releases/comm-esr31/',
     # Try repos
     'try':              'try/',
     'try-comm-central': 'try-comm-central/',
