@@ -167,7 +167,7 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
     # commits. (Or, we made a mistake and updated the wrong review.)
     for rid in unclaimed_rids:
         rr = api_root.get_review_request(review_request_id=rid)
-        rr.update(status='discared')
+        rr.update(status='discarded')
 
     squashed_description = []
     for commit in commits['individual']:

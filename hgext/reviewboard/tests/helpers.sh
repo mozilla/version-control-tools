@@ -33,6 +33,8 @@ password = password
 default-push = ssh://user@dummy/$TESTTMP/server
 
 [extensions]
+strip =
+rebase =
 reviewboard = $TESTDIR/hgext/reviewboard/client.py
 
 EOF
