@@ -1,6 +1,5 @@
 {% extends "reviews/reviewable_base.html" %}
-{% load compressed i18n djblets_deco djblets_js rb_extensions reviewtags staticfiles tz %}
-
+{% load djblets_extensions rb_extensions i18n %}
 {% block title %}{{review_request.summary}} | {% trans "Review Request" %}{% endblock %}
 
 {% block content %}
@@ -8,7 +7,10 @@
 
 </div>
 {% endblock content %}
-{% compressed_js 'commits' %}
+
+{% block scripts-post %}
+{% template_hook_point "rbmozui-commits-scripts" %}
 <script>
   alert('{{review_request.id}}');
 </script>
+{% endblock scripts-post %}

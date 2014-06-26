@@ -53,7 +53,8 @@ class RBMozUI(Extension):
                      apply_to=review_request_url_names)
         TemplateHook(self, 'base-scripts-post', 'rbmozui/review-header-workaround.html',
                      apply_to=review_request_url_names)
-
+        TemplateHook(self, 'rbmozui-commits-scripts', 'rbmozui/commits-scripts-js.html',
+                     apply_to="rbmozui-commits")
         urlpatterns = patterns('',
             url(r'^rbmozui/', include('rbmozui.urls')))
         URLHook(self, urlpatterns)
