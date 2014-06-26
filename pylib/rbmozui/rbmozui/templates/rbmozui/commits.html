@@ -11,6 +11,6 @@
 {% block scripts-post %}
 {% template_hook_point "rbmozui-commits-scripts" %}
 <script>
-  alert('{{review_request.id}}');
+  new RBMozUI.CommitsView({id: {{review_request.id}}});
 </script>
 {% endblock scripts-post %}
