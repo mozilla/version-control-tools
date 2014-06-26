@@ -12,6 +12,19 @@ var RBMozUI = RBMozUI || {};
 
   var Commits = new RBMozUI.CommitsList();
 
+  RBMozUI.CommitView = Backbone.View.extend({
+    tagName: 'li',
+    render: function() {
+      if (!this.template) {
+        this.template = _.template($('#commit-template').html());
+      }
+      this.$el.html(this.template({
+        summary: this.model.get('summary')
+      }));
+      return this;
+    }
+  });
+
   RBMozUI.CommitsView = Backbone.View.extend({
     initialize: function() {
 
@@ -45,7 +58,8 @@ var RBMozUI = RBMozUI || {};
     addOne: function(aCommit) {
       aCommit.ready({
         ready: function() {
-          console.log(aCommit);
+          var view = new RBMozUI.CommitView({model: aCommit});
+          this.$("#commit-list").append(view.render().el);
         }
       })
     }

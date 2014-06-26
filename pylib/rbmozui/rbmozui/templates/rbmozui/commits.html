@@ -4,12 +4,18 @@
 
 {% block content %}
 <div id="commits">
-
+  <ul id="commit-list"></ul>
 </div>
 {% endblock content %}
 
 {% block scripts-post %}
 {% template_hook_point "rbmozui-commits-scripts" %}
+<script type="text/template" id="commit-template">
+  <div class="view">
+    <label><%- summary %></label>
+  </div>
+</script>
+
 <script>
   new RBMozUI.CommitsView({id: {{review_request.id}}});
 </script>
