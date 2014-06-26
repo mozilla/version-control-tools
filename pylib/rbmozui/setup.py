@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from setuptools import find_packages, setup
+from reviewboard.extensions.packaging import setup
+from setuptools import find_packages
 
 from rbmozui import get_package_version
 
