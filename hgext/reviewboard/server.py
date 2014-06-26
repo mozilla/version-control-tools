@@ -49,6 +49,16 @@ def capabilities(orig, repo, proto):
 
     return caps
 
+def changegrouphook(ui, repo, source, url, **kwargs):
+    # We send output to *every* client that the reviewboard client
+    # extension is required. The reviewboard client extension will
+    # filter this output.
+    repo.ui.write(
+        _('REVIEWBOARD: You need to have the reviewboard client extension '
+          'installed in order to perform code reviews.\n'))
+    repo.ui.write(
+        _('REVIEWBOARD: See https://hg.mozilla.org/hgcustom/version-control-tools/file/tip/hgext/reviewboard/README.rst\n'))
+
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
 
@@ -63,3 +73,6 @@ def reposetup(ui, repo):
     if not ui.configint('reviewboard', 'repoid', None):
         raise util.Abort(_('Please set reviewboard.repoid to the numeric ID '
             'of the repository this repo is associated with.'))
+
+    ui.setconfig('hooks', 'changegroup.reviewboard', changegrouphook)
+

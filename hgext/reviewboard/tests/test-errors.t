@@ -10,7 +10,7 @@
   > EOF
   $ echo "reviewboard=$(echo $TESTDIR)/hgext/reviewboard/server.py" >> server/.hg/hgrc
 
-Sserver should complain if the extension is not configured
+Server should complain if the extension is not configured
 
   $ hg -R server identify
   abort: Please set reviewboard.url to the URL of the Review Board instance to talk to.
@@ -29,27 +29,31 @@ Sserver should complain if the extension is not configured
   $ hg serve -R server -d -p $HGPORT --pid-file hg.pid
   $ cat hg.pid >> $DAEMON_PIDS
 
-  $ cat >> client/.hg/hgrc <<EOF
-  > [extensions]
-  > EOF
-  $ echo "reviewboard=$(echo $TESTDIR)/hgext/reviewboard/client.py" >> client/.hg/hgrc
-  $ echo "[reviewboard]" >> client/.hg/hgrc
+Pushing when we don't have the client extension installed results in warning.
 
   $ cd client
-  $ echo "foo" > foo
+  $ echo 'foo' > foo
   $ hg commit -A -m 'first commit'
   adding foo
-  $ hg push --noreview http://localhost:$HGPORT
+  $ hg push http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
+  remote: REVIEWBOARD: You need to have the reviewboard client extension installed in order to perform code reviews.
+  remote: REVIEWBOARD: See https://hg.mozilla.org/hgcustom/version-control-tools/file/tip/hgext/reviewboard/README.rst
 
-Attempt to push while not configured will result in a warning
+  $ cat >> .hg/hgrc <<EOF
+  > [extensions]
+  > EOF
+  $ echo "reviewboard=$(echo $TESTDIR)/hgext/reviewboard/client.py" >> .hg/hgrc
+  $ echo "[reviewboard]" >> .hg/hgrc
 
-  $ echo "bar" > foo
+Attempt to push with Bugzilla not configured will result in a warning
+
+  $ echo 'bar' > foo
   $ hg commit -m 'second commit'
   $ hg push http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/

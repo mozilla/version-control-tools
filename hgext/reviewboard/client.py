@@ -108,11 +108,27 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
     if not revs:
         revs = [repo['.'].node()]
 
-    # We always do force push because we don't want users to need to
-    # specify it. The big danger here is pushing multiple heads or
-    # branches or mq patches. We check the former above and we don't
-    # want to limit user choice on the latter two.
-    return orig(repo, remote, force=True, revs=revs, newbranch=newbranch)
+    # We filter the "extension isn't installed" message from the server.
+    # This is a bit hacky, but it's easier than sending a signal over the
+    # wire protocol (at least until bundle2).
+    oldcls = remote.ui.__class__
+    class filteringwrite(remote.ui.__class__):
+        def write(self, *args, **kwargs):
+            if args[0] == _('remote: ') and len(args) >= 2 and \
+                args[1].startswith('REVIEWBOARD: '):
+                return
+
+            return oldcls.write(self, *args, **kwargs)
+
+    remote.ui.__class__ = filteringwrite
+    try:
+        # We always do force push because we don't want users to need to
+        # specify it. The big danger here is pushing multiple heads or
+        # branches or mq patches. We check the former above and we don't
+        # want to limit user choice on the latter two.
+        return orig(repo, remote, force=True, revs=revs, newbranch=newbranch)
+    finally:
+        remote.ui.__class__ = oldcls
 
 def wrappedpushbookmark(orig, pushop):
     """Wraps exchange._pushbookmark to also push a review."""
