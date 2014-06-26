@@ -1,2 +1,3 @@
 include README.md
-recursive-include rbmozui/static *.html *.js *.css *.less
+include AUTHORS
+include LICENSE
