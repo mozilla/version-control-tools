@@ -1,10 +1,14 @@
 {% extends "reviews/reviewable_base.html" %}
-{% load i18n djblets_deco djblets_js rb_extensions reviewtags staticfiles tz %}
+{% load compressed i18n djblets_deco djblets_js rb_extensions reviewtags staticfiles tz %}
 
 {% block title %}{{review_request.summary}} | {% trans "Review Request" %}{% endblock %}
 
 {% block content %}
-<div id="review_request">
+<div id="commits">
 
 </div>
 {% endblock content %}
+{% compressed_js 'commits' %}
+<script>
+  alert('{{review_request.id}}');
+</script>

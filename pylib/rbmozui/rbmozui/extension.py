@@ -30,6 +30,11 @@ class RBMozUI(Extension):
             'source_filenames': ['css/viewdiff.less'],
         },
     }
+    js_bundles = {
+        'commits': {
+            'source_filenames': ['js/commits.js'],
+        }
+    }
 
     def initialize(self):
         # Start by hiding the Testing Done field in all review requests, since
