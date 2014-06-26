@@ -63,7 +63,7 @@ Attempt to push with Bugzilla not configured will result in a warning
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   tip: to not prompt for Bugzilla credentials in the future, * (glob)
-  Bugzilla username None
+  Bugzilla username: None
   Bugzilla credentials not available. Not submitting review.
 
 Configure authentication
