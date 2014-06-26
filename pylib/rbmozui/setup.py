@@ -28,6 +28,8 @@ setup(
         'rbmozui': [
             'templates/rbmozui/*.txt',
             'templates/rbmozui/*.html',
+            'static/css/*.css',
+            'static/css/*.less'
         ],
     }
 )
