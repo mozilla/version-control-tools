@@ -261,18 +261,24 @@ def doreview(repo, ui, remote, reviewnode):
     ui.write(_('submitting %d changesets for review\n') % len(nodes))
 
     res = remote._call('reviewboard', data='\n'.join(lines))
-    lines = res.split('\n')
-    if len(lines) < 1:
-        raise util.Abort(_('Unknown response from server.'))
 
-    version = int(lines[0])
-    if version != 1:
-        raise util.Abort(_('Do not know how to handle response.'))
+    # All protocol versions begin with: <version>\n
+    try:
+        off = res.index('\n')
+        version = int(res[0:off])
+
+        if version != 1:
+            raise util.Abort(_('do not know how to handle response from server.'))
+    except ValueError:
+        raise util.Abort(_('invalid response from server.'))
+
+    assert version == 1
+    lines = res.split('\n')[1:]
 
     nodereviews = {}
     newparentid = None
 
-    for line in lines[1:]:
+    for line in lines:
         t, d = line.split(' ', 1)
 
         if t == 'display':

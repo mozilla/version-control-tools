@@ -28,18 +28,23 @@ def reviewboard(repo, proto, args=None):
     else:
         data = args['data']
 
-    lines = data.split('\n')
-    if len(lines) < 1:
+    try:
+        off = data.index('\n')
+        version = int(data[0:off])
+
+        if version < 1:
+            return wireproto.pusherr(_('Your reviewboard extension is out '
+                'of date. Please pull and update your version-control-tools '
+                'repo.'))
+        elif version > 1:
+            return wireproto.pusherr(_('Your reviewboard extension is newer '
+                'than what the server supports. Please downgrade to a '
+                'compatible version.'))
+    except ValueError:
         return wireproto.pusherr(_('Invalid payload.'))
 
-    version = int(lines[0])
-    if version < 1:
-        return wireproto.pusherr(_('Your reviewboard extension is out of date. '
-            'Please pull and update your version-control-tools repo.'))
-    elif version > 1:
-        return wireproto.pusherr(_('Your reviewboard extension is newer than '
-            'what the server supports. Please downgrade to a compatible '
-            'version.'))
+    assert version == 1
+    lines = data.split('\n')[1:]
 
     bzusername = None
     bzpassword = None
@@ -48,7 +53,7 @@ def reviewboard(repo, proto, args=None):
     identifier = None
     nodes = []
 
-    for line in lines[1:]:
+    for line in lines:
         t, d = line.split(' ', 1)
 
         if t == 'bzusername':
