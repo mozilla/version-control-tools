@@ -100,7 +100,7 @@ The parent review should have dropped the reference to /r/6
     Commit ID: bz://123
     Extra:
       p2rb: True
-      p2rb.commits: [["c5b850e249510046906bcb24f774635c4521a4a9", 2], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c", 3], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", 4], ["53b32d356f20f6730c14ec62c3706eba7e68e078", 5]]
+      p2rb.commits: [["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c", "3"], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", "4"], ["53b32d356f20f6730c14ec62c3706eba7e68e078", "5"]]
       p2rb.identifier: bz://123
       p2rb.is_squashed: True
   Draft: 1

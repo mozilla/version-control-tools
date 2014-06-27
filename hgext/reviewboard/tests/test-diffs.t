@@ -44,7 +44,7 @@ Push a single commit
     Commit ID: bz://300124
     Extra:
       p2rb: True
-      p2rb.commits: [["8078da8bec9fca76a56ce358bb0addd12c83e708", 2]]
+      p2rb.commits: [["8078da8bec9fca76a56ce358bb0addd12c83e708", "2"]]
       p2rb.identifier: bz://300124
       p2rb.is_squashed: True
   Draft: 1
@@ -134,7 +134,7 @@ Pushing multiple commits should result in parent diffs
     Commit ID: bz://10000
     Extra:
       p2rb: True
-      p2rb.commits: [["393666323ae92d185152eaa15bda086f01f2b115", 4], ["5638d29dda5131a2a79bf6ac7c465dd3a7052275", 5], ["c5acb46cb0f75caf1566a2af32fad101798f1178", 6]]
+      p2rb.commits: [["393666323ae92d185152eaa15bda086f01f2b115", "4"], ["5638d29dda5131a2a79bf6ac7c465dd3a7052275", "5"], ["c5acb46cb0f75caf1566a2af32fad101798f1178", "6"]]
       p2rb.identifier: bz://10000
       p2rb.is_squashed: True
   Draft: 3

@@ -74,7 +74,7 @@ The parent review should have its description updated.
     Commit ID: bz://123
     Extra:
       p2rb: True
-      p2rb.commits: [["bb41178fa30c323500834d0368774ef4ed412d7b", 2], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9", 3], ["27d2e8c43375f3dd075cd7492a1f301ecdca9ffc", 4]]
+      p2rb.commits: [["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9", "3"], ["27d2e8c43375f3dd075cd7492a1f301ecdca9ffc", "4"]]
       p2rb.identifier: bz://123
       p2rb.is_squashed: True
   Draft: 1

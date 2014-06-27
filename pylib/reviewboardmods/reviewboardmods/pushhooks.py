@@ -133,7 +133,7 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
         # where it belongs.
 
         # This is where things could get complicated. We could involve
-        # heuristic based matching (comparing commit messages, changes
+        # heuristic based matching (comparing commit messages, changed
         # files, etc). We may do that in the future.
 
         # For now, match the commit up against the next one in the index.
@@ -160,7 +160,9 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
             summary=commit['message'].splitlines()[0],
             description=commit['message'])
         processed_nodes.add(commit['id'])
-        node_to_rid[node] = rr.id
+        # Normalize all review identifiers to strings.
+        assert isinstance(rr.id, int)
+        node_to_rid[node] = str(rr.id)
 
     # At this point every incoming commit has been accounted for.
     # If there are any remaining reviews, they must belong to deleted
@@ -203,7 +205,24 @@ def get_previous_commits(squashed_rr):
         ]
     """
     extra_data = squashed_rr.extra_data
-    commits = (
-        extra_data["p2rb.commits"] if "p2rb.commits" in extra_data else "[]")
-    return json.loads(commits)
+    if 'p2rb.commits' not in extra_data:
+        return []
 
+    commits = []
+    for node, rid in json.loads(extra_data['p2rb.commits']):
+        # JSON decoding likes to give us unicode types. We speak str
+        # internally, so convert.
+        if isinstance(node, unicode):
+            node = node.encode('utf-8')
+
+        if isinstance(rid, unicode):
+            rid = rid.encode('utf-8')
+        elif isinstance(rid, int):
+            rid = str(rid)
+
+        assert isinstance(node, str)
+        assert isinstance(rid, str)
+
+        commits.append((node, rid))
+
+    return commits
