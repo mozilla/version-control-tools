@@ -74,5 +74,9 @@ def reposetup(ui, repo):
         raise util.Abort(_('Please set reviewboard.repoid to the numeric ID '
             'of the repository this repo is associated with.'))
 
+    if ui.configbool('phases', 'publish', True):
+        raise util.Abort(_('reviewboard server extension is only compatible '
+            'with non-publishing repositories.'))
+
     ui.setconfig('hooks', 'changegroup.reviewboard', changegrouphook)
 

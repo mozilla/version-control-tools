@@ -23,6 +23,15 @@ Server should complain if the extension is not configured
   [255]
 
   $ echo "repoid = 1" >> server/.hg/hgrc
+
+Publishing repositories should trigger error
+
+  $ hg -R server identify
+  abort: reviewboard server extension is only compatible with non-publishing repositories.
+  [255]
+
+  $ echo "[phases]" >> server/.hg/hgrc
+  $ echo "publish = False" >> server/.hg/hgrc
   $ hg -R server identify
   000000000000 tip
 
