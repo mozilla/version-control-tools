@@ -17,6 +17,8 @@ from rbbz.diffs import build_plaintext_review
 from rbbz.errors import (BugzillaError, ConfidentialBugError, InvalidBugsError,
                          InvalidBugIdError)
 
+BZIMPORT_PREFIX = "bz://"
+
 def review_request_url(review_request, site=None, siteconfig=None):
     if not site:
         site = Site.objects.get_current()
@@ -56,6 +58,10 @@ def publish_review_request(user, review_request_draft, **kwargs):
     # The reviewid passed through p2rb is, for Mozilla's instance anyway, also
     # the bug ID.
     bug_id = review_request_draft.extra_data.get('p2rb.identifier', None)
+
+    bug_id = bugs[0]
+    if bug_id.startswith(BZIMPORT_PREFIX):
+      bug_id = bug_id[len(BZIMPORT_PREFIX):]
 
     try:
         bug_id = int(bug_id)
