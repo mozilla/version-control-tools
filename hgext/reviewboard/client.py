@@ -41,22 +41,18 @@ from mercurial.i18n import _
 from mercurial.node import bin, hex
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
-REPO_ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
-PYLIB = os.path.join(REPO_ROOT, 'pylib')
+execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 demandimport.disable()
 try:
-    from mozautomation.commitparser import parse_bugs
     import hgrb.shared
 except ImportError:
-    sys.path.insert(0, os.path.join(PYLIB, 'mozautomation'))
-    sys.path.insert(0, os.path.join(PYLIB, 'mozhg'))
     sys.path.insert(0, OUR_DIR)
 
-    from mozautomation.commitparser import parse_bugs
     import hgrb.shared
 demandimport.enable()
 
+from mozautomation.commitparser import parse_bugs
 from mozhg.auth import getbugzillaauth
 
 testedwith = '3.0.1'
