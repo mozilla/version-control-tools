@@ -51,5 +51,11 @@ prefixes are supported:
    These lines should be displayed on the client.
 ``reviewid``
    The identifier of the main Review Board review for this push.
-``nodereview``
-   Maps a submitted node to a review identifier.
+``csetreview``
+   Consists of the 40 digit hex node of a changeset followed by its
+   review identifier.
+``reviewdata``
+   Contains metadata for an individual review.
+
+   Fields are space delimited. The fields are ``review id``, ``field``,
+   and ``field value``. The value is %XX encoded.

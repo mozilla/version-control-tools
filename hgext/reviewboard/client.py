@@ -275,8 +275,8 @@ def doreview(repo, ui, remote, reviewnode):
     assert version == 1
     lines = res.split('\n')[1:]
 
-    nodereviews = {}
     newparentid = None
+    reviewdata = {}
 
     for line in lines:
         t, d = line.split(' ', 1)
@@ -286,10 +286,15 @@ def doreview(repo, ui, remote, reviewnode):
         elif t == 'parentreview':
             newparentid = d
             reviews.addparentreview(identifier, newparentid)
+            reviewdata[newparentid] = {}
         elif t == 'csetreview':
             node, rid = d.split(' ', 1)
             reviews.addnodereview(bin(node), rid, newparentid)
-            nodereviews[bin(node)] = rid
+            reviewdata[rid] = {}
+        elif t == 'reviewdata':
+            rid, field, value = d.split(' ', 2)
+            value = urllib.unquote(value)
+            reviewdata[rid][field] = value
         elif t == 'rburl':
             reviews.baseurl = d
 

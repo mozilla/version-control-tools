@@ -85,11 +85,14 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
         rr.get_diffs().upload_diff(commit['diff'],
                                    parent_diff=commit['parent_diff'])
 
+        return rr
+
     previous_commits = get_previous_commits(squashed_rr)
     remaining_nodes = dict((t[0], t[1]) for i, t in enumerate(previous_commits))
     unclaimed_rids = [t[1] for t in previous_commits]
     processed_nodes = set()
     node_to_rid = {}
+    reviews = {}
 
     # Do a pass and find all commits that map cleanly to old reviews.
     for commit in commits['individual']:
@@ -105,6 +108,9 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
             unclaimed_rids.remove(rid)
             processed_nodes.add(node)
             node_to_rid[node] = rid
+
+            rr = api_root.get_review_request(review_request_id=rid)
+            reviews[rid] = rr
             continue
 
         # We haven't seen this commit before.
@@ -118,9 +124,10 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
                     unclaimed_rids.remove(rid)
                     break
 
-            update_review(commit['rid'], commit)
+            rr = update_review(commit['rid'], commit)
             processed_nodes.add(node)
             node_to_rid[node] = commit['rid']
+            reviews[commit['rid']] = rr
             continue
 
     # Now do a pass over the commits that didn't map cleanly.
@@ -140,9 +147,10 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
         if unclaimed_rids:
             assumed_old_rid = unclaimed_rids[0]
             unclaimed_rids.pop(0)
-            update_review(assumed_old_rid, commit)
+            rr = update_review(assumed_old_rid, commit)
             processed_nodes.add(commit['id'])
             node_to_rid[node] = assumed_old_rid
+            reviews[assumed_old_rid] = rr
             continue
 
         # There are no more unclaimed review IDs. This means we have more
@@ -162,7 +170,9 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
         processed_nodes.add(commit['id'])
         # Normalize all review identifiers to strings.
         assert isinstance(rr.id, int)
-        node_to_rid[node] = str(rr.id)
+        rid = str(rr.id)
+        node_to_rid[node] = rid
+        reviews[rid] = rr
 
     # At this point every incoming commit has been accounted for.
     # If there are any remaining reviews, they must belong to deleted
@@ -190,8 +200,9 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
 
     squashed_rr.update(data={
         'extra_data.p2rb.commits': json.dumps(commit_list)})
+    reviews[str(squashed_rr.id)] = squashed_rr
 
-    return squashed_rr.id, node_to_rid
+    return str(squashed_rr.id), node_to_rid, reviews
 
 def get_previous_commits(squashed_rr):
     """Retrieve the previous commits from a squashed review request.

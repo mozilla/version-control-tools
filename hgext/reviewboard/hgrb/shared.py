@@ -112,19 +112,30 @@ def reviewboard(repo, proto, args=None):
     rburl = repo.ui.config('reviewboard', 'url', None).rstrip('/')
     repoid = repo.ui.configint('reviewboard', 'repoid', None)
 
-    parentrid, commitmap = post_reviews(rburl, repoid, identifier, commits,
-                                        username=bzusername,
-                                        password=bzpassword,
-                                        cookie=bzcookie)
+    parentrid, commitmap, reviews = post_reviews(rburl, repoid, identifier,
+                                                 commits,
+                                                 username=bzusername,
+                                                 password=bzpassword,
+                                                 cookie=bzcookie)
 
     lines = [
         '1',
         'rburl %s' % rburl,
         'reviewid %s' % identifier,
         'parentreview %s' % parentrid,
+        'reviewdata %s status %s' % (parentrid,
+            urllib.quote(reviews[parentrid].status.encode('utf-8'))),
     ]
 
     for node, rid in commitmap.items():
+        rr = reviews[rid]
         lines.append('csetreview %s %s' % (node, rid))
+        lines.append('reviewdata %s status %s' % (rid,
+            urllib.quote(rr.status.encode('utf-8'))))
 
-    return '\n'.join(lines)
+    # It's easy for unicode to creep in from RBClient APIs. Mercurial doesn't
+    # like unicode type responses, so catch it early and avoid the crypic
+    # KeyError: <type 'unicode'> in Mercurial.
+    res = '\n'.join(lines)
+    assert isinstance(res, str)
+    return res
