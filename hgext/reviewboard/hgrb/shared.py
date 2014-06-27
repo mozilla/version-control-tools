@@ -13,7 +13,7 @@ def post_reviews(*args, **kwargs):
     from reviewboardmods.pushhooks import post_reviews as pr
     return pr(*args, **kwargs)
 
-@wireproto.wireprotocommand('reviewboard', '*')
+@wireproto.wireprotocommand('pushreview', '*')
 def reviewboard(repo, proto, args=None):
     proto.redirect()
 

@@ -263,7 +263,7 @@ def doreview(repo, ui, remote, reviewnode):
 
     ui.write(_('submitting %d changesets for review\n') % len(nodes))
 
-    res = remote._call('reviewboard', data='\n'.join(lines))
+    res = remote._call('pushreview', data='\n'.join(lines))
 
     # All protocol versions begin with: <version>\n
     try:
