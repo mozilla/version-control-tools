@@ -86,7 +86,7 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
                                    parent_diff=commit['parent_diff'])
 
     previous_commits = get_previous_commits(squashed_rr)
-    remaining_nodes = {t[0]: t[1] for i, t in enumerate(previous_commits)}
+    remaining_nodes = dict((t[0], t[1]) for i, t in enumerate(previous_commits))
     unclaimed_rids = [t[1] for t in previous_commits]
     processed_nodes = set()
     node_to_rid = {}
