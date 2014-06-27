@@ -66,3 +66,4 @@ class RBMozUI(Extension):
         field = get_review_request_field('testing_done')
         if not field:
           fieldset.add_field(TestingDoneField)
+        super(RBMozUI, self).shutdown()
