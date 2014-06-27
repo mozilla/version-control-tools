@@ -29,14 +29,14 @@
   
   changeset:  1:bb41178fa30c
   summary:    Bug 123 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   changeset:  2:9d24f6cb513e
   summary:    Bug 123 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3
+  review:     http://localhost:$HGPORT1/r/3 (pending)
   
   review id:  bz://123
-  review url: http://localhost:$HGPORT1/r/1
+  review url: http://localhost:$HGPORT1/r/1 (pending)
 
 Adding commits to old reviews should create new reviews
 
@@ -53,18 +53,18 @@ Adding commits to old reviews should create new reviews
   
   changeset:  1:bb41178fa30c
   summary:    Bug 123 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   changeset:  2:9d24f6cb513e
   summary:    Bug 123 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3
+  review:     http://localhost:$HGPORT1/r/3 (pending)
   
   changeset:  3:27d2e8c43375
   summary:    Bug 123 - Foo 3
-  review:     http://localhost:$HGPORT1/r/4
+  review:     http://localhost:$HGPORT1/r/4 (pending)
   
   review id:  bz://123
-  review url: http://localhost:$HGPORT1/r/1
+  review url: http://localhost:$HGPORT1/r/1 (pending)
 
 The parent review should have its description updated.
 

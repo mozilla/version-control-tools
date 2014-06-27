@@ -33,10 +33,10 @@ Push a single commit
   
   changeset:  1:8078da8bec9f
   summary:    Bug 300124 - Updated foo component
-  review:     http://localhost:$HGPORT1/r/2
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   review id:  bz://300124
-  review url: http://localhost:$HGPORT1/r/1
+  review url: http://localhost:$HGPORT1/r/1 (pending)
 
   $ rbmanage ../rbserver dumpreview $HGPORT1 1
   Review: 1
@@ -115,18 +115,18 @@ Pushing multiple commits should result in parent diffs
   
   changeset:  2:393666323ae9
   summary:    Bug 10000 - updated bar
-  review:     http://localhost:$HGPORT1/r/4
+  review:     http://localhost:$HGPORT1/r/4 (pending)
   
   changeset:  3:5638d29dda51
   summary:    updated foo again
-  review:     http://localhost:$HGPORT1/r/5
+  review:     http://localhost:$HGPORT1/r/5 (pending)
   
   changeset:  4:c5acb46cb0f7
   summary:    updated bar again
-  review:     http://localhost:$HGPORT1/r/6
+  review:     http://localhost:$HGPORT1/r/6 (pending)
   
   review id:  bz://10000
-  review url: http://localhost:$HGPORT1/r/3
+  review url: http://localhost:$HGPORT1/r/3 (pending)
 
   $ rbmanage ../rbserver dumpreview $HGPORT1 3
   Review: 3

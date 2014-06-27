@@ -256,7 +256,9 @@ def doreview(repo, ui, remote, reviewnode):
                     '{label("log.summary", "summary:    ")}'
                     '{label("log.summary", firstline(desc))}\n'
                     '{label("log.reviewurl", "review:     ")}'
-                    '{label("log.reviewurl", reviewurl)}\n'
+                    '{label("log.reviewurl", reviewurl)}'
+                    '{label("log.reviewstatus", '
+                        'ifeq(reviewstatus, "pending", " (pending)"))}\n'
          })
 
     ui.write(_('submitting %d changesets for review\n') % len(nodes))
@@ -310,7 +312,10 @@ def doreview(repo, ui, remote, reviewnode):
         ui.write('\n')
 
     ui.write(_('review id:  %s\n') % identifier)
-    ui.write(_('review url: %s\n') % reviews.parentreviewurl(identifier))
+    ui.write(_('review url: %s') % reviews.parentreviewurl(identifier))
+    if reviewdata[newparentid].get('status', None) == 'pending':
+        ui.write(' (pending)')
+    ui.write('\n')
 
 
 class reviewstore(object):
@@ -404,6 +409,24 @@ class reviewstore(object):
 
         self._vfs.write(path, '%s\n' % '\n'.join(lines))
 
+    def getreviewrequest(self, rid):
+        """Obtain metadata about a single review request."""
+        path = self._vfs.join('review/%s.state' % rid)
+        data = self._vfs.tryread(path)
+        if not data:
+            return None
+
+        d = {}
+        for line in data.splitlines():
+            line = line.rstrip()
+            if not line:
+                continue
+
+            k, v = line.split(' ', 1)
+            d[k] = urllib.unquote(v)
+
+        return d
+
     def addparentreview(self, identifier, rid):
         """Record the existence of a parent review."""
         self._parents[identifier] = rid
@@ -465,6 +488,20 @@ def template_reviewurl(repo, ctx, **args):
     """:reviewurl: String. The URL of the review for this changeset."""
     return repo.reviews.reviewurl(ctx.node())
 
+def template_reviewstatus(repo, ctx, revcache, **args):
+    """:reviewstatus: String. The status of the review for this changeset."""
+    if 'reviewstatus' not in revcache:
+        rid = repo.reviews.findnodereview(ctx.node())
+        if rid:
+            d = repo.reviews.getreviewrequest(rid)
+        else:
+            d = {}
+
+        revcache['reviewstatus'] = d.get('status', None)
+
+    return revcache['reviewstatus']
+
+
 def extsetup(ui):
     extensions.wrapfunction(exchange, 'push', wrappedpush)
     # _pushbookmark gets called near the end of push. Sadly, there isn't
@@ -478,6 +515,7 @@ def extsetup(ui):
     entry[1].append(('', 'reviewid', '', _('Review identifier')))
 
     templatekw.keywords['reviewurl'] = template_reviewurl
+    templatekw.keywords['reviewstatus'] = template_reviewstatus
 
 def reposetup(ui, repo):
     if not repo.local():

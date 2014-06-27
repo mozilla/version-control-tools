@@ -37,10 +37,10 @@ Set up the repo
   
   changeset:  1:c3480b3f6944
   summary:    foo2
-  review:     http://localhost:$HGPORT/r/2
+  review:     http://localhost:$HGPORT/r/2 (pending)
   
   review id:  bz://123
-  review url: http://localhost:$HGPORT/r/1
+  review url: http://localhost:$HGPORT/r/1 (pending)
 
 Now create a new head and push a rebase
 
@@ -64,11 +64,11 @@ Now create a new head and push a rebase
   
   changeset:  2:e7315a409763
   summary:    bar
-  review:     http://localhost:$HGPORT/r/3
+  review:     http://localhost:$HGPORT/r/3 (pending)
   
   changeset:  3:5003cd557db3
   summary:    foo2
-  review:     http://localhost:$HGPORT/r/2
+  review:     http://localhost:$HGPORT/r/2 (pending)
   
   review id:  bz://123
-  review url: http://localhost:$HGPORT/r/1
+  review url: http://localhost:$HGPORT/r/1 (pending)

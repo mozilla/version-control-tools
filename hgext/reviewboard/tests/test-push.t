@@ -81,10 +81,10 @@ Pushing a single changeset will initiate a single review (no children)
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://localhost:$HGPORT1/r/2
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   review id:  bz://345
-  review url: http://localhost:$HGPORT1/r/1
+  review url: http://localhost:$HGPORT1/r/1 (pending)
 
 {reviewurl} template works
 
@@ -102,10 +102,10 @@ Pushing no changesets will do a re-review
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://localhost:$HGPORT1/r/2
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   review id:  bz://345
-  review url: http://localhost:$HGPORT1/r/1
+  review url: http://localhost:$HGPORT1/r/1 (pending)
   [1]
 
 Pushing patches from mq will result in a warning
@@ -124,10 +124,10 @@ Pushing patches from mq will result in a warning
   
   changeset:  7:7458cff9569f
   summary:    mq patch
-  review:     http://localhost:$HGPORT1/r/4
+  review:     http://localhost:$HGPORT1/r/4 (pending)
   
   review id:  bz://784841
-  review url: http://localhost:$HGPORT1/r/3
+  review url: http://localhost:$HGPORT1/r/3 (pending)
 
   $ hg qpop
   popping patch1
@@ -143,10 +143,10 @@ Custom identifier will create a new review from same changesets.
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://localhost:$HGPORT1/r/2
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   review id:  bz://3452
-  review url: http://localhost:$HGPORT1/r/5
+  review url: http://localhost:$HGPORT1/r/5 (pending)
   [1]
 
 SSH works
@@ -162,10 +162,10 @@ SSH works
   
   changeset:  2:a21bef69f0d4
   summary:    Bug 123 - Test identifier
-  review:     http://localhost:$HGPORT1/r/7
+  review:     http://localhost:$HGPORT1/r/7 (pending)
   
   review id:  bz://123
-  review url: http://localhost:$HGPORT1/r/6
+  review url: http://localhost:$HGPORT1/r/6 (pending)
 
 Specifying multiple -r for the same head works
 
@@ -177,8 +177,8 @@ Specifying multiple -r for the same head works
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://localhost:$HGPORT1/r/2
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   review id:  bz://50000
-  review url: http://localhost:$HGPORT1/r/8
+  review url: http://localhost:$HGPORT1/r/8 (pending)
   [1]

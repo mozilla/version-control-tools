@@ -31,10 +31,10 @@ Pushing a review will create the reviews file
   
   changeset:  1:7f387c765e68
   summary:    Bug 456 - second commit
-  review:     http://localhost:$HGPORT/r/2
+  review:     http://localhost:$HGPORT/r/2 (pending)
   
   review id:  bz://456
-  review url: http://localhost:$HGPORT/r/1
+  review url: http://localhost:$HGPORT/r/1 (pending)
 
   $ cat .hg/reviews
   u http://localhost:$HGPORT

@@ -47,26 +47,26 @@
   
   changeset:  1:c5b850e24951
   summary:    Bug 123 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   changeset:  2:905ad211ecc6
   summary:    Bug 123 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3
+  review:     http://localhost:$HGPORT1/r/3 (pending)
   
   changeset:  3:68fdf92dbf14
   summary:    Bug 123 - Foo 3
-  review:     http://localhost:$HGPORT1/r/4
+  review:     http://localhost:$HGPORT1/r/4 (pending)
   
   changeset:  4:53b32d356f20
   summary:    Bug 123 - Foo 4
-  review:     http://localhost:$HGPORT1/r/5
+  review:     http://localhost:$HGPORT1/r/5 (pending)
   
   changeset:  5:f466ed1de516
   summary:    Bug 123 - Foo 5
-  review:     http://localhost:$HGPORT1/r/6
+  review:     http://localhost:$HGPORT1/r/6 (pending)
   
   review id:  bz://123
-  review url: http://localhost:$HGPORT1/r/1
+  review url: http://localhost:$HGPORT1/r/1 (pending)
 
 Popping the last commit truncates the review set
 
@@ -80,22 +80,22 @@ Popping the last commit truncates the review set
   
   changeset:  1:c5b850e24951
   summary:    Bug 123 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   changeset:  2:905ad211ecc6
   summary:    Bug 123 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3
+  review:     http://localhost:$HGPORT1/r/3 (pending)
   
   changeset:  3:68fdf92dbf14
   summary:    Bug 123 - Foo 3
-  review:     http://localhost:$HGPORT1/r/4
+  review:     http://localhost:$HGPORT1/r/4 (pending)
   
   changeset:  4:53b32d356f20
   summary:    Bug 123 - Foo 4
-  review:     http://localhost:$HGPORT1/r/5
+  review:     http://localhost:$HGPORT1/r/5 (pending)
   
   review id:  bz://123
-  review url: http://localhost:$HGPORT1/r/1
+  review url: http://localhost:$HGPORT1/r/1 (pending)
   [1]
 
 The parent review should have dropped the reference to /r/6
@@ -178,18 +178,18 @@ be preserved.
   
   changeset:  5:ce44f0c4506c
   summary:    Bug 123 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3
+  review:     http://localhost:$HGPORT1/r/3 (pending)
   
   changeset:  6:2879da44c7e2
   summary:    Bug 123 - Foo 3
-  review:     http://localhost:$HGPORT1/r/4
+  review:     http://localhost:$HGPORT1/r/4 (pending)
   
   changeset:  7:e44f9d56a1a4
   summary:    Bug 123 - Foo 4
-  review:     http://localhost:$HGPORT1/r/5
+  review:     http://localhost:$HGPORT1/r/5 (pending)
   
   review id:  bz://123
-  review url: http://localhost:$HGPORT1/r/1
+  review url: http://localhost:$HGPORT1/r/1 (pending)
 
 The dropped commit should now be discarded
 
@@ -222,14 +222,14 @@ Try removing a commit in the middle.
   
   changeset:  5:ce44f0c4506c
   summary:    Bug 123 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3
+  review:     http://localhost:$HGPORT1/r/3 (pending)
   
   changeset:  8:cd0051d388da
   summary:    Bug 123 - Foo 4
-  review:     http://localhost:$HGPORT1/r/5
+  review:     http://localhost:$HGPORT1/r/5 (pending)
   
   review id:  bz://123
-  review url: http://localhost:$HGPORT1/r/1
+  review url: http://localhost:$HGPORT1/r/1 (pending)
 
 The parent review should have been updated accordingly.
 
