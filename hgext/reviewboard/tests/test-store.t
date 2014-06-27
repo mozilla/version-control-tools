@@ -41,3 +41,12 @@ Pushing a review will create the reviews file
   p bz://456 1
   c 7f387c765e685da95d7a4ffab2ccf06548c06fcf 2
   pc 7f387c765e685da95d7a4ffab2ccf06548c06fcf 1
+
+  $ ls .hg/reviewboard/review
+  1.state
+  2.state
+
+  $ cat .hg/reviewboard/review/1.state
+  status pending
+  $ cat .hg/reviewboard/review/2.state
+  status pending

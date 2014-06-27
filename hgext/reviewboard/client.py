@@ -33,6 +33,7 @@ from mercurial import hg
 from mercurial import localrepo
 from mercurial import obsolete
 from mercurial import phases
+from mercurial import scmutil
 from mercurial import templatekw
 from mercurial import util
 from mercurial import wireproto
@@ -299,6 +300,8 @@ def doreview(repo, ui, remote, reviewnode):
             reviews.baseurl = d
 
     reviews.write()
+    for rid, data in reviewdata.iteritems():
+        reviews.savereviewrequest(rid, data)
 
     ui.write('\n')
     for node in nodes:
@@ -314,7 +317,7 @@ class reviewstore(object):
     """Holds information about ongoing reviews.
 
     When we push and pull review information, we store that data in a local
-    file. This class manages that file.
+    data store. This class interacts with that store.
 
     The file consists of newline delimited data. Each line begins with a
     data type followed by a space followed by the data for that type.
@@ -325,6 +328,7 @@ class reviewstore(object):
     """
     def __init__(self, repo):
         self._repo = repo
+        self._vfs = scmutil.vfs(repo.vfs.join('reviewboard'), audit=False)
 
         # Maps nodes to (review requests, parent requests set) tuples.
         self._nodes = {}
@@ -389,6 +393,16 @@ class reviewstore(object):
             f.close()
         finally:
             wlock.release()
+
+    def savereviewrequest(self, rid, data):
+        """Save metadata about an individual review request."""
+
+        path = self._vfs.join('review/%s.state' % rid)
+        lines = []
+        for k, v in sorted(data.iteritems()):
+            lines.append('%s %s' % (k, urllib.quote(v)))
+
+        self._vfs.write(path, '%s\n' % '\n'.join(lines))
 
     def addparentreview(self, identifier, rid):
         """Record the existence of a parent review."""
