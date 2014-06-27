@@ -24,6 +24,7 @@ class ConfidentialBugError(PublishError):
 #
 class BugzillaError(Exception):
     def __init__(self, msg):
+        super(BugzillaError, self).__init__(msg)
         self.msg = msg
 
 
