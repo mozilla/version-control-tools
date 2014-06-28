@@ -154,7 +154,7 @@ def on_review_publishing(user, review, **kwargs):
 
     b.post_comment(bug_id, build_plaintext_review(review, {"user": user}))
 
-    if review.ship_it and not review_request.depends_on.count():
+    if review.ship_it and is_review_request_squashed(review_request):
         b.r_plus_attachment(bug_id, review.user.username,
                             review_request_url(review_request, site,
                                                siteconfig))
