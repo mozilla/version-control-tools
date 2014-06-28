@@ -61,7 +61,6 @@ def publish_review_request(user, review_request_draft, **kwargs):
     # the bug ID.
     bug_id = review_request_draft.extra_data.get('p2rb.identifier', None)
 
-    bug_id = bugs[0]
     if bug_id.startswith(BZIMPORT_PREFIX):
       bug_id = bug_id[len(BZIMPORT_PREFIX):]
 
