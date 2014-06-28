@@ -14,8 +14,7 @@ from reviewboard.site.urlresolvers import local_site_reverse
 
 from rbbz.bugzilla import Bugzilla
 from rbbz.diffs import build_plaintext_review
-from rbbz.errors import (BugzillaError, ConfidentialBugError, InvalidBugsError,
-                         InvalidBugIdError)
+from rbbz.errors import (BugzillaError, ConfidentialBugError, InvalidBugIdError)
 
 def review_request_url(review_request, site=None, siteconfig=None):
     if not site:
@@ -67,10 +66,11 @@ def publish_review_request(user, review_request_draft, **kwargs):
     try:
         if b.is_bug_confidential(bug_id):
             raise ConfidentialBugError
-    except xmlrpclib.Fault as e:
-        # 100: Invalid Bug Alias
-        # 101: Bug does not exist
-        if e.faultCode == 100 or e.faultCode == 101:
+    except BugzillaError as e:
+        # Special cases:
+        #   100: Invalid Bug Alias
+        #   101: Bug does not exist
+        if e.fault_code and (e.fault_code == 100 or e.fault_code == 101):
             raise InvalidBugIdError(bug_id)
         raise
 

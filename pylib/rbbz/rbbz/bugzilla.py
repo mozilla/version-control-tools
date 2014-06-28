@@ -17,7 +17,7 @@ def xmlrpc_to_bugzilla_errors(func):
         try:
             return func(*args, **kwargs)
         except xmlrpclib.Fault as e:
-            raise BugzillaError(e.faultString)
+            raise BugzillaError(e.faultString, e.faultCode)
     return _transform_errors
 
 
@@ -164,7 +164,8 @@ class Bugzilla(object):
         params['file_name'] = 'reviewboard-%d-url.txt' % review_id
         params['summary'] = summary
         params['comment'] = description
-        params['flags'] = flags
+        if flags:
+            params['flags'] = flags
 
         if rb_attachment:
             self.proxy.Bug.update_attachment(params)

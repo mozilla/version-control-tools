@@ -23,9 +23,10 @@ class ConfidentialBugError(PublishError):
 # Bugzilla errors.
 #
 class BugzillaError(Exception):
-    def __init__(self, msg):
+    def __init__(self, msg, fault_code=None):
         super(BugzillaError, self).__init__(msg)
         self.msg = msg
+        self.fault_code = fault_code
 
 
 class BugzillaUrlError(BugzillaError):
