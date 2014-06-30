@@ -13,10 +13,7 @@ def post_reviews(*args, **kwargs):
     from reviewboardmods.pushhooks import post_reviews as pr
     return pr(*args, **kwargs)
 
-@wireproto.wireprotocommand('pushreview', '*')
-def reviewboard(repo, proto, args=None):
-    proto.redirect()
-
+def getpayload(proto, args):
     # HTTP and SSH behave differently here. In SSH, the data is
     # passed as an argument. In HTTP, the data is on a stream which
     # we need to read from.
@@ -27,6 +24,11 @@ def reviewboard(repo, proto, args=None):
         fp.close()
     else:
         data = args['data']
+
+    return data
+
+def parsepayload(proto, args):
+    data = getpayload(proto, args)
 
     try:
         off = data.index('\n')
@@ -46,25 +48,54 @@ def reviewboard(repo, proto, args=None):
     assert version == 1
     lines = data.split('\n')[1:]
 
-    bzusername = None
-    bzpassword = None
-    bzuserid = None
-    bzcookie = None
-    identifier = None
-    nodes = []
+    o = {
+        'bzusername': None,
+        'bzpassword': None,
+        'bzcookie': None,
+        'bzuserid': None,
+        'other': []
+    }
 
     for line in lines:
         t, d = line.split(' ', 1)
 
         if t == 'bzusername':
-            bzusername = urllib.unquote(d)
+            o['bzusername'] = urllib.unquote(d)
         elif t == 'bzpassword':
-            bzpassword = urllib.unquote(d)
+            o['bzpassword'] = urllib.unquote(d)
         elif t == 'bzuserid':
-            bzuserid = urllib.unquote(d)
+            o['bzuserid'] = urllib.unquote(d)
         elif t == 'bzcookie':
-            bzcookie = urllib.unquote(d)
-        elif t == 'reviewidentifier':
+            o['bzcookie'] = urllib.unquote(d)
+        else:
+            o['other'].append((t, d))
+
+    return o
+
+def getrbapi(repo, o):
+    from rbtools.api.client import RBClient
+
+    url = repo.ui.config('reviewboard', 'url', None).rstrip('/')
+    c = RBClient(url, username=o['bzusername'], password=o['bzpassword'])
+    return c.get_root()
+
+@wireproto.wireprotocommand('pushreview', '*')
+def reviewboard(repo, proto, args=None):
+    proto.redirect()
+
+    o = parsepayload(proto, args)
+    if isinstance(o, wireproto.pusherr):
+        return o
+
+    bzusername = o['bzusername']
+    bzpassword = o['bzpassword']
+    bzuserid = o['bzuserid']
+    bzcookie = o['bzcookie']
+    identifier = None
+    nodes = []
+
+    for t, d in o['other']:
+        if t == 'reviewidentifier':
             identifier = urllib.unquote(d)
         elif t == 'csetreview':
             fields = d.split(' ', 1)
@@ -138,4 +169,30 @@ def reviewboard(repo, proto, args=None):
     # KeyError: <type 'unicode'> in Mercurial.
     res = '\n'.join(lines)
     assert isinstance(res, str)
+    return res
+
+@wireproto.wireprotocommand('pullreviews', '*')
+def pullreviews(repo, proto, args=None):
+    proto.redirect()
+
+    o = parsepayload(proto, args)
+    if isinstance(o, wireproto.pusherr):
+        return o
+
+    root = getrbapi(repo, o)
+
+    lines = ['1']
+
+    for k, v in o['other']:
+        if k != 'rid':
+            continue
+
+        rr = root.get_review_request(review_request_id=v)
+
+        lines.append('reviewdata %s status %s' % (v,
+            urllib.quote(rr.status.encode('utf-8'))))
+
+    res = '\n'.join(lines)
+    assert isinstance(res, str)
+
     return res

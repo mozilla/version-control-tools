@@ -38,6 +38,7 @@ Pushing a review will create the reviews file
 
   $ cat .hg/reviews
   u http://localhost:$HGPORT
+  r ssh://user@dummy/$TESTTMP/server
   p bz://456 1
   c 7f387c765e685da95d7a4ffab2ccf06548c06fcf 2
   pc 7f387c765e685da95d7a4ffab2ccf06548c06fcf 1

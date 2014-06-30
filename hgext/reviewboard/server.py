@@ -45,6 +45,7 @@ def capabilities(orig, repo, proto):
 
     if repo.ui.configint('reviewboard', 'repoid', None):
         caps.append('reviewboard')
+        caps.append('pullreviews')
 
     return caps
 

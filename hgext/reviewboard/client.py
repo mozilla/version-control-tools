@@ -57,6 +57,9 @@ from mozhg.auth import getbugzillaauth
 
 testedwith = '3.0.1'
 
+cmdtable = {}
+command = cmdutil.command(cmdtable)
+
 def ensurereviewid(rid):
     """Ensure and nornalize a review id, aborting if necessary."""
     if not rid:
@@ -297,6 +300,8 @@ def doreview(repo, ui, remote, reviewnode):
         elif t == 'rburl':
             reviews.baseurl = d
 
+    reviews.remoteurl = remote.url()
+
     reviews.write()
     for rid, data in reviewdata.iteritems():
         reviews.savereviewrequest(rid, data)
@@ -313,6 +318,51 @@ def doreview(repo, ui, remote, reviewnode):
         ui.write(' (pending)')
     ui.write('\n')
 
+def _pullreviews(repo):
+    reviews = repo.reviews
+    if not reviews.remoteurl:
+        raise util.Abort(_("We don't know of any review servers. Try "
+                           "creating a review first."))
+
+    # In the ideal world, we'd use RBTools to talk directly to the ReviewBoard
+    # API. Unfortunately, the Mercurial distribution on Windows doesn't ship
+    # with the json module. So, we proxy through the Mercurial server and have
+    # it do all the heavy lifting.
+    # FUTURE Hook up RBTools directly.
+    remote = hg.peer(repo, {}, reviews.remoteurl)
+    remote.requirecap('pullreviews', _('obtain code reviews'))
+
+    lines = ['1']
+    for rid in sorted(reviews.reviewids):
+        lines.append('rid %s' % rid)
+
+    res = remote._call('pullreviews', data='\n'.join(lines))
+
+    try:
+        off = res.index('\n')
+        version = int(res[0:off])
+
+        if version != 1:
+            raise util.Abort(_('do not know how to handle response from server.'))
+    except ValueError:
+        raise util.Abort(_('invalid response from server.'))
+
+    assert version == 1
+    lines = res.split('\n')[1:]
+    reviewdata = {}
+
+    for line in lines:
+        t, d = line.split(' ', 1)
+
+        if t == 'reviewdata':
+            rid, field, value = d.split(' ', 2)
+            value = urllib.unquote(value)
+            reviewdata.setdefault(rid, {})[field] = value
+
+    for rid, data in reviewdata.iteritems():
+        reviews.savereviewrequest(rid, data)
+
+    repo.ui.write(_('updated %d reviews\n') % len(reviewdata))
 
 class reviewstore(object):
     """Holds information about ongoing reviews.
@@ -337,6 +387,7 @@ class reviewstore(object):
         self._parents = {}
 
         self.baseurl = None
+        self.remoteurl = None
 
         try:
             for line in repo.vfs('reviews'):
@@ -368,10 +419,18 @@ class reviewstore(object):
                     self._nodes[bin(node)][1].add(pid)
                 elif t == 'u':
                     self.baseurl = d
+                elif t == 'r':
+                    self.remoteurl = d
 
         except IOError as inst:
             if inst.errno != errno.ENOENT:
                 raise
+
+    @property
+    def reviewids(self):
+        """Returns a set of all known review IDs."""
+        return set([t[0] for t in self._nodes.values()]) | \
+               set(self._parents.values())
 
     def write(self):
         """Write the reviews file back to disk."""
@@ -383,6 +442,8 @@ class reviewstore(object):
 
             if self.baseurl:
                 f.write('u %s\n' % self.baseurl)
+            if self.remoteurl:
+                f.write('r %s\n' % self.remoteurl)
 
             for ident, rid in sorted(self._parents.iteritems()):
                 f.write('p %s %s\n' % (ident, rid))
@@ -497,6 +558,18 @@ def template_reviewstatus(repo, ctx, revcache, **args):
 
     return revcache['reviewstatus']
 
+@command('pullreviews', [], _('hg pullreviews'))
+def pullreviews(ui, repo, **opts):
+    """Pull information about your active code reviews.
+
+    When you initiate a code review by pushing to a review-enabled remote,
+    your repository will track the existence of that code review.
+
+    This command is used to pull code review information from a code review
+    server into your local repository.
+    """
+    return repo.pullreviews()
+
 
 def extsetup(ui):
     extensions.wrapfunction(exchange, 'push', wrappedpush)
@@ -527,6 +600,10 @@ def reposetup(ui, repo):
         @localrepo.repofilecache('reviews')
         def reviews(self):
             return reviewstore(self)
+
+        def pullreviews(self):
+            """Pull relevant code review information from a remote server."""
+            return _pullreviews(self)
 
     repo.__class__ = reviewboardrepo
 
