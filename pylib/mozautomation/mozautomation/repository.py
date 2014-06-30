@@ -153,6 +153,11 @@ def resolve_uri_to_tree(uri):
         if uri.startswith('%s%s' % (BASE_READ_URI, path)):
             return tree
 
+        if uri.startswith('%s%s' % (
+            BASE_READ_URI.replace('https://', 'http://'),
+            path)):
+            return tree
+
         if uri.startswith('%s%s' % (BASE_WRITE_URI, path)):
             return tree
 
