@@ -48,13 +48,12 @@ This extension lives under ``hgext/mozext``.
 Testing
 =======
 
-Testing requires a Python virtualenv because some extensions launch
-actual servers instead of mocking. To create the virtualenv::
+Testing requires a special Python environment. To create this
+environment:
 
-  $ virtualenv env
-  $ source env/bin/activate
-  $ pip install -r test-requirements.txt
-  $ easy_install ReviewBoard==2.0.2
+  $ ./create-test-environment
+  $ source venv/bin/activate
 
-(Yes, we need to use ``easy_install`` because ReviewBoard doesn't play
-nice with pip.)
+Then, launch the tests:
+
+  $ ./run-mercurial-tests.py

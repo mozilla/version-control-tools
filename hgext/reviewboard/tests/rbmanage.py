@@ -78,6 +78,10 @@ def main(args):
             'rbbz.extension.BugzillaExtension'], cwd=path,
             env=env, stdout=f, stderr=f)
 
+        subprocess.check_call(manage + ['enable-extension',
+            'rbmozui.extension.RBMozUI'],
+            cwd=path, env=env, stdout=f, stderr=f)
+
         subprocess.check_call(manage + ['createsuperuser', '--username',
             'testadmin', '--email', 'testadmin@example.com', '--noinput'], cwd=path,
             env=env, stderr=f, stdout=f)
