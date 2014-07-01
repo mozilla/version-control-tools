@@ -36,6 +36,7 @@ def HGEXT_BOOTSTRAP():
         'pylib/mozhg',
         'pylib/pep8',
         'pylib/pyflakes',
+        'pylib/requests',
         'pylib/reviewboardmods',
     ]
     for p in lib_paths:
