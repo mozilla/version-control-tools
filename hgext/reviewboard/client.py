@@ -238,12 +238,18 @@ def doreview(repo, ui, remote, reviewnode):
 
     reviews = repo.reviews
     oldparentid = reviews.findparentreview(identifier=identifier)
+
+    # If a changeset has multiple successors, we could associate the same
+    # review with different successor changesets. So, we need to be careful
+    # that we don't map multiple changesets to the same rid.
+    seenrids = set()
     for node in nodes:
         rid = reviews.findnodereview(node)
         data = hex(node)
-        if rid:
+        if rid and rid not in seenrids:
             data += ' %s' % rid
         lines.append('csetreview %s' % data)
+        seenrids.add(rid)
 
     # TODO can we define a new named template with the API so people can
     # customize this?
