@@ -30,6 +30,7 @@ def HGEXT_BOOTSTRAP():
     paths = set(sys.path)
 
     lib_paths = [
+        'pylib/bugsy',
         'pylib/flake8',
         'pylib/mccabe',
         'pylib/mozautomation',
