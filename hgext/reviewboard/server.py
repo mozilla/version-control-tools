@@ -31,10 +31,10 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 demandimport.disable()
 try:
-    import hgrb.shared
+    import hgrb.proto
 except ImportError:
     sys.path.insert(0, OUR_DIR)
-    import hgrb.shared
+    import hgrb.proto
 demandimport.enable()
 
 testedwith = '3.0.1'
