@@ -242,6 +242,12 @@ def doreview(repo, ui, remote, reviewnode):
     # If a changeset has multiple successors, we could associate the same
     # review with different successor changesets. So, we need to be careful
     # that we don't map multiple changesets to the same rid.
+    #
+    # Our current rule is first successor wins. Ideally, we'd probably use
+    # a content-based algorithm to select the most appropriate successor.
+    # This is because successors can be created any number of ways. A static
+    # rule based on successor index is likely the least correct of any
+    # option.
     seenrids = set()
     for node in nodes:
         rid = reviews.findnodereview(node)
