@@ -1,9 +1,12 @@
+import datetime
 import requests
 
 
 VALID_STATUS = ["RESOLVED", "ASSIGNED", "NEW", "UNCONFIRMED"]
 VALID_RESOLUTION = ["FIXED", "INCOMPLETE", "INVALID", "WORKSFORME", "DUPLICATE", "WONTFIX"]
 
+def str2datetime(s):
+    return datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%SZ')
 
 class BugException(Exception):
     """
@@ -20,19 +23,16 @@ class BugException(Exception):
 class Bug(object):
     """This represents a Bugzilla Bug"""
 
-    def __init__(self, bugzilla_url=None, token=None, **kwargs):
+    def __init__(self, bugsy=None, **kwargs):
         """
             Defaults are set if there are no kwargs passed in. To pass in
             a dict create the Bug object like the following
 
-            :param bugzilla_url: This is the Bugzilla REST URL endpoint. Defaults to None
-            :param token: Login token generated when instantiating a Bugsy() object with
-                          a valid username and password
+            :param bugsy: Bugsy instance to use to connect to Bugzilla.
 
             >>> bug = Bug(**myDict)
         """
-        self.bugzilla_url = bugzilla_url
-        self.token = token
+        self._bugsy = bugsy
         self._bug = dict(**kwargs)
         self._bug['op_sys'] = kwargs.get('op_sys', 'All')
         self._bug['product'] = kwargs.get('product', 'core')
@@ -201,13 +201,21 @@ class Bug(object):
             'FIXED'
         """
         if self._bug.has_key('id'):
-            url = self.bugzilla_url + "/bug/%s" % self._bug['id']
-            if self.token:
-                url = url + '?token=%s' % self.token
-            result = requests.get(url).json()
+            result = self._bugsy.request('bug/%s' % self._bug['id']).json()
             self._bug = dict(**result['bugs'][0])
         else:
             raise BugException("Unable to update bug that isn't in Bugzilla")
+
+    def get_comments(self):
+        """
+            Obtain comments for this bug.
+
+            Returns a list of Comment instances.
+        """
+        bug = unicode(self._bug['id'])
+        res = self._bugsy.request('bug/%s/comment' % bug).json()
+
+        return [Comment.from_json(c) for c in res['bugs'][bug]['comments']]
 
     def add_comment(self, comment):
         """
@@ -224,3 +232,28 @@ class Bug(object):
             Return the raw dict that is used inside this object
         """
         return self._bug
+
+
+class Comment(object):
+    """
+        Represents a single Bugzilla comment.
+    """
+
+    @staticmethod
+    def from_json(j):
+        c = Comment()
+
+        c.attachment_id = j['attachment_id']
+        c.author = j['author']
+        c.bug_id = j['bug_id']
+        c.creation_time = str2datetime(j['creation_time'])
+        c.creator = j['creator']
+        c.id = j['id']
+        c.is_private = j['is_private']
+        c.text = j['text']
+        c.time = str2datetime(j['time'])
+
+        if 'tags' in j:
+            c.tags = set(j['tags'])
+
+        return c
