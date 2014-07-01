@@ -129,7 +129,7 @@ def wrappedpushbookmark(orig, pushop):
         comment = '\n'.join(lines)
 
         ui.write(_('recording push in bug %s\n') % bugnumber)
-        bug.add_comment(comment)
+        bug.add_comment_working(comment)
 
     return result
 

@@ -227,6 +227,14 @@ class Bug(object):
         """
         self._bug['comment'] = comment
 
+    def add_comment_working(self, comment):
+        """API to add a comment that actually works.
+
+        This is a temporary workaround until add_comment is fixed.
+        """
+        self._bugsy.request('bug/%s/comment' % self._bug['id'], 'POST',
+            data={'comment': comment})
+
     def to_dict(self):
         """
             Return the raw dict that is used inside this object
