@@ -52,6 +52,8 @@ from bugsy import Bugsy
 demandimport.enable()
 from mozautomation.commitparser import parse_bugs
 from mozautomation.repository import (
+    BASE_READ_URI,
+    BASE_WRITE_URI,
     RELEASE_TREES,
     resolve_trees_to_uris,
     resolve_uri_to_tree,
@@ -63,17 +65,26 @@ testedwith = '3.0.1'
 def wrappedpushbookmark(orig, pushop):
     result = orig(pushop)
 
-    tree = resolve_uri_to_tree(pushop.remote.url())
-    if not tree:
-        return result
-
+    remoteurl = pushop.remote.url()
+    tree = resolve_uri_to_tree(remoteurl)
     # We don't support release trees (yet) because they have special flags
     # that need to get updated.
-    if tree in RELEASE_TREES:
+    if tree and tree in RELEASE_TREES:
         return result
 
-    baseuri = resolve_trees_to_uris([tree])[0][1]
-    assert baseuri
+    if tree:
+        baseuri = resolve_trees_to_uris([tree])[0][1]
+        assert baseuri
+    else:
+        # This isn't a known Firefox tree. Fall back to resolving URLs by
+        # hostname.
+
+        # Only attend Mozilla's server.
+        if not remoteurl.startswith(BASE_WRITE_URI):
+            return result
+
+        path = remoteurl[len(BASE_WRITE_URI):]
+        baseuri = remoteurl.replace(BASE_WRITE_URI, BASE_READ_URI).rstrip('/')
 
     bugsmap = {}
 
