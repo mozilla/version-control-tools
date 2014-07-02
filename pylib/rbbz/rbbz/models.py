@@ -9,7 +9,7 @@ from django.contrib.sites.models import Site
 from django.db import models
 from djblets.siteconfig.models import SiteConfiguration
 from djblets.util.decorators import simple_decorator
-from reviewboard.reviews.errors import PublishError
+from reviewboard.reviews.errors import PermissionError, PublishError
 from reviewboard.reviews.signals import (review_request_publishing,
                                          review_publishing, reply_publishing)
 from reviewboard.site.urlresolvers import local_site_reverse
