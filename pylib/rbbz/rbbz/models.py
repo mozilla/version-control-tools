@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import logging
+
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db import models
@@ -96,6 +98,15 @@ def publish_review_request(user, review_request_draft, **kwargs):
                       review_request_draft.description,
                       review_request_url(review_request),
                       reviewers)
+        # Publish and child review requests that are either not
+        # public, or have drafts.
+        for child in review_request_draft.depends_on.all():
+            if child.get_draft(user=user) or not child.public:
+                try:
+                    child.publish(user=user)
+                except PermissionError as e:
+                    logging.error('Could not publish child review request '
+                                  'with id %s because of error %s' % (child.id, e))
 
 def publish_review(user, review, **kwargs):
     review_request = review.review_request
