@@ -9,6 +9,8 @@ import imp
 import os
 import sys
 
+from coverage import coverage
+
 # Mercurial's run-tests.py isn't meant to be loaded as a module. We do it
 # anyway.
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -45,6 +47,36 @@ if __name__ == '__main__':
     hg = os.path.join(os.path.dirname(sys.executable), 'hg')
     sys.argv.extend(['--with-hg', hg])
 
+    coveragerc = os.path.join(HERE, '.coveragerc')
+    coverdir = os.path.join(HERE, 'coverage')
+    if not os.path.exists(coverdir):
+        os.mkdir(coverdir)
+
+    docoverage = '--cover' in sys.argv
+    sys.argv = [a for a in sys.argv if a != '--cover']
+
+    # run-tests.py's coverage options don't work for us... yet. So, we hack
+    # in code coverage manually.
+    if docoverage:
+        os.environ['COVERAGE_DIR'] = coverdir
+        os.environ['CODE_COVERAGE'] = '1'
+
     runner = runtestsmod.TestRunner()
     sys.argv.extend(find_test_files())
-    sys.exit(runner.run(sys.argv[1:]))
+
+    res = runner.run(sys.argv[1:])
+
+    if docoverage:
+        cov = coverage(data_file=os.path.join(coverdir, 'coverage'))
+        cov.combine()
+        cov.html_report(directory='coverage/html', ignore_errors=True,
+            omit=[
+                os.path.join(HERE, 'venv', '*'),
+                os.path.join(HERE, 'pylib', 'flake8', '*'),
+                os.path.join(HERE, 'pylib', 'mccabe', '*'),
+                os.path.join(HERE, 'pylib', 'mercurial-support', '*'),
+                os.path.join(HERE, 'pylib', 'pep8', '*'),
+                os.path.join(HERE, 'pylib', 'pyflakes', '*'),
+            ])
+
+    sys.exit(res)

@@ -21,4 +21,21 @@ else
   git clone git@github.com:mikeconley/rbmozui.git venv/tmp/rbmozui
 fi
 
-cd venv/tmp/rbmozui && python setup.py develop
+cd venv/tmp/rbmozui;
+python setup.py develop
+cd ../../..
+
+cat > venv/bin/sitecustomize.py << EOF
+import os
+
+if os.environ.get('CODE_COVERAGE', False):
+    import uuid
+    import coverage
+
+    covpath = os.path.join(os.environ['COVERAGE_DIR'],
+        'coverage.%s' % uuid.uuid1())
+    cov = coverage.coverage(data_file=covpath, auto_data=True)
+    cov._warn_no_data = False
+    cov._warn_unimported_source = False
+    cov.start()
+EOF
