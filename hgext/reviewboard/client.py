@@ -600,12 +600,6 @@ def reposetup(ui, repo):
         return
 
     class reviewboardrepo(repo.__class__):
-        def __init__(self, *args, **kwargs):
-            super(reviewboardrepo, self).__init__(*args, **kwargs)
-
-            self.noreviewboardpush = False
-            self.reviewid = None
-
         @localrepo.repofilecache('reviews')
         def reviews(self):
             return reviewstore(self)
@@ -615,6 +609,8 @@ def reposetup(ui, repo):
             return _pullreviews(self)
 
     repo.__class__ = reviewboardrepo
+    repo.noreviewboardpush = False
+    repo.reviewid = None
 
     def prepushoutgoinghook(local, remote, outgoing):
         if len(outgoing.missingheads) > 1:
