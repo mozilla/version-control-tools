@@ -72,9 +72,6 @@ def ensurereviewid(rid):
     if rid and (not rid.startswith('bz://') or not rid[5:].isdigit()):
         raise util.Abort(_('review identifier must be a bug number.'))
 
-    if len(rid.split()) > 1:
-        raise util.Abort(_('review identifier must not contain spaces.'))
-
     return rid
 
 def pushcommand(orig, ui, repo, *args, **kwargs):
