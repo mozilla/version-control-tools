@@ -1,0 +1,19 @@
+diff --git a/Bugzilla/Install/Requirements.pm b/Bugzilla/Install/Requirements.pm
+index 1c9c913..384df22 100644
+--- a/Bugzilla/Install/Requirements.pm
++++ b/Bugzilla/Install/Requirements.pm
+@@ -386,13 +386,6 @@ sub OPTIONAL_MODULES {
+         version => '0',
+         feature => ['memcached'],
+     },
+-
+-    # BMO - metrics
+-    {
+-        package => 'ElasticSearch',
+-        module  => 'ElasticSearch',
+-        version => '0',
+-    },
+     );
+
+     my $extra_modules = _get_extension_requirements('OPTIONAL_MODULES');
+bugzilla@vagrant-ubuntu-trusty-64:~/bugzilla$

@@ -1,0 +1,12 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu-1404-amd64"
+
+  config.vm.network "forwarded_port", guest: 80, host: 12000
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 4096
+    v.cpus = 4
+  end
+
+  config.vm.provision :shell, path: "vagrant-bootstrap.sh"
+end
