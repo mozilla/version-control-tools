@@ -14,16 +14,13 @@ easy_install ReviewBoard==2.0.2
 
 # rbmozui requires Node.js when installed normally. But in local
 # development mode it doesn't. So use local development node.
-mkdir -p venv/tmp
-if [ -d venv/tmp/rbmozui ]; then
-  cd venv/tmp/rbmzui && git pull
-else
-  git clone git@github.com:mikeconley/rbmozui.git venv/tmp/rbmozui
-fi
-
-cd venv/tmp/rbmozui;
+cd pylib/rbmozui;
 python setup.py develop
-cd ../../..
+cd ../..
+
+cd pylib/rbbz
+python setup.py develop
+cd ../..
 
 cat > venv/bin/sitecustomize.py << EOF
 import os

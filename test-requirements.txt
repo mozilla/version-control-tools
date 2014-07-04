@@ -1,6 +1,5 @@
 --find-links http://downloads.reviewboard.org/releases/Djblets/0.8/
 --find-links http://downloads.reviewboard.org/releases/django-evolution/0.7/
-git+git://github.com/mozilla/rbbz.git@master#egg=rbbz
 Django==1.6.5
 Markdown==2.4.1
 Pillow==2.4.0

@@ -9,8 +9,6 @@ import imp
 import os
 import sys
 
-from coverage import coverage
-
 # Mercurial's run-tests.py isn't meant to be loaded as a module. We do it
 # anyway.
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -42,7 +40,7 @@ def find_test_files():
 if __name__ == '__main__':
     if not hasattr(sys, 'real_prefix'):
         raise Exception('You are not running inside the virtualenv. Please '
-                'create one and `pip install -r test-requirements.txt`')
+                'run `create-test-environment` and `source venv/bin/activate`')
 
     hg = os.path.join(os.path.dirname(sys.executable), 'hg')
     sys.argv.extend(['--with-hg', hg])
@@ -65,6 +63,8 @@ if __name__ == '__main__':
     sys.argv.extend(find_test_files())
 
     res = runner.run(sys.argv[1:])
+
+    from coverage import coverage
 
     if docoverage:
         cov = coverage(data_file=os.path.join(coverdir, 'coverage'))
