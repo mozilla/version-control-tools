@@ -10,7 +10,6 @@ set -e
 err() { echo $1; exit 1; }
 prep-repo() {
   [ -n "$(hg qapplied --repository $1)" ] && err "Error: Patches applied in $1"
-  hg pull --repository "$1"
 }
 
 [ $# -ne 2 ] && err "Usage: $(basename "$0") REPO-TO-IMPORT TARGET-SUBDIRECTORY"
