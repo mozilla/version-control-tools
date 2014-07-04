@@ -1,4 +1,6 @@
 coverage/
+pylib/rbbz/rbbz.egg-info/
+pylib/rbmozui/rbmozui.egg-info/
 venv/
 \.pyc$
 \.pyo$
