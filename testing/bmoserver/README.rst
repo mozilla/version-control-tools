@@ -27,6 +27,14 @@ the VM, Bugzilla is available at http://localhost:12000/.
 The admin username and password is ``admin@example.com`` and
 ``password``.
 
+If you install a BMO data dump, you'll need to modify an existing
+account to become an admin::
+
+   $ vagrant ssh
+   $ sudo su - bugzilla
+   $ cd ~/bugzilla
+   $ ./checksetup.pl --make-admin=gps@mozilla.com --reset-password=gps@mozilla.com
+
 Choice of Vagrant
 =================
 
