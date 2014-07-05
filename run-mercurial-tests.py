@@ -65,6 +65,7 @@ if __name__ == '__main__':
     if oldvmstate != vm.RUNNING:
         vm.up()
         print('Brought up BMO virtual machine.')
+    os.environ['BUGZILLA_URL'] = 'http://localhost:12000'
 
     runner = runtestsmod.TestRunner()
     sys.argv.extend(find_test_files())

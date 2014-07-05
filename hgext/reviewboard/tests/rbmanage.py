@@ -82,6 +82,9 @@ def main(args):
             'rbmozui.extension.RBMozUI'],
             cwd=path, env=env, stdout=f, stderr=f)
 
+        # As long as we create a user here, rbbz will still authenticate it.
+        # Ideally, we'd create a user in Bugzilla and only have users
+        # go through rbbz/Bugzilla.
         subprocess.check_call(manage + ['createsuperuser', '--username',
             'testadmin', '--email', 'testadmin@example.com', '--noinput'], cwd=path,
             env=env, stderr=f, stdout=f)
@@ -105,6 +108,11 @@ def main(args):
         sc = SiteConfiguration.objects.get_current()
         sc.set('site_static_root', os.path.join(path, 'htdocs', 'static'))
         sc.set('site_media_root', os.path.join(path, 'htdocs', 'media'))
+
+        # Hook up rbbz authentication.
+        sc.set('auth_backend', 'bugzilla')
+        sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % os.environ['BUGZILLA_URL'])
+
         sc.save()
 
     elif action == 'repo':
