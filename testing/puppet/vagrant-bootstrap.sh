@@ -23,16 +23,11 @@ if [ ! -d $MODULES_DIR ]; then
   mkdir -p $MODULES_DIR
 fi
 
-cp /vagrant/Puppetfile $MODULES_DIR/Puppetfile
+cp /version-control-tools/testing/puppet/Puppetfile $MODULES_DIR/Puppetfile
 
 if [ `gem query --local | grep librarian-puppet | wc -l` -eq 0 ]; then
   gem install librarian-puppet
-  cd $MODULES_DIR && librarian-puppet install --clean
+  cd $MODULES_DIR && librarian-puppet install
 else
   cd $MODULES_DIR && librarian-puppet update
 fi
-
-puppet apply --verbose \
-  --modulepath=$MODULES_DIR/modules/ \
-  --fileserverconfig=/vagrant/puppet/fileserver.vagrant.conf \
-  /vagrant/manifests/bugzilla.pp

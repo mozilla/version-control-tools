@@ -2,7 +2,8 @@ coverage/
 pylib/rbbz/rbbz.egg-info/
 pylib/rbmozui/rbmozui.egg-info/
 testing/bmoserver/.vagrant
-testing/bmoserver/files/Mozilla-Bugzilla-Public*
+testing/puppet/files/Mozilla-Bugzilla-Public*
+testing/unifiedserver/.vagrant
 venv/
 \.pyc$
 \.pyo$

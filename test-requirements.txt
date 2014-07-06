@@ -2,9 +2,10 @@
 --find-links http://downloads.reviewboard.org/releases/django-evolution/0.7/
 Django==1.6.5
 Markdown==2.4.1
+MySQL-python==1.2.5
 Pillow==2.4.0
 Pygments==1.6
-RBTools==0.6.1
+--allow-external RBTools==0.6.1
 Whoosh==2.6.0
 coverage==3.7.1
 django-evolution==0.7.2
