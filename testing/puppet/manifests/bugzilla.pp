@@ -194,17 +194,6 @@ class bugzilla {
     cwd     => '/home/bugzilla/bugzilla',
   }
 
-  # Bug 1034678. Error creating default product.
-  # This is only relevant is we don't do a BMO load. But it's harmless of
-  # we do.
-  exec { 'patch_defaultproduct':
-    before   => Exec['bzchecksetup'],
-    require  => Exec['reset_git'],
-    command  => "/usr/bin/patch -p1 < $files/nodefaultproduct.patch",
-    user     => 'bugzilla',
-    cwd      => '/home/bugzilla/bugzilla',
-  }
-
   # The .htaccess isn't compatible with Apache 2.4. We fix that.
   exec { 'patch_htaccess':
     require => Exec['reset_git'],
