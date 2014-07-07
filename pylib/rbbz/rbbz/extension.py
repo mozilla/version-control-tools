@@ -2,48 +2,46 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import json
+
 from django.contrib.sites.models import Site
 
 from djblets.siteconfig.models import SiteConfiguration
 from djblets.util.decorators import simple_decorator
 
+from reviewboard.extensions.base import Extension
+from reviewboard.extensions.hooks import SignalHook
+from reviewboard.reviews.errors import PermissionError, PublishError
+from reviewboard.reviews.models import ReviewRequest
+from reviewboard.reviews.signals import (reply_publishing,
+                                         review_publishing,
+                                         review_request_closed,
+                                         review_request_publishing)
+from reviewboard.site.urlresolvers import local_site_reverse
+
 from rbbz.bugzilla import Bugzilla
 from rbbz.diffs import build_plaintext_review
-from rbbz.errors import (BugzillaError, ConfidentialBugError, InvalidBugIdError)
+from rbbz.errors import (BugzillaError,
+                         ConfidentialBugError,
+                         InvalidBugIdError)
 from rbbz.middleware import BugzillaCookieAuthMiddleware
-
-from reviewboard.extensions.base import Extension
-from reviewboard.reviews.errors import PermissionError, PublishError
-from reviewboard.reviews.signals import (review_request_publishing,
-                                         review_publishing,
-                                         reply_publishing)
-from reviewboard.site.urlresolvers import local_site_reverse
 
 
 BZIMPORT_PREFIX = "bz://"
+AUTO_CLOSE_DESCRIPTION = """
+Discarded automatically because parent review request was discarded.
+"""
 
 
 class BugzillaExtension(Extension):
     middleware = [BugzillaCookieAuthMiddleware]
 
     def initialize(self):
-        connect_signals()
-
-    def shutdown(self):
-        disconnect_signals()
-        super(BugzillaExtension, self).shutdown()
-
-
-def connect_signals():
-    review_request_publishing.connect(on_review_request_publishing)
-    review_publishing.connect(on_review_publishing)
-    reply_publishing.connect(on_reply_publishing)
-
-
-def disconnect_signals():
-    review_request_publishing.disconnect(on_review_request_publishing)
-    review_publishing.disconnect(on_review_publishing)
-    reply_publishing.disconnect(on_reply_publishing)
+        SignalHook(self, review_request_publishing,
+                   on_review_request_publishing)
+        SignalHook(self, review_publishing, on_review_publishing)
+        SignalHook(self, reply_publishing, on_reply_publishing)
+        SignalHook(self, review_request_closed, on_review_request_closed)
 
 
 def review_request_url(review_request, site=None, siteconfig=None):
@@ -64,7 +62,8 @@ def is_review_request_pushed(review_request):
 
 
 def is_review_request_squashed(review_request):
-    return str(review_request.extra_data.get('p2rb.is_squashed', False)) == "True"
+    squashed = str(review_request.extra_data.get('p2rb.is_squashed', False))
+    return squashed == "True"
 
 
 @simple_decorator
@@ -90,7 +89,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
     bug_id = review_request_draft.extra_data.get('p2rb.identifier', None)
 
     if bug_id.startswith(BZIMPORT_PREFIX):
-      bug_id = bug_id[len(BZIMPORT_PREFIX):]
+        bug_id = bug_id[len(BZIMPORT_PREFIX):]
 
     try:
         bug_id = int(bug_id)
@@ -129,13 +128,16 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                       reviewers)
         # Publish and child review requests that are either not
         # public, or have drafts.
-        for child in review_request_draft.depends_on.all():
-            if child.get_draft(user=user) or not child.public:
-                try:
+        for child in generate_child_review_requests(review_request):
+            try:
+                if child.status == ReviewRequest.DISCARDED:
+                    child.reopen(user=user)
+                if child.get_draft(user=user) or not child.public:
                     child.publish(user=user)
-                except PermissionError as e:
-                    logging.error('Could not publish child review request '
-                                  'with id %s because of error %s' % (child.id, e))
+            except PermissionError as e:
+                logging.error('Could not reopen or publish child review '
+                              'request with id %s because of error %s'
+                              % (child.id, e))
 
 
 def on_review_publishing(user, review, **kwargs):
@@ -170,3 +172,44 @@ def on_reply_publishing(user, reply, **kwargs):
 
     b.post_comment(bug_id, build_plaintext_review(reply, {"user": user}))
 
+
+def on_review_request_closed(user, review_request, type, **kwargs):
+    if (is_review_request_squashed(review_request) and
+            type == ReviewRequest.DISCARDED):
+        # At the point of discarding, it's possible that if this review
+        # request was never published, that most of the fields are empty
+        # (See https://code.google.com/p/reviewboard/issues/detail?id=3465).
+        # Luckily, the extra_data is still around, and more luckily, it's
+        # not exposed in the UI for user-meddling. We can find all of the
+        # child review requests via extra_data.p2rb.commits.
+        for child in generate_child_review_requests(review_request):
+            child.close(ReviewRequest.DISCARDED,
+                        user=user,
+                        description=AUTO_CLOSE_DESCRIPTION)
+
+        # Next, we clear out the commit_id on the squashed review request
+        # so that someone can post follow-up work with the same review
+        # identifier in the future. This value is, however, still being
+        # stored in extra_data under "p2rb.identifier".
+        review_request.commit = None
+        review_request.save()
+
+
+def generate_child_review_requests(squashed_review_request):
+    if not is_review_request_squashed(squashed_review_request):
+        return
+
+    commits = squashed_review_request.extra_data['p2rb.commits']
+    if commits:
+        commits = json.loads(commits)
+        for commit_tuple in commits:
+            child_commit_id = commit_tuple[0]
+            child_request_id = commit_tuple[1]
+            try:
+                child = ReviewRequest.objects.get(pk=child_request_id)
+                yield child
+            except ReviewRequest.DoesNotExist:
+                logging.error('Could not retrieve child review request '
+                              'with id %s belonging to commit %s because '
+                              'it does not appear to exist.'
+                              % (child_request_id, child_commit_id))
