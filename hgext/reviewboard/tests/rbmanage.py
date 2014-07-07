@@ -110,8 +110,9 @@ def main(args):
         sc.set('site_media_root', os.path.join(path, 'htdocs', 'media'))
 
         # Hook up rbbz authentication.
-        sc.set('auth_backend', 'bugzilla')
-        sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % os.environ['BUGZILLA_URL'])
+        # TODO enable when vm runs during tests
+        #sc.set('auth_backend', 'bugzilla')
+        #sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % os.environ['BUGZILLA_URL'])
 
         sc.save()
 
