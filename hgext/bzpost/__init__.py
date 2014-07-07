@@ -72,9 +72,14 @@ def wrappedpushbookmark(orig, pushop):
     if tree and tree in RELEASE_TREES:
         return result
 
+    tbpltree = None
+
     if tree:
         baseuri = resolve_trees_to_uris([tree])[0][1]
         assert baseuri
+
+        if tree == 'try':
+            tbpltree = 'Try'
     else:
         # This isn't a known Firefox tree. Fall back to resolving URLs by
         # hostname.
@@ -83,10 +88,11 @@ def wrappedpushbookmark(orig, pushop):
         if not remoteurl.startswith(BASE_WRITE_URI):
             return result
 
-        path = remoteurl[len(BASE_WRITE_URI):]
         baseuri = remoteurl.replace(BASE_WRITE_URI, BASE_READ_URI).rstrip('/')
 
     bugsmap = {}
+    lastbug = None
+    lastnode = None
 
     for node in pushop.outgoing.missing:
         ctx = pushop.repo[node]
@@ -105,6 +111,8 @@ def wrappedpushbookmark(orig, pushop):
             continue
 
         bugsmap.setdefault(bugs[0], []).append(ctx.hex()[0:12])
+        lastbug = bugs[0]
+        lastnode = ctx.hex()[0:12]
 
     if not bugsmap:
         return result
@@ -115,6 +123,23 @@ def wrappedpushbookmark(orig, pushop):
         return result
 
     bugsy = Bugsy(username=bzauth.username, password=bzauth.password)
+
+    # If this is a try push, we paste the TBPL link for the tip commit, because
+    # the per-commit URLs don't have much value.
+    # TODO roll this into normal pushing so we get a TBPL link in bugs as well.
+    if tbpltree and lastbug:
+        tbplurl = 'https://tbpl.mozilla.org/?tree=%s&rev=%s' % (
+            tbpltree, lastnode)
+
+        bug = bugsy.get(lastbug)
+        comments = bug.get_comments()
+        for comment in comments:
+            if tbplurl in comment.text:
+                return result
+
+        ui.write(_('recording TBPL push in bug %s\n') % lastbug)
+        bug.add_comment_working(tbplurl)
+        return result
 
     for bugnumber, nodes in bugsmap.items():
         bug = bugsy.get(bugnumber)
