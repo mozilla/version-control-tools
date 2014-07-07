@@ -35,6 +35,14 @@ AUTO_CLOSE_DESCRIPTION = """
 Discarded automatically because parent review request was discarded.
 """
 
+# Extra data fields which should be automatically copied from
+# the draft to the review request on publish.
+DRAFTED_EXTRA_DATA_KEYS = [
+    'p2rb.identifier',
+    'p2rb.commit_id',
+    'p2rb.commits',
+]
+
 
 class BugzillaExtension(Extension):
     middleware = [BugzillaCookieAuthMiddleware]
@@ -154,6 +162,16 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                 logging.error('Could not reopen or publish child review '
                               'request with id %s because of error %s'
                               % (child.id, e))
+
+    # Copy p2rb extra data from the draft, overwriting the current
+    # values on the review request.
+    draft_extra_data = review_request_draft.extra_data
+
+    for key in DRAFTED_EXTRA_DATA_KEYS:
+        if key in draft_extra_data:
+            review_request.extra_data[key] = draft_extra_data[key]
+
+    review_request.save()
 
 
 @bugzilla_to_publish_errors
