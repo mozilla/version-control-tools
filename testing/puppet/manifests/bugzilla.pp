@@ -44,7 +44,7 @@ class bugzilla {
     owner    => bugzilla,
     group    => bugzilla,
     ensure   => latest,
-    revision => 'production',
+    revision => 'master',
     require  => File['/home/bugzilla'],
   }
 
