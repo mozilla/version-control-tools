@@ -65,6 +65,10 @@ testedwith = '3.0.1'
 def wrappedpushbookmark(orig, pushop):
     result = orig(pushop)
 
+    # Don't do anything if error from push.
+    if result:
+        return result
+
     remoteurl = pushop.remote.url()
     tree = resolve_uri_to_tree(remoteurl)
     # We don't support release trees (yet) because they have special flags
