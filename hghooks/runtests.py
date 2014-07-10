@@ -908,6 +908,14 @@ class TestPreventWebIDLHook(unittest.TestCase):
     commit(u, self.clonerepo, message="checkin 1 bug 12345; r=foobar")
     self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
 
+  def testWebIDLEditWithoutReviewFromDOMPeerShouldPass(self):
+    """ Test that editing .webidl file by DOM peers without review should pass """
+    u = self.ui
+    editFile(join(self.clonedir, "original.webidl"), "interface Foo{};", "interface Bar{};")
+    commit(u, self.clonerepo, message="checkin 1 bug 12345", user="Johnny Stenback <jst@mozilla.com>")
+    result = push(u, self.clonerepo, dest=self.repodir)
+    self.assertEqual(result, 0)
+
   def testWebIDLEditWithoutProperReviewInReleaseMergeShouldPass(self):
     """ Test that editing .webidl file without proper DOM peer review when doing a code uplift should pass """
     u = self.ui

@@ -20,6 +20,7 @@ This hook is to prevent changes to .webidl files in pushes without proper DOM pe
 
 import re
 from mercurial.node import short
+from mercurial import util
 
 backoutMessage = [re.compile(x) for x in [
     r'^(back(ing|ed)?\s+out|backout)',
@@ -47,6 +48,19 @@ def hook(ui, repo, hooktype, node, **kwargs):
         'mrbkap',           # Blake Kaplan
         'bholley',          # Bobby Holley
     ]
+    DOM_authors = [
+        'jst@mozilla.com',         # Johnny Stenback
+        'peterv@propagandism.org', # Peter Van der Beken
+        'bzbarsky@mit.edu',        # Boris Zbarsky
+        'jonas@sicking.cc',        # Jonas Sicking
+        'olli.pettay@helsinki.fi', # Olli Pettay
+        'bent.mozilla@gmail.com',  # Ben Turner
+        'mounir@lamouri.fr',       # Mounir Lamouri
+        'khuey@kylehuey.com',      # Kyle Huey
+        'justin.lebar@gmail.com',  # Justin Lebar
+        'hsivonen@hsivonen.fi',    # Henri Sivonen
+        'mrbkap@gmail.com',        # Blake Kaplan
+    ]
     error = ""
     webidlReviewed = False
     changesets = list(repo.changelog.revs(repo[node].rev()))
@@ -66,12 +80,18 @@ def hook(ui, repo, hooktype, node, **kwargs):
             # Only Check WebIDL Files
             if file.endswith('.webidl'):
                 message = c.description().lower()
+                email = util.email(c.user())
                 def search():
                   matches = re.findall('\Ws?r\s*=\s*(\w+(?:,\w+)*)', message)
                   for match in matches:
                       for reviewer in match.split(','):
                           if reviewer in DOM_peers:
                               return True
+                  # We allow DOM peers to commit changes to WebIDL files without any review
+                  # requirements assuming that they have looked at the changes they're committing.
+                  for peer in DOM_authors:
+                      if peer == email:
+                          return True
                   return False
                 webidlReviewed = search()
                 if not webidlReviewed and not isBackout(message):
