@@ -25,14 +25,52 @@ tag will not move forward.
 
 import os
 
+from mercurial import cmdutil
 from mercurial.i18n import _
 
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 from mozautomation.repository import (
+    resolve_trees_to_uris,
     resolve_uri_to_tree,
 )
+
+testedwith = '3.0 3.0.1 3.0.2'
+
+cmdtable = {}
+command = cmdutil.command(cmdtable)
+
+shorttemplate = ''.join([
+    '{label("log.changeset", rev)}',
+    '{label("log.changeset", ":")}',
+    '{label("log.changeset", node|short)}',
+    ' ',
+    '{label("log.tag", tags)}',
+    ' ',
+    '{label("log.summary", firstline(desc))}',
+    '\n',
+    ])
+
+@command('fxheads', [
+    ('T', 'template', shorttemplate,
+     _('display with template'), _('TEMPLATE')),
+    ], _('show Firefox tree heads'))
+def fxheads(ui, repo, **opts):
+    """Show last known head commits for pulled Firefox trees.
+
+    The displayed list may be out of date. Pull before running to ensure
+    data is current.
+    """
+    displayer = cmdutil.show_changeset(ui, repo, opts)
+    for tag, node in sorted(repo.tags().items()):
+        if not resolve_trees_to_uris([tag])[0][1]:
+            continue
+
+        ctx = repo[node]
+        displayer.show(ctx)
+
+    displayer.close()
 
 def reposetup(ui, repo):
     if not repo.local():
