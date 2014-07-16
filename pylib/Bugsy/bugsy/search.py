@@ -1,5 +1,8 @@
+import copy
+
 import requests
 from bug import Bug
+import bugsy as Bugsy
 
 
 class Search(object):
@@ -13,12 +16,12 @@ class Search(object):
             :param bugsy: Bugsy instance to use to connect to Bugzilla.
         """
         self._bugsy = bugsy
-        self._includefields = ['version', 'id', 'summary', 'status', 'op_sys',
-                              'resolution', 'product', 'component', 'platform']
+        self._includefields = copy.copy(bugsy.DEFAULT_SEARCH)
         self._keywords = []
         self._assigned = []
         self._summaries = []
         self._whiteboard = []
+        self._bug_numbers = []
 
     def include_fields(self, *args):
         r"""
@@ -88,6 +91,18 @@ class Search(object):
         self._whiteboard = list(args)
         return self
 
+    def bug_number(self, bug_numbers):
+        r"""
+            When you want to search for a bugs and be able to change the fields returned.
+
+            :param bug_numbers: A string for the bug number or a list of strings
+            :returns: :class:`Search`
+
+            >>> bugzilla.search_for.bug_number(['123123', '123456'])
+        """
+        self._bug_numbers = list(bug_numbers)
+        return self
+
     def search(self):
         r"""
             Call the Bugzilla endpoint that will do the search. It will take the information
@@ -102,16 +117,24 @@ class Search(object):
         params = {}
         if self._includefields:
             params['include_fields'] = list(self._includefields)
-        if self._keywords:
-            params['keywords'] = list(self._keywords)
-        if self._assigned:
-            params['assigned_to'] = list(self._assigned)
-        if self._summaries:
-            params['short_desc_type'] = 'allwordssubstr'
-            params['short_desc'] = list(self._summaries)
-        if self._whiteboard:
-            params['short_desc_type'] = 'allwordssubstr'
-            params['whiteboard'] = list(self._whiteboard)
+        if self._bug_numbers:
+            bugs = []
+            for bug in self._bug_numbers:
+                result = self._bugsy.request('bug/%s' % bug, params=params).json()
+                bugs.append(Bug(self._bugsy, **result['bugs'][0]))
 
-        results = self._bugsy.request('bug', params=params).json()
-        return [Bug(self._bugsy, **bug) for bug in results['bugs']]
+            return bugs
+        else:
+            if self._keywords:
+                params['keywords'] = list(self._keywords)
+            if self._assigned:
+                params['assigned_to'] = list(self._assigned)
+            if self._summaries:
+                params['short_desc_type'] = 'allwordssubstr'
+                params['short_desc'] = list(self._summaries)
+            if self._whiteboard:
+                params['short_desc_type'] = 'allwordssubstr'
+                params['whiteboard'] = list(self._whiteboard)
+
+            results = self._bugsy.request('bug', params=params).json()
+            return [Bug(self._bugsy, **bug) for bug in results['bugs']]

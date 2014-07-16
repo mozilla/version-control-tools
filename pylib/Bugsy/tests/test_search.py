@@ -47,7 +47,6 @@ def test_we_only_ask_for_the_include_fields():
          ]
       }
 
-
   responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?assigned_to=dburns@mozilla.com&whiteboard=affects&short_desc_type=allwordssubstr&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform&include_fields=flags',
                     body=json.dumps(include_return), status=200,
                     content_type='application/json', match_querystring=True)
@@ -263,3 +262,41 @@ def test_we_can_search_whiteboard_fields():
     assert len(bugs) == 2
     assert bugs[0].product == whiteboard_return['bugs'][0]['product']
     assert bugs[0].summary == whiteboard_return['bugs'][0]['summary']
+
+@responses.activate
+def test_we_can_search_for_a_list_of_bug_numbers():
+    return_1 = {
+     "bugs" : [
+        {
+           "component" : "CSS Parsing and Computation",
+           "product" : "Core",
+           "summary" : "Map \"rebeccapurple\" to #663399 in named color list."
+        }
+      ]
+    }
+
+    return_2 = {
+     "bugs" : [
+        {
+           "component" : "Marionette",
+           "product" : "Testing",
+           "summary" : "Marionette thinks that the play button in the music app is not displayed"
+        }
+      ]
+    }
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+                      body=json.dumps(return_1), status=200,
+                      content_type='application/json', match_querystring=True)
+
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017316?include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+                      body=json.dumps(return_2), status=200,
+                      content_type='application/json', match_querystring=True)
+    bugzilla = Bugsy()
+    bugs = bugzilla.search_for\
+            .bug_number(['1017315', '1017316'])\
+            .search()
+
+    assert len(responses.calls) == 2
+    assert len(bugs) == 2
+    assert bugs[0].product == return_1['bugs'][0]['product']
+    assert bugs[0].summary == return_1['bugs'][0]['summary']

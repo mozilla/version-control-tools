@@ -1,4 +1,13 @@
 
+0.3.0 / 2014-07-14
+==================
+
+ * Updated Documentation
+ * Fix adding comments to bugs that already exist. Fixes #2
+ * Give the ability to search for multiple bugs which allows changing the fields returned
+ * Only request a small number of fields from Bugzilla. Fixes #3
+ * Initial Comments API design
+
 0.2.0 / 2014-06-26
 ==================
 

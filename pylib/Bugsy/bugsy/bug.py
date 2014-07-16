@@ -40,148 +40,176 @@ class Bug(object):
         self._bug['platform'] = kwargs.get('platform', 'All')
         self._bug['version'] = kwargs.get('version', 'unspecified')
 
-    def id():
-        doc = """
-            Property for getting the ID of a bug.
-
-            >>> bug.id
-            123456
+    @property
+    def id(self):
         """
-        def fget(self):
-            return self._bug.get('id', None)
-        return locals()
-    id = property(**id())
+        Property for getting the ID of a bug.
 
-    def summary():
-        doc = """
+        >>> bug.id
+        123456
+        """
+        return self._bug.get('id', None)
+
+    @property
+    def summary(self):
+        """
             Property for getting and setting the bug summary
 
-            >>> bug.summary = "I like cheese"
             >>> bug.summary
             "I like cheese"
         """
-        def fget(self):
-            return self._bug.get('summary', '')
-        def fset(self, value):
-            self._bug['summary'] = value
-        def fdel(self):
-            del self._bug['summary']
-        return locals()
-    summary = property(**summary())
+        return self._bug.get('summary', '')
 
-    def status():
-        doc = """
+    @summary.setter
+    def summary(self, value):
+        """
+            Property for getting and setting the bug summary
+
+            >>> bug.summary = "I like cheese"
+        """
+        self._bug['summary'] = value
+
+    @property
+    def status(self):
+        """
             Property for getting or setting the bug status
 
-            >>> bug.status = "REOPENED"
             >>> bug.status
             "REOPENED"
         """
-        def fget(self):
-            return self._bug.get('status', '')
-        def fset(self, value):
-            if self._bug.get('id', None):
-                if value in VALID_STATUS:
-                    self._bug['status'] = value
-                else:
-                    raise BugException("Invalid status type was used")
-            else:
-                raise BugException("Can not set status unless there is a bug id. Please call Update() before setting")
-        def fdel(self):
-            del self._bug['status']
-        return locals()
-    status = property(**status())
+        return self._bug.get('status', '')
 
-    def OS():
-        doc = """
+    @status.setter
+    def status(self, value):
+        """
+            Property for getting or setting the bug status
+
+            >>> bug.status = "REOPENED"
+        """
+        if self._bug.get('id', None):
+            if value in VALID_STATUS:
+                self._bug['status'] = value
+            else:
+                raise BugException("Invalid status type was used")
+        else:
+            raise BugException("Can not set status unless there is a bug id. Please call Update() before setting")
+
+    @property
+    def OS(self):
+        """
             Property for getting or setting the OS that the bug occured on
 
             >>> bug.OS
             "All"
+        """
+        return self._bug['op_sys']
+
+    @OS.setter
+    def OS(self, value):
+        """
+            Property for getting or setting the OS that the bug occured on
+
             >>> bug.OS = "Linux"
         """
-        def fget(self):
-            return self._bug['op_sys']
-        def fset(self, value):
-            self._bug['op_sys']
-        return locals()
-    OS = property(**OS())
+        self._bug['op_sys']
 
-    def resolution():
-        doc = """
+    @property
+    def resolution(self):
+        """
             Property for getting or setting the bug resolution
 
-            >>> bug.resolution = "FIXED"
             >>> bug.resolution
             "FIXED"
         """
-        def fget(self):
-            return self._bug['resolution']
-        def fset(self, value):
-            if value in VALID_RESOLUTION:
-                self._bug['resolution'] = value
-            else:
-                raise BugException("Invalid resolution type was used")
-        def fdel(self):
-            del self._bug['resolution']
-        return locals()
-    resolution = property(**resolution())
+        return self._bug['resolution']
 
-    def product():
-        doc = """
+    @resolution.setter
+    def resolution(self, value):
+        """
+            Property for getting or setting the bug resolution
+
+            >>> bug.resolution = "FIXED"
+        """
+        if value in VALID_RESOLUTION:
+            self._bug['resolution'] = value
+        else:
+            raise BugException("Invalid resolution type was used")
+
+    @property
+    def product(self):
+        """
             Property for getting the bug product
 
             >>> bug.product
             Core
         """
-        def fget(self):
-            return self._bug['product']
-        def fset(self, value):
-            self._product = value
-        return locals()
-    product = property(**product())
+        return self._bug['product']
 
-    def component():
-        doc = """
+    @product.setter
+    def product(self, value):
+        """
+            Property for getting the bug product
+
+            >>> bug.product = "DOM"
+        """
+        self._bug['product'] = value
+
+    @property
+    def component(self):
+        """
             Property for getting the bug component
 
             >>> bug.component
             General
         """
-        def fget(self):
-            return self._bug['component']
-        def fset(self, value):
-            self._bug['component'] = value
-        return locals()
-    component = property(**component())
+        return self._bug['component']
 
-    def platform():
-        doc = """
+    @component.setter
+    def component(self, value):
+        """
+            Property for getting the bug component
+
+            >>> bug.component = "Marionette"
+        """
+        self._bug['component'] = value
+
+    @property
+    def platform(self):
+        """
             Property for getting the bug platform
 
             >>> bug.platform
             "ARM"
         """
-        def fget(self):
-            return self._bug['platform']
-        def fset(self, value):
-            self._bug['platform'] = value
-        return locals()
-    platform = property(**platform())
+        return self._bug['platform']
 
-    def version():
-        doc = """
+    @platform.setter
+    def platform(self, value):
+        """
+            Property for getting the bug platform
+
+            >>> bug.platform = "OSX"
+        """
+        self._bug['platform'] = value
+
+    @property
+    def version(self):
+        """
             Property for getting the bug platform
 
             >>> bug.version
             "TRUNK"
         """
-        def fget(self):
-            return self._bug['version']
-        def fset(self, value):
-            self._bug['version'] = value
-        return locals()
-    version = property(**version())
+        return self._bug['version']
+
+    @version.setter
+    def version(self, value):
+        """
+            Property for getting the bug platform
+
+            >>> bug.version = "0.3"
+        """
+        self._bug['version'] = value
 
     def to_dict(self):
         """
@@ -215,25 +243,26 @@ class Bug(object):
         bug = unicode(self._bug['id'])
         res = self._bugsy.request('bug/%s/comment' % bug).json()
 
-        return [Comment.from_json(c) for c in res['bugs'][bug]['comments']]
+        return [Comment(**comments) for comments in res['bugs'][bug]['comments']]
 
     def add_comment(self, comment):
         """
-            Adds a comment to a bug. Once you have added it you will need to
-            call put on the Bugsy object
+            Adds a comment to a bug. If a bug does not have a bug ID then you need
+            call `put` on the :class:`Bugsy` class.
 
             >>> bug.add_comment("I like sausages")
             >>> bugzilla.put(bug)
-        """
-        self._bug['comment'] = comment
 
-    def add_comment_working(self, comment):
-        """API to add a comment that actually works.
+            If it does have a bug id then this will do a post to the server
 
-        This is a temporary workaround until add_comment is fixed.
+            >>> bug.add_comment("I like eggs too")
         """
-        self._bugsy.request('bug/%s/comment' % self._bug['id'], 'POST',
-            data={'comment': comment})
+        # If we have a key post immediately otherwise hold onto it until put(bug)
+        # is called
+        if self._bug.has_key('id'):
+            self._bugsy.session.post('%s/bug/%s/comment' % (self._bugsy.bugzilla_url, self._bug['id']), data={"comment": comment}, )
+        else:
+            self._bug['comment'] = comment
 
     def to_dict(self):
         """
@@ -247,21 +276,18 @@ class Comment(object):
         Represents a single Bugzilla comment.
     """
 
-    @staticmethod
-    def from_json(j):
-        c = Comment()
+    def __init__(self, **kwargs):
 
-        c.attachment_id = j['attachment_id']
-        c.author = j['author']
-        c.bug_id = j['bug_id']
-        c.creation_time = str2datetime(j['creation_time'])
-        c.creator = j['creator']
-        c.id = j['id']
-        c.is_private = j['is_private']
-        c.text = j['text']
-        c.time = str2datetime(j['time'])
+        self.attachment_id = kwargs['attachment_id']
+        self.author = kwargs['author']
+        self.bug_id = kwargs['bug_id']
+        self.creation_time = str2datetime(kwargs['creation_time'])
+        self.creator = kwargs['creator']
+        self.id = kwargs['id']
+        self.is_private = kwargs['is_private']
+        self.text = kwargs['text']
+        self.time = str2datetime(kwargs['time'])
 
-        if 'tags' in j:
-            c.tags = set(j['tags'])
+        if 'tags' in kwargs:
+            self.tags = set(kwargs['tags'])
 
-        return c

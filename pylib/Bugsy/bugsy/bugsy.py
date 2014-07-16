@@ -5,6 +5,8 @@ from bug import Bug
 from search import Search
 
 
+
+
 class BugsyException(Exception):
     """
         If while interacting with Bugzilla and we try do something that is not
@@ -31,6 +33,9 @@ class Bugsy(object):
     """
         Bugsy allows easy getting and putting of Bugzilla bugs
     """
+
+    DEFAULT_SEARCH = ['version', 'id', 'summary', 'status', 'op_sys',
+                      'resolution', 'product', 'component', 'platform']
 
     def __init__(self, username=None, password=None, bugzilla_url='https://bugzilla.mozilla.org/rest'):
         """
@@ -70,7 +75,7 @@ class Bugsy(object):
             >>> bugzilla = Bugsy()
             >>> bug = bugzilla.get(123456)
         """
-        bug = self.request('bug/%s' % bug_number).json()
+        bug = self.request('bug/%s' % bug_number, params={"include_fields" : self. DEFAULT_SEARCH}).json()
         return Bug(self, **bug['bugs'][0])
 
     def put(self, bug):
@@ -99,18 +104,16 @@ class Bugsy(object):
             result = self.request('bug', 'POST', data=bug.to_dict()).json()
             if not result.has_key('error'):
                 bug._bug['id'] = result['id']
+                bug._bugsy = self
             else:
                 raise BugsyException(result['message'])
         else:
             self.session.post('%s/bug/%s' % (self.bugzilla_url, bug.id),
                 data=bug.to_dict())
 
-    def search_for():
-        doc = "The search_for property."
-        def fget(self):
-            return Search(self)
-        return locals()
-    search_for = property(**search_for())
+    @property
+    def search_for(self):
+        return Search(self)
 
     def request(self, path, method='GET', **kwargs):
         """Perform a HTTP request.
@@ -119,6 +122,8 @@ class Bugsy(object):
         and arguments suitable for requests.Request(), perform a
         HTTP request.
         """
+        headers = {"User-Agent": "Bugsy"}
+        kwargs['headers'] = headers
         url = '%s/%s' % (self.bugzilla_url, path)
         return self.session.request(method, url, **kwargs)
 

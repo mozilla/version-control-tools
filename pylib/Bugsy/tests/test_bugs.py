@@ -1,3 +1,4 @@
+import datetime
 import responses
 import json
 
@@ -21,6 +22,41 @@ e': u'dburns@mozilla.com', u'real_name': u'David Burns :automatedtester'}, {u'id
 as]'}], u'alias': None, u'cf_tracking_b2g_v1_2': u'---', u'cf_tracking_b2g_v1_3': u'---', u'flags': [], u'assigned_to': u'jgriffin@mozilla.com', u'cf_s\
 tatus_firefox_esr24': u'---', u'resolution': u'FIXED', u'last_change_time': u'2014-05-30T21:20:17Z', u'cc': [u'coop@mozilla.com', u'dburns@mozilla.com'
 , u'jlund@mozilla.com', u'mdas@mozilla.com'], u'cf_blocking_fennec': u'---'}]}
+
+comments_return = {
+    u'bugs': {
+        u'1017315': {
+            u'comments': [
+                {
+                   u'attachment_id': None,
+                   u'author': u'gps@mozilla.com',
+                   u'bug_id': 1017315,
+                   u'creation_time': u'2014-03-27T23:47:45Z',
+                   u'creator': u'gps@mozilla.com',
+                   u'id': 8589785,
+                   u'is_private': False,
+                   u'raw_text': u'raw text 1',
+                   u'tags': [u'tag1', u'tag2'],
+                   u'text': u'text 1',
+                   u'time': u'2014-03-27T23:47:45Z'
+                },
+                {
+                   u'attachment_id': 8398207,
+                   u'author': u'gps@mozilla.com',
+                   u'bug_id': 1017315,
+                   u'creation_time': u'2014-03-27T23:56:34Z',
+                   u'creator': u'gps@mozilla.com',
+                   u'id': 8589812,
+                   u'is_private': True,
+                   u'raw_text': u'raw text 2',
+                   u'tags': [],
+                   u'text': u'text 2',
+                   u'time': u'2014-03-27T23:56:34Z'
+                },
+            ],
+        },
+    },
+}
 
 def test_can_create_bug_and_set_summary_afterwards():
     bug = Bug()
@@ -91,7 +127,7 @@ def test_we_can_get_a_dict_version_of_the_bug():
 
 @responses.activate
 def test_we_can_update_a_bug_from_bugzilla():
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315',
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
                       body=json.dumps(example_return), status=200,
                       content_type='application/json', match_querystring=True)
     bugzilla = Bugsy()
@@ -119,7 +155,7 @@ def test_we_can_update_a_bug_with_login_token():
                         body='{"token": "foobar"}', status=200,
                         content_type='application/json', match_querystring=True)
 
-  responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?token=foobar',
+  responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?token=foobar&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
                     body=json.dumps(example_return), status=200,
                     content_type='application/json', match_querystring=True)
   bugzilla = Bugsy("foo", "bar")
@@ -137,19 +173,72 @@ def test_we_can_update_a_bug_with_login_token():
   assert bug.summary == 'Schedule Mn tests on opt Linux builds on cedar'
 
 @responses.activate
-def test_that_we_can_add_a_comment_to_a_bug():
+def test_that_we_can_add_a_comment_to_a_bug_before_it_is_put():
     responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/login?login=foo&password=bar',
                           body='{"token": "foobar"}', status=200,
                           content_type='application/json', match_querystring=True)
 
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?token=foobar',
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?token=foobar&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+                      body=json.dumps(example_return), status=200,
+                      content_type='application/json', match_querystring=True)
+    bugzilla = Bugsy("foo", "bar")
+    bug = Bug()
+    bug.summary = "I like cheese"
+    bug.add_comment("I like sausages")
+
+    bug_dict = bug.to_dict().copy()
+    bug_dict['id'] = 123123
+
+    responses.add(responses.POST, 'https://bugzilla.mozilla.org/rest/bug?token=foobar',
+                      body=json.dumps(bug_dict), status=200,
+                      content_type='application/json', match_querystring=True)
+    bugzilla.put(bug)
+
+@responses.activate
+def test_that_we_can_add_a_comment_to_an_existing_bug():
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/login?login=foo&password=bar',
+                          body='{"token": "foobar"}', status=200,
+                          content_type='application/json', match_querystring=True)
+
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?token=foobar&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
                       body=json.dumps(example_return), status=200,
                       content_type='application/json', match_querystring=True)
     bugzilla = Bugsy("foo", "bar")
     bug = bugzilla.get(1017315)
+
+    responses.add(responses.POST, 'https://bugzilla.mozilla.org/rest/bug/1017315/comment?token=foobar',
+                      body=json.dumps({}), status=200,
+                      content_type='application/json', match_querystring=True)
+
     bug.add_comment("I like sausages")
 
-    responses.add(responses.POST, 'https://bugzilla.mozilla.org/rest/bug/1017315?token=foobar',
+    assert len(responses.calls) == 3
+
+@responses.activate
+def test_comment_retrieval():
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/login?login=foo&password=bar',
+                        body='{"token": "foobar"}', status=200,
+                        content_type='application/json', match_querystring=True)
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?token=foobar&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
                       body=json.dumps(example_return), status=200,
                       content_type='application/json', match_querystring=True)
-    bugzilla.put(bug)
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315/comment?token=foobar',
+                    body=json.dumps(comments_return), status=200,
+                    content_type='application/json', match_querystring=True)
+
+    bugzilla = Bugsy("foo", "bar")
+    bug = bugzilla.get(1017315)
+    comments = bug.get_comments()
+    assert len(comments) == 2
+    c1 = comments[0]
+    assert c1.attachment_id is None
+    assert c1.author == u'gps@mozilla.com'
+    assert c1.bug_id == 1017315
+    assert c1.creation_time == datetime.datetime(2014, 03, 27, 23, 47, 45)
+    assert c1.creator == u'gps@mozilla.com'
+    assert c1.id == 8589785
+    assert c1.is_private is False
+    assert c1.text == u'text 1'
+    assert c1.tags == set([u'tag1', u'tag2'])
+    assert c1.time == datetime.datetime(2014, 03, 27, 23, 47, 45)
+

@@ -87,6 +87,27 @@ o you just chain the items that you need and then call `search` when the search 
 
 More details can be found in from the :class:`Search` class
 
+Comments
+~~~~~~~~
+
+Getting comments from a bug
+
+.. code-block:: python
+
+    import bugsy
+    bugzilla = bugsy.Bugsy()
+    bug = bugzilla.get(123456)
+    comments = bug.get_comments()
+    comments[0].text # Returns  "I <3 Sausages"
+
+Adding comments to a bug
+
+.. code-block:: python
+
+    import bugsy
+    bugzilla = bugsy.Bugsy()
+    bug = bugzilla.get(123456)
+    bug.add_comment("And I love bacon too!")
 
 To see further details look at:
 
@@ -95,6 +116,7 @@ To see further details look at:
 
    bugsy.rst
    bug.rst
+   comment.rst
    search_bug.rst
 
 
