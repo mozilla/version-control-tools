@@ -68,8 +68,6 @@ def peerorrepo(orig, ui, path, *args, **kwargs):
 
         return orig(ui, uri, *args, **kwargs)
 
-extensions.wrapfunction(hg, '_peerorrepo', peerorrepo)
-
 @command('fxheads', [
     ('T', 'template', shorttemplate,
      _('display with template'), _('TEMPLATE')),
@@ -89,6 +87,9 @@ def fxheads(ui, repo, **opts):
         displayer.show(ctx)
 
     displayer.close()
+
+def extsetup(ui):
+    extensions.wrapfunction(hg, '_peerorrepo', peerorrepo)
 
 def reposetup(ui, repo):
     if not repo.local():
