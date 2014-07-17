@@ -27,8 +27,10 @@ import os
 
 from mercurial import (
     cmdutil,
+    exchange,
     extensions,
     hg,
+    util,
 )
 from mercurial.error import RepoError
 from mercurial.i18n import _
@@ -57,6 +59,21 @@ shorttemplate = ''.join([
     '\n',
     ])
 
+def isfirefoxrepo(repo):
+    """Whether a repository is a Firefox repository.
+
+    A Firefox repository is a peer that has a URL of a known tree or a local
+    repository whose initial commit is the well-known initial Firefox commit.
+    """
+    tree = resolve_uri_to_tree(repo.url())
+    if tree:
+        return True
+
+    if not len(repo):
+        return False
+
+    return repo[0].hex() == '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
+
 # Wrap repo lookup to automagically resolve tree names to URIs.
 def peerorrepo(orig, ui, path, *args, **kwargs):
     try:
@@ -67,6 +84,35 @@ def peerorrepo(orig, ui, path, *args, **kwargs):
             raise
 
         return orig(ui, uri, *args, **kwargs)
+
+def push(orig, repo, remote, force=False, revs=None, newbranch=False):
+    # If no arguments are specified to `hg push`, Mercurial's default
+    # behavior is to try to push all non-remote changesets. The Firefox
+    # trees all have hooks that prevent new heads from being created.
+    # This default Mercurial behavior can really cause problems when people
+    # are doing multi-headed development (e.g. bookmark-based development
+    # instead of mq). So, we silently change the default behavior of
+    # `hg push` to only push the current changeset.
+    if isfirefoxrepo(repo) and not revs:
+        repo.ui.write(_('no revisions specified to push; '
+            'using . to avoid pushing multiple heads\n'))
+        revs = [repo['.'].node()]
+
+    return orig(repo, remote, force=force, revs=revs, newbranch=newbranch)
+
+def prepushoutgoinghook(local, remote, outgoing):
+    """Hook that prevents us from attempting to push multiple heads.
+
+    Firefox repos have hooks that prevent receiving multiple heads. Waiting
+    for the hook to fire on the remote wastes time. Implement it locally.
+    """
+    tree = resolve_uri_to_tree(remote.url())
+    if not tree or tree == 'try':
+        return
+
+    if len(outgoing.missingheads) > 1:
+        raise util.Abort(_('cannot push multiple heads to a Firefox tree; '
+            'limit pushed revisions using the -r argument'))
 
 @command('fxheads', [
     ('T', 'template', shorttemplate,
@@ -90,6 +136,7 @@ def fxheads(ui, repo, **opts):
 
 def extsetup(ui):
     extensions.wrapfunction(hg, '_peerorrepo', peerorrepo)
+    extensions.wrapfunction(exchange, 'push', push)
 
 def reposetup(ui, repo):
     if not repo.local():
@@ -122,3 +169,4 @@ def reposetup(ui, repo):
             self.tag(tree, node, message=None, local=True, user=None, date=None)
 
     repo.__class__ = firefoxtreerepo
+    repo.prepushoutgoinghooks.add('firefoxtree', prepushoutgoinghook)
