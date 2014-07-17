@@ -74,9 +74,16 @@ class Bugzilla(object):
 
             user_id = result['id']
 
-        params = {'ids': [user_id], 'include_fields': self.user_fields}
+        params = {'ids': [user_id], 'include_fields': self.user_fields,
+                  'groups': ['reviewboard']}
 
-        return self.proxy.User.get(params)
+        try:
+            return self.proxy.User.get(params)
+        except xmlrpclib.Fault as e:
+            if e.faultCode == 804:
+                # User isn't a member of the requisite group.
+                return None
+            raise
 
     @xmlrpc_to_bugzilla_errors
     def get_user(self, username):
