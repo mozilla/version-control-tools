@@ -21,6 +21,36 @@ pull mozilla-central changeset by running ``hg up central``.
 
 These local tags are read only. If you update to a tag and commit, the
 tag will not move forward.
+
+Pre-defined Repository Paths
+============================
+
+Instead of defining URLs of Firefox repositories in your .hg/hgrc, the
+extension defines them for you.
+
+You can run `hg pull central` or `hg pull inbound` and the alias
+automatically gets resolved to the appropriate URL.
+
+Safer Push Defaults
+===================
+
+The default behavior of `hg push` is to transfer all non-remote changesets
+to the remote. For people with a head/bookmark-based workflow, this is
+extremely annoying, as you'll perform the push only to have a hook on a
+server reject it because you are pushing multiple heads.
+
+This extension changes the default behavior of `hg push` to only push
+'.' (the commit of the working copy) by default when pushing to a
+Firefox repo.
+
+This extension also prevents pushing of multiple heads to known Firefox
+repos (the server would reject the multi-headed push anyway).
+
+fxheads Command
+===============
+
+The `hg fxheads` command is a variation of `hg heads` that prints a concise
+list of the last-known commits for the Firefox repositories.
 """
 
 import os
