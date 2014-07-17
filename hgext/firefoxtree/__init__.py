@@ -25,7 +25,12 @@ tag will not move forward.
 
 import os
 
-from mercurial import cmdutil
+from mercurial import (
+    cmdutil,
+    extensions,
+    hg,
+)
+from mercurial.error import RepoError
 from mercurial.i18n import _
 
 OUR_DIR = os.path.dirname(__file__)
@@ -51,6 +56,19 @@ shorttemplate = ''.join([
     '{label("log.summary", firstline(desc))}',
     '\n',
     ])
+
+# Wrap repo lookup to automagically resolve tree names to URIs.
+def peerorrepo(orig, ui, path, *args, **kwargs):
+    try:
+        return orig(ui, path, *args, **kwargs)
+    except RepoError:
+        tree, uri = resolve_trees_to_uris([path])[0]
+        if not uri:
+            raise
+
+        return orig(ui, uri, *args, **kwargs)
+
+extensions.wrapfunction(hg, '_peerorrepo', peerorrepo)
 
 @command('fxheads', [
     ('T', 'template', shorttemplate,
