@@ -154,6 +154,9 @@ def fxheads(ui, repo, **opts):
     The displayed list may be out of date. Pull before running to ensure
     data is current.
     """
+    if not isfirefoxrepo(repo):
+        raise util.Abort(_('fxheads is only available on Firefox repos'))
+
     displayer = cmdutil.show_changeset(ui, repo, opts)
     for tag, node in sorted(repo.tags().items()):
         if not resolve_trees_to_uris([tag])[0][1]:
@@ -170,6 +173,11 @@ def extsetup(ui):
 
 def reposetup(ui, repo):
     if not repo.local():
+        return
+
+    # Only change behavior on repositories that are clones of a Firefox
+    # repository.
+    if not isfirefoxrepo(repo):
         return
 
     orig_pull = repo.pull
