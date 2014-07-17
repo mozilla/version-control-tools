@@ -10,7 +10,7 @@ from djblets.siteconfig.models import SiteConfiguration
 from djblets.util.decorators import simple_decorator
 
 from reviewboard.extensions.base import Extension
-from reviewboard.extensions.hooks import SignalHook
+from reviewboard.extensions.hooks import AuthBackendHook, SignalHook
 from reviewboard.reviews.errors import PermissionError, PublishError
 from reviewboard.reviews.models import ReviewRequest
 from reviewboard.reviews.signals import (reply_publishing,
@@ -19,6 +19,7 @@ from reviewboard.reviews.signals import (reply_publishing,
                                          review_request_publishing)
 from reviewboard.site.urlresolvers import local_site_reverse
 
+from rbbz.auth import BugzillaBackend
 from rbbz.bugzilla import Bugzilla
 from rbbz.diffs import build_plaintext_review
 from rbbz.errors import (BugzillaError,
@@ -37,6 +38,7 @@ class BugzillaExtension(Extension):
     middleware = [BugzillaCookieAuthMiddleware]
 
     def initialize(self):
+        AuthBackendHook(self, BugzillaBackend)
         SignalHook(self, review_request_publishing,
                    on_review_request_publishing)
         SignalHook(self, review_publishing, on_review_publishing)

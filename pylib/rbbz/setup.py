@@ -14,8 +14,5 @@ setup(name=PACKAGE,
       entry_points={
           'reviewboard.extensions':
               '%s = rbbz.extension:BugzillaExtension' % PACKAGE,
-          'reviewboard.auth_backends': [
-              'bugzilla = rbbz.auth:BugzillaBackend',
-          ],
       }
 )
