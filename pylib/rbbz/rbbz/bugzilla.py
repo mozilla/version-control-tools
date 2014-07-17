@@ -18,6 +18,16 @@ def xmlrpc_to_bugzilla_errors(func):
             return func(*args, **kwargs)
         except xmlrpclib.Fault as e:
             raise BugzillaError(e.faultString, e.faultCode)
+        except xmlrpclib.ProtocolError as e:
+            raise BugzillaError(e.errmsg, e.errcode)
+        except IOError as e:
+            # Raised when the protocol is invalid.
+            msg = 'unknown IOError'
+
+            if e.args:
+                msg = e.args[0]
+
+            raise BugzillaError(msg)
     return _transform_errors
 
 
