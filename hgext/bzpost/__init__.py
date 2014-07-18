@@ -66,7 +66,7 @@ def wrappedpushbookmark(orig, pushop):
     result = orig(pushop)
 
     # Don't do anything if error from push.
-    if result:
+    if not pushop.ret:
         return result
 
     remoteurl = pushop.remote.url()
