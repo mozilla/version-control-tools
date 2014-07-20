@@ -80,25 +80,28 @@ import urllib2
 from mercurial import (
     changegroup,
     cmdutil,
-    exchange,
     extensions,
     url as hgurl,
     wireproto,
 )
 from mercurial.i18n import _
 
-testedwith = '3.0 3.0.1 3.0.2'
+testedwith = '2.5.4 2.6 2.6.1 2.6.2 2.6.3 2.7 2.7.1 2.7.2 2.8 2.8.1 2.8.2 2.9 2.9.1 2.9.2 3.0 3.0.1 3.0.2'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
-def capabilities(orig, *args, **kwargs):
-    caps = orig(*args, **kwargs)
-    caps.append('bundles')
+origcapabilities = wireproto.capabilities
 
-    return caps
+try:
+    from mercurial import exchange
+    readbundle = exchange.readbundle
+except ImportError:
+    readbundle = changegroup.readbundle
 
-@wireproto.wireprotocommand('bundles', '')
+def capabilities(*args, **kwargs):
+    return origcapabilities(*args, **kwargs) + ' bundles'
+
 def bundles(repo, proto):
     """Server command for returning info for available bundles.
 
@@ -107,7 +110,9 @@ def bundles(repo, proto):
     return repo.opener.tryread('bundleclone.manifest')
 
 def extsetup(ui):
-    extensions.wrapfunction(wireproto, '_capabilities', capabilities)
+    wireproto.capabilities = capabilities
+    wireproto.commands['capabilities'] = (capabilities, '')
+    wireproto.commands['bundles'] = (bundles, '')
 
 def reposetup(ui, repo):
     if not repo.local():
@@ -149,8 +154,18 @@ def reposetup(ui, repo):
 
             try:
                 fh = hgurl.open(self.ui, url)
-                cg = exchange.readbundle(self.ui, fh, 'stream')
-                changegroup.addchangegroup(self, cg, 'bundleclone', url)
+                # Newer versions of readbundle take a ui argument.
+                try:
+                    cg = readbundle(self.ui, fh, 'stream')
+                except TypeError:
+                    cg = readbundle(fh, 'stream')
+
+                # addchangegroup moved from localrepo class to changegroup module.
+                if hasattr(changegroup, 'addchangegroup'):
+                    changegroup.addchangegroup(self, cg, 'bundleclone', url)
+                else:
+                    self.addchangegroup(cg, 'bundleclone', url)
+
                 self.ui.status(_('finishing applying bundle; pulling\n'))
                 return self.pull(remote, heads=heads)
 
