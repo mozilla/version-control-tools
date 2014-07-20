@@ -142,6 +142,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                               % (child.id, e))
 
 
+@bugzilla_to_publish_errors
 def on_review_publishing(user, review, **kwargs):
     review_request = review.review_request
 
@@ -162,6 +163,7 @@ def on_review_publishing(user, review, **kwargs):
                                                siteconfig))
 
 
+@bugzilla_to_publish_errors
 def on_reply_publishing(user, reply, **kwargs):
     review_request = reply.review_request
 
