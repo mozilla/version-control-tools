@@ -28,13 +28,15 @@ def get_extensions():
     m = {}
 
     for d in os.listdir(EXTDIR):
-        if d.startswith('.'):
+        ext_dir = os.path.join(EXTDIR, d)
+
+        if d.startswith('.') or not os.path.isdir(ext_dir):
             continue
 
-        e = {'tests': set()}
+        e = {'tests': set(), 'testedwith': set()}
 
         # Find test files.
-        test_dir = os.path.join(EXTDIR, d, 'tests')
+        test_dir = os.path.join(ext_dir, 'tests')
         if os.path.isdir(test_dir):
             for f in os.listdir(test_dir):
                 if f.startswith('.'):
@@ -42,6 +44,22 @@ def get_extensions():
 
                 if f.startswith('test-') and f.endswith(('.py', '.t')):
                     e['tests'].add(os.path.join(test_dir, f))
+
+        # Look for compatibility info.
+        for f in os.listdir(ext_dir):
+            if f.startswith('.') or not f.endswith('.py'):
+                continue
+
+            with open(os.path.join(ext_dir, f), 'rb') as fh:
+                lines = fh.readlines()
+
+            for line in lines:
+                if not line.startswith('testedwith'):
+                    continue
+
+                v, value = line.split('=', 1)
+                value = value.strip().strip("'").strip('"').strip()
+                e['testedwith'] = set(value.split())
 
         m[d] = e
 
