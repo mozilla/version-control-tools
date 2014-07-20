@@ -20,23 +20,32 @@ sys.path.insert(0, os.path.join(HERE, 'pylib', 'mercurial-support'))
 runtestsmod = imp.load_source('runtests', RUNTESTS)
 
 
-def find_test_files():
-    """Find all test files in this repository."""
+def get_extensions():
+    """Obtain information about extensions.
+
+    Returns a dict mapping extension name to metadata.
+    """
+    m = {}
+
     for d in os.listdir(EXTDIR):
         if d.startswith('.'):
             continue
 
+        e = {'tests': set()}
+
+        # Find test files.
         test_dir = os.path.join(EXTDIR, d, 'tests')
-        if not os.path.isdir(test_dir):
-            continue
+        if os.path.isdir(test_dir):
+            for f in os.listdir(test_dir):
+                if f.startswith('.'):
+                    continue
 
-        for f in os.listdir(test_dir):
-            if f.startswith('.'):
-                continue
+                if f.startswith('test-') and f.endswith(('.py', '.t')):
+                    e['tests'].add(os.path.join(test_dir, f))
 
-            if f.startswith('test-') and f.endswith(('.py', '.t')):
-                yield os.path.join(test_dir, f)
+        m[d] = e
 
+    return m
 
 if __name__ == '__main__':
     if not hasattr(sys, 'real_prefix'):
@@ -81,7 +90,8 @@ if __name__ == '__main__':
 
     # Add all tests unless we get an argument that looks like a test path.
     if not any(a for a in extra[1:] if not a.startswith('-')):
-        sys.argv.extend(find_test_files())
+        for e in get_extensions().values():
+            sys.argv.extend(sorted(e['tests']))
 
     res = runner.run(sys.argv[1:])
 
