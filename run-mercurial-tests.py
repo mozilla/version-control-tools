@@ -5,6 +5,7 @@
 
 # This file is used to run all Mercurial-related tests in this repository.
 
+import argparse
 import imp
 import os
 import sys
@@ -42,22 +43,30 @@ if __name__ == '__main__':
         raise Exception('You are not running inside the virtualenv. Please '
                 'run `create-test-environment` and `source venv/bin/activate`')
 
-    hg = os.path.join(os.path.dirname(sys.executable), 'hg')
-    sys.argv.extend(['--with-hg', hg])
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--with-hg')
+    parser.add_argument('-C', '--cover', action='store_true')
+
+    options, extra = parser.parse_known_args(sys.argv)
+
+    if not options.with_hg:
+        hg = os.path.join(os.path.dirname(sys.executable), 'hg')
+        sys.argv.extend(['--with-hg', hg])
 
     coveragerc = os.path.join(HERE, '.coveragerc')
     coverdir = os.path.join(HERE, 'coverage')
     if not os.path.exists(coverdir):
         os.mkdir(coverdir)
 
-    docoverage = '--cover' in sys.argv
-    sys.argv = [a for a in sys.argv if a != '--cover']
-
     # run-tests.py's coverage options don't work for us... yet. So, we hack
     # in code coverage manually.
-    if docoverage:
+    if options.cover:
         os.environ['COVERAGE_DIR'] = coverdir
         os.environ['CODE_COVERAGE'] = '1'
+
+    # We do our own code coverage. Strip it so run-tests.py doesn't try to do
+    # it's own.
+    sys.argv = [a for a in sys.argv if a != '--cover']
 
     # TODO enable integration with virtual machine when it is ready.
     #from vagrant import Vagrant
@@ -80,7 +89,7 @@ if __name__ == '__main__':
 
     from coverage import coverage
 
-    if docoverage:
+    if options.cover:
         cov = coverage(data_file=os.path.join(coverdir, 'coverage'))
         cov.combine()
         cov.html_report(directory='coverage/html', ignore_errors=True,
