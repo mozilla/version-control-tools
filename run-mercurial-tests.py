@@ -78,7 +78,10 @@ if __name__ == '__main__':
     #os.environ['BUGZILLA_URL'] = 'http://localhost:12000'
 
     runner = runtestsmod.TestRunner()
-    sys.argv.extend(find_test_files())
+
+    # Add all tests unless we get an argument that looks like a test path.
+    if not any(a for a in extra[1:] if not a.startswith('-')):
+        sys.argv.extend(find_test_files())
 
     res = runner.run(sys.argv[1:])
 
