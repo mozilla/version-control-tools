@@ -127,7 +127,7 @@ class Bugzilla(object):
         return bool(groups)
 
     @xmlrpc_to_bugzilla_errors
-    def post_rb_url(self, bug_id, review_id, summary, description, url,
+    def post_rb_url(self, bug_id, review_id, summary, comment, url,
                     reviewers):
         """Posts a new attachment containing a review-request URL, or updates
            an existing one."""
@@ -180,7 +180,7 @@ class Bugzilla(object):
 
         params['file_name'] = 'reviewboard-%d-url.txt' % review_id
         params['summary'] = summary
-        params['comment'] = description
+        params['comment'] = comment
         if flags:
             params['flags'] = flags
 

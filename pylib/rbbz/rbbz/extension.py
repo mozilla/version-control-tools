@@ -122,10 +122,19 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
     # Bugzilla gets inundatated with lots of patches, and the squashed
     # one is the only one we want to post there.
     if is_review_request_squashed(review_request):
+        comment = review_request_draft.description
+
+        if (review_request_draft.changedesc and
+            review_request_draft.changedesc.text):
+            if not comment.endswith('\n'):
+                comment += '\n'
+
+            comment += '\n%s' % review_request_draft.changedesc.text
+
         b.post_rb_url(bug_id,
                       review_request.id,
                       review_request_draft.summary,
-                      review_request_draft.description,
+                      comment,
                       review_request_url(review_request),
                       reviewers)
         # Publish and child review requests that are either not
