@@ -22,6 +22,8 @@ cd pylib/rbbz
 python setup.py develop
 cd ../..
 
+# Collect code coverage from all Python processes if environment variable
+# is set.
 cat > venv/bin/sitecustomize.py << EOF
 import os
 
@@ -36,3 +38,19 @@ if os.environ.get('CODE_COVERAGE', False):
     cov._warn_unimported_source = False
     cov.start()
 EOF
+
+# Install various Mercurial versions for multi-version testing.
+if [ ! -d venv/hg ]; then
+  hg clone https://hg.selenic.com/hg venv/hg
+fi
+
+for v in 2.5.4 2.6 2.6.1 2.6.2 2.6.3 2.7 2.7.1 2.7.2 2.8 2.8.1 2.8.2 2.9 2.9.1 2.9.2 3.0 3.0.1 3.0.2; do
+  destdir=`pwd`/venv/mercurials/$v
+  if [ ! -d $destdir ]; then
+    cd venv/hg
+    hg up $v
+    make install PREFIX=$destdir
+    make clean
+    cd ../..
+  fi
+done
