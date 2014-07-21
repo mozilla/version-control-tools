@@ -10,21 +10,8 @@
   {% if request.resolver_match.url_name == 'view-diff' %}
     class="active"
   {% endif %}>Diff</a></li>
-  {% if review_request|isSquashed %}
   <li><a href="{% url 'rbmozui.views.commits' review_request.id %}"
-  {% if request.resolver_match.url_name == 'view-diff' %}
+  {% if request.resolver_match.url_name == 'rbmozui-commits' %}
     class="active"
   {% endif %}>Commits</a></li>
-  {% endif %}
 </ul>
-
-
-
-
-
-
-
-
-
-
-

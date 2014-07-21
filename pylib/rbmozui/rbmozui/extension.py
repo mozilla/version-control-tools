@@ -59,7 +59,7 @@ class RBMozUI(Extension):
                      apply_to=diffviewer_url_names)
         TemplateHook(self, 'base-before-content', 'rbmozui/review-header.html',
                      apply_to=review_request_url_names + ['rbmozui-commits'])
-        TemplateHook(self, 'base-scripts-post', 'rbmozui/review-js.html',
+        TemplateHook(self, 'base-scripts-post', 'rbmozui/review-scripts-js.html',
                      apply_to=review_request_url_names)
         TemplateHook(self, 'rbmozui-commits-scripts', 'rbmozui/commits-scripts-js.html',
                      apply_to='rbmozui-commits')
