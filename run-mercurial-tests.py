@@ -174,6 +174,14 @@ if __name__ == '__main__':
     if options.cover:
         cov = coverage(data_file=os.path.join(coverdir, 'coverage'))
         cov.combine()
+
+        # Ensure all .py files show up in coverage report.
+        for d in (EXTDIR, os.path.join(HERE, 'pylib')):
+            for root, dirs, files in os.walk(d):
+                for f in files:
+                    if f.endswith('.py'):
+                        cov.data.touch_file(os.path.join(root, f))
+
         cov.html_report(directory='coverage/html', ignore_errors=True,
             omit=[
                 os.path.join(HERE, 'venv', '*'),
