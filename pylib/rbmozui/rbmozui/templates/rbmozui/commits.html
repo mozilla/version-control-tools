@@ -1,22 +1,93 @@
 {% extends "reviews/reviewable_base.html" %}
+
 {% load djblets_extensions rb_extensions i18n %}
+
+{% ext_css_bundle extension "commits" %}
+
 {% block title %}{{review_request.summary}} | {% trans "Review Request" %}{% endblock %}
 
 {% block content %}
-<div id="commits">
-  <ul id="commit-list"></ul>
+
+<div id="commits-container">
+  <div id="error-container">
+    <h1>Well, this is embarassing...</h1>
+    <p>
+      Something's gone wrong in either retrieving or manipulating these review requests. Sorry about that. <a href="https://bugzilla.mozilla.org/enter_bug.cgi?product=bugzilla.mozilla.org&component=rbbz" target="_blank">Please consider filing a bug,</a> and including the following information:
+    </p>
+    <p id="error-info">
+    </p>
+    <a href="#" id="error-close">Close</a>
+  </div>
+  <div id="commits">
+    <ul id="commit-list"></ul>
+  </div>
+  <button id="publish">Publish</button>
 </div>
 {% endblock content %}
 
 {% block scripts-post %}
+
+{{block.super}}
+
 {% template_hook_point "rbmozui-commits-scripts" %}
+
+<script type="text/template" id="loading-template">
+  <div class="loading commit-container">
+    Loading <%=commitID%>...
+  </div>
+</script>
+
+<script type="text/template" id="reviewer-template">
+  <li class="reviewer">
+    <span class="remove rb-icon rb-icon-delete" data-username="<%= reviewer.get('username')%>"></span>
+    <span><%= reviewer.get('username') %></span>
+  </li>
+</script>
+
 <script type="text/template" id="commit-template">
-  <div class="view">
-    <label><%- summary %></label>
+  <div class="commit commit-container" hasReviewers="<%= hasReviewers %>" state="<%= state %>">
+    <div class="commit-container-head">
+      <label class="commit-id">
+        <a href="<%=commitLink%>"><%=commitNum%>: <%= commitID %></a>
+      </label>
+      <div class="summary" title="<%= description %>"><%= summary %></div>
+    </div>
+    <div class="reviewer-container">
+      <label class="no-reviewers">
+        Needs reviewers
+      </label>
+      <label class="has-reviewers">
+        Reviewers:
+      </label>
+      <ul class="reviewers">
+        <% reviewers.each(function(reviewer) { %>
+          <%= reviewerTemplate({reviewer: reviewer}) %>
+        <% }); %>
+      </ul>
+    </div>
+    <div class="commit-container-foot">
+      <label class="add-reviewer-label">
+        Add a reviewer
+      </label>
+      <form class="reviewer-form">
+        <input class="reviewer-input" type="text" placeholder="Try a name, e-mail address, or IRC nick"/>
+      </form>
+      <span class="state">
+        <span class="needs-publishing">Needs publishing</span>
+        <span class="unsaved-changes">Unsaved changes</span>
+        <span class="published">Published</span>
+      </span>
+    </div>
   </div>
 </script>
 
 <script>
-  new RBMozUI.CommitsView({id: {{review_request.id}}});
+$(document).ready(function() {
+  new RBMozUI.CommitsView({
+    squashedID: {{squashedID}},
+    commits: JSON.parse("{{commits_json|escapejs}}")
+  });
+  $("#new-navbar").show();
+});
 </script>
 {% endblock scripts-post %}
