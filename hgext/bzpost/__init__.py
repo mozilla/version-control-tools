@@ -126,7 +126,10 @@ def wrappedpushbookmark(orig, pushop):
     if not bzauth or not bzauth.username or not bzauth.password:
         return result
 
-    bugsy = Bugsy(username=bzauth.username, password=bzauth.password)
+    bzurl = ui.config('bugzilla', 'url', 'https://bugzilla.mozilla.org/rest')
+
+    bugsy = Bugsy(username=bzauth.username, password=bzauth.password,
+            bugzilla_url=bzurl)
 
     # If this is a try push, we paste the TBPL link for the tip commit, because
     # the per-commit URLs don't have much value.
