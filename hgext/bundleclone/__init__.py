@@ -19,6 +19,10 @@ To enable cloning from bundles, simply enable this extension on the client.
 If the server supports bundle clones and a bundle is available, it will be
 used. If not, there is no change in behavior.
 
+The ``bundleclone.pullmanifest`` boolean config flag can be set to enable
+pulling the bundleclone manifest from the server during clone and pull
+operations. It is not enabled by default.
+
 Server Use
 ==========
 
@@ -179,5 +183,20 @@ def reposetup(ui, repo):
                 return super(bundleclonerepo, self).clone(remote, heads=heads,
                         stream=stream)
 
+        def pull(self, remote, *args, **kwargs):
+            res = super(bundleclonerepo, self).pull(remote, *args, **kwargs)
+
+            if remote.capable('bundles') and \
+                    self.ui.configbool('bundleclone', 'pullmanifest', False):
+
+                lock = self.lock()
+                self.ui.status(_('pulling bundleclone manifest\n'))
+                manifest = remote._call('bundles')
+                try:
+                    self.opener.write('bundleclone.manifest', manifest)
+                finally:
+                    lock.release()
+
+            return res
 
     repo.__class__ = bundleclonerepo

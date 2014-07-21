@@ -132,3 +132,45 @@ Bundle with full content works
   no changes found
   updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+
+Clone will copy manifest from server
+
+  $ python $TESTDIR/hgext/bundleclone/tests/httpserver.py $HGPORT1 2> server.log &
+  $ while [ ! -f listening ]; do sleep 0; done
+  $ hg --config bundleclone.pullmanifest=True clone http://localhost:$HGPORT clone-copy-manifest
+  downloading bundle http://localhost:$HGPORT1/aaff8d2ffbbf.hg
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 2 changes to 2 files
+  finishing applying bundle; pulling
+  searching for changes
+  no changes found
+  pulling bundleclone manifest
+  updating to branch default
+  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ cat clone-copy-manifest/.hg/bundleclone.manifest
+  http://localhost:$HGPORT1/aaff8d2ffbbf.hg
+
+Pull will copy manifest from server
+
+  $ python $TESTDIR/hgext/bundleclone/tests/httpserver.py $HGPORT1 2> server.log &
+  $ while [ ! -f listening ]; do sleep 0; done
+  $ hg clone http://localhost:$HGPORT pull-copy-manifest
+  downloading bundle http://localhost:$HGPORT1/aaff8d2ffbbf.hg
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 2 changes to 2 files
+  finishing applying bundle; pulling
+  searching for changes
+  no changes found
+  updating to branch default
+  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg -R pull-copy-manifest --config bundleclone.pullmanifest=True pull
+  pulling from http://localhost:$HGPORT/
+  searching for changes
+  no changes found
+  pulling bundleclone manifest
+  $ cat clone-copy-manifest/.hg/bundleclone.manifest
+  http://localhost:$HGPORT1/aaff8d2ffbbf.hg
