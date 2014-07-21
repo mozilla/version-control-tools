@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import json
+import re
 
 from django.contrib.sites.models import Site
 
@@ -28,7 +29,7 @@ from rbbz.errors import (BugzillaError,
 from rbbz.middleware import BugzillaCookieAuthMiddleware
 
 
-BZIMPORT_PREFIX = "bz://"
+REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')
 AUTO_CLOSE_DESCRIPTION = """
 Discarded automatically because parent review request was discarded.
 """
@@ -86,12 +87,15 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
     if not is_review_request_pushed(review_request):
         return
 
-    # The reviewid passed through p2rb is, for Mozilla's instance anyway, also
-    # the bug ID.
-    bug_id = review_request_draft.extra_data.get('p2rb.identifier', None)
+    # The reviewid passed through p2rb is, for Mozilla's instance anyway,
+    # bz://<bug id>/<irc nick>.
+    reviewid = review_request_draft.extra_data.get('p2rb.identifier', None)
+    m = REVIEWID_RE.match(reviewid)
 
-    if bug_id.startswith(BZIMPORT_PREFIX):
-        bug_id = bug_id[len(BZIMPORT_PREFIX):]
+    if not m:
+        raise InvalidBugIdError('<unknown>')
+
+    bug_id = m.group(1)
 
     try:
         bug_id = int(bug_id)
