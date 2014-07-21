@@ -4,7 +4,7 @@ Django==1.6.5
 Markdown==2.4.1
 Pillow==2.4.0
 Pygments==1.6
---allow-external RBTools==0.6.1
+RBTools==0.6.1
 Whoosh==2.6.0
 coverage==3.7.1
 django-evolution==0.7.2
