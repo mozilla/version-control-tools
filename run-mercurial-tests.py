@@ -73,12 +73,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--with-hg')
     parser.add_argument('-C', '--cover', action='store_true')
+    parser.add_argument('--all-versions', action='store_true',
+        help='Test against all marked compatible versions')
 
     options, extra = parser.parse_known_args(sys.argv)
 
-    if not options.with_hg:
-        hg = os.path.join(os.path.dirname(sys.executable), 'hg')
-        sys.argv.extend(['--with-hg', hg])
+    # --all-versions belongs to use only. Don't pass it along
+    sys.argv = [a for a in sys.argv if a != '--all-versions']
 
     coveragerc = os.path.join(HERE, '.coveragerc')
     coverdir = os.path.join(HERE, 'coverage')
@@ -106,12 +107,55 @@ if __name__ == '__main__':
 
     runner = runtestsmod.TestRunner()
 
+    orig_args = list(sys.argv)
+
+    if not options.with_hg:
+        hg = os.path.join(os.path.dirname(sys.executable), 'hg')
+        sys.argv.extend(['--with-hg', hg])
+
+    extensions = get_extensions()
+
     # Add all tests unless we get an argument that looks like a test path.
     if not any(a for a in extra[1:] if not a.startswith('-')):
-        for e in get_extensions().values():
+        for e in extensions.values():
             sys.argv.extend(sorted(e['tests']))
 
+    old_env = os.environ.copy()
+    old_defaults = dict(runtestsmod.defaults)
     res = runner.run(sys.argv[1:])
+    os.environ.clear()
+    os.environ.update(old_env)
+    runtestsmod.defaults = dict(old_defaults)
+
+    # If we're running the full compatibility run, figure out what versions
+    # apply to what and run them.
+    if options.all_versions:
+        versions = {}
+        for e, m in extensions.items():
+            for v in m['testedwith']:
+                tests = versions.setdefault(v, set())
+                tests |= m['tests']
+
+        mercurials_dir = os.path.normpath(os.path.abspath(os.path.join(
+            os.environ['VIRTUAL_ENV'], 'mercurials')))
+
+        for version, tests in sorted(versions.items()):
+            if not tests:
+                continue
+
+            sys.argv = list(orig_args)
+            sys.argv.extend(['--with-hg',
+                os.path.join(mercurials_dir, version, 'bin', 'hg')])
+            sys.argv.extend(sorted(tests))
+
+            print('Testing with Mercurial %s' % version)
+            runner = runtestsmod.TestRunner()
+            res2 = runner.run(sys.argv[1:])
+            if res2:
+                res = res2
+            os.environ.clear()
+            os.environ.update(old_env)
+            runtestsmod.defaults = dict(old_defaults)
 
     #if oldvmstate in (vm.NOT_CREATED, vm.POWEROFF, vm.ABORTED):
     #    vm.halt()
