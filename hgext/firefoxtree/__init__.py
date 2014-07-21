@@ -125,7 +125,7 @@ def push(orig, repo, remote, force=False, revs=None, newbranch=False):
     # instead of mq). So, we silently change the default behavior of
     # `hg push` to only push the current changeset.
     if isfirefoxrepo(repo) and not revs:
-        repo.ui.write(_('no revisions specified to push; '
+        repo.ui.status(_('no revisions specified to push; '
             'using . to avoid pushing multiple heads\n'))
         revs = [repo['.'].node()]
 
