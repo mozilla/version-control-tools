@@ -177,11 +177,13 @@ if __name__ == '__main__':
         cov.html_report(directory='coverage/html', ignore_errors=True,
             omit=[
                 os.path.join(HERE, 'venv', '*'),
+                os.path.join(HERE, 'pylib', 'Bugsy', '*'),
                 os.path.join(HERE, 'pylib', 'flake8', '*'),
                 os.path.join(HERE, 'pylib', 'mccabe', '*'),
                 os.path.join(HERE, 'pylib', 'mercurial-support', '*'),
                 os.path.join(HERE, 'pylib', 'pep8', '*'),
                 os.path.join(HERE, 'pylib', 'pyflakes', '*'),
+                os.path.join(HERE, 'pylib', 'requests', '*'),
             ])
 
     sys.exit(res)
