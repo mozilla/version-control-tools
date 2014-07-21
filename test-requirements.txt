@@ -16,6 +16,7 @@ feedparser==5.1.3
 futures==2.1.6
 mercurial==3.0.1
 mimeparse==0.1.3
+mock==1.0.1
 paramiko==1.14.0
 pillowfight==0.2
 pycrypto==2.6.1
@@ -24,3 +25,6 @@ python-memcached==1.53
 python-vagrant==0.5.0
 pytz==2014.4
 recaptcha-client==1.0.6
+requests==2.3.0
+responses==0.2.2
+six==1.7.3
