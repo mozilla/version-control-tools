@@ -142,7 +142,7 @@ def wrappedpushbookmark(orig, pushop):
                 return result
 
         ui.write(_('recording TBPL push in bug %s\n') % lastbug)
-        bug.add_comment_working(tbplurl)
+        bug.add_comment(tbplurl)
         return result
 
     for bugnumber, nodes in bugsmap.items():
