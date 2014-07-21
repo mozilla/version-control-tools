@@ -99,10 +99,11 @@ def isfirefoxrepo(repo):
     if tree:
         return True
 
-    if not len(repo):
-        return False
+    if len(repo) and repo[0].hex() == '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29':
+        return True
 
-    return repo[0].hex() == '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
+    # Backdoor for testing.
+    return repo.opener.exists('IS_FIREFOX_REPO')
 
 # Wrap repo lookup to automagically resolve tree names to URIs.
 def peerorrepo(orig, ui, path, *args, **kwargs):
