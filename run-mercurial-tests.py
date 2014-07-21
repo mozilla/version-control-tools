@@ -5,6 +5,8 @@
 
 # This file is used to run all Mercurial-related tests in this repository.
 
+from __future__ import print_function
+
 import argparse
 import imp
 import os
@@ -73,10 +75,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--with-hg')
     parser.add_argument('-C', '--cover', action='store_true')
+    parser.add_argument('-j', '--jobs', type=int)
     parser.add_argument('--all-versions', action='store_true',
         help='Test against all marked compatible versions')
 
     options, extra = parser.parse_known_args(sys.argv)
+
+    if not options.jobs:
+        print('WARNING: Not running tests optimally. Specify -j to run tests '
+                'in parallel.', file=sys.stderr)
 
     # --all-versions belongs to use only. Don't pass it along
     sys.argv = [a for a in sys.argv if a != '--all-versions']
