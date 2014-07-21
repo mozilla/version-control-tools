@@ -22,6 +22,10 @@ pull mozilla-central changeset by running ``hg up central``.
 These local tags are read only. If you update to a tag and commit, the
 tag will not move forward.
 
+Servers can optionally enable serving these tags by setting
+``firefoxtree.servetags`` to True. When clients perform a pull, they will
+download and apply these tags automatically.
+
 Pre-defined Repository Paths
 ============================
 
@@ -61,9 +65,14 @@ from mercurial import (
     extensions,
     hg,
     util,
+    wireproto,
 )
 from mercurial.error import RepoError
 from mercurial.i18n import _
+from mercurial.node import (
+    bin,
+    hex,
+)
 
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
@@ -115,6 +124,28 @@ def peerorrepo(orig, ui, path, *args, **kwargs):
             raise
 
         return orig(ui, uri, *args, **kwargs)
+
+# Wraps capabilities wireproto command to advertise firefoxtree existence.
+def capabilities(orig, repo, proto):
+    caps = orig(repo, proto)
+
+    if isfirefoxrepo(repo) and \
+            repo.ui.configbool('firefoxtree', 'servetags', False):
+        caps.append('firefoxtrees')
+
+    return caps
+
+@wireproto.wireprotocommand('firefoxtrees', '')
+def firefoxtrees(repo, proto):
+    lines = []
+
+    for tag, node in sorted(repo.tags().items()):
+        if not resolve_trees_to_uris([tag])[0][1]:
+            continue
+
+        lines.append('%s %s' % (tag, hex(node)))
+
+    return '\n'.join(lines)
 
 def push(orig, repo, remote, force=False, revs=None, newbranch=False):
     # If no arguments are specified to `hg push`, Mercurial's default
@@ -171,6 +202,7 @@ def fxheads(ui, repo, **opts):
 def extsetup(ui):
     extensions.wrapfunction(hg, '_peerorrepo', peerorrepo)
     extensions.wrapfunction(exchange, 'push', push)
+    extensions.wrapfunction(wireproto, '_capabilities', capabilities)
 
 def reposetup(ui, repo):
     if not repo.local():
@@ -186,10 +218,37 @@ def reposetup(ui, repo):
         def pull(self, remote, *args, **kwargs):
             old_rev = len(self)
             res = orig_pull(remote, *args, **kwargs)
-            tree = resolve_uri_to_tree(remote.url())
-            if tree:
-                tree = tree.encode('utf-8')
-                self._updateremoterefs(remote, tree)
+
+            lock = self.lock()
+            try:
+                if remote.capable('firefoxtrees'):
+                    lines = remote._call('firefoxtrees').splitlines()
+                    oldtags = self.tags()
+                    for line in lines:
+                        tag, node = line.split()
+                        node = bin(node)
+                        self.tag(tag, node, message=None, local=True,
+                                user=None, date=None)
+                        between = None
+                        if tag in oldtags:
+                            between = len(list(self.revs('%s::%s' % (
+                                hex(oldtags[tag]), hex(node))))) - 1
+
+                            if not between:
+                                continue
+
+                        msg = _('updated firefox tree tag %s') % tag
+                        if between:
+                            msg += _(' (+%d commits)') % between
+                        msg += '\n'
+                        self.ui.status(msg)
+
+                tree = resolve_uri_to_tree(remote.url())
+                if tree:
+                    tree = tree.encode('utf-8')
+                    self._updateremoterefs(remote, tree)
+            finally:
+                lock.release()
 
             return res
 
