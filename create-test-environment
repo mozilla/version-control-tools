@@ -41,7 +41,7 @@ EOF
 
 # Install various Mercurial versions for multi-version testing.
 if [ ! -d venv/hg ]; then
-  hg clone https://hg.selenic.com/hg venv/hg
+  hg clone http://selenic.com/repo/hg venv/hg
 fi
 
 for v in 2.5.4 2.6 2.6.1 2.6.2 2.6.3 2.7 2.7.1 2.7.2 2.8 2.8.1 2.8.2 2.9 2.9.1 2.9.2 3.0 3.0.1 3.0.2; do
