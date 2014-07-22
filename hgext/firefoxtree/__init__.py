@@ -83,6 +83,7 @@ from mozautomation.repository import (
 )
 
 testedwith = '3.0 3.0.1 3.0.2'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Other%20Applications&component=firefoxtree'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
