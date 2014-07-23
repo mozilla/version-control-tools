@@ -17,13 +17,10 @@ hgNameToRevURL = {
     'mozilla-esr24':   'releases/mozilla-esr24/',
     'mozilla-esr31':   'releases/mozilla-esr31/',
     # Gecko B2G branches
+    'mozilla-b2g32_v2_0':      'releases/mozilla-b2g32_v2_0/',
     'mozilla-b2g30_v1_4':      'releases/mozilla-b2g30_v1_4/',
     'mozilla-b2g28_v1_3':      'releases/mozilla-b2g28_v1_3/',
     'mozilla-b2g28_v1_3t':     'releases/mozilla-b2g28_v1_3t/',
-    'mozilla-b2g26_v1_2':      'releases/mozilla-b2g26_v1_2/',
-    'mozilla-b2g26_v1_2f':     'releases/mozilla-b2g26_v1_2f/',
-    'mozilla-b2g18':           'releases/mozilla-b2g18/',
-    'mozilla-b2g18_v1_1_0_hd': 'releases/mozilla-b2g18_v1_1_0_hd/',
     # Thunderbird branches
     'comm-central': 'comm-central/',
     'comm-aurora':  'releases/comm-aurora/',
