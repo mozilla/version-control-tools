@@ -36,7 +36,7 @@
   summary:    Bug 123 - Foo 1
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
 Splitting the changeset results in multiple reviews
@@ -69,5 +69,5 @@ Splitting the changeset results in multiple reviews
   summary:    Bug 123 - Foo 3
   review:     http://localhost:$HGPORT1/r/3 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)

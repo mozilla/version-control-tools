@@ -39,7 +39,7 @@ Set up the repo
   summary:    foo2
   review:     http://localhost:$HGPORT/r/2 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT/r/1 (pending)
 
 Now create a new head and push a rebase
@@ -70,5 +70,5 @@ Now create a new head and push a rebase
   summary:    foo2
   review:     http://localhost:$HGPORT/r/2 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT/r/1 (pending)

@@ -60,24 +60,57 @@ testedwith = '3.0 3.0.1 3.0.2'
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
-def ensurereviewid(rid):
-    """Ensure and nornalize a review id, aborting if necessary."""
-    if not rid:
-        return None
+class ReviewID(object):
+    """Represents a parsed review identifier."""
 
-    # Assume digits are Bugzilla bugs.
-    if rid.isdigit():
-        rid = 'bz://%s' % rid
+    def __init__(self, rid):
+        self.bug = None
+        self.user = None
 
-    if rid and (not rid.startswith('bz://') or not rid[5:].isdigit()):
-        raise util.Abort(_('review identifier must be a bug number.'))
+        if not rid:
+            return
 
-    return rid
+        # Assume digits are Bugzilla bugs.
+        if rid.isdigit():
+            rid = 'bz://%s' % rid
+
+        if rid and not rid.startswith('bz://'):
+            raise util.Abort(_('review identifier must begin with bz://'))
+
+        full = rid
+        paths = rid[5:].split('/')
+        if not paths[0]:
+            raise util.Abort(_('review identifier must not be bz://'))
+
+        bug = paths[0]
+        if not bug.isdigit():
+            raise util.Abort(_('first path component of review identifier must be a bug number'))
+        self.bug = int(bug)
+
+        if len(paths) > 1:
+            self.user = paths[1]
+
+        if len(paths) > 2:
+            raise util.Abort(_('unrecognized review id: %s') % rid)
+
+    def __nonzero__(self):
+        if self.bug or self.user:
+            return True
+
+        return False
+
+    @property
+    def full(self):
+        s = 'bz://%s' % self.bug
+        if self.user:
+            s += '/%s' % self.user
+
+        return s
 
 def pushcommand(orig, ui, repo, *args, **kwargs):
     """Wraps commands.push to read the --reviewid argument."""
 
-    rid = ensurereviewid(kwargs['reviewid'])
+    ReviewID(kwargs['reviewid'])
 
     # There isn't a good way to send custom arguments to the push api. So, we
     # inject some temporary values on the repo. This may fail in many
@@ -95,6 +128,11 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
     """Wraps exchange.push to enforce restrictions for review pushes."""
     if not remote.capable('reviewboard'):
         return orig(repo, remote, force=force, revs=revs, newbranch=newbranch)
+
+    ircnick = repo.ui.config('mozilla', 'ircnick', None)
+    if not ircnick:
+        raise util.Abort(_('you must set mozilla.ircnick in your hgrc config '
+            'file to your IRC nickname in order to perform code reviews'))
 
     # If no arguments are specified to push, Mercurial will try to push all
     # non-remote changesets by default. This can result in unexpected behavior,
@@ -208,13 +246,22 @@ def doreview(repo, ui, remote, reviewnode):
                 identifier = 'bz://%s' % bugs[0]
                 break
 
-    identifier = ensurereviewid(identifier)
+    identifier = ReviewID(identifier)
 
     if not identifier:
         ui.write(_('Unable to determine review identifier. Review '
             'identifiers are extracted from commit messages automatically. '
             'Try to begin one of your commit messages with "Bug XXXXXX -"\n'))
         return
+
+    # Append irc nick to review identifier.
+    # This is an ugly workaround to a limitation in ReviewBoard. RB doesn't
+    # really support changing the owner of a review. It is doable, but no
+    # history is stored and this leads to faulty attribution. More details
+    # in bug 1034188.
+    if not identifier.user:
+        ircnick = ui.config('mozilla', 'ircnick', None)
+        identifier.user = ircnick
 
     if hasattr(repo, 'mq'):
         for patch in repo.mq.applied:
@@ -226,7 +273,7 @@ def doreview(repo, ui, remote, reviewnode):
 
     lines = [
         '1',
-        'reviewidentifier %s' % urllib.quote(identifier),
+        'reviewidentifier %s' % urllib.quote(identifier.full),
     ]
 
     for p in ('username', 'password', 'userid', 'cookie'):
@@ -234,7 +281,7 @@ def doreview(repo, ui, remote, reviewnode):
             lines.append('bz%s %s' % (p, urllib.quote(getattr(bzauth, p))))
 
     reviews = repo.reviews
-    oldparentid = reviews.findparentreview(identifier=identifier)
+    oldparentid = reviews.findparentreview(identifier=identifier.full)
 
     # If a changeset has multiple successors, we could associate the same
     # review with different successor changesets. So, we need to be careful
@@ -296,7 +343,7 @@ def doreview(repo, ui, remote, reviewnode):
             ui.write('%s\n' % d)
         elif t == 'parentreview':
             newparentid = d
-            reviews.addparentreview(identifier, newparentid)
+            reviews.addparentreview(identifier.full, newparentid)
             reviewdata[newparentid] = {}
         elif t == 'csetreview':
             node, rid = d.split(' ', 1)
@@ -321,8 +368,8 @@ def doreview(repo, ui, remote, reviewnode):
         displayer.show(ctx)
         ui.write('\n')
 
-    ui.write(_('review id:  %s\n') % identifier)
-    ui.write(_('review url: %s') % reviews.parentreviewurl(identifier))
+    ui.write(_('review id:  %s\n') % identifier.full)
+    ui.write(_('review url: %s') % reviews.parentreviewurl(identifier.full))
     if reviewdata[newparentid].get('status', None) == 'pending':
         ui.write(' (pending)')
     ui.write('\n')

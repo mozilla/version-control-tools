@@ -59,7 +59,7 @@
   summary:    Bug 123 - Foo 5
   review:     http://localhost:$HGPORT1/r/6 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
 Popping the last commit truncates the review set
@@ -88,7 +88,7 @@ Popping the last commit truncates the review set
   summary:    Bug 123 - Foo 4
   review:     http://localhost:$HGPORT1/r/5 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
   [1]
 
@@ -97,15 +97,15 @@ The parent review should have dropped the reference to /r/6
   $ rbmanage ../rbserver dumpreview $HGPORT1 1
   Review: 1
     Status: pending
-    Commit ID: bz://123
+    Commit ID: bz://123/mynick
     Extra:
       p2rb: True
       p2rb.commits: [["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c", "3"], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", "4"], ["53b32d356f20f6730c14ec62c3706eba7e68e078", "5"]]
-      p2rb.identifier: bz://123
+      p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: True
   Draft: 1
-    Commit ID: bz://123
-    Summary: Review for review ID: bz://123
+    Commit ID: bz://123/mynick
+    Summary: Review for review ID: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -114,7 +114,7 @@ The parent review should have dropped the reference to /r/6
       
     Extra:
       p2rb: True
-      p2rb.identifier: bz://123
+      p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: True
   Diff: 7
     Revision: 1
@@ -148,13 +148,13 @@ Review 6 should be marked as discarded
     Commit ID: f466ed1de51670e583e11deb2f1022a342b52ccd
     Extra:
       p2rb: True
-      p2rb.identifier: bz://123
+      p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: False
   Draft: 6
     Commit ID: f466ed1de51670e583e11deb2f1022a342b52ccd
     Extra:
       p2rb: True
-      p2rb.identifier: bz://123
+      p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: False
 
 Dropping the first commit should shuffle all the reviews down the line.
@@ -185,7 +185,7 @@ likely gets invalidated.
   summary:    Bug 123 - Foo 4
   review:     http://localhost:$HGPORT1/r/4 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
 The first commit was rewritten (we assume all subsequent were as well).
@@ -196,7 +196,7 @@ The first commit was rewritten (we assume all subsequent were as well).
     Commit ID: c5b850e249510046906bcb24f774635c4521a4a9
     Extra:
       p2rb: True
-      p2rb.identifier: bz://123
+      p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: False
   Draft: 2
     Commit ID: ce44f0c4506c2e377ccfb702277cec50905be3e3
@@ -205,7 +205,7 @@ The first commit was rewritten (we assume all subsequent were as well).
       Bug 123 - Foo 2
     Extra:
       p2rb: True
-      p2rb.identifier: bz://123
+      p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: False
   Diff: 9
     Revision: 1
@@ -224,13 +224,13 @@ The last commit should have been discarded.
     Commit ID: 53b32d356f20f6730c14ec62c3706eba7e68e078
     Extra:
       p2rb: True
-      p2rb.identifier: bz://123
+      p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: False
   Draft: 7
     Commit ID: 53b32d356f20f6730c14ec62c3706eba7e68e078
     Extra:
       p2rb: True
-      p2rb.identifier: bz://123
+      p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: False
 
 Try removing a commit in the middle.
@@ -256,5 +256,5 @@ Try removing a commit in the middle.
   summary:    Bug 123 - Foo 4
   review:     http://localhost:$HGPORT1/r/3 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)

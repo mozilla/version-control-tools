@@ -45,7 +45,7 @@ Seed the repo
   summary:    Bug 123 - Foo 2
   review:     http://localhost:$HGPORT1/r/3 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
 Pulling reviews with no changes

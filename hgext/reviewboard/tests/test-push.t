@@ -83,7 +83,7 @@ Pushing a single changeset will initiate a single review (no children)
   summary:    anonymous head
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://345
+  review id:  bz://345/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
 {reviewurl} template works
@@ -104,7 +104,7 @@ Pushing no changesets will do a re-review
   summary:    anonymous head
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://345
+  review id:  bz://345/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
   [1]
 
@@ -126,7 +126,7 @@ Pushing patches from mq will result in a warning
   summary:    mq patch
   review:     http://localhost:$HGPORT1/r/4 (pending)
   
-  review id:  bz://784841
+  review id:  bz://784841/mynick
   review url: http://localhost:$HGPORT1/r/3 (pending)
 
   $ hg qpop
@@ -145,7 +145,7 @@ Custom identifier will create a new review from same changesets.
   summary:    anonymous head
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://3452
+  review id:  bz://3452/mynick
   review url: http://localhost:$HGPORT1/r/5 (pending)
   [1]
 
@@ -164,7 +164,7 @@ SSH works
   summary:    Bug 123 - Test identifier
   review:     http://localhost:$HGPORT1/r/7 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/6 (pending)
 
 Specifying multiple -r for the same head works
@@ -179,6 +179,6 @@ Specifying multiple -r for the same head works
   summary:    anonymous head
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://50000
+  review id:  bz://50000/mynick
   review url: http://localhost:$HGPORT1/r/8 (pending)
   [1]

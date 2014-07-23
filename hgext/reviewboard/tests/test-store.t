@@ -33,13 +33,13 @@ Pushing a review will create the reviews file
   summary:    Bug 456 - second commit
   review:     http://localhost:$HGPORT/r/2 (pending)
   
-  review id:  bz://456
+  review id:  bz://456/mynick
   review url: http://localhost:$HGPORT/r/1 (pending)
 
   $ cat .hg/reviews
   u http://localhost:$HGPORT
   r ssh://user@dummy/$TESTTMP/server
-  p bz://456 1
+  p bz://456/mynick 1
   c 7f387c765e685da95d7a4ffab2ccf06548c06fcf 2
   pc 7f387c765e685da95d7a4ffab2ccf06548c06fcf 1
 

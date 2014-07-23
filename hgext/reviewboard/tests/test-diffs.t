@@ -35,27 +35,27 @@ Push a single commit
   summary:    Bug 300124 - Updated foo component
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://300124
+  review id:  bz://300124/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
   $ rbmanage ../rbserver dumpreview $HGPORT1 1
   Review: 1
     Status: pending
-    Commit ID: bz://300124
+    Commit ID: bz://300124/mynick
     Extra:
       p2rb: True
       p2rb.commits: [["8078da8bec9fca76a56ce358bb0addd12c83e708", "2"]]
-      p2rb.identifier: bz://300124
+      p2rb.identifier: bz://300124/mynick
       p2rb.is_squashed: True
   Draft: 1
-    Commit ID: bz://300124
-    Summary: Review for review ID: bz://300124
+    Commit ID: bz://300124/mynick
+    Summary: Review for review ID: bz://300124/mynick
     Description:
       /r/2 - Bug 300124 - Updated foo component
       
     Extra:
       p2rb: True
-      p2rb.identifier: bz://300124
+      p2rb.identifier: bz://300124/mynick
       p2rb.is_squashed: True
   Diff: 1
     Revision: 1
@@ -73,7 +73,7 @@ Push a single commit
     Commit ID: 8078da8bec9fca76a56ce358bb0addd12c83e708
     Extra:
       p2rb: True
-      p2rb.identifier: bz://300124
+      p2rb.identifier: bz://300124/mynick
       p2rb.is_squashed: False
   Draft: 2
     Commit ID: 8078da8bec9fca76a56ce358bb0addd12c83e708
@@ -82,7 +82,7 @@ Push a single commit
       Bug 300124 - Updated foo component
     Extra:
       p2rb: True
-      p2rb.identifier: bz://300124
+      p2rb.identifier: bz://300124/mynick
       p2rb.is_squashed: False
   Diff: 2
     Revision: 1
@@ -125,21 +125,21 @@ Pushing multiple commits should result in parent diffs
   summary:    updated bar again
   review:     http://localhost:$HGPORT1/r/6 (pending)
   
-  review id:  bz://10000
+  review id:  bz://10000/mynick
   review url: http://localhost:$HGPORT1/r/3 (pending)
 
   $ rbmanage ../rbserver dumpreview $HGPORT1 3
   Review: 3
     Status: pending
-    Commit ID: bz://10000
+    Commit ID: bz://10000/mynick
     Extra:
       p2rb: True
       p2rb.commits: [["393666323ae92d185152eaa15bda086f01f2b115", "4"], ["5638d29dda5131a2a79bf6ac7c465dd3a7052275", "5"], ["c5acb46cb0f75caf1566a2af32fad101798f1178", "6"]]
-      p2rb.identifier: bz://10000
+      p2rb.identifier: bz://10000/mynick
       p2rb.is_squashed: True
   Draft: 3
-    Commit ID: bz://10000
-    Summary: Review for review ID: bz://10000
+    Commit ID: bz://10000/mynick
+    Summary: Review for review ID: bz://10000/mynick
     Description:
       /r/4 - Bug 10000 - updated bar
       /r/5 - updated foo again
@@ -147,7 +147,7 @@ Pushing multiple commits should result in parent diffs
       
     Extra:
       p2rb: True
-      p2rb.identifier: bz://10000
+      p2rb.identifier: bz://10000/mynick
       p2rb.is_squashed: True
   Diff: 3
     Revision: 1
@@ -170,7 +170,7 @@ Pushing multiple commits should result in parent diffs
     Commit ID: 393666323ae92d185152eaa15bda086f01f2b115
     Extra:
       p2rb: True
-      p2rb.identifier: bz://10000
+      p2rb.identifier: bz://10000/mynick
       p2rb.is_squashed: False
   Draft: 4
     Commit ID: 393666323ae92d185152eaa15bda086f01f2b115
@@ -179,7 +179,7 @@ Pushing multiple commits should result in parent diffs
       Bug 10000 - updated bar
     Extra:
       p2rb: True
-      p2rb.identifier: bz://10000
+      p2rb.identifier: bz://10000/mynick
       p2rb.is_squashed: False
   Diff: 4
     Revision: 1
@@ -197,7 +197,7 @@ Pushing multiple commits should result in parent diffs
     Commit ID: 5638d29dda5131a2a79bf6ac7c465dd3a7052275
     Extra:
       p2rb: True
-      p2rb.identifier: bz://10000
+      p2rb.identifier: bz://10000/mynick
       p2rb.is_squashed: False
   Draft: 5
     Commit ID: 5638d29dda5131a2a79bf6ac7c465dd3a7052275
@@ -206,7 +206,7 @@ Pushing multiple commits should result in parent diffs
       updated foo again
     Extra:
       p2rb: True
-      p2rb.identifier: bz://10000
+      p2rb.identifier: bz://10000/mynick
       p2rb.is_squashed: False
   Diff: 5
     Revision: 1
@@ -224,7 +224,7 @@ Pushing multiple commits should result in parent diffs
     Commit ID: c5acb46cb0f75caf1566a2af32fad101798f1178
     Extra:
       p2rb: True
-      p2rb.identifier: bz://10000
+      p2rb.identifier: bz://10000/mynick
       p2rb.is_squashed: False
   Draft: 6
     Commit ID: c5acb46cb0f75caf1566a2af32fad101798f1178
@@ -233,7 +233,7 @@ Pushing multiple commits should result in parent diffs
       updated bar again
     Extra:
       p2rb: True
-      p2rb.identifier: bz://10000
+      p2rb.identifier: bz://10000/mynick
       p2rb.is_squashed: False
   Diff: 6
     Revision: 1

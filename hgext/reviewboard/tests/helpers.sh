@@ -29,6 +29,9 @@ ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
 username = testadmin
 password = password
 
+[mozilla]
+ircnick = mynick
+
 [paths]
 default-push = ssh://user@dummy/$TESTTMP/server
 

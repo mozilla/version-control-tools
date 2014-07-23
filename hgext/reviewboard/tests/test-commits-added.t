@@ -35,7 +35,7 @@
   summary:    Bug 123 - Foo 2
   review:     http://localhost:$HGPORT1/r/3 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
 Adding commits to old reviews should create new reviews
@@ -63,7 +63,7 @@ Adding commits to old reviews should create new reviews
   summary:    Bug 123 - Foo 3
   review:     http://localhost:$HGPORT1/r/4 (pending)
   
-  review id:  bz://123
+  review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
 The parent review should have its description updated.
@@ -71,15 +71,15 @@ The parent review should have its description updated.
   $ rbmanage ../rbserver dumpreview $HGPORT1 1
   Review: 1
     Status: pending
-    Commit ID: bz://123
+    Commit ID: bz://123/mynick
     Extra:
       p2rb: True
       p2rb.commits: [["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9", "3"], ["27d2e8c43375f3dd075cd7492a1f301ecdca9ffc", "4"]]
-      p2rb.identifier: bz://123
+      p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: True
   Draft: 1
-    Commit ID: bz://123
-    Summary: Review for review ID: bz://123
+    Commit ID: bz://123/mynick
+    Summary: Review for review ID: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -87,7 +87,7 @@ The parent review should have its description updated.
       
     Extra:
       p2rb: True
-      p2rb.identifier: bz://123
+      p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: True
   Diff: 4
     Revision: 1

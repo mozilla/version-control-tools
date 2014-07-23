@@ -60,6 +60,18 @@ Pushing when we don't have the client extension installed results in warning.
   $ echo "reviewboard=$(echo $TESTDIR)/hgext/reviewboard/client.py" >> .hg/hgrc
   $ echo "[reviewboard]" >> .hg/hgrc
 
+Pushing without IRC nick configured will result in a warning
+
+  $ hg push http://localhost:$HGPORT
+  pushing to http://localhost:$HGPORT/
+  abort: you must set mozilla.ircnick in your hgrc * (glob)
+  [255]
+
+  $ cat >> .hg/hgrc << EOF
+  > [mozilla]
+  > ircnick = mynick
+  > EOF
+
 Attempt to push with Bugzilla not configured will result in a warning
 
   $ echo 'bar' > foo
@@ -95,7 +107,19 @@ Unknown review identifier
 Bad review identifier
 
   $ hg push --reviewid foobar
-  abort: review identifier must be a bug number.
+  abort: review identifier must begin with bz://
+  [255]
+
+  $ hg push --reviewid bz://
+  abort: review identifier must not be bz://
+  [255]
+
+  $ hg push --reviewid bz://foobar
+  abort: first path component of review identifier must be a bug number
+  [255]
+
+  $ hg push --reviewid bz://1234/user/extra
+  abort: unrecognized review id: bz://1234/user/extra
   [255]
 
 Pushing multiple heads is rejected
