@@ -225,9 +225,16 @@ def reposetup(ui, repo):
                 if remote.capable('firefoxtrees'):
                     lines = remote._call('firefoxtrees').splitlines()
                     oldtags = self.tags()
+                    newtags = {}
                     for line in lines:
                         tag, node = line.split()
+                        newtags[tag] = node
+
                         node = bin(node)
+
+                        if oldtags.get(tag, None) == node:
+                            continue
+
                         self.tag(tag, node, message=None, local=True,
                                 user=None, date=None)
                         between = None
@@ -243,6 +250,23 @@ def reposetup(ui, repo):
                             msg += _(' (+%d commits)') % between
                         msg += '\n'
                         self.ui.status(msg)
+
+                    # self.tag will produce multiple entries for a tag. Prune
+                    # the old ones.
+                    localdata = self.opener.tryread('localtags')
+                    newlines = []
+                    for line in localdata.splitlines():
+                        line = line.strip()
+                        node, tag = line.split()
+
+                        if tag not in newtags or newtags[tag] != node:
+                            continue
+
+                        newlines.append(line)
+                    if newlines:
+                        newlines.append('')
+                    if newlines:
+                        self.opener.write('localtags', '\n'.join(newlines))
 
                 tree = resolve_uri_to_tree(remote.url())
                 if tree:
