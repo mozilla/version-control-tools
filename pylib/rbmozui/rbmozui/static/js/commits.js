@@ -364,18 +364,39 @@ $(document).ready(function() {
       this.model.draft.ready({
         ready: function() {
           var editor = new RB.ReviewRequestEditor({reviewRequest: this.model});
-          editor.setDraftField('public', true, {
-            jsonFieldName: 'public',
-            success: function() {
-              console.log('Successfully published - reloading page...');
-              $("#publish").prop("disabled", false);
-              location.reload();
-            },
-            error: function(aMsg) {
-              $("#publish").prop("disabled", false);
-              reportError(aMsg);
-            }
-          })
+          // This bit of functional programming iterates each commit
+          // returning an array of reviewer usernames for each, which
+          // we union, unique, and then join in a string separated
+          // by commas. We use an apply because the Commits.map will
+          // return an array of arrays.
+          var reviewers = _.unique(_.union.apply(this, Commits.map(function(aCommit) {
+            return aCommit.reviewers.pluck('username');
+          }))).join(',');
+
+          console.log("Setting reviewers on squashed request to: "
+                      + reviewers);
+
+          editor.setDraftField('targetPeople', reviewers, {
+            jsonFieldName: 'target_people',
+              success: function() {
+                editor.setDraftField('public', true, {
+                  jsonFieldName: 'public',
+                  success: function() {
+                    console.log('Successfully published - reloading page...');
+                    $("#publish").prop("disabled", false);
+                    location.reload();
+                  },
+                  error: function(aMsg) {
+                    $("#publish").prop("disabled", false);
+                    reportError(aMsg);
+                  }
+                })
+              },
+              error: function(aErrorObject) {
+                reportError('Failed to set reviewers on squashed review: '
+                            + aErrorObject.errorText);
+              }
+          });
         }
       }, this);
     }
