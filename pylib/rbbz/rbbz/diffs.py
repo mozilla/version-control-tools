@@ -229,7 +229,28 @@ def render_equal_chunk(chunk, parser):
 
     return lines
 
-def render_comment_plain(comment, context):
+def render_comment_plain(comment, context, is_reply):
+    if is_reply:
+        parent_comment = comment.reply_to
+
+        # We will quote the last comment on the
+        # parent as this is most likely a discussion
+        # and not a reply to the original review
+        # comment.
+        replies = parent_comment.public_replies()
+
+        if replies:
+            last_reply = replies.last()
+        else:
+            last_reply = parent_comment
+
+        lines = ["> %s" % line for line in str(last_reply).split('\n')]
+        lines.append("\n%s" % comment)
+
+        return "\n".join(lines)
+
+    # This is the base comment of a review, so we
+    # should quote the code the comment is adressing.
     parser = HTMLParser.HTMLParser()
     chunks = list(get_file_chunks_in_range_custom(
         context,
@@ -266,29 +287,7 @@ def render_comment_plain(comment, context):
             for line in chunk['lines']:
                 lines.append("> +%s" % parser.unescape(line[5]))
 
-    lines.append("")
-
-    comments = []
-    c = comment
-    depth = 0
-
-    while True:
-        if depth:
-            prefix = '%s ' % ('>' * depth,)
-        else:
-            prefix = ''
-
-        comments.append("%s%s" % (prefix, c))
-
-        if c.reply_to:
-            c = c.reply_to
-            depth += 1
-        else:
-            break
-
-    comments.reverse()
-
-    lines.extend(comments)
+    lines.append("\n%s" % comment)
 
     return "\n".join(lines)
 
@@ -301,7 +300,8 @@ def build_plaintext_review(review, context):
         review_text.append(review.body_top)
 
     for comment in review.comments.all():
-        review_text.append(render_comment_plain(comment, context))
+        review_text.append(render_comment_plain(comment, context,
+                                                review.is_reply()))
 
     if review.body_bottom:
         review_text.append(review.body_bottom)
