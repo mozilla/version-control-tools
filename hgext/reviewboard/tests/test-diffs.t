@@ -55,7 +55,7 @@ Push a single commit
       
       Pull down this commit:
       
-      hg pull -r 8078da8bec9fca76a56ce358bb0addd12c83e708 review
+      hg pull review -r 8078da8bec9fca76a56ce358bb0addd12c83e708
       
     Extra:
       p2rb: True
@@ -151,7 +151,7 @@ Pushing multiple commits should result in parent diffs
       
       Pull down these commits:
       
-      hg pull -r c5acb46cb0f75caf1566a2af32fad101798f1178 review
+      hg pull review -r c5acb46cb0f75caf1566a2af32fad101798f1178
       
     Extra:
       p2rb: True

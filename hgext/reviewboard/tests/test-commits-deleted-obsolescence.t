@@ -120,7 +120,7 @@ The parent review should have dropped the reference to /r/6
       
       Pull down these commits:
       
-      hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 review
+      hg pull review -r 53b32d356f20f6730c14ec62c3706eba7e68e078
       
     Extra:
       p2rb: True
@@ -255,7 +255,7 @@ The parent review should have been updated accordingly.
       
       Pull down these commits:
       
-      hg pull -r cd0051d388dabe9694e0e2c5ce1cdbb17749c53d review
+      hg pull review -r cd0051d388dabe9694e0e2c5ce1cdbb17749c53d
       
     Extra:
       p2rb: True

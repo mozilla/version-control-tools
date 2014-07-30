@@ -87,7 +87,7 @@ The parent review should have its description updated.
       
       Pull down these commits:
       
-      hg pull -r 27d2e8c43375f3dd075cd7492a1f301ecdca9ffc review
+      hg pull review -r 27d2e8c43375f3dd075cd7492a1f301ecdca9ffc
       
     Extra:
       p2rb: True
