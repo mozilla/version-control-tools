@@ -98,6 +98,8 @@ def hook(ui, repo, node, hooktype, **kwargs):
         tip_node = short(repo.changectx(tip).node())
         print 'You can view the progress of your build at the following URL:'
         print '  https://tbpl.mozilla.org/?tree=Try&rev=%s' % tip_node
+        print 'Alternatively, view them on Treeherder (experimental):'
+        print '  https://treeherder.mozilla.org/ui/#/jobs?repo=try&revision=%s' % tip_node
         return 0
 
     # For try-comm-central, print out a TBPL url rather than the pushlog
@@ -105,6 +107,8 @@ def hook(ui, repo, node, hooktype, **kwargs):
         tip_node = short(repo.changectx(tip).node())
         print 'You can view the progress of your build at the following URL:'
         print '  https://tbpl.mozilla.org/?tree=Thunderbird-Try&rev=%s' % tip_node
+        print 'Alternatively, view them on Treeherder (experimental):'
+        print '  https://treeherder.mozilla.org/ui/#/jobs?repo=thunderbird-try&revision=%s' % tip_node
         return 0
 
     num_changes = tip + 1 - rev
