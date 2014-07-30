@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import logging
 import xmlrpclib
 
 from djblets.siteconfig.models import SiteConfiguration
@@ -207,6 +208,8 @@ class Bugzilla(object):
     @xmlrpc_to_bugzilla_errors
     def r_plus_attachment(self, bug_id, reviewer, rb_url):
         """Set a review flag to "+"."""
+
+        logging.info('r+ from %s on bug %d.' % (reviewer, bug_id))
 
         rb_attachment = None
         attachments = self.get_rb_attachments(bug_id)
