@@ -85,6 +85,10 @@ The parent review should have its description updated.
       /r/3 - Bug 123 - Foo 2
       /r/4 - Bug 123 - Foo 3
       
+      Pull down these commits:
+      
+      hg pull -r 27d2e8c43375f3dd075cd7492a1f301ecdca9ffc review
+      
     Extra:
       p2rb: True
       p2rb.identifier: bz://123/mynick

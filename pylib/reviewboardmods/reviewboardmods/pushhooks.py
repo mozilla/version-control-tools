@@ -187,6 +187,15 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
             node_to_rid[commit['id']],
             commit['message'].splitlines()[0]))
 
+    squashed_description.extend(['', 'Pull down '])
+    if len(commits['individual']) == 1:
+        squashed_description[-1] += 'this commit:'
+    else:
+        squashed_description[-1] += 'these commits:'
+
+    squashed_description.extend(
+        ['', 'hg pull review -r %s' % commits['individual'][-1]['id']])
+
     depends = ','.join(str(i) for i in sorted(node_to_rid.values()))
     squashed_draft = squashed_rr.get_or_create_draft(
         summary='Review for review ID: %s' % identifier,

@@ -118,6 +118,10 @@ The parent review should have dropped the reference to /r/6
       /r/4 - Bug 123 - Foo 3
       /r/5 - Bug 123 - Foo 4
       
+      Pull down these commits:
+      
+      hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 review
+      
     Extra:
       p2rb: True
       p2rb.identifier: bz://123/mynick
@@ -248,6 +252,10 @@ The parent review should have been updated accordingly.
     Description:
       /r/3 - Bug 123 - Foo 2
       /r/5 - Bug 123 - Foo 4
+      
+      Pull down these commits:
+      
+      hg pull -r cd0051d388dabe9694e0e2c5ce1cdbb17749c53d review
       
     Extra:
       p2rb: True

@@ -53,6 +53,10 @@ Push a single commit
     Description:
       /r/2 - Bug 300124 - Updated foo component
       
+      Pull down this commit:
+      
+      hg pull -r 8078da8bec9fca76a56ce358bb0addd12c83e708 review
+      
     Extra:
       p2rb: True
       p2rb.identifier: bz://300124/mynick
@@ -144,6 +148,10 @@ Pushing multiple commits should result in parent diffs
       /r/4 - Bug 10000 - updated bar
       /r/5 - updated foo again
       /r/6 - updated bar again
+      
+      Pull down these commits:
+      
+      hg pull -r c5acb46cb0f75caf1566a2af32fad101798f1178 review
       
     Extra:
       p2rb: True
