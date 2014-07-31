@@ -177,7 +177,7 @@ class Bugzilla(object):
         else:
             params['ids'] = [bug_id]
             params['data'] = url
-            params['content_type'] = 'text/plain'
+            params['content_type'] = 'text/x-review-board-request'
 
         params['file_name'] = 'reviewboard-%d-url.txt' % review_id
         params['summary'] = summary
