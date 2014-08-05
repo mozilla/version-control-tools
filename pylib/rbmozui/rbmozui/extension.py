@@ -20,9 +20,6 @@ class RBMozUI(Extension):
         'Summary': 'UI tweaks to Review Board for Mozilla',
     }
     css_bundles = {
-        'commits': {
-            'source_filenames': ['css/commits.less'],
-        },
         'default': {
             'source_filenames': ['css/common.css'],
         },
@@ -36,9 +33,6 @@ class RBMozUI(Extension):
     js_bundles = {
         'commits': {
             'source_filenames': ['js/commits.js'],
-        },
-        'review': {
-            'source_filenames': ['js/review.js'],
         }
     }
 
@@ -51,18 +45,16 @@ class RBMozUI(Extension):
           fieldset.remove_field(field)
         # All of our review request styling is injected via review-stylings-css,
         # which in turn loads the review.css static bundle.
-        TemplateHook(self, 'base-css', 'rbmozui/commits-stylings-css.html',
-                     apply_to='rbmozui-commits')
         TemplateHook(self, 'base-css', 'rbmozui/review-stylings-css.html',
-                     apply_to=review_request_url_names + ['rbmozui-commits'])
+                     apply_to=review_request_url_names)
         TemplateHook(self, 'base-css', 'rbmozui/viewdiff-stylings-css.html',
                      apply_to=diffviewer_url_names)
         TemplateHook(self, 'base-before-content', 'rbmozui/review-header.html',
-                     apply_to=review_request_url_names + ['rbmozui-commits'])
-        TemplateHook(self, 'base-scripts-post', 'rbmozui/review-js.html',
+                     apply_to=review_request_url_names)
+        TemplateHook(self, 'base-scripts-post', 'rbmozui/review-header-workaround.html',
                      apply_to=review_request_url_names)
         TemplateHook(self, 'rbmozui-commits-scripts', 'rbmozui/commits-scripts-js.html',
-                     apply_to='rbmozui-commits')
+                     apply_to="rbmozui-commits")
         urlpatterns = patterns('',
             url(r'^rbmozui/', include('rbmozui.urls')))
         URLHook(self, urlpatterns)
