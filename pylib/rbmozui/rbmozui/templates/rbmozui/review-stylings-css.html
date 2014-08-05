@@ -1,6 +1,2 @@
 {% load djblets_extensions %}
-{% load rbmozui %}
-
-{% if review_request|isPush %}
-{%   ext_css_bundle extension "review" %}
-{% endif %}
+{% ext_css_bundle extension "review" %}
