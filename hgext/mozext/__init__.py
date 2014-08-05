@@ -380,6 +380,13 @@ colortable = {
 # known URIs.
 old_peerorrepo = hg._peerorrepo
 
+def get_ircnick(ui):
+    headless = ui.configbool('mozext', 'headless')
+    ircnick = ui.config('mozext', 'ircnick')
+    if not ircnick and not headless:
+        raise util.Abort(_('Set "[mozext] ircnick" in your hgrc to your '
+            'Mozilla IRC nickname to enable additional functionality.'))
+    return ircnick
 
 def peerorrepo(ui, path, *args, **kwargs):
     # Always try the old mechanism first. That way if there is a local
@@ -712,7 +719,7 @@ def mybookmarks(ui, repo):
     A bookmark belonging to you is one whose name begins with your configured
     IRC nick or has you as the author of the bookmark's changeset.
     """
-    nick = ui.config('mozext', 'ircnick')
+    nick = get_ircnick(ui)
     prefix = '%s/' % nick
     me = ui.config('ui', 'username')
 
@@ -841,7 +848,7 @@ def revset_me(repo, subset, x):
     if not me:
         raise util.Abort(_('"[ui] username" must be set to use me()'))
 
-    ircnick = repo.ui.config('mozext', 'ircnick')
+    ircnick = get_ircnick(repo.ui)
 
     n = encoding.lower(me)
     kind, pattern, matcher = revset._substringmatcher(n)
@@ -854,10 +861,9 @@ def revset_me(repo, subset, x):
             revs.append(r)
             continue
 
-        if ircnick:
-            if ircnick in parse_reviewers(ctx.description()):
-                revs.append(r)
-                continue
+        if ircnick in parse_reviewers(ctx.description()):
+            revs.append(r)
+            continue
 
     return revs
 
@@ -1560,10 +1566,6 @@ def reposetup(ui, repo):
 
 
     repo.__class__ = remotestrackingrepo
-    headless = ui.configbool('mozext', 'headless')
-    if not ui.config('mozext', 'ircnick') and not headless:
-        raise util.Abort(_('Set "[mozext] ircnick" in your hgrc to your '
-            'Mozilla IRC nickname to enable additional functionality.'))
 
     if not ui.configbool('mozext', 'noautocritic'):
         ui.setconfig('hooks', 'commit.critic', critic_hook)
