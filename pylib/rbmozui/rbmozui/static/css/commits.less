@@ -1,0 +1,126 @@
+#commits-container {
+  position: relative;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#commit-list {
+  padding: 0px;
+}
+
+.commit-list-item {
+  list-style: none;
+}
+.commit-container {
+  border: 1px solid #AAAAAA;
+  padding: 15px;
+  margin: 0px 0px 15px 0px;
+
+  .reviewer-container {
+    margin: 15px 0px;
+  }
+
+  &:not([hasreviewers="true"]) {
+    .reviewer-container {
+      .has-reviewers,
+      .reviewers {
+        display: none;
+      }
+    }
+  }
+
+  &[hasreviewers="true"] > .reviewer-container > .no-reviewers {
+    display: none;
+  }
+
+  .commit-container-head {
+    .commit-id {
+      color: #555555;
+    }
+    .summary {
+      font-weight: bold;
+      margin: 5px 0px;
+    }
+  }
+
+  .commit-container-foot {
+    position: relative;
+
+    .reviewer-form {
+      display: inline-block;
+    }
+
+    .state {
+      position: absolute;
+      right: 0px;
+
+      span {
+        display: none;
+      }
+    }
+  }
+
+  &[state="needs-publishing"] {
+    background-color: #C1FFC1;
+    & > .commit-container-foot > .state > .needs-publishing {
+      display: block;
+    }
+  }
+
+  &[state="unsaved-changes"] {
+    background-color: #C1FFC1;
+    .commit-container-foot > .state > .unsaved-changes {
+      display: block;
+    }
+  }
+
+  &[state="published"] > .commit-container-foot > .state > .published {
+    display: block;
+  }
+}
+
+.add-reviewer-label {
+  display: block;
+}
+
+.reviewer-input {
+  width: 70ch;
+}
+
+.reviewers {
+  padding: 0;
+
+  .reviewer {
+    list-style: none;
+
+    .remove {
+      cursor: pointer;
+      display: inline-block;
+      margin-right: 5px;
+    }
+  }
+}
+
+#publish {
+  font-size: 1.2em;
+  padding: 20px;
+  background-color: #C1FFC1;
+  position: absolute;
+  right: 0px;
+}
+
+#error-container {
+  &:not([haserror="true"]) {
+    display: none;
+  }
+
+  border: 1px solid red;
+  background-color: #ffb2b2;
+  padding: 15px;
+
+  h1 {
+    font-size: 1.3em;
+    font-weight: bold;
+  }
+}

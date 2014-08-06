@@ -16,8 +16,12 @@ def commits(request, review_request_id, local_site=None, template_name='rbmozui/
         return response
 
     if review_request.extra_data.get('p2rb.is_squashed', 'False') == 'True':
+      draft = review_request.get_draft()
+      thing_to_show = draft if draft else review_request
       response = render_to_response(template_name, RequestContext(request, {
-          'review_request': review_request
+          'review_request': review_request,
+          'squashed_id': review_request.id,
+          'commits_json': thing_to_show.extra_data.get('p2rb.commits'),
       }))
       return response
 
