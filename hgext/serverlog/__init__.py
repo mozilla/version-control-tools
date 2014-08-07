@@ -37,7 +37,7 @@ def protocolcall(repo, req, cmd):
     """Wraps mercurial.hgweb.protocol to record requests."""
 
     ident = repo.ui.config('syslog', 'ident', 'hgweb')
-    facility = repo.ui.config('syslog', 'facility', 'LOG_LOCAL5')
+    facility = repo.ui.config('syslog', 'facility', 'LOG_LOCAL2')
     facility = getattr(syslog, facility)
 
     reporoot = repo.ui.config('serverlog', 'reporoot', '')
