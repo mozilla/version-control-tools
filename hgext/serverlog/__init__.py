@@ -223,6 +223,9 @@ class syslogmixin(object):
         self._serverlog['path'] = repopath
 
     def _syslog(self, action, *args):
+        if not hasattr(self, '_serverlog'):
+            return
+
         if not self._serverlog['syslogconfigured']:
             ident = self.repo.ui.config('syslog', 'ident', 'hgweb')
             facility = self.repo.ui.config('syslog', 'facility', 'LOG_LOCAL2')
