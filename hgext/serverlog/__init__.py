@@ -181,6 +181,7 @@ testedwith = '2.5.4'
 
 import mercurial.hgweb.protocol as protocol
 import mercurial.hgweb.hgweb_mod as hgweb_mod
+import mercurial.hgweb.hgwebdir_mod as hgwebdir_mod
 import mercurial.localrepo as localrepo
 import mercurial.sshserver as sshserver
 import mercurial.wireproto as wireproto
@@ -380,6 +381,7 @@ def extsetup(ui):
 
     if ui.configbool('serverlog', 'hgweb', True):
         hgweb_mod.hgweb = hgwebwrapped
+        hgwebdir_mod.hgweb = hgwebwrapped
 
     if ui.configbool('serverlog', 'ssh', True):
         sshserver.sshserver = sshserverwrapped
