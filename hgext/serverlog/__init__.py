@@ -36,6 +36,10 @@ serverlog.hgweb
 serverlog.ssh
    Whether to record requests for ssh server. Defaults to True.
 
+serverlog.datalogsizeinterval
+   Interval (in bytes) between log events when data is being streamed to
+   clients. Default value is 10,000,000.
+
 Logged Messages
 ===============
 
@@ -261,10 +265,19 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
         startcpu = startusage.ru_utime + startusage.ru_stime
         starttime = time.time()
 
+        datasizeinterval = self.repo.ui.configint('serverlog',
+            'datalogsizeinterval', 10000000)
+        lastlogamount = 0
+
         try:
             for what in super(hgwebwrapped, self).run_wsgi(req):
                 self._serverlog['writecount'] += len(what)
                 yield what
+
+                if self._serverlog['writecount'] - lastlogamount > datasizeinterval:
+                    self._syslog('WRITE_PROGRESS',
+                        '%d' % self._serverlog['writecount'])
+                    lastlogamount = self._serverlog['writecount']
         finally:
             endtime = time.time()
             endusage = resource.getrusage(resource.RUSAGE_SELF)
