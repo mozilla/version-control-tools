@@ -16,6 +16,10 @@ syslog.ident
 syslog.facility
    String syslog facility to write to. Corresponds to a LOG_* attribute
    in the syslog module.
+
+serverlog.reporoot
+   Root path for all repositories. When logging the repository path, this
+   prefix will be stripped.
 """
 
 testedwith = '2.5.4'
@@ -36,14 +40,23 @@ def protocolcall(repo, req, cmd):
     facility = repo.ui.config('syslog', 'facility', 'LOG_LOCAL5')
     facility = getattr(syslog, facility)
 
+    reporoot = repo.ui.config('serverlog', 'reporoot', '')
+    if reporoot and not reporoot.endswith('/'):
+        reporoot += '/'
+
+    path = repo.path
+    if reporoot and path.startswith(reporoot):
+        path = path[len(reporoot):]
+    path = path.rstrip('/').rstrip('/.hg')
+
     syslog.openlog(ident, 0, facility)
 
     reqid = str(uuid.uuid1())
     uri = req.env['REQUEST_URI']
     clientip = req.env.get('HTTP_X_CLUSTER_CLIENT_IP', 'NONE')
 
-    syslog.syslog(syslog.LOG_NOTICE, '%s BEGIN %s %s %s' % (
-        reqid, clientip, cmd, uri))
+    syslog.syslog(syslog.LOG_NOTICE, '%s BEGIN %s %s %s %s' % (
+        reqid, path, clientip, cmd, uri))
 
     startusage = resource.getrusage(resource.RUSAGE_SELF)
     startcpu = startusage.ru_utime + startusage.ru_stime
