@@ -49,9 +49,13 @@ def protocolcall(repo, req, cmd):
     startcpu = startusage.ru_utime + startusage.ru_stime
     starttime = time.time()
 
-    writecount = [0]
+    writecount = 0
 
-    def logend():
+    try:
+        for chunk in origcall(repo, req, cmd):
+            writecount += len(chunk)
+            yield chunk
+    finally:
         endtime = time.time()
         endusage = resource.getrusage(resource.RUSAGE_SELF)
         endcpu = endusage.ru_utime + endusage.ru_stime
@@ -64,31 +68,8 @@ def protocolcall(repo, req, cmd):
             cpupercent = 0.0
 
         syslog.syslog(syslog.LOG_NOTICE, '%s END %d %.3f %.3f' % (
-            reqid, writecount[0], deltatime, cpupercent))
+            reqid, writecount, deltatime, cpupercent))
         syslog.closelog()
-
-    # Wrap the iterator returned by the protocol layer to log after iterator
-    # exhaustion. This may not log in the case of aborts. Meh.
-    class wrappediter(object):
-        def __init__(self, it):
-            if isinstance(it, list):
-                self._it = iter(it)
-            else:
-                self._it = it
-
-        def __iter__(self):
-            return self
-
-        def next(self):
-            try:
-                what = self._it.next()
-                writecount[0] += len(what)
-                return what
-            except StopIteration:
-                logend()
-                raise
-
-    return wrappediter(origcall(repo, req, cmd))
 
 def extsetup(ui):
     protocol.call = protocolcall
