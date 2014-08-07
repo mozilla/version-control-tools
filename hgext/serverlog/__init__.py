@@ -197,7 +197,11 @@ origdispatch = wireproto.dispatch
 def protocolcall(repo, req, cmd):
     """Wraps mercurial.hgweb.protocol to record requests."""
 
-    req._syslog('BEGIN_PROTOCOL', cmd)
+    # TODO figure out why our custom attribute is getting lost in
+    # production.
+    if hasattr(req, '_syslog'):
+        req._syslog('BEGIN_PROTOCOL', cmd)
+
     return origcall(repo, req, cmd)
 
 class syslogmixin(object):
