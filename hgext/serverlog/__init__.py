@@ -8,23 +8,92 @@ server operators can have better insight into what a server is doing.
 
 The extension is tailored for Mozilla's needs.
 
-Configuration options:
+Installing
+==========
+
+In your hgrc, add the following:
+
+    [extensions]
+    serverlog = /path/to/version-control-tools/hgext/serverlog
+
+Configuration Options
+=====================
 
 syslog.ident
    String to prefix all syslog entries with. Defaults to "hgweb".
 
 syslog.facility
    String syslog facility to write to. Corresponds to a LOG_* attribute
-   in the syslog module.
+   in the syslog module. Defaults to LOG_LOCAL2.
 
 serverlog.reporoot
    Root path for all repositories. When logging the repository path, this
    prefix will be stripped.
+
+Logged Messages
+===============
+
+syslog messages conform to a well-defined string format:
+
+    <request id> <action> [<arg0> [<arg1> [...]]]
+
+The actions are defined in the following sections.
+
+BEGIN_REQUEST
+-------------
+
+Written when a new request comes in. This occurs for all HTTP requests.
+
+Arguments:
+
+* repo path
+* client ip ("UNKNOWN" if not known)
+* URL path and query string
+
+e.g. ``bc286e11-1e44-11e4-8889-b8e85631ff68 BEGIN_REQUEST server2 127.0.0.1 /?cmd=capabilities``
+
+BEGIN_PROTOCOL
+--------------
+
+Written when a command from the wire protocol is about to be executed. This
+almost certainly derives from a Mercurial client talking to the server (as
+opposed to say a browser viewing HTML).
+
+Arguments:
+
+* command name
+
+e.g. ``bc286e11-1e44-11e4-8889-b8e85631ff68 BEGIN_PROTOCOL capabilities``
+
+END_REQUEST
+-----------
+
+Written when a request finishes and all data has been sent.
+
+There should be an ``END_REQUEST`` for every ``BEGIN_REQUEST``.
+
+Arguments:
+
+* Integer bytes written to client
+* Float wall time to process request
+* Float CPU time to process request
+
+e.g. ``bc286e11-1e44-11e4-8889-b8e85631ff68 END 0 0.002 0.002``
+
+Limitations
+===========
+
+The extension currently only uses syslog for writing events.
+
+The extension assumes only 1 thread is running per process. If multiple threads
+are running, CPU time calculations will not be accurate. Other state may get
+mixed up.
 """
 
 testedwith = '2.5.4'
 
 import mercurial.hgweb.protocol as protocol
+import mercurial.hgweb.hgweb_mod as hgweb_mod
 
 import resource
 import syslog
@@ -36,53 +105,84 @@ origcall = protocol.call
 def protocolcall(repo, req, cmd):
     """Wraps mercurial.hgweb.protocol to record requests."""
 
-    ident = repo.ui.config('syslog', 'ident', 'hgweb')
-    facility = repo.ui.config('syslog', 'facility', 'LOG_LOCAL2')
-    facility = getattr(syslog, facility)
+    req._syslog('BEGIN_PROTOCOL', cmd)
+    return origcall(repo, req, cmd)
 
-    reporoot = repo.ui.config('serverlog', 'reporoot', '')
-    if reporoot and not reporoot.endswith('/'):
-        reporoot += '/'
+class hgwebwrapped(hgweb_mod.hgweb):
+    def run_wsgi(self, req):
+        self._serverlog = {
+            'syslogconfigured': False,
+            'requestid': str(uuid.uuid1()),
+            'uri': req.env['REQUEST_URI'],
+            'writecount': 0,
+        }
 
-    path = repo.path
-    if reporoot and path.startswith(reporoot):
-        path = path[len(reporoot):]
-    path = path.rstrip('/').rstrip('/.hg')
+        # Resolve the repository path.
+        # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
+        # set to the relative path of the repo (I think).
+        repopath = req.env.get('REPO_NAME')
+        if not repopath:
+            reporoot = self.repo.ui.config('serverlog', 'reporoot', '')
+            if reporoot and not reporoot.endswith('/'):
+                reporoot += '/'
 
-    syslog.openlog(ident, 0, facility)
+            repopath = self.repo.path
+            if reporoot and repopath.startswith(reporoot):
+                repopath = repopath[len(reporoot):]
+            repopath = repopath.rstrip('/').rstrip('/.hg')
 
-    reqid = str(uuid.uuid1())
-    uri = req.env['REQUEST_URI']
-    clientip = req.env.get('HTTP_X_CLUSTER_CLIENT_IP', 'NONE')
+        self._serverlog['path'] = repopath
 
-    syslog.syslog(syslog.LOG_NOTICE, '%s BEGIN %s %s %s %s' % (
-        reqid, path, clientip, cmd, uri))
+        self._serverlog['ip'] = req.env.get('HTTP_X_CLUSTER_CLIENT_IP') or \
+            req.env.get('REMOTE_ADDR') or 'UNKNOWN'
 
-    startusage = resource.getrusage(resource.RUSAGE_SELF)
-    startcpu = startusage.ru_utime + startusage.ru_stime
-    starttime = time.time()
+        # Stuff a reference to the state and the bound logging method so we can
+        # record and log inside request handling.
+        req._serverlog = self._serverlog
+        req._syslog = self._syslog
 
-    writecount = 0
+        sl = self._serverlog
+        self._syslog('BEGIN_REQUEST', sl['path'], sl['ip'], sl['uri'])
 
-    try:
-        for chunk in origcall(repo, req, cmd):
-            writecount += len(chunk)
-            yield chunk
-    finally:
-        endtime = time.time()
-        endusage = resource.getrusage(resource.RUSAGE_SELF)
-        endcpu = endusage.ru_utime + endusage.ru_stime
+        startusage = resource.getrusage(resource.RUSAGE_SELF)
+        startcpu = startusage.ru_utime + startusage.ru_stime
+        starttime = time.time()
 
-        deltatime = endtime - starttime
-        deltacpu = endcpu - startcpu
-        if deltatime > 0.0:
-            cpupercent = deltacpu / deltatime
-        else:
-            cpupercent = 0.0
+        try:
+            for what in super(hgwebwrapped, self).run_wsgi(req):
+                self._serverlog['writecount'] += len(what)
+                yield what
+        finally:
+            endtime = time.time()
+            endusage = resource.getrusage(resource.RUSAGE_SELF)
+            endcpu = endusage.ru_utime + endusage.ru_stime
 
-        syslog.syslog(syslog.LOG_NOTICE, '%s END %d %.3f %.3f' % (
-            reqid, writecount, deltatime, cpupercent))
-        syslog.closelog()
+            deltatime = endtime - starttime
+            deltacpu = endcpu - startcpu
+
+            self._syslog('END_REQUEST', '%d' % sl['writecount'], '%.3f' % deltatime,
+                '%.3f' % deltacpu)
+
+            syslog.closelog()
+            self._serverlog['syslogconfigured'] = False
+
+    def _syslog(self, action, *args):
+        if not self._serverlog['syslogconfigured']:
+            ident = self.repo.ui.config('syslog', 'ident', 'hgweb')
+            facility = self.repo.ui.config('syslog', 'facility', 'LOG_LOCAL2')
+            facility = getattr(syslog, facility)
+
+            syslog.openlog(ident, 0, facility)
+            self._serverlog['syslogconfigured'] = True
+
+        msg = '%s %s %s' % (self._serverlog['requestid'], action,
+            ' '.join(args))
+        try:
+            syslog.syslog(syslog.LOG_NOTICE, msg)
+        except Exception as e:
+            pass
 
 def extsetup(ui):
     protocol.call = protocolcall
+
+    hgweb_mod.hgweb = hgwebwrapped
