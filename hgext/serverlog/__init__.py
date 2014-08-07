@@ -151,6 +151,18 @@ Arguments:
 
 e.g. ``9bddcd66-1e4e-11e4-af92-b8e85631ff68:9bdf08ab-1e4e-11e4-836d-b8e85631ff68 END_SSH_COMMAND 0.000 0.000``
 
+
+CHANGEGROUPSUBSET_START
+-----------------------
+
+Written when a repository is producing a bundle of changesets. This
+usually occurs during processing of an ``unbundle`` command.
+
+Arguments:
+
+* Source of the changesets
+* Integer number of changesets being included in the bundle.
+
 Limitations
 ===========
 
@@ -165,6 +177,7 @@ testedwith = '2.5.4'
 
 import mercurial.hgweb.protocol as protocol
 import mercurial.hgweb.hgweb_mod as hgweb_mod
+import mercurial.localrepo as localrepo
 import mercurial.sshserver as sshserver
 import mercurial.wireproto as wireproto
 
@@ -239,6 +252,7 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
         # record and log inside request handling.
         req._serverlog = self._serverlog
         req._syslog = self._syslog
+        self.repo._serverlog = self._serverlog
 
         sl = self._serverlog
         self._syslog('BEGIN_REQUEST', sl['path'], sl['ip'], sl['uri'])
@@ -276,6 +290,10 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
         }
 
         self._populaterepopath()
+
+        # Stuff a reference to the state so we can do logging within repo
+        # methods.
+        self.repo._serverlog = self._serverlog
 
         self._syslog('BEGIN_SSH_SESSION',
             self._serverlog['path'],
@@ -331,6 +349,15 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
             wireproto.dispatch = origdispatch
             self._serverlog['requestid'] = ''
 
+class wrappedlocalrepo(localrepo.localrepository, syslogmixin):
+    def _changegroupsubset(self, commonrevs, csets, heads, source):
+        self._syslog('CHANGEGROUPSUBSET_START',
+            source,
+            '%d' % len(csets))
+
+        return super(wrappedlocalrepo, self)._changegroupsubset(commonrevs,
+            csets, heads, source)
+
 def extsetup(ui):
     protocol.call = protocolcall
 
@@ -339,3 +366,5 @@ def extsetup(ui):
 
     if ui.configbool('serverlog', 'ssh', True):
         sshserver.sshserver = sshserverwrapped
+
+    localrepo.localrepository = wrappedlocalrepo
