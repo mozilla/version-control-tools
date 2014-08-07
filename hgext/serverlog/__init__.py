@@ -30,12 +30,34 @@ serverlog.reporoot
    Root path for all repositories. When logging the repository path, this
    prefix will be stripped.
 
+serverlog.hgweb
+   Whether to record requests for hgweb. Defaults to True.
+
+serverlog.ssh
+   Whether to record requests for ssh server. Defaults to True.
+
 Logged Messages
 ===============
 
 syslog messages conform to a well-defined string format:
 
-    <request id> <action> [<arg0> [<arg1> [...]]]
+    [<session id>:]<request id> <action> [<arg0> [<arg1> [...]]]
+
+The first word is a single or colon-delimited pair of UUIDs. This identifier
+is used to associate multiple events together.
+
+HTTP requests will have a single UUID. A new UUID will be generated at the
+beginning of the request.
+
+SSH sessions will have multiple UUIDs. The first UUID is a session ID. It will
+be created when the connection initiates. Subsequent UUIDs will be generated
+for each command processed on the SSH server.
+
+The idea is to write "point" events as soon as they happen and to correlate
+these point events into higher-level events later. This approach enables
+streaming consumers of the log output to identify in-flight requests. If we
+buffered log messages until response completion (such as Apache request logs),
+we wouldn't haven't a good handle on what the server is actively doing.
 
 The actions are defined in the following sections.
 
@@ -80,6 +102,32 @@ Arguments:
 
 e.g. ``bc286e11-1e44-11e4-8889-b8e85631ff68 END 0 0.002 0.002``
 
+BEGIN_SSH_SESSION
+-----------------
+
+Written when an SSH session starts.
+
+Arguments:
+
+* repo path
+* username creating the session
+
+e.g. ``c9417b51-1e4b-11e4-8adf-b8e85631ff68: BEGIN_SSH_SESSION mozilla-central gps``
+
+Note that there is an empty request id for this event!
+
+END_SSH_SESSION
+---------------
+
+Written when an SSH session terminates.
+
+Arguments:
+
+* Float wall time of session
+* Float CPU time of session
+
+e.g. ``3f74662b-1e4c-11e4-af00-b8e85631ff68: END_SSH_SESSION 1.716 0.000``
+
 Limitations
 ===========
 
@@ -94,7 +142,9 @@ testedwith = '2.5.4'
 
 import mercurial.hgweb.protocol as protocol
 import mercurial.hgweb.hgweb_mod as hgweb_mod
+import mercurial.sshserver as sshserver
 
+import os
 import resource
 import syslog
 import time
@@ -108,19 +158,11 @@ def protocolcall(repo, req, cmd):
     req._syslog('BEGIN_PROTOCOL', cmd)
     return origcall(repo, req, cmd)
 
-class hgwebwrapped(hgweb_mod.hgweb):
-    def run_wsgi(self, req):
-        self._serverlog = {
-            'syslogconfigured': False,
-            'requestid': str(uuid.uuid1()),
-            'uri': req.env['REQUEST_URI'],
-            'writecount': 0,
-        }
+class syslogmixin(object):
+    """Shared class providing an API to do syslog writing."""
+    def _populaterepopath(self):
+        repopath = self._serverlog.get('path', None)
 
-        # Resolve the repository path.
-        # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
-        # set to the relative path of the repo (I think).
-        repopath = req.env.get('REPO_NAME')
         if not repopath:
             reporoot = self.repo.ui.config('serverlog', 'reporoot', '')
             if reporoot and not reporoot.endswith('/'):
@@ -132,6 +174,38 @@ class hgwebwrapped(hgweb_mod.hgweb):
             repopath = repopath.rstrip('/').rstrip('/.hg')
 
         self._serverlog['path'] = repopath
+
+    def _syslog(self, action, *args):
+        if not self._serverlog['syslogconfigured']:
+            ident = self.repo.ui.config('syslog', 'ident', 'hgweb')
+            facility = self.repo.ui.config('syslog', 'facility', 'LOG_LOCAL2')
+            facility = getattr(syslog, facility)
+
+            syslog.openlog(ident, 0, facility)
+            self._serverlog['syslogconfigured'] = True
+
+        fmt = '%s %s %s'
+        formatters = (self._serverlog['requestid'], action, ' '.join(args))
+        if self._serverlog.get('sessionid'):
+            fmt = '%s:' + fmt
+            formatters = tuple([self._serverlog['sessionid']] + list(formatters))
+
+        syslog.syslog(syslog.LOG_NOTICE, fmt % formatters)
+
+class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
+    def run_wsgi(self, req):
+        self._serverlog = {
+            'syslogconfigured': False,
+            'requestid': str(uuid.uuid1()),
+            'uri': req.env['REQUEST_URI'],
+            'writecount': 0,
+        }
+
+        # Resolve the repository path.
+        # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
+        # set to the relative path of the repo (I think).
+        self._serverlog['path'] = req.env.get('REPO_NAME')
+        self._populaterepopath()
 
         self._serverlog['ip'] = req.env.get('HTTP_X_CLUSTER_CLIENT_IP') or \
             req.env.get('REMOTE_ADDR') or 'UNKNOWN'
@@ -166,23 +240,56 @@ class hgwebwrapped(hgweb_mod.hgweb):
             syslog.closelog()
             self._serverlog['syslogconfigured'] = False
 
-    def _syslog(self, action, *args):
-        if not self._serverlog['syslogconfigured']:
-            ident = self.repo.ui.config('syslog', 'ident', 'hgweb')
-            facility = self.repo.ui.config('syslog', 'facility', 'LOG_LOCAL2')
-            facility = getattr(syslog, facility)
+class sshserverwrapped(sshserver.sshserver, syslogmixin):
+    """Wrap sshserver class to record events."""
 
-            syslog.openlog(ident, 0, facility)
-            self._serverlog['syslogconfigured'] = True
+    def serve_forever(self):
+        self._serverlog = {
+            'sessionid': str(uuid.uuid1()),
+            'requestid': '',
+            'syslogconfigured': False,
+        }
 
-        msg = '%s %s %s' % (self._serverlog['requestid'], action,
-            ' '.join(args))
+        self._populaterepopath()
+
+        self._syslog('BEGIN_SSH_SESSION',
+            self._serverlog['path'],
+            os.environ['USER'])
+
+        startusage = resource.getrusage(resource.RUSAGE_SELF)
+        startcpu = startusage.ru_utime + startusage.ru_stime
+        starttime = time.time()
+
         try:
-            syslog.syslog(syslog.LOG_NOTICE, msg)
-        except Exception as e:
-            pass
+            return super(sshserverwrapped, self).serve_forever()
+        finally:
+            endtime = time.time()
+            endusage = resource.getrusage(resource.RUSAGE_SELF)
+            endcpu = endusage.ru_utime + endusage.ru_stime
+
+            deltatime = endtime - starttime
+            deltacpu = endcpu - startcpu
+
+            self._syslog('END_SSH_SESSION',
+                '%.3f' % deltatime,
+                '%.3f' % deltacpu)
+
+            syslog.closelog()
+            self._serverlog['syslogconfigured'] = False
+
+    def serve_one(self):
+        self._serverlog['requestid'] = str(uuid.uuid1())
+
+        try:
+            return super(sshserverwrapped, self).serve_one()
+        finally:
+            self._serverlog['requestid'] = ''
 
 def extsetup(ui):
     protocol.call = protocolcall
 
-    hgweb_mod.hgweb = hgwebwrapped
+    if ui.configbool('serverlog', 'hgweb', True):
+        hgweb_mod.hgweb = hgwebwrapped
+
+    if ui.configbool('serverlog', 'ssh', True):
+        sshserver.sshserver = sshserverwrapped
