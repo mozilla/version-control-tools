@@ -128,6 +128,29 @@ Arguments:
 
 e.g. ``3f74662b-1e4c-11e4-af00-b8e85631ff68: END_SSH_SESSION 1.716 0.000``
 
+BEGIN_SSH_COMMAND
+-----------------
+
+Written when an SSH session starts processing a command.
+
+Arguments:
+
+* command name
+
+e.g. ``9bddcd66-1e4e-11e4-af92-b8e85631ff68:9bdf08ab-1e4e-11e4-836d-b8e85631ff68 BEGIN_SSH_COMMAND between``
+
+END_SSH_COMMAND
+---------------
+
+Written when an SSH session finishes processing a command.
+
+Arguments:
+
+* Float wall time to process command
+* Float CPU time to process command
+
+e.g. ``9bddcd66-1e4e-11e4-af92-b8e85631ff68:9bdf08ab-1e4e-11e4-836d-b8e85631ff68 END_SSH_COMMAND 0.000 0.000``
+
 Limitations
 ===========
 
@@ -143,6 +166,7 @@ testedwith = '2.5.4'
 import mercurial.hgweb.protocol as protocol
 import mercurial.hgweb.hgweb_mod as hgweb_mod
 import mercurial.sshserver as sshserver
+import mercurial.wireproto as wireproto
 
 import os
 import resource
@@ -151,6 +175,7 @@ import time
 import uuid
 
 origcall = protocol.call
+origdispatch = wireproto.dispatch
 
 def protocolcall(repo, req, cmd):
     """Wraps mercurial.hgweb.protocol to record requests."""
@@ -280,9 +305,30 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
     def serve_one(self):
         self._serverlog['requestid'] = str(uuid.uuid1())
 
+        def dispatch(repo, proto, cmd):
+            self._syslog('BEGIN_SSH_COMMAND', cmd)
+            return origdispatch(repo, proto, cmd)
+
+        startusage = resource.getrusage(resource.RUSAGE_SELF)
+        startcpu = startusage.ru_utime + startusage.ru_stime
+        starttime = time.time()
+
+        wireproto.dispatch = dispatch
         try:
             return super(sshserverwrapped, self).serve_one()
         finally:
+            endtime = time.time()
+            endusage = resource.getrusage(resource.RUSAGE_SELF)
+            endcpu = endusage.ru_utime + endusage.ru_stime
+
+            deltatime = endtime - starttime
+            deltacpu = endcpu - startcpu
+
+            self._syslog('END_SSH_COMMAND',
+                '%.3f' % deltatime,
+                '%.3f' % deltacpu)
+
+            wireproto.dispatch = origdispatch
             self._serverlog['requestid'] = ''
 
 def extsetup(ui):
