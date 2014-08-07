@@ -186,6 +186,7 @@ import mercurial.localrepo as localrepo
 import mercurial.sshserver as sshserver
 import mercurial.wireproto as wireproto
 
+import inspect
 import os
 import resource
 import syslog
@@ -247,7 +248,6 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
         self._serverlog = {
             'syslogconfigured': False,
             'requestid': str(uuid.uuid1()),
-            'uri': req.env['REQUEST_URI'],
             'writecount': 0,
         }
 
@@ -266,8 +266,12 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
         req._syslog = self._syslog
         self.repo._serverlog = self._serverlog
 
+        # TODO REQUEST_URI may not be defined in all WSGI environments,
+        # including wsgiref. We /could/ copy code from hgweb_mod here.
+        uri = req.env.get('REQUEST_URI', 'UNKNOWN')
+
         sl = self._serverlog
-        self._syslog('BEGIN_REQUEST', sl['path'], sl['ip'], sl['uri'])
+        self._syslog('BEGIN_REQUEST', sl['path'], sl['ip'], uri)
 
         startusage = resource.getrusage(resource.RUSAGE_SELF)
         startcpu = startusage.ru_utime + startusage.ru_stime
@@ -383,8 +387,28 @@ def extsetup(ui):
     protocol.call = protocolcall
 
     if ui.configbool('serverlog', 'hgweb', True):
+        orighgweb = hgweb_mod.hgweb
         hgweb_mod.hgweb = hgwebwrapped
         hgwebdir_mod.hgweb = hgwebwrapped
+
+        # If running in wsgi mode, this extension may not load until
+        # hgweb_mod.hgweb.__init__ is on the stack. At that point, changing
+        # module symbols will do nothing: we need to change an actually object
+        # instance.
+        #
+        # So, we walk the stack and see if we have a hgweb_mod.hgweb instance
+        # that we need to monkeypatch.
+        for f in inspect.stack():
+            frame = f[0]
+            if 'self' not in frame.f_locals:
+                continue
+
+            s = frame.f_locals['self']
+            if not isinstance(s, orighgweb):
+                continue
+
+            s.__class__ = hgwebwrapped
+            break
 
     if ui.configbool('serverlog', 'ssh', True):
         sshserver.sshserver = sshserverwrapped
