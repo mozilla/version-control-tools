@@ -7,6 +7,7 @@ import logging
 import re
 
 from django.contrib.sites.models import Site
+from django.db.models.signals import pre_delete
 
 from djblets.siteconfig.models import SiteConfiguration
 from djblets.util.decorators import simple_decorator
@@ -14,7 +15,8 @@ from djblets.util.decorators import simple_decorator
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import AuthBackendHook, SignalHook
 from reviewboard.reviews.errors import PermissionError, PublishError
-from reviewboard.reviews.models import ReviewRequest
+from reviewboard.reviews.models import (ReviewRequest,
+                                        ReviewRequestDraft)
 from reviewboard.reviews.signals import (reply_publishing,
                                          review_publishing,
                                          review_request_closed,
@@ -31,8 +33,17 @@ from rbbz.middleware import BugzillaCookieAuthMiddleware
 
 
 REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')
+
 AUTO_CLOSE_DESCRIPTION = """
 Discarded automatically because parent review request was discarded.
+"""
+
+NEVER_USED_DESCRIPTION = """
+Discarded because this review request ended up not being needed.
+"""
+
+OBSOLETE_DESCRIPTION = """
+Discarded because this change is no longer required.
 """
 
 # Extra data fields which should be automatically copied from
@@ -49,6 +60,7 @@ class BugzillaExtension(Extension):
 
     def initialize(self):
         AuthBackendHook(self, BugzillaBackend)
+        SignalHook(self, pre_delete, on_draft_pre_delete)
         SignalHook(self, review_request_publishing,
                    on_review_request_publishing)
         SignalHook(self, review_publishing, on_review_publishing)
@@ -78,6 +90,69 @@ def is_review_request_squashed(review_request):
     return squashed == "True"
 
 
+def on_draft_pre_delete(sender, instance, using, **kwargs):
+    """ Handle draft discards.
+
+    There are no handy signals built into Review Board (yet) for us to detect
+    when a squashed Review Request Draft is discarded. Instead, we monitor for
+    deletions of models, and handle cases where the models being deleted are
+    ReviewRequestDrafts. We then do some processing to ensure that the draft
+    is indeed a draft of a squashed review request that we want to handle,
+    and then propagate the discard down to the child review requests.
+    """
+    if not sender == ReviewRequestDraft:
+        return
+
+    # Drafts can get deleted for a number of reasons. They get deleted when
+    # drafts are discarded, obviously, but also whenever review requests are
+    # published, because the data gets copied over to the review request, and
+    # then the draft is blown away. Unfortunately, on_pre_delete doesn't give
+    # us too many clues about which scenario we're in, so we have to infer it
+    # based on other things attached to the model. This is a temporary fix until
+    # we get more comprehensive draft deletion signals built into Review Board.
+    #
+    # In the case where the review request is NOT public yet, the draft will
+    # not have a change description. In this case, we do not need to
+    # differentiate between publish and discard because discards of non-public
+    # review request's drafts will always cause the review request to be closed
+    # as discarded, and this case is handled by on_review_request_closed().
+    #
+    # In the case where the review request has a change description, but it's
+    # set to public, we must have just published this draft before deleting it,
+    # so there's nothing to do here.
+    if (instance.changedesc is None or instance.changedesc.public):
+        return
+
+    review_request = instance.review_request
+
+    if not review_request:
+        return
+
+    if not is_review_request_squashed(review_request):
+        return
+
+    # If the review request is marked as discarded, then we must be closing
+    # it, and so the on_review_request_closed() handler will take care of it.
+    if review_request.status == ReviewRequest.DISCARDED:
+        return
+
+    user = review_request.submitter
+
+    for child in gen_child_rrs(review_request):
+        draft = child.get_draft()
+        if draft:
+            draft.delete()
+
+    for child in gen_rrs_by_extra_data_key(review_request, 'unpublished_rids'):
+        child.close(ReviewRequest.DISCARDED,
+                    user=user,
+                    description=NEVER_USED_DESCRIPTION)
+
+    review_request.extra_data['p2rb.discard_on_publish_rids'] = '[]'
+    review_request.extra_data['p2rb.unpublished_rids'] = '[]'
+    review_request.save()
+
+
 @simple_decorator
 def bugzilla_to_publish_errors(func):
     def _transform_errors(*args, **kwargs):
@@ -90,6 +165,16 @@ def bugzilla_to_publish_errors(func):
 
 @bugzilla_to_publish_errors
 def on_review_request_publishing(user, review_request_draft, **kwargs):
+    # There have been strange cases (all local, and during development), where
+    # when attempting to publish a review request, this handler will fail
+    # because the draft does not exist. This is a really strange case, and not
+    # one we expect to happen in production. However, since we've seen it
+    # locally, we handle it here, and log.
+    if not review_request_draft:
+        logging.error('Strangely, there was no review request draft on the '
+                      'review request we were attempting to publish.')
+        return
+
     review_request = review_request_draft.get_review_request()
 
     # skip review requests that were not pushed
@@ -105,24 +190,25 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
         raise InvalidBugIdError('<unknown>')
 
     bug_id = m.group(1)
-
+    using_bugzilla = we_are_using_bugzilla()
     try:
         bug_id = int(bug_id)
     except (TypeError, ValueError):
         raise InvalidBugIdError(bug_id)
 
-    b = Bugzilla(user.bzlogin, user.bzcookie)
+    if using_bugzilla:
+        b = Bugzilla(user.bzlogin, user.bzcookie)
 
-    try:
-        if b.is_bug_confidential(bug_id):
-            raise ConfidentialBugError
-    except BugzillaError as e:
-        # Special cases:
-        #   100: Invalid Bug Alias
-        #   101: Bug does not exist
-        if e.fault_code and (e.fault_code == 100 or e.fault_code == 101):
-            raise InvalidBugIdError(bug_id)
-        raise
+        try:
+            if b.is_bug_confidential(bug_id):
+                raise ConfidentialBugError
+        except BugzillaError as e:
+            # Special cases:
+            #   100: Invalid Bug Alias
+            #   101: Bug does not exist
+            if e.fault_code and (e.fault_code == 100 or e.fault_code == 101):
+                raise InvalidBugIdError(bug_id)
+            raise
 
     # At this point, we know that the bug ID that we've got
     # is valid and accessible.
@@ -144,24 +230,47 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
 
             comment += '\n%s' % review_request_draft.changedesc.text
 
-        b.post_rb_url(bug_id,
-                      review_request.id,
-                      review_request_draft.summary,
-                      comment,
-                      review_request_url(review_request),
-                      reviewers)
-        # Publish and child review requests that are either not
-        # public, or have drafts.
-        for child in generate_child_review_requests(review_request):
-            try:
-                if child.status == ReviewRequest.DISCARDED:
-                    child.reopen(user=user)
-                if child.get_draft(user=user) or not child.public:
-                    child.publish(user=user)
-            except PermissionError as e:
-                logging.error('Could not reopen or publish child review '
-                              'request with id %s because of error %s'
-                              % (child.id, e))
+        if using_bugzilla:
+            b.post_rb_url(bug_id,
+                          review_request.id,
+                          review_request_draft.summary,
+                          comment,
+                          review_request_url(review_request),
+                          reviewers)
+
+        unpublished_rids = json.loads(
+            review_request.extra_data['p2rb.unpublished_rids'])
+        discard_on_publish_rids = json.loads(
+            review_request.extra_data['p2rb.discard_on_publish_rids'])
+
+        # Publish any draft commits that have drafts. This will already include
+        # items that are in unpublished_rids, so we'll remove anything we publish
+        # out of unpublished_rids.
+        for child in gen_child_rrs(review_request_draft):
+            if child.get_draft(user=user) or not child.public:
+                child.publish(user=user)
+                id_str = str(child.id)
+                if id_str in unpublished_rids:
+                    unpublished_rids.remove(id_str)
+
+        # The remaining unpubished_rids need to be closed as discarded because
+        # they have never been published, and they will appear in the user's
+        # dashboard unless closed.
+        for child in gen_rrs_by_rids(unpublished_rids):
+            child.close(ReviewRequest.DISCARDED,
+                        user=user,
+                        description=NEVER_USED_DESCRIPTION)
+
+        # We also close the discard_on_publish review requests because, well,
+        # we don't need them anymore. We use a slightly different message
+        # though.
+        for child in gen_rrs_by_rids(discard_on_publish_rids):
+            child.close(ReviewRequest.DISCARDED,
+                        user=user,
+                        description=OBSOLETE_DESCRIPTION)
+
+        review_request.extra_data['p2rb.unpublished_rids'] = '[]'
+        review_request.extra_data['p2rb.discard_on_publish_rids'] = '[]'
 
     # Copy p2rb extra data from the draft, overwriting the current
     # values on the review request.
@@ -218,34 +327,75 @@ def on_review_request_closed(user, review_request, type, **kwargs):
         # Luckily, the extra_data is still around, and more luckily, it's
         # not exposed in the UI for user-meddling. We can find all of the
         # child review requests via extra_data.p2rb.commits.
-        for child in generate_child_review_requests(review_request):
+        for child in gen_child_rrs(review_request):
             child.close(ReviewRequest.DISCARDED,
                         user=user,
                         description=AUTO_CLOSE_DESCRIPTION)
+
+        # We want to discard any review requests that this squashed review
+        # request never got to publish, so were never part of its "commits"
+        # list.
+        for child in gen_rrs_by_extra_data_key(review_request,
+                                               'unpublished_rids'):
+            child.close(ReviewRequest.DISCARDED,
+                        user=user,
+                        description=NEVER_USED_DESCRIPTION)
 
         # Next, we clear out the commit_id on the squashed review request
         # so that someone can post follow-up work with the same review
         # identifier in the future. This value is, however, still being
         # stored in extra_data under "p2rb.identifier".
         review_request.commit = None
+        review_request.extra_data['p2rb.unpublished_rids'] = '[]'
+        review_request.extra_data['p2rb.discard_on_publish_rids'] = '[]'
         review_request.save()
 
 
-def generate_child_review_requests(squashed_review_request):
-    if not is_review_request_squashed(squashed_review_request):
+def gen_child_rrs(review_request):
+    """ Generate child review requests.
+
+    For some review request (draft or normal), that has a p2rb.commits
+    extra_data field, we yield the child review requests belonging to
+    the rids in that field.
+
+    If a review request is not found for the listed ID, get_rr_for_id will
+    log this, and we'll skip that ID.
+    """
+    key = 'p2rb.commits'
+    if not key in review_request.extra_data:
         return
 
-    commits = squashed_review_request.extra_data['p2rb.commits']
-    if commits:
-        commits = json.loads(commits)
-        for commit_tuple in commits:
-            child_commit_id = commit_tuple[0]
-            child_request_id = commit_tuple[1]
-            try:
-                child = ReviewRequest.objects.get(pk=child_request_id)
-                yield child
-            except ReviewRequest.DoesNotExist:
-                logging.error('Could not retrieve child review request '
-                              'with id %s belonging to commit %s because '
-                              'it does not appear to exist.'
-                              % (child_request_id, child_commit_id))
+    commit_tuples = json.loads(review_request.extra_data[key])
+    for commit_tuple in commit_tuples:
+        child = get_rr_for_id(commit_tuple[1])
+        if child:
+            yield child
+
+
+def gen_rrs_by_extra_data_key(review_request, key):
+    key = 'p2rb.' + key
+    if not key in review_request.extra_data:
+        return
+
+    return gen_rrs_by_rids(json.loads(review_request.extra_data[key]))
+
+
+def gen_rrs_by_rids(rids):
+    for rid in rids:
+        review_request = get_rr_for_id(rid)
+        if review_request:
+            yield review_request
+
+
+def get_rr_for_id(rid):
+    try:
+        return ReviewRequest.objects.get(pk=rid)
+    except ReviewRequest.DoesNotExist:
+        logging.error('Could not retrieve child review request with '
+                      'rid %s because it does not appear to exist.'
+                      % rid)
+
+
+def we_are_using_bugzilla():
+    siteconfig = SiteConfiguration.objects.get_current()
+    return siteconfig.settings.get("auth_backend", "builtin") == "bugzilla"

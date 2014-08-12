@@ -32,7 +32,6 @@ class BugzillaBackend(AuthBackend):
 
     def authenticate(self, username, password, cookie=False):
         username = username.strip()
-
         try:
             bugzilla = Bugzilla()
         except BugzillaUrlError:

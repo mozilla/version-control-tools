@@ -353,7 +353,6 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
         'extra_data.p2rb.commits': commit_list_json,
     })
 
-
     squashed_rr.update(**{
         'extra_data.p2rb.discard_on_publish_rids': json.dumps(
             discard_on_publish_rids),
