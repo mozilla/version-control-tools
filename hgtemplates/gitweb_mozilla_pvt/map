@@ -27,7 +27,7 @@ fileannotate = fileannotate.tmpl
 filediff = filediff.tmpl
 filelog = filelog.tmpl
 fileline = '<div style="font-family:monospace" class="parity{parity}"><pre><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</pre></div>'
-annotateline = '<div class="l{parity}"><div class="codeauthor"><a href="{url}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{author|user|obfuscate}@{rev}</a></div><a class="codeline" href="#{lineid}" id="{lineid}">{linenumber}</a>{line|escape}</div>'
+annotateline = '<div class="l{parity}"><div class="codeauthor"><a href="{url}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{author|emailuser|obfuscate}@{rev}</a></div><a class="codeline" href="#{lineid}" id="{lineid}">{linenumber}</a>{line|escape}</div>'
 difflineplus = '<span class="difflineplus"><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
 difflineminus = '<span class="difflineminus"><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
 difflineat = '<span class="difflineat"><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
