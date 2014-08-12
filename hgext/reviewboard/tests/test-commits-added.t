@@ -71,12 +71,14 @@ The parent review should have its description updated.
   $ rbmanage ../rbserver dumpreview $HGPORT1 1
   Review: 1
     Status: pending
+    Public: False
     Commit ID: bz://123/mynick
     Extra:
       p2rb: True
-      p2rb.commits: [["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9", "3"], ["27d2e8c43375f3dd075cd7492a1f301ecdca9ffc", "4"]]
+      p2rb.discard_on_publish_rids: []
       p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: True
+      p2rb.unpublished_rids: ["2", "3", "4"]
   Draft: 1
     Commit ID: bz://123/mynick
     Summary: Review for review ID: bz://123/mynick
@@ -91,8 +93,11 @@ The parent review should have its description updated.
       
     Extra:
       p2rb: True
+      p2rb.commits: [["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9", "3"], ["27d2e8c43375f3dd075cd7492a1f301ecdca9ffc", "4"]]
+      p2rb.discard_on_publish_rids: []
       p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: True
+      p2rb.unpublished_rids: []
   Diff: 4
     Revision: 1
   diff -r 7c5bdf0cec4a -r 27d2e8c43375 foo

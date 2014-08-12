@@ -180,30 +180,45 @@ def main(args):
 
     elif action == 'dumpreview':
         port, rid = args[2:]
-
-        from rbtools.api.client import RBClient
-        c = RBClient('http://localhost:%s/' % port, username='testadmin',
-                password='password')
-        root = c.get_root()
-
+        root = get_root(port)
         r = root.get_review_request(review_request_id=rid)
+        dump_review_request(r)
 
-        # TODO Figure out depends_on dumping.
-        print('Review: %s' % r.id)
-        print('  Status: %s' % r.status)
-        if r.bugs_closed:
-            print('  Bugs: %s' % ' '.join(r.bugs_closed))
-        print('  Commit ID: %s' % r.commit_id)
-        if r.summary:
-            print('  Summary: %s' % r.summary)
-        if r.description:
-            print('  Description:\n    %s' % r.description.replace('\n', '\n    '))
-        print('  Extra:')
-        for k, v in sorted(r.extra_data.iteritems()):
-            print ('    %s: %s' % (k, v))
+    elif action == 'publish':
+        port, rid = args[2:]
+        root = get_root(port)
+        r = root.get_review_request(review_request_id=rid)
+        response = r.get_draft().update(public=True)
+        # TODO: Dump the response code?
 
 
-        d = r.get_or_create_draft()
+def get_root(port):
+    from rbtools.api.client import RBClient
+    c = RBClient('http://localhost:%s/' % port, username='testadmin',
+            password='password')
+    return c.get_root()
+
+
+def dump_review_request(r):
+    from rbtools.api.errors import APIError
+
+    # TODO Figure out depends_on dumping.
+    print('Review: %s' % r.id)
+    print('  Status: %s' % r.status)
+    print('  Public: %s' % r.public)
+    if r.bugs_closed:
+        print('  Bugs: %s' % ' '.join(r.bugs_closed))
+    print('  Commit ID: %s' % r.commit_id)
+    if r.summary:
+        print('  Summary: %s' % r.summary)
+    if r.description:
+        print('  Description:\n    %s' % r.description.replace('\n', '\n    '))
+    print('  Extra:')
+    for k, v in sorted(r.extra_data.iteritems()):
+        print ('    %s: %s' % (k, v))
+
+    try:
+        d = r.get_draft()
         print('Draft: %s' % d.id)
         if d.bugs_closed:
             print('  Bugs: %s' % ' '.join(d.bugs_closed))
@@ -224,6 +239,10 @@ def main(args):
                 print('  Base Commit: %s' % diff.base_commit_id)
             patch = diff.get_patch()
             print(patch.data)
+    except APIError as e:
+        # There was no draft, so nothing to print.
+        pass
+
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

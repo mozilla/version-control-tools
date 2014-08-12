@@ -77,6 +77,7 @@
   saved backup bundle to * (glob)
   saved backup bundle to * (glob)
 
+  $ rbmanage ../rbserver publish $HGPORT1 1
   $ hg push
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes

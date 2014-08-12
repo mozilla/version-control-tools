@@ -38,6 +38,7 @@ Push a single commit
   review id:  bz://300124/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
+  $ rbmanage ../rbserver publish $HGPORT1 1
   $ rbmanage ../rbserver dumpreview $HGPORT1 1
   Review: 1
     Status: pending
