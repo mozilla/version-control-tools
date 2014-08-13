@@ -49,8 +49,8 @@ for v in 2.5.4 2.6 2.6.1 2.6.2 2.6.3 2.7 2.7.1 2.7.2 2.8 2.8.1 2.8.2 2.9 2.9.1 2
   if [ ! -d $destdir ]; then
     cd venv/hg
     hg up $v
-    make install PREFIX=$destdir
-    make clean
+    make install-bin PREFIX=$destdir
+    hg --config extensions.purge= purge --all
     cd ../..
   fi
 done
