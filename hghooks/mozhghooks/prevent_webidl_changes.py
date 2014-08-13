@@ -47,6 +47,7 @@ def hook(ui, repo, hooktype, node, **kwargs):
         'hsivonen',         # Henri Sivonen
         'mrbkap',           # Blake Kaplan
         'bholley',          # Bobby Holley
+        'baku',             # Andrea Marchesini
     ]
     DOM_authors = [
         'jst@mozilla.com',         # Johnny Stenback
@@ -60,6 +61,7 @@ def hook(ui, repo, hooktype, node, **kwargs):
         'justin.lebar@gmail.com',  # Justin Lebar
         'hsivonen@hsivonen.fi',    # Henri Sivonen
         'mrbkap@gmail.com',        # Blake Kaplan
+        'amarchesini@mozilla.com', # Andrea Marchesini
     ]
     error = ""
     webidlReviewed = False
