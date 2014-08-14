@@ -1,7 +1,7 @@
 $provision = <<SCRIPT
 apt-get update
 apt-get -y upgrade
-apt-get -y install mercurial python-dev python-virtualenv
+apt-get -y install mercurial python-dev python-virtualenv unzip
 SCRIPT
 
 Vagrant.configure('2') do |config|
