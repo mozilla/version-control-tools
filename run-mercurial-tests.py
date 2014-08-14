@@ -142,10 +142,16 @@ if __name__ == '__main__':
     runtestsmod.defaults = dict(old_defaults)
 
     if options.run_hooks:
+        # We need our custom sitecustomize.py to be loaded. To force this, we
+        # need our path to be before any other or the system's sitecustomize.py
+        # may get loaded.
+        env = os.environ.copy()
+        env['PYTHONPATH'] = os.path.join(HERE, 'venv', 'bin')
+
         # TODO hook up to unittest directly and share TestSuite and TestResult
         # with Mercurial.
         args = [sys.executable, os.path.join(HERE, 'hghooks', 'runtests.py')]
-        res2 = subprocess.call(args, cwd=os.path.join(HERE, 'hghooks'))
+        res2 = subprocess.call(args, cwd=os.path.join(HERE, 'hghooks'), env=env)
         if res2:
             res = res2
 

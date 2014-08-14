@@ -25,7 +25,7 @@ cd ../..
 
 # Collect code coverage from all Python processes if environment variable
 # is set.
-cat > venv/lib/python2.7/site-packages/sitecustomize.py << EOF
+cat > venv/bin/sitecustomize.py << EOF
 import os
 
 if os.environ.get('CODE_COVERAGE', False):
