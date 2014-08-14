@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 if [ ! -e version-control-tools ]; then
   hg clone /version-control-tools version-control-tools
 fi
@@ -14,6 +12,9 @@ hg up tip
 ./create-test-environment
 source venv/bin/activate
 ./run-mercurial-tests.py -j4 --all-versions --cover
+result=$?
 
 rm -rf /version-control-tools/coverage
 mv coverage/ /version-control-tools/
+
+exit $result
