@@ -46,6 +46,11 @@ def isGoodMessage(c):
         message("Rev {rev} uses try syntax. (Did you mean to push to Try instead?)")
         return False
 
+    # Match against [PATCH] and [PATCH n/m]
+    if "[PATCH" in desc:
+        message("Rev {rev} contains git-format-patch \"[PATCH]\" cruft. Use git-format-patch -k to avoid this.")
+        return False
+
     for r in goodMessage:
         if r.search(desc):
             return True
