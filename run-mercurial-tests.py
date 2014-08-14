@@ -10,6 +10,7 @@ from __future__ import print_function
 import argparse
 import imp
 import os
+import subprocess
 import sys
 
 # Mercurial's run-tests.py isn't meant to be loaded as a module. We do it
@@ -78,6 +79,9 @@ if __name__ == '__main__':
     parser.add_argument('-j', '--jobs', type=int)
     parser.add_argument('--all-versions', action='store_true',
         help='Test against all marked compatible versions')
+    parser.add_argument('--no-hooks', dest='run_hooks', default=True,
+        action='store_false',
+        help='Do not run the tests for hghooks')
 
     options, extra = parser.parse_known_args(sys.argv)
 
@@ -85,8 +89,9 @@ if __name__ == '__main__':
         print('WARNING: Not running tests optimally. Specify -j to run tests '
                 'in parallel.', file=sys.stderr)
 
-    # --all-versions belongs to use only. Don't pass it along
-    sys.argv = [a for a in sys.argv if a != '--all-versions']
+    # some arguments belong to us only. Don't pass it along to run-tests.py.
+    sys.argv = [a for a in sys.argv
+        if a not in {'--all-versions', '--no-hooks'}]
 
     coveragerc = os.path.join(HERE, '.coveragerc')
     coverdir = os.path.join(HERE, 'coverage')
@@ -123,7 +128,9 @@ if __name__ == '__main__':
     extensions = get_extensions()
 
     # Add all tests unless we get an argument that looks like a test path.
-    if not any(a for a in extra[1:] if not a.startswith('-')):
+    if any(a for a in extra[1:] if not a.startswith('-')):
+        options.run_hooks = False
+    else:
         for e in extensions.values():
             sys.argv.extend(sorted(e['tests']))
 
@@ -134,9 +141,26 @@ if __name__ == '__main__':
     os.environ.update(old_env)
     runtestsmod.defaults = dict(old_defaults)
 
+    if options.run_hooks:
+        # TODO hook up to unittest directly and share TestSuite and TestResult
+        # with Mercurial.
+        args = [sys.executable, os.path.join(HERE, 'hghooks', 'runtests.py')]
+        res2 = subprocess.call(args, cwd=os.path.join(HERE, 'hghooks'))
+        if res2:
+            res = res2
+
     # If we're running the full compatibility run, figure out what versions
     # apply to what and run them.
     if options.all_versions:
+        # No need to grab code coverage for legacy versions - it just slows
+        # us down.
+        # Assertion: we have no tests that only work on legacy Mercurial
+        # versions.
+        try:
+            del os.environ['CODE_COVERAGE']
+        except KeyError:
+            pass
+
         versions = {}
         for e, m in extensions.items():
             for v in m['testedwith']:
@@ -175,8 +199,14 @@ if __name__ == '__main__':
         cov = coverage(data_file=os.path.join(coverdir, 'coverage'))
         cov.combine()
 
+        pydirs = [
+            EXTDIR,
+            os.path.join(HERE, 'pylib'),
+            os.path.join(HERE, 'hghooks'),
+        ]
+
         # Ensure all .py files show up in coverage report.
-        for d in (EXTDIR, os.path.join(HERE, 'pylib')):
+        for d in pydirs:
             for root, dirs, files in os.walk(d):
                 for f in files:
                     if f.endswith('.py'):
