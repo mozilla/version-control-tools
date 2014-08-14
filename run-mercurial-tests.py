@@ -186,6 +186,7 @@ if __name__ == '__main__':
             sys.argv.extend(sorted(tests))
 
             print('Testing with Mercurial %s' % version)
+            sys.stdout.flush()
             runner = runtestsmod.TestRunner()
             res2 = runner.run(sys.argv[1:])
             if res2:
@@ -193,6 +194,8 @@ if __name__ == '__main__':
             os.environ.clear()
             os.environ.update(old_env)
             runtestsmod.defaults = dict(old_defaults)
+            sys.stdout.flush()
+            sys.stderr.flush()
 
     #if oldvmstate in (vm.NOT_CREATED, vm.POWEROFF, vm.ABORTED):
     #    vm.halt()
