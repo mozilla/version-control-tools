@@ -55,6 +55,7 @@ def hook(ui, repo, hooktype, node, **kwargs):
         'bzbarsky@mit.edu',        # Boris Zbarsky
         'jonas@sicking.cc',        # Jonas Sicking
         'olli.pettay@helsinki.fi', # Olli Pettay
+        'bugs@pettay.fi',          # Olli Pettay
         'bent.mozilla@gmail.com',  # Ben Turner
         'mounir@lamouri.fr',       # Mounir Lamouri
         'khuey@kylehuey.com',      # Kyle Huey
