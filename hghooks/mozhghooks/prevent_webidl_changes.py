@@ -103,7 +103,7 @@ def hook(ui, repo, hooktype, node, **kwargs):
     if error != "":
         print "\n\n************************** ERROR ****************************"
         ui.warn("\n" + error + "\n")
-        print "\n\rChanges to WebIDL files in this repo require review from a DOM peer in the form of r=...\n\rThis is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..\n\r"
+        print "\nChanges to WebIDL files in this repo require review from a DOM peer in the form of r=...\nThis is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..\n"
         print "*************************************************************\n\n"
         # Reject the changesets
         return 1
