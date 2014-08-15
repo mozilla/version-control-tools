@@ -129,17 +129,18 @@ if __name__ == '__main__':
 
     extensions = get_extensions()
 
+    hooks_test_dir = os.path.join(HERE, 'hghooks', 'tests')
+    hooks_tests = [os.path.join(hooks_test_dir, f)
+                   for f in os.listdir(hooks_test_dir)
+                   if is_test_filename(f)]
+
     # Add all tests unless we get an argument that looks like a test path.
     if any(a for a in extra[1:] if not a.startswith('-')):
         options.run_hooks = False
     else:
         for e in extensions.values():
             sys.argv.extend(sorted(e['tests']))
-
-        hooks_test_dir = os.path.join(HERE, 'hghooks', 'tests')
-        for f in os.listdir(hooks_test_dir):
-            if is_test_filename(f):
-                sys.argv.append(os.path.join(hooks_test_dir, f))
+        sys.argv.extend(hooks_tests)
 
     old_env = os.environ.copy()
     old_defaults = dict(runtestsmod.defaults)
@@ -191,6 +192,7 @@ if __name__ == '__main__':
             sys.argv.extend(['--with-hg',
                 os.path.join(mercurials_dir, version, 'bin', 'hg')])
             sys.argv.extend(sorted(tests))
+            sys.argv.extend(hooks_tests)
 
             print('Testing with Mercurial %s' % version)
             sys.stdout.flush()
