@@ -22,6 +22,8 @@ EXTDIR = os.path.join(HERE, 'hgext')
 sys.path.insert(0, os.path.join(HERE, 'pylib', 'mercurial-support'))
 runtestsmod = imp.load_source('runtests', RUNTESTS)
 
+def is_test_filename(f):
+    return f.startswith('test-') and f.endswith(('.py', '.t'))
 
 def get_extensions():
     """Obtain information about extensions.
@@ -45,7 +47,7 @@ def get_extensions():
                 if f.startswith('.'):
                     continue
 
-                if f.startswith('test-') and f.endswith(('.py', '.t')):
+                if is_test_filename(f):
                     e['tests'].add(os.path.join(test_dir, f))
 
         # Look for compatibility info.
@@ -133,6 +135,11 @@ if __name__ == '__main__':
     else:
         for e in extensions.values():
             sys.argv.extend(sorted(e['tests']))
+
+        hooks_test_dir = os.path.join(HERE, 'hghooks', 'tests')
+        for f in os.listdir(hooks_test_dir):
+            if is_test_filename(f):
+                sys.argv.append(os.path.join(hooks_test_dir, f))
 
     old_env = os.environ.copy()
     old_defaults = dict(runtestsmod.defaults)
