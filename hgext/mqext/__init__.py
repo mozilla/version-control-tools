@@ -88,10 +88,14 @@ from hgext import mq
 from collections import Counter
 
 try:
-    # hg 1.9+
-    from mercurial.scmutil import canonpath
+    # hg 3.0.1+
+    from mercurial.pathutil import canonpath
 except:
-    from mercurial.util import canonpath
+    try:
+        # hg 1.9+
+        from mercurial.scmutil import canonpath
+    except:
+        from mercurial.util import canonpath
 
 bugzilla_jsonrpc_url = "https://bugzilla.mozilla.org/jsonrpc.cgi"
 
