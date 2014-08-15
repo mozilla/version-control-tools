@@ -544,42 +544,6 @@ class TestTreeCommCentralClosureHook(ClosureHookTestHelpers, unittest.TestCase):
     push(u, self.clonerepo, dest=self.repodir)
     self.assertEqual(self.director.opened, 1)
 
-class TestTryMandatoryHook(ClosureHookTestHelpers, unittest.TestCase):
-  def setUp(self):
-    self.ui = ui.ui()
-    self.ui.quiet = True
-    self.ui.verbose = False
-    self.repodir = mkdtemp(prefix="hg-test")
-    init(self.ui, dest=self.repodir)
-    addHook(self.repodir, "try_mandatory.hook")
-    self.repo = hg.repository(self.ui, self.repodir)
-    self.clonedir = mkdtemp(prefix="hg-test")
-    clone(self.ui, self.repo, self.clonedir)
-    self.clonerepo = hg.repository(self.ui, self.clonedir)
-    ClosureHookTestHelpers.setUp(self)
-
-  def tearDown(self):
-    shutil.rmtree(self.repodir)
-    shutil.rmtree(self.clonedir)
-    ClosureHookTestHelpers.tearDown(self)
-
-  def testWithoutTrySyntax(self):
-    """Push one changeset, without using the try syntax should error."""
-    u = self.ui
-    appendFile(join(self.clonedir, "testfile"), "checkin 1")
-    add(u, self.clonerepo, join(self.clonedir, "testfile"))
-    commit(u, self.clonerepo, message="checkin 1 bug 12345")
-    self.assertRaises(util.Abort, push, u, self.clonerepo, dest=self.repodir)
-
-  def testWithTrySyntax(self):
-    """Push one changeset, with using the try syntax should succeed."""
-    u = self.ui
-    appendFile(join(self.clonedir, "testfile"), "checkin 1")
-    add(u, self.clonerepo, join(self.clonedir, "testfile"))
-    commit(u, self.clonerepo, message="checkin 1 try: -b do -p all")
-    result = push(u, self.clonerepo, dest=self.repodir)
-    self.assertEqual(result, 0)
-
 class TestCommitMessageHook(unittest.TestCase):
   def setUp(self):
     self.ui = ui.ui()
