@@ -1,7 +1,7 @@
 # This is a distutils setup script for the mozhghooks module.
 # Install the module by running `python setup.py install`
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name="Mozilla Hg Hooks",
       version='0.1',
