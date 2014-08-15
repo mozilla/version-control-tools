@@ -35,8 +35,8 @@ def hook(ui, repo, hooktype, node, **kwargs):
     # Check if an error occured in any of the files that were changed
     if error != "":
         print "\n\n************************** ERROR ****************************"
-        ui.warn("\n\r*** " + error + "***\n\r")
-        print "\n\rChanges to IDL files in this repo require you to provide binary change approval in your top comment in the form of ba=... (or, more accurately, ba\\S*=...)\n\rThis is to ensure that UUID changes (or method changes missing corresponding UUID change) are caught early, before release.\n\r"
+        ui.warn("\n*** " + error + "***\n")
+        print "\nChanges to IDL files in this repo require you to provide binary change approval in your top comment in the form of ba=... (or, more accurately, ba\\S*=...)\nThis is to ensure that UUID changes (or method changes missing corresponding UUID change) are caught early, before release.\n"
         print "*************************************************************\n\n"
         # Reject the changesets
         return 1
