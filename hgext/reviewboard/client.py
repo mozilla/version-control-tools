@@ -34,6 +34,7 @@ from mercurial import localrepo
 from mercurial import obsolete
 from mercurial import phases
 from mercurial import scmutil
+from mercurial import sshpeer
 from mercurial import templatekw
 from mercurial import util
 from mercurial import wireproto
@@ -626,12 +627,40 @@ def pullreviews(ui, repo, **opts):
     """
     return repo.pullreviews()
 
+# The implementation of sshpeer.readerr() is buggy on Linux.
+# See issue 4336 in Mercurial. This will likely get fixed in
+# Mercurial 3.2. Work around it until we no longer support the
+# buggy version.
+def wrappedreaderr(orig, self):
+    import fcntl
+    flags = fcntl.fcntl(self.pipee, fcntl.F_GETFL)
+    flags |= os.O_NONBLOCK
+    oldflags = fcntl.fcntl(self.pipee, fcntl.F_SETFL, flags)
+
+    chunks = []
+    try:
+        while True:
+            try:
+                s = self.pipee.read()
+                if not s:
+                    break
+                chunks.append(s)
+            except IOError:
+                break
+    finally:
+        fcntl.fcntl(self.pipee, fcntl.F_SETFL, oldflags)
+
+    for l in ''.join(chunks).splitlines():
+        self.ui.status(_("remote: "), l, '\n')
 
 def extsetup(ui):
     extensions.wrapfunction(exchange, 'push', wrappedpush)
     # _pushbookmark gets called near the end of push. Sadly, there isn't
     # a better place to hook that has access to the pushop.
     extensions.wrapfunction(exchange, '_pushbookmark', wrappedpushbookmark)
+
+    if os.name == 'posix':
+        extensions.wrapfunction(sshpeer.sshpeer, 'readerr', wrappedreaderr)
 
     # Define some extra arguments on the push command.
     entry = extensions.wrapcommand(commands.table, 'push', pushcommand)
