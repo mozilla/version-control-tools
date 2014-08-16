@@ -87,7 +87,7 @@ Push multiple changesets to a non-try repo
 
 Push a lot of changesets to a non-try repo
 
-  $ for i in {0..20}; do echo $i > foo; hg commit -m $i; done
+  $ for i in $(seq 0 20); do echo $i > foo; hg commit -m $i; done
   $ hg push ../mozilla-inbound
   pushing to ../mozilla-inbound
   searching for changes
