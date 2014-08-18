@@ -1,4 +1,4 @@
-var RBMozUI = RBMozUI || {};
+RBMozUI = {};
 
 $(document).ready(function() {
 
