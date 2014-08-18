@@ -127,6 +127,9 @@ if __name__ == '__main__':
         hg = os.path.join(os.path.dirname(sys.executable), 'hg')
         sys.argv.extend(['--with-hg', hg])
 
+    sys.argv.extend(['--xunit',
+        os.path.join(HERE, 'coverage', 'results.xml')])
+
     extensions = get_extensions()
 
     hooks_test_dir = os.path.join(HERE, 'hghooks', 'tests')
