@@ -191,6 +191,24 @@ def main(args):
         response = r.get_draft().update(public=True)
         # TODO: Dump the response code?
 
+    elif action == 'closediscarded':
+        port, rid = args[2:]
+        root = get_root(port)
+        r = root.get_review_request(review_request_id=rid)
+        response = r.update(status='discarded')
+
+    elif action == 'closesubmitted':
+        port, rid = args[2:]
+        root = get_root(port)
+        r = root.get_review_request(review_request_id=rid)
+        response = r.update(status='submitted')
+
+    elif action == 'reopen':
+        port, rid = args[2:]
+        root = get_root(port)
+        r = root.get_review_request(review_request_id=rid)
+        response = r.update(status='pending')
+
 
 def get_root(port):
     from rbtools.api.client import RBClient
