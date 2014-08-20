@@ -20,7 +20,8 @@ from reviewboard.reviews.models import (ReviewRequest,
 from reviewboard.reviews.signals import (reply_publishing,
                                          review_publishing,
                                          review_request_closed,
-                                         review_request_publishing)
+                                         review_request_publishing,
+                                         review_request_reopened)
 from reviewboard.site.urlresolvers import local_site_reverse
 
 from rbbz.auth import BugzillaBackend
@@ -36,6 +37,10 @@ REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')
 
 AUTO_CLOSE_DESCRIPTION = """
 Discarded automatically because parent review request was discarded.
+"""
+
+AUTO_SUBMITTED_DESCRIPTION = """
+Submitted because the parent review request was submitted.
 """
 
 NEVER_USED_DESCRIPTION = """
@@ -65,7 +70,11 @@ class BugzillaExtension(Extension):
                    on_review_request_publishing)
         SignalHook(self, review_publishing, on_review_publishing)
         SignalHook(self, reply_publishing, on_reply_publishing)
-        SignalHook(self, review_request_closed, on_review_request_closed)
+        SignalHook(self, review_request_closed,
+                   on_review_request_closed_discarded)
+        SignalHook(self, review_request_closed,
+                   on_review_request_closed_submitted)
+        SignalHook(self, review_request_reopened, on_review_request_reopened)
 
 
 def review_request_url(review_request, site=None, siteconfig=None):
@@ -318,37 +327,103 @@ def on_reply_publishing(user, reply, **kwargs):
     b.post_comment(bug_id, build_plaintext_review(reply, {"user": user}))
 
 
-def on_review_request_closed(user, review_request, type, **kwargs):
-    if (is_review_request_squashed(review_request) and
-            type == ReviewRequest.DISCARDED):
-        # At the point of discarding, it's possible that if this review
-        # request was never published, that most of the fields are empty
-        # (See https://code.google.com/p/reviewboard/issues/detail?id=3465).
-        # Luckily, the extra_data is still around, and more luckily, it's
-        # not exposed in the UI for user-meddling. We can find all of the
-        # child review requests via extra_data.p2rb.commits.
-        for child in gen_child_rrs(review_request):
-            child.close(ReviewRequest.DISCARDED,
-                        user=user,
-                        description=AUTO_CLOSE_DESCRIPTION)
+def on_review_request_closed_discarded(user, review_request, type, **kwargs):
+    if (not is_review_request_squashed(review_request) or
+        type != ReviewRequest.DISCARDED):
+        return
 
-        # We want to discard any review requests that this squashed review
-        # request never got to publish, so were never part of its "commits"
-        # list.
-        for child in gen_rrs_by_extra_data_key(review_request,
-                                               'unpublished_rids'):
-            child.close(ReviewRequest.DISCARDED,
-                        user=user,
-                        description=NEVER_USED_DESCRIPTION)
+    # close_child_review_requests will call save on this review request, so
+    # we don't have to worry about it.
+    review_request.commit = None
 
-        # Next, we clear out the commit_id on the squashed review request
-        # so that someone can post follow-up work with the same review
-        # identifier in the future. This value is, however, still being
-        # stored in extra_data under "p2rb.identifier".
-        review_request.commit = None
-        review_request.extra_data['p2rb.unpublished_rids'] = '[]'
-        review_request.extra_data['p2rb.discard_on_publish_rids'] = '[]'
-        review_request.save()
+    close_child_review_requests(user, review_request, ReviewRequest.DISCARDED,
+                                  AUTO_CLOSE_DESCRIPTION)
+
+
+def on_review_request_closed_submitted(user, review_request, type, **kwargs):
+    if (not is_review_request_squashed(review_request) or
+        type != ReviewRequest.SUBMITTED):
+        return
+
+    close_child_review_requests(user, review_request, ReviewRequest.SUBMITTED,
+                                  AUTO_SUBMITTED_DESCRIPTION)
+
+
+def close_child_review_requests(user, review_request, status,
+                                  child_close_description):
+    """Closes all child review requests for a squashed review request."""
+    # At the point of closing, it's possible that if this review
+    # request was never published, that most of the fields are empty
+    # (See https://code.google.com/p/reviewboard/issues/detail?id=3465).
+    # Luckily, the extra_data is still around, and more luckily, it's
+    # not exposed in the UI for user-meddling. We can find all of the
+    # child review requests via extra_data.p2rb.commits.
+    for child in gen_child_rrs(review_request):
+        child.close(status,
+                    user=user,
+                    description=child_close_description)
+
+    # We want to discard any review requests that this squashed review
+    # request never got to publish, so were never part of its "commits"
+    # list.
+    for child in gen_rrs_by_extra_data_key(review_request,
+                                           'unpublished_rids'):
+        child.close(ReviewRequest.DISCARDED,
+                    user=user,
+                    description=NEVER_USED_DESCRIPTION)
+
+    review_request.extra_data['p2rb.unpublished_rids'] = '[]'
+    review_request.extra_data['p2rb.discard_on_publish_rids'] = '[]'
+    review_request.save()
+
+
+def on_review_request_reopened(user, review_request, **kwargs):
+    if not is_review_request_squashed(review_request):
+        return
+
+    identifier = review_request.extra_data['p2rb.identifier']
+
+    # If we're reviving a squashed review request that was discarded, it means
+    # we're going to want to restore the commit ID field back, since we remove
+    # it on discarding. This might be a problem if there's already a review
+    # request with the same commit ID somewhere on Review Board, since commit
+    # IDs are unique.
+    #
+    # When this signal fires, the state of the review request has already
+    # changed, so we query for a review request with the same commit ID that is
+    # not equal to the revived review request.
+    try:
+        preexisting_review_request = ReviewRequest.objects.get(
+            commit_id=identifier)
+        if preexisting_review_request != review_request:
+            logging.error("Could not revive review request with ID %s "
+                          "because its commit id (%s) is already being used by "
+                          "a review request with ID %s."
+                          % (review_request.id, identifier,
+                             preexisting_review_request.id))
+            # TODO: We need Review Board to recognize exceptions in these signal
+            # handlers so that the UI can print out a useful message.
+            raise Exception("Revive failed because a review request with commit ID %s "
+                            "already exists." % identifier)
+    except ReviewRequest.DoesNotExist:
+        # Great! This is a success case.
+        pass
+
+    for child in gen_child_rrs(review_request):
+        child.reopen(user=user)
+
+    # If the review request had been discarded, then the commit ID would
+    # have been cleared out. If the review request had been submitted,
+    # this is a no-op, since the commit ID would have been there already.
+    review_request.commit = identifier
+    review_request.save()
+
+    # If the review request has a draft, we have to set the commit ID there as
+    # well, otherwise it'll get overwritten on publish.
+    draft = review_request.get_draft(user)
+    if draft:
+        draft.commit = identifier
+        draft.save()
 
 
 def gen_child_rrs(review_request):
