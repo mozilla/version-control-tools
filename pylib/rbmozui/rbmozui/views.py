@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import (get_object_or_404, get_list_or_404, redirect,
                               render, render_to_response)
 from django.template.context import RequestContext
