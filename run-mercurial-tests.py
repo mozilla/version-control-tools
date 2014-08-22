@@ -10,7 +10,6 @@ from __future__ import print_function
 import argparse
 import imp
 import os
-import subprocess
 import sys
 
 # Mercurial's run-tests.py isn't meant to be loaded as a module. We do it
@@ -81,9 +80,6 @@ if __name__ == '__main__':
     parser.add_argument('-j', '--jobs', type=int)
     parser.add_argument('--all-versions', action='store_true',
         help='Test against all marked compatible versions')
-    parser.add_argument('--no-hooks', dest='run_hooks', default=True,
-        action='store_false',
-        help='Do not run the tests for hghooks')
 
     options, extra = parser.parse_known_args(sys.argv)
 
@@ -93,7 +89,7 @@ if __name__ == '__main__':
 
     # some arguments belong to us only. Don't pass it along to run-tests.py.
     sys.argv = [a for a in sys.argv
-        if a not in {'--all-versions', '--no-hooks'}]
+        if a not in {'--all-versions'}]
 
     coveragerc = os.path.join(HERE, '.coveragerc')
     coverdir = os.path.join(HERE, 'coverage')
@@ -138,9 +134,7 @@ if __name__ == '__main__':
                    if is_test_filename(f)]
 
     # Add all tests unless we get an argument that looks like a test path.
-    if any(a for a in extra[1:] if not a.startswith('-')):
-        options.run_hooks = False
-    else:
+    if not any(a for a in extra[1:] if not a.startswith('-')):
         for e in extensions.values():
             sys.argv.extend(sorted(e['tests']))
         sys.argv.extend(hooks_tests)
@@ -151,20 +145,6 @@ if __name__ == '__main__':
     os.environ.clear()
     os.environ.update(old_env)
     runtestsmod.defaults = dict(old_defaults)
-
-    if options.run_hooks:
-        # We need our custom sitecustomize.py to be loaded. To force this, we
-        # need our path to be before any other or the system's sitecustomize.py
-        # may get loaded.
-        env = os.environ.copy()
-        env['PYTHONPATH'] = os.path.join(HERE, 'venv', 'bin')
-
-        # TODO hook up to unittest directly and share TestSuite and TestResult
-        # with Mercurial.
-        args = [sys.executable, os.path.join(HERE, 'hghooks', 'runtests.py')]
-        res2 = subprocess.call(args, cwd=os.path.join(HERE, 'hghooks'), env=env)
-        if res2:
-            res = res2
 
     # If we're running the full compatibility run, figure out what versions
     # apply to what and run them.
