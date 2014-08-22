@@ -37,6 +37,7 @@ def isGoodMessage(c):
         print "*************************************************************\n\n"
 
     desc = c.description()
+    firstline = desc.splitlines()[0]
     if c.user() in ["ffxbld", "seabld", "tbirdbld", "cltbld",
                     "Gaia Pushbot <release+gaiajson@mozilla.com>",
                     "B2G Bumper Bot <release+b2gbumper@mozilla.com>"]:
@@ -52,7 +53,7 @@ def isGoodMessage(c):
         return False
 
     for r in goodMessage:
-        if r.search(desc):
+        if r.search(firstline):
             return True
 
     dlower = desc.lower()
