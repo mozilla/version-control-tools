@@ -431,8 +431,19 @@ class reviewstore(object):
     data type followed by a space followed by the data for that type.
     The types are as follows:
 
-    1 - Maps nodes to review ids. Format is "<node> <rid>" where <node>
-        should be a hex node and <rid> should be an opaque identifier.
+    'u' - URL of the Review Board server associated with the reviews repository.
+
+    'r' - The push path of the reviews repository.
+
+    'p' - Maps review identifier to id of the associated parent review request.
+          Format is "<identifier> <review-request-id>".
+
+    'c' - Maps node to associated review request id. Format is
+          "<node> <review-request-id>".
+
+    'pc' - Maps node to review request id of the parent review request. This
+           associates a commit to a specific review identifier. Format is
+           "<node> <review-request-id>".
     """
     def __init__(self, repo):
         self._repo = repo
