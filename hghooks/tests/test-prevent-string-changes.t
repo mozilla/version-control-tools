@@ -75,7 +75,7 @@ Add file (tracked extension, inside expected path), wrong commit message, should
   $ mkdir -p browser/locales/en-US
   $ echo "DTD file #1" >> browser/locales/en-US/test.dtd
   $ echo "DTD file #2" >> browser/locales/en-US/test2.dtd
-  $ hg commit -A -m "Commit .dtd files inside l10n path, l10nok"
+  $ hg commit -A -m "Commit .dtd files inside l10n path, a=l10n"
   adding browser/locales/en-US/test.dtd
   adding browser/locales/en-US/test2.dtd
   $ hg push ../server
@@ -91,10 +91,10 @@ Add file (tracked extension, inside expected path), wrong commit message, should
   * File used for localization (browser/locales/en-US/test.dtd) altered in this changeset *
   * File used for localization (browser/locales/en-US/test2.dtd) altered in this changeset *
   
-  This repository is string frozen. It is possible to override this
-  block by adding a=l10n to the commit message.
-  Before doing that, please CC a member of l10n-drivers to the bug
-  to request approval and get feedback.
+  This repository is string frozen. Please request explicit permission from
+  release managers to break string freeze in your bug.
+  If you have that explicit permission, denote that by including in
+  your commit message l10n=...
   *************************************************************
   
   transaction abort!
@@ -104,8 +104,8 @@ Add file (tracked extension, inside expected path), wrong commit message, should
 
 Amend commit message to use correct keyword, should work
 
-  $ hg commit --amend -m "Commit .dtd files inside l10n path, a=l10n"
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/37c800ece1fa-amend-backup.hg
+  $ hg commit --amend -m "Commit .dtd files inside l10n path, l10n=foo"
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b4d6fed5f917-amend-backup.hg
   $ hg push ../server
   pushing to ../server
   searching for changes
@@ -118,7 +118,7 @@ Amend commit message to use correct keyword, should work
 Edit existing file and commit with correct keyword, should work
 
   $ echo "Updated DTD content" >> browser/locales/en-US/test.dtd
-  $ hg commit -A -m "Update .dtd file inside l10n path, a=l10n"
+  $ hg commit -A -m "Update .dtd file inside l10n path, l10n=foo"
   $ hg push ../server
   pushing to ../server
   searching for changes
@@ -144,10 +144,10 @@ Delete a file and commit without the correct keyword, should fail
   
   * File used for localization (browser/locales/en-US/test.dtd) altered in this changeset *
   
-  This repository is string frozen. It is possible to override this
-  block by adding a=l10n to the commit message.
-  Before doing that, please CC a member of l10n-drivers to the bug
-  to request approval and get feedback.
+  This repository is string frozen. Please request explicit permission from
+  release managers to break string freeze in your bug.
+  If you have that explicit permission, denote that by including in
+  your commit message l10n=...
   *************************************************************
   
   transaction abort!
@@ -155,8 +155,8 @@ Delete a file and commit without the correct keyword, should fail
   abort: pretxnchangegroup.prevent_string_changes hook failed
   [255]
 
-  $ hg commit --amend -m "Remove .dtd file inside l10n path, a=l10n"
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/aa1da582e4af-amend-backup.hg
+  $ hg commit --amend -m "Remove .dtd file inside l10n path, l10n=foo"
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b6536c318948-amend-backup.hg
   $ hg push ../server
   pushing to ../server
   searching for changes
@@ -200,10 +200,10 @@ Same edit of a tracked file after release uplift, should fail
   
   * File used for localization (browser/locales/en-US/test.dtd) altered in this changeset *
   
-  This repository is string frozen. It is possible to override this
-  block by adding a=l10n to the commit message.
-  Before doing that, please CC a member of l10n-drivers to the bug
-  to request approval and get feedback.
+  This repository is string frozen. Please request explicit permission from
+  release managers to break string freeze in your bug.
+  If you have that explicit permission, denote that by including in
+  your commit message l10n=...
   *************************************************************
   
   transaction abort!
@@ -213,10 +213,10 @@ Same edit of a tracked file after release uplift, should fail
 
 Message check should be case insensitive
 
-  $ hg commit --amend -m "Remove .dtd file inside l10n path, A=L10N"
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/19dffe1a0e53-amend-backup.hg
+  $ hg commit --amend -m "Remove .dtd file inside l10n path, L10n=foo"
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/9e4abad50792-amend-backup.hg
   $ echo "DTD file #1" >> browser/locales/en-US/test.dtd
-  $ hg commit -m 'Change DTD file, a=l10N'
+  $ hg commit -m 'Change DTD file, l10N='
   $ hg push ../server
   pushing to ../server
   searching for changes

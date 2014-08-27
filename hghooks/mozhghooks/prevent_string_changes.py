@@ -37,17 +37,17 @@ def hook(ui, repo, hooktype, node, **kwargs):
             # Interested only in files potentially used for l10n
             if (re.search('locales/en-US/', file) and file.endswith(('.dtd', '.ini', '.properties'))):
                 changed_strings = True
-                if not re.search('a=l10n',
+                if not re.search('l10n=',
                                  repo.changectx('tip').description().lower()):
                     error += "* File used for localization (%s) altered in this changeset *\n" % file
     # Check if an error occurred
     if error != "":
         print "\n************************** ERROR ****************************\n"
         print error
-        print "This repository is string frozen. It is possible to override this"
-        print "block by adding a=l10n to the commit message."
-        print "Before doing that, please CC a member of l10n-drivers to the bug"
-        print "to request approval and get feedback."
+        print "This repository is string frozen. Please request explicit permission from"
+        print "release managers to break string freeze in your bug."
+        print "If you have that explicit permission, denote that by including in"
+        print "your commit message l10n=..."
         print "*************************************************************\n"
         # Reject the changesets
         return 1
