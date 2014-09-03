@@ -292,9 +292,9 @@ def render_comment_plain(comment, context, is_reply):
     return "\n".join(lines)
 
 
-def build_plaintext_review(review, context):
+def build_plaintext_review(review, url, context):
     """Create a plaintext patch style representation of a review"""
-    review_text = []
+    review_text = [url]
 
     if review.body_top:
         review_text.append(review.body_top)

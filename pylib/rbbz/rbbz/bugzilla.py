@@ -181,7 +181,6 @@ class Bugzilla(object):
 
         params['file_name'] = 'reviewboard-%d-url.txt' % review_id
         params['summary'] = summary
-        params['comment'] = comment
         if flags:
             params['flags'] = flags
 
@@ -189,6 +188,13 @@ class Bugzilla(object):
             self.proxy.Bug.update_attachment(params)
         else:
             self.proxy.Bug.add_attachment(params)
+
+        # FIXME: The comment should be posted as part of add/update_attachment,
+        # but due to bug 508541, the comment won't be included in the bugmail,
+        # so until that bug is fixed, we sent the comment separately, after
+        # setting the flag.
+        self.post_comment(bug_id, comment)
+
 
     @xmlrpc_to_bugzilla_errors
     def get_rb_attachments(self, bug_id):
@@ -206,7 +212,7 @@ class Bugzilla(object):
                 a['content_type'] == 'text/x-review-board-request']
 
     @xmlrpc_to_bugzilla_errors
-    def r_plus_attachment(self, bug_id, reviewer, rb_url):
+    def r_plus_attachment(self, bug_id, reviewer, comment, rb_url):
         """Set a review flag to "+"."""
 
         logging.info('r+ from %s on bug %d.' % (reviewer, bug_id))
@@ -239,6 +245,12 @@ class Bugzilla(object):
         }
 
         self.proxy.Bug.update_attachment(params)
+        # FIXME: The comment should be posted as part of update_attachment,
+        # but due to bug 508541, the comment won't be included in the bugmail,
+        # so until that bug is fixed, we sent the comment separately, after
+        # setting the flag.
+        self.post_comment(bug_id, comment)
+
 
     @property
     def transport(self):

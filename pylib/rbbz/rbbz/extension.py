@@ -77,7 +77,7 @@ class BugzillaExtension(Extension):
         SignalHook(self, review_request_reopened, on_review_request_reopened)
 
 
-def review_request_url(review_request, site=None, siteconfig=None):
+def review_or_request_url(review_or_request, site=None, siteconfig=None):
     if not site:
         site = Site.objects.get_current()
 
@@ -87,7 +87,7 @@ def review_request_url(review_request, site=None, siteconfig=None):
     return '%s://%s%s%s' % (
         siteconfig.get('site_domain_method'), site.domain,
         local_site_reverse('root').rstrip('/'),
-        review_request.get_absolute_url())
+        review_or_request.get_absolute_url())
 
 
 def is_review_request_pushed(review_request):
@@ -244,7 +244,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                           review_request.id,
                           review_request_draft.summary,
                           comment,
-                          review_request_url(review_request),
+                          review_or_request_url(review_request),
                           reviewers)
 
         unpublished_rids = json.loads(
@@ -303,14 +303,18 @@ def on_review_publishing(user, review, **kwargs):
     bug_id = int(review_request.get_bug_list()[0])
     site = Site.objects.get_current()
     siteconfig = SiteConfiguration.objects.get_current()
+    comment = build_plaintext_review(review,
+                                     review_or_request_url(review, site,
+                                                           siteconfig),
+                                     {"user": user})
     b = Bugzilla(user.bzlogin, user.bzcookie)
 
-    b.post_comment(bug_id, build_plaintext_review(review, {"user": user}))
-
     if review.ship_it and is_review_request_squashed(review_request):
-        b.r_plus_attachment(bug_id, review.user.username,
-                            review_request_url(review_request, site,
-                                               siteconfig))
+        b.r_plus_attachment(bug_id, review.user.username, comment,
+                            review_or_request_url(review_request, site,
+                                                  siteconfig))
+    else:
+        b.post_comment(bug_id, comment)
 
 
 @bugzilla_to_publish_errors
