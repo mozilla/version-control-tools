@@ -451,6 +451,16 @@ def _verifyresponseversion(res):
 
     return version
 
+class identifierrecord(object):
+    """Describes a review identifier in the context of the store."""
+    def __init__(self, parentrrid):
+        """Create a new review identifier record.
+
+        ``parentrrid`` is the review request id of the parent review for this
+        review identifier.
+        """
+        self.parentrrid = parentrrid
+
 class reviewstore(object):
     """Holds information about ongoing reviews.
 
@@ -479,10 +489,11 @@ class reviewstore(object):
         self._repo = repo
         self._vfs = scmutil.vfs(repo.vfs.join('reviewboard'), audit=False)
 
+        # Maps review identifiers to identifierrecord instances.
+        self._identifiers = {}
+
         # Maps nodes to (review requests, parent requests set) tuples.
         self._nodes = {}
-        # Maps review identifiers to parent review requests.
-        self._parents = {}
 
         self.baseurl = None
         self.remoteurl = None
@@ -503,8 +514,8 @@ class reviewstore(object):
 
                 # Identifier to parent review ID.
                 if t == 'p':
-                    ident, rid = d.split(' ', 1)
-                    self._parents[ident] = rid
+                    ident, rrid = d.split(' ', 1)
+                    self._identifiers[ident] = identifierrecord(parentrrid=rrid)
                 # Node to review id.
                 elif t == 'c':
                     node, rid = d.split(' ', 1)
@@ -527,13 +538,16 @@ class reviewstore(object):
     @property
     def reviewids(self):
         """Returns a set of all known review IDs."""
-        return set([t[0] for t in self._nodes.values()]) | \
-               set(self._parents.values())
+        s = set([t[0] for t in self._nodes.values()])
+        for r in self._identifiers.values():
+            s.add(r.parentrrid)
+
+        return s
 
     @property
     def identifiers(self):
         """Returns a set of all known review identifiers."""
-        return set(self._parents.keys())
+        return set(self._identifiers.keys())
 
     def write(self):
         """Write the reviews file back to disk."""
@@ -548,8 +562,8 @@ class reviewstore(object):
             if self.remoteurl:
                 f.write('r %s\n' % self.remoteurl)
 
-            for ident, rid in sorted(self._parents.iteritems()):
-                f.write('p %s %s\n' % (ident, rid))
+            for ident, r in sorted(self._identifiers.iteritems()):
+                f.write('p %s %s\n' % (ident, r.parentrrid))
             for node, (rid, pids) in sorted(self._nodes.iteritems()):
                 f.write('c %s %s\n' % (hex(node), rid))
                 for pid in sorted(pids):
@@ -587,9 +601,9 @@ class reviewstore(object):
 
         return d
 
-    def addparentreview(self, identifier, rid):
+    def addparentreview(self, identifier, rrid):
         """Record the existence of a parent review."""
-        self._parents[identifier] = rid
+        self._identifiers[identifier] = identifierrecord(parentrrid=rrid)
 
     def addnodereview(self, node, rid, pid):
         """Record the existence of a review against a single node."""
@@ -621,19 +635,19 @@ class reviewstore(object):
         """Find a parent review given some data."""
 
         if identifier:
-            rid = self._parents.get(identifier, None)
-            if rid:
-                return rid
+            r = self._identifiers.get(identifier, None)
+            if r:
+                return r.parentrrid
 
         return None
 
     def parentreviewurl(self, identifier):
         """Obtain the URL associated with the review for an identifier."""
-        rid = self._parents.get(identifier, None)
-        if not rid:
+        r = self._identifiers.get(identifier, None)
+        if not r:
             return None
 
-        return '%s/r/%s' % (self.baseurl, rid)
+        return '%s/r/%s' % (self.baseurl, r.parentrrid)
 
     def reviewurl(self, node):
         """Obtain the URL associated with the review for a node."""
