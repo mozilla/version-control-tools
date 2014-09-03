@@ -435,8 +435,13 @@ def _pullreviewidentifiers(repo, reviewids):
 
 def _verifyresponseversion(res):
     """Verify the format and version of a response from a server."""
+    # Empty responses consist of a single line without a newline.
     try:
         off = res.index('\n')
+    except ValueError:
+        off = len(res)
+
+    try:
         version = int(res[0:off])
 
         if version != 1:
