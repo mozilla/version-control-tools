@@ -381,14 +381,14 @@ def _pullreviews(repo):
         raise util.Abort(_("We don't know of any review servers. Try "
                            "creating a review first."))
 
-    reviewdata = _pullreviewidentifiers(repo, sorted(reviews.reviewids))
+    reviewdata = _pullreviewidentifiers(repo, sorted(reviews.identifiers))
     repo.ui.write(_('updated %d reviews\n') % len(reviewdata))
 
 def _pullreviewidentifiers(repo, reviewids):
     """Pull down information for a list of review identifier strings.
 
     This will request the currently published data for a review identifier,
-    including hte mapping of commits to review request ids for all review
+    including the mapping of commits to review request ids for all review
     requests that are currently part of the identifier.
     """
     reviews = repo.reviews
@@ -403,7 +403,7 @@ def _pullreviewidentifiers(repo, reviewids):
 
     lines = ['1']
     for identifier in reviewids:
-        lines.append('rid %s' % identifier)
+        lines.append('reviewid %s' % identifier)
 
     res = remote._call('pullreviews', data='\n'.join(lines))
 
@@ -416,10 +416,17 @@ def _pullreviewidentifiers(repo, reviewids):
     for line in lines:
         t, d = line.split(' ', 1)
 
-        if t == 'reviewdata':
-            rid, field, value = d.split(' ', 2)
-            value = urllib.unquote(value)
+        if t == 'parentreview':
+            identifier, parentid = map(urllib.unquote, d.split(' ', 2))
+            reviewdata[parentid] = {}
+        elif t == 'csetreview':
+            parentid, node, rid = map(urllib.unquote, d.split(' ', 3))
+            reviewdata[rid] = {}
+        elif t == 'reviewdata':
+            rid, field, value = map(urllib.unquote, d.split(' ', 3))
             reviewdata.setdefault(rid, {})[field] = value
+        else:
+            raise util.Abort(_('unknown value in response payload: %s') % t)
 
     for rid, data in reviewdata.iteritems():
         reviews.savereviewrequest(rid, data)
@@ -517,6 +524,11 @@ class reviewstore(object):
         """Returns a set of all known review IDs."""
         return set([t[0] for t in self._nodes.values()]) | \
                set(self._parents.values())
+
+    @property
+    def identifiers(self):
+        """Returns a set of all known review identifiers."""
+        return set(self._parents.keys())
 
     def write(self):
         """Write the reviews file back to disk."""

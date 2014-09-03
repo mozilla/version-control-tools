@@ -1,6 +1,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import json
 import urllib
 from StringIO import StringIO
 from mercurial import mdiff
@@ -184,12 +185,39 @@ def pullreviews(repo, proto, args=None):
     lines = ['1']
 
     for k, v in o['other']:
-        if k != 'rid':
+        if k != 'reviewid':
             continue
 
-        rr = root.get_review_request(review_request_id=v)
+        identifier = urllib.unquote(v)
+        rrs = root.get_review_requests(commit_id=identifier)
 
-        lines.append('reviewdata %s status %s' % (v,
+        if rrs.total_results != 1:
+            continue
+
+        rr = rrs[0]
+        extra_data = rr.extra_data
+
+        if 'p2rb.is_squashed' in extra_data and extra_data['p2rb.is_squashed'] == 'True':
+            if 'p2rb.commits' in extra_data:
+                commits = extra_data['p2rb.commits']
+            else:
+                draft = rr.get_draft()
+                if 'p2rb.commits' in draft.extra_data:
+                    commits = draft.extra_data['p2rb.commits']
+                else:
+                    commits = '[]'
+
+            lines.append('parentreview %s %s' % (
+                urllib.quote(identifier), rr.id))
+            for relation in json.loads(commits):
+                node = relation[0].encode('utf-8')
+                rid = relation[1].encode('utf-8')
+
+                lines.append('csetreview %s %s %s' % (rr.id, node, rid))
+                lines.append('reviewdata %s status %s' % (rid,
+                    urllib.quote(rr.status.encode('utf-8'))))
+
+        lines.append('reviewdata %s status %s' % (rr.id,
             urllib.quote(rr.status.encode('utf-8'))))
 
     res = '\n'.join(lines)
