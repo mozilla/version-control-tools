@@ -381,6 +381,18 @@ def _pullreviews(repo):
         raise util.Abort(_("We don't know of any review servers. Try "
                            "creating a review first."))
 
+    reviewdata = _pullreviewidentifiers(repo, sorted(reviews.reviewids))
+    repo.ui.write(_('updated %d reviews\n') % len(reviewdata))
+
+def _pullreviewidentifiers(repo, reviewids):
+    """Pull down information for a list of review identifier strings.
+
+    This will request the currently published data for a review identifier,
+    including hte mapping of commits to review request ids for all review
+    requests that are currently part of the identifier.
+    """
+    reviews = repo.reviews
+
     # In the ideal world, we'd use RBTools to talk directly to the ReviewBoard
     # API. Unfortunately, the Mercurial distribution on Windows doesn't ship
     # with the json module. So, we proxy through the Mercurial server and have
@@ -390,21 +402,14 @@ def _pullreviews(repo):
     remote.requirecap('pullreviews', _('obtain code reviews'))
 
     lines = ['1']
-    for rid in sorted(reviews.reviewids):
-        lines.append('rid %s' % rid)
+    for identifier in reviewids:
+        lines.append('rid %s' % identifier)
 
     res = remote._call('pullreviews', data='\n'.join(lines))
 
-    try:
-        off = res.index('\n')
-        version = int(res[0:off])
-
-        if version != 1:
-            raise util.Abort(_('do not know how to handle response from server.'))
-    except ValueError:
-        raise util.Abort(_('invalid response from server.'))
-
+    version = _verifyresponseversion(res)
     assert version == 1
+
     lines = res.split('\n')[1:]
     reviewdata = {}
 
@@ -419,7 +424,20 @@ def _pullreviews(repo):
     for rid, data in reviewdata.iteritems():
         reviews.savereviewrequest(rid, data)
 
-    repo.ui.write(_('updated %d reviews\n') % len(reviewdata))
+    return reviewdata
+
+def _verifyresponseversion(res):
+    """Verify the format and version of a response from a server."""
+    try:
+        off = res.index('\n')
+        version = int(res[0:off])
+
+        if version != 1:
+            raise util.Abort(_('do not know how to handle response from server.'))
+    except ValueError:
+        raise util.Abort(_('invalid response from server.'))
+
+    return version
 
 class reviewstore(object):
     """Holds information about ongoing reviews.
