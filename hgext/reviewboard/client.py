@@ -461,6 +461,12 @@ class identifierrecord(object):
         """
         self.parentrrid = parentrrid
 
+class noderecord(object):
+    """Describes a node in the context of the store."""
+    def __init__(self, rrid, parentrrids=None):
+        self.rrid = rrid
+        self.parentrrids = parentrrids or set()
+
 class reviewstore(object):
     """Holds information about ongoing reviews.
 
@@ -492,7 +498,7 @@ class reviewstore(object):
         # Maps review identifiers to identifierrecord instances.
         self._identifiers = {}
 
-        # Maps nodes to (review requests, parent requests set) tuples.
+        # Maps nodes to noderecord instances.
         self._nodes = {}
 
         self.baseurl = None
@@ -520,12 +526,12 @@ class reviewstore(object):
                 elif t == 'c':
                     node, rid = d.split(' ', 1)
                     assert len(node) == 40
-                    self._nodes[bin(node)] = (rid, set())
+                    self._nodes[bin(node)] = noderecord(rid)
                 # Node to parent id.
                 elif t == 'pc':
                     node, pid = d.split(' ', 1)
                     assert len(node) == 40
-                    self._nodes[bin(node)][1].add(pid)
+                    self._nodes[bin(node)].parentrrids.add(pid)
                 elif t == 'u':
                     self.baseurl = d
                 elif t == 'r':
@@ -538,7 +544,7 @@ class reviewstore(object):
     @property
     def reviewids(self):
         """Returns a set of all known review IDs."""
-        s = set([t[0] for t in self._nodes.values()])
+        s = set([n.rrid for n in self._nodes.values()])
         for r in self._identifiers.values():
             s.add(r.parentrrid)
 
@@ -564,9 +570,9 @@ class reviewstore(object):
 
             for ident, r in sorted(self._identifiers.iteritems()):
                 f.write('p %s %s\n' % (ident, r.parentrrid))
-            for node, (rid, pids) in sorted(self._nodes.iteritems()):
-                f.write('c %s %s\n' % (hex(node), rid))
-                for pid in sorted(pids):
+            for node, r in sorted(self._nodes.iteritems()):
+                f.write('c %s %s\n' % (hex(node), r.rrid))
+                for pid in sorted(r.parentrrids):
                     f.write('pc %s %s\n' % (hex(node), pid))
 
             f.close()
@@ -609,7 +615,7 @@ class reviewstore(object):
         """Record the existence of a review against a single node."""
         assert len(node) == 20
         assert pid
-        self._nodes.setdefault(node, (rid, set()))[1].add(pid)
+        self._nodes.setdefault(node, noderecord(rid)).parentrrids.add(pid)
 
     def findnodereview(self, node):
         """Attempt to find a review for the specified changeset.
@@ -619,15 +625,15 @@ class reviewstore(object):
         """
         assert len(node) == 20
 
-        rid = self._nodes.get(node, (None, None))[0]
-        if rid:
-            return rid
+        r = self._nodes.get(node)
+        if r:
+            return r.rrid
 
         obstore = self._repo.obsstore
         for pnode in obsolete.allprecursors(obstore, [node]):
-            rid = self._nodes.get(pnode, (None, None))[0]
-            if rid:
-                return rid
+            r = self._nodes.get(pnode)
+            if r:
+                return r.rrid
 
         return None
 
