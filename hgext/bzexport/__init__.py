@@ -362,7 +362,7 @@ def edit_form(ui, repo, fields, template_name):
 
 
 def bugzilla_info(ui, profile):
-    api_server = ui.config("bzexport", "api_server", "https://bugzilla.mozilla.org/bzapi/")
+    api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/latest/")
     bugzilla = ui.config("bzexport", "bugzilla", "https://bugzilla.mozilla.org/")
     username = ui.config("bzexport", "username", None)
     password = ui.config("bzexport", "password", None)
