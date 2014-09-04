@@ -605,24 +605,12 @@ class reviewstore(object):
         r.parentrrids.add(pid)
 
     def findnodereviews(self, node):
-        """Find all reviews associated with a node.
-
-        We look for both direct review associations as well as obsolescence
-        data to find reviews associated with precursor changesets.
-        """
+        """Find all reviews associated with a node."""
         assert len(node) == 20
 
         r = self._nodes.get(node)
         if r and r.rrids:
             return r.rrids
-
-        # No direct review associations were present. Fall back to looking
-        # at obsolesence.
-        obsstore = self._repo.obsstore
-        for pnode in obsolete.allprecursors(obsstore, [node]):
-            r = self._nodes.get(pnode)
-            if r and r.rrids:
-                return r.rrids
 
         return set()
 
