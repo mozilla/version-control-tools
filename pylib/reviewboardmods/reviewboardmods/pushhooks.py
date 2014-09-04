@@ -38,7 +38,7 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
             'individual': [
                 {
                     'id': <commit-id>,
-                    'rid': <previus-review-request-id>,
+                    'precursors': [<previous changeset>],
                     'message': <commit-message>,
                     'diff': <diff>,
                     'parent_diff': <diff-from-base-to-commit>,
@@ -199,55 +199,58 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
     # API object.
     review_requests = {}
 
-
-
     # Do a pass and find all commits that map cleanly to old review requests.
     for commit in commits['individual']:
         node = commit['id']
 
+        if node not in remaining_nodes:
+            continue
+
         # If the commit appears in an old review request, by definition of
         # commits deriving from content, the commit has not changed and there
-        # is nothing to update.
-        if node in remaining_nodes:
-            rid = remaining_nodes[node]
-            del remaining_nodes[node]
+        # is nothing to update. Update our accounting and move on.
+        rid = remaining_nodes[node]
+        del remaining_nodes[node]
+        unclaimed_rids.remove(rid)
+        processed_nodes.add(node)
+        node_to_rid[node] = rid
+
+        rr = api_root.get_review_request(review_request_id=rid)
+        review_requests[rid] = rr
+
+        try:
+            discard_on_publish_rids.remove(rid)
+        except ValueError:
+            pass
+
+    # Find commits that map to a previous version.
+    for commit in commits['individual']:
+        node = commit['id']
+        if node in processed_nodes:
+            continue
+
+        # The client may have sent obsolescence data saying which commit this
+        # commit has derived from. Use that data (if available) to try to find
+        # a mapping to an old review request.
+        for precursor in commit['precursors']:
+            rid = remaining_nodes.get(precursor)
+            if not rid:
+                continue
+
+            del remaining_nodes[precursor]
             unclaimed_rids.remove(rid)
+
+            rr = update_review_request(rid, commit)
             processed_nodes.add(node)
             node_to_rid[node] = rid
-
-            rr = api_root.get_review_request(review_request_id=rid)
             review_requests[rid] = rr
 
-            if rid in discard_on_publish_rids:
+            try:
                 discard_on_publish_rids.remove(rid)
+            except ValueError:
+                pass
 
-            continue
-
-        # We haven't seen this commit before.
-
-        # The client may tell us what review request it is associated with.
-        # If so, listen to the client, for they are always right.
-        # TODO: We should really trust the server if they disagree, not the
-        # client; The server represents the actual state of the data. This
-        # disagreement could come about because the user pushed somewhere
-        # but didn't publish, and has now pushed again. Bug 1047516
-        if commit['rid']:
-            for n, rid in remaining_nodes.items():
-                if rid == commit['rid']:
-                    del remaining_nodes[n]
-                    unclaimed_rids.remove(rid)
-                    break
-
-            rr = update_review_request(commit['rid'], commit)
-            processed_nodes.add(node)
-            node_to_rid[node] = commit['rid']
-            review_requests[commit['rid']] = rr
-            rid = str(rr.id)
-
-            if rid in discard_on_publish_rids:
-                discard_on_publish_rids.remove(rid)
-
-            continue
+            break
 
     # Now do a pass over the commits that didn't map cleanly.
     for commit in commits['individual']:
@@ -255,8 +258,8 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
         if node in processed_nodes:
             continue
 
-        # We haven't seen this commit before *and* the client doesn't know
-        # where it belongs.
+        # We haven't seen this commit before *and* our mapping above didn't
+        # do anything useful with it.
 
         # This is where things could get complicated. We could involve
         # heuristic based matching (comparing commit messages, changed
@@ -275,8 +278,10 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
             node_to_rid[node] = assumed_old_rid
             review_requests[assumed_old_rid] = rr
 
-            if assumed_old_rid in discard_on_publish_rids:
+            try:
                 discard_on_publish_rids.remove(assumed_old_rid)
+            except ValueError:
+                pass
 
             continue
 

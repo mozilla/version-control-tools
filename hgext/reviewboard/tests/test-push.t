@@ -143,7 +143,7 @@ Custom identifier will create a new review from same changesets.
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://localhost:$HGPORT1/r/6 (pending)
   
   review id:  bz://3452/mynick
   review url: http://localhost:$HGPORT1/r/5 (pending)
@@ -162,10 +162,10 @@ SSH works
   
   changeset:  2:a21bef69f0d4
   summary:    Bug 123 - Test identifier
-  review:     http://localhost:$HGPORT1/r/7 (pending)
+  review:     http://localhost:$HGPORT1/r/8 (pending)
   
   review id:  bz://123/mynick
-  review url: http://localhost:$HGPORT1/r/6 (pending)
+  review url: http://localhost:$HGPORT1/r/7 (pending)
 
 Specifying multiple -r for the same head works
 
@@ -177,8 +177,8 @@ Specifying multiple -r for the same head works
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://localhost:$HGPORT1/r/10 (pending)
   
   review id:  bz://50000/mynick
-  review url: http://localhost:$HGPORT1/r/8 (pending)
+  review url: http://localhost:$HGPORT1/r/9 (pending)
   [1]

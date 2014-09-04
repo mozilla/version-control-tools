@@ -94,16 +94,21 @@ def reviewboard(repo, proto, args=None):
     bzcookie = o['bzcookie']
     identifier = None
     nodes = []
+    precursors = {}
 
     for t, d in o['other']:
         if t == 'reviewidentifier':
             identifier = urllib.unquote(d)
         elif t == 'csetreview':
-            fields = d.split(' ', 1)
-            if len(fields) > 1:
-                nodes.append(tuple(fields))
-            else:
-                nodes.append((d, None))
+            # This detects old versions of the client from before official
+            # release.
+            fields = d.split(' ')
+            if len(fields) != 1:
+                return wireproto.pusherr(_('old reviewboard client detected; please upgrade'))
+            nodes.append(d)
+        elif t == 'precursors':
+            node, before = d.split(' ', 1)
+            precursors[node] = before.split()
 
     if not identifier:
         return wireproto.pusherr(_('no review identifier in request'))
@@ -118,8 +123,8 @@ def reviewboard(repo, proto, args=None):
     # Note patch.diff() is appears to accept anything that can be fed into
     # repo[]. However, it blindly does a hex() on the argument as opposed
     # to the changectx, so we need to pass in the binary node.
-    base_parent_node = repo[nodes[0][0]].p1().node()
-    for i, (node, rid) in enumerate(nodes):
+    base_parent_node = repo[nodes[0]].p1().node()
+    for i, node in enumerate(nodes):
         ctx = repo[node]
         p1 = ctx.p1().node()
         diff = None
@@ -128,18 +133,18 @@ def reviewboard(repo, proto, args=None):
         diff = ''.join(patch.diff(repo, node1=p1, node2=ctx.node(), opts=diffopts))
         if i:
             parent_diff = ''.join(patch.diff(repo, node1=base_parent_node,
-                node2=repo[nodes[i-1][0]].node(), opts=diffopts))
+                node2=repo[nodes[i-1]].node(), opts=diffopts))
 
         commits['individual'].append({
             'id': node,
-            'rid': rid,
+            'precursors': precursors.get(node, []),
             'message': ctx.description(),
             'diff': diff,
             'parent_diff': parent_diff,
         })
 
     commits['squashed']['diff'] = ''.join(patch.diff(repo, node1=base_parent_node,
-        node2=repo[nodes[-1][0]].node(), opts=diffopts))
+        node2=repo[nodes[-1]].node(), opts=diffopts))
 
     rburl = repo.ui.config('reviewboard', 'url', None).rstrip('/')
     repoid = repo.ui.configint('reviewboard', 'repoid', None)

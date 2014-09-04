@@ -284,23 +284,12 @@ def doreview(repo, ui, remote, reviewnode):
     reviews = repo.reviews
     oldparentid = reviews.findparentreview(identifier=identifier.full)
 
-    # If a changeset has multiple successors, we could associate the same
-    # review with different successor changesets. So, we need to be careful
-    # that we don't map multiple changesets to the same rid.
-    #
-    # Our current rule is first successor wins. Ideally, we'd probably use
-    # a content-based algorithm to select the most appropriate successor.
-    # This is because successors can be created any number of ways. A static
-    # rule based on successor index is likely the least correct of any
-    # option.
-    seenrids = set()
+    # Include obsolescence data so server can make intelligent decisions.
+    obsstore = repo.obsstore
     for node in nodes:
-        rids = list(reviews.findnodereviews(node))
-        data = hex(node)
-        if rids and rids[0] not in seenrids:
-            data += ' %s' % rids[0]
-            seenrids.add(rids[0])
-        lines.append('csetreview %s' % data)
+        lines.append('csetreview %s' % hex(node))
+        precursors = [hex(n) for n in obsolete.allprecursors(obsstore, [node])]
+        lines.append('precursors %s %s' % (hex(node), ' '.join(precursors)))
 
     ui.write(_('submitting %d changesets for review\n') % len(nodes))
 
