@@ -86,11 +86,11 @@ Pushing a single changeset will initiate a single review (no children)
   review id:  bz://345/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
-{reviewurl} template works
+{reviews} template works
 
-  $ hg log -r 0::1 --template '{node|short} {reviewurl}\n'
+  $ hg log -r 0::1 --template "{node|short} {reviews % '{get(review, \"url\")} {get(review, \"status\")}'}\n"
   3a9f6899ef84 
-  6f06b4ac6efe http://localhost:$HGPORT1/r/2
+  6f06b4ac6efe http://localhost:$HGPORT1/r/2 pending
 
 Pushing no changesets will do a re-review
 

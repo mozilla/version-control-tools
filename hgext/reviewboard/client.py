@@ -311,10 +311,12 @@ def doreview(repo, ui, remote, reviewnode):
                     '{label("log.changeset", node|short)}\n'
                     '{label("log.summary", "summary:    ")}'
                     '{label("log.summary", firstline(desc))}\n'
-                    '{label("log.reviewurl", "review:     ")}'
-                    '{label("log.reviewurl", reviewurl)}'
-                    '{label("log.reviewstatus", '
-                        'ifeq(reviewstatus, "pending", " (pending)"))}\n'
+                    '{label("log.review", "review:     ")}'
+                    '{label("log.review", reviews % "'
+                        '{get(review, \'url\')}'
+                        '{ifeq(get(review, \'status\'), \'pending\', \' (pending)\')}'
+                        '")}'
+                    '\n'
          })
 
     ui.write(_('submitting %d changesets for review\n') % len(nodes))
@@ -656,31 +658,24 @@ class reviewstore(object):
 
         return '%s/r/%s' % (self.baseurl, r.parentrrid)
 
-    def reviewurl(self, node):
-        """Obtain the URL associated with the review for a node."""
+    def reviewurl(self, rid):
+        """Obtain the URL associated with a review id."""
+        return '%s/r/%s' % (self.baseurl, rid)
 
-        rids = list(self.findnodereviews(node))
-        if not rids or not self.baseurl:
-            return None
+def template_reviews(repo, ctx, revcache, **args):
+    """:reviews: List. Objects describing each review for this changeset."""
+    if 'reviews' not in revcache:
+        reviews = []
+        for rid in sorted(repo.reviews.findnodereviews(ctx.node())):
+            r = repo.reviews.getreviewrequest(rid)
+            # Bug 1065022 add parent review info to this data structure.
+            reviews.append({
+                'url': repo.reviews.reviewurl(rid),
+                'status': r.get('status'),
+            })
 
-        return '%s/r/%s' % (self.baseurl, rids[0])
-
-def template_reviewurl(repo, ctx, **args):
-    """:reviewurl: String. The URL of the review for this changeset."""
-    return repo.reviews.reviewurl(ctx.node())
-
-def template_reviewstatus(repo, ctx, revcache, **args):
-    """:reviewstatus: String. The status of the review for this changeset."""
-    if 'reviewstatus' not in revcache:
-        rids = list(repo.reviews.findnodereviews(ctx.node()))
-        if rids:
-            d = repo.reviews.getreviewrequest(rids[0])
-        else:
-            d = {}
-
-        revcache['reviewstatus'] = d.get('status', None)
-
-    return revcache['reviewstatus']
+        revcache['reviews'] = reviews
+    return templatekw.showlist('review', revcache['reviews'])
 
 @command('pullreviews', [], _('hg pullreviews'))
 def pullreviews(ui, repo, **opts):
@@ -735,8 +730,7 @@ def extsetup(ui):
                      _('Do not perform a review on push.')))
     entry[1].append(('', 'reviewid', '', _('Review identifier')))
 
-    templatekw.keywords['reviewurl'] = template_reviewurl
-    templatekw.keywords['reviewstatus'] = template_reviewstatus
+    templatekw.keywords['reviews'] = template_reviews
 
 def reposetup(ui, repo):
     if not repo.local():
