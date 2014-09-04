@@ -302,23 +302,6 @@ def doreview(repo, ui, remote, reviewnode):
             seenrids.add(rids[0])
         lines.append('csetreview %s' % data)
 
-    # TODO can we define a new named template with the API so people can
-    # customize this?
-    displayer = cmdutil.show_changeset(ui, repo, {
-        'template': '{label("log.changeset", "changeset:  ")}'
-                    '{label("log.changeset", rev)}'
-                    '{label("log.changeset", ":")}'
-                    '{label("log.changeset", node|short)}\n'
-                    '{label("log.summary", "summary:    ")}'
-                    '{label("log.summary", firstline(desc))}\n'
-                    '{label("log.review", "review:     ")}'
-                    '{label("log.review", reviews % "'
-                        '{get(review, \'url\')}'
-                        '{ifeq(get(review, \'status\'), \'pending\', \' (pending)\')}'
-                        '")}'
-                    '\n'
-         })
-
     ui.write(_('submitting %d changesets for review\n') % len(nodes))
 
     res = remote._call('pushreview', data='\n'.join(lines))
@@ -337,6 +320,7 @@ def doreview(repo, ui, remote, reviewnode):
     lines = res.split('\n')[1:]
 
     newparentid = None
+    nodereviews = {}
     reviewdata = {}
 
     for line in lines:
@@ -350,8 +334,10 @@ def doreview(repo, ui, remote, reviewnode):
             reviewdata[newparentid] = {}
         elif t == 'csetreview':
             node, rid = d.split(' ', 1)
-            reviews.addnodereview(bin(node), rid, newparentid)
+            node = bin(node)
+            reviews.addnodereview(node, rid, newparentid)
             reviewdata[rid] = {}
+            nodereviews[node] = rid
         elif t == 'reviewdata':
             rid, field, value = d.split(' ', 2)
             value = urllib.unquote(value)
@@ -367,9 +353,15 @@ def doreview(repo, ui, remote, reviewnode):
 
     ui.write('\n')
     for node in nodes:
+        rid = nodereviews[node]
         ctx = repo[node]
-        displayer.show(ctx)
-        ui.write('\n')
+        # Bug 1065024 use cmdutil.show_changeset() here.
+        ui.write('changeset:  %s:%s\n' % (ctx.rev(), ctx.hex()[0:12]))
+        ui.write('summary:    %s\n' % ctx.description().splitlines()[0])
+        ui.write('review:     %s' % reviews.reviewurl(rid))
+        if reviewdata[rid].get('status') == 'pending':
+            ui.write(' (pending)')
+        ui.write('\n\n')
 
     ui.write(_('review id:  %s\n') % identifier.full)
     ui.write(_('review url: %s') % reviews.parentreviewurl(identifier.full))
