@@ -295,12 +295,12 @@ def doreview(repo, ui, remote, reviewnode):
     # option.
     seenrids = set()
     for node in nodes:
-        rid = reviews.findnodereview(node)
+        rids = list(reviews.findnodereviews(node))
         data = hex(node)
-        if rid and rid not in seenrids:
-            data += ' %s' % rid
+        if rids and rids[0] not in seenrids:
+            data += ' %s' % rids[0]
+            seenrids.add(rids[0])
         lines.append('csetreview %s' % data)
-        seenrids.add(rid)
 
     # TODO can we define a new named template with the API so people can
     # customize this?
@@ -616,8 +616,8 @@ class reviewstore(object):
         r.rrids.add(rid)
         r.parentrrids.add(pid)
 
-    def findnodereview(self, node):
-        """Attempt to find a review for the specified changeset.
+    def findnodereviews(self, node):
+        """Find all reviews associated with a node.
 
         We look for both direct review associations as well as obsolescence
         data to find reviews associated with precursor changesets.
@@ -626,15 +626,17 @@ class reviewstore(object):
 
         r = self._nodes.get(node)
         if r and r.rrids:
-            return list(r.rrids)[0]
+            return r.rrids
 
-        obstore = self._repo.obsstore
-        for pnode in obsolete.allprecursors(obstore, [node]):
+        # No direct review associations were present. Fall back to looking
+        # at obsolesence.
+        obsstore = self._repo.obsstore
+        for pnode in obsolete.allprecursors(obsstore, [node]):
             r = self._nodes.get(pnode)
             if r and r.rrids:
-                return list(r.rrids)[0]
+                return r.rrids
 
-        return None
+        return set()
 
     def findparentreview(self, identifier=None):
         """Find a parent review given some data."""
@@ -657,11 +659,11 @@ class reviewstore(object):
     def reviewurl(self, node):
         """Obtain the URL associated with the review for a node."""
 
-        rid = self.findnodereview(node)
-        if not rid or not self.baseurl:
+        rids = list(self.findnodereviews(node))
+        if not rids or not self.baseurl:
             return None
 
-        return '%s/r/%s' % (self.baseurl, rid)
+        return '%s/r/%s' % (self.baseurl, rids[0])
 
 def template_reviewurl(repo, ctx, **args):
     """:reviewurl: String. The URL of the review for this changeset."""
@@ -670,9 +672,9 @@ def template_reviewurl(repo, ctx, **args):
 def template_reviewstatus(repo, ctx, revcache, **args):
     """:reviewstatus: String. The status of the review for this changeset."""
     if 'reviewstatus' not in revcache:
-        rid = repo.reviews.findnodereview(ctx.node())
-        if rid:
-            d = repo.reviews.getreviewrequest(rid)
+        rids = list(repo.reviews.findnodereviews(ctx.node()))
+        if rids:
+            d = repo.reviews.getreviewrequest(rids[0])
         else:
             d = {}
 
