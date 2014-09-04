@@ -463,9 +463,13 @@ class identifierrecord(object):
 
 class noderecord(object):
     """Describes a node in the context of the store."""
-    def __init__(self, rrid, parentrrids=None):
-        self.rrid = rrid
-        self.parentrrids = parentrrids or set()
+    def __init__(self, rrids=None, parentrrids=None):
+        self.rrids = set()
+        self.parentrrids = set()
+        if rrids:
+            self.rrids |= set(rrids)
+        if parentrrids:
+            self.parentrrids |= set(parentrrids)
 
 class reviewstore(object):
     """Holds information about ongoing reviews.
@@ -526,7 +530,8 @@ class reviewstore(object):
                 elif t == 'c':
                     node, rid = d.split(' ', 1)
                     assert len(node) == 40
-                    self._nodes[bin(node)] = noderecord(rid)
+                    r = self._nodes.setdefault(bin(node), noderecord())
+                    r.rrids.add(rid)
                 # Node to parent id.
                 elif t == 'pc':
                     node, pid = d.split(' ', 1)
@@ -562,7 +567,8 @@ class reviewstore(object):
             for ident, r in sorted(self._identifiers.iteritems()):
                 f.write('p %s %s\n' % (ident, r.parentrrid))
             for node, r in sorted(self._nodes.iteritems()):
-                f.write('c %s %s\n' % (hex(node), r.rrid))
+                for rid in sorted(r.rrids):
+                    f.write('c %s %s\n' % (hex(node), rid))
                 for pid in sorted(r.parentrrids):
                     f.write('pc %s %s\n' % (hex(node), pid))
 
@@ -606,7 +612,9 @@ class reviewstore(object):
         """Record the existence of a review against a single node."""
         assert len(node) == 20
         assert pid
-        self._nodes.setdefault(node, noderecord(rid)).parentrrids.add(pid)
+        r = self._nodes.setdefault(node, noderecord())
+        r.rrids.add(rid)
+        r.parentrrids.add(pid)
 
     def findnodereview(self, node):
         """Attempt to find a review for the specified changeset.
@@ -617,14 +625,14 @@ class reviewstore(object):
         assert len(node) == 20
 
         r = self._nodes.get(node)
-        if r:
-            return r.rrid
+        if r and r.rrids:
+            return list(r.rrids)[0]
 
         obstore = self._repo.obsstore
         for pnode in obsolete.allprecursors(obstore, [node]):
             r = self._nodes.get(pnode)
-            if r:
-                return r.rrid
+            if r and r.rrids:
+                return list(r.rrids)[0]
 
         return None
 
