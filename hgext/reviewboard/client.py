@@ -661,7 +661,7 @@ def pullreviews(ui, repo, **opts):
     This command is used to pull code review information from a code review
     server into your local repository.
     """
-    return repo.pullreviews()
+    return _pullreviews(repo)
 
 # The implementation of sshpeer.readerr() is buggy on Linux.
 # See issue 4336 in Mercurial. This will likely get fixed in
@@ -714,10 +714,6 @@ def reposetup(ui, repo):
         @localrepo.repofilecache('reviews')
         def reviews(self):
             return reviewstore(self)
-
-        def pullreviews(self):
-            """Pull relevant code review information from a remote server."""
-            return _pullreviews(self)
 
     repo.__class__ = reviewboardrepo
     repo.noreviewboardpush = False
