@@ -503,6 +503,9 @@ class reviewstore(object):
 
         # Maps review identifiers to identifierrecord instances.
         self._identifiers = {}
+        # Maps parent review id to identifierrecord instances. Shares the same
+        # object instances as _identifiers.
+        self._prids = {}
 
         # Maps nodes to noderecord instances.
         self._nodes = {}
@@ -527,7 +530,9 @@ class reviewstore(object):
                 # Identifier to parent review ID.
                 if t == 'p':
                     ident, rrid = d.split(' ', 1)
-                    self._identifiers[ident] = identifierrecord(parentrrid=rrid)
+                    r = identifierrecord(parentrrid=rrid)
+                    self._identifiers[ident] = r
+                    self._prids[rrid] = r
                 # Node to review id.
                 elif t == 'c':
                     node, rid = d.split(' ', 1)
