@@ -11,6 +11,7 @@ create table AutolandRequest (
     builds integer,
     last_updated timestamp,
     can_be_landed boolean,
+    landed boolean,
     primary key(tree, revision)
 );
 grant all privileges on table AutolandRequest to autoland;
