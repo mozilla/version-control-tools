@@ -52,6 +52,12 @@ def get_or_create_bugzilla_users(user_data):
                 user.is_active = can_login
                 modified = True
 
+            profile = user.get_profile()
+
+            if not profile.is_private:
+                profile.is_private = True
+                profile.save()
+
             if modified:
                 user.save()
 
