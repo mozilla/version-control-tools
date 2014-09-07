@@ -26,7 +26,7 @@ def get_or_create_bugzilla_users(user_data):
             bugzilla_user_map = BugzillaUserMap.objects.get(
                 bugzilla_user_id=bz_user_id)
         except BugzillaUserMap.DoesNotExist:
-            user = User(username=email, password='!', first_name=real_name,
+            user = User(username=bz_user_id, password='!', first_name=real_name,
                         email=email, is_active=can_login)
             user.save()
             bugzilla_user_map = BugzillaUserMap(user=user,
@@ -36,8 +36,11 @@ def get_or_create_bugzilla_users(user_data):
             modified = False
             user = bugzilla_user_map.user
 
-            if user.username != email:
-                user.username = email
+            if user.username != bz_user_id:
+                user.username = bz_user_id
+                modified = True
+
+            if user.email != email:
                 user.email = email
                 modified = True
 
