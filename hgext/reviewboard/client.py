@@ -384,7 +384,7 @@ def _pullreviews(repo):
     reviewdata = _pullreviewidentifiers(repo, sorted(reviews.identifiers))
     repo.ui.write(_('updated %d reviews\n') % len(reviewdata))
 
-def _pullreviewidentifiers(repo, reviewids):
+def _pullreviewidentifiers(repo, identifiers):
     """Pull down information for a list of review identifier strings.
 
     This will request the currently published data for a review identifier,
@@ -402,7 +402,7 @@ def _pullreviewidentifiers(repo, reviewids):
     remote.requirecap('pullreviews', _('obtain code reviews'))
 
     lines = ['1']
-    for identifier in reviewids:
+    for identifier in identifiers:
         lines.append('reviewid %s' % identifier)
 
     res = remote._call('pullreviews', data='\n'.join(lines))
@@ -540,15 +540,6 @@ class reviewstore(object):
         except IOError as inst:
             if inst.errno != errno.ENOENT:
                 raise
-
-    @property
-    def reviewids(self):
-        """Returns a set of all known review IDs."""
-        s = set([n.rrid for n in self._nodes.values()])
-        for r in self._identifiers.values():
-            s.add(r.parentrrid)
-
-        return s
 
     @property
     def identifiers(self):
