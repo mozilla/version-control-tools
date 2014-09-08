@@ -9,3 +9,4 @@ venv/
 \.pyo$
 \.swp$
 ~$
+\.vagrant/*
