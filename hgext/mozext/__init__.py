@@ -533,7 +533,9 @@ def treestatus(ui, *trees, **opts):
     trees = resolve_trees_to_official(trees)
 
     if trees:
-        status = {k: status[k] for k in status if k in trees}
+        irrelevant = [k for k in status if k not in trees]
+        for k in irrelevant:
+            del status[k]
 
     longest = max(len(s) for s in status)
 
