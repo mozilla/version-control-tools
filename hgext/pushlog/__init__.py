@@ -116,8 +116,7 @@ class pushlog(object):
         # greater than the repo's.
         self.repo = weakref.proxy(repo)
 
-    @contextlib.contextmanager
-    def conn(self):
+    def _getconn(self):
         path = self.repo.vfs.join('pushlog2.db')
         create = False
         if not os.path.exists(path):
@@ -137,6 +136,11 @@ class pushlog(object):
             st = os.stat(path)
             os.chmod(path, st.st_mode | stat.S_IWGRP)
 
+        return conn
+
+    @contextlib.contextmanager
+    def conn(self):
+        conn = self._getconn()
         try:
             yield conn
         finally:
