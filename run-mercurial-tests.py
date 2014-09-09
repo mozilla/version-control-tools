@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     # some arguments belong to us only. Don't pass it along to run-tests.py.
     sys.argv = [a for a in sys.argv
-        if a not in {'--all-versions'}]
+        if a not in set(['--all-versions'])]
 
     coveragerc = os.path.join(HERE, '.coveragerc')
     coverdir = os.path.join(HERE, 'coverage')
