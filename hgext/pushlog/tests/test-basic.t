@@ -143,6 +143,7 @@ Pushing to a locked DB errors out (bug 508863)
   Trying to insert into pushlog.
   Please do not interrupt...
   Error inserting into pushlog. Please retry your push.
+  rolling back pushlog
   transaction abort!
   rollback completed
   abort: pretxnchangegroup.pushlog hook failed

@@ -151,19 +151,54 @@ class pushlog(object):
 
         A push consists of a list of nodes, a username, and a time of the
         push.
+
+        This function assumes it is running in the context of a transaction.
+        There are valid scenarios where this may not hold true. However, we
+        don't have a need to support them, so we error in these scenarios.
         '''
-        with self.conn() as c:
-            res = c.execute('INSERT INTO pushlog (user, date) VALUES (?, ?)', (user, when))
-            pushid = res.lastrowid
-            for e in nodes:
-                ctx = self.repo[e]
-                rev = ctx.rev()
-                node = ctx.hex()
+        # WARNING low-level hacks applied.
+        #
+        # The active transaction object provides various instance-specific internal
+        # callbacks. When we run, the transaction object comes from
+        # localrepository.transaction(). The assert statements check our
+        # assumptions for how that code works, namely that
+        # localrepository.transaction() *always* defines these callbacks.
+        #
+        # The code here essentially monkeypatches the "finish" and "abort"
+        # callbacks on the transaction to commit and close the database.
+        #
+        # If the database is closed without a commit(), the active transaction
+        # (our inserts) will be rolled back.
+        tr = self.repo._transref()
+        assert tr.onabort is None
+        assert tr.after
 
-                c.execute('INSERT INTO changesets (pushid, rev, node) '
-                        'VALUES (?, ?, ?)', (pushid, rev, node))
+        c = self._getconn()
+        oldafter = tr.after
 
+        def abort():
+            c.close()
+            self.repo.ui.warn('rolling back pushlog\n')
+
+        def commit():
+            oldafter()
             c.commit()
+            c.close()
+
+        tr.onabort = abort
+        tr.after = commit
+
+        # Now that the hooks are installed, any exceptions will result in db
+        # close via abort().
+        res = c.execute('INSERT INTO pushlog (user, date) VALUES (?, ?)', (user, when))
+        pushid = res.lastrowid
+        for e in nodes:
+            ctx = self.repo[e]
+            rev = ctx.rev()
+            node = ctx.hex()
+
+            c.execute('INSERT INTO changesets (pushid, rev, node) '
+                    'VALUES (?, ?, ?)', (pushid, rev, node))
 
     def recordpushes(self, pushes):
         """Record multiple pushes.

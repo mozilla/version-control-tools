@@ -44,12 +44,31 @@ record
   Please do not interrupt...
   Inserted into the pushlog db successfully.
   fake hook failure
+  rolling back pushlog
   transaction abort!
   rollback completed
   abort: pretxnchangegroup.abort hook exited with status 1
   [255]
 
-THIS OUTPUT IS NOT CORRECT AND SHOULD BE FIXED.
+  $ dumppushlog server
+  ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
+
+Remove the abort hook and ensure pushing again works as expected
+
+  $ cat >> ../server/.hg/hgrc << EOF
+  > pretxnchangegroup.abort = /bin/echo 'fake hook success' && exit 0
+  > EOF
+  $ hg push ../server
+  pushing to ../server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  Trying to insert into pushlog.
+  Please do not interrupt...
+  Inserted into the pushlog db successfully.
+  fake hook success
 
   $ dumppushlog server
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
