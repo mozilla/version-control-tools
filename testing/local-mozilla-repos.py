@@ -11,7 +11,10 @@ Enabling this extension causes local repositories in the test environment
 to answer true to "is a Mozilla repository."
 """
 
+from mercurial import demandimport
+demandimport.disable()
 import responses
+demandimport.enable()
 
 from mozautomation import repository
 
