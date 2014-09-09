@@ -22,7 +22,6 @@ Populate the repo with some data
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: Trying to insert into pushlog.
-  remote: Please do not interrupt...
   remote: Inserted into the pushlog db successfully.
 
   $ hg branch branch_foo > /dev/null

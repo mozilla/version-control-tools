@@ -29,7 +29,6 @@ Pushing single changesets at a time works
   adding file changes
   added 1 changesets with 1 changes to 1 files
   Trying to insert into pushlog.
-  Please do not interrupt...
   Inserted into the pushlog db successfully.
 
   $ dumppushlog server
@@ -45,7 +44,6 @@ Pushing single changesets at a time works
   adding file changes
   added 1 changesets with 1 changes to 1 files
   Trying to insert into pushlog.
-  Please do not interrupt...
   Inserted into the pushlog db successfully.
 
   $ dumppushlog server
@@ -72,7 +70,6 @@ Pushing multiple changesets at a time works
   adding file changes
   added 2 changesets with 2 changes to 1 files
   Trying to insert into pushlog.
-  Please do not interrupt...
   Inserted into the pushlog db successfully.
 
   $ dumppushlog server
@@ -108,7 +105,6 @@ Pushing to an empty db file works (bug 466149)
   adding file changes
   added 4 changesets with 4 changes to 1 files
   Trying to insert into pushlog.
-  Please do not interrupt...
   Inserted into the pushlog db successfully.
 
   $ dumppushlog empty
@@ -141,7 +137,6 @@ Pushing to a locked DB errors out (bug 508863)
   adding file changes
   added 3 changesets with 3 changes to 1 files
   Trying to insert into pushlog.
-  Please do not interrupt...
   Error inserting into pushlog. Please retry your push.
   rolling back pushlog
   transaction abort!
@@ -158,7 +153,6 @@ Pushing to a locked DB errors out (bug 508863)
   adding file changes
   added 1 changesets with 1 changes to 1 files
   Trying to insert into pushlog.
-  Please do not interrupt...
   Inserted into the pushlog db successfully.
 
   $ dumppushlog locked

@@ -17,7 +17,6 @@
   adding file changes
   added 1 changesets with 1 changes to 1 files
   Trying to insert into pushlog.
-  Please do not interrupt...
   Inserted into the pushlog db successfully.
   $ echo foo2 > foo
   $ hg commit -m 'second'
@@ -29,7 +28,6 @@
   adding file changes
   added 1 changesets with 1 changes to 1 files
   Trying to insert into pushlog.
-  Please do not interrupt...
   Inserted into the pushlog db successfully.
 
 Stripping changesets should result in pushlog getting stripped

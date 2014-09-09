@@ -325,7 +325,6 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
         return 0
 
     ui.write('Trying to insert into pushlog.\n')
-    ui.write('Please do not interrupt...\n')
     try:
         t = int(time.time())
         revs = range(repo[node].rev(), len(repo))

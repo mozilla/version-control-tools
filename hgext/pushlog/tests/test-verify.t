@@ -18,7 +18,6 @@ Single valid pushlog verifies OK
   adding file changes
   added 1 changesets with 1 changes to 1 files
   Trying to insert into pushlog.
-  Please do not interrupt...
   Inserted into the pushlog db successfully.
 
   $ echo second > foo
@@ -33,7 +32,6 @@ Single valid pushlog verifies OK
   adding file changes
   added 2 changesets with 2 changes to 1 files
   Trying to insert into pushlog.
-  Please do not interrupt...
   Inserted into the pushlog db successfully.
 
   $ hg -R ../server verifypushlog
