@@ -4,7 +4,7 @@ create user autoland password 'autoland';
 create table AutolandRequest (
     tree varchar(20),
     revision varchar(40),
-    bugnumber integer,
+    bugid integer,
     patch text,
     pending integer,
     running integer,

@@ -5,6 +5,7 @@ import httplib
 import json
 import logging
 import psycopg2
+import re
 import requests
 import string
 import uuid
@@ -30,19 +31,30 @@ def extract_try(patch):
         if i != -1:
             return line[i:]
 
+def extract_bugid(patch):
+    #TODO: check to see if there is an "official" re for this
+    bugid = re.compile('[Bb]ug (\d+) ')
+    m = re.search(bugid, patch)
+    if m:
+        return m.groups()[0]
+
 def handle_message(data, message):
     message.ack()
 
     payload = data['payload']
+
+    if not 'tree' in payload:
+        return
+
     tree = payload['tree']
 
     if tree != 'try':
-        logger.error('received update for tree other than try: %s' % tree)
+        #logger.error('received update for tree other than try: %s' % tree)
         return
 
     rev = payload['revision']
-    key = data['_meta']['routing_key']
-    print(rev, key)
+    #key = data['_meta']['routing_key']
+    #print(rev, key)
 
     patch = mercurial.get_raw_revision(tree, rev)
     if patch:
@@ -50,6 +62,12 @@ def handle_message(data, message):
 
         if '--autoland' in try_string:
             logger.debug('found autoland job: %s %s: %s' % (tree, rev, try_string))
+
+            bugid = extract_bugid(patch)
+            if not bugid:
+                logger.error('could not find bug id for autoland request')
+                return
+
             pending, running, builds = selfserve.jobs_for_revision(auth, tree, rev)
             logger.debug('pending: %d running: %d builds: %d' % (len(pending), len(running), len(builds)))
 
@@ -61,15 +79,13 @@ def handle_message(data, message):
             row = cursor.fetchone()
             if row is None:
                 query = """
-                    insert into AutolandRequest(tree,revision,patch,pending,
+                    insert into AutolandRequest(tree,revision,bugid,patch,pending,
                         running,builds,last_updated)
-                    values(%s,%s,%s,%s,%s,%s,%s)
+                    values(%s,%s,%s,%s,%s,%s,%s,%s)
                 """
-                cursor.execute(query, (tree, rev, patch,
-                                       len(pending),
-                                       len(running),
-                                       len(builds),
-                                       datetime.datetime.now()))
+                cursor.execute(query, (tree, rev, bugid, patch,
+                                       len(pending), len(running),
+                                       len(builds), datetime.datetime.now()))
             else:
                 query = """
                     update AutolandRequest set pending=%s,
