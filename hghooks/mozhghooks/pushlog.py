@@ -16,23 +16,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-import os
-import time
-
 def log(ui, repo, node, **kwargs):
     if not hasattr(repo, 'pushlog'):
         ui.write('repository not properly configured; missing pushlog extension.\n')
         return 1
 
-    ui.write('Trying to insert into pushlog.\n')
-    ui.write('Please do not interrupt...\n')
-    try:
-        t = int(time.time())
-        revs = range(repo[node].rev(), len(repo))
-        repo.pushlog.recordpush(revs, os.environ['USER'], t)
-        ui.write('Inserted into the pushlog db successfully.\n')
-        return 0
-    except Exception:
-        ui.write('Error inserting into pushlog. Please retry your push.\n')
-
+    # As long as the pushlog extension is installed, we should never get
+    # here because the extension installs its own hook which overwrites
+    # us.
+    ui.write('Assertion failure: the pushlog hook code should not run any more. '
+        'Please file a bug.\n')
     return 1

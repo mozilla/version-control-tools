@@ -6,6 +6,7 @@
 import os
 import sqlite3
 import stat
+import time
 import weakref
 
 testedwith = '3.0 3.1 3.2'
@@ -81,9 +82,25 @@ class pushlog(object):
             c.close()
             self._conn = None
 
+def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
+    ui.write('Trying to insert into pushlog.\n')
+    ui.write('Please do not interrupt...\n')
+    try:
+        t = int(time.time())
+        revs = range(repo[node].rev(), len(repo))
+        repo.pushlog.recordpush(revs, os.environ['USER'], t)
+        ui.write('Inserted into the pushlog db successfully.\n')
+        return 0
+    except Exception:
+        ui.write('Error inserting into pushlog. Please retry your push.\n')
+
+    return 1
+
 def reposetup(ui, repo):
     if not repo.local():
         return
+
+    ui.setconfig('hooks', 'pretxnchangegroup.pushlog', pretxnchangegrouphook, 'pushlog')
 
     class pushlogrepo(repo.__class__):
         @property
