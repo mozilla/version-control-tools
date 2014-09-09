@@ -44,6 +44,9 @@ if os.environ.get('CODE_COVERAGE', False):
     cov.start()
 EOF
 
+# Ensure system settings don't sneak in and change behavior.
+export HGRCPATH=/dev/null
+
 # Install various Mercurial versions for multi-version testing.
 if [ ! -d venv/hg ]; then
   hg clone http://selenic.com/repo/hg venv/hg
