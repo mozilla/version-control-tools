@@ -163,23 +163,3 @@ Pushing to a locked DB errors out (bug 508863)
   $ dumppushlog locked
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 12cb2e907074dd3f8a985a0bb3713836bae731d8 (re)
   ID: 2; user: hguser; Date: \d+; Rev: 1; Node: 6e7d3c626e4989d83a04858aa53fb650d828ab23 (re)
-
-Having the hook configured without the extension results in a specific error
-
-  $ hg init ../server-no-extension
-  $ cat >> ../server-no-extension/.hg/hgrc << EOF
-  > [hooks]
-  > pretxnchangegroup.pushlog = python:mozhghooks.pushlog.log
-  > EOF
-  $ hg push -r 1 ../server-no-extension
-  pushing to ../server-no-extension
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 2 changesets with 2 changes to 1 files
-  repository not properly configured; missing pushlog extension.
-  transaction abort!
-  rollback completed
-  abort: pretxnchangegroup.pushlog hook failed
-  [255]
