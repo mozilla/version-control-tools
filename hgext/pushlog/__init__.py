@@ -3,6 +3,7 @@
 
 '''Record pushes to Mercurial repositories.'''
 
+import contextlib
 import os
 import sqlite3
 import stat
@@ -30,31 +31,31 @@ class pushlog(object):
         # greater than the repo's.
         self.repo = weakref.proxy(repo)
 
-    @property
+    @contextlib.contextmanager
     def conn(self):
-        if not hasattr(self, '_conn'):
-            path = self.repo.vfs.join('pushlog2.db')
-            create = False
-            if not os.path.exists(path):
+        path = self.repo.vfs.join('pushlog2.db')
+        create = False
+        if not os.path.exists(path):
+            create = True
+
+        conn = sqlite3.connect(path)
+        if not create:
+            res = conn.execute(
+                "SELECT COUNT(*) FROM SQLITE_MASTER WHERE name='pushlog'")
+            if res.fetchone()[0] != 1:
                 create = True
 
-            conn = sqlite3.connect(path)
-            if not create:
-                res = conn.execute(
-                    "SELECT COUNT(*) FROM SQLITE_MASTER WHERE name='pushlog'")
-                if res.fetchone()[0] != 1:
-                    create = True
+        if create:
+            for sql in SCHEMA:
+                conn.execute(sql)
+            conn.commit()
+            st = os.stat(path)
+            os.chmod(path, st.st_mode | stat.S_IWGRP)
 
-            if create:
-                for sql in SCHEMA:
-                    conn.execute(sql)
-                conn.commit()
-                st = os.stat(path)
-                os.chmod(path, st.st_mode | stat.S_IWGRP)
-
-            self._conn = conn
-
-        return self._conn
+        try:
+            yield conn
+        finally:
+            conn.close()
 
     def recordpush(self, nodes, user, when):
         '''Record a push into the pushlog.
@@ -62,8 +63,7 @@ class pushlog(object):
         A push consists of a list of nodes, a username, and a time of the
         push.
         '''
-        c = self.conn
-        try:
+        with self.conn() as c:
             res = c.execute('INSERT INTO pushlog (user, date) VALUES (?, ?)', (user, when))
             pushid = res.lastrowid
             for e in nodes:
@@ -75,12 +75,6 @@ class pushlog(object):
                         'VALUES (?, ?, ?)', (pushid, rev, node))
 
             c.commit()
-        finally:
-            # We mimic the behavior of the old pushlog for now and destroy the
-            # connection after it is used. This should eventually be changed to use
-            # more sane resource management, such as a context manager.
-            c.close()
-            self._conn = None
 
 def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
     # This hook is executed whenever changesets are introduced. We ignore
