@@ -100,7 +100,7 @@ OFFICIAL_MAP = {
     'esr31': 'mozilla-esr31',
 }
 
-RELEASE_TREES = {
+RELEASE_TREES = set([
     'central',
     'aurora',
     'beta',
@@ -111,7 +111,7 @@ RELEASE_TREES = {
     'esr31',
     'b2g26',
     'b2g28',
-}
+])
 
 
 def resolve_trees_to_official(trees):
