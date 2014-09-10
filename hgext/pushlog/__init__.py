@@ -83,6 +83,18 @@ class pushlog(object):
             self._conn = None
 
 def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
+    # This hook is executed whenever changesets are introduced. We ignore
+    # new changesets unless they come from a push. ``source`` can be
+    # ``push`` for ssh or ``serve`` for HTTP pushes.
+    #
+    # This is arguably the wrong thing to do: designing a system to record
+    # all changes to the store is the right thing to do. However, things are
+    # like this for backwards compatibility with the original intent of
+    # pushlog.
+    if source not in ('push', 'serve'):
+        ui.status('(not updating pushlog since changesets come from %s)\n' % source)
+        return 0
+
     ui.write('Trying to insert into pushlog.\n')
     ui.write('Please do not interrupt...\n')
     try:
