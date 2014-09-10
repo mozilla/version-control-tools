@@ -71,8 +71,12 @@ def handle_message(data, message):
 
             # see if we know already know about this autoland request
             query = """select revision from AutolandRequest
-                       where tree=%(tree)s and revision=%(rev)s"""
-            cursor.execute(query, {'tree': tree, 'rev': rev})
+                       where tree=%(tree)s
+                       and substring(revision, 0, %(len)s)=%(rev)s"""
+            cursor = dbconn.cursor()
+            cursor.execute(query, {'tree': tree,
+                                   'len': len(rev) + 1,
+                                   'rev': rev})
             row = cursor.fetchone()
             if row is not None:
                 logger.debug('autoland job already known')
