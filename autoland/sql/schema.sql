@@ -5,7 +5,6 @@ create table AutolandRequest (
     tree varchar(20),
     revision varchar(40),
     bugid integer,
-    patch text,
     pending integer,
     running integer,
     builds integer,

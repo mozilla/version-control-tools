@@ -56,7 +56,7 @@ def handle_landing(logger, dbconn, tree, rev, bugid):
     logger.debug('autoland request %s %s can be landed' % (tree, rev))
     cursor = dbconn.cursor()
     query = """
-        update AutolandRequest set can_be_landed=TRUE,last_updated=%s
+        update AutolandRequest set can_be_landed=true,last_updated=%s
         where tree=%s and revision=%s
     """
     cursor.execute(query, (datetime.datetime.now(), tree, rev))
@@ -65,7 +65,8 @@ def handle_landing(logger, dbconn, tree, rev, bugid):
     # TODO: add transplant info for tree and changeset
     token = bugzilla.login()
     comment = 'Autoland request succeeded!'
-    bugzilla.add_comment(token, bugid, comment)
+    if not bugzilla.add_comment(token, bugid, comment):
+        logger.error('could not update bug %s' % bugid)
 
 def handle_autoland_request(logger, auth, dbconn, tree, rev):
 

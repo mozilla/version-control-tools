@@ -15,3 +15,11 @@ def get_raw_revision(tree, rev):
         r = requests.get(url)
         if r.status_code == 200:
             return r.text
+
+def get_changesets(tree, pushlog):
+    changesets = {}
+    for key in pushlog:
+        for changeset in pushlog[key]['changesets']:
+            text = get_raw_revision(tree, changeset)
+            changesets[changeset] = text
+    return changesets
