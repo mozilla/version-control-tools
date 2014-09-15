@@ -32,6 +32,29 @@ class BugzillaBackend(AuthBackend):
 
     def authenticate(self, username, password, cookie=False):
         username = username.strip()
+
+        if username.isdigit():
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                return None
+
+            username = user.email
+
+        # If the username *isn't* a digit, then this is an unknown email
+        # address, and we pass it straight to bugzilla.log_in().  If the
+        # corresponding user already exists in Review Board, its email
+        # will be updated in get_or_create_bugzilla_users().
+
+        # There is a *tiny* probability that this will not work, but only if
+        # user A changes their email address, then user B changes their email
+        # address to user A's old email, and Review Board doesn't pick up
+        # user A's change because they aren't currently involved in any
+        # Review Board reviews.  In this case 'username' would have resolved
+        # to user A's address.  There's no easy way to detect this without
+        # a search on Bugzilla before every log in, and I (mcote) don't think
+        # that's worth it for such an improbable event.
+
         try:
             bugzilla = Bugzilla()
         except BugzillaUrlError:
