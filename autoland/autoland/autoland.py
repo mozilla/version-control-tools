@@ -16,7 +16,13 @@ from mozlog.structured import (
 )
 
 import bugzilla
+import mercurial
+import mozilla_ldap
 import selfserve
+import transplant
+
+CHECK_LDAP_GROUP = False  #disable ldap checking (while debugging)
+BUGZILLA_COMMENT_LIMIT = 10  # max comments to post / iteration
 
 def handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id):
     logger.debug('autoland request %s %s needs to retry job for %s' % (tree, rev, buildername))
@@ -34,6 +40,18 @@ def handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id
         logger.debug('could not rebuild %s for autoland job %s %s' % (build_id, tree, rev))
 
 
+def handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame):
+    cursor = dbconn.cursor()
+    query = """
+        update AutolandRequest set can_be_landed=false, last_updated=%s
+        where tree=%s and revision=%s
+    """
+    cursor.execute(query, (datetime.datetime.now(), tree, rev))
+    dconn.commit()
+
+    comment = 'Autoland request failed. User %s has insufficient permissions to land on tree %s.' %  (blame, tree)
+    add_bugzilla_comment(dbconn, bugid, comment)
+
 def handle_failure(logger, dbconn, tree, rev, bugid, buildername):
     logger.debug('autoland request %s %s has too many failures for %s' % (tree, rev, buildername))
 
@@ -47,12 +65,10 @@ def handle_failure(logger, dbconn, tree, rev, bugid, buildername):
 
     #TODO: add treeherder/tbpl link for job
     #      maybe should look at all failures for better reporting
-    #      retry bugzilla if posting fails
-    token = bugzilla.login()
     comment = 'Autoland request failed. Too many failures for %s.' %  (buildername)
-    bugzilla.add_comment(token, bugid, comment)
+    add_bugzilla_comment(dbconn, bugid, comment)
 
-def handle_landing(logger, dbconn, tree, rev, bugid):
+def handle_can_be_landed(logger, dbconn, tree, rev):
     logger.debug('autoland request %s %s can be landed' % (tree, rev))
     cursor = dbconn.cursor()
     query = """
@@ -62,22 +78,59 @@ def handle_landing(logger, dbconn, tree, rev, bugid):
     cursor.execute(query, (datetime.datetime.now(), tree, rev))
     dbconn.commit()
 
-    # TODO: add transplant info for tree and changeset
-    token = bugzilla.login()
-    comment = 'Autoland request succeeded!'
-    if not bugzilla.add_comment(token, bugid, comment):
-        logger.error('could not update bug %s' % bugid)
+def handle_pending_transplants(logger, dbconn):
+
+    cursor = dbconn.cursor()
+    query = """
+        select tree,revision,bugid from AutolandRequest
+        where can_be_landed is true and landed is null
+    """
+    cursor.execute(query)
+
+    landed = []
+    for row in cursor.fetchall():
+        tree, rev, bugid = row
+
+        pushlog = mercurial.get_pushlog(tree, rev)
+        if not pushlog:
+            logger.debug('could not get pushlog for tree: %s rev %s' % (tree, rev))
+            return
+
+        changesets = []
+        for key in pushlog:
+            for changeset in pushlog[key]['changesets']:
+                changesets.append(changeset)
+
+        status, text = transplant.transplant(tree, 'mozilla-inbound', changesets, message)
+        if status != 200:
+            logger.debug('could not transplant changesets: %s' % text)
+            return
+
+        landed.append([datetime.datetime.now(), tree, rev])
+
+        comment = 'Autoland request succeeded!'
+        add_bugzilla_comment(dbconn, bugid, comment)
+
+    if landed:
+        # TODO: These could be deleted instead of updated but in the short
+        #term, having this here will be helpful for debugging.
+        query = """
+            update AutolandRequest set landed=true,last_updated=%s
+            where tree=%s and revision=%s
+        """
+        cursor.executemany(query, landed)
+        dbconn.commit()
 
 def handle_autoland_request(logger, auth, dbconn, tree, rev):
 
     logger.debug('looking at autoland request %s %s' % (tree, rev))
 
-    cursor = dbconn.cursor()
     status = selfserve.job_is_done(auth, tree, rev)
     if not status:
         logger.debug('could not get job status for %s %s' % (tree, rev))
         return
- 
+
+    cursor = dbconn.cursor()
     if not status['job_complete']:
         logger.debug('autoland request %s %s job not complete' % (tree, rev))
         # update pending so we won't look at this job again
@@ -91,18 +144,36 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         return
 
     query = """
-        select bugid from AutolandRequest
+        select bugid, blame from AutolandRequest
         where tree=%s and revision=%s
     """
     cursor.execute(query, (tree, rev))
-    bugid = str(cursor.fetchone()[0])
+    bugid, blame = cursor.fetchone()
+
+    # check ldap group
+    if CHECK_LDAP_GROUP:
+        blame = blame.strip('{}')
+        auth = mozilla_ldap.read_credentials()
+        result = mozilla_ldap.check_group(auth, 'scm_level_3', blame)
+        if result is None:
+            # can't check credentials right now, we'll try again later
+            logger.debug('could not check ldap group')
+            return
+
+        if not result:
+            handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame)
+            return
 
     # everything passed, so we can land
     if status['job_passed']:
-        return handle_landing(logger, dbconn, tree, rev, bugid)
+        return handle_can_be_landed(logger, dbconn, tree, rev, bugid)
 
     pending, running, builds = selfserve.jobs_for_revision(auth, tree, rev)
-   
+
+    if not builds:
+        logger.debug('could not get jobs for revision')
+        return
+
     if len(pending) > 0 or len(running) > 0:
         logger.debug('autoland request %s %s still has pending or running jobs: %d %d' % (tree, rev, len(pending), len(running)))
         query = """
@@ -118,6 +189,10 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
     build_results = {}
     for build_id in builds:
         build_info = selfserve.build_info(auth, tree, build_id)
+        if not build_info:
+            logger.debug('could not get build_info for build: %s' % build_id)
+            return
+
         buildername = build_info['buildername']
         build_results.setdefault(buildername, []).append(build_info)
 
@@ -141,7 +216,38 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         action()
 
     if all_passed:
-        return handle_landing(logger, dbconn, tree, rev, bugid)
+        return handle_can_be_landed(logger, dbconn, tree, rev)
+
+def add_bugzilla_comment(dbconn, bugid, comment):
+    cursor = dbconn.cursor()
+    query = """insert into BugzillaComment(bugid, bug_comment)
+               values(%s, %s)"""
+    cursor.execute(query, (bugid, comment))
+    dbconn.commit()
+
+def handle_pending_bugzilla_comments(logger, dbconn):
+    cursor = dbconn.cursor()
+    query = """select sequence, bugid, bug_comment from BugzillaComment
+               order by sequence limit %(limit)s"""
+    cursor.execute(query, {'limit': BUGZILLA_COMMENT_LIMIT})
+
+    token = bugzilla.login()
+    if not token:
+        logger.debug('bugzilla authentication failure')
+        return
+
+    to_delete = []
+    for row in cursor.fetchall():
+        sequence, bugid, comment = row
+        bugid = str(bugid)
+        result = bugzilla.add_comment(token, bugid, comment)
+        if not result:
+            logger.debug('could not post bugzilla comment to bug %s' % bugid)
+        to_delete.append([sequence])
+
+    query = """delete from BugzillaComment where sequence = %s"""
+    cursor.executemany(query, to_delete)
+    dbconn.commit()
 
 def main():
     parser = argparse.ArgumentParser()
@@ -183,6 +289,12 @@ def main():
         for row in cursor.fetchall():
             tree, rev = row
             handle_autoland_request(logger, auth, dbconn, tree, rev)
+
+        #
+        handle_pending_bugzilla_comments(logger, dbconn)
+
+        #
+        handle_pending_transplants(logger, dbconn)
 
         time.sleep(30)
 

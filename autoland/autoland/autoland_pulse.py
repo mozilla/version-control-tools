@@ -45,10 +45,13 @@ def handle_message(data, message):
     payload = data['payload']
 
     if key.find('started') != -1:
+        blame = payload['build']['blame']
+
         tree = None
         rev = None
         autoland = False
-        comments = None
+        message = None
+        bugid = None
         for prop in payload['build']['properties']:
             if prop[0] == 'revision':
                 rev = prop[1]
@@ -57,15 +60,26 @@ def handle_message(data, message):
         try:
             for change in payload['build']['sourceStamp']['changes']:
                 comments = change['comments']
-                if '--autoland' in comments:
+                index = comments.find('--autoland')
+                if index > -1:
                     autoland = True
+                    message = comments[index + len('--autoland') + 1:].strip()
+                    bugid = extract_bugid(message)
         except KeyError:
             pass
 
         #if tree == 'try':
+        #    print(json.dumps(payload, sort_keys=True, indent=2))
         #    print(rev, autoland, comments)
         if autoland:
             logger.debug('found autoland job: %s %s' % (tree, rev))
+
+            if not bugid:
+                logger.debug('autoland job missing bugid')
+                return
+            else:
+                logger.debug('bugid %s' % bugid)
+
 
             cursor = dbconn.cursor()
 
@@ -83,30 +97,13 @@ def handle_message(data, message):
                 return
 
             logger.debug('found new autoland job!')
-            pushlog = mercurial.get_pushlog(tree, rev)
-            if not pushlog:
-                logger.error('could not retrieve pushlog')
-                return
-
-            changesets = mercurial.get_changesets(tree, pushlog)
-            if not changesets:
-                logger.error('could not retrieve changesets')
-                return
-
-            bugid = None
-            for changeset in changesets:
-                bugid = bugid or extract_bugid(changesets[changeset])
-
-            if not bugid:
-                logger.error('could not find bug id')
-                return
 
             # insert into database
             query = """
-                insert into AutolandRequest(tree,revision,bugid,last_updated)
-                values(%s,%s,%s,%s)
+                insert into AutolandRequest(tree,revision,bugid,blame,message,last_updated)
+                values(%s,%s,%s,%s,%s,%s)
             """
-            cursor.execute(query, (tree, rev, bugid, datetime.datetime.now()))
+            cursor.execute(query, (tree, rev, bugid, blame, message, datetime.datetime.now()))
             dbconn.commit()
     elif key.find('finished') != -1:
         rev = None
@@ -166,7 +163,7 @@ def main():
         try:
             pulse.listen()
         except IOError as e:
-            logger.error('pulse error: ' + str(e))
+            logger.debug('pulse error: ' + str(e))
 
 if __name__ == '__main__':
     main()

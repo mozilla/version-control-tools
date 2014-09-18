@@ -6,10 +6,13 @@ BUGZILLA_URL = 'https://bugzilla.mozilla.org'
 def login():
     user, passwd = open('bugzilla-credentials.txt').read().strip().split(',')
     url = BUGZILLA_URL + '/rest/login?login=' + user + '&password=' + passwd
-    r = requests.get(url)
-    if r.status_code == 200:
-        token = json.loads(r.text)['token']
-        return token
+    try:
+        r = requests.get(url)
+        if r.status_code == 200:
+            token = json.loads(r.text)['token']
+            return token
+    except requests.exceptions.ConnectionError:
+        pass
 
 def add_comment(token, bugid, comment):
     url = BUGZILLA_URL + '/rest/bug/' + bugid + '/comment' + '?token=' + token
@@ -18,5 +21,9 @@ def add_comment(token, bugid, comment):
         'id': bugid,
         'comment': comment,
     }
-    r = requests.post(url, data=data)
-    return r.status_code, r.text
+    try:
+        r = requests.post(url, data=data)
+    except requests.exceptions.ConnectionError:
+        return
+    if r.status_code == 200:
+        return r.text

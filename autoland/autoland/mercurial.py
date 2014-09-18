@@ -23,3 +23,9 @@ def get_changesets(tree, pushlog):
             text = get_raw_revision(tree, changeset)
             changesets[changeset] = text
     return changesets
+
+def get_tree_permissions(tree):
+    url = MERCURIAL_URL + '/repo-group?repo=' + tree
+    r = requests.get(url)
+    if r.status_code == 200:
+        return r.text
