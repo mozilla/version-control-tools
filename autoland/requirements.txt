@@ -1,6 +1,6 @@
 beautifulsoup4
-python-ldap
 mozillapulse
 mozlog == 2.2
 psycopg2
+python-ldap
 requests
