@@ -345,8 +345,9 @@ def pushlogHTML(web, req, tmpl):
     def nodeinbranch(repo, ctx):
         branches = []
         branch = ctx.branch()
-        if branch != 'default' and repo.branchtags().get(branch) != ctx.node():
-            branches.append({"name": branch})
+        if hasattr(repo, 'branchtags'):
+            if branch != 'default' and repo.branchtags().get(branch) != ctx.node():
+                branches.append({"name": branch})
         return branches
 
     def changenav():
