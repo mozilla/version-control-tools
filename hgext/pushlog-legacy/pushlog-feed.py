@@ -338,8 +338,9 @@ def pushlogHTML(web, req, tmpl):
         # If this is an empty repo, ctx.node() == nullid,
         # ctx.branch() == 'default', but branchtags() is
         # an empty dict. Using dict.get avoids a traceback.
-        if repo.branchtags().get(branch) == ctx.node():
-            branches.append({"name": branch})
+        if hasattr(repo, 'branchtags'):
+            if repo.branchtags().get(branch) == ctx.node():
+                branches.append({"name": branch})
         return branches
 
     def nodeinbranch(repo, ctx):
