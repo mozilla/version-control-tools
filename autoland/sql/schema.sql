@@ -1,5 +1,4 @@
-drop role if exists autoland;
-create user autoland password 'autoland';
+alter user autoland with password 'autoland';
 
 create table AutolandRequest (
     tree varchar(20),

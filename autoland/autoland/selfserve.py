@@ -62,7 +62,7 @@ def job_is_done(auth, branch, rev):
     try:
         r = requests.get(BUILDAPI_URL + '/' + branch + '/rev/' + rev + '/is_done', auth=auth)
     except requests.exceptions.ConnectionError:
-        return   
+        return
     if r.status_code == 200:
         soup = bs4.BeautifulSoup(r.text)
         return json.loads(soup.text)

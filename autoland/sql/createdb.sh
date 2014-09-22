@@ -1,9 +1,13 @@
 #!/bin/bash
 # This script must be run as the postgres user
-
-# create database
 dropdb autoland
-createdb autoland
+dropdb testautoland
 
-# populate tables
+dropuser autoland
+createuser autoland -S -D -R
+
+createdb autoland
 psql autoland -f schema.sql
+
+createdb testautoland
+psql testautoland -f schema.sql

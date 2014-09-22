@@ -1,0 +1,270 @@
+[
+  {
+    "comment": "Merge m-c to b2g-inbound.", 
+    "bugid": null
+  },
+  {
+    "comment": "Backed out changeset 317c684efd2d (bug 997908) for mochitest-e10s leaks.", 
+    "bugid": "997908"
+  },
+  {
+    "comment": "Backed out changeset 944bd4284ace (bug 1063053) for B2G bustage.", 
+    "bugid": "1063053"
+  },
+  {
+    "comment": "Bug 1058158 - Run marionette unit tests in test-container, remove oop option_ r=jgriffin a=test-only", 
+    "bugid": "1058158"
+  },
+  {
+    "comment": "try: -b do -p all -u none -t none", 
+    "bugid": null
+  },
+  {
+    "comment": "try: -b do -p all -u all[x64] -t none", 
+    "bugid": null
+  },
+  {
+    "comment": "Gaia PR#24229: Dave Huseby (dhuseby) mozilla-b2g:master <-- privacy-panel-master", 
+    "bugid": null
+  },
+  {
+    "comment": "Gaia PR#24204: David Flanagan (davidflanagan) mozilla-b2g:master <-- bug1068986", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 1063053 - Add stronger types to WebGL texture code for better debug/compile time checking. r=jgilbert,kamidphish", 
+    "bugid": "1063053"
+  },
+  {
+    "comment": "try: -b do -p all -u all -t none", 
+    "bugid": null
+  },
+  {
+    "comment": "Merge inbound to m-c. a=merge", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 1063318: Switch Chromium IPC code to Mozilla_s ref/auto ptr types. Also fix thread safety bug. r=nfroyd", 
+    "bugid": "1063318"
+  },
+  {
+    "comment": "Bumping manifests a=b2g-bump", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 1063561 - Convert Addon Manager telemetry timings to use Components.utils.now()_ r=irvingreid", 
+    "bugid": "1063561"
+  },
+  {
+    "comment": "Backing out bug 893276 for causing bug 1058840. a=lmandel", 
+    "bugid": "893276" 
+  },
+  {
+    "comment": "Bug 1057563 - There is no need to sync with the GC helper thread between slices; r=jonco", 
+    "bugid": "1057563"
+  },
+  {
+    "comment": "try: -b o -p android,android-x86 -u all -t all", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 918828, part 4 - Implement JSOP_SYMBOL in the baseline compiler. r=nbp. try: -b d -p linux64,linux64-st-an,macosx64 -u all[10.8,x64] -t none", 
+    "bugid": "918828"
+  },
+  {
+    "comment": "Bug 1066319 - Reject mp4 files with unreasonable sample sizes. r=ajones, a=lmandel", 
+    "bugid": "1066319"
+  },
+  {
+    "comment": "Merge fx-team to m-c. a=merge", 
+    "bugid": null
+  },
+  {
+    "comment": "try: -b do -p all -u all -t all", 
+    "bugid": null
+  },
+  {
+    "comment": "Merge m-c to inbound.", 
+    "bugid": null
+  },
+  {
+    "comment": "[S] mobile: Bug 1066634 - Make new Tablet configuration-related strings localizable", 
+    "bugid": "1066634"
+  },
+  {
+    "comment": "try: -b d -p win32 -u all -t none", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 1068852 - Highlight search suggestions on hover/mouseover on about:home/about:newtab. r=MattN, a=sylvestre", 
+    "bugid": "1068852"
+  },
+  {
+    "comment": "Gaia PR#24197: Wilson Page (wilsonpage) mozilla-b2g:master <-- 1069200", 
+    "bugid": null
+  },
+  {
+    "comment": "Merge m-c to oak.", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 1068123 - Make the MOZ_GCTIMER logs more verbose and readable_ r=jonco", 
+    "bugid": "1068123"
+  },
+  {
+    "comment": "Backing out bug 893276 for causing bug 1058840.", 
+    "bugid": "893276" 
+  },
+  {
+    "comment": "Bug 999239: Copy session history when recreating browser element for the remote -> non-remote transition. CLOSED TREE. try: -b do -p linux,linux64,linux64-asan,macosx64,win32 -u all -t none", 
+    "bugid": "999239"
+  },
+  {
+    "comment": "Bug 1069569 - Complain about missing test files for all suites. r=mshal", 
+    "bugid": "1069569"
+  },
+  {
+    "comment": "Gaia PR#24010: Wilson Page (wilsonpage) mozilla-b2g:master <-- 1066660", 
+    "bugid": null
+  },
+  {
+    "comment": "Merge m-c to fx-team.", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 1068388 - Part 5: If stumbler built off, test should ignore stumbler prefs. r=nalexander", 
+    "bugid": "1068388"
+  },
+  {
+    "comment": "Gaia PR#24216:  (lissyx) mozilla-b2g:master <-- bug1068860", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 1057563 - There is no need to sync with the GC helper thread between slices_ r=jonco", 
+    "bugid": "1057563"
+  },
+  {
+    "comment": "Bug 967977 - Add pref to disable session identifiers (session tickets and session IDs). r=dkeeler", 
+    "bugid": "967977"
+  },
+  {
+    "comment": "Bug 1066319 - Reject mp4 files with unreasonable sample sizes. r=ajones, a=lmandel\n\nDon't believe the Sample Size Box if it declares too large a value.\n\nThe limit is four times the fallback voodoo constant for 1080p in\nthe stsz parser, to support UHD but not 8k video, per current limits\nelsewhere.", 
+    "bugid": "1066319"
+  },
+  {
+    "comment": "backout 79bf6ebacb09 for causing 1070072", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 997908 DeferredFinalize test, try: -b do -p all -u all", 
+    "bugid": "997908"
+  },
+  {
+    "comment": "Bug 1067998 - Fix OOM crash in gfxAlphaBoxBlur::Init on large blur surface. r=Bas, a=bkerensa", 
+    "bugid": "1067998"
+  },
+  {
+    "comment": "try: -b do -p macosx64 -u reftest -t none", 
+    "bugid": null
+  },
+  {
+    "comment": "Gaia PR#24148: Kevin Grandon (KevinGrandon) mozilla-b2g:master <-- bug_1068888_places_defer_save_appload", 
+    "bugid": null
+  },
+  {
+    "comment": "try: -u all", 
+    "bugid": null
+  },
+  {
+    "comment": "try: -b do -p win32,linux -u crashtest,xpcshell,mochitests -t none", 
+    "bugid": null
+  },
+  {
+    "comment": "Gaia PR#24193: Douglas Sherk (DouglasSherk) mozilla-b2g:master <-- 1069439-ice-contacts-broken", 
+    "bugid": null
+  },
+  {
+    "comment": "Gaia master branch push by Douglas Sherk (DouglasSherk) c7ef0bf...d8f1475", 
+    "bugid": null
+  },
+  {
+    "comment": "Gaia PR#11500: Jim Porter (jimporter) mozilla-b2g:master <-- music-id3-improvements", 
+    "bugid": null
+  },
+  {
+    "comment": "Gaia PR#23967: Sam Foster (sfoster) mozilla-b2g:master <-- task-manager-bug-1065511", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 1066175 - Only crash when crash reporting annotation succeeds. r=snorp, a=sledru", 
+    "bugid": "1066175"
+  },
+  {
+    "comment": "Bug 1040735 - DOM node reinsertion under anonymous content may trigger a11y child adoption, r=bz, tbdaunde, davidb try: -u all", 
+    "bugid": "1040735"
+  },
+  {
+    "comment": "Bug 1068230 - Don't use the gfxContext transform in intermediate surface. r=seth, a=sledru", 
+    "bugid": "1068230"
+  },
+  {
+    "comment": "Bug 1064433 - Remove old unused webgl conformance mochitest files. - r=kamidphish", 
+    "bugid": "1064433"
+  },
+  {
+    "comment": "try: -n -b do -p all -t none -u none", 
+    "bugid": null
+  },
+  {
+    "comment": "[S] toolkit: Bug 1065303 - Prepare autocomplete.xml/UnifiedComplete for adding new special result types and heuristics", 
+    "bugid": "1065303"
+  },
+  {
+    "comment": "try: -b do -p all -u reftest,reftest-ipc,reftest-no-accel,crashtest,plain-reftest-1,plain-reftest-2,plain-reftest-3,plain-reftest-4,plain-reftest-5,plain-reftest-6,plain-reftest-7,plain-reftest-8,plain-reftest-9,plain-reftest-10,plain-reftest-11,plain-reftest-12,plain-reftest-13,plain-reftest-14,plain-reftest-15,plain-reftest-16,reftest-1,reftest-2,reftest-3,reftest-4,reftest-5,reftest-6,reftest-7,reftest-8,reftest-9,reftest-10,reftest-11,reftest-12,reftest-13,reftest-14,reftest-15,reftest-16,reftest-17,reftest-18,reftest-19,reftest-20 -t none", 
+    "bugid": null
+  },
+  {
+    "comment": "try: -b do -p linux,linux64,linux64-asan,macosx64,win32 -u all -t none", 
+    "bugid": null
+  },
+  {
+    "comment": "try: -b do -p all -u all", 
+    "bugid": null
+  },
+  {
+    "comment": "try: -b do -p android,android-x86 -u robocop-1,robocop-2,robocop-3,robocop-4,robocop-5 -t none", 
+    "bugid": null
+  },
+  {
+    "comment": "Gaia PR#23520: punamdahiya mozilla-b2g:master <-- Bug1042319", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 1068230 - Don_t use the gfxContext transform in intermediate surface. r=seth, a=sledru", 
+    "bugid": "1068230"
+  },
+  {
+    "comment": "Bug 1065130 - nsFtpState::mDoomCache is used uninitialised r=jduell", 
+    "bugid": "1065130"
+  },
+  {
+    "comment": "Gaia v2.0 branch push by Ryan VanderMeulen (rvandermeulen) 31434a3...d904bc0", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 1063877 - Change nsVolumeService to use sync IPC for initial request. r=khuey, a=bajaj", 
+    "bugid": "1063877"
+  },
+  {
+    "comment": "try: -b d -p linux64,linux64-st-an,macosx64 -u all[10.8,x64] -t none", 
+    "bugid": null
+  },
+  {
+    "comment": "Bug 1026556 - Stk Timer Management Proactive Command error conditions not supported. r=htsai, sr=jonas, a=bajaj", 
+    "bugid": "1026556"
+  },
+  {
+    "comment": "try: -b d -p emulator -u all -t none", 
+    "bugid": null
+  }
+]

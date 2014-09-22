@@ -47,7 +47,7 @@ def handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame):
         where tree=%s and revision=%s
     """
     cursor.execute(query, (datetime.datetime.now(), tree, rev))
-    dconn.commit()
+    dbconn.commit()
 
     comment = 'Autoland request failed. User %s has insufficient permissions to land on tree %s.' %  (blame, tree)
     add_bugzilla_comment(dbconn, bugid, comment)

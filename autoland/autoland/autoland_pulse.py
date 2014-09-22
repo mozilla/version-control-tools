@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 import argparse
+import amqp
 import datetime
 import httplib
 import json
 import logging
 import psycopg2
 import re
-import requests
 import string
 import uuid
+
+seen_comments = {}
 
 from mozillapulse import consumers
 
@@ -19,17 +21,13 @@ from mozlog.structured import (
     structuredlog,
 )
 
-import mercurial
 import selfserve
 
+# Some global variables that we need in the 'handle_message' callback
+auth = None
 dbconn = None
 logger = None
-
-def extract_try(patch):
-    for line in patch.split('\n'):
-        i = line.find('try:')
-        if i != -1:
-            return line[i:]
+message_log_path = None
 
 def extract_bugid(patch):
     #TODO: check to see if there is an "official" re for this
@@ -38,11 +36,28 @@ def extract_bugid(patch):
     if m:
         return m.groups()[0]
 
+def is_known_autoland_job(dbconn, tree, rev): 
+    cursor = dbconn.cursor()
+
+    # see if we know already know about this autoland request
+    query = """select revision from AutolandRequest
+               where tree=%(tree)s
+               and substring(revision, 0, %(len)s)=%(rev)s"""
+    cursor.execute(query, {'tree': tree,
+                           'len': len(rev) + 1,
+                           'rev': rev})
+    row = cursor.fetchone()
+    return row is not None
+
 def handle_message(data, message):
     message.ack()
 
     key = data['_meta']['routing_key']
     payload = data['payload']
+
+    if message_log_path:
+        with open(message_log_path, 'a') as f:
+            json.dump(data, f, indent=2, sort_keys=True)
 
     if key.find('started') != -1:
         blame = payload['build']['blame']
@@ -68,9 +83,6 @@ def handle_message(data, message):
         except KeyError:
             pass
 
-        #if tree == 'try':
-        #    print(json.dumps(payload, sort_keys=True, indent=2))
-        #    print(rev, autoland, comments)
         if autoland:
             logger.debug('found autoland job: %s %s' % (tree, rev))
 
@@ -80,29 +92,17 @@ def handle_message(data, message):
             else:
                 logger.debug('bugid %s' % bugid)
 
-
-            cursor = dbconn.cursor()
-
-            # see if we know already know about this autoland request
-            query = """select revision from AutolandRequest
-                       where tree=%(tree)s
-                       and substring(revision, 0, %(len)s)=%(rev)s"""
-            cursor = dbconn.cursor()
-            cursor.execute(query, {'tree': tree,
-                                   'len': len(rev) + 1,
-                                   'rev': rev})
-            row = cursor.fetchone()
-            if row is not None:
-                logger.debug('autoland job already known')
+            if is_known_autoland_job(dbconn, tree, rev):
                 return
 
-            logger.debug('found new autoland job!')
+            logger.debug('found new autoland job')
 
             # insert into database
             query = """
                 insert into AutolandRequest(tree,revision,bugid,blame,message,last_updated)
                 values(%s,%s,%s,%s,%s,%s)
             """
+            cursor = dbconn.cursor()
             cursor.execute(query, (tree, rev, bugid, blame, message, datetime.datetime.now()))
             dbconn.commit()
     elif key.find('finished') != -1:
@@ -114,18 +114,10 @@ def handle_message(data, message):
             elif prop[0] == 'branch':
                 tree = prop[1]
 
-        if tree == 'try' and rev:
-            #print('finished', tree, rev)
-            query = """select revision from AutolandRequest
-                       where tree=%(tree)s
-                       and substring(revision, 0, %(len)s)=%(rev)s"""
-            cursor = dbconn.cursor()
-            cursor.execute(query, {'tree': tree,
-                                   'len': len(rev) + 1,
-                                   'rev': rev})
-            row = cursor.fetchone()
-            if row is not None:
+        if tree and rev:
+            if is_known_autoland_job(dbconn, tree, rev):
                 logger.debug('updating autoland job: %s %s' % (tree, rev))
+
                 pending, running, builds = selfserve.jobs_for_revision(auth, tree, rev)
                 logger.debug('pending: %d running: %d builds: %d' % (len(pending), len(running), len(builds)))
 
@@ -134,18 +126,21 @@ def handle_message(data, message):
                         running=%s,builds=%s,last_updated=%s
                     where tree=%s
                     and substring(revision, 0, %s)=%s"""
+                cursor = dbconn.cursor()
                 cursor.execute(query, (len(pending), len(running), len(builds), datetime.datetime.now(), tree, len(rev) + 1, rev))
-
-            dbconn.commit()
+                dbconn.commit()
 
 def main():
     global auth
     global dbconn
     global logger
+    global message_log_path
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--dsn', default='dbname=autoland user=autoland host=localhost password=autoland',
                         help='Postgresql DSN connection string')
+    parser.add_argument('--message-log-path', default=None,
+                        help='Path to which to log received messages')
     commandline.add_logging_group(parser)
     args = parser.parse_args()
 
@@ -156,12 +151,22 @@ def main():
     auth = selfserve.read_credentials()
     dbconn = psycopg2.connect(args.dsn)
 
+    if args.message_log_path:
+        try:
+            open(args.message_log_path, 'w')
+            message_log_path = args.message_log_path
+        except IOError:
+            pass
+
     unique_label = 'autoland-%s' % uuid.uuid4()
     pulse = consumers.BuildConsumer(applabel=unique_label)
-    pulse.configure(topic=['build.#'], callback=handle_message)
+    pulse.configure(topic=['build.#.started', 'build.#.finished'],
+                    callback=handle_message)
     while True:
         try:
             pulse.listen()
+        except amqp.exceptions.ConnectionForced as e:
+            logger.debug('pulse error: ' + str(e))
         except IOError as e:
             logger.debug('pulse error: ' + str(e))
 
