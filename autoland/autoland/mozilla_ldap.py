@@ -4,7 +4,7 @@ LDAP_HOST = 'ldap.db.scl3.mozilla.com'
 LDAP_PORT = 389
 
 def read_credentials():
-    user, passwd = open('ldap-credentials.txt').read().strip().split(',')
+    user, passwd = open('credentials/ldap.txt').read().strip().split(',')
     return (user, passwd)
 
 def check_group(auth, group, email):

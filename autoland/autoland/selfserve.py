@@ -5,7 +5,7 @@ import requests
 BUILDAPI_URL = 'https://secure.pub.build.mozilla.org/buildapi/self-serve'
 
 def read_credentials():
-    user, passwd = open('selfserve-credentials.txt').read().strip().split(',')
+    user, passwd = open('credentials/selfserve.txt').read().strip().split(',')
     return (user, passwd)
 
 def make_buildprops(buildurl, testsurl):

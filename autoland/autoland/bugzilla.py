@@ -4,7 +4,7 @@ import requests
 BUGZILLA_URL = 'https://bugzilla.mozilla.org'
 
 def login():
-    user, passwd = open('bugzilla-credentials.txt').read().strip().split(',')
+    user, passwd = open('credentials/bugzilla.txt').read().strip().split(',')
     url = BUGZILLA_URL + '/rest/login?login=' + user + '&password=' + passwd
     try:
         r = requests.get(url)
