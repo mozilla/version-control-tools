@@ -12,6 +12,7 @@ create table AutolandRequest (
     last_updated timestamp,
     can_be_landed boolean,
     landed boolean,
+    transplant_result text,
     primary key(tree, revision)
 );
 grant all privileges on table AutolandRequest to autoland;

@@ -16,13 +16,11 @@ def transplant(src, dest, changesets, message):
              'message': message}
         ]
     }
-    print(json.dumps(data, indent=2))
     try:
         r = requests.post(url, data=json.dumps(data), headers=headers)
     except requests.exceptions.ConnectionError:
         return
-    if r.status_code == 200:
-        return r.text
+    return json.loads(r.text)
 
 if __name__ == '__main__':
     print(transplant('transplant-src', 'transplant-dst',

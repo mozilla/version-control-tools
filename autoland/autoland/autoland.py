@@ -28,7 +28,7 @@ def handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id
     logger.debug('autoland request %s %s needs to retry job for %s' % (tree, rev, buildername))
     job_id = selfserve.rebuild_job(auth, tree, build_id)
     if job_id:
-        logger.debug('submitted rebuild request %s for autoland job %s %s' % (job_id, tree, rev))
+        logger.info('submitted rebuild request %s for autoland job %s %s' % (job_id, tree, rev))
         cursor = dbconn.cursor()
         query = """
             update AutolandRequest set last_updated=%s
@@ -37,7 +37,7 @@ def handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id
         cursor.execute(query, (datetime.datetime.now(), tree, rev))
         dbconn.commit()
     else:
-        logger.debug('could not rebuild %s for autoland job %s %s' % (build_id, tree, rev))
+        logger.info('could not rebuild %s for autoland job %s %s' % (build_id, tree, rev))
 
 
 def handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame):
@@ -53,7 +53,7 @@ def handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame):
     add_bugzilla_comment(dbconn, bugid, comment)
 
 def handle_failure(logger, dbconn, tree, rev, bugid, buildername):
-    logger.debug('autoland request %s %s has too many failures for %s' % (tree, rev, buildername))
+    logger.info('autoland request %s %s has too many failures for %s' % (tree, rev, buildername))
 
     cursor = dbconn.cursor()
     query = """
@@ -69,7 +69,7 @@ def handle_failure(logger, dbconn, tree, rev, bugid, buildername):
     add_bugzilla_comment(dbconn, bugid, comment)
 
 def handle_can_be_landed(logger, dbconn, tree, rev):
-    logger.debug('autoland request %s %s can be landed' % (tree, rev))
+    logger.info('autoland request %s %s can be landed' % (tree, rev))
     cursor = dbconn.cursor()
     query = """
         update AutolandRequest set can_be_landed=true,last_updated=%s
@@ -79,17 +79,16 @@ def handle_can_be_landed(logger, dbconn, tree, rev):
     dbconn.commit()
 
 def handle_pending_transplants(logger, dbconn):
-
     cursor = dbconn.cursor()
     query = """
-        select tree,revision,bugid from AutolandRequest
+        select tree,revision,bugid,message from AutolandRequest
         where can_be_landed is true and landed is null
     """
     cursor.execute(query)
 
     landed = []
     for row in cursor.fetchall():
-        tree, rev, bugid = row
+        tree, rev, bugid, message = row
 
         pushlog = mercurial.get_pushlog(tree, rev)
         if not pushlog:
@@ -101,21 +100,26 @@ def handle_pending_transplants(logger, dbconn):
             for changeset in pushlog[key]['changesets']:
                 changesets.append(changeset)
 
-        status, text = transplant.transplant(tree, 'mozilla-inbound', changesets, message)
-        if status != 200:
-            logger.debug('could not transplant changesets: %s' % text)
-            return
+        # TODO: allow for transplant to other trees than 'mozilla-inbound'
+        result = transplant.transplant(tree, 'mozilla-inbound', changesets, message)
 
-        landed.append([datetime.datetime.now(), tree, rev])
+        if not result:
+            continue
 
-        comment = 'Autoland request succeeded!'
+        if 'error' in result:
+            succeeded = False
+            logger.info('transplant failed: tree: %s rev: %s error: %s' % (tree, rev, json.dumps(result)))
+            comment = 'Autoland request failed: could not transplant: %s' % result['error']
+        else:
+            succeeded = True
+            comment = 'Autoland request succeeded.'
+
+        landed.append([succeeded, json.dumps(result), datetime.datetime.now(), tree, rev])
         add_bugzilla_comment(dbconn, bugid, comment)
 
     if landed:
-        # TODO: These could be deleted instead of updated but in the short
-        #term, having this here will be helpful for debugging.
         query = """
-            update AutolandRequest set landed=true,last_updated=%s
+            update AutolandRequest set landed=%s,transplant_result=%s,last_updated=%s
             where tree=%s and revision=%s
         """
         cursor.executemany(query, landed)
@@ -123,7 +127,7 @@ def handle_pending_transplants(logger, dbconn):
 
 def handle_autoland_request(logger, auth, dbconn, tree, rev):
 
-    logger.debug('looking at autoland request %s %s' % (tree, rev))
+    logger.info('looking at autoland request %s %s' % (tree, rev))
 
     status = selfserve.job_is_done(auth, tree, rev)
     if not status:
@@ -157,7 +161,7 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         result = mozilla_ldap.check_group(auth, 'scm_level_3', blame)
         if result is None:
             # can't check credentials right now, we'll try again later
-            logger.debug('could not check ldap group')
+            logger.info('could not check ldap group')
             return
 
         if not result:
@@ -166,7 +170,7 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
 
     # everything passed, so we can land
     if status['job_passed']:
-        return handle_can_be_landed(logger, dbconn, tree, rev, bugid)
+        return handle_can_be_landed(logger, dbconn, tree, rev)
 
     pending, running, builds = selfserve.jobs_for_revision(auth, tree, rev)
 
@@ -175,7 +179,7 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         return
 
     if len(pending) > 0 or len(running) > 0:
-        logger.debug('autoland request %s %s still has pending or running jobs: %d %d' % (tree, rev, len(pending), len(running)))
+        logger.info('autoland request %s %s still has pending or running jobs: %d %d' % (tree, rev, len(pending), len(running)))
         query = """
             update AutolandRequest set pending=%s,running=%s,
                                        builds=%s,last_updated=%s
@@ -258,7 +262,7 @@ def main():
 
     logging.basicConfig()
     logger = commandline.setup_logging('autoland', vars(args), {})
-    logger.debug('starting autoland')
+    logger.info('starting autoland')
 
     auth = selfserve.read_credentials()
     dbconn = psycopg2.connect(args.dsn)

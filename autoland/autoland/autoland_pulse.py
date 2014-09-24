@@ -84,18 +84,18 @@ def handle_message(data, message):
             pass
 
         if autoland:
-            logger.debug('found autoland job: %s %s' % (tree, rev))
+            logger.info('found autoland job: %s %s' % (tree, rev))
 
             if not bugid:
-                logger.debug('autoland job missing bugid')
+                logger.info('autoland job missing bugid')
                 return
             else:
-                logger.debug('bugid %s' % bugid)
+                logger.info('bugid %s' % bugid)
 
             if is_known_autoland_job(dbconn, tree, rev):
                 return
 
-            logger.debug('found new autoland job')
+            logger.info('found new autoland job')
 
             # insert into database
             query = """
@@ -116,10 +116,10 @@ def handle_message(data, message):
 
         if tree and rev:
             if is_known_autoland_job(dbconn, tree, rev):
-                logger.debug('updating autoland job: %s %s' % (tree, rev))
+                logger.info('updating autoland job: %s %s' % (tree, rev))
 
                 pending, running, builds = selfserve.jobs_for_revision(auth, tree, rev)
-                logger.debug('pending: %d running: %d builds: %d' % (len(pending), len(running), len(builds)))
+                logger.info('pending: %d running: %d builds: %d' % (len(pending), len(running), len(builds)))
 
                 query = """
                     update AutolandRequest set pending=%s,
@@ -146,7 +146,7 @@ def main():
 
     logging.basicConfig()
     logger = commandline.setup_logging('autoland-pulse', vars(args), {})
-    logger.debug('starting pulse listener')
+    logger.info('starting pulse listener')
 
     auth = selfserve.read_credentials()
     dbconn = psycopg2.connect(args.dsn)
@@ -166,9 +166,9 @@ def main():
         try:
             pulse.listen()
         except amqp.exceptions.ConnectionForced as e:
-            logger.debug('pulse error: ' + str(e))
+            logger.error('pulse error: ' + str(e))
         except IOError as e:
-            logger.debug('pulse error: ' + str(e))
+            logger.error('pulse error: ' + str(e))
 
 if __name__ == '__main__':
     main()

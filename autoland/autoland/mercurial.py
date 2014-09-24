@@ -6,15 +6,21 @@ MERCURIAL_URL = 'http://hg.mozilla.org'
 def get_pushlog(tree, rev):
     url = MERCURIAL_URL + '/' + tree + '/json-pushes?changeset=' + rev
 
-    r = requests.get(url)
+    try:
+        r = requests.get(url)
+    except requests.exceptions.ConnectionError:
+        return
     if r.status_code == 200:
         return json.loads(r.text)
 
 def get_raw_revision(tree, rev):
-        url = MERCURIAL_URL + '/' + tree + '/raw-rev/' + rev
+    url = MERCURIAL_URL + '/' + tree + '/raw-rev/' + rev
+    try:
         r = requests.get(url)
-        if r.status_code == 200:
-            return r.text
+    except requests.exceptions.ConnectionError:
+        return
+    if r.status_code == 200:
+        return r.text
 
 def get_changesets(tree, pushlog):
     changesets = {}
@@ -23,9 +29,3 @@ def get_changesets(tree, pushlog):
             text = get_raw_revision(tree, changeset)
             changesets[changeset] = text
     return changesets
-
-def get_tree_permissions(tree):
-    url = MERCURIAL_URL + '/repo-group?repo=' + tree
-    r = requests.get(url)
-    if r.status_code == 200:
-        return r.text
