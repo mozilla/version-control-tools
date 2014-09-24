@@ -162,6 +162,7 @@ def main():
     pulse = consumers.BuildConsumer(applabel=unique_label)
     pulse.configure(topic=['build.#.started', 'build.#.finished'],
                     callback=handle_message)
+    logger.debug('applabel: %s' % unique_label)
     while True:
         try:
             pulse.listen()
