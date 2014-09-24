@@ -21,7 +21,3 @@ def transplant(src, dest, changesets, message):
     except requests.exceptions.ConnectionError:
         return
     return json.loads(r.text)
-
-if __name__ == '__main__':
-    print(transplant('transplant-src', 'transplant-dst',
-                ['0f10a48de152', '67f4411247cc'], 'hi there'))

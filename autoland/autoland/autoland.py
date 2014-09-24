@@ -112,7 +112,7 @@ def handle_pending_transplants(logger, dbconn):
             comment = 'Autoland request failed: could not transplant: %s' % result['error']
         else:
             succeeded = True
-            comment = 'Autoland request succeeded.'
+            comment = 'Autoland request succeeded: mozilla-inbound tip: %s' % result['tip']
 
         landed.append([succeeded, json.dumps(result), datetime.datetime.now(), tree, rev])
         add_bugzilla_comment(dbconn, bugid, comment)
