@@ -224,7 +224,43 @@ def fullpaths(ui, repo, paths):
     cwd = os.getcwd()
     return [pathutil.canonpath(repo.root, cwd, path) for path in paths]
 
-def patch_changes(ui, repo, patchfile=None, **opts):
+def at_most(gen, seen, limit):
+    for result in gen:
+        if len(seen) >= limit:
+            return
+        seen.add(result)
+        yield result
+
+def cmdutil_getlogrevs(repo, pats, opts):
+    result = cmdutil.getlogrevs(repo, pats, opts)
+    if not result:
+        return result
+    if len(result) == 2:
+        return result
+    revs, _, filematcher = result
+    return revs, filematcher
+        
+def get_logrevs_for_files(repo, files, found, opts):
+    limit = opts['limit'] or 1000000
+    seen = set()
+
+    revs, filematcher = cmdutil_getlogrevs(repo, files, {'limit': limit})
+    for rev in at_most(revs, seen, limit):
+        yield rev
+
+    # The consumer has declared that it has seen enough, so don't retry with --follow.
+    if found[0]:
+        return
+
+    # Only keep the file paths, not the directory globs, since they are
+    # incompatible with --follow.
+    files = [f for f in files if 'path:' in f]
+
+    revs, filematcher = cmdutil_getlogrevs(repo, files, {'follow': True, 'limit': limit - len(seen)})
+    for rev in at_most(revs, seen, limit):
+        yield rev
+
+def patch_changes(ui, repo, found, patchfile=None, **opts):
     '''Given a patch, look at what files it changes, and map a function over
     the changesets that touch overlapping files.
 
@@ -236,12 +272,17 @@ def patch_changes(ui, repo, patchfile=None, **opts):
 
     Alternatively, the -f option may be used to pass in one or more files
     that will be used directly.
+
+    The changes will first be found without following renames. If after
+    yielding all changes the caller has not yet set found[0] to True, try again
+    with --follow and yield any new changes found. (--follow is substantially
+    slower, even at beginning to yield results.)
     '''
 
     if opts.get('file'):
         changedFiles = fullpaths(ui, repo, opts['file'])
     elif opts.get('dir'):
-        changedFiles = None
+        changedFiles = opts['dir']  # For --debug printout only
     elif opts.get('rev'):
         revs = scmutil.revrange(repo, opts['rev'])
         if not revs:
@@ -293,7 +334,7 @@ def patch_changes(ui, repo, patchfile=None, **opts):
         if len(changedFiles) == 0:
             ui.write("Warning: no modified files found in patch. Did you mean to use the -f option?\n")
 
-    if ui.verbose and changedFiles is not None:
+    if ui.verbose:
         ui.write("Using files:\n")
         if len(changedFiles) == 0:
             ui.write("  (none)\n")
@@ -310,23 +351,8 @@ def patch_changes(ui, repo, patchfile=None, **opts):
         if len(exactFiles) == 0:
             return
 
-    remaining = opts['limit']
-    revs, expr, filematcher = cmdutil.getlogrevs(repo, exactFiles, {})
-    for rev in revs:
+    for rev in get_logrevs_for_files(repo, exactFiles, found, opts):
         yield repo[rev]
-        if remaining <= 1:
-            break
-        remaining -= 1
-    return
-
-    matchfn = scmutil.match(repo[None], exactFiles)
-    remaining = opts['limit']
-    opts['rev'] = None
-    for ctx in cmdutil.walkchangerevs(repo, matchfn, opts, lambda a,b: None):
-        if remaining == 0:
-            break
-        remaining -= 1
-        yield repo[ctx.rev()]
 
 fileRe = re.compile(r"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
 suckerRe = re.compile(r"[^s-]r=(\w+)")
@@ -364,11 +390,15 @@ def reviewers(ui, repo, patchfile=None, **opts):
     suckers = Counter()
     supersuckers = Counter()
     changeCount = 0
-    for change in patch_changes(ui, repo, patchfile, **opts):
+    found = [False]
+    minSuckers = 5
+    for change in patch_changes(ui, repo, found, patchfile, **opts):
         changeCount += 1
         suckers.update(canon(x) for x in suckerRe.findall(change.description()))
         if not opts.get('brief'):
             supersuckers.update(canon(x) for x in supersuckerRe.findall(change.description()))
+        if len(suckers) >= minSuckers:
+            found[0] = True
 
     if changeCount == 0:
         ui.write("no matching files found\n")
@@ -453,10 +483,14 @@ def fetch_bugs(url, ui, bugs):
 
 def guess_components(ui, repo, patchfile=None, **opts):
     bugs = set()
-    for change in patch_changes(ui, repo, patchfile, **opts):
+    found = [False]
+    minBugs = 5
+    for change in patch_changes(ui, repo, found, patchfile, **opts):
         m = BUG_RE.search(change.description())
         if m:
             bugs.add(m.group(2))
+        if len(bugs) >= minBugs:
+            found[0] = True
     if len(bugs) == 0:
         ui.write("No bugs found\n")
         return
@@ -531,10 +565,14 @@ def bzbugs(ui, repo, patchfile=None, **opts):
     '''
 
     bugs = set()
-    for change in patch_changes(ui, repo, patchfile, **opts):
+    found = [False]
+    minBugs = 5
+    for change in patch_changes(ui, repo, found, patchfile, **opts):
         m = BUG_RE.search(change.description())
         if m:
             bugs.add(m.group(2))
+        if len(bugs) >= minBugs:
+            found[0] = True
 
     if bugs:
         for bug in bugs:
