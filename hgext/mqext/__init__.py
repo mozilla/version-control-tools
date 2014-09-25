@@ -238,9 +238,11 @@ def patch_changes(ui, repo, patchfile=None, **opts):
     that will be used directly.
     '''
 
-    if opts['file']:
+    if opts.get('file'):
         changedFiles = fullpaths(ui, repo, opts['file'])
-    elif opts['rev']:
+    elif opts.get('dir'):
+        changedFiles = None
+    elif opts.get('rev'):
         revs = scmutil.revrange(repo, opts['rev'])
         if not revs:
             raise error.Abort("no changes found")
@@ -264,22 +266,26 @@ def patch_changes(ui, repo, patchfile=None, **opts):
                 ui.pushbuffer()
                 try:
                     commands.diff(ui, repo, change="qtip", git=True)
-                except error.RepoLookupError, e:
+                except error.RepoLookupError:
                     raise error.Abort("no current diff, no mq patch to use")
                 diff = ui.popbuffer()
             else:
                 raise error.Abort("no changes found")
         else:
-            try:
-                diff = url.open(ui, patchfile).read()
-                source = "patch file %s" % patchfile
-            except IOError, e:
-                q = repo.mq
-                if q:
-                    diff = url.open(ui, q.lookup(patchfile)).read()
-                    source = "mq patch %s" % patchfile
-                else:
-                    pass
+            if hasattr(patchfile, 'getvalue'):
+                diff = patchfile.getvalue()
+                source = "patch data"
+            else:
+                try:
+                    diff = url.open(ui, patchfile).read()
+                    source = "patch file %s" % patchfile
+                except IOError:
+                    q = repo.mq
+                    if q:
+                        diff = url.open(ui, q.lookup(patchfile)).read()
+                        source = "mq patch %s" % patchfile
+                    else:
+                        pass
 
         changedFiles = fileRe.findall(diff)
         if ui.verbose:
@@ -287,7 +293,7 @@ def patch_changes(ui, repo, patchfile=None, **opts):
         if len(changedFiles) == 0:
             ui.write("Warning: no modified files found in patch. Did you mean to use the -f option?\n")
 
-    if ui.verbose:
+    if ui.verbose and changedFiles is not None:
         ui.write("Using files:\n")
         if len(changedFiles) == 0:
             ui.write("  (none)\n")
@@ -296,18 +302,30 @@ def patch_changes(ui, repo, patchfile=None, **opts):
                 ui.write("  %s\n" % changedFile)
 
     # Expand files out to their current full paths
-    matchfn = scmutil.match(repo[None], changedFiles, default='relglob')
-    exactFiles = repo.walk(matchfn)
-    if len(exactFiles) == 0:
-        return
+    if opts.get('dir'):
+        exactFiles = ['glob:' + opts['dir'] + '/**']
+    else:
+        matchfn = scmutil.match(repo[None], changedFiles, default='relglob')
+        exactFiles = ['path:' + path for path in repo.walk(matchfn)]
+        if len(exactFiles) == 0:
+            return
 
-    matchfn = scmutil.match(repo[None], exactFiles, default='path')
-    left = opts['limit']
+    remaining = opts['limit']
+    revs, expr, filematcher = cmdutil.getlogrevs(repo, exactFiles, {})
+    for rev in revs:
+        yield repo[rev]
+        if remaining <= 1:
+            break
+        remaining -= 1
+    return
+
+    matchfn = scmutil.match(repo[None], exactFiles)
+    remaining = opts['limit']
     opts['rev'] = None
     for ctx in cmdutil.walkchangerevs(repo, matchfn, opts, lambda a,b: None):
-        if left == 0:
+        if remaining == 0:
             break
-        left -= 1
+        remaining -= 1
         yield repo[ctx.rev()]
 
 fileRe = re.compile(r"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
@@ -414,7 +432,7 @@ def fetch_bugs(url, ui, bugs):
                 if ui.verbose:
                     ui.write("  dropping nonexistent bug %s\n" % m.group(1))
                 badbug = m.group(1)
-            m = re.search(r'You are not authorized to access bug #(\d+)', buginfo['error']['message'])
+            m = re.search(r'You are not authorized to access bug (?:#?)(\d+)', buginfo['error']['message'])
             if m:
                 if ui.verbose:
                     ui.write("  dropping inaccessible bug %s\n" % m.group(1))
@@ -433,26 +451,7 @@ def fetch_bugs(url, ui, bugs):
 
     return buginfo['result']['bugs']
 
-@command('components', [
-    ('f', 'file', [], 'see components for FILE', 'FILE'),
-    ('r', 'rev', [], 'see reviewers for revisions', 'REVS'),
-    ('l', 'limit', 25, 'how many revisions back to scan', 'LIMIT'),
-    ('', 'brief', False, 'shorter output')],
-    _('hg components [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]'))
-def bzcomponents(ui, repo, patchfile=None, **opts):
-    '''Suggest a bugzilla product and component for a patch
-
-    Scan through the last LIMIT commits to find bug product/components that
-    touch the same files.
-
-    The patch may be given as a file or a URL. If no patch is specified,
-    the changes in the working directory will be used. If there are no
-    changes, the topmost applied patch in your mq repository will be used.
-
-    Alternatively, the -f option may be used to pass in one or more files
-    that will be used to infer the component instead.
-    '''
-
+def guess_components(ui, repo, patchfile=None, **opts):
     bugs = set()
     for change in patch_changes(ui, repo, patchfile, **opts):
         m = BUG_RE.search(change.description())
@@ -475,6 +474,29 @@ def bzcomponents(ui, repo, patchfile=None, **opts):
         comp = "%s :: %s" % (b['product'], b['component'])
         ui.debug("bug %s: %s\n" % (b['id'], comp))
         components.update([comp])
+
+    return components
+
+@command('components', [
+    ('f', 'file', [], 'see components for FILE', 'FILE'),
+    ('r', 'rev', [], 'see reviewers for revisions', 'REVS'),
+    ('l', 'limit', 25, 'how many revisions back to scan', 'LIMIT'),
+    ('', 'brief', False, 'shorter output')],
+    _('hg components [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]'))
+def bzcomponents(ui, repo, patchfile=None, **opts):
+    '''Suggest a bugzilla product and component for a patch
+
+    Scan through the last LIMIT commits to find bug product/components that
+    touch the same files.
+
+    The patch may be given as a file or a URL. If no patch is specified,
+    the changes in the working directory will be used. If there are no
+    changes, the topmost applied patch in your mq repository will be used.
+
+    Alternatively, the -f option may be used to pass in one or more files
+    that will be used to infer the component instead.
+    '''
+    components = guess_components(ui, repo, patchfile, **opts)
 
     if opts.get('brief'):
         if len(components) == 0:
