@@ -48,6 +48,9 @@ def hook(ui, repo, hooktype, node, **kwargs):
         'mrbkap',           # Blake Kaplan
         'bholley',          # Bobby Holley
         'baku',             # Andrea Marchesini
+
+        # Non-DOM peers who can review some WebIDL changes
+        'hsinyi',           # Hsin-Yi Tsai for RIL APIs
     ]
     DOM_authors = [
         'jst@mozilla.com',         # Johnny Stenback
