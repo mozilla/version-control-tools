@@ -336,19 +336,17 @@ def pushlogHTML(web, req, tmpl):
         branches = []
         branch = ctx.branch()
         # If this is an empty repo, ctx.node() == nullid,
-        # ctx.branch() == 'default', but branchtags() is
+        # ctx.branch() == 'default', but branchmap is
         # an empty dict. Using dict.get avoids a traceback.
-        if hasattr(repo, 'branchtags'):
-            if repo.branchtags().get(branch) == ctx.node():
-                branches.append({"name": branch})
+        if repo.branchmap().get(branch) == ctx.node():
+            branches.append({'name': branch})
         return branches
 
     def nodeinbranch(repo, ctx):
         branches = []
         branch = ctx.branch()
-        if hasattr(repo, 'branchtags'):
-            if branch != 'default' and repo.branchtags().get(branch) != ctx.node():
-                branches.append({"name": branch})
+        if branch != 'default' and repo.branchmap().get(branch) != ctx.node():
+            branches.append({'name': branch})
         return branches
 
     def changenav():
