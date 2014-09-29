@@ -30,10 +30,6 @@ We currently only post comments to integration/non-release repositories.
 This is because pushes to release repositories involve updating other
 Bugzilla fields. This extension could support these someday - it just
 doesn't yet.
-
-We only support posting comments to known Firefox repositories. This
-extension could be adopted to post URLs to non-Firefox repositories
-as well.
 """
 
 import os
