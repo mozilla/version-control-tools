@@ -21,7 +21,6 @@ import mozilla_ldap
 import selfserve
 import transplant
 
-CHECK_LDAP_GROUP = False  #disable ldap checking (while debugging)
 BUGZILLA_COMMENT_LIMIT = 10  # max comments to post / iteration
 
 def handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id):
@@ -155,18 +154,17 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
     bugid, blame = cursor.fetchone()
 
     # check ldap group
-    if CHECK_LDAP_GROUP:
-        blame = blame.strip('{}')
-        auth = mozilla_ldap.read_credentials()
-        result = mozilla_ldap.check_group(auth, 'scm_level_3', blame)
-        if result is None:
-            # can't check credentials right now, we'll try again later
-            logger.info('could not check ldap group')
-            return
+    blame = blame.strip('{}')
+    auth = mozilla_ldap.read_credentials()
+    result = mozilla_ldap.check_group(auth, 'scm_level_3', blame)
+    if result is None:
+        # can't check credentials right now, we'll try again later
+        logger.info('could not check ldap group')
+        return
 
-        if not result:
-            handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame)
-            return
+    if not result:
+        handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame)
+        return
 
     # everything passed, so we can land
     if status['job_passed']:

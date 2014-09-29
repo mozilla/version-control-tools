@@ -1,7 +1,7 @@
 import ldap
 
-LDAP_HOST = 'ldap.db.scl3.mozilla.com'
-LDAP_PORT = 389
+LDAP_HOST = 'ldap.mozilla.org'
+LDAP_PORT = 636
 
 def read_credentials():
     user, passwd = open('credentials/ldap.txt').read().strip().split(',')
@@ -9,7 +9,7 @@ def read_credentials():
 
 def check_group(auth, group, email):
     try:
-        l = ldap.initialize('ldap://%s:%s' % (LDAP_HOST, LDAP_PORT))
+        l = ldap.initialize('ldaps://%s:%s' % (LDAP_HOST, LDAP_PORT))
         l.protocol_version = ldap.VERSION3
         l.simple_bind_s('uid=%s,ou=logins,dc=mozilla' % auth[0], auth[1])
         l.search('dc=mozilla', ldap.SCOPE_SUBTREE,
