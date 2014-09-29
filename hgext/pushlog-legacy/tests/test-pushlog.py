@@ -120,43 +120,6 @@ class HGWebTest:
 #==============================
 # tests
 
-class TestEmptyRepo(HGWebTest, unittest.TestCase):
-    def setUpRepo(self):
-        # create an empty repo
-        init(self.ui, dest=self.repodir)
-
-    def testemptyrepo(self):
-        """Accessing /pushlog on a repo without a pushlog db should succeed"""
-        # just GET /pushlog and verify that it's 200 OK
-        conn = HTTPConnection("localhost", self.port)
-        conn.request("GET", "/pushlog")
-        r = conn.getresponse()
-        conn.close()
-        self.assertEqual(r.status, 200, "empty pushlog should not error (got HTTP status %d, expected 200)" % r.status)
-        # The webcommand should not create pushlog2.db, it should simply
-        # return no data and allow the db to be created by the hook.
-        self.assertFalse(isfile(join(self.repodir, ".hg", "pushlog2.db")))
-
-    def testemptyreporeadonly(self):
-        """Accessing /pushlog on a read-only empty repo should succeed."""
-        # just GET /pushlog and verify that it's 200 OK
-        def rchmod(canWrite = False):
-            w = 0
-            if canWrite:
-                w = stat.S_IWRITE
-            for dir, subdirs, files in os.walk(self.repodir):
-                os.chmod(dir, stat.S_IREAD + stat.S_IEXEC + w)
-                for f in files:
-                    os.chmod(os.path.join(dir, f), stat.S_IREAD)
-            pass
-        rchmod()
-        conn = HTTPConnection("localhost", self.port)
-        conn.request("GET", "/pushlog")
-        r = conn.getresponse()
-        conn.close()
-        rchmod(True)
-        self.assertEqual(r.status, 200, "empty pushlog should not error (got HTTP status %d, expected 200)" % r.status)
-
 class TestPushlog(HGWebTest, unittest.TestCase):
     def setUp(self):
         HGWebTest.setUp(self)
