@@ -114,7 +114,20 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
     When discarding an unpublished squashed review request (always a close "discarded"):
         TODO Bug 1047465
     """
-    rbc = RBClient(url, username=username, password=password)
+    rbc = None
+
+    if userid and cookie:
+        # TODO: This is bugzilla specific code that really shouldn't be inside
+        # of this file. The whole bugzilla cookie resource is a hack anyways
+        # though so we'll deal with this for now.
+        rbc = RBClient(url)
+        login_resource = rbc.get_path(
+            'extensions/rbbz.extension.BugzillaExtension/'
+            'bugzilla-cookie-logins/')
+        login_resource.create(login_id=userid, login_cookie=cookie)
+    else:
+        rbc = RBClient(url, username=username, password=password)
+
     api_root = rbc.get_root()
 
     # Retrieve the squashed review request or create it.
