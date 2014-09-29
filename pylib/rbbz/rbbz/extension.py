@@ -31,6 +31,7 @@ from rbbz.errors import (BugzillaError,
                          ConfidentialBugError,
                          InvalidBugIdError)
 from rbbz.middleware import BugzillaCookieAuthMiddleware
+from rbbz.resources import bugzilla_cookie_login_resource
 
 
 REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')
@@ -62,6 +63,10 @@ DRAFTED_EXTRA_DATA_KEYS = [
 
 class BugzillaExtension(Extension):
     middleware = [BugzillaCookieAuthMiddleware]
+
+    resources = [
+        bugzilla_cookie_login_resource,
+    ]
 
     def initialize(self):
         AuthBackendHook(self, BugzillaBackend)

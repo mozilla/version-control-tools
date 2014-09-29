@@ -46,10 +46,11 @@ class BugzillaBackend(AuthBackend):
         # user who does not yet have an entry in the Review Board
         # database.
 
-        try:
-            username = User.objects.get(username=username).email
-        except User.DoesNotExist:
-            pass
+        if not cookie:
+            try:
+                username = User.objects.get(username=username).email
+            except User.DoesNotExist:
+                pass
 
         # There is a *tiny* probability that this will not work, but only if
         # user A changes their email address, then user B changes their email
