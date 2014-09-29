@@ -4,14 +4,14 @@ from mercurial.hgweb import webcommands
 from mercurial import templatefilters
 
 demandimport.disable()
-import simplejson
+import json
 demandimport.enable()
 
 isodate = lambda x: util.datestr(x, '%Y-%m-%d %H:%M %1%2')
 
-class HGJSONEncoder(simplejson.JSONEncoder):
+class HGJSONEncoder(json.JSONEncoder):
     def __init__(self):
-        simplejson.JSONEncoder.__init__(self, indent=1)
+        json.JSONEncoder.__init__(self, indent=1)
 
     def __call__(self, obj):
         return self.encode(obj)
@@ -39,7 +39,7 @@ class HGJSONEncoder(simplejson.JSONEncoder):
         if hasattr(v, '__iter__'):
             return [o for o in v]
 
-        return simplejson.JSONEncoder.default(self, v)
+        return json.JSONEncoder.default(self, v)
 
 templatefilters.filters['mozjson'] = HGJSONEncoder()
 

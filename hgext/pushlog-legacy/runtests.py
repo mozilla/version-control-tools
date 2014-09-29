@@ -18,7 +18,7 @@ from httplib import HTTPConnection
 from urllib import urlopen
 from time import sleep
 from tempfile import mkdtemp
-import simplejson
+import json
 import feedparser
 import shutil
 import threading
@@ -43,7 +43,7 @@ style=gitweb_mozilla
 def loadjsonfile(f):
     """Given a file path relative to the srcdir, load the file as a JSON object."""
     f = file(os.path.join(mydir, f))
-    j = simplejson.loads(''.join(f.readlines()))
+    j = json.loads(''.join(f.readlines()))
     f.close()
     return j
 
@@ -111,7 +111,7 @@ class HGWebTest:
     def loadjsonurl(self, url):
         """Convenience function to load JSON from a URL into an object."""
         u = self.urlopen(url)
-        j = simplejson.loads(''.join(u.readlines()))
+        j = json.loads(''.join(u.readlines()))
         u.close()
         return j
 
@@ -189,7 +189,7 @@ class TestPushlog(HGWebTest, unittest.TestCase):
 
     def testprintpushlog(self):
         """Get all json data via 'hg printpushlog'."""
-        testjson = simplejson.loads(Popen(["hg", "-R", self.repodir, "printpushlog"], stdout=PIPE).communicate()[0])
+        testjson = json.loads(Popen(["hg", "-R", self.repodir, "printpushlog"], stdout=PIPE).communicate()[0])
         expectedjson = loadjsonfile("testdata/test-repo-data.json")
         self.assertEqual(testjson, expectedjson, "printpushlog did not yield expected json data!")
 
