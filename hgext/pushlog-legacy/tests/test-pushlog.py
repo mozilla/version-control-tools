@@ -3,6 +3,7 @@
 
 import sys
 import unittest
+import silenttestrunner
 import os.path
 import inspect
 from os.path import join, isdir, isfile
@@ -24,7 +25,8 @@ import shutil
 import threading
 from urlparse import urljoin
 
-mydir = os.path.abspath(os.path.dirname(__file__))
+here = os.path.abspath(os.path.dirname(__file__))
+mydir = os.path.normpath(os.path.join(here, '..'))
 devnull = file("/dev/null", "w")
 
 #==============================
@@ -366,14 +368,8 @@ class TestPushlogUserQueries(HGWebTest, unittest.TestCase):
         self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
 if __name__ == '__main__':
-    if sys.version[:3] < '2.6':
-        # sucks, but it's just a hassle to get BaseServer.shutdown() otherwise
-        print >>sys.stderr, "This script requires Python 2.6 or newer"
-        sys.exit(1)
-
-    here = os.path.dirname(__file__)
     template_dir = os.path.normpath(os.path.abspath(
-        os.path.join(here, '..', '..', 'hgtemplates')))
+        os.path.join(here, '..', '..', '..', 'hgtemplates')))
     os.environ['HG_TEMPLATES'] = template_dir
 
-    unittest.main()
+    silenttestrunner.main(__name__)
