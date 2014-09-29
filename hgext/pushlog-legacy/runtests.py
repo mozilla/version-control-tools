@@ -40,11 +40,6 @@ templates=%s
 style=gitweb_mozilla
 """ % (mydir, mydir, mydir, os.environ['HG_TEMPLATES']))
 
-def pull_templates(path):
-    """Clone the hg_templates repo to |path|."""
-    # need to grab the moz hg templates
-    clone(ui.ui(), "http://hg.mozilla.org/hgcustom/hg_templates/", path);
-
 def loadjsonfile(f):
     """Given a file path relative to the srcdir, load the file as a JSON object."""
     f = file(os.path.join(mydir, f))
@@ -376,13 +371,9 @@ if __name__ == '__main__':
         print >>sys.stderr, "This script requires Python 2.6 or newer"
         sys.exit(1)
 
-    if 'HG_TEMPLATES' not in os.environ or not isdir(os.environ['HG_TEMPLATES']):
-        os.environ['HG_TEMPLATES'] = mkdtemp()
-        pull_templates(os.environ['HG_TEMPLATES'])
-        madeTemplatePath = True
-    else:
-        madeTemplatePath = False
+    here = os.path.dirname(__file__)
+    template_dir = os.path.normpath(os.path.abspath(
+        os.path.join(here, '..', '..', 'hgtemplates')))
+    os.environ['HG_TEMPLATES'] = template_dir
 
     unittest.main()
-    if madeTemplatePath:
-        shutil.rmtree(os.environ['HG_TEMPLATES'])
