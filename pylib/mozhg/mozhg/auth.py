@@ -57,57 +57,59 @@ def getbugzillaauth(ui, require=False):
 
     return None
 
-def find_profile(ui, profileName):
-    """
-    Find the default Firefox profile location. Returns None
-    if no profile could be located.
+def find_profile(name=None):
+    """Find the location of a Firefox profile.
 
+    This function attempts to locate a Firefox profile directory. It accepts
+    the name of a profile to look for.
+
+    Returns the path to a profile directory or None if no profile could be
+    found.
     """
     path = None
-    if platform.system() == "Darwin":
-        # Use FSFindFolder
+    if platform.system() == 'Darwin':
         from Carbon import Folder, Folders
         pathref = Folder.FSFindFolder(Folders.kUserDomain,
                                       Folders.kApplicationSupportFolderType,
                                       Folders.kDontCreateFolder)
         basepath = pathref.FSRefMakePath()
-        path = os.path.join(basepath, "Firefox")
-    elif platform.system() == "Windows":
+        path = os.path.join(basepath, 'Firefox')
+    elif platform.system() == 'Windows':
         # From http://msdn.microsoft.com/en-us/library/windows/desktop/bb762494%28v=vs.85%29.aspx
         CSIDL_APPDATA = 26
         path = win_get_folder_path(CSIDL_APPDATA)
         if path:
-            path = os.path.join(path, "Mozilla", "Firefox")
+            path = os.path.join(path, 'Mozilla', 'Firefox')
     else:
         # Assume POSIX
         # Pretty simple in comparison, eh?
-        path = os.path.expanduser("~/.mozilla/firefox")
+        path = os.path.expanduser('~/.mozilla/firefox')
     if path is None:
-        raise util.Abort(_("Could not find a Firefox profile"))
+        raise util.Abort(_('Could not find a Firefox profile'))
 
-    profileini = os.path.join(path, "profiles.ini")
+    profileini = os.path.join(path, 'profiles.ini')
     c = config.config()
     c.read(profileini)
 
-    if profileName:
-        sections = [s for s in c.sections() if profileName in [s, c.get(s, "Name", None)]]
+    if name:
+        sections = [s for s in c.sections() if name in [s, c.get(s, 'Name', None)]]
     else:
-        sections = [s for s in c.sections() if c.get(s, "Default", None)]
-        if len(sections) == 0:
+        sections = [s for s in c.sections() if c.get(s, 'Default', None)]
+        if not sections:
             sections = c.sections()
 
-    sections = [s for s in sections if c.get(s, "Path", None) is not None]
-    if len(sections) == 0:
-        raise util.Abort(_("Could not find a Firefox profile"))
+    sections = [s for s in sections if c.get(s, 'Path', None) is not None]
+    if not sections:
+        raise util.Abort(_('Could not find a Firefox profile'))
 
     section = sections.pop(0)
-    profile = c[section].get("Path")
-    if c.get(section, "IsRelative", "0") == "1":
+    profile = c[section].get('Path')
+    if c.get(section, 'IsRelative', '0') == '1':
         profile = os.path.join(path, profile)
+
     return profile
 
 def win_get_folder_path(folder):
-    # Use SHGetFolderPath
     import ctypes
     SHGetFolderPath = ctypes.windll.shell32.SHGetFolderPathW
     SHGetFolderPath.argtypes = [ctypes.c_void_p,
