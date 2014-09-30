@@ -57,14 +57,11 @@ def getbugzillaauth(ui, require=False):
 
     return None
 
-def find_profile(name=None):
-    """Find the location of a Firefox profile.
+def find_profiles_path():
+    """Find the path containing Firefox profiles.
 
-    This function attempts to locate a Firefox profile directory. It accepts
-    the name of a profile to look for.
-
-    Returns the path to a profile directory or None if no profile could be
-    found.
+    The location of Firefox profiles is OS dependent. This function handles the
+    differences.
     """
     path = None
     if platform.system() == 'Darwin':
@@ -84,6 +81,19 @@ def find_profile(name=None):
         # Assume POSIX
         # Pretty simple in comparison, eh?
         path = os.path.expanduser('~/.mozilla/firefox')
+
+    return path
+
+def find_profile(name=None):
+    """Find the location of a Firefox profile.
+
+    This function attempts to locate a Firefox profile directory. It accepts
+    the name of a profile to look for.
+
+    Returns the path to a profile directory or None if no profile could be
+    found.
+    """
+    path = find_profiles_path()
     if path is None:
         raise util.Abort(_('Could not find a Firefox profile'))
 
