@@ -5,6 +5,9 @@
 
 import os
 import platform
+import shutil
+import tempfile
+import urlparse
 
 from mercurial import config, util
 from mercurial.i18n import _
@@ -156,4 +159,73 @@ def win_get_folder_path(folder):
 
     return path_buf.value
 
+
+# Choose the cookie to use based on how much of its path matches the URL.
+# Useful if you happen to have cookies for both
+# https://landfill.bugzilla.org/bzapi_sandbox/ and
+# https://landfill.bugzilla.org/bugzilla-3.6-branch/, for example.
+def matching_path_len(cookie_path, url_path):
+    return len(cookie_path) if url_path.startswith(cookie_path) else 0
+
+
+def get_cookies_from_profile(ui, profile, bugzilla):
+    """
+    Given a Firefox profile, try to find the login cookies
+    for the given bugzilla URL.
+
+    """
+    try:
+        import sqlite3
+    except:
+        ui.write("Import of sqlite3 failed - this is expected if on Windows (see README).\n")
+        return None, None
+
+    cookies = os.path.join(profile, "cookies.sqlite")
+    if not os.path.exists(cookies):
+        return None, None
+
+    # Get bugzilla hostname
+    host = urlparse.urlparse(bugzilla).hostname
+    path = urlparse.urlparse(bugzilla).path
+
+    # Firefox locks this file, so if we can't open it (browser is running)
+    # then copy it somewhere else and try to open it.
+    tempdir = None
+    try:
+        tempdir = tempfile.mkdtemp()
+        tempcookies = os.path.join(tempdir, "cookies.sqlite")
+        shutil.copyfile(cookies, tempcookies)
+        # Firefox uses sqlite's WAL feature, which bumps the sqlite
+        # version number. Older sqlites will refuse to open the db,
+        # but the actual format is the same (just the journalling is different).
+        # Patch the file to give it an older version number so we can open it.
+        with open(tempcookies, 'r+b') as f:
+            f.seek(18, 0)
+            f.write("\x01\x01")
+        conn = sqlite3.connect(tempcookies)
+        logins = conn.execute("select value, path from moz_cookies "
+                              "where name = 'Bugzilla_login' and (host = ? or host = ?)",
+                              (host, "." + host)).fetchall()
+        row = sorted(logins, key=lambda row: -matching_path_len(row[1], path))[0]
+        login = row[0]
+        cookie = conn.execute("select value from moz_cookies "
+                              "where name = 'Bugzilla_logincookie' "
+                              " and (host = ? or host= ?) "
+                              " and path = ?",
+                              (host, "." + host, row[1])).fetchone()[0]
+        ui.debug("host=%s path=%s login=%s cookie=%s\n" % (host, row[1], login, cookie))
+        if isinstance(login, unicode):
+            login = login.encode("utf-8")
+            cookie = cookie.encode("utf-8")
+        return login, cookie
+
+    except Exception, e:
+        if not isinstance(e, IndexError):
+            ui.write_err(_("Failed to get bugzilla login cookies from "
+                           "Firefox profile at %s: %s\n") % (profile, str(e)))
+        pass
+
+    finally:
+        if tempdir:
+            shutil.rmtree(tempdir)
 
