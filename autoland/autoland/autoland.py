@@ -155,8 +155,8 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
 
     # check ldap group
     blame = blame.strip('{}')
-    auth = mozilla_ldap.read_credentials()
-    result = mozilla_ldap.check_group(auth, 'scm_level_3', blame)
+    result = mozilla_ldap.check_group(mozilla_ldap.read_credentials(),
+                                      'scm_level_3', blame)
     if result is None:
         # can't check credentials right now, we'll try again later
         logger.info('could not check ldap group')
@@ -263,6 +263,10 @@ def main():
     logger.info('starting autoland')
 
     auth = selfserve.read_credentials()
+    if auth is None:
+        logger.critical('could not read selfserve credentials. aborting')
+        return
+
     dbconn = psycopg2.connect(args.dsn)
 
     # this should exceed the stable delay in buildapi
