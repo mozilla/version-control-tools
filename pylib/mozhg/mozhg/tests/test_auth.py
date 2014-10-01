@@ -135,6 +135,17 @@ class TestAuth(unittest.TestCase):
         names = [p['name'] for p in profiles]
         self.assertEqual(names, ['baz', 'bar', 'foo'])
 
+    def test_find_profiles_path(self):
+        # This should always work on all supported systems.
+        path = auth.find_profiles_path()
+        self.assertIsNotNone(path)
+
+        try:
+            os.environ['FIREFOX_PROFILES_DIR'] = self.tmpdir
+            self.assertEqual(auth.find_profiles_path(), self.tmpdir)
+        finally:
+            del os.environ['FIREFOX_PROFILES_DIR']
+
     def test_cookie_no_db(self):
         """Ensure we react sanely when no cookies.sqlite file is present."""
         userid, cookie = auth.get_bugzilla_login_cookie_from_profile(self.tmpdir, 'http://dummy')

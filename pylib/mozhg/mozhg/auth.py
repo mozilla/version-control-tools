@@ -85,6 +85,10 @@ def find_profiles_path():
         # Pretty simple in comparison, eh?
         path = os.path.expanduser('~/.mozilla/firefox')
 
+    # This is a backdoor to facilitate testing, since find_profiles_path()
+    # doesn't need to be run-time configurable.
+    path = os.environ.get('FIREFOX_PROFILES_DIR', path)
+
     return path
 
 def get_profiles(profilesdir):
