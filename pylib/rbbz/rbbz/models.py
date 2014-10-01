@@ -48,6 +48,10 @@ def get_or_create_bugzilla_users(user_data):
                 user.first_name = real_name
                 modified = True
 
+            # Note that users *must* be disabled in Bugzilla and *cannot*
+            # be disabled in Review Board, since, if user.is_active is False,
+            # we can't tell if this was a result of can_login going False
+            # at some previous time or the action of a Review Board admin.
             if user.is_active != can_login:
                 user.is_active = can_login
                 modified = True

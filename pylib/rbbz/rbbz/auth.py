@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import logging
+
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
@@ -58,11 +60,14 @@ class BugzillaBackend(AuthBackend):
         try:
             bugzilla = Bugzilla()
         except BugzillaUrlError:
+            logging.warn('Login failure for user %s: Bugzilla URL not set.'
+                         % username)
             return None
 
         try:
             user_data = bugzilla.log_in(username, password, cookie)
-        except BugzillaError:
+        except BugzillaError as e:
+            logging.error('Login failure for user %s: %s' % (username, e))
             return None
 
         if not user_data:
@@ -71,11 +76,15 @@ class BugzillaBackend(AuthBackend):
         users = get_or_create_bugzilla_users(user_data)
 
         if not users:
+            logging.error('Login failure for user %s: failed to create user.'
+                          % username)
             return None
 
         user = users[0]
 
         if not user.is_active:
+            logging.error('Login failure for user %s: user is not active.'
+                          % username)
             return None
 
         if not cookie:

@@ -20,15 +20,16 @@ def xmlrpc_to_bugzilla_errors(func):
         except xmlrpclib.Fault as e:
             raise BugzillaError(e.faultString, e.faultCode)
         except xmlrpclib.ProtocolError as e:
-            raise BugzillaError(e.errmsg, e.errcode)
+            raise BugzillaError('ProtocolError: %s' % e.errmsg, e.errcode)
         except IOError as e:
-            # Raised when the protocol is invalid.
-            msg = 'unknown IOError'
+            # Raised when the protocol is invalid or the server can't be
+            # found.
+            msg = 'unknown'
 
             if e.args:
                 msg = e.args[0]
 
-            raise BugzillaError(msg)
+            raise BugzillaError('IOError: %s' % msg)
     return _transform_errors
 
 
@@ -44,6 +45,7 @@ class Bugzilla(object):
     """
 
     user_fields = ['id', 'email', 'real_name', 'can_login']
+    AUTHORIZED_GROUP = 'reviewboard'
 
     def __init__(self, login=None, logincookie=None, xmlrpc_url=None):
         if xmlrpc_url:
@@ -76,23 +78,32 @@ class Bugzilla(object):
             try:
                 result = self.proxy.User.login({'login': username,
                                                 'password': password})
-
             except xmlrpclib.Fault as e:
-                if e.faultCode == 300 or e.faultCode == 301:
-                    # Invalid username/password or account disabled
+                if e.faultCode == 300:
+                    logging.error('Login failure for user %s: '
+                                  'invalid username or password.' % username)
+                    return None
+                elif e.faultCode == 301:
+                    logging.error('Login failure for user %s: '
+                                  'user is disabled.' % username)
                     return None
                 raise
 
             user_id = result['id']
 
-        params = {'ids': [user_id], 'include_fields': self.user_fields,
-                  'groups': ['reviewboard']}
+        params = {
+            'ids': [user_id],
+            'include_fields': self.user_fields,
+            'groups': [self.AUTHORIZED_GROUP]
+        }
 
         try:
             return self.proxy.User.get(params)
         except xmlrpclib.Fault as e:
             if e.faultCode == 804:
-                # User isn't a member of the requisite group.
+                logging.error('Login failure for user %s: user is not part '
+                              'of the "%s" group.' %
+                              (username, self.AUTHORIZED_GROUP))
                 return None
             raise
 
