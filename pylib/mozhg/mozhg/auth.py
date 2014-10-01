@@ -168,16 +168,15 @@ def matching_path_len(cookie_path, url_path):
     return len(cookie_path) if url_path.startswith(cookie_path) else 0
 
 
-def get_bugzilla_login_cookie_from_profile(ui, profile, url):
-    """Given a Firefox profile path, try to find the login cookies for the given bugzilla URL.
+class NoSQLiteError(Exception):
+    """Raised when SQLite3 is not available."""
 
-    ui is a mercurial.ui instance.
-    """
+def get_bugzilla_login_cookie_from_profile(profile, url):
+    """Given a Firefox profile path, try to find the login cookies for the given bugzilla URL."""
     try:
         import sqlite3
     except:
-        ui.write("Import of sqlite3 failed - this is expected if on Windows (see README).\n")
-        return None, None
+        raise NoSQLiteError()
 
     cookies = os.path.join(profile, 'cookies.sqlite')
     if not os.path.exists(cookies):
@@ -212,16 +211,13 @@ def get_bugzilla_login_cookie_from_profile(ui, profile, url):
                               " and path = ?",
                               (host, "." + host, row[1])).fetchone()[0]
         conn.close()
-        ui.debug('host=%s path=%s login=%s cookie=%s\n' % (host, row[1], login, cookie))
         if isinstance(login, unicode):
             login = login.encode('utf-8')
             cookie = cookie.encode('utf-8')
         return login, cookie
 
-    except Exception, e:
-        if not isinstance(e, IndexError):
-            ui.write_err(_('Failed to get bugzilla login cookies from '
-                           'Firefox profile at %s: %s\n') % (profile, str(e)))
+    except IndexError:
+        return None, None
 
     finally:
         if tempdir:
