@@ -76,14 +76,13 @@ Attempt to push with Bugzilla not configured will result in a warning
 
   $ echo 'bar' > foo
   $ hg commit -m 'second commit'
-  $ hg push http://localhost:$HGPORT
+  $ FIREFOX_PROFILES_DIR=$TESTTMP hg push http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  tip: to not prompt for Bugzilla credentials in the future, * (glob)
   Bugzilla username: None
   Bugzilla credentials not available. Not submitting review.
 

@@ -32,8 +32,11 @@ def getbugzillaauth(ui, require=False):
 
     This returns a BugzillaAuth instance on success or None on failure.
 
-    TODO: Incorporate bzexport's code for grabbing credentials from Firefox
-    profiles.
+    The order of preference for Bugzilla credentials is as follows:
+
+      1) bugzilla.username and bugzilla.password from hgrc
+      2) login cookies from Firefox profile
+      3) prompt the user
     """
 
     username = ui.config('bugzilla', 'username')
@@ -42,18 +45,32 @@ def getbugzillaauth(ui, require=False):
     if username and password:
         return BugzillaAuth(username=username, password=password)
 
-    ui.warn(_('tip: to not prompt for Bugzilla credentials in the future, '
-              'store them in your hgrc under bugzilla.username and '
-              'bugzilla.password\n'))
+    if username:
+        password = ui.getpass(_('Bugzilla password:'), None)
+        if password:
+            return BugzillaAuth(username=username, password=password)
+
+    ui.debug('searching for Bugzilla cookies in Firefox profile\n')
+    url = ui.config('bugzilla', 'url', 'https://bugzilla.mozilla.org/')
+    profilesdir = find_profiles_path()
+    for profile in get_profiles(profilesdir):
+        try:
+            userid, cookie = get_bugzilla_login_cookie_from_profile(profile['path'], url)
+
+            if userid and cookie:
+                return BugzillaAuth(userid=userid, cookie=cookie)
+        except NoSQLiteError:
+            ui.warn('SQLite unavailable. Unable to look for Bugzilla cookie.\n')
+            break
 
     if not username:
         username = ui.prompt(_('Bugzilla username:'), None)
 
-    if not password:
-        password = ui.getpass(_('Bugzilla password:'), None)
+        if not password:
+            password = ui.getpass(_('Bugzilla password:'), None)
 
-    if username and password:
-        return BugzillaAuth(username=username, password=password)
+        if username and password:
+            return BugzillaAuth(username=username, password=password)
 
     if require:
         raise util.Abort(_('unable to obtain Bugzilla authentication.'))
