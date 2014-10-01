@@ -328,7 +328,9 @@ def on_reply_publishing(user, reply, **kwargs):
     bug_id = int(review_request.get_bug_list()[0])
     b = Bugzilla(user.bzlogin, user.bzcookie)
 
-    b.post_comment(bug_id, build_plaintext_review(reply, {"user": user}))
+    url = review_or_request_url(reply)
+    comment = build_plaintext_review(reply, url, {"user": user})
+    b.post_comment(bug_id, comment)
 
 
 def on_review_request_closed_discarded(user, review_request, type, **kwargs):
