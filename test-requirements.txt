@@ -22,6 +22,7 @@ futures==2.1.6
 mercurial==3.0.1
 mimeparse==0.1.3
 mock==1.0.1
+nose==1.3.4
 paramiko==1.14.0
 pillowfight==0.2
 psutil==2.1.3

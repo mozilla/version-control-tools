@@ -10,6 +10,7 @@ from __future__ import print_function
 import argparse
 import imp
 import os
+import subprocess
 import sys
 
 # Mercurial's run-tests.py isn't meant to be loaded as a module. We do it
@@ -71,6 +72,51 @@ def get_extensions():
 
     return m
 
+def get_test_files(extensions):
+    extension_tests = []
+    for e in extensions.values():
+        extension_tests.extend(e['tests'])
+
+    hooks_test_dir = os.path.join(HERE, 'hghooks', 'tests')
+    hook_tests = [os.path.join(hooks_test_dir, f)
+                   for f in os.listdir(hooks_test_dir)
+                   if is_test_filename(f)]
+
+    # Directories containing Python unit tests.
+    unit_test_dirs = [
+        'pylib',
+    ]
+
+    # Directories whose Python unit tests we should ignore.
+    unit_test_ignores = (
+        'pylib/Bugsy',
+        'pylib/flake8',
+        'pylib/mccabe',
+        'pylib/pep8',
+        'pylib/pyflakes',
+        'pylib/requests',
+    )
+
+    unit_tests = []
+    for base in unit_test_dirs:
+        base = os.path.join(HERE, base)
+        for root, dirs, files in os.walk(base):
+            relative = root[len(HERE) + 1:]
+            if relative.startswith(unit_test_ignores):
+                continue
+
+            for f in files:
+                if f.startswith('test') and f.endswith('.py'):
+                    unit_tests.append(os.path.join(root, f))
+
+    return {
+        'extension': sorted(extension_tests),
+        'hook': sorted(hook_tests),
+        'unit': sorted(unit_tests),
+        'all': set(extension_tests) | set(hook_tests) | set(unit_tests),
+    }
+
+
 if __name__ == '__main__':
     if not hasattr(sys, 'real_prefix'):
         raise Exception('You are not running inside the virtualenv. Please '
@@ -89,6 +135,8 @@ if __name__ == '__main__':
         help='Test against all marked compatible versions')
     parser.add_argument('--no-hg-tip', action='store_true',
         help='Do not run tests against the @ bookmark of hg')
+    parser.add_argument('--no-unit', action='store_true',
+        help='Do not run Python unit tests')
 
     options, extra = parser.parse_known_args(sys.argv)
 
@@ -160,16 +208,18 @@ if __name__ == '__main__':
 
     extensions = get_extensions()
 
-    hooks_test_dir = os.path.join(HERE, 'hghooks', 'tests')
-    hooks_tests = [os.path.join(hooks_test_dir, f)
-                   for f in os.listdir(hooks_test_dir)
-                   if is_test_filename(f)]
+    test_files = get_test_files(extensions)
+    extension_tests = test_files['extension']
+    unit_tests = test_files['unit']
 
-    # Add all tests unless we get an argument that looks like a test path.
-    if not any(a for a in extra[1:] if not a.startswith('-')):
-        for e in extensions.values():
-            sys.argv.extend(sorted(e['tests']))
-        sys.argv.extend(hooks_tests)
+    possible_tests = [os.path.normpath(os.path.abspath(a))
+                      for a in extra[1:] if not a.startswith('-')]
+    requested_tests = [a for a in possible_tests if a in test_files['all']]
+
+    # Add all Mercurial tests unless we get an argument that is a known test.
+    if not requested_tests:
+        sys.argv.extend(extension_tests)
+        sys.argv.extend(test_files['hook'])
 
     old_env = os.environ.copy()
     old_defaults = dict(runtestsmod.defaults)
@@ -177,6 +227,35 @@ if __name__ == '__main__':
     os.environ.clear()
     os.environ.update(old_env)
     runtestsmod.defaults = dict(old_defaults)
+
+    run_unit_tests = unit_tests
+    if requested_tests:
+        run_unit_tests = [t for t in requested_tests if t in unit_tests]
+    if options.no_unit:
+        run_unit_tests = []
+
+    if run_unit_tests:
+        noseargs = [sys.executable, '-m', 'nose.core', '-s']
+        noseargs.extend(unit_tests)
+
+        env = dict(os.environ)
+        paths = [p for p in env.get('PYTHONPATH', '').split(os.pathsep) if p]
+
+        # We need the directory with sitecustomize.py in sys.path for code
+        # coverage to work. This is arguably a bug in the location of
+        # sitecustomize.py.
+        paths.append(os.path.dirname(sys.executable))
+
+        for p in os.listdir(os.path.join(HERE, 'pylib')):
+            p = os.path.join(HERE, 'pylib', p)
+            if os.path.isdir(p) and p not in paths:
+                paths.insert(0, p)
+
+        env['PYTHONPATH'] = ':'.join(paths)
+
+        noseres = subprocess.call(noseargs, env=env)
+        if noseres:
+            res = noseres
 
     # If we're running the full compatibility run, figure out what versions
     # apply to what and run them.
