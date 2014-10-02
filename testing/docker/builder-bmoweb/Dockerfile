@@ -58,6 +58,8 @@
 #     The password to use when connecting to MySQL.
 #   DB_NAME
 #     The database to store Bugzilla data in.
+#   DB_TIMEOUT
+#     How long to wait for the database server to become available.
 #   ADMIN_EMAIL
 #     The email address to use for the admin account.
 #   ADMIN_PASSWORD

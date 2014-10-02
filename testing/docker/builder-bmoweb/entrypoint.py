@@ -8,8 +8,10 @@
 
 import os
 import shutil
+import socket
 import subprocess
 import sys
+import time
 
 if 'BMODB_PORT_3306_TCP_ADDR' not in os.environ:
     print('error: container invoked improperly. please link to a bmodb container')
@@ -20,9 +22,32 @@ db_port = os.environ['BMODB_PORT_3306_TCP_PORT']
 db_user = os.environ.get('DB_USER', 'root')
 db_pass = os.environ.get('DB_PASS', 'password')
 db_name = os.environ.get('DB_NAME', 'bugs')
+db_timeout = int(os.environ.get('DB_TIMEOUT', '60'))
 admin_email = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
 admin_password = os.environ.get('ADMIN_PASSWORD', 'password')
 reset_database = 'RESET_DATABASE' in os.environ
+
+# If we start this and the BMODB container at the same time, MySQL may not be
+# running yet. Wait for it.
+
+time_start = time.time()
+while True:
+    try:
+        print('attempting to connect to database...', end='')
+        sys.stdout.flush()
+        socket.create_connection((db_host, db_port), timeout=1)
+        print('success')
+        time.sleep(1)
+        break
+    except socket.error:
+        print('error')
+    sys.stdout.flush()
+
+    if time.time() - time_start > db_timeout:
+        print('could not connect to database before timeout; giving up')
+        sys.exit(1)
+
+    time.sleep(1)
 
 j = os.path.join
 h = os.environ['BUGZILLA_HOME']
