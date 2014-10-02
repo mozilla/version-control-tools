@@ -1,0 +1,12 @@
+bmodb:
+  build: ../builder-bmodb
+  expose:
+    - "3606"
+  environment:
+   MYSQL_ROOT_PASSWORD: password
+bmoweb:
+  build: ../builder-bmoweb
+  links:
+    - bmodb:bmodb
+  ports:
+    - "80"
