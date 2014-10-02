@@ -58,7 +58,7 @@ from mozautomation.repository import (
 from mozhg.auth import getbugzillaauth
 
 testedwith = '3.0 3.0.1 3.0.2 3.1'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Other%20Applications&component=bzpost'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial:%20bzpost'
 
 def maybe_save_comment(ui, bug, comment):
     '''Possibly save a Bugzilla comment to disk.
