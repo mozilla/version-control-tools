@@ -25,6 +25,10 @@ db_name = os.environ.get('DB_NAME', 'bugs')
 db_timeout = int(os.environ.get('DB_TIMEOUT', '60'))
 admin_email = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
 admin_password = os.environ.get('ADMIN_PASSWORD', 'password')
+bmo_url = os.environ.get('BMO_URL', 'http://localhost:80/')
+if not bmo_url.endswith('/'):
+    bmo_url += '/'
+
 reset_database = 'RESET_DATABASE' in os.environ
 
 # If we start this and the BMODB container at the same time, MySQL may not be
@@ -79,6 +83,7 @@ with open(answers, 'wb') as fh:
     writeanswer(fh, 'db_name', db_name)
     writeanswer(fh, 'ADMIN_EMAIL', admin_email)
     writeanswer(fh, 'ADMIN_PASSWORD', admin_password)
+    writeanswer(fh, 'urlbase', bmo_url)
 
 mysql_args = [
     '/usr/bin/mysql',
@@ -111,5 +116,7 @@ subprocess.check_call([j(b, 'checksetup.pl',), answers], cwd=b)
 subprocess.check_call([j(b, 'checksetup.pl',), answers], cwd=b)
 
 subprocess.check_call(['/bin/chown', '-R', 'bugzilla:bugzilla', b])
+
+sys.stdout.flush()
 
 os.execl(sys.argv[1], *sys.argv[1:])

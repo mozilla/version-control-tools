@@ -30,19 +30,26 @@
 # be exposing MySQL on port 3306.
 #
 # Assuming a MySQL server is running in the "bmodb" container and you
-# wish to expose the HTTP server on port 8000 of the current machine,
+# wish to expose the HTTP server on port 80 of the current machine,
 # start a container by running:
 #
-#   docker run -d --link bmodb:bmodb -p 8000:80 bmoweb
+#   docker run -d --link bmodb:bmodb -p 80:80 bmoweb
 #
 # This first time you do this, you may wish to run interactively to
 # verify everything is working:
 #
 #   docker run -it --link bmodb:bmodb bmoweb
 #
-# You should then be able to open http://localhost:8000/ and log into
+# You should then be able to open http://localhost:80/ and log into
 # Bugzilla using the admin credentials. The default username and
 # password is: admin@example.com / password
+#
+# Bugzilla needs to construct absolute URLs that refer to the running
+# instance. By default, we assume that URL is http://localhost:80/.
+# If you are applying port mapping or are exposing Bugzilla on a
+# different network interface, you'll need to specify the BMO_URL
+# environment variable when starting the container so Bugzilla
+# constructs proper URLs.
 #
 # If you want an interactive shell in the container, provide a command
 # to use to override the container's default (which runs Apache):
@@ -64,6 +71,11 @@
 #     The email address to use for the admin account.
 #   ADMIN_PASSWORD
 #     The password to use for the admin account.
+#   BMO_URL
+#     The URL that Bugzilla will be exposed as. Bugzilla needs to
+#     dynamically construct URLs during HTTP response generation. The
+#     value of this environment variable will form the prefix for all
+#     URLs.
 #   RESET_DATABASE
 #     If set, the MySQL database will be dropped when the container starts.
 #     Typically, the bmodb container will have persistent data and
@@ -100,6 +112,7 @@ ENV DB_PASS password
 ENV DB_NAME bugs
 ENV ADMIN_EMAIL admin@example.com
 ENV ADMIN_PASSWORD password
+ENV BMO_URL http://localhost:80/
 
 RUN /usr/sbin/groupadd -g 1000 bugzilla
 RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 bugzilla
