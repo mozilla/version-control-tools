@@ -1,0 +1,12 @@
+diff --git a/.htaccess b/.htaccess
+index a901a44..715899e 100644
+--- a/.htaccess
++++ b/.htaccess
+@@ -1,6 +1,6 @@
+ # Don't allow people to retrieve non-cgi executable files or our private data
+ <FilesMatch (\.pm|\.pl|\.tmpl|\.swf|localconfig.*)$>
+-  deny from all
++  Require all denied
+ </FilesMatch>
+ <IfModule mod_expires.c>
+ <IfModule mod_headers.c>

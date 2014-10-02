@@ -1,0 +1,17 @@
+diff --git a/Bugzilla/DB.pm b/Bugzilla/DB.pm
+index cf828d7..1df5fb8 100644
+--- a/Bugzilla/DB.pm
++++ b/Bugzilla/DB.pm
+@@ -577,8 +577,10 @@ sub bz_add_column {
+     my $current_def = $self->bz_column_info($table, $name);
+ 
+     if (!$current_def) {
++        my $trimmed_def = dclone($new_def);
++        delete $trimmed_def->{REFERENCES};
+         my @statements = $self->_bz_real_schema->get_add_column_ddl(
+-            $table, $name, $new_def, 
++            $table, $name, $trimmed_def, 
+             defined $init_value ? $self->quote($init_value) : undef);
+         print get_text('install_column_add',
+                        { column => $name, table => $table }) . "\n"
+
