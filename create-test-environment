@@ -52,7 +52,7 @@ if [ ! -d venv/hg ]; then
   hg clone http://selenic.com/repo/hg venv/hg
 fi
 
-for v in 2.5.4 2.6 2.6.1 2.6.2 2.6.3 2.7 2.7.1 2.7.2 2.8 2.8.1 2.8.2 2.9 2.9.1 2.9.2 3.0 3.0.1 3.0.2 3.1; do
+for v in 2.5.4 2.6 2.6.1 2.6.2 2.6.3 2.7 2.7.1 2.7.2 2.8 2.8.1 2.8.2 2.9 2.9.1 2.9.2 3.0 3.0.1 3.0.2 3.1 3.1.1 3.1.2; do
   destdir=`pwd`/venv/mercurials/$v
   if [ ! -d $destdir ]; then
     cd venv/hg
