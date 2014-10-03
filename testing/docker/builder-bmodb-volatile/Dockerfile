@@ -9,6 +9,10 @@
 
 FROM mysql:5.6.20
 
+RUN mkdir /var/lib/mysql-local
+
 COPY my.cnf /etc/mysql/my.cnf
 
 COPY entrypoint.sh /entrypoint.sh
+
+CMD ["mysqld", "--datadir=/var/lib/mysql-local", "--user=mysql"]
