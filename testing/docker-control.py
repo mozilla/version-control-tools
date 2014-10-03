@@ -80,69 +80,113 @@ class Docker(object):
                 break
 
         self.state['images'][name] = image
+        self.save_state()
 
         return image
 
-    def ensure_bmo_built(self):
-        """Ensure the images for a BMO service are built."""
-        db_image = self.ensure_built('bmodb')
+    def build_bmo(self):
+        """Ensure the images for a BMO service are built.
+
+        bmoweb's entrypoint does a lot of setup on first run. This takes many
+        seconds to perform and this cost is unacceptable for efficient test
+        running. So, when we build the BMO images, we create throwaway
+        containers and commit the results to a new image. This allows us to
+        spin up multiple bmoweb containers very quickly.
+        """
+        images = self.state['images']
+        db_image = self.ensure_built('bmodb-volatile')
         web_image = self.ensure_built('bmoweb')
 
-        return db_image, web_image
+        if 'bmoweb-bootstrapped' in images:
+            return images['bmodb-bootstrapped'], images['bmoweb-bootstrapped']
 
-    def start_bmo(self, http_port):
-        """Start a BMO service accepting HTTP traffic on the specified port."""
-        db_image, web_image = self.ensure_bmo_built()
+        db_id = self.client.create_container(db_image,
+                environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
 
-        # We assume the hostname running Docker is the hostname we'll
-        # expose BMO as.
+        web_id = self.client.create_container(web_image)['Id']
+
+        self.client.start(db_id)
+        db_state = self.client.inspect_container(db_id)
+
+        self.client.start(web_id,
+                links=[(db_state['Name'], 'bmodb')],
+                port_bindings={80: None})
+        web_state = self.client.inspect_container(web_id)
+
         hostname = urlparse.urlparse(self.client.base_url).hostname
-        url = 'http://%s:%s/' % (hostname, http_port)
+        http_port = int(web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
+        print('waiting for bmoweb to bootstrap')
+        sys.stdout.flush()
+        wait_for_socket(hostname, http_port)
 
-        db_id = self.state['containers'].get('bmodb')
-        if not db_id:
-            db_id = self.client.create_container(db_image,
-                    environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
-            self.state['containers']['bmodb'] = db_id
+        db_bootstrap = self.client.commit(db_id)['Id']
+        web_bootstrap = self.client.commit(web_id)['Id']
+        self.state['images']['bmodb-bootstrapped'] = db_bootstrap
+        self.state['images']['bmoweb-bootstrapped'] = web_bootstrap
+        self.save_state()
 
-        web_id = self.state['containers'].get('bmoweb')
-        if not web_id:
-
-            r = self.client.create_container(web_image,
-                    environment={'BMO_URL': url})
-            web_id = r['Id']
-            self.state['containers']['bmoweb'] = web_id
-
+        self.client.kill(web_id)
+        self.client.kill(db_id)
         db_state = self.client.inspect_container(db_id)
         web_state = self.client.inspect_container(web_id)
 
-        if not db_state['State']['Running']:
-            self.client.start(db_id)
-            db_state = self.client.inspect_container(db_id)
-
-        if not web_state['State']['Running']:
-            self.client.start(web_id,
-                    links=[(db_state['Name'], 'bmodb')],
-                    port_bindings={80: http_port})
-            web_state = self.client.inspect_container(web_id)
-
-        print('waiting for Bugzilla HTTP server to start')
-        sys.stdout.flush()
-        wait_for_socket(hostname, http_port)
-        print('Bugzilla web server listening at %s' % url)
-
-    def stop_bmo(self):
-        db_id = self.state['containers'].get('bmodb')
-        web_id = self.state['containers'].get('bmoweb')
-
-        if web_id:
+        if web_state['State']['Running']:
             self.client.stop(web_id)
-            self.client.remove_container(web_id)
-            del self.state['containers']['bmoweb']
-        if db_id:
+        if db_state['State']['Running']:
             self.client.stop(db_id)
-            self.client.remove_container(db_id)
-            del self.state['containers']['bmodb']
+
+        self.client.remove_container(web_id)
+        self.client.remove_container(db_id)
+
+        return db_bootstrap, web_bootstrap
+
+    def start_bmo(self, cluster, hostname=None, http_port=80):
+        db_image, web_image = self.build_bmo()
+
+        containers = self.state['containers'].setdefault(cluster, [])
+
+        docker_hostname = urlparse.urlparse(self.client.base_url).hostname
+
+        # Default hostname is the hostname running Docker.
+        if not hostname:
+            hostname = docker_hostname
+        url = 'http://%s:%s/' % (hostname, http_port)
+
+        db_id = self.client.create_container(db_image,
+                environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
+        containers.append(db_id)
+        web_id = self.client.create_container(web_image,
+                environment={'BMO_URL': url})['Id']
+        containers.append(web_id)
+        self.save_state()
+
+        self.client.start(db_id)
+        db_state = self.client.inspect_container(db_id)
+        self.client.start(web_id,
+                links=[(db_state['Name'], 'bmodb')],
+                port_bindings={80: http_port})
+        web_state = self.client.inspect_container(web_id)
+
+        print('waiting for Bugzilla HTTP server to start...')
+        sys.stdout.flush()
+        wait_for_socket(docker_hostname, http_port)
+
+    def stop_bmo(self, cluster):
+        for container in self.state['containers'].get(cluster, []):
+            self.client.kill(container)
+            self.client.stop(container)
+            info = self.client.inspect_container(container)
+            self.client.remove_container(container)
+
+            image = info['Image']
+            if image not in self.state['images'].values():
+                self.client.remove_image(info['Image'])
+
+        try:
+            del self.state['containers'][cluster]
+            self.save_state()
+        except KeyError:
+            pass
 
     def save_state(self):
         with open(self._state_path, 'wb') as fh:
@@ -160,13 +204,12 @@ def main(args):
     action = args[0]
 
     if action == 'build-bmo':
-        d.ensure_bmo_built()
+        d.build_bmo()
     elif action == 'start-bmo':
-        d.start_bmo(args[1])
+        cluster, http_port = args[1:]
+        d.start_bmo(cluster=cluster, hostname=None, http_port=http_port)
     elif action == 'stop-bmo':
-        d.stop_bmo()
-
-    d.save_state()
+        d.stop_bmo(cluster=args[1])
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

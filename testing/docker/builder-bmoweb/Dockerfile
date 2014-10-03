@@ -117,8 +117,8 @@ ENV BMO_URL http://localhost:80/
 RUN /usr/sbin/groupadd -g 1000 bugzilla
 RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 bugzilla
 
-RUN apt-get update
-RUN apt-get -y install apache2 build-essential cvs g++ git graphviz \
+RUN apt-get update && apt-get -y install \
+  apache2 build-essential cvs g++ git graphviz \
   libapache2-mod-perl2 libdaemon-generic-perl libgd-dev libssl-dev \
   mysql-client patchutils perlmagick pkg-config unzip
 

@@ -41,6 +41,7 @@ while True:
         sys.stdout.flush()
         socket.create_connection((db_host, db_port), timeout=1)
         print('success')
+        sys.stdout.flush()
         time.sleep(1)
         break
     except socket.error:
@@ -96,13 +97,6 @@ mysql_args = [
 fresh_database = bool(subprocess.call(mysql_args + ['bugs'],
     stdin=subprocess.DEVNULL))
 
-# checksetup.pl appears to not always refresh data/params if the answers
-# have been updated. Force it be removing output.
-try:
-    shutil.rmtree(j(b, 'data'))
-except FileNotFoundError:
-    pass
-
 if reset_database and not fresh_database:
     print(subprocess.check_output(mysql_args, input=b'DROP DATABASE bugs;'))
     fresh_database = True
@@ -112,11 +106,53 @@ if reset_database and not fresh_database:
 with open(j(b, 'extensions', 'ComponentWatching', 'disabled'), 'a'):
     pass
 
-subprocess.check_call([j(b, 'checksetup.pl',), answers], cwd=b)
-subprocess.check_call([j(b, 'checksetup.pl',), answers], cwd=b)
+if not os.path.exists(j(h, 'checksetup.done')):
+    subprocess.check_call([j(b, 'checksetup.pl',), answers], cwd=b)
+    subprocess.check_call([j(b, 'checksetup.pl',), answers], cwd=b)
+
+    with open(j(h, 'checksetup.done'), 'a'):
+        pass
+
+# The base URL is dynamic at container start time. Since we don't always run
+# checksetup.pl (because it adds unacceptable container start overhead), we
+# hack up the occurrence of this variable in data/params.
+params_lines = open(j(b, 'data', 'params'), 'r').readlines()
+with open(j(b, 'data', 'params'), 'w') as fh:
+    for line in params_lines:
+        if "'urlbase' =>" not in line:
+            fh.write(line)
+        else:
+            fh.write("           'urlbase' => '" + bmo_url + "',\n")
+
+# Ditto for the database host.
+localconfig_lines = open(j(b, 'localconfig'), 'r').readlines()
+with open(j(b, 'localconfig'), 'w') as fh:
+    def write_variable(k, v):
+        fh.write("$%s = '%s';\n" % (k, v))
+
+    for line in localconfig_lines:
+        if line.startswith('$db_user'):
+            write_variable('db_user', db_user)
+        elif line.startswith('$db_pass'):
+            write_variable('db_pass', db_pass)
+        elif line.startswith('$db_host'):
+            write_variable('db_host', db_host)
+        elif line.startswith('$db_port'):
+            write_variable('db_port', db_port)
+        elif line.startswith('$db_name'):
+            write_variable('db_name', db_name)
+        else:
+            fh.write(line)
 
 subprocess.check_call(['/bin/chown', '-R', 'bugzilla:bugzilla', b])
 
 sys.stdout.flush()
+
+# If the container is aborted, the apache run file will be present and Apache
+# will refuse to start.
+try:
+    os.unlink('/var/run/apache2/apache2.pid')
+except FileNotFoundError:
+    pass
 
 os.execl(sys.argv[1], *sys.argv[1:])
