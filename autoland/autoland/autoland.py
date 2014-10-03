@@ -6,7 +6,9 @@ import logging
 import psycopg2
 import re
 import requests
+import sys
 import time
+import traceback
 
 from mozlog.structured import (
     commandline,
@@ -274,35 +276,42 @@ def main():
     old_job = datetime.timedelta(minutes=30)
 
     while True:
-        cursor = dbconn.cursor()
-        now = datetime.datetime.now()
+        try:
+            cursor = dbconn.cursor()
+            now = datetime.datetime.now()
 
-        # handle potentially finished autoland jobs
-        query = """select tree,revision from AutolandRequest
-                   where pending=0 and running=0 and last_updated<=%(time)s
-                   and can_be_landed is null"""
-        cursor.execute(query, ({'time': now - stable_delay}))
-        for row in cursor.fetchall():
-            tree, rev = row
-            handle_autoland_request(logger, auth, dbconn, tree, rev)
+            # handle potentially finished autoland jobs
+            query = """select tree,revision from AutolandRequest
+                       where pending=0 and running=0 and last_updated<=%(time)s
+                       and can_be_landed is null"""
+            cursor.execute(query, ({'time': now - stable_delay}))
+            for row in cursor.fetchall():
+                tree, rev = row
+                handle_autoland_request(logger, auth, dbconn, tree, rev)
 
-        # we also look for any older jobs - maybe something got missed
-        # in pulse
-        query = """select tree,revision from AutolandRequest
-                   where last_updated<=%(time)s
-                   and can_be_landed is null"""
-        cursor.execute(query, ({'time': now - old_job}))
-        for row in cursor.fetchall():
-            tree, rev = row
-            handle_autoland_request(logger, auth, dbconn, tree, rev)
+            # we also look for any older jobs - maybe something got missed
+            # in pulse
+            query = """select tree,revision from AutolandRequest
+                       where last_updated<=%(time)s
+                       and can_be_landed is null"""
+            cursor.execute(query, ({'time': now - old_job}))
+            for row in cursor.fetchall():
+                tree, rev = row
+                handle_autoland_request(logger, auth, dbconn, tree, rev)
 
-        #
-        handle_pending_bugzilla_comments(logger, dbconn)
+            #
+            handle_pending_bugzilla_comments(logger, dbconn)
 
-        #
-        handle_pending_transplants(logger, dbconn)
+            #
+            handle_pending_transplants(logger, dbconn)
 
-        time.sleep(30)
+            time.sleep(30)
+
+        except KeyboardInterrupt:
+            break
+        except:
+            t, v, tb = sys.exc_info()
+            logger.error('\n'.join(traceback.format_exception(t, v, tb)))
 
 if __name__ == "__main__":
     main()
