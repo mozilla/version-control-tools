@@ -2,7 +2,7 @@
 --find-links http://downloads.reviewboard.org/releases/django-evolution/0.7/
 --allow-external rbtools
 --allow-unverified rbtools
-Django==1.6.6
+Django==1.6.7
 Markdown==2.4.1
 Pillow==2.4.0
 Pygments==1.6
