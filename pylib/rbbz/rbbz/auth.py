@@ -35,18 +35,21 @@ class BugzillaBackend(AuthBackend):
     def authenticate(self, username, password, cookie=False):
         username = username.strip()
 
-        if username.isdigit():
-            try:
-                user = User.objects.get(username=username)
-            except User.DoesNotExist:
-                return None
+        # If the user provides an email address when authenticating,
+        # it is checked against Review Board's email field in the User
+        # Model.  If a match is found, the email will be translated into
+        # the username field before being passed into this method's
+        # 'username' argument.
+        #
+        # If a match is not found, 'username' will contain whatever was
+        # entered, which may be the Bugzilla login (email address) for a
+        # user who does not yet have an entry in the Review Board
+        # database.
 
-            username = user.email
-
-        # If the username *isn't* a digit, then this is an unknown email
-        # address, and we pass it straight to bugzilla.log_in().  If the
-        # corresponding user already exists in Review Board, its email
-        # will be updated in get_or_create_bugzilla_users().
+        try:
+            username = User.objects.get(username=username).email
+        except User.DoesNotExist:
+            pass
 
         # There is a *tiny* probability that this will not work, but only if
         # user A changes their email address, then user B changes their email
@@ -56,6 +59,9 @@ class BugzillaBackend(AuthBackend):
         # to user A's address.  There's no easy way to detect this without
         # a search on Bugzilla before every log in, and I (mcote) don't think
         # that's worth it for such an improbable event.
+        #
+        # This also applies to changes to the user's username, since it has
+        # to be unique (see get_or_create_bugzilla_users()).
 
         try:
             bugzilla = Bugzilla()
@@ -133,6 +139,7 @@ class BugzillaBackend(AuthBackend):
     def search_users(self, query, request):
         """Search anywhere in name to support BMO :irc_nick convention."""
         q = Q(username__icontains=query)
+        q = q | Q(email__icontains=query)
 
         if request.GET.get('fullname', None):
             q = q | (Q(first_name__icontains=query) |

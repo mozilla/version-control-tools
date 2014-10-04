@@ -2,13 +2,20 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import re
+
 from django.contrib.auth.models import User
 from django.db import models
 
+BZ_IRCNICK_RE = re.compile(':([-0-9A-}]+)')
 
 class BugzillaUserMap(models.Model):
     user = models.OneToOneField(User)
     bugzilla_user_id = models.IntegerField(unique=True, db_index=True)
+
+
+def placeholder_username(email, bz_user_id):
+    return '%s+%s' % (email.split('@')[0], bz_user_id)
 
 
 def get_or_create_bugzilla_users(user_data):
@@ -22,13 +29,28 @@ def get_or_create_bugzilla_users(user_data):
         real_name = user['real_name']
         can_login = user['can_login']
 
+        ircnick_match = BZ_IRCNICK_RE.search(real_name)
+
+        if ircnick_match:
+            username = ircnick_match.group(1)
+        else:
+            username = placeholder_username(email, bz_user_id)
+
         try:
             bugzilla_user_map = BugzillaUserMap.objects.get(
                 bugzilla_user_id=bz_user_id)
         except BugzillaUserMap.DoesNotExist:
-            user = User(username=bz_user_id, password='!', first_name=real_name,
+            user = User(username=username, password='!', first_name=real_name,
                         email=email, is_active=can_login)
-            user.save()
+
+            try:
+                user.save()
+            except:
+                # Blanket exceptions are terrible, but there appears to
+                # be no way to catch a generic IntegrityError.
+                user.username = placeholder_username(email, bz_user_id)
+                user.save()
+
             bugzilla_user_map = BugzillaUserMap(user=user,
                                                 bugzilla_user_id=bz_user_id)
             bugzilla_user_map.save()
@@ -36,8 +58,8 @@ def get_or_create_bugzilla_users(user_data):
             modified = False
             user = bugzilla_user_map.user
 
-            if user.username != bz_user_id:
-                user.username = bz_user_id
+            if user.username != username:
+                user.username = username
                 modified = True
 
             if user.email != email:
@@ -63,7 +85,13 @@ def get_or_create_bugzilla_users(user_data):
                 profile.save()
 
             if modified:
-                user.save()
+                try:
+                    user.save()
+                except:
+                    # Blanket exceptions are terrible, but there appears to
+                    # be no way to catch a generic IntegrityError.
+                    user.username = placeholder_username(email, bz_user_id)
+                    user.save()
 
         users.append(user)
     return users
