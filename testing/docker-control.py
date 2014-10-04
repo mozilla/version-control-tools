@@ -93,7 +93,7 @@ class Docker(object):
             if s.startswith('Successfully built '):
                 image = s[len('Successfully built '):]
                 # There is likely a trailing newline.
-                image = image.rstrip()
+                image = self.get_full_image(image.rstrip())
                 break
 
         self.state['images'][key] = image
@@ -117,8 +117,10 @@ class Docker(object):
         # The keys for the bootstrapped images are derived from the base
         # images they depend on. This means that if we regenerate a new
         # base image, the bootstrapped images will be regenerated.
-        db_bootstrapped_key = 'bmodb-bootstrapped:%s' % db_image
-        web_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (db_image, web_image)
+        db_bootstrapped_key = 'bmodb-bootstrapped:%s:%s' % (
+                self._hgnode, db_image)
+        web_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s:%s' % (
+                self._hgnode, db_image, web_image)
 
         have_db = db_bootstrapped_key in images
         have_web = web_bootstrapped_key in images
@@ -221,6 +223,33 @@ class Docker(object):
         except KeyError:
             pass
 
+    def get_full_image(self, image):
+        for i in self.client.images():
+            if i['Id'][0:12] == image:
+                return i['Id']
+
+        return image
+
+    def prune_images(self):
+        """Prune images belonging to old revisions we no longer care about."""
+        running = set(self.get_full_image(c['Image'])
+                      for c in self.client.containers())
+
+        existing = set(i['Id'] for i in self.client.images())
+        retained = {}
+        for key, image in sorted(self.state['images'].items()):
+            if image not in existing:
+                continue
+
+            if self._hgnode in key or image in running:
+                retained[key] = image
+            else:
+                print('Removing image %s (%s)' % (image, key))
+                self.client.remove_image(image)
+
+        self.state['images'] = retained
+        self.save_state()
+
     def save_state(self):
         with open(self._state_path, 'wb') as fh:
             json.dump(self.state, fh)
@@ -243,6 +272,8 @@ def main(args):
         d.start_bmo(cluster=cluster, hostname=None, http_port=http_port)
     elif action == 'stop-bmo':
         d.stop_bmo(cluster=args[1])
+    elif action == 'prune-images':
+        d.prune_images()
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))
