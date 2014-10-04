@@ -65,6 +65,6 @@ done
 
 # Building Docker images for BMO is expensive. Do it during test environment
 # creation.
-if docker -v >/dev/null; then
+if hash docker 2>/dev/null; then
   DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-bmo
 fi
