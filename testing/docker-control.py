@@ -10,6 +10,7 @@ import docker
 import json
 import os
 import socket
+import subprocess
 import sys
 import time
 import urlparse
@@ -52,14 +53,27 @@ class Docker(object):
 
         self.client = docker.Client(base_url=url)
 
+        # We use the Mercurial working copy node to track images.
+        # We assume the current working directory is inside a Mercurial
+        # repository.
+        env = dict(os.environ)
+        env['HGRCPATH'] = '/dev/null'
+        node = subprocess.check_output(['hg identify -i'], shell=True,
+                env=env)
+        self._hgnode = node.strip()
+        self._hgdirty = '+' in node
+
     def ensure_built(self, name):
-        """Ensure a Docker image from a builder directory is built."""
+        """Ensure a Docker image from a builder directory is built and up to date"""
         p = os.path.join(self._ddir, 'builder-%s' % name)
         if not os.path.isdir(p):
             raise Exception('Unknown Docker builder name: %s' % name)
 
-        image = self.state['images'].get(name)
-        if image:
+        # Image is derived from the working copy. If dirty, always rebuild
+        # because all bets are off.
+        key = '%s:%s' % (name, self._hgnode)
+        image = self.state['images'].get(key)
+        if image and not self._hgdirty:
             return image
 
         # TODO create a lock to avoid race conditions.
@@ -82,7 +96,7 @@ class Docker(object):
                 image = image.rstrip()
                 break
 
-        self.state['images'][name] = image
+        self.state['images'][key] = image
         self.save_state()
 
         return image
@@ -100,9 +114,27 @@ class Docker(object):
         db_image = self.ensure_built('bmodb-volatile')
         web_image = self.ensure_built('bmoweb')
 
-        if 'bmoweb-bootstrapped' in images:
-            return images['bmodb-bootstrapped'], images['bmoweb-bootstrapped']
+        # The keys for the bootstrapped images are derived from the base
+        # images they depend on. This means that if we regenerate a new
+        # base image, the bootstrapped images will be regenerated.
+        db_bootstrapped_key = 'bmodb-bootstrapped:%s' % db_image
+        web_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (db_image, web_image)
 
+        have_db = db_bootstrapped_key in images
+        have_web = web_bootstrapped_key in images
+
+        if have_db and have_web and not self._hgdirty:
+            return images[db_bootstrapped_key], images[web_bootstrapped_key]
+
+        # If we already have the bootstrapped image, just throw it away
+        # and recreate it. This catches the case where we have a dirty working
+        # copy.
+        if db_bootstrapped_key in images:
+            self.client.remove_image(images[db_bootstrapped_key])
+        if web_bootstrapped_key in images:
+            self.client.remove_image(images[web_bootstrapped_key])
+
+        # should fix that.
         db_id = self.client.create_container(db_image,
                 environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
 
@@ -123,8 +155,8 @@ class Docker(object):
 
         db_bootstrap = self.client.commit(db_id)['Id']
         web_bootstrap = self.client.commit(web_id)['Id']
-        self.state['images']['bmodb-bootstrapped'] = db_bootstrap
-        self.state['images']['bmoweb-bootstrapped'] = web_bootstrap
+        self.state['images'][db_bootstrapped_key] = db_bootstrap
+        self.state['images'][web_bootstrapped_key] = web_bootstrap
         self.save_state()
 
         self.client.kill(web_id)
