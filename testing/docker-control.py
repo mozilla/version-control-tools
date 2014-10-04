@@ -53,6 +53,16 @@ class Docker(object):
 
         self.client = docker.Client(base_url=url)
 
+        # Try to obtain a network hostname for the Docker server. We use this
+        # for determining where to look for opened ports.
+        # This is a bit complicated because Docker can be running from a local
+        # socket or or another host via something like boot2docker.
+        # TODO look at network info for Docker and extract IP address instead.
+        docker_url = urlparse.urlparse(self.client.base_url)
+        self.docker_hostname = docker_url.hostname
+        if 'unix' in docker_url.scheme:
+            self.docker_hostname = 'localhost'
+
         # We use the Mercurial working copy node to track images.
         # We assume the current working directory is inside a Mercurial
         # repository.
@@ -150,10 +160,9 @@ class Docker(object):
                 port_bindings={80: None})
         web_state = self.client.inspect_container(web_id)
 
-        hostname = urlparse.urlparse(self.client.base_url).hostname
         http_port = int(web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
         print('waiting for bmoweb to bootstrap')
-        wait_for_socket(hostname, http_port)
+        wait_for_socket(self.docker_hostname, http_port)
 
         db_bootstrap = self.client.commit(db_id)['Id']
         web_bootstrap = self.client.commit(web_id)['Id']
@@ -181,11 +190,8 @@ class Docker(object):
 
         containers = self.state['containers'].setdefault(cluster, [])
 
-        docker_hostname = urlparse.urlparse(self.client.base_url).hostname
-
-        # Default hostname is the hostname running Docker.
         if not hostname:
-            hostname = docker_hostname
+            hostname = self.docker_hostname
         url = 'http://%s:%s/' % (hostname, http_port)
 
         db_id = self.client.create_container(db_image,
@@ -204,7 +210,7 @@ class Docker(object):
         web_state = self.client.inspect_container(web_id)
 
         print('waiting for Bugzilla HTTP server to start...')
-        wait_for_socket(docker_hostname, http_port)
+        wait_for_socket(self.docker_hostname, http_port)
 
     def stop_bmo(self, cluster):
         for container in self.state['containers'].get(cluster, []):
