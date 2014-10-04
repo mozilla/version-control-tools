@@ -44,7 +44,7 @@ if last_good_build is None or BUILD_NUMBER > last_good_build + 1:
     print('Last build was bad. Blowing away virtual machine just in case.')
     subprocess.check_call([VAGRANT, 'destroy', '-f'], cwd=HERE)
 
-subprocess.check_call([VAGRANT, 'up'], cwd=HERE)
+subprocess.check_call([VAGRANT, 'up', '--provision'], cwd=HERE)
 
 res = subprocess.call([VAGRANT, 'ssh', '--', '/version-control-tools/testing/jenkins/run.sh'],
     cwd=HERE)
