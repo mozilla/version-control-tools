@@ -17,6 +17,9 @@ import urlparse
 HERE = os.path.abspath(os.path.dirname(__file__))
 DOCKER_DIR = os.path.join(HERE, 'docker')
 
+# Unbuffer stdout.
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+
 def wait_for_socket(host, port, timeout=60):
     """Wait for a TCP socket to accept connections."""
 
@@ -116,7 +119,6 @@ class Docker(object):
         hostname = urlparse.urlparse(self.client.base_url).hostname
         http_port = int(web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
         print('waiting for bmoweb to bootstrap')
-        sys.stdout.flush()
         wait_for_socket(hostname, http_port)
 
         db_bootstrap = self.client.commit(db_id)['Id']
@@ -168,7 +170,6 @@ class Docker(object):
         web_state = self.client.inspect_container(web_id)
 
         print('waiting for Bugzilla HTTP server to start...')
-        sys.stdout.flush()
         wait_for_socket(docker_hostname, http_port)
 
     def stop_bmo(self, cluster):
