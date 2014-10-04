@@ -1,4 +1,12 @@
 $provision = <<SCRIPT
+
+# Give VM some swap.
+if [ ! -e /var/swap ]; then
+  dd if=/dev/zero of=/var/swap bs=1048576 count=512
+  mkswap /var/swap
+fi
+swapon /var/swap
+
 apt-get -y remove chef puppet && apt-get -y autoremove
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
 sh -c "echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
