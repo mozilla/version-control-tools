@@ -25,6 +25,14 @@ if 'REPO_ROOT' not in globals():
 HGHAVE_PY = os.path.join(REPO_ROOT, 'pylib', 'mercurial-support', 'hghave.py')
 execfile(HGHAVE_PY)
 
+# Define custom checks for our environment.
+@check('docker', 'We can talk to Docker')
+def has_docker():
+    import docker
+    c = docker.Client(base_url=os.environ.get('DOCKER_HOST', None))
+    c.containers()
+    return True
+
 # Now we reimplement the command line syntax of the CLI hghave script.
 failures = 0
 
