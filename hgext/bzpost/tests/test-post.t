@@ -1,3 +1,4 @@
+#require docker
   $ cat >> $HGRCPATH << EOF
   > [extensions]
   > bzpost = $TESTDIR/hgext/bzpost
