@@ -62,3 +62,9 @@ for v in 2.5.4 2.6 2.6.1 2.6.2 2.6.3 2.7 2.7.1 2.7.2 2.8 2.8.1 2.8.2 2.9 2.9.1 2
     cd ../..
   fi
 done
+
+# Building Docker images for BMO is expensive. Do it during test environment
+# creation.
+if docker -v >/dev/null; then
+  DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-bmo
+fi
