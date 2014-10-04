@@ -106,6 +106,9 @@ if __name__ == '__main__':
     # it's own.
     sys.argv = [a for a in sys.argv if a != '--cover']
 
+    # Enable tests to interact with our Docker controlling script.
+    os.environ['DOCKER_STATE_FILE'] = os.path.join(HERE, '.docker-state.json')
+
     # TODO enable integration with virtual machine when it is ready.
     #from vagrant import Vagrant
     #vm = Vagrant(os.path.join(HERE, 'testing', 'bmoserver'), quiet_stdout=False)

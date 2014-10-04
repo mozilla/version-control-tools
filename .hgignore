@@ -10,3 +10,4 @@ venv/
 \.swp$
 ~$
 \.vagrant/*
+\.docker-state.json$
