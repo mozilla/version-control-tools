@@ -13,6 +13,10 @@ pip install --upgrade -r test-requirements.txt
 # ReviewBoard doesn't work with pip, sadly.
 easy_install ReviewBoard==2.0.6
 
+cd pylib/Bugsy
+python setup.py develop
+cd ../..
+
 # rbmozui requires Node.js when installed normally. But in local
 # development mode it doesn't. So use local development node.
 cd pylib/rbmozui;
