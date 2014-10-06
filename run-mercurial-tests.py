@@ -21,6 +21,8 @@ EXTDIR = os.path.join(HERE, 'hgext')
 sys.path.insert(0, os.path.join(HERE, 'pylib', 'mercurial-support'))
 runtestsmod = imp.load_source('runtests', RUNTESTS)
 
+sys.path.insert(0, os.path.join(HERE, 'testing'))
+
 def is_test_filename(f):
     return f.startswith('test-') and f.endswith(('.py', '.t'))
 
