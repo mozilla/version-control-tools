@@ -82,7 +82,7 @@ from mozautomation.repository import (
     resolve_uri_to_tree,
 )
 
-testedwith = '3.0 3.0.1 3.0.2'
+testedwith = '3.0 3.1'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial:%20firefoxtree'
 
 cmdtable = {}
