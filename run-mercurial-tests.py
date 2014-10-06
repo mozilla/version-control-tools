@@ -171,14 +171,30 @@ if __name__ == '__main__':
         except KeyError:
             pass
 
-        versions = {}
-        for e, m in extensions.items():
-            for v in m['testedwith']:
-                tests = versions.setdefault(v, set())
-                tests |= m['tests']
-
         mercurials_dir = os.path.normpath(os.path.abspath(os.path.join(
             os.environ['VIRTUAL_ENV'], 'mercurials')))
+
+        # Maps directories/versions to lists of tests to run.
+        # We normalize X.Y.Z to X.Y for compatibility because the monthly
+        # minor releases of Mercurial shouldn't change behavior. If an
+        # extension is marked as compatible with X.Y, we run its tests
+        # against all X.Y and X.Y.Z releases seen on disk.
+        versions = {}
+        for dirver in os.listdir(mercurials_dir):
+            if dirver.startswith('.') or dirver == '@':
+                continue
+
+            normdirver = '.'.join(dirver.split('.')[0:2])
+
+            tests = versions.setdefault(dirver, set())
+            tests |= set(hooks_tests)
+
+            for e, m in sorted(extensions.items()):
+                for extver in m['testedwith']:
+                    normever = '.'.join(extver.split('.')[0:2])
+
+                    if extver == dirver or normever == normdirver:
+                        tests |= m['tests']
 
         def run_hg_tests(version, tests):
             if not tests:
@@ -188,7 +204,6 @@ if __name__ == '__main__':
             sys.argv.extend(['--with-hg',
                 os.path.join(mercurials_dir, version, 'bin', 'hg')])
             sys.argv.extend(sorted(tests))
-            sys.argv.extend(hooks_tests)
 
             print('Testing with Mercurial %s' % version)
             sys.stdout.flush()
@@ -205,6 +220,8 @@ if __name__ == '__main__':
             if res2:
                 res = res2
 
+        # Run all tests against @ because we always want to be compatible
+        # with the bleeding edge of development.
         all_hg_tests = []
         for e, m in extensions.items():
             all_hg_tests.extend(sorted(m['tests']))
