@@ -76,6 +76,8 @@ if __name__ == '__main__':
         raise Exception('You are not running inside the virtualenv. Please '
                 'run `create-test-environment` and `source venv/bin/activate`')
 
+    from vcttesting.docker import Docker
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--with-hg')
     parser.add_argument('-C', '--cover', action='store_true')
@@ -109,7 +111,10 @@ if __name__ == '__main__':
     sys.argv = [a for a in sys.argv if a != '--cover']
 
     # Enable tests to interact with our Docker controlling script.
-    os.environ['DOCKER_STATE_FILE'] = os.path.join(HERE, '.docker-state.json')
+    docker_state = os.path.join(HERE, '.docker-state.json')
+    os.environ['DOCKER_STATE_FILE'] = docker_state
+    docker = Docker(docker_state, os.environ.get('DOCKER_HOST', None))
+    os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
 
     # TODO enable integration with virtual machine when it is ready.
     #from vagrant import Vagrant
