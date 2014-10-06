@@ -68,8 +68,13 @@ class Docker(object):
         # repository.
         env = dict(os.environ)
         env['HGRCPATH'] = '/dev/null'
-        node = subprocess.check_output(['hg identify -i'], shell=True,
-                env=env)
+        cmd = ['hg', 'identify', '-i']
+
+        # We may not be executed from the working directory of a
+        # version-control-tools checkout. Try harder to find it.
+        if 'TESTDIR' in env:
+            cmd.extend(['-R', env['TESTDIR']])
+        node = subprocess.check_output(cmd, shell=True, env=env)
         self._hgnode = node.strip()
         self._hgdirty = '+' in node
 
