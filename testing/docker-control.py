@@ -214,11 +214,14 @@ class Docker(object):
                 port_bindings={80: http_port})
         web_state = self.client.inspect_container(web_id)
 
-        print('waiting for Bugzilla HTTP server to start...')
+        print('waiting for Bugzilla to start')
         wait_for_socket(self.docker_hostname, http_port)
+        print('Bugzilla accessible on %s' % url)
 
     def stop_bmo(self, cluster):
+        count = 0
         for container in self.state['containers'].get(cluster, []):
+            count += 1
             self.client.kill(container)
             self.client.stop(container)
             info = self.client.inspect_container(container)
@@ -227,6 +230,8 @@ class Docker(object):
             image = info['Image']
             if image not in self.state['images'].values():
                 self.client.remove_image(info['Image'])
+
+        print('stopped %d containers' % count)
 
         try:
             del self.state['containers'][cluster]
