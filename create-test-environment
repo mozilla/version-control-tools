@@ -56,16 +56,27 @@ if [ ! -d venv/hg ]; then
   hg clone http://selenic.com/repo/hg venv/hg
 fi
 
+hg -R venv/hg pull
+
+mercurials=`pwd`/venv/mercurials
+
 for v in 2.5.4 2.6 2.6.1 2.6.2 2.6.3 2.7 2.7.1 2.7.2 2.8 2.8.1 2.8.2 2.9 2.9.1 2.9.2 3.0 3.0.1 3.0.2 3.1 3.1.1 3.1.2; do
-  destdir=`pwd`/venv/mercurials/$v
   if [ ! -d $destdir ]; then
     cd venv/hg
     hg up $v
-    make install-bin PREFIX=$destdir
+    make install-bin PREFIX=$mercurials/$v
     hg --config extensions.purge= purge --all
     cd ../..
   fi
 done
+
+# Install the bleeding edge of Mercurial so we find regressions early.
+rm -rf $mercurials/@
+cd venv/hg
+hg up @
+make install-bin PREFIX=$mercurials/@
+hg --config extensions.purge= purge --all
+cd ../..
 
 # Building Docker images for BMO is expensive. Do it during test environment
 # creation.

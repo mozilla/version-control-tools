@@ -180,9 +180,9 @@ if __name__ == '__main__':
         mercurials_dir = os.path.normpath(os.path.abspath(os.path.join(
             os.environ['VIRTUAL_ENV'], 'mercurials')))
 
-        for version, tests in sorted(versions.items()):
+        def run_hg_tests(version, tests):
             if not tests:
-                continue
+                return
 
             sys.argv = list(orig_args)
             sys.argv.extend(['--with-hg',
@@ -193,14 +193,24 @@ if __name__ == '__main__':
             print('Testing with Mercurial %s' % version)
             sys.stdout.flush()
             runner = runtestsmod.TestRunner()
-            res2 = runner.run(sys.argv[1:])
-            if res2:
-                res = res2
+            r = runner.run(sys.argv[1:])
             os.environ.clear()
             os.environ.update(old_env)
             runtestsmod.defaults = dict(old_defaults)
             sys.stdout.flush()
             sys.stderr.flush()
+
+        for version, tests in sorted(versions.items()):
+            res2 = run_hg_tests(version, tests)
+            if res2:
+                res = res2
+
+        all_hg_tests = []
+        for e, m in extensions.items():
+            all_hg_tests.extend(sorted(m['tests']))
+        all_hg_tests.extend(hooks_tests)
+        run_hg_tests('@', all_hg_tests)
+
 
     #if oldvmstate in (vm.NOT_CREATED, vm.POWEROFF, vm.ABORTED):
     #    vm.halt()
