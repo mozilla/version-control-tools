@@ -209,7 +209,8 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
 
         if len(fails) == 1 and not passes:
             all_passed = False
-            actions.append(lambda: handle_single_failure(logger, auth, dbconn, tree, rev, buildername, fails[0]['build_id']))
+            build_id = fails[0]['build_id']
+            actions.append(lambda: handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id))
         elif len(fails) == 2:
             all_passed = False
             actions = []
