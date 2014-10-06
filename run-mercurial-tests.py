@@ -116,6 +116,9 @@ if __name__ == '__main__':
     docker = Docker(docker_state, os.environ.get('DOCKER_HOST', None))
     os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
 
+    os.environ['BUGZILLA_USERNAME'] = 'admin@example.com'
+    os.environ['BUGZILLA_PASSWORD'] = 'password'
+
     # TODO enable integration with virtual machine when it is ready.
     #from vagrant import Vagrant
     #vm = Vagrant(os.path.join(HERE, 'testing', 'bmoserver'), quiet_stdout=False)
