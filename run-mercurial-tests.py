@@ -84,6 +84,8 @@ if __name__ == '__main__':
     parser.add_argument('-j', '--jobs', type=int)
     parser.add_argument('--all-versions', action='store_true',
         help='Test against all marked compatible versions')
+    parser.add_argument('--no-hg-tip', action='store_true',
+        help='Do not run tests against the @ bookmark of hg')
 
     options, extra = parser.parse_known_args(sys.argv)
 
@@ -93,7 +95,7 @@ if __name__ == '__main__':
 
     # some arguments belong to us only. Don't pass it along to run-tests.py.
     sys.argv = [a for a in sys.argv
-        if a not in set(['--all-versions'])]
+        if a not in set(['--all-versions', '--no-hg-tip'])]
 
     coveragerc = os.path.join(HERE, '.coveragerc')
     coverdir = os.path.join(HERE, 'coverage')
@@ -222,11 +224,12 @@ if __name__ == '__main__':
 
         # Run all tests against @ because we always want to be compatible
         # with the bleeding edge of development.
-        all_hg_tests = []
-        for e, m in extensions.items():
-            all_hg_tests.extend(sorted(m['tests']))
-        all_hg_tests.extend(hooks_tests)
-        run_hg_tests('@', all_hg_tests)
+        if not options.no_hg_tip:
+            all_hg_tests = []
+            for e, m in extensions.items():
+                all_hg_tests.extend(sorted(m['tests']))
+            all_hg_tests.extend(hooks_tests)
+            run_hg_tests('@', all_hg_tests)
 
 
     #if oldvmstate in (vm.NOT_CREATED, vm.POWEROFF, vm.ABORTED):
