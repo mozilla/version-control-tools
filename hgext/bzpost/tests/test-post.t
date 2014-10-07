@@ -74,8 +74,15 @@ Pushing to mozilla-inbound will result in bug being updated
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   recording push in bug 1
-    posting to bug 1
-    http://localhost:$HGPORT/integration/mozilla-inbound/rev/b507e8e33160
+
+  $ $TESTDIR/testing/bugzilla.py dump-bug 1
+  Bug 1:
+    comments:
+    - id: 1
+      text: ''
+    - id: 2
+      text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/b507e8e33160
+    summary: bug1
 
 Pushing multiple changesets with multiple bugs will result in bug being updated
 
@@ -96,12 +103,25 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 1 files
   recording push in bug 2
-    posting to bug 2
-    http://localhost:$HGPORT/integration/mozilla-inbound/rev/a224eb610808
-    http://localhost:$HGPORT/integration/mozilla-inbound/rev/e3b5f3c3c45d
   recording push in bug 3
-    posting to bug 3
-    http://localhost:$HGPORT/integration/mozilla-inbound/rev/abe0245372d4
+
+  $ $TESTDIR/testing/bugzilla.py dump-bug 2 3
+  Bug 2:
+    comments:
+    - id: 3
+      text: ''
+    - id: 5
+      text: 'http://localhost:$HGPORT/integration/mozilla-inbound/rev/a224eb610808
+  
+        http://localhost:$HGPORT/integration/mozilla-inbound/rev/e3b5f3c3c45d'
+    summary: bug2
+  Bug 3:
+    comments:
+    - id: 4
+      text: ''
+    - id: 6
+      text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/abe0245372d4
+    summary: bug3
 
   $ cd ..
 
@@ -123,8 +143,15 @@ Pushing to Try will post TBPL comment
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
   recording TBPL push in bug 4
-    posting to bug 4
-    https://tbpl.mozilla.org/?tree=Try&rev=311111800824
+
+  $ $TESTDIR/testing/bugzilla.py dump-bug 4
+  Bug 4:
+    comments:
+    - id: 7
+      text: ''
+    - id: 8
+      text: https://tbpl.mozilla.org/?tree=Try&rev=311111800824
+    summary: bug4
 
   $ cd ..
 
@@ -147,6 +174,13 @@ Public changesets pushed to Try will be ignored if no bug in draft changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 1 files (+1 heads)
+
+  $ $TESTDIR/testing/bugzilla.py dump-bug 5
+  Bug 5:
+    comments:
+    - id: 9
+      text: ''
+    summary: bug5
 
   $ cd ..
 
@@ -171,8 +205,20 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 1 files (+1 heads)
   recording TBPL push in bug 6
-    posting to bug 6
-    https://tbpl.mozilla.org/?tree=Try&rev=9257b757fa7a
+
+  $ $TESTDIR/testing/bugzilla.py dump-bug 5 6
+  Bug 5:
+    comments:
+    - id: 9
+      text: ''
+    summary: bug5
+  Bug 6:
+    comments:
+    - id: 10
+      text: ''
+    - id: 11
+      text: https://tbpl.mozilla.org/?tree=Try&rev=9257b757fa7a
+    summary: bug6
 
   $ cd ..
 

@@ -60,26 +60,6 @@ from mozhg.auth import getbugzillaauth
 testedwith = '3.0 3.0.1 3.0.2 3.1'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial:%20bzpost'
 
-def maybe_save_comment(ui, bug, comment):
-    '''Possibly save a Bugzilla comment to disk.
-
-    This is a rather hacky backdoor to facilitate testing. If a config
-    flag is present, we will write the to-be-posted comment to output
-    so it can be tested.
-
-    A proper solution to avoid this hack involves deep hooks into the Bugzilla
-    client module to intercept the outgoing HTTP request. Even better would be
-    running a real Bugzilla server as part of tests. Until then, we live with
-    this hack.
-    '''
-    if not ui.configbool('bzpost', 'debugcomments', False):
-        return
-
-    lines = ['posting to bug %s' % bug]
-    lines.extend(comment.splitlines())
-    for line in lines:
-        ui.write('  %s\n' % line)
-
 def wrappedpushbookmark(orig, pushop):
     result = orig(pushop)
 
@@ -171,7 +151,6 @@ def wrappedpushbookmark(orig, pushop):
 
         ui.write(_('recording TBPL push in bug %s\n') % lastbug)
         bug.add_comment(tbplurl)
-        maybe_save_comment(ui, lastbug, tbplurl)
         return result
 
     for bugnumber, nodes in bugsmap.items():
@@ -199,7 +178,6 @@ def wrappedpushbookmark(orig, pushop):
 
         ui.write(_('recording push in bug %s\n') % bugnumber)
         bug.add_comment(comment)
-        maybe_save_comment(ui, bugnumber, comment)
 
     return result
 
