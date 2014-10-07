@@ -24,6 +24,7 @@ mimeparse==0.1.3
 mock==1.0.1
 paramiko==1.14.0
 pillowfight==0.2
+psutil==2.1.3
 pycrypto==2.6.1
 python-dateutil==1.5
 python-memcached==1.53
