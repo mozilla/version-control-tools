@@ -12,9 +12,6 @@ to answer true to "is a Mozilla repository."
 """
 
 from mercurial import demandimport
-demandimport.disable()
-import responses
-demandimport.enable()
 
 from mozautomation import repository
 
@@ -26,10 +23,3 @@ def extsetup(ui):
         repository.BASE_READ_URI = read_uri
     if write_uri:
         repository.BASE_WRITE_URI = write_uri
-
-    responses.start()
-
-    extra = ui.config('localmozrepo', 'execfile', None)
-    if extra:
-        bzurl = ui.config('bugzilla', 'url')
-        execfile(extra)
