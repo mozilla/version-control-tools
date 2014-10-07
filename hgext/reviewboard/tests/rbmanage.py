@@ -68,6 +68,8 @@ def main(args):
     env['TMPDIR'] = tmpdir
 
     if action == 'create':
+        bz_auth = 'USE_BZ_AUTH' in os.environ
+
         with open(os.path.join(path, 'settings_local.py'), 'wb') as fh:
             fh.write(SETTINGS_LOCAL)
 
@@ -88,14 +90,15 @@ def main(args):
         # As long as we create a user here, rbbz will still authenticate it.
         # Ideally, we'd create a user in Bugzilla and only have users
         # go through rbbz/Bugzilla.
-        subprocess.check_call(manage + ['createsuperuser', '--username',
-            'testadmin', '--email', 'testadmin@example.com', '--noinput'], cwd=path,
-            env=env, stderr=f, stdout=f)
+        if not bz_auth:
+            subprocess.check_call(manage + ['createsuperuser', '--username',
+                'testadmin', '--email', 'testadmin@example.com', '--noinput'], cwd=path,
+                env=env, stderr=f, stdout=f)
 
-        from django.contrib.auth.models import User
-        u = User.objects.get(username__exact='testadmin')
-        u.set_password('password')
-        u.save()
+            from django.contrib.auth.models import User
+            u = User.objects.get(username__exact='testadmin')
+            u.set_password('password')
+            u.save()
 
         from reviewboard.cmdline.rbsite import Site, parse_options
         class dummyoptions(object):
@@ -113,9 +116,9 @@ def main(args):
         sc.set('site_media_root', os.path.join(path, 'htdocs', 'media'))
 
         # Hook up rbbz authentication.
-        # TODO enable when vm runs during tests
-        #sc.set('auth_backend', 'bugzilla')
-        #sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % os.environ['BUGZILLA_URL'])
+        if bz_auth:
+            sc.set('auth_backend', 'bugzilla')
+            sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % os.environ['BUGZILLA_URL'])
 
         sc.save()
 
