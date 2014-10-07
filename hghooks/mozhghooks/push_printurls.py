@@ -17,6 +17,7 @@ hgNameToRevURL = {
     'mozilla-esr24':   'releases/mozilla-esr24/',
     'mozilla-esr31':   'releases/mozilla-esr31/',
     # Gecko B2G branches
+    'mozilla-b2g34_v2_1':      'releases/mozilla-b2g34_v2_1/',
     'mozilla-b2g32_v2_0':      'releases/mozilla-b2g32_v2_0/',
     'mozilla-b2g30_v1_4':      'releases/mozilla-b2g30_v1_4/',
     'mozilla-b2g28_v1_3':      'releases/mozilla-b2g28_v1_3/',
