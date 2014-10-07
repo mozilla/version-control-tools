@@ -1,5 +1,6 @@
+#require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv
+  $ commonenv rb-test-commits-added
 
   $ cd client
   $ echo 'foo0' > foo
@@ -110,3 +111,5 @@ The parent review should have its description updated.
 
   $ cd ..
   $ rbmanage rbserver stop
+
+  $ dockercontrol stop-bmo rb-test-commits-added > /dev/null
