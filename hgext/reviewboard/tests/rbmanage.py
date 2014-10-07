@@ -3,10 +3,13 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import signal
 import subprocess
 import sys
 import time
 import urllib
+
+import psutil
 
 SETTINGS_LOCAL = """
 from __future__ import unicode_literals
@@ -133,8 +136,18 @@ def main(args):
         proc = subprocess.Popen(manage + ['runserver', '--noreload', port],
             cwd=path, env=env, stderr=f, stdout=f)
 
+        # We write the PID to DAEMON_PIDS so Mercurial kills it automatically
+        # if it is running.
         with open(env['DAEMON_PIDS'], 'ab') as fh:
             fh.write('%d\n' % proc.pid)
+
+        # We write the PID to a local file so the test can kill it. The benefit
+        # of having the test kill it (with SIGINT as opposed to SIGKILL) is
+        # that coverage information will be written if the process is stopped
+        # with SIGINT.
+        # TODO consider changing Mercurial to SIGINT first, SIGKILL later.
+        with open(os.path.join(path, 'rbserver.pid'), 'wb') as fh:
+            fh.write('%d' % proc.pid)
 
         # There is a race condition between us exiting and the tests
         # querying the server before it is ready. So, we wait on the
@@ -177,6 +190,18 @@ def main(args):
             sys.exit(1)
 
         sys.exit(0)
+
+    # You should call this so the server stop gracefully and records code
+    # coverage data. Otherwise, Mercurial will kill it with SIGKILL and no
+    # coverage data will be saved.
+    elif action == 'stop':
+        with open(os.path.join(path, 'rbserver.pid'), 'rb') as fh:
+            pid = int(fh.read())
+
+        os.kill(pid, signal.SIGINT)
+
+        while psutil.pid_exists(pid):
+            time.sleep(0.1)
 
     elif action == 'dumpreview':
         port, rid = args[2:]
