@@ -240,8 +240,16 @@ def main(args):
 
 def get_root(port):
     from rbtools.api.client import RBClient
-    c = RBClient('http://localhost:%s/' % port, username='testadmin',
-            password='password')
+
+    username = 'testadmin'
+    password = 'password'
+
+    if 'USE_BZ_AUTH' in os.environ:
+        username = os.environ['BUGZILLA_USERNAME']
+        password = os.environ['BUGZILLA_PASSWORD']
+
+    c = RBClient('http://localhost:%s/' % port, username=username,
+            password=password)
     return c.get_root()
 
 

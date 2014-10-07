@@ -21,13 +21,20 @@ EOF
 }
 
 clientconfig() {
+  username=testadmin
+  password=password
+  if [ ! -z ${USE_BZ_AUTH} ]; then
+    username=${BUGZILLA_USERNAME}
+    password=${BUGZILLA_PASSWORD}
+  fi
+
   cat >> $1 << EOF
 [ui]
 ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
 
 [bugzilla]
-username = testadmin
-password = password
+username = ${username}
+password = ${password}
 
 [mozilla]
 ircnick = mynick
