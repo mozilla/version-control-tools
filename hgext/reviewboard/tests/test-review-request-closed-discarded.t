@@ -274,3 +274,6 @@ Child review request with ID 3 should be published.
       p2rb.commit_id: 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9
       p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: False
+
+  $ cd ..
+  $ rbmanage rbserver stop

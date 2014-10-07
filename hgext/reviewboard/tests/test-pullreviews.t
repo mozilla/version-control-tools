@@ -52,3 +52,6 @@ Pulling reviews with no changes
 
   $ hg pullreviews
   updated 3 reviews
+
+  $ cd ..
+  $ rbmanage rbserver stop

@@ -107,3 +107,6 @@ The parent review should have its description updated.
   -foo0
   +foo3
   
+
+  $ cd ..
+  $ rbmanage rbserver stop

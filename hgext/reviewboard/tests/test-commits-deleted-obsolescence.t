@@ -381,3 +381,6 @@ The parent review should have been updated accordingly.
       p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: True
       p2rb.unpublished_rids: []
+
+  $ cd ..
+  $ rbmanage rbserver stop

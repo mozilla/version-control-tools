@@ -182,3 +182,6 @@ Specifying multiple -r for the same head works
   review id:  bz://50000/mynick
   review url: http://localhost:$HGPORT1/r/9 (pending)
   [1]
+
+  $ cd ..
+  $ rbmanage rbserver stop

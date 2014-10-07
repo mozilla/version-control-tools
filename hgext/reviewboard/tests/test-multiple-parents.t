@@ -68,3 +68,6 @@ Pushing with a different review ID will create a "duplicate" review
   $ hg log --template "{reviews % '{get(review, \"url\")}\n'}"
   http://localhost:$HGPORT1/r/2
   http://localhost:$HGPORT1/r/4
+
+  $ cd ..
+  $ rbmanage rbserver stop

@@ -74,3 +74,6 @@ Now create a new head and push a rebase
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT/r/1 (pending)
+
+  $ cd ..
+  $ rbmanage rbserver stop

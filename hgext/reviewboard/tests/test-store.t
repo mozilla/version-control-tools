@@ -51,3 +51,6 @@ Pushing a review will create the reviews file
   status pending
   $ cat .hg/reviewboard/review/2.state
   status pending
+
+  $ cd ..
+  $ rbmanage rbserver stop

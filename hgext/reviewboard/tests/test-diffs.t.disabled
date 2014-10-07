@@ -253,3 +253,5 @@ Pushing multiple commits should result in parent diffs
   -updated bar
   +updated bar again
   
+  $ cd ..
+  $ rbmanage rbserver stop

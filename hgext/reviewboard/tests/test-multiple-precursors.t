@@ -72,3 +72,6 @@ Splitting the changeset results in multiple reviews
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+
+  $ cd ..
+  $ rbmanage rbserver stop
