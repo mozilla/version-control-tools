@@ -100,7 +100,7 @@ class Docker(object):
         # We assume this is a bug that will change behavior later and work
         # around it by ensuring consisten behavior.
         print('Building Docker image %s' % name)
-        for stream in self.client.build(path=p, stream=True):
+        for stream in self.client.build(path=p, tag=name, stream=True):
             s = json.loads(stream)
             if 'stream' not in s:
                 continue
@@ -112,10 +112,9 @@ class Docker(object):
             if s.startswith('Successfully built '):
                 image = s[len('Successfully built '):]
                 # There is likely a trailing newline.
-                image = self.get_full_image(image.rstrip())
-                break
+                return self.get_full_image(image.rstrip())
 
-        return image
+        raise Exception('Unable to confirm image was built')
 
     def build_bmo(self, verbose=False):
         """Ensure the images for a BMO service are built.
