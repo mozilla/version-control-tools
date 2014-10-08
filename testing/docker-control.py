@@ -27,7 +27,7 @@ def main(args):
     action = args[0]
 
     if action == 'build-bmo':
-        d.build_bmo()
+        d.build_bmo(verbose=True)
     elif action == 'start-bmo':
         cluster, http_port = args[1:]
         db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
