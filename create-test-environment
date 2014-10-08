@@ -77,9 +77,3 @@ hg up @
 make install-bin PREFIX=$mercurials/@
 hg --config extensions.purge= purge --all
 cd ../..
-
-# Building Docker images for BMO is expensive. Do it during test environment
-# creation.
-if hash docker 2>/dev/null; then
-  DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-bmo
-fi
