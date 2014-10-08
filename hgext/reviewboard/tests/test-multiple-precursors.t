@@ -1,5 +1,9 @@
+#require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv
+  $ commonenv rb-test-multiple-precursors
+
+  $ bugzilla create-bug-range TestProduct TestComponent 123
+  created 123 bugs
 
   $ cat > obs.py << EOF
   > import mercurial.obsolete
@@ -75,3 +79,5 @@ Splitting the changeset results in multiple reviews
 
   $ cd ..
   $ rbmanage rbserver stop
+
+  $ dockercontrol stop-bmo rb-test-multiple-precursors > /dev/null
