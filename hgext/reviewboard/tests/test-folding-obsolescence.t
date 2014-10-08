@@ -1,5 +1,9 @@
+#require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv
+  $ commonenv rb-test-folding-obsolescence
+
+  $ bugzilla create-bug-range TestProduct TestComponent 123
+  created 123 bugs
 
   $ cat > obs.py << EOF
   > import mercurial.obsolete
@@ -104,3 +108,5 @@
 
   $ cd ..
   $ rbmanage rbserver stop
+
+  $ dockercontrol stop-bmo rb-test-folding-obsolescence > /dev/null
