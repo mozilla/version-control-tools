@@ -26,7 +26,11 @@ def main(args):
         d.build_bmo()
     elif action == 'start-bmo':
         cluster, http_port = args[1:]
-        d.start_bmo(cluster=cluster, hostname=None, http_port=http_port)
+        db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
+        web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
+
+        d.start_bmo(cluster=cluster, hostname=None, http_port=http_port,
+                db_image=db_image, web_image=web_image)
     elif action == 'stop-bmo':
         d.stop_bmo(cluster=args[1])
     elif action == 'prune-images':
