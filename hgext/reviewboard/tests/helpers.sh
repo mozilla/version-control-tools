@@ -63,12 +63,10 @@ dockercontrol() {
 }
 
 commonenv() {
-  if [ ! -z $1 ]; then
-    $TESTDIR/testing/docker-control.py start-bmo $1 $HGPORT2 > /dev/null
-    export BUGZILLA_URL=http://${DOCKER_HOSTNAME}:$HGPORT2
-    $TESTDIR/testing/bugzilla.py create-group reviewboard 'reviewboard users'
-    export USE_BZ_AUTH=1
-  fi
+  $TESTDIR/testing/docker-control.py start-bmo $1 $HGPORT2 > /dev/null
+  export BUGZILLA_URL=http://${DOCKER_HOSTNAME}:$HGPORT2
+  $TESTDIR/testing/bugzilla.py create-group reviewboard 'reviewboard users'
+  export USE_BZ_AUTH=1
 
   hg init client
   hg init server
