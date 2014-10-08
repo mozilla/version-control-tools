@@ -86,7 +86,7 @@ class Docker(object):
         except requests.exceptions.RequestException:
             return False
 
-    def ensure_built(self, name):
+    def ensure_built(self, name, verbose=False):
         """Ensure a Docker image from a builder directory is built and up to date"""
         p = os.path.join(self._ddir, 'builder-%s' % name)
         if not os.path.isdir(p):
@@ -112,7 +112,9 @@ class Docker(object):
                 continue
 
             s = s['stream']
-            #sys.stdout.write(s)
+            if verbose:
+                # s has newlines, so don't go through print().
+                sys.stdout.write(s)
             if s.startswith('Successfully built '):
                 image = s[len('Successfully built '):]
                 # There is likely a trailing newline.
@@ -124,7 +126,7 @@ class Docker(object):
 
         return image
 
-    def build_bmo(self):
+    def build_bmo(self, verbose=False):
         """Ensure the images for a BMO service are built.
 
         bmoweb's entrypoint does a lot of setup on first run. This takes many
@@ -134,8 +136,8 @@ class Docker(object):
         spin up multiple bmoweb containers very quickly.
         """
         images = self.state['images']
-        db_image = self.ensure_built('bmodb-volatile')
-        web_image = self.ensure_built('bmoweb')
+        db_image = self.ensure_built('bmodb-volatile', verbose=verbose)
+        web_image = self.ensure_built('bmoweb', verbose=verbose)
 
         # The keys for the bootstrapped images are derived from the base
         # images they depend on. This means that if we regenerate a new
@@ -159,7 +161,6 @@ class Docker(object):
         if web_bootstrapped_key in images:
             self.client.remove_image(images[web_bootstrapped_key])
 
-        # should fix that.
         db_id = self.client.create_container(db_image,
                 environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
 
