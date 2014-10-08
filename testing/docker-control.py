@@ -12,13 +12,17 @@ import sys
 from vcttesting.docker import Docker
 
 def main(args):
-    if 'DOCKER_STATE_FILE' not in os.environ:
-        print('DOCKER_STATE_FILE must be defined')
+    if 'DOCKER_STATE_FILE' in os.environ:
+        state_file = os.environ['DOCKER_STATE_FILE']
+    elif 'HGTMP' in os.environ:
+        state_file = os.path.join(os.environ['HGTMP'], 'docker-state.json')
+    else:
+        print('Do not know where to put a Docker state file.')
         return 1
 
     docker_url = os.environ.get('DOCKER_HOST', None)
 
-    d = Docker(os.environ['DOCKER_STATE_FILE'], docker_url)
+    d = Docker(state_file, docker_url)
 
     action = args[0]
 
