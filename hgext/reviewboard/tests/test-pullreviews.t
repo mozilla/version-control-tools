@@ -1,5 +1,6 @@
+#require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv
+  $ commonenv rb-test-pullreviews
   $ cd client
 
 Pulling with no reviews should result in error
@@ -55,3 +56,5 @@ Pulling reviews with no changes
 
   $ cd ..
   $ rbmanage rbserver stop
+
+  $ dockercontrol stop-bmo rb-test-pullreviews > /dev/null
