@@ -5,12 +5,10 @@ import datetime
 import httplib
 import json
 import logging
+import platform
 import psycopg2
 import re
 import string
-import uuid
-
-seen_comments = {}
 
 from mozillapulse import consumers
 
@@ -28,6 +26,11 @@ auth = None
 dbconn = None
 logger = None
 message_log_path = None
+
+def read_credentials():
+    user, passwd = open('credentials/pulse.txt').read().strip().split(',')
+    return (user, passwd)
+
 
 def extract_bugid(patch):
     #TODO: check to see if there is an "official" re for this
@@ -158,8 +161,10 @@ def main():
         except IOError:
             pass
 
-    unique_label = 'autoland-%s' % uuid.uuid4()
-    pulse = consumers.BuildConsumer(applabel=unique_label)
+    user, password = read_credentials()
+
+    unique_label = 'autoland-%s' % platform.node()
+    pulse = consumers.BuildConsumer(applabel=unique_label, user=user, password=password)
     pulse.configure(topic=['build.#.started', 'build.#.finished'],
                     callback=handle_message)
     logger.debug('applabel: %s' % unique_label)
