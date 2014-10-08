@@ -54,7 +54,22 @@ rbmanage() {
   python $TESTDIR/hgext/reviewboard/tests/rbmanage.py $1 $2 $3 $4 $5
 }
 
+bugzilla() {
+  $TESTDIR/testing/bugzilla.py $1 $2 $3 $4 $5 $6 $7 $8 $9
+}
+
+dockercontrol() {
+  $TESTDIR/testing/docker-control.py $1 $2 $3 $4 $5
+}
+
 commonenv() {
+  if [ ! -z $1 ]; then
+    $TESTDIR/testing/docker-control.py start-bmo $1 $HGPORT2 > /dev/null
+    export BUGZILLA_URL=http://${DOCKER_HOSTNAME}:$HGPORT2
+    $TESTDIR/testing/bugzilla.py create-group reviewboard 'reviewboard users'
+    export USE_BZ_AUTH=1
+  fi
+
   hg init client
   hg init server
   rbmanage rbserver create
