@@ -1,5 +1,9 @@
+#require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv
+  $ commonenv rb-test-commits-deleted-no-obsolescence
+
+  $ bugzilla create-bug-range TestProduct TestComponent 123
+  created 123 bugs
 
   $ cd client
   $ echo 'foo' > foo0
@@ -352,3 +356,5 @@ Try removing a commit in the middle.
 
   $ cd ..
   $ rbmanage rbserver stop
+
+  $ dockercontrol stop-bmo rb-test-commits-deleted-no-obsolescence > /dev/null
