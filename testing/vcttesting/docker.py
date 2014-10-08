@@ -10,6 +10,7 @@ from __future__ import absolute_import
 import docker
 import json
 import os
+import requests
 import socket
 import subprocess
 import sys
@@ -75,6 +76,15 @@ class Docker(object):
         node = subprocess.check_output(cmd, shell=True, env=env)
         self._hgnode = node.strip()
         self._hgdirty = '+' in node
+
+    def is_alive(self):
+        """Whether the connection to Docker is alive."""
+        # This is a layering violation with docker.client, but meh.
+        try:
+            self.client._get(self.client._url('/version'), timeout=1)
+            return True
+        except requests.exceptions.RequestException:
+            return False
 
     def ensure_built(self, name):
         """Ensure a Docker image from a builder directory is built and up to date"""
