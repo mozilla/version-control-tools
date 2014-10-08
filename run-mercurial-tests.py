@@ -114,9 +114,10 @@ if __name__ == '__main__':
 
     # Enable tests to interact with our Docker controlling script.
     docker_state = os.path.join(HERE, '.docker-state.json')
-    os.environ['DOCKER_STATE_FILE'] = docker_state
     docker = Docker(docker_state, os.environ.get('DOCKER_HOST', None))
-    os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
+    if docker.is_alive():
+        os.environ['DOCKER_STATE_FILE'] = docker_state
+        os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
 
     os.environ['BUGZILLA_USERNAME'] = 'admin@example.com'
     os.environ['BUGZILLA_PASSWORD'] = 'password'
