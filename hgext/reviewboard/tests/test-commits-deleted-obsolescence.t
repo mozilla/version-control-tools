@@ -1,5 +1,9 @@
+#require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv
+  $ commonenv rb-test-commits-deleted-obsolescence
+
+  $ bugzilla create-bug-range TestProduct TestComponent 123
+  created 123 bugs
 
   $ cat > obs.py << EOF
   > import mercurial.obsolete
@@ -384,3 +388,5 @@ The parent review should have been updated accordingly.
 
   $ cd ..
   $ rbmanage rbserver stop
+
+  $ dockercontrol stop-bmo rb-test-commits-deleted-obsolescence > /dev/null
