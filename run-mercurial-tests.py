@@ -112,11 +112,25 @@ if __name__ == '__main__':
     # it's own.
     sys.argv = [a for a in sys.argv if a != '--cover']
 
+    # We take a snapshot of Docker containers and images before we start tests
+    # so we can look for leaks later.
+    #
+    # This behavior is non-ideal: we should not leak Docker containers and
+    # images. Furthermore, if others interact with Docker while we run, bad
+    # things will happen. But this is the easiest solution, so hacks win.
+    preserve_containers = set()
+    preserve_images = set()
+
     # Enable tests to interact with our Docker controlling script.
     docker_state = os.path.join(HERE, '.docker-state.json')
     docker = Docker(docker_state, os.environ.get('DOCKER_HOST', None))
     if docker.is_alive():
         os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
+
+        for c in docker.client.containers(all=True):
+            preserve_containers.add(c['Id'])
+        for i in docker.client.images(all=True):
+            preserve_images.add(i['Id'])
 
     os.environ['BUGZILLA_USERNAME'] = 'admin@example.com'
     os.environ['BUGZILLA_PASSWORD'] = 'password'
@@ -257,5 +271,18 @@ if __name__ == '__main__':
                 omit=omit)
         cov.xml_report(outfile='coverage/coverage.xml', ignore_errors=True,
                 omit=omit)
+
+    # Clean up leaked Docker containers and images.
+    if docker.is_alive():
+        for c in docker.client.containers(all=True):
+            if c['Id'] not in preserve_containers:
+                print('Removing orphaned Docker container: %s' % c['Id'])
+                docker.client.stop(c['Id'])
+                docker.client.remove_container(c['Id'])
+
+        for i in docker.client.images(all=True):
+            if i['Id'] not in preserve_images:
+                print('Removing orphaned Docker image: %s' % c['Id'])
+                docker.client.remove_image(i['Id'])
 
     sys.exit(res)
