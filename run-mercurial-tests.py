@@ -116,7 +116,6 @@ if __name__ == '__main__':
     docker_state = os.path.join(HERE, '.docker-state.json')
     docker = Docker(docker_state, os.environ.get('DOCKER_HOST', None))
     if docker.is_alive():
-        os.environ['DOCKER_STATE_FILE'] = docker_state
         os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
 
     os.environ['BUGZILLA_USERNAME'] = 'admin@example.com'
