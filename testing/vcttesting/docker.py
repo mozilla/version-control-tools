@@ -226,12 +226,10 @@ class Docker(object):
             count += 1
             self.client.kill(container)
             self.client.stop(container)
-            info = self.client.inspect_container(container)
             self.client.remove_container(container)
 
-            image = info['Image']
-            if image not in self.state['images'].values():
-                self.client.remove_image(info['Image'])
+            # The base image could be shared across multiple containers. So do
+            # not try to delete it.
 
         print('stopped %d containers' % count)
 
