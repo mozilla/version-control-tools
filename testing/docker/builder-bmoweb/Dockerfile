@@ -106,6 +106,8 @@
 
 FROM ubuntu:14.04.1
 
+ADD CLOBBER /CLOBBER
+
 ENV BUGZILLA_HOME /var/lib/bugzilla
 ENV DB_USER root
 ENV DB_PASS password
