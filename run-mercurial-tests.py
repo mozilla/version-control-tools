@@ -111,6 +111,7 @@ if __name__ == '__main__':
     # We do our own code coverage. Strip it so run-tests.py doesn't try to do
     # it's own.
     sys.argv = [a for a in sys.argv if a != '--cover']
+    verbose = '-v' in sys.argv or '--verbose' in sys.argv
 
     # We take a snapshot of Docker containers and images before we start tests
     # so we can look for leaks later.
@@ -126,6 +127,13 @@ if __name__ == '__main__':
     docker = Docker(docker_state, os.environ.get('DOCKER_HOST', None))
     if docker.is_alive():
         os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
+
+        # We build the base BMO images in the test runner because doing it
+        # from tests would be racey. It is easier to do it here instead of
+        # complicating code with locks.
+        db_image, web_image = docker.build_bmo(verbose=verbose)
+        os.environ['DOCKER_BMO_DB_IMAGE'] = db_image
+        os.environ['DOCKER_BMO_WEB_IMAGE'] = web_image
 
         for c in docker.client.containers(all=True):
             preserve_containers.add(c['Id'])
