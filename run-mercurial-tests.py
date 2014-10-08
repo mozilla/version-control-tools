@@ -121,15 +121,6 @@ if __name__ == '__main__':
     os.environ['BUGZILLA_USERNAME'] = 'admin@example.com'
     os.environ['BUGZILLA_PASSWORD'] = 'password'
 
-    # TODO enable integration with virtual machine when it is ready.
-    #from vagrant import Vagrant
-    #vm = Vagrant(os.path.join(HERE, 'testing', 'bmoserver'), quiet_stdout=False)
-    #oldvmstate = vm.status()[0].state
-    #if oldvmstate != vm.RUNNING:
-    #    vm.up()
-    #    print('Brought up BMO virtual machine.')
-    #os.environ['BUGZILLA_URL'] = 'http://localhost:12000'
-
     runner = runtestsmod.TestRunner()
 
     orig_args = list(sys.argv)
@@ -231,11 +222,6 @@ if __name__ == '__main__':
             all_hg_tests.extend(hooks_tests)
             run_hg_tests('@', all_hg_tests)
 
-
-    #if oldvmstate in (vm.NOT_CREATED, vm.POWEROFF, vm.ABORTED):
-    #    vm.halt()
-    #elif oldvmstate == vm.SAVED:
-    #    vm.suspend()
 
     from coverage import coverage
 
