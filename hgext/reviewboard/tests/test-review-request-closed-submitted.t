@@ -1,5 +1,8 @@
+#require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv
+  $ commonenv rb-test-review-request-closed-submitted
+  $ bugzilla create-bug-range TestProduct TestComponent 123
+  created 123 bugs
 
   $ cd client
   $ echo 'foo0' > foo
@@ -169,3 +172,4 @@ Child review request with ID 3 should be re-opened...
 
   $ cd ..
   $ rbmanage rbserver stop
+  $ dockercontrol stop-bmo rb-test-review-request-closed-submitted > /dev/null
