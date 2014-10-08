@@ -93,13 +93,6 @@ class Docker(object):
         if not os.path.isdir(p):
             raise Exception('Unknown Docker builder name: %s' % name)
 
-        # Image is derived from the working copy. If dirty, always rebuild
-        # because all bets are off.
-        key = '%s:%s' % (name, self._hgnode)
-        image = self.state['images'].get(key)
-        if image and not self._hgdirty:
-            return image
-
         # TODO create a lock to avoid race conditions.
 
         # The API here is wonky, possibly due to buggy behavior in
@@ -121,9 +114,6 @@ class Docker(object):
                 # There is likely a trailing newline.
                 image = self.get_full_image(image.rstrip())
                 break
-
-        self.state['images'][key] = image
-        self.save_state()
 
         return image
 
