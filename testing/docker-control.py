@@ -24,6 +24,10 @@ def main(args):
 
     d = Docker(state_file, docker_url)
 
+    if not d.is_alive():
+        print('Docker is not available!')
+        return 1
+
     action = args[0]
 
     if action == 'build-bmo':
