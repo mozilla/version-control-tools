@@ -53,8 +53,8 @@ def handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame):
     comment = 'Autoland request failed. User %s has insufficient permissions to land on tree %s.' %  (blame, tree)
     add_bugzilla_comment(dbconn, bugid, comment)
 
-def handle_failure(logger, dbconn, tree, rev, bugid, buildername):
-    logger.info('autoland request %s %s has too many failures for %s' % (tree, rev, buildername))
+def handle_failure(logger, dbconn, tree, rev, bugid, buildernames):
+    logger.info('autoland request %s %s has too many failures for %s' % (tree, rev, ', '.join(buildernames)))
 
     cursor = dbconn.cursor()
     query = """
@@ -65,8 +65,7 @@ def handle_failure(logger, dbconn, tree, rev, bugid, buildername):
     dbconn.commit()
 
     #TODO: add treeherder/tbpl link for job
-    #      maybe should look at all failures for better reporting
-    comment = 'Autoland request failed. Too many failures for %s.' %  (buildername)
+    comment = 'Autoland request failed. Too many failures for %s.' %  (', '.join(buildernames))
     add_bugzilla_comment(dbconn, bugid, comment)
 
 def handle_can_be_landed(logger, dbconn, tree, rev):
@@ -105,6 +104,7 @@ def handle_pending_transplants(logger, dbconn):
         result = transplant.transplant(tree, 'mozilla-inbound', changesets, message)
 
         if not result:
+            logger.debug('could not connect to transplant server: tree: %s rev %s' % (tree, rev))
             continue
 
         if 'error' in result:
@@ -200,27 +200,36 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         buildername = build_info['buildername']
         build_results.setdefault(buildername, []).append(build_info)
 
-    all_passed = True
-    actions = []
+    if len(build_results) == 0:
+        logger.debug('no build results')
+        return
+
+    single_failures = []
+    double_failures = []
     for buildername in build_results:
         passes = [x for x in build_results[buildername] if x['status'] == 0]
-        fails = [x for x in build_results[buildername] if x['status'] == 1]
+        fails = [x for x in build_results[buildername] if x['status'] in [1, 2]]
         #TODO: cancelled jobs imply cancel autoland
+        print(buildername, len(passes), len(fails))
 
         if len(fails) == 1 and not passes:
-            all_passed = False
             build_id = fails[0]['build_id']
-            actions.append(lambda: handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id))
+            single_failures.append((buildername, build_id))
         elif len(fails) == 2:
-            all_passed = False
-            actions = []
-            handle_failure(logger, dbconn, tree, rev, bugid, buildername)
-            break
+            build_id = fails[0]['build_id']
+            double_failures.append(buildername)
 
-    for action in actions:
-        action()
+    # if there are double failures, the autoland request has failed
+    if double_failures:
+        return handle_failure(logger, dbconn, tree, rev, bugid, double_failures)
 
-    if all_passed:
+    # single failures need to be retried
+    for failure in single_failures:
+        buildername, build_id = failure
+        handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id)
+
+    # if no failures, we can land
+    if not single_failures:
         return handle_can_be_landed(logger, dbconn, tree, rev)
 
 def add_bugzilla_comment(dbconn, bugid, comment):
