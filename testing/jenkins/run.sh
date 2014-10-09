@@ -11,7 +11,7 @@ hg up tip
 
 ./create-test-environment
 source venv/bin/activate
-./run-mercurial-tests.py -j4 --all-versions --cover
+./run-mercurial-tests.py -j2 --all-versions --cover
 result=$?
 
 rm -rf /version-control-tools/coverage
