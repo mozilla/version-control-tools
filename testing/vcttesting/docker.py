@@ -168,21 +168,17 @@ class Docker(object):
         print('waiting for bmoweb to bootstrap')
         wait_for_socket(self.docker_hostname, http_port)
 
+        # Ask the containers to shut down gracefully.
+        # This gives the MySQL container opportunity to flush, etc.
+        self.client.stop(web_id, timeout=20)
+        self.client.stop(db_id, timeout=20)
+
+        # Save an image of the stopped containers.
         db_bootstrap = self.client.commit(db_id)['Id']
         web_bootstrap = self.client.commit(web_id)['Id']
         self.state['images'][db_bootstrapped_key] = db_bootstrap
         self.state['images'][web_bootstrapped_key] = web_bootstrap
         self.save_state()
-
-        self.client.kill(web_id)
-        self.client.kill(db_id)
-        db_state = self.client.inspect_container(db_id)
-        web_state = self.client.inspect_container(web_id)
-
-        if web_state['State']['Running']:
-            self.client.stop(web_id)
-        if db_state['State']['Running']:
-            self.client.stop(db_id)
 
         self.client.remove_container(web_id)
         self.client.remove_container(db_id)
