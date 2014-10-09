@@ -82,5 +82,8 @@ hg up @
 make install-bin PREFIX=$mercurials/@
 hg --config extensions.purge= purge --all
 cd ../..
+echo finished install Mercurials
+
+DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-bmo
 
 echo finished creating test environment
