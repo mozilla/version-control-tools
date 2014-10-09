@@ -78,6 +78,9 @@ if __name__ == '__main__':
 
     from vcttesting.docker import Docker
 
+    # Unbuffer stdout.
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--with-hg')
     parser.add_argument('-C', '--cover', action='store_true')
