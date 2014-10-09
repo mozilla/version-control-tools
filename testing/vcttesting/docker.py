@@ -187,6 +187,8 @@ class Docker(object):
         self.client.remove_container(web_id)
         self.client.remove_container(db_id)
 
+        print('Bootstrapped BMO images created')
+
         return db_bootstrap, web_bootstrap
 
     def start_bmo(self, cluster, hostname=None, http_port=80, db_image=None,
