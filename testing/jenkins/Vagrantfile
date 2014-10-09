@@ -25,6 +25,10 @@ fi
 
 mount /var/btrfs /var/lib/docker
 
+# Docker may have been started before btrfs was mounted. If so, it would
+# have started in devicemapper mode. Force a restart to pick up btrfs.
+restart docker
+
 apt-get -y install lxc-docker mercurial python-dev python-virtualenv unzip
 usermod --append -G docker vagrant
 SCRIPT
