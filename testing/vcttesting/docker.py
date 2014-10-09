@@ -20,20 +20,20 @@ import urlparse
 HERE = os.path.abspath(os.path.dirname(__file__))
 DOCKER_DIR = os.path.normpath(os.path.join(HERE, '..', 'docker'))
 
-def wait_for_socket(host, port, timeout=60):
-    """Wait for a TCP socket to accept connections."""
+def wait_for_http(host, port, timeout=60):
+    """Wait for an HTTP response."""
 
     start = time.time()
 
     while True:
         try:
-            socket.create_connection((host, port), timeout=1)
+            requests.get('http://%s:%s/' % (host, port), timeout=1)
             return
-        except socket.error:
+        except requests.exceptions.RequestException:
             pass
 
         if time.time() - start > timeout:
-            raise Exception('Timeout reached waiting for socket')
+            raise Exception('Timeout reached waiting for HTTP')
 
         time.sleep(1)
 
@@ -166,7 +166,7 @@ class Docker(object):
 
         http_port = int(web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
         print('waiting for bmoweb to bootstrap')
-        wait_for_socket(self.docker_hostname, http_port)
+        wait_for_http(self.docker_hostname, http_port)
 
         # Ask the containers to shut down gracefully.
         # This gives the MySQL container opportunity to flush, etc.
@@ -214,7 +214,7 @@ class Docker(object):
         web_state = self.client.inspect_container(web_id)
 
         print('waiting for Bugzilla to start')
-        wait_for_socket(self.docker_hostname, http_port)
+        wait_for_http(self.docker_hostname, http_port)
         print('Bugzilla accessible on %s' % url)
 
     def stop_bmo(self, cluster):
