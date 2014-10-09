@@ -13,6 +13,8 @@ import subprocess
 import sys
 import time
 
+import mysql.connector
+
 if 'BMODB_PORT_3306_TCP_ADDR' not in os.environ:
     print('error: container invoked improperly. please link to a bmodb container')
     sys.exit(1)
@@ -39,12 +41,15 @@ while True:
     try:
         print('attempting to connect to database...', end='')
         sys.stdout.flush()
-        socket.create_connection((db_host, db_port), timeout=1)
+        # There appear to be race conditions between MySQL opening the socket
+        # and MySQL actually responding. So, we on a successful MySQL
+        # connection before continuing.
+        mysql.connector.connect(user=db_user, password=db_pass, host=db_host,
+                port=db_port)
         print('success')
         sys.stdout.flush()
-        time.sleep(1)
         break
-    except socket.error:
+    except (ConnectionError, mysql.connector.errors.Error):
         print('error')
     sys.stdout.flush()
 
