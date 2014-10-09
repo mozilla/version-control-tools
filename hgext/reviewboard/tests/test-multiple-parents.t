@@ -1,14 +1,6 @@
+#require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ hg init client
-  $ hg init server
-  $ rbmanage rbserver create
-  $ rbmanage rbserver repo test-repo http://localhost:$HGPORT/
-  $ rbmanage rbserver start $HGPORT1
-  $ serverconfig server/.hg/hgrc $HGPORT1
-  $ clientconfig client/.hg/hgrc
-
-  $ hg serve -R server -d -p $HGPORT --pid-file hg.pid
-  $ cat hg.pid >> $DAEMON_PIDS
+  $ commonenv rb-test-multiple-parents
 
 Set up repo
 
@@ -71,3 +63,4 @@ Pushing with a different review ID will create a "duplicate" review
 
   $ cd ..
   $ rbmanage rbserver stop
+  $ dockercontrol stop-bmo rb-test-multiple-parents > /dev/null
