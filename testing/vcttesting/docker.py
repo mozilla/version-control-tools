@@ -221,8 +221,7 @@ class Docker(object):
         count = 0
         for container in self.state['containers'].get(cluster, []):
             count += 1
-            self.client.kill(container)
-            self.client.stop(container)
+            self.client.stop(container, timeout=10)
             self.client.remove_container(container)
 
             # The base image could be shared across multiple containers. So do
