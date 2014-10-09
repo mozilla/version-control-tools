@@ -17,7 +17,7 @@ import xmlrpclib
 from rbbz.transports import bugzilla_transport
 
 def main(args):
-    url = os.environ['BUGZILLA_URL']
+    url = os.environ['BUGZILLA_URL'] + '/rest'
     username = os.environ['BUGZILLA_USERNAME']
     password = os.environ['BUGZILLA_PASSWORD']
 
