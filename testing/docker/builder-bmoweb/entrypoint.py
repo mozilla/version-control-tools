@@ -15,6 +15,21 @@ import time
 
 import mysql.connector
 
+# Dirty hack to make stdout unbuffered. This matters for Docker log viewing.
+class Unbuffered(object):
+   def __init__(self, s):
+       self.s = s
+   def write(self, d):
+       self.s.write(d)
+       self.s.flush()
+   def __getattr__(self, a):
+       return getattr(self.s, a)
+sys.stdout = Unbuffered(sys.stdout)
+
+# We also assign stderr to stdout because Docker sometimes doesn't capture
+# stderr by default.
+sys.stderr = sys.stdout
+
 if 'BMODB_PORT_3306_TCP_ADDR' not in os.environ:
     print('error: container invoked improperly. please link to a bmodb container')
     sys.exit(1)
@@ -40,18 +55,15 @@ time_start = time.time()
 while True:
     try:
         print('attempting to connect to database...', end='')
-        sys.stdout.flush()
         # There appear to be race conditions between MySQL opening the socket
         # and MySQL actually responding. So, we on a successful MySQL
         # connection before continuing.
         mysql.connector.connect(user=db_user, password=db_pass, host=db_host,
                 port=db_port)
         print('success')
-        sys.stdout.flush()
         break
     except (ConnectionError, mysql.connector.errors.Error):
         print('error')
-    sys.stdout.flush()
 
     if time.time() - time_start > db_timeout:
         print('could not connect to database before timeout; giving up')
@@ -150,8 +162,6 @@ with open(j(b, 'localconfig'), 'w') as fh:
             fh.write(line)
 
 subprocess.check_call(['/bin/chown', '-R', 'bugzilla:bugzilla', b])
-
-sys.stdout.flush()
 
 # If the container is aborted, the apache run file will be present and Apache
 # will refuse to start.
