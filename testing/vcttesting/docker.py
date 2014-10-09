@@ -219,7 +219,7 @@ class Docker(object):
 
     def stop_bmo(self, cluster):
         count = 0
-        for container in self.state['containers'].get(cluster, []):
+        for container in reversed(self.state['containers'].get(cluster, [])):
             count += 1
             self.client.stop(container, timeout=10)
             self.client.remove_container(container)
