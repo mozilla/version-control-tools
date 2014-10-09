@@ -60,7 +60,7 @@ while True:
         # connection before continuing.
         mysql.connector.connect(user=db_user, password=db_pass, host=db_host,
                 port=db_port)
-        print('success')
+        print('connected to database at %s:%s as %s' % (db_host, db_port, db_user))
         break
     except (ConnectionError, mysql.connector.errors.Error):
         print('error')
