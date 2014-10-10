@@ -296,6 +296,9 @@ if __name__ == '__main__':
                         tests |= m['tests']
 
         def run_hg_tests(version, tests):
+            if requested_tests:
+                tests = [t for t in tests if t in requested_tests]
+
             if not tests:
                 return
 
