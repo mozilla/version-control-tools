@@ -1,11 +1,6 @@
+#require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ hg init client
-  $ hg init server
-  $ rbmanage rbserver create
-  $ rbmanage rbserver repo test-repo http://localhost:$HGPORT/
-  $ rbmanage rbserver start $HGPORT1
-  $ serverconfig server/.hg/hgrc $HGPORT1
-  $ clientconfig client/.hg/hgrc
+  $ commonenv rb-test-push
 
   $ cat > obs.py << EOF
   > import mercurial.obsolete
@@ -16,9 +11,6 @@
   > mq=
   > rebase=
   > EOF
-
-  $ hg serve -R server -d -p $HGPORT --pid-file hg.pid
-  $ cat hg.pid >> $DAEMON_PIDS
 
 Set up the repo
 
@@ -185,3 +177,4 @@ Specifying multiple -r for the same head works
 
   $ cd ..
   $ rbmanage rbserver stop
+  $ dockercontrol stop-bmo rb-test-push > /dev/null
