@@ -84,6 +84,64 @@ def find_profiles_path():
 
     return path
 
+def get_profiles(profilesdir):
+    """Obtain information about available Firefox profiles.
+
+    The Firefox profiles from the specified path will be loaded. A list of
+    dicts describing each profile will be returned. The list is sorted
+    according to profile preference. The default profile is always first.
+    """
+    profileini = os.path.join(profilesdir, 'profiles.ini')
+    if not os.path.exists(profileini):
+        return []
+
+    c = config.config()
+    c.read(profileini)
+
+    profiles = []
+    for s in c.sections():
+        if not c.get(s, 'Path') or not c.get(s, 'Name'):
+            continue
+
+        name = c.get(s, 'Name')
+        path = c.get(s, 'Path')
+
+        if c.get(s, 'IsRelative') == '1':
+            path = os.path.join(profilesdir, path)
+
+        newest = -1
+        if os.path.exists(path):
+            mtimes = []
+            for p in os.listdir(path):
+                p = os.path.join(path, p)
+                if os.path.isfile(p):
+                    mtimes.append(os.path.getmtime(p))
+
+            newest = max(mtimes)
+
+        p = {
+            'name': name,
+            'path': path,
+            'default': c.get(s, 'Default', False) and True,
+            'mtime': newest,
+        }
+
+        profiles.append(p)
+
+    def compare(a, b):
+        """Sort profile by default first, file mtime second."""
+        if a['default']:
+            return -1
+
+        if a['mtime'] > b['mtime']:
+            return -1
+        elif a['mtime'] < b['mtime']:
+            return 1
+
+        return 0
+
+    return sorted(profiles, cmp=compare)
+
 def find_profile(name=None):
     """Find the location of a Firefox profile.
 
@@ -97,27 +155,21 @@ def find_profile(name=None):
     if path is None:
         raise util.Abort(_('Could not find a Firefox profile'))
 
-    profileini = os.path.join(path, 'profiles.ini')
-    c = config.config()
-    c.read(profileini)
-
+    profiles = get_profiles(path)
+    profile = None
+    # Use selected name first or highest priority second.
     if name:
-        sections = [s for s in c.sections() if name in [s, c.get(s, 'Name', None)]]
-    else:
-        sections = [s for s in c.sections() if c.get(s, 'Default', None)]
-        if not sections:
-            sections = c.sections()
+        for p in profiles:
+            if p['name'] == name:
+                profile = p
+                break
+    elif profiles:
+        profile = profiles[0]
 
-    sections = [s for s in sections if c.get(s, 'Path', None) is not None]
-    if not sections:
+    if not profile:
         raise util.Abort(_('Could not find a Firefox profile'))
 
-    section = sections.pop(0)
-    profile = c[section].get('Path')
-    if c.get(section, 'IsRelative', '0') == '1':
-        profile = os.path.join(path, profile)
-
-    return profile
+    return profile['path']
 
 def win_get_folder_path(folder):
     import ctypes
