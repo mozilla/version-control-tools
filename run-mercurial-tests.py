@@ -109,6 +109,10 @@ def get_test_files(extensions):
             for f in files:
                 if f.startswith('test') and f.endswith('.py'):
                     unit_tests.append(os.path.join(root, f))
+                elif f.startswith('test') and f.endswith('.t'):
+                    # These aren't technically hooks. But it satifies the
+                    # requirement of putting .t tests elsewhere easily.
+                    hook_tests.append(os.path.join(root, f))
 
     return {
         'extension': sorted(extension_tests),
