@@ -1,14 +1,6 @@
+#require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ hg init client
-  $ hg init server
-  $ rbmanage rbserver create
-  $ rbmanage rbserver repo test-repo http://localhost:$HGPORT1
-  $ rbmanage rbserver start $HGPORT
-  $ hg serve -R server -d -p $HGPORT1 --pid-file hg.pid
-  $ cat hg.pid >> $DAEMON_PIDS
-
-  $ serverconfig server/.hg/hgrc $HGPORT
-  $ clientconfig client/.hg/hgrc
+  $ commonenv rb-test-store
 
 Pushing a review will create the reviews file
 
@@ -31,13 +23,13 @@ Pushing a review will create the reviews file
   
   changeset:  1:7f387c765e68
   summary:    Bug 456 - second commit
-  review:     http://localhost:$HGPORT/r/2 (pending)
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   review id:  bz://456/mynick
-  review url: http://localhost:$HGPORT/r/1 (pending)
+  review url: http://localhost:$HGPORT1/r/1 (pending)
 
   $ cat .hg/reviews
-  u http://localhost:$HGPORT
+  u http://localhost:$HGPORT1
   r ssh://user@dummy/$TESTTMP/server
   p bz://456/mynick 1
   c 7f387c765e685da95d7a4ffab2ccf06548c06fcf 2
@@ -54,3 +46,4 @@ Pushing a review will create the reviews file
 
   $ cd ..
   $ rbmanage rbserver stop
+  $ dockercontrol stop-bmo rb-test-store > /dev/null
