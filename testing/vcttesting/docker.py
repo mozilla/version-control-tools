@@ -116,7 +116,7 @@ class Docker(object):
 
         raise Exception('Unable to confirm image was built')
 
-    def build_bmo(self, verbose=False):
+    def build_bmo(self, verbose=False, allow_dirty=False):
         """Ensure the images for a BMO service are built.
 
         bmoweb's entrypoint does a lot of setup on first run. This takes many
@@ -140,8 +140,9 @@ class Docker(object):
         have_db = db_bootstrapped_key in images
         have_web = web_bootstrapped_key in images
 
-        if have_db and have_web and not self._hgdirty:
-            return images[db_bootstrapped_key], images[web_bootstrapped_key]
+        if have_db and have_web:
+            if allow_dirty or not self._hgdirty:
+                return images[db_bootstrapped_key], images[web_bootstrapped_key]
 
         # If we already have the bootstrapped image, just throw it away
         # and recreate it. This catches the case where we have a dirty working
