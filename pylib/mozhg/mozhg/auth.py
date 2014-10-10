@@ -142,35 +142,6 @@ def get_profiles(profilesdir):
 
     return sorted(profiles, cmp=compare)
 
-def find_profile(name=None):
-    """Find the location of a Firefox profile.
-
-    This function attempts to locate a Firefox profile directory. It accepts
-    the name of a profile to look for.
-
-    Returns the path to a profile directory or None if no profile could be
-    found.
-    """
-    path = find_profiles_path()
-    if path is None:
-        raise util.Abort(_('Could not find a Firefox profile'))
-
-    profiles = get_profiles(path)
-    profile = None
-    # Use selected name first or highest priority second.
-    if name:
-        for p in profiles:
-            if p['name'] == name:
-                profile = p
-                break
-    elif profiles:
-        profile = profiles[0]
-
-    if not profile:
-        raise util.Abort(_('Could not find a Firefox profile'))
-
-    return profile['path']
-
 def win_get_folder_path(folder):
     import ctypes
     SHGetFolderPath = ctypes.windll.shell32.SHGetFolderPathW
