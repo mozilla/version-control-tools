@@ -11,6 +11,68 @@ import urlparse
 
 import mozhg.auth as auth
 
+def create_cookies_db(profiledir):
+    """Create a cookies SQLite database as used by Firefox profiles."""
+    path = os.path.join(profiledir, 'cookies.sqlite')
+
+    with sqlite3.connect(path) as db:
+        db.execute(
+            'CREATE TABLE moz_cookies '
+            '(id INTEGER PRIMARY KEY, '
+            'baseDomain TEXT, '
+            'appId INTEGER DEFAULT 0, '
+            'inBrowserElement INTEGER DEFAULT 0, '
+            'name TEXT, '
+            'value TEXT, '
+            'host TEXT, '
+            'path TEXT, '
+            'expiry INTEGER, '
+            'lastAccessed INTEGER, '
+            'creationTime INTEGER, '
+            'isSecure INTEGER, '
+            'isHttpOnly INTEGER, '
+            'CONSTRAINT moz_uniqueid UNIQUE (name, host, path, appId, inBrowserElement))')
+
+def create_login_cookie(profiledir, url, userid, cookie):
+    """Create a Bugzilla login cookie."""
+    path = os.path.join(profiledir, 'cookies.sqlite')
+    if not os.path.exists(path):
+        create_cookies_db(profiledir)
+
+    with sqlite3.connect(path) as db:
+        # The time values shouldn't matter.
+        expiry = int(time.time()) + 3600
+        last_accessed = int(time.time()) * 1000
+        creation_time = int(time.time()) * 1000
+
+        url = urlparse.urlparse(url)
+        domain = '.'.join(url.hostname.split('.')[-2:])
+        host = url.hostname
+        path = url.path
+
+        sql = ' '.join([
+            'INSERT INTO moz_cookies (baseDomain, name, value, host, path,',
+            'expiry, lastAccessed, creationTime, isSecure, isHttpOnly)',
+            'VALUES (:base_domain, :name, :value, :host, :path, :expiry,',
+            ':last_accessed, :creation_time, :is_secure, :is_http_only)',
+        ])
+        params = dict(
+            base_domain=domain,
+            name='Bugzilla_login',
+            value=userid,
+            host=host,
+            path=path,
+            expiry=expiry,
+            last_accessed=last_accessed,
+            creation_time=creation_time,
+            is_secure=1,
+            is_http_only=1)
+
+        db.execute(sql, params)
+        params['name'] = 'Bugzilla_logincookie'
+        params['value'] = cookie
+        db.execute(sql, params)
+
 class TestAuth(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
@@ -152,69 +214,9 @@ class TestAuth(unittest.TestCase):
         self.assertIsNone(userid)
         self.assertIsNone(cookie)
 
-    def _create_cookies_db(self, profiledir):
-        path = os.path.join(profiledir, 'cookies.sqlite')
-
-        with sqlite3.connect(path) as db:
-            db.execute(
-                'CREATE TABLE moz_cookies '
-                '(id INTEGER PRIMARY KEY, '
-                'baseDomain TEXT, '
-                'appId INTEGER DEFAULT 0, '
-                'inBrowserElement INTEGER DEFAULT 0, '
-                'name TEXT, '
-                'value TEXT, '
-                'host TEXT, '
-                'path TEXT, '
-                'expiry INTEGER, '
-                'lastAccessed INTEGER, '
-                'creationTime INTEGER, '
-                'isSecure INTEGER, '
-                'isHttpOnly INTEGER, '
-                'CONSTRAINT moz_uniqueid UNIQUE (name, host, path, appId, inBrowserElement))')
-
-    def _create_login_cookie(self, profiledir, url, userid, cookie):
-        path = os.path.join(profiledir, 'cookies.sqlite')
-        if not os.path.exists(path):
-            self._create_cookies_db(profiledir)
-
-        with sqlite3.connect(path) as db:
-            # The time values shouldn't matter.
-            expiry = int(time.time()) + 3600
-            last_accessed = int(time.time()) * 1000
-            creation_time = int(time.time()) * 1000
-
-            url = urlparse.urlparse(url)
-            domain = '.'.join(url.hostname.split('.')[-2:])
-            host = url.hostname
-            path = url.path
-
-            sql = ' '.join([
-                'INSERT INTO moz_cookies (baseDomain, name, value, host, path,',
-                'expiry, lastAccessed, creationTime, isSecure, isHttpOnly)',
-                'VALUES (:base_domain, :name, :value, :host, :path, :expiry,',
-                ':last_accessed, :creation_time, :is_secure, :is_http_only)',
-            ])
-            params = dict(
-                base_domain=domain,
-                name='Bugzilla_login',
-                value=userid,
-                host=host,
-                path=path,
-                expiry=expiry,
-                last_accessed=last_accessed,
-                creation_time=creation_time,
-                is_secure=1,
-                is_http_only=1)
-
-            db.execute(sql, params)
-            params['name'] = 'Bugzilla_logincookie'
-            params['value'] = cookie
-            db.execute(sql, params)
-
     def test_cookie_empty_db(self):
         """Ensure empty cookies.db behaves properly."""
-        self._create_cookies_db(self.tmpdir)
+        create_cookies_db(self.tmpdir)
 
         userid, cookie = auth.get_bugzilla_login_cookie_from_profile(self.tmpdir,
                 'http://dummy')
@@ -222,7 +224,7 @@ class TestAuth(unittest.TestCase):
         self.assertIsNone(cookie)
 
     def test_get_cookie_simple(self):
-        self._create_login_cookie(self.tmpdir, 'https://bugzilla.mozilla.org/',
+        create_login_cookie(self.tmpdir, 'https://bugzilla.mozilla.org/',
                 'userid', 'cookievalue')
 
         userid, cookie = auth.get_bugzilla_login_cookie_from_profile(self.tmpdir,
@@ -232,7 +234,7 @@ class TestAuth(unittest.TestCase):
 
     def test_get_cookie_no_host(self):
         """If we request a cookie from another host, we shouldn't get a cookie."""
-        self._create_login_cookie(self.tmpdir, 'https://example.com/',
+        create_login_cookie(self.tmpdir, 'https://example.com/',
                 'userid', 'cookie')
         userid, cookie = auth.get_bugzilla_login_cookie_from_profile(self.tmpdir,
                 'https://bugzilla.mozilla.org')
@@ -242,9 +244,9 @@ class TestAuth(unittest.TestCase):
 
     def test_get_cookie_multiple_paths(self):
         """If we have multiple cookies for a domain, one with correct path is used."""
-        self._create_login_cookie(self.tmpdir,
+        create_login_cookie(self.tmpdir,
             'https://bugzilla.mozilla.org/production/', 'produser', 'prodpass')
-        self._create_login_cookie(self.tmpdir,
+        create_login_cookie(self.tmpdir,
             'https://bugzilla.mozilla.org/testing/', 'testuser', 'testpass')
 
         userid, cookie = auth.get_bugzilla_login_cookie_from_profile(self.tmpdir,
