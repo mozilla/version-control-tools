@@ -1,13 +1,6 @@
+#require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ hg init client
-  $ hg init server
-  $ rbmanage rbserver create
-  $ rbmanage rbserver repo test-repo http://localhost:$HGPORT2/
-  $ rbmanage rbserver start $HGPORT
-  $ serverconfig server/.hg/hgrc $HGPORT
-  $ clientconfig client/.hg/hgrc
-  $ hg serve -R server -d -p $HGPORT2 --pid-file hg.pid
-  $ cat hg.pid >> $DAEMON_PIDS
+  $ commonenv rb-test-obsolescence
 
   $ cat > obs.py << EOF
   > import mercurial.obsolete
@@ -16,6 +9,9 @@
 
   $ echo "rebase=" >> client/.hg/hgrc
   $ echo "obs=$TESTTMP/obs.py" >> client/.hg/hgrc
+
+  $ bugzilla create-bug-range TestProduct TestComponent 123
+  created 123 bugs
 
 Set up the repo
 
@@ -37,12 +33,12 @@ Set up the repo
   
   changeset:  1:c3480b3f6944
   summary:    foo2
-  review:     http://localhost:$HGPORT/r/2 (pending)
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   review id:  bz://123/mynick
-  review url: http://localhost:$HGPORT/r/1 (pending)
+  review url: http://localhost:$HGPORT1/r/1 (pending)
 
-  $ rbmanage ../rbserver publish $HGPORT 1
+  $ rbmanage ../rbserver publish $HGPORT1 1
 
 Now create a new head and push a rebase
 
@@ -66,14 +62,16 @@ Now create a new head and push a rebase
   
   changeset:  2:e7315a409763
   summary:    bar
-  review:     http://localhost:$HGPORT/r/3 (pending)
+  review:     http://localhost:$HGPORT1/r/3 (pending)
   
   changeset:  3:5003cd557db3
   summary:    foo2
-  review:     http://localhost:$HGPORT/r/2 (pending)
+  review:     http://localhost:$HGPORT1/r/2 (pending)
   
   review id:  bz://123/mynick
-  review url: http://localhost:$HGPORT/r/1 (pending)
+  review url: http://localhost:$HGPORT1/r/1 (pending)
 
   $ cd ..
   $ rbmanage rbserver stop
+
+  $ dockercontrol stop-bmo rb-test-obsolescence > /dev/null
