@@ -21,20 +21,13 @@ EOF
 }
 
 clientconfig() {
-  username=testadmin
-  password=password
-  if [ ! -z ${USE_BZ_AUTH} ]; then
-    username=${BUGZILLA_USERNAME}
-    password=${BUGZILLA_PASSWORD}
-  fi
-
   cat >> $1 << EOF
 [ui]
 ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
 
 [bugzilla]
-username = ${username}
-password = ${password}
+username = ${BUGZILLA_USERNAME}
+password = ${BUGZILLA_PASSWORD}
 
 [mozilla]
 ircnick = mynick
@@ -66,7 +59,6 @@ commonenv() {
   $TESTDIR/testing/docker-control.py start-bmo $1 $HGPORT2 > /dev/null
   export BUGZILLA_URL=http://${DOCKER_HOSTNAME}:$HGPORT2
   $TESTDIR/testing/bugzilla.py create-group reviewboard 'reviewboard users'
-  export USE_BZ_AUTH=1
 
   hg init client
   hg init server
