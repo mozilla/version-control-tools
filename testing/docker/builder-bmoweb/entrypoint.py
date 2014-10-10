@@ -65,7 +65,10 @@ cc(['/usr/bin/git', 'checkout', '--'] + list(patched_files), cwd=bz_dir)
 if 'FETCH_BMO' in os.environ:
     cc(['/usr/bin/git', 'fetch', 'origin'], cwd=bz_dir)
 
-cc(['/usr/bin/git', 'checkout', 'origin/master'], cwd=bz_dir)
+
+# We temporarily pin the Git commit until bug 1074586 is addressed.
+cc(['/usr/bin/git', 'checkout', '1f84551e1414eeba886e04e0e9e2a8e61d568fc1'],
+    cwd=bz_dir)
 
 for patch in sorted(patches):
     print('applying patch %s' % patch)
