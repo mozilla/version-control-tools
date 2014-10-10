@@ -141,6 +141,10 @@ def get_profiles(profilesdir):
                 if os.path.isfile(p):
                     mtimes.append(os.path.getmtime(p))
 
+            # If there are no files, ignore the profile completely.
+            if not mtimes:
+                continue
+
             newest = max(mtimes)
 
         p = {
