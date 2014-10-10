@@ -34,6 +34,8 @@ if 'BMODB_PORT_3306_TCP_ADDR' not in os.environ:
     print('error: container invoked improperly. please link to a bmodb container')
     sys.exit(1)
 
+bz_home = os.environ['BUGZILLA_HOME']
+bz_dir = os.path.join(bz_home, 'bugzilla')
 db_host = os.environ['BMODB_PORT_3306_TCP_ADDR']
 db_port = os.environ['BMODB_PORT_3306_TCP_PORT']
 db_user = os.environ.get('DB_USER', 'root')
@@ -47,6 +49,27 @@ if not bmo_url.endswith('/'):
     bmo_url += '/'
 
 reset_database = 'RESET_DATABASE' in os.environ
+
+cc = subprocess.check_call
+
+patches = {'apache24.patch', 'fkpatch.patch', 'elasticsearch.patch'}
+patched_files = {'.htaccess', 'Bugzilla/DB.pm', 'Bugzilla/Install/Requirements.pm'}
+
+# Ensure Bugzilla Git clone is up to date.
+
+# First unpatch changed files just in case they get modified.
+cc(['/usr/bin/git', 'checkout', '--'] + list(patched_files), cwd=bz_dir)
+
+# We want container startup to work when offline. So put this behind
+# an environment variable that can be specified by automation.
+if 'FETCH_BMO' in os.environ:
+    cc(['/usr/bin/git', 'fetch', 'origin'], cwd=bz_dir)
+
+cc(['/usr/bin/git', 'checkout', 'origin/master'], cwd=bz_dir)
+
+for patch in sorted(patches):
+    print('applying patch %s' % patch)
+    cc(['/usr/bin/git', 'apply', os.path.join(bz_home, patch)], cwd=bz_dir)
 
 # If we start this and the BMODB container at the same time, MySQL may not be
 # running yet. Wait for it.
@@ -124,8 +147,8 @@ with open(j(b, 'extensions', 'ComponentWatching', 'disabled'), 'a'):
     pass
 
 if not os.path.exists(j(h, 'checksetup.done')):
-    subprocess.check_call([j(b, 'checksetup.pl',), answers], cwd=b)
-    subprocess.check_call([j(b, 'checksetup.pl',), answers], cwd=b)
+    cc([j(b, 'checksetup.pl',), answers], cwd=b)
+    cc([j(b, 'checksetup.pl',), answers], cwd=b)
 
     with open(j(h, 'checksetup.done'), 'a'):
         pass
@@ -161,7 +184,7 @@ with open(j(b, 'localconfig'), 'w') as fh:
         else:
             fh.write(line)
 
-subprocess.check_call(['/bin/chown', '-R', 'bugzilla:bugzilla', b])
+cc(['/bin/chown', '-R', 'bugzilla:bugzilla', b])
 
 # If the container is aborted, the apache run file will be present and Apache
 # will refuse to start.

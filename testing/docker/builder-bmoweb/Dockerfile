@@ -129,8 +129,8 @@ RUN git clone https://git.mozilla.org/webtools/bmo/bugzilla.git $BUGZILLA_HOME/b
 
 # ElasticSearch isn't available on CPAN. Patch Bugzilla to not install
 # it.
-ADD elasticsearch.patch /elasticsearch.patch
-RUN cd $BUGZILLA_HOME/bugzilla && /usr/bin/patch -p1 < /elasticsearch.patch
+ADD elasticsearch.patch $BUGZILLA_HOME/elasticsearch.patch
+RUN cd $BUGZILLA_HOME/bugzilla && /usr/bin/patch -p1 < $BUGZILLA_HOME/elasticsearch.patch
 
 # Linux::Pid is a dependency for Apache::SizeLimit that for whatever
 # reason isn't detected by CPAN.
@@ -143,11 +143,9 @@ ADD checksetup_answers.txt $BUGZILLA_HOME/checksetup_answers.txt
 
 # The .htaccess isn't compatible with Apache 2.4. We fix that.
 ADD apache24.patch $BUGZILLA_HOME/apache24.patch
-RUN cd $BUGZILLA_HOME/bugzilla && /usr/bin/patch -p1 < $BUGZILLA_HOME/apache24.patch
 
 # Bug 769829. Foreign key issue with component watching schema updating.
 ADD fkpatch.patch $BUGZILLA_HOME/fkpatch.patch
-RUN cd $BUGZILLA_HOME/bugzilla && /usr/bin/patch -p1 < $BUGZILLA_HOME/fkpatch.patch
 
 # Configure Apache
 RUN rm /etc/apache2/sites-enabled/*
