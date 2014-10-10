@@ -211,6 +211,7 @@ if __name__ == '__main__':
     test_files = get_test_files(extensions)
     extension_tests = test_files['extension']
     unit_tests = test_files['unit']
+    hook_tests = test_files['hook']
 
     possible_tests = [os.path.normpath(os.path.abspath(a))
                       for a in extra[1:] if not a.startswith('-')]
@@ -219,7 +220,7 @@ if __name__ == '__main__':
     # Add all Mercurial tests unless we get an argument that is a known test.
     if not requested_tests:
         sys.argv.extend(extension_tests)
-        sys.argv.extend(test_files['hook'])
+        sys.argv.extend(hook_tests)
 
     old_env = os.environ.copy()
     old_defaults = dict(runtestsmod.defaults)
@@ -285,7 +286,7 @@ if __name__ == '__main__':
             normdirver = '.'.join(dirver.split('.')[0:2])
 
             tests = versions.setdefault(dirver, set())
-            tests |= set(hooks_tests)
+            tests |= set(hook_tests)
 
             for e, m in sorted(extensions.items()):
                 for extver in m['testedwith']:
@@ -324,7 +325,7 @@ if __name__ == '__main__':
             all_hg_tests = []
             for e, m in extensions.items():
                 all_hg_tests.extend(sorted(m['tests']))
-            all_hg_tests.extend(hooks_tests)
+            all_hg_tests.extend(hook_tests)
             run_hg_tests('@', all_hg_tests)
 
 
