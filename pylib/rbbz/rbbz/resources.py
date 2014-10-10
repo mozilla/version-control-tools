@@ -65,4 +65,19 @@ class BugzillaCookieLoginResource(WebAPIResource):
             },
         }
 
+    @webapi_request_fields(allow_unknown=True)
+    def get_list(self, request, *args, **kwargs):
+        """Handles HTTP GETs to the list resource.
+
+        We override this method to permit accessing the resource anonymously
+        even when Review Board is configured to prevent anonymous access.
+        This allows using the resource to authenticate with bugzilla without
+        already being logged in to the API.
+        """
+        return 200, {
+            'links': self.get_links(self.list_child_resources,
+                                    request=request, *args, **kwargs),
+        }
+
+
 bugzilla_cookie_login_resource = BugzillaCookieLoginResource()
