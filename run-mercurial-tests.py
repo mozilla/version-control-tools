@@ -10,6 +10,7 @@ from __future__ import print_function
 import argparse
 import imp
 import os
+import re
 import subprocess
 import sys
 
@@ -224,6 +225,29 @@ if __name__ == '__main__':
 
     old_env = os.environ.copy()
     old_defaults = dict(runtestsmod.defaults)
+
+    # This is used by hghave to detect the running Mercurial because run-tests
+    # doesn't pass down the version info in the environment of the hghave
+    # invocation.
+    import mercurial.__version__
+    hgversion = mercurial.__version__.version
+    os.environ['HGVERSION'] = hgversion
+
+    if options.with_hg:
+        clean_env = dict(os.environ)
+        clean_env['HGPLAIN'] = '1'
+        clean_env['HGRCPATH'] = '/dev/null'
+        out = subprocess.check_output('%s --version' % options.with_hg,
+                env=clean_env, shell=True)
+        out = out.splitlines()[0]
+        match = re.search('version ([^\+\)]+)', out)
+        if not match:
+            print('ERROR: Unable to identify Mercurial version.')
+            sys.exit(1)
+
+        hgversion = match.group(1)
+        os.environ['HGVERSION'] = hgversion
+
     res = runner.run(sys.argv[1:])
     os.environ.clear()
     os.environ.update(old_env)
@@ -309,6 +333,7 @@ if __name__ == '__main__':
 
             print('Testing with Mercurial %s' % version)
             sys.stdout.flush()
+            os.environ['HGVERSION'] = version
             runner = runtestsmod.TestRunner()
             r = runner.run(sys.argv[1:])
             os.environ.clear()

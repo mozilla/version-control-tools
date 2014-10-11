@@ -33,6 +33,14 @@ def has_docker():
     c.containers()
     return True
 
+@check('hg30+', 'Running with Mercurial 3.0+')
+def has_hg_30_plus():
+    v = os.environ['HGVERSION']
+    v = v.split('+')[0]
+    vers = [int(i) for i in v.split('.')]
+
+    return vers[0] >= 3
+
 # Now we reimplement the command line syntax of the CLI hghave script.
 failures = 0
 
