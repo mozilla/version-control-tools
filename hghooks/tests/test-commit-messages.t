@@ -31,7 +31,7 @@ No bug is rejected
   
   
   ************************** ERROR ****************************
-  Rev b648292ceed8 needs a bug number.
+  Rev b648292ceed8 needs "Bug N" or "No bug" in the commit message.
   test
   create foo
   *************************************************************
@@ -59,49 +59,29 @@ Bug XYZ syntax is accepted
   adding file changes
   added 1 changesets with 1 changes to 1 files
 
-Bug #XYZ form is accepted
+Adding a few dummy commits for upcoming backouts.
 
-  $ echo poundnumber > foo
-  $ hg commit -m 'Bug #123456 - add test'
+  $ echo dummycommit1 > foo
+  $ hg commit -A -m 'Bug 100 - Part 1: Test. r=me'
+  $ echo dummycommit2 > foo
+  $ hg commit -A -m 'Bug 100 - Part 2: Test. r=me'
+  $ echo dummycommit3 > foo
+  $ hg commit -A -m 'Bug 100 - Part 3: Test. r=me'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
-
-b=XYZ at beginning is accepted
-
-  $ echo bequals > foo
-  $ hg commit -m 'b=630117, rename typed array slice(); r=jwalden, a=block'
-  $ hg push
-  pushing to $TESTTMP/server
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 1 changesets with 1 changes to 1 files
-
-b=XYZ in middle is accepted
-
-  $ echo bequalsmiddle > foo
-  $ hg commit -m 'ARM assembler tweaks. (b=588021, r=cdleary)'
-  $ hg push
-  pushing to $TESTTMP/server
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 3 changesets with 3 changes to 1 files
 
 Backouts need to reference a changeset with 12 digit hash.
 
 Backing out a single changeset
 
-  $ hg backout -r . -m 'Backed out changeset d9be75507e88'
+  $ hg backout -r . -m 'Backed out changeset 4910f543acd8'
   reverting foo
-  changeset 4:2f75aa63ea4b backs out changeset 3:d9be75507e88
+  changeset 4:ceac31c0ce89 backs out changeset 3:4910f543acd8
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -110,9 +90,9 @@ Backing out a single changeset
   adding file changes
   added 1 changesets with 1 changes to 1 files
 
-  $ hg backout -r . -m 'Backout of 2f75aa63ea4b due to bustage'
+  $ hg backout -r . -m 'Backout of ceac31c0ce89 due to bustage'
   reverting foo
-  changeset 5:bcdfc8c76354 backs out changeset 4:2f75aa63ea4b
+  changeset 5:41f80b316d60 backs out changeset 4:ceac31c0ce89
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -123,9 +103,9 @@ Backing out a single changeset
 
 Including the local numeric ID is silly, but allowed
 
-  $ hg backout -r . -m 'backout 5:bcdfc8c76354'
+  $ hg backout -r . -m 'backout 5:41f80b316d60'
   reverting foo
-  changeset 6:31f438c5b89c backs out changeset 5:bcdfc8c76354
+  changeset 6:8b918b1082f8 backs out changeset 5:41f80b316d60
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -136,9 +116,9 @@ Including the local numeric ID is silly, but allowed
 
 Checking "revert to" syntax
 
-  $ hg backout -r . -m 'Revert to changeset bcdfc8c76354 due to incomplete backout'
+  $ hg backout -r . -m 'Revert to changeset 41f80b316d60 due to incomplete backout'
   reverting foo
-  changeset 7:cfff144d2d79 backs out changeset 6:31f438c5b89c
+  changeset 7:6b805c7a1ea0 backs out changeset 6:8b918b1082f8
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -151,7 +131,7 @@ Multiple changesets should work
 
   $ hg backout -r . -m 'Backout changesets  9e4ab3907b29, 3abc0dbbf710 due to m-oth permaorange'
   reverting foo
-  changeset 8:427250785150 backs out changeset 7:cfff144d2d79
+  changeset 8:2d4e565cf83f backs out changeset 7:6b805c7a1ea0
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -163,7 +143,7 @@ Multiple changesets should work
 Tag syntax should be allowed
 
   $ echo addedtag > foo
-  $ hg commit -m 'Added tag AURORA_BASE_20110412 for changeset 427250785150'
+  $ hg commit -m 'Added tag AURORA_BASE_20110412 for changeset 2d4e565cf83f'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -218,7 +198,7 @@ Test some bad commit messages
   
   
   ************************** ERROR ****************************
-  Rev aceedd3a7a9c needs a bug number.
+  Rev 9dafa242bc02 needs "Bug N" or "No bug" in the commit message.
   test
   Mass revert m-i to the last known good state
   *************************************************************
@@ -242,7 +222,7 @@ Test some bad commit messages
   
   
   ************************** ERROR ****************************
-  Rev 28a84ef30213 needs a bug number.
+  Rev 25cc2437fe62 needs "Bug N" or "No bug" in the commit message.
   test
   update revision of Add-on SDK tests to latest tip; test-only
   *************************************************************
@@ -266,7 +246,7 @@ Test some bad commit messages
   
   
   ************************** ERROR ****************************
-  Rev a76cbc1dad35 needs a bug number.
+  Rev b8a6d8dcb77a needs "Bug N" or "No bug" in the commit message.
   test
   Fix stupid bug in foo::bar()
   *************************************************************
@@ -296,7 +276,7 @@ Test some bad commit messages
   
   
   ************************** ERROR ****************************
-  Rev 15188c21f222 needs a bug number.
+  Rev 50d0d93c30bd needs "Bug N" or "No bug" in the commit message.
   test
   First line does not have a bug number
   
@@ -322,7 +302,7 @@ Test some bad commit messages
   
   
   ************************** ERROR ****************************
-  Rev f8ed876d3982 needs a bug number.
+  Rev 8d84ebce3706 needs "Bug N" or "No bug" in the commit message.
   test
   imported patch phishingfixes
   *************************************************************
@@ -346,7 +326,7 @@ Test some bad commit messages
   
   
   ************************** ERROR ****************************
-  Rev 2c7d6012b15a needs a bug number.
+  Rev 1a6c631a1bbe needs "Bug N" or "No bug" in the commit message.
   test
   imported patch 441197-1
   *************************************************************
@@ -370,7 +350,7 @@ Test some bad commit messages
   
   
   ************************** ERROR ****************************
-  Backout rev e9f73684e287 needs a bug number or a rev id.
+  Backout rev 0c2851fbf7ba needs a bug number or a rev id.
   test
   Back out Dao's push because of build bustage
   *************************************************************
@@ -394,7 +374,7 @@ Test some bad commit messages
   
   
   ************************** ERROR ****************************
-  Rev 01f57b6e29c4 needs a bug number.
+  Rev 86cf6b0971a5 needs "Bug N" or "No bug" in the commit message.
   test
   Bump mozilla-central version numbers for the next release on a CLOSED TREE
   *************************************************************
@@ -418,7 +398,7 @@ Test some bad commit messages
   
   
   ************************** ERROR ****************************
-  Rev 465821751091 needs a bug number.
+  Rev d856cba17651 needs "Bug N" or "No bug" in the commit message.
   test
   Bump Sync version to 1.9.0. r=me
   *************************************************************
@@ -442,7 +422,7 @@ Test some bad commit messages
   
   
   ************************** ERROR ****************************
-  Rev 4e02cc296e91 uses try syntax. (Did you mean to push to Try instead?)
+  Rev d9e9911a2e7a uses try syntax. (Did you mean to push to Try instead?)
   test
   checkin 1 try: -b do -p all
   *************************************************************

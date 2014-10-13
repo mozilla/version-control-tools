@@ -19,8 +19,7 @@ import re
 from mercurial.node import hex
 
 goodMessage = [re.compile(x, re.I) for x in [
-    r'bug\s+\#?[0-9]+',
-    r'b=[0-9]+',
+    r'bug [0-9]+',
     r'no bug',
 
     r'^(back(ing|ed)?\s+out|backout).*(\s+|\:)[0-9a-f]{12}',
@@ -68,7 +67,7 @@ def isGoodMessage(c):
         # Purposely ambiguous: it's ok to say "backed out rev N" or "reverted to rev N-1"
         message("Backout rev {rev} needs a bug number or a rev id.")
     else:
-        message("Rev {rev} needs a bug number.")
+        message("Rev {rev} needs \"Bug N\" or \"No bug\" in the commit message.")
 
     return False
 
