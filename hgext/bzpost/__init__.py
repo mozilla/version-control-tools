@@ -66,8 +66,15 @@ buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Servic
 def wrappedpushbookmark(orig, pushop):
     result = orig(pushop)
 
+    # pushop.ret was renamed to pushop.cgresult in Mercurial 3.2. We can drop
+    # this branch once we drop <3.2 support.
+    if hasattr(pushop, 'cgresult'):
+        origresult = pushop.cgresult
+    else:
+        origresult = pushop.ret
+
     # Don't do anything if error from push.
-    if not pushop.ret:
+    if not origresult:
         return result
 
     remoteurl = pushop.remote.url()
