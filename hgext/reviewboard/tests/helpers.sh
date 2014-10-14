@@ -25,15 +25,24 @@ clientconfig() {
 [ui]
 ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
 
-[bugzilla]
-username = ${BUGZILLA_USERNAME}
-password = ${BUGZILLA_PASSWORD}
-
 [mozilla]
 ircnick = mynick
 
 [paths]
 default-push = ssh://user@dummy/$TESTTMP/server
+
+EOF
+
+if [ -z ${NO_BUGZILLA_AUTH} ]; then
+  cat >> $1 << EOF
+[bugzilla]
+username = ${BUGZILLA_USERNAME}
+password = ${BUGZILLA_PASSWORD}
+EOF
+
+  # We want [extensions] to be last because some tests write
+  # ext=path/to/ext lines.
+  cat >> $1 << EOF
 
 [extensions]
 strip =
@@ -41,6 +50,9 @@ rebase =
 reviewboard = $TESTDIR/hgext/reviewboard/client.py
 
 EOF
+
+fi
+
 }
 
 rbmanage() {
