@@ -155,7 +155,13 @@ class Docker(object):
         db_id = self.client.create_container(db_image,
                 environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
 
-        web_id = self.client.create_container(web_image)['Id']
+        web_environ = {}
+        # Temporarily pin Bugzilla commit until bootstrapping is fixed.
+        # See bug 1074586.
+        web_environ['BMO_COMMIT'] = '1f84551e1414eeba886e04e0e9e2a8e61d568fc1'
+
+        web_id = self.client.create_container(web_image,
+                environment=web_environ)['Id']
 
         self.client.start(db_id)
         db_state = self.client.inspect_container(db_id)
