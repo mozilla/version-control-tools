@@ -7,7 +7,12 @@ import re
 from django.contrib.auth.models import User
 from django.db import models
 
-BZ_IRCNICK_RE = re.compile(':([-0-9A-}]+)')
+# Note that Review Board only allows a subset of legal IRC-nick characters.
+# Specifically, Review Board does not allow [ \ ] ^ ` { | }
+# Anyone with those in their :ircnicks will have them truncated at the last
+# legal character.  Not great, but we can later implement a UI for letting
+# people change their usernames in Review Board.
+BZ_IRCNICK_RE = re.compile(':([A-Za-z0-9_\-\.]+)')
 
 class BugzillaUserMap(models.Model):
     user = models.OneToOneField(User)
