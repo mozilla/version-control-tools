@@ -148,7 +148,7 @@ def firefoxtrees(repo, proto):
 
     return '\n'.join(lines)
 
-def push(orig, repo, remote, force=False, revs=None, newbranch=False):
+def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     # If no arguments are specified to `hg push`, Mercurial's default
     # behavior is to try to push all non-remote changesets. The Firefox
     # trees all have hooks that prevent new heads from being created.
@@ -161,7 +161,8 @@ def push(orig, repo, remote, force=False, revs=None, newbranch=False):
             'using . to avoid pushing multiple heads\n'))
         revs = [repo['.'].node()]
 
-    return orig(repo, remote, force=force, revs=revs, newbranch=newbranch)
+    return orig(repo, remote, force=force, revs=revs, newbranch=newbranch,
+            **kwargs)
 
 def prepushoutgoinghook(local, remote, outgoing):
     """Hook that prevents us from attempting to push multiple heads.
