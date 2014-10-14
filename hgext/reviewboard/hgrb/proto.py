@@ -8,11 +8,34 @@ from mercurial import mdiff
 from mercurial import patch
 from mercurial import wireproto
 
+class AuthError(Exception):
+    """Represents an error authenticating or authorizing to Bugzilla."""
+
+    def __init__(self, e, username, password, cookie, **kwargs):
+        self.e = e
+        self.username = username
+        self.password = password
+        self.cookie = cookie
+
+    def __str__(self):
+        if self.password:
+            return 'invalid Bugzilla username/password; check your settings'
+        if self.cookie:
+            return 'invalid Bugzilla login cookie; is it expired?'
+        else:
+            return 'unknown failure'
+
 # Wrap post_reviews because we don't want to require the clients to
 # import rbtools.
 def post_reviews(*args, **kwargs):
     from reviewboardmods.pushhooks import post_reviews as pr
-    return pr(*args, **kwargs)
+    from rbtools.api.errors import AuthorizationError
+
+    try:
+        return pr(*args, **kwargs)
+    except AuthorizationError as e:
+        # Reraise as our internal type to avoid import issues.
+        raise AuthError(e, **kwargs)
 
 def getpayload(proto, args):
     # HTTP and SSH behave differently here. In SSH, the data is
@@ -149,26 +172,32 @@ def reviewboard(repo, proto, args=None):
     rburl = repo.ui.config('reviewboard', 'url', None).rstrip('/')
     repoid = repo.ui.configint('reviewboard', 'repoid', None)
 
-    parentrid, commitmap, reviews = post_reviews(rburl, repoid, identifier,
-                                                 commits,
-                                                 username=bzusername,
-                                                 password=bzpassword,
-                                                 cookie=bzcookie)
-
     lines = [
         '1',
         'rburl %s' % rburl,
         'reviewid %s' % identifier,
-        'parentreview %s' % parentrid,
-        'reviewdata %s status %s' % (parentrid,
-            urllib.quote(reviews[parentrid].status.encode('utf-8'))),
     ]
 
-    for node, rid in commitmap.items():
-        rr = reviews[rid]
-        lines.append('csetreview %s %s' % (node, rid))
-        lines.append('reviewdata %s status %s' % (rid,
-            urllib.quote(rr.status.encode('utf-8'))))
+    try:
+        parentrid, commitmap, reviews = post_reviews(rburl, repoid, identifier,
+                                                     commits,
+                                                     username=bzusername,
+                                                     password=bzpassword,
+                                                     cookie=bzcookie)
+        lines.extend([
+            'parentreview %s' % parentrid,
+            'reviewdata %s status %s' % (parentrid,
+                urllib.quote(reviews[parentrid].status.encode('utf-8'))),
+        ])
+
+        for node, rid in commitmap.items():
+            rr = reviews[rid]
+            lines.append('csetreview %s %s' % (node, rid))
+            lines.append('reviewdata %s status %s' % (rid,
+                urllib.quote(rr.status.encode('utf-8'))))
+
+    except AuthError as e:
+        lines.append('error %s' % str(e))
 
     # It's easy for unicode to creep in from RBClient APIs. Mercurial doesn't
     # like unicode type responses, so catch it early and avoid the crypic

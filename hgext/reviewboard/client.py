@@ -322,6 +322,8 @@ def doreview(repo, ui, remote, reviewnode):
 
         if t == 'display':
             ui.write('%s\n' % d)
+        elif t == 'error':
+            raise util.Abort(d)
         elif t == 'parentreview':
             newparentid = d
             reviews.addparentreview(identifier.full, newparentid)
