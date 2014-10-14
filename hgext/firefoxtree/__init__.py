@@ -178,6 +178,70 @@ def prepushoutgoinghook(local, remote, outgoing):
         raise util.Abort(_('cannot push multiple heads to a Firefox tree; '
             'limit pushed revisions using the -r argument'))
 
+def pull(orig, repo, remote, *args, **kwargs):
+    old_rev = len(repo)
+    res = orig(repo, remote, *args, **kwargs)
+
+    if not isfirefoxrepo(repo):
+        return res
+
+    lock = repo.lock()
+    try:
+        if remote.capable('firefoxtrees'):
+            lines = remote._call('firefoxtrees').splitlines()
+            oldtags = repo.tags()
+            newtags = {}
+            for line in lines:
+                tag, node = line.split()
+                newtags[tag] = node
+
+                node = bin(node)
+
+                if oldtags.get(tag, None) == node:
+                    continue
+
+                repo.tag(tag, node, message=None, local=True,
+                        user=None, date=None)
+                between = None
+                if tag in oldtags:
+                    between = len(list(repo.revs('%s::%s' % (
+                        hex(oldtags[tag]), hex(node))))) - 1
+
+                    if not between:
+                        continue
+
+                msg = _('updated firefox tree tag %s') % tag
+                if between:
+                    msg += _(' (+%d commits)') % between
+                msg += '\n'
+                repo.ui.status(msg)
+
+            # repo.tag will produce multiple entries for a tag. Prune
+            # the old ones.
+            localdata = repo.opener.tryread('localtags')
+            newlines = []
+            for line in localdata.splitlines():
+                line = line.strip()
+                node, tag = line.split()
+
+                if tag not in newtags or newtags[tag] != node:
+                    continue
+
+                newlines.append(line)
+            if newlines:
+                newlines.append('')
+            if newlines:
+                repo.opener.write('localtags', '\n'.join(newlines))
+
+        tree = resolve_uri_to_tree(remote.url())
+        if tree:
+            tree = tree.encode('utf-8')
+            repo._updateremoterefs(remote, tree)
+    finally:
+        lock.release()
+
+    return res
+
 @command('fxheads', [
     ('T', 'template', shorttemplate,
      _('display with template'), _('TEMPLATE')),
@@ -204,6 +268,7 @@ def fxheads(ui, repo, **opts):
 def extsetup(ui):
     extensions.wrapfunction(hg, '_peerorrepo', peerorrepo)
     extensions.wrapfunction(exchange, 'push', push)
+    extensions.wrapfunction(exchange, 'pull', pull)
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
 
 def reposetup(ui, repo):
@@ -215,69 +280,7 @@ def reposetup(ui, repo):
     if not isfirefoxrepo(repo):
         return
 
-    orig_pull = repo.pull
     class firefoxtreerepo(repo.__class__):
-        def pull(self, remote, *args, **kwargs):
-            old_rev = len(self)
-            res = orig_pull(remote, *args, **kwargs)
-
-            lock = self.lock()
-            try:
-                if remote.capable('firefoxtrees'):
-                    lines = remote._call('firefoxtrees').splitlines()
-                    oldtags = self.tags()
-                    newtags = {}
-                    for line in lines:
-                        tag, node = line.split()
-                        newtags[tag] = node
-
-                        node = bin(node)
-
-                        if oldtags.get(tag, None) == node:
-                            continue
-
-                        self.tag(tag, node, message=None, local=True,
-                                user=None, date=None)
-                        between = None
-                        if tag in oldtags:
-                            between = len(list(self.revs('%s::%s' % (
-                                hex(oldtags[tag]), hex(node))))) - 1
-
-                            if not between:
-                                continue
-
-                        msg = _('updated firefox tree tag %s') % tag
-                        if between:
-                            msg += _(' (+%d commits)') % between
-                        msg += '\n'
-                        self.ui.status(msg)
-
-                    # self.tag will produce multiple entries for a tag. Prune
-                    # the old ones.
-                    localdata = self.opener.tryread('localtags')
-                    newlines = []
-                    for line in localdata.splitlines():
-                        line = line.strip()
-                        node, tag = line.split()
-
-                        if tag not in newtags or newtags[tag] != node:
-                            continue
-
-                        newlines.append(line)
-                    if newlines:
-                        newlines.append('')
-                    if newlines:
-                        self.opener.write('localtags', '\n'.join(newlines))
-
-                tree = resolve_uri_to_tree(remote.url())
-                if tree:
-                    tree = tree.encode('utf-8')
-                    self._updateremoterefs(remote, tree)
-            finally:
-                lock.release()
-
-            return res
-
         def _updateremoterefs(self, remote, tree):
             # We only care about the default branch. We could import
             # RELBRANCH and other branches if we really cared about it.
