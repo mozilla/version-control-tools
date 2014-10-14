@@ -125,10 +125,14 @@ def pushcommand(orig, ui, repo, *args, **kwargs):
         repo.noreviewboardpush = None
         repo.reviewid = None
 
-def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
+# kwargs is here for "bookmarks," which was introduced in Mercurial 3.2. We
+# can add it explicitly once support for <3.2 has been dropped.
+def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
+                **kwargs):
     """Wraps exchange.push to enforce restrictions for review pushes."""
     if not remote.capable('reviewboard'):
-        return orig(repo, remote, force=force, revs=revs, newbranch=newbranch)
+        return orig(repo, remote, force=force, revs=revs, newbranch=newbranch,
+                    **kwargs)
 
     ircnick = repo.ui.config('mozilla', 'ircnick', None)
     if not ircnick:
@@ -162,7 +166,8 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False):
         # specify it. The big danger here is pushing multiple heads or
         # branches or mq patches. We check the former above and we don't
         # want to limit user choice on the latter two.
-        return orig(repo, remote, force=True, revs=revs, newbranch=newbranch)
+        return orig(repo, remote, force=True, revs=revs, newbranch=newbranch,
+                **kwargs)
     finally:
         remote.ui.__class__ = oldcls
 
