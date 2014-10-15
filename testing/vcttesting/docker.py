@@ -47,11 +47,20 @@ class Docker(object):
         self.state = {
             'images': {},
             'containers': {},
+            'last-db-id': None,
+            'last-web-id': None,
+            'last-db-bootstrap-id': None,
+            'last-web-bootstrap-id': None,
         }
 
         if os.path.exists(state_path):
             with open(state_path, 'rb') as fh:
                 self.state = json.load(fh)
+
+        self.state.setdefault('last-db-id', None)
+        self.state.setdefault('last-web-id', None)
+        self.state.setdefault('last-db-bootstrap-id', None)
+        self.state.setdefault('last-web-bootstrap-id', None)
 
         self.client = docker.Client(base_url=url)
 
@@ -149,6 +158,9 @@ class Docker(object):
         db_image = self.ensure_built('bmodb-volatile', verbose=verbose)
         web_image = self.ensure_built('bmoweb', verbose=verbose)
 
+        self.state['last-db-id'] = db_image
+        self.state['last-web-id'] = web_image
+
         # The keys for the bootstrapped images are derived from the base
         # images they depend on. This means that if we regenerate a new
         # base image, the bootstrapped images will be regenerated.
@@ -206,6 +218,8 @@ class Docker(object):
                 tag=web_unique_id)['Id']
         self.state['images'][db_bootstrapped_key] = db_bootstrap
         self.state['images'][web_bootstrapped_key] = web_bootstrap
+        self.state['last-db-bootstrap-id'] = db_bootstrap
+        self.state['last-web-bootstrap-id'] = web_bootstrap
         self.save_state()
 
         self.client.remove_container(web_id)
