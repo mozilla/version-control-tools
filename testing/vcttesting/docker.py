@@ -120,7 +120,7 @@ class Docker(object):
         # around it by ensuring consistent behavior.
         print('Building Docker image %s' % name)
         for stream in self.client.build(fileobj=buf, custom_context=True,
-                tag=name, stream=True):
+                tag=name, rm=True, stream=True):
             s = json.loads(stream)
             if 'stream' not in s:
                 continue
