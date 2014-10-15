@@ -34,13 +34,19 @@ def getbugzillaauth(ui, require=False):
 
     The order of preference for Bugzilla credentials is as follows:
 
-      1) bugzilla.username and bugzilla.password from hgrc
-      2) login cookies from Firefox profile
-      3) prompt the user
+      1) bugzilla.userid and bugzilla.cookie from hgrc
+      2) bugzilla.username and bugzilla.password from hgrc
+      3) login cookies from Firefox profile
+      4) prompt the user
     """
 
     username = ui.config('bugzilla', 'username')
     password = ui.config('bugzilla', 'password')
+    userid = ui.config('bugzilla', 'userid')
+    cookie = ui.config('bugzilla', 'cookie')
+
+    if userid and cookie:
+        return BugzillaAuth(userid=userid, cookie=cookie)
 
     if username and password:
         return BugzillaAuth(username=username, password=password)

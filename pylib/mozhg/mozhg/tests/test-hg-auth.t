@@ -33,6 +33,14 @@ If nothing defined, we get prompted for username and password
   username: user-i
   password: fakepass
 
+If userid and cookie are in config, they get used
+
+  $ hg --config bugzilla.userid=uid1 --config bugzilla.cookie=cookie1 bzauth
+  userid: uid1
+  cookie: cookie1
+  username: None
+  password: None
+
 If username and password are in config, they get used
 
   $ hg --config bugzilla.username=user1 --config bugzilla.password=pass1 bzauth
@@ -40,6 +48,14 @@ If username and password are in config, they get used
   cookie: None
   username: user1
   password: pass1
+
+If cookie and u/p are in config, we prefer the cookie
+
+  $ hg --config bugzilla.username=user1 --config bugzilla.password=pass1 --config bugzilla.userid=uid1 --config bugzilla.cookie=cookie1 bzauth
+  userid: uid1
+  cookie: cookie1
+  username: None
+  password: None
 
 If just username is in config, we get prompted for password
 
