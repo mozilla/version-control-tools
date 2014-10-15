@@ -14,8 +14,10 @@ import requests
 import socket
 import subprocess
 import sys
+import tarfile
 import time
 import urlparse
+from io import BytesIO
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 DOCKER_DIR = os.path.normpath(os.path.join(HERE, '..', 'docker'))
@@ -95,12 +97,33 @@ class Docker(object):
 
         # TODO create a lock to avoid race conditions.
 
+        # We build the build context for the image manually because we need to
+        # include things outside of the directory containing the Dockerfile.
+        buf = BytesIO()
+        tar = tarfile.open(mode='w', fileobj=buf)
+
+        for root, dirs, files in os.walk(p):
+            for f in files:
+                if f == '.dockerignore':
+                    raise Exception('.dockerignore not currently supported!')
+
+                full = os.path.join(root, f)
+                rel = full[len(p)+1:]
+                tar.add(full, arcname=rel)
+
+        tar.close()
+
+        # Need to seek to beginning so .read() inside docker.client will return
+        # data.
+        buf.seek(0)
+
         # The API here is wonky, possibly due to buggy behavior in
         # docker.client always setting stream=True if version > 1.8.
         # We assume this is a bug that will change behavior later and work
-        # around it by ensuring consisten behavior.
+        # around it by ensuring consistent behavior.
         print('Building Docker image %s' % name)
-        for stream in self.client.build(path=p, tag=name, stream=True):
+        for stream in self.client.build(fileobj=buf, custom_context=True,
+                tag=name, stream=True):
             s = json.loads(stream)
             if 'stream' not in s:
                 continue
