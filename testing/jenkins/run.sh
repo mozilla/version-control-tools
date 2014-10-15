@@ -9,6 +9,9 @@ hg pull
 hg --config extensions.purge= purge
 hg up tip
 
+# We always want to update BMO's source code as part of CI.
+export FETCH_BMO=1
+
 ./create-test-environment
 source venv/bin/activate
 ./run-mercurial-tests.py -j2 --all-versions --cover
