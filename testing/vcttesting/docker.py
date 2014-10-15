@@ -17,6 +17,7 @@ import sys
 import tarfile
 import time
 import urlparse
+import uuid
 from io import BytesIO
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -189,9 +190,20 @@ class Docker(object):
         self.client.stop(web_id, timeout=20)
         self.client.stop(db_id, timeout=20)
 
+        db_unique_id = str(uuid.uuid1())
+        web_unique_id = str(uuid.uuid1())
+
         # Save an image of the stopped containers.
-        db_bootstrap = self.client.commit(db_id)['Id']
-        web_bootstrap = self.client.commit(web_id)['Id']
+        # We tag with a unique ID so we can identify all bootrapped images
+        # easily from Docker's own metadata. We have to give a tag becaue
+        # Docker will forget the repository name if a name image has only a
+        # repository name as well.
+        db_bootstrap = self.client.commit(db_id,
+                repository='bmodb-volatile-bootstrapped',
+                tag=db_unique_id)['Id']
+        web_bootstrap = self.client.commit(web_id,
+                repository='bmoweb-bootstrapped',
+                tag=web_unique_id)['Id']
         self.state['images'][db_bootstrapped_key] = db_bootstrap
         self.state['images'][web_bootstrapped_key] = web_bootstrap
         self.save_state()
