@@ -129,7 +129,7 @@ class Docker(object):
         # around it by ensuring consistent behavior.
         print('Building Docker image %s' % name)
         for stream in self.client.build(fileobj=buf, custom_context=True,
-                tag=name, rm=True, stream=True):
+                rm=True, stream=True):
             s = json.loads(stream)
             if 'stream' not in s:
                 continue
@@ -141,7 +141,22 @@ class Docker(object):
             if s.startswith('Successfully built '):
                 image = s[len('Successfully built '):]
                 # There is likely a trailing newline.
-                return self.get_full_image(image.rstrip())
+                full_image = self.get_full_image(image.rstrip())
+
+                # We only tag the image once to avoid redundancy.
+                have_tag = False
+                for i in self.client.images():
+                    if i['Id'] == full_image:
+                        for repotag in i['RepoTags']:
+                            repo, tag = repotag.split(':')
+                            if repo == name:
+                                have_tag = True
+
+                        break
+                if not have_tag:
+                    self.client.tag(full_image, name, str(uuid.uuid1()))
+
+                return full_image
 
         raise Exception('Unable to confirm image was built')
 
