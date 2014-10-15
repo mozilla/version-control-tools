@@ -111,6 +111,18 @@ class Docker(object):
                 rel = full[len(p)+1:]
                 tar.add(full, arcname=rel)
 
+        # Include extra context from us and other support tools used for
+        # creating [bootstrapped] images so Dockerfiles can ADD these files and
+        # force cache invalidation of produced images if our logic changes.
+
+        # Add ourself.
+        tar.add(os.path.join(HERE, 'docker.py'), 'extra/vcttesting/docker.py')
+
+        # Add the script for managing docker. This shouldn't be needed, but you
+        # never know.
+        tar.add(os.path.join(HERE, '..', 'docker-control.py'),
+                'extra/docker-control.py')
+
         tar.close()
 
         # Need to seek to beginning so .read() inside docker.client will return
