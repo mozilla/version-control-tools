@@ -197,6 +197,9 @@ class Docker(object):
         # See bug 1074586.
         web_environ['BMO_COMMIT'] = '1f84551e1414eeba886e04e0e9e2a8e61d568fc1'
 
+        if 'FETCH_BMO' in os.environ:
+            web_environ['FETCH_BMO'] = '1'
+
         web_id = self.client.create_container(web_image,
                 environment=web_environ)['Id']
 
