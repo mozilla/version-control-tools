@@ -64,22 +64,6 @@ class Docker(object):
         if 'unix' in docker_url.scheme:
             self.docker_hostname = 'localhost'
 
-        # We use the Mercurial working copy node to track images.
-        # We assume the current working directory is inside a Mercurial
-        # repository.
-        env = dict(os.environ)
-        env['HGRCPATH'] = '/dev/null'
-        cmd = 'hg identify -i'
-
-        # We may not be executed from the working directory of a
-        # version-control-tools checkout. Try harder to find it.
-        if 'TESTDIR' in env:
-            cmd += ' -R %s' % env['TESTDIR']
-        node = subprocess.check_output(cmd, shell=True, env=env,
-                stderr=subprocess.PIPE)
-        self._hgnode = node.strip()
-        self._hgdirty = '+' in node
-
     def is_alive(self):
         """Whether the connection to Docker is alive."""
         # This is a layering violation with docker.client, but meh.
@@ -151,7 +135,7 @@ class Docker(object):
 
         raise Exception('Unable to confirm image was built')
 
-    def build_bmo(self, verbose=False, allow_dirty=False):
+    def build_bmo(self, verbose=False):
         """Ensure the images for a BMO service are built.
 
         bmoweb's entrypoint does a lot of setup on first run. This takes many
@@ -167,25 +151,15 @@ class Docker(object):
         # The keys for the bootstrapped images are derived from the base
         # images they depend on. This means that if we regenerate a new
         # base image, the bootstrapped images will be regenerated.
-        db_bootstrapped_key = 'bmodb-bootstrapped:%s:%s' % (
-                self._hgnode, db_image)
-        web_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s:%s' % (
-                self._hgnode, db_image, web_image)
+        db_bootstrapped_key = 'bmodb-bootstrapped:%s' % db_image
+        web_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (
+                db_image, web_image)
 
         have_db = db_bootstrapped_key in images
         have_web = web_bootstrapped_key in images
 
         if have_db and have_web:
-            if allow_dirty or not self._hgdirty:
-                return images[db_bootstrapped_key], images[web_bootstrapped_key]
-
-        # If we already have the bootstrapped image, just throw it away
-        # and recreate it. This catches the case where we have a dirty working
-        # copy.
-        if db_bootstrapped_key in images:
-            self.client.remove_image(images[db_bootstrapped_key])
-        if web_bootstrapped_key in images:
-            self.client.remove_image(images[web_bootstrapped_key])
+            return images[db_bootstrapped_key], images[web_bootstrapped_key]
 
         db_id = self.client.create_container(db_image,
                 environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
@@ -295,7 +269,7 @@ class Docker(object):
             if image not in existing:
                 continue
 
-            if self._hgnode in key or image in running:
+            if image in running:
                 retained[key] = image
             else:
                 print('Removing image %s (%s)' % (image, key))
