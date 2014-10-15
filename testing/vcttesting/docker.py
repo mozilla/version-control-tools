@@ -300,21 +300,52 @@ class Docker(object):
         return image
 
     def prune_images(self):
-        """Prune images belonging to old revisions we no longer care about."""
+        """Prune images that are old and likely unused."""
         running = set(self.get_full_image(c['Image'])
                       for c in self.client.containers())
 
-        existing = set(i['Id'] for i in self.client.images())
-        retained = {}
-        for key, image in sorted(self.state['images'].items()):
-            if image not in existing:
+        candidates = []
+
+        ignore_images = set([
+            self.state['last-db-id'],
+            self.state['last-web-id'],
+            self.state['last-db-bootstrap-id'],
+            self.state['last-web-bootstrap-id'],
+        ])
+
+        relevant_repos = set([
+            'bmoweb',
+            'bmoweb-bootstrapped',
+            'bmodb-volatile',
+            'bmodb-volatile-bootstrapped',
+        ])
+
+        for i in self.client.images():
+            iid = i['Id']
+
+            # Don't do anything with images attached to running containers -
+            # Docker won't allow it.
+            if iid in running:
                 continue
 
-            if image in running:
+            # Don't do anything with our last used images.
+            if iid in ignore_images:
+                continue
+
+            for repotag in i['RepoTags']:
+                repo, tag = repotag.split(':')
+                if repo in relevant_repos:
+                    candidates.append(iid)
+                    break
+
+        retained = {}
+        for key, image in sorted(self.state['images'].items()):
+            if image in candidates:
                 retained[key] = image
-            else:
-                print('Removing image %s (%s)' % (image, key))
-                self.client.remove_image(image)
+
+        for iid in candidates:
+            print('Removing image %s' % iid)
+            self.client.remove_image(iid)
 
         self.state['images'] = retained
         self.save_state()
