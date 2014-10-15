@@ -160,6 +160,10 @@ ADD prefork.conf /etc/apache2/mods-available/mpm_prefork.conf
 ADD entrypoint.py /bmoweb_entrypoint.py
 ADD run-apache.sh /run-apache.sh
 
+# Force image cache invalidation if code used to bootstrap
+# changes.
+ADD extra/ $BUGZILLA_HOME/extra-docker-context
+
 EXPOSE 80
 
 ENTRYPOINT ["/bmoweb_entrypoint.py"]

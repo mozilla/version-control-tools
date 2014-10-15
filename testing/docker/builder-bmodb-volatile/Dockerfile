@@ -15,4 +15,8 @@ ADD my.cnf /etc/mysql/my.cnf
 
 ADD entrypoint.sh /entrypoint.sh
 
+# Force image cache invalidation if code used to bootstrap
+# changes.
+ADD extra/ $BUGZILLA_HOME/extra-docker-context
+
 CMD ["mysqld", "--datadir=/var/lib/mysql-local", "--user=mysql"]
