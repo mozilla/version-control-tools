@@ -209,6 +209,21 @@ Changing the email address in Bugzilla will update the RB email
     url: /users/newnick/
     username: newnick
 
+Disabling a user in Bugzilla will prevent them from using Review Board
+
+  $ exportbzauth admin@example.com password
+  $ bugzilla update-user-login-denied-text user1@example.com disabled
+  updated user 2
+
+(This error message isn't terrific. It can be improved later.)
+  $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/disableduser
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  submitting 1 changesets for review
+  abort: invalid Bugzilla username/password; check your settings
+  [255]
+
 Cleanup
 
   $ rbmanage ../rbserver stop
