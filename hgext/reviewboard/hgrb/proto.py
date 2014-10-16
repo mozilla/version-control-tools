@@ -11,10 +11,11 @@ from mercurial import wireproto
 class AuthError(Exception):
     """Represents an error authenticating or authorizing to Bugzilla."""
 
-    def __init__(self, e, username, password, cookie, **kwargs):
+    def __init__(self, e, username, password, userid, cookie, **kwargs):
         self.e = e
         self.username = username
         self.password = password
+        self.userid = userid
         self.cookie = cookie
 
     def __str__(self):
@@ -183,6 +184,7 @@ def reviewboard(repo, proto, args=None):
                                                      commits,
                                                      username=bzusername,
                                                      password=bzpassword,
+                                                     userid=bzuserid,
                                                      cookie=bzcookie)
         lines.extend([
             'parentreview %s' % parentrid,
