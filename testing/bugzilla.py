@@ -83,6 +83,16 @@ def main(args):
             data[key] = d
 
         print(yaml.safe_dump(data, default_flow_style=False).rstrip())
+
+    elif action == 'create-user':
+        email, password, name = args[1:]
+        h = proxy.User.create({
+            'email': email,
+            'password': password,
+            'full_name': name,
+        })
+        print('created user %s' % h['id'])
+
     elif action == 'create-group':
         group, desc = args[1:]
         # Adding every user to every group is wrong. This is a quick hack to
