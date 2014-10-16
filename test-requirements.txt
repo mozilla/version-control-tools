@@ -3,11 +3,13 @@
 --allow-external rbtools
 --allow-unverified rbtools
 Django==1.6.7
+Jinja2==2.7.3
 Markdown==2.4.1
 Pillow==2.4.0
 PyYAML==3.11
 Pygments==1.6
 RBTools==0.6.1
+Sphinx==1.2.3
 Whoosh==2.6.0
 backports.ssl-match-hostname==3.4.0.2
 coverage==3.7.1
@@ -19,6 +21,7 @@ docker-py==0.5.0
 ecdsa==0.11
 feedparser==5.1.3
 futures==2.1.6
+markupsafe==0.23
 mercurial==3.0.1
 mimeparse==0.1.3
 mock==1.0.1
