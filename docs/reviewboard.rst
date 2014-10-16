@@ -101,7 +101,7 @@ global)::
   ircnick = mynick
 
 Don't worry if you forget this: the extension will abort with an
-actionable message isn't set.
+actionable message if it isn't set.
 
 Defining the Code Review Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -141,8 +141,42 @@ following::
   $ hg pullreviews
 
 If that prints a message like *updated 27 reviews* and exits without
-spewing an error, every is configured properly and you are ready to
+spewing an error, everything is configured properly and you are ready to
 start conducting code review!
+
+How Review Board Works
+======================
+
+Before we go on to describe how to conduct code review, it is important
+to have a brief understanding of how Review Board works.
+
+For the patient, a read of the
+`Review Board User Guide <https://www.reviewboard.org/docs/manual/2.0/users/>`_
+is recommended.
+
+For the impatient, some terminology.
+
+review request
+   A request to review a single patch/diff/commit
+review
+   Responses to a review request
+issues
+   A component of a review that is explicitly tracked as part of
+the review request
+review request series
+   A collection of review requests all belonging to the same logical
+   group
+parent review request
+   For review request series, the review request that tracks the
+   overall state of the series
+draft
+   Refers to a state review requests or reviews can be in where content
+   is not publicly visible and is only available to the person who created
+   it.
+   All review requests and reviews start in the draft state by default.
+publishing
+   The act of taking a draft review request or draft review and marking
+   it as public, making it visible to everybody
 
 Pushing Code for Review
 =======================
