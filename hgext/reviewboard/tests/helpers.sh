@@ -82,3 +82,8 @@ commonenv() {
   hg serve -R server -d -p $HGPORT --pid-file hg.pid
   cat hg.pid >> $DAEMON_PIDS
 }
+
+exportbzauth() {
+  export BUGZILLA_USERNAME=$1
+  export BUGZILLA_PASSWORD=$2
+}
