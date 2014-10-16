@@ -291,6 +291,88 @@ adding a new user or splitting this test file.)
     url: /users/user3%2B4/
     username: user3+4
 
+If an existing RB user changes their IRC nick to one taken by another RB
+user, they will be assigned the email+id username.
+
+  $ exportbzauth admin@example.com password
+  $ $TESTDIR/testing/bugzilla.py update-user-fullname user3@example.com 'Mozilla User3 [:mynick]'
+  updated user 4
+
+(We need to push to get the RB username updated)
+
+  $ hg --config bugzilla.username=user3@example.com --config bugzilla.password=password3 push --reviewid bz://1/user3newnick > /dev/null
+  [1]
+
+  $ exportbzauth user3@example.com password3
+  $ rbmanage ../rbserver dump-user $HGPORT1 mynick
+  4:
+    avatar_url: http://www.gravatar.com/avatar/* (glob)
+    email: user3@example.com
+    first_name: Mozilla User3 [:mynick]
+    fullname: Mozilla User3 [:mynick]
+    id: 4
+    last_name: ''
+    url: /users/mynick/
+    username: mynick
+
+(Now update another RB user to have :newnick)
+
+(But first we check the existing state, just in case tests change)
+
+  $ exportbzauth user2-new@example.com password2
+  $ rbmanage ../rbserver dump-user $HGPORT1 newnick
+  3:
+    avatar_url: http://www.gravatar.com/avatar/* (glob)
+    email: user2-new@example.com
+    first_name: Mozilla User [:newnick]
+    fullname: Mozilla User [:newnick]
+    id: 3
+    last_name: ''
+    url: /users/newnick/
+    username: newnick
+
+  $ exportbzauth admin@example.com password
+  $ $TESTDIR/testing/bugzilla.py update-user-fullname user2-new@example.com 'Mozilla User [:mynick]'
+  updated user 3
+
+  $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2sharednick
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  submitting 1 changesets for review
+  
+  changeset:  1:737709d9e5f4
+  summary:    Bug 1 - Testing 1 2 3
+  review:     http://localhost:$HGPORT1/r/20 (pending)
+  
+  review id:  bz://1/user2sharednick
+  review url: http://localhost:$HGPORT1/r/19 (pending)
+  [1]
+
+  $ exportbzauth user3@example.com password3
+  $ rbmanage ../rbserver dump-user $HGPORT1 mynick
+  4:
+    avatar_url: http://www.gravatar.com/avatar/* (glob)
+    email: user3@example.com
+    first_name: Mozilla User3 [:mynick]
+    fullname: Mozilla User3 [:mynick]
+    id: 4
+    last_name: ''
+    url: /users/mynick/
+    username: mynick
+
+  $ exportbzauth user2-new@example.com password2
+  $ rbmanage ../rbserver dump-user $HGPORT1 user2-new+3
+  3:
+    avatar_url: http://www.gravatar.com/avatar/* (glob)
+    email: user2-new@example.com
+    first_name: Mozilla User [:mynick]
+    fullname: Mozilla User [:mynick]
+    id: 3
+    last_name: ''
+    url: /users/user2-new%2B3/
+    username: user2-new+3
+
 Cleanup
 
   $ rbmanage ../rbserver stop
