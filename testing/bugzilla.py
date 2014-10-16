@@ -11,6 +11,7 @@ import os
 import sys
 
 import bugsy
+import requests
 import yaml
 import xmlrpclib
 
@@ -35,7 +36,7 @@ def main(args):
         product, component, summary = args[1:]
         bug = bugsy.Bug(client, product=product, component=component, summary=summary)
         client.put(bug)
-    if action == 'create-bug-range':
+    elif action == 'create-bug-range':
         product, component, upper = args[1:]
 
         existing = client.search_for.search()
@@ -52,7 +53,7 @@ def main(args):
 
         print('created %d bugs' % count)
 
-    if action == 'dump-bug':
+    elif action == 'dump-bug':
         data = {}
         for bid in args[1:]:
             bug = client.get(bid)
@@ -91,6 +92,30 @@ def main(args):
             'description': desc,
             'user_regexp': '.*',
         })
+
+    elif action == 'create-login-cookie':
+        # We simulate a browser's HTML interaction with Bugzilla to obtain a
+        # login cookie. Is there a better way?
+        url = os.environ['BUGZILLA_URL']
+        r = requests.get(url + '/')
+        cookies = dict(r.cookies)
+
+        params = {
+            'Bugzilla_login': os.environ['BUGZILLA_USERNAME'],
+            'Bugzilla_password': os.environ['BUGZILLA_PASSWORD'],
+            'Bugzilla_login_token': '',
+        }
+        r = requests.post(url + '/index.cgi', params=params, cookies=cookies)
+        if r.status_code != 200:
+            raise Exception('Non-200 response from Bugzilla. Proper credentials?')
+
+        login = r.cookies['Bugzilla_login']
+        cookie = r.cookies['Bugzilla_logincookie']
+        print('%s %s' % (login, cookie))
+
+    else:
+        print('unknown action: %s' % action)
+        return 1
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))
