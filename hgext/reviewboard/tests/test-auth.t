@@ -224,6 +224,25 @@ Disabling a user in Bugzilla will prevent them from using Review Board
   abort: invalid Bugzilla username/password; check your settings
   [255]
 
+Re-enabling a disabled user will allow them to use Review Board
+
+  $ exportbzauth admin@example.com password
+  $ $TESTDIR/testing/bugzilla.py update-user-login-denied-text user1@example.com ''
+  updated user 2
+  $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/undisableduser
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  submitting 1 changesets for review
+  
+  changeset:  1:737709d9e5f4
+  summary:    Bug 1 - Testing 1 2 3
+  review:     http://localhost:$HGPORT1/r/14 (pending)
+  
+  review id:  bz://1/undisableduser
+  review url: http://localhost:$HGPORT1/r/13 (pending)
+  [1]
+
 Cleanup
 
   $ rbmanage ../rbserver stop
