@@ -243,6 +243,54 @@ Re-enabling a disabled user will allow them to use Review Board
   review url: http://localhost:$HGPORT1/r/13 (pending)
   [1]
 
+If a new Review Board user claims the same IRC nick as an existing user,
+we fall back to non-IRC RB usernames.
+
+  $ exportbzauth admin@example.com password
+  $ $TESTDIR/testing/bugzilla.py create-user user3@example.com password3 'Dummy User3 [:newnick]'
+  created user 4
+
+  $ hg --config bugzilla.username=user3@example.com --config bugzilla.password=password3 push --reviewid bz://1/conflictingircnick
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  submitting 1 changesets for review
+  
+  changeset:  1:737709d9e5f4
+  summary:    Bug 1 - Testing 1 2 3
+  review:     http://localhost:$HGPORT1/r/16 (pending)
+  
+  review id:  bz://1/conflictingircnick
+  review url: http://localhost:$HGPORT1/r/15 (pending)
+  [1]
+
+(Recycling user2 for this test is a bit dangerous. We should consider
+adding a new user or splitting this test file.)
+
+  $ exportbzauth user2-new@example.com password2
+  $ rbmanage ../rbserver dump-user $HGPORT1 newnick
+  3:
+    avatar_url: http://www.gravatar.com/avatar/* (glob)
+    email: user2-new@example.com
+    first_name: Mozilla User [:newnick]
+    fullname: Mozilla User [:newnick]
+    id: 3
+    last_name: ''
+    url: /users/newnick/
+    username: newnick
+
+  $ exportbzauth user3@example.com password3
+  $ rbmanage ../rbserver dump-user $HGPORT1 user3+4
+  4:
+    avatar_url: http://www.gravatar.com/avatar/* (glob)
+    email: user3@example.com
+    first_name: Dummy User3 [:newnick]
+    fullname: Dummy User3 [:newnick]
+    id: 4
+    last_name: ''
+    url: /users/user3%2B4/
+    username: user3+4
+
 Cleanup
 
   $ rbmanage ../rbserver stop
