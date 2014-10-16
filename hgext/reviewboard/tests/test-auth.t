@@ -50,9 +50,9 @@ Pushing with invalid cookie results in sane failure
 
 Pushing using cookie auth works
 
-  $ out=( `bugzilla create-login-cookie` )
-  $ userid=${out[0]}
-  $ cookie=${out[1]}
+  $ out=`bugzilla create-login-cookie`
+  $ userid=`echo ${out} | awk '{print $1}'`
+  $ cookie=`echo ${out} | awk '{print $2}'`
 
   $ hg --config bugzilla.userid=${userid} --config bugzilla.cookie=${cookie} push --reviewid bz://1/goodcookie
   pushing to ssh://user@dummy/$TESTTMP/server
