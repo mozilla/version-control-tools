@@ -147,6 +147,37 @@ Usernames for users with IRC nicks are the IRC nickname
     url: /users/nick/
     username: nick
 
+Changing the IRC nickname in Bugzilla will update the RB username
+
+  $ $TESTDIR/testing/bugzilla.py update-user-fullname user2@example.com 'Mozilla User [:newnick]'
+  updated user 3
+
+  $ hg --config bugzilla.username=user2@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newnick
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  submitting 1 changesets for review
+  
+  changeset:  1:737709d9e5f4
+  summary:    Bug 1 - Testing 1 2 3
+  review:     http://localhost:$HGPORT1/r/10 (pending)
+  
+  review id:  bz://1/user2newnick
+  review url: http://localhost:$HGPORT1/r/9 (pending)
+  [1]
+
+  $ exportbzauth user2@example.com password2
+  $ rbmanage ../rbserver dump-user $HGPORT1 newnick
+  3:
+    avatar_url: http://www.gravatar.com/avatar/* (glob)
+    email: user2@example.com
+    first_name: Mozilla User [:newnick]
+    fullname: Mozilla User [:newnick]
+    id: 3
+    last_name: ''
+    url: /users/newnick/
+    username: newnick
+
 Cleanup
 
   $ rbmanage ../rbserver stop
