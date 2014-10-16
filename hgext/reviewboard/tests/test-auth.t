@@ -178,6 +178,37 @@ Changing the IRC nickname in Bugzilla will update the RB username
     url: /users/newnick/
     username: newnick
 
+Changing the email address in Bugzilla will update the RB email
+
+  $ exportbzauth admin@example.com password
+  $ $TESTDIR/testing/bugzilla.py update-user-email user2@example.com user2-new@example.com
+  updated user 3
+  $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newemail
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  submitting 1 changesets for review
+  
+  changeset:  1:737709d9e5f4
+  summary:    Bug 1 - Testing 1 2 3
+  review:     http://localhost:$HGPORT1/r/12 (pending)
+  
+  review id:  bz://1/user2newemail
+  review url: http://localhost:$HGPORT1/r/11 (pending)
+  [1]
+
+  $ exportbzauth user2-new@example.com password2
+  $ rbmanage ../rbserver dump-user $HGPORT1 newnick
+  3:
+    avatar_url: http://www.gravatar.com/avatar/* (glob)
+    email: user2-new@example.com
+    first_name: Mozilla User [:newnick]
+    fullname: Mozilla User [:newnick]
+    id: 3
+    last_name: ''
+    url: /users/newnick/
+    username: newnick
+
 Cleanup
 
   $ rbmanage ../rbserver stop
