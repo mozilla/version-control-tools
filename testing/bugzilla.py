@@ -93,6 +93,15 @@ def main(args):
         })
         print('created user %s' % h['id'])
 
+    elif action == 'update-user-fullname':
+        email, name = args[1:]
+
+        h = proxy.User.update({
+            'names': [email],
+            'full_name': name,
+        })
+        print('updated user %s' % h['users'][0]['id'])
+
     elif action == 'create-group':
         group, desc = args[1:]
         # Adding every user to every group is wrong. This is a quick hack to
