@@ -10,6 +10,7 @@ import time
 import urllib
 
 import psutil
+import yaml
 
 SETTINGS_LOCAL = """
 from __future__ import unicode_literals
@@ -220,6 +221,20 @@ def main(args):
         root = get_root(port)
         r = root.get_review_request(review_request_id=rid)
         response = r.update(status='pending')
+
+    elif action == 'dump-user':
+        port, username = args[2:]
+        root = get_root(port)
+        u = root.get_user(username=username)
+
+        o = {}
+        for field in u.iterfields():
+            o[field] = getattr(u, field)
+
+        data = {}
+        data[u.id] = o
+
+        print(yaml.safe_dump(data, default_flow_style=False).rstrip())
 
 
 def get_root(port):
