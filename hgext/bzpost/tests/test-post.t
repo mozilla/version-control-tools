@@ -51,6 +51,10 @@
   > EOF
   $ cd ..
 
+  $ mkdir -p users/bzpost_mozilla.com
+  $ hg clone mozilla-central users/bzpost_mozilla.com/mozilla-central > /dev/null
+  $ cp try/.hg/hgrc users/bzpost_mozilla.com/mozilla-central/.hg/hgrc
+
   $ cat >> hgweb << EOF
   > [paths]
   > / = *
@@ -219,6 +223,53 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
     - id: 11
       text: https://tbpl.mozilla.org/?tree=Try&rev=9257b757fa7a
     summary: bug6
+
+  $ cd ..
+
+Pushing commit with bug number to user repo will not post comment by default
+
+  $ hg clone -r 0 users/bzpost_mozilla.com/mozilla-central no-post-to-user > /dev/null
+  $ cd no-post-to-user
+  $ echo 'no post to user repo' > foo
+  $ hg commit -m 'Bug 123 - New changeset with bug.'
+  $ hg push http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central
+  pushing to http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  $ cd ..
+
+Pushing commit with bug number to user repo will post comment if enabled
+
+  $ $TESTDIR/testing/bugzilla.py create-bug TestProduct TestComponent bug7
+  $ hg clone users/bzpost_mozilla.com/mozilla-central post-to-user > /dev/null
+  $ cd post-to-user
+  $ cat >> .hg/hgrc << EOF
+  > [bzpost]
+  > updateuserrepo = True
+  > EOF
+
+  $ echo 'post to user repo' > foo
+  $ hg commit -m 'Bug 7 - New changeset with bug.'
+  $ hg push http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central
+  pushing to http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  recording push in bug 7
+
+  $ $TESTDIR/testing/bugzilla.py dump-bug 7
+  Bug 7:
+    comments:
+    - id: 12
+      text: ''
+    - id: 13
+      text: http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central/rev/e48ee73711db
+    summary: bug7
 
   $ cd ..
 

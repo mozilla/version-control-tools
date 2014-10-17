@@ -30,6 +30,15 @@ We currently only post comments to integration/non-release repositories.
 This is because pushes to release repositories involve updating other
 Bugzilla fields. This extension could support these someday - it just
 doesn't yet.
+
+User Repositories
+=================
+
+By default, we do not post pushes to user repositories. To enable posting
+to user repositories, set the following in your hgrc:
+
+    [bzpost]
+    updateuserrepo = True
 """
 
 import os
@@ -48,13 +57,7 @@ demandimport.disable()
 from bugsy import Bugsy
 demandimport.enable()
 from mozautomation.commitparser import parse_bugs
-from mozautomation.repository import (
-    BASE_READ_URI,
-    BASE_WRITE_URI,
-    RELEASE_TREES,
-    resolve_trees_to_uris,
-    resolve_uri_to_tree,
-)
+from mozautomation import repository
 from mozhg.auth import getbugzillaauth
 
 testedwith = '3.0 3.0.1 3.0.2 3.1'
@@ -68,16 +71,17 @@ def wrappedpushbookmark(orig, pushop):
         return result
 
     remoteurl = pushop.remote.url()
-    tree = resolve_uri_to_tree(remoteurl)
+    tree = repository.resolve_uri_to_tree(remoteurl)
     # We don't support release trees (yet) because they have special flags
     # that need to get updated.
-    if tree and tree in RELEASE_TREES:
+    if tree and tree in repository.RELEASE_TREES:
         return result
 
     tbpltree = None
+    ui = pushop.ui
 
     if tree:
-        baseuri = resolve_trees_to_uris([tree])[0][1]
+        baseuri = repository.resolve_trees_to_uris([tree])[0][1]
         assert baseuri
 
         if tree == 'try':
@@ -87,10 +91,10 @@ def wrappedpushbookmark(orig, pushop):
         # hostname.
 
         # Only attend Mozilla's server.
-        if not remoteurl.startswith(BASE_WRITE_URI):
+        if not updateunknown(remoteurl, repository.BASE_WRITE_URI, ui):
             return result
 
-        baseuri = remoteurl.replace(BASE_WRITE_URI, BASE_READ_URI).rstrip('/')
+        baseuri = remoteurl.replace(repository.BASE_WRITE_URI, repository.BASE_READ_URI).rstrip('/')
 
     bugsmap = {}
     lastbug = None
@@ -126,7 +130,6 @@ def wrappedpushbookmark(orig, pushop):
     if not bugsmap:
         return result
 
-    ui = pushop.ui
     bzauth = getbugzillaauth(ui)
     if not bzauth or not bzauth.username or not bzauth.password:
         return result
@@ -183,3 +186,9 @@ def wrappedpushbookmark(orig, pushop):
 
 def extsetup(ui):
     extensions.wrapfunction(exchange, '_pushbookmark', wrappedpushbookmark)
+
+def updateunknown(remoteurl, base, ui):
+    if not remoteurl.startswith(base):
+        return False
+
+    return not remoteurl.startswith(base + 'users/') or ui.configbool('bzpost', 'updateuserrepo', False)
