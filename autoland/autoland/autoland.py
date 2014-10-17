@@ -32,7 +32,7 @@ def handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id
         logger.info('submitted rebuild request %s for autoland job %s %s' % (job_id, tree, rev))
         cursor = dbconn.cursor()
         query = """
-            update AutolandRequest set last_updated=%s
+            update Autoland set last_updated=%s
             where tree=%s and revision=%s
         """
         cursor.execute(query, (datetime.datetime.now(), tree, rev))
@@ -44,7 +44,7 @@ def handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id
 def handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame):
     cursor = dbconn.cursor()
     query = """
-        update AutolandRequest set can_be_landed=false, last_updated=%s
+        update Autoland set can_be_landed=false, last_updated=%s
         where tree=%s and revision=%s
     """
     cursor.execute(query, (datetime.datetime.now(), tree, rev))
@@ -58,7 +58,7 @@ def handle_failure(logger, dbconn, tree, rev, bugid, buildernames):
 
     cursor = dbconn.cursor()
     query = """
-        update AutolandRequest set can_be_landed=FALSE,last_updated=%s
+        update Autoland set can_be_landed=FALSE,last_updated=%s
         where tree=%s and revision=%s
     """
     cursor.execute(query, (datetime.datetime.now(), tree, rev))
@@ -72,7 +72,7 @@ def handle_can_be_landed(logger, dbconn, tree, rev):
     logger.info('autoland request %s %s can be landed' % (tree, rev))
     cursor = dbconn.cursor()
     query = """
-        update AutolandRequest set can_be_landed=true,last_updated=%s
+        update Autoland set can_be_landed=true,last_updated=%s
         where tree=%s and revision=%s
     """
     cursor.execute(query, (datetime.datetime.now(), tree, rev))
@@ -81,14 +81,14 @@ def handle_can_be_landed(logger, dbconn, tree, rev):
 def handle_pending_transplants(logger, dbconn):
     cursor = dbconn.cursor()
     query = """
-        select tree,revision,bugid,message from AutolandRequest
+        select tree,revision,bugid from Autoland
         where can_be_landed is true and landed is null
     """
     cursor.execute(query)
 
     landed = []
     for row in cursor.fetchall():
-        tree, rev, bugid, message = row
+        tree, rev, bugid = row
 
         pushlog = mercurial.get_pushlog(tree, rev)
         if not pushlog:
@@ -98,10 +98,13 @@ def handle_pending_transplants(logger, dbconn):
         changesets = []
         for key in pushlog:
             for changeset in pushlog[key]['changesets']:
-                changesets.append(changeset)
+                # we assume by convention head revision is empty and should
+                # not be landed
+                if changeset != rev:
+                    changesets.append(changeset)
 
         # TODO: allow for transplant to other trees than 'mozilla-inbound'
-        result = transplant.transplant(tree, 'mozilla-inbound', changesets, message)
+        result = transplant.transplant(tree, 'mozilla-inbound', changesets)
 
         if not result:
             logger.debug('could not connect to transplant server: tree: %s rev %s' % (tree, rev))
@@ -120,7 +123,7 @@ def handle_pending_transplants(logger, dbconn):
 
     if landed:
         query = """
-            update AutolandRequest set landed=%s,transplant_result=%s,last_updated=%s
+            update Autoland set landed=%s,transplant_result=%s,last_updated=%s
             where tree=%s and revision=%s
         """
         cursor.executemany(query, landed)
@@ -141,7 +144,7 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         # update pending so we won't look at this job again
         # until we get another update over pulse
         query = """
-            update AutolandRequest set pending=null,last_updated=%s
+            update Autoland set pending=null,last_updated=%s
             where tree=%s and revision=%s
         """
         cursor.execute(query, (datetime.datetime.now(), tree, rev))
@@ -149,7 +152,7 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         return
 
     query = """
-        select bugid, blame from AutolandRequest
+        select bugid, blame from Autoland
         where tree=%s and revision=%s
     """
     cursor.execute(query, (tree, rev))
@@ -181,7 +184,7 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
     if len(pending) > 0 or len(running) > 0:
         logger.info('autoland request %s %s still has pending or running jobs: %d %d' % (tree, rev, len(pending), len(running)))
         query = """
-            update AutolandRequest set pending=%s,running=%s,
+            update Autoland set pending=%s,running=%s,
                                        builds=%s,last_updated=%s
             where tree=%s and revision=%s
         """
@@ -291,7 +294,7 @@ def main():
             now = datetime.datetime.now()
 
             # handle potentially finished autoland jobs
-            query = """select tree,revision from AutolandRequest
+            query = """select tree,revision from Autoland
                        where pending=0 and running=0 and last_updated<=%(time)s
                        and can_be_landed is null"""
             cursor.execute(query, ({'time': now - stable_delay}))
@@ -301,7 +304,7 @@ def main():
 
             # we also look for any older jobs - maybe something got missed
             # in pulse
-            query = """select tree,revision from AutolandRequest
+            query = """select tree,revision from Autoland
                        where last_updated<=%(time)s
                        and can_be_landed is null"""
             cursor.execute(query, ({'time': now - old_job}))

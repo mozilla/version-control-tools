@@ -39,11 +39,11 @@ def extract_bugid(patch):
     if m:
         return m.groups()[0]
 
-def is_known_autoland_job(dbconn, tree, rev): 
+def is_known_autoland_job(dbconn, tree, rev):
     cursor = dbconn.cursor()
 
     # see if we know already know about this autoland request
-    query = """select revision from AutolandRequest
+    query = """select revision from Autoland
                where tree=%(tree)s
                and substring(revision, 0, %(len)s)=%(rev)s"""
     cursor.execute(query, {'tree': tree,
@@ -68,7 +68,6 @@ def handle_message(data, message):
         tree = None
         rev = None
         autoland = False
-        message = None
         bugid = None
         for prop in payload['build']['properties']:
             if prop[0] == 'revision':
@@ -81,8 +80,7 @@ def handle_message(data, message):
                 index = comments.find('--autoland')
                 if index > -1:
                     autoland = True
-                    message = comments[index + len('--autoland') + 1:].strip()
-                    bugid = extract_bugid(message)
+                    bugid = extract_bugid(comments)
         except KeyError:
             pass
 
@@ -102,11 +100,11 @@ def handle_message(data, message):
 
             # insert into database
             query = """
-                insert into AutolandRequest(tree,revision,bugid,blame,message,last_updated)
-                values(%s,%s,%s,%s,%s,%s)
+                insert into Autoland(tree,revision,bugid,blame,last_updated)
+                values(%s,%s,%s,%s,%s)
             """
             cursor = dbconn.cursor()
-            cursor.execute(query, (tree, rev, bugid, blame, message, datetime.datetime.now()))
+            cursor.execute(query, (tree, rev, bugid, blame, datetime.datetime.now()))
             dbconn.commit()
     elif key.find('finished') != -1:
         rev = None
@@ -125,7 +123,7 @@ def handle_message(data, message):
                 logger.info('pending: %d running: %d builds: %d' % (len(pending), len(running), len(builds)))
 
                 query = """
-                    update AutolandRequest set pending=%s,
+                    update Autoland set pending=%s,
                         running=%s,builds=%s,last_updated=%s
                     where tree=%s
                     and substring(revision, 0, %s)=%s"""

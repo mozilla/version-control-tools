@@ -1,11 +1,10 @@
 alter user autoland with password 'autoland';
 
-create table AutolandRequest (
+create table Autoland (
     tree varchar(20),
     revision varchar(40),
     bugid integer,
     blame varchar(120),
-    message text,
     pending integer,
     running integer,
     builds integer,
@@ -15,7 +14,7 @@ create table AutolandRequest (
     transplant_result text,
     primary key(tree, revision)
 );
-grant all privileges on table AutolandRequest to autoland;
+grant all privileges on table Autoland to autoland;
 
 create table BugzillaComment (
     sequence bigserial,

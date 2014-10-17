@@ -9,8 +9,8 @@ class TestAutoland(unittest.TestCase):
 
     def clear_database(self):
         cursor = self.dbconn.cursor()
-        cursor.execute('delete from autolandrequest')
-        cursor.execute('delete from bugzillacomment')
+        cursor.execute('delete from Autoland')
+        cursor.execute('delete from BugzillaComment')
         self.dbconn.commit()
 
     def setUp(self):
@@ -30,7 +30,7 @@ class TestAutoland(unittest.TestCase):
         blame = 'cthulhu@mozilla.com'
 
         cursor = self.dbconn.cursor()
-        query = """insert into AutolandRequest(tree, revision)
+        query = """insert into Autoland(tree, revision)
                    values(%s, %s)"""
         cursor.execute(query, (tree, rev))
         self.dbconn.commit()
@@ -38,7 +38,7 @@ class TestAutoland(unittest.TestCase):
         autoland.handle_insufficient_permissions(self.logger, self.dbconn,
             tree, rev, bugid, blame)
 
-        query = """select can_be_landed, last_updated from AutolandRequest
+        query = """select can_be_landed, last_updated from Autoland
                    where tree=%s and revision=%s"""
         cursor.execute(query, (tree, rev))
         can_be_landed, last_updated = cursor.fetchone()

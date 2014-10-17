@@ -15,7 +15,7 @@ class TestAutolandPulse(unittest.TestCase):
 
     def clear_database(self):
         cursor = self.dbconn.cursor()
-        cursor.execute('delete from autolandrequest')
+        cursor.execute('delete from Autoland')
         self.dbconn.commit()
 
     def setUp(self):
@@ -37,7 +37,7 @@ class TestAutolandPulse(unittest.TestCase):
     def test_is_known_autoland_job(self):
         tree = 'try'
         rev = 'd28403874a12f2f5449190ce267a58d7abab350a'
-        query = """insert into AutolandRequest(tree, revision)
+        query = """insert into Autoland(tree, revision)
                    values(%s, %s)
         """
         cursor = self.dbconn.cursor()
@@ -80,7 +80,7 @@ class TestAutolandPulse(unittest.TestCase):
         for i, data in enumerate(message_data):
             autoland_pulse.handle_message(data, DummyMessage())
 
-            cursor.execute('select pending,running,builds from AutolandRequest')
+            cursor.execute('select pending,running,builds from Autoland')
             if i < 176:
                 self.assertEqual(cursor.rowcount, 0, 'should be no autoland jobs')
             else:
