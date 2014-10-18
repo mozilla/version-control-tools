@@ -26,14 +26,6 @@ class TestAutolandPulse(unittest.TestCase):
         autoland_pulse.dbconn = self.dbconn
         autoland_pulse.logger = logging.getLogger(__name__)
 
-    def test_extract_bugid(self):
-        with open('test-data/comments.json') as f:
-            comments = json.load(f)
-            for comment in comments:
-                bugid = autoland_pulse.extract_bugid(comment['comment'])
-                self.assertEqual(bugid, comment['bugid'], '%s should match %s' %
-                    (bugid, comment['bugid']))
-
     def test_is_known_autoland_job(self):
         tree = 'try'
         rev = 'd28403874a12f2f5449190ce267a58d7abab350a'

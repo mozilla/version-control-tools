@@ -31,14 +31,6 @@ def read_credentials():
     user, passwd = open('credentials/pulse.txt').read().strip().split(',')
     return (user, passwd)
 
-
-def extract_bugid(patch):
-    #TODO: check to see if there is an "official" re for this
-    bugid = re.compile('[Bb]ug (\d+)')
-    m = re.search(bugid, patch)
-    if m:
-        return m.groups()[0]
-
 def is_known_autoland_job(dbconn, tree, rev):
     cursor = dbconn.cursor()
 
@@ -68,7 +60,6 @@ def handle_message(data, message):
         tree = None
         rev = None
         autoland = False
-        bugid = None
         for prop in payload['build']['properties']:
             if prop[0] == 'revision':
                 rev = prop[1]
@@ -77,21 +68,13 @@ def handle_message(data, message):
         try:
             for change in payload['build']['sourceStamp']['changes']:
                 comments = change['comments']
-                index = comments.find('--autoland')
-                if index > -1:
+                if comments.find('--autoland') > -1:
                     autoland = True
-                    bugid = extract_bugid(comments)
         except KeyError:
             pass
 
         if autoland:
             logger.info('found autoland job: %s %s' % (tree, rev))
-
-            if not bugid:
-                logger.info('autoland job missing bugid')
-                return
-            else:
-                logger.info('bugid %s' % bugid)
 
             if is_known_autoland_job(dbconn, tree, rev):
                 return
@@ -100,11 +83,11 @@ def handle_message(data, message):
 
             # insert into database
             query = """
-                insert into Autoland(tree,revision,bugid,blame,last_updated)
-                values(%s,%s,%s,%s,%s)
+                insert into Autoland(tree,revision,blame,last_updated)
+                values(%s,%s,%s,%s)
             """
             cursor = dbconn.cursor()
-            cursor.execute(query, (tree, rev, bugid, blame, datetime.datetime.now()))
+            cursor.execute(query, (tree, rev, blame, datetime.datetime.now()))
             dbconn.commit()
     elif key.find('finished') != -1:
         rev = None

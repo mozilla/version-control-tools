@@ -25,6 +25,13 @@ import transplant
 
 BUGZILLA_COMMENT_LIMIT = 10  # max comments to post / iteration
 
+def extract_bugid(patch):
+    #TODO: check to see if there is an "official" re for this
+    bugid = re.compile('[Bb]ug (\d+)')
+    m = re.search(bugid, patch)
+    if m:
+        return m.groups()[0]
+
 def handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id):
     logger.debug('autoland request %s %s needs to retry job for %s' % (tree, rev, buildername))
     job_id = selfserve.rebuild_job(auth, tree, build_id)
@@ -158,6 +165,33 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
     cursor.execute(query, (tree, rev))
     bugid, blame = cursor.fetchone()
 
+    # determine bugid if necessary
+    if bugid is None:
+        pushlog = mercurial.get_pushloghtml(tree, rev)
+        if not pushlog:
+            logger.debug('could not get pushlog for tree: %s rev %s' % (tree, rev))
+            return
+        bugid = extract_bugid(pushlog)
+
+        if bugid is None:
+            logger.debug('autoland failed: could not get determine bugid for tree: %s rev: %s' % (tree, rev))
+
+            query = """
+                update Autoland set can_be_landed=false,last_updated=%s
+                where tree=%s and revision=%s
+            """
+            cursor.execute(query, (datetime.datetime.now(), tree, rev))
+            dbconn.commit()
+        else:
+            logger.debug('bugid for tree: %s rev: %s is: %s' % (tree, rev, bugid))
+
+            query = """
+                update Autoland set bugid=%s,last_updated=%s
+                where tree=%s and revision=%s
+            """
+            cursor.execute(query, (bugid, datetime.datetime.now(), tree, rev))
+            dbconn.commit()
+
     # check ldap group
     blame = blame.strip('{}')
     result = mozilla_ldap.check_group(mozilla_ldap.read_credentials(),
@@ -213,7 +247,6 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         passes = [x for x in build_results[buildername] if x['status'] == 0]
         fails = [x for x in build_results[buildername] if x['status'] in [1, 2]]
         #TODO: cancelled jobs imply cancel autoland
-        print(buildername, len(passes), len(fails))
 
         if len(fails) == 1 and not passes:
             build_id = fails[0]['build_id']

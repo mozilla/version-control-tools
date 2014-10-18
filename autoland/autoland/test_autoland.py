@@ -1,3 +1,4 @@
+import json
 import logging
 import psycopg2
 import responses
@@ -60,6 +61,14 @@ class TestAutoland(unittest.TestCase):
         cursor.execute('select bugid, bug_comment from bugzillacomment')
         self.assertEqual(cursor.rowcount, 10,
                 'could not create multiple comments for same bug')
+
+    def test_extract_bugid(self):
+        with open('test-data/comments.json') as f:
+            comments = json.load(f)
+            for comment in comments:
+                bugid = autoland.extract_bugid(comment['comment'])
+                self.assertEqual(bugid, comment['bugid'], '%s should match %s' %
+                    (bugid, comment['bugid']))
         
 if __name__ == '__main__':
     unittest.main()
