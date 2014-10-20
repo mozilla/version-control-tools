@@ -365,7 +365,7 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
     depends = ','.join(str(i) for i in sorted(node_to_rid.values()))
 
     squashed_draft = squashed_rr.get_or_create_draft(**{
-        'summary': 'Review for review ID: %s' % identifier,
+        'summary': identifier,
         'description': '%s\n' % '\n'.join(squashed_description),
         'depends_on': depends,
         'extra_data.p2rb.commits': commit_list_json,

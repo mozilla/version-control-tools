@@ -106,7 +106,7 @@ Review request 6 should be added to the list of discard on publish rids.
     Public: True
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -128,7 +128,7 @@ Review request 6 should be added to the list of discard on publish rids.
   Draft: 1
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -266,7 +266,7 @@ request is published.
     Public: True
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -287,7 +287,7 @@ request is published.
   Draft: 1
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 2
       /r/3 - Bug 123 - Foo 3

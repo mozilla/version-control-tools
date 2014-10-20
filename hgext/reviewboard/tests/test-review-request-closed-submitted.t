@@ -56,7 +56,7 @@ Squashed review request with ID 1 should be closed as submitted...
     Public: True
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -119,7 +119,7 @@ Squashed review request with ID 1 should be re-opened...
     Public: True
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2

@@ -191,7 +191,7 @@ class Bugzilla(object):
             params['content_type'] = 'text/x-review-board-request'
 
         params['file_name'] = 'reviewboard-%d-url.txt' % review_id
-        params['summary'] = summary
+        params['summary'] = "MozReview Request: %s" % summary
         if flags:
             params['flags'] = flags
 

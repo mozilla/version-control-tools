@@ -50,7 +50,7 @@ Push a single commit
       p2rb.is_squashed: True
   Draft: 1
     Commit ID: bz://300124/mynick
-    Summary: Review for review ID: bz://300124/mynick
+    Summary: bz://300124/mynick
     Description:
       /r/2 - Bug 300124 - Updated foo component
       
@@ -144,7 +144,7 @@ Pushing multiple commits should result in parent diffs
       p2rb.is_squashed: True
   Draft: 3
     Commit ID: bz://10000/mynick
-    Summary: Review for review ID: bz://10000/mynick
+    Summary: bz://10000/mynick
     Description:
       /r/4 - Bug 10000 - updated bar
       /r/5 - updated foo again

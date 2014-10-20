@@ -49,16 +49,16 @@ Publishing the review will add an attachment to the bug
     - attacher: admin@example.com
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
-      description: 'Review for review ID: bz://1/mynick'
+      description: 'MozReview Request: bz://1/mynick'
       id: 1
-      summary: 'Review for review ID: bz://1/mynick'
+      summary: 'MozReview Request: bz://1/mynick'
     comments:
     - id: 1
       text: ''
     - id: 3
       text: 'Created attachment 1
   
-        Review for review ID: bz://1/mynick'
+        MozReview Request: bz://1/mynick'
     - id: 4
       text: '/r/2 - Bug 1 - Foo 1
   

@@ -57,7 +57,7 @@ no Commit ID set.
     Public: True
     Bugs: 123
     Commit ID: None
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -122,7 +122,7 @@ Commit ID re-instated.
     Public: False
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -141,7 +141,7 @@ Commit ID re-instated.
   Draft: 1
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -227,7 +227,7 @@ Squashed review request should be published.
     Public: True
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2

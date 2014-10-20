@@ -82,7 +82,7 @@ The parent review should have its description updated.
       p2rb.unpublished_rids: ["2", "3", "4"]
   Draft: 1
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2

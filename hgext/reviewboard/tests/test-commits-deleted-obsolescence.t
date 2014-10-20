@@ -113,7 +113,7 @@ on publish.
     Public: True
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -135,7 +135,7 @@ on publish.
   Draft: 1
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -187,7 +187,7 @@ The parent review should have dropped the reference to /r/6
     Public: True
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -260,7 +260,7 @@ on publish.
     Public: True
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/2 - Bug 123 - Foo 1
       /r/3 - Bug 123 - Foo 2
@@ -281,7 +281,7 @@ on publish.
   Draft: 1
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/3 - Bug 123 - Foo 2
       /r/4 - Bug 123 - Foo 3
@@ -369,7 +369,7 @@ The parent review should have been updated accordingly.
     Public: True
     Bugs: 123
     Commit ID: bz://123/mynick
-    Summary: Review for review ID: bz://123/mynick
+    Summary: bz://123/mynick
     Description:
       /r/3 - Bug 123 - Foo 2
       /r/5 - Bug 123 - Foo 4
