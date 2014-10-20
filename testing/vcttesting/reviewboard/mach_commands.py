@@ -203,10 +203,17 @@ class ReviewBoardCommands(object):
     @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request id to publish')
     def publish(self, port, rrid):
+        from rbtools.api.errors import APIError
         root = self._get_root(port)
         r = root.get_review_request(review_request_id=rrid)
-        response = r.get_draft().update(public=True)
-        # TODO: Dump the response code?
+
+        try:
+            response = r.get_draft().update(public=True)
+            # TODO: Dump the response code?
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                e.rsp['err']['msg']))
+            return 1
 
     @Command('get-users', category='reviewboard',
         description='Query the Review Board user list')
