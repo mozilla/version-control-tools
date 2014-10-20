@@ -50,7 +50,7 @@ child review requests.
 
 Squashed review request with ID 1 should be closed as submitted...
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: submitted
     Public: True
@@ -75,7 +75,7 @@ Squashed review request with ID 1 should be closed as submitted...
 
 Child review request with ID 2 should be closed as submitted...
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 2
+  $ rbmanage dumpreview $HGPORT1 2
   Review: 2
     Status: submitted
     Public: True
@@ -92,7 +92,7 @@ Child review request with ID 2 should be closed as submitted...
 
 Child review request with ID 3 should be closed as submitted...
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 3
+  $ rbmanage dumpreview $HGPORT1 3
   Review: 3
     Status: submitted
     Public: True
@@ -113,7 +113,7 @@ Re-opening the parent review request should re-open all of the children.
 
 Squashed review request with ID 1 should be re-opened...
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: pending
     Public: True
@@ -138,7 +138,7 @@ Squashed review request with ID 1 should be re-opened...
 
 Child review request with ID 2 should be re-opened...
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 2
+  $ rbmanage dumpreview $HGPORT1 2
   Review: 2
     Status: pending
     Public: True
@@ -155,7 +155,7 @@ Child review request with ID 2 should be re-opened...
 
 Child review request with ID 3 should be re-opened...
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 3
+  $ rbmanage dumpreview $HGPORT1 3
   Review: 3
     Status: pending
     Public: True

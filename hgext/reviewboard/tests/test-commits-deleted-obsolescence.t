@@ -107,7 +107,7 @@ Popping the last commit truncates the review set
 Review request 6 should be in the list of review requests to discard
 on publish.
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: pending
     Public: True
@@ -181,7 +181,7 @@ on publish.
 
 The parent review should have dropped the reference to /r/6
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: pending
     Public: True
@@ -208,7 +208,7 @@ The parent review should have dropped the reference to /r/6
 
 Review 6 should be marked as discarded
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 6
+  $ rbmanage dumpreview $HGPORT1 6
   Review: 6
     Status: discarded
     Public: True
@@ -254,7 +254,7 @@ be preserved.
 Review request 2 should be in the list of review requests to discard
 on publish.
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: pending
     Public: True
@@ -321,7 +321,7 @@ on publish.
 
 The dropped commit should now be discarded
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 2
+  $ rbmanage dumpreview $HGPORT1 2
   Review: 2
     Status: discarded
     Public: True
@@ -363,7 +363,7 @@ Try removing a commit in the middle.
 
 The parent review should have been updated accordingly.
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: pending
     Public: True

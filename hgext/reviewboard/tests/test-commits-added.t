@@ -69,7 +69,7 @@ Adding commits to old reviews should create new reviews
 
 The parent review should have its description updated.
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: pending
     Public: False

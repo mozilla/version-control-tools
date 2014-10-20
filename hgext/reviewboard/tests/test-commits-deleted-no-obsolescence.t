@@ -100,7 +100,7 @@ Popping the last commit truncates the review set
 
 Review request 6 should be added to the list of discard on publish rids.
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: pending
     Public: True
@@ -174,7 +174,7 @@ Review request 6 should be added to the list of discard on publish rids.
 
 Review 6 should be marked as discarded
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 6
+  $ rbmanage dumpreview $HGPORT1 6
   Review: 6
     Status: discarded
     Public: True
@@ -222,7 +222,7 @@ likely gets invalidated.
 
 The first commit was rewritten (we assume all subsequent were as well).
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 2
+  $ rbmanage dumpreview $HGPORT1 2
   Review: 2
     Status: pending
     Public: True
@@ -260,7 +260,7 @@ The last review request that got invalidated in the shuffle should
 be in the list of review requests to discard when the squashed review
 request is published.
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: pending
     Public: True

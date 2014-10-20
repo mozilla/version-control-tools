@@ -46,6 +46,52 @@ INTERNAL_IPS = "127.0.0.1"
 
 """.strip()
 
+# TODO Use YAML.
+def dump_review_request(r):
+    from rbtools.api.errors import APIError
+
+    # TODO Figure out depends_on dumping.
+    print('Review: %s' % r.id)
+    print('  Status: %s' % r.status)
+    print('  Public: %s' % r.public)
+    if r.bugs_closed:
+        print('  Bugs: %s' % ' '.join(r.bugs_closed))
+    print('  Commit ID: %s' % r.commit_id)
+    if r.summary:
+        print('  Summary: %s' % r.summary)
+    if r.description:
+        print('  Description:\n    %s' % r.description.replace('\n', '\n    '))
+    print('  Extra:')
+    for k, v in sorted(r.extra_data.iteritems()):
+        print ('    %s: %s' % (k, v))
+
+    try:
+        d = r.get_draft()
+        print('Draft: %s' % d.id)
+        if d.bugs_closed:
+            print('  Bugs: %s' % ' '.join(d.bugs_closed))
+        print('  Commit ID: %s' % d.commit_id)
+        if d.summary:
+            print('  Summary: %s' % d.summary)
+        if d.description:
+            print('  Description:\n    %s' % d.description.replace('\n', '\n    '))
+        print('  Extra:')
+        for k, v in sorted(d.extra_data.iteritems()):
+            print('    %s: %s' % (k, v))
+
+        dds = d.get_draft_diffs()
+        for diff in dds:
+            print('Diff: %s' % diff.id)
+            print('  Revision: %s' % diff.revision)
+            if diff.base_commit_id:
+                print('  Base Commit: %s' % diff.base_commit_id)
+            patch = diff.get_patch()
+            print(patch.data)
+    except APIError as e:
+        # There was no draft, so nothing to print.
+        pass
+
+
 @CommandProvider
 class ReviewBoardCommands(object):
     def __init__(self, context):
@@ -74,6 +120,15 @@ class ReviewBoardCommands(object):
 
         return path
 
+    def _get_root(self, port):
+        from rbtools.api.client import RBClient
+
+        username = os.environ.get('BUGZILLA_USERNAME')
+        password = os.environ.get('BUGZILLA_PASSWORD')
+
+        c = RBClient('http://localhost:%s/' % port, username=username,
+                password=password)
+        return c.get_root()
 
     @Command('create', category='reviewboard',
         description='Create a Review Board server install.')
@@ -131,3 +186,12 @@ class ReviewBoardCommands(object):
         tool = Tool.objects.get(name__exact='Mercurial')
         r = Repository(name=name, path=url, tool=tool)
         r.save()
+
+    @Command('dumpreview', category='reviewboard',
+        description='Print a representation of a review request.')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Review request id to dump')
+    def dumpreview(self, port, rrid):
+        root = self._get_root(port)
+        r = root.get_review_request(review_request_id=rrid)
+        dump_review_request(r)

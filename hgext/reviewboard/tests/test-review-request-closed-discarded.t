@@ -51,7 +51,7 @@ child review requests.
 Squashed review request with ID 1 should be closed as discarded and have
 no Commit ID set.
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: discarded
     Public: True
@@ -76,7 +76,7 @@ no Commit ID set.
 
 Child review request with ID 2 should be closed as discarded...
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 2
+  $ rbmanage dumpreview $HGPORT1 2
   Review: 2
     Status: discarded
     Public: True
@@ -93,7 +93,7 @@ Child review request with ID 2 should be closed as discarded...
 
 Child review request with ID 3 should be closed as discarded...
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 3
+  $ rbmanage dumpreview $HGPORT1 3
   Review: 3
     Status: discarded
     Public: True
@@ -116,7 +116,7 @@ and they should be non-public.
 Squashed review request with ID 1 should be re-opened and have its
 Commit ID re-instated.
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: pending
     Public: False
@@ -160,7 +160,7 @@ Commit ID re-instated.
 
 Child review request with ID 2 should be re-opened...
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 2
+  $ rbmanage dumpreview $HGPORT1 2
   Review: 2
     Status: pending
     Public: False
@@ -188,7 +188,7 @@ Child review request with ID 2 should be re-opened...
 
 Child review request with ID 3 should be re-opened...
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 3
+  $ rbmanage dumpreview $HGPORT1 3
   Review: 3
     Status: pending
     Public: False
@@ -221,7 +221,7 @@ squashed review request.
 
 Squashed review request should be published.
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage dumpreview $HGPORT1 1
   Review: 1
     Status: pending
     Public: True
@@ -246,7 +246,7 @@ Squashed review request should be published.
 
 Child review request with ID 2 should be published.
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 2
+  $ rbmanage dumpreview $HGPORT1 2
   Review: 2
     Status: pending
     Public: True
@@ -263,7 +263,7 @@ Child review request with ID 2 should be published.
 
 Child review request with ID 3 should be published.
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 3
+  $ rbmanage dumpreview $HGPORT1 3
   Review: 3
     Status: pending
     Public: True
