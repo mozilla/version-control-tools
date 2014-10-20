@@ -6,6 +6,7 @@ import re
 
 from django.contrib.auth.models import User
 from django.db import models
+from reviewboard.accounts.models import Profile
 
 # Note that Review Board only allows a subset of legal IRC-nick characters.
 # Specifically, Review Board does not allow [ \ ] ^ ` { | }
@@ -83,8 +84,7 @@ def get_or_create_bugzilla_users(user_data):
                 user.is_active = can_login
                 modified = True
 
-            profile = user.get_profile()
-
+            profile = Profile.objects.get_or_create(user=user)[0]
             if not profile.is_private:
                 profile.is_private = True
                 profile.save()
