@@ -56,7 +56,7 @@ Splitting the changeset results in multiple reviews
   adding foo3
   $ hg debugobsolete -d '0 0' c5b850e249510046906bcb24f774635c4521a4a9 05451502b94b2b05f1dd640074d4c0aa7985f52f 9d5db6367f324fad46508f44086ddbc7c79eda0e
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
+  $ rbmanage publish $HGPORT1 1
   $ hg push
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes

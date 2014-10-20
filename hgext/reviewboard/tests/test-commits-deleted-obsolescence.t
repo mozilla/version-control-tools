@@ -72,7 +72,7 @@
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
+  $ rbmanage publish $HGPORT1 1
 
 Popping the last commit truncates the review set
 
@@ -177,7 +177,7 @@ on publish.
   +foo4
   
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
+  $ rbmanage publish $HGPORT1 1
 
 The parent review should have dropped the reference to /r/6
 
@@ -317,7 +317,7 @@ on publish.
   +foo4
   
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
+  $ rbmanage publish $HGPORT1 1
 
 The dropped commit should now be discarded
 
@@ -359,7 +359,7 @@ Try removing a commit in the middle.
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
+  $ rbmanage publish $HGPORT1 1
 
 The parent review should have been updated accordingly.
 

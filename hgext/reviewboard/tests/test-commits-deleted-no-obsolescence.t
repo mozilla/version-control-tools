@@ -66,7 +66,7 @@
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
+  $ rbmanage publish $HGPORT1 1
 
 Popping the last commit truncates the review set
 
@@ -170,7 +170,7 @@ Review request 6 should be added to the list of discard on publish rids.
   +foo4
   
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
+  $ rbmanage publish $HGPORT1 1
 
 Review 6 should be marked as discarded
 
@@ -326,7 +326,7 @@ request is published.
 Publish to get us up to date, but we're not going to test the publishing
 behaviour here. We'll save that for other tests.
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
+  $ rbmanage publish $HGPORT1 1
 
 Try removing a commit in the middle.
 

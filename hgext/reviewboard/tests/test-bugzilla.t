@@ -42,7 +42,7 @@ Pushing a review should not touch Bugzilla
 
 Publishing the review will add an attachment to the bug
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
+  $ rbmanage publish $HGPORT1 1
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:

@@ -41,7 +41,7 @@
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
+  $ rbmanage publish $HGPORT1 1
 
 Close the squashed review request as submitted, which should close all of the
 child review requests.

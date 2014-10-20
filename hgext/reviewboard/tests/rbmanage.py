@@ -28,7 +28,6 @@ def main(args):
     legacy_actions = set([
         'start',
         'stop',
-        'publish',
         'closediscarded',
         'closesubmitted',
         'reopen',
@@ -143,13 +142,6 @@ def main(args):
 
         while psutil.pid_exists(pid):
             time.sleep(0.1)
-
-    elif action == 'publish':
-        port, rid = args[2:]
-        root = get_root(port)
-        r = root.get_review_request(review_request_id=rid)
-        response = r.get_draft().update(public=True)
-        # TODO: Dump the response code?
 
     elif action == 'closediscarded':
         port, rid = args[2:]

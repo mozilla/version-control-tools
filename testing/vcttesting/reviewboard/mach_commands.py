@@ -195,3 +195,13 @@ class ReviewBoardCommands(object):
         root = self._get_root(port)
         r = root.get_review_request(review_request_id=rrid)
         dump_review_request(r)
+
+    @Command('publish', category='reviewboard',
+        description='Publish a review request')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Review request id to publish')
+    def publish(self, port, rrid):
+        root = self._get_root(port)
+        r = root.get_review_request(review_request_id=rrid)
+        response = r.get_draft().update(public=True)
+        # TODO: Dump the response code?

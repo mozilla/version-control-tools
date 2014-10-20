@@ -38,7 +38,7 @@ Set up the repo
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
+  $ rbmanage publish $HGPORT1 1
 
 Now create a new head and push a rebase
 
