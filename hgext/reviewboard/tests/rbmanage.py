@@ -12,42 +12,43 @@ import urllib
 import psutil
 import yaml
 
-SETTINGS_LOCAL = """
-from __future__ import unicode_literals
+from mach.main import Mach
 
-import os
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'reviewboard.db',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-    },
-}
-
-LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
-PRODUCTION = False
-
-SECRET_KEY = "mbr7-l=uhl)rnu_dgl)um$62ad2ay=xw+$oxzo_ct!$xefe780"
-TIME_ZONE = 'UTC'
-LANGUAGE_CODE = 'en-us'
-SITE_ID = 1
-USE_I18N = True
-LDAP_TLS = False
-LOGGING_ENABLED = True
-LOGGING_LEVEL = "DEBUG"
-LOGGING_DIRECTORY = "."
-LOGGING_ALLOW_PROFILING = True
-DEBUG = True
-INTERNAL_IPS = "127.0.0.1"
-
-""".strip()
-
+HERE = os.path.abspath(os.path.dirname(__file__))
+ROOT = os.path.join(HERE, '..', '..', '..')
+sys.path.insert(0, os.path.normpath(os.path.join(ROOT, 'testing')))
 
 def main(args):
+    m = Mach(os.getcwd())
+
+    m.define_category('reviewboard', 'Review Board',
+        'Interface with Review Board', 50)
+    import vcttesting.reviewboard.mach_commands
+
+    legacy_actions = set([
+        'repo',
+        'start',
+        'stop',
+        'dumpreview',
+        'publish',
+        'closediscarded',
+        'closesubmitted',
+        'reopen',
+        'dump-user',
+    ])
+
+    use_mach = True
+
+    try:
+        path, action = args[0:2]
+        if action in legacy_actions:
+            use_mach = False
+    except Exception:
+        pass
+
+    if use_mach:
+        return m.run(args)
+
     path, action = args[0:2]
     path = os.path.abspath(path)
     sys.path.insert(0, path)
@@ -68,46 +69,7 @@ def main(args):
         os.mkdir(tmpdir)
     env['TMPDIR'] = tmpdir
 
-    if action == 'create':
-        with open(os.path.join(path, 'settings_local.py'), 'wb') as fh:
-            fh.write(SETTINGS_LOCAL)
-
-        # TODO figure out how to suppress logging when invoking via native
-        # Python API.
-        f = open(os.devnull, 'w')
-        subprocess.check_call(manage + ['syncdb', '--noinput'], cwd=path,
-                env=env, stdout=f, stderr=f)
-
-        subprocess.check_call(manage + ['enable-extension',
-            'rbbz.extension.BugzillaExtension'], cwd=path,
-            env=env, stdout=f, stderr=f)
-
-        subprocess.check_call(manage + ['enable-extension',
-            'rbmozui.extension.RBMozUI'],
-            cwd=path, env=env, stdout=f, stderr=f)
-
-        from reviewboard.cmdline.rbsite import Site, parse_options
-        class dummyoptions(object):
-            no_input = True
-            site_root = '/'
-            db_type = 'sqlite3'
-            copy_media = True
-
-        site = Site(path, dummyoptions())
-        site.rebuild_site_directory()
-
-        from djblets.siteconfig.models import SiteConfiguration
-        sc = SiteConfiguration.objects.get_current()
-        sc.set('site_static_root', os.path.join(path, 'htdocs', 'static'))
-        sc.set('site_media_root', os.path.join(path, 'htdocs', 'media'))
-
-        # Hook up rbbz authentication.
-        sc.set('auth_backend', 'bugzilla')
-        sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % os.environ['BUGZILLA_URL'])
-
-        sc.save()
-
-    elif action == 'repo':
+    if action == 'repo':
         name, url = args[2:]
 
         from reviewboard.scmtools.models import Repository, Tool
