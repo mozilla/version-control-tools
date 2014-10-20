@@ -12,6 +12,8 @@ from mach.decorators import (
     Command,
 )
 
+import yaml
+
 SETTINGS_LOCAL = """
 from __future__ import unicode_literals
 
@@ -205,3 +207,27 @@ class ReviewBoardCommands(object):
         r = root.get_review_request(review_request_id=rrid)
         response = r.get_draft().update(public=True)
         # TODO: Dump the response code?
+
+    @Command('get-users', category='reviewboard',
+        description='Query the Review Board user list')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('q', help='Query string')
+    def query_users(self, port, q=None):
+        from rbtools.api.errors import APIError
+
+        root = self._get_root(port)
+        try:
+            r = root.get_users(q=q, fullname=True)
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                e.rsp['err']['msg']))
+            return 1
+
+        users = []
+        for u in r.rsp['users']:
+            users.append(dict(
+                id=u['id'],
+                url=u['url'],
+                username=u['username']))
+
+        print(yaml.safe_dump(users, default_flow_style=False).rstrip())
