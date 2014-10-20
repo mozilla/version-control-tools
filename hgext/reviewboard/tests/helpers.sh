@@ -55,17 +55,9 @@ fi
 
 }
 
-rbmanage() {
-  python $TESTDIR/hgext/reviewboard/tests/rbmanage.py $1 $2 $3 $4 $5
-}
-
-bugzilla() {
-  $TESTDIR/testing/bugzilla.py $1 $2 $3 $4 $5 $6 $7 $8 $9
-}
-
-dockercontrol() {
-  $TESTDIR/testing/docker-control.py $1 $2 $3 $4 $5
-}
+alias rbmanage='python $TESTDIR/hgext/reviewboard/tests/rbmanage.py'
+alias bugzilla='$TESTDIR/testing/bugzilla.py'
+alias dockercontrol='$TESTDIR/testing/docker-control.py'
 
 commonenv() {
   $TESTDIR/testing/docker-control.py start-bmo $1 $HGPORT2 > /dev/null
