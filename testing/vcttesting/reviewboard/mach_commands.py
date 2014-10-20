@@ -119,3 +119,15 @@ class ReviewBoardCommands(object):
 
         sc.save()
 
+    @Command('repo', category='reviewboard',
+        description='Add a repository to Review Board')
+    @CommandArgument('path', help='Path to ReviewBoard install.')
+    @CommandArgument('name', help='Name to give to this repository.')
+    @CommandArgument('url', help='URL this repository should be accessed under.')
+    def repo(self, path, name, url):
+        path = self._setup_env(path)
+
+        from reviewboard.scmtools.models import Repository, Tool
+        tool = Tool.objects.get(name__exact='Mercurial')
+        r = Repository(name=name, path=url, tool=tool)
+        r.save()

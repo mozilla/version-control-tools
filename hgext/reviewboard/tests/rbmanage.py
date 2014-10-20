@@ -26,7 +26,6 @@ def main(args):
     import vcttesting.reviewboard.mach_commands
 
     legacy_actions = set([
-        'repo',
         'start',
         'stop',
         'dumpreview',
@@ -69,14 +68,7 @@ def main(args):
         os.mkdir(tmpdir)
     env['TMPDIR'] = tmpdir
 
-    if action == 'repo':
-        name, url = args[2:]
-
-        from reviewboard.scmtools.models import Repository, Tool
-        tool = Tool.objects.get(name__exact='Mercurial')
-        r = Repository(name=name, path=url, tool=tool)
-        r.save()
-    elif action == 'start':
+    if action == 'start':
         port = args[2]
 
         env['HOME'] = path
