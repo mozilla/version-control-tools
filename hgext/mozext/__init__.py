@@ -300,6 +300,7 @@ import sys
 from operator import methodcaller
 
 from mercurial import (
+    exchange,
     revset,
     templatefilters,
     templatekw,
@@ -770,6 +771,34 @@ def reject_repo_names_hook(ui, repo, namespace=None, key=None, old=None,
 
     return False
 
+def pull(orig, repo, remote, *args, **kwargs):
+    """Wraps exchange.pull to add remote tracking refs."""
+    if not hasattr(repo, 'changetracker'):
+        return orig(repo, remote, *args, **kwargs)
+
+    old_rev = len(repo)
+    res = orig(repo, remote, *args, **kwargs)
+    lock = repo.wlock()
+    try:
+        tree = resolve_uri_to_tree(remote.url())
+
+        if tree:
+            repo._update_remote_refs(remote, tree)
+            if repo.changetracker:
+                repo.changetracker.load_pushlog(tree)
+
+        # Sync bug info.
+        for rev in repo.changelog.revs(old_rev + 1):
+            ctx = repo[rev]
+            bugs = parse_bugs(ctx.description())
+            if bugs and repo.changetracker:
+                repo.changetracker.associate_bugs_with_changeset(bugs,
+                    ctx.node())
+
+    finally:
+        lock.release()
+
+    return res
 
 def pullexpand(orig, ui, repo, source='default', **opts):
     """Wraps built-in pull command to expand aliases to multiple sources."""
@@ -781,6 +810,22 @@ def pullexpand(orig, ui, repo, source='default', **opts):
 
     return 0
 
+def push(orig, repo, remote, *args, **kwargs):
+    if not hasattr(repo, 'changetracker'):
+        return orig(repo, remote, *args, **kwargs)
+
+    res = orig(repo, remote, *args, **kwargs)
+    lock = repo.wlock()
+    try:
+        tree = resolve_uri_to_tree(remote.url())
+
+        if tree:
+            repo._update_remote_refs(remote, tree)
+
+    finally:
+        lock.release()
+
+    return res
 
 class remoterefs(dict):
     """Represents a remote refs file."""
@@ -1280,6 +1325,8 @@ def extsetup(ui):
         pass
 
     extensions.wrapcommand(commands.table, 'pull', pullexpand)
+    extensions.wrapfunction(exchange, 'pull', pull)
+    extensions.wrapfunction(exchange, 'push', push)
 
     revset.symbols['bug'] = revset_bug
     revset.symbols['dontbuild'] = revset_dontbuild
@@ -1331,8 +1378,6 @@ def reposetup(ui, repo):
 
     orig_findtags = repo._findtags
     orig_lookup = repo.lookup
-    orig_pull = repo.pull
-    orig_push = repo.push
 
     class remotestrackingrepo(repo.__class__):
         @repofilecache('remoterefs')
@@ -1363,47 +1408,6 @@ def reposetup(ui, repo):
             tags.update(self.remoterefs)
 
             return tags, tagtypes
-
-        def pull(self, remote, *args, **kwargs):
-            # Pulls from known repositories will automatically update our
-            # remote tracking references.
-            old_rev = len(self)
-            res = orig_pull(remote, *args, **kwargs)
-            lock = self.wlock()
-            try:
-                tree = resolve_uri_to_tree(remote.url())
-
-                if tree:
-                    self._update_remote_refs(remote, tree)
-                    if self.changetracker:
-                        self.changetracker.load_pushlog(tree)
-
-                # Sync bug info.
-                for rev in self.changelog.revs(old_rev + 1):
-                    ctx = self[rev]
-                    bugs = parse_bugs(ctx.description())
-                    if bugs and self.changetracker:
-                        self.changetracker.associate_bugs_with_changeset(bugs,
-                            ctx.node())
-
-            finally:
-                lock.release()
-
-            return res
-
-        def push(self, remote, *args, **kwargs):
-            res = orig_push(remote, *args, **kwargs)
-            lock = self.wlock()
-            try:
-                tree = resolve_uri_to_tree(remote.url())
-
-                if tree:
-                    self._update_remote_refs(remote, tree)
-
-            finally:
-                lock.release()
-
-            return res
 
         def _update_remote_refs(self, remote, tree):
             mb = self.ui.configbool('mozext', 'refs_as_bookmarks',
