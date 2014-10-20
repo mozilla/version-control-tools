@@ -127,7 +127,7 @@ if __name__ == '__main__':
         raise Exception('You are not running inside the virtualenv. Please '
                 'run `create-test-environment` and `source venv/bin/activate`')
 
-    from vcttesting.docker import Docker
+    import vcttesting.docker as vctdocker
 
     # Unbuffer stdout.
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -180,7 +180,8 @@ if __name__ == '__main__':
 
     # Enable tests to interact with our Docker controlling script.
     docker_state = os.path.join(HERE, '.docker-state.json')
-    docker = Docker(docker_state, os.environ.get('DOCKER_HOST', None))
+    docker_url, docker_tls = vctdocker.params_from_env(os.environ)
+    docker = vctdocker.Docker(docker_state, docker_url, tls=docker_tls)
     if docker.is_alive():
         os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
 
