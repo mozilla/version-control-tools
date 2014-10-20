@@ -16,6 +16,7 @@
 
 import os
 import sys
+import tempfile
 
 if 'REPO_ROOT' not in globals():
     print('hghave.py included wrong. please set REPO_ROOT variable in calling script')
@@ -25,13 +26,21 @@ if 'REPO_ROOT' not in globals():
 HGHAVE_PY = os.path.join(REPO_ROOT, 'pylib', 'mercurial-support', 'hghave.py')
 execfile(HGHAVE_PY)
 
+# Need to supplement sys.path because PYTHONPATH isn't set properly
+# from the context of run-tests.py. This is very hacky.
+sys.path.insert(0, os.path.join(REPO_ROOT, 'testing'))
+
 # Define custom checks for our environment.
 @check('docker', 'We can talk to Docker')
 def has_docker():
-    import docker
-    c = docker.Client(base_url=os.environ.get('DOCKER_HOST', None))
-    c.containers()
-    return True
+    from vcttesting.docker import Docker, params_from_env
+
+    url, tls = params_from_env(os.environ)
+
+    tf = tempfile.NamedTemporaryFile()
+    tf.close()
+    d = Docker(tf.name, url, tls=tls)
+    return d.is_alive()
 
 @check('hg30+', 'Running with Mercurial 3.0+')
 def has_hg_30_plus():
