@@ -110,7 +110,25 @@ def bundles(repo, proto):
     """
     return repo.opener.tryread('bundleclone.manifest')
 
+def pull(orig, repo, remote, *args, **kwargs):
+    res = orig(repo, remote, *args, **kwargs)
+
+    if remote.capable('bundles') and \
+            repo.ui.configbool('bundleclone', 'pullmanifest', False):
+
+        lock = repo.lock()
+        repo.ui.status(_('pulling bundleclone manifest\n'))
+        manifest = remote._call('bundles')
+        try:
+            repo.opener.write('bundleclone.manifest', manifest)
+        finally:
+            lock.release()
+
+    return res
+
 def extsetup(ui):
+    extensions.wrapfunction(exchange, 'pull', pull)
+
     wireproto.capabilities = capabilities
     wireproto.commands['capabilities'] = (capabilities, '')
     wireproto.commands['bundles'] = (bundles, '')
@@ -160,7 +178,7 @@ def reposetup(ui, repo):
                 changegroup.addchangegroup(self, cg, 'bundleclone', url)
 
                 self.ui.status(_('finishing applying bundle; pulling\n'))
-                return self.pull(remote, heads=heads)
+                return exchange.pull(self, remote, heads=heads)
 
             except urllib2.HTTPError as e:
                 self.ui.warn(_('HTTP error fetching bundle; using normal clone: %s\n') % str(e))
@@ -171,21 +189,5 @@ def reposetup(ui, repo):
                 self.ui.warn(_('error fetching bundle; using normal clone: %s\n') % e.reason)
                 return super(bundleclonerepo, self).clone(remote, heads=heads,
                         stream=stream)
-
-        def pull(self, remote, *args, **kwargs):
-            res = super(bundleclonerepo, self).pull(remote, *args, **kwargs)
-
-            if remote.capable('bundles') and \
-                    self.ui.configbool('bundleclone', 'pullmanifest', False):
-
-                lock = self.lock()
-                self.ui.status(_('pulling bundleclone manifest\n'))
-                manifest = remote._call('bundles')
-                try:
-                    self.opener.write('bundleclone.manifest', manifest)
-                finally:
-                    lock.release()
-
-            return res
 
     repo.__class__ = bundleclonerepo
