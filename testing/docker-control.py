@@ -9,7 +9,10 @@
 import os
 import sys
 
-from vcttesting.docker import Docker
+from vcttesting.docker import (
+    Docker,
+    params_from_env,
+)
 
 def main(args):
     if 'DOCKER_STATE_FILE' in os.environ:
@@ -20,9 +23,9 @@ def main(args):
         print('Do not know where to put a Docker state file.')
         return 1
 
-    docker_url = os.environ.get('DOCKER_HOST', None)
+    docker_url, tls = params_from_env(os.environ)
 
-    d = Docker(state_file, docker_url)
+    d = Docker(state_file, docker_url, tls=tls)
 
     if not d.is_alive():
         print('Docker is not available!')

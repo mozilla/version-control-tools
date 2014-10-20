@@ -40,8 +40,40 @@ def wait_for_http(host, port, timeout=60):
 
         time.sleep(1)
 
+def params_from_env(env):
+    """Obtain Docker connect parameters from the environment.
+
+    This returns a tuple that should be used for base_url and tls arguments
+    of Docker.__init__.
+    """
+    host = env.get('DOCKER_HOST', None)
+    tls = False
+
+    if env.get('DOCKER_TLS_VERIFY'):
+        tls = True
+
+    # This is likely encountered with boot2docker.
+    cert_path = env.get('DOCKER_CERT_PATH')
+    if cert_path:
+        ca_path = os.path.join(cert_path, 'ca.pem')
+        tls_cert_path = os.path.join(cert_path, 'cert.pem')
+        tls_key_path = os.path.join(cert_path, 'key.pem')
+
+        # Hostnames will attempt to be verified by default. We don't know what
+        # the hostname should be, so don't attempt it.
+        tls = docker.tls.TLSConfig(client_cert=(tls_cert_path, tls_key_path),
+                ca_cert=ca_path, verify=True, assert_hostname=False)
+
+    # docker-py expects the protocol to have something TLS in it. tcp:// won't
+    # work. Hack around it until docker-py works as expected.
+    if tls and host:
+        if host.startswith('tcp://'):
+            host = host.replace('tcp://', 'https://')
+
+    return host, tls
+
 class Docker(object):
-    def __init__(self, state_path, url):
+    def __init__(self, state_path, url, tls=False):
         self._ddir = DOCKER_DIR
         self._state_path = state_path
         self.state = {
@@ -62,7 +94,7 @@ class Docker(object):
         self.state.setdefault('last-db-bootstrap-id', None)
         self.state.setdefault('last-web-bootstrap-id', None)
 
-        self.client = docker.Client(base_url=url)
+        self.client = docker.Client(base_url=url, tls=tls)
 
         # Try to obtain a network hostname for the Docker server. We use this
         # for determining where to look for opened ports.
