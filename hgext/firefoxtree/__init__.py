@@ -236,11 +236,30 @@ def pull(orig, repo, remote, *args, **kwargs):
         tree = resolve_uri_to_tree(remote.url())
         if tree:
             tree = tree.encode('utf-8')
-            repo._updateremoterefs(remote, tree)
+            updateremoterefs(repo, remote, tree)
     finally:
         lock.release()
 
     return res
+
+def updateremoterefs(repo, remote, tree):
+    """Update the remote refs for a Firefox repository.
+
+    This is called during pull to create the remote tracking tags for
+    Firefox repos.
+    """
+    # We only care about the default branch. We could import
+    # RELBRANCH and other branches if we really cared about it.
+    # Maybe later.
+    branchmap = remote.branchmap()
+    if 'default' not in branchmap:
+        return
+
+    # Firefox repos should only ever have a single head in the
+    # default branch.
+    defaultnodes = branchmap['default']
+    node = defaultnodes[-1]
+    repo.tag(tree, node, message=None, local=True, user=None, date=None)
 
 @command('fxheads', [
     ('T', 'template', shorttemplate,
@@ -280,20 +299,4 @@ def reposetup(ui, repo):
     if not isfirefoxrepo(repo):
         return
 
-    class firefoxtreerepo(repo.__class__):
-        def _updateremoterefs(self, remote, tree):
-            # We only care about the default branch. We could import
-            # RELBRANCH and other branches if we really cared about it.
-            # Maybe later.
-            branchmap = remote.branchmap()
-            if 'default' not in branchmap:
-                return
-
-            # Firefox repos should only ever have a single head in the
-            # default branch.
-            defaultnodes = branchmap['default']
-            node = defaultnodes[-1]
-            self.tag(tree, node, message=None, local=True, user=None, date=None)
-
-    repo.__class__ = firefoxtreerepo
     repo.prepushoutgoinghooks.add('firefoxtree', prepushoutgoinghook)
