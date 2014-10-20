@@ -240,8 +240,8 @@ def main(args):
 def get_root(port):
     from rbtools.api.client import RBClient
 
-    username = os.environ['BUGZILLA_USERNAME']
-    password = os.environ['BUGZILLA_PASSWORD']
+    username = os.environ.get('BUGZILLA_USERNAME')
+    password = os.environ.get('BUGZILLA_PASSWORD')
 
     c = RBClient('http://localhost:%s/' % port, username=username,
             password=password)
