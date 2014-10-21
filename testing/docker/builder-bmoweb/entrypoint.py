@@ -163,10 +163,12 @@ if not os.path.exists(j(h, 'checksetup.done')):
 params_lines = open(j(b, 'data', 'params'), 'r').readlines()
 with open(j(b, 'data', 'params'), 'w') as fh:
     for line in params_lines:
-        if "'urlbase' =>" not in line:
-            fh.write(line)
-        else:
+        if "'urlbase' =>" in line:
             fh.write("           'urlbase' => '" + bmo_url + "',\n")
+        elif "'mail_delivery_method' =>" in line:
+            fh.write("           'mail_delivery_method' => 'Test',\n")
+        else:
+            fh.write(line)
 
 # Ditto for the database host.
 localconfig_lines = open(j(b, 'localconfig'), 'r').readlines()
