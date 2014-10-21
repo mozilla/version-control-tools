@@ -29,7 +29,6 @@ def main(args):
 
     legacy_actions = set([
         'dump-bug',
-        'update-user-fullname',
         'update-user-email',
         'update-user-login-denied-text',
     ])
@@ -87,15 +86,6 @@ def main(args):
             data[key] = d
 
         print(yaml.safe_dump(data, default_flow_style=False).rstrip())
-
-    elif action == 'update-user-fullname':
-        email, name = args[1:]
-
-        h = proxy.User.update({
-            'names': [email],
-            'full_name': name,
-        })
-        print('updated user %s' % h['users'][0]['id'])
 
     elif action == 'update-user-email':
         old_email, new_email = args[1:]

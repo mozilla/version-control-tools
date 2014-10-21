@@ -96,6 +96,17 @@ class BugzillaCommands(object):
         })
         print('created user %s' % h['id'])
 
+    @Command('update-user-fullname', category='bugzilla',
+            description='Update the fullname field of a user')
+    @CommandArgument('email', help='The email of the user to update')
+    @CommandArgument('name', help='The new name for the user')
+    def update_user_fullname(self, email, name):
+        h = self.proxy.User.update({
+            'names': [email],
+            'full_name': name,
+        })
+        print('updated user %s' % h['users'][0]['id'])
+
     @Command('create-login-cookie', category='bugzilla',
             description='Create a login cookie from credentials')
     def create_login_cookie(self):
