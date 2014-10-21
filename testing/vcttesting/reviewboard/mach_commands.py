@@ -238,3 +238,31 @@ class ReviewBoardCommands(object):
                 username=u['username']))
 
         print(yaml.safe_dump(users, default_flow_style=False).rstrip())
+
+    @Command('create-review', category='reviewboard',
+        description='Create a new review on a review request')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Review request to create the review on')
+    @CommandArgument('--body-bottom',
+            help='Review content below comments')
+    @CommandArgument('--body-top',
+            help='Review content above comments')
+    @CommandArgument('--public', action='store_true',
+            help='Whether to make this review public')
+    @CommandArgument('--ship-it', action='store_true',
+            help='Whether to mark the review "Ship It"')
+    def create_review(self, port, rrid, body_bottom=None, body_top=None, public=False,
+            ship_it=False):
+        root = self._get_root(port)
+        reviews = root.get_reviews(review_request_id=rrid)
+        # rbtools will convert body_* to str() and insert "None" if we pass
+        # an argument.
+        args = {'public': public, 'ship_it': ship_it}
+        if body_bottom:
+            args['body_bottom'] = body_bottom
+        if body_top:
+            args['body_top'] = body_top
+
+        r = reviews.create(**args)
+
+        print('created review %s' % r.rsp['review']['id'])
