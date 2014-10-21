@@ -301,3 +301,12 @@ class ReviewBoardCommands(object):
         root = self._get_root(port)
         rr = root.get_review_request(review_request_id=rrid)
         rr.update(status='discarded')
+
+    @Command('closesubmitted', category='reviewboard',
+        description='Close a review request as submitted.')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Request request to submit')
+    def close_submitted(self, port, rrid):
+        root = self._get_root(port)
+        rr = root.get_review_request(review_request_id=rrid)
+        rr.update(status='submitted')

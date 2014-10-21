@@ -28,7 +28,6 @@ def main(args):
     legacy_actions = set([
         'start',
         'stop',
-        'closesubmitted',
         'reopen',
         'dump-user',
     ])
@@ -141,12 +140,6 @@ def main(args):
 
         while psutil.pid_exists(pid):
             time.sleep(0.1)
-
-    elif action == 'closesubmitted':
-        port, rid = args[2:]
-        root = get_root(port)
-        r = root.get_review_request(review_request_id=rid)
-        response = r.update(status='submitted')
 
     elif action == 'reopen':
         port, rid = args[2:]

@@ -46,7 +46,7 @@
 Close the squashed review request as submitted, which should close all of the
 child review requests.
 
-  $ rbmanage ../rbserver closesubmitted $HGPORT1 1
+  $ rbmanage closesubmitted $HGPORT1 1
 
 Squashed review request with ID 1 should be closed as submitted...
 
