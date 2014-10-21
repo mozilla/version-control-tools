@@ -198,6 +198,33 @@ class ReviewBoardCommands(object):
 
         print('created review %s' % r.rsp['review']['id'])
 
+    @Command('create-review-reply', category='reviewboard',
+        description='Create a reply to an existing review')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Review request to create reply on')
+    @CommandArgument('rid', help='Review to create reply on')
+    @CommandArgument('--body-bottom',
+        help='Reply content below the comments')
+    @CommandArgument('--body-top',
+        help='Reply content above the comments')
+    @CommandArgument('--public', action='store_true',
+        help='Whether to make this reply public')
+    @CommandArgument('--text-type', default='plain',
+        help='The format of the text')
+    def create_review_reply(self, port, rrid, rid, body_bottom, body_top,
+            public, text_type):
+        root = self._get_root(port)
+        replies = root.get_replies(review_request_id=rrid, review_id=rid)
+
+        args = {'public': public, 'text_type': text_type}
+        if body_bottom:
+            args['body_bottom'] = body_bottom
+        if body_top:
+            args['body_top'] = body_top
+
+        r = replies.create(**args)
+        print('created review reply %s' % r.rsp['reply']['id'])
+
     @Command('closediscarded', category='reviewboard',
         description='Close a review request as discarded.')
     @CommandArgument('port', help='Port number Review Board is running on')
