@@ -28,7 +28,6 @@ def main(args):
     import vcttesting.bugzilla.mach_commands
 
     legacy_actions = set([
-        'create-bug-range',
         'dump-bug',
         'create-user',
         'update-user-fullname',
@@ -61,24 +60,7 @@ def main(args):
 
     action = args[0]
 
-    if action == 'create-bug-range':
-        product, component, upper = args[1:]
-
-        existing = client.search_for.search()
-        ids = [int(b['id']) for b in existing]
-        ids.append(1)
-        maxid = max(ids)
-
-        count = 0
-        for i in range(maxid, int(upper) + 1):
-            count += 1
-            bug = bugsy.Bug(client, product=product, component=component,
-                    summary='Range %d' % i)
-            foo = client.put(bug)
-
-        print('created %d bugs' % count)
-
-    elif action == 'dump-bug':
+    if action == 'dump-bug':
         data = {}
         for bid in args[1:]:
             bug = client.get(bid)

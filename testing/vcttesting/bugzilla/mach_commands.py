@@ -44,3 +44,23 @@ class BugzillaCommands(object):
         bug = bugsy.Bug(self.client, product=product, component=component,
                 summary=summary)
         self.client.put(bug)
+
+    @Command('create-bug-range', category='bugzilla',
+            description='Create multiple bugs at once')
+    @CommandArgument('product', help='Product to create bugs in')
+    @CommandArgument('component', help='Component to create bugs in')
+    @CommandArgument('upper', type=int, help='The highest bug # to create')
+    def create_bug_range(self, product, component, upper):
+        existing = self.client.search_for.search()
+        ids = [int(b['id']) for b in existing]
+        ids.append(1)
+        maxid = max(ids)
+
+        count = 0
+        for i in range(maxid, upper + 1):
+            count += 1
+            bug = bugsy.Bug(self.client, product=product, component=component,
+                    summary='Range %d' % i)
+            self.client.put(bug)
+
+        print('created %d bugs' % count)
