@@ -83,6 +83,19 @@ class BugzillaCommands(object):
             'user_regexp': '.*',
         })
 
+    @Command('create-user', category='bugzilla',
+            description='Create a user')
+    @CommandArgument('email', help='The email / username of the user to create')
+    @CommandArgument('password', help='The password to use for the user')
+    @CommandArgument('name', help='The full name of the user being created')
+    def create_user(self, email, password, name):
+        h = self.proxy.User.create({
+            'email': email,
+            'password': password,
+            'full_name': name,
+        })
+        print('created user %s' % h['id'])
+
     @Command('create-login-cookie', category='bugzilla',
             description='Create a login cookie from credentials')
     def create_login_cookie(self):

@@ -29,7 +29,6 @@ def main(args):
 
     legacy_actions = set([
         'dump-bug',
-        'create-user',
         'update-user-fullname',
         'update-user-email',
         'update-user-login-denied-text',
@@ -88,15 +87,6 @@ def main(args):
             data[key] = d
 
         print(yaml.safe_dump(data, default_flow_style=False).rstrip())
-
-    elif action == 'create-user':
-        email, password, name = args[1:]
-        h = proxy.User.create({
-            'email': email,
-            'password': password,
-            'full_name': name,
-        })
-        print('created user %s' % h['id'])
 
     elif action == 'update-user-fullname':
         email, name = args[1:]
