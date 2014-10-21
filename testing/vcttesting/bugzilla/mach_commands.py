@@ -118,6 +118,17 @@ class BugzillaCommands(object):
         })
         print('updated user %s' % h['users'][0]['id'])
 
+    @Command('update-user-login-denied-text', category='bugzilla',
+            description='Update the login denied text for a user')
+    @CommandArgument('email', help='The email of the user to update')
+    @CommandArgument('text', help='The login denied text for the user')
+    def update_user_login_denied_text(self, email, text):
+        h = self.proxy.User.update({
+            'names': [email],
+            'login_denied_text': text,
+        })
+        print('updated user %s' % h['users'][0]['id'])
+
     @Command('create-login-cookie', category='bugzilla',
             description='Create a login cookie from credentials')
     def create_login_cookie(self):

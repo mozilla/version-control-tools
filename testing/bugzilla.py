@@ -29,7 +29,6 @@ def main(args):
 
     legacy_actions = set([
         'dump-bug',
-        'update-user-login-denied-text',
     ])
 
     use_mach = True
@@ -85,15 +84,6 @@ def main(args):
             data[key] = d
 
         print(yaml.safe_dump(data, default_flow_style=False).rstrip())
-
-    elif action == 'update-user-login-denied-text':
-        email, text = args[1:]
-
-        h = proxy.User.update({
-            'names': [email],
-            'login_denied_text': text,
-        })
-        print('updated user %s' % h['users'][0]['id'])
 
     else:
         print('unknown action: %s' % action)
