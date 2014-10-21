@@ -16,8 +16,37 @@ import yaml
 import xmlrpclib
 
 from rbbz.transports import bugzilla_transport
+from mach.main import Mach
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+sys.path.insert(0, HERE)
 
 def main(args):
+    m = Mach(os.getcwd())
+    m.define_category('bugzilla', 'Bugzilla',
+        'Interface with Bugzilla', 50)
+    import vcttesting.bugzilla.mach_commands
+
+    legacy_actions = set([
+        'create-bug-range',
+        'dump-bug',
+        'create-user',
+        'update-user-fullname',
+        'update-user-email',
+        'update-user-login-denied-text',
+        'create-group',
+        'create-login-cookie',
+    ])
+
+    use_mach = True
+
+    action = args[0]
+    if action in legacy_actions:
+        use_mach = False
+
+    if use_mach:
+        return m.run(args)
+
     url = os.environ['BUGZILLA_URL'] + '/rest'
     username = os.environ['BUGZILLA_USERNAME']
     password = os.environ['BUGZILLA_PASSWORD']
@@ -32,11 +61,7 @@ def main(args):
 
     action = args[0]
 
-    if action == 'create-bug':
-        product, component, summary = args[1:]
-        bug = bugsy.Bug(client, product=product, component=component, summary=summary)
-        client.put(bug)
-    elif action == 'create-bug-range':
+    if action == 'create-bug-range':
         product, component, upper = args[1:]
 
         existing = client.search_for.search()
