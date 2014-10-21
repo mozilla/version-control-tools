@@ -173,6 +173,16 @@ class BugzillaCommands(object):
 
             r = self.client.request('bug/%s/attachment' % bid).json()
             for a in r['bugs'].get(bid, []):
+                flags = []
+                for f in a['flags']:
+                    flags.append(dict(
+                        id=f['id'],
+                        name=f['name'],
+                        requestee=f.get('requestee'),
+                        setter=f['setter'],
+                        status=f['status'],
+                    ))
+
                 at = d.setdefault('attachments', [])
                 at.append(dict(
                     id=a['id'],
@@ -180,7 +190,8 @@ class BugzillaCommands(object):
                     content_type=a['content_type'],
                     description=a['description'],
                     summary=a['summary'],
-                    data=base64.b64decode(a['data'])))
+                    data=base64.b64decode(a['data']),
+                    flags=flags))
 
             key = 'Bug %s' % bid
             data[key] = d

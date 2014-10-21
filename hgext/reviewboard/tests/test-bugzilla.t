@@ -50,6 +50,7 @@ Publishing the review will add an attachment to the bug
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://1/mynick'
+      flags: []
       id: 1
       summary: 'MozReview Request: bz://1/mynick'
     comments:
