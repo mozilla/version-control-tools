@@ -2,12 +2,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import base64
 import os
 import sys
 import xmlrpclib
 
 import bugsy
 import requests
+import yaml
 
 from mach.decorators import (
     CommandArgument,
@@ -150,3 +152,38 @@ class BugzillaCommands(object):
         login = r.cookies['Bugzilla_login']
         cookie = r.cookies['Bugzilla_logincookie']
         print('%s %s' % (login, cookie))
+
+    @Command('dump-bug', category='bugzilla',
+            description='Dump a representation of a bug')
+    @CommandArgument('bugs', nargs='+', help='Bugs to dump')
+    def dump_bug(self, bugs):
+        data = {}
+        for bid in bugs:
+            bug = self.client.get(bid)
+
+            d = dict(
+                summary=bug.summary,
+                comments=[],
+            )
+            for comment in bug.get_comments():
+                d['comments'].append(dict(
+                    id=comment.id,
+                    text=comment.text,
+                ))
+
+            r = self.client.request('bug/%s/attachment' % bid).json()
+            for a in r['bugs'].get(bid, []):
+                at = d.setdefault('attachments', [])
+                at.append(dict(
+                    id=a['id'],
+                    attacher=a['attacher'],
+                    content_type=a['content_type'],
+                    description=a['description'],
+                    summary=a['summary'],
+                    data=base64.b64decode(a['data'])))
+
+            key = 'Bug %s' % bid
+            data[key] = d
+
+        print(yaml.safe_dump(data, default_flow_style=False).rstrip())
+
