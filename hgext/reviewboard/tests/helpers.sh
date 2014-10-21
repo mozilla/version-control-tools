@@ -68,7 +68,7 @@ commonenv() {
   hg init server
   rbmanage create rbserver
   rbmanage repo rbserver test-repo http://localhost:$HGPORT/
-  rbmanage rbserver start $HGPORT1
+  rbmanage start rbserver $HGPORT1
   serverconfig server/.hg/hgrc $HGPORT1
   clientconfig client/.hg/hgrc
   hg serve -R server -d -p $HGPORT --pid-file hg.pid

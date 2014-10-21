@@ -7,6 +7,7 @@ import signal
 import subprocess
 import sys
 import time
+import urllib
 
 from mach.decorators import (
     CommandArgument,
@@ -339,6 +340,77 @@ class ReviewBoardCommands(object):
         data[u.id] = o
 
         print(yaml.safe_dump(data, default_flow_style=False).rstrip())
+
+    @Command('start', category='reviewboard',
+        description='Start a Review Board HTTP server.')
+    @CommandArgument('path', help='Path to Review Board install')
+    @CommandArgument('port', help='Port number to start server on.')
+    def start(self, path, port):
+        path = self._setup_env(path)
+
+        env = dict(self.env)
+
+        env['HOME'] = path
+        f = open(os.devnull, 'w')
+        # --noreload prevents process for forking. If we don't do this,
+        # our written pid is not correct.
+        proc = subprocess.Popen(self.manage + ['runserver', '--noreload', port],
+            cwd=path, env=env, stderr=f, stdout=f)
+
+        # We write the PID to DAEMON_PIDS so Mercurial kills it automatically
+        # if it is running.
+        with open(env['DAEMON_PIDS'], 'ab') as fh:
+            fh.write('%d\n' % proc.pid)
+
+        # We write the PID to a local file so the test can kill it. The benefit
+        # of having the test kill it (with SIGINT as opposed to SIGKILL) is
+        # that coverage information will be written if the process is stopped
+        # with SIGINT.
+        # TODO consider changing Mercurial to SIGINT first, SIGKILL later.
+        with open(os.path.join(path, 'rbserver.pid'), 'wb') as fh:
+            fh.write('%d' % proc.pid)
+
+        # There is a race condition between us exiting and the tests
+        # querying the server before it is ready. So, we wait on the
+        # server before proceeding.
+        while True:
+            try:
+                urllib.urlopen('http://localhost:%s/' % port)
+                break
+            except IOError:
+                time.sleep(0.1)
+
+        # We need to go through the double fork and session leader foo
+        # to get this process to detach from the shell the process runs
+        # under otherwise this process will keep it alive and the Mercurial
+        # test runner will think the test is still running. Oy.
+        pid = os.fork()
+        if pid > 0:
+            sys.exit(0)
+
+        os.chdir('/')
+        os.setsid()
+        os.umask(0)
+
+        pid = os.fork()
+        if pid > 0:
+            sys.exit(0)
+
+        sys.stdout.flush()
+        sys.stderr.flush()
+
+        os.dup2(f.fileno(), sys.stdin.fileno())
+        os.dup2(f.fileno(), sys.stdout.fileno())
+        os.dup2(f.fileno(), sys.stderr.fileno())
+
+        # And we spin forever.
+        try:
+            proc.wait()
+        except Exception as e:
+            print(e)
+            sys.exit(1)
+
+        sys.exit(0)
 
     # This command should be called at the end of tests because not doing so
     # will result in Mercurial sending SIGKILL, which will cause the Python
