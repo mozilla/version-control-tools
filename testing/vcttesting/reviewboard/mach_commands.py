@@ -198,6 +198,32 @@ class ReviewBoardCommands(object):
         r = root.get_review_request(review_request_id=rrid)
         dump_review_request(r)
 
+    @Command('add-reviewer', category='reviewboard',
+        description='Add a reviewer to a review request')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Review request id to modify')
+    @CommandArgument('--user', action='append',
+        help='User from whom to ask for review')
+    def add_reviewer(self, port, rrid, user):
+        root = self._get_root(port)
+        rr = root.get_review_request(review_request_id=rrid)
+
+        people = set()
+        for p in rr.target_people:
+            people.add(p.username)
+
+        # Review Board doesn't call into the auth plugin when mapping target
+        # people to RB users. So, we perform an API call here to ensure the
+        # user is present.
+        for u in user:
+            people.add(u)
+            root.get_users(q=u)
+
+        people = ','.join(sorted(people))
+
+        draft = rr.get_or_create_draft(target_people=people)
+        print('%d people listed on review request' % len(draft.target_people))
+
     @Command('publish', category='reviewboard',
         description='Publish a review request')
     @CommandArgument('port', help='Port number Review Board is running on')
