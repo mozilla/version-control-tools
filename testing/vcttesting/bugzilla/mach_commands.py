@@ -70,6 +70,19 @@ class BugzillaCommands(object):
 
         print('created %d bugs' % count)
 
+    @Command('create-group', category='bugzilla',
+            description='Create a Bugzilla group')
+    @CommandArgument('group', help='Name of the group to create')
+    @CommandArgument('description', help='Description of the group to create')
+    def create_group(self, group, description):
+        # Adding every user to every group is wrong. This is a quick hack to
+        # work around bug 1079463.
+        h = self.proxy.Group.create({
+            'name': group,
+            'description': description,
+            'user_regexp': '.*',
+        })
+
     @Command('create-login-cookie', category='bugzilla',
             description='Create a login cookie from credentials')
     def create_login_cookie(self):

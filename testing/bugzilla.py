@@ -33,7 +33,6 @@ def main(args):
         'update-user-fullname',
         'update-user-email',
         'update-user-login-denied-text',
-        'create-group',
     ])
 
     use_mach = True
@@ -125,16 +124,6 @@ def main(args):
             'login_denied_text': text,
         })
         print('updated user %s' % h['users'][0]['id'])
-
-    elif action == 'create-group':
-        group, desc = args[1:]
-        # Adding every user to every group is wrong. This is a quick hack to
-        # work around bug 1079463.
-        h = proxy.Group.create({
-            'name': group,
-            'description': desc,
-            'user_regexp': '.*',
-        })
 
     else:
         print('unknown action: %s' % action)
