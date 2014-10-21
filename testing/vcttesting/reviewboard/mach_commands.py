@@ -225,6 +225,25 @@ class ReviewBoardCommands(object):
         rr = root.get_review_request(review_request_id=rrid)
         rr.update(status='pending')
 
+    @Command('discard-review-request-draft', category='reviewboard',
+        description='Discard (delete) a draft review request.')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Review request whose draft to delete')
+    def discard_draft(self, port, rrid):
+        root = self._get_root(port)
+        rr = root.get_review_request(review_request_id=rrid)
+        draft = rr.get_draft()
+
+        # Review Board sends an Content-Length 0 response with a JSON content
+        # type. rbtools tries to parse this as JSON and raises a ValueError
+        # in the process. This is a bug somewhere. Work around it by swallowing
+        # the exception.
+        try:
+            draft.delete()
+        except ValueError:
+            pass
+        print('Discarded draft for review request %s' % rrid)
+
     @Command('dump-user', category='reviewboard',
         description='Print a representation of a user.')
     @CommandArgument('port', help='Port number Review Board is running on')
