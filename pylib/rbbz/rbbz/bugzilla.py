@@ -118,6 +118,12 @@ class Bugzilla(object):
         return self.proxy.User.get(params)
 
     @xmlrpc_to_bugzilla_errors
+    def get_user_from_userid(self, userid):
+        """Convert an integer user ID to string username."""
+        params = {'ids': [userid], 'include_fields': self.user_fields}
+        return self.proxy.User.get(params)
+
+    @xmlrpc_to_bugzilla_errors
     def post_comment(self, bug_id, comment):
         params = {
             'id': bug_id,

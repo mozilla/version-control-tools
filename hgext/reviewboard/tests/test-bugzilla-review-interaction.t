@@ -24,7 +24,43 @@ Create a review request from a regular user
   $ hg commit -m 'Bug 1 - Initial commit to review'
   $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/ > /dev/null
 
+Adding a reviewer should result in a r? flag being set
+
+  $ rbmanage add-reviewer $HGPORT1 1 --user reviewer
+  1 people listed on review request
   $ rbmanage publish $HGPORT1 1
+
+  $ bugzilla dump-bug 1
+  Bug 1:
+    attachments:
+    - attacher: author@example.com
+      content_type: text/x-review-board-request
+      data: http://example.com/r/1/
+      description: 'MozReview Request: bz://1/mynick'
+      flags:
+      - id: 1
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
+      id: 1
+      summary: 'MozReview Request: bz://1/mynick'
+    comments:
+    - id: 1
+      text: ''
+    - id: 2
+      text: 'Created attachment 1
+  
+        MozReview Request: bz://1/mynick'
+    - id: 3
+      text: '/r/2 - Bug 1 - Initial commit to review
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull review -r 57755461e85f1e3e66738ec2d57f325249897409'
+    summary: First Bug
 
 Adding a "Ship It" review will grant r+
 
@@ -41,6 +77,11 @@ Adding a "Ship It" review will grant r+
       description: 'MozReview Request: bz://1/mynick'
       flags:
       - id: 1
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
+      - id: 2
         name: review
         requestee: null
         setter: reviewer@example.com

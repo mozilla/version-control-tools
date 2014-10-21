@@ -31,6 +31,8 @@ from rbbz.errors import (BugzillaError,
                          ConfidentialBugError,
                          InvalidBugIdError)
 from rbbz.middleware import BugzillaCookieAuthMiddleware
+from rbbz.models import (BugzillaUserMap,
+                         get_or_create_bugzilla_users)
 from rbbz.resources import bugzilla_cookie_login_resource
 
 
@@ -228,8 +230,37 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
     # is valid and accessible.
     review_request_draft.bugs_closed = str(bug_id)
 
-    reviewers = [x.get_username() for x in
-                 review_request_draft.target_people.all()]
+    # The review request exposes a list of usernames for reviewers. We need
+    # to convert these to Bugzilla emails in order to make the request into
+    # Bugzilla.
+    #
+    # It may seem like there is a data syncing problem here where usernames may
+    # get out of sync with the reality from Bugzilla. Fortunately, Review Board
+    # is smarter than that. Internally, the target_people list is stored with
+    # foreign keys into the numeric primary key of the user table. If the
+    # RB username changes, this won't impact target_people nor the stored
+    # mapping to the numeric Bugzilla ID, which is immutable.
+    #
+    # But we do have a potential data syncing problem with the stored email
+    # address. Review Board's stored email address could be stale. So instead
+    # of using it directly, we query Bugzilla and map the stored, immutable
+    # numeric Bugzilla userid into an email address. This lookup could be
+    # avoided if Bugzilla accepted a numeric userid in the requestee parameter
+    # when modifying an attachment.
+    reviewers = []
+
+    for u in review_request_draft.target_people.all():
+        if not using_bugzilla:
+            reviewers.append(u.get_username())
+
+        bum = BugzillaUserMap.objects.get(user=u)
+
+        user_data = b.get_user_from_userid(bum.bugzilla_user_id)
+
+        # Since we're making the API call, we might as well ensure the local
+        # database is up to date.
+        users = get_or_create_bugzilla_users(user_data)
+        reviewers.append(users[0].email)
 
     # Don't make attachments for child review requests, otherwise,
     # Bugzilla gets inundatated with lots of patches, and the squashed
