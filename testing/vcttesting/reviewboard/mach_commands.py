@@ -310,3 +310,12 @@ class ReviewBoardCommands(object):
         root = self._get_root(port)
         rr = root.get_review_request(review_request_id=rrid)
         rr.update(status='submitted')
+
+    @Command('reopen', category='reviewboard',
+        description='Reopen a closed review request')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Review request to reopen')
+    def reopen(self, port, rrid):
+        root = self._get_root(port)
+        rr = root.get_review_request(review_request_id=rrid)
+        rr.update(status='pending')

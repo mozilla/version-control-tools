@@ -109,7 +109,7 @@ Child review request with ID 3 should be closed as submitted...
 
 Re-opening the parent review request should re-open all of the children.
 
-  $ rbmanage ../rbserver reopen $HGPORT1 1
+  $ rbmanage reopen $HGPORT1 1
 
 Squashed review request with ID 1 should be re-opened...
 

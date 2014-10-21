@@ -111,7 +111,7 @@ Child review request with ID 3 should be closed as discarded...
 Re-opening the parent review request should re-open all of the children,
 and they should be non-public.
 
-  $ rbmanage ../rbserver reopen $HGPORT1 1
+  $ rbmanage reopen $HGPORT1 1
 
 Squashed review request with ID 1 should be re-opened and have its
 Commit ID re-instated.

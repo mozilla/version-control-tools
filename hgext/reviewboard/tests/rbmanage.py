@@ -28,7 +28,6 @@ def main(args):
     legacy_actions = set([
         'start',
         'stop',
-        'reopen',
         'dump-user',
     ])
 
@@ -140,12 +139,6 @@ def main(args):
 
         while psutil.pid_exists(pid):
             time.sleep(0.1)
-
-    elif action == 'reopen':
-        port, rid = args[2:]
-        root = get_root(port)
-        r = root.get_review_request(review_request_id=rid)
-        response = r.update(status='pending')
 
     elif action == 'dump-user':
         port, username = args[2:]
