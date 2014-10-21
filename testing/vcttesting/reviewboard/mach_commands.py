@@ -3,8 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import signal
 import subprocess
 import sys
+import time
 
 from mach.decorators import (
     CommandArgument,
@@ -12,6 +14,7 @@ from mach.decorators import (
     Command,
 )
 
+import psutil
 import yaml
 
 SETTINGS_LOCAL = """
@@ -336,3 +339,20 @@ class ReviewBoardCommands(object):
         data[u.id] = o
 
         print(yaml.safe_dump(data, default_flow_style=False).rstrip())
+
+    # This command should be called at the end of tests because not doing so
+    # will result in Mercurial sending SIGKILL, which will cause the Python
+    # process to not shut down gracefully, which will not record code coverage
+    # data.
+    @Command('stop', category='reviewboard',
+        description='Stop a running Review Board server.')
+    @CommandArgument('path', help='Path to the Review Board install')
+    def stop(self, path):
+        with open(os.path.join(path, 'rbserver.pid'), 'rb') as fh:
+            pid = int(fh.read())
+
+        os.kill(pid, signal.SIGINT)
+
+        while psutil.pid_exists(pid):
+            time.sleep(0.1)
+

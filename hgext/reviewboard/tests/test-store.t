@@ -45,5 +45,5 @@ Pushing a review will create the reviews file
   status pending
 
   $ cd ..
-  $ rbmanage rbserver stop
+  $ rbmanage stop rbserver
   $ dockercontrol stop-bmo rb-test-store > /dev/null

@@ -279,6 +279,6 @@ Child review request with ID 3 should be published.
       p2rb.is_squashed: False
 
   $ cd ..
-  $ rbmanage rbserver stop
+  $ rbmanage stop rbserver
 
   $ dockercontrol stop-bmo rb-test-review-request-closed-discarded > /dev/null

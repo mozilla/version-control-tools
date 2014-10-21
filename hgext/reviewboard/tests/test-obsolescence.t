@@ -72,6 +72,6 @@ Now create a new head and push a rebase
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
   $ cd ..
-  $ rbmanage rbserver stop
+  $ rbmanage stop rbserver
 
   $ dockercontrol stop-bmo rb-test-obsolescence > /dev/null

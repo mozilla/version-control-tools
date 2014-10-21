@@ -40,5 +40,5 @@ TODO test publishing against a confidential bug (waiting on BMO API)
 
 Cleanup
 
-  $ rbmanage rbserver stop
+  $ rbmanage stop rbserver
   $ $TESTDIR/testing/docker-control.py stop-bmo rb-test-autocomplete > /dev/null

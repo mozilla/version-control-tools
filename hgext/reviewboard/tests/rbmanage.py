@@ -3,13 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-import signal
 import subprocess
 import sys
 import time
 import urllib
-
-import psutil
 
 from mach.main import Mach
 
@@ -26,7 +23,6 @@ def main(args):
 
     legacy_actions = set([
         'start',
-        'stop',
     ])
 
     use_mach = True
@@ -125,18 +121,6 @@ def main(args):
             sys.exit(1)
 
         sys.exit(0)
-
-    # You should call this so the server stop gracefully and records code
-    # coverage data. Otherwise, Mercurial will kill it with SIGKILL and no
-    # coverage data will be saved.
-    elif action == 'stop':
-        with open(os.path.join(path, 'rbserver.pid'), 'rb') as fh:
-            pid = int(fh.read())
-
-        os.kill(pid, signal.SIGINT)
-
-        while psutil.pid_exists(pid):
-            time.sleep(0.1)
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

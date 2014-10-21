@@ -176,5 +176,5 @@ Specifying multiple -r for the same head works
   [1]
 
   $ cd ..
-  $ rbmanage rbserver stop
+  $ rbmanage stop rbserver
   $ dockercontrol stop-bmo rb-test-push > /dev/null

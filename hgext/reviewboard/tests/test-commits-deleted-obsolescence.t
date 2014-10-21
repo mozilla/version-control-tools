@@ -387,6 +387,6 @@ The parent review should have been updated accordingly.
       p2rb.unpublished_rids: []
 
   $ cd ..
-  $ rbmanage rbserver stop
+  $ rbmanage stop rbserver
 
   $ dockercontrol stop-bmo rb-test-commits-deleted-obsolescence > /dev/null

@@ -62,5 +62,5 @@ Pushing with a different review ID will create a "duplicate" review
   http://localhost:$HGPORT1/r/4
 
   $ cd ..
-  $ rbmanage rbserver stop
+  $ rbmanage stop rbserver
   $ dockercontrol stop-bmo rb-test-multiple-parents > /dev/null

@@ -114,5 +114,5 @@ Adding a "Ship It" review will grant r+
 
 Cleanup
 
-  $ rbmanage rbserver stop
+  $ rbmanage stop rbserver
   $ $TESTDIR/testing/docker-control.py stop-bmo rb-test-bugzilla-review-interaction > /dev/null

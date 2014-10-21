@@ -70,6 +70,6 @@ Publishing the review will add an attachment to the bug
         hg pull review -r 24417bc94b2c053e8f5dd8c09da33fbbef5404fe'
     summary: bug1
 
-  $ rbmanage ../rbserver stop
+  $ rbmanage stop ../rbserver
 
   $ $TESTDIR/testing/docker-control.py stop-bmo rb-test-bugzilla > /dev/null

@@ -55,6 +55,6 @@ Pulling reviews with no changes
   updated 3 reviews
 
   $ cd ..
-  $ rbmanage rbserver stop
+  $ rbmanage stop rbserver
 
   $ dockercontrol stop-bmo rb-test-pullreviews > /dev/null
