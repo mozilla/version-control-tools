@@ -123,7 +123,7 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
 
 Usernames for users without the IRC nick syntax are based on email fragment and BZ user id
 
-  $ rbmanage ../rbserver dump-user $HGPORT1 'user1+2'
+  $ rbmanage dump-user $HGPORT1 'user1+2'
   2:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user1@example.com
@@ -136,7 +136,7 @@ Usernames for users without the IRC nick syntax are based on email fragment and 
 
 Usernames for users with IRC nicks are the IRC nickname
 
-  $ rbmanage ../rbserver dump-user $HGPORT1 nick
+  $ rbmanage dump-user $HGPORT1 nick
   3:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2@example.com
@@ -167,7 +167,7 @@ Changing the IRC nickname in Bugzilla will update the RB username
   [1]
 
   $ exportbzauth user2@example.com password2
-  $ rbmanage ../rbserver dump-user $HGPORT1 newnick
+  $ rbmanage dump-user $HGPORT1 newnick
   3:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2@example.com
@@ -198,7 +198,7 @@ Changing the email address in Bugzilla will update the RB email
   [1]
 
   $ exportbzauth user2-new@example.com password2
-  $ rbmanage ../rbserver dump-user $HGPORT1 newnick
+  $ rbmanage dump-user $HGPORT1 newnick
   3:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
@@ -268,7 +268,7 @@ we fall back to non-IRC RB usernames.
 adding a new user or splitting this test file.)
 
   $ exportbzauth user2-new@example.com password2
-  $ rbmanage ../rbserver dump-user $HGPORT1 newnick
+  $ rbmanage dump-user $HGPORT1 newnick
   3:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
@@ -280,7 +280,7 @@ adding a new user or splitting this test file.)
     username: newnick
 
   $ exportbzauth user3@example.com password3
-  $ rbmanage ../rbserver dump-user $HGPORT1 user3+4
+  $ rbmanage dump-user $HGPORT1 user3+4
   4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user3@example.com
@@ -304,7 +304,7 @@ user, they will be assigned the email+id username.
   [1]
 
   $ exportbzauth user3@example.com password3
-  $ rbmanage ../rbserver dump-user $HGPORT1 mynick
+  $ rbmanage dump-user $HGPORT1 mynick
   4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user3@example.com
@@ -320,7 +320,7 @@ user, they will be assigned the email+id username.
 (But first we check the existing state, just in case tests change)
 
   $ exportbzauth user2-new@example.com password2
-  $ rbmanage ../rbserver dump-user $HGPORT1 newnick
+  $ rbmanage dump-user $HGPORT1 newnick
   3:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
@@ -350,7 +350,7 @@ user, they will be assigned the email+id username.
   [1]
 
   $ exportbzauth user3@example.com password3
-  $ rbmanage ../rbserver dump-user $HGPORT1 mynick
+  $ rbmanage dump-user $HGPORT1 mynick
   4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user3@example.com
@@ -362,7 +362,7 @@ user, they will be assigned the email+id username.
     username: mynick
 
   $ exportbzauth user2-new@example.com password2
-  $ rbmanage ../rbserver dump-user $HGPORT1 user2-new+3
+  $ rbmanage dump-user $HGPORT1 user2-new+3
   3:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com

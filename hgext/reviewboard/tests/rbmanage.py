@@ -10,7 +10,6 @@ import time
 import urllib
 
 import psutil
-import yaml
 
 from mach.main import Mach
 
@@ -28,7 +27,6 @@ def main(args):
     legacy_actions = set([
         'start',
         'stop',
-        'dump-user',
     ])
 
     use_mach = True
@@ -139,31 +137,6 @@ def main(args):
 
         while psutil.pid_exists(pid):
             time.sleep(0.1)
-
-    elif action == 'dump-user':
-        port, username = args[2:]
-        root = get_root(port)
-        u = root.get_user(username=username)
-
-        o = {}
-        for field in u.iterfields():
-            o[field] = getattr(u, field)
-
-        data = {}
-        data[u.id] = o
-
-        print(yaml.safe_dump(data, default_flow_style=False).rstrip())
-
-
-def get_root(port):
-    from rbtools.api.client import RBClient
-
-    username = os.environ.get('BUGZILLA_USERNAME')
-    password = os.environ.get('BUGZILLA_PASSWORD')
-
-    c = RBClient('http://localhost:%s/' % port, username=username,
-            password=password)
-    return c.get_root()
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

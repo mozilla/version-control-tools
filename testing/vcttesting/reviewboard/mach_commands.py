@@ -319,3 +319,20 @@ class ReviewBoardCommands(object):
         root = self._get_root(port)
         rr = root.get_review_request(review_request_id=rrid)
         rr.update(status='pending')
+
+    @Command('dump-user', category='reviewboard',
+        description='Print a representation of a user.')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('username', help='Username whose info the print')
+    def dump_user(self, port, username):
+        root = self._get_root(port)
+        u = root.get_user(username=username)
+
+        o = {}
+        for field in u.iterfields():
+            o[field] = getattr(u, field)
+
+        data = {}
+        data[u.id] = o
+
+        print(yaml.safe_dump(data, default_flow_style=False).rstrip())
