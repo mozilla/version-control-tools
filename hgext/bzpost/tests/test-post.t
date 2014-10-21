@@ -82,9 +82,13 @@ Pushing to mozilla-inbound will result in bug being updated
   $ $TESTDIR/testing/bugzilla.py dump-bug 1
   Bug 1:
     comments:
-    - id: 1
+    - author: admin@example.com
+      id: 1
+      tags: []
       text: ''
-    - id: 2
+    - author: admin@example.com
+      id: 2
+      tags: []
       text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/b507e8e33160
     summary: bug1
 
@@ -112,18 +116,26 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
   $ $TESTDIR/testing/bugzilla.py dump-bug 2 3
   Bug 2:
     comments:
-    - id: 3
+    - author: admin@example.com
+      id: 3
+      tags: []
       text: ''
-    - id: 5
+    - author: admin@example.com
+      id: 5
+      tags: []
       text: 'http://localhost:$HGPORT/integration/mozilla-inbound/rev/a224eb610808
   
         http://localhost:$HGPORT/integration/mozilla-inbound/rev/e3b5f3c3c45d'
     summary: bug2
   Bug 3:
     comments:
-    - id: 4
+    - author: admin@example.com
+      id: 4
+      tags: []
       text: ''
-    - id: 6
+    - author: admin@example.com
+      id: 6
+      tags: []
       text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/abe0245372d4
     summary: bug3
 
@@ -151,9 +163,13 @@ Pushing to Try will post TBPL comment
   $ $TESTDIR/testing/bugzilla.py dump-bug 4
   Bug 4:
     comments:
-    - id: 7
+    - author: admin@example.com
+      id: 7
+      tags: []
       text: ''
-    - id: 8
+    - author: admin@example.com
+      id: 8
+      tags: []
       text: https://tbpl.mozilla.org/?tree=Try&rev=311111800824
     summary: bug4
 
@@ -182,7 +198,9 @@ Public changesets pushed to Try will be ignored if no bug in draft changesets
   $ $TESTDIR/testing/bugzilla.py dump-bug 5
   Bug 5:
     comments:
-    - id: 9
+    - author: admin@example.com
+      id: 9
+      tags: []
       text: ''
     summary: bug5
 
@@ -213,14 +231,20 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
   $ $TESTDIR/testing/bugzilla.py dump-bug 5 6
   Bug 5:
     comments:
-    - id: 9
+    - author: admin@example.com
+      id: 9
+      tags: []
       text: ''
     summary: bug5
   Bug 6:
     comments:
-    - id: 10
+    - author: admin@example.com
+      id: 10
+      tags: []
       text: ''
-    - id: 11
+    - author: admin@example.com
+      id: 11
+      tags: []
       text: https://tbpl.mozilla.org/?tree=Try&rev=9257b757fa7a
     summary: bug6
 
@@ -265,9 +289,13 @@ Pushing commit with bug number to user repo will post comment if enabled
   $ $TESTDIR/testing/bugzilla.py dump-bug 7
   Bug 7:
     comments:
-    - id: 12
+    - author: admin@example.com
+      id: 12
+      tags: []
       text: ''
-    - id: 13
+    - author: admin@example.com
+      id: 13
+      tags: []
       text: http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central/rev/e48ee73711db
     summary: bug7
 

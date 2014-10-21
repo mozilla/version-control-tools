@@ -46,13 +46,19 @@ Adding a reviewer should result in a r? flag being set
       id: 1
       summary: 'MozReview Request: bz://1/mynick'
     comments:
-    - id: 1
+    - author: author@example.com
+      id: 1
+      tags: []
       text: ''
-    - id: 2
+    - author: author@example.com
+      id: 2
+      tags: []
       text: 'Created attachment 1
   
         MozReview Request: bz://1/mynick'
-    - id: 3
+    - author: author@example.com
+      id: 3
+      tags: []
       text: '/r/2 - Bug 1 - Initial commit to review
   
   
@@ -89,13 +95,19 @@ Adding a "Ship It" review will grant r+
       id: 1
       summary: 'MozReview Request: bz://1/mynick'
     comments:
-    - id: 1
+    - author: author@example.com
+      id: 1
+      tags: []
       text: ''
-    - id: 2
+    - author: author@example.com
+      id: 2
+      tags: []
       text: 'Created attachment 1
   
         MozReview Request: bz://1/mynick'
-    - id: 3
+    - author: author@example.com
+      id: 3
+      tags: []
       text: '/r/2 - Bug 1 - Initial commit to review
   
   
@@ -103,7 +115,9 @@ Adding a "Ship It" review will grant r+
   
   
         hg pull review -r 57755461e85f1e3e66738ec2d57f325249897409'
-    - id: 4
+    - author: reviewer@example.com
+      id: 4
+      tags: []
       text: 'http://example.com/r/1/#review1
   
   
@@ -137,13 +151,19 @@ Adding a reply to the review will add a comment to Bugzilla
       id: 1
       summary: 'MozReview Request: bz://1/mynick'
     comments:
-    - id: 1
+    - author: author@example.com
+      id: 1
+      tags: []
       text: ''
-    - id: 2
+    - author: author@example.com
+      id: 2
+      tags: []
       text: 'Created attachment 1
   
         MozReview Request: bz://1/mynick'
-    - id: 3
+    - author: author@example.com
+      id: 3
+      tags: []
       text: '/r/2 - Bug 1 - Initial commit to review
   
   
@@ -151,12 +171,16 @@ Adding a reply to the review will add a comment to Bugzilla
   
   
         hg pull review -r 57755461e85f1e3e66738ec2d57f325249897409'
-    - id: 4
+    - author: reviewer@example.com
+      id: 4
+      tags: []
       text: 'http://example.com/r/1/#review1
   
   
         LGTM'
-    - id: 5
+    - author: author@example.com
+      id: 5
+      tags: []
       text: 'http://example.com/r/1/#review2
   
   

@@ -36,7 +36,9 @@ Pushing a review should not touch Bugzilla
   $ bugzilla dump-bug 1
   Bug 1:
     comments:
-    - id: 1
+    - author: admin@example.com
+      id: 1
+      tags: []
       text: ''
     summary: bug1
 
@@ -54,13 +56,19 @@ Publishing the review will add an attachment to the bug
       id: 1
       summary: 'MozReview Request: bz://1/mynick'
     comments:
-    - id: 1
+    - author: admin@example.com
+      id: 1
+      tags: []
       text: ''
-    - id: 3
+    - author: admin@example.com
+      id: 3
+      tags: []
       text: 'Created attachment 1
   
         MozReview Request: bz://1/mynick'
-    - id: 4
+    - author: admin@example.com
+      id: 4
+      tags: []
       text: '/r/2 - Bug 1 - Foo 1
   
   

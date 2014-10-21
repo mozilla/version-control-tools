@@ -118,7 +118,9 @@ class Bugzilla(object):
             )
             for comment in bug.get_comments():
                 d['comments'].append(dict(
+                    author=comment.author,
                     id=comment.id,
+                    tags=sorted(comment.tags),
                     text=comment.text,
                 ))
 
