@@ -8,7 +8,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   reviewboard
+   mozreview
    hacking-mozreview
    testing
 

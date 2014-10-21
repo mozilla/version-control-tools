@@ -1,24 +1,25 @@
-.. _reviewboard:
+.. _mozreview:
 
-=============================
-Code Review with Review Board
-=============================
+==========================
+Code Review with MozReview
+==========================
 
-This article is a guide on conducting code review at Mozilla using
+This article is a guide on conducting code review at Mozilla using MozReview,
+a repository-based code-review system based on
 `Review Board <https://www.reviewboard.org/>`_.
 
 Getting Started
 ===============
 
 Before you start code review, you need some code to review. This article
-assumes you have at least basic knowledge of Mercurial (preferred) or
-Git and can create commits that should be reviewed.
+assumes you have at least basic knowledge of Mercurial and can create
+commits that should be reviewed.
 
 Installing the Mercurial Extension
 ----------------------------------
 
 We have authored a Mercurial extension to make the process of submitting
-code review to Mozilla as easy as possible. To install that extension,
+code reviews to Mozilla as easy as possible. To install that extension,
 clone the
 `version-control-tools <https://hg.mozilla.org/hgcustom/version-control-tools>`_
 repository and activate the ``hgext/reviewboard/client.py`` extension in
@@ -48,7 +49,7 @@ Bugzilla Credentials
 ^^^^^^^^^^^^^^^^^^^^
 
 Mozilla's Review Board deployment uses
-`Mozilla's Bugzilla Deployment <https://bugzilla.mozilla.org/>`_ (BMO)
+`Mozilla's Bugzilla deployment <https://bugzilla.mozilla.org/>`_ (BMO)
 for user authentication and authorization. In order to talk to Review
 Board, you will need to provide valid Bugzilla credentials.
 
@@ -62,14 +63,15 @@ following Mercurial configuration snippet into your global ``~/.hgrc``
 or per-repository ``.hg/hgrc`` file and adjust to your liking::
 
   [bugzilla]
-  ; Your Bugzilla username. This is typically an email address.
+  ; Your Bugzilla username. This is an email address.
   username = me@example.com
   ; Your Bugzilla password (in plain text)
   password = MySecretPassword
 
+  ; or
+
   ; Your numeric Bugzilla user id.
   userid = 24113
-
   ; A valid Bugzilla login cookie.
   cookie = ihsLJHF308hd
 
@@ -124,7 +126,7 @@ like::
 
   review = ssh://reviewboard.mozilla.org/hg/reviews/firefox
 
-.. note:: Upcoming auto discovery of repositories
+.. note:: Upcoming autodiscovery of repositories
 
    It is a planned feature to have the Mercurial extension automatically
    discover and use the appropriate code review repository. This will
@@ -142,27 +144,28 @@ following::
 
 If that prints a message like *updated 27 reviews* and exits without
 spewing an error, everything is configured properly and you are ready to
-start conducting code review!
+submit code for review!
 
 How Review Board Works
 ======================
 
-Before we go on to describe how to conduct code review, it is important
+Before we go on to describe how to conduct code reviews, it is important
 to have a brief understanding of how Review Board works.
 
 For the patient, a read of the
 `Review Board User Guide <https://www.reviewboard.org/docs/manual/2.0/users/>`_
 is recommended.
 
-For the impatient, some terminology.
+For the impatient, some terminology.  Note that some of these terms
+are specific to MozReview.
 
 review request
    A request to review a single patch/diff/commit
 review
    Responses to a review request
 issues
-   A component of a review that is explicitly tracked as part of
-the review request
+   A component of a review that is explicitly tracked as part of the
+   review request
 review request series
    A collection of review requests all belonging to the same logical
    group
@@ -181,19 +184,19 @@ publishing
 Pushing Code for Review
 =======================
 
-Initiating code review is very simple: just push::
+Initiating code review is very simple; just push::
 
-  $ hg push
+  $ hg push review
 
-If not arguments are specified, the working copy's commit and all its
+If no arguments are specified, the working copy's commit and all its
 unpublished ancestors will be considered for review.
 
 If you would like to control which commits are reviewed, specify ``-r
 <rev>``. e.g.::
 
-  $ hg push -r 77c9ee75117e
+  $ hg push -r 77c9ee75117e review
   or
-  $ hg push -r 32114
+  $ hg push -r 32114 review
 
 If all goes well, Mercurial should print information about submitted
 review requests. e.g.::
