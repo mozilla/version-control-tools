@@ -151,6 +151,9 @@ if not os.path.exists(j(h, 'checksetup.done')):
     cc([j(b, 'checksetup.pl',), answers], cwd=b)
     cc([j(b, 'checksetup.pl',), answers], cwd=b)
 
+    with open(j(h, 'bmo.sql'), 'rb') as fh:
+        subprocess.check_call(mysql_args + [db_name], stdin=fh)
+
     with open(j(h, 'checksetup.done'), 'a'):
         pass
 
