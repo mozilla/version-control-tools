@@ -292,3 +292,12 @@ class ReviewBoardCommands(object):
         r = reviews.create(**args)
 
         print('created review %s' % r.rsp['review']['id'])
+
+    @Command('closediscarded', category='reviewboard',
+        description='Close a review request as discarded.')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Request request to discard')
+    def close_discarded(self, port, rrid):
+        root = self._get_root(port)
+        rr = root.get_review_request(review_request_id=rrid)
+        rr.update(status='discarded')

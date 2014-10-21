@@ -46,7 +46,7 @@
 Close the squashed review request as discarded, which should close all of the
 child review requests.
 
-  $ rbmanage ../rbserver closediscarded $HGPORT1 1
+  $ rbmanage closediscarded $HGPORT1 1
 
 Squashed review request with ID 1 should be closed as discarded and have
 no Commit ID set.
