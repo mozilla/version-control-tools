@@ -7,6 +7,7 @@ import sys
 import xmlrpclib
 
 import bugsy
+import requests
 
 from mach.decorators import (
     CommandArgument,
@@ -20,8 +21,12 @@ from rbbz.transports import bugzilla_transport
 class BugzillaCommands(object):
     def __init__(self, context):
         url = os.environ['BUGZILLA_URL'] + '/rest'
+        self.base_url = os.environ['BUGZILLA_URL']
         username = os.environ['BUGZILLA_USERNAME']
         password = os.environ['BUGZILLA_PASSWORD']
+
+        self.username = username
+        self.password = password
 
         xmlrpcurl = os.environ['BUGZILLA_URL'] + '/xmlrpc.cgi'
         transport = bugzilla_transport(xmlrpcurl)
@@ -64,3 +69,25 @@ class BugzillaCommands(object):
             self.client.put(bug)
 
         print('created %d bugs' % count)
+
+    @Command('create-login-cookie', category='bugzilla',
+            description='Create a login cookie from credentials')
+    def create_login_cookie(self):
+        # We simulate a browser's HTML interaction with Bugzilla to obtain a
+        # login cookie. Is there a better way?
+        url = self.base_url + '/'
+        r = requests.get(url + '/')
+        cookies = dict(r.cookies)
+
+        params = {
+            'Bugzilla_login': self.username,
+            'Bugzilla_password': self.password,
+            'Bugzilla_login_token': '',
+        }
+        r = requests.post(url + '/index.cgi', params=params, cookies=cookies)
+        if r.status_code != 200:
+            raise Exception('Non-200 response from Bugzilla. Proper credentials?')
+
+        login = r.cookies['Bugzilla_login']
+        cookie = r.cookies['Bugzilla_logincookie']
+        print('%s %s' % (login, cookie))

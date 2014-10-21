@@ -34,7 +34,6 @@ def main(args):
         'update-user-email',
         'update-user-login-denied-text',
         'create-group',
-        'create-login-cookie',
     ])
 
     use_mach = True
@@ -136,26 +135,6 @@ def main(args):
             'description': desc,
             'user_regexp': '.*',
         })
-
-    elif action == 'create-login-cookie':
-        # We simulate a browser's HTML interaction with Bugzilla to obtain a
-        # login cookie. Is there a better way?
-        url = os.environ['BUGZILLA_URL']
-        r = requests.get(url + '/')
-        cookies = dict(r.cookies)
-
-        params = {
-            'Bugzilla_login': os.environ['BUGZILLA_USERNAME'],
-            'Bugzilla_password': os.environ['BUGZILLA_PASSWORD'],
-            'Bugzilla_login_token': '',
-        }
-        r = requests.post(url + '/index.cgi', params=params, cookies=cookies)
-        if r.status_code != 200:
-            raise Exception('Non-200 response from Bugzilla. Proper credentials?')
-
-        login = r.cookies['Bugzilla_login']
-        cookie = r.cookies['Bugzilla_logincookie']
-        print('%s %s' % (login, cookie))
 
     else:
         print('unknown action: %s' % action)
