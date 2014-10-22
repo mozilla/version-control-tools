@@ -7,6 +7,7 @@ from StringIO import StringIO
 from mercurial import mdiff
 from mercurial import patch
 from mercurial import wireproto
+from mercurial.node import short
 
 class AuthError(Exception):
     """Represents an error authenticating or authorizing to Bugzilla."""
@@ -144,12 +145,28 @@ def reviewboard(repo, proto, args=None):
         'squashed': {}
     }
 
+    def formatresponse(*lines):
+        l = ['1'] + list(lines)
+        res = '\n'.join(l)
+        # It's easy for unicode to creep in from RBClient APIs. Mercurial
+        # doesn't like unicode type responses, so catch it early and avoid
+        # the crypic KeyError: <type 'unicode'> in Mercurial.
+        assert isinstance(res, str)
+        return res
+
     # Note patch.diff() is appears to accept anything that can be fed into
     # repo[]. However, it blindly does a hex() on the argument as opposed
     # to the changectx, so we need to pass in the binary node.
     base_parent_node = repo[nodes[0]].p1().node()
     for i, node in enumerate(nodes):
         ctx = repo[node]
+
+        # Reviewing merge commits doesn't make much sense and only makes
+        # situations more complicated. So disallow the practice.
+        if len(ctx.parents()) > 1:
+            msg = 'cannot review merge commits (%s)' % short(ctx.node())
+            return formatresponse('error %s' % msg)
+
         p1 = ctx.p1().node()
         diff = None
         parent_diff = None
@@ -174,7 +191,6 @@ def reviewboard(repo, proto, args=None):
     repoid = repo.ui.configint('reviewboard', 'repoid', None)
 
     lines = [
-        '1',
         'rburl %s' % rburl,
         'reviewid %s' % identifier,
     ]
@@ -201,11 +217,7 @@ def reviewboard(repo, proto, args=None):
     except AuthError as e:
         lines.append('error %s' % str(e))
 
-    # It's easy for unicode to creep in from RBClient APIs. Mercurial doesn't
-    # like unicode type responses, so catch it early and avoid the crypic
-    # KeyError: <type 'unicode'> in Mercurial.
-    res = '\n'.join(lines)
-    assert isinstance(res, str)
+    res = formatresponse(*lines)
     return res
 
 @wireproto.wireprotocommand('pullreviews', '*')

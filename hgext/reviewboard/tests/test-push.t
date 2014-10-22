@@ -175,6 +175,32 @@ Specifying multiple -r for the same head works
   review url: http://localhost:$HGPORT1/r/9 (pending)
   [1]
 
+Reviewing merge commits is rejected
+
+  $ hg up -r 0 > /dev/null
+  $ echo merge1 > foo
+  $ hg commit -m 'Bug 1 - Merge A'
+  created new head
+  $ hg up -r 0 > /dev/null
+  $ echo merge2 > foo
+  $ hg commit -m 'Bug 1 - Merge B'
+  created new head
+  $ hg merge --tool internal:other 63170dd88642
+  0 files updated, 1 files merged, 0 files removed, 0 files unresolved
+  (branch merge, don't forget to commit)
+  $ hg commit -m 'Bug 1 - Do merge'
+
+  $ hg push ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 3 changesets with 3 changes to 1 files (+1 heads)
+  submitting 3 changesets for review
+  abort: cannot review merge commits (b21a68e5d0e0)
+  [255]
+
   $ cd ..
   $ rbmanage stop rbserver
   $ dockercontrol stop-bmo rb-test-push
