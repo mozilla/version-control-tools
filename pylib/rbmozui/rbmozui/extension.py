@@ -7,8 +7,7 @@ from django.conf.urls import include, patterns, url
 
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import (TemplateHook, URLHook)
-from reviewboard.reviews.builtin_fields import (TargetPeopleField,
-                                                TestingDoneField)
+from reviewboard.reviews.builtin_fields import TestingDoneField
 from reviewboard.reviews.fields import (get_review_request_field,
                                         get_review_request_fieldset)
 from reviewboard.urls import (diffviewer_url_names,
@@ -46,16 +45,10 @@ class RBMozUI(Extension):
     def initialize(self):
         # Start by hiding the Testing Done field in all review requests, since
         # Mozilla developers will not be using it.
-        main_fieldset = get_review_request_fieldset('main')
-        testing_done_field = get_review_request_field('testing_done')
-        if testing_done_field:
-            main_fieldset.remove_field(testing_done_field)
-
-        reviewers_fieldset = get_review_request_fieldset('reviewers')
-        people_field = get_review_request_field('target_people')
-        if people_field:
-            reviewers_fieldset.remove_field(people_field)
-
+        fieldset = get_review_request_fieldset('main')
+        field = get_review_request_field('testing_done')
+        if (field):
+          fieldset.remove_field(field)
         # All of our review request styling is injected via review-stylings-css,
         # which in turn loads the review.css static bundle.
         TemplateHook(self, 'base-css', 'rbmozui/commits-stylings-css.html',
@@ -77,14 +70,8 @@ class RBMozUI(Extension):
     def shutdown(self):
         # We have to put the TestingDone field back before we shut down
         # in order to get the instance back to its original state.
-        main_fieldset = get_review_request_fieldset('main')
-        testing_done_field = get_review_request_field('testing_done')
-        if not testing_done_field:
-            main_fieldset.add_field(TestingDoneField)
-
-        reviewers_fieldset = get_review_request_fieldset('reviewers')
-        people_field = get_review_request_field('target_people')
-        if not people_field:
-            reviewers_fieldset.add_field(TargetPeopleField)
-
+        fieldset = get_review_request_fieldset('main')
+        field = get_review_request_field('testing_done')
+        if not field:
+          fieldset.add_field(TestingDoneField)
         super(RBMozUI, self).shutdown()
