@@ -2,8 +2,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import base64
+
 import bugsy
+import requests
 import xmlrpclib
+import yaml
 
 from rbbz.transports import bugzilla_transport
 
@@ -11,6 +15,10 @@ class Bugzilla(object):
     """High-level API to common Bugzilla tasks."""
 
     def __init__(self, base_url, username, password):
+        self.base_url = base_url
+        self.username = username
+        self.password = password
+
         xmlrpc_url = base_url + '/xmlrpc.cgi'
         rest_url = base_url + '/rest'
 
@@ -28,3 +36,115 @@ class Bugzilla(object):
         bug = bugsy.Bug(self.client, product=product, component=component,
                 summary=summary)
         self.client.put(bug)
+
+    def create_bug_range(self, product, component, upper):
+        existing = self.client.search_for.search()
+        ids = [int(b['id']) for b in existing]
+        ids.append(1)
+        maxid = max(ids)
+
+        count = 0
+        for i in range(maxid, upper + 1):
+            count += 1
+            bug = bugsy.Bug(self.client, product=product, component=component,
+                    summary='Range %d' % i)
+            self.client.put(bug)
+
+        return count
+
+    def create_group(self, group, description):
+        # Adding every user to every group is wrong. This is a quick hack to
+        # work around bug 1079463.
+        return self.proxy.Group.create({
+            'name': group,
+            'description': description,
+            'user_regexp': '.*',
+        })
+
+    def create_user(self, email, password, name):
+        return self.proxy.User.create({
+            'email': email,
+            'password': password,
+            'full_name': name,
+        })
+
+    def update_user_fullname(self, email, name):
+        return self.proxy.User.update({
+            'names': [email],
+            'full_name': name,
+        })
+
+    def update_user_email(self, old_email, new_email):
+        return self.proxy.User.update({
+            'names': [old_email],
+            'email': new_email,
+        })
+
+    def update_user_login_denied_text(self, email, text):
+        return self.proxy.User.update({
+            'names': [email],
+            'login_denied_text': text,
+        })
+
+    def create_login_cookie(self):
+        # We simulate a browser's HTML interaction with Bugzilla to obtain a
+        # login cookie. Is there a better way?
+        url = self.base_url + '/'
+        r = requests.get(url + '/')
+        cookies = dict(r.cookies)
+
+        params = {
+            'Bugzilla_login': self.username,
+            'Bugzilla_password': self.password,
+            'Bugzilla_login_token': '',
+        }
+        r = requests.post(url + '/index.cgi', params=params, cookies=cookies)
+        if r.status_code != 200:
+            raise Exception('Non-200 response from Bugzilla. Proper credentials?')
+
+        login = r.cookies['Bugzilla_login']
+        cookie = r.cookies['Bugzilla_logincookie']
+
+        return login, cookie
+
+    def serialize_bugs(self, bugs):
+        data = {}
+        for bid in bugs:
+            bug = self.client.get(bid)
+
+            d = dict(
+                summary=bug.summary,
+                comments=[],
+            )
+            for comment in bug.get_comments():
+                d['comments'].append(dict(
+                    id=comment.id,
+                    text=comment.text,
+                ))
+
+            r = self.client.request('bug/%s/attachment' % bid).json()
+            for a in r['bugs'].get(bid, []):
+                flags = []
+                for f in a['flags']:
+                    flags.append(dict(
+                        id=f['id'],
+                        name=f['name'],
+                        requestee=f.get('requestee'),
+                        setter=f['setter'],
+                        status=f['status'],
+                    ))
+
+                at = d.setdefault('attachments', [])
+                at.append(dict(
+                    id=a['id'],
+                    attacher=a['attacher'],
+                    content_type=a['content_type'],
+                    description=a['description'],
+                    summary=a['summary'],
+                    data=base64.b64decode(a['data']),
+                    flags=flags))
+
+            key = 'Bug %s' % bid
+            data[key] = d
+
+        return yaml.safe_dump(data, default_flow_style=False).rstrip()
