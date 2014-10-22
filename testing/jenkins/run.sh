@@ -20,6 +20,11 @@ result=$?
 rm -rf /version-control-tools/coverage
 mv coverage/ /version-control-tools/
 
+# Generate Sphinx documentation.
+make -C docs html
+rm -rf /version-control-tools/sphinx-docs
+mv docs/_build /version-control-tools/sphinx-docs
+
 # Ideally this would be part of running tests. Until then, add it here
 # so Jenkins doesn't bloat.
 DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py prune-images
