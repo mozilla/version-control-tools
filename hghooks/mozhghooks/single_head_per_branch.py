@@ -17,10 +17,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 def hook(ui, repo, **kwargs):
-    for b in repo.branchtags():
-        if len(repo.branchheads(b)) > 1:
+    for branch, heads in repo.branchmap().iteritems():
+        if len(heads) > 1:
             print "\n\n************************** ERROR ****************************"
-            print "Two heads detected on branch '%s'" % b
+            print "Multiple heads detected on branch '%s'" % branch
             print "Only one head per branch is allowed!"
             print "*************************************************************\n\n"
             return 1
