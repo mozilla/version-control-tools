@@ -113,18 +113,40 @@ class ReviewBoardCommands(object):
         root = self._get_root(port)
         rr = root.get_review_request(review_request_id=rrid)
 
-        people = set()
+        people = []
         for p in rr.target_people:
-            people.add(p.username)
+            people.add(p.get().username)
 
         # Review Board doesn't call into the auth plugin when mapping target
         # people to RB users. So, we perform an API call here to ensure the
         # user is present.
         for u in user:
-            people.add(u)
-            root.get_users(q=u)
+            if u not in people:
+                people.append(u)
+                root.get_users(q=u)
 
-        people = ','.join(sorted(people))
+        people = ','.join(people)
+
+        draft = rr.get_or_create_draft(target_people=people)
+        print('%d people listed on review request' % len(draft.target_people))
+
+    @Command('remove-reviewer', category='reviewboard',
+        description='Remove a reviewer from a review request')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Review request id to modify')
+    @CommandArgument('--user', action='append',
+        help='User to remove from review')
+    def remove_reviewer(self, port, rrid, user):
+        root = self._get_root(port)
+        rr = root.get_review_request(review_request_id=rrid)
+
+        people = []
+        for p in rr.target_people:
+            username = p.get().username
+            if username not in user:
+                people.append(username)
+
+        people = ','.join(people)
 
         draft = rr.get_or_create_draft(target_people=people)
         print('%d people listed on review request' % len(draft.target_people))
