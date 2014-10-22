@@ -14,6 +14,8 @@
   created user 2
   $ bugzilla create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]'
   created user 3
+  $ bugzilla create-user reviewer2@example.com password 'Another Reviewer [:rev2]'
+  created user 4
 
 Create a review request from a regular user
 
@@ -187,6 +189,63 @@ Adding a reply to the review will add a comment to Bugzilla
         Thanks!'
     summary: First Bug
 
+Ensure multiple reviewers works as expected
+
+  $ exportbzauth author@example.com password
+  $ bugzilla create-bug TestProduct TestComponent 'Multiple Reviewers'
+
+  $ hg up -r 0 > /dev/null
+  $ echo b2 > foo
+  $ hg commit -m 'Bug 2 - Multiple reviewers'
+  created new head
+  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/ > /dev/null
+
+  $ rbmanage add-reviewer $HGPORT1 3 --user reviewer --user rev2
+  2 people listed on review request
+  $ rbmanage publish $HGPORT1 3
+
+  $ bugzilla dump-bug 2
+  Bug 2:
+    attachments:
+    - attacher: author@example.com
+      content_type: text/x-review-board-request
+      data: http://example.com/r/3/
+      description: 'MozReview Request: bz://2/mynick'
+      flags:
+      - id: 3
+        name: review
+        requestee: reviewer2@example.com
+        setter: author@example.com
+        status: '?'
+      - id: 4
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
+      id: 2
+      summary: 'MozReview Request: bz://2/mynick'
+    comments:
+    - author: author@example.com
+      id: 6
+      tags: []
+      text: ''
+    - author: author@example.com
+      id: 7
+      tags: []
+      text: 'Created attachment 2
+  
+        MozReview Request: bz://2/mynick'
+    - author: author@example.com
+      id: 8
+      tags: []
+      text: '/r/4 - Bug 2 - Multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull review -r d17099d7ee43e288f43e0210edc71b9782f92b77'
+    summary: Multiple Reviewers
 
   $ cd ..
 
