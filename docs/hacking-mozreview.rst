@@ -37,7 +37,7 @@ like production.
 To get started, you'll need to configure your environment. Run the
 following::
 
-   $ ./create-test-environment
+  $ ./create-test-environment
 
 This will create a virtualenv in ``venv/`` with all the necessary
 package dependencies. It will also create Docker images for running
@@ -47,21 +47,17 @@ image).
 
 Now, you can create and start a MozReview instance::
 
-   $ ./mach mozreview-start mozreview
-
-The ``mozreview`` argument in that command is the path where we will
-create and store MozReview data and state. It can be anywhere on the
-filesystem. You may want to put it outside of the Mercurial clone so
-``hg status`` doesn't report hundreds of untracked files.
-
-If everything is successful, that command should print out details about
-the running MozReview instance. e.g.::
-
+  $ ./mach mozreview-start /path/to/instance
   Bugzilla URL: http://192.168.59.103:57485/
   Review Board URL: http://localhost:57486/
   Mercurial URL: http://localhost:57487/
   Admin username: admin@example.com
   Admin password: password
+
+The argument in that command is the path where we will create and store
+MozReview data and state. It can be anywhere on the filesystem. You may
+want to put it outside of the Mercurial clone so ``hg status`` doesn't
+report hundreds of untracked files.
 
 You should be able to load the printed URLs in your browser and see a
 working site. If you don't, file a bug!
@@ -136,3 +132,10 @@ The MozReview tests are all defined as part of the Mercurial extension.
 To run the tests::
 
    $ ./run-mercurial-tests -j2 hgext/reviewboard/tests/*
+
+Filing Bugs
+===========
+
+Found a bug in MozReview or want to create a bug to track an
+improvement? File bugs against ``Developer Services :: MozReview``
+at https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview.
