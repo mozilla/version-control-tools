@@ -9,43 +9,15 @@
 import os
 import sys
 
-from vcttesting.docker import (
-    Docker,
-    params_from_env,
-)
+from mach.main import Mach
 
 def main(args):
-    if 'DOCKER_STATE_FILE' in os.environ:
-        state_file = os.environ['DOCKER_STATE_FILE']
-    elif 'HGTMP' in os.environ:
-        state_file = os.path.join(os.environ['HGTMP'], 'docker-state.json')
-    else:
-        print('Do not know where to put a Docker state file.')
-        return 1
+    m = Mach(os.getcwd())
+    m.define_category('docker', 'Docker',
+        'Common actions involving Docker')
+    import vcttesting.docker_mach_commands
 
-    docker_url, tls = params_from_env(os.environ)
-
-    d = Docker(state_file, docker_url, tls=tls)
-
-    if not d.is_alive():
-        print('Docker is not available!')
-        return 1
-
-    action = args[0]
-
-    if action == 'build-bmo':
-        d.build_bmo(verbose=True)
-    elif action == 'start-bmo':
-        cluster, http_port = args[1:]
-        db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
-        web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
-
-        d.start_bmo(cluster=cluster, hostname=None, http_port=http_port,
-                db_image=db_image, web_image=web_image)
-    elif action == 'stop-bmo':
-        d.stop_bmo(cluster=args[1])
-    elif action == 'prune-images':
-        d.prune_images()
+    return m.run(args)
 
 if __name__ == '__main__':
     # Unbuffer stdout.
