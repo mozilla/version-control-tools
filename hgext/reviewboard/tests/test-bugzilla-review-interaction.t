@@ -362,6 +362,80 @@ Removing all reviewers should remove all flags
         hg pull review -r d17099d7ee43e288f43e0210edc71b9782f92b77'
     summary: Multiple Reviewers
 
+review? sticks around when 1 person grants review
+
+  $ exportbzauth author@example.com password
+  $ bugzilla create-bug TestProduct TestComponent 'More Multiple Reviewers'
+
+  $ hg up -r 0 > /dev/null
+  $ echo more_multiple_reviewers > foo
+  $ hg commit -m 'Bug 3 - More multiple reviewers'
+  created new head
+  $ hg --config bugzilla.username=author@example.com push > /dev/null
+
+  $ rbmanage add-reviewer $HGPORT1 5 --user reviewer --user rev2
+  2 people listed on review request
+  $ rbmanage publish $HGPORT1 5
+
+  $ exportbzauth reviewer@example.com password
+  $ rbmanage create-review $HGPORT1 5 --body-top 'land it!' --public --ship-it
+  created review 3
+
+  $ bugzilla dump-bug 3
+  Bug 3:
+    attachments:
+    - attacher: author@example.com
+      content_type: text/x-review-board-request
+      data: http://example.com/r/5/
+      description: 'MozReview Request: bz://3/mynick'
+      flags:
+      - id: 5
+        name: review
+        requestee: reviewer2@example.com
+        setter: author@example.com
+        status: '?'
+      - id: 6
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
+      - id: 7
+        name: review
+        requestee: null
+        setter: reviewer@example.com
+        status: +
+      id: 3
+      summary: 'MozReview Request: bz://3/mynick'
+    comments:
+    - author: author@example.com
+      id: 11
+      tags: []
+      text: ''
+    - author: author@example.com
+      id: 12
+      tags: []
+      text: 'Created attachment 3
+  
+        MozReview Request: bz://3/mynick'
+    - author: author@example.com
+      id: 13
+      tags: []
+      text: '/r/6 - Bug 3 - More multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull review -r fb992de2921c9dd3117becff799b1e41e0dc4827'
+    - author: reviewer@example.com
+      id: 14
+      tags: []
+      text: 'http://example.com/r/5/#review3
+  
+  
+        land it!'
+    summary: More Multiple Reviewers
+
   $ cd ..
 
 Cleanup
