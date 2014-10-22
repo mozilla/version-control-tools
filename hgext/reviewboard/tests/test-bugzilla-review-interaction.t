@@ -16,6 +16,8 @@
   created user 3
   $ bugzilla create-user reviewer2@example.com password 'Another Reviewer [:rev2]'
   created user 4
+  $ bugzilla create-user troll@example.com password 'Reviewer Troll [:troll]'
+  created user 5
 
 Create a review request from a regular user
 
@@ -420,6 +422,75 @@ review? sticks around when 1 person grants review
   
         land it!'
     summary: More Multiple Reviewers
+
+Random users can come along and grant review
+
+  $ exportbzauth author@example.com password
+  $ bugzilla create-bug TestProduct TestComponent 'Unrelated Reviewers'
+
+  $ hg up -r 0 > /dev/null
+  $ echo unrelated_reviewer > foo
+  $ hg commit -m 'Bug 4 - Unrelated Reviewers'
+  created new head
+  $ hg --config bugzilla.username=author@example.com push > /dev/null
+
+  $ rbmanage add-reviewer $HGPORT1 7 --user reviewer
+  1 people listed on review request
+  $ rbmanage publish $HGPORT1 7
+
+  $ exportbzauth troll@example.com password
+  $ rbmanage create-review $HGPORT1 7 --body-top 'I am always watching' --public --ship-it
+  created review 4
+
+  $ bugzilla dump-bug 4
+  Bug 4:
+    attachments:
+    - attacher: author@example.com
+      content_type: text/x-review-board-request
+      data: http://example.com/r/7/
+      description: 'MozReview Request: bz://4/mynick'
+      flags:
+      - id: 6
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
+      - id: 7
+        name: review
+        requestee: null
+        setter: troll@example.com
+        status: +
+      id: 4
+      summary: 'MozReview Request: bz://4/mynick'
+    comments:
+    - author: author@example.com
+      id: 15
+      tags: []
+      text: ''
+    - author: author@example.com
+      id: 16
+      tags: []
+      text: 'Created attachment 4
+  
+        MozReview Request: bz://4/mynick'
+    - author: author@example.com
+      id: 17
+      tags: []
+      text: '/r/8 - Bug 4 - Unrelated Reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull review -r 13295ed17a69bdcef2644c0ab72736292db21b80'
+    - author: troll@example.com
+      id: 18
+      tags: []
+      text: 'http://example.com/r/7/#review4
+  
+  
+        I am always watching'
+    summary: Unrelated Reviewers
 
   $ cd ..
 
