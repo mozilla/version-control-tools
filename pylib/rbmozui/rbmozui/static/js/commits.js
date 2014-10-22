@@ -217,6 +217,7 @@ $(document).ready(function() {
       if (!$elArray.length) {
         reportError("Couldn't find reviewer input for commit " + this.model.commitID);
       }
+      var model = this.model;
       var reviewRequest = this.model.reviewRequest;
       var $el = $($elArray[0]);
       var options = {
@@ -281,6 +282,10 @@ $(document).ready(function() {
             }
 
             return parsed;
+        },
+        result: function (el, data, value) {
+          console.log("Adding reviewer: " + value);
+          model.addReviewer(value);
         },
         url: SITE_ROOT +
              'api/' + (options.resourceName || options.fieldName) + '/',
