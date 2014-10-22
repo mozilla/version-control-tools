@@ -247,6 +247,61 @@ Ensure multiple reviewers works as expected
         hg pull review -r d17099d7ee43e288f43e0210edc71b9782f92b77'
     summary: Multiple Reviewers
 
+Removing a reviewer should remove their review flag
+
+  $ rbmanage remove-reviewer $HGPORT1 3 --user rev2
+  1 people listed on review request
+
+  $ rbmanage publish $HGPORT1 3
+
+  $ bugzilla dump-bug 2
+  Bug 2:
+    attachments:
+    - attacher: author@example.com
+      content_type: text/x-review-board-request
+      data: http://example.com/r/3/
+      description: 'MozReview Request: bz://2/mynick'
+      flags:
+      - id: 4
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
+      id: 2
+      summary: 'MozReview Request: bz://2/mynick'
+    comments:
+    - author: author@example.com
+      id: 6
+      tags: []
+      text: ''
+    - author: author@example.com
+      id: 7
+      tags: []
+      text: 'Created attachment 2
+  
+        MozReview Request: bz://2/mynick'
+    - author: author@example.com
+      id: 8
+      tags: []
+      text: '/r/4 - Bug 2 - Multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull review -r d17099d7ee43e288f43e0210edc71b9782f92b77'
+    - author: author@example.com
+      id: 9
+      tags: []
+      text: '/r/4 - Bug 2 - Multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull review -r d17099d7ee43e288f43e0210edc71b9782f92b77'
+    summary: Multiple Reviewers
+
   $ cd ..
 
 Cleanup
