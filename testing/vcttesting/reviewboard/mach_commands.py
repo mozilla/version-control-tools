@@ -3,11 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-import signal
-import subprocess
 import sys
-import time
-import urllib
 
 from mach.decorators import (
     CommandArgument,
@@ -15,42 +11,7 @@ from mach.decorators import (
     Command,
 )
 
-import psutil
 import yaml
-
-SETTINGS_LOCAL = """
-from __future__ import unicode_literals
-
-import os
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'reviewboard.db',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-    },
-}
-
-LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
-PRODUCTION = False
-
-SECRET_KEY = "mbr7-l=uhl)rnu_dgl)um$62ad2ay=xw+$oxzo_ct!$xefe780"
-TIME_ZONE = 'UTC'
-LANGUAGE_CODE = 'en-us'
-SITE_ID = 1
-USE_I18N = True
-LDAP_TLS = False
-LOGGING_ENABLED = True
-LOGGING_LEVEL = "DEBUG"
-LOGGING_DIRECTORY = "."
-LOGGING_ALLOW_PROFILING = True
-DEBUG = True
-INTERNAL_IPS = "127.0.0.1"
-
-""".strip()
 
 # TODO Use YAML.
 def dump_review_request(r):
@@ -103,29 +64,6 @@ class ReviewBoardCommands(object):
     def __init__(self, context):
         self.old_env = os.environ.copy()
 
-    def _setup_env(self, path):
-        """Set up the environment for executing Review Board commands."""
-        path = os.path.abspath(path)
-        sys.path.insert(0, path)
-
-        self.env = os.environ.copy()
-        self.env['PYTHONPATH'] = '%s:%s' % (path, self.env.get('PYTHONPATH', ''))
-        os.environ['DJANGO_SETTINGS_MODULE'] = 'reviewboard.settings'
-        self.manage = [sys.executable, '-m', 'reviewboard.manage']
-
-        if not os.path.exists(path):
-            os.mkdir(path)
-        os.chdir(path)
-
-        # Some Django operations put things in TMP. This mucks with concurrent
-        # execution. So we pin TMP to the instance.
-        tmpdir = os.path.join(path, 'tmp')
-        if not os.path.exists(tmpdir):
-            os.mkdir(tmpdir)
-        self.env['TMPDIR'] = tmpdir
-
-        return path
-
     def _get_root(self, port):
         from rbtools.api.client import RBClient
 
@@ -136,49 +74,16 @@ class ReviewBoardCommands(object):
                 password=password)
         return c.get_root()
 
+    def _get_rb(self, path):
+        from vcttesting.reviewboard import MozReviewBoard
+        return MozReviewBoard(path, os.environ['BUGZILLA_URL'])
+
     @Command('create', category='reviewboard',
         description='Create a Review Board server install.')
     @CommandArgument('path', help='Where to create RB install.')
     def create(self, path):
-        path = self._setup_env(path)
-
-        with open(os.path.join(path, 'settings_local.py'), 'wb') as fh:
-            fh.write(SETTINGS_LOCAL)
-
-        # TODO figure out how to suppress logging when invoking via native
-        # Python API.
-        f = open(os.devnull, 'w')
-        subprocess.check_call(self.manage + ['syncdb', '--noinput'], cwd=path,
-                env=self.env, stdout=f, stderr=f)
-
-        subprocess.check_call(self.manage + ['enable-extension',
-            'rbbz.extension.BugzillaExtension'], cwd=path,
-            env=self.env, stdout=f, stderr=f)
-
-        subprocess.check_call(self.manage + ['enable-extension',
-            'rbmozui.extension.RBMozUI'],
-            cwd=path, env=self.env, stdout=f, stderr=f)
-
-        from reviewboard.cmdline.rbsite import Site, parse_options
-        class dummyoptions(object):
-            no_input = True
-            site_root = '/'
-            db_type = 'sqlite3'
-            copy_media = True
-
-        site = Site(path, dummyoptions())
-        site.rebuild_site_directory()
-
-        from djblets.siteconfig.models import SiteConfiguration
-        sc = SiteConfiguration.objects.get_current()
-        sc.set('site_static_root', os.path.join(path, 'htdocs', 'static'))
-        sc.set('site_media_root', os.path.join(path, 'htdocs', 'media'))
-
-        # Hook up rbbz authentication.
-        sc.set('auth_backend', 'bugzilla')
-        sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % os.environ['BUGZILLA_URL'])
-
-        sc.save()
+        rb = self._get_rb(path)
+        rb.create()
 
     @Command('repo', category='reviewboard',
         description='Add a repository to Review Board')
@@ -186,12 +91,8 @@ class ReviewBoardCommands(object):
     @CommandArgument('name', help='Name to give to this repository.')
     @CommandArgument('url', help='URL this repository should be accessed under.')
     def repo(self, path, name, url):
-        path = self._setup_env(path)
-
-        from reviewboard.scmtools.models import Repository, Tool
-        tool = Tool.objects.get(name__exact='Mercurial')
-        r = Repository(name=name, path=url, tool=tool)
-        r.save()
+        rb = self._get_rb(path)
+        rb.add_repository(name, url)
 
     @Command('dumpreview', category='reviewboard',
         description='Print a representation of a review request.')
@@ -346,71 +247,8 @@ class ReviewBoardCommands(object):
     @CommandArgument('path', help='Path to Review Board install')
     @CommandArgument('port', help='Port number to start server on.')
     def start(self, path, port):
-        path = self._setup_env(path)
-
-        env = dict(self.env)
-
-        env['HOME'] = path
-        f = open(os.devnull, 'w')
-        # --noreload prevents process for forking. If we don't do this,
-        # our written pid is not correct.
-        proc = subprocess.Popen(self.manage + ['runserver', '--noreload', port],
-            cwd=path, env=env, stderr=f, stdout=f)
-
-        # We write the PID to DAEMON_PIDS so Mercurial kills it automatically
-        # if it is running.
-        with open(env['DAEMON_PIDS'], 'ab') as fh:
-            fh.write('%d\n' % proc.pid)
-
-        # We write the PID to a local file so the test can kill it. The benefit
-        # of having the test kill it (with SIGINT as opposed to SIGKILL) is
-        # that coverage information will be written if the process is stopped
-        # with SIGINT.
-        # TODO consider changing Mercurial to SIGINT first, SIGKILL later.
-        with open(os.path.join(path, 'rbserver.pid'), 'wb') as fh:
-            fh.write('%d' % proc.pid)
-
-        # There is a race condition between us exiting and the tests
-        # querying the server before it is ready. So, we wait on the
-        # server before proceeding.
-        while True:
-            try:
-                urllib.urlopen('http://localhost:%s/' % port)
-                break
-            except IOError:
-                time.sleep(0.1)
-
-        # We need to go through the double fork and session leader foo
-        # to get this process to detach from the shell the process runs
-        # under otherwise this process will keep it alive and the Mercurial
-        # test runner will think the test is still running. Oy.
-        pid = os.fork()
-        if pid > 0:
-            sys.exit(0)
-
-        os.chdir('/')
-        os.setsid()
-        os.umask(0)
-
-        pid = os.fork()
-        if pid > 0:
-            sys.exit(0)
-
-        sys.stdout.flush()
-        sys.stderr.flush()
-
-        os.dup2(f.fileno(), sys.stdin.fileno())
-        os.dup2(f.fileno(), sys.stdout.fileno())
-        os.dup2(f.fileno(), sys.stderr.fileno())
-
-        # And we spin forever.
-        try:
-            proc.wait()
-        except Exception as e:
-            print(e)
-            sys.exit(1)
-
-        sys.exit(0)
+        rb = self._get_rb(path)
+        rb.start(port)
 
     # This command should be called at the end of tests because not doing so
     # will result in Mercurial sending SIGKILL, which will cause the Python
@@ -420,11 +258,5 @@ class ReviewBoardCommands(object):
         description='Stop a running Review Board server.')
     @CommandArgument('path', help='Path to the Review Board install')
     def stop(self, path):
-        with open(os.path.join(path, 'rbserver.pid'), 'rb') as fh:
-            pid = int(fh.read())
-
-        os.kill(pid, signal.SIGINT)
-
-        while psutil.pid_exists(pid):
-            time.sleep(0.1)
-
+        rb = self._get_rb(path)
+        rb.stop()
