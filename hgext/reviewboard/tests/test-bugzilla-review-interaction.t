@@ -86,11 +86,6 @@ Adding a "Ship It" review will grant r+
       flags:
       - id: 1
         name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 2
-        name: review
         requestee: null
         setter: reviewer@example.com
         status: +
@@ -141,11 +136,6 @@ Adding a reply to the review will add a comment to Bugzilla
       description: 'MozReview Request: bz://1/mynick'
       flags:
       - id: 1
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 2
         name: review
         requestee: null
         setter: reviewer@example.com
@@ -212,14 +202,14 @@ Ensure multiple reviewers works as expected
       data: http://example.com/r/3/
       description: 'MozReview Request: bz://2/mynick'
       flags:
+      - id: 2
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
       - id: 3
         name: review
         requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 4
-        name: review
-        requestee: reviewer@example.com
         setter: author@example.com
         status: '?'
       id: 2
@@ -262,7 +252,7 @@ Removing a reviewer should remove their review flag
       data: http://example.com/r/3/
       description: 'MozReview Request: bz://2/mynick'
       flags:
-      - id: 4
+      - id: 2
         name: review
         requestee: reviewer@example.com
         setter: author@example.com
@@ -389,21 +379,16 @@ review? sticks around when 1 person grants review
       data: http://example.com/r/5/
       description: 'MozReview Request: bz://3/mynick'
       flags:
+      - id: 4
+        name: review
+        requestee: null
+        setter: reviewer@example.com
+        status: +
       - id: 5
         name: review
         requestee: reviewer2@example.com
         setter: author@example.com
         status: '?'
-      - id: 6
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 7
-        name: review
-        requestee: null
-        setter: reviewer@example.com
-        status: +
       id: 3
       summary: 'MozReview Request: bz://3/mynick'
     comments:

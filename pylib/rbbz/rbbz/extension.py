@@ -346,7 +346,7 @@ def on_review_publishing(user, review, **kwargs):
     b = Bugzilla(user.bzlogin, user.bzcookie)
 
     if review.ship_it and is_review_request_squashed(review_request):
-        b.r_plus_attachment(bug_id, review.user.username, comment,
+        b.r_plus_attachment(bug_id, review.user.email, comment,
                             review_or_request_url(review_request, site,
                                                   siteconfig))
     else:
