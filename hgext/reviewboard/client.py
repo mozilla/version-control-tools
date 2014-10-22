@@ -658,16 +658,18 @@ def template_reviews(repo, ctx, revcache, **args):
         revcache['reviews'] = reviews
     return templatekw.showlist('review', revcache['reviews'])
 
-@command('pullreviews', [], _('hg pullreviews'))
-def pullreviews(ui, repo, **opts):
-    """Pull information about your active code reviews.
+@command('fetchreviews', [], _('hg fetchreviews'))
+def fetchreviews(ui, repo, **opts):
+    """Fetch information about your active code reviews.
 
     When you initiate a code review by pushing to a review-enabled remote,
     your repository will track the existence of that code review.
 
-    This command is used to pull code review information from a code review
+    This command is used to fetch code review information from a code review
     server into your local repository.
     """
+    # Terminology around this feature uses "pull" because we eventually want
+    # to work this into "hg pull."
     return _pullreviews(repo)
 
 # The implementation of sshpeer.readerr() is buggy on Linux.

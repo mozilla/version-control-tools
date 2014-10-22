@@ -140,7 +140,7 @@ Now that the Mercurial extension is installed and configured, you'll
 need to test it. From your repository's directory, simply run the
 following::
 
-  $ hg pullreviews
+  $ hg fetchreviews
 
 If that prints a message like *updated 27 reviews* and exits without
 spewing an error, everything is configured properly and you are ready to

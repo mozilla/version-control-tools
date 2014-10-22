@@ -1,11 +1,11 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-pullreviews
+  $ commonenv rb-test-fetchreviews
   $ cd client
 
 Pulling with no reviews should result in error
 
-  $ hg pullreviews
+  $ hg fetchreviews
   abort: We don't know of any review servers. Try creating a review first.
   [255]
 
@@ -51,11 +51,11 @@ Seed the repo
 
 Pulling reviews with no changes
 
-  $ hg pullreviews
+  $ hg fetchreviews
   updated 3 reviews
 
   $ cd ..
   $ rbmanage stop rbserver
 
-  $ dockercontrol stop-bmo rb-test-pullreviews
+  $ dockercontrol stop-bmo rb-test-fetchreviews
   stopped 2 containers
