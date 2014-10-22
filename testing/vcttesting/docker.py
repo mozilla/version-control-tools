@@ -308,6 +308,7 @@ class Docker(object):
         print('waiting for Bugzilla to start')
         wait_for_http(self.docker_hostname, http_port)
         print('Bugzilla accessible on %s' % url)
+        return url, db_id, web_id
 
     def stop_bmo(self, cluster):
         count = 0
