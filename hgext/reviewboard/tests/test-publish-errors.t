@@ -2,7 +2,7 @@
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
 
-  $ commonenv rb-test-publish-errrs
+  $ commonenv rb-test-publish-errors
 
   $ cd client
   $ echo foo > foo
@@ -41,4 +41,5 @@ TODO test publishing against a confidential bug (waiting on BMO API)
 Cleanup
 
   $ rbmanage stop rbserver
-  $ $TESTDIR/testing/docker-control.py stop-bmo rb-test-autocomplete > /dev/null
+  $ dockercontrol stop-bmo rb-test-publish-errors
+  stopped 2 containers

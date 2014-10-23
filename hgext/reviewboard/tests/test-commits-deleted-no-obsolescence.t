@@ -357,4 +357,5 @@ Try removing a commit in the middle.
   $ cd ..
   $ rbmanage stop rbserver
 
-  $ dockercontrol stop-bmo rb-test-commits-deleted-no-obsolescence > /dev/null
+  $ dockercontrol stop-bmo rb-test-commits-deleted-no-obsolescence
+  stopped 2 containers

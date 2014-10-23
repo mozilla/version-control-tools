@@ -389,4 +389,5 @@ The parent review should have been updated accordingly.
   $ cd ..
   $ rbmanage stop rbserver
 
-  $ dockercontrol stop-bmo rb-test-commits-deleted-obsolescence > /dev/null
+  $ dockercontrol stop-bmo rb-test-commits-deleted-obsolescence
+  stopped 2 containers

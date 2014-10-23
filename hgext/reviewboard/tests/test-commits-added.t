@@ -112,4 +112,5 @@ The parent review should have its description updated.
   $ cd ..
   $ rbmanage stop rbserver
 
-  $ dockercontrol stop-bmo rb-test-commits-added > /dev/null
+  $ dockercontrol stop-bmo rb-test-commits-added
+  stopped 2 containers

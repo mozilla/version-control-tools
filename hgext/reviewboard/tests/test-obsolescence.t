@@ -74,4 +74,5 @@ Now create a new head and push a rebase
   $ cd ..
   $ rbmanage stop rbserver
 
-  $ dockercontrol stop-bmo rb-test-obsolescence > /dev/null
+  $ dockercontrol stop-bmo rb-test-obsolescence
+  stopped 2 containers

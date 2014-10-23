@@ -2,7 +2,7 @@
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
 
-  $ commonenv rb-bugzilla-review-interaction
+  $ commonenv rb-test-bugzilla-review-interaction
 
   $ cd client
   $ echo foo > foo
@@ -115,4 +115,5 @@ Adding a "Ship It" review will grant r+
 Cleanup
 
   $ rbmanage stop rbserver
-  $ $TESTDIR/testing/docker-control.py stop-bmo rb-test-bugzilla-review-interaction > /dev/null
+  $ dockercontrol stop-bmo rb-test-bugzilla-review-interaction
+  stopped 2 containers

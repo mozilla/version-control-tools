@@ -72,4 +72,5 @@ Publishing the review will add an attachment to the bug
 
   $ rbmanage stop ../rbserver
 
-  $ $TESTDIR/testing/docker-control.py stop-bmo rb-test-bugzilla > /dev/null
+  $ dockercontrol stop-bmo rb-test-bugzilla
+  stopped 2 containers

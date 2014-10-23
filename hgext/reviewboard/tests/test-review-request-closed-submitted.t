@@ -172,4 +172,5 @@ Child review request with ID 3 should be re-opened...
 
   $ cd ..
   $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-review-request-closed-submitted > /dev/null
+  $ dockercontrol stop-bmo rb-test-review-request-closed-submitted
+  stopped 2 containers

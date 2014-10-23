@@ -281,4 +281,5 @@ Child review request with ID 3 should be published.
   $ cd ..
   $ rbmanage stop rbserver
 
-  $ dockercontrol stop-bmo rb-test-review-request-closed-discarded > /dev/null
+  $ dockercontrol stop-bmo rb-test-review-request-closed-discarded
+  stopped 2 containers

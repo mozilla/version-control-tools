@@ -21,8 +21,13 @@ class DockerCommands(object):
     def __init__(self, context):
         if 'DOCKER_STATE_FILE' in os.environ:
             state_file = os.environ['DOCKER_STATE_FILE']
-        elif 'HGTMP' in os.environ:
-            state_file = os.path.join(os.environ['HGTMP'], 'docker-state-json')
+
+        # When running from Mercurial tests, use a per-test state file.
+        # We can't use HGTMP because it is shared across many tests. We
+        # use HGRCPATH as a base, since it is in a test-specific directory.
+        elif 'HGRCPATH' in os.environ:
+            state_file = os.path.join(os.path.dirname(os.environ['HGRCPATH']),
+                                     'docker-state.json')
         else:
             print('Do not know where to put a Docker state file.')
             sys.exit(1)

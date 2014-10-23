@@ -376,4 +376,5 @@ user, they will be assigned the email+id username.
 Cleanup
 
   $ rbmanage stop ../rbserver
-  $ $TESTDIR/testing/docker-control.py stop-bmo rb-test-auth > /dev/null
+  $ dockercontrol stop-bmo rb-test-auth
+  stopped 2 containers

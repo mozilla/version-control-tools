@@ -63,4 +63,5 @@ Pushing with a different review ID will create a "duplicate" review
 
   $ cd ..
   $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-multiple-parents > /dev/null
+  $ dockercontrol stop-bmo rb-test-multiple-parents
+  stopped 2 containers

@@ -103,4 +103,5 @@ Searching on name for a user with IRC nick returns results
 Cleanup
 
   $ rbmanage stop rbserver
-  $ $TESTDIR/testing/docker-control.py stop-bmo rb-test-autocomplete > /dev/null
+  $ dockercontrol stop-bmo rb-test-autocomplete
+  stopped 2 containers
