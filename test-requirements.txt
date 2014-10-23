@@ -43,4 +43,5 @@ recaptcha-client==1.0.6
 requests==2.3.0
 responses==0.2.2
 six==1.7.3
+sphinx-rtd-theme==0.1.6
 websocket-client==0.18.0
