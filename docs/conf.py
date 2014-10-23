@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-import sys
 import os
+import sys
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+ROOT = os.path.normpath(os.path.join(HERE, '..'))
+sys.path.insert(0, os.path.join(ROOT, 'pylib', 'mozautomation'))
+sys.path.insert(0, os.path.join(ROOT, 'pylib', 'mozhg'))
+sys.path.insert(0, os.path.join(ROOT, 'pylib', 'reviewboardmods'))
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -43,3 +49,10 @@ if not on_rtd:
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+# Set up Django environment so we can load Review Board modules for
+# documenting.
+sys.path.insert(0, os.path.dirname(__file__))
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'reviewboard.settings')
+import reviewboard
+
