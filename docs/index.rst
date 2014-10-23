@@ -10,6 +10,7 @@ Contents:
 
    mozreview
    hacking-mozreview
+   headless-repositories
    testing
 
 
