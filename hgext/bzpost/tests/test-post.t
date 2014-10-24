@@ -62,7 +62,7 @@
   $ hg serve -d -p $HGPORT --pid-file hg.pid --web-conf hgweb
   $ cat hg.pid >> $DAEMON_PIDS
 
-  $ $TESTDIR/testing/bugzilla.py create-bug TestProduct TestComponent bug1
+  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug1
 
 Pushing to mozilla-inbound will result in bug being updated
 
@@ -79,7 +79,7 @@ Pushing to mozilla-inbound will result in bug being updated
   remote: added 1 changesets with 1 changes to 1 files
   recording push in bug 1
 
-  $ $TESTDIR/testing/bugzilla.py dump-bug 1
+  $ $TESTDIR/bugzilla dump-bug 1
   Bug 1:
     comments:
     - author: admin@example.com
@@ -94,8 +94,8 @@ Pushing to mozilla-inbound will result in bug being updated
 
 Pushing multiple changesets with multiple bugs will result in bug being updated
 
-  $ $TESTDIR/testing/bugzilla.py create-bug TestProduct TestComponent bug2
-  $ $TESTDIR/testing/bugzilla.py create-bug TestProduct TestComponent bug3
+  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug2
+  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug3
 
   $ echo 2_1 > foo
   $ hg commit -m 'Bug 2 - First commit'
@@ -113,7 +113,7 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
   recording push in bug 2
   recording push in bug 3
 
-  $ $TESTDIR/testing/bugzilla.py dump-bug 2 3
+  $ $TESTDIR/bugzilla dump-bug 2 3
   Bug 2:
     comments:
     - author: admin@example.com
@@ -143,7 +143,7 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
 
 Pushing to Try will post TBPL comment
 
-  $ $TESTDIR/testing/bugzilla.py create-bug TestProduct TestComponent bug4
+  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug4
 
   $ hg clone -r 0 try client > /dev/null
   $ cd client
@@ -160,7 +160,7 @@ Pushing to Try will post TBPL comment
   remote: added 2 changesets with 2 changes to 1 files
   recording TBPL push in bug 4
 
-  $ $TESTDIR/testing/bugzilla.py dump-bug 4
+  $ $TESTDIR/bugzilla dump-bug 4
   Bug 4:
     comments:
     - author: admin@example.com
@@ -177,7 +177,7 @@ Pushing to Try will post TBPL comment
 
 Public changesets pushed to Try will be ignored if no bug in draft changesets
 
-  $ $TESTDIR/testing/bugzilla.py create-bug TestProduct TestComponent bug5
+  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug5
   $ hg clone -r 0 try no-bug-in-draft > /dev/null
   $ cd no-bug-in-draft
   $ echo no-bug-in-draft > foo
@@ -195,7 +195,7 @@ Public changesets pushed to Try will be ignored if no bug in draft changesets
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 1 files (+1 heads)
 
-  $ $TESTDIR/testing/bugzilla.py dump-bug 5
+  $ $TESTDIR/bugzilla dump-bug 5
   Bug 5:
     comments:
     - author: admin@example.com
@@ -208,7 +208,7 @@ Public changesets pushed to Try will be ignored if no bug in draft changesets
 
 Public changesets pushed to Try will be ignored if a bug in draft changesets
 
-  $ $TESTDIR/testing/bugzilla.py create-bug TestProduct TestComponent bug6
+  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug6
 
   $ hg clone -r 0 try bug-in-draft > /dev/null
   $ cd bug-in-draft
@@ -228,7 +228,7 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
   remote: added 3 changesets with 3 changes to 1 files (+1 heads)
   recording TBPL push in bug 6
 
-  $ $TESTDIR/testing/bugzilla.py dump-bug 5 6
+  $ $TESTDIR/bugzilla dump-bug 5 6
   Bug 5:
     comments:
     - author: admin@example.com
@@ -267,7 +267,7 @@ Pushing commit with bug number to user repo will not post comment by default
 
 Pushing commit with bug number to user repo will post comment if enabled
 
-  $ $TESTDIR/testing/bugzilla.py create-bug TestProduct TestComponent bug7
+  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug7
   $ hg clone users/bzpost_mozilla.com/mozilla-central post-to-user > /dev/null
   $ cd post-to-user
   $ cat >> .hg/hgrc << EOF
@@ -286,7 +286,7 @@ Pushing commit with bug number to user repo will post comment if enabled
   remote: added 1 changesets with 1 changes to 1 files
   recording push in bug 7
 
-  $ $TESTDIR/testing/bugzilla.py dump-bug 7
+  $ $TESTDIR/bugzilla dump-bug 7
   Bug 7:
     comments:
     - author: admin@example.com

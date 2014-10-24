@@ -6,11 +6,11 @@
 
 Create some users
 
-  $ $TESTDIR/testing/bugzilla.py create-user joe1@example.com password 'Joe Smith'
+  $ bugzilla create-user joe1@example.com password 'Joe Smith'
   created user 2
-  $ $TESTDIR/testing/bugzilla.py create-user the-real-j-o-e@example.com password 'Joe Another'
+  $ bugzilla create-user the-real-j-o-e@example.com password 'Joe Another'
   created user 3
-  $ $TESTDIR/testing/bugzilla.py create-user jane@example.com password 'Jane Jones [:jenny]'
+  $ bugzilla create-user jane@example.com password 'Jane Jones [:jenny]'
   created user 4
 
 Unauthenticated users should not be able to search

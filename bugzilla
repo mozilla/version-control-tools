@@ -9,12 +9,13 @@
 import os
 import sys
 
-from mach.main import Mach
-
 HERE = os.path.abspath(os.path.dirname(__file__))
-sys.path.insert(0, HERE)
 
 def main(args):
+    sys.path.insert(0, os.path.join(HERE, 'testing'))
+
+    from mach.main import Mach
+
     m = Mach(os.getcwd())
     m.define_category('bugzilla', 'Bugzilla',
         'Interface with Bugzilla', 50)

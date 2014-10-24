@@ -110,6 +110,29 @@ instance is to run ``mozreview stop``. e.g.::
 
    $ ./mozreview stop /path/to/instance
 
+Interacting with Bugzilla
+=========================
+
+The ``bugzilla`` tool in the root of the repository provides a quick an
+convenient interface to performing common Bugzilla operations, such as
+creating bugs and printing the state of bugs.
+
+This tool has the dual role of supporting both machines and humans. The
+tests rely heavily on this tool to perform small, well-defined Bugzilla
+interactions. You are encouraged to use the tool to help you hack on
+MozReview.
+
+Since the tool had its origins in testing land, it currently
+requires some environment variables to use:
+
+BUGZILLA_URL
+   This must be set the base URL of the Bugzilla instance you wish to
+   communicate with.
+BUGZILLA_USERNAME
+   The username your API requests to Bugzilla will use.
+BUGZILLA_PASSWORD
+   The password your API requests to Bugzilla will use.
+
 Code Locations
 ==============
 

@@ -56,13 +56,13 @@ fi
 }
 
 alias rbmanage='python $TESTDIR/hgext/reviewboard/tests/rbmanage.py'
-alias bugzilla='$TESTDIR/testing/bugzilla.py'
+alias bugzilla='$TESTDIR/bugzilla'
 alias dockercontrol='$TESTDIR/testing/docker-control.py'
 
 commonenv() {
   $TESTDIR/testing/docker-control.py start-bmo $1 $HGPORT2 > /dev/null
   export BUGZILLA_URL=http://${DOCKER_HOSTNAME}:$HGPORT2
-  $TESTDIR/testing/bugzilla.py create-group reviewboard 'reviewboard users'
+  $TESTDIR/bugzilla create-group reviewboard 'reviewboard users'
 
   hg init client
   hg init server

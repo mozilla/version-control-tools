@@ -88,9 +88,9 @@ Pushing as a user not in Review Board should auto create the RB account
 We create 2 users here. 1 looks like a normal person: "First Last"
 The other has Mozilla IRC syntax: "First Last [:nick]"
 
-  $ $TESTDIR/testing/bugzilla.py create-user user1@example.com password1 'Dummy User1'
+  $ bugzilla create-user user1@example.com password1 'Dummy User1'
   created user 2
-  $ $TESTDIR/testing/bugzilla.py create-user user2@example.com password2 'Mozila User [:nick]'
+  $ bugzilla create-user user2@example.com password2 'Mozila User [:nick]'
   created user 3
 
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/nonick
@@ -149,7 +149,7 @@ Usernames for users with IRC nicks are the IRC nickname
 
 Changing the IRC nickname in Bugzilla will update the RB username
 
-  $ $TESTDIR/testing/bugzilla.py update-user-fullname user2@example.com 'Mozilla User [:newnick]'
+  $ bugzilla update-user-fullname user2@example.com 'Mozilla User [:newnick]'
   updated user 3
 
   $ hg --config bugzilla.username=user2@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newnick
@@ -181,7 +181,7 @@ Changing the IRC nickname in Bugzilla will update the RB username
 Changing the email address in Bugzilla will update the RB email
 
   $ exportbzauth admin@example.com password
-  $ $TESTDIR/testing/bugzilla.py update-user-email user2@example.com user2-new@example.com
+  $ bugzilla update-user-email user2@example.com user2-new@example.com
   updated user 3
   $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newemail
   pushing to ssh://user@dummy/$TESTTMP/server
@@ -227,7 +227,7 @@ Disabling a user in Bugzilla will prevent them from using Review Board
 Re-enabling a disabled user will allow them to use Review Board
 
   $ exportbzauth admin@example.com password
-  $ $TESTDIR/testing/bugzilla.py update-user-login-denied-text user1@example.com ''
+  $ bugzilla update-user-login-denied-text user1@example.com ''
   updated user 2
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/undisableduser
   pushing to ssh://user@dummy/$TESTTMP/server
@@ -247,7 +247,7 @@ If a new Review Board user claims the same IRC nick as an existing user,
 we fall back to non-IRC RB usernames.
 
   $ exportbzauth admin@example.com password
-  $ $TESTDIR/testing/bugzilla.py create-user user3@example.com password3 'Dummy User3 [:newnick]'
+  $ bugzilla create-user user3@example.com password3 'Dummy User3 [:newnick]'
   created user 4
 
   $ hg --config bugzilla.username=user3@example.com --config bugzilla.password=password3 push --reviewid bz://1/conflictingircnick
@@ -295,7 +295,7 @@ If an existing RB user changes their IRC nick to one taken by another RB
 user, they will be assigned the email+id username.
 
   $ exportbzauth admin@example.com password
-  $ $TESTDIR/testing/bugzilla.py update-user-fullname user3@example.com 'Mozilla User3 [:mynick]'
+  $ bugzilla update-user-fullname user3@example.com 'Mozilla User3 [:mynick]'
   updated user 4
 
 (We need to push to get the RB username updated)
@@ -332,7 +332,7 @@ user, they will be assigned the email+id username.
     username: newnick
 
   $ exportbzauth admin@example.com password
-  $ $TESTDIR/testing/bugzilla.py update-user-fullname user2-new@example.com 'Mozilla User [:mynick]'
+  $ bugzilla update-user-fullname user2-new@example.com 'Mozilla User [:mynick]'
   updated user 3
 
   $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2sharednick
