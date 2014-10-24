@@ -47,7 +47,7 @@ image).
 
 Now, you can create and start a MozReview instance::
 
-  $ ./mach mozreview-start /path/to/instance
+  $ ./mozrevew start /path/to/instance
   Bugzilla URL: http://192.168.59.103:57485/
   Review Board URL: http://localhost:57486/
   Mercurial URL: http://localhost:57487/
@@ -68,9 +68,9 @@ Creating Repositories
 MozReview instances are initially empty. They don't have any
 repositories you can push to.
 
-To create an empty repository to hold reviews, use mach::
+To create an empty repository to hold reviews, use mozreview::
 
-   $ ./mach mozreview-create-repo /path/to/mozreview repo_name
+   $ ./mozreview create-repo /path/to/instance repo_name
 
 If all goes well, the URL of the newly-created repository should be
 printed. You should then be able to ``hg push`` to that repository.
@@ -86,21 +86,21 @@ Creating Users
 --------------
 
 MozReview instances initially only have a single user: the admin user.
-You'll probably want to set up a regular user account. Using mach::
+You'll probably want to set up a regular user account. Using mozreview:: 
 
-   $ ./mach mozreview-create-user /path/to/mozreview me@example.com password 'Joe Smith'
+   $ ./mozrevew create-user /path/to/instance me@example.com password 'Joe Smith'
 
 Stopping the Servers
 --------------------
 
-When you run ``mach mozreview-start``, a number of Docker containers and
+When you run ``mozreview start``, a number of Docker containers and
 daemon processes will be started. These will linger forever - taking up
 system resources - until there is some form of intervention.
 
 The easiest way to stop everything related to the running MozReview
-instance is to run ``mach mozreview-stop``. e.g.::
+instance is to run ``mozreview stop``. e.g.::
 
-   $ ./mach mozreview-stop mozreview
+   $ ./mozreview stop /path/to/instance
 
 Code Locations
 ==============

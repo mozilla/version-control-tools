@@ -21,7 +21,7 @@ def main(args):
 
     m.define_category('mozreview', 'MozReview',
         'Mozilla Code Review Service', 50)
-    import vcttesting.mach_commands
+    import vcttesting.mozreview_mach_commands
 
     return m.run(args)
 
