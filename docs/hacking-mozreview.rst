@@ -54,13 +54,21 @@ Now, you can create and start a MozReview instance::
   Admin username: admin@example.com
   Admin password: password
 
-The argument in that command is the path where we will create and store
-MozReview data and state. It can be anywhere on the filesystem. You may
-want to put it outside of the Mercurial clone so ``hg status`` doesn't
-report hundreds of untracked files.
-
 You should be able to load the printed URLs in your browser and see a
 working site. If you don't, file a bug!
+
+.. warning::
+
+   Storing MozReview instances inside a Mercurial repository will
+   introduce many untracked files. It is recommended to store your
+   instances outside of a repository checkout.
+
+.. hint::
+
+   All ``mozreview`` commands take a positional argument defining the
+   path to the instance they should operate on. If you define the
+   ``MOZREVIEW_PATH`` environment variable, you do not need to define
+   this argument.
 
 Creating Repositories
 ---------------------

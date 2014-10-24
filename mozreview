@@ -20,7 +20,7 @@ def main(args):
     m = Mach(os.getcwd())
 
     m.define_category('mozreview', 'MozReview',
-        'Mozilla Code Review Service', 50)
+        'Control and Interact with the Mozilla Code Review Service', 50)
     import vcttesting.mozreview_mach_commands
 
     return m.run(args)

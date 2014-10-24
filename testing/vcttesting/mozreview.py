@@ -41,6 +41,8 @@ class MozReview(object):
     """
 
     def __init__(self, path):
+        if not path:
+            raise Exception('You must specify a path to create an instance')
         path = os.path.abspath(path)
         self._path = path
 

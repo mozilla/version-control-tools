@@ -12,17 +12,18 @@ from mach.decorators import (
 )
 
 @CommandProvider
-class ServerCommands(object):
-    def __init__(self, context):
-        self.context = context
-
+class MozReviewCommands(object):
     def _get_mozreview(self, where):
+        if not where and 'MOZREVIEW_PATH' in os.environ:
+            where = os.environ['MOZREVIEW_PATH']
+
         from vcttesting.mozreview import MozReview
         return MozReview(where)
 
     @Command('start', category='mozreview',
         description='Start a MozReview instance')
-    @CommandArgument('where', help='Directory for data')
+    @CommandArgument('where', nargs='?',
+        help='Directory of MozReview instance')
     @CommandArgument('--bugzilla-port', type=int,
         help='Port Bugzilla HTTP server should listen on.')
     @CommandArgument('--reviewboard-port', type=int,
@@ -45,14 +46,16 @@ class ServerCommands(object):
 
     @Command('stop', category='mozreview',
         description='Stop a MozReview instance')
-    @CommandArgument('where', help='Directory of MozReview instance')
+    @CommandArgument('where', nargs='?',
+        help='Directory of MozReview instance')
     def stop(self, where):
         mr = self._get_mozreview(where)
         mr.stop()
 
     @Command('create-repo', category='mozreview',
         description='Add a repository to a MozReview instance')
-    @CommandArgument('where', help='Directory of MozReview instance')
+    @CommandArgument('where', nargs='?',
+        help='Directory of MozReview instance')
     @CommandArgument('path', help='Relative path of repository')
     def create_repo(self, where, path):
         mr = self._get_mozreview(where)
@@ -61,7 +64,8 @@ class ServerCommands(object):
 
     @Command('create-user', category='mozreview',
         description='Create a user in a MozReview instance')
-    @CommandArgument('where', help='Directory of MozReview instance')
+    @CommandArgument('where', nargs='?',
+        help='Directory of MozReview instance')
     @CommandArgument('email', help='Email address for user')
     @CommandArgument('password', help='Password for user')
     @CommandArgument('fullname', help='Full name for user')
