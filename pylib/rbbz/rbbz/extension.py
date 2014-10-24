@@ -262,6 +262,10 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
         users = get_or_create_bugzilla_users(user_data)
         reviewers.append(users[0].email)
 
+    # Sorted so behavior is deterministic (this mucks with test output
+    # otherwise).
+    reviewers = sorted(reviewers)
+
     # Don't make attachments for child review requests, otherwise,
     # Bugzilla gets inundatated with lots of patches, and the squashed
     # one is the only one we want to post there.
