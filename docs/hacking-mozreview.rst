@@ -133,6 +133,22 @@ BUGZILLA_USERNAME
 BUGZILLA_PASSWORD
    The password your API requests to Bugzilla will use.
 
+Interacting with Review Board
+=============================
+
+The ``reviewboard`` tool in the root of the repository provides a
+mechanism to perform well-defined interactions with Review Board
+instances. You are encouraged to use the tool to help you hack on
+MozReview.
+
+The tool had its origins in testing code, so its human interface could
+use some use.
+
+You'll need to define your Review Board credentials through environment
+variables: ``BUGZILLA_USERNAME`` and ``BUGZILLA_PASSWORD``. The name
+*bugzilla* is in there because MozReview shares its user database with
+Bugzilla.
+
 Code Locations
 ==============
 

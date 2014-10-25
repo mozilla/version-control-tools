@@ -55,7 +55,7 @@ fi
 
 }
 
-alias rbmanage='python $TESTDIR/hgext/reviewboard/tests/rbmanage.py'
+alias rbmanage='$TESTDIR/reviewboard'
 alias bugzilla='$TESTDIR/bugzilla'
 alias dockercontrol='$TESTDIR/testing/docker-control.py'
 
