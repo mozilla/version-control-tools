@@ -14,6 +14,9 @@ allow_push = *
 url = http://localhost:$2
 repoid = 1
 
+[bugzilla]
+url = ${BUGZILLA_URL}
+
 [extensions]
 reviewboard = $TESTDIR/hgext/reviewboard/server.py
 

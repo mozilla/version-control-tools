@@ -24,6 +24,14 @@ Server should complain if the extension is not configured
 
   $ echo "repoid = 1" >> server/.hg/hgrc
 
+  $ hg -R server identify
+  abort: Please set bugzilla.url to the URL of the Bugzilla instance to talk to.
+  [255]
+  $ cat >> server/.hg/hgrc << EOF
+  > [bugzilla]
+  > url = http://localhost/
+  > EOF
+
 Publishing repositories should trigger error
 
   $ hg -R server identify

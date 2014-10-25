@@ -74,6 +74,10 @@ def reposetup(ui, repo):
         raise util.Abort(_('Please set reviewboard.repoid to the numeric ID '
             'of the repository this repo is associated with.'))
 
+    if not ui.config('bugzilla', 'url', None):
+        raise util.Abort(_('Please set bugzilla.url to the URL of the '
+            'Bugzilla instance to talk to.'))
+
     if ui.configbool('phases', 'publish', True):
         raise util.Abort(_('reviewboard server extension is only compatible '
             'with non-publishing repositories.'))
