@@ -53,6 +53,8 @@ except ImportError:
     import hgrb.proto
 demandimport.enable()
 
+from hgrb.util import ReviewID
+
 from mozautomation.commitparser import parse_bugs
 from mozhg.auth import getbugzillaauth
 
@@ -60,53 +62,6 @@ testedwith = '3.0 3.1 3.2'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
-
-class ReviewID(object):
-    """Represents a parsed review identifier."""
-
-    def __init__(self, rid):
-        self.bug = None
-        self.user = None
-
-        if not rid:
-            return
-
-        # Assume digits are Bugzilla bugs.
-        if rid.isdigit():
-            rid = 'bz://%s' % rid
-
-        if rid and not rid.startswith('bz://'):
-            raise util.Abort(_('review identifier must begin with bz://'))
-
-        full = rid
-        paths = rid[5:].split('/')
-        if not paths[0]:
-            raise util.Abort(_('review identifier must not be bz://'))
-
-        bug = paths[0]
-        if not bug.isdigit():
-            raise util.Abort(_('first path component of review identifier must be a bug number'))
-        self.bug = int(bug)
-
-        if len(paths) > 1:
-            self.user = paths[1]
-
-        if len(paths) > 2:
-            raise util.Abort(_('unrecognized review id: %s') % rid)
-
-    def __nonzero__(self):
-        if self.bug or self.user:
-            return True
-
-        return False
-
-    @property
-    def full(self):
-        s = 'bz://%s' % self.bug
-        if self.user:
-            s += '/%s' % self.user
-
-        return s
 
 def pushcommand(orig, ui, repo, *args, **kwargs):
     """Wraps commands.push to read the --reviewid argument."""
