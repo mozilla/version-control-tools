@@ -56,7 +56,7 @@ demandimport.enable()
 from mozautomation.commitparser import parse_bugs
 from mozhg.auth import getbugzillaauth
 
-testedwith = '3.0 3.0.1 3.0.2'
+testedwith = '3.0 3.1 3.2'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
