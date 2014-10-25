@@ -154,19 +154,27 @@ def reviewboard(repo, proto, args=None):
         assert isinstance(res, str)
         return res
 
-    # Note patch.diff() is appears to accept anything that can be fed into
-    # repo[]. However, it blindly does a hex() on the argument as opposed
-    # to the changectx, so we need to pass in the binary node.
-    base_parent_node = repo[nodes[0]].p1().node()
-    for i, node in enumerate(nodes):
-        ctx = repo[node]
+    # We do multiple passes over the changesets requested for review because
+    # some operations could be slow or may involve queries to external
+    # resources. We want to run the fast checks first so we don't waste
+    # resources before finding the error. The drawback here is the client
+    # will not see the full set of errors. We may revisit this decision
+    # later.
 
+    for node in nodes:
+        ctx = repo[node]
         # Reviewing merge commits doesn't make much sense and only makes
         # situations more complicated. So disallow the practice.
         if len(ctx.parents()) > 1:
             msg = 'cannot review merge commits (%s)' % short(ctx.node())
             return formatresponse('error %s' % msg)
 
+    # Note patch.diff() appears to accept anything that can be fed into
+    # repo[]. However, it blindly does a hex() on the argument as opposed
+    # to the changectx, so we need to pass in the binary node.
+    base_parent_node = repo[nodes[0]].p1().node()
+    for i, node in enumerate(nodes):
+        ctx = repo[node]
         p1 = ctx.p1().node()
         diff = None
         parent_diff = None
