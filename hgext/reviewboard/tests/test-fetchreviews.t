@@ -1,6 +1,9 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv rb-test-fetchreviews
+
+  $ bugzilla create-bug TestProduct TestComponent 'Initial Bug'
+
   $ cd client
 
 Pulling with no reviews should result in error
@@ -24,10 +27,10 @@ Seed the repo
   $ hg phase --public -r .
 
   $ echo 'foo1' > foo1
-  $ hg commit -A -m 'Bug 123 - Foo 1'
+  $ hg commit -A -m 'Bug 1 - Foo 1'
   adding foo1
   $ echo 'foo2' > foo2
-  $ hg commit -A -m 'Bug 123 - Foo 2'
+  $ hg commit -A -m 'Bug 1 - Foo 2'
   adding foo2
   $ hg push
   pushing to ssh://user@dummy/$TESTTMP/server
@@ -38,15 +41,15 @@ Seed the repo
   remote: added 2 changesets with 2 changes to 2 files
   submitting 2 changesets for review
   
-  changeset:  1:775aa9c61e2b
-  summary:    Bug 123 - Foo 1
+  changeset:  1:2b77e5337389
+  summary:    Bug 1 - Foo 1
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  changeset:  2:c90aa97490e2
-  summary:    Bug 123 - Foo 2
+  changeset:  2:19006c154c5f
+  summary:    Bug 1 - Foo 2
   review:     http://localhost:$HGPORT1/r/3 (pending)
   
-  review id:  bz://123/mynick
+  review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
   (visit review url to publish this review request so others can see it)
 
