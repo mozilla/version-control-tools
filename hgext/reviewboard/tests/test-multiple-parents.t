@@ -2,6 +2,9 @@
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv rb-test-multiple-parents
 
+  $ bugzilla create-bug-range TestProduct TestComponent 2
+  created 2 bugs
+
 Set up repo
 
   $ cd client
@@ -15,7 +18,7 @@ Set up repo
 
 Do the initial review
 
-  $ hg push -r 1 --reviewid 123 http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid 1 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   remote: adding changesets
@@ -28,13 +31,13 @@ Do the initial review
   summary:    second commit
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://123/mynick
+  review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
   (visit review url to publish this review request so others can see it)
 
 Pushing with a different review ID will create a "duplicate" review
 
-  $ hg push -r 1 --reviewid 456 http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid 2 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
@@ -44,7 +47,7 @@ Pushing with a different review ID will create a "duplicate" review
   summary:    second commit
   review:     http://localhost:$HGPORT1/r/4 (pending)
   
-  review id:  bz://456/mynick
+  review id:  bz://2/mynick
   review url: http://localhost:$HGPORT1/r/3 (pending)
   (visit review url to publish this review request so others can see it)
   [1]
@@ -52,8 +55,8 @@ Pushing with a different review ID will create a "duplicate" review
   $ cat .hg/reviews
   u http://localhost:$HGPORT1
   r http://localhost:$HGPORT/
-  p bz://123/mynick 1
-  p bz://456/mynick 3
+  p bz://1/mynick 1
+  p bz://2/mynick 3
   c cd3395bd3f8a2108fb3178d6b1ec6077ca2bdbee 2
   c cd3395bd3f8a2108fb3178d6b1ec6077ca2bdbee 4
   pc cd3395bd3f8a2108fb3178d6b1ec6077ca2bdbee 1
