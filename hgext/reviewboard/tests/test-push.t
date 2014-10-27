@@ -12,6 +12,9 @@
   > rebase=
   > EOF
 
+  $ bugzilla create-bug-range TestProduct TestComponent 5
+  created 5 bugs
+
 Set up the repo
 
   $ cd client
@@ -23,7 +26,7 @@ Set up the repo
   $ hg up -r 0
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ echo 'with parseable id' > foo
-  $ hg commit -m 'Bug 123 - Test identifier'
+  $ hg commit -m 'Bug 4 - Test identifier'
   created new head
   $ hg up -r 0
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -62,7 +65,7 @@ Seed the root changeset on the server
 
 Pushing a single changeset will initiate a single review (no children)
 
-  $ hg push -r 1 --reviewid 345 http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid 1 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   remote: adding changesets
@@ -75,7 +78,7 @@ Pushing a single changeset will initiate a single review (no children)
   summary:    anonymous head
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://345/mynick
+  review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
   (visit review url to publish this review request so others can see it)
 
@@ -87,7 +90,7 @@ Pushing a single changeset will initiate a single review (no children)
 
 Pushing no changesets will do a re-review
 
-  $ hg push -r 1 --reviewid 345 http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid 1 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
@@ -97,7 +100,7 @@ Pushing no changesets will do a re-review
   summary:    anonymous head
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://345/mynick
+  review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
   (visit review url to publish this review request so others can see it)
   [1]
@@ -106,7 +109,7 @@ Pushing patches from mq will result in a warning
 
   $ echo 'mq patch' > foo
   $ hg qnew -m 'mq patch' -d '0 0' patch1
-  $ hg push -r . --reviewid 784841 http://localhost:$HGPORT
+  $ hg push -r . --reviewid 2 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   remote: adding changesets
@@ -120,7 +123,7 @@ Pushing patches from mq will result in a warning
   summary:    mq patch
   review:     http://localhost:$HGPORT1/r/4 (pending)
   
-  review id:  bz://784841/mynick
+  review id:  bz://2/mynick
   review url: http://localhost:$HGPORT1/r/3 (pending)
   (visit review url to publish this review request so others can see it)
 
@@ -130,7 +133,7 @@ Pushing patches from mq will result in a warning
 
 Custom identifier will create a new review from same changesets.
 
-  $ hg push -r 1 --reviewid 3452 http://localhost:$HGPORT
+  $ hg push -r 1 --reviewid 3 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   no changes found
@@ -140,7 +143,7 @@ Custom identifier will create a new review from same changesets.
   summary:    anonymous head
   review:     http://localhost:$HGPORT1/r/6 (pending)
   
-  review id:  bz://3452/mynick
+  review id:  bz://3/mynick
   review url: http://localhost:$HGPORT1/r/5 (pending)
   (visit review url to publish this review request so others can see it)
   [1]
@@ -156,17 +159,17 @@ SSH works
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   submitting 1 changesets for review
   
-  changeset:  2:a21bef69f0d4
-  summary:    Bug 123 - Test identifier
+  changeset:  2:6a5e03035256
+  summary:    Bug 4 - Test identifier
   review:     http://localhost:$HGPORT1/r/8 (pending)
   
-  review id:  bz://123/mynick
+  review id:  bz://4/mynick
   review url: http://localhost:$HGPORT1/r/7 (pending)
   (visit review url to publish this review request so others can see it)
 
 Specifying multiple -r for the same head works
 
-  $ hg push -r 0 -r 1 --reviewid 50000 ssh://user@dummy/$TESTTMP/server
+  $ hg push -r 0 -r 1 --reviewid 5 ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
   no changes found
@@ -176,7 +179,7 @@ Specifying multiple -r for the same head works
   summary:    anonymous head
   review:     http://localhost:$HGPORT1/r/10 (pending)
   
-  review id:  bz://50000/mynick
+  review id:  bz://5/mynick
   review url: http://localhost:$HGPORT1/r/9 (pending)
   (visit review url to publish this review request so others can see it)
   [1]
