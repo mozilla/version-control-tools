@@ -2,6 +2,8 @@
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv rb-test-store
 
+  $ bugzilla create-bug TestProduct TestComponent 1
+
 Pushing a review will create the reviews file
 
   $ cd client
@@ -11,7 +13,7 @@ Pushing a review will create the reviews file
   $ hg phase --public -r .
 
   $ echo "foo" >> foo
-  $ hg commit -m 'Bug 456 - second commit'
+  $ hg commit -m 'Bug 1 - second commit'
   $ hg push ssh://user@dummy/$TESTTMP/server
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
@@ -21,20 +23,20 @@ Pushing a review will create the reviews file
   remote: added 2 changesets with 2 changes to 1 files
   submitting 1 changesets for review
   
-  changeset:  1:7f387c765e68
-  summary:    Bug 456 - second commit
+  changeset:  1:be8ff4f28043
+  summary:    Bug 1 - second commit
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://456/mynick
+  review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
   (visit review url to publish this review request so others can see it)
 
   $ cat .hg/reviews
   u http://localhost:$HGPORT1
   r ssh://user@dummy/$TESTTMP/server
-  p bz://456/mynick 1
-  c 7f387c765e685da95d7a4ffab2ccf06548c06fcf 2
-  pc 7f387c765e685da95d7a4ffab2ccf06548c06fcf 1
+  p bz://1/mynick 1
+  c be8ff4f2804309fdbe6048ff76559f8e391ce765 2
+  pc be8ff4f2804309fdbe6048ff76559f8e391ce765 1
 
   $ ls .hg/reviewboard/review
   1.state
