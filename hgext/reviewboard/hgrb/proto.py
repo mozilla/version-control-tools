@@ -4,10 +4,13 @@
 import json
 import urllib
 from StringIO import StringIO
+import xmlrpclib
 from mercurial import mdiff
 from mercurial import patch
 from mercurial import wireproto
 from mercurial.node import short
+
+from hgrb.util import ReviewID
 
 class AuthError(Exception):
     """Represents an error authenticating or authorizing to Bugzilla."""
@@ -168,6 +171,37 @@ def reviewboard(repo, proto, args=None):
         if len(ctx.parents()) > 1:
             msg = 'cannot review merge commits (%s)' % short(ctx.node())
             return formatresponse('error %s' % msg)
+
+    # Invalid or confidental bugs will raise errors in the Review Board
+    # interface later. Fail fast to minimize wasted time and resources.
+    try:
+        reviewid = ReviewID(identifier)
+    except util.Abort as e:
+        return formatresponse('error %s' % e)
+
+    if reviewid.bug:
+        # We use xmlrpc here because the Bugsy REST client doesn't currently handle
+        # errors in responses.
+
+        # We don't use available Bugzilla credentials because that's the
+        # easiest way to test for confidential bugs. If/when we support posting
+        # reviews to confidential bugs, we'll need to change this.
+        xmlrpc_url = repo.ui.config('bugzilla', 'url').rstrip('/') + '/xmlrpc.cgi'
+        proxy = xmlrpclib.ServerProxy(xmlrpc_url)
+        try:
+            proxy.Bug.get({'ids': [reviewid.bug]})
+        except xmlrpclib.Fault as f:
+            if f.faultCode == 101:
+                return formatresponse('error bug %s does not exist; '
+                    'please change the review id (%s)' % (reviewid.bug,
+                        reviewid.full))
+            elif f.faultCode == 102:
+                return formatresponse('error bug %s could not be accessed '
+                    '(we do not currently allow posting of reviews to '
+                    'confidential bugs)' % reviewid.bug)
+
+            return formatresponse('error server error verifying bug %s exists; '
+                'please retry or report a bug' % reviewid.bug)
 
     # Note patch.diff() appears to accept anything that can be fed into
     # repo[]. However, it blindly does a hex() on the argument as opposed
