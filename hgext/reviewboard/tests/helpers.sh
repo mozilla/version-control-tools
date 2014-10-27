@@ -73,7 +73,7 @@ commonenv() {
   rbmanage start rbserver $HGPORT1
   serverconfig server/.hg/hgrc $HGPORT1
   clientconfig client/.hg/hgrc
-  hg serve -R server -d -p $HGPORT --pid-file hg.pid
+  hg serve -R server -d -p $HGPORT --pid-file hg.pid --accesslog hg.access.log --errorlog hg.error.log
   cat hg.pid >> $DAEMON_PIDS
 }
 
