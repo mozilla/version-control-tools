@@ -65,6 +65,7 @@
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
   $ rbmanage publish $HGPORT1 1
 
@@ -96,6 +97,7 @@ Popping the last commit truncates the review set
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
   [1]
 
 Review request 6 should be added to the list of discard on publish rids.
@@ -219,6 +221,7 @@ likely gets invalidated.
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
 The first commit was rewritten (we assume all subsequent were as well).
 
@@ -353,6 +356,7 @@ Try removing a commit in the middle.
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
   $ cd ..
   $ rbmanage stop rbserver

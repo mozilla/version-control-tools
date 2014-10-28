@@ -71,6 +71,7 @@
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
   $ rbmanage publish $HGPORT1 1
 
@@ -102,6 +103,7 @@ Popping the last commit truncates the review set
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
   [1]
 
 Review request 6 should be in the list of review requests to discard
@@ -250,6 +252,7 @@ be preserved.
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
 Review request 2 should be in the list of review requests to discard
 on publish.
@@ -358,6 +361,7 @@ Try removing a commit in the middle.
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
   $ rbmanage publish $HGPORT1 1
 

@@ -51,6 +51,7 @@
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
   $ echo 'foo3' > foo3
   $ hg commit -A -m 'Bug 123 - Foo 3'
@@ -105,6 +106,7 @@
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
   $ cd ..
   $ rbmanage stop rbserver

@@ -359,11 +359,17 @@ def doreview(repo, ui, remote, reviewnode):
             ui.write(' (pending)')
         ui.write('\n\n')
 
+    ispending = reviewdata[newparentid].get('status', None) == 'pending'
     ui.write(_('review id:  %s\n') % identifier.full)
     ui.write(_('review url: %s') % reviews.parentreviewurl(identifier.full))
-    if reviewdata[newparentid].get('status', None) == 'pending':
+    if ispending:
         ui.write(' (pending)')
     ui.write('\n')
+
+    # Make it clear to the user that they need to take action in order for
+    # others to see this review series.
+    if ispending:
+        ui.status(_('(visit review url to publish this review request so others can see it)\n'))
 
 def _pullreviews(repo):
     reviews = repo.reviews

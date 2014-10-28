@@ -27,6 +27,7 @@ Pushing a review will create the reviews file
   
   review id:  bz://456/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
   $ cat .hg/reviews
   u http://localhost:$HGPORT1

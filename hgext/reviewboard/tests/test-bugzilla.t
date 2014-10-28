@@ -32,6 +32,7 @@ Pushing a review should not touch Bugzilla
   
   review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
   $ bugzilla dump-bug 1
   Bug 1:

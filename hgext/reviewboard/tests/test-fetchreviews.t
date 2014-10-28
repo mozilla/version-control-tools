@@ -48,6 +48,7 @@ Seed the repo
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
 Pulling reviews with no changes
 

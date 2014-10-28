@@ -30,6 +30,7 @@ Do the initial review
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
 Pushing with a different review ID will create a "duplicate" review
 
@@ -45,6 +46,7 @@ Pushing with a different review ID will create a "duplicate" review
   
   review id:  bz://456/mynick
   review url: http://localhost:$HGPORT1/r/3 (pending)
+  (visit review url to publish this review request so others can see it)
   [1]
 
   $ cat .hg/reviews

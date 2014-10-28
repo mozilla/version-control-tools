@@ -31,6 +31,7 @@
   
   review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
 Now publish the review and create a new draft
 
@@ -52,6 +53,7 @@ Now publish the review and create a new draft
   
   review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
 We should have a disagreement between published and draft
 

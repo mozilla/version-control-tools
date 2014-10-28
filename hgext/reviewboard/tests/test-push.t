@@ -77,6 +77,7 @@ Pushing a single changeset will initiate a single review (no children)
   
   review id:  bz://345/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
 {reviews} template works
 
@@ -98,6 +99,7 @@ Pushing no changesets will do a re-review
   
   review id:  bz://345/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
   [1]
 
 Pushing patches from mq will result in a warning
@@ -120,6 +122,7 @@ Pushing patches from mq will result in a warning
   
   review id:  bz://784841/mynick
   review url: http://localhost:$HGPORT1/r/3 (pending)
+  (visit review url to publish this review request so others can see it)
 
   $ hg qpop
   popping patch1
@@ -139,6 +142,7 @@ Custom identifier will create a new review from same changesets.
   
   review id:  bz://3452/mynick
   review url: http://localhost:$HGPORT1/r/5 (pending)
+  (visit review url to publish this review request so others can see it)
   [1]
 
 SSH works
@@ -158,6 +162,7 @@ SSH works
   
   review id:  bz://123/mynick
   review url: http://localhost:$HGPORT1/r/7 (pending)
+  (visit review url to publish this review request so others can see it)
 
 Specifying multiple -r for the same head works
 
@@ -173,6 +178,7 @@ Specifying multiple -r for the same head works
   
   review id:  bz://50000/mynick
   review url: http://localhost:$HGPORT1/r/9 (pending)
+  (visit review url to publish this review request so others can see it)
   [1]
 
 Reviewing merge commits is rejected

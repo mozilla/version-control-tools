@@ -29,6 +29,7 @@ Referencing a bug that doesn't exist should throw a graceful error during publis
   
   review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
+  (visit review url to publish this review request so others can see it)
 
   $ rbmanage publish $HGPORT1 1
   API Error: 500: 225: Invalid bug ID "1".
