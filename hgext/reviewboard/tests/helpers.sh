@@ -62,7 +62,6 @@ alias dockercontrol='$TESTDIR/testing/docker-control.py'
 commonenv() {
   $TESTDIR/testing/docker-control.py start-bmo $1 $HGPORT2 > /dev/null
   export BUGZILLA_URL=http://${DOCKER_HOSTNAME}:$HGPORT2
-  $TESTDIR/bugzilla create-group reviewboard 'reviewboard users'
 
   hg init client
   hg init server

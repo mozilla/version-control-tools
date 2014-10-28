@@ -84,8 +84,6 @@ class MozReview(object):
 
         bugzilla = self.get_bugzilla(bugzilla_url)
 
-        bugzilla.create_group('reviewboard', 'reviewboard users')
-
         rb = MozReviewBoard(self._path, bugzilla_url=bugzilla_url)
         rb.create()
         reviewboard_pid = rb.start(reviewboard_port)

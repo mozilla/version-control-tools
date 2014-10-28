@@ -45,7 +45,6 @@ class Bugzilla(object):
     """
 
     user_fields = ['id', 'email', 'real_name', 'can_login']
-    AUTHORIZED_GROUP = 'reviewboard'
 
     def __init__(self, login=None, logincookie=None, xmlrpc_url=None):
         if xmlrpc_url:
@@ -94,17 +93,11 @@ class Bugzilla(object):
         params = {
             'ids': [user_id],
             'include_fields': self.user_fields,
-            'groups': [self.AUTHORIZED_GROUP]
         }
 
         try:
             return self.proxy.User.get(params)
         except xmlrpclib.Fault as e:
-            if e.faultCode == 804:
-                logging.error('Login failure for user %s: user is not part '
-                              'of the "%s" group.' %
-                              (username, self.AUTHORIZED_GROUP))
-                return None
             raise
 
     @xmlrpc_to_bugzilla_errors
