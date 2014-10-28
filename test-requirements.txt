@@ -47,6 +47,7 @@ RBTools==0.6.1
 recaptcha-client==1.0.6
 requests==2.4.3
 responses==0.2.2
+selenium==2.44.0
 six==1.8.0
 Sphinx==1.2.3
 sphinx-rtd-theme==0.1.6
