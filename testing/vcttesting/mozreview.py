@@ -65,7 +65,7 @@ class MozReview(object):
         return Bugzilla(url, username=username, password=password)
 
     def start(self, bugzilla_port=None, reviewboard_port=None,
-            mercurial_port=None, verbose=False):
+            mercurial_port=None, verbose=False, db_image=None, web_image=None):
         """Start a MozReview instance."""
         if not bugzilla_port:
             bugzilla_port = get_available_port()
@@ -76,6 +76,7 @@ class MozReview(object):
 
         bugzilla_url = self._docker.start_bmo(cluster=self._name,
                 hostname=None, http_port=bugzilla_port,
+                db_image=db_image, web_image=web_image,
                 verbose=verbose)[0]
         with open(self._bugzilla_url_path, 'wb') as fh:
             fh.write(bugzilla_url)
