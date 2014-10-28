@@ -74,11 +74,9 @@ class MozReview(object):
         if not mercurial_port:
             mercurial_port = get_available_port()
 
-        db_image, web_image = self._docker.build_bmo(verbose=verbose)
-
         bugzilla_url = self._docker.start_bmo(cluster=self._name,
                 hostname=None, http_port=bugzilla_port,
-                db_image=db_image, web_image=web_image)[0]
+                verbose=verbose)[0]
         with open(self._bugzilla_url_path, 'wb') as fh:
             fh.write(bugzilla_url)
 

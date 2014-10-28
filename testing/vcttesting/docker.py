@@ -324,9 +324,9 @@ class Docker(object):
         return db_bootstrap, web_bootstrap
 
     def start_bmo(self, cluster, hostname=None, http_port=80, db_image=None,
-            web_image=None):
+            web_image=None, verbose=False):
         if not db_image or not web_image:
-            db_image, web_image = self.build_bmo()
+            db_image, web_image = self.build_bmo(verbose=verbose)
 
         containers = self.state['containers'].setdefault(cluster, [])
 
