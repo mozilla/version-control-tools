@@ -39,6 +39,13 @@ automatically.
 
 .. note:: The reviewboard extension requires Mercurial 3.0 or above.
 
+   Running the most recent released version of Mercurial is strongly
+   recommended. New major releases come out every 3 months. New minor
+   releases come every month.
+
+   As of November 2014, Mercurial 3.2 is the best recent and recommended
+   version.
+
 Configuring the Mercurial Extension
 -----------------------------------
 
@@ -115,7 +122,7 @@ Review Board.
 You will want to define a named path in your per-repository ``.hg/hrc``
 to the code review Mercurial repository. We recommend the name
 ``review``. The URL for the repository should be
-``ssh://reviewboard.mozilla.org/hg/reviews/<repo>`` where ``<repo>`` is
+``ssh://reviewboard-hg.mozilla.org/<repo>`` where ``<repo>`` is
 the name of a repository. Valid names include ``firefox`` and
 ``version-control-tools``. An example ``.hg/hgrc`` fragment may look
 like::
@@ -124,7 +131,7 @@ like::
   default = https://hg.mozilla.org/mozilla-central
   default-push = ssh://hg.mozilla.org/mozilla-central
 
-  review = ssh://reviewboard.mozilla.org/hg/reviews/firefox
+  review = ssh://reviewboard-hg.mozilla.org/firefox
 
 .. note:: Upcoming autodiscovery of repositories
 
@@ -163,7 +170,7 @@ review request
    A request to review a single patch/diff/commit
 review
    Responses to a review request
-issues
+issue
    A component of a review that is explicitly tracked as part of the
    review request
 review request series
@@ -175,11 +182,16 @@ parent review request
 draft
    Refers to a state review requests or reviews can be in where content
    is not publicly visible and is only available to the person who created
-   it.
-   All review requests and reviews start in the draft state by default.
+   it. All review requests and reviews start in the draft state by default.
 publishing
    The act of taking a draft review request or draft review and marking
    it as public, making it visible to everybody
+ship it
+   This is the term used for *granting review* or *r+* in Bugzilla
+   terminology.
+review id
+   A unique identifier identifying a review request series. This is
+   commonly derived from a bug number and username.
 
 Pushing Code for Review
 =======================
@@ -218,11 +230,63 @@ review requests. e.g.::
   review url: https://reviewboard.mozilla.org/r/7 (pending)
 
 You should see a summary of the changesets that were pushed for review
-and a link to the parent review request. The status of each review
+and a URL to the parent review request. The status of each review
 request is surrounded in parenthesis.
 
+Looking Under the Covers
+========================
+
+Let's disect what happens when you run ``hg push review`` and the
+follow-up actions so that you have a better understanding of some of the
+magic involved.
+
+When you type ``hg push review``, Mercurial first tries to resolve the
+``review`` argument to a repository URL. Your ``.hg/hgrc`` file is
+consulted and resolved to something like
+``ssh://reviewboard-hg/firefox``.
+
+Mercurial then opens a connection to that remote repositories and
+discovers what local commits part of the requested review don't exist
+on the remote and it pushes them.
+
+Up until this point, everything is standard Mercurial behavior.
+
+Once changes have been pushed to the remote repository, the
+``reviewboard`` Mercurial extension you installed kicks into gear. It
+sees that you have pushed to a repository that is capable of performing
+code review. It assumes this is an intent to conduct code review
+(otherwise why were you pushing to this repository).
+
+The ``reviewboard`` Mercurial extension then collects information about
+the pushed head and its ancestors. By default, it walks the parent commits
+until it arrives at a commit that has the ``public`` phase (``published``
+in Mercurial parlance). The range of commits between the pushed head and
+the child of the last *published* commit form the review range: these
+are all the commits that we are asking to review.
+
+From this range of commits, we look at the commit messages. Our goal is
+to find a bug number to associate the review against. We perform simple
+pattern matching to find bug numbers. If we find multiple bug numbers,
+we take the most recent bug number seen. If there are multiple bug
+numbers in a commit message, we give weight to the first line (likely
+appearing in the first line).
+
+The found bug number along with your user identifier (your *ircnick*
+setting) construct the *Review ID*. The *Review ID* is globally
+unique and is used to identify this review for all of time.
+
+Once the commits have been identified and a *Review ID* chosen,
+Mercurial sends all this data to the remote Mercurial server in a
+command that basically says *initiate a code review with these
+parameters*.
+
+The remote Mercurial server then takes this data and turns it into
+review requests on Review Board. The result of this operation is
+communicated back to the client - your machine - where a summary of the
+result is printed.
+
 Commit Message Formatting
--------------------------
+=========================
 
 The contents of commit messages are important to Review Board.
 
@@ -236,8 +300,7 @@ messages to contain a bug reference (e.g. *Bug 123 - Fix foo*), or you
 can pass ``--reviewid`` to ``hg push``. e.g. ``hg push --reviewid 123``.
 In this example, the review will be attached to bug 123.
 
-**It is recommended to use proper commit messages instead of passing
---reviewid.**
+.. tip:: It is recommended to use proper commit messages instead of passing --reviewid.
 
 The commit message will also be used to populate Review Board's fields
 for the review request for that commit.
@@ -247,7 +310,71 @@ message.
 
 The description of the review request will be all subsequent lines.
 
-**It is recommended to write a paragraph or two in the commit message to
-explain the purpose of the commit.**
+.. tip:: It is recommended to write a multiline commit message.
 
+   Because the commit message is used to populate fields of a review
+   request (including the summary and description), writing a multiline
+   commit message will save you time from having to fill out these
+   fields later.
 
+   Diffs of these fields are shown in the web-based review interface, so
+   changes can be followed over time.
+
+History Rewriting
+=================
+
+A common problem with code review tools is that they don't handle
+history rewriting very well. A goal of MozReview is for this criticism
+to not be levied at it. In this section, we'll talk a little about how
+MozReview handles history rewriting.
+
+Let's start with a simple example. Say you start with the following
+changesets::
+
+   500:2b9b330ed031 Bug 123 - Prep work for feature X
+   501:61e7f5525241 Bug 123 - Implement feature X
+
+You push these for review. They get assigned review requests 10 and 11,
+respectively.
+
+During the course of code review, someone asks you to perform more prep
+work before the main feature commit. In other words, they want you to
+insert a commit between ``500:2b9b330ed031`` and ``501:61e7f5525241``.
+You refactor your commits via history rewriting (``hg histedit``) and
+arrive at the following::
+
+  500:2b9b330ed031 Bug 123 - Prep work for feature X
+  502:7f825c52e03c Bug 123 - More prep work for feature X
+  503:1833bbae416f Bug 123 - Implement feature X
+
+You now push these for review. What happens?
+
+Your minimal expectation should be that MozReview creates a new review
+request to handle the newly-introduced commit. MozReview does indeed do
+this. Added or removed commits will result in the review series being
+expanded or truncated as necessary.
+
+Your next expectation should be that MozReview appropriately maps each
+commit to the appropriate pre-existing review request. In our example,
+``500:2b9b330ed031`` would get mapped to review request 10 (simple
+enough - nothing changed). In addition, ``503:1833bbae416f`` would get
+mapped to review request 11 (because that commit is a logical successor
+to ``501:61e7f5525241`` (which no longer exists because it was rewritten
+into ``503:1833bbae416f``).
+
+In its current implementation, MozReview should meet your expectations
+and history rewriting should *just work* - rewritten commits and review
+requests will automatically map to the appropriate former ones -
+**provided you have obsolescence enabled**. If obsolescence is not
+enabled, MozReview will perform index-based mapping. e.g. the first
+commit will get mapped to the first review request, the second commit to
+the second review request and so on. Added commits or removed commits
+will impact review requests at the end of the series.
+
+.. tip::
+
+   Obsolescence markers result in automagical handling of history
+   rewriting and are therefore highly recommended.
+
+   To enable obsolescence markers, install the the
+   `evolve extension <https://bitbucket.org/marmoute/mutable-history>`_.
