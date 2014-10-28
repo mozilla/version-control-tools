@@ -35,6 +35,10 @@ cd hghooks
 python setup.py develop
 cd ..
 
+cd testing
+python setup.py develop
+cd ..
+
 # Collect code coverage from all Python processes if environment variable
 # is set.
 cat > venv/bin/sitecustomize.py << EOF

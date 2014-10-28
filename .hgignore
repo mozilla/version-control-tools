@@ -8,6 +8,7 @@ pylib/Bugsy/bugsy.egg-info/
 testing/bmoserver/.vagrant
 testing/puppet/files/Mozilla-Bugzilla-Public*
 testing/unifiedserver/.vagrant
+testing/vcttesting.egg-info/
 venv/
 \.pyc$
 \.pyo$

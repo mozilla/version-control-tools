@@ -14,8 +14,6 @@ def main(args):
         execfile(activate, dict(__file__=activate))
         sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
 
-    sys.path.insert(0, os.path.join(HERE, 'testing'))
-
     from mach.main import Mach
 
     m = Mach(os.getcwd())
