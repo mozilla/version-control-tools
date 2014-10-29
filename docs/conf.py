@@ -54,5 +54,10 @@ if not on_rtd:
 # documenting.
 sys.path.insert(0, os.path.dirname(__file__))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'reviewboard.settings')
-import reviewboard
+
+# We should fix the ReadTheDocs config to make this work.
+try:
+    import reviewboard
+except ImportError:
+    pass
 
