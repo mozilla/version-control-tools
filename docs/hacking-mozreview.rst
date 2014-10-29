@@ -186,3 +186,44 @@ Filing Bugs
 Found a bug in MozReview or want to create a bug to track an
 improvement? File bugs against ``Developer Services :: MozReview``
 at https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview.
+
+Releasing Updates
+=================
+
+Want to release an update to MozReview? This section is for you.
+
+Building eggs for Review Board Extensions
+-----------------------------------------
+
+If you modify ``rbbz`` or ``rbmozui``, you'll need to produce new Python
+eggs suitable for deployment on production.
+
+We've provided a build environment in a Docker container to enable
+building eggs. In addition, we have a high-level command that will start
+the container, generate the eggs, retrieve them, and store them on the
+local filesystem. To use::
+
+  $ source venv/bin/activate
+  $ DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-reviewboard-eggs /path/to/output/directory
+  Wrote /path/to/output/directory/rbbz-0.2.6-py2.6.egg
+  Wrote /path/to/output/directory/rbmozui-0.2.3beta0-py2.6.egg
+
+If you wish to use the Docker container, extract the image id from the
+``build-reviewboard-eggs`` command output and invoke Docker like so::
+
+  $ docker-control.py build-reviewboard-eggs .
+  ...
+  Successfully built 63b369dee3c4
+  Generating eggs...
+  Wrote ./rbbz-0.2.6-py2.6.egg
+  Wrote ./rbmozui-0.2.3beta0-py2.6.egg
+  $ docker run -it 63b369dee3c4 /bin/bash
+
+You will find a virtualenv in ``/venv``. A copy of the
+``version-control-tools`` repository is stored in
+``/version-control-tools``. You can build eggs yourself by running
+something like the following::
+
+  $ source /venv/bin/activate
+  $ cd /version-control-tools/pylib/rbbz
+  $ python setup.py bdist_egg

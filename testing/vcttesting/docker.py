@@ -7,6 +7,7 @@
 
 from __future__ import absolute_import
 
+import base64
 import docker
 import json
 import os
@@ -22,6 +23,7 @@ from io import BytesIO
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 DOCKER_DIR = os.path.normpath(os.path.join(HERE, '..', 'docker'))
+ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 
 def wait_for_http(host, port, timeout=60):
     """Wait for an HTTP response."""
@@ -115,8 +117,23 @@ class Docker(object):
         except requests.exceptions.RequestException:
             return False
 
-    def ensure_built(self, name, verbose=False):
-        """Ensure a Docker image from a builder directory is built and up to date"""
+    def ensure_built(self, name, verbose=False, add_vct=False):
+        """Ensure a Docker image from a builder directory is built and up to date.
+
+        This function is docker build++. Under the hood, it talks to the same
+        ``build`` Docker API. However, it does one important thing differently:
+        it builds the context archive manually.
+
+        We supplement all contexts with the content of the source in this
+        repository related to building Docker containers. If ``add_vct`` is
+        True, we add the entire source repository to the Docker context.
+
+        This added content can be ``ADD``ed to the produced image inside the
+        Dockerfile. If the content changes, the Docker image ID changes and the
+        cache is invalidated. This effectively allows downstream consumers to
+        call ``ensure_built()`` as there *is the image up to date* check.
+        """
+
         p = os.path.join(self._ddir, 'builder-%s' % name)
         if not os.path.isdir(p):
             raise Exception('Unknown Docker builder name: %s' % name)
@@ -148,6 +165,18 @@ class Docker(object):
         # never know.
         tar.add(os.path.join(HERE, '..', 'docker-control.py'),
                 'extra/docker-control.py')
+
+        if add_vct:
+            # We grab the set of tracked files in this repository.
+            hg = os.path.join(ROOT, 'venv', 'bin', 'hg')
+            env = dict(os.environ)
+            env['HGRCPATH'] = '/dev/null'
+            args = [hg, '-R', ROOT, 'locate', '-r', '.']
+            output = subprocess.check_output(args, env=env, cwd='/')
+            # And add them to the archive.
+            for line in output.splitlines():
+                filename = line.strip()
+                tar.add(os.path.join(ROOT, filename), 'extra/vct/%s' % filename)
 
         tar.close()
 
@@ -327,6 +356,28 @@ class Docker(object):
             self.save_state()
         except KeyError:
             pass
+
+    def build_reviewboard_eggs(self):
+        image = self.ensure_built('eggbuild', verbose=True, add_vct=True)
+        container = self.client.create_container(image)['Id']
+
+        self.client.start(container, port_bindings={80: None})
+        state = self.client.inspect_container(container)
+        port = int(state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
+
+        print('Generating eggs...')
+        wait_for_http(self.docker_hostname, port)
+
+        res = requests.get('http://%s:%s/' % (self.docker_hostname, port))
+
+        files = {}
+        for filename, data in res.json().items():
+            files[filename] = base64.b64decode(data)
+
+        self.client.stop(container)
+        self.client.remove_container(container)
+
+        return files
 
     def get_full_image(self, image):
         for i in self.client.images():

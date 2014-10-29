@@ -68,3 +68,14 @@ class DockerCommands(object):
         description='Prune old Docker images')
     def prune_images(self):
         self.d.prune_images()
+
+    @Command('build-reviewboard-eggs', category='docker',
+        description='Build eggs for Review Board')
+    @CommandArgument('destdir', help='Directory in which to save eggs')
+    def build_eggs(self, destdir):
+        for filename, data in self.d.build_reviewboard_eggs().items():
+            outfile = os.path.join(destdir, filename)
+            with open(outfile, 'wb') as fh:
+                fh.write(data)
+            print('Wrote %s' % outfile)
+
