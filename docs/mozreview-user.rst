@@ -215,10 +215,17 @@ review requests. e.g.::
 
   review id:  bz://123/mynick
   review url: https://reviewboard.mozilla.org/r/7 (pending)
+  (visit review url to publish this review request so others can see it)
 
 You should see a summary of the changesets that were pushed for review
 and a URL to the parent review request. The status of each review
 request is surrounded in parenthesis.
+
+.. tip:: You often need to log in to Review Board to publish the review.
+
+   Review requests aren't published to the world by default (yet). If
+   you need to take additional action to enable others to see the review
+   requests, you will be alerted by the command output.
 
 Looking Under the Covers
 ========================
