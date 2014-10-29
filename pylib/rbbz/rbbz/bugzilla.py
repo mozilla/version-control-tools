@@ -184,6 +184,9 @@ class Bugzilla(object):
 
         if rb_attachment:
             params['ids'] = [rb_attachment['id']]
+
+            if rb_attachment['is_obsolete']:
+                params['is_obsolete'] = False
         else:
             params['ids'] = [bug_id]
             params['data'] = url
@@ -218,8 +221,7 @@ class Bugzilla(object):
 
         return [a for a
                 in self.proxy.Bug.attachments(params)['bugs'][str(bug_id)]
-                if not a['is_obsolete'] and
-                a['content_type'] == 'text/x-review-board-request']
+                if a['content_type'] == 'text/x-review-board-request']
 
     @xmlrpc_to_bugzilla_errors
     def r_plus_attachment(self, bug_id, reviewer, comment, rb_url):
