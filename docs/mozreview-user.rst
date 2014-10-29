@@ -43,7 +43,7 @@ automatically.
    recommended. New major releases come out every 3 months. New minor
    releases come every month.
 
-   As of November 2014, Mercurial 3.2 is the best recent and recommended
+   As of November 2014, Mercurial 3.2 is the most recent and recommended
    version.
 
 Configuring the Mercurial Extension
