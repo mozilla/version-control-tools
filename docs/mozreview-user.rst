@@ -123,15 +123,15 @@ You will want to define a named path in your per-repository ``.hg/hrc``
 to the code review Mercurial repository. We recommend the name
 ``review``. The URL for the repository should be
 ``ssh://reviewboard-hg.mozilla.org/<repo>`` where ``<repo>`` is
-the name of a repository. Valid names include ``firefox`` and
-``version-control-tools``. An example ``.hg/hgrc`` fragment may look
-like::
+the name of a repository. You can find the list of repositories at
+https://reviewboard-hg.mozilla.org/.  An example ``.hg/hgrc``
+fragment may look like::
 
   [paths]
   default = https://hg.mozilla.org/mozilla-central
   default-push = ssh://hg.mozilla.org/mozilla-central
 
-  review = ssh://reviewboard-hg.mozilla.org/firefox
+  review = ssh://reviewboard-hg.mozilla.org/gecko
 
 .. note:: Upcoming autodiscovery of repositories
 
@@ -139,19 +139,6 @@ like::
    discover and use the appropriate code review repository. This will
    alleviate the requirement of setting a repository path in your
    ``hgrc`` file.
-
-Testing the Configuration
--------------------------
-
-Now that the Mercurial extension is installed and configured, you'll
-need to test it. From your repository's directory, simply run the
-following::
-
-  $ hg fetchreviews
-
-If that prints a message like *updated 27 reviews* and exits without
-spewing an error, everything is configured properly and you are ready to
-submit code for review!
 
 How Review Board Works
 ======================
