@@ -55,6 +55,7 @@ Publishing the review will add an attachment to the bug
       description: 'MozReview Request: bz://1/mynick'
       flags: []
       id: 1
+      is_obsolete: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: admin@example.com

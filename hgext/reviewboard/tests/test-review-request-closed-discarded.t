@@ -52,6 +52,7 @@
       description: 'MozReview Request: bz://123/mynick'
       flags: []
       id: 1
+      is_obsolete: false
       summary: 'MozReview Request: bz://123/mynick'
     comments:
     - author: admin@example.com
@@ -155,6 +156,7 @@ TODO Not implemented yet
       description: 'MozReview Request: bz://123/mynick'
       flags: []
       id: 1
+      is_obsolete: false
       summary: 'MozReview Request: bz://123/mynick'
     comments:
     - author: admin@example.com
@@ -299,6 +301,7 @@ TODO not yet implemented
       description: 'MozReview Request: bz://123/mynick'
       flags: []
       id: 1
+      is_obsolete: false
       summary: 'MozReview Request: bz://123/mynick'
     comments:
     - author: admin@example.com
@@ -401,6 +404,7 @@ TODO not implemented
       description: 'MozReview Request: bz://123/mynick'
       flags: []
       id: 1
+      is_obsolete: false
       summary: 'MozReview Request: bz://123/mynick'
     comments:
     - author: admin@example.com

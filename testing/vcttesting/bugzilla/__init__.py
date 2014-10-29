@@ -144,7 +144,8 @@ class Bugzilla(object):
                     description=a['description'],
                     summary=a['summary'],
                     data=base64.b64decode(a['data']),
-                    flags=flags))
+                    flags=flags,
+                    is_obsolete=bool(a['is_obsolete'])))
 
             key = 'Bug %s' % bid
             data[key] = d

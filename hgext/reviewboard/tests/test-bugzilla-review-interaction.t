@@ -48,6 +48,7 @@ Adding a reviewer should result in a r? flag being set
         setter: author@example.com
         status: '?'
       id: 1
+      is_obsolete: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: author@example.com
@@ -92,6 +93,7 @@ Adding a "Ship It" review will grant r+
         setter: reviewer@example.com
         status: +
       id: 1
+      is_obsolete: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: author@example.com
@@ -143,6 +145,7 @@ Adding a reply to the review will add a comment to Bugzilla
         setter: reviewer@example.com
         status: +
       id: 1
+      is_obsolete: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: author@example.com
@@ -215,6 +218,7 @@ Ensure multiple reviewers works as expected
         setter: author@example.com
         status: '?'
       id: 2
+      is_obsolete: false
       summary: 'MozReview Request: bz://2/mynick'
     comments:
     - author: author@example.com
@@ -260,6 +264,7 @@ Removing a reviewer should remove their review flag
         setter: author@example.com
         status: '?'
       id: 2
+      is_obsolete: false
       summary: 'MozReview Request: bz://2/mynick'
     comments:
     - author: author@example.com
@@ -310,6 +315,7 @@ Removing all reviewers should remove all flags
       description: 'MozReview Request: bz://2/mynick'
       flags: []
       id: 2
+      is_obsolete: false
       summary: 'MozReview Request: bz://2/mynick'
     comments:
     - author: author@example.com
@@ -392,6 +398,7 @@ review? sticks around when 1 person grants review
         setter: reviewer@example.com
         status: +
       id: 3
+      is_obsolete: false
       summary: 'MozReview Request: bz://3/mynick'
     comments:
     - author: author@example.com
@@ -461,6 +468,7 @@ Random users can come along and grant review
         setter: troll@example.com
         status: +
       id: 4
+      is_obsolete: false
       summary: 'MozReview Request: bz://4/mynick'
     comments:
     - author: author@example.com
