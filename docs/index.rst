@@ -43,6 +43,7 @@ Table of Contents
    mozreview
    headless-repositories
    testing
+   contributing
 
 
 Indices and tables
