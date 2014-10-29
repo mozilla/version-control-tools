@@ -21,6 +21,13 @@ MozReview launched late October 2014. In the spirit of *perfect is the
 enemy of good*, the product launched with many rough edges and
 unimplemented features.
 
+If you find something that is obviously wrong or seems bad, chances are
+we know about it. Most of the energy to this point has been spent on
+shipping something, not shipping the perfect solution.
+
+We've spent a lot of energy making it easy to hack on the tool so anyone
+can come along and improve it. For more, read :ref:`hacking_mozreview`.
+
 Known Issues and Limitations
 ----------------------------
 
