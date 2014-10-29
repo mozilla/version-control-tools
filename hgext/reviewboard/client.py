@@ -227,9 +227,10 @@ def doreview(repo, ui, remote, reviewnode):
     if hasattr(repo, 'mq'):
         for patch in repo.mq.applied:
             if patch.node in nodes:
-                ui.warn(_('You are using mq to develop patches. mq is '
-                          'deprecated. Please develop with bookmarks or '
-                          'use the shelve extension instead.\n'))
+                ui.warn(_('(You are using mq to develop patches. For the best '
+                    'code review experience, use bookmark-based development '
+                    'with changeset evolution. Read more at '
+                    'http://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview-user.html)\n'))
                 break
 
     lines = [

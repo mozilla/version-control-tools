@@ -116,7 +116,7 @@ Pushing patches from mq will result in a warning
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  You are using mq to develop patches. * (glob)
+  (You are using mq to develop patches. *) (glob)
   submitting 1 changesets for review
   
   changeset:  7:7458cff9569f
