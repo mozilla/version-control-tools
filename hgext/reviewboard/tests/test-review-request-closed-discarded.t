@@ -145,7 +145,6 @@ Child review request with ID 3 should be closed as discarded...
       p2rb.is_squashed: False
 
 The review attachment should be marked as obsolete
-TODO Not implemented yet
 
   $ bugzilla dump-bug 123
   Bug 123:
@@ -156,7 +155,7 @@ TODO Not implemented yet
       description: 'MozReview Request: bz://123/mynick'
       flags: []
       id: 1
-      is_obsolete: false
+      is_obsolete: true
       summary: 'MozReview Request: bz://123/mynick'
     comments:
     - author: admin@example.com
@@ -289,8 +288,7 @@ Child review request with ID 3 should be re-opened...
       p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: False
 
-There should not be an attachment on the bug yet
-TODO not yet implemented
+There should still not be a visible attachment on the bug
 
   $ bugzilla dump-bug 123
   Bug 123:
@@ -301,7 +299,7 @@ TODO not yet implemented
       description: 'MozReview Request: bz://123/mynick'
       flags: []
       id: 1
-      is_obsolete: false
+      is_obsolete: true
       summary: 'MozReview Request: bz://123/mynick'
     comments:
     - author: admin@example.com
@@ -404,6 +402,14 @@ TODO not implemented
       description: 'MozReview Request: bz://123/mynick'
       flags: []
       id: 1
+      is_obsolete: true
+      summary: 'MozReview Request: bz://123/mynick'
+    - attacher: admin@example.com
+      content_type: text/x-review-board-request
+      data: http://example.com/r/1/
+      description: 'MozReview Request: bz://123/mynick'
+      flags: []
+      id: 2
       is_obsolete: false
       summary: 'MozReview Request: bz://123/mynick'
     comments:
@@ -431,6 +437,12 @@ TODO not implemented
         hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9'
     - author: admin@example.com
       id: 126
+      tags: []
+      text: 'Created attachment 2
+  
+        MozReview Request: bz://123/mynick'
+    - author: admin@example.com
+      id: 127
       tags: []
       text: '/r/2 - Bug 123 - Foo 1
   

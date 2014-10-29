@@ -385,6 +385,10 @@ def on_review_request_closed_discarded(user, review_request, type, **kwargs):
     close_child_review_requests(user, review_request, ReviewRequest.DISCARDED,
                                   AUTO_CLOSE_DESCRIPTION)
 
+    b = Bugzilla(user.bzlogin, user.bzcookie)
+    bug = int(review_request.get_bug_list()[0])
+    url = review_or_request_url(review_request)
+    b.obsolete_review_attachments(bug, url)
 
 def on_review_request_closed_submitted(user, review_request, type, **kwargs):
     if (not is_review_request_squashed(review_request) or

@@ -261,6 +261,23 @@ class Bugzilla(object):
         # setting the flag.
         self.post_comment(bug_id, comment)
 
+    @xmlrpc_to_bugzilla_errors
+    def obsolete_review_attachments(self, bug_id, rb_url):
+        """Mark any attachments for a given bug and review request as obsolete.
+
+        This is called when review requests are discarded or deleted. We don't
+        want to leave any lingering references in Bugzilla.
+        """
+        params = {
+            'ids': [],
+            'is_obsolete': True,
+        }
+
+        for a in self.get_rb_attachments(bug_id):
+            if a.get('data') == rb_url and not a.get('is_obsolete'):
+                params['ids'].append(a['id'])
+
+        self.proxy.Bug.update_attachment(params)
 
     @property
     def transport(self):
