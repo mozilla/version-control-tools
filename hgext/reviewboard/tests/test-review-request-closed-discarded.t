@@ -43,6 +43,40 @@
   (visit review url to publish this review request so others can see it)
 
   $ rbmanage publish $HGPORT1 1
+  $ bugzilla dump-bug 123
+  Bug 123:
+    attachments:
+    - attacher: admin@example.com
+      content_type: text/x-review-board-request
+      data: http://example.com/r/1/
+      description: 'MozReview Request: bz://123/mynick'
+      flags: []
+      id: 1
+      summary: 'MozReview Request: bz://123/mynick'
+    comments:
+    - author: admin@example.com
+      id: 123
+      tags: []
+      text: ''
+    - author: admin@example.com
+      id: 124
+      tags: []
+      text: 'Created attachment 1
+  
+        MozReview Request: bz://123/mynick'
+    - author: admin@example.com
+      id: 125
+      tags: []
+      text: '/r/2 - Bug 123 - Foo 1
+  
+        /r/3 - Bug 123 - Foo 2
+  
+  
+        Pull down these commits:
+  
+  
+        hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9'
+    summary: Range 123
 
 Close the squashed review request as discarded, which should close all of the
 child review requests.
@@ -108,6 +142,44 @@ Child review request with ID 3 should be closed as discarded...
       p2rb.commit_id: 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9
       p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: False
+
+The review attachment should be marked as obsolete
+TODO Not implemented yet
+
+  $ bugzilla dump-bug 123
+  Bug 123:
+    attachments:
+    - attacher: admin@example.com
+      content_type: text/x-review-board-request
+      data: http://example.com/r/1/
+      description: 'MozReview Request: bz://123/mynick'
+      flags: []
+      id: 1
+      summary: 'MozReview Request: bz://123/mynick'
+    comments:
+    - author: admin@example.com
+      id: 123
+      tags: []
+      text: ''
+    - author: admin@example.com
+      id: 124
+      tags: []
+      text: 'Created attachment 1
+  
+        MozReview Request: bz://123/mynick'
+    - author: admin@example.com
+      id: 125
+      tags: []
+      text: '/r/2 - Bug 123 - Foo 1
+  
+        /r/3 - Bug 123 - Foo 2
+  
+  
+        Pull down these commits:
+  
+  
+        hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9'
+    summary: Range 123
 
 Re-opening the parent review request should re-open all of the children,
 and they should be non-public.
@@ -215,6 +287,44 @@ Child review request with ID 3 should be re-opened...
       p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: False
 
+There should not be an attachment on the bug yet
+TODO not yet implemented
+
+  $ bugzilla dump-bug 123
+  Bug 123:
+    attachments:
+    - attacher: admin@example.com
+      content_type: text/x-review-board-request
+      data: http://example.com/r/1/
+      description: 'MozReview Request: bz://123/mynick'
+      flags: []
+      id: 1
+      summary: 'MozReview Request: bz://123/mynick'
+    comments:
+    - author: admin@example.com
+      id: 123
+      tags: []
+      text: ''
+    - author: admin@example.com
+      id: 124
+      tags: []
+      text: 'Created attachment 1
+  
+        MozReview Request: bz://123/mynick'
+    - author: admin@example.com
+      id: 125
+      tags: []
+      text: '/r/2 - Bug 123 - Foo 1
+  
+        /r/3 - Bug 123 - Foo 2
+  
+  
+        Pull down these commits:
+  
+  
+        hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9'
+    summary: Range 123
+
 Should be able to publish these review requests again by publishing the
 squashed review request.
 
@@ -278,6 +388,56 @@ Child review request with ID 3 should be published.
       p2rb.commit_id: 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9
       p2rb.identifier: bz://123/mynick
       p2rb.is_squashed: False
+
+The attachment for the review request should be unobsoleted
+TODO not implemented
+
+  $ bugzilla dump-bug 123
+  Bug 123:
+    attachments:
+    - attacher: admin@example.com
+      content_type: text/x-review-board-request
+      data: http://example.com/r/1/
+      description: 'MozReview Request: bz://123/mynick'
+      flags: []
+      id: 1
+      summary: 'MozReview Request: bz://123/mynick'
+    comments:
+    - author: admin@example.com
+      id: 123
+      tags: []
+      text: ''
+    - author: admin@example.com
+      id: 124
+      tags: []
+      text: 'Created attachment 1
+  
+        MozReview Request: bz://123/mynick'
+    - author: admin@example.com
+      id: 125
+      tags: []
+      text: '/r/2 - Bug 123 - Foo 1
+  
+        /r/3 - Bug 123 - Foo 2
+  
+  
+        Pull down these commits:
+  
+  
+        hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9'
+    - author: admin@example.com
+      id: 126
+      tags: []
+      text: '/r/2 - Bug 123 - Foo 1
+  
+        /r/3 - Bug 123 - Foo 2
+  
+  
+        Pull down these commits:
+  
+  
+        hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9'
+    summary: Range 123
 
   $ cd ..
   $ rbmanage stop rbserver
