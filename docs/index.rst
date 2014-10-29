@@ -10,7 +10,6 @@ Contents:
 
    hgcustom
    mozreview
-   hacking-mozreview
    headless-repositories
    testing
 

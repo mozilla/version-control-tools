@@ -1,8 +1,8 @@
 .. _mozreview:
 
-==========================
-Code Review with MozReview
-==========================
+====================
+MozReview User Guide
+====================
 
 This article is a guide on conducting code review at Mozilla using MozReview,
 a repository-based code-review system based on
