@@ -372,3 +372,30 @@ will impact review requests at the end of the series.
 
    To enable obsolescence markers, install the the
    `evolve extension <https://bitbucket.org/marmoute/mutable-history>`_.
+
+Filing Bugs
+===========
+
+Did you find a bug in MozReview? Do you have a feature request to make
+it better? `File a bug <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview>`_
+in the ``Developer Services :: MozReview`` component.
+
+.. tip::
+
+   We like bug reports that contain command output!
+
+   If you see an exception, stack trace, or error message, copy it into
+   the bug.
+
+   The tests for MozReview are implemented as a series of user-facing
+   commands, simulating terminal interaction. If you give us the
+   commands you used to cause the error, there's a good chance we can
+   reproduce it and add a test case so it doesn't break.
+
+Getting Help
+============
+
+If you prefer IRC, join ``#reviewboard`` ``irc.mozilla.org``.
+
+If you prefer email, send one to
+`mozilla-code-review@googlegroups.com <mailto:mozilla-code-review@googlegroups.com>`_.
