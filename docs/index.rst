@@ -8,6 +8,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   hgcustom
    mozreview
    hacking-mozreview
    headless-repositories
