@@ -1,4 +1,4 @@
-.. _mozreview:
+.. _mozreview_user:
 
 ====================
 MozReview User Guide
