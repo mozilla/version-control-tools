@@ -24,7 +24,7 @@ following IRC channels on ``irc.mozilla.org``:
 #vcs
    Where everybody who maintains all the version control properties
    hangs out.
-#reviewboard
+#mozreview
    Where developers and users of MozReview lurk.
 
 Just pop in a channel, ask a question, and wait for someone to answer.

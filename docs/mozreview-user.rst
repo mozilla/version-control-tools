@@ -395,7 +395,7 @@ in the ``Developer Services :: MozReview`` component.
 Getting Help
 ============
 
-If you prefer IRC, join ``#reviewboard`` ``irc.mozilla.org``.
+If you prefer IRC, join ``#mozreview`` ``irc.mozilla.org``.
 
 If you prefer email, send one to
 `mozilla-code-review@googlegroups.com <mailto:mozilla-code-review@googlegroups.com>`_.
