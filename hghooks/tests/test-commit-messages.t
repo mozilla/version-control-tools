@@ -446,7 +446,6 @@ IGNORE BAD COMMIT MESSAGES should work
   added 2 changesets with 2 changes to 1 files
 
 "try" at the end of words should not trigger the try syntax checking
-THIS TEST SHOWS BAD BEHAVIOR!
 
   $ echo nottry > foo
   $ hg commit -m 'Bug 1084180 - Refine RemoveEntry: Not only remove this entry but also its children if exist. r=dhylands'
@@ -457,16 +456,3 @@ THIS TEST SHOWS BAD BEHAVIOR!
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  
-  
-  ************************** ERROR ****************************
-  Rev 540e187d57e4 uses try syntax. (Did you mean to push to Try instead?)
-  test
-  Bug 1084180 - Refine RemoveEntry: Not only remove this entry but also its children if exist. r=dhylands
-  *************************************************************
-  
-  
-  transaction abort!
-  rollback completed
-  abort: pretxnchangegroup.commit_message hook failed
-  [255]

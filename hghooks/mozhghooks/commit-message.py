@@ -27,6 +27,8 @@ goodMessage = [re.compile(x, re.I) for x in [
     r'^add(ed|ing)? tag'
 ]]
 
+trySyntax = re.compile(r'\btry:')
+
 def isGoodMessage(c):
     def message(fmt):
         print "\n\n************************** ERROR ****************************"
@@ -42,7 +44,7 @@ def isGoodMessage(c):
                     "B2G Bumper Bot <release+b2gbumper@mozilla.com>"]:
         return True
 
-    if "try: " in desc:
+    if trySyntax.search(firstline):
         message("Rev {rev} uses try syntax. (Did you mean to push to Try instead?)")
         return False
 
