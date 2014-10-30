@@ -58,3 +58,14 @@ If you prefer IRC, join ``#mozreview`` ``irc.mozilla.org``.
 
 If you prefer email, send one to
 `mozilla-code-review@googlegroups.com <mailto:mozilla-code-review@googlegroups.com>`_.
+
+Adding Review Repositories
+==========================
+
+Since code review is initiated by pushing to a repository, every
+repository must have a corresponding code review repository configured
+to receive reviews.
+
+To request creation of a new code review repository,
+`file a bug <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview>`_
+with the source repository URL and your request will likely be granted.
