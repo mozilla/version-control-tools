@@ -40,6 +40,9 @@ fast and not break things.
 Known Issues and Limitations
 ----------------------------
 
+Please see the `open bugs for MozReview <http://mzl.la/1sHkGHM>`_. Some
+notables include:
+
 * Errors on the *Commits* page don't always result in UI. This is an
   upstream bug and is tracked in
   `bug 1088823 <https://bugzilla.mozilla.org/show_bug.cgi?id=1088823>`_.
@@ -57,8 +60,9 @@ Known Issues and Limitations
 Planned Features
 ----------------
 
-There are many features that we know people want and need. Here is a
-partial list:
+There are many features that we know people want and need. Many items
+are tracked in the `open bugs list <http://mzl.la/1sHkGHM>`_. In
+addition, some high-level features that we want to build:
 
 * Git support. We only support Mercurial right now because it is the
   canonical version control tool for Firefox and because it is easier to
