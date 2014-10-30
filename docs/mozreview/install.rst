@@ -150,11 +150,16 @@ Updating SSH Config
 
 Mercurial will look in your SSH config (likely ``~/.ssh/config``) to
 determine what username to use. You need to configure
-``reviewboard-hg.mozilla.org`` to use your Mozilla LDAP username. For
-example::
+``reviewboard-hg.mozilla.org`` to use your Mozilla-registered account
+that has SSH access configured. For example::
 
   Host reviewboard-hg.mozilla.org
     User me@mozilla.com
+
+.. tip::
+
+   If you have already configured ``hg.mozilla.org`` in your SSH config,
+   just copy the settings to ``reviewboard-hg.mozilla.org``.
 
 Verify your SSH settings are sane by attempting to SSH into
 ``reviewboard-hg.mozilla.org``. Your terminal output should resemble the
