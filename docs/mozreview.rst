@@ -17,16 +17,25 @@ developer productivity.
 Status
 ======
 
-MozReview launched late October 2014. In the spirit of *perfect is the
-enemy of good*, the product launched with many rough edges and
-unimplemented features.
+MozReview soft launched on October 29, 2014. The soft launch means:
 
-If you find something that is obviously wrong or seems bad, chances are
-we know about it. Most of the energy to this point has been spent on
-shipping something, not shipping the perfect solution.
+* We are encouraging early adoptors and select groups to start using it.
+* We commit to not mass-deleting data or making major
+  backwards-incompatible changes.
+* We expect to make major changes that may significantly alter
+  appearances and/or workflows.
 
-We've spent a lot of energy making it easy to hack on the tool so anyone
-can come along and improve it. For more, read :ref:`hacking_mozreview`.
+In the spirit of *perfect is the enemy of good*, MozReview launched
+with many rough edges and unimplemented features. If you find
+something that is obviously wrong or seems bad, chances are we know
+about it. Most of the energy to this point has been spent on shipping
+something, not shipping the perfect solution.
+
+We've spent a lot of energy making it easy to hack on MozReview so
+anyone can come along and improve it. For more, read
+:ref:`hacking_mozreview`. We've spent a lot of time on a robust and
+comprehensive :ref:`testing infrastructure <testing>` so we can move
+fast and not break things.
 
 Known Issues and Limitations
 ----------------------------
