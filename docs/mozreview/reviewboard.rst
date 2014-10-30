@@ -171,6 +171,26 @@ section of the Review Board User Guide before conducting review. When
 reading, you may want to pay attention to the following, which may be
 new concepts if you are coming from Bugzilla code reviews:
 
+Advanced Diff Viewer and Commenting
+   The diff viewing and commenting mechanism in Review Board is much
+   more advanced compared to Bugzilla/Splinter.
+
+   If the lines of context in a review are not sufficient, you can
+   expand context right from the review interface (it just fetches the
+   data from the underlying repository you pushed the commits too).
+
+   Intra-line diffs are supported. This means if you only change a
+   single character or line, that is clearly indicated.
+
+   Whitespace differences can be shown or hidden dynamically from the
+   interface.
+
+   Review comments can be set over multiple lines, allowing reviewers
+   to be clearer about where the comment applies.
+
+   Interdiff (showing the diff between multiple versions of the diff)
+   works.
+
 `Issue Tracking <https://www.reviewboard.org/docs/manual/2.0/users/reviews/issue-tracking/>`_
    When writing comments on reviews, Review Board allows you to open an
    *Issue*.
