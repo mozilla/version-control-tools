@@ -152,9 +152,79 @@ requested.
    to improve the UX situation. If you have web design skills, we
    love patches.
 
-Review Workflow
-===============
+Reviewing Code
+==============
 
-We need to write this documentation. Until then, read the aforementioned
-Review Board User Guide or go to https://reviewboard.mozilla.org/ and
-tell us what parts aren't obvious.
+So you've been asked to review something on Review Board. You've come
+to the right place to learn.
+
+Mozilla hasn't customized the review interface of Review Board
+significantly. So, the
+`Review Board User Guide <https://www.reviewboard.org/docs/manual/2.0/users/>`_,
+particularly the section on
+`Reviewing <https://www.reviewboard.org/docs/manual/2.0/users/reviews/>`_,
+is almost completely applicable to MozReview!
+
+We **highly** recommend reading the
+`Reviewing <https://www.reviewboard.org/docs/manual/2.0/users/reviews/>`_
+section of the Review Board User Guide before conducting review. When
+reading, you may want to pay attention to the following, which may be
+new concepts if you are coming from Bugzilla code reviews:
+
+`Issue Tracking <https://www.reviewboard.org/docs/manual/2.0/users/reviews/issue-tracking/>`_
+   When writing comments on reviews, Review Board allows you to open an
+   *Issue*.
+
+   Issues are important comments that are explcitly tracked by
+   Review Board.
+
+   When you view a review request, a table of issues is presented. This
+   allows reviewer and code author to track the progress of a review over
+   multiple iterations.
+
+`Markdown <https://www.reviewboard.org/docs/manual/2.0/users/markdown/>`_
+   Review Board supports Markdown in many of its multi-line text fields.
+   This includes review comments. Use the power responsibly.
+
+Drafts and Published Reviews
+   Review comments are in an unpublished *draft* state by default. You
+   must explicitly click a **Publish Review** button for your review to
+   be visible by others.
+
+Conversion to Bugzilla Comments
+   When reviews are published, their content is converted to text and
+   posted to Bugzilla as a comment.
+
+   (There is talk of changing this behavior because capturing the rich
+   review interface in Bugzilla comments can be challenging and appears
+   to offer little value over just going to Review Board and looking at
+   the original comments there.)
+
+Granting Review via Ship It
+   There is a **Ship It** checkbox in the reviewer interface. This is
+   Review Board's way of granting review (``r+`` in Bugzilla
+   terminology).
+
+   There is currently no equivalent to ``feedback+`` or cancelling
+   reviews. This workflow is still being discussed.
+
+Two Types of Ship Its
+---------------------
+
+A **Ship It** on a per-commit review request behaves different from a
+**Ship It** on a parent review request.
+
+Since we only create a Bugzilla ``review?`` attachments/flags for the
+parent review request, setting **Ship It** on a per-commit review will
+not impact Bugzilla flags.
+
+For a ``review+`` flag to be set in Bugzilla, a **Ship It** review must
+be conducted on the parent review request. This means that you may have
+to grant an extra **Ship It** review in addition to granting **Ship It**
+on the individual commits.
+
+.. note::
+
+   The behavior of **Ship It** and how we manage review requests in
+   Bugzilla is a bit clumsy. It is very likely the workflow will change
+   over time. Proposals are very welcome.
