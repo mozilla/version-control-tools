@@ -44,6 +44,7 @@ Table of Contents
    headless-repositories
    testing
    contributing
+   hgmozilla/index
 
 
 Indices and tables
