@@ -143,3 +143,7 @@ Pushing multiple heads is rejected
   searching for changes
   abort: cannot push multiple heads to remote; limit pushed revisions using the -r argument.
   [255]
+
+Ensure bad imports are detected
+
+  $ hg --config extensions.findbadimports=$TESTDIR/testing/find-bad-imports.py findbadimports

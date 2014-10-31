@@ -1,7 +1,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import json
 import urllib
 from StringIO import StringIO
 import xmlrpclib
@@ -264,6 +263,8 @@ def reviewboard(repo, proto, args=None):
 
 @wireproto.wireprotocommand('pullreviews', '*')
 def pullreviews(repo, proto, args=None):
+    import json
+
     proto.redirect()
 
     o = parsepayload(proto, args)
