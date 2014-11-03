@@ -77,7 +77,7 @@ Publishing the review will add an attachment to the bug
         Pull down this commit:
   
   
-        hg pull review -r 24417bc94b2c053e8f5dd8c09da33fbbef5404fe'
+        hg pull -r 24417bc94b2c053e8f5dd8c09da33fbbef5404fe http://localhost:$HGPORT/'
     summary: bug1
 
   $ rbmanage stop ../rbserver

@@ -70,7 +70,7 @@ Adding a reviewer should result in a r? flag being set
         Pull down this commit:
   
   
-        hg pull review -r 57755461e85f1e3e66738ec2d57f325249897409'
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
     summary: First Bug
 
 Adding a "Ship It" review will grant r+
@@ -115,7 +115,7 @@ Adding a "Ship It" review will grant r+
         Pull down this commit:
   
   
-        hg pull review -r 57755461e85f1e3e66738ec2d57f325249897409'
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
     - author: reviewer@example.com
       id: 4
       tags: []
@@ -167,7 +167,7 @@ Adding a reply to the review will add a comment to Bugzilla
         Pull down this commit:
   
   
-        hg pull review -r 57755461e85f1e3e66738ec2d57f325249897409'
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
     - author: reviewer@example.com
       id: 4
       tags: []
@@ -240,7 +240,7 @@ Ensure multiple reviewers works as expected
         Pull down this commit:
   
   
-        hg pull review -r d17099d7ee43e288f43e0210edc71b9782f92b77'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
     summary: Multiple Reviewers
 
 Removing a reviewer should remove their review flag
@@ -286,7 +286,7 @@ Removing a reviewer should remove their review flag
         Pull down this commit:
   
   
-        hg pull review -r d17099d7ee43e288f43e0210edc71b9782f92b77'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
     - author: author@example.com
       id: 9
       tags: []
@@ -296,7 +296,7 @@ Removing a reviewer should remove their review flag
         Pull down this commit:
   
   
-        hg pull review -r d17099d7ee43e288f43e0210edc71b9782f92b77'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
     summary: Multiple Reviewers
 
 Removing all reviewers should remove all flags
@@ -337,7 +337,7 @@ Removing all reviewers should remove all flags
         Pull down this commit:
   
   
-        hg pull review -r d17099d7ee43e288f43e0210edc71b9782f92b77'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
     - author: author@example.com
       id: 9
       tags: []
@@ -347,7 +347,7 @@ Removing all reviewers should remove all flags
         Pull down this commit:
   
   
-        hg pull review -r d17099d7ee43e288f43e0210edc71b9782f92b77'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
     - author: author@example.com
       id: 10
       tags: []
@@ -357,7 +357,7 @@ Removing all reviewers should remove all flags
         Pull down this commit:
   
   
-        hg pull review -r d17099d7ee43e288f43e0210edc71b9782f92b77'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
     summary: Multiple Reviewers
 
 review? sticks around when 1 person grants review
@@ -420,7 +420,7 @@ review? sticks around when 1 person grants review
         Pull down this commit:
   
   
-        hg pull review -r fb992de2921c9dd3117becff799b1e41e0dc4827'
+        hg pull -r fb992de2921c9dd3117becff799b1e41e0dc4827 http://localhost:$HGPORT/'
     - author: reviewer@example.com
       id: 14
       tags: []
@@ -490,7 +490,7 @@ Random users can come along and grant review
         Pull down this commit:
   
   
-        hg pull review -r 13295ed17a69bdcef2644c0ab72736292db21b80'
+        hg pull -r 13295ed17a69bdcef2644c0ab72736292db21b80 http://localhost:$HGPORT/'
     - author: troll@example.com
       id: 18
       tags: []

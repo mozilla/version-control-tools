@@ -76,7 +76,7 @@
         Pull down these commits:
   
   
-        hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9'
+        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
     summary: Range 123
 
 Close the squashed review request as discarded, which should close all of the
@@ -100,7 +100,7 @@ no Commit ID set.
       
       Pull down these commits:
       
-      hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9
+      hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/
       
     Extra:
       p2rb: True
@@ -179,7 +179,7 @@ The review attachment should be marked as obsolete
         Pull down these commits:
   
   
-        hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9'
+        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
     summary: Range 123
 
 Re-opening the parent review request should re-open all of the children,
@@ -203,7 +203,7 @@ Commit ID re-instated.
       
       Pull down these commits:
       
-      hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9
+      hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/
       
     Extra:
       p2rb: True
@@ -222,7 +222,7 @@ Commit ID re-instated.
       
       Pull down these commits:
       
-      hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9
+      hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/
       
     Extra:
       p2rb: True
@@ -323,7 +323,7 @@ There should still not be a visible attachment on the bug
         Pull down these commits:
   
   
-        hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9'
+        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
     summary: Range 123
 
 Should be able to publish these review requests again by publishing the
@@ -346,7 +346,7 @@ Squashed review request should be published.
       
       Pull down these commits:
       
-      hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9
+      hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/
       
     Extra:
       p2rb: True
@@ -425,7 +425,7 @@ The attachment for the review request should be unobsoleted
         Pull down these commits:
   
   
-        hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9'
+        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
     - author: admin@example.com
       id: 126
       tags: []
@@ -437,7 +437,7 @@ The attachment for the review request should be unobsoleted
         Pull down these commits:
   
   
-        hg pull review -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9'
+        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
     summary: Range 123
 
   $ cd ..

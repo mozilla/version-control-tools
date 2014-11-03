@@ -94,7 +94,7 @@ The parent review should have its description updated.
       
       Pull down these commits:
       
-      hg pull review -r 3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11
+      hg pull -r 3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11 http://localhost:$HGPORT/
       
     Extra:
       p2rb: True

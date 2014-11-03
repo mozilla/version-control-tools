@@ -118,7 +118,7 @@ Review request 6 should be added to the list of discard on publish rids.
       
       Pull down these commits:
       
-      hg pull review -r f466ed1de51670e583e11deb2f1022a342b52ccd
+      hg pull -r f466ed1de51670e583e11deb2f1022a342b52ccd http://localhost:$HGPORT/
       
     Extra:
       p2rb: True
@@ -139,7 +139,7 @@ Review request 6 should be added to the list of discard on publish rids.
       
       Pull down these commits:
       
-      hg pull review -r 53b32d356f20f6730c14ec62c3706eba7e68e078
+      hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/
       
     Extra:
       p2rb: True
@@ -278,7 +278,7 @@ request is published.
       
       Pull down these commits:
       
-      hg pull review -r 53b32d356f20f6730c14ec62c3706eba7e68e078
+      hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/
       
     Extra:
       p2rb: True
@@ -298,7 +298,7 @@ request is published.
       
       Pull down these commits:
       
-      hg pull review -r e44f9d56a1a491868bf5b3742196896dc76fd62e
+      hg pull -r e44f9d56a1a491868bf5b3742196896dc76fd62e http://localhost:$HGPORT/
       
     Extra:
       p2rb: True

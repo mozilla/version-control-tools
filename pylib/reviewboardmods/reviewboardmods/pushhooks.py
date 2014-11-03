@@ -130,6 +130,11 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
 
     api_root = rbc.get_root()
 
+    # This assumes that we pushed to the repository/URL that Review Board is
+    # configured to use. This assumption may not always hold.
+    repo = api_root.get_repository(repository_id=repoid)
+    repo_url = repo.path
+
     # Retrieve the squashed review request or create it.
     previous_commits = []
     squashed_rr = None
@@ -353,8 +358,10 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
     else:
         squashed_description[-1] += 'these commits:'
 
-    squashed_description.extend(
-        ['', 'hg pull review -r %s' % commits['individual'][-1]['id']])
+    squashed_description.extend([
+        '',
+        'hg pull -r %s %s' % (commits['individual'][-1]['id'], repo_url),
+    ])
 
     commit_list = []
     for commit in commits['individual']:
