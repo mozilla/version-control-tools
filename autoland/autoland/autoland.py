@@ -25,6 +25,7 @@ import transplant
 
 BUGZILLA_COMMENT_LIMIT = 10  # max comments to post / iteration
 
+
 def extract_bugid(patch):
     #TODO: check to see if there is an "official" re for this
     bugid = re.compile('[Bb]ug (\d+)')
@@ -32,11 +33,15 @@ def extract_bugid(patch):
     if m:
         return m.groups()[0]
 
-def handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id):
-    logger.debug('autoland request %s %s needs to retry job for %s' % (tree, rev, buildername))
+
+def handle_single_failure(logger, auth, dbconn, tree, rev, buildername,
+                          build_id):
+    logger.debug('autoland request %s %s needs to retry job for %s' %
+                 (tree, rev, buildername))
     job_id = selfserve.rebuild_job(auth, tree, build_id)
     if job_id:
-        logger.info('submitted rebuild request %s for autoland job %s %s' % (job_id, tree, rev))
+        logger.info('submitted rebuild request %s for autoland job %s %s' %
+                    (job_id, tree, rev))
         cursor = dbconn.cursor()
         query = """
             update Autoland set last_updated=%s
@@ -45,7 +50,8 @@ def handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id
         cursor.execute(query, (datetime.datetime.now(), tree, rev))
         dbconn.commit()
     else:
-        logger.info('could not rebuild %s for autoland job %s %s' % (build_id, tree, rev))
+        logger.info('could not rebuild %s for autoland job %s %s' %
+                    (build_id, tree, rev))
 
 
 def handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame):
@@ -57,11 +63,14 @@ def handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame):
     cursor.execute(query, (datetime.datetime.now(), tree, rev))
     dbconn.commit()
 
-    comment = 'Autoland request failed. User %s has insufficient permissions to land on tree %s.' %  (blame, tree)
-    add_bugzilla_comment(dbconn, bugid, comment)
+    comment = """Autoland request failed.
+                 User %s has insufficient permissions to land on tree %s."""
+    add_bugzilla_comment(dbconn, bugid, comment % (blame, tree))
+
 
 def handle_failure(logger, dbconn, tree, rev, bugid, buildernames):
-    logger.info('autoland request %s %s has too many failures for %s' % (tree, rev, ', '.join(buildernames)))
+    logger.info('autoland request %s %s has too many failures for %s' %
+                (tree, rev, ', '.join(buildernames)))
 
     cursor = dbconn.cursor()
     query = """
@@ -72,8 +81,9 @@ def handle_failure(logger, dbconn, tree, rev, bugid, buildernames):
     dbconn.commit()
 
     #TODO: add treeherder/tbpl link for job
-    comment = 'Autoland request failed. Too many failures for %s.' %  (', '.join(buildernames))
-    add_bugzilla_comment(dbconn, bugid, comment)
+    comment = """Autoland request failed. Too many failures for %s."""
+    add_bugzilla_comment(dbconn, bugid, comment % ', '.join(buildernames))
+
 
 def handle_can_be_landed(logger, dbconn, tree, rev):
     logger.info('autoland request %s %s can be landed' % (tree, rev))
@@ -84,6 +94,7 @@ def handle_can_be_landed(logger, dbconn, tree, rev):
     """
     cursor.execute(query, (datetime.datetime.now(), tree, rev))
     dbconn.commit()
+
 
 def handle_pending_transplants(logger, dbconn):
     cursor = dbconn.cursor()
@@ -99,7 +110,8 @@ def handle_pending_transplants(logger, dbconn):
 
         pushlog = mercurial.get_pushlog(tree, rev)
         if not pushlog:
-            logger.debug('could not get pushlog for tree: %s rev %s' % (tree, rev))
+            logger.debug('could not get pushlog for tree: %s rev %s' %
+                        (tree, rev))
             return
 
         changesets = []
@@ -114,19 +126,23 @@ def handle_pending_transplants(logger, dbconn):
         result = transplant.transplant(tree, 'mozilla-inbound', changesets)
 
         if not result:
-            logger.debug('could not connect to transplant server: tree: %s rev %s' % (tree, rev))
+            logger.debug("""could not connect to transplant server:
+                            tree: %s rev %s""" % (tree, rev))
             continue
 
         if 'error' in result:
             succeeded = False
-            logger.info('transplant failed: tree: %s rev: %s error: %s' % (tree, rev, json.dumps(result)))
-            comment = 'Autoland request failed: could not transplant: %s' % result['error']
+            logger.info('transplant failed: tree: %s rev: %s error: %s' %
+                        (tree, rev, json.dumps(result)))
+            comment = 'Autoland request failed: could not transplant: %s'
+            add_bugzilla_comment(dbconn, bugid, comment % result['error'])
         else:
             succeeded = True
-            comment = 'Autoland request succeeded: mozilla-inbound tip: %s' % result['tip']
+            comment = 'Autoland request succeeded: mozilla-inbound tip: %s'
+            add_bugzilla_comment(dbconn, bugid, comment % result['tip'])
 
-        landed.append([succeeded, json.dumps(result), datetime.datetime.now(), tree, rev])
-        add_bugzilla_comment(dbconn, bugid, comment)
+        landed.append([succeeded, json.dumps(result), datetime.datetime.now(),
+                      tree, rev])
 
     if landed:
         query = """
@@ -135,6 +151,7 @@ def handle_pending_transplants(logger, dbconn):
         """
         cursor.executemany(query, landed)
         dbconn.commit()
+
 
 def handle_autoland_request(logger, auth, dbconn, tree, rev):
 
@@ -169,12 +186,14 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
     if bugid is None:
         pushlog = mercurial.get_pushloghtml(tree, rev)
         if not pushlog:
-            logger.debug('could not get pushlog for tree: %s rev %s' % (tree, rev))
+            logger.debug('could not get pushlog for tree: %s rev %s' %
+                         (tree, rev))
             return
         bugid = extract_bugid(pushlog)
 
         if bugid is None:
-            logger.debug('autoland failed: could not get determine bugid for tree: %s rev: %s' % (tree, rev))
+            logger.debug('autoland failed: no bugid for tree: %s rev: %s' %
+                         (tree, rev))
 
             query = """
                 update Autoland set can_be_landed=false,last_updated=%s
@@ -183,7 +202,8 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
             cursor.execute(query, (datetime.datetime.now(), tree, rev))
             dbconn.commit()
         else:
-            logger.debug('bugid for tree: %s rev: %s is: %s' % (tree, rev, bugid))
+            logger.debug('bugid for tree: %s rev: %s is: %s' %
+                         (tree, rev, bugid))
 
             query = """
                 update Autoland set bugid=%s,last_updated=%s
@@ -202,7 +222,8 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         return
 
     if not result:
-        handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame)
+        handle_insufficient_permissions(logger, dbconn, tree, rev, bugid,
+                                        blame)
         return
 
     # everything passed, so we can land
@@ -216,13 +237,12 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         return
 
     if len(pending) > 0 or len(running) > 0:
-        logger.info('autoland request %s %s still has pending or running jobs: %d %d' % (tree, rev, len(pending), len(running)))
         query = """
-            update Autoland set pending=%s,running=%s,
-                                       builds=%s,last_updated=%s
+            update Autoland set pending=%s,running=%s,builds=%s,last_updated=%s
             where tree=%s and revision=%s
         """
-        cursor.execute(query, (len(pending), len(running), len(builds), datetime.datetime.now(), tree, rev))
+        cursor.execute(query, (len(pending), len(running), len(builds),
+                       datetime.datetime.now(), tree, rev))
         dbconn.commit()
         return
 
@@ -243,9 +263,9 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
 
     single_failures = []
     double_failures = []
-    for buildername in build_results:
-        passes = [x for x in build_results[buildername] if x['status'] == 0]
-        fails = [x for x in build_results[buildername] if x['status'] in [1, 2]]
+    for builder in build_results:
+        passes = [x for x in build_results[builder] if x['status'] == 0]
+        fails = [x for x in build_results[builder] if x['status'] in [1, 2]]
         #TODO: cancelled jobs imply cancel autoland
 
         if len(fails) == 1 and not passes:
@@ -257,16 +277,19 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
 
     # if there are double failures, the autoland request has failed
     if double_failures:
-        return handle_failure(logger, dbconn, tree, rev, bugid, double_failures)
+        return handle_failure(logger, dbconn, tree, rev, bugid,
+                              double_failures)
 
     # single failures need to be retried
     for failure in single_failures:
         buildername, build_id = failure
-        handle_single_failure(logger, auth, dbconn, tree, rev, buildername, build_id)
+        handle_single_failure(logger, auth, dbconn, tree, rev, buildername,
+                              build_id)
 
     # if no failures, we can land
     if not single_failures:
         return handle_can_be_landed(logger, dbconn, tree, rev)
+
 
 def add_bugzilla_comment(dbconn, bugid, comment):
     cursor = dbconn.cursor()
@@ -274,6 +297,7 @@ def add_bugzilla_comment(dbconn, bugid, comment):
                values(%s, %s)"""
     cursor.execute(query, (bugid, comment))
     dbconn.commit()
+
 
 def handle_pending_bugzilla_comments(logger, dbconn):
     cursor = dbconn.cursor()
@@ -299,9 +323,11 @@ def handle_pending_bugzilla_comments(logger, dbconn):
     cursor.executemany(query, to_delete)
     dbconn.commit()
 
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dsn', default='dbname=autoland user=autoland host=localhost password=autoland',
+    dsn = 'dbname=autoland user=autoland host=localhost password=autoland'
+    parser.add_argument('--dsn', default=dsn,
                         help="Postgresql DSN connection string")
     commandline.add_logging_group(parser)
     args = parser.parse_args()
@@ -358,6 +384,7 @@ def main():
         except:
             t, v, tb = sys.exc_info()
             logger.error('\n'.join(traceback.format_exception(t, v, tb)))
+
 
 if __name__ == "__main__":
     main()

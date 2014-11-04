@@ -27,9 +27,11 @@ dbconn = None
 logger = None
 message_log_path = None
 
+
 def read_credentials():
     user, passwd = open('credentials/pulse.txt').read().strip().split(',')
     return (user, passwd)
+
 
 def is_known_autoland_job(dbconn, tree, rev):
     cursor = dbconn.cursor()
@@ -43,6 +45,7 @@ def is_known_autoland_job(dbconn, tree, rev):
                            'rev': rev})
     row = cursor.fetchone()
     return row is not None
+
 
 def handle_message(data, message):
     message.ack()
@@ -102,8 +105,15 @@ def handle_message(data, message):
             if is_known_autoland_job(dbconn, tree, rev):
                 logger.info('updating autoland job: %s %s' % (tree, rev))
 
-                pending, running, builds = selfserve.jobs_for_revision(auth, tree, rev)
-                logger.info('pending: %d running: %d builds: %d' % (len(pending), len(running), len(builds)))
+                pending, running, builds = selfserve.jobs_for_revision(auth,
+                                                                       tree,
+                                                                       rev)
+
+                npending = len(pending)
+                nrunning = len(running)
+                nbuilds = len(builds)
+                logger.info('pending: %d running: %d builds: %d' %
+                            (npending, nrunning, nbuilds))
 
                 query = """
                     update Autoland set pending=%s,
@@ -111,8 +121,11 @@ def handle_message(data, message):
                     where tree=%s
                     and substring(revision, 0, %s)=%s"""
                 cursor = dbconn.cursor()
-                cursor.execute(query, (len(pending), len(running), len(builds), datetime.datetime.now(), tree, len(rev) + 1, rev))
+                cursor.execute(query, (npending, nrunning, nbuilds,
+                               datetime.datetime.now(), tree,
+                               len(rev) + 1, rev))
                 dbconn.commit()
+
 
 def main():
     global auth
@@ -121,7 +134,8 @@ def main():
     global message_log_path
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dsn', default='dbname=autoland user=autoland host=localhost password=autoland',
+    dsn = 'dbname=autoland user=autoland host=localhost password=autoland'
+    parser.add_argument('--dsn', default=dsn,
                         help='Postgresql DSN connection string')
     parser.add_argument('--message-log-path', default=None,
                         help='Path to which to log received messages')
@@ -145,7 +159,8 @@ def main():
     user, password = read_credentials()
 
     unique_label = 'autoland-%s' % platform.node()
-    pulse = consumers.BuildConsumer(applabel=unique_label, user=user, password=password)
+    pulse = consumers.BuildConsumer(applabel=unique_label, user=user,
+                                    password=password)
     pulse.configure(topic=['build.#.started', 'build.#.finished'],
                     callback=handle_message)
     logger.debug('applabel: %s' % unique_label)
@@ -156,6 +171,7 @@ def main():
             logger.error('pulse error: ' + str(e))
         except IOError as e:
             logger.error('pulse error: ' + str(e))
+
 
 if __name__ == '__main__':
     main()

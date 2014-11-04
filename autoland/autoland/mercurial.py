@@ -3,6 +3,7 @@ import requests
 
 MERCURIAL_URL = 'http://hg.mozilla.org'
 
+
 def get_pushlog(tree, rev):
     url = MERCURIAL_URL + '/' + tree + '/json-pushes?changeset=' + rev
 
@@ -12,6 +13,7 @@ def get_pushlog(tree, rev):
         return
     if r.status_code == 200:
         return json.loads(r.text)
+
 
 def get_pushloghtml(tree, rev):
     url = MERCURIAL_URL + '/' + tree + '/pushloghtml?changeset=' + rev
@@ -23,6 +25,7 @@ def get_pushloghtml(tree, rev):
     if r.status_code == 200:
         return r.text
 
+
 def get_raw_revision(tree, rev):
     url = MERCURIAL_URL + '/' + tree + '/raw-rev/' + rev
     try:
@@ -31,6 +34,7 @@ def get_raw_revision(tree, rev):
         return
     if r.status_code == 200:
         return r.text
+
 
 def get_changesets(tree, pushlog):
     changesets = {}

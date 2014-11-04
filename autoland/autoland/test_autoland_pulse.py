@@ -7,9 +7,13 @@ import responses
 
 import autoland_pulse
 
+DSN = 'dbname=testautoland user=autoland host=localhost password=autoland'
+
+
 class DummyMessage(object):
     def ack(self):
         pass
+
 
 class TestAutolandPulse(unittest.TestCase):
 
@@ -19,8 +23,7 @@ class TestAutolandPulse(unittest.TestCase):
         self.dbconn.commit()
 
     def setUp(self):
-        dsn = 'dbname=testautoland user=autoland host=localhost password=autoland'
-        self.dbconn = psycopg2.connect(dsn)
+        self.dbconn = psycopg2.connect(DSN)
         self.clear_database()
 
         autoland_pulse.dbconn = self.dbconn
@@ -39,7 +42,8 @@ class TestAutolandPulse(unittest.TestCase):
         # we need to match "short" revisions against the full string
         for i in xrange(0, len(rev) + 1):
             short = rev[:i]
-            known = autoland_pulse.is_known_autoland_job(self.dbconn, tree, short)
+            known = autoland_pulse.is_known_autoland_job(self.dbconn, tree,
+                                                         short)
             self.assertTrue(known, "%s should be a known revision" % short)
 
         # and other revisions shouldn't match
@@ -49,7 +53,8 @@ class TestAutolandPulse(unittest.TestCase):
                 'd774d40a0521',
                 'd28403874a13']
         for rev in revs:
-            known = autoland_pulse.is_known_autoland_job(self.dbconn, tree, rev)
+            known = autoland_pulse.is_known_autoland_job(self.dbconn, tree,
+                                                         rev)
             self.assertFalse(known, '%s should not be a known revision' % rev)
 
     @responses.activate
@@ -59,11 +64,11 @@ class TestAutolandPulse(unittest.TestCase):
         with open('test-data/selfserve-jobs-for-revision.html') as f:
             jobs_for_revision = f.read()
         responses.add(responses.GET, 'https://secure.pub.build.mozilla.org/buildapi/self-serve/try/rev/7dda5def66faf5d9d0173aed32d33c964247daf3',
-            body=jobs_for_revision, status=200,
-            content_type='application/json', match_querystring=True)
+                      body=jobs_for_revision, status=200,
+                      content_type='application/json', match_querystring=True)
         responses.add(responses.GET, 'https://secure.pub.build.mozilla.org/buildapi/self-serve/try/rev/7dda5def66fa',
-            body=jobs_for_revision, status=200,
-            content_type='application/json', match_querystring=True)
+                      body=jobs_for_revision, status=200,
+                      content_type='application/json', match_querystring=True)
 
         # read and replay canned messages
         cursor = self.dbconn.cursor()
@@ -74,7 +79,8 @@ class TestAutolandPulse(unittest.TestCase):
 
             cursor.execute('select pending,running,builds from Autoland')
             if i < 176:
-                self.assertEqual(cursor.rowcount, 0, 'should be no autoland jobs')
+                self.assertEqual(cursor.rowcount, 0,
+                                 'should be no autoland jobs')
             else:
                 self.assertEqual(cursor.rowcount, 1, 'autoland job not found')
                 pending, running, builds = cursor.fetchone()

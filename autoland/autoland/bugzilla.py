@@ -3,6 +3,7 @@ import requests
 
 BUGZILLA_URL = 'https://bugzilla.mozilla.org'
 
+
 def login():
     user, passwd = open('credentials/bugzilla.txt').read().strip().split(',')
     url = BUGZILLA_URL + '/rest/login?login=' + user + '&password=' + passwd
@@ -13,6 +14,7 @@ def login():
             return token
     except requests.exceptions.ConnectionError:
         pass
+
 
 def add_comment(token, bugid, comment):
     url = BUGZILLA_URL + '/rest/bug/' + bugid + '/comment' + '?token=' + token
