@@ -122,7 +122,7 @@ to ``MozReview``.
 There are multiple code review repositories. There is typically one per
 repository that wishes to have code reviewed.
 
-You will want to define a named path in your per-repository ``.hg/hrc``
+You will want to define a named path in your per-repository ``.hg/hgrc``
 to the code review Mercurial repository. We recommend the name
 ``review``. The URL for the repository should be
 ``ssh://reviewboard-hg.mozilla.org/<repo>`` where ``<repo>`` is
