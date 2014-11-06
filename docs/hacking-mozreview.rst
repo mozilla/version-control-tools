@@ -187,6 +187,12 @@ Found a bug in MozReview or want to create a bug to track an
 improvement? File bugs against ``Developer Services :: MozReview``
 at https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview.
 
+Discussion
+==========
+
+General discussion on MozReview development and direction occurs on
+our mailing list, `mozilla-code-review@googlegroups.com <mailto:mozilla-code-review@googlegroups.com>`_.
+
 Releasing Updates
 =================
 

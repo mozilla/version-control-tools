@@ -58,6 +58,7 @@ If you prefer IRC, join ``#mozreview`` ``irc.mozilla.org``.
 
 If you prefer email, send one to
 `mozilla-code-review@googlegroups.com <mailto:mozilla-code-review@googlegroups.com>`_.
+This is also our general development mailing list.
 
 Adding Review Repositories
 ==========================
