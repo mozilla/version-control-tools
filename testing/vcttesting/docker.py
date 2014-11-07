@@ -13,6 +13,7 @@ import json
 import os
 import requests
 import socket
+import ssl
 import subprocess
 import sys
 import tarfile
@@ -64,7 +65,8 @@ def params_from_env(env):
         # Hostnames will attempt to be verified by default. We don't know what
         # the hostname should be, so don't attempt it.
         tls = docker.tls.TLSConfig(client_cert=(tls_cert_path, tls_key_path),
-                ca_cert=ca_path, verify=True, assert_hostname=False)
+                ssl_version=ssl.PROTOCOL_TLSv1, ca_cert=ca_path, verify=True,
+                assert_hostname=False)
 
     # docker-py expects the protocol to have something TLS in it. tcp:// won't
     # work. Hack around it until docker-py works as expected.
