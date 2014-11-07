@@ -24,7 +24,7 @@ feedparser==5.1.3
 futures==2.1.6
 mach==0.4
 markupsafe==0.23
-mercurial==3.0.1
+mercurial==3.2
 mimeparse==0.1.3
 mock==1.0.1
 mozfile==1.1
