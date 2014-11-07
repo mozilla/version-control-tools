@@ -23,34 +23,29 @@ Set up the repo
   adding foo
   $ echo 'anonymous head' > foo
   $ hg commit -m 'anonymous head'
-  $ hg up -r 0
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg up -q -r 0
   $ echo 'with parseable id' > foo
   $ hg commit -m 'Bug 4 - Test identifier'
   created new head
-  $ hg up -r 0
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg up -q -r 0
   $ hg bookmark bookmark-1
   $ echo 'bookmark-1' > foo
   $ hg commit -m 'bookmark with single commit'
   created new head
-  $ hg up -r 0
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg up -q -r 0
   $ hg bookmark bookmark-2
   $ echo 'bookmark-2a' > foo
   $ hg commit -m 'bookmark with 2 commits, 1st'
   created new head
   $ echo 'bookmark-2b' > foo
   $ hg commit -m 'bookmark with 2 commits, 2nd'
-  $ hg up -r 0
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg up -q -r 0
   $ hg branch test-branch
   marked working directory as branch test-branch
   (branches are permanent and global, did you want a bookmark?)
   $ echo 'branch' > foo
   $ hg commit -m 'branch with single commit'
-  $ hg up -r 0
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg up -q -r 0
 
 Seed the root changeset on the server
 
@@ -186,11 +181,11 @@ Specifying multiple -r for the same head works
 
 Reviewing merge commits is rejected
 
-  $ hg up -r 0 > /dev/null
+  $ hg up -q -r 0
   $ echo merge1 > foo
   $ hg commit -m 'Bug 1 - Merge A'
   created new head
-  $ hg up -r 0 > /dev/null
+  $ hg up -q -r 0
   $ echo merge2 > foo
   $ hg commit -m 'Bug 1 - Merge B'
   created new head
