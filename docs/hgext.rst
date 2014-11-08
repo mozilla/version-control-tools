@@ -41,6 +41,8 @@ firefoxtree
 The firefoxtree extension makes working with the various Firefox
 repositories much more pleasant.
 
+For more, read :ref:`it's documentation <firefoxtree>`.
+
 mozext
 ------
 

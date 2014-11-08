@@ -12,3 +12,4 @@ to the right place!
 
    installing
    extensions
+   firefoxtree
