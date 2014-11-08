@@ -71,10 +71,6 @@ and push operations.
 
 This feature is similar to Git remote refs.
 
-If the config bool ``refs_as_bookmarks`` is True, remote references will be
-stored in the repo's bookmarks file. This is useful for hosted unified
-repositories.
-
 Static Analysis
 ===============
 
@@ -277,17 +273,6 @@ mozext.reject_pushes_with_repo_names
    and ``inbound/foobar`` will be rejected because they begin with the names
    of official Mozilla repositories. However, pushes to the bookmark
    ``gps/test`` will be allowed.
-
-mozext.refs_as_bookmarks
-   If enabled, this boolean flag will cause remote keys to be added to
-   the local repository's bookmarks during push and pull operations. This
-   is most useful on servers, as remote keys/refs are typically only
-   created dynamically at run-time via a mechanism independent of
-   bookmarks.
-
-mozext.skip_relbranch_bookmarks
-   If enabled, this boolean flag will cause refs_as_bookmarks to ignore
-   "release branches" from creeping into bookmarks.
 """
 
 import calendar
@@ -1394,11 +1379,6 @@ def reposetup(ui, repo):
                 raise util.Abort(e.message)
 
         def _update_remote_refs(self, remote, tree):
-            mb = self.ui.configbool('mozext', 'refs_as_bookmarks',
-                default=False)
-            ignore_relbranch = self.ui.configbool('mozext',
-                'skip_relbranch_bookmarks', default=False)
-
             existing_refs = set()
             incoming_refs = set()
 
@@ -1410,7 +1390,7 @@ def reposetup(ui, repo):
                 # Don't store RELBRANCH refs for non-release trees, as they are
                 # meaningless and cruft from yesteryear.
                 if branch.endswith('RELBRANCH'):
-                    if ignore_relbranch or tree not in TREE_ALIASES['releases']:
+                    if tree not in TREE_ALIASES['releases']:
                         continue
 
                 ref = '%s/%s' % (tree, branch)
@@ -1419,9 +1399,6 @@ def reposetup(ui, repo):
                 for node in nodes:
                     self.remoterefs[ref] = node
 
-                    if mb:
-                        self._bookmarks[ref] = node
-
             # Prune old refs.
             for ref in existing_refs - incoming_refs:
                 try:
@@ -1429,16 +1406,7 @@ def reposetup(ui, repo):
                 except KeyError:
                     pass
 
-                if mb:
-                    try:
-                        del self._bookmarks[ref]
-                    except KeyError:
-                        pass
-
             self.remoterefs.write()
-
-            if mb:
-                self._bookmarks.write()
 
         def _revision_milestone(self, rev):
             """Look up the Gecko milestone of a revision."""
