@@ -12,4 +12,5 @@ to the right place!
 
    installing
    extensions
+   bookmarks
    firefoxtree
