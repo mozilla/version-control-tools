@@ -1393,22 +1393,6 @@ def reposetup(ui, repo):
             except Exception as e:
                 raise util.Abort(e.message)
 
-        # Resolve remote ref symbols. For some reason, we need both lookup
-        # and findtags implemented.
-        def lookup(self, key):
-            try:
-                key = self.remoterefs[key]
-            except (KeyError, TypeError):
-                pass
-
-            return orig_lookup(key)
-
-        def _findtags(self):
-            tags, tagtypes = orig_findtags()
-            tags.update(self.remoterefs)
-
-            return tags, tagtypes
-
         def _update_remote_refs(self, remote, tree):
             mb = self.ui.configbool('mozext', 'refs_as_bookmarks',
                 default=False)
