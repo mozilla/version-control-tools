@@ -348,7 +348,7 @@ from mozautomation.repository import (
 
 bz_available = False
 
-testedwith = '3.0 3.1'
+testedwith = '3.0 3.1 3.2'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial:%20mozext'
 
 commands.norepo += ' cloneunified moztrees treestatus'
