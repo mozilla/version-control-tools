@@ -65,13 +65,10 @@ def wrap_env():
 class MozReviewBoard(object):
     """Interact with a Mozilla-flavored Review Board install."""
 
-    def __init__(self, path, bugzilla_url=None, username=None,
-                 password=None):
+    def __init__(self, path, bugzilla_url=None):
         self.path = os.path.abspath(path)
         self.manage = [sys.executable, '-m', 'reviewboard.manage']
         self.bugzilla_url = bugzilla_url
-        self.username = username
-        self.password = password
 
     def create(self):
         """Install Review Board."""
@@ -168,13 +165,6 @@ class MozReviewBoard(object):
         sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % self.bugzilla_url)
 
         sc.save()
-
-        from rbbz.auth import BugzillaBackend
-        backend = BugzillaBackend()
-        admin = backend.authenticate(self.username, self.password)
-        admin.is_staff = True
-        admin.is_superuser = True
-        admin.save()
 
     def _start(self, port):
         port = str(port)
