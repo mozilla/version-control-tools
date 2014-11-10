@@ -12,8 +12,8 @@
   > rebase=
   > EOF
 
-  $ bugzilla create-bug-range TestProduct TestComponent 5
-  created 5 bugs
+  $ bugzilla create-bug-range TestProduct TestComponent 6
+  created 6 bugs
 
 Set up the repo
 
@@ -176,6 +176,23 @@ Specifying multiple -r for the same head works
   
   review id:  bz://5/mynick
   review url: http://localhost:$HGPORT1/r/9 (pending)
+  (visit review url to publish this review request so others can see it)
+  [1]
+
+Specifying a revision range works
+
+  $ hg push -r 0::1 --reviewid 6 ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  submitting 1 changesets for review
+  
+  changeset:  1:6f06b4ac6efe
+  summary:    anonymous head
+  review:     http://localhost:$HGPORT1/r/12 (pending)
+  
+  review id:  bz://6/mynick
+  review url: http://localhost:$HGPORT1/r/11 (pending)
   (visit review url to publish this review request so others can see it)
   [1]
 
