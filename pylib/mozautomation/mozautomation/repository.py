@@ -30,6 +30,8 @@ TREE_ALIASES = {
     'mozilla-beta': ('beta',),
     'mozilla-b2g18': ('b2g18',),
     'b2g-inbound': ('b2ginbound',),
+    'b2g': ('b2ginbound',),
+    'b-i': ('b2ginbound',),
     'comm-central': ('comm',),
     'c-c': ('comm',),
 
