@@ -692,8 +692,18 @@ def reposetup(ui, repo):
 
     def prepushoutgoinghook(local, remote, outgoing):
         if remote.capable('reviewboard'):
+            # We can't simply look at outgoing.missingheads here because
+            # Mercurial treats all revisions to `hg push` as "heads" in the
+            # context of discovery. This is arguably a bug in Mercurial and may
+            # be changed. This behavior was last observed in 3.2. So, in the
+            # case of multiple missing heads, we run things through the DAG,
+            # just in case.
             if len(outgoing.missingheads) > 1:
-                raise util.Abort(_('cannot push multiple heads to remote; limit '
-                                   'pushed revisions using the -r argument.'))
+                # "%ln" is internal revset syntax for "a list of binary nodes."
+                realmissingheads = local.revs('children(%ln) & head()',
+                    outgoing.missingheads)
+                if len(realmissingheads) > 1:
+                    raise util.Abort(_('cannot push multiple heads to remote; '
+                        'limit pushed revisions using the -r argument.'))
 
     repo.prepushoutgoinghooks.add('reviewboard', prepushoutgoinghook)
