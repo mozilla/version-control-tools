@@ -28,14 +28,16 @@ TREE_ALIASES = {
     'mozilla-release': ('release',),
     'mozilla-aurora': ('aurora',),
     'mozilla-beta': ('beta',),
-    'mozilla-b2g18': ('b2g18',),
+    'mozilla-b2g32': ('b2g32',),
+    'mozilla-b2g34': ('b2g34',),
     'b2g-inbound': ('b2ginbound',),
     'b2g': ('b2ginbound',),
     'b-i': ('b2ginbound',),
     'comm-central': ('comm',),
     'c-c': ('comm',),
 
-    'releases': ('esr17', 'b2g18', 'esr24', 'b2g26', 'b2g28', 'esr31', 'release', 'beta', 'aurora', 'central'),
+    'releases': ('esr17', 'b2g18', 'esr24', 'b2g26', 'b2g28', 'b2g30', 'esr31',
+        'b2g32', 'b2g34', 'release', 'beta', 'aurora', 'central'),
     'integration': ('inbound', 'fx-team', 'services', 'build', 'b2ginbound'),
     'twigs': ('alder', 'ash', 'birch', 'cedar', 'cypress', 'date', 'elm',
         'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine'),
@@ -57,6 +59,9 @@ REPOS = {
     'b2g18': 'releases/mozilla-b2g18',
     'b2g26': 'releases/mozilla-b2g26_v1_2',
     'b2g28': 'releases/mozilla-b2g28_v1_3',
+    'b2g30': 'releases/mozilla-b2g30_v1_4',
+    'b2g32': 'releases/mozilla-b2g32_v2_0',
+    'b2g34': 'releases/mozilla-b2g34_v2_1',
 
     # Integration repositories.
     'b2ginbound': 'integration/b2g-inbound',
@@ -110,9 +115,12 @@ RELEASE_TREES = set([
     'b2g18',
     'esr17',
     'esr24',
-    'esr31',
     'b2g26',
     'b2g28',
+    'b2g30',
+    'esr31',
+    'b2g32',
+    'b2g34',
 ])
 
 
