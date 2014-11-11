@@ -349,13 +349,15 @@ def on_review_publishing(user, review, **kwargs):
                                      {"user": user})
     b = Bugzilla(user.bzlogin, user.bzcookie)
 
-    if review.ship_it and is_review_request_squashed(review_request):
-        b.r_plus_attachment(bug_id, review.user.email, comment,
-                            review_or_request_url(review_request, site,
-                                                  siteconfig))
-    else:
-        b.post_comment(bug_id, comment)
+    rr_url = review_or_request_url(review_request, site, siteconfig)
 
+    if review.ship_it and is_review_request_squashed(review_request):
+        b.r_plus_attachment(bug_id, review.user.email, comment, rr_url)
+    else:
+        cancelled = b.cancel_review_request(bug_id, review.user.email,
+            rr_url, comment)
+        if not cancelled and comment:
+            b.post_comment(bug_id, comment)
 
 @bugzilla_to_publish_errors
 def on_reply_publishing(user, reply, **kwargs):

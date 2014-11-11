@@ -223,20 +223,21 @@ class Bugzilla(object):
                 in self.proxy.Bug.attachments(params)['bugs'][str(bug_id)]
                 if a['content_type'] == 'text/x-review-board-request']
 
+    def _get_review_request_attachment(self, bug_id, rb_url):
+        """Obtain a Bugzilla attachment for a review request."""
+        for a in self.get_rb_attachments(bug_id):
+            if a.get('data') == rb_url:
+                return a
+
+        return None
+
     @xmlrpc_to_bugzilla_errors
     def r_plus_attachment(self, bug_id, reviewer, comment, rb_url):
         """Set a review flag to "+"."""
 
         logging.info('r+ from %s on bug %d.' % (reviewer, bug_id))
 
-        rb_attachment = None
-        attachments = self.get_rb_attachments(bug_id)
-
-        for a in attachments:
-            if a.get('data') == rb_url:
-                rb_attachment = a
-                break
-
+        rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
         if not rb_attachment:
             return
 
@@ -262,6 +263,43 @@ class Bugzilla(object):
         # so until that bug is fixed, we sent the comment separately, after
         # setting the flag.
         self.post_comment(bug_id, comment)
+
+    @xmlrpc_to_bugzilla_errors
+    def cancel_review_request(self, bug_id, reviewer, rb_url, comment=None):
+        """Cancel a r? flag on a Bugzilla attachment while maybe adding a comment.
+
+        We return a boolean indicating whether we cancelled a review request.
+        This is so callers can do something with the comment (which won't get
+        posted unless the review flag was cleared).
+        """
+        logging.info('maybe cancelling r? from %s on bug %d.' % (reviewer, bug_id))
+
+        rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
+
+        if not rb_attachment:
+            return False
+
+        flags = rb_attachment.get('flags', [])
+        new_flag = {'name': 'review', 'status': 'X'}
+
+        for f in flags:
+            logging.info("Flag %s" % f)
+            if f['name'] == 'review' and f.get('requestee') == reviewer:
+                new_flag['id'] = f['id']
+                break
+        else:
+            return False
+
+        params = {
+            'ids': [rb_attachment['id']],
+            'flags': [new_flag],
+        }
+
+        if comment:
+            params['comment'] = comment
+
+        self.proxy.Bug.update_attachment(params)
+        return True
 
     @xmlrpc_to_bugzilla_errors
     def obsolete_review_attachments(self, bug_id, rb_url):
