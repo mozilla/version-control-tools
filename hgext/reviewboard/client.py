@@ -140,8 +140,20 @@ def wrappedpushbookmark(orig, pushop):
         return result
 
     reviewnode = None
+    basenode = None
     if pushop.revs:
-        reviewnode = repo[pushop.revs[-1]].node()
+        # Our prepushoutgoing hook validates that all pushed changesets are
+        # part of the same DAG head. If revisions were specified by the user,
+        # the last is the tip commit to review and the first (if more than 1)
+        # is the base commit to review.
+        #
+        # Note: the revisions are in the order they were specified by the user.
+        # This may not be DAG order. So we have to explicitly order them here.
+        revs = sorted(repo[r].rev() for r in pushop.revs)
+        reviewnode = repo[revs[-1]].node()
+        if len(revs) > 1:
+            basenode = repo[revs[0]].node()
+
     elif pushop.outgoing.missing:
         reviewnode = pushop.outgoing.missing[-1]
     else:
@@ -151,15 +163,17 @@ def wrappedpushbookmark(orig, pushop):
 
     assert reviewnode
 
-    doreview(repo, ui, pushop.remote, reviewnode)
+    doreview(repo, ui, pushop.remote, reviewnode, basenode=basenode)
 
     return result
 
-def doreview(repo, ui, remote, reviewnode):
+def doreview(repo, ui, remote, reviewnode, basenode=None):
     """Do the work of submitting a review to a remote repo.
 
     :remote is a peerrepository.
     :reviewnode is the node of the tip to review.
+    :basenode is the bottom node to review. If not specified, we will review
+    all non-public ancestors of :reviewnode.
     """
     assert remote.capable('reviewboard')
 
@@ -169,16 +183,26 @@ def doreview(repo, ui, remote, reviewnode):
         return
 
     # Given a tip node, we need to find all changesets to review.
+    #
     # A solution that works most of the time is to find all non-public
-    # ancestors of that node.
+    # ancestors of that node. This is our default.
+    #
+    # If basenode is specified, we stop the traversal when we encounter it.
+    #
+    # Note that we will still refuse to review a public changeset even with
+    # basenode. This decision is somewhat arbitrary and can be revisited later
+    # if there is an actual need to review public changesets.
     nodes = [reviewnode]
     for node in repo[reviewnode].ancestors():
         ctx = repo[node]
+
         if ctx.phase() == phases.public:
             break
-        nodes.insert(0, ctx.node())
+        if basenode and ctx.node() == basenode:
+            nodes.insert(0, ctx.node())
+            break
 
-    # TODO need ability to manually override review nodes.
+        nodes.insert(0, ctx.node())
 
     identifier = None
 

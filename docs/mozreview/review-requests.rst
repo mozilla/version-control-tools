@@ -24,12 +24,31 @@ commit (``.``) and any of its parents that haven't landed yet.
    The selection of commits for review is equivalent to the Mercurial
    revset query ``::. and draft()``.
 
-If you would like to control which commits are reviewed, specify ``-r
-<rev>``. e.g.::
+If you would like to control which commits are reviewed, you can pass ``-r
+<rev>`` to specify an explicit *tip* and/or *base* commit.
+
+With 1 revision specified, you define the *top-most* commit to be reviewed.::
 
   $ hg push -r 77c9ee75117e review
   or
   $ hg push -r 32114 review
+
+With 2 revisions or a revset that evaluates to multiple revisions, you define
+both the *base* and *tip* commits to review.::
+
+  $ hg push -r 84e8a1584aad::b55f2b9937c7 review
+  or
+  $ hg push -r 520::524 review
+
+.. hint::
+
+   The 2 revision form is useful if you have multiple, distinct review series
+   building on top of each other. You have a commit relying on changes made by
+   an earlier one but you want to keep the reviews separate.
+
+   The default selection of all non-public ancestors would include the parent
+   commit(s) against your desires. Specifying an explicit base revision
+   will keep your intentions clear.
 
 If all goes well, Mercurial should print information about submitted
 review requests. e.g.::

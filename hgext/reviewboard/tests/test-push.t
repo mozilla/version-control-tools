@@ -12,8 +12,8 @@
   > rebase=
   > EOF
 
-  $ bugzilla create-bug-range TestProduct TestComponent 6
-  created 6 bugs
+  $ bugzilla create-bug-range TestProduct TestComponent 9
+  created 9 bugs
 
 Set up the repo
 
@@ -193,6 +193,93 @@ Specifying a revision range works
   
   review id:  bz://6/mynick
   review url: http://localhost:$HGPORT1/r/11 (pending)
+  (visit review url to publish this review request so others can see it)
+  [1]
+
+Specifying a base revision limits reviewed changesets
+
+  $ hg up -q -r 0
+  $ echo ignore > foo
+  $ hg -q commit -m 'Ignore this commit'
+  $ echo base > foo
+  $ hg commit -m 'Review base'
+  $ echo middle > foo
+  $ hg commit -m 'Middle commit'
+  $ echo tip > foo
+  $ hg commit -m 'Review tip'
+
+  $ hg push -r 84e8a1584aad::b55f2b9937c7 --reviewid 7 ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 4 changesets with 4 changes to 1 files (+1 heads)
+  submitting 3 changesets for review
+  
+  changeset:  8:84e8a1584aad
+  summary:    Review base
+  review:     http://localhost:$HGPORT1/r/14 (pending)
+  
+  changeset:  9:ae66c8223052
+  summary:    Middle commit
+  review:     http://localhost:$HGPORT1/r/15 (pending)
+  
+  changeset:  10:b55f2b9937c7
+  summary:    Review tip
+  review:     http://localhost:$HGPORT1/r/16 (pending)
+  
+  review id:  bz://7/mynick
+  review url: http://localhost:$HGPORT1/r/13 (pending)
+  (visit review url to publish this review request so others can see it)
+
+Specifying multiple -r arguments selects base and tip
+
+  $ hg push -r 84e8a1584aad -r b55f2b9937c7 --reviewid 8 ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  submitting 3 changesets for review
+  
+  changeset:  8:84e8a1584aad
+  summary:    Review base
+  review:     http://localhost:$HGPORT1/r/18 (pending)
+  
+  changeset:  9:ae66c8223052
+  summary:    Middle commit
+  review:     http://localhost:$HGPORT1/r/19 (pending)
+  
+  changeset:  10:b55f2b9937c7
+  summary:    Review tip
+  review:     http://localhost:$HGPORT1/r/20 (pending)
+  
+  review id:  bz://8/mynick
+  review url: http://localhost:$HGPORT1/r/17 (pending)
+  (visit review url to publish this review request so others can see it)
+  [1]
+
+Specifying multiple -r in reverse order still works
+
+  $ hg push -r b55f2b9937c7 -r 84e8a1584aad --reviewid 9 ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  submitting 3 changesets for review
+  
+  changeset:  8:84e8a1584aad
+  summary:    Review base
+  review:     http://localhost:$HGPORT1/r/22 (pending)
+  
+  changeset:  9:ae66c8223052
+  summary:    Middle commit
+  review:     http://localhost:$HGPORT1/r/23 (pending)
+  
+  changeset:  10:b55f2b9937c7
+  summary:    Review tip
+  review:     http://localhost:$HGPORT1/r/24 (pending)
+  
+  review id:  bz://9/mynick
+  review url: http://localhost:$HGPORT1/r/21 (pending)
   (visit review url to publish this review request so others can see it)
   [1]
 
