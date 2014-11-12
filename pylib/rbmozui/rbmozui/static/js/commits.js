@@ -235,8 +235,8 @@ $(document).ready(function() {
            */
           var aUsername = a.data.username,
               bUsername = b.data.username,
-              aFullname = a.data.fullname,
-              bFullname = a.data.fullname;
+              aFullname = a.data.fullname || "",
+              bFullname = a.data.fullname || "";
 
           if (aUsername.indexOf(term) === 0) {
               if (bUsername.indexOf(term) === 0) {
