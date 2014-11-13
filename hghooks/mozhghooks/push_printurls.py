@@ -95,17 +95,6 @@ def hook(ui, repo, node, hooktype, **kwargs):
     rev = repo.changectx(node).rev()
     tip = repo.changectx('tip').rev()
 
-    # For try repositories, output a results dashboard url rather than the pushlog.
-    if repo_name in ['try', 'try-comm-central']:
-        tip_node = short(repo.changectx(tip).node())
-        # TBPL uses alternative names that don't match buildbot or hg.
-        tbpl_name = 'Thunderbird-Try' if repo_name == 'try-comm-central' else 'Try'
-        print 'You can view the progress of your build at the following URL:'
-        print '  https://treeherder.mozilla.org/ui/#/jobs?repo=%s&revision=%s' % (repo_name, tip_node)
-        print 'Alternatively, view them on TBPL (soon to be deprecated):'
-        print '  https://tbpl.mozilla.org/?tree=%s&rev=%s' % (tbpl_name, tip_node)
-        return 0
-
     num_changes = tip + 1 - rev
     url = 'https://hg.mozilla.org/' + hgNameToRevURL[repo_name]
 
@@ -120,5 +109,15 @@ def hook(ui, repo, node, hooktype, **kwargs):
         tip_node = short(repo.changectx(tip).node())
         print 'You can view the pushlog for your changes at the following URL:'
         print '  %spushloghtml?changeset=%s' % (url, tip_node)
+
+    # For try repositories, also output a results dashboard url.
+    if repo_name in ['try', 'try-comm-central']:
+        tip_node = short(repo.changectx(tip).node())
+        # TBPL uses alternative names that don't match buildbot or hg.
+        tbpl_name = 'Thunderbird-Try' if repo_name == 'try-comm-central' else 'Try'
+        print 'You can view the progress of your build at the following URL:'
+        print '  https://treeherder.mozilla.org/ui/#/jobs?repo=%s&revision=%s' % (repo_name, tip_node)
+        print 'Alternatively, view them on TBPL (soon to be deprecated):'
+        print '  https://tbpl.mozilla.org/?tree=%s&rev=%s' % (tbpl_name, tip_node)
 
     return 0

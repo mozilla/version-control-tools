@@ -49,6 +49,8 @@ Pushing a changeset to Try prints Treeherder and TBPL URLs
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+  You can view your change at the following URL:
+    https://hg.mozilla.org/try/rev/3d7d3272d708
   You can view the progress of your build at the following URL:
     https://treeherder.mozilla.org/ui/#/jobs?repo=try&revision=3d7d3272d708
   Alternatively, view them on TBPL (soon to be deprecated):
@@ -63,6 +65,8 @@ try-comm-central is also special
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+  You can view your change at the following URL:
+    https://hg.mozilla.org/try-comm-central/rev/3d7d3272d708
   You can view the progress of your build at the following URL:
     https://treeherder.mozilla.org/ui/#/jobs?repo=try-comm-central&revision=3d7d3272d708
   Alternatively, view them on TBPL (soon to be deprecated):
