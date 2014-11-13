@@ -25,6 +25,11 @@ make -C docs html
 rm -rf /version-control-tools/sphinx-docs
 mv docs/_build /version-control-tools/sphinx-docs
 
+# Generate Python eggs for Review Board extensions.
+rm -rf /version-control-tools/eggs
+mkdir /version-control-tools/eggs
+DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-reviewboard-eggs /version-control-tools/eggs
+
 # Ideally this would be part of running tests. Until then, add it here
 # so Jenkins doesn't bloat.
 DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py prune-images
