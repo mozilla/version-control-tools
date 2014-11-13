@@ -161,8 +161,17 @@ def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
             'using . to avoid pushing multiple heads\n'))
         revs = [repo['.'].node()]
 
-    return orig(repo, remote, force=force, revs=revs, newbranch=newbranch,
+    res = orig(repo, remote, force=force, revs=revs, newbranch=newbranch,
             **kwargs)
+
+    # If we push to a known tree, update the remote refs.
+    # We can ignore result of the push because updateremoterefs() doesn't care:
+    # it merely synchronizes state with the remote. Worst case it is a no-op.
+    tree = resolve_uri_to_tree(remote.url())
+    if tree:
+        updateremoterefs(repo, remote, tree.encode('utf-8'))
+
+    return res
 
 def prepushoutgoinghook(local, remote, outgoing):
     """Hook that prevents us from attempting to push multiple heads.
