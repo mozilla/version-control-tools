@@ -28,15 +28,12 @@ import os
 ALLOWED_USERS = set([
     'Callek@gmail.com',
     'arich@mozilla.com',
-    'armenzg@mozilla.com',
-    'asasaki@mozilla.com',
     'bhearsum@mozilla.com',
     'catlee@mozilla.com',
     'coop@mozilla.com',
     'dmitchell@mozilla.com',
     'hwine@mozilla.com',
     'jlund@mozilla.com',
-    'jozeller@mozilla.com',
     'jwatkins@mozilla.com',
     'jwood@mozilla.com',
     'kmoir@mozilla.com',
@@ -48,6 +45,7 @@ ALLOWED_USERS = set([
     'qfortier@mozilla.com',
     'raliiev@mozilla.com',
     'sbruno@mozilla.com',
+    'winter2718@gmail.com',
 ])
 
 
