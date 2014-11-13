@@ -6,6 +6,9 @@ import os
 import subprocess
 import sys
 
+# Unbuffer stdout.
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+
 HERE = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
 
 VAGRANT = None
