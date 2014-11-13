@@ -31,10 +31,9 @@ def totals_by_day(fh):
         totals[2] += t_cpu
 
     for date, repos in sorted(days.items()):
-        for repo in totals in sorted(repos.items()):
+        for repo, totals in sorted(repos.items()):
             print('%s\t%s\t%d\t%d\t%d' % (
                 date.isoformat(), repo, totals[0], totals[1], totals[2]))
 
 if __name__ == '__main__':
     totals_by_day(sys.stdin)
-
