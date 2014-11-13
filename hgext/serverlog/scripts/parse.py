@@ -54,7 +54,6 @@ def parse_events(fh):
 
         if action == 'BEGIN_REQUEST':
             repo, ip, url = parts[2:]
-            assert request not in requests
             requests[request] = Request(date, repo, ip, url)
 
         elif action == 'BEGIN_PROTOCOL':
