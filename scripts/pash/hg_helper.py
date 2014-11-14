@@ -203,6 +203,19 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
       fix_user_repo_perms (cname, repo_name)
       sys.exit (0)
 
+def get_and_validate_user_repo(cname, repo_name):
+    global doc_root
+    user = os.getenv('USER')
+    user_repo_dir = user.replace('@', '_')
+    rel_path = '/users/%s/%s' % (user_repo_dir, repo_name)
+    fs_path = '%s%s' % (doc_root[cname], rel_path)
+
+    if not os.path.exists(fs_path):
+        sys.stderr.write('Could not find repository at %s.\n' % rel_path)
+        sys.exit(1)
+
+    return fs_path
+
 def edit_repo_description (cname, repo_name):
     global doc_root
     user = os.getenv ('USER')
