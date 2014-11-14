@@ -224,29 +224,29 @@ def edit_repo_description (cname, repo_name):
     print 'If you need to edit the description for a top level repo, please quit now and file an IT bug for it.'
     selection = prompt_user ('Proceed?', ['yes', 'no'])
     if (selection == 'yes'):
-        if os.path.exists ('%s/users/%s/%s' % (doc_root[cname], user_repo_dir, repo_name)):
-            repo_description =  raw_input ('Enter a one line descripton for the repository: ')
-            if (repo_description != ''):
-                repo_description = escape (repo_description)
-                repo_config = ConfigParser.RawConfigParser ()
-                repo_config_file = '%s/users/%s/%s' % (doc_root[cname], user_repo_dir, repo_name) + '/.hg/hgrc'
-                if not os.path.isfile (repo_config_file):
-                    run_command ('touch ' + repo_config_file)
-                    run_command ('chown ' + user + ':scm_level_1 ' + repo_config_file)
-                if repo_config.read (repo_config_file):
-                    repo_config_file = open (repo_config_file, 'w+')
-                else:
-                    sys.stderr.write ('Could not read the hgrc file for /users/%s/%s.\n' % (user_repo_dir, repo_name))
-                    sys.stderr.write ('Please file an IT bug to troubleshoot this.')
-                    sys.exit (1)
-                if not repo_config.has_section ('web'):
-                    repo_config.add_section ('web')
-                repo_config.set ('web', 'description', repo_description)
-                repo_config.write (repo_config_file)
-                repo_config_file.close ()
+        repo_path = get_and_validate_user_repo(cname, repo_name)
+        repo_description =  raw_input ('Enter a one line descripton for the repository: ')
+        if repo_description == '':
+            return
+
+        repo_config_file = '%s/.hg/hgrc' % repo_path
+
+        repo_description = escape(repo_description)
+        repo_config = ConfigParser.RawConfigParser()
+        if not os.path.isfile(repo_config_file):
+            run_command('touch ' + repo_config_file)
+            run_command('chown ' + user + ':scm_level_1 ' + repo_config_file)
+        if repo_config.read(repo_config_file):
+            repo_config_file = open (repo_config_file, 'w+')
         else:
-            sys.stderr.write ('Could not find the repository at /users/%s/%s.\n' % (user_repo_dir, repo_name))
-            sys.exit (1)
+            sys.stderr.write('Could not read the hgrc file for /users/%s/%s.\n' % (user_repo_dir, repo_name))
+            sys.stderr.write('Please file an IT bug to troubleshoot this.')
+            sys.exit(1)
+        if not repo_config.has_section('web'):
+            repo_config.add_section('web')
+        repo_config.set('web', 'description', repo_description)
+        repo_config.write(repo_config_file)
+        repo_config_file.close()
 
 def do_delete(cname, repo_dir, repo_name, verbose=False):
     global doc_root
