@@ -216,6 +216,25 @@ def get_and_validate_user_repo(cname, repo_name):
 
     return fs_path
 
+def get_user_repo_config(repo_dir):
+    """Obtain a ConfigParser for a repository.
+
+    If the hgrc file doesn't exist, it will be created automatically.
+    """
+    user = os.getenv('USER')
+    path = '%s/.hg/hgrc' % repo_dir
+    if not os.path.isfile(path):
+        run_command('touch %s' % path)
+        run_command('chown %s:scm_level_1 %s' % (user, path))
+
+    config = ConfigParser.RawConfigParser()
+    if not config.read(path):
+        sys.stderr.write('Could not read the hgrc file for this repo\n')
+        sys.stderr.write('Please file a Developer Services :: hg.mozilla.org bug\n')
+        sys.exit(1)
+
+    return path, config
+
 def edit_repo_description (cname, repo_name):
     global doc_root
     user = os.getenv ('USER')
@@ -229,24 +248,17 @@ def edit_repo_description (cname, repo_name):
         if repo_description == '':
             return
 
-        repo_config_file = '%s/.hg/hgrc' % repo_path
-
         repo_description = escape(repo_description)
-        repo_config = ConfigParser.RawConfigParser()
-        if not os.path.isfile(repo_config_file):
-            run_command('touch ' + repo_config_file)
-            run_command('chown ' + user + ':scm_level_1 ' + repo_config_file)
-        if repo_config.read(repo_config_file):
-            repo_config_file = open (repo_config_file, 'w+')
-        else:
-            sys.stderr.write('Could not read the hgrc file for /users/%s/%s.\n' % (user_repo_dir, repo_name))
-            sys.stderr.write('Please file an IT bug to troubleshoot this.')
-            sys.exit(1)
-        if not repo_config.has_section('web'):
-            repo_config.add_section('web')
-        repo_config.set('web', 'description', repo_description)
-        repo_config.write(repo_config_file)
-        repo_config_file.close()
+
+        config_path, config = get_user_repo_config(repo_path)
+
+        if not config.has_section('web'):
+            config.add_section('web')
+
+        config.set('web', 'description', repo_description)
+
+        with open(config_path, 'w+') as fh:
+            config.write(fh)
 
 def do_delete(cname, repo_dir, repo_name, verbose=False):
     global doc_root
