@@ -20,11 +20,11 @@ def is_valid_user (mail):
     #     return 'Invalid Email Address'
     account_status = get_ldap_attribute (mail, 'hgAccountEnabled', 'ldap://ldap.db.scl3.mozilla.com')
     if account_status == 'TRUE':
-	return 1
+        return 1
     elif account_status == 'FALSE':
-	return 2
+        return 2
     else:
-	return 0
+        return 0
 
 #
 # Please be very careful when you relax/change the good_chars regular expression.
@@ -54,13 +54,13 @@ def run_hg_clone (cname, user_repo_dir, repo_name, source_repo_path, verbose=Fal
         run_command ('mkdir %s' % userdir)
       print 'Please wait.  Cloning /%s to %s' % (source_repo_path, dest_url)
       if(verbose):
-        run_command ('nohup /usr/bin/hg clone --debug --verbose --time --pull -U %s/%s %s' % 
+        run_command ('nohup /usr/bin/hg clone --debug --verbose --time --pull -U %s/%s %s' %
                      (doc_root[cname], source_repo_path, dest_dir),
                      verbose=True)
       else:
-        run_command ('nohup /usr/bin/hg clone --pull -U %s/%s %s' % 
+        run_command ('nohup /usr/bin/hg clone --pull -U %s/%s %s' %
                      (doc_root[cname], source_repo_path, dest_dir))
-         
+
       print "Clone complete."
     else:
       print 'Sorry, there is no source repo called %s.' % source_repo_path
@@ -116,7 +116,7 @@ def fix_user_repo_perms (cname, repo_name):
         run_command ('find %s/users/%s/%s -depth -type d | xargs chmod g+s' % (doc_root[cname], user_repo_dir, repo_name))
     except Exception, e:
         print "Exception %s" % (e)
-    
+
 def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo=''):
   global doc_root
   user = os.getenv ('USER')
@@ -155,7 +155,7 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
           source_repo = prompt_user ('Pick a source repo:', repo_list)
       elif (selection == 'Clone a private repository'):
         source_user = raw_input ('Please enter the e-mail address of the user owning the repo: ')
-	valid_user = is_valid_user(source_user)
+        valid_user = is_valid_user(source_user)
         if valid_user == True:
           source_user = source_user.replace ('@', '_')
         elif valid_user == False:
@@ -211,10 +211,10 @@ def edit_repo_description (cname, repo_name):
     print 'If you need to edit the description for a top level repo, please quit now and file an IT bug for it.'
     selection = prompt_user ('Proceed?', ['yes', 'no'])
     if (selection == 'yes'):
-	if os.path.exists ('%s/users/%s/%s' % (doc_root[cname], user_repo_dir, repo_name)):
+        if os.path.exists ('%s/users/%s/%s' % (doc_root[cname], user_repo_dir, repo_name)):
             repo_description =  raw_input ('Enter a one line descripton for the repository: ')
             if (repo_description != ''):
-		repo_description = escape (repo_description)
+                repo_description = escape (repo_description)
                 repo_config = ConfigParser.RawConfigParser ()
                 repo_config_file = '%s/users/%s/%s' % (doc_root[cname], user_repo_dir, repo_name) + '/.hg/hgrc'
                 if not os.path.isfile (repo_config_file):
@@ -276,14 +276,14 @@ def edit_repo (cname, repo_name, do_quick_delete):
       if action == 'Edit the description':
         edit_repo_description (cname, repo_name)
       elif action == 'Delete the repository':
-        delete_repo (cname, repo_name, False) 
+        delete_repo (cname, repo_name, False)
     return
 
 def serve (cname):
     global doc_root
     ssh_command = os.getenv ('SSH_ORIGINAL_COMMAND')
     if not ssh_command:
-        sys.stderr.write ('No interactive shells allowed here!\n') 
+        sys.stderr.write ('No interactive shells allowed here!\n')
         sys.exit (1)
     elif ssh_command.startswith ('hg'):
         repo_expr = re.compile ('(.*)\s+-R\s+([^\s]+\s+)(.*)')
@@ -324,7 +324,7 @@ def serve (cname):
             print(fh.read())
             fh.close()
     else:
-        sys.stderr.write ('No interactive commands allowed here!\n') 
+        sys.stderr.write ('No interactive commands allowed here!\n')
         sys.exit (1)
 
 if __name__ == '__main__':
@@ -332,5 +332,5 @@ if __name__ == '__main__':
     if is_valid_user ('bkero@mozilla.com'):
         serve ("hg.mozilla.org")
     else:
-        sys.stderr.write ('You are not welcome here, go away!\n') 
+        sys.stderr.write ('You are not welcome here, go away!\n')
         sys.exit (1)

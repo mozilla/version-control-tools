@@ -37,11 +37,11 @@ def run_command(command_string, input=None, verbose=False):
     command_end = fixed_command_string.find("|")
     if command_end > 0:
         subcommand = subprocess.Popen(
-            shlex.split(fixed_command_string[:command_end]), 
+            shlex.split(fixed_command_string[:command_end]),
             stdin=input, stderr=out_fd, stdout=subprocess.PIPE)
         return(run_command(fixed_command_string[command_end + 1:], input = subcommand.stdout))
     else:
-        subcommand = subprocess.Popen(shlex.split(fixed_command_string), 
+        subcommand = subprocess.Popen(shlex.split(fixed_command_string),
                                       stdin=input, stderr=out_fd, stdout=subprocess.PIPE)
     while True:
         l = subcommand.stdout.readline()
