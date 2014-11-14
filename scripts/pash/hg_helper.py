@@ -260,6 +260,35 @@ def edit_repo_description (cname, repo_name):
         with open(config_path, 'w+') as fh:
             config.write(fh)
 
+def set_repo_publishing(cname, repo_name, publish):
+    """Set the publishing flag on a repository.
+
+    A publishing repository turns its pushed commits into public
+    phased commits. It is the default behavior.
+
+    Non-publishing repositories have their commits stay in the draft phase
+    when pushed.
+    """
+    repo_path = get_and_validate_user_repo(cname, repo_name)
+    config_path, config = get_user_repo_config(repo_path)
+
+    if not config.has_section('phases'):
+        config.add_section('phases')
+
+    value = 'True' if publish else 'False'
+
+    config.set('phases', 'publish', value)
+
+    with open(config_path, 'w') as fh:
+        config.write(fh)
+
+    if publish:
+        sys.stderr.write('Repository marked as publishing: changesets will '
+            'change to public phase when pushed.\n')
+    else:
+        sys.stderr.write('Repository marked as non-publishing: draft '
+            'changesets will remain in the draft phase when pushed.\n')
+
 def do_delete(cname, repo_dir, repo_name, verbose=False):
     global doc_root
     if verbose:
@@ -297,11 +326,20 @@ def edit_repo (cname, repo_name, do_quick_delete):
     if do_quick_delete:
         delete_repo (cname, repo_name, do_quick_delete)
     else:
-      action = prompt_user ('What would you like to do?', ['Delete the repository', 'Edit the description'])
-      if action == 'Edit the description':
-        edit_repo_description (cname, repo_name)
-      elif action == 'Delete the repository':
-        delete_repo (cname, repo_name, False)
+        action = prompt_user('What would you like to do?', [
+            'Delete the repository',
+            'Edit the description',
+            'Mark repository as non-publishing',
+            'Mark repository as publishing',
+            ])
+        if action == 'Edit the description':
+            edit_repo_description(cname, repo_name)
+        elif action == 'Delete the repository':
+            delete_repo(cname, repo_name, False)
+        elif action == 'Mark repository as non-publishig':
+            set_repo_publishing(cname, repo_name, False)
+        elif action == 'Mark repository as publishing':
+            set_repo_publishing(cname, repo_name, True)
     return
 
 def serve (cname):
