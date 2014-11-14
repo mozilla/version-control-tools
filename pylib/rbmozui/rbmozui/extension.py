@@ -6,12 +6,17 @@ from django.conf import settings
 from django.conf.urls import include, patterns, url
 
 from reviewboard.extensions.base import Extension
-from reviewboard.extensions.hooks import (TemplateHook, URLHook)
-from reviewboard.reviews.builtin_fields import TestingDoneField
+from reviewboard.extensions.hooks import (ReviewRequestFieldsHook,
+                                          TemplateHook,
+                                          URLHook)
+from reviewboard.reviews.builtin_fields import (TargetPeopleField,
+                                                TestingDoneField)
 from reviewboard.reviews.fields import (get_review_request_field,
                                         get_review_request_fieldset)
 from reviewboard.urls import (diffviewer_url_names,
                               review_request_url_names)
+
+from rbmozui.fields import CommitsListField
 
 
 class RBMozUI(Extension):
@@ -45,10 +50,12 @@ class RBMozUI(Extension):
     def initialize(self):
         # Start by hiding the Testing Done field in all review requests, since
         # Mozilla developers will not be using it.
-        fieldset = get_review_request_fieldset('main')
-        field = get_review_request_field('testing_done')
-        if (field):
-          fieldset.remove_field(field)
+        main_fieldset = get_review_request_fieldset('main')
+        testing_done_field = get_review_request_field('testing_done')
+
+        if testing_done_field:
+            main_fieldset.remove_field(testing_done_field)
+
         # All of our review request styling is injected via review-stylings-css,
         # which in turn loads the review.css static bundle.
         TemplateHook(self, 'base-css', 'rbmozui/commits-stylings-css.html',
@@ -61,17 +68,25 @@ class RBMozUI(Extension):
                      apply_to=review_request_url_names + ['rbmozui-commits'])
         TemplateHook(self, 'base-scripts-post', 'rbmozui/review-scripts-js.html',
                      apply_to=review_request_url_names)
-        TemplateHook(self, 'rbmozui-commits-scripts', 'rbmozui/commits-scripts-js.html',
-                     apply_to='rbmozui-commits')
-        urlpatterns = patterns('',
-            url(r'^rbmozui/', include('rbmozui.urls')))
-        URLHook(self, urlpatterns)
+        TemplateHook(self, 'base-scripts-post', 'rbmozui/commits-scripts-js.html',
+                     apply_to=review_request_url_names)
+
+        ReviewRequestFieldsHook(self, 'main', [CommitsListField])
+        # Workaround for editable field bug - we force the commits list field to be
+        # the first field.
+        main_fieldset.field_classes.insert(0, main_fieldset.field_classes.pop())
 
     def shutdown(self):
         # We have to put the TestingDone field back before we shut down
         # in order to get the instance back to its original state.
-        fieldset = get_review_request_fieldset('main')
-        field = get_review_request_field('testing_done')
-        if not field:
-          fieldset.add_field(TestingDoneField)
+        main_fieldset = get_review_request_fieldset('main')
+        testing_done_field = get_review_request_field('testing_done')
+        if not testing_done_field:
+            main_fieldset.add_field(TestingDoneField)
+
+        reviewers_fieldset = get_review_request_fieldset('reviewers')
+        people_field = get_review_request_field('target_people')
+        if not people_field:
+            reviewers_fieldset.add_field(TargetPeopleField)
+
         super(RBMozUI, self).shutdown()
