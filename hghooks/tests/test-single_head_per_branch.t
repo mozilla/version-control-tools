@@ -7,16 +7,30 @@
   $ cd mozilla-central
   $ echo orig > file.txt
   $ hg -q commit -A -m 'original commit'
-  $ echo 'new text in orig repo' > file.txt
-  $ hg commit -m 'second commit in mc'
   $ cd ..
 
   $ hg init client
   $ cd client
-  $ hg -q pull -r 0 -u ../mozilla-central
+  $ hg -q pull -u ../mozilla-central
 
+Pushing a head forward is allowed
+
+  $ echo 'new text in orig repo' > file.txt
+  $ hg commit -m 'second commit in mc'
+  $ hg push ../mozilla-central
+  pushing to ../mozilla-central
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+
+Creating a new head on the default branch is not allowed
+
+  $ hg -q up -r 0
   $ echo different > file.txt
   $ hg commit -m 'different commit'
+  created new head
   $ hg push -f ../mozilla-central
   pushing to ../mozilla-central
   searching for changes
