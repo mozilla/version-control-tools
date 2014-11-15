@@ -68,6 +68,30 @@ Merging the two heads and pushing is allowed
 
   $ cd ..
 
+A closed branch head shouldn't impact things
+
+  $ cd mozilla-central
+  $ hg -q up -r tip^
+  $ echo 'will close' > file.txt
+  $ hg commit -m 'creating new head on default'
+  created new head
+  $ hg commit --close-branch -m 'closing old default branch'
+
+  $ cd ../client
+  $ hg -q pull ../mozilla-central
+
+  $ echo 'after closed branch' > file.txt
+  $ hg commit -m 'after closed branch'
+  $ hg push ../mozilla-central
+  pushing to ../mozilla-central
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+
+  $ cd ..
+
 A repository with multiple branches can still push when this hook is active
 
   $ hg -q clone mozilla-central client2
