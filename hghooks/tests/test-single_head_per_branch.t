@@ -51,6 +51,21 @@ Creating a new head on the default branch is not allowed
   abort: pretxnchangegroup.b_singlehead hook failed
   [255]
 
+Merging the two heads and pushing is allowed
+
+  $ hg merge --tool internal:other -r 1
+  0 files updated, 1 files merged, 0 files removed, 0 files unresolved
+  (branch merge, don't forget to commit)
+  $ hg commit -m Merge
+
+  $ hg push ../mozilla-central
+  pushing to ../mozilla-central
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 2 changes to 1 files
+
   $ cd ..
 
 A repository with multiple branches can still push when this hook is active
