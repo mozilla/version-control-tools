@@ -14,3 +14,4 @@ to the right place!
    extensions
    bookmarks
    firefoxtree
+   unifiedrepo
