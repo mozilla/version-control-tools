@@ -1,0 +1,56 @@
+####################################
+## This file is managed by puppet ##
+####################################
+
+[trusted]
+users = hg, root
+groups = scm_level_1, scm_level_2, scm_level_3, scm_l10n, scm_private, scm_l10n_infra, scm_sec_sensitive, scm_l10n_drivers, scm_nss
+
+[email]
+method = /usr/sbin/sendmail
+from = hg@hg.mozilla.org
+
+[web]
+style = gitweb_mozilla
+allow_archive = bz2 gz zip
+templates = /repo/hg/hg_templates/
+pygments_style = emacs
+encoding = UTF-8
+baseurl = http://hg.mozilla.org/
+maxchanges = 20
+
+[diff]
+showfunc = True
+git = 1
+unified = 8
+
+[hooks]
+sorthooks = True
+changegroup.z_loghistory = python:mozhghooks.pushlog.log
+changegroup.recordlogs = /repo/hg/scripts/record-pushes.sh
+changegroup.mirrorpush = /repo/hg/scripts/push-repo.sh
+#pretxnchangegroup.renamecase = python:mozhghooks.prevent_case_only_renames.hook
+#changegroup.zz_mirrorpush = python:mozhghooks.signal-mirrors.hook
+
+[extensions]
+hgwebjson = /repo/hg/extensions/hgwebjson.py
+pushlog-feed = /repo/hg/extensions/pushlog-feed.py
+buglink = /repo/hg/extensions/buglink.py
+serverlog = /repo/hg/extensions/serverlog
+#highlight =
+#interhg =
+
+[interhg]
+a_httplinks = s|(https?://\S+)|<a href="\1">\1</a>|i
+bugzilla = s|((?:bug[\s#]*|b=#?|#)(\d{4,}))|<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=\2" title="Bug \2">\1</a>|i
+
+[broker]
+BROKER_HOST = pulse.mozilla.org
+BROKER_USER = hg_shim
+BROKER_PASS = W3_l1ke_f1x3s
+MSG_EXCHANGE = org.mozilla.exchange.code
+BASE_PATH = /repo/hg/mozilla
+
+[serverlog]
+reporoot = /repo/hg/mozilla/
+

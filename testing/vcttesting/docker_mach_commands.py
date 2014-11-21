@@ -41,6 +41,11 @@ class DockerCommands(object):
 
         self.d = d
 
+    @Command('build-hgmo', category='docker',
+        description='Build hg.mozilla.org Docker images')
+    def build_hgmo(self):
+        self.d.build_hgmo(verbose=True)
+
     @Command('build-bmo', category='docker',
         description='Build bugzilla.mozilla.org Docker images')
     def build_bmo(self):

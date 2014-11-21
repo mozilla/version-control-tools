@@ -223,6 +223,19 @@ class Docker(object):
 
         raise Exception('Unable to confirm image was built')
 
+    def build_hgmo(self, verbose=False):
+        """Ensure the images for a hg.mozilla.org service are built.
+
+        hg-master runs the ssh service while hg-slave runs hgweb. The mirroring
+        and other bits should be the same as in production with the caveat that
+        LDAP integration is probably out of scope.
+        """
+        images = self.state['images']
+        hg_master_image = self.ensure_built('hgmaster', add_vct=True, verbose=verbose)
+        # hg_slave_image = self.ensure_built('hgslave', verbose=verbose)
+        self.state['last-hgmaster-id'] = hg_master_image
+        # self.state['last-hgslave-id'] = hg_slave_image
+
     def build_bmo(self, verbose=False):
         """Ensure the images for a BMO service are built.
 
