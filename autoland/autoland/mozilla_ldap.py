@@ -1,4 +1,5 @@
 import ldap
+import mozdef
 
 LDAP_HOST = 'ldap.mozilla.org'
 LDAP_PORT = 636
@@ -17,6 +18,9 @@ def check_group(auth, group, email):
         l.search('dc=mozilla', ldap.SCOPE_SUBTREE,
                  filterstr='cn=%s' % group)
         result = l.result(timeout=10)
-        return email in result[1][0][1]['memberUid']
+        in_group = email in result[1][0][1]['memberUid']
+        mozdef_auth = mozdef.read_credentials()
+        mozdef.post_ldap_group_check(mozdef_auth, email, group, in_group)
+        return in_group
     except ldap.SERVER_DOWN, ldap.TIMEOUT:
         pass
