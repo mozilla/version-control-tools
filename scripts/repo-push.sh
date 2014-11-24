@@ -1,4 +1,7 @@
 #!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 ppid=$$
 sshargs="-i /etc/mercurial/mirror -o ServerAliveInterval=5 -o ConnectionAttempts=3 -o StrictHostKeyChecking=no -o ConnectTimeout=10s -o PasswordAuthentication=no -o PreferredAuthentications=publickey -o UserKnownHostsFile=/etc/mercurial/known_hosts"
