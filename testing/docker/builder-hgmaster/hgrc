@@ -44,13 +44,6 @@ serverlog = /repo/hg/extensions/serverlog
 a_httplinks = s|(https?://\S+)|<a href="\1">\1</a>|i
 bugzilla = s|((?:bug[\s#]*|b=#?|#)(\d{4,}))|<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=\2" title="Bug \2">\1</a>|i
 
-[broker]
-BROKER_HOST = pulse.mozilla.org
-BROKER_USER = hg_shim
-BROKER_PASS = W3_l1ke_f1x3s
-MSG_EXCHANGE = org.mozilla.exchange.code
-BASE_PATH = /repo/hg/mozilla
-
 [serverlog]
 reporoot = /repo/hg/mozilla/
 
