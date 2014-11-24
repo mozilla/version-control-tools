@@ -1,8 +1,10 @@
-import datetime
 import kombu 
 import os
+import pytz
 import platform
 import sys
+
+from datetime import datetime
 
 MOZDEF_PORT = 5671
 
@@ -24,14 +26,16 @@ def post(auth, data):
 
 
 def post_ldap_group_check(auth, user, group, result):
+    now = pytz.timezone('UTC').localize(datetime.utcnow()).isoformat()
+
     data = {
-        'timestamp': datetime.datetime.utcnow().isoformat(),
+        'utctimestamp': now,
         'hostname': platform.node(),
         'processname': sys.argv[0],
         'processid': os.getpid(),
         'severity': 'INFO',
         'summary': 'LDAP autoland group membership check',
-        'category': 'authentication',
+        'category': 'event',
         'source': '',
         'tags': [
             'Autoland',
