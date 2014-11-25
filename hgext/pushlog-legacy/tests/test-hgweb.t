@@ -94,11 +94,31 @@ Format version 1 works
    }
   } (no-eol)
 
-Format version 2 fails
+Format version 3 fails
 
-  $ http "http://localhost:$HGPORT/json-pushes?changeset=91826025c77c&version=2" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/json-pushes?changeset=91826025c77c&version=3" --header content-type --body-file body
   500
   content-type: application/json
 
   $ cat body
-  "version parameter must be 1" (no-eol)
+  "version parameter must be 1 or 2" (no-eol)
+
+Format version 2 has pushes in a child object
+
+  $ http "http://localhost:$HGPORT/json-pushes?changeset=91826025c77c&version=2" --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ cat body
+  {
+   "pushes": {
+    "16": {
+     "changesets": [
+      "91826025c77c6a8e5711735adaa9766dd4eac7fc", 
+      "25f2a69ac7ac2919ef35c0b937b862fbb9e7e1f7"
+     ], 
+     "date": 1227196396, 
+     "user": "luser"
+    }
+   }
+  } (no-eol)

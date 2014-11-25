@@ -294,8 +294,8 @@ def pushlogSetup(repo, req):
         query.formatversion = int(req.form.get('version', ['1'])[0])
     except ValueError:
         raise ErrorResponse(500, 'version parameter must be an integer')
-    if query.formatversion < 1 or query.formatversion > 1:
-        raise ErrorResponse(500, 'version parameter must be 1')
+    if query.formatversion < 1 or query.formatversion > 2:
+        raise ErrorResponse(500, 'version parameter must be 1 or 2')
 
     query.DoQuery()
     return query
@@ -469,7 +469,13 @@ def pushes_worker(query, web = None):
                           'date': date,
                           'changesets': [node]
                           }
-    return pushes
+
+    if query.formatversion == 1:
+        return pushes
+    elif query.formatversion == 2:
+        return {'pushes': pushes}
+
+    raise ErrorResponse(500, 'unexpected formatversion')
 
 def pushes(web, req, tmpl):
     """WebCommand to return a data structure containing pushes."""
