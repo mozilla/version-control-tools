@@ -2,15 +2,18 @@ import mercurial.hgweb.protocol as hgwebprotocol
 import mercurial.hgweb.webcommands as hgwebcommands
 import mercurial.hgweb.webutil as webutil
 from mercurial.templatefilters import xmlescape
-from mercurial.hgweb.common import HTTP_OK, HTTP_NOT_FOUND, HTTP_SERVER_ERROR, paritygen
-from mercurial.node import short, bin, hex, nullid
+from mercurial.hgweb.common import (
+    ErrorResponse,
+    HTTP_OK,
+    paritygen,
+)
+from mercurial.node import hex, nullid
 from mercurial import demandimport
 
 import sys, os.path, re
 from datetime import datetime
 import time
 from math import ceil
-import sys
 
 sys.path.append(os.path.dirname(__file__))
 
@@ -64,6 +67,8 @@ class PushlogQuery(object):
         self.userquery = []
         # Allow query-by-individual-changeset
         self.changesetquery = []
+
+        self.formatversion = 1
 
     def DoQuery(self):
         """Figure out what the query parameters are, and query the database
@@ -285,17 +290,24 @@ def pushlogSetup(repo, req):
     if 'changeset' in req.form:
         query.changesetquery = req.form.get('changeset', [])
 
+    try:
+        query.formatversion = int(req.form.get('version', ['1'])[0])
+    except ValueError:
+        raise ErrorResponse(500, 'version parameter must be an integer')
+    if query.formatversion < 1 or query.formatversion > 1:
+        raise ErrorResponse(500, 'version parameter must be 1')
+
     query.DoQuery()
     return query
 
 def pushlogFeed(web, req, tmpl):
     """WebCommand for producing the ATOM feed of the pushlog."""
-    
+
     req.form['style'] = ['atom']
     tmpl = web.templater(req)
     query = pushlogSetup(web.repo, req)
     isotime = lambda x: datetime.utcfromtimestamp(x).isoformat() + 'Z'
-    
+
     if query.entries:
         dt = isotime(query.entries[0][2])
     else:

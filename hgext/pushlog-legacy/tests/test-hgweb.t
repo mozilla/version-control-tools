@@ -75,3 +75,30 @@ Query a changeset that doesn't exist
 
   $ cat body
   "unknown revision 'foobar'" (no-eol)
+
+Format version 1 works
+
+  $ http "http://localhost:$HGPORT/json-pushes?changeset=91826025c77c&version=1" --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ cat body
+  {
+   "16": {
+    "changesets": [
+     "91826025c77c6a8e5711735adaa9766dd4eac7fc", 
+     "25f2a69ac7ac2919ef35c0b937b862fbb9e7e1f7"
+    ], 
+    "date": 1227196396, 
+    "user": "luser"
+   }
+  } (no-eol)
+
+Format version 2 fails
+
+  $ http "http://localhost:$HGPORT/json-pushes?changeset=91826025c77c&version=2" --header content-type --body-file body
+  500
+  content-type: application/json
+
+  $ cat body
+  "version parameter must be 1" (no-eol)
