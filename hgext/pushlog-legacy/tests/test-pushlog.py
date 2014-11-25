@@ -189,12 +189,6 @@ class TestPushlog(HGWebTest, unittest.TestCase):
         expectedjson = loadjsonfile("testdata/test-repo-data-full.json")
         self.assertEqual(testjson, expectedjson, "json-pushes?full=1 did not yield expected json data!")
 
-    def testprintpushlog(self):
-        """Get all json data via 'hg printpushlog'."""
-        testjson = json.loads(Popen(["hg", "-R", self.repodir, "printpushlog"], stdout=PIPE).communicate()[0])
-        expectedjson = loadjsonfile("testdata/test-repo-data.json")
-        self.assertEqual(testjson, expectedjson, "printpushlog did not yield expected json data!")
-
     def assertEqualFeeds(self, a, b):
         self.assertEqual(a.feed.updated, b.feed.updated, "not the same updated time, %s != %s" % (a.feed.updated, b.feed.updated))
         self.assertEqual(len(a.entries), len(b.entries), "not the same number of entries, %d != %d" % (len(a.entries), len(b.entries)))

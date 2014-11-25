@@ -464,29 +464,6 @@ def pushes(web, req, tmpl):
     query = pushlogSetup(web.repo, req)
     return tmpl('pushes', data=pushes_worker(query, 'full' in req.form and web))
 
-def printpushlog(ui, repo, *args):
-    """HG Command to print the pushlog data in JSON format."""
-    from hgwebjson import HGJSONEncoder
-    e = HGJSONEncoder()
-    startID = len(args) and args[0] or 0
-    endID = len(args) > 1 and args[1] or None
-    try:
-        conn = sqlite.connect(os.path.join(repo.path, 'pushlog2.db'))
-    except sqlite.OperationalError:
-        conn = None
-    query = PushlogQuery(repo=repo, dbconn=conn)
-    query.querystart = QueryType.PUSHID
-    query.querystart_value = startID
-    if endID is not None:
-        query.queryend = QueryType.PUSHID
-        query.queryend_value = endID
-    query.DoQuery()
-    print e.encode(pushes_worker(query))
-
 addwebcommand(pushlogFeed, 'pushlog')
 addwebcommand(pushlogHTML, 'pushloghtml')
 addwebcommand(pushes, 'pushes')
-
-cmdtable = {
-    'printpushlog': (printpushlog, [], "hg printpushlog [startID [endID]]"),
-}
