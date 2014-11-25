@@ -40,30 +40,30 @@ ATOM_MIMETYPE = 'application/atom+xml'
 class QueryType:
     DATE, CHANGESET, PUSHID, COUNT = range(4)
 
-class PushlogQuery:
-    page = 1
-    dates = []
-    entries = []
-    totalentries = 1
-    # by default, we return the last 10 pushes
-    querystart = QueryType.COUNT
-    querystart_value = PUSHES_PER_PAGE
-    # don't need a default here, since by default
-    # we'll get everything newer than whatever your start
-    # query is
-    queryend = None
-    queryend_value = None
-    # Allow query-by-user
-    userquery = []
-    # Allow query-by-individual-changeset
-    changesetquery = []
-
+class PushlogQuery(object):
     def __init__(self, repo, dbconn, urlbase='', tipsonly=False, reponame=''):
         self.repo = repo
         self.conn = dbconn
         self.urlbase = urlbase
         self.tipsonly = tipsonly
         self.reponame = reponame
+
+        self.page = 1
+        self.dates = []
+        self.entries = []
+        self.totalentries = 1
+        # by default, we return the last 10 pushes
+        self.querystart = QueryType.COUNT
+        self.querystart_value = PUSHES_PER_PAGE
+        # don't need a default here, since by default
+        # we'll get everything newer than whatever your start
+        # query is
+        self.queryend = None
+        self.queryend_value = None
+        # Allow query-by-user
+        self.userquery = []
+        # Allow query-by-individual-changeset
+        self.changesetquery = []
 
     def DoQuery(self):
         """Figure out what the query parameters are, and query the database
