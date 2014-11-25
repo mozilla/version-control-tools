@@ -11,7 +11,7 @@ isodate = lambda x: util.datestr(x, '%Y-%m-%d %H:%M %1%2')
 
 class HGJSONEncoder(json.JSONEncoder):
     def __init__(self):
-        json.JSONEncoder.__init__(self, indent=1)
+        json.JSONEncoder.__init__(self, indent=1, sort_keys=True)
 
     def __call__(self, obj):
         return self.encode(obj)
@@ -31,7 +31,7 @@ class HGJSONEncoder(json.JSONEncoder):
                                     if n != nullid],
                     'files':       v.files(),
                     }
-        
+
         if isinstance(v, context.filectx):
             return {'filerev':     v.filerev(),
                     'filenode':    hex(v.filenode())}
