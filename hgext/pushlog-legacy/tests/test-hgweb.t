@@ -66,3 +66,12 @@ Query for two changesets at once
   content-type: application/json
 
   $ jsoncompare body $TESTDATA/test-repo-multi-changeset-query.json
+
+Query a changeset that doesn't exist
+
+  $ http "http://localhost:$HGPORT/json-pushes?changeset=foobar" --header content-type --body-file body
+  404
+  content-type: application/json
+
+  $ cat body
+  "unknown revision 'foobar'" (no-eol)
