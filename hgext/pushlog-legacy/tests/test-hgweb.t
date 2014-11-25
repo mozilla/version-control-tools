@@ -34,3 +34,19 @@ Get all JSON data with details
   content-type: application/json
 
   $ jsoncompare body $TESTDATA/test-repo-data-full.json
+
+Query with fromchange and an endID
+
+  $ http "http://localhost:$HGPORT/json-pushes?fromchange=cc07cc0e87f8&endID=15" --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ jsoncompare body $TESTDATA/test-repo-fromchange-endid-query.json
+
+Query with a startID and tochange
+
+  $ http "http://localhost:$HGPORT/json-pushes?startID=5&tochange=af5fb85d9324" --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ jsoncompare body $TESTDATA/test-repo-startid-tochange-query.json

@@ -205,12 +205,6 @@ class TestPushlog(HGWebTest, unittest.TestCase):
         expectedjson = loadjsonfile("testdata/test-repo-startdate-endid-query.json")
         self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
-    def testfromchangetoendidquery(self):
-        """Query with fromchange and an endID."""
-        testjson = self.loadjsonurl("/json-pushes?fromchange=cc07cc0e87f8&endID=15")
-        expectedjson = loadjsonfile("testdata/test-repo-fromchange-endid-query.json")
-        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
-
     def teststartidtochangequery(self):
         """Query with a startID and tochange."""
         testjson = self.loadjsonurl("/json-pushes?startID=5&tochange=af5fb85d9324")
