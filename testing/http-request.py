@@ -36,7 +36,10 @@ def main(args):
     url = urlparse.urlparse(url)
 
     conn = httplib.HTTPConnection(url.hostname, url.port or 80)
-    conn.request('GET', '/' + url.path)
+    path = url.path
+    if url.query:
+        path = '%s?%s' % (path, url.query)
+    conn.request('GET', path)
     response = conn.getresponse()
     print(response.status)
 
