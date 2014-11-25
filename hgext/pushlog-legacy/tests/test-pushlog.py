@@ -130,28 +130,6 @@ class TestPushlog(HGWebTest, unittest.TestCase):
         repoarchive = os.path.join(mydir, "testdata/test-repo.tar.bz2")
         check_call(["tar", "xjf", repoarchive], cwd=self.repodir)
 
-    def testpushloghtml(self):
-        """Sanity check the html output."""
-        u = self.urlopen("/pushloghtml")
-        data = ''.join(u.readlines())
-        u.close()
-        # ensure we didn't hit a server error in the middle
-        self.assertEqual(data.find("Internal Server Error"), -1, "should not get an internal server error in the html output")
-        # crap test, but I don't want to parse html
-        self.assertNotEqual(data.find("427bfb5defee"), -1, "should have the latest changeset in the html output")
-        
-    def testalljsonpushes(self):
-        """Get all json data from json-pushes."""
-        testjson = self.loadjsonurl("/json-pushes?startID=0")
-        expectedjson = loadjsonfile("testdata/test-repo-data.json")
-        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
-
-    def testjsonpushdetails(self):
-        """Get all json data from json-pushes with details."""
-        testjson = self.loadjsonurl("/json-pushes?startID=0&full=1")
-        expectedjson = loadjsonfile("testdata/test-repo-data-full.json")
-        self.assertEqual(testjson, expectedjson, "json-pushes?full=1 did not yield expected json data!")
-
     def assertEqualFeeds(self, a, b):
         self.assertEqual(a.feed.updated, b.feed.updated, "not the same updated time, %s != %s" % (a.feed.updated, b.feed.updated))
         self.assertEqual(len(a.entries), len(b.entries), "not the same number of entries, %d != %d" % (len(a.entries), len(b.entries)))
