@@ -205,12 +205,6 @@ class TestPushlog(HGWebTest, unittest.TestCase):
         expectedjson = loadjsonfile("testdata/test-repo-startdate-endid-query.json")
         self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
-    def teststartidtochangequery(self):
-        """Query with a startID and tochange."""
-        testjson = self.loadjsonurl("/json-pushes?startID=5&tochange=af5fb85d9324")
-        expectedjson = loadjsonfile("testdata/test-repo-startid-tochange-query.json")
-        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
-
     def testfromchangetoenddatequery(self):
         """Query with fromchange and an enddate."""
         testjson = self.loadjsonurl("/json-pushes?fromchange=cc07cc0e87f8&enddate=2008-11-20%2010:52:56")
@@ -221,18 +215,6 @@ class TestPushlog(HGWebTest, unittest.TestCase):
         """Query with a startdate and tochange."""
         testjson = self.loadjsonurl("/json-pushes?startdate=2008-11-20%2010:52:25&tochange=af5fb85d9324")
         expectedjson = loadjsonfile("testdata/test-repo-startdate-tochange-query.json")
-        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
-
-    def testsinglechangesetquery(self):
-        """Query for a single changeset."""        
-        testjson = self.loadjsonurl("/json-pushes?changeset=91826025c77c")
-        expectedjson = loadjsonfile("testdata/test-repo-changeset-query.json")
-        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
-
-    def testmultichangesetquery(self):
-        """Query for two changesets at once."""
-        testjson = self.loadjsonurl("/json-pushes?changeset=91826025c77c&changeset=a79451771352")
-        expectedjson = loadjsonfile("testdata/test-repo-multi-changeset-query.json")
         self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
 
     def testdateparsing(self):

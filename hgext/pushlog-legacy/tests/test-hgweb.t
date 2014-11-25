@@ -50,3 +50,19 @@ Query with a startID and tochange
   content-type: application/json
 
   $ jsoncompare body $TESTDATA/test-repo-startid-tochange-query.json
+
+Query for a single changeset
+
+  $ http "http://localhost:$HGPORT/json-pushes?changeset=91826025c77c" --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ jsoncompare body $TESTDATA/test-repo-changeset-query.json
+
+Query for two changesets at once
+
+  $ http "http://localhost:$HGPORT/json-pushes?changeset=91826025c77c&changeset=a79451771352" --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ jsoncompare body $TESTDATA/test-repo-multi-changeset-query.json
