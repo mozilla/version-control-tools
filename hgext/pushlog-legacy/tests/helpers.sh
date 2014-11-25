@@ -19,3 +19,7 @@ EOF
 }
 
 alias http=$TESTDIR/testing/http-request.py
+
+jsoncompare() {
+  python $TESTDIR/hgext/pushlog-legacy/tests/json-compare.py $1 $2
+}
