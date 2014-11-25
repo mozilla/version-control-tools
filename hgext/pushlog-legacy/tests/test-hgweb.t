@@ -103,7 +103,7 @@ Format version 3 fails
   $ cat body
   "version parameter must be 1 or 2" (no-eol)
 
-Format version 2 has pushes in a child object
+Format version 2 has pushes in a child object and a last push id
 
   $ http "http://localhost:$HGPORT/json-pushes?changeset=91826025c77c&version=2" --header content-type --body-file body
   200
@@ -111,6 +111,7 @@ Format version 2 has pushes in a child object
 
   $ cat body
   {
+   "lastpushid": 21, 
    "pushes": {
     "16": {
      "changesets": [

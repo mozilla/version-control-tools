@@ -69,6 +69,8 @@ class PushlogQuery(object):
         self.changesetquery = []
 
         self.formatversion = 1
+        # ID of the last known push in the database.
+        self.lastpushid = None
 
     def DoQuery(self):
         """Figure out what the query parameters are, and query the database
@@ -138,7 +140,7 @@ class PushlogQuery(object):
                     params['node%d' % i] = hex(self.repo.lookup(c))
                     i += 1
                 where.append('(' + ' OR '.join(subquery) + ')')
-            
+
             query = basequery + ' AND '.join(where) + ' ORDER BY id DESC, rev DESC'
             #print "query: %s" % query
             #print "params: %s" % params
@@ -153,6 +155,12 @@ class PushlogQuery(object):
             except sqlite.OperationalError:
                 # likely just an empty db, so return an empty result
                 pass
+
+        try:
+            query = 'select id from pushlog order by id desc limit 1'
+            self.lastpushid = self.conn.execute(query).fetchone()[0]
+        except sqlite.OperationalError:
+            pass
 
     def description(self):
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
@@ -473,7 +481,7 @@ def pushes_worker(query, web = None):
     if query.formatversion == 1:
         return pushes
     elif query.formatversion == 2:
-        return {'pushes': pushes}
+        return {'pushes': pushes, 'lastpushid': query.lastpushid}
 
     raise ErrorResponse(500, 'unexpected formatversion')
 
