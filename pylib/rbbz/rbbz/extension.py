@@ -247,7 +247,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
     # numeric Bugzilla userid into an email address. This lookup could be
     # avoided if Bugzilla accepted a numeric userid in the requestee parameter
     # when modifying an attachment.
-    reviewers = []
+    reviewers = set()
 
     for u in review_request_draft.target_people.all():
         if not using_bugzilla:
@@ -260,11 +260,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
         # Since we're making the API call, we might as well ensure the local
         # database is up to date.
         users = get_or_create_bugzilla_users(user_data)
-        reviewers.append(users[0].email)
-
-    # Sorted so behavior is deterministic (this mucks with test output
-    # otherwise).
-    reviewers = sorted(reviewers)
+        reviewers.add(users[0].email)
 
     # Don't make attachments for child review requests, otherwise,
     # Bugzilla gets inundatated with lots of patches, and the squashed

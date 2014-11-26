@@ -143,6 +143,7 @@ class Bugzilla(object):
         """Posts a new attachment containing a review-request URL, or updates
            an existing one."""
 
+        # Copy because we modify it.
         reviewers = set(reviewers)
         params = {}
         flags = []
@@ -178,7 +179,9 @@ class Bugzilla(object):
 
         # Add flags for new reviewers.
 
-        for r in reviewers:
+        # Sorted so behavior is deterministic (this mucks with test output
+        # otherwise).
+        for r in sorted(reviewers):
             flags.append({'name': 'review', 'status': '?', 'requestee': r,
                           'new': True})
 
