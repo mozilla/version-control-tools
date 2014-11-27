@@ -5,7 +5,7 @@
 
   $ . $TESTDIR/testing/firefoxrepos.sh
   $ makefirefoxreposserver root $HGPORT
-  $ installfakereposerver $HGPORT
+  $ installfakereposerver $HGPORT $TESTTMP/root
   $ populatedummydata root >/dev/null
 
   $ hg init repo1
@@ -32,7 +32,7 @@ Pushing to a known tree should update the local tag
   $ hg commit -m 'Bug 789 - Testing push1'
 
   $ hg push -r . central
-  pushing to central
+  pushing to ssh://user@dummy/$TESTTMP/root/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests

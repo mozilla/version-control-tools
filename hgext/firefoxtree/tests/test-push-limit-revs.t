@@ -5,7 +5,7 @@
 
   $ . $TESTDIR/testing/firefoxrepos.sh
   $ makefirefoxreposserver root $HGPORT
-  $ installfakereposerver $HGPORT
+  $ installfakereposerver $HGPORT $TESTTMP/root
   $ populatedummydata root >/dev/null
 
   $ hg init repo1
@@ -35,7 +35,7 @@
 Pushing with no -r argument will limit to .
 
   $ hg push central
-  pushing to central
+  pushing to ssh://user@dummy/$TESTTMP/root/mozilla-central
   no revisions specified to push; using . to avoid pushing multiple heads
   searching for changes
   remote: adding changesets

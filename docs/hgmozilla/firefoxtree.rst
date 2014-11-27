@@ -139,16 +139,16 @@ the names and URLs of those remotes in the ``[paths]`` section of the
 repository's ``.hg/hgrc`` file. The names and URLs of Firefox
 repositories are well-known, so *firefoxtree* does this for you.
 
-Simple type ``hg pull <tree>`` to pull from a known Firefox repository.
+Simply type ``hg pull <tree>`` to pull from a known Firefox repository.
 For example::
 
   $ hg pull central
   $ hg pull inbound
 
-.. important::
+Or type ``hg push <tree>`` to push to a Firefox repository.::
 
-   This magic aliasing does not yet work for ``hg push``: you'll still
-   want to set some values under ``[paths]`` in your ``.hg/hgrc``.
+  $ hg push inbound
+  $ hg push aurora
 
 .. tip::
 

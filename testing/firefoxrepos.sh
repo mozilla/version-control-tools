@@ -28,10 +28,6 @@ makefirefoxreposserver() {
   cat > hgweb.conf << EOF
 [paths]
 / = $root/*
-
-[web]
-allow_push = *
-push_ssl = False
 EOF
 
   hg serve -d -p $2 --pid-file hg.pid --web-conf hgweb.conf
@@ -44,9 +40,12 @@ installfakereposerver() {
 [extensions]
 localmozrepo = $TESTDIR/testing/local-mozilla-repos.py
 
+[ui]
+ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
+
 [localmozrepo]
 readuri = http://localhost:$1/
-writeuri = http://localhost:$1/
+writeuri = ssh://user@dummy/$2/
 EOF
 }
 

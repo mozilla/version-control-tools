@@ -61,6 +61,7 @@ import os
 
 from mercurial import (
     cmdutil,
+    commands,
     exchange,
     extensions,
     hg,
@@ -273,6 +274,21 @@ def updateremoterefs(repo, remote, tree):
     node = defaultnodes[-1]
     repo.tag(tree, node, message=None, local=True, user=None, date=None)
 
+def pushcommand(orig, ui, repo, dest=None, **opts):
+    """Wraps commands.push to resolve names to tree URLs.
+
+    Ideally we'd patch ``ui.expandpath()``. However, It isn't easy to tell
+    from that API whether we should be giving out HTTP or SSH URLs.
+    This was proposed and rejected as a core feature to Mercurial.
+    http://www.selenic.com/pipermail/mercurial-devel/2014-September/062052.html
+    """
+    if isfirefoxrepo(repo):
+        tree, uri = resolve_trees_to_uris([dest], write_access=True)[0]
+        if uri:
+            dest = uri
+
+    return orig(ui, repo, dest=dest, **opts)
+
 @command('fxheads', [
     ('T', 'template', shorttemplate,
      _('display with template'), _('TEMPLATE')),
@@ -301,6 +317,7 @@ def extsetup(ui):
     extensions.wrapfunction(exchange, 'push', push)
     extensions.wrapfunction(exchange, 'pull', pull)
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
+    extensions.wrapcommand(commands.table, 'push', pushcommand)
 
 def reposetup(ui, repo):
     if not repo.local():

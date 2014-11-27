@@ -5,7 +5,7 @@
 
   $ . $TESTDIR/testing/firefoxrepos.sh
   $ makefirefoxreposserver root $HGPORT
-  $ installfakereposerver $HGPORT
+  $ installfakereposerver $HGPORT $TESTTMP/root
   $ populatedummydata root >/dev/null
 
   $ hg init repo1
@@ -35,7 +35,7 @@
 Pushing multiple heads will result in abort
 
   $ hg push --force -r 0:tip central
-  pushing to central
+  pushing to ssh://user@dummy/$TESTTMP/root/mozilla-central
   searching for changes
   abort: cannot push multiple heads to a Firefox tree; limit pushed revisions using the -r argument
   [255]
@@ -44,7 +44,7 @@ We can still push multiple heads to non-Firefox repos
 
   $ rm .hg/IS_FIREFOX_REPO
   $ hg push --force -r 0:tip central
-  pushing to central
+  pushing to ssh://user@dummy/$TESTTMP/root/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
