@@ -48,6 +48,7 @@ def hook(ui, repo, hooktype, node, **kwargs):
         'mrbkap',           # Blake Kaplan
         'bholley',          # Bobby Holley
         'baku',             # Andrea Marchesini
+        'ehsan',            # Ehsan Akhgari
 
         # Non-DOM peers who can review some WebIDL changes
         'hsinyi',           # Hsin-Yi Tsai for RIL APIs
@@ -66,6 +67,8 @@ def hook(ui, repo, hooktype, node, **kwargs):
         'hsivonen@hsivonen.fi',    # Henri Sivonen
         'mrbkap@gmail.com',        # Blake Kaplan
         'amarchesini@mozilla.com', # Andrea Marchesini
+        'ehsan@mozilla.com',       # Ehsan Akhgari
+        'ehsan.akhgari@gmail.com', # Ehsan Akhgari
     ]
     error = ""
     webidlReviewed = False
