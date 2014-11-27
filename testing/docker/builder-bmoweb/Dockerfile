@@ -119,12 +119,9 @@ ENV BMO_URL http://localhost:80/
 RUN /usr/sbin/groupadd -g 1000 bugzilla
 RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 bugzilla
 
-# The DateTime packages were added to this list because we were getting
-# errors installing them from CPAN and this workaround was expedient.
 RUN apt-get update && apt-get -y install \
   apache2 build-essential cvs g++ git graphviz \
   libapache2-mod-perl2 libdaemon-generic-perl libgd-dev libssl-dev \
-  libdatetime-perl libdatetime-timezone-perl \
   mysql-client patchutils perlmagick pkg-config python3-mysql.connector \
   unzip
 
