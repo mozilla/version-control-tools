@@ -22,6 +22,9 @@ RUN curl -sL -o /Djblets.egg http://downloads.reviewboard.org/releases/Djblets/$
 RUN curl -sL -o /ReviewBoard.egg http://downloads.reviewboard.org/releases/ReviewBoard/${REVIEWBOARD_VERSION}
 RUN curl -sL -o /django_evolution.egg http://downloads.reviewboard.org/releases/django-evolution/${DJANGO_EVOLUTION_VERSION}
 
+ADD requirements.txt /requirements.txt
+RUN /venv/bin/pip install -r /requirements.txt
+
 RUN /venv/bin/easy_install /Djblets.egg
 RUN /venv/bin/easy_install /django_evolution.egg
 RUN /venv/bin/easy_install /ReviewBoard.egg
