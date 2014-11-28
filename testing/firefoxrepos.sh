@@ -3,8 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 makefirefoxrepo() {
-  hg init $1
-  touch $1/.hg/IS_FIREFOX_REPO
+  if [ ! -d $1 ]; then
+    hg init $1
+    touch $1/.hg/IS_FIREFOX_REPO
+  fi
 }
 
 # Construct a tree of repositories mimicking hg.mozilla.org.
@@ -29,6 +31,14 @@ makefirefoxreposserver() {
 [paths]
 / = $root/*
 EOF
+
+  if [ ! -z "${PUSHABLE_HTTP}" ]; then
+    cat >> hgweb.conf << EOF
+[web]
+push_ssl = False
+allow_push = *
+EOF
+  fi
 
   hg serve -d -p $2 --pid-file hg.pid --web-conf hgweb.conf
   cat hg.pid >> $DAEMON_PIDS
