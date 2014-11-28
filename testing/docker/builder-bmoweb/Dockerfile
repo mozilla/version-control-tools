@@ -123,7 +123,7 @@ RUN apt-get update && apt-get -y install \
   apache2 build-essential cvs g++ git graphviz \
   libapache2-mod-perl2 libdaemon-generic-perl libgd-dev libssl-dev \
   mysql-client patchutils perlmagick pkg-config python3-mysql.connector \
-  unzip
+  unzip wget
 
 RUN git clone https://git.mozilla.org/webtools/bmo/bugzilla.git $BUGZILLA_HOME/bugzilla
 
@@ -138,6 +138,12 @@ RUN cd $BUGZILLA_HOME/bugzilla && /usr/bin/patch -p1 < $BUGZILLA_HOME/elasticsea
 # this dependency isn't installed.
 RUN cd $BUGZILLA_HOME/bugzilla && ./install-module.pl Linux::Pid XMLRPC::Transport::HTTP
 RUN cd $BUGZILLA_HOME/bugzilla && ./install-module.pl --all
+
+# SOAP::Lite 1.12 is buggy.
+# Install 1.11 explicitly until it is fixed.
+RUN cd $BUGZILLA_HOME && wget http://search.cpan.org/CPAN/authors/id/P/PH/PHRED/SOAP-Lite-1.11.tar.gz
+RUN tar -C $BUGZILLA_HOME -xvz -f $BUGZILLA_HOME/SOAP-Lite-1.11.tar.gz
+RUN cd $BUGZILLA_HOME/SOAP-Lite-1.11 && perl Makefile.PL INSTALLSITELIB=$BUGZILLA_HOME/bugzilla/lib && make install
 
 ADD checksetup_answers.txt $BUGZILLA_HOME/checksetup_answers.txt
 
