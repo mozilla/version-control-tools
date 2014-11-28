@@ -15,6 +15,8 @@ class Bugzilla(object):
     """High-level API to common Bugzilla tasks."""
 
     def __init__(self, base_url, username, password):
+        base_url = base_url.rstrip('/')
+
         self.base_url = base_url
         self.username = username
         self.password = password
