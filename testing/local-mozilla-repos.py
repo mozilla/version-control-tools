@@ -11,9 +11,16 @@ Enabling this extension causes local repositories in the test environment
 to answer true to "is a Mozilla repository."
 """
 
-from mercurial import demandimport
+import os
+import sys
 
-from mozautomation import repository
+try:
+    from mozautomation import repository
+except ImportError:
+    root = os.path.join(os.path.dirname(__file__), '..')
+    sys.path.insert(0, os.path.normpath(os.path.join(root, 'pylib', 'mozautomation')))
+
+    from mozautomation import repository
 
 def extsetup(ui):
     read_uri = ui.config('localmozrepo', 'readuri')
