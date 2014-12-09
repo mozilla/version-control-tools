@@ -220,6 +220,18 @@ class ReviewBoardCommands(object):
 
         print('created review %s' % r.rsp['review']['id'])
 
+    @Command('publish-review', category='reviewboard',
+        description='Publish a review')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Review request review is attached to')
+    @CommandArgument('rid', help='Review to publish')
+    def publish_review(self, port, rrid, rid):
+        root = self._get_root(port)
+        review = root.get_review(review_request_id=rrid, review_id=rid)
+        review.update(public=True)
+
+        print('published review %s' % review.id)
+
     @Command('create-review-reply', category='reviewboard',
         description='Create a reply to an existing review')
     @CommandArgument('port', help='Port number Review Board is running on')
@@ -246,6 +258,37 @@ class ReviewBoardCommands(object):
 
         r = replies.create(**args)
         print('created review reply %s' % r.rsp['reply']['id'])
+
+    @Command('create-diff-comment', category='reviewboard',
+        description='Create a comment on a diff')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Review request to create comment on')
+    @CommandArgument('rid', help='Review to create comment on')
+    @CommandArgument('filename', help='File to leave comment on')
+    @CommandArgument('first_line', help='Line comment should apply to')
+    @CommandArgument('text', help='Text constituting diff comment')
+    def create_diff_comment(self, port, rrid, rid, filename, first_line, text):
+        root = self._get_root(port)
+
+        diffs = root.get_diffs(review_request_id=rrid)
+        diff = diffs[-1]
+        files = diff.get_files()
+
+        file_id = None
+        for file_diff in files:
+            if file_diff.source_file == filename:
+                file_id = file_diff.id
+
+        if not file_id:
+            print('could not find file in diff: %s' % filename)
+            return 1
+
+        reviews = root.get_reviews(review_request_id=rrid)
+        review = reviews.create()
+        comments = review.get_diff_comments()
+        comment = comments.create(filediff_id=file_id, first_line=first_line,
+            num_lines=1, text=text)
+        print('created diff comment %s' % comment.id)
 
     @Command('closediscarded', category='reviewboard',
         description='Close a review request as discarded.')
