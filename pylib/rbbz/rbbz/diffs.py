@@ -287,9 +287,9 @@ def render_comment_plain(comment, context, is_reply):
             for line in chunk['lines']:
                 lines.append("> +%s" % parser.unescape(line[5]))
 
-    lines.append("\n%s" % comment)
+    lines.append(u"\n%s" % comment)
 
-    return "\n".join(lines)
+    return u"\n".join(lines)
 
 
 def build_plaintext_review(review, url, context):
