@@ -35,6 +35,13 @@ TREE_ALIASES = {
     'b-i': ('b2ginbound',),
     'comm-central': ('comm',),
     'c-c': ('comm',),
+    'cc': ('comm',),
+    'c-a': ('comm-aurora',),
+    'ca': ('comm-aurora',),
+    'c-b': ('comm-beta',),
+    'cb': ('comm-beta',),
+    'c-r': ('comm-release',),
+    'cr': ('comm-release',),
 
     'releases': ('esr17', 'b2g18', 'esr24', 'b2g26', 'b2g28', 'b2g30', 'esr31',
         'b2g32', 'b2g34', 'release', 'beta', 'aurora', 'central'),
@@ -89,9 +96,19 @@ REPOS = {
     'oak': 'projects/oak',
     'pine': 'projects/pine',
 
+    # Comm repositories.
+    'comm': 'comm-central',
+    'comm-aurora': 'releases/comm-aurora',
+    'comm-beta': 'releases/comm-beta',
+    'comm-release': 'releases/comm-release',
+    'comm-esr10': 'releases/comm-esr10',
+    'comm-esr17': 'releases/comm-esr17',
+    'comm-esr24': 'releases/comm-esr24',
+    'comm-esr31': 'releases/comm-esr31',
+
     # Misc
     'try': 'try',
-    'comm': 'comm-central',
+    'try-comm': 'try-comm-central',
 }
 
 OFFICIAL_MAP = {
