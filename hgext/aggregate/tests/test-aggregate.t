@@ -49,3 +49,10 @@ Install a new commit on central and aggregate
   adding file changes
   added 1 changesets with 1 changes to 1 files (+1 heads)
   aggregated 1 changesets from 1 repos
+
+Test repo-aggregate.py
+
+  $ $TESTDIR/hgext/aggregate/repo-aggregate.py `which hg` . --maximum 3 --delay 1
+  no changesets aggregated
+  no changesets aggregated
+  no changesets aggregated
