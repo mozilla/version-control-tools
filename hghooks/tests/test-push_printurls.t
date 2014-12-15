@@ -52,7 +52,7 @@ Pushing a changeset to Try prints Treeherder and TBPL URLs
   You can view your change at the following URL:
     https://hg.mozilla.org/try/rev/3d7d3272d708
   You can view the progress of your build at the following URL:
-    https://treeherder.mozilla.org/ui/#/jobs?repo=try&revision=3d7d3272d708
+    https://treeherder.mozilla.org/#/jobs?repo=try&revision=3d7d3272d708
   Alternatively, view them on TBPL (soon to be deprecated):
     https://tbpl.mozilla.org/?tree=Try&rev=3d7d3272d708
 
@@ -68,7 +68,7 @@ try-comm-central is also special
   You can view your change at the following URL:
     https://hg.mozilla.org/try-comm-central/rev/3d7d3272d708
   You can view the progress of your build at the following URL:
-    https://treeherder.mozilla.org/ui/#/jobs?repo=try-comm-central&revision=3d7d3272d708
+    https://treeherder.mozilla.org/#/jobs?repo=try-comm-central&revision=3d7d3272d708
   Alternatively, view them on TBPL (soon to be deprecated):
     https://tbpl.mozilla.org/?tree=Thunderbird-Try&rev=3d7d3272d708
 

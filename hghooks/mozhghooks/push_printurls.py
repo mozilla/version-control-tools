@@ -116,7 +116,7 @@ def hook(ui, repo, node, hooktype, **kwargs):
         # TBPL uses alternative names that don't match buildbot or hg.
         tbpl_name = 'Thunderbird-Try' if repo_name == 'try-comm-central' else 'Try'
         print 'You can view the progress of your build at the following URL:'
-        print '  https://treeherder.mozilla.org/ui/#/jobs?repo=%s&revision=%s' % (repo_name, tip_node)
+        print '  https://treeherder.mozilla.org/#/jobs?repo=%s&revision=%s' % (repo_name, tip_node)
         print 'Alternatively, view them on TBPL (soon to be deprecated):'
         print '  https://tbpl.mozilla.org/?tree=%s&rev=%s' % (tbpl_name, tip_node)
 
