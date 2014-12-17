@@ -63,6 +63,7 @@ from mozhg.auth import getbugzillaauth
 testedwith = '3.0 3.1 3.2'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial:%20bzpost'
 
+
 def wrappedpushbookmark(orig, pushop):
     result = orig(pushop)
 
@@ -84,15 +85,11 @@ def wrappedpushbookmark(orig, pushop):
     if tree and tree in repository.RELEASE_TREES:
         return result
 
-    tbpltree = None
     ui = pushop.ui
 
     if tree:
         baseuri = repository.resolve_trees_to_uris([tree])[0][1]
         assert baseuri
-
-        if tree == 'try':
-            tbpltree = 'Try'
     else:
         # This isn't a known Firefox tree. Fall back to resolving URLs by
         # hostname.
@@ -122,7 +119,7 @@ def wrappedpushbookmark(orig, pushop):
         # changesets that have been pushed to an official tree but aren't yet
         # on this specific remote. We use the phase information as a proxy
         # for "already pushed" and prune public changesets from consideration.
-        if tbpltree == 'Try' and ctx.phase() == phases.public:
+        if tree == 'try' and ctx.phase() == phases.public:
             continue
 
         bugs = parse_bugs(ctx.description())
@@ -146,21 +143,20 @@ def wrappedpushbookmark(orig, pushop):
     bugsy = Bugsy(username=bzauth.username, password=bzauth.password,
             bugzilla_url=bzurl)
 
-    # If this is a try push, we paste the TBPL link for the tip commit, because
+    # If this is a try push, we paste the Treeherder link for the tip commit, because
     # the per-commit URLs don't have much value.
-    # TODO roll this into normal pushing so we get a TBPL link in bugs as well.
-    if tbpltree and lastbug:
-        tbplurl = 'https://tbpl.mozilla.org/?tree=%s&rev=%s' % (
-            tbpltree, lastnode)
+    # TODO roll this into normal pushing so we get a Treeherder link in bugs as well.
+    if tree == 'try' and lastbug:
+        treeherderurl = repository.treeherder_url(tree, lastnode)
 
         bug = bugsy.get(lastbug)
         comments = bug.get_comments()
         for comment in comments:
-            if tbplurl in comment.text:
+            if treeherderurl in comment.text:
                 return result
 
-        ui.write(_('recording TBPL push in bug %s\n') % lastbug)
-        bug.add_comment(tbplurl)
+        ui.write(_('recording Treeherder push in bug %s\n') % lastbug)
+        bug.add_comment(treeherderurl)
         return result
 
     for bugnumber, nodes in bugsmap.items():
@@ -191,8 +187,10 @@ def wrappedpushbookmark(orig, pushop):
 
     return result
 
+
 def extsetup(ui):
     extensions.wrapfunction(exchange, '_pushbookmark', wrappedpushbookmark)
+
 
 def updateunknown(remoteurl, base, ui):
     if not remoteurl.startswith(base):

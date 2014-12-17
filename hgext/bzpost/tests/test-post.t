@@ -170,7 +170,7 @@ Pushing to Try will post TBPL comment
     - author: admin@example.com
       id: 8
       tags: []
-      text: https://tbpl.mozilla.org/?tree=Try&rev=311111800824
+      text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=311111800824
     summary: bug4
 
   $ cd ..
@@ -245,7 +245,7 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
     - author: admin@example.com
       id: 11
       tags: []
-      text: https://tbpl.mozilla.org/?tree=Try&rev=9257b757fa7a
+      text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=9257b757fa7a
     summary: bug6
 
   $ cd ..
