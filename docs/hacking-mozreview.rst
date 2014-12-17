@@ -47,7 +47,7 @@ image).
 
 Now, you can create and start a MozReview instance::
 
-  $ ./mozrevew start /path/to/instance
+  $ ./mozreview start /path/to/instance
   Bugzilla URL: http://192.168.59.103:57485/
   Review Board URL: http://localhost:57486/
   Mercurial URL: http://localhost:57487/
@@ -96,7 +96,7 @@ Creating Users
 MozReview instances initially only have a single user: the admin user.
 You'll probably want to set up a regular user account. Using mozreview:: 
 
-   $ ./mozrevew create-user /path/to/instance me@example.com password 'Joe Smith'
+   $ ./mozreview create-user /path/to/instance me@example.com password 'Joe Smith'
 
 Stopping the Servers
 --------------------
@@ -178,7 +178,7 @@ Running Tests
 The MozReview tests are all defined as part of the Mercurial extension.
 To run the tests::
 
-   $ ./run-mercurial-tests -j2 hgext/reviewboard/tests/*
+   $ ./run-mercurial-tests.py -j2 hgext/reviewboard/tests/*
 
 Filing Bugs
 ===========
