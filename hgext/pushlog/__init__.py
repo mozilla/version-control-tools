@@ -19,7 +19,7 @@ from mercurial import (
 from mercurial.error import Abort
 from mercurial.node import bin, hex
 
-testedwith = '3.0 3.1 3.2'
+testedwith = '3.2'
 
 SCHEMA = [
     'CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)',
