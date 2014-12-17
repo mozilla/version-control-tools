@@ -141,7 +141,7 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
 
   $ cd ..
 
-Pushing to Try will post TBPL comment
+Pushing to Try will post Treeherder comment
 
   $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug4
 
@@ -158,7 +158,7 @@ Pushing to Try will post TBPL comment
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
-  recording TBPL push in bug 4
+  recording Treeherder push in bug 4
 
   $ $TESTDIR/bugzilla dump-bug 4
   Bug 4:
@@ -226,7 +226,7 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 1 files (+1 heads)
-  recording TBPL push in bug 6
+  recording Treeherder push in bug 6
 
   $ $TESTDIR/bugzilla dump-bug 5 6
   Bug 5:
