@@ -205,8 +205,8 @@ firstpushuser
 firstpushtree
    The name of the first tree this changeset was pushed to.
 
-firstpushtbpl
-   The URL of the TBPL results for the first push of this changeset.
+firstpushtreeherder
+   The URL of the Treeherder results for the first push of this changeset.
 
 firstpushdate
    The date of the first push of this changeset.
@@ -341,7 +341,7 @@ from mozautomation.repository import (
     resolve_trees_to_official,
     resolve_trees_to_uris,
     resolve_uri_to_tree,
-    tbpl_url,
+    treeherder_url,
     TREE_ALIASES,
 )
 
@@ -534,9 +534,9 @@ def treestatus(ui, *trees, **opts):
             ui.write('%s: %s\n' % (tree.rjust(longest), s.status))
 
 
-@command('tbpl', [], _('hg tbpl [TREE] [REV]'))
-def tbpl(ui, repo, tree=None, rev=None, **opts):
-    """Open TBPL showing build status for the specified revision.
+@command('treeherder', [], _('hg treeherder [TREE] [REV]'))
+def treeherder(ui, repo, tree=None, rev=None, **opts):
+    """Open Treeherder showing build status for the specified revision.
 
     The command receives a tree name and a revision to query. The tree is
     required because a revision/changeset may existing in multiple
@@ -561,7 +561,7 @@ def tbpl(ui, repo, tree=None, rev=None, **opts):
 
     push_node = push.last_node
 
-    url = tbpl_url(tree, push_node[0:12])
+    url = treeherder_url(tree, push_node[0:12])
 
     import webbrowser
     webbrowser.get('firefox').open(url)
@@ -644,10 +644,10 @@ def print_changeset_pushes(ui, repo, rev, all=False):
         if len(releases):
             release = sorted(releases)[0]
 
-        tbpl = tbpl_url(tree, hex(head_node)[0:12])
+        url = treeherder_url(tree, hex(head_node)[0:12])
         date = datetime.datetime.fromtimestamp(when)
         ui.write(release.ljust(8), tree.ljust(longest_tree), date.isoformat(),
-            ' ', user.ljust(longest_user), tbpl or '', '\n')
+            ' ', user.ljust(longest_user), url or '', '\n')
 
 
 @command('changesetpushes',
@@ -1228,8 +1228,8 @@ def template_firstpushtree(repo, ctx, **args):
     return pushes[0][0]
 
 
-def template_firstpushtbpl(repo, ctx, **args):
-    """:firstpushtbpl: String. TBPL URL for the first push of this changeset.
+def template_firstpushtreeherder(repo, ctx, **args):
+    """:firstpushtreeherder: String. Treeherder URL for the first push of this changeset.
     """
     pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
     if not pushes:
@@ -1238,7 +1238,7 @@ def template_firstpushtbpl(repo, ctx, **args):
     push = pushes[0]
     tree, node = push[0], push[4]
 
-    return tbpl_url(tree, hex(node)[0:12])
+    return treeherder_url(tree, hex(node)[0:12])
 
 
 def template_firstpushdate(repo, ctx, **args):
@@ -1341,7 +1341,7 @@ def extsetup(ui):
         templatekw.keywords['nightlydate'] = template_nightlydate
         templatekw.keywords['firstpushuser'] = template_firstpushuser
         templatekw.keywords['firstpushtree'] = template_firstpushtree
-        templatekw.keywords['firstpushtbpl'] = template_firstpushtbpl
+        templatekw.keywords['firstpushtreeherder'] = template_firstpushtreeherder
         templatekw.keywords['firstpushdate'] = template_firstpushdate
         templatekw.keywords['pushdates'] = template_pushdates
         templatekw.keywords['pushheaddates'] = template_pushheaddates

@@ -195,28 +195,14 @@ def resolve_uri_to_tree(uri):
     return None
 
 
-def tbpl_tree_name(tree):
-    """Obtain the TBPL tree name of a tree.
-
-    Returns None if the tree isn't known.
-    """
-
+def treeherder_url(tree, rev):
+    """Obtain the Treeherder url for a push."""
     tree = resolve_trees_to_official([tree])[0]
 
     if not tree:
         return None
 
-    return '-'.join(s.title() for s in tree.split('-'))
-
-
-def tbpl_url(tree, rev):
-    """Obtain the TBPL url for a push."""
-    tree = tbpl_tree_name(tree)
-
-    if not tree:
-        return None
-
-    return 'https://tbpl.mozilla.org/?tree=%s&rev=%s' % (tree, rev)
+    return 'https://treeherder.mozilla.org/#/jobs?repo=%s&revision=%s' % (tree, rev)
 
 
 class PushInfo(object):
