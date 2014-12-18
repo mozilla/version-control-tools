@@ -22,14 +22,14 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
     to Review Board. Each commit will become its own review request.
     Additionally, a review request with a diff encompassing all the commits
     will be created; This "squashed" review request will represent the push
-    for the provided `identifier`.
+    for the provided ``identifier``.
 
-    The `identifier` is a unique string which represents a series of pushed
+    The ``identifier`` is a unique string which represents a series of pushed
     commit sets. This identifier is used to update review requests with a new
     set of diffs from a new push. Generally this identifier will represent
     some unit of work, such as a bug.
 
-    The `commits` argument takes the following form:
+    The ``commits`` argument takes the following form::
 
         {
             'squashed': {
@@ -59,60 +59,63 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
 
     Legend:
 
-    "unpublished_rids" = squashed_rr.extra_data['p2rb.unpublished_rids']
-    "discard_on_publish_rids" = squashed_rr.extra_data['p2rb.discard_on_publish_rids']
-    "squashed.commits" = squashed_rr.extra_data['p2rb.commits']
-    "draft.commits" = squashed_rr.draft.extra_data['p2rb.commits']
+    * "unpublished_rids" = squashed_rr.extra_data['p2rb.unpublished_rids']
+    * "discard_on_publish_rids" = squashed_rr.extra_data['p2rb.discard_on_publish_rids']
+    * "squashed.commits" = squashed_rr.extra_data['p2rb.commits']
+    * "draft.commits" = squashed_rr.draft.extra_data['p2rb.commits']
 
-    A = unpublished_rids - draft.commits
-    B = draft.commits - squashed.commits
-    C = draft.commits - unpublished rids
-    D = delete_on_publish_rids
+    * A = unpublished_rids - draft.commits
+    * B = draft.commits - squashed.commits
+    * C = draft.commits - unpublished rids
+    * D = delete_on_publish_rids
 
-    Diagram:
+    Diagram::
 
-            unpublished_rids                       squashed.commits
-     ________________________________________________________________
-    |                             |                                  |
-    |                             |                                  |
-    |                _____________|_____________                     |
-    |               |             |             |                    |
-    |        A      |       draft.commits       |           D        |
-    |               |             |             |                    |
-    |               |             |             |                    |
-    |               |      B      |        C    |                    |
-    |               |             |             |                    |
-    |               |             |             |                    |
-    |               |_____________|_____________|                    |
-    |                             |                                  |
-    |                             |         discard_on_publish_rids  |
-    |                             |                                  |
-    |_____________________________|__________________________________|
+                unpublished_rids                       squashed.commits
+         ________________________________________________________________
+        |                             |                                  |
+        |                             |                                  |
+        |                _____________|_____________                     |
+        |               |             |             |                    |
+        |        A      |       draft.commits       |           D        |
+        |               |             |             |                    |
+        |               |             |             |                    |
+        |               |      B      |        C    |                    |
+        |               |             |             |                    |
+        |               |             |             |                    |
+        |               |_____________|_____________|                    |
+        |                             |                                  |
+        |                             |         discard_on_publish_rids  |
+        |                             |                                  |
+        |_____________________________|__________________________________|
 
 
     The following rules should apply to the review request sets when publishing
-    or discarding:
+    or discarding.
 
     When publishing the squashed review request:
-        A: close "discarded" because it was never used
-        B: publish draft
-        C: publish draft
-        D: close "discarded" because it is obsolete
-        - set unpublished_rids to empty '[]'
-        - set discard_on_publish_rids to empty '[]'
+
+    * A: close "discarded" because it was never used
+    * B: publish draft
+    * C: publish draft
+    * D: close "discarded" because it is obsolete
+    * set unpublished_rids to empty '[]'
+    * set discard_on_publish_rids to empty '[]'
 
     When discarding the draft of a published squashed review request:
-        A: close "discarded" because it was never used (so it does not appear in
-            the owners dashboard)
-        B: close "discarded" because it was never used (so it does not appear in
-            the owners dashboard)
-        C: DELETE the review request draft
-        D: do nothing
-        - set unpublished_rids to empty '[]'
-        - set discard_on_publish_rids to empty '[]'
+
+    * A: close "discarded" because it was never used (so it does not appear in
+      the owners dashboard)
+    * B: close "discarded" because it was never used (so it does not appear in
+      the owners dashboard)
+    * C: DELETE the review request draft
+    * D: do nothing
+    * set unpublished_rids to empty '[]'
+    * set discard_on_publish_rids to empty '[]'
 
     When discarding an unpublished squashed review request (always a close "discarded"):
-        TODO Bug 1047465
+
+    * TODO Bug 1047465
     """
     rbc = None
 
@@ -413,6 +416,7 @@ def get_previous_commits(squashed_rr):
 
     This will return a list of tuples specifying the previous commit
     id as well as the review request it is represented by. ex::
+
         [
             # (<commit-id>, <review-request-id>),
             ('d4bd89322f54', '13'),
