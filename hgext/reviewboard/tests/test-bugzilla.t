@@ -67,11 +67,10 @@ Publishing the review will add an attachment to the bug
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick'
-    - author: admin@example.com
-      id: 4
-      tags: []
-      text: '/r/2 - Bug 1 - Foo 1
+        MozReview Request: bz://1/mynick
+  
+  
+        /r/2 - Bug 1 - Foo 1
   
   
         Pull down this commit:

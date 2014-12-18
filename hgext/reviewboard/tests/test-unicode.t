@@ -56,11 +56,10 @@ The globbing is patching over a bug in mach
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick'
-    - author: author@example.com
-      id: 3
-      tags: []
-      text: '/r/2 - Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
+  
+  
+        /r/2 - Bug 1 - Initial commit to review
   
   
         Pull down this commit:
@@ -68,7 +67,7 @@ The globbing is patching over a bug in mach
   
         hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
     - author: author@example.com
-      id: 4
+      id: 3
       tags: []
       text: "http://example.com/r/1/#review1\n\n::: foo\n(Diff revision 1)\n> -foo\n\
         > +initial\n\n\u3053\u3093\u306B\u3061\u306F\u4E16\u754C"

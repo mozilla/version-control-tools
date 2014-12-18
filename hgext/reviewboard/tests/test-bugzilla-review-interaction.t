@@ -60,11 +60,10 @@ Adding a reviewer should result in a r? flag being set
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick'
-    - author: author@example.com
-      id: 3
-      tags: []
-      text: '/r/2 - Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
+  
+  
+        /r/2 - Bug 1 - Initial commit to review
   
   
         Pull down this commit:
@@ -105,11 +104,10 @@ Adding a "Ship It" review will grant r+
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick'
-    - author: author@example.com
-      id: 3
-      tags: []
-      text: '/r/2 - Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
+  
+  
+        /r/2 - Bug 1 - Initial commit to review
   
   
         Pull down this commit:
@@ -117,9 +115,14 @@ Adding a "Ship It" review will grant r+
   
         hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
     - author: reviewer@example.com
-      id: 4
+      id: 3
       tags: []
-      text: 'http://example.com/r/1/#review1
+      text: 'Comment on attachment 1
+  
+        MozReview Request: bz://1/mynick
+  
+  
+        http://example.com/r/1/#review1
   
   
         LGTM'
@@ -157,11 +160,10 @@ Adding a reply to the review will add a comment to Bugzilla
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick'
-    - author: author@example.com
-      id: 3
-      tags: []
-      text: '/r/2 - Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
+  
+  
+        /r/2 - Bug 1 - Initial commit to review
   
   
         Pull down this commit:
@@ -169,14 +171,19 @@ Adding a reply to the review will add a comment to Bugzilla
   
         hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
     - author: reviewer@example.com
-      id: 4
+      id: 3
       tags: []
-      text: 'http://example.com/r/1/#review1
+      text: 'Comment on attachment 1
+  
+        MozReview Request: bz://1/mynick
+  
+  
+        http://example.com/r/1/#review1
   
   
         LGTM'
     - author: author@example.com
-      id: 5
+      id: 4
       tags: []
       text: 'http://example.com/r/1/#review2
   
@@ -222,19 +229,18 @@ Ensure multiple reviewers works as expected
       summary: 'MozReview Request: bz://2/mynick'
     comments:
     - author: author@example.com
-      id: 6
+      id: 5
       tags: []
       text: ''
     - author: author@example.com
-      id: 7
+      id: 6
       tags: []
       text: 'Created attachment 2
   
-        MozReview Request: bz://2/mynick'
-    - author: author@example.com
-      id: 8
-      tags: []
-      text: '/r/4 - Bug 2 - Multiple reviewers
+        MozReview Request: bz://2/mynick
+  
+  
+        /r/4 - Bug 2 - Multiple reviewers
   
   
         Pull down this commit:
@@ -268,19 +274,18 @@ Removing a reviewer should remove their review flag
       summary: 'MozReview Request: bz://2/mynick'
     comments:
     - author: author@example.com
-      id: 6
+      id: 5
       tags: []
       text: ''
     - author: author@example.com
-      id: 7
+      id: 6
       tags: []
       text: 'Created attachment 2
   
-        MozReview Request: bz://2/mynick'
-    - author: author@example.com
-      id: 8
-      tags: []
-      text: '/r/4 - Bug 2 - Multiple reviewers
+        MozReview Request: bz://2/mynick
+  
+  
+        /r/4 - Bug 2 - Multiple reviewers
   
   
         Pull down this commit:
@@ -288,9 +293,14 @@ Removing a reviewer should remove their review flag
   
         hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
     - author: author@example.com
-      id: 9
+      id: 7
       tags: []
-      text: '/r/4 - Bug 2 - Multiple reviewers
+      text: 'Comment on attachment 2
+  
+        MozReview Request: bz://2/mynick
+  
+  
+        /r/4 - Bug 2 - Multiple reviewers
   
   
         Pull down this commit:
@@ -319,39 +329,48 @@ Removing all reviewers should remove all flags
       summary: 'MozReview Request: bz://2/mynick'
     comments:
     - author: author@example.com
-      id: 6
+      id: 5
       tags: []
       text: ''
     - author: author@example.com
-      id: 7
+      id: 6
       tags: []
       text: 'Created attachment 2
   
-        MozReview Request: bz://2/mynick'
+        MozReview Request: bz://2/mynick
+  
+  
+        /r/4 - Bug 2 - Multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
+    - author: author@example.com
+      id: 7
+      tags: []
+      text: 'Comment on attachment 2
+  
+        MozReview Request: bz://2/mynick
+  
+  
+        /r/4 - Bug 2 - Multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
     - author: author@example.com
       id: 8
       tags: []
-      text: '/r/4 - Bug 2 - Multiple reviewers
+      text: 'Comment on attachment 2
+  
+        MozReview Request: bz://2/mynick
   
   
-        Pull down this commit:
-  
-  
-        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
-    - author: author@example.com
-      id: 9
-      tags: []
-      text: '/r/4 - Bug 2 - Multiple reviewers
-  
-  
-        Pull down this commit:
-  
-  
-        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
-    - author: author@example.com
-      id: 10
-      tags: []
-      text: '/r/4 - Bug 2 - Multiple reviewers
+        /r/4 - Bug 2 - Multiple reviewers
   
   
         Pull down this commit:
@@ -402,19 +421,18 @@ review? sticks around when 1 person grants review
       summary: 'MozReview Request: bz://3/mynick'
     comments:
     - author: author@example.com
-      id: 11
+      id: 9
       tags: []
       text: ''
     - author: author@example.com
-      id: 12
+      id: 10
       tags: []
       text: 'Created attachment 3
   
-        MozReview Request: bz://3/mynick'
-    - author: author@example.com
-      id: 13
-      tags: []
-      text: '/r/6 - Bug 3 - More multiple reviewers
+        MozReview Request: bz://3/mynick
+  
+  
+        /r/6 - Bug 3 - More multiple reviewers
   
   
         Pull down this commit:
@@ -422,9 +440,14 @@ review? sticks around when 1 person grants review
   
         hg pull -r fb992de2921c9dd3117becff799b1e41e0dc4827 http://localhost:$HGPORT/'
     - author: reviewer@example.com
-      id: 14
+      id: 11
       tags: []
-      text: 'http://example.com/r/5/#review3
+      text: 'Comment on attachment 3
+  
+        MozReview Request: bz://3/mynick
+  
+  
+        http://example.com/r/5/#review3
   
   
         land it!'
@@ -472,19 +495,18 @@ Random users can come along and grant review
       summary: 'MozReview Request: bz://4/mynick'
     comments:
     - author: author@example.com
-      id: 15
+      id: 12
       tags: []
       text: ''
     - author: author@example.com
-      id: 16
+      id: 13
       tags: []
       text: 'Created attachment 4
   
-        MozReview Request: bz://4/mynick'
-    - author: author@example.com
-      id: 17
-      tags: []
-      text: '/r/8 - Bug 4 - Unrelated Reviewers
+        MozReview Request: bz://4/mynick
+  
+  
+        /r/8 - Bug 4 - Unrelated Reviewers
   
   
         Pull down this commit:
@@ -492,9 +514,14 @@ Random users can come along and grant review
   
         hg pull -r 13295ed17a69bdcef2644c0ab72736292db21b80 http://localhost:$HGPORT/'
     - author: troll@example.com
-      id: 18
+      id: 14
       tags: []
-      text: 'http://example.com/r/7/#review4
+      text: 'Comment on attachment 4
+  
+        MozReview Request: bz://4/mynick
+  
+  
+        http://example.com/r/7/#review4
   
   
         I am always watching'

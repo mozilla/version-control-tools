@@ -64,11 +64,10 @@
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://123/mynick'
-    - author: admin@example.com
-      id: 125
-      tags: []
-      text: '/r/2 - Bug 123 - Foo 1
+        MozReview Request: bz://123/mynick
+  
+  
+        /r/2 - Bug 123 - Foo 1
   
         /r/3 - Bug 123 - Foo 2
   
@@ -167,11 +166,10 @@ The review attachment should be marked as obsolete
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://123/mynick'
-    - author: admin@example.com
-      id: 125
-      tags: []
-      text: '/r/2 - Bug 123 - Foo 1
+        MozReview Request: bz://123/mynick
+  
+  
+        /r/2 - Bug 123 - Foo 1
   
         /r/3 - Bug 123 - Foo 2
   
@@ -311,11 +309,10 @@ There should still not be a visible attachment on the bug
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://123/mynick'
-    - author: admin@example.com
-      id: 125
-      tags: []
-      text: '/r/2 - Bug 123 - Foo 1
+        MozReview Request: bz://123/mynick
+  
+  
+        /r/2 - Bug 123 - Foo 1
   
         /r/3 - Bug 123 - Foo 2
   
@@ -413,11 +410,10 @@ The attachment for the review request should be unobsoleted
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://123/mynick'
-    - author: admin@example.com
-      id: 125
-      tags: []
-      text: '/r/2 - Bug 123 - Foo 1
+        MozReview Request: bz://123/mynick
+  
+  
+        /r/2 - Bug 123 - Foo 1
   
         /r/3 - Bug 123 - Foo 2
   
@@ -427,9 +423,14 @@ The attachment for the review request should be unobsoleted
   
         hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
     - author: admin@example.com
-      id: 126
+      id: 125
       tags: []
-      text: '/r/2 - Bug 123 - Foo 1
+      text: 'Comment on attachment 1
+  
+        MozReview Request: bz://123/mynick
+  
+  
+        /r/2 - Bug 123 - Foo 1
   
         /r/3 - Bug 123 - Foo 2
   

@@ -54,11 +54,10 @@ Sanity check to ensure we have a review flag set
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick'
-    - author: author@example.com
-      id: 3
-      tags: []
-      text: '/r/2 - Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
+  
+  
+        /r/2 - Bug 1 - Initial commit to review
   
   
         Pull down this commit:
@@ -94,11 +93,10 @@ Publishing a review will clear the r? flag
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick'
-    - author: author@example.com
-      id: 3
-      tags: []
-      text: '/r/2 - Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
+  
+  
+        /r/2 - Bug 1 - Initial commit to review
   
   
         Pull down this commit:
@@ -106,7 +104,7 @@ Publishing a review will clear the r? flag
   
         hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/'
     - author: reviewer@example.com
-      id: 4
+      id: 3
       tags: []
       text: 'Comment on attachment 1
   
@@ -145,11 +143,10 @@ Posting a non Ship It review without a review flag adds a comment
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick'
-    - author: author@example.com
-      id: 3
-      tags: []
-      text: '/r/2 - Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
+  
+  
+        /r/2 - Bug 1 - Initial commit to review
   
   
         Pull down this commit:
@@ -157,7 +154,7 @@ Posting a non Ship It review without a review flag adds a comment
   
         hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/'
     - author: reviewer@example.com
-      id: 4
+      id: 3
       tags: []
       text: 'Comment on attachment 1
   
@@ -169,7 +166,7 @@ Posting a non Ship It review without a review flag adds a comment
   
         I have reservations'
     - author: reviewer@example.com
-      id: 5
+      id: 4
       tags: []
       text: 'http://example.com/r/1/#review2
   
