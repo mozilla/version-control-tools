@@ -4,12 +4,12 @@ $(document).ready(function() {
   $("#new-navbar").insertBefore(".box.review-request");
   $("#new-navbar").show();
 
-  // Disable all editable fields in the review
-  // request box.
-  $(".main .editable").inlineEditor("disable");
-  // And then re-enable just the ones for reviewers in
-  // the commits list.
-  $("#rbmozui-child-commits .editable").inlineEditor("enable");
+  // Disable all editable fields.
+  $(".editable").inlineEditor("disable");
 
-  $('label[for="field_target_people"]').parent().parent().hide();
+  // Remove any of the non-header text in the draft banner
+  // that we can't get rid of nicely with CSS.
+  $("#draft-banner").click(function() {
+      window.location = (SITE_ROOT + 'rbmozui/commits/' + gReviewRequest.id);
+  });
 });

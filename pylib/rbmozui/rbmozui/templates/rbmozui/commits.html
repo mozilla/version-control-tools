@@ -1,39 +1,93 @@
-{% comment %}
-This is the template for the "Commits" list in a push-based review request.
-{% endcomment %}
+{% extends "reviews/reviewable_base.html" %}
 
-{% load i18n %}
+{% load djblets_extensions rb_extensions i18n %}
 
-<ul id="rbmozui-child-commits" class="current-arrow">
-  <li {% if root_rr.id == current_id %} current="true" {% endif %}>{% trans "Root review request" %}
-    <div class="reviews-diffs-links">
-{%  if is_draft %}
-      <a href="{{root_rr.review_request.get_absolute_url}}">[{% trans "Reviews" %}]</a> <a href="{{root_rr.review_request.get_absolute_url}}diff/">[{% trans "Diff" %}]</a>
-{%  else %}
-{%    if root_rr.id != current_id %}
-     <a href="{{root_rr.get_absolute_url}}">[{% trans "Reviews" %}]</a> <a href="{{root_rr.get_absolute_url}}diff/">[{% trans "Diff" %}]</a>
-{%    endif %}
-{%  endif %}
-    </div>
+{% ext_css_bundle extension "commits" %}
 
-    <ul class="current-arrow">
-{% for commit_id, child in child_rrs %}
-      <li {% if child.id == current_id %} current="true" {% endif %}>
-        <span title="{{commit_id}}">{{ commit_id|truncatechars:11 }}</span> - <span title="{{child.description}}">{{ child.summary }}</span>
-        <div>
-          <label>{% trans "Reviewers:" %}</label> <span class="child-rr-reviewers" data-id="{{child.id}}"></span>
-        </div>
-        <div class="reviews-diffs-links">
-{%    if child.id != current_id %}
-{%      if is_draft %}
-          <a href="{{child.review_request.get_absolute_url}}">[{% trans "Reviews" %}]</a> <a href="{{child.review_request.get_absolute_url}}diff/">[{% trans "Diff" %}]</a>
-{%      else %}
-          <a href="{{child.get_absolute_url}}">[{% trans "Reviews" %}]</a> <a href="{{child.get_absolute_url}}diff/">[{% trans "Diff" %}]</a>
-{%      endif %}
-{%    endif %}
-        </div>
-      </li>
-{% endfor %}
-    </ul>
+{% block title %}{{review_request.summary}} | {% trans "Review Request" %}{% endblock %}
+
+{% block content %}
+
+<div id="commits-container">
+  <div id="error-container">
+    <h1>Well, this is embarassing...</h1>
+    <p>
+      Something's gone wrong in either retrieving or manipulating these review requests. Sorry about that. <a href="https://bugzilla.mozilla.org/enter_bug.cgi?product=bugzilla.mozilla.org&component=rbbz" target="_blank">Please consider filing a bug,</a> and including the following information:
+    </p>
+    <p id="error-info">
+    </p>
+    <a href="#" id="error-close">Close</a>
+  </div>
+  <div id="commits">
+    <ul id="commit-list"></ul>
+  </div>
+  <button id="publish">Publish</button>
+</div>
+{% endblock content %}
+
+{% block scripts-post %}
+
+{{block.super}}
+
+{% template_hook_point "rbmozui-commits-scripts" %}
+
+<script type="text/template" id="loading-template">
+  <div class="loading commit-container">
+    Loading <%=commitID%>...
+  </div>
+</script>
+
+<script type="text/template" id="reviewer-template">
+  <li class="reviewer">
+    <span class="remove rb-icon rb-icon-delete" data-username="<%= reviewer.get('username')%>"></span>
+    <span><%= reviewer.get('username') %></span>
   </li>
-</ul>
+</script>
+
+<script type="text/template" id="commit-template">
+  <div class="commit commit-container" hasReviewers="<%= hasReviewers %>" state="<%= state %>">
+    <div class="commit-container-head">
+      <label class="commit-id">
+        <a href="<%=commitLink%>"><%=commitNum%>: <%= commitID %></a>
+      </label>
+      <div class="summary" title="<%= description %>"><%= summary %></div>
+    </div>
+    <div class="reviewer-container">
+      <label class="no-reviewers">
+        Needs reviewers
+      </label>
+      <label class="has-reviewers">
+        Reviewers:
+      </label>
+      <ul class="reviewers">
+        <% reviewers.each(function(reviewer) { %>
+          <%= reviewerTemplate({reviewer: reviewer}) %>
+        <% }); %>
+      </ul>
+    </div>
+    <div class="commit-container-foot">
+      <label class="add-reviewer-label">
+        Add a reviewer
+      </label>
+      <form class="reviewer-form">
+        <input class="reviewer-input" type="text" placeholder="Try a name, e-mail address, or IRC nick"/>
+      </form>
+      <span class="state">
+        <span class="needs-publishing">Needs publishing</span>
+        <span class="unsaved-changes">Unsaved changes</span>
+        <span class="published">Published</span>
+      </span>
+    </div>
+  </div>
+</script>
+
+<script>
+$(document).ready(function() {
+  new RBMozUI.CommitsView({
+    squashedID: {{squashed_id}},
+    commits: JSON.parse("{{commits_json|escapejs}}")
+  });
+  $("#new-navbar").show();
+});
+</script>
+{% endblock scripts-post %}

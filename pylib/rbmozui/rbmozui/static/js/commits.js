@@ -1,317 +1,413 @@
-/**
- * This code manages the construction and functionality of the reviewers
- * lists for each commit in a push-based review request.
- */
+RBMozUI = {};
 
 $(document).ready(function() {
-  // In order for us to successfully publish the review request on this page,
-  // we need to account for the possibility that this is a child review request
-  // and that no changes have been made directly to this request. For example,
-  // we're looking at a child review request, and the user has changed the
-  // reviewers on one of the other sibling review requests. In order to make
-  // it possible to publish with that change, we need to change this review
-  // request to suit - otherwise, Review Board will complain about us
-  // attempting to publish a draft with no changes. The change we make is
-  // to increment an extra_data value, the reviewer_epoch. This value is
-  // never used anywhere, and is just a hacky way of getting around the
-  // change requirement.
-  var epochKey = "p2rb.reviewer_epoch";
 
-  // We need to start by getting the reviewRequestEditor for the page
-  // we're on, since we're going to need to (at the very least) bump
-  // it's epoch and get ready to publish it.
-  var rootEditor = RB.PageManager.getPage().reviewRequestEditor;
-  var rootEditorView = RB.PageManager.getPage().reviewRequestEditorView;
-  var rootRequest = rootEditor.get("reviewRequest");
+  var $ErrorContainer = $("#error-container");
+  function reportError(aMsg) {
+    // A pretty terrible error reporting mechanism, but it sure
+    // beats modal alert dialogs.
+    $("#error-info").text(aMsg);
+    $ErrorContainer.attr("haserror", "true");;
+  }
 
-  // We need this warning in case we enter a reviewer name that doesn't
-  // exist. It's not the greatest warning interface, but it's what Review
-  // Board uses itself, so I guess it's as native as it gets.
-  var warning = $("#review-request-warning");
+  $("#error-close").click(function(aEvent) {
+    $ErrorContainer.attr("haserror", false);
+  });
 
-  // Depending on whether or not the current user has the ability to change
-  // the review request will determine what we load. If, for example, there
-  // is a draft for this review request, we will only attempt to load that
-  // draft if the user can, in fact, see the draft.
-  var isEditable = rootEditor.get("mutableByUser");
-  var rootThingToLoad = isEditable ? rootRequest.draft : rootRequest;
+  RBMozUI.Reviewer = RB.BaseResource.extend({
+    defaults: {
+      username: ""
+    },
 
-  // Takes a review request. If that review request has a draft, returns the
-  // draft - otherwise, it returns the review request. This is used when
-  // loading the reviewer lists for each child commit.
-  var requestOrDraft = function(reviewRequest) {
-    return reviewRequest.draft.id !== undefined ?
-           reviewRequest.draft :
-           reviewRequest;
-  };
+    initialize: function(aOptions) {
+      var person = aOptions.person;
+      if (person.hasOwnProperty('username')) {
+        this.set('username', person['username']);
+      } else {
+        this.set('username', person['title']);
+      }
+    }
+  });
 
-  // Takes a review request or a draft, and returns a string for the reviewers
-  // of that reviewable, comma-separated.
-  var getReviewers = function(reviewable) {
-    return reviewable.get('targetPeople')
-                     .map(function(aItem) {
-                       return aItem['username'] || aItem['title'];
-                     })
-                     .join(', ');
-  };
+  RBMozUI.ReviewerList = Backbone.Collection.extend({
+    model: RBMozUI.Reviewer
+  });
 
-  rootThingToLoad.ready({
-    ready: function() {
-      // The review request (or draft) for this page is loaded. Let's grab
-      // any previous epoch off of it to increment if necessary.
-      var epoch = parseInt(rootRequest.get("extraData")[epochKey], 10) || 0;
-      console.log("Loaded epoch: " + epoch);
+  RBMozUI.Commit = Backbone.Model.extend({
+    defaults: {
+      loaded: false,
+    },
 
-      var isSquashed = rootRequest.get("extraData")["p2rb.is_squashed"] == "True";
-      console.log("This request is squashed?: " + isSquashed);
+    requestOrDraft: function() {
+      return this.reviewRequest.draft.id !== undefined ?
+             this.reviewRequest.draft :
+             this.reviewRequest;
+    },
 
-      // This function will check through all of the reviewers that have been set,
-      // get the final, de-duped set of reviewers, and set those reviewers on the
-      // squashed review request. For now, this will only get called if the current
-      // review request we're viewing is the root review request.
-      var updateSquashedReviewers = function() {
-        var reviewerNames = [];
-        // We could / should probably store each child review request object,
-        // and query them rather than grabbing the text out of the nodes, but this
-        // will do for now.
-        $(".child-rr-reviewers").each(function(i, reviewerList) {
-          reviewerNames = reviewerNames.concat($(reviewerList).text().split(', '));
-        });
-        reviewerNames = _.unique(reviewerNames).join(',');
+    hasDraft: function() {
+      return this.reviewRequest.draft.id !== undefined;
+    },
 
-        console.log("Setting root reviewer names to: " + reviewerNames);
-
-        // Now set the reviewer names on the squashed review request!
-        rootEditor.setDraftField("targetPeople", reviewerNames, {
-          jsonFieldName: "target_people",
-            success: function() {
-              console.log('Successfully set reviewers on root review request.');
-              // Now, because it's possible that the final set of the reviewers
-              // didn't actually change for the squashed review request, we bump
-              // the epoch so that publishing goes smoothly.
-              epoch++;
-              console.log("Setting epoch to: " + epoch);
-
-              rootEditor.setDraftField(epochKey, epoch, {
-                fieldID: epochKey,
-                useExtraData: true,
-                success: function() {
-                  console.log('Reviewers and epoch correctly set.');
-                },
-                error: function(aErrorObject) {
-                  console.error('Failed to bump epoch on squashed review request: '
-                                 + aErrorObject.errorText);
-                }
-              })
-            },
-            error: function(aErrorObject) {
-              console.error('Failed to set reviewers on squashed review: '
-                             + aErrorObject.errorText);
-            }
-        });
-      };
-
-      // Now we populate the list of reviewers for each child review request,
-      // and potentially make them editable if the user has edit rights on this
-      // review request and this is the squashed review request.
-      $(".child-rr-reviewers").each(function(i, reviewerList) {
-        console.log("Constructing reviewer list for item at index " + i);
-        var rid = $(reviewerList).data("id");
-        console.log("Fetching info for review request with id: " + rid);
-        var rr = new RB.ReviewRequest({id: rid});
-
-        // As before, we might have a draft we can load if we have edit rights.
-        var thingToLoad = isEditable ? rr.draft : rr;
-
-        thingToLoad.ready({
-          ready: function() {
-            // If this review request is editable, but there's actually no draft
-            // just yet, then we need to pull the target people from the review
-            // request instead of the draft. That's where requestOrDraft comes in
-            // handy.
-            var thingToReview = requestOrDraft(rr);
-            var reviewers = getReviewers(thingToReview);
-            console.log("Got reviewers: " + reviewers);
-
-            // Display the reviewers in the node.
-            $(reviewerList).text(reviewers);
-
-            // Construct the editor to allow the user to update
-            // the reviewers.
-            var editorOptions = {
-              editIconClass: "rb-icon rb-icon-edit",
-              useEditIconOnly: true,
-              // For now, we only enable editing the reviewers on
-              // child review requests when looking at the squashed
-              // review request.
-              enabled: isEditable && isSquashed,
-            };
-
-            $(reviewerList)
-              .inlineEditor(editorOptions)
-              .on({
-                beginEdit: function() {
-                  console.assert(isEditable, "User needs edit permissions on this review request.");
-                  // The editCount is used to determine if we should warn the user before
-                  // unloading the page because they still have an editor open.
-                  rootEditor.incr("editCount");
-                },
-                cancel: _.bind(function() {
-                  rootEditor.decr("editCount");
-                }, this),
-                complete: _.bind(function(e, value) {
-                  console.assert(isEditable, 'User needs edit permissions on this review request.');
-
-                  // The ReviewRequestEditor is the interface that we use to modify
-                  // a review request easily.
-                  var editor = new RB.ReviewRequestEditor({reviewRequest: rr});
-
-                  // This sets the reviewers on the child review request.
-                  editor.setDraftField(
-                    "targetPeople",
-                    value,
-                    {
-                      jsonFieldName: "target_people",
-                      error: function(error) {
-                        rootEditor.decr("editCount");
-                        console.error(error);
-                        // This error display code is copied pretty much verbatim
-                        // from Review Board core to match the behaviour of attempting
-                        // to set a target reviewer to one or more users that does not
-                        // exist.
-                        warning
-                          .delay(6000)
-                          .fadeOut(400, function() {
-                              $(this).hide();
-                          })
-                          .show()
-                          .html(error.errorText);
-
-                        // Revert the list back to what we started with.
-                        $(reviewerList).text(reviewers);
-                      },
-                      success: function() {
-                        rootEditor.decr("editCount");
-                        // We need to set the reviewers on the root review request
-                        // as well, or else Review Board is going to complain.
-                        updateSquashedReviewers();
-                        rootEditorView.showBanner();
-                        $(reviewerList).text(getReviewers(rr.draft));
-                      }
-                    },
-                    this);
-                }, this)
-            });
-
-            // This next bit sets up the autocomplete popups for reviewers for
-            // the inline editors.
-            var acOptions = {
-              fieldName: "users",
-              nameKey: "username",
-              descKey: "fullname",
-              extraParams: {
-                fullname: 1
-              },
-              cmp: function(term, a, b) {
-                /*
-                 * Sort the results with username matches first (in
-                 * alphabetical order), followed by real name matches (in
-                 * alphabetical order)
-                 */
-                var aUsername = a.data.username,
-                    bUsername = b.data.username,
-                    aFullname = a.data.fullname || "",
-                    bFullname = a.data.fullname || "";
-
-                if (aUsername.indexOf(term) === 0) {
-                  if (bUsername.indexOf(term) === 0) {
-                      return aUsername.localeCompare(bUsername);
-                  }
-                  return -1;
-                } else if (bUsername.indexOf(term) === 0) {
-                  return 1;
-                } else {
-                  return aFullname.localeCompare(bFullname);
-                }
-              }
-            };
-
-            // Again, this is copied almost verbatim from Review Board core to
-            // mimic traditional behaviour for this kind of field.
-            $(reviewerList).inlineEditor("field")
-                           .rbautocomplete({
-              formatItem: function(data) {
-                var s = data[acOptions.nameKey];
-
-                if (acOptions.descKey && data[acOptions.descKey]) {
-                  s += ' <span>(' + _.escape(data[acOptions.descKey]) +
-                       ')</span>';
-                }
-
-                return s;
-              },
-              matchCase: false,
-              multiple: true,
-              parse: function(data) {
-                var items = data[acOptions.fieldName],
-                    itemsLen = items.length,
-                    parsed = [],
-                    value,
-                    i;
-
-                for (i = 0; i < itemsLen; i++) {
-                  value = items[i];
-
-                  parsed.push({
-                      data: value,
-                      value: value[acOptions.nameKey],
-                      result: value[acOptions.nameKey]
-                  });
-                }
-
-                return parsed;
-              },
-              url: SITE_ROOT +
-                   'api/' + (acOptions.resourceName || acOptions.fieldName) + '/',
-              extraParams: acOptions.extraParams,
-              cmp: acOptions.cmp,
-              width: 350,
-              error: function(xhr) {
-                  var text;
-                  try {
-                      text = $.parseJSON(xhr.responseText).err.msg;
-                  } catch (e) {
-                      text = 'HTTP ' + xhr.status + ' ' + xhr.statusText;
-                  }
-                  reportError(text);
-              }
-            }).on("autocompleteshow", function() {
-              /*
-               * Add the footer to the bottom of the results pane the
-               * first time it's created.
-               *
-               * Note that we may have multiple .ui-autocomplete-results
-               * elements, and we don't necessarily know which is tied to
-               * this. So, we'll look for all instances that don't contain
-               * a footer.
-               */
-              var resultsPane = $('.ui-autocomplete-results:not(' +
-                                  ':has(.ui-autocomplete-footer))');
-              if (resultsPane.length > 0) {
-                  $('<div/>')
-                      .addClass('ui-autocomplete-footer')
-                      .text(gettext('Press Tab to auto-complete.'))
-                      .appendTo(resultsPane);
-              }
-            });
-          },
-        });
+    initialize: function(options) {
+      this.reviewers = new RBMozUI.ReviewerList();
+      this.reviewRequest = new RB.ReviewRequest({
+        id: options.reviewRequestID,
+      });
+      this.commitID = options.commitID;
+      this.commitNum = options.commitNum;
+      this.editor = new RB.ReviewRequestEditor({
+        reviewRequest: this.reviewRequest
       });
     },
-    error: function(error) {
-      // Maybe do something a bit louder here, since this
-      // is a pretty awful case?
-      console.error(error);
+
+    ready: function(aSuccess, aFailure) {
+      this.reviewRequest.draft.ready({
+        ready: function() {
+          aSuccess();
+          this.resetReviewers();
+          this.set("loaded", true);
+        },
+        error: function(aMessage) {
+          aFailure(aMessage);
+        }
+      }, this);
+    },
+
+    resetReviewers: function() {
+      var targetPeople = this.requestOrDraft().get('targetPeople');
+      var reviewers = _.map(targetPeople, function(aTargetPerson) {
+        return new RBMozUI.Reviewer({person: aTargetPerson});
+      });
+      this.reviewers.reset(reviewers);
+    },
+
+    removeReviewer: function(aUsername) {
+      var usernames = this.reviewers
+                          .pluck('username')
+                          .filter(function(username) {
+                            return username != aUsername;
+                          }).join(',');
+      var self = this;
+      this.editor.setDraftField('targetPeople', usernames, {
+        jsonFieldName: 'target_people',
+        success: function() {
+          console.log('Successfully removed reviewer ' + aUsername);
+          self.resetReviewers();
+        },
+        error: function(aErrorObject) {
+          console.error(aErrorObject.errorText);
+        }
+      });
+    },
+
+    addReviewer: function(aUsername) {
+      var usernames = this.reviewers.pluck('username');
+      usernames.push(aUsername);
+
+      var usernameString = usernames.join(',');
+      var self = this;
+
+      this.editor.setDraftField('targetPeople', usernameString, {
+        jsonFieldName: 'target_people',
+        success: function() {
+          console.log('Successfully added reviewer ' + aUsername);
+          self.resetReviewers();
+        },
+        error: function(aErrorObject) {
+          reportError(aErrorObject.errorText);
+        }
+      });
     }
   })
+
+
+  RBMozUI.CommitsList = Backbone.Collection.extend({
+    model: RB.ReviewRequest
+  });
+
+  var Commits = new RBMozUI.CommitsList();
+
+  RBMozUI.CommitView = Backbone.View.extend({
+    tagName: 'li',
+    className: 'commit-list-item',
+    events: {
+      'click .remove': 'removeReviewer',
+      'submit .reviewer-form': 'onReviewerSubmit'
+    },
+    loadingTemplate: _.template($('#loading-template').html()),
+    commitTemplate: _.template($('#commit-template').html()),
+    reviewerTemplate: _.template($('#reviewer-template').html()),
+
+    initialize: function(aOptions) {
+      this.listenTo(this.model, "change", this.render);
+      this.listenTo(this.model.reviewRequest, "change", this.render);
+      this.listenTo(this.model.reviewRequest.draft, "change", this.render);
+      this.listenTo(this.model.reviewers, "reset", this.reviewersChanged);
+      // Kick off loading the Commit that we're holding onto.
+      this.model.ready(function() {
+        console.log('Successfully loaded Commit with ID' + this.model.commitID);
+      }.bind(this), this.handleError.bind(this));
+    },
+
+    handleError: function(aErrorMessage) {
+      reportError(aErrorMessage);
+    },
+
+    computeState: function() {
+      if (!this.model.reviewRequest.get('public')) {
+        return "needs-publishing";
+      }
+
+      if (this.model.hasDraft()) {
+        return "unsaved-changes";
+      }
+
+      return "published";
+    },
+
+    reviewersChanged: function() {
+      this.render();
+      this.$el.find('input.reviewer-input').focus();
+    },
+
+    render: function() {
+      // Hack alert - if an autocomplete GET request is still making the round
+      // trip by the time we re-render (if the user, for example, new the
+      // email address and just typed it in and pressed enter), in order to
+      // prevent the autocomplete popup from showing up anyways (and anchoring
+      // to the top left corner of the screen since the .reviewer-input is about
+      // to be replaced), we blur the input so that rbautocomplete ignores any
+      // requests coming in for it until it's refocused.
+      var input = this.$el.find('input.reviewer-input');
+      if (input) {
+        input.blur();
+      }
+
+      // In the base case, we've just kicked off the request to populate
+      // our review request and draft models, so we show a loading spinner.
+      if (!this.model.get("loaded")) {
+        this.$el.html(this.loadingTemplate({
+          commitID: this.model.commitID
+        }));
+        return this;
+      }
+
+      var reviewable = this.model.requestOrDraft();
+      var commitLink = SITE_ROOT + 'r/' + this.model.reviewRequest.id;
+
+      this.$el.html(this.commitTemplate({
+        reviewerTemplate: this.reviewerTemplate,
+        commitLink: commitLink,
+        commitNum: this.model.commitNum,
+        summary: reviewable.get('summary'),
+        description: reviewable.get('description'),
+        hasReviewers: reviewable.get('targetPeople').length > 0,
+        reviewers: this.model.reviewers,
+        commitID: this.model.commitID,
+        state: this.computeState()
+      }));
+
+      this.buildReviewerAutocomplete(
+        this.$el.find('input.reviewer-input')
+      );
+      return this;
+    },
+
+    buildReviewerAutocomplete: function($elArray) {
+      if (!$elArray.length) {
+        reportError("Couldn't find reviewer input for commit " + this.model.commitID);
+      }
+      var model = this.model;
+      var reviewRequest = this.model.reviewRequest;
+      var $el = $($elArray[0]);
+      var options = {
+        fieldName: 'users',
+        nameKey: 'username',
+        descKey: 'fullname',
+        extraParams: {
+          fullname: 1
+        },
+        cmp: function(term, a, b) {
+          /*
+           * Sort the results with username matches first (in
+           * alphabetical order), followed by real name matches (in
+           * alphabetical order)
+           */
+          var aUsername = a.data.username,
+              bUsername = b.data.username,
+              aFullname = a.data.fullname || "",
+              bFullname = a.data.fullname || "";
+
+          if (aUsername.indexOf(term) === 0) {
+              if (bUsername.indexOf(term) === 0) {
+                  return aUsername.localeCompare(bUsername);
+              }
+              return -1;
+          } else if (bUsername.indexOf(term) === 0) {
+              return 1;
+          } else {
+              return aFullname.localeCompare(bFullname);
+          }
+        }
+      };
+
+      $el.rbautocomplete({
+        formatItem: function(data) {
+            var s = data[options.nameKey];
+
+            if (options.descKey && data[options.descKey]) {
+                s += ' <span>(' + _.escape(data[options.descKey]) +
+                     ')</span>';
+            }
+
+            return s;
+        },
+        matchCase: false,
+        multiple: false,
+        parse: function(data) {
+            var items = data[options.fieldName],
+                itemsLen = items.length,
+                parsed = [],
+                value,
+                i;
+
+            for (i = 0; i < itemsLen; i++) {
+                value = items[i];
+
+                parsed.push({
+                    data: value,
+                    value: value[options.nameKey],
+                    result: value[options.nameKey]
+                });
+            }
+
+            return parsed;
+        },
+        result: function (el, data, value) {
+          console.log("Adding reviewer: " + value);
+          model.addReviewer(value);
+        },
+        url: SITE_ROOT +
+             'api/' + (options.resourceName || options.fieldName) + '/',
+        extraParams: options.extraParams,
+        cmp: options.cmp,
+        width: 350,
+        error: function(xhr) {
+            var text;
+
+            try {
+                text = $.parseJSON(xhr.responseText).err.msg;
+            } catch (e) {
+                text = 'HTTP ' + xhr.status + ' ' + xhr.statusText;
+            }
+
+            reportError(text);
+        }
+      }).on('autocompleteshow', function() {
+        /*
+         * Add the footer to the bottom of the results pane the
+         * first time it's created.
+         *
+         * Note that we may have multiple .ui-autocomplete-results
+         * elements, and we don't necessarily know which is tied to
+         * this. So, we'll look for all instances that don't contain
+         * a footer.
+         */
+        var resultsPane = $('.ui-autocomplete-results:not(' +
+                            ':has(.ui-autocomplete-footer))');
+
+        if (resultsPane.length > 0) {
+            $('<div/>')
+                .addClass('ui-autocomplete-footer')
+                .text(gettext('Press Tab to auto-complete.'))
+                .appendTo(resultsPane);
+        }
+      });
+    },
+
+    removeReviewer: function(aEvent) {
+      var username = aEvent.target.dataset.username;
+      console.log('Removing reviewer with id: ' + username);
+      this.model.removeReviewer(username);
+    },
+
+    onReviewerSubmit: function(aEvent) {
+      aEvent.preventDefault();
+      var username = this.$el.find('.reviewer-input').first().val();
+      console.log('Adding reviewer with id: ' + username);
+      this.model.addReviewer(username);
+    }
+  });
+
+  RBMozUI.CommitsView = Backbone.View.extend({
+    initialize: function(aOptions) {
+      this.listenTo(Commits, 'add', this.add);
+      this.model = new RB.ReviewRequest({id: aOptions.squashedID});
+
+      $("#publish").click(this.publish.bind(this));
+
+      var commits = aOptions.commits;
+      var commitModels = commits.map(function(aTuple, aIndex) {
+        return new RBMozUI.Commit({
+          reviewRequestID: aTuple[1],
+          commitNum: aIndex,
+          commitID: aTuple[0]
+        });
+      });
+      Commits.add(commitModels);
+    },
+
+    add: function(aCommit) {
+      var view = new RBMozUI.CommitView({model: aCommit});
+      // At this point, we don't have to worry about commit
+      // removal, so let's just add this and forget about it.
+      $("#commit-list").append(view.render().el);
+    },
+
+    publish: function() {
+      $("#publish").prop("disabled", true);
+      this.model.draft.ready({
+        ready: function() {
+          var editor = new RB.ReviewRequestEditor({reviewRequest: this.model});
+          // This bit of functional programming iterates each commit
+          // returning an array of reviewer usernames for each, which
+          // we union, unique, and then join in a string separated
+          // by commas. We use an apply because the Commits.map will
+          // return an array of arrays.
+          var reviewers = _.unique(_.union.apply(this, Commits.map(function(aCommit) {
+            return aCommit.reviewers.pluck('username');
+          }))).join(',');
+
+          console.log("Setting reviewers on squashed request to: "
+                      + reviewers);
+
+          editor.setDraftField('targetPeople', reviewers, {
+            jsonFieldName: 'target_people',
+              success: function() {
+                editor.setDraftField('public', true, {
+                  jsonFieldName: 'public',
+                  success: function() {
+                    console.log('Successfully published - reloading page...');
+                    $("#publish").prop("disabled", false);
+                    location.reload();
+                  },
+                  error: function(aMsg) {
+                    $("#publish").prop("disabled", false);
+                    reportError(aMsg);
+                  }
+                })
+              },
+              error: function(aErrorObject) {
+                reportError('Failed to set reviewers on squashed review: '
+                            + aErrorObject.errorText);
+              }
+          });
+        }
+      }, this);
+    }
+  });
+
+  // I'll bet you're wondering what kicks this all off. Well, that'd be
+  // in the commits.html template, which calls into RBMozUI and gets all
+  // of this machinery working.
 });
