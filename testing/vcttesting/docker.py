@@ -381,7 +381,7 @@ class Docker(object):
         port = int(state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
 
         print(message)
-        wait_for_http(self.docker_hostname, port)
+        wait_for_http(self.docker_hostname, port, timeout=120)
 
         res = requests.get('http://%s:%s/' % (self.docker_hostname, port))
 
