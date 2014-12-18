@@ -372,15 +372,15 @@ class Docker(object):
         except KeyError:
             pass
 
-    def build_reviewboard_eggs(self):
-        image = self.ensure_built('eggbuild', verbose=True, add_vct=True)
+    def _get_files_from_http_container(self, builder, message):
+        image = self.ensure_built(builder, verbose=True, add_vct=True)
         container = self.client.create_container(image)['Id']
 
         self.client.start(container, port_bindings={80: None})
         state = self.client.inspect_container(container)
         port = int(state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
 
-        print('Generating eggs...')
+        print(message)
         wait_for_http(self.docker_hostname, port)
 
         res = requests.get('http://%s:%s/' % (self.docker_hostname, port))
@@ -393,6 +393,14 @@ class Docker(object):
         self.client.remove_container(container)
 
         return files
+
+    def build_reviewboard_eggs(self):
+        return self._get_files_from_http_container('eggbuild',
+            'Generating eggs...')
+
+    def build_mercurial_rpms(self):
+        return self._get_files_from_http_container('hgrpm',
+            'Generating RPMs...')
 
     def get_full_image(self, image):
         for i in self.client.images():

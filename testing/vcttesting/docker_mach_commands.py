@@ -84,3 +84,12 @@ class DockerCommands(object):
                 fh.write(data)
             print('Wrote %s' % outfile)
 
+    @Command('build-mercurial-rpms', category='docker',
+        description='Build RPMs for Mercurial')
+    @CommandArgument('destdir', help='Directory in which to save RPMs')
+    def build_rpms(self, destdir):
+        for filename, data in self.d.build_mercurial_rpms().items():
+            outfile = os.path.join(destdir, filename)
+            with open(outfile, 'wb') as fh:
+                fh.write(data)
+            print('Wrote %s' % outfile)
