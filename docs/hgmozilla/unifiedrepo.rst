@@ -23,6 +23,71 @@ Creating a Unified Repository
 The recommended method to create a unified Firefox repository is documented as
 part of the :ref:`firefoxtree extension documentation <firefoxtree>`.
 
+Uplifting / Backporting Commits
+===============================
+
+Often times there are commits that you want to uplift to other projects
+branches. e.g. a commit from ``mozilla-central`` should be uplifted to
+``mozilla-aurora``. This operation is typically referred to as a
+*backport* or a *cherry-pick*.
+
+The ``hg graft`` command should be used to perform these kinds of
+operations.
+
+Say you wish to backport ``77bbac61cd5e`` from *central* to *aurora*.:
+
+.. code:: sh
+
+   # Ensure your destination repository is up to date.
+   $ hg pull aurora
+   ...
+
+   # Update to the destination where commits should be applied.
+   $ hg up aurora
+
+   # Perform the backport.
+   $ hg graft -r 77bbac61cd5e
+
+When ``hg graft`` is executed, it will essentially *rebase* the
+specified commits onto the target commit. If there are no merge
+conflicts or other issues, it will commit the new changes automatically,
+preserving the original commit message.
+
+If you would like to edit the commit message on the new commit (e.g.
+you want to add ``a=``), simply add ``--edit``::
+
+   $ hg graft --edit -r 77bbac61cd5e
+
+If Mercurial encounters merge conflicts during the operation, you'll
+see something like the following:
+
+.. code:: sh
+
+   $ hg graft -r 77bbac61cd5e
+   warning: conflicts during merge.
+   merging foo incomplete! (edit conflicts, then use 'hg resolve --mark')
+   abort: unresolved conflicts, can't continue
+   (use hg resolve and hg graft --continue)
+
+Read `Mercurial's conflict docs <http://mercurial.selenic.com/wiki/TutorialConflict>`_
+for how to resolve conflicts. When you are done resolving conflicts,
+simply run ``hg graft --continue`` to continue the graft where it left
+off.
+
+If you wish to backport multiple commits, you can specify a range of
+commits to process them all at once:
+
+.. code:: sh
+
+   $ hg graft -r 77bbac61cd5e::e8f80db57b48
+
+.. tip::
+
+   ``hg graft`` is superior to other solutions like ``hg qimport``
+   because ``hg graft`` will perform a 3-way merge and will use
+   Mercurial's configured merge tool to resolve conflicts. This should
+   give you the best possible merge conflict outcome.
+
 Maintaining Multiple Checkouts With a Unified Repository
 ========================================================
 
