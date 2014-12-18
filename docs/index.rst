@@ -45,6 +45,7 @@ Table of Contents
    testing
    contributing
    hgmozilla/index
+   server
 
 
 Indices and tables
