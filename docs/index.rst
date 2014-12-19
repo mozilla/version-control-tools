@@ -45,6 +45,7 @@ Table of Contents
    testing
    contributing
    hgmozilla/index
+   hgmo/index
    server
 
 
