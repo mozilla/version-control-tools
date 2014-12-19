@@ -64,10 +64,7 @@ def pushlogwireproto(repo, proto, firstpush):
     try:
         firstpush = int(firstpush)
 
-        for pushid, who, when, nodes in repo.pushlog.pushes():
-            if pushid < firstpush:
-                continue
-
+        for pushid, who, when, nodes in repo.pushlog.pushes(startid=firstpush):
             lines.append('%d %s %d %s' % (pushid, who, when, ' '.join(nodes)))
 
         return '\n'.join(lines)
@@ -192,7 +189,7 @@ class pushlog(object):
                 return 0
             return res[0]
 
-    def pushes(self):
+    def pushes(self, startid=1):
         """Return information about pushes to this repository.
 
         This is a generator of tuples describing each push. Each tuple has the
@@ -201,11 +198,15 @@ class pushlog(object):
             (pushid, who, when, [nodes])
 
         Nodes are returned in their 40 byte hex form.
+
+        ``startid`` is the numeric pushid to start returning values from. Value
+        is inclusive.
         """
         with self.conn() as c:
             res = c.execute('SELECT id, user, date, rev, node from pushlog '
                     'LEFT JOIN changesets ON id=pushid '
-                    'ORDER BY id, rev ASC')
+                    'WHERE id >= ? '
+                    'ORDER BY id, rev ASC', (startid,))
 
             lastid = None
             current = None
