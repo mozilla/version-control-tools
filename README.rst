@@ -13,7 +13,9 @@ other sites and services.
 The canonical repository is https://hg.mozilla.org/hgcustom/version-control-tools/
 
 Most documentation exists in the ``docs/`` directory. It can be
-`viewed online <https://mozilla-version-control-tools.readthedocs.org/en/latest/>`_ on Read the Docs.
+`viewed online <https://mozilla-version-control-tools.readthedocs.org/en/latest/>`_
+on Read the Docs. Latest CI reports can be `viewed online
+<https://ci.mozilla.org/job/version-control-tools/>`_.
 
 If you are interested in getting in touch with the people who maintain
 this repository, join ``#vcs`` in ``irc.mozilla.org``.
