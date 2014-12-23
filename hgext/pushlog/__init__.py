@@ -11,15 +11,22 @@ import time
 import weakref
 
 from mercurial import (
+    cmdutil,
     exchange,
     extensions,
     wireproto,
 )
 
-from mercurial.error import Abort
+from mercurial.error import (
+    Abort,
+    RepoLookupError,
+)
 from mercurial.node import bin, hex
 
 testedwith = '3.2'
+
+cmdtable = {}
+command = cmdutil.command(cmdtable)
 
 SCHEMA = [
     'CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)',
@@ -212,17 +219,58 @@ class pushlog(object):
             current = None
             for pushid, who, when, rev, node in res:
                 who = who.encode('utf-8')
-                node = node.encode('ascii')
+
+                # node could be None if no nodes associated with push.
+                if node:
+                    node = node.encode('ascii')
                 if pushid != lastid:
                     if current:
                         yield current
                     lastid = pushid
-                    current = (pushid, who, when, [node])
+                    current = (pushid, who, when, [])
+                    if node:
+                        current[3].append(node)
                 else:
                     current[3].append(node)
 
             if current:
                 yield current
+
+    def verify(self):
+        repo = self.repo
+        ui = self.repo.ui
+
+        ret = 0
+        seennodes = set()
+        pushcount = 0
+        for pushcount, (pushid, who, when, nodes) in enumerate(self.pushes(), 1):
+            if not nodes:
+                ui.warn('pushlog entry has no nodes: #%s\n' % pushid)
+                continue
+
+            for node in nodes:
+                try:
+                    repo[node]
+                except RepoLookupError:
+                    ui.warn('changeset in pushlog entry #%s does not exist: %s\n' %
+                        (pushid, node))
+                    ret = 1
+
+                seennodes.add(bin(node))
+
+        for rev in repo:
+            ctx = repo[rev]
+            if ctx.node() not in seennodes:
+                ui.warn('changeset does not exist in pushlog: %s\n' % ctx.hex())
+                ret = 1
+
+        if ret:
+            ui.status('pushlog has errors\n')
+        else:
+            ui.status('pushlog contains all %d changesets across %d pushes\n' %
+                (len(seennodes), pushcount))
+
+        return ret
 
 def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
     # This hook is executed whenever changesets are introduced. We ignore
@@ -249,6 +297,11 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
         ui.write('Error inserting into pushlog. Please retry your push.\n')
 
     return 1
+
+@command('verifypushlog', [], 'verify the pushlog data is sane')
+def verifypushlog(ui, repo):
+    """Verify the pushlog data looks correct."""
+    return repo.pushlog.verify()
 
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
