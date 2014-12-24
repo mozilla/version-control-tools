@@ -156,6 +156,13 @@ class pushlog(object):
         There are valid scenarios where this may not hold true. However, we
         don't have a need to support them, so we error in these scenarios.
         '''
+        if not isinstance(user, str):
+            raise TypeError('Expected a str user. Got %s' % str(type(user)))
+
+        # We want invalid usernames to fail insertion. This will raise
+        # UnicodeDecodeError.
+        user.decode('utf-8', 'strict')
+
         # WARNING low-level hacks applied.
         #
         # The active transaction object provides various instance-specific internal
@@ -215,6 +222,11 @@ class pushlog(object):
         """
         with self.conn() as c:
             for pushid, user, when, nodes in pushes:
+                if not isinstance(user, str):
+                    raise TypeError('Expected a str user. Got %s' % str(type(user)))
+
+                user.decode('utf-8', 'strict')
+
                 c.execute('INSERT INTO pushlog (id, user, date) VALUES (?, ?, ?)',
                     (pushid, user, when))
                 for n in nodes:
