@@ -159,8 +159,10 @@ def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     # This default Mercurial behavior can really cause problems when people
     # are doing multi-headed development (e.g. bookmark-based development
     # instead of mq). So, we silently change the default behavior of
-    # `hg push` to only push the current changeset.
-    if isfirefoxrepo(repo) and not revs:
+    # `hg push` to only push the current changeset when pushing to a Firefox
+    # repo.
+    tree = resolve_uri_to_tree(remote.url())
+    if tree and not revs:
         repo.ui.status(_('no revisions specified to push; '
             'using . to avoid pushing multiple heads\n'))
         revs = [repo['.'].node()]
@@ -171,7 +173,6 @@ def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     # If we push to a known tree, update the remote refs.
     # We can ignore result of the push because updateremoterefs() doesn't care:
     # it merely synchronizes state with the remote. Worst case it is a no-op.
-    tree = resolve_uri_to_tree(remote.url())
     if tree:
         updateremoterefs(repo, remote, tree.encode('utf-8'))
 

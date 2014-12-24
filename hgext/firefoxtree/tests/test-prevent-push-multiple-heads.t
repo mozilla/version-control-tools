@@ -9,6 +9,8 @@
   $ installfakereposerver $HGPORT $TESTTMP/root
   $ populatedummydata root >/dev/null
 
+  $ hg init root/non-canonical
+
   $ hg init repo1
   $ cd repo1
   $ touch .hg/IS_FIREFOX_REPO
@@ -40,6 +42,16 @@ Pushing multiple heads will result in abort
   searching for changes
   abort: cannot push multiple heads to a Firefox tree; limit pushed revisions using the -r argument
   [255]
+
+Pushing multiple heads to a non-canonical tree is OK
+
+  $ hg push --force ssh://user@dummy/$TESTTMP/root/non-canonical
+  pushing to ssh://user@dummy/$TESTTMP/root/non-canonical
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 4 changesets with 4 changes to 1 files (+1 heads)
 
 We can still push multiple heads to non-Firefox repos
 
