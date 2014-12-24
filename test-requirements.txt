@@ -17,15 +17,15 @@ coverage==3.7.1
 django-evolution==0.7.4
 django-haystack==2.1.0
 django-pipeline==1.3.24
-docutils==0.11
 docker-py==0.6.0
+docutils==0.11
 ecdsa==0.11
 feedparser==5.1.3
 futures==2.1.6
 lxml==3.4.1
 mach==0.4
 markupsafe==0.23
-mercurial==3.2
+mercurial==3.2.3
 mimeparse==0.1.3
 mock==1.0.1
 mozfile==1.1
