@@ -169,5 +169,8 @@ following::
   No interactive shells allowed here!
   Connection to reviewboard-hg.mozilla.org closed.
 
+As of December 2014, the SSH fingerprint for the RSA key is
+``a6:13:ae:35:2c:20:2b:8d:f4:8d:8e:d7:a8:55:67:97``.
+
 Now that your client is all configured, it is time to conduct some code
 review. Continue reading the :ref:`mozreview_user`.
