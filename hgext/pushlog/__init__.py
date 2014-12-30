@@ -91,7 +91,7 @@ def exchangepullpushlog(orig, pullop):
 
     statusline = lines.next()
     if statusline[0] == '0':
-        raise Abort('error fetching pushlog: %s' % lines[1])
+        raise Abort('remote error fetching pushlog: %s' % lines.next())
     elif statusline != '1':
         raise Abort('error fetching pushlog: unexpected response: %s\n' %
             statusline)
