@@ -116,10 +116,24 @@ class pushlog(object):
         # greater than the repo's.
         self.repo = weakref.proxy(repo)
 
-    def _getconn(self):
+    def _getconn(self, readonly=False):
+        """Get a SQLite connection to the pushlog.
+
+        In normal operation, this will return a ``sqlite3.Connection``.
+        If the database does not exist, it will be created. If the database
+        schema is not present or up to date, it will be updated. An error will
+        be raised if any of this could not be performed.
+
+        If ``readonly`` is truthy, ``None`` will be returned if the database
+        file does not exist. This gives read-only consumers the opportunity to
+        short-circuit if no data is available.
+        """
         path = self.repo.vfs.join('pushlog2.db')
         create = False
         if not os.path.exists(path):
+            if readonly:
+                return None
+
             create = True
 
         conn = sqlite3.connect(path)
@@ -139,12 +153,13 @@ class pushlog(object):
         return conn
 
     @contextlib.contextmanager
-    def conn(self):
-        conn = self._getconn()
+    def conn(self, readonly=False):
+        conn = self._getconn(readonly=readonly)
         try:
             yield conn
         finally:
-            conn.close()
+            if conn:
+                conn.close()
 
     def recordpush(self, nodes, user, when):
         '''Record a push into the pushlog.
@@ -260,7 +275,10 @@ class pushlog(object):
         ``startid`` is the numeric pushid to start returning values from. Value
         is inclusive.
         """
-        with self.conn() as c:
+        with self.conn(readonly=True) as c:
+            if not c:
+                return
+
             res = c.execute('SELECT id, user, date, rev, node from pushlog '
                     'LEFT JOIN changesets ON id=pushid '
                     'WHERE id >= ? '

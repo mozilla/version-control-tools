@@ -26,15 +26,12 @@ Cloning over SSH with no pushlog file should work
   updating to branch default
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
-This should have created an empty pushlog file
+No pushlog file should have been created for read-only operations
 
   $ ls server/.hg
   00changelog.i
-  pushlog2.db
   requires
   store
-
-  $ rm server/.hg/pushlog2.db
 
 Cloning over HTTP with no pushlog file should work
 
@@ -44,10 +41,9 @@ Cloning over HTTP with no pushlog file should work
   updating to branch default
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
-This should have created an empty pushlog file
+No pushlog file should have been created for read-only operations
 
   $ ls server/.hg
   00changelog.i
-  pushlog2.db
   requires
   store
