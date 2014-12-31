@@ -51,13 +51,6 @@ repository. By default, `hg push` will attempt to push all local changesets not
 in a remote. This is obviously not desired (you wouldn't want to push
 mozilla-central to mozilla-beta)! Instead, you'll want to limit outgoing
 changesets to a specific head or revision. You can specify `hg push -r REV`.
-Or, for your convenience, the `hg pushtree` is made available. By default, this
-command will push the current "tip" revision to the tree specified. e.g. if you
-have patches on the current tip that need to land in inbound, you can run
-`hg pushtree inbound`.
-
-You can also get creative and push a "remote tracking revision" to another
-repository. e.g. `hg pushtree -r central/default inbound`.
 
 Remote References
 =================
@@ -469,34 +462,6 @@ def cloneunified(ui, dest='gecko', **opts):
     finally:
         if not success:
             shutil.rmtree(path)
-
-
-@command('pushtree',
-    [('r', 'rev', 'tip', _('revision'), _('REV'))],
-    _('hg pushtree [-r REV] TREE'))
-def pushtree(ui, repo, tree=None, rev=None, **opts):
-    """Push changesets to a Mozilla repository.
-
-    If only the tree argument is defined, we will attempt to push the current
-    tip to the repository specified. This may fail due to pushed mq patches,
-    local changes, etc. Please note we only attempt to push the current tip and
-    it's ancestors, not all changesets not in the remote repository. This is
-    different from the default behavior of |hg push| and is the distinguishing
-    difference from that command.
-
-    If you would like to push a non-active head, specify it with -r REV. For
-    example, if you are currently on mozilla-central but wish to push inbound
-    to mozilla-inbound, run `hg pushtree -r inbound/default inbound`.
-    """
-    if not tree:
-        raise util.Abort(_('A tree must be specified.'))
-
-    tree, uri = resolve_trees_to_uris([tree], write_access=True)[0]
-
-    if not uri:
-        raise util.Abort("Don't know about tree: %s" % tree)
-
-    return push(ui, repo, rev=[rev], dest=uri)
 
 
 @command('treestatus', [], _('hg treestatus [TREE] ...'))
