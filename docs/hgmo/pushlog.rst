@@ -18,6 +18,59 @@ the server, the authenticated username from SSH is stored in the
 time, and the list of changesets that were pushed in a SQLite database
 in the repository.
 
+Installing
+==========
+
+The *pushlog* extension (source in ``hgext/pushlog``) contains the core
+data recording and data replication code. When installed, a
+``pretxnchangegroup`` hook inserts pushlog entries when changesets are
+introduced. To install this extension, add the following line to your
+hgrc::
+
+   [extensions]
+   pushlog = /path/to/version-control-tools/hgext/pushlog
+
+No additional configuration is necessary.
+
+The web components for pushlog are separate from the core extension and
+require a bit more effort to configure. This code lives in
+``hgext/pushlog-legacy``. It is our intention to eventually aggregate
+this code into ``hgext/pushlog`` so there is a unified pushlog
+experience.
+
+The web component will require the following extensions::
+
+   [extensions]
+   hgwebjson = /path/to/version-control-tools/hgext/pushlog-legacy/hgwebjson.py
+   pushlog-feed = /path/to/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py
+
+``hgwebjson`` defines a mechanism for exposing JSON for certain
+Mercurial commands. (This should really be merged into core Mercurial.)
+It is utilized by ``pushlog-feed.py``.
+
+``pushlog-feed.py`` exposes some hgweb endpoints that expose pushlog
+data.
+
+Templates
+---------
+
+It isn't enough to activate the ``pushlog-feed`` extension: you'll also
+need to configure some
+`Mercurial theming <http://mercurial.selenic.com/wiki/Theming>`_
+to render pushlog data.
+
+The Atom output will require the existence of an ``atom`` style. You are
+encouraged to copy the files in ``hgtemplates/atom`` to your Mercurial
+styles directory.
+
+The ``pushloghtml`` page will render the ``pushlog`` template. This is
+something you'll need to define. Look for ``pushlog.tmpl`` files in
+``hgtemplates/`` in this repository for examples.
+
+Pushlog templates typically make use of a named ``pushlogentry``
+entity. You may also need to define this. Searching for ``pushlog`` in
+``hgtemplates`` to find all references is probably a good idea.
+
 Pushlog Wire Protocol Command
 =============================
 
