@@ -1,19 +1,21 @@
 {header}
-<title>{repo|escape}: diff {file|escape}</title>
+<title>{repo|escape}: comparison {file|escape}</title>
 <link rel="alternate" type="application/atom+xml"
    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+<link rel="alternate" type="application/rss+xml"
+   href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
 </head>
 <body>
 
 <div class="page_header">
-<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a><a href="{url|urlescape}summary{sessionvars%urlparameter}">{repo|escape}</a> - diff - {file|escape}
+<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
+<a href="/">Mercurial</a> {pathdef%breadcrumb} / comparison
 </div>
 
 <div class="page_nav">
 <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
 <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
 <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
 <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
 <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
 <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
@@ -24,8 +26,8 @@
 <a href="{url|urlescape}file/tip/{file|urlescape}{sessionvars%urlparameter}">latest</a> |
 <a href="{url|urlescape}log/{node|short}/{file|urlescape}{sessionvars%urlparameter}">revisions</a> |
 <a href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">annotate</a> |
-diff |
-<a href="{url|urlescape}comparison/{node|short}/{file|urlescape}{sessionvars%urlparameter}">comparison</a> |
+<a href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">diff</a> |
+comparison |
 <a href="{url|urlescape}raw-diff/{node|short}/{file|urlescape}">raw</a> |
 <a href="{url|urlescape}help{sessionvars%urlparameter}">help</a>
 <br/>
@@ -38,14 +40,33 @@ diff |
 <tr>
  <td>changeset {rev}</td>
  <td style="font-family:monospace"><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a></td></tr>
-{parent%filediffparent}
-{child%filediffchild}
+{parent%filecompparent}
+{child%filecompchild}
 </table>
 
 <div class="list_head"></div>
 
 <div class="page_body">
-{diff}
+
+<div class="legend">
+  <span class="legendinfo equal">equal</span>
+  <span class="legendinfo delete">deleted</span>
+  <span class="legendinfo insert">inserted</span>
+  <span class="legendinfo replace">replaced</span>
+</div>
+
+<div class="comparison">
+  <table style="border-collapse:collapse;">
+    <thead class="header">
+      <tr>
+        <th>{leftrev}:{leftnode|short}</th>
+        <th>{rightrev}:{rightnode|short}</th>
+      </tr>
+    </thead>
+    {comparison}
+  </table>
+</div>
+
 </div>
 
 {footer}

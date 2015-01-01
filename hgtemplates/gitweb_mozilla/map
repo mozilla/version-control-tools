@@ -44,6 +44,7 @@ fileentry = '<tr class="parity{parity}"><td style="font-family:monospace">{permi
 filerevision = filerevision.tmpl
 fileannotate = fileannotate.tmpl
 filediff = filediff.tmpl
+filecomparison = filecomparison.tmpl
 filelog = filelog.tmpl
 fileline = '<div style="font-family:monospace" class="parity{parity}"><pre><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</pre></div>'
 annotateline = '<div class="l{parity}"><div class="codeauthor"><a href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}" title="{node|short}: {desc|escape|firstline}">{author|emailuser|obfuscate}@{rev}</a></div><a class="codeline" href="#{lineid}" id="{lineid}">{linenumber}</a>{line|escape}</div>'
@@ -51,6 +52,17 @@ difflineplus = '<span class="difflineplus"><a class="linenr" href="#{lineid}" id
 difflineminus = '<span class="difflineminus"><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
 difflineat = '<span class="difflineat"><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
 diffline = '<a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}'
+
+comparisonblock ='
+  <tbody class="block">
+  {lines}
+  </tbody>'
+comparisonline = '
+  <tr style="font-family:monospace">
+    <td class="{type}"><pre><a class="linenr" href="#{lineid}" id="{lineid}">{leftlinenumber}</a> {leftline|escape}</pre></td>
+    <td class="{type}"><pre><a class="linenr" href="#{lineid}" id="{lineid}">{rightlinenumber}</a> {rightline|escape}</pre></td>
+  </tr>'
+
 changelogparent = '<tr><th class="parent">parent {rev}:</th><td class="parent"><a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a></td></tr>'
 changesetbranch = '<tr><td>branch</td><td>{name}</td></tr>'
 changesetparent = '<tr><td>parent {rev}</td><td style="font-family:monospace"><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a></td></tr>'
@@ -80,8 +92,24 @@ branches = branches.tmpl
 branchentry = '<tr class="parity{parity}"><td class="age"><i>at {date|date}</i></td><td><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}"><b>{node|short}</b></a></td><td>{branch|escape}</td><td class="link"><a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">changeset</a> | <a href="{url|urlescape}log/{node|short}{sessionvars%urlparameter}">changelog</a> | <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">files</a></td></tr>'
 diffblock = '<pre>{lines}</pre>'
 filediffparent = '<tr><td>parent {rev}</td><td style="font-family:monospace"><a class="list" href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a></td></tr>'
+filecompparent = '
+  <tr>
+    <td>parent {rev}</td>
+    <td style="font-family:monospace">
+      <a class="list" href="{url|urlescape}comparison/{node|short}/{file|urlescape}{sessionvars%urlparameter}">
+        {node|short}
+      </a>
+    </td>
+  </tr>'
 filelogparent = '<tr><td align="right">parent {rev}:&nbsp;</td><td><a href="{url|urlescape}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a></td></tr>'
 filediffchild = '<tr><td>child {rev}</td><td style="font-family:monospace"><a class="list" href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a></td></tr>'
+filecompchild = '
+  <tr>
+    <td>child {rev}</td>
+    <td style="font-family:monospace">
+      <a class="list" href="{url|urlescape}comparison/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a>
+    </td>
+  </tr>'
 filelogchild = '<tr><td align="right">child {rev}:&nbsp;</td><td><a href="{url|urlescape}file{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a></td></tr>'
 shortlog = shortlog.tmpl
 pushlog = pushlog.tmpl
