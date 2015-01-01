@@ -7,6 +7,19 @@ changelog = changelog.tmpl
 summary = summary.tmpl
 error = error.tmpl
 notfound = notfound.tmpl
+
+help = help.tmpl
+helptopics = helptopics.tmpl
+
+helpentry = '
+  <tr><td>
+    <a href="{url|urlescape}help/{topic|escape}{sessionvars%urlparameter}">
+      {topic|escape}
+    </a>
+  </td><td>
+    {summary|escape}
+  </td></tr>'
+
 naventry = '<a href="{url|urlescape}log/{node|short}{sessionvars%urlparameter}">{label|escape}</a> '
 navshortentry = '<a href="{url|urlescape}shortlog/{node|short}{sessionvars%urlparameter}">{label|escape}</a> '
 navgraphentry = '<a href="{url|urlescape}graph/{node|short}{sessionvars%urlparameter}">{label|escape}</a> '
@@ -52,6 +65,18 @@ filerevchild = '<tr><td>child {rev}</td><td style="font-family:monospace"><a cla
 fileannotatechild = '<tr><td>child {rev}</td><td style="font-family:monospace"><a class="list" href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a></td></tr>'
 tags = tags.tmpl
 tagentry = '<tr class="parity{parity}"><td class="age"><i>at {date|date}</i></td><td><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}"><b>{tag|escape}</b></a></td><td class="link"><a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">changeset</a> | <a href="{url|urlescape}log/{node|short}{sessionvars%urlparameter}">changelog</a> | <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">files</a></td></tr>'
+bookmarks = bookmarks.tmpl
+bookmarkentry = '
+  <tr class="parity{parity}">
+    <td class="age"><i class="age">{date|rfc822date}</i></td>
+    <td><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}"><b>{bookmark|escape}</b></a></td>
+    <td class="link">
+      <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">changeset</a> |
+      <a href="{url|urlescape}log/{node|short}{sessionvars%urlparameter}">changelog</a> |
+      <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">files</a>
+    </td>
+  </tr>'
+branches = branches.tmpl
 branchentry = '<tr class="parity{parity}"><td class="age"><i>at {date|date}</i></td><td><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}"><b>{node|short}</b></a></td><td>{branch|escape}</td><td class="link"><a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">changeset</a> | <a href="{url|urlescape}log/{node|short}{sessionvars%urlparameter}">changelog</a> | <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">files</a></td></tr>'
 diffblock = '<pre>{lines}</pre>'
 filediffparent = '<tr><td>parent {rev}</td><td style="font-family:monospace"><a class="list" href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a></td></tr>'
@@ -77,3 +102,4 @@ urlparameter = '{separator}{name}={value|urlescape}'
 hiddenformentry = '<input type="hidden" name="{name}" value="{value|escape}" />'
 
 graph = graph.tmpl
+breadcrumb = '&gt; <a href="{url|urlescape}">{name|escape}</a> '
