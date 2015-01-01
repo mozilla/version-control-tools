@@ -16,6 +16,7 @@ from mercurial import (
     exchange,
     extensions,
     revset,
+    templatekw,
     util,
     wireproto,
 )
@@ -431,6 +432,62 @@ def revset_pushuser(repo, subset, x):
 
     return subset & revset.generatorset(getrevs())
 
+# Again, for performance reasons we read the entire pushlog database and cache
+# the results. Again, this is unfortunate. But, the alternative is a potential
+# very expensive series of database lookups.
+#
+# The justification for doing this for templates is even less than doing it for
+# revsets because where revsets typically need to operate on lots of
+# changesets, templates typically only render a small handful of changesets.
+# Performing a query for each changeset being templatized is an easier pill to
+# swallow. Depending on how these templates are used in the wild, we should
+# revisit the decision to precache the pushlog.
+
+def _getpushinfo(repo, ctx, cache):
+    if 'nodetopush' not in cache:
+        nodetopush = {}
+        for push in repo.pushlog.pushes():
+            pushid, who, when, nodes = push
+            for node in nodes:
+                nodetopush[node] = push
+
+        cache['nodetopush'] = nodetopush
+
+    return cache['nodetopush'].get(ctx.hex(), (None, None, None, None))
+
+def template_pushid(repo, ctx, templ, cache, **args):
+    """:pushid: Integer. The unique identifier for the push that introduced
+    this changeset.
+    """
+    pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
+    return pushid
+
+def template_pushuser(repo, ctx, templ, cache, **args):
+    """:pushuser: String. The user who pushed this changeset."""
+    pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
+    return who
+
+def template_pushdate(repo, ctx, templ, cache, **args):
+    """:pushdate: Date information. When this changeset was pushed."""
+    pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
+    return util.makedate(when) if when else None
+
+def template_pushbasenode(repo, ctx, templ, cache, **args):
+    """:pushbasenode: String. The changeset identification hash, as a 40 digit
+    hexadecimal string, that was the first/base node for the push this
+    changeset was part of.
+    """
+    pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
+    return nodes[0] if nodes else None
+
+def template_pushheadnode(repo, ctx, templ, cache, **args):
+    """:pushheadnode: String. The changeset identification hash, as a 40 digit
+    hexadecimal string, that was the head for the push this changeset was
+    part of.
+    """
+    pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
+    return nodes[-1] if nodes else None
+
 @command('verifypushlog', [], 'verify the pushlog data is sane')
 def verifypushlog(ui, repo):
     """Verify the pushlog data looks correct."""
@@ -444,6 +501,17 @@ def extsetup(ui):
     revset.symbols['pushhead'] = revset_pushhead
     revset.symbols['pushdate'] = revset_pushdate
     revset.symbols['pushuser'] = revset_pushuser
+
+    keywords = {
+        'pushid': template_pushid,
+        'pushuser': template_pushuser,
+        'pushdate': template_pushdate,
+        'pushbasenode': template_pushbasenode,
+        'pushheadnode': template_pushheadnode,
+    }
+
+    templatekw.keywords.update(keywords)
+    templatekw.dockeywords.update(keywords)
 
 def reposetup(ui, repo):
     if not repo.local():
