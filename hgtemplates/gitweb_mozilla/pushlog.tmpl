@@ -1,7 +1,7 @@
 {header}
 <title>{repo|escape}: pushlog</title>
 <link rel="alternate" type="application/atom+xml"
-   href="{url}pushlog" title="Atom feed for {repo|escape} pushlog"/>
+   href="{url|urlescape}pushlog" title="Atom feed for {repo|escape} pushlog"/>
 <style type="text/css">
 #localize, .expand \{
   font-size: x-small;
@@ -37,10 +37,10 @@ $(document).ready(function () \{
 <body>
 
 <div class="page_header">
-<a href="http://developer.mozilla.org/en/docs/Mercurial" title="Mercurial" style="float: right;">Mercurial</a><a href="{url}summary{sessionvars%urlparameter}">{repo|escape}</a> - pushlog
+<a href="http://developer.mozilla.org/en/docs/Mercurial" title="Mercurial" style="float: right;">Mercurial</a><a href="{url|urlescape}summary{sessionvars%urlparameter}">{repo|escape}</a> - pushlog
 </div>
 
-<form action="{url}pushloghtml">
+<form action="{url|urlescape}pushloghtml">
 <div class="search">
 From:
 <input type="text" name="startdate"  value="{startdate|escape}"/>
@@ -50,13 +50,13 @@ To:
 </div>
 </form>
 <div class="page_nav">
-<a href="{url}summary{sessionvars%urlparameter}">summary</a> |
-<a href="{url}shortlog/{rev}{sessionvars%urlparameter}">shortlog</a> |
-<a href="{url}log{sessionvars%urlparameter}">changelog</a> |
+<a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
+<a href="{url|urlescape}shortlog/{rev}{sessionvars%urlparameter}">shortlog</a> |
+<a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
 pushlog |
-<a href="{url}graph{sessionvars%urlparameter}">graph</a> |
-<a href="{url}tags{sessionvars%urlparameter}">tags</a> |
-<a href="{url}file/tip{sessionvars%urlparameter}">files</a>{archives%archiveentry}
+<a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
+<a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
+<a href="{url|urlescape}file/tip{sessionvars%urlparameter}">files</a>{archives%archiveentry}
 <br/>
 Page {changenav%navpushentry}<br/>
 </div>
