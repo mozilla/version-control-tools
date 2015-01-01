@@ -33,12 +33,28 @@ Accessing an empty repo should not have created the pushlog db
 
 Accessing a read-only repository should also succeed
 
-  >>> import os, stat
-  >>> for root, dirs, files in os.walk('.'):
-  ...     os.chmod(root, stat.S_IREAD + stat.S_IEXEC)
-  ...     for f in files:
-  ...         os.chmod(os.path.join(root, f), stat.S_IREAD)
+  $ chmod 555 .hg
 
   $ http http://localhost:$HGPORT/pushlog --no-body --header content-type
   200
   content-type: application/atom+xml
+
+  $ chmod 775 .hg
+
+Create an empty database and test variations with that
+
+  $ hg verifypushlog
+  pushlog contains all 0 changesets across 0 pushes
+
+  $ ls .hg
+  00changelog.i
+  hgrc
+  pushlog2.db
+  requires
+  store
+
+  $ http http://localhost:$HGPORT/json-pushes --header content-type
+  200
+  content-type: application/json
+  
+  {}

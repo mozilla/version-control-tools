@@ -306,6 +306,10 @@ class pushlog(object):
                 yield current
 
     def verify(self):
+        # Attempt to create database (since .pushes below won't).
+        with self.conn():
+            pass
+
         repo = self.repo
         ui = self.repo.ui
 

@@ -158,7 +158,9 @@ class PushlogQuery(object):
 
         try:
             query = 'select id from pushlog order by id desc limit 1'
-            self.lastpushid = self.conn.execute(query).fetchone()[0]
+            row = self.conn.execute(query).fetchone()
+            if row:
+                self.lastpushid = row[0]
         except sqlite.OperationalError:
             pass
 
