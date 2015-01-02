@@ -1,4 +1,4 @@
-body { font-family: sans-serif; font-size: 12px; margin:0px; border:solid #d9d8d1; border-width:1px; margin:10px; }
+body { font-family: sans-serif; font-size: 12px; border:solid #d9d8d1; border-width:1px; margin:10px; }
 a { color:#0000cc; }
 a:hover, a:visited, a:active { color:#880000; }
 div.page_header { height:25px; padding:8px; font-size:18px; font-weight:bold; background-color:#d9d8d1; }
@@ -29,8 +29,11 @@ a.list { text-decoration:none; color:#000000; }
 a.list:hover { text-decoration:underline; color:#880000; }
 table { padding:8px 4px; }
 th { padding:2px 5px; font-size:12px; text-align:left; }
+tr.light:hover, .parity0:hover { background-color:#edece6; }
 tr.dark, .parity1 { background-color:#f6f6f0; }
+tr.dark:hover, .parity1:hover { background-color:#edece6; }
 td { padding:2px 5px; font-size:12px; vertical-align:top; }
+td.closed { background-color: #99f; }
 td.link { padding:2px 5px; font-family:sans-serif; font-size:10px; }
 td.indexlinks { white-space: nowrap; }
 td.indexlinks a {
@@ -108,6 +111,11 @@ a.codeline:active {
     color: #880000;
 }
 
+span.logtags span.bookmarktag {
+	background-color: #afdffa;
+	border-color: #ccecff #46ace6 #46ace6 #ccecff;
+}
+
 /* Graph */
 div#wrapper {
 	position: relative;
@@ -148,4 +156,69 @@ ul#graphnodes li .info {
 	position: relative;
 	top: -3px;
 	font-style: italic;
+}
+
+/* Comparison */
+.legend {
+    padding: 1.5% 0 1.5% 0;
+}
+
+.legendinfo {
+    border: 1px solid #d9d8d1;
+    font-size: 80%;
+    text-align: center;
+    padding: 0.5%;
+}
+
+.equal {
+    background-color: #ffffff;
+}
+
+.delete {
+    background-color: #faa;
+    color: #333;
+}
+
+.insert {
+    background-color: #ffa;
+}
+
+.replace {
+    background-color: #e8e8e8;
+}
+
+.comparison {
+    overflow-x: auto;
+}
+
+.header th {
+    text-align: center;
+}
+
+.block {
+    border-top: 1px solid #d9d8d1;
+}
+
+.scroll-loading {
+  -webkit-animation: change_color 1s linear 0s infinite alternate;
+  -moz-animation: change_color 1s linear 0s infinite alternate;
+  -o-animation: change_color 1s linear 0s infinite alternate;
+  animation: change_color 1s linear 0s infinite alternate;
+}
+
+@-webkit-keyframes change_color {
+  from { background-color: #A0CEFF; } to {  }
+}
+@-moz-keyframes change_color {
+  from { background-color: #A0CEFF; } to {  }
+}
+@-o-keyframes change_color {
+  from { background-color: #A0CEFF; } to {  }
+}
+@keyframes change_color {
+  from { background-color: #A0CEFF; } to {  }
+}
+
+.scroll-loading-error {
+    background-color: #FFCCCC !important;
 }
