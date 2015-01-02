@@ -147,7 +147,7 @@ filerevparent = '
     </td>
   </tr>'
 filerename = '{file|escape}@'
-filelogrename = '<br/><a href="{url|urlescape}log/{node|short}/{file|urlescape}{sessionvars%urlparameter}">base</a>'
+filelogrename = '| <a href="{url|urlescape}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">base</a>'
 fileannotateparent = '
   <tr>
     <td>parent {rev}</td>
