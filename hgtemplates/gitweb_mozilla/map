@@ -184,7 +184,7 @@ fileannotatechild = '
 tags = tags.tmpl
 tagentry = '
   <tr class="parity{parity}">
-    <td class="age"><i>at {date|date}</i></td>
+    <td class="age"><i class="age">{date|rfc822date}</i></td>
     <td><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}"><b>{tag|escape}</b></a></td>
     <td class="link">
       <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">changeset</a> |
