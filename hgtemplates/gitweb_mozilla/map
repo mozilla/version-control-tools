@@ -256,6 +256,7 @@ graph = graph.tmpl
 tagtag = '<span class="tagtag" title="{name|escape}">{name|escape}</span> '
 branchtag = '<span class="branchtag" title="{name|escape}">{name|escape}</span> '
 inbranchtag = '<span class="inbranchtag" title="{name|escape}">{name|escape}</span> '
+bookmarktag = '<span class="bookmarktag" title="{name|escape}">{name|escape}</span> '
 shortlogentry = '
   <tr class="parity{parity}">
     <td class="link">
