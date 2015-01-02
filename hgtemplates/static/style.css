@@ -2,30 +2,30 @@ a { text-decoration:none; }
 .age { white-space:nowrap; }
 .date { white-space:nowrap; }
 .indexlinks { white-space:nowrap; }
-.parity0 { background-color: #dddddd; }
-.parity1 { background-color: #eeeeee; }
-.lineno { width: 60px; color: #aaaaaa; font-size: smaller;
-          text-align: right; padding-right:1em; }
+.parity0 { background-color: #ddd; }
+.parity1 { background-color: #eee; }
+.lineno { width: 60px; color: #aaa; font-size: smaller;
+          text-align: right; }
 .plusline { color: green; }
 .minusline { color: red; }
 .atline { color: purple; }
 .annotate { font-size: smaller; text-align: right; padding-right: 1em; }
 .buttons a {
-  background-color: #666666;
+  background-color: #666;
   padding: 2pt;
   color: white;
-  font-family: sans;
+  font-family: sans-serif;
   font-weight: bold;
 }
 .navigate a {
   background-color: #ccc;
   padding: 2pt;
-  font-family: sans;
+  font-family: sans-serif;
   color: black;
 }
 
 .metatag {
-  background-color: #888888;
+  background-color: #888;
   color: white;
   text-align: right;
 }
@@ -41,6 +41,7 @@ pre { margin: 0; }
 /* Changelog/Filelog entries */
 .logEntry { width: 100%; }
 .logEntry .age { width: 15%; }
+.logEntry th.label { width: 16em; }
 .logEntry th { font-weight: normal; text-align: right; vertical-align: top; }
 .logEntry th.age, .logEntry th.firstline { font-weight: bold; }
 .logEntry th.firstline { text-align: left; width: inherit; }
@@ -64,3 +65,42 @@ pre { margin: 0; }
 #filediffEntry { }
 #filediffEntry th { font-weight: normal; background-color: #888; color: #fff; text-align: right; }
 
+/* Graph */
+div#wrapper {
+	position: relative;
+	margin: 0;
+	padding: 0;
+}
+
+canvas {
+	position: absolute;
+	z-index: 5;
+	top: -0.6em;
+	margin: 0;
+}
+
+ul#nodebgs {
+	list-style: none inside none;
+	padding: 0;
+	margin: 0;
+	top: -0.7em;
+}
+
+ul#graphnodes li, ul#nodebgs li {
+	height: 39px;
+}
+
+ul#graphnodes {
+	position: absolute;
+	z-index: 10;
+	top: -0.85em;
+	list-style: none inside none;
+	padding: 0;
+}
+
+ul#graphnodes li .info {
+	display: block;
+	font-size: 70%;
+	position: relative;
+	top: -1px;
+}
