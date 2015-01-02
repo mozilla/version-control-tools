@@ -141,7 +141,9 @@ filerevparent = '
   <tr>
     <td>parent {rev}</td>
     <td style="font-family:monospace">
-      <a class="list" href="{url|urlescape}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{rename%filerename}{node|short}</a>
+      <a class="list" href="{url|urlescape}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">
+        {rename%filerename}{node|short}
+      </a>
     </td>
   </tr>'
 filerename = '{file|escape}@'
@@ -150,15 +152,15 @@ fileannotateparent = '
   <tr>
     <td>parent {rev}</td>
     <td style="font-family:monospace">
-      <a class="list" href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{rename%filerename}{node|short}</a>
+      <a class="list" href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">
+        {rename%filerename}{node|short}
+      </a>
     </td>
   </tr>'
 changelogchild = '
   <tr>
     <th class="child">child {rev}:</th>
-    <td class="child">
-      <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a>
-    </td>
+    <td class="child"><a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a></td>
   </tr>'
 changesetchild = '
   <tr>
@@ -171,16 +173,14 @@ filerevchild = '
   <tr>
     <td>child {rev}</td>
     <td style="font-family:monospace">
-      <a class="list" href="{url|urlescape}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a>
-    </td>
-  </tr>'
+      <a class="list" href="{url|urlescape}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a></td>
+    </tr>'
 fileannotatechild = '
   <tr>
     <td>child {rev}</td>
     <td style="font-family:monospace">
-      <a class="list" href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a>
-    </td>
-  </tr>'
+      <a class="list" href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a></td>
+    </tr>'
 tags = tags.tmpl
 tagentry = '
   <tr class="parity{parity}">
@@ -220,7 +220,9 @@ filediffparent = '
   <tr>
     <td>parent {rev}</td>
     <td style="font-family:monospace">
-      <a class="list" href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{node|short}</a>
+      <a class="list" href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">
+        {node|short}
+      </a>
     </td>
   </tr>'
 filecompparent = '
