@@ -68,6 +68,7 @@ direntry = '
     <td style="font-family:monospace"></td>
     <td>
       <a href="{url|urlescape}file/{node|short}{path|urlescape}{sessionvars%urlparameter}">{basename|escape}</a>
+      <a href="{url|urlescape}file/{node|short}{path|urlescape}/{emptydirs|urlescape}{sessionvars%urlparameter}">{emptydirs|escape}</a>
     </td>
     <td class="link">
       <a href="{url|urlescape}file/{node|short}{path|urlescape}{sessionvars%urlparameter}">files</a>
@@ -97,16 +98,18 @@ fileline = '
     <pre><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</pre>
   </div>'
 annotateline = '
-  <div class="l{parity}">
-    <div class="codeauthor">
-      <a href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}" title="{node|short}: {desc|escape|firstline}">{author|emailuser|obfuscate}@{rev}</a>
-    </div>
-    <a class="codeline" href="#{lineid}" id="{lineid}">{linenumber}</a>{line|escape}
-  </div>'
+  <tr style="font-family:monospace" class="parity{parity}">
+    <td class="linenr" style="text-align: right;">
+      <a href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}#l{targetline}"
+         title="{node|short}: {desc|escape|firstline}">{author|user}@{rev}</a>
+    </td>
+    <td><pre><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a></pre></td>
+    <td><pre>{line|escape}</pre></td>
+  </tr>'
 difflineplus = '<span class="difflineplus"><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
 difflineminus = '<span class="difflineminus"><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
 difflineat = '<span class="difflineat"><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
-diffline = '<a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}'
+diffline = '<span><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
 
 comparisonblock ='
   <tbody class="block">
