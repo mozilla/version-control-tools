@@ -40,7 +40,7 @@ file |
  <td>{author|obfuscate}</td></tr>
 <tr>
  <td></td>
- <td>{date|date} (at {date|date})</td></tr>
+ <td class="date age">{date|rfc822date}</td></tr>
 {branch%filerevbranch}
 <tr>
  <td>changeset {rev}</td>
@@ -54,7 +54,7 @@ file |
 </div>
 
 <div class="page_path">
-{desc|strip|escape|addbreaks|buglink}
+{desc|strip|escape|websub|addbreaks|buglink|nonempty}
 </div>
 
 <div class="page_body">
