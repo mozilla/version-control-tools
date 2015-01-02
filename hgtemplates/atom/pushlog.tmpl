@@ -1,7 +1,7 @@
 {header}
- <id>{urlbase}{url}pushlog</id>
- <link rel="self" href="{urlbase}{url}pushlog"/>
- <link rel="alternate" href="{urlbase}{url}pushloghtml"/>
+ <id>{urlbase}{url|urlescape}pushlog</id>
+ <link rel="self" href="{urlbase}{url|urlescape}pushlog"/>
+ <link rel="alternate" href="{urlbase}{url|urlescape}pushloghtml"/>
  <title>{repo|escape} Pushlog</title>
  <updated>{date}</updated>
 {entries%pushlogentry}
