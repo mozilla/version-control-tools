@@ -123,7 +123,7 @@ changelogparent = '
       <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a>
     </td>
   </tr>'
-changesetbranch = '<tr><td>branch</td><td>{name}</td></tr>'
+changesetbranch = '<tr><td>branch</td><td>{name|escape}</td></tr>'
 changesetparent = '
   <tr>
     <td>parent {rev}</td>
@@ -131,7 +131,7 @@ changesetparent = '
       <a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a>
     </td>
   </tr>'
-filerevbranch = '<tr><td>branch</td><td>{name}</td></tr>'
+filerevbranch = '<tr><td>branch</td><td>{name|escape}</td></tr>'
 filerevparent = '
   <tr>
     <td>parent {rev}</td>
