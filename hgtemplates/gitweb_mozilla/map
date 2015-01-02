@@ -286,7 +286,6 @@ filelogentry = '
     <td class="age">{node|short}<br/><i>{date|isodate}</i>{rename%filelogrename}</td>
     <td><strong><cite>{author|person}</cite> - {desc|strip|firstline|escape|buglink}</strong></td>
   </tr>'
-filelogentry_old = '<tr class="parity{parity}"><td class="age"><i>at {date|date}</i></td><td><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}"><b>{desc|strip|firstline|escape|buglink}</b></a></td><td class="link"><a href="{url|urlescape}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">file</a>&nbsp;|&nbsp;<a href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">diff</a>&nbsp;|&nbsp;<a href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">annotate</a> {rename%filelogrename}</td></tr>'
 archiveentry = ' | <a href="{url|urlescape}archive/{node|short}{extension}">{type|escape}</a> '
 indexentry = '
   <tr class="parity{parity}">
