@@ -40,7 +40,7 @@ annotate |
  <td>{author|obfuscate}</td></tr>
 <tr>
  <td></td>
- <td>{date|date} (at {date|date})</td></tr>
+ <td class="date age">{date|rfc822date}</td></tr>
 {branch%filerevbranch}
 <tr>
  <td>changeset {rev}</td>
@@ -54,12 +54,12 @@ annotate |
 </div>
 
 <div class="page_path">
-{desc|strip|escape|addbreaks}
+{desc|strip|escape|websub|addbreaks|nonempty}
 </div>
 <div class="page_body">
-<pre class="completecodeline">
+<table>
 {annotate%annotateline}
-</pre>
+</table>
 </div>
 
 {footer}
