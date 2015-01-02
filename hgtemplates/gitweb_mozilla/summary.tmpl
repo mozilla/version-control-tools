@@ -50,11 +50,17 @@ summary |
 <tr class="light"><td colspan="3"><a class="list" href="{url|urlescape}tags{sessionvars%urlparameter}">...</a></td></tr>
 </table>
 
-<div><a class="title" href="#">branches</a></div>
+<div><a class="title" href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a></div>
+<table cellspacing="0">
+{bookmarks%bookmarkentry}
+<tr class="light"><td colspan="3"><a class="list" href="{url|urlescape}bookmarks{sessionvars%urlparameter}">...</a></td></tr>
+</table>
+
+<div><a class="title" href="{url|urlescape}branches{sessionvars%urlparameter}">branches</a></div>
 <table cellspacing="0">
 {branches%branchentry}
 <tr class="light">
-  <td colspan="4"><a class="list"  href="#">...</a></td>
+  <td colspan="4"><a class="list"  href="{url|urlescape}branches{sessionvars%urlparameter}">...</a></td>
 </tr>
 </table>
 {footer}
