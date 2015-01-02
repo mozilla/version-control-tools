@@ -26,12 +26,12 @@ changeset |
 </div>
 
 <div class="title">
-{desc|strip|escape|firstline|buglink} <span class="logtags">{inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}</span>
+{desc|strip|escape|firstline|buglink|nonempty} <span class="logtags">{inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}{bookmarks%bookmarktag}</span>
 </div>
 <div class="title_text">
 <table cellspacing="0">
 <tr><td>author</td><td>{author|obfuscate}</td></tr>
-<tr><td></td><td>{date|date} (at {date|date})</td></tr>
+<tr><td></td><td class="date age">{date|rfc822date}</td></tr>
 {branch%changesetbranch}
 <tr><td>changeset {rev}</td><td style="font-family:monospace">{node|short}</td></tr>
 {parent%changesetparent}
@@ -40,7 +40,7 @@ changeset |
 </table></div>
 
 <div class="page_body">
-{desc|strip|escape|buglink|addbreaks}
+{desc|strip|escape|websub|buglink|addbreaks}
 </div>
 <div class="list_head"></div>
 <div class="title_text">
