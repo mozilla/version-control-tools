@@ -206,11 +206,11 @@ bookmarkentry = '
 branches = branches.tmpl
 branchentry = '
   <tr class="parity{parity}">
-    <td class="age"><i>at {date|date}</i></td>
-    <td><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}"><b>{node|short}</b></a></td>
-    <td>{branch|escape}</td>
+    <td class="age"><i class="age">{date|rfc822date}</i></td>
+    <td><a class="list" href="{url|urlescape}shortlog/{node|short}{sessionvars%urlparameter}"><b>{node|short}</b></a></td>
+    <td class="{status}">{branch|escape}</td>
     <td class="link">
-      <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">changeset</a> |
+      <a href="{url|urlescape}changeset/{node|short}{sessionvars%urlparameter}">changeset</a> |
       <a href="{url|urlescape}log/{node|short}{sessionvars%urlparameter}">changelog</a> |
       <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">files</a>
     </td>
