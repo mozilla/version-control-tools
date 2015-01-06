@@ -12,8 +12,11 @@ import weakref
 
 from mercurial import (
     cmdutil,
+    encoding,
     exchange,
     extensions,
+    revset,
+    util,
     wireproto,
 )
 
@@ -370,6 +373,64 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
 
     return 1
 
+def revset_pushhead(repo, subset, x):
+    """``pushhead()``
+    Changesets that were heads when they were pushed.
+
+    A push head is a changeset that was a head at the time it was pushed.
+    """
+    revset.getargs(x, 0, 0, 'pushhead takes no arguments')
+
+    # Iterating over all pushlog data is unfortunate, as there is overhead
+    # involved. However, this is less overhead than issuing a SQL query for
+    # every changeset, especially on large repositories. There is room to make
+    # this optimal by batching SQL, but that adds complexity. For now,
+    # simplicity wins.
+    def getrevs():
+        for pushid, who, when, nodes in repo.pushlog.pushes():
+            yield repo[nodes[-1]].rev()
+
+    return subset & revset.generatorset(getrevs())
+
+def revset_pushdate(repo, subset, x):
+    """``pushdate(interval)``
+    Changesets that were pushed within the interval, see :hg:`help dates`.
+    """
+    l = revset.getargs(x, 1, 1, 'pushdate requires one argument')
+
+    ds = revset.getstring(l[0], 'pushdate requires a string argument')
+    dm = util.matchdate(ds)
+
+    def getrevs():
+        for pushid, who, when, nodes in repo.pushlog.pushes():
+            if dm(when):
+                for node in nodes:
+                    yield repo[node].rev()
+
+    return subset & revset.generatorset(getrevs())
+
+def revset_pushuser(repo, subset, x):
+    """``pushuser(string)``
+
+    User name that pushed the changeset contains string. The match is
+    case-insensitive.
+
+    If `string` starts with `re:`, the remainder of the string is treated as
+    a regular expression. To match a user that actually contains `re:`, use
+    the prefix `literal:`.
+    """
+    l = revset.getargs(x, 1, 1, 'pushuser requires one argument')
+    n = encoding.lower(revset.getstring(l[0], 'pushuser requires a string'))
+    kind, pattern, matcher = revset._substringmatcher(n)
+
+    def getrevs():
+        for pushid, who, when, nodes in repo.pushlog.pushes():
+            if matcher(encoding.lower(who)):
+                for node in nodes:
+                    yield repo[node].rev()
+
+    return subset & revset.generatorset(getrevs())
+
 @command('verifypushlog', [], 'verify the pushlog data is sane')
 def verifypushlog(ui, repo):
     """Verify the pushlog data looks correct."""
@@ -379,6 +440,10 @@ def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     extensions.wrapfunction(exchange.pulloperation, 'closetransaction',
         exchangepullpushlog)
+
+    revset.symbols['pushhead'] = revset_pushhead
+    revset.symbols['pushdate'] = revset_pushdate
+    revset.symbols['pushuser'] = revset_pushuser
 
 def reposetup(ui, repo):
     if not repo.local():
