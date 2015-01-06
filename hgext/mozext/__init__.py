@@ -750,16 +750,6 @@ def pull(orig, repo, remote, *args, **kwargs):
 
     return res
 
-def pullexpand(orig, ui, repo, source='default', **opts):
-    """Wraps built-in pull command to expand aliases to multiple sources."""
-    for tree, uri in resolve_trees_to_uris([source]):
-        result = orig(ui, repo, uri or tree, **opts)
-
-        if result:
-            return result
-
-    return 0
-
 def push(orig, repo, remote, *args, **kwargs):
     if not hasattr(repo, 'changetracker'):
         return orig(repo, remote, *args, **kwargs)
@@ -1274,7 +1264,6 @@ def extsetup(ui):
     except KeyError:
         pass
 
-    extensions.wrapcommand(commands.table, 'pull', pullexpand)
     extensions.wrapfunction(exchange, 'pull', pull)
     extensions.wrapfunction(exchange, 'push', push)
 
