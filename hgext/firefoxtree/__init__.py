@@ -310,6 +310,22 @@ def pullcommand(orig, ui, repo, source='default', **opts):
 
     return orig(ui, repo, source=source, **opts)
 
+def outgoingcommand(orig, ui, repo, dest=None, **opts):
+    """Wraps command.outgoing to limit considered nodes.
+
+    We wrap commands.outgoing rather than hg._outgoing because the latter is a
+    low-level API used by discovery. Manipulating it could lead to unintended
+    consequences.
+    """
+    tree, uri = resolve_trees_to_uris([dest])[0]
+    rev = opts.get('rev')
+    if uri and not rev:
+        ui.status(_('no revisions specified; '
+            'using . to avoid inspecting multiple heads\n'))
+        opts['rev'] = '.'
+
+    return orig(ui, repo, dest=dest, **opts)
+
 def pushcommand(orig, ui, repo, dest=None, **opts):
     """Wraps commands.push to resolve names to tree URLs.
 
@@ -353,6 +369,7 @@ def extsetup(ui):
     extensions.wrapfunction(exchange, 'push', push)
     extensions.wrapfunction(exchange, 'pull', pull)
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
+    extensions.wrapcommand(commands.table, 'outgoing', outgoingcommand)
     extensions.wrapcommand(commands.table, 'pull', pullcommand)
     extensions.wrapcommand(commands.table, 'push', pushcommand)
 

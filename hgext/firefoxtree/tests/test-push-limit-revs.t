@@ -32,6 +32,20 @@
   $ hg commit -m 'Bug 790 - Testing push2'
   created new head
 
+Outgoing with no -r argument will limit to .
+
+  $ hg out central
+  no revisions specified; using . to avoid inspecting multiple heads
+  comparing with central
+  searching for changes
+  changeset:   3:d455de7ec717
+  tag:         tip
+  parent:      1:994ec05999da
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     Bug 790 - Testing push2
+  
+
 Pushing with no -r argument will limit to .
 
   $ hg push central
@@ -43,11 +57,11 @@ Pushing with no -r argument will limit to .
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
 
+Outgoing should be limited, so no output expected
+
   $ hg out central
+  no revisions specified; using . to avoid inspecting multiple heads
   comparing with central
   searching for changes
-  changeset:   2:683791dab932
-  user:        test
-  date:        Thu Jan 01 00:00:00 1970 +0000
-  summary:     Bug 789 - Testing push1
-  
+  no changes found
+  [1]
