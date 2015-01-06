@@ -157,6 +157,33 @@ Or type ``hg push <tree>`` to push to a Firefox repository.::
    or want to see the full list of names, read
    `the source <https://hg.mozilla.org/hgcustom/version-control-tools/file/default/pylib/mozautomation/mozautomation/repository.py>`_.
 
+The Special *fxtrees* Path
+--------------------------
+
+The ``fxtrees`` path is special. If you ``hg pull fxtrees``, firefoxtree
+will pull from all Firefox repositories that you have previously pulled
+from.
+
+Typically, developers only care about a subset of all the Firefox
+repositories. ``hg pull fxtrees`` provides a convenient mechanism to
+only pull the repositories you have previously expressed an interest in
+interacting with.
+
+Other Special Paths
+-------------------
+
+There are some special paths that expand to multiple repositories. If
+you run ``hg pull`` with one of these paths, firefoxtree will iterate
+through each of these repositories and pull from all of them. These
+special paths include:
+
+integration
+   Pull from all integration/landing repositories (inbound, fx-team,
+   b2g-inbound)
+releases
+   Pull from all repositories that Firefox is released from (central,
+   aurora, beta, release, esr, etc)
+
 Safer Push Defaults
 ===================
 
