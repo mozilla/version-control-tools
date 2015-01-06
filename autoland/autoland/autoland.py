@@ -270,10 +270,10 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
 
         if len(fails) == 1 and not passes:
             build_id = fails[0]['build_id']
-            single_failures.append((buildername, build_id))
+            single_failures.append((builder, build_id))
         elif len(fails) == 2:
             build_id = fails[0]['build_id']
-            double_failures.append(buildername)
+            double_failures.append(builder)
 
     # if there are double failures, the autoland request has failed
     if double_failures:
