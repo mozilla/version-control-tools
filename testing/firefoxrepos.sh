@@ -84,11 +84,7 @@ populatedummydata() {
   touch bar
   hg commit -A -m 'Bug 460 - Create bar on fx-team'
 
-  cd ../../services/services-central
-  hg pull ../../mozilla-central
   cd ../../integration/b2g-inbound
-  hg pull ../../mozilla-central
-  cd ../../projects/build-system
   hg pull ../../mozilla-central
 
   cd $oldpwd

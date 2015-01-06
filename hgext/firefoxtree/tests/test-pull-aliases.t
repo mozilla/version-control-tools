@@ -29,22 +29,14 @@ We can pull from the special multiple tree aliases
   adding file changes
   added 1 changesets with 1 changes to 1 files (+1 heads)
   (run 'hg heads' to see heads, 'hg merge' to merge)
-  pulling from services
-  searching for changes
-  no changes found
-  pulling from build
-  searching for changes
-  no changes found
   pulling from b2ginbound
   searching for changes
   no changes found
 
   $ hg fxheads
-  1:994ec05999da b2ginbound build services Bug 457 - second commit to m-c; r=ted
-  1:994ec05999da b2ginbound build services Bug 457 - second commit to m-c; r=ted
+  1:994ec05999da b2ginbound Bug 457 - second commit to m-c; r=ted
   4:3057abf99ee2 fx-team tip Bug 460 - Create bar on fx-team
   3:1b348279b0e9 inbound Bug 459 - Second commit to inbound
-  1:994ec05999da b2ginbound build services Bug 457 - second commit to m-c; r=ted
 
   $ cd ..
 

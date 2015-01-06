@@ -45,7 +45,7 @@ TREE_ALIASES = {
 
     'releases': ('esr17', 'b2g18', 'esr24', 'b2g26', 'b2g28', 'b2g30', 'esr31',
         'b2g32', 'b2g34', 'release', 'beta', 'aurora', 'central'),
-    'integration': ('inbound', 'fx-team', 'services', 'build', 'b2ginbound'),
+    'integration': ('inbound', 'fx-team', 'b2ginbound'),
     'twigs': ('alder', 'ash', 'birch', 'cedar', 'cypress', 'date', 'elm',
         'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine'),
 }
