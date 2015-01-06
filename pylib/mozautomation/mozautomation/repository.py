@@ -50,6 +50,12 @@ TREE_ALIASES = {
         'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine'),
 }
 
+# Aliases that map to multiple repositories.
+MULTI_TREE_ALIASES = {}
+for tree, aliases in TREE_ALIASES.items():
+    if len(aliases) > 1:
+        MULTI_TREE_ALIASES[tree] = aliases
+
 BASE_READ_URI = 'https://hg.mozilla.org/'
 BASE_WRITE_URI = 'ssh://hg.mozilla.org/'
 

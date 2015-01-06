@@ -23,8 +23,8 @@ Can pull from an alias
   added 2 changesets with 2 changes to 1 files
   (run 'hg update' to get a working copy)
 
-  $ hg pull integration
-  pulling from integration
+  $ hg pull inbound
+  pulling from inbound
   searching for changes
   adding changesets
   adding manifests

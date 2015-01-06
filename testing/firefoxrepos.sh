@@ -17,9 +17,12 @@ makefirefoxrepos() {
   makefirefoxrepo $1/releases/mozilla-beta
   makefirefoxrepo $1/releases/mozilla-release
   makefirefoxrepo $1/releases/mozilla-esr31
+  makefirefoxrepo $1/integration/b2g-inbound
   makefirefoxrepo $1/integration/mozilla-inbound
   makefirefoxrepo $1/integration/fx-team
   makefirefoxrepo $1/projects/alder
+  makefirefoxrepo $1/projects/build-system
+  makefirefoxrepo $1/services/services-central
   makefirefoxrepo $1/unified
 }
 
@@ -80,6 +83,13 @@ populatedummydata() {
   hg up tip
   touch bar
   hg commit -A -m 'Bug 460 - Create bar on fx-team'
+
+  cd ../../services/services-central
+  hg pull ../../mozilla-central
+  cd ../../integration/b2g-inbound
+  hg pull ../../mozilla-central
+  cd ../../projects/build-system
+  hg pull ../../mozilla-central
 
   cd $oldpwd
 }

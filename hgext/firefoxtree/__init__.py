@@ -35,6 +35,13 @@ extension defines them for you.
 You can run `hg pull central` or `hg pull inbound` and the alias
 automatically gets resolved to the appropriate URL.
 
+The special source ``fxtrees`` will expand to the set of Firefox trees
+that have previously been pulled. This is essentially an alias that runs
+``hg pull`` in a loop.
+
+If a source is a known alias that maps to multiple repositories (such as
+``releases`` or ``integration``), all repositories in that alias are pulled.
+
 Safer Push Defaults
 ===================
 
@@ -79,6 +86,7 @@ OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 from mozautomation.repository import (
+    MULTI_TREE_ALIASES,
     resolve_trees_to_uris,
     resolve_uri_to_tree,
 )
@@ -275,6 +283,33 @@ def updateremoterefs(repo, remote, tree):
     node = defaultnodes[-1]
     repo.tag(tree, node, message=None, local=True, user=None, date=None)
 
+def pullcommand(orig, ui, repo, source='default', **opts):
+    """Wraps built-in pull command to expand special aliases."""
+    if not isfirefoxrepo(repo):
+        return orig(ui, repo, source=source, **opts)
+
+    # The special source "fxtrees" will pull all trees we've pulled before.
+    if source == 'fxtrees':
+        for tag, node in sorted(repo.tags().items()):
+            tree, uri = resolve_trees_to_uris([tag])[0]
+            if not uri:
+                continue
+
+            res = orig(ui, repo, source=tree, **opts)
+            if res:
+                return res
+
+        return 0
+    elif source in MULTI_TREE_ALIASES:
+        for tree, uri in resolve_trees_to_uris([source]):
+            res = orig(ui, repo, source=tree, **opts)
+            if res:
+                return res
+
+        return 0
+
+    return orig(ui, repo, source=source, **opts)
+
 def pushcommand(orig, ui, repo, dest=None, **opts):
     """Wraps commands.push to resolve names to tree URLs.
 
@@ -318,6 +353,7 @@ def extsetup(ui):
     extensions.wrapfunction(exchange, 'push', push)
     extensions.wrapfunction(exchange, 'pull', pull)
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
+    extensions.wrapcommand(commands.table, 'pull', pullcommand)
     extensions.wrapcommand(commands.table, 'push', pushcommand)
 
 def reposetup(ui, repo):
