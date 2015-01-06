@@ -286,9 +286,6 @@ from mercurial import (
 )
 
 from mercurial.i18n import _
-from mercurial.commands import (
-    push,
-)
 from mercurial.error import (
     ParseError,
     RepoError,
