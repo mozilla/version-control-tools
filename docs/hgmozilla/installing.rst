@@ -30,14 +30,18 @@ needed (if a severe issue is encountered).
 Versions to Avoid
 -----------------
 
-Mercurial versions older than 3.x should be avoided because they are old
-and it is difficult to maintain API compatibility with them for certain
-operations.
+Mercurial versions older than 3.2.3 should be avoided due to a security
+issue (CVE-2014-9390) impacting Windows and OS X users.
+
+Mercurial versions older than 3.x should be avoided because they are
+old, slow, and contain known bugs. Also, it is difficult to maintain
+extension compatibility with them.
 
 Mercurial 3.0 through 3.1.1 contained a significant performance
 regression that manifests when performing certain repository operations,
-such cloning or pulling several thousand changesets. **Please do not use
-these versions.** The regression was fixed in Mercurial 3.1.2.
+such cloning or pulling several thousand changesets. **If you use these
+versions with the Firefox repository, you are going to have a bad
+time.** The regression was fixed in Mercurial 3.1.2.
 
 Installing on Windows
 =====================
@@ -61,6 +65,9 @@ Homebrew typically keeps their Mercurial package up to date. Install
 Mercurial through Homebrew by running::
 
   $ brew install mercurial
+
+You may want to run ``brew update`` first to ensure your package
+database is up to date.
 
 MacPorts
 --------
@@ -90,7 +97,7 @@ out the version you wish to install::
 
   $ hg clone http://selenic.com/repo/hg
   $ cd hg
-  $ hg up 3.1.2
+  $ hg up 3.2.4
 
 Once you have the source code, run ``make`` to install Mercurial::
 
@@ -113,7 +120,7 @@ If you would like to install Mercurial to a custom prefix::
    Are you concerned about a manual Mercurial install polluting your
    filesystem? Don't be.
 
-   A Mercurial source install is fully self-container. If you install to
+   A Mercurial source install is fully self-contained. If you install to
    a prefix, you only need a reference to the ``PREFIX/bin/hg`` executable
    to run Mercurial. You can create a symlink to ``PREFIX/bin/hg`` anywhere
    in ``PATH`` and Mercurial should *just work*.
