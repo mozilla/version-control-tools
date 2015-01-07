@@ -270,7 +270,7 @@ shortlogentry = '
       <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">diff</a><br/>
       <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">browse</a>
     </td>
-    <td class="age">{node|short}<br/><i>{date|isodate}</i></td>
+    <td>{node|short}<br/><i class="age">{date|isodate}</i></td>
     <td><strong><cite>{author|person}</cite> - {desc|strip|firstline|escape|buglink}</strong> <span class="logtags">{inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}</span></td>
   </tr>'
 pushinfo = '<cite>{user}<br/><span class="date">{date|date}</span></cite>'
