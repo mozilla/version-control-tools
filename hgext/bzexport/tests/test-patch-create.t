@@ -49,5 +49,5 @@ Uploading a simple patch to a bug works
         First patch'
     summary: bug1
 
-  $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-newbug
+  $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-patch-create
   stopped 2 containers
