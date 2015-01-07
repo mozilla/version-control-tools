@@ -41,6 +41,11 @@ Pushing a review should not touch Bugzilla
       id: 1
       tags: []
       text: ''
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: bug1
 
 Publishing the review will add an attachment to the bug
@@ -53,9 +58,11 @@ Publishing the review will add an attachment to the bug
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags: []
       id: 1
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: admin@example.com
@@ -77,6 +84,11 @@ Publishing the review will add an attachment to the bug
   
   
         hg pull -r 24417bc94b2c053e8f5dd8c09da33fbbef5404fe http://localhost:$HGPORT/'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: bug1
 
   $ rbmanage stop ../rbserver

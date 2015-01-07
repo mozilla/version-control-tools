@@ -41,6 +41,7 @@ Adding a reviewer should result in a r? flag being set
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags:
       - id: 1
         name: review
@@ -49,6 +50,7 @@ Adding a reviewer should result in a r? flag being set
         status: '?'
       id: 1
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: author@example.com
@@ -70,6 +72,11 @@ Adding a reviewer should result in a r? flag being set
   
   
         hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: First Bug
 
 Adding a "Ship It" review will grant r+
@@ -85,6 +92,7 @@ Adding a "Ship It" review will grant r+
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags:
       - id: 1
         name: review
@@ -93,6 +101,7 @@ Adding a "Ship It" review will grant r+
         status: +
       id: 1
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: author@example.com
@@ -126,6 +135,11 @@ Adding a "Ship It" review will grant r+
   
   
         LGTM'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: First Bug
 
 Adding a reply to the review will add a comment to Bugzilla
@@ -141,6 +155,7 @@ Adding a reply to the review will add a comment to Bugzilla
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags:
       - id: 1
         name: review
@@ -149,6 +164,7 @@ Adding a reply to the review will add a comment to Bugzilla
         status: +
       id: 1
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: author@example.com
@@ -189,6 +205,11 @@ Adding a reply to the review will add a comment to Bugzilla
   
   
         Thanks!'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: First Bug
 
 Ensure multiple reviewers works as expected
@@ -213,6 +234,7 @@ Ensure multiple reviewers works as expected
       content_type: text/x-review-board-request
       data: http://example.com/r/3/
       description: 'MozReview Request: bz://2/mynick'
+      file_name: reviewboard-3-url.txt
       flags:
       - id: 2
         name: review
@@ -226,6 +248,7 @@ Ensure multiple reviewers works as expected
         status: '?'
       id: 2
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://2/mynick'
     comments:
     - author: author@example.com
@@ -247,6 +270,11 @@ Ensure multiple reviewers works as expected
   
   
         hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: Multiple Reviewers
 
 Removing a reviewer should remove their review flag
@@ -263,6 +291,7 @@ Removing a reviewer should remove their review flag
       content_type: text/x-review-board-request
       data: http://example.com/r/3/
       description: 'MozReview Request: bz://2/mynick'
+      file_name: reviewboard-3-url.txt
       flags:
       - id: 3
         name: review
@@ -271,6 +300,7 @@ Removing a reviewer should remove their review flag
         status: '?'
       id: 2
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://2/mynick'
     comments:
     - author: author@example.com
@@ -307,6 +337,11 @@ Removing a reviewer should remove their review flag
   
   
         hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: Multiple Reviewers
 
 Removing all reviewers should remove all flags
@@ -323,9 +358,11 @@ Removing all reviewers should remove all flags
       content_type: text/x-review-board-request
       data: http://example.com/r/3/
       description: 'MozReview Request: bz://2/mynick'
+      file_name: reviewboard-3-url.txt
       flags: []
       id: 2
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://2/mynick'
     comments:
     - author: author@example.com
@@ -377,6 +414,11 @@ Removing all reviewers should remove all flags
   
   
         hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: Multiple Reviewers
 
 review? sticks around when 1 person grants review
@@ -405,6 +447,7 @@ review? sticks around when 1 person grants review
       content_type: text/x-review-board-request
       data: http://example.com/r/5/
       description: 'MozReview Request: bz://3/mynick'
+      file_name: reviewboard-5-url.txt
       flags:
       - id: 4
         name: review
@@ -418,6 +461,7 @@ review? sticks around when 1 person grants review
         status: +
       id: 3
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://3/mynick'
     comments:
     - author: author@example.com
@@ -451,6 +495,11 @@ review? sticks around when 1 person grants review
   
   
         land it!'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: More Multiple Reviewers
 
 Random users can come along and grant review
@@ -479,6 +528,7 @@ Random users can come along and grant review
       content_type: text/x-review-board-request
       data: http://example.com/r/7/
       description: 'MozReview Request: bz://4/mynick'
+      file_name: reviewboard-7-url.txt
       flags:
       - id: 6
         name: review
@@ -492,6 +542,7 @@ Random users can come along and grant review
         status: +
       id: 4
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://4/mynick'
     comments:
     - author: author@example.com
@@ -525,6 +576,11 @@ Random users can come along and grant review
   
   
         I am always watching'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: Unrelated Reviewers
 
   $ cd ..

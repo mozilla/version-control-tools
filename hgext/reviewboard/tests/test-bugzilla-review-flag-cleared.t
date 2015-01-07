@@ -35,6 +35,7 @@ Sanity check to ensure we have a review flag set
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags:
       - id: 1
         name: review
@@ -43,6 +44,7 @@ Sanity check to ensure we have a review flag set
         status: '?'
       id: 1
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: author@example.com
@@ -64,6 +66,11 @@ Sanity check to ensure we have a review flag set
   
   
         hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: First Bug
 
 Publishing a review will clear the r? flag
@@ -79,9 +86,11 @@ Publishing a review will clear the r? flag
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags: []
       id: 1
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: author@example.com
@@ -115,6 +124,11 @@ Publishing a review will clear the r? flag
   
   
         I have reservations'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: First Bug
 
 Posting a non Ship It review without a review flag adds a comment
@@ -129,9 +143,11 @@ Posting a non Ship It review without a review flag adds a comment
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags: []
       id: 1
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: author@example.com
@@ -172,6 +188,11 @@ Posting a non Ship It review without a review flag adds a comment
   
   
         One more thing...'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: First Bug
 
   $ cd ..

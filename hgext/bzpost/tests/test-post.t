@@ -90,6 +90,11 @@ Pushing to mozilla-inbound will result in bug being updated
       id: 2
       tags: []
       text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/b507e8e33160
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: bug1
 
 Pushing multiple changesets with multiple bugs will result in bug being updated
@@ -126,6 +131,11 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
       text: 'http://localhost:$HGPORT/integration/mozilla-inbound/rev/a224eb610808
   
         http://localhost:$HGPORT/integration/mozilla-inbound/rev/e3b5f3c3c45d'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: bug2
   Bug 3:
     comments:
@@ -137,6 +147,11 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
       id: 6
       tags: []
       text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/abe0245372d4
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: bug3
 
   $ cd ..
@@ -171,6 +186,11 @@ Pushing to Try will post Treeherder comment
       id: 8
       tags: []
       text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=311111800824
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: bug4
 
   $ cd ..
@@ -202,6 +222,11 @@ Public changesets pushed to Try will be ignored if no bug in draft changesets
       id: 9
       tags: []
       text: ''
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: bug5
 
   $ cd ..
@@ -235,6 +260,11 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
       id: 9
       tags: []
       text: ''
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: bug5
   Bug 6:
     comments:
@@ -246,6 +276,11 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
       id: 11
       tags: []
       text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=9257b757fa7a
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: bug6
 
   $ cd ..
@@ -297,6 +332,11 @@ Pushing commit with bug number to user repo will post comment if enabled
       id: 13
       tags: []
       text: http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central/rev/e48ee73711db
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: bug7
 
   $ cd ..

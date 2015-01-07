@@ -123,6 +123,11 @@ class Bugzilla(object):
             d = dict(
                 summary=bug.summary,
                 comments=[],
+                product=bug.product,
+                component=bug.component,
+                status=bug.status,
+                resolution=bug.resolution,
+                platform=bug.platform,
             )
             for comment in bug.get_comments():
                 d['comments'].append(dict(
@@ -147,13 +152,15 @@ class Bugzilla(object):
                 at = d.setdefault('attachments', [])
                 at.append(dict(
                     id=a['id'],
+                    file_name=a['file_name'],
                     attacher=a['attacher'],
                     content_type=a['content_type'],
                     description=a['description'],
                     summary=a['summary'],
                     data=base64.b64decode(a['data']),
                     flags=flags,
-                    is_obsolete=bool(a['is_obsolete'])))
+                    is_obsolete=bool(a['is_obsolete']),
+                    is_patch=bool(a['is_patch'])))
 
             key = 'Bug %s' % bid
             data[key] = d

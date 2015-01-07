@@ -20,6 +20,11 @@
       id: 1
       tags: []
       text: Description
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: First Bug
 
 Cleanup

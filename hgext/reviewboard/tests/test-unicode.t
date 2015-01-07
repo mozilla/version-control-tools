@@ -42,9 +42,11 @@ The globbing is patching over a bug in mach
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags: []
       id: 1
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
     comments:
     - author: author@example.com
@@ -71,6 +73,11 @@ The globbing is patching over a bug in mach
       tags: []
       text: "http://example.com/r/1/#review1\n\n::: foo\n(Diff revision 1)\n> -foo\n\
         > +initial\n\n\u3053\u3093\u306B\u3061\u306F\u4E16\u754C"
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
     summary: First Bug
 
 Cleanup

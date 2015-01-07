@@ -32,9 +32,11 @@ Uploading a simple patch to a bug works
         \ -r ac5453011ddd foo\n--- a/foo\tThu Jan 01 00:00:00 1970 +0000\n+++ b/foo\t\
         Thu Jan 01 00:00:00 1970 +0000\n@@ -0,0 +1,1 @@\n+first\n"
       description: First patch
+      file_name: first-patch
       flags: []
       id: 1
       is_obsolete: false
+      is_patch: true
       summary: First patch
     comments:
     - author: admin@example.com
@@ -47,6 +49,11 @@ Uploading a simple patch to a bug works
       text: 'Created attachment 1
   
         First patch'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: bug1
 
   $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-patch-create

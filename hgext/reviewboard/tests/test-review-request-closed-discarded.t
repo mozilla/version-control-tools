@@ -50,9 +50,11 @@
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://123/mynick'
+      file_name: reviewboard-1-url.txt
       flags: []
       id: 1
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://123/mynick'
     comments:
     - author: admin@example.com
@@ -76,6 +78,11 @@
   
   
         hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: Range 123
 
 Close the squashed review request as discarded, which should close all of the
@@ -152,9 +159,11 @@ The review attachment should be marked as obsolete
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://123/mynick'
+      file_name: reviewboard-1-url.txt
       flags: []
       id: 1
       is_obsolete: true
+      is_patch: false
       summary: 'MozReview Request: bz://123/mynick'
     comments:
     - author: admin@example.com
@@ -178,6 +187,11 @@ The review attachment should be marked as obsolete
   
   
         hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: Range 123
 
 Re-opening the parent review request should re-open all of the children,
@@ -295,9 +309,11 @@ There should still not be a visible attachment on the bug
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://123/mynick'
+      file_name: reviewboard-1-url.txt
       flags: []
       id: 1
       is_obsolete: true
+      is_patch: false
       summary: 'MozReview Request: bz://123/mynick'
     comments:
     - author: admin@example.com
@@ -321,6 +337,11 @@ There should still not be a visible attachment on the bug
   
   
         hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: Range 123
 
 Should be able to publish these review requests again by publishing the
@@ -396,9 +417,11 @@ The attachment for the review request should be unobsoleted
       content_type: text/x-review-board-request
       data: http://example.com/r/1/
       description: 'MozReview Request: bz://123/mynick'
+      file_name: reviewboard-1-url.txt
       flags: []
       id: 1
       is_obsolete: false
+      is_patch: false
       summary: 'MozReview Request: bz://123/mynick'
     comments:
     - author: admin@example.com
@@ -439,6 +462,11 @@ The attachment for the review request should be unobsoleted
   
   
         hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
+    component: TestComponent
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
     summary: Range 123
 
   $ cd ..
