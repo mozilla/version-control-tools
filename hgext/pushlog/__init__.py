@@ -85,8 +85,10 @@ def pushlogwireproto(repo, proto, firstpush):
 def exchangepullpushlog(orig, pullop):
     """This is called during pull to fetch pushlog data."""
     # check stepsdone for future compatibility with bundle2 pushlog exchange.
+    res = orig(pullop)
+
     if 'pushlog' in pullop.stepsdone or not pullop.remote.capable('pushlog'):
-        return orig(pullop)
+        return res
 
     repo = pullop.repo
     fetchfrom = repo.pushlog.lastpushid() + 1
@@ -109,7 +111,7 @@ def exchangepullpushlog(orig, pullop):
     repo.pushlog.recordpushes(pushes)
     repo.ui.status('added %d pushes\n' % len(pushes))
 
-    return orig(pullop)
+    return res
 
 class pushlog(object):
     '''An interface to pushlog data.'''
@@ -494,8 +496,8 @@ def verifypushlog(ui, repo):
 
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
-    extensions.wrapfunction(exchange.pulloperation, 'closetransaction',
-        exchangepullpushlog)
+
+    extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
 
     revset.symbols['pushhead'] = revset_pushhead
     revset.symbols['pushdate'] = revset_pushdate
