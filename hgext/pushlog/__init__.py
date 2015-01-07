@@ -447,8 +447,7 @@ def _getpushinfo(repo, ctx, cache):
     if 'nodetopush' not in cache:
         nodetopush = {}
         for push in repo.pushlog.pushes():
-            pushid, who, when, nodes = push
-            for node in nodes:
+            for node in push[3]:
                 nodetopush[node] = push
 
         cache['nodetopush'] = nodetopush
