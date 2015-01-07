@@ -71,12 +71,7 @@ class CookieTransportMixin:
                                           response.reason,
                                           response.msg.headers)
 
-        payload = response.read()
-        parser, unmarshaller = self.getparser()
-        parser.feed(payload)
-        parser.close()
-
-        return unmarshaller.close()
+        return self.parse_response(response)
 
 
 class BugzillaTransportMixin(CookieTransportMixin):
