@@ -91,9 +91,9 @@ We create 2 users here. 1 looks like a normal person: "First Last"
 The other has Mozilla IRC syntax: "First Last [:nick]"
 
   $ bugzilla create-user user1@example.com password1 'Dummy User1'
-  created user 2
-  $ bugzilla create-user user2@example.com password2 'Mozila User [:nick]'
   created user 3
+  $ bugzilla create-user user2@example.com password2 'Mozila User [:nick]'
+  created user 4
 
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/nonick
   pushing to ssh://user@dummy/$TESTTMP/server
@@ -127,7 +127,7 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
 
 Usernames for users without the IRC nick syntax are based on email fragment and BZ user id
 
-  $ rbmanage dump-user $HGPORT1 'user1+2'
+  $ rbmanage dump-user $HGPORT1 'user1+3'
   2:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user1@example.com
@@ -135,8 +135,8 @@ Usernames for users without the IRC nick syntax are based on email fragment and 
     fullname: Dummy User1
     id: 2
     last_name: ''
-    url: /users/user1%2B2/
-    username: user1+2
+    url: /users/user1%2B3/
+    username: user1+3
 
 Usernames for users with IRC nicks are the IRC nickname
 
@@ -154,7 +154,7 @@ Usernames for users with IRC nicks are the IRC nickname
 Changing the IRC nickname in Bugzilla will update the RB username
 
   $ bugzilla update-user-fullname user2@example.com 'Mozilla User [:newnick]'
-  updated user 3
+  updated user 4
 
   $ hg --config bugzilla.username=user2@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newnick
   pushing to ssh://user@dummy/$TESTTMP/server
@@ -187,7 +187,7 @@ Changing the email address in Bugzilla will update the RB email
 
   $ exportbzauth admin@example.com password
   $ bugzilla update-user-email user2@example.com user2-new@example.com
-  updated user 3
+  updated user 4
   $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newemail
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
@@ -219,7 +219,7 @@ Disabling a user in Bugzilla will prevent them from using Review Board
 
   $ exportbzauth admin@example.com password
   $ bugzilla update-user-login-denied-text user1@example.com disabled
-  updated user 2
+  updated user 3
 
 (This error message isn't terrific. It can be improved later.)
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/disableduser
@@ -234,7 +234,7 @@ Re-enabling a disabled user will allow them to use Review Board
 
   $ exportbzauth admin@example.com password
   $ bugzilla update-user-login-denied-text user1@example.com ''
-  updated user 2
+  updated user 3
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/undisableduser
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes
@@ -255,7 +255,7 @@ we fall back to non-IRC RB usernames.
 
   $ exportbzauth admin@example.com password
   $ bugzilla create-user user3@example.com password3 'Dummy User3 [:newnick]'
-  created user 4
+  created user 5
 
   $ hg --config bugzilla.username=user3@example.com --config bugzilla.password=password3 push --reviewid bz://1/conflictingircnick
   pushing to ssh://user@dummy/$TESTTMP/server
@@ -288,7 +288,7 @@ adding a new user or splitting this test file.)
     username: newnick
 
   $ exportbzauth user3@example.com password3
-  $ rbmanage dump-user $HGPORT1 user3+4
+  $ rbmanage dump-user $HGPORT1 user3+5
   4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user3@example.com
@@ -296,15 +296,15 @@ adding a new user or splitting this test file.)
     fullname: Dummy User3 [:newnick]
     id: 4
     last_name: ''
-    url: /users/user3%2B4/
-    username: user3+4
+    url: /users/user3%2B5/
+    username: user3+5
 
 If an existing RB user changes their IRC nick to one taken by another RB
 user, they will be assigned the email+id username.
 
   $ exportbzauth admin@example.com password
   $ bugzilla update-user-fullname user3@example.com 'Mozilla User3 [:mynick]'
-  updated user 4
+  updated user 5
 
 (We need to push to get the RB username updated)
 
@@ -341,7 +341,7 @@ user, they will be assigned the email+id username.
 
   $ exportbzauth admin@example.com password
   $ bugzilla update-user-fullname user2-new@example.com 'Mozilla User [:mynick]'
-  updated user 3
+  updated user 4
 
   $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2sharednick
   pushing to ssh://user@dummy/$TESTTMP/server
@@ -371,7 +371,7 @@ user, they will be assigned the email+id username.
     username: mynick
 
   $ exportbzauth user2-new@example.com password2
-  $ rbmanage dump-user $HGPORT1 user2-new+3
+  $ rbmanage dump-user $HGPORT1 user2-new+4
   3:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
@@ -379,8 +379,8 @@ user, they will be assigned the email+id username.
     fullname: Mozilla User [:mynick]
     id: 3
     last_name: ''
-    url: /users/user2-new%2B3/
-    username: user2-new+3
+    url: /users/user2-new%2B4/
+    username: user2-new+4
 
 Cleanup
 

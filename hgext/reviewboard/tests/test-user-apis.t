@@ -7,11 +7,11 @@
 Create some users
 
   $ bugzilla create-user joe1@example.com password 'Joe Smith'
-  created user 2
-  $ bugzilla create-user the-real-j-o-e@example.com password 'Joe Another'
   created user 3
-  $ bugzilla create-user jane@example.com password 'Jane Jones [:jenny]'
+  $ bugzilla create-user the-real-j-o-e@example.com password 'Joe Another'
   created user 4
+  $ bugzilla create-user jane@example.com password 'Jane Jones [:jenny]'
+  created user 5
 
 Unauthenticated users should not be able to search
 
@@ -32,40 +32,40 @@ An empty query string should not cause database population
 
   $ rbmanage get-users $HGPORT1 ''
   - id: 1
-    url: /users/joe1%2B2/
-    username: joe1+2
+    url: /users/joe1%2B3/
+    username: joe1+3
 
 Searching lowercase and uppercase versions of names returns the same
 results
 
   $ rbmanage get-users $HGPORT1 joe
   - id: 1
-    url: /users/joe1%2B2/
-    username: joe1+2
+    url: /users/joe1%2B3/
+    username: joe1+3
   - id: 2
-    url: /users/the-real-j-o-e%2B3/
-    username: the-real-j-o-e+3
+    url: /users/the-real-j-o-e%2B4/
+    username: the-real-j-o-e+4
   $ rbmanage get-users $HGPORT1 Joe
   - id: 1
-    url: /users/joe1%2B2/
-    username: joe1+2
+    url: /users/joe1%2B3/
+    username: joe1+3
   - id: 2
-    url: /users/the-real-j-o-e%2B3/
-    username: the-real-j-o-e+3
+    url: /users/the-real-j-o-e%2B4/
+    username: the-real-j-o-e+4
 
 Searching a full name returns results
 
   $ rbmanage get-users $HGPORT1 'Joe Smith'
   - id: 1
-    url: /users/joe1%2B2/
-    username: joe1+2
+    url: /users/joe1%2B3/
+    username: joe1+3
 
 Searching a last name returns results
 
   $ rbmanage get-users $HGPORT1 Smith
   - id: 1
-    url: /users/joe1%2B2/
-    username: joe1+2
+    url: /users/joe1%2B3/
+    username: joe1+3
 
 Searching an IRC nick without : returns results
 

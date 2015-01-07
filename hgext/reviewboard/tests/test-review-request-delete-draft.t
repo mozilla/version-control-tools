@@ -4,7 +4,7 @@
   $ commonenv rb-test-draft-delete
 
   $ bugzilla create-user submitter@example.com password 'Dummy Submitter'
-  created user 2
+  created user 3
   $ exportbzauth submitter@example.com password
   $ bugzilla create-bug TestProduct TestComponent 'Initial Bug'
 
