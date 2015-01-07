@@ -52,7 +52,7 @@ reset_database = 'RESET_DATABASE' in os.environ
 
 cc = subprocess.check_call
 
-patches = {'apache24.patch', 'fkpatch.patch', 'elasticsearch.patch'}
+patches = {'apache24.patch', 'elasticsearch.patch'}
 patched_files = {'.htaccess', 'Bugzilla/DB.pm', 'Bugzilla/Install/Requirements.pm'}
 
 # Ensure Bugzilla Git clone is up to date.
@@ -141,11 +141,6 @@ fresh_database = bool(subprocess.call(mysql_args + ['bugs'],
 if reset_database and not fresh_database:
     print(subprocess.check_output(mysql_args, input=b'DROP DATABASE bugs;'))
     fresh_database = True
-
-# Component watching throws a fit initializing against a fresh database.
-# Disable it.
-with open(j(b, 'extensions', 'ComponentWatching', 'disabled'), 'a'):
-    pass
 
 if not os.path.exists(j(h, 'checksetup.done')):
     cc([j(b, 'checksetup.pl',), answers], cwd=b)

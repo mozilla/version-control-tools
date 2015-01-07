@@ -150,9 +150,6 @@ ADD checksetup_answers.txt $BUGZILLA_HOME/checksetup_answers.txt
 # The .htaccess isn't compatible with Apache 2.4. We fix that.
 ADD apache24.patch $BUGZILLA_HOME/apache24.patch
 
-# Bug 769829. Foreign key issue with component watching schema updating.
-ADD fkpatch.patch $BUGZILLA_HOME/fkpatch.patch
-
 # Configure Apache
 RUN rm /etc/apache2/sites-enabled/*
 RUN /usr/sbin/a2dismod mpm_event && /usr/sbin/a2enmod mpm_prefork
