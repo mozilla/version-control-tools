@@ -33,6 +33,7 @@ import bz
 
 from mozhg.auth import (
     find_profiles_path,
+    get_profiles,
     win_get_folder_path,
 )
 
@@ -169,26 +170,11 @@ def find_profile(ui, profileName):
     if not path:
         raise util.Abort(_("Could not find a Firefox profile"))
 
-    profileini = os.path.join(path, "profiles.ini")
-    c = config.config()
-    c.read(profileini)
+    profiles = get_profiles(path)
+    if not profiles:
+        raise util.Abort(_('Could not find a Firefox profile'))
 
-    if profileName:
-        sections = [s for s in c.sections() if profileName in [s, c.get(s, "Name", None)]]
-    else:
-        sections = [s for s in c.sections() if c.get(s, "Default", None)]
-        if len(sections) == 0:
-            sections = c.sections()
-
-    sections = [s for s in sections if c.get(s, "Path", None) is not None]
-    if len(sections) == 0:
-        raise util.Abort(_("Could not find a Firefox profile"))
-
-    section = sections.pop(0)
-    profile = c[section].get("Path")
-    if c.get(section, "IsRelative", "0") == "1":
-        profile = os.path.join(path, profile)
-    return profile
+    return profiles[0]
 
 
 # Choose the cookie to use based on how much of its path matches the URL.
