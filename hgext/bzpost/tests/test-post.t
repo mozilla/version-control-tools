@@ -81,6 +81,8 @@ Pushing to mozilla-inbound will result in bug being updated
 
   $ $TESTDIR/bugzilla dump-bug 1
   Bug 1:
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 1
@@ -91,6 +93,7 @@ Pushing to mozilla-inbound will result in bug being updated
       tags: []
       text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/b507e8e33160
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -120,6 +123,8 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
 
   $ $TESTDIR/bugzilla dump-bug 2 3
   Bug 2:
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 3
@@ -132,12 +137,15 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
   
         http://localhost:$HGPORT/integration/mozilla-inbound/rev/e3b5f3c3c45d'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
     status: NEW
     summary: bug2
   Bug 3:
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 4
@@ -148,6 +156,7 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
       tags: []
       text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/abe0245372d4
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -177,6 +186,8 @@ Pushing to Try will post Treeherder comment
 
   $ $TESTDIR/bugzilla dump-bug 4
   Bug 4:
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 7
@@ -187,6 +198,7 @@ Pushing to Try will post Treeherder comment
       tags: []
       text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=311111800824
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -217,12 +229,15 @@ Public changesets pushed to Try will be ignored if no bug in draft changesets
 
   $ $TESTDIR/bugzilla dump-bug 5
   Bug 5:
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 9
       tags: []
       text: ''
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -255,18 +270,23 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
 
   $ $TESTDIR/bugzilla dump-bug 5 6
   Bug 5:
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 9
       tags: []
       text: ''
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
     status: NEW
     summary: bug5
   Bug 6:
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 10
@@ -277,6 +297,7 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
       tags: []
       text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=9257b757fa7a
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -323,6 +344,8 @@ Pushing commit with bug number to user repo will post comment if enabled
 
   $ $TESTDIR/bugzilla dump-bug 7
   Bug 7:
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 12
@@ -333,6 +356,7 @@ Pushing commit with bug number to user repo will post comment if enabled
       tags: []
       text: http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central/rev/e48ee73711db
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''

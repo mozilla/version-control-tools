@@ -52,6 +52,9 @@ Adding a reviewer should result in a r? flag being set
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
+    blocks: []
+    cc:
+    - reviewer@example.com
     comments:
     - author: author@example.com
       id: 1
@@ -73,6 +76,7 @@ Adding a reviewer should result in a r? flag being set
   
         hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -103,6 +107,9 @@ Adding a "Ship It" review will grant r+
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
+    blocks: []
+    cc:
+    - reviewer@example.com
     comments:
     - author: author@example.com
       id: 1
@@ -136,6 +143,7 @@ Adding a "Ship It" review will grant r+
   
         LGTM'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -166,6 +174,9 @@ Adding a reply to the review will add a comment to Bugzilla
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
+    blocks: []
+    cc:
+    - reviewer@example.com
     comments:
     - author: author@example.com
       id: 1
@@ -206,6 +217,7 @@ Adding a reply to the review will add a comment to Bugzilla
   
         Thanks!'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -250,6 +262,10 @@ Ensure multiple reviewers works as expected
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://2/mynick'
+    blocks: []
+    cc:
+    - reviewer2@example.com
+    - reviewer@example.com
     comments:
     - author: author@example.com
       id: 5
@@ -271,6 +287,7 @@ Ensure multiple reviewers works as expected
   
         hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -302,6 +319,10 @@ Removing a reviewer should remove their review flag
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://2/mynick'
+    blocks: []
+    cc:
+    - reviewer2@example.com
+    - reviewer@example.com
     comments:
     - author: author@example.com
       id: 5
@@ -338,6 +359,7 @@ Removing a reviewer should remove their review flag
   
         hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -364,6 +386,10 @@ Removing all reviewers should remove all flags
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://2/mynick'
+    blocks: []
+    cc:
+    - reviewer2@example.com
+    - reviewer@example.com
     comments:
     - author: author@example.com
       id: 5
@@ -415,6 +441,7 @@ Removing all reviewers should remove all flags
   
         hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -463,6 +490,10 @@ review? sticks around when 1 person grants review
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://3/mynick'
+    blocks: []
+    cc:
+    - reviewer2@example.com
+    - reviewer@example.com
     comments:
     - author: author@example.com
       id: 9
@@ -496,6 +527,7 @@ review? sticks around when 1 person grants review
   
         land it!'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -544,6 +576,9 @@ Random users can come along and grant review
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://4/mynick'
+    blocks: []
+    cc:
+    - reviewer@example.com
     comments:
     - author: author@example.com
       id: 12
@@ -577,6 +612,7 @@ Random users can come along and grant review
   
         I am always watching'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''

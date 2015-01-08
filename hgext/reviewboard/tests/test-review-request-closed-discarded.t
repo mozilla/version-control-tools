@@ -56,6 +56,8 @@
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://123/mynick'
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 123
@@ -79,6 +81,7 @@
   
         hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -165,6 +168,8 @@ The review attachment should be marked as obsolete
       is_obsolete: true
       is_patch: false
       summary: 'MozReview Request: bz://123/mynick'
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 123
@@ -188,6 +193,7 @@ The review attachment should be marked as obsolete
   
         hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -315,6 +321,8 @@ There should still not be a visible attachment on the bug
       is_obsolete: true
       is_patch: false
       summary: 'MozReview Request: bz://123/mynick'
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 123
@@ -338,6 +346,7 @@ There should still not be a visible attachment on the bug
   
         hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -423,6 +432,8 @@ The attachment for the review request should be unobsoleted
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://123/mynick'
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 123
@@ -463,6 +474,7 @@ The attachment for the review request should be unobsoleted
   
         hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''

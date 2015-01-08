@@ -46,6 +46,9 @@ Sanity check to ensure we have a review flag set
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
+    blocks: []
+    cc:
+    - reviewer@example.com
     comments:
     - author: author@example.com
       id: 1
@@ -67,6 +70,7 @@ Sanity check to ensure we have a review flag set
   
         hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -92,6 +96,9 @@ Publishing a review will clear the r? flag
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
+    blocks: []
+    cc:
+    - reviewer@example.com
     comments:
     - author: author@example.com
       id: 1
@@ -125,6 +132,7 @@ Publishing a review will clear the r? flag
   
         I have reservations'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -149,6 +157,9 @@ Posting a non Ship It review without a review flag adds a comment
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
+    blocks: []
+    cc:
+    - reviewer@example.com
     comments:
     - author: author@example.com
       id: 1
@@ -189,6 +200,7 @@ Posting a non Ship It review without a review flag adds a comment
   
         One more thing...'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''

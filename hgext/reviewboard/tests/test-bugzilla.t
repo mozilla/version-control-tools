@@ -36,12 +36,15 @@ Pushing a review should not touch Bugzilla
 
   $ bugzilla dump-bug 1
   Bug 1:
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 1
       tags: []
       text: ''
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
@@ -64,6 +67,8 @@ Publishing the review will add an attachment to the bug
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 1
@@ -85,6 +90,7 @@ Publishing the review will add an attachment to the bug
   
         hg pull -r 24417bc94b2c053e8f5dd8c09da33fbbef5404fe http://localhost:$HGPORT/'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''

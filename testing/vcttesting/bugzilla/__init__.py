@@ -128,6 +128,9 @@ class Bugzilla(object):
                 status=bug['status'],
                 resolution=bug['resolution'],
                 platform=bug['platform'],
+                cc=sorted(bug['cc']),
+                blocks=sorted(bug['blocks']),
+                depends_on=sorted(bug['depends_on']),
             )
             r = self.client.request('bug/%s/comment' % bid).json()
             for comment in r['bugs'][bid]['comments']:

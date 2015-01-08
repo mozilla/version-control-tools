@@ -38,6 +38,8 @@ Uploading a simple patch to a bug works
       is_obsolete: false
       is_patch: true
       summary: First patch
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 1
@@ -50,6 +52,7 @@ Uploading a simple patch to a bug works
   
         First patch'
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''

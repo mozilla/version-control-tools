@@ -48,6 +48,8 @@ The globbing is patching over a bug in mach
       is_obsolete: false
       is_patch: false
       summary: 'MozReview Request: bz://1/mynick'
+    blocks: []
+    cc: []
     comments:
     - author: author@example.com
       id: 1
@@ -74,6 +76,7 @@ The globbing is patching over a bug in mach
       text: "http://example.com/r/1/#review1\n\n::: foo\n(Diff revision 1)\n> -foo\n\
         > +initial\n\n\u3053\u3093\u306B\u3061\u306F\u4E16\u754C"
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''

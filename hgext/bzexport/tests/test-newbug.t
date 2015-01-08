@@ -15,12 +15,15 @@
 
   $ bugzilla dump-bug 1
   Bug 1:
+    blocks: []
+    cc: []
     comments:
     - author: admin@example.com
       id: 1
       tags: []
       text: Description
     component: TestComponent
+    depends_on: []
     platform: All
     product: TestProduct
     resolution: ''
