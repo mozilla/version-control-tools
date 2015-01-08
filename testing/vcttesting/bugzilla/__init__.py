@@ -117,24 +117,25 @@ class Bugzilla(object):
 
     def serialize_bugs(self, bugs):
         data = {}
-        for bid in bugs:
-            bug = self.client.get(bid)
 
+        for bug in self.proxy.Bug.get({'ids': bugs})['bugs']:
+            bid = str(bug['id'])
             d = dict(
-                summary=bug.summary,
+                summary=bug['summary'],
                 comments=[],
-                product=bug.product,
-                component=bug.component,
-                status=bug.status,
-                resolution=bug.resolution,
-                platform=bug.platform,
+                product=bug['product'],
+                component=bug['component'],
+                status=bug['status'],
+                resolution=bug['resolution'],
+                platform=bug['platform'],
             )
-            for comment in bug.get_comments():
+            r = self.client.request('bug/%s/comment' % bid).json()
+            for comment in r['bugs'][bid]['comments']:
                 d['comments'].append(dict(
-                    author=comment.author,
-                    id=comment.id,
-                    tags=sorted(comment.tags),
-                    text=comment.text,
+                    author=comment['author'],
+                    id=comment['id'],
+                    tags=sorted(comment['tags']),
+                    text=comment['text'],
                 ))
 
             r = self.client.request('bug/%s/attachment' % bid).json()
