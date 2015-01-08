@@ -8,6 +8,9 @@
 
   $ hg init repo
   $ cd repo
+
+Creating a bug with basic options works
+
   $ hg newbug --product TestProduct --component TestComponent -t 'First Bug' 'Description'
   Refreshing configuration cache for http://*:$HGPORT/bzapi/ (glob)
   Using default version 'unspecified' of product TestProduct
@@ -29,6 +32,28 @@
     resolution: ''
     status: NEW
     summary: First Bug
+
+Assigning a bug works
+
+  $ hg newbug --take-bug --product TestProduct --component TestComponent -t 'Assign it' 'dummy'
+  Using default version 'unspecified' of product TestProduct
+  Created bug 2 at http://*:$HGPORT/show_bug.cgi?id=2 (glob)
+  $ bugzilla dump-bug 2
+  Bug 2:
+    blocks: []
+    cc: []
+    comments:
+    - author: admin@example.com
+      id: 2
+      tags: []
+      text: dummy
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: ASSIGNED
+    summary: Assign it
 
 Cleanup
 
