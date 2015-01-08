@@ -20,13 +20,18 @@ import time
 import urllib
 import urllib2
 import json
-from mercurial import config, util
+from mercurial import config, demandimport, util
 from mercurial.i18n import _
 try:
     import cPickle as pickle
 except:
     import pickle
 import bz
+
+# requests doesn't like lazy importing
+demandimport.disable()
+import requests
+demandimport.enable()
 
 from mozhg.auth import (
     getbugzillaauth,
@@ -46,7 +51,7 @@ class bzAuth:
     typeCookie = 1
     typeExplicit = 2
 
-    def __init__(self, userid=None, cookie=None, username=None, password=None):
+    def __init__(self, url, userid=None, cookie=None, username=None, password=None):
         assert (userid and cookie) or (username and password)
         assert not ((userid or cookie) and (username or password))
         if userid:
@@ -58,6 +63,9 @@ class bzAuth:
             self._type = self.typeExplicit
             self._username = username
             self._password = password
+
+        self._url = url.rstrip('/')
+        self._session = None
 
     def auth(self):
         if self._type == self.typeCookie:
@@ -71,6 +79,31 @@ class bzAuth:
             return get_username(api_server, self)
         else:
             return self._username
+
+    @property
+    def session(self):
+        """Obtain a ``requests.Session`` used for making requests."""
+        if self._session:
+            return self._session
+
+        s = requests.Session()
+        s.headers['User-Agent'] = 'bzexport'
+
+        if self._type == self.typeCookie:
+            s.cookies['Bugzilla_login'] = self._userid
+            s.cookies['Bugzilla_logincookie'] = self._cookie
+        else:
+            # Resolve a token.
+            params = {'login': self._username, 'password': self._password}
+            res = s.get('%s/rest/login' % self._url, params=params)
+            j = res.json()
+            if 'token' not in j:
+                raise util.Abort(_('failed to login to Bugzilla'))
+
+            s.params['token'] = j['token']
+
+        self._session = s
+        return s
 
 
 def get_global_path(filename):
@@ -158,12 +191,12 @@ def load_configuration(ui, api_server, filename):
 
 def get_auth(ui, bugzilla, profile, username, password):
     if username and password:
-        return bzAuth(username=username, password=password)
+        return bzAuth(bugzilla, username=username, password=password)
 
     auth = getbugzillaauth(ui, require=True)
     if auth.userid:
-        return bzAuth(userid=auth.userid, cookie=auth.cookie)
-    return bzAuth(username=auth.username, password=auth.password)
+        return bzAuth(bugzilla, userid=auth.userid, cookie=auth.cookie)
+    return bzAuth(bugzilla, username=auth.username, password=auth.password)
 
 
 def get_username(api_server, token):
