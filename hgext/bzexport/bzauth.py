@@ -189,10 +189,7 @@ def load_configuration(ui, api_server, filename):
     return cache['configuration']
 
 
-def get_auth(ui, bugzilla, profile, username, password):
-    if username and password:
-        return bzAuth(bugzilla, username=username, password=password)
-
+def get_auth(ui, bugzilla, profile):
     auth = getbugzillaauth(ui, require=True)
     if auth.userid:
         return bzAuth(bugzilla, userid=auth.userid, cookie=auth.cookie)

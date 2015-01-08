@@ -370,11 +370,22 @@ def edit_form(ui, repo, fields, template_name):
 def bugzilla_info(ui, profile):
     api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/latest/")
     bugzilla = ui.config("bzexport", "bugzilla", "https://bugzilla.mozilla.org/")
+
+    # The [bzexport] auth config entries are deprecated in favor of
+    # [bugzilla] via mozhg.auth.
     username = ui.config("bzexport", "username", None)
     password = ui.config("bzexport", "password", None)
 
-    auth = bzauth.get_auth(ui, bugzilla, profile, username, password)
-    return (auth, api_server, bugzilla)
+    if username:
+        ui.warn('(the bzexport.username config option is deprecated and ignored; '
+            'use bugzilla.username instead)\n')
+
+    if password:
+        ui.warn('(the bzexport.password config option is deprecated and ignored; '
+            'use bugzilla.password or cookie auth by logging into Bugzilla in Firefox)\n')
+
+    auth = bzauth.get_auth(ui, bugzilla, profile)
+    return auth, api_server, bugzilla
 
 
 def urlopen(ui, req):
