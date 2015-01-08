@@ -75,6 +75,7 @@ REPOS = {
     'b2g30': 'releases/mozilla-b2g30_v1_4',
     'b2g32': 'releases/mozilla-b2g32_v2_0',
     'b2g34': 'releases/mozilla-b2g34_v2_1',
+    'b2g37': 'releases/mozilla-b2g37_v2_2',
 
     # Integration repositories.
     'b2ginbound': 'integration/b2g-inbound',
