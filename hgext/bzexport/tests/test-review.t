@@ -128,7 +128,6 @@ Parsing reviewer out of commit message works
     summary: bug2
 
 Changing the reviewer works
-TODO finish implementing after bug 1105433
 
   $ bugzilla create-bug TestProduct TestComponent bug3
   $ hg qref -m 'Bug 3 - Switching reviewer'
@@ -139,9 +138,71 @@ TODO finish implementing after bug 1105433
   $ hg bzexport --review :bob
   Requesting review from user2@example.com
   test-reviewer uploaded as http://*:$HGPORT/attachment.cgi?id=4&action=edit (glob)
-  Error: There is no flag with the id '3'.
-  abort: Could not update attachment 3: HTTP Error 400: Bad Request
-  [255]
+
+  $ bugzilla dump-bug 3
+  Bug 3:
+    attachments:
+    - attacher: admin@example.com
+      content_type: text/plain
+      data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
+        \ 1970 +0000\n# Node ID 863dcf97c40f401dedc9eed21e4579de9c8a4699\n# Parent \
+        \ 96ee1d7354c4ad7372047672c36a1f561e3a6a4c\nBug 3 - Switching reviewer\n\ndiff\
+        \ -r 96ee1d7354c4 -r 863dcf97c40f foo\n--- a/foo\tThu Jan 01 00:00:00 1970 +0000\n\
+        +++ b/foo\tThu Jan 01 00:00:00 1970 +0000\n@@ -0,0 +1,1 @@\n+first\n"
+      description: Switching reviewer
+      file_name: test-reviewer
+      flags: []
+      id: 3
+      is_obsolete: true
+      is_patch: true
+      summary: Switching reviewer
+    - attacher: admin@example.com
+      content_type: text/plain
+      data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
+        \ 1970 +0000\n# Node ID 863dcf97c40f401dedc9eed21e4579de9c8a4699\n# Parent \
+        \ 96ee1d7354c4ad7372047672c36a1f561e3a6a4c\nBug 3 - Switching reviewer\n\ndiff\
+        \ -r 96ee1d7354c4 -r 863dcf97c40f foo\n--- a/foo\tThu Jan 01 00:00:00 1970 +0000\n\
+        +++ b/foo\tThu Jan 01 00:00:00 1970 +0000\n@@ -0,0 +1,1 @@\n+first\n"
+      description: Switching reviewer
+      file_name: test-reviewer
+      flags:
+      - id: 4
+        name: review
+        requestee: user2@example.com
+        setter: admin@example.com
+        status: '?'
+      id: 4
+      is_obsolete: false
+      is_patch: true
+      summary: Switching reviewer
+    blocks: []
+    cc:
+    - user1@example.com
+    - user2@example.com
+    comments:
+    - author: admin@example.com
+      id: 5
+      tags: []
+      text: ''
+    - author: admin@example.com
+      id: 6
+      tags: []
+      text: 'Created attachment 3
+  
+        Switching reviewer'
+    - author: admin@example.com
+      id: 7
+      tags: []
+      text: 'Created attachment 4
+  
+        Switching reviewer'
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: bug3
 
   $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-review
   stopped 2 containers

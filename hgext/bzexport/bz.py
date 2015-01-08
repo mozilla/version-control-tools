@@ -111,13 +111,16 @@ def get_attachments(api_server, token, bug):
     return urllib2.Request(url, None, JSON_HEADERS)
 
 
-def obsolete_attachment(api_server, token, attachment):
-    url = make_url(api_server, token, 'attachment/%s' % str(attachment['id']))
+def obsolete_attachment(bugzilla_url, auth, attachment):
+    url = '%s/rest/bug/attachment/%s' % (
+        bugzilla_url.rstrip('/'), attachment['id'])
 
-    info = attachment.copy()
-    info["is_obsolete"] = True
-    return PUTRequest(url, json.dumps(info), JSON_HEADERS)
+    o = {
+        'ids': [attachment['id']],
+        'is_obsolete': True,
+    }
 
+    return auth.session.put(url, data=o)
 
 def find_users(api_server, token, search_string):
     url = make_url(api_server, token, 'user', {'match': search_string})

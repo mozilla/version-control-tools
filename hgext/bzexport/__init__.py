@@ -673,11 +673,10 @@ def obsolete_old_patches(ui, api_server, token, bugid, bugzilla, filename, ignor
         if pre_hook and not pre_hook(url=attachment_url, filename=p['file_name'], description=p["description"]):
             continue
 
-        req = bz.obsolete_attachment(api_server, token, p)
-        try:
-            json.load(urlopen(ui, req))
-        except Exception, e:
-            raise util.Abort(_("Could not update attachment %s: %s") % (p["id"], str(e)))
+        res = bz.obsolete_attachment(bugzilla, token, p).json()
+        if 'error' in res:
+            raise util.Abort(_('Could not update attachment %s: %s') % (
+                p['id'], res['message']))
 
     return True
 
