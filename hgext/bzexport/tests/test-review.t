@@ -127,6 +127,22 @@ Parsing reviewer out of commit message works
     status: NEW
     summary: bug2
 
+Changing the reviewer works
+TODO finish implementing after bug 1105433
+
+  $ bugzilla create-bug TestProduct TestComponent bug3
+  $ hg qref -m 'Bug 3 - Switching reviewer'
+  $ hg bzexport --review :mary
+  Requesting review from user1@example.com
+  test-reviewer uploaded as http://*:$HGPORT/attachment.cgi?id=3&action=edit (glob)
+
+  $ hg bzexport --review :bob
+  Requesting review from user2@example.com
+  test-reviewer uploaded as http://*:$HGPORT/attachment.cgi?id=4&action=edit (glob)
+  Error: There is no flag with the id '3'.
+  abort: Could not update attachment 3: HTTP Error 400: Bad Request
+  [255]
+
   $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-review
   stopped 2 containers
 
