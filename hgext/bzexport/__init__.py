@@ -42,16 +42,22 @@ This extension also adds a 'newbug' command for creating a new bug without
 attaching anything to it.
 
 """
+
+import json
+import os
+import re
+import sys
+import urllib2
+import urlparse
+from cStringIO import StringIO
+
 from mercurial.i18n import _
 from mercurial import cmdutil, util, patch
 from hgext import mq
-from cStringIO import StringIO
-import json
-import sys
-import os
-import re
-import urllib2
-import urlparse
+
+OUR_DIR = os.path.dirname(__file__)
+execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+
 import bzauth
 import bz
 
