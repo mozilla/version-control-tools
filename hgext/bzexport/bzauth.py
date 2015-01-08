@@ -17,9 +17,6 @@
 import os
 import platform
 import time
-import tempfile
-import shutil
-import urlparse
 import urllib
 import urllib2
 import json
@@ -32,9 +29,7 @@ except:
 import bz
 
 from mozhg.auth import (
-    find_profiles_path,
-    get_bugzilla_login_cookie_from_profile,
-    get_profiles,
+    getbugzillaauth,
     win_get_folder_path,
 )
 
@@ -161,45 +156,14 @@ def load_configuration(ui, api_server, filename):
     return cache['configuration']
 
 
-def find_profile(ui, profileName):
-    """
-    Find the default Firefox profile location. Returns None
-    if no profile could be located.
-
-    """
-    path = find_profiles_path()
-    if not path:
-        raise util.Abort(_("Could not find a Firefox profile"))
-
-    profiles = get_profiles(path)
-    if not profiles:
-        raise util.Abort(_('Could not find a Firefox profile'))
-
-    return profiles[0]
-
-
 def get_auth(ui, bugzilla, profile, username, password):
-    if not password:
-        # If the password wasn't specified in the hgrc, then see if the
-        # credentials can be retrieved from Bugzilla cookies
-        userid = None
-        cookie = None
-        profile = find_profile(ui, profile)
-        if profile:
-            try:
-                userid, cookie = get_bugzilla_login_cookie_from_profile(profile, bugzilla)
-            except Exception as e:
-                print("Warning: " + str(e))
-        if userid and cookie:
-            return bzAuth(userid=userid, cookie=cookie)
-        ui.write("Credentials not found in .hgrc & unable to retrieve bugzilla login cookies.\n")
+    if username and password:
+        return bzAuth(username=username, password=password)
 
-    if not username:
-        username = ui.prompt("Enter username for %s:" % bugzilla, default='')
-    if not password:
-        password = ui.getpass("Enter password for %s: " % username)
-
-    return bzAuth(username=username, password=password)
+    auth = getbugzillaauth(ui, require=True)
+    if auth.userid:
+        return bzAuth(userid=auth.userid, cookie=auth.cookie)
+    return bzAuth(username=auth.username, password=auth.password)
 
 
 def get_username(api_server, token):
