@@ -3,7 +3,7 @@
   $ commonenv rb-test-commits-deleted-obsolescence
 
   $ bugzilla create-bug-range TestProduct TestComponent 123
-  created 123 bugs
+  created bugs 1 to 123
 
   $ cat > obs.py << EOF
   > import mercurial.obsolete

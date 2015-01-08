@@ -11,7 +11,7 @@
   $ echo "obs=$TESTTMP/obs.py" >> client/.hg/hgrc
 
   $ bugzilla create-bug-range TestProduct TestComponent 123
-  created 123 bugs
+  created bugs 1 to 123
 
 Set up the repo
 

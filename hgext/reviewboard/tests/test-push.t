@@ -13,7 +13,7 @@
   > EOF
 
   $ bugzilla create-bug-range TestProduct TestComponent 9
-  created 9 bugs
+  created bugs 1 to 9
 
 Set up the repo
 

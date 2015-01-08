@@ -39,20 +39,20 @@ class Bugzilla(object):
                 summary=summary)
         self.client.put(bug)
 
-    def create_bug_range(self, product, component, upper):
-        existing = self.client.search_for.search()
-        ids = [int(b['id']) for b in existing]
-        ids.append(1)
-        maxid = max(ids)
-
-        count = 0
-        for i in range(maxid, upper + 1):
-            count += 1
+    def create_bug_range(self, product, component, total):
+        first = None
+        last = None
+        for i in range(0, total):
             bug = bugsy.Bug(self.client, product=product, component=component,
-                    summary='Range %d' % i)
+                    summary='Range %d' % (i + 1))
             self.client.put(bug)
 
-        return count
+            if i == 0:
+                first = bug.id
+            else:
+                last = bug.id
+
+        return total, first, last
 
     def create_group(self, group, description):
         # Adding every user to every group is wrong. This is a quick hack to

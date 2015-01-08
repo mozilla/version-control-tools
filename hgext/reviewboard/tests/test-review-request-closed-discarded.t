@@ -2,7 +2,7 @@
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv rb-test-review-request-closed-discarded
   $ bugzilla create-bug-range TestProduct TestComponent 123
-  created 123 bugs
+  created bugs 1 to 123
 
   $ cd client
   $ echo 'foo0' > foo

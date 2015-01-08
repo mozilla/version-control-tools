@@ -33,10 +33,10 @@ class BugzillaCommands(object):
             description='Create multiple bugs at once')
     @CommandArgument('product', help='Product to create bugs in')
     @CommandArgument('component', help='Component to create bugs in')
-    @CommandArgument('upper', type=int, help='The highest bug # to create')
-    def create_bug_range(self, product, component, upper):
-        count = self.b.create_bug_range(product, component, upper)
-        print('created %d bugs' % count)
+    @CommandArgument('count', type=int, help='The number of bugs to create')
+    def create_bug_range(self, product, component, count):
+        total, first, last = self.b.create_bug_range(product, component, count)
+        print('created bugs %d to %d' % (first, last))
 
     @Command('create-group', category='bugzilla',
             description='Create a Bugzilla group')

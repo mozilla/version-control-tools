@@ -3,7 +3,7 @@
   $ commonenv rb-test-multiple-parents
 
   $ bugzilla create-bug-range TestProduct TestComponent 2
-  created 2 bugs
+  created bugs 1 to 2
 
 Set up repo
 
