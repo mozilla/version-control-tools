@@ -50,9 +50,16 @@ class BugzillaCommands(object):
     @CommandArgument('email', help='The email / username of the user to create')
     @CommandArgument('password', help='The password to use for the user')
     @CommandArgument('name', help='The full name of the user being created')
-    def create_user(self, email, password, name):
+    @CommandArgument('--group', nargs='*',
+            help='Group to add the user to')
+    def create_user(self, email, password, name, group=None):
+        groups = group or []
+
         u = self.b.create_user(email, password, name)
         print('created user %s' % u['id'])
+
+        for g in groups:
+            self.b.add_user_to_group(email, g)
 
     @Command('update-user-fullname', category='bugzilla',
             description='Update the fullname field of a user')

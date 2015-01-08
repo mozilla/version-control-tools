@@ -70,6 +70,12 @@ class Bugzilla(object):
             'full_name': name,
         })
 
+    def add_user_to_group(self, email, group):
+        return self.proxy.User.update({
+            'names': [email],
+            'groups': {'add': [group]},
+            })
+
     def update_user_fullname(self, email, name):
         return self.proxy.User.update({
             'names': [email],
