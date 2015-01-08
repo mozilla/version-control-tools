@@ -31,6 +31,10 @@ except:
     import pickle
 import bz
 
+from mozhg.auth import (
+    win_get_folder_path,
+)
+
 global_cache = None
 
 
@@ -152,22 +156,6 @@ def load_configuration(ui, api_server, filename):
     cache['configuration_timestamp'] = now
     store_global_cache(filename)
     return cache['configuration']
-
-
-def win_get_folder_path(folder):
-    # Use SHGetFolderPath
-    import ctypes
-    SHGetFolderPath = ctypes.windll.shell32.SHGetFolderPathW
-    SHGetFolderPath.argtypes = [ctypes.c_void_p,
-                                ctypes.c_int,
-                                ctypes.c_void_p,
-                                ctypes.c_int32,
-                                ctypes.c_wchar_p]
-    path_buf = ctypes.create_unicode_buffer(1024)
-    if SHGetFolderPath(0, folder, 0, 0, path_buf) != 0:
-        return None
-
-    return path_buf.value
 
 
 def find_profile(ui, profileName):
