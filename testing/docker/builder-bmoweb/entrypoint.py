@@ -52,8 +52,13 @@ reset_database = 'RESET_DATABASE' in os.environ
 
 cc = subprocess.check_call
 
-patches = {'apache24.patch', 'elasticsearch.patch'}
-patched_files = {'.htaccess', 'Bugzilla/DB.pm', 'Bugzilla/Install/Requirements.pm'}
+patches = {'apache24.patch', 'bmodata.patch', 'elasticsearch.patch'}
+patched_files = {
+    '.htaccess',
+    'Bugzilla/DB.pm',
+    'Bugzilla/Install/Requirements.pm',
+    'contrib/docker/generate_bmo_data.pl',
+}
 
 # Ensure Bugzilla Git clone is up to date.
 
@@ -146,8 +151,15 @@ if not os.path.exists(j(h, 'checksetup.done')):
     cc([j(b, 'checksetup.pl',), answers], cwd=b)
     cc([j(b, 'checksetup.pl',), answers], cwd=b)
 
-    with open(j(h, 'bmo.sql'), 'rb') as fh:
-        subprocess.check_call(mysql_args + [db_name], stdin=fh)
+    # We may not always need -I. When introduced, upstream assumed the modules
+    # were already in the default path.
+    args = [
+        'perl',
+        '-I', j(b, 'lib'),
+        j(b, 'contrib', 'docker', 'generate_bmo_data.pl'),
+    ]
+
+    subprocess.check_call(args, cwd=b)
 
     with open(j(h, 'checksetup.done'), 'a'):
         pass

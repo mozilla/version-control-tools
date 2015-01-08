@@ -11,13 +11,13 @@
   $ hg phase --public -r .
 
   $ bugzilla create-user author@example.com password 'Some Contributor'
-  created user 3
-  $ bugzilla create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]'
-  created user 4
-  $ bugzilla create-user reviewer2@example.com password 'Another Reviewer [:rev2]'
   created user 5
-  $ bugzilla create-user troll@example.com password 'Reviewer Troll [:troll]'
+  $ bugzilla create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --group editbugs
   created user 6
+  $ bugzilla create-user reviewer2@example.com password 'Another Reviewer [:rev2]' --group editbugs
+  created user 7
+  $ bugzilla create-user troll@example.com password 'Reviewer Troll [:troll]' --group editbugs
+  created user 8
 
 Create a review request from a regular user
 

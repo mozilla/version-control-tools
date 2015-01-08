@@ -157,10 +157,10 @@ RUN /usr/sbin/a2enmod expires
 RUN /usr/sbin/a2enmod headers
 RUN /usr/sbin/a2enmod rewrite
 
+ADD bmodata.patch $BUGZILLA_HOME/bmodata.patch
+
 ADD bugzilla.conf /etc/apache2/sites-enabled/25-bugzilla.conf
 ADD prefork.conf /etc/apache2/mods-available/mpm_prefork.conf
-
-ADD bmo.sql $BUGZILLA_HOME/bmo.sql
 
 ADD entrypoint.py /bmoweb_entrypoint.py
 ADD run-apache.sh /run-apache.sh
