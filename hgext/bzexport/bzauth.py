@@ -32,6 +32,7 @@ except:
 import bz
 
 from mozhg.auth import (
+    find_profiles_path,
     win_get_folder_path,
 )
 
@@ -164,26 +165,8 @@ def find_profile(ui, profileName):
     if no profile could be located.
 
     """
-    path = None
-    if platform.system() == "Darwin":
-        # Use FSFindFolder
-        from Carbon import Folder, Folders
-        pathref = Folder.FSFindFolder(Folders.kUserDomain,
-                                      Folders.kApplicationSupportFolderType,
-                                      Folders.kDontCreateFolder)
-        basepath = pathref.FSRefMakePath()
-        path = os.path.join(basepath, "Firefox")
-    elif platform.system() == "Windows":
-        # From http://msdn.microsoft.com/en-us/library/windows/desktop/bb762494%28v=vs.85%29.aspx
-        CSIDL_APPDATA = 26
-        path = win_get_folder_path(CSIDL_APPDATA)
-        if path:
-            path = os.path.join(path, "Mozilla", "Firefox")
-    else:
-        # Assume POSIX
-        # Pretty simple in comparison, eh?
-        path = os.path.expanduser("~/.mozilla/firefox")
-    if path is None:
+    path = find_profiles_path()
+    if not path:
         raise util.Abort(_("Could not find a Firefox profile"))
 
     profileini = os.path.join(path, "profiles.ini")
