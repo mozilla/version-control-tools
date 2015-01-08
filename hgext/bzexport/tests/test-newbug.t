@@ -55,6 +55,36 @@ Assigning a bug works
     status: ASSIGNED
     summary: Assign it
 
+Specifying a CC list works
+
+  $ bugzilla create-user user1@example.com password1 'Mary Jane [:mary]'
+  created user 5
+  $ bugzilla create-user user2@example.com password2 'Bob Jones [:bob]'
+  created user 6
+
+  $ hg newbug --cc ':mary,:bob' --product TestProduct --component TestComponent -t 'CC list' 'dummy'
+  Using default version 'unspecified' of product TestProduct
+  Created bug 3 at http://192.168.59.103:$HGPORT/show_bug.cgi?id=3
+
+  $ bugzilla dump-bug 3
+  Bug 3:
+    blocks: []
+    cc:
+    - user1@example.com
+    - user2@example.com
+    comments:
+    - author: admin@example.com
+      id: 3
+      tags: []
+      text: dummy
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: CC list
+
 Cleanup
 
   $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-newbug

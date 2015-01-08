@@ -1118,7 +1118,7 @@ def newbug(ui, repo, *args, **opts):
               'COMPONENT': opts.get('component', '') or ui.config("bzexport", "component", '<choose-from-menu>'),
               'PRODVERSION': opts.get('prodversion', '') or ui.config("bzexport", "prodversion", '<default>'),
               'BUGCOMMENT0': bug_comment,
-              'CC': [],
+              'CC': [cc for cc in opts.get('cc', '').split(',') if cc],
               'DEPENDS': opts["depends"].split(","),
               'BLOCKS': opts["blocks"].split(","),
               }
