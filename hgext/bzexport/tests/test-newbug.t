@@ -85,6 +85,31 @@ Specifying a CC list works
     status: NEW
     summary: CC list
 
+Specifying blockers and dependencies works
+
+  $ hg newbug -B 1 -D 2 --product TestProduct --component TestComponent -t 'Dependencies' 'dummy'
+  Using default version 'unspecified' of product TestProduct
+  Created bug 4 at http://*:$HGPORT/show_bug.cgi?id=4 (glob)
+
+  $ bugzilla dump-bug 4
+  Bug 4:
+    blocks:
+    - 1
+    cc: []
+    comments:
+    - author: admin@example.com
+      id: 4
+      tags: []
+      text: dummy
+    component: TestComponent
+    depends_on:
+    - 2
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: Dependencies
+
 Cleanup
 
   $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-newbug
