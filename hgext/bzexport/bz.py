@@ -119,9 +119,9 @@ def obsolete_attachment(auth, attachment):
     return auth.rest_request('PUT', 'bug/attachment/%s' % attachment['id'],
         data=o)
 
-def find_users(api_server, token, search_string):
-    url = make_url(api_server, token, 'user', {'match': search_string})
-    return urllib2.Request(url, None, JSON_HEADERS)
+
+def find_users(auth, search_string):
+    return auth.rest_request('GET', 'user', params={'match': [search_string]})
 
 
 def get_configuration(api_server):

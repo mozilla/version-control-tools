@@ -159,7 +159,7 @@ def multi_user_prompt(ui, desc, search_results):
 
 
 # Returns [ { search_string: original, names: [ str ], real_names: [ str ] } ]
-def find_users(ui, api_server, user_cache_filename, token, search_strings):
+def find_users(ui, api_server, user_cache_filename, auth, search_strings):
     c = bzauth.load_user_cache(ui, api_server, user_cache_filename)
     section = api_server
 
@@ -173,7 +173,10 @@ def find_users(ui, api_server, user_cache_filename, token, search_strings):
             continue
 
         try:
-            users = json.load(urlopen(ui, bz.find_users(api_server, token, search_string)))
+            try:
+                users = bz.find_users(auth, search_string)
+            except Exception as e:
+                raise util.Abort(e.message)
             name = None
             real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"])
                              if user["real_name"] else user["email"], users["users"])
@@ -690,7 +693,7 @@ def obsolete_old_patches(ui, auth, bugid, bugzilla, filename, ignore_id, pre_hoo
     return True
 
 
-def find_reviewers(ui, api_server, user_cache_filename, token, search_strings):
+def find_reviewers(ui, api_server, user_cache_filename, auth, search_strings):
     cache = bzauth.load_user_cache(ui, api_server, user_cache_filename)
     section = api_server
 
@@ -704,7 +707,10 @@ def find_reviewers(ui, api_server, user_cache_filename, token, search_strings):
             continue
 
         try:
-            users = json.load(urlopen(ui, bz.find_users(api_server, token, search_string)))
+            try:
+                users = bz.find_users(auth, search_string)
+            except Exception as e:
+                raise util.Abort(e.message)
             name = None
             real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"])
                              if user["real_name"] else user["email"], users["users"])
