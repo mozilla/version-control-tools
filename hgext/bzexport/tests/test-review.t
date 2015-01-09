@@ -204,6 +204,65 @@ Changing the reviewer works
     status: NEW
     summary: bug3
 
+Specifying both reviewer and feedback works
+
+  $ bugzilla create-bug TestProduct TestComponent bug4
+  $ hg qref -m 'Bug 4 - Review and feedback'
+  $ hg bzexport --review :mary --feedback :bob
+  Requesting review from user1@example.com
+  Requesting feedback from user2@example.com
+  test-reviewer uploaded as http://*:$HGPORT/attachment.cgi?id=5&action=edit (glob)
+
+  $ bugzilla dump-bug 4
+  Bug 4:
+    attachments:
+    - attacher: admin@example.com
+      content_type: text/plain
+      data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
+        \ 1970 +0000\n# Node ID a767676592014b53eb4cdb31cc527db916c265fc\n# Parent \
+        \ 96ee1d7354c4ad7372047672c36a1f561e3a6a4c\nBug 4 - Review and feedback\n\n\
+        diff -r 96ee1d7354c4 -r a76767659201 foo\n--- a/foo\tThu Jan 01 00:00:00 1970\
+        \ +0000\n+++ b/foo\tThu Jan 01 00:00:00 1970 +0000\n@@ -0,0 +1,1 @@\n+first\n"
+      description: Review and feedback
+      file_name: test-reviewer
+      flags:
+      - id: 5
+        name: feedback
+        requestee: user2@example.com
+        setter: admin@example.com
+        status: '?'
+      - id: 6
+        name: review
+        requestee: user1@example.com
+        setter: admin@example.com
+        status: '?'
+      id: 5
+      is_obsolete: false
+      is_patch: true
+      summary: Review and feedback
+    blocks: []
+    cc:
+    - user1@example.com
+    - user2@example.com
+    comments:
+    - author: admin@example.com
+      id: 8
+      tags: []
+      text: ''
+    - author: admin@example.com
+      id: 9
+      tags: []
+      text: 'Created attachment 5
+  
+        Review and feedback'
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: bug4
+
   $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-review
   stopped 2 containers
 
