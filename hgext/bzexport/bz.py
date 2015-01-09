@@ -124,11 +124,6 @@ def find_users(api_server, token, search_string):
     return urllib2.Request(url, None, JSON_HEADERS)
 
 
-def get_user(api_server, bzauth):
-    url = make_url(api_server, bzauth, 'user/%s' % bzauth._userid)
-    return urllib2.Request(url, None, JSON_HEADERS)
-
-
 def get_configuration(api_server):
     url = make_url(api_server, None, 'configuration', {'cached_ok': 1})
     return urllib2.Request(url, None, JSON_HEADERS)

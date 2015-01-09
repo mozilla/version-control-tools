@@ -76,7 +76,8 @@ class bzAuth:
     def username(self, api_server):
         # This returns and caches the email-address-like username of the user's ID
         if self._type == self.typeCookie and self._username is None:
-            return get_username(api_server, self)
+            resp = self.rest_request('GET', 'user/%s' % self._userid)
+            return resp['users'][0]['name']
         else:
             return self._username
 
@@ -216,24 +217,3 @@ def get_auth(ui, bugzilla, profile):
     if auth.userid:
         return bzAuth(bugzilla, userid=auth.userid, cookie=auth.cookie)
     return bzAuth(bugzilla, username=auth.username, password=auth.password)
-
-
-def get_username(api_server, token):
-    req = bz.get_user(api_server, token)
-    try:
-        user = json.load(urllib2.urlopen(req, timeout=30))
-        return user["name"]
-    except urllib2.HTTPError, e:
-        msg = ''
-        try:
-            err = json.load(e)
-            msg = err['message']
-        except:
-            msg = e
-            pass
-
-        if msg:
-            raise util.Abort('Unable to get username: %s\n' % msg)
-        raise
-    except Exception, e:
-        raise util.Abort(_("Unable to get username: %s") % str(e))
