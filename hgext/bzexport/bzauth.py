@@ -102,8 +102,30 @@ class bzAuth:
 
             s.params['token'] = j['token']
 
+        s.headers['Content-Type'] = 'application/json'
+        s.headers['Accept'] = 'application/json'
+
         self._session = s
         return s
+
+    def rest_request(self, method, path, data=None, **kwargs):
+        """Make a request against the REST API.
+
+        Returns the parsed JSON response as an object or raises if an error
+        occurred.
+        """
+        url = '%s/rest/%s' % (self._url, path.lstrip('/'))
+        if data:
+            data = json.dumps(data)
+
+        res = self.session.request(method, url, data=data, **kwargs)
+
+        j = res.json()
+        if 'error' in j:
+            raise Exception('REST error on %s to %s: %s' % (
+                method, url, j['message']))
+
+        return j
 
 
 def get_global_path(filename):
