@@ -751,7 +751,7 @@ def feedback_flag_type_id(ui, api_server, config_cache_filename, product, compon
     return flag_type_id(ui, api_server, config_cache_filename, 'feedback', product, component)
 
 
-def create_attachment(ui, api_server, token, bug,
+def create_attachment(ui, api_server, auth, bug,
                       config_cache_filename,
                       attachment_contents, description="attachment",
                       filename="attachment", comment="",
@@ -766,10 +766,10 @@ def create_attachment(ui, api_server, token, bug,
         opts['feedback_flag_id'] = feedback_flag_type_id(ui, api_server, config_cache_filename, product, component)
         opts['feedback'] = feedback
 
-    req = bz.create_attachment(api_server, token, bug, attachment_contents,
-                               description=description, filename=filename, comment=comment,
-                               **opts)
-    return json.load(urlopen(ui, req))
+    return bz.create_attachment(auth, bug, attachment_contents,
+                                description=description, filename=filename,
+                                comment=comment,
+                                **opts)
 
 
 def bzexport(ui, repo, *args, **opts):
@@ -1049,8 +1049,9 @@ def bzexport(ui, repo, *args, **opts):
                                description=description,
                                comment=values['ATTACHCOMMENT'],
                                **extra_args)
+    aid = result['attachments'].keys()[0]
     attachment_url = urlparse.urljoin(bugzilla,
-                                      "attachment.cgi?id=" + result["id"] + "&action=edit")
+                                      'attachment.cgi?id=%s&action=edit' % aid)
     print "%s uploaded as %s" % (rev, attachment_url)
 
     def pre_obsolete(**kwargs):
@@ -1059,7 +1060,7 @@ def bzexport(ui, repo, *args, **opts):
         url, filename, description = [kwargs[k] for k in ['url', 'filename', 'description']]
         return ui.prompt(_("Obsolete patch %s (%s) - %s (y/n)?") % (url, filename, description)) == 'y'
 
-    obsolete_old_patches(ui, auth, bug, bugzilla, filename, result['id'], pre_hook=pre_obsolete)
+    obsolete_old_patches(ui, auth, bug, bugzilla, filename, aid, pre_hook=pre_obsolete)
 
     # If attaching to an existing bug (and not suppressed on the command line), take the bug
     if not opts['new'] and not opts['no_take_bug']:

@@ -58,7 +58,7 @@ def create_bug(token, product, component, version, title, description,
     return token.rest_request('POST', 'bug', data=o)
 
 
-def create_attachment(api_server, token, bug, contents,
+def create_attachment(auth, bug, contents,
                       description="attachment",
                       filename="attachment", comment="",
                       reviewers=None, review_flag_id=None,
@@ -67,38 +67,44 @@ def create_attachment(api_server, token, bug, contents,
     Post an attachment to a bugzilla bug using BzAPI.
     """
     attachment = base64.b64encode(contents)
-    url = make_url(api_server, token, 'bug/%s/attachment' % bug)
 
-    json_data = {'data': attachment,
-                 'encoding': 'base64',
-                 'file_name': filename,
-                 'description': description,
-                 'is_patch': True,
-                 'content_type': 'text/plain',
-                 'flags': []}
+    o = {
+        'ids': [bug],
+        'data': attachment,
+        'encoding': 'base64',
+        'file_name': filename,
+        'summary': description,
+        'is_patch': True,
+        'content_type': 'text/plain',
+        'flags': [],
+    }
+
     if reviewers:
-        flags = []
         assert review_flag_id
-        flags.append({"name": "review",
-                      "requestee": {"name": ", ".join(reviewers)},
-                      "status": "?",
-                      "type_id": review_flag_id})
-        json_data["flags"].extend(flags)
+        for requestee in reviewers:
+            o['flags'].append({
+                'name': 'review',
+                'requestee': requestee,
+                'status': '?',
+                'type_id': review_flag_id,
+                'new': True,
+            })
 
     if feedback:
-        flags = []
         assert feedback_flag_id
-        flags.append({"name": "feedback",
-                      "requestee": {"name": ", ".join(feedback)},
-                      "status": "?",
-                      "type_id": feedback_flag_id})
-        json_data["flags"].extend(flags)
+        for requestee in feedback:
+            o['flags'].append({
+                'name': 'feedback',
+                'requestee': requestee,
+                'status': '?',
+                'type_id': feedback_flag_id,
+                'new': True,
+            })
 
     if comment:
-        json_data["comments"] = [{'text': comment}]
+        o['comment'] = comment
 
-    attachment_json = json.dumps(json_data)
-    return urllib2.Request(url, attachment_json, JSON_HEADERS)
+    return auth.rest_request('POST', 'bug/%s/attachment' % bug, data=o)
 
 
 class PUTRequest(urllib2.Request):
