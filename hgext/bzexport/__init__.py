@@ -661,21 +661,19 @@ def update_patch(ui, repo, rev, bug, update_patch, rename_patch, interactive):
     return rev
 
 
-def obsolete_old_patches(ui, api_server, token, bugid, bugzilla, filename, ignore_id, pre_hook=None):
-    bug = None
-    req = bz.get_attachments(api_server, token, bugid)
+def obsolete_old_patches(ui, auth, bugid, bugzilla, filename, ignore_id, pre_hook=None):
     try:
-        bug = json.load(urlopen(ui, req))
-    except Exception, e:
-        raise util.Abort(_("Could not load info for bug %s: %s") % (bug, str(e)))
+        bug_attachments = bz.get_attachments(auth, bugid)
+        attachments = bug_attachments['bugs'][bugid]
+    except Exception as e:
+        raise util.Abort(e.message)
 
-    patches = [p
-               for p in bug["attachments"]
+    patches = [p for p in attachments
                if (p["is_patch"]
                    and not p["is_obsolete"]
                    and p["file_name"] == filename
                    and int(p["id"]) != int(ignore_id))]
-    if not len(patches):
+    if not patches:
         return True
 
     for p in patches:
@@ -685,7 +683,7 @@ def obsolete_old_patches(ui, api_server, token, bugid, bugzilla, filename, ignor
             continue
 
         try:
-            bz.obsolete_attachment(token, p)
+            bz.obsolete_attachment(auth, p)
         except Exception as e:
             raise util.Abort(e.message)
 
@@ -1061,7 +1059,7 @@ def bzexport(ui, repo, *args, **opts):
         url, filename, description = [kwargs[k] for k in ['url', 'filename', 'description']]
         return ui.prompt(_("Obsolete patch %s (%s) - %s (y/n)?") % (url, filename, description)) == 'y'
 
-    obsolete_old_patches(ui, api_server, auth, bug, bugzilla, filename, result['id'], pre_hook=pre_obsolete)
+    obsolete_old_patches(ui, auth, bug, bugzilla, filename, result['id'], pre_hook=pre_obsolete)
 
     # If attaching to an existing bug (and not suppressed on the command line), take the bug
     if not opts['new'] and not opts['no_take_bug']:

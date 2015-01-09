@@ -106,9 +106,8 @@ class PUTRequest(urllib2.Request):
         return "PUT"
 
 
-def get_attachments(api_server, token, bug):
-    url = make_url(api_server, token, 'bug/%s/attachment' % bug)
-    return urllib2.Request(url, None, JSON_HEADERS)
+def get_attachments(auth, bug):
+    return auth.rest_request('GET', 'bug/%s/attachment' % bug)
 
 
 def obsolete_attachment(auth, attachment):
