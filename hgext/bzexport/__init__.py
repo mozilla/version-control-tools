@@ -1034,7 +1034,7 @@ def bzexport(ui, repo, *args, **opts):
             extra_args['product'] = values['PRODUCT']
             extra_args['component'] = values['COMPONENT']
         else:
-            buginfo = json.load(urlopen(ui, bz.get_bug(api_server, auth, bug, include_fields=['product', 'component'])))
+            buginfo = bz.get_bug(auth, bug, include_fields=['product', 'component'])
             extra_args['product'] = buginfo['product']
             extra_args['component'] = buginfo['component']
 
@@ -1064,19 +1064,16 @@ def bzexport(ui, repo, *args, **opts):
 
     # If attaching to an existing bug (and not suppressed on the command line), take the bug
     if not opts['new'] and not opts['no_take_bug']:
-        req = bz.get_bug(api_server, auth, bug, include_fields=['assigned_to', 'status'])
-        result = json.load(urlopen(ui, req))
+        result = bz.get_bug(auth, bug, include_fields=['assigned_to', 'status'])
         taker = auth.username(api_server)
-        if result['assigned_to']['name'] != taker:
-            result['assigned_to'] = {'name': taker}
+        if result['assigned_to_detail']['name'] != taker:
+            result['assigned_to_detail'] = {'name': taker}
             if result['status'] != 'RESOLVED':
                 result['status'] = 'ASSIGNED'
-            req = bz.update_bug(api_server, auth, result)
             try:
-                result = json.load(urlopen(ui, req))
-                assert result.get('ok', None)
-            except Exception, e:
-                raise util.Abort(_("Error when updating bug %s: %s") % (bug, result))
+                result = bz.update_bug(auth, result)
+            except Exception as e:
+                raise util.Abort(e.message)
 
 
 def newbug(ui, repo, *args, **opts):

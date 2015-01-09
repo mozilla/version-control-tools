@@ -107,11 +107,6 @@ def create_attachment(auth, bug, contents,
     return auth.rest_request('POST', 'bug/%s/attachment' % bug, data=o)
 
 
-class PUTRequest(urllib2.Request):
-    def get_method(self):
-        return "PUT"
-
-
 def get_attachments(auth, bug):
     return auth.rest_request('GET', 'bug/%s/attachment' % bug)
 
@@ -139,7 +134,7 @@ def get_configuration(api_server):
     return urllib2.Request(url, None, JSON_HEADERS)
 
 
-def get_bug(api_server, token, bug, **opts):
+def get_bug(auth, bug, **opts):
     """
     Retrieve an existing bug
     """
@@ -147,14 +142,14 @@ def get_bug(api_server, token, bug, **opts):
     if 'include_fields' in opts:
         args['include_fields'] = ",".join(set(
             opts['include_fields'] + ['id', 'ref', 'token', 'last_change_time', 'update_token']))
-    url = make_url(api_server, token, 'bug/%s' % str(bug), args)
-    return urllib2.Request(url, None, JSON_HEADERS)
+
+    resp = auth.rest_request('GET', 'bug/%s' % bug, data=args)
+    return resp['bugs'][0]
 
 
-def update_bug(api_server, token, bugdata):
+def update_bug(auth, bugdata):
     """
     Update an existing bug. Must pass in an existing bug as a data structure.
     Mid-air collisions are possible.
     """
-    url = make_url(api_server, token, 'bug/%s' % str(bugdata['id']))
-    return PUTRequest(url, json.dumps(bugdata), JSON_HEADERS)
+    return auth.rest_request('PUT', 'bug/%s' % bugdata['id'], bugdata)
