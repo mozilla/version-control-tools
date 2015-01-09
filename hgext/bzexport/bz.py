@@ -33,29 +33,29 @@ def make_url(api_server, auth, command, args={}):
     return url + "?" + '&'.join(params)
 
 
-def create_bug(api_server, token, product, component, version, title, description,
+def create_bug(token, product, component, version, title, description,
                assign_to=None, cc=[], depends=[], blocks=[]):
     """
-    Create a bugzilla bug using BzAPI.
+    Create a bugzilla bug.
     """
-    url = make_url(api_server, token, 'bug')
-    json_data = {'product': product,
-                 'component': component,
-                 'summary': title,
-                 'version': version,
-                 'comments': [{'text': description}],
-                 'op_sys': 'All',
-                 'platform': 'All',
-                 'depends_on': depends,
-                 'blocks': blocks,
-                 'cc': [{'name': u} for u in cc],
-                 }
+    o = {
+        'product': product,
+        'component': component,
+        'summary': title,
+        'version': version,
+        'description': description,
+        'op_sys': 'All',
+        'platform': 'All',
+        'depends_on': depends,
+        'blocks': blocks,
+        'cc': cc,
+    }
 
     if assign_to:
-        json_data['assigned_to'] = {"name": assign_to}
-        json_data['status'] = 'ASSIGNED'
+        o['assigned_to'] = assign_to
+        o['status'] = 'ASSIGNED'
 
-    return urllib2.Request(url, json.dumps(json_data), JSON_HEADERS)
+    return token.rest_request('POST', 'bug', data=o)
 
 
 def create_attachment(api_server, token, bug, contents,

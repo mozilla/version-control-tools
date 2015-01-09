@@ -973,7 +973,7 @@ def bzexport(ui, repo, *args, **opts):
             create_opts = {}
             if not opts['no_take_bug']:
                 create_opts['assign_to'] = auth.username(api_server)
-            req = bz.create_bug(api_server, auth,
+            result = bz.create_bug(auth,
                                 product=values['PRODUCT'],
                                 component=values['COMPONENT'],
                                 version=values['PRODVERSION'],
@@ -983,7 +983,6 @@ def bzexport(ui, repo, *args, **opts):
                                 depends=depends,
                                 blocks=blocks,
                                 **create_opts)
-            result = json.load(urlopen(ui, req))
             bug = result['id']
             ui.write("Created bug %s at %sshow_bug.cgi?id=%s\n" % (bug, bugzilla, bug))
         except Exception, e:
@@ -1144,7 +1143,7 @@ def newbug(ui, repo, *args, **opts):
     if opts['take_bug']:
         create_opts['assign_to'] = auth.username(api_server)
 
-    req = bz.create_bug(api_server, auth,
+    result = bz.create_bug(auth,
                         product=values['PRODUCT'],
                         component=values['COMPONENT'],
                         version=values['PRODVERSION'],
@@ -1154,7 +1153,6 @@ def newbug(ui, repo, *args, **opts):
                         depends=values['DEPENDS'],
                         blocks=values['BLOCKS'],
                         **create_opts)
-    result = json.load(urlopen(ui, req))
     bug = result['id']
     ui.write("Created bug %s at %sshow_bug.cgi?id=%s\n" % (bug, bugzilla, bug))
 
