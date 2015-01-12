@@ -20,6 +20,7 @@ import tarfile
 import time
 import urlparse
 import uuid
+from contextlib import contextmanager
 from io import BytesIO
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -42,6 +43,7 @@ def wait_for_http(host, port, timeout=60):
             raise Exception('Timeout reached waiting for HTTP')
 
         time.sleep(1)
+
 
 def params_from_env(env):
     """Obtain Docker connect parameters from the environment.
@@ -75,6 +77,7 @@ def params_from_env(env):
             host = host.replace('tcp://', 'https://')
 
     return host, tls
+
 
 class Docker(object):
     def __init__(self, state_path, url, tls=False):
@@ -276,22 +279,14 @@ class Docker(object):
         web_id = self.client.create_container(web_image,
                 environment=web_environ)['Id']
 
-        self.client.start(db_id)
-        db_state = self.client.inspect_container(db_id)
+        with self._start_container(db_id) as db_state:
+            with self._start_container(web_id,
+                    links=[(db_state['Name'], 'bmodb')],
+                    port_bindings={80: None}) as web_state:
 
-        self.client.start(web_id,
-                links=[(db_state['Name'], 'bmodb')],
-                port_bindings={80: None})
-        web_state = self.client.inspect_container(web_id)
-
-        http_port = int(web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
-        print('waiting for bmoweb to bootstrap')
-        wait_for_http(self.docker_hostname, http_port)
-
-        # Ask the containers to shut down gracefully.
-        # This gives the MySQL container opportunity to flush, etc.
-        self.client.stop(web_id, timeout=20)
-        self.client.stop(db_id, timeout=20)
+                http_port = int(web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
+                print('waiting for bmoweb to bootstrap')
+                wait_for_http(self.docker_hostname, http_port)
 
         db_unique_id = str(uuid.uuid1())
         web_unique_id = str(uuid.uuid1())
@@ -373,20 +368,18 @@ class Docker(object):
         image = self.ensure_built(builder, verbose=True, add_vct=True)
         container = self.client.create_container(image)['Id']
 
-        self.client.start(container, port_bindings={80: None})
-        state = self.client.inspect_container(container)
-        port = int(state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
+        with self._start_container(container, port_bindings={80: None}) as state:
+            port = int(state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
 
-        print(message)
-        wait_for_http(self.docker_hostname, port, timeout=120)
+            print(message)
+            wait_for_http(self.docker_hostname, port, timeout=120)
 
-        res = requests.get('http://%s:%s/' % (self.docker_hostname, port))
+            res = requests.get('http://%s:%s/' % (self.docker_hostname, port))
 
-        files = {}
-        for filename, data in res.json().items():
-            files[filename] = base64.b64decode(data)
+            files = {}
+            for filename, data in res.json().items():
+                files[filename] = base64.b64decode(data)
 
-        self.client.stop(container)
         self.client.remove_container(container)
 
         return files
@@ -460,3 +453,20 @@ class Docker(object):
     def save_state(self):
         with open(self._state_path, 'wb') as fh:
             json.dump(self.state, fh)
+
+    @contextmanager
+    def _start_container(self, cid, **kwargs):
+        """Context manager for starting and stopping a Docker container.
+
+        The container with id ``cid`` will be started when the context manager is
+        entered and stopped when the context manager is execited.
+
+        The context manager receives the inspected state of the container,
+        immediately after it is started.
+        """
+        self.client.start(cid, **kwargs)
+        try:
+            state = self.client.inspect_container(cid)
+            yield state
+        finally:
+            self.client.stop(cid, timeout=20)
