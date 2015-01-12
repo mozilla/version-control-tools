@@ -49,7 +49,7 @@ class DockerCommands(object):
     @Command('build-bmo', category='docker',
         description='Build bugzilla.mozilla.org Docker images')
     def build_bmo(self):
-        self.d.build_bmo(verbose=True)
+        self.d.build_mozreview(verbose=True)
 
     @Command('start-bmo', category='docker',
         description='Start a bugzilla.mozilla.org instance')

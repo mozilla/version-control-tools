@@ -239,8 +239,8 @@ class Docker(object):
         self.state['last-hgmaster-id'] = hg_master_image
         # self.state['last-hgslave-id'] = hg_slave_image
 
-    def build_bmo(self, verbose=False):
-        """Ensure the images for a BMO service are built.
+    def build_mozreview(self, verbose=False):
+        """Ensure the images for a MozReview service are built.
 
         bmoweb's entrypoint does a lot of setup on first run. This takes many
         seconds to perform and this cost is unacceptable for efficient test
@@ -318,7 +318,7 @@ class Docker(object):
     def start_bmo(self, cluster, hostname=None, http_port=80, db_image=None,
             web_image=None, verbose=False):
         if not db_image or not web_image:
-            db_image, web_image = self.build_bmo(verbose=verbose)
+            db_image, web_image = self.build_mozreview(verbose=verbose)
 
         containers = self.state['containers'].setdefault(cluster, [])
 
