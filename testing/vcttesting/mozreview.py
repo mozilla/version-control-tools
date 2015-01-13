@@ -74,7 +74,7 @@ class MozReview(object):
         if not mercurial_port:
             mercurial_port = get_available_port()
 
-        bugzilla_url = self._docker.start_bmo(cluster=self._name,
+        bugzilla_url = self._docker.start_mozreview(cluster=self._name,
                 hostname=None, http_port=bugzilla_port,
                 db_image=db_image, web_image=web_image,
                 verbose=verbose)[0]

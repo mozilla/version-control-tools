@@ -60,7 +60,7 @@ class DockerCommands(object):
         db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
 
-        self.d.start_bmo(cluster=cluster, hostname=None, http_port=http_port,
+        self.d.start_mozreview(cluster=cluster, hostname=None, http_port=http_port,
                 db_image=db_image, web_image=web_image)
 
     @Command('stop-bmo', category='docker',

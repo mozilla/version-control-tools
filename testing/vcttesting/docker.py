@@ -315,7 +315,7 @@ class Docker(object):
 
         return db_bootstrap, web_bootstrap
 
-    def start_bmo(self, cluster, hostname=None, http_port=80, db_image=None,
+    def start_mozreview(self, cluster, hostname=None, http_port=80, db_image=None,
             web_image=None, verbose=False):
         if not db_image or not web_image:
             db_image, web_image = self.build_mozreview(verbose=verbose)
