@@ -1055,9 +1055,10 @@ def bzexport(ui, repo, *args, **opts):
                                description=description,
                                comment=values['ATTACHCOMMENT'],
                                **extra_args)
-    aid = result['attachments'].keys()[0]
+    attachid = result['attachments'].keys()[0]
     attachment_url = urlparse.urljoin(bugzilla,
-                                      'attachment.cgi?id=%s&action=edit' % aid)
+                                      'attachment.cgi?id=%s&action=edit' %
+                                      attachid)
     print "%s uploaded as %s" % (rev, attachment_url)
 
     def pre_obsolete(**kwargs):
@@ -1066,7 +1067,7 @@ def bzexport(ui, repo, *args, **opts):
         url, filename, description = [kwargs[k] for k in ['url', 'filename', 'description']]
         return ui.prompt(_("Obsolete patch %s (%s) - %s (y/n)?") % (url, filename, description)) == 'y'
 
-    obsolete_old_patches(ui, auth, bug, bugzilla, filename, aid, pre_hook=pre_obsolete)
+    obsolete_old_patches(ui, auth, bug, bugzilla, filename, attachid, pre_hook=pre_obsolete)
 
     # If attaching to an existing bug (and not suppressed on the command line), take the bug
     if not opts['new'] and not opts['no_take_bug']:
