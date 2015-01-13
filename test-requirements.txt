@@ -2,6 +2,8 @@
 --find-links https://downloads.reviewboard.org/releases/django-evolution/0.7/
 --allow-external rbtools
 --allow-unverified rbtools
+--allow-external django-evolution
+--allow-unverified django-evolution
 backports.ssl-match-hostname==3.4.0.2
 blessings==1.6
 coverage==3.7.1
