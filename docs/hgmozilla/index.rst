@@ -12,6 +12,7 @@ to the right place!
 
    installing
    extensions
+   auth
    bookmarks
    firefoxtree
    unifiedrepo
