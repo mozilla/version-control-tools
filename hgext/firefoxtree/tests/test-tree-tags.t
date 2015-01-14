@@ -64,3 +64,20 @@ hg fxheads displays known tree commits
   $ hg fxheads
   1:994ec05999da central Bug 457 - second commit to m-c; r=ted
   3:1b348279b0e9 inbound tip Bug 459 - Second commit to inbound
+
+hg fxheads revset gives known tree commits
+
+  $ hg log -r "fxheads()"
+  changeset:   1:994ec05999da
+  tag:         central
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     Bug 457 - second commit to m-c; r=ted
+  
+  changeset:   3:1b348279b0e9
+  tag:         inbound
+  tag:         tip
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     Bug 459 - Second commit to inbound
+  

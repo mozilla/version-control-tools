@@ -72,6 +72,7 @@ from mercurial import (
     exchange,
     extensions,
     hg,
+    revset,
     util,
     wireproto,
 )
@@ -363,6 +364,15 @@ def fxheads(ui, repo, **opts):
 
     displayer.close()
 
+def fxheadsrevset(repo, subset, x):
+    """``fxheads()``
+    Last known head commits of pulled Firefox trees.
+    """
+    revset.getargs(x, 0, 0, _("fxheads takes no arguments"))
+    r = revset.baseset(repo[node].rev()
+                       for t, node, tr, u in get_firefoxtrees(repo))
+    return r & subset
+
 def extsetup(ui):
     extensions.wrapfunction(hg, '_peerorrepo', peerorrepo)
     extensions.wrapfunction(exchange, 'push', push)
@@ -371,6 +381,7 @@ def extsetup(ui):
     extensions.wrapcommand(commands.table, 'outgoing', outgoingcommand)
     extensions.wrapcommand(commands.table, 'pull', pullcommand)
     extensions.wrapcommand(commands.table, 'push', pushcommand)
+    revset.symbols['fxheads'] = fxheadsrevset
 
 def reposetup(ui, repo):
     if not repo.local():
