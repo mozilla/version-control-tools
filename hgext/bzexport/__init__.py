@@ -1074,11 +1074,11 @@ def bzexport(ui, repo, *args, **opts):
         result = bz.get_bug(auth, bug, include_fields=['assigned_to', 'status'])
         taker = auth.username(api_server)
         if result['assigned_to_detail']['name'] != taker:
-            result['assigned_to_detail'] = {'name': taker}
+            params = {'assigned_to': taker}
             if result['status'] != 'RESOLVED':
-                result['status'] = 'ASSIGNED'
+                params['status'] = 'ASSIGNED'
             try:
-                result = bz.update_bug(auth, result)
+                result = bz.update_bug(auth, result['id'], params)
             except Exception as e:
                 raise util.Abort(e.message)
 

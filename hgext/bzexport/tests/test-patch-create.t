@@ -129,7 +129,7 @@ Updating the patch works
 
 Uploading a new patch will reassign bug to you
 
-  $ bugzilla create-user original-author@example.com password1 'Original Author'
+  $ bugzilla create-user original-author@example.com password1 'Original Author' --group editbugs
   created user 5
 
   $ bugzilla create-bug TestProduct TestComponent bug2
@@ -137,9 +137,6 @@ Uploading a new patch will reassign bug to you
   $ hg qnew -d '0 0' -m 'Bug 2 - Initial author' some-patch
   $ hg --config bugzilla.username=original-author@example.com --config bugzilla.password=password1 bzexport
   some-patch uploaded as http://*:$HGPORT/attachment.cgi?id=3&action=edit (glob)
-  abort: REST error on PUT to http://*:$HGPORT/rest/bug/2: Not a HASH reference at /var/lib/bugzilla/bugzilla/Bugzilla/Bug.pm line 2466. (glob)
-  
-  [255]
 
   $ bugzilla dump-bug 2
   Bug 2:
@@ -176,7 +173,7 @@ Uploading a new patch will reassign bug to you
     platform: All
     product: TestProduct
     resolution: ''
-    status: NEW
+    status: ASSIGNED
     summary: bug2
 
   $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-patch-create

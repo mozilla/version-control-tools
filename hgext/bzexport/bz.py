@@ -142,9 +142,9 @@ def get_bug(auth, bug, **opts):
     return resp['bugs'][0]
 
 
-def update_bug(auth, bugdata):
+def update_bug(auth, bugid, bugdata):
     """
     Update an existing bug. Must pass in an existing bug as a data structure.
     Mid-air collisions are possible.
     """
-    return auth.rest_request('PUT', 'bug/%s' % bugdata['id'], bugdata)
+    return auth.rest_request('PUT', 'bug/%s' % bugid, bugdata)
