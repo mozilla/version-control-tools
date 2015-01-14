@@ -148,14 +148,20 @@ def capabilities(orig, repo, proto):
 
     return caps
 
+# Generator for firefox tree tags in this repo.
+def get_firefoxtrees(repo):
+    for tag, node in sorted(repo.tags().items()):
+        result = resolve_trees_to_uris([tag])[0]
+        if not result[1]:
+            continue
+        tree, uri = result
+        yield tag, node, tree, uri
+
 @wireproto.wireprotocommand('firefoxtrees', '')
 def firefoxtrees(repo, proto):
     lines = []
 
-    for tag, node in sorted(repo.tags().items()):
-        if not resolve_trees_to_uris([tag])[0][1]:
-            continue
-
+    for tag, node, tree, uri in get_firefoxtrees(repo):
         lines.append('%s %s' % (tag, hex(node)))
 
     return '\n'.join(lines)
@@ -290,11 +296,7 @@ def pullcommand(orig, ui, repo, source='default', **opts):
 
     # The special source "fxtrees" will pull all trees we've pulled before.
     if source == 'fxtrees':
-        for tag, node in sorted(repo.tags().items()):
-            tree, uri = resolve_trees_to_uris([tag])[0]
-            if not uri:
-                continue
-
+        for tag, node, tree, uri in get_firefoxtrees(repo):
             res = orig(ui, repo, source=tree, **opts)
             if res:
                 return res
@@ -355,10 +357,7 @@ def fxheads(ui, repo, **opts):
         raise util.Abort(_('fxheads is only available on Firefox repos'))
 
     displayer = cmdutil.show_changeset(ui, repo, opts)
-    for tag, node in sorted(repo.tags().items()):
-        if not resolve_trees_to_uris([tag])[0][1]:
-            continue
-
+    for tag, node, tree, uri in get_firefoxtrees(repo):
         ctx = repo[node]
         displayer.show(ctx)
 
