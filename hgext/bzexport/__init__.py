@@ -371,8 +371,15 @@ def edit_form(ui, repo, fields, template_name):
 
 
 def bugzilla_info(ui, profile):
-    api_server = ui.config("bzexport", "api_server", "https://api-dev.bugzilla.mozilla.org/latest/")
     bugzilla = ui.config("bzexport", "bugzilla", "https://bugzilla.mozilla.org/")
+    api_server = '%s/bzapi/' % bugzilla.rstrip('/')
+
+    # The API server setting was from days before Bugzilla hosted the API
+    # server itself. Warn if this setting is defined.
+    legacy_api_server = ui.config('bzexport', 'api_server', None)
+    if legacy_api_server:
+        ui.warn('(the bzexport.api_server config option is deprecated and ignored; '
+            'delete it from your config)\n')
 
     # The [bzexport] auth config entries are deprecated in favor of
     # [bugzilla] via mozhg.auth.

@@ -16,7 +16,6 @@ mq =
 bzexport = $TESTDIR/hgext/bzexport
 
 [bzexport]
-api_server = ${BUGZILLA_URL}/bzapi/
 bugzilla = ${BUGZILLA_URL}/
 
 [bugzilla]

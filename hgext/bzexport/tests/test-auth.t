@@ -4,7 +4,6 @@
   > bzexport = $TESTDIR/hgext/bzexport
   > 
   > [bzexport]
-  > api_server = http://dummy/bzapi/
   > bugzilla = http://dummy/
   > EOF
 
@@ -36,6 +35,14 @@ bzexport.password is deprecated and should print a warning
 
   $ hg --config bzexport.password=oldpass newbug --product TestProduct --component TestComponent -t 'old password' 'dummy'
   (the bzexport.password config option is deprecated and ignored; use bugzilla.password or cookie auth by logging into Bugzilla in Firefox)
+  Bugzilla username: None
+  abort: unable to obtain Bugzilla authentication.
+  [255]
+
+bzexport.api_server is deprecated and should print a warning
+
+  $ hg --config bzexport.api_server=http://dummy/bzapi newbug --product TestProduct --component TestComponent -t 'api server' 'dummy'
+  (the bzexport.api_server config option is deprecated and ignored; delete it from your config)
   Bugzilla username: None
   abort: unable to obtain Bugzilla authentication.
   [255]

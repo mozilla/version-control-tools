@@ -36,16 +36,5 @@ EDITING OPTIONS
 bzexport options can be added in a [bzexport] section in your .hgrc.
 Currently supported options are:
 [bzexport]
-# Your bugzilla login, only necessary if bzexport can't locate
-# your Firefox profile, or if you're on Windows using
-# a binary Mercurial release.
-username = username@example.com
-
-# Your bugzilla password, see above.
-password = secret
-
 # URL of the Bugzilla server
 bugzilla = https://bugzilla.mozilla.org
-
-# URL of the corresponding BzAPI server
-api_server = https://api-dev.bugzilla.mozilla.org/latest/
