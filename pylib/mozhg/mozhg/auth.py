@@ -42,14 +42,19 @@ def getbugzillaauth(ui, require=False, profile=None):
 
       1) bugzilla.userid and bugzilla.cookie from hgrc
       2) bugzilla.username and bugzilla.password from hgrc
-      3) login cookies from Firefox profile
+      3) login cookies from Firefox profiles
       4) prompt the user
+
+    The ``bugzilla.firefoxprofile`` option is interpretted as a list of Firefox
+    profiles from which data should be read. This overrides the default sort
+    order.
     """
 
     username = ui.config('bugzilla', 'username')
     password = ui.config('bugzilla', 'password')
     userid = ui.config('bugzilla', 'userid')
     cookie = ui.config('bugzilla', 'cookie')
+    profileorder = ui.configlist('bugzilla', 'firefoxprofile', [])
 
     if userid and cookie:
         return BugzillaAuth(userid=userid, cookie=cookie)
@@ -65,7 +70,15 @@ def getbugzillaauth(ui, require=False, profile=None):
     ui.debug('searching for Bugzilla cookies in Firefox profile\n')
     url = ui.config('bugzilla', 'url', 'https://bugzilla.mozilla.org/')
     profilesdir = find_profiles_path()
-    for p in get_profiles(profilesdir):
+    profiles = get_profiles(profilesdir)
+
+    # If the list of profiles is explicitly defined, filter out unknown
+    # profiles and sort by order.
+    if profileorder:
+        profiles = [p for p in profiles if p['name'] in profileorder]
+        profiles = sorted(profiles, key=lambda p: profileorder.index(p['name']))
+
+    for p in profiles:
         if profile and p['name'] != profile:
             continue
 

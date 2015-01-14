@@ -138,3 +138,27 @@ Requesting a specific profile works
   cookie: bmocookie2
   username: None
   password: None
+
+Specifying a profile via config option works
+
+  $ cat >> profiles/profiles.ini << EOF
+  > [Profile3]
+  > Name=profile3
+  > IsRelative=1
+  > Path=profile3
+  > EOF
+
+  $ mkdir profiles/profile3
+  $ hg bzcreatecookie profiles/profile3 https://bugzilla.mozilla.org/ bmouser3 bmocookie3
+
+  $ hg --config bugzilla.firefoxprofile=profile3 bzauth
+  userid: bmouser3
+  cookie: bmocookie3
+  username: None
+  password: None
+
+  $ hg --config bugzilla.firefoxprofile=profile2,profile3 bzauth
+  userid: bmouser2
+  cookie: bmocookie2
+  username: None
+  password: None

@@ -35,7 +35,15 @@ Firefox profiles. For example, Bugzilla login cookies are looked for
 in Firefox's cookie database.
 
 The first step of this is finding available Firefox profiles via the
-current user's ``profiles.ini`` file. Next, the available profiles are
-sorted. The default profile is searched first. Remaining profiles are
-searched according to the modification time of files in the profile -
-the more recently the profile was used, the earlier it is searched.
+current user's ``profiles.ini`` file.
+
+By default, the available profiles are sorted. The default profile is
+searched first. Remaining profiles are searched according to the
+modification time of files in the profile - the more recent the
+profile was used, the earlier it is searched.
+
+If the ``bugzilla.firefoxprofile`` config option is present, it will
+explicitly control the Firefox profile search order. If the value is a
+string such as ``default``, only that profile will be considered.
+If the value is a comma-delimited list, only the profiles listed will be
+considered and profiles will be considered in the order listed.
