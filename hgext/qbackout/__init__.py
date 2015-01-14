@@ -252,9 +252,8 @@ def oops(ui, repo, rev, **opts):
     will be rolled up into a single backout changeset. Otherwise, there will
     be one changeset queued up for each backed-out changeset.
 
-    The --apply option will reapply a patch instead of backing it out, which
-    can be useful when you (or someone else) has backed your patch out and
-    you want to try again.
+    Note that if you want to reapply a previously backed out patch, use
+    hg graft -f.
 
     Examples:
       hg oops -r 20 -r 30    # backout revisions 20 and 30
@@ -317,7 +316,6 @@ cmdtable = {
           ('D', 'currentdate', None, _('add "Date: <current date>" to patch')),
           ('d', 'date', '',
            _('add "Date: <DATE>" to patch'), _('DATE')),
-          ('', 'apply', False, _('re-apply a change instead of backing out')),
           ],
          ('hg oops -r REVS [-f] [commit options]')),
 }
