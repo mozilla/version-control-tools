@@ -213,7 +213,7 @@ def load_configuration(ui, api_server, filename):
 
 
 def get_auth(ui, bugzilla, profile):
-    auth = getbugzillaauth(ui, require=True)
+    auth = getbugzillaauth(ui, require=True, profile=profile)
     if auth.userid:
         return bzAuth(bugzilla, userid=auth.userid, cookie=auth.cookie)
     return bzAuth(bugzilla, username=auth.username, password=auth.password)

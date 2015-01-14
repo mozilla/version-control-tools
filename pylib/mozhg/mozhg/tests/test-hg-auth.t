@@ -90,9 +90,14 @@ Now we set up some Firefox profiles to test cookie extraction
   > Name=foo
   > IsRelative=1
   > Path=foo
+  > 
+  > [Profile1]
+  > Name=profile2
+  > IsRelative=1
+  > Path=profile2
   > EOF
 
-  $ mkdir profiles/foo
+  $ mkdir profiles/foo profiles/profile2
 
 Empty profile should have no cookies and should get nothing
 
@@ -125,5 +130,11 @@ Custom bugzilla.url should be respected
   username: None
   password: None
 
-We don't need to test multiple profiles because the .py unit tests
-should have that covered.
+Requesting a specific profile works
+
+  $ hg bzcreatecookie profiles/profile2 https://bugzilla.mozilla.org/ bmouser2 bmocookie2
+  $ hg bzauth --ffprofile profile2
+  userid: bmouser2
+  cookie: bmocookie2
+  username: None
+  password: None

@@ -23,14 +23,15 @@ commands.norepo += ' bzauth bzcreatecookie'
 @command('bzauth', [
     ('', 'require', False, 'Require auth'),
     ('', 'fakegetpass', '', 'Provide a fake getpass.getpass answer'),
+    ('', 'ffprofile', '', 'Firefox profile to use'),
     ], 'hg bzauth')
-def bzauth(ui, require=False, fakegetpass=None):
+def bzauth(ui, require=False, fakegetpass=None, ffprofile=None):
     if fakegetpass:
         def newgetpass(arg):
             return fakegetpass
         getpass.getpass = newgetpass
 
-    a = getbugzillaauth(ui, require=require)
+    a = getbugzillaauth(ui, require=require, profile=ffprofile)
     if a:
         ui.write('userid: %s\n' % a.userid)
         ui.write('cookie: %s\n' % a.cookie)

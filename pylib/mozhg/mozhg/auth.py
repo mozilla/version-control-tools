@@ -27,10 +27,16 @@ class BugzillaAuth(object):
         self.username = username
         self.password = password
 
-def getbugzillaauth(ui, require=False):
+def getbugzillaauth(ui, require=False, profile=None):
     """Obtain Bugzilla authentication credentials from any possible source.
 
     This returns a BugzillaAuth instance on success or None on failure.
+
+    If ``require`` is True, we abort if Bugzilla credentials could not be
+    found.
+
+    If ``profile`` is defined, we will only consult the profile having this
+    name. The default behavior is to examine all available profiles.
 
     The order of preference for Bugzilla credentials is as follows:
 
@@ -59,9 +65,12 @@ def getbugzillaauth(ui, require=False):
     ui.debug('searching for Bugzilla cookies in Firefox profile\n')
     url = ui.config('bugzilla', 'url', 'https://bugzilla.mozilla.org/')
     profilesdir = find_profiles_path()
-    for profile in get_profiles(profilesdir):
+    for p in get_profiles(profilesdir):
+        if profile and p['name'] != profile:
+            continue
+
         try:
-            userid, cookie = get_bugzilla_login_cookie_from_profile(profile['path'], url)
+            userid, cookie = get_bugzilla_login_cookie_from_profile(p['path'], url)
 
             if userid and cookie:
                 return BugzillaAuth(userid=userid, cookie=cookie)
