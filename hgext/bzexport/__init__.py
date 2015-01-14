@@ -439,6 +439,8 @@ def infer_arguments(ui, repo, args, opts):
                 # Assume it's a bug alias. The REST API will fail with bad bug
                 # numbers.
                 bug = args[0]
+                if ' ' in bug:
+                    raise util.Abort(_("Invalid arguments. Can only pass revision and/or bug number"))
                 ui.debug("interpreting '%s' as a bug alias. Fingers crossed.")
 
         # With zero args we'll guess at both, and if we fail we'll
