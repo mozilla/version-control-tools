@@ -67,6 +67,53 @@ def qbackout(ui, repo, rev, **opts):
     See "hg help revisions" and "hg help revsets" for more about specifying
     revisions.
     """
+    reverse_order = not opts.get('apply')
+    if opts.get('nopush'):
+        reverse_order = not reverse_order
+
+    if opts.get('nopush') and opts.get('single'):
+        ui.fatal("--single not supported with --nopush")
+
+    new_opts = opts.copy()
+    mq.setupheaderopts(ui, new_opts)
+
+    name_used = [False]
+
+    def compute_patch_name(action, force_name, node=None, revisions=None):
+        if force_name:
+            if name_used[0]:
+                raise util.Abort('option "-n" not valid when backing out multiple changes')
+            name_used[0] = True
+            return force_name
+        else:
+            if node:
+                return '%s-%s' % (action, short(node))
+            else:
+                return '%s-%d-changesets' % (action, len(revisions))
+
+    def handle_change(desc, node, qimport=False):
+        if qimport:
+            name = compute_patch_name(desc['name'], opts.get('name'), node=node)
+            mq.qimport(ui, repo, '-', name=name, rev=[], git=True)
+        else:
+            commands.import_(ui, repo, '-',
+                             force=True,
+                             no_commit=True,
+                             strip=1,
+                             base='',
+                             obsolete=[])
+
+    def commit_change(ui, repo, action, force_name=None, node=None, revisions=None, **opts):
+        patchname = compute_patch_name(action, force_name, node=node, revisions=revisions)
+        mq.new(ui, repo, patchname, **opts)
+        if ui.verbose:
+            ui.write("queued up patch %s\n" % patchname)
+
+    do_backout(ui, repo, rev, handle_change, commit_change,
+               reverse_order=reverse_order,
+               **opts)
+
+def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, reverse_order=False, **opts):
     if not opts.get('force'):
         ui.status('checking for uncommitted changes\n')
         cmdutil.bailifchanged(repo)
@@ -88,16 +135,9 @@ def qbackout(ui, repo, rev, **opts):
         raise util.Abort('at least one revision required')
 
     csets = [ repo[r] for r in rev ]
-    reverse_order = backout
-    if opts.get('nopush'):
-        reverse_order = not reverse_order
     csets.sort(reverse=reverse_order, key=lambda cset: cset.rev())
 
-    if opts.get('single') and opts.get('name') and len(rev) > 1:
-        raise util.Abort('option "-n" not valid when backing out multiple changes')
-
     new_opts = opts.copy()
-    mq.setupheaderopts(ui, new_opts)
 
     def bugs_suffix(bugs):
         if len(bugs) == 0:
@@ -136,14 +176,7 @@ def qbackout(ui, repo, rev, **opts):
             saved_stdin = sys.stdin
             sys.stdin = rpatch
 
-        if push_patch:
-            commands.import_(ui, repo, '-',
-                             force=True,
-                             no_commit=True,
-                             strip=1,
-                             base='')
-        else:
-            mq.qimport(ui, repo, '-', name=name, rev=[], git=True)
+        handle_change(desc, node, qimport=(use_mq and new_opts.get('nopush')))
 
         if saved_stdin is None:
             ui.fin = save_fin
@@ -180,12 +213,9 @@ def qbackout(ui, repo, rev, **opts):
         node = cset.node()
         shortnode = short(node)
         ui.status('%s %s\n' % (desc['actioning'], shortnode))
-        if opts.get('nopush') and opts.get('single'):
-            ui.fatal("--single not supported with --nopush")
-        patchname = None
-        if not opts.get('single'):
-            patchname = opts.get('name') or '%s-%s' % (desc['name'], shortnode)
-        apply_change(node, backout, push_patch=(not opts.get('nopush')), name=patchname)
+
+        apply_change(node, backout, push_patch=(not opts.get('nopush')))
+
         msg = ('%s changeset %s' % (desc['Actioned'], shortnode)) + bugs_suffix(bugs)
         user = None
 
@@ -206,17 +236,53 @@ def qbackout(ui, repo, rev, **opts):
             # Override the user to that of the original patch author in the case of --apply
             if user is not None:
                 new_opts['user'] = user
-            mq.new(ui, repo, patchname, **new_opts)
-            if ui.verbose:
-                ui.write("queued up patch %s\n" % patchname)
+            commit_change(ui, repo, desc['name'], node=node, force_name=opts.get('name'), **new_opts)
 
     msg = ('%s %d changesets' % (desc['Actioned'], len(rev))) + bugs_suffix(allbugs) + '\n'
     messages.insert(0, msg)
     new_opts['message'] = "\n".join(messages)
     if opts.get('single'):
-        patchname = opts.get('name') or '%s-%d-changesets' % (desc['name'], len(rev))
-        mq.new(ui, repo, patchname, **new_opts)
+        commit_change(ui, repo, desc['name'], revisions=rev, force_name=opts.get('name'), **new_opts)
 
+def oops(ui, repo, rev, **opts):
+    """backout a change or set of changes
+
+    oops commits a changeset or set of changesets by undoing existing changesets.
+    If the -s/--single option is set, then all backed-out changesets
+    will be rolled up into a single backout changeset. Otherwise, there will
+    be one changeset queued up for each backed-out changeset.
+
+    The --apply option will reapply a patch instead of backing it out, which
+    can be useful when you (or someone else) has backed your patch out and
+    you want to try again.
+
+    Examples:
+      hg oops -r 20 -r 30    # backout revisions 20 and 30
+
+      hg oops -r 20+30       # backout revisions 20 and 30
+
+      hg oops -r 20+30:32    # backout revisions 20, 30, 31, and 32
+
+      hg oops -r a3a81775    # the usual revision syntax is available
+
+    See "hg help revisions" and "hg help revsets" for more about specifying
+    revisions.
+    """
+    def handle_change(desc, node, **kwargs):
+        commands.import_(ui, repo, '-',
+                         force=True,
+                         no_commit=True,
+                         strip=1,
+                         base='',
+                         obsolete=[])
+
+    def commit_change(ui, repo, action, force_name=None, node=None, revisions=None, **opts):
+        commands.commit(ui, repo, **opts)
+
+    do_backout(ui, repo, rev,
+               handle_change, commit_change,
+               use_mq=True, reverse_order=(not opts.get('apply')),
+               **opts)
 
 cmdtable = {
     'qbackout':
@@ -237,5 +303,21 @@ cmdtable = {
           ('', 'nopush', False, _('do not push patches (useful when they do not apply properly)')),
           ],
          ('hg qbackout -r REVS [-f] [-n NAME] [qnew options]')),
-}
 
+    'oops':
+        (oops,
+         [('r', 'rev', [], _('revisions to backout')),
+          ('s', 'single', None, _('fold all backed out changes into a single changeset')),
+          ('f', 'force', None, _('skip check for outstanding uncommitted changes')),
+          ('e', 'edit', None, _('edit commit messages')),
+          ('m', 'message', '', _('use text as commit message'), _('TEXT')),
+          ('U', 'currentuser', None, _('add "From: <current user>" to patch')),
+          ('u', 'user', '',
+           _('add "From: <USER>" to patch'), _('USER')),
+          ('D', 'currentdate', None, _('add "Date: <current date>" to patch')),
+          ('d', 'date', '',
+           _('add "Date: <DATE>" to patch'), _('DATE')),
+          ('', 'apply', False, _('re-apply a change instead of backing out')),
+          ],
+         ('hg oops -r REVS [-f] [commit options]')),
+}
