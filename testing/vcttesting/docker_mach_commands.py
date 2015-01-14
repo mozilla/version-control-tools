@@ -59,9 +59,10 @@ class DockerCommands(object):
     def start_bmo(self, cluster, http_port):
         db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
+        rbweb_image = os.environ.get('DOCKER_RB_WEB_IMAGE')
 
         self.d.start_mozreview(cluster=cluster, hostname=None, http_port=http_port,
-                db_image=db_image, web_image=web_image)
+                db_image=db_image, web_image=web_image, rbweb_image=rbweb_image)
 
     @Command('stop-bmo', category='docker',
         description='Stop a bugzilla.mozilla.org instance')

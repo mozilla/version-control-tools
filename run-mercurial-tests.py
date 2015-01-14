@@ -188,9 +188,10 @@ if __name__ == '__main__':
         # We build the base BMO images in the test runner because doing it
         # from tests would be racey. It is easier to do it here instead of
         # complicating code with locks.
-        db_image, web_image = docker.build_mozreview(verbose=verbose)
+        db_image, bmoweb_image = docker.build_mozreview(verbose=verbose)
         os.environ['DOCKER_BMO_DB_IMAGE'] = db_image
-        os.environ['DOCKER_BMO_WEB_IMAGE'] = web_image
+        os.environ['DOCKER_BMO_WEB_IMAGE'] = bmoweb_image
+        #os.environ['DOCKER_RB_WEB_IMAGE'] = rbweb_image
 
         for c in docker.client.containers(all=True):
             preserve_containers.add(c['Id'])

@@ -88,8 +88,10 @@ class Docker(object):
             'containers': {},
             'last-db-id': None,
             'last-web-id': None,
+            'last-rbweb-id': None,
             'last-db-bootstrap-id': None,
             'last-web-bootstrap-id': None,
+            'last-rbweb-bootstrap-id': None,
         }
 
         if os.path.exists(state_path):
@@ -98,8 +100,10 @@ class Docker(object):
 
         self.state.setdefault('last-db-id', None)
         self.state.setdefault('last-web-id', None)
+        self.state.setdefault('last-rbweb-id', None)
         self.state.setdefault('last-db-bootstrap-id', None)
         self.state.setdefault('last-web-bootstrap-id', None)
+        self.state.setdefault('last-rbweb-bootstrap-id', None)
 
         self.client = docker.Client(base_url=url, tls=tls)
 
@@ -251,9 +255,11 @@ class Docker(object):
         images = self.state['images']
         db_image = self.ensure_built('bmodb-volatile', verbose=verbose)
         web_image = self.ensure_built('bmoweb', verbose=verbose)
+        rbweb_image = self.ensure_built('rbweb', verbose=verbose, add_vct=True)
 
         self.state['last-db-id'] = db_image
         self.state['last-web-id'] = web_image
+        self.state['last-rbweb-id'] = rbweb_image
 
         # The keys for the bootstrapped images are derived from the base
         # images they depend on. This means that if we regenerate a new
@@ -261,12 +267,19 @@ class Docker(object):
         db_bootstrapped_key = 'bmodb-bootstrapped:%s' % db_image
         web_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (
                 db_image, web_image)
+        rbweb_bootstrapped_key = 'rbweb-bootstrapped:%s:%s' % (db_image,
+                rbweb_image)
 
         have_db = db_bootstrapped_key in images
         have_web = web_bootstrapped_key in images
+        #have_rbweb = rbweb_bootstrapped_key in images
 
-        if have_db and have_web:
-            return images[db_bootstrapped_key], images[web_bootstrapped_key]
+        if have_db and have_web: # and have_rbweb:
+            return (
+                images[db_bootstrapped_key],
+                images[web_bootstrapped_key],
+                #images[rbweb_bootstrapped_key]
+            )
 
         db_id = self.client.create_container(db_image,
                 environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
@@ -278,18 +291,30 @@ class Docker(object):
 
         web_id = self.client.create_container(web_image,
                 environment=web_environ)['Id']
+        rbweb_id = self.client.create_container(rbweb_image)['Id']
 
         with self._start_container(db_id) as db_state:
-            with self._start_container(web_id,
-                    links=[(db_state['Name'], 'bmodb')],
-                    port_bindings={80: None}) as web_state:
-
-                http_port = int(web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
-                print('waiting for bmoweb to bootstrap')
-                wait_for_http(self.docker_hostname, http_port)
+            web_params = {
+                'links': [(db_state['Name'], 'bmodb')],
+                'port_bindings': {80: None},
+            }
+            rbweb_params = {
+                'links': [(db_state['Name'], 'rbdb')],
+                'port_bindings': {80: None},
+            }
+            with self._start_container(web_id, **web_params) as web_state:
+                #with self._start_container(rbweb_id, **rbweb_params) as rbweb_state:
+                bmoweb_port = int(web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
+                #rbweb_port = int(rbweb_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
+                print('waiting for containers to bootstrap')
+                wait_for_http(self.docker_hostname, bmoweb_port)
+                #wait_for_http(self.docker_hostname, rbweb_port)
 
         db_unique_id = str(uuid.uuid1())
         web_unique_id = str(uuid.uuid1())
+        rbweb_unique_id = str(uuid.uuid1())
+
+        print('committing bootstrapped images')
 
         # Save an image of the stopped containers.
         # We tag with a unique ID so we can identify all bootrapped images
@@ -302,21 +327,29 @@ class Docker(object):
         web_bootstrap = self.client.commit(web_id,
                 repository='bmoweb-bootstrapped',
                 tag=web_unique_id)['Id']
+        #rbweb_bootstrap = self.client.commit(rbweb_id,
+        #        repository='rbweb-bootstrapped',
+        #        tag=rbweb_unique_id)['Id']
         self.state['images'][db_bootstrapped_key] = db_bootstrap
         self.state['images'][web_bootstrapped_key] = web_bootstrap
+        #self.state['images'][rbweb_bootstrapped_key] = rbweb_bootstrap
         self.state['last-db-bootstrap-id'] = db_bootstrap
         self.state['last-web-bootstrap-id'] = web_bootstrap
+        #self.state['last-rbweb-bootstrap-id'] = rbweb_bootstrap
         self.save_state()
 
+        print('removing non-bootstrapped containers')
+        #self.client.remove_container(rbweb_id)
         self.client.remove_container(web_id)
         self.client.remove_container(db_id)
 
-        print('Bootstrapped BMO images created')
+        print('bootstrapped images created')
 
-        return db_bootstrap, web_bootstrap
+        return db_bootstrap, web_bootstrap #, rbweb_bootstrap
 
-    def start_mozreview(self, cluster, hostname=None, http_port=80, db_image=None,
-            web_image=None, verbose=False):
+    def start_mozreview(self, cluster, hostname=None, http_port=80,
+            rbweb_port=None, db_image=None,
+            web_image=None, rbweb_image=None, verbose=False):
         if not db_image or not web_image:
             db_image, web_image = self.build_mozreview(verbose=verbose)
 
@@ -332,6 +365,8 @@ class Docker(object):
         web_id = self.client.create_container(web_image,
                 environment={'BMO_URL': url})['Id']
         containers.append(web_id)
+        #rbweb_id = self.client.create_container(rbweb_image)['Id']
+        #containers.append(rbweb_id)
         self.save_state()
 
         self.client.start(db_id)
@@ -340,10 +375,24 @@ class Docker(object):
                 links=[(db_state['Name'], 'bmodb')],
                 port_bindings={80: http_port})
         web_state = self.client.inspect_container(web_id)
+        #self.client.start(rbweb_id,
+        #        links=[
+        #            (db_state['Name'], 'rbdb'),
+        #            (web_state['Name'], 'bzweb'),
+        #        ],
+        #        port_bindings={80: rbweb_port})
+        #rbweb_state = self.client.inspect_container(rbweb_id)
+
+        wait_bmoweb_port = web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort']
+        #wait_rbweb_port = rbweb_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort']
+
+        #rb_url = 'http://%s:%s/' % (hostname, wait_rbweb_port)
 
         print('waiting for Bugzilla to start')
-        wait_for_http(self.docker_hostname, http_port)
+        wait_for_http(self.docker_hostname, wait_bmoweb_port)
+        #wait_for_http(self.docker_hostname, wait_rbweb_port)
         print('Bugzilla accessible on %s' % url)
+        #print('Review Board accessible at %s' % rb_url)
         return url, db_id, web_id
 
     def stop_bmo(self, cluster):
@@ -409,8 +458,10 @@ class Docker(object):
         ignore_images = set([
             self.state['last-db-id'],
             self.state['last-web-id'],
+            self.state['last-rbweb-id'],
             self.state['last-db-bootstrap-id'],
             self.state['last-web-bootstrap-id'],
+            self.state['last-rbweb-bootstrap-id'],
         ])
 
         relevant_repos = set([
@@ -418,6 +469,8 @@ class Docker(object):
             'bmoweb-bootstrapped',
             'bmodb-volatile',
             'bmodb-volatile-bootstrapped',
+            'rbweb',
+            'rbweb-bootstrapped',
         ])
 
         for i in self.client.images():
