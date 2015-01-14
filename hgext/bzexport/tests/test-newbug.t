@@ -64,7 +64,7 @@ Specifying a CC list works
 
   $ hg newbug --cc ':mary,:bob' --product TestProduct --component TestComponent -t 'CC list' 'dummy'
   Using default version 'unspecified' of product TestProduct
-  Created bug 3 at http://192.168.59.103:$HGPORT/show_bug.cgi?id=3
+  Created bug 3 at http://*:$HGPORT/show_bug.cgi?id=3 (glob)
 
   $ bugzilla dump-bug 3
   Bug 3:
