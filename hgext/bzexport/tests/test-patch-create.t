@@ -13,7 +13,7 @@
 
 Uploading a simple patch to a bug works
 
-  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug1
+  $ bugzilla create-bug TestProduct TestComponent bug1
 
   $ echo first > foo
   $ hg qnew -d '0 0' -m 'Bug 1 - First patch' first-patch
@@ -123,6 +123,61 @@ Updating the patch works
     resolution: ''
     status: NEW
     summary: bug1
+
+  $ hg -q qpop -a
+  patch queue now empty
+
+Uploading a new patch will reassign bug to you
+
+  $ bugzilla create-user original-author@example.com password1 'Original Author'
+  created user 5
+
+  $ bugzilla create-bug TestProduct TestComponent bug2
+  $ echo initial-author > foo
+  $ hg qnew -d '0 0' -m 'Bug 2 - Initial author' some-patch
+  $ hg --config bugzilla.username=original-author@example.com --config bugzilla.password=password1 bzexport
+  some-patch uploaded as http://*:$HGPORT/attachment.cgi?id=3&action=edit (glob)
+  abort: REST error on PUT to http://*:$HGPORT/rest/bug/2: Not a HASH reference at /var/lib/bugzilla/bugzilla/Bugzilla/Bug.pm line 2466. (glob)
+  
+  [255]
+
+  $ bugzilla dump-bug 2
+  Bug 2:
+    attachments:
+    - attacher: original-author@example.com
+      content_type: text/plain
+      data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
+        \ 1970 +0000\n# Node ID cecfd177524092b38595878e4a3ffe5b0c74e85b\n# Parent \
+        \ 96ee1d7354c4ad7372047672c36a1f561e3a6a4c\nBug 2 - Initial author\n\ndiff -r\
+        \ 96ee1d7354c4 -r cecfd1775240 foo\n--- a/foo\tThu Jan 01 00:00:00 1970 +0000\n\
+        +++ b/foo\tThu Jan 01 00:00:00 1970 +0000\n@@ -0,0 +1,1 @@\n+initial-author\n"
+      description: Initial author
+      file_name: some-patch
+      flags: []
+      id: 3
+      is_obsolete: false
+      is_patch: true
+      summary: Initial author
+    blocks: []
+    cc: []
+    comments:
+    - author: admin@example.com
+      id: 4
+      tags: []
+      text: ''
+    - author: original-author@example.com
+      id: 5
+      tags: []
+      text: 'Created attachment 3
+  
+        Initial author'
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: bug2
 
   $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-patch-create
   stopped 2 containers
