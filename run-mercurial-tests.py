@@ -220,12 +220,30 @@ if __name__ == '__main__':
 
     possible_tests = [os.path.normpath(os.path.abspath(a))
                       for a in extra[1:] if not a.startswith('-')]
-    requested_tests = [a for a in possible_tests if a in test_files['all']]
+    sys.argv = [a for a in sys.argv if a not in possible_tests]
+
+    requested_tests = []
+    for t in possible_tests:
+        if t in test_files['all']:
+            requested_tests.append(t)
+            continue
+
+        if os.path.isdir(t):
+            t = os.path.normpath(t)
+            for test in test_files['all']:
+                common = os.path.commonprefix([t, test])
+                common = os.path.normpath(common)
+                if common == t and test not in requested_tests:
+                    requested_tests.append(test)
+
+            continue
 
     # Add all Mercurial tests unless we get an argument that is a known test.
     if not requested_tests:
         sys.argv.extend(extension_tests)
         sys.argv.extend(hook_tests)
+    else:
+        sys.argv.extend(requested_tests)
 
     old_env = os.environ.copy()
     old_defaults = dict(runtestsmod.defaults)
