@@ -123,6 +123,14 @@ Profile with cookie from BMO should be returned
   username: None
   password: None
 
+If there is just a username specified in config, but we can find a profile with a cookie we should use the cookie.
+
+  $ hg --config bugzilla.username=dontusethis bzauth
+  userid: bmouser
+  cookie: bmocookie
+  username: None
+  password: None
+
 Custom bugzilla.url should be respected
 
   $ hg bzcreatecookie profiles/foo https://mybugzilla/ bzuser bzcookie
@@ -162,5 +170,32 @@ Specifying a profile via config option works
   $ hg --config bugzilla.firefoxprofile=profile2,profile3 bzauth
   userid: bmouser2
   cookie: bmocookie2
+  username: None
+  password: None
+
+The default profile should be chosen over other profiles.
+
+  $ cat >> profiles/profiles.ini << EOF
+  > [Profile4]
+  > Name=profile4
+  > IsRelative=1
+  > Path=profile4
+  > Default=1
+  > EOF
+
+  $ mkdir profiles/profile4
+  $ hg bzcreatecookie profiles/profile4 https://bugzilla.mozilla.org/ bmouser4 bmocookie4
+
+  $ hg bzauth
+  userid: bmouser4
+  cookie: bmocookie4
+  username: None
+  password: None
+
+But profile selection in config should override default.
+
+  $ hg --config bugzilla.firefoxprofile=profile3 bzauth
+  userid: bmouser3
+  cookie: bmocookie3
   username: None
   password: None

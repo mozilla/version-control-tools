@@ -45,7 +45,7 @@ def getbugzillaauth(ui, require=False, profile=None):
       3) login cookies from Firefox profiles
       4) prompt the user
 
-    The ``bugzilla.firefoxprofile`` option is interpretted as a list of Firefox
+    The ``bugzilla.firefoxprofile`` option is interpreted as a list of Firefox
     profiles from which data should be read. This overrides the default sort
     order.
     """
@@ -61,11 +61,6 @@ def getbugzillaauth(ui, require=False, profile=None):
 
     if username and password:
         return BugzillaAuth(username=username, password=password)
-
-    if username:
-        password = ui.getpass(_('Bugzilla password: '), None)
-        if password:
-            return BugzillaAuth(username=username, password=password)
 
     ui.debug('searching for Bugzilla cookies in Firefox profile\n')
     url = ui.config('bugzilla', 'url', 'https://bugzilla.mozilla.org/')
@@ -94,11 +89,11 @@ def getbugzillaauth(ui, require=False, profile=None):
     if not username:
         username = ui.prompt(_('Bugzilla username:'), None)
 
-        if not password:
-            password = ui.getpass(_('Bugzilla password: '), None)
+    if not password:
+        password = ui.getpass(_('Bugzilla password: '), None)
 
-        if username and password:
-            return BugzillaAuth(username=username, password=password)
+    if username and password:
+        return BugzillaAuth(username=username, password=password)
 
     if require:
         raise util.Abort(_('unable to obtain Bugzilla authentication.'))
