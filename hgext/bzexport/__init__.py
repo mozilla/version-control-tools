@@ -1056,12 +1056,16 @@ def bzexport(ui, repo, *args, **opts):
         description = "Patch " + opts['number'] + " - " + description
 
     contents.seek(0)
-    result = create_attachment(ui, api_server, auth,
-                               bug, BINARY_CACHE_FILENAME, contents.read(),
-                               filename=filename,
-                               description=description,
-                               comment=values['ATTACHCOMMENT'],
-                               **extra_args)
+    try:
+        result = create_attachment(ui, api_server, auth,
+                                   bug, BINARY_CACHE_FILENAME, contents.read(),
+                                   filename=filename,
+                                   description=description,
+                                   comment=values['ATTACHCOMMENT'],
+                                   **extra_args)
+    except Exception as e:
+        raise util.Abort('error uploading attachment: %s' % e.message)
+
     attachid = result['attachments'].keys()[0]
     attachment_url = urlparse.urljoin(bugzilla,
                                       'attachment.cgi?id=%s&action=edit' %
@@ -1153,16 +1157,20 @@ def newbug(ui, repo, *args, **opts):
     if opts['take_bug']:
         create_opts['assign_to'] = auth.username(api_server)
 
-    result = bz.create_bug(auth,
-                        product=values['PRODUCT'],
-                        component=values['COMPONENT'],
-                        version=values['PRODVERSION'],
-                        title=values['BUGTITLE'],
-                        description=values['BUGCOMMENT0'],
-                        cc=cc,
-                        depends=values['DEPENDS'],
-                        blocks=values['BLOCKS'],
-                        **create_opts)
+    try:
+        result = bz.create_bug(auth,
+                            product=values['PRODUCT'],
+                            component=values['COMPONENT'],
+                            version=values['PRODVERSION'],
+                            title=values['BUGTITLE'],
+                            description=values['BUGCOMMENT0'],
+                            cc=cc,
+                            depends=values['DEPENDS'],
+                            blocks=values['BLOCKS'],
+                            **create_opts)
+    except Exception as e:
+        raise util.Abort('error creating bug: %s' % e.message)
+
     bug = result['id']
     ui.write("Created bug %s at %sshow_bug.cgi?id=%s\n" % (bug, bugzilla, bug))
 

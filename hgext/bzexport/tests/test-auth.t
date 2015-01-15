@@ -1,10 +1,17 @@
+#require docker
+  $ $TESTDIR/testing/docker-control.py start-bmo bzexport-test-auth $HGPORT
+  waiting for Bugzilla to start
+  Bugzilla accessible on http://*:$HGPORT/ (glob)
+
+  $ export BUGZILLA_URL=http://${DOCKER_HOSTNAME}:$HGPORT/
+
   $ cat >> $HGRCPATH << EOF
   > [extensions]
   > mq =
   > bzexport = $TESTDIR/hgext/bzexport
   > 
   > [bzexport]
-  > bugzilla = http://dummy/
+  > bugzilla = ${BUGZILLA_URL}
   > EOF
 
 Dummy out profiles directory to prevent running system from leaking in
@@ -46,3 +53,22 @@ bzexport.api_server is deprecated and should print a warning
   Bugzilla username: None
   abort: unable to obtain Bugzilla authentication.
   [255]
+
+Invalid cookie should result in appropriate error message
+
+  $ hg --config bugzilla.userid=badid --config bugzilla.cookie=badcookie newbug --product TestProduct --component TestComponent -t 'Bad Cookie' 'dummy'
+  Refreshing configuration cache for http://*:$HGPORT/bzapi/ (glob)
+  Using default version 'unspecified' of product TestProduct
+  abort: error creating bug: REST error on POST to http://*:$HGPORT/rest/bug: The cookies or token provide were not valid or have expired. You may login again to get new cookies or a new token. (glob)
+  [255]
+
+  $ echo patch > foo
+  $ hg qnew -d '0 0' -m 'Bug 1 - Test cookie' cookie-patch
+  $ hg --config bugzilla.userid=badid --config bugzilla.cookie=badcookie bzexport
+  abort: error uploading attachment: REST error on POST to http://*:$HGPORT/rest/bug/1/attachment: The cookies or token provide were not valid or have expired. You may login again to get new cookies or a new token. (glob)
+  [255]
+
+Cleanup
+
+  $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-auth
+  stopped 2 containers
