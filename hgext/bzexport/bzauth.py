@@ -76,21 +76,8 @@ class bzAuth:
     def username(self, api_server):
         # This returns and caches the email-address-like username of the user's ID
         if self._type == self.typeCookie and self._username is None:
-            # The REST API doesn't allow us to get user info unless we are
-            # logged in. And, the REST API only allows cookie credentials for
-            # POST or PUT HTTP methods. And, the login REST URI is only
-            # accessible via GET. So, we are unable to look up user info with
-            # the current REST API. Fall back to bzAPI.
-            url = '%s/bzapi/user/%s' % (self._url, self._userid)
-            res = self.session.request('GET', url,
-                params={'userid': self._userid, 'cookie': self._cookie})
-
-            j = res.json()
-            if 'message' in j:
-                raise Exception('bzAPI error resolving user name for %s: %s' % (
-                    url, j['message']))
-
-            return j['name']
+            resp = self.rest_request('GET', 'user/%s' % self._userid)
+            return resp['users'][0]['name']
         else:
             return self._username
 
@@ -106,6 +93,16 @@ class bzAuth:
         if self._type == self.typeCookie:
             s.cookies['Bugzilla_login'] = self._userid
             s.cookies['Bugzilla_logincookie'] = self._cookie
+
+            # The REST token is composed of the cookie values. It is arguably
+            # redundant with setting cookies as part of the request. But, error
+            # messages from Bugzilla with cookies defined are slightly better
+            # than errors from invalid tokens, so we set both in hopes it leads
+            # to better error messages.
+            #
+            # It's worth noting that cookies aren't used for auth on GET
+            # requests in the REST API.
+            s.params['token'] = '%s-%s' % (self._userid, self._cookie)
         else:
             # Resolve a token.
             params = {'login': self._username, 'password': self._password}

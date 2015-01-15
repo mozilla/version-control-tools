@@ -26,7 +26,12 @@ Specifying a reviewer by IRC nick works
 
   $ echo first > foo
   $ hg qnew -d '0 0' -m 'Bug 1 - Testing reviewer' test-reviewer
-  $ hg bzexport --review ':mary'
+
+  $ out=`bugzilla create-login-cookie`
+  $ userid=`echo ${out} | awk '{print $1}'`
+  $ cookie=`echo ${out} | awk '{print $2}'`
+
+  $ hg --config bugzilla.userid=${userid} --config bugzilla.cookie=${cookie} bzexport --review ':mary'
   Refreshing configuration cache for http://*:$HGPORT/bzapi/ (glob)
   Requesting review from user1@example.com
   test-reviewer uploaded as http://*:$HGPORT/attachment.cgi?id=1&action=edit (glob)
