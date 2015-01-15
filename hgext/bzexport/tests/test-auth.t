@@ -1,4 +1,6 @@
 #require docker
+  $ . $TESTDIR/hgext/bzexport/tests/helpers.sh
+
   $ $TESTDIR/testing/docker-control.py start-bmo bzexport-test-auth $HGPORT
   waiting for Bugzilla to start
   Bugzilla accessible on http://*:$HGPORT/ (glob)
@@ -67,6 +69,18 @@ Invalid cookie should result in appropriate error message
   $ hg --config bugzilla.userid=badid --config bugzilla.cookie=badcookie bzexport
   abort: error uploading attachment: REST error on POST to http://*:$HGPORT/rest/bug/1/attachment: The cookies or token provide were not valid or have expired. You may login again to get new cookies or a new token. (glob)
   [255]
+
+Cookie authentication works
+
+  $ out=`bugzilla create-login-cookie`
+  $ userid=`echo ${out} | awk '{print $1}'`
+  $ cookie=`echo ${out} | awk '{print $2}'`
+
+  $ hg --config bugzilla.userid=${userid} --config bugzilla.cookie=${cookie} newbug --product TestProduct --component TestComponent -t 'Good Cookie' 'dummy'
+  Using default version 'unspecified' of product TestProduct
+  Created bug 1 at http://*:$HGPORT/show_bug.cgi?id=1 (glob)
+  $ hg --config bugzilla.userid=${userid} --config bugzilla.cookie=${cookie} bzexport
+  cookie-patch uploaded as http://*:$HGPORT/attachment.cgi?id=1&action=edit (glob)
 
 Cleanup
 
