@@ -220,8 +220,8 @@ if __name__ == '__main__':
 
     possible_tests = [os.path.normpath(os.path.abspath(a))
                       for a in extra[1:] if not a.startswith('-')]
-    sys.argv = [a for a in sys.argv if a not in possible_tests]
-
+    sys.argv = [a for a in sys.argv
+                if os.path.normpath(os.path.abspath(a)) not in possible_tests]
     requested_tests = []
     for t in possible_tests:
         if t in test_files['all']:
