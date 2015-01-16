@@ -28,6 +28,7 @@ from mercurial.error import (
 from mercurial.node import bin, hex
 
 testedwith = '3.2'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
