@@ -61,6 +61,9 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 import bzauth
 import bz
 
+testedwith = '3.0 3.1 3.2'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bzexport'
+
 # This is stolen from buglink.py
 bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                         # a standalone sequence of numbers
