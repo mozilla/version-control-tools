@@ -40,6 +40,7 @@ bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
 backout_re = re.compile(r'[bB]ack(?:ed)?(?: ?out) (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})')
 reapply_re = re.compile(r'Reapplied (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})')
 
+
 def qbackout(ui, repo, rev, **opts):
     """backout a change or set of changes
 
@@ -114,28 +115,29 @@ def qbackout(ui, repo, rev, **opts):
                reverse_order=reverse_order,
                **opts)
 
+
 def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, reverse_order=False, **opts):
     if not opts.get('force'):
         ui.status('checking for uncommitted changes\n')
         cmdutil.bailifchanged(repo)
     backout = not opts.get('apply')
-    desc = { 'action': 'backout',
-             'Actioned': 'Backed out',
-             'actioning': 'backing out',
-             'name': 'backout'
-             }
+    desc = {'action': 'backout',
+            'Actioned': 'Backed out',
+            'actioning': 'backing out',
+            'name': 'backout'
+            }
     if not backout:
-        desc = { 'action': 'apply',
-                 'Actioned': 'Reapplied',
-                 'actioning': 'Reapplying',
-                 'name': 'patch'
-                 }
+        desc = {'action': 'apply',
+                'Actioned': 'Reapplied',
+                'actioning': 'Reapplying',
+                'name': 'patch'
+                }
 
     rev = scmutil.revrange(repo, rev)
     if len(rev) == 0:
         raise util.Abort('at least one revision required')
 
-    csets = [ repo[r] for r in rev ]
+    csets = [repo[r] for r in rev]
     csets.sort(reverse=reverse_order, key=lambda cset: cset.rev())
 
     new_opts = opts.copy()
@@ -244,6 +246,7 @@ def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, revers
     new_opts['message'] = "\n".join(messages)
     if opts.get('single'):
         commit_change(ui, repo, desc['name'], revisions=rev, force_name=opts.get('name'), **new_opts)
+
 
 def oops(ui, repo, rev, **opts):
     """backout a change or set of changes
