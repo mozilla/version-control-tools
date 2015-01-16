@@ -45,6 +45,9 @@ import bzhandler
 import pb
 import scp
 
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qimportbz'
+
+
 def extsetup(ui=None):
   # "Mercurial version 8e6019b16a7d and later (that is post-1.3.1) will pass a
   # ui argument to extsetup."
