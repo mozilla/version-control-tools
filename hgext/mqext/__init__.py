@@ -97,6 +97,8 @@ except:
     except:
         from mercurial.util import canonpath
 
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
+
 bugzilla_jsonrpc_url = "https://bugzilla.mozilla.org/jsonrpc.cgi"
 
 def qshow(ui, repo, patchspec=None, **opts):
