@@ -397,6 +397,94 @@ head/bookmark-based development.
    alias so the output is easier to understand and closer to your
    fingertips.
 
+Collaborating / Sharing Bookmarks
+=================================
+
+Say you have multiple machines and you wish to keep your bookmarks in
+sync across all of them. Or, say you want to publish a bookmark
+somewhere for others to pull from. For these use cases, you'll need a
+server accessible to all parties to push and pull from.
+
+If you have Mozilla commit access, you can
+`create a user repository <https://developer.mozilla.org/en-US/docs/Creating_Mercurial_User_Repositories>`_
+to hold your bookmarks.
+
+If you don't have Mozilla commit access or don't want to use a user
+repository, you can create a repository on Bitbucket.
+
+If neither of these options work for you, you can always run your own
+Mercurial server.
+
+Pushing and Pulling Bookmarks
+-----------------------------
+
+``hg push`` by default won't transfer bookmark updates. Instead, you
+need to use the ``-B`` argument to tell Mercurial to push a bookmark
+update. e.g.::
+
+   $ hg push -B my-bookmark user
+   pushing to user
+   searching for changes
+   remote: adding changesets
+   remote: adding manifests
+   remote: adding file changes
+   remote: added 1 changesets with 1 changes to 1 files
+   exporting bookmark my-bookmark
+
+.. tip::
+
+   When pushing bookmarks, it is sufficient to use ``-B`` instead of
+   ``-r``.
+
+   When using ``hg push``, it is a common practice to specify ``-r
+   <rev>`` to indicate which local changes you wish to push to the
+   remote. When pushing bookmarks, ``-B <bookmark>`` implies
+   ``-r <bookmark>``, so you don't need to specify ``-r <rev>``.
+
+Unlike ``hg push``, ``hg pull`` will pull all bookmark updates
+automatically. If a bookmark has been added or updated since the last
+time you pulled, ``hg pull`` will tell you so. e.g.::
+
+   $ hg pull user
+   pulling from user
+   pulling from $TESTTMP/a (glob)
+   searching for changes
+   adding changesets
+   adding manifests
+   adding file changes
+   added 1 changesets with 1 changes to 1 files (+1 heads)
+   updating bookmark my-bookmark
+
+Things to Watch Out For
+-----------------------
+
+Mozilla user repositories currently have two problems making them less
+than ideal for sharing bookmarks:
+
+1. User repositories are publishing by default.
+2. Bookmark pushes aren't immediately synchronized to the read-only HTTP
+   slaves.
+
+These are both likely deal breakers.
+
+If you push changesets to a user repository on hg.mozilla.org,
+changesets are bumped from *draft* to *public*. This means Mercurial
+will refuse to mutate them. **This is often not what you want** and will
+result in a lot of pain. Fixing this is tracked in
+`bug 1089385 <https://bugzilla.mozilla.org/show_bug.cgi?id=1089385>`_.
+
+If you push a bookmark to hg.mozilla.org, the bookmark will be set on
+ssh://hg.mozilla.org, but it won't synchronize to
+https://hg.mozilla.org/ until the subsequent push. This means if you
+pull from https://hg.mozilla.org/, you may be seeing outdated bookmark
+information! Fixing this is tracked in
+`bug 1112965 <https://bugzilla.mozilla.org/show_bug.cgi?id=1112965>`_.
+
+Bitbucket repositories are also publishing by default. However, unlike
+user repositories, they provide an option for making them
+non-publishing. **If you are using Bitbucket to share bookmarks, you
+should mark the repository as non-publishing via the Bitbucket web UI.**
+
 Relationship to MQ
 ==================
 
