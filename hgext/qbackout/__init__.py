@@ -3,8 +3,6 @@
 This is a port of mak's mercurial backout script from
 https://wiki.mozilla.org/User:Mak77 to a mercurial extension.'''
 
-testedwith = '2.5.2'
-
 from mercurial import scmutil, commands, cmdutil, patch, mdiff, util
 from mercurial.i18n import _
 from mercurial.node import nullid, short
@@ -19,6 +17,9 @@ if not getattr(cmdutil, 'bailifchanged', None):
     cmdutil.bailifchanged = cmdutil.bail_if_changed
 if 'mercurial.scmutil' not in sys.modules:
     import mercurial.cmdutil as scmutil
+
+testedwith = '3.0 3.1 3.2'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qbackout'
 
 # This is stolen from bzexport.py, which stole it from buglink.py
 # Tweaked slightly to avoid grabbing bug numbers from the beginning of SHA-1s
