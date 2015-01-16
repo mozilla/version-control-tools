@@ -93,7 +93,7 @@ from mozautomation.repository import (
 )
 
 testedwith = '3.0 3.1 3.2'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial:%20firefoxtree'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
 # The root revisions in mozilla-central and comm-central, respectively.
 MOZ_ROOT_REV = '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
 COMM_ROOT_REV = 'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
