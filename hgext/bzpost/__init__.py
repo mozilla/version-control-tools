@@ -61,7 +61,7 @@ from mozautomation import repository
 from mozhg.auth import getbugzillaauth
 
 testedwith = '3.0 3.1 3.2'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial:%20bzpost'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bzpost'
 
 
 def wrappedpushbookmark(orig, pushop):
