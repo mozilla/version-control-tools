@@ -59,6 +59,7 @@ from mozautomation.commitparser import parse_bugs
 from mozhg.auth import getbugzillaauth
 
 testedwith = '3.0 3.1 3.2'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
