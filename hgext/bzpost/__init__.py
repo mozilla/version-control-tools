@@ -141,7 +141,7 @@ def wrappedpushbookmark(orig, pushop):
     bzurl = ui.config('bugzilla', 'url', 'https://bugzilla.mozilla.org/rest')
 
     bugsy = Bugsy(username=bzauth.username, password=bzauth.password,
-            bugzilla_url=bzurl)
+                  bugzilla_url=bzurl)
 
     # If this is a try push, we paste the Treeherder link for the tip commit, because
     # the per-commit URLs don't have much value.
@@ -175,7 +175,7 @@ def wrappedpushbookmark(orig, pushop):
 
         if not missing_nodes:
             ui.write(_('bug %s already knows about pushed changesets\n') %
-                bugnumber)
+                     bugnumber)
             continue
 
         lines = ['%s/rev/%s' % (baseuri, node) for node in missing_nodes]
