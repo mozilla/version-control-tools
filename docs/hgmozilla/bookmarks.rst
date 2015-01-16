@@ -4,7 +4,7 @@
 Using Bookmarks
 ===============
 
-The Mercurial projects recommends the use of bookmarks for doing
+The Mercurial project recommends the use of bookmarks for doing
 development.
 
 At its core, bookmarks are a labeling mechanism. Instead of a
