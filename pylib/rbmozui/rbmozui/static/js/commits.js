@@ -469,7 +469,7 @@ $(document).ready(function() {
           var reviewable = self.model.draft.id ? self.model.draft : self.model;
 
           var extraData = reviewable.get("extraData");
-          var isSquashed = extraData["p2rb.is_squashed"] == "True";
+          var isSquashed = extraData["p2rb.is_squashed"].toString().toLowerCase() == "true";
           if (!isSquashed) {
             reportError("Root review request with ID: " + self.model.id + " does not " +
                         "have p2rb.is_squashed set to True");
