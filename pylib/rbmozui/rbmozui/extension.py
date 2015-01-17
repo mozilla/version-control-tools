@@ -39,6 +39,9 @@ class RBMozUI(Extension):
         'commits': {
             'source_filenames': ['js/commits.js'],
         },
+        'rbmozuiautocomplete': {
+            'source_filenames': ['js/ui.rbmozuiautocomplete.js'],
+        },
         'review': {
             'source_filenames': ['js/review.js'],
         }

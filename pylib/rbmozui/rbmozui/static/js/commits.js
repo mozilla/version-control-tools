@@ -94,7 +94,7 @@ $(document).ready(function() {
 
   var ReviewerListView = Backbone.View.extend({
     render: function() {
-      return this.collection.pluck("username").join(",");
+      return this.collection.pluck("username").join(", ");
     }
   });
 
@@ -267,10 +267,24 @@ $(document).ready(function() {
             var editor = new RB.ReviewRequestEditor({reviewRequest: this.model.reviewRequest});
             var warning = $("#review-request-warning");
 
+            // For Mozilla, we sometimes use colons as a prefix for searching for
+            // IRC nicks - that's just a convention that has developed over time.
+            // Since IRC nicks are what MozReview recognizes, we need to be careful
+            // that the user hasn't actually included those colon prefixes, otherwise
+            // MozReview is going to complain that it doesn't recognize the user (since
+            // MozReview's notion of a username doesn't include the colon prefix).
+            var sanitized = value.split(" ").map(function(aName) {
+              var trimmed = aName.trim();
+              if (trimmed.indexOf(":") == 0) {
+                trimmed = trimmed.substring(1);
+              }
+              return trimmed;
+            });
+
             // This sets the reviewers on the child review request.
             editor.setDraftField(
               "targetPeople",
-              value,
+              sanitized.join(", "),
               {
                 jsonFieldName: "target_people",
                 error: function(error) {
@@ -344,7 +358,7 @@ $(document).ready(function() {
       // Again, this is copied almost verbatim from Review Board core to
       // mimic traditional behaviour for this kind of field.
       $(reviewerList).inlineEditor("field")
-                     .rbautocomplete({
+                     .rbmozuiautocomplete({
         formatItem: function(data) {
           var s = data[acOptions.nameKey];
           if (acOptions.descKey && data[acOptions.descKey]) {
@@ -356,6 +370,7 @@ $(document).ready(function() {
         },
         matchCase: false,
         multiple: true,
+        searchPrefix: ":",
         parse: function(data) {
           var items = data[acOptions.fieldName],
               itemsLen = items.length,

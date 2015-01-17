@@ -1,0 +1,47 @@
+diff --git a/pylib/rbmozui/rbmozui/static/js/ui.rbmozuiautocomplete.js b/pylib/rbmozui/rbmozui/static/js/ui.rbmozuiautocomplete.js
+--- a/pylib/rbmozui/rbmozui/static/js/ui.rbmozuiautocomplete.js
++++ b/pylib/rbmozui/rbmozui/static/js/ui.rbmozuiautocomplete.js
+@@ -36,17 +36,18 @@
+         multiple: false,
+         multipleSeparator: ", ",
+         highlight: function(value, term) {
+             return value.replace(new RegExp("(?![^&;]+;)(?!<[^<>]*)(" + term.replace(/([\^\$\(\)\[\]\{\}\*\.\+\?\|\\])/gi, "\\$1") + ")(?![^<>]*>)(?![^&;]+;)", "gi"), "<strong>$1</strong>");
+         },
+         scroll: true,
+         clickToURL: false,
+         enterToURL: false,
+-        scrollHeight: 180
++        scrollHeight: 180,
++        searchPrefix: null,
+     },
+ 
+     _init: function() {
+         $.extend(this.options, {
+             delay: this.options.delay != undefined ? this.options.delay : (this.options.url? this.options.ajaxDelay : this.options.localDelay),
+             max: this.options.max != undefined ? this.options.max : (this.options.scroll? this.options.scrollMax : this.options.noScrollMax),
+             highlight: this.options.highlight || function(value) { return value; }, // if highlight is set to false, replace it with a do-nothing function
+             formatMatch: this.options.formatMatch || this.options.formatItem // if the formatMatch option is not specified, then use formatItem for backwards compatibility
+@@ -273,17 +274,22 @@
+                 return [""];
+             }
+             if ( !options.multiple ) {
+                 return [value];
+             }
+             var words = value.split( options.multipleSeparator );
+             var result = [];
+             $.each(words, function(i, value) {
+-                result[i] = $.trim(value);
++                var trimmed = $.trim(value);
++                if (options.searchPrefix &&
++                    trimmed.indexOf(options.searchPrefix) == 0) {
++                    trimmed = trimmed.substring(options.searchPrefix.length);
++                }
++                result[i] = trimmed;
+             });
+             return result;
+         };
+ 
+         function lastWord(value) {
+             var words = trimWords(value);
+             return words[words.length - 1];
+         };
