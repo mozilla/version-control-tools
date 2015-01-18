@@ -42,13 +42,24 @@ def has_docker():
     d = Docker(tf.name, url, tls=tls)
     return d.is_alive()
 
-@check('hg30+', 'Running with Mercurial 3.0+')
-def has_hg_30_plus():
+def hgversion():
     v = os.environ['HGVERSION']
     v = v.split('+')[0]
-    vers = [int(i) for i in v.split('.')]
+    return tuple(int(i) for i in v.split('.'))
 
-    return vers[0] >= 3
+@check('hg30+', 'Running with Mercurial 3.0+')
+def has_hg_30_plus():
+    return hgversion()[0] >= 3
+
+@check('hg31+', 'Running with Mercurial 3.1+')
+def has_hg_31_plus():
+    v = tuple(hgversion()[0:2])
+    return v >= (3, 1)
+
+@check('hg32+', 'Running with Mercurial 3.2+')
+def has_hg32_plus():
+    v = tuple(hgversion()[0:2])
+    return v >= (3, 2)
 
 # Now we reimplement the command line syntax of the CLI hghave script.
 failures = 0
