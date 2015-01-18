@@ -61,6 +61,11 @@ def has_hg32_plus():
     v = tuple(hgversion()[0:2])
     return v >= (3, 2)
 
+@check('hg33+', 'Running with Mercurial 3.3+')
+def has_hg33_plus():
+    v = tuple(hgversion()[0:2])
+    return v >= (3, 3)
+
 # Now we reimplement the command line syntax of the CLI hghave script.
 failures = 0
 
