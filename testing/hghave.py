@@ -45,6 +45,7 @@ def has_docker():
 def hgversion():
     v = os.environ['HGVERSION']
     v = v.split('+')[0]
+    v = v.split('-')[0]
     return tuple(int(i) for i in v.split('.'))
 
 @check('hg30+', 'Running with Mercurial 3.0+')
