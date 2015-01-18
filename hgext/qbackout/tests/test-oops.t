@@ -1,3 +1,6 @@
+graft -f wasn't added until 3.2
+#require hg32+
+
   $ cat >> $HGRCPATH << EOF
   > [extensions]
   > qbackout = $TESTDIR/hgext/qbackout
