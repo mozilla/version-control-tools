@@ -14,8 +14,8 @@ from mach.decorators import (
 @CommandProvider
 class MozReviewCommands(object):
     def _get_mozreview(self, where):
-        if not where and 'MOZREVIEW_PATH' in os.environ:
-            where = os.environ['MOZREVIEW_PATH']
+        if not where and 'MOZREVIEW_HOME' in os.environ:
+            where = os.environ['MOZREVIEW_HOME']
 
         from vcttesting.mozreview import MozReview
         return MozReview(where)

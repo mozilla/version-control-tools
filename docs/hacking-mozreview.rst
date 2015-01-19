@@ -67,7 +67,7 @@ working site. If you don't, file a bug!
 
    All ``mozreview`` commands take a positional argument defining the
    path to the instance they should operate on. If you define the
-   ``MOZREVIEW_PATH`` environment variable, you do not need to define
+   ``MOZREVIEW_HOME`` environment variable, you do not need to define
    this argument.
 
 Creating Repositories
