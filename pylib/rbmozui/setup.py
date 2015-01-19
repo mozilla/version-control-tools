@@ -14,9 +14,6 @@ setup(
     license="MIT",
     description="UI tweaks to Review Board for Mozilla",
     packages=find_packages(),
-    install_requires=[
-        'ReviewBoard>=2.0.2',
-    ],
     classifiers=[
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
