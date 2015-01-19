@@ -28,7 +28,7 @@ class MozReviewCommands(object):
         help='Port Bugzilla HTTP server should listen on.')
     @CommandArgument('--reviewboard-port', type=int,
         help='Port Review Board HTTP server should listen on.')
-    @CommandArgument('--mercurial_port', type=int,
+    @CommandArgument('--mercurial-port', type=int,
         help='Port Mercurial HTTP server should listen on.')
     def start(self, where, bugzilla_port, reviewboard_port,
             mercurial_port):
