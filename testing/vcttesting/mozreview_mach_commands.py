@@ -43,6 +43,8 @@ class MozReviewCommands(object):
         print('Mercurial URL: %s' % mr.mercurial_url)
         print('Admin username: %s' % mr.admin_username)
         print('Admin password: %s' % mr.admin_password)
+        print('Run the following to use this instance with all future commands:')
+        print('  export MOZREVIEW_HOME=%s' % mr._path)
 
     @Command('stop', category='mozreview',
         description='Stop a MozReview instance')
