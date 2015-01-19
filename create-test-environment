@@ -11,7 +11,7 @@ pip install --upgrade pip
 pip install --upgrade -r test-requirements.txt
 
 # ReviewBoard doesn't work with pip, sadly.
-easy_install ReviewBoard==2.0.11
+easy_install ReviewBoard==2.0.12
 
 cd pylib/Bugsy
 python setup.py develop
