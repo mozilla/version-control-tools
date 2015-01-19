@@ -170,7 +170,7 @@ class MozReviewBoard(object):
         port = str(port)
         env = self.env
         env['HOME'] = self.path
-        f = open(os.devnull, 'w')
+        f = open(os.path.join(self.path, 'reviewboard-server.log'), 'w')
         # --noreload prevents process for forking. If we don't do this,
         # our written pid is not correct.
         proc = subprocess.Popen(self.manage + ['runserver', '--noreload', port],
