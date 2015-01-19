@@ -95,7 +95,8 @@ class MozReview(object):
                 db_image=db_image, web_image=web_image,
                 verbose=verbose)[0]
 
-        bugzilla = self.get_bugzilla(bugzilla_url)
+        self.bugzilla_url = bugzilla_url
+        bugzilla = self.get_bugzilla()
 
         rb = MozReviewBoard(self._path, bugzilla_url=bugzilla_url)
         rb.create()
