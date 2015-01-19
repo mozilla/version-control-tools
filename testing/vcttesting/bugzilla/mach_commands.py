@@ -11,15 +11,28 @@ from mach.decorators import (
 )
 
 from vcttesting.bugzilla import Bugzilla
+from vcttesting.mozreview import MozReview
 
 @CommandProvider
 class BugzillaCommands(object):
     def __init__(self, context):
-        self.base_url = os.environ['BUGZILLA_URL']
-        username = os.environ['BUGZILLA_USERNAME']
-        password = os.environ['BUGZILLA_PASSWORD']
+        if 'BUGZILLA_URL' in os.environ:
+            self.base_url = os.environ['BUGZILLA_URL']
+            username = os.environ['BUGZILLA_USERNAME']
+            password = os.environ['BUGZILLA_PASSWORD']
 
-        self.b = Bugzilla(self.base_url, username=username, password=password)
+            self.b = Bugzilla(self.base_url, username=username, password=password)
+
+        elif 'MOZREVIEW_HOME' in os.environ:
+            mr = MozReview(os.environ['MOZREVIEW_HOME'])
+            username = os.environ.get('BUGZILLA_USERNAME')
+            password = os.environ.get('BUGZILLA_PASSWORD')
+
+            self.b = mr.get_bugzilla(username=username, password=password)
+
+        else:
+            raise Exception('Do not know which Bugzilla instance to talk to. '
+                    'Set BUGZILLA_URL or MOZREVIEW_HOME environment variables.')
 
     @Command('create-bug', category='bugzilla',
             description='Create a new bug')

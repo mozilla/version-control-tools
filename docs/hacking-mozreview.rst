@@ -122,8 +122,12 @@ tests rely heavily on this tool to perform small, well-defined Bugzilla
 interactions. You are encouraged to use the tool to help you hack on
 MozReview.
 
-Since the tool had its origins in testing land, it currently
-requires some environment variables to use:
+Since the tool had its origins in testing land, it currently requires
+environment variable(s) to define which Bugzilla instance to use.
+
+If you have the ``MOZREVIEW_HOME`` variable set, the Bugzilla instance
+associated with that MozReview instance is used. Else, you will need to
+define the following variables:
 
 BUGZILLA_URL
    This must be set the base URL of the Bugzilla instance you wish to
