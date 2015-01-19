@@ -87,4 +87,4 @@ Cleanup
 
   $ rbmanage stop rbserver
   $ dockercontrol stop-bmo rb-test-unicode
-  stopped 2 containers
+  stopped 3 containers

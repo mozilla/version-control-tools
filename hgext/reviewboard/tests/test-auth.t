@@ -386,4 +386,4 @@ Cleanup
 
   $ rbmanage stop ../rbserver
   $ dockercontrol stop-bmo rb-test-auth
-  stopped 2 containers
+  stopped 3 containers

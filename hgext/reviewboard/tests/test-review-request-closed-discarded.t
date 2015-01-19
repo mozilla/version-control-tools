@@ -481,4 +481,4 @@ The attachment for the review request should be unobsoleted
   $ rbmanage stop rbserver
 
   $ dockercontrol stop-bmo rb-test-review-request-closed-discarded
-  stopped 2 containers
+  stopped 3 containers

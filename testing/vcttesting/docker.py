@@ -87,6 +87,7 @@ class Docker(object):
             'images': {},
             'containers': {},
             'last-db-id': None,
+            'last-pulse-id': None,
             'last-web-id': None,
             'last-rbweb-id': None,
             'last-db-bootstrap-id': None,
@@ -99,6 +100,7 @@ class Docker(object):
                 self.state = json.load(fh)
 
         self.state.setdefault('last-db-id', None)
+        self.state.setdefault('last-pulse-id', None)
         self.state.setdefault('last-web-id', None)
         self.state.setdefault('last-rbweb-id', None)
         self.state.setdefault('last-db-bootstrap-id', None)
@@ -255,9 +257,11 @@ class Docker(object):
         images = self.state['images']
         db_image = self.ensure_built('bmodb-volatile', verbose=verbose)
         web_image = self.ensure_built('bmoweb', verbose=verbose)
+        pulse_image = self.ensure_built('pulse', verbose=verbose)
         #rbweb_image = self.ensure_built('rbweb', verbose=verbose, add_vct=True)
 
         self.state['last-db-id'] = db_image
+        self.state['last-pulse-id'] = pulse_image
         self.state['last-web-id'] = web_image
         #self.state['last-rbweb-id'] = rbweb_image
 
@@ -272,12 +276,14 @@ class Docker(object):
 
         have_db = db_bootstrapped_key in images
         have_web = web_bootstrapped_key in images
+        have_pulse = 'pulse' in images
         #have_rbweb = rbweb_bootstrapped_key in images
 
-        if have_db and have_web: # and have_rbweb:
+        if have_db and have_web and have_pulse: # and have_rbweb:
             return (
                 images[db_bootstrapped_key],
                 images[web_bootstrapped_key],
+                images['pulse'],
                 #images[rbweb_bootstrapped_key]
             )
 
@@ -332,6 +338,7 @@ class Docker(object):
         #        tag=rbweb_unique_id)['Id']
         self.state['images'][db_bootstrapped_key] = db_bootstrap
         self.state['images'][web_bootstrapped_key] = web_bootstrap
+        self.state['images']['pulse'] = pulse_image
         #self.state['images'][rbweb_bootstrapped_key] = rbweb_bootstrap
         self.state['last-db-bootstrap-id'] = db_bootstrap
         self.state['last-web-bootstrap-id'] = web_bootstrap
@@ -345,13 +352,17 @@ class Docker(object):
 
         print('bootstrapped images created')
 
-        return db_bootstrap, web_bootstrap #, rbweb_bootstrap
+        return db_bootstrap, web_bootstrap, pulse_image #, rbweb_bootstrap
 
-    def start_mozreview(self, cluster, hostname=None, http_port=80,
-            rbweb_port=None, db_image=None,
-            web_image=None, rbweb_image=None, verbose=False):
-        if not db_image or not web_image:
-            db_image, web_image = self.build_mozreview(verbose=verbose)
+    def start_mozreview(self, cluster, hostname=None, start_pulse=False,
+            http_port=80, pulse_port=None, rbweb_port=None, db_image=None,
+            web_image=None, pulse_image=None, rbweb_image=None, verbose=False):
+
+        if pulse_port:
+            start_pulse = True
+
+        if not db_image or not web_image or not pulse_image:
+            db_image, web_image, pulse_image = self.build_mozreview(verbose=verbose)
 
         containers = self.state['containers'].setdefault(cluster, [])
 
@@ -362,6 +373,11 @@ class Docker(object):
         db_id = self.client.create_container(db_image,
                 environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
         containers.append(db_id)
+
+        if start_pulse:
+            pulse_id = self.client.create_container(pulse_image)['Id']
+            containers.append(pulse_id)
+
         web_id = self.client.create_container(web_image,
                 environment={'BMO_URL': url})['Id']
         containers.append(web_id)
@@ -375,6 +391,10 @@ class Docker(object):
                 links=[(db_state['Name'], 'bmodb')],
                 port_bindings={80: http_port})
         web_state = self.client.inspect_container(web_id)
+        if start_pulse:
+            self.client.start(pulse_id,
+                    port_bindings={5672: pulse_port})
+            pulse_state = self.client.inspect_container(pulse_id)
         #self.client.start(rbweb_id,
         #        links=[
         #            (db_state['Name'], 'rbdb'),
@@ -384,6 +404,8 @@ class Docker(object):
         #rbweb_state = self.client.inspect_container(rbweb_id)
 
         wait_bmoweb_port = web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort']
+        if start_pulse:
+            wait_rabbit_port = pulse_state['NetworkSettings']['Ports']['5672/tcp'][0]['HostPort']
         #wait_rbweb_port = rbweb_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort']
 
         #rb_url = 'http://%s:%s/' % (hostname, wait_rbweb_port)
@@ -391,6 +413,7 @@ class Docker(object):
         print('waiting for Bugzilla to start')
         wait_for_http(self.docker_hostname, wait_bmoweb_port)
         #wait_for_http(self.docker_hostname, wait_rbweb_port)
+        # TODO wait on Rabbit TCP port.
         print('Bugzilla accessible on %s' % url)
         #print('Review Board accessible at %s' % rb_url)
         return url, db_id, web_id
@@ -457,6 +480,7 @@ class Docker(object):
 
         ignore_images = set([
             self.state['last-db-id'],
+            self.state['last-pulse-id'],
             self.state['last-web-id'],
             self.state['last-rbweb-id'],
             self.state['last-db-bootstrap-id'],
@@ -469,6 +493,7 @@ class Docker(object):
             'bmoweb-bootstrapped',
             'bmodb-volatile',
             'bmodb-volatile-bootstrapped',
+            'pulse',
             'rbweb',
             'rbweb-bootstrapped',
         ])

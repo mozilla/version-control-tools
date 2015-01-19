@@ -100,4 +100,4 @@ Publishing the review will add an attachment to the bug
   $ rbmanage stop ../rbserver
 
   $ dockercontrol stop-bmo rb-test-bugzilla
-  stopped 2 containers
+  stopped 3 containers

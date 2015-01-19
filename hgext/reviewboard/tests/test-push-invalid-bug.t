@@ -24,4 +24,4 @@ Cleanup
 
   $ rbmanage stop rbserver
   $ dockercontrol stop-bmo rb-test-push-invalid-bug
-  stopped 2 containers
+  stopped 3 containers

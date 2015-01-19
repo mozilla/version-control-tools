@@ -50,4 +50,4 @@ Pushing a review will create the reviews file
   $ cd ..
   $ rbmanage stop rbserver
   $ dockercontrol stop-bmo rb-test-store
-  stopped 2 containers
+  stopped 3 containers

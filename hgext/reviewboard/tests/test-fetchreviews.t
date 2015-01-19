@@ -62,4 +62,4 @@ Pulling reviews with no changes
   $ rbmanage stop rbserver
 
   $ dockercontrol stop-bmo rb-test-fetchreviews
-  stopped 2 containers
+  stopped 3 containers

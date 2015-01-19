@@ -83,4 +83,4 @@ Splitting the changeset results in multiple reviews
   $ rbmanage stop rbserver
 
   $ dockercontrol stop-bmo rb-test-multiple-precursors
-  stopped 2 containers
+  stopped 3 containers

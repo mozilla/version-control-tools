@@ -358,4 +358,4 @@ Try removing a commit in the middle.
   $ rbmanage stop rbserver
 
   $ dockercontrol stop-bmo rb-test-commits-deleted-no-obsolescence
-  stopped 2 containers
+  stopped 3 containers

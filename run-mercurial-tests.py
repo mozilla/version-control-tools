@@ -252,9 +252,10 @@ if __name__ == '__main__':
 
         if build_docker:
             print('generating Docker images needed for tests')
-            db_image, bmoweb_image = docker.build_mozreview(verbose=verbose)
+            db_image, bmoweb_image, pulse_image = docker.build_mozreview(verbose=verbose)
             os.environ['DOCKER_BMO_DB_IMAGE'] = db_image
             os.environ['DOCKER_BMO_WEB_IMAGE'] = bmoweb_image
+            os.environ['DOCKER_PULSE_IMAGE'] = pulse_image
             #os.environ['DOCKER_RB_WEB_IMAGE'] = rbweb_image
 
         for c in docker.client.containers(all=True):
