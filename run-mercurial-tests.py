@@ -169,35 +169,6 @@ if __name__ == '__main__':
     sys.argv = [a for a in sys.argv if a != '--cover']
     verbose = '-v' in sys.argv or '--verbose' in sys.argv
 
-    # We take a snapshot of Docker containers and images before we start tests
-    # so we can look for leaks later.
-    #
-    # This behavior is non-ideal: we should not leak Docker containers and
-    # images. Furthermore, if others interact with Docker while we run, bad
-    # things will happen. But this is the easiest solution, so hacks win.
-    preserve_containers = set()
-    preserve_images = set()
-
-    # Enable tests to interact with our Docker controlling script.
-    docker_state = os.path.join(HERE, '.docker-state.json')
-    docker_url, docker_tls = vctdocker.params_from_env(os.environ)
-    docker = vctdocker.Docker(docker_state, docker_url, tls=docker_tls)
-    if docker.is_alive():
-        os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
-
-        # We build the base BMO images in the test runner because doing it
-        # from tests would be racey. It is easier to do it here instead of
-        # complicating code with locks.
-        db_image, bmoweb_image = docker.build_mozreview(verbose=verbose)
-        os.environ['DOCKER_BMO_DB_IMAGE'] = db_image
-        os.environ['DOCKER_BMO_WEB_IMAGE'] = bmoweb_image
-        #os.environ['DOCKER_RB_WEB_IMAGE'] = rbweb_image
-
-        for c in docker.client.containers(all=True):
-            preserve_containers.add(c['Id'])
-        for i in docker.client.images(all=True):
-            preserve_images.add(i['Id'])
-
     os.environ['BUGZILLA_USERNAME'] = 'admin@example.com'
     os.environ['BUGZILLA_PASSWORD'] = 'password'
 
@@ -239,12 +210,57 @@ if __name__ == '__main__':
 
             continue
 
+    running_tests = []
+
     # Add all Mercurial tests unless we get an argument that is a known test.
     if not requested_tests:
-        sys.argv.extend(extension_tests)
-        sys.argv.extend(hook_tests)
+        running_tests.extend(extension_tests)
+        running_tests.extend(hook_tests)
     else:
-        sys.argv.extend(requested_tests)
+        running_tests.extend(requested_tests)
+
+    sys.argv.extend(running_tests)
+
+    # We take a snapshot of Docker containers and images before we start tests
+    # so we can look for leaks later.
+    #
+    # This behavior is non-ideal: we should not leak Docker containers and
+    # images. Furthermore, if others interact with Docker while we run, bad
+    # things will happen. But this is the easiest solution, so hacks win.
+    preserve_containers = set()
+    preserve_images = set()
+
+    # Enable tests to interact with our Docker controlling script.
+    docker_state = os.path.join(HERE, '.docker-state.json')
+    docker_url, docker_tls = vctdocker.params_from_env(os.environ)
+    docker = vctdocker.Docker(docker_state, docker_url, tls=docker_tls)
+    if docker.is_alive():
+        os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
+
+        # We build the base BMO images in the test runner because doing it
+        # from tests would be racey. It is easier to do it here instead of
+        # complicating code with locks.
+        #
+        # But only do this if a test we are running utilizes Docker.
+        build_docker = False
+        for t in running_tests:
+            with open(t, 'rb') as fh:
+                content = fh.read()
+                if b'docker' in content:
+                    build_docker = True
+                    break
+
+        if build_docker:
+            print('generating Docker images needed for tests')
+            db_image, bmoweb_image = docker.build_mozreview(verbose=verbose)
+            os.environ['DOCKER_BMO_DB_IMAGE'] = db_image
+            os.environ['DOCKER_BMO_WEB_IMAGE'] = bmoweb_image
+            #os.environ['DOCKER_RB_WEB_IMAGE'] = rbweb_image
+
+        for c in docker.client.containers(all=True):
+            preserve_containers.add(c['Id'])
+        for i in docker.client.images(all=True):
+            preserve_images.add(i['Id'])
 
     old_env = os.environ.copy()
     old_defaults = dict(runtestsmod.defaults)
