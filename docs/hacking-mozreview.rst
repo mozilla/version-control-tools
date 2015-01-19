@@ -193,6 +193,12 @@ Discussion
 General discussion on MozReview development and direction occurs on
 our mailing list, `mozilla-code-review@googlegroups.com <mailto:mozilla-code-review@googlegroups.com>`_.
 
+Submitting Changes
+==================
+
+See :ref:`contributing` for how to formulate and submit changes for
+the ``version-control-tools`` repository.
+
 Releasing Updates
 =================
 
