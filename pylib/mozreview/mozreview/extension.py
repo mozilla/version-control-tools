@@ -1,5 +1,7 @@
 from reviewboard.extensions.base import Extension
 
+from mozreview.pulse import initialize_pulse_handlers
+
 
 class MozReviewExtension(Extension):
     metadata = {
@@ -8,4 +10,4 @@ class MozReviewExtension(Extension):
     }
 
     def initialize(self):
-        pass
+        initialize_pulse_handlers(self)
