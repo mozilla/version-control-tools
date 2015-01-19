@@ -48,6 +48,10 @@ conf_dir = os.path.join(path, 'conf')
 os.chdir(conf_dir)
 
 subprocess.check_call(manage + ['enable-extension',
+    'mozreview.extension.MozReviewExtension'],
+    cwd=conf_dir)
+
+subprocess.check_call(manage + ['enable-extension',
     'rbbz.extension.BugzillaExtension'],
     cwd=conf_dir)
 

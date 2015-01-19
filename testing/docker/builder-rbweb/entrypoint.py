@@ -131,6 +131,9 @@ rbmanage = [
     '-m', 'reviewboard.manage',
 ]
 
+print('activating mozreview extension')
+cc(rbmanage + ['enable-extension', 'mozreview.extension.MozReviewExtension'],
+    cwd=conf)
 print('activating rbbz extension')
 cc(rbmanage + ['enable-extension', 'rbbz.extension.BugzillaExtension'],
     cwd=conf)

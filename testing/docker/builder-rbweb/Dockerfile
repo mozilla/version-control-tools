@@ -40,9 +40,11 @@ ADD vhost.conf /etc/apache2/sites-enabled/reviewboard.conf
 
 ADD entrypoint.py /entrypoint.py
 
+ADD extra/vct/pylib/mozreview ${RB_HOME}/mozreview
 ADD extra/vct/pylib/rbbz ${RB_HOME}/rbbz
 ADD extra/vct/pylib/rbmozui ${RB_HOME}/rbmozui
 
+RUN cd ${RB_HOME}/mozreview && ${RB_HOME}/venv/bin/python setup.py install
 RUN cd ${RB_HOME}/rbbz && ${RB_HOME}/venv/bin/python setup.py install
 RUN cd ${RB_HOME}/rbmozui && ${RB_HOME}/venv/bin/python setup.py install
 

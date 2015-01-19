@@ -138,6 +138,10 @@ class MozReviewBoard(object):
                 cwd=self.path, env=self.env, stdout=f, stderr=f)
 
         subprocess.check_call(self.manage + ['enable-extension',
+            'mozreview.extension.MozReviewExtension'],
+            cwd=self.path, env=self.env, stdout=f, stderr=f)
+
+        subprocess.check_call(self.manage + ['enable-extension',
             'rbbz.extension.BugzillaExtension'], cwd=self.path,
             env=self.env, stdout=f, stderr=f)
 

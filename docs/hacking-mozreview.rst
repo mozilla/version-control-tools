@@ -211,8 +211,8 @@ Want to release an update to MozReview? This section is for you.
 Building eggs for Review Board Extensions
 -----------------------------------------
 
-If you modify ``rbbz`` or ``rbmozui``, you'll need to produce new Python
-eggs suitable for deployment on production.
+If you modify ``mozreview``, ``rbbz`` or ``rbmozui``, you'll need to produce
+new Python eggs suitable for deployment on production.
 
 We've provided a build environment in a Docker container to enable
 building eggs. In addition, we have a high-level command that will start
@@ -221,6 +221,7 @@ local filesystem. To use::
 
   $ source venv/bin/activate
   $ DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-reviewboard-eggs /path/to/output/directory
+  Wrote /path/to/output/directory/mozreview-0.1.0alpha0-py2.6.egg
   Wrote /path/to/output/directory/rbbz-0.2.6-py2.6.egg
   Wrote /path/to/output/directory/rbmozui-0.2.3beta0-py2.6.egg
 
@@ -231,6 +232,7 @@ If you wish to use the Docker container, extract the image id from the
   ...
   Successfully built 63b369dee3c4
   Generating eggs...
+  Wrote ./mozreview-0.1.0alpha0-py2.6.egg
   Wrote ./rbbz-0.2.6-py2.6.egg
   Wrote ./rbmozui-0.2.3beta0-py2.6.egg
   $ docker run -it 63b369dee3c4 /bin/bash

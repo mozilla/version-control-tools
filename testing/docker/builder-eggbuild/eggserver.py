@@ -10,6 +10,7 @@ import os
 EGG_DIRS = [
     '/version-control-tools/pylib/rbbz/dist',
     '/version-control-tools/pylib/rbmozui/dist',
+    '/version-control-tools/pylib/mozreview/dist',
 ]
 
 def newest_egg(path):

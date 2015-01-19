@@ -50,6 +50,13 @@ class reviewboard {
     cwd     => '/home/reviewboard',
   }
 
+  file { '/home/reviewboard/venv/lib/python2.7/site-packages/mozreview.pth':
+    require => Python::Virtualenv['/home/reviewboard/venv'],
+    content => '/version-control-tools/pylib/mozreview',
+    owner   => 'reviewboard',
+    group   => 'reviewboard',
+  } -> Exec['rbsetup']
+
   file { '/home/reviewboard/venv/lib/python2.7/site-packages/rbmozui.pth':
     require => Python::Virtualenv['/home/reviewboard/venv'],
     content => '/version-control-tools/pylib/rbmozui',
