@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import json
 import os
 import signal
 import socket
@@ -51,6 +52,8 @@ class MozReview(object):
         if not os.path.exists(path):
             os.mkdir(path)
 
+        self._state_path = os.path.join(path, 'state.json')
+
         docker_state = os.path.join(path, 'docker-state.json')
 
         self._docker_state = docker_state
@@ -61,8 +64,21 @@ class MozReview(object):
         if not self._docker.is_alive():
             raise Exception('Docker is not available.')
 
-    def get_bugzilla(self, url, username='admin@example.com', password='password'):
-        return Bugzilla(url, username=username, password=password)
+        self.bugzilla_username = None
+        self.bugzilla_password = None
+
+        if os.path.exists(self._state_path):
+            with open(self._state_path, 'rb') as fh:
+                state = json.load(fh)
+
+                for k, v in state.items():
+                    setattr(self, k, v)
+
+    def get_bugzilla(self, username=None, password=None):
+        username = username or self.bugzilla_username or 'admin@example.com'
+        password = password or self.bugzilla_password or 'password'
+
+        return Bugzilla(self.bugzilla_url, username=username, password=password)
 
     def start(self, bugzilla_port=None, reviewboard_port=None,
             mercurial_port=None, verbose=False, db_image=None, web_image=None):
@@ -78,8 +94,6 @@ class MozReview(object):
                 hostname=None, http_port=bugzilla_port,
                 db_image=db_image, web_image=web_image,
                 verbose=verbose)[0]
-        with open(self._bugzilla_url_path, 'wb') as fh:
-            fh.write(bugzilla_url)
 
         bugzilla = self.get_bugzilla(bugzilla_url)
 
@@ -102,6 +116,19 @@ class MozReview(object):
             fh.write(self.mercurial_url)
 
         self.mercurial_pid = mercurial_pid
+
+        state = {
+            'bugzilla_url': bugzilla_url,
+            'reviewboard_url': reviewboard_url,
+            'reviewboard_pid': reviewboard_pid,
+            'mercurial_url': self.mercurial_url,
+            'mercurial_pid': mercurial_pid,
+            'admin_username': bugzilla.username,
+            'admin_password': bugzilla.password,
+        }
+
+        with open(self._state_path, 'wb') as fh:
+            json.dump(state, fh, indent=2, sort_keys=True)
 
     def stop(self):
         """Stop all services associated with this MozReview instance."""
@@ -140,10 +167,7 @@ class MozReview(object):
         return url, rbid
 
     def create_user(self, email, password, fullname):
-        with open(self._bugzilla_url_path, 'r') as fh:
-            url = fh.read()
-
-        b = self.get_bugzilla(url)
+        b = self.get_bugzilla()
         return b.create_user(email, password, fullname)
 
     @property
@@ -157,10 +181,6 @@ class MozReview(object):
     @property
     def _hg(self):
         return os.path.join(ROOT, 'venv', 'bin', 'hg')
-
-    @property
-    def _bugzilla_url_path(self):
-        return os.path.join(self._path, 'bugzilla.url')
 
     def _start_mercurial_server(self, port):
         repos_path = os.path.join(self._path, 'repos')
