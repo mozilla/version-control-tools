@@ -104,17 +104,19 @@ def autoland_status(request_id):
 
 
 def main():
+    global DSN
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--dsn', default=DSN,
                         help='Postgresql DSN connection string')
     commandline.add_logging_group(parser)
     args = parser.parse_args()
 
-    logging.basicConfig()
+    logging.basicConfig(level=logging.INFO)
     app.logger.info('starting REST listener on port %d' % PORT)
     DSN = args.dsn
 
-    app.run(host="0.0.0.0", port=PORT, debug=True)
+    app.run(host="0.0.0.0", port=PORT, debug=False)
 
 
 if __name__ == "__main__":
