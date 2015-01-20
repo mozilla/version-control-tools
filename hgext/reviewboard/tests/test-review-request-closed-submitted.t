@@ -65,7 +65,6 @@ Squashed review request with ID 1 should be closed as submitted...
       Pull down these commits:
       
       hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/
-      
     Extra:
       p2rb: True
       p2rb.commits: [["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9", "3"]]
@@ -128,7 +127,6 @@ Squashed review request with ID 1 should be re-opened...
       Pull down these commits:
       
       hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/
-      
     Extra:
       p2rb: True
       p2rb.commits: [["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9", "3"]]

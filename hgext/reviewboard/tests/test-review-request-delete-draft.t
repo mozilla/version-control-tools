@@ -70,7 +70,6 @@ We should have a disagreement between published and draft
       Pull down this commit:
       
       hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://localhost:$HGPORT/
-      
     Extra:
       p2rb: True
       p2rb.commits: [["8c2be86a13c96ceb24c3eaa50cc6ef214c656d50", "2"]]
@@ -88,7 +87,6 @@ We should have a disagreement between published and draft
       Pull down this commit:
       
       hg pull -r c1eb968010521027f51dd6d901d92dc44bfdcd5d http://localhost:$HGPORT/
-      
     Extra:
       p2rb: True
       p2rb.commits: [["c1eb968010521027f51dd6d901d92dc44bfdcd5d", "2"]]
@@ -159,7 +157,6 @@ Discarding the parent review request draft should discard draft on children
       Pull down this commit:
       
       hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://localhost:$HGPORT/
-      
     Extra:
       p2rb: True
       p2rb.commits: [["8c2be86a13c96ceb24c3eaa50cc6ef214c656d50", "2"]]

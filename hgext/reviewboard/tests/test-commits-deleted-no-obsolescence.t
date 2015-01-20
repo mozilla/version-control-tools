@@ -119,7 +119,6 @@ Review request 6 should be added to the list of discard on publish rids.
       Pull down these commits:
       
       hg pull -r f466ed1de51670e583e11deb2f1022a342b52ccd http://localhost:$HGPORT/
-      
     Extra:
       p2rb: True
       p2rb.commits: [["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c", "3"], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", "4"], ["53b32d356f20f6730c14ec62c3706eba7e68e078", "5"], ["f466ed1de51670e583e11deb2f1022a342b52ccd", "6"]]
@@ -140,7 +139,6 @@ Review request 6 should be added to the list of discard on publish rids.
       Pull down these commits:
       
       hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/
-      
     Extra:
       p2rb: True
       p2rb.commits: [["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c", "3"], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", "4"], ["53b32d356f20f6730c14ec62c3706eba7e68e078", "5"]]
@@ -279,7 +277,6 @@ request is published.
       Pull down these commits:
       
       hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/
-      
     Extra:
       p2rb: True
       p2rb.commits: [["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c", "3"], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", "4"], ["53b32d356f20f6730c14ec62c3706eba7e68e078", "5"]]
@@ -299,7 +296,6 @@ request is published.
       Pull down these commits:
       
       hg pull -r e44f9d56a1a491868bf5b3742196896dc76fd62e http://localhost:$HGPORT/
-      
     Extra:
       p2rb: True
       p2rb.commits: [["ce44f0c4506c2e377ccfb702277cec50905be3e3", "2"], ["2879da44c7e2010282f90fcb2c1aa743038ac156", "3"], ["e44f9d56a1a491868bf5b3742196896dc76fd62e", "4"]]

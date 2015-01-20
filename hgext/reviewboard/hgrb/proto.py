@@ -288,7 +288,15 @@ def pullreviews(repo, proto, args=None):
         rr = rrs[0]
         extra_data = rr.extra_data
 
-        if 'p2rb.is_squashed' in extra_data and extra_data['p2rb.is_squashed'] == 'True':
+        try:
+            is_squashed = extra_data['p2rb.is_squashed']
+        except KeyError:
+            is_squashed = None
+
+        # 'True' in RB <= 2.0.11; True in 2.0.11+. We may have old
+        # values in the database, so keep checking for 'True' until we
+        # have a migration.
+        if is_squashed is True or is_squashed == 'True':
             if 'p2rb.commits' in extra_data:
                 commits = extra_data['p2rb.commits']
             else:
