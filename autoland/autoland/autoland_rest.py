@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import argparse
-import amqp
 import datetime
 import httplib
 import json
@@ -19,15 +18,8 @@ from mozlog.structured import (
     structuredlog,
 )
 
-import selfserve
-
 PORT = 8157
-
-
-# Some global variables that we need in the 'handle_message' callback
-auth = None
-dbconn = None
-logger = None
+DSN = 'dbname=autoland user=autoland host=localhost password=autoland'
 
 app = Flask(__name__, static_url_path='', static_folder='')
 
@@ -53,6 +45,7 @@ def autoland():
 
     """
 
+    dbconn = psycopg2.connect(DSN)
     cursor = dbconn.cursor()
 
     query = """
@@ -68,7 +61,7 @@ def autoland():
     request_id = cursor.fetchone()[0]
     dbconn.commit()
 
-    logger.info('received transplant request: %s' % json.dumps(request.json)) 
+    app.logger.info('received transplant request: %s' % json.dumps(request.json)) 
 
     result = json.dumps({'request_id': request_id})
 
@@ -82,6 +75,7 @@ def autoland():
 @app.route('/autoland/status/<request_id>')
 def autoland_status(request_id):
 
+    dbconn = psycopg2.connect(DSN)
     cursor = dbconn.cursor()
 
     query = """
@@ -110,23 +104,17 @@ def autoland_status(request_id):
 
 
 def main():
-    global dbconn
-    global logger
-
     parser = argparse.ArgumentParser()
-    dsn = 'dbname=autoland user=autoland host=localhost password=autoland'
-    parser.add_argument('--dsn', default=dsn,
+    parser.add_argument('--dsn', default=DSN,
                         help='Postgresql DSN connection string')
     commandline.add_logging_group(parser)
     args = parser.parse_args()
 
     logging.basicConfig()
-    logger = commandline.setup_logging('autoland-rest', vars(args), {})
-    logger.info('starting REST listener on port %d' % PORT)
+    app.logger.info('starting REST listener on port %d' % PORT)
+    DSN = args.dsn
 
-    dbconn = psycopg2.connect(args.dsn)
-
-    app.run(host="0.0.0.0", port=PORT, debug=False)
+    app.run(host="0.0.0.0", port=PORT, debug=True)
 
 
 if __name__ == "__main__":
