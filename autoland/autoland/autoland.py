@@ -254,7 +254,7 @@ def handle_pending_mozreview_updates(logger, dbconn):
 
     updated = []
     for transplant_id, review_request_id, result in cursor.fetchall():
-        if mozreview.update_review(mozreview_auth, review_request_id, result):
+        if mozreview.update_review(mozreview_auth, review_request_id, result) and mozreview.publish_review(mozreview_auth, review_request_id):
             updated.append(transplant_id)
 
     if updated:
