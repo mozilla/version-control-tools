@@ -255,11 +255,11 @@ class Docker(object):
         images = self.state['images']
         db_image = self.ensure_built('bmodb-volatile', verbose=verbose)
         web_image = self.ensure_built('bmoweb', verbose=verbose)
-        rbweb_image = self.ensure_built('rbweb', verbose=verbose, add_vct=True)
+        #rbweb_image = self.ensure_built('rbweb', verbose=verbose, add_vct=True)
 
         self.state['last-db-id'] = db_image
         self.state['last-web-id'] = web_image
-        self.state['last-rbweb-id'] = rbweb_image
+        #self.state['last-rbweb-id'] = rbweb_image
 
         # The keys for the bootstrapped images are derived from the base
         # images they depend on. This means that if we regenerate a new
@@ -267,8 +267,8 @@ class Docker(object):
         db_bootstrapped_key = 'bmodb-bootstrapped:%s' % db_image
         web_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (
                 db_image, web_image)
-        rbweb_bootstrapped_key = 'rbweb-bootstrapped:%s:%s' % (db_image,
-                rbweb_image)
+        #rbweb_bootstrapped_key = 'rbweb-bootstrapped:%s:%s' % (db_image,
+        #        rbweb_image)
 
         have_db = db_bootstrapped_key in images
         have_web = web_bootstrapped_key in images
@@ -291,7 +291,7 @@ class Docker(object):
 
         web_id = self.client.create_container(web_image,
                 environment=web_environ)['Id']
-        rbweb_id = self.client.create_container(rbweb_image)['Id']
+        #rbweb_id = self.client.create_container(rbweb_image)['Id']
 
         with self._start_container(db_id) as db_state:
             web_params = {
@@ -312,7 +312,7 @@ class Docker(object):
 
         db_unique_id = str(uuid.uuid1())
         web_unique_id = str(uuid.uuid1())
-        rbweb_unique_id = str(uuid.uuid1())
+        #rbweb_unique_id = str(uuid.uuid1())
 
         print('committing bootstrapped images')
 
