@@ -627,6 +627,8 @@ class Test(unittest.TestCase):
             (r':%s\b' % self._startport, ':$HGPORT'),
             (r':%s\b' % (self._startport + 1), ':$HGPORT1'),
             (r':%s\b' % (self._startport + 2), ':$HGPORT2'),
+            (r':%s\b' % (self._startport + 3), ':$HGPORT3'),
+            (r':%s\b' % (self._startport + 4), ':$HGPORT4'),
             (r'(?m)^(saved backup bundle to .*\.hg)( \(glob\))?$',
              r'\1 (glob)'),
             ]
@@ -649,6 +651,8 @@ class Test(unittest.TestCase):
         env["HGPORT"] = str(self._startport)
         env["HGPORT1"] = str(self._startport + 1)
         env["HGPORT2"] = str(self._startport + 2)
+        env["HGPORT3"] = str(self._startport + 3)
+        env["HGPORT4"] = str(self._startport + 4)
         env["HGRCPATH"] = os.path.join(self._threadtmp, '.hgrc')
         env["DAEMON_PIDS"] = os.path.join(self._threadtmp, 'daemon.pids')
         env["HGEDITOR"] = ('"' + sys.executable + '"'
@@ -1770,7 +1774,7 @@ class TestRunner(object):
                        keeptmpdir=self.options.keep_tmpdir,
                        debug=self.options.debug,
                        timeout=self.options.timeout,
-                       startport=self.options.port + count * 3,
+                       startport=self.options.port + count * 5,
                        extraconfigopts=self.options.extra_config_opt,
                        py3kwarnings=self.options.py3k_warnings,
                        shell=self.options.shell)
