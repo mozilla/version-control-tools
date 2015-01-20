@@ -3,6 +3,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rbbz.auth import BugzillaBackend
+
+from django.conf import settings
 from reviewboard.accounts.backends import get_enabled_auth_backends
 
 
@@ -45,4 +47,13 @@ class BugzillaCookieAuthMiddleware(object):
 
         request.session['Bugzilla_login'] = bzlogin
         request.session['Bugzilla_logincookie'] = bzcookie
+        return response
+
+
+class CorsHeaderMiddleware(object):
+    """Add a CORS header if running in debug mode."""
+
+    def process_response(self, request, response):
+        if settings.DEBUG:
+            response['Access-Control-Allow-Origin'] = '*'
         return response

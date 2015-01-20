@@ -14,7 +14,7 @@ from djblets.util.decorators import simple_decorator
 
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import AuthBackendHook, SignalHook
-from reviewboard.reviews.errors import PermissionError, PublishError
+from reviewboard.reviews.errors import PublishError
 from reviewboard.reviews.models import (ReviewRequest,
                                         ReviewRequestDraft)
 from reviewboard.reviews.signals import (reply_publishing,
@@ -30,7 +30,8 @@ from rbbz.diffs import build_plaintext_review
 from rbbz.errors import (BugzillaError,
                          ConfidentialBugError,
                          InvalidBugIdError)
-from rbbz.middleware import BugzillaCookieAuthMiddleware
+from rbbz.middleware import (BugzillaCookieAuthMiddleware,
+                             CorsHeaderMiddleware)
 from rbbz.models import (BugzillaUserMap,
                          get_or_create_bugzilla_users)
 from rbbz.resources import bugzilla_cookie_login_resource
@@ -64,7 +65,7 @@ DRAFTED_EXTRA_DATA_KEYS = [
 
 
 class BugzillaExtension(Extension):
-    middleware = [BugzillaCookieAuthMiddleware]
+    middleware = [BugzillaCookieAuthMiddleware, CorsHeaderMiddleware]
 
     resources = [
         bugzilla_cookie_login_resource,
