@@ -20,7 +20,7 @@ setup(
     ],
     entry_points={
         'reviewboard.extensions':
-            '%s = mozreview.extension:MozReviewExtension' % PACKAGE_NAME,
+            '%s = mozreview.extension:MozReviewExtension' % 'mozreview',
     },
     package_data={
         'mozreview': [
