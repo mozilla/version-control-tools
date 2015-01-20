@@ -13,8 +13,8 @@ class TestAutoland(unittest.TestCase):
 
     def clear_database(self):
         cursor = self.dbconn.cursor()
-        cursor.execute('delete from Autoland')
-        cursor.execute('delete from BugzillaComment')
+        cursor.execute('delete from Testrun')
+        cursor.execute('delete from Transplant')
         self.dbconn.commit()
 
     def setUp(self):
@@ -25,53 +25,6 @@ class TestAutoland(unittest.TestCase):
 
     def tearDown(self):
         self.dbconn.close()
-
-    def test_handle_insufficient_permissions(self):
-        tree = 'try'
-        rev = 'a revision'
-        bugid = '1'
-        blame = 'cthulhu@mozilla.com'
-
-        cursor = self.dbconn.cursor()
-        query = """insert into Autoland(tree, revision)
-                   values(%s, %s)"""
-        cursor.execute(query, (tree, rev))
-        self.dbconn.commit()
-
-        autoland.handle_insufficient_permissions(self.logger, self.dbconn,
-                                                 tree, rev, bugid, blame)
-
-        query = """select can_be_landed, last_updated from Autoland
-                   where tree=%s and revision=%s"""
-        cursor.execute(query, (tree, rev))
-        can_be_landed, last_updated = cursor.fetchone()
-        self.assertEqual(can_be_landed, False)
-        self.assertIsNotNone(last_updated)
-
-    def test_add_bugzilla_comment(self):
-        autoland.add_bugzilla_comment(self.dbconn, '1', 'a comment')
-
-        cursor = self.dbconn.cursor()
-        cursor.execute('select bugid, bug_comment from bugzillacomment')
-        bugid, bug_comment = cursor.fetchone()
-        self.assertEqual(bugid, 1, 'bugid does not match')
-        self.assertEqual(bug_comment, 'a comment',
-                         'bug comment does not match')
-
-        self.clear_database()
-        for i in xrange(0, 10):
-            autoland.add_bugzilla_comment(self.dbconn, '1', 'comment %s' % i)
-        cursor.execute('select bugid, bug_comment from bugzillacomment')
-        self.assertEqual(cursor.rowcount, 10,
-                         'could not create multiple comments for same bug')
-
-    def test_extract_bugid(self):
-        with open('test-data/comments.json') as f:
-            comments = json.load(f)
-            for comment in comments:
-                bugid = autoland.extract_bugid(comment['comment'])
-                self.assertEqual(bugid, comment['bugid'], '%s should match %s'
-                                 % (bugid, comment['bugid']))
 
 
 if __name__ == '__main__':

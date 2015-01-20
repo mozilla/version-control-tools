@@ -1,26 +1,28 @@
 alter user autoland with password 'autoland';
 
-create table Autoland (
+create table Testrun (
     tree varchar(20),
     revision varchar(40),
-    bugid integer,
-    blame varchar(120),
     pending integer,
     running integer,
     builds integer,
-    last_updated timestamp,
     can_be_landed boolean,
-    landed boolean,
-    transplant_result text,
+    last_updated timestamp,
     primary key(tree, revision)
 );
-grant all privileges on table Autoland to autoland;
+grant all privileges on table Testrun to autoland;
 
-create table BugzillaComment (
-    sequence bigserial,
-    bugid integer,
-    bug_comment text,
-    primary key(sequence)
+create table Transplant (
+    id bigserial,
+    tree varchar(20),
+    rev varchar(40),
+    destination varchar(20),
+    trysyntax text,
+    landed boolean,
+    result text,
+    review_request_id bigint,
+    review_updated boolean,
+    primary key(id)
 );
-grant all privileges on table BugzillaComment to autoland;
-grant usage, select on sequence bugzillacomment_sequence_seq to autoland;
+grant all privileges on table Transplant to autoland;
+grant usage, select on sequence transplant_id_seq to autoland;

@@ -77,7 +77,11 @@ def job_is_done(auth, branch, rev):
     if r.status_code == 200:
         soup = bs4.BeautifulSoup(r.text)
         return json.loads(soup.text)
-
+    elif r.status_code == 404:
+        soup = bs4.BeautifulSoup(r.text)
+        pre = soup.find('pre')
+        if pre:
+            return json.loads(pre.text)
 
 def build_info(auth, branch, build_id):
     try:

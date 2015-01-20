@@ -1,20 +1,56 @@
 import json
+import re
 import requests
+import subprocess
 
-TRANSPLANT_URL = 'http://50.18.255.25:8010'
+HGMO_REXP = 'https://hg.mozilla.org/try/rev/(\w+)'
+REPO_CONFIG = {}
 
 
-def transplant(src, dest, changesets):
-    """Transplant changesets from src to dest"""
-    url = TRANSPLANT_URL + '/transplant/'
-    headers = {'Content-Type': 'application/json'}
-    data = {
-        'src': src,
-        'dst': dest,
-        'items': [{'commit': changeset} for changeset in changesets]
-    }
-    try:
-        r = requests.post(url, data=json.dumps(data), headers=headers)
-    except requests.exceptions.ConnectionError:
-        return
-    return json.loads(r.text)
+def transplant_to_try(tree, rev, trysyntax):
+
+    """ This assumes that the repo has a bookmark for the head revision
+        called 'central' and that the .hg/hgrc config contains links to
+        the try and mozreview repos"""
+
+    global REPO_CONFIG
+
+    if not REPO_CONFIG:
+        with open('repo-config.json') as f:
+            REPO_CONFIG = json.load(f)
+
+    landed = False
+    result = ''
+
+    cmds = [['hg', 'update', '--clean'],
+            ['hg', 'update', 'central'],
+            ['hg', 'pull', 'mozreview', '-r', rev],
+            ['hg', 'bookmark', '-r', rev, 'transplant'],
+            ['hg', 'update', 'transplant'],
+            ['hg', 'qpop', '--all'],
+            ['hg', 'qdelete', 'try'],
+            ['hg', 'qnew', 'try'],
+            ['hg', 'qrefresh', '-m', '"' + trysyntax + '"'],
+            ['hg', 'push', '-r', '.', '-f', 'try'],
+            ['hg', 'qpop'],
+            ['hg', 'qdelete', 'try'],
+            ['hg', 'update', 'central'],
+            ['hg', 'bookmark', '--delete', 'transplant']]
+
+    for cmd in cmds:
+        try:
+            repo_path = REPO_CONFIG.get(tree, '.')
+            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT,
+                                             cwd=repo_path)
+            m = re.search(HGMO_REXP, output)
+            if m:
+                landed = True
+                result = m.groups()[0]
+            #TODO: this should be logged, somewhere
+        except subprocess.CalledProcessError as e:
+            # in normal circumstances we expect this mq error on delete
+            if 'abort: patch try not in series' not in e.output:
+                result = e.output
+                break
+
+    return landed, result

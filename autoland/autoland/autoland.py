@@ -3,6 +3,7 @@ import argparse
 import datetime
 import json
 import logging
+import mozreview
 import psycopg2
 import re
 import requests
@@ -17,145 +18,119 @@ from mozlog.structured import (
     structuredlog,
 )
 
-import bugzilla
 import mercurial
 import mozilla_ldap
 import selfserve
 import transplant
 
-BUGZILLA_COMMENT_LIMIT = 10  # max comments to post / iteration
+MOZREVIEW_COMMENT_LIMIT = 10  # max updates to post to reviewboard / iteration
+
+# this should exceed the stable delay in buildapi
+STABLE_DELAY = datetime.timedelta(minutes=5)
+OLD_JOB = datetime.timedelta(minutes=30)
 
 
-def extract_bugid(patch):
-    #TODO: check to see if there is an "official" re for this
-    bugid = re.compile('[Bb]ug (\d+)')
-    m = re.search(bugid, patch)
-    if m:
-        return m.groups()[0]
+def handle_pending_transplants(logger, dbconn):
+    cursor = dbconn.cursor()
+
+    query = """
+        select id,tree,rev,destination,trysyntax from Transplant
+        where landed is null
+    """
+    cursor.execute(query)
+
+    landed_revisions = []
+    for row in cursor.fetchall():
+        transplant_id, tree, rev, destination, trysyntax = row
+
+        if destination == 'try':
+            landed, result = transplant.transplant_to_try(tree, rev, trysyntax)
+            if landed:
+                logger.info('transplanted from tree: %s rev: %s to destination: %s new revision: %s' %
+                        (tree, rev, destination, result))
+
+                query = """
+                    insert into Testrun(tree,revision,last_updated)
+                    values(%s,%s,%s)
+                """
+                cursor.execute(query, ('try', result, datetime.datetime.now()))
+
+            else:
+                logger.info('transplant failed: tree: %s rev: %s destination: %s error: %s' %
+                        (tree, rev, destination, result))
+
+
+
+        else:
+            #TODO, we're only landing to try at the moment
+            pass
+
+        landed_revisions.append([landed, result, transplant_id])
+
+    if landed_revisions:
+        query = """
+            update Transplant set landed=%s,result=%s
+            where id=%s
+        """
+        cursor.executemany(query, landed_revisions)
+        dbconn.commit()
 
 
 def handle_single_failure(logger, auth, dbconn, tree, rev, buildername,
                           build_id):
-    logger.debug('autoland request %s %s needs to retry job for %s' %
+    """Retrigger a job for a testrun."""
+
+    logger.debug('testrun request %s %s needs to retry job for %s' %
                  (tree, rev, buildername))
     job_id = selfserve.rebuild_job(auth, tree, build_id)
     if job_id:
-        logger.info('submitted rebuild request %s for autoland job %s %s' %
+        logger.info('submitted rebuild request %s for testrun job %s %s' %
                     (job_id, tree, rev))
         cursor = dbconn.cursor()
         query = """
-            update Autoland set last_updated=%s
+            update Testrun set last_updated=%s
             where tree=%s and revision=%s
         """
         cursor.execute(query, (datetime.datetime.now(), tree, rev))
         dbconn.commit()
     else:
-        logger.info('could not rebuild %s for autoland job %s %s' %
+        logger.info('could not rebuild %s for testrun job %s %s' %
                     (build_id, tree, rev))
 
 
-def handle_insufficient_permissions(logger, dbconn, tree, rev, bugid, blame):
-    cursor = dbconn.cursor()
-    query = """
-        update Autoland set can_be_landed=false, last_updated=%s
-        where tree=%s and revision=%s
-    """
-    cursor.execute(query, (datetime.datetime.now(), tree, rev))
-    dbconn.commit()
+def handle_failure(logger, dbconn, tree, rev, buildernames):
+    """Mark testrun as not landable"""
 
-    comment = """Autoland request failed.
-                 User %s has insufficient permissions to land on tree %s."""
-    add_bugzilla_comment(dbconn, bugid, comment % (blame, tree))
-
-
-def handle_failure(logger, dbconn, tree, rev, bugid, buildernames):
-    logger.info('autoland request %s %s has too many failures for %s' %
+    logger.info('testrun %s %s has too many failures for %s' %
                 (tree, rev, ', '.join(buildernames)))
 
     cursor = dbconn.cursor()
     query = """
-        update Autoland set can_be_landed=FALSE,last_updated=%s
+        update Testrun set can_be_landed=FALSE,last_updated=%s
         where tree=%s and revision=%s
     """
     cursor.execute(query, (datetime.datetime.now(), tree, rev))
     dbconn.commit()
-
-    #TODO: add treeherder/tbpl link for job
-    comment = """Autoland request failed. Too many failures for %s."""
-    add_bugzilla_comment(dbconn, bugid, comment % ', '.join(buildernames))
 
 
 def handle_can_be_landed(logger, dbconn, tree, rev):
-    logger.info('autoland request %s %s can be landed' % (tree, rev))
+    """Mark testrun as landable."""
+
+    logger.info('testrun %s %s can be landed' % (tree, rev))
     cursor = dbconn.cursor()
     query = """
-        update Autoland set can_be_landed=true,last_updated=%s
+        update Testrun set can_be_landed=true,last_updated=%s
         where tree=%s and revision=%s
     """
     cursor.execute(query, (datetime.datetime.now(), tree, rev))
     dbconn.commit()
 
 
-def handle_pending_transplants(logger, dbconn):
-    cursor = dbconn.cursor()
-    query = """
-        select tree,revision,bugid from Autoland
-        where can_be_landed is true and landed is null
-    """
-    cursor.execute(query)
+def check_testrun(logger, auth, dbconn, tree, rev):
+    """Check an individual testrun and see if jobs need to be retriggered
+       or we can mark it as complete """
 
-    landed = []
-    for row in cursor.fetchall():
-        tree, rev, bugid = row
-
-        pushlog = mercurial.get_pushlog(tree, rev)
-        if not pushlog:
-            logger.debug('could not get pushlog for tree: %s rev %s' %
-                        (tree, rev))
-            return
-
-        changesets = []
-        for key in pushlog:
-            for changeset in pushlog[key]['changesets']:
-                # we assume by convention head revision is empty and should
-                # not be landed
-                if changeset != rev:
-                    changesets.append(changeset)
-
-        # TODO: allow for transplant to other trees than 'mozilla-inbound'
-        result = transplant.transplant(tree, 'mozilla-inbound', changesets)
-
-        if not result:
-            logger.debug("""could not connect to transplant server:
-                            tree: %s rev %s""" % (tree, rev))
-            continue
-
-        if 'error' in result:
-            succeeded = False
-            logger.info('transplant failed: tree: %s rev: %s error: %s' %
-                        (tree, rev, json.dumps(result)))
-            comment = 'Autoland request failed: could not transplant: %s'
-            add_bugzilla_comment(dbconn, bugid, comment % result['error'])
-        else:
-            succeeded = True
-            comment = 'Autoland request succeeded: mozilla-inbound tip: %s'
-            add_bugzilla_comment(dbconn, bugid, comment % result['tip'])
-
-        landed.append([succeeded, json.dumps(result), datetime.datetime.now(),
-                      tree, rev])
-
-    if landed:
-        query = """
-            update Autoland set landed=%s,transplant_result=%s,last_updated=%s
-            where tree=%s and revision=%s
-        """
-        cursor.executemany(query, landed)
-        dbconn.commit()
-
-
-def handle_autoland_request(logger, auth, dbconn, tree, rev):
-
-    logger.info('looking at autoland request %s %s' % (tree, rev))
+    logger.info('looking at testrun %s %s' % (tree, rev))
 
     status = selfserve.job_is_done(auth, tree, rev)
     if not status:
@@ -163,67 +138,26 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         return
 
     cursor = dbconn.cursor()
-    if not status['job_complete']:
-        logger.debug('autoland request %s %s job not complete' % (tree, rev))
-        # update pending so we won't look at this job again
-        # until we get another update over pulse
+    if 'status' in status and status['status'] == 'FAILED':
+        logger.debug('testrun %s %s is unknown' % (tree, rev))
         query = """
-            update Autoland set pending=null,last_updated=%s
+            update Testrun set can_be_landed=FALSE,last_updated=%s
             where tree=%s and revision=%s
         """
         cursor.execute(query, (datetime.datetime.now(), tree, rev))
         dbconn.commit()
         return
 
-    query = """
-        select bugid, blame from Autoland
-        where tree=%s and revision=%s
-    """
-    cursor.execute(query, (tree, rev))
-    bugid, blame = cursor.fetchone()
-
-    # determine bugid if necessary
-    if bugid is None:
-        pushlog = mercurial.get_pushloghtml(tree, rev)
-        if not pushlog:
-            logger.debug('could not get pushlog for tree: %s rev %s' %
-                         (tree, rev))
-            return
-        bugid = extract_bugid(pushlog)
-
-        if bugid is None:
-            logger.debug('autoland failed: no bugid for tree: %s rev: %s' %
-                         (tree, rev))
-
-            query = """
-                update Autoland set can_be_landed=false,last_updated=%s
-                where tree=%s and revision=%s
-            """
-            cursor.execute(query, (datetime.datetime.now(), tree, rev))
-            dbconn.commit()
-        else:
-            logger.debug('bugid for tree: %s rev: %s is: %s' %
-                         (tree, rev, bugid))
-
-            query = """
-                update Autoland set bugid=%s,last_updated=%s
-                where tree=%s and revision=%s
-            """
-            cursor.execute(query, (bugid, datetime.datetime.now(), tree, rev))
-            dbconn.commit()
-
-    # check ldap group
-    blame = blame.strip('{}')
-    result = mozilla_ldap.check_group(mozilla_ldap.read_credentials(),
-                                      'scm_level_3', blame)
-    if result is None:
-        # can't check credentials right now, we'll try again later
-        logger.info('could not check ldap group')
-        return
-
-    if not result:
-        handle_insufficient_permissions(logger, dbconn, tree, rev, bugid,
-                                        blame)
+    if not status['job_complete']:
+        logger.debug('testrun %s %s job not complete' % (tree, rev))
+        # update pending so we won't look at this job again
+        # until we get another update over pulse
+        query = """
+            update Testrun set pending=null,last_updated=%s
+            where tree=%s and revision=%s
+        """
+        cursor.execute(query, (datetime.datetime.now(), tree, rev))
+        dbconn.commit()
         return
 
     # everything passed, so we can land
@@ -238,7 +172,7 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
 
     if len(pending) > 0 or len(running) > 0:
         query = """
-            update Autoland set pending=%s,running=%s,builds=%s,last_updated=%s
+            update Testrun set pending=%s,running=%s,builds=%s,last_updated=%s
             where tree=%s and revision=%s
         """
         cursor.execute(query, (len(pending), len(running), len(builds),
@@ -271,14 +205,13 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         if len(fails) == 1 and not passes:
             build_id = fails[0]['build_id']
             single_failures.append((builder, build_id))
-        elif len(fails) == 2:
+        elif len(fails) >= 2:
             build_id = fails[0]['build_id']
             double_failures.append(builder)
 
     # if there are double failures, the autoland request has failed
     if double_failures:
-        return handle_failure(logger, dbconn, tree, rev, bugid,
-                              double_failures)
+        return handle_failure(logger, dbconn, tree, rev, double_failures)
 
     # single failures need to be retried
     for failure in single_failures:
@@ -291,37 +224,46 @@ def handle_autoland_request(logger, auth, dbconn, tree, rev):
         return handle_can_be_landed(logger, dbconn, tree, rev)
 
 
-def add_bugzilla_comment(dbconn, bugid, comment):
+def monitor_testruns(logger, auth, dbconn):
+    """ Find testruns to examine for completion """
+
     cursor = dbconn.cursor()
-    query = """insert into BugzillaComment(bugid, bug_comment)
-               values(%s, %s)"""
-    cursor.execute(query, (bugid, comment))
-    dbconn.commit()
 
-
-def handle_pending_bugzilla_comments(logger, dbconn):
-    cursor = dbconn.cursor()
-    query = """select sequence, bugid, bug_comment from BugzillaComment
-               order by sequence limit %(limit)s"""
-    cursor.execute(query, {'limit': BUGZILLA_COMMENT_LIMIT})
-
-    token = bugzilla.login()
-    if not token:
-        logger.debug('bugzilla authentication failure')
-        return
-
-    to_delete = []
+    # handle potentially finished test runs
+    now = datetime.datetime.now()
+    query = """select tree,revision from Testrun
+               where ((pending=0 and running=0 and last_updated<=%(time)s)
+               or last_updated<=%(old)s)
+               and can_be_landed is null"""
+    cursor.execute(query, ({'time': now - STABLE_DELAY, 'old': now - OLD_JOB}))
     for row in cursor.fetchall():
-        sequence, bugid, comment = row
-        bugid = str(bugid)
-        result = bugzilla.add_comment(token, bugid, comment)
-        if not result:
-            logger.debug('could not post bugzilla comment to bug %s' % bugid)
-        to_delete.append([sequence])
+        tree, rev = row
+        check_testrun(logger, auth, dbconn, tree, rev)
 
-    query = """delete from BugzillaComment where sequence = %s"""
-    cursor.executemany(query, to_delete)
-    dbconn.commit()
+
+def handle_pending_mozreview_updates(logger, dbconn):
+    """Attempt to post updates to mozreview"""
+
+    cursor = dbconn.cursor()
+    query = """select id, review_request_id, result from Transplant
+               where landed=TRUE and review_updated=FALSE
+               order by id limit %(limit)s"""
+    cursor.execute(query, {'limit': MOZREVIEW_COMMENT_LIMIT})
+
+    mozreview_auth = mozreview.read_credentials()
+
+    updated = []
+    for transplant_id, review_request_id, result in cursor.fetchall():
+        if mozreview.update_review(mozreview_auth, review_request_id, result):
+            updated.append(transplant_id)
+
+    if updated:
+        query = """
+            update Transplant set review_updated=TRUE
+            where id=%s
+        """
+        cursor.executemany(query, updated)
+        dbconn.commit()
 
 
 def main():
@@ -343,42 +285,12 @@ def main():
 
     dbconn = psycopg2.connect(args.dsn)
 
-    # this should exceed the stable delay in buildapi
-    stable_delay = datetime.timedelta(minutes=5)
-    old_job = datetime.timedelta(minutes=30)
-
     while True:
         try:
-            cursor = dbconn.cursor()
-            now = datetime.datetime.now()
-
-            # handle potentially finished autoland jobs
-            query = """select tree,revision from Autoland
-                       where pending=0 and running=0 and last_updated<=%(time)s
-                       and can_be_landed is null"""
-            cursor.execute(query, ({'time': now - stable_delay}))
-            for row in cursor.fetchall():
-                tree, rev = row
-                handle_autoland_request(logger, auth, dbconn, tree, rev)
-
-            # we also look for any older jobs - maybe something got missed
-            # in pulse
-            query = """select tree,revision from Autoland
-                       where last_updated<=%(time)s
-                       and can_be_landed is null"""
-            cursor.execute(query, ({'time': now - old_job}))
-            for row in cursor.fetchall():
-                tree, rev = row
-                handle_autoland_request(logger, auth, dbconn, tree, rev)
-
-            #
-            handle_pending_bugzilla_comments(logger, dbconn)
-
-            #
+            monitor_testruns(logger, auth, dbconn)
             handle_pending_transplants(logger, dbconn)
-
+            handle_pending_mozreview_updates(logger, dbconn)
             time.sleep(30)
-
         except KeyboardInterrupt:
             break
         except:

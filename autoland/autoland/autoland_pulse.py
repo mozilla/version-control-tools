@@ -27,22 +27,24 @@ dbconn = None
 logger = None
 message_log_path = None
 
+REV_LENGTH = 12
+
 
 def read_credentials():
     user, passwd = open('credentials/pulse.txt').read().strip().split(',')
     return (user, passwd)
 
 
-def is_known_autoland_job(dbconn, tree, rev):
+def is_known_testrun(dbconn, tree, rev):
     cursor = dbconn.cursor()
 
-    # see if we know already know about this autoland request
-    query = """select revision from Autoland
+    query = """select revision from Testrun
                where tree=%(tree)s
                and substring(revision, 0, %(len)s)=%(rev)s"""
     cursor.execute(query, {'tree': tree,
-                           'len': len(rev) + 1,
-                           'rev': rev})
+                           'len': REV_LENGTH + 1,
+                           'rev': rev[:REV_LENGTH]})
+
     row = cursor.fetchone()
     return row is not None
 
@@ -57,74 +59,37 @@ def handle_message(data, message):
         with open(message_log_path, 'a') as f:
             json.dump(data, f, indent=2, sort_keys=True)
 
-    if key.find('started') != -1:
-        blame = payload['build']['blame']
+    rev = None
+    tree = None
+    for prop in payload['build']['properties']:
+        if prop[0] == 'revision':
+            rev = prop[1]
+        elif prop[0] == 'branch':
+            tree = prop[1]
 
-        tree = None
-        rev = None
-        autoland = False
-        for prop in payload['build']['properties']:
-            if prop[0] == 'revision':
-                rev = prop[1]
-            elif prop[0] == 'branch':
-                tree = prop[1]
-        try:
-            for change in payload['build']['sourceStamp']['changes']:
-                comments = change['comments']
-                if comments.find('--autoland') > -1:
-                    autoland = True
-        except KeyError:
-            pass
+    if tree and rev and is_known_testrun(dbconn, tree, rev):
+        logger.info('updating testrun: %s %s' % (tree, rev))
 
-        if autoland:
-            logger.info('found autoland job: %s %s' % (tree, rev))
+        pending, running, builds = selfserve.jobs_for_revision(auth,
+                                                               tree,
+                                                               rev)
 
-            if is_known_autoland_job(dbconn, tree, rev):
-                return
+        npending = len(pending)
+        nrunning = len(running)
+        nbuilds = len(builds)
+        logger.info('pending: %d running: %d builds: %d' %
+                    (npending, nrunning, nbuilds))
 
-            logger.info('found new autoland job')
-
-            # insert into database
-            query = """
-                insert into Autoland(tree,revision,blame,last_updated)
-                values(%s,%s,%s,%s)
-            """
-            cursor = dbconn.cursor()
-            cursor.execute(query, (tree, rev, blame, datetime.datetime.now()))
-            dbconn.commit()
-    elif key.find('finished') != -1:
-        rev = None
-        tree = None
-        for prop in payload['build']['properties']:
-            if prop[0] == 'revision':
-                rev = prop[1]
-            elif prop[0] == 'branch':
-                tree = prop[1]
-
-        if tree and rev:
-            if is_known_autoland_job(dbconn, tree, rev):
-                logger.info('updating autoland job: %s %s' % (tree, rev))
-
-                pending, running, builds = selfserve.jobs_for_revision(auth,
-                                                                       tree,
-                                                                       rev)
-
-                npending = len(pending)
-                nrunning = len(running)
-                nbuilds = len(builds)
-                logger.info('pending: %d running: %d builds: %d' %
-                            (npending, nrunning, nbuilds))
-
-                query = """
-                    update Autoland set pending=%s,
-                        running=%s,builds=%s,last_updated=%s
-                    where tree=%s
-                    and substring(revision, 0, %s)=%s"""
-                cursor = dbconn.cursor()
-                cursor.execute(query, (npending, nrunning, nbuilds,
-                               datetime.datetime.now(), tree,
-                               len(rev) + 1, rev))
-                dbconn.commit()
+        query = """
+            update Testrun set pending=%s,
+                running=%s,builds=%s,last_updated=%s
+            where tree=%s
+            and substring(revision, 0, %s)=%s"""
+        cursor = dbconn.cursor()
+        cursor.execute(query, (npending, nrunning, nbuilds,
+                       datetime.datetime.now(), tree,
+                       REV_LENGTH + 1, rev[:REV_LENGTH]))
+        dbconn.commit()
 
 
 def main():
