@@ -554,6 +554,7 @@ $(document).ready(function() {
 
           rootEditor.setDraftField(EPOCH_KEY, self.epoch, {
             fieldID: EPOCH_KEY,
+            jsonFieldName: EPOCH_KEY,
             useExtraData: true,
             success: function() {
               console.log("Root review request epoch has been set to " + self.epoch);
