@@ -28,7 +28,8 @@ If nothing defined, we get prompted for username and password
   $ hg --config ui.interactive=true bzauth --fakegetpass fakepass << EOF
   > user-i
   > EOF
-  Bugzilla username: Bugzilla password: userid: None
+  Bugzilla username: user-i
+  Bugzilla password: userid: None
   cookie: None
   username: user-i
   password: fakepass
@@ -75,7 +76,8 @@ If just password in config, we get prompted for username
   $ hg --config bugzilla.password=pass1 bzauth --config ui.interactive=true << EOF
   > justpass
   > EOF
-  Bugzilla username: userid: None
+  Bugzilla username: justpass
+  userid: None
   cookie: None
   username: justpass
   password: pass1

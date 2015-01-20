@@ -44,7 +44,7 @@ No bug is rejected
 
   $ hg strip -r .
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b648292ceed8-backup.hg
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b648292ceed8-backup.hg (glob)
 
 Bug XYZ syntax is accepted
 

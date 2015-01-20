@@ -105,7 +105,7 @@ Add file (tracked extension, inside expected path), wrong commit message, should
 Amend commit message to use correct keyword, should work
 
   $ hg commit --amend -m "Commit .dtd files inside l10n path, l10n=foo"
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b4d6fed5f917-amend-backup.hg
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b4d6fed5f917-amend-backup.hg (glob)
   $ hg push ../server
   pushing to ../server
   searching for changes
@@ -156,7 +156,7 @@ Delete a file and commit without the correct keyword, should fail
   [255]
 
   $ hg commit --amend -m "Remove .dtd file inside l10n path, l10n=foo"
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b6536c318948-amend-backup.hg
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b6536c318948-amend-backup.hg (glob)
   $ hg push ../server
   pushing to ../server
   searching for changes
@@ -214,7 +214,7 @@ Same edit of a tracked file after release uplift, should fail
 Message check should be case insensitive
 
   $ hg commit --amend -m "Remove .dtd file inside l10n path, L10n=foo"
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/9e4abad50792-amend-backup.hg
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/9e4abad50792-amend-backup.hg (glob)
   $ echo "DTD file #1" >> browser/locales/en-US/test.dtd
   $ hg commit -m 'Change DTD file, l10N='
   $ hg push ../server
