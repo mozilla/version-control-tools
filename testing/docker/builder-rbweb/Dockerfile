@@ -14,7 +14,7 @@ RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 reviewboard
 
 RUN apt-get update && apt-get -y install \
   apache2 curl libapache2-mod-wsgi libmysqlclient-dev libxslt1-dev \
-  mysql-client nodejs node-uglify npm \
+  mercurial mysql-client nodejs node-uglify npm \
   python2.7-dev python3-mysql.connector
 
 # Needed to make some Node and RBMozUI packaging happy, sadly.
