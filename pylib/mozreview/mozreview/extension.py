@@ -11,8 +11,10 @@ class MozReviewExtension(Extension):
     default_settings = {
         'enabled': False,
         'pulse_host': '',
+        'pulse_port': '',
         'pulse_user': '',
         'pulse_password': '',
+        'pulse_ssl': False,
     }
 
     is_configurable = True

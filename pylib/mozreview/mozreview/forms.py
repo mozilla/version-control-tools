@@ -11,6 +11,8 @@ class MozReviewSettingsForm(SettingsForm):
         widget=forms.TextInput(attrs={
             'size': 100,
         }))
+    pulse_port = forms.IntegerField(required=False)
+    pulse_ssl = forms.BooleanField(required=False)
     pulse_user = forms.CharField(required=False)
     pulse_password = forms.CharField(required=False, widget=forms.PasswordInput)
 
