@@ -81,7 +81,8 @@ class MozReview(object):
         return Bugzilla(self.bugzilla_url, username=username, password=password)
 
     def start(self, bugzilla_port=None, reviewboard_port=None,
-            mercurial_port=None, verbose=False, db_image=None, web_image=None):
+            mercurial_port=None, pulse_port=None, verbose=False,
+            db_image=None, web_image=None, pulse_image=None):
         """Start a MozReview instance."""
         if not bugzilla_port:
             bugzilla_port = get_available_port()
@@ -89,16 +90,21 @@ class MozReview(object):
             reviewboard_port = get_available_port()
         if not mercurial_port:
             mercurial_port = get_available_port()
+        if not pulse_port:
+            pulse_port = get_available_port()
 
-        bugzilla_url = self._docker.start_mozreview(cluster=self._name,
-                hostname=None, http_port=bugzilla_port,
+        mr_info = self._docker.start_mozreview(cluster=self._name,
+                hostname=None, http_port=bugzilla_port, pulse_port=pulse_port,
                 db_image=db_image, web_image=web_image,
-                verbose=verbose)[0]
+                pulse_image=pulse_image, verbose=verbose)
+
+        bugzilla_url = mr_info['bugzilla_url']
 
         self.bugzilla_url = bugzilla_url
         bugzilla = self.get_bugzilla()
 
-        rb = MozReviewBoard(self._path, bugzilla_url=bugzilla_url)
+        rb = MozReviewBoard(self._path, bugzilla_url=bugzilla_url,
+            pulse_host=mr_info['pulse_host'], pulse_port=mr_info['pulse_port'])
         rb.create()
         reviewboard_pid = rb.start(reviewboard_port)
 
@@ -109,6 +115,8 @@ class MozReview(object):
         self.reviewboard_pid = reviewboard_pid
         self.admin_username = bugzilla.username
         self.admin_password = bugzilla.password
+        self.pulse_host = mr_info['pulse_host']
+        self.pulse_port = mr_info['pulse_port']
 
         mercurial_pid = self._start_mercurial_server(mercurial_port)
 
@@ -126,6 +134,8 @@ class MozReview(object):
             'mercurial_pid': mercurial_pid,
             'admin_username': bugzilla.username,
             'admin_password': bugzilla.password,
+            'pulse_host': mr_info['pulse_host'],
+            'pulse_port': mr_info['pulse_port'],
         }
 
         with open(self._state_path, 'wb') as fh:

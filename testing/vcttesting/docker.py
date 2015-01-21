@@ -416,7 +416,14 @@ class Docker(object):
         # TODO wait on Rabbit TCP port.
         print('Bugzilla accessible on %s' % url)
         #print('Review Board accessible at %s' % rb_url)
-        return url, db_id, web_id
+
+        return {
+            'bugzilla_url': url,
+            'db_id': db_id,
+            'web_id': web_id,
+            'pulse_host': self.docker_hostname,
+            'pulse_port': pulse_port,
+        }
 
     def stop_bmo(self, cluster):
         count = 0
