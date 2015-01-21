@@ -78,7 +78,7 @@ Case only rename that isn't tip should fail
 
   $ hg strip -r 2:
   1 files updated, 0 files merged, 1 files removed, 0 files unresolved
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/515b46df57ee-backup.hg
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/515b46df57ee-backup.hg (glob)
 
 Case only rename of directory should be rejected
 
