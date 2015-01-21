@@ -61,10 +61,13 @@ fi
 alias rbmanage='$TESTDIR/reviewboard'
 alias bugzilla='$TESTDIR/bugzilla'
 alias dockercontrol='$TESTDIR/testing/docker-control.py'
+alias pulse='$TESTDIR/pulse'
 
 commonenv() {
   $TESTDIR/testing/docker-control.py start-bmo $1 $HGPORT2 --pulse-port $HGPORT3 > /dev/null
   export BUGZILLA_URL=http://${DOCKER_HOSTNAME}:$HGPORT2
+  export PULSE_HOST=${DOCKER_HOSTNAME}
+  export PULSE_PORT=${HGPORT3}
 
   hg init client
   hg init server
@@ -75,6 +78,8 @@ commonenv() {
   clientconfig client/.hg/hgrc
   hg serve -R server -d -p $HGPORT --pid-file hg.pid --accesslog hg.access.log --errorlog hg.error.log
   cat hg.pid >> $DAEMON_PIDS
+
+  pulse create-exchange MozReviewConsumer
 }
 
 exportbzauth() {
