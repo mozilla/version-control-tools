@@ -23,6 +23,7 @@ def handle_review_request_published(extension=None, **kwargs):
 
     publish_message(extension, msg)
 
+
 def publish_message(extension, msg):
     config = get_pulse_config(extension)
     pulse = publishers.MozReviewPublisher(**config)
@@ -31,6 +32,7 @@ def publish_message(extension, msg):
         pulse.publish(msg)
     finally:
         pulse.disconnect()
+
 
 def get_pulse_config(extension):
     return {
