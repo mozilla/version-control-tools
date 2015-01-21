@@ -5,6 +5,7 @@ from mozillapulse import publishers
 from mozillapulse.messages import base
 
 from mozreview.decorators import if_ext_enabled
+from mozreview.utils import is_parent, is_pushed
 
 
 def initialize_pulse_handlers(extension):
@@ -15,6 +16,11 @@ def initialize_pulse_handlers(extension):
 @if_ext_enabled
 def handle_review_request_published(extension=None, **kwargs):
     review_request = kwargs.get('review_request')
+
+    if (review_request is None or
+        not is_pushed(review_request) or
+        not is_parent(review_request)):
+        return
 
     # TODO: Expand this message to make it useful
     msg = base.GenericMessage()
