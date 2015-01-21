@@ -38,10 +38,13 @@ def handle_commits_published(extension=None, **kwargs):
     # the diff which is mandatory if the commits changed. TODO: Properly use
     # the commit information once we start populating the change description
     # with it.
+    #
+    # A change description will not exist if this is the first publish of the
+    # review request. In that case we know there must be commits since this
+    # is a pushed request.
     cd = kwargs.get('changedesc')
-    if (cd is None or
-        'diff' not in cd.fields_changed or
-        'added' not in cd.fields_changed['diff']):
+    if (cd is not None and ('diff' not in cd.fields_changed or
+                            'added' not in cd.fields_changed['diff'])):
         return
 
     # TODO: Find a better place to retrieve the repository url since we might

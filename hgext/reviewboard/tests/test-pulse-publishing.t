@@ -46,9 +46,17 @@ Publishing the review request will send a single message to Pulse with
 details from the parent review request
 
   $ rbmanage publish $HGPORT1 1
-TODO this is buggy
   $ pulse dump-messages exchange/mozreview/ all
-  []
+  - _meta:
+      exchange: exchange/mozreview/
+      routing_key: mozreview.commits.published
+    commits:
+    - - 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
+      - '2'
+    - - 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
+      - '3'
+    parent_review_request_id: 1
+    repository_url: http://localhost:$HGPORT/
 
 Cleanup
 
