@@ -37,7 +37,6 @@ def autoland():
       'revision': '235740:9cc25f7ac50a',
       'destination': 'try',
       'trysyntax': 'try: -b o -p linux -u mochitest-1 -t none',
-      'review-request-id': 42 
     }
 
     Returns an id which can be used to get the status of the autoland 
@@ -45,23 +44,22 @@ def autoland():
 
     """
 
+    app.logger.info('received transplant request: %s' % json.dumps(request.json)) 
+
     dbconn = psycopg2.connect(DSN)
     cursor = dbconn.cursor()
 
     query = """
-        insert into Transplant(tree,rev,destination,trysyntax,review_request_id)
-        values (%s,%s,%s,%s,%s)
+        insert into Transplant(tree,rev,destination,trysyntax)
+        values (%s,%s,%s,%s)
         returning id
     """
 
     cursor.execute(query, (request.json['tree'], request.json['rev'],
                            request.json['destination'],
-                           request.json['trysyntax'],
-                           request.json['review-request-id']))
+                           request.json['trysyntax']))
     request_id = cursor.fetchone()[0]
     dbconn.commit()
-
-    app.logger.info('received transplant request: %s' % json.dumps(request.json)) 
 
     result = json.dumps({'request_id': request_id})
 
