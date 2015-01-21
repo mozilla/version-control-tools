@@ -76,7 +76,9 @@ class ReviewBoardCommands(object):
 
     def _get_rb(self, path):
         from vcttesting.reviewboard import MozReviewBoard
-        return MozReviewBoard(path, os.environ['BUGZILLA_URL'])
+        return MozReviewBoard(path, os.environ['BUGZILLA_URL'],
+            pulse_host=os.environ.get('PULSE_HOST'),
+            pulse_port=os.environ.get('PULSE_PORT'))
 
     @Command('create', category='reviewboard',
         description='Create a Review Board server install.')

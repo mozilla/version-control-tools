@@ -65,10 +65,16 @@ def wrap_env():
 class MozReviewBoard(object):
     """Interact with a Mozilla-flavored Review Board install."""
 
-    def __init__(self, path, bugzilla_url=None):
+    def __init__(self, path, bugzilla_url=None,
+            pulse_host=None, pulse_port=None,
+            pulse_user='guest', pulse_password='guest'):
         self.path = os.path.abspath(path)
         self.manage = [sys.executable, '-m', 'reviewboard.manage']
         self.bugzilla_url = bugzilla_url
+        self.pulse_host = pulse_host
+        self.pulse_port = pulse_port
+        self.pulse_user = pulse_user
+        self.pulse_password = pulse_password
 
     def create(self):
         """Install Review Board."""
@@ -167,8 +173,17 @@ class MozReviewBoard(object):
         # Hook up rbbz authentication.
         sc.set('auth_backend', 'bugzilla')
         sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % self.bugzilla_url)
-
         sc.save()
+
+        # Hook up Pulse.
+        from djblets.extensions.models import RegisteredExtension
+        mre = RegisteredExtension.objects.get(class_name='mozreview.extension.MozReviewExtension')
+        mre.settings['pulse_host'] = self.pulse_host
+        mre.settings['pulse_port'] = self.pulse_port
+        mre.settings['pulse_user'] = self.pulse_user
+        mre.settings['pulse_password'] = self.pulse_password
+        mre.settings['pulse_ssl'] = False
+        mre.save()
 
     def _start(self, port):
         port = str(port)
