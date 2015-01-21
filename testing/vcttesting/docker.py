@@ -23,6 +23,8 @@ import uuid
 from contextlib import contextmanager
 from io import BytesIO
 
+import kombu
+
 HERE = os.path.abspath(os.path.dirname(__file__))
 DOCKER_DIR = os.path.normpath(os.path.join(HERE, '..', 'docker'))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
@@ -44,6 +46,23 @@ def wait_for_http(host, port, timeout=60):
 
         time.sleep(1)
 
+def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60):
+    c = kombu.Connection(hostname=hostname, port=port, userid=userid,
+            password=password, ssl=ssl)
+
+    start = time.time()
+
+    while True:
+        try:
+            c.connection
+            return
+        except Exception:
+            pass
+
+        if time.time() - start > timeout:
+            raise Exception('Timeout reached waiting for AMQP')
+
+        time.sleep(1)
 
 def params_from_env(env):
     """Obtain Docker connect parameters from the environment.
@@ -413,7 +432,8 @@ class Docker(object):
         print('waiting for Bugzilla to start')
         wait_for_http(self.docker_hostname, wait_bmoweb_port)
         #wait_for_http(self.docker_hostname, wait_rbweb_port)
-        # TODO wait on Rabbit TCP port.
+        if wait_rabbit_port:
+            wait_for_amqp(self.docker_hostname, wait_rabbit_port, 'guest', 'guest')
         print('Bugzilla accessible on %s' % url)
         #print('Review Board accessible at %s' % rb_url)
 
