@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import socket
 import yaml
 
 from mach.decorators import (
@@ -74,6 +75,9 @@ class PulseCommands(object):
             data.append(d)
 
         with conn.Consumer([q], callbacks=[onmessage], auto_declare=False):
-            conn.drain_events(timeout=0.1)
+            try:
+                conn.drain_events(timeout=0.1)
+            except socket.timeout:
+                pass
 
         print(yaml.safe_dump(data, default_flow_style=False).rstrip())
