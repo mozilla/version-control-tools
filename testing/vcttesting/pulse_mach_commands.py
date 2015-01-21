@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import yaml
 
 from mach.decorators import (
     CommandArgument,
@@ -12,10 +13,9 @@ from mach.decorators import (
 
 @CommandProvider
 class PulseCommands(object):
-    def _get_consumer(self, class_name):
-        import mozillapulse.consumers as consumers
+    def _get_connection(self):
+        from kombu import Connection
 
-        cls = getattr(consumers, class_name)
         pulse_host = None
         pulse_port = None
 
@@ -29,16 +29,51 @@ class PulseCommands(object):
         if not pulse_port:
             raise Exception('Can not find Pulse port. Try setting PULSE_PORT')
 
-        return cls(user='guest', password='guest', host=pulse_host,
-                port=pulse_port, topic='#', ssl=False)
+        return Connection(hostname=pulse_host, port=pulse_port,
+            userid='guest', password='guest', ssl=False)
 
-    @Command('create-exchange', category='pulse',
-        description='Create an exchange')
-    @CommandArgument('classname',
-        help='Pulse class name of exchange to initialize')
-    def create_exchange(self, classname):
-        from kombu import Exchange
-        c = self._get_consumer(classname)
+    def _get_queue(self, exchange, queue):
+        from kombu import Exchange, Queue
 
-        exchange = Exchange(c.exchange, type='topic')
-        exchange(c.connection).declare()
+        e = Exchange(exchange, type='topic', durable=True)
+        q = Queue(name=queue, exchange=e, durable=True,
+                routing_key='#', exclusive=False, auto_delete=False)
+
+        return e, q
+
+    @Command('create-queue', category='pulse',
+        description='Create a queue')
+    @CommandArgument('exchange', help='Name of exchange to create on')
+    @CommandArgument('queue', help='Name of queue to create')
+    def create_exchange(self, exchange, queue):
+        conn = self._get_connection()
+        e, q = self._get_queue(exchange, queue)
+        e(conn).declare(passive=False)
+        conn.Consumer([q], auto_declare=True)
+
+    @Command('dump-messages', category='pulse',
+        description='Dump all messages on a queue')
+    @CommandArgument('exchange', help='Exchange to read from')
+    @CommandArgument('queue', help='Queue to read from')
+    def dump_messages(self, exchange, queue):
+        conn = self._get_connection()
+        e, q = self._get_queue(exchange, queue)
+
+        data = []
+
+        def onmessage(body, message):
+            d = {
+                '_meta': {
+                    'exchange': body['_meta']['exchange'],
+                    'routing_key': body['_meta']['routing_key'],
+                },
+            }
+            for k, v in body['payload'].iteritems():
+                d[k] = v
+
+            data.append(d)
+
+        with conn.Consumer([q], callbacks=[onmessage], auto_declare=False):
+            conn.drain_events(timeout=0.1)
+
+        print(yaml.safe_dump(data, default_flow_style=False).rstrip())
