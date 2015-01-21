@@ -30,7 +30,7 @@ class PulseCommands(object):
             raise Exception('Can not find Pulse port. Try setting PULSE_PORT')
 
         return cls(user='guest', password='guest', host=pulse_host,
-                port=pulse_port)
+                port=pulse_port, ssl=False)
 
     @Command('create-exchange', category='pulse',
         description='Create an exchange')
