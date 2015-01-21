@@ -1,0 +1,3 @@
+{
+    "dsn": "dbname=autoland user=postgres host=db"
+}

@@ -1,0 +1,5 @@
+[phases]
+publish = False
+
+[hooks]
+incoming = /try_hook.sh

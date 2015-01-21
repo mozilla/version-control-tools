@@ -1,0 +1,10 @@
+[ui]
+username = Otto Land <bind-autoland@mozilla.com>
+merge = internal:merge
+
+[extensions]
+mq = 
+
+[paths]
+mozreview = /repos/mozreview 
+try = /repos/try 

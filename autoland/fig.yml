@@ -1,0 +1,12 @@
+autoland:
+    build: .
+    command: /home/ubuntu/autoland/start-autoland.sh
+    links:
+        - db
+    ports:
+        - "8000:80"
+
+db:
+    image: postgres
+    ports:
+        - "6543:5432"
