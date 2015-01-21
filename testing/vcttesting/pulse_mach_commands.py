@@ -30,11 +30,15 @@ class PulseCommands(object):
             raise Exception('Can not find Pulse port. Try setting PULSE_PORT')
 
         return cls(user='guest', password='guest', host=pulse_host,
-                port=pulse_port, ssl=False)
+                port=pulse_port, topic='#', ssl=False)
 
     @Command('create-exchange', category='pulse',
         description='Create an exchange')
     @CommandArgument('classname',
         help='Pulse class name of exchange to initialize')
     def create_exchange(self, classname):
-        self._get_consumer(classname)
+        from kombu import Exchange
+        c = self._get_consumer(classname)
+
+        exchange = Exchange(c.exchange, type='topic')
+        exchange(c.connection).declare()
