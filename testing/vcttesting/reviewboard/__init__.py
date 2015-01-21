@@ -183,6 +183,8 @@ class MozReviewBoard(object):
         mre.settings['pulse_user'] = self.pulse_user
         mre.settings['pulse_password'] = self.pulse_password
         mre.settings['pulse_ssl'] = False
+        if self.pulse_host and self.pulse_port:
+            mre.settings['enabled'] = True
         mre.save()
 
     def _start(self, port):
