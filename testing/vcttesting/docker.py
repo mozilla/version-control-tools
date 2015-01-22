@@ -499,18 +499,10 @@ class Docker(object):
     def stop_bmo(self, cluster):
         count = 0
 
-        def stop(cid):
-            self.client.stop(cid, timeout=10)
-            return cid
-
         with futures.ThreadPoolExecutor(4) as e:
-            fs = []
             for container in reversed(self.state['containers'].get(cluster, [])):
                 count += 1
-                fs.append(e.submit(stop, container))
-
-            for f in futures.as_completed(fs):
-                e.submit(self.client.remove_container, f.result())
+                e.submit(self.client.remove_container, container, force=True)
 
         print('stopped %d containers' % count)
 
