@@ -418,38 +418,60 @@ class Docker(object):
             hostname = self.docker_hostname
         url = 'http://%s:%s/' % (hostname, http_port)
 
-        db_id = self.client.create_container(db_image,
-                environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
-        containers.append(db_id)
+        with futures.ThreadPoolExecutor(4) as e:
+            # Create containers concurrently - no race conditions here.
+            f_db_create = e.submit(self.client.create_container, db_image,
+                    environment={'MYSQL_ROOT_PASSWORD': 'password'})
+            if start_pulse:
+                f_pulse_create = e.submit(self.client.create_container,
+                        pulse_image)
 
-        if start_pulse:
-            pulse_id = self.client.create_container(pulse_image)['Id']
-            containers.append(pulse_id)
+            f_web_create = e.submit(self.client.create_container,
+                    web_image, environment={'BMO_URL': url})
 
-        web_id = self.client.create_container(web_image,
-                environment={'BMO_URL': url})['Id']
-        containers.append(web_id)
-        #rbweb_id = self.client.create_container(rbweb_image)['Id']
-        #containers.append(rbweb_id)
-        self.save_state()
+            #f_rbweb_create = e.submit(self.client.create_container,
+            #        rbweb_image)
 
-        self.client.start(db_id)
-        db_state = self.client.inspect_container(db_id)
-        self.client.start(web_id,
-                links=[(db_state['Name'], 'bmodb')],
-                port_bindings={80: http_port})
-        web_state = self.client.inspect_container(web_id)
-        if start_pulse:
-            self.client.start(pulse_id,
-                    port_bindings={5672: pulse_port})
-            pulse_state = self.client.inspect_container(pulse_id)
-        #self.client.start(rbweb_id,
-        #        links=[
-        #            (db_state['Name'], 'rbdb'),
-        #            (web_state['Name'], 'bzweb'),
-        #        ],
-        #        port_bindings={80: rbweb_port})
-        #rbweb_state = self.client.inspect_container(rbweb_id)
+            # We expose the database to containers. Start it first.
+            db_id = f_db_create.result()['Id']
+            containers.append(db_id)
+            f_db_start = e.submit(self.client.start, db_id)
+            f_db_start.result()
+            db_state = self.client.inspect_container(db_id)
+
+            web_id = f_web_create.result()['Id']
+            containers.append(web_id)
+
+            #rbweb_id = f_rbweb_create.result()['Id']
+            #containers.append(rbweb_id)
+
+            if start_pulse:
+                pulse_id = f_pulse_create.result()['Id']
+                containers.append(pulse_id)
+                f_start_pulse = e.submit(self.client.start, pulse_id,
+                        port_bindings={5672: pulse_port})
+
+            # At this point, all containers have started.
+            self.save_state()
+
+            f_start_web = e.submit(self.client.start, web_id,
+                    links=[(db_state['Name'], 'bmodb')],
+                    port_bindings={80: http_port})
+            f_start_web.result()
+            web_state = self.client.inspect_container(web_id)
+
+            #f_start_rbweb = e.submit(self.client.start, rbweb_id,
+            #        links=[
+            #            (db_state['Name'], 'rbdb'),
+            #            (web_state['Name'], 'bzweb'),
+            #        ],
+            #        port_bindings={80: rbweb_port})
+            #f_start_rbweb.result()
+            #rbweb_state = self.client.inspect_container(rbweb_id)
+
+            if start_pulse:
+                f_start_pulse.result()
+                pulse_state = self.client.inspect_container(pulse_id)
 
         wait_bmoweb_port = web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort']
         if start_pulse:
