@@ -1,0 +1,28 @@
+{
+  "ldap": {
+    "user": "",
+    "passwd": ""
+  },
+  "mozdef": {
+    "user": "",
+    "passwd": "",
+    "host": ""
+  },
+  "mozreview": {
+    "user": "",
+    "passwd": "",
+    "host": ""
+  },
+  "pulse": {
+    "user": "",
+    "passwd": ""
+  },
+  "selfserve": {
+    "user": "",
+    "passwd": ""
+  },
+  "database": "dbname=autoland user=postgres host=db",
+  "repos" : {
+    "mozilla-central": "/repos/mozilla-central"
+  }
+}

@@ -40,8 +40,7 @@ ADD testing/docker/try-hgrc /repos/try/.hg/hgrc
 ADD testing/docker/try_hook.sh /
 
 #
-ADD testing/docker/repo-config.json ${AUTOLAND_HOME}/autoland/repo-config.json 
-ADD testing/docker/database-config.json ${AUTOLAND_HOME}/autoland/database-config.json 
+ADD testing/docker/config.json ${AUTOLAND_HOME}/autoland/config.json
 ADD sql ${AUTOLAND_HOME}/sql
 ADD testing/docker/start-autoland.sh ${AUTOLAND_HOME}/start-autoland.sh
 CMD ${AUTOLAND_HOME}/start-autoland.sh
