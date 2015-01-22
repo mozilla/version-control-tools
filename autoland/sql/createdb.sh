@@ -13,13 +13,7 @@ then
 fi
 
 dropdb -h $HOST -p $PORT -U postgres autoland
-dropdb -h $HOST -p $PORT -U postgres testautoland
-
 dropuser -h $HOST -p $PORT -U postgres autoland
 createuser -h $HOST -p $PORT -U postgres autoland -S -D -R
-
 createdb -h $HOST -p $PORT -U postgres autoland
 psql -h $HOST -p $PORT -U postgres autoland -f schema.sql
-
-createdb -h $HOST -p $PORT -U postgres testautoland
-psql -h $HOST -p $PORT -U postgres testautoland -f schema.sql

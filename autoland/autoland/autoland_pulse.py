@@ -50,6 +50,18 @@ def is_known_testrun(dbconn, tree, rev):
     return row is not None
 
 
+def extract_tree_and_rev(payload):
+    tree = None
+    rev = None
+    for prop in payload['build']['properties']:
+        if prop[0] == 'revision':
+            rev = prop[1]
+        elif prop[0] == 'branch':
+            tree = prop[1]
+
+    return tree, rev
+
+
 def handle_message(data, message):
     message.ack()
 
@@ -60,13 +72,7 @@ def handle_message(data, message):
         with open(message_log_path, 'a') as f:
             json.dump(data, f, indent=2, sort_keys=True)
 
-    rev = None
-    tree = None
-    for prop in payload['build']['properties']:
-        if prop[0] == 'revision':
-            rev = prop[1]
-        elif prop[0] == 'branch':
-            tree = prop[1]
+    tree, rev = extract_tree_and_rev(payload)
 
     if tree and rev and is_known_testrun(dbconn, tree, rev):
         logger.info('updating testrun: %s %s' % (tree, rev))
