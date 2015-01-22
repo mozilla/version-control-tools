@@ -275,10 +275,31 @@ class Docker(object):
         spin up multiple bmoweb containers very quickly.
         """
         images = self.state['images']
-        db_image = self.ensure_built('bmodb-volatile', verbose=verbose)
-        web_image = self.ensure_built('bmoweb', verbose=verbose)
-        pulse_image = self.ensure_built('pulse', verbose=verbose)
-        #rbweb_image = self.ensure_built('rbweb', verbose=verbose, add_vct=True)
+
+        def build(name, **kwargs):
+            image = self.ensure_built(name, verbose=verbose, **kwargs)
+            return name, image
+
+        with futures.ThreadPoolExecutor(4) as e:
+            fs = []
+            fs.append(e.submit(build, 'bmodb-volatile'))
+            fs.append(e.submit(build, 'bmoweb'))
+            fs.append(e.submit(build, 'pulse'))
+            #fs.append(e.submit(build, 'rbweb', add_vct=True))
+
+        # This is very ugly.
+        for f in futures.as_completed(fs):
+            name, image = f.result()
+            if name == 'bmodb-volatile':
+                db_image = image
+            elif name == 'bmoweb':
+                web_image = image
+            elif name == 'pulse':
+                pulse_image = image
+            elif name == 'rbweb':
+                rbweb_image = image
+            else:
+                assert False
 
         self.state['last-db-id'] = db_image
         self.state['last-pulse-id'] = pulse_image
