@@ -20,7 +20,8 @@ class TestAutolandIntegration(unittest.TestCase):
             'tree': 'mozilla-central',
             'rev': '2bcb4d148ef5',
             'destination': 'try',
-            'trysyntax': 'try: -b o -p linux -u mochitest-1 -t none'
+            'trysyntax': 'try: -b o -p linux -u mochitest-1 -t none',
+            'endpoint': 'http://localhost:8000'
         }
 
         r = requests.post('http://localhost:8000/autoland',
@@ -75,7 +76,8 @@ class TestAutolandIntegration(unittest.TestCase):
             'tree': 'mozilla-central',
             'rev': '2bcb4d148ef5',
             'destination': 'try',
-            'trysyntax': 'try: -b o -p linux -u mochitest-1 -t none'
+            'trysyntax': 'try: -b o -p linux -u mochitest-1 -t none',
+            'endpoint': 'http://localhost:8000'
         }
 
         r = requests.post('http://localhost:8000/autoland',

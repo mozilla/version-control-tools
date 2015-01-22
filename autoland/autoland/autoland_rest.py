@@ -72,14 +72,15 @@ def autoland():
     cursor = dbconn.cursor()
 
     query = """
-        insert into Transplant(tree,rev,destination,trysyntax)
-        values (%s,%s,%s,%s)
+        insert into Transplant(tree,rev,destination,trysyntax,endpoint)
+        values (%s,%s,%s,%s,%s)
         returning id
     """
 
     cursor.execute(query, (request.json['tree'], request.json['rev'],
                            request.json['destination'],
-                           request.json['trysyntax']))
+                           request.json.get('trysyntax', ''),
+                           request.json['endpoint']))
     request_id = cursor.fetchone()[0]
     dbconn.commit()
 
@@ -99,7 +100,7 @@ def autoland_status(request_id):
     cursor = dbconn.cursor()
 
     query = """
-        select tree,rev,destination,trysyntax,landed,result from Transplant
+        select tree,rev,destination,trysyntax,landed,result,endpoint from Transplant
         where id = %(request_id)s
     """
 
@@ -115,7 +116,8 @@ def autoland_status(request_id):
                              'destination': row[2],
                              'trysyntax': row[3],
                              'landed': row[4],
-                             'result': row[5]})
+                             'result': row[5],
+                             'endpoint': row[6]})
 
         headers = [
             ("Content-Type", "application/json"),

@@ -1,13 +1,18 @@
 import json
 import requests
 
-MOZREVIEW_URL = 'https://reviewboard-dev.allizom.org/api'
-#MOZREVIEW_URL = 'http://localhost:55563/api'
-
 
 def read_credentials():
-    pass
+    with open('config.json') as f:
+        bugzilla = json.load(f)['bugzilla']
+    return (bugzilla['user'], bugzilla['passwd'])
 
 
-def update_review(auth, review_request_id, rev):
-    return True
+def update_review(auth, endpoint, data):
+    try:
+        r = requests.post(endpoint, data=json.dumps(data),
+                          headers= {'Content-Type': 'application/json'},
+                          auth=auth)
+        return r.status_code == 200
+    except requests.exceptions.ConnectionError:
+        return

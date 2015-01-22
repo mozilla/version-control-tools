@@ -1,14 +1,13 @@
 {
+  "bugzilla": {
+    "user": "",
+    "passwd": ""
+  },
   "ldap": {
     "user": "",
     "passwd": ""
   },
   "mozdef": {
-    "user": "",
-    "passwd": "",
-    "host": ""
-  },
-  "mozreview": {
     "user": "",
     "passwd": "",
     "host": ""

@@ -20,8 +20,8 @@ create table Transplant (
     trysyntax text,
     landed boolean,
     result text,
-    review_request_id bigint,
     review_updated boolean,
+    endpoint text,
     primary key(id)
 );
 grant all privileges on table Transplant to autoland;

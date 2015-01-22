@@ -245,16 +245,30 @@ def handle_pending_mozreview_updates(logger, dbconn):
     """Attempt to post updates to mozreview"""
 
     cursor = dbconn.cursor()
-    query = """select id, review_request_id, result from Transplant
-               where landed=TRUE and review_updated=FALSE
-               order by id limit %(limit)s"""
+    query = """select id,tree,rev,destination,trysyntax,landed,result,endpoint from Transplant
+               where landed is not NULL and review_updated is NULL
+               limit %(limit)s"""
     cursor.execute(query, {'limit': MOZREVIEW_COMMENT_LIMIT})
 
     mozreview_auth = mozreview.read_credentials()
 
     updated = []
-    for transplant_id, review_request_id, result in cursor.fetchall():
-        if mozreview.update_review(mozreview_auth, review_request_id, result):
+    for row in cursor.fetchall():
+        endpoint = row[7]
+        data = {
+            'request_id': row[0],
+            'tree': row[1],
+            'rev': row[2],
+            'destination': row[3],
+            'trysyntax': row[4],
+            'landed': row[5],
+            'result': row[6]
+        }
+
+        logger.info('trying to post mozreview update to: %s for request: %s' %
+                    (row[7], row[0]))
+
+        if mozreview.update_review(mozreview_auth, endpoint, data):
             updated.append(transplant_id)
 
     if updated:
