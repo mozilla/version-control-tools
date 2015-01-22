@@ -25,7 +25,8 @@ class TestAutolandIntegration(unittest.TestCase):
 
         r = requests.post('http://localhost:8000/autoland',
                           data=json.dumps(data),
-                          headers= {'Content-Type': 'application/json'})
+                          headers= {'Content-Type': 'application/json'},
+                          auth=('autoland', 'autoland'))
 
         self.assertEqual(r.status_code, 200,
                          'Post to autoland should return 200')
@@ -46,6 +47,26 @@ class TestAutolandIntegration(unittest.TestCase):
         self.assertEqual(r.status_code, 405,
                          'Put to autoland should return 405')
 
+        r = requests.post('http://localhost:8000/autoland',
+                          data=json.dumps(data),
+                          headers= {'Content-Type': 'application/json'})
+        self.assertEqual(r.status_code, 401,
+                         'Post with no auth should return 401')
+
+        r = requests.post('http://localhost:8000/autoland',
+                          data=json.dumps(data),
+                          headers= {'Content-Type': 'application/json'},
+                          auth=('autolnd', 'autoland'))
+        self.assertEqual(r.status_code, 401,
+                         'Post with bad user should return 401')
+
+        r = requests.post('http://localhost:8000/autoland',
+                          data=json.dumps(data),
+                          headers= {'Content-Type': 'application/json'},
+                          auth=('autoland', 'autolnd'))
+        self.assertEqual(r.status_code, 401,
+                         'Post with bad paswd should return 401')
+
 
     def test_autoland_status_endpoint(self):
         """Test getting status from the /autoland/status/ endpoint"""
@@ -59,7 +80,8 @@ class TestAutolandIntegration(unittest.TestCase):
 
         r = requests.post('http://localhost:8000/autoland',
                           data=json.dumps(data),
-                          headers= {'Content-Type': 'application/json'})
+                          headers= {'Content-Type': 'application/json'},
+                          auth=('autoland', 'autoland'))
 
         self.assertEqual(r.status_code, 200,
                          'Post to autoland should return 200')

@@ -1,14 +1,8 @@
 #!/usr/bin/env python
-import argparse
-import datetime
-import httplib
 import json
 import logging
 import os
-import platform
 import psycopg2
-import re
-import string
 
 from flask import Flask, request, json, Response, abort
 
@@ -19,6 +13,7 @@ from mozlog.structured import (
     structuredlog,
 )
 
+AUTH = None
 DSN = None
 
 app = Flask(__name__, static_url_path='', static_folder='')
@@ -32,6 +27,18 @@ def get_dbconn():
             DSN = json.load(f)['database']
 
     return psycopg2.connect(DSN)
+
+
+def check_auth(user, passwd):
+    global AUTH
+
+    if not AUTH:
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                               'config.json')) as f:
+            AUTH = json.load(f)['auth']
+
+    if user in AUTH and AUTH[user] == passwd:
+        return True
 
 
 @app.route('/autoland', methods=['POST'])
@@ -54,7 +61,12 @@ def autoland():
 
     """
 
-    app.logger.info('received transplant request: %s' % json.dumps(request.json)) 
+    auth = request.authorization
+    if not auth or not check_auth(auth.username, auth.password):
+        return Response('Login required', 401,
+                        {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+    app.logger.info('received transplant request: %s' % json.dumps(request.json))
 
     dbconn = get_dbconn()
     cursor = dbconn.cursor()
@@ -114,6 +126,7 @@ def autoland_status(request_id):
 
     return Response('', status=404)
 
+
 @app.route('/')
 def hi_there():
     result = 'Welcome to Autoland'
@@ -124,3 +137,23 @@ def hi_there():
     ]
 
     return Response(result, status=200, headers=headers)
+
+
+def main():
+    import argparse
+
+    global DSN
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', type=int, default=8000,
+                        help='Port on which to listen')
+    commandline.add_logging_group(parser)
+    args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO)
+
+    app.logger.info('starting REST listener on port %d' % args.port)
+    app.run(host="0.0.0.0", port=args.port, debug=False)
+
+
+if __name__ == "__main__":
+    main()
