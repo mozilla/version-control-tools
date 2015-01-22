@@ -40,6 +40,61 @@ def serialize_review_requests(rr):
     d['description'] = _serialize_text(rr.description)
     d['extra_data'] = dict(rr.extra_data.iteritems())
 
+    review_list = rr.get_reviews(review_request_id=rr.id)
+    reviews = []
+    for review in review_list:
+        d['review_count'] = review_list.total_results
+
+        rd = OrderedDict()
+        rd['id'] = review.id
+        rd['public'] = review.public
+        rd['ship_it'] = review.ship_it
+        if dict(review.extra_data.iteritems()):
+            rd['extra_data'] = dict(review.extra_data.iteritems())
+        if review.body_top:
+            rd['body_top'] = _serialize_text(review.body_top)
+            rd['body_top_text_type'] = review.body_top_text_type
+        if review.body_bottom:
+            rd['body_bottom'] = _serialize_text(review.body_bottom)
+            rd['body_bottom_text_type'] = review.body_bottom_text_type
+
+        rd['diff_comments'] = []
+
+        diff_list = review.get_diff_comments()
+        for comment in diff_list:
+            rd['diff_count'] = diff_list.total_results
+
+            cd = OrderedDict()
+
+            user = comment.get_user()
+            filediff = comment.get_filediff()
+            # TODO handle interdiffs
+            # interfilediff = comment.get_interfilediff()
+
+            cd['id'] = comment.id
+            cd['public'] = comment.public
+            cd['user'] = user.username
+            cd['issue_opened'] = comment.issue_opened
+            if comment.issue_opened:
+                cd['issue_status'] = comment.issue_status
+            cd['first_line'] = comment.first_line
+            cd['num_lines'] = comment.num_lines
+            cd['text'] = _serialize_text(comment.text)
+            cd['text_type'] = comment.text_type
+
+            if dict(comment.extra_data.iteritems()):
+                cd['extra_data'] = dict(comment.extra_data.iteritems())
+
+            cd['diff_id'] = filediff.id
+            cd['diff_dest_file'] = filediff.dest_file
+
+            rd['diff_comments'].append(cd)
+
+        reviews.append(rd)
+
+    if reviews:
+        d['reviews'] = reviews
+
     try:
         draft = rr.get_draft()
         ddraft = OrderedDict()
