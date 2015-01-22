@@ -229,7 +229,7 @@ class Docker(object):
             s = s['stream']
             if verbose:
                 # s has newlines, so don't go through print().
-                sys.stdout.write(s)
+                sys.stdout.write('%s> %s' % (name, s))
             if s.startswith('Successfully built '):
                 image = s[len('Successfully built '):]
                 # There is likely a trailing newline.
