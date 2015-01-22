@@ -27,7 +27,8 @@ def get_dbconn():
     global DSN
 
     if not DSN:
-        with open('config.json') as f:
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                               'config.json')) as f:
             DSN = json.load(f)['database']
 
     return psycopg2.connect(DSN)
@@ -87,9 +88,9 @@ def autoland_status(request_id):
 
     query = """
         select tree,rev,destination,trysyntax,landed,result from Transplant
-        where id = %s
+        where id = %(request_id)s
     """
-    cursor.execute(query, (request_id))
+    cursor.execute(query, ({'request_id': int(request_id)}))
 
     row = cursor.fetchone()
     if row:
