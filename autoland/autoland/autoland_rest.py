@@ -90,7 +90,11 @@ def autoland_status(request_id):
         select tree,rev,destination,trysyntax,landed,result from Transplant
         where id = %(request_id)s
     """
-    cursor.execute(query, ({'request_id': int(request_id)}))
+
+    try:
+        cursor.execute(query, ({'request_id': int(request_id)}))
+    except ValueError:
+        return Response('', status=404)
 
     row = cursor.fetchone()
     if row:
@@ -120,22 +124,3 @@ def hi_there():
     ]
 
     return Response(result, status=200, headers=headers)
-
-
-def main():
-    global DSN
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--port', type=int, default=8000,
-                        help='Port on which to listen')
-    commandline.add_logging_group(parser)
-    args = parser.parse_args()
-
-    logging.basicConfig(level=logging.INFO)
-
-    app.logger.info('starting REST listener on port %d' % args.port)
-    app.run(host="0.0.0.0", port=args.port, debug=False)
-
-
-if __name__ == "__main__":
-    main()

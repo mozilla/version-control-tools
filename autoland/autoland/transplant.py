@@ -25,7 +25,7 @@ def transplant_to_try(tree, rev, trysyntax):
     cmds = [['hg', 'update', '--clean'],
             ['hg', 'update', 'central'],
             ['hg', 'pull', 'mozreview', '-r', rev],
-            ['hg', 'bookmark', '-r', rev, 'transplant'],
+            ['hg', 'bookmark', '-f', '-r', rev, 'transplant'],
             ['hg', 'update', 'transplant'],
             ['hg', 'qpop', '--all'],
             ['hg', 'qdelete', 'try'],
@@ -34,8 +34,7 @@ def transplant_to_try(tree, rev, trysyntax):
             ['hg', 'push', '-r', '.', '-f', 'try'],
             ['hg', 'qpop'],
             ['hg', 'qdelete', 'try'],
-            ['hg', 'update', 'central'],
-            ['hg', 'bookmark', '--delete', 'transplant']]
+            ['hg', 'update', 'central']]
 
     for cmd in cmds:
         try:
