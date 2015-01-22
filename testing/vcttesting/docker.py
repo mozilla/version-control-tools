@@ -23,6 +23,7 @@ import uuid
 from contextlib import contextmanager
 from io import BytesIO
 
+import concurrent.futures as futures
 import kombu
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -447,13 +448,19 @@ class Docker(object):
 
     def stop_bmo(self, cluster):
         count = 0
-        for container in reversed(self.state['containers'].get(cluster, [])):
-            count += 1
-            self.client.stop(container, timeout=10)
-            self.client.remove_container(container)
 
-            # The base image could be shared across multiple containers. So do
-            # not try to delete it.
+        def stop(cid):
+            self.client.stop(cid, timeout=10)
+            return cid
+
+        with futures.ThreadPoolExecutor(4) as e:
+            fs = []
+            for container in reversed(self.state['containers'].get(cluster, [])):
+                count += 1
+                fs.append(e.submit(stop, container))
+
+            for f in futures.as_completed(fs):
+                e.submit(self.client.remove_container, f.result())
 
         print('stopped %d containers' % count)
 
