@@ -483,7 +483,7 @@ class Docker(object):
         print('waiting for Bugzilla to start')
         wait_for_http(self.docker_hostname, wait_bmoweb_port)
         #wait_for_http(self.docker_hostname, wait_rbweb_port)
-        if wait_rabbit_port:
+        if start_pulse:
             wait_for_amqp(self.docker_hostname, wait_rabbit_port, 'guest', 'guest')
         print('Bugzilla accessible on %s' % url)
         #print('Review Board accessible at %s' % rb_url)
