@@ -373,3 +373,16 @@ class ReviewBoardCommands(object):
     def stop(self, path):
         rb = self._get_rb(path)
         rb.stop()
+
+    @Command('make-admin', category='reviewboard',
+        description='Make a user a superuser and staff user')
+    @CommandArgument('path', help='Path to Review Board install')
+    @CommandArgument('email', help='Email address of user to modify')
+    def make_admin(self, path, email):
+        import sqlite3
+        db = os.path.join(path, 'reviewboard.db')
+        conn = sqlite3.connect(db)
+        with conn:
+            conn.execute('UPDATE auth_user SET is_superuser=1, is_staff=1 '
+                    'WHERE email=?', (email,))
+            conn.commit()
