@@ -1,5 +1,6 @@
 from reviewboard.extensions.base import Extension
 
+from mozreview.batchreview.resources import batch_review_resource
 from mozreview.pulse import initialize_pulse_handlers
 
 
@@ -16,6 +17,10 @@ class MozReviewExtension(Extension):
         'pulse_password': '',
         'pulse_ssl': False,
     }
+
+    resources = [
+        batch_review_resource,
+    ]
 
     is_configurable = True
 
