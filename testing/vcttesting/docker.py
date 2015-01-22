@@ -347,15 +347,20 @@ class Docker(object):
         # easily from Docker's own metadata. We have to give a tag becaue
         # Docker will forget the repository name if a name image has only a
         # repository name as well.
-        db_bootstrap = self.client.commit(db_id,
-                repository='bmodb-volatile-bootstrapped',
-                tag=db_unique_id)['Id']
-        web_bootstrap = self.client.commit(web_id,
-                repository='bmoweb-bootstrapped',
-                tag=web_unique_id)['Id']
-        #rbweb_bootstrap = self.client.commit(rbweb_id,
-        #        repository='rbweb-bootstrapped',
-        #        tag=rbweb_unique_id)['Id']
+        with futures.ThreadPoolExecutor(4) as e:
+            db_future = e.submit(self.client.commit, db_id,
+                    repository='bmodb-volatile-bootstrapped',
+                    tag=db_unique_id)
+            web_future = e.submit(self.client.commit, web_id,
+                    repository='bmoweb-bootstrapped',
+                    tag=web_unique_id)
+            #rbweb_future = e.submit(self.client.commit, rbweb_id,
+            #        repository='rbweb-bootstrapped',
+            #        tag=rbweb_unique_id)
+
+        db_bootstrap = db_future.result()['Id']
+        web_bootstrap = web_future.result()['Id']
+        #rbweb_bootstrap = rbweb_future.result()['Id']
         self.state['images'][db_bootstrapped_key] = db_bootstrap
         self.state['images'][web_bootstrapped_key] = web_bootstrap
         self.state['images']['pulse'] = pulse_image
@@ -366,9 +371,11 @@ class Docker(object):
         self.save_state()
 
         print('removing non-bootstrapped containers')
-        #self.client.remove_container(rbweb_id)
-        self.client.remove_container(web_id)
-        self.client.remove_container(db_id)
+
+        with futures.ThreadPoolExecutor(4) as e:
+            e.submit(self.client.remove_container, web_id)
+            e.submit(self.client.remove_container, db_id)
+            #e.submit(self.client.remove_container, rbweb_id)
 
         print('bootstrapped images created')
 
