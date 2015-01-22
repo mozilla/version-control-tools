@@ -6,8 +6,9 @@ LDAP_PORT = 636
 
 
 def read_credentials():
-    user, passwd = open('credentials/ldap.txt').read().strip().split(',')
-    return (user, passwd)
+    with open('config.json') as f:
+        ldap = json.load(f)['ldap']
+    return (ldap['user'], ldap['passwd'])
 
 
 def check_group(auth, group, email):

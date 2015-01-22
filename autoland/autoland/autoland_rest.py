@@ -27,8 +27,8 @@ def get_dbconn():
     global DSN
 
     if not DSN:
-        with open('database-config.json') as f:
-            DSN = json.load(f)['dsn']
+        with open('config.json') as f:
+            DSN = json.load(f)['database']
 
     return psycopg2.connect(DSN)
 

@@ -10,8 +10,9 @@ MOZDEF_PORT = 5671
 
 
 def read_credentials():
-    user, passwd, server = open('credentials/mozdef.txt').read().strip().split(',')
-    return (user, passwd, server)
+    with open('config.json') as f:
+        mozdef = json.load(f)['mozdef']
+        return mozdef['user'], mozdef['passwd'], mozdef['host']
 
 
 def post(auth, data):

@@ -16,8 +16,8 @@ def transplant_to_try(tree, rev, trysyntax):
     global REPO_CONFIG
 
     if not REPO_CONFIG:
-        with open('repo-config.json') as f:
-            REPO_CONFIG = json.load(f)
+        with open('config-config.json') as f:
+            REPO_CONFIG = json.load(f)['repos']
 
     landed = False
     result = ''

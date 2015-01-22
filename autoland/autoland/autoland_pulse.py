@@ -31,8 +31,9 @@ REV_LENGTH = 12
 
 
 def read_credentials():
-    user, passwd = open('credentials/pulse.txt').read().strip().split(',')
-    return (user, passwd)
+    with open('config.json') as f:
+        pulse = json.load(f)['pulse']
+        return pulse['user'], pulse['passwd']
 
 
 def is_known_testrun(dbconn, tree, rev):
