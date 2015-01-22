@@ -103,91 +103,99 @@ Popping the last commit truncates the review set
 Review request 6 should be added to the list of discard on publish rids.
 
   $ rbmanage dumpreview $HGPORT1 1
-  Review: 1
-    Status: pending
-    Public: True
-    Bugs: 123
-    Commit ID: bz://123/mynick
-    Summary: bz://123/mynick
-    Description:
-      /r/2 - Bug 123 - Foo 1
-      /r/3 - Bug 123 - Foo 2
-      /r/4 - Bug 123 - Foo 3
-      /r/5 - Bug 123 - Foo 4
-      /r/6 - Bug 123 - Foo 5
-      
-      Pull down these commits:
-      
-      hg pull -r f466ed1de51670e583e11deb2f1022a342b52ccd http://localhost:$HGPORT/
-    Extra:
-      p2rb: True
-      p2rb.commits: [["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c", "3"], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", "4"], ["53b32d356f20f6730c14ec62c3706eba7e68e078", "5"], ["f466ed1de51670e583e11deb2f1022a342b52ccd", "6"]]
-      p2rb.discard_on_publish_rids: ["6"]
+  id: 1
+  status: pending
+  public: true
+  bugs:
+  - '123'
+  commit: bz://123/mynick
+  summary: bz://123/mynick
+  description:
+  - /r/2 - Bug 123 - Foo 1
+  - /r/3 - Bug 123 - Foo 2
+  - /r/4 - Bug 123 - Foo 3
+  - /r/5 - Bug 123 - Foo 4
+  - /r/6 - Bug 123 - Foo 5
+  - ''
+  - 'Pull down these commits:'
+  - ''
+  - hg pull -r f466ed1de51670e583e11deb2f1022a342b52ccd http://localhost:$HGPORT/
+  extra_data:
+    p2rb: true
+    p2rb.commits: '[["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c",
+      "3"], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", "4"], ["53b32d356f20f6730c14ec62c3706eba7e68e078",
+      "5"], ["f466ed1de51670e583e11deb2f1022a342b52ccd", "6"]]'
+    p2rb.discard_on_publish_rids: '["6"]'
+    p2rb.identifier: bz://123/mynick
+    p2rb.is_squashed: true
+    p2rb.unpublished_rids: '[]'
+  draft:
+    bugs:
+    - '123'
+    commit: bz://123/mynick
+    summary: bz://123/mynick
+    description:
+    - /r/2 - Bug 123 - Foo 1
+    - /r/3 - Bug 123 - Foo 2
+    - /r/4 - Bug 123 - Foo 3
+    - /r/5 - Bug 123 - Foo 4
+    - ''
+    - 'Pull down these commits:'
+    - ''
+    - hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/
+    extra:
+      p2rb: true
+      p2rb.commits: '[["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c",
+        "3"], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", "4"], ["53b32d356f20f6730c14ec62c3706eba7e68e078",
+        "5"]]'
+      p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://123/mynick
-      p2rb.is_squashed: True
-      p2rb.unpublished_rids: []
-  Draft: 1
-    Bugs: 123
-    Commit ID: bz://123/mynick
-    Summary: bz://123/mynick
-    Description:
-      /r/2 - Bug 123 - Foo 1
-      /r/3 - Bug 123 - Foo 2
-      /r/4 - Bug 123 - Foo 3
-      /r/5 - Bug 123 - Foo 4
-      
-      Pull down these commits:
-      
-      hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/
-    Extra:
-      p2rb: True
-      p2rb.commits: [["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c", "3"], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", "4"], ["53b32d356f20f6730c14ec62c3706eba7e68e078", "5"]]
-      p2rb.discard_on_publish_rids: []
-      p2rb.identifier: bz://123/mynick
-      p2rb.is_squashed: True
-      p2rb.unpublished_rids: []
-  Diff: 7
-    Revision: 2
-  diff -r 93d9429b41ec -r 53b32d356f20 foo1
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo1	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +foo1
-  diff -r 93d9429b41ec -r 53b32d356f20 foo2
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo2	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +foo2
-  diff -r 93d9429b41ec -r 53b32d356f20 foo3
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo3	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +foo3
-  diff -r 93d9429b41ec -r 53b32d356f20 foo4
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo4	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +foo4
-  
+      p2rb.is_squashed: true
+      p2rb.unpublished_rids: '[]'
+    diffs:
+    - id: 7
+      revision: 2
+      base_commit_id: null
+      patch:
+      - diff -r 93d9429b41ec -r 53b32d356f20 foo1
+      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
+      - "+++ b/foo1\tThu Jan 01 00:00:00 1970 +0000"
+      - '@@ -0,0 +1,1 @@'
+      - +foo1
+      - diff -r 93d9429b41ec -r 53b32d356f20 foo2
+      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
+      - "+++ b/foo2\tThu Jan 01 00:00:00 1970 +0000"
+      - '@@ -0,0 +1,1 @@'
+      - +foo2
+      - diff -r 93d9429b41ec -r 53b32d356f20 foo3
+      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
+      - "+++ b/foo3\tThu Jan 01 00:00:00 1970 +0000"
+      - '@@ -0,0 +1,1 @@'
+      - +foo3
+      - diff -r 93d9429b41ec -r 53b32d356f20 foo4
+      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
+      - "+++ b/foo4\tThu Jan 01 00:00:00 1970 +0000"
+      - '@@ -0,0 +1,1 @@'
+      - +foo4
 
   $ rbmanage publish $HGPORT1 1
 
 Review 6 should be marked as discarded
 
   $ rbmanage dumpreview $HGPORT1 6
-  Review: 6
-    Status: discarded
-    Public: True
-    Bugs: 123
-    Commit ID: None
-    Summary: Bug 123 - Foo 5
-    Description:
-      Bug 123 - Foo 5
-    Extra:
-      p2rb: True
-      p2rb.commit_id: f466ed1de51670e583e11deb2f1022a342b52ccd
-      p2rb.identifier: bz://123/mynick
-      p2rb.is_squashed: False
+  id: 6
+  status: discarded
+  public: true
+  bugs:
+  - '123'
+  commit: null
+  summary: Bug 123 - Foo 5
+  description: Bug 123 - Foo 5
+  extra_data:
+    p2rb: true
+    p2rb.commit_id: f466ed1de51670e583e11deb2f1022a342b52ccd
+    p2rb.identifier: bz://123/mynick
+    p2rb.is_squashed: false
 
 Dropping the first commit should shuffle all the reviews down the line.
 NOTE: If we ever employ heuristic matching on the server, this test
@@ -224,103 +232,112 @@ likely gets invalidated.
 The first commit was rewritten (we assume all subsequent were as well).
 
   $ rbmanage dumpreview $HGPORT1 2
-  Review: 2
-    Status: pending
-    Public: True
-    Bugs: 123
-    Commit ID: None
-    Summary: Bug 123 - Foo 1
-    Description:
-      Bug 123 - Foo 1
-    Extra:
-      p2rb: True
-      p2rb.commit_id: c5b850e249510046906bcb24f774635c4521a4a9
-      p2rb.identifier: bz://123/mynick
-      p2rb.is_squashed: False
-  Draft: 2
-    Bugs: 123
-    Commit ID: None
-    Summary: Bug 123 - Foo 2
-    Description:
-      Bug 123 - Foo 2
-    Extra:
-      p2rb: True
+  id: 2
+  status: pending
+  public: true
+  bugs:
+  - '123'
+  commit: null
+  summary: Bug 123 - Foo 1
+  description: Bug 123 - Foo 1
+  extra_data:
+    p2rb: true
+    p2rb.commit_id: c5b850e249510046906bcb24f774635c4521a4a9
+    p2rb.identifier: bz://123/mynick
+    p2rb.is_squashed: false
+  draft:
+    bugs:
+    - '123'
+    commit: null
+    summary: Bug 123 - Foo 2
+    description: Bug 123 - Foo 2
+    extra:
+      p2rb: true
       p2rb.commit_id: ce44f0c4506c2e377ccfb702277cec50905be3e3
       p2rb.identifier: bz://123/mynick
-      p2rb.is_squashed: False
-  Diff: 9
-    Revision: 2
-  diff -r 93d9429b41ec -r ce44f0c4506c foo2
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo2	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +foo2
-  
+      p2rb.is_squashed: false
+    diffs:
+    - id: 9
+      revision: 2
+      base_commit_id: null
+      patch:
+      - diff -r 93d9429b41ec -r ce44f0c4506c foo2
+      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
+      - "+++ b/foo2\tThu Jan 01 00:00:00 1970 +0000"
+      - '@@ -0,0 +1,1 @@'
+      - +foo2
 
 The last review request that got invalidated in the shuffle should
 be in the list of review requests to discard when the squashed review
 request is published.
 
   $ rbmanage dumpreview $HGPORT1 1
-  Review: 1
-    Status: pending
-    Public: True
-    Bugs: 123
-    Commit ID: bz://123/mynick
-    Summary: bz://123/mynick
-    Description:
-      /r/2 - Bug 123 - Foo 1
-      /r/3 - Bug 123 - Foo 2
-      /r/4 - Bug 123 - Foo 3
-      /r/5 - Bug 123 - Foo 4
-      
-      Pull down these commits:
-      
-      hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/
-    Extra:
-      p2rb: True
-      p2rb.commits: [["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c", "3"], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", "4"], ["53b32d356f20f6730c14ec62c3706eba7e68e078", "5"]]
-      p2rb.discard_on_publish_rids: ["5"]
+  id: 1
+  status: pending
+  public: true
+  bugs:
+  - '123'
+  commit: bz://123/mynick
+  summary: bz://123/mynick
+  description:
+  - /r/2 - Bug 123 - Foo 1
+  - /r/3 - Bug 123 - Foo 2
+  - /r/4 - Bug 123 - Foo 3
+  - /r/5 - Bug 123 - Foo 4
+  - ''
+  - 'Pull down these commits:'
+  - ''
+  - hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/
+  extra_data:
+    p2rb: true
+    p2rb.commits: '[["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c",
+      "3"], ["68fdf92dbf149ab8afb8295a76b79fb82a9629b1", "4"], ["53b32d356f20f6730c14ec62c3706eba7e68e078",
+      "5"]]'
+    p2rb.discard_on_publish_rids: '["5"]'
+    p2rb.identifier: bz://123/mynick
+    p2rb.is_squashed: true
+    p2rb.unpublished_rids: '[]'
+  draft:
+    bugs:
+    - '123'
+    commit: bz://123/mynick
+    summary: bz://123/mynick
+    description:
+    - /r/2 - Bug 123 - Foo 2
+    - /r/3 - Bug 123 - Foo 3
+    - /r/4 - Bug 123 - Foo 4
+    - ''
+    - 'Pull down these commits:'
+    - ''
+    - hg pull -r e44f9d56a1a491868bf5b3742196896dc76fd62e http://localhost:$HGPORT/
+    extra:
+      p2rb: true
+      p2rb.commits: '[["ce44f0c4506c2e377ccfb702277cec50905be3e3", "2"], ["2879da44c7e2010282f90fcb2c1aa743038ac156",
+        "3"], ["e44f9d56a1a491868bf5b3742196896dc76fd62e", "4"]]'
+      p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://123/mynick
-      p2rb.is_squashed: True
-      p2rb.unpublished_rids: []
-  Draft: 1
-    Bugs: 123
-    Commit ID: bz://123/mynick
-    Summary: bz://123/mynick
-    Description:
-      /r/2 - Bug 123 - Foo 2
-      /r/3 - Bug 123 - Foo 3
-      /r/4 - Bug 123 - Foo 4
-      
-      Pull down these commits:
-      
-      hg pull -r e44f9d56a1a491868bf5b3742196896dc76fd62e http://localhost:$HGPORT/
-    Extra:
-      p2rb: True
-      p2rb.commits: [["ce44f0c4506c2e377ccfb702277cec50905be3e3", "2"], ["2879da44c7e2010282f90fcb2c1aa743038ac156", "3"], ["e44f9d56a1a491868bf5b3742196896dc76fd62e", "4"]]
-      p2rb.discard_on_publish_rids: []
-      p2rb.identifier: bz://123/mynick
-      p2rb.is_squashed: True
-      p2rb.unpublished_rids: []
-  Diff: 8
-    Revision: 3
-  diff -r 93d9429b41ec -r e44f9d56a1a4 foo2
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo2	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +foo2
-  diff -r 93d9429b41ec -r e44f9d56a1a4 foo3
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo3	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +foo3
-  diff -r 93d9429b41ec -r e44f9d56a1a4 foo4
-  --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo4	Thu Jan 01 00:00:00 1970 +0000
-  @@ -0,0 +1,1 @@
-  +foo4
-  
+      p2rb.is_squashed: true
+      p2rb.unpublished_rids: '[]'
+    diffs:
+    - id: 8
+      revision: 3
+      base_commit_id: null
+      patch:
+      - diff -r 93d9429b41ec -r e44f9d56a1a4 foo2
+      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
+      - "+++ b/foo2\tThu Jan 01 00:00:00 1970 +0000"
+      - '@@ -0,0 +1,1 @@'
+      - +foo2
+      - diff -r 93d9429b41ec -r e44f9d56a1a4 foo3
+      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
+      - "+++ b/foo3\tThu Jan 01 00:00:00 1970 +0000"
+      - '@@ -0,0 +1,1 @@'
+      - +foo3
+      - diff -r 93d9429b41ec -r e44f9d56a1a4 foo4
+      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
+      - "+++ b/foo4\tThu Jan 01 00:00:00 1970 +0000"
+      - '@@ -0,0 +1,1 @@'
+      - +foo4
 
 Publish to get us up to date, but we're not going to test the publishing
 behaviour here. We'll save that for other tests.

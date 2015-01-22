@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-import sys
+from collections import OrderedDict
 
 from mach.decorators import (
     CommandArgument,
@@ -13,50 +13,56 @@ from mach.decorators import (
 
 import yaml
 
-# TODO Use YAML.
-def dump_review_request(r):
-    from rbtools.api.errors import APIError
 
-    # TODO Figure out depends_on dumping.
-    print('Review: %s' % r.id)
-    print('  Status: %s' % r.status)
-    print('  Public: %s' % r.public)
-    if r.bugs_closed:
-        print('  Bugs: %s' % ' '.join(r.bugs_closed))
-    print('  Commit ID: %s' % r.commit_id)
-    if r.summary:
-        print('  Summary: %s' % r.summary)
-    if r.description:
-        print('  Description:\n    %s' % r.description.replace('\n', '\n    '))
-    print('  Extra:')
-    for k, v in sorted(r.extra_data.iteritems()):
-        print ('    %s: %s' % (k, v))
+# Teach yaml how to format OrderedDict.
+def ordered_dict_presenter(dumper, data):
+    return dumper.represent_dict(data.items())
+yaml.add_representer(OrderedDict, ordered_dict_presenter,
+                     Dumper=yaml.SafeDumper)
+
+
+def _serialize_text(s):
+    lines = s.splitlines()
+    if len(lines) > 1:
+        return lines
+    return s
+
+
+def serialize_review_requests(rr):
+    from rbtools.api.errors import APIError
+    d = OrderedDict()
+    d['id'] = rr.id
+    d['status'] = rr.status
+    d['public'] = rr.public
+    d['bugs'] = list(rr.bugs_closed)
+    d['commit'] = rr.commit_id
+    d['summary'] = _serialize_text(rr.summary)
+    d['description'] = _serialize_text(rr.description)
+    d['extra_data'] = dict(rr.extra_data.iteritems())
 
     try:
-        d = r.get_draft()
-        print('Draft: %s' % d.id)
-        if d.bugs_closed:
-            print('  Bugs: %s' % ' '.join(d.bugs_closed))
-        print('  Commit ID: %s' % d.commit_id)
-        if d.summary:
-            print('  Summary: %s' % d.summary)
-        if d.description:
-            print('  Description:\n    %s' % d.description.replace('\n', '\n    '))
-        print('  Extra:')
-        for k, v in sorted(d.extra_data.iteritems()):
-            print('    %s: %s' % (k, v))
+        draft = rr.get_draft()
+        ddraft = OrderedDict()
+        d['draft'] = ddraft
+        ddraft['bugs'] = list(draft.bugs_closed)
+        ddraft['commit'] = draft.commit_id
+        ddraft['summary'] = _serialize_text(draft.summary)
+        ddraft['description'] = _serialize_text(draft.description)
+        ddraft['extra'] = dict(draft.extra_data.iteritems())
 
-        dds = d.get_draft_diffs()
-        for diff in dds:
-            print('Diff: %s' % diff.id)
-            print('  Revision: %s' % diff.revision)
-            if diff.base_commit_id:
-                print('  Base Commit: %s' % diff.base_commit_id)
-            patch = diff.get_patch()
-            print(patch.data)
-    except APIError as e:
-        # There was no draft, so nothing to print.
+        ddraft['diffs'] = []
+        for diff in draft.get_draft_diffs():
+            diffd = OrderedDict()
+            diffd['id'] = diff.id
+            diffd['revision'] = diff.revision
+            diffd['base_commit_id'] = diff.base_commit_id
+            diffd['patch'] = diff.get_patch().data.splitlines()
+            ddraft['diffs'].append(diffd)
+
+    except APIError:
         pass
+
+    return yaml.safe_dump(d, default_flow_style=False).rstrip()
 
 
 @CommandProvider
@@ -103,7 +109,7 @@ class ReviewBoardCommands(object):
     def dumpreview(self, port, rrid):
         root = self._get_root(port)
         r = root.get_review_request(review_request_id=rrid)
-        dump_review_request(r)
+        print(serialize_review_requests(r))
 
     @Command('add-reviewer', category='reviewboard',
         description='Add a reviewer to a review request')

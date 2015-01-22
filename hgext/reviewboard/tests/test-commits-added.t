@@ -74,43 +74,50 @@ Adding commits to old reviews should create new reviews
 The parent review should have its description updated.
 
   $ rbmanage dumpreview $HGPORT1 1
-  Review: 1
-    Status: pending
-    Public: False
-    Commit ID: bz://1/mynick
-    Extra:
-      p2rb: True
-      p2rb.discard_on_publish_rids: []
+  id: 1
+  status: pending
+  public: false
+  bugs: []
+  commit: bz://1/mynick
+  summary: ''
+  description: ''
+  extra_data:
+    p2rb: true
+    p2rb.discard_on_publish_rids: '[]'
+    p2rb.identifier: bz://1/mynick
+    p2rb.is_squashed: true
+    p2rb.unpublished_rids: '["2", "3", "4"]'
+  draft:
+    bugs: []
+    commit: bz://1/mynick
+    summary: bz://1/mynick
+    description:
+    - /r/2 - Bug 1 - Foo 1
+    - /r/3 - Bug 1 - Foo 2
+    - /r/4 - Bug 1 - Foo 3
+    - ''
+    - 'Pull down these commits:'
+    - ''
+    - hg pull -r 3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11 http://localhost:$HGPORT/
+    extra:
+      p2rb: true
+      p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
+        "3"], ["3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11", "4"]]'
+      p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
-      p2rb.is_squashed: True
-      p2rb.unpublished_rids: ["2", "3", "4"]
-  Draft: 1
-    Commit ID: bz://1/mynick
-    Summary: bz://1/mynick
-    Description:
-      /r/2 - Bug 1 - Foo 1
-      /r/3 - Bug 1 - Foo 2
-      /r/4 - Bug 1 - Foo 3
-      
-      Pull down these commits:
-      
-      hg pull -r 3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11 http://localhost:$HGPORT/
-    Extra:
-      p2rb: True
-      p2rb.commits: [["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d", "3"], ["3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11", "4"]]
-      p2rb.discard_on_publish_rids: []
-      p2rb.identifier: bz://1/mynick
-      p2rb.is_squashed: True
-      p2rb.unpublished_rids: []
-  Diff: 4
-    Revision: 1
-  diff -r 7c5bdf0cec4a -r 3e4b2ebd3703 foo
-  --- a/foo	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/foo	Thu Jan 01 00:00:00 1970 +0000
-  @@ -1,1 +1,1 @@
-  -foo0
-  +foo3
-  
+      p2rb.is_squashed: true
+      p2rb.unpublished_rids: '[]'
+    diffs:
+    - id: 4
+      revision: 1
+      base_commit_id: null
+      patch:
+      - diff -r 7c5bdf0cec4a -r 3e4b2ebd3703 foo
+      - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"
+      - "+++ b/foo\tThu Jan 01 00:00:00 1970 +0000"
+      - '@@ -1,1 +1,1 @@'
+      - -foo0
+      - +foo3
 
   $ cd ..
   $ rbmanage stop rbserver
