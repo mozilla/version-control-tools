@@ -51,10 +51,13 @@ details from the parent review request
       exchange: exchange/mozreview/
       routing_key: mozreview.commits.published
     commits:
-    - - 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
-      - '2'
-    - - 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
-      - '3'
+    - diffset_revision: 1
+      rev: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
+      review_request_id: 2
+    - diffset_revision: 1
+      rev: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
+      review_request_id: 3
+    parent_diffset_revision: 1
     parent_review_request_id: 1
     repository_url: http://localhost:$HGPORT/
 

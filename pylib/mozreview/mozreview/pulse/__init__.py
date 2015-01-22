@@ -1,6 +1,9 @@
+from __future__ import unicode_literals
+
 import json
 
 from reviewboard.extensions.hooks import SignalHook
+from reviewboard.reviews.models import ReviewRequest
 from reviewboard.reviews.signals import review_request_published
 
 from mozillapulse import publishers
@@ -51,11 +54,39 @@ def handle_commits_published(extension=None, **kwargs):
     # want it to be different from path here. This will require a new convention
     # for where to store it, mirror_path might work.
     repo_url = review_request.repository.path
-    commits = json.loads(review_request.extra_data.get('p2rb.commits', '[]'))
+
+    child_rrids = []
+    commits = []
+    ext_commits = json.loads(
+        review_request.extra_data.get('p2rb.commits', '[]'))
+
+    for rev, rrid in ext_commits:
+        child_rrids.append(int(rrid))
+        commits.append({
+            'rev': rev,
+            'review_request_id': int(rrid),
+            'diffset_revision': None
+        })
+
+
+    # In order to retrieve the diff revision for each commit we need to fetch
+    # their correpsonding child review request.
+    review_requests = dict(
+        (obj.id, obj) for obj in
+        ReviewRequest.objects.filter(pk__in=child_rrids))
+
+    for commit_info in commits:
+        # TODO: Every call to get_latest_diffset() makes its own query to the
+        # database. It is probably possible to retrieve the diffsets we care
+        # about using a single query through Django's ORM, but it's not trivial.
+        commit_info['diffset_revision'] = review_requests[
+            commit_info['review_request_id']
+        ].get_latest_diffset().revision
 
     msg = base.GenericMessage()
     msg.routing_parts.append('mozreview.commits.published')
     msg.data['parent_review_request_id'] = review_request.id
+    msg.data['parent_diffset_revision'] = review_request.get_latest_diffset().revision
     msg.data['commits'] = commits
     msg.data['repository_url'] = repo_url
 
