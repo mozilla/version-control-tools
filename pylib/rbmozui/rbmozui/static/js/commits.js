@@ -444,11 +444,10 @@ $(document).ready(function() {
 
     /**
      * Options:
-     *   rootID: the ID of the root / squashed review request.
+     *   model: the root review request as an RB.ReviewRequest model.
      */
     initialize: function(options) {
       console.log("Initializing CommitListView");
-      this.model = new RB.ReviewRequest({id: options.rootID});
       this.commitList = new CommitList();
       this.listenTo(this.commitList, "add", this.add);
       // Now we need to retrieve the data for this review request - the
@@ -461,7 +460,7 @@ $(document).ready(function() {
       var self = this;
       console.log("Requesting root review request and draft");
 
-      var mutableByUser = rootEditor.get("mutableByUser");
+      var mutableByUser = RBMozUI.currentIsMutableByUser;
       var reviewable = mutableByUser ? this.model.draft : this.model;
       reviewable.ready({
         ready: function() {
@@ -476,7 +475,7 @@ $(document).ready(function() {
             return;
           }
 
-          var isMutable = rootEditor.get("mutableByUser");
+          var isMutable = RBMozUI.currentIsMutableByUser;
           var isViewingRoot = (self.model.id == gReviewRequest.id);
 
           // Now we need the child review requests in the extra_data...
@@ -574,19 +573,5 @@ $(document).ready(function() {
     }
   });
 
-  // End of Backbone model / collection / view definitions.
-
-  // The back-end should have already supplied us with the squashed / root review
-  // request ID (whether or not we're already looking at it), and set it as
-  // the data-id attribute on the rbmozui-commits-root element. Let's get that
-  // first - because if we can't get it, we're stuck.
-  var rootID = $("#rbmozui-commits-root").data("id");
-  if (!rootID) {
-    console.error("Could not find a valid id for the root review " +
-                  "request.");
-    return;
-  }
-
-  console.log("Found root review request ID: " + rootID);
-  new CommitListView({rootID: rootID});
+  new CommitListView({model: RBMozUI.rootReviewRequest});
 });

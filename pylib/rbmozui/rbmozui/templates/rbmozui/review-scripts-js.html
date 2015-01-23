@@ -2,6 +2,11 @@
 {% load rbmozui %}
 
 {% if review_request|isPush %}
-{%   ext_js_bundle extension "rbmozuiautocomplete" %}
-{%   ext_js_bundle extension "review" %}
+{%   ext_js_bundle extension "reviews" %}
+
+{%   if review_request|isSquashed %}
+{%     ext_js_bundle extension "try" %}
+{%   endif %}
+
 {% endif %}
+
