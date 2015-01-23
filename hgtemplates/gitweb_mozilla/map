@@ -100,7 +100,7 @@ fileline = '
 annotateline = '
   <tr style="font-family:monospace" class="parity{parity}">
     <td class="linenr" style="text-align: right;">
-      <a href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}#l{targetline}"
+      <a href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}"
          title="{node|short}: {desc|escape|firstline}">{author|user}@{rev}</a>
     </td>
     <td><pre><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a></pre></td>
