@@ -91,8 +91,8 @@ def autoland():
         error = 'Bad request: bad endpoint'
         return make_response(jsonify({'error': error}), 400)
 
-
-    app.logger.info('received transplant request: %s' % json.dumps(request.json))
+    app.logger.info('received transplant request: %s' %
+                    json.dumps(request.json))
 
     dbconn = get_dbconn()
     cursor = dbconn.cursor()
@@ -120,7 +120,8 @@ def autoland_status(request_id):
     cursor = dbconn.cursor()
 
     query = """
-        select tree,rev,destination,trysyntax,landed,result,endpoint from Transplant
+        select tree,rev,destination,trysyntax,landed,result,endpoint
+        from Transplant
         where id = %(request_id)s
     """
 
