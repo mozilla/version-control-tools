@@ -191,6 +191,15 @@ class MozReviewBoard(object):
         port = str(port)
         env = self.env
         env['HOME'] = self.path
+
+        # Hook up the django site domain. We have to do this at every
+        # startup since the port may change.
+        from django.contrib.sites.models import Site as DjangoSite
+        site = DjangoSite.objects.get(pk=1)
+        site.domain = 'localhost:%s' % port
+        site.name = 'localhost'
+        site.save()
+
         f = open(os.path.join(self.path, 'reviewboard-server.log'), 'w')
         # --noreload prevents process for forking. If we don't do this,
         # our written pid is not correct.
