@@ -4,7 +4,7 @@ import logging
 import os
 import psycopg2
 
-from flask import Flask, request, json, Response, abort
+from flask import Flask, request, jsonify, Response, abort, make_response
 
 from mozlog.structured import (
     commandline,
@@ -17,6 +17,12 @@ AUTH = None
 DSN = None
 
 app = Flask(__name__, static_url_path='', static_folder='')
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
 
 def get_dbconn():
     global DSN
@@ -66,6 +72,15 @@ def autoland():
         return Response('Login required', 401,
                         {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
+    if request.json is None:
+        error = 'Bad request: missing json'
+        return make_response(jsonify({'error': error}), 400)
+
+    for field in ['tree', 'rev', 'destination', 'endpoint']:
+        if not field in request.json:
+            error = 'Bad request: missing json field: %s' % field
+            return make_response(jsonify({'error': error}), 400)
+
     app.logger.info('received transplant request: %s' % json.dumps(request.json))
 
     dbconn = get_dbconn()
@@ -84,13 +99,7 @@ def autoland():
     request_id = cursor.fetchone()[0]
     dbconn.commit()
 
-    result = json.dumps({'request_id': request_id})
-
-    headers = [
-        ("Content-Type", "application/json"),
-        ("Content-Length", str(len(result)))
-    ]
-    return Response(result, status=200, headers=headers)
+    return jsonify({'request_id': request_id})
 
 
 @app.route('/autoland/status/<request_id>')
@@ -107,26 +116,23 @@ def autoland_status(request_id):
     try:
         cursor.execute(query, ({'request_id': int(request_id)}))
     except ValueError:
-        return Response('', status=404)
+        abort(404)
 
     row = cursor.fetchone()
     if row:
-        result = json.dumps({'tree': row[0],
-                             'rev': row[1],
-                             'destination': row[2],
-                             'trysyntax': row[3],
-                             'landed': row[4],
-                             'result': row[5],
-                             'endpoint': row[6]})
+        result = {
+            'tree': row[0],
+            'rev': row[1],
+            'destination': row[2],
+            'trysyntax': row[3],
+            'landed': row[4],
+            'result': row[5],
+            'endpoint': row[6]
+        }
 
-        headers = [
-            ("Content-Type", "application/json"),
-            ("Content-Length", str(len(result)))
-        ]
+        return jsonify(result)
 
-        return Response(result, status=200, headers=headers)
-
-    return Response('', status=404)
+    abort(404)
 
 
 @app.route('/')
