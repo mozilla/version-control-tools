@@ -135,6 +135,15 @@ class ReviewBoardCommands(object):
         username = os.environ.get('BUGZILLA_USERNAME')
         password = os.environ.get('BUGZILLA_PASSWORD')
 
+        # RBClient is persisting login cookies from call to call
+        # in $HOME/.rbtools-cookies. We want to be able to easily switch
+        # between users, so we clear that cookie between calls to the
+        # server and reauthenticate every time.
+        try:
+            os.remove(os.path.join(os.environ.get('HOME'), '.rbtools-cookies'))
+        except Exception:
+            pass
+
         c = RBClient('http://localhost:%s/' % port, username=username,
                 password=password)
         return c.get_root()
@@ -427,6 +436,50 @@ class ReviewBoardCommands(object):
         data[u.id] = o
 
         print(yaml.safe_dump(data, default_flow_style=False).rstrip())
+
+    @Command('hit-try-autoland-trigger', category='reviewboard',
+             description='Pass some values to the try-autoland-trigger WebAPI '
+                         'resource.')
+    @CommandArgument('port',
+                     help='Port number Review Board is running on')
+    @CommandArgument('review_request_id',
+                     help='The review request ID to pass to the WebAPI '
+                          'resource')
+    @CommandArgument('try_syntax',
+                     help='The try syntax to send to the endpoint')
+    @CommandArgument('--autoland-request-id', default=1,
+                     help='The autoland request id to put into the database')
+    def hit_try_autoland_trigger(self, port, review_request_id,
+                                 try_syntax, autoland_request_id=None):
+        from rbtools.api.errors import APIError
+        root = self._get_root(port)
+        ext = root.get_extension(
+            extension_name="mozreview.extension.MozReviewExtension")
+
+        try:
+            ext.get_try_autoland_triggers().create(
+                review_request_id=review_request_id,
+                try_syntax=try_syntax,
+                autoland_request_id_for_testing=autoland_request_id)
+        except APIError as e:
+            print e
+            return 1
+
+    @Command('dump-autoland-requests', category='reviewboard',
+             description='Dump the table of autoland requests.')
+    @CommandArgument('port',
+                     help='Port number Review Board is running on')
+    def dump_autoland_requests(self, port):
+        root = self._get_root(port)
+        ext = root.get_extension(
+            extension_name="mozreview.extension.MozReviewExtension")
+
+        requests = ext.get_try_autoland_triggers()
+        o = {}
+        for request in requests:
+            for field in request.iterfields():
+                o[field] = getattr(request, field)
+            print(yaml.safe_dump(o, default_flow_style=False).rstrip())
 
     @Command('start', category='reviewboard',
         description='Start a Review Board HTTP server.')
