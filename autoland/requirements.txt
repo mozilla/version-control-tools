@@ -1,6 +1,7 @@
 beautifulsoup4
 flask
 kombu
+mock
 mozillapulse
 mozlog == 2.2
 psycopg2
