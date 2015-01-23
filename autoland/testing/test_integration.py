@@ -97,6 +97,35 @@ class TestAutolandIntegration(unittest.TestCase):
         self.assertEqual(r.status_code, 400,
                          'Empty data should return bad request')
 
+        data = {
+            'tree': 'mozilla-central',
+            'rev': '2bcb4d148ef5',
+            'destination': 'try',
+            'endpoint': ''
+        }
+
+        r = requests.post('http://localhost:8000/autoland',
+                          data=json.dumps(data),
+                          headers= {'Content-Type': 'application/json'},
+                          auth=('autoland', 'autoland'))
+
+        self.assertEqual(r.status_code, 400,
+                         'Empty endpoint should return bad request')
+
+        data = {
+            'tree': 'mozilla-central',
+            'rev': '2bcb4d148ef5',
+            'destination': 'try',
+            'endpoint': 'localhost:8000'
+        }
+
+        r = requests.post('http://localhost:8000/autoland',
+                          data=json.dumps(data),
+                          headers= {'Content-Type': 'application/json'},
+                          auth=('autoland', 'autoland'))
+        self.assertEqual(r.status_code, 400,
+                         'Missing scheme should return bad request')
+
 
     def test_autoland_status_endpoint(self):
         """Test getting status from the /autoland/status/ endpoint"""

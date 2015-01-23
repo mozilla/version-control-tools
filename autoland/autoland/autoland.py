@@ -269,7 +269,7 @@ def handle_pending_mozreview_updates(logger, dbconn):
                     (row[7], row[0]))
 
         if mozreview.update_review(mozreview_auth, endpoint, data):
-            updated.append(transplant_id)
+            updated.append(row[0])
 
     if updated:
         query = """

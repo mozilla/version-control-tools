@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import psycopg2
+import urlparse
 
 from flask import Flask, request, jsonify, Response, abort, make_response
 
@@ -80,6 +81,16 @@ def autoland():
         if not field in request.json:
             error = 'Bad request: missing json field: %s' % field
             return make_response(jsonify({'error': error}), 400)
+
+    try:
+        parsed = urlparse.urlparse(request.json['endpoint'])
+        if 'http' not in parsed.scheme:
+            error = 'Bad request: bad endpoint'
+            return make_response(jsonify({'error': error}), 400)
+    except:
+        error = 'Bad request: bad endpoint'
+        return make_response(jsonify({'error': error}), 400)
+
 
     app.logger.info('received transplant request: %s' % json.dumps(request.json))
 
