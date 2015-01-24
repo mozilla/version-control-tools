@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import logging
 
 from django.template.loader import Context, get_template
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from reviewboard.extensions.base import get_extension_manager
@@ -10,6 +11,8 @@ from reviewboard.reviews.fields import BaseReviewRequestField
 from reviewboard.reviews.models import ReviewRequest, ReviewRequestDraft
 
 from mozreview.utils import is_parent, is_pushed
+
+from mozreview.autoland.models import AutolandRequest, AutolandEventLogEntry
 
 
 def get_root(review_request):
@@ -78,6 +81,11 @@ class TryField(BaseReviewRequestField):
 
     can_record_change_entry = True
 
+    _retreive_error_txt = _('There was an error retrieving the try push.')
+    _waiting_txt = _('Waiting for autoland request to execute, hold tight.')
+    _autoland_problem = _('Autoland reported a problem: %s')
+    _job_url = 'https://treeherder.mozilla.org/#/jobs?repo=try&revision=%s'
+
     def should_render(self, value):
         ext = get_extension_manager().get_enabled_extension(
             'rbmozui.extension.RBMozUI')
@@ -90,15 +98,58 @@ class TryField(BaseReviewRequestField):
     def load_value(self, review_request_details):
         return review_request_details.extra_data.get('p2rb.autoland_try')
 
+    def get_change_entry_sections_html(self, info):
+        if 'new' not in info:
+            # If there was no new value we won't bother rendering anything.
+            # this would really only happen if the latest try build was
+            # removed and not replaced with a new one, which would be very
+            # strange.
+            return []
+
+        return [{
+            'title': self.label,
+            'rendered_html': mark_safe(self.render_change_entry_html(info)),
+        }]
+
     def render_change_entry_html(self, info):
-        # TODO
-        return ""
+        try:
+            autoland_id = int(info['new'][0])
+        except ValueError:
+            # Something unexpected was recorded as the autoland id in the
+            # changedescription. This either means we have a serious bug or
+            # someone was attempting to change the field themselves (possibly
+            # maliciously).
+            logging.error('A malformed autoland_id was detected: %s' %
+                          info['new'][0])
+            return self._retreive_error_txt
+
+        try:
+            ar = AutolandRequest.objects.get(pk=autoland_id)
+        except:
+            logging.error('An unknown autoland_id was detected: %s' %
+                info['new'][0])
+            return self._retreive_error_txt
+
+        if ar.last_known_status == AutolandEventLogEntry.REQUESTED:
+            return self._waiting_txt
+        elif ar.last_known_status == AutolandEventLogEntry.PROBLEM:
+            return self._autoland_problem % ar.last_details
+        elif ar.last_known_status == AutolandEventLogEntry.SERVED:
+            # TODO: Use a real template to render this stuff.
+            url = self._job_url % ar.repository_revision
+            return  '<a href="%s">%s</a>' % (url, url)
+        else:
+            return self._retreive_error_txt
 
     def as_html(self):
         rr = ensure_review_request(self.review_request_details)
 
         template = get_template('rbmozui/try.html')
-        current_autoland_try = int(rr.extra_data.get('p2rb.autoland_try'))
+        current_autoland_try = rr.extra_data.get('p2rb.autoland_try', None)
+
+        if current_autoland_try is not None:
+            current_autoland_try = int(current_autoland_try)
+
         return template.render(Context({
-            'autoland_try': current_autoland_try or None,
+            'autoland_try': current_autoland_try,
         }))
