@@ -1,6 +1,6 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-multiple-parents
+  $ commonenv
 
   $ bugzilla create-bug-range TestProduct TestComponent 2
   created bugs 1 to 2
@@ -66,7 +66,7 @@ Pushing with a different review ID will create a "duplicate" review
   http://localhost:$HGPORT1/r/2
   http://localhost:$HGPORT1/r/4
 
-  $ cd ..
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-multiple-parents
+Cleanup
+
+  $ mozreview stop
   stopped 3 containers

@@ -1,7 +1,7 @@
 #require docker
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-bugzilla-review-flag-cleared
+  $ commonenv
 
   $ cd client
   $ echo initial > foo
@@ -211,6 +211,5 @@ Posting a non Ship It review without a review flag adds a comment
 
 Cleanup
 
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-bugzilla-review-flag-cleared
+  $ mozreview stop
   stopped 3 containers

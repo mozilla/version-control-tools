@@ -1,8 +1,7 @@
 #require docker
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-
-  $ commonenv rb-test-auth
+  $ commonenv
 
   $ cd client
   $ echo foo0 > foo
@@ -384,6 +383,5 @@ user, they will be assigned the email+id username.
 
 Cleanup
 
-  $ rbmanage stop ../rbserver
-  $ dockercontrol stop-bmo rb-test-auth
+  $ mozreview stop
   stopped 3 containers

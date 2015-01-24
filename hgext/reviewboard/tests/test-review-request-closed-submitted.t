@@ -1,6 +1,6 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-review-request-closed-submitted
+  $ commonenv
   $ bugzilla create-bug-range TestProduct TestComponent 123
   created bugs 1 to 123
 
@@ -171,7 +171,7 @@ Child review request with ID 3 should be re-opened...
     p2rb.identifier: bz://123/mynick
     p2rb.is_squashed: false
 
-  $ cd ..
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-review-request-closed-submitted
+Cleanup
+
+  $ mozreview stop
   stopped 3 containers

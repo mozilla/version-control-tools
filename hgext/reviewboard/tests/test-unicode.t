@@ -1,8 +1,7 @@
 #require docker
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-
-  $ commonenv rb-test-unicode
+  $ commonenv
 
   $ cd client
   $ echo foo > foo
@@ -85,6 +84,5 @@ The globbing is patching over a bug in mach
 
 Cleanup
 
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-unicode
+  $ mozreview stop
   stopped 3 containers

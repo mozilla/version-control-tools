@@ -1,6 +1,6 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-commits-deleted-obsolescence
+  $ commonenv
 
   $ bugzilla create-bug-range TestProduct TestComponent 123
   created bugs 1 to 123
@@ -404,8 +404,7 @@ The parent review should have been updated accordingly.
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
 
-  $ cd ..
-  $ rbmanage stop rbserver
+Cleanup
 
-  $ dockercontrol stop-bmo rb-test-commits-deleted-obsolescence
+  $ mozreview stop
   stopped 3 containers

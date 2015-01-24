@@ -1,8 +1,7 @@
 #require docker
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-
-  $ commonenv rb-test-autocomplete
+  $ commonenv
 
 Create some users
 
@@ -102,6 +101,5 @@ Searching on name for a user with IRC nick returns results
 
 Cleanup
 
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-autocomplete
+  $ mozreview stop
   stopped 3 containers

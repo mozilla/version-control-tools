@@ -1,6 +1,6 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-push
+  $ commonenv
 
   $ cat > obs.py << EOF
   > import mercurial.obsolete
@@ -309,7 +309,7 @@ Reviewing merge commits is rejected
   abort: cannot review merge commits (b21a68e5d0e0)
   [255]
 
-  $ cd ..
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-push
+Cleanup
+
+  $ mozreview stop
   stopped 3 containers

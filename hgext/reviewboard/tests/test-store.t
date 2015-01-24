@@ -1,6 +1,6 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-store
+  $ commonenv
 
   $ bugzilla create-bug TestProduct TestComponent 1
 
@@ -47,7 +47,7 @@ Pushing a review will create the reviews file
   $ cat .hg/reviewboard/review/2.state
   status pending
 
-  $ cd ..
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-store
+Cleanup
+
+  $ mozreview stop
   stopped 3 containers

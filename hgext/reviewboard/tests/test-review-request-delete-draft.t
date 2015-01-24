@@ -1,7 +1,7 @@
 #require docker
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-draft-delete
+  $ commonenv
 
   $ bugzilla create-user submitter@example.com password 'Dummy Submitter'
   created user 5
@@ -189,5 +189,5 @@ Discarding the parent review request draft should discard draft on children
 
 Cleanup
 
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-draft-delete > /dev/null
+  $ mozreview stop
+  stopped 3 containers

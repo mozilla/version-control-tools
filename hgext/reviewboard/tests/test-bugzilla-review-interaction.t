@@ -1,8 +1,7 @@
 #require docker
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-
-  $ commonenv rb-test-bugzilla-review-interaction
+  $ commonenv
 
   $ cd client
   $ echo foo > foo
@@ -623,6 +622,5 @@ Random users can come along and grant review
 
 Cleanup
 
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-bugzilla-review-interaction
+  $ mozreview stop
   stopped 3 containers

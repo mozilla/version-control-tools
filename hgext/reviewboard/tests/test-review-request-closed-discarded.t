@@ -1,6 +1,6 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-review-request-closed-discarded
+  $ commonenv
   $ bugzilla create-bug-range TestProduct TestComponent 123
   created bugs 1 to 123
 
@@ -488,8 +488,7 @@ The attachment for the review request should be unobsoleted
     status: NEW
     summary: Range 123
 
-  $ cd ..
-  $ rbmanage stop rbserver
+Cleanup
 
-  $ dockercontrol stop-bmo rb-test-review-request-closed-discarded
+  $ mozreview stop
   stopped 3 containers

@@ -1,6 +1,5 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-
   $ commonenv rb-test-bugzilla
 
   $ cd client
@@ -64,7 +63,5 @@ details from the parent review request
 
 Cleanup
 
-  $ rbmanage stop ../rbserver
-
-  $ dockercontrol stop-bmo rb-test-bugzilla
+  $ mozreview stop
   stopped 3 containers

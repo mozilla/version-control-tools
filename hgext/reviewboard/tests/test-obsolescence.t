@@ -1,6 +1,6 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-obsolescence
+  $ commonenv
 
   $ cat > obs.py << EOF
   > import mercurial.obsolete
@@ -73,8 +73,7 @@ Now create a new head and push a rebase
   review url: http://localhost:$HGPORT1/r/1 (pending)
   (visit review url to publish this review request so others can see it)
 
-  $ cd ..
-  $ rbmanage stop rbserver
+Cleanup
 
-  $ dockercontrol stop-bmo rb-test-obsolescence
+  $ mozreview stop
   stopped 3 containers

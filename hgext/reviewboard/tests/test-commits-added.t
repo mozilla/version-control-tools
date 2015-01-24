@@ -1,6 +1,6 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-commits-added
+  $ commonenv
 
   $ bugzilla create-bug TestProduct TestComponent 'Initial Bug'
 
@@ -119,8 +119,7 @@ The parent review should have its description updated.
       - -foo0
       - +foo3
 
-  $ cd ..
-  $ rbmanage stop rbserver
+Cleanup
 
-  $ dockercontrol stop-bmo rb-test-commits-added
+  $ mozreview stop
   stopped 3 containers

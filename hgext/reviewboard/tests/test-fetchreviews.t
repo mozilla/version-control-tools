@@ -1,6 +1,6 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-fetchreviews
+  $ commonenv
 
   $ bugzilla create-bug TestProduct TestComponent 'Initial Bug'
 
@@ -58,8 +58,7 @@ Pulling reviews with no changes
   $ hg fetchreviews
   updated 3 reviews
 
-  $ cd ..
-  $ rbmanage stop rbserver
+Cleanup
 
-  $ dockercontrol stop-bmo rb-test-fetchreviews
+  $ mozreview stop
   stopped 3 containers

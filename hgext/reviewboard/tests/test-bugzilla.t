@@ -1,7 +1,6 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-
-  $ commonenv rb-test-bugzilla
+  $ commonenv
 
   $ cd client
   $ echo foo0 > foo
@@ -97,7 +96,5 @@ Publishing the review will add an attachment to the bug
     status: NEW
     summary: bug1
 
-  $ rbmanage stop ../rbserver
-
-  $ dockercontrol stop-bmo rb-test-bugzilla
+  $ mozreview stop
   stopped 3 containers

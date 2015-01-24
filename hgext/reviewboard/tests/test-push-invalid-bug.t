@@ -22,6 +22,5 @@ TODO Test for confidential bugs when Bugzilla's API enables it
 
 Cleanup
 
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-push-invalid-bug
+  $ mozreview stop
   stopped 3 containers
