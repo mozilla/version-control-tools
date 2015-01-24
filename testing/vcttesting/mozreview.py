@@ -218,6 +218,11 @@ class MozReview(object):
                 '[bugzilla]',
                 'url = %s' % self.bugzilla_url,
                 '',
+            ]))
+
+        web_conf = os.path.join(self._path, 'web.conf')
+        with open(web_conf, 'w') as fh:
+            fh.write('\n'.join([
                 '[web]',
                 'push_ssl = False',
                 'allow_push = *',
@@ -228,7 +233,7 @@ class MozReview(object):
             ]))
 
         env = os.environ.copy()
-        env['HGRCPATH'] = '/dev/null'
+        env['HGRCPATH'] = global_hgrc
         env['HGENCODING'] = 'UTF-8'
         args = [
             self._hg,
@@ -236,7 +241,7 @@ class MozReview(object):
             '-d',
             '-p', str(port),
             '--pid-file', self._hg_pid_path,
-            '--web-conf', global_hgrc,
+            '--web-conf', web_conf,
             '--accesslog', os.path.join(self._path, 'hg.access.log'),
             '--errorlog', os.path.join(self._path, 'hg.error.log'),
         ]
