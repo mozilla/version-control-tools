@@ -58,3 +58,29 @@ Once you've executed ``create-test-environment``, you'll need to
 *activate* it so your current shell has access to all its wonders::
 
    $ source venv/bin/activate
+
+boot2docker
+===========
+
+If you are running OS X and have boot2docker installed to run Docker
+containers, you may want to increase the amount of memory available
+to the boot2docker VM.
+
+Run the following to see how much memory is currently allocated to
+boot2docker::
+
+   $ boot2docker config | grep Memory
+   2048
+
+The default is ``2048`` (megabytes). **We recommend at least 4096
+MB.**
+
+To adjust the amount of memory allocated to boot2docker, run the
+following::
+
+   $ VBoxManage modifyvm boot2docker-vm --memory 4096
+
+Alternatively, if you haven't created a boot2docker VM yet, define the
+memory allocation when you create it::
+
+   $ boot2docker init --memory=4096
