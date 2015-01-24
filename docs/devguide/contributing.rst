@@ -1,4 +1,4 @@
-.. _contributing:
+.. _devguide_contributing:
 
 ============
 Contributing
@@ -40,8 +40,8 @@ push ssh://reviewboard-hg.mozilla.org/version-control-tools`` to
 initiate the code review process.
 
 Before submitting patches for review, please :ref:`run the tests
-<testing>` and verify things still work. Please also read the following
-section on how to optimally create commits.
+<devguide_testing>` and verify things still work. Please also read the
+following section on how to optimally create commits.
 
 Commit Creation Guidelines
 --------------------------
@@ -81,16 +81,19 @@ to reflect that.
 Bug and Review Requirements
 ---------------------------
 
-We do not require that every commit have a bug association. If there
+**We do not require that every commit have a bug association.** If there
 isn't a bug on file, please don't waste time filing one just to write a
 patch.
 
-We do not require that every commit be reviewed. The rules here aren't
-yet very well-defined. Generally speaking:
+**We do not require that every commit be reviewed.**
 
-* If you are modifying code that runs on a production service or we
-  install or recommend installing on a user's machine (MozReview,
-  Mercurial extensions, Mercurial hooks, etc), you need a review.
+Please abide by the following rules before pushing without a bug or
+review:
+
+* **A review is required** if you are modifying code that runs on a
+  production service or we install or recommend installing on a
+  user's machine (MozReview, Mercurial extensions, Mercurial hooks,
+  etc).
 
 * If you are adding new test code and you know what you are doing, you
   may **not** need a review. This exception is a little fuzzy around
@@ -100,6 +103,9 @@ yet very well-defined. Generally speaking:
 * If you are adding or hacking on a miscellaneous tool that doesn't
   have test coverage or isn't widely used or relied upon, you may
   **not** need a review.
+
+* You do **not** need a review to update documentation. If something is
+  wrong, just fix it.
 
 * When in doubt, ask someone on ``#vcs`` if you need a review before
   pushing.

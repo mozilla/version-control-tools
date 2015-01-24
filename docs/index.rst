@@ -39,11 +39,10 @@ Table of Contents
 .. toctree::
    :maxdepth: 2
 
+   devguide/index
    hgcustom
    mozreview
    headless-repositories
-   testing
-   contributing
    hgmozilla/index
    hgmo/index
    server
