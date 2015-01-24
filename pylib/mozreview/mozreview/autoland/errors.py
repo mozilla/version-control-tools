@@ -22,3 +22,8 @@ BAD_AUTOLAND_CREDENTIALS = WebAPIError(
     903,
     "Bad or missing Autoland credentials.",
     http_status=401)  # 401 Unauthorized
+
+BAD_UPDATE_CREDENTIALS = WebAPIError(
+    904,
+    "Bad or missing AutolandRequest update credentials.",
+    http_status=401)  # 401 Unauthorized

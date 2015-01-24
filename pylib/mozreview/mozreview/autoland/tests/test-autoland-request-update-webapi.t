@@ -1,7 +1,7 @@
 #require docker
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv
+  $ commonenv rb-test-try-autoland-trigger
 
   $ cd client
   $ echo foo > foo
@@ -13,8 +13,6 @@ Create the test users
 
   $ bugzilla create-user author@example.com password 'Patch Author'
   created user 5
-  $ bugzilla create-user dummy1@example.com password 'Dummy User'
-  created user 6
 
 Create and publish a review request
 
@@ -24,24 +22,6 @@ Create and publish a review request
   $ hg commit -m 'Bug 1 - Initial commit to review'
   $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/ > /dev/null
   $ rbmanage publish $HGPORT1 1
-
-Try to trigger the WebAPI endpoint as user@dummy, which should fail, because
-dummy1@example.com is not the submitter.
-
-  $ exportbzauth dummy1@example.com password
-
-Force the dummy Review Board user to be created by querying for it.
-
-  $ rbmanage get-users $HGPORT1 ''
-  - id: 1
-    url: /users/author%2B5/
-    username: author+5
-  - id: 2
-    url: /users/dummy1%2B6/
-    username: dummy1+6
-
-  $ rbmanage hit-try-autoland-trigger $HGPORT1 1 "try -b do -p all -t none -u all"
-  You don't have permission for this (HTTP 403, API Error 101)
 
 Try to trigger the WebAPI endpoint as the submitter, which should succeed.
 
@@ -57,9 +37,6 @@ Force the admin Review Board user to be created by querying for it.
   - id: 1
     url: /users/author%2B5/
     username: author+5
-  - id: 2
-    url: /users/dummy1%2B6/
-    username: dummy1+6
 
   $ rbmanage dump-autoland-requests $HGPORT1
   autoland_id: 1
@@ -70,6 +47,17 @@ Force the admin Review Board user to be created by querying for it.
   review_request_id: 1
   user_id: 1
 
+Hit the WebAPI with the Autoland response
+
+  $ rbmanage hit-autoland-request-update $HGPORT1 1 mozilla-central abcdefghijklmnop try "try -b do -p all -t none -u all" true Foo
+  $ rbmanage dump-autoland-requests $HGPORT1
+  autoland_id: 1
+  last_known_status: Request served
+  push_revision: 57755461e85f1e3e66738ec2d57f325249897409
+  repository_revision: Foo
+  repository_url: ''
+  review_request_id: 1
+  user_id: 1
 
   $ cd ..
   $ rbmanage stop rbserver

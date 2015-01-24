@@ -42,6 +42,15 @@ class AutolandRequest(models.Model):
     class Meta:
         app_label = 'mozreview'
 
+    @property
+    def last_known_status(self):
+        try:
+            last_evt = self.event_log_entries.order_by('-event_time').all()[0]
+            return last_evt.get_status_display()
+        except IndexError:
+            # in case we don't have any event yet
+            return ""
+
 
 class AutolandEventLogEntry(models.Model):
     REQUESTED = 'R'

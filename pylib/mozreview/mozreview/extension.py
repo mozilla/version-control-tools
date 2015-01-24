@@ -5,7 +5,8 @@ from djblets.webapi.resources import (register_resource_for_model,
 from reviewboard.extensions.base import Extension
 
 from mozreview.autoland.models import AutolandRequest
-from mozreview.autoland.resources import try_autoland_trigger_resource
+from mozreview.autoland.resources import (autoland_request_update_resource,
+                                          try_autoland_trigger_resource)
 from mozreview.batchreview.resources import batch_review_resource
 from mozreview.pulse import initialize_pulse_handlers
 
@@ -36,6 +37,7 @@ class MozReviewExtension(Extension):
     is_configurable = True
 
     resources = [
+        autoland_request_update_resource,
         try_autoland_trigger_resource,
     ]
 

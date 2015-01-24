@@ -465,6 +465,52 @@ class ReviewBoardCommands(object):
             print e
             return 1
 
+    @Command('hit-autoland-request-update', category='reviewboard',
+             description='Pass some values to the autoland-request-update '
+                         'WebAPI resource.')
+    @CommandArgument('port',
+                     help='Port number Review Board is running on')
+    @CommandArgument('autoland_request_id',
+                     help='The autoland request id to update in the database')
+    @CommandArgument('tree',
+                     help='The tree for autoland to report back')
+    @CommandArgument('rev',
+                     help='The rev for autoland to report back')
+    @CommandArgument('destination',
+                     help='The destination for autoland to report back')
+    @CommandArgument('try_syntax',
+                     help='The try syntax to report back')
+    @CommandArgument('landed',
+                     help='The landed state for autoland to report back')
+    @CommandArgument('result',
+                     help='The result state for autoland to report back')
+    def hit_autoland_request_update(self, port, autoland_request_id,
+                                    tree, rev, destination, try_syntax,
+                                    landed, result):
+        import json
+        import requests
+        # There's probably a better way to get this URL from the extension
+        # resource or something, but this will do for now.
+        endpoint = ('http://localhost:%s/api/extensions/'
+                    'mozreview.extension.MozReviewExtension/'
+                    'autoland-request-updates/' % port)
+
+        username = os.environ.get('BUGZILLA_USERNAME')
+        password = os.environ.get('BUGZILLA_PASSWORD')
+
+        requests.post(endpoint, data=json.dumps({
+            'request_id': int(autoland_request_id),
+            'tree': tree,
+            'rev': rev,
+            'destination': destination,
+            'trysyntax': try_syntax,
+            'landed': bool(landed),
+            'result': result,
+        }), headers={
+            'content-type': 'application/json',
+        },  auth=(username, password),
+            timeout=10.0)
+
     @Command('dump-autoland-requests', category='reviewboard',
              description='Dump the table of autoland requests.')
     @CommandArgument('port',

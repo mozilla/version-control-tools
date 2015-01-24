@@ -16,6 +16,7 @@ import requests
 from reviewboard.changedescs.models import ChangeDescription
 from reviewboard.extensions.base import get_extension_manager
 from reviewboard.reviews.models import ReviewRequest
+from reviewboard.site.urlresolvers import local_site_reverse
 from reviewboard.webapi.resources import WebAPIResource
 
 from mozreview.autoland.models import (AutolandEventLogEntry,
@@ -23,7 +24,8 @@ from mozreview.autoland.models import (AutolandEventLogEntry,
 from mozreview.autoland.errors import (AUTOLAND_ERROR,
                                        AUTOLAND_TIMEOUT,
                                        BAD_AUTOLAND_CREDENTIALS,
-                                       BAD_AUTOLAND_URL)
+                                       BAD_AUTOLAND_URL,
+                                       BAD_UPDATE_CREDENTIALS)
 from mozreview.errors import NOT_PUSHED_PARENT_REVIEW_REQUEST
 from mozreview.utils import is_parent, is_pushed
 
@@ -68,6 +70,10 @@ class TryAutolandTriggerResource(WebAPIResource):
         'user_id': {
             'type': int,
             'description': 'The user that initiated the Autoland request.',
+        },
+        'last_known_status': {
+            'type': six.text_type,
+            'description': 'The last known status for this request.',
         },
     }
 
@@ -146,9 +152,15 @@ class TryAutolandTriggerResource(WebAPIResource):
             if not autoland_user or not autoland_password:
                 return BAD_AUTOLAND_CREDENTIALS
 
+            endpoint = autoland_request_update_resource.get_uri(request)
+
+            logging.info('Telling Autoland to give status updates to %s'
+                         % endpoint)
+
             try:
                 response = requests.post(autoland_host, data=json.dumps({
                     'tree': TRY_AUTOLAND_TREE,
+                    'endpoint': endpoint,
                     'rev': last_revision,
                     'destination': TRY_AUTOLAND_DESTINATION,
                     'trysyntax': try_syntax,
@@ -210,7 +222,7 @@ class TryAutolandTriggerResource(WebAPIResource):
         # In order to display the fact that a build was kicked off in the UI,
         # we construct a change description that our TryField can render.
         changedesc = ChangeDescription(public=True, text='', rich_text=False)
-        changedesc.record_field_change('extra_data.p2rb.autoland_try',
+        changedesc.record_field_change('p2rb.autoland_try',
                                        old_request_id, autoland_request_id)
         changedesc.save()
         rr.changedescs.add(changedesc)
@@ -219,5 +231,111 @@ class TryAutolandTriggerResource(WebAPIResource):
             self.item_result_key: autoland_request,
         }
 
+    def serialize_last_known_status_field(self, obj, **kwargs):
+        return obj.last_known_status
+
 
 try_autoland_trigger_resource = TryAutolandTriggerResource()
+
+
+class AutolandRequestUpdateResource(WebAPIResource):
+    """Resource for notifications of Autoland requests status update"""
+    name = 'autoland_request_update'
+    allowed_methods = ('POST',)
+    fields = {
+        'request_id': {
+            'type': int,
+            'description': 'ID of the Autoland request this event refers to'
+        },
+        'destination': {
+            'type': six.text_type,
+            'description': 'Repository where the push landed'
+        },
+        'landed': {
+            'type': bool,
+            'description': 'Whether this push landed or not'
+        },
+        'result': {
+            'type': six.text_type,
+            'description': 'Either an error message or the revision of the '
+                           'push landed'
+        },
+        'rev': {
+            'type': six.text_type,
+            'description': 'The revision of what got pushed for Autoland to'
+                           'grab'
+        },
+        'tree': {
+            'type': six.text_type,
+            'description': 'Origin of this push'
+        },
+        'trysyntax': {
+            'type': six.text_type,
+            'description': 'The TryChooser syntax for the builds we will kick '
+                           'off'
+        }
+    }
+
+    def has_access_permissions(self, request, *args, **kwargs):
+        return False
+
+    def has_list_access_permissions(self, request, *args, **kwargs):
+        return True
+
+    def get_uri(self, request):
+        # TODO - remove this before landing. Just for local testing on mconley's machine
+        #return "http://192.168.59.3:60353/api/extensions/mozreview.extension.MozReviewExtension/autoland-request-updates/"
+        named_url = self._build_named_url(self.name_plural)
+
+        return request.build_absolute_uri(
+            local_site_reverse(named_url, request=request, kwargs={}))
+
+    @webapi_response_errors(DOES_NOT_EXIST, INVALID_FORM_DATA,
+                            NOT_LOGGED_IN, PERMISSION_DENIED)
+    @webapi_login_required
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        ext = get_extension_manager().get_enabled_extension(
+            'mozreview.extension.MozReviewExtension')
+
+        testing = ext.settings.get('testing', False)
+
+        if not testing:
+            if not request.user.has_perm('mozreview.autoland.autoland_add'):
+                return BAD_UPDATE_CREDENTIALS
+
+        try:
+            fields = json.loads(request.body)
+            for field_name, field_definition in self.fields.items():
+                assert type(fields[field_name]) == field_definition['type']
+        except (ValueError, IndexError, AssertionError) as e:
+            return INVALID_FORM_DATA, {
+                'error': e,
+            }
+
+        try:
+            AutolandRequest.objects.get(pk=fields['request_id'])
+        except AutolandRequest.DoesNotExist:
+            return INVALID_FORM_DATA
+
+        update_queryset = AutolandRequest.objects.filter(
+            pk=fields['request_id'])
+
+        if fields['landed']:
+            update_queryset.filter(pk=fields['request_id']).update(
+                repository_revision=fields['result']
+            )
+
+        status = (AutolandEventLogEntry.SERVED if fields['landed'] else
+                  AutolandEventLogEntry.PROBLEM)
+
+        AutolandEventLogEntry.objects.create(
+            autoland_request_id=fields['request_id'],
+            status=status,
+            details=fields['result'],
+        )
+
+        return 200, {}
+
+
+autoland_request_update_resource = AutolandRequestUpdateResource()
