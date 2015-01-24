@@ -12,7 +12,6 @@ import docker
 import json
 import os
 import requests
-import socket
 import ssl
 import subprocess
 import sys
@@ -20,6 +19,7 @@ import tarfile
 import time
 import urlparse
 import uuid
+import warnings
 from contextlib import contextmanager
 from io import BytesIO
 
@@ -145,7 +145,27 @@ class Docker(object):
         try:
             self.client._get(self.client._url('/version'), timeout=1)
             return True
-        except requests.exceptions.RequestException:
+
+        # docker-py, urllib3, and Python's ssl packages all seem to have
+        # a difficult time talking to boot2docker under Python 2.7.9. We
+        # report a warning in this case and recommend using Python 2.7.8
+        # until a workaround is known.
+        except requests.exceptions.SSLError as e:
+            if 'CERTIFICATE_VERIFY_FAILED' not in str(e.message):
+                return False
+
+            if sys.version_info[0:3] != (2, 7, 9):
+                return False
+
+            warnings.warn(
+                'SSL error encountered talking to Docker. This is a known '
+                'issue with Python 2.7.9, which you are running. It is '
+                'recommended to use Python 2.7.8 until a workaround is '
+                'identified: %s' % e.message)
+
+            return False
+
+        except requests.exceptions.RequestException as e:
             return False
 
     def ensure_built(self, name, verbose=False, add_vct=False):
