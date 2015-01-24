@@ -60,6 +60,7 @@ details from the parent review request
     parent_diffset_revision: 1
     parent_review_request_id: 1
     repository_url: http://localhost:$HGPORT/
+    review_board_url: http://localhost:$HGPORT1/
 
 Cleanup
 

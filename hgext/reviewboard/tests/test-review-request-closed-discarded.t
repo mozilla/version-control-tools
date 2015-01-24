@@ -48,7 +48,7 @@
     attachments:
     - attacher: admin@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://123/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -161,7 +161,7 @@ The review attachment should be marked as obsolete
     attachments:
     - attacher: admin@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://123/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -319,7 +319,7 @@ There should still not be a visible attachment on the bug
     attachments:
     - attacher: admin@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://123/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -431,7 +431,7 @@ The attachment for the review request should be unobsoleted
     attachments:
     - attacher: admin@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://123/mynick'
       file_name: reviewboard-1-url.txt
       flags: []

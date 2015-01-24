@@ -39,7 +39,7 @@ Adding a reviewer should result in a r? flag being set
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags:
@@ -94,7 +94,7 @@ Adding a "Ship It" review will grant r+
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags:
@@ -138,7 +138,7 @@ Adding a "Ship It" review will grant r+
         MozReview Request: bz://1/mynick
   
   
-        http://example.com/r/1/#review1
+        http://localhost:$HGPORT1/r/1/#review1
   
   
         LGTM'
@@ -161,7 +161,7 @@ Adding a reply to the review will add a comment to Bugzilla
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags:
@@ -205,14 +205,14 @@ Adding a reply to the review will add a comment to Bugzilla
         MozReview Request: bz://1/mynick
   
   
-        http://example.com/r/1/#review1
+        http://localhost:$HGPORT1/r/1/#review1
   
   
         LGTM'
     - author: author@example.com
       id: 4
       tags: []
-      text: 'http://example.com/r/1/#review2
+      text: 'http://localhost:$HGPORT1/r/1/#review2
   
   
         Thanks!'
@@ -244,7 +244,7 @@ Ensure multiple reviewers works as expected
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/3/
+      data: http://localhost:$HGPORT1/r/3/
       description: 'MozReview Request: bz://2/mynick'
       file_name: reviewboard-3-url.txt
       flags:
@@ -306,7 +306,7 @@ Removing a reviewer should remove their review flag
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/3/
+      data: http://localhost:$HGPORT1/r/3/
       description: 'MozReview Request: bz://2/mynick'
       file_name: reviewboard-3-url.txt
       flags:
@@ -378,7 +378,7 @@ Removing all reviewers should remove all flags
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/3/
+      data: http://localhost:$HGPORT1/r/3/
       description: 'MozReview Request: bz://2/mynick'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -472,7 +472,7 @@ review? sticks around when 1 person grants review
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/5/
+      data: http://localhost:$HGPORT1/r/5/
       description: 'MozReview Request: bz://3/mynick'
       file_name: reviewboard-5-url.txt
       flags:
@@ -522,7 +522,7 @@ review? sticks around when 1 person grants review
         MozReview Request: bz://3/mynick
   
   
-        http://example.com/r/5/#review3
+        http://localhost:$HGPORT1/r/5/#review3
   
   
         land it!'
@@ -558,7 +558,7 @@ Random users can come along and grant review
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/7/
+      data: http://localhost:$HGPORT1/r/7/
       description: 'MozReview Request: bz://4/mynick'
       file_name: reviewboard-7-url.txt
       flags:
@@ -607,7 +607,7 @@ Random users can come along and grant review
         MozReview Request: bz://4/mynick
   
   
-        http://example.com/r/7/#review4
+        http://localhost:$HGPORT1/r/7/#review4
   
   
         I am always watching'

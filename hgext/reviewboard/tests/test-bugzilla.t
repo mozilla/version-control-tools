@@ -59,7 +59,7 @@ Publishing the review will add an attachment to the bug
     attachments:
     - attacher: admin@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []

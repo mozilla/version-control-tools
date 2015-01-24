@@ -40,7 +40,7 @@ The globbing is patching over a bug in mach
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -73,7 +73,7 @@ The globbing is patching over a bug in mach
     - author: author@example.com
       id: 3
       tags: []
-      text: "http://example.com/r/1/#review1\n\n::: foo\n(Diff revision 1)\n> -foo\n\
+      text: "http://localhost:$HGPORT1/r/1/#review1\n\n::: foo\n(Diff revision 1)\n> -foo\n\
         > +initial\n\n\u3053\u3093\u306B\u3061\u306F\u4E16\u754C"
     component: TestComponent
     depends_on: []

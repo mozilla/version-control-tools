@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import json
 
+from reviewboard.admin.server import get_server_url
 from reviewboard.extensions.hooks import SignalHook
 from reviewboard.reviews.models import ReviewRequest
 from reviewboard.reviews.signals import review_request_published
@@ -89,6 +90,9 @@ def handle_commits_published(extension=None, **kwargs):
     msg.data['parent_diffset_revision'] = review_request.get_latest_diffset().revision
     msg.data['commits'] = commits
     msg.data['repository_url'] = repo_url
+
+    # TODO: Make work with RB localsites.
+    msg.data['review_board_url'] = get_server_url()
 
     publish_message(extension, msg)
 

@@ -33,7 +33,7 @@ Sanity check to ensure we have a review flag set
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags:
@@ -88,7 +88,7 @@ Publishing a review will clear the r? flag
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -127,7 +127,7 @@ Publishing a review will clear the r? flag
         MozReview Request: bz://1/mynick
   
   
-        http://example.com/r/1/#review1
+        http://localhost:$HGPORT1/r/1/#review1
   
   
         I have reservations'
@@ -149,7 +149,7 @@ Posting a non Ship It review without a review flag adds a comment
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://example.com/r/1/
+      data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -188,14 +188,14 @@ Posting a non Ship It review without a review flag adds a comment
         MozReview Request: bz://1/mynick
   
   
-        http://example.com/r/1/#review1
+        http://localhost:$HGPORT1/r/1/#review1
   
   
         I have reservations'
     - author: reviewer@example.com
       id: 4
       tags: []
-      text: 'http://example.com/r/1/#review2
+      text: 'http://localhost:$HGPORT1/r/1/#review2
   
   
         One more thing...'
