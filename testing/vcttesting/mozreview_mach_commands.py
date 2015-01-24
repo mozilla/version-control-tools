@@ -17,8 +17,13 @@ class MozReviewCommands(object):
         if not where and 'MOZREVIEW_HOME' in os.environ:
             where = os.environ['MOZREVIEW_HOME']
 
+        db_image = os.environ.get('DOCKER_BMO_DB_IMAGE', None)
+        web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE', None)
+        pulse_image = os.environ.get('DOCKER_PULSE_IMAGE', None)
+
         from vcttesting.mozreview import MozReview
-        return MozReview(where)
+        return MozReview(where, db_image=db_image, web_image=web_image,
+                         pulse_image=pulse_image)
 
     @Command('start', category='mozreview',
         description='Start a MozReview instance')

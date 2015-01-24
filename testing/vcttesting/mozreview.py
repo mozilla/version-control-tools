@@ -41,11 +41,15 @@ class MozReview(object):
     This class can be used to create and control MozReview instances.
     """
 
-    def __init__(self, path):
+    def __init__(self, path, web_image=None, db_image=None, pulse_image=None):
         if not path:
             raise Exception('You must specify a path to create an instance')
         path = os.path.abspath(path)
         self._path = path
+
+        self.db_image = db_image
+        self.web_image = web_image
+        self.pulse_image = pulse_image
 
         self._name = os.path.dirname(path)
 
@@ -92,6 +96,10 @@ class MozReview(object):
             mercurial_port = get_available_port()
         if not pulse_port:
             pulse_port = get_available_port()
+
+        db_image = db_image or self.db_image
+        web_image = web_image or self.web_image
+        pulse_image = pulse_image or self.pulse_image
 
         mr_info = self._docker.start_mozreview(cluster=self._name,
                 hostname=None, http_port=bugzilla_port, pulse_port=pulse_port,
