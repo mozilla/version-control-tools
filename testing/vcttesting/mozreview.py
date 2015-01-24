@@ -129,9 +129,6 @@ class MozReview(object):
         mercurial_pid = self._start_mercurial_server(mercurial_port)
 
         self.mercurial_url = 'http://localhost:%s/' % mercurial_port
-        with open(self._hg_url_path, 'w') as fh:
-            fh.write(self.mercurial_url)
-
         self.mercurial_pid = mercurial_pid
 
         state = {
@@ -164,9 +161,7 @@ class MozReview(object):
         self._docker.stop_bmo(self._name)
 
     def create_repository(self, path):
-        with open(self._hg_url_path, 'rb') as fh:
-            url = '%s%s' % (fh.read(), path)
-
+        url = '%s%s' % (self.mercurial_url, path)
         full_path = os.path.join(self._path, 'repos', path)
 
         env = dict(os.environ)
@@ -192,10 +187,6 @@ class MozReview(object):
     @property
     def _hg_pid_path(self):
         return os.path.join(self._path, 'hg.pid')
-
-    @property
-    def _hg_url_path(self):
-        return os.path.join(self._path, 'hg.url')
 
     @property
     def _hg(self):
