@@ -10,6 +10,7 @@ import subprocess
 import time
 
 import psutil
+import concurrent.futures as futures
 
 from vcttesting.bugzilla import Bugzilla
 from vcttesting.docker import (
@@ -101,24 +102,32 @@ class MozReview(object):
         web_image = web_image or self.web_image
         pulse_image = pulse_image or self.pulse_image
 
-        mr_info = self._docker.start_mozreview(cluster=self._name,
-                hostname=None, http_port=bugzilla_port, pulse_port=pulse_port,
-                db_image=db_image, web_image=web_image,
-                pulse_image=pulse_image, verbose=verbose)
+        rb = MozReviewBoard(self._path)
 
-        bugzilla_url = mr_info['bugzilla_url']
+        with futures.ThreadPoolExecutor(2) as e:
+            f_mr_info = e.submit(self._docker.start_mozreview,
+                                 cluster=self._name,
+                                 hostname=None,
+                                 http_port=bugzilla_port,
+                                 pulse_port=pulse_port,
+                                 db_image=db_image,
+                                 web_image=web_image,
+                                 pulse_image=pulse_image,
+                                 verbose=verbose)
 
-        self.bugzilla_url = bugzilla_url
+            e.submit(rb.create)
+
+        mr_info = f_mr_info.result()
+        rb.bugzilla_url = mr_info['bugzilla_url']
+        rb.pulse_host = mr_info['pulse_host']
+        rb.pulse_port = mr_info['pulse_port']
+
+        self.bugzilla_url = mr_info['bugzilla_url']
         bugzilla = self.get_bugzilla()
 
-        rb = MozReviewBoard(self._path, bugzilla_url=bugzilla_url,
-            pulse_host=mr_info['pulse_host'], pulse_port=mr_info['pulse_port'])
-        rb.create()
         reviewboard_pid = rb.start(reviewboard_port)
-
         reviewboard_url = 'http://localhost:%s/' % reviewboard_port
 
-        self.bugzilla_url = bugzilla_url
         self.reviewboard_url = reviewboard_url
         self.reviewboard_pid = reviewboard_pid
         self.admin_username = bugzilla.username
@@ -132,7 +141,7 @@ class MozReview(object):
         self.mercurial_pid = mercurial_pid
 
         state = {
-            'bugzilla_url': bugzilla_url,
+            'bugzilla_url': self.bugzilla_url,
             'reviewboard_url': reviewboard_url,
             'reviewboard_pid': reviewboard_pid,
             'mercurial_url': self.mercurial_url,
