@@ -30,14 +30,14 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 DOCKER_DIR = os.path.normpath(os.path.join(HERE, '..', 'docker'))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 
-def wait_for_http(host, port, timeout=60):
+def wait_for_http(host, port, path='', timeout=60):
     """Wait for an HTTP response."""
 
     start = time.time()
 
     while True:
         try:
-            requests.get('http://%s:%s/' % (host, port), timeout=1)
+            requests.get('http://%s:%s/%s' % (host, port, path), timeout=1)
             return
         except requests.exceptions.RequestException:
             pass
@@ -374,7 +374,7 @@ class Docker(object):
                 bmoweb_port = int(web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
                 #rbweb_port = int(rbweb_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
                 print('waiting for containers to bootstrap')
-                wait_for_http(self.docker_hostname, bmoweb_port)
+                wait_for_http(self.docker_hostname, bmoweb_port, path='xmlrpc.cgi')
                 #wait_for_http(self.docker_hostname, rbweb_port)
 
         db_unique_id = str(uuid.uuid1())
