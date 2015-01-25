@@ -232,11 +232,17 @@ class MozReview(object):
                 '',
             ]))
 
+        # hgwebdir doesn't pick up new repositories until 20s after they
+        # are created. We install an extension to always refresh.
+        refreshing_path = os.path.join(ROOT, 'testing',
+                                       'refreshinghgwebdir.py')
+
         env = os.environ.copy()
         env['HGRCPATH'] = global_hgrc
         env['HGENCODING'] = 'UTF-8'
         args = [
             self._hg,
+            '--config', 'extensions.refreshinghgwebdir=%s' % refreshing_path,
             'serve',
             '-d',
             '-p', str(port),
