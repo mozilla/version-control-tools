@@ -170,7 +170,26 @@ class MozReviewBoard(object):
         sc.set('site_static_root', os.path.join(self.path, 'htdocs', 'static'))
         sc.set('site_media_root', os.path.join(self.path, 'htdocs', 'media'))
 
+    def _start(self, port):
+        port = str(port)
+        env = self.env
+        env['HOME'] = self.path
+
+        # We have various configs that may change at every startup. Ensure
+        # they are current. (Deferring to start also allows us to create
+        # the instance concurrently with other services, making bootstrap
+        # faster.)
+
+        # Hook up the django site domain.
+        from django.contrib.sites.models import Site as DjangoSite
+        site = DjangoSite.objects.get(pk=1)
+        site.domain = 'localhost:%s' % port
+        site.name = 'localhost'
+        site.save()
+
         # Hook up rbbz authentication.
+        from djblets.siteconfig.models import SiteConfiguration
+        sc = SiteConfiguration.objects.get_current()
         sc.set('auth_backend', 'bugzilla')
         sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % self.bugzilla_url)
         sc.save()
@@ -186,19 +205,6 @@ class MozReviewBoard(object):
         if self.pulse_host and self.pulse_port:
             mre.settings['enabled'] = True
         mre.save()
-
-    def _start(self, port):
-        port = str(port)
-        env = self.env
-        env['HOME'] = self.path
-
-        # Hook up the django site domain. We have to do this at every
-        # startup since the port may change.
-        from django.contrib.sites.models import Site as DjangoSite
-        site = DjangoSite.objects.get(pk=1)
-        site.domain = 'localhost:%s' % port
-        site.name = 'localhost'
-        site.save()
 
         f = open(os.path.join(self.path, 'reviewboard-server.log'), 'w')
         # --noreload prevents process for forking. If we don't do this,
