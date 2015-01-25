@@ -3,6 +3,9 @@
 import sys
 import os
 
+if 'HGSSHHGRCPATH' in os.environ:
+    os.environ['HGRCPATH'] = os.environ['HGSSHHGRCPATH']
+
 os.chdir(os.getenv('TESTTMP'))
 
 if sys.argv[1] != "user@dummy":
