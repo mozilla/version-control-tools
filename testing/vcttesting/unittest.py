@@ -53,6 +53,9 @@ class MozReviewTest(unittest.TestCase):
     def hgurl(self):
         return self.mr.mercurial_url
 
+    def bugzilla(self, **kwargs):
+        return self.mr.get_bugzilla(**kwargs)
+
 
 class MozReviewWebDriverTest(MozReviewTest):
     """A base class used for testing MozReview instances.
@@ -71,3 +74,15 @@ class MozReviewWebDriverTest(MozReviewTest):
 
     def setUp(self):
         self.addCleanup(self.browser.quit)
+
+    def reviewboard_login(self, username, password):
+        self.browser.get('%saccount/login/' % self.rburl)
+
+        input_username = self.browser.find_element_by_id('id_username')
+        input_username.send_keys(username)
+        input_password = self.browser.find_element_by_id('id_password')
+        input_password.send_keys(password)
+
+        input_password.submit()
+
+        self.assertEqual(self.browser.current_url, '%sdashboard/' % self.rburl)
