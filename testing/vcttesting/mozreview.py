@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import errno
 import json
 import os
 import signal
@@ -30,11 +31,13 @@ def get_available_port():
 
     return port
 
+
 def kill(pid):
     os.kill(pid, signal.SIGINT)
 
     while psutil.pid_exists(pid):
         time.sleep(0.1)
+
 
 class MozReview(object):
     """Interface to MozService service.
@@ -194,6 +197,37 @@ class MozReview(object):
 
         return url, rbid
 
+    def get_local_repository(self, path, ircnick=None,
+                             bugzilla_username=None,
+                             bugzilla_password=None):
+        """Obtain a LocalMercurialRepository for the named server repository.
+
+        Call this with the same argument passed to ``create_repository()``
+        to obtain an object to interface with a local clone of that server
+        repository.
+
+        If bugzilla credentials are passed, they will be defined in the
+        repository's hgrc.
+        """
+        localrepos = os.path.join(self._path, 'localrepos')
+        try:
+            os.mkdir(localrepos)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+        local_path = os.path.join(localrepos, os.path.basename(path))
+
+        http_url = '%s%s' % (self.mercurial_url, path)
+        ssh_url = 'ssh://user@dummy%s/localrepos/%s' % (self._path, path)
+
+        # TODO make pushes via SSH work (it doesn't work outside of Mercurial
+        # tests because dummy expects certain environment variables).
+        return LocalMercurialRepository(self._hg, local_path, http_url,
+                                        ircnick=ircnick,
+                                        bugzilla_username=bugzilla_username,
+                                        bugzilla_password=bugzilla_password)
+
     def create_user(self, email, password, fullname):
         b = self.get_bugzilla()
         return b.create_user(email, password, fullname)
@@ -278,3 +312,97 @@ class MozReview(object):
             pid = fh.read().strip()
 
         return pid
+
+
+class LocalMercurialRepository(object):
+    """An interface to a Mercurial repository on the local filesystem.
+
+    This class facilitates easily running ``hg`` commands against a local
+    repository from the context of Python.
+    """
+    def __init__(self, hg, path, default_url, push_url=None, ircnick=None,
+                 bugzilla_username=None, bugzilla_password=None):
+        """Create a local Mercurial repository.
+
+        ``hg`` is the hg binary to use.
+        ``path`` is the local path to initialize the repository at.
+        ``default_url`` is the URL for the default path to the repository.
+        ``push_url`` is the default URL to be used for pushing.
+        ``ircnick`` is the IRC nickname to use.
+        ``bugzilla_username`` and ``bugzilla_password`` define the credentials
+        to use when talking to Bugzilla or MozReview.
+        """
+        self.hg = hg
+        self.path = path
+
+        if not os.path.exists(path):
+            subprocess.check_call([self.hg, 'init', path], cwd='/')
+
+        dummyssh = os.path.join(ROOT, 'pylib', 'mercurial-support', 'dummyssh')
+        reviewboard = os.path.join(ROOT, 'hgext', 'reviewboard', 'client.py')
+
+        with open(os.path.join(path, '.hg', 'hgrc'), 'w') as fh:
+            fh.write('\n'.join([
+                '[paths]',
+                'default = %s' % default_url,
+            ]))
+            if push_url:
+                fh.write('default-push = %s\n' % push_url)
+            fh.write('\n')
+
+            if bugzilla_username or bugzilla_password:
+                fh.write('[bugzilla]\n')
+                if bugzilla_username:
+                    fh.write('username = %s\n' % bugzilla_username)
+                if bugzilla_password:
+                    fh.write('password = %s\n' % bugzilla_password)
+                fh.write('\n')
+
+            if ircnick:
+                fh.write('[mozilla]\n')
+                fh.write('ircnick = %s\n' % ircnick)
+                fh.write('\n')
+
+            fh.write('\n'.join([
+                '[ui]',
+                'ssh = python "%s"' % dummyssh,
+                '',
+                '[defaults]',
+                'backout = -d "0 0"',
+                'commit = -d "0 0"',
+                'shelve = --date "0 0"',
+                'tag = -d "0 0"',
+                '',
+                '[extensions]',
+                'reviewboard = %s' % reviewboard,
+                '',
+            ]))
+
+    def run(self, args):
+        cmd = [self.hg]
+        cmd.extend(args)
+
+        env = dict(os.environ)
+        env['HGUSER'] = 'test'
+        env['EMAIL'] = 'Foo Bar <foo.bar@example.com>'
+        env['HOME'] = '/'
+        env['TZ'] = 'GMT'
+        env['LANG'] = env['LC_ALL'] = env['LANGUAGE'] = 'C'
+        env['HGENCODING'] = 'ascii'
+
+        return subprocess.check_output(cmd, cwd=self.path,
+                                       stderr=subprocess.STDOUT,
+                                       env=env)
+
+    def touch(self, path):
+        p = os.path.join(self.path, path)
+        with open(p, 'a'):
+            os.utime(p, None)
+
+    def write(self, path, content):
+        with open(os.path.join(self.path, path), 'w') as fh:
+            fh.write(content)
+
+    def append(self, path, content):
+        with open(os.path.join(self.path, path), 'a') as fh:
+            fh.write(content)
