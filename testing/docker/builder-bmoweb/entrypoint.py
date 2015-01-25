@@ -98,7 +98,7 @@ while True:
         print('could not connect to database before timeout; giving up')
         sys.exit(1)
 
-    time.sleep(1)
+    time.sleep(0.250)
 
 j = os.path.join
 h = os.environ['BUGZILLA_HOME']
