@@ -45,7 +45,7 @@ def wait_for_http(host, port, timeout=60):
         if time.time() - start > timeout:
             raise Exception('Timeout reached waiting for HTTP')
 
-        time.sleep(1)
+        time.sleep(0.1)
 
 def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60):
     c = kombu.Connection(hostname=hostname, port=port, userid=userid,
