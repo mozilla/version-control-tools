@@ -9,9 +9,10 @@ import sys
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 def main(args):
-    activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
-    execfile(activate, dict(__file__=activate))
-    sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
+    if 'VIRTUAL_ENV' not in os.environ:
+        activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
+        execfile(activate, dict(__file__=activate))
+        sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
 
     sys.path.insert(0, os.path.join(HERE, 'testing'))
 
