@@ -63,7 +63,7 @@ def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60):
         if time.time() - start > timeout:
             raise Exception('Timeout reached waiting for AMQP')
 
-        time.sleep(1)
+        time.sleep(0.1)
 
 def params_from_env(env):
     """Obtain Docker connect parameters from the environment.
