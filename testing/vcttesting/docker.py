@@ -456,6 +456,16 @@ class Docker(object):
             db_id = f_db_create.result()['Id']
             containers.append(db_id)
             f_db_start = e.submit(self.client.start, db_id)
+
+            # RabbitMQ takes a while to start up. Start it before other
+            # containers. (We probably could have a callback-driven mechanism
+            # here to ensure no time is lost. But that is more complex.)
+            if start_pulse:
+                pulse_id = f_pulse_create.result()['Id']
+                containers.append(pulse_id)
+                f_start_pulse = e.submit(self.client.start, pulse_id,
+                                         port_bindings={5672: pulse_port})
+
             f_db_start.result()
             db_state = self.client.inspect_container(db_id)
 
@@ -464,12 +474,6 @@ class Docker(object):
 
             #rbweb_id = f_rbweb_create.result()['Id']
             #containers.append(rbweb_id)
-
-            if start_pulse:
-                pulse_id = f_pulse_create.result()['Id']
-                containers.append(pulse_id)
-                f_start_pulse = e.submit(self.client.start, pulse_id,
-                        port_bindings={5672: pulse_port})
 
             # At this point, all containers have started.
             self.save_state()
