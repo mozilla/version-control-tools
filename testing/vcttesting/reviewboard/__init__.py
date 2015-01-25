@@ -234,17 +234,17 @@ class MozReviewBoard(object):
         # to get this process to detach from the shell the process runs
         # under otherwise this process will keep it alive and the Mercurial
         # test runner will think the test is still running. Oy.
-        pid = os.fork()
-        if pid > 0:
-            sys.exit(0)
+        child = os.fork()
+        if child > 0:
+            return proc.pid
 
         os.chdir('/')
         os.setsid()
         os.umask(0)
 
-        pid = os.fork()
-        if pid > 0:
-            return pid
+        grandchild = os.fork()
+        if grandchild > 0:
+            sys.exit(0)
 
         sys.stdout.flush()
         sys.stderr.flush()
