@@ -107,9 +107,13 @@ class MozReviewBoard(object):
         with open(path, 'rb') as fh:
             pid = int(fh.read())
 
-        os.kill(pid, signal.SIGINT)
+        proc = psutil.Process(pid)
+        proc.send_signal(signal.SIGINT)
 
-        while psutil.pid_exists(pid):
+        # Ideally we should check is_alive() here. However, this fails
+        # if the process is started and stopped from the same parent process.
+        # This is likely indicative of a bug in our daemonizing code.
+        while proc.status() == psutil.STATUS_RUNNING:
             time.sleep(0.1)
 
         os.unlink(path)
