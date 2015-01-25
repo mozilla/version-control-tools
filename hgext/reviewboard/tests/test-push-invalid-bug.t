@@ -8,7 +8,7 @@
   $ hg commit -A -m 'Bug 100 - Not an existing bug'
   adding foo
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests

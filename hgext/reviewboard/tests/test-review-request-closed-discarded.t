@@ -9,7 +9,7 @@
   $ hg commit -A -m 'root commit'
   adding foo
   $ hg push --noreview
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -22,7 +22,7 @@
   $ echo 'foo2' > foo
   $ hg commit -m 'Bug 123 - Foo 2'
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -79,7 +79,7 @@
         Pull down these commits:
   
   
-        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
+        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/test-repo'
     component: TestComponent
     depends_on: []
     platform: All
@@ -110,7 +110,7 @@ no Commit ID set.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/
+  - hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/test-repo
   extra_data:
     p2rb: true
     p2rb.commits: '[["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9",
@@ -192,7 +192,7 @@ The review attachment should be marked as obsolete
         Pull down these commits:
   
   
-        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
+        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/test-repo'
     component: TestComponent
     depends_on: []
     platform: All
@@ -223,7 +223,7 @@ Commit ID re-instated.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/
+  - hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/test-repo
   extra_data:
     p2rb: true
     p2rb.commits: '[["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9",
@@ -243,7 +243,7 @@ Commit ID re-instated.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/
+    - hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/test-repo
     extra:
       p2rb: true
       p2rb.commits: '[["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9",
@@ -350,7 +350,7 @@ There should still not be a visible attachment on the bug
         Pull down these commits:
   
   
-        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
+        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/test-repo'
     component: TestComponent
     depends_on: []
     platform: All
@@ -380,7 +380,7 @@ Squashed review request should be published.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/
+  - hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/test-repo
   extra_data:
     p2rb: true
     p2rb.commits: '[["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9",
@@ -462,7 +462,7 @@ The attachment for the review request should be unobsoleted
         Pull down these commits:
   
   
-        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
+        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/test-repo'
     - author: admin@example.com
       id: 125
       tags: []
@@ -479,7 +479,7 @@ The attachment for the review request should be unobsoleted
         Pull down these commits:
   
   
-        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/'
+        hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/test-repo'
     component: TestComponent
     depends_on: []
     platform: All

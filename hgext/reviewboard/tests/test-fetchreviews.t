@@ -18,7 +18,7 @@ Seed the repo
   $ hg commit -A -m 'foo0'
   adding foo0
   $ hg push --noreview
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -33,7 +33,7 @@ Seed the repo
   $ hg commit -A -m 'Bug 1 - Foo 2'
   adding foo2
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests

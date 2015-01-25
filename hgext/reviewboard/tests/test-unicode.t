@@ -19,7 +19,7 @@ Create a review request
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/ > /dev/null
+  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/test-repo > /dev/null
   $ rbmanage publish $HGPORT1 1
 
 Add a comment with unicode
@@ -69,7 +69,7 @@ The globbing is patching over a bug in mach
         Pull down this commit:
   
   
-        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/test-repo'
     - author: author@example.com
       id: 3
       tags: []

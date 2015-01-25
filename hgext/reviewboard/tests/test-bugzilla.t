@@ -18,7 +18,7 @@ Pushing a review should not touch Bugzilla
   $ echo foo1 > foo
   $ hg commit -m 'Bug 1 - Foo 1'
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -88,7 +88,7 @@ Publishing the review will add an attachment to the bug
         Pull down this commit:
   
   
-        hg pull -r 24417bc94b2c053e8f5dd8c09da33fbbef5404fe http://localhost:$HGPORT/'
+        hg pull -r 24417bc94b2c053e8f5dd8c09da33fbbef5404fe http://localhost:$HGPORT/test-repo'
     component: TestComponent
     depends_on: []
     platform: All

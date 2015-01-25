@@ -14,8 +14,8 @@ Pushing a review will create the reviews file
 
   $ echo "foo" >> foo
   $ hg commit -m 'Bug 1 - second commit'
-  $ hg push ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
+  $ hg push ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -33,7 +33,7 @@ Pushing a review will create the reviews file
 
   $ cat .hg/reviews
   u http://localhost:$HGPORT1
-  r ssh://user@dummy/$TESTTMP/server
+  r ssh://user@dummy/$TESTTMP/repos/test-repo
   p bz://1/mynick 1
   c be8ff4f2804309fdbe6048ff76559f8e391ce765 2
   pc be8ff4f2804309fdbe6048ff76559f8e391ce765 1

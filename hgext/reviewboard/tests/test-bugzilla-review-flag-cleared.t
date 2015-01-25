@@ -20,7 +20,7 @@ Create a review
 
   $ echo bug > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT > /dev/null
+  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/test-repo > /dev/null
 
   $ rbmanage add-reviewer $HGPORT1 1 --user reviewer
   1 people listed on review request
@@ -68,7 +68,7 @@ Sanity check to ensure we have a review flag set
         Pull down this commit:
   
   
-        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/'
+        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/test-repo'
     component: TestComponent
     depends_on: []
     platform: All
@@ -118,7 +118,7 @@ Publishing a review will clear the r? flag
         Pull down this commit:
   
   
-        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/'
+        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/test-repo'
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -179,7 +179,7 @@ Posting a non Ship It review without a review flag adds a comment
         Pull down this commit:
   
   
-        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/'
+        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/test-repo'
     - author: reviewer@example.com
       id: 3
       tags: []

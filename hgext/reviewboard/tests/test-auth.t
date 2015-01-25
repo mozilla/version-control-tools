@@ -18,7 +18,7 @@
 Pushing with unknown username results in sane failure
 
   $ hg --config bugzilla.username=unknown --config bugzilla.password=irrelevant push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -31,7 +31,7 @@ Pushing with unknown username results in sane failure
 Pushing with invalid password results in sane failure
 
   $ hg --config bugzilla.username=${BUGZILLA_USERNAME} --config bugzilla.password=badpass push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -41,7 +41,7 @@ Pushing with invalid password results in sane failure
 Pushing with invalid cookie results in sane failure
 
   $ hg --config bugzilla.userid=baduserid --config bugzilla.cookie=irrelevant push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -55,7 +55,7 @@ Pushing using cookie auth works
   $ cookie=`echo ${out} | awk '{print $2}'`
 
   $ hg --config bugzilla.userid=${userid} --config bugzilla.cookie=${cookie} push --reviewid bz://1/goodcookie
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -72,7 +72,7 @@ Pushing using cookie auth works
 Pushing using username password auth works
 
   $ hg --config bugzilla.username=${BUGZILLA_USERNAME} --config bugzilla.password=${BUGZILLA_PASSWORD} push --reviewid bz://1/gooduserpass
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -96,7 +96,7 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
   created user 6
 
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/nonick
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -111,7 +111,7 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
   [1]
 
   $ hg --config bugzilla.username=user2@example.com --config bugzilla.password=password2 push --reviewid bz://1/withnick
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -157,7 +157,7 @@ Changing the IRC nickname in Bugzilla will update the RB username
   updated user 6
 
   $ hg --config bugzilla.username=user2@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newnick
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -189,7 +189,7 @@ Changing the email address in Bugzilla will update the RB email
   $ bugzilla update-user-email user2@example.com user2-new@example.com
   updated user 6
   $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newemail
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -223,7 +223,7 @@ Disabling a user in Bugzilla will prevent them from using Review Board
 
 (This error message isn't terrific. It can be improved later.)
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/disableduser
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -236,7 +236,7 @@ Re-enabling a disabled user will allow them to use Review Board
   $ bugzilla update-user-login-denied-text user1@example.com ''
   updated user 5
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/undisableduser
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -258,7 +258,7 @@ we fall back to non-IRC RB usernames.
   created user 7
 
   $ hg --config bugzilla.username=user3@example.com --config bugzilla.password=password3 push --reviewid bz://1/conflictingircnick
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -344,7 +344,7 @@ user, they will be assigned the email+id username.
   updated user 6
 
   $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2sharednick
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review

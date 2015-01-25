@@ -16,7 +16,7 @@
   $ hg commit -A -m 'root commit'
   adding foo0
   $ hg push --noreview
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -41,7 +41,7 @@
   adding foo5
 
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -80,7 +80,7 @@ Popping the last commit truncates the review set
   $ hg strip -r 5 --no-backup
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 4 changesets for review
@@ -126,7 +126,7 @@ on publish.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r f466ed1de51670e583e11deb2f1022a342b52ccd http://localhost:$HGPORT/
+  - hg pull -r f466ed1de51670e583e11deb2f1022a342b52ccd http://localhost:$HGPORT/test-repo
   extra_data:
     p2rb: true
     p2rb.commits: '[["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c",
@@ -149,7 +149,7 @@ on publish.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/
+    - hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/test-repo
     extra:
       p2rb: true
       p2rb.commits: '[["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c",
@@ -205,7 +205,7 @@ The parent review should have dropped the reference to /r/6
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/
+  - hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/test-repo
   extra_data:
     p2rb: true
     p2rb.commits: '[["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c",
@@ -238,7 +238,7 @@ be preserved.
 
   $ hg rebase -s 2 -d 0
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -281,7 +281,7 @@ on publish.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/
+  - hg pull -r 53b32d356f20f6730c14ec62c3706eba7e68e078 http://localhost:$HGPORT/test-repo
   extra_data:
     p2rb: true
     p2rb.commits: '[["c5b850e249510046906bcb24f774635c4521a4a9", "2"], ["905ad211ecc6f024e1f0ffdbe084dd06cf28ae1c",
@@ -303,7 +303,7 @@ on publish.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r e44f9d56a1a491868bf5b3742196896dc76fd62e http://localhost:$HGPORT/
+    - hg pull -r e44f9d56a1a491868bf5b3742196896dc76fd62e http://localhost:$HGPORT/test-repo
     extra:
       p2rb: true
       p2rb.commits: '[["ce44f0c4506c2e377ccfb702277cec50905be3e3", "3"], ["2879da44c7e2010282f90fcb2c1aa743038ac156",
@@ -356,7 +356,7 @@ Try removing a commit in the middle.
 
   $ hg rebase -s e44f9d56a1a4 -d ce44f0c4506c
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -394,7 +394,7 @@ The parent review should have been updated accordingly.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r cd0051d388dabe9694e0e2c5ce1cdbb17749c53d http://localhost:$HGPORT/
+  - hg pull -r cd0051d388dabe9694e0e2c5ce1cdbb17749c53d http://localhost:$HGPORT/test-repo
   extra_data:
     p2rb: true
     p2rb.commits: '[["ce44f0c4506c2e377ccfb702277cec50905be3e3", "3"], ["cd0051d388dabe9694e0e2c5ce1cdbb17749c53d",

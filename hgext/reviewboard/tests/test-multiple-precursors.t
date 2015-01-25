@@ -16,7 +16,7 @@
   $ hg commit -A -m 'root commit'
   adding foo0
   $ hg push --noreview
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -28,7 +28,7 @@
   $ hg commit -A -m 'Bug 123 - Foo 1'
   adding foo1
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -59,7 +59,7 @@ Splitting the changeset results in multiple reviews
 
   $ rbmanage publish $HGPORT1 1
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests

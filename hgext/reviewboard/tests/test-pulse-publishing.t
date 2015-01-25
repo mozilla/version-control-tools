@@ -19,7 +19,7 @@ Pushing a review should not publish to Pulse
   $ echo foo2 > foo
   $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -59,7 +59,7 @@ details from the parent review request
       review_request_id: 3
     parent_diffset_revision: 1
     parent_review_request_id: 1
-    repository_url: http://localhost:$HGPORT/
+    repository_url: http://localhost:$HGPORT/test-repo
     review_board_url: http://localhost:$HGPORT1/
 
 Cleanup

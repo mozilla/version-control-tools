@@ -18,8 +18,8 @@ Set up repo
 
 Do the initial review
 
-  $ hg push -r 1 --reviewid 1 http://localhost:$HGPORT
-  pushing to http://localhost:$HGPORT/
+  $ hg push -r 1 --reviewid 1 http://localhost:$HGPORT/test-repo
+  pushing to http://localhost:$HGPORT/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -37,8 +37,8 @@ Do the initial review
 
 Pushing with a different review ID will create a "duplicate" review
 
-  $ hg push -r 1 --reviewid 2 http://localhost:$HGPORT
-  pushing to http://localhost:$HGPORT/
+  $ hg push -r 1 --reviewid 2 http://localhost:$HGPORT/test-repo
+  pushing to http://localhost:$HGPORT/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -54,7 +54,7 @@ Pushing with a different review ID will create a "duplicate" review
 
   $ cat .hg/reviews
   u http://localhost:$HGPORT1
-  r http://localhost:$HGPORT/
+  r http://localhost:$HGPORT/test-repo
   p bz://1/mynick 1
   p bz://2/mynick 3
   c cd3395bd3f8a2108fb3178d6b1ec6077ca2bdbee 2

@@ -22,8 +22,8 @@ Set up the repo
   $ hg phase --public -r .
   $ echo 'foo2' > foo
   $ hg commit -m 'foo2'
-  $ hg push --reviewid 123 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
+  $ hg push --reviewid 123 ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -52,8 +52,8 @@ Now create a new head and push a rebase
   $ hg rebase -s 1 -d .
   $ hg up tip
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  $ hg push --reviewid 123 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
+  $ hg push --reviewid 123 ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests

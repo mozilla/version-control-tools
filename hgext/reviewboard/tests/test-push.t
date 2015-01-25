@@ -49,8 +49,8 @@ Set up the repo
 
 Seed the root changeset on the server
 
-  $ hg push -r 0 --noreview http://localhost:$HGPORT
-  pushing to http://localhost:$HGPORT/
+  $ hg push -r 0 --noreview http://localhost:$HGPORT/test-repo
+  pushing to http://localhost:$HGPORT/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -60,8 +60,8 @@ Seed the root changeset on the server
 
 Pushing a single changeset will initiate a single review (no children)
 
-  $ hg push -r 1 --reviewid 1 http://localhost:$HGPORT
-  pushing to http://localhost:$HGPORT/
+  $ hg push -r 1 --reviewid 1 http://localhost:$HGPORT/test-repo
+  pushing to http://localhost:$HGPORT/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -85,8 +85,8 @@ Pushing a single changeset will initiate a single review (no children)
 
 Pushing no changesets will do a re-review
 
-  $ hg push -r 1 --reviewid 1 http://localhost:$HGPORT
-  pushing to http://localhost:$HGPORT/
+  $ hg push -r 1 --reviewid 1 http://localhost:$HGPORT/test-repo
+  pushing to http://localhost:$HGPORT/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -104,8 +104,8 @@ Pushing patches from mq will result in a warning
 
   $ echo 'mq patch' > foo
   $ hg qnew -m 'mq patch' -d '0 0' patch1
-  $ hg push -r . --reviewid 2 http://localhost:$HGPORT
-  pushing to http://localhost:$HGPORT/
+  $ hg push -r . --reviewid 2 http://localhost:$HGPORT/test-repo
+  pushing to http://localhost:$HGPORT/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -128,8 +128,8 @@ Pushing patches from mq will result in a warning
 
 Custom identifier will create a new review from same changesets.
 
-  $ hg push -r 1 --reviewid 3 http://localhost:$HGPORT
-  pushing to http://localhost:$HGPORT/
+  $ hg push -r 1 --reviewid 3 http://localhost:$HGPORT/test-repo
+  pushing to http://localhost:$HGPORT/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -145,8 +145,8 @@ Custom identifier will create a new review from same changesets.
 
 SSH works
 
-  $ hg push -r 2 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
+  $ hg push -r 2 ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -164,8 +164,8 @@ SSH works
 
 Specifying multiple -r for the same head works
 
-  $ hg push -r 0 -r 1 --reviewid 5 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
+  $ hg push -r 0 -r 1 --reviewid 5 ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -181,8 +181,8 @@ Specifying multiple -r for the same head works
 
 Specifying a revision range works
 
-  $ hg push -r 0::1 --reviewid 6 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
+  $ hg push -r 0::1 --reviewid 6 ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -208,8 +208,8 @@ Specifying a base revision limits reviewed changesets
   $ echo tip > foo
   $ hg commit -m 'Review tip'
 
-  $ hg push -r 84e8a1584aad::b55f2b9937c7 --reviewid 7 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
+  $ hg push -r 84e8a1584aad::b55f2b9937c7 --reviewid 7 ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -235,8 +235,8 @@ Specifying a base revision limits reviewed changesets
 
 Specifying multiple -r arguments selects base and tip
 
-  $ hg push -r 84e8a1584aad -r b55f2b9937c7 --reviewid 8 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
+  $ hg push -r 84e8a1584aad -r b55f2b9937c7 --reviewid 8 ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 3 changesets for review
@@ -260,8 +260,8 @@ Specifying multiple -r arguments selects base and tip
 
 Specifying multiple -r in reverse order still works
 
-  $ hg push -r b55f2b9937c7 -r 84e8a1584aad --reviewid 9 ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
+  $ hg push -r b55f2b9937c7 -r 84e8a1584aad --reviewid 9 ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 3 changesets for review
@@ -298,8 +298,8 @@ Reviewing merge commits is rejected
   (branch merge, don't forget to commit)
   $ hg commit -m 'Bug 1 - Do merge'
 
-  $ hg push ssh://user@dummy/$TESTTMP/server
-  pushing to ssh://user@dummy/$TESTTMP/server
+  $ hg push ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests

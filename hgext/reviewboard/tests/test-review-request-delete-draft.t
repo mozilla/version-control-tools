@@ -17,7 +17,7 @@
   $ echo foo1 > foo
   $ hg commit -m 'Bug 1 - Initial commit'
   $ hg --config bugzilla.username=submitter@example.com push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -39,7 +39,7 @@ Now publish the review and create a new draft
   $ echo foo3 > foo
   $ hg commit --amend > /dev/null
   $ hg --config bugzilla.username=submitter@example.com push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -70,7 +70,7 @@ We should have a disagreement between published and draft
   - ''
   - 'Pull down this commit:'
   - ''
-  - hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://localhost:$HGPORT/
+  - hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://localhost:$HGPORT/test-repo
   extra_data:
     p2rb: true
     p2rb.commits: '[["8c2be86a13c96ceb24c3eaa50cc6ef214c656d50", "2"]]'
@@ -88,7 +88,7 @@ We should have a disagreement between published and draft
     - ''
     - 'Pull down this commit:'
     - ''
-    - hg pull -r c1eb968010521027f51dd6d901d92dc44bfdcd5d http://localhost:$HGPORT/
+    - hg pull -r c1eb968010521027f51dd6d901d92dc44bfdcd5d http://localhost:$HGPORT/test-repo
     extra:
       p2rb: true
       p2rb.commits: '[["c1eb968010521027f51dd6d901d92dc44bfdcd5d", "2"]]'
@@ -163,7 +163,7 @@ Discarding the parent review request draft should discard draft on children
   - ''
   - 'Pull down this commit:'
   - ''
-  - hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://localhost:$HGPORT/
+  - hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://localhost:$HGPORT/test-repo
   extra_data:
     p2rb: true
     p2rb.commits: '[["8c2be86a13c96ceb24c3eaa50cc6ef214c656d50", "2"]]'

@@ -26,7 +26,7 @@ Create a review request from a regular user
 
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/ > /dev/null
+  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/test-repo > /dev/null
 
 Adding a reviewer should result in a r? flag being set
 
@@ -74,7 +74,7 @@ Adding a reviewer should result in a r? flag being set
         Pull down this commit:
   
   
-        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/test-repo'
     component: TestComponent
     depends_on: []
     platform: All
@@ -129,7 +129,7 @@ Adding a "Ship It" review will grant r+
         Pull down this commit:
   
   
-        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/test-repo'
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -196,7 +196,7 @@ Adding a reply to the review will add a comment to Bugzilla
         Pull down this commit:
   
   
-        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/'
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/test-repo'
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -233,7 +233,7 @@ Ensure multiple reviewers works as expected
   $ echo b2 > foo
   $ hg commit -m 'Bug 2 - Multiple reviewers'
   created new head
-  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/ > /dev/null
+  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/test-repo > /dev/null
 
   $ rbmanage add-reviewer $HGPORT1 3 --user reviewer --user rev2
   2 people listed on review request
@@ -285,7 +285,7 @@ Ensure multiple reviewers works as expected
         Pull down this commit:
   
   
-        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/test-repo'
     component: TestComponent
     depends_on: []
     platform: All
@@ -342,7 +342,7 @@ Removing a reviewer should remove their review flag
         Pull down this commit:
   
   
-        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/test-repo'
     - author: author@example.com
       id: 7
       tags: []
@@ -357,7 +357,7 @@ Removing a reviewer should remove their review flag
         Pull down this commit:
   
   
-        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/test-repo'
     component: TestComponent
     depends_on: []
     platform: All
@@ -409,7 +409,7 @@ Removing all reviewers should remove all flags
         Pull down this commit:
   
   
-        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/test-repo'
     - author: author@example.com
       id: 7
       tags: []
@@ -424,7 +424,7 @@ Removing all reviewers should remove all flags
         Pull down this commit:
   
   
-        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/test-repo'
     - author: author@example.com
       id: 8
       tags: []
@@ -439,7 +439,7 @@ Removing all reviewers should remove all flags
         Pull down this commit:
   
   
-        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/'
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://localhost:$HGPORT/test-repo'
     component: TestComponent
     depends_on: []
     platform: All
@@ -513,7 +513,7 @@ review? sticks around when 1 person grants review
         Pull down this commit:
   
   
-        hg pull -r fb992de2921c9dd3117becff799b1e41e0dc4827 http://localhost:$HGPORT/'
+        hg pull -r fb992de2921c9dd3117becff799b1e41e0dc4827 http://localhost:$HGPORT/test-repo'
     - author: reviewer@example.com
       id: 11
       tags: []
@@ -598,7 +598,7 @@ Random users can come along and grant review
         Pull down this commit:
   
   
-        hg pull -r 13295ed17a69bdcef2644c0ab72736292db21b80 http://localhost:$HGPORT/'
+        hg pull -r 13295ed17a69bdcef2644c0ab72736292db21b80 http://localhost:$HGPORT/test-repo'
     - author: troll@example.com
       id: 14
       tags: []

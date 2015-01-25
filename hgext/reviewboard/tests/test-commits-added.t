@@ -9,7 +9,7 @@
   $ hg commit -A -m 'root commit'
   adding foo
   $ hg push --noreview
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -22,7 +22,7 @@
   $ echo 'foo2' > foo
   $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -47,7 +47,7 @@ Adding commits to old reviews should create new reviews
   $ echo 'foo3' > foo
   $ hg commit -m 'Bug 1 - Foo 3'
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/server
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -98,7 +98,7 @@ The parent review should have its description updated.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r 3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11 http://localhost:$HGPORT/
+    - hg pull -r 3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11 http://localhost:$HGPORT/test-repo
     extra:
       p2rb: true
       p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
