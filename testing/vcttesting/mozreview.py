@@ -125,20 +125,24 @@ class MozReview(object):
         self.bugzilla_url = mr_info['bugzilla_url']
         bugzilla = self.get_bugzilla()
 
-        reviewboard_pid = rb.start(reviewboard_port)
         reviewboard_url = 'http://localhost:%s/' % reviewboard_port
-
         self.reviewboard_url = reviewboard_url
+
+        with futures.ThreadPoolExecutor(2) as e:
+            f_rb_pid = e.submit(rb.start, reviewboard_port)
+            f_hg_pid = e.submit(self._start_mercurial_server, mercurial_port)
+
+        reviewboard_pid = f_rb_pid.result()
         self.reviewboard_pid = reviewboard_pid
+
         self.admin_username = bugzilla.username
         self.admin_password = bugzilla.password
         self.pulse_host = mr_info['pulse_host']
         self.pulse_port = mr_info['pulse_port']
 
-        mercurial_pid = self._start_mercurial_server(mercurial_port)
-
-        self.mercurial_url = 'http://localhost:%s/' % mercurial_port
+        mercurial_pid = f_hg_pid.result()
         self.mercurial_pid = mercurial_pid
+        self.mercurial_url = 'http://localhost:%s/' % mercurial_port
 
         state = {
             'bugzilla_url': self.bugzilla_url,
