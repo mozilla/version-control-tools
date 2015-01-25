@@ -1,6 +1,0 @@
-forge "https://forgeapi.puppetlabs.com"
-
-mod "puppetlabs/apache", "1.0.1"
-mod "puppetlabs/mysql", "2.2.3"
-mod "puppetlabs/vcsrepo", "1.0.2"
-mod "stankevich/python", "1.7.5"
