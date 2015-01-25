@@ -617,9 +617,10 @@ class Docker(object):
             if image in candidates:
                 retained[key] = image
 
-        for iid in candidates:
-            print('Removing image %s' % iid)
-            self.client.remove_image(iid)
+        with futures.ThreadPoolExecutor(4) as e:
+            for iid in candidates:
+                print('Removing image %s' % iid)
+                e.submit(self.client.remove_image, iid)
 
         self.state['images'] = retained
         self.save_state()
