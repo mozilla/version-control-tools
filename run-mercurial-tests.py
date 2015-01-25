@@ -243,12 +243,21 @@ if __name__ == '__main__':
         # complicating code with locks.
         #
         # But only do this if a test we are running utilizes Docker.
+        docker_keywords = (
+            b'docker',
+            b'MozReviewTest',
+            b'MozReviewWebDriverTest',
+        )
         build_docker = False
         for t in running_tests:
             with open(t, 'rb') as fh:
                 content = fh.read()
-                if b'docker' in content:
-                    build_docker = True
+                for keyword in docker_keywords:
+                    if keyword in content:
+                        build_docker = True
+                        break
+
+                if build_docker:
                     break
 
         if build_docker:
