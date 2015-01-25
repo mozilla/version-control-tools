@@ -190,7 +190,12 @@ class MozReview(object):
 
     @property
     def _hg(self):
-        return os.path.join(ROOT, 'venv', 'bin', 'hg')
+        for path in os.environ['PATH'].split(os.pathsep):
+            hg = os.path.join(path, 'hg')
+            if os.path.isfile(hg):
+                return hg
+
+        raise Exception('could not find hg executable')
 
     def _start_mercurial_server(self, port):
         repos_path = os.path.join(self._path, 'repos')
