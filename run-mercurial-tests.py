@@ -127,6 +127,7 @@ if __name__ == '__main__':
         raise Exception('You are not running inside the virtualenv. Please '
                 'run `create-test-environment` and `source venv/bin/activate`')
 
+    import concurrent.futures as futures
     import vcttesting.docker as vctdocker
 
     # Unbuffer stdout.
@@ -434,15 +435,18 @@ if __name__ == '__main__':
 
     # Clean up leaked Docker containers and images.
     if docker.is_alive():
-        for c in docker.client.containers(all=True):
-            if c['Id'] not in preserve_containers:
-                print('Removing orphaned Docker container: %s' % c['Id'])
-                docker.client.stop(c['Id'])
-                docker.client.remove_container(c['Id'])
+        with futures.ThreadPoolExecutor(4) as e:
+            for c in docker.client.containers(all=True):
+                if c['Id'] not in preserve_containers:
+                    print('removing orphaned docker container: %s' %
+                          c['Id'])
+                    e.submit(docker.client.remove_container, c['Id'],
+                             force=True)
 
-        for i in docker.client.images(all=True):
-            if i['Id'] not in preserve_images:
-                print('Removing orphaned Docker image: %s' % c['Id'])
-                docker.client.remove_image(i['Id'])
+        with futures.ThreadPoolExecutor(4) as e:
+            for i in docker.client.images(all=True):
+                if i['Id'] not in preserve_images:
+                    print('removing orphaned docker image: %s' % c['Id'])
+                    e.submit(docker.client.remove_image, c['Id'])
 
     sys.exit(res)
