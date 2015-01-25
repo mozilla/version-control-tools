@@ -56,7 +56,7 @@ checkout``. You'll also want to read the logs between versions.
    ...
 
 Afterwards you'll want to run all the automated checks against this new
-code. See :ref:`testing`.
+code. See :ref:`devguide_testing`.
 
 The version-control-tools repository uses its own Mercurial version
 separate from your system (or previously cloned) Mercurial. As such,

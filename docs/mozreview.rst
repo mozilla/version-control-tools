@@ -34,8 +34,8 @@ something, not shipping the perfect solution.
 We've spent a lot of energy making it easy to hack on MozReview so
 anyone can come along and improve it. For more, read
 :ref:`hacking_mozreview`. We've spent a lot of time on a robust and
-comprehensive :ref:`testing infrastructure <testing>` so we can move
-fast and not break things.
+comprehensive :ref:`testing infrastructure <devguide_testing>` so we can
+move fast and not break things.
 
 Known Issues and Limitations
 ----------------------------

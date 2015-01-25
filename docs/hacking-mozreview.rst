@@ -200,8 +200,8 @@ our mailing list, `mozilla-code-review@googlegroups.com <mailto:mozilla-code-rev
 Submitting Changes
 ==================
 
-See :ref:`contributing` for how to formulate and submit changes for
-the ``version-control-tools`` repository.
+See :ref:`devguide_contributing` for how to formulate and submit changes
+for the ``version-control-tools`` repository.
 
 Releasing Updates
 =================
