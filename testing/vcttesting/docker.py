@@ -300,7 +300,7 @@ class Docker(object):
             image = self.ensure_built(name, verbose=verbose, **kwargs)
             return name, image
 
-        with futures.ThreadPoolExecutor(4) as e:
+        with futures.ThreadPoolExecutor(3) as e:
             fs = []
             fs.append(e.submit(build, 'bmodb-volatile'))
             fs.append(e.submit(build, 'bmoweb'))
@@ -388,7 +388,7 @@ class Docker(object):
         # easily from Docker's own metadata. We have to give a tag becaue
         # Docker will forget the repository name if a name image has only a
         # repository name as well.
-        with futures.ThreadPoolExecutor(4) as e:
+        with futures.ThreadPoolExecutor(2) as e:
             db_future = e.submit(self.client.commit, db_id,
                     repository='bmodb-volatile-bootstrapped',
                     tag=db_unique_id)
@@ -413,7 +413,7 @@ class Docker(object):
 
         print('removing non-bootstrapped containers')
 
-        with futures.ThreadPoolExecutor(4) as e:
+        with futures.ThreadPoolExecutor(2) as e:
             e.submit(self.client.remove_container, web_id)
             e.submit(self.client.remove_container, db_id)
             #e.submit(self.client.remove_container, rbweb_id)
