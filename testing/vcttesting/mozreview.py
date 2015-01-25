@@ -157,17 +157,18 @@ class MozReview(object):
 
     def stop(self):
         """Stop all services associated with this MozReview instance."""
-        if os.path.exists(self._hg_pid_path):
-            with open(self._hg_pid_path, 'rb') as fh:
-                pid = int(fh.read().strip())
-                kill(pid)
+        with futures.ThreadPoolExecutor(2) as e:
+            rb = MozReviewBoard(self._path)
+            e.submit(rb.stop)
 
-            os.unlink(self._hg_pid_path)
+            e.submit(self._docker.stop_bmo, self._name)
 
-        rb = MozReviewBoard(self._path)
-        rb.stop()
+            if os.path.exists(self._hg_pid_path):
+                with open(self._hg_pid_path, 'rb') as fh:
+                    pid = int(fh.read().strip())
+                    kill(pid)
 
-        self._docker.stop_bmo(self._name)
+                os.unlink(self._hg_pid_path)
 
     def create_repository(self, path):
         url = '%s%s' % (self.mercurial_url, path)
