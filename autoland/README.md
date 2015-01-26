@@ -83,6 +83,7 @@ following:
 
 
 [1] http://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview.html
+
 [2] http://hg.mozilla.org/try
 
 
@@ -101,7 +102,7 @@ from one repository to another. If the destination repository is Try, the
 resulting test run will then be monitored and any failures will be retriggered
 exactly once as a means of dealing with intermittent failures.
 
-* [1] https://pulse.mozilla.org/
+[1] https://pulse.mozilla.org/
 
 Installation
 ------------
