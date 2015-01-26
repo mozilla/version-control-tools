@@ -4,74 +4,112 @@ autoland
 Overview
 --------
 
-Autoland is a tool to monitor patches submitted to the try server [1] and land
-them automatically provided builds succeed and tests pass. It works closely
-with the transplant tool [2] to accomplish this.
+Autoland is a tool that automatically lands patches from one tree to another.
+It also monitors test runs and re-triggers jobs automatically to help determine
+if failures are due to intermittents or not.
 
-When pushing autoland patches to try it is necessary that the head patch be
-empty and that the commit message contains the try syntax along with the
-string '--autoland'.
+Currently Autoland is aimed at automatically landing patches from MozReview [1]
+to Try [2] to allow for patches to be easily pushed to Try during the review
+process.
 
-An example of a summary for an autoland push is:
+A Web API is exposed to allow for try requests to be made at /autoland. This
+endpoint expects a json structure to be posted to it with mime-type
+"application/json". It is protected by HTTP Basic Auth.
 
-  * try: -b do -p all -u all -t none --autoland
-  * Bug XXXXXX - Do interesting stuff; r=yyy
+The posted structure must be as follows:
 
-The autoland tool does not mandate a minimal set of tests for a change or
-check that the patch has been properly reviewed. In order to keep autoland as
-simple as possible it is assumed that these policies will be enforced elsewhere,
-for instance, in mozreview [3]. A check is done to verify that the person who
-pushed to try is a member of the appropriate LDAP group to land on the
-destination repository, i.e. scm level 3 in order to land on mozilla-inbound.
 
-A single failure is allowed for each build and test. In this case, autoland
-automatically retriggers the job to see if it will succeed on the second
-attempt. If it succeeds on the second run, it is assumed that the failure was
-intermittent and that the patch can be landed. If two failures occur for any
-build or test, the autoland request fails.
+.. code-block:: javascript
 
-If the autoland request succeeds, the transplant tool is used to land the
-changes. Whether or not the request succeeds, the bugzilla bug corresponding to
-the request is updated.
+    {
+      "tree": "mozilla-central",
+      "revision": "9cc25f7ac50a",
+      "destination": "try",
+      "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
+      "endpoint": "http://localhost/mozreview"
+    }
 
-[1] http://hg.mozilla.org/try/
-[2] https://github.com/laggyluke/build-transplant
-[3] http://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview.html
+
+The tree and revision specify the source of the patch to be autolanded. The
+destination determines where the patch will be landed. The trysyntax, which is
+optional, provides the additional trysyntax to be used if the destination tree
+is Try. The endpoint provides a callback url which is hit once the patch has
+been attempted to be landed.
+
+A successful request returns a 200 and a json encoded structure containing a
+request_id that can be used to determine the status of the autoland request:
+
+
+.. code-block:: javascript
+
+    {
+      "request_id": 42
+    }
+
+
+A simple script which posts to this endpoint using the Python requests library
+can be found under testing/utils/post-job.py.
+
+The callback json structure looks like the following:
+
+
+.. code-block:: javascript
+
+    {
+      "request_id": 42,
+      "tree": "mozilla-central",
+      "rev": "9cc25f7ac50a",
+      "destination": "try",
+      "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
+      "landed": true,
+      "result": "1f34accb7920"
+    }
+
+
+The request_id matches the request_id returned for the initial request. The
+tree, revision, destination and try_syntax fields match what was passed in the
+initial request. The landed field is true if the patch was successfully landed
+and false otherwise. The result field has the SHA1 of the new revision if the
+patch was successfully landed, and an error message otherwise.
+
+A status API is also provided under autoland/request/<id> which allows for the
+status of a request to be queried. The json structure returned looks like the
+following:
+
+
+.. code-block:: javascript
+
+    {
+      "tree": "mozilla-central",
+      "rev": "9cc25f7ac50a",
+      "destination": "try",
+      "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
+      "landed": true,
+      "result": "1f34accb7920"
+      "endpoint": "http://localhost/mozreview"
+    }
+
+
+[1] http://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview.html
+[2] http://hg.mozilla.org/try
 
 
 Design
 ------
 
-Conceptually autoland consists of four components: a pulse listener, a bugzilla
-interface, a transplant interface, and autoland itself. For convenience,
-the last three are currently combined within one python program, but they could
-easily be split out if required.
+Autoland consists of three components which run independently. A Flask based
+Web API listens for incoming autoland requests. A Pulse [1] listener listens
+for build started and finished messages and uses these to update test runs
+which are being monitored. The main autoland service periodically queries for
+pending autoland requests and monitored test runs which require servicing. A
+Postgres database is used to track autoland request and test run state.
 
-The pulse listener listens for build and test _started_ and _finished_  messages
-on Mozilla Pulse [1]. Commit comments for started builds are examined for the
-'--autoland' string. If present, and the autoland request is not known to the
-system, data about the commit is added to a postgres database. Both _started_
-and _finished_ messages are used as a trigger to query the buildapi to determine
-the number of pending, running and finished jobs for the changeset. This is
-done to limit the amount of polling down by autoland.
+Autoland requests are serviced by using mercurial commands to move the commit
+from one repository to another. If the destination repository is Try, the
+resulting test run will then be monitored and any failures will be retriggered
+exactly once as a means of dealing with intermittent failures.
 
-The bugzilla interface posts comments to bugs when autoland requests succeed or
-fail. Comments are stored in postgres until successfuly posted.
-
-The transplant interface attempts to transplant changesets for successful
-autoland requests. Again, the changesets are stored in postgres so the
-transplant can be retried in the event the server is unavailable.
-
-The main portion of autoland periodically checks the postgres database for
-incomplete autoland jobs which have no pending or running builds or which have
-not been examined recently (e.g. no activity in the past 30 minutes). The
-buildapi is then used to determine whether or not the job has completed. If so,
-it is examined to see if any failures have occurred. If there are no failures,
-the request is marked as ready to be landed. If there are single failures for
-any job types, requests are made to rebuild those jobs. If there are two
-failures for any job types, the autoland request is marked as failed.
-
-[1] https://pulse.mozilla.org/
+* [1] https://pulse.mozilla.org/
 
 Installation
 ------------
@@ -79,7 +117,8 @@ Installation
 Install required ubuntu packages:
 
     sudo apt-get update
-    sudo apt-get install git pip python-dev postgresql libqu-dev libldap2-dev libsasl2-dev
+    sudo apt-get install mercurial pip python-dev postgresql libpq-dev \
+                         libldap2-dev libsasl2-dev virtualenv
 
 Create a virtualenv:
 
@@ -95,3 +134,5 @@ Create the autoland database:
 
     cd sql
     sudo -u postgres ./createdb.sh
+
+A docker image is also provided, see the Dockerfile in the root directory.

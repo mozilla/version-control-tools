@@ -57,10 +57,11 @@ def autoland():
     Example request json:
 
     {
-      'tree': 'mozilla-central',
-      'revision': '9cc25f7ac50a',
-      'destination': 'try',
-      'trysyntax': 'try: -b o -p linux -u mochitest-1 -t none',
+      "tree": "mozilla-central",
+      "revision": "9cc25f7ac50a",
+      "destination": "try",
+      "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
+      "endpoint": "http://localhost/",
     }
 
     Returns an id which can be used to get the status of the autoland
