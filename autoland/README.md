@@ -128,4 +128,15 @@ Create the autoland database:
     cd sql
     sudo -u postgres ./createdb.sh
 
-A docker image is also provided, see the Dockerfile in the root directory.
+
+Testing
+-------
+
+Testing is most easily accomplished using docker. A Dockerfile for Autoland is
+present in the root directory. A postgres instance is also required for
+testing. A docker-compose [1] docker-compose.yml is provided to easily get a
+test environment stood up.
+
+Integration tests are present under testing/test_integration.py.
+
+[1] https://github.com/docker/fig
