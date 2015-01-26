@@ -19,8 +19,6 @@ endpoint expects a json structure to be posted to it with mime-type
 The posted structure must be as follows:
 
 
-.. code-block:: javascript
-
     {
       "tree": "mozilla-central",
       "revision": "9cc25f7ac50a",
@@ -40,8 +38,6 @@ A successful request returns a 200 and a json encoded structure containing a
 request_id that can be used to determine the status of the autoland request:
 
 
-.. code-block:: javascript
-
     {
       "request_id": 42
     }
@@ -52,8 +48,6 @@ can be found under testing/utils/post-job.py.
 
 The callback json structure looks like the following:
 
-
-.. code-block:: javascript
 
     {
       "request_id": 42,
@@ -76,8 +70,6 @@ A status API is also provided under autoland/request/<id> which allows for the
 status of a request to be queried. The json structure returned looks like the
 following:
 
-
-.. code-block:: javascript
 
     {
       "tree": "mozilla-central",
