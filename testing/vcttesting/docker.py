@@ -239,7 +239,6 @@ class Docker(object):
         # docker.client always setting stream=True if version > 1.8.
         # We assume this is a bug that will change behavior later and work
         # around it by ensuring consistent behavior.
-        print('Building Docker image %s' % name)
         for stream in self.client.build(fileobj=buf, custom_context=True,
                 rm=True, stream=True):
             s = json.loads(stream)
