@@ -120,6 +120,20 @@ def serialize_review_requests(rr):
     return yaml.safe_dump(d, default_flow_style=False).rstrip()
 
 
+def short_review_request_dict(rr):
+    # Don't include last_updated since it's hard to test.
+    d = OrderedDict()
+    d['summary'] = _serialize_text(rr['summary'])
+
+    for k in ('id', 'commit', 'submitter', 'issue_open_count', 'status'):
+        if k in rr:
+            d[k] = rr[k]
+
+    d['reviewers'] = [x for x in rr['reviewers']]
+
+    return d
+
+
 @CommandProvider
 class ReviewBoardCommands(object):
     def __init__(self, context):
@@ -129,7 +143,7 @@ class ReviewBoardCommands(object):
         else:
             self.mr = None
 
-    def _get_root(self, port):
+    def _get_client(self, port):
         from rbtools.api.client import RBClient
 
         username = os.environ.get('BUGZILLA_USERNAME')
@@ -144,9 +158,11 @@ class ReviewBoardCommands(object):
         except Exception:
             pass
 
-        c = RBClient('http://localhost:%s/' % port, username=username,
-                password=password)
-        return c.get_root()
+        return RBClient('http://localhost:%s/' % port, username=username,
+                        password=password)
+
+    def _get_root(self, port):
+        return self._get_client(port).get_root()
 
     def _get_rb(self, path):
         from vcttesting.reviewboard import MozReviewBoard
@@ -344,14 +360,17 @@ class ReviewBoardCommands(object):
         print('created review reply %s' % r.rsp['reply']['id'])
 
     @Command('create-diff-comment', category='reviewboard',
-        description='Create a comment on a diff')
+             description='Create a comment on a diff')
     @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request to create comment on')
     @CommandArgument('rid', help='Review to create comment on')
     @CommandArgument('filename', help='File to leave comment on')
     @CommandArgument('first_line', help='Line comment should apply to')
     @CommandArgument('text', help='Text constituting diff comment')
-    def create_diff_comment(self, port, rrid, rid, filename, first_line, text):
+    @CommandArgument('--open-issue', action='store_true',
+                     help='Whether to open an issue in this review')
+    def create_diff_comment(self, port, rrid, rid, filename, first_line, text,
+                            open_issue=False):
         root = self._get_root(port)
 
         diffs = root.get_diffs(review_request_id=rrid)
@@ -371,8 +390,25 @@ class ReviewBoardCommands(object):
         review = reviews.create()
         comments = review.get_diff_comments()
         comment = comments.create(filediff_id=file_id, first_line=first_line,
-            num_lines=1, text=text)
+                                  num_lines=1, text=text,
+                                  issue_opened=open_issue)
         print('created diff comment %s' % comment.id)
+
+    @Command('update-issue-status', category='reviewboard',
+             description='Update issue status on a diff comment.')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Review request for the diff comment review')
+    @CommandArgument('rid', help='Review for the diff comment')
+    @CommandArgument('cid', help='Diff comment of issue to be updated')
+    @CommandArgument('status', help='Desired issue status ("open", "dropped", '
+                     'or "resolved")')
+    def update_issue_status(self, port, rrid, rid, cid, status):
+        root = self._get_root(port)
+
+        review = root.get_review(review_request_id=rrid, review_id=rid)
+        diff_comment = review.get_diff_comments().get_item(cid)
+        diff_comment.update(issue_status=status)
+        print('updated issue status on diff comment %s' % cid)
 
     @Command('closediscarded', category='reviewboard',
         description='Close a review request as discarded.')
@@ -526,6 +562,28 @@ class ReviewBoardCommands(object):
             for field in request.iterfields():
                 o[field] = getattr(request, field)
             print(yaml.safe_dump(o, default_flow_style=False).rstrip())
+
+    @Command('dump-summary', category='reviewboard',
+             description='Return parent and child review-request summary.')
+    @CommandArgument('port', help='Port number Review Board is running on')
+    @CommandArgument('rrid', help='Parent review request id')
+    def dump_summary(self, port, rrid):
+        from rbtools.api.errors import APIError
+        c = self._get_client(port)
+
+        try:
+            r = c.get_path('/extensions/mozreview.extension.MozReviewExtension'
+                           '/summary/%s/' % rrid)
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                e.rsp['err']['msg']))
+            return 1
+
+        d = OrderedDict()
+        d['parent'] = short_review_request_dict(r['parent'])
+        d['children'] = [short_review_request_dict(x) for x in r['children']]
+
+        print(yaml.safe_dump(d, default_flow_style=False).rstrip())
 
     @Command('start', category='reviewboard',
         description='Start a Review Board HTTP server.')

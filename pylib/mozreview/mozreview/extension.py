@@ -9,6 +9,8 @@ from mozreview.autoland.resources import (autoland_request_update_resource,
                                           try_autoland_trigger_resource)
 from mozreview.batchreview.resources import batch_review_resource
 from mozreview.pulse import initialize_pulse_handlers
+from mozreview.resources.review_request_summary import (
+    review_request_summary_resource,)
 
 
 class MozReviewExtension(Extension):
@@ -35,6 +37,7 @@ class MozReviewExtension(Extension):
     resources = [
         autoland_request_update_resource,
         batch_review_resource,
+        review_request_summary_resource,
         try_autoland_trigger_resource,
     ]
 
