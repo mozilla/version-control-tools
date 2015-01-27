@@ -1,6 +1,5 @@
 import json
 import re
-import requests
 import subprocess
 
 HGMO_REXP = 'https://hg.mozilla.org/try/rev/(\w+)'

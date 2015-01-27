@@ -11,7 +11,7 @@ def read_credentials():
 def update_review(auth, endpoint, data):
     try:
         r = requests.post(endpoint, data=json.dumps(data),
-                          headers= {'Content-Type': 'application/json'},
+                          headers={'Content-Type': 'application/json'},
                           auth=auth)
         return r.status_code == 200
     except requests.exceptions.ConnectionError:

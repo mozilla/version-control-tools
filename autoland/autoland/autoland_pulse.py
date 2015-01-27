@@ -2,22 +2,14 @@
 import argparse
 import amqp
 import datetime
-import httplib
 import json
 import logging
 import platform
 import psycopg2
-import re
-import string
 
 from mozillapulse import consumers
 
-from mozlog.structured import (
-    commandline,
-    formatters,
-    handlers,
-    structuredlog,
-)
+from mozlog.structured import commandline
 
 import selfserve
 
@@ -65,7 +57,6 @@ def extract_tree_and_rev(payload):
 def handle_message(data, message):
     message.ack()
 
-    key = data['_meta']['routing_key']
     payload = data['payload']
 
     if message_log_path:

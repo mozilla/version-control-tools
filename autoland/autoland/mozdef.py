@@ -1,4 +1,5 @@
-import kombu 
+import json
+import kombu
 import os
 import pytz
 import platform
@@ -16,8 +17,10 @@ def read_credentials():
 
 
 def post(auth, data):
-    conn_string = 'amqp://{0}:{1}@{2}:{3}/autoland'.format(auth[0], auth[1],
-                                                           auth[2], MOZDEF_PORT)
+    conn_string = 'amqp://{0}:{1}@{2}:{3}/autoland'.format(auth[0],
+                                                           auth[1],
+                                                           auth[2],
+                                                           MOZDEF_PORT)
     conn = kombu.Connection(conn_string, ssl=True)
     exchange = kombu.Exchange('eventtask', type='direct', durable=True)
     exchange(conn).declare()
@@ -44,7 +47,7 @@ def post_ldap_group_check(auth, user, group, result):
         ],
         'details': {
             'user': user,
-            'group': group, 
+            'group': group,
             'in_group': result
         }
     }

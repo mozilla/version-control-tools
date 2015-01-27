@@ -1,25 +1,15 @@
 #!/usr/bin/env python
 import argparse
 import datetime
-import json
 import logging
 import mozreview
 import psycopg2
-import re
-import requests
 import sys
 import time
 import traceback
 
-from mozlog.structured import (
-    commandline,
-    formatters,
-    handlers,
-    structuredlog,
-)
+from mozlog.structured import commandline
 
-import mercurial
-import mozilla_ldap
 import selfserve
 import transplant
 
@@ -46,8 +36,9 @@ def handle_pending_transplants(logger, dbconn):
         if destination == 'try':
             landed, result = transplant.transplant_to_try(tree, rev, trysyntax)
             if landed:
-                logger.info('transplanted from tree: %s rev: %s to destination: %s new revision: %s' %
-                        (tree, rev, destination, result))
+                logger.info(('transplanted from tree: %s rev: %s'
+                             ' to destination: %s new revision: %s') %
+                            (tree, rev, destination, result))
 
                 query = """
                     insert into Testrun(tree,revision,last_updated)
@@ -56,10 +47,9 @@ def handle_pending_transplants(logger, dbconn):
                 cursor.execute(query, ('try', result, datetime.datetime.now()))
 
             else:
-                logger.info('transplant failed: tree: %s rev: %s destination: %s error: %s' %
-                        (tree, rev, destination, result))
-
-
+                logger.info(('transplant failed: tree: %s rev: %s'
+                             'destination: %s error: %s') %
+                            (tree, rev, destination, result))
 
         else:
             #TODO, we're only landing to try at the moment
@@ -245,9 +235,12 @@ def handle_pending_mozreview_updates(logger, dbconn):
     """Attempt to post updates to mozreview"""
 
     cursor = dbconn.cursor()
-    query = """select id,tree,rev,destination,trysyntax,landed,result,endpoint from Transplant
-               where landed is not NULL and review_updated is NULL
-               limit %(limit)s"""
+    query = """
+        select id,tree,rev,destination,trysyntax,landed,result,endpoint
+        from Transplant
+        where landed is not NULL and review_updated is NULL
+        limit %(limit)s
+    """
     cursor.execute(query, {'limit': MOZREVIEW_COMMENT_LIMIT})
 
     mozreview_auth = mozreview.read_credentials()

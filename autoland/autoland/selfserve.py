@@ -84,6 +84,7 @@ def job_is_done(auth, branch, rev):
         if pre:
             return json.loads(pre.text)
 
+
 def build_info(auth, branch, build_id):
     try:
         r = requests.get(BUILDAPI_URL + '/' + branch + '/build/' + build_id,

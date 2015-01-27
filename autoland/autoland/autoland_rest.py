@@ -7,12 +7,7 @@ import urlparse
 
 from flask import Flask, request, jsonify, Response, abort, make_response
 
-from mozlog.structured import (
-    commandline,
-    formatters,
-    handlers,
-    structuredlog,
-)
+from mozlog.structured import commandline
 
 AUTH = None
 DSN = None

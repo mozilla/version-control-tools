@@ -1,6 +1,7 @@
 import json
 import requests
 
+
 def post_job(host, tree, rev, destination, trysyntax, endpoint, user, passwd):
 
     data = {
@@ -12,7 +13,7 @@ def post_job(host, tree, rev, destination, trysyntax, endpoint, user, passwd):
     }
 
     r = requests.post(host + '/autoland', data=json.dumps(data),
-                      headers= {'Content-Type': 'application/json'},
+                      headers={'Content-Type': 'application/json'},
                       auth=(user, passwd))
     return r.status_code, r.text
 
@@ -24,7 +25,8 @@ if __name__ == '__main__':
     parser.add_argument('--host', required=True,
                         help='Host to which to post the job ' +
                              'e.g. http://localhost:8000')
-    parser.add_argument('--tree', required=True, help='Source tree of the revision')
+    parser.add_argument('--tree', required=True,
+                        help='Source tree of the revision')
     parser.add_argument('--rev', required=True, help='Revision to land')
     parser.add_argument('--destination', required=True,
                         help='Destination tree for the revision')
