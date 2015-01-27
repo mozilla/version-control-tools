@@ -131,12 +131,17 @@ if __name__ == '__main__':
                         help='Dump available messages and exit')
     parser.add_argument('--onetime', action='store_true',
                         help='Process a single message and exit')
+    parser.add_argument('--start-from', type=int,
+                        help='Start N records from the beginning')
 
     args = parser.parse_args()
 
     config = Config(filename=args.config)
 
     consumer = config.consumer
+
+    if args.start_from:
+        consumer.seek(args.start_from, 0)
 
     if args.dump:
         messages = []
