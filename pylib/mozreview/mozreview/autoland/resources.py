@@ -142,8 +142,8 @@ class TryAutolandTriggerResource(WebAPIResource):
                          'ID %s for revision %s '
                          % (review_request_id, last_revision))
 
-            autoland_host = ext.settings.get('autoland_host')
-            if not autoland_host:
+            autoland_url = ext.settings.get('autoland_url')
+            if not autoland_url:
                 return BAD_AUTOLAND_URL
 
             autoland_user = ext.settings.get('autoland_user')
@@ -158,7 +158,7 @@ class TryAutolandTriggerResource(WebAPIResource):
                          % endpoint)
 
             try:
-                response = requests.post(autoland_host, data=json.dumps({
+                response = requests.post(autoland_url, data=json.dumps({
                     'tree': TRY_AUTOLAND_TREE,
                     'endpoint': endpoint,
                     'rev': last_revision,

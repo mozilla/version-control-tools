@@ -24,7 +24,7 @@ class MozReviewExtension(Extension):
         'pulse_user': '',
         'pulse_password': '',
         'pulse_ssl': False,
-        'autoland_host': '',
+        'autoland_url': '',
         'autoland_user': '',
         'autoland_password': '',
         'testing': False,

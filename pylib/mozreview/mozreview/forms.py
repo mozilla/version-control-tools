@@ -15,7 +15,7 @@ class MozReviewSettingsForm(SettingsForm):
     pulse_user = forms.CharField(required=False)
     pulse_password = forms.CharField(required=False,
                                      widget=forms.PasswordInput)
-    autoland_host = forms.CharField(
+    autoland_url = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={
             'size': 100,
