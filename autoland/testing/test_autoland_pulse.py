@@ -41,6 +41,7 @@ class TestAutolandPulse(unittest.TestCase):
         with gzip.open('test-data/pulse-messages.json.gz') as f:
             message_data = json.load(f)
 
+        hit_monitored_testrun = False
         for i, data in enumerate(message_data):
             autoland_pulse.dbconn = mock.Mock()
             autoland_pulse.logger = mock.Mock()
@@ -53,12 +54,15 @@ class TestAutolandPulse(unittest.TestCase):
 
             if (tree == 'try' and
                     rev == '7dda5def66faf5d9d0173aed32d33c964247daf3'):
+
+                hit_monitored_testrun = True
                 self.assertTrue(autoland_pulse.logger.info.called)
                 self.assertEqual(autoland_pulse.logger.info.call_args[0][0],
                                  'pending: 0 running: 0 builds: 4')
             else:
                 self.assertFalse(autoland_pulse.logger.info.called)
 
+        self.assertTrue(hit_monitored_testrun)
 
 if __name__ == '__main__':
     unittest.main()
