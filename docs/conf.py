@@ -23,7 +23,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = u'Mozilla Version Control Tools'
-copyright = u'2014, Mozilla'
+copyright = u'2015, Mozilla'
 
 version = '0'
 release = '0'
