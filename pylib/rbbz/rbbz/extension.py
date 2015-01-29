@@ -75,7 +75,8 @@ class BugzillaExtension(Extension):
         AuthBackendHook(self, BugzillaBackend)
         SignalHook(self, pre_delete, on_draft_pre_delete)
         SignalHook(self, review_request_publishing,
-                   on_review_request_publishing)
+                   on_review_request_publishing,
+                   sandbox_errors=False)
         SignalHook(self, review_publishing, on_review_publishing)
         SignalHook(self, reply_publishing, on_reply_publishing)
         SignalHook(self, review_request_closed,
