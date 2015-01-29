@@ -170,3 +170,32 @@ You'll simply need to SSH into the running host (``hg.mozilla.org``) and run
 Looking for currently running processes. If you can't find any, then
 it's safe to perform the Zeus SSH pool failover. If there are existing
 jobs running, plesae wait for them to finish.
+
+Repository Mirroring
+====================
+
+On mirrors (hgweb machines), replication of a single repository
+can be initiated by running ``/usr/local/bin/mirror-pull``. This
+script takes the argument of a repository path, relative to its
+home on ``hg.mozilla.org``. e.g. ``hgcustom/version-control-tools``.
+
+**It is important to run this script as the hg user.**
+
+Here is how it is typically used::
+
+   sudo -u hg /usr/local/bin/mirror-pull releases/mozilla-beta
+
+On the *hgssh* machines, you can run a single script to have all
+mirrors pull. It works the same way and takes an argument that
+is the repository's relative path. e.g.::
+
+   /repo/hg/scripts/push-repo.sh hgcustom/version-control-tools
+
+It is safe to run this script as root - it will ``su`` to the correct
+user.
+
+If you want to go a level deeper, you can run
+``/usr/local/bin/repo-push.sh``. **This script should be executed
+as the hg user.** e.g.::
+
+   sudo -u hg /usr/local/bin/repo-push.sh hgcustom/version-control-tools
