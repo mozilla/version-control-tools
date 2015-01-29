@@ -352,6 +352,61 @@ class pushlog(object):
 
         return ret
 
+    def handledestroyed(self):
+        """Handle a destroyed event in the repository.
+
+        This is called when changesets have been destroyed from the repository.
+        This function will reconcile the state of the pushlog to match new
+        reality.
+
+        Push IDs are explicitly not deleted. However, they may become empty.
+        """
+        repo = self.repo
+
+        with self.conn() as c:
+            if not c:
+                return
+
+            res = c.execute('SELECT pushid, rev, node FROM changesets '
+                            'ORDER BY pushid, rev ASC')
+
+            deletes = []
+            revupdates = []
+
+            for pushid, rev, node in res:
+                try:
+                    ctx = repo[node]
+                    # Changeset has new ordering in revlog. Correct it.
+                    if ctx.rev() != rev:
+                        revupdates.append((node, ctx.rev()))
+                        repo.ui.warn('changeset rev will be updated in '
+                                     'pushlog: %s\n' % node)
+                except RepoLookupError:
+                    # The changeset was stripped. Remove it from the pushlog.
+                    deletes.append(node)
+                    repo.ui.warn('changeset will be deleted from '
+                                 'pushlog: %s\n' % node)
+
+            for node in deletes:
+                c.execute('DELETE FROM changesets WHERE node = ?', (node,))
+
+            if deletes:
+                repo.ui.log('pushlog',
+                            'deleted %d changesets from pushlog: %s\n' % (
+                            len(deletes), ', '.join(deletes)))
+
+            for node, rev in revupdates:
+                c.execute('UPDATE changesets SET rev=? WHERE node=?',
+                          (rev, node))
+
+            if revupdates:
+                repo.ui.log('pushlog',
+                            'reordered %d changesets in pushlog\n' %
+                            len(revupdates))
+
+            c.commit()
+
+
 def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
     # This hook is executed whenever changesets are introduced. We ignore
     # new changesets unless they come from a push. ``source`` can be
@@ -528,5 +583,9 @@ def reposetup(ui, repo):
                 self._pushlog = pushlog(self)
 
             return self._pushlog
+
+        def destroyed(self):
+            super(pushlogrepo, self).destroyed()
+            self.pushlog.handledestroyed()
 
     repo.__class__ = pushlogrepo
