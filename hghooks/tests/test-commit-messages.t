@@ -411,7 +411,11 @@ Test some bad commit messages
   $ hg strip -r . > /dev/null
 
   $ echo try > foo
-  $ hg commit -m 'checkin 1 try: -b do -p all'
+  $ hg commit -l - << EOF
+  > Bug 123 - foo
+  > checkin 1
+  > try: -b do -p all
+  > EOF
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -422,9 +426,11 @@ Test some bad commit messages
   
   
   ************************** ERROR ****************************
-  Rev d9e9911a2e7a uses try syntax. (Did you mean to push to Try instead?)
+  Rev 53f34037defb uses try syntax. (Did you mean to push to Try instead?)
   test
-  checkin 1 try: -b do -p all
+  Bug 123 - foo
+  checkin 1
+  try: -b do -p all
   *************************************************************
   
   

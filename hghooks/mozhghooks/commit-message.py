@@ -44,7 +44,7 @@ def isGoodMessage(c):
                     "B2G Bumper Bot <release+b2gbumper@mozilla.com>"]:
         return True
 
-    if trySyntax.search(firstline):
+    if trySyntax.search(desc):
         message("Rev {rev} uses try syntax. (Did you mean to push to Try instead?)")
         return False
 
