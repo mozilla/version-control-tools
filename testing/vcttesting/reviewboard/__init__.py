@@ -97,7 +97,7 @@ class MozReviewBoard(object):
         """Start the HTTP server on the specified port."""
         with wrap_env():
             self._setup_env()
-            self._start(port)
+            return self._start(port)
 
     def stop(self):
         path = os.path.join(self.path, 'rbserver.pid')
