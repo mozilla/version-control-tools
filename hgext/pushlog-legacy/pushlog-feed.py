@@ -148,6 +148,10 @@ class PushlogQuery(object):
                 res = self.conn.execute(query, params)
                 lastid = None
                 for (id, user, date, node) in res:
+                    # Empty push.
+                    if not node:
+                        continue
+
                     if self.tipsonly and id == lastid:
                         continue
                     self.entries.append((id,user,date,node))
