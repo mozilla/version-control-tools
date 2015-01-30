@@ -454,9 +454,8 @@ class ReviewBoardCommands(object):
             print('You must have MOZREVIEW_HOME set to restart servers')
             return 1
 
-        rb = self.mr.get_reviewboard()
-        rb.stop()
-        rb.start()
+        url = self.mr.restart_reviewboard()
+        print('Review Board accessible at %s' % url)
 
     @Command('make-admin', category='reviewboard',
         description='Make a user a superuser and staff user')

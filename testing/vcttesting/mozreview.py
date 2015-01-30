@@ -9,6 +9,7 @@ import signal
 import socket
 import subprocess
 import time
+import urlparse
 
 import psutil
 import concurrent.futures as futures
@@ -94,6 +95,16 @@ class MozReview(object):
                               bugzilla_url=self.bugzilla_url,
                               pulse_host=self.pulse_host,
                               pulse_port=self.pulse_port)
+
+    def restart_reviewboard(self):
+        rb = self.get_reviewboard()
+        rb.stop()
+
+        url = urlparse.urlparse(self.reviewboard_url)
+        rb.start(url.port)
+
+        return self.reviewboard_url
+
 
     def start(self, bugzilla_port=None, reviewboard_port=None,
             mercurial_port=None, pulse_port=None, verbose=False,

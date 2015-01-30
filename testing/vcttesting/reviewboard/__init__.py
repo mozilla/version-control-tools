@@ -113,8 +113,11 @@ class MozReviewBoard(object):
         # Ideally we should check is_alive() here. However, this fails
         # if the process is started and stopped from the same parent process.
         # This is likely indicative of a bug in our daemonizing code.
-        while proc.status() == psutil.STATUS_RUNNING:
-            time.sleep(0.1)
+        try:
+            while proc.status() == psutil.STATUS_RUNNING:
+                time.sleep(0.1)
+        except psutil.NoSuchProcess:
+            pass
 
         os.unlink(path)
 
