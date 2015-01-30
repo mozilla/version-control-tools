@@ -88,6 +88,13 @@ class MozReview(object):
 
         return Bugzilla(self.bugzilla_url, username=username, password=password)
 
+    def get_reviewboard(self):
+        """Obtain a MozReviewBoard instance tied to this MozReview instance."""
+        return MozReviewBoard(self._path,
+                              bugzilla_url=self.bugzilla_url,
+                              pulse_host=self.pulse_host,
+                              pulse_port=self.pulse_port)
+
     def start(self, bugzilla_port=None, reviewboard_port=None,
             mercurial_port=None, pulse_port=None, verbose=False,
             db_image=None, web_image=None, pulse_image=None):

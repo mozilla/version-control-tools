@@ -123,7 +123,11 @@ def serialize_review_requests(rr):
 @CommandProvider
 class ReviewBoardCommands(object):
     def __init__(self, context):
-        self.old_env = os.environ.copy()
+        from vcttesting.mozreview import MozReview
+        if 'MOZREVIEW_HOME' in os.environ:
+            self.mr = MozReview(os.environ['MOZREVIEW_HOME'])
+        else:
+            self.mr = None
 
     def _get_root(self, port):
         from rbtools.api.client import RBClient
@@ -137,9 +141,17 @@ class ReviewBoardCommands(object):
 
     def _get_rb(self, path):
         from vcttesting.reviewboard import MozReviewBoard
-        return MozReviewBoard(path, os.environ['BUGZILLA_URL'],
-            pulse_host=os.environ.get('PULSE_HOST'),
-            pulse_port=os.environ.get('PULSE_PORT'))
+
+        if self.mr:
+            return self.mr.get_reviewboard()
+        elif 'BUGZILLA_HOME' is os.environ:
+            return MozReviewBoard(path, os.environ['BUGZILLA_URL'],
+                pulse_host=os.environ.get('PULSE_HOST'),
+                pulse_port=os.environ.get('PULSE_PORT'))
+        else:
+            raise Exception('Do not know about Bugzilla URL. Cannot talk to '
+                            'Review Board. Try running `mozreview start` and '
+                            'setting MOZREVIEW_HOME.')
 
     @Command('create', category='reviewboard',
         description='Create a Review Board server install.')
@@ -434,6 +446,17 @@ class ReviewBoardCommands(object):
     def stop(self, path):
         rb = self._get_rb(path)
         rb.stop()
+
+    @Command('restart', category='reviewboard',
+             description='Restart a Review Board HTTP server.')
+    def restart(self):
+        if not self.mr:
+            print('You must have MOZREVIEW_HOME set to restart servers')
+            return 1
+
+        rb = self.mr.get_reviewboard()
+        rb.stop()
+        rb.start()
 
     @Command('make-admin', category='reviewboard',
         description='Make a user a superuser and staff user')
