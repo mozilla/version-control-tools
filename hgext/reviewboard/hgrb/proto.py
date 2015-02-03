@@ -11,7 +11,8 @@ from mercurial.node import short
 
 from hgrb.util import ReviewID
 
-class AuthError(Exception):
+
+class AuthorizationError(Exception):
     """Represents an error authenticating or authorizing to Bugzilla."""
 
     def __init__(self, e, username, password, userid, cookie, **kwargs):
@@ -29,17 +30,33 @@ class AuthError(Exception):
         else:
             return 'unknown failure'
 
+
+class BadRequestError(Exception):
+    """Represents an error making a request to Reviewboard."""
+
+    def __init__(self, e):
+        self.e = e
+
+    def __str__(self):
+        return ('reviewboard error: "%d - %s". please try submitting the'
+                ' review again. if that doesn\'t work, you\'ve likely'
+                ' encountered a bug.') % (self.e.error_code, self.e.message)
+
+
 # Wrap post_reviews because we don't want to require the clients to
 # import rbtools.
 def post_reviews(*args, **kwargs):
     from reviewboardmods.pushhooks import post_reviews as pr
-    from rbtools.api.errors import AuthorizationError
+    from rbtools.api import errors
 
     try:
         return pr(*args, **kwargs)
-    except AuthorizationError as e:
+    except errors.AuthorizationError as e:
         # Reraise as our internal type to avoid import issues.
-        raise AuthError(e, **kwargs)
+        raise AuthorizationError(e, **kwargs)
+    except errors.BadRequestError as e:
+        raise BadRequestError(e)
+
 
 def getpayload(proto, args):
     # HTTP and SSH behave differently here. In SSH, the data is
@@ -255,7 +272,9 @@ def reviewboard(repo, proto, args=None):
             lines.append('reviewdata %s status %s' % (rid,
                 urllib.quote(rr.status.encode('utf-8'))))
 
-    except AuthError as e:
+    except AuthorizationError as e:
+        lines.append('error %s' % str(e))
+    except BadRequestError as e:
         lines.append('error %s' % str(e))
 
     res = formatresponse(*lines)

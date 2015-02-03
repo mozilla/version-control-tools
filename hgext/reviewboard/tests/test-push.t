@@ -309,6 +309,25 @@ Reviewing merge commits is rejected
   abort: cannot review merge commits (b21a68e5d0e0)
   [255]
 
+Empty changesets show a reviewboard error, not an internal server
+error (Bug 1128555)
+  $ hg up -q -r 0
+  $ touch empty
+  $ hg add empty
+  $ hg commit -m "Bug 2 - Added empty file"
+  created new head
+  $ hg push http://localhost:$HGPORT/test-repo
+  pushing to http://localhost:$HGPORT/test-repo
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  submitting 1 changesets for review
+  abort: reviewboard error: "105 - One or more fields had errors". please try submitting the review again. if that doesn't work, you've likely encountered a bug.
+  [255]
+
+
 Cleanup
 
   $ mozreview stop
