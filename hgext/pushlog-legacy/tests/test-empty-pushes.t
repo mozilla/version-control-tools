@@ -44,14 +44,14 @@ JSON output should render empty changeset array
      "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
     ], 
     "date": \d+,\s (re)
-    "user": "gps"
+    "user": "*" (glob)
    }, 
    "3": {
     "changesets": [
      "059b473c43d7e25d6b6f5070dfb1c468b0e9518c"
     ], 
     "date": \d+,\s (re)
-    "user": "gps"
+    "user": "*" (glob)
    }
   } (no-eol)
 
@@ -77,7 +77,7 @@ Full output should do the same
      }
     ], 
     "date": \d+,\s (re)
-    "user": "gps"
+    "user": "*" (glob)
    }, 
    "3": {
     "changesets": [
@@ -95,6 +95,6 @@ Full output should do the same
      }
     ], 
     "date": \d+,\s (re)
-    "user": "gps"
+    "user": "*" (glob)
    }
   } (no-eol)
