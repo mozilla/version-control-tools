@@ -20,7 +20,10 @@ This hook is to prevent changes to IID or UUID in pushes to trees where such cha
 
 import re
 
-def hook(ui, repo, hooktype, node, **kwargs):
+def hook(ui, repo, hooktype, node, source=None, **kwargs):
+    if source == 'strip':
+        return 0
+
     error = ""
     bc = False
     # Loop through each changeset being added to the repository
