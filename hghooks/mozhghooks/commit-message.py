@@ -73,7 +73,10 @@ def isGoodMessage(c):
 
     return False
 
-def hook(ui, repo, node, hooktype, **kwargs):
+def hook(ui, repo, node, hooktype, source=None, **kwargs):
+    if source == 'strip':
+        return 0
+
     # All changesets from node to "tip" inclusive are part of this push.
     rev = repo.changectx(node).rev()
     tip = repo.changectx("tip").rev()

@@ -487,17 +487,7 @@ Reapplying a stripped bundle should not trigger hook
   > EOF
 
   $ hg strip -r 1 --no-backup
-  
-  
-  ************************** ERROR ****************************
-  Rev e3d623084e10 needs "Bug N" or "No bug" in the commit message.
-  test
-  bad commit
-  *************************************************************
-  
-  
-  transaction abort!
-  rollback completed
-  strip failed, partial bundle stored in '$TESTTMP/striptest/.hg/strip-backup/46054ff63cbc-temp.hg'
-  abort: pretxnchangegroup.commit_message hook failed
-  [255]
+
+  $ hg log -T '{rev} {desc}\n'
+  1 bad commit
+  0 initial
