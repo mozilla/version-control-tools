@@ -121,6 +121,12 @@ Now, you can ``hg up`` inside both repositories independently! If you commit
 to one, that commit will be available in the other checkouts using that
 shared store.
 
+.. tip::
+
+   Mercurial 3.3 and newer support sharing bookmarks with repositories created
+   with ``hg share``. To activate bookmark sharing, you'll need to add ``-B``
+   to ``hg share``. e.g. ``hg share -B existing new-checkout``
+
 .. caution::
 
    Users of MQ should exercise extreme caution when using shared stores.
