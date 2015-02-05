@@ -169,6 +169,12 @@ repositories. ``hg pull fxtrees`` provides a convenient mechanism to
 only pull the repositories you have previously expressed an interest in
 interacting with.
 
+The *review* Path
+-----------------
+
+Using ``review`` as a path will automatically utilize the
+`MozReview <mozreview>`_ code review repository.
+
 Other Special Paths
 -------------------
 

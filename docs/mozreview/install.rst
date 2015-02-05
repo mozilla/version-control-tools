@@ -133,10 +133,17 @@ at https://reviewboard-hg.mozilla.org/. Just swap ``https://`` with
 An example ``.hg/hgrc`` fragment may look like::
 
   [paths]
-  default = https://hg.mozilla.org/mozilla-central
-  default-push = ssh://hg.mozilla.org/mozilla-central
+  default = https://hg.mozilla.org/hgcustom/version-control-tools
+  default-push = ssh://hg.mozilla.org/hgcustom/version-control-tools
 
-  review = ssh://reviewboard-hg.mozilla.org/gecko
+  review = ssh://reviewboard-hg.mozilla.org/version-control-tools
+
+.. tip::
+
+   If you have the `firefoxtree <firefoxtree>`_ Mercurial extension installed
+   and are working on a Firefox repository, you don't need to define the
+   ``review`` path: it is automatically defined when operating on a Firefox
+   repository.
 
 .. note:: Upcoming autodiscovery of repositories
 

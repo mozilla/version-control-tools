@@ -42,6 +42,8 @@ that have previously been pulled. This is essentially an alias that runs
 If a source is a known alias that maps to multiple repositories (such as
 ``releases`` or ``integration``), all repositories in that alias are pulled.
 
+The ``review`` path is also pre-defined to point to MozReview.
+
 Safer Push Defaults
 ===================
 
@@ -338,9 +340,14 @@ def pushcommand(orig, ui, repo, dest=None, **opts):
     http://www.selenic.com/pipermail/mercurial-devel/2014-September/062052.html
     """
     if isfirefoxrepo(repo):
-        tree, uri = resolve_trees_to_uris([dest], write_access=True)[0]
-        if uri:
-            dest = uri
+        # Automatically define "review" unless it is already defined.
+        if dest == 'review':
+            if not ui.config('paths', 'review', None):
+                dest = 'ssh://reviewboard-hg.mozilla.org/gecko'
+        else:
+            tree, uri = resolve_trees_to_uris([dest], write_access=True)[0]
+            if uri:
+                dest = uri
 
     return orig(ui, repo, dest=dest, **opts)
 
