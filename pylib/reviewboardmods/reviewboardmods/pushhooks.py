@@ -117,20 +117,7 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
 
     * TODO Bug 1047465
     """
-    rbc = None
-
-    if userid and cookie:
-        # TODO: This is bugzilla specific code that really shouldn't be inside
-        # of this file. The whole bugzilla cookie resource is a hack anyways
-        # though so we'll deal with this for now.
-        rbc = RBClient(url)
-        login_resource = rbc.get_path(
-            'extensions/rbbz.extension.BugzillaExtension/'
-            'bugzilla-cookie-logins/')
-        login_resource.create(login_id=userid, login_cookie=cookie)
-    else:
-        rbc = RBClient(url, username=username, password=password)
-
+    rbc = get_rbclient(url, username, password, userid, cookie)
     api_root = rbc.get_root()
 
     # This assumes that we pushed to the repository/URL that Review Board is
@@ -178,37 +165,15 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
     # review request's draft. This data represents the mapping from commit
     # to rid in the event that we would have published. We're overwritting
     # this data. This will only come into play if we start trusting the server
-    # isntead of the client when matching review request ids. Bug 1047516
+    # instead of the client when matching review request ids. Bug 1047516
+
     previous_commits = get_previous_commits(squashed_rr)
-
-    # A mapping from previously pushed node, which has not been processed
-    # yet, to the review request id associated with that node.
-    remaining_nodes = dict((t[0], t[1]) for i, t in enumerate(previous_commits))
-
-    # A list of review request ids that should be discarded when publishing.
-    # Adding to this list will mark a review request as to-be-discarded when
-    # the squashed draft is published on Review Board.
-    discard_on_publish_rids = rid_list_to_str(json.loads(
-        squashed_rr.extra_data['p2rb.discard_on_publish_rids']))
-
-    # A list of review request ids that have been created for individual commits
-    # but have not been published. If this list contains an item, it should be
-    # re-used for indiviual commits instead of creating a brand new review
-    # request.
-    unpublished_rids = rid_list_to_str(json.loads(
-        squashed_rr.extra_data['p2rb.unpublished_rids']))
-
-    # Set of review request ids which have not been matched to a commit
-    # from the current push. We use a list to represent this set because
-    # if any entries are left over we need to process them in order.
-    # This list includes currently published rids that were part of the
-    # previous push and rids which have been used for drafts on this
-    # reviewid but have not been published.
-    unclaimed_rids = [t[1] for t in previous_commits]
-
-    for rid in (discard_on_publish_rids + unpublished_rids):
-        if rid not in unclaimed_rids:
-            unclaimed_rids.append(rid)
+    remaining_nodes = get_remaining_nodes(previous_commits)
+    discard_on_publish_rids = get_discard_on_publish_rids(squashed_rr)
+    unpublished_rids = get_unpublished_rids(squashed_rr)
+    unclaimed_rids = get_unclaimed_rids(previous_commits,
+                                        discard_on_publish_rids,
+                                        unpublished_rids)
 
     # Previously pushed nodes which have been processed and had their review
     # request updated or did not require updating.
@@ -393,6 +358,22 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
     return str(squashed_rr.id), node_to_rid, review_requests
 
 
+def get_rbclient(url, username, password, userid, cookie):
+    if userid and cookie:
+        # TODO: This is bugzilla specific code that really shouldn't be inside
+        # of this file. The whole bugzilla cookie resource is a hack anyways
+        # though so we'll deal with this for now.
+        rbc = RBClient(url)
+        login_resource = rbc.get_path(
+            'extensions/rbbz.extension.BugzillaExtension/'
+            'bugzilla-cookie-logins/')
+        login_resource.create(login_id=userid, login_cookie=cookie)
+    else:
+        rbc = RBClient(url, username=username, password=password)
+
+    return rbc
+
+
 def rid_list_to_str(rids):
     """Convert a list of rids loaded from json to a list of rid strings.
 
@@ -451,3 +432,47 @@ def get_previous_commits(squashed_rr):
         commits.append((node, rid))
 
     return commits
+
+
+def get_remaining_nodes(previous_commits):
+    """A mapping from previously pushed node, which has not been processed
+    yet, to the review request id associated with that node.
+    """
+    return dict((t[0], t[1]) for i, t in enumerate(previous_commits))
+
+
+def get_discard_on_publish_rids(squashed_rr):
+    """A list of review request ids that should be discarded when publishing.
+    Adding to this list will mark a review request as to-be-discarded when
+    the squashed draft is published on Review Board.
+    """
+    return rid_list_to_str(json.loads(
+        squashed_rr.extra_data['p2rb.discard_on_publish_rids']))
+
+
+def get_unpublished_rids(squashed_rr):
+    """A list of review request ids that have been created for individual commits
+    but have not been published. If this list contains an item, it should be
+    re-used for indiviual commits instead of creating a brand new review
+    request.
+    """
+    return rid_list_to_str(json.loads(
+        squashed_rr.extra_data['p2rb.unpublished_rids']))
+
+
+def get_unclaimed_rids(previous_commits, discard_on_publish_rids,
+                       unpublished_rids):
+    """Set of review request ids which have not been matched to a commit
+    from the current push. We use a list to represent this set because
+    if any entries are left over we need to process them in order.
+    This list includes currently published rids that were part of the
+    previous push and rids which have been used for drafts on this
+    reviewid but have not been published.
+    """
+    unclaimed_rids = [t[1] for t in previous_commits]
+
+    for rid in (discard_on_publish_rids + unpublished_rids):
+        if rid not in unclaimed_rids:
+            unclaimed_rids.append(rid)
+
+    return unclaimed_rids

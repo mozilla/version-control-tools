@@ -43,8 +43,8 @@ class BadRequestError(Exception):
                 ' encountered a bug.') % (self.e.error_code, self.e.message)
 
 
-# Wrap post_reviews because we don't want to require the clients to
-# import rbtools.
+# Wrap reviewboardmods and error types because we don't want to require the
+# clients to import rbtools.
 def post_reviews(*args, **kwargs):
     from reviewboardmods.pushhooks import post_reviews as pr
     from rbtools.api import errors
@@ -52,7 +52,6 @@ def post_reviews(*args, **kwargs):
     try:
         return pr(*args, **kwargs)
     except errors.AuthorizationError as e:
-        # Reraise as our internal type to avoid import issues.
         raise AuthorizationError(e, **kwargs)
     except errors.BadRequestError as e:
         raise BadRequestError(e)
@@ -71,6 +70,7 @@ def getpayload(proto, args):
         data = args['data']
 
     return data
+
 
 def parsepayload(proto, args):
     data = getpayload(proto, args)
@@ -117,12 +117,46 @@ def parsepayload(proto, args):
 
     return o
 
+
+def parseidentifier(o):
+    identifier = None
+    nodes = []
+    precursors = {}
+
+    for t, d in o['other']:
+        if t == 'reviewidentifier':
+            identifier = urllib.unquote(d)
+        elif t == 'csetreview':
+            # This detects old versions of the client from before official
+            # release.
+            fields = d.split(' ')
+            if len(fields) != 1:
+                identifier = wireproto.pusherr(_('old reviewboard client detected; please upgrade'))
+            nodes.append(d)
+        elif t == 'precursors':
+            node, before = d.split(' ', 1)
+            precursors[node] = before.split()
+
+    return identifier, nodes, precursors
+
+
 def getrbapi(repo, o):
     from rbtools.api.client import RBClient
 
     url = repo.ui.config('reviewboard', 'url', None).rstrip('/')
     c = RBClient(url, username=o['bzusername'], password=o['bzpassword'])
     return c.get_root()
+
+
+def formatresponse(*lines):
+    l = ['1'] + list(lines)
+    res = '\n'.join(l)
+    # It's easy for unicode to creep in from RBClient APIs. Mercurial
+    # doesn't like unicode type responses, so catch it early and avoid
+    # the crypic KeyError: <type 'unicode'> in Mercurial.
+    assert isinstance(res, str)
+    return res
+
 
 @wireproto.wireprotocommand('pushreview', '*')
 def reviewboard(repo, proto, args=None):
@@ -136,24 +170,8 @@ def reviewboard(repo, proto, args=None):
     bzpassword = o['bzpassword']
     bzuserid = o['bzuserid']
     bzcookie = o['bzcookie']
-    identifier = None
-    nodes = []
-    precursors = {}
 
-    for t, d in o['other']:
-        if t == 'reviewidentifier':
-            identifier = urllib.unquote(d)
-        elif t == 'csetreview':
-            # This detects old versions of the client from before official
-            # release.
-            fields = d.split(' ')
-            if len(fields) != 1:
-                return wireproto.pusherr(_('old reviewboard client detected; please upgrade'))
-            nodes.append(d)
-        elif t == 'precursors':
-            node, before = d.split(' ', 1)
-            precursors[node] = before.split()
-
+    identifier, nodes, precursors = parseidentifier(o)
     if not identifier:
         return wireproto.pusherr(_('no review identifier in request'))
 
@@ -163,15 +181,6 @@ def reviewboard(repo, proto, args=None):
         'individual': [],
         'squashed': {}
     }
-
-    def formatresponse(*lines):
-        l = ['1'] + list(lines)
-        res = '\n'.join(l)
-        # It's easy for unicode to creep in from RBClient APIs. Mercurial
-        # doesn't like unicode type responses, so catch it early and avoid
-        # the crypic KeyError: <type 'unicode'> in Mercurial.
-        assert isinstance(res, str)
-        return res
 
     # We do multiple passes over the changesets requested for review because
     # some operations could be slow or may involve queries to external
