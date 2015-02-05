@@ -202,3 +202,45 @@ Removing an .idl with UUID with approval should pass
   adding file changes
   added 1 changesets with 0 changes to 0 files
   You've signaled approval for the binary change(s) in your push, thanks for the extra caution.
+
+  $ cd ..
+
+Stripping should not trigger hook
+
+  $ hg init striptest
+  $ cd striptest
+  $ echo 'uuid(abc123)' > original.idl
+  $ hg -q commit -A -m initial
+  $ echo 'uuid(def456)' > original.idl
+  $ hg commit -m 'Changing UUID; ba=me'
+  $ hg -q up -r 0
+  $ echo 'uuid(bad789)' > original.idl
+  $ hg commit -m 'Bad UUID'
+  created new head
+
+  $ cat >> .hg/hgrc << EOF
+  > [extensions]
+  > strip =
+  > 
+  > [hooks]
+  > pretxnchangegroup.prevent_uuid_changes = python:mozhghooks.prevent_uuid_changes.hook
+  > EOF
+
+  $ hg strip -r 1 --no-backup
+  
+  
+  ************************** ERROR ****************************
+  
+  *** IDL file original.idl altered in this changeset***
+  
+  Changes to IDL files in this repo require you to provide binary change approval in your top comment in the form of ba=... (or, more accurately, ba\S*=...)
+  This is to ensure that UUID changes (or method changes missing corresponding UUID change) are caught early, before release.
+  
+  *************************************************************
+  
+  
+  transaction abort!
+  rollback completed
+  strip failed, partial bundle stored in '$TESTTMP/striptest/.hg/strip-backup/2c33dbd63e71-temp.hg'
+  abort: pretxnchangegroup.prevent_uuid_changes hook failed
+  [255]
