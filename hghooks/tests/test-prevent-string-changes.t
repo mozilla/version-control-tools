@@ -250,19 +250,7 @@ Hook should not run when stripping
   > EOF
 
   $ hg strip -r 1 --no-backup
-  
-  ************************** ERROR ****************************
-  
-  * File used for localization (browser/locales/en-US/test.dtd) altered in this changeset *
-  
-  This repository is string frozen. Please request explicit permission from
-  release managers to break string freeze in your bug.
-  If you have that explicit permission, denote that by including in
-  your commit message l10n=...
-  *************************************************************
-  
-  transaction abort!
-  rollback completed
-  strip failed, partial bundle stored in '$TESTTMP/striptest/.hg/strip-backup/324aee3e89ad-temp.hg'
-  abort: pretxnchangegroup.prevent_string_changes hook failed
-  [255]
+
+  $ hg log -T '{rev} {desc}\n'
+  1 Bad commit
+  0 initial

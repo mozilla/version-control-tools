@@ -23,7 +23,10 @@ commit message (case sensitive), see bug 859358 for further details.
 import re
 
 
-def hook(ui, repo, hooktype, node, **kwargs):
+def hook(ui, repo, hooktype, node, source=None, **kwargs):
+    if source == 'strip':
+        return 0
+
     error = ""
     changed_strings = False
     changesets = list(repo.changelog.revs(repo[node].rev()))
