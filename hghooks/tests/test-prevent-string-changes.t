@@ -225,3 +225,44 @@ Message check should be case insensitive
   adding file changes
   added 3 changesets with 3 changes to 2 files
   You've signaled approval for changes to strings in your push, thanks.
+
+  $ cd ..
+
+Hook should not run when stripping
+
+  $ hg init striptest
+  $ cd striptest
+  $ echo initial > foo
+  $ hg -q commit -A -m initial
+  $ echo good > foo
+  $ hg commit -m 'Good commit'
+  $ hg -q up -r 0
+  $ mkdir -p browser/locales/en-US
+  $ echo 'DTD file #1' > browser/locales/en-US/test.dtd
+  $ hg -q commit -A -m 'Bad commit'
+
+  $ cat >> .hg/hgrc << EOF
+  > [extensions]
+  > strip =
+  > 
+  > [hooks]
+  > pretxnchangegroup.prevent_string_changes = python:mozhghooks.prevent_string_changes.hook
+  > EOF
+
+  $ hg strip -r 1 --no-backup
+  
+  ************************** ERROR ****************************
+  
+  * File used for localization (browser/locales/en-US/test.dtd) altered in this changeset *
+  
+  This repository is string frozen. Please request explicit permission from
+  release managers to break string freeze in your bug.
+  If you have that explicit permission, denote that by including in
+  your commit message l10n=...
+  *************************************************************
+  
+  transaction abort!
+  rollback completed
+  strip failed, partial bundle stored in '$TESTTMP/striptest/.hg/strip-backup/324aee3e89ad-temp.hg'
+  abort: pretxnchangegroup.prevent_string_changes hook failed
+  [255]
