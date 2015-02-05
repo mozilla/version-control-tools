@@ -462,3 +462,42 @@ IGNORE BAD COMMIT MESSAGES should work
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+
+  $ cd ..
+
+Reapplying a stripped bundle should not trigger hook
+
+  $ hg init striptest
+  $ cd striptest
+  $ echo initial > foo
+  $ hg -q commit -A -m initial
+  $ echo good > foo
+  $ hg commit -m 'Bug 123 - Good commit'
+  $ hg -q up -r 0
+  $ echo 'no bug' > foo
+  $ hg commit -m 'bad commit'
+  created new head
+
+  $ cat >> .hg/hgrc << EOF
+  > [extensions]
+  > strip=
+  > 
+  > [hooks]
+  > pretxnchangegroup.commit_message = python:mozhghooks.commit-message.hook
+  > EOF
+
+  $ hg strip -r 1 --no-backup
+  
+  
+  ************************** ERROR ****************************
+  Rev e3d623084e10 needs "Bug N" or "No bug" in the commit message.
+  test
+  bad commit
+  *************************************************************
+  
+  
+  transaction abort!
+  rollback completed
+  strip failed, partial bundle stored in '$TESTTMP/striptest/.hg/strip-backup/46054ff63cbc-temp.hg'
+  abort: pretxnchangegroup.commit_message hook failed
+  [255]
