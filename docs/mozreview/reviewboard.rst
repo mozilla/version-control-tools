@@ -34,7 +34,7 @@ review request series
    group
 parent review request
    For review request series, the review request that tracks the
-   overall state of the series
+   overall state of the series. This is also known as the root review request.
 draft
    Refers to a state review requests or reviews can be in where content
    is not publicly visible and is only available to the person who created
@@ -58,32 +58,27 @@ When you push commits to the review repository, review requests are
 created in Review Board. As a refresher::
 
   $ hg push review
-  pushing to ssh://reviewboard-hg.mozilla.org/version-control-tools
+  pushing to ssh://reviewboard-hg.mozilla.org/gecko
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 4 changesets with 8 changes to 4 files (+1 heads)
-  submitting 4 changesets for review
+  remote: added 2 changesets with 2 changes to 2 files (+1 heads)
+  remote: Trying to insert into pushlog.
+  remote: Please do not interrupt...
+  remote: Inserted into the pushlog db successfully.
+  submitting 2 changesets for review
 
-  changeset:  4615:04d7e5fb8b05
-  summary:    Bug 1065050 - Rewrite pushlog as an extension
-  review:     https://reviewboard.mozilla.org/r/63 (pending)
+  changeset:  227233:8943dd91f4c0
+  summary:    Bug 448604 - Rewrite Firefox on top of Servo
+  review:     https://reviewboard.mozilla.org/r/3361 (pending)
 
-  changeset:  4616:64703e0880a5
-  summary:    Bug 1065050 - Write to pushlog through extension API
-  review:     https://reviewboard.mozilla.org/r/65 (pending)
+  changeset:  227234:5de956a4f2b5
+  summary:    Bug 448604 - Remove all XUL usage
+  review:     https://reviewboard.mozilla.org/r/3363 (pending)
 
-  changeset:  4617:c1481072c248
-  summary:    Bug 1065050 - Move the pretxnchangegroup hook into the extension
-  review:     https://reviewboard.mozilla.org/r/67 (pending)
-
-  changeset:  4618:3cbf9972a90d
-  summary:    Bug 1065050 - Move pushlog tests into extension
-  review:     https://reviewboard.mozilla.org/r/69 (pending)
-
-  review id:  bz://1065050/gps
-  review url: https://reviewboard.mozilla.org/r/61 (pending)
+  review id:  bz://448604/MattN
+  review url: https://reviewboard.mozilla.org/r/3359 (pending)
   (visit review url to publish this review request so others can see it)
 
 The *pending* in the output says that the review requests are in an
@@ -95,8 +90,8 @@ the *review url*. You should see a page like the following:
 
 .. image:: parent-unpublished.png
 
-This is the parent review request. It is a special review request that
-manages the state of all the *children* review requests.
+This is the parent (aka. root) review request. It is a special review request
+that manages the state of all the *children* review requests.
 
 The metadata on the parent review request is derived from the content of
 commits you've pushed for review. You can see a list of commits and
@@ -109,20 +104,13 @@ their summary lines that are part of the review.
    to eliminate the parent review request for reviews only consisting of
    a single commit.
 
-To publish the collection of review requests, you'll want to click on
-the **Commits** tab near the top right. When that page loads, it looks
-something like the following:
+To publish the collection of review requests, you'll want to assign reviewers.
 
-.. image:: commits.png
+Each commit has **Reviewers** line that shows the reviewer(s) for the commit.
 
-You will see a listing of every commit in the review along with basic
-metadata about that commit.
-
-Each commit has an input box assigned to it. This input box is used to
-select the reviewer for the commit.
-
-Typing into the input box will display results from Bugzilla's and
-Review Board's shared user database. Here is what that looks like:
+To edit reviewers, click the pencil icon to display an input box. Typing into
+the input box will display results from Bugzilla's and Review Board's shared
+user database. Here is what that looks like:
 
 .. image:: select-reviewer.png
 
@@ -131,26 +119,18 @@ Review Board's shared user database. Here is what that looks like:
    The easiest way to find a reviewer is by IRC nickname. You should
    not need to type the leading colon that exists in Bugzilla.
 
-After you've selected a reviewer for each commit, your **Commits** tab
+Once you've selected the reviewers for a commit, click **OK** to stop editing
+the field.
+
+After you've selected a reviewer for each commit, your parent review request
 will look something like the following:
 
 .. image:: publish.png
 
-At this time, you'll want to click the giant **Publish** button in the
-bottom right. This will start the process of publishing the reviews in
+At this time, you'll want to click the **Publish** button on the green
+notification bar. This will start the process of publishing the reviews in
 Review Board and updating Bugzilla to reflect that a review is
 requested.
-
-.. warning::
-
-   The MozReview maintainers don't like the current implementation of
-   the **Commits** tab. We know the interface isn't intuitive. It is
-   implemented the way it is because that was easiest.
-
-   There are
-   `plans <https://bugzilla.mozilla.org/show_bug.cgi?id=1064111>`_
-   to improve the UX situation. If you have web design skills, we
-   love patches.
 
 Reviewing Code
 ==============
