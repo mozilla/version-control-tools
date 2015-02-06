@@ -1,4 +1,16 @@
 #!/bin/sh
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script is called on replication mirrors to pull changes from
+# another repository.
+#
+# While this script can be executed standalone, repo-push.sh assumes
+# this script is installed as the login command for the "hg" user
+# via the ~hg/.ssh/authorized_keys file. e.g.
+#
+#  command="/usr/local/bin/mirror-pull -t /repo_local/mozilla/mozilla $SSH_ORIGINAL_COMMAND"
 
 die() {
     echo "$1" 1>&2
