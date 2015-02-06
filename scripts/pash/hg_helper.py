@@ -336,7 +336,7 @@ def edit_repo (cname, repo_name, do_quick_delete):
             edit_repo_description(cname, repo_name)
         elif action == 'Delete the repository':
             delete_repo(cname, repo_name, False)
-        elif action == 'Mark repository as non-publishig':
+        elif action == 'Mark repository as non-publishing':
             set_repo_publishing(cname, repo_name, False)
         elif action == 'Mark repository as publishing':
             set_repo_publishing(cname, repo_name, True)
