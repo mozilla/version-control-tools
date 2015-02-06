@@ -6,9 +6,10 @@ from sh_helper import run_command, prompt_user
 from cgi import escape
 from subprocess import Popen, PIPE, STDOUT
 import shlex
+import repo_group
 
-doc_root = {'hg.mozilla.org': '/repo_local/mozilla',
-            'hg.ecmascript.org': '/repo_local/ecma/mozilla'}
+doc_root = {'hg.mozilla.org': '/repo/hg/mozilla',
+            'hg.ecmascript.org': '/repo/hg_ecma/mozilla'}
 
 verbose_users = [ 'bkero@mozilla.com2', ]
 
@@ -69,7 +70,7 @@ def run_hg_clone (cname, user_repo_dir, repo_name, source_repo_path, verbose=Fal
 
 def make_wsgi_dir (cname, user_repo_dir):
   global doc_root
-  wsgi_dir = "/repo_local/mozilla/webroot_wsgi/users/%s" % user_repo_dir
+  wsgi_dir = "/repo/hg/webroot_wsgi/users/%s" % user_repo_dir
       # Create user's webroot_wsgi folder if it doesn't already exist
   if not os.path.isdir(wsgi_dir):
     os.mkdir(wsgi_dir)
@@ -200,6 +201,10 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
               print "Exception %s" % (e)
 
           run_command ('/usr/bin/nohup /usr/bin/hg init %s/users/%s/%s' % (doc_root[cname], user_repo_dir, repo_name))
+          run_command('/bin/touch %s/users/%s/%s/.hg/pushlog2.db' %
+                  (doc_root[cname], user_repo_dir, repo_name))
+          run_command('/usr/bin/sudo -u hg /usr/local/bin/repo-push.sh -e '
+                      'users/%s/%s' % (user_repo_dir, repo_name))
       fix_user_repo_perms (cname, repo_name)
       sys.exit (0)
 
@@ -294,6 +299,8 @@ def do_delete(cname, repo_dir, repo_name, verbose=False):
     if verbose:
         print "Deleting..."
     run_command ('rm -rf %s/users/%s/%s' % (doc_root[cname], repo_dir, repo_name))
+    run_command('/usr/bin/sudo -u hg /usr/local/bin/repo-push.sh -d -e '
+            'users/%s/%s' % (repo_dir, repo_name))
     if verbose:
         print "Finished deleting"
     purge_log = open ('/tmp/pushlog_purge.%s' % os.getpid(), "a")
@@ -383,9 +390,13 @@ def serve (cname):
     elif ssh_command.startswith ('pushlog ') and (cname != 'hg.ecmascript.org'):
         args = ssh_command.replace ('pushlog', '').split()
         if check_repo_name (args[0]):
-            fh = open("/repo_local/mozilla/%s/.hg/pushlog2.db" % (args[0]))
-            print(fh.read())
+            fh = open("/repo/hg/mozilla/%s/.hg/pushlog2.db" % (args[0]), 'rb')
+            sys.stdout.write(fh.read())
             fh.close()
+    elif ssh_command.startswith ('repo-group') and (cname != 'hg.ecmascript.org'):
+        args = ssh_command.replace ('repo-group', '').split()
+        if check_repo_name (args[0]):
+            print(repo_group.repo_owner(args[0]))
     else:
         sys.stderr.write ('No interactive commands allowed here!\n')
         sys.exit (1)

@@ -6,7 +6,7 @@ import logging
 from sh_helper import QuoteForPOSIX
 
 if __name__ == '__main__':
-    os.environ['PYTHONPATH'] = '/repo_local/mozilla/libraries/'
+    os.environ['PYTHONPATH'] = '/repo/hg/libraries/'
     if os.getenv ('USER') == 'root':
         root_shell = pwd.getpwuid (0)[6]
         ssh_command = os.getenv ('SSH_ORIGINAL_COMMAND')
