@@ -18,7 +18,7 @@ if not getattr(cmdutil, 'bailifchanged', None):
 if 'mercurial.scmutil' not in sys.modules:
     import mercurial.cmdutil as scmutil
 
-testedwith = '3.0 3.1 3.2'
+testedwith = '3.0 3.1 3.2 3.3'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qbackout'
 
 # This is stolen from bzexport.py, which stole it from buglink.py
