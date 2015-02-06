@@ -112,3 +112,96 @@ mq
 shelve
    Enables uncommitted work to be saved to a standalone file without
    being committed to the repository.
+
+3rd Party Extensions You Should Highly Consider
+===============================================
+
+hgwatchman
+----------
+
+`hgwatchman <https://bitbucket.org/facebook/hgwatchman>`_ integrates the
+`watchman <https://github.com/facebook/watchman>`_ filesystem watching tool
+into Mercurial.
+
+Typically, commands like ``hg status`` need to perform a lot of queries
+against the filesystem. With hgwatchman, filesystem notifications are
+processed by a background daemon as they occur and commands like
+``hg status`` can complete by asking watchman what has changed since last
+time. This can potentially shave seconds off command execution time.
+
+.. important::
+
+   hgwatchman is highly recommended when interacting with the Firefox
+   repository. It will make Mercurial commands faster.
+
+chg
+---
+
+`chg <https://bitbucket.org/yuja/chg/>`_ is a C wrapper for the ``hg``
+command. Typically, when you type ``hg``, a new Python process is created,
+Mercurial is loaded, and your requested command runs and the process exits.
+
+With ``chg``, a Mercurial *command server* background process is created
+that runs Mercurial. When you type ``chg``, a C program connects to that
+background process and executes Mercurial commands.
+
+**chg can drastically speed up Mercurial.** This is because the overhead
+for launching a new Python process is high (often over 50ms) and the
+overhead for loading Mercurial state into that process can also be high,
+especially for larger repositories. With ``chg``, you may this cost once
+and all subsequent commands effectively eliminate the Python and Mercurial
+startup overhead. For example::
+
+   $ time hg --version
+   real    0m0.118s
+   user    0m0.100s
+   sys     0m0.015s
+
+   $ time chg --version
+   real    0m0.012s
+   user    0m0.000s
+   sys     0m0.004s
+
+   $ time hg export
+   real    0m0.137s
+   user    0m0.093s
+   sys     0m0.042s
+
+   $ time chg export
+   real    0m0.034s
+   user    0m0.000s
+   sys     0m0.004s
+
+Here, we see ~100ms wall time improvement with chg activated. That may not
+sound likea lot, but you will notice.
+
+Additional 3rd Party Extensions to Consider
+===========================================
+
+evolve
+------
+
+The `evolve extensions <http://mercurial.selenic.com/wiki/EvolveExtension>`_
+opens up new workflows that harness Mercurial's ability to record how
+changesets *evolve* over time.
+
+Typically, when history is rewritten, new commits are created and the old
+ones are discarded. With the ``evolve`` extension enabled, Mercurial intsead
+hides the old commits and writes metadata holding the relationship between
+old and new commits. This metadata can be transferred between clients,
+allowing clients to make intelligent decisions about how to recover from
+rewritten history. For example, if a force push is performed, a client
+will now exactly what rebase to perform to mimic what was done elsewhere.
+
+The ``evolve`` extension also enables useful Mercurial commands such as
+``hg previous``, ``hg next``, and ``hg amend`` (which is a shortcut for
+``hg commit --amend``).
+
+githelp
+-------
+
+Are you a Git user learning Mercurial for the first time? The
+`githelp extension <https://bitbucket.org/facebook/hg-experimental/>`_
+adds a ``hg githelp`` command that suggests Mercurial equivalent
+commands from Git commands. Just type a Git command and learn how to
+use Mercurial!
