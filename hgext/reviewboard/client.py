@@ -58,7 +58,7 @@ from hgrb.util import ReviewID
 from mozautomation.commitparser import parse_bugs
 from mozhg.auth import getbugzillaauth
 
-testedwith = '3.0 3.1 3.2'
+testedwith = '3.0 3.1 3.2 3.3'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview'
 
 cmdtable = {}

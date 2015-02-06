@@ -37,7 +37,7 @@ except ImportError:
     import hgrb.proto
 demandimport.enable()
 
-testedwith = '3.0 3.1 3.2'
+testedwith = '3.0 3.1 3.2 3.3'
 
 def capabilities(orig, repo, proto):
     """Wraps wireproto._capabilities to advertise reviewboard support."""
