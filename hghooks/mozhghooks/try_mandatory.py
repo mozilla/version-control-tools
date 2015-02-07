@@ -8,7 +8,10 @@ def printError(message):
     print message
     print "*************************************************************\n\n"
 
-def hook(ui, repo, **kwargs):
+def hook(ui, repo, source=None, **kwargs):
+    if source == 'strip':
+        return 0
+
     # Block the push unless they use the try_syntax
     # 'try: ' is enough to activate try_parser and get the default set
     comment = repo.changectx('tip').description()
