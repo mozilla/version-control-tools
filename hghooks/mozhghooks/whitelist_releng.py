@@ -49,7 +49,10 @@ ALLOWED_USERS = set([
 ])
 
 
-def hook(ui, repo, node=None, **kwargs):
+def hook(ui, repo, node=None, source=None, **kwargs):
+    if source == 'strip':
+        return 0
+
     rev = repo[node].rev()
     tip = repo['tip'].rev()
     branches = set(repo.changectx(i).branch() for i in range(rev, tip + 1))
