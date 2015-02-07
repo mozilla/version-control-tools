@@ -91,3 +91,31 @@ whitelist_releng.py
 
 This hook enforces a whitelist of accounts that are allowed to push to certain
 Release Engineer repositories.
+
+Hook Development Standards
+==========================
+
+Hooks are written and loaded into Mercurial as Python modules. This goes
+against recommendations by the Mercurial project. However, we do this for
+performance reasons, as spawning new processes for hooks wastes valuable
+wall time during push. (Mercurial recommends against in-process hooks
+because they don't make promises about the stability of the internal API.)
+
+Hooks should be unit tested via ``.t tests`` and should strive for 100%
+code coverage. We don't want any surprises in production. We don't want
+to have to manually test hooks when upgrading Mercurial. We should have
+confidence in our automated tests.
+
+Pre-commit (notably ``pretxnchangegroup``) hooks should filter the ``strip``
+source and always return success for these. If an ``hg strip`` operation
+is running, the changesets already got into the repository, so a hook
+has no business checking them again.
+
+Any hook change touching a Mercurial API should be reviewed by someone who
+knows Mercurial internals. You should default to getting review from
+``gps``.
+
+Hooks connecting to external systems or performing process that could be
+deferred will be heavily scrutinized. We want ``hg push`` operations to
+be fast. Slow services, networks, or CPU or I/O intensive hooks all
+undermine that goal.
