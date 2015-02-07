@@ -277,21 +277,7 @@ Hook should not run when stripping
   > EOF
 
   $ hg strip -r 1 --no-backup
-  
-  
-  ************************** ERROR ****************************
-  
-  WebIDL file original.webidl altered in changeset d9d509b9ec59 without DOM peer review
-  
-  
-  Changes to WebIDL files in this repo require review from a DOM peer in the form of r=...
-  This is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..
-  
-  *************************************************************
-  
-  
-  transaction abort!
-  rollback completed
-  strip failed, partial bundle stored in '$TESTTMP/striptest/.hg/strip-backup/c69945245784-temp.hg'
-  abort: pretxnchangegroup.prevent_webidl hook failed
-  [255]
+
+  $ hg log -T '{rev} {desc}\n'
+  1 Bad commit
+  0 initial

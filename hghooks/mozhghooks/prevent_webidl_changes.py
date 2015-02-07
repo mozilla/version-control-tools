@@ -33,7 +33,10 @@ def isBackout(message):
             return True
     return False
 
-def hook(ui, repo, hooktype, node, **kwargs):
+def hook(ui, repo, hooktype, node, source=None, **kwargs):
+    if source == 'strip':
+        return 0
+
     DOM_peers = [
         'jst',              # Johnny Stenback
         'peterv',           # Peter Van der Beken
