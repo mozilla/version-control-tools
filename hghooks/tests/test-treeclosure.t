@@ -202,16 +202,7 @@ Hook should not run when stripping
   > EOF
 
   $ hg strip -r 1 --no-backup
-  intercepting url
-  
-  
-  ************************** ERROR ****************************
-  Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\S*=...)
-  *************************************************************
-  
-  
-  transaction abort!
-  rollback completed
-  strip failed, partial bundle stored in '$TESTTMP/striptest/.hg/strip-backup/f609945ce5f0-temp.hg'
-  abort: pretxnchangegroup.treeclosure hook failed
-  [255]
+
+  $ hg log -T '{rev} {desc}\n'
+  1 commit2
+  0 initial

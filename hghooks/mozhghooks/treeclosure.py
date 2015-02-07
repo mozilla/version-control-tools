@@ -30,7 +30,10 @@ def printError(message):
     print message
     print "*************************************************************\n\n"
 
-def hook(ui, repo, **kwargs):
+def hook(ui, repo, source=None, **kwargs):
+    if source == 'strip':
+        return 0
+
     name = os.path.basename(repo.root)
     url = "%s/%s?format=json" % (treestatus_base_url, name)
     try:
