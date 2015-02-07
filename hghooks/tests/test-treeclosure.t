@@ -168,3 +168,50 @@ Approval is only needed on tip-most commit
   adding file changes
   added 3 changesets with 3 changes to 1 files
   intercepting url
+
+  $ cd ..
+
+Hook should not run when stripping
+
+  $ hg init striptest
+  $ cd striptest
+  $ echo initial > foo
+  $ hg -q commit -A -m initial
+  $ echo foo > foo
+  $ hg commit -m commit1
+  $ hg -q up -r 0
+  $ echo bar > foo
+  $ hg commit -m commit2
+  created new head
+
+  $ cat >> .hg/hgrc << EOF
+  > [extensions]
+  > strip =
+  > urlintercept = $TESTDIR/testing/url-intercept.py
+  > 
+  > [urlintercept]
+  > path = $TESTTMP/url
+  > 
+  > [hooks]
+  > pretxnchangegroup.treeclosure = python:mozhghooks.treeclosure.hook
+  > EOF
+
+  $ cat > $TESTTMP/url << EOF
+  > https://treestatus.mozilla.org/striptest?format=json
+  > {"status": "approval required", "reason": "it does not matter"}
+  > EOF
+
+  $ hg strip -r 1 --no-backup
+  intercepting url
+  
+  
+  ************************** ERROR ****************************
+  Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\S*=...)
+  *************************************************************
+  
+  
+  transaction abort!
+  rollback completed
+  strip failed, partial bundle stored in '$TESTTMP/striptest/.hg/strip-backup/f609945ce5f0-temp.hg'
+  abort: pretxnchangegroup.treeclosure hook failed
+  [255]
