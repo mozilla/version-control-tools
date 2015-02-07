@@ -97,7 +97,10 @@ def isOwned(changedFile, ownerArray):
 
     return False
 
-def hook(ui, repo, node, **kwargs):
+def hook(ui, repo, node, source=None, **kwargs):
+    if source == 'strip':
+        return 0
+
     try:
         # First find out which trees are affected
         apps = { 'thunderbird' : False,
