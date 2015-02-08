@@ -42,6 +42,12 @@ renaming ``foo`` to ``FOO`` would be disallowed.
 
 This hooks exists to prevent issues with case-insensitive filesystems.
 
+prevent_idl_change_without_uuid_change.py
+-----------------------------------------
+
+This hook prevents non-comment changes to IDL interfaces without accompanying
+UUID bumps.
+
 prevent_string_changes.py
 -------------------------
 
