@@ -26,8 +26,7 @@ Create a repo with a few pushes
 
 Now strip a push so it is empty
 
-  $ hg --config extensions.strip= -R ../server strip -r 1
-  saved backup bundle to $TESTTMP/server/.hg/strip-backup/5c7fc4be67ec-backup.hg (glob)
+  $ hg --config extensions.strip= -R ../server strip -r 1 --no-backup
   changeset will be deleted from pushlog: 5c7fc4be67eca7df5186bbc52dcb223fee2b6cbc
   changeset rev will be updated in pushlog: 059b473c43d7e25d6b6f5070dfb1c468b0e9518c
 
