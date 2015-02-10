@@ -128,15 +128,21 @@ def autoland_status(request_id):
 
     row = cursor.fetchone()
     if row:
+        landed = row[4]
+
         result = {
             'tree': row[0],
             'rev': row[1],
             'destination': row[2],
             'trysyntax': row[3],
-            'landed': row[4],
-            'result': row[5],
+            'landed': landed,
             'pingback_url': row[6]
         }
+
+        if landed:
+            result['result'] = row[5]
+        else:
+            result['error_msg'] = row[5]
 
         return jsonify(result)
 

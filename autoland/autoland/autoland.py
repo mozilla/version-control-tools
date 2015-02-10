@@ -247,6 +247,7 @@ def handle_pending_mozreview_updates(logger, dbconn):
 
     updated = []
     for row in cursor.fetchall():
+        landed = row[5]
         pingback_url = row[7]
         data = {
             'request_id': row[0],
@@ -254,9 +255,13 @@ def handle_pending_mozreview_updates(logger, dbconn):
             'rev': row[2],
             'destination': row[3],
             'trysyntax': row[4],
-            'landed': row[5],
-            'result': row[6]
+            'landed': landed
         }
+
+        if landed:
+            data['result'] = row[6]
+        else:
+            data['error_msg'] = row[6]
 
         logger.info('trying to post mozreview update to: %s for request: %s' %
                     (row[7], row[0]))

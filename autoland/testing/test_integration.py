@@ -159,7 +159,6 @@ class TestAutolandIntegration(unittest.TestCase):
                              '%s in status should match posted data')
 
         self.assertTrue('landed' in status)
-        self.assertTrue('result' in status)
 
         r = requests.get('http://localhost:8000/autoland/status/wtf')
         self.assertEqual(r.status_code, 404,
