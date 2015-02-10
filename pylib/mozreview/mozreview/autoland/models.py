@@ -45,7 +45,7 @@ class AutolandRequest(models.Model):
     @property
     def last_known_status(self):
         try:
-            last_evt = self.event_log_entries.order_by('-event_time').all()[0]
+            last_evt = self.event_log_entries.order_by('-pk').all()[0]
             return last_evt.status
         except IndexError:
             # in case we don't have any event yet
@@ -54,7 +54,7 @@ class AutolandRequest(models.Model):
     @property
     def last_details(self):
         try:
-            last_evt = self.event_log_entries.order_by('-event_time').all()[0]
+            last_evt = self.event_log_entries.order_by('-pk').all()[0]
             return last_evt.details
         except IndexError:
             return ""
