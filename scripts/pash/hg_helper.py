@@ -151,13 +151,13 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
       if (selection == 'Clone a public repository'):
         exec_command = "/usr/bin/find " + doc_root[cname] + " -maxdepth 3 -mindepth 2 -type d -name .hg"
         args = shlex.split(exec_command)
-        #repo_list = run_command (exec_command)
         p = Popen(args, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
         repo_list = p.communicate()[0].split("\n")
         if repo_list:
           print "We have the repo_list"
           repo_list = map (lambda x: x.replace (doc_root[cname] + '/', ''), repo_list)
           repo_list = map (lambda x: x.replace ('/.hg', ''), repo_list)
+          repo_list = sorted(repo_list)
           print 'List of available public repos'
           source_repo = prompt_user ('Pick a source repo:', repo_list)
       elif (selection == 'Clone a private repository'):
@@ -181,6 +181,7 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
           user_repo_list = map (lambda x: x.replace (doc_root[cname] + '/users/' + source_user, ''), user_repo_list)
           user_repo_list = map (lambda x: x.replace ('/.hg', ''), user_repo_list)
           user_repo_list = map (lambda x: x.strip ('/'), user_repo_list)
+          user_repo_list = sorted(user_repo_list)
           print 'Select the users repo you wish to clone.'
           source_repo = prompt_user ('Pick a source repo:', user_repo_list)
           source_repo = 'users/' + source_user + '/' + source_repo
