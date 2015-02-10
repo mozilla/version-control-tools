@@ -320,7 +320,7 @@ class AutolandRequestUpdateResource(WebAPIResource):
         try:
             AutolandRequest.objects.get(pk=fields['request_id'])
         except AutolandRequest.DoesNotExist:
-            return INVALID_FORM_DATA
+            return DOES_NOT_EXIST
 
         update_queryset = AutolandRequest.objects.filter(
             pk=fields['request_id'])
