@@ -397,6 +397,14 @@ def serve (cname):
         args = ssh_command.replace ('repo-group', '').split()
         if check_repo_name (args[0]):
             print(repo_group.repo_owner(args[0]))
+    elif ssh_command.startswith('repo-config ') and cname != 'hg.ecmascript.org':
+        args = ssh_command.split()[1:]
+        repo = args[0]
+        if check_repo_name(repo):
+            hgrc = '/repo/hg/mozilla/%s/.hg/hgrc' % repo
+            if os.path.exists(hgrc):
+                with open(hgrc, 'rb') as fh:
+                    sys.stdout.write(fh.read())
     else:
         sys.stderr.write ('No interactive commands allowed here!\n')
         sys.exit (1)
