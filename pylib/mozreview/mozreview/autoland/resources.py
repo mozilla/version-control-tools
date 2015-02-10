@@ -152,15 +152,15 @@ class TryAutolandTriggerResource(WebAPIResource):
             if not autoland_user or not autoland_password:
                 return BAD_AUTOLAND_CREDENTIALS
 
-            endpoint = autoland_request_update_resource.get_uri(request)
+            pingback_url = autoland_request_update_resource.get_uri(request)
 
             logging.info('Telling Autoland to give status updates to %s'
-                         % endpoint)
+                         % pingback_url)
 
             try:
                 response = requests.post(autoland_url, data=json.dumps({
                     'tree': TRY_AUTOLAND_TREE,
-                    'endpoint': endpoint,
+                    'pingback_url': pingback_url,
                     'rev': last_revision,
                     'destination': TRY_AUTOLAND_DESTINATION,
                     'trysyntax': try_syntax,
