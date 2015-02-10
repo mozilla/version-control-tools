@@ -56,8 +56,8 @@ Lack of permissions on pushlog should prevent pushes from completing
   remote: added 1 changesets with 1 changes to 1 files
   remote: Trying to insert into pushlog.
   remote: Error inserting into pushlog. Please retry your push.
-  remote: rolling back pushlog
   remote: transaction abort!
+  remote: rolling back pushlog
   remote: rollback completed
   remote: abort: pretxnchangegroup.pushlog hook failed
   [1]

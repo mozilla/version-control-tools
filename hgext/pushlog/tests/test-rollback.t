@@ -42,8 +42,8 @@ record
   Trying to insert into pushlog.
   Inserted into the pushlog db successfully.
   fake hook failure
-  rolling back pushlog
   transaction abort!
+  rolling back pushlog
   rollback completed
   abort: pretxnchangegroup.abort hook exited with status 1
   [255]

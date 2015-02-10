@@ -17,6 +17,7 @@ from mercurial import (
     extensions,
     revset,
     templatekw,
+    transaction,
     util,
     wireproto,
 )
@@ -27,7 +28,7 @@ from mercurial.error import (
 )
 from mercurial.node import bin, hex
 
-testedwith = '3.2'
+testedwith = '3.2 3.3'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
@@ -114,6 +115,13 @@ def exchangepullpushlog(orig, pullop):
 
     return res
 
+
+def playback(orig, journal, report, *args, **kwargs):
+    report('rolling back pushlog\n')
+
+    return orig(journal, report, *args, **kwargs)
+
+
 class pushlog(object):
     '''An interface to pushlog data.'''
 
@@ -189,36 +197,60 @@ class pushlog(object):
         #
         # The active transaction object provides various instance-specific internal
         # callbacks. When we run, the transaction object comes from
-        # localrepository.transaction(). The assert statements check our
-        # assumptions for how that code works, namely that
-        # localrepository.transaction() *always* defines these callbacks.
+        # localrepository.transaction().
         #
-        # The code here essentially monkeypatches the "finish" and "abort"
-        # callbacks on the transaction to commit and close the database.
+        # The transaction API changed significantly in Mercurial 3.3. It added
+        # various add* APIs to register callbacks to be called after various
+        # transaction events. We have 2 versions of our monkeypatch: one for
+        # 3.2 and another for 3.3+.
         #
-        # If the database is closed without a commit(), the active transaction
-        # (our inserts) will be rolled back.
+        # The code here essentially wraps transaction close/commit to DB
+        # commit + close and transaction abort/rollback to DB close.
+        # If the database is closed without a commit, the active database
+        # transaction (our inserts) will be rolled back.
         tr = self.repo._transref()
-        assert tr.onabort is None
-        assert tr.after
+        newapi = hasattr(tr, 'addpostclose')
+        oldafter = None
+        oldabort = None
+
+        if not newapi:
+            assert tr.onabort is None
+            assert tr.after
+            oldafter = tr.after
+
+        oldabort = tr._abort
 
         c = self._getconn()
-        oldafter = tr.after
 
-        def abort():
-            c.close()
-            self.repo.ui.warn('rolling back pushlog\n')
-
-        def commit():
-            oldafter()
+        # New API.
+        def onpostclose(tr):
             c.commit()
             c.close()
 
-        tr.onabort = abort
-        tr.after = commit
+        def onabort(tr):
+            # Only false when called from commit() below.
+            if tr:
+                tr.report('rolling back pushlog\n')
+            c.close()
+
+        # Old API.
+        def abort():
+            onabort(None)
+            oldabort()
+
+        def commit():
+            oldafter()
+            onpostclose(None)
+
+        if newapi:
+            tr.addpostclose('pushlog', onpostclose)
+            tr.addabort('pushlog', onabort)
+        else:
+            tr.after = commit
+            tr._abort = abort
 
         # Now that the hooks are installed, any exceptions will result in db
-        # close via abort().
+        # close via one of our abort handlers.
         res = c.execute('INSERT INTO pushlog (user, date) VALUES (?, ?)', (user, when))
         pushid = res.lastrowid
         for e in nodes:
@@ -552,8 +584,11 @@ def verifypushlog(ui, repo):
 
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
-
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
+
+    # Only for <3.3 support.
+    if not hasattr(transaction.transaction, 'addpostclose'):
+        extensions.wrapfunction(transaction, '_playback', playback)
 
     revset.symbols['pushhead'] = revset_pushhead
     revset.symbols['pushdate'] = revset_pushdate

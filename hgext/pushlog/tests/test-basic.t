@@ -138,8 +138,8 @@ Pushing to a locked DB errors out (bug 508863)
   added 3 changesets with 3 changes to 1 files
   Trying to insert into pushlog.
   Error inserting into pushlog. Please retry your push.
-  rolling back pushlog
   transaction abort!
+  rolling back pushlog
   rollback completed
   abort: pretxnchangegroup.pushlog hook failed
   [255]
