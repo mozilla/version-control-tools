@@ -131,7 +131,7 @@ class TryAutolandTriggerResource(WebAPIResource):
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
 
-        testing = ext.settings.get('testing', False)
+        testing = ext.settings.get('autoland_testing', False)
 
         if testing:
             logging.info('In testing mode - storing autoland request id %s'
@@ -298,7 +298,7 @@ class AutolandRequestUpdateResource(WebAPIResource):
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
 
-        testing = ext.settings.get('testing', False)
+        testing = ext.settings.get('autoland_testing', False)
 
         if not testing:
             if not request.user.has_perm('mozreview.autoland.autoland_add'):

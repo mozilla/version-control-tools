@@ -24,4 +24,4 @@ class MozReviewSettingsForm(SettingsForm):
     autoland_password = forms.CharField(required=False,
                                         widget=forms.PasswordInput)
 
-    testing = forms.BooleanField(initial=False, required=False)
+    autoland_testing = forms.BooleanField(initial=False, required=False)

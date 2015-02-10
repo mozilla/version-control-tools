@@ -27,7 +27,7 @@ class MozReviewExtension(Extension):
         'autoland_url': '',
         'autoland_user': '',
         'autoland_password': '',
-        'testing': False,
+        'autoland_testing': False,
     }
 
     resources = [
