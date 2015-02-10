@@ -208,8 +208,6 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
               print "Exception %s" % (e)
 
           run_command ('/usr/bin/nohup /usr/bin/hg init %s/users/%s/%s' % (doc_root[cname], user_repo_dir, repo_name))
-          run_command('/bin/touch %s/users/%s/%s/.hg/pushlog2.db' %
-                  (doc_root[cname], user_repo_dir, repo_name))
           run_repo_push('-e users/%s/%s' % (user_repo_dir, repo_name))
       fix_user_repo_perms (cname, repo_name)
       # New user repositories are non-publishing by default.
