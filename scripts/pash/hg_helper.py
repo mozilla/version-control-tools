@@ -269,6 +269,8 @@ def edit_repo_description (cname, repo_name):
         with open(config_path, 'w+') as fh:
             config.write(fh)
 
+        run_repo_push('-e users/%s/%s --hgrc' % (user_repo_dir, repo_name))
+
 def set_repo_publishing(cname, repo_name, publish):
     """Set the publishing flag on a repository.
 
@@ -278,6 +280,8 @@ def set_repo_publishing(cname, repo_name, publish):
     Non-publishing repositories have their commits stay in the draft phase
     when pushed.
     """
+    user = os.getenv('USER')
+    user_repo_dir = user.replace('@', '_')
     repo_path = get_and_validate_user_repo(cname, repo_name)
     config_path, config = get_user_repo_config(repo_path)
 
@@ -290,6 +294,8 @@ def set_repo_publishing(cname, repo_name, publish):
 
     with open(config_path, 'w') as fh:
         config.write(fh)
+
+    run_repo_push('-e users/%s/%s --hgrc' % (user_repo_dir, repo_name))
 
     if publish:
         sys.stderr.write('Repository marked as publishing: changesets will '
