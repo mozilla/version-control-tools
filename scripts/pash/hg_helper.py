@@ -8,8 +8,7 @@ from subprocess import Popen, PIPE, STDOUT
 import shlex
 import repo_group
 
-doc_root = {'hg.mozilla.org': '/repo/hg/mozilla',
-            'hg.ecmascript.org': '/repo/hg_ecma/mozilla'}
+doc_root = {'hg.mozilla.org': '/repo/hg/mozilla'}
 
 verbose_users = [ 'bkero@mozilla.com2', ]
 
@@ -379,7 +378,7 @@ def serve (cname):
             else:
                 sys.stderr.write ("Thank you dchen! but.. I don't think so!\n")
                 sys.exit (1)
-    elif ssh_command.startswith ('clone ') and (cname != 'hg.ecmascript.org'):
+    elif ssh_command.startswith('clone '):
         args = ssh_command.replace ('clone', '').split()
         if check_repo_name (args[0]):
             if len(args) == 1:
@@ -390,7 +389,7 @@ def serve (cname):
             sys.exit (0)
         sys.stderr.write ('clone usage: ssh hg.mozilla.org clone newrepo [srcrepo]\n')
         sys.exit (1)
-    elif ssh_command.startswith ('edit ') and (cname != 'hg.ecmascript.org'):
+    elif ssh_command.startswith('edit '):
         args = ssh_command.replace ('edit', '',  1).split()
         if check_repo_name (args[0]):
             if len(args) == 1:
@@ -400,17 +399,17 @@ def serve (cname):
             else:
                 sys.stderr.write ('edit usage: ssh hg.mozilla.org edit [userrepo delete] - WARNING: will not prompt!\n')
                 sys.exit (1)
-    elif ssh_command.startswith ('pushlog ') and (cname != 'hg.ecmascript.org'):
+    elif ssh_command.startswith('pushlog '):
         args = ssh_command.replace ('pushlog', '').split()
         if check_repo_name (args[0]):
             fh = open("/repo/hg/mozilla/%s/.hg/pushlog2.db" % (args[0]), 'rb')
             sys.stdout.write(fh.read())
             fh.close()
-    elif ssh_command.startswith ('repo-group') and (cname != 'hg.ecmascript.org'):
+    elif ssh_command.startswith('repo-group'):
         args = ssh_command.replace ('repo-group', '').split()
         if check_repo_name (args[0]):
             print(repo_group.repo_owner(args[0]))
-    elif ssh_command.startswith('repo-config ') and cname != 'hg.ecmascript.org':
+    elif ssh_command.startswith('repo-config '):
         args = ssh_command.split()[1:]
         repo = args[0]
         if check_repo_name(repo):
