@@ -136,6 +136,8 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
     else:
       run_hg_clone (cname, user_repo_dir, repo_name, quick_src)
     fix_user_repo_perms (cname, repo_name)
+    # New user repositories are non-publishing by default.
+    set_repo_publishing(cname, repo_name, False)
     sys.exit(0)
   else:
     #make_wsgi_dir(cname, user_repo_dir)
@@ -210,6 +212,8 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
                   (doc_root[cname], user_repo_dir, repo_name))
           run_repo_push('-e users/%s/%s' % (user_repo_dir, repo_name))
       fix_user_repo_perms (cname, repo_name)
+      # New user repositories are non-publishing by default.
+      set_repo_publishing(cname, repo_name, False)
       sys.exit (0)
 
 def get_and_validate_user_repo(cname, repo_name):
