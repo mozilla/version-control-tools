@@ -267,8 +267,7 @@ class AutolandRequestUpdateResource(WebAPIResource):
         },
         'rev': {
             'type': six.text_type,
-            'description': 'The revision of what got pushed for Autoland to'
-                           'grab'
+            'description': 'The revision requested to land'
         },
         'tree': {
             'type': six.text_type,
