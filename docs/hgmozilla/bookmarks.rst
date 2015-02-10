@@ -458,32 +458,17 @@ time you pulled, ``hg pull`` will tell you so. e.g.::
 Things to Watch Out For
 -----------------------
 
-Mozilla user repositories currently have two problems making them less
-than ideal for sharing bookmarks:
+Mercurial repositories are publishing by default. If you push to a
+publishing repository, your Mercurial client won't let you modify
+pushed changesets.
 
-1. User repositories are publishing by default.
-2. Bookmark pushes aren't immediately synchronized to the read-only HTTP
-   slaves.
-
-These are both likely deal breakers.
-
-If you push changesets to a user repository on hg.mozilla.org,
-changesets are bumped from *draft* to *public*. This means Mercurial
-will refuse to mutate them. **This is often not what you want** and will
-result in a lot of pain. Fixing this is tracked in
-`bug 1089385 <https://bugzilla.mozilla.org/show_bug.cgi?id=1089385>`_.
-
-If you push a bookmark to hg.mozilla.org, the bookmark will be set on
-ssh://hg.mozilla.org, but it won't synchronize to
-https://hg.mozilla.org/ until the subsequent push. This means if you
-pull from https://hg.mozilla.org/, you may be seeing outdated bookmark
-information! Fixing this is tracked in
-`bug 1112965 <https://bugzilla.mozilla.org/show_bug.cgi?id=1112965>`_.
-
-Bitbucket repositories are also publishing by default. However, unlike
-user repositories, they provide an option for making them
-non-publishing. **If you are using Bitbucket to share bookmarks, you
-should mark the repository as non-publishing via the Bitbucket web UI.**
+As of February 2015, user repository on hg.mozilla.org are
+non-publishing by default, so you don't have to worry about this.
+However, if you use a 3rd party hosting service, this could be
+a problem. Some providers have an option to mark repositories as
+non-publishing. This includes Bitbucket. **If you plan on sharing
+bookmarks and rewriting history, be sure you are using a non-publishing
+repository.**
 
 Relationship to MQ
 ==================
