@@ -255,10 +255,15 @@ class AutolandRequestUpdateResource(WebAPIResource):
             'type': bool,
             'description': 'Whether this push landed or not'
         },
+        # TODO: result and error_msg should be declared mutually exclusive
         'result': {
             'type': six.text_type,
-            'description': 'Either an error message or the revision of the '
+            'description': 'In case of success, this is the revision of the '
                            'push landed'
+        },
+        'error_msg': {
+            'type': six.text_type,
+            'description': 'An error message in case something went wrong'
         },
         'rev': {
             'type': six.text_type,
@@ -333,6 +338,7 @@ class AutolandRequestUpdateResource(WebAPIResource):
             autoland_request_id=fields['request_id'],
             status=status,
             details=fields['result'],
+            error_msg=fields['error_msg']
         )
 
         return 200, {}

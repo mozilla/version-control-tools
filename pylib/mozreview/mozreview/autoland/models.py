@@ -78,6 +78,7 @@ class AutolandEventLogEntry(models.Model):
     status = models.CharField(_('status'), max_length=1, choices=STATUSES,
                               db_index=True)
     details = models.TextField(_('details'), blank=True)
+    error_msg = models.TextField(_('error_msg'), blank=True)
 
     class Meta:
         app_label = 'mozreview'
