@@ -2,14 +2,14 @@ import json
 import requests
 
 
-def post_job(host, tree, rev, destination, trysyntax, endpoint, user, passwd):
+def post_job(host, tree, rev, destination, trysyntax, pingback_url, user, passwd):
 
     data = {
         'tree': tree,
         'rev': rev,
         'destination': destination,
         'trysyntax': trysyntax,
-        'endpoint': endpoint
+        'pingback_url': pingback_url
     }
 
     r = requests.post(host + '/autoland', data=json.dumps(data),
@@ -32,10 +32,11 @@ if __name__ == '__main__':
                         help='Destination tree for the revision')
     parser.add_argument('--trysyntax', default='',
                         help='Try syntax to use if landing to try.')
-    parser.add_argument('--endpoint', help='Endpoint to which to post results')
+    parser.add_argument('--pingback-url',
+                        help='Endpoint to which to post results')
     parser.add_argument('--user', required=True, help='Autoland user')
     parser.add_argument('--passwd', required=True, help='Autoland password')
     args = parser.parse_args()
 
     print(post_job(args.host, args.tree, args.rev, args.destination,
-                   args.trysyntax, args.endpoint, args.user, args.passwd))
+                   args.trysyntax, args.pingback_url, args.user, args.passwd))

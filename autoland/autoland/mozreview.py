@@ -8,9 +8,9 @@ def read_credentials():
     return (bugzilla['user'], bugzilla['passwd'])
 
 
-def update_review(auth, endpoint, data):
+def update_review(auth, pingback_url, data):
     try:
-        r = requests.post(endpoint, data=json.dumps(data),
+        r = requests.post(pingback_url, data=json.dumps(data),
                           headers={'Content-Type': 'application/json'},
                           auth=auth)
         return r.status_code == 200

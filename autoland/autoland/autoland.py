@@ -236,7 +236,7 @@ def handle_pending_mozreview_updates(logger, dbconn):
 
     cursor = dbconn.cursor()
     query = """
-        select id,tree,rev,destination,trysyntax,landed,result,endpoint
+        select id,tree,rev,destination,trysyntax,landed,result,pingback_url
         from Transplant
         where landed is not NULL and review_updated is NULL
         limit %(limit)s
@@ -247,7 +247,7 @@ def handle_pending_mozreview_updates(logger, dbconn):
 
     updated = []
     for row in cursor.fetchall():
-        endpoint = row[7]
+        pingback_url = row[7]
         data = {
             'request_id': row[0],
             'tree': row[1],
@@ -261,7 +261,7 @@ def handle_pending_mozreview_updates(logger, dbconn):
         logger.info('trying to post mozreview update to: %s for request: %s' %
                     (row[7], row[0]))
 
-        if mozreview.update_review(mozreview_auth, endpoint, data):
+        if mozreview.update_review(mozreview_auth, pingback_url, data):
             updated.append([row[0]])
 
     if updated:

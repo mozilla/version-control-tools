@@ -13,14 +13,14 @@ class TestAutolandIntegration(unittest.TestCase):
         self.assertEqual(r.text, 'Welcome to Autoland')
 
     def test_autoland_post(self):
-        """Test posting a request to the /autoland endpoint"""
+        """Test posting a request to the /autoland pingback_url"""
 
         data = {
             'tree': 'mozilla-central',
             'rev': '2bcb4d148ef5',
             'destination': 'try',
             'trysyntax': 'try: -b o -p linux -u mochitest-1 -t none',
-            'endpoint': 'http://localhost:8000'
+            'pingback_url': 'http://localhost:8000'
         }
 
         r = requests.post('http://localhost:8000/autoland',
@@ -77,7 +77,7 @@ class TestAutolandIntegration(unittest.TestCase):
             'tree': 'mozilla-central',
             'rev': '2bcb4d148ef5',
             'destination': 'try',
-            'endpoint': 'http://localhost:8000'
+            'pingback_url': 'http://localhost:8000'
         }
 
         r = requests.post('http://localhost:8000/autoland',
@@ -100,7 +100,7 @@ class TestAutolandIntegration(unittest.TestCase):
             'tree': 'mozilla-central',
             'rev': '2bcb4d148ef5',
             'destination': 'try',
-            'endpoint': ''
+            'pingback_url': ''
         }
 
         r = requests.post('http://localhost:8000/autoland',
@@ -109,13 +109,13 @@ class TestAutolandIntegration(unittest.TestCase):
                           auth=('autoland', 'autoland'))
 
         self.assertEqual(r.status_code, 400,
-                         'Empty endpoint should return bad request')
+                         'Empty pingback_url should return bad request')
 
         data = {
             'tree': 'mozilla-central',
             'rev': '2bcb4d148ef5',
             'destination': 'try',
-            'endpoint': 'localhost:8000'
+            'pingback_url': 'localhost:8000'
         }
 
         r = requests.post('http://localhost:8000/autoland',
@@ -126,14 +126,14 @@ class TestAutolandIntegration(unittest.TestCase):
                          'Missing scheme should return bad request')
 
     def test_autoland_status(self):
-        """Test getting status from the /autoland/status/ endpoint"""
+        """Test getting status from the /autoland/status/ pingback_url"""
 
         data = {
             'tree': 'mozilla-central',
             'rev': '2bcb4d148ef5',
             'destination': 'try',
             'trysyntax': 'try: -b o -p linux -u mochitest-1 -t none',
-            'endpoint': 'http://localhost:8000'
+            'pingback_url': 'http://localhost:8000'
         }
 
         r = requests.post('http://localhost:8000/autoland',

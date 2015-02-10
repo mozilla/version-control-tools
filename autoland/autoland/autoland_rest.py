@@ -56,7 +56,7 @@ def autoland():
       "revision": "9cc25f7ac50a",
       "destination": "try",
       "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
-      "endpoint": "http://localhost/",
+      "pingback_url": "http://localhost/",
     }
 
     Returns an id which can be used to get the status of the autoland
@@ -73,18 +73,18 @@ def autoland():
         error = 'Bad request: missing json'
         return make_response(jsonify({'error': error}), 400)
 
-    for field in ['tree', 'rev', 'destination', 'endpoint']:
+    for field in ['tree', 'rev', 'destination', 'pingback_url']:
         if not field in request.json:
             error = 'Bad request: missing json field: %s' % field
             return make_response(jsonify({'error': error}), 400)
 
     try:
-        parsed = urlparse.urlparse(request.json['endpoint'])
+        parsed = urlparse.urlparse(request.json['pingback_url'])
         if 'http' not in parsed.scheme:
-            error = 'Bad request: bad endpoint'
+            error = 'Bad request: bad pingback_url'
             return make_response(jsonify({'error': error}), 400)
     except:
-        error = 'Bad request: bad endpoint'
+        error = 'Bad request: bad pingback_url'
         return make_response(jsonify({'error': error}), 400)
 
     app.logger.info('received transplant request: %s' %
@@ -94,7 +94,7 @@ def autoland():
     cursor = dbconn.cursor()
 
     query = """
-        insert into Transplant(tree,rev,destination,trysyntax,endpoint)
+        insert into Transplant(tree,rev,destination,trysyntax,pingback_url)
         values (%s,%s,%s,%s,%s)
         returning id
     """
@@ -102,7 +102,7 @@ def autoland():
     cursor.execute(query, (request.json['tree'], request.json['rev'],
                            request.json['destination'],
                            request.json.get('trysyntax', ''),
-                           request.json['endpoint']))
+                           request.json['pingback_url']))
     request_id = cursor.fetchone()[0]
     dbconn.commit()
 
@@ -116,7 +116,7 @@ def autoland_status(request_id):
     cursor = dbconn.cursor()
 
     query = """
-        select tree,rev,destination,trysyntax,landed,result,endpoint
+        select tree,rev,destination,trysyntax,landed,result,pingback_url
         from Transplant
         where id = %(request_id)s
     """
@@ -135,7 +135,7 @@ def autoland_status(request_id):
             'trysyntax': row[3],
             'landed': row[4],
             'result': row[5],
-            'endpoint': row[6]
+            'pingback_url': row[6]
         }
 
         return jsonify(result)

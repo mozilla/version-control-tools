@@ -21,7 +21,7 @@ create table Transplant (
     landed boolean,
     result text,
     review_updated boolean,
-    endpoint text,
+    pingback_url text,
     primary key(id)
 );
 grant all privileges on table Transplant to autoland;
