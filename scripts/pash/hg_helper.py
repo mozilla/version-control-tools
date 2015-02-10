@@ -68,6 +68,11 @@ def run_hg_clone (cname, user_repo_dir, repo_name, source_repo_path, verbose=Fal
       print 'If you think this is wrong, please file an IT bug'
       sys.exit (1)
 
+def run_repo_push(args):
+    """Run repo-push.sh, signaling mirror-pull on mirrors to do something."""
+    command = '/usr/bin/sudo -u hg /usr/local/bin/repo-push.sh %s' % args
+    return run_command(command)
+
 def make_wsgi_dir (cname, user_repo_dir):
   global doc_root
   wsgi_dir = "/repo/hg/webroot_wsgi/users/%s" % user_repo_dir
@@ -203,8 +208,7 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
           run_command ('/usr/bin/nohup /usr/bin/hg init %s/users/%s/%s' % (doc_root[cname], user_repo_dir, repo_name))
           run_command('/bin/touch %s/users/%s/%s/.hg/pushlog2.db' %
                   (doc_root[cname], user_repo_dir, repo_name))
-          run_command('/usr/bin/sudo -u hg /usr/local/bin/repo-push.sh -e '
-                      'users/%s/%s' % (user_repo_dir, repo_name))
+          run_repo_push('-e users/%s/%s' % (user_repo_dir, repo_name))
       fix_user_repo_perms (cname, repo_name)
       sys.exit (0)
 
@@ -299,8 +303,7 @@ def do_delete(cname, repo_dir, repo_name, verbose=False):
     if verbose:
         print "Deleting..."
     run_command ('rm -rf %s/users/%s/%s' % (doc_root[cname], repo_dir, repo_name))
-    run_command('/usr/bin/sudo -u hg /usr/local/bin/repo-push.sh -d -e '
-            'users/%s/%s' % (repo_dir, repo_name))
+    run_repo_push('-d -e users/%s/%s' % (repo_dir, repo_name))
     if verbose:
         print "Finished deleting"
     purge_log = open ('/tmp/pushlog_purge.%s' % os.getpid(), "a")
