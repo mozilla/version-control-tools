@@ -26,6 +26,13 @@ For management of non-user repositories, please file a
 `Developer Services :: hg.mozilla.org <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org>`_
 bug.
 
+Who Has Access
+==============
+
+Any account with
+:ref:`level 1 commit access <https://www.mozilla.org/hacking/commit-access-policy/#Summary>`
+can push to user repositories and can manage their own user repositories.
+
 When to Use a User Repository
 =============================
 
@@ -121,3 +128,22 @@ Deleting a User Repository
 
 To delete a user repository, run ``edit <repo>`` and select the
 ``delete`` option.
+
+User Repository URLs
+====================
+
+Your own user repositories are accessible under the following URLs:
+
+   ssh://hg.mozilla.org/users/<username>/<repo> (read/write)
+   https://hg.mozilla.org/users/<username>/<repo> (read only)
+
+Your SSH/LDAP username is normalized. Specifically, the ``@`` in your
+email address is normalized to ``_``. e.g. ``mary@example.com``
+becomes ``mary_example.com``.
+
+When you create a user repository, you probably want to set up some
+paths in your hgrc. Here is an example ``.hg/hgrc``::
+
+   [paths]
+   default = https://hg.mozilla.org/users/me_example.com/my-repo
+   default-push = ssh://hg.mozilla.org/users/me_example.com/my-repo
