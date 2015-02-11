@@ -1,3 +1,4 @@
+#require hg32+
   $ hg init server
   $ cat >> server/.hg/hgrc << EOF
   > [hooks]
