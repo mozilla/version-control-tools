@@ -84,7 +84,7 @@ class TryField(BaseReviewRequestField):
     _retreive_error_txt = _('There was an error retrieving the try push.')
     _waiting_txt = _('Waiting for autoland request to execute, hold tight.')
     _autoland_problem = _('Autoland reported a problem: %s')
-    _job_url = 'https://treeherder.mozilla.org/#/jobs?repo=try&revision=%s'
+    _job_url = 'https://treeherder.mozilla.org/embed/resultset-status/try/%s/'
 
     def should_render(self, value):
         ext = get_extension_manager().get_enabled_extension(
@@ -135,9 +135,9 @@ class TryField(BaseReviewRequestField):
         elif ar.last_known_status == AutolandEventLogEntry.PROBLEM:
             return self._autoland_problem % ar.last_details
         elif ar.last_known_status == AutolandEventLogEntry.SERVED:
-            # TODO: Use a real template to render this stuff.
             url = self._job_url % ar.repository_revision
-            return  '<a href="%s">%s</a>' % (url, url)
+            template = get_template('rbmozui/try_result.html')
+            return template.render(Context({'url': url}))
         else:
             return self._retreive_error_txt
 
