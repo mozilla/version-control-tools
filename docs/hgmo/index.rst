@@ -8,3 +8,4 @@ hg.mozilla.org
    :maxdepth: 2
 
    pushlog
+   managing-repos
