@@ -381,6 +381,22 @@ def peerorrepo(ui, path, *args, **kwargs):
 hg._peerorrepo = peerorrepo
 
 
+def exchangepullpushlog(orig, pullop):
+    res = orig(pullop)
+
+    if 'pushlog' in pullop.stepsdone or not pullop.remote.capable('pushlog'):
+        return res
+
+    repo = pullop.repo
+
+    tree = resolve_uri_to_tree(pullop.remote.url())
+    if not tree or not repo.changetracker:
+        return res
+
+    repo.ui.status('fetching pushlog\n')
+    repo.changetracker.load_pushlog(tree)
+
+
 def critique(ui, repo, entire=False, node=None, **kwargs):
     """Perform a critique of a changeset."""
     demandimport.disable()
@@ -1263,6 +1279,7 @@ def extsetup(ui):
 
     extensions.wrapfunction(exchange, 'pull', pull)
     extensions.wrapfunction(exchange, 'push', push)
+    extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
 
     revset.symbols['bug'] = revset_bug
     revset.symbols['dontbuild'] = revset_dontbuild
