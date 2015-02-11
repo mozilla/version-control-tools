@@ -155,26 +155,13 @@ An example ``.hg/hgrc`` fragment may look like::
 Updating SSH Config
 ===================
 
-Mercurial will look in your SSH config (likely ``~/.ssh/config``) to
-determine what username to use. You need to configure
-``reviewboard-hg.mozilla.org`` to use your Mozilla-registered account
-that has SSH access configured. For example::
-
-  Host reviewboard-hg.mozilla.org
-    User me@mozilla.com
+You will want to configure your SSH username for
+``reviewboard-hg.mozilla.org``. See :ref:`auth_ssh` for instructions.
 
 .. tip::
 
    If you have already configured ``hg.mozilla.org`` in your SSH config,
    just copy the settings to ``reviewboard-hg.mozilla.org``.
-
-Verify your SSH settings are sane by attempting to SSH into
-``reviewboard-hg.mozilla.org``. Your terminal output should resemble the
-following::
-
-  $ ssh reviewboard-hg.mozilla.org
-  No interactive shells allowed here!
-  Connection to reviewboard-hg.mozilla.org closed.
 
 As of December 2014, the SSH fingerprint for the RSA key is
 ``a6:13:ae:35:2c:20:2b:8d:f4:8d:8e:d7:a8:55:67:97``.

@@ -1,7 +1,39 @@
 .. _hgmozilla_auth:
 
-============================
-Authentication with Services
+==========================
+Configuring Authentication
+==========================
+
+.. _auth_ssh:
+
+SSH Configuration
+=================
+
+Pushing to Mercurial is performed via SSH. You will need to configure
+your SSH client to talk appropriate settings to Mozilla's Mercurial
+servers.
+
+Typically, the only setting that needs configured is your username.
+In your SSH config (likely ``~/.ssh/config``), add the following::
+
+   Host hg.mozilla.org
+     User me@mozilla.com
+
+   Host reviewboard-hg.mozilla.org
+     User me@mozilla.com
+
+.. tip::
+   Be sure to replace ``me@mozilla.com`` with your Mozilla-registered
+   LDAP account that is configured for SSH access to Mercurial.
+
+Verify your SSH settings are working by attempting to SSH into a server.
+Your terminal output should resemble the following::
+
+   $ ssh hg.mozilla.org
+   No interactive shells allowed here!
+   Connection to hg.mozilla.org closed.
+
+Authenticating with Services
 ============================
 
 Various Mercurial extensions interface with services such as Bugzilla.
