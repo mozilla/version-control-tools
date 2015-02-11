@@ -396,6 +396,7 @@ def exchangepullpushlog(orig, pullop):
     repo.ui.status('fetching pushlog\n')
     repo.changetracker.load_pushlog(tree)
 
+    return res
 
 def critique(ui, repo, entire=False, node=None, **kwargs):
     """Perform a critique of a changeset."""
