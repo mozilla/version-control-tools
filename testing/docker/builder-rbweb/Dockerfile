@@ -7,7 +7,7 @@
 FROM ubuntu:14.04.1
 
 ENV RB_HOME /var/lib/reviewboard
-ENV RB_VERSION 2.0.12
+ENV RB_VERSION 2.0.13
 
 RUN /usr/sbin/groupadd -g 1000 reviewboard
 RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 reviewboard
