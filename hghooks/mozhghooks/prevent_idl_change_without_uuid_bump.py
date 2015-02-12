@@ -13,6 +13,7 @@ or 'a=release' to the tip commit message.
 """
 
 import re
+from mercurial.node import short
 
 REJECT_MESSAGE = """
 *************************** ERROR ***************************
@@ -44,7 +45,7 @@ IDL_MATCH_INTERFACE_BODY_AND_CAPTURE_NAME_PATTERN = \
 
 ILD_RE = re.compile(
     r'(' + IDL_MATCH_ATTRIBUTE_LIST_AND_CAPTURE_UUID_PATTERN +
-        IDL_MATCH_INTERFACE_BODY_AND_CAPTURE_NAME_PATTERN + ')',
+        IDL_MATCH_INTERFACE_BODY_AND_CAPTURE_NAME_PATTERN + r')',
     re.DOTALL | re.IGNORECASE)
 
 def check_unbumped_idl_interfaces(old_idl, new_idl):
@@ -90,13 +91,15 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
 
             fctx = ctx[path]
             prev_fctx = fctx.filectx(fctx.filerev() - 1)
-            unbumped_interfaces.extend(
-                check_unbumped_idl_interfaces(prev_fctx.data(), fctx.data()))
+            unbumped_interfaces.extend([(x, short(ctx.node())) for x in
+                check_unbumped_idl_interfaces(prev_fctx.data(), fctx.data())])
 
     if unbumped_interfaces:
-        unbumped_interfaces = sorted(set(unbumped_interfaces))
-        ui.warn(REJECT_MESSAGE % ('\n  - '.join(unbumped_interfaces),
-                                  ' '.join(unbumped_interfaces)))
+        names_and_revs = sorted(name + ' in changeset ' + rev
+                                    for name, rev in unbumped_interfaces)
+        names = sorted(set(name for name, rev in unbumped_interfaces))
+        ui.warn(REJECT_MESSAGE % ('\n  - '.join(names_and_revs),
+                                  ' '.join(names)))
         return 1
 
     return 0

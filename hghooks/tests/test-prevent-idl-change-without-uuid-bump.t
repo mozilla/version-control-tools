@@ -77,7 +77,7 @@ Modifying interface should fail.
   *************************** ERROR ***************************
   Push rejected because the following IDL interfaces were
   modified without changing the UUID:
-    - A
+    - A in changeset d37488062eb5
   
   To update the UUID for all of the above interfaces and their
   descendants, run:
@@ -130,7 +130,8 @@ Modifying interface in two separate commits should fail.
   *************************** ERROR ***************************
   Push rejected because the following IDL interfaces were
   modified without changing the UUID:
-    - A
+    - A in changeset 6166c7b45675
+    - A in changeset d275ef228c2c
   
   To update the UUID for all of the above interfaces and their
   descendants, run:
@@ -214,8 +215,8 @@ Modifying both interfaces file should fail.
   *************************** ERROR ***************************
   Push rejected because the following IDL interfaces were
   modified without changing the UUID:
-    - A
-    - A2
+    - A in changeset 8fa01e4e5a1d
+    - A2 in changeset 8fa01e4e5a1d
   
   To update the UUID for all of the above interfaces and their
   descendants, run:
@@ -254,7 +255,7 @@ Modifying both interfaces should fail even when one UUID is changed.
   *************************** ERROR ***************************
   Push rejected because the following IDL interfaces were
   modified without changing the UUID:
-    - A
+    - A in changeset be234b691fe3
   
   To update the UUID for all of the above interfaces and their
   descendants, run:
@@ -361,8 +362,8 @@ Adding and modifying multiple IDL files should fail if UUID is not bumped.
   *************************** ERROR ***************************
   Push rejected because the following IDL interfaces were
   modified without changing the UUID:
-    - A
-    - B
+    - A in changeset c22c2a1f042d
+    - B in changeset c22c2a1f042d
   
   To update the UUID for all of the above interfaces and their
   descendants, run:
@@ -444,7 +445,7 @@ UUID is not bumped.
   *************************** ERROR ***************************
   Push rejected because the following IDL interfaces were
   modified without changing the UUID:
-    - nsISupports
+    - nsISupports in changeset e47c8b4783a5
   
   To update the UUID for all of the above interfaces and their
   descendants, run:
