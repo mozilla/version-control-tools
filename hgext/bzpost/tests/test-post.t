@@ -77,7 +77,7 @@ Pushing to mozilla-inbound will result in bug being updated
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  recording push in bug 1
+  recording push at http://*:$HGPORT1/show_bug.cgi?id=1 (glob)
 
   $ $TESTDIR/bugzilla dump-bug 1
   Bug 1:
@@ -118,8 +118,8 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
   remote: adding manifests
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 1 files
-  recording push in bug 2
-  recording push in bug 3
+  recording push at http://*:$HGPORT1/show_bug.cgi?id=2 (glob)
+  recording push at http://*:$HGPORT1/show_bug.cgi?id=3 (glob)
 
   $ $TESTDIR/bugzilla dump-bug 2 3
   Bug 2:
@@ -182,7 +182,7 @@ Pushing to Try will post Treeherder comment
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
-  recording Treeherder push in bug 4
+  recording Treeherder push at http://*:$HGPORT1/show_bug.cgi?id=4 (glob)
 
   $ $TESTDIR/bugzilla dump-bug 4
   Bug 4:
@@ -266,7 +266,7 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 1 files (+1 heads)
-  recording Treeherder push in bug 6
+  recording Treeherder push at http://*:$HGPORT1/show_bug.cgi?id=6 (glob)
 
   $ $TESTDIR/bugzilla dump-bug 5 6
   Bug 5:
@@ -340,7 +340,7 @@ Pushing commit with bug number to user repo will post comment if enabled
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  recording push in bug 7
+  recording push at http://*:$HGPORT1/show_bug.cgi?id=7 (glob)
 
   $ $TESTDIR/bugzilla dump-bug 7
   Bug 7:

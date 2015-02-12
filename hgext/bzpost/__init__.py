@@ -143,6 +143,11 @@ def wrappedpushbookmark(orig, pushop):
     bugsy = Bugsy(username=bzauth.username, password=bzauth.password,
                   bugzilla_url=bzurl)
 
+    def public_url_for_bug(bug):
+        '''Turn 123 into "https://bugzilla.mozilla.org/show_bug.cgi?id=123".'''
+        public_baseurl = bzurl.replace('rest', '').rstrip('/')
+        return '%s/show_bug.cgi?id=%s' % (public_baseurl, bug)
+
     # If this is a try push, we paste the Treeherder link for the tip commit, because
     # the per-commit URLs don't have much value.
     # TODO roll this into normal pushing so we get a Treeherder link in bugs as well.
@@ -155,7 +160,7 @@ def wrappedpushbookmark(orig, pushop):
             if treeherderurl in comment.text:
                 return result
 
-        ui.write(_('recording Treeherder push in bug %s\n') % lastbug)
+        ui.write(_('recording Treeherder push at %s\n') % public_url_for_bug(lastbug))
         bug.add_comment(treeherderurl)
         return result
 
@@ -182,7 +187,7 @@ def wrappedpushbookmark(orig, pushop):
 
         comment = '\n'.join(lines)
 
-        ui.write(_('recording push in bug %s\n') % bugnumber)
+        ui.write(_('recording push at %s\n') % public_url_for_bug(bugnumber))
         bug.add_comment(comment)
 
     return result
