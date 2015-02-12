@@ -75,6 +75,7 @@ from mercurial import (
     extensions,
     hg,
     revset,
+    templatekw,
     util,
     wireproto,
 )
@@ -380,6 +381,31 @@ def fxheadsrevset(repo, subset, x):
                        for t, node, tr, u in get_firefoxtrees(repo))
     return r & subset
 
+
+def _getcachedlabels(repo, ctx, cache):
+    labels = cache.get('fxheads', None)
+    if labels is None:
+        if isfirefoxrepo(repo):
+            labels = list(get_firefoxtrees(repo))
+            cache['fxheads'] = labels
+        else:
+            labels = False
+            cache['fxheads'] = False
+
+    return labels
+
+
+def template_fxheads(repo, ctx, templ, cache, **args):
+    """:fxheads: List of strings. Firefox trees with heads on this commit."""
+    labels = _getcachedlabels(repo, ctx, cache)
+    if not labels:
+        return []
+
+    res = set(tag for tag, node, tree, uri in labels if node == ctx.node())
+
+    return sorted(res)
+
+
 def extsetup(ui):
     extensions.wrapfunction(hg, '_peerorrepo', peerorrepo)
     extensions.wrapfunction(exchange, 'push', push)
@@ -389,6 +415,14 @@ def extsetup(ui):
     extensions.wrapcommand(commands.table, 'pull', pullcommand)
     extensions.wrapcommand(commands.table, 'push', pushcommand)
     revset.symbols['fxheads'] = fxheadsrevset
+
+    keywords = {
+        'fxheads': template_fxheads,
+    }
+
+    templatekw.keywords.update(keywords)
+    templatekw.dockeywords.update(keywords)
+
 
 def reposetup(ui, repo):
     if not repo.local():

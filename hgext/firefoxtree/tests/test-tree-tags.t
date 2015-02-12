@@ -81,3 +81,20 @@ hg fxheads revset gives known tree commits
   date:        Thu Jan 01 00:00:00 1970 +0000
   summary:     Bug 459 - Second commit to inbound
   
+
+{fxheads} template keyword works
+
+  $ hg log -T '{rev} {fxheads}\n'
+  3 inbound
+  2 
+  1 central
+  0 
+
+{fxheads} with multiple values
+
+  $ hg -q pull b2ginbound
+  $ hg log -T '{rev} {join(fxheads, " ")}\n'
+  3 inbound
+  2 
+  1 b2ginbound central
+  0 
