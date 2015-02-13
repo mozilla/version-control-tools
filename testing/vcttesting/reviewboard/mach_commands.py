@@ -558,13 +558,34 @@ class ReviewBoardCommands(object):
 
     @Command('make-admin', category='reviewboard',
         description='Make a user a superuser and staff user')
-    @CommandArgument('path', help='Path to Review Board install')
     @CommandArgument('email', help='Email address of user to modify')
-    def make_admin(self, path, email):
+    @CommandArgument('--path', required=False,
+                     help='Path to Review Board install')
+    def make_admin(self, email, path=None):
         import sqlite3
-        db = os.path.join(path, 'reviewboard.db')
+        db = os.path.join(path or self.mr._path, 'reviewboard.db')
         conn = sqlite3.connect(db)
         with conn:
             conn.execute('UPDATE auth_user SET is_superuser=1, is_staff=1 '
                     'WHERE email=?', (email,))
             conn.commit()
+
+    @Command('dump-account-profile', category='reviewboard',
+         description='Dump the contents of the auth_user table')
+    @CommandArgument('username', help='Username whose info the print')
+    @CommandArgument('--path', required=False,
+                     help='Path to Review Board install')
+    def dump_account_profile(self, username, path=None):
+        import sqlite3
+        db = os.path.join(path or self.mr._path, 'reviewboard.db')
+        conn = sqlite3.connect(db)
+        with conn:
+            c = conn.cursor()
+            c.execute('SELECT accounts_profile.* '
+                      'FROM auth_user, accounts_profile '
+                      'WHERE accounts_profile.user_id = auth_user.id '
+                      'AND auth_user.username = ?', (username,))
+            profile = c.fetchone()
+            if profile:
+                for i, description in enumerate(c.description):
+                    print('%s: %s' % (description[0], profile[i]))
