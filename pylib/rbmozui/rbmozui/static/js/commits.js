@@ -229,8 +229,8 @@ $(document).ready(function() {
       this.$el.html(this.commitTemplate({
         commitID: this.model.commitID,
         commitIDShort: this.model.commitID.substring(0, 8),
-        description: reviewable.get("description"),
-        summary: reviewable.get("summary"),
+        description: _.escape(reviewable.get("description")),
+        summary: _.escape(reviewable.get("summary")),
         childID: this.model.id,
         reviewers: reviewers.render(),
         links: links
