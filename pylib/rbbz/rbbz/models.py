@@ -60,6 +60,11 @@ def get_or_create_bugzilla_users(user_data):
             bugzilla_user_map = BugzillaUserMap(user=user,
                                                 bugzilla_user_id=bz_user_id)
             bugzilla_user_map.save()
+
+            profile = Profile.objects.get_or_create(user=user)[0]
+            if not profile.is_private:
+                profile.is_private = True
+                profile.save()
         else:
             modified = False
             user = bugzilla_user_map.user
@@ -83,11 +88,6 @@ def get_or_create_bugzilla_users(user_data):
             if user.is_active != can_login:
                 user.is_active = can_login
                 modified = True
-
-            profile = Profile.objects.get_or_create(user=user)[0]
-            if not profile.is_private:
-                profile.is_private = True
-                profile.save()
 
             if modified:
                 try:

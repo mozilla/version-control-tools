@@ -124,6 +124,10 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
   (visit review url to publish this review request so others can see it)
   [1]
 
+We need to be an admin to see the details for users with is_private set
+
+  $ rbmanage make-admin $BUGZILLA_USERNAME
+
 Usernames for users without the IRC nick syntax are based on email fragment and BZ user id
 
   $ rbmanage dump-user $HGPORT1 'user1+5'
@@ -136,6 +140,32 @@ Usernames for users without the IRC nick syntax are based on email fragment and 
     last_name: ''
     url: /users/user1%2B5/
     username: user1+5
+
+Newly created users should have a suitable profile (e.g. is_private is set)
+
+  $ rbmanage dump-account-profile 'user1+5'
+  id: 2
+  user_id: 2
+  first_time_setup_done: 0
+  should_send_email: 1
+  should_send_own_updates: 1
+  collapsed_diffs: 1
+  wordwrapped_diffs: 1
+  syntax_highlighting: 1
+  is_private: 1
+  open_an_issue: 1
+  default_use_rich_text: None
+  show_closed: 1
+  sort_review_request_columns: 
+  sort_dashboard_columns: 
+  sort_submitter_columns: 
+  sort_group_columns: 
+  review_request_columns: 
+  dashboard_columns: 
+  submitter_columns: 
+  group_columns: 
+  timezone: UTC
+  extra_data: {}
 
 Usernames for users with IRC nicks are the IRC nickname
 
