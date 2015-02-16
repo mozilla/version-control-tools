@@ -17,6 +17,7 @@ This extension adds new options to the `push` command:
     testing or ensuring certain commits are present on the remote.
   * --reviewid The review identifier to use. Pushes using the same
     review ID will overwrite existing reviews for that ID.
+  * -c Single changeset to review.
 """
 
 import errno
@@ -69,17 +70,28 @@ def pushcommand(orig, ui, repo, *args, **kwargs):
 
     ReviewID(kwargs['reviewid'])
 
+    if kwargs['rev'] and kwargs['changeset']:
+        raise util.Abort(_('cannot specify both -r and -c'))
+
     # There isn't a good way to send custom arguments to the push api. So, we
     # inject some temporary values on the repo. This may fail in many
     # scenarios, most of them related to server operation.
     repo.noreviewboardpush = kwargs['noreview']
     repo.reviewid = kwargs['reviewid']
 
+    # -c implies -r <rev> with an identical base node.
+    if kwargs['changeset']:
+        kwargs['rev'] = [kwargs['changeset']]
+        repo.pushsingle = True
+    else:
+        repo.pushsingle = False
+
     try:
         return orig(ui, repo, *args, **kwargs)
     finally:
         repo.noreviewboardpush = None
         repo.reviewid = None
+        repo.pushsingle = None
 
 # kwargs is here for "bookmarks," which was introduced in Mercurial 3.2. We
 # can add it explicitly once support for <3.2 has been dropped.
@@ -164,6 +176,9 @@ def wrappedpushbookmark(orig, pushop):
 
     assert reviewnode
 
+    if repo.pushsingle:
+        basenode = reviewnode
+
     doreview(repo, ui, pushop.remote, reviewnode, basenode=basenode)
 
     return result
@@ -194,16 +209,20 @@ def doreview(repo, ui, remote, reviewnode, basenode=None):
     # basenode. This decision is somewhat arbitrary and can be revisited later
     # if there is an actual need to review public changesets.
     nodes = [reviewnode]
-    for node in repo[reviewnode].ancestors():
-        ctx = repo[node]
+    # Special case where basenode is the tip node.
+    if basenode and reviewnode == basenode:
+        pass
+    else:
+        for node in repo[reviewnode].ancestors():
+            ctx = repo[node]
 
-        if ctx.phase() == phases.public:
-            break
-        if basenode and ctx.node() == basenode:
+            if ctx.phase() == phases.public:
+                break
+            if basenode and ctx.node() == basenode:
+                nodes.insert(0, ctx.node())
+                break
+
             nodes.insert(0, ctx.node())
-            break
-
-        nodes.insert(0, ctx.node())
 
     identifier = None
 
@@ -699,6 +718,8 @@ def extsetup(ui):
     entry[1].append(('', 'noreview', False,
                      _('Do not perform a review on push.')))
     entry[1].append(('', 'reviewid', '', _('Review identifier')))
+    entry[1].append(('c', 'changeset', '',
+                    _('Review this specific changeset only')))
 
     templatekw.keywords['reviews'] = template_reviews
 

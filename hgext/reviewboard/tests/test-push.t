@@ -12,8 +12,8 @@
   > rebase=
   > EOF
 
-  $ bugzilla create-bug-range TestProduct TestComponent 9
-  created bugs 1 to 9
+  $ bugzilla create-bug-range TestProduct TestComponent 11
+  created bugs 1 to 11
 
 Set up the repo
 
@@ -283,6 +283,29 @@ Specifying multiple -r in reverse order still works
   (visit review url to publish this review request so others can see it)
   [1]
 
+-r and -c are mutually exclusive
+
+  $ hg push -c ae66c8223052 -r b55f2b9937c7
+  abort: cannot specify both -r and -c
+  [255]
+
+-c can be used to select a single changeset to review
+
+  $ hg push -c ae66c8223052 --reviewid 11 ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  searching for changes
+  no changes found
+  submitting 1 changesets for review
+  
+  changeset:  9:ae66c8223052
+  summary:    Middle commit
+  review:     http://localhost:$HGPORT1/r/26 (pending)
+  
+  review id:  bz://11/mynick
+  review url: http://localhost:$HGPORT1/r/25 (pending)
+  (visit review url to publish this review request so others can see it)
+  [1]
+
 Reviewing merge commits is rejected
 
   $ hg up -q -r 0
@@ -326,7 +349,6 @@ error (Bug 1128555)
   submitting 1 changesets for review
   abort: reviewboard error: "105 - One or more fields had errors". please try submitting the review again. if that doesn't work, you've likely encountered a bug.
   [255]
-
 
 Cleanup
 

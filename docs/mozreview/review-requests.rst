@@ -21,17 +21,23 @@ commit (``.``) and any of its parents that haven't landed yet.
 
 .. hint::
 
-   The selection of commits for review is equivalent to the Mercurial
-   revset query ``::. and draft()``.
+   The default selection of commits for review is equivalent to the
+   Mercurial revset ``::. and draft()``. i.e.  ``hg push review``
+   and ``hg push -r '::. and draft()' review`` are equivalent.
 
 If you would like to control which commits are reviewed, you can pass ``-r
-<rev>`` to specify an explicit *tip* and/or *base* commit.
+<rev>`` to specify an explicit *tip* and/or *base* commit. For advanced
+scenario, there is also a ``--from`` argument that can be used to specify
+the base revision.
 
 With 1 revision specified, you define the *top-most* commit to be reviewed.::
 
   $ hg push -r 77c9ee75117e review
   or
   $ hg push -r 32114 review
+
+In this form, the specified commit and all of its draft ancestors will be
+added to MozReview.
 
 With 2 revisions or a revset that evaluates to multiple revisions, you define
 both the *base* and *tip* commits to review.::
@@ -50,8 +56,13 @@ both the *base* and *tip* commits to review.::
    commit(s) against your desires. Specifying an explicit base revision
    will keep your intentions clear.
 
-If all goes well, Mercurial should print information about submitted
-review requests. e.g.::
+For the special case where you only want to review a single changeset,
+the ``-c`` argument can be used to specify a single changeset to review.::
+
+  $ hg push -c b55f2b9937c7 review
+
+If all goes well, the output of ``hg push`` to a review repository should
+look something like this::
 
   $ hg push -r 2 review
   pushing to review
