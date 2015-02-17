@@ -8,6 +8,45 @@ from subprocess import Popen, PIPE, STDOUT
 import shlex
 import repo_group
 
+USER_REPO_EXISTS = """
+You already have a repo called %s.
+
+If you think this is wrong, please file a Developer Services :: hg.mozilla.org
+bug at https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
+""".strip()
+
+NO_SOURCE_REPO = """
+Sorry, there is no source repo called %s.
+
+If you think this is wrong, please file a Developer Services :: hg.mozilla.org
+bug at https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
+""".strip()
+
+HGWEB_ERROR = """
+Problem opening hgweb.wsgi file.
+
+Please file a Developer Services :: hg.mozilla.org bug at
+https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
+""".strip()
+
+MAKING_REPO = """
+Making repo %(repo)s for %(user)s.
+
+This repo will appear as {cname}/users/{user_dir}/{repo}s.
+
+If you need a top level repo, please quit now and file a
+Developer Services :: hg.mozilla.org bug at
+https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
+""".strip()
+
+EDIT_DESCRIPTION = """
+You are about to edit the description for hg.mozilla.org/users/%s/%s.
+
+If you need to edit the description for a top level repo, please quit now
+and file a Developer Services :: hg.mozilla.org bug at
+https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
+""".strip()
+
 doc_root = {'hg.mozilla.org': '/repo/hg/mozilla'}
 
 verbose_users = [ 'bkero@mozilla.com2', ]
@@ -44,10 +83,9 @@ def run_hg_clone (cname, user_repo_dir, repo_name, source_repo_path, verbose=Fal
   dest_dir = "%s/%s" % (userdir, repo_name)
   dest_url = "/users/%s/%s" % (user_repo_dir, repo_name)
 
-  if os.path.exists (dest_dir):
-    print 'Sorry, you already have a repo called %s' % repo_name
-    print 'If you think this is wrong, please file an IT bug'
-    sys.exit (1)
+  if os.path.exists(dest_dir):
+      print(USER_REPO_EXISTS % repo_name)
+      sys.exit(1)
   else:
     if (os.path.exists ('%s/%s' % (doc_root[cname], source_repo_path))) and (check_repo_name (source_repo_path)):
       if not os.path.exists (userdir):
@@ -63,9 +101,8 @@ def run_hg_clone (cname, user_repo_dir, repo_name, source_repo_path, verbose=Fal
 
       print "Clone complete."
     else:
-      print 'Sorry, there is no source repo called %s.' % source_repo_path
-      print 'If you think this is wrong, please file an IT bug'
-      sys.exit (1)
+        print(NO_SOURCE_REPO % source_repo_path)
+        sys.exit(1)
 
 def run_repo_push(args):
     """Run repo-push.sh, signaling mirror-pull on mirrors to do something."""
@@ -94,18 +131,20 @@ def make_wsgi_dir (cname, user_repo_dir):
 
       # Create hgweb.wsgi file if it doesn't already exist
   if not os.path.isfile("%s/hgweb.wsgi" % wsgi_dir):
-    try:
-      hgwsgi = open("%s/hgweb.wsgi" % wsgi_dir, "w")
-    except:
-      print("Problem opening hweb.wsgi file, please file an IT bug with this error.")
-    hgwsgi.write("#!/usr/bin/env python\n")
-    hgwsgi.write("config = '%s/hgweb.config'\n" % wsgi_dir)
-    hgwsgi.write("from mercurial import demandimport; demandimport.enable()\n")
-    hgwsgi.write("from mercurial.hgweb import hgweb\n")
-    hgwsgi.write("import os\n")
-    hgwsgi.write("os.environ['HGENCODING'] = 'UTF-8'\n")
-    hgwsgi.write("application = hgweb(config)\n")
-    hgwsgi.close()
+      try:
+          hgwsgi = open("%s/hgweb.wsgi" % wsgi_dir, "w")
+      except Exception:
+          print(HGWEB_ERROR)
+          sys.exit(1)
+
+      hgwsgi.write("#!/usr/bin/env python\n")
+      hgwsgi.write("config = '%s/hgweb.config'\n" % wsgi_dir)
+      hgwsgi.write("from mercurial import demandimport; demandimport.enable()\n")
+      hgwsgi.write("from mercurial.hgweb import hgweb\n")
+      hgwsgi.write("import os\n")
+      hgwsgi.write("os.environ['HGENCODING'] = 'UTF-8'\n")
+      hgwsgi.write("application = hgweb(config)\n")
+      hgwsgi.close()
 
 def fix_user_repo_perms (cname, repo_name):
     global doc_root
@@ -139,10 +178,8 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
     set_repo_publishing(cname, repo_name, False)
     sys.exit(0)
   else:
-    #make_wsgi_dir(cname, user_repo_dir)
-    print "Making repo %s for %s." % (repo_name, user)
-    print "This repo will appear as %s/users/%s/%s." % (cname, user_repo_dir, repo_name)
-    print 'If you need a top level repo, please quit now and file a bug for IT to create one for you.'
+    print(MAKING_REPO.format(repo=repo_name, user=user, cname=cname,
+                             user_dir=user_repo_dir))
     selection = prompt_user ('Proceed?', ['yes', 'no'])
     if (selection == 'yes'):
       print 'You can clone an existing public repo or a users private repo.'
@@ -250,8 +287,7 @@ def edit_repo_description (cname, repo_name):
     global doc_root
     user = os.getenv ('USER')
     user_repo_dir = user.replace ('@', '_')
-    print 'You are about to edit the description for hg.mozilla.org/users/%s/%s.' % (user_repo_dir, repo_name)
-    print 'If you need to edit the description for a top level repo, please quit now and file an IT bug for it.'
+    print(EDIT_DESCRIPTION % (user_repo_dir, repo_name))
     selection = prompt_user ('Proceed?', ['yes', 'no'])
     if (selection == 'yes'):
         repo_path = get_and_validate_user_repo(cname, repo_name)
