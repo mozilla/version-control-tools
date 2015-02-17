@@ -159,7 +159,7 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
           repo_list = map (lambda x: x.replace ('/.hg', ''), repo_list)
           repo_list = sorted(repo_list)
           print 'List of available public repos'
-          source_repo = prompt_user ('Pick a source repo:', repo_list)
+          source_repo = prompt_user ('Pick a source repo:', repo_list, period=False)
       elif (selection == 'Clone a private repository'):
         source_user = raw_input ('Please enter the e-mail address of the user owning the repo: ')
         valid_user = is_valid_user(source_user)
@@ -183,7 +183,7 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
           user_repo_list = map (lambda x: x.strip ('/'), user_repo_list)
           user_repo_list = sorted(user_repo_list)
           print 'Select the users repo you wish to clone.'
-          source_repo = prompt_user ('Pick a source repo:', user_repo_list)
+          source_repo = prompt_user ('Pick a source repo:', user_repo_list, period=False)
           source_repo = 'users/' + source_user + '/' + source_repo
       elif (selection == 'Create an empty repository'):
         source_repo=''

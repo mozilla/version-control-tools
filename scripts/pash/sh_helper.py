@@ -56,13 +56,16 @@ def run_command(command_string, input=None, verbose=False):
         out_fd.close()
     return output_lines
 
-def prompt_user(prompt_string, options):
+def prompt_user(prompt_string, options, period=True):
     index = 0
     print
     print '0) Exit.'
     for option in options:
         index += 1
-        print '%s) %s.' %(index, option)
+        s = '%s) %s' % (index, option)
+        if period:
+            s += '.'
+        print s
     print
     selection = raw_input(prompt_string + ' ')
     if selection.isdigit():
