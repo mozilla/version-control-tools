@@ -30,14 +30,11 @@ class MozReviewExtension(Extension):
         'autoland_testing': False,
     }
 
-    resources = [
-        batch_review_resource,
-    ]
-
     is_configurable = True
 
     resources = [
         autoland_request_update_resource,
+        batch_review_resource,
         try_autoland_trigger_resource,
     ]
 
