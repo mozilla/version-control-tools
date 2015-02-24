@@ -29,6 +29,8 @@ Push a single changeset to a non-try repo print the URL
   added 1 changesets with 1 changes to 1 files
   You can view your change at the following URL:
     https://hg.mozilla.org/integration/mozilla-inbound/rev/3d7d3272d708
+  You can view the progress of your build at the following URL:
+    https://treeherder.mozilla.org/#/jobs?repo=mozilla-inbound&revision=3d7d3272d708
 
 Pushing to a non-tree repo does nothing
 
@@ -84,6 +86,8 @@ Push multiple changesets to a non-try repo
   You can view your changes at the following URLs:
     https://hg.mozilla.org/integration/mozilla-inbound/rev/3129f8f30e80
     https://hg.mozilla.org/integration/mozilla-inbound/rev/e046d8987087
+  You can view the progress of your build at the following URL:
+    https://treeherder.mozilla.org/#/jobs?repo=mozilla-inbound&revision=e046d8987087
 
 Push a lot of changesets to a non-try repo
 
@@ -97,4 +101,6 @@ Push a lot of changesets to a non-try repo
   added 21 changesets with 21 changes to 1 files
   You can view the pushlog for your changes at the following URL:
     https://hg.mozilla.org/integration/mozilla-inbound/pushloghtml?changeset=77380cff16a1
+  You can view the progress of your build at the following URL:
+    https://treeherder.mozilla.org/#/jobs?repo=mozilla-inbound&revision=77380cff16a1
 

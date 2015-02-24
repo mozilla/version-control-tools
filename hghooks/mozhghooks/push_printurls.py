@@ -2,7 +2,7 @@
 import os.path
 from mercurial.node import short
 
-hgNameToRevURL = {
+TREEHERDER_REPOS = {
     # Gecko trunk / integration branches
     'b2g-inbound':      'integration/b2g-inbound/',
     'build-system':     'projects/build-system',
@@ -31,10 +31,7 @@ hgNameToRevURL = {
     # Try repos
     'try':              'try/',
     'try-comm-central': 'try-comm-central/',
-}
-
-# Project branches that are in active use
-hgNameToRevURL.update({
+    # Project branches that are in active use
     'alder':   'projects/alder/',
     'ash':     'projects/ash/',
     'birch':   'projects/birch/',
@@ -50,16 +47,13 @@ hgNameToRevURL.update({
     'maple':   'projects/maple/',
     'oak':     'projects/oak/',
     'pine':    'projects/pine/',
-})
+}
 
-# QA repos
-hgNameToRevURL.update({
+OTHER_REPOS = {
+    # QA repos
     'mozmill-tests':        'qa/mozmill-tests/',
     'testcase-data':        'qa/testcase-data/',
-})
-
-# RelEng repos
-hgNameToRevURL.update({
+    # RelEng repos
     'autoland':             'build/autoland/',
     'braindump':            'build/braindump/',
     'buildapi':             'build/buildapi/',
@@ -82,7 +76,10 @@ hgNameToRevURL.update({
     'tbpl':                 'webtools/tbpl/',
     'tools':                'build/tools/',
     'twisted':              'build/twisted/',
-})
+}
+
+hgNameToRevURL = dict(TREEHERDER_REPOS)
+hgNameToRevURL.update(OTHER_REPOS)
 
 
 def hook(ui, repo, node, hooktype, **kwargs):
@@ -93,6 +90,7 @@ def hook(ui, repo, node, hooktype, **kwargs):
     # All changesets from node to "tip" inclusive are part of this push.
     rev = repo.changectx(node).rev()
     tip = repo.changectx('tip').rev()
+    tip_node = short(repo.changectx(tip).node())
 
     num_changes = tip + 1 - rev
     url = 'https://hg.mozilla.org/' + hgNameToRevURL[repo_name]
@@ -105,13 +103,11 @@ def hook(ui, repo, node, hooktype, **kwargs):
             node = short(repo.changectx(i).node())
             print '  %srev/%s' % (url, node)
     else:
-        tip_node = short(repo.changectx(tip).node())
         print 'You can view the pushlog for your changes at the following URL:'
         print '  %spushloghtml?changeset=%s' % (url, tip_node)
 
-    # For try repositories, also output a results dashboard url.
-    if repo_name in ['try', 'try-comm-central']:
-        tip_node = short(repo.changectx(tip).node())
+    # For repositories that report CI results to Treeherder, also output a Treeherder url.
+    if repo_name in TREEHERDER_REPOS:
         print 'You can view the progress of your build at the following URL:'
         print '  https://treeherder.mozilla.org/#/jobs?repo=%s&revision=%s' % (repo_name, tip_node)
 
