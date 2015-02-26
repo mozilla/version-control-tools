@@ -1,7 +1,7 @@
 #require docker
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
-  $ commonenv rb-test-try-autoland-trigger
+  $ commonenv
 
   $ cd client
   $ echo foo > foo
@@ -60,6 +60,5 @@ Hit the WebAPI with the Autoland response
   user_id: 1
 
   $ cd ..
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-try-autoland-trigger
+  $ mozreview stop
   stopped 3 containers

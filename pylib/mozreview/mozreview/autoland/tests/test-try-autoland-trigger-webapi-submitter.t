@@ -72,6 +72,5 @@ Force the admin Review Board user to be created by querying for it.
 
 
   $ cd ..
-  $ rbmanage stop rbserver
-  $ dockercontrol stop-bmo rb-test-try-autoland-trigger
+  $ mozreview stop
   stopped 3 containers
