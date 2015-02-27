@@ -18,3 +18,4 @@ python-dateutil==1.5
 python-memcached==1.53
 pytz==2014.10
 recaptcha-client==1.0.6
+requests==2.4.3
