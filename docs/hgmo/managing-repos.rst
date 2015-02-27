@@ -30,7 +30,7 @@ Who Has Access
 ==============
 
 Any account with
-:ref:`level 1 commit access <https://www.mozilla.org/hacking/commit-access-policy/#Summary>`
+`level 1 commit access <https://www.mozilla.org/hacking/commit-access-policy/#Summary>`_
 can push to user repositories and can manage their own user repositories.
 
 When to Use a User Repository
