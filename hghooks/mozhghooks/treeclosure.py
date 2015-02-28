@@ -31,11 +31,7 @@ def printError(message):
     print "*************************************************************\n\n"
 
 
-def hook(ui, repo, source=None, **kwargs):
-    if source == 'strip':
-        return 0
-
-    name = os.path.basename(repo.root)
+def isPushAllowed(repo, name):
     url = "%s/%s?format=json" % (treestatus_base_url, name)
     try:
         u = urlopen(url)
@@ -45,7 +41,7 @@ def hook(ui, repo, source=None, **kwargs):
             # Block the push unless they know the magic words
             if repo.changectx('tip').description().find(magicwords) == -1:
                 printError("%s\nTo push despite the closed tree, include \"%s\" in your push comment" % (closure_text, magicwords))
-                return 1
+                return False
 
             print "%s\nBut you included the magic words.  Hope you had permission!" % closure_text
         elif data['status'] == 'approval required':
@@ -53,7 +49,7 @@ def hook(ui, repo, source=None, **kwargs):
             dlower = repo.changectx('tip').description().lower()
             if not (re.search('a\S*=', dlower) or dlower.startswith('back') or dlower.startswith('revert')):
                 printError("Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)")
-                return 1
+                return False
 
     except (ValueError, IOError), (err):
         # fail closed if treestatus is down, unless the magic words have been used
@@ -62,5 +58,13 @@ def hook(ui, repo, source=None, **kwargs):
                    "Unable to check if the tree is open - treating as if CLOSED.\n"
                    "To push regardless, include \"%s\" in your push comment." % (url, err, magicwords))
         if repo.changectx('tip').description().find(magicwords) == -1:
-            return 1
-    return 0
+            return False
+    return True
+
+
+def hook(ui, repo, source=None, **kwargs):
+    if source == 'strip':
+        return 0
+
+    treestatus_name = os.path.basename(repo.root)
+    return 0 if isPushAllowed(repo, treestatus_name) else 1
