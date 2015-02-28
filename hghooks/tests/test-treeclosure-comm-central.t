@@ -97,11 +97,10 @@ Pushing to a closed Thunderbird tree should fail
   adding file changes
   added 1 changesets with 1 changes to 1 files
   intercepting url
-  Tree Thunderbird comm-central is CLOSED!
-  Thunderbird is closed
   
   
   ************************** ERROR ****************************
+  comm-central-thunderbird is CLOSED! Reason: splines won't reticulate
   To push despite the closed tree, include "CLOSED TREE" in your push comment
   *************************************************************
   
@@ -130,11 +129,10 @@ Test pushing when SeaMonkey is closed
   adding file changes
   added 1 changesets with 1 changes to 1 files
   intercepting url
-  Tree Seamonkey comm-central is CLOSED!
-  Test SeaMonkey push
   
   
   ************************** ERROR ****************************
+  comm-central-seamonkey is CLOSED! Reason: splines won't reticulate
   To push despite the closed tree, include "CLOSED TREE" in your push comment
   *************************************************************
   
@@ -163,11 +161,10 @@ Test pushing when calendar is closed
   adding file changes
   added 1 changesets with 1 changes to 1 files
   intercepting url
-  Tree Thunderbird comm-central is CLOSED!
-  Calendar is closed
   
   
   ************************** ERROR ****************************
+  comm-central-thunderbird is CLOSED! Reason: splines won't reticulate
   To push despite the closed tree, include "CLOSED TREE" in your push comment
   *************************************************************
   
@@ -188,8 +185,7 @@ Adding CLOSED TREE allows the push to go through
   adding file changes
   added 1 changesets with 1 changes to 1 files
   intercepting url
-  Tree Thunderbird comm-central is CLOSED!
-  Forcing it on a CLOSED TREE
+  comm-central-thunderbird is CLOSED! Reason: splines won't reticulate
   But you included the magic words.  Hope you had permission!
 
 And the same for SeaMonkey
@@ -209,8 +205,7 @@ And the same for SeaMonkey
   adding file changes
   added 1 changesets with 1 changes to 1 files
   intercepting url
-  Tree Seamonkey comm-central is CLOSED!
-  Forcing SeaMonkey on a CLOSED TREE
+  comm-central-seamonkey is CLOSED! Reason: splines won't reticulate
   But you included the magic words.  Hope you had permission!
 
 CLOSED TREE only needed on tip commit
@@ -229,8 +224,7 @@ CLOSED TREE only needed on tip commit
   adding file changes
   added 3 changesets with 3 changes to 1 files
   intercepting url
-  Tree Seamonkey comm-central is CLOSED!
-  Multiple commits on a CLOSED TREE
+  comm-central-seamonkey is CLOSED! Reason: splines won't reticulate
   But you included the magic words.  Hope you had permission!
 
 Approval required is enforced

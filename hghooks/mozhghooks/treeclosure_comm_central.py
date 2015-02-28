@@ -16,10 +16,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from urllib2 import urlopen
 import os.path
-import re
-import json
+
+from treeclosure import isPushAllowed
 
 # Array of which directories SeaMonkey exclusively controls in comm-central
 seamonkeyOwns = [
@@ -31,64 +30,6 @@ instantbirdOwns = [
 ]
 # Everything else is assumed to be controlled by Thunderbird.
 
-magicwords = "CLOSED TREE"
-
-treestatus_base_url = "https://treestatus.mozilla.org"
-
-def printError(message):
-    print "\n\n************************** ERROR ****************************"
-    print message
-    print "*************************************************************\n\n"
-
-# This function actually does the checking to see if a tree is closed or set
-# to approval required.
-def checkJsonTreeState(repo, repoName, appName):
-    name = os.path.basename(repo.root)
-    url = "%s/%s-%s?format=json" % (treestatus_base_url, name, appName)
-    try:
-        u = urlopen(url)
-        data = json.load(u)
-
-        if data['status'] == 'closed':
-            # The tree is closed
-
-            # Tell the pusher
-            print "Tree %s %s is CLOSED!" % (appName.capitalize(), name)
-            print repo.changectx('tip').description()
-
-            # Block the push if no magic words
-            if repo.changectx('tip').description().find(magicwords) == -1:
-                printError("To push despite the closed tree, include \"%s\" in your push comment" % magicwords)
-                return 1
-
-            # Otherwise let them push
-            print "But you included the magic words.  Hope you had permission!"
-            return 0
-
-        elif data['status'] == 'approval required':
-            # The tree needs approval
-
-            # If they've specified an approval or are backing out, let them push
-            dlower = repo.changectx('tip').description().lower()
-            if re.search('a\S*=', dlower) or dlower.startswith('back') or dlower.startswith('revert'):
-                return 0
-
-            # Otherwise tell them about the rule
-            printError("Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)")
-            return 1
-
-    except (ValueError, IOError), (err):
-        # fail closed if treestatus is down, unless the magic words have been used
-        printError("Error accessing %s :\n"
-                   "%s\n"
-                   "Unable to check if the tree is open - treating as if CLOSED.\n"
-                   "To push regardless, include \"%s\" in your push comment." % (url, err, magicwords))
-        if repo.changectx('tip').description().find(magicwords) == -1:
-            return 1
-
-    # By default the tree is open
-    return 0
-
 
 def isOwned(changedFile, ownerArray):
     for dir in ownerArray:
@@ -96,6 +37,7 @@ def isOwned(changedFile, ownerArray):
             return True
 
     return False
+
 
 def hook(ui, repo, node, source=None, **kwargs):
     if source == 'strip':
@@ -120,15 +62,12 @@ def hook(ui, repo, node, source=None, **kwargs):
                     apps['thunderbird'] = True
 
         repoName = os.path.basename(repo.root)
-        status = 0
 
         for app in apps:
             if apps[app]:
-                status = checkJsonTreeState(repo, repoName, app)
-                if status == 1:
+                treestatus_name = "%s-%s" % (repoName, app)
+                if not isPushAllowed(repo, treestatus_name):
                     return 1
-
-        return status;
 
     except IOError, (err):
         #TODO: Below obsolete?
