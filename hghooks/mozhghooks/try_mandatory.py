@@ -3,10 +3,12 @@
 chooserUrl = 'http://trychooser.pub.build.mozilla.org/'
 infoUrl = 'https://wiki.mozilla.org/Build:TryChooser'
 
+
 def printError(message):
     print "\n\n************************** ERROR ****************************"
     print message
     print "*************************************************************\n\n"
+
 
 def hook(ui, repo, source=None, **kwargs):
     if source == 'strip':
@@ -28,9 +30,4 @@ Please try try again. If you *intended* to push without triggering
 any jobs, use -p any_invalid_syntax. For assistance with try server
 syntax, see %(infoUrl)s.""" % info)
         return 1
-    else:
-        print """Looks like you used try syntax, going ahead with the push.
-If you don't get what you expected, check %(chooserUrl)s
-for help with building your trychooser request.
-Thanks for helping save resources, you're the best!""" % info
-        return 0
+    return 0

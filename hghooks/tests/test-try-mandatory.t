@@ -45,7 +45,3 @@ Pushing a changeset with try syntax on the tip should be allowed
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
-  Looks like you used try syntax, going ahead with the push.
-  If you don't get what you expected, check http://trychooser.pub.build.mozilla.org/
-  for help with building your trychooser request.
-  Thanks for helping save resources, you're the best!
