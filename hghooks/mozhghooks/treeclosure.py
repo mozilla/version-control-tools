@@ -22,13 +22,14 @@ import re
 import json
 
 magicwords = "CLOSED TREE"
-
 treestatus_base_url = "https://treestatus.mozilla.org"
+
 
 def printError(message):
     print "\n\n************************** ERROR ****************************"
     print message
     print "*************************************************************\n\n"
+
 
 def hook(ui, repo, source=None, **kwargs):
     if source == 'strip':
@@ -47,15 +48,12 @@ def hook(ui, repo, source=None, **kwargs):
                 return 1
 
             print "%s\nBut you included the magic words.  Hope you had permission!" % closure_text
-            return 0
         elif data['status'] == 'approval required':
             # Block the push unless they have approval or are backing out
             dlower = repo.changectx('tip').description().lower()
-            if re.search('a\S*=', dlower) or dlower.startswith('back') or dlower.startswith('revert'):
-                return 0
-
-            printError("Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)")
-            return 1
+            if not (re.search('a\S*=', dlower) or dlower.startswith('back') or dlower.startswith('revert')):
+                printError("Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)")
+                return 1
 
     except (ValueError, IOError), (err):
         # fail closed if treestatus is down, unless the magic words have been used
