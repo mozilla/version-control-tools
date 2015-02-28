@@ -23,7 +23,7 @@ Pushing to an open Thunderbird tree should succeed
 
   $ cat > $TESTTMP/url << EOF
   > https://treestatus.mozilla.org/comm-central-thunderbird?format=json
-  > {"status": "open", "reason": null}
+  > {"status": "open", "reason": ""}
   > EOF
 
   $ echo thunderbird > testfile
@@ -43,7 +43,7 @@ Note that paths under suite/ are treated as seamonkey
 
   $ cat > $TESTTMP/url << EOF
   > https://treestatus.mozilla.org/comm-central-seamonkey?format=json
-  > {"status": "open", "reason": null}
+  > {"status": "open", "reason": ""}
   > EOF
 
   $ mkdir -p suite/build
@@ -64,7 +64,7 @@ Note that paths under calendar/ query thunderbird
 
   $ cat > $TESTTMP/url << EOF
   > https://treestatus.mozilla.org/comm-central-thunderbird?format=json
-  > {"status": "open", "reason": null}
+  > {"status": "open", "reason": ""}
   > EOF
 
   $ mkdir -p calendar/app
@@ -84,7 +84,7 @@ Pushing to a closed Thunderbird tree should fail
 
   $ cat > $TESTTMP/url << EOF
   > https://treestatus.mozilla.org/comm-central-thunderbird?format=json
-  > {"status": "closed", "reason": null}
+  > {"status": "closed", "reason": "splines won't reticulate"}
   > EOF
 
   $ echo closed > testfile
@@ -117,7 +117,7 @@ Test pushing when SeaMonkey is closed
 
   $ cat > $TESTTMP/url << EOF
   > https://treestatus.mozilla.org/comm-central-seamonkey?format=json
-  > {"status": "closed", "reason": null}
+  > {"status": "closed", "reason": "splines won't reticulate"}
   > EOF
 
   $ echo closed > suite/build/test
@@ -150,7 +150,7 @@ Test pushing when calendar is closed
 
   $ cat > $TESTTMP/url << EOF
   > https://treestatus.mozilla.org/comm-central-thunderbird?format=json
-  > {"status": "closed", "reason": null}
+  > {"status": "closed", "reason": "splines won't reticulate"}
   > EOF
 
   $ echo calendarclosed > calendar/app/test
@@ -196,7 +196,7 @@ And the same for SeaMonkey
 
   $ cat > $TESTTMP/url << EOF
   > https://treestatus.mozilla.org/comm-central-seamonkey?format=json
-  > {"status": "closed", "reason": null}
+  > {"status": "closed", "reason": "splines won't reticulate"}
   > EOF
 
   $ echo forcing > suite/build/test
@@ -237,7 +237,7 @@ Approval required is enforced
 
   $ cat > $TESTTMP/url << EOF
   > https://treestatus.mozilla.org/comm-central-thunderbird?format=json
-  > {"status": "approval required", "reason": null}
+  > {"status": "approval required", "reason": ""}
   > EOF
 
   $ echo approval > testfile

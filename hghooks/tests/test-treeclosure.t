@@ -19,7 +19,7 @@ Pushing to an open tree should succeed
 
   $ cat > $TESTTMP/url << EOF
   > https://treestatus.mozilla.org/mozilla-central?format=json
-  > {"status": "open", "reason": null}
+  > {"status": "open", "reason": ""}
   > EOF
 
   $ touch foo
