@@ -5,6 +5,7 @@ set -e
 PYTHON=/venv/bin/python
 
 cd /version-control-tools/pylib/mozreview
+$PYTHON setup.py develop
 $PYTHON setup.py bdist_egg
 
 cd /version-control-tools/pylib/rbbz
