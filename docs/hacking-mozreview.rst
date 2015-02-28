@@ -176,6 +176,79 @@ isn't the GPL (Review Board isn't GPL - Mercurial is).
 Mercurial integration. This includes code for finding Bugzilla
 credentials.
 
+Review Board Modifications
+==========================
+
+Review Request Extra Data
+-------------------------
+
+We store the following in the ``extra_data`` field of review requests:
+
+p2rb
+   String with value ``True``.
+
+   The presence of this property differentiates review requests created
+   by MozReview's special commit tracking code from ones created by
+   vanilla Review Board. Many of our customizations to Review Board
+   ignore review requests unless they have this annotation.
+
+p2rb.is_squashed
+   String with values ``True`` or ``False``.
+
+   This property identifies whether this review request is a special
+   *parent*/*squashed*/*tracking* review request.
+
+   Since Review Board doesn't yet have the concept of multiple commits
+   per review request. We needed to invent one. This property helps us
+   distinguish the parent/tracking review request from its children.
+
+p2rb.identifier
+   String with user-supplied value.
+
+   The value of this string groups multiple review requests belonging to
+   the same logical review together. This property is defined on all
+   our review requests and it should be the same for every review
+   request tracked by a single *squashed*/*parent* review request.
+
+p2rb.commits
+   String of JSON serialization of an array of strings corresponding to
+   review request IDs.
+
+   This is set on *parent* review requests only.
+
+   This array holds the list of review requests currently associated
+   with this review request series.
+
+p2rb.discard_on_publish_rids
+   String of JSON serialization of an array of strings corresponding to
+   review request IDs.
+
+   This is set on *parent* review requests only.
+
+   When drafts are created, sometimes extra review requests get created
+   and associated with the *parent* review request but never actually
+   get published (say you upload a commit by accident and then decide to
+   remove it from review). There is no way to delete and recycle a
+   review request, even if it has never been published. Instead, we
+   track which review requests would become orphans. At publish time,
+   we discard the drafts and review requests.
+
+p2rb.unpublished_rids
+   String of JSON serialization of an array of strings corresponding to
+   review request IDs.
+
+   This is set on *parent* review requests only.
+
+   The list of review requests in this property tracks which review
+   requests tracked by this *parent* review request should be published
+   when the parent review request moves from *draft* to *published*
+   state.
+
+p2rb.commit_id
+   String SHA-1 of the commit currently associated with this review
+   request.
+
+
 Running Tests
 =============
 
