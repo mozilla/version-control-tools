@@ -51,10 +51,10 @@ Pushing to a closed tree should fail
   adding file changes
   added 1 changesets with 1 changes to 1 files
   intercepting url
-  Tree mozilla-central is CLOSED! (https://treestatus.mozilla.org/mozilla-central?format=json) - splines won't reticulate
   
   
   ************************** ERROR ****************************
+  mozilla-central is CLOSED! Reason: splines won't reticulate
   To push despite the closed tree, include "CLOSED TREE" in your push comment
   *************************************************************
   
@@ -75,7 +75,7 @@ Pushing to a closed tree with the magic words is allowed
   adding file changes
   added 1 changesets with 1 changes to 1 files
   intercepting url
-  Tree mozilla-central is CLOSED! (https://treestatus.mozilla.org/mozilla-central?format=json) - splines won't reticulate
+  mozilla-central is CLOSED! Reason: splines won't reticulate
   But you included the magic words.  Hope you had permission!
 
 Pushing multiple changesets to a closed tree is accepted if CLOSED TREE
@@ -95,7 +95,7 @@ is on the tip commit
   adding file changes
   added 3 changesets with 3 changes to 1 files
   intercepting url
-  Tree mozilla-central is CLOSED! (https://treestatus.mozilla.org/mozilla-central?format=json) - splines won't reticulate
+  mozilla-central is CLOSED! Reason: splines won't reticulate
   But you included the magic words.  Hope you had permission!
 
 Pushing to an approval required tree should fail

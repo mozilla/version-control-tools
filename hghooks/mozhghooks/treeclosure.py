@@ -40,14 +40,13 @@ def hook(ui, repo, source=None, **kwargs):
         u = urlopen(url)
         data = json.load(u)
         if data['status'] == 'closed':
-            print "Tree %s is CLOSED! (%s) - %s" % (name, url, data['reason'])
-
+            closure_text = "%s is CLOSED! Reason: %s" % (name, data['reason'])
             # Block the push unless they know the magic words
             if repo.changectx('tip').description().find(magicwords) == -1:
-                printError("To push despite the closed tree, include \"%s\" in your push comment" % magicwords)
+                printError("%s\nTo push despite the closed tree, include \"%s\" in your push comment" % (closure_text, magicwords))
                 return 1
 
-            print "But you included the magic words.  Hope you had permission!"
+            print "%s\nBut you included the magic words.  Hope you had permission!" % closure_text
             return 0
         elif data['status'] == 'approval required':
             # Block the push unless they have approval or are backing out
