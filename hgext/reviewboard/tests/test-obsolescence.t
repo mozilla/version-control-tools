@@ -49,7 +49,7 @@ Now create a new head and push a rebase
   $ hg commit -A -m 'bar'
   adding bar
   created new head
-  $ hg rebase -s 1 -d .
+  $ hg -q rebase -s 1 -d .
   $ hg up tip
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg push --reviewid 123 ssh://user@dummy/$TESTTMP/repos/test-repo
@@ -58,7 +58,7 @@ Now create a new head and push a rebase
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 2 changesets with 1 changes to 1 files (+1 heads)
+  remote: added 2 changesets with 1 changes to ? files (+1 heads) (glob)
   submitting 2 changesets for review
   
   changeset:  2:e7315a409763

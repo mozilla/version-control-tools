@@ -54,8 +54,7 @@ Editing a .webidl file without any review should fail
 
 Editing a .webidl file without /DOM/ peer review should fail
 
-  $ hg commit --amend -m 'Bug 123 - Add Bar; r=foobar'
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/35f6fa5728fb-amend-backup.hg (glob)
+  $ hg -q commit --amend -m 'Bug 123 - Add Bar; r=foobar'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -83,8 +82,7 @@ Editing a .webidl file without /DOM/ peer review should fail
 
 Editing a .webidl file by DOM peers without review should pass
 
-  $ hg commit --amend -u 'Johnny Stenback <jst@mozilla.com>' -m 'Bug 123 - Add Bar'
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/17ac6dbbb5f7-amend-backup.hg (glob)
+  $ hg -q commit --amend -u 'Johnny Stenback <jst@mozilla.com>' -m 'Bug 123 - Add Bar'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes

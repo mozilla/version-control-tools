@@ -48,8 +48,7 @@ Editing a UUID without ba= should fail
 
 Editing a UUID with ba= should pass
 
-  $ hg commit --amend -m 'Changing UUID; ba=me'
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/5475ca91db3f-amend-backup.hg (glob)
+  $ hg -q commit --amend -m 'Changing UUID; ba=me'
   $ hg push ../server
   pushing to ../server
   searching for changes
@@ -93,8 +92,7 @@ Editing .idl file with UUID with other files and no ba= should fail
 
 Adding ba= anywhere in the push will get through the hook
 
-  $ hg commit --amend -m 'Unrelated commit; ba=approver'
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/c2ca04c9aa66-amend-backup.hg (glob)
+  $ hg -q commit --amend -m 'Unrelated commit; ba=approver'
   $ hg push ../server
   pushing to ../server
   searching for changes
@@ -147,8 +145,7 @@ Removing uuid() from an .idl file without ba= should fail
 
 Removing UUID with ba= approval should pass
 
-  $ hg commit --amend -m 'Removing UUID; ba=me'
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/72d6c9de6844-amend-backup.hg (glob)
+  $ hg -q commit --amend -m 'Removing UUID; ba=me'
   $ hg push ../server
   pushing to ../server
   searching for changes
@@ -192,8 +189,7 @@ Removing an .idl with UUID without approval should fail
 
 Removing an .idl with UUID with approval should pass
 
-  $ hg commit --amend -m 'Removing existing; ba=me'
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/d6eafdbb87e1-amend-backup.hg (glob)
+  $ hg -q commit --amend -m 'Removing existing; ba=me'
   $ hg push ../server
   pushing to ../server
   searching for changes

@@ -29,7 +29,7 @@ Single-commit backout:
 Reapply single-commit backout:
 
   $ hg graft -f -r 1
-  grafting revision 1
+  grafting * (glob)
   merging file1.txt
   $ hg log -r . --template '{desc}\n'
   commit 2
@@ -49,13 +49,13 @@ Multi-commit backout:
 Reapply buried backout:
 
   $ hg graft -f -r 1
-  grafting revision 1
+  grafting * (glob)
   merging file1.txt
 
 Get back to original state:
 
   $ hg graft -f -r 2
-  grafting revision 2
+  grafting * (glob)
   merging file2.txt
 
 Folding together multiple commits into a single backout changeset:
@@ -89,9 +89,9 @@ Backouts should be 'test' user, re-applies should be original user:
 Clean up
 
   $ hg graft -f -r 1+2
-  grafting revision 1
+  grafting * (glob)
   merging file1.txt
-  grafting revision 2
+  grafting * (glob)
   merging file2.txt
 
 Patches should be automatically sorted into correct order:
@@ -106,9 +106,9 @@ Patches should be automatically sorted into correct order:
   Backed out changeset 22355b867c01
   Backed out changeset 5b367719b421
   $ hg graft -f -r 1+2
-  grafting revision 1
+  grafting * (glob)
   merging file1.txt
-  grafting revision 2
+  grafting * (glob)
   merging file2.txt
   $ hg oops -r 2+1
   checking for uncommitted changes
@@ -120,9 +120,9 @@ Patches should be automatically sorted into correct order:
   Backed out changeset 22355b867c01
   Backed out changeset 5b367719b421
   $ hg graft -f -r 1+2
-  grafting revision 1
+  grafting * (glob)
   merging file1.txt
-  grafting revision 2
+  grafting * (glob)
   merging file2.txt
 
 Some error cases

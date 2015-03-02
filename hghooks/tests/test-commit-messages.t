@@ -42,9 +42,7 @@ No bug is rejected
   abort: pretxnchangegroup.commit_message hook failed
   [255]
 
-  $ hg strip -r .
-  0 files updated, 0 files merged, 1 files removed, 0 files unresolved
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b648292ceed8-backup.hg (glob)
+  $ hg -q strip -r .
 
 Bug XYZ syntax is accepted
 

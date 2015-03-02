@@ -201,8 +201,7 @@ Dropping the first commit should shuffle all the reviews down the line.
 NOTE: If we ever employ heuristic matching on the server, this test
 likely gets invalidated.
 
-  $ hg rebase -s 2 -d 0
-  saved backup bundle * (glob)
+  $ hg -q rebase -s 2 -d 0
   $ hg strip -r 1 --no-backup
   $ hg push
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
@@ -346,8 +345,7 @@ behaviour here. We'll save that for other tests.
 
 Try removing a commit in the middle.
 
-  $ hg rebase -s 3 -d 1
-  saved backup bundle * (glob)
+  $ hg -q rebase -s 3 -d 1
   $ hg strip -r 2 --no-backup
 
   $ hg push

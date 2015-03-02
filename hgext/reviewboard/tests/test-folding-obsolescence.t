@@ -89,7 +89,7 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 3 changesets with 3 changes to 3 files (+1 heads)
+  remote: added 3 changesets with 3 changes to ? files (+1 heads) (glob)
   submitting 3 changesets for review
   
   changeset:  6:1c48b4fc57df

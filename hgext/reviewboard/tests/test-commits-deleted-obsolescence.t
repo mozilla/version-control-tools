@@ -236,14 +236,14 @@ Review 6 should be marked as discarded
 Dropping the first commit should drop its review. Subsequent reviews should
 be preserved.
 
-  $ hg rebase -s 2 -d 0
+  $ hg -q rebase -s 2 -d 0
   $ hg push
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 3 changesets with 0 changes to 0 files (+1 heads)
+  remote: added 3 changesets with 0 changes to ? files (+1 heads) (glob)
   submitting 3 changesets for review
   
   changeset:  5:ce44f0c4506c
@@ -354,14 +354,14 @@ The dropped commit should now be discarded
 
 Try removing a commit in the middle.
 
-  $ hg rebase -s e44f9d56a1a4 -d ce44f0c4506c
+  $ hg -q rebase -s e44f9d56a1a4 -d ce44f0c4506c
   $ hg push
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 0 changes to 0 files (+1 heads)
+  remote: added 1 changesets with 0 changes to ? files (+1 heads) (glob)
   submitting 2 changesets for review
   
   changeset:  5:ce44f0c4506c

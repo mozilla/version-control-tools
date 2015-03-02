@@ -91,7 +91,7 @@ User in whitelist can strip
   > EOF
 
   $ USER=admin hg debugpushkey ssh://user@dummy/$TESTTMP/repos/test-repo strip dummy '' cd04635afb3cc9f4d8b8d074465a7e3d0d70908e
-  remote: saved backup bundle to $TESTTMP/repos/test-repo/.hg/strip-backup/cd04635afb3c-remotestrip.hg
+  remote: saved backup bundle to $TESTTMP/repos/test-repo/.hg/strip-backup/cd04635afb3c-*remotestrip.hg (glob)
   True
 
   $ hg -R $TESTTMP/repos/test-repo log -T '{node} {desc}\n'
