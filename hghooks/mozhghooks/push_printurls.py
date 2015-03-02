@@ -97,18 +97,18 @@ def hook(ui, repo, node, hooktype, **kwargs):
 
     if num_changes <= 10:
         plural = 's' if num_changes > 1 else ''
-        print 'You can view your change%s at the following URL%s:' % (plural, plural)
+        print '\nView your change%s here:' % plural
 
         for i in xrange(rev, tip + 1):
             node = short(repo.changectx(i).node())
             print '  %srev/%s' % (url, node)
     else:
-        print 'You can view the pushlog for your changes at the following URL:'
+        print '\nView the pushlog for these changes here:'
         print '  %spushloghtml?changeset=%s' % (url, tip_node)
 
     # For repositories that report CI results to Treeherder, also output a Treeherder url.
     if repo_name in TREEHERDER_REPOS:
-        print 'You can view the progress of your build at the following URL:'
+        print '\nFollow the progress of your build on Treeherder:'
         print '  https://treeherder.mozilla.org/#/jobs?repo=%s&revision=%s' % (repo_name, tip_node)
 
     return 0
