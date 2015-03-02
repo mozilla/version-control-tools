@@ -199,7 +199,7 @@ p2rb.is_squashed
    *parent*/*squashed*/*tracking* review request.
 
    Since Review Board doesn't yet have the concept of multiple commits
-   per review request. We needed to invent one. This property helps us
+   per review request, we needed to invent one. This property helps us
    distinguish the parent/tracking review request from its children.
 
 p2rb.identifier
