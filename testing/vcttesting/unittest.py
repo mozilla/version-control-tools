@@ -76,11 +76,28 @@ class MozReviewWebDriverTest(MozReviewTest):
 
         MozReviewTest.setUpClass()
 
-    def setUp(self):
-        self.addCleanup(self.browser.quit)
+        cls.users = {}
 
-    def reviewboard_login(self, username, password):
-        self.browser.get('%saccount/login/' % self.rburl)
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.quit()
+        MozReviewTest.tearDownClass()
+
+    def tearDown(self):
+        self.browser.delete_all_cookies()
+
+    def load_rburl(self, path):
+        """Load the specified Review Board URL."""
+        self.browser.get('%s%s' % (self.rburl, path))
+
+    def verify_rburl(self, path):
+        """Verify the current URL is the specified Review Board URL."""
+        current = self.browser.current_url
+        self.assertEqual(current, '%s%s' % (self.rburl, path))
+
+    def reviewboard_login(self, username, password, verify=True):
+        """Log into Review Board with the specified credentials."""
+        self.load_rburl('account/login')
 
         input_username = self.browser.find_element_by_id('id_username')
         input_username.send_keys(username)
@@ -89,4 +106,19 @@ class MozReviewWebDriverTest(MozReviewTest):
 
         input_password.submit()
 
-        self.assertEqual(self.browser.current_url, '%sdashboard/' % self.rburl)
+        if verify:
+            self.verify_rburl('dashboard/')
+
+    def create_users(self, users):
+        """Create multiple users at once.
+
+        Receives an iterable of (email, password, name) 3-tuples.
+        """
+        b = self.bugzilla(username='admin@example.com', password='password')
+        for (email, password, name) in users:
+            b.create_user(email, password, name)
+            self.users[email] = (password, name)
+
+    def user_bugzilla(self, email):
+        """Obtain a Bugzilla handle for a given user, specified by email address."""
+        return self.bugzilla(username=email, password=self.users[email][0])

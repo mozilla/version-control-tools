@@ -16,13 +16,11 @@ from vcttesting.unittest import MozReviewWebDriverTest
 
 class AutocompleteTest(MozReviewWebDriverTest):
     def test_reviewer_autocomplete(self):
-        self.bugzilla().create_user('jsmith@example.com', 'password1',
-                                    'Jeremy Smith [:jsmith]')
-        self.bugzilla().create_user('mjane@example.com', 'password2',
-                                    'Mary Jane [:mary]')
-
-        mjb = self.bugzilla(username='mjane@example.com',
-                            password='password2')
+        self.create_users([
+            ('jsmith@example.com', 'password1', 'Jeremy Smith [:jsmith]'),
+            ('mjane@example.com', 'password2', 'Mary Jane [:mary]'),
+        ])
+        mjb = self.user_bugzilla('mjane@example.com')
         mjb.create_bug('TestProduct', 'TestComponent', 'bug1')
 
         self.mr.create_repository('repo1')
@@ -41,7 +39,7 @@ class AutocompleteTest(MozReviewWebDriverTest):
 
         self.reviewboard_login('mjane@example.com', 'password2')
 
-        self.browser.get('%sr/1' % self.rburl)
+        self.load_rburl('r/1')
 
         children = self.browser.find_element_by_id('rbmozui-commits-children')
         WebDriverWait(self.browser, 10).until(
