@@ -10,6 +10,11 @@ import tempfile
 import unittest
 
 from selenium import webdriver
+import selenium.webdriver.support.expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.switch_to import SwitchTo
+from selenium.webdriver.support.wait import WebDriverWait
+
 
 from vcttesting.mozreview import MozReview
 
@@ -85,6 +90,11 @@ class MozReviewWebDriverTest(MozReviewTest):
 
     def tearDown(self):
         self.browser.delete_all_cookies()
+        super(MozReviewWebDriverTest, self).tearDown()
+
+    @property
+    def switch_to(self):
+        return SwitchTo(self.browser)
 
     def load_rburl(self, path):
         """Load the specified Review Board URL."""
@@ -122,3 +132,45 @@ class MozReviewWebDriverTest(MozReviewTest):
     def user_bugzilla(self, email):
         """Obtain a Bugzilla handle for a given user, specified by email address."""
         return self.bugzilla(username=email, password=self.users[email][0])
+
+    def create_basic_repo(self, email, nick):
+        self.mr.create_repository('test_repo')
+        lr = self.mr.get_local_repository(
+            'test_repo',
+            ircnick=nick,
+            bugzilla_username=email,
+            bugzilla_password=self.users[email][0])
+        lr.touch('foo')
+        lr.run(['commit', '-A', '-m', 'initial'])
+        lr.run(['phase', '--public', '-r', '0'])
+
+        return lr
+
+    def wait_for_reviewers_to_load(self):
+        """Wait for reviewers information to load."""
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located(
+                (By.CLASS_NAME, 'child-rr-reviewers')))
+
+    def get_commits_el(self):
+        """Obtain the element containing the multi-commit information."""
+        return self.browser.find_element_by_id('rbmozui-commits')
+
+    def prepare_edit_reviewers(self, idx):
+        """Start editing reviewers for the commit at index ``idx``."""
+        commits = self.get_commits_el()
+        editicons = commits.find_elements_by_class_name('editicon')
+        icon = editicons[idx]
+        icon.click()
+
+        autocompletes = commits.find_elements_by_class_name('ui-autocomplete-input')
+        self.assertEqual(len(autocompletes), 1)
+        return autocompletes[0]
+
+    def wait_for_autocomplete_results(self):
+        WebDriverWait(self.browser, 10).until(
+            EC.visibility_of_element_located(
+                (By.CLASS_NAME, 'ui-autocomplete-results')))
+        results = self.browser.find_elements_by_class_name('ui-autocomplete-results')
+        self.assertEqual(len(results), 1)
+        return results[0]
