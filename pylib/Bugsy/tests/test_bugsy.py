@@ -81,6 +81,15 @@ def test_we_can_get_a_bug_with_login_token():
   assert bug.summary == 'Schedule Mn tests on opt Linux builds on cedar'
 
 @responses.activate
+def test_we_can_get_username_with_userid_cookie():
+  responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/user/1234?token=1234-abcd',
+                        body='{"users": [{"name": "user@example.com"}]}', status=200,
+                        content_type='application/json', match_querystring=True)
+
+  bugzilla = Bugsy(userid='1234', cookie='abcd')
+  assert bugzilla.username == 'user@example.com'
+
+@responses.activate
 def test_we_can_create_a_new_remote_bug():
     bug = Bug()
     bug.summary = "I like foo"

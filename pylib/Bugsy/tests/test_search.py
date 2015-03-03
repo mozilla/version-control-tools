@@ -1,6 +1,7 @@
 import bugsy
 from bugsy import Bugsy, BugsyException, LoginException
 from bugsy import Bug
+from bugsy.search import SearchException
 
 import responses
 import json
@@ -300,3 +301,105 @@ def test_we_can_search_for_a_list_of_bug_numbers():
     assert len(bugs) == 2
     assert bugs[0].product == return_1['bugs'][0]['product']
     assert bugs[0].summary == return_1['bugs'][0]['summary']
+
+@responses.activate
+def test_we_can_search_for_a_list_of_bug_numbers_with_start_finish_dates():
+    return_1 = {
+     "bugs" : [
+        {
+           "component" : "CSS Parsing and Computation",
+           "product" : "Core",
+           "summary" : "Map \"rebeccapurple\" to #663399 in named color list."
+        }
+      ]
+    }
+
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?chfieldfrom=2014-12-01&chfieldto=2014-12-05&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+                      body=json.dumps(return_1), status=200,
+                      content_type='application/json', match_querystring=True)
+
+    bugzilla = Bugsy()
+    bugs = bugzilla.search_for\
+            .timeframe('2014-12-01', '2014-12-05')\
+            .search()
+
+    assert len(responses.calls) == 1
+    assert len(bugs) == 1
+    assert bugs[0].product == return_1['bugs'][0]['product']
+    assert bugs[0].summary == return_1['bugs'][0]['summary']
+
+@responses.activate
+def test_we_can_search_with_change_history_field_throws_when_not_given_a_list():
+
+    return_1 = {
+     "bugs" : [
+        {
+           "component" : "CSS Parsing and Computation",
+           "product" : "Core",
+           "summary" : "Map \"rebeccapurple\" to #663399 in named color list."
+        }
+      ]
+    }
+
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?chfieldfrom=2014-12-01&chfieldto=2014-12-05&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform&chfield=[Bug Creation]&chfield=Alias&chfieldvalue=foo',
+                      body=json.dumps(return_1), status=200,
+                      content_type='application/json', match_querystring=False)
+    try:
+      bugzilla = Bugsy()
+      bugs = bugzilla.search_for\
+              .change_history_fields('[Bug Creation]', 'foo')\
+              .timeframe('2014-12-01', '2014-12-05')\
+              .search()
+    except Exception as e:
+      assert str(e) == "fields should be a list"
+
+
+@responses.activate
+def test_we_can_search_with_change_history_field_gets_bugs():
+
+    return_1 = {
+     "bugs" : [
+        {
+           "component" : "CSS Parsing and Computation",
+           "product" : "Core",
+           "summary" : "Map \"rebeccapurple\" to #663399 in named color list."
+        }
+      ]
+    }
+
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?chfield=%5BBug+creation%5D&chfield=Alias&chfieldvalue=foo&chfieldfrom=2014-12-01&chfieldto=2014-12-05&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+                      body=json.dumps(return_1), status=200,
+                      content_type='application/json', match_querystring=True)
+
+    bugzilla = Bugsy()
+    bugs = bugzilla.search_for\
+            .change_history_fields(['[Bug creation]', 'Alias'], 'foo')\
+            .timeframe('2014-12-01', '2014-12-05')\
+            .search()
+
+    assert len(responses.calls) == 1
+    assert len(bugs) == 1
+    assert bugs[0].product == return_1['bugs'][0]['product']
+    assert bugs[0].summary == return_1['bugs'][0]['summary']
+
+@responses.activate
+def test_we_can_handle_errors_coming_back_from_search():
+    error_return = {
+        "code" : 108,
+        "documentation" : "http://www.bugzilla.org/docs/tip/en/html/api/",
+        "error" : True,
+        "message" : "Can't use [Bug Creation] as a field name."
+    }
+
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?chfield=%5BBug+Creation%5D&chfield=Alias&chfieldvalue=foo&chfieldfrom=2014-12-01&chfieldto=2014-12-05&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+                      body=json.dumps(error_return), status=200,
+                      content_type='application/json', match_querystring=True)
+
+    bugzilla = Bugsy()
+    try:
+        bugzilla.search_for\
+                .change_history_fields(['[Bug Creation]', 'Alias'], 'foo')\
+                .timeframe('2014-12-01', '2014-12-05')\
+                .search()
+    except SearchException as e:
+        assert str(e) == "Can't use [Bug Creation] as a field name."

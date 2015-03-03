@@ -1,8 +1,18 @@
 import copy
 
-import requests
 from bug import Bug
-import bugsy as Bugsy
+
+
+class SearchException(Exception):
+    """
+        If while interacting with Bugzilla and we try do something that is not
+        supported this error will be raised.
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return "%s" % self.msg
 
 
 class Search(object):
@@ -22,6 +32,8 @@ class Search(object):
         self._summaries = []
         self._whiteboard = []
         self._bug_numbers = []
+        self._time_frame = {}
+        self._change_history = {"fields": []}
 
     def include_fields(self, *args):
         r"""
@@ -103,6 +115,33 @@ class Search(object):
         self._bug_numbers = list(bug_numbers)
         return self
 
+    def timeframe(self, start, end):
+        r"""
+            When you want to search bugs for a certain time frame.
+
+            :param start:
+            :param end:
+            :returns: :class:`Search`
+        """
+        if start:
+            self._time_frame['chfieldfrom'] = start
+        if end:
+            self._time_frame['chfieldto'] = end
+        return self
+
+    def change_history_fields(self, fields, value=None):
+        r"""
+
+        """
+        if not isinstance(fields, list):
+            raise Exception('fields should be a list')
+
+        self._change_history['fields'] = fields
+        if value:
+            self._change_history['value'] = value
+
+        return self
+
     def search(self):
         r"""
             Call the Bugzilla endpoint that will do the search. It will take the information
@@ -115,6 +154,8 @@ class Search(object):
             ...                .search()
         """
         params = {}
+        params = dict(params.items() + self._time_frame.items())
+
         if self._includefields:
             params['include_fields'] = list(self._includefields)
         if self._bug_numbers:
@@ -135,6 +176,13 @@ class Search(object):
             if self._whiteboard:
                 params['short_desc_type'] = 'allwordssubstr'
                 params['whiteboard'] = list(self._whiteboard)
+            if self._change_history['fields']:
+                params['chfield'] = self._change_history['fields']
+            if self._change_history.get('value', None):
+                params['chfieldvalue'] = self._change_history['value']
 
             results = self._bugsy.request('bug', params=params).json()
+            error = results.get("error", None)
+            if error:
+                raise SearchException(results['message'])
             return [Bug(self._bugsy, **bug) for bug in results['bugs']]

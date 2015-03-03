@@ -1,4 +1,13 @@
 
+0.4.0 / 2014-12-05
+==================
+
+ * Add in the ability to use change history fields for searchings
+ * allow searching to handle time frames
+ * Change UserAgent for bugsy to that Bugzilla knows that it is us calling. Fixes #4
+ * Add version added to comments documentation
+ * Add documenation for comments
+
 0.3.0 / 2014-07-14
 ==================
 

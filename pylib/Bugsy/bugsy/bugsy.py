@@ -37,20 +37,35 @@ class Bugsy(object):
     DEFAULT_SEARCH = ['version', 'id', 'summary', 'status', 'op_sys',
                       'resolution', 'product', 'component', 'platform']
 
-    def __init__(self, username=None, password=None, bugzilla_url='https://bugzilla.mozilla.org/rest'):
+    def __init__(
+            self,
+            username=None,
+            password=None,
+            userid=None,
+            cookie=None,
+            bugzilla_url='https://bugzilla.mozilla.org/rest'
+    ):
         """
             Initialises a new instance of Bugsy
 
             :param username: Username to login with. Defaults to None
             :param password: Password to login with. Defaults to None
+            :param userid: User ID to login with. Defaults to None
+            :param cookie: Cookie to login with. Defaults to None
             :param bugzilla_url: URL endpoint to interact with. Defaults to https://bugzilla.mozilla.org/rest
 
             If a username AND password are passed in Bugsy will try get a login token
             from Bugzilla. If we can't login then a LoginException will
             be raised.
+
+            If a userid AND cookie are passed in Bugsy will create a login token from them.
+            If no username was passed in it will then try to get the username
+            from Bugzilla.
         """
         self.username = username
         self.password = password
+        self.userid = userid
+        self.cookie = cookie
         self.bugzilla_url = bugzilla_url
         self.token = None
         self.session = requests.Session()
@@ -64,6 +79,16 @@ class Bugsy(object):
                 self.token = result['token']
             else:
                 raise LoginException(result['message'])
+        elif self.userid and self.cookie:
+            # The token is crafted from the userid and cookie.
+            self.token = '%s-%s' % (self.userid, self.cookie)
+            self.session.params['token'] = self.token
+            if not self.username:
+                result = self.request('user/%s' % self.userid).json()
+                if result.get('users', []):
+                    self.username = result['users'][0]['name']
+                else:
+                    raise LoginException(result['message'])
 
     def get(self, bug_number):
         """
