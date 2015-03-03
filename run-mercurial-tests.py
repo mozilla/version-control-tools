@@ -314,7 +314,7 @@ if __name__ == '__main__':
 
     if run_unit_tests:
         noseargs = [sys.executable, '-m', 'nose.core', '-s']
-        noseargs.extend(unit_tests)
+        noseargs.extend(run_unit_tests)
 
         env = dict(os.environ)
         paths = [p for p in env.get('PYTHONPATH', '').split(os.pathsep) if p]
