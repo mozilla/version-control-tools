@@ -69,8 +69,12 @@ class MozReviewWebDriverTest(MozReviewTest):
 
     @classmethod
     def setUpClass(cls):
+        try:
+            cls.browser = webdriver.Firefox()
+        except Exception:
+            raise unittest.SkipTest('Unable to start Firefox')
+
         MozReviewTest.setUpClass()
-        cls.browser = webdriver.Firefox()
 
     def setUp(self):
         self.addCleanup(self.browser.quit)
