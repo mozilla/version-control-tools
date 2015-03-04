@@ -314,6 +314,11 @@ if __name__ == '__main__':
 
     if run_unit_tests:
         noseargs = [sys.executable, '-m', 'nose.core', '-s']
+        if options.jobs:
+            noseargs.extend([
+                '--processes=%d' % options.jobs,
+                '--process-timeout=120',
+            ])
         noseargs.extend(run_unit_tests)
 
         env = dict(os.environ)
