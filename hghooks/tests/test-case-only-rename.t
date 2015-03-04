@@ -76,9 +76,7 @@ Case only rename that isn't tip should fail
   abort: pretxnchangegroup.prevent_case_only_names hook failed
   [255]
 
-  $ hg strip -r 2:
-  1 files updated, 0 files merged, 1 files removed, 0 files unresolved
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/515b46df57ee-backup.hg (glob)
+  $ hg -q strip -r 2:
 
 Case only rename of directory should be rejected
 
