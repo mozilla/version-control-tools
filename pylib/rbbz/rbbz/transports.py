@@ -28,8 +28,14 @@ class CookieTransportMixin:
     # Note this must be an old-style class so that __init__ handling works
     # correctly with the old-style Transport class. If you make this class
     # a new-style class, Transport.__init__() won't be called.
+    @property
+    def cookies(self):
+        # xmlrpc transport classes don't do a good job of calling __init__.
+        # Create our cookies instance variable on demand.
+        if not hasattr(self, '_cookies'):
+            self._cookies = []
 
-    cookies = []
+        return self._cookies
 
     def send_cookies(self, connection):
         if self.cookies:
