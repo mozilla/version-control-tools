@@ -146,10 +146,6 @@ if __name__ == '__main__':
 
     options, extra = parser.parse_known_args(sys.argv)
 
-    if not options.jobs:
-        print('WARNING: Not running tests optimally. Specify -j to run tests '
-                'in parallel.', file=sys.stderr)
-
     # some arguments belong to us only. Don't pass it along to run-tests.py.
     sys.argv = [a for a in sys.argv
         if a not in set(['--all-versions', '--no-hg-tip'])]
@@ -219,6 +215,10 @@ if __name__ == '__main__':
         running_tests.extend(hook_tests)
     else:
         running_tests.extend(requested_tests)
+
+    if not options.jobs and len(running_tests) > 1:
+        print('WARNING: Not running tests optimally. Specify -j to run tests '
+                'in parallel.', file=sys.stderr)
 
     sys.argv.extend(running_tests)
 
