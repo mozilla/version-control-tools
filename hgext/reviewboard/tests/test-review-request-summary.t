@@ -143,4 +143,4 @@ Resolving an issue should decrement the issue count.
 Cleanup
 
   $ mozreview stop
-  stopped 3 containers
+  stopped 5 containers

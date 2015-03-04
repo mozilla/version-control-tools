@@ -623,4 +623,4 @@ Random users can come along and grant review
 Cleanup
 
   $ mozreview stop
-  stopped 3 containers
+  stopped 5 containers

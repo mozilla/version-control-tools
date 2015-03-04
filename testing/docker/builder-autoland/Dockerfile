@@ -12,13 +12,13 @@ RUN /usr/sbin/groupadd -g 1000 ubuntu
 RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 ubuntu
 
 RUN apt-get update && apt-get -y install \
-  apache2 curl libapache2-mod-wsgi postgresql \
+  apache2 curl libapache2-mod-wsgi postgresql-client \
   python2.7-dev libpq-dev libldap2-dev libsasl2-dev \
   mercurial
 
 # Python
-ADD requirements.txt ${AUTOLAND_HOME}/requirements.txt
-ADD autoland ${AUTOLAND_HOME}/autoland
+ADD extra/vct/autoland/requirements.txt ${AUTOLAND_HOME}/requirements.txt
+ADD extra/vct/autoland/autoland ${AUTOLAND_HOME}/autoland
 
 RUN curl -SL 'https://bootstrap.pypa.io/get-pip.py' | python2
 RUN pip install virtualenv
@@ -28,19 +28,18 @@ RUN ${AUTOLAND_HOME}/venv/bin/pip install -r ${AUTOLAND_HOME}/requirements.txt
 # Apache
 RUN a2enmod headers
 RUN rm /etc/apache2/sites-enabled/*
-ADD apache/autoland.conf /etc/apache2/sites-enabled/autoland.conf
+ADD autoland.conf /etc/apache2/sites-enabled/autoland.conf
 EXPOSE 80
 
 # Hg
 RUN mkdir /repos && hg init /repos/mozilla-central && hg init /repos/try
 RUN cd /repos/mozilla-central && hg bookmark central
-ADD testing/docker/mozreview.tgz /repos
-ADD testing/docker/hgrc /repos/mozilla-central/.hg/hgrc
-ADD testing/docker/try-hgrc /repos/try/.hg/hgrc
-ADD testing/docker/try_hook.sh /
+ADD mozreview.tgz /repos
+ADD hgrc /repos/mozilla-central/.hg/hgrc
+ADD try-hgrc /repos/try/.hg/hgrc
+ADD try_hook.sh /
 
 #
-ADD testing/docker/config.json ${AUTOLAND_HOME}/autoland/config.json
-ADD sql ${AUTOLAND_HOME}/sql
-ADD testing/docker/start-autoland.sh ${AUTOLAND_HOME}/start-autoland.sh
-CMD ${AUTOLAND_HOME}/start-autoland.sh
+ADD config.json ${AUTOLAND_HOME}/autoland/config.json
+ADD start-autoland.sh /start-autoland.sh
+CMD ["/start-autoland.sh"]

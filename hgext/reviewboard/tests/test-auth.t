@@ -414,4 +414,4 @@ user, they will be assigned the email+id username.
 Cleanup
 
   $ mozreview stop
-  stopped 3 containers
+  stopped 5 containers

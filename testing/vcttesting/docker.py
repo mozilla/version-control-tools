@@ -113,6 +113,8 @@ class Docker(object):
             'last-db-bootstrap-id': None,
             'last-web-bootstrap-id': None,
             'last-rbweb-bootstrap-id': None,
+            'last-autolanddb-id': None,
+            'last-autoland-id': None,
         }
 
         if os.path.exists(state_path):
@@ -126,6 +128,8 @@ class Docker(object):
         self.state.setdefault('last-db-bootstrap-id', None)
         self.state.setdefault('last-web-bootstrap-id', None)
         self.state.setdefault('last-rbweb-bootstrap-id', None)
+        self.state.setdefault('last-autolanddb-id', None)
+        self.state.setdefault('last-autoland-id', None)
 
         self.client = docker.Client(base_url=url, tls=tls)
 
@@ -299,11 +303,13 @@ class Docker(object):
             image = self.ensure_built(name, verbose=verbose, **kwargs)
             return name, image
 
-        with futures.ThreadPoolExecutor(3) as e:
+        with futures.ThreadPoolExecutor(5) as e:
             fs = []
             fs.append(e.submit(build, 'bmodb-volatile'))
             fs.append(e.submit(build, 'bmoweb'))
             fs.append(e.submit(build, 'pulse'))
+            fs.append(e.submit(build, 'autolanddb', add_vct=True))
+            fs.append(e.submit(build, 'autoland', add_vct=True))
             #fs.append(e.submit(build, 'rbweb', add_vct=True))
 
         # This is very ugly.
@@ -317,12 +323,18 @@ class Docker(object):
                 pulse_image = image
             elif name == 'rbweb':
                 rbweb_image = image
+            elif name == 'autolanddb':
+                autolanddb_image = image
+            elif name == 'autoland':
+                autoland_image = image
             else:
                 assert False
 
         self.state['last-db-id'] = db_image
         self.state['last-pulse-id'] = pulse_image
         self.state['last-web-id'] = web_image
+        self.state['last-autolanddb-id'] = autolanddb_image
+        self.state['last-autoland-id'] = autoland_image
         #self.state['last-rbweb-id'] = rbweb_image
 
         # The keys for the bootstrapped images are derived from the base
@@ -331,19 +343,26 @@ class Docker(object):
         db_bootstrapped_key = 'bmodb-bootstrapped:%s' % db_image
         web_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (
                 db_image, web_image)
+        autolanddb_bootstrapped_key = 'autolanddb-bootstrapped:%s' % autolanddb_image
+        autoland_bootstrapped_key = 'autoland-bootstrapped:%s' % autoland_image
         #rbweb_bootstrapped_key = 'rbweb-bootstrapped:%s:%s' % (db_image,
         #        rbweb_image)
 
         have_db = db_bootstrapped_key in images
         have_web = web_bootstrapped_key in images
         have_pulse = 'pulse' in images
+        have_autolanddb = autolanddb_bootstrapped_key in images
+        have_autoland = autoland_bootstrapped_key in images
         #have_rbweb = rbweb_bootstrapped_key in images
 
-        if have_db and have_web and have_pulse: # and have_rbweb:
+        if (have_db and have_web and have_pulse and
+                have_autolanddb and have_autoland): # and have_rbweb:
             return (
                 images[db_bootstrapped_key],
                 images[web_bootstrapped_key],
                 images['pulse'],
+                images[autolanddb_bootstrapped_key],
+                images[autoland_bootstrapped_key],
                 #images[rbweb_bootstrapped_key]
             )
 
@@ -357,6 +376,10 @@ class Docker(object):
 
         web_id = self.client.create_container(web_image,
                 environment=web_environ)['Id']
+
+        autolanddb_id = self.client.create_container(autolanddb_image)['Id']
+        autoland_id = self.client.create_container(autoland_image)['Id']
+
         #rbweb_id = self.client.create_container(rbweb_image)['Id']
 
         with self._start_container(db_id) as db_state:
@@ -378,6 +401,8 @@ class Docker(object):
 
         db_unique_id = str(uuid.uuid1())
         web_unique_id = str(uuid.uuid1())
+        autolanddb_unique_id = str(uuid.uuid1())
+        autoland_unique_id = str(uuid.uuid1())
         #rbweb_unique_id = str(uuid.uuid1())
 
         print('committing bootstrapped images')
@@ -387,26 +412,38 @@ class Docker(object):
         # easily from Docker's own metadata. We have to give a tag becaue
         # Docker will forget the repository name if a name image has only a
         # repository name as well.
-        with futures.ThreadPoolExecutor(2) as e:
+        with futures.ThreadPoolExecutor(4) as e:
             db_future = e.submit(self.client.commit, db_id,
                     repository='bmodb-volatile-bootstrapped',
                     tag=db_unique_id)
             web_future = e.submit(self.client.commit, web_id,
                     repository='bmoweb-bootstrapped',
                     tag=web_unique_id)
+            autolanddb_future = e.submit(self.client.commit, autolanddb_id,
+                    repository='autolanddb-bootstrapped',
+                    tag=autolanddb_unique_id)
+            autoland_future = e.submit(self.client.commit, autoland_id,
+                    repository='autoland-bootstrapped',
+                    tag=autoland_unique_id)
             #rbweb_future = e.submit(self.client.commit, rbweb_id,
             #        repository='rbweb-bootstrapped',
             #        tag=rbweb_unique_id)
 
         db_bootstrap = db_future.result()['Id']
         web_bootstrap = web_future.result()['Id']
+        autolanddb_bootstrap = autolanddb_future.result()['Id']
+        autoland_bootstrap = autoland_future.result()['Id']
         #rbweb_bootstrap = rbweb_future.result()['Id']
         self.state['images'][db_bootstrapped_key] = db_bootstrap
         self.state['images'][web_bootstrapped_key] = web_bootstrap
         self.state['images']['pulse'] = pulse_image
+        self.state['images'][autolanddb_bootstrapped_key] = autolanddb_bootstrap
+        self.state['images'][autoland_bootstrapped_key] = autoland_bootstrap
         #self.state['images'][rbweb_bootstrapped_key] = rbweb_bootstrap
         self.state['last-db-bootstrap-id'] = db_bootstrap
         self.state['last-web-bootstrap-id'] = web_bootstrap
+        self.state['last-autolanddb-bootstrap-id'] = autolanddb_bootstrap
+        self.state['last-autoland-bootstrap-id'] = autoland_bootstrap
         #self.state['last-rbweb-bootstrap-id'] = rbweb_bootstrap
         self.save_state()
 
@@ -419,17 +456,25 @@ class Docker(object):
 
         print('bootstrapped images created')
 
-        return db_bootstrap, web_bootstrap, pulse_image #, rbweb_bootstrap
+        return (db_bootstrap, web_bootstrap, pulse_image,
+                autolanddb_bootstrap, autoland_bootstrap) #, rbweb_bootstrap
 
-    def start_mozreview(self, cluster, hostname=None, start_pulse=False,
-            http_port=80, pulse_port=None, rbweb_port=None, db_image=None,
-            web_image=None, pulse_image=None, rbweb_image=None, verbose=False):
+    def start_mozreview(self, cluster, hostname=None, http_port=80,
+            pulse_port=None, rbweb_port=None, db_image=None, web_image=None,
+            pulse_image=None, rbweb_image=None, autolanddb_image=None,
+            autoland_image=None, autoland_port=None, verbose=False):
 
+        start_pulse = False
         if pulse_port:
             start_pulse = True
 
-        if not db_image or not web_image or not pulse_image:
-            db_image, web_image, pulse_image = self.build_mozreview(verbose=verbose)
+        start_autoland = False
+        if autoland_port:
+            start_autoland = True
+
+        if (not db_image or not web_image or not pulse_image or
+                not autolanddb_image or not autoland_image):
+            db_image, web_image, pulse_image, autolanddb_image, autoland_image = self.build_mozreview(verbose=verbose)
 
         containers = self.state['containers'].setdefault(cluster, [])
 
@@ -448,13 +493,26 @@ class Docker(object):
             f_web_create = e.submit(self.client.create_container,
                     web_image, environment={'BMO_URL': url})
 
+            if start_autoland:
+                f_autolanddb_create = e.submit(self.client.create_container,
+                        autolanddb_image)
+
+                f_autoland_create = e.submit(self.client.create_container,
+                        autoland_image)
+
             #f_rbweb_create = e.submit(self.client.create_container,
             #        rbweb_image)
+
 
             # We expose the database to containers. Start it first.
             db_id = f_db_create.result()['Id']
             containers.append(db_id)
             f_db_start = e.submit(self.client.start, db_id)
+
+            if start_autoland:
+                autolanddb_id = f_autolanddb_create.result()['Id']
+                containers.append(autolanddb_id)
+                f_start_autolanddb = e.submit(self.client.start, autolanddb_id)
 
             # RabbitMQ takes a while to start up. Start it before other
             # containers. (We probably could have a callback-driven mechanism
@@ -470,6 +528,13 @@ class Docker(object):
 
             web_id = f_web_create.result()['Id']
             containers.append(web_id)
+
+            if start_autoland:
+                f_start_autolanddb.result()
+                autolanddb_state = self.client.inspect_container(autolanddb_id)
+                autoland_id = f_autoland_create.result()['Id']
+                containers.append(autoland_id)
+                autoland_state = self.client.inspect_container(autoland_id)
 
             #rbweb_id = f_rbweb_create.result()['Id']
             #containers.append(rbweb_id)
@@ -492,6 +557,14 @@ class Docker(object):
             #f_start_rbweb.result()
             #rbweb_state = self.client.inspect_container(rbweb_id)
 
+            if start_autoland:
+                bind_path = os.path.abspath(os.path.dirname(self._state_path))
+                f_start_autoland = e.submit(self.client.start, autoland_id,
+                        links=[(autolanddb_state['Name'], 'db')],
+                        port_bindings={80: autoland_port})
+                f_start_autoland.result()
+                autoland_state = self.client.inspect_container(autoland_id)
+
             if start_pulse:
                 f_start_pulse.result()
                 pulse_state = self.client.inspect_container(pulse_id)
@@ -511,13 +584,19 @@ class Docker(object):
         print('Bugzilla accessible on %s' % url)
         #print('Review Board accessible at %s' % rb_url)
 
-        return {
+        result = {
             'bugzilla_url': url,
             'db_id': db_id,
             'web_id': web_id,
             'pulse_host': self.docker_hostname,
             'pulse_port': pulse_port,
         }
+
+        if start_autoland:
+            result['autolanddb_id'] = autolanddb_id
+            result['autoland_id'] = autoland_id
+
+        return result
 
     def stop_bmo(self, cluster):
         count = 0

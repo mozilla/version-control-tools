@@ -269,12 +269,14 @@ if __name__ == '__main__':
         if build_docker:
             print('generating Docker images needed for tests')
             t_start = time.time()
-            db_image, bmoweb_image, pulse_image = docker.build_mozreview(verbose=verbose)
+            db_image, bmoweb_image, pulse_image, autolanddb_image, autoland_image = docker.build_mozreview(verbose=verbose)
             t_end = time.time()
             print('got Docker images in %.2fs' % (t_end - t_start))
             os.environ['DOCKER_BMO_DB_IMAGE'] = db_image
             os.environ['DOCKER_BMO_WEB_IMAGE'] = bmoweb_image
             os.environ['DOCKER_PULSE_IMAGE'] = pulse_image
+            os.environ['DOCKER_AUTOLANDDB_IMAGE'] = autolanddb_image
+            os.environ['DOCKER_AUTOLAND_IMAGE'] = autoland_image
             #os.environ['DOCKER_RB_WEB_IMAGE'] = rbweb_image
 
         for c in docker.client.containers(all=True):

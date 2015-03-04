@@ -20,10 +20,14 @@ class MozReviewCommands(object):
         db_image = os.environ.get('DOCKER_BMO_DB_IMAGE', None)
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE', None)
         pulse_image = os.environ.get('DOCKER_PULSE_IMAGE', None)
+        autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE', None)
+        autoland_image = os.environ.get('DOCKER_AUTOLAND_IMAGE', None)
 
         from vcttesting.mozreview import MozReview
         return MozReview(where, db_image=db_image, web_image=web_image,
-                         pulse_image=pulse_image)
+                         pulse_image=pulse_image,
+                         autolanddb_image=autolanddb_image,
+                         autoland_image=autoland_image)
 
     @Command('start', category='mozreview',
         description='Start a MozReview instance')
@@ -37,19 +41,23 @@ class MozReviewCommands(object):
         help='Port Mercurial HTTP server should listen on.')
     @CommandArgument('--pulse-port', type=int,
         help='Port Pulse should listen on.')
+    @CommandArgument('--autoland-port', type=int,
+        help='Port Autoland should listen on.')
     def start(self, where, bugzilla_port=None, reviewboard_port=None,
-            mercurial_port=None, pulse_port=None):
+            mercurial_port=None, pulse_port=None, autoland_port=None):
         mr = self._get_mozreview(where)
         mr.start(bugzilla_port=bugzilla_port,
                 reviewboard_port=reviewboard_port,
                 mercurial_port=mercurial_port,
                 pulse_port=pulse_port,
+                autoland_port=autoland_port,
                 verbose=True)
 
         print('Bugzilla URL: %s' % mr.bugzilla_url)
         print('Review Board URL: %s' % mr.reviewboard_url)
         print('Mercurial URL: %s' % mr.mercurial_url)
         print('Pulse endpoint: %s:%s' % (mr.pulse_host, mr.pulse_port))
+        print('Autoland URL: %s' % mr.autoland_url)
         print('Admin username: %s' % mr.admin_username)
         print('Admin password: %s' % mr.admin_password)
         print('Run the following to use this instance with all future commands:')

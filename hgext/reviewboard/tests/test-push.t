@@ -353,4 +353,4 @@ error (Bug 1128555)
 Cleanup
 
   $ mozreview stop
-  stopped 3 containers
+  stopped 5 containers

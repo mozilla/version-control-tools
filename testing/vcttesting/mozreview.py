@@ -46,7 +46,8 @@ class MozReview(object):
     This class can be used to create and control MozReview instances.
     """
 
-    def __init__(self, path, web_image=None, db_image=None, pulse_image=None):
+    def __init__(self, path, web_image=None, db_image=None, pulse_image=None,
+                 autolanddb_image=None, autoland_image=None):
         if not path:
             raise Exception('You must specify a path to create an instance')
         path = os.path.abspath(path)
@@ -55,6 +56,8 @@ class MozReview(object):
         self.db_image = db_image
         self.web_image = web_image
         self.pulse_image = pulse_image
+        self.autolanddb_image = autolanddb_image
+        self.autoland_image = autoland_image
 
         self._name = os.path.dirname(path)
 
@@ -108,7 +111,8 @@ class MozReview(object):
 
     def start(self, bugzilla_port=None, reviewboard_port=None,
             mercurial_port=None, pulse_port=None, verbose=False,
-            db_image=None, web_image=None, pulse_image=None):
+            db_image=None, web_image=None, pulse_image=None,
+            autolanddb_image=None, autoland_image=None, autoland_port=None):
         """Start a MozReview instance."""
         if not bugzilla_port:
             bugzilla_port = get_available_port()
@@ -118,10 +122,14 @@ class MozReview(object):
             mercurial_port = get_available_port()
         if not pulse_port:
             pulse_port = get_available_port()
+        if not autoland_port:
+            autoland_port = get_available_port()
 
         db_image = db_image or self.db_image
         web_image = web_image or self.web_image
         pulse_image = pulse_image or self.pulse_image
+        autolanddb_image = autolanddb_image or self.autolanddb_image
+        autoland_image = autoland_image or self.autoland_image
 
         rb = MozReviewBoard(self._path)
 
@@ -134,6 +142,9 @@ class MozReview(object):
                                  db_image=db_image,
                                  web_image=web_image,
                                  pulse_image=pulse_image,
+                                 autolanddb_image=autolanddb_image,
+                                 autoland_image=autoland_image,
+                                 autoland_port=autoland_port,
                                  verbose=verbose)
 
             e.submit(rb.create)
@@ -148,6 +159,9 @@ class MozReview(object):
 
         reviewboard_url = 'http://localhost:%s/' % reviewboard_port
         self.reviewboard_url = reviewboard_url
+
+        autoland_url = 'http://localhost:%s/' % autoland_port
+        self.autoland_url = autoland_url
 
         with futures.ThreadPoolExecutor(2) as e:
             f_rb_pid = e.submit(rb.start, reviewboard_port)
@@ -175,6 +189,7 @@ class MozReview(object):
             'admin_password': bugzilla.password,
             'pulse_host': mr_info['pulse_host'],
             'pulse_port': mr_info['pulse_port'],
+            'autoland_url': self.autoland_url,
         }
 
         with open(self._state_path, 'wb') as fh:

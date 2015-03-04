@@ -58,16 +58,23 @@ class DockerCommands(object):
         help='HTTP port the server should be exposed on')
     @CommandArgument('--pulse-port', type=int,
         help='Port Pulse should be exposed on.')
-    def start_bmo(self, cluster, http_port, pulse_port=None):
+    @CommandArgument('--autoland-port', type=int,
+        help='Port Autoland should be exposed on.')
+    def start_bmo(self, cluster, http_port, pulse_port=None,
+                  autoland_port=None):
         db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
         pulse_image = os.environ.get('DOCKER_PULSE_IMAGE')
         rbweb_image = os.environ.get('DOCKER_RB_WEB_IMAGE')
+        autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE')
+        autoland_image = os.environ.get('DOCKER_AUTOLAND_IMAGE')
 
         self.d.start_mozreview(cluster=cluster, hostname=None,
                 http_port=http_port, pulse_port=pulse_port,
                 db_image=db_image, web_image=web_image,
-                pulse_image=pulse_image, rbweb_image=rbweb_image)
+                pulse_image=pulse_image, rbweb_image=rbweb_image,
+                autolanddb_image=autolanddb_image,
+                autoland_image=autoland_image, autoland_port=autoland_port)
 
     @Command('stop-bmo', category='docker',
         description='Stop a bugzilla.mozilla.org instance')

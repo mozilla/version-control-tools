@@ -20,6 +20,11 @@ def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
+@app.errorhandler(500)
+def internal_server_error(error):
+    return make_response(jsonify({'error': str(error)}), 500)
+
+
 def get_dbconn():
     global DSN
 
