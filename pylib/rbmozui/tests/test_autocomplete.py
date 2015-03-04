@@ -16,22 +16,26 @@ class AutocompleteTest(MozReviewWebDriverTest):
     def setUpClass(cls):
         MozReviewWebDriverTest.setUpClass()
 
-        self = cls('run')
-        self.create_users([
-            ('joe@example.com', 'password', 'Joe Smith [:joe]'),
-            ('jane@example.com', 'password', 'Jane Doe [:jane]'),
-            ('bob@example.com', 'password', 'Bob Jones [:bob]'),
-            ('peter@example.com', 'password', 'Peter Nonick'),
-            ('joey@example.com', 'password', 'Joey Somebody [:joey]'),
-        ])
+        try:
+            self = cls('run')
+            self.create_users([
+                ('joe@example.com', 'password', 'Joe Smith [:joe]'),
+                ('jane@example.com', 'password', 'Jane Doe [:jane]'),
+                ('bob@example.com', 'password', 'Bob Jones [:bob]'),
+                ('peter@example.com', 'password', 'Peter Nonick'),
+                ('joey@example.com', 'password', 'Joey Somebody [:joey]'),
+            ])
 
-        bb = self.user_bugzilla('bob@example.com')
-        bb.create_bug('TestProduct', 'TestComponent', 'First Bug')
-        lr = self.create_basic_repo('bob@example.com', 'bob')
+            bb = self.user_bugzilla('bob@example.com')
+            bb.create_bug('TestProduct', 'TestComponent', 'First Bug')
+            lr = self.create_basic_repo('bob@example.com', 'bob')
 
-        lr.write('foo', 'first')
-        lr.run(['commit', '-m', 'Bug 1 - First commit'])
-        lr.run(['push'])
+            lr.write('foo', 'first')
+            lr.run(['commit', '-m', 'Bug 1 - First commit'])
+            lr.run(['push'])
+        except Exception:
+            MozReviewWebDriverTest.tearDownClass()
+            raise
 
     def test_autocomplete_results_appear(self):
         self.reviewboard_login('bob@example.com', 'password')

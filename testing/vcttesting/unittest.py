@@ -37,9 +37,17 @@ class MozReviewTest(unittest.TestCase):
         mr = MozReview(tmpdir)
 
         cls.mr = mr
-        mr.start(db_image=os.environ['DOCKER_BMO_DB_IMAGE'],
-                 web_image=os.environ['DOCKER_BMO_WEB_IMAGE'],
-                 pulse_image=os.environ['DOCKER_PULSE_IMAGE'])
+        # If this fails mid-operation, we could have some services running.
+        # unittest doesn't call tearDownClass if setUpClass fails. So do it
+        # ourselves.
+        try:
+            mr.start(db_image=os.environ['DOCKER_BMO_DB_IMAGE'],
+                     web_image=os.environ['DOCKER_BMO_WEB_IMAGE'],
+                     pulse_image=os.environ['DOCKER_PULSE_IMAGE'])
+        except Exception:
+            mr.stop()
+            shutil.rmtree(tmpdir)
+            raise
 
     @classmethod
     def tearDownClass(cls):
@@ -79,7 +87,13 @@ class MozReviewWebDriverTest(MozReviewTest):
         except Exception:
             raise unittest.SkipTest('Unable to start Firefox')
 
-        MozReviewTest.setUpClass()
+        # Exceptions during setUpClass don't result in calls to tearDownClass,
+        # so do it ourselves.
+        try:
+            MozReviewTest.setUpClass()
+        except Exception:
+            cls.browser.quit()
+            raise
 
         cls.users = {}
 
