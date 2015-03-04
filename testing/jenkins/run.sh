@@ -30,10 +30,6 @@ rm -rf /version-control-tools/artifacts
 mkdir -p /version-control-tools/artifacts/eggs
 DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-reviewboard-eggs /version-control-tools/artifacts/eggs
 
-# Generate Mercurial RPMs.
-mkdir -p /version-control-tools/artifacts/rpms
-DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-mercurial-rpms /version-control-tools/artifacts/rpms
-
 # Ideally this would be part of running tests. Until then, add it here
 # so Jenkins doesn't bloat.
 DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py prune-images
