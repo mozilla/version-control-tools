@@ -28,8 +28,12 @@ class Bugzilla(object):
         proxy = xmlrpclib.ServerProxy(xmlrpc_url, transport)
         proxy.User.login({'login': username, 'password': password})
 
-        client = bugsy.Bugsy(username=username, password=password,
-            bugzilla_url=rest_url)
+        userid, cookie = transport.bugzilla_cookies()
+        assert userid
+        assert cookie
+
+        client = bugsy.Bugsy(username=username, userid=userid, cookie=cookie,
+                             bugzilla_url=rest_url)
 
         self.proxy = proxy
         self.client = client
