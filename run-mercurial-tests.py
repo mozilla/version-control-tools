@@ -309,7 +309,9 @@ if __name__ == '__main__':
         hgversion = match.group(1)
         os.environ['HGVERSION'] = hgversion
 
-    res = runner.run(sys.argv[1:])
+    res = 0
+    if run_hg_tests:
+        res = runner.run(sys.argv[1:])
     os.environ.clear()
     os.environ.update(old_env)
     runtestsmod.defaults = dict(old_defaults)
