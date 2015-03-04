@@ -83,21 +83,17 @@ class Handler(urllib2.BaseHandler):
             patch = bug.get_patch(attachid)
 
         if not patch:
+            if not bug.patches:
+                self.ui.warn("No patches found for this bug\n")
+                return
             patches = [p for p in bug.patches if not p.obsolete]
-            if len(patches) == 0:
-                patches = bug.patches
-                if len(patches) == 0:
-                    self.ui.warn("No patches found for this bug\n")
+            if not patches:
+                if 'y' != self.ui.prompt("Only obsolete patches found. Import anyway? [Default is 'y']", default='y'):
                     return
-
-                if len(patches) > 1:
-                    self.ui.warn("Only obsolete patches found\n")
-                else:
-                    if 'y' != self.ui.prompt("Only found one patch and it is obsolete. Import anyways? [Default is 'y']", default='y'):
-                        return
+                patches = bug.patches
             if len(patches) == 1:
                 patch = patches[0]
-            elif len(patches) > 0:
+            else:
                 for i, p in enumerate(patches):
                     flags = p.joinFlags(False)
                     self.ui.write("%s: %s%s\n" % (i + 1, p.desc, "\n  %s" % flags if flags else ""))
