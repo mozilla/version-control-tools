@@ -207,20 +207,26 @@ if __name__ == '__main__':
 
             continue
 
-    running_tests = []
+    run_hg_tests = []
+    run_unit_tests = []
 
-    # Add all Mercurial tests unless we get an argument that is a known test.
+    # All tests unless we got an argument that is a test.
     if not requested_tests:
-        running_tests.extend(extension_tests)
-        running_tests.extend(hook_tests)
+        run_hg_tests.extend(extension_tests)
+        run_hg_tests.extend(hook_tests)
+        run_unit_tests.extend(unit_tests)
     else:
-        running_tests.extend(requested_tests)
+        for t in requested_tests:
+            if t in unit_tests:
+                run_unit_tests.append(t)
+            else:
+                run_hg_tests.append(t)
 
-    if not options.jobs and len(running_tests) > 1:
+    run_all_tests = run_hg_tests + run_unit_tests
+
+    if not options.jobs and len(run_all_tests) > 1:
         print('WARNING: Not running tests optimally. Specify -j to run tests '
                 'in parallel.', file=sys.stderr)
-
-    sys.argv.extend(running_tests)
 
     # We take a snapshot of Docker containers and images before we start tests
     # so we can look for leaks later.
@@ -249,7 +255,7 @@ if __name__ == '__main__':
             b'MozReviewWebDriverTest',
         )
         build_docker = False
-        for t in running_tests:
+        for t in run_all_tests:
             with open(t, 'rb') as fh:
                 content = fh.read()
                 for keyword in docker_keywords:
@@ -275,6 +281,8 @@ if __name__ == '__main__':
             preserve_containers.add(c['Id'])
         for i in docker.client.images(all=True):
             preserve_images.add(i['Id'])
+
+    sys.argv.extend(run_hg_tests)
 
     old_env = os.environ.copy()
     old_defaults = dict(runtestsmod.defaults)
@@ -306,9 +314,6 @@ if __name__ == '__main__':
     os.environ.update(old_env)
     runtestsmod.defaults = dict(old_defaults)
 
-    run_unit_tests = unit_tests
-    if requested_tests:
-        run_unit_tests = [t for t in requested_tests if t in unit_tests]
     if options.no_unit:
         run_unit_tests = []
 
