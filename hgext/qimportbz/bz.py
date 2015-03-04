@@ -52,7 +52,7 @@ class Flag(object):
         # Ignored node attributes: 'id' and 'type_id'.
 
         self.name = node.attrib['name']
-        if self.name not in ('review', 'superreview', 'ui-review', 'feedback', 'checked-in') and not self.name.startswith('approval'):
+        if self.name not in ('review', 'superreview', 'ui-review', 'feedback', 'checkin') and not self.name.startswith('approval'):
             bug.settings.ui.warn("Unknown flag %s\n" % self.name)
 
         self.setter = removeDomain(node.attrib['setter'])
