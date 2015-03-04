@@ -103,8 +103,8 @@ class Handler(urllib2.BaseHandler):
                     self.ui.write("%s: %s%s\n" % (i + 1, p.desc, "\n  %s" % flags if flags else ""))
                 choicestr = ' '.join([str(n) for n in xrange(1, len(patches)+1)])
                 if not self.autoChoose:
-                    choicestr = self.ui.prompt("Which patches do you want to import? [Default is '1', use '1-%d' for all]" %
-                                               len(patches), default="1")
+                    choicestr = self.ui.prompt("Which patches do you want to import, and in which order? [eg '1-3,5,4'. Default is all]",
+                                               default="1-%d" % len(patches))
                 for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
                     try:
                         m = re.match(r'(\d+)-(\d+)$', choice)
