@@ -204,7 +204,8 @@ class MozReview(object):
         subprocess.check_call([self._hg, 'init', full_path], env=env)
 
         rb = MozReviewBoard(self._path)
-        rbid = rb.add_repository(os.path.dirname(path), url)
+        rbid = rb.add_repository(os.path.dirname(path), url,
+                                 bugzilla_url=self.bugzilla_url)
 
         with open(os.path.join(full_path, '.hg', 'hgrc'), 'w') as fh:
             fh.write('\n'.join([

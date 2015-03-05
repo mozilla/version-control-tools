@@ -82,14 +82,18 @@ class MozReviewBoard(object):
             self._setup_env()
             self._create()
 
-    def add_repository(self, name, url):
+    def add_repository(self, name, url, bugzilla_url):
         """Add a repository to Review Board."""
+        bugzilla_url = bugzilla_url.rstrip('/')
+
         with wrap_env():
             self._setup_env()
 
+            bug_url = '%s/show_bug.cgi?id=%%s' % bugzilla_url
+
             from reviewboard.scmtools.models import Repository, Tool
             tool = Tool.objects.get(name__exact='Mercurial')
-            r = Repository(name=name, path=url, tool=tool)
+            r = Repository(name=name, path=url, tool=tool, bug_tracker=bug_url)
             r.save()
             return r.id
 
