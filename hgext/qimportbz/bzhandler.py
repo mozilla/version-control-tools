@@ -110,22 +110,22 @@ class Handler(urllib2.BaseHandler):
         for i, p in enumerate(patches):
             flags = p.joinFlags(False)
             self.ui.write("%s: %s%s\n" % (i + 1, p.desc, "\n  %s" % flags if flags else ""))
-        choicestr = self.ui.prompt("Which patches do you want to import, and in which order? [eg '1-3,5,4'. Default is all]",
-                                   default="1-%d" % len(patches))
-        selected_patches = []
-        for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
+        while True:
+            choicestr = self.ui.prompt("Which patches do you want to import, and in which order? [eg '1-3,5,4'. Default is all]",
+                                       default="1-%d" % len(patches))
+            selected_patches = []
             try:
-                m = re.match(r'(\d+)-(\d+)$', choice)
-                if m:
-                    selected_patches.extend([patches[p] for p in xrange(int(m.group(1)) - 1, int(m.group(2)))])
-                else:
-                    if int(choice) <= 0:
-                        raise IndexError()
-                    selected_patches.append(patches[int(choice) - 1])
+                for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
+                    m = re.match(r'(\d+)-(\d+)$', choice)
+                    if m:
+                        selected_patches.extend([patches[p] for p in xrange(int(m.group(1)) - 1, int(m.group(2)))])
+                    else:
+                        if int(choice) <= 0:
+                            raise IndexError()
+                        selected_patches.append(patches[int(choice) - 1])
+                return selected_patches
             except (ValueError, IndexError):
                 self.ui.warn("Invalid patch number = '%s'\n" % choice)
-                continue
-        return selected_patches
 
 
 # interface reverse engineered from urllib.addbase
