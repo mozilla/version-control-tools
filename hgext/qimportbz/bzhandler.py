@@ -115,7 +115,7 @@ class Handler(urllib2.BaseHandler):
                                        default="1-%d" % len(patches))
             selected_patches = []
             try:
-                for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
+                for choice in map(str.strip, choicestr.split(',')):
                     m = re.match(r'(\d+)-(\d+)$', choice)
                     if m:
                         selected_patches.extend([patches[p] for p in xrange(int(m.group(1)) - 1, int(m.group(2)))])
