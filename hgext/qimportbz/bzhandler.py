@@ -124,14 +124,18 @@ class Handler(urllib2.BaseHandler):
                         end = int(m.group(2))
                         if start not in valid_patch_choices or end not in valid_patch_choices:
                             raise IndexError()
-                        selected_patches.extend([patches[p] for p in xrange(start - 1, end)])
+                        if start < end:
+                            selected_patches.extend(patches[start - 1:end])
+                        else:
+                            # The range is in reverse order, eg "3-1".
+                            selected_patches.extend(reversed(patches[end - 1:start]))
                     else:
                         if int(choice) not in valid_patch_choices:
                             raise IndexError()
                         selected_patches.append(patches[int(choice) - 1])
                 return selected_patches
             except (ValueError, IndexError):
-                self.ui.warn("Invalid patch number = '%s'\n" % choice)
+                self.ui.warn("Invalid patch selection: '%s'\n" % choice)
 
 
 # interface reverse engineered from urllib.addbase
