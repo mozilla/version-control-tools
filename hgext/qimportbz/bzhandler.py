@@ -105,13 +105,13 @@ class Handler(urllib2.BaseHandler):
             return PatchResponse(patch)
 
     def choose_patches(self, patches):
+        if self.autoChoose:
+            return patches
         for i, p in enumerate(patches):
             flags = p.joinFlags(False)
             self.ui.write("%s: %s%s\n" % (i + 1, p.desc, "\n  %s" % flags if flags else ""))
-        choicestr = ' '.join([str(n) for n in xrange(1, len(patches)+1)])
-        if not self.autoChoose:
-            choicestr = self.ui.prompt("Which patches do you want to import, and in which order? [eg '1-3,5,4'. Default is all]",
-                                       default="1-%d" % len(patches))
+        choicestr = self.ui.prompt("Which patches do you want to import, and in which order? [eg '1-3,5,4'. Default is all]",
+                                   default="1-%d" % len(patches))
         selected_patches = []
         for choice in (s.strip() for t in choicestr.split(',') for s in t.split()):
             try:
