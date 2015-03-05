@@ -95,8 +95,7 @@ class Handler(urllib2.BaseHandler):
                 patch = patches[0]
             else:
                 delayed_imports.extend(self.choose_patches(patches))
-                if not patch and len(delayed_imports) > 0:
-                    patch = delayed_imports.pop()
+                patch = delayed_imports.pop()
 
         # and finally return the response
         if patch:
