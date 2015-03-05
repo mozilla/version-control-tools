@@ -41,9 +41,13 @@ class MozReviewTest(unittest.TestCase):
         # unittest doesn't call tearDownClass if setUpClass fails. So do it
         # ourselves.
         try:
+            # The environment variables should be set by the test runner. If
+            # they aren't set, you are likely invoking the tests wrong.
             mr.start(db_image=os.environ['DOCKER_BMO_DB_IMAGE'],
                      web_image=os.environ['DOCKER_BMO_WEB_IMAGE'],
-                     pulse_image=os.environ['DOCKER_PULSE_IMAGE'])
+                     pulse_image=os.environ['DOCKER_PULSE_IMAGE'],
+                     autolanddb_image=os.environ['DOCKER_AUTOLANDDB_IMAGE'],
+                     autoland_image=os.environ['DOCKER_AUTOLAND_IMAGE'])
         except Exception:
             mr.stop()
             shutil.rmtree(tmpdir)
