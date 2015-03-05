@@ -107,6 +107,7 @@ class Handler(urllib2.BaseHandler):
     def choose_patches(self, patches):
         if self.autoChoose:
             return patches
+        valid_patch_choices = range(1, len(patches) + 1)
         for i, p in enumerate(patches):
             flags = p.joinFlags(False)
             self.ui.write("%s: %s%s\n" % (i + 1, p.desc, "\n  %s" % flags if flags else ""))
@@ -116,11 +117,16 @@ class Handler(urllib2.BaseHandler):
             selected_patches = []
             try:
                 for choice in map(str.strip, choicestr.split(',')):
+                    # The string should either be a range of patches or else a single patch number.
                     m = re.match(r'(\d+)-(\d+)$', choice)
                     if m:
-                        selected_patches.extend([patches[p] for p in xrange(int(m.group(1)) - 1, int(m.group(2)))])
+                        start = int(m.group(1))
+                        end = int(m.group(2))
+                        if start not in valid_patch_choices or end not in valid_patch_choices:
+                            raise IndexError()
+                        selected_patches.extend([patches[p] for p in xrange(start - 1, end)])
                     else:
-                        if int(choice) <= 0:
+                        if int(choice) not in valid_patch_choices:
                             raise IndexError()
                         selected_patches.append(patches[int(choice) - 1])
                 return selected_patches
