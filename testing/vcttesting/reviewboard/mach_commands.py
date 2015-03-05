@@ -185,15 +185,6 @@ class ReviewBoardCommands(object):
         rb = self._get_rb(path)
         rb.create()
 
-    @Command('repo', category='reviewboard',
-        description='Add a repository to Review Board')
-    @CommandArgument('path', help='Path to ReviewBoard install.')
-    @CommandArgument('name', help='Name to give to this repository.')
-    @CommandArgument('url', help='URL this repository should be accessed under.')
-    def repo(self, path, name, url):
-        rb = self._get_rb(path)
-        rb.add_repository(name, url)
-
     @Command('dumpreview', category='reviewboard',
         description='Print a representation of a review request.')
     @CommandArgument('port', help='Port number Review Board is running on')
