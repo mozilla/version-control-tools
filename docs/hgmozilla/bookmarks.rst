@@ -424,9 +424,8 @@ changeset to its associated bug.
 To streamline this process even further, you can properly
 format the changeset summary (i.e. ``Bug <bug-number> - <changeset-summary>``)
 to avoid being prompted and have this information
-parsed instead. You can also `specify your bugzilla credentials in your hgrc
-<http://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/auth.html#finding-bugzilla-credentials>`_
-to avoid being prompted for those.
+parsed instead. You can also :ref:`specify your bugzilla credentials in your hgrc
+<hgmozilla_finding_bugzilla_credentials>` to avoid being prompted for those.
 
 bzexport contains many flags for modifying the bug associated with the
 changeset: see ``hg help bzexport`` for more information.

@@ -45,6 +45,8 @@ extension or hook wishing to obtain authentication credentials.
 New extensions are encouraged to use or add to this module instead
 of rolling their own code.
 
+.. _hgmozilla_finding_bugzilla_credentials:
+
 Finding Bugzilla Credentials
 ============================
 
