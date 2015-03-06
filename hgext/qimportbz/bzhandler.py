@@ -6,6 +6,7 @@ except ImportError:
     import StringIO
 import os
 import re
+from itertools import cycle
 
 # qimportbz modules
 import bz
@@ -106,13 +107,20 @@ class Handler(urllib2.BaseHandler):
     def choose_patches(self, patches):
         if self.autoChoose:
             return patches
+        # The initial sort order is by attachment 'id'.
+        sort_types = cycle(['desc', 'id'])
         valid_patch_choices = range(1, len(patches) + 1)
-        for i, p in enumerate(patches):
-            flags = p.joinFlags(False)
-            self.ui.write("%s: %s%s\n" % (i + 1, p.desc, "\n  %s" % flags if flags else ""))
+        self.list_patches(patches)
         while True:
-            choicestr = self.ui.prompt("Which patches do you want to import, and in which order? [eg '1-3,5,4'. Default is all]",
+            choicestr = self.ui.prompt("\nWhich patches do you want to import, and in which order? [Default is all]\n"
+                                       "(eg '1-3,5', or 's' to toggle the sort order between id & patch description)",
                                        default="1-%d" % len(patches))
+            if choicestr == "s":
+                new_sort_type = sort_types.next()
+                self.ui.write("\nSorted by %s:\n" % new_sort_type)
+                patches.sort(key=lambda p: getattr(p, new_sort_type))
+                self.list_patches(patches)
+                continue
             selected_patches = []
             try:
                 for choice in map(str.strip, choicestr.split(',')):
@@ -135,6 +143,11 @@ class Handler(urllib2.BaseHandler):
                 return selected_patches
             except (ValueError, IndexError):
                 self.ui.warn("Invalid patch selection: '%s'\n" % choice)
+
+    def list_patches(self, patches):
+        for i, p in enumerate(patches):
+            flags = p.joinFlags(False)
+            self.ui.write("%s: %s%s\n" % (i + 1, p.desc, "\n  %s" % flags if flags else ""))
 
 
 # interface reverse engineered from urllib.addbase
