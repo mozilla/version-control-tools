@@ -4,6 +4,11 @@
   Bugzilla accessible on http://*:$HGPORT1/ (glob)
 
   $ export BUGZILLA_URL=http://${DOCKER_HOSTNAME}:$HGPORT1
+  $ $TESTDIR/bugzilla create-user default@example.com password 'Default User' --group editbugs
+  created user 5
+
+  $ export BUGZILLA_USERNAME=default@example.com
+  $ export BUGZILLA_PASSWORD=password
 
   $ cat >> $HGRCPATH << EOF
   > [extensions]
@@ -16,7 +21,7 @@
   > writeuri = http://localhost:$HGPORT/
   > 
   > [bugzilla]
-  > username = admin@example.com
+  > username = default@example.com
   > password = password
   > url = ${BUGZILLA_URL}/rest
   > 
@@ -84,11 +89,11 @@ Pushing to mozilla-inbound will result in bug being updated
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 1
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 2
       tags: []
       text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/b507e8e33160
@@ -126,11 +131,11 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 3
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 5
       tags: []
       text: 'http://localhost:$HGPORT/integration/mozilla-inbound/rev/a224eb610808
@@ -147,11 +152,11 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 4
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 6
       tags: []
       text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/abe0245372d4
@@ -189,11 +194,11 @@ Pushing to Try will post Treeherder comment
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 7
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 8
       tags: []
       text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=311111800824
@@ -232,7 +237,7 @@ Public changesets pushed to Try will be ignored if no bug in draft changesets
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 9
       tags: []
       text: ''
@@ -273,7 +278,7 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 9
       tags: []
       text: ''
@@ -288,11 +293,11 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 10
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 11
       tags: []
       text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=9257b757fa7a
@@ -347,11 +352,11 @@ Pushing commit with bug number to user repo will post comment if enabled
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 12
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 13
       tags: []
       text: http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central/rev/e48ee73711db
