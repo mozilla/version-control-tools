@@ -1,0 +1,17 @@
+attributetype ( 1.3.6.1.4.1.22054.1.1.1.13 NAME 'sshPublicKey'
+        DESC 'MANDATORY: OpenSSH Public key'
+        EQUALITY octetStringMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 )
+
+attributetype ( 1.3.6.1.4.1.22054.1.1.1.14 NAME 'sshPublicKeyAttributeMapping'
+        DESC 'OPTIONAL: OpenSSH Public key Attribute Mapping'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+# printableString SYNTAX yes|no
+objectclass ( 1.3.6.1.4.1.22054.500.1.1.2.0 NAME 'ldapPublicKey' SUP top AUXILIARY
+        DESC 'MANDATORY: OpenSSH LPK objectclass'
+        MUST ( sshPublicKey $ uid )
+        MAY ( sshPublicKeyAttributeMapping )
+        )

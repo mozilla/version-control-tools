@@ -1,0 +1,122 @@
+attributetype ( 1.3.6.1.4.1.13769.1.1.1 NAME 'svnHome'
+	DESC 'The absolute path to the home directory for SVN'
+	EQUALITY caseExactIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.2 NAME 'svnShell'
+	DESC 'The path to the svn login shell'
+	EQUALITY caseExactIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.26 NAME 'svnAccessDate'
+	DESC 'last time this svn account was accessed'
+	EQUALITY generalizedTimeMatch
+    ORDERING generalizedTimeOrderingMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.28 NAME 'svnAccountEnabled'
+	DESC 'Is this svn account enabled?'
+	EQUALITY booleanMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.10 NAME 'fakeHome'
+	DESC 'The absolute path to a fake home directory for svn/hg'
+	EQUALITY caseExactIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+
+objectclass ( 1.3.6.1.4.1.13769.1.2.2
+    NAME 'svnAccount'
+    DESC 'Object holding svn account attributes'
+    SUP top
+    AUXILIARY
+        MUST ( svnHome $ svnShell )
+        MAY  ( fakeHome $ svnAccessDate $ svnAccountEnabled ) )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.3 NAME 'hgHome'
+	DESC 'The absolute path to the home directory for mercurial'
+	EQUALITY caseExactIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.4 NAME 'hgShell'
+	DESC 'The path to the hg login shell'
+	EQUALITY caseExactIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.27 NAME 'hgAccessDate'
+	DESC 'last time this hg account was accessed'
+	EQUALITY generalizedTimeMatch
+    ORDERING generalizedTimeOrderingMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.29 NAME 'hgAccountEnabled'
+	DESC 'Is this hg account enabled?'
+	EQUALITY booleanMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE )
+
+objectclass ( 1.3.6.1.4.1.13769.1.2.3
+    NAME 'hgAccount'
+    DESC 'Object holding mercurial account attributes'
+    SUP top
+    AUXILIARY
+        MUST ( hgHome $ hgShell )
+        MAY  ( fakeHome $ hgAccessDate $ hgAccountEnabled ) )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.33 NAME 'gitHome'
+	DESC 'The absolute path to the home directory for git'
+	EQUALITY caseExactIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.34 NAME 'gitShell'
+	DESC 'The path to the git login shell'
+	EQUALITY caseExactIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.35 NAME 'gitAccessDate'
+	DESC 'last time this git account was accessed'
+	EQUALITY generalizedTimeMatch
+    ORDERING generalizedTimeOrderingMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.36 NAME 'gitAccountEnabled'
+	DESC 'Is this git account enabled?'
+	EQUALITY booleanMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE )
+
+objectclass ( 1.3.6.1.4.1.13769.1.2.12
+    NAME 'gitAccount'
+    DESC 'Object holding git account attributes'
+    SUP top
+    AUXILIARY
+        MUST ( gitHome $ gitShell )
+        MAY  ( fakeHome $ gitAccessDate $ gitAccountEnabled ) )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.22 NAME 'bzrHome'
+	DESC 'The absolute path to the home directory for bazaar'
+	EQUALITY caseExactIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.23 NAME 'bzrShell'
+	DESC 'The path to the bazaar login shell'
+	EQUALITY caseExactIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+
+objectclass ( 1.3.6.1.4.1.13769.1.2.8
+    NAME 'bzrAccount'
+    DESC 'Object holding bazaar account attributes'
+    SUP top
+    AUXILIARY
+        MUST ( bzrHome $ bzrShell )
+        MAY  ( fakeHome ) )
+
+attributetype ( 1.3.6.1.4.1.13769.1.1.21 NAME 'bugzillaEmail'
+	DESC 'Bugzilla ID'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreIA5SubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+objectclass ( 1.3.6.1.4.1.13769.1.2.6
+    NAME 'bugzillaAccount'
+    DESC 'Object holding a users bugzilla account information'
+    SUP top
+    AUXILIARY
+        MAY ( bugzillaEmail ) )

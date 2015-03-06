@@ -1,0 +1,32 @@
+dn: dc=mozilla
+objectClass: dcObject
+objectClass: organization
+o: The Mozilla Family.
+dc: mozilla
+
+dn: o=com,dc=mozilla
+o: com
+objectClass: organization
+
+dn: ou=groups,dc=mozilla
+ou: groups
+objectClass: organizationalUnit
+objectClass: top
+
+dn: cn=scm_level_1,ou=groups,dc=mozilla
+gidNumber: 600
+objectClass: posixGroup
+objectClass: top
+cn: scm_level_1
+
+dn: cn=scm_level_2,ou=groups,dc=mozilla
+gidNumber: 601
+objectClass: posixGroup
+objectClass: top
+cn: scm_level_2
+
+dn: cn=scm_level_3,ou=groups,dc=mozilla
+gidNumber: 602
+objectClass: posixGroup
+objectClass: top
+cn: scm_level_3
