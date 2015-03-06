@@ -16,7 +16,6 @@ import ssl
 import subprocess
 import sys
 import tarfile
-import time
 import urlparse
 import uuid
 import warnings
@@ -24,46 +23,17 @@ from contextlib import contextmanager
 from io import BytesIO
 
 import concurrent.futures as futures
-import kombu
+
+from .util import (
+    wait_for_amqp,
+    wait_for_http,
+)
+
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 DOCKER_DIR = os.path.normpath(os.path.join(HERE, '..', 'docker'))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 
-def wait_for_http(host, port, path='', timeout=60):
-    """Wait for an HTTP response."""
-
-    start = time.time()
-
-    while True:
-        try:
-            requests.get('http://%s:%s/%s' % (host, port, path), timeout=1)
-            return
-        except requests.exceptions.RequestException:
-            pass
-
-        if time.time() - start > timeout:
-            raise Exception('Timeout reached waiting for HTTP')
-
-        time.sleep(0.1)
-
-def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60):
-    c = kombu.Connection(hostname=hostname, port=port, userid=userid,
-            password=password, ssl=ssl)
-
-    start = time.time()
-
-    while True:
-        try:
-            c.connection
-            return
-        except Exception:
-            pass
-
-        if time.time() - start > timeout:
-            raise Exception('Timeout reached waiting for AMQP')
-
-        time.sleep(0.1)
 
 def params_from_env(env):
     """Obtain Docker connect parameters from the environment.

@@ -5,13 +5,9 @@
 import errno
 import json
 import os
-import signal
-import socket
 import subprocess
-import time
 import urlparse
 
-import psutil
 import concurrent.futures as futures
 
 from vcttesting.bugzilla import Bugzilla
@@ -21,23 +17,13 @@ from vcttesting.docker import (
 )
 from vcttesting.reviewboard import MozReviewBoard
 
+from .util import (
+    get_available_port,
+    kill,
+)
+
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
-
-def get_available_port():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('', 0))
-    host, port = s.getsockname()
-    s.close()
-
-    return port
-
-
-def kill(pid):
-    os.kill(pid, signal.SIGINT)
-
-    while psutil.pid_exists(pid):
-        time.sleep(0.1)
 
 
 class MozReview(object):
