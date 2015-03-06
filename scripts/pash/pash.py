@@ -1,19 +1,25 @@
 #! /usr/bin/python -u
 
-import datetime, os, sys, pwd
-import hg_helper, ldap_helper
+from datetime import datetime
 import logging
+import os
+import pwd
+import sys
+
+import hg_helper
+import ldap_helper
 from sh_helper import QuoteForPOSIX
+
 
 if __name__ == '__main__':
     os.environ['PYTHONPATH'] = '/repo/hg/libraries/'
-    if os.getenv ('USER') == 'root':
-        root_shell = pwd.getpwuid (0)[6]
-        ssh_command = os.getenv ('SSH_ORIGINAL_COMMAND')
+    if os.getenv('USER') == 'root':
+        root_shell = pwd.getpwuid(0)[6]
+        ssh_command = os.getenv('SSH_ORIGINAL_COMMAND')
         if ssh_command:
-            os.system (root_shell + " -c " + QuoteForPOSIX (ssh_command))
+            os.system(root_shell + " -c " + QuoteForPOSIX(ssh_command))
         else:
-            os.execl (root_shell, root_shell)
+            os.execl(root_shell, root_shell)
     else:
         server_port = os.getenv('SSH_CONNECTION').split ()[-1]
 
@@ -32,9 +38,12 @@ if __name__ == '__main__':
 
         # Run ldap access date toucher, silently fail and log if we're unable to write
         try:
-           ldap_helper.update_ldap_attribute(os.getenv('USER'), 'hgAccessDate', datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ"), 'ldap://ldap.db.scl3.mozilla.com', 'ldap://ldapsync1.db.scl3.mozilla.com')
+           ldap_helper.update_ldap_attribute(os.getenv('USER'), 'hgAccessDate',
+                                             datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ"),
+                                             'ldap://ldap.db.scl3.mozilla.com',
+                                             'ldap://ldapsync1.db.scl3.mozilla.com')
         except Exception:
-           logging.basicConfig(filename='/var/log/pash.log',level=logging.DEBUG)
+           logging.basicConfig(filename='/var/log/pash.log', level=logging.DEBUG)
            logging.exception('Failed to update LDAP attributes for ' + os.getenv('USER'))
 
         # hg.mozilla.org handler
