@@ -252,11 +252,16 @@ class Docker(object):
         and other bits should be the same as in production with the caveat that
         LDAP integration is probably out of scope.
         """
-        images = self.state['images']
-        hg_master_image = self.ensure_built('hgmaster', add_vct=True, verbose=verbose)
-        # hg_slave_image = self.ensure_built('hgslave', verbose=verbose)
+        with futures.ThreadPoolExecutor(2) as e:
+            f_hg = e.submit(self.ensure_built, 'hgmaster', add_vct=True,
+                            verbose=verbose)
+            f_ldap = e.submit(self.ensure_built, 'ldap', verbose=verbose)
+
+        hg_master_image = f_hg.result()
+        ldap_image = f_ldap.result()
+
         self.state['last-hgmaster-id'] = hg_master_image
-        # self.state['last-hgslave-id'] = hg_slave_image
+        self.state['last-ldap-id'] = ldap_image
 
     def build_mozreview(self, verbose=False):
         """Ensure the images for a MozReview service are built.
