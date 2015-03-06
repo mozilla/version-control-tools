@@ -81,6 +81,7 @@ The parent review should have its description updated.
   commit: bz://1/mynick
   summary: ''
   description: ''
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.discard_on_publish_rids: '[]'
@@ -99,6 +100,7 @@ The parent review should have its description updated.
     - 'Pull down these commits:'
     - ''
     - hg pull -r 3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11 http://localhost:$HGPORT/test-repo
+    target_people: []
     extra:
       p2rb: true
       p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",

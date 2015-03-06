@@ -65,6 +65,7 @@ Squashed review request with ID 1 should be closed as submitted...
   - 'Pull down these commits:'
   - ''
   - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
@@ -85,6 +86,7 @@ Child review request with ID 2 should be closed as submitted...
   commit: null
   summary: Bug 1 - Foo 1
   description: Bug 1 - Foo 1
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commit_id: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
@@ -100,6 +102,7 @@ Child review request with ID 2 should be closed as submitted...
   commit: null
   summary: Bug 1 - Foo 2
   description: Bug 1 - Foo 2
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commit_id: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
@@ -127,6 +130,7 @@ Squashed review request with ID 1 should be re-opened...
   - 'Pull down these commits:'
   - ''
   - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
@@ -147,6 +151,7 @@ Child review request with ID 2 should be re-opened...
   commit: null
   summary: Bug 1 - Foo 1
   description: Bug 1 - Foo 1
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commit_id: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
@@ -164,6 +169,7 @@ Child review request with ID 3 should be re-opened...
   commit: null
   summary: Bug 1 - Foo 2
   description: Bug 1 - Foo 2
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commit_id: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d

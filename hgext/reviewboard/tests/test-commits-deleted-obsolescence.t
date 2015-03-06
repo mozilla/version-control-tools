@@ -126,6 +126,7 @@ on publish.
   - 'Pull down these commits:'
   - ''
   - hg pull -r d86c61a23fc8978f5d0c59a0ce608dc5d4312da5 http://localhost:$HGPORT/test-repo
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", "2"], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
@@ -149,6 +150,7 @@ on publish.
     - 'Pull down these commits:'
     - ''
     - hg pull -r f5691a90b4d0ef04bbf08408d9f214356811db40 http://localhost:$HGPORT/test-repo
+    target_people: []
     extra:
       p2rb: true
       p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", "2"], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
@@ -205,6 +207,7 @@ The parent review should have dropped the reference to /r/6
   - 'Pull down these commits:'
   - ''
   - hg pull -r f5691a90b4d0ef04bbf08408d9f214356811db40 http://localhost:$HGPORT/test-repo
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", "2"], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
@@ -226,6 +229,7 @@ Review 6 should be marked as discarded
   commit: null
   summary: Bug 1 - Foo 5
   description: Bug 1 - Foo 5
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commit_id: d86c61a23fc8978f5d0c59a0ce608dc5d4312da5
@@ -281,6 +285,7 @@ on publish.
   - 'Pull down these commits:'
   - ''
   - hg pull -r f5691a90b4d0ef04bbf08408d9f214356811db40 http://localhost:$HGPORT/test-repo
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", "2"], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
@@ -303,6 +308,7 @@ on publish.
     - 'Pull down these commits:'
     - ''
     - hg pull -r d768dcb976decf31b8ac1431701fefdacd31a390 http://localhost:$HGPORT/test-repo
+    target_people: []
     extra:
       p2rb: true
       p2rb.commits: '[["3299fd5f5fca4800c424e989c65615edb52a421b", "3"], ["4fcbb12a36e4f7a606c8ad86636e232d2133cfe1",
@@ -345,6 +351,7 @@ The dropped commit should now be discarded
   commit: null
   summary: Bug 1 - Foo 1
   description: Bug 1 - Foo 1
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commit_id: a252038ad0749f90e448cb7384a47ca3642c6362
@@ -394,6 +401,7 @@ The parent review should have been updated accordingly.
   - 'Pull down these commits:'
   - ''
   - hg pull -r 7f4c8af7c6c440f9ce8a55fd2ab6203bac3cefbe http://localhost:$HGPORT/test-repo
+  target_people: []
   extra_data:
     p2rb: true
     p2rb.commits: '[["3299fd5f5fca4800c424e989c65615edb52a421b", "3"], ["7f4c8af7c6c440f9ce8a55fd2ab6203bac3cefbe",

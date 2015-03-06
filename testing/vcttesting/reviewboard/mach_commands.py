@@ -38,6 +38,7 @@ def serialize_review_requests(rr):
     d['commit'] = rr.commit_id
     d['summary'] = _serialize_text(rr.summary)
     d['description'] = _serialize_text(rr.description)
+    d['target_people'] = [p.get().username for p in rr.target_people]
     d['extra_data'] = dict(rr.extra_data.iteritems())
 
     review_list = rr.get_reviews(review_request_id=rr.id)
@@ -103,6 +104,7 @@ def serialize_review_requests(rr):
         ddraft['commit'] = draft.commit_id
         ddraft['summary'] = _serialize_text(draft.summary)
         ddraft['description'] = _serialize_text(draft.description)
+        ddraft['target_people'] = [p.get().username for p in draft.target_people]
         ddraft['extra'] = dict(draft.extra_data.iteritems())
 
         ddraft['diffs'] = []
