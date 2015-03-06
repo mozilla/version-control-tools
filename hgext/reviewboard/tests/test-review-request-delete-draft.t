@@ -3,7 +3,7 @@
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv
 
-  $ bugzilla create-user submitter@example.com password 'Dummy Submitter'
+  $ adminbugzilla create-user submitter@example.com password 'Dummy Submitter'
   created user 5
   $ exportbzauth submitter@example.com password
   $ bugzilla create-bug TestProduct TestComponent 'Initial Bug'

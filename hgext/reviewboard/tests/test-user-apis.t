@@ -5,11 +5,11 @@
 
 Create some users
 
-  $ bugzilla create-user joe1@example.com password 'Joe Smith'
+  $ adminbugzilla create-user joe1@example.com password 'Joe Smith'
   created user 5
-  $ bugzilla create-user the-real-j-o-e@example.com password 'Joe Another'
+  $ adminbugzilla create-user the-real-j-o-e@example.com password 'Joe Another'
   created user 6
-  $ bugzilla create-user jane@example.com password 'Jane Jones [:jenny]'
+  $ adminbugzilla create-user jane@example.com password 'Jane Jones [:jenny]'
   created user 7
 
 Unauthenticated users should not be able to search

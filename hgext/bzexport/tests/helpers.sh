@@ -25,3 +25,4 @@ EOF
 }
 
 alias bugzilla=$TESTDIR/bugzilla
+alias adminbugzilla='BUGZILLA_USERNAME=admin@example.com BUGZILLA_PASSWORD=password $TESTDIR/bugzilla'

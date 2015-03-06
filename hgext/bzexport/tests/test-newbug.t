@@ -57,9 +57,9 @@ Assigning a bug works
 
 Specifying a CC list works
 
-  $ bugzilla create-user user1@example.com password1 'Mary Jane [:mary]'
+  $ adminbugzilla create-user user1@example.com password1 'Mary Jane [:mary]'
   created user 5
-  $ bugzilla create-user user2@example.com password2 'Bob Jones [:bob]'
+  $ adminbugzilla create-user user2@example.com password2 'Bob Jones [:bob]'
   created user 6
 
   $ hg newbug --cc ':mary,:bob' --product TestProduct --component TestComponent -t 'CC list' 'dummy'

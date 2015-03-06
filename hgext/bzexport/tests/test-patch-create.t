@@ -129,7 +129,7 @@ Updating the patch works
 
 Uploading a new patch will reassign bug to you
 
-  $ bugzilla create-user original-author@example.com password1 'Original Author' --group editbugs
+  $ adminbugzilla create-user original-author@example.com password1 'Original Author' --group editbugs
   created user 5
 
   $ bugzilla create-bug TestProduct TestComponent bug2

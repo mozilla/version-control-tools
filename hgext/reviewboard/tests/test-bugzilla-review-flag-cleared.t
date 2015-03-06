@@ -8,9 +8,9 @@
   $ hg -q commit -A -m 'root commit'
   $ hg phase --public -r .
 
-  $ bugzilla create-user author@example.com password 'Patch Author'
+  $ adminbugzilla create-user author@example.com password 'Patch Author'
   created user 5
-  $ bugzilla create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --group editbugs
+  $ adminbugzilla create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --group editbugs
   created user 6
 
 Create a review

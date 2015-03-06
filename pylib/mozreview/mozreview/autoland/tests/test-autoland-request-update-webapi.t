@@ -13,7 +13,7 @@ Disabled because test is failing
 
 Create the test users
 
-  $ bugzilla create-user author@example.com password 'Patch Author'
+  $ adminbugzilla create-user author@example.com password 'Patch Author'
   created user 5
 
 Create and publish a review request

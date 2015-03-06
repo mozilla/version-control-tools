@@ -9,7 +9,7 @@
   adding foo
   $ hg phase --public -r .
 
-  $ bugzilla create-user author@example.com password 'Patch Author'
+  $ adminbugzilla create-user author@example.com password 'Patch Author'
   created user 5
 
 Create a review request
