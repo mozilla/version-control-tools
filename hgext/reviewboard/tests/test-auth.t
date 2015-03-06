@@ -2,6 +2,9 @@
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv
+  $ rbmanage make-admin admin@example.com
+  $ createandusedefaultuser
+  created user 5
 
   $ cd client
   $ echo foo0 > foo
@@ -90,9 +93,9 @@ We create 2 users here. 1 looks like a normal person: "First Last"
 The other has Mozilla IRC syntax: "First Last [:nick]"
 
   $ adminbugzilla create-user user1@example.com password1 'Dummy User1'
-  created user 5
-  $ adminbugzilla create-user user2@example.com password2 'Mozila User [:nick]'
   created user 6
+  $ adminbugzilla create-user user2@example.com password2 'Mozila User [:nick]'
+  created user 7
 
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/nonick
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
@@ -124,13 +127,10 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
   (visit review url to publish this review request so others can see it)
   [1]
 
-We need to be an admin to see the details for users with is_private set
-
-  $ rbmanage make-admin $BUGZILLA_USERNAME
-
 Usernames for users without the IRC nick syntax are based on email fragment and BZ user id
 
-  $ rbmanage dump-user $HGPORT1 'user1+5'
+  $ exportbzauth user1@example.com password1
+  $ rbmanage dump-user $HGPORT1 'user1+6'
   2:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user1@example.com
@@ -138,12 +138,12 @@ Usernames for users without the IRC nick syntax are based on email fragment and 
     fullname: Dummy User1
     id: 2
     last_name: ''
-    url: /users/user1%2B5/
-    username: user1+5
+    url: /users/user1%2B6/
+    username: user1+6
 
 Newly created users should have a suitable profile (e.g. is_private is set)
 
-  $ rbmanage dump-account-profile 'user1+5'
+  $ rbmanage dump-account-profile 'user1+6'
   id: 2
   user_id: 2
   first_time_setup_done: 0
@@ -169,6 +169,7 @@ Newly created users should have a suitable profile (e.g. is_private is set)
 
 Usernames for users with IRC nicks are the IRC nickname
 
+  $ exportbzauth user2@example.com password2
   $ rbmanage dump-user $HGPORT1 nick
   3:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
@@ -183,7 +184,7 @@ Usernames for users with IRC nicks are the IRC nickname
 Changing the IRC nickname in Bugzilla will update the RB username
 
   $ adminbugzilla update-user-fullname user2@example.com 'Mozilla User [:newnick]'
-  updated user 6
+  updated user 7
 
   $ hg --config bugzilla.username=user2@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newnick
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
@@ -215,7 +216,7 @@ Changing the IRC nickname in Bugzilla will update the RB username
 Changing the email address in Bugzilla will update the RB email
 
   $ adminbugzilla update-user-email user2@example.com user2-new@example.com
-  updated user 6
+  updated user 7
   $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newemail
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
@@ -246,7 +247,7 @@ Changing the email address in Bugzilla will update the RB email
 Disabling a user in Bugzilla will prevent them from using Review Board
 
   $ adminbugzilla update-user-login-denied-text user1@example.com disabled
-  updated user 5
+  updated user 6
 
 (This error message isn't terrific. It can be improved later.)
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/disableduser
@@ -260,7 +261,7 @@ Disabling a user in Bugzilla will prevent them from using Review Board
 Re-enabling a disabled user will allow them to use Review Board
 
   $ adminbugzilla update-user-login-denied-text user1@example.com ''
-  updated user 5
+  updated user 6
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/undisableduser
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
@@ -280,7 +281,7 @@ If a new Review Board user claims the same IRC nick as an existing user,
 we fall back to non-IRC RB usernames.
 
   $ adminbugzilla create-user user3@example.com password3 'Dummy User3 [:newnick]'
-  created user 7
+  created user 8
 
   $ hg --config bugzilla.username=user3@example.com --config bugzilla.password=password3 push --reviewid bz://1/conflictingircnick
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
@@ -313,7 +314,7 @@ adding a new user or splitting this test file.)
     username: newnick
 
   $ exportbzauth user3@example.com password3
-  $ rbmanage dump-user $HGPORT1 user3+7
+  $ rbmanage dump-user $HGPORT1 user3+8
   4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user3@example.com
@@ -321,14 +322,14 @@ adding a new user or splitting this test file.)
     fullname: Dummy User3 [:newnick]
     id: 4
     last_name: ''
-    url: /users/user3%2B7/
-    username: user3+7
+    url: /users/user3%2B8/
+    username: user3+8
 
 If an existing RB user changes their IRC nick to one taken by another RB
 user, they will be assigned the email+id username.
 
   $ adminbugzilla update-user-fullname user3@example.com 'Mozilla User3 [:mynick]'
-  updated user 7
+  updated user 8
 
 (We need to push to get the RB username updated)
 
@@ -364,7 +365,7 @@ user, they will be assigned the email+id username.
     username: newnick
 
   $ adminbugzilla update-user-fullname user2-new@example.com 'Mozilla User [:mynick]'
-  updated user 6
+  updated user 7
 
   $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2sharednick
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
@@ -394,7 +395,7 @@ user, they will be assigned the email+id username.
     username: mynick
 
   $ exportbzauth user2-new@example.com password2
-  $ rbmanage dump-user $HGPORT1 user2-new+6
+  $ rbmanage dump-user $HGPORT1 user2-new+7
   3:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
@@ -402,8 +403,8 @@ user, they will be assigned the email+id username.
     fullname: Mozilla User [:mynick]
     id: 3
     last_name: ''
-    url: /users/user2-new%2B6/
-    username: user2-new+6
+    url: /users/user2-new%2B7/
+    username: user2-new+7
 
 Cleanup
 

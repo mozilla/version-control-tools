@@ -62,3 +62,8 @@ exportbzauth() {
   export BUGZILLA_USERNAME=$1
   export BUGZILLA_PASSWORD=$2
 }
+
+createandusedefaultuser() {
+  adminbugzilla create-user default@example.com password 'Default User' --group editbugs
+  exportbzauth default@example.com password
+}
