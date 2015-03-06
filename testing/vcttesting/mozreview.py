@@ -170,6 +170,8 @@ class MozReview(object):
         reviewboard_pid = f_rb_pid.result()
         self.reviewboard_pid = reviewboard_pid
 
+        rb.make_admin(bugzilla.username)
+
         self.admin_username = bugzilla.username
         self.admin_password = bugzilla.password
         self.pulse_host = mr_info['pulse_host']

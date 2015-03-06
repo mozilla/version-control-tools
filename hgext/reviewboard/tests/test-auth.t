@@ -2,7 +2,6 @@
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv
-  $ rbmanage make-admin admin@example.com
 
   $ cd client
   $ echo foo0 > foo
