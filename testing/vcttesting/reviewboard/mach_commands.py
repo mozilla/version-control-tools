@@ -181,13 +181,6 @@ class ReviewBoardCommands(object):
                             'Review Board. Try running `mozreview start` and '
                             'setting MOZREVIEW_HOME.')
 
-    @Command('create', category='reviewboard',
-        description='Create a Review Board server install.')
-    @CommandArgument('path', help='Where to create RB install.')
-    def create(self, path):
-        rb = self._get_rb(path)
-        rb.create()
-
     @Command('dumpreview', category='reviewboard',
         description='Print a representation of a review request.')
     @CommandArgument('port', help='Port number Review Board is running on')
