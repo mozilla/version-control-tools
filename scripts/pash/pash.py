@@ -13,17 +13,20 @@ from sh_helper import QuoteForPOSIX
 
 if __name__ == '__main__':
     os.environ['PYTHONPATH'] = '/repo/hg/libraries/'
-    if os.getenv('USER') == 'root':
+
+    user = os.environ.get('USER')
+
+    if user == 'root':
         root_shell = pwd.getpwuid(0)[6]
-        ssh_command = os.getenv('SSH_ORIGINAL_COMMAND')
+        ssh_command = os.environ.get('SSH_ORIGINAL_COMMAND')
         if ssh_command:
             os.system(root_shell + " -c " + QuoteForPOSIX(ssh_command))
         else:
             os.execl(root_shell, root_shell)
     else:
-        server_port = os.getenv('SSH_CONNECTION').split ()[-1]
+        server_port = os.environ.get('SSH_CONNECTION').split ()[-1]
 
-        user_status = hg_helper.is_valid_user(os.getenv('USER'))
+        user_status = hg_helper.is_valid_user(user)
         if user_status == 2:
             sys.stderr.write('Your mercurial account has been disabled due \
                               to inactivity.\nPlease file a bug at \
@@ -38,13 +41,13 @@ if __name__ == '__main__':
 
         # Run ldap access date toucher, silently fail and log if we're unable to write
         try:
-           ldap_helper.update_ldap_attribute(os.getenv('USER'), 'hgAccessDate',
+           ldap_helper.update_ldap_attribute(user, 'hgAccessDate',
                                              datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ"),
                                              'ldap://ldap.db.scl3.mozilla.com',
                                              'ldap://ldapsync1.db.scl3.mozilla.com')
         except Exception:
            logging.basicConfig(filename='/var/log/pash.log', level=logging.DEBUG)
-           logging.exception('Failed to update LDAP attributes for ' + os.getenv('USER'))
+           logging.exception('Failed to update LDAP attributes for %s' % user)
 
         # hg.mozilla.org handler
         if server_port == "22":
