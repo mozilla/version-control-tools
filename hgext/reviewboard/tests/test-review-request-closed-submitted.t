@@ -1,8 +1,7 @@
 #require docker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv
-  $ bugzilla create-bug-range TestProduct TestComponent 123
-  created bugs 1 to 123
+  $ bugzilla create-bug TestProduct TestComponent summary
 
   $ cd client
   $ echo 'foo0' > foo
@@ -18,9 +17,9 @@
   $ hg phase --public -r .
 
   $ echo 'foo1' > foo
-  $ hg commit -m 'Bug 123 - Foo 1'
+  $ hg commit -m 'Bug 1 - Foo 1'
   $ echo 'foo2' > foo
-  $ hg commit -m 'Bug 123 - Foo 2'
+  $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
@@ -30,15 +29,15 @@
   remote: added 2 changesets with 2 changes to 1 files
   submitting 2 changesets for review
   
-  changeset:  1:bb41178fa30c
-  summary:    Bug 123 - Foo 1
+  changeset:  1:24417bc94b2c
+  summary:    Bug 1 - Foo 1
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  changeset:  2:9d24f6cb513e
-  summary:    Bug 123 - Foo 2
+  changeset:  2:61e2e5c813d2
+  summary:    Bug 1 - Foo 2
   review:     http://localhost:$HGPORT1/r/3 (pending)
   
-  review id:  bz://123/mynick
+  review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
   (visit review url to publish this review request so others can see it)
 
@@ -56,22 +55,22 @@ Squashed review request with ID 1 should be closed as submitted...
   status: submitted
   public: true
   bugs:
-  - '123'
-  commit: bz://123/mynick
-  summary: bz://123/mynick
+  - '1'
+  commit: bz://1/mynick
+  summary: bz://1/mynick
   description:
-  - /r/2 - Bug 123 - Foo 1
-  - /r/3 - Bug 123 - Foo 2
+  - /r/2 - Bug 1 - Foo 1
+  - /r/3 - Bug 1 - Foo 2
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/test-repo
+  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo
   extra_data:
     p2rb: true
-    p2rb.commits: '[["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9",
+    p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
       "3"]]'
     p2rb.discard_on_publish_rids: '[]'
-    p2rb.identifier: bz://123/mynick
+    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
 
@@ -82,14 +81,14 @@ Child review request with ID 2 should be closed as submitted...
   status: submitted
   public: true
   bugs:
-  - '123'
+  - '1'
   commit: null
-  summary: Bug 123 - Foo 1
-  description: Bug 123 - Foo 1
+  summary: Bug 1 - Foo 1
+  description: Bug 1 - Foo 1
   extra_data:
     p2rb: true
-    p2rb.commit_id: bb41178fa30c323500834d0368774ef4ed412d7b
-    p2rb.identifier: bz://123/mynick
+    p2rb.commit_id: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
+    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 
   $ rbmanage dumpreview $HGPORT1 3
@@ -97,14 +96,14 @@ Child review request with ID 2 should be closed as submitted...
   status: submitted
   public: true
   bugs:
-  - '123'
+  - '1'
   commit: null
-  summary: Bug 123 - Foo 2
-  description: Bug 123 - Foo 2
+  summary: Bug 1 - Foo 2
+  description: Bug 1 - Foo 2
   extra_data:
     p2rb: true
-    p2rb.commit_id: 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9
-    p2rb.identifier: bz://123/mynick
+    p2rb.commit_id: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
+    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 
 Re-opening the parent review request should re-open all of the children.
@@ -118,22 +117,22 @@ Squashed review request with ID 1 should be re-opened...
   status: pending
   public: true
   bugs:
-  - '123'
-  commit: bz://123/mynick
-  summary: bz://123/mynick
+  - '1'
+  commit: bz://1/mynick
+  summary: bz://1/mynick
   description:
-  - /r/2 - Bug 123 - Foo 1
-  - /r/3 - Bug 123 - Foo 2
+  - /r/2 - Bug 1 - Foo 1
+  - /r/3 - Bug 1 - Foo 2
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9 http://localhost:$HGPORT/test-repo
+  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo
   extra_data:
     p2rb: true
-    p2rb.commits: '[["bb41178fa30c323500834d0368774ef4ed412d7b", "2"], ["9d24f6cb513e7a5b4e19b684e863304b47dfe4c9",
+    p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
       "3"]]'
     p2rb.discard_on_publish_rids: '[]'
-    p2rb.identifier: bz://123/mynick
+    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
 
@@ -144,14 +143,14 @@ Child review request with ID 2 should be re-opened...
   status: pending
   public: true
   bugs:
-  - '123'
+  - '1'
   commit: null
-  summary: Bug 123 - Foo 1
-  description: Bug 123 - Foo 1
+  summary: Bug 1 - Foo 1
+  description: Bug 1 - Foo 1
   extra_data:
     p2rb: true
-    p2rb.commit_id: bb41178fa30c323500834d0368774ef4ed412d7b
-    p2rb.identifier: bz://123/mynick
+    p2rb.commit_id: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
+    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 
 Child review request with ID 3 should be re-opened...
@@ -161,14 +160,14 @@ Child review request with ID 3 should be re-opened...
   status: pending
   public: true
   bugs:
-  - '123'
+  - '1'
   commit: null
-  summary: Bug 123 - Foo 2
-  description: Bug 123 - Foo 2
+  summary: Bug 1 - Foo 2
+  description: Bug 1 - Foo 2
   extra_data:
     p2rb: true
-    p2rb.commit_id: 9d24f6cb513e7a5b4e19b684e863304b47dfe4c9
-    p2rb.identifier: bz://123/mynick
+    p2rb.commit_id: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
+    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 
 Cleanup

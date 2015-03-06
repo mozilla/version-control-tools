@@ -10,8 +10,7 @@
   $ echo "rebase=" >> client/.hg/hgrc
   $ echo "obs=$TESTTMP/obs.py" >> client/.hg/hgrc
 
-  $ bugzilla create-bug-range TestProduct TestComponent 123
-  created bugs 1 to 123
+  $ bugzilla create-bug TestProduct TestComponent 1
 
 Set up the repo
 
@@ -22,7 +21,7 @@ Set up the repo
   $ hg phase --public -r .
   $ echo 'foo2' > foo
   $ hg commit -m 'foo2'
-  $ hg push --reviewid 123 ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ hg push --reviewid 1 ssh://user@dummy/$TESTTMP/repos/test-repo
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
@@ -35,7 +34,7 @@ Set up the repo
   summary:    foo2
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://123/mynick
+  review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
   (visit review url to publish this review request so others can see it)
 
@@ -52,7 +51,7 @@ Now create a new head and push a rebase
   $ hg -q rebase -s 1 -d .
   $ hg up tip
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  $ hg push --reviewid 123 ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ hg push --reviewid 1 ssh://user@dummy/$TESTTMP/repos/test-repo
   pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
@@ -69,7 +68,7 @@ Now create a new head and push a rebase
   summary:    foo2
   review:     http://localhost:$HGPORT1/r/2 (pending)
   
-  review id:  bz://123/mynick
+  review id:  bz://1/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
   (visit review url to publish this review request so others can see it)
 
