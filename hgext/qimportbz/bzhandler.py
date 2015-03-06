@@ -145,9 +145,12 @@ class Handler(urllib2.BaseHandler):
                 self.ui.warn("Invalid patch selection: '%s'\n" % choice)
 
     def list_patches(self, patches):
+        self.ui.write("\n")
         for i, p in enumerate(patches):
+            self.ui.write("%s: %s\n" % (i + 1, p.desc), label="cyan")
             flags = p.joinFlags(False)
-            self.ui.write("%s: %s%s\n" % (i + 1, p.desc, "\n  %s" % flags if flags else ""))
+            if flags:
+                self.ui.write("   %s\n" % flags)
 
 
 # interface reverse engineered from urllib.addbase
