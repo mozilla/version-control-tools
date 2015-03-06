@@ -57,14 +57,7 @@ def process_non_root_login(user):
        logging.basicConfig(filename='/var/log/pash.log', level=logging.DEBUG)
        logging.exception('Failed to update LDAP attributes for %s' % user)
 
-    # hg.mozilla.org handler
-    if server_port == "22":
-        hg_helper.serve('hg.mozilla.org')
-
-    # hg.ecmascript.org handler
-    elif server_port == "222":
-        hg_helper.serve('hg.ecmascript.org')
-
+    hg_helper.serve('hg.mozilla.org')
     sys.exit(0)
 
 
