@@ -664,6 +664,8 @@ class Docker(object):
             self.state['last-db-bootstrap-id'],
             self.state['last-web-bootstrap-id'],
             self.state['last-rbweb-bootstrap-id'],
+            self.state['last-autolanddb-bootstrap-id'],
+            self.state['last-autoland-bootstrap-id'],
         ])
 
         relevant_repos = set([
@@ -674,6 +676,10 @@ class Docker(object):
             'pulse',
             'rbweb',
             'rbweb-bootstrapped',
+            'autolanddb',
+            'autolanddb-bootstrapped',
+            'autoland',
+            'autoland-bootstrapped',
         ])
 
         for i in self.client.images():
