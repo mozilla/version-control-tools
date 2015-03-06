@@ -21,7 +21,7 @@ Creating a bug with basic options works
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 1
       tags: []
       text: Description
@@ -43,7 +43,7 @@ Assigning a bug works
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 2
       tags: []
       text: dummy
@@ -58,9 +58,9 @@ Assigning a bug works
 Specifying a CC list works
 
   $ adminbugzilla create-user user1@example.com password1 'Mary Jane [:mary]'
-  created user 5
-  $ adminbugzilla create-user user2@example.com password2 'Bob Jones [:bob]'
   created user 6
+  $ adminbugzilla create-user user2@example.com password2 'Bob Jones [:bob]'
+  created user 7
 
   $ hg newbug --cc ':mary,:bob' --product TestProduct --component TestComponent -t 'CC list' 'dummy'
   Using default version 'unspecified' of product TestProduct
@@ -73,7 +73,7 @@ Specifying a CC list works
     - user1@example.com
     - user2@example.com
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 3
       tags: []
       text: dummy
@@ -97,7 +97,7 @@ Specifying blockers and dependencies works
     - 1
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 4
       tags: []
       text: dummy

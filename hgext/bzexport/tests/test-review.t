@@ -1,17 +1,18 @@
 #require docker
   $ . $TESTDIR/hgext/bzexport/tests/helpers.sh
-  $ configurebzexport $HGPORT $HGRCPATH
 
   $ $TESTDIR/testing/docker-control.py start-bmo bzexport-test-review $HGPORT
   waiting for Bugzilla to start
   Bugzilla accessible on http://*:$HGPORT/ (glob)
 
+  $ configurebzexport $HGPORT $HGRCPATH
+
 Create some Bugzilla users
 
   $ adminbugzilla create-user user1@example.com password1 'Mary Jane [:mary]'
-  created user 5
-  $ adminbugzilla create-user user2@example.com password2 'Bob Jones [:bob]'
   created user 6
+  $ adminbugzilla create-user user2@example.com password2 'Bob Jones [:bob]'
+  created user 7
 
 Set up repo and Bugzilla state
 
@@ -20,7 +21,7 @@ Set up repo and Bugzilla state
   $ touch foo
   $ hg -q commit -A -m 'initial'
 
-  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug1
+  $ bugzilla create-bug TestProduct TestComponent bug1
 
 Specifying a reviewer by IRC nick works
 
@@ -39,7 +40,7 @@ Specifying a reviewer by IRC nick works
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/plain
       data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
         \ 1970 +0000\n# Node ID 141273a2a25953ea9b916eb5d232728c6ef01383\n# Parent \
@@ -52,7 +53,7 @@ Specifying a reviewer by IRC nick works
       - id: 1
         name: review
         requestee: user1@example.com
-        setter: admin@example.com
+        setter: default@example.com
         status: '?'
       id: 1
       is_obsolete: false
@@ -62,11 +63,11 @@ Specifying a reviewer by IRC nick works
     cc:
     - user1@example.com
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 1
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 2
       tags: []
       text: 'Created attachment 1
@@ -77,7 +78,7 @@ Specifying a reviewer by IRC nick works
     platform: All
     product: TestProduct
     resolution: ''
-    status: NEW
+    status: ASSIGNED
     summary: bug1
 
 Parsing reviewer out of commit message works
@@ -91,7 +92,7 @@ Parsing reviewer out of commit message works
   $ bugzilla dump-bug 2
   Bug 2:
     attachments:
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/plain
       data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
         \ 1970 +0000\n# Node ID 69fb1288e32b83586e070b678ead805e6a48fba7\n# Parent \
@@ -104,7 +105,7 @@ Parsing reviewer out of commit message works
       - id: 2
         name: review
         requestee: user2@example.com
-        setter: admin@example.com
+        setter: default@example.com
         status: '?'
       id: 2
       is_obsolete: false
@@ -114,11 +115,11 @@ Parsing reviewer out of commit message works
     cc:
     - user2@example.com
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 3
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 4
       tags: []
       text: 'Created attachment 2
@@ -129,7 +130,7 @@ Parsing reviewer out of commit message works
     platform: All
     product: TestProduct
     resolution: ''
-    status: NEW
+    status: ASSIGNED
     summary: bug2
 
 Changing the reviewer works
@@ -147,7 +148,7 @@ Changing the reviewer works
   $ bugzilla dump-bug 3
   Bug 3:
     attachments:
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/plain
       data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
         \ 1970 +0000\n# Node ID 863dcf97c40f401dedc9eed21e4579de9c8a4699\n# Parent \
@@ -161,7 +162,7 @@ Changing the reviewer works
       is_obsolete: true
       is_patch: true
       summary: Switching reviewer
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/plain
       data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
         \ 1970 +0000\n# Node ID 863dcf97c40f401dedc9eed21e4579de9c8a4699\n# Parent \
@@ -174,7 +175,7 @@ Changing the reviewer works
       - id: 4
         name: review
         requestee: user2@example.com
-        setter: admin@example.com
+        setter: default@example.com
         status: '?'
       id: 4
       is_obsolete: false
@@ -185,17 +186,17 @@ Changing the reviewer works
     - user1@example.com
     - user2@example.com
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 5
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 6
       tags: []
       text: 'Created attachment 3
   
         Switching reviewer'
-    - author: admin@example.com
+    - author: default@example.com
       id: 7
       tags: []
       text: 'Created attachment 4
@@ -206,7 +207,7 @@ Changing the reviewer works
     platform: All
     product: TestProduct
     resolution: ''
-    status: NEW
+    status: ASSIGNED
     summary: bug3
 
 Specifying both reviewer and feedback works
@@ -221,7 +222,7 @@ Specifying both reviewer and feedback works
   $ bugzilla dump-bug 4
   Bug 4:
     attachments:
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/plain
       data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
         \ 1970 +0000\n# Node ID a767676592014b53eb4cdb31cc527db916c265fc\n# Parent \
@@ -234,12 +235,12 @@ Specifying both reviewer and feedback works
       - id: 5
         name: feedback
         requestee: user2@example.com
-        setter: admin@example.com
+        setter: default@example.com
         status: '?'
       - id: 6
         name: review
         requestee: user1@example.com
-        setter: admin@example.com
+        setter: default@example.com
         status: '?'
       id: 5
       is_obsolete: false
@@ -250,11 +251,11 @@ Specifying both reviewer and feedback works
     - user1@example.com
     - user2@example.com
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 8
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 9
       tags: []
       text: 'Created attachment 5
@@ -265,7 +266,7 @@ Specifying both reviewer and feedback works
     platform: All
     product: TestProduct
     resolution: ''
-    status: NEW
+    status: ASSIGNED
     summary: bug4
 
   $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-review

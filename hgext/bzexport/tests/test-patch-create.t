@@ -24,7 +24,7 @@ Uploading a simple patch to a bug works
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/plain
       data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
         \ 1970 +0000\n# Node ID ac5453011ddd13f327fa0ffb7d7e91fc51d86f39\n# Parent \
@@ -41,11 +41,11 @@ Uploading a simple patch to a bug works
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 1
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 2
       tags: []
       text: 'Created attachment 1
@@ -56,7 +56,7 @@ Uploading a simple patch to a bug works
     platform: All
     product: TestProduct
     resolution: ''
-    status: NEW
+    status: ASSIGNED
     summary: bug1
 
 Updating the patch works
@@ -69,7 +69,7 @@ Updating the patch works
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/plain
       data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
         \ 1970 +0000\n# Node ID ac5453011ddd13f327fa0ffb7d7e91fc51d86f39\n# Parent \
@@ -83,7 +83,7 @@ Updating the patch works
       is_obsolete: true
       is_patch: true
       summary: First patch
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/plain
       data: "# HG changeset patch\n# User test\n# Date 0 0\n#      Thu Jan 01 00:00:00\
         \ 1970 +0000\n# Node ID 126f93d96a111d3a795db22137198ddb95995d23\n# Parent \
@@ -100,17 +100,17 @@ Updating the patch works
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 1
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 2
       tags: []
       text: 'Created attachment 1
   
         First patch'
-    - author: admin@example.com
+    - author: default@example.com
       id: 3
       tags: []
       text: 'Created attachment 2
@@ -121,7 +121,7 @@ Updating the patch works
     platform: All
     product: TestProduct
     resolution: ''
-    status: NEW
+    status: ASSIGNED
     summary: bug1
 
   $ hg -q qpop -a
@@ -130,7 +130,7 @@ Updating the patch works
 Uploading a new patch will reassign bug to you
 
   $ adminbugzilla create-user original-author@example.com password1 'Original Author' --group editbugs
-  created user 5
+  created user 6
 
   $ bugzilla create-bug TestProduct TestComponent bug2
   $ echo initial-author > foo
@@ -158,7 +158,7 @@ Uploading a new patch will reassign bug to you
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 4
       tags: []
       text: ''
