@@ -11,7 +11,7 @@
   $ hg push --noreview > /dev/null
 
   $ adminbugzilla create-user reviewer@example.com password1 'Mozilla Reviewer [:reviewer]' --group editbugs
-  created user 5
+  created user 6
 
   $ bugzilla create-bug TestProduct TestComponent bug1
 
@@ -48,7 +48,7 @@
   parent:
     summary: bz://1/mynick
     id: 1
-    submitter: admin+1
+    submitter: default+5
     issue_open_count: 0
     status: pending
     reviewers: []
@@ -56,7 +56,7 @@
   - summary: Bug 1 - Foo 1
     id: 2
     commit: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
-    submitter: admin+1
+    submitter: default+5
     issue_open_count: 0
     status: pending
     reviewers:
@@ -64,7 +64,7 @@
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
-    submitter: admin+1
+    submitter: default+5
     issue_open_count: 0
     status: pending
     reviewers: []
@@ -89,7 +89,7 @@ Opening an issue should be reflected in the summary.
   parent:
     summary: bz://1/mynick
     id: 1
-    submitter: admin+1
+    submitter: default+5
     issue_open_count: 0
     status: pending
     reviewers: []
@@ -97,7 +97,7 @@ Opening an issue should be reflected in the summary.
   - summary: Bug 1 - Foo 1
     id: 2
     commit: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
-    submitter: admin+1
+    submitter: default+5
     issue_open_count: 1
     status: pending
     reviewers:
@@ -105,7 +105,7 @@ Opening an issue should be reflected in the summary.
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
-    submitter: admin+1
+    submitter: default+5
     issue_open_count: 0
     status: pending
     reviewers: []
@@ -119,7 +119,7 @@ Resolving an issue should decrement the issue count.
   parent:
     summary: bz://1/mynick
     id: 1
-    submitter: admin+1
+    submitter: default+5
     issue_open_count: 0
     status: pending
     reviewers: []
@@ -127,7 +127,7 @@ Resolving an issue should decrement the issue count.
   - summary: Bug 1 - Foo 1
     id: 2
     commit: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
-    submitter: admin+1
+    submitter: default+5
     issue_open_count: 0
     status: pending
     reviewers:
@@ -135,7 +135,7 @@ Resolving an issue should decrement the issue count.
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
-    submitter: admin+1
+    submitter: default+5
     issue_open_count: 0
     status: pending
     reviewers: []

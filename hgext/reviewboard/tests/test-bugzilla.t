@@ -38,7 +38,7 @@ Pushing a review should not touch Bugzilla
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 1
       tags: []
       text: ''
@@ -56,7 +56,7 @@ Publishing the review will add an attachment to the bug
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
@@ -69,11 +69,11 @@ Publishing the review will add an attachment to the bug
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 1
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 3
       tags: []
       text: 'Created attachment 1

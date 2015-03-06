@@ -108,7 +108,7 @@ Review request 6 should be added to the list of discard on publish rids.
   bugs:
   - '1'
   commit: bz://1/mynick
-  submitter: admin+1
+  submitter: default+5
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Foo 1
@@ -191,7 +191,7 @@ Review 6 should be marked as discarded
   bugs:
   - '1'
   commit: null
-  submitter: admin+1
+  submitter: default+5
   summary: Bug 1 - Foo 5
   description: Bug 1 - Foo 5
   target_people: []
@@ -241,7 +241,7 @@ The first commit was rewritten (we assume all subsequent were as well).
   bugs:
   - '1'
   commit: null
-  submitter: admin+1
+  submitter: default+5
   summary: Bug 1 - Foo 1
   description: Bug 1 - Foo 1
   target_people: []
@@ -284,7 +284,7 @@ request is published.
   bugs:
   - '1'
   commit: bz://1/mynick
-  submitter: admin+1
+  submitter: default+5
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Foo 1

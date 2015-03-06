@@ -9,9 +9,9 @@
   $ hg phase --public -r .
 
   $ adminbugzilla create-user author@example.com password 'Patch Author'
-  created user 5
-  $ adminbugzilla create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --group editbugs
   created user 6
+  $ adminbugzilla create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --group editbugs
+  created user 7
 
 Create a review
 

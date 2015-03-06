@@ -44,6 +44,8 @@ commonenv() {
   export MOZREVIEW_HOME=`pwd`
   export HGSSHHGRCPATH=${MOZREVIEW_HOME}/hgrc
 
+  createandusedefaultuser > /dev/null
+
   mozreview create-repo test-repo > /dev/null
 
   export BUGZILLA_URL=http://${DOCKER_HOSTNAME}:$HGPORT2

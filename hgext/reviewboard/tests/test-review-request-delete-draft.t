@@ -4,7 +4,7 @@
   $ commonenv
 
   $ adminbugzilla create-user submitter@example.com password 'Dummy Submitter'
-  created user 5
+  created user 6
   $ exportbzauth submitter@example.com password
   $ bugzilla create-bug TestProduct TestComponent 'Initial Bug'
 
@@ -64,7 +64,7 @@ We should have a disagreement between published and draft
   bugs:
   - '1'
   commit: bz://1/mynick
-  submitter: submitter+5
+  submitter: submitter+6
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Initial commit
@@ -118,7 +118,7 @@ We should have a disagreement between published and draft
   bugs:
   - '1'
   commit: null
-  submitter: submitter+5
+  submitter: submitter+6
   summary: Bug 1 - Initial commit
   description: Bug 1 - Initial commit
   target_people: []
@@ -163,7 +163,7 @@ Discarding the parent review request draft should discard draft on children
   bugs:
   - '1'
   commit: bz://1/mynick
-  submitter: submitter+5
+  submitter: submitter+6
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Initial commit
@@ -187,7 +187,7 @@ Discarding the parent review request draft should discard draft on children
   bugs:
   - '1'
   commit: null
-  submitter: submitter+5
+  submitter: submitter+6
   summary: Bug 1 - Initial commit
   description: Bug 1 - Initial commit
   target_people: []

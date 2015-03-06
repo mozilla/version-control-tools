@@ -79,7 +79,7 @@ The parent review should have its description updated.
   public: false
   bugs: []
   commit: bz://1/mynick
-  submitter: admin+1
+  submitter: default+5
   summary: ''
   description: ''
   target_people: []

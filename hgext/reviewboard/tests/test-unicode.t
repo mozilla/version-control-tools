@@ -10,7 +10,7 @@
   $ hg phase --public -r .
 
   $ adminbugzilla create-user author@example.com password 'Patch Author'
-  created user 5
+  created user 6
 
 Create a review request
 

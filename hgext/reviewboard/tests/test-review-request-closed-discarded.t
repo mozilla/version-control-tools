@@ -45,7 +45,7 @@
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
@@ -58,11 +58,11 @@
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 1
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 2
       tags: []
       text: 'Created attachment 1
@@ -102,7 +102,7 @@ no Commit ID set.
   bugs:
   - '1'
   commit: null
-  submitter: admin+1
+  submitter: default+5
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Foo 1
@@ -130,7 +130,7 @@ Child review request with ID 2 should be closed as discarded...
   bugs:
   - '1'
   commit: null
-  submitter: admin+1
+  submitter: default+5
   summary: Bug 1 - Foo 1
   description: Bug 1 - Foo 1
   target_people: []
@@ -149,7 +149,7 @@ Child review request with ID 3 should be closed as discarded...
   bugs:
   - '1'
   commit: null
-  submitter: admin+1
+  submitter: default+5
   summary: Bug 1 - Foo 2
   description: Bug 1 - Foo 2
   target_people: []
@@ -164,7 +164,7 @@ The review attachment should be marked as obsolete
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
@@ -177,11 +177,11 @@ The review attachment should be marked as obsolete
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 1
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 2
       tags: []
       text: 'Created attachment 1
@@ -221,7 +221,7 @@ Commit ID re-instated.
   bugs:
   - '1'
   commit: bz://1/mynick
-  submitter: admin+1
+  submitter: default+5
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Foo 1
@@ -271,7 +271,7 @@ Child review request with ID 2 should be re-opened...
   bugs:
   - '1'
   commit: null
-  submitter: admin+1
+  submitter: default+5
   summary: Bug 1 - Foo 1
   description: Bug 1 - Foo 1
   target_people: []
@@ -303,7 +303,7 @@ Child review request with ID 3 should be re-opened...
   bugs:
   - '1'
   commit: null
-  submitter: admin+1
+  submitter: default+5
   summary: Bug 1 - Foo 2
   description: Bug 1 - Foo 2
   target_people: []
@@ -331,7 +331,7 @@ There should still not be a visible attachment on the bug
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
@@ -344,11 +344,11 @@ There should still not be a visible attachment on the bug
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 1
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 2
       tags: []
       text: 'Created attachment 1
@@ -387,7 +387,7 @@ Squashed review request should be published.
   bugs:
   - '1'
   commit: bz://1/mynick
-  submitter: admin+1
+  submitter: default+5
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Foo 1
@@ -415,7 +415,7 @@ Child review request with ID 2 should be published.
   bugs:
   - '1'
   commit: null
-  submitter: admin+1
+  submitter: default+5
   summary: Bug 1 - Foo 1
   description: Bug 1 - Foo 1
   target_people: []
@@ -434,7 +434,7 @@ Child review request with ID 3 should be published.
   bugs:
   - '1'
   commit: null
-  submitter: admin+1
+  submitter: default+5
   summary: Bug 1 - Foo 2
   description: Bug 1 - Foo 2
   target_people: []
@@ -449,7 +449,7 @@ The attachment for the review request should be unobsoleted
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:
-    - attacher: admin@example.com
+    - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://localhost:$HGPORT1/r/1/
       description: 'MozReview Request: bz://1/mynick'
@@ -462,11 +462,11 @@ The attachment for the review request should be unobsoleted
     blocks: []
     cc: []
     comments:
-    - author: admin@example.com
+    - author: default@example.com
       id: 1
       tags: []
       text: ''
-    - author: admin@example.com
+    - author: default@example.com
       id: 2
       tags: []
       text: 'Created attachment 1
@@ -483,7 +483,7 @@ The attachment for the review request should be unobsoleted
   
   
         hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo'
-    - author: admin@example.com
+    - author: default@example.com
       id: 3
       tags: []
       text: 'Comment on attachment 1
