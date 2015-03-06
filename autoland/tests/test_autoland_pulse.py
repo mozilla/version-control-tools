@@ -6,9 +6,12 @@ import unittest
 import responses
 import sys
 
-sys.path.insert(0, os.path.join(os.path.split(os.path.split(
-                os.path.realpath(__file__))[0])[0], 'autoland'))
+HERE = os.path.split(os.path.realpath(__file__))[0]
+
+SYS_PATH = sys.path
+sys.path.append(os.path.join(os.path.split(HERE)[0], 'autoland'))
 import autoland_pulse
+sys.path = SYS_PATH
 
 
 class TestAutolandPulse(unittest.TestCase):
@@ -23,7 +26,8 @@ class TestAutolandPulse(unittest.TestCase):
         autoland_pulse.is_known_testrun = is_known_testrun
 
         # set up responses for selfserve.jobs_for_revision
-        with open('test-data/selfserve-jobs-for-revision.html') as f:
+        with open(os.path.join(HERE,
+                  'test-data/selfserve-jobs-for-revision.html')) as f:
             jobs_for_revision = f.read()
         responses.add(responses.GET,
                       ('https://secure.pub.build.mozilla.org/buildapi/'
@@ -38,7 +42,8 @@ class TestAutolandPulse(unittest.TestCase):
                       content_type='application/json', match_querystring=True)
 
         # read and replay canned messages
-        with gzip.open('test-data/pulse-messages.json.gz') as f:
+        with gzip.open(os.path.join(HERE,
+                                    'test-data/pulse-messages.json.gz')) as f:
             message_data = json.load(f)
 
         hit_monitored_testrun = False

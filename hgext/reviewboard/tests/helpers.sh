@@ -45,9 +45,10 @@ alias bugzilla='$TESTDIR/bugzilla'
 alias dockercontrol='$TESTDIR/testing/docker-control.py'
 alias pulse='$TESTDIR/pulse'
 alias mozreview='$TESTDIR/mozreview'
+alias ottoland='$TESTDIR/ottoland'
 
 commonenv() {
-  mozreview start `pwd` --mercurial-port $HGPORT --reviewboard-port $HGPORT1 --bugzilla-port $HGPORT2 --pulse-port $HGPORT3 > /dev/null
+  mozreview start `pwd` --mercurial-port $HGPORT --reviewboard-port $HGPORT1 --bugzilla-port $HGPORT2 --pulse-port $HGPORT3 --autoland-port $HGPORT4 > /dev/null
   export MOZREVIEW_HOME=`pwd`
   export HGSSHHGRCPATH=${MOZREVIEW_HOME}/hgrc
 
@@ -57,6 +58,7 @@ commonenv() {
   export REVIEWBOARD_URL=http://localhost:$HGPORT1/
   export PULSE_HOST=${DOCKER_HOSTNAME}
   export PULSE_PORT=${HGPORT3}
+  export AUTOLAND_URL=http://${DOCKER_HOSTNAME}:${HGPORT4}/
 
   hg init client
   clientconfig client/.hg/hgrc

@@ -85,6 +85,7 @@ def get_test_files(extensions):
 
     # Directories containing Python unit tests.
     unit_test_dirs = [
+        'autoland/tests',
         'pylib',
     ]
 
