@@ -397,6 +397,43 @@ head/bookmark-based development.
    alias so the output is easier to understand and closer to your
    fingertips.
 
+Sharing Changesets
+==================
+Once you have a changeset (or several!) that you'd like to get checked into
+a Mozilla repository, you'll need to share them with others in order to get
+them reviewed and landed.
+
+When working with mozilla-central, if you have at least `level 1 commit
+access <https://www.mozilla.org/en-US/about/governance/policies/commit/>`_,
+pushing your changesets to MozReview is the primary method of sharing. See
+the :ref:`MozReview documentation <mozreview>` for more information.
+
+If you do not have at least level 1 commit access, you will be unable to
+push to MozReview for the time being. In this case, you will be uploading
+patches to Bugzilla directly.
+
+Exporting patch files
+---------------------
+The preferred method for exporting patch files to Bugzilla is with the bzexport
+extension. The ``./mach mercurial-setup`` command should enable this for you.
+
+With the changeset you'd like to share checked out, run the ``hg bzexport``
+command - you will be prompted for the information required to post this
+changeset to its associated bug.
+
+To streamline this process even further, you can properly
+format the changeset summary (i.e. ``Bug <bug-number> - <changeset-summary>``)
+to avoid being prompted and have this information
+parsed instead. You can also `specify your bugzilla credentials in your hgrc
+<http://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/auth.html#finding-bugzilla-credentials>`_
+to avoid being prompted for those.
+
+bzexport contains many flags for modifying the bug associated with the
+changeset: see ``hg help bzexport`` for more information.
+
+If you need to export a patch that you don't want to directly upload to
+Bugzilla, try the ``hg export`` command.
+
 Collaborating / Sharing Bookmarks
 =================================
 
