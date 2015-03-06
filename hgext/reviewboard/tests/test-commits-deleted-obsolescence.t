@@ -115,6 +115,7 @@ on publish.
   bugs:
   - '1'
   commit: bz://1/mynick
+  submitter: admin+1
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Foo 1
@@ -197,6 +198,7 @@ The parent review should have dropped the reference to /r/6
   bugs:
   - '1'
   commit: bz://1/mynick
+  submitter: admin+1
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Foo 1
@@ -227,6 +229,7 @@ Review 6 should be marked as discarded
   bugs:
   - '1'
   commit: null
+  submitter: admin+1
   summary: Bug 1 - Foo 5
   description: Bug 1 - Foo 5
   target_people: []
@@ -275,6 +278,7 @@ on publish.
   bugs:
   - '1'
   commit: bz://1/mynick
+  submitter: admin+1
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Foo 1
@@ -349,6 +353,7 @@ The dropped commit should now be discarded
   bugs:
   - '1'
   commit: null
+  submitter: admin+1
   summary: Bug 1 - Foo 1
   description: Bug 1 - Foo 1
   target_people: []
@@ -393,6 +398,7 @@ The parent review should have been updated accordingly.
   bugs:
   - '1'
   commit: bz://1/mynick
+  submitter: admin+1
   summary: bz://1/mynick
   description:
   - /r/3 - Bug 1 - Foo 2

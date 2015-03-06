@@ -36,6 +36,7 @@ def serialize_review_requests(rr):
     d['public'] = rr.public
     d['bugs'] = list(rr.bugs_closed)
     d['commit'] = rr.commit_id
+    d['submitter'] = rr.get_submitter().username
     d['summary'] = _serialize_text(rr.summary)
     d['description'] = _serialize_text(rr.description)
     d['target_people'] = [p.get().username for p in rr.target_people]

@@ -57,6 +57,7 @@ Squashed review request with ID 1 should be closed as submitted...
   bugs:
   - '1'
   commit: bz://1/mynick
+  submitter: admin+1
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Foo 1
@@ -84,6 +85,7 @@ Child review request with ID 2 should be closed as submitted...
   bugs:
   - '1'
   commit: null
+  submitter: admin+1
   summary: Bug 1 - Foo 1
   description: Bug 1 - Foo 1
   target_people: []
@@ -100,6 +102,7 @@ Child review request with ID 2 should be closed as submitted...
   bugs:
   - '1'
   commit: null
+  submitter: admin+1
   summary: Bug 1 - Foo 2
   description: Bug 1 - Foo 2
   target_people: []
@@ -122,6 +125,7 @@ Squashed review request with ID 1 should be re-opened...
   bugs:
   - '1'
   commit: bz://1/mynick
+  submitter: admin+1
   summary: bz://1/mynick
   description:
   - /r/2 - Bug 1 - Foo 1
@@ -149,6 +153,7 @@ Child review request with ID 2 should be re-opened...
   bugs:
   - '1'
   commit: null
+  submitter: admin+1
   summary: Bug 1 - Foo 1
   description: Bug 1 - Foo 1
   target_people: []
@@ -167,6 +172,7 @@ Child review request with ID 3 should be re-opened...
   bugs:
   - '1'
   commit: null
+  submitter: admin+1
   summary: Bug 1 - Foo 2
   description: Bug 1 - Foo 2
   target_people: []
