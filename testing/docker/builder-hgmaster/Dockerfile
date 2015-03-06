@@ -67,11 +67,8 @@ ADD extra/vct/scripts/pash/* /usr/local/bin/
 
 # TODO: Set up an LDAP container, run tests against it
 # Comment out the ldap nastiness
-RUN sed -i 's/, ldap_helper//; s/ .*ldap_helper.*/           pass/' /usr/local/bin/pash.py
-RUN sed -i 's/^from ldap_helper.*//; s/    account_status =.*/    return 1/' /usr/local/bin/hg_helper.py
-
-# Fix path in pash.py
-RUN sed -i "s/'\/repo_local\/mozilla/'\/repo_local\/mozilla\/mozilla/" /usr/local/bin/hg_helper.py
+#RUN sed -i 's/, ldap_helper//; s/ .*ldap_helper.*/           pass/' /usr/local/bin/pash.py
+#RUN sed -i 's/^from ldap_helper.*//; s/    account_status =.*/    return 1/' /usr/local/bin/hg_helper.py
 
 # Configure sshd to use pash.py
 RUN sed -i 's/#\tForceCommand.*/ForceCommand \/usr\/local\/bin\/pash.py/' /etc/ssh/sshd_config
