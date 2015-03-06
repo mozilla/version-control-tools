@@ -166,12 +166,12 @@ class ReviewBoardCommands(object):
     def _get_root(self, port):
         return self._get_client(port).get_root()
 
-    def _get_rb(self, path):
+    def _get_rb(self, path=None):
         from vcttesting.reviewboard import MozReviewBoard
 
         if self.mr:
             return self.mr.get_reviewboard()
-        elif 'BUGZILLA_HOME' is os.environ:
+        elif 'BUGZILLA_HOME' in os.environ and path:
             return MozReviewBoard(path, os.environ['BUGZILLA_URL'],
                 pulse_host=os.environ.get('PULSE_HOST'),
                 pulse_port=os.environ.get('PULSE_PORT'))
@@ -610,16 +610,8 @@ class ReviewBoardCommands(object):
     @Command('make-admin', category='reviewboard',
         description='Make a user a superuser and staff user')
     @CommandArgument('email', help='Email address of user to modify')
-    @CommandArgument('--path', required=False,
-                     help='Path to Review Board install')
-    def make_admin(self, email, path=None):
-        import sqlite3
-        db = os.path.join(path or self.mr._path, 'reviewboard.db')
-        conn = sqlite3.connect(db)
-        with conn:
-            conn.execute('UPDATE auth_user SET is_superuser=1, is_staff=1 '
-                    'WHERE email=?', (email,))
-            conn.commit()
+    def make_admin(self, email):
+        self._get_rb().make_admin(email)
 
     @Command('dump-account-profile', category='reviewboard',
          description='Dump the contents of the auth_user table')

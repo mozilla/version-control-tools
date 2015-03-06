@@ -2,8 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import logging
 import os
 import signal
+import sqlite3
 import subprocess
 import sys
 import time
@@ -12,6 +14,10 @@ import urllib
 from contextlib import contextmanager
 
 import psutil
+
+
+logger = logging.getLogger(__name__)
+
 
 SETTINGS_LOCAL = """
 from __future__ import unicode_literals
@@ -96,6 +102,23 @@ class MozReviewBoard(object):
             r = Repository(name=name, path=url, tool=tool, bug_tracker=bug_url)
             r.save()
             return r.id
+
+    def make_admin(self, email):
+        """Make the user with the specified email an admin.
+
+        This grants superuser and staff privileges to the user.
+        """
+        db = os.path.join(self.path, 'reviewboard.db')
+        conn = sqlite3.connect(db)
+        with conn:
+            count = conn.execute('UPDATE auth_user SET is_superuser=1, is_staff=1 '
+                                 'WHERE email=?', (email,))
+
+            if not count:
+                raise Exception('Cannot make unknown user an admin: %s' % email)
+
+            conn.commit()
+            logger.info('made %s an admin' % email)
 
     def start(self, port):
         """Start the HTTP server on the specified port."""
