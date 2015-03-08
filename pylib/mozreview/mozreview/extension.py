@@ -71,3 +71,5 @@ class MozReviewExtension(Extension):
 
     def shutdown(self):
         unregister_resource_for_model(AutolandRequest)
+        super(MozReviewExtension, self).shutdown()
+
