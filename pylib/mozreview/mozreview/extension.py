@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from djblets.webapi.resources import (register_resource_for_model,
                                       unregister_resource_for_model)
 from reviewboard.extensions.base import Extension
+from reviewboard.extensions.hooks import HeaderDropdownActionHook
 
 from mozreview.autoland.models import AutolandRequest
 from mozreview.autoland.resources import (autoland_request_update_resource,
@@ -45,6 +46,28 @@ class MozReviewExtension(Extension):
         register_resource_for_model(AutolandRequest,
                                     try_autoland_trigger_resource)
         initialize_pulse_handlers(self)
+
+        HeaderDropdownActionHook(self, actions=[{
+            'label': 'MozReview',
+            'items': [
+                {
+                    'label': 'User Guide',
+                    'url': 'https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview-user.html',
+                },
+                {
+                    'label': 'Mercurial for Mozillians',
+                    'url': 'https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/index.html',
+                },
+                {
+                    'label': 'Hacking MozReview',
+                    'url': 'https://mozilla-version-control-tools.readthedocs.org/en/latest/hacking-mozreview.html',
+                },
+                {
+                    'label': 'File a Bug',
+                    'url': 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview',
+                },
+            ],
+        }])
 
     def shutdown(self):
         unregister_resource_for_model(AutolandRequest)
