@@ -296,6 +296,7 @@ class Docker(object):
             master_paths = (
                 'scripts/pash/',
                 'hgext/pushlog-legacy/',
+                'hgext/pushlog/',
                 'hgext/serverlog/',
                 'hghooks/',
                 'scripts/',

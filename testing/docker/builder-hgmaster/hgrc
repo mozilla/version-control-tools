@@ -26,19 +26,26 @@ unified = 8
 
 [hooks]
 sorthooks = True
-changegroup.z_loghistory = python:mozhghooks.pushlog.log
 changegroup.recordlogs = /repo/hg/scripts/record-pushes.sh
 changegroup.mirrorpush = /repo/hg/scripts/push-repo.sh
+pushkey.mirrorpush = /repo/hg/scripts/push-repo.sh
 #pretxnchangegroup.renamecase = python:mozhghooks.prevent_case_only_renames.hook
 #changegroup.zz_mirrorpush = python:mozhghooks.signal-mirrors.hook
 
 [extensions]
+blackbox =
 hgwebjson = /repo/hg/extensions/hgwebjson.py
 pushlog-feed = /repo/hg/extensions/pushlog-feed.py
+pushlog = /repo/hg/extensions/pushlog
 buglink = /repo/hg/extensions/buglink.py
 serverlog = /repo/hg/extensions/serverlog
 #highlight =
 #interhg =
+
+[blackbox]
+track = *
+maxsize = 10 MB
+maxfiles = 2
 
 [interhg]
 a_httplinks = s|(https?://\S+)|<a href="\1">\1</a>|i
@@ -47,3 +54,5 @@ bugzilla = s|((?:bug[\s#]*|b=#?|#)(\d{4,}))|<a href="https://bugzilla.mozilla.or
 [serverlog]
 reporoot = /repo/hg/mozilla/
 
+[server]
+validate = True
