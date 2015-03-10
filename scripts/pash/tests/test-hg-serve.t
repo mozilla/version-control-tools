@@ -3,7 +3,7 @@
   $ . $TESTDIR/scripts/pash/tests/helpers.sh
   $ hgmoenv
 
-  $ hgmo create-ldap-user user@example.com testuser 1000 'Test User' --key-file testuser
+  $ hgmo create-ldap-user user@example.com testuser 1000 'Test User' --key-file testuser --scm-level 1
 
   $ cat >> $HGRCPATH << EOF
   > [ui]
@@ -27,5 +27,20 @@ Invalid paths are rejected
   remote: Please try again with only those characters.
   abort: no suitable response from remote hg!
   [255]
+
+A push works
+
+  $ cd repo1
+  $ touch foo
+  $ hg -q commit -A -m initial
+  $ hg push ssh://$SSH_SERVER:$HGPORT/repo1
+  pushing to ssh://*:$HGPORT/repo1 (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
 
   $ hgmo clean
