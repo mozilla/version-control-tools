@@ -65,7 +65,8 @@ ADD entrypoint.py /entrypoint.py
 ADD extra/vct/testing/docker/builder-hgmaster/hgrc /etc/mercurial/hgrc
 ADD extra/vct/scripts/pash/* /usr/local/bin/
 ADD extra/vct/hgext/pushlog-legacy/* /repo/hg/extensions/
-ADD extra/vct/hgext/serverlog /repo/hg/extensions/
+ADD extra/vct/hgext/pushlog-legacy/parsedatetime/* /repo/hg/extensions/parsedatetime/
+ADD extra/vct/hgext/serverlog/* /repo/hg/extensions/serverlog/
 ADD extra/vct/hghooks /repo/hg/libraries/
 ADD extra/vct/scripts/record-pushes.sh /repo/hg/scripts/
 ADD extra/vct/scripts/push-repo.sh /repo/hg/scripts/
