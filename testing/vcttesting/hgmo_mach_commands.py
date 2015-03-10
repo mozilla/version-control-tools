@@ -75,12 +75,12 @@ class HgmoCommands(object):
                      help='Full name of the user')
     @CommandArgument('--key-file',
                      help='Use or create an SSH key')
-    @CommandArgument('--scm-level', type=int, choices=(1, 2, 3), nargs='*',
+    @CommandArgument('--scm-level', type=int, choices=(1, 2, 3),
                      help='Add the user to the specified SCM level groups')
     def create_ldap_user(self, email, username, uid, fullname, key_file=None,
                          scm_level=None):
         self.c.create_ldap_user(email, username, uid, fullname,
-                                key_filename=key_file, scm_levels=scm_level)
+                                key_filename=key_file, scm_level=scm_level)
 
     @Command('add-ssh-key', category='hgmo',
              description='Add an SSH public key to a user')

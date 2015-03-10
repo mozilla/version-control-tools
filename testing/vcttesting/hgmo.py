@@ -205,7 +205,7 @@ class HgCluster(object):
         return c
 
     def create_ldap_user(self, email, username, uid, fullname,
-                         key_filename=None, scm_levels=None):
+                         key_filename=None, scm_level=None):
         """Create a new user in LDAP.
 
         The user has an ``email`` address, a full ``name``, a
@@ -252,12 +252,14 @@ class HgCluster(object):
 
             self.add_ssh_key(email, pubkey)
 
-        for level in scm_levels or []:
-            if level < 1 or level > 3:
+        if scm_level:
+            if scm_level < 1 or scm_level > 3:
                 raise ValueError('scm level must be between 1 and 3: %s' %
-                                 level)
-            group = b'scm_level_%d' % level
-            self.add_user_to_ldap_group(email, group)
+                                 scm_level)
+
+            for level in range(1, scm_level + 1):
+                group = b'scm_level_%d' % level
+                self.add_user_to_ldap_group(email, group)
 
     def add_ssh_key(self, email, key):
         """Add an SSH key to a user in LDAP."""
