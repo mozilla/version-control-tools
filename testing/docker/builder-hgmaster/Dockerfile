@@ -14,14 +14,13 @@ MAINTAINER Ben Kero <bkero@mozilla.com>
 # Install requisite packages
 RUN yum update -y
 
-RUN curl https://mrepo.mozilla.org/mrepo/6Server-x86_64/RPMS.mozilla/openssh-lpk-5.4p1-1.x86_64.rpm > /openssh-lpk.rpm
-RUN curl https://mrepo.mozilla.org/mrepo/6Server-x86_64/RPMS.mozilla/openssh-lpk-clients-5.4p1-1.x86_64.rpm > /openssh-lpk-clients.rpm
-RUN curl https://mrepo.mozilla.org/mrepo/6Server-x86_64/RPMS.mozilla/openssh-lpk-server-5.4p1-1.x86_64.rpm > /openssh-lpk-server.rpm
-
 RUN yum install -y authconfig nss-pam-ldapd openldap-clients pam_ldap python-ldap sudo syslog
-RUN yum install -y /openssh-lpk.rpm /openssh-lpk-clients.rpm /openssh-lpk-server.rpm
-
-RUN yum localinstall -y https://mrepo.mozilla.org/mrepo/6Server-x86_64/RPMS.mozilla/mercurial-3.3.2-0.x86_64.rpm
+# These are copies from Mozilla's internal "mrepo" repository.
+RUN yum install -y \
+    https://people.mozilla.org/~gszorc/openssh-lpk-5.4p1-1.x86_64.rpm \
+    https://people.mozilla.org/~gszorc/openssh-lpk-clients-5.4p1-1.x86_64.rpm \
+    https://people.mozilla.org/~gszorc/openssh-lpk-server-5.4p1-1.x86_64.rpm \
+    https://people.mozilla.org/~gszorc/mercurial-3.3.2-0.x86_64.rpm
 
 RUN yum clean all
 

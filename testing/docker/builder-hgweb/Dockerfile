@@ -6,7 +6,6 @@ FROM centos:centos6
 
 RUN useradd -u 500 hg
 
-ADD mozilla.repo /etc/yum.repos.d/mozilla.repo
 RUN yum update -y
 
 RUN mkdir -p /repo_local/mozilla/mozilla /repo
@@ -15,7 +14,7 @@ RUN chown -R hg:hg /repo_local/mozilla/mozilla
 
 RUN yum install -y httpd lockfile-progs mod_wsgi openssh-server python-pygments python-simplejson python-argparse syslog
 
-RUN yum localinstall -y https://mrepo.mozilla.org/mrepo/6Server-x86_64/RPMS.mozilla/mercurial-3.3.2-0.x86_64.rpm
+RUN yum install -y https://people.mozilla.org/~gszorc/mercurial-3.3.2-0.x86_64.rpm
 
 RUN yum clean all
 

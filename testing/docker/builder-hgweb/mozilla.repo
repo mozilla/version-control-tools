@@ -1,5 +1,0 @@
-[mozilla]
-name=Mozilla Package Repo - $basearch
-baseurl=https://mrepo.mozilla.org/mrepo/$releasever-$basearch/RPMS.mozilla
-enabled=1
-gpgcheck=0
