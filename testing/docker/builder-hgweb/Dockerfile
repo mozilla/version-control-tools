@@ -12,7 +12,8 @@ RUN mkdir -p /repo_local/mozilla/mozilla /repo
 RUN ln -sf /repo_local/mozilla /repo/hg
 RUN chown -R hg:hg /repo_local/mozilla/mozilla
 
-RUN yum install -y httpd lockfile-progs mod_wsgi openssh-server python-pygments python-simplejson python-argparse syslog
+RUN yum install -y httpd lockfile-progs mod_wsgi openssh-clients openssh-server \
+    python-pygments python-simplejson python-argparse syslog
 
 RUN yum install -y https://people.mozilla.org/~gszorc/mercurial-3.3.2-0.x86_64.rpm
 
