@@ -45,6 +45,8 @@ RUN mkdir -p /repo/hg/mozilla /repo/hg/extensions /repo/hg/scripts
 RUN mkdir -p /repo/hg/mozilla/users
 RUN chmod 2775 /repo/hg/mozilla/users && chown -R hg:scm_level_1 /repo/hg/mozilla/users
 
+RUN touch /etc/mercurial/known_hosts && chown hg /etc/mercurial/known_hosts
+
 # TODO: Fix this logging or remove record-pushes script as it's information duplicates serverlog
 RUN touch /var/log/hg-push.log && chmod 666 /var/log/hg-push.log
 
@@ -53,7 +55,7 @@ RUN touch /var/log/pash.log && chmod 666 /var/log/pash.log
 ADD sshd_config /etc/ssh/sshd_config
 ADD nslcd.conf /etc/nslcd.conf
 
-RUN ssh-keygen -b 2048 -f /etc/mercurial/mirror -t rsa
+RUN ssh-keygen -b 2048 -f /etc/mercurial/mirror -t rsa && chown hg /etc/mercurial/mirror /etc/mercurial/mirror.pub
 RUN mkdir /home/hg/.ssh
 RUN cp /etc/mercurial/mirror.pub /home/hg/.ssh/authorized_keys
 RUN chown -R hg:hg /home/hg/.ssh
