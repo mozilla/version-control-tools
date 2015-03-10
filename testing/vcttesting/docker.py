@@ -609,6 +609,13 @@ class Docker(object):
         except KeyError:
             pass
 
+    def build_all_images(self, verbose=False):
+        with futures.ThreadPoolExecutor(2) as e:
+            f_mr = e.submit(self.build_mozreview, verbose=verbose)
+            f_hgmo = e.submit(self.build_hgmo, verbose=verbose)
+
+        return f_mr.result(), f_hgmo.result()
+
     def _get_files_from_http_container(self, builder, message):
         image = self.ensure_built(builder, verbose=True, add_vct=True)
         container = self.client.create_container(image)['Id']
