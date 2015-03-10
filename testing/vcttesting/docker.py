@@ -152,7 +152,7 @@ class Docker(object):
         except requests.exceptions.RequestException as e:
             return False
 
-    def ensure_built(self, name, verbose=False, add_vct=False):
+    def ensure_built(self, name, verbose=False, add_vct=False, vct_paths=None):
         """Ensure a Docker image from a builder directory is built and up to date.
 
         This function is docker build++. Under the hood, it talks to the same
@@ -162,6 +162,12 @@ class Docker(object):
         We supplement all contexts with the content of the source in this
         repository related to building Docker containers. If ``add_vct`` is
         True, we add the entire source repository to the Docker context.
+        If ``vct_paths`` is an iterable, we add only the paths specified to the
+        context.
+
+        If an entry in ``vct_paths`` ends in a ``/``, we add all files under
+        that directory. Otherwise, we assume it is a literal match and only add
+        a single file.
 
         This added content can be ``ADD``ed to the produced image inside the
         Dockerfile. If the content changes, the Docker image ID changes and the
@@ -172,8 +178,6 @@ class Docker(object):
         p = os.path.join(self._ddir, 'builder-%s' % name)
         if not os.path.isdir(p):
             raise Exception('Unknown Docker builder name: %s' % name)
-
-        # TODO create a lock to avoid race conditions.
 
         # We build the build context for the image manually because we need to
         # include things outside of the directory containing the Dockerfile.
@@ -201,7 +205,7 @@ class Docker(object):
         tar.add(os.path.join(HERE, '..', 'docker-control.py'),
                 'extra/docker-control.py')
 
-        if add_vct:
+        if add_vct or vct_paths:
             # We grab the set of tracked files in this repository.
             hg = os.path.join(ROOT, 'venv', 'bin', 'hg')
             env = dict(os.environ)
@@ -210,10 +214,34 @@ class Docker(object):
             null = open(os.devnull, 'wb')
             output = subprocess.check_output(args, env=env, cwd='/',
                                              stderr=null)
-            # And add them to the archive.
-            for line in output.splitlines():
-                filename = line.strip()
-                tar.add(os.path.join(ROOT, filename), 'extra/vct/%s' % filename)
+
+            vct_files = output.splitlines()
+            if add_vct:
+                for f in vct_files:
+                    f = f.strip()
+                    tar.add(os.path.join(ROOT, f), 'extra/vct/%s' % f)
+            else:
+                added = set()
+                for p in vct_paths:
+                    ap = os.path.join(ROOT, p)
+                    if not os.path.exists(ap):
+                        raise Exception('specified path not under version '
+                                        'control: %s' % p)
+                    if p.endswith('/'):
+                        for f in vct_files:
+                            if not f.startswith(p):
+                                continue
+                            full = os.path.join(ROOT, f)
+                            rel = 'extra/vct/%s' % f
+                            if full in added:
+                                continue
+                            tar.add(full, rel)
+                    else:
+                        full = os.path.join(ROOT, p)
+                        if full in added:
+                            continue
+                        rel = 'extra/vct/%s' % p
+                        tar.add(full, rel)
 
         tar.close()
 
