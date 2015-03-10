@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -e
+
+hg init /repo/hg/mozilla/$1
+chown -R hg:$2 /repo/hg/mozilla/$1
