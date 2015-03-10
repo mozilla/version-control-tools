@@ -207,7 +207,9 @@ class Docker(object):
             env = dict(os.environ)
             env['HGRCPATH'] = '/dev/null'
             args = [hg, '-R', ROOT, 'locate', '-r', '.']
-            output = subprocess.check_output(args, env=env, cwd='/')
+            null = open(os.devnull, 'wb')
+            output = subprocess.check_output(args, env=env, cwd='/',
+                                             stderr=null)
             # And add them to the archive.
             for line in output.splitlines():
                 filename = line.strip()
