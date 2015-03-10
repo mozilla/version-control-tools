@@ -89,3 +89,12 @@ class HgmoCommands(object):
         if key == '-':
             key = sys.stdin.read().strip().encode('utf-8')
         self.c.add_ssh_key(email, key)
+
+    @Command('create-repo', category='hgmo',
+             description='Create a repository in the cluster')
+    @CommandArgument('name',
+                     help='Name of repository to create')
+    @CommandArgument('level', type=int, choices=[1, 2, 3], default=1,
+                     help='SCM level access for this repository')
+    def create_repo(self, name, level):
+        self.c.create_repo(name, level=level)

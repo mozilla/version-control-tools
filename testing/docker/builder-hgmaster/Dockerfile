@@ -59,6 +59,7 @@ RUN cp /etc/mercurial/mirror.pub /home/hg/.ssh/authorized_keys
 RUN chown -R hg:hg /home/hg/.ssh
 RUN chmod 640 /home/hg/.ssh/authorized_keys
 
+ADD create-repo /create-repo
 ADD set-mirrors.py /set-mirrors.py
 ADD entrypoint.py /entrypoint.py
 
