@@ -295,7 +295,12 @@ def main():
         logger.critical('could not read selfserve credentials. aborting')
         return
 
-    dbconn = psycopg2.connect(args.dsn)
+    dbconn = None
+    while not dbconn:
+        try:
+            dbconn = psycopg2.connect(args.dsn)
+        except psycopg2.OperationalError:
+            time.sleep(5)
 
     while True:
         try:

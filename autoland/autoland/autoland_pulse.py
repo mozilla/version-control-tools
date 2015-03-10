@@ -6,6 +6,7 @@ import json
 import logging
 import platform
 import psycopg2
+import time
 
 from mozillapulse import consumers
 
@@ -110,7 +111,12 @@ def main():
     logger.info('starting pulse listener')
 
     auth = selfserve.read_credentials()
-    dbconn = psycopg2.connect(args.dsn)
+
+    while not dbconn:
+        try:
+            dbconn = psycopg2.connect(args.dsn)
+        except psycopg2.OperationalError:
+            time.sleep(5)
 
     if args.message_log_path:
         try:
