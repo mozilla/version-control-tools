@@ -40,8 +40,10 @@ class HgmoCommands(object):
 
     @Command('start', category='hgmo',
              description='Start a hg.mozilla.org cluster')
-    def start(self):
-        s = self.c.start()
+    @CommandArgument('--master-ssh-port', type=int,
+                     help='Port number on which SSH server should listen')
+    def start(self, master_ssh_port=None):
+        s = self.c.start(master_ssh_port=master_ssh_port)
         print('SSH Hostname: %s' % s['master_ssh_hostname'])
         print('SSH Port: %s' % s['master_ssh_port'])
         print('LDAP URI: %s' % s['ldap_uri'])
