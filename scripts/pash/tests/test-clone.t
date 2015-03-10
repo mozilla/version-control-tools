@@ -159,4 +159,53 @@ Selecting a repo will result in a prompt
   
   Proceed?  (no-eol)
 
+Saying "no" is handled properly
+(TODO this is buggy)
+
+  $ testuserssh $SSH_SERVER clone repo-1 << EOF
+  > 1
+  > 1
+  > 2
+  > 2
+  > 0
+  > EOF
+  Making repo repo-1 for user@example.com.
+  
+  This repo will appear as hg.mozilla.org/users/user_example.com/repo-1.
+  
+  If you need a top level repo, please quit now and file a
+  Developer Services :: hg.mozilla.org bug at
+  https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
+  
+  0) Exit.
+  1) yes.
+  2) no.
+  
+  Proceed? You can clone an existing public repo or a users private repo.
+  You can also create an empty repository.
+  
+  0) Exit.
+  1) Clone a public repository.
+  2) Clone a private repository.
+  3) Create an empty repository.
+  
+  Source repository: We have the repo_list
+  List of available public repos
+  
+  0) Exit.
+  1) 
+  2) hgcustom/version-control-tools
+  3) integration/mozilla-inbound
+  4) mozilla-central
+  
+  Pick a source repo: About to clone /hgcustom/version-control-tools to /users/user_example.com/repo-1
+  
+  0) Exit.
+  1) yes.
+  2) no.
+  
+  Proceed? Fixing permissions, don't interrupt.
+  Could not find repository at /users/user_example.com/repo-1.
+  [1]
+
   $ hgmo clean
