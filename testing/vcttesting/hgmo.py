@@ -20,7 +20,8 @@ class HgCluster(object):
     hg.mozilla.org server configuration.
     """
 
-    def __init__(self, docker, state_path=None):
+    def __init__(self, docker, state_path=None, ldap_image=None,
+                 master_image=None, web_image=None):
         self._d = docker
         self._dc = docker.client
         self.state_path = state_path
@@ -31,8 +32,9 @@ class HgCluster(object):
                 for k, v in state.items():
                     setattr(self, k, v)
         else:
-            self.ldap_image = None
-            self.master_image = None
+            self.ldap_image = ldap_image
+            self.master_image = master_image
+            self.web_image = web_image
             self.ldap_id = None
             self.master_id = None
             self.web_ids = []
@@ -44,11 +46,15 @@ class HgCluster(object):
     def start(self, ldap_port=None, master_ssh_port=None, web_count=2):
         """Start the cluster."""
 
-        images = self._d.build_hgmo(verbose=True)
+        ldap_image = self.ldap_image
+        master_image = self.master_image
+        web_image = self.web_image
 
-        master_image = images['hgmaster']
-        web_image = images['hgweb']
-        ldap_image = images['ldap']
+        if not ldap_image or not master_image or not web_image:
+            images = self._d.build_hgmo(verbose=True)
+            master_image = images['hgmaster']
+            web_image = images['hgweb']
+            ldap_image = images['ldap']
 
         with futures.ThreadPoolExecutor(4) as e:
             f_ldap_create = e.submit(self._dc.create_container, ldap_image)

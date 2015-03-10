@@ -36,7 +36,10 @@ class HgmoCommands(object):
             sys.exit(1)
 
         docker = Docker(os.environ['DOCKER_STATE_FILE'], docker_url, tls=tls)
-        self.c = HgCluster(docker, os.environ['HGMO_STATE_FILE'])
+        self.c = HgCluster(docker, os.environ['HGMO_STATE_FILE'],
+                           ldap_image=os.environ.get('DOCKER_LDAP_IMAGE'),
+                           master_image=os.environ.get('DOCKER_HGMASTER_IMAGE'),
+                           web_image=os.environ.get('DOCKER_HGWEB_IMAGE'))
 
     @Command('start', category='hgmo',
              description='Start a hg.mozilla.org cluster')
