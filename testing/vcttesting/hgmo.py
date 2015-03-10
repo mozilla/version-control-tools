@@ -157,13 +157,12 @@ class HgCluster(object):
         Containers will be shut down and removed. The state file will
         destroyed.
         """
-        self.stop()
         c = self._d.client
         with futures.ThreadPoolExecutor(4) as e:
-            e.submit(c.remove_container, self.master_id)
-            e.submit(c.remove_container, self.ldap_id)
+            e.submit(c.remove_container, self.master_id, force=True)
+            e.submit(c.remove_container, self.ldap_id, force=True)
             for i in self.web_ids:
-                e.submit(c.remove_container, i)
+                e.submit(c.remove_container, i, force=True)
 
         try:
             os.unlink(self.state_path)
