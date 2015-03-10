@@ -30,9 +30,9 @@ https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&componen
 """.strip()
 
 MAKING_REPO = """
-Making repo %(repo)s for %(user)s.
+Making repo {repo} for {user}.
 
-This repo will appear as {cname}/users/{user_dir}/{repo}s.
+This repo will appear as {cname}/users/{user_dir}/{repo}.
 
 If you need a top level repo, please quit now and file a
 Developer Services :: hg.mozilla.org bug at

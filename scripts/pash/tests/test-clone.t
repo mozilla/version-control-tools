@@ -15,9 +15,9 @@ This also tests the exit choice.
   > 0
   > EOF
   Warning: Permanently added '[*]:$HGPORT' (RSA) to the list of known hosts.\r (glob) (esc)
-  Making repo %(repo)s for %(user)s.
+  Making repo repo-1 for user@example.com.
   
-  This repo will appear as hg.mozilla.org/users/user_example.com/repo-1s.
+  This repo will appear as hg.mozilla.org/users/user_example.com/repo-1.
   
   If you need a top level repo, please quit now and file a
   Developer Services :: hg.mozilla.org bug at
