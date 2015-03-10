@@ -4,3 +4,5 @@ set -e
 
 hg init /repo/hg/mozilla/$1
 chown -R hg:$2 /repo/hg/mozilla/$1
+find /repo/hg/mozilla/$1 | xargs chmod g+w
+find /repo/hg/mozilla/$1 -type d | xargs chmod g+s
