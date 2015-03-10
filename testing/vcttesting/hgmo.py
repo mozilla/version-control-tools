@@ -205,7 +205,7 @@ class HgCluster(object):
         return c
 
     def create_ldap_user(self, email, username, uid, fullname,
-                         key_filename=None):
+                         key_filename=None, scm_levels=None):
         """Create a new user in LDAP.
 
         The user has an ``email`` address, a full ``name``, a
@@ -252,6 +252,13 @@ class HgCluster(object):
 
             self.add_ssh_key(email, pubkey)
 
+        for level in scm_levels or []:
+            if level < 1 or level > 3:
+                raise ValueError('scm level must be between 1 and 3: %s' %
+                                 level)
+            group = b'scm_level_%d' % level
+            self.add_user_to_ldap_group(email, group)
+
     def add_ssh_key(self, email, key):
         """Add an SSH key to a user in LDAP."""
         dn = 'mail=%s,o=com,dc=mozilla' % email
@@ -269,6 +276,17 @@ class HgCluster(object):
         modlist.append((ldap.MOD_ADD, b'sshPublicKey', key))
 
         c.modify_s(dn, modlist)
+
+    def add_user_to_ldap_group(self, member, group):
+        """Add a user to the specified LDAP group.
+
+        The ``group`` is defined in terms of its ``cn`` under
+        ``ou=groups,dc=mozilla`. e.g. ``scml_level_3``.
+        """
+        dn = 'cn=%s,ou=groups,dc=mozilla' % group
+
+        modlist = [(ldap.MOD_ADD, b'memberUid', member)]
+        self.ldap.modify_s(dn, modlist)
 
     def create_repo(self, name, level=1):
         """Create a repository on the cluster.
