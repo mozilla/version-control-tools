@@ -1,0 +1,169 @@
+#!/bin/sh
+
+die() {
+    echo "$1" 1>&2
+    exit ${2:-1}
+}
+
+usage() {
+    echo "USAGE"
+    echo " $0 [-r source_repo_root] [-t target_directory] [-c changeset] [-d] -e <repository>"
+    echo
+}
+
+check_nowait_lock() {
+    if [ -e $1 ]; then
+        return 1
+    fi
+
+    return 0
+}
+
+check_wait_lock() {
+    if [ -e $1 ]; then
+        sleep 5
+        check_wait_lock $1
+    fi
+    return 0
+}
+
+create_lock() {
+    check_nowait_lock $1 && touch $1
+}
+
+if [ -n "$SSH_ORIGINAL_COMMAND" ]; then
+    set -- $SSH_ORIGINAL_COMMAND
+fi
+
+TEMP=`getopt --options hdr:t:l:c:e: --long help,delete,hgrc,root:,target:lock-retries:changeset:repo: \
+    -n 'mirror-pull' -- "$@"`
+if [ $? != 0 ]; then
+    die "getopt barfed"
+fi
+
+eval set -- "$TEMP"
+
+# defaults:
+REPO_ROOT=ssh://<%= @mirror_source %>
+REPO_TARGET=<%= @repo_serve_path %>
+LOCK_RETRIES=3 # 3 retries, the first is 5, second is 10, third is 15
+DELETE=false
+HGRC=false
+CHANGESET=""
+
+export PYTHONPATH=<%= @python_lib_override_path %>:<%= @python_lib_path %>
+
+while true; do
+    case "$1" in 
+        -r|--root)
+            REPO_ROOT="$2" ; shift 2
+            ;;
+        -t|--target)
+            REPO_TARGET="$2" ; shift 2
+            ;;
+        -l|--lock-retries)
+            LOCK_RETRIES="$2" ; shift 2
+            ;;
+        -c|--changeset)
+            CHANGESET="-r $2" ; shift 2
+            ;;
+        -e|--repo)
+            REPO="$2" ; shift 2
+            ;;
+        -d|--delete)
+            DELETE=true ; shift 1
+            ;;
+        --hgrc)
+            HGRC=true ; shift 1
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift ; break
+            ;;
+        *)
+            die "I don't know what happened."
+            ;;
+    esac
+done
+
+if [ -n "$REPO" ]; then
+    repo=$REPO
+else
+    repo="$1"
+fi
+
+repo=`echo "$repo" | sed 's#[^-\._/[:alnum:]]##g'`
+test -z "$repo" && die "need a repo to clone, relative to %<= @repo_serve_path %>" 
+
+name=`echo $repo | sed 's#^/*##'`
+src=${REPO_ROOT}/$name
+
+GLOBAL_HG_OPTS="--config hooks.pretxnchangegroup.z_linearhistory= --config hooks.pretxnchangegroup.z_loghistory= --config trusted.users=root,hg --config paths.default=ssh://<%= @mirror_source %>/${name}"
+
+if [ "$DELETE" = "true" ]; then
+    if [ "$(echo ${repo}|cut -f1 --delimiter=/)" != "users" ]; then
+        echo "You requested to delete ${repo}. This does not begin with 'users/', ignoring."
+        exit 1
+    fi
+    if [ ! -d $REPO_TARGET/$repo ]; then
+        echo "No repo found at $repo"
+        exit 1
+    fi
+    echo "Deleting repo $repo"
+    /bin/rm -rf $REPO_TARGET/$repo
+    exit 0
+fi
+
+cd $REPO_TARGET || die "$REPO_TARGET does not exist, cannot create repositories there"
+
+retry() {
+    local _cmd=$*
+    eval $_cmd
+    res=$?
+    if [ "$res" != 0 ]; then
+        sleep 1
+        echo "retrying $_cmd"
+        eval $_cmd
+        res=$?
+    fi
+    return $res
+}
+
+if [ "$HGRC" = "true" ]; then
+    if [ ! -d $repo/.hg ]; then
+        echo "No repo found at $repo"
+        exit 1
+    fi
+    echo "Updating hgrc for $repo"
+    TEMPFILE=$(/bin/mktemp)
+    retry "ssh -i <%= @mirror_priv_key_path %> -l <%= @mirror_user_name %> <%= @mirror_source %> repo-config $name > $TEMPFILE" && /bin/mv $TEMPFILE $repo/.hg/hgrc
+    exit 0
+fi
+
+exit_code=0
+if [ -d "$name" ]; then
+    echo "$name already exists, pulling"
+    retry hg -R $name pull $GLOBAL_HG_OPTS $CHANGESET
+    exit_code=$?
+elif [ \! -e $name ]; then
+    mkdir -p `dirname $name` 
+    echo "$name does not yet exist, cloning"
+    lockfile -r $LOCK_RETRIES ${PWD}/syncing.lck || die "Could not lock destination"
+    retry hg clone $GLOBAL_HG_OPTS -U -v "$src" $name
+    exit_code=$?
+    rm ${PWD}/syncing.lck
+else
+    die "WTF is $REPO_TARGET/$name"
+fi
+
+exit $exit_code
+
+# Local variables:
+# mode: shell-script
+# tab-width: 4
+# indent-tabs-mode: nil
+# end:
+

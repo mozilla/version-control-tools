@@ -12,19 +12,23 @@ FROM centos:centos6
 MAINTAINER Ben Kero <bkero@mozilla.com>
 
 # Install requisite packages
-RUN yum install -y update; yum clean all
-RUN yum install -y openssh-server git sudo; yum clean all
-RUN yum localinstall -y http://people.mozilla.org/~bkero/mercurial-3.2.1+2-3246801ff313.x86_64.rpm
+RUN yum update -y
 
-# TODO: Use the virtualenv instead of global package
-#RUN yum -y install epel-release python-pip python-virtualenv gcc
-#RUN mkdir /hg; cd /hg; virtualenv venv
-#RUN cd /hg; source venv/bin/activate; pip install mercurial
+RUN curl https://mrepo.mozilla.org/mrepo/6Server-x86_64/RPMS.mozilla/openssh-lpk-5.4p1-1.x86_64.rpm > /openssh-lpk.rpm
+RUN curl https://mrepo.mozilla.org/mrepo/6Server-x86_64/RPMS.mozilla/openssh-lpk-clients-5.4p1-1.x86_64.rpm > /openssh-lpk-clients.rpm
+RUN curl https://mrepo.mozilla.org/mrepo/6Server-x86_64/RPMS.mozilla/openssh-lpk-server-5.4p1-1.x86_64.rpm > /openssh-lpk-server.rpm
 
-# Add an example user for testing (guest/guest, member of scm_level_1)
-RUN groupadd scm_level_1; groupadd scm_level_2; groupadd scm_level_3
-RUN useradd guest; echo guest:guest|chpasswd; gpasswd -a guest scm_level_1
-RUN mkdir -p /home/guest; chown guest:guest /home/guest
+RUN yum install -y authconfig nss-pam-ldapd openldap-clients pam_ldap python-ldap sudo syslog
+RUN yum install -y /openssh-lpk.rpm /openssh-lpk-clients.rpm /openssh-lpk-server.rpm
+
+RUN yum localinstall -y https://mrepo.mozilla.org/mrepo/6Server-x86_64/RPMS.mozilla/mercurial-3.3.2-0.x86_64.rpm
+
+RUN yum clean all
+
+# These should stay in sync with mozilla.ldif from the ldap server.
+RUN groupadd -g 600 scm_level_1
+RUN groupadd -g 601 scm_level_2
+RUN groupadd -g 602 scm_level_3
 
 # Add the hg user
 RUN useradd hg
@@ -34,16 +38,12 @@ RUN echo root:mozillafirefox|chpasswd
 
 # Set up Mercurial, adding example content
 RUN mkdir -p /etc/mercurial
-RUN mkdir -p /repo_local/mozilla/mozilla /repo_local/mozilla/extensions /repo_local/mozilla/scripts /repo
-RUN ln -sf /repo_local/mozilla /repo/hg
-
-# Clone the xforms repo as a small example repository
-RUN hg clone -U https://hg.mozilla.org/xforms /repo/hg/mozilla/xforms; chmod -R 2775 /repo/hg/mozilla/xforms; chown -R hg:scm_level_1 /repo/hg/mozilla/xforms
+RUN mkdir -p /repo/hg/mozilla /repo/hg/extensions /repo/hg/scripts
 
 # Set up users directories, make permissions right
-RUN mkdir -p /repo_local/mozilla/mozilla/users
-RUN chmod 2775 /repo_local/mozilla/mozilla/users
-RUN chown -R hg:scm_level_1 /repo_local/mozilla/mozilla/users
+RUN mkdir -p /repo/hg/mozilla/users
+RUN chmod 2775 /repo/hg/mozilla/users
+RUN chown -R hg:scm_level_1 /repo/hg/mozilla/users
 
 # Install Mercurial config files
 ADD extra/vct/testing/docker/builder-hgmaster/hgrc /etc/mercurial/hgrc
@@ -62,21 +62,24 @@ ADD extra/vct/scripts/repo-push.sh /usr/local/bin/
 # TODO: Fix this logging or remove record-pushes script as it's information duplicates serverlog
 RUN touch /var/log/hg-push.log; chmod 666 /var/log/hg-push.log
 
+RUN touch /var/log/pash.log && chmod 666 /var/log/pash.log
+
 # Put the files in the right place
 ADD extra/vct/scripts/pash/* /usr/local/bin/
 
-# TODO: Set up an LDAP container, run tests against it
-# Comment out the ldap nastiness
-#RUN sed -i 's/, ldap_helper//; s/ .*ldap_helper.*/           pass/' /usr/local/bin/pash.py
-#RUN sed -i 's/^from ldap_helper.*//; s/    account_status =.*/    return 1/' /usr/local/bin/hg_helper.py
+ADD sshd_config /etc/ssh/sshd_config
+ADD nslcd.conf /etc/nslcd.conf
 
-# Configure sshd to use pash.py
-RUN sed -i 's/#\tForceCommand.*/ForceCommand \/usr\/local\/bin\/pash.py/' /etc/ssh/sshd_config
-RUN sed -i 's/#PermitRootLogin/PermitRootLogin/' /etc/ssh/sshd_config
+RUN ssh-keygen -b 2048 -f /etc/mercurial/mirror -t rsa
+RUN mkdir /home/hg/.ssh
+RUN cp /etc/mercurial/mirror.pub /home/hg/.ssh/authorized_keys
+RUN chown -R hg:hg /home/hg/.ssh
+RUN chmod 640 /home/hg/.ssh/authorized_keys
 
-# Generate the SSH host keys
-RUN service sshd start
-
+ADD set-mirrors.py /set-mirrors.py
+ADD entrypoint.py /entrypoint.py
 
 EXPOSE 22
+
+ENTRYPOINT ["/entrypoint.py"]
 CMD ["/usr/sbin/sshd", "-D"]

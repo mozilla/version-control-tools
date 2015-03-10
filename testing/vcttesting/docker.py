@@ -85,21 +85,31 @@ class Docker(object):
             'last-rbweb-bootstrap-id': None,
             'last-autolanddb-id': None,
             'last-autoland-id': None,
+            'last-hgmaster-id': None,
+            'last-hgweb-id': None,
+            'last-ldap-id': None,
         }
 
         if os.path.exists(state_path):
             with open(state_path, 'rb') as fh:
                 self.state = json.load(fh)
 
-        self.state.setdefault('last-db-id', None)
-        self.state.setdefault('last-pulse-id', None)
-        self.state.setdefault('last-web-id', None)
-        self.state.setdefault('last-rbweb-id', None)
-        self.state.setdefault('last-db-bootstrap-id', None)
-        self.state.setdefault('last-web-bootstrap-id', None)
-        self.state.setdefault('last-rbweb-bootstrap-id', None)
-        self.state.setdefault('last-autolanddb-id', None)
-        self.state.setdefault('last-autoland-id', None)
+        keys = (
+            'last-db-id',
+            'last-pulse-id',
+            'last-web-id',
+            'last-rbweb-id',
+            'last-db-bootstrap-id',
+            'last-web-bootstrap-id',
+            'last-rbweb-bootstrap-id',
+            'last-autolanddb-id',
+            'last-autoland-id',
+            'last-hgmaster-id',
+            'last-hgweb-id',
+            'last-ldap-id',
+        )
+        for k in keys:
+            self.state.setdefault(k, None)
 
         self.client = docker.Client(base_url=url, tls=tls)
 
@@ -252,16 +262,26 @@ class Docker(object):
         and other bits should be the same as in production with the caveat that
         LDAP integration is probably out of scope.
         """
-        with futures.ThreadPoolExecutor(2) as e:
+        with futures.ThreadPoolExecutor(3) as e:
             f_hg = e.submit(self.ensure_built, 'hgmaster', add_vct=True,
                             verbose=verbose)
+            f_hgweb = e.submit(self.ensure_built, 'hgweb', add_vct=True,
+                               verbose=verbose)
             f_ldap = e.submit(self.ensure_built, 'ldap', verbose=verbose)
 
         hg_master_image = f_hg.result()
+        hgweb_image = f_hgweb.result()
         ldap_image = f_ldap.result()
 
         self.state['last-hgmaster-id'] = hg_master_image
+        self.state['last-hgweb-id'] = hgweb_image
         self.state['last-ldap-id'] = ldap_image
+
+        return {
+            'hgmaster': hg_master_image,
+            'hgweb': hgweb_image,
+            'ldap': ldap_image,
+        }
 
     def build_mozreview(self, verbose=False):
         """Ensure the images for a MozReview service are built.
@@ -641,6 +661,9 @@ class Docker(object):
             self.state['last-rbweb-bootstrap-id'],
             self.state['last-autolanddb-bootstrap-id'],
             self.state['last-autoland-bootstrap-id'],
+            self.state['last-hgmaster-id'],
+            self.state['last-hgweb-id'],
+            self.state['last-ldap-id'],
         ])
 
         relevant_repos = set([
@@ -655,6 +678,9 @@ class Docker(object):
             'autolanddb-bootstrapped',
             'autoland',
             'autoland-bootstrapped',
+            'hgmaster',
+            'hgweb',
+            'ldap',
         ])
 
         for i in self.client.images():
@@ -708,3 +734,12 @@ class Docker(object):
             yield state
         finally:
             self.client.stop(cid, timeout=20)
+
+    def get_file_content(self, cid, path):
+        """Get the contents of a file from a container."""
+        r = self.client.copy(cid, path)
+        buf = BytesIO(r.read())
+        buf.seek(0)
+        t = tarfile.open(mode='r', fileobj=buf)
+        fp = t.extractfile(os.path.basename(path))
+        return fp.read()

@@ -1,0 +1,19 @@
+LogLevel VERBOSE
+PermitRootLogin without-password
+PasswordAuthentication no
+Protocol 2
+
+AcceptEnv LANG LC_ALL LC_MESSAGES
+ChallengeResponseAuthentication no
+
+UseLPK yes
+# This entry gets replaced by the entrypoint script.
+LpkServers ldap://localhost/
+LpkForceTLS no
+LpkUIDAttribute mail
+LpkBindDN cn=admin,dc=mozilla
+LpkBindPw password
+LpkUserDN dc=mozilla
+
+Subsystem sftp /usr/libexec/openssh/sftp-server
+ForceCommand /usr/local/bin/pash.py

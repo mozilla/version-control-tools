@@ -1,0 +1,40 @@
+#!/bin/bash
+
+check_lock() {
+    if [ -e "$1" ]
+    then
+        return 1
+    else
+        touch "$1"
+        return 0
+    fi
+}
+
+RETRIES=15;
+
+if [ "$1" = "-r" ]; then
+    RETRIES="$2"
+    shift 2
+fi
+
+LOCKFILE=$1
+
+if [ -z "$1" ]; then
+    echo "Filename required"
+    exit 1
+fi
+
+while [ $RETRIES -ne 0 ]; do
+    if check_lock $LOCKFILE
+    then
+        exit 0
+    else
+        echo "Repository locked, will try again in 8 seconds"
+        sleep 8
+        RETRIES=$(expr $RETRIES - 1)
+    fi
+done
+
+echo "Failed to grab lock file $LOCKFILE, did a push fail and leave a stale lockfile?"
+
+exit 1

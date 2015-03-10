@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import os
+import sys
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+def main(args):
+    if 'VIRTUAL_ENV' not in os.environ:
+        activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
+        execfile(activate, dict(__file__=activate))
+        sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
+
+    from mach.main import Mach
+
+    m = Mach(os.getcwd())
+
+    m.define_category('hgmo', 'hg.mozilla.org',
+        'Control and Interact with an hg.mozilla.org cluster', 50)
+    import vcttesting.hgmo_mach_commands
+
+    return m.run(args)
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))
