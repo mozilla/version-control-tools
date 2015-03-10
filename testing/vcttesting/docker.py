@@ -308,6 +308,8 @@ class Docker(object):
                 'hgtemplates/',
                 'hghooks/',
                 'hgext/pushlog-legacy/',
+                'hgext/pushlog/',
+                'hgext/serverlog/',
             )
             f_hgweb = e.submit(self.ensure_built, 'hgweb',
                                vct_paths=web_paths,

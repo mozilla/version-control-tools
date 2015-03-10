@@ -33,6 +33,9 @@ ADD extra/vct/hgtemplates /repo_local/mozilla/hg_templates
 ADD extra/vct/hghooks /repo_local/mozilla/hghooks
 
 ADD extra/vct/hgext/pushlog-legacy/*.py /repo_local/mozilla/extensions/
+ADD extra/vct/hgext/pushlog-legacy/parsedatetime/* /repo_local/mozilla/extensions/parsedatetime/
+ADD extra/vct/hgext/pushlog/* /repo_local/mozilla/extensions/pushlog/
+ADD extra/vct/hgext/serverlog/* /repo_local/mozilla/extensions/serverlog/
 RUN ln -sf /repo_local/mozilla/hghooks/mozhghooks /repo_local/mozilla/libraries
 
 ADD hgweb.wsgi hgweb.config /repo_local/mozilla/webroot_wsgi/
