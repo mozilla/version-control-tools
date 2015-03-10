@@ -245,7 +245,8 @@ class HgCluster(object):
             else:
                 k = paramiko.rsakey.RSAKey.generate(2048)
                 k.write_private_key_file(key_filename)
-                pubkey = b'%s %s %s' % (k.get_name(), k.get_base64(), email)
+                pubkey = '%s %s %s' % (k.get_name(), k.get_base64(), email)
+                pubkey = pubkey.encode('utf-8')
                 with open(pubkey_filename, 'wb') as fh:
                     fh.write(pubkey)
 
