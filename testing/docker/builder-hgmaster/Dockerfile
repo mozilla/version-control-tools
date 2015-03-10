@@ -26,9 +26,7 @@ RUN yum localinstall -y https://mrepo.mozilla.org/mrepo/6Server-x86_64/RPMS.mozi
 RUN yum clean all
 
 # These should stay in sync with mozilla.ldif from the ldap server.
-RUN groupadd -g 600 scm_level_1
-RUN groupadd -g 601 scm_level_2
-RUN groupadd -g 602 scm_level_3
+RUN groupadd -g 600 scm_level_1 && groupadd -g 601 scm_level_2 && groupadd -g 603 scm_level_3
 
 # Add the hg user
 RUN useradd hg
@@ -42,11 +40,10 @@ RUN mkdir -p /repo/hg/mozilla /repo/hg/extensions /repo/hg/scripts
 
 # Set up users directories, make permissions right
 RUN mkdir -p /repo/hg/mozilla/users
-RUN chmod 2775 /repo/hg/mozilla/users
-RUN chown -R hg:scm_level_1 /repo/hg/mozilla/users
+RUN chmod 2775 /repo/hg/mozilla/users && chown -R hg:scm_level_1 /repo/hg/mozilla/users
 
 # TODO: Fix this logging or remove record-pushes script as it's information duplicates serverlog
-RUN touch /var/log/hg-push.log; chmod 666 /var/log/hg-push.log
+RUN touch /var/log/hg-push.log && chmod 666 /var/log/hg-push.log
 
 RUN touch /var/log/pash.log && chmod 666 /var/log/pash.log
 
@@ -59,19 +56,15 @@ RUN cp /etc/mercurial/mirror.pub /home/hg/.ssh/authorized_keys
 RUN chown -R hg:hg /home/hg/.ssh
 RUN chmod 640 /home/hg/.ssh/authorized_keys
 
-ADD create-repo /create-repo
-ADD set-mirrors.py /set-mirrors.py
-ADD entrypoint.py /entrypoint.py
+ADD create-repo set-mirrors.py entrypoint.py /
 
-ADD extra/vct/testing/docker/builder-hgmaster/hgrc /etc/mercurial/hgrc
-ADD extra/vct/scripts/pash/* /usr/local/bin/
-ADD extra/vct/hgext/pushlog-legacy/* /repo/hg/extensions/
+ADD hgrc /etc/mercurial/hgrc
+ADD extra/vct/scripts/pash/* extra/vct/scripts/repo-push.sh /usr/local/bin/
+ADD extra/vct/hgext/pushlog-legacy/buglink.py extra/vct/hgext/pushlog-legacy/feedparser.py extra/vct/hgext/pushlog-legacy/hgwebjson.py extra/vct/hgext/pushlog-legacy/pushlog-feed.py /repo/hg/extensions/
 ADD extra/vct/hgext/pushlog-legacy/parsedatetime/* /repo/hg/extensions/parsedatetime/
 ADD extra/vct/hgext/serverlog/* /repo/hg/extensions/serverlog/
 ADD extra/vct/hghooks /repo/hg/libraries/
-ADD extra/vct/scripts/record-pushes.sh /repo/hg/scripts/
-ADD extra/vct/scripts/push-repo.sh /repo/hg/scripts/
-ADD extra/vct/scripts/repo-push.sh /usr/local/bin/
+ADD extra/vct/scripts/record-pushes.sh extra/vct/scripts/push-repo.sh /repo/hg/scripts/
 
 EXPOSE 22
 

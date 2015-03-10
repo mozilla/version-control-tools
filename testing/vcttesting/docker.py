@@ -293,9 +293,23 @@ class Docker(object):
         LDAP integration is probably out of scope.
         """
         with futures.ThreadPoolExecutor(3) as e:
-            f_hg = e.submit(self.ensure_built, 'hgmaster', add_vct=True,
+            master_paths = (
+                'scripts/pash/',
+                'hgext/pushlog-legacy/',
+                'hgext/serverlog/',
+                'hghooks/',
+                'scripts/',
+            )
+            f_hg = e.submit(self.ensure_built, 'hgmaster',
+                            vct_paths=master_paths,
                             verbose=verbose)
-            f_hgweb = e.submit(self.ensure_built, 'hgweb', add_vct=True,
+            web_paths = (
+                'hgtemplates/',
+                'hghooks/',
+                'hgext/pushlog-legacy/',
+            )
+            f_hgweb = e.submit(self.ensure_built, 'hgweb',
+                               vct_paths=web_paths,
                                verbose=verbose)
             f_ldap = e.submit(self.ensure_built, 'ldap', verbose=verbose)
 

@@ -27,22 +27,16 @@ ADD mod_wsgi.conf /etc/httpd/conf.d/wsgi.conf
 RUN mkdir /var/log/httpd/hg
 
 ADD hgrc /etc/mercurial/hgrc
-ADD mirror-pull /usr/local/bin/mirror-pull
-ADD repo-group /usr/local/bin/repo-group
-ADD lockfile /usr/local/bin/lockfile
+ADD mirror-pull repo-group lockfile /usr/local/bin/
 ADD ssh-config /home/hg/.ssh/config
 
 ADD extra/vct/hgtemplates /repo_local/mozilla/hg_templates
 ADD extra/vct/hghooks /repo_local/mozilla/hghooks
 
-ADD extra/vct/hgext/pushlog-legacy/buglink.py /repo_local/mozilla/extensions
-ADD extra/vct/hgext/pushlog-legacy/feedparser.py /repo_local/mozilla/extensions
-ADD extra/vct/hgext/pushlog-legacy/hgwebjson.py /repo_local/mozilla/extensions
-ADD extra/vct/hgext/pushlog-legacy/pushlog-feed.py /repo_local/mozilla/extensions
+ADD extra/vct/hgext/pushlog-legacy/*.py /repo_local/mozilla/extensions/
 RUN ln -sf /repo_local/mozilla/hghooks/mozhghooks /repo_local/mozilla/libraries
 
-ADD hgweb.wsgi /repo_local/mozilla/webroot_wsgi/hgweb.wsgi
-ADD hgweb.config /repo_local/mozilla/webroot_wsgi/hgweb.config
+ADD hgweb.wsgi hgweb.config /repo_local/mozilla/webroot_wsgi/
 ADD set-mirror-key.py /set-mirror-key.py
 ADD entrypoint.py /entrypoint.py
 ADD run.sh /run.sh
