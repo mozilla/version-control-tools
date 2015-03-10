@@ -25,6 +25,10 @@ RUN yum localinstall -y https://mrepo.mozilla.org/mrepo/6Server-x86_64/RPMS.mozi
 
 RUN yum clean all
 
+# Docker doesn't have full TTYs. sudo will fail unless we disable this
+# requirement.
+RUN sed -i "s/Defaults    requiretty.*/#Defaults requiretty/g" /etc/sudoers
+
 # These should stay in sync with mozilla.ldif from the ldap server.
 RUN groupadd -g 600 scm_level_1 && groupadd -g 601 scm_level_2 && groupadd -g 603 scm_level_3
 
@@ -56,8 +60,8 @@ RUN cp /etc/mercurial/mirror.pub /home/hg/.ssh/authorized_keys
 RUN chown -R hg:hg /home/hg/.ssh
 RUN chmod 640 /home/hg/.ssh/authorized_keys
 
+ADD repo-push.sudoers /etc/sudoers.d/repo-push
 ADD create-repo set-mirrors.py entrypoint.py /
-
 ADD hgrc /etc/mercurial/hgrc
 ADD extra/vct/scripts/pash/* extra/vct/scripts/repo-push.sh /usr/local/bin/
 ADD extra/vct/hgext/pushlog-legacy/buglink.py extra/vct/hgext/pushlog-legacy/feedparser.py extra/vct/hgext/pushlog-legacy/hgwebjson.py extra/vct/hgext/pushlog-legacy/pushlog-feed.py /repo/hg/extensions/

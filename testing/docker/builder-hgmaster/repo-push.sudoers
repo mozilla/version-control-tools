@@ -1,0 +1,7 @@
+Cmnd_Alias REPOPUSH = /usr/local/bin/repo-push.sh [a-zA-Z0-9/-]*
+        %scm_level_1 ALL = (hg) NOPASSWD: REPOPUSH
+        %scm_level_2 ALL = (hg) NOPASSWD: REPOPUSH
+        %scm_level_3 ALL = (hg) NOPASSWD: REPOPUSH
+        %scm_l10n ALL = (hg) NOPASSWD: REPOPUSH
+        %scm_nss ALL = (hg) NOPASSWD: REPOPUSH
+        vcs-sync@mozilla.com ALL = (hg) NOPASSWD: REPOPUSH
