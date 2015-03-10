@@ -45,27 +45,10 @@ RUN mkdir -p /repo/hg/mozilla/users
 RUN chmod 2775 /repo/hg/mozilla/users
 RUN chown -R hg:scm_level_1 /repo/hg/mozilla/users
 
-# Install Mercurial config files
-ADD extra/vct/testing/docker/builder-hgmaster/hgrc /etc/mercurial/hgrc
-
-# TODO: Write up the client and re-enable the mirror push script
-RUN sed -i 's/changegroup.mirrorpush/#changegroup.mirrorpush/' /etc/mercurial/hgrc
-
-# Copy scripts into place
-ADD extra/vct/hgext/pushlog-legacy/* /repo/hg/extensions/
-ADD extra/vct/hgext/serverlog /repo/hg/extensions/
-ADD extra/vct/hghooks /repo/hg/libraries/
-ADD extra/vct/scripts/record-pushes.sh /repo/hg/scripts/
-ADD extra/vct/scripts/push-repo.sh /repo/hg/scripts/
-ADD extra/vct/scripts/repo-push.sh /usr/local/bin/
-
 # TODO: Fix this logging or remove record-pushes script as it's information duplicates serverlog
 RUN touch /var/log/hg-push.log; chmod 666 /var/log/hg-push.log
 
 RUN touch /var/log/pash.log && chmod 666 /var/log/pash.log
-
-# Put the files in the right place
-ADD extra/vct/scripts/pash/* /usr/local/bin/
 
 ADD sshd_config /etc/ssh/sshd_config
 ADD nslcd.conf /etc/nslcd.conf
@@ -78,6 +61,15 @@ RUN chmod 640 /home/hg/.ssh/authorized_keys
 
 ADD set-mirrors.py /set-mirrors.py
 ADD entrypoint.py /entrypoint.py
+
+ADD extra/vct/testing/docker/builder-hgmaster/hgrc /etc/mercurial/hgrc
+ADD extra/vct/scripts/pash/* /usr/local/bin/
+ADD extra/vct/hgext/pushlog-legacy/* /repo/hg/extensions/
+ADD extra/vct/hgext/serverlog /repo/hg/extensions/
+ADD extra/vct/hghooks /repo/hg/libraries/
+ADD extra/vct/scripts/record-pushes.sh /repo/hg/scripts/
+ADD extra/vct/scripts/push-repo.sh /repo/hg/scripts/
+ADD extra/vct/scripts/repo-push.sh /usr/local/bin/
 
 EXPOSE 22
 
