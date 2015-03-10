@@ -13,7 +13,7 @@ Host *
   StrictHostKeyChecking no
   PasswordAuthentication no
   PreferredAuthentications publickey
-  UserKnownHostsFile ssh-known-hosts
+  UserKnownHostsFile `pwd`/ssh-known-hosts
   ForwardX11 no
 EOF
 }
