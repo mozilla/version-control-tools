@@ -29,7 +29,7 @@ RUN yum clean all
 RUN sed -i "s/Defaults    requiretty.*/#Defaults requiretty/g" /etc/sudoers
 
 # These should stay in sync with mozilla.ldif from the ldap server.
-RUN groupadd -g 600 scm_level_1 && groupadd -g 601 scm_level_2 && groupadd -g 603 scm_level_3
+RUN groupadd -g 600 scm_level_1 && groupadd -g 601 scm_level_2 && groupadd -g 602 scm_level_3
 
 # Add the hg user
 RUN useradd hg
