@@ -15,7 +15,7 @@ apt-get -y upgrade
 apt-get -y install btrfs-tools
 
 if [ ! -e /var/btrfs ]; then
-  dd if=/dev/zero of=/var/btrfs bs=1048576 count=8192
+  dd if=/dev/zero of=/var/btrfs bs=1048576 count=12000
   mkfs.btrfs /var/btrfs
 fi
 
