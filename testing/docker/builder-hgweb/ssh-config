@@ -9,4 +9,3 @@ Host hg.mozilla.org
 # Bug 1030759
 #    ControlMaster auto
 #    ControlPath ~/.ssh/%r@%h:%p
-

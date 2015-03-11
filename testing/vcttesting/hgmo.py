@@ -121,14 +121,16 @@ class HgCluster(object):
         ldap_host_port = ldap_ports['389/tcp'][0]['HostPort']
         master_ssh_host_port = master_ssh_ports['22/tcp'][0]['HostPort']
 
+        self.ldap_uri = 'ldap://%s:%s/' % (self._d.docker_hostname,
+                                           ldap_host_port)
+        self.create_vcs_sync_login(mirror_public_key)
+
         self.ldap_image = ldap_image
         self.master_image = master_image
         self.web_image = web_image
         self.ldap_id = ldap_id
         self.master_id = master_id
         self.web_ids = web_ids
-        self.ldap_uri = 'ldap://%s:%s/' % (self._d.docker_hostname,
-                                           ldap_host_port)
         self.master_ssh_hostname = self._d.docker_hostname
         self.master_ssh_port = master_ssh_host_port
         self.web_urls = []
@@ -260,6 +262,33 @@ class HgCluster(object):
             for level in range(1, scm_level + 1):
                 group = b'scm_level_%d' % level
                 self.add_user_to_ldap_group(email, group)
+
+    def create_vcs_sync_login(self, pubkey):
+        dn = 'uid=vcs-sync,ou=logins,dc=mozilla'
+
+        r = [
+            (b'objectClass', [
+                b'account',
+                b'top',
+                b'uidObject',
+                b'hgAccount',
+                b'mailObject',
+                b'posixAccount',
+                b'ldapPublicKey',
+            ]),
+            (b'cn', [b'VCS Sync']),
+            (b'fakeHome', [b'/tmp']),
+            (b'gidNumber', [b'100']),
+            (b'hgAccountEnabled', [b'TRUE']),
+            (b'hgHome', [b'/tmp']),
+            (b'hgShell', [b'/bin/sh']),
+            (b'homeDirectory', [b'/home/vcs-sync']),
+            (b'mail', [b'vcs-sync@mozilla.com']),
+            (b'uidNumber', [b'1500']),
+            (b'sshPublicKey', [pubkey]),
+        ]
+
+        self.ldap.add_s(dn, r)
 
     def add_ssh_key(self, email, key):
         """Add an SSH key to a user in LDAP."""

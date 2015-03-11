@@ -29,6 +29,8 @@ RUN mkdir /var/log/httpd/hg
 ADD hgrc /etc/mercurial/hgrc
 ADD mirror-pull repo-group lockfile /usr/local/bin/
 ADD ssh-config /home/hg/.ssh/config
+RUN touch /home/hg/.ssh/known_hosts
+RUN chown -R hg:hg /home/hg
 
 ADD extra/vct/hgtemplates /repo_local/mozilla/hg_templates
 ADD extra/vct/hghooks /repo_local/mozilla/hghooks
