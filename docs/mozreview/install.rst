@@ -24,7 +24,7 @@ your ``hgrc``. For example::
 .. tip::
 
    If you already have a Firefox repository like
-   `mozilla-central <https://hg.mozilla.org/mozilla-central>`_, clones, you
+   `mozilla-central <https://hg.mozilla.org/mozilla-central>`_ cloned, you
    can run ``mach mercurial-setup`` and the guided wizard will prompt you
    for code review settings. Follow the prompts and this configuration
    will be done for you.
