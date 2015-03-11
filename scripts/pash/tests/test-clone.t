@@ -297,4 +297,4 @@ We are able to push to the new user repo
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
 
-  $ hgmo clean
+  $ cleanup

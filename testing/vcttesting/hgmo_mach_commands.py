@@ -46,7 +46,8 @@ class HgmoCommands(object):
     @CommandArgument('--master-ssh-port', type=int,
                      help='Port number on which SSH server should listen')
     def start(self, master_ssh_port=None):
-        s = self.c.start(master_ssh_port=master_ssh_port)
+        s = self.c.start(master_ssh_port=master_ssh_port,
+                         coverage='CODE_COVERAGE' in os.environ)
         print('SSH Hostname: %s' % s['master_ssh_hostname'])
         print('SSH Port: %s' % s['master_ssh_port'])
         print('LDAP URI: %s' % s['ldap_uri'])
@@ -101,3 +102,10 @@ class HgmoCommands(object):
                      help='SCM level access for this repository')
     def create_repo(self, name, level):
         self.c.create_repo(name, level=level)
+
+    @Command('aggregate-code-coverage', category='hgmo',
+             description='Aggregate code coverage results to a directory')
+    @CommandArgument('destdir',
+                     help='Directory where to save code coverage files')
+    def aggregate_code_coverage(self, destdir):
+        self.c.aggregate_code_coverage(destdir)

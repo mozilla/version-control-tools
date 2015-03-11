@@ -14,7 +14,17 @@ MAINTAINER Ben Kero <bkero@mozilla.com>
 # Install requisite packages
 RUN yum update -y
 
-RUN yum install -y authconfig nss-pam-ldapd openldap-clients pam_ldap python-ldap sudo syslog
+RUN yum install -y \
+    authconfig \
+    nss-pam-ldapd \
+    openldap-clients \
+    pam_ldap \
+    python-devel \
+    python-ldap \
+    sudo \
+    syslog \
+    tar
+
 # These are copies from Mozilla's internal "mrepo" repository.
 RUN yum install -y \
     https://people.mozilla.org/~gszorc/openssh-lpk-5.4p1-1.x86_64.rpm \
@@ -23,6 +33,9 @@ RUN yum install -y \
     https://people.mozilla.org/~gszorc/mercurial-3.3.2-0.x86_64.rpm
 
 RUN yum clean all
+
+RUN curl https://bootstrap.pypa.io/get-pip.py | python
+RUN pip install coverage
 
 # Docker doesn't have full TTYs. sudo will fail unless we disable this
 # requirement.
@@ -36,6 +49,8 @@ RUN useradd hg
 
 # Set root password to something for debugging purposes
 RUN echo root:mozillafirefox|chpasswd
+
+RUN mkdir /coverage && chmod 777 /coverage
 
 # Set up Mercurial, adding example content
 RUN mkdir -p /etc/mercurial
@@ -61,6 +76,7 @@ RUN cp /etc/mercurial/mirror.pub /home/hg/.ssh/authorized_keys
 RUN chown -R hg:hg /home/hg/.ssh
 RUN chmod 640 /home/hg/.ssh/authorized_keys
 
+ADD sitecustomize.py /usr/lib/python2.6/site-packages/sitecustomize.py
 ADD repo-push.sudoers /etc/sudoers.d/repo-push
 ADD create-repo set-mirrors.py entrypoint.py /
 ADD hgrc /etc/mercurial/hgrc

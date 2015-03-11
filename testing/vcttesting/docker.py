@@ -11,6 +11,7 @@ import base64
 import docker
 import json
 import os
+import pickle
 import requests
 import ssl
 import subprocess
@@ -23,6 +24,7 @@ from contextlib import contextmanager
 from io import BytesIO
 
 import concurrent.futures as futures
+from coverage.data import CoverageData
 
 from .util import (
     wait_for_amqp,
@@ -797,3 +799,76 @@ class Docker(object):
         t = tarfile.open(mode='r', fileobj=buf)
         fp = t.extractfile(os.path.basename(path))
         return fp.read()
+
+    def get_directory_contents(self, cid, path, tar='/bin/tar'):
+        """Obtain the contents of all files in a directory in a container.
+
+        This is done by invoking "tar" inside the container and piping the
+        results to us.
+
+        This returns an iterable of ``tarfile.TarInfo``, fileobj 2-tuples.
+        """
+        data = self.client.execute(cid, [tar, '-c', '-C', path, '-f', '-', '.'],
+                                   stderr=False)
+        buf = BytesIO(data)
+        t = tarfile.open(mode='r', fileobj=buf)
+        for member in t:
+            f = t.extractfile(member)
+            member.name = member.name[2:]
+            yield member, f
+
+    def get_code_coverage(self, cid, filemap=None):
+        """Obtain code coverage data from a container.
+
+        Containers can be programmed to collect code coverage from executed
+        programs automatically. Our convention is to place coverage files in
+        ``/coverage``.
+
+        This method will fetch coverage files and parse them into data
+        structures, which it will emit.
+
+        If a ``filemap`` dict is passed, it will be used to map filenames
+        inside the container to local filesystem paths. When present,
+        files not inside the map will be ignored.
+        """
+        filemap = filemap or {}
+
+        for member, fh in self.get_directory_contents(cid, '/coverage'):
+            if not member.name.startswith('coverage.'):
+                continue
+
+            data = pickle.load(fh)
+
+            c = CoverageData(basename=member.name,
+                             collector=data.get('collector'))
+
+            lines = {}
+            for f, linenos in data.get('lines', {}).items():
+                newname = filemap.get(f)
+                if not newname:
+                    # Ignore entries missing from map.
+                    if filemap:
+                        continue
+
+                    newname = f
+
+                lines[newname] = dict.fromkeys(linenos, None)
+
+            arcs = {}
+            for f, arcpairs in data.get('arcs', {}).items():
+                newname = filemap.get(f)
+                if not newname:
+                    if filemap:
+                        continue
+
+                    newname = f
+
+                arcs[newname] = dict.fromkeys(arcpairs, None)
+
+            if not lines and not arcs:
+                continue
+
+            c.lines = lines
+            c.arcs = arcs
+
+            yield c

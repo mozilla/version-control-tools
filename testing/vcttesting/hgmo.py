@@ -7,10 +7,15 @@ from __future__ import absolute_import, unicode_literals
 import errno
 import json
 import os
+import uuid
 
 import concurrent.futures as futures
 import ldap
 import paramiko
+
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 
 
 class HgCluster(object):
@@ -19,6 +24,18 @@ class HgCluster(object):
     This class manages Docker contains and environments that replicate the
     hg.mozilla.org server configuration.
     """
+    MASTER_FILE_MAP = {
+        'hgext/pushlog-legacy/buglink.py': '/repo/hg/extensions/buglink.py',
+        'hgext/pushlog-legacy/hgwebjson.py': '/repo/hg/extensions/hgwebjson.py',
+        'hgext/pushlog-legacy/pushlog-feed.py': '/repo/hg/extensions/pushlog-feed.py',
+        'hgext/pushlog/__init__.py': '/repo/hg/extensions/pushlog/__init__.py',
+        'hgext/serverlog/__init__.py': '/repo/hg/extensions/serverlog/__init__.py',
+        'scripts/pash/pash.py': '/usr/local/bin/pash.py',
+        'scripts/pash/hg_helper.py': '/usr/local/bin/hg_helper.py',
+        'scripts/pash/ldap_helper.py': '/usr/local/bin/ldap_helper.py',
+        'scripts/pash/repo_group.py': '/usr/local/bin/repo_group.py',
+        'scripts/pash/sh_helper.py': '/usr/local/bin/sh_helper.py',
+    }
 
     def __init__(self, docker, state_path=None, ldap_image=None,
                  master_image=None, web_image=None):
@@ -43,8 +60,13 @@ class HgCluster(object):
             self.master_ssh_port = None
             self.web_urls = []
 
-    def start(self, ldap_port=None, master_ssh_port=None, web_count=2):
-        """Start the cluster."""
+    def start(self, ldap_port=None, master_ssh_port=None, web_count=2,
+              coverage=False):
+        """Start the cluster.
+
+        If ``coverage`` is True, code coverage for Python executions will be
+        obtained.
+        """
 
         ldap_image = self.ldap_image
         master_image = self.master_image
@@ -58,8 +80,14 @@ class HgCluster(object):
 
         with futures.ThreadPoolExecutor(4) as e:
             f_ldap_create = e.submit(self._dc.create_container, ldap_image)
+
+            env = {}
+            if coverage:
+                env['CODE_COVERAGE'] = '1'
+
             f_master_create = e.submit(self._dc.create_container,
-                                       master_image)
+                                       master_image,
+                                       environment=env)
             f_web_creates = []
             for i in range(web_count):
                 f_web_creates.append(e.submit(self._dc.create_container,
@@ -334,3 +362,12 @@ class HgCluster(object):
         cmd = ['/create-repo', name, 'scm_level_%d' % level]
 
         self._dc.execute(self.master_id, cmd)
+
+    def aggregate_code_coverage(self, destdir):
+        master_map = {}
+        for host, container in self.MASTER_FILE_MAP.items():
+            master_map[container] = os.path.join(ROOT, host)
+
+        for c in self._d.get_code_coverage(self.master_id, filemap=master_map):
+            dest = os.path.join(destdir, 'coverage.%s' % uuid.uuid1())
+            c.write_file(dest)

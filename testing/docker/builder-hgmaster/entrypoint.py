@@ -99,6 +99,16 @@ subprocess.check_call([
     '--ldapbasedn=dc=mozilla',
     '--updateall'])
 
+# Set up code coverage, if requested.
+if 'CODE_COVERAGE' in os.environ:
+    with open('/collect-coverage', 'a'):
+        pass
+else:
+    try:
+        os.unlink('/collect-coverage')
+    except OSError:
+        pass
+
 subprocess.check_call(['/sbin/service', 'rsyslog', 'start'])
 
 os.execl(sys.argv[1], *sys.argv[1:])

@@ -43,4 +43,4 @@ A push works
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
 
-  $ hgmo clean
+  $ cleanup

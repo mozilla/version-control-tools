@@ -26,4 +26,4 @@ SSH with a valid key gives us warning about no interactive shells
   No interactive shells allowed here!
   [1]
 
-  $ hgmo clean
+  $ cleanup

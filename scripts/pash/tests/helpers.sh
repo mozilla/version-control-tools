@@ -27,3 +27,8 @@ standarduser() {
 ssh = ssh -F `pwd`/ssh_config -i `pwd`/testuser -l user@example.com
 EOF
 }
+
+cleanup() {
+  hgmo aggregate-code-coverage $TESTDIR/coverage
+  hgmo clean
+}
