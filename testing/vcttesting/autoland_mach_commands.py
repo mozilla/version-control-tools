@@ -47,3 +47,28 @@ class AutolandCommands(object):
     def autoland_job_status(self, host, requestid):
         r = requests.get(host + '/autoland/status/' + requestid)
         print(r.status_code, r.text)
+
+    @Command('wait-for-autoland-pingback', category='autoland',
+        description='Wait for an autoland job pingback')
+    @CommandArgument('host', help='Address on which to listen')
+    @CommandArgument('port', type=int, help='Port oo which to listen')
+    @CommandArgument('timeout', type=int, help='Timeout')
+    def wait_for_autoland_pingback(self, host, port, timeout):
+        import SocketServer
+
+        class AutolandServer(SocketServer.TCPServer):
+            def handle_timeout(self):
+                print('timed out')
+
+        class RequestHandler(SocketServer.BaseRequestHandler):
+            def handle(self):
+                self.data = self.request.recv(4096).split('\n')
+                self.request.sendall('HTTP/1.1 200 OK\r\n')
+
+                # this outputs just the request body
+                print(self.data[-1].strip())
+
+        server = AutolandServer((host, port), RequestHandler)
+        server.allow_reuse_address = True
+        server.timeout = timeout
+        server.handle_request()

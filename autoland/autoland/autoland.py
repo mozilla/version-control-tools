@@ -50,10 +50,9 @@ def handle_pending_transplants(logger, dbconn):
                 logger.info(('transplant failed: tree: %s rev: %s'
                              'destination: %s error: %s') %
                             (tree, rev, destination, result))
-
         else:
-            #TODO, we're only landing to try at the moment
-            pass
+            landed = False
+            result = 'unknown destination: %s' % destination
 
         landed_revisions.append([landed, result, transplant_id])
 
