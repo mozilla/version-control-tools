@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import json
 import logging
 
 from django.template.loader import Context, get_template
@@ -37,25 +38,38 @@ def ensure_review_request(review_request_details):
     return review_request_details
 
 
+class CombinedReviewersField(BaseReviewRequestField):
+    """ This field allows for empty pushes on the parent request"""
+    field_id = "p2rb.reviewer_epoch"
+
+    can_record_change_entry = True
+
+    def should_render(self, value):
+        return False
+
+
 class CommitsListField(BaseReviewRequestField):
     """The commits list field for review requests.
 
     This field is injected in the details of a review request that
     is a "push" based review request.
     """
-    field_id = "p2rb.reviewer_epoch"
+    field_id = "p2rb.commits"
     label = _("Commits")
 
     can_record_change_entry = True
 
+    def has_value_changed(self, old_value, new_value):
+        # Just to be safe, we de-serialize the json and compare values
+        if old_value is not None and new_value is not None:
+            return json.loads(old_value) != json.loads(new_value)
+        return old_value != new_value
+
     def should_render(self, value):
         return is_pushed(self.review_request_details)
 
-    def load_value(self, review_request_details):
-        return review_request_details.extra_data.get('p2rb.reviewer_epoch')
-
-    def render_change_entry_html(self, info):
-        return ""
+    def get_change_entry_sections_html(self, info):
+        return []
 
     def as_html(self):
         rr = ensure_review_request(self.review_request_details)

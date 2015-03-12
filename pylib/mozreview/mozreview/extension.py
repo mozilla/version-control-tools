@@ -19,7 +19,8 @@ from mozreview.batchreview.resources import batch_review_resource
 from mozreview.pulse import initialize_pulse_handlers
 from mozreview.resources.review_request_summary import (
     review_request_summary_resource,)
-from mozreview.fields import (CommitsListField, TryField)
+from mozreview.fields import (CombinedReviewersField, CommitsListField,
+                              TryField)
 
 
 class MozReviewExtension(Extension):
@@ -125,6 +126,7 @@ class MozReviewExtension(Extension):
 
         # The above hack forced Commits at the top, but the rest of these
         # fields are fine below the Description.
+        ReviewRequestFieldsHook(self, 'main', [CombinedReviewersField])
         ReviewRequestFieldsHook(self, 'main', [TryField])
 
     def shutdown(self):

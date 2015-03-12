@@ -60,7 +60,6 @@ Discarded because this change is no longer required.
 DRAFTED_EXTRA_DATA_KEYS = [
     'p2rb.identifier',
     'p2rb.commit_id',
-    'p2rb.commits',
 ]
 
 
