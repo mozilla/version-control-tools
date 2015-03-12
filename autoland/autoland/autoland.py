@@ -299,7 +299,7 @@ def main():
         try:
             dbconn = psycopg2.connect(args.dsn)
         except psycopg2.OperationalError:
-            time.sleep(5)
+            time.sleep(0.1)
 
     while True:
         try:
