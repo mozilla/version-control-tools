@@ -1,0 +1,4 @@
+---
+dependencies:
+  - { role: hg-ssh }
+  - { role: docker-python-coverage }

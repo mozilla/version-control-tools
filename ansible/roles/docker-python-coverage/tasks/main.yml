@@ -1,0 +1,12 @@
+---
+- name: Prerequisites to install Python code coverage tools
+  yum: name=python-devel state=present
+
+- name: Python code coverage module installed
+  pip: name=coverage state=latest
+
+- name: Code coverage directory present
+  file: path=/coverage state=directory mode=0777
+
+- name: Install custom sitecustomize.py
+  copy: src=sitecustomize.py dest=/usr/lib/python2.6/site-packages/sitecustomize.py

@@ -1,0 +1,4 @@
+---
+basedn: dc=mozilla
+uid_attribute: mail
+home_attribute: homeDirectory

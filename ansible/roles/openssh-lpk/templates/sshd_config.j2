@@ -8,12 +8,15 @@ ChallengeResponseAuthentication no
 
 UseLPK yes
 # This entry gets replaced by the entrypoint script.
-LpkServers ldap://localhost/
+LpkServers {{ ldap_uri | mandatory }}
 LpkForceTLS no
-LpkUIDAttribute mail
-LpkBindDN cn=admin,dc=mozilla
-LpkBindPw password
-LpkUserDN dc=mozilla
+LpkUIDAttribute {{ uid_attribute | mandatory }}
+LpkBindDN {{ bind_dn | mandatory }}
+LpkBindPw {{ bind_pw | mandatory }}
+LpkUserDN {{ basedn | mandatory }}
 
 Subsystem sftp /usr/libexec/openssh/sftp-server
-ForceCommand /usr/local/bin/pash.py
+
+{% if force_command %}
+ForceCommand {{ force_command }}
+{% endif %}

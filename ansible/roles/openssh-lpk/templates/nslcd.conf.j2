@@ -1,0 +1,15 @@
+uri {{ ldap_uri | mandatory }}
+base {{ basedn | mandatory }}
+binddn {{ bind_dn | mandatory }}
+bindpw {{ bind_pw | mandatory }}
+
+scope sub
+
+bind_timelimit 30
+
+map passwd uid {{ uid_attribute | mandatory }}
+map passwd homeDirectory {{ home_attribute | mandatory }}
+
+uid nslcd
+gid ldap
+ssl no

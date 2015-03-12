@@ -1,0 +1,53 @@
+---
+- name: Install packages required to run a Mercurial server
+  yum: name={{ item }} state=present
+  with_items:
+    - python-ldap
+    - sudo
+    - syslog
+    - tar
+    - https://people.mozilla.org/~gszorc/mercurial-3.3.2-0.x86_64.rpm
+
+- name: Create groups for SCM ACLs
+  group: name={{ item.name }} gid={{ item.gid }}
+  with_items:
+    - { name: 'scm_level_1', gid: 600 }
+    - { name: 'scm_level_2', gid: 601 }
+    - { name: 'scm_level_3', gid: 602 }
+
+- name: Create hg group
+  group: name=hg
+
+- name: Create hg user
+  user: name=hg group=hg
+
+- name: hg user ssh config is prepared
+  file: path=/home/hg/.ssh state=directory mode=0775 owner=hg group=hg
+
+- name: Mercurial config directory is present
+  file: path=/etc/mercurial state=directory mode=0775
+
+- name: Mercurial known hosts file is present
+  file: path=/etc/mercurial/known_hosts mode=0660 owner=hg group=hg state=touch
+
+- name: Mercurial repository directories are present
+  file: path={{ item }} state=directory mode=0775
+  with_items:
+    - /repo/hg/mozilla
+    - /repo/hg/extensions
+    - /repo/hg/scripts
+
+- name: User repository directories are present
+  file: path=/repo/hg/mozilla/users state=directory mode=0775 owner=hg group=scm_level_1
+
+- name: Mercurial log files are present and writable
+  file: path={{ item }} mode=0666 state=touch
+  with_items:
+    - /var/log/hg-push.log
+    - /var/log/pash.log
+
+- name: sudoers policy for repo-push is in place
+  copy: src=repo-push.sudoers dest=/etc/sudoers.d/repo-push
+
+- name: Global Mercurial config is in place
+  copy: src=hgrc dest=/etc/mercurial/hgrc mode=0664 owner=root group=root

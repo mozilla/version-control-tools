@@ -1,0 +1,26 @@
+---
+- name: Regular OpenSSH cannot be installed
+  yum: name={{ item }} state=absent
+  with_items:
+    - openssh
+    - openssh-clients
+    - openssh-server
+
+- name: Install packages related to LDAP auth
+  yum: name={{ item }} state=present
+  with_items:
+    - authconfig
+    - nss-pam-ldapd
+    - openldap-clients
+    - pam_ldap
+    - https://people.mozilla.org/~gszorc/openssh-lpk-5.4p1-1.x86_64.rpm
+    - https://people.mozilla.org/~gszorc/openssh-lpk-clients-5.4p1-1.x86_64.rpm
+    - https://people.mozilla.org/~gszorc/openssh-lpk-server-5.4p1-1.x86_64.rpm
+
+- name: Configure system authentication settings
+  template: src=nslcd.conf.j2 dest=/etc/nslcd.conf
+  notify: run authconfig
+
+- name: Configure sshd
+  template: src=sshd_config.j2 dest=/etc/ssh/sshd_config
+  notify: restart sshd
