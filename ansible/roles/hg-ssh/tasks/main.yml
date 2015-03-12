@@ -11,9 +11,13 @@
 - name: Create groups for SCM ACLs
   group: name={{ item.name }} gid={{ item.gid }}
   with_items:
-    - { name: 'scm_level_1', gid: 600 }
-    - { name: 'scm_level_2', gid: 601 }
-    - { name: 'scm_level_3', gid: 602 }
+    - { name: 'scm_level_1', gid: 673 }
+    - { name: 'scm_level_2', gid: 685 }
+    - { name: 'scm_level_3', gid: 679 }
+    - { name: 'scm_l10n', gid: 678 }
+    - { name: 'scm_l10n_infra', gid: 680 }
+    - { name: 'scm_sec_sensitive', gid: 686 }
+    - { name: 'scm_ecmascript', gid: 687 }
 
 - name: Create hg group
   group: name=hg

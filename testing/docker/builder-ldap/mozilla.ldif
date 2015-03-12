@@ -19,19 +19,43 @@ objectClass: organizationalUnit
 objectClass: top
 
 dn: cn=scm_level_1,ou=groups,dc=mozilla
-gidNumber: 600
+gidNumber: 673
 objectClass: posixGroup
 objectClass: top
 cn: scm_level_1
 
 dn: cn=scm_level_2,ou=groups,dc=mozilla
-gidNumber: 601
+gidNumber: 685
 objectClass: posixGroup
 objectClass: top
 cn: scm_level_2
 
 dn: cn=scm_level_3,ou=groups,dc=mozilla
-gidNumber: 602
+gidNumber: 679
 objectClass: posixGroup
 objectClass: top
 cn: scm_level_3
+
+dn: cn=scm_l10n,ou=groups,dc=mozilla
+gidNumber: 678
+objectClass: posixGroup
+objectClass: top
+cn: scm_l10n
+
+dn: cn=scm_l10n_infra,ou=groups,dc=mozilla
+gidNumber: 680
+objectClass: posixGroup
+objectClass: top
+cn: scm_l10n_infra
+
+dn: cn=scm_sec_sensitive,ou=groups,dc=mozilla
+gidNumber: 686
+objectClass: posixGroup
+objectClass: top
+cn: scm_sec_sensitive
+
+dn: cn=scm_ecmascript,ou=groups,dc=mozilla
+gidNumber: 687
+objectClass: posixGroup
+objectClass: top
+cn: scm_ecmascript
