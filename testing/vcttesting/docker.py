@@ -154,7 +154,8 @@ class Docker(object):
         except requests.exceptions.RequestException as e:
             return False
 
-    def ensure_built(self, name, verbose=False, add_vct=False, vct_paths=None):
+    def ensure_built(self, name, verbose=False, add_vct=False,
+                     scan_includes=False):
         """Ensure a Docker image from a builder directory is built and up to date.
 
         This function is docker build++. Under the hood, it talks to the same
@@ -164,12 +165,13 @@ class Docker(object):
         We supplement all contexts with the content of the source in this
         repository related to building Docker containers. If ``add_vct`` is
         True, we add the entire source repository to the Docker context.
-        If ``vct_paths`` is an iterable, we add only the paths specified to the
-        context.
 
-        If an entry in ``vct_paths`` ends in a ``/``, we add all files under
-        that directory. Otherwise, we assume it is a literal match and only add
-        a single file.
+        Preferred over ``add_vct`` is ``scan_includes``. When ``True``, the
+        source ``Dockerfile`` will be parsed for lines of the form
+        ``# %include <path>``. Paths will be matched against files in the
+        source repository and added to the context. If an entry ends in a
+        ``/``, we add all files under that directory. Otherwise, we assume it
+        is a literal match and only add a single file
 
         This added content can be ``ADD``ed to the produced image inside the
         Dockerfile. If the content changes, the Docker image ID changes and the
@@ -180,6 +182,16 @@ class Docker(object):
         p = os.path.join(self._ddir, 'builder-%s' % name)
         if not os.path.isdir(p):
             raise Exception('Unknown Docker builder name: %s' % name)
+
+        vct_paths = []
+        if scan_includes:
+            with open(os.path.join(p, 'Dockerfile'), 'rb') as fh:
+                for line in fh:
+                    line = line.rstrip()
+                    if not line.startswith('# %include'):
+                        continue
+
+                    vct_paths.append(line[len('# %include '):])
 
         # We build the build context for the image manually because we need to
         # include things outside of the directory containing the Dockerfile.
@@ -212,7 +224,7 @@ class Docker(object):
             hg = os.path.join(ROOT, 'venv', 'bin', 'hg')
             env = dict(os.environ)
             env['HGRCPATH'] = '/dev/null'
-            args = [hg, '-R', ROOT, 'locate', '-r', '.']
+            args = [hg, '-R', ROOT, 'locate']
             null = open(os.devnull, 'wb')
             output = subprocess.check_output(args, env=env, cwd='/',
                                              stderr=null)
@@ -295,26 +307,11 @@ class Docker(object):
         LDAP integration is probably out of scope.
         """
         with futures.ThreadPoolExecutor(3) as e:
-            master_paths = (
-                'scripts/pash/',
-                'hgext/pushlog-legacy/',
-                'hgext/pushlog/',
-                'hgext/serverlog/',
-                'hghooks/',
-                'scripts/',
-            )
             f_hg = e.submit(self.ensure_built, 'hgmaster',
-                            vct_paths=master_paths,
+                            scan_includes=True,
                             verbose=verbose)
-            web_paths = (
-                'hgtemplates/',
-                'hghooks/',
-                'hgext/pushlog-legacy/',
-                'hgext/pushlog/',
-                'hgext/serverlog/',
-            )
             f_hgweb = e.submit(self.ensure_built, 'hgweb',
-                               vct_paths=web_paths,
+                               scan_includes=True,
                                verbose=verbose)
             f_ldap = e.submit(self.ensure_built, 'ldap', verbose=verbose)
 

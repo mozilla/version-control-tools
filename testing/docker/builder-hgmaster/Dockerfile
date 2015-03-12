@@ -80,6 +80,12 @@ ADD sitecustomize.py /usr/lib/python2.6/site-packages/sitecustomize.py
 ADD repo-push.sudoers /etc/sudoers.d/repo-push
 ADD create-repo set-mirrors.py entrypoint.py /
 ADD hgrc /etc/mercurial/hgrc
+# %include scripts/pash/
+# %include hgext/pushlog-legacy/
+# %include hgext/pushlog/
+# %include hgext/serverlog/
+# %include hghooks/
+# %include scripts/
 ADD extra/vct/scripts/pash/* extra/vct/scripts/repo-push.sh /usr/local/bin/
 ADD extra/vct/hgext/pushlog-legacy/buglink.py extra/vct/hgext/pushlog-legacy/feedparser.py extra/vct/hgext/pushlog-legacy/hgwebjson.py extra/vct/hgext/pushlog-legacy/pushlog-feed.py /repo/hg/extensions/
 ADD extra/vct/hgext/pushlog-legacy/parsedatetime/* /repo/hg/extensions/parsedatetime/

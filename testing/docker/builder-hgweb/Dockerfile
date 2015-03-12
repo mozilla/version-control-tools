@@ -32,6 +32,11 @@ ADD ssh-config /home/hg/.ssh/config
 RUN touch /home/hg/.ssh/known_hosts
 RUN chown -R hg:hg /home/hg
 
+# %include hgtemplates/
+# %include hghooks/
+# %include hgext/pushlog-legacy/
+# %include hgext/pushlog/
+# %include hgext/serverlog/
 ADD extra/vct/hgtemplates /repo_local/mozilla/hg_templates
 ADD extra/vct/hghooks /repo_local/mozilla/hghooks
 

@@ -82,6 +82,12 @@ class DockerCommands(object):
     def stop_bmo(self, cluster):
         self.d.stop_bmo(cluster)
 
+    @Command('build', category='docker',
+             description='Build a single image')
+    @CommandArgument('name', help='Name of image to build')
+    def build(self, name):
+        self.d.ensure_built(name, scan_includes=True, verbose=True)
+
     @Command('prune-images', category='docker',
         description='Prune old Docker images')
     def prune_images(self):
