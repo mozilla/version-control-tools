@@ -297,4 +297,23 @@ We are able to push to the new user repo
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
 
+  $ cd ..
+
+TODO verify the new user repo shows up in hgweb
+
+Specifying the source path when doing a clone command works
+
+  $ testuserssh $SSH_SERVER clone repo-2 hgcustom/version-control-tools
+  Please wait.  Cloning /hgcustom/version-control-tools to /users/user_example.com/repo-2
+  Clone complete.
+  Fixing permissions, don't interrupt.
+  Repository marked as non-publishing: draft changesets will remain in the draft phase when pushed.
+
+TODO verify new user repo shows up in hgweb
+
+Specifying an invalid source repo to clone will result in error
+TODO this behavior is wrong (bug 758608)
+
+  $ testuserssh $SSH_SERVER clone repo-missing does-not-exist
+
   $ cleanup
