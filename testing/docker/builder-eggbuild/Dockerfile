@@ -31,6 +31,9 @@ RUN /venv/bin/easy_install /ReviewBoard.egg
 
 ADD eggserver.py /eggserver.py
 
+# %include pylib/mozreview/
+# %include pylib/rbbz/
+# %include pylib/rbmozui/
 ADD extra/vct /version-control-tools
 
 ADD entrypoint.sh /entrypoint.sh
