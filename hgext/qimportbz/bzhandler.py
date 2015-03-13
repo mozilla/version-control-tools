@@ -7,6 +7,7 @@ import os
 import re
 from itertools import cycle
 
+from mercurial.util import Abort
 import bz
 
 # Patch list
@@ -74,8 +75,8 @@ class Handler(urllib2.BaseHandler):
             try:
                 bug = bz.Bug(self.ui, data)
             except bz.PermissionError as e:
-                self.ui.warn(" %s\n" % e.msg)
-                return
+                self.ui.status("\n")
+                raise Abort(e.msg)
             self.ui.status(" done\n")
 
         attachid = req.get_selector()[1:]
@@ -84,12 +85,11 @@ class Handler(urllib2.BaseHandler):
 
         if not patch:
             if not bug.patches:
-                self.ui.warn("No patches found for this bug\n")
-                return
+                raise Abort("No patches found for this bug")
             patches = [p for p in bug.patches if not p.obsolete]
             if not patches:
                 if 'y' != self.ui.prompt("Only obsolete patches found. Import anyway? [Default is 'y']", default='y'):
-                    return
+                    raise Abort("Nothing to import")
                 patches = bug.patches
             if len(patches) == 1:
                 patch = patches[0]
