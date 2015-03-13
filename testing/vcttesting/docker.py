@@ -292,19 +292,21 @@ class Docker(object):
 
         raise Exception('Unable to confirm image was built')
 
-    def ensure_images_built(self, names, verbose=False):
+    def ensure_images_built(self, names, existing=None, verbose=False):
         """Ensure that multiple images are built.
 
         ``names`` is a list of Docker images to build.
         """
+        existing = existing or {}
+        images = dict(existing)
+        missing = set(names) - set(existing.keys())
+
         def build(name, **kwargs):
             image = self.ensure_built(name, **kwargs)
             return name, image
 
-        images = {}
-
-        with futures.ThreadPoolExecutor(len(names)) as e:
-            fs = [e.submit(build, name, verbose=verbose) for name in names]
+        with futures.ThreadPoolExecutor(len(missing)) as e:
+            fs = [e.submit(build, name, verbose=verbose) for name in missing]
 
             for f in futures.as_completed(fs):
                 name, image = f.result()
@@ -312,7 +314,7 @@ class Docker(object):
 
         return images
 
-    def build_hgmo(self, verbose=False):
+    def build_hgmo(self, images=None, verbose=False):
         """Ensure the images for a hg.mozilla.org service are built.
 
         hg-master runs the ssh service while hg-slave runs hgweb. The mirroring
@@ -320,7 +322,7 @@ class Docker(object):
         LDAP integration is probably out of scope.
         """
         images = self.ensure_images_built(['hgmaster', 'hgweb', 'ldap'],
-                                          verbose=verbose)
+                                          existing=images, verbose=verbose)
 
         self.state['last-hgmaster-id'] = images['hgmaster']
         self.state['last-hgweb-id'] = images['hgweb']
@@ -328,7 +330,7 @@ class Docker(object):
 
         return images
 
-    def build_mozreview(self, verbose=False):
+    def build_mozreview(self, images=None, verbose=False):
         """Ensure the images for a MozReview service are built.
 
         bmoweb's entrypoint does a lot of setup on first run. This takes many
@@ -346,7 +348,7 @@ class Docker(object):
             'autolanddb',
             'autoland',
             #'rbweb',
-        ], verbose=verbose)
+        ], existing=images, verbose=verbose)
 
         self.state['last-bmodb-id'] = images['bmodb-volatile']
         self.state['last-bmoweb-id'] = images['bmoweb']
@@ -633,9 +635,22 @@ class Docker(object):
             pass
 
     def build_all_images(self, verbose=False):
+        images = self.ensure_images_built([
+            'autolanddb',
+            'autoland',
+            'bmodb-volatile',
+            'bmoweb',
+            'hgmaster',
+            'hgweb',
+            'ldap',
+            'pulse',
+            #'rbweb',
+        ], verbose=verbose)
+
         with futures.ThreadPoolExecutor(2) as e:
-            f_mr = e.submit(self.build_mozreview, verbose=verbose)
-            f_hgmo = e.submit(self.build_hgmo, verbose=verbose)
+            f_mr = e.submit(self.build_mozreview, images=images,
+                            verbose=verbose)
+            f_hgmo = e.submit(self.build_hgmo, images=images, verbose=verbose)
 
         return f_mr.result(), f_hgmo.result()
 
