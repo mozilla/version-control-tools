@@ -10,34 +10,6 @@ import urllib
 import urllib2
 
 
-def _relpath(filepath, start=os.curdir):
-    """os.path.relpath is 2.6+, so don't rely on it being present.
-    See the os.path.relpath docs for further reference."""
-    path, filename = os.path.split(filepath)
-    pathdrive, path = os.path.splitdrive(os.path.abspath(path))
-    startdrive, start = os.path.splitdrive(os.path.abspath(start))
-    prefix = os.path.commonprefix((path, start))
-
-    # interesting question: is it possible to construct a relative path
-    # on windows that specifies a location on a drive different than the
-    # drive in which the cwd is?
-    assert pathdrive == startdrive
-
-    def splitparts(p):
-        return filter(lambda s: s != '', p.split(os.sep))
-    prefixlen = len(splitparts(prefix))
-    pathparts = splitparts(path)[prefixlen:]
-    startparts = splitparts(start)[prefixlen:]
-
-    # walk from |start| to the LCA ...
-    relpath = os.sep.join(['..'] * len(startparts))
-
-    # then back down to |filepath|
-    relpath = os.path.join(relpath, path)
-
-    return os.path.join(relpath, filename)
-
-
 class Handler(urllib2.BaseHandler):
     def __init__(self, ui, passmgr):
         self.ui = ui
@@ -56,7 +28,7 @@ class Handler(urllib2.BaseHandler):
         # Windows drive letters fool scp into thinking a path refers to a
         # remote machine in the mingw shell.  So instead, use a relative
         # path
-        tmpfilename = _relpath(tmpfilename)
+        tmpfilename = os.path.relpath(tmpfilename)
 
         output = ''
         try:
