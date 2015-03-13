@@ -299,6 +299,30 @@ class Docker(object):
 
         raise Exception('Unable to confirm image was built')
 
+    def ensure_images_built(self, builds, verbose=False):
+        """Ensure that multiple images are built.
+
+        ``builds`` is a list of 2-tuple of build rules. The first item is the
+        image name. The second item is a dict of named arguments to
+        ``ensure_built``.
+        """
+        def build(name, **kwargs):
+            image = self.ensure_built(name, **kwargs)
+            return name, image
+
+        images = {}
+
+        with futures.ThreadPoolExecutor(len(builds)) as e:
+            fs = []
+            for name, kwargs in builds:
+                fs.append(e.submit(build, name, verbose=verbose, **kwargs))
+
+            for f in futures.as_completed(fs):
+                name, image = f.result()
+                images[name] = image
+
+        return images
+
     def build_hgmo(self, verbose=False):
         """Ensure the images for a hg.mozilla.org service are built.
 
@@ -306,28 +330,17 @@ class Docker(object):
         and other bits should be the same as in production with the caveat that
         LDAP integration is probably out of scope.
         """
-        with futures.ThreadPoolExecutor(3) as e:
-            f_hg = e.submit(self.ensure_built, 'hgmaster',
-                            scan_includes=True,
-                            verbose=verbose)
-            f_hgweb = e.submit(self.ensure_built, 'hgweb',
-                               scan_includes=True,
-                               verbose=verbose)
-            f_ldap = e.submit(self.ensure_built, 'ldap', verbose=verbose)
+        images = self.ensure_images_built([
+            ('hgmaster', {'scan_includes': True}),
+            ('hgweb', {'scan_includes': True}),
+            ('ldap', {}),
+        ], verbose=verbose)
 
-        hg_master_image = f_hg.result()
-        hgweb_image = f_hgweb.result()
-        ldap_image = f_ldap.result()
+        self.state['last-hgmaster-id'] = images['hgmaster']
+        self.state['last-hgweb-id'] = images['hgweb']
+        self.state['last-ldap-id'] = images['ldap']
 
-        self.state['last-hgmaster-id'] = hg_master_image
-        self.state['last-hgweb-id'] = hgweb_image
-        self.state['last-ldap-id'] = ldap_image
-
-        return {
-            'hgmaster': hg_master_image,
-            'hgweb': hgweb_image,
-            'ldap': ldap_image,
-        }
+        return images
 
     def build_mozreview(self, verbose=False):
         """Ensure the images for a MozReview service are built.
@@ -340,54 +353,32 @@ class Docker(object):
         """
         state_images = self.state['images']
 
-        def build(name, **kwargs):
-            image = self.ensure_built(name, verbose=verbose, **kwargs)
-            return name, image
+        images = self.ensure_images_built([
+            ('bmodb-volatile', {}),
+            ('bmoweb', {}),
+            ('pulse', {}),
+            ('autolanddb', {'add_vct': True}),
+            ('autoland', {'add_vct': True}),
+            #('rbweb', {'add_vct': True}),
+        ], verbose=verbose)
 
-        with futures.ThreadPoolExecutor(5) as e:
-            fs = []
-            fs.append(e.submit(build, 'bmodb-volatile'))
-            fs.append(e.submit(build, 'bmoweb'))
-            fs.append(e.submit(build, 'pulse'))
-            fs.append(e.submit(build, 'autolanddb', add_vct=True))
-            fs.append(e.submit(build, 'autoland', add_vct=True))
-            #fs.append(e.submit(build, 'rbweb', add_vct=True))
-
-        # This is very ugly.
-        for f in futures.as_completed(fs):
-            name, image = f.result()
-            if name == 'bmodb-volatile':
-                bmodb_image = image
-            elif name == 'bmoweb':
-                bmoweb_image = image
-            elif name == 'pulse':
-                pulse_image = image
-            elif name == 'rbweb':
-                rbweb_image = image
-            elif name == 'autolanddb':
-                autolanddb_image = image
-            elif name == 'autoland':
-                autoland_image = image
-            else:
-                assert False
-
-        self.state['last-bmodb-id'] = bmodb_image
-        self.state['last-bmoweb-id'] = bmoweb_image
-        self.state['last-pulse-id'] = pulse_image
-        self.state['last-autolanddb-id'] = autolanddb_image
-        self.state['last-autoland-id'] = autoland_image
-        #self.state['last-rbweb-id'] = rbweb_image
+        self.state['last-bmodb-id'] = images['bmodb-volatile']
+        self.state['last-bmoweb-id'] = images['bmoweb']
+        self.state['last-pulse-id'] = images['pulse']
+        self.state['last-autolanddb-id'] = images['autolanddb']
+        self.state['last-autoland-id'] = images['autoland']
+        #self.state['last-rbweb-id'] = images['rbweb']
 
         # The keys for the bootstrapped images are derived from the base
         # images they depend on. This means that if we regenerate a new
         # base image, the bootstrapped images will be regenerated.
-        bmodb_bootstrapped_key = 'bmodb-bootstrapped:%s' % bmodb_image
+        bmodb_bootstrapped_key = 'bmodb-bootstrapped:%s' % images['bmodb-volatile']
         bmoweb_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (
-                bmodb_image, bmoweb_image)
-        autolanddb_bootstrapped_key = 'autolanddb-bootstrapped:%s' % autolanddb_image
-        autoland_bootstrapped_key = 'autoland-bootstrapped:%s' % autoland_image
+                images['bmodb-volatile'], images['bmoweb'])
+        autolanddb_bootstrapped_key = 'autolanddb-bootstrapped:%s' % images['autolanddb']
+        autoland_bootstrapped_key = 'autoland-bootstrapped:%s' % images['autoland']
         #rbweb_bootstrapped_key = 'rbweb-bootstrapped:%s:%s' % (db_image,
-        #        rbweb_image)
+        #        images['rbweb'])
 
         have_bmodb = bmodb_bootstrapped_key in state_images
         have_bmoweb = bmoweb_bootstrapped_key in state_images
@@ -407,7 +398,7 @@ class Docker(object):
                 #state_images[rbweb_bootstrapped_key]
             )
 
-        bmodb_id = self.client.create_container(bmodb_image,
+        bmodb_id = self.client.create_container(images['bmodb-volatile'],
                 environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
 
         bmoweb_environ = {}
@@ -415,13 +406,13 @@ class Docker(object):
         if 'FETCH_BMO' in os.environ:
             bmoweb_environ['FETCH_BMO'] = '1'
 
-        bmoweb_id = self.client.create_container(bmoweb_image,
+        bmoweb_id = self.client.create_container(images['bmoweb'],
                                                  environment=bmoweb_environ)['Id']
 
-        autolanddb_id = self.client.create_container(autolanddb_image)['Id']
-        autoland_id = self.client.create_container(autoland_image)['Id']
+        autolanddb_id = self.client.create_container(images['autolanddb'])['Id']
+        autoland_id = self.client.create_container(images['autoland'])['Id']
 
-        #rbweb_id = self.client.create_container(rbweb_image)['Id']
+        #rbweb_id = self.client.create_container(images['rbweb'])['Id']
 
         with self._start_container(bmodb_id) as db_state:
             web_params = {
@@ -477,7 +468,7 @@ class Docker(object):
         #rbweb_bootstrap = rbweb_future.result()['Id']
         state_images[bmodb_bootstrapped_key] = bmodb_bootstrap
         state_images[bmoweb_bootstrapped_key] = bmoweb_bootstrap
-        state_images['pulse'] = pulse_image
+        state_images['pulse'] = images['pulse']
         state_images[autolanddb_bootstrapped_key] = autolanddb_bootstrap
         state_images[autoland_bootstrapped_key] = autoland_bootstrap
         #state_images[rbweb_bootstrapped_key] = rbweb_bootstrap
@@ -497,7 +488,7 @@ class Docker(object):
 
         print('bootstrapped images created')
 
-        return (bmodb_bootstrap, bmoweb_bootstrap, pulse_image,
+        return (bmodb_bootstrap, bmoweb_bootstrap, images['pulse'],
                 autolanddb_bootstrap, autoland_bootstrap) #, rbweb_bootstrap
 
     def start_mozreview(self, cluster, hostname=None, http_port=80,
