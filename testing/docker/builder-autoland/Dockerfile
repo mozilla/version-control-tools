@@ -17,6 +17,8 @@ RUN apt-get update && apt-get -y install \
   mercurial
 
 # Python
+# %include autoland/requirements.txt
+# %include autoland/autoland/
 ADD extra/vct/autoland/requirements.txt ${AUTOLAND_HOME}/requirements.txt
 ADD extra/vct/autoland/autoland ${AUTOLAND_HOME}/autoland
 

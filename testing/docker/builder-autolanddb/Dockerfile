@@ -12,5 +12,6 @@ FROM postgres:9.4
 ENV PGDATA /postgresql-data
 RUN mkdir $PGDATA
 
+# %include autoland/sql/schema.sql
 ADD extra/vct/autoland/sql/schema.sql /docker-entrypoint-initdb.d/schema.sql
 ADD createdb.sh /docker-entrypoint-initdb.d/createdb.sh

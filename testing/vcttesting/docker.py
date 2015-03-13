@@ -357,9 +357,9 @@ class Docker(object):
             ('bmodb-volatile', {}),
             ('bmoweb', {}),
             ('pulse', {}),
-            ('autolanddb', {'add_vct': True}),
-            ('autoland', {'add_vct': True}),
-            #('rbweb', {'add_vct': True}),
+            ('autolanddb', {'scan_includes': True}),
+            ('autoland', {'scan_includes': True}),
+            #('rbweb', {'scan_includes': True}),
         ], verbose=verbose)
 
         self.state['last-bmodb-id'] = images['bmodb-volatile']
