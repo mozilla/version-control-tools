@@ -93,8 +93,22 @@ def extsetup(ui):
 
         # checks for an unused patch name. prompts if the patch already exists and
         # returns the corrected name.
-        def checkpatchname(patch):
+        def checkpatchname(patch, current_filename=None):
             name = patch.name
+            # For the first patch imported, the patch has already been temporarily saved
+            # to disk by the time we reach here, with a filename that we cannot control
+            # (eg 973703 for bz://973703). The patch is then renamed by us to the name of
+            # the attachment in Bugzilla (unless patch_format has been overridden).
+            # Unfortunately it's common for people to use the bug number as the filename of
+            # the attachment, which would cause a name collision with this temporary file.
+            # Patches other than the first will not have a current_filename.
+            if name == current_filename:
+                # Add a suffix to the patch filename to avoid a collision. This is preferable
+                # to just skipping the check to see if the file exists, since if we leave the
+                # filename as-is, subsequent qimports of the same bug will abort with an mq
+                # "patch already exists" when it is unable to write its temporary file.
+                ui.status("Changing patch filename to avoid conflict with temporary file.\n")
+                name = "%s_" % name
             while os.path.exists(q.join(name)):
                 prompt = "A patch file named '%s' already exists in your patch directory. Rename %s '%s' (%d) (r)/overwrite (o)?" % \
                          (name,
@@ -151,7 +165,7 @@ def extsetup(ui):
             # rest will be in bzhandler.delayed_imports, which we'll name correctly
             # in the first place.
             oldpatchname = q.fullseries[q.fullseriesend()]
-            newpatchname = checkpatchname(bzhandler.last_imported_patch())
+            newpatchname = checkpatchname(bzhandler.last_imported_patch(), current_filename=oldpatchname)
             if newpatchname != oldpatchname:
                 if newpatchname in q.series:
                     q.delete(repo, [newpatchname], {})
