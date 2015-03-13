@@ -13,6 +13,8 @@ import concurrent.futures as futures
 import ldap
 import paramiko
 
+from .util import wait_for_ssh
+
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
@@ -146,12 +148,15 @@ class HgCluster(object):
         ldap_ports = ldap_state['NetworkSettings']['Ports']
         master_ssh_ports = master_state['NetworkSettings']['Ports']
 
-        ldap_host_port = ldap_ports['389/tcp'][0]['HostPort']
-        master_ssh_host_port = master_ssh_ports['22/tcp'][0]['HostPort']
+        ldap_host_port = int(ldap_ports['389/tcp'][0]['HostPort'])
+        master_ssh_host_port = int(master_ssh_ports['22/tcp'][0]['HostPort'])
 
         self.ldap_uri = 'ldap://%s:%s/' % (self._d.docker_hostname,
                                            ldap_host_port)
-        self.create_vcs_sync_login(mirror_public_key)
+        with futures.ThreadPoolExecutor(2) as e:
+            e.submit(self.create_vcs_sync_login, mirror_public_key)
+            e.submit(wait_for_ssh, self._d.docker_hostname,
+                     master_ssh_host_port)
 
         self.ldap_image = ldap_image
         self.master_image = master_image

@@ -10,6 +10,7 @@ import socket
 import time
 
 import kombu
+import paramiko
 import psutil
 import requests
 
@@ -57,6 +58,37 @@ def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60):
 
         if time.time() - start > timeout:
             raise Exception('Timeout reached waiting for AMQP')
+
+        time.sleep(0.1)
+
+
+class IgnoreHostKeyPolicy(paramiko.MissingHostKeyPolicy):
+    def missing_host_key(self, client, hostname, key):
+        return
+
+
+def wait_for_ssh(hostname, port, timeout=60):
+    """Wait for an SSH server to start on the specified host and port."""
+    start = time.time()
+
+    while True:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(IgnoreHostKeyPolicy())
+        try:
+            client.connect(hostname, port=port, timeout=0.1, allow_agent=False,
+                           look_for_keys=False)
+            client.close()
+            return
+        except socket.error:
+            pass
+        except paramiko.SSHException:
+            # This is probably wrong. We should ideally attempt authentication
+            # and wait for an explicit auth failed instead of a generic
+            # error.
+            return
+
+        if time.time() - start > timeout:
+            raise Exception('Timeout reached waiting for SSH')
 
         time.sleep(0.1)
 
