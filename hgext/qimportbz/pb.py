@@ -1,9 +1,9 @@
-# std python modules
 import urllib2
 import os
 
 
 class Handler(urllib2.BaseHandler):
+
     def __init__(self, ui, passmgr):
         self.ui = ui
         self.passmgr = passmgr

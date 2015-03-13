@@ -15,6 +15,7 @@ cache = {}
 
 
 class Settings(object):
+
     def __init__(self, ui):
         self.ui = ui
         self.msg_format = ui.config('qimportbz', 'msg_format',
@@ -24,6 +25,7 @@ class Settings(object):
 
 
 class Attachment(object):
+
     def __init__(self, bug, node):
         self.bug = bug
         self.obsolete = node.attrib['isobsolete'] == "1"
@@ -41,6 +43,7 @@ class Attachment(object):
 
 
 class Flag(object):
+
     def __init__(self, bug, node):
         def removeDomain(emailAddress):
             """Removes domain from email address if (old) Bugzilla didn't do it."""
@@ -85,6 +88,7 @@ class Flag(object):
 
 
 class Patch(Attachment):
+
     def __init__(self, bug, node):
         Attachment.__init__(self, bug, node)
         self.flags = list(sorted(Flag(bug, n) for n in node.findall('flag')))
@@ -235,6 +239,7 @@ class Patch(Attachment):
 
 
 class Comment(object):
+
     def __init__(self, node):
         who = node.find('who')
         self.who = who.attrib['name']
@@ -248,6 +253,7 @@ class Comment(object):
 
 
 class Bug(object):
+
     def __init__(self, ui, data):
         self.settings = Settings(ui)
         xml = xmlfromstring(data)
@@ -277,6 +283,7 @@ class Bug(object):
 
 
 class PermissionError(Exception):
+
     def __init__(self, msg):
         self.msg = msg
 

@@ -1,4 +1,3 @@
-# std python modules
 import urllib2
 try:
     import cStringIO as StringIO
@@ -8,7 +7,6 @@ import os
 import re
 from itertools import cycle
 
-# qimportbz modules
 import bz
 
 # Patch list
@@ -23,6 +21,7 @@ def last_imported_patch():
 
 
 class ObjectResponse(object):
+
     def __init__(self, obj):
         self.obj = obj
 
@@ -31,6 +30,7 @@ class ObjectResponse(object):
 
 
 class Handler(urllib2.BaseHandler):
+
     def __init__(self, ui, passmgr):
         self.ui = ui
         self.passmgr = passmgr
@@ -73,8 +73,7 @@ class Handler(urllib2.BaseHandler):
             self.ui.status("Parsing...")
             try:
                 bug = bz.Bug(self.ui, data)
-            # TODO: update syntax when mercurial requires Python 2.6
-            except bz.PermissionError, e:
+            except bz.PermissionError as e:
                 self.ui.warn(" %s\n" % e.msg)
                 return
             self.ui.status(" done\n")
@@ -155,6 +154,7 @@ class Handler(urllib2.BaseHandler):
 
 # interface reverse engineered from urllib.addbase
 class PatchResponse(object):
+
     def __init__(self, p):
         self.patch = p
         # utf-8: convert from internal (16/32-bit) Unicode to 8-bit encoding.

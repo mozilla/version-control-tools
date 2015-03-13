@@ -33,7 +33,7 @@ The default values are::
   patch_format = %(filename)s
   msg_format = Bug %(bugnum)s - "%(title)s" [%(flags)s]
 """
-from mercurial import hg, commands, cmdutil, extensions, url, error, httppeer
+from mercurial import hg, commands, cmdutil, extensions, url, httppeer
 from hgext import mq
 
 import re

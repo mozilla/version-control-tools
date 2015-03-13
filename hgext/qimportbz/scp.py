@@ -11,6 +11,7 @@ import urllib2
 
 
 class Handler(urllib2.BaseHandler):
+
     def __init__(self, ui, passmgr):
         self.ui = ui
         self.passmgr = passmgr
