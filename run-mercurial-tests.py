@@ -272,15 +272,14 @@ if __name__ == '__main__':
             print('generating Docker images needed for tests')
             t_start = time.time()
             mr_images, hgmo_images = docker.build_all_images(verbose=verbose)
-            db_image, bmoweb_image, pulse_image, autolanddb_image, autoland_image = mr_images
             t_end = time.time()
             print('got Docker images in %.2fs' % (t_end - t_start))
-            os.environ['DOCKER_BMO_DB_IMAGE'] = db_image
-            os.environ['DOCKER_BMO_WEB_IMAGE'] = bmoweb_image
-            os.environ['DOCKER_PULSE_IMAGE'] = pulse_image
-            os.environ['DOCKER_AUTOLANDDB_IMAGE'] = autolanddb_image
-            os.environ['DOCKER_AUTOLAND_IMAGE'] = autoland_image
-            #os.environ['DOCKER_RB_WEB_IMAGE'] = rbweb_image
+            os.environ['DOCKER_BMO_DB_IMAGE'] = mr_images['bmodb']
+            os.environ['DOCKER_BMO_WEB_IMAGE'] = mr_images['bmoweb']
+            os.environ['DOCKER_PULSE_IMAGE'] = mr_images['pulse']
+            os.environ['DOCKER_AUTOLANDDB_IMAGE'] = mr_images['autolanddb']
+            os.environ['DOCKER_AUTOLAND_IMAGE'] = mr_images['autoland']
+            #os.environ['DOCKER_RB_WEB_IMAGE'] = mr_images['rbweb']
             os.environ['DOCKER_HGMASTER_IMAGE'] = hgmo_images['hgmaster']
             os.environ['DOCKER_HGWEB_IMAGE'] = hgmo_images['hgweb']
             os.environ['DOCKER_LDAP_IMAGE'] = hgmo_images['ldap']

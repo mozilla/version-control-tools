@@ -377,14 +377,14 @@ class Docker(object):
 
         if (have_bmodb and have_bmoweb and have_pulse and
                 have_autolanddb and have_autoland): # and have_rbweb:
-            return (
-                state_images[bmodb_bootstrapped_key],
-                state_images[bmoweb_bootstrapped_key],
-                state_images['pulse'],
-                state_images[autolanddb_bootstrapped_key],
-                state_images[autoland_bootstrapped_key],
-                #state_images[rbweb_bootstrapped_key]
-            )
+            return {
+                'autolanddb': state_images[autolanddb_bootstrapped_key],
+                'autoland': state_images[autoland_bootstrapped_key],
+                'bmodb': state_images[bmodb_bootstrapped_key],
+                'bmoweb': state_images[bmoweb_bootstrapped_key],
+                'pulse': state_images['pulse'],
+                #'rbweb': state_images[rbweb_bootstrapped_key],
+            }
 
         bmodb_id = self.client.create_container(images['bmodb-volatile'],
                 environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
@@ -476,8 +476,14 @@ class Docker(object):
 
         print('bootstrapped images created')
 
-        return (bmodb_bootstrap, bmoweb_bootstrap, images['pulse'],
-                autolanddb_bootstrap, autoland_bootstrap) #, rbweb_bootstrap
+        return {
+            'autolanddb': autolanddb_bootstrap,
+            'autoland': autoland_bootstrap,
+            'bmodb': bmodb_bootstrap,
+            'bmoweb': bmoweb_bootstrap,
+            'pulse': images['pulse'],
+            #'rbweb': rbweb_bootstrap,
+        }
 
     def start_mozreview(self, cluster, hostname=None, http_port=80,
             pulse_port=None, rbweb_port=None, db_image=None, web_image=None,
@@ -494,7 +500,12 @@ class Docker(object):
 
         if (not db_image or not web_image or not pulse_image or
                 not autolanddb_image or not autoland_image):
-            db_image, web_image, pulse_image, autolanddb_image, autoland_image = self.build_mozreview(verbose=verbose)
+            images = self.build_mozreview(verbose=verbose)
+            autolanddb_image = images['autolanddb']
+            autoland_image = images['autoland']
+            db_image = images['bmodb']
+            web_image = images['bmoweb']
+            pulse_image = images['pulse']
 
         containers = self.state['containers'].setdefault(cluster, [])
 
