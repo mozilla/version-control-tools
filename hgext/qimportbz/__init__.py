@@ -48,28 +48,10 @@ import scp
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qimportbz'
 
 
-def extsetup(ui=None):
-    # "Mercurial version 8e6019b16a7d and later (that is post-1.3.1) will pass a
-    # ui argument to extsetup."
-    # 'None': support pre/post Hg v1.3.1 versions.
-
-    # Insert preview flag into qimport:
-    # For HG 1.3.1 and earlier, commands.table has the commands for mq
-    # For HG 1.4, commands.table does not have the commands for mq so we
-    #   use mq.cmdtable
-    #
-    # Note that we cannot just use mq.cmdtable always because each command entry
-    # is a tuple so wrapping the qimport function will not update the right
-    # table
-    #
-    # Hence our strategy is to try commands.table and fall back to mq.cmdtable
-    # rather than do an explicit version check.
-    try:
-        qimport_cmd = cmdutil.findcmd("qimport", commands.table)
-        cmdtable = commands.table
-    except error.UnknownCommand:
-        qimport_cmd = cmdutil.findcmd("qimport", mq.cmdtable)
-        cmdtable = mq.cmdtable
+def extsetup(ui):
+    # Insert preview flag into qimport
+    qimport_cmd = cmdutil.findcmd("qimport", mq.cmdtable)
+    cmdtable = mq.cmdtable
     qimport_cmd[1][1].append(('p', 'preview', False, "preview commit message"))
 
     # re to match our url syntax
@@ -168,11 +150,7 @@ def extsetup(ui=None):
             # Rename the already imported patch. If there are multiple patches, the
             # rest will be in bzhandler.delayed_imports, which we'll name correctly
             # in the first place.
-            try:
-                # hg 1.9+
-                oldpatchname = q.fullseries[q.fullseriesend()]
-            except:
-                oldpatchname = q.full_series[q.full_series_end()]
+            oldpatchname = q.fullseries[q.fullseriesend()]
             newpatchname = checkpatchname(bzhandler.last_imported_patch())
             if newpatchname != oldpatchname:
                 if newpatchname in q.series:
@@ -213,18 +191,6 @@ def extsetup(ui=None):
         'scp': scp.Handler
     }
 
-    # Mercurial 1.4 has an easy way to do this for bz://dddddd urls
-    if hasattr(url, 'handlerfuncs') and hasattr(hg, 'schemes'):
-        for s, p in processors.items():
-            url.handlerfuncs.append(p)
-            hg.schemes[s] = httppeer
-    else:
-        # monkey patching for 1.3.1 :(
-        # patch in bz: and pb: url support
-        def bzopener(orig, ui, authinfo=None):
-            result = orig(ui, authinfo)
-            for p in processors:
-                result.add_handler(p(ui, authinfo))
-            return result
-
-        extensions.wrapfunction(url, "opener", bzopener)
+    for s, p in processors.items():
+        url.handlerfuncs.append(p)
+        hg.schemes[s] = httppeer
