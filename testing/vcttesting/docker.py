@@ -154,8 +154,7 @@ class Docker(object):
         except requests.exceptions.RequestException as e:
             return False
 
-    def ensure_built(self, name, verbose=False, add_vct=False,
-                     scan_includes=False):
+    def ensure_built(self, name, verbose=False):
         """Ensure a Docker image from a builder directory is built and up to date.
 
         This function is docker build++. Under the hood, it talks to the same
@@ -163,15 +162,15 @@ class Docker(object):
         it builds the context archive manually.
 
         We supplement all contexts with the content of the source in this
-        repository related to building Docker containers. If ``add_vct`` is
-        True, we add the entire source repository to the Docker context.
+        repository related to building Docker containers. This is done by
+        scanning the Dockerfile for references to extra files to include.
 
-        Preferred over ``add_vct`` is ``scan_includes``. When ``True``, the
-        source ``Dockerfile`` will be parsed for lines of the form
-        ``# %include <path>``. Paths will be matched against files in the
-        source repository and added to the context. If an entry ends in a
-        ``/``, we add all files under that directory. Otherwise, we assume it
-        is a literal match and only add a single file
+        If a line in the Dockerfile has the form ``# %include <path>``,
+        the relative path specified on that line will be matched against
+        files in the source repository and added to the context under the
+        path ``extra/vct/``. If an entry ends in a ``/``, we add all files
+        under that directory. Otherwise, we assume it is a literal match and
+        only add a single file.
 
         This added content can be ``ADD``ed to the produced image inside the
         Dockerfile. If the content changes, the Docker image ID changes and the
@@ -184,14 +183,13 @@ class Docker(object):
             raise Exception('Unknown Docker builder name: %s' % name)
 
         vct_paths = []
-        if scan_includes:
-            with open(os.path.join(p, 'Dockerfile'), 'rb') as fh:
-                for line in fh:
-                    line = line.rstrip()
-                    if not line.startswith('# %include'):
-                        continue
+        with open(os.path.join(p, 'Dockerfile'), 'rb') as fh:
+            for line in fh:
+                line = line.rstrip()
+                if not line.startswith('# %include'):
+                    continue
 
-                    vct_paths.append(line[len('# %include '):])
+                vct_paths.append(line[len('# %include '):])
 
         # We build the build context for the image manually because we need to
         # include things outside of the directory containing the Dockerfile.
@@ -219,7 +217,7 @@ class Docker(object):
         tar.add(os.path.join(HERE, '..', 'docker-control.py'),
                 'extra/docker-control.py')
 
-        if add_vct or vct_paths:
+        if vct_paths:
             # We grab the set of tracked files in this repository.
             hg = os.path.join(ROOT, 'venv', 'bin', 'hg')
             env = dict(os.environ)
@@ -230,32 +228,27 @@ class Docker(object):
                                              stderr=null)
 
             vct_files = output.splitlines()
-            if add_vct:
-                for f in vct_files:
-                    f = f.strip()
-                    tar.add(os.path.join(ROOT, f), 'extra/vct/%s' % f)
-            else:
-                added = set()
-                for p in vct_paths:
-                    ap = os.path.join(ROOT, p)
-                    if not os.path.exists(ap):
-                        raise Exception('specified path not under version '
-                                        'control: %s' % p)
-                    if p.endswith('/'):
-                        for f in vct_files:
-                            if not f.startswith(p):
-                                continue
-                            full = os.path.join(ROOT, f)
-                            rel = 'extra/vct/%s' % f
-                            if full in added:
-                                continue
-                            tar.add(full, rel)
-                    else:
-                        full = os.path.join(ROOT, p)
+            added = set()
+            for p in vct_paths:
+                ap = os.path.join(ROOT, p)
+                if not os.path.exists(ap):
+                    raise Exception('specified path not under version '
+                                    'control: %s' % p)
+                if p.endswith('/'):
+                    for f in vct_files:
+                        if not f.startswith(p):
+                            continue
+                        full = os.path.join(ROOT, f)
+                        rel = 'extra/vct/%s' % f
                         if full in added:
                             continue
-                        rel = 'extra/vct/%s' % p
                         tar.add(full, rel)
+                else:
+                    full = os.path.join(ROOT, p)
+                    if full in added:
+                        continue
+                    rel = 'extra/vct/%s' % p
+                    tar.add(full, rel)
 
         tar.close()
 
@@ -299,12 +292,10 @@ class Docker(object):
 
         raise Exception('Unable to confirm image was built')
 
-    def ensure_images_built(self, builds, verbose=False):
+    def ensure_images_built(self, names, verbose=False):
         """Ensure that multiple images are built.
 
-        ``builds`` is a list of 2-tuple of build rules. The first item is the
-        image name. The second item is a dict of named arguments to
-        ``ensure_built``.
+        ``names`` is a list of Docker images to build.
         """
         def build(name, **kwargs):
             image = self.ensure_built(name, **kwargs)
@@ -312,10 +303,8 @@ class Docker(object):
 
         images = {}
 
-        with futures.ThreadPoolExecutor(len(builds)) as e:
-            fs = []
-            for name, kwargs in builds:
-                fs.append(e.submit(build, name, verbose=verbose, **kwargs))
+        with futures.ThreadPoolExecutor(len(names)) as e:
+            fs = [e.submit(build, name, verbose=verbose) for name in names]
 
             for f in futures.as_completed(fs):
                 name, image = f.result()
@@ -330,11 +319,8 @@ class Docker(object):
         and other bits should be the same as in production with the caveat that
         LDAP integration is probably out of scope.
         """
-        images = self.ensure_images_built([
-            ('hgmaster', {'scan_includes': True}),
-            ('hgweb', {'scan_includes': True}),
-            ('ldap', {}),
-        ], verbose=verbose)
+        images = self.ensure_images_built(['hgmaster', 'hgweb', 'ldap'],
+                                          verbose=verbose)
 
         self.state['last-hgmaster-id'] = images['hgmaster']
         self.state['last-hgweb-id'] = images['hgweb']
@@ -354,12 +340,12 @@ class Docker(object):
         state_images = self.state['images']
 
         images = self.ensure_images_built([
-            ('bmodb-volatile', {}),
-            ('bmoweb', {}),
-            ('pulse', {}),
-            ('autolanddb', {'scan_includes': True}),
-            ('autoland', {'scan_includes': True}),
-            #('rbweb', {'scan_includes': True}),
+            'bmodb-volatile',
+            'bmoweb',
+            'pulse',
+            'autolanddb',
+            'autoland',
+            #'rbweb',
         ], verbose=verbose)
 
         self.state['last-bmodb-id'] = images['bmodb-volatile']
