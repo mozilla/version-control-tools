@@ -62,8 +62,8 @@ Mercurial print a stack trace when it crashes.
 As an alternative to adding ``--traceback`` to every command, add the following
 to your hgrc::
 
-    [ui]
-    traceback = on
+   [ui]
+   traceback = on
 
 Always Check Exit Codes
 -----------------------
@@ -109,3 +109,9 @@ Debugging
 When debugging Mercurial commands, consider adding ``--verbose`` or ``--debug``
 to the command invocation to get Mercurial to print more information about what
 it is doing. This output can be especially when reporting bugs.
+
+Like ``--traceback``, these options can be enabled via ``hgrc`` files::
+
+   [ui]
+   debug = True
+   verbose = True
