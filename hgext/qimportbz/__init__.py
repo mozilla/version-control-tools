@@ -110,16 +110,17 @@ def extsetup(ui):
                 ui.status("Changing patch filename to avoid conflict with temporary file.\n")
                 name = "%s_" % name
             while os.path.exists(q.join(name)):
-                prompt = "A patch file named '%s' already exists in your patch directory. Rename %s '%s' (%d) (r)/overwrite (o)?" % \
-                         (name,
-                          'patch' if isinstance(patch, bz.Patch) else 'attachment',
-                          patch.desc,
-                          int(patch.id))
+                msg = ("A file named '%s' already exists in your patch directory.\n"
+                       "Rename %s '%s' (%d) (r)/overwrite (o)?" %
+                       (name,
+                        'patch' if isinstance(patch, bz.Patch) else 'attachment',
+                        patch.desc,
+                        int(patch.id)))
                 if name in q.series and q.isapplied(name):
                     ui.write("A patch file named '%s' is already applied.\n")
                     choice = 'r'
                 else:
-                    choice = ui.prompt(prompt, "r")
+                    choice = ui.prompt(msg, default="r")
                 if choice == 'r':
                     name = ui.prompt("Enter the new patch name (old one was '%s'):" % name, default=name)
                 else:
