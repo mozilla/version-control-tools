@@ -78,12 +78,12 @@ class Docker(object):
         self.state = {
             'images': {},
             'containers': {},
-            'last-db-id': None,
+            'last-bmodb-id': None,
+            'last-bmoweb-id': None,
             'last-pulse-id': None,
-            'last-web-id': None,
             'last-rbweb-id': None,
-            'last-db-bootstrap-id': None,
-            'last-web-bootstrap-id': None,
+            'last-bmodb-bootstrap-id': None,
+            'last-bmoweb-bootstrap-id': None,
             'last-rbweb-bootstrap-id': None,
             'last-autolanddb-id': None,
             'last-autoland-id': None,
@@ -97,12 +97,12 @@ class Docker(object):
                 self.state = json.load(fh)
 
         keys = (
-            'last-db-id',
+            'last-bmodb-id',
+            'last-bmoweb-id',
             'last-pulse-id',
-            'last-web-id',
             'last-rbweb-id',
-            'last-db-bootstrap-id',
-            'last-web-bootstrap-id',
+            'last-bmodb-bootstrap-id',
+            'last-bmoweb-bootstrap-id',
             'last-rbweb-bootstrap-id',
             'last-autolanddb-id',
             'last-autoland-id',
@@ -357,9 +357,9 @@ class Docker(object):
         for f in futures.as_completed(fs):
             name, image = f.result()
             if name == 'bmodb-volatile':
-                db_image = image
+                bmodb_image = image
             elif name == 'bmoweb':
-                web_image = image
+                bmoweb_image = image
             elif name == 'pulse':
                 pulse_image = image
             elif name == 'rbweb':
@@ -371,9 +371,9 @@ class Docker(object):
             else:
                 assert False
 
-        self.state['last-db-id'] = db_image
+        self.state['last-bmodb-id'] = bmodb_image
+        self.state['last-bmoweb-id'] = bmoweb_image
         self.state['last-pulse-id'] = pulse_image
-        self.state['last-web-id'] = web_image
         self.state['last-autolanddb-id'] = autolanddb_image
         self.state['last-autoland-id'] = autoland_image
         #self.state['last-rbweb-id'] = rbweb_image
@@ -381,49 +381,49 @@ class Docker(object):
         # The keys for the bootstrapped images are derived from the base
         # images they depend on. This means that if we regenerate a new
         # base image, the bootstrapped images will be regenerated.
-        db_bootstrapped_key = 'bmodb-bootstrapped:%s' % db_image
-        web_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (
-                db_image, web_image)
+        bmodb_bootstrapped_key = 'bmodb-bootstrapped:%s' % bmodb_image
+        bmoweb_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (
+                bmodb_image, bmoweb_image)
         autolanddb_bootstrapped_key = 'autolanddb-bootstrapped:%s' % autolanddb_image
         autoland_bootstrapped_key = 'autoland-bootstrapped:%s' % autoland_image
         #rbweb_bootstrapped_key = 'rbweb-bootstrapped:%s:%s' % (db_image,
         #        rbweb_image)
 
-        have_db = db_bootstrapped_key in images
-        have_web = web_bootstrapped_key in images
+        have_bmodb = bmodb_bootstrapped_key in images
+        have_bmoweb = bmoweb_bootstrapped_key in images
         have_pulse = 'pulse' in images
         have_autolanddb = autolanddb_bootstrapped_key in images
         have_autoland = autoland_bootstrapped_key in images
         #have_rbweb = rbweb_bootstrapped_key in images
 
-        if (have_db and have_web and have_pulse and
+        if (have_bmodb and have_bmoweb and have_pulse and
                 have_autolanddb and have_autoland): # and have_rbweb:
             return (
-                images[db_bootstrapped_key],
-                images[web_bootstrapped_key],
+                images[bmodb_bootstrapped_key],
+                images[bmoweb_bootstrapped_key],
                 images['pulse'],
                 images[autolanddb_bootstrapped_key],
                 images[autoland_bootstrapped_key],
                 #images[rbweb_bootstrapped_key]
             )
 
-        db_id = self.client.create_container(db_image,
+        bmodb_id = self.client.create_container(bmodb_image,
                 environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
 
-        web_environ = {}
+        bmoweb_environ = {}
 
         if 'FETCH_BMO' in os.environ:
-            web_environ['FETCH_BMO'] = '1'
+            bmoweb_environ['FETCH_BMO'] = '1'
 
-        web_id = self.client.create_container(web_image,
-                environment=web_environ)['Id']
+        bmoweb_id = self.client.create_container(bmoweb_image,
+                                                 environment=bmoweb_environ)['Id']
 
         autolanddb_id = self.client.create_container(autolanddb_image)['Id']
         autoland_id = self.client.create_container(autoland_image)['Id']
 
         #rbweb_id = self.client.create_container(rbweb_image)['Id']
 
-        with self._start_container(db_id) as db_state:
+        with self._start_container(bmodb_id) as db_state:
             web_params = {
                 'links': [(db_state['Name'], 'bmodb')],
                 'port_bindings': {80: None},
@@ -432,7 +432,7 @@ class Docker(object):
                 'links': [(db_state['Name'], 'rbdb')],
                 'port_bindings': {80: None},
             }
-            with self._start_container(web_id, **web_params) as web_state:
+            with self._start_container(bmoweb_id, **web_params) as web_state:
                 #with self._start_container(rbweb_id, **rbweb_params) as rbweb_state:
                 bmoweb_port = int(web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
                 #rbweb_port = int(rbweb_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
@@ -440,8 +440,8 @@ class Docker(object):
                 wait_for_http(self.docker_hostname, bmoweb_port, path='xmlrpc.cgi')
                 #wait_for_http(self.docker_hostname, rbweb_port)
 
-        db_unique_id = str(uuid.uuid1())
-        web_unique_id = str(uuid.uuid1())
+        bmodb_unique_id = str(uuid.uuid1())
+        bmoweb_unique_id = str(uuid.uuid1())
         autolanddb_unique_id = str(uuid.uuid1())
         autoland_unique_id = str(uuid.uuid1())
         #rbweb_unique_id = str(uuid.uuid1())
@@ -454,15 +454,15 @@ class Docker(object):
         # Docker will forget the repository name if a name image has only a
         # repository name as well.
         with futures.ThreadPoolExecutor(4) as e:
-            db_future = e.submit(self.client.commit, db_id,
-                    repository='bmodb-volatile-bootstrapped',
-                    tag=db_unique_id)
-            web_future = e.submit(self.client.commit, web_id,
-                    repository='bmoweb-bootstrapped',
-                    tag=web_unique_id)
+            bmodb_future = e.submit(self.client.commit, bmodb_id,
+                                    repository='bmodb-volatile-bootstrapped',
+                                    tag=bmodb_unique_id)
+            bmoweb_future = e.submit(self.client.commit, bmoweb_id,
+                                     repository='bmoweb-bootstrapped',
+                                     tag=bmoweb_unique_id)
             autolanddb_future = e.submit(self.client.commit, autolanddb_id,
-                    repository='autolanddb-bootstrapped',
-                    tag=autolanddb_unique_id)
+                                         repository='autolanddb-bootstrapped',
+                                         tag=autolanddb_unique_id)
             autoland_future = e.submit(self.client.commit, autoland_id,
                     repository='autoland-bootstrapped',
                     tag=autoland_unique_id)
@@ -470,19 +470,19 @@ class Docker(object):
             #        repository='rbweb-bootstrapped',
             #        tag=rbweb_unique_id)
 
-        db_bootstrap = db_future.result()['Id']
-        web_bootstrap = web_future.result()['Id']
+        bmodb_bootstrap = bmodb_future.result()['Id']
+        bmoweb_bootstrap = bmoweb_future.result()['Id']
         autolanddb_bootstrap = autolanddb_future.result()['Id']
         autoland_bootstrap = autoland_future.result()['Id']
         #rbweb_bootstrap = rbweb_future.result()['Id']
-        self.state['images'][db_bootstrapped_key] = db_bootstrap
-        self.state['images'][web_bootstrapped_key] = web_bootstrap
+        self.state['images'][bmodb_bootstrapped_key] = bmodb_bootstrap
+        self.state['images'][bmoweb_bootstrapped_key] = bmoweb_bootstrap
         self.state['images']['pulse'] = pulse_image
         self.state['images'][autolanddb_bootstrapped_key] = autolanddb_bootstrap
         self.state['images'][autoland_bootstrapped_key] = autoland_bootstrap
         #self.state['images'][rbweb_bootstrapped_key] = rbweb_bootstrap
-        self.state['last-db-bootstrap-id'] = db_bootstrap
-        self.state['last-web-bootstrap-id'] = web_bootstrap
+        self.state['last-bmodb-bootstrap-id'] = bmodb_bootstrap
+        self.state['last-bmoweb-bootstrap-id'] = bmoweb_bootstrap
         self.state['last-autolanddb-bootstrap-id'] = autolanddb_bootstrap
         self.state['last-autoland-bootstrap-id'] = autoland_bootstrap
         #self.state['last-rbweb-bootstrap-id'] = rbweb_bootstrap
@@ -491,13 +491,13 @@ class Docker(object):
         print('removing non-bootstrapped containers')
 
         with futures.ThreadPoolExecutor(2) as e:
-            e.submit(self.client.remove_container, web_id)
-            e.submit(self.client.remove_container, db_id)
+            e.submit(self.client.remove_container, bmoweb_id)
+            e.submit(self.client.remove_container, bmodb_id)
             #e.submit(self.client.remove_container, rbweb_id)
 
         print('bootstrapped images created')
 
-        return (db_bootstrap, web_bootstrap, pulse_image,
+        return (bmodb_bootstrap, bmoweb_bootstrap, pulse_image,
                 autolanddb_bootstrap, autoland_bootstrap) #, rbweb_bootstrap
 
     def start_mozreview(self, cluster, hostname=None, http_port=80,
@@ -705,9 +705,9 @@ class Docker(object):
         candidates = []
 
         ignore_images = set([
-            self.state['last-db-id'],
+            self.state['last-bmodb-id'],
+            self.state['last-bmoweb-id'],
             self.state['last-pulse-id'],
-            self.state['last-web-id'],
             self.state['last-rbweb-id'],
             self.state['last-db-bootstrap-id'],
             self.state['last-web-bootstrap-id'],
