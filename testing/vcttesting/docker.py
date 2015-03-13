@@ -338,7 +338,7 @@ class Docker(object):
         containers and commit the results to a new image. This allows us to
         spin up multiple bmoweb containers very quickly.
         """
-        images = self.state['images']
+        state_images = self.state['images']
 
         def build(name, **kwargs):
             image = self.ensure_built(name, verbose=verbose, **kwargs)
@@ -389,22 +389,22 @@ class Docker(object):
         #rbweb_bootstrapped_key = 'rbweb-bootstrapped:%s:%s' % (db_image,
         #        rbweb_image)
 
-        have_bmodb = bmodb_bootstrapped_key in images
-        have_bmoweb = bmoweb_bootstrapped_key in images
-        have_pulse = 'pulse' in images
-        have_autolanddb = autolanddb_bootstrapped_key in images
-        have_autoland = autoland_bootstrapped_key in images
-        #have_rbweb = rbweb_bootstrapped_key in images
+        have_bmodb = bmodb_bootstrapped_key in state_images
+        have_bmoweb = bmoweb_bootstrapped_key in state_images
+        have_pulse = 'pulse' in state_images
+        have_autolanddb = autolanddb_bootstrapped_key in state_images
+        have_autoland = autoland_bootstrapped_key in state_images
+        #have_rbweb = rbweb_bootstrapped_key in state_images
 
         if (have_bmodb and have_bmoweb and have_pulse and
                 have_autolanddb and have_autoland): # and have_rbweb:
             return (
-                images[bmodb_bootstrapped_key],
-                images[bmoweb_bootstrapped_key],
-                images['pulse'],
-                images[autolanddb_bootstrapped_key],
-                images[autoland_bootstrapped_key],
-                #images[rbweb_bootstrapped_key]
+                state_images[bmodb_bootstrapped_key],
+                state_images[bmoweb_bootstrapped_key],
+                state_images['pulse'],
+                state_images[autolanddb_bootstrapped_key],
+                state_images[autoland_bootstrapped_key],
+                #state_images[rbweb_bootstrapped_key]
             )
 
         bmodb_id = self.client.create_container(bmodb_image,
@@ -475,12 +475,12 @@ class Docker(object):
         autolanddb_bootstrap = autolanddb_future.result()['Id']
         autoland_bootstrap = autoland_future.result()['Id']
         #rbweb_bootstrap = rbweb_future.result()['Id']
-        self.state['images'][bmodb_bootstrapped_key] = bmodb_bootstrap
-        self.state['images'][bmoweb_bootstrapped_key] = bmoweb_bootstrap
-        self.state['images']['pulse'] = pulse_image
-        self.state['images'][autolanddb_bootstrapped_key] = autolanddb_bootstrap
-        self.state['images'][autoland_bootstrapped_key] = autoland_bootstrap
-        #self.state['images'][rbweb_bootstrapped_key] = rbweb_bootstrap
+        state_images[bmodb_bootstrapped_key] = bmodb_bootstrap
+        state_images[bmoweb_bootstrapped_key] = bmoweb_bootstrap
+        state_images['pulse'] = pulse_image
+        state_images[autolanddb_bootstrapped_key] = autolanddb_bootstrap
+        state_images[autoland_bootstrapped_key] = autoland_bootstrap
+        #state_images[rbweb_bootstrapped_key] = rbweb_bootstrap
         self.state['last-bmodb-bootstrap-id'] = bmodb_bootstrap
         self.state['last-bmoweb-bootstrap-id'] = bmoweb_bootstrap
         self.state['last-autolanddb-bootstrap-id'] = autolanddb_bootstrap
