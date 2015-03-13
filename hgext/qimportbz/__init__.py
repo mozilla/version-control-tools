@@ -121,7 +121,7 @@ def extsetup(ui):
                 else:
                     choice = ui.prompt(prompt, "r")
                 if choice == 'r':
-                    name = ui.prompt("Enter the new patch name (old one was '%s'):" % name)
+                    name = ui.prompt("Enter the new patch name (old one was '%s'):" % name, default=name)
                 else:
                     # overwrite
                     break
