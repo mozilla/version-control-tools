@@ -17,3 +17,4 @@ to the right place!
    bookmarks
    firefoxtree
    unifiedrepo
+   automation
