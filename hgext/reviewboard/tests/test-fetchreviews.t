@@ -61,4 +61,4 @@ Pulling reviews with no changes
 Cleanup
 
   $ mozreview stop
-  stopped 5 containers
+  stopped 6 containers

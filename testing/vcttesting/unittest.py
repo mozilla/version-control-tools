@@ -45,6 +45,7 @@ class MozReviewTest(unittest.TestCase):
             # they aren't set, you are likely invoking the tests wrong.
             mr.start(db_image=os.environ['DOCKER_BMO_DB_IMAGE'],
                      web_image=os.environ['DOCKER_BMO_WEB_IMAGE'],
+                     ldap_image=os.environ['DOCKER_LDAP_IMAGE'],
                      pulse_image=os.environ['DOCKER_PULSE_IMAGE'],
                      autolanddb_image=os.environ['DOCKER_AUTOLANDDB_IMAGE'],
                      autoland_image=os.environ['DOCKER_AUTOLAND_IMAGE'])

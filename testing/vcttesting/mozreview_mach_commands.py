@@ -17,15 +17,16 @@ class MozReviewCommands(object):
         if not where and 'MOZREVIEW_HOME' in os.environ:
             where = os.environ['MOZREVIEW_HOME']
 
-        db_image = os.environ.get('DOCKER_BMO_DB_IMAGE', None)
-        web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE', None)
-        pulse_image = os.environ.get('DOCKER_PULSE_IMAGE', None)
-        autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE', None)
-        autoland_image = os.environ.get('DOCKER_AUTOLAND_IMAGE', None)
+        db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
+        web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
+        ldap_image = os.environ.get('DOCKER_LDAP_IMAGE')
+        pulse_image = os.environ.get('DOCKER_PULSE_IMAGE')
+        autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE')
+        autoland_image = os.environ.get('DOCKER_AUTOLAND_IMAGE')
 
         from vcttesting.mozreview import MozReview
         return MozReview(where, db_image=db_image, web_image=web_image,
-                         pulse_image=pulse_image,
+                         ldap_image=ldap_image, pulse_image=pulse_image,
                          autolanddb_image=autolanddb_image,
                          autoland_image=autoland_image)
 
@@ -43,14 +44,18 @@ class MozReviewCommands(object):
         help='Port Pulse should listen on.')
     @CommandArgument('--autoland-port', type=int,
         help='Port Autoland should listen on.')
+    @CommandArgument('--ldap-port', type=int,
+                     help='Port LDAP server should listen on.')
     def start(self, where, bugzilla_port=None, reviewboard_port=None,
-            mercurial_port=None, pulse_port=None, autoland_port=None):
+            mercurial_port=None, pulse_port=None, autoland_port=None,
+            ldap_port=None):
         mr = self._get_mozreview(where)
         mr.start(bugzilla_port=bugzilla_port,
                 reviewboard_port=reviewboard_port,
                 mercurial_port=mercurial_port,
                 pulse_port=pulse_port,
                 autoland_port=autoland_port,
+                ldap_port=ldap_port,
                 verbose=True)
 
         print('Bugzilla URL: %s' % mr.bugzilla_url)
@@ -60,6 +65,7 @@ class MozReviewCommands(object):
         print('Autoland URL: %s' % mr.autoland_url)
         print('Admin username: %s' % mr.admin_username)
         print('Admin password: %s' % mr.admin_password)
+        print('LDAP URI: %s' % mr.ldap_uri)
         print('Run the following to use this instance with all future commands:')
         print('  export MOZREVIEW_HOME=%s' % mr._path)
 

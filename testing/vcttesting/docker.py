@@ -342,19 +342,21 @@ class Docker(object):
         state_images = self.state['images']
 
         images = self.ensure_images_built([
-            'bmodb-volatile',
-            'bmoweb',
-            'pulse',
             'autolanddb',
             'autoland',
+            'bmodb-volatile',
+            'bmoweb',
+            'ldap',
+            'pulse',
             #'rbweb',
         ], existing=images, verbose=verbose)
 
-        self.state['last-bmodb-id'] = images['bmodb-volatile']
-        self.state['last-bmoweb-id'] = images['bmoweb']
-        self.state['last-pulse-id'] = images['pulse']
         self.state['last-autolanddb-id'] = images['autolanddb']
         self.state['last-autoland-id'] = images['autoland']
+        self.state['last-bmodb-id'] = images['bmodb-volatile']
+        self.state['last-bmoweb-id'] = images['bmoweb']
+        self.state['last-ldap-id'] = images['ldap']
+        self.state['last-pulse-id'] = images['pulse']
         #self.state['last-rbweb-id'] = images['rbweb']
 
         # The keys for the bootstrapped images are derived from the base
@@ -370,18 +372,20 @@ class Docker(object):
 
         have_bmodb = bmodb_bootstrapped_key in state_images
         have_bmoweb = bmoweb_bootstrapped_key in state_images
+        have_ldap = 'ldap' in state_images
         have_pulse = 'pulse' in state_images
         have_autolanddb = autolanddb_bootstrapped_key in state_images
         have_autoland = autoland_bootstrapped_key in state_images
         #have_rbweb = rbweb_bootstrapped_key in state_images
 
-        if (have_bmodb and have_bmoweb and have_pulse and
+        if (have_bmodb and have_bmoweb and have_ldap and have_pulse and
                 have_autolanddb and have_autoland): # and have_rbweb:
             return {
                 'autolanddb': state_images[autolanddb_bootstrapped_key],
                 'autoland': state_images[autoland_bootstrapped_key],
                 'bmodb': state_images[bmodb_bootstrapped_key],
                 'bmoweb': state_images[bmoweb_bootstrapped_key],
+                'ldap': state_images['ldap'],
                 'pulse': state_images['pulse'],
                 #'rbweb': state_images[rbweb_bootstrapped_key],
             }
@@ -456,6 +460,7 @@ class Docker(object):
         #rbweb_bootstrap = rbweb_future.result()['Id']
         state_images[bmodb_bootstrapped_key] = bmodb_bootstrap
         state_images[bmoweb_bootstrapped_key] = bmoweb_bootstrap
+        state_images['ldap'] = images['ldap']
         state_images['pulse'] = images['pulse']
         state_images[autolanddb_bootstrapped_key] = autolanddb_bootstrap
         state_images[autoland_bootstrapped_key] = autoland_bootstrap
@@ -481,14 +486,20 @@ class Docker(object):
             'autoland': autoland_bootstrap,
             'bmodb': bmodb_bootstrap,
             'bmoweb': bmoweb_bootstrap,
+            'ldap': images['ldap'],
             'pulse': images['pulse'],
             #'rbweb': rbweb_bootstrap,
         }
 
     def start_mozreview(self, cluster, hostname=None, http_port=80,
-            pulse_port=None, rbweb_port=None, db_image=None, web_image=None,
-            pulse_image=None, rbweb_image=None, autolanddb_image=None,
+            ldap_image=None, ldap_port=None, pulse_port=None,
+            rbweb_port=None, db_image=None, web_image=None, pulse_image=None,
+            rbweb_image=None, autolanddb_image=None,
             autoland_image=None, autoland_port=None, verbose=False):
+
+        start_ldap = False
+        if ldap_port:
+            start_ldap = True
 
         start_pulse = False
         if pulse_port:
@@ -498,12 +509,14 @@ class Docker(object):
         if autoland_port:
             start_autoland = True
 
-        if (not db_image or not web_image or not pulse_image or
-                not autolanddb_image or not autoland_image):
+        if (not db_image or not web_image or not ldap_image
+                or not pulse_image or not autolanddb_image
+                or not autoland_image):
             images = self.build_mozreview(verbose=verbose)
             autolanddb_image = images['autolanddb']
             autoland_image = images['autoland']
             db_image = images['bmodb']
+            ldap_image = images['ldap']
             web_image = images['bmoweb']
             pulse_image = images['pulse']
 
@@ -513,7 +526,7 @@ class Docker(object):
             hostname = self.docker_hostname
         url = 'http://%s:%s/' % (hostname, http_port)
 
-        with futures.ThreadPoolExecutor(4) as e:
+        with futures.ThreadPoolExecutor(5) as e:
             # Create containers concurrently - no race conditions here.
             f_db_create = e.submit(self.client.create_container, db_image,
                     environment={'MYSQL_ROOT_PASSWORD': 'password'})
@@ -523,6 +536,10 @@ class Docker(object):
 
             f_web_create = e.submit(self.client.create_container,
                     web_image, environment={'BMO_URL': url})
+
+            if start_ldap:
+                f_ldap_create = e.submit(self.client.create_container,
+                                         ldap_image)
 
             if start_autoland:
                 f_autolanddb_create = e.submit(self.client.create_container,
@@ -553,6 +570,13 @@ class Docker(object):
                 containers.append(pulse_id)
                 f_start_pulse = e.submit(self.client.start, pulse_id,
                                          port_bindings={5672: pulse_port})
+
+
+            if start_ldap:
+                ldap_id = f_ldap_create.result()['Id']
+                containers.append(ldap_id)
+                f_start_ldap = e.submit(self.client.start, ldap_id,
+                                        port_bindings={389: ldap_port})
 
             f_db_start.result()
             db_state = self.client.inspect_container(db_id)
@@ -600,6 +624,10 @@ class Docker(object):
                 f_start_pulse.result()
                 pulse_state = self.client.inspect_container(pulse_id)
 
+            if start_ldap:
+                f_start_ldap.result()
+                ldap_state = self.client.inspect_container(ldap_id)
+
         wait_bmoweb_port = web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort']
         if start_pulse:
             wait_rabbit_port = pulse_state['NetworkSettings']['Ports']['5672/tcp'][0]['HostPort']
@@ -626,6 +654,12 @@ class Docker(object):
         if start_autoland:
             result['autolanddb_id'] = autolanddb_id
             result['autoland_id'] = autoland_id
+
+        if start_ldap:
+            ldap_port = int(ldap_state['NetworkSettings']['Ports']['389/tcp'][0]['HostPort'])
+            result['ldap_id'] = ldap_id
+            result['ldap_uri'] = 'ldap://%s:%d/' % (self.docker_hostname,
+                                                    ldap_port)
 
         return result
 

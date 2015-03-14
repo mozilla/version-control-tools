@@ -32,8 +32,8 @@ class MozReview(object):
     This class can be used to create and control MozReview instances.
     """
 
-    def __init__(self, path, web_image=None, db_image=None, pulse_image=None,
-                 autolanddb_image=None, autoland_image=None):
+    def __init__(self, path, web_image=None, db_image=None, ldap_image=None,
+                 pulse_image=None, autolanddb_image=None, autoland_image=None):
         if not path:
             raise Exception('You must specify a path to create an instance')
         path = os.path.abspath(path)
@@ -41,6 +41,7 @@ class MozReview(object):
 
         self.db_image = db_image
         self.web_image = web_image
+        self.ldap_image = ldap_image
         self.pulse_image = pulse_image
         self.autolanddb_image = autolanddb_image
         self.autoland_image = autoland_image
@@ -97,7 +98,8 @@ class MozReview(object):
 
     def start(self, bugzilla_port=None, reviewboard_port=None,
             mercurial_port=None, pulse_port=None, verbose=False,
-            db_image=None, web_image=None, pulse_image=None,
+            db_image=None, web_image=None, ldap_image=None, ldap_port=None,
+            pulse_image=None,
             autolanddb_image=None, autoland_image=None, autoland_port=None):
         """Start a MozReview instance."""
         if not bugzilla_port:
@@ -106,6 +108,8 @@ class MozReview(object):
             reviewboard_port = get_available_port()
         if not mercurial_port:
             mercurial_port = get_available_port()
+        if not ldap_port:
+            ldap_port = get_available_port()
         if not pulse_port:
             pulse_port = get_available_port()
         if not autoland_port:
@@ -113,6 +117,7 @@ class MozReview(object):
 
         db_image = db_image or self.db_image
         web_image = web_image or self.web_image
+        ldap_image = ldap_image or self.ldap_image
         pulse_image = pulse_image or self.pulse_image
         autolanddb_image = autolanddb_image or self.autolanddb_image
         autoland_image = autoland_image or self.autoland_image
@@ -127,6 +132,8 @@ class MozReview(object):
                                  pulse_port=pulse_port,
                                  db_image=db_image,
                                  web_image=web_image,
+                                 ldap_image=ldap_image,
+                                 ldap_port=ldap_port,
                                  pulse_image=pulse_image,
                                  autolanddb_image=autolanddb_image,
                                  autoland_image=autoland_image,
@@ -160,6 +167,7 @@ class MozReview(object):
 
         self.admin_username = bugzilla.username
         self.admin_password = bugzilla.password
+        self.ldap_uri = mr_info['ldap_uri']
         self.pulse_host = mr_info['pulse_host']
         self.pulse_port = mr_info['pulse_port']
 
@@ -175,6 +183,7 @@ class MozReview(object):
             'mercurial_pid': mercurial_pid,
             'admin_username': bugzilla.username,
             'admin_password': bugzilla.password,
+            'ldap_uri': mr_info['ldap_uri'],
             'pulse_host': mr_info['pulse_host'],
             'pulse_port': mr_info['pulse_port'],
             'autoland_url': self.autoland_url,

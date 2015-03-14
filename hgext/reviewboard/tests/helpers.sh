@@ -40,7 +40,7 @@ alias mozreview='$TESTDIR/mozreview'
 alias ottoland='$TESTDIR/ottoland'
 
 commonenv() {
-  mozreview start `pwd` --mercurial-port $HGPORT --reviewboard-port $HGPORT1 --bugzilla-port $HGPORT2 --pulse-port $HGPORT3 --autoland-port $HGPORT4 > /dev/null
+  mozreview start `pwd` --mercurial-port $HGPORT --reviewboard-port $HGPORT1 --bugzilla-port $HGPORT2 --pulse-port $HGPORT3 --autoland-port $HGPORT4 --ldap-port $HGPORT5 > /dev/null
   export MOZREVIEW_HOME=`pwd`
   export HGSSHHGRCPATH=${MOZREVIEW_HOME}/hgrc
 

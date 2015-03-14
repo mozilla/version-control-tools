@@ -64,6 +64,7 @@ class DockerCommands(object):
                   autoland_port=None):
         db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
+        ldap_image = os.environ.get('DOCKER_LDAP_IMAGE')
         pulse_image = os.environ.get('DOCKER_PULSE_IMAGE')
         rbweb_image = os.environ.get('DOCKER_RB_WEB_IMAGE')
         autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE')
@@ -71,6 +72,7 @@ class DockerCommands(object):
 
         self.d.start_mozreview(cluster=cluster, hostname=None,
                 http_port=http_port, pulse_port=pulse_port,
+                ldap_image=ldap_image,
                 db_image=db_image, web_image=web_image,
                 pulse_image=pulse_image, rbweb_image=rbweb_image,
                 autolanddb_image=autolanddb_image,

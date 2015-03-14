@@ -125,4 +125,4 @@ The parent review should have its description updated.
 Cleanup
 
   $ mozreview stop
-  stopped 5 containers
+  stopped 6 containers

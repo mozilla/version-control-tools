@@ -97,4 +97,4 @@ Publishing the review will add an attachment to the bug
     summary: bug1
 
   $ mozreview stop
-  stopped 5 containers
+  stopped 6 containers

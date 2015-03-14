@@ -212,4 +212,4 @@ Posting a non Ship It review without a review flag adds a comment
 Cleanup
 
   $ mozreview stop
-  stopped 5 containers
+  stopped 6 containers

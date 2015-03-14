@@ -75,4 +75,4 @@ Force the admin Review Board user to be created by querying for it.
 
   $ cd ..
   $ mozreview stop
-  stopped 5 containers
+  stopped 6 containers

@@ -102,4 +102,4 @@ Searching on name for a user with IRC nick returns results
 Cleanup
 
   $ mozreview stop
-  stopped 5 containers
+  stopped 6 containers

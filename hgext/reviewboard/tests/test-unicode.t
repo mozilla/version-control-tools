@@ -85,4 +85,4 @@ The globbing is patching over a bug in mach
 Cleanup
 
   $ mozreview stop
-  stopped 5 containers
+  stopped 6 containers

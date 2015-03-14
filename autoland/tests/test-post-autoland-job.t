@@ -24,4 +24,4 @@ Getting status for an unknown job should return a 404
   (404, u'{\n  "error": "Not found"\n}')
 
   $ mozreview stop
-  stopped 5 containers
+  stopped 6 containers

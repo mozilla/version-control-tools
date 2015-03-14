@@ -81,4 +81,4 @@ Splitting the changeset results in multiple reviews
 Cleanup
 
   $ mozreview stop
-  stopped 5 containers
+  stopped 6 containers

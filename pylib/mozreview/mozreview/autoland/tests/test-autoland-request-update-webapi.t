@@ -63,4 +63,4 @@ Hit the WebAPI with the Autoland response
 
   $ cd ..
   $ mozreview stop
-  stopped 5 containers
+  stopped 6 containers
