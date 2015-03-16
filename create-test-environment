@@ -92,7 +92,7 @@ hg --config extensions.purge= purge --all
 cd ../..
 echo finished installing Mercurials
 
-DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-mozreview || {
+DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-all || {
   echo "You will not be able to run tests that require Docker.";
   echo "Please see https://docs.docker.com/installation/ for how to install Docker.";
   echo "When Docker is installed, re-run this script";

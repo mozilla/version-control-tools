@@ -88,6 +88,11 @@ class DockerCommands(object):
     def build(self, name):
         self.d.ensure_built(name, scan_includes=True, verbose=True)
 
+    @Command('build-all', category='docker',
+             description='Build all images')
+    def build_all(self):
+        self.d.build_all_images(verbose=True)
+
     @Command('prune-images', category='docker',
         description='Prune old Docker images')
     def prune_images(self):
