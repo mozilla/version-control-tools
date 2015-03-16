@@ -80,7 +80,7 @@ class HgmoCommands(object):
                      help='Add the user to the specified SCM level groups')
     def create_ldap_user(self, email, username, uid, fullname, key_file=None,
                          scm_level=None):
-        self.c.create_ldap_user(email, username, uid, fullname,
+        self.c.ldap.create_user(email, username, uid, fullname,
                                 key_filename=key_file, scm_level=scm_level)
 
     @Command('add-ssh-key', category='hgmo',
@@ -92,7 +92,7 @@ class HgmoCommands(object):
     def add_ssh_key(self, email, key):
         if key == '-':
             key = sys.stdin.read().strip().encode('utf-8')
-        self.c.add_ssh_key(email, key)
+        self.c.ldap.add_ssh_key(email, key)
 
     @Command('create-repo', category='hgmo',
              description='Create a repository in the cluster')

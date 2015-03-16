@@ -10,9 +10,8 @@ import os
 import uuid
 
 import concurrent.futures as futures
-import ldap
-import paramiko
 
+from .ldap import LDAP
 from .util import wait_for_ssh
 
 
@@ -154,7 +153,7 @@ class HgCluster(object):
         self.ldap_uri = 'ldap://%s:%s/' % (self._d.docker_hostname,
                                            ldap_host_port)
         with futures.ThreadPoolExecutor(2) as e:
-            e.submit(self.create_vcs_sync_login, mirror_public_key)
+            e.submit(self.ldap.create_vcs_sync_login, mirror_public_key)
             e.submit(wait_for_ssh, self._d.docker_hostname,
                      master_ssh_host_port)
 
@@ -234,123 +233,7 @@ class HgCluster(object):
     @property
     def ldap(self):
         assert self.ldap_uri
-        c = ldap.initialize(self.ldap_uri)
-        c.simple_bind_s('cn=admin,dc=mozilla', 'password')
-
-        return c
-
-    def create_ldap_user(self, email, username, uid, fullname,
-                         key_filename=None, scm_level=None):
-        """Create a new user in LDAP.
-
-        The user has an ``email`` address, a full ``name``, a
-        ``username`` (for system accounts) and a numeric ``uid``.
-        """
-
-        dn = 'mail=%s,o=com,dc=mozilla' % email
-
-        r = [
-            (b'objectClass', [
-                b'hgAccount',
-                b'inetOrgPerson',
-                b'organizationalPerson',
-                b'person',
-                b'posixAccount',
-                b'top',
-            ]),
-            (b'cn', [fullname]),
-            (b'fakeHome', [b'/tmp']),
-            (b'gidNumber', [b'100']),
-            (b'hgAccountEnabled', [b'TRUE']),
-            (b'hgHome', [b'/tmp']),
-            (b'hgShell', [b'/bin/sh']),
-            (b'homeDirectory', [b'/home/%s' % username]),
-            (b'sn', [fullname.split()[-1]]),
-            (b'uid', [username]),
-            (b'uidNumber', [str(uid)]),
-        ]
-
-        self.ldap.add_s(dn, r)
-
-        if key_filename:
-            pubkey_filename = '%s.pub' % key_filename
-            if os.path.exists(key_filename):
-                with open(pubkey_filename, 'rb') as fh:
-                    pubkey = fh.read()
-            else:
-                k = paramiko.rsakey.RSAKey.generate(2048)
-                k.write_private_key_file(key_filename)
-                pubkey = '%s %s %s' % (k.get_name(), k.get_base64(), email)
-                pubkey = pubkey.encode('utf-8')
-                with open(pubkey_filename, 'wb') as fh:
-                    fh.write(pubkey)
-
-            self.add_ssh_key(email, pubkey)
-
-        if scm_level:
-            if scm_level < 1 or scm_level > 3:
-                raise ValueError('scm level must be between 1 and 3: %s' %
-                                 scm_level)
-
-            for level in range(1, scm_level + 1):
-                group = b'scm_level_%d' % level
-                self.add_user_to_ldap_group(email, group)
-
-    def create_vcs_sync_login(self, pubkey):
-        dn = 'uid=vcs-sync,ou=logins,dc=mozilla'
-
-        r = [
-            (b'objectClass', [
-                b'account',
-                b'top',
-                b'uidObject',
-                b'hgAccount',
-                b'mailObject',
-                b'posixAccount',
-                b'ldapPublicKey',
-            ]),
-            (b'cn', [b'VCS Sync']),
-            (b'fakeHome', [b'/tmp']),
-            (b'gidNumber', [b'100']),
-            (b'hgAccountEnabled', [b'TRUE']),
-            (b'hgHome', [b'/tmp']),
-            (b'hgShell', [b'/bin/sh']),
-            (b'homeDirectory', [b'/home/vcs-sync']),
-            (b'mail', [b'vcs-sync@mozilla.com']),
-            (b'uidNumber', [b'1500']),
-            (b'sshPublicKey', [pubkey]),
-        ]
-
-        self.ldap.add_s(dn, r)
-
-    def add_ssh_key(self, email, key):
-        """Add an SSH key to a user in LDAP."""
-        dn = 'mail=%s,o=com,dc=mozilla' % email
-
-        c = self.ldap
-        modlist = []
-
-        try:
-            existing = c.search_s(dn, ldap.SCOPE_BASE)[0][1]
-            if b'ldapPublicKey' not in existing[b'objectClass']:
-                modlist.append((ldap.MOD_ADD, b'objectClass', b'ldapPublicKey'))
-        except ldap.NO_SUCH_OBJECT:
-            pass
-
-        modlist.append((ldap.MOD_ADD, b'sshPublicKey', key))
-
-        c.modify_s(dn, modlist)
-
-    def add_user_to_ldap_group(self, member, group):
-        """Add a user to the specified LDAP group.
-
-        The ``group`` is defined in terms of its ``cn`` under
-        ``ou=groups,dc=mozilla`. e.g. ``scml_level_3``.
-        """
-        dn = 'cn=%s,ou=groups,dc=mozilla' % group
-
-        modlist = [(ldap.MOD_ADD, b'memberUid', member)]
-        self.ldap.modify_s(dn, modlist)
+        return LDAP(self.ldap_uri, 'cn=admin,dc=mozilla', 'password')
 
     def create_repo(self, name, level=1):
         """Create a repository on the cluster.
