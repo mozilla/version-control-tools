@@ -49,8 +49,8 @@ Set up the repo
 
 Seed the root changeset on the server
 
-  $ hg push -r 0 --noreview http://localhost:$HGPORT/test-repo
-  pushing to http://localhost:$HGPORT/test-repo
+  $ hg push -r 0 --noreview
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -60,8 +60,8 @@ Seed the root changeset on the server
 
 Pushing a single changeset will initiate a single review (no children)
 
-  $ hg push -r 1 --reviewid 1 http://localhost:$HGPORT/test-repo
-  pushing to http://localhost:$HGPORT/test-repo
+  $ hg push -r 1 --reviewid 1
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -85,8 +85,8 @@ Pushing a single changeset will initiate a single review (no children)
 
 Pushing no changesets will do a re-review
 
-  $ hg push -r 1 --reviewid 1 http://localhost:$HGPORT/test-repo
-  pushing to http://localhost:$HGPORT/test-repo
+  $ hg push -r 1 --reviewid 1
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -104,8 +104,8 @@ Pushing patches from mq will result in a warning
 
   $ echo 'mq patch' > foo
   $ hg qnew -m 'mq patch' -d '0 0' patch1
-  $ hg push -r . --reviewid 2 http://localhost:$HGPORT/test-repo
-  pushing to http://localhost:$HGPORT/test-repo
+  $ hg push -r . --reviewid 2
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -128,8 +128,8 @@ Pushing patches from mq will result in a warning
 
 Custom identifier will create a new review from same changesets.
 
-  $ hg push -r 1 --reviewid 3 http://localhost:$HGPORT/test-repo
-  pushing to http://localhost:$HGPORT/test-repo
+  $ hg push -r 1 --reviewid 3
+  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review

@@ -20,7 +20,7 @@ Create a review
 
   $ echo bug > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/test-repo > /dev/null
+  $ hg --config bugzilla.username=author@example.com push > /dev/null
 
   $ rbmanage add-reviewer $HGPORT1 1 --user reviewer
   1 people listed on review request

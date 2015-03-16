@@ -25,7 +25,7 @@ Create a review request from a regular user
 
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/test-repo > /dev/null
+  $ hg --config bugzilla.username=author@example.com push > /dev/null
 
 Adding a reviewer should result in a r? flag being set
 
@@ -232,7 +232,7 @@ Ensure multiple reviewers works as expected
   $ echo b2 > foo
   $ hg commit -m 'Bug 2 - Multiple reviewers'
   created new head
-  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/test-repo > /dev/null
+  $ hg --config bugzilla.username=author@example.com push > /dev/null
 
   $ rbmanage add-reviewer $HGPORT1 3 --user reviewer --user rev2
   2 people listed on review request
