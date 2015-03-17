@@ -700,7 +700,7 @@ class Docker(object):
         return f_mr.result(), f_hgmo.result()
 
     def _get_files_from_http_container(self, builder, message):
-        image = self.ensure_built(builder, verbose=True, scan_includes=True)
+        image = self.ensure_built(builder, verbose=True)
         container = self.client.create_container(image)['Id']
 
         with self._start_container(container, port_bindings={80: None}) as state:

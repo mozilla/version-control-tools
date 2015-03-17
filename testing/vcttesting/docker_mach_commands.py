@@ -88,7 +88,7 @@ class DockerCommands(object):
              description='Build a single image')
     @CommandArgument('name', help='Name of image to build')
     def build(self, name):
-        self.d.ensure_built(name, scan_includes=True, verbose=True)
+        self.d.ensure_built(name, verbose=True)
 
     @Command('build-all', category='docker',
              description='Build all images')
