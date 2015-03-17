@@ -154,7 +154,7 @@ class Docker(object):
         except requests.exceptions.RequestException as e:
             return False
 
-    def ensure_built(self, name, verbose=False):
+    def ensure_built(self, name, verbose=False, nocache=False):
         """Ensure a Docker image from a builder directory is built and up to date.
 
         This function is docker build++. Under the hood, it talks to the same
@@ -261,7 +261,7 @@ class Docker(object):
         # We assume this is a bug that will change behavior later and work
         # around it by ensuring consistent behavior.
         for stream in self.client.build(fileobj=buf, custom_context=True,
-                rm=True, stream=True):
+                                        rm=True, stream=True, nocache=nocache):
             s = json.loads(stream)
             if 'stream' not in s:
                 continue
