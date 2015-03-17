@@ -236,7 +236,7 @@ class Docker(object):
                                     'control: %s' % p)
                 if p.endswith('/'):
                     for f in vct_files:
-                        if not f.startswith(p):
+                        if not f.startswith(p) and p != '/':
                             continue
                         full = os.path.join(ROOT, f)
                         rel = 'extra/vct/%s' % f
