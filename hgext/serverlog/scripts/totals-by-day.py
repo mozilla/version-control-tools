@@ -12,8 +12,12 @@ def totals_by_day(fh):
     for line in fh:
         parts = line.rstrip().split()
 
-        when, repo, ip, command, size, t_wall, t_cpu = parts
-        when = datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M:%S')
+        try:
+            when, repo, ip, command, size, t_wall, t_cpu = parts
+            when = datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M:%S')
+        except (TypeError, ValueError):
+            continue
+
         size = int(size)
         t_wall = float(t_wall)
         t_cpu = float(t_cpu)
