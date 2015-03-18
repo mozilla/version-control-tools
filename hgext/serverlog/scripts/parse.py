@@ -65,6 +65,8 @@ class SSHSession(object):
 
 
 def parse_events(fh):
+    thisyear = datetime.date.today().year
+
     requests = {}
     sessions = {}
 
@@ -76,6 +78,9 @@ def parse_events(fh):
             if date[4] == ' ':
                 date = date[0:4] + '0' + date[5:]
             date = datetime.datetime.strptime(date, '%b %d %H:%M:%S')
+            # Year isn't in the logs and Python defaults to 1900.
+            date = date.combine(datetime.date(thisyear, date.month, date.day),
+                                date.time())
 
             hostaction, line = line[16:].split(':', 1)
             host, action = hostaction.split()
