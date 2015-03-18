@@ -14,10 +14,10 @@ def totals_by_day(fh):
 
         try:
             when, repo, ip, command, size, t_wall, t_cpu = parts
-        except ValueError:
+            when = datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M:%S')
+        except (TypeError, ValueError):
             continue
 
-        when = datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M:%S')
         size = int(size)
         t_wall = float(t_wall)
         t_cpu = float(t_cpu)
