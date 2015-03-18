@@ -175,7 +175,7 @@ def extsetup(ui):
                 # report the rename. But if ui.verbose is on, qrename will have already
                 # reported it.
                 if not ui.verbose:
-                    ui.write("renamed %s -> %s\n" % (oldpatchname, newpatchname))
+                    ui.status("renamed %s -> %s\n" % (oldpatchname, newpatchname))
 
         # now process the delayed imports
 
