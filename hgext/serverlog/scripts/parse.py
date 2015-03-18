@@ -73,13 +73,14 @@ def parse_events(fh):
         host = None
         if ' hgweb: ' in line:
             date = line[0:15]
-            host = line[16:43]
-
             if date[4] == ' ':
                 date = date[0:4] + '0' + date[5:]
             date = datetime.datetime.strptime(date, '%b %d %H:%M:%S')
 
-            line = line[50:]
+            hostaction, line = line[16:].split(':', 1)
+            host, action = hostaction.split()
+
+            line = line.strip()
         parts = line.rstrip().split()
 
         ids, action = parts[0:2]
