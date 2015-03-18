@@ -259,8 +259,24 @@ def render_comment_plain(comment, context, is_reply):
         comment.first_line,
         comment.num_lines))
 
+    dest_lineno = None
+    for chunk in chunks:
+        for line in chunk['lines']:
+            if line[0] == comment.first_line:
+                # this is an empty string if the line does not exist in
+                # the destination file
+                dest_lineno = line[4]
+                break
+        if dest_lineno is not None:
+            break
+    else:
+        dest_lineno = ''
+
+    if dest_lineno:
+        dest_lineno = ':%s' % dest_lineno
+
     lines = [
-        "::: %s" % comment.filediff.dest_file_display,
+        "::: %s%s" % (comment.filediff.dest_file_display, dest_lineno),
     ]
 
     if comment.interfilediff:
