@@ -18,7 +18,6 @@ import base64
 import urllib
 import urllib2
 import urlparse
-import json
 
 JSON_HEADERS = {"Accept": "application/json",
                 "Content-Type": "application/json"}
