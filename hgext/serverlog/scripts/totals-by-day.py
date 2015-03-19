@@ -24,13 +24,15 @@ def totals_by_day(fh):
 
         date = when.date()
 
-        totals = days.setdefault(date, [0, 0.0, 0.0])
-        totals[0] += size
-        totals[1] += t_wall
-        totals[2] += t_cpu
+        totals = days.setdefault(date, [0, 0, 0.0, 0.0])
+        totals[0] += 1
+        totals[1] += size
+        totals[2] += t_wall
+        totals[3] += t_cpu
 
     for date, totals in sorted(days.items()):
-        print('%s\t%d\t%d\t%d' % (date.isoformat(), totals[0], totals[1], totals[2]))
+        print('%s\t%d\t%d\t%d\t%d' % (date.isoformat(), totals[0], totals[1],
+                                      totals[2], totals[3]))
 
 if __name__ == '__main__':
     totals_by_day(sys.stdin)
