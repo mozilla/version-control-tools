@@ -460,10 +460,51 @@ UUID is not bumped.
   abort: pretxnchangegroup.prevent_idl_change_without_uuid_bump hook failed
   [255]
 
-  $ cd ..
+  $ hg commit --amend -m 'nsISupports.idl IGNORE IDL'
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/e47c8b4783a5-amend-backup.hg (glob)
+
+  $ hg push $TESTTMP/server
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 2 changes to 1 files
+
+Merge commits should be ignored
+
+  $ cat > a.idl << EOF
+  > [uuid(00000000-0000-0000-c000-000000000046)]
+  > interface A {
+  > };
+  > EOF
+
+  $ hg commit -A -m 'a.idl IGNORE IDL'
+  $ mergerev=`hg log --template {rev} -r .`
+  $ hg up -r 'last(public())'
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+
+  $ echo 'merge' > dummy
+  $ hg commit -A -m 'create a head'
+  adding dummy
+  created new head
+
+  $ hg merge $mergerev
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (branch merge, don't forget to commit)
+
+  $ hg commit -m 'merge'
+  $ hg push $TESTTMP/server
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 3 changesets with 2 changes to 2 files
 
 Stripping should not trigger hook
 
+  $ cd ..
   $ hg init striptest
   $ cd striptest
   $ cat > original.idl << EOF

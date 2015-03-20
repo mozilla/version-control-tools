@@ -84,6 +84,10 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         if 'IGNORE IDL' in ctx.description():
             continue
 
+        if len(ctx.parents()) > 1:
+            # Skip merge changesets.
+            continue
+
         status = ctx.status(ctx.p1())
         for path in status.modified:
             if not path.endswith('.idl'):
