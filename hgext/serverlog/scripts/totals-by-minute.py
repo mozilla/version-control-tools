@@ -12,8 +12,12 @@ def totals_by_minute(fh):
     for line in fh:
         parts = line.rstrip().split()
 
-        when, repo, ip, command, size, t_wall, t_cpu = parts
-        when = datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M:%S')
+        try:
+            when, repo, ip, command, size, t_wall, t_cpu = parts
+            when = datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M:%S')
+        except (TypeError, ValueError):
+            continue
+
         size = int(size)
         t_wall = float(t_wall)
         t_cpu = float(t_cpu)
@@ -28,8 +32,8 @@ def totals_by_minute(fh):
         totals[3] += t_cpu
 
     for date, totals in sorted(minutes.items()):
-        print('%s\t%d\t%d\t%d\t' % (date.isoformat(), totals[0], totals[1],
-                                    totals[2], totals[3]))
+        print('%s\t%d\t%d\t%d\t%d' % (date.isoformat(), totals[0], totals[1],
+                                      totals[2], totals[3]))
 
 if __name__ == '__main__':
     totals_by_minute(sys.stdin)
