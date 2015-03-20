@@ -88,12 +88,17 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
             # Skip merge changesets.
             continue
 
-        status = ctx.status(ctx.p1())
-        for path in status.modified:
+        for path in ctx.files():
             if not path.endswith('.idl'):
                 continue
 
+            if path not in ctx:  # Deleted file
+                continue
+
             fctx = ctx[path]
+            if fctx.filerev() == 0:  # New file
+                continue
+
             prev_fctx = fctx.filectx(fctx.filerev() - 1)
             unbumped_interfaces.extend([(x, short(ctx.node())) for x in
                 check_unbumped_idl_interfaces(prev_fctx.data(), fctx.data())])

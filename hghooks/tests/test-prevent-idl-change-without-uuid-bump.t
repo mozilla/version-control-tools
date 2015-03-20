@@ -307,6 +307,30 @@ Removing one interface should work.
   adding file changes
   added 1 changesets with 1 changes to 1 files
 
+Copying an IDL file should work.
+
+  $ hg cp a.idl acopy.idl
+  $ hg commit -A -m 'acopy.idl'
+  $ hg push $TESTTMP/server
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+
+Moving an IDL file should work.
+
+  $ hg mv acopy.idl amove.idl
+  $ hg commit -A -m 'amove.idl'
+  $ hg push $TESTTMP/server
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+
 Deleting an IDL file should work.
 
   $ hg rm a.idl
@@ -362,8 +386,8 @@ Adding and modifying multiple IDL files should fail if UUID is not bumped.
   *************************** ERROR ***************************
   Push rejected because the following IDL interfaces were
   modified without changing the UUID:
-    - A in changeset c22c2a1f042d
-    - B in changeset c22c2a1f042d
+    - A in changeset a1f62287c4dd
+    - B in changeset a1f62287c4dd
   
   To update the UUID for all of the above interfaces and their
   descendants, run:
@@ -445,7 +469,7 @@ UUID is not bumped.
   *************************** ERROR ***************************
   Push rejected because the following IDL interfaces were
   modified without changing the UUID:
-    - nsISupports in changeset e47c8b4783a5
+    - nsISupports in changeset c4abf967d1fe
   
   To update the UUID for all of the above interfaces and their
   descendants, run:
@@ -461,7 +485,7 @@ UUID is not bumped.
   [255]
 
   $ hg commit --amend -m 'nsISupports.idl IGNORE IDL'
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/e47c8b4783a5-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/c4abf967d1fe-amend-backup.hg (glob)
 
   $ hg push $TESTTMP/server
   pushing to $TESTTMP/server
