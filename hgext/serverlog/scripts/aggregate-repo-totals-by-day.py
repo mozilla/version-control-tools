@@ -12,21 +12,24 @@ def aggregate(fh, min_size=0):
     for line in fh:
         parts = line.rstrip().split()
 
-        when, repo, size, t_wall, t_cpu = parts
+        when, repo, count, size, t_wall, t_cpu = parts
+        count = int(count)
         size = int(size)
         t_wall = float(t_wall)
         t_cpu = float(t_cpu)
 
-        totals = entries.setdefault((when, repo), [0, 0.0, 0.0])
-        totals[0] += size
-        totals[1] += t_wall
-        totals[2] += t_cpu
+        totals = entries.setdefault((when, repo), [0, 0, 0.0, 0.0])
+        totals[0] += count
+        totals[1] += size
+        totals[2] += t_wall
+        totals[3] += t_cpu
 
     for (date, repo), totals in sorted(entries.items()):
-        if min_size and totals[0] < min_size:
+        if min_size and totals[1] < min_size:
             continue
 
-        print('%s\t%s\t%d\t%d\t%d' % (date, repo, totals[0], totals[1], totals[2]))
+        print('%s\t%s\t%d\t%d\t%d\t%d' % (date, repo, totals[0], totals[1],
+                                          totals[2], totals[3]))
 
 if __name__ == '__main__':
     parser = OptionParser()
