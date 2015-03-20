@@ -60,14 +60,14 @@ Publishing the review will add an attachment to the bug
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/1/ (glob)
-      description: 'MozReview Request: bz://1/mynick'
-      file_name: reviewboard-1-url.txt
+      data: http://*:$HGPORT1/r/2/ (glob)
+      description: 'MozReview Request: Bug 1 - Foo 1'
+      file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: bz://1/mynick'
+      summary: 'MozReview Request: Bug 1 - Foo 1'
     blocks: []
     cc: []
     comments:
@@ -80,16 +80,10 @@ Publishing the review will add an attachment to the bug
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick
+        MozReview Request: Bug 1 - Foo 1
   
   
-        /r/2 - Bug 1 - Foo 1
-  
-  
-        Pull down this commit:
-  
-  
-        hg pull -r 24417bc94b2c053e8f5dd8c09da33fbbef5404fe http://*:$HGPORT/test-repo' (glob)
+        Bug 1 - Foo 1'
     component: TestComponent
     depends_on: []
     platform: All

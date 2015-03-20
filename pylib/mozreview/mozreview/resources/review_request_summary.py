@@ -9,7 +9,7 @@ from djblets.webapi.decorators import (webapi_response_errors,
                                        webapi_request_fields)
 from djblets.webapi.errors import (DOES_NOT_EXIST, INVALID_ATTRIBUTE,
                                    NOT_LOGGED_IN, PERMISSION_DENIED)
-from rbbz.models import BugzillaUserMap
+
 from reviewboard.reviews.models import ReviewRequest
 from reviewboard.webapi.encoder import status_to_string
 from reviewboard.webapi.resources import WebAPIResource
@@ -57,6 +57,7 @@ class ReviewRequestSummaryResource(WebAPIResource):
                 q = q & Q(bugs_closed=request.GET.get('bug'))
 
         queryset = ReviewRequest.objects.public(
+            status=None,
             extra_query=q
         )
 

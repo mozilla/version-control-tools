@@ -19,6 +19,13 @@ class ConfidentialBugError(PublishError):
                               'the patch directly to the bug.')
 
 
+class ParentShipItError(PublishError):
+    def __init__(self):
+        PublishError.__init__(self, '"Ship it" reviews on parent review '
+                              'requests are not allowed.  Please review '
+                              'individual commits.')
+
+
 #
 # Bugzilla errors.
 #
