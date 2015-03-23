@@ -273,6 +273,7 @@ def reviewboard(repo, proto, args=None):
             'parentreview %s' % parentrid,
             'reviewdata %s status %s' % (parentrid,
                 urllib.quote(reviews[parentrid].status.encode('utf-8'))),
+            'reviewdata %s public %s' % (parentrid, reviews[parentrid].public),
         ])
 
         for node, rid in commitmap.items():
@@ -280,6 +281,7 @@ def reviewboard(repo, proto, args=None):
             lines.append('csetreview %s %s' % (node, rid))
             lines.append('reviewdata %s status %s' % (rid,
                 urllib.quote(rr.status.encode('utf-8'))))
+            lines.append('reviewdata %s public %s' % (rid, rr.public))
 
     except AuthorizationError as e:
         lines.append('error %s' % str(e))
@@ -343,9 +345,11 @@ def pullreviews(repo, proto, args=None):
                 lines.append('csetreview %s %s %s' % (rr.id, node, rid))
                 lines.append('reviewdata %s status %s' % (rid,
                     urllib.quote(rr.status.encode('utf-8'))))
+                lines.append('reviewdata %s public %s' % (rid, rr.public))
 
         lines.append('reviewdata %s status %s' % (rr.id,
             urllib.quote(rr.status.encode('utf-8'))))
+        lines.append('reviewdata %s public %s' % (rr.id, rr.public))
 
     res = '\n'.join(lines)
     assert isinstance(res, str)
