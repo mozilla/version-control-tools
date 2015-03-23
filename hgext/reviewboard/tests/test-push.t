@@ -350,6 +350,15 @@ error (Bug 1128555)
   abort: reviewboard error: "105 - One or more fields had errors". please try submitting the review again. if that doesn't work, you've likely encountered a bug.
   [255]
 
+We disallow completely empty revisions.
+
+  $ hg up -q -r 0
+  $ hg qnew -m 'mq patch' -d '0 0' empty-patch
+  $ hg push http://localhost:$HGPORT/test-repo
+  pushing to http://localhost:$HGPORT/test-repo
+  abort: not reviewing empty revision 72a12b75c815. please add content.
+  [255]
+
 Cleanup
 
   $ mozreview stop

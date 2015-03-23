@@ -116,6 +116,13 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
     if not revs:
         revs = [repo['.'].node()]
 
+    # We stop completely empty changesets prior to review.
+    for rev in revs:
+        ctx = repo[rev]
+        if not ctx.files():
+            raise util.Abort(_('not reviewing empty revision %s. please add'
+                               ' content.' % hex(rev)[:12]))
+
     # We filter the "extension isn't installed" message from the server.
     # This is a bit hacky, but it's easier than sending a signal over the
     # wire protocol (at least until bundle2).
