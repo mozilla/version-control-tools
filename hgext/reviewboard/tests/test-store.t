@@ -43,8 +43,10 @@ Pushing a review will create the reviews file
   2.state
 
   $ cat .hg/reviewboard/review/1.state
+  public False
   status pending
   $ cat .hg/reviewboard/review/2.state
+  public False
   status pending
 
 Cleanup
