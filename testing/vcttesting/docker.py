@@ -474,10 +474,12 @@ class Docker(object):
 
         print('removing non-bootstrapped containers')
 
-        with futures.ThreadPoolExecutor(2) as e:
+        with futures.ThreadPoolExecutor(4) as e:
             e.submit(self.client.remove_container, bmoweb_id)
             e.submit(self.client.remove_container, bmodb_id)
             #e.submit(self.client.remove_container, rbweb_id)
+            e.submit(self.client.remove_container, autolanddb_id)
+            e.submit(self.client.remove_container, autoland_id)
 
         print('bootstrapped images created')
 
