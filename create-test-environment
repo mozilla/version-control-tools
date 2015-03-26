@@ -21,12 +21,6 @@ cd pylib/mozreview
 python setup.py develop
 cd ../..
 
-# rbmozui requires Node.js when installed normally. But in local
-# development mode it doesn't. So use local development node.
-cd pylib/rbmozui;
-python setup.py develop
-cd ../..
-
 cd pylib/rbbz
 python setup.py develop
 cd ../..

@@ -41,7 +41,7 @@ class AutocompleteTest(MozReviewWebDriverTest):
 
         self.load_rburl('r/1')
 
-        children = self.browser.find_element_by_id('rbmozui-commits-children')
+        children = self.browser.find_element_by_id('mozreview-commits-children')
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located(
                 (By.CLASS_NAME, 'child-rr-reviewers')))

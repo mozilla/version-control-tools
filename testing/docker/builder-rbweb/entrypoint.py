@@ -137,9 +137,6 @@ cc(rbmanage + ['enable-extension', 'mozreview.extension.MozReviewExtension'],
 print('activating rbbz extension')
 cc(rbmanage + ['enable-extension', 'rbbz.extension.BugzillaExtension'],
     cwd=conf)
-print('activating rbmozui extension')
-cc(rbmanage + ['enable-extension', 'rbmozui.extension.RBMozUI'],
-    cwd=conf)
 
 # Normalize the default admin user to be compatible with rbbz.
 if action == 'install':

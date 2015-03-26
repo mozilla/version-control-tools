@@ -17,7 +17,7 @@ RUN apt-get update && apt-get -y install \
   mercurial mysql-client nodejs node-uglify npm \
   python2.7-dev python3-mysql.connector
 
-# Needed to make some Node and RBMozUI packaging happy, sadly.
+# Needed to make some Node and Mozreview packaging happy, sadly.
 RUN ln -s /usr/bin/nodejs /usr/local/bin/node
 
 # NPM package required for building Review Board extensions.
@@ -42,11 +42,9 @@ ADD entrypoint.py /entrypoint.py
 
 ADD extra/vct/pylib/mozreview ${RB_HOME}/mozreview
 ADD extra/vct/pylib/rbbz ${RB_HOME}/rbbz
-ADD extra/vct/pylib/rbmozui ${RB_HOME}/rbmozui
 
 RUN cd ${RB_HOME}/mozreview && ${RB_HOME}/venv/bin/python setup.py install
 RUN cd ${RB_HOME}/rbbz && ${RB_HOME}/venv/bin/python setup.py install
-RUN cd ${RB_HOME}/rbmozui && ${RB_HOME}/venv/bin/python setup.py install
 
 EXPOSE 80
 

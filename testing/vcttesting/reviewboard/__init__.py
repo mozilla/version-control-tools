@@ -185,9 +185,6 @@ class MozReviewBoard(object):
             'rbbz.extension.BugzillaExtension'], cwd=self.path,
             env=self.env, stdout=f, stderr=f)
 
-        subprocess.check_call(self.manage + ['enable-extension',
-            'rbmozui.extension.RBMozUI'],
-            cwd=self.path, env=self.env, stdout=f, stderr=f)
 
         from reviewboard.cmdline.rbsite import Site, parse_options
         class dummyoptions(object):

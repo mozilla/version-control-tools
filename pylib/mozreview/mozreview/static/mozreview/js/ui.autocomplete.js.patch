@@ -1,6 +1,6 @@
-diff --git a/pylib/rbmozui/rbmozui/static/js/ui.rbmozuiautocomplete.js b/pylib/rbmozui/rbmozui/static/js/ui.rbmozuiautocomplete.js
---- a/pylib/rbmozui/rbmozui/static/js/ui.rbmozuiautocomplete.js
-+++ b/pylib/rbmozui/rbmozui/static/js/ui.rbmozuiautocomplete.js
+diff --git a/pylib/mozreview/mozreview/static/js/ui.mozreviewautocomplete.js b/pylib/mozreview/mozreview/static/js/ui.mozreviewautocomplete.js
+--- a/pylib/mozreview/mozreview/static/js/ui.mozreviewautocomplete.js
++++ b/pylib/mozreview/mozreview/static/js/ui.mozreviewautocomplete.js
 @@ -36,17 +36,18 @@
          multiple: false,
          multipleSeparator: ", ",

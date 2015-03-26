@@ -12,7 +12,7 @@
  */
 (function($) {
 
-$.widget("ui.rbmozuiautocomplete", {
+$.widget("ui.mozreviewautocomplete", {
     options: {
         inputClass: "ui-autocomplete-input",
         resultsClass: "ui-autocomplete-results",
@@ -59,7 +59,7 @@ $.widget("ui.rbmozuiautocomplete", {
             $input = $(input).attr("autocomplete", "off").addClass(options.inputClass),
             KEY = $.ui.keyCode,
             previousValue = "",
-            cache = $.ui.rbmozuiautocomplete.cache(options),
+            cache = $.ui.mozreviewautocomplete.cache(options),
             hasFocus = 0,
             config = {
                 mouseDownOnSelect: false
@@ -67,14 +67,14 @@ $.widget("ui.rbmozuiautocomplete", {
             timeout,
             blockSubmit,
             lastKeyPressCode,
-            select = $.ui.rbmozuiautocomplete.select(options, input, selectCurrent, config);
+            select = $.ui.mozreviewautocomplete.select(options, input, selectCurrent, config);
 
         if(options.result) {
-            $input.bind('result.rbmozuiautocomplete', options.result);
+            $input.bind('result.mozreviewautocomplete', options.result);
         }
 
         // prevent form submit in opera when selecting with return key
-        $.browser.opera && $(input.form).bind("submit.rbmozuiautocomplete", function() {
+        $.browser.opera && $(input.form).bind("submit.mozreviewautocomplete", function() {
             if (blockSubmit) {
                 blockSubmit = false;
                 return false;
@@ -82,7 +82,7 @@ $.widget("ui.rbmozuiautocomplete", {
         });
 
         // only opera doesn't trigger keydown multiple times while pressed, others don't work with keypress at all
-        $input.bind(($.browser.opera ? "keypress" : "keydown") + ".rbmozuiautocomplete", function(event) {
+        $input.bind(($.browser.opera ? "keypress" : "keydown") + ".mozreviewautocomplete", function(event) {
             // track last key pressed
             lastKeyPressCode = event.keyCode;
             switch(event.keyCode) {
@@ -190,7 +190,7 @@ $.widget("ui.rbmozuiautocomplete", {
         }).bind("unautocomplete", function() {
             select.unbind();
             $input.unbind();
-            $(input.form).unbind(".rbmozuiautocomplete");
+            $(input.form).unbind(".mozreviewautocomplete");
         });
 
 
@@ -304,7 +304,7 @@ $.widget("ui.rbmozuiautocomplete", {
                 // fill in the value (keep the case the user has typed)
                 $input.val($input.val() + sValue.substring(lastWord(previousValue).length));
                 // select the portion of the value not typed by the user (so the next character will erase)
-                $.ui.rbmozuiautocomplete.selection(input, previousValue.length, previousValue.length + sValue.length);
+                $.ui.mozreviewautocomplete.selection(input, previousValue.length, previousValue.length + sValue.length);
             }
         };
 
@@ -320,7 +320,7 @@ $.widget("ui.rbmozuiautocomplete", {
             stopLoading();
             if (options.mustMatch) {
                 // call search and run callback
-                $input.rbmozuiautocomplete("search", function (result){
+                $input.mozreviewautocomplete("search", function (result){
                         // if no value found, clear the input box
                         if( !result ) {
                             if (options.multiple) {
@@ -335,7 +335,7 @@ $.widget("ui.rbmozuiautocomplete", {
             }
             if (wasVisible)
                 // position cursor at end of input field
-                $.ui.rbmozuiautocomplete.selection(input, input.value.length, input.value.length);
+                $.ui.mozreviewautocomplete.selection(input, input.value.length, input.value.length);
         };
 
         function receiveData(q, data) {
@@ -470,7 +470,7 @@ $.widget("ui.rbmozuiautocomplete", {
     }
 });
 
-$.ui.rbmozuiautocomplete.cache = function(options) {
+$.ui.mozreviewautocomplete.cache = function(options) {
 
     var data = {};
     var length = 0;
@@ -606,7 +606,7 @@ $.ui.rbmozuiautocomplete.cache = function(options) {
     };
 };
 
-$.ui.rbmozuiautocomplete.select = function (options, input, select, config) {
+$.ui.mozreviewautocomplete.select = function (options, input, select, config) {
     var CLASSES = {
         ACTIVE: "ui-autocomplete-over"
     };
@@ -844,7 +844,7 @@ $.ui.rbmozuiautocomplete.select = function (options, input, select, config) {
     };
 };
 
-$.ui.rbmozuiautocomplete.selection = function(field, start, end) {
+$.ui.mozreviewautocomplete.selection = function(field, start, end) {
     if( field.createTextRange ){
         var selRange = field.createTextRange();
         selRange.collapse(true);

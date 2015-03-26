@@ -3,7 +3,6 @@ docs/_build/
 hghooks/Mozilla_Hg_Hooks.egg-info/
 pylib/mozreview/mozreview.egg-info/
 pylib/rbbz/rbbz.egg-info/
-pylib/rbmozui/rbmozui.egg-info/
 pylib/Bugsy/bugsy.egg-info/
 testing/bmoserver/.vagrant
 testing/puppet/files/Mozilla-Bugzilla-Public*

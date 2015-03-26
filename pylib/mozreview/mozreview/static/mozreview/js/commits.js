@@ -191,8 +191,8 @@ $(document).ready(function() {
    */
   var CommitView = Backbone.View.extend({
     tagName: "li",
-    commitTemplate: _.template($("#rbmozui-commits-child").html()),
-    linksTemplate: _.template($("#rbmozui-commit-links").html()),
+    commitTemplate: _.template($("#mozreview-commits-child").html()),
+    linksTemplate: _.template($("#mozreview-commit-links").html()),
 
     initialize: function(options) {
       this.listenTo(this.model, "change", this.render);
@@ -358,7 +358,7 @@ $(document).ready(function() {
       // Again, this is copied almost verbatim from Review Board core to
       // mimic traditional behaviour for this kind of field.
       $(reviewerList).inlineEditor("field")
-                     .rbmozuiautocomplete({
+                     .mozreviewautocomplete({
         formatItem: function(data) {
           var s = data[acOptions.nameKey];
           if (acOptions.descKey && data[acOptions.descKey]) {
@@ -440,7 +440,7 @@ $(document).ready(function() {
    * This is really the prime mover, or main view for the whole thing.
    */
   var CommitListView = Backbone.View.extend({
-    linksTemplate: _.template($("#rbmozui-commit-links").html()),
+    linksTemplate: _.template($("#mozreview-commit-links").html()),
 
     /**
      * Options:
@@ -460,7 +460,7 @@ $(document).ready(function() {
       var self = this;
       console.log("Requesting root review request and draft");
 
-      var mutableByUser = RBMozUI.currentIsMutableByUser;
+      var mutableByUser = MozReview.currentIsMutableByUser;
       var reviewable = mutableByUser ? this.model.draft : this.model;
       reviewable.ready({
         ready: function() {
@@ -475,7 +475,7 @@ $(document).ready(function() {
             return;
           }
 
-          var isMutable = RBMozUI.currentIsMutableByUser;
+          var isMutable = MozReview.currentIsMutableByUser;
           var isViewingRoot = (self.model.id == gReviewRequest.id);
 
           // Now we need the child review requests in the extra_data...
@@ -511,12 +511,12 @@ $(document).ready(function() {
             childURL: self.model.get("reviewURL")
           });
 
-          $("#rbmozui-commits-root-links").html(links);
+          $("#mozreview-commits-root-links").html(links);
 
           // Finally, set the arrow on the root review request in the list
           // if that's what we're viewing.
           if (isViewingRoot) {
-            $("#rbmozui-commits-root").attr("current", "true");
+            $("#mozreview-commits-root").attr("current", "true");
           }
         },
         error: function(errorObject) {
@@ -528,7 +528,7 @@ $(document).ready(function() {
 
     add: function(commit) {
       var view = new CommitView({model: commit, listView: this});
-      $("#rbmozui-commits-children").append(view.render().el);
+      $("#mozreview-commits-children").append(view.render().el);
     },
 
     updateRootReviewers: function() {
@@ -573,5 +573,5 @@ $(document).ready(function() {
     }
   });
 
-  new CommitListView({model: RBMozUI.rootReviewRequest});
+  new CommitListView({model: MozReview.rootReviewRequest});
 });

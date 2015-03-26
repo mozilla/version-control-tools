@@ -62,7 +62,7 @@ class CommitsListField(BaseReviewRequestField):
 
         root_rr = get_root(rr)
 
-        template = get_template('rbmozui/commits.html')
+        template = get_template('mozreview/commits.html')
         return template.render(Context({
             'current_id': rr.id,
             'root_rr': root_rr,
@@ -88,7 +88,7 @@ class TryField(BaseReviewRequestField):
 
     def should_render(self, value):
         ext = get_extension_manager().get_enabled_extension(
-            'rbmozui.extension.RBMozUI')
+            'mozreview.extension.MozReviewExtension')
 
         if not ext or not ext.settings.get('autoland_try_ui_enabled'):
             return False
@@ -136,7 +136,7 @@ class TryField(BaseReviewRequestField):
             return self._autoland_problem % ar.last_details
         elif ar.last_known_status == AutolandEventLogEntry.SERVED:
             url = self._job_url % ar.repository_revision
-            template = get_template('rbmozui/try_result.html')
+            template = get_template('mozreview/try_result.html')
             return template.render(Context({'url': url}))
         else:
             return self._retreive_error_txt
@@ -144,7 +144,7 @@ class TryField(BaseReviewRequestField):
     def as_html(self):
         rr = ensure_review_request(self.review_request_details)
 
-        template = get_template('rbmozui/try.html')
+        template = get_template('mozreview/try.html')
         current_autoland_try = rr.extra_data.get('p2rb.autoland_try', None)
 
         if current_autoland_try is not None:

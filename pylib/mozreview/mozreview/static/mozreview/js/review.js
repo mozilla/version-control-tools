@@ -9,7 +9,7 @@ $(document).ready(function() {
   $(".main .editable").inlineEditor("disable");
   // And then re-enable just the ones for reviewers in
   // the commits list.
-  $("#rbmozui-child-commits .editable").inlineEditor("enable");
+  $("#mozreview-child-commits .editable").inlineEditor("enable");
 
   $('label[for="field_target_people"]').parent().parent().hide();
 });

@@ -20,7 +20,7 @@ Bugzilla
 rbbz
    A Review Board extension that integrates Review Board with Bugzilla.
 
-rbmozui
+mozreview
    A Review Board extension modifying the Review Board user interface.
 
 Review Board Mercurial Extension
@@ -159,7 +159,7 @@ Code Locations
 ``pylib/rbbz`` contains the modifications to Review Board to enable
 Bugzilla integration and support for series of reviews.
 
-``pylib/rbmozui`` contains the UI modifications to Review Board.
+``pylib/mozreview`` contains the UI modifications to Review Board.
 
 ``hgext/reviewboard`` contains the client and server Mercurial
 extensions.
@@ -284,7 +284,7 @@ Want to release an update to MozReview? This section is for you.
 Building eggs for Review Board Extensions
 -----------------------------------------
 
-If you modify ``mozreview``, ``rbbz`` or ``rbmozui``, you'll need to produce
+If you modify ``mozreview``, ``rbbz`` or ``mozreview``, you'll need to produce
 new Python eggs suitable for deployment on production.
 
 We've provided a build environment in a Docker container to enable
@@ -296,7 +296,6 @@ local filesystem. To use::
   $ DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-reviewboard-eggs /path/to/output/directory
   Wrote /path/to/output/directory/mozreview-0.1.0alpha0-py2.6.egg
   Wrote /path/to/output/directory/rbbz-0.2.6-py2.6.egg
-  Wrote /path/to/output/directory/rbmozui-0.2.3beta0-py2.6.egg
 
 If you wish to use the Docker container, extract the image id from the
 ``build-reviewboard-eggs`` command output and invoke Docker like so::
@@ -307,7 +306,6 @@ If you wish to use the Docker container, extract the image id from the
   Generating eggs...
   Wrote ./mozreview-0.1.0alpha0-py2.6.egg
   Wrote ./rbbz-0.2.6-py2.6.egg
-  Wrote ./rbmozui-0.2.3beta0-py2.6.egg
   $ docker run -it 63b369dee3c4 /bin/bash
 
 You will find a virtualenv in ``/venv``. A copy of the

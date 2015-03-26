@@ -1,7 +1,6 @@
 {% load djblets_extensions %}
-{% load rbmozui %}
+{% load mozreview %}
 
 {% if review_request|isPush %}
 {%   ext_css_bundle extension "review" %}
-{%   ext_css_bundle extension "commits" %}
 {% endif %}

@@ -24,10 +24,10 @@ setup(
     },
     package_data={
         'mozreview': [
-            'templates/mozreview/*.txt',
-            'templates/mozreview/*.html',
-            'static/css/*.css',
-            'static/css/*.less'
-        ],
+            'templates/**/*.html',
+            'static/**/*.css',
+            'static/**/*.less',
+            'static/**/*.js'
+        ]
     }
 )

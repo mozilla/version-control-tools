@@ -4,7 +4,7 @@ This is the template for the "Commits" list in a push-based review request.
 
 {% load i18n %}
 
-<script type="text/template" id="rbmozui-commits-child">
+<script type="text/template" id="mozreview-commits-child">
   <span title="<%= commitID %>"><%= commitIDShort %></span> - <span title="<%= description %>"><%= summary %></span>
   <div>
     <label>{% trans "Reviewers:" %}</label> <span class="child-rr-reviewers" data-id="<%= childID %>"><%= reviewers %></span>
@@ -12,7 +12,7 @@ This is the template for the "Commits" list in a push-based review request.
   <div><%= links %></div>
 </script>
 
-<script type="text/template" id="rbmozui-commit-links">
+<script type="text/template" id="mozreview-commit-links">
   <a href="<%= childURL %>">[{% trans "Reviews" %}]</a> <a href="<%= childURL %>diff/#0">[{% trans "Diff" %}]</a>
 </script>
 
@@ -25,9 +25,9 @@ This is the template for the "Commits" list in a push-based review request.
   <a href="#" id="error-close">Close</a>
 </div>
 
-<ul id="rbmozui-commits" class="current-arrow">
-  <li id="rbmozui-commits-root" data-id="{{root_rr.id}}">{% trans "Root review request" %}
-    <div id="rbmozui-commits-root-links"></div>
-    <ul id="rbmozui-commits-children" class="current-arrow"></ul>
+<ul id="mozreview-commits" class="current-arrow">
+  <li id="mozreview-commits-root" data-id="{{root_rr.id}}">{% trans "Root review request" %}
+    <div id="mozreview-commits-root-links"></div>
+    <ul id="mozreview-commits-children" class="current-arrow"></ul>
   </li>
 </ul>

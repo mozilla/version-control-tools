@@ -1,7 +1,7 @@
 $(document).ready(function() {
   var TRY_AUTOLAND = "/api/extensions/mozreview.extension.MozReviewExtension/try-autoland-triggers/";
 
-  $("#rbmozui-autoland-try-trigger").click(function() {
+  $("#mozreview-autoland-try-trigger").click(function() {
     var box = $("<div/>")
         .addClass("formdlg")
         .keypress(function(e) {
@@ -10,13 +10,13 @@ $(document).ready(function() {
 
     box.width("60em");
     var html = [
-      '<label for="rbmozui-autoland-try-syntax">TryChooser Syntax</label>',
-      '<textarea id="rbmozui-autoland-try-syntax" name="rbmozui-autoland-try-syntax" placeholder="try: -b do -p win32 -u all -t none"/>',
+      '<label for="mozreview-autoland-try-syntax">TryChooser Syntax</label>',
+      '<textarea id="mozreview-autoland-try-syntax" name="mozreview-autoland-try-syntax" placeholder="try: -b do -p win32 -u all -t none"/>',
       '<p>Enter TryChooser syntax here for your Try build. <a href="http://trychooser.pub.build.mozilla.org/" target="_blank">You can graphically build TryChooser syntax here.</a></p>'
     ];
 
     for (var i = 0; i < html.length; ++i) {
-      box.append($(html[i]).addClass("rbmozui-autoland-try-chooser-element"));
+      box.append($(html[i]).addClass("mozreview-autoland-try-chooser-element"));
     }
 
     box.modalBox({
@@ -28,7 +28,7 @@ $(document).ready(function() {
             .val("Submit")
             .click(function() {
               var submit = $(this);
-              var tryInput = $("#rbmozui-autoland-try-syntax");
+              var tryInput = $("#mozreview-autoland-try-syntax");
               submit.enable(false);
               tryInput.enable(false);
 
@@ -41,8 +41,8 @@ $(document).ready(function() {
                 type: "POST",
                 url: TRY_AUTOLAND,
                 data: {
-                  review_request_id: RBMozUI.rootReviewRequest.id,
-                  try_syntax: $("#rbmozui-autoland-try-syntax").val()
+                  review_request_id: MozReview.rootReviewRequest.id,
+                  try_syntax: $("#mozreview-autoland-try-syntax").val()
                 }
               })
               .done(function(){
@@ -69,10 +69,10 @@ $(document).ready(function() {
         ]
     });
 
-    $("#rbmozui-autoland-try-syntax").focus();
+    $("#mozreview-autoland-try-syntax").focus();
 
     return false;
   });
 
-  $("#rbmozui-autoland-try-trigger").enable(RBMozUI.currentIsMutableByUser);
+  $("#mozreview-autoland-try-trigger").enable(MozReview.currentIsMutableByUser);
 });
