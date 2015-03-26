@@ -167,6 +167,9 @@ ADD run-apache.sh /run-apache.sh
 
 # Force image cache invalidation if code used to bootstrap
 # changes.
+# %include testing/vcttesting/bugzilla/
+# %include testing/vcttesting/docker.py
+# %include testing/vcttesting/mozreview.py
 ADD extra/ $BUGZILLA_HOME/extra-docker-context
 
 EXPOSE 80
