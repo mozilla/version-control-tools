@@ -135,12 +135,13 @@ def wrappedpushbookmark(orig, pushop):
         return result
 
     bzauth = getbugzillaauth(ui)
-    if not bzauth or not bzauth.username or not bzauth.password:
+    if not bzauth:
         return result
 
     bzurl = ui.config('bugzilla', 'url', 'https://bugzilla.mozilla.org/rest')
 
     bugsy = Bugsy(username=bzauth.username, password=bzauth.password,
+                  userid=bzauth.userid, cookie=bzauth.cookie,
                   bugzilla_url=bzurl)
 
     def public_url_for_bug(bug):

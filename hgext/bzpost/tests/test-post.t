@@ -400,6 +400,7 @@ Verify cookie auth works
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
+  recording push at http://*:$HGPORT1/show_bug.cgi?id=8 (glob)
 
   $ $TESTDIR/bugzilla dump-bug 8
   Bug 8:
@@ -410,6 +411,10 @@ Verify cookie auth works
       id: 14
       tags: []
       text: ''
+    - author: default@example.com
+      id: 15
+      tags: []
+      text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/377d66b28de0
     component: TestComponent
     depends_on: []
     platform: All
