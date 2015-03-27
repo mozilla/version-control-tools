@@ -305,7 +305,7 @@ class AutolandRequestUpdateResource(WebAPIResource):
         testing = ext.settings.get('autoland_testing', False)
 
         if not testing:
-            if not request.user.has_perm('mozreview.autoland.autoland_add'):
+            if not request.user.has_perm('mozreview.add_autolandeventlogentry'):
                 return BAD_UPDATE_CREDENTIALS
 
         try:
