@@ -13,6 +13,7 @@
   $ cat >> $HGRCPATH << EOF
   > [extensions]
   > bzpost = $TESTDIR/hgext/bzpost
+  > bzauth = $TESTDIR/pylib/mozhg/mozhg/tests/auth.py
   > localmozrepo = $TESTDIR/testing/local-mozilla-repos.py
   > strip =
   > 
@@ -367,6 +368,57 @@ Pushing commit with bug number to user repo will post comment if enabled
     resolution: ''
     status: NEW
     summary: bug7
+
+  $ cd ..
+
+Verify cookie auth works
+
+  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug8
+  $ mkdir profiles
+  $ export FIREFOX_PROFILES_DIR=`pwd`/profiles
+  $ cat > profiles/profiles.ini << EOF
+  > [Profile0]
+  > Name=foo
+  > IsRelative=1
+  > Path=foo
+  > EOF
+
+  $ mkdir profiles/foo
+  $ BUGZILLA_USERNAME=default@example.com BUGZILLA_PASSWORD=password out=`$TESTDIR/bugzilla create-login-cookie`
+  $ userid=`echo ${out} | awk '{print $1}'`
+  $ cookie=`echo ${out} | awk '{print $2}'`
+  $ hg bzcreatecookie profiles/foo ${BUGZILLA_URL} ${userid} ${cookie}
+
+  $ hg -q clone http://localhost:$HGPORT/integration/mozilla-inbound cookie-auth
+  $ cd cookie-auth
+  $ echo cookie > foo
+  $ hg commit -m 'Bug 8 - Test cookie auth'
+  $ hg --config bugzilla.username= --config bugzilla.password= push
+  pushing to http://localhost:$HGPORT/integration/mozilla-inbound
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+
+  $ $TESTDIR/bugzilla dump-bug 8
+  Bug 8:
+    blocks: []
+    cc: []
+    comments:
+    - author: default@example.com
+      id: 14
+      tags: []
+      text: ''
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: bug8
+
+  $ unset FIREFOX_PROFILES_DIR
 
   $ cd ..
 
