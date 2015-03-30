@@ -254,7 +254,9 @@ def handle_pending_mozreview_updates(logger, dbconn):
             'rev': row[2],
             'destination': row[3],
             'trysyntax': row[4],
-            'landed': landed
+            'landed': landed,
+            'error_msg': '',
+            'result': ''
         }
 
         if landed:
@@ -265,8 +267,11 @@ def handle_pending_mozreview_updates(logger, dbconn):
         logger.info('trying to post mozreview update to: %s for request: %s' %
                     (row[7], row[0]))
 
-        if mozreview.update_review(mozreview_auth, pingback_url, data):
+        status_code, text = mozreview.update_review(mozreview_auth, pingback_url, data)
+        if status_code == 200: 
             updated.append([row[0]])
+        else:
+            logger.info('failed: %s - %s' % (status_code, text))
 
     if updated:
         query = """

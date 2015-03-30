@@ -13,6 +13,6 @@ def update_review(auth, pingback_url, data):
         r = requests.post(pingback_url, data=json.dumps(data),
                           headers={'Content-Type': 'application/json'},
                           auth=auth)
-        return r.status_code == 200
+        return r.status_code, r.text
     except requests.exceptions.ConnectionError:
         return
