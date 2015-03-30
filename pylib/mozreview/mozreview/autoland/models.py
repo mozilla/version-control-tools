@@ -45,7 +45,7 @@ class AutolandRequest(models.Model):
     @property
     def last_known_status(self):
         last_evt = self.event_log_entries.last()
-        return last_evt.status if last_evt else ""
+        return last_evt.get_status_display() if last_evt else ""
 
     @property
     def last_details(self):

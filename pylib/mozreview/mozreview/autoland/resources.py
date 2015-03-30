@@ -255,7 +255,6 @@ class AutolandRequestUpdateResource(WebAPIResource):
             'type': bool,
             'description': 'Whether this push landed or not'
         },
-        # TODO: result and error_msg should be declared mutually exclusive
         'result': {
             'type': six.text_type,
             'description': 'In case of success, this is the revision of the '
@@ -287,8 +286,6 @@ class AutolandRequestUpdateResource(WebAPIResource):
         return True
 
     def get_uri(self, request):
-        # TODO - remove this before landing. Just for local testing on mconley's machine
-        #return "http://192.168.59.3:60353/api/extensions/mozreview.extension.MozReviewExtension/autoland-request-updates/"
         named_url = self._build_named_url(self.name_plural)
 
         return request.build_absolute_uri(
@@ -304,41 +301,41 @@ class AutolandRequestUpdateResource(WebAPIResource):
 
         testing = ext.settings.get('autoland_testing', False)
 
-        if not testing:
-            if not request.user.has_perm('mozreview.add_autolandeventlogentry'):
-                return BAD_UPDATE_CREDENTIALS
+        if not testing and not request.user.has_perm(
+                'mozreview.add_autolandeventlogentry'):
+            return BAD_UPDATE_CREDENTIALS
 
         try:
             fields = json.loads(request.body)
-            for field_name, field_definition in self.fields.items():
-                assert type(fields[field_name]) == field_definition['type']
+            landed = fields['landed']
+            # result and error_msg are mutually exclusive
+            filtered_field = 'error_msg' if landed else 'result'
+            mandatory_fields = [f for f in self.fields if f != filtered_field]
+            for field_name in mandatory_fields:
+                assert type(fields[field_name]) == self.fields[field_name]['type']
         except (ValueError, IndexError, AssertionError) as e:
             return INVALID_FORM_DATA, {
                 'error': e,
-            }
-
+                }
         try:
             AutolandRequest.objects.get(pk=fields['request_id'])
         except AutolandRequest.DoesNotExist:
             return DOES_NOT_EXIST
 
-        update_queryset = AutolandRequest.objects.filter(
-            pk=fields['request_id'])
+        if landed:
+            AutolandRequest.objects.filter(pk=fields['request_id'])\
+            .update(repository_revision=fields['result'])
 
-        if fields['landed']:
-            update_queryset.filter(pk=fields['request_id']).update(
-                repository_revision=fields['result']
+            AutolandEventLogEntry.objects.create(
+                autoland_request_id=fields['request_id'],
+                status=AutolandEventLogEntry.SERVED,
+                details=fields['result'])
+        else:
+            AutolandEventLogEntry.objects.create(
+                autoland_request_id=fields['request_id'],
+                status=AutolandEventLogEntry.PROBLEM,
+                error_msg=fields['error_msg']
             )
-
-        status = (AutolandEventLogEntry.SERVED if fields['landed'] else
-                  AutolandEventLogEntry.PROBLEM)
-
-        AutolandEventLogEntry.objects.create(
-            autoland_request_id=fields['request_id'],
-            status=status,
-            details=fields['result'],
-            error_msg=fields['error_msg']
-        )
 
         return 200, {}
 

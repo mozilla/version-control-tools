@@ -1,5 +1,4 @@
 Disabled because test is failing
-#require false
 #require docker
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
@@ -14,9 +13,9 @@ Disabled because test is failing
 Create the test users
 
   $ adminbugzilla create-user author@example.com password 'Patch Author'
-  created user 5
-  $ adminbugzilla create-user dummy1@example.com password 'Dummy User'
   created user 6
+  $ adminbugzilla create-user dummy1@example.com password 'Dummy User'
+  created user 7
 
 Create and publish a review request
 
@@ -24,7 +23,7 @@ Create and publish a review request
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/ > /dev/null
+  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/test-repo > /dev/null
   $ rbmanage publish $HGPORT1 1
 
 Try to trigger the WebAPI endpoint as user@dummy, which should fail, because
@@ -36,14 +35,15 @@ Force the dummy Review Board user to be created by querying for it.
 
   $ rbmanage get-users $HGPORT1 ''
   - id: 1
-    url: /users/author%2B5/
-    username: author+5
+    url: /users/author%2B6/
+    username: author+6
   - id: 2
-    url: /users/dummy1%2B6/
-    username: dummy1+6
+    url: /users/dummy1%2B7/
+    username: dummy1+7
 
   $ rbmanage hit-try-autoland-trigger $HGPORT1 1 "try -b do -p all -t none -u all"
   You don't have permission for this (HTTP 403, API Error 101)
+  [1]
 
 Try to trigger the WebAPI endpoint as the submitter, which should succeed.
 
@@ -57,11 +57,11 @@ Force the admin Review Board user to be created by querying for it.
 
   $ rbmanage get-users $HGPORT1 ''
   - id: 1
-    url: /users/author%2B5/
-    username: author+5
+    url: /users/author%2B6/
+    username: author+6
   - id: 2
-    url: /users/dummy1%2B6/
-    username: dummy1+6
+    url: /users/dummy1%2B7/
+    username: dummy1+7
 
   $ rbmanage dump-autoland-requests $HGPORT1
   autoland_id: 1
