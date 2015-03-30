@@ -46,7 +46,9 @@ $(document).ready(function() {
                 }
               })
               .done(function(){
-                // TODO
+                // There may be a better way to get the review request updates
+                // but this is probably good enough for now
+                window.location.reload()
               })
               .fail(function(){
                 submit.enable(true);
