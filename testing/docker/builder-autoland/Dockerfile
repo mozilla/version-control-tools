@@ -6,7 +6,7 @@
 
 FROM ubuntu:14.04.1
 
-ENV AUTOLAND_HOME /home/ubuntu/autoland
+ENV AUTOLAND_HOME /home/ubuntu/version-control-tools/autoland
 
 RUN /usr/sbin/groupadd -g 1000 ubuntu
 RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 ubuntu
