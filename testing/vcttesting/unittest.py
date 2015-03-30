@@ -173,7 +173,7 @@ class MozReviewWebDriverTest(MozReviewTest):
 
     def get_commits_el(self):
         """Obtain the element containing the multi-commit information."""
-        return self.browser.find_element_by_id('rbmozui-commits')
+        return self.browser.find_element_by_id('mozreview-commits')
 
     def prepare_edit_reviewers(self, idx):
         """Start editing reviewers for the commit at index ``idx``."""
