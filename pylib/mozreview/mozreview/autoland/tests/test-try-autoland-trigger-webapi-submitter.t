@@ -65,7 +65,7 @@ Force the admin Review Board user to be created by querying for it.
 
   $ rbmanage dump-autoland-requests $HGPORT1
   autoland_id: 1
-  last_known_status: Request received
+  last_known_status: R
   push_revision: 57755461e85f1e3e66738ec2d57f325249897409
   repository_revision: ''
   repository_url: ''

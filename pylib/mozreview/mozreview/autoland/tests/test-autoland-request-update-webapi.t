@@ -40,7 +40,7 @@ Force the admin Review Board user to be created by querying for it.
 
   $ rbmanage dump-autoland-requests $HGPORT1
   autoland_id: 1
-  last_known_status: Request received
+  last_known_status: R
   push_revision: 57755461e85f1e3e66738ec2d57f325249897409
   repository_revision: ''
   repository_url: ''
@@ -52,7 +52,7 @@ Hit the WebAPI with the Autoland response
   $ rbmanage hit-autoland-request-update $HGPORT1 1 mozilla-central abcdefghijklmnop try "try -b do -p all -t none -u all" true Foo
   $ rbmanage dump-autoland-requests $HGPORT1
   autoland_id: 1
-  last_known_status: Request served
+  last_known_status: S
   push_revision: 57755461e85f1e3e66738ec2d57f325249897409
   repository_revision: Foo
   repository_url: ''
