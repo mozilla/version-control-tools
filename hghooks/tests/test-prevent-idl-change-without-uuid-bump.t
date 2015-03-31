@@ -485,7 +485,7 @@ UUID is not bumped.
   [255]
 
   $ hg commit --amend -m 'nsISupports.idl IGNORE IDL'
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/c4abf967d1fe-amend-backup.hg (glob)
+  saved backup bundle to * (glob)
 
   $ hg push $TESTTMP/server
   pushing to $TESTTMP/server
