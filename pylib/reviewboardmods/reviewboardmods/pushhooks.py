@@ -8,10 +8,12 @@ Review Board install. Please abstract away Mozilla implementation
 details.
 """
 
+from contextlib import contextmanager
+import os
 import json
+import tempfile
 
 from rbtools.api.client import RBClient
-from rbtools.api.errors import APIError
 
 
 def post_reviews(url, repoid, identifier, commits, username=None, password=None,
@@ -117,9 +119,11 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
 
     * TODO Bug 1047465
     """
-    rbc = get_rbclient(url, username, password, userid, cookie)
-    api_root = rbc.get_root()
+    with ReviewBoardClient(url, username, password, userid, cookie) as rbc:
+        root = rbc.get_root()
+        return _post_reviews(root, repoid, identifier, commits)
 
+def _post_reviews(api_root, repoid, identifier, commits):
     # This assumes that we pushed to the repository/URL that Review Board is
     # configured to use. This assumption may not always hold.
     repo = api_root.get_repository(repository_id=repoid)
@@ -358,20 +362,42 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
     return str(squashed_rr.id), node_to_rid, review_requests
 
 
-def get_rbclient(url, username, password, userid, cookie):
-    if userid and cookie:
-        # TODO: This is bugzilla specific code that really shouldn't be inside
-        # of this file. The whole bugzilla cookie resource is a hack anyways
-        # though so we'll deal with this for now.
-        rbc = RBClient(url)
-        login_resource = rbc.get_path(
-            'extensions/rbbz.extension.BugzillaExtension/'
-            'bugzilla-cookie-logins/')
-        login_resource.create(login_id=userid, login_cookie=cookie)
-    else:
-        rbc = RBClient(url, username=username, password=password)
+@contextmanager
+def ReviewBoardClient(url, username, password, userid, cookie):
+    """Obtain a RBClient instance via a context manager.
 
-    return rbc
+    This exists as a context manager because of gross hacks necessary for
+    dealing with cookies. ``RBClient`` is coded such that it assumes it is
+    being used under a user account and storing cookies is always acceptable.
+    There is no way to disable cookie file writing or to tell it to use a file
+    object (such as BytesIO) as the cookies database.
+
+    We work around this deficiency by creating a temporary file and using it as
+    the cookies database for the lifetime of the context manager. When the
+    context manager exits, the temporary cookies file is deleted.
+    """
+    fd, path = tempfile.mkstemp()
+    os.close(fd)
+    try:
+        if userid and cookie:
+            # TODO: This is bugzilla specific code that really shouldn't be inside
+            # of this file. The whole bugzilla cookie resource is a hack anyways
+            # though so we'll deal with this for now.
+            rbc = RBClient(url, cookie_file=path)
+            login_resource = rbc.get_path(
+                'extensions/rbbz.extension.BugzillaExtension/'
+                'bugzilla-cookie-logins/')
+            login_resource.create(login_id=userid, login_cookie=cookie)
+        else:
+            rbc = RBClient(url, username=username, password=password,
+                           cookie_file=path)
+
+        yield rbc
+    finally:
+        try:
+            os.unlink(path)
+        except Exception:
+            pass
 
 
 def rid_list_to_str(rids):
