@@ -1,4 +1,4 @@
-from setuptools import setup
+from reviewboard.extensions.packaging import setup
 
 PACKAGE = 'rbbz'
 VERSION = '0.2.8'
