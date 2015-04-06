@@ -129,7 +129,7 @@ class Docker(object):
         """Whether the connection to Docker is alive."""
         # This is a layering violation with docker.client, but meh.
         try:
-            self.client._get(self.client._url('/version'), timeout=1)
+            self.client._get(self.client._url('/version'), timeout=5)
             return True
 
         # docker-py, urllib3, and Python's ssl packages all seem to have
