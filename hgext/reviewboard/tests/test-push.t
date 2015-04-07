@@ -347,7 +347,7 @@ error (Bug 1128555)
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   submitting 1 changesets for review
-  abort: reviewboard error: "105 - One or more fields had errors". please try submitting the review again. if that doesn't work, you've likely encountered a bug.
+  abort: reviewboard error: "One or more fields had errors (HTTP 400, API Error 105)". please try submitting the review again. if that doesn't work, you've likely encountered a bug.
   [255]
 
 We disallow completely empty revisions.

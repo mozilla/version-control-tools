@@ -38,9 +38,9 @@ class BadRequestError(Exception):
         self.e = e
 
     def __str__(self):
-        return ('reviewboard error: "%d - %s". please try submitting the'
+        return ('reviewboard error: "%s". please try submitting the'
                 ' review again. if that doesn\'t work, you\'ve likely'
-                ' encountered a bug.') % (self.e.error_code, self.e.message)
+                ' encountered a bug.') % str(self.e).splitlines()[0]
 
 
 # Wrap reviewboardmods and error types because we don't want to require the
