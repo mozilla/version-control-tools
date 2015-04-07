@@ -1,5 +1,6 @@
 beautifulsoup4
 flask
+github3.py
 kombu
 mock
 mozillapulse
