@@ -53,6 +53,8 @@ Seed the repo
   review url: http://localhost:$HGPORT1/r/1 (pending)
   (visit review url to publish this review request so others can see it)
 
+  $ rbmanage publish $HGPORT1 1
+
 Pulling reviews with no changes
 
   $ hg fetchreviews
