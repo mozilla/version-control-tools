@@ -110,6 +110,10 @@ with the upgrade. You'll also likely want to send an email to
 ``sheriffs@mozilla.org`` explaining the work, so those thare are on duty
 next will be able to tell you if they find something funny later.
 
+If extra caution is warranted, a bug should be filed against the Change Advisory
+Board. This board will help you schedule the upgrade work. Details can be found
+at https://wiki.mozilla.org/IT/ChangeControl.
+
 Performing the upgrade
 ----------------------
 
@@ -136,11 +140,31 @@ host and perform the upgrade.
 
    $ ssh ssh.mozilla.com -A
    ssh $ ssh hgweb1.dmz.scl3.mozilla.com
-   hgweb1 $ yum clean metadata
-   hgweb1 $ yum upgrade mercurial # (say Yes at the prompt or pass -y here)
+   hgweb1 $ yum-wrapper clean metadata
+   hgweb1 $ yum-wrapper upgrade mercurial # (say Yes at the prompt or pass -y here)
    hgweb1 $ service httpd restart
 
 Repeat this procedure until all webheads have been upgraded.
+
+Re-add and confirm correctness
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+After the host has been upgraded, it should be tested to ensure that the host is
+still serving correctly. There is no formal process to do this, as the testing
+is done previously through the v-c-t testing framework. Still, a good test is to
+run elinks against the localhost to ensure that the front page and a single
+repository will load.
+
+.. code:: sh
+
+   $ elinks -dump http://localhost/
+   ...
+   $ elinks -dump http://localhost/mozilla-central
+
+If you have cause for concern, the httpd's logs should be checked. These are
+located in /var/log/httpd/hg.mozilla.org/.
+
+If everything looks good, then re-add the host back to the node pool in Zeus.
 
 SSH Master hosts
 ^^^^^^^^^^^^^^^^
