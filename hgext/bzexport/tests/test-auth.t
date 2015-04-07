@@ -61,13 +61,13 @@ Invalid cookie should result in appropriate error message
   $ hg --config bugzilla.userid=badid --config bugzilla.cookie=badcookie newbug --product TestProduct --component TestComponent -t 'Bad Cookie' 'dummy'
   Refreshing configuration cache for http://*:$HGPORT/bzapi/ (glob)
   Using default version 'unspecified' of product TestProduct
-  abort: error creating bug: REST error on POST to http://*:$HGPORT/rest/bug: The cookies or token provide were not valid or have expired. You may login again to get new cookies or a new token. (glob)
+  abort: error creating bug: REST error on POST to http://*:$HGPORT/rest/bug: You must log in before using this part of Bugzilla. (glob)
   [255]
 
   $ echo patch > foo
   $ hg qnew -d '0 0' -m 'Bug 1 - Test cookie' cookie-patch
   $ hg --config bugzilla.userid=badid --config bugzilla.cookie=badcookie bzexport
-  abort: error uploading attachment: REST error on POST to http://*:$HGPORT/rest/bug/1/attachment: The cookies or token provide were not valid or have expired. You may login again to get new cookies or a new token. (glob)
+  abort: error uploading attachment: REST error on POST to http://*:$HGPORT/rest/bug/1/attachment: You must log in before using this part of Bugzilla. (glob)
   [255]
 
 Cookie authentication works
