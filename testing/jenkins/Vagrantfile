@@ -29,7 +29,7 @@ mount /var/btrfs /var/lib/docker
 # have started in devicemapper mode. Force a restart to pick up btrfs.
 restart docker
 
-apt-get -y install libldap2-dev libsasl2-dev libxslt1-dev lxc-docker mercurial python-dev python-virtualenv sqlite3 unzip zlib1g-dev
+apt-get -y install libffi-dev libldap2-dev libsasl2-dev libssl-dev libxslt1-dev lxc-docker mercurial python-dev python-virtualenv sqlite3 unzip zlib1g-dev
 usermod --append -G docker vagrant
 SCRIPT
 
