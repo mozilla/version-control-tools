@@ -22,7 +22,10 @@ def HGEXT_BOOTSTRAP():
             root = here
             break
 
-        here = os.path.dirname(here)
+        newhere = os.path.dirname(here)
+        if newhere == here:
+            break
+        here = newhere
 
     if not here or not root:
         raise Exception('Could not find repository root.')
