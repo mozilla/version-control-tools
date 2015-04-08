@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-
-# This software may be used and distributed according to the terms of the
-# GNU General Public License version 2 or any later version.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 # This file is used to run all Mercurial-related tests in this repository.
 
