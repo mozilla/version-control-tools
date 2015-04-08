@@ -31,9 +31,12 @@ if __name__ == '__main__':
         sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
         os.environ['VIRTUAL_ENV'] = os.path.join(HERE, 'venv')
 
-    import concurrent.futures as futures
     import vcttesting.docker as vctdocker
-    from vcttesting.testing import get_extensions, get_test_files
+    from vcttesting.testing import (
+        get_extensions,
+        get_test_files,
+        prune_docker_orphans,
+    )
 
     # Unbuffer stdout.
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -369,19 +372,6 @@ if __name__ == '__main__':
                 omit=omit)
 
     # Clean up leaked Docker containers and images.
-    if docker.is_alive():
-        with futures.ThreadPoolExecutor(4) as e:
-            for c in docker.client.containers(all=True):
-                if c['Id'] not in preserve_containers:
-                    print('removing orphaned docker container: %s' %
-                          c['Id'])
-                    e.submit(docker.client.remove_container, c['Id'],
-                             force=True)
-
-        with futures.ThreadPoolExecutor(4) as e:
-            for i in docker.client.images(all=True):
-                if i['Id'] not in preserve_images:
-                    print('removing orphaned docker image: %s' % c['Id'])
-                    e.submit(docker.client.remove_image, c['Id'])
+    prune_docker_orphans(docker, preserve_containers, preserve_images)
 
     sys.exit(res)

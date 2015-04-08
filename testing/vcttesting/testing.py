@@ -6,6 +6,9 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 
+import concurrent.futures as futures
+
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 
@@ -110,3 +113,27 @@ def get_test_files(extensions):
         'unit': sorted(unit_tests),
         'all': set(extension_tests) | set(hook_tests) | set(unit_tests),
     }
+
+
+def prune_docker_orphans(docker, containers, images):
+    """Prune Docker containers and images that were orphaned from tests.
+
+    If tests are aborted, Docker containers and images could linger. This will
+    clean them.
+    """
+    if not docker.is_alive():
+        return
+
+    with futures.ThreadPoolExecutor(4) as e:
+        for c in docker.client.containers(all=True):
+            if c['Id'] not in containers:
+                print('removing orphaned docker container: %s' %
+                      c['Id'])
+                e.submit(docker.client.remove_container, c['Id'],
+                         force=True)
+
+    with futures.ThreadPoolExecutor(4) as e:
+        for i in docker.client.images(all=True):
+            if i['Id'] not in images:
+                print('removing orphaned docker image: %s' % c['Id'])
+                e.submit(docker.client.remove_image, c['Id'])
