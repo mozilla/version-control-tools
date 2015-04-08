@@ -35,6 +35,7 @@ if __name__ == '__main__':
     from vcttesting.testing import (
         get_extensions,
         get_test_files,
+        run_nose_tests,
         produce_coverage_reports,
         prune_docker_orphans,
     )
@@ -235,30 +236,7 @@ if __name__ == '__main__':
         run_unit_tests = []
 
     if run_unit_tests:
-        noseargs = [sys.executable, '-m', 'nose.core', '-s']
-        if options.jobs:
-            noseargs.extend([
-                '--processes=%d' % options.jobs,
-                '--process-timeout=120',
-            ])
-        noseargs.extend(run_unit_tests)
-
-        env = dict(os.environ)
-        paths = [p for p in env.get('PYTHONPATH', '').split(os.pathsep) if p]
-
-        # We need the directory with sitecustomize.py in sys.path for code
-        # coverage to work. This is arguably a bug in the location of
-        # sitecustomize.py.
-        paths.append(os.path.dirname(sys.executable))
-
-        for p in os.listdir(os.path.join(HERE, 'pylib')):
-            p = os.path.join(HERE, 'pylib', p)
-            if os.path.isdir(p) and p not in paths:
-                paths.insert(0, p)
-
-        env['PYTHONPATH'] = ':'.join(paths)
-
-        noseres = subprocess.call(noseargs, env=env)
+        noseres = run_nose_tests(run_unit_tests, options.jobs)
         if noseres:
             res = noseres
 

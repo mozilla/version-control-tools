@@ -5,6 +5,8 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
+import subprocess
+import sys
 
 import concurrent.futures as futures
 from coverage import coverage
@@ -176,3 +178,34 @@ def produce_coverage_reports(coverdir):
                     ignore_errors=True, omit=omit)
     cov.xml_report(outfile=os.path.join(coverdir, 'coverage.xml'),
                    ignore_errors=True, omit=omit)
+
+
+def run_nose_tests(tests, process_count=None):
+    """Run nose tests and return result code."""
+    noseargs = [sys.executable, '-m', 'nose.core', '-s']
+
+    if process_count:
+        noseargs.extend([
+            '--processes=%d' % process_count,
+            '--process-timeout=120',
+        ])
+    noseargs.extend(tests)
+
+    env = dict(os.environ)
+    paths = [p for p in env.get('PYTHONPATH', '').split(os.pathsep) if p]
+
+    # We need the directory with sitecustomize.py in sys.path for code
+    # coverage to work. This is arguably a bug in the location of
+    # sitecustomize.py.
+    paths.append(os.path.dirname(sys.executable))
+
+    # We also need our support libraries in sys.path.
+    # TODO shouldn't the virtualenv handle this?
+    for p in os.listdir(os.path.join(ROOT, 'pylib')):
+        p = os.path.join(ROOT, 'pylib', p)
+        if os.path.isdir(p) and p not in paths:
+            paths.insert(0, p)
+
+        env['PYTHONPATH'] = ':'.join(paths)
+
+    return subprocess.call(noseargs, env=env)
