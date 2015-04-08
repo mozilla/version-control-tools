@@ -4,7 +4,10 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import json
+import logging
 import os
+from pipes import quote
 import subprocess
 
 
@@ -12,10 +15,31 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 ANSIBLE = os.path.join(ROOT, 'ansible')
 
-def run_playbook(name):
+logger = logging.getLogger(__name__)
+
+
+def run_playbook(name, extra_vars=None, verbosity=0):
+    extra_vars = extra_vars or {}
+
     args = [
         'ansible-playbook',
         '-i', os.path.join(ANSIBLE, 'hosts'),
         '%s.yml' % name,
+        '--extra-vars', json.dumps(extra_vars),
     ]
+    if verbosity:
+        args.append('-%s' % ('v' * verbosity))
+
+    logger.info('$ %s' % ' '.join([quote(a) for a in args]))
     return subprocess.call(args, cwd=ANSIBLE)
+
+
+def deploy_reviewboard_dev(repo=None, rev=None, verbosity=0):
+    extra = {}
+    if repo:
+        extra['repo'] = repo
+    if rev:
+        extra['rev'] = rev
+
+    return run_playbook('reviewboard-dev', extra_vars=extra,
+                        verbosity=verbosity)

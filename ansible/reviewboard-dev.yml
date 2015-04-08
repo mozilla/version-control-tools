@@ -2,6 +2,8 @@
 ---
 - hosts: reviewboard1.dev.webapp.scl3.mozilla.com
   vars:
+    rev: "@"
+    repo: https://hg.mozilla.org/hgcustom/version-control-tools
     sitehome: /data/www/reviewboard-dev.allizom.org/reviewboard
     vct: /data/www/reviewboard-dev.allizom.org/version-control-tools
     pip: /data/www/reviewboard-dev.allizom.org/venv/bin/pip
@@ -12,8 +14,11 @@
   - name: Clear old files out of v-c-t
     command: hg --config extensions.purge= -R {{ vct }} purge -a
 
+  - name: Pull v-c-t repository
+    command: hg -R {{ vct }} pull {{ repo }}
+
   - name: Update v-c-t repository
-    command: hg -R {{ vct }} pull -u
+    command: hg -R {{ vct }} up -C {{ rev }}
 
   - name: Install RBTools
     command: "{{ pip }} install --allow-external RBTools --allow-unverified RBTools --upgrade RBTools==0.6.1"
