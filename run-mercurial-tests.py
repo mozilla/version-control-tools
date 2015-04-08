@@ -8,7 +8,6 @@
 from __future__ import print_function
 
 import argparse
-import imp
 import os
 import re
 import subprocess
@@ -20,8 +19,6 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 RUNTESTS = os.path.join(HERE, 'pylib', 'mercurial-support', 'run-tests.py')
 EXTDIR = os.path.join(HERE, 'hgext')
 
-sys.path.insert(0, os.path.join(HERE, 'pylib', 'mercurial-support'))
-runtestsmod = imp.load_source('runtests', RUNTESTS)
 
 if __name__ == '__main__':
     if 'VIRTUAL_ENV' not in os.environ:
@@ -57,8 +54,9 @@ if __name__ == '__main__':
     options, extra = parser.parse_known_args(sys.argv)
 
     # some arguments belong to us only. Don't pass it along to run-tests.py.
-    sys.argv = [a for a in sys.argv
-        if a not in set(['--all-versions', '--no-hg-tip'])]
+    hg_harness_args = [a for a in sys.argv
+            if a not in {'--all-versions', '--no-hg-tip'}]
+    hg_harness_args[0] = RUNTESTS
 
     coveragerc = os.path.join(HERE, '.coveragerc')
     coverdir = os.path.join(HERE, 'coverage')
@@ -73,21 +71,22 @@ if __name__ == '__main__':
 
     # We do our own code coverage. Strip it so run-tests.py doesn't try to do
     # it's own.
-    sys.argv = [a for a in sys.argv if a != '--cover']
-    verbose = '-v' in sys.argv or '--verbose' in sys.argv
+    hg_harness_args = [a for a in hg_harness_args if a != '--cover']
+    verbose = '-v' in hg_harness_args or '--verbose' in hg_harness_args
 
     os.environ['BUGZILLA_USERNAME'] = 'admin@example.com'
     os.environ['BUGZILLA_PASSWORD'] = 'password'
 
-    runner = runtestsmod.TestRunner()
+    orig_args = list(hg_harness_args)
 
-    orig_args = list(sys.argv)
-
+    # Explicitly use our own HG from the virtualenv so other installs
+    # on the system don't interfere.
     if not options.with_hg:
         hg = os.path.join(os.path.dirname(sys.executable), 'hg')
-        sys.argv.extend(['--with-hg', hg])
+        hg_harness_args.extend(['--with-hg', hg])
 
-    sys.argv.extend(['--xunit',
+    # Always produce an XUnit result file.
+    hg_harness_args.extend(['--xunit',
         os.path.join(HERE, 'coverage', 'results.xml')])
 
     extensions = get_extensions(EXTDIR)
@@ -99,7 +98,8 @@ if __name__ == '__main__':
 
     possible_tests = [os.path.normpath(os.path.abspath(a))
                       for a in extra[1:] if not a.startswith('-')]
-    sys.argv = [a for a in sys.argv
+    # Filter out arguments that might be tests.
+    hg_harness_args = [a for a in hg_harness_args
                 if os.path.normpath(os.path.abspath(a)) not in possible_tests]
     requested_tests = []
     for t in possible_tests:
@@ -164,10 +164,7 @@ if __name__ == '__main__':
         preserve_containers |= res[1]
         preserve_images |= res[2]
 
-    sys.argv.extend(run_hg_tests)
-
-    old_env = os.environ.copy()
-    old_defaults = dict(runtestsmod.defaults)
+    hg_harness_args.extend(run_hg_tests)
 
     # This is used by hghave to detect the running Mercurial because run-tests
     # doesn't pass down the version info in the environment of the hghave
@@ -193,10 +190,7 @@ if __name__ == '__main__':
 
     res = 0
     if run_hg_tests:
-        res = runner.run(sys.argv[1:])
-    os.environ.clear()
-    os.environ.update(old_env)
-    runtestsmod.defaults = dict(old_defaults)
+        res = subprocess.call(hg_harness_args, cwd=HERE)
 
     if options.no_unit:
         run_unit_tests = []
@@ -250,19 +244,16 @@ if __name__ == '__main__':
             if not tests:
                 return
 
-            sys.argv = list(orig_args)
-            sys.argv.extend(['--with-hg',
-                os.path.join(mercurials_dir, version, 'bin', 'hg')])
-            sys.argv.extend(sorted(tests))
+            args = list(orig_args) + [
+                '--with-hg',
+                os.path.join(mercurials_dir, version, 'bin', 'hg'),
+            ] + sorted(tests)
+            args[0] = RUNTESTS
 
             print('Testing with Mercurial %s' % version)
             sys.stdout.flush()
             os.environ['HGVERSION'] = version
-            runner = runtestsmod.TestRunner()
-            r = runner.run(sys.argv[1:])
-            os.environ.clear()
-            os.environ.update(old_env)
-            runtestsmod.defaults = dict(old_defaults)
+            r = subprocess.call(args, cwd=HERE)
             sys.stdout.flush()
             sys.stderr.flush()
 
