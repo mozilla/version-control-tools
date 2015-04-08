@@ -74,3 +74,44 @@ class AutolandCommands(object):
         server.allow_reuse_address = True
         server.timeout = timeout
         server.handle_request()
+
+    @Command('post-pullrequest-job', category='autoland',
+        description='Post a pullrequest job to autoland')
+    @CommandArgument('host', help='Host to which to post the job')
+    @CommandArgument('ghuser', help='Github user of the pullrequest')
+    @CommandArgument('repo', help='Github repository of the pullrequest')
+    @CommandArgument('pullrequest', help='Pull request identifier')
+    @CommandArgument('destination', help='Destination tree for the revision')
+    @CommandArgument('bzuserid', help='Bugzilla userid for authentication')
+    @CommandArgument('bzcookie', help='Bugzilla cookie for authentication')
+    @CommandArgument('bugid', help='Bugzilla cookie for authentication')
+    @CommandArgument('pingback_url', default='http://localhost/',
+                     help='URL to which Autoland should post result')
+    @CommandArgument('--user', required=False, default='autoland', help='Autoland user')
+    @CommandArgument('--password', required=False, default='autoland', help='Autoland password')
+    def post_pullrequest_job(self, host, ghuser, repo, pullrequest, destination,
+                             bzuserid, bzcookie, bugid, pingback_url,
+                             user=None, password=None):
+        data = {
+            'user': ghuser,
+            'repo': repo,
+            'pullrequest': pullrequest,
+            'destination': destination,
+            'bzuserid': bzuserid,
+            'bzcookie': bzcookie,
+            'bugid': bugid,
+            'pingback_url': pingback_url
+        }
+
+        r = requests.post(host + '/pullrequest/mozreview', data=json.dumps(data),
+                          headers={'Content-Type': 'application/json'},
+                          auth=(user, password))
+        print(r.status_code, r.text)
+
+    @Command('pullrequest-job-status', category='autoland',
+        description='Get an autoland job status')
+    @CommandArgument('host', help='Host to which to post the job')
+    @CommandArgument('requestid', help='Id of the job for which to get status')
+    def pullrequest_job_status(self, host, requestid):
+        r = requests.get(host + '/pullrequest/mozreview/status/' + requestid)
+        print(r.status_code, r.text)

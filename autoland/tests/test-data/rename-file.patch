@@ -1,0 +1,29 @@
+From 327ee97745f4f7145b79c5979eb4f239b7e1b8a0 Mon Sep 17 00:00:00 2001
+From: Cthulhu <cthulhu@mozilla.com>
+Date: Mon, 20 Apr 2015 10:01:59 -0400
+Subject: [PATCH] bug 1 - more stuff
+
+---
+ goodbye | 1 +
+ hello   | 1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ create mode 100644 goodbye
+ delete mode 100644 hello
+
+diff --git a/goodbye b/goodbye
+new file mode 100644
+index 0000000..270c611
+--- /dev/null
++++ b/goodbye
+@@ -0,0 +1 @@
++hello, world!
+diff --git a/hello b/hello
+deleted file mode 100644
+index 270c611..0000000
+--- a/hello
++++ /dev/null
+@@ -1 +0,0 @@
+-hello, world!
+-- 
+1.9.1
+

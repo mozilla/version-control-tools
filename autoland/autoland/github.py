@@ -12,7 +12,6 @@ def connect():
 def retrieve_commits(gh, user, repo, pullrequest, path):
     commits = []
 
-    # TODO: presumably this raises something if it fails
     pr = gh.pull_request(user, repo, pullrequest)
 
     if pr:

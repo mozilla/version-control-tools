@@ -3,7 +3,7 @@ import json
 import re
 import subprocess
 
-REVIEW_REXP = '^review url: .+/r/(\d+)'
+REVIEW_REXP = '^review url: (.+/r/\d+)'
 
 REPO_CONFIG = {}
 
@@ -18,7 +18,8 @@ def get_repo_path(tree):
     return REPO_CONFIG.get(tree, '.')
 
 
-def transplant_to_mozreview(tree, user, repo, pullrequest):
+def transplant_to_mozreview(tree, user, repo, pullrequest, bzuserid, bzcookie,
+                            bugid):
 
     """For now, we assume the source for our request is a github pull request.
     """
@@ -26,7 +27,13 @@ def transplant_to_mozreview(tree, user, repo, pullrequest):
     landed = False
     result = ''
 
+    repo_path = get_repo_path(tree)
+    if repo_path is None:
+        return False, 'unknown tree: ' % tree
+
     cmds = [['hg', 'update', '--clean'],
+            ['hg', 'strip', '--no-backup', '-r', 'draft()'],
+            ['hg', 'pull'],
             ['hg', 'update', 'central'],
             ['hg', 'bookmark', '-f', 'transplant'],
             ['hg', 'update', 'transplant']]
@@ -35,26 +42,39 @@ def transplant_to_mozreview(tree, user, repo, pullrequest):
 
     # create commands to import each github commit
     gh = github.connect()
+    if not gh:
+        # return None to signify we should retry this next time
+        return None, None
+
     commits = github.retrieve_commits(gh, user, repo, pullrequest, repo_path)
+    if not commits:
+        return False, 'no commits found!'
+
     for commit in commits:
         cmds.append(['hg', 'import', commit])
         cmds.append(['rm', commit])
 
-    # create commands to clean up
-    commits.append(['hg', 'push', 'mozreview'])
-    commits.append(['hg', 'update', 'central'])
+    # actually push the revision and clean up
+    cmds.append(['hg', '--config', 'bugzilla.userid=%s' % bzuserid,
+                       '--config', 'bugzilla.cookie=%s' % bzcookie,
+                       '--config', 'mozilla.ircnick=%s' % user,
+                       'push', '--reviewid', str(bugid), '-r', 'transplant',
+                       'mozreview-push'])
+    cmds.append(['hg', 'strip', '--no-backup', '-r', 'draft()'])
+    cmds.append(['hg', 'update', 'central'])
 
     for cmd in cmds:
         try:
             output = subprocess.check_output(cmd, stderr=subprocess.STDOUT,
                                              cwd=repo_path)
-            m = re.search(REVIEW_REXP, output)
+            m = re.search(REVIEW_REXP, output, re.MULTILINE)
             if m:
                 landed = True
                 result = m.groups()[0]
         except subprocess.CalledProcessError as e:
-            result = e.output
-            break
+            if 'abort: empty revision set' not in e.output:
+                result = e.output
+                break
 
     return landed, result
 

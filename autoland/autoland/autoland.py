@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import datetime
+import github
 import logging
 import mozreview
 import psycopg2
@@ -13,11 +14,62 @@ from mozlog.structured import commandline
 import selfserve
 import transplant
 
+GITHUB_COMMENT_LIMIT = 10  # max updates to post to github / iteration
 MOZREVIEW_COMMENT_LIMIT = 10  # max updates to post to reviewboard / iteration
 
 # this should exceed the stable delay in buildapi
 STABLE_DELAY = datetime.timedelta(minutes=5)
 OLD_JOB = datetime.timedelta(minutes=30)
+
+
+def handle_pending_mozreview_pullrequests(logger, dbconn):
+    cursor = dbconn.cursor()
+
+    query = """
+        select id,ghuser,repo,pullrequest,destination,bzuserid,bzcookie,bugid
+        from MozreviewPullRequest
+        where landed is null
+    """
+    cursor.execute(query)
+
+    landed_revisions = []
+    for row in cursor.fetchall():
+        (transplant_id, ghuser, repo, pullrequest, destination, bzuserid,
+         bzcookie, bugid) = row
+
+        landed, result = transplant.transplant_to_mozreview(destination,
+                                                            ghuser, repo,
+                                                            pullrequest,
+                                                            bzuserid, bzcookie,
+                                                            bugid)
+
+        if landed is None:
+            logger.info(('transplant failed - could not connect to github'
+                         ' for https://github.com/%s/%s/pull/%s'
+                         ' to destination: %s') %
+                        (ghuser, repo, pullrequest, destination))
+            # we'll try again later
+            break
+        elif landed:
+            logger.info(('transplanted from'
+                         ' https://github.com/%s/%s/pull/%s'
+                         ' to destination: %s new revision: %s') %
+                        (ghuser, repo, pullrequest, destination, result))
+        else:
+            logger.info(('transplant failed'
+                         ' https://github.com/%s/%s/pull/%s'
+                         ' destination: %s error: %s') %
+                        (ghuser, repo, pullrequest, destination, result))
+
+        landed_revisions.append([landed, result, transplant_id])
+
+    if landed_revisions:
+        query = """
+            update MozreviewPullRequest set landed=%s,result=%s
+            where id=%s
+        """
+        cursor.executemany(query, landed_revisions)
+        dbconn.commit()
 
 
 def handle_pending_transplants(logger, dbconn):
@@ -230,6 +282,55 @@ def monitor_testruns(logger, auth, dbconn):
         check_testrun(logger, auth, dbconn, tree, rev)
 
 
+def handle_pending_github_updates(logger, dbconn):
+    """Attempt to post updates to github"""
+
+    gh = github.connect()
+    if not gh:
+        return
+
+    cursor = dbconn.cursor()
+    query = """
+        select id,ghuser,repo,pullrequest,destination,landed,result,pingback_url
+        from MozreviewPullRequest
+        where landed is not NULL and pullrequest_updated is NULL
+        limit %(limit)s
+    """
+    cursor.execute(query, {'limit': GITHUB_COMMENT_LIMIT})
+
+    updated = []
+    for row in cursor.fetchall():
+        ghuser = row[1]
+        repo = row[2]
+        pullrequest = row[3]
+        landed = row[5]
+        result = row[6]
+        pingback_url = row[7]
+
+        if landed:
+            message = 'Your new review request is available at: %s' % result
+        else:
+            message = 'Something went wrong importing to mozreview: %s' % result
+
+        logger.info('attempting to add comment to pullrequest for request: %s' % row[0])
+
+        worked = github.add_pullrequest_comment(gh, ghuser, repo,
+                                                pullrequest,
+                                                message)
+        if worked:
+            updated.append([row[0]])
+        else:
+            logger.info('commenting on pull request failed')
+
+    if updated:
+        query = """
+            update MozreviewPullRequest set pullrequest_updated=TRUE
+            where id=%s
+        """
+        cursor.executemany(query, updated)
+        dbconn.commit()
+
+
 def handle_pending_mozreview_updates(logger, dbconn):
     """Attempt to post updates to mozreview"""
 
@@ -309,7 +410,9 @@ def main():
     while True:
         try:
             monitor_testruns(logger, auth, dbconn)
+            handle_pending_mozreview_pullrequests(logger, dbconn)
             handle_pending_transplants(logger, dbconn)
+            handle_pending_github_updates(logger, dbconn)
             handle_pending_mozreview_updates(logger, dbconn)
             time.sleep(30)
         except KeyboardInterrupt:

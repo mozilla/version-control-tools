@@ -23,32 +23,62 @@ class TestAutoland(unittest.TestCase):
         local_repo_path = tempfile.mkdtemp()
         mozreview_repo_path = tempfile.mkdtemp()
 
+        shutil.copy(os.path.join(HERE, 'test-data', 'initial.patch'),
+                    local_repo_path)
         try:
             cmds = [['hg', 'init'],
+                    ['hg', 'import', 'initial.patch'],
+                    ['hg', 'phase', '--public', '-r', '.'],
                     ['hg', 'bookmark', 'central']]
 
             for cmd in cmds:
-                subprocess.check_call(cmd, cwd=local_repo_path)
-
+                # Use check_output to suppress the output from hg import
+                subprocess.check_output(cmd, stderr=subprocess.STDOUT,
+                                        cwd=local_repo_path)
             with open(os.path.join(local_repo_path, '.hg', 'hgrc'), 'w') as f:
-                f.write('[paths]\nmozreview = ')
+                f.write('[paths]\nmozreview-push = ')
                 f.write(mozreview_repo_path)
                 f.write('\n')
+                f.write('default = .\n')
+
+            cmds = [['hg', 'init']]
+            for cmd in cmds:
+                # Use check_output to suppress the output from hg import
+                subprocess.check_output(cmd, stderr=subprocess.STDOUT,
+                                        cwd=mozreview_repo_path)
+
+            with open(os.path.join(mozreview_repo_path, '.hg', 'hgrc'), 'w') as f:
+                f.write('[phases]\npublish = False\n')
 
             def get_repo_path(tree):
                 return local_repo_path
             transplant.get_repo_path = get_repo_path
 
             transplant.github.connect = mock.Mock()
-            def retrieve_commits(gh, user, repo, pullrequest, path):
-                shutil.copy(os.path.join(HERE, 'test-data', 'patch.txt'),
-                            local_repo_path)
-                return ['patch.txt']
-            transplant.github.retrieve_commits = retrieve_commits
+            class RetrieveCommits():
+                def __init__(self):
+                    self.files = [['rename-file.patch'],
+                                  ['added-blah.patch']]
+                    self.current = 0
 
+                def __call__(self, gh, user, repo, pullrequest, path):
+                    if self.current > len(self.files):
+                        return []
+                    else:
+                        files = self.files[self.current]
+                        self.current += 1
+                        for f in files:
+                            shutil.copy(os.path.join(HERE, 'test-data', f),
+                                        local_repo_path)
+                    return files
+
+            transplant.github.retrieve_commits = RetrieveCommits()
+
+            # land a patch with a rename
             landed, result = transplant.transplant_to_mozreview('mozilla',
                                                                 'cthulhu',
-                                                                'repo', 0)
+                                                                'repo', 0,
+                                                                0, 'cookie', 0)
 
             # We expect this to not be landed as we're not pushing to a repo
             # with the mozreview extension, but we should not see an error in
@@ -56,10 +86,27 @@ class TestAutoland(unittest.TestCase):
             self.assertEqual(landed, False)
             self.assertEqual(result, '')
 
+            # ensure patches are applied independently - this should fail if
+            # we still see the rename above.
+            cmds = [['hg', 'strip', '--no-backup', '-r', 'draft()']]
+            for cmd in cmds:
+                subprocess.check_call(cmd, stderr=subprocess.STDOUT,
+                                      cwd=mozreview_repo_path)
+
+            landed, result = transplant.transplant_to_mozreview('mozilla',
+                                                                'cthulhu',
+                                                                'repo', 0, 0,
+                                                                'cookie', 0)
+            self.assertEqual(landed, False)
+            self.assertEqual(result, '')
+            self.assertTrue(os.path.isfile(os.path.join(local_repo_path,
+                            'hello')))
+
+            # simple test of rexp to extract review id
             output = 'review url: http://localhost:55557/r/1 (pending)'
             m = re.search(transplant.REVIEW_REXP, output)
             self.assertIsNotNone(m)
-            self.assertEqual(m.groups()[0], '1')
+            self.assertEqual(m.groups()[0], 'http://localhost:55557/r/1')
 
         finally:
             shutil.rmtree(local_repo_path)
@@ -72,10 +119,10 @@ class TestAutoland(unittest.TestCase):
 
         try:
             # Configure 'mozreview' repo
-            shutil.copy(os.path.join(HERE, 'test-data', 'patch.txt'),
+            shutil.copy(os.path.join(HERE, 'test-data', 'initial.patch'),
                         mozreview_repo_path)
             cmds = [['hg', 'init'],
-                    ['hg', 'import', 'patch.txt']]
+                    ['hg', 'import', 'initial.patch']]
             for cmd in cmds:
                 # Use check_output to suppress the output from hg import
                 subprocess.check_output(cmd, stderr=subprocess.STDOUT,
