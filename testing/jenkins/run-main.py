@@ -25,11 +25,13 @@ if not VAGRANT:
     print('vagrant not found')
     sys.exit(1)
 
-subprocess.check_call([VAGRANT, 'up', '--provision'], cwd=HERE)
-
-res = subprocess.call([VAGRANT, 'ssh', '--', '/version-control-tools/testing/jenkins/run.sh'],
-    cwd=HERE)
-
-subprocess.check_call([VAGRANT, 'halt'], cwd=HERE)
+res = 1
+try:
+    subprocess.check_call([VAGRANT, 'up', '--provision'], cwd=HERE)
+    res = subprocess.call([VAGRANT, 'ssh', '--',
+                           '/version-control-tools/testing/jenkins/run.sh'],
+                          cwd=HERE)
+finally:
+    subprocess.check_call([VAGRANT, 'halt'], cwd=HERE)
 
 sys.exit(res)
