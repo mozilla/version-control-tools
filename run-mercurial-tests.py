@@ -24,106 +24,6 @@ EXTDIR = os.path.join(HERE, 'hgext')
 sys.path.insert(0, os.path.join(HERE, 'pylib', 'mercurial-support'))
 runtestsmod = imp.load_source('runtests', RUNTESTS)
 
-
-def is_test_filename(f):
-    return f.startswith('test-') and f.endswith(('.py', '.t'))
-
-def get_extensions():
-    """Obtain information about extensions.
-
-    Returns a dict mapping extension name to metadata.
-    """
-    m = {}
-
-    for d in os.listdir(EXTDIR):
-        ext_dir = os.path.join(EXTDIR, d)
-
-        if d.startswith('.') or not os.path.isdir(ext_dir):
-            continue
-
-        e = {'tests': set(), 'testedwith': set()}
-
-        # Find test files.
-        test_dir = os.path.join(ext_dir, 'tests')
-        if os.path.isdir(test_dir):
-            for f in os.listdir(test_dir):
-                if f.startswith('.'):
-                    continue
-
-                if is_test_filename(f):
-                    e['tests'].add(os.path.join(test_dir, f))
-
-        # Look for compatibility info.
-        for f in os.listdir(ext_dir):
-            if f.startswith('.') or not f.endswith('.py'):
-                continue
-
-            with open(os.path.join(ext_dir, f), 'rb') as fh:
-                lines = fh.readlines()
-
-            for line in lines:
-                if not line.startswith('testedwith'):
-                    continue
-
-                v, value = line.split('=', 1)
-                value = value.strip().strip("'").strip('"').strip()
-                e['testedwith'] = set(value.split())
-
-        m[d] = e
-
-    return m
-
-def get_test_files(extensions):
-    extension_tests = []
-    for e in extensions.values():
-        extension_tests.extend(e['tests'])
-
-    hooks_test_dir = os.path.join(HERE, 'hghooks', 'tests')
-    hook_tests = [os.path.join(hooks_test_dir, f)
-                   for f in os.listdir(hooks_test_dir)
-                   if is_test_filename(f)]
-
-    # Directories containing Python unit tests.
-    unit_test_dirs = [
-        'autoland/tests',
-        'scripts/pash/tests',
-        'pylib',
-    ]
-
-    # Directories whose Python unit tests we should ignore.
-    unit_test_ignores = (
-        'pylib/Bugsy',
-        'pylib/flake8',
-        'pylib/mccabe',
-        'pylib/pep8',
-        'pylib/pyflakes',
-        'pylib/requests',
-    )
-
-    unit_tests = []
-    for base in unit_test_dirs:
-        base = os.path.join(HERE, base)
-        for root, dirs, files in os.walk(base):
-            relative = root[len(HERE) + 1:]
-            if relative.startswith(unit_test_ignores):
-                continue
-
-            for f in files:
-                if f.startswith('test') and f.endswith('.py'):
-                    unit_tests.append(os.path.join(root, f))
-                elif f.startswith('test') and f.endswith('.t'):
-                    # These aren't technically hooks. But it satifies the
-                    # requirement of putting .t tests elsewhere easily.
-                    hook_tests.append(os.path.join(root, f))
-
-    return {
-        'extension': sorted(extension_tests),
-        'hook': sorted(hook_tests),
-        'unit': sorted(unit_tests),
-        'all': set(extension_tests) | set(hook_tests) | set(unit_tests),
-    }
-
-
 if __name__ == '__main__':
     if not hasattr(sys, 'real_prefix'):
         raise Exception('You are not running inside the virtualenv. Please '
@@ -131,6 +31,7 @@ if __name__ == '__main__':
 
     import concurrent.futures as futures
     import vcttesting.docker as vctdocker
+    from vcttesting.testing import get_extensions, get_test_files
 
     # Unbuffer stdout.
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -182,7 +83,7 @@ if __name__ == '__main__':
     sys.argv.extend(['--xunit',
         os.path.join(HERE, 'coverage', 'results.xml')])
 
-    extensions = get_extensions()
+    extensions = get_extensions(EXTDIR)
 
     test_files = get_test_files(extensions)
     extension_tests = test_files['extension']
