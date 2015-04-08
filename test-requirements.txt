@@ -5,6 +5,7 @@
 --allow-external django-evolution
 --allow-unverified django-evolution
 amqp==1.4.6
+ansible==1.9.0.1
 anyjson==0.3.3
 backports.ssl-match-hostname==3.4.0.2
 beautifulsoup4==4.3.2
