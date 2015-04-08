@@ -32,11 +32,11 @@ Running
 Tests are executed by running the following in an *activated*
 :ref:`environment <devguide_create_env>`::
 
-   $ ./run-mercurial-tests.py
+   $ ./run-tests
 
 To see help on options that control execution::
 
-   $ ./run-mercurial-tests.py --help
+   $ ./run-tests --help
 
 Unknown script arguments will be proxied to Mercurial's ``run-tests.py``
 testing harness.
@@ -45,31 +45,31 @@ Common tasks are described below.
 
 Run all tests, 8 at a time::
 
-  $ ./run-mercurial-tests.py -j8
+  $ ./run-tests -j8
 
 Obtain code coverage results (makes tests run slower)::
 
-  $ ./run-mercurial-tests.py --cover
+  $ ./run-tests --cover
 
 Test a single file::
 
-  $ ./run-mercurial-tests.py path/to/test.t
+  $ ./run-tests path/to/test.t
 
 Run all tests in a directory::
 
-  $ ./run-mercurial-tests.py hgext/reviewboard
+  $ ./run-tests hgext/reviewboard
 
 Run a test in debug mode (see progress, interact with a debugger)::
 
-  $ ./run-mercurial-tests.py -d path/to/test.t
+  $ ./run-tests -d path/to/test.t
 
 Run tests against all supported Mercurial versions::
 
-  $ ./run-mercurial-tests.py --all-versions
+  $ ./run-tests --all-versions
 
 Run tests with a specific Mercurial installation::
 
-  $ ./run-mercurial-tests.py --with-hg=/path/to/hg
+  $ ./run-tests --with-hg=/path/to/hg
 
 Authoring Tests
 ===============
@@ -95,7 +95,7 @@ Python unit test filenames must be prefixed with ``test``. e.g.
 
 To write a new test, simply put the test file in one of the
 aforementioned directories and name it so that it will be discovered. If
-you run ``run-mercurial-tests.py path/test/test`` and the specified
+you run ``run-tests path/test/test`` and the specified
 filename wouldn't get discovered, an error will be raised saying so.
 
 Choice of Test Flavor

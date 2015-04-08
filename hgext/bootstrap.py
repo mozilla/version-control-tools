@@ -7,6 +7,7 @@
 
 # We do everything in a function so symbols don't leak.
 def HGEXT_BOOTSTRAP():
+    import os
     import sys
 
     # __file__ comes from the invoking script (usually). It shouldn't
@@ -17,7 +18,7 @@ def HGEXT_BOOTSTRAP():
         if not here:
             break
 
-        possible = os.path.join(here, 'run-mercurial-tests.py')
+        possible = os.path.join(here, 'run-tests')
         if os.path.exists(possible):
             root = here
             break

@@ -66,7 +66,7 @@ of Mercurial.
 
 .. code:: sh
 
-   $ ./run-mercurial-tests.sh --with-hg=/path/to/system/hg
+   $ ./run-tests --with-hg=/path/to/system/hg
 
 Assuming all tests pass you can do a little dance, then move on to the
 next step.

@@ -14,7 +14,7 @@ export FETCH_BMO=1
 
 ./create-test-environment
 source venv/bin/activate
-./run-mercurial-tests.py -j2 --all-versions --cover
+./run-tests -j2 --all-versions --cover
 result=$?
 
 rm -rf /version-control-tools/coverage
