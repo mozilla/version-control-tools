@@ -141,7 +141,8 @@ def autoland_status(request_id):
             'destination': row[2],
             'trysyntax': row[3],
             'landed': landed,
-            'pingback_url': row[6]
+            'result': '',
+            'error_msg': ''
         }
 
         if landed:

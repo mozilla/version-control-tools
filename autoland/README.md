@@ -24,7 +24,7 @@ The posted structure must be as follows:
       "revision": "9cc25f7ac50a",
       "destination": "try",
       "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
-      "endpoint": "http://localhost/mozreview"
+      "pingback_url": "http://localhost/mozreview"
     }
 
 
@@ -56,7 +56,8 @@ The callback json structure looks like the following:
       "destination": "try",
       "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
       "landed": true,
-      "result": "1f34accb7920"
+      "result": "1f34accb7920",
+      "error_msg": ""
     }
 
 
@@ -64,7 +65,8 @@ The request_id matches the request_id returned for the initial request. The
 tree, revision, destination and try_syntax fields match what was passed in the
 initial request. The landed field is true if the patch was successfully landed
 and false otherwise. The result field has the SHA1 of the new revision if the
-patch was successfully landed, and an error message otherwise.
+patch was successfully landed, otherwise, the error_msg field will contain
+an error message.
 
 A status API is also provided under autoland/request/<id> which allows for the
 status of a request to be queried. The json structure returned looks like the
@@ -78,7 +80,7 @@ following:
       "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
       "landed": true,
       "result": "1f34accb7920"
-      "endpoint": "http://localhost/mozreview"
+      "error_msg": ""
     }
 
 
@@ -107,15 +109,23 @@ exactly once as a means of dealing with intermittent failures.
 Installation
 ------------
 
+Many of the defaults here assume that Autoland is installed under
+/home/ubuntu/version-control-tools/autoland. You will need to adjust the
+configuration if this is not the case.
+
+If not already present, install mercurial from
+http://mercurial.selenic.com/downloads rather than relying upon the version
+present in the ubuntu packages.
+
 Install required ubuntu packages:
 
     sudo apt-get update
-    sudo apt-get install mercurial pip python-dev postgresql libpq-dev \
-                         libldap2-dev libsasl2-dev virtualenv
+    sudo apt-get install python-pip python-dev postgresql libpq-dev \
+                         libldap2-dev libsasl2-dev python-virtualenv
 
-Create a virtualenv:
+Create and activate a virtualenv:
 
-    sudo pip install virtualenv
+    cd version-control-tools/autoland
     virtualenv venv
     . venv/bin/activate
 
@@ -128,15 +138,43 @@ Create the autoland database:
     cd sql
     sudo -u postgres ./createdb.sh
 
+Install and configure Apache (optional)
+
+    sudo apt-get install apache2 libapache2-mod-wsgi
+    sudo a2enmod headers
+    sudo a2enmod wsgi
+    sudo rm /etc/apache2/sites-enabled/000-default.conf
+    sudo cp version-control-tools/apache/autoland-no-ssl.conf /etc/apache2/sites-enabled
+    sudo apachectl restart
+
+Create repositories
+
+    sudo mkdir /repos
+    sudo chmod 777 /repos
+    cd /repos
+    hg clone https://hg.mozilla.org/mozilla-central mozreview-gecko
+
+Add the following to the mozreview-gecko .hgrc under paths:
+
+    mozreview = http://reviewboard-hg.mozilla.org/gecko
+    try = ssh://hg.mozilla.org/try
+
+User account information and other configuration is expected to be found in
+version-control-tools/autoland/autoland/config.json. A skeleton file used with
+the docker image can be found in
+version-control-tools/testing/docker/builder-autoland/config.json
+and used as a basis for creating this file.
+
 
 Testing
 -------
 
-Testing is most easily accomplished using docker. A Dockerfile for Autoland is
-present in the root directory. A postgres instance is also required for
-testing. A docker-compose [1] docker-compose.yml is provided to easily get a
-test environment stood up.
+The tests can be run by using the test script in the root version-control-tools
+directory:
 
-Integration tests are present under testing/test_integration.py.
+     run-mercurial-tests -j 2 autoland/tests
 
-[1] https://github.com/docker/fig
+Mach commands are provided by the ottoland script in the root
+version-control-tools directory that can be used for manual or automated tests.
+The implementation of the commands is in
+testing/vcttesting/autoland_mach_commands.py.
