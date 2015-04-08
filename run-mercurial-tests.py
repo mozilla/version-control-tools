@@ -25,9 +25,11 @@ sys.path.insert(0, os.path.join(HERE, 'pylib', 'mercurial-support'))
 runtestsmod = imp.load_source('runtests', RUNTESTS)
 
 if __name__ == '__main__':
-    if not hasattr(sys, 'real_prefix'):
-        raise Exception('You are not running inside the virtualenv. Please '
-                'run `create-test-environment` and `source venv/bin/activate`')
+    if 'VIRTUAL_ENV' not in os.environ:
+        activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
+        execfile(activate, dict(__file__=activate))
+        sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
+        os.environ['VIRTUAL_ENV'] = os.path.join(HERE, 'venv')
 
     import concurrent.futures as futures
     import vcttesting.docker as vctdocker
