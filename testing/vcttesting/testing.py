@@ -7,6 +7,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 import subprocess
 import sys
+import time
 
 import concurrent.futures as futures
 from coverage import coverage
@@ -134,6 +135,59 @@ def get_test_files(extensions):
         'unit': sorted(unit_tests),
         'all': set(extension_tests) | set(hook_tests) | set(unit_tests),
     }
+
+
+def tests_require_docker(tests):
+    """Whether any of the specified test files require Docker."""
+    docker_keywords = (
+        b'docker',
+        b'MozReviewTest',
+        b'MozReviewWebDriverTest',
+    )
+
+    for t in tests:
+        with open(t, 'rb') as fh:
+            content = fh.read()
+            for keyword in docker_keywords:
+                if keyword in content:
+                    return True
+
+    return False
+
+
+# TODO this and prune_docker_orphans should be refactored into a context
+# manager.
+def get_docker_state(docker, tests, verbose=False):
+    build_docker = tests_require_docker(tests)
+
+    env = {}
+
+    if build_docker:
+        print('generating Docker images needed for tests')
+        t_start = time.time()
+        mr_images, hgmo_images = docker.build_all_images(verbose=verbose)
+        t_end = time.time()
+        print('got Docker images in %.2fs' % (t_end - t_start))
+        env['DOCKER_BMO_DB_IMAGE'] = mr_images['bmodb']
+        env['DOCKER_BMO_WEB_IMAGE'] = mr_images['bmoweb']
+        env['DOCKER_PULSE_IMAGE'] = mr_images['pulse']
+        env['DOCKER_HGRB_IMAGE'] = mr_images['hgrb']
+        env['DOCKER_AUTOLANDDB_IMAGE'] = mr_images['autolanddb']
+        env['DOCKER_AUTOLAND_IMAGE'] = mr_images['autoland']
+        env['DOCKER_RBWEB_IMAGE'] = mr_images['rbweb']
+        env['DOCKER_HGMASTER_IMAGE'] = hgmo_images['hgmaster']
+        env['DOCKER_HGWEB_IMAGE'] = hgmo_images['hgweb']
+        env['DOCKER_LDAP_IMAGE'] = hgmo_images['ldap']
+
+    containers = set()
+    images = set()
+
+    for c in docker.client.containers(all=True):
+        containers.add(c['Id'])
+    for i in docker.client.images(all=True):
+        images.add(i['Id'])
+
+    return env, containers, images
 
 
 def prune_docker_orphans(docker, containers, images):

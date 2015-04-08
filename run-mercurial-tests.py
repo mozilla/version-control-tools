@@ -13,7 +13,6 @@ import os
 import re
 import subprocess
 import sys
-import time
 
 # Mercurial's run-tests.py isn't meant to be loaded as a module. We do it
 # anyway.
@@ -33,6 +32,7 @@ if __name__ == '__main__':
 
     import vcttesting.docker as vctdocker
     from vcttesting.testing import (
+        get_docker_state,
         get_extensions,
         get_test_files,
         run_nose_tests,
@@ -159,44 +159,10 @@ if __name__ == '__main__':
         # complicating code with locks.
         #
         # But only do this if a test we are running utilizes Docker.
-        docker_keywords = (
-            b'docker',
-            b'MozReviewTest',
-            b'MozReviewWebDriverTest',
-        )
-        build_docker = False
-        for t in run_all_tests:
-            with open(t, 'rb') as fh:
-                content = fh.read()
-                for keyword in docker_keywords:
-                    if keyword in content:
-                        build_docker = True
-                        break
-
-                if build_docker:
-                    break
-
-        if build_docker:
-            print('generating Docker images needed for tests')
-            t_start = time.time()
-            mr_images, hgmo_images = docker.build_all_images(verbose=verbose)
-            t_end = time.time()
-            print('got Docker images in %.2fs' % (t_end - t_start))
-            os.environ['DOCKER_BMO_DB_IMAGE'] = mr_images['bmodb']
-            os.environ['DOCKER_BMO_WEB_IMAGE'] = mr_images['bmoweb']
-            os.environ['DOCKER_PULSE_IMAGE'] = mr_images['pulse']
-            os.environ['DOCKER_HGRB_IMAGE'] = mr_images['hgrb']
-            os.environ['DOCKER_AUTOLANDDB_IMAGE'] = mr_images['autolanddb']
-            os.environ['DOCKER_AUTOLAND_IMAGE'] = mr_images['autoland']
-            os.environ['DOCKER_RBWEB_IMAGE'] = mr_images['rbweb']
-            os.environ['DOCKER_HGMASTER_IMAGE'] = hgmo_images['hgmaster']
-            os.environ['DOCKER_HGWEB_IMAGE'] = hgmo_images['hgweb']
-            os.environ['DOCKER_LDAP_IMAGE'] = hgmo_images['ldap']
-
-        for c in docker.client.containers(all=True):
-            preserve_containers.add(c['Id'])
-        for i in docker.client.images(all=True):
-            preserve_images.add(i['Id'])
+        res = get_docker_state(docker, run_all_tests, verbose=verbose)
+        os.environ.update(res[0])
+        preserve_containers |= res[1]
+        preserve_images |= res[2]
 
     sys.argv.extend(run_hg_tests)
 
