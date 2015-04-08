@@ -9,7 +9,6 @@ from __future__ import print_function
 
 import argparse
 import os
-import re
 import subprocess
 import sys
 
@@ -31,6 +30,7 @@ if __name__ == '__main__':
     from vcttesting.testing import (
         get_docker_state,
         get_extensions,
+        get_hg_version,
         get_test_files,
         run_nose_tests,
         produce_coverage_reports,
@@ -166,27 +166,17 @@ if __name__ == '__main__':
 
     hg_harness_args.extend(run_hg_tests)
 
-    # This is used by hghave to detect the running Mercurial because run-tests
-    # doesn't pass down the version info in the environment of the hghave
-    # invocation.
-    import mercurial.__version__
-    hgversion = mercurial.__version__.version
-    os.environ['HGVERSION'] = hgversion
-
+    # Our custom HGHAVE introduces a check for running Mercurial version.
+    # This is done by consulting a HGVERSION environment variable.
+    hg = os.path.join(HERE, 'venv', 'bin', 'hg')
     if options.with_hg:
-        clean_env = dict(os.environ)
-        clean_env['HGPLAIN'] = '1'
-        clean_env['HGRCPATH'] = '/dev/null'
-        out = subprocess.check_output('%s --version' % options.with_hg,
-                env=clean_env, shell=True)
-        out = out.splitlines()[0]
-        match = re.search('version ([^\+\)]+)', out)
-        if not match:
-            print('ERROR: Unable to identify Mercurial version.')
-            sys.exit(1)
+        hg = options.with_hg
+    hgversion = get_hg_version(hg)
+    if hgversion is None:
+        print('Unable to determine Mercurial version')
+        sys.exit(1)
 
-        hgversion = match.group(1)
-        os.environ['HGVERSION'] = hgversion
+    os.environ['HGVERSION'] = hgversion
 
     res = 0
     if run_hg_tests:

@@ -5,6 +5,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
+import re
 import subprocess
 import sys
 import time
@@ -263,3 +264,17 @@ def run_nose_tests(tests, process_count=None):
         env['PYTHONPATH'] = ':'.join(paths)
 
     return subprocess.call(noseargs, env=env)
+
+
+def get_hg_version(hg):
+    env = dict(os.environ)
+    env[b'HGPLAIN'] = b'1'
+    env[b'HGRCPATH'] = b'/dev/null'
+    out = subprocess.check_output('%s --version' % hg,
+                                  env=env, shell=True)
+    out = out.splitlines()[0]
+    match = re.search('version ([^\+\)]+)', out)
+    if not match:
+        return None
+
+    return match.group(1)
