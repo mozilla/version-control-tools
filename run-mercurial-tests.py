@@ -35,6 +35,7 @@ if __name__ == '__main__':
     from vcttesting.testing import (
         get_extensions,
         get_test_files,
+        produce_coverage_reports,
         prune_docker_orphans,
     )
 
@@ -336,40 +337,8 @@ if __name__ == '__main__':
             run_hg_tests('@', all_hg_tests)
 
 
-    from coverage import coverage
-
     if options.cover:
-        cov = coverage(data_file=os.path.join(coverdir, 'coverage'))
-        cov.combine()
-
-        pydirs = [
-            EXTDIR,
-            os.path.join(HERE, 'pylib'),
-            os.path.join(HERE, 'hghooks'),
-        ]
-
-        # Ensure all .py files show up in coverage report.
-        for d in pydirs:
-            for root, dirs, files in os.walk(d):
-                for f in files:
-                    if f.endswith('.py'):
-                        cov.data.touch_file(os.path.join(root, f))
-
-        omit = [
-            os.path.join(HERE, 'venv', '*'),
-            os.path.join(HERE, 'pylib', 'Bugsy', '*'),
-            os.path.join(HERE, 'pylib', 'flake8', '*'),
-            os.path.join(HERE, 'pylib', 'mccabe', '*'),
-            os.path.join(HERE, 'pylib', 'mercurial-support', '*'),
-            os.path.join(HERE, 'pylib', 'pep8', '*'),
-            os.path.join(HERE, 'pylib', 'pyflakes', '*'),
-            os.path.join(HERE, 'pylib', 'requests', '*'),
-        ]
-
-        cov.html_report(directory='coverage/html', ignore_errors=True,
-                omit=omit)
-        cov.xml_report(outfile='coverage/coverage.xml', ignore_errors=True,
-                omit=omit)
+        produce_coverage_reports(coverdir)
 
     # Clean up leaked Docker containers and images.
     prune_docker_orphans(docker, preserve_containers, preserve_images)

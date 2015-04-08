@@ -7,10 +7,29 @@ from __future__ import absolute_import, unicode_literals
 import os
 
 import concurrent.futures as futures
+from coverage import coverage
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
+
+
+PYTHON_COVERAGE_DIRS = (
+    'hgext',
+    'pylib',
+    'hghooks',
+)
+
+COVERAGE_OMIT = (
+    'venv/*',
+    'pylib/Bugsy/*',
+    'pylib/flake/*',
+    'pylib/mccabe/*',
+    'pylib/mercurial-support/*',
+    'pylib/pep8/*',
+    'pylib/pyflakes/*',
+    'pylib/requests/*',
+)
 
 
 def is_test_filename(f):
@@ -137,3 +156,23 @@ def prune_docker_orphans(docker, containers, images):
             if i['Id'] not in images:
                 print('removing orphaned docker image: %s' % c['Id'])
                 e.submit(docker.client.remove_image, c['Id'])
+
+
+def produce_coverage_reports(coverdir):
+    cov = coverage(data_file=os.path.join(coverdir, 'coverage'))
+    cov.combine()
+
+    pydirs = [os.path.join(ROOT, d) for d in PYTHON_COVERAGE_DIRS]
+    omit = [os.path.join(ROOT, d) for d in COVERAGE_OMIT]
+
+    # Ensure all .py files show up in coverage report.
+    for d in pydirs:
+        for root, dirs, files in os.walk(d):
+            for f in files:
+                if f.endswith('.py'):
+                    cov.data.touch_file(os.path.join(root, f))
+
+    cov.html_report(directory=os.path.join(coverdir, 'html'),
+                    ignore_errors=True, omit=omit)
+    cov.xml_report(outfile=os.path.join(coverdir, 'coverage.xml'),
+                   ignore_errors=True, omit=omit)
