@@ -34,7 +34,6 @@ if __name__ == '__main__':
         get_test_files,
         run_nose_tests,
         produce_coverage_reports,
-        prune_docker_orphans,
     )
 
     # Unbuffer stdout.
@@ -138,15 +137,6 @@ if __name__ == '__main__':
         print('WARNING: Not running tests optimally. Specify -j to run tests '
                 'in parallel.', file=sys.stderr)
 
-    # We take a snapshot of Docker containers and images before we start tests
-    # so we can look for leaks later.
-    #
-    # This behavior is non-ideal: we should not leak Docker containers and
-    # images. Furthermore, if others interact with Docker while we run, bad
-    # things will happen. But this is the easiest solution, so hacks win.
-    preserve_containers = set()
-    preserve_images = set()
-
     # Enable tests to interact with our Docker controlling script.
     docker_state = os.path.join(HERE, '.docker-state.json')
     docker_url, docker_tls = vctdocker.params_from_env(os.environ)
@@ -159,10 +149,8 @@ if __name__ == '__main__':
         # complicating code with locks.
         #
         # But only do this if a test we are running utilizes Docker.
-        res = get_docker_state(docker, run_all_tests, verbose=verbose)
-        os.environ.update(res[0])
-        preserve_containers |= res[1]
-        preserve_images |= res[2]
+        os.environ.update(get_docker_state(docker, run_all_tests,
+                          verbose=verbose))
 
     hg_harness_args.extend(run_hg_tests)
 
@@ -180,13 +168,18 @@ if __name__ == '__main__':
 
     res = 0
     if run_hg_tests:
-        res = subprocess.call(hg_harness_args, cwd=HERE)
+        # We should ideally not leak containers and images. But until
+        # the Mercurial test harness allows tests to register cleanup
+        # actions, there is only so much we can do.
+        with docker.auto_clean_orphans():
+            res = subprocess.call(hg_harness_args, cwd=HERE)
 
     if options.no_unit:
         run_unit_tests = []
 
     if run_unit_tests:
-        noseres = run_nose_tests(run_unit_tests, options.jobs)
+        with docker.auto_clean_orphans():
+            noseres = run_nose_tests(run_unit_tests, options.jobs)
         if noseres:
             res = noseres
 
@@ -243,7 +236,8 @@ if __name__ == '__main__':
             print('Testing with Mercurial %s' % version)
             sys.stdout.flush()
             os.environ['HGVERSION'] = version
-            r = subprocess.call(args, cwd=HERE)
+            with docker.auto_clean_orphans():
+                r = subprocess.call(args, cwd=HERE)
             sys.stdout.flush()
             sys.stderr.flush()
 
@@ -264,8 +258,5 @@ if __name__ == '__main__':
 
     if options.cover:
         produce_coverage_reports(coverdir)
-
-    # Clean up leaked Docker containers and images.
-    prune_docker_orphans(docker, preserve_containers, preserve_images)
 
     sys.exit(res)

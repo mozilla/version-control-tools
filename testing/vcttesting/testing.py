@@ -156,8 +156,6 @@ def tests_require_docker(tests):
     return False
 
 
-# TODO this and prune_docker_orphans should be refactored into a context
-# manager.
 def get_docker_state(docker, tests, verbose=False):
     build_docker = tests_require_docker(tests)
 
@@ -180,39 +178,7 @@ def get_docker_state(docker, tests, verbose=False):
         env['DOCKER_HGWEB_IMAGE'] = hgmo_images['hgweb']
         env['DOCKER_LDAP_IMAGE'] = hgmo_images['ldap']
 
-    containers = set()
-    images = set()
-
-    for c in docker.client.containers(all=True):
-        containers.add(c['Id'])
-    for i in docker.client.images(all=True):
-        images.add(i['Id'])
-
-    return env, containers, images
-
-
-def prune_docker_orphans(docker, containers, images):
-    """Prune Docker containers and images that were orphaned from tests.
-
-    If tests are aborted, Docker containers and images could linger. This will
-    clean them.
-    """
-    if not docker.is_alive():
-        return
-
-    with futures.ThreadPoolExecutor(4) as e:
-        for c in docker.client.containers(all=True):
-            if c['Id'] not in containers:
-                print('removing orphaned docker container: %s' %
-                      c['Id'])
-                e.submit(docker.client.remove_container, c['Id'],
-                         force=True)
-
-    with futures.ThreadPoolExecutor(4) as e:
-        for i in docker.client.images(all=True):
-            if i['Id'] not in images:
-                print('removing orphaned docker image: %s' % c['Id'])
-                e.submit(docker.client.remove_image, c['Id'])
+    return env
 
 
 def produce_coverage_reports(coverdir):

@@ -1121,6 +1121,27 @@ class Docker(object):
             if start:
                 self.client.stop(cid)
 
+    @contextmanager
+    def auto_clean_orphans(self):
+        if not self.is_alive():
+            return
+
+        containers = {c['Id'] for c in self.client.containers(all=True)}
+        images = {i['Id'] for i in self.client.images(all=True)}
+        try:
+            yield
+        finally:
+            with futures.ThreadPoolExecutor(8) as e:
+                for c in self.client.containers(all=True):
+                    if c['Id'] not in containers:
+                        e.submit(self.client.remove_container, c['Id'],
+                                 force=True)
+
+            with futures.ThreadPoolExecutor(8) as e:
+                for i in self.client.images(all=True):
+                    if i['Id'] not in images:
+                        e.submit(self.client.remove_image, c['Id'])
+
     def get_file_content(self, cid, path):
         """Get the contents of a file from a container."""
         r = self.client.copy(cid, path)
