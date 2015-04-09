@@ -147,6 +147,10 @@ if reset_database and not fresh_database:
     print(subprocess.check_output(mysql_args, input=b'DROP DATABASE bugs;'))
     fresh_database = True
 
+# Workaround for bug 1152616.
+if fresh_database:
+    cc(mysql_args + ['-e', 'CREATE DATABASE %s;' % db_name])
+
 if not os.path.exists(j(h, 'checksetup.done')):
     cc([j(b, 'checksetup.pl',), answers], cwd=b)
     cc([j(b, 'checksetup.pl',), answers], cwd=b)
