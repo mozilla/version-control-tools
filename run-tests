@@ -153,8 +153,6 @@ if __name__ == '__main__':
         os.environ.update(get_docker_state(docker, run_all_tests,
                           verbose=verbose))
 
-    hg_harness_args.extend(run_hg_tests)
-
     # Our custom HGHAVE introduces a check for running Mercurial version.
     # This is done by consulting a HGVERSION environment variable.
     hg = os.path.join(HERE, 'venv', 'bin', 'hg')
@@ -178,7 +176,7 @@ if __name__ == '__main__':
         # the Mercurial test harness allows tests to register cleanup
         # actions, there is only so much we can do.
         with docker.auto_clean_orphans():
-            res = subprocess.call(hg_harness_args, cwd=HERE)
+            res = subprocess.call(hg_harness_args + run_hg_tests, cwd=HERE)
 
     if options.no_unit:
         run_unit_tests = []
