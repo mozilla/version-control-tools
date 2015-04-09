@@ -13,7 +13,7 @@ RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 ubuntu
 
 RUN apt-get update && apt-get -y install \
   apache2 curl libapache2-mod-wsgi postgresql-client \
-  python2.7-dev libpq-dev libldap2-dev libsasl2-dev \
+  python2.7-dev libffi6 libffi-dev libpq-dev libldap2-dev libsasl2-dev \
   mercurial
 
 # Python

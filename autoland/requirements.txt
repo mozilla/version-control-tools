@@ -1,6 +1,6 @@
 beautifulsoup4
 flask
-github3.py
+github3.py==1.0.0a1
 kombu
 mozillapulse
 mozlog == 2.2
