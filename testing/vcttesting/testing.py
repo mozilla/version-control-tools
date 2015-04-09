@@ -4,13 +4,13 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import errno
 import os
 import re
 import subprocess
 import sys
 import time
 
-import concurrent.futures as futures
 from coverage import coverage
 
 
@@ -244,3 +244,13 @@ def get_hg_version(hg):
         return None
 
     return match.group(1)
+
+
+def remove_err_files(tests):
+    for t in tests:
+        err = '%s.err' % t
+        try:
+            os.remove(err)
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise

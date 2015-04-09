@@ -34,6 +34,7 @@ if __name__ == '__main__':
         get_test_files,
         run_nose_tests,
         produce_coverage_reports,
+        remove_err_files,
     )
 
     # Unbuffer stdout.
@@ -168,6 +169,11 @@ if __name__ == '__main__':
 
     res = 0
     if run_hg_tests:
+        # The Mercurial test harness has been observed to not remove the .err
+        # files after execution. This is probably a result of us using
+        # separate directories. Manually remove .err files.
+        remove_err_files(run_hg_tests)
+
         # We should ideally not leak containers and images. But until
         # the Mercurial test harness allows tests to register cleanup
         # actions, there is only so much we can do.
@@ -226,6 +232,8 @@ if __name__ == '__main__':
 
             if not tests:
                 return
+
+            remove_err_files(tests)
 
             args = list(orig_args) + [
                 '--with-hg',
