@@ -1,0 +1,69 @@
+---
+# Measurements revealed that the yum module is slow and adds a few seconds
+# overhead to invocations. So, we use low-level commands, which execute
+# much faster.
+- name: System packages installed
+  command: /usr/bin/yum -y install openldap-clients openldap-devel sudo syslog https://people.mozilla.org/~gszorc/mercurial-3.3.2-0.x86_64.rpm https://people.mozilla.org/~gszorc/mod_wsgi-4.4.8-1.el6.x86_64.rpm
+
+- name: Python package dependencies
+  pip: requirements={{ vct }}/ansible/roles/hg-reviewboard/files/requirements.txt
+
+- name: Source code groups
+  group: name={{ item.name }} gid={{ item.gid }}
+  with_items:
+    - { name: 'scm_level_1', gid: 673 }
+    - { name: 'scm_level_2', gid: 685 }
+    - { name: 'scm_level_3', gid: 679 }
+    - { name: 'scm_l10n', gid: 678 }
+    - { name: 'scm_l10n_infra', gid: 680 }
+    - { name: 'scm_sec_sensitive', gid: 686 }
+    - { name: 'scm_ecmascript', gid: 687 }
+
+- name: Create hg user
+  user: name=hg uid=500 shell=/bin/bash comment='Hg user' groups=scm_level_1,scm_level_2,scm_level_3,scm_l10n,scm_l10n_infra,scm_sec_sensitive
+
+- name: Repository directories present
+  file: path={{ item }} state=directory mode=0755
+  with_items:
+    - /repo
+    - /repo/hg
+    - /repo/hg/library
+    - /repo/hg/mozilla
+    - /repo/hg/webroot_wsgi
+
+- name: Synchronize version-control-tools
+  synchronize: src={{ vct }}/ dest=/repo/hg/version-control-tools/ recursive=yes delete=yes
+
+#- name: hg scripts are in place
+#  hg: dest=/repo/hg/scripts repo=https://hg.mozilla.org/hgcustom/hgscripts
+
+- name: Global hgrc installed
+  template: src=hgrc.j2 dest=/etc/mercurial/hgrc mode=0444
+
+- name: Install pash
+  template: src={{ item }}.j2 dest=/usr/local/bin/{{ item }} mode=0755
+  with_items:
+    - hg_helper.py
+    - ldap_helper.py
+    - pash.py
+    - sh_helper.py
+    - repo_group.py
+  tags: docker-startup
+
+- name: Install pash wrapper
+  copy: src=pash_wrapper dest=/usr/local/bin/pash_wrapper mode=0755
+
+- name: hgweb wsgi and config in place
+  copy: src={{ item }} dest=/repo/hg/webroot_wsgi/{{ item }}
+  with_items:
+    - hgweb.config
+    - hgweb.wsgi
+
+- name: Apache vhost config in place
+  template: src=vhost.conf.j2 dest=/etc/httpd/conf.d/hg.conf
+
+- name: Apache log directory present
+  file: path=/var/log/httpd/{{ domain | mandatory }} state=directory mode=0755
+
+- name: Prune system httpd configs
+  file: path=/etc/httpd/conf.d/welcome.conf state=absent

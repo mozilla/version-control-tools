@@ -6,7 +6,10 @@ hgmoenv() {
   export HGMO_STATE_FILE=`pwd`/hgmo.json
 
   hgmo start --master-ssh-port $HGPORT > /dev/null
-  export SSH_SERVER=${DOCKER_HOSTNAME}
+  if [ $? -ne 0 ]; then
+    exit 80
+  fi
+  $(hgmo shellinit)
 
   cat > ssh_config << EOF
 Host *

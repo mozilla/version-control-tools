@@ -1,0 +1,70 @@
+---
+- name: Create Review Board user
+  user: name=reviewboard
+
+- name: Configure Node sources
+  shell: curl https://rpm.nodesource.com/setup | bash creates=/etc/yum.repos.d/nodesource-el.repo
+
+# The yum module is slow. Run commands manually.
+- name: System packages installed
+  command: /usr/bin/yum install -y libjpeg-turbo-devel memcached mod_wsgi nodejs patch zlib-devel https://people.mozilla.org/~gszorc/mercurial-3.3.2-0.x86_64.rpm
+
+- name: Install virtualenv
+  pip: name=virtualenv
+
+- name: Install pip requirements file
+  copy: src=requirements.txt dest=/requirements.txt
+
+- name: Python package dependencies
+  pip: requirements=/requirements.txt virtualenv=/venv
+
+# This is required for building Review Board extensions.
+# Make it conditional because it takes a long time to run, making building
+# avoidably slow.
+- name: Install Node packages
+  command: /usr/bin/npm install -g less uglify-js creates=/usr/bin/lessc
+
+- name: Install Review Board package
+  command: /venv/bin/easy_install ReviewBoard==2.0.12
+
+- name: Synchronize version-control-tools
+  synchronize: src={{ vct }}/ dest=/version-control-tools/ recursive=yes delete=yes
+
+- name: Install mozreview extension
+  command: /venv/bin/python setup.py develop chdir=/version-control-tools/pylib/mozreview
+
+- name: Install rbbz extension
+  command: /venv/bin/python setup.py develop chdir=/version-control-tools/pylib/rbbz
+
+- name: Remove default httpd configs
+  file: path={{ item }} state=absent
+  with_items:
+    - /etc/httpd/conf.d/welcome.conf
+    - /etc/httpd/conf.d/README
+
+- name: Install httpd vhost config
+  copy: src=vhost.conf dest=/etc/httpd/conf.d/reviewboard.conf
+
+- name: Install Review Board
+  command: /venv/bin/rb-site install --noinput --opt-out-support-data --domain-name=example.com --admin-user=admin+1 --admin-password=password --admin-email=admin@example.com --db-type=sqlite3 --db-name=/reviewboard/data/reviewboard.db --cache-type=memcached --cache-info=localhost:11211 --web-server-type=apache --python-loader=wsgi /reviewboard creates=/reviewboard
+
+- name: Install Review Board installation script
+  copy: src=install-reviewboard dest=/install-reviewboard owner=reviewboard group=reviewboard mode=0755
+
+- name: Configure Review Board
+  command: /install-reviewboard
+
+- name: Install support scripts
+  copy: src={{ item }} dest=/{{ item }} owner=reviewboard group=reviewboard mode=0755
+  with_items:
+    - dump-profile
+    - kill-wsgi-procs
+    - make-admin
+    - refresh
+    - set-site-url
+
+- name: Install entrypoint script
+  copy: src=entrypoint.py dest=/entrypoint.py owner=root mode=0755
+
+- name: Install container run script
+  copy: src=run dest=/run owner=root mode=0755

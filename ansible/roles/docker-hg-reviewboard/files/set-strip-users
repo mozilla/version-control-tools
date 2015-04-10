@@ -1,0 +1,16 @@
+#!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script is needed for test-remote-strip.t. In theory it should be
+# possible to do this via remote Docker exec. But shell quoting was
+# proving problematic.
+#
+# Script takes as arguments the repo relpath and a string for the
+# "remote_strip_users" value.
+
+set -e
+
+/usr/bin/ansible localhost -c local -m ini_file -a \
+  "dest=/repo/hg/mozilla/$1/.hg/hgrc section=reviewboard option=remote_strip_users value=$2"

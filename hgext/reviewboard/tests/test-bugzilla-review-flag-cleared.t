@@ -10,6 +10,7 @@
 
   $ adminbugzilla create-user author@example.com password 'Patch Author'
   created user 6
+  $ mozreview create-ldap-user author@example.com contributor 2001 'Some Contributor' --key-file ${MOZREVIEW_HOME}/keys/author@example.com --scm-level 1
   $ adminbugzilla create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --group editbugs
   created user 7
 
@@ -22,9 +23,9 @@ Create a review
   $ hg commit -m 'Bug 1 - Initial commit to review'
   $ hg --config bugzilla.username=author@example.com push > /dev/null
 
-  $ rbmanage add-reviewer $HGPORT1 1 --user reviewer
+  $ rbmanage add-reviewer 1 --user reviewer
   1 people listed on review request
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
 
 Sanity check to ensure we have a review flag set
 
@@ -33,7 +34,7 @@ Sanity check to ensure we have a review flag set
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://localhost:$HGPORT1/r/1/
+      data: http://*:$HGPORT1/r/1/ (glob)
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags:
@@ -68,7 +69,7 @@ Sanity check to ensure we have a review flag set
         Pull down this commit:
   
   
-        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/test-repo'
+        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://*:$HGPORT/test-repo' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -80,7 +81,7 @@ Sanity check to ensure we have a review flag set
 Publishing a review will clear the r? flag
 
   $ exportbzauth reviewer@example.com password
-  $ rbmanage create-review $HGPORT1 1 --body-top 'I have reservations' --public
+  $ rbmanage create-review 1 --body-top 'I have reservations' --public
   created review 1
 
   $ bugzilla dump-bug 1
@@ -88,7 +89,7 @@ Publishing a review will clear the r? flag
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://localhost:$HGPORT1/r/1/
+      data: http://*:$HGPORT1/r/1/ (glob)
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -118,7 +119,7 @@ Publishing a review will clear the r? flag
         Pull down this commit:
   
   
-        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/test-repo'
+        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://*:$HGPORT/test-repo' (glob)
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -127,7 +128,7 @@ Publishing a review will clear the r? flag
         MozReview Request: bz://1/mynick
   
   
-        http://localhost:$HGPORT1/r/1/#review1
+        http://*:$HGPORT1/r/1/#review1 (glob)
   
   
         I have reservations'
@@ -141,7 +142,7 @@ Publishing a review will clear the r? flag
 
 Posting a non Ship It review without a review flag adds a comment
 
-  $ rbmanage create-review $HGPORT1 1 --body-top 'One more thing...' --public
+  $ rbmanage create-review 1 --body-top 'One more thing...' --public
   created review 2
 
   $ bugzilla dump-bug 1
@@ -149,7 +150,7 @@ Posting a non Ship It review without a review flag adds a comment
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://localhost:$HGPORT1/r/1/
+      data: http://*:$HGPORT1/r/1/ (glob)
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -179,7 +180,7 @@ Posting a non Ship It review without a review flag adds a comment
         Pull down this commit:
   
   
-        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://localhost:$HGPORT/test-repo'
+        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://*:$HGPORT/test-repo' (glob)
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -188,14 +189,14 @@ Posting a non Ship It review without a review flag adds a comment
         MozReview Request: bz://1/mynick
   
   
-        http://localhost:$HGPORT1/r/1/#review1
+        http://*:$HGPORT1/r/1/#review1 (glob)
   
   
         I have reservations'
     - author: reviewer@example.com
       id: 4
       tags: []
-      text: 'http://localhost:$HGPORT1/r/1/#review2
+      text: 'http://*:$HGPORT1/r/1/#review2 (glob)
   
   
         One more thing...'
@@ -212,4 +213,4 @@ Posting a non Ship It review without a review flag adds a comment
 Cleanup
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

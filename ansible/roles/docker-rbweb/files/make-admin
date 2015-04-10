@@ -1,0 +1,22 @@
+#!/venv/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import sqlite3
+import sys
+
+email = sys.argv[1]
+
+db = '/reviewboard/data/reviewboard.db'
+
+conn = sqlite3.connect(db)
+with conn:
+    count = conn.execute('UPDATE auth_user SET is_superuser=1, is_staff=1 '
+                         'WHERE email=?', (email,))
+    if not count.rowcount:
+        print('Cannot make unknown user an admin: %s' % email)
+        sys.exit(1)
+
+    conn.commit()
+    print('made %s an admin' % email)

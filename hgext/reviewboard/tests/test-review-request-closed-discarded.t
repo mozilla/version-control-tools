@@ -8,12 +8,14 @@
   $ hg commit -A -m 'root commit'
   adding foo
   $ hg push --noreview
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   $ hg phase --public -r .
 
   $ echo 'foo1' > foo
@@ -21,33 +23,35 @@
   $ echo 'foo2' > foo
   $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
   changeset:  1:24417bc94b2c
   summary:    Bug 1 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   changeset:  2:61e2e5c813d2
   summary:    Bug 1 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://localhost:$HGPORT1/r/1/
+      data: http://*:$HGPORT1/r/1/ (glob)
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -78,7 +82,7 @@
         Pull down these commits:
   
   
-        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo'
+        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -90,12 +94,12 @@
 Close the squashed review request as discarded, which should close all of the
 child review requests.
 
-  $ rbmanage closediscarded $HGPORT1 1
+  $ rbmanage closediscarded 1
 
 Squashed review request with ID 1 should be closed as discarded and have
 no Commit ID set.
 
-  $ rbmanage dumpreview $HGPORT1 1
+  $ rbmanage dumpreview 1
   id: 1
   status: discarded
   public: true
@@ -110,7 +114,7 @@ no Commit ID set.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo
+  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
@@ -123,7 +127,7 @@ no Commit ID set.
 
 Child review request with ID 2 should be closed as discarded...
 
-  $ rbmanage dumpreview $HGPORT1 2
+  $ rbmanage dumpreview 2
   id: 2
   status: discarded
   public: true
@@ -142,7 +146,7 @@ Child review request with ID 2 should be closed as discarded...
 
 Child review request with ID 3 should be closed as discarded...
 
-  $ rbmanage dumpreview $HGPORT1 3
+  $ rbmanage dumpreview 3
   id: 3
   status: discarded
   public: true
@@ -166,7 +170,7 @@ The review attachment should be marked as obsolete
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://localhost:$HGPORT1/r/1/
+      data: http://*:$HGPORT1/r/1/ (glob)
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -197,7 +201,7 @@ The review attachment should be marked as obsolete
         Pull down these commits:
   
   
-        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo'
+        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -209,12 +213,12 @@ The review attachment should be marked as obsolete
 Re-opening the parent review request should re-open all of the children,
 and they should be non-public.
 
-  $ rbmanage reopen $HGPORT1 1
+  $ rbmanage reopen 1
 
 Squashed review request with ID 1 should be re-opened and have its
 Commit ID re-instated.
 
-  $ rbmanage dumpreview $HGPORT1 1
+  $ rbmanage dumpreview 1
   id: 1
   status: pending
   public: false
@@ -229,7 +233,7 @@ Commit ID re-instated.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo
+  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
@@ -250,7 +254,7 @@ Commit ID re-instated.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo
+    - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
@@ -264,7 +268,7 @@ Commit ID re-instated.
 
 Child review request with ID 2 should be re-opened...
 
-  $ rbmanage dumpreview $HGPORT1 2
+  $ rbmanage dumpreview 2
   id: 2
   status: pending
   public: false
@@ -296,7 +300,7 @@ Child review request with ID 2 should be re-opened...
 
 Child review request with ID 3 should be re-opened...
 
-  $ rbmanage dumpreview $HGPORT1 3
+  $ rbmanage dumpreview 3
   id: 3
   status: pending
   public: false
@@ -333,7 +337,7 @@ There should still not be a visible attachment on the bug
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://localhost:$HGPORT1/r/1/
+      data: http://*:$HGPORT1/r/1/ (glob)
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -364,7 +368,7 @@ There should still not be a visible attachment on the bug
         Pull down these commits:
   
   
-        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo'
+        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -376,11 +380,11 @@ There should still not be a visible attachment on the bug
 Should be able to publish these review requests again by publishing the
 squashed review request.
 
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
 
 Squashed review request should be published.
 
-  $ rbmanage dumpreview $HGPORT1 1
+  $ rbmanage dumpreview 1
   id: 1
   status: pending
   public: true
@@ -395,7 +399,7 @@ Squashed review request should be published.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo
+  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
@@ -408,7 +412,7 @@ Squashed review request should be published.
 
 Child review request with ID 2 should be published.
 
-  $ rbmanage dumpreview $HGPORT1 2
+  $ rbmanage dumpreview 2
   id: 2
   status: pending
   public: true
@@ -427,7 +431,7 @@ Child review request with ID 2 should be published.
 
 Child review request with ID 3 should be published.
 
-  $ rbmanage dumpreview $HGPORT1 3
+  $ rbmanage dumpreview 3
   id: 3
   status: pending
   public: true
@@ -451,7 +455,7 @@ The attachment for the review request should be unobsoleted
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://localhost:$HGPORT1/r/1/
+      data: http://*:$HGPORT1/r/1/ (glob)
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -482,7 +486,7 @@ The attachment for the review request should be unobsoleted
         Pull down these commits:
   
   
-        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo'
+        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo' (glob)
     - author: default@example.com
       id: 3
       tags: []
@@ -499,7 +503,7 @@ The attachment for the review request should be unobsoleted
         Pull down these commits:
   
   
-        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo'
+        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -511,4 +515,4 @@ The attachment for the review request should be unobsoleted
 Cleanup
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

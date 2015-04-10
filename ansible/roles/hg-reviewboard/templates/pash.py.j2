@@ -1,0 +1,40 @@
+#! /usr/bin/python -u
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import datetime, os, sys, pwd
+import hg_helper, ldap_helper
+import logging
+from sh_helper import QuoteForPOSIX
+
+if __name__ == '__main__':
+    os.environ['PYTHONPATH'] = '/repo/hg/libraries/'
+    if os.getenv ('USER') == 'root':
+        root_shell = pwd.getpwuid (0)[6]
+        ssh_command = os.getenv ('SSH_ORIGINAL_COMMAND')
+        if ssh_command:
+            os.system (root_shell + " -c " + QuoteForPOSIX (ssh_command))
+        else:
+            os.execl (root_shell, root_shell)
+    else:
+        server_port = os.getenv('SSH_CONNECTION').split ()[-1]
+
+        user_status = hg_helper.is_valid_user(os.getenv('USER'))
+        if user_status == 2:
+            sys.stderr.write('Your mercurial account has been disabled due \
+                              to inactivity.\nPlease file a bug at \
+                              https://bugzilla.mozilla.org (or \
+                              http://tinyurl.com/njcfhma) to re-activate \
+                              your account.\n')
+            sys.exit(0)
+
+        elif user_status != 1:
+            sys.stderr.write('You do not have a valid mercurial account!\n')
+            sys.exit(0)
+
+        # hg.mozilla.org handler
+        if server_port == "22":
+            hg_helper.serve()
+
+        sys.exit (0)

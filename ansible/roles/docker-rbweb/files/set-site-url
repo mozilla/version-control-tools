@@ -1,0 +1,26 @@
+#!/venv/bin/python -u
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import os
+import subprocess
+import sys
+import urlparse
+
+sys.path.insert(0, '/reviewboard/conf')
+os.environ['DJANGO_SETTINGS_MODULE'] = 'reviewboard.settings'
+
+url = urlparse.urlsplit(sys.argv[1])
+
+# Define hostname.
+from django.contrib.sites.models import Site as DjangoSite
+site = DjangoSite.objects.get(pk=1)
+site.domain = url.netloc
+site.name = url.hostname
+site.save()
+
+# Django caches the site settings in memory in each process
+# and there doesn't appear to be an easy way to invalidate or
+# change that setting. So, we kill the WSGI processes and rely on
+subprocess.check_call(['/kill-wsgi-procs'])

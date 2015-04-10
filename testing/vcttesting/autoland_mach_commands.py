@@ -35,6 +35,7 @@ class AutolandCommands(object):
             'pingback_url': pingback_url
         }
 
+        host = host.rstrip('/')
         r = requests.post(host + '/autoland', data=json.dumps(data),
                           headers={'Content-Type': 'application/json'},
                           auth=(user, password))
@@ -45,6 +46,7 @@ class AutolandCommands(object):
     @CommandArgument('host', help='Host to which to post the job')
     @CommandArgument('requestid', help='Id of the job for which to get status')
     def autoland_job_status(self, host, requestid):
+        host = host.rstrip('/')
         r = requests.get(host + '/autoland/status/' + requestid)
         print(r.status_code, r.text)
 

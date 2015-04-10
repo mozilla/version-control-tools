@@ -48,11 +48,28 @@ image).
 Now, you can create and start a MozReview instance::
 
   $ ./mozreview start /path/to/instance
-  Bugzilla URL: http://192.168.59.103:57485/
-  Review Board URL: http://localhost:57486/
-  Mercurial URL: http://localhost:57487/
+  waiting for Bugzilla to start
+  Bugzilla accessible on http://192.168.59.104:55568/
+  Bugzilla URL: http://192.168.59.104:55568/
+  Review Board URL: http://192.168.59.104:55569/
+  Mercurial URL: http://192.168.59.104:55570/
+  Pulse endpoint: 192.168.59.104:55573
+  Autoland URL: http://192.168.59.104:55574/
   Admin username: admin@example.com
   Admin password: password
+  LDAP URI: ldap://192.168.59.104:55571/
+  HG Push URL: ssh://192.168.59.104:55572/
+
+  Run the following to use this instance with all future commands:
+    export MOZREVIEW_HOME=/Users/gps/tmp/mozreview
+
+  Refresh code in the cluster by running:
+    ./mozreview refresh
+
+  Perform refreshing automatically by running:
+    ./mozreview autorefresh
+
+  (autorefresh requires `watchman`)
 
 You should be able to load the printed URLs in your browser and see a
 working site. If you don't, file a bug!
@@ -70,33 +87,116 @@ working site. If you don't, file a bug!
    ``MOZREVIEW_HOME`` environment variable, you do not need to define
    this argument.
 
+   The remainder of this document assumes this environment variable
+   is defined.
+
 Creating Repositories
 ---------------------
 
 MozReview instances are initially empty. They don't have any
 repositories you can push to.
 
-To create an empty repository to hold reviews, use mozreview::
+To create an empty repository to hold reviews, use ``mozreview``::
 
-   $ ./mozreview create-repo /path/to/instance repo_name
+   $ ./mozreview create-repo repo_name
+   HTTP URL (read only): http://192.168.59.104:55570/repo_name
+   SSH URL (read+write): ssh://192.168.59.104:55572/repo_name
 
-If all goes well, the URL of the newly-created repository should be
-printed. You should then be able to ``hg push`` to that repository.
-e.g.::
-
-   $ hg push http://localhost:57487/repo_name
-
-Remember to configure your client repository's hgrc to enable the Review
-Board client extension and to set up proper Bugzilla credentials! Don't
-worry, if something is wrong, the server will tell you during push.
+Pushing to repositories is done via SSH, as this is how production
+works.
 
 Creating Users
 --------------
 
-MozReview instances initially only have a single user: the admin user.
-You'll probably want to set up a regular user account. Using mozreview:: 
+There are two primary account systems inside the MozReview cluster:
+Bugzilla and LDAP.
 
-   $ ./mozreview create-user /path/to/instance me@example.com password 'Joe Smith'
+Bugzilla accounts provide authentication and authorization for
+web properties, including Bugzilla, MozReview, and Autoland.
+
+LDAP accounts hold information needed to communicate with the
+Mercurial SSH server.
+
+The two account systems are completely separate.
+
+Review Board also has its own account system. But it is linked
+to Bugzilla's user database and should be thought of an extension
+rather than a separate account system.
+
+LDAP Accounts
+^^^^^^^^^^^^^
+
+In order to speak to the SSH server, you'll need to create an
+LDAP account and configure it with an SSH key.
+
+.. note::
+
+   This workflow is a bit complicated and should be improved.
+
+SSH accounts are managed via LDAP. So, creating an LDAP user is
+equivalent to configuring SSH access. Run the ``create-ldap-user``
+sub-command to create an LDAP user with an existing SSH key::
+
+  $ ./mozreview create-ldap-user gszorc@mozilla.com gps 2002 'Gregory Szorc' --key-file ~/.ssh/id_rsa --scm-level 3
+
+Here, we create the account ``gszorc@mozilla.com`` with system user
+name ``gps`` with user ID ``2`` with name ``Gregory Szorc`` with an
+existing RSA SSH keypair and with level 3 source code access.
+
+.. note::
+
+   When specifying an existing key file, the public key will be
+   added to the LDAP server running in the cluster. Your private key
+   remains as a secret on your local machine.
+
+You'll likely want your LDAP/SSH username to be shared with your
+login name for hg.mozilla.org. This is to make your Mercurial SSH
+configuration simpler. If the usernames are shared, you can add
+something like the following to your ``hgrc``::
+
+  [ui]
+  ssh = ssh -l gszorc@mozilla.com
+
+This tells Mercurial to use a specified login name for all SSH
+connections.
+
+Alternatively, edit your ``~/.ssh/config`` file and specify an
+alternate ``User`` for the Docker host.
+
+Bugzilla Accounts
+^^^^^^^^^^^^^^^^^
+
+MozReview clusters are provisioned with a single admin user by default.
+Credentials for this user are printed during ``mozreview start``.
+
+You'll almost certainly want to create a regular, non-admin user.
+This can be done with the ``create-user`` sub-command::
+
+   $ ./mozreview create-user me@example.com password 'Joe Smith'
+
+Refreshing Code
+---------------
+
+Because processes are running inside Docker containers and are operating
+on copies of code, changes to the source code in your working directory
+will not automatically take effect in running processes.
+
+To refresh code running on the cluster, run the ``refresh``
+sub-command::
+
+   $ ./mozreview refresh
+
+The ``autorefresh`` command can be used to start a file watching
+daemon that will automatically refresh the cluster when local files
+are changed::
+
+   $ ./mozreview autorefresh
+
+.. tip::
+
+   Use of ``autorefresh`` is highly recommended when doing development,
+   as it will save you the overhead of having to manually type a refresh
+   command every time you change something.
 
 Stopping the Servers
 --------------------
@@ -108,7 +208,18 @@ system resources - until there is some form of intervention.
 The easiest way to stop everything related to the running MozReview
 instance is to run ``mozreview stop``. e.g.::
 
-   $ ./mozreview stop /path/to/instance
+   $ ./mozreview stop
+
+Exporting Environment Variables
+-------------------------------
+
+Many support tools (``bugzilla``, ``reviewboard``, etc) look for magic
+environment variables to configure things like what server to talk to.
+
+The ``shellinit`` sub-command can be used to mass export all variables
+defining how a MozReview cluster works::
+
+   $ $(./mozreview shellinit)
 
 Interacting with Bugzilla
 =========================
@@ -146,7 +257,7 @@ instances. You are encouraged to use the tool to help you hack on
 MozReview.
 
 The tool had its origins in testing code, so its human interface could
-use some use.
+use some love.
 
 You'll need to define your Review Board credentials through environment
 variables: ``BUGZILLA_USERNAME`` and ``BUGZILLA_PASSWORD``. The name

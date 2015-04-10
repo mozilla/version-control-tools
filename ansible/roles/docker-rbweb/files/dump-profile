@@ -1,0 +1,27 @@
+#!/usr/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import json
+import sqlite3
+import sys
+
+username = sys.argv[1]
+
+res = {}
+
+db = '/reviewboard/data/reviewboard.db'
+conn = sqlite3.connect(db)
+with conn:
+    c = conn.cursor()
+    c.execute('SELECT accounts_profile.* '
+              'FROM auth_user, accounts_profile '
+              'WHERE accounts_profile.user_id = auth_user.id '
+              'AND auth_user.username = ?', (username,))
+    profile = c.fetchone()
+    if profile:
+        for i, description in enumerate(c.description):
+            res[description[0]] = profile[i]
+
+print(json.dumps(res))

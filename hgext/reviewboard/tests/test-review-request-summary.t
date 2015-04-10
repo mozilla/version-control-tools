@@ -20,31 +20,33 @@
   $ echo foo2 > foo
   $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
   changeset:  1:24417bc94b2c
   summary:    Bug 1 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   changeset:  2:61e2e5c813d2
   summary:    Bug 1 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
-  $ rbmanage add-reviewer $HGPORT1 2 --user reviewer
+  $ rbmanage add-reviewer 2 --user reviewer
   1 people listed on review request
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
 
-  $ rbmanage dump-summary $HGPORT1 1
+  $ rbmanage dump-summary 1
   parent:
     summary: bz://1/mynick
     id: 1
@@ -71,21 +73,21 @@
 
 Only parents have summaries.
 
-  $ rbmanage dump-summary $HGPORT1 2
+  $ rbmanage dump-summary 2
   API Error: 400: 1001: Review request is not a parent
   [1]
 
-  $ rbmanage create-review $HGPORT1 2
+  $ rbmanage create-review 2
   created review 1
 
 Opening an issue should be reflected in the summary.
 
-  $ rbmanage create-diff-comment $HGPORT1 2 1 foo 1 'Fix this.' --open-issue
+  $ rbmanage create-diff-comment 2 1 foo 1 'Fix this.' --open-issue
   created diff comment 1
-  $ rbmanage publish-review $HGPORT1 2 1
+  $ rbmanage publish-review 2 1
   published review 1
 
-  $ rbmanage dump-summary $HGPORT1 1
+  $ rbmanage dump-summary 1
   parent:
     summary: bz://1/mynick
     id: 1
@@ -112,10 +114,10 @@ Opening an issue should be reflected in the summary.
 
 Resolving an issue should decrement the issue count.
 
-  $ rbmanage update-issue-status $HGPORT1 2 1 1 resolved
+  $ rbmanage update-issue-status 2 1 1 resolved
   updated issue status on diff comment 1
 
-  $ rbmanage dump-summary $HGPORT1 1
+  $ rbmanage dump-summary 1
   parent:
     summary: bz://1/mynick
     id: 1
@@ -143,4 +145,4 @@ Resolving an issue should decrement the issue count.
 Cleanup
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

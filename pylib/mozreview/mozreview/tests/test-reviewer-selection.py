@@ -20,19 +20,11 @@ class AutocompleteTest(MozReviewWebDriverTest):
             ('jsmith@example.com', 'password1', 'Jeremy Smith [:jsmith]'),
             ('mjane@example.com', 'password2', 'Mary Jane [:mary]'),
         ])
+        self.create_ldap(b'mjane@example.com', b'mjane', 2001, b'Mary Jane')
         mjb = self.user_bugzilla('mjane@example.com')
         mjb.create_bug('TestProduct', 'TestComponent', 'bug1')
 
-        self.mr.create_repository('repo1')
-        lr = self.mr.get_local_repository(
-                'repo1',
-                ircnick='mary',
-                bugzilla_username='mjane@example.com',
-                bugzilla_password='password2')
-
-        lr.touch('foo')
-        lr.run(['commit', '-A', '-m', 'initial'])
-        lr.run(['phase', '--public', '-r', '0'])
+        lr = self.create_basic_repo('mjane@example.com', 'mjane')
         lr.write('foo', 'first change\n')
         lr.run(['commit', '-m', 'Bug 1 - Test autocomplete'])
         lr.run(['push'])

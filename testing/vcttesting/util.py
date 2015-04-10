@@ -4,14 +4,11 @@
 
 from __future__ import absolute_import, unicode_literals
 
-import os
-import signal
 import socket
 import time
 
 import kombu
 import paramiko
-import psutil
 import requests
 
 
@@ -90,11 +87,4 @@ def wait_for_ssh(hostname, port, timeout=60):
         if time.time() - start > timeout:
             raise Exception('Timeout reached waiting for SSH')
 
-        time.sleep(0.1)
-
-
-def kill(pid):
-    os.kill(pid, signal.SIGINT)
-
-    while psutil.pid_exists(pid):
         time.sleep(0.1)

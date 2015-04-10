@@ -4,3 +4,4 @@
 
 - name: restart sshd
   service: name=sshd state=restarted
+  when: ansible_env.DOCKER_ENTRYPOINT is not defined

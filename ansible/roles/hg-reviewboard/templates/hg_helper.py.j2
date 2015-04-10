@@ -1,0 +1,80 @@
+#! /usr/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import os, sys, re, ConfigParser
+from ldap_helper import ldap_connect, get_ldap_attribute
+from sh_helper import run_command, prompt_user
+from cgi import escape
+from subprocess import Popen, PIPE, STDOUT
+import shlex
+import repo_group
+
+DOC_ROOT = '/repo/hg/mozilla'
+
+verbose_users = [ 'bkero@mozilla.com2', ]
+
+def is_valid_user (mail):
+    mail = mail.strip()
+    ## If the regex search below fails, comment out the conditional and the return. Then Uncomment the following line to atleat sanitize the input
+    mail = mail.replace("(",'').replace(")",'').replace("'",'').replace('"','').replace(';','').replace("\"",'')
+    #if not re.search("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", mail):
+    #     return 'Invalid Email Address'
+    account_status = get_ldap_attribute (mail, 'hgAccountEnabled', '{{ ldap_uri | mandatory }}')
+    if account_status == 'TRUE':
+	return 1
+    elif account_status == 'FALSE':
+	return 2
+    else:
+	return 0
+
+#
+# Please be very careful when you relax/change the good_chars regular expression.
+# Being lax with it can open us up to all kind of security problems.
+#
+def check_repo_name (repo_name):
+    good_chars = re.compile ('^(\w|-|/|\.\w)+\s*$')
+    if not good_chars.search (repo_name):
+        sys.stderr.write ('Only alpha-numeric characters, ".", and "-" are allowed in the repository names.\n')
+        sys.stderr.write ('Please try again with only those characters.\n')
+        sys.exit (1)
+    return True
+
+def serve():
+    ssh_command = os.getenv ('SSH_ORIGINAL_COMMAND')
+    if not ssh_command:
+        sys.stderr.write ('No interactive shells allowed here!\n') 
+        sys.exit (1)
+    elif ssh_command.startswith ('hg'):
+        repo_expr = re.compile ('(.*)\s+-R\s+([^\s]+\s+)(.*)')
+        if (repo_expr.search (ssh_command)):
+            [(hg_path, repo_path, hg_command)] = repo_expr.findall (ssh_command)
+            if (hg_command == 'serve --stdio') and (check_repo_name (repo_path)):
+                hg_arg_string = '/usr/bin/hg -R ' + DOC_ROOT + '/' + repo_path + hg_command
+                hg_args = hg_arg_string.split ()
+                os.execv ('/usr/bin/hg', hg_args)
+            else:
+                sys.stderr.write ("Thank you dchen! but.. I don't think so!\n")
+                sys.exit (1)
+    elif ssh_command.startswith ('pushlog '):
+        args = ssh_command.replace ('pushlog', '').split()
+        if check_repo_name (args[0]):
+            fh = open("/repo/hg/mozilla/%s/.hg/pushlog2.db" % (args[0]), 'rb')
+            sys.stdout.write(fh.read())
+            fh.close()
+    elif ssh_command.startswith ('repo-group'):
+        args = ssh_command.replace ('repo-group', '').split()
+        if check_repo_name (args[0]):
+            print(repo_group.repo_owner(args[0]))
+    else:
+        sys.stderr.write ('No interactive commands allowed here!\n') 
+        sys.exit (1)
+
+if __name__ == '__main__':
+#    if is_valid_user (os.getenv ('USER')):
+    if is_valid_user ('klibby@mozilla.com'):
+        serve()
+    else:
+        sys.stderr.write ('You are not welcome here, go away!\n') 
+        sys.exit (1)

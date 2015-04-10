@@ -4,9 +4,9 @@
 
 # This is a Docker container for running a Mozilla flavored LDAP server.
 
-FROM ubuntu:14.04.1
+FROM ubuntu:14.04.2
 
-RUN apt-get update && apt-get -y install slapd
+RUN apt-get update && apt-get --no-install-recommends -y install slapd
 
 RUN rm -rf /etc/ldap/slapd.d
 

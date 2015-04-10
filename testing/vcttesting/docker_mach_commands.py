@@ -64,15 +64,16 @@ class DockerCommands(object):
                   autoland_port=None):
         db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
+        hgrb_image = os.environ.get('DOCKER_HGRB_IMAGE')
         ldap_image = os.environ.get('DOCKER_LDAP_IMAGE')
         pulse_image = os.environ.get('DOCKER_PULSE_IMAGE')
-        rbweb_image = os.environ.get('DOCKER_RB_WEB_IMAGE')
+        rbweb_image = os.environ.get('DOCKER_RBWEB_IMAGE')
         autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE')
         autoland_image = os.environ.get('DOCKER_AUTOLAND_IMAGE')
 
-        self.d.start_mozreview(cluster=cluster, hostname=None,
+        self.d.start_mozreview(cluster=cluster,
                 http_port=http_port, pulse_port=pulse_port,
-                ldap_image=ldap_image,
+                hgrb_image=hgrb_image, ldap_image=ldap_image,
                 db_image=db_image, web_image=web_image,
                 pulse_image=pulse_image, rbweb_image=rbweb_image,
                 autolanddb_image=autolanddb_image,
@@ -94,6 +95,21 @@ class DockerCommands(object):
              description='Build all images')
     def build_all(self):
         self.d.build_all_images(verbose=True)
+
+    @Command('run-ansible', category='docker',
+             description='Run Ansible to produce a Docker image')
+    @CommandArgument('playbook',
+                     help='Name of Ansible playbook to execute')
+    @CommandArgument('--builder',
+                     help='Docker build to start from')
+    @CommandArgument('--start-image',
+                     help='Existing Docker image to operate on')
+    @CommandArgument('--repository',
+                     help='Tag the produced image with this repository')
+    def run_ansible(self, playbook, builder=None, start_image=None,
+                    repository=None):
+        self.d.run_ansible(playbook, builder=builder, start_image=start_image,
+                           repository=repository, verbose=True)
 
     @Command('prune-images', category='docker',
         description='Prune old Docker images')

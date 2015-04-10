@@ -1,0 +1,27 @@
+#!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script is used to establish an SSH connection to a Mercurial server
+# running in a Docker container as part of mozreview tests.
+
+set -e
+
+if [ -z "${BUGZILLA_USERNAME}" -a -z "${SSH_KEYNAME}" ]; then
+  echo "BUGZILLA_USERNAME or SSH_KEYNAME must be defined"
+  exit 1
+fi
+
+username=${BUGZILLA_USERNAME}
+if [ ! -z ${SSH_KEYNAME} ]; then
+  username=${SSH_KEYNAME}
+fi
+
+if [ ! -f ${MOZREVIEW_HOME}/keys/${username} ]; then
+  echo "No SSH key found for ${username}."
+  echo "You should probably use 'mozreview create-ldap-user' to make one"
+  exit 1
+fi
+
+ssh -F ${MOZREVIEW_HOME}/ssh_config -i ${MOZREVIEW_HOME}/keys/${username} -l ${username} $@

@@ -1,0 +1,34 @@
+[trusted]
+users = hg, root, apache
+groups = scm_level_1
+
+[email]
+method = /usr/sbin/sendmail
+from = hg@{{ domain | mandatory }}
+
+[extensions]
+pushlog = /repo/hg/version-control-tools/hgext/pushlog/
+hgwebjson = /repo/hg/version-control-tools/hgext/pushlog-legacy/hgwebjson.py
+pushlog-feed = /repo/hg/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py
+buglink = /repo/hg/version-control-tools/hgext/pushlog-legacy/buglink.py
+serverlog = /repo/hg/version-control-tools/hgext/serverlog/
+rbserver = /repo/hg/version-control-tools/hgext/reviewboard/server.py
+
+[interhg]
+a_httplinks = s|(https?://\S+)|<a href="\1">\1</a>|i
+bugzilla = s|((?:bug[\s#]*|b=#?|#)(\d{4,}))|<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=\2" title="Bug \2">\1</a>|i
+
+[serverlog]
+reporoot = /repo/hg/mozilla
+
+[format]
+generaldelta = true
+
+[phases]
+publish = False
+
+[bugzilla]
+url =
+
+[reviewboard]
+url =

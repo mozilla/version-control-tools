@@ -55,6 +55,7 @@ export HGRCPATH=/dev/null
 
 # Install various Mercurial versions for multi-version testing.
 if [ ! -d venv/hg ]; then
+  echo "Cloning Mercurial repository"
   hg clone http://selenic.com/repo/hg venv/hg
 fi
 
@@ -71,6 +72,8 @@ for v in 3.0.2 3.1.2 3.2.4 3.3.3; do
   if [ ! -d $destdir ]; then
     cd venv/hg
     hg up $v
+    # We don't care about support files, which only slow us down, so
+    # install-bin is the only target we need.
     make install-bin PREFIX=$destdir
     hg --config extensions.purge= purge --all
     cd ../..
@@ -85,6 +88,11 @@ make install-bin PREFIX=$mercurials/@
 hg --config extensions.purge= purge --all
 cd ../..
 echo finished installing Mercurials
+
+echo ""
+echo "Building Docker images."
+echo "This could take a while and may consume a lot of internet bandwidth."
+echo "If you don't want Docker images, it is safe to hit CTRL+c to abort this."
 
 DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-all || {
   echo "You will not be able to run tests that require Docker.";

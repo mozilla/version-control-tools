@@ -16,12 +16,14 @@
   $ hg commit -A -m 'root commit'
   adding foo0
   $ hg push --noreview
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   $ hg phase --public -r .
 
   $ echo 'foo1' > foo1
@@ -32,24 +34,26 @@
   adding foo2
 
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 2 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
   changeset:  1:a252038ad074
   summary:    Bug 1 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   changeset:  2:c3d0947fefb7
   summary:    Bug 1 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ echo 'foo3' > foo3
@@ -81,33 +85,35 @@
   saved backup bundle to * (glob)
   saved backup bundle to * (glob)
 
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 3 changesets with 3 changes to ? files (+1 heads) (glob)
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
   
   changeset:  6:4726ad3f958d
   summary:    Bug 1 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   changeset:  7:a17cc6746ab4
   summary:    Bug 1 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   changeset:  8:35fb57be1151
   summary:    Bug 1 - Foo 5
-  review:     http://localhost:$HGPORT1/r/4 (pending)
+  review:     http://*:$HGPORT1/r/4 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
 Cleanup
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

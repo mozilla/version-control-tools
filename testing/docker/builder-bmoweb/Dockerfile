@@ -104,7 +104,7 @@
 #
 # We blow away the Bugzilla data directory during container start.
 
-FROM ubuntu:14.04.1
+FROM ubuntu:14.04.2
 
 ADD CLOBBER /CLOBBER
 
@@ -119,7 +119,7 @@ ENV BMO_URL http://localhost:80/
 RUN /usr/sbin/groupadd -g 1000 bugzilla
 RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 bugzilla
 
-RUN apt-get update && apt-get -y install \
+RUN apt-get update && apt-get --no-install-recommends -y install \
   apache2 build-essential cvs g++ git graphviz \
   libapache2-mod-perl2 libdaemon-generic-perl libgd-dev libssl-dev \
   mysql-client patchutils perlmagick pkg-config python3-mysql.connector \
@@ -164,13 +164,6 @@ ADD prefork.conf /etc/apache2/mods-available/mpm_prefork.conf
 
 ADD entrypoint.py /bmoweb_entrypoint.py
 ADD run-apache.sh /run-apache.sh
-
-# Force image cache invalidation if code used to bootstrap
-# changes.
-# %include testing/vcttesting/bugzilla/
-# %include testing/vcttesting/docker.py
-# %include testing/vcttesting/mozreview.py
-ADD extra/ $BUGZILLA_HOME/extra-docker-context
 
 EXPOSE 80
 

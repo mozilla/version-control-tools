@@ -17,9 +17,12 @@ import ssl
 import subprocess
 import sys
 import tarfile
+import tempfile
 import urlparse
 import uuid
 import warnings
+
+from docker.errors import APIError as DockerAPIError
 from contextlib import contextmanager
 from io import BytesIO
 
@@ -29,12 +32,27 @@ from coverage.data import CoverageData
 from .util import (
     wait_for_amqp,
     wait_for_http,
+    wait_for_ssh,
 )
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 DOCKER_DIR = os.path.normpath(os.path.join(HERE, '..', 'docker'))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
+
+
+def rsync(*args):
+    prog = None
+    for path in os.environ['PATH'].split(':'):
+        candidate = os.path.join(path, 'rsync')
+        if os.path.exists(candidate):
+            prog = candidate
+            break
+
+    if not prog:
+        raise Exception('Could not find rsync program')
+
+    subprocess.check_call([prog] + list(args), cwd='/')
 
 
 def params_from_env(env):
@@ -90,6 +108,8 @@ class Docker(object):
             'last-hgmaster-id': None,
             'last-hgweb-id': None,
             'last-ldap-id': None,
+            'last-vct-id': None,
+            'vct-cid': None,
         }
 
         if os.path.exists(state_path):
@@ -109,6 +129,8 @@ class Docker(object):
             'last-hgmaster-id',
             'last-hgweb-id',
             'last-ldap-id',
+            'last-vct-id',
+            'vct-cid',
         )
         for k in keys:
             self.state.setdefault(k, None)
@@ -154,7 +176,26 @@ class Docker(object):
         except requests.exceptions.RequestException as e:
             return False
 
-    def ensure_built(self, name, verbose=False, nocache=False):
+    def _get_vct_files(self):
+        """Obtain all the files in the version-control-tools repo.
+
+        Returns a dict of relpath to full path.
+        """
+        hg = os.path.join(ROOT, 'venv', 'bin', 'hg')
+        env = dict(os.environ)
+        env['HGRCPATH'] = '/dev/null'
+        args = [hg, '-R', ROOT, 'locate']
+        with open(os.devnull, 'wb') as null:
+            output = subprocess.check_output(args, env=env, cwd='/',
+                                             stderr=null)
+
+        paths = {}
+        for f in output.splitlines():
+            paths[f] = os.path.join(ROOT, f)
+
+        return paths
+
+    def ensure_built(self, name, verbose=False):
         """Ensure a Docker image from a builder directory is built and up to date.
 
         This function is docker build++. Under the hood, it talks to the same
@@ -205,29 +246,9 @@ class Docker(object):
                 rel = full[len(p)+1:]
                 tar.add(full, arcname=rel)
 
-        # Include extra context from us and other support tools used for
-        # creating [bootstrapped] images so Dockerfiles can ADD these files and
-        # force cache invalidation of produced images if our logic changes.
-
-        # Add ourself.
-        tar.add(os.path.join(HERE, 'docker.py'), 'extra/vcttesting/docker.py')
-
-        # Add the script for managing docker. This shouldn't be needed, but you
-        # never know.
-        tar.add(os.path.join(HERE, '..', 'docker-control.py'),
-                'extra/docker-control.py')
-
         if vct_paths:
             # We grab the set of tracked files in this repository.
-            hg = os.path.join(ROOT, 'venv', 'bin', 'hg')
-            env = dict(os.environ)
-            env['HGRCPATH'] = '/dev/null'
-            args = [hg, '-R', ROOT, 'locate']
-            null = open(os.devnull, 'wb')
-            output = subprocess.check_output(args, env=env, cwd='/',
-                                             stderr=null)
-
-            vct_files = output.splitlines()
+            vct_files = sorted(self._get_vct_files().keys())
             added = set()
             for p in vct_paths:
                 ap = os.path.join(ROOT, p)
@@ -261,7 +282,7 @@ class Docker(object):
         # We assume this is a bug that will change behavior later and work
         # around it by ensuring consistent behavior.
         for stream in self.client.build(fileobj=buf, custom_context=True,
-                                        rm=True, stream=True, nocache=nocache):
+                                        rm=True, stream=True):
             s = json.loads(stream)
             if 'stream' not in s:
                 continue
@@ -292,27 +313,155 @@ class Docker(object):
 
         raise Exception('Unable to confirm image was built')
 
-    def ensure_images_built(self, names, existing=None, verbose=False):
+    def ensure_images_built(self, names, ansibles=None, existing=None,
+                            verbose=False):
         """Ensure that multiple images are built.
 
         ``names`` is a list of Docker images to build.
+        ``ansibles`` describes how to build ansible-based images. Keys
+        are repositories. Values are tuples of (playbook, builder). If an
+        image in the specified repositories is found, we'll use it as the
+        start image. Otherwise, we'll use the configured builder.
         """
+        ansibles = ansibles or {}
         existing = existing or {}
-        images = dict(existing)
-        missing = set(names) - set(existing.keys())
+
+        # Verify existing images actually exist.
+        docker_images = self.all_docker_images()
+
+        images = {k: v for k, v in existing.items() if v in docker_images}
+
+        missing = (set(names) | set(ansibles.keys())) - set(images.keys())
+
+        if not missing:
+            return images
+
+        ma = {k: ansibles[k] for k in missing if k in ansibles}
+        start_images = {}
+        for image in reversed(self.client.images()):
+            for repotag in image['RepoTags']:
+                repo, tag = repotag.split(':', 1)
+                if repo in ma:
+                    start_images[repo] = image['Id']
 
         def build(name, **kwargs):
             image = self.ensure_built(name, **kwargs)
             return name, image
 
-        with futures.ThreadPoolExecutor(len(missing)) as e:
-            fs = [e.submit(build, name, verbose=verbose) for name in missing]
+        def build_ansible(f_builder, vct_cid, playbook, repository=None,
+                          builder=None, start_image=None, verbose=False):
+            # Wait for the builder image to be built.
+            if f_builder:
+                start_image = f_builder.result()
+                builder = None
+
+            image, repo, tag = self.run_ansible(playbook,
+                                                repository=repository,
+                                                builder=builder,
+                                                start_image=start_image,
+                                                vct_cid=vct_cid,
+                                                verbose=verbose)
+            return repository, image
+
+        with self.vct_container(verbose=verbose) as vct_state, futures.ThreadPoolExecutor(len(missing)) as e:
+            vct_cid = vct_state['Id']
+            fs = []
+            builder_fs = {}
+            for n in sorted(missing):
+                if n in names:
+                    fs.append(e.submit(build, n, verbose=verbose))
+                else:
+                    playbook, builder = ansibles[n]
+                    start_image = start_images.get(n)
+                    if start_image:
+                        builder = None
+
+                    # Builders may be shared across images. This code it to
+                    # ensure we only build the builder image once.
+                    if builder:
+                        bf = builder_fs.get(builder)
+                        if not bf:
+                            bf = e.submit(self.ensure_built,
+                                          'ansible-%s' % builder,
+                                          verbose=verbose)
+                            builder_fs[builder] = bf
+                    else:
+                        bf = None
+
+                    fs.append(e.submit(build_ansible, bf, vct_cid, playbook,
+                                       repository=n, builder=builder,
+                                       start_image=start_image,
+                                       verbose=verbose))
+
 
             for f in futures.as_completed(fs):
                 name, image = f.result()
                 images[name] = image
 
         return images
+
+    def run_ansible(self, playbook, repository=None,
+                    builder=None, start_image=None, vct_image=None,
+                    vct_cid=None, verbose=False):
+        """Create an image with the results of Ansible playbook execution.
+
+        This function essentially does the following:
+
+        1. Obtain a starting image.
+        2. Create and start a container with the content of v-c-t mounted
+           in that container.
+        3. Run the ansible playbook specified.
+        4. Tag the resulting image.
+
+        You can think of this function as an alternative mechanism for building
+        Docker images. Instead of Dockerfiles, we use Ansible to "provision"
+        our containers.
+
+        You can provision containers either from scratch or incrementally.
+
+        To build from scratch, specify a ``builder``. This corresponds to a
+        directory in v-c-t that contains a Dockerfile specifying how to install
+        Ansible in an image. e.g. ``centos6`` will be expanded to
+        ``builder-ansible-centos6``.
+
+        To build incrementally, specify a ``start_image``. This is an existing
+        Docker image.
+
+        One of ``builder`` or ``start_image`` must be specified. Both cannot be
+        specified.
+        """
+        if not builder and not start_image:
+            raise ValueError('At least 1 of "builder" or "start_image" '
+                             'must be defined')
+        if builder and start_image:
+            raise ValueError('Only 1 of "builder" and "start_image" may '
+                             'be defined')
+
+        repository = repository or playbook
+
+        if builder:
+            full_builder = 'ansible-%s' % builder
+            start_image = self.ensure_built(full_builder, verbose=verbose)
+
+        with self.vct_container(image=vct_image, cid=vct_cid, verbose=verbose) as vct_state:
+            cmd = ['/sync-and-build', '%s.yml' % playbook]
+            with self.create_container(start_image, command=cmd) as cid:
+                self.client.start(cid, volumes_from=[vct_state['Name']])
+
+                for s in self.client.attach(cid, stream=True, logs=True):
+                    if verbose:
+                        for line in s.splitlines():
+                            print('%s> %s' % (repository, line))
+
+                state = self.client.inspect_container(cid)
+                if state['State']['ExitCode']:
+                    raise Exception('Ansible did not complete successfully')
+
+                tag = str(uuid.uuid1())
+
+                iid = self.client.commit(cid['Id'], repository=repository, tag=tag)['Id']
+                iid = self.get_full_image(iid)
+                return iid, repository, tag
 
     def build_hgmo(self, images=None, verbose=False):
         """Ensure the images for a hg.mozilla.org service are built.
@@ -348,16 +497,19 @@ class Docker(object):
             'bmoweb',
             'ldap',
             'pulse',
-            #'rbweb',
-        ], existing=images, verbose=verbose)
+        ], ansibles={
+            'hgrb': ('docker-hgrb', 'centos6'),
+            'rbweb': ('docker-rbweb', 'centos6'),
+        }, existing=images, verbose=verbose)
 
         self.state['last-autolanddb-id'] = images['autolanddb']
         self.state['last-autoland-id'] = images['autoland']
         self.state['last-bmodb-id'] = images['bmodb-volatile']
         self.state['last-bmoweb-id'] = images['bmoweb']
+        self.state['last-hgrb-id'] = images['hgrb']
         self.state['last-ldap-id'] = images['ldap']
         self.state['last-pulse-id'] = images['pulse']
-        #self.state['last-rbweb-id'] = images['rbweb']
+        self.state['last-rbweb-id'] = images['rbweb']
 
         # The keys for the bootstrapped images are derived from the base
         # images they depend on. This means that if we regenerate a new
@@ -365,69 +517,70 @@ class Docker(object):
         bmodb_bootstrapped_key = 'bmodb-bootstrapped:%s' % images['bmodb-volatile']
         bmoweb_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (
                 images['bmodb-volatile'], images['bmoweb'])
-        autolanddb_bootstrapped_key = 'autolanddb-bootstrapped:%s' % images['autolanddb']
-        autoland_bootstrapped_key = 'autoland-bootstrapped:%s' % images['autoland']
-        #rbweb_bootstrapped_key = 'rbweb-bootstrapped:%s:%s' % (db_image,
-        #        images['rbweb'])
 
-        have_bmodb = bmodb_bootstrapped_key in state_images
-        have_bmoweb = bmoweb_bootstrapped_key in state_images
-        have_ldap = 'ldap' in state_images
-        have_pulse = 'pulse' in state_images
-        have_autolanddb = autolanddb_bootstrapped_key in state_images
-        have_autoland = autoland_bootstrapped_key in state_images
-        #have_rbweb = rbweb_bootstrapped_key in state_images
+        self.save_state()
 
-        if (have_bmodb and have_bmoweb and have_ldap and have_pulse and
-                have_autolanddb and have_autoland): # and have_rbweb:
-            return {
-                'autolanddb': state_images[autolanddb_bootstrapped_key],
-                'autoland': state_images[autoland_bootstrapped_key],
-                'bmodb': state_images[bmodb_bootstrapped_key],
-                'bmoweb': state_images[bmoweb_bootstrapped_key],
-                'ldap': state_images['ldap'],
-                'pulse': state_images['pulse'],
-                #'rbweb': state_images[rbweb_bootstrapped_key],
-            }
+        bmodb_bootstrap = state_images.get(bmodb_bootstrapped_key)
+        bmoweb_bootstrap = state_images.get(bmoweb_bootstrapped_key)
 
-        bmodb_id = self.client.create_container(images['bmodb-volatile'],
+        known_images = self.all_docker_images()
+        if bmodb_bootstrap and bmodb_bootstrap not in known_images:
+            bmodb_bootstrap = None
+        if bmoweb_bootstrap and bmoweb_bootstrap not in known_images:
+            bmoweb_bootstrap = None
+
+        if not bmodb_bootstrap or not bmoweb_bootstrap:
+            bmodb_bootstrap, bmoweb_bootstrap = self._bootstrap_bmo(
+                    images['bmodb-volatile'], images['bmoweb'])
+
+        state_images[bmodb_bootstrapped_key] = bmodb_bootstrap
+        state_images[bmoweb_bootstrapped_key] = bmoweb_bootstrap
+        self.state['last-bmodb-bootstrap-id'] = bmodb_bootstrap
+        self.state['last-bmoweb-bootstrap-id'] = bmoweb_bootstrap
+        self.save_state()
+
+        return {
+            'autolanddb': images['autolanddb'],
+            'autoland': images['autoland'],
+            'bmodb': bmodb_bootstrap,
+            'bmoweb': bmoweb_bootstrap,
+            'hgrb': images['hgrb'],
+            'ldap': images['ldap'],
+            'pulse': images['pulse'],
+            'rbweb': images['rbweb'],
+        }
+
+    def _bootstrap_bmo(self, db_image, web_image):
+        """Build bootstrapped BMO images.
+
+        BMO's first run time takes several seconds. It isn't practical to wait
+        for this every time the containers start. So, we do the first run code
+        once and commit the result to a new image.
+        """
+        db_id = self.client.create_container(
+                db_image,
                 environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
 
-        bmoweb_environ = {}
+        web_environ = {}
 
         if 'FETCH_BMO' in os.environ:
-            bmoweb_environ['FETCH_BMO'] = '1'
+            web_environ['FETCH_BMO'] = '1'
 
-        bmoweb_id = self.client.create_container(images['bmoweb'],
-                                                 environment=bmoweb_environ)['Id']
+        web_id = self.client.create_container(web_image,
+                                              environment=web_environ)['Id']
 
-        autolanddb_id = self.client.create_container(images['autolanddb'])['Id']
-        autoland_id = self.client.create_container(images['autoland'])['Id']
-
-        #rbweb_id = self.client.create_container(images['rbweb'])['Id']
-
-        with self._start_container(bmodb_id) as db_state:
+        with self.start_container(db_id) as db_state:
             web_params = {
                 'links': [(db_state['Name'], 'bmodb')],
                 'port_bindings': {80: None},
             }
-            rbweb_params = {
-                'links': [(db_state['Name'], 'rbdb')],
-                'port_bindings': {80: None},
-            }
-            with self._start_container(bmoweb_id, **web_params) as web_state:
-                #with self._start_container(rbweb_id, **rbweb_params) as rbweb_state:
-                bmoweb_port = int(web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
-                #rbweb_port = int(rbweb_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
+            with self.start_container(web_id, **web_params) as web_state:
+                web_hostname, web_port = self._get_host_hostname_port(web_state, '80/tcp')
                 print('waiting for containers to bootstrap')
-                wait_for_http(self.docker_hostname, bmoweb_port, path='xmlrpc.cgi')
-                #wait_for_http(self.docker_hostname, rbweb_port)
+                wait_for_http(web_hostname, web_port, path='xmlrpc.cgi')
 
-        bmodb_unique_id = str(uuid.uuid1())
-        bmoweb_unique_id = str(uuid.uuid1())
-        autolanddb_unique_id = str(uuid.uuid1())
-        autoland_unique_id = str(uuid.uuid1())
-        #rbweb_unique_id = str(uuid.uuid1())
+        db_unique_id = str(uuid.uuid1())
+        web_unique_id = str(uuid.uuid1())
 
         print('committing bootstrapped images')
 
@@ -436,71 +589,42 @@ class Docker(object):
         # easily from Docker's own metadata. We have to give a tag becaue
         # Docker will forget the repository name if a name image has only a
         # repository name as well.
-        with futures.ThreadPoolExecutor(4) as e:
-            bmodb_future = e.submit(self.client.commit, bmodb_id,
-                                    repository='bmodb-volatile-bootstrapped',
-                                    tag=bmodb_unique_id)
-            bmoweb_future = e.submit(self.client.commit, bmoweb_id,
-                                     repository='bmoweb-bootstrapped',
-                                     tag=bmoweb_unique_id)
-            autolanddb_future = e.submit(self.client.commit, autolanddb_id,
-                                         repository='autolanddb-bootstrapped',
-                                         tag=autolanddb_unique_id)
-            autoland_future = e.submit(self.client.commit, autoland_id,
-                    repository='autoland-bootstrapped',
-                    tag=autoland_unique_id)
-            #rbweb_future = e.submit(self.client.commit, rbweb_id,
-            #        repository='rbweb-bootstrapped',
-            #        tag=rbweb_unique_id)
+        with futures.ThreadPoolExecutor(2) as e:
+            db_future = e.submit(self.client.commit, db_id,
+                                 repository='bmodb-volatile-bootstrapped',
+                                 tag=db_unique_id)
+            web_future = e.submit(self.client.commit, web_id,
+                                  repository='bmoweb-bootstrapped',
+                                  tag=web_unique_id)
 
-        bmodb_bootstrap = bmodb_future.result()['Id']
-        bmoweb_bootstrap = bmoweb_future.result()['Id']
-        autolanddb_bootstrap = autolanddb_future.result()['Id']
-        autoland_bootstrap = autoland_future.result()['Id']
-        #rbweb_bootstrap = rbweb_future.result()['Id']
-        state_images[bmodb_bootstrapped_key] = bmodb_bootstrap
-        state_images[bmoweb_bootstrapped_key] = bmoweb_bootstrap
-        state_images['ldap'] = images['ldap']
-        state_images['pulse'] = images['pulse']
-        state_images[autolanddb_bootstrapped_key] = autolanddb_bootstrap
-        state_images[autoland_bootstrapped_key] = autoland_bootstrap
-        #state_images[rbweb_bootstrapped_key] = rbweb_bootstrap
-        self.state['last-bmodb-bootstrap-id'] = bmodb_bootstrap
-        self.state['last-bmoweb-bootstrap-id'] = bmoweb_bootstrap
-        self.state['last-autolanddb-bootstrap-id'] = autolanddb_bootstrap
-        self.state['last-autoland-bootstrap-id'] = autoland_bootstrap
-        #self.state['last-rbweb-bootstrap-id'] = rbweb_bootstrap
-        self.save_state()
+        db_bootstrap = db_future.result()['Id']
+        web_bootstrap = web_future.result()['Id']
 
         print('removing non-bootstrapped containers')
 
-        with futures.ThreadPoolExecutor(4) as e:
-            e.submit(self.client.remove_container, bmoweb_id)
-            e.submit(self.client.remove_container, bmodb_id)
-            #e.submit(self.client.remove_container, rbweb_id)
-            e.submit(self.client.remove_container, autolanddb_id)
-            e.submit(self.client.remove_container, autoland_id)
+        with futures.ThreadPoolExecutor(2) as e:
+            e.submit(self.client.remove_container, web_id)
+            e.submit(self.client.remove_container, db_id)
 
         print('bootstrapped images created')
 
-        return {
-            'autolanddb': autolanddb_bootstrap,
-            'autoland': autoland_bootstrap,
-            'bmodb': bmodb_bootstrap,
-            'bmoweb': bmoweb_bootstrap,
-            'ldap': images['ldap'],
-            'pulse': images['pulse'],
-            #'rbweb': rbweb_bootstrap,
-        }
+        return db_bootstrap, web_bootstrap
 
-    def start_mozreview(self, cluster, hostname=None, http_port=80,
-            ldap_image=None, ldap_port=None, pulse_port=None,
+    def start_mozreview(self, cluster, http_port=80,
+            hgrb_image=None, ldap_image=None, ldap_port=None, pulse_port=None,
             rbweb_port=None, db_image=None, web_image=None, pulse_image=None,
-            rbweb_image=None, autolanddb_image=None,
-            autoland_image=None, autoland_port=None, verbose=False):
+            rbweb_image=None, autolanddb_image=None, ssh_port=None,
+            hg_port=None, autoland_image=None, autoland_port=None,
+            verbose=False):
 
         start_ldap = False
         if ldap_port:
+            start_ldap = True
+
+        start_hgrb = False
+        if ssh_port or hg_port:
+            start_hgrb = True
+            # We need LDAP for SSH logins to work.
             start_ldap = True
 
         start_pulse = False
@@ -511,22 +635,40 @@ class Docker(object):
         if autoland_port:
             start_autoland = True
 
-        if (not db_image or not web_image or not ldap_image
+        start_rbweb = False
+        if rbweb_port or start_autoland or start_hgrb:
+            start_rbweb = True
+
+        known_images = self.all_docker_images()
+        if db_image and db_image not in known_images:
+            db_image = None
+        if web_image and web_image not in known_images:
+            web_image = None
+        if hgrb_image and hgrb_image not in known_images:
+            hgrb_image = None
+        if ldap_image and ldap_image not in known_images:
+            ldap_image = None
+        if pulse_image and pulse_image not in known_images:
+            pulse_image = None
+        if autoland_image and autoland_image not in known_images:
+            autoland_image = None
+        if autolanddb_image and autolanddb_image not in known_images:
+            autolanddb_image = None
+
+        if (not db_image or not web_image or not hgrb_image or not ldap_image
                 or not pulse_image or not autolanddb_image
-                or not autoland_image):
+                or not autoland_image or not rbweb_image):
             images = self.build_mozreview(verbose=verbose)
             autolanddb_image = images['autolanddb']
             autoland_image = images['autoland']
             db_image = images['bmodb']
+            hgrb_image = images['hgrb']
             ldap_image = images['ldap']
             web_image = images['bmoweb']
             pulse_image = images['pulse']
+            rbweb_image = images['rbweb']
 
         containers = self.state['containers'].setdefault(cluster, [])
-
-        if not hostname:
-            hostname = self.docker_hostname
-        url = 'http://%s:%s/' % (hostname, http_port)
 
         with futures.ThreadPoolExecutor(5) as e:
             # Create containers concurrently - no race conditions here.
@@ -536,12 +678,28 @@ class Docker(object):
                 f_pulse_create = e.submit(self.client.create_container,
                         pulse_image)
 
+            bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
+
             f_web_create = e.submit(self.client.create_container,
-                    web_image, environment={'BMO_URL': url})
+                    web_image, environment={'BMO_URL': bmo_url})
+
+            if start_rbweb:
+                f_rbweb_create = e.submit(self.client.create_container,
+                                          rbweb_image,
+                                          command=['/run'],
+                                          entrypoint=['/entrypoint.py'],
+                                          ports=[80])
 
             if start_ldap:
                 f_ldap_create = e.submit(self.client.create_container,
                                          ldap_image)
+
+            if start_hgrb:
+                f_hgrb_create = e.submit(self.client.create_container,
+                                         hgrb_image,
+                                         command=['/run.sh'],
+                                         entrypoint=['/entrypoint.py'],
+                                         ports=[22, 80])
 
             if start_autoland:
                 f_autolanddb_create = e.submit(self.client.create_container,
@@ -549,10 +707,6 @@ class Docker(object):
 
                 f_autoland_create = e.submit(self.client.create_container,
                         autoland_image)
-
-            #f_rbweb_create = e.submit(self.client.create_container,
-            #        rbweb_image)
-
 
             # We expose the database to containers. Start it first.
             db_id = f_db_create.result()['Id']
@@ -573,7 +727,6 @@ class Docker(object):
                 f_start_pulse = e.submit(self.client.start, pulse_id,
                                          port_bindings={5672: pulse_port})
 
-
             if start_ldap:
                 ldap_id = f_ldap_create.result()['Id']
                 containers.append(ldap_id)
@@ -593,10 +746,15 @@ class Docker(object):
                 containers.append(autoland_id)
                 autoland_state = self.client.inspect_container(autoland_id)
 
-            #rbweb_id = f_rbweb_create.result()['Id']
-            #containers.append(rbweb_id)
+            if start_hgrb:
+                hgrb_id = f_hgrb_create.result()['Id']
+                containers.append(hgrb_id)
 
-            # At this point, all containers have started.
+            if start_rbweb:
+                rbweb_id = f_rbweb_create.result()['Id']
+                containers.append(rbweb_id)
+
+            # At this point, all containers have been created.
             self.save_state()
 
             f_start_web = e.submit(self.client.start, web_id,
@@ -604,15 +762,6 @@ class Docker(object):
                     port_bindings={80: http_port})
             f_start_web.result()
             web_state = self.client.inspect_container(web_id)
-
-            #f_start_rbweb = e.submit(self.client.start, rbweb_id,
-            #        links=[
-            #            (db_state['Name'], 'rbdb'),
-            #            (web_state['Name'], 'bzweb'),
-            #        ],
-            #        port_bindings={80: rbweb_port})
-            #f_start_rbweb.result()
-            #rbweb_state = self.client.inspect_container(rbweb_id)
 
             if start_autoland:
                 bind_path = os.path.abspath(os.path.dirname(self._state_path))
@@ -630,38 +779,90 @@ class Docker(object):
                 f_start_ldap.result()
                 ldap_state = self.client.inspect_container(ldap_id)
 
-        wait_bmoweb_port = web_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort']
-        if start_pulse:
-            wait_rabbit_port = pulse_state['NetworkSettings']['Ports']['5672/tcp'][0]['HostPort']
-        #wait_rbweb_port = rbweb_state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort']
+            if start_hgrb:
+                self.client.start(hgrb_id,
+                                  links=[(ldap_state['Name'], 'ldap')],
+                                  port_bindings={22: ssh_port, 80: hg_port})
+                hgrb_state = self.client.inspect_container(hgrb_id)
 
-        #rb_url = 'http://%s:%s/' % (hostname, wait_rbweb_port)
+            if start_rbweb:
+                assert start_autoland
+                self.client.start(rbweb_id,
+                                  links=[(web_state['Name'], 'bmoweb'),
+                                         (pulse_state['Name'], 'pulse'),
+                                         (hgrb_state['Name'], 'hgrb'),
+                                         (autoland_state['Name'], 'autoland'),
+                                  ],
+                                  port_bindings={80: rbweb_port})
+                rbweb_state = self.client.inspect_container(rbweb_id)
+
+        bmoweb_hostname, bmoweb_hostport = \
+                self._get_host_hostname_port(web_state, '80/tcp')
+        bmo_url = 'http://%s:%d/' % (bmoweb_hostname, bmoweb_hostport)
+
+        if start_pulse:
+            rabbit_hostname, rabbit_hostport = \
+                self._get_host_hostname_port(pulse_state, '5672/tcp')
+
+        if start_hgrb:
+            hgssh_hostname, hgssh_hostport = \
+                self._get_host_hostname_port(hgrb_state, '22/tcp')
+            hgweb_hostname, hgweb_hostport = \
+                self._get_host_hostname_port(hgrb_state, '80/tcp')
+
+        if start_rbweb:
+            rbweb_hostname, rbweb_hostport = \
+                self._get_host_hostname_port(rbweb_state, '80/tcp')
+            rbweb_url = 'http://%s:%s/' % (rbweb_hostname, rbweb_hostport)
 
         print('waiting for Bugzilla to start')
-        wait_for_http(self.docker_hostname, wait_bmoweb_port)
-        #wait_for_http(self.docker_hostname, wait_rbweb_port)
+        wait_for_http(bmoweb_hostname, bmoweb_hostport)
         if start_pulse:
-            wait_for_amqp(self.docker_hostname, wait_rabbit_port, 'guest', 'guest')
-        print('Bugzilla accessible on %s' % url)
-        #print('Review Board accessible at %s' % rb_url)
+            wait_for_amqp(rabbit_hostname, rabbit_hostport, 'guest', 'guest')
+        if start_hgrb:
+            wait_for_ssh(hgssh_hostname, hgssh_hostport)
+            wait_for_http(hgweb_hostname, hgweb_hostport)
+        if start_rbweb:
+            wait_for_http(rbweb_hostname, rbweb_hostport)
+
+        print('Bugzilla accessible on %s' % bmo_url)
 
         result = {
-            'bugzilla_url': url,
+            'bugzilla_url': bmo_url,
             'db_id': db_id,
             'web_id': web_id,
-            'pulse_host': self.docker_hostname,
-            'pulse_port': pulse_port,
         }
 
         if start_autoland:
             result['autolanddb_id'] = autolanddb_id
             result['autoland_id'] = autoland_id
+            autoland_hostname, autoland_hostport = \
+                    self._get_host_hostname_port(autoland_state, '80/tcp')
+            result['autoland_url'] = 'http://%s:%d/' % (autoland_hostname,
+                                                        autoland_hostport)
+
+        if start_pulse:
+            result['pulse_id'] = pulse_id
+            result['pulse_host'] = rabbit_hostname
+            result['pulse_port'] = rabbit_hostport
 
         if start_ldap:
-            ldap_port = int(ldap_state['NetworkSettings']['Ports']['389/tcp'][0]['HostPort'])
+            ldap_hostname, ldap_hostport = \
+                    self._get_host_hostname_port(ldap_state, '389/tcp')
             result['ldap_id'] = ldap_id
-            result['ldap_uri'] = 'ldap://%s:%d/' % (self.docker_hostname,
-                                                    ldap_port)
+            result['ldap_uri'] = 'ldap://%s:%d/' % (ldap_hostname,
+                                                    ldap_hostport)
+
+        if start_hgrb:
+            result['hgrb_id'] = hgrb_id
+            result['ssh_hostname'] = hgssh_hostname
+            result['ssh_port'] = hgssh_hostport
+            result['mercurial_url'] = 'http://%s:%d/' % (hgweb_hostname,
+                                                         hgweb_hostport)
+
+        if start_rbweb:
+            result['rbweb_id'] = rbweb_id
+            result['reviewboard_url'] = rbweb_url
 
         return result
 
@@ -691,13 +892,17 @@ class Docker(object):
             'hgweb',
             'ldap',
             'pulse',
-            #'rbweb',
-        ], verbose=verbose)
+        ], ansibles={
+            'hgrb': ('docker-hgrb', 'centos6'),
+            'rbweb': ('docker-rbweb', 'centos6'),
+        }, verbose=verbose)
 
         with futures.ThreadPoolExecutor(2) as e:
             f_mr = e.submit(self.build_mozreview, images=images,
                             verbose=verbose)
             f_hgmo = e.submit(self.build_hgmo, images=images, verbose=verbose)
+
+        self.prune_images()
 
         return f_mr.result(), f_hgmo.result()
 
@@ -705,7 +910,7 @@ class Docker(object):
         image = self.ensure_built(builder, verbose=True)
         container = self.client.create_container(image)['Id']
 
-        with self._start_container(container, port_bindings={80: None}) as state:
+        with self.start_container(container, port_bindings={80: None}) as state:
             port = int(state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
 
             print(message)
@@ -741,21 +946,20 @@ class Docker(object):
         running = set(self.get_full_image(c['Image'])
                       for c in self.client.containers())
 
-        candidates = []
-
         ignore_images = set([
+            self.state['last-autoland-id'],
+            self.state['last-autolanddb-id'],
             self.state['last-bmodb-id'],
             self.state['last-bmoweb-id'],
+            self.state['last-hgrb-id'],
             self.state['last-pulse-id'],
             self.state['last-rbweb-id'],
-            self.state['last-db-bootstrap-id'],
-            self.state['last-web-bootstrap-id'],
-            self.state['last-rbweb-bootstrap-id'],
-            self.state['last-autolanddb-bootstrap-id'],
-            self.state['last-autoland-bootstrap-id'],
+            self.state['last-bmodb-bootstrap-id'],
+            self.state['last-bmoweb-bootstrap-id'],
             self.state['last-hgmaster-id'],
             self.state['last-hgweb-id'],
             self.state['last-ldap-id'],
+            self.state['last-vct-id'],
         ])
 
         relevant_repos = set([
@@ -765,15 +969,18 @@ class Docker(object):
             'bmodb-volatile-bootstrapped',
             'pulse',
             'rbweb',
-            'rbweb-bootstrapped',
             'autolanddb',
             'autolanddb-bootstrapped',
             'autoland',
             'autoland-bootstrapped',
             'hgmaster',
+            'hgrb',
             'hgweb',
             'ldap',
+            'vct',
         ])
+
+        to_delete = {}
 
         for i in self.client.images():
             iid = i['Id']
@@ -790,18 +997,18 @@ class Docker(object):
             for repotag in i['RepoTags']:
                 repo, tag = repotag.split(':')
                 if repo in relevant_repos:
-                    candidates.append(iid)
+                    to_delete[iid] = repo
                     break
 
         retained = {}
         for key, image in sorted(self.state['images'].items()):
-            if image in candidates:
+            if image not in to_delete:
                 retained[key] = image
 
-        with futures.ThreadPoolExecutor(4) as e:
-            for iid in candidates:
-                print('Removing image %s' % iid)
-                e.submit(self.client.remove_image, iid)
+        with futures.ThreadPoolExecutor(8) as e:
+            for image, repo in to_delete.items():
+                print('Pruning old %s image %s' % (repo, image))
+                e.submit(self.client.remove_image, image)
 
         self.state['images'] = retained
         self.save_state()
@@ -810,8 +1017,12 @@ class Docker(object):
         with open(self._state_path, 'wb') as fh:
             json.dump(self.state, fh)
 
+    def all_docker_images(self):
+        """Obtain the set of all known Docker image IDs."""
+        return {i['Id'] for i in self.client.images(all=True)}
+
     @contextmanager
-    def _start_container(self, cid, **kwargs):
+    def start_container(self, cid, **kwargs):
         """Context manager for starting and stopping a Docker container.
 
         The container with id ``cid`` will be started when the context manager is
@@ -826,6 +1037,89 @@ class Docker(object):
             yield state
         finally:
             self.client.stop(cid, timeout=20)
+
+    @contextmanager
+    def create_container(self, image, remove_volumes=False, **kwargs):
+        """Context manager for creating a temporary container.
+
+        A container will be created from an image. When the context manager
+        exists, the container will be removed.
+
+        This context manager is useful for temporary containers that shouldn't
+        outlive the life of the process.
+        """
+        s = self.client.create_container(image, **kwargs)
+        try:
+            yield s
+        finally:
+            self.client.remove_container(s['Id'], force=True, v=remove_volumes)
+
+    @contextmanager
+    def vct_container(self, image=None, cid=None, verbose=False):
+        """Obtain a container with content of v-c-t available inside.
+
+        We employ some hacks to make this as fast as possible. Three run modes
+        are possible:
+
+        1) Client passes in a running container (``cid``)
+        2) A previously executed container is available to start
+        3) We create and start a temporary container.
+
+        The multiple code paths make the logic a bit difficult. But it makes
+        code in consumers slightly easier to follow.
+        """
+        existing_cid = self.state['vct-cid']
+
+        # If we're going to use an existing container, verify it exists.
+        if not cid and existing_cid:
+            try:
+                state = self.client.inspect_container(existing_cid)
+            except DockerAPIError:
+                existing_cid = None
+                self.state['vct-cid'] = None
+
+        # Build the image if we're in temporary container mode.
+        if not image and not cid and not existing_cid:
+            image = self.ensure_built('vct', verbose=verbose)
+
+        start = False
+
+        if cid:
+            state = self.client.inspect_container(cid)
+            if not state['State']['Running']:
+                raise Exception('Passed container ID is not running')
+        elif existing_cid:
+            cid = existing_cid
+            start = True
+        else:
+            cid = self.client.create_container(image,
+                                               volumes=['/vct-mount'],
+                                               ports=[873])['Id']
+            start = True
+
+        try:
+            if start:
+                self.client.start(cid, port_bindings={873: None})
+                state = self.client.inspect_container(cid)
+                port = state['NetworkSettings']['Ports']['873/tcp'][0]['HostPort']
+                url = 'rsync://%s:%s/vct-mount/' % (self.docker_hostname, port)
+
+                vct_paths = self._get_vct_files()
+                with tempfile.NamedTemporaryFile() as fh:
+                    for f in sorted(vct_paths.keys()):
+                        fh.write('%s\n' % f)
+                    fh.flush()
+
+                    rsync('-a', '--delete-before', '--files-from', fh.name, ROOT, url)
+
+                self.state['last-vct-id'] = image
+                self.state['vct-cid'] = cid
+                self.save_state()
+
+            yield state
+        finally:
+            if start:
+                self.client.stop(cid)
 
     def get_file_content(self, cid, path):
         """Get the contents of a file from a container."""
@@ -908,3 +1202,20 @@ class Docker(object):
             c.arcs = arcs
 
             yield c
+
+    def _get_host_hostname_port(self, state, port):
+        """Resolve the host hostname and port number for an exposed port."""
+        host_port = state['NetworkSettings']['Ports'][port][0]
+        host_ip = host_port['HostIp']
+        host_port = int(host_port['HostPort'])
+
+        if host_ip != '0.0.0.0':
+            return host_ip, host_port
+
+        if self.docker_hostname != 'localhost':
+            return self.docker_hostname, host_port
+
+        # This works when Docker is running locally, which is common. But it
+        # is far from robust.
+        gateway = state['NetworkSettings']['Gateway']
+        return gateway, host_port

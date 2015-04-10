@@ -8,13 +8,13 @@ EOF
 clientconfig() {
   cat >> $1 << EOF
 [ui]
-ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
+ssh = $TESTDIR/testing/mozreview-ssh
 
 [mozilla]
 ircnick = mynick
 
 [paths]
-default-push = ssh://user@dummy/$TESTTMP/repos/test-repo
+default-push = ssh://${HGSSH_HOST}:${HGSSH_PORT}/test-repo
 
 [bugzilla]
 username = ${BUGZILLA_USERNAME}
@@ -40,19 +40,31 @@ alias mozreview='$TESTDIR/mozreview'
 alias ottoland='$TESTDIR/ottoland'
 
 commonenv() {
-  mozreview start `pwd` --mercurial-port $HGPORT --reviewboard-port $HGPORT1 --bugzilla-port $HGPORT2 --pulse-port $HGPORT3 --autoland-port $HGPORT4 --ldap-port $HGPORT5 > /dev/null
-  export MOZREVIEW_HOME=`pwd`
+  mozreview start `pwd` \
+    --mercurial-port $HGPORT \
+    --reviewboard-port $HGPORT1 \
+    --bugzilla-port $HGPORT2 \
+    --pulse-port $HGPORT3 \
+    --autoland-port $HGPORT4 \
+    --ldap-port $HGPORT5 \
+    --ssh-port $HGPORT6 \
+    > /dev/null
+
+  # MozReview randomly fails to start. Handle it elegantly.
+  if [ $? -ne 0 ]; then
+    exit 80
+  fi
+
+  $(mozreview shellinit `pwd`)
+
   export HGSSHHGRCPATH=${MOZREVIEW_HOME}/hgrc
 
   createandusedefaultuser > /dev/null
+  mozreview create-ldap-user default@example.com defaultuser 2000 'Default User' \
+    --key-file ${MOZREVIEW_HOME}/keys/default@example.com \
+    --scm-level 1
 
   mozreview create-repo test-repo > /dev/null
-
-  export BUGZILLA_URL=http://${DOCKER_HOSTNAME}:$HGPORT2
-  export REVIEWBOARD_URL=http://localhost:$HGPORT1/
-  export PULSE_HOST=${DOCKER_HOSTNAME}
-  export PULSE_PORT=${HGPORT3}
-  export AUTOLAND_URL=http://${DOCKER_HOSTNAME}:${HGPORT4}/
 
   hg init client
   clientconfig client/.hg/hgrc

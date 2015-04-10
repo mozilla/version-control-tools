@@ -1,0 +1,4 @@
+---
+- hosts: localhost
+  roles:
+    - docker-hg-reviewboard

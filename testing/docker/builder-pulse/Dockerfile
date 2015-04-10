@@ -1,8 +1,8 @@
-FROM ubuntu:14.04.1
+FROM ubuntu:14.04.2
 
 ENV RABBITMQ_CONFIG_FILE /etc/rabbitmq/rabbitmq
 
-RUN apt-get update && apt-get -y install rabbitmq-server
+RUN apt-get update && apt-get --no-install-recommends -y install rabbitmq-server
 
 ADD rabbitmq.config /etc/rabbitmq/rabbitmq.config
 

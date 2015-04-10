@@ -2,13 +2,15 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from __future__ import absolute_import, print_function
+
 import errno
 import json
+import logging
 import os
 import subprocess
-import urlparse
 
-import concurrent.futures as futures
+import paramiko
 
 from vcttesting.bugzilla import Bugzilla
 from vcttesting.docker import (
@@ -17,13 +19,36 @@ from vcttesting.docker import (
 )
 from vcttesting.reviewboard import MozReviewBoard
 
-from .util import (
-    get_available_port,
-    kill,
-)
+from .ldap import LDAP
+from .util import get_available_port
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
+
+
+SSH_CONFIG = '''
+Host *
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  PreferredAuthentications publickey
+  UserKnownHostsFile {known_hosts}
+  ForwardX11 no
+
+Host hgrb
+  HostName {hostname}
+  Port {port}
+'''.strip()
+
+
+logger = logging.getLogger(__name__)
+
+
+WATCHMAN = None
+for path in os.environ['PATH'].split(':'):
+    c = os.path.join(path, 'watchman')
+    if os.path.exists(c):
+        WATCHMAN = c
+        break
 
 
 class MozReview(object):
@@ -32,8 +57,9 @@ class MozReview(object):
     This class can be used to create and control MozReview instances.
     """
 
-    def __init__(self, path, web_image=None, db_image=None, ldap_image=None,
-                 pulse_image=None, autolanddb_image=None, autoland_image=None):
+    def __init__(self, path, web_image=None, db_image=None, hgrb_image=None,
+                 ldap_image=None, pulse_image=None, rbweb_image=None,
+                 autolanddb_image=None, autoland_image=None):
         if not path:
             raise Exception('You must specify a path to create an instance')
         path = os.path.abspath(path)
@@ -41,8 +67,10 @@ class MozReview(object):
 
         self.db_image = db_image
         self.web_image = web_image
+        self.hgrb_image = hgrb_image
         self.ldap_image = ldap_image
         self.pulse_image = pulse_image
+        self.rbweb_image = rbweb_image
         self.autolanddb_image = autolanddb_image
         self.autoland_image = autoland_image
 
@@ -51,20 +79,19 @@ class MozReview(object):
         if not os.path.exists(path):
             os.mkdir(path)
 
+        keys_path = os.path.join(path, 'keys')
+        if not os.path.exists(keys_path):
+            os.mkdir(keys_path)
+
         self._state_path = os.path.join(path, 'state.json')
 
         docker_state = os.path.join(path, 'docker-state.json')
 
         self._docker_state = docker_state
 
-        docker_url, tls = params_from_env(os.environ)
-        self._docker = Docker(docker_state, docker_url, tls=tls)
-
-        if not self._docker.is_alive():
-            raise Exception('Docker is not available.')
-
         self.bugzilla_username = None
         self.bugzilla_password = None
+        self.docker_env = {}
 
         if os.path.exists(self._state_path):
             with open(self._state_path, 'rb') as fh:
@@ -72,6 +99,19 @@ class MozReview(object):
 
                 for k, v in state.items():
                     setattr(self, k, v)
+
+        # Preserve Docker settings from last time.
+        #
+        # This was introduced to make watchman happy, as its triggers may not
+        # inherit environment variables.
+        for k, v in self.docker_env.items():
+            os.environ[k] = v
+
+        docker_url, tls = params_from_env(os.environ)
+        self._docker = Docker(docker_state, docker_url, tls=tls)
+
+        if not self._docker.is_alive():
+            raise Exception('Docker is not available.')
 
     def get_bugzilla(self, username=None, password=None):
         username = username or self.bugzilla_username or 'admin@example.com'
@@ -81,25 +121,21 @@ class MozReview(object):
 
     def get_reviewboard(self):
         """Obtain a MozReviewBoard instance tied to this MozReview instance."""
-        return MozReviewBoard(self._path,
+        return MozReviewBoard(self._docker, self.rbweb_id,
+                              self.reviewboard_url,
                               bugzilla_url=self.bugzilla_url,
                               pulse_host=self.pulse_host,
                               pulse_port=self.pulse_port)
 
-    def restart_reviewboard(self):
-        rb = self.get_reviewboard()
-        rb.stop()
-
-        url = urlparse.urlparse(self.reviewboard_url)
-        rb.start(url.port)
-
-        return self.reviewboard_url
-
+    def get_ldap(self):
+        """Obtain an LDAP instance connected to the LDAP server in this instance."""
+        return LDAP(self.ldap_uri, 'cn=admin,dc=mozilla', 'password')
 
     def start(self, bugzilla_port=None, reviewboard_port=None,
             mercurial_port=None, pulse_port=None, verbose=False,
-            db_image=None, web_image=None, ldap_image=None, ldap_port=None,
-            pulse_image=None,
+            db_image=None, web_image=None, hgrb_image=None,
+            ldap_image=None, ldap_port=None, pulse_image=None,
+            rbweb_image=None, ssh_port=None,
             autolanddb_image=None, autoland_image=None, autoland_port=None):
         """Start a MozReview instance."""
         if not bugzilla_port:
@@ -110,6 +146,8 @@ class MozReview(object):
             mercurial_port = get_available_port()
         if not ldap_port:
             ldap_port = get_available_port()
+        if not ssh_port:
+            ssh_port = get_available_port()
         if not pulse_port:
             pulse_port = get_available_port()
         if not autoland_port:
@@ -117,76 +155,105 @@ class MozReview(object):
 
         db_image = db_image or self.db_image
         web_image = web_image or self.web_image
+        hgrb_image = hgrb_image or self.hgrb_image
         ldap_image = ldap_image or self.ldap_image
         pulse_image = pulse_image or self.pulse_image
+        rbweb_image = rbweb_image or self.rbweb_image
         autolanddb_image = autolanddb_image or self.autolanddb_image
         autoland_image = autoland_image or self.autoland_image
 
-        rb = MozReviewBoard(self._path)
-
-        with futures.ThreadPoolExecutor(2) as e:
-            f_mr_info = e.submit(self._docker.start_mozreview,
-                                 cluster=self._name,
-                                 hostname=None,
-                                 http_port=bugzilla_port,
-                                 pulse_port=pulse_port,
-                                 db_image=db_image,
-                                 web_image=web_image,
-                                 ldap_image=ldap_image,
-                                 ldap_port=ldap_port,
-                                 pulse_image=pulse_image,
-                                 autolanddb_image=autolanddb_image,
-                                 autoland_image=autoland_image,
-                                 autoland_port=autoland_port,
-                                 verbose=verbose)
-
-            e.submit(rb.create)
-
-        mr_info = f_mr_info.result()
-        rb.bugzilla_url = mr_info['bugzilla_url']
-        rb.pulse_host = mr_info['pulse_host']
-        rb.pulse_port = mr_info['pulse_port']
+        mr_info = self._docker.start_mozreview(
+                cluster=self._name,
+                http_port=bugzilla_port,
+                pulse_port=pulse_port,
+                db_image=db_image,
+                web_image=web_image,
+                hgrb_image=hgrb_image,
+                ldap_image=ldap_image,
+                ldap_port=ldap_port,
+                pulse_image=pulse_image,
+                rbweb_image=rbweb_image,
+                rbweb_port=reviewboard_port,
+                ssh_port=ssh_port,
+                hg_port=mercurial_port,
+                autolanddb_image=autolanddb_image,
+                autoland_image=autoland_image,
+                autoland_port=autoland_port,
+                verbose=verbose)
 
         self.bugzilla_url = mr_info['bugzilla_url']
         bugzilla = self.get_bugzilla()
 
-        reviewboard_url = 'http://localhost:%s/' % reviewboard_port
-        self.reviewboard_url = reviewboard_url
+        self.reviewboard_url = mr_info['reviewboard_url']
+        self.rbweb_id = mr_info['rbweb_id']
 
-        autoland_url = 'http://localhost:%s/' % autoland_port
-        self.autoland_url = autoland_url
-
-        with futures.ThreadPoolExecutor(2) as e:
-            f_rb_pid = e.submit(rb.start, reviewboard_port)
-            f_hg_pid = e.submit(self._start_mercurial_server, mercurial_port)
-
-        reviewboard_pid = f_rb_pid.result()
-        self.reviewboard_pid = reviewboard_pid
-
-        rb.make_admin(bugzilla.username)
+        self.autoland_url = mr_info['autoland_url']
+        self.pulse_host = mr_info['pulse_host']
+        self.pulse_port = mr_info['pulse_port']
 
         self.admin_username = bugzilla.username
         self.admin_password = bugzilla.password
         self.ldap_uri = mr_info['ldap_uri']
-        self.pulse_host = mr_info['pulse_host']
-        self.pulse_port = mr_info['pulse_port']
+        self.hgrb_id = mr_info['hgrb_id']
+        self.ssh_hostname = mr_info['ssh_hostname']
+        self.ssh_port = mr_info['ssh_port']
+        self.mercurial_url = mr_info['mercurial_url']
 
-        mercurial_pid = f_hg_pid.result()
-        self.mercurial_pid = mercurial_pid
-        self.mercurial_url = 'http://localhost:%s/' % mercurial_port
+        # Ensure admin user is present and has admin privileges.
+        rb = self.get_reviewboard()
+        rb.login_user(bugzilla.username, bugzilla.password)
+        rb.make_admin(bugzilla.username)
+
+        # Tell hgrb about URLs.
+        self._docker.client.execute(
+                self.hgrb_id,
+                ['/set-urls', self.bugzilla_url, self.reviewboard_url])
+
+        # Define site domain and hostname in rbweb. This is necessary so it
+        # constructs self-referential URLs properly.
+        self._docker.client.execute(self.rbweb_id,
+                                    ['/set-site-url', self.reviewboard_url])
+
+        hg_ssh_host_key = self._docker.get_file_content(
+                mr_info['hgrb_id'],
+                '/etc/ssh/ssh_host_rsa_key.pub').rstrip()
+        key_type, key_key = hg_ssh_host_key.split()
+
+        assert key_type == 'ssh-rsa'
+        key = paramiko.rsakey.RSAKey(data=paramiko.py3compat.decodebytes(key_key))
+
+        hostkeys_path = os.path.join(self._path, 'ssh-known-hosts')
+        load_path = hostkeys_path if os.path.exists(hostkeys_path) else None
+        hostkeys = paramiko.hostkeys.HostKeys(filename=load_path)
+        hoststring = '[%s]:%d' % (mr_info['ssh_hostname'], mr_info['ssh_port'])
+        hostkeys.add(hoststring, key_type, key)
+        hostkeys.save(hostkeys_path)
+
+        with open(os.path.join(self._path, 'ssh_config'), 'wb') as fh:
+            fh.write(SSH_CONFIG.format(
+                known_hosts=hostkeys_path,
+                hostname=self.ssh_hostname,
+                port=self.ssh_port))
 
         state = {
+            'bmoweb_id': mr_info['web_id'],
+            'bmodb_id': mr_info['db_id'],
             'bugzilla_url': self.bugzilla_url,
-            'reviewboard_url': reviewboard_url,
-            'reviewboard_pid': reviewboard_pid,
+            'reviewboard_url': self.reviewboard_url,
+            'rbweb_id': self.rbweb_id,
             'mercurial_url': self.mercurial_url,
-            'mercurial_pid': mercurial_pid,
             'admin_username': bugzilla.username,
             'admin_password': bugzilla.password,
             'ldap_uri': mr_info['ldap_uri'],
+            'pulse_id': mr_info['pulse_id'],
             'pulse_host': mr_info['pulse_host'],
             'pulse_port': mr_info['pulse_port'],
             'autoland_url': self.autoland_url,
+            'autoland_id': mr_info['autoland_id'],
+            'hgrb_id': self.hgrb_id,
+            'ssh_hostname': self.ssh_hostname,
+            'ssh_port': self.ssh_port,
+            'docker_env': {k: v for k, v in os.environ.items() if k.startswith('DOCKER')}
         }
 
         with open(self._state_path, 'wb') as fh:
@@ -194,39 +261,70 @@ class MozReview(object):
 
     def stop(self):
         """Stop all services associated with this MozReview instance."""
-        with futures.ThreadPoolExecutor(2) as e:
-            rb = MozReviewBoard(self._path)
-            e.submit(rb.stop)
+        self._docker.stop_bmo(self._name)
 
-            e.submit(self._docker.stop_bmo, self._name)
+        if WATCHMAN:
+            with open(os.devnull, 'wb') as devnull:
+                subprocess.call([WATCHMAN, 'trigger-del', ROOT,
+                                 'mozreview-%s' % os.path.basename(self._path)],
+                                stdout=devnull, stderr=subprocess.STDOUT)
 
-            if os.path.exists(self._hg_pid_path):
-                with open(self._hg_pid_path, 'rb') as fh:
-                    pid = int(fh.read().strip())
-                    kill(pid)
+    def refresh(self, verbose=False):
+        """Refresh a running cluster with latest version of code.
 
-                os.unlink(self._hg_pid_path)
+        This only updates code from the v-c-t repo. Not all containers
+        are currently updated.
+        """
+        with self._docker.vct_container(verbose=verbose) as vct_state:
+            # We update rbweb by rsyncing state and running the refresh script.
+            rsync_port = vct_state['NetworkSettings']['Ports']['873/tcp'][0]['HostPort']
+            url = 'rsync://%s:%s/vct-mount/' % (self._docker.docker_hostname,
+                                                rsync_port)
+            res = self._docker.client.execute(self.rbweb_id, ['/refresh', url],
+                                              stream=True)
+            for msg in res:
+                if verbose:
+                    print(msg, end='')
 
-    def create_repository(self, path):
-        url = '%s%s' % (self.mercurial_url, path)
-        full_path = os.path.join(self._path, 'repos', path)
+    def start_autorefresh(self):
+        """Enable auto refreshing of the cluster when changes are made.
 
-        env = dict(os.environ)
-        env['HGRCPATH'] = '/dev/null'
-        subprocess.check_call([self._hg, 'init', full_path], env=env)
+        Watchman will be configured to start watching the source directory.
+        When relevant files are changed, containers will be synchronized
+        automatically.
 
-        rb = MozReviewBoard(self._path)
-        rbid = rb.add_repository(os.path.dirname(path) or path, url,
+        When enabled, this removes overhead from developers having to manually
+        refresh state during development.
+        """
+        if not WATCHMAN:
+            raise Exception('watchman binary not found')
+        subprocess.check_call([WATCHMAN, 'watch-project', ROOT])
+        name = 'mozreview-%s' % os.path.basename(self._path)
+
+        data = json.dumps(['trigger', ROOT, {
+            'name': name,
+            'chdir': ROOT,
+            'expression': ['pcre', 'pylib/(mozreview|rbbz)/.*'],
+            'command': ['%s/mozreview' % ROOT, 'refresh', self._path],
+        }])
+        p = subprocess.Popen([WATCHMAN, '-j'], stdin=subprocess.PIPE)
+        p.communicate(data)
+        res = p.wait()
+        if res != 0:
+            raise Exception('error creating watchman trigger')
+
+    def create_repository(self, name):
+        http_url = '%s%s' % (self.mercurial_url, name)
+        ssh_url = 'ssh://%s:%d/%s' % (self.ssh_hostname, self.ssh_port, name)
+
+        rb = self.get_reviewboard()
+        rbid = rb.add_repository(os.path.dirname(name) or name, http_url,
                                  bugzilla_url=self.bugzilla_url)
 
-        with open(os.path.join(full_path, '.hg', 'hgrc'), 'w') as fh:
-            fh.write('\n'.join([
-                '[reviewboard]',
-                'repoid = %s' % rbid,
-                '',
-            ]))
+        self._docker.client.execute(self.hgrb_id,
+                                    ['/create-repo', name, str(rbid)])
 
-        return url, rbid
+        return http_url, ssh_url, rbid
 
     def get_local_repository(self, path, ircnick=None,
                              bugzilla_username=None,
@@ -250,22 +348,37 @@ class MozReview(object):
         local_path = os.path.join(localrepos, os.path.basename(path))
 
         http_url = '%s%s' % (self.mercurial_url, path)
-        ssh_url = 'ssh://user@dummy%s/localrepos/%s' % (self._path, path)
+        ssh_url = 'ssh://%s:%d/%s' % (self.ssh_hostname, self.ssh_port, path)
 
         # TODO make pushes via SSH work (it doesn't work outside of Mercurial
         # tests because dummy expects certain environment variables).
-        return LocalMercurialRepository(self._hg, local_path, http_url,
-                                        ircnick=ircnick,
+        return LocalMercurialRepository(self._path, self._hg, local_path,
+                                        http_url, push_url=ssh_url, ircnick=ircnick,
                                         bugzilla_username=bugzilla_username,
                                         bugzilla_password=bugzilla_password)
 
-    def create_user(self, email, password, fullname):
+    def create_user(self, email, password, fullname, uid=None, username=None,
+                    scm_level=None):
         b = self.get_bugzilla()
-        return b.create_user(email, password, fullname)
 
-    @property
-    def _hg_pid_path(self):
-        return os.path.join(self._path, 'hg.pid')
+        if not username:
+            username = email[0:email.index('@')]
+
+        res = {
+            'bugzilla': b.create_user(email, password, fullname),
+        }
+
+        # Create an LDAP account as well.
+        if uid:
+            key_filename = os.path.join(self._path, 'keys', email)
+            lr = self.get_ldap().create_user(email, username, uid,
+                                             fullname,
+                                             key_filename=key_filename,
+                                             scm_level=scm_level)
+
+            res.update(lr)
+
+        return res
 
     @property
     def _hg(self):
@@ -276,74 +389,6 @@ class MozReview(object):
 
         raise Exception('could not find hg executable')
 
-    def _start_mercurial_server(self, port):
-        repos_path = os.path.join(self._path, 'repos')
-        if not os.path.exists(repos_path):
-            os.mkdir(repos_path)
-
-        rb_ext_path = os.path.join(ROOT, 'hgext', 'reviewboard', 'server.py')
-        dummyssh = os.path.join(ROOT, 'pylib', 'mercurial-support', 'dummyssh')
-
-        global_hgrc = os.path.join(self._path, 'hgrc')
-        with open(global_hgrc, 'w') as fh:
-            fh.write('\n'.join([
-                '[phases]',
-                'publish = False',
-                '',
-                '[ui]',
-                'ssh = python "%s"' % dummyssh,
-                '',
-                '[reviewboard]',
-                'url = %s' % self.reviewboard_url,
-                '',
-                '[extensions]',
-                'reviewboard = %s' % rb_ext_path,
-                '',
-                '[bugzilla]',
-                'url = %s' % self.bugzilla_url,
-                '',
-            ]))
-
-        web_conf = os.path.join(self._path, 'web.conf')
-        with open(web_conf, 'w') as fh:
-            fh.write('\n'.join([
-                '[web]',
-                'push_ssl = False',
-                'allow_push = *',
-                '',
-                '[paths]',
-                '/ = %s/**' % repos_path,
-                '',
-            ]))
-
-        # hgwebdir doesn't pick up new repositories until 20s after they
-        # are created. We install an extension to always refresh.
-        refreshing_path = os.path.join(ROOT, 'testing',
-                                       'refreshinghgwebdir.py')
-
-        env = os.environ.copy()
-        env['HGRCPATH'] = global_hgrc
-        env['HGENCODING'] = 'UTF-8'
-        args = [
-            self._hg,
-            '--config', 'extensions.refreshinghgwebdir=%s' % refreshing_path,
-            'serve',
-            '-d',
-            '-p', str(port),
-            '--pid-file', self._hg_pid_path,
-            '--web-conf', web_conf,
-            '--accesslog', os.path.join(self._path, 'hg.access.log'),
-            '--errorlog', os.path.join(self._path, 'hg.error.log'),
-        ]
-        # We execute from / so Mercurial doesn't pick up config files
-        # from parent directories.
-        subprocess.check_call(args, env=env, cwd='/')
-
-        with open(self._hg_pid_path, 'rb') as fh:
-            pid = fh.read().strip()
-
-        return pid
-
 
 class LocalMercurialRepository(object):
     """An interface to a Mercurial repository on the local filesystem.
@@ -351,10 +396,11 @@ class LocalMercurialRepository(object):
     This class facilitates easily running ``hg`` commands against a local
     repository from the context of Python.
     """
-    def __init__(self, hg, path, default_url, push_url=None, ircnick=None,
-                 bugzilla_username=None, bugzilla_password=None):
+    def __init__(self, mrpath, hg, path, default_url, push_url=None,
+                 ircnick=None, bugzilla_username=None, bugzilla_password=None):
         """Create a local Mercurial repository.
 
+        ``mrpath`` is the home directory of the MozReview installation.
         ``hg`` is the hg binary to use.
         ``path`` is the local path to initialize the repository at.
         ``default_url`` is the URL for the default path to the repository.
@@ -363,19 +409,21 @@ class LocalMercurialRepository(object):
         ``bugzilla_username`` and ``bugzilla_password`` define the credentials
         to use when talking to Bugzilla or MozReview.
         """
+        self.mrpath = mrpath
         self.hg = hg
         self.path = path
+        self.bugzilla_username = bugzilla_username
 
         if not os.path.exists(path):
             subprocess.check_call([self.hg, 'init', path], cwd='/')
 
-        dummyssh = os.path.join(ROOT, 'pylib', 'mercurial-support', 'dummyssh')
+        mrssh = os.path.join(ROOT, 'testing', 'mozreview-ssh')
         reviewboard = os.path.join(ROOT, 'hgext', 'reviewboard', 'client.py')
 
         with open(os.path.join(path, '.hg', 'hgrc'), 'w') as fh:
             fh.write('\n'.join([
                 '[paths]',
-                'default = %s' % default_url,
+                'default = %s\n' % default_url,
             ]))
             if push_url:
                 fh.write('default-push = %s\n' % push_url)
@@ -396,7 +444,7 @@ class LocalMercurialRepository(object):
 
             fh.write('\n'.join([
                 '[ui]',
-                'ssh = python "%s"' % dummyssh,
+                'ssh = %s' % mrssh,
                 '',
                 '[defaults]',
                 'backout = -d "0 0"',
@@ -421,9 +469,19 @@ class LocalMercurialRepository(object):
         env['LANG'] = env['LC_ALL'] = env['LANGUAGE'] = 'C'
         env['HGENCODING'] = 'ascii'
 
-        return subprocess.check_output(cmd, cwd=self.path,
-                                       stderr=subprocess.STDOUT,
-                                       env=env)
+        # Needed so SSH wrapper picks the right key.
+        if self.bugzilla_username:
+            env['MOZREVIEW_HOME'] = self.mrpath
+            env['SSH_KEYNAME'] = self.bugzilla_username
+
+        try:
+            logger.info('Running command: %s' % cmd)
+            return subprocess.check_output(cmd, cwd=self.path,
+                                           stderr=subprocess.STDOUT,
+                                           env=env)
+        except subprocess.CalledProcessError as e:
+            logger.error('Error running command: %s' % e.output)
+            raise
 
     def touch(self, path):
         p = os.path.join(self.path, path)

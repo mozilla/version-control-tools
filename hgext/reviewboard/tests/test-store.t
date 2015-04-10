@@ -14,26 +14,28 @@ Pushing a review will create the reviews file
 
   $ echo "foo" >> foo
   $ hg commit -m 'Bug 1 - second commit'
-  $ hg push ssh://user@dummy/$TESTTMP/repos/test-repo
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ hg push
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
   changeset:  1:be8ff4f28043
   summary:    Bug 1 - second commit
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ cat .hg/reviews
-  u http://localhost:$HGPORT1
-  r ssh://user@dummy/$TESTTMP/repos/test-repo
+  u http://*:$HGPORT1 (glob)
+  r ssh://*:$HGPORT6/test-repo (glob)
   p bz://1/mynick 1
   c be8ff4f2804309fdbe6048ff76559f8e391ce765 2
   pc be8ff4f2804309fdbe6048ff76559f8e391ce765 1
@@ -52,4 +54,4 @@ Pushing a review will create the reviews file
 Cleanup
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

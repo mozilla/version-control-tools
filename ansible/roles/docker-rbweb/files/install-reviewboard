@@ -1,0 +1,69 @@
+#!/venv/bin/python -u
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import os
+import subprocess
+import sys
+
+ROOT = '/reviewboard'
+
+os.environ['HOME'] = '%s/data' % ROOT
+sys.path.insert(0, '%s/conf' % ROOT)
+
+# Ensure settings allow proper access.
+lines = open('%s/conf/settings_local.py' % ROOT, 'rb').readlines()
+with open('%s/conf/settings_local.py' % ROOT, 'wb') as fh:
+    for line in lines:
+        if line.startswith(b'ALLOWED_HOSTS'):
+            line = b'ALLOWED_HOSTS = ["*"]\n'
+        elif line.startswith(b'LOGGING_ENABLED'):
+            line = b'LOGGING_ENABLED = True\n'
+        elif line.startswith(b'PRODUCTION'):
+            line = b'PRODUCTION = False\n'
+        elif line.startswith(b'DEBUG ='):
+            line = b'DEBUG = True\n'
+
+        fh.write(line)
+
+from reviewboard.cmdline.rbsite import Site
+
+cc = subprocess.check_call
+
+class FakeOptions(object):
+    copy_media = False
+
+site = Site(ROOT, FakeOptions())
+
+site.rebuild_site_directory()
+
+site.run_manage_command('syncdb', ['--noinput'])
+
+site.setup_settings()
+from reviewboard import initialize
+initialize()
+
+site.run_manage_command('enable-extension', ['mozreview.extension.MozReviewExtension'])
+site.run_manage_command('enable-extension', ['rbbz.extension.BugzillaExtension'])
+
+site.run_manage_command('collectstatic', ['--noinput'])
+
+# Hook up Bugzilla authentication.
+site.run_manage_command('set-siteconfig', ['--key=auth_backend',
+                        '--value=bugzilla'])
+
+# Ensure admin user is hooked up to Bugzilla.
+from django.contrib.auth.models import User
+from rbbz.models import BugzillaUserMap
+u = User.objects.get(email='admin@example.com')
+u.password='!'
+u.save()
+try:
+    BugzillaUserMap.objects.get(bugzilla_user_id=1)
+except BugzillaUserMap.DoesNotExist:
+    bum = BugzillaUserMap(user=u, bugzilla_user_id=1)
+    bum.save()
+
+# Set sane permissions (since we run as root).
+cc(['/bin/chown', '-R', 'reviewboard:reviewboard', ROOT])

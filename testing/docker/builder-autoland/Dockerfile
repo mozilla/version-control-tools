@@ -4,17 +4,17 @@
 
 # This is a Docker container for running an autoland instance
 
-FROM ubuntu:14.04.1
+FROM ubuntu:14.04.2
 
 ENV AUTOLAND_HOME /home/ubuntu/version-control-tools/autoland
 
 RUN /usr/sbin/groupadd -g 1000 ubuntu
 RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 ubuntu
 
-RUN apt-get update && apt-get -y install \
-  apache2 curl libapache2-mod-wsgi postgresql-client \
+RUN apt-get update && apt-get --no-install-recommends -y install \
+  apache2 curl gcc libapache2-mod-wsgi postgresql-client \
   python2.7-dev libffi6 libffi-dev libpq-dev libldap2-dev libsasl2-dev \
-  mercurial
+  mercurial ca-certificates
 
 # Python
 # %include autoland/requirements.txt

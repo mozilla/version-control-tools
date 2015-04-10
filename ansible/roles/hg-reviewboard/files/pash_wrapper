@@ -1,0 +1,21 @@
+#!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+set -eu
+
+# minimal wrapper to log
+
+facility=local2
+level=INFO
+tag="${0##*/}[$$]"   # script[PID]
+
+prog_dir=$(cd $(dirname "$0");/bin/pwd)
+
+logger -t "$tag" -p "$facility.$level" "start user: '${USER:-}; ssh_command: '${SSH_ORIGINAL_COMMAND:-}'; connection: '${SSH_CONNECTION:-}'"
+ec=0
+$prog_dir/pash.py "$@" || ec=$?
+logger -t "$tag" -p "$facility.$level" "end user: '${USER:-}; ssh_command: '${SSH_ORIGINAL_COMMAND:-}'; connection: '${SSH_CONNECTION:-}'; ec: '$ec'"
+
+exit $ec

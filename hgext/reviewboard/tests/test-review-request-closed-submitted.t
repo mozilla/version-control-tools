@@ -8,12 +8,14 @@
   $ hg commit -A -m 'root commit'
   adding foo
   $ hg push --noreview
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   $ hg phase --public -r .
 
   $ echo 'foo1' > foo
@@ -21,36 +23,38 @@
   $ echo 'foo2' > foo
   $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
   changeset:  1:24417bc94b2c
   summary:    Bug 1 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   changeset:  2:61e2e5c813d2
   summary:    Bug 1 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
 
 Close the squashed review request as submitted, which should close all of the
 child review requests.
 
-  $ rbmanage closesubmitted $HGPORT1 1
+  $ rbmanage closesubmitted 1
 
 Squashed review request with ID 1 should be closed as submitted...
 
-  $ rbmanage dumpreview $HGPORT1 1
+  $ rbmanage dumpreview 1
   id: 1
   status: submitted
   public: true
@@ -65,7 +69,7 @@ Squashed review request with ID 1 should be closed as submitted...
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo
+  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
@@ -78,7 +82,7 @@ Squashed review request with ID 1 should be closed as submitted...
 
 Child review request with ID 2 should be closed as submitted...
 
-  $ rbmanage dumpreview $HGPORT1 2
+  $ rbmanage dumpreview 2
   id: 2
   status: submitted
   public: true
@@ -95,7 +99,7 @@ Child review request with ID 2 should be closed as submitted...
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 
-  $ rbmanage dumpreview $HGPORT1 3
+  $ rbmanage dumpreview 3
   id: 3
   status: submitted
   public: true
@@ -114,11 +118,11 @@ Child review request with ID 2 should be closed as submitted...
 
 Re-opening the parent review request should re-open all of the children.
 
-  $ rbmanage reopen $HGPORT1 1
+  $ rbmanage reopen 1
 
 Squashed review request with ID 1 should be re-opened...
 
-  $ rbmanage dumpreview $HGPORT1 1
+  $ rbmanage dumpreview 1
   id: 1
   status: pending
   public: true
@@ -133,7 +137,7 @@ Squashed review request with ID 1 should be re-opened...
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://localhost:$HGPORT/test-repo
+  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
@@ -146,7 +150,7 @@ Squashed review request with ID 1 should be re-opened...
 
 Child review request with ID 2 should be re-opened...
 
-  $ rbmanage dumpreview $HGPORT1 2
+  $ rbmanage dumpreview 2
   id: 2
   status: pending
   public: true
@@ -165,7 +169,7 @@ Child review request with ID 2 should be re-opened...
 
 Child review request with ID 3 should be re-opened...
 
-  $ rbmanage dumpreview $HGPORT1 3
+  $ rbmanage dumpreview 3
   id: 3
   status: pending
   public: true
@@ -185,4 +189,4 @@ Child review request with ID 3 should be re-opened...
 Cleanup
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

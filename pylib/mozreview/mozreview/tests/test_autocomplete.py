@@ -26,6 +26,8 @@ class AutocompleteTest(MozReviewWebDriverTest):
                 ('joey@example.com', 'password', 'Joey Somebody [:joey]'),
             ])
 
+            self.create_ldap(b'bob@example.com', b'bob', 2001, b'Bob User')
+
             bb = self.user_bugzilla('bob@example.com')
             bb.create_bug('TestProduct', 'TestComponent', 'First Bug')
             lr = self.create_basic_repo('bob@example.com', 'bob')

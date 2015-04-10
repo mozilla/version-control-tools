@@ -1,6 +1,6 @@
 ---
 - name: Generate replication SSH key
-  command: /usr/bin/ssh-keygen -b 2048 -f /etc/mercurial/mirror -t rsa
+  command: /usr/bin/ssh-keygen -b 2048 -f /etc/mercurial/mirror -t rsa creates=/etc/mercurial/mirror
 
 - name: Proper permissions on replication private key
   file: path={{ item }} owner=hg group=hg

@@ -144,18 +144,16 @@ class HgCluster(object):
             mirrors = [s['NetworkSettings']['IPAddress'] for s in web_states]
             e.submit(self._dc.execute, master_id, ['/set-mirrors.py'] + mirrors)
 
-        ldap_ports = ldap_state['NetworkSettings']['Ports']
-        master_ssh_ports = master_state['NetworkSettings']['Ports']
+        ldap_hostname, ldap_hostport = \
+                self._d._get_host_hostname_port(ldap_state, '389/tcp')
+        master_ssh_hostname, master_ssh_hostport = \
+                self._d._get_host_hostname_port(master_state, '22/tcp')
 
-        ldap_host_port = int(ldap_ports['389/tcp'][0]['HostPort'])
-        master_ssh_host_port = int(master_ssh_ports['22/tcp'][0]['HostPort'])
-
-        self.ldap_uri = 'ldap://%s:%s/' % (self._d.docker_hostname,
-                                           ldap_host_port)
+        self.ldap_uri = 'ldap://%s:%d/' % (ldap_hostname,
+                                           ldap_hostport)
         with futures.ThreadPoolExecutor(2) as e:
             e.submit(self.ldap.create_vcs_sync_login, mirror_public_key)
-            e.submit(wait_for_ssh, self._d.docker_hostname,
-                     master_ssh_host_port)
+            e.submit(wait_for_ssh, master_ssh_hostname, master_ssh_hostport)
 
         self.ldap_image = ldap_image
         self.master_image = master_image
@@ -163,13 +161,12 @@ class HgCluster(object):
         self.ldap_id = ldap_id
         self.master_id = master_id
         self.web_ids = web_ids
-        self.master_ssh_hostname = self._d.docker_hostname
-        self.master_ssh_port = master_ssh_host_port
+        self.master_ssh_hostname = master_ssh_hostname
+        self.master_ssh_port = master_ssh_hostport
         self.web_urls = []
         for s in web_states:
-            port = s['NetworkSettings']['Ports']['80/tcp'][0]['HostPort']
-            self.web_urls.append('http://%s:%s/' % (self._d.docker_hostname,
-                                                    port))
+            hostname, hostport = self._d._get_host_hostname_port(s, '80/tcp')
+            self.web_urls.append('http://%s:%d/' % (hostname, hostport))
 
         return self._write_state()
 

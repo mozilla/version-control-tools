@@ -48,7 +48,9 @@ class MozReviewTest(unittest.TestCase):
                      ldap_image=os.environ['DOCKER_LDAP_IMAGE'],
                      pulse_image=os.environ['DOCKER_PULSE_IMAGE'],
                      autolanddb_image=os.environ['DOCKER_AUTOLANDDB_IMAGE'],
-                     autoland_image=os.environ['DOCKER_AUTOLAND_IMAGE'])
+                     autoland_image=os.environ['DOCKER_AUTOLAND_IMAGE'],
+                     hgrb_image=os.environ['DOCKER_HGRB_IMAGE'],
+                     rbweb_image=os.environ['DOCKER_RBWEB_IMAGE'])
         except Exception:
             mr.stop()
             shutil.rmtree(tmpdir)
@@ -73,6 +75,10 @@ class MozReviewTest(unittest.TestCase):
 
     def bugzilla(self, **kwargs):
         return self.mr.get_bugzilla(**kwargs)
+
+    @property
+    def ldap(self):
+        return self.mr.get_ldap()
 
 
 class MozReviewWebDriverTest(MozReviewTest):
@@ -147,6 +153,11 @@ class MozReviewWebDriverTest(MozReviewTest):
         for (email, password, name) in users:
             b.create_user(email, password, name)
             self.users[email] = (password, name)
+
+    def create_ldap(self, email, username, uid, name, scm_level=1):
+        kf = os.path.join(self.mr._path, 'keys', email)
+        self.ldap.create_user(email, username, uid, name, key_filename=kf,
+                              scm_level=scm_level)
 
     def user_bugzilla(self, email):
         """Obtain a Bugzilla handle for a given user, specified by email address."""

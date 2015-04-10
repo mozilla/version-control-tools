@@ -49,6 +49,7 @@ if not bmo_url.endswith('/'):
     bmo_url += '/'
 
 reset_database = 'RESET_DATABASE' in os.environ
+install_module = False
 
 cc = subprocess.check_call
 
@@ -69,6 +70,7 @@ cc(['/usr/bin/git', 'checkout', '--'] + list(patched_files), cwd=bz_dir)
 # an environment variable that can be specified by automation.
 if 'FETCH_BMO' in os.environ:
     cc(['/usr/bin/git', 'fetch', 'origin'], cwd=bz_dir)
+    install_module = True
 
 bmo_commit = os.environ.get('BMO_COMMIT', 'origin/master')
 cc(['/usr/bin/git', 'checkout', bmo_commit], cwd=bz_dir)
@@ -104,6 +106,9 @@ j = os.path.join
 h = os.environ['BUGZILLA_HOME']
 b = j(h, 'bugzilla')
 answers = j(h, 'checksetup_answers.txt')
+
+if install_module:
+    cc([j(b, 'install-module.pl'), '--all'], cwd=b)
 
 # We aren't allowed to embed environment variable references in Perl code in
 # checksetup_answers.txt because Perl executes that file in a sandbox. So we

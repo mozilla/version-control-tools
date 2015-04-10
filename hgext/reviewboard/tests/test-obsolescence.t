@@ -21,24 +21,26 @@ Set up the repo
   $ hg phase --public -r .
   $ echo 'foo2' > foo
   $ hg commit -m 'foo2'
-  $ hg push --reviewid 1 ssh://user@dummy/$TESTTMP/repos/test-repo
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ hg push --reviewid 1
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
   changeset:  1:c3480b3f6944
   summary:    foo2
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
 
 Now create a new head and push a rebase
 
@@ -51,28 +53,30 @@ Now create a new head and push a rebase
   $ hg -q rebase -s 1 -d .
   $ hg up tip
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  $ hg push --reviewid 1 ssh://user@dummy/$TESTTMP/repos/test-repo
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ hg push --reviewid 1
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 1 changes to ? files (+1 heads) (glob)
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
   changeset:  2:e7315a409763
   summary:    bar
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   changeset:  3:5003cd557db3
   summary:    foo2
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
 Cleanup
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

@@ -1,0 +1,19 @@
+WSGISocketPrefix /var/run/wsgi
+<VirtualHost *:80>
+    ServerName {{ domain | mandatory }}
+    DocumentRoot /repo/hg/mozilla
+
+    SetEnv HGENCODING UTF-8
+    SetEnv LC_TYPE UTF-8
+
+    WSGIDaemonProcess hg processes={{ wsgi_processes }} threads=1 maximum-requests=100 deadlock-timeout=60 inactivity-timeout=300 user=hg group=hg display-name=hg
+    WSGIProcessGroup hg
+
+    WSGIPassAuthorization On
+    WSGIScriptAlias "/hg" "/repo/hg/webroot_wsgi/hgweb.wsgi"
+    WSGIScriptAlias "/" "/repo/hg/webroot_wsgi/hgweb.wsgi"
+
+    LogFormat "%h %v %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\""
+    ErrorLog "/var/log/httpd/{{ domain | mandatory }}/error_log"
+    CustomLog "/var/log/httpd/{{ domain | mandatory }}/access_log" combined env=!image
+</VirtualHost>

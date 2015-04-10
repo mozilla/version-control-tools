@@ -31,10 +31,6 @@ class HgmoCommands(object):
             sys.exit(1)
 
         docker_url, tls = params_from_env(os.environ)
-        if not docker_url:
-            print('Docker not available')
-            sys.exit(1)
-
         docker = Docker(os.environ['DOCKER_STATE_FILE'], docker_url, tls=tls)
         self.c = HgCluster(docker, os.environ['HGMO_STATE_FILE'],
                            ldap_image=os.environ.get('DOCKER_LDAP_IMAGE'),
@@ -53,6 +49,12 @@ class HgmoCommands(object):
         print('LDAP URI: %s' % s['ldap_uri'])
         for url in s['web_urls']:
             print('Web URL: %s' % url)
+
+    @Command('shellinit', category='hgmo',
+             description='Print shell commands to export variables')
+    def shellinit(self):
+        print('export SSH_SERVER=%s' % self.c.master_ssh_hostname)
+        print('export SSH_PORT=%d' % self.c.master_ssh_port)
 
     @Command('stop', category='hgmo',
              description='Stop a hg.mozilla.org cluster')

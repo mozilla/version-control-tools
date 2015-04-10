@@ -9,12 +9,14 @@
   $ hg commit -A -m 'root commit'
   adding foo
   $ hg push --noreview
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   $ hg phase --public -r .
 
   $ echo 'foo1' > foo
@@ -22,24 +24,26 @@
   $ echo 'foo2' > foo
   $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
   changeset:  1:24417bc94b2c
   summary:    Bug 1 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   changeset:  2:61e2e5c813d2
   summary:    Bug 1 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
 Adding commits to old reviews should create new reviews
@@ -47,33 +51,35 @@ Adding commits to old reviews should create new reviews
   $ echo 'foo3' > foo
   $ hg commit -m 'Bug 1 - Foo 3'
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
   
   changeset:  1:24417bc94b2c
   summary:    Bug 1 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   changeset:  2:61e2e5c813d2
   summary:    Bug 1 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   changeset:  3:3e4b2ebd3703
   summary:    Bug 1 - Foo 3
-  review:     http://localhost:$HGPORT1/r/4 (pending)
+  review:     http://*:$HGPORT1/r/4 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
 The parent review should have its description updated.
 
-  $ rbmanage dumpreview $HGPORT1 1
+  $ rbmanage dumpreview 1
   id: 1
   status: pending
   public: false
@@ -100,7 +106,7 @@ The parent review should have its description updated.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r 3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11 http://localhost:$HGPORT/test-repo
+    - hg pull -r 3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11 http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
@@ -125,4 +131,4 @@ The parent review should have its description updated.
 Cleanup
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

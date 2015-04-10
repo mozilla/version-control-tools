@@ -1,0 +1,15 @@
+#!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+set -e
+
+/usr/bin/rsync -a --delete-after $1 /vct/
+chown -R root:root /vct
+/usr/bin/rsync -rlpt /vct/ /version-control-tools/
+
+/install-reviewboard
+
+# Need to kill WSGI processes to ensure Python code is current.
+/kill-wsgi-procs

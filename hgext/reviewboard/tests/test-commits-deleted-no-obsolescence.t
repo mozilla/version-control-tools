@@ -9,12 +9,14 @@
   $ hg commit -A -m 'root commit'
   adding foo0
   $ hg push --noreview
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   $ hg phase --public -r .
 
   $ echo 'foo1' > foo1
@@ -34,74 +36,76 @@
   adding foo5
 
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 5 changesets with 5 changes to 5 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 5 changesets for review
   
   changeset:  1:a252038ad074
   summary:    Bug 1 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   changeset:  2:c3d0947fefb7
   summary:    Bug 1 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   changeset:  3:de473ef3c9d2
   summary:    Bug 1 - Foo 3
-  review:     http://localhost:$HGPORT1/r/4 (pending)
+  review:     http://*:$HGPORT1/r/4 (pending) (glob)
   
   changeset:  4:f5691a90b4d0
   summary:    Bug 1 - Foo 4
-  review:     http://localhost:$HGPORT1/r/5 (pending)
+  review:     http://*:$HGPORT1/r/5 (pending) (glob)
   
   changeset:  5:d86c61a23fc8
   summary:    Bug 1 - Foo 5
-  review:     http://localhost:$HGPORT1/r/6 (pending)
+  review:     http://*:$HGPORT1/r/6 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
 
 Popping the last commit truncates the review set
 
   $ hg strip -r 5 --no-backup
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 4 changesets for review
   
   changeset:  1:a252038ad074
   summary:    Bug 1 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   changeset:  2:c3d0947fefb7
   summary:    Bug 1 - Foo 2
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   changeset:  3:de473ef3c9d2
   summary:    Bug 1 - Foo 3
-  review:     http://localhost:$HGPORT1/r/4 (pending)
+  review:     http://*:$HGPORT1/r/4 (pending) (glob)
   
   changeset:  4:f5691a90b4d0
   summary:    Bug 1 - Foo 4
-  review:     http://localhost:$HGPORT1/r/5 (pending)
+  review:     http://*:$HGPORT1/r/5 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
 Review request 6 should be added to the list of discard on publish rids.
 
-  $ rbmanage dumpreview $HGPORT1 1
+  $ rbmanage dumpreview 1
   id: 1
   status: pending
   public: true
@@ -119,7 +123,7 @@ Review request 6 should be added to the list of discard on publish rids.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r d86c61a23fc8978f5d0c59a0ce608dc5d4312da5 http://localhost:$HGPORT/test-repo
+  - hg pull -r d86c61a23fc8978f5d0c59a0ce608dc5d4312da5 http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
@@ -143,7 +147,7 @@ Review request 6 should be added to the list of discard on publish rids.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r f5691a90b4d0ef04bbf08408d9f214356811db40 http://localhost:$HGPORT/test-repo
+    - hg pull -r f5691a90b4d0ef04bbf08408d9f214356811db40 http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
@@ -180,11 +184,11 @@ Review request 6 should be added to the list of discard on publish rids.
       - '@@ -0,0 +1,1 @@'
       - +foo4
 
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
 
 Review 6 should be marked as discarded
 
-  $ rbmanage dumpreview $HGPORT1 6
+  $ rbmanage dumpreview 6
   id: 6
   status: discarded
   public: true
@@ -208,33 +212,35 @@ likely gets invalidated.
   $ hg -q rebase -s 2 -d 0
   $ hg strip -r 1 --no-backup
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 3 changesets with 0 changes to 3 files (+1 heads)
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
   
   changeset:  1:3299fd5f5fca
   summary:    Bug 1 - Foo 2
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   changeset:  2:4fcbb12a36e4
   summary:    Bug 1 - Foo 3
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   changeset:  3:d768dcb976de
   summary:    Bug 1 - Foo 4
-  review:     http://localhost:$HGPORT1/r/4 (pending)
+  review:     http://*:$HGPORT1/r/4 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
 The first commit was rewritten (we assume all subsequent were as well).
 
-  $ rbmanage dumpreview $HGPORT1 2
+  $ rbmanage dumpreview 2
   id: 2
   status: pending
   public: true
@@ -277,7 +283,7 @@ The last review request that got invalidated in the shuffle should
 be in the list of review requests to discard when the squashed review
 request is published.
 
-  $ rbmanage dumpreview $HGPORT1 1
+  $ rbmanage dumpreview 1
   id: 1
   status: pending
   public: true
@@ -294,7 +300,7 @@ request is published.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r f5691a90b4d0ef04bbf08408d9f214356811db40 http://localhost:$HGPORT/test-repo
+  - hg pull -r f5691a90b4d0ef04bbf08408d9f214356811db40 http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
@@ -317,7 +323,7 @@ request is published.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r d768dcb976decf31b8ac1431701fefdacd31a390 http://localhost:$HGPORT/test-repo
+    - hg pull -r d768dcb976decf31b8ac1431701fefdacd31a390 http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
@@ -351,7 +357,7 @@ request is published.
 Publish to get us up to date, but we're not going to test the publishing
 behaviour here. We'll save that for other tests.
 
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
 
 Try removing a commit in the middle.
 
@@ -359,25 +365,27 @@ Try removing a commit in the middle.
   $ hg strip -r 2 --no-backup
 
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 0 changes to 1 files (+1 heads)
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
   changeset:  1:3299fd5f5fca
   summary:    Bug 1 - Foo 2
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   changeset:  2:7f4c8af7c6c4
   summary:    Bug 1 - Foo 4
-  review:     http://localhost:$HGPORT1/r/3 (pending)
+  review:     http://*:$HGPORT1/r/3 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

@@ -15,11 +15,4 @@ ADD my.cnf /etc/mysql/my.cnf
 
 ADD entrypoint.sh /entrypoint.sh
 
-# Force image cache invalidation if code used to bootstrap
-# changes.
-# %include testing/vcttesting/bugzilla/
-# %include testing/vcttesting/docker.py
-# %include testing/vcttesting/mozreview.py
-ADD extra/ /extra-docker-context
-
 CMD ["mysqld", "--datadir=/var/lib/mysql-local", "--user=mysql"]

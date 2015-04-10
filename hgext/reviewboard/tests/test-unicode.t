@@ -11,6 +11,7 @@
 
   $ adminbugzilla create-user author@example.com password 'Patch Author'
   created user 6
+  $ mozreview create-ldap-user author@example.com contributor 2001 'Some Contributor' --key-file ${MOZREVIEW_HOME}/keys/author@example.com --scm-level 1
 
 Create a review request
 
@@ -18,20 +19,20 @@ Create a review request
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com push http://localhost:$HGPORT/test-repo > /dev/null
-  $ rbmanage publish $HGPORT1 1
+  $ hg --config bugzilla.username=author@example.com push > /dev/null
+  $ rbmanage publish 1
 
 Add a comment with unicode
 
-  $ rbmanage create-review $HGPORT1 1
+  $ rbmanage create-review 1
   created review 1
 
 The globbing is patching over a bug in mach
-  $ rbmanage create-diff-comment $HGPORT1 1 1 foo 1 'こんにちは世界'
+  $ rbmanage create-diff-comment 1 1 foo 1 'こんにちは世界'
   * UnicodeWarning: * (glob)
   * (glob)
   created diff comment 1
-  $ rbmanage publish-review $HGPORT1 1 1
+  $ rbmanage publish-review 1 1
   published review 1
 
   $ bugzilla dump-bug 1
@@ -39,7 +40,7 @@ The globbing is patching over a bug in mach
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://localhost:$HGPORT1/r/1/
+      data: http://*:$HGPORT1/r/1/ (glob)
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -68,11 +69,11 @@ The globbing is patching over a bug in mach
         Pull down this commit:
   
   
-        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://localhost:$HGPORT/test-repo'
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://*:$HGPORT/test-repo' (glob)
     - author: author@example.com
       id: 3
       tags: []
-      text: "http://localhost:$HGPORT1/r/1/#review1\n\n::: foo:1\n(Diff revision 1)\n>\
+      text: "http://*:$HGPORT1/r/1/#review1\n\n::: foo:1\n(Diff revision 1)\n>\ (glob)
         \ -foo\n> +initial\n\n\u3053\u3093\u306B\u3061\u306F\u4E16\u754C"
     component: TestComponent
     depends_on: []
@@ -85,4 +86,4 @@ The globbing is patching over a bug in mach
 Cleanup
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

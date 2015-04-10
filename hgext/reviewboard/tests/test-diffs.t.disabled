@@ -38,8 +38,8 @@ Push a single commit
   review id:  bz://300124/mynick
   review url: http://localhost:$HGPORT1/r/1 (pending)
 
-  $ rbmanage ../rbserver publish $HGPORT1 1
-  $ rbmanage ../rbserver dumpreview $HGPORT1 1
+  $ rbmanage publish 1
+  $ rbmanage dumpreview 1
   Review: 1
     Status: pending
     Commit ID: bz://300124/mynick
@@ -72,7 +72,7 @@ Push a single commit
   +updated foo
   
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 2
+  $ rbmanage dumpreview 2
   Review: 2
     Status: pending
     Commit ID: 8078da8bec9fca76a56ce358bb0addd12c83e708
@@ -133,7 +133,7 @@ Pushing multiple commits should result in parent diffs
   review id:  bz://10000/mynick
   review url: http://localhost:$HGPORT1/r/3 (pending)
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 3
+  $ rbmanage dumpreview 3
   Review: 3
     Status: pending
     Commit ID: bz://10000/mynick
@@ -173,7 +173,7 @@ Pushing multiple commits should result in parent diffs
   -updated foo
   +updated foo again
   
-  $ rbmanage ../rbserver dumpreview $HGPORT1 4
+  $ rbmanage dumpreview 4
   Review: 4
     Status: pending
     Commit ID: 393666323ae92d185152eaa15bda086f01f2b115
@@ -200,7 +200,7 @@ Pushing multiple commits should result in parent diffs
   +updated bar
   
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 5
+  $ rbmanage dumpreview 5
   Review: 5
     Status: pending
     Commit ID: 5638d29dda5131a2a79bf6ac7c465dd3a7052275
@@ -227,7 +227,7 @@ Pushing multiple commits should result in parent diffs
   +updated foo again
   
 
-  $ rbmanage ../rbserver dumpreview $HGPORT1 6
+  $ rbmanage dumpreview 6
   Review: 6
     Status: pending
     Commit ID: c5acb46cb0f75caf1566a2af32fad101798f1178

@@ -146,8 +146,12 @@ class ReviewBoardCommands(object):
         else:
             self.mr = None
 
-    def _get_client(self, port):
+    def _get_client(self):
         from rbtools.api.client import RBClient
+
+        # TODO consider moving this to __init__.
+        if not self.mr:
+            raise Exception('Could not find MozReview cluster instance')
 
         username = os.environ.get('BUGZILLA_USERNAME')
         password = os.environ.get('BUGZILLA_PASSWORD')
@@ -161,11 +165,11 @@ class ReviewBoardCommands(object):
         except Exception:
             pass
 
-        return RBClient('http://localhost:%s/' % port, username=username,
+        return RBClient(self.mr.reviewboard_url, username=username,
                         password=password)
 
-    def _get_root(self, port):
-        return self._get_client(port).get_root()
+    def _get_root(self):
+        return self._get_client().get_root()
 
     def _get_rb(self, path=None):
         from vcttesting.reviewboard import MozReviewBoard
@@ -183,21 +187,19 @@ class ReviewBoardCommands(object):
 
     @Command('dumpreview', category='reviewboard',
         description='Print a representation of a review request.')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request id to dump')
-    def dumpreview(self, port, rrid):
-        root = self._get_root(port)
+    def dumpreview(self, rrid):
+        root = self._get_root()
         r = root.get_review_request(review_request_id=rrid)
         print(serialize_review_requests(r))
 
     @Command('add-reviewer', category='reviewboard',
         description='Add a reviewer to a review request')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request id to modify')
     @CommandArgument('--user', action='append',
         help='User from whom to ask for review')
-    def add_reviewer(self, port, rrid, user):
-        root = self._get_root(port)
+    def add_reviewer(self, rrid, user):
+        root = self._get_root()
         rr = root.get_review_request(review_request_id=rrid)
 
         people = []
@@ -219,12 +221,11 @@ class ReviewBoardCommands(object):
 
     @Command('remove-reviewer', category='reviewboard',
         description='Remove a reviewer from a review request')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request id to modify')
     @CommandArgument('--user', action='append',
         help='User to remove from review')
-    def remove_reviewer(self, port, rrid, user):
-        root = self._get_root(port)
+    def remove_reviewer(self, rrid, user):
+        root = self._get_root()
         rr = root.get_review_request(review_request_id=rrid)
 
         people = []
@@ -240,11 +241,10 @@ class ReviewBoardCommands(object):
 
     @Command('publish', category='reviewboard',
         description='Publish a review request')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request id to publish')
-    def publish(self, port, rrid):
+    def publish(self, rrid):
         from rbtools.api.errors import APIError
-        root = self._get_root(port)
+        root = self._get_root()
         r = root.get_review_request(review_request_id=rrid)
 
         try:
@@ -257,12 +257,11 @@ class ReviewBoardCommands(object):
 
     @Command('get-users', category='reviewboard',
         description='Query the Review Board user list')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('q', help='Query string')
-    def query_users(self, port, q=None):
+    def query_users(self, q=None):
         from rbtools.api.errors import APIError
 
-        root = self._get_root(port)
+        root = self._get_root()
         try:
             r = root.get_users(q=q, fullname=True)
         except APIError as e:
@@ -281,7 +280,6 @@ class ReviewBoardCommands(object):
 
     @Command('create-review', category='reviewboard',
         description='Create a new review on a review request')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request to create the review on')
     @CommandArgument('--body-bottom',
             help='Review content below comments')
@@ -291,9 +289,9 @@ class ReviewBoardCommands(object):
             help='Whether to make this review public')
     @CommandArgument('--ship-it', action='store_true',
             help='Whether to mark the review "Ship It"')
-    def create_review(self, port, rrid, body_bottom=None, body_top=None, public=False,
+    def create_review(self, rrid, body_bottom=None, body_top=None, public=False,
             ship_it=False):
-        root = self._get_root(port)
+        root = self._get_root()
         reviews = root.get_reviews(review_request_id=rrid)
         # rbtools will convert body_* to str() and insert "None" if we pass
         # an argument.
@@ -309,11 +307,10 @@ class ReviewBoardCommands(object):
 
     @Command('publish-review', category='reviewboard',
         description='Publish a review')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request review is attached to')
     @CommandArgument('rid', help='Review to publish')
-    def publish_review(self, port, rrid, rid):
-        root = self._get_root(port)
+    def publish_review(self, rrid, rid):
+        root = self._get_root()
         review = root.get_review(review_request_id=rrid, review_id=rid)
         review.update(public=True)
 
@@ -321,7 +318,6 @@ class ReviewBoardCommands(object):
 
     @Command('create-review-reply', category='reviewboard',
         description='Create a reply to an existing review')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request to create reply on')
     @CommandArgument('rid', help='Review to create reply on')
     @CommandArgument('--body-bottom',
@@ -332,9 +328,9 @@ class ReviewBoardCommands(object):
         help='Whether to make this reply public')
     @CommandArgument('--text-type', default='plain',
         help='The format of the text')
-    def create_review_reply(self, port, rrid, rid, body_bottom, body_top,
+    def create_review_reply(self, rrid, rid, body_bottom, body_top,
             public, text_type):
-        root = self._get_root(port)
+        root = self._get_root()
         replies = root.get_replies(review_request_id=rrid, review_id=rid)
 
         args = {'public': public, 'text_type': text_type}
@@ -348,7 +344,6 @@ class ReviewBoardCommands(object):
 
     @Command('create-diff-comment', category='reviewboard',
              description='Create a comment on a diff')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request to create comment on')
     @CommandArgument('rid', help='Review to create comment on')
     @CommandArgument('filename', help='File to leave comment on')
@@ -356,9 +351,9 @@ class ReviewBoardCommands(object):
     @CommandArgument('text', help='Text constituting diff comment')
     @CommandArgument('--open-issue', action='store_true',
                      help='Whether to open an issue in this review')
-    def create_diff_comment(self, port, rrid, rid, filename, first_line, text,
+    def create_diff_comment(self, rrid, rid, filename, first_line, text,
                             open_issue=False):
-        root = self._get_root(port)
+        root = self._get_root()
 
         diffs = root.get_diffs(review_request_id=rrid)
         diff = diffs[-1]
@@ -383,14 +378,13 @@ class ReviewBoardCommands(object):
 
     @Command('update-issue-status', category='reviewboard',
              description='Update issue status on a diff comment.')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request for the diff comment review')
     @CommandArgument('rid', help='Review for the diff comment')
     @CommandArgument('cid', help='Diff comment of issue to be updated')
     @CommandArgument('status', help='Desired issue status ("open", "dropped", '
                      'or "resolved")')
-    def update_issue_status(self, port, rrid, rid, cid, status):
-        root = self._get_root(port)
+    def update_issue_status(self, rrid, rid, cid, status):
+        root = self._get_root()
 
         review = root.get_review(review_request_id=rrid, review_id=rid)
         diff_comment = review.get_diff_comments().get_item(cid)
@@ -399,37 +393,33 @@ class ReviewBoardCommands(object):
 
     @Command('closediscarded', category='reviewboard',
         description='Close a review request as discarded.')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Request request to discard')
-    def close_discarded(self, port, rrid):
-        root = self._get_root(port)
+    def close_discarded(self, rrid):
+        root = self._get_root()
         rr = root.get_review_request(review_request_id=rrid)
         rr.update(status='discarded')
 
     @Command('closesubmitted', category='reviewboard',
         description='Close a review request as submitted.')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Request request to submit')
-    def close_submitted(self, port, rrid):
-        root = self._get_root(port)
+    def close_submitted(self, rrid):
+        root = self._get_root()
         rr = root.get_review_request(review_request_id=rrid)
         rr.update(status='submitted')
 
     @Command('reopen', category='reviewboard',
         description='Reopen a closed review request')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request to reopen')
-    def reopen(self, port, rrid):
-        root = self._get_root(port)
+    def reopen(self, rrid):
+        root = self._get_root()
         rr = root.get_review_request(review_request_id=rrid)
         rr.update(status='pending')
 
     @Command('discard-review-request-draft', category='reviewboard',
         description='Discard (delete) a draft review request.')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Review request whose draft to delete')
-    def discard_draft(self, port, rrid):
-        root = self._get_root(port)
+    def discard_draft(self, rrid):
+        root = self._get_root()
         rr = root.get_review_request(review_request_id=rrid)
         draft = rr.get_draft()
 
@@ -445,10 +435,9 @@ class ReviewBoardCommands(object):
 
     @Command('dump-user', category='reviewboard',
         description='Print a representation of a user.')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('username', help='Username whose info the print')
-    def dump_user(self, port, username):
-        root = self._get_root(port)
+    def dump_user(self, username):
+        root = self._get_root()
         u = root.get_user(username=username)
 
         o = {}
@@ -463,8 +452,6 @@ class ReviewBoardCommands(object):
     @Command('hit-try-autoland-trigger', category='reviewboard',
              description='Pass some values to the try-autoland-trigger WebAPI '
                          'resource.')
-    @CommandArgument('port',
-                     help='Port number Review Board is running on')
     @CommandArgument('review_request_id',
                      help='The review request ID to pass to the WebAPI '
                           'resource')
@@ -472,10 +459,10 @@ class ReviewBoardCommands(object):
                      help='The try syntax to send to the endpoint')
     @CommandArgument('--autoland-request-id', default=1,
                      help='The autoland request id to put into the database')
-    def hit_try_autoland_trigger(self, port, review_request_id,
+    def hit_try_autoland_trigger(self, review_request_id,
                                  try_syntax, autoland_request_id=None):
         from rbtools.api.errors import APIError
-        root = self._get_root(port)
+        root = self._get_root()
         ext = root.get_extension(
             extension_name="mozreview.extension.MozReviewExtension")
 
@@ -491,8 +478,6 @@ class ReviewBoardCommands(object):
     @Command('hit-autoland-request-update', category='reviewboard',
              description='Pass some values to the autoland-request-update '
                          'WebAPI resource.')
-    @CommandArgument('port',
-                     help='Port number Review Board is running on')
     @CommandArgument('autoland_request_id',
                      help='The autoland request id to update in the database')
     @CommandArgument('tree',
@@ -507,16 +492,16 @@ class ReviewBoardCommands(object):
                      help='The landed state for autoland to report back')
     @CommandArgument('result',
                      help='The result state for autoland to report back')
-    def hit_autoland_request_update(self, port, autoland_request_id,
+    def hit_autoland_request_update(self, autoland_request_id,
                                     tree, rev, destination, try_syntax,
                                     landed, result):
         import json
         import requests
         # There's probably a better way to get this URL from the extension
         # resource or something, but this will do for now.
-        endpoint = ('http://localhost:%s/api/extensions/'
+        endpoint = ('%s/api/extensions/'
                     'mozreview.extension.MozReviewExtension/'
-                    'autoland-request-updates/' % port)
+                    'autoland-request-updates/' % self.mr.reviewboard_url)
 
         username = os.environ.get('BUGZILLA_USERNAME')
         password = os.environ.get('BUGZILLA_PASSWORD')
@@ -536,10 +521,8 @@ class ReviewBoardCommands(object):
 
     @Command('dump-autoland-requests', category='reviewboard',
              description='Dump the table of autoland requests.')
-    @CommandArgument('port',
-                     help='Port number Review Board is running on')
-    def dump_autoland_requests(self, port):
-        root = self._get_root(port)
+    def dump_autoland_requests(self):
+        root = self._get_root()
         ext = root.get_extension(
             extension_name="mozreview.extension.MozReviewExtension")
 
@@ -552,11 +535,10 @@ class ReviewBoardCommands(object):
 
     @Command('dump-summary', category='reviewboard',
              description='Return parent and child review-request summary.')
-    @CommandArgument('port', help='Port number Review Board is running on')
     @CommandArgument('rrid', help='Parent review request id')
-    def dump_summary(self, port, rrid):
+    def dump_summary(self, rrid):
         from rbtools.api.errors import APIError
-        c = self._get_client(port)
+        c = self._get_client()
 
         try:
             r = c.get_path('/extensions/mozreview.extension.MozReviewExtension'
@@ -572,35 +554,6 @@ class ReviewBoardCommands(object):
 
         print(yaml.safe_dump(d, default_flow_style=False).rstrip())
 
-    @Command('start', category='reviewboard',
-        description='Start a Review Board HTTP server.')
-    @CommandArgument('path', help='Path to Review Board install')
-    @CommandArgument('port', help='Port number to start server on.')
-    def start(self, path, port):
-        rb = self._get_rb(path)
-        rb.start(port)
-
-    # This command should be called at the end of tests because not doing so
-    # will result in Mercurial sending SIGKILL, which will cause the Python
-    # process to not shut down gracefully, which will not record code coverage
-    # data.
-    @Command('stop', category='reviewboard',
-        description='Stop a running Review Board server.')
-    @CommandArgument('path', help='Path to the Review Board install')
-    def stop(self, path):
-        rb = self._get_rb(path)
-        rb.stop()
-
-    @Command('restart', category='reviewboard',
-             description='Restart a Review Board HTTP server.')
-    def restart(self):
-        if not self.mr:
-            print('You must have MOZREVIEW_HOME set to restart servers')
-            return 1
-
-        url = self.mr.restart_reviewboard()
-        print('Review Board accessible at %s' % url)
-
     @Command('make-admin', category='reviewboard',
         description='Make a user a superuser and staff user')
     @CommandArgument('email', help='Email address of user to modify')
@@ -610,19 +563,7 @@ class ReviewBoardCommands(object):
     @Command('dump-account-profile', category='reviewboard',
          description='Dump the contents of the auth_user table')
     @CommandArgument('username', help='Username whose info the print')
-    @CommandArgument('--path', required=False,
-                     help='Path to Review Board install')
-    def dump_account_profile(self, username, path=None):
-        import sqlite3
-        db = os.path.join(path or self.mr._path, 'reviewboard.db')
-        conn = sqlite3.connect(db)
-        with conn:
-            c = conn.cursor()
-            c.execute('SELECT accounts_profile.* '
-                      'FROM auth_user, accounts_profile '
-                      'WHERE accounts_profile.user_id = auth_user.id '
-                      'AND auth_user.username = ?', (username,))
-            profile = c.fetchone()
-            if profile:
-                for i, description in enumerate(c.description):
-                    print('%s: %s' % (description[0], profile[i]))
+    def dump_account_profile(self, username):
+        fields = self._get_rb().get_profile_data(username)
+        for k, v in sorted(fields.items()):
+            print('%s: %s' % (k, v))

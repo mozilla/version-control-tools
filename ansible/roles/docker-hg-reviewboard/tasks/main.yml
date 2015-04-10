@@ -1,0 +1,21 @@
+---
+- name: Install Docker support scripts
+  copy: src={{ item }} dest=/{{ item }} mode=0755
+  with_items:
+    - create-repo
+    - entrypoint.py
+    - run.sh
+    - set-strip-users
+    - set-urls
+
+# hgweb only refreshes available repositories every 20s. This is no good
+# for testing, where we want instant gratification. Install an extension
+# that makes refreshes instantaneous.
+- name: Install refreshinghgwebdir extension
+  copy: src={{ vct }}/testing/refreshinghgwebdir.py dest=/repo/hg/library/refreshinghgwebdir.py
+
+- name: Activate refreshinghgwebdir extension
+  ini_file: dest=/etc/mercurial/hgrc
+            section=extensions
+            option=refreshhgwebdir
+            value=/repo/hg/library/refreshinghgwebdir.py

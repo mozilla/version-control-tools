@@ -5,6 +5,7 @@
 
   $ adminbugzilla create-user submitter@example.com password 'Dummy Submitter'
   created user 6
+  $ mozreview create-ldap-user submitter@example.com submitter 2001 'Dummy Submitter' --key-file ${MOZREVIEW_HOME}/keys/submitter@example.com --scm-level 1
   $ exportbzauth submitter@example.com password
   $ bugzilla create-bug TestProduct TestComponent 'Initial Bug'
 
@@ -17,47 +18,51 @@
   $ echo foo1 > foo
   $ hg commit -m 'Bug 1 - Initial commit'
   $ hg --config bugzilla.username=submitter@example.com push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
   changeset:  1:8c2be86a13c9
   summary:    Bug 1 - Initial commit
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
 Now publish the review and create a new draft
 
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
   $ echo foo3 > foo
   $ hg commit --amend > /dev/null
   $ hg --config bugzilla.username=submitter@example.com push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
   changeset:  1:c1eb96801052
   summary:    Bug 1 - Initial commit
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
 We should have a disagreement between published and draft
 
-  $ rbmanage dumpreview $HGPORT1 1
+  $ rbmanage dumpreview 1
   id: 1
   status: pending
   public: true
@@ -71,7 +76,7 @@ We should have a disagreement between published and draft
   - ''
   - 'Pull down this commit:'
   - ''
-  - hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://localhost:$HGPORT/test-repo
+  - hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
@@ -90,7 +95,7 @@ We should have a disagreement between published and draft
     - ''
     - 'Pull down this commit:'
     - ''
-    - hg pull -r c1eb968010521027f51dd6d901d92dc44bfdcd5d http://localhost:$HGPORT/test-repo
+    - hg pull -r c1eb968010521027f51dd6d901d92dc44bfdcd5d http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
@@ -111,7 +116,7 @@ We should have a disagreement between published and draft
       - -foo
       - +foo3
 
-  $ rbmanage dumpreview $HGPORT1 2
+  $ rbmanage dumpreview 2
   id: 2
   status: pending
   public: true
@@ -153,10 +158,10 @@ We should have a disagreement between published and draft
 
 Discarding the parent review request draft should discard draft on children
 
-  $ rbmanage discard-review-request-draft $HGPORT1 1
+  $ rbmanage discard-review-request-draft 1
   Discarded draft for review request 1
 
-  $ rbmanage dumpreview $HGPORT1 1
+  $ rbmanage dumpreview 1
   id: 1
   status: pending
   public: true
@@ -170,7 +175,7 @@ Discarding the parent review request draft should discard draft on children
   - ''
   - 'Pull down this commit:'
   - ''
-  - hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://localhost:$HGPORT/test-repo
+  - hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
@@ -180,7 +185,7 @@ Discarding the parent review request draft should discard draft on children
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
 
-  $ rbmanage dumpreview $HGPORT1 2
+  $ rbmanage dumpreview 2
   id: 2
   status: pending
   public: true
@@ -200,4 +205,4 @@ Discarding the parent review request draft should discard draft on children
 Cleanup
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

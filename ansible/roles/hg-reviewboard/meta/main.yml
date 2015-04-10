@@ -1,0 +1,3 @@
+---
+dependencies:
+  - { role: openssh-lpk, force_command: /usr/local/bin/pash_wrapper, home_attribute: fakeHome }

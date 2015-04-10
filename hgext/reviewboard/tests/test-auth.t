@@ -17,12 +17,14 @@
 Pushing with unknown username results in sane failure
 
   $ hg --config bugzilla.username=unknown --config bugzilla.password=irrelevant push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   abort: invalid Bugzilla username/password; check your settings
   [255]
@@ -30,7 +32,7 @@ Pushing with unknown username results in sane failure
 Pushing with invalid password results in sane failure
 
   $ hg --config bugzilla.username=${BUGZILLA_USERNAME} --config bugzilla.password=badpass push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -40,7 +42,7 @@ Pushing with invalid password results in sane failure
 Pushing with invalid cookie results in sane failure
 
   $ hg --config bugzilla.userid=baduserid --config bugzilla.cookie=irrelevant push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -54,34 +56,34 @@ Pushing using cookie auth works
   $ cookie=`echo ${out} | awk '{print $2}'`
 
   $ hg --config bugzilla.userid=${userid} --config bugzilla.cookie=${cookie} push --reviewid bz://1/goodcookie
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   review id:  bz://1/goodcookie
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
 Pushing using username password auth works
 
   $ hg --config bugzilla.username=${BUGZILLA_USERNAME} --config bugzilla.password=${BUGZILLA_PASSWORD} push --reviewid bz://1/gooduserpass
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://localhost:$HGPORT1/r/4 (pending)
+  review:     http://*:$HGPORT1/r/4 (pending) (glob)
   
   review id:  bz://1/gooduserpass
-  review url: http://localhost:$HGPORT1/r/3 (pending)
+  review url: http://*:$HGPORT1/r/3 (pending) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -91,49 +93,53 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
 
   $ adminbugzilla create-user user1@example.com password1 'Dummy User1'
   created user 6
+  $ mozreview create-ldap-user user1@example.com user1 2001 'User One' --key-file ${MOZREVIEW_HOME}/keys/user1@example.com --scm-level 1
   $ adminbugzilla create-user user2@example.com password2 'Mozila User [:nick]'
   created user 7
+  $ mozreview create-ldap-user user2@example.com user2 2002 'User Two' --key-file ${MOZREVIEW_HOME}/keys/user2@example.com --scm-level 1
 
-  $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/nonick
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ exportbzauth user1@example.com password1
+  $ hg push --reviewid bz://1/nonick
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://localhost:$HGPORT1/r/6 (pending)
+  review:     http://*:$HGPORT1/r/6 (pending) (glob)
   
   review id:  bz://1/nonick
-  review url: http://localhost:$HGPORT1/r/5 (pending)
+  review url: http://*:$HGPORT1/r/5 (pending) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
-  $ hg --config bugzilla.username=user2@example.com --config bugzilla.password=password2 push --reviewid bz://1/withnick
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ exportbzauth user2@example.com password2
+  $ hg push --reviewid bz://1/withnick
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://localhost:$HGPORT1/r/8 (pending)
+  review:     http://*:$HGPORT1/r/8 (pending) (glob)
   
   review id:  bz://1/withnick
-  review url: http://localhost:$HGPORT1/r/7 (pending)
+  review url: http://*:$HGPORT1/r/7 (pending) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
 Usernames for users without the IRC nick syntax are based on email fragment and BZ user id
 
   $ exportbzauth user1@example.com password1
-  $ rbmanage dump-user $HGPORT1 'user1+6'
-  2:
+  $ rbmanage dump-user 'user1+6'
+  3:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user1@example.com
     first_name: Dummy User1
     fullname: Dummy User1
-    id: 2
+    id: 3
     last_name: ''
     url: /users/user1%2B6/
     username: user1+6
@@ -141,39 +147,39 @@ Usernames for users without the IRC nick syntax are based on email fragment and 
 Newly created users should have a suitable profile (e.g. is_private is set)
 
   $ rbmanage dump-account-profile 'user1+6'
-  id: 2
-  user_id: 2
-  first_time_setup_done: 0
-  should_send_email: 1
-  should_send_own_updates: 1
   collapsed_diffs: 1
-  wordwrapped_diffs: 1
-  syntax_highlighting: 1
+  dashboard_columns: 
+  default_use_rich_text: None
+  extra_data: {}
+  first_time_setup_done: 0
+  group_columns: 
+  id: 2
   is_private: 1
   open_an_issue: 1
-  default_use_rich_text: None
-  show_closed: 1
-  sort_review_request_columns: 
-  sort_dashboard_columns: 
-  sort_submitter_columns: 
-  sort_group_columns: 
   review_request_columns: 
-  dashboard_columns: 
+  should_send_email: 1
+  should_send_own_updates: 1
+  show_closed: 1
+  sort_dashboard_columns: 
+  sort_group_columns: 
+  sort_review_request_columns: 
+  sort_submitter_columns: 
   submitter_columns: 
-  group_columns: 
+  syntax_highlighting: 1
   timezone: UTC
-  extra_data: {}
+  user_id: 3
+  wordwrapped_diffs: 1
 
 Usernames for users with IRC nicks are the IRC nickname
 
   $ exportbzauth user2@example.com password2
-  $ rbmanage dump-user $HGPORT1 nick
-  3:
+  $ rbmanage dump-user nick
+  4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2@example.com
     first_name: Mozila User [:nick]
     fullname: Mozila User [:nick]
-    id: 3
+    id: 4
     last_name: ''
     url: /users/nick/
     username: nick
@@ -183,29 +189,29 @@ Changing the IRC nickname in Bugzilla will update the RB username
   $ adminbugzilla update-user-fullname user2@example.com 'Mozilla User [:newnick]'
   updated user 7
 
-  $ hg --config bugzilla.username=user2@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newnick
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ exportbzauth user2@example.com password2
+  $ hg push --reviewid bz://1/user2newnick
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://localhost:$HGPORT1/r/10 (pending)
+  review:     http://*:$HGPORT1/r/10 (pending) (glob)
   
   review id:  bz://1/user2newnick
-  review url: http://localhost:$HGPORT1/r/9 (pending)
+  review url: http://*:$HGPORT1/r/9 (pending) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
-  $ exportbzauth user2@example.com password2
-  $ rbmanage dump-user $HGPORT1 newnick
-  3:
+  $ rbmanage dump-user newnick
+  4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2@example.com
     first_name: Mozilla User [:newnick]
     fullname: Mozilla User [:newnick]
-    id: 3
+    id: 4
     last_name: ''
     url: /users/newnick/
     username: newnick
@@ -214,29 +220,29 @@ Changing the email address in Bugzilla will update the RB email
 
   $ adminbugzilla update-user-email user2@example.com user2-new@example.com
   updated user 7
-  $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2newemail
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ exportbzauth user2-new@example.com password2
+  $ SSH_KEYNAME=user2@example.com hg push --reviewid bz://1/user2newemail
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://localhost:$HGPORT1/r/12 (pending)
+  review:     http://*:$HGPORT1/r/12 (pending) (glob)
   
   review id:  bz://1/user2newemail
-  review url: http://localhost:$HGPORT1/r/11 (pending)
+  review url: http://*:$HGPORT1/r/11 (pending) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
-  $ exportbzauth user2-new@example.com password2
-  $ rbmanage dump-user $HGPORT1 newnick
-  3:
+  $ rbmanage dump-user newnick
+  4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
     first_name: Mozilla User [:newnick]
     fullname: Mozilla User [:newnick]
-    id: 3
+    id: 4
     last_name: ''
     url: /users/newnick/
     username: newnick
@@ -247,8 +253,9 @@ Disabling a user in Bugzilla will prevent them from using Review Board
   updated user 6
 
 (This error message isn't terrific. It can be improved later.)
+  $ exportbzauth user1@example.com
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/disableduser
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -259,18 +266,19 @@ Re-enabling a disabled user will allow them to use Review Board
 
   $ adminbugzilla update-user-login-denied-text user1@example.com ''
   updated user 6
-  $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/undisableduser
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ exportbzauth user1@example.com password1
+  $ hg push --reviewid bz://1/undisableduser
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://localhost:$HGPORT1/r/14 (pending)
+  review:     http://*:$HGPORT1/r/14 (pending) (glob)
   
   review id:  bz://1/undisableduser
-  review url: http://localhost:$HGPORT1/r/13 (pending)
+  review url: http://*:$HGPORT1/r/13 (pending) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -279,19 +287,21 @@ we fall back to non-IRC RB usernames.
 
   $ adminbugzilla create-user user3@example.com password3 'Dummy User3 [:newnick]'
   created user 8
+  $ mozreview create-ldap-user user3@example.com user3 2003 'User Three' --key-file ${MOZREVIEW_HOME}/keys/user3@example.com --scm-level 1
 
-  $ hg --config bugzilla.username=user3@example.com --config bugzilla.password=password3 push --reviewid bz://1/conflictingircnick
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ exportbzauth user3@example.com password3
+  $ hg push --reviewid bz://1/conflictingircnick
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://localhost:$HGPORT1/r/16 (pending)
+  review:     http://*:$HGPORT1/r/16 (pending) (glob)
   
   review id:  bz://1/conflictingircnick
-  review url: http://localhost:$HGPORT1/r/15 (pending)
+  review url: http://*:$HGPORT1/r/15 (pending) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -299,25 +309,25 @@ we fall back to non-IRC RB usernames.
 adding a new user or splitting this test file.)
 
   $ exportbzauth user2-new@example.com password2
-  $ rbmanage dump-user $HGPORT1 newnick
-  3:
+  $ rbmanage dump-user newnick
+  4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
     first_name: Mozilla User [:newnick]
     fullname: Mozilla User [:newnick]
-    id: 3
+    id: 4
     last_name: ''
     url: /users/newnick/
     username: newnick
 
   $ exportbzauth user3@example.com password3
-  $ rbmanage dump-user $HGPORT1 user3+8
-  4:
+  $ rbmanage dump-user user3+8
+  5:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user3@example.com
     first_name: Dummy User3 [:newnick]
     fullname: Dummy User3 [:newnick]
-    id: 4
+    id: 5
     last_name: ''
     url: /users/user3%2B8/
     username: user3+8
@@ -330,17 +340,17 @@ user, they will be assigned the email+id username.
 
 (We need to push to get the RB username updated)
 
-  $ hg --config bugzilla.username=user3@example.com --config bugzilla.password=password3 push --reviewid bz://1/user3newnick > /dev/null
+  $ exportbzauth user3@example.com password3
+  $ hg push --reviewid bz://1/user3newnick > /dev/null
   [1]
 
-  $ exportbzauth user3@example.com password3
-  $ rbmanage dump-user $HGPORT1 mynick
-  4:
+  $ rbmanage dump-user mynick
+  5:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user3@example.com
     first_name: Mozilla User3 [:mynick]
     fullname: Mozilla User3 [:mynick]
-    id: 4
+    id: 5
     last_name: ''
     url: /users/mynick/
     username: mynick
@@ -350,13 +360,13 @@ user, they will be assigned the email+id username.
 (But first we check the existing state, just in case tests change)
 
   $ exportbzauth user2-new@example.com password2
-  $ rbmanage dump-user $HGPORT1 newnick
-  3:
+  $ rbmanage dump-user newnick
+  4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
     first_name: Mozilla User [:newnick]
     fullname: Mozilla User [:newnick]
-    id: 3
+    id: 4
     last_name: ''
     url: /users/newnick/
     username: newnick
@@ -364,41 +374,42 @@ user, they will be assigned the email+id username.
   $ adminbugzilla update-user-fullname user2-new@example.com 'Mozilla User [:mynick]'
   updated user 7
 
-  $ hg --config bugzilla.username=user2-new@example.com --config bugzilla.password=password2 push --reviewid bz://1/user2sharednick
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  $ exportbzauth user2-new@example.com password2
+  $ SSH_KEYNAME=user2@example.com hg push --reviewid bz://1/user2sharednick
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://localhost:$HGPORT1/r/20 (pending)
+  review:     http://*:$HGPORT1/r/20 (pending) (glob)
   
   review id:  bz://1/user2sharednick
-  review url: http://localhost:$HGPORT1/r/19 (pending)
+  review url: http://*:$HGPORT1/r/19 (pending) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
   $ exportbzauth user3@example.com password3
-  $ rbmanage dump-user $HGPORT1 mynick
-  4:
+  $ rbmanage dump-user mynick
+  5:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user3@example.com
     first_name: Mozilla User3 [:mynick]
     fullname: Mozilla User3 [:mynick]
-    id: 4
+    id: 5
     last_name: ''
     url: /users/mynick/
     username: mynick
 
   $ exportbzauth user2-new@example.com password2
-  $ rbmanage dump-user $HGPORT1 user2-new+7
-  3:
+  $ rbmanage dump-user user2-new+7
+  4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
     first_name: Mozilla User [:mynick]
     fullname: Mozilla User [:mynick]
-    id: 3
+    id: 4
     last_name: ''
     url: /users/user2-new%2B7/
     username: user2-new+7
@@ -406,4 +417,4 @@ user, they will be assigned the email+id username.
 Cleanup
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers

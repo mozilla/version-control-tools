@@ -17,20 +17,22 @@ Pushing a review should not touch Bugzilla
   $ echo foo1 > foo
   $ hg commit -m 'Bug 1 - Foo 1'
   $ hg push
-  pushing to ssh://user@dummy/$TESTTMP/repos/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
   changeset:  1:24417bc94b2c
   summary:    Bug 1 - Foo 1
-  review:     http://localhost:$HGPORT1/r/2 (pending)
+  review:     http://*:$HGPORT1/r/2 (pending) (glob)
   
   review id:  bz://1/mynick
-  review url: http://localhost:$HGPORT1/r/1 (pending)
+  review url: http://*:$HGPORT1/r/1 (pending) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ bugzilla dump-bug 1
@@ -52,13 +54,13 @@ Pushing a review should not touch Bugzilla
 
 Publishing the review will add an attachment to the bug
 
-  $ rbmanage publish $HGPORT1 1
+  $ rbmanage publish 1
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://localhost:$HGPORT1/r/1/
+      data: http://*:$HGPORT1/r/1/ (glob)
       description: 'MozReview Request: bz://1/mynick'
       file_name: reviewboard-1-url.txt
       flags: []
@@ -87,7 +89,7 @@ Publishing the review will add an attachment to the bug
         Pull down this commit:
   
   
-        hg pull -r 24417bc94b2c053e8f5dd8c09da33fbbef5404fe http://localhost:$HGPORT/test-repo'
+        hg pull -r 24417bc94b2c053e8f5dd8c09da33fbbef5404fe http://*:$HGPORT/test-repo' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -97,4 +99,4 @@ Publishing the review will add an attachment to the bug
     summary: bug1
 
   $ mozreview stop
-  stopped 6 containers
+  stopped 8 containers
