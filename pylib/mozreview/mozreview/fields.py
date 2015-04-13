@@ -47,6 +47,9 @@ class CombinedReviewersField(BaseReviewRequestField):
     def should_render(self, value):
         return False
 
+    def get_change_entry_sections_html(self, info):
+        return []
+
 
 class CommitsListField(BaseReviewRequestField):
     """The commits list field for review requests.
