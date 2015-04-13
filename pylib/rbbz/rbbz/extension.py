@@ -72,12 +72,18 @@ class BugzillaExtension(Extension):
 
     def initialize(self):
         AuthBackendHook(self, BugzillaBackend)
+
+        # Any abortable signal hooks that talk to Bugzilla should have
+        # sandbox_errors=False, since we don't want to complete the action if
+        # updating Bugzilla failed for any reason.
         SignalHook(self, pre_delete, on_draft_pre_delete)
         SignalHook(self, review_request_publishing,
                    on_review_request_publishing,
                    sandbox_errors=False)
-        SignalHook(self, review_publishing, on_review_publishing)
-        SignalHook(self, reply_publishing, on_reply_publishing)
+        SignalHook(self, review_publishing, on_review_publishing,
+                   sandbox_errors=False)
+        SignalHook(self, reply_publishing, on_reply_publishing,
+                   sandbox_errors=False)
         SignalHook(self, review_request_closed,
                    on_review_request_closed_discarded)
         SignalHook(self, review_request_closed,
