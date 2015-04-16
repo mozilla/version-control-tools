@@ -14,6 +14,7 @@ import json
 import tempfile
 
 from rbtools.api.client import RBClient
+from rbtools.api.errors import APIError
 from rbtools.api.transport.sync import SyncTransport
 
 
@@ -47,6 +48,7 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
                     'diff': <diff>,
                     'parent_diff': <diff-from-base-to-commit> (optional),
                     'base_commit_id': <commit-id-to-apply-diffs-to> (optional),
+                    'reviewers': [<user1>, <user2>, ...] (optional),
                 },
                 {
                     ...
@@ -137,6 +139,9 @@ def _post_reviews(api_root, repoid, identifier, commits):
     squashed_rr = None
     rrs = api_root.get_review_requests(commit_id=identifier,
                                        repository=repoid)
+    users = api_root.get_users()
+
+    squashed_reviewers = set()
 
     if rrs.total_results > 0:
         squashed_rr = rrs[0]
@@ -158,12 +163,46 @@ def _post_reviews(api_root, repoid, identifier, commits):
         commits["squashed"]["diff"],
         base_commit_id=commits["squashed"].get('base_commit_id', None))
 
+    def extract_reviewers(commit):
+        reviewers = set()
+        for reviewer in commit.get('reviewers', []):
+            # we've already seen this reviewer so we can just add them as a
+            # reviewer for this commit.
+            if reviewer in squashed_reviewers:
+                reviewers.add(reviewer)
+                continue
+
+            try:
+                # Check to see if this user exists (and sync things up
+                # between reviewboard and bugzilla, if necessary).
+                r = api_root.get_users(q=reviewer)
+
+                if len(r.rsp['users']) == 1:
+                    username = r.rsp['users'][0]['username']
+                    if reviewer == username:
+                        reviewers.add(username)
+                        squashed_reviewers.add(username)
+                elif len(users) > 1:
+                    # If we get multiple users, we'll look for an exact match.
+                    # It would be nice to use this at first, but we seem to
+                    # need the call to get_users in order to synchronize our
+                    # users with bugzilla.
+                    r = users.get_item(reviewer)
+                    username = r.rsp['user']['username']
+                    reviewers.add(username)
+                    squashed_reviewers.add(username)
+            except APIError:
+                pass
+
+        return sorted(reviewers)
+
     def update_review_request(rid, commit):
         rr = api_root.get_review_request(review_request_id=rid)
         draft = rr.get_or_create_draft(**{
             "summary": commit['message'].splitlines()[0],
             "description": commit['message'],
             "extra_data.p2rb.commit_id": commit['id'],
+            "target_people": ','.join(extract_reviewers(commit)),
         })
 
         rr.get_diffs().upload_diff(
@@ -298,7 +337,8 @@ def _post_reviews(api_root, repoid, identifier, commits):
             base_commit_id=commit.get('base_commit_id', None))
         draft = rr.get_or_create_draft(
             summary=commit['message'].splitlines()[0],
-            description=commit['message'])
+            description=commit['message'],
+            target_people=','.join(extract_reviewers(commit)))
         processed_nodes.add(commit['id'])
         assert isinstance(rr.id, int)
         node_to_rid[node] = rr.id
@@ -356,6 +396,7 @@ def _post_reviews(api_root, repoid, identifier, commits):
         'description': '%s\n' % '\n'.join(squashed_description),
         'depends_on': depends,
         'extra_data.p2rb.commits': commit_list_json,
+        'target_people': ','.join(sorted(squashed_reviewers)),
     })
 
     squashed_rr.update(**{

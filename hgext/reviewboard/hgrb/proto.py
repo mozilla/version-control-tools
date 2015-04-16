@@ -11,6 +11,8 @@ from mercurial.node import short
 
 from hgrb.util import ReviewID
 
+from mozautomation import commitparser
+
 
 class AuthorizationError(Exception):
     """Represents an error authenticating or authorizing to Bugzilla."""
@@ -245,13 +247,14 @@ def reviewboard(repo, proto, args=None):
             base_commit_id = nodes[i-1]
         else:
             base_commit_id = base_ctx.hex()
-
+        summary = ctx.description().splitlines()[0]
         commits['individual'].append({
             'id': node,
             'precursors': precursors.get(node, []),
             'message': ctx.description(),
             'diff': diff,
             'base_commit_id': base_commit_id,
+            'reviewers': list(commitparser.parse_reviewers(summary))
         })
 
     commits['squashed']['diff'] = ''.join(patch.diff(repo, node1=base_parent_node,

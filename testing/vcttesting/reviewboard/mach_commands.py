@@ -205,12 +205,15 @@ class ReviewBoardCommands(object):
     @CommandArgument('--user', action='append',
         help='User from whom to ask for review')
     def add_reviewer(self, rrid, user):
+        from rbtools.api.errors import APIError
+
         root = self._get_root()
         rr = root.get_review_request(review_request_id=rrid)
 
         people = []
-        for p in rr.target_people:
-            people.add(p.get().username)
+        draft = rr.get_or_create_draft()
+        for p in draft.target_people:
+            people.append(p.title)
 
         # Review Board doesn't call into the auth plugin when mapping target
         # people to RB users. So, we perform an API call here to ensure the
@@ -224,6 +227,29 @@ class ReviewBoardCommands(object):
 
         draft = rr.get_or_create_draft(target_people=people)
         print('%d people listed on review request' % len(draft.target_people))
+
+    @Command('list-reviewers', category='reviewboard',
+        description='List reviewers on a review request')
+    @CommandArgument('rrid', help='Review request id for which to list reviewers')
+    @CommandArgument('--draft', action='store_true',
+            help='List reviewers on the current draft')
+    def list_reviewers(self, rrid, draft):
+        from rbtools.api.errors import APIError
+        root = self._get_root()
+        rr = root.get_review_request(review_request_id=rrid)
+
+        people = []
+        if draft:
+            try:
+                for p in rr.get_draft().target_people:
+                    people.append(p.title)
+            except APIError:
+                pass
+        else:
+            for p in rr.target_people:
+                people.append(p.title)
+
+        print(', '.join(sorted(people)))
 
     @Command('remove-reviewer', category='reviewboard',
         description='Remove a reviewer from a review request')

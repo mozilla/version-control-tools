@@ -24,15 +24,32 @@ BUG_RE = re.compile(
            (?:\s*\#?)(\d+)(?=\b)
          )''', re.I | re.X)
 
-REVIEW_RE = re.compile(r'[ra][=?]+(\w[^ ]+)')
+SPECIFIER_RE = re.compile(r'[ra][=?]')
 
-LIST_RE = re.compile(r'[;\.,\+\/\\]')
+REQUAL_SPECIFIER_RE = re.compile(r'r=')
+
+LIST_RE = re.compile(r'[;\.,\/\\]')
+
 
 def parse_bugs(s):
     bugs = [int(m[1]) for m in BUG_RE.findall(s)]
     return [bug for bug in bugs if bug < 100000000]
 
 def parse_reviewers(s):
-    for r in REVIEW_RE.findall(s):
+    for r in SPECIFIER_RE.split(s)[1:]:
         for part in LIST_RE.split(r):
-            yield part.strip('[](){}')
+            part = part.strip('[](){} ')
+            if part:
+                # strip off the 'specifier' if any
+                yield SPECIFIER_RE.split(part)[-1]
+
+def parse_requal_reviewers(s):
+    for r in REQUAL_SPECIFIER_RE.split(s)[1:]:
+        for part in LIST_RE.split(r):
+            part = part.strip('[](){} ')
+            if part:
+                part = REQUAL_SPECIFIER_RE.split(part)[-1]
+                # we've stripped off 'r=' but we might still have another
+                # specifier
+                if not SPECIFIER_RE.match(part):
+                    yield part
