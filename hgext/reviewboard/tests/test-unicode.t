@@ -73,7 +73,7 @@ The globbing is patching over a bug in mach
     - author: author@example.com
       id: 3
       tags: []
-      text: "http://*:$HGPORT1/r/1/#review1\n\n::: foo:1\n(Diff revision 1)\n>\\ (glob)
+      text: "http://*:$HGPORT1/r/1/#review1\n\n::: foo:1\n(Diff revision 1)\n>\ (glob)
         \ -foo\n> +initial\n\n\u3053\u3093\u306B\u3061\u306F\u4E16\u754C"
     component: TestComponent
     depends_on: []
