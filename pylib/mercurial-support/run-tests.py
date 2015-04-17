@@ -1010,7 +1010,7 @@ class TTest(Test):
         while i < n:
             c = el[i]
             i += 1
-            if c == '\\' and el[i] in '*?\\/':
+            if c == '\\' and i < n and el[i] in '*?\\/':
                 res += el[i - 1:i + 1]
                 i += 1
             elif c == '*':
