@@ -4,57 +4,111 @@
 --allow-unverified rbtools
 --allow-external django-evolution
 --allow-unverified django-evolution
+# sha256: BwPB6lpq8LttDOwkcIMBM0lJ1W68f5XGQCjZxm-djV0
 alabaster==0.7.3
+# sha256: 406XZaYSD0ZkwSD0GYp4bDmg-35KWb0ZotbjqIS2OIk
 amqp==1.4.6
+# sha256: shk_2aQGGrYk-mcxF5ZBmnWd4GtPMh03FpsiujgxMxw
 ansible==1.9.0.1
+# sha256: N4Ethjya0-NcBzTELgvwMgzow77YLNIK1UyzTRWBV7o
 anyjson==0.3.3
+# sha256: nwLQNXGE3h8JPBABK1LnRUoQCL5qXBhat6Mwes6x0S4
 Babel==1.3
+# sha256: B0EOf7Caq3va9eYY3mbD2shOLj1ig1KBTcTDfeMh1q4
 backports.ssl-match-hostname==3.4.0.2
+# sha256: orKb0EjKL-VKBGspdwlkc4hyqXRwA6NxNEqT7t961Y4
 beautifulsoup4==4.3.2
+# sha256: 7cVxMGHxCWYEi_a0DZpRSzgeC6hJxk4DTE72wYR9MAc
 blessings==1.6
+# sha256: 0a6hxKphuDZtakLdNlBiL7-cY07STq9_N5yLlw5e1E4
 coverage==3.7.1
+# sha256: byzISLK3Kt9TpvPyG-BJxHfoLECLznzttX7-sJhL3iQ
 Django==1.6.11
+# sha256: C3W_Fj1chZ8XG69nRQPfs8p9HS7wguXFlS1Sue5mROQ
 django-evolution==0.7.4
+# sha256: ow34iO4NoyxIN8Mo7PhZ6ZLtttGF76fUk0HMGUnbsk0
 django-haystack==2.3.1
+# sha256: ca3Sb2gsLnZSxD0Bq2rBscaT2Gn2YxQvX3w3sAeI0WI
 django-pipeline==1.3.27
+# sha256: OR_xF3GLOIXvVicMY14h4A3y77HPxXRrQ270pQSC6JI
 docker-py==0.7.1
+# sha256: x9txeBCraWX2bIzwOYqYydjfmC2jm0zX8WKRHriVlvo
 docutils==0.12
+# sha256: QNACzzYNDgNc8suYXhMI1BqqCHy_wTWy3C2EQpbqVGw
 ecdsa==0.13
+# sha256: f2UH1ADQft_R6oIF2jaAgAmwxTn1uKbgq1Qze5VebcM
 feedparser==5.1.3
+# sha256: n9IrNUpMR1WtjH0WHZP1AmrKTP6Zm9LlMWjxR2XALNY
 futures==2.2.0
+# sha256: LiSsXQBNtXFJdqBKwOgMbfbkfpjDVMssDYL4h51Pj9s
 Jinja2==2.7.3
+# sha256: SGL3SQ8T4GJXMS9X6BVT85jMcboDXQJjL_QXOcVy1K0
 kombu==3.0.24
+# sha256: x9WZApivb_sAMSlzol8MyRemNoEm3UDqq0HXjT4eol0
 lxml==3.4.2
+# sha256: Yb2hoQM8EQ94FCfEed0VGkX8ReRs4o43-r8NPMLt-R4
 mach==0.5.1
+# sha256: gS7FJJ9F7cMTMLf7BuUqr2qy2DqicEfffLaDfvLSabY
 Markdown==2.4.1
+# sha256: pOwa_1m5WhS0XrLiN2GgF56YMZ2lp-t2tW6ozce4ccM
 MarkupSafe==0.23
+# sha256: pEU2fw3Lrzpieb-nQ7Nk5ym-DR8MhSy2038peRb_rhM
 mercurial==3.3.3
+# sha256: U0_2_u_hzQOYT0ROZBWqzHnAqF87ho7EGi_VADAEwx4
 mimeparse==0.1.3
+# sha256: uDndLZwRfHAUMMFJlWkYpCOphjtIsJyQ4wpgE-fS9E8
 mock==1.0.1
+# sha256: 4dhQXJ1XUFHggx7mWamCorv67DcBPclG1gowcaRCiI4
 mozfile==1.1
+# sha256: 0n91tmhhTyjfLmG4qkvrb2jzyZNvyROfrnVXKPK0hEo
 mozinfo==0.7
+# sha256: AQCIYcygr7ac0w3NOJhD_rgX57nRRtU0UClUTPA73nI
 mozlog==2.2
+# sha256: LVbgFaNZTwYTDowBX3yofz-Ng9nEv1RYjwd86brZoIs
 mozprocess==0.22
+# sha256: eLAxFrrdDbsu1N7clqSj1CE4uUu4n8Lrmffzvf0Zn1Y
 nose==1.3.4
+# sha256: xnVVjqRXwUdce4L0rkBL31bERj9vJiZloxvfi5yahZw
 paramiko==1.15.2
+# sha256: AQR0SbxuRnkiF_5i3rpoOXmmCzPefv2Z7VZM9DkHAhs
 Pillow==2.7.0
+# sha256: Fbzhklo9ZpQM65ozw8Vd6NlUYs4TbE1G6Gc_KRm0AdY
 pillowfight==0.2
+# sha256: 8s4emJsnLPy2d2FnY-Ci5-xlnv-meoiqkrOmVSj2Cjw
 pycrypto==2.6.1
+# sha256: CjoiZeHvsN76ci0fQpcw3J35da3DxgrH0rQyvfA8BB0
 Pygments==2.0.2
+# sha256: bxlzSLRvuM358_z8Kn1al9qV2z4uhmfPZXIWJ0_hsAk
 python-dateutil==1.5
+# sha256: Av3bOsy_tU5A_0ellFfkIrJT-fts1kuzhRs0kpX6sEg
 python-ldap==2.4.19
+# sha256: Z-HBi2uZykwsjkoC4KlhdL9waJGaWv9Sg2YAl0we9Ng
 python-memcached==1.54
+# sha256: NYsFoMJgXBXPgzfRcBbrla_qrQfJAN-cLN524hlKklg
 pytz==2015.2
+# sha256: w2yTiocuX_SUk4szsUqqFWy0OexnVI_Ks1Nbt4sIRug
 PyYAML==3.11
+# sha256: SFxYdfcE05QYN1gC0971KqEk7KP85BG_dgBMsBBodzU
 RBTools==0.6.1
+# sha256: KMaFPB0T02W33HGmsF5f-1ZHH3CoUN4xivUNPXwN6i8
 recaptcha-client==1.0.6
+# sha256: EkiQ9BcjyFqoLf4IB0Mq6kbSSusNr840CWnSCJVIwsM
 requests==2.4.3
+# sha256: bF65Fbz3Y7Z3uOUc22jIR0EnqbYOSebiQLBexeRJxDs
 responses==0.3.0
+# sha256: cjlM5ykoyH02UBp1_MU1c30WZU_v1sIWwxUVgpS8wSY
 selenium==2.45.0
+# sha256: 8sLRhLrAXUkfxZ6C3cv2-gRY-vSsj1yGxIqwvWlW7yE
 setuptools==14.3.1
+# sha256: QYqTw5en7asj5ViNvAZ6x0pyPts9VBvUk295R252Rdo
 six==1.9.0
+# sha256: bVTzUOeg5IkDpOO2ssq9G0PiN2X7yXUGVAKJNpKVQZE
 snowballstemmer==1.2.0
+# sha256: Ld8Y2jsGIfpD_uS3KQ2grnibRvuJkniorMzaGVxJeac
 Sphinx==1.3.1
+# sha256: qKLiOalzG2hcfepiSF3sgc7zYB6-UKd6lalr3yl6-_c
 sphinx-rtd-theme==0.1.7
+# sha256: vsd5lACwT9FJ0TvJQHwa5HMc_Rpwn5L-xWBYDcELsAA
 websocket-client==0.26.0
+# sha256: fee8TQCm0FHbs2C0jrfzzQAjc9hyUvsLKEo8nEU6dnc
 Whoosh==2.6.0
