@@ -121,7 +121,9 @@ RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 bugzilla
 
 RUN apt-get update && apt-get --no-install-recommends -y install \
   apache2 build-essential cvs g++ git graphviz \
-  libapache2-mod-perl2 libdaemon-generic-perl libgd-dev libssl-dev \
+  libapache2-mod-perl2 \
+  libdaemon-generic-perl libfile-slurp-perl \
+  libgd-dev libssl-dev \
   mysql-client patchutils perlmagick pkg-config python3-mysql.connector \
   unzip wget
 
