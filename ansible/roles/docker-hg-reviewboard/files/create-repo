@@ -17,3 +17,12 @@ EOF
 chown -R hg:scm_level_1 /repo/hg/mozilla/$1
 find /repo/hg/mozilla/$1 | xargs chmod g+w
 find /repo/hg/mozilla/$1 -type d | xargs chmod g+s
+
+# By default, hgweb only refreshes the list of known repos every 20s.
+# This latency is not acceptable for tests. We forcefully refresh the
+# list by triggering the WSGI processes to start.
+#
+# Note: we previously tried to monkeypatch Mercurial via an extension to
+# eliminate the refresh interval. But for whatever reason that didn't
+# work consistently.
+/kill-wsgi-procs

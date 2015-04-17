@@ -1,0 +1,22 @@
+#!/usr/bin/python -u
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script is used to kill wsgi processes on the server. This will
+# force Python code to be reloaded.
+#
+# Apache should respawn killed processes automatically and
+# instantaneously.
+
+import psutil
+
+for proc in psutil.process_iter():
+    if proc.name() != 'httpd':
+        continue
+
+    if proc.username() != 'hg':
+        continue
+
+    print('killing WSGI process %d' % proc.pid)
+    proc.kill()
