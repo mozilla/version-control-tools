@@ -4,7 +4,7 @@ index a901a44..715899e 100644
 +++ b/.htaccess
 @@ -1,6 +1,6 @@
  # Don't allow people to retrieve non-cgi executable files or our private data
- <FilesMatch (\.pm|\.pl|\.tmpl|\.swf|localconfig.*)$>
+ <FilesMatch (\.pm|\.pl|\.tmpl|\.swf|localconfig.*|cpanfile)$>
 -  deny from all
 +  Require all denied
  </FilesMatch>
