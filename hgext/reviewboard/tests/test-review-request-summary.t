@@ -142,6 +142,38 @@ Resolving an issue should decrement the issue count.
     status: pending
     reviewers: []
 
+Verify we can also get the summaries by bug.
+
+  $ rbmanage dump-summaries-by-bug 1
+  - parent:
+      summary: bz://1/mynick
+      id: 1
+      submitter: default+5
+      issue_open_count: 0
+      status: pending
+      reviewers: []
+    children:
+    - summary: Bug 1 - Foo 1
+      id: 2
+      commit: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
+      submitter: default+5
+      issue_open_count: 0
+      status: pending
+      reviewers:
+      - reviewer
+    - summary: Bug 1 - Foo 2
+      id: 3
+      commit: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
+      submitter: default+5
+      issue_open_count: 0
+      status: pending
+      reviewers: []
+
+Verify that we get nothing from non-existent bugs.
+
+  $ rbmanage dump-summaries-by-bug 2
+  []
+
 Cleanup
 
   $ mozreview stop

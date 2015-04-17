@@ -554,6 +554,33 @@ class ReviewBoardCommands(object):
 
         print(yaml.safe_dump(d, default_flow_style=False).rstrip())
 
+    @Command('dump-summaries-by-bug', category='reviewboard',
+             description='Return parent and child review-request summaries '
+                         'for a given bug.')
+    @CommandArgument('bug', help='Bug id')
+    def dump_summaries_by_bug(self, bug):
+        from rbtools.api.errors import APIError
+        c = self._get_client()
+
+        try:
+            r = c.get_path('/extensions/mozreview.extension.MozReviewExtension'
+                           '/summary/', bug=bug)
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                                             e.rsp['err']['msg']))
+            return 1
+
+        l = []
+
+        for summary in r:
+            d = OrderedDict()
+            d['parent'] = short_review_request_dict(summary['parent'])
+            d['children'] = [short_review_request_dict(x) for x in
+                             summary['children']]
+            l.append(d)
+
+        print(yaml.safe_dump(l, default_flow_style=False).rstrip())
+
     @Command('make-admin', category='reviewboard',
         description='Make a user a superuser and staff user')
     @CommandArgument('email', help='Email address of user to modify')
