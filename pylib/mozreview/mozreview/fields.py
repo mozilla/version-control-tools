@@ -20,7 +20,8 @@ def get_root(review_request):
     if not is_parent(review_request):
         identifier = review_request.extra_data.get('p2rb.identifier')
         try:
-            review_request = ReviewRequest.objects.get(commit_id=identifier)
+            review_request = ReviewRequest.objects.get(
+                commit_id=identifier, repository=review_request.repository)
         except:
             logging.error('Could not retrieve root review request with '
                           'commit id %s because it does not appear to exist, '

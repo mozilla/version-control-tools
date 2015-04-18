@@ -11,6 +11,7 @@ from django.db.models.signals import pre_delete
 
 from djblets.siteconfig.models import SiteConfiguration
 from djblets.util.decorators import simple_decorator
+
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import AuthBackendHook, SignalHook
 from reviewboard.reviews.errors import PublishError
@@ -23,6 +24,10 @@ from reviewboard.reviews.signals import (reply_publishing,
                                          review_request_reopened)
 from reviewboard.site.urlresolvers import local_site_reverse
 
+from mozreview.extra_data import (UNPUBLISHED_RRIDS_KEY,
+                                  gen_child_rrs,
+                                  gen_rrs_by_rids,
+                                  gen_rrs_by_extra_data_key)
 from mozreview.models import (BugzillaUserMap,
                               get_or_create_bugzilla_users)
 from rbbz.auth import BugzillaBackend
@@ -165,7 +170,8 @@ def on_draft_pre_delete(sender, instance, using, **kwargs):
         if draft:
             draft.delete()
 
-    for child in gen_rrs_by_extra_data_key(review_request, 'unpublished_rids'):
+    for child in gen_rrs_by_extra_data_key(review_request,
+                                           UNPUBLISHED_RRIDS_KEY):
         child.close(ReviewRequest.DISCARDED,
                     user=user,
                     description=NEVER_USED_DESCRIPTION)
@@ -421,7 +427,7 @@ def close_child_review_requests(user, review_request, status,
     # request never got to publish, so were never part of its "commits"
     # list.
     for child in gen_rrs_by_extra_data_key(review_request,
-                                           'unpublished_rids'):
+                                           UNPUBLISHED_RRIDS_KEY):
         child.close(ReviewRequest.DISCARDED,
                     user=user,
                     description=NEVER_USED_DESCRIPTION)
@@ -448,7 +454,7 @@ def on_review_request_reopened(user, review_request, **kwargs):
     # not equal to the revived review request.
     try:
         preexisting_review_request = ReviewRequest.objects.get(
-            commit_id=identifier)
+            commit_id=identifier, repository=review_request.repository)
         if preexisting_review_request != review_request:
             logging.error("Could not revive review request with ID %s "
                           "because its commit id (%s) is already being used by "
@@ -478,51 +484,6 @@ def on_review_request_reopened(user, review_request, **kwargs):
     if draft:
         draft.commit = identifier
         draft.save()
-
-
-def gen_child_rrs(review_request):
-    """ Generate child review requests.
-
-    For some review request (draft or normal), that has a p2rb.commits
-    extra_data field, we yield the child review requests belonging to
-    the rids in that field.
-
-    If a review request is not found for the listed ID, get_rr_for_id will
-    log this, and we'll skip that ID.
-    """
-    key = 'p2rb.commits'
-    if not key in review_request.extra_data:
-        return
-
-    commit_tuples = json.loads(review_request.extra_data[key])
-    for commit_tuple in commit_tuples:
-        child = get_rr_for_id(commit_tuple[1])
-        if child:
-            yield child
-
-
-def gen_rrs_by_extra_data_key(review_request, key):
-    key = 'p2rb.' + key
-    if not key in review_request.extra_data:
-        return
-
-    return gen_rrs_by_rids(json.loads(review_request.extra_data[key]))
-
-
-def gen_rrs_by_rids(rids):
-    for rid in rids:
-        review_request = get_rr_for_id(rid)
-        if review_request:
-            yield review_request
-
-
-def get_rr_for_id(rid):
-    try:
-        return ReviewRequest.objects.get(pk=rid)
-    except ReviewRequest.DoesNotExist:
-        logging.error('Could not retrieve child review request with '
-                      'rid %s because it does not appear to exist.'
-                      % rid)
 
 
 def we_are_using_bugzilla():
