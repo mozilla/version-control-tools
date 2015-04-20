@@ -14,6 +14,15 @@
     rbsite: /data/reviewboard/src/reviewboard.mozilla.org/venv/bin/rb-site
     sitehome: /data/reviewboard/src/reviewboard.mozilla.org/reviewboard
   tasks:
+    - name: notify IRC a deployment has been started
+      irc: server=irc.mozilla.org
+           port=6697
+           use_ssl=true
+           channel="#mozreview"
+           nick=mozreview-deploy-bot
+           color=red
+           msg="Production deployment of MozReview initiated"
+
     - name: prepare v-c-t repo
       hg: repo={{ repo }} dest={{ vct }} revision={{ rev }} force=yes purge=yes executable={{ venv }}/bin/hg
 
@@ -32,3 +41,26 @@
 
     - name: generate static Review Board files
       command: "{{ rbsite }} manage {{ sitehome }} -- collectstatic --noinput"
+
+    - name: deploy code to web servers
+      command: /data/reviewboard/deploy -v reviewboard.mozilla.org
+
+# TODO: serialize and integrate with load balancer management
+- hosts: rbweb-prod
+  tasks:
+    - name: restart memcached
+      service: name=memcached state=restarted
+
+    - name: restart httpd
+      service: name=httpd state=restarted
+
+- hosts: reviewboardadm.private.scl3.mozilla.com
+  tasks:
+    - name: notify IRC that the deployment has finished
+      irc: server=irc.mozilla.org
+           port=6697
+           use_ssl=true
+           channel="#mozreview"
+           nick=mozreview-deploy-bot
+           color=red
+           msg="Production deployment of MozReview complete"
