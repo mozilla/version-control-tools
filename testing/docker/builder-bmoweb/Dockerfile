@@ -171,6 +171,3 @@ EXPOSE 80
 
 ENTRYPOINT ["/bmoweb_entrypoint.py"]
 CMD ["/run-apache.sh"]
-
-# Temporarily pin until bug 1155833 is resolved.
-ENV BMO_COMMIT 7b7e0cc4000fa15305a8f76f580b3a2dd22a04ee
