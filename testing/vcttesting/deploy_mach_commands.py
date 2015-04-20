@@ -8,7 +8,10 @@ from mach.decorators import (
     Command,
 )
 
-from vcttesting.deploy import deploy_reviewboard_dev
+from vcttesting.deploy import (
+    deploy_reviewboard_dev,
+    deploy_reviewboard_prod,
+)
 
 
 @CommandProvider
@@ -27,3 +30,14 @@ class DeployCommands(object):
                      help='How verbose to be with output')
     def reviewboard_dev(self, repo=None, rev=None, verbosity=None):
         return deploy_reviewboard_dev(repo=repo, rev=rev, verbosity=verbosity)
+
+    @Command('reviewboard-prod', category='deploy',
+             description='Deploy Review Board to production')
+    @CommandArgument('--repo',
+                     help='Alternative repository URL to deploy from')
+    @CommandArgument('--rev',
+                     help='Explicit revision in repository to deploy from')
+    @CommandArgument('--verbosity', type=int,
+                     help='How verbose to be with output')
+    def reviewboard_prod(self, repo=None, rev=None, verbosity=None):
+        return deploy_reviewboard_prod(repo=repo, rev=rev, verbosity=verbosity)

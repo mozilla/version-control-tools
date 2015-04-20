@@ -1,0 +1,34 @@
+# This playbook is used to update the production deployment of
+# MozReview (reviewboard.mozilla.org).
+---
+- hosts: reviewboardadm.private.scl3.mozilla.com
+  roles:
+    - { role: reviewboard-admin, site: reviewboard.mozilla.org }
+  vars:
+    repo: https://hg.mozilla.org/hgcustom/version-control-tools
+    rev: "@"
+    vct: /data/reviewboard/src/version-control-tools
+    venv: /data/reviewboard/src/reviewboard.mozilla.org/venv
+    python: /data/reviewboard/src/reviewboard.mozilla.org/venv/bin/python
+    easy_install: /data/reviewboard/src/reviewboard.mozilla.org/venv/bin/easy_install
+    rbsite: /data/reviewboard/src/reviewboard.mozilla.org/venv/bin/rb-site
+    sitehome: /data/reviewboard/src/reviewboard.mozilla.org/reviewboard
+  tasks:
+    - name: prepare v-c-t repo
+      hg: repo={{ repo }} dest={{ vct }} revision={{ rev }} force=yes purge=yes executable={{ venv }}/bin/hg
+
+    # TODO: consolidate with reviewboard-dev.yml in a role.
+    - name: build MozReview eggs
+      command: "{{ python }} setup.py bdist_egg chdir={{ vct }}/{{ item }}"
+      with_items:
+        - pylib/mozreview
+        - pylib/rbbz
+
+    - name: install MozReview eggs
+      shell: "{{ easy_install }} -U dist/*.egg chdir={{ vct }}/{{ item}}"
+      with_items:
+        - pylib/mozreview
+        - pylib/rbbz
+
+    - name: generate static Review Board files
+      command: "{{ rbsite }} manage {{ sitehome }} -- collectstatic --noinput"

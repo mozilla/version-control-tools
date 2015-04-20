@@ -43,3 +43,14 @@ def deploy_reviewboard_dev(repo=None, rev=None, verbosity=0):
 
     return run_playbook('reviewboard-dev', extra_vars=extra,
                         verbosity=verbosity)
+
+
+def deploy_reviewboard_prod(repo=None, rev=None, verbosity=0):
+    extra = {}
+    if repo:
+        extra['repo'] = repo
+    if rev:
+        extra['rev'] = rev
+
+    return run_playbook('deploy-mozreview-prod', extra_vars=extra,
+                        verbosity=verbosity)
