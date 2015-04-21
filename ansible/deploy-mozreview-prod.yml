@@ -23,24 +23,7 @@
            color=red
            msg="Production deployment of MozReview initiated"
 
-    - name: prepare v-c-t repo
-      hg: repo={{ repo }} dest={{ vct }} revision={{ rev }} force=yes purge=yes executable={{ venv }}/bin/hg
-
-    # TODO: consolidate with reviewboard-dev.yml in a role.
-    - name: build MozReview eggs
-      command: "{{ python }} setup.py bdist_egg chdir={{ vct }}/{{ item }}"
-      with_items:
-        - pylib/mozreview
-        - pylib/rbbz
-
-    - name: install MozReview eggs
-      shell: "{{ easy_install }} -U dist/*.egg chdir={{ vct }}/{{ item}}"
-      with_items:
-        - pylib/mozreview
-        - pylib/rbbz
-
-    - name: generate static Review Board files
-      command: "{{ rbsite }} manage {{ sitehome }} -- collectstatic --noinput"
+    - include: tasks/install-mozreview.yml
 
     - name: deploy code to web servers
       command: /data/reviewboard/deploy -v reviewboard.mozilla.org

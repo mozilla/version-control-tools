@@ -5,41 +5,20 @@
     rev: "@"
     repo: https://hg.mozilla.org/hgcustom/version-control-tools
     sitehome: /data/www/reviewboard-dev.allizom.org/reviewboard
+    venv: /data/www/reviewboard-dev.allizom.org/venv
     vct: /data/www/reviewboard-dev.allizom.org/version-control-tools
     pip: /data/www/reviewboard-dev.allizom.org/venv/bin/pip
     easy_install: /data/www/reviewboard-dev.allizom.org/venv/bin/easy_install
     python: /data/www/reviewboard-dev.allizom.org/venv/bin/python
     rbsite: /data/www/reviewboard-dev.allizom.org/venv/bin/rb-site
   tasks:
-  - name: Clear old files out of v-c-t
-    command: hg --config extensions.purge= -R {{ vct }} purge -a
-
-  - name: Pull v-c-t repository
-    command: hg -R {{ vct }} pull {{ repo }}
-
-  - name: Update v-c-t repository
-    command: hg -R {{ vct }} up -C {{ rev }}
-
   - name: Install RBTools
     command: "{{ pip }} install --allow-external RBTools --allow-unverified RBTools --upgrade RBTools==0.6.1"
 
   - name: Install Review Board and Djblets
     command: "{{ easy_install }} -U Djblets==0.8.18 ReviewBoard==2.0.12"
 
-  - name: Build Review Board extension eggs
-    command: "{{ python }} setup.py bdist_egg chdir={{ vct }}/{{ item }}"
-    with_items:
-      - pylib/mozreview
-      - pylib/rbbz
-
-  - name: Install Review Board extension eggs
-    shell: "{{ easy_install }} -U dist/*.egg chdir={{ vct }}/{{ item }}"
-    with_items:
-      - pylib/mozreview
-      - pylib/rbbz
-
-  - name: Generate static Review Board files
-    command: "{{ rbsite }} manage {{ sitehome }} -- collectstatic --noinput"
+  - include: tasks/install-mozreview.yml
 
   - name: Set proper file permissions for web files
     file: path={{ sitehome }}/htdocs/static/ext owner=apache group=apache recurse=true
