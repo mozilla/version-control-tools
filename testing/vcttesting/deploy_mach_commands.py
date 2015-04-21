@@ -8,11 +8,6 @@ from mach.decorators import (
     Command,
 )
 
-from vcttesting.deploy import (
-    deploy_reviewboard_dev,
-    deploy_reviewboard_prod,
-)
-
 
 @CommandProvider
 class DeployCommands(object):
@@ -29,6 +24,7 @@ class DeployCommands(object):
     @CommandArgument('--verbosity', type=int,
                      help='How verbose to be with output')
     def reviewboard_dev(self, repo=None, rev=None, verbosity=None):
+        from vcttesting.deploy import deploy_reviewboard_dev
         return deploy_reviewboard_dev(repo=repo, rev=rev, verbosity=verbosity)
 
     @Command('reviewboard-prod', category='deploy',
@@ -40,4 +36,17 @@ class DeployCommands(object):
     @CommandArgument('--verbosity', type=int,
                      help='How verbose to be with output')
     def reviewboard_prod(self, repo=None, rev=None, verbosity=None):
+        from vcttesting.deploy import deploy_reviewboard_prod
         return deploy_reviewboard_prod(repo=repo, rev=rev, verbosity=verbosity)
+
+    @Command('hgmo-strip', category='deploy',
+             description='Strip commits from a hg.mozilla.org repo')
+    @CommandArgument('repo',
+                     help='Repo to strip (path under hg.mozilla.org/)')
+    @CommandArgument('rev',
+                     help='Revset of revisions to strip')
+    @CommandArgument('--verbosity', type=int,
+                     help='How verbose to be with output')
+    def hgmo_strip(self, repo, rev, verbosity=None):
+        from vcttesting.deploy import hgmo_strip as strip
+        return strip(repo, rev, verbosity=verbosity)

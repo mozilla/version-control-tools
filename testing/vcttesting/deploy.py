@@ -54,3 +54,13 @@ def deploy_reviewboard_prod(repo=None, rev=None, verbosity=0):
 
     return run_playbook('deploy-mozreview-prod', extra_vars=extra,
                         verbosity=verbosity)
+
+
+def hgmo_strip(repo, rev, verbosity=0):
+    extra = {
+        'repo': repo,
+        'rev': rev,
+    }
+
+    return run_playbook('hgmo-strip-repo', extra_vars=extra,
+                        verbosity=0)
