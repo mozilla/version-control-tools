@@ -8,8 +8,7 @@ fi
 
 source venv/bin/activate
 pip install --upgrade pip
-pip install --upgrade peep
-peep install --upgrade -r test-requirements.txt
+pip install --upgrade -r test-requirements.txt
 
 # ReviewBoard doesn't work with pip, sadly.
 easy_install ReviewBoard==2.0.12
