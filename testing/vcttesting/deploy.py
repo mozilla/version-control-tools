@@ -24,6 +24,7 @@ def run_playbook(name, extra_vars=None, verbosity=0):
     args = [
         'ansible-playbook',
         '-i', os.path.join(ANSIBLE, 'hosts'),
+        '-f', '20',
         '%s.yml' % name,
         '--extra-vars', json.dumps(extra_vars),
     ]
