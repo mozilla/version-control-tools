@@ -25,17 +25,65 @@
 
     - include: tasks/install-mozreview.yml
 
-    - name: deploy code to web servers
-      command: /data/reviewboard/deploy -v reviewboard.mozilla.org
+    - name: stage code for deployment
+      command: /usr/bin/rsync -aq --exclude '.git*' --exclude '.hg*' --delete /data/reviewboard/src /data/reviewboard/www
 
-# TODO: serialize and integrate with load balancer management
 - hosts: rbweb-prod
+  serial: 1
+  vars_prompt:
+  - name: ldap_username
+    prompt: "What is your Mozilla LDAP username?"
+    private: no
+
+  - name: ldap_password
+    prompt: "What is your Mozilla LDAP password?"
+    private: yes
+
+  pre_tasks:
+    - name: take node out of load balancer
+      stingray_node:
+        pool: "reviewboard.mozilla.org-http"
+        node: "{{ inventory_hostname }}:80"
+        state: draining
+        url: https://zlb1.ops.scl3.mozilla.com:9070/
+        username: "{{ ldap_username }}"
+        password: "{{ ldap_password }}"
+      delegate_to: 127.0.0.1
+
+    - name: wait for HTTP server to drain
+      wait_for: port=80 state=drained timeout=60
+
   tasks:
+    - name: sync code from admin node
+      command: /data/bin/update-www.sh reviewboard.mozilla.org
+
     - name: restart memcached
       service: name=memcached state=restarted
 
     - name: restart httpd
       service: name=httpd state=restarted
+
+  post_tasks:
+    - name: wait for HTTP server to become available
+      wait_for: port=80
+
+    - name: prime HTTP server
+      shell: "for n in `seq 20`; do curl -H 'Host: reviewboard.mozilla.org' http://localhost/r/ > /dev/null; done"
+
+    - name: add node back in load balancer
+      stingray_node:
+        pool: "reviewboard.mozilla.org-http"
+        node: "{{ inventory_hostname }}:80"
+        state: active
+        url: https://zlb1.ops.scl3.mozilla.com:9070/
+        username: "{{ ldap_username }}"
+        password: "{{ ldap_password }}"
+      delegate_to: 127.0.0.1
+
+    # We should ideally send HTTP requests through load balancer until
+    # we see a request on the origin server.
+    - name: wait for load balancer to re-add node
+      pause: seconds=15
 
 - hosts: reviewboardadm.private.scl3.mozilla.com
   tasks:
