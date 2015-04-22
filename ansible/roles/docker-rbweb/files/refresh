@@ -13,3 +13,5 @@ chown -R root:root /vct
 
 # Need to kill WSGI processes to ensure Python code is current.
 /kill-wsgi-procs
+
+echo 'refreshed rbweb container successfully'
