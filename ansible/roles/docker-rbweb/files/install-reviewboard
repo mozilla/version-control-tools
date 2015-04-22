@@ -15,17 +15,24 @@ sys.path.insert(0, '%s/conf' % ROOT)
 # Ensure settings allow proper access.
 lines = open('%s/conf/settings_local.py' % ROOT, 'rb').readlines()
 with open('%s/conf/settings_local.py' % ROOT, 'wb') as fh:
+    # We would ideally set logging_directory via site config, but Djblets
+    # isn't allowing us to set a string value to a None type. Derp.
+    log_directory_found = False
     for line in lines:
         if line.startswith(b'ALLOWED_HOSTS'):
             line = b'ALLOWED_HOSTS = ["*"]\n'
-        elif line.startswith(b'LOGGING_ENABLED'):
-            line = b'LOGGING_ENABLED = True\n'
         elif line.startswith(b'PRODUCTION'):
             line = b'PRODUCTION = False\n'
         elif line.startswith(b'DEBUG ='):
             line = b'DEBUG = True\n'
+        elif line.startswith(b'LOGGING_DIRECTORY'):
+            line = b'LOGGING_DIRECTORY = "%s/logs"\n' % ROOT
+            log_directory_found = True
 
         fh.write(line)
+
+    if not log_directory_found:
+        fh.write('LOGGING_DIRECTORY = "%s/logs"\n' % ROOT)
 
 from reviewboard.cmdline.rbsite import Site
 
@@ -52,6 +59,9 @@ site.run_manage_command('collectstatic', ['--noinput'])
 # Hook up Bugzilla authentication.
 site.run_manage_command('set-siteconfig', ['--key=auth_backend',
                         '--value=bugzilla'])
+
+site.run_manage_command('set-siteconfig', ['--key=logging_enabled',
+                        '--value=1'])
 
 # Ensure admin user is hooked up to Bugzilla.
 from django.contrib.auth.models import User
