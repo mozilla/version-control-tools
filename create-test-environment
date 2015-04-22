@@ -17,6 +17,10 @@ cd pylib/Bugsy
 python setup.py develop
 cd ../..
 
+cd pylib/mozansible
+python setup.py develop
+cd ../..
+
 cd pylib/mozreview
 python setup.py develop
 cd ../..
