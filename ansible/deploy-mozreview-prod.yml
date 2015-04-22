@@ -51,7 +51,7 @@
       delegate_to: 127.0.0.1
 
     - name: wait for HTTP server to drain
-      wait_for: port=80 state=drained timeout=60
+      apache_worker_drain: url=http://localhost/server-status timeout=300
 
   tasks:
     - name: sync code from admin node
