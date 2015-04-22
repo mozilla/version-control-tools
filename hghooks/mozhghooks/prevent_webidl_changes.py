@@ -54,7 +54,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         'ehsan',            # Ehsan Akhgari
 
         # Non-DOM peers who can review some WebIDL changes
-        'hsinyi',           # Hsin-Yi Tsai for RIL APIs
+        'hsinyi', 'htsai',  # Hsin-Yi Tsai for RIL APIs
     ]
     DOM_authors = [
         'jst@mozilla.com',         # Johnny Stenback
