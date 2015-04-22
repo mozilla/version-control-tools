@@ -48,26 +48,26 @@
   
   changeset:  1:a252038ad074
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   changeset:  2:c3d0947fefb7
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   changeset:  3:de473ef3c9d2
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/4 (pending) (glob)
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
   changeset:  4:f5691a90b4d0
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/5 (pending) (glob)
+  review:     http://*:$HGPORT1/r/5 (draft) (glob)
   
   changeset:  5:d86c61a23fc8
   summary:    Bug 1 - Foo 5
-  review:     http://*:$HGPORT1/r/6 (pending) (glob)
+  review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ rbmanage publish 1
@@ -84,23 +84,22 @@ Popping the last commit truncates the review set
   
   changeset:  1:a252038ad074
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (glob)
   
   changeset:  2:c3d0947fefb7
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (glob)
   
   changeset:  3:de473ef3c9d2
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/4 (pending) (glob)
+  review:     http://*:$HGPORT1/r/4 (glob)
   
   changeset:  4:f5691a90b4d0
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/5 (pending) (glob)
+  review:     http://*:$HGPORT1/r/5 (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
-  (visit review url to publish this review request so others can see it)
+  review url: http://*:$HGPORT1/r/1 (glob)
   [1]
 
 Review request 6 should be added to the list of discard on publish rids.
@@ -224,19 +223,18 @@ likely gets invalidated.
   
   changeset:  1:3299fd5f5fca
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (glob)
   
   changeset:  2:4fcbb12a36e4
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (glob)
   
   changeset:  3:d768dcb976de
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/4 (pending) (glob)
+  review:     http://*:$HGPORT1/r/4 (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
-  (visit review url to publish this review request so others can see it)
+  review url: http://*:$HGPORT1/r/1 (glob)
 
 The first commit was rewritten (we assume all subsequent were as well).
 
@@ -377,15 +375,14 @@ Try removing a commit in the middle.
   
   changeset:  1:3299fd5f5fca
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (glob)
   
   changeset:  2:7f4c8af7c6c4
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
-  (visit review url to publish this review request so others can see it)
+  review url: http://*:$HGPORT1/r/1 (glob)
 
   $ mozreview stop
   stopped 8 containers

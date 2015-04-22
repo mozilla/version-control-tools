@@ -46,14 +46,14 @@
   
   changeset:  1:a252038ad074
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   changeset:  2:c3d0947fefb7
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ echo 'foo3' > foo3
@@ -99,19 +99,18 @@
   
   changeset:  6:4726ad3f958d
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (glob)
   
   changeset:  7:a17cc6746ab4
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (glob)
   
   changeset:  8:35fb57be1151
   summary:    Bug 1 - Foo 5
-  review:     http://*:$HGPORT1/r/4 (pending) (glob)
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
-  (visit review url to publish this review request so others can see it)
+  review url: http://*:$HGPORT1/r/1 (glob)
 
 Cleanup
 

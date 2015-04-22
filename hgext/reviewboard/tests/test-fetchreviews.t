@@ -47,14 +47,14 @@ Seed the repo
   
   changeset:  1:2b77e5337389
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   changeset:  2:19006c154c5f
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ rbmanage publish 1

@@ -75,10 +75,10 @@ Pushing a single changeset will initiate a single review (no children)
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
 {reviews} template works
@@ -97,10 +97,10 @@ Pushing no changesets will do a re-review
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -122,10 +122,10 @@ Pushing patches from mq will result in a warning
   
   changeset:  7:7458cff9569f
   summary:    mq patch
-  review:     http://*:$HGPORT1/r/4 (pending) (glob)
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
   review id:  bz://2/mynick
-  review url: http://*:$HGPORT1/r/3 (pending) (glob)
+  review url: http://*:$HGPORT1/r/3 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ hg qpop
@@ -142,10 +142,10 @@ Custom identifier will create a new review from same changesets.
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://*:$HGPORT1/r/6 (pending) (glob)
+  review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
   review id:  bz://3/mynick
-  review url: http://*:$HGPORT1/r/5 (pending) (glob)
+  review url: http://*:$HGPORT1/r/5 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -166,10 +166,10 @@ rest of the test.)
   
   changeset:  2:6a5e03035256
   summary:    Bug 4 - Test identifier
-  review:     http://*:$HGPORT1/r/8 (pending) (glob)
+  review:     http://*:$HGPORT1/r/8 (draft) (glob)
   
   review id:  bz://4/mynick
-  review url: http://*:$HGPORT1/r/7 (pending) (glob)
+  review url: http://*:$HGPORT1/r/7 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
 Specifying multiple -r for the same head works
@@ -182,10 +182,10 @@ Specifying multiple -r for the same head works
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://*:$HGPORT1/r/10 (pending) (glob)
+  review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
   review id:  bz://5/mynick
-  review url: http://*:$HGPORT1/r/9 (pending) (glob)
+  review url: http://*:$HGPORT1/r/9 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -199,10 +199,10 @@ Specifying a revision range works
   
   changeset:  1:6f06b4ac6efe
   summary:    anonymous head
-  review:     http://*:$HGPORT1/r/12 (pending) (glob)
+  review:     http://*:$HGPORT1/r/12 (draft) (glob)
   
   review id:  bz://6/mynick
-  review url: http://*:$HGPORT1/r/11 (pending) (glob)
+  review url: http://*:$HGPORT1/r/11 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -231,18 +231,18 @@ Specifying a base revision limits reviewed changesets
   
   changeset:  8:84e8a1584aad
   summary:    Review base
-  review:     http://*:$HGPORT1/r/14 (pending) (glob)
+  review:     http://*:$HGPORT1/r/14 (draft) (glob)
   
   changeset:  9:ae66c8223052
   summary:    Middle commit
-  review:     http://*:$HGPORT1/r/15 (pending) (glob)
+  review:     http://*:$HGPORT1/r/15 (draft) (glob)
   
   changeset:  10:b55f2b9937c7
   summary:    Review tip
-  review:     http://*:$HGPORT1/r/16 (pending) (glob)
+  review:     http://*:$HGPORT1/r/16 (draft) (glob)
   
   review id:  bz://7/mynick
-  review url: http://*:$HGPORT1/r/13 (pending) (glob)
+  review url: http://*:$HGPORT1/r/13 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
 Specifying multiple -r arguments selects base and tip
@@ -255,18 +255,18 @@ Specifying multiple -r arguments selects base and tip
   
   changeset:  8:84e8a1584aad
   summary:    Review base
-  review:     http://*:$HGPORT1/r/18 (pending) (glob)
+  review:     http://*:$HGPORT1/r/18 (draft) (glob)
   
   changeset:  9:ae66c8223052
   summary:    Middle commit
-  review:     http://*:$HGPORT1/r/19 (pending) (glob)
+  review:     http://*:$HGPORT1/r/19 (draft) (glob)
   
   changeset:  10:b55f2b9937c7
   summary:    Review tip
-  review:     http://*:$HGPORT1/r/20 (pending) (glob)
+  review:     http://*:$HGPORT1/r/20 (draft) (glob)
   
   review id:  bz://8/mynick
-  review url: http://*:$HGPORT1/r/17 (pending) (glob)
+  review url: http://*:$HGPORT1/r/17 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -280,18 +280,18 @@ Specifying multiple -r in reverse order still works
   
   changeset:  8:84e8a1584aad
   summary:    Review base
-  review:     http://*:$HGPORT1/r/22 (pending) (glob)
+  review:     http://*:$HGPORT1/r/22 (draft) (glob)
   
   changeset:  9:ae66c8223052
   summary:    Middle commit
-  review:     http://*:$HGPORT1/r/23 (pending) (glob)
+  review:     http://*:$HGPORT1/r/23 (draft) (glob)
   
   changeset:  10:b55f2b9937c7
   summary:    Review tip
-  review:     http://*:$HGPORT1/r/24 (pending) (glob)
+  review:     http://*:$HGPORT1/r/24 (draft) (glob)
   
   review id:  bz://9/mynick
-  review url: http://*:$HGPORT1/r/21 (pending) (glob)
+  review url: http://*:$HGPORT1/r/21 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -311,10 +311,10 @@ Specifying multiple -r in reverse order still works
   
   changeset:  9:ae66c8223052
   summary:    Middle commit
-  review:     http://*:$HGPORT1/r/26 (pending) (glob)
+  review:     http://*:$HGPORT1/r/26 (draft) (glob)
   
   review id:  bz://11/mynick
-  review url: http://*:$HGPORT1/r/25 (pending) (glob)
+  review url: http://*:$HGPORT1/r/25 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 

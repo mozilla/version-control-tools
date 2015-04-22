@@ -36,14 +36,14 @@
   
   changeset:  1:24417bc94b2c
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   changeset:  2:61e2e5c813d2
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
 Adding commits to old reviews should create new reviews
@@ -63,18 +63,18 @@ Adding commits to old reviews should create new reviews
   
   changeset:  1:24417bc94b2c
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   changeset:  2:61e2e5c813d2
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   changeset:  3:3e4b2ebd3703
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/4 (pending) (glob)
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
 The parent review should have its description updated.

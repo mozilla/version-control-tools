@@ -362,20 +362,20 @@ def doreview(repo, ui, remote, reviewnode, basenode=None):
         ui.write('changeset:  %s:%s\n' % (ctx.rev(), ctx.hex()[0:12]))
         ui.write('summary:    %s\n' % ctx.description().splitlines()[0])
         ui.write('review:     %s' % reviews.reviewurl(rid))
-        if reviewdata[rid].get('status') == 'pending':
-            ui.write(' (pending)')
+        if reviewdata[rid].get('public') == 'False':
+            ui.write(' (draft)')
         ui.write('\n\n')
 
-    ispending = reviewdata[newparentid].get('status', None) == 'pending'
+    isdraft = reviewdata[newparentid].get('public', None) == 'False'
     ui.write(_('review id:  %s\n') % identifier.full)
     ui.write(_('review url: %s') % reviews.parentreviewurl(identifier.full))
-    if ispending:
-        ui.write(' (pending)')
+    if isdraft:
+        ui.write(' (draft)')
     ui.write('\n')
 
     # Make it clear to the user that they need to take action in order for
     # others to see this review series.
-    if ispending:
+    if isdraft:
         ui.status(_('(visit review url to publish this review request so others can see it)\n'))
 
 def _pullreviews(repo):

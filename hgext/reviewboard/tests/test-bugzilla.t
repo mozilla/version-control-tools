@@ -29,10 +29,10 @@ Pushing a review should not touch Bugzilla
   
   changeset:  1:24417bc94b2c
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ bugzilla dump-bug 1

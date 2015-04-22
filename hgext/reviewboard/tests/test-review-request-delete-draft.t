@@ -30,10 +30,10 @@
   
   changeset:  1:8c2be86a13c9
   summary:    Bug 1 - Initial commit
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
 Now publish the review and create a new draft
@@ -54,11 +54,10 @@ Now publish the review and create a new draft
   
   changeset:  1:c1eb96801052
   summary:    Bug 1 - Initial commit
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
-  (visit review url to publish this review request so others can see it)
+  review url: http://*:$HGPORT1/r/1 (glob)
 
 We should have a disagreement between published and draft
 

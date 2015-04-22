@@ -34,10 +34,10 @@ Set up the repo
   
   changeset:  1:c3480b3f6944
   summary:    foo2
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ rbmanage publish 1
@@ -66,15 +66,14 @@ Now create a new head and push a rebase
   
   changeset:  2:e7315a409763
   summary:    bar
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   changeset:  3:5003cd557db3
   summary:    foo2
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
-  (visit review url to publish this review request so others can see it)
+  review url: http://*:$HGPORT1/r/1 (glob)
 
 Cleanup
 

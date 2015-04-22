@@ -31,10 +31,10 @@ Do the initial review
   
   changeset:  1:cd3395bd3f8a
   summary:    second commit
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
 Pushing with a different review ID will create a "duplicate" review
@@ -47,10 +47,10 @@ Pushing with a different review ID will create a "duplicate" review
   
   changeset:  1:cd3395bd3f8a
   summary:    second commit
-  review:     http://*:$HGPORT1/r/4 (pending) (glob)
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
   review id:  bz://2/mynick
-  review url: http://*:$HGPORT1/r/3 (pending) (glob)
+  review url: http://*:$HGPORT1/r/3 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 

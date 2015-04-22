@@ -63,10 +63,10 @@ Pushing using cookie auth works
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/goodcookie
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -80,10 +80,10 @@ Pushing using username password auth works
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/4 (pending) (glob)
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
   review id:  bz://1/gooduserpass
-  review url: http://*:$HGPORT1/r/3 (pending) (glob)
+  review url: http://*:$HGPORT1/r/3 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -107,10 +107,10 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/6 (pending) (glob)
+  review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
   review id:  bz://1/nonick
-  review url: http://*:$HGPORT1/r/5 (pending) (glob)
+  review url: http://*:$HGPORT1/r/5 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -123,10 +123,10 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/8 (pending) (glob)
+  review:     http://*:$HGPORT1/r/8 (draft) (glob)
   
   review id:  bz://1/withnick
-  review url: http://*:$HGPORT1/r/7 (pending) (glob)
+  review url: http://*:$HGPORT1/r/7 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -198,10 +198,10 @@ Changing the IRC nickname in Bugzilla will update the RB username
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/10 (pending) (glob)
+  review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
   review id:  bz://1/user2newnick
-  review url: http://*:$HGPORT1/r/9 (pending) (glob)
+  review url: http://*:$HGPORT1/r/9 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -229,10 +229,10 @@ Changing the email address in Bugzilla will update the RB email
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/12 (pending) (glob)
+  review:     http://*:$HGPORT1/r/12 (draft) (glob)
   
   review id:  bz://1/user2newemail
-  review url: http://*:$HGPORT1/r/11 (pending) (glob)
+  review url: http://*:$HGPORT1/r/11 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -275,10 +275,10 @@ Re-enabling a disabled user will allow them to use Review Board
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/14 (pending) (glob)
+  review:     http://*:$HGPORT1/r/14 (draft) (glob)
   
   review id:  bz://1/undisableduser
-  review url: http://*:$HGPORT1/r/13 (pending) (glob)
+  review url: http://*:$HGPORT1/r/13 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -298,10 +298,10 @@ we fall back to non-IRC RB usernames.
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/16 (pending) (glob)
+  review:     http://*:$HGPORT1/r/16 (draft) (glob)
   
   review id:  bz://1/conflictingircnick
-  review url: http://*:$HGPORT1/r/15 (pending) (glob)
+  review url: http://*:$HGPORT1/r/15 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 
@@ -383,10 +383,10 @@ user, they will be assigned the email+id username.
   
   changeset:  1:737709d9e5f4
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/20 (pending) (glob)
+  review:     http://*:$HGPORT1/r/20 (draft) (glob)
   
   review id:  bz://1/user2sharednick
-  review url: http://*:$HGPORT1/r/19 (pending) (glob)
+  review url: http://*:$HGPORT1/r/19 (draft) (glob)
   (visit review url to publish this review request so others can see it)
   [1]
 

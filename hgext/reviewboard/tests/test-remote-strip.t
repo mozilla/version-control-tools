@@ -48,14 +48,14 @@ globally
   
   changeset:  1:cd04635afb3c
   summary:    h1c1
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   changeset:  2:0050780911c8
   summary:    h1c2
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   review id:  bz://1/mynick-1
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ hg push -r . --reviewid bz://1/mynick-2
@@ -71,14 +71,14 @@ globally
   
   changeset:  3:faaa0821e83d
   summary:    h2c1
-  review:     http://*:$HGPORT1/r/5 (pending) (glob)
+  review:     http://*:$HGPORT1/r/5 (draft) (glob)
   
   changeset:  4:85811c4bd2cd
   summary:    h2c2
-  review:     http://*:$HGPORT1/r/6 (pending) (glob)
+  review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
   review id:  bz://1/mynick-2
-  review url: http://*:$HGPORT1/r/4 (pending) (glob)
+  review url: http://*:$HGPORT1/r/4 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
 User can't remote strip unless allowed

@@ -41,10 +41,10 @@
   
   changeset:  1:a252038ad074
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
 Splitting the changeset results in multiple reviews
@@ -74,15 +74,14 @@ Splitting the changeset results in multiple reviews
   
   changeset:  2:422e7a879de2
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (glob)
   
   changeset:  3:04215824bc37
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/3 (pending) (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
-  (visit review url to publish this review request so others can see it)
+  review url: http://*:$HGPORT1/r/1 (glob)
 
 Cleanup
 

@@ -27,10 +27,10 @@ Pushing a review will create the reviews file
   
   changeset:  1:be8ff4f28043
   summary:    Bug 1 - second commit
-  review:     http://*:$HGPORT1/r/2 (pending) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (pending) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (visit review url to publish this review request so others can see it)
 
   $ cat .hg/reviews
