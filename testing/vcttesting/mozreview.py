@@ -15,6 +15,7 @@ import paramiko
 from vcttesting.bugzilla import Bugzilla
 from vcttesting.docker import (
     Docker,
+    DockerNotAvailable,
     params_from_env,
 )
 from vcttesting.reviewboard import MozReviewBoard
@@ -111,7 +112,7 @@ class MozReview(object):
         self._docker = Docker(docker_state, docker_url, tls=tls)
 
         if not self._docker.is_alive():
-            raise Exception('Docker is not available.')
+            raise DockerNotAvailable('Docker is not available.')
 
     def get_bugzilla(self, username=None, password=None):
         username = username or self.bugzilla_username or 'admin@example.com'

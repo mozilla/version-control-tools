@@ -55,6 +55,10 @@ def rsync(*args):
     subprocess.check_call([prog] + list(args), cwd='/')
 
 
+class DockerNotAvailable(Exception):
+    """Error raised when Docker is not available."""
+
+
 def params_from_env(env):
     """Obtain Docker connect parameters from the environment.
 

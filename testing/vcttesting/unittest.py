@@ -15,7 +15,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.switch_to import SwitchTo
 from selenium.webdriver.support.wait import WebDriverWait
 
-
+from vcttesting.docker import DockerNotAvailable
 from vcttesting.mozreview import MozReview
 
 
@@ -34,7 +34,10 @@ class MozReviewTest(unittest.TestCase):
         tmpdir = tempfile.mkdtemp()
         cls._tmpdir = tmpdir
 
-        mr = MozReview(tmpdir)
+        try:
+            mr = MozReview(tmpdir)
+        except DockerNotAvailable:
+            raise unittest.SkipTest('Docker not available')
 
         cls.mr = mr
         # If this fails mid-operation, we could have some services running.
