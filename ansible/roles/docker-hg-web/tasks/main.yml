@@ -1,0 +1,112 @@
+---
+- name: create hg user
+  user: name=hg uid=500
+
+- name: install system packages
+  command: yum install -y httpd lockfile-progs mod_wsgi openssh-clients openssh-server python-pygments python-simplejson python-argparse syslog
+
+- name: install Mercurial package
+  command: yum localinstall -y https://people.mozilla.org/~gszorc/mercurial-3.3.2-0.x86_64.rpm
+
+- name: create directories for hg files
+  file: path={{ item }} state=directory owner=hg group=hg mode=0755
+  with_items:
+    - /repo_local/hg/extensions
+    - /repo_local/hg/extensions/parsedatetime
+    - /repo_local/hg/extensions/pushlog
+    - /repo_local/hg/extensions/serverlog
+    - /repo_local/hg/hghooks
+    - /repo_local/hg/hg_templates
+    - /repo_local/hg/libraries
+    - /repo_local/hg/libraries/mozhghooks
+    - /repo_local/hg/webroot_wsgi
+    - /repo_local/mozilla/mozilla
+
+- name: symlink /repo to /repo_local
+  file: src=/repo_local dest=/repo state=link
+
+- name: install library_overrides repository
+  hg: repo=https://hg.mozilla.org/hgcustom/library_overrides dest=/repo_local/mozilla/library_overrides force=yes purge=yes
+
+- name: install httpd.conf
+  copy: src=httpd.conf dest=/etc/httpd/conf/httpd.conf
+
+- name: install vhost config
+  copy: src=vhost.conf dest=/etc/httpd/conf.d/hg-vhost.conf
+
+- name: install wsgi config
+  copy: src=mod_wsgi.conf dest=/etc/httpd/conf.d/wsgi.conf
+
+- name: create httpd log directory
+  file: path=/var/log/httpd/hg state=directory
+
+- name: install global hgrc config
+  copy: src=hgrc dest=/etc/mercurial/hgrc
+
+- name: install mirroring scripts
+  copy: src={{ item }} dest=/usr/local/bin/{{ item }} mode=0755
+  with_items:
+    - lockfile
+    - mirror-pull
+    - repo-group
+
+- name: create .ssh directory for hg user
+  file: path=/home/hg/.ssh owner=hg group=hg mode=0750 state=directory
+
+- name: install ssh config file
+  copy: src=ssh-config dest=/home/hg/.ssh/config owner=hg group=hg mode=0640
+
+- name: ensure hg user known hosts file exists
+  file: path=/home/hg/.ssh/known_hosts state=touch owner=hg group=hg mode=0640
+
+- name: synchronize hg templates
+  synchronize: src={{ vct }}/hgtemplates dest=/repo/hg/hg_templates recursive=yes
+
+# TODO this should get consolidated in a central task/role.
+- name: install pushlog hgweb files
+  copy: src={{ vct }}/hgext/pushlog-legacy/{{ item }} dest=/repo/hg/extensions/{{ item }} owner=root group=root mode=0644
+  with_items:
+    - buglink.py
+    - feedparser.py
+    - hgwebjson.py
+    - pushlog-feed.py
+    - parsedatetime/__init__.py
+    - parsedatetime/parsedatetime.py
+    - parsedatetime/parsedatetime_consts.py
+
+- name: install pushlog extension
+  copy: src={{ vct }}/hgext/pushlog/__init__.py dest=/repo/hg/extensions/pushlog/__init__.py owner=root group=root mode=0644
+
+- name: install serverlog extension
+  copy: src={{ vct }}/hgext/serverlog/__init__.py dest=/repo/hg/extensions/serverlog/__init__.py owner=root group=root mode=0644
+
+- name: install hooks
+  copy: src={{ vct }}/hghooks/mozhghooks/{{ item }} dest=/repo/hg/libraries/mozhghooks/{{ item }} owner=root group=root mode=0644
+  with_items:
+    - changelog_correctness.py
+    - commit-message.py
+    - prevent_case_only_renames.py
+    - prevent_idl_change_without_uuid_bump.py
+    - prevent_string_changes.py
+    - prevent_uuid_changes.py
+    - prevent_webidl_changes.py
+    - push_printurls.py
+    - single_head_per_branch.py
+    - treeclosure.py
+    - treeclosure_comm_central.py
+    - try_mandatory.py
+    - whitelist_qa.py
+    - whitelist_releng.py
+
+- name: install hgweb wsgi files
+  copy: src={{ item }} dest=/repo/hg/webroot_wsgi/{{ item }} owner=hg group=hg
+  with_items:
+    - hgweb.config
+    - hgweb.wsgi
+
+- name: install Docker support files
+  copy: src={{ item }} dest=/{{ item }} owner=root group=root mode=0755
+  with_items:
+    - entrypoint.py
+    - run.sh
+    - set-mirror-key.py

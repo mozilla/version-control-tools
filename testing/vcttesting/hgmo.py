@@ -95,7 +95,10 @@ class HgCluster(object):
             f_web_creates = []
             for i in range(web_count):
                 f_web_creates.append(e.submit(self._dc.create_container,
-                                              web_image))
+                                              web_image,
+                                              ports=[22, 80],
+                                              entrypoint=['/entrypoint.py'],
+                                              command=['/run.sh']))
 
             ldap_id = f_ldap_create.result()['Id']
             master_id = f_master_create.result()['Id']
