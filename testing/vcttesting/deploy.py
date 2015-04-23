@@ -57,6 +57,14 @@ def deploy_reviewboard_prod(repo=None, rev=None, verbosity=0):
                         verbosity=verbosity)
 
 
+def hgmo_deploy_extensions(verbosity=0):
+    """Deploy hooks and extensions to hg.mozilla.org servers."""
+    extra = {'vct': ROOT}
+
+    return run_playbook('deploy-hgmo-extensions', extra_vars=extra,
+                        verbosity=verbosity)
+
+
 def hgmo_strip(repo, rev, verbosity=0):
     extra = {
         'repo': repo,

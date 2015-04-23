@@ -1,0 +1,23 @@
+---
+- hosts: hgssh1.dmz.scl3.mozilla.com
+  tasks:
+    - name: notify IRC of deployment
+
+      irc: server=irc.mozilla.org
+           port=6697
+           use_ssl=true
+           channel="#vcs"
+           nick=hg-deploy-bot
+           color=red
+           msg="Starting deploy of hooks and extensions to hg.mozilla.org"
+
+    - include: tasks/hgmo-extensions.yml
+
+    - name: notify IRC of deployment
+      irc: server=irc.mozilla.org
+           port=6697
+           use_ssl=true
+           channel="#vcs"
+           nick=hg-deploy-bot
+           color=red
+           msg="Finished deploy of hooks and extensions to hg.mozilla.org"
