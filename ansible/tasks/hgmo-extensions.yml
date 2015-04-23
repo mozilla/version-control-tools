@@ -48,3 +48,6 @@
 
 - name: synchronize hg templates
   synchronize: src={{ vct }}/hgtemplates/ dest=/repo/hg/hg_templates/ recursive=yes delete=yes
+
+- name: adjust file permissions for hg templates
+  command: /bin/chown -R hg:hg /repo/hg/hg_templates
