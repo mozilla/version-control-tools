@@ -104,6 +104,24 @@ Pushing no changesets will do a re-review
   (visit review url to publish this review request so others can see it)
   [1]
 
+Pushing no changesets will do a re-review but will not reset a published
+review back to draft (See Bug 1096761)
+
+  $ rbmanage publish 1
+  $ hg push -r 1 --reviewid 1
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  searching for changes
+  no changes found
+  submitting 1 changesets for review
+  
+  changeset:  1:6f06b4ac6efe
+  summary:    anonymous head
+  review:     http://*:$HGPORT1/r/2 (glob)
+  
+  review id:  bz://1/mynick
+  review url: http://*:$HGPORT1/r/1 (glob)
+  [1]
+
 Pushing patches from mq will result in a warning
 
   $ echo 'mq patch' > foo
