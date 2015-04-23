@@ -17,7 +17,7 @@ subprocess.check_call([
     '/usr/bin/python', '-u',
     '/usr/bin/ansible-playbook', 'docker-hgmaster.yml', '-c', 'local',
     '-t', 'docker-startup'],
-    cwd='/ansible')
+    cwd='/vct/ansible')
 
 del os.environ['DOCKER_ENTRYPOINT']
 

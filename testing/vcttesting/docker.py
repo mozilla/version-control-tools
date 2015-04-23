@@ -474,8 +474,12 @@ class Docker(object):
         and other bits should be the same as in production with the caveat that
         LDAP integration is probably out of scope.
         """
-        images = self.ensure_images_built(['hgmaster', 'hgweb', 'ldap'],
-                                          existing=images, verbose=verbose)
+        images = self.ensure_images_built([
+            'hgweb',
+            'ldap',
+        ], ansibles={
+            'hgmaster': ('docker-hgmaster', 'centos6'),
+        }, existing=images, verbose=verbose)
 
         self.state['last-hgmaster-id'] = images['hgmaster']
         self.state['last-hgweb-id'] = images['hgweb']
@@ -892,11 +896,11 @@ class Docker(object):
             'autoland',
             'bmodb-volatile',
             'bmoweb',
-            'hgmaster',
             'hgweb',
             'ldap',
             'pulse',
         ], ansibles={
+            'hgmaster': ('docker-hgmaster', 'centos6'),
             'hgrb': ('docker-hgrb', 'centos6'),
             'rbweb': ('docker-rbweb', 'centos6'),
         }, verbose=verbose)

@@ -21,3 +21,71 @@
 
 - name: Create set-mirrors script
   copy: src=set-mirrors.py dest=/set-mirrors.py mode=0755
+
+- name: Ensure directories exist
+  file: path={{ item }} state=directory
+  with_items:
+    - /usr/local/bin
+    - /repo/hg/extensions
+    - /repo/hg/extensions/pushlog
+    - /repo/hg/extensions/parsedatetime
+    - /repo/hg/extensions/serverlog
+    - /repo/hg/libraries
+    - /repo/hg/libraries/mozhghooks
+    - /repo/hg/scripts
+
+- name: Install pash
+  copy: src={{ vct }}/scripts/pash/{{ item }} dest=/usr/local/bin/{{ item }} mode=0755
+  with_items:
+    - hg_helper.py
+    - ldap_helper.py
+    - pash.py
+    - repo_group.py
+    - sh_helper.py
+
+- name: Install repo-push script
+  copy: src={{ vct }}/scripts/repo-push.sh dest=/usr/local/bin/repo-push.sh mode=0755
+
+- name: Install pushlog web extensions
+  copy: src={{ vct }}/hgext/pushlog-legacy/{{ item }} dest=/repo/hg/extensions/{{ item }}
+  with_items:
+    - buglink.py
+    - feedparser.py
+    - hgwebjson.py
+    - pushlog-feed.py
+    - parsedatetime/__init__.py
+    - parsedatetime/parsedatetime.py
+    - parsedatetime/parsedatetime_consts.py
+
+- name: Install pushlog extension
+  copy: src={{ vct }}/hgext/pushlog/__init__.py dest=/repo/hg/extensions/pushlog/__init__.py
+
+- name: Install serverlog extension
+  copy: src={{ vct }}/hgext/serverlog/__init__.py dest=/repo/hg/extensions/serverlog/__init__.py
+
+- name: install hooks
+  copy: src={{ vct }}/hghooks/mozhghooks/{{ item }} dest=/repo/hg/libraries/mozhghooks/{{ item }} owner=root group=root mode=0644
+  with_items:
+    - changelog_correctness.py
+    - commit-message.py
+    - prevent_case_only_renames.py
+    - prevent_idl_change_without_uuid_bump.py
+    - prevent_string_changes.py
+    - prevent_uuid_changes.py
+    - prevent_webidl_changes.py
+    - push_printurls.py
+    - single_head_per_branch.py
+    - treeclosure.py
+    - treeclosure_comm_central.py
+    - try_mandatory.py
+    - whitelist_qa.py
+    - whitelist_releng.py
+
+- name: Install push scripts
+  copy: src={{ vct }}/scripts/{{ item }} dest=/repo/hg/scripts/{{ item }} mode=0755
+  with_items:
+    - record-pushes.sh
+    - push-repo.sh
+
+- name: Install entrypoint script
+  copy: src=entrypoint.py dest=/entrypoint.py mode=0755

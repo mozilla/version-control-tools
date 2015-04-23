@@ -88,7 +88,10 @@ class HgCluster(object):
 
             f_master_create = e.submit(self._dc.create_container,
                                        master_image,
-                                       environment=env)
+                                       environment=env,
+                                       entrypoint=['/entrypoint.py'],
+                                       command=['/usr/sbin/sshd', '-D'],
+                                       ports=[22])
             f_web_creates = []
             for i in range(web_count):
                 f_web_creates.append(e.submit(self._dc.create_container,
