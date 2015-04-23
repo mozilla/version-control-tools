@@ -52,9 +52,6 @@
 
 - include: ../../../tasks/hgmo-extensions.yml
 
-- name: synchronize hg templates
-  synchronize: src={{ vct }}/hgtemplates dest=/repo/hg/hg_templates recursive=yes
-
 - name: install hgweb wsgi files
   copy: src={{ item }} dest=/repo/hg/webroot_wsgi/{{ item }} owner=hg group=hg
   with_items:
