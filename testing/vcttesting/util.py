@@ -4,12 +4,18 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import os
 import socket
+import subprocess
 import time
 
 import kombu
 import paramiko
 import requests
+
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 
 
 def get_available_port():
@@ -88,3 +94,17 @@ def wait_for_ssh(hostname, port, timeout=60):
             raise Exception('Timeout reached waiting for SSH')
 
         time.sleep(0.1)
+
+
+def get_and_write_vct_node():
+    hg = os.path.join(ROOT, 'venv', 'bin', 'hg')
+    env = dict(os.environ)
+    env['HGRCPATH'] = '/dev/null'
+    args = [hg, '-R', ROOT, 'log', '-r', '.', '-T', '{node|short}']
+    with open(os.devnull, 'wb') as null:
+        node = subprocess.check_output(args, env=env, cwd='/', stderr=null)
+
+    with open(os.path.join(ROOT, '.vctnode'), 'wb') as fh:
+        fh.write(node)
+
+    return node

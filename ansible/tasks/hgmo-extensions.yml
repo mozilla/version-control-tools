@@ -49,5 +49,10 @@
 - name: synchronize hg templates
   synchronize: src={{ vct }}/hgtemplates/ dest=/repo/hg/hg_templates/ recursive=yes delete=yes
 
+- name: advertise current v-c-t changeset in hgweb
+  replace: dest=/repo/hg/hg_templates/gitweb_mozilla/footer.tmpl
+           regexp='VCTNODE'
+           replace={{ lookup('file', '../../.vctnode') }}
+
 - name: adjust file permissions for hg templates
   command: /bin/chown -R hg:hg /repo/hg/hg_templates

@@ -30,6 +30,7 @@ import concurrent.futures as futures
 from coverage.data import CoverageData
 
 from .util import (
+    get_and_write_vct_node,
     wait_for_amqp,
     wait_for_http,
     wait_for_ssh,
@@ -1112,10 +1113,12 @@ class Docker(object):
                 port = state['NetworkSettings']['Ports']['873/tcp'][0]['HostPort']
                 url = 'rsync://%s:%s/vct-mount/' % (self.docker_hostname, port)
 
+                get_and_write_vct_node()
                 vct_paths = self._get_vct_files()
                 with tempfile.NamedTemporaryFile() as fh:
                     for f in sorted(vct_paths.keys()):
                         fh.write('%s\n' % f)
+                    fh.write('.vctnode\n')
                     fh.flush()
 
                     rsync('-a', '--delete-before', '--files-from', fh.name, ROOT, url)

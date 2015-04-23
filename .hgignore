@@ -17,3 +17,4 @@ venv/
 ~$
 \.vagrant/*
 \.docker-state.json$
+\.vctnode$
