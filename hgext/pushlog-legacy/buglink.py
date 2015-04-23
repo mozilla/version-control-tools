@@ -3,14 +3,22 @@
 # [extensions]
 # buglink = /path/to/buglink.py
 
-import os
 import re
 from mercurial import templatefilters
 
-OUR_DIR = os.path.dirname(__file__)
-execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
-
-from mozautomation.commitparser import BUG_RE
+bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
+                        # a standalone sequence of numbers
+                     (
+                        (?:
+                          bug |
+                          b= |
+                          # a sequence of 5+ numbers preceded by whitespace
+                          (?=\b\#?\d{5,}) |
+                          # numbers at the very beginning
+                          ^(?=\d)
+                        )
+                        (?:\s*\#?)(\d+)
+                     )''', re.I | re.X)
 
 bugzilla_link_templ = r'<a href="%s\2">\1</a>'
 bugzilla_link = ""
@@ -18,7 +26,7 @@ bugzilla = "https://bugzilla.mozilla.org/show_bug.cgi?id="
 
 
 def buglink(x):
-    return BUG_RE.sub(bugzilla_link, x)
+    return bug_re.sub(bugzilla_link, x)
 
 templatefilters.filters["buglink"] = buglink
 
