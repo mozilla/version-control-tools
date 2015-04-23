@@ -51,8 +51,11 @@
 
 - name: advertise current v-c-t changeset in hgweb
   replace: dest=/repo/hg/hg_templates/gitweb_mozilla/footer.tmpl
-           regexp='VCTNODE'
-           replace={{ lookup('file', '../../.vctnode') }}
+           regexp={{ item.search }}
+           replace={{ item.replace }}
+  with_items:
+    - { search: VCTNODE, replace: "{{ lookup('file', '../../.vctnode') }}" }
+    - { search: DEPLOYDATE, replace: "{{ ansible_date_time.iso8601 }}" }
 
 - name: adjust file permissions for hg templates
   command: /bin/chown -R hg:hg /repo/hg/hg_templates
