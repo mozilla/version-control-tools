@@ -17,7 +17,7 @@ bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                           # numbers at the very beginning
                           ^(?=\d)
                         )
-                        (?:\s*\#?)(\d+)
+                        (?:\s*\#?)(\d+)(?=\b)
                      )''', re.I | re.X)
 
 bugzilla_link_templ = r'<a href="%s\2">\1</a>'
