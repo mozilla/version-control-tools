@@ -1124,6 +1124,7 @@ class Docker(object):
     @contextmanager
     def auto_clean_orphans(self):
         if not self.is_alive():
+            yield
             return
 
         containers = {c['Id'] for c in self.client.containers(all=True)}
