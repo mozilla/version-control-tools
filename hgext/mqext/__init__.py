@@ -87,6 +87,11 @@ from mercurial import commands, util, cmdutil, mdiff, error, url, patch, extensi
 from hgext import mq
 from collections import Counter
 
+OUR_DIR = os.path.dirname(__file__)
+execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+
+from mozautomation.commitparser import BUG_RE
+
 try:
     # hg 3.0.1+
     from mercurial.pathutil import canonpath
@@ -293,21 +298,6 @@ def reviewers(ui, repo, patchfile=None, **opts):
         for (reviewer, count) in supersuckers.most_common(10):
             ui.write("  %s: %d\n" % (reviewer, count))
  
-# This is stolen from bzexport.py, which stole it from buglink.py
-# Tweaked slightly to avoid grabbing bug numbers from the beginning of SHA-1s
-bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
-                        # a standalone sequence of numbers
-                     (
-                        (?:
-                          bug |
-                          b= |
-                          # a sequence of 5+ numbers preceded by whitespace
-                          (?=\b\#?\d{5,}\b) |
-                          # numbers at the very beginning
-                          ^(?=\d+\b)
-                        )
-                        (?:\s*\#?)(\d+)
-                     )''', re.I | re.X)
 
 def fetch_bugs(url, ui, bugs):
     data = json.dumps({
@@ -377,7 +367,7 @@ def bzcomponents(ui, repo, patchfile=None, **opts):
 
     bugs = set()
     for change in patch_changes(ui, repo, patchfile, **opts):
-        m = bug_re.search(change.description())
+        m = BUG_RE.search(change.description())
         if m:
             bugs.add(m.group(2))
     if len(bugs) == 0:
@@ -428,7 +418,7 @@ def bzbugs(ui, repo, patchfile=None, **opts):
 
     bugs = set()
     for change in patch_changes(ui, repo, patchfile, **opts):
-        m = bug_re.search(change.description())
+        m = BUG_RE.search(change.description())
         if m:
             bugs.add(m.group(2))
 

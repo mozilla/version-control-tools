@@ -21,7 +21,7 @@ BUG_RE = re.compile(
              # numbers at the very beginning
              ^(?=\d)
            )
-           (?:\s*\#?)(\d+)
+           (?:\s*\#?)(\d+)(?=\b)
          )''', re.I | re.X)
 
 REVIEW_RE = re.compile(r'[ra][=?]+(\w[^ ]+)')

@@ -60,24 +60,11 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 import bzauth
 import bz
+from mozautomation.commitparser import BUG_RE
 
 testedwith = '3.0 3.1 3.2 3.3'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bzexport'
 
-# This is stolen from buglink.py
-bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
-                        # a standalone sequence of numbers
-                     (
-                        (?:
-                          bug |
-                          b= |
-                          # a sequence of 5+ numbers preceded by whitespace
-                          (?=\b\#?\d{5,}) |
-                          # numbers at the very beginning
-                          ^(?=\d)
-                        )
-                        (?:\s*\#?)(\d+)
-                     )''', re.I | re.X)
 review_re = re.compile(r'[ra][=?]+(\w[^ ]+)')
 
 BINARY_CACHE_FILENAME = ".bzexport.cache"
@@ -490,7 +477,7 @@ def extract_bug_num_and_desc(desc):
     # Given a commit description, attempt to return a bug number (if found),
     # and the description with that bug number string removed.
     bug = None
-    m = bug_re.search(desc)
+    m = BUG_RE.search(desc)
     if m:
         bug = m.group(2)
         desc = desc[:m.start()] + desc[m.end():]
@@ -666,7 +653,7 @@ def update_patch(ui, repo, rev, bug, update_patch, rename_patch, interactive):
         msg = [s.decode('utf-8') for s in ph.message]
         if not msg:
             msg = ["Bug %s patch" % bug]
-        elif not bug_re.search(msg[0]):
+        elif not BUG_RE.search(msg[0]):
             msg[0] = "Bug %s - %s" % (bug, msg[0])
         opts = {'git': True, 'message': '\n'.join(msg).encode('utf-8'), 'include': ["re:."]}
         mq.refresh(ui, repo, **opts)

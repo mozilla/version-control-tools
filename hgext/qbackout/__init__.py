@@ -8,9 +8,15 @@ from mercurial.i18n import _
 from mercurial.node import nullid, short
 from hgext import mq
 
+
 import StringIO
+import os
 import re
 
+OUR_DIR = os.path.dirname(__file__)
+execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+
+from mozautomation.commitparser import BUG_RE
 # mercurial version portability
 import sys
 if not getattr(cmdutil, 'bailifchanged', None):
@@ -20,22 +26,6 @@ if 'mercurial.scmutil' not in sys.modules:
 
 testedwith = '3.0 3.1 3.2 3.3'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qbackout'
-
-# This is stolen from bzexport.py, which stole it from buglink.py
-# Tweaked slightly to avoid grabbing bug numbers from the beginning of SHA-1s
-bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
-                        # a standalone sequence of numbers
-                     (
-                        (?:
-                          bug |
-                          b= |
-                          # a sequence of 5+ numbers preceded by whitespace
-                          (?=\b\#?\d{5,}\b) |
-                          # numbers at the very beginning
-                          ^(?=\d+\b)
-                        )
-                        (?:\s*\#?)(\d+)
-                     )''', re.I | re.X)
 
 backout_re = re.compile(r'[bB]ack(?:ed)?(?: ?out) (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})')
 reapply_re = re.compile(r'Reapplied (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})')
@@ -152,7 +142,7 @@ def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, revers
 
     def parse_bugs(msg):
         bugs = set()
-        m = bug_re.search(msg)
+        m = BUG_RE.search(msg)
         if m:
             bugs.add(m.group(2))
         return bugs
