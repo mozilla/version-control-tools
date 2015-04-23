@@ -1,4 +1,17 @@
 ---
+- name: hg directories exist
+  file: path=/repo/hg/{{ item }} owner=hg group=hg mode=0755 state=directory
+  with_items:
+    - extensions
+    - extensions/parsedatetime
+    - extensions/pushlog
+    - extensions/serverlog
+    - hghooks
+    - hg_templates
+    - libraries
+    - libraries/mozhghooks
+    - webroot_wsgi
+
 - name: install pushlog hgweb files
   copy: src={{ vct | mandatory }}/hgext/pushlog-legacy/{{ item }} dest=/repo/hg/extensions/{{ item }} owner=root group=root mode=0644
   with_items:
@@ -11,13 +24,13 @@
     - parsedatetime/parsedatetime_consts.py
 
 - name: install pushlog extension
-  copy: src={{ vct }}/hgext/pushlog/__init__.py dest=/repo/hg/extensions/pushlog/__init__.py owner=root group=root mode=0644
+  copy: src={{ vct }}/hgext/pushlog/__init__.py dest=/repo/hg/extensions/pushlog/__init__.py owner=hg group=hg mode=0644
 
 - name: install serverlog extension
-  copy: src={{ vct }}/hgext/serverlog/__init__.py dest=/repo/hg/extensions/serverlog/__init__.py owner=root group=root mode=0644
+  copy: src={{ vct }}/hgext/serverlog/__init__.py dest=/repo/hg/extensions/serverlog/__init__.py owner=hg group=hg mode=0644
 
 - name: install hooks
-  copy: src={{ vct }}/hghooks/mozhghooks/{{ item }} dest=/repo/hg/libraries/mozhghooks/{{ item }} owner=root group=root mode=0644
+  copy: src={{ vct }}/hghooks/mozhghooks/{{ item }} dest=/repo/hg/libraries/mozhghooks/{{ item }} owner=hg group=hg mode=0644
   with_items:
     - changelog_correctness.py
     - commit-message.py
@@ -33,3 +46,6 @@
     - try_mandatory.py
     - whitelist_qa.py
     - whitelist_releng.py
+
+- name: synchronize hg templates
+  synchronize: src={{ vct }}/hgtemplates dest=/repo/hg/hg_templates recursive=yes
