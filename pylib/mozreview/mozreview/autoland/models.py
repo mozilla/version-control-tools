@@ -52,6 +52,11 @@ class AutolandRequest(models.Model):
         last_evt = self.event_log_entries.last()
         return last_evt.details if last_evt else ""
 
+    @property
+    def last_error_msg(self):
+        last_evt = self.event_log_entries.last()
+        return last_evt.error_msg if last_evt else ""
+
 
 class AutolandEventLogEntry(models.Model):
     REQUESTED = 'R'

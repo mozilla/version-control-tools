@@ -151,7 +151,7 @@ class TryField(BaseReviewRequestField):
         if ar.last_known_status == AutolandEventLogEntry.REQUESTED:
             return self._waiting_txt
         elif ar.last_known_status == AutolandEventLogEntry.PROBLEM:
-            return self._autoland_problem % ar.last_details
+            return self._autoland_problem % ar.last_error_msg
         elif ar.last_known_status == AutolandEventLogEntry.SERVED:
             url = self._job_url % ar.repository_revision
             template = get_template('mozreview/try_result.html')
