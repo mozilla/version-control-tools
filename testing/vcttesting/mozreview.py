@@ -182,13 +182,18 @@ class MozReview(object):
                 autoland_port=autoland_port,
                 verbose=verbose)
 
+        self.bmoweb_id = mr_info['web_id']
+        self.bmodb_id = mr_info['db_id']
+
         self.bugzilla_url = mr_info['bugzilla_url']
         bugzilla = self.get_bugzilla()
 
         self.reviewboard_url = mr_info['reviewboard_url']
         self.rbweb_id = mr_info['rbweb_id']
 
+        self.autoland_id = mr_info['autoland_id']
         self.autoland_url = mr_info['autoland_url']
+        self.pulse_id = mr_info['pulse_id']
         self.pulse_host = mr_info['pulse_host']
         self.pulse_port = mr_info['pulse_port']
 
@@ -241,20 +246,20 @@ class MozReview(object):
                 port=self.ssh_port))
 
         state = {
-            'bmoweb_id': mr_info['web_id'],
-            'bmodb_id': mr_info['db_id'],
+            'bmoweb_id': self.bmoweb_id,
+            'bmodb_id': self.bmodb_id,
             'bugzilla_url': self.bugzilla_url,
             'reviewboard_url': self.reviewboard_url,
             'rbweb_id': self.rbweb_id,
             'mercurial_url': self.mercurial_url,
             'admin_username': bugzilla.username,
             'admin_password': bugzilla.password,
-            'ldap_uri': mr_info['ldap_uri'],
-            'pulse_id': mr_info['pulse_id'],
-            'pulse_host': mr_info['pulse_host'],
-            'pulse_port': mr_info['pulse_port'],
+            'ldap_uri': self.ldap_uri,
+            'pulse_id': self.pulse_id,
+            'pulse_host': self.pulse_host,
+            'pulse_port': self.pulse_port,
             'autoland_url': self.autoland_url,
-            'autoland_id': mr_info['autoland_id'],
+            'autoland_id': self.autoland_id,
             'hgrb_id': self.hgrb_id,
             'ssh_hostname': self.ssh_hostname,
             'ssh_port': self.ssh_port,
