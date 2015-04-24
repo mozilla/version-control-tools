@@ -1,0 +1,35 @@
+#!/usr/bin/python2.7
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+from __future__ import print_function, unicode_literals
+
+import os
+import sys
+
+import psutil
+
+pf = '/var/lib/bugzilla/bugzilla/data/params'
+
+rburl = sys.argv[1]
+
+params_lines = open(pf, 'r').readlines()
+with open(pf, 'w') as fh:
+    for line in params_lines:
+        if "'mozreview_base_url' =>" in line:
+            line = "           'mozreview_base_url' => '%s',\n" % rburl
+
+        fh.write(line)
+
+for proc in psutil.process_iter():
+    if proc.name() != 'apache2':
+        continue
+
+    if proc.username() != 'bugzilla':
+        continue
+
+    print('killing Apache worker %d' % proc.pid)
+    proc.kill()
+
+print('Finished updating MozReview URL in Bugzilla')

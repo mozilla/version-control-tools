@@ -215,6 +215,10 @@ class MozReview(object):
         self._docker.client.execute(self.rbweb_id,
                                     ['/set-site-url', self.reviewboard_url])
 
+        # Tell Bugzilla about Review Board URL.
+        self._docker.client.execute(mr_info['web_id'],
+                                    ['/set-urls', self.reviewboard_url])
+
         hg_ssh_host_key = self._docker.get_file_content(
                 mr_info['hgrb_id'],
                 '/etc/ssh/ssh_host_rsa_key.pub').rstrip()

@@ -125,7 +125,7 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
   libdaemon-generic-perl libfile-slurp-perl \
   libgd-dev libssl-dev \
   mysql-client patchutils perlmagick pkg-config python3-mysql.connector \
-  unzip wget
+  python-psutil unzip wget
 
 RUN git clone https://git.mozilla.org/webtools/bmo/bugzilla.git $BUGZILLA_HOME/bugzilla
 
@@ -164,6 +164,7 @@ ADD bmodata.patch $BUGZILLA_HOME/bmodata.patch
 ADD bugzilla.conf /etc/apache2/sites-enabled/25-bugzilla.conf
 ADD prefork.conf /etc/apache2/mods-available/mpm_prefork.conf
 
+ADD set-urls /set-urls
 ADD entrypoint.py /bmoweb_entrypoint.py
 ADD run-apache.sh /run-apache.sh
 
