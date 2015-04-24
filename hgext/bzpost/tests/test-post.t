@@ -427,5 +427,46 @@ Verify cookie auth works
 
   $ cd ..
 
+Pushing commit with bug number to excluded tree will not post comment
+
+  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug9
+  $ hg clone -r 0 mozilla-central no-post-to-excludetrees > /dev/null
+  $ cd no-post-to-excludetrees
+  $ cat >> .hg/hgrc << EOF
+  > [bzpost]
+  > excludetrees = inbound
+  > EOF
+
+  $ echo 'no post to excludetrees' > foo
+  $ hg commit -m 'Bug 9 - New changeset with bug.'
+  $ hg push -f http://localhost:$HGPORT/integration/mozilla-inbound
+  pushing to http://localhost:$HGPORT/integration/mozilla-inbound
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+
+  $ $TESTDIR/bugzilla dump-bug 9
+  Bug 9:
+    blocks: []
+    cc: []
+    comments:
+    - author: default@example.com
+      id: 16
+      tags: []
+      text: ''
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: bug9
+
+  $ cd ..
+
+Cleanup
+
   $ $TESTDIR/testing/docker-control.py stop-bmo bzpost-test-post
   stopped 2 containers

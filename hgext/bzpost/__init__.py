@@ -86,6 +86,8 @@ def wrappedpushbookmark(orig, pushop):
         return result
 
     ui = pushop.ui
+    if tree and tree in ui.configlist('bzpost', 'excludetrees', default=[]):
+        return result
 
     if tree:
         baseuri = repository.resolve_trees_to_uris([tree])[0][1]
