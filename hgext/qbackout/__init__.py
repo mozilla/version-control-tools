@@ -93,6 +93,7 @@ def qbackout(ui, repo, rev, **opts):
                              no_commit=True,
                              strip=1,
                              base='',
+                             prefix='',
                              obsolete=[])
 
     def commit_change(ui, repo, action, force_name=None, node=None, revisions=None, **opts):
@@ -267,6 +268,7 @@ def oops(ui, repo, rev, **opts):
                          no_commit=True,
                          strip=1,
                          base='',
+                         prefix='',
                          obsolete=[])
 
     def commit_change(ui, repo, action, force_name=None, node=None, revisions=None, **opts):
