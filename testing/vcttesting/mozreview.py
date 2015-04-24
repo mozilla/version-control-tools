@@ -11,6 +11,7 @@ import os
 import subprocess
 
 import paramiko
+import concurrent.futures as futures
 
 from vcttesting.bugzilla import Bugzilla
 from vcttesting.docker import (
@@ -206,23 +207,26 @@ class MozReview(object):
         self.mercurial_url = mr_info['mercurial_url']
 
         # Ensure admin user is present and has admin privileges.
-        rb = self.get_reviewboard()
-        rb.login_user(bugzilla.username, bugzilla.password)
-        rb.make_admin(bugzilla.username)
+        def make_admin():
+            rb = self.get_reviewboard()
+            rb.login_user(bugzilla.username, bugzilla.password)
+            rb.make_admin(bugzilla.username)
 
-        # Tell hgrb about URLs.
-        self._docker.client.execute(
-                self.hgrb_id,
-                ['/set-urls', self.bugzilla_url, self.reviewboard_url])
+        with futures.ThreadPoolExecutor(4) as e:
+            e.submit(make_admin)
 
-        # Define site domain and hostname in rbweb. This is necessary so it
-        # constructs self-referential URLs properly.
-        self._docker.client.execute(self.rbweb_id,
-                                    ['/set-site-url', self.reviewboard_url])
+            # Tell hgrb about URLs.
+            e.submit(self._docker.client.execute, self.hgrb_id,
+                     ['/set-urls', self.bugzilla_url, self.reviewboard_url])
 
-        # Tell Bugzilla about Review Board URL.
-        self._docker.client.execute(mr_info['web_id'],
-                                    ['/set-urls', self.reviewboard_url])
+            # Define site domain and hostname in rbweb. This is necessary so it
+            # constructs self-referential URLs properly.
+            e.submit(self._docker.client.execute, self.rbweb_id,
+                     ['/set-site-url', self.reviewboard_url])
+
+            # Tell Bugzilla about Review Board URL.
+            e.submit(self._docker.client.execute, mr_info['web_id'],
+                     ['/set-urls', self.reviewboard_url])
 
         hg_ssh_host_key = self._docker.get_file_content(
                 mr_info['hgrb_id'],
