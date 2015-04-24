@@ -85,6 +85,11 @@ class MozReviewCommands(object):
         print('  ./mozreview autorefresh')
         print('')
         print('(autorefresh requires `watchman`)')
+        print('')
+        print('Obtain a shell in a container by running:')
+        print('  ./mozreview shell <container>')
+        print('')
+        print('(valid container names include: rbweb, bmoweb, hgrb, autoland)')
 
     @Command('shellinit', category='mozreview',
              description='Print statements to export variables to shells.')
