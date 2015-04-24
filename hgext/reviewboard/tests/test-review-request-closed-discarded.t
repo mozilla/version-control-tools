@@ -136,6 +136,7 @@ no Commit ID set.
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
 
 Child review request with ID 2 should be closed as discarded...
@@ -266,6 +267,7 @@ Commit ID re-instated.
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   draft:
     bugs:
@@ -287,6 +289,7 @@ Commit ID re-instated.
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
+      p2rb.reviewer_map: '{}'
       p2rb.unpublished_rids: '[]'
     diffs: []
 
@@ -443,6 +446,7 @@ Squashed review request should be published.
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
 
 Child review request with ID 2 should be published.

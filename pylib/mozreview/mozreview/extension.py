@@ -1,17 +1,22 @@
 from __future__ import unicode_literals
 
+import logging
+
 from django.conf.urls import include, patterns, url
+from django.db.models.signals import post_save
 
 from djblets.webapi.resources import (register_resource_for_model,
                                       unregister_resource_for_model)
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
                                           ReviewRequestFieldsHook,
+                                          SignalHook,
                                           TemplateHook,
                                           URLHook)
 from reviewboard.reviews.builtin_fields import TestingDoneField
 from reviewboard.reviews.fields import (get_review_request_field,
                                         get_review_request_fieldset)
+from reviewboard.reviews.models import ReviewRequestDraft
 from reviewboard.urls import (diffviewer_url_names,
                               review_request_url_names)
 
@@ -23,11 +28,14 @@ from mozreview.autoland.resources import (autoland_request_update_resource,
                                           try_autoland_trigger_resource)
 from mozreview.autoland.views import import_pullrequest
 from mozreview.batchreview.resources import batch_review_resource
+from mozreview.extra_data import (get_parent_rr, is_parent, is_pushed,
+                                  update_parent_rr_reviewers)
+from mozreview.fields import (CombinedReviewersField, CommitsListField,
+                              TryField)
+from mozreview.hooks import MozReviewApprovalHook
 from mozreview.pulse import initialize_pulse_handlers
 from mozreview.resources.review_request_summary import (
     review_request_summary_resource,)
-from mozreview.fields import (CombinedReviewersField, CommitsListField,
-                              TryField)
 
 
 class MozReviewExtension(Extension):
@@ -143,6 +151,13 @@ class MozReviewExtension(Extension):
         ReviewRequestFieldsHook(self, 'main', [CombinedReviewersField])
         ReviewRequestFieldsHook(self, 'main', [TryField])
 
+        # Use a custom method to calculate a review approval state.
+        MozReviewApprovalHook(self)
+
+        SignalHook(self, post_save, self.on_draft_changed,
+                   sender=ReviewRequestDraft)
+
+
         URLHook(self, patterns('',
             url(r'^import-pullrequest/(?P<user>.+)/(?P<repo>.+)/(?P<pullrequest>\d+)/$',
             import_pullrequest, name='import_pullrequest')))
@@ -158,3 +173,16 @@ class MozReviewExtension(Extension):
         unregister_resource_for_model(AutolandRequest)
         super(MozReviewExtension, self).shutdown()
 
+
+    def on_draft_changed(self, sender, **kwargs):
+        instance = kwargs["instance"]
+        rr = instance.get_review_request()
+
+        if is_pushed(instance) and not is_parent(rr):
+            parent_rr = get_parent_rr(rr)
+            parent_rr_draft = parent_rr.get_draft()
+
+            if parent_rr_draft is None:
+                parent_rr_draft = ReviewRequestDraft.create(parent_rr)
+
+            update_parent_rr_reviewers(parent_rr_draft)

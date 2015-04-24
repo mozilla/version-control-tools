@@ -1,20 +1,106 @@
-ul.current-arrow > li {
-  label {
-    font-size: 100% !important;
-    margin-right: 5px;
-  }
-
-  &[current="true"] {
-    list-style-type: none;
-    &::before {
-      content: "➡";
-      margin-left: -1em;
-    }
-  }
+/*
+ * We need to copy a few definitions from rb because there's a bug
+ * that prevents to import a less file from another application.
+ * See https://bugzilla.mozilla.org/show_bug.cgi?id=1168436 for more info.
+ */
+.border-radius(...) {
+  -moz-border-radius: @arguments;
+  -webkit-border-radius: @arguments;
+  border-radius: @arguments;
 }
 
-.reviews-diffs-links {
-  margin-bottom: 10px;
+@issue-opened-bg: #fff4B0;
+@issue-opened-border-color: darken(@issue-opened-bg, 40%);
+@issue-opened-link-color: darken(@issue-opened-bg, 60%);
+
+/*******************************************************/
+
+
+#mozreview-request-series{
+  margin-top:5px;
+}
+
+#mozreview-child-requests {
+  width: 100%;
+  border-spacing: 0px;
+  border-collapse: collapse;
+  margin-top:10px;
+
+  & > thead > tr {
+    text-align: left;
+  }
+
+  & > tbody > tr {
+    background-color: #FFFFFF;
+  }
+  & > tbody > tr[current="true"],
+  & > tbody > tr:hover {
+    background-color: #d4e0f3;
+    border: 1px solid grey;
+  }
+
+   td,
+   th {
+     padding: 5px;
+     border: 1px solid #C1C1C1;
+   }
+
+   & > thead > tr {
+     background: transparent url("/static/djblets/images/datagrid/header_bg.png") repeat-x scroll left bottom;
+   }
+
+   & > tbody td.mozreview_min_length {
+     width: 1px;
+   }
+
+   & a.mozreview_commit_summary {
+     width: 300px;
+   }
+
+   & > tbody td.truncate_text a,
+   & > tbody td.truncate_text span{
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     display: inline-block;
+   }
+
+   & > tbody td > a.commit_sha {
+     font-family: monospace
+   }
+
+   /* This was copied from the rb dashboard less file.*/
+   .issue-count,
+   .shipit-count {
+     display: inline-block;
+     font-weight: bold;
+     padding: 0.05em 0.8em;
+     white-space: nowrap;
+     .border-radius(10px);
+   }
+
+   .issue-count {
+     border: 1px darken(@issue-opened-bg, 50%) solid;
+     color: #205003;
+     background-repeat: no-repeat;
+     background-image: linear-gradient(#FFF49C, #FFF49C 25%, #FFE303);
+
+     .issue-icon {
+       color: darken(@issue-opened-bg, 60%);
+       display: inline-block;
+       padding: 0 3px 0 1px;
+       text-align: center;
+      }
+    }
+
+    .shipit-count {
+      background-image: url("/static/rb/images/shipit_bg.png");
+      background-position: top left;
+      background-repeat: repeat-x;
+      background-color: #6bc810;
+      border: 1px #478a06 solid;
+      color: #205003;
+    }
 }
 
 #error-container {

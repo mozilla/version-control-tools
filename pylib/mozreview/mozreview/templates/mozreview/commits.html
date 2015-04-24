@@ -3,18 +3,7 @@ This is the template for the "Commits" list in a push-based review request.
 {% endcomment %}
 
 {% load i18n %}
-
-<script type="text/template" id="mozreview-commits-child">
-  <span title="<%= commitID %>"><%= commitIDShort %></span> - <span title="<%= description %>"><%= summary %></span>
-  <div>
-    <label>{% trans "Reviewers:" %}</label> <span class="child-rr-reviewers" data-id="<%= childID %>"><%= reviewers %></span>
-  </div>
-  <div><%= links %></div>
-</script>
-
-<script type="text/template" id="mozreview-commit-links">
-  <a href="<%= childURL %>">[{% trans "Reviews" %}]</a> <a href="<%= childURL %>diff/#0">[{% trans "Diff" %}]</a>
-</script>
+{% load djblets_utils %}
 
 <div id="error-container">
   <h1>Well, this is embarassing...</h1>
@@ -24,10 +13,53 @@ This is the template for the "Commits" list in a push-based review request.
   <a href="#" id="error-stack-toggle">Stack</a>
   <a href="#" id="error-close">Close</a>
 </div>
-
-<ul id="mozreview-commits" class="current-arrow">
-  <li id="mozreview-commits-root" data-id="{{root_rr.id}}">{% trans "Root review request" %}
-    <div id="mozreview-commits-root-links"></div>
-    <ul id="mozreview-commits-children" class="current-arrow"></ul>
-  </li>
-</ul>
+<div id="mozreview-request-series">
+  <div id="mozreview-parent-request" data-id="{{parent_details.get_review_request.id}}">
+    <a href="{{parent_details.get_review_request.get_absolute_url}}diff/#index_header">Complete Diff</a> |
+    <a href="{{parent_details.get_review_request.get_absolute_url}}">Review Summary</a>
+  </div>
+  <table id="mozreview-child-requests">
+    <thead>
+    <tr>
+      <th>{% trans "Diff" %}</th>
+      <th>{% trans "Reviews" %}</th>
+      {% comment "TODO: show this column when the commit author will be available" %}
+      <th>{% trans "Submitter" %}</th>
+      {% endcomment %}
+      <th>{% trans "Reviewers" %}</th>
+      <th><div class="rb-icon rb-icon-shipit" title="Ship It!"></div></th>
+    </tr>
+    </thead>
+    {% for child_details in children_details %}
+    <tr {% if child_details.get_review_request.id = review_request_details.get_review_request.id %}current="true"{% endif %}>
+      <td class="mozreview_min_length">
+        <a title="See diff for commit {{child_details.extra_data|getitem:"p2rb.commit_id"|slice:":12"}}"
+           class="commit_sha" href="{{child_details.get_review_request.get_absolute_url}}diff/#index_header">
+          {{child_details.extra_data|getitem:"p2rb.commit_id"|slice:":12"}}
+        </a>
+      </td>
+      <td class="truncate_text mozreview_min_length">
+        <a class="mozreview_commit_summary" title="{{ child_details.summary}}" href="{{child_details.get_review_request.get_absolute_url}}">
+          {{ child_details.summary|truncatechars:25 }}
+        </a>
+      </td>
+      {% comment "TODO: show this column when the commit author will be available" %}
+      <td>{{ child_details.submitter }}</td>
+      {% endcomment %}
+      <td>
+        <span class="mozreview-child-reviewer-list"
+              data-id="{{child_details.get_review_request.id}}">{{ child_details.target_people.all|join:", " }}</span>
+      </td>
+      <td class="mozreview_min_length">
+        {% if child_details.issue_open_count > 0 %}
+        <span class="issue-count"> <span class="issue-icon">!</span> {{child_details.issue_open_count}}</span>
+        {% elif child_details.shipit_count > 0 %}
+        <span class="shipit-count"> <div class="rb-icon rb-icon-shipit-checkmark" title="Ship It!"></div>
+          {{child_details.shipit_count}}
+        </span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>

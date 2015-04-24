@@ -80,6 +80,7 @@ Squashed review request with ID 1 should be closed as submitted...
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
 
 Child review request with ID 2 should be closed as submitted...
@@ -148,6 +149,7 @@ Squashed review request with ID 1 should be re-opened...
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
 
 Child review request with ID 2 should be re-opened...

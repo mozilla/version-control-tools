@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).on("mozreview_ready", function() {
   var TRY_AUTOLAND = "/api/extensions/mozreview.extension.MozReviewExtension/try-autoland-triggers/";
 
   $("#mozreview-autoland-try-trigger").click(function() {

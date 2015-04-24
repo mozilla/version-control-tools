@@ -134,6 +134,7 @@ Review request 6 should be added to the list of discard on publish rids.
     p2rb.discard_on_publish_rids: '[6]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   draft:
     bugs:
@@ -158,6 +159,7 @@ Review request 6 should be added to the list of discard on publish rids.
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
+      p2rb.reviewer_map: '{}'
       p2rb.unpublished_rids: '[]'
     diffs:
     - id: 7
@@ -317,6 +319,7 @@ request is published.
     p2rb.discard_on_publish_rids: '[5]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   draft:
     bugs:
@@ -339,6 +342,7 @@ request is published.
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
+      p2rb.reviewer_map: '{"3": [], "2": [], "5": [], "4": []}'
       p2rb.unpublished_rids: '[]'
     diffs:
     - id: 8

@@ -85,6 +85,7 @@ We should have a disagreement between published and draft
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   draft:
     bugs:
@@ -104,6 +105,7 @@ We should have a disagreement between published and draft
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
+      p2rb.reviewer_map: '{"2": []}'
       p2rb.unpublished_rids: '[]'
     diffs:
     - id: 3
@@ -186,6 +188,7 @@ Discarding the parent review request draft should discard draft on children
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
 
   $ rbmanage dumpreview 2

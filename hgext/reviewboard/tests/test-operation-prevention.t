@@ -54,6 +54,7 @@ Publishing the parent should succeed.
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{"2": []}'
     p2rb.unpublished_rids: '[]'
 
   $ rbmanage dumpreview 2

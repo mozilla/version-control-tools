@@ -28,7 +28,7 @@ from mozreview.autoland.errors import (AUTOLAND_ERROR,
                                        BAD_AUTOLAND_URL,
                                        BAD_UPDATE_CREDENTIALS)
 from mozreview.errors import NOT_PUSHED_PARENT_REVIEW_REQUEST
-from mozreview.utils import is_parent, is_pushed
+from mozreview.extra_data import is_parent, is_pushed
 
 AUTOLAND_REQUEST_TIMEOUT = 10.0
 IMPORT_PULLREQUEST_DESTINATION = 'mozreview'

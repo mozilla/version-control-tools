@@ -39,7 +39,7 @@ class ReviewerSpecificationTest(MozReviewWebDriverTest):
 
         WebDriverWait(self.browser, 3).until(
             EC.text_to_be_present_in_element(
-                (By.CLASS_NAME, 'child-rr-reviewers'), 'jsmith'))
+                (By.CLASS_NAME, 'mozreview-child-reviewer-list'), 'jsmith'))
 
         time.sleep(1)
         publish = self.browser.find_element_by_id('btn-draft-publish')
@@ -50,7 +50,7 @@ class ReviewerSpecificationTest(MozReviewWebDriverTest):
 
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located(
-                (By.CLASS_NAME, 'child-rr-reviewers')))
-        reviewers = self.browser.find_elements_by_class_name('child-rr-reviewers')
+                (By.CLASS_NAME, 'mozreview-child-reviewer-list')))
+        reviewers = self.browser.find_elements_by_class_name('mozreview-child-reviewer-list')
         self.assertEqual(len(reviewers), 1)
         self.assertEqual(reviewers[0].text, 'jsmith')

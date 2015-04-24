@@ -198,11 +198,11 @@ class MozReviewWebDriverTest(MozReviewTest):
         """Wait for reviewers information to load."""
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located(
-                (By.CLASS_NAME, 'child-rr-reviewers')))
+                (By.CLASS_NAME, 'mozreview-child-reviewer-list')))
 
     def get_commits_el(self):
         """Obtain the element containing the multi-commit information."""
-        return self.browser.find_element_by_id('mozreview-commits')
+        return self.browser.find_element_by_id('mozreview-child-requests')
 
     def prepare_edit_reviewers(self, idx):
         """Start editing reviewers for the commit at index ``idx``."""

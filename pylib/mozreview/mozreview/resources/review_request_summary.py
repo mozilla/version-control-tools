@@ -20,7 +20,7 @@ from mozreview.extra_data import (COMMITS_KEY,
                                   get_parent_rr)
 from mozreview.models import BugzillaUserMap
 from mozreview.resources.errors import NOT_PARENT
-from mozreview.utils import is_parent
+from mozreview.extra_data import is_parent
 
 
 class ReviewRequestSummaryResource(WebAPIResource):

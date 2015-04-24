@@ -11,25 +11,8 @@ from reviewboard.extensions.base import get_extension_manager
 from reviewboard.reviews.fields import BaseReviewRequestField
 from reviewboard.reviews.models import ReviewRequest, ReviewRequestDraft
 
-from mozreview.utils import is_parent, is_pushed
-
-from mozreview.autoland.models import AutolandRequest, AutolandEventLogEntry
-
-
-def get_root(review_request):
-    if not is_parent(review_request):
-        identifier = review_request.extra_data.get('p2rb.identifier')
-        try:
-            review_request = ReviewRequest.objects.get(
-                commit_id=identifier, repository=review_request.repository)
-        except:
-            logging.error('Could not retrieve root review request with '
-                          'commit id %s because it does not appear to exist, '
-                          'or the user does not have read access to it.'
-                          % identifier)
-            return None
-
-    return review_request
+from mozreview.autoland.models import AutolandEventLogEntry, AutolandRequest
+from mozreview.extra_data import gen_child_rrs, get_parent_rr, is_parent, is_pushed
 
 
 def ensure_review_request(review_request_details):
@@ -41,15 +24,18 @@ def ensure_review_request(review_request_details):
 
 class CombinedReviewersField(BaseReviewRequestField):
     """ This field allows for empty pushes on the parent request"""
-    field_id = "p2rb.reviewer_epoch"
-
+    field_id = "p2rb.reviewer_map"
+    is_editable = True
     can_record_change_entry = True
 
     def should_render(self, value):
         return False
 
     def get_change_entry_sections_html(self, info):
-        return []
+        return [{
+            'title': 'Reviewers',
+            'rendered_html': 'List updated',
+        }]
 
 
 class CommitsListField(BaseReviewRequestField):
@@ -76,14 +62,22 @@ class CommitsListField(BaseReviewRequestField):
         return []
 
     def as_html(self):
-        rr = ensure_review_request(self.review_request_details)
+        user = self.request.user
+        parent = get_parent_rr(self.review_request_details.get_review_request())
+        parent_details = parent.get_draft() or parent
 
-        root_rr = get_root(rr)
+        # If a user can view the parent draft they should also have
+        # permission to view every child. We check if the child is
+        # accessible anyways in case it has been restricted for other
+        # reasons.
+        children_details = [
+            child for child in gen_child_rrs(parent_details, user)
+            if child.is_accessible_by(user)]
 
-        template = get_template('mozreview/commits.html')
-        return template.render(Context({
-            'current_id': rr.id,
-            'root_rr': root_rr,
+        return get_template('mozreview/commits.html').render(Context({
+            'review_request_details': self.review_request_details,
+            'parent_details': parent_details,
+            'children_details': children_details,
         }))
 
 

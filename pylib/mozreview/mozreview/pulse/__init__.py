@@ -11,7 +11,7 @@ from mozillapulse import publishers
 from mozillapulse.messages import base
 
 from mozreview.decorators import if_ext_enabled
-from mozreview.utils import is_parent, is_pushed
+from mozreview.extra_data import is_parent, is_pushed
 
 
 def initialize_pulse_handlers(extension):

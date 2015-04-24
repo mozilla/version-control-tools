@@ -140,6 +140,7 @@ on publish.
     p2rb.discard_on_publish_rids: '[6]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   draft:
     bugs:
@@ -164,6 +165,7 @@ on publish.
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
+      p2rb.reviewer_map: '{}'
       p2rb.unpublished_rids: '[]'
     diffs:
     - id: 7
@@ -227,6 +229,7 @@ The parent review should have dropped the reference to /r/6
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
 
 Review 6 should be marked as discarded
@@ -308,6 +311,7 @@ on publish.
     p2rb.discard_on_publish_rids: '[2]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   draft:
     bugs:
@@ -330,6 +334,7 @@ on publish.
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
+      p2rb.reviewer_map: '{"3": [], "2": [], "5": [], "4": []}'
       p2rb.unpublished_rids: '[]'
     diffs:
     - id: 8
@@ -430,6 +435,7 @@ The parent review should have been updated accordingly.
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
+    p2rb.reviewer_map: '{"3": [], "5": [], "4": []}'
     p2rb.unpublished_rids: '[]'
 
 Cleanup

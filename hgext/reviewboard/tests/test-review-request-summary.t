@@ -55,7 +55,8 @@
     submitter: default+5
     issue_open_count: 0
     status: pending
-    reviewers: []
+    reviewers:
+    - reviewer
   children:
   - summary: Bug 1 - Foo 1
     id: 2
@@ -96,7 +97,8 @@ Opening an issue should be reflected in the summary.
     submitter: default+5
     issue_open_count: 0
     status: pending
-    reviewers: []
+    reviewers:
+    - reviewer
   children:
   - summary: Bug 1 - Foo 1
     id: 2
@@ -126,7 +128,8 @@ Resolving an issue should decrement the issue count.
     submitter: default+5
     issue_open_count: 0
     status: pending
-    reviewers: []
+    reviewers:
+    - reviewer
   children:
   - summary: Bug 1 - Foo 1
     id: 2
@@ -155,7 +158,8 @@ Verify we can also get the summaries by bug, including closed ones.
       submitter: default+5
       issue_open_count: 0
       status: pending
-      reviewers: []
+      reviewers:
+      - reviewer
     children:
     - summary: Bug 1 - Foo 1
       id: 2

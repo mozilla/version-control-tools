@@ -29,11 +29,11 @@ from mozreview.errors import (CommitPublishProhibited,
 from mozreview.extra_data import (UNPUBLISHED_RRIDS_KEY,
                                   gen_child_rrs,
                                   gen_rrs_by_rids,
-                                  gen_rrs_by_extra_data_key)
+                                  gen_rrs_by_extra_data_key,
+                                  is_parent)
 from mozreview.models import (BugzillaUserMap,
                               get_or_create_bugzilla_users)
 from mozreview.signals import commit_request_publishing
-from mozreview.utils import is_parent
 from rbbz.auth import BugzillaBackend
 from rbbz.bugzilla import Bugzilla
 from rbbz.diffs import build_plaintext_review
