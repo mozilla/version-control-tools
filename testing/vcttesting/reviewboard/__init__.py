@@ -48,12 +48,14 @@ class MozReviewBoard(object):
         with ReviewBoardClient(self.url, username, password) as c:
             c.get_root()
 
-    def add_repository(self, name, url, bugzilla_url):
+    def add_repository(self, name, url, bugzilla_url,
+                       username='admin@example.com',
+                       password='password'):
         """Add a repository to Review Board."""
         bugzilla_url = bugzilla_url.rstrip('/')
         bug_url = '%s/show_bug.cgi?id=%%s' % bugzilla_url
 
-        with ReviewBoardClient(self.url, 'admin@example.com', 'password') as c:
+        with ReviewBoardClient(self.url, username, password) as c:
             root = c.get_root()
             repos = root.get_repositories()
             repo = repos.create(name=name, path=url, tool='Mercurial',
