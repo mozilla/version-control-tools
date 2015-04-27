@@ -23,4 +23,4 @@ if __name__ == '__main__':
 
     for d in sys.argv[1:]:
         for path in find_hg_repos(d):
-            print(path)
+            print(path[len(d):])
