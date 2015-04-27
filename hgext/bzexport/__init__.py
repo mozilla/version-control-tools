@@ -801,7 +801,7 @@ def bzexport(ui, repo, *args, **opts):
 
     contents = StringIO()
     diffopts = patch.diffopts(ui, opts)
-    context = ui.config("bzexport", "unified", None)
+    context = ui.config("bzexport", "unified", ui.config("diff", "unified", None))
     if context:
         diffopts.context = int(context)
     if rev in repo:
