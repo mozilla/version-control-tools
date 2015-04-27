@@ -79,7 +79,7 @@ site.run_manage_command('set-siteconfig', ['--key=logging_enabled',
 
 # Ensure admin user is hooked up to Bugzilla.
 from django.contrib.auth.models import User
-from rbbz.models import BugzillaUserMap
+from mozreview.models import BugzillaUserMap
 u = User.objects.get(email='admin@example.com')
 u.password='!'
 u.save()

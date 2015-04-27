@@ -11,7 +11,6 @@ from django.db.models.signals import pre_delete
 
 from djblets.siteconfig.models import SiteConfiguration
 from djblets.util.decorators import simple_decorator
-
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import AuthBackendHook, SignalHook
 from reviewboard.reviews.errors import PublishError
@@ -24,6 +23,8 @@ from reviewboard.reviews.signals import (reply_publishing,
                                          review_request_reopened)
 from reviewboard.site.urlresolvers import local_site_reverse
 
+from mozreview.models import (BugzillaUserMap,
+                              get_or_create_bugzilla_users)
 from rbbz.auth import BugzillaBackend
 from rbbz.bugzilla import Bugzilla
 from rbbz.diffs import build_plaintext_review
@@ -32,8 +33,6 @@ from rbbz.errors import (BugzillaError,
                          InvalidBugIdError)
 from rbbz.middleware import (BugzillaCookieAuthMiddleware,
                              CorsHeaderMiddleware)
-from rbbz.models import (BugzillaUserMap,
-                         get_or_create_bugzilla_users)
 from rbbz.resources import bugzilla_cookie_login_resource
 
 
