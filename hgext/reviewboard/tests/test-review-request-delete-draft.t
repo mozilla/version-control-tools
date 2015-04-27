@@ -79,7 +79,7 @@ We should have a disagreement between published and draft
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["8c2be86a13c96ceb24c3eaa50cc6ef214c656d50", "2"]]'
+    p2rb.commits: '[["8c2be86a13c96ceb24c3eaa50cc6ef214c656d50", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
@@ -98,7 +98,7 @@ We should have a disagreement between published and draft
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["c1eb968010521027f51dd6d901d92dc44bfdcd5d", "2"]]'
+      p2rb.commits: '[["c1eb968010521027f51dd6d901d92dc44bfdcd5d", 2]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -178,7 +178,7 @@ Discarding the parent review request draft should discard draft on children
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["8c2be86a13c96ceb24c3eaa50cc6ef214c656d50", "2"]]'
+    p2rb.commits: '[["8c2be86a13c96ceb24c3eaa50cc6ef214c656d50", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true

@@ -94,7 +94,7 @@ The parent review should have its description updated.
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
-    p2rb.unpublished_rids: '["2", "3", "4"]'
+    p2rb.unpublished_rids: '[2, 3, 4]'
   draft:
     bugs: []
     commit: bz://1/mynick
@@ -110,8 +110,8 @@ The parent review should have its description updated.
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
-        "3"], ["3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11", "4"]]'
+      p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", 2], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
+        3], ["3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11", 4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -127,6 +127,43 @@ The parent review should have its description updated.
       - '@@ -1,1 +1,1 @@'
       - -foo0
       - +foo3
+
+Ensure we are able to deal with rids that are strings by forcing the commit
+rids to be strings and then pushing a new commit.
+
+  $ rbmanage convert-draft-rids-to-str 1
+  $ echo 'foo4' > foo
+  $ hg commit -m 'Bug 1 - Foo 4'
+  $ hg push
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
+  submitting 4 changesets for review
+  
+  changeset:  1:24417bc94b2c
+  summary:    Bug 1 - Foo 1
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  
+  changeset:  2:61e2e5c813d2
+  summary:    Bug 1 - Foo 2
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  
+  changeset:  3:3e4b2ebd3703
+  summary:    Bug 1 - Foo 3
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  
+  changeset:  4:caf358b0a831
+  summary:    Bug 1 - Foo 4
+  review:     http://*:$HGPORT1/r/5 (draft) (glob)
+  
+  review id:  bz://1/mynick
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
 
 Cleanup
 

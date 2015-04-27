@@ -50,7 +50,7 @@ Publishing the parent should succeed.
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["57755461e85f1e3e66738ec2d57f325249897409", "2"]]'
+    p2rb.commits: '[["57755461e85f1e3e66738ec2d57f325249897409", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true

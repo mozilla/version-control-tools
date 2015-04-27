@@ -300,12 +300,10 @@ def _post_reviews(api_root, repoid, identifier, commits):
             summary=commit['message'].splitlines()[0],
             description=commit['message'])
         processed_nodes.add(commit['id'])
-        # Normalize all review request identifiers to strings.
         assert isinstance(rr.id, int)
-        rid = str(rr.id)
-        node_to_rid[node] = rid
-        review_requests[rid] = rr
-        unpublished_rids.append(rid)
+        node_to_rid[node] = rr.id
+        review_requests[rr.id] = rr
+        unpublished_rids.append(rr.id)
 
     # At this point every incoming commit has been accounted for.
     # If there are any remaining review requests, they must belong to
@@ -367,9 +365,9 @@ def _post_reviews(api_root, repoid, identifier, commits):
             unpublished_rids),
     })
 
-    review_requests[str(squashed_rr.id)] = squashed_rr
+    review_requests[squashed_rr.id] = squashed_rr
 
-    return str(squashed_rr.id), node_to_rid, review_requests
+    return squashed_rr.id, node_to_rid, review_requests
 
 
 class NoCacheTransport(SyncTransport):
@@ -417,24 +415,6 @@ def ReviewBoardClient(url, username, password, userid, cookie):
             pass
 
 
-def rid_list_to_str(rids):
-    """Convert a list of rids loaded from json to a list of rid strings.
-
-    Using unicode strings, or ints, could cause problems interacting with
-    other code, so we need to make sure each rid is represented using a
-    string.
-    """
-    rv = []
-    for rid in rids:
-        if isinstance(rid, unicode):
-            rid = rid.encode('utf-8')
-        elif isinstance(rid, int):
-            rid = str(rid)
-
-        rv.append(rid)
-
-    return rv
-
 def get_previous_commits(squashed_rr):
     """Retrieve the previous commits from a squashed review request.
 
@@ -443,8 +423,8 @@ def get_previous_commits(squashed_rr):
 
         [
             # (<commit-id>, <review-request-id>),
-            ('d4bd89322f54', '13'),
-            ('373537353134', '14'),
+            ('d4bd89322f54', 13),
+            ('373537353134', 14),
         ]
     """
     extra_data = None
@@ -464,15 +444,9 @@ def get_previous_commits(squashed_rr):
         if isinstance(node, unicode):
             node = node.encode('utf-8')
 
-        if isinstance(rid, unicode):
-            rid = rid.encode('utf-8')
-        elif isinstance(rid, int):
-            rid = str(rid)
-
         assert isinstance(node, str)
-        assert isinstance(rid, str)
 
-        commits.append((node, rid))
+        commits.append((node, int(rid)))
 
     return commits
 
@@ -489,8 +463,8 @@ def get_discard_on_publish_rids(squashed_rr):
     Adding to this list will mark a review request as to-be-discarded when
     the squashed draft is published on Review Board.
     """
-    return rid_list_to_str(json.loads(
-        squashed_rr.extra_data['p2rb.discard_on_publish_rids']))
+    return map(int, json.loads(
+               squashed_rr.extra_data['p2rb.discard_on_publish_rids']))
 
 
 def get_unpublished_rids(squashed_rr):
@@ -499,8 +473,8 @@ def get_unpublished_rids(squashed_rr):
     re-used for indiviual commits instead of creating a brand new review
     request.
     """
-    return rid_list_to_str(json.loads(
-        squashed_rr.extra_data['p2rb.unpublished_rids']))
+    return map(int, json.loads(
+               squashed_rr.extra_data['p2rb.unpublished_rids']))
 
 
 def get_unclaimed_rids(previous_commits, discard_on_publish_rids,

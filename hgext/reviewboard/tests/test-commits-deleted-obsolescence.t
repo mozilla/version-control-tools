@@ -133,10 +133,10 @@ on publish.
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", "2"], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
-      "3"], ["de473ef3c9d292c8cf419958e4f3a3318a2d6a4d", "4"], ["f5691a90b4d0ef04bbf08408d9f214356811db40",
-      "5"], ["d86c61a23fc8978f5d0c59a0ce608dc5d4312da5", "6"]]'
-    p2rb.discard_on_publish_rids: '["6"]'
+    p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", 2], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
+      3], ["de473ef3c9d292c8cf419958e4f3a3318a2d6a4d", 4], ["f5691a90b4d0ef04bbf08408d9f214356811db40",
+      5], ["d86c61a23fc8978f5d0c59a0ce608dc5d4312da5", 6]]'
+    p2rb.discard_on_publish_rids: '[6]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -157,9 +157,9 @@ on publish.
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", "2"], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
-        "3"], ["de473ef3c9d292c8cf419958e4f3a3318a2d6a4d", "4"], ["f5691a90b4d0ef04bbf08408d9f214356811db40",
-        "5"]]'
+      p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", 2], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
+        3], ["de473ef3c9d292c8cf419958e4f3a3318a2d6a4d", 4], ["f5691a90b4d0ef04bbf08408d9f214356811db40",
+        5]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -215,9 +215,9 @@ The parent review should have dropped the reference to /r/6
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", "2"], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
-      "3"], ["de473ef3c9d292c8cf419958e4f3a3318a2d6a4d", "4"], ["f5691a90b4d0ef04bbf08408d9f214356811db40",
-      "5"]]'
+    p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", 2], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
+      3], ["de473ef3c9d292c8cf419958e4f3a3318a2d6a4d", 4], ["f5691a90b4d0ef04bbf08408d9f214356811db40",
+      5]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
@@ -296,10 +296,10 @@ on publish.
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", "2"], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
-      "3"], ["de473ef3c9d292c8cf419958e4f3a3318a2d6a4d", "4"], ["f5691a90b4d0ef04bbf08408d9f214356811db40",
-      "5"]]'
-    p2rb.discard_on_publish_rids: '["2"]'
+    p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", 2], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
+      3], ["de473ef3c9d292c8cf419958e4f3a3318a2d6a4d", 4], ["f5691a90b4d0ef04bbf08408d9f214356811db40",
+      5]]'
+    p2rb.discard_on_publish_rids: '[2]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -319,8 +319,8 @@ on publish.
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["3299fd5f5fca4800c424e989c65615edb52a421b", "3"], ["4fcbb12a36e4f7a606c8ad86636e232d2133cfe1",
-        "4"], ["d768dcb976decf31b8ac1431701fefdacd31a390", "5"]]'
+      p2rb.commits: '[["3299fd5f5fca4800c424e989c65615edb52a421b", 3], ["4fcbb12a36e4f7a606c8ad86636e232d2133cfe1",
+        4], ["d768dcb976decf31b8ac1431701fefdacd31a390", 5]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -415,8 +415,8 @@ The parent review should have been updated accordingly.
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["3299fd5f5fca4800c424e989c65615edb52a421b", "3"], ["7f4c8af7c6c440f9ce8a55fd2ab6203bac3cefbe",
-      "5"]]'
+    p2rb.commits: '[["3299fd5f5fca4800c424e989c65615edb52a421b", 3], ["7f4c8af7c6c440f9ce8a55fd2ab6203bac3cefbe",
+      5]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true

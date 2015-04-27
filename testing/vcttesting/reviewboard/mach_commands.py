@@ -600,3 +600,30 @@ class ReviewBoardCommands(object):
         fields = self._get_rb().get_profile_data(username)
         for k, v in sorted(fields.items()):
             print('%s: %s' % (k, v))
+
+    @Command('convert-draft-rids-to-str', category='reviewboard',
+         description='Convert any review ids stored in extra data to strings')
+    @CommandArgument('rrid', help='Review request id convert')
+    def convert_draft_rids_to_str(self, rrid):
+        from rbtools.api.errors import APIError
+        import json
+        root = self._get_root()
+        rr = root.get_review_request(review_request_id=rrid)
+        try:
+            draft = rr.get_draft()
+            d = dict(draft.extra_data.iteritems())
+
+            extra_data = {}
+            fields = ['p2rb.commits', 'p2rb.discard_on_publish_rids',
+                      'p2rb.unpublished_rids']
+            for field in fields:
+                if field not in d:
+                    continue
+                try:
+                    value = [[x[0], str(x[1])] for x in json.loads(d[field])]
+                except TypeError:
+                    value = [str(x) for x in json.loads(d[field])]
+                extra_data['extra_data.' + field] = json.dumps(value)
+            rr.get_or_create_draft(**extra_data)
+        except APIError:
+            pass

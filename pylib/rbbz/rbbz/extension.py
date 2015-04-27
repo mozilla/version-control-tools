@@ -315,10 +315,10 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                           review_or_request_url(review_request),
                           reviewers)
 
-        unpublished_rids = json.loads(
-            review_request.extra_data['p2rb.unpublished_rids'])
-        discard_on_publish_rids = json.loads(
-            review_request.extra_data['p2rb.discard_on_publish_rids'])
+        unpublished_rids = map(int, json.loads(
+            review_request.extra_data['p2rb.unpublished_rids']))
+        discard_on_publish_rids = map(int, json.loads(
+            review_request.extra_data['p2rb.discard_on_publish_rids']))
 
         # Publish any draft commits that have drafts. This will already include
         # items that are in unpublished_rids, so we'll remove anything we publish
@@ -341,9 +341,8 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                         sender=child,
                         weak=False)
 
-                id_str = str(child.id)
-                if id_str in unpublished_rids:
-                    unpublished_rids.remove(id_str)
+                if child.id in unpublished_rids:
+                    unpublished_rids.remove(child.id)
 
         # The remaining unpubished_rids need to be closed as discarded because
         # they have never been published, and they will appear in the user's

@@ -344,7 +344,7 @@ def pullreviews(repo, proto, args=None):
                 urllib.quote(identifier), rr.id))
             for relation in json.loads(commits):
                 node = relation[0].encode('utf-8')
-                rid = relation[1].encode('utf-8')
+                rid = str(relation[1])
 
                 lines.append('csetreview %s %s %s' % (rr.id, node, rid))
                 lines.append('reviewdata %s status %s' % (rid,

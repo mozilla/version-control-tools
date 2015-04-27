@@ -118,8 +118,8 @@ no Commit ID set.
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
-      "3"]]'
+    p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", 2], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
+      3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
@@ -237,8 +237,8 @@ Commit ID re-instated.
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
-      "3"]]'
+    p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", 2], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
+      3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
@@ -258,8 +258,8 @@ Commit ID re-instated.
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
-        "3"]]'
+      p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", 2], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
+        3]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -403,8 +403,8 @@ Squashed review request should be published.
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", "2"], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
-      "3"]]'
+    p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", 2], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
+      3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true

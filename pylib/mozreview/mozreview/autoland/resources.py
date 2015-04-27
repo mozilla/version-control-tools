@@ -125,8 +125,7 @@ class TryAutolandTriggerResource(WebAPIResource):
         if not rr.is_mutable_by(request.user):
             return PERMISSION_DENIED
 
-        commit_list = json.loads(rr.extra_data.get('p2rb.commits'))
-        last_revision = commit_list[-1][0]
+        last_revision = json.loads(rr.extra_data.get('p2rb.commits'))[-1][0]
 
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
