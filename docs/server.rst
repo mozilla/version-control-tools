@@ -4,6 +4,25 @@
 Mozilla Server Operational Guide
 ================================
 
+hg.mozilla.org Hooks, Extensions, and Customizations Upgrade
+============================================================
+
+All code running on the servers behind hg.mozilla.org is in the
+version-control-tools repository (or at least it should be - there are
+still some components coming from sysadmins Puppet).
+
+Deployment of new code to hg.mozilla.org is performed via an Ansible
+playbook defined in the version-control-tools repository. To deploy new
+code, simply run::
+
+   $ ./deploy hgmo-extensions
+
+.. important::
+
+   Files from your local machine's version-control-tools working copy
+   will be installed on servers. Be aware of any local changes you have
+   performed, as they might be reflected on the server.
+
 Mercurial Software Upgrade Instructions
 =======================================
 
@@ -194,6 +213,24 @@ You'll simply need to SSH into the running host (``hg.mozilla.org``) and run
 Looking for currently running processes. If you can't find any, then
 it's safe to perform the Zeus SSH pool failover. If there are existing
 jobs running, plesae wait for them to finish.
+
+Forcing a hgweb Repository Re-clone
+===================================
+
+It is sometimes desirable to force a re-clone of a repository to each
+hgweb node. For example, if a new Mercurial release offers newer
+features in the repository store, you may need to perform a fresh clone
+in order to *upgrade* the repository on-disk format.
+
+To perform a re-clone of a repository on hgweb nodes, the
+``hgmo-reclone-repos`` deploy target can be used::
+
+   $ ./deploy hgmo-reclone-repos mozilla-central releases/mozilla-beta
+
+The underlying Ansible playbook integrates with the load balancers and
+will automatically take machines out of service and wait for active
+connections to be served before performing a re-clone. The re-clone
+should thus complete without any client-perceived downtime.
 
 Repository Mirroring
 ====================

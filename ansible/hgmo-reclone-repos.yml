@@ -1,0 +1,63 @@
+---
+- hosts: hgweb-prod
+  serial: 4
+  vars:
+    zlb: https://zlb1.ops.scl3.mozilla.com:9070/
+  vars_prompt:
+    - name: ldap_username
+      prompt: "What is your Mozilla LDAP username?"
+      private: no
+    - name: ldap_password
+      prompt: "What is your Mozilla LDAP password?"
+      private: yes
+
+  pre_tasks:
+    - name: take node out of load balancer
+      stingray_node:
+        pool: hgweb-http
+        node: "{{ hostvars[inventory_hostname].ansible_bond0.ipv4.address | mandatory }}:80"
+        state: draining
+        url: "{{ zlb }}"
+        username: "{{ ldap_username }}"
+        password: "{{ ldap_password }}"
+        lockfile: hgweb.lock
+      delegate_to: 127.0.0.1
+
+  tasks:
+    - name: wait for HTTP server to drain
+      apache_worker_drain: url=http://localhost/server-status timeout=3600
+
+    - name: back up old repositories
+      command: /bin/mv /repo/hg/mozilla/{{ item }} /repo/hg/mozilla/{{ item }}.bak.{{ ansible_date_time.iso8601 }} removes=/repo/hg/mozilla/{{ item }}
+      with_items: "{{ repos }}"
+
+    - name: reclone repositories
+      command: /usr/bin/sudo -u hg /usr/local/bin/mirror-pull {{ item }}
+      with_items: "{{ repos }}"
+
+    - name: restore hgrc
+      command: /usr/bin/sudo -u hg /usr/local/bin/mirror-pull --hgrc {{ item }}
+      with_items: "{{ repos }}"
+
+    - name: pull again in case upstream changed
+      command: /usr/bin/sudo -u hg /usr/local/bin/mirror-pull {{ item }}
+      with_items: "{{ repos }}"
+
+    - name: delete temporary repo backup
+      command: /bin/rm -rf /repo/hg/mozilla/{{ item }}.bak.{{ ansible_date_time.iso8601 }} removes=/repo/hg/mozilla/{{ item }}.bak/{{ ansible_date_time.iso8601 }}
+      with_items: "{{ repos }}"
+
+  post_tasks:
+    - name: add node back to load balancer
+      stingray_node:
+        pool: hgweb-http
+        node: "{{ hostvars[inventory_hostname].ansible_bond0.ipv4.address | mandatory }}:80"
+        state: active
+        url: "{{ zlb }}"
+        username: "{{ ldap_username }}"
+        password: "{{ ldap_password }}"
+        lockfile: hgweb.lock
+      delegate_to: 127.0.0.1
+
+    - name: wait for load balancer to re-add node
+      pause: seconds=15

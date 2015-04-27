@@ -58,3 +58,11 @@ class DeployCommands(object):
     def hgmo_strip(self, repo, rev, verbosity=None):
         from vcttesting.deploy import hgmo_strip as strip
         return strip(repo, rev, verbosity=verbosity)
+
+    @Command('hgmo-reclone-repos', category='deploy',
+             description='Re-clone repositories on hg.mozilla.org')
+    @CommandArgument('repo', nargs='+',
+                     help='Repositories to re-clone')
+    def hgmo_reclone_repos(self, repo):
+        from vcttesting.deploy import hgmo_reclone_repos as reclone
+        return reclone(repo)

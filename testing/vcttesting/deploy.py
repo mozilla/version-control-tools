@@ -75,4 +75,11 @@ def hgmo_strip(repo, rev, verbosity=0):
     }
 
     return run_playbook('hgmo-strip-repo', extra_vars=extra,
-                        verbosity=0)
+                        verbosity=verbosity)
+
+
+def hgmo_reclone_repos(repos, verbosity=0):
+    extra = {'repos': repos}
+
+    return run_playbook('hgmo-reclone-repos', extra_vars=extra,
+                        verbosity=verbosity)
