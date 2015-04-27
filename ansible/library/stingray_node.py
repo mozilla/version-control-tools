@@ -2,6 +2,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 3 or any later version.
 
+import os
+import lockfile
+
 from mozansible.stingray import StingrayConnection
 
 
@@ -16,7 +19,8 @@ def main():
             },
             'url': {'required': True},
             'username': {'required': True},
-            'password': {'password': True},
+            'password': {'required': True},
+            'lockfile': {'required': False},
         },
     )
 
@@ -27,8 +31,18 @@ def main():
     node = module.params['node']
     state = module.params['state']
 
-    conn = StingrayConnection(module, url, username, password)
-    changed = conn.set_node_state(pool, node, state)
+    lock = None
+    if module.params['lockfile']:
+        lockpath = os.path.join(os.environ['TMPDIR'], module.params['lockfile'])
+        lock = lockfile.LockFile(lockpath)
+        lock.acquire(60)
+
+    try:
+        conn = StingrayConnection(module, url, username, password)
+        changed = conn.set_node_state(pool, node, state)
+    finally:
+        if lock:
+            lock.release()
 
     module.exit_json(changed=changed, msg='Set %s state to %s' % (node, state))
 
