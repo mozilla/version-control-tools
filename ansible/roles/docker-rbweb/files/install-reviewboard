@@ -51,9 +51,23 @@ site.setup_settings()
 from reviewboard import initialize
 initialize()
 
+# We need to toggle disable/enable state to get first run code to run.
+# We should *not* carry this pattern forward to production, because it may
+# have undesirable consequences.
+#
+# TODO this appears to add ~1s overhead. Consider putting this behavior
+# behind a flag.
+print('disabling extensions')
+site.run_manage_command('disable-extension',
+                        ['mozreview.extension.MozReviewExtension'])
+site.run_manage_command('disable-extension',
+                        ['rbbz.extension.BugzillaExtension'])
+
+print('enabling extensions')
 site.run_manage_command('enable-extension', ['mozreview.extension.MozReviewExtension'])
 site.run_manage_command('enable-extension', ['rbbz.extension.BugzillaExtension'])
 
+print('generating static assets')
 site.run_manage_command('collectstatic', ['--noinput'])
 
 # Hook up Bugzilla authentication.
