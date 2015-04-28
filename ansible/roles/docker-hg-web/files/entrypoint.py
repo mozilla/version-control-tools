@@ -29,7 +29,6 @@ REPLACEMENTS = {
     '<%= @mirror_source %>': ssh_hostname,
     '<%= @repo_serve_path %>': '/repo_local/mozilla/mozilla',
     '%<= @repo_serve_path %>': '/repo_local/mozilla/mozilla',
-    '<%= @python_lib_override_path %>': '/repo_local/mozilla/library_overrides',
     '<%= @python_lib_path %>': '/repo_local/mozilla/libraries',
     '<%= @mirror_priv_key_path %>': '/etc/mercurial/mirror',
     '<%= @mirror_user_name %>': 'hg',

@@ -16,9 +16,6 @@
 - name: symlink /repo to /repo_local
   file: src=/repo_local dest=/repo state=link
 
-- name: install library_overrides repository
-  hg: repo=https://hg.mozilla.org/hgcustom/library_overrides dest=/repo_local/mozilla/library_overrides force=yes purge=yes
-
 - name: install httpd.conf
   copy: src=httpd.conf dest=/etc/httpd/conf/httpd.conf
 

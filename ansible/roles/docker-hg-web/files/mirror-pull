@@ -51,7 +51,7 @@ DELETE=false
 HGRC=false
 CHANGESET=""
 
-export PYTHONPATH=<%= @python_lib_override_path %>:<%= @python_lib_path %>
+export PYTHONPATH=<%= @python_lib_path %>
 
 while true; do
     case "$1" in 

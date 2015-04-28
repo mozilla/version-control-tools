@@ -7,7 +7,7 @@
 - hosts: hgweb-prod
   tasks:
     - name: Strip repo on mirrors
-      shell: "PYTHONPATH=/repo_local/mozilla/library_overrides:/repo_local/mozilla/libraries hg --config extensions.strip= -R /repo_local/mozilla/mozilla/{{ repo }} strip -r {{ rev }}"
+      shell: "PYTHONPATH=/repo_local/mozilla/libraries hg --config extensions.strip= -R /repo_local/mozilla/mozilla/{{ repo }} strip -r {{ rev }}"
 
     - name: Ensure mirror is up to date
       command: sudo -u hg /usr/local/bin/mirror-pull {{ repo }}
