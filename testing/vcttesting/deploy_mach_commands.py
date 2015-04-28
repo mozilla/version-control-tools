@@ -61,8 +61,18 @@ class DeployCommands(object):
 
     @Command('hgmo-reclone-repos', category='deploy',
              description='Re-clone repositories on hg.mozilla.org')
-    @CommandArgument('repo', nargs='+',
+    @CommandArgument('repo', nargs='*',
                      help='Repositories to re-clone')
-    def hgmo_reclone_repos(self, repo):
+    @CommandArgument('--repo-file',
+                     help='File containing list of repositories to re-clone')
+    def hgmo_reclone_repos(self, repo, repo_file=None):
         from vcttesting.deploy import hgmo_reclone_repos as reclone
+
+        if repo_file:
+            if repo:
+                print('cannot specify repos from both arguments and a file')
+                return 1
+
+            repo = open(repo_file, 'rb').read().splitlines()
+
         return reclone(repo)
