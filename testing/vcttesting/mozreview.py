@@ -294,11 +294,17 @@ class MozReview(object):
             rsync_port = vct_state['NetworkSettings']['Ports']['873/tcp'][0]['HostPort']
             url = 'rsync://%s:%s/vct-mount/' % (self._docker.docker_hostname,
                                                 rsync_port)
-            res = self._docker.client.execute(self.rbweb_id, ['/refresh', url],
-                                              stream=True)
-            for msg in res:
-                if verbose:
-                    print(msg, end='')
+
+            def refresh(name, cid):
+                res = self._docker.client.execute(cid, ['/refresh', url],
+                                                  stream=True)
+                for msg in res:
+                    if verbose:
+                        print('%s> %s' % (name, msg), end='')
+
+            with futures.ThreadPoolExecutor(2) as e:
+                e.submit(refresh, 'rbweb', self.rbweb_id)
+                e.submit(refresh, 'hgrb', self.hgrb_id)
 
     def start_autorefresh(self):
         """Enable auto refreshing of the cluster when changes are made.
@@ -318,7 +324,12 @@ class MozReview(object):
         data = json.dumps(['trigger', ROOT, {
             'name': name,
             'chdir': ROOT,
-            'expression': ['pcre', 'pylib/(mozreview|rbbz)/.*'],
+            'expression': ['anyof',
+                ['dirname', 'hgext/reviewboard'],
+                ['dirname', 'pylib/mozreview'],
+                ['dirname', 'pylib/rbbz'],
+                ['dirname', 'reviewboardmods'],
+            ],
             'command': ['%s/mozreview' % ROOT, 'refresh', self._path],
         }])
         p = subprocess.Popen([WATCHMAN, '-j'], stdin=subprocess.PIPE)

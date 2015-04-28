@@ -5,6 +5,7 @@
     - create-repo
     - entrypoint.py
     - kill-wsgi-procs
+    - refresh
     - run.sh
     - set-strip-users
     - set-urls
