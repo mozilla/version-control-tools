@@ -5,6 +5,7 @@
 import base64
 
 import bugsy
+import mechanize
 import requests
 import xmlrpclib
 import yaml
@@ -101,23 +102,26 @@ class Bugzilla(object):
     def create_login_cookie(self):
         # We simulate a browser's HTML interaction with Bugzilla to obtain a
         # login cookie. Is there a better way?
+        br = mechanize.Browser()
         url = self.base_url + '/'
-        r = requests.get(url + '/')
-        cookies = dict(r.cookies)
-
-        params = {
-            'Bugzilla_login': self.username,
-            'Bugzilla_password': self.password,
-            'Bugzilla_login_token': '',
-        }
-        r = requests.post(url + '/index.cgi', params=params, cookies=cookies)
-        if r.status_code != 200:
+        br.set_handle_robots(False)
+        br.open(url)
+        br.select_form(nr=0)
+        br.form['Bugzilla_login'] = self.username
+        br.form['Bugzilla_password'] = self.password
+        resp = br.submit()
+        if resp.code != 200:
             raise Exception('Non-200 response from Bugzilla. Proper credentials?')
+        # Is there a better way to extract cookies?
+        cookies = br._ua_handlers['_cookies'].cookiejar
 
-        login = r.cookies['Bugzilla_login']
-        cookie = r.cookies['Bugzilla_logincookie']
+        login = [c.value for c in cookies if c.name == 'Bugzilla_login']
+        assert login, "Bugzilla_login cookie not found"
 
-        return login, cookie
+        cookie = [c.value for c in cookies if c.name == 'Bugzilla_logincookie']
+        assert cookie, "Bugzilla_logincookie cookie not found"
+
+        return login[0], cookie[0]
 
     def serialize_bugs(self, bugs):
         data = {}
