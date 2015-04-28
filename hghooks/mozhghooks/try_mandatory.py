@@ -11,7 +11,7 @@ def printError(message):
 
 
 def hook(ui, repo, source=None, **kwargs):
-    if source == 'strip':
+    if source in ('pull', 'strip'):
         return 0
 
     # Block the push unless they use the try_syntax

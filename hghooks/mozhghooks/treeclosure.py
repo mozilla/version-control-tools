@@ -63,7 +63,7 @@ def isPushAllowed(repo, name):
 
 
 def hook(ui, repo, source=None, **kwargs):
-    if source == 'strip':
+    if source in ('pull', 'strip'):
         return 0
 
     treestatus_name = os.path.basename(repo.root)

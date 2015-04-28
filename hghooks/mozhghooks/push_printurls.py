@@ -82,7 +82,10 @@ hgNameToRevURL = dict(TREEHERDER_REPOS)
 hgNameToRevURL.update(OTHER_REPOS)
 
 
-def hook(ui, repo, node, hooktype, **kwargs):
+def hook(ui, repo, node, hooktype, source=None, **kwargs):
+    if source in ('pull', 'strip'):
+        return 0
+
     repo_name = os.path.basename(repo.root)
     if repo_name not in hgNameToRevURL:
         return 0

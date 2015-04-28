@@ -75,7 +75,10 @@ def get_changed_files(repo, cs1, cs2):
     return changed_files
 
 
-def hook(ui, repo, node, **kwargs):
+def hook(ui, repo, node, source=None, **kwargs):
+    if source in ('pull', 'strip'):
+        return 0
+
     broken = []
 
     # All changesets from node to "tip" inclusive are part of this push.

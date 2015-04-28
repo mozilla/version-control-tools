@@ -40,7 +40,7 @@ def isOwned(changedFile, ownerArray):
 
 
 def hook(ui, repo, node, source=None, **kwargs):
-    if source == 'strip':
+    if source in ('pull', 'strip'):
         return 0
 
     # First find out which trees are affected

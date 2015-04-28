@@ -67,7 +67,7 @@ def check_unbumped_idl_interfaces(old_idl, new_idl):
                     new_interfaces[x]['body'] != old_interfaces[x]['body'])]
 
 def hook(ui, repo, hooktype, node, source=None, **kwargs):
-    if source == 'strip':
+    if source in ('pull', 'strip'):
         return 0
 
     changesets = list(repo.changelog.revs(repo[node].rev()))

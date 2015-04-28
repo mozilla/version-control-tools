@@ -24,7 +24,7 @@ import re
 
 
 def hook(ui, repo, hooktype, node, source=None, **kwargs):
-    if source == 'strip':
+    if source in ('pull', 'strip'):
         return 0
 
     error = ""

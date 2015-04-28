@@ -32,7 +32,7 @@ ALLOWED_USERS = set([
 
 
 def hook(ui, repo, node=None, source=None, **kwargs):
-    if source == 'strip':
+    if source in ('pull', 'strip'):
         return 0
 
     rev = repo[node].rev()

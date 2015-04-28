@@ -16,7 +16,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-def hook(ui, repo, **kwargs):
+def hook(ui, repo, source=None, **kwargs):
+    if source in ('pull', 'strip'):
+        return 0
+
     for branch, heads in repo.branchmap().iteritems():
         # Filter closed branch heads.
         heads = [h for h in heads if not repo[h].closesbranch()]

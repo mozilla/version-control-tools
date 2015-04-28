@@ -19,7 +19,10 @@ This hook is designed to prevent renames that only change the case of a file.
 """
 from mercurial.node import hex, short
 
-def hook(ui, repo, node, hooktype, **kwargs):
+def hook(ui, repo, node, hooktype, source=None, **kwargs):
+    if source in ('pull', 'strip'):
+        return 0
+
     # All changesets from node to "tip" inclusive are part of this push.
     rev = repo.changectx(node).rev()
     tip = repo.changectx("tip").rev()
