@@ -460,7 +460,8 @@ class Docker(object):
 
                 state = self.client.inspect_container(cid)
                 if state['State']['ExitCode']:
-                    raise Exception('Ansible did not complete successfully')
+                    raise Exception('Ansible did not run on %s successfully' %
+                                    repository)
 
                 tag = str(uuid.uuid1())
 
