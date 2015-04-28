@@ -9,6 +9,9 @@ set -e
 chown -R root:root /vct
 /usr/bin/rsync -rlpt /vct/ /version-control-tools/
 
+cp /version-control-tools/ansible/roles/docker-rbweb/files/install-reviewboard /install-reviewboard
+chown reviewboard:reviewboard /install-reviewboard
+
 /install-reviewboard
 
 # Need to kill WSGI processes to ensure Python code is current.
