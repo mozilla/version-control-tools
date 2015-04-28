@@ -8,6 +8,7 @@
 from __future__ import absolute_import
 
 import base64
+from collections import deque
 import docker
 import json
 import os
@@ -451,15 +452,20 @@ class Docker(object):
         with self.vct_container(image=vct_image, cid=vct_cid, verbose=verbose) as vct_state:
             cmd = ['/sync-and-build', '%s.yml' % playbook]
             with self.create_container(start_image, command=cmd) as cid:
+                output = deque(maxlen=20)
                 self.client.start(cid, volumes_from=[vct_state['Name']])
 
                 for s in self.client.attach(cid, stream=True, logs=True):
-                    if verbose:
-                        for line in s.splitlines():
+                    for line in s.splitlines():
+                        output.append(line)
+                        if verbose:
                             print('%s> %s' % (repository, line))
 
                 state = self.client.inspect_container(cid)
                 if state['State']['ExitCode']:
+                    # This should arguably be part of the exception.
+                    for line in output:
+                        print('ERROR %s> %s' % (repository, line))
                     raise Exception('Ansible did not run on %s successfully' %
                                     repository)
 
