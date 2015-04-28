@@ -44,7 +44,7 @@
       with_items: "{{ repos }}"
 
     - name: delete temporary repo backup
-      command: /bin/rm -rf /repo/hg/mozilla/{{ item }}.bak.{{ ansible_date_time.iso8601 }} removes=/repo/hg/mozilla/{{ item }}.bak/{{ ansible_date_time.iso8601 }}
+      command: /bin/rm -rf /repo/hg/mozilla/{{ item }}.bak.{{ ansible_date_time.iso8601 }} removes=/repo/hg/mozilla/{{ item }}.bak.{{ ansible_date_time.iso8601 }}
       with_items: "{{ repos }}"
 
   post_tasks:
