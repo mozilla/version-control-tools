@@ -27,24 +27,8 @@
     - name: wait for HTTP server to drain
       apache_worker_drain: url=http://localhost/server-status timeout=3600
 
-    - name: back up old repositories
-      command: /bin/mv /repo/hg/mozilla/{{ item }} /repo/hg/mozilla/{{ item }}.bak.{{ ansible_date_time.iso8601 }} removes=/repo/hg/mozilla/{{ item }}
-      with_items: "{{ repos }}"
-
-    - name: reclone repositories
-      command: /usr/bin/sudo -u hg /usr/local/bin/mirror-pull {{ item }}
-      with_items: "{{ repos }}"
-
-    - name: restore hgrc
-      command: /usr/bin/sudo -u hg /usr/local/bin/mirror-pull --hgrc {{ item }}
-      with_items: "{{ repos }}"
-
-    - name: pull again in case upstream changed
-      command: /usr/bin/sudo -u hg /usr/local/bin/mirror-pull {{ item }}
-      with_items: "{{ repos }}"
-
-    - name: delete temporary repo backup
-      command: /bin/rm -rf /repo/hg/mozilla/{{ item }}.bak.{{ ansible_date_time.iso8601 }} removes=/repo/hg/mozilla/{{ item }}.bak.{{ ansible_date_time.iso8601 }}
+    - name: reclone repository
+      hgweb_reclone: repo={{ item }}
       with_items: "{{ repos }}"
 
   post_tasks:
