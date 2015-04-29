@@ -34,8 +34,19 @@ def main():
 
     mp = ['/usr/bin/sudo', '-u', 'hg', '/usr/local/bin/mirror-pull']
 
-    # Clone the repository.
-    rc, out, err = module.run_command(mp + [repo], check_rc=True)
+    # Create the empty repo.
+    #
+    # `mirror-pull <repo>` could be used to create the repo from scratch.
+    # However, mirror-pull takes out a global lock during `hg clone`. This
+    # effectively prevents multiple repositories from being created
+    # simultaneously. This lock adds little value, as Mercurial itself performs
+    # repo-level locking where appropriate. But the lock exists, so work around
+    # it.
+    module.run_command(['/usr/bin/sudo', '-u', 'hg', 'hg', 'init', repo_path],
+                       check_rc=True)
+
+    # Pull repo.
+    module.run_command(mp + [repo], check_rc=True)
 
     # Restore hgrc
     module.run_command(mp + ['--hgrc', repo], check_rc=True)
