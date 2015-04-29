@@ -15,6 +15,7 @@ TREEHERDER_REPOS = {
     'mozilla-beta':    'releases/mozilla-beta/',
     'mozilla-release': 'releases/mozilla-release/',
     'mozilla-esr31':   'releases/mozilla-esr31/',
+    'mozilla-esr38':   'releases/mozilla-esr38/',
     # Gecko B2G branches
     'mozilla-b2g37_v2_2':      'releases/mozilla-b2g37_v2_2/',
     'mozilla-b2g34_v2_1s':     'releases/mozilla-b2g34_v2_1s/',
@@ -28,6 +29,7 @@ TREEHERDER_REPOS = {
     'comm-beta':    'releases/comm-beta/',
     'comm-release': 'releases/comm-release/',
     'comm-esr31':   'releases/comm-esr31/',
+    'comm-esr38':   'releases/comm-esr38/',
     # Try repos
     'try':              'try/',
     'try-comm-central': 'try-comm-central/',
