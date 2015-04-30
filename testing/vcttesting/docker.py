@@ -449,6 +449,22 @@ class Docker(object):
             full_builder = 'ansible-%s' % builder
             start_image = self.ensure_built(full_builder, verbose=verbose)
 
+        # Docker imposes a limit of 127 stacked images, at which point an
+        # error will be raised creating a new container. Since Ansible
+        # containers are incremental images, it's only a matter of time before
+        # this limit gets hit.
+        #
+        # When we approach this limit, walk the stack of images and reset the
+        # base image to the first image built with Ansible. This ensures
+        # some cache hits and continuation and prevents us from brushing into
+        # the limit.
+        history = self.client.history(start_image)
+        if len(history) > 120:
+            # Newest to oldest.
+            for base in history:
+                if base['CreatedBy'].startswith('/sync-and-build'):
+                    start_image = base['Id']
+
         with self.vct_container(image=vct_image, cid=vct_cid, verbose=verbose) as vct_state:
             cmd = ['/sync-and-build', '%s.yml' % playbook]
             with self.create_container(start_image, command=cmd) as cid:
