@@ -4,7 +4,10 @@ from djblets.extensions.forms import SettingsForm
 
 
 class MozReviewSettingsForm(SettingsForm):
-    enabled = forms.BooleanField(initial=False, required=False)
+    enabled = forms.BooleanField(
+        initial=False,
+        required=False,
+        label=_('Enable Pulse'))
     pulse_host = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={
