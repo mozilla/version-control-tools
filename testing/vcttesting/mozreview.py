@@ -295,16 +295,20 @@ class MozReview(object):
             url = 'rsync://%s:%s/vct-mount/' % (self._docker.docker_hostname,
                                                 rsync_port)
 
-            def refresh(name, cid):
-                res = self._docker.client.execute(cid, ['/refresh', url],
-                                                  stream=True)
+            def execute(name, cid, command):
+                res = self._docker.client.execute(cid, command, stream=True)
                 for msg in res:
                     if verbose:
                         print('%s> %s' % (name, msg), end='')
 
-            with futures.ThreadPoolExecutor(2) as e:
+            def refresh(name, cid):
+                execute(name, cid, ['/refresh', url])
+
+            with futures.ThreadPoolExecutor(3) as e:
                 e.submit(refresh, 'rbweb', self.rbweb_id)
                 e.submit(refresh, 'hgrb', self.hgrb_id)
+                e.submit(execute, 'bmoweb', self.bmoweb_id,
+                         ['/usr/bin/supervisorctl', 'restart', 'httpd'])
 
     def start_autorefresh(self):
         """Enable auto refreshing of the cluster when changes are made.

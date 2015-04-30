@@ -168,7 +168,11 @@ ADD set-urls /set-urls
 ADD entrypoint.py /bmoweb_entrypoint.py
 ADD run-apache.sh /run-apache.sh
 
+# TODO move this above once we modify package list next.
+RUN apt-get -y install supervisor
+ADD supervisord.conf /etc/supervisor/conf.d/docker.conf
+
 EXPOSE 80
 
 ENTRYPOINT ["/bmoweb_entrypoint.py"]
-CMD ["/run-apache.sh"]
+CMD ["/usr/bin/supervisord"]
