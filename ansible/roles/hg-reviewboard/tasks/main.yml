@@ -69,3 +69,5 @@
 
 - name: Prune system httpd configs
   file: path=/etc/httpd/conf.d/welcome.conf state=absent
+
+- include: discovery-repo.yml repo=autoreview

@@ -31,6 +31,7 @@ from mercurial import demandimport
 from mercurial import exchange
 from mercurial import extensions
 from mercurial import hg
+from mercurial import httppeer
 from mercurial import localrepo
 from mercurial import obsolete
 from mercurial import phases
@@ -38,7 +39,6 @@ from mercurial import scmutil
 from mercurial import sshpeer
 from mercurial import templatekw
 from mercurial import util
-from mercurial import wireproto
 from mercurial.i18n import _
 from mercurial.node import bin, hex
 
@@ -98,9 +98,58 @@ def pushcommand(orig, ui, repo, *args, **kwargs):
 def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
                 **kwargs):
     """Wraps exchange.push to enforce restrictions for review pushes."""
+
+    # The repository does not support pushing reviews.
     if not remote.capable('reviewboard'):
-        return orig(repo, remote, force=force, revs=revs, newbranch=newbranch,
-                    **kwargs)
+        # See if this repository is a special "discovery" repository
+        # and follow the link, if present.
+        if not remote.capable('listreviewrepos'):
+            return orig(repo, remote, force=force, revs=revs,
+                        newbranch=newbranch, **kwargs)
+
+        repo.ui.status(_('searching for appropriate review repository\n'))
+        repos = remote.listkeys('reviewrepos')
+        rootnode = repo[0].hex()
+        newurl = None
+        for url, node in repos.items():
+            if rootnode == node:
+                newurl = url
+                break
+        else:
+            raise util.Abort(_('no review repository found'))
+
+        newurl = util.url(newurl)
+        oldurl = util.url(remote._url)
+
+        # We don't currently allow redirecting to different protocols
+        # or hosts. This is due to abundance of caution around
+        # security concerns.
+
+        if newurl.scheme != oldurl.scheme or newurl.host != oldurl.host:
+            raise util.Abort(_('refusing to redirect due to URL mismatch: %s' %
+                newurl))
+
+        repo.ui.status(_('redirecting push to %s\n') % newurl)
+
+        if isinstance(remote, httppeer.httppeer):
+            remote._url = str(newurl)
+
+            newurl.user = oldurl.user
+            newurl.passwd = oldurl.passwd
+            remote.path = str(newurl)
+            newremote = remote
+
+        elif isinstance(remote, sshpeer.sshpeer):
+            newurl.user = oldurl.user
+
+            # SSH remotes establish processes. We can't simply monkeypatch
+            # the instance.
+            newremote = type(remote)(remote.ui, str(newurl))
+        else:
+            raise util.Abort(_('do not know how to talk to this remote type\n'))
+
+        return wrappedpush(orig, repo, newremote, force=False, revs=None,
+                           newbranch=False, **kwargs)
 
     ircnick = repo.ui.config('mozilla', 'ircnick', None)
     if not ircnick:

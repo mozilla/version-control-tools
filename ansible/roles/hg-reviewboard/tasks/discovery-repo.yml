@@ -1,0 +1,22 @@
+# This playbook is used to create an auto-review repository.
+# Auto-review repositories are repositories that advertise the URLs of
+# other repositories. Simply push to an auto-review repository and the
+# client will automatically figure out which repo to push to.
+---
+- name: create auto-review repository
+  command: /usr/bin/hg --config extensions.rbserver=! init /repo/hg/mozilla/{{ repo }} creates=/repo/hg/mozilla/{{ repo }}
+
+- name: configure auto-review repository
+  ini_file: dest=/repo/hg/mozilla/{{ repo }}/.hg/hgrc section={{ item.section }} option={{ item.option }} value="{{ item.value }}"
+  with_items:
+    - { section: reviewboard, option: isdiscoveryrepo, value: true }
+    - { section: web, option: description, value: "Push here to start code review" }
+
+- name: ensure proper repo owners
+  command: /bin/chown -R hg:scm_level_1 /repo/hg/mozilla/{{ repo }}
+
+- name: group file permissions
+  shell: find /repo/hg/mozilla/{{ repo }} -type f | xargs chmod g+w
+
+- name: group directory permissions
+  shell: find /repo/hg/mozilla/{{ repo }} -type d | xargs chmod g+sw

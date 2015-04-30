@@ -21,8 +21,10 @@ import os
 import sys
 
 from mercurial import (
+    cmdutil,
     demandimport,
     extensions,
+    hg,
     phases,
     pushkey,
     repair,
@@ -30,6 +32,10 @@ from mercurial import (
     wireproto,
 )
 from mercurial.i18n import _
+from mercurial.node import (
+    hex,
+    nullid,
+)
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
@@ -42,7 +48,11 @@ except ImportError:
     import hgrb.proto
 demandimport.enable()
 
-testedwith = '3.0 3.1 3.2 3.3'
+testedwith = '3.3'
+
+cmdtable = {}
+command = cmdutil.command(cmdtable)
+
 
 def capabilities(orig, repo, proto):
     """Wraps wireproto._capabilities to advertise reviewboard support."""
@@ -52,7 +62,11 @@ def capabilities(orig, repo, proto):
         caps.append('reviewboard')
         caps.append('pullreviews')
 
+    if repo.ui.config('reviewboard', 'isdiscoveryrepo', None):
+        caps.append('listreviewrepos')
+
     return caps
+
 
 def changegrouphook(ui, repo, source, url, **kwargs):
     # We send output to *every* client that the reviewboard client
@@ -63,6 +77,13 @@ def changegrouphook(ui, repo, source, url, **kwargs):
           'installed in order to perform code reviews.\n'))
     repo.ui.write(
         _('REVIEWBOARD: See https://hg.mozilla.org/hgcustom/version-control-tools/file/tip/hgext/reviewboard/README.rst\n'))
+
+
+def disallowpushhook(ui, repo, **kwargs):
+    repo.ui.write('Pushing to discovery repos is not allowed!\n')
+    repo.ui.write('You likely are seeing this error because your '
+                  '"reviewboard" Mercurial extension is out of date.\n')
+    return 1
 
 
 def pushstrip(repo, key, old, new):
@@ -104,9 +125,79 @@ def liststrip(repo):
     return {}
 
 
+def listreviewrepos(repo):
+    """Obtains a mapping of available repositories to root node.
+
+    The data is read from a file so as to incur minimal run-time overhead.
+    """
+    repos = {}
+    for line in repo.vfs.tryreadlines('reviewrepos'):
+        line = line.rstrip()
+        if not line:
+            continue
+
+        node, url = line.split(None, 1)
+        repos[url] = node
+
+    return repos
+
+
+def getreposfromreviewboard(repo):
+    from rbtools.api.client import RBClient
+
+    client = RBClient(repo.ui.config('reviewboard', 'url').rstrip('/'))
+    root = client.get_root()
+    urls = set()
+
+    repos = root.get_repositories(max_results=250, tool='Mercurial')
+    try:
+        while True:
+            for r in repos:
+                urls.add(r.path)
+
+            repos = repos.get_next()
+
+    except StopIteration:
+        pass
+
+    return urls
+
+
+@command('createrepomanifest', [
+    ('-s', 'search', '', _('string to replace in URLs')),
+    ('-r', 'replace', '', _('replacement string for URLs'))
+    ],
+    _('hg createrepomanifest'))
+def createrepomanifest(ui, repo, search=None, replace=None):
+    repos = {}
+    for url in getreposfromreviewboard(repo):
+        peer = hg.peer(ui, {}, url)
+        root = peer.lookup('0')
+        # Filter out empty repos.
+        if root == nullid:
+            continue
+
+        if search and replace:
+            url = url.replace(search, replace)
+
+        repos[url] = root
+
+    lines = []
+    for url, root in sorted(repos.items()):
+        lines.append('%s %s\n' % (hex(root), url))
+
+    data = ''.join(lines)
+    repo.vfs.write('reviewrepos', data)
+    ui.write(data)
+
+
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     pushkey.register('strip', pushstrip, liststrip)
+
+    # Add a pushkey namespace to obtain the list of available review
+    # repositories. This is used for repository discovery.
+    pushkey.register('reviewrepos', lambda *x: False, listreviewrepos)
 
 
 def reposetup(ui, repo):
@@ -117,7 +208,8 @@ def reposetup(ui, repo):
         raise util.Abort(_('Please set reviewboard.url to the URL of the '
             'Review Board instance to talk to.'))
 
-    if not ui.configint('reviewboard', 'repoid', None):
+    if (not ui.configint('reviewboard', 'repoid', None) and
+            not ui.configbool('reviewboard', 'isdiscoveryrepo')):
         raise util.Abort(_('Please set reviewboard.repoid to the numeric ID '
             'of the repository this repo is associated with.'))
 
@@ -131,3 +223,6 @@ def reposetup(ui, repo):
 
     ui.setconfig('hooks', 'changegroup.reviewboard', changegrouphook)
 
+    if ui.configbool('reviewboard', 'isdiscoveryrepo'):
+        ui.setconfig('hooks', 'pretxnchangegroup.disallowpush',
+                     disallowpushhook)
