@@ -112,15 +112,40 @@ actionable message if it isn't set.
    Don't worry, the extension will tell you if your configuration needs
    updating.
 
-Per-Repository Configuration
-============================
+Review Repositories
+===================
 
 The Mercurial extension initiates code review with Review Board by
 pushing changesets to a special code review repository that is attached
 to ``MozReview``.
 
-There are multiple code review repositories. There is typically one per
-repository that wishes to have code reviewed.
+There are multiple code review repositories, one per *canonical*
+repository.
+
+Unless you like typing full URLs every time you push, you will want
+to configure a *path* in your ``hgrc`` file.
+
+Simple Configuration
+--------------------
+
+If you push to ``ssh://reviewboard-hg.mozilla.org/autoreview``, your
+client will automatically figure out which review repository to push to.
+It doesn't matter which repository you are using: if there is a review
+repository configured, things will *just work*. If a review repository
+is not known, the push will fail.
+
+To configure the *auto review* repository, add an entry for this URL
+under the ``[paths]`` section of your ``~/.hgrc`` or ``.hg/hgrc`` file.
+We recommend the name ``review``. e.g.::
+
+   [paths]
+   review = ssh://reviewboard-hg.mozilla.org/autoreview
+
+Advanced Configuration
+----------------------
+
+If the *auto review* repository is too much magic for you, you can
+define the review URL for each repository you wish to review from.
 
 You will want to define a named path in your per-repository ``.hg/hgrc``
 to the code review Mercurial repository. We recommend the name
@@ -144,13 +169,6 @@ An example ``.hg/hgrc`` fragment may look like::
    and are working on a Firefox repository, you don't need to define the
    ``review`` path: it is automatically defined when operating on a Firefox
    repository.
-
-.. note:: Upcoming autodiscovery of repositories
-
-   It is a planned feature to have the Mercurial extension automatically
-   discover and use the appropriate code review repository. This will
-   alleviate the requirement of setting a repository path in your
-   ``hgrc`` file.
 
 Updating SSH Config
 ===================
