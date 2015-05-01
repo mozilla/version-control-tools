@@ -53,12 +53,18 @@ install_module = False
 
 cc = subprocess.check_call
 
-patches = {'apache24.patch', 'bmodata.patch', 'elasticsearch.patch'}
+patches = {
+    'apache24.patch',
+    'bmodata.patch',
+    'elasticsearch.patch',
+    'mod_perl.patch',
+}
 patched_files = {
     '.htaccess',
     'Bugzilla/DB.pm',
     'Bugzilla/Install/Requirements.pm',
     'contrib/docker/generate_bmo_data.pl',
+    'mod_perl.pl',
 }
 
 # Ensure Bugzilla Git clone is up to date.

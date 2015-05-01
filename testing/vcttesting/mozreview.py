@@ -307,8 +307,8 @@ class MozReview(object):
             with futures.ThreadPoolExecutor(3) as e:
                 e.submit(refresh, 'rbweb', self.rbweb_id)
                 e.submit(refresh, 'hgrb', self.hgrb_id)
-                #e.submit(execute, 'bmoweb', self.bmoweb_id,
-                #         ['/usr/bin/supervisorctl', 'restart', 'httpd'])
+                e.submit(execute, 'bmoweb', self.bmoweb_id,
+                         ['/usr/bin/supervisorctl', 'restart', 'httpd'])
 
     def start_autorefresh(self):
         """Enable auto refreshing of the cluster when changes are made.
