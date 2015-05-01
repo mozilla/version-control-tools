@@ -175,4 +175,6 @@ ADD supervisord.conf /etc/supervisor/conf.d/docker.conf
 EXPOSE 80
 
 ENTRYPOINT ["/bmoweb_entrypoint.py"]
-CMD ["/usr/bin/supervisord"]
+# Supervisor isn't working because of a wat.
+#CMD ["/usr/bin/supervisord"]
+CMD ["/run-apache.sh"]
