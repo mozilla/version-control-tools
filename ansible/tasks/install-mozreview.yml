@@ -2,17 +2,20 @@
 - name: prepare v-c-t repo
   hg: repo={{ repo }} dest={{ vct }} revision={{ rev }} force=yes purge=yes executable={{ venv }}/bin/hg
 
-- name: build MozReview eggs
-  command: "{{ python }} setup.py bdist_egg chdir={{ vct }}/{{ item }}"
-  with_items:
-    - pylib/mozreview
-    - pylib/rbbz
+# rbbz imports from mozreview package. So, we need to install mozreview before
+# rbbz can be built.
 
-- name: Install Review Board extension eggs
-  shell: "{{ easy_install }} -U dist/*.egg chdir={{ vct }}/{{ item }}"
-  with_items:
-    - pylib/mozreview
-    - pylib/rbbz
+- name: build mozreview egg
+  command: "{{ python }} setup.py bdist_egg chdir={{ vct }}/pylib/mozreview"
+
+- name: install mozreview egg
+  shell: "{{ easy_install }} -U dist/*.egg chdir={{ vct }}/pylib/mozreview"
+
+- name: build rbbz egg
+  command: "{{ python }} setup.py bdist_egg chdir={{ vct }}/pylib/rbbz"
+
+- name: install rbbz egg
+  shell: "{{ easy_install }} -U dist/*.egg chdir={{ vct }}/pylib/rbbz"
 
 - name: Generate static Review Board files
   command: "{{ rbsite }} manage {{ sitehome }} -- collectstatic --noinput"
