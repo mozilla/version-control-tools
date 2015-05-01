@@ -26,7 +26,7 @@
     - include: tasks/install-mozreview.yml
 
     - name: stage code for deployment
-      command: /usr/bin/rsync -aq --exclude '.git*' --exclude '.hg*' --delete /data/reviewboard/src /data/reviewboard/www
+      command: /usr/bin/rsync -aq --exclude '.git*' --exclude '.hg*' --delete /data/reviewboard/src/ /data/reviewboard/www/
 
 - hosts: rbweb-prod
   serial: 1

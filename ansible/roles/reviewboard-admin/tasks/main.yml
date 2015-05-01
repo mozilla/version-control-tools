@@ -10,6 +10,13 @@
     - python-virtualenv
     - zlib-devel
 
+- name: ensure source directory exists
+  file: path={{ item }} owner=root group=root state=directory
+  with_items:
+    - "{{ src }}"
+    - "{{ src }}/{{ site }}"
+    - "{{ www }}"
+
 - name: copy requirements.txt
   copy: src=requirements.txt dest={{ src }}/{{ site }}/requirements.txt owner=root group=root
 
