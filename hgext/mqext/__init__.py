@@ -177,6 +177,15 @@ def patch_changes(ui, repo, patchfile=None, **opts):
 
     if opts['file']:
         changedFiles = fullpaths(ui, repo, opts['file'])
+    elif opts['rev']:
+        revs = scmutil.revrange(repo, opts['rev'])
+        if not revs:
+            raise util.Abort("no changes found")
+        filesInRevs = set()
+        for rev in revs:
+            for f in repo[rev].files():
+                filesInRevs.add(f)
+        changedFiles = sorted(filesInRevs)
     else:
         if patchfile is None:
             # we should use the current diff, or if that is empty, the top
@@ -758,10 +767,11 @@ cmdtable = {
     'reviewers':
         (reviewers,
          [('f', 'file', [], 'see reviewers for FILE', 'FILE'),
+          ('r', 'rev', [], 'see reviewers for revisions', 'REVS'),
           ('l', 'limit', 200, 'how many revisions back to scan', 'LIMIT'),
           ('', 'brief', False, 'shorter output'),
           ],
-         ('hg reviewers [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
+         ('hg reviewers [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]')),
 
     'bugs':
         (bzbugs,
@@ -773,10 +783,11 @@ cmdtable = {
     'components':
         (bzcomponents,
          [('f', 'file', [], 'see components for FILE', 'FILE'),
+          ('r', 'rev', [], 'see reviewers for revisions', 'REVS'),
           ('l', 'limit', 25, 'how many revisions back to scan', 'LIMIT'),
           ('', 'brief', False, 'shorter output'),
           ],
-         ('hg components [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
+         ('hg components [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]')),
 
     'qtouched':
         (touched,
