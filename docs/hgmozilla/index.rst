@@ -18,3 +18,4 @@ to the right place!
    firefoxtree
    unifiedrepo
    automation
+   issues
