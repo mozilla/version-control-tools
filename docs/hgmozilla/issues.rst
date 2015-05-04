@@ -25,7 +25,7 @@ With hg.mozilla.org
 
 Notice something weird on hg.mozilla.org (including performance problems)?
 Please file a bug against
-[Developer Services :: hg.mozilla.org](https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org).
+`Developer Services :: hg.mozilla.org <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org>`_.
 
 If you want to talk with someone before filing a bug, hop in to #vcs on
 irc.mozilla.org. That is a low traffic channel and your question should be
@@ -35,7 +35,7 @@ With Core Mercurial
 -------------------
 
 Found a bug in Mercurial? Have a performance concern? File a bug in
-[Mercurial's Bugzilla](http://bz.selenic.com/). Choose the *Mercurial*
+`Mercurial's Bugzilla <http://bz.selenic.com/>`_. Choose the *Mercurial*
 component if you are unsure what component to use.
 
 Before filing bugs, ensure you are using the latest Mercurial release. If not,
@@ -53,7 +53,7 @@ to reproduce.
 
 If you are unsure whether something is a bug, hop in to #mercurial on the
 Freenode IRC network and ask around. Or, post to one of the Mercurial
-[mailing lists](http://mercurial.selenic.com/wiki/MailingLists).
+`mailing lists <http://mercurial.selenic.com/wiki/MailingLists>`_.
 
 With a Mozilla Extensions
 -------------------------
