@@ -68,6 +68,49 @@ that your version-control-tools repo (the repo containing most of the
 extensions) is fully up to date. Otherwise, you may be reporting a bug that's
 been fixed already.
 
+For the Impatient
+=================
+
+In a hurry and don't want to spend the time to report a proper bug? Ping
+*gps* on irc.mozilla.org and he'll do the right thing if he can.
+
+Ways to Make Bug Reports More Useful
+====================================
+
+All Mercurial commands accept the following options, which may prove useful
+when reporting bugs:
+
+``--debug``
+   When this option is present, Mercurial will print debug info to output. This
+   may aid debugging hangs and other issues.
+
+``--traceback``
+   When this option is present, Mercurial will dump its execution stack
+   when aborted. Using --traceback plus ctrl+c is a good way to see which
+   method is spinning the CPU.
+
+``--profile``
+   Profile Mercurial execution and print a summary after execution. This is
+   useful for debugging performance issues to see where Mercurial is spending
+   most of its time.
+
+Including the output with one or more of these options can make bugs reports
+(especially performance issues) much more meaningful.
+
+Another tool to aid debugging is the *blackbox* extension. Simply add the
+following to your hgrc::
+
+   [extensions]
+   blackbox =
+
+   [blackbox]
+   track = *
+   maxsize = 10 MB
+   maxfiles = 2
+
+A ``.hg/blackbox.log`` file will now exist in each repository. This log will
+capture forensic details that may aid debugging and performance analysis.
+
 How Not to Report Issues
 ========================
 
