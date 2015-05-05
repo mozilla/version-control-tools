@@ -36,6 +36,7 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
         {
             'squashed': {
                 'diff': <squashed-diff-string>,
+                'base_commit_id': <commit-id-to-apply-diff-to> (optional),
             },
             'individual': [
                 {
@@ -43,7 +44,8 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
                     'precursors': [<previous changeset>],
                     'message': <commit-message>,
                     'diff': <diff>,
-                    'parent_diff': <diff-from-base-to-commit>,
+                    'parent_diff': <diff-from-base-to-commit> (optional),
+                    'base_commit_id': <commit-id-to-apply-diffs-to> (optional),
                 },
                 {
                     ...
@@ -151,7 +153,9 @@ def _post_reviews(api_root, repoid, identifier, commits):
             "repository": repoid,
         })
 
-    squashed_rr.get_diffs().upload_diff(commits["squashed"]["diff"])
+    squashed_rr.get_diffs().upload_diff(
+        commits["squashed"]["diff"],
+        base_commit_id=commits["squashed"].get('base_commit_id', None))
 
     def update_review_request(rid, commit):
         rr = api_root.get_review_request(review_request_id=rid)
@@ -160,8 +164,11 @@ def _post_reviews(api_root, repoid, identifier, commits):
             "description": commit['message'],
             "extra_data.p2rb.commit_id": commit['id'],
         })
-        rr.get_diffs().upload_diff(commit['diff'],
-                                   parent_diff=commit['parent_diff'])
+
+        rr.get_diffs().upload_diff(
+            commit['diff'],
+            parent_diff=commit.get('parent_diff', None),
+            base_commit_id=commit.get('base_commit_id', None))
 
         return rr
 
@@ -284,8 +291,10 @@ def _post_reviews(api_root, repoid, identifier, commits):
             'extra_data.p2rb.commit_id': commit['id'],
             'repository': repoid,
         })
-        rr.get_diffs().upload_diff(commit['diff'],
-                                   parent_diff=commit['parent_diff'])
+        rr.get_diffs().upload_diff(
+            commit['diff'],
+            parent_diff=commit.get('parent_diff', None),
+            base_commit_id=commit.get('base_commit_id', None))
         draft = rr.get_or_create_draft(
             summary=commit['message'].splitlines()[0],
             description=commit['message'])
