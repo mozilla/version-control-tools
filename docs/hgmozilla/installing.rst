@@ -14,34 +14,72 @@ your tools.
    Mercurial has a strong committment to backwards compatibility.
 
    If you are scared that upgrading will break workflows or command
-   behavior, don't be. It is very rare for Mercurial to break backwards
-   compatibility.
+   behavior, don't be. It is very rare for Mercurial to intentionally
+   break backwards compatibility.
 
 Recommended Versions
 ====================
 
-Mozilla recommends running the latest stable release of Mercurial.
+Mozilla recommends running the latest stable release of Mercurial. The
+latest stable release is always listed at
+`http://mercurial.selenic.com/ <http://mercurial.selenic.com/>`_.
 
 Mercurial makes a major *X.Y* release every three months, typically around
 the first of the month. Release months are February, May, August, and
 November. A *X.Y.Z* point release is performed each month after or as
 needed (if a severe issue is encountered).
 
-Versions to Avoid
------------------
+If you are conservative about software updates, it is OK to wait to
+upgrade until the *X.Y.1* point release following a major version bump.
+
+Reasons to Upgrade
+------------------
+
+General Advice
+^^^^^^^^^^^^^^
+
+Mercurial releases tend to be faster and have fewer bugs than previous
+releases. These are compelling reasons to stay up to date.
+
+Avoid Mercurial versions older than 3.2.4 due to issues below.
+
+Tags Cache Performance
+^^^^^^^^^^^^^^^^^^^^^^
+
+Mercurial 3.4 contains improvements to the tags cache that prevent
+it from frequently doing CPU-intensive computations in some workflows.
+
+.. important::
+
+   Users of evolve will have horrible performance due to the tags
+   cache implementation in versions older than 3.4 and should upgrade
+   to 3.4+.
+
+Performance Issues with Large Repositories
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Mercurial 3.0 through 3.1.1 contained a significant performance
+regression that manifests when cloning or pulling tens of thousands
+of changesets. These versions of Mercurial should be avoided
+when interacting with large repositories, such as mozilla-central.
+
+Mercurial 3.3 introduced a class of performance regressions most
+likely encountered as part of running ``hg blame`` or ``hg graft``.
+The regressions are largely fixed in 3.4.
+
+CVE-2014-9390
+^^^^^^^^^^^^^
 
 Mercurial versions older than 3.2.3 should be avoided due to a security
 issue (CVE-2014-9390) impacting Windows and OS X users.
 
-Mercurial versions older than 3.x should be avoided because they are
-old, slow, and contain known bugs. Also, it is difficult to maintain
-extension compatibility with them.
+Supporting Old Versions
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Mercurial 3.0 through 3.1.1 contained a significant performance
-regression that manifests when performing certain repository operations,
-such cloning or pulling several thousand changesets. **If you use these
-versions with the Firefox repository, you are going to have a bad
-time.** The regression was fixed in Mercurial 3.1.2.
+Mozilla has written a handful of Mercurial extensions. Supporting
+N versions of Mercurial is easier than supporting N+1 versions,
+especially as Mercurial's API is rapidly evolving. It is extra work
+to support old versions when new versions work just fine.
 
 Installing on Windows
 =====================
