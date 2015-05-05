@@ -106,7 +106,7 @@ We should have a disagreement between published and draft
     diffs:
     - id: 3
       revision: 2
-      base_commit_id: null
+      base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
       patch:
       - diff -r 3a9f6899ef84 -r c1eb96801052 foo
       - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"
@@ -146,7 +146,7 @@ We should have a disagreement between published and draft
     diffs:
     - id: 4
       revision: 2
-      base_commit_id: null
+      base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
       patch:
       - diff -r 3a9f6899ef84 -r c1eb96801052 foo
       - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"

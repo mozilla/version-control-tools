@@ -119,7 +119,7 @@ The parent review should have its description updated.
     diffs:
     - id: 4
       revision: 1
-      base_commit_id: null
+      base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       patch:
       - diff -r 7c5bdf0cec4a -r 3e4b2ebd3703 foo
       - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"

@@ -160,7 +160,7 @@ Review request 6 should be added to the list of discard on publish rids.
     diffs:
     - id: 7
       revision: 2
-      base_commit_id: null
+      base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       patch:
       - diff -r 93d9429b41ec -r f5691a90b4d0 foo1
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
@@ -269,7 +269,7 @@ The first commit was rewritten (we assume all subsequent were as well).
     diffs:
     - id: 9
       revision: 2
-      base_commit_id: null
+      base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       patch:
       - diff -r 93d9429b41ec -r 3299fd5f5fca foo2
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
@@ -334,7 +334,7 @@ request is published.
     diffs:
     - id: 8
       revision: 3
-      base_commit_id: null
+      base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       patch:
       - diff -r 93d9429b41ec -r d768dcb976de foo2
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"

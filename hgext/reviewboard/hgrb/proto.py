@@ -231,7 +231,8 @@ def reviewboard(repo, proto, args=None):
     # Note patch.diff() appears to accept anything that can be fed into
     # repo[]. However, it blindly does a hex() on the argument as opposed
     # to the changectx, so we need to pass in the binary node.
-    base_parent_node = repo[nodes[0]].p1().node()
+    base_ctx = repo[nodes[0]].p1()
+    base_parent_node = base_ctx.node()
     for i, node in enumerate(nodes):
         ctx = repo[node]
         p1 = ctx.p1().node()
@@ -239,20 +240,23 @@ def reviewboard(repo, proto, args=None):
         parent_diff = None
 
         diff = ''.join(patch.diff(repo, node1=p1, node2=ctx.node(), opts=diffopts))
+
         if i:
-            parent_diff = ''.join(patch.diff(repo, node1=base_parent_node,
-                node2=repo[nodes[i-1]].node(), opts=diffopts))
+            base_commit_id = nodes[i-1]
+        else:
+            base_commit_id = base_ctx.hex()
 
         commits['individual'].append({
             'id': node,
             'precursors': precursors.get(node, []),
             'message': ctx.description(),
             'diff': diff,
-            'parent_diff': parent_diff,
+            'base_commit_id': base_commit_id,
         })
 
     commits['squashed']['diff'] = ''.join(patch.diff(repo, node1=base_parent_node,
         node2=repo[nodes[-1]].node(), opts=diffopts))
+    commits['squashed']['base_commit_id'] = base_ctx.hex()
 
     rburl = repo.ui.config('reviewboard', 'url', None).rstrip('/')
     repoid = repo.ui.configint('reviewboard', 'repoid', None)
