@@ -135,7 +135,7 @@ out the version you wish to install::
 
   $ hg clone http://selenic.com/repo/hg
   $ cd hg
-  $ hg up 3.3
+  $ hg up 3.4
 
 Once you have the source code, run ``make`` to install Mercurial::
 
