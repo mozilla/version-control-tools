@@ -80,6 +80,8 @@ class TestAutoland(unittest.TestCase):
                 # Use check_output to suppress the output from hg import
                 subprocess.check_output(cmd, stderr=subprocess.STDOUT,
                                         cwd=mozreview_repo_path)
+            with open(os.path.join(mozreview_repo_path, '.hg', 'hgrc'), 'w') as f:
+                f.write('[phases]\npublish = False\n')
 
             # Configure 'try' repo
             cmds = [['hg', 'init']]

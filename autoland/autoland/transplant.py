@@ -81,6 +81,7 @@ def transplant_to_try(tree, rev, trysyntax):
             ['hg', 'push', '-r', '.', '-f', 'try'],
             ['hg', 'qpop'],
             ['hg', 'qdelete', 'try'],
+            ['hg', 'strip', '--no-backup', '-r', 'draft()'],
             ['hg', 'update', 'central']]
 
     repo_path = get_repo_path(tree)
