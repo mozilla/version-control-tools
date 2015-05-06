@@ -14,6 +14,15 @@ $(document).ready(function() {
 
   console.log("Found root review request ID: " + rootID);
 
+  // Setup a CSS class so we can differentiate between parent
+  // and commit review requests.
+  var currentID = RB.PageManager.getPage().reviewRequest.id;
+  if (currentID == rootID) {
+      $("#review_request").addClass("parent-request");
+  } else {
+      $("#review_request").addClass("commit-request");
+  }
+
   MozReview.rootReviewRequest = new RB.ReviewRequest({id: rootID});
 
   var pageEditor = RB.PageManager.getPage().reviewRequestEditor;

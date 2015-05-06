@@ -40,6 +40,24 @@
   }
 }
 
+#draft-banner {
+  #btn-draft-publish,
+  #btn-review-request-discard,
+  #btn-draft-discard {
+    display: none;
+  }
+}
+
+// We allow publishing on parents so override hiding
+// the buttons.
+.parent-request #draft-banner {
+  #btn-draft-publish,
+  #btn-review-request-discard,
+  #btn-draft-discard {
+    display: inline-block;
+  }
+}
+
 .mozreview-autoland-try-chooser-element {
   margin-bottom: 5px;
   margin-top: 5px;
