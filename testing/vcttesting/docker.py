@@ -197,7 +197,11 @@ class Docker(object):
 
         paths = {}
         for f in output.splitlines():
-            paths[f] = os.path.join(ROOT, f)
+            full = os.path.join(ROOT, f)
+            # Filter out files that have been removed in the working
+            # copy but haven't been committed.
+            if os.path.exists(full):
+                paths[f] = full
 
         return paths
 
