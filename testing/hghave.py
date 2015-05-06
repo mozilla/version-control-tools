@@ -48,10 +48,6 @@ def hgversion():
     v = v.split('-')[0]
     return tuple(int(i) for i in v.split('.'))
 
-@check('hg30+', 'Running with Mercurial 3.0+')
-def has_hg_30_plus():
-    return hgversion()[0] >= 3
-
 @check('hg31+', 'Running with Mercurial 3.1+')
 def has_hg_31_plus():
     v = tuple(hgversion()[0:2])
