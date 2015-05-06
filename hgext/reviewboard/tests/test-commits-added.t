@@ -123,9 +123,9 @@ The parent review should have its description updated.
       revision: 1
       base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       patch:
-      - diff -r 7c5bdf0cec4a -r 4cb601f74de5 foo
-      - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"
-      - "+++ b/foo\tThu Jan 01 00:00:00 1970 +0000"
+      - diff --git a/foo b/foo
+      - '--- a/foo'
+      - +++ b/foo
       - '@@ -1,1 +1,1 @@'
       - -foo0
       - +foo3

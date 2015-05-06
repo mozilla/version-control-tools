@@ -110,9 +110,9 @@ We should have a disagreement between published and draft
       revision: 2
       base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
       patch:
-      - diff -r 3a9f6899ef84 -r b3be3d464d6b foo
-      - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"
-      - "+++ b/foo\tThu Jan 01 00:00:00 1970 +0000"
+      - diff --git a/foo b/foo
+      - '--- a/foo'
+      - +++ b/foo
       - '@@ -1,1 +1,1 @@'
       - -foo
       - +foo3
@@ -150,9 +150,9 @@ We should have a disagreement between published and draft
       revision: 2
       base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
       patch:
-      - diff -r 3a9f6899ef84 -r b3be3d464d6b foo
-      - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"
-      - "+++ b/foo\tThu Jan 01 00:00:00 1970 +0000"
+      - diff --git a/foo b/foo
+      - '--- a/foo'
+      - +++ b/foo
       - '@@ -1,1 +1,1 @@'
       - -foo
       - +foo3

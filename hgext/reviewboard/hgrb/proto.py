@@ -177,7 +177,7 @@ def reviewboard(repo, proto, args=None):
     if not identifier:
         return wireproto.pusherr(_('no review identifier in request'))
 
-    diffopts = mdiff.diffopts(context=8, showfunc=True)
+    diffopts = mdiff.diffopts(context=8, showfunc=True, git=True)
 
     commits = {
         'individual': [],
@@ -241,7 +241,7 @@ def reviewboard(repo, proto, args=None):
         diff = None
         parent_diff = None
 
-        diff = ''.join(patch.diff(repo, node1=p1, node2=ctx.node(), opts=diffopts))
+        diff = ''.join(patch.diff(repo, node1=p1, node2=ctx.node(), opts=diffopts)) + '\n'
 
         if i:
             base_commit_id = nodes[i-1]
@@ -258,7 +258,7 @@ def reviewboard(repo, proto, args=None):
         })
 
     commits['squashed']['diff'] = ''.join(patch.diff(repo, node1=base_parent_node,
-        node2=repo[nodes[-1]].node(), opts=diffopts))
+        node2=repo[nodes[-1]].node(), opts=diffopts)) + '\n'
     commits['squashed']['base_commit_id'] = base_ctx.hex()
 
     rburl = repo.ui.config('reviewboard', 'url', None).rstrip('/')

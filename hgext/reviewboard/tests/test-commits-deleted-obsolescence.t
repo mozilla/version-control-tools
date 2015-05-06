@@ -170,24 +170,28 @@ on publish.
       revision: 2
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       patch:
-      - diff -r 93d9429b41ec -r 98dd6a7335db foo1
-      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
-      - "+++ b/foo1\tThu Jan 01 00:00:00 1970 +0000"
+      - diff --git a/foo1 b/foo1
+      - new file mode 100644
+      - '--- /dev/null'
+      - +++ b/foo1
       - '@@ -0,0 +1,1 @@'
       - +foo1
-      - diff -r 93d9429b41ec -r 98dd6a7335db foo2
-      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
-      - "+++ b/foo2\tThu Jan 01 00:00:00 1970 +0000"
+      - diff --git a/foo2 b/foo2
+      - new file mode 100644
+      - '--- /dev/null'
+      - +++ b/foo2
       - '@@ -0,0 +1,1 @@'
       - +foo2
-      - diff -r 93d9429b41ec -r 98dd6a7335db foo3
-      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
-      - "+++ b/foo3\tThu Jan 01 00:00:00 1970 +0000"
+      - diff --git a/foo3 b/foo3
+      - new file mode 100644
+      - '--- /dev/null'
+      - +++ b/foo3
       - '@@ -0,0 +1,1 @@'
       - +foo3
-      - diff -r 93d9429b41ec -r 98dd6a7335db foo4
-      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
-      - "+++ b/foo4\tThu Jan 01 00:00:00 1970 +0000"
+      - diff --git a/foo4 b/foo4
+      - new file mode 100644
+      - '--- /dev/null'
+      - +++ b/foo4
       - '@@ -0,0 +1,1 @@'
       - +foo4
 
@@ -331,19 +335,22 @@ on publish.
       revision: 3
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       patch:
-      - diff -r 93d9429b41ec -r b891c874875b foo2
-      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
-      - "+++ b/foo2\tThu Jan 01 00:00:00 1970 +0000"
+      - diff --git a/foo2 b/foo2
+      - new file mode 100644
+      - '--- /dev/null'
+      - +++ b/foo2
       - '@@ -0,0 +1,1 @@'
       - +foo2
-      - diff -r 93d9429b41ec -r b891c874875b foo3
-      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
-      - "+++ b/foo3\tThu Jan 01 00:00:00 1970 +0000"
+      - diff --git a/foo3 b/foo3
+      - new file mode 100644
+      - '--- /dev/null'
+      - +++ b/foo3
       - '@@ -0,0 +1,1 @@'
       - +foo3
-      - diff -r 93d9429b41ec -r b891c874875b foo4
-      - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
-      - "+++ b/foo4\tThu Jan 01 00:00:00 1970 +0000"
+      - diff --git a/foo4 b/foo4
+      - new file mode 100644
+      - '--- /dev/null'
+      - +++ b/foo4
       - '@@ -0,0 +1,1 @@'
       - +foo4
 

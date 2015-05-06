@@ -394,33 +394,13 @@ Reviewing merge commits is rejected
   abort: cannot review merge commits (35ae0b8f2835)
   [255]
 
-Empty changesets show a reviewboard error, not an internal server
-error (Bug 1128555)
-  $ hg up -q -r 0
-  $ touch empty
-  $ hg add empty
-  $ hg commit -m "Bug 2 - Added empty file"
-  created new head
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
-  searching for changes
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
-  submitting 1 changesets for review
-  abort: reviewboard error: "One or more fields had errors (HTTP 400, API Error 105)". please try submitting the review again. if that doesn't work, you've likely encountered a bug.
-  [255]
-
 We disallow completely empty revisions.
 
   $ hg up -q -r 0
   $ hg qnew -m 'mq patch' -d '0 0' empty-patch
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
-  abort: not reviewing empty revision 3ccd6e5b29d2. please add content.
+  abort: not reviewing empty revision 1bcdd587da6e. please add content.
   [255]
 
 Cleanup
