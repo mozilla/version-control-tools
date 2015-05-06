@@ -46,9 +46,6 @@ class MozReviewExtension(Extension):
     is_configurable = True
 
     css_bundles = {
-        'default': {
-            'source_filenames': ['mozreview/css/common.css'],
-        },
         'review': {
             'source_filenames': ['mozreview/css/review.less',
                                  'mozreview/css/commits.less'],
@@ -64,7 +61,7 @@ class MozReviewExtension(Extension):
                                  'mozreview/js/ui.mozreviewautocomplete.js',
                                  'mozreview/js/review.js',
                                  'mozreview/js/try.js'],
-        }
+        },
     }
 
     resources = [
