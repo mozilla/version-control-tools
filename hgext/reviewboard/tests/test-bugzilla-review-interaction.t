@@ -217,6 +217,12 @@ Ensure multiple reviewers works as expected
   created new head
   $ hg --config bugzilla.username=author@example.com push > /dev/null
 
+Emulate the JavaScript by setting the reviewers on both parent and commit.
+TODO: Implement the JavaScript bits on the server so we don't need to do this
+in the tests.
+
+  $ rbmanage add-reviewer 3 --user reviewer --user rev2
+  2 people listed on review request
   $ rbmanage add-reviewer 4 --user reviewer --user rev2
   2 people listed on review request
   $ rbmanage publish 3
@@ -272,10 +278,12 @@ Ensure multiple reviewers works as expected
 
 Removing a reviewer should remove their review flag
 
+  $ rbmanage remove-reviewer 3 --user rev2
+  1 people listed on review request
   $ rbmanage remove-reviewer 4 --user rev2
   1 people listed on review request
 
-  $ rbmanage publish 4
+  $ rbmanage publish 3
 
   $ bugzilla dump-bug 2
   Bug 2:
@@ -332,10 +340,12 @@ Removing a reviewer should remove their review flag
 
 Removing all reviewers should remove all flags
 
+  $ rbmanage remove-reviewer 3 --user reviewer
+  0 people listed on review request
   $ rbmanage remove-reviewer 4 --user reviewer
   0 people listed on review request
 
-  $ rbmanage publish 4
+  $ rbmanage publish 3
 
   $ bugzilla dump-bug 2
   Bug 2:
@@ -405,6 +415,8 @@ review? sticks around when 1 person grants review
   created new head
   $ hg --config bugzilla.username=author@example.com push > /dev/null
 
+  $ rbmanage add-reviewer 5 --user reviewer --user rev2
+  2 people listed on review request
   $ rbmanage add-reviewer 6 --user reviewer --user rev2
   2 people listed on review request
   $ rbmanage publish 5
@@ -485,6 +497,8 @@ Random users can come along and grant review
   created new head
   $ hg --config bugzilla.username=author@example.com push > /dev/null
 
+  $ rbmanage add-reviewer 7 --user reviewer
+  1 people listed on review request
   $ rbmanage add-reviewer 8 --user reviewer
   1 people listed on review request
   $ rbmanage publish 7
@@ -568,6 +582,8 @@ Test interaction with multiple commits.
   $ hg commit -m 'Bug 5 - Parent reviews, third commit'
   $ hg --config bugzilla.username=author@example.com push > /dev/null
 
+  $ rbmanage add-reviewer 9 --user reviewer --user rev2
+  2 people listed on review request
   $ rbmanage add-reviewer 10 --user reviewer --user rev2
   2 people listed on review request
   $ rbmanage add-reviewer 11 --user reviewer --user rev2
