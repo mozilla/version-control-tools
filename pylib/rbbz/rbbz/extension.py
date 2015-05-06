@@ -24,12 +24,15 @@ from reviewboard.reviews.signals import (reply_publishing,
                                          review_request_reopened)
 from reviewboard.site.urlresolvers import local_site_reverse
 
+from mozreview.errors import CommitPublishProhibited
 from mozreview.extra_data import (UNPUBLISHED_RRIDS_KEY,
                                   gen_child_rrs,
                                   gen_rrs_by_rids,
                                   gen_rrs_by_extra_data_key)
 from mozreview.models import (BugzillaUserMap,
                               get_or_create_bugzilla_users)
+from mozreview.signals import commit_request_publishing
+from mozreview.utils import is_parent
 from rbbz.auth import BugzillaBackend
 from rbbz.bugzilla import Bugzilla
 from rbbz.diffs import build_plaintext_review
@@ -209,6 +212,23 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
     if not is_review_request_pushed(review_request):
         return
 
+    if not is_parent(review_request):
+        # Send a signal asking for approval to publish this review request.
+        # We only want to publish this commit request if we are in the middle
+        # of publishing the parent. If the parent is publishing it will be
+        # listening for this signal to approve it.
+        approvals = commit_request_publishing.send_robust(
+            sender=review_request,
+            user=user,
+            review_request_draft=review_request_draft)
+
+        for receiver, approved in approvals:
+            if approved:
+                break;
+        else:
+            # This publish is not approved by the parent review request.
+            raise CommitPublishProhibited()
+
     # The reviewid passed through p2rb is, for Mozilla's instance anyway,
     # bz://<bug id>/<irc nick>.
     reviewid = review_request_draft.extra_data.get('p2rb.identifier', None)
@@ -305,7 +325,22 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
         # out of unpublished_rids.
         for child in gen_child_rrs(review_request_draft):
             if child.get_draft(user=user) or not child.public:
-                child.publish(user=user)
+                def approve_publish(sender, user, review_request_draft,
+                                    **kwargs):
+                    return child is sender
+
+                # Setup the parent signal handler to approve the publish
+                # and then publish the child.
+                commit_request_publishing.connect(approve_publish, sender=child,
+                                                  weak=False)
+                try:
+                    child.publish(user=user)
+                finally:
+                    commit_request_publishing.disconnect(
+                        receiver=approve_publish,
+                        sender=child,
+                        weak=False)
+
                 id_str = str(child.id)
                 if id_str in unpublished_rids:
                     unpublished_rids.remove(id_str)

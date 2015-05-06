@@ -2,6 +2,15 @@ from __future__ import unicode_literals
 
 from djblets.webapi.errors import WebAPIError
 
+from reviewboard.reviews.errors import PublishError
+
+
+class CommitPublishProhibited(PublishError):
+    def __init__(self):
+        PublishError.__init__(self,
+                              'Publishing commit review requests is '
+                              'prohibited, please publish parent.')
+
 
 NOT_PUSHED_PARENT_REVIEW_REQUEST = WebAPIError(
     800,
