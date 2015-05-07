@@ -159,22 +159,6 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
         raise util.Abort(_('you must set mozilla.ircnick in your hgrc config '
             'file to your IRC nickname in order to perform code reviews'))
 
-    # If no arguments are specified to push, Mercurial will try to push all
-    # non-remote changesets by default. This can result in unexpected behavior,
-    # especially for people doing multi-headed development.
-    #
-    # Since we reject pushes with multiple heads anyway, default to pushing
-    # the working copy.
-    if not revs:
-        revs = [repo['.'].node()]
-
-    # We stop completely empty changesets prior to review.
-    for rev in revs:
-        ctx = repo[rev]
-        if not ctx.files():
-            raise util.Abort(_('not reviewing empty revision %s. please add'
-                               ' content.' % hex(rev)[:12]))
-
     # We filter the "extension isn't installed" message from the server.
     # This is a bit hacky, but it's easier than sending a signal over the
     # wire protocol (at least until bundle2).
@@ -198,66 +182,59 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
     finally:
         remote.ui.__class__ = oldcls
 
-def wrappedpushbookmark(orig, pushop):
-    """Wraps exchange._pushbookmark to also push a review."""
-    result = orig(pushop)
+def wrappedpushdiscovery(orig, pushop):
+    """Wraps exchange._pushdiscovery to add extra review metadata.
+
+    We discover what nodes to review before discovery. This ensures that
+    errors are discovered and reported quickly, without waiting for
+    server communication.
+    """
+
+    pushop.reviewnodes = None
 
     if not pushop.remote.capable('reviewboard'):
-        return result
+        return orig(pushop)
 
-    ui = pushop.ui
     repo = pushop.repo
 
     if repo.noreviewboardpush:
-        return result
+        return orig(pushop)
 
-    reviewnode = None
+    # If no arguments are specified to push, Mercurial will try to push all
+    # non-remote changesets by default. This can result in unexpected behavior,
+    # especially for people doing multi-headed development.
+    #
+    # Since we reject pushes with multiple heads anyway, default to pushing
+    # the working copy.
+    if not pushop.revs:
+        pushop.revs = [repo['.'].node()]
+
+    # We stop completely empty changesets prior to review.
+    for rev in pushop.revs:
+        ctx = repo[rev]
+        if not ctx.files():
+            raise util.Abort(_('not reviewing empty revision %s. please add'
+                               ' content.' % hex(rev)[:12]))
+
+    tipnode = None
     basenode = None
-    if pushop.revs:
-        # Our prepushoutgoing hook validates that all pushed changesets are
-        # part of the same DAG head. If revisions were specified by the user,
-        # the last is the tip commit to review and the first (if more than 1)
-        # is the base commit to review.
-        #
-        # Note: the revisions are in the order they were specified by the user.
-        # This may not be DAG order. So we have to explicitly order them here.
-        revs = sorted(repo[r].rev() for r in pushop.revs)
-        reviewnode = repo[revs[-1]].node()
-        if len(revs) > 1:
-            basenode = repo[revs[0]].node()
 
-    elif pushop.outgoing.missing:
-        reviewnode = pushop.outgoing.missing[-1]
-    else:
-        ui.write(_('Unable to determine what to review. Please invoke '
-            'with -r to specify what to review.\n'))
-        return result
-
-    assert reviewnode
+    # Our prepushoutgoing hook validates that all pushed changesets are
+    # part of the same DAG head. If revisions were specified by the user,
+    # the last is the tip commit to review and the first (if more than 1)
+    # is the base commit to review.
+    #
+    # Note: the revisions are in the order they were specified by the user.
+    # This may not be DAG order. So we have to explicitly order them here.
+    revs = sorted(repo[r].rev() for r in pushop.revs)
+    tipnode = repo[revs[-1]].node()
+    if len(revs) > 1:
+        basenode = repo[revs[0]].node()
 
     if repo.pushsingle:
-        basenode = reviewnode
+        basenode = tipnode
 
-    doreview(repo, ui, pushop.remote, reviewnode, basenode=basenode)
-
-    return result
-
-def doreview(repo, ui, remote, reviewnode, basenode=None):
-    """Do the work of submitting a review to a remote repo.
-
-    :remote is a peerrepository.
-    :reviewnode is the node of the tip to review.
-    :basenode is the bottom node to review. If not specified, we will review
-    all non-public ancestors of :reviewnode.
-    """
-    assert remote.capable('reviewboard')
-
-    bzauth = getbugzillaauth(ui)
-    if not bzauth:
-        ui.warn(_('Bugzilla credentials not available. Not submitting review.\n'))
-        return
-
-    # Given a tip node, we need to find all changesets to review.
+    # Given a base and tip node, find all changesets to review.
     #
     # A solution that works most of the time is to find all non-public
     # ancestors of that node. This is our default.
@@ -267,12 +244,12 @@ def doreview(repo, ui, remote, reviewnode, basenode=None):
     # Note that we will still refuse to review a public changeset even with
     # basenode. This decision is somewhat arbitrary and can be revisited later
     # if there is an actual need to review public changesets.
-    nodes = [reviewnode]
+    nodes = [tipnode]
     # Special case where basenode is the tip node.
-    if basenode and reviewnode == basenode:
+    if basenode and tipnode == basenode:
         pass
     else:
-        for node in repo[reviewnode].ancestors():
+        for node in repo[tipnode].ancestors():
             ctx = repo[node]
 
             if ctx.phase() == phases.public:
@@ -282,6 +259,35 @@ def doreview(repo, ui, remote, reviewnode, basenode=None):
                 break
 
             nodes.insert(0, ctx.node())
+
+    pushop.reviewnodes = nodes
+
+    return orig(pushop)
+
+def wrappedpushbookmark(orig, pushop):
+    """Wraps exchange._pushbookmark to also push a review."""
+    result = orig(pushop)
+
+    if not pushop.reviewnodes:
+        return result
+
+    doreview(pushop.repo, pushop.ui, pushop.remote, pushop.reviewnodes)
+
+    return result
+
+def doreview(repo, ui, remote, nodes):
+    """Do the work of submitting a review to a remote repo.
+
+    :remote is a peerrepository.
+    :nodes is a list of nodes to review.
+    """
+    assert nodes
+    assert remote.capable('reviewboard')
+
+    bzauth = getbugzillaauth(ui)
+    if not bzauth:
+        ui.warn(_('Bugzilla credentials not available. Not submitting review.\n'))
+        return
 
     identifier = None
 
@@ -771,6 +777,10 @@ def wrappedreaderr(orig, self):
 
 def extsetup(ui):
     extensions.wrapfunction(exchange, 'push', wrappedpush)
+    # Mercurial 3.2 introduces a decorator for registering functions to
+    # be called during discovery. Switch to this once we drop support for
+    # 3.1.
+    extensions.wrapfunction(exchange, '_pushdiscovery', wrappedpushdiscovery)
     # _pushbookmark gets called near the end of push. Sadly, there isn't
     # a better place to hook that has access to the pushop.
     extensions.wrapfunction(exchange, '_pushbookmark', wrappedpushbookmark)
