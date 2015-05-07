@@ -34,6 +34,37 @@ If you are on Windows or want to create a fully-isolated environment,
 the Vagrant configuration used by :ref:`Jenkins <devguide_jenkins>`
 provides a fully capable environment.
 
+Ubuntu Requirements
+-------------------
+
+On a fresh Ubuntu 14.04 install, the following packages need to be
+installed:
+
+* libldap2-dev
+* libsasl2-dev
+* libxml2-dev
+* libxslt1-dev
+* mercurial (to clone version-control-tools)
+* python-dev
+* python-virtualenv
+* zlib1g-dev
+
+Many of these dependencies are needed to compile binary Python
+extensions that are part of the virtualenv.
+
+You can install these dependencies by running::
+
+   $ sudo apt-get install libldap2-dev libsasl2-dev \
+     libxml2-dev libxslt1-dev \
+     mercurial \
+     python-dev python-virtualenv \
+     zlib1g-dev
+
+You will also need to install Docker for a number of test and dev
+environments to work. See the
+`official Docker instructions <https://docs.docker.com/installation/ubuntulinux/#installing-docker-on-ubuntu>`_
+for more.
+
 .. _devguide_create_env:
 
 Creating and Updating Your Environment
