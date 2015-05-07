@@ -71,7 +71,7 @@ for old in 2.5.4 2.6 2.6.1 2.6.2 2.6.3 2.7 2.7.1 2.7.2 2.8 2.8.1 2.8.2 2.9 2.9.1
   rm -rf $mercurials/$old
 done
 
-for v in 3.1.2 3.2.4 3.3.3; do
+for v in 3.1.2 3.2.4 3.3.3 3.4; do
   destdir=$mercurials/$v
   if [ ! -d $destdir ]; then
     cd venv/hg
