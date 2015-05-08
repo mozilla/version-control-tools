@@ -11,12 +11,22 @@
     easy_install: /data/www/reviewboard-dev.allizom.org/venv/bin/easy_install
     python: /data/www/reviewboard-dev.allizom.org/venv/bin/python
     rbsite: /data/www/reviewboard-dev.allizom.org/venv/bin/rb-site
+    djblets_version: 0.8.18
+    rb_version: 2.0.15
   tasks:
   - name: Install RBTools
     command: "{{ pip }} install --allow-external RBTools --allow-unverified RBTools --upgrade RBTools==0.6.1"
 
   - name: Install Review Board and Djblets
-    command: "{{ easy_install }} -U Djblets==0.8.18 ReviewBoard==2.0.12"
+    command: "{{ easy_install }} -U Djblets=={{ djblets_version }} ReviewBoard=={{ rb_version }}"
+
+  - name: Upgrade the Review Board site
+    command: "{{ rbsite }} upgrade {{ sitehome }}"
+    register: site_upgrade
+
+  - name: Display any manual upgrade steps
+    when: "not (site_upgrade.stdout_lines[-1] == 'Upgrade complete!')"
+    debug: msg={{ site_upgrade.stdout }}
 
   - include: tasks/install-mozreview.yml
 

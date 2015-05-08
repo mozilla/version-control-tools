@@ -30,4 +30,4 @@
   pip: virtualenv={{ src }}/{{ site }}/venv requirements={{ src }}/{{ site }}/requirements.txt executable={{ src }}/{{ site }}/venv/bin/peep
 
 - name: install Review Board package
-  command: "{{ src }}/{{ site }}/venv/bin/easy_install ReviewBoard==2.0.12"
+  command: "{{ src }}/{{ site }}/venv/bin/easy_install ReviewBoard==2.0.15"
