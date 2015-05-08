@@ -14,6 +14,7 @@ import json
 import tempfile
 
 from rbtools.api.client import RBClient
+from rbtools.api.transport.sync import SyncTransport
 
 
 def post_reviews(url, repoid, identifier, commits, username=None, password=None,
@@ -371,6 +372,12 @@ def _post_reviews(api_root, repoid, identifier, commits):
     return str(squashed_rr.id), node_to_rid, review_requests
 
 
+class NoCacheTransport(SyncTransport):
+    """API transport with disabled caching."""
+    def enable_cache(self):
+        pass
+
+
 @contextmanager
 def ReviewBoardClient(url, username, password, userid, cookie):
     """Obtain a RBClient instance via a context manager.
@@ -392,14 +399,15 @@ def ReviewBoardClient(url, username, password, userid, cookie):
             # TODO: This is bugzilla specific code that really shouldn't be inside
             # of this file. The whole bugzilla cookie resource is a hack anyways
             # though so we'll deal with this for now.
-            rbc = RBClient(url, cookie_file=path)
+            rbc = RBClient(url, cookie_file=path,
+                           transport_cls=NoCacheTransport)
             login_resource = rbc.get_path(
                 'extensions/rbbz.extension.BugzillaExtension/'
                 'bugzilla-cookie-logins/')
             login_resource.create(login_id=userid, login_cookie=cookie)
         else:
             rbc = RBClient(url, username=username, password=password,
-                           cookie_file=path)
+                           cookie_file=path, transport_cls=NoCacheTransport)
 
         yield rbc
     finally:

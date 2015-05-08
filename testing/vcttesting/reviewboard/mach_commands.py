@@ -148,6 +148,12 @@ class ReviewBoardCommands(object):
 
     def _get_client(self):
         from rbtools.api.client import RBClient
+        from rbtools.api.transport.sync import SyncTransport
+
+        class NoCacheTransport(SyncTransport):
+            """API transport with disabled caching."""
+            def enable_cache(self):
+                pass
 
         # TODO consider moving this to __init__.
         if not self.mr:
@@ -166,7 +172,7 @@ class ReviewBoardCommands(object):
             pass
 
         return RBClient(self.mr.reviewboard_url, username=username,
-                        password=password)
+                        password=password, transport_cls=NoCacheTransport)
 
     def _get_root(self):
         return self._get_client().get_root()
