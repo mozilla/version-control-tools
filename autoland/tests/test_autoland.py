@@ -110,15 +110,9 @@ class TestAutoland(unittest.TestCase):
             landed, result = transplant.transplant_to_try('mozilla', '0',
                                                           'try')
 
-            # We expect this to not be landed as we're not pushing to try, but
-            # we should not see an error in the result.
-            self.assertEqual(landed, False)
-            self.assertEqual(result, '')
-
-            output = 'remote:   https://hg.mozilla.org/try/rev/f4a5dc70834d'
-            m = re.search(transplant.HGMO_REXP, output)
-            self.assertIsNotNone(m)
-            self.assertEqual(m.groups()[0], 'f4a5dc70834d')
+            self.assertEqual(landed, True)
+            self.assertEqual(len(result), 12)
+            self.assertIsNotNone(re.match('([a-f0-9]+)', result))
 
         finally:
             shutil.rmtree(local_repo_path)

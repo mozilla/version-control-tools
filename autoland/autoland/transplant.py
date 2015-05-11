@@ -3,7 +3,6 @@ import json
 import re
 import subprocess
 
-HGMO_REXP = 'https://hg.mozilla.org/try/rev/(\w+)'
 REVIEW_REXP = '^review url: .+/r/(\d+)'
 
 REPO_CONFIG = {}
@@ -66,7 +65,7 @@ def transplant_to_try(tree, rev, trysyntax):
         called 'central' and that the .hg/hgrc config contains links to
         the try and mozreview repos"""
 
-    landed = False
+    landed = True
     result = ''
 
     cmds = [['hg', 'update', '--clean'],
@@ -76,8 +75,10 @@ def transplant_to_try(tree, rev, trysyntax):
             ['hg', 'update', 'transplant'],
             ['hg', 'qpop', '--all'],
             ['hg', 'qdelete', 'try'],
-            ['hg', 'qnew', 'try'],
-            ['hg', 'qrefresh', '-m', '"' + trysyntax + '"'],
+            # TODO: hg is going to add a ui.allowemptycommit flag in 3.5
+            #       which means we can remove the use of queues here
+            ['hg', 'qnew', 'try', '-m', '"' + trysyntax + '"'],
+            ['hg', 'log', '-r', 'qtip', '-T', '{node|short}'],
             ['hg', 'push', '-r', '.', '-f', 'try'],
             ['hg', 'qpop'],
             ['hg', 'qdelete', 'try'],
@@ -85,18 +86,18 @@ def transplant_to_try(tree, rev, trysyntax):
             ['hg', 'update', 'central']]
 
     repo_path = get_repo_path(tree)
+    qtip_rev = ''
     for cmd in cmds:
         try:
+            #TODO: this should be logged, somewhere
             output = subprocess.check_output(cmd, stderr=subprocess.STDOUT,
                                              cwd=repo_path)
-            m = re.search(HGMO_REXP, output)
-            if m:
-                landed = True
-                result = m.groups()[0]
-            #TODO: this should be logged, somewhere
+            if 'log' in cmd:
+                result = output
         except subprocess.CalledProcessError as e:
             # in normal circumstances we expect this mq error on delete
             if 'abort: patch try not in series' not in e.output:
+                landed = False
                 result = e.output
                 break
 
