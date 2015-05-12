@@ -229,60 +229,43 @@ class Bugzilla(object):
         return None
 
     @xmlrpc_to_bugzilla_errors
-    def r_plus_attachment(self, bug_id, reviewer, rb_url, comment=None):
-        """Set a review flag to "+".
-
-        Does nothing if the reviewer has already r+ed the attachment.
-        Updates flag if a corresponding r? is found; otherwise creates a
-        new flag.
-
-        We return a boolean indicating whether we r+ed the attachment.
-        """
+    def r_plus_attachment(self, bug_id, reviewer, comment, rb_url):
+        """Set a review flag to "+"."""
 
         logging.info('r+ from %s on bug %d.' % (reviewer, bug_id))
 
         rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
         if not rb_attachment:
-            logging.error('Could not find attachment for Review Board URL %s '
-                          'in bug %s.' % (rb_url, bug_id))
-            return False
+            return
 
         flags = rb_attachment.get('flags', [])
-        flag = {'name': 'review', 'status': '+'}
+        new_flag = {'name': 'review', 'status': '+'}
 
         for f in flags:
             if f['name'] == 'review' and f.get('requestee') == reviewer:
-                flag['id'] = f['id']
+                new_flag['id'] = f['id']
                 break
-            elif (f['name'] == 'review' and f.get('setter') == reviewer and
-                  f['status'] == '+'):
-                logging.info('r+ already set.')
-                return False
         else:
-            flag['new'] = True
-            flag['requestee'] = reviewer
+            new_flag['new'] = True
+            new_flag['requestee'] = reviewer
 
         params = {
             'ids': [rb_attachment['id']],
-            'flags': [flag],
+            'flags': [new_flag],
+            'comment': comment
         }
 
-        if comment:
-            params['comment'] = comment
-
         self.proxy.Bug.update_attachment(params)
-        return True
 
     @xmlrpc_to_bugzilla_errors
     def cancel_review_request(self, bug_id, reviewer, rb_url, comment=None):
-        """Cancel an r? or r+ flag on a Bugzilla attachment.
+        """Cancel a r? flag on a Bugzilla attachment while maybe adding a comment.
 
         We return a boolean indicating whether we cancelled a review request.
         This is so callers can do something with the comment (which won't get
         posted unless the review flag was cleared).
         """
-        logging.info('maybe cancelling r? from %s on bug %d.' % (reviewer,
-                                                                 bug_id))
+        logging.info('maybe cancelling r? from %s on bug %d.' % (reviewer, bug_id))
 
         rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
 
@@ -290,21 +273,19 @@ class Bugzilla(object):
             return False
 
         flags = rb_attachment.get('flags', [])
-        flag = {'name': 'review', 'status': 'X'}
+        new_flag = {'name': 'review', 'status': 'X'}
 
         for f in flags:
             logging.info("Flag %s" % f)
-            if f['name'] == 'review' and (f.get('requestee') == reviewer or
-                                          (f.get('setter') == reviewer and
-                                           f.get('status') == '+')):
-                flag['id'] = f['id']
+            if f['name'] == 'review' and f.get('requestee') == reviewer:
+                new_flag['id'] = f['id']
                 break
         else:
             return False
 
         params = {
             'ids': [rb_attachment['id']],
-            'flags': [flag],
+            'flags': [new_flag],
         }
 
         if comment:

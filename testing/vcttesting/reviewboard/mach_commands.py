@@ -291,7 +291,6 @@ class ReviewBoardCommands(object):
             help='Whether to mark the review "Ship It"')
     def create_review(self, rrid, body_bottom=None, body_top=None, public=False,
             ship_it=False):
-        from rbtools.api.errors import APIError
         root = self._get_root()
         reviews = root.get_reviews(review_request_id=rrid)
         # rbtools will convert body_* to str() and insert "None" if we pass
@@ -302,12 +301,7 @@ class ReviewBoardCommands(object):
         if body_top:
             args['body_top'] = body_top
 
-        try:
-            r = reviews.create(**args)
-        except APIError as e:
-            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
-                                             e.rsp['err']['msg']))
-            return 1
+        r = reviews.create(**args)
 
         print('created review %s' % r.rsp['review']['id'])
 
@@ -316,16 +310,9 @@ class ReviewBoardCommands(object):
     @CommandArgument('rrid', help='Review request review is attached to')
     @CommandArgument('rid', help='Review to publish')
     def publish_review(self, rrid, rid):
-        from rbtools.api.errors import APIError
         root = self._get_root()
         review = root.get_review(review_request_id=rrid, review_id=rid)
-
-        try:
-            review.update(public=True)
-        except APIError as e:
-            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
-                                             e.rsp['err']['msg']))
-            return 1
+        review.update(public=True)
 
         print('published review %s' % review.id)
 

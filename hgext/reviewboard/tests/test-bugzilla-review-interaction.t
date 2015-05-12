@@ -30,7 +30,7 @@ Create a review request from a regular user
 
 Adding a reviewer should result in a r? flag being set
 
-  $ rbmanage add-reviewer 2 --user reviewer
+  $ rbmanage add-reviewer 1 --user reviewer
   1 people listed on review request
   $ rbmanage publish 1
 
@@ -39,9 +39,9 @@ Adding a reviewer should result in a r? flag being set
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
-      file_name: reviewboard-2-url.txt
+      data: http://*:$HGPORT1/r/1/ (glob)
+      description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags:
       - id: 1
         name: review
@@ -51,7 +51,7 @@ Adding a reviewer should result in a r? flag being set
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: 'MozReview Request: bz://1/mynick'
     blocks: []
     cc:
     - reviewer@example.com
@@ -65,10 +65,16 @@ Adding a reviewer should result in a r? flag being set
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
   
   
-        Bug 1 - Initial commit to review'
+        /r/2 - Bug 1 - Initial commit to review
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://*:$HGPORT/test-repo' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -80,7 +86,7 @@ Adding a reviewer should result in a r? flag being set
 Adding a "Ship It" review will grant r+
 
   $ exportbzauth reviewer@example.com password
-  $ rbmanage create-review 2 --body-top LGTM --public --ship-it
+  $ rbmanage create-review 1 --body-top LGTM --public --ship-it
   created review 1
 
   $ bugzilla dump-bug 1
@@ -88,9 +94,9 @@ Adding a "Ship It" review will grant r+
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
-      file_name: reviewboard-2-url.txt
+      data: http://*:$HGPORT1/r/1/ (glob)
+      description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags:
       - id: 1
         name: review
@@ -100,7 +106,7 @@ Adding a "Ship It" review will grant r+
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: 'MozReview Request: bz://1/mynick'
     blocks: []
     cc:
     - reviewer@example.com
@@ -114,19 +120,25 @@ Adding a "Ship It" review will grant r+
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
   
   
-        Bug 1 - Initial commit to review'
+        /r/2 - Bug 1 - Initial commit to review
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://*:$HGPORT/test-repo' (glob)
     - author: reviewer@example.com
       id: 3
       tags: []
       text: 'Comment on attachment 1
   
-        MozReview Request: Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
   
   
-        http://*:$HGPORT1/r/2/#review1 (glob)
+        http://*:$HGPORT1/r/1/#review1 (glob)
   
   
         LGTM'
@@ -141,7 +153,7 @@ Adding a "Ship It" review will grant r+
 Adding a reply to the review will add a comment to Bugzilla
 
   $ exportbzauth author@example.com password
-  $ rbmanage create-review-reply 2 1 --body-bottom 'Thanks!' --public
+  $ rbmanage create-review-reply 1 1 --body-bottom 'Thanks!' --public
   created review reply 2
 
   $ bugzilla dump-bug 1
@@ -149,9 +161,9 @@ Adding a reply to the review will add a comment to Bugzilla
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
-      file_name: reviewboard-2-url.txt
+      data: http://*:$HGPORT1/r/1/ (glob)
+      description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags:
       - id: 1
         name: review
@@ -161,7 +173,7 @@ Adding a reply to the review will add a comment to Bugzilla
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: 'MozReview Request: bz://1/mynick'
     blocks: []
     cc:
     - reviewer@example.com
@@ -175,26 +187,32 @@ Adding a reply to the review will add a comment to Bugzilla
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
   
   
-        Bug 1 - Initial commit to review'
+        /r/2 - Bug 1 - Initial commit to review
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://*:$HGPORT/test-repo' (glob)
     - author: reviewer@example.com
       id: 3
       tags: []
       text: 'Comment on attachment 1
   
-        MozReview Request: Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
   
   
-        http://*:$HGPORT1/r/2/#review1 (glob)
+        http://*:$HGPORT1/r/1/#review1 (glob)
   
   
         LGTM'
     - author: author@example.com
       id: 4
       tags: []
-      text: 'http://*:$HGPORT1/r/2/#review2 (glob)
+      text: 'http://*:$HGPORT1/r/1/#review2 (glob)
   
   
         Thanks!'
@@ -211,19 +229,13 @@ Ensure multiple reviewers works as expected
   $ exportbzauth author@example.com password
   $ bugzilla create-bug TestProduct TestComponent 'Multiple Reviewers'
 
-  $ hg -q up -r 0
+  $ hg up -r 0 > /dev/null
   $ echo b2 > foo
   $ hg commit -m 'Bug 2 - Multiple reviewers'
   created new head
   $ hg --config bugzilla.username=author@example.com push > /dev/null
 
-Emulate the JavaScript by setting the reviewers on both parent and commit.
-TODO: Implement the JavaScript bits on the server so we don't need to do this
-in the tests.
-
   $ rbmanage add-reviewer 3 --user reviewer --user rev2
-  2 people listed on review request
-  $ rbmanage add-reviewer 4 --user reviewer --user rev2
   2 people listed on review request
   $ rbmanage publish 3
 
@@ -232,9 +244,9 @@ in the tests.
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/ (glob)
-      description: 'MozReview Request: Bug 2 - Multiple reviewers'
-      file_name: reviewboard-4-url.txt
+      data: http://*:$HGPORT1/r/3/ (glob)
+      description: 'MozReview Request: bz://2/mynick'
+      file_name: reviewboard-3-url.txt
       flags:
       - id: 2
         name: review
@@ -249,7 +261,7 @@ in the tests.
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 2 - Multiple reviewers'
+      summary: 'MozReview Request: bz://2/mynick'
     blocks: []
     cc:
     - reviewer2@example.com
@@ -264,10 +276,16 @@ in the tests.
       tags: []
       text: 'Created attachment 2
   
-        MozReview Request: Bug 2 - Multiple reviewers
+        MozReview Request: bz://2/mynick
   
   
-        Bug 2 - Multiple reviewers'
+        /r/4 - Bug 2 - Multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://*:$HGPORT/test-repo' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -280,8 +298,6 @@ Removing a reviewer should remove their review flag
 
   $ rbmanage remove-reviewer 3 --user rev2
   1 people listed on review request
-  $ rbmanage remove-reviewer 4 --user rev2
-  1 people listed on review request
 
   $ rbmanage publish 3
 
@@ -290,9 +306,9 @@ Removing a reviewer should remove their review flag
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/ (glob)
-      description: 'MozReview Request: Bug 2 - Multiple reviewers'
-      file_name: reviewboard-4-url.txt
+      data: http://*:$HGPORT1/r/3/ (glob)
+      description: 'MozReview Request: bz://2/mynick'
+      file_name: reviewboard-3-url.txt
       flags:
       - id: 3
         name: review
@@ -302,7 +318,7 @@ Removing a reviewer should remove their review flag
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 2 - Multiple reviewers'
+      summary: 'MozReview Request: bz://2/mynick'
     blocks: []
     cc:
     - reviewer2@example.com
@@ -317,19 +333,31 @@ Removing a reviewer should remove their review flag
       tags: []
       text: 'Created attachment 2
   
-        MozReview Request: Bug 2 - Multiple reviewers
+        MozReview Request: bz://2/mynick
   
   
-        Bug 2 - Multiple reviewers'
+        /r/4 - Bug 2 - Multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://*:$HGPORT/test-repo' (glob)
     - author: author@example.com
       id: 7
       tags: []
       text: 'Comment on attachment 2
   
-        MozReview Request: Bug 2 - Multiple reviewers
+        MozReview Request: bz://2/mynick
   
   
-        Bug 2 - Multiple reviewers'
+        /r/4 - Bug 2 - Multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://*:$HGPORT/test-repo' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -342,8 +370,6 @@ Removing all reviewers should remove all flags
 
   $ rbmanage remove-reviewer 3 --user reviewer
   0 people listed on review request
-  $ rbmanage remove-reviewer 4 --user reviewer
-  0 people listed on review request
 
   $ rbmanage publish 3
 
@@ -352,14 +378,14 @@ Removing all reviewers should remove all flags
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/ (glob)
-      description: 'MozReview Request: Bug 2 - Multiple reviewers'
-      file_name: reviewboard-4-url.txt
+      data: http://*:$HGPORT1/r/3/ (glob)
+      description: 'MozReview Request: bz://2/mynick'
+      file_name: reviewboard-3-url.txt
       flags: []
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 2 - Multiple reviewers'
+      summary: 'MozReview Request: bz://2/mynick'
     blocks: []
     cc:
     - reviewer2@example.com
@@ -374,28 +400,46 @@ Removing all reviewers should remove all flags
       tags: []
       text: 'Created attachment 2
   
-        MozReview Request: Bug 2 - Multiple reviewers
+        MozReview Request: bz://2/mynick
   
   
-        Bug 2 - Multiple reviewers'
+        /r/4 - Bug 2 - Multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://*:$HGPORT/test-repo' (glob)
     - author: author@example.com
       id: 7
       tags: []
       text: 'Comment on attachment 2
   
-        MozReview Request: Bug 2 - Multiple reviewers
+        MozReview Request: bz://2/mynick
   
   
-        Bug 2 - Multiple reviewers'
+        /r/4 - Bug 2 - Multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://*:$HGPORT/test-repo' (glob)
     - author: author@example.com
       id: 8
       tags: []
       text: 'Comment on attachment 2
   
-        MozReview Request: Bug 2 - Multiple reviewers
+        MozReview Request: bz://2/mynick
   
   
-        Bug 2 - Multiple reviewers'
+        /r/4 - Bug 2 - Multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r d17099d7ee43e288f43e0210edc71b9782f92b77 http://*:$HGPORT/test-repo' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -409,7 +453,7 @@ review? sticks around when 1 person grants review
   $ exportbzauth author@example.com password
   $ bugzilla create-bug TestProduct TestComponent 'More Multiple Reviewers'
 
-  $ hg -q up -r 0
+  $ hg up -r 0 > /dev/null
   $ echo more_multiple_reviewers > foo
   $ hg commit -m 'Bug 3 - More multiple reviewers'
   created new head
@@ -417,12 +461,10 @@ review? sticks around when 1 person grants review
 
   $ rbmanage add-reviewer 5 --user reviewer --user rev2
   2 people listed on review request
-  $ rbmanage add-reviewer 6 --user reviewer --user rev2
-  2 people listed on review request
   $ rbmanage publish 5
 
   $ exportbzauth reviewer@example.com password
-  $ rbmanage create-review 6 --body-top 'land it!' --public --ship-it
+  $ rbmanage create-review 5 --body-top 'land it!' --public --ship-it
   created review 3
 
   $ bugzilla dump-bug 3
@@ -430,9 +472,9 @@ review? sticks around when 1 person grants review
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/6/ (glob)
-      description: 'MozReview Request: Bug 3 - More multiple reviewers'
-      file_name: reviewboard-6-url.txt
+      data: http://*:$HGPORT1/r/5/ (glob)
+      description: 'MozReview Request: bz://3/mynick'
+      file_name: reviewboard-5-url.txt
       flags:
       - id: 4
         name: review
@@ -447,7 +489,7 @@ review? sticks around when 1 person grants review
       id: 3
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 3 - More multiple reviewers'
+      summary: 'MozReview Request: bz://3/mynick'
     blocks: []
     cc:
     - reviewer2@example.com
@@ -462,19 +504,25 @@ review? sticks around when 1 person grants review
       tags: []
       text: 'Created attachment 3
   
-        MozReview Request: Bug 3 - More multiple reviewers
+        MozReview Request: bz://3/mynick
   
   
-        Bug 3 - More multiple reviewers'
+        /r/6 - Bug 3 - More multiple reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r fb992de2921c9dd3117becff799b1e41e0dc4827 http://*:$HGPORT/test-repo' (glob)
     - author: reviewer@example.com
       id: 11
       tags: []
       text: 'Comment on attachment 3
   
-        MozReview Request: Bug 3 - More multiple reviewers
+        MozReview Request: bz://3/mynick
   
   
-        http://*:$HGPORT1/r/6/#review3 (glob)
+        http://*:$HGPORT1/r/5/#review3 (glob)
   
   
         land it!'
@@ -491,7 +539,7 @@ Random users can come along and grant review
   $ exportbzauth author@example.com password
   $ bugzilla create-bug TestProduct TestComponent 'Unrelated Reviewers'
 
-  $ hg -q up -r 0
+  $ hg up -r 0 > /dev/null
   $ echo unrelated_reviewer > foo
   $ hg commit -m 'Bug 4 - Unrelated Reviewers'
   created new head
@@ -499,12 +547,10 @@ Random users can come along and grant review
 
   $ rbmanage add-reviewer 7 --user reviewer
   1 people listed on review request
-  $ rbmanage add-reviewer 8 --user reviewer
-  1 people listed on review request
   $ rbmanage publish 7
 
   $ exportbzauth troll@example.com password
-  $ rbmanage create-review 8 --body-top 'I am always watching' --public --ship-it
+  $ rbmanage create-review 7 --body-top 'I am always watching' --public --ship-it
   created review 4
 
   $ bugzilla dump-bug 4
@@ -512,9 +558,9 @@ Random users can come along and grant review
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/8/ (glob)
-      description: 'MozReview Request: Bug 4 - Unrelated Reviewers'
-      file_name: reviewboard-8-url.txt
+      data: http://*:$HGPORT1/r/7/ (glob)
+      description: 'MozReview Request: bz://4/mynick'
+      file_name: reviewboard-7-url.txt
       flags:
       - id: 6
         name: review
@@ -529,7 +575,7 @@ Random users can come along and grant review
       id: 4
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 4 - Unrelated Reviewers'
+      summary: 'MozReview Request: bz://4/mynick'
     blocks: []
     cc:
     - reviewer@example.com
@@ -543,19 +589,25 @@ Random users can come along and grant review
       tags: []
       text: 'Created attachment 4
   
-        MozReview Request: Bug 4 - Unrelated Reviewers
+        MozReview Request: bz://4/mynick
   
   
-        Bug 4 - Unrelated Reviewers'
+        /r/8 - Bug 4 - Unrelated Reviewers
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r 13295ed17a69bdcef2644c0ab72736292db21b80 http://*:$HGPORT/test-repo' (glob)
     - author: troll@example.com
       id: 14
       tags: []
       text: 'Comment on attachment 4
   
-        MozReview Request: Bug 4 - Unrelated Reviewers
+        MozReview Request: bz://4/mynick
   
   
-        http://*:$HGPORT1/r/8/#review4 (glob)
+        http://*:$HGPORT1/r/7/#review4 (glob)
   
   
         I am always watching'
@@ -566,686 +618,6 @@ Random users can come along and grant review
     resolution: ''
     status: UNCONFIRMED
     summary: Unrelated Reviewers
-
-Test interaction with multiple commits.
-
-  $ exportbzauth author@example.com password
-  $ bugzilla create-bug TestProduct TestComponent 'Parent Reviews'
-
-  $ hg -q up -r 0
-  $ echo parent_reviews > foo
-  $ hg commit -m 'Bug 5 - Parent reviews'
-  created new head
-  $ echo parent_reviews_2 >> foo
-  $ hg commit -m 'Bug 5 - Parent reviews, second commit'
-  $ echo parent_reviews_3 >> foo
-  $ hg commit -m 'Bug 5 - Parent reviews, third commit'
-  $ hg --config bugzilla.username=author@example.com push > /dev/null
-
-  $ rbmanage add-reviewer 9 --user reviewer --user rev2
-  2 people listed on review request
-  $ rbmanage add-reviewer 10 --user reviewer --user rev2
-  2 people listed on review request
-  $ rbmanage add-reviewer 11 --user reviewer --user rev2
-  2 people listed on review request
-  $ rbmanage add-reviewer 12 --user reviewer --user rev2
-  2 people listed on review request
-  $ rbmanage publish 9
-
-  $ bugzilla dump-bug 5
-  Bug 5:
-    attachments:
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/10/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews'
-      file_name: reviewboard-10-url.txt
-      flags:
-      - id: 8
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 9
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      id: 5
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews'
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/11/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
-      file_name: reviewboard-11-url.txt
-      flags:
-      - id: 10
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 11
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      id: 6
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/12/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
-      file_name: reviewboard-12-url.txt
-      flags:
-      - id: 12
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 13
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      id: 7
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, third commit'
-    blocks: []
-    cc:
-    - reviewer2@example.com
-    - reviewer@example.com
-    comments:
-    - author: author@example.com
-      id: 15
-      tags: []
-      text: ''
-    - author: author@example.com
-      id: 16
-      tags: []
-      text: 'Created attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        Bug 5 - Parent reviews'
-    - author: author@example.com
-      id: 17
-      tags: []
-      text: 'Created attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        Bug 5 - Parent reviews, second commit'
-    - author: author@example.com
-      id: 18
-      tags: []
-      text: 'Created attachment 7
-  
-        MozReview Request: Bug 5 - Parent reviews, third commit
-  
-  
-        Bug 5 - Parent reviews, third commit'
-    component: TestComponent
-    depends_on: []
-    platform: All
-    product: TestProduct
-    resolution: ''
-    status: UNCONFIRMED
-    summary: Parent Reviews
-
-  $ exportbzauth reviewer@example.com password
-
-Verify that a single ship-it r+s only that attachment.
-
-  $ rbmanage create-review 11 --body-top 'land it!' --public --ship-it
-  created review 5
-
-  $ bugzilla dump-bug 5
-  Bug 5:
-    attachments:
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/10/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews'
-      file_name: reviewboard-10-url.txt
-      flags:
-      - id: 8
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 9
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      id: 5
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews'
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/11/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
-      file_name: reviewboard-11-url.txt
-      flags:
-      - id: 10
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 11
-        name: review
-        requestee: null
-        setter: reviewer@example.com
-        status: +
-      id: 6
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/12/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
-      file_name: reviewboard-12-url.txt
-      flags:
-      - id: 12
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 13
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      id: 7
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, third commit'
-    blocks: []
-    cc:
-    - reviewer2@example.com
-    - reviewer@example.com
-    comments:
-    - author: author@example.com
-      id: 15
-      tags: []
-      text: ''
-    - author: author@example.com
-      id: 16
-      tags: []
-      text: 'Created attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        Bug 5 - Parent reviews'
-    - author: author@example.com
-      id: 17
-      tags: []
-      text: 'Created attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        Bug 5 - Parent reviews, second commit'
-    - author: author@example.com
-      id: 18
-      tags: []
-      text: 'Created attachment 7
-  
-        MozReview Request: Bug 5 - Parent reviews, third commit
-  
-  
-        Bug 5 - Parent reviews, third commit'
-    - author: reviewer@example.com
-      id: 19
-      tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review5 (glob)
-  
-  
-        land it!'
-    component: TestComponent
-    depends_on: []
-    platform: All
-    product: TestProduct
-    resolution: ''
-    status: UNCONFIRMED
-    summary: Parent Reviews
-
-Ship-it reviews are not allowed on the parent.
-
-  $ rbmanage create-review 9 --body-top 'all good!' --public --ship-it
-  API Error: 500: 225: "Ship it" reviews on parent review requests are not allowed.  Please review individual commits.
-  [1]
-
-A non-ship-it review on a child should clear only that attachment's r+.
-
-  $ rbmanage create-review 11 --body-top 'there is a problem' --public
-  created review 7
-
-  $ bugzilla dump-bug 5
-  Bug 5:
-    attachments:
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/10/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews'
-      file_name: reviewboard-10-url.txt
-      flags:
-      - id: 8
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 9
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      id: 5
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews'
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/11/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
-      file_name: reviewboard-11-url.txt
-      flags:
-      - id: 10
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      id: 6
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/12/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
-      file_name: reviewboard-12-url.txt
-      flags:
-      - id: 12
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 13
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      id: 7
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, third commit'
-    blocks: []
-    cc:
-    - reviewer2@example.com
-    - reviewer@example.com
-    comments:
-    - author: author@example.com
-      id: 15
-      tags: []
-      text: ''
-    - author: author@example.com
-      id: 16
-      tags: []
-      text: 'Created attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        Bug 5 - Parent reviews'
-    - author: author@example.com
-      id: 17
-      tags: []
-      text: 'Created attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        Bug 5 - Parent reviews, second commit'
-    - author: author@example.com
-      id: 18
-      tags: []
-      text: 'Created attachment 7
-  
-        MozReview Request: Bug 5 - Parent reviews, third commit
-  
-  
-        Bug 5 - Parent reviews, third commit'
-    - author: reviewer@example.com
-      id: 19
-      tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review5 (glob)
-  
-  
-        land it!'
-    - author: reviewer@example.com
-      id: 20
-      tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review7 (glob)
-  
-  
-        there is a problem'
-    component: TestComponent
-    depends_on: []
-    platform: All
-    product: TestProduct
-    resolution: ''
-    status: UNCONFIRMED
-    summary: Parent Reviews
-
-A non-ship-it review on a child should also clear the attachment's r?.
-
-  $ exportbzauth reviewer2@example.com password
-  $ rbmanage create-review 10 --body-top 'this is not good' --public
-  created review 8
-
-  $ bugzilla dump-bug 5
-  Bug 5:
-    attachments:
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/10/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews'
-      file_name: reviewboard-10-url.txt
-      flags:
-      - id: 9
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      id: 5
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews'
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/11/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
-      file_name: reviewboard-11-url.txt
-      flags:
-      - id: 10
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      id: 6
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/12/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
-      file_name: reviewboard-12-url.txt
-      flags:
-      - id: 12
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 13
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      id: 7
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, third commit'
-    blocks: []
-    cc:
-    - reviewer2@example.com
-    - reviewer@example.com
-    comments:
-    - author: author@example.com
-      id: 15
-      tags: []
-      text: ''
-    - author: author@example.com
-      id: 16
-      tags: []
-      text: 'Created attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        Bug 5 - Parent reviews'
-    - author: author@example.com
-      id: 17
-      tags: []
-      text: 'Created attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        Bug 5 - Parent reviews, second commit'
-    - author: author@example.com
-      id: 18
-      tags: []
-      text: 'Created attachment 7
-  
-        MozReview Request: Bug 5 - Parent reviews, third commit
-  
-  
-        Bug 5 - Parent reviews, third commit'
-    - author: reviewer@example.com
-      id: 19
-      tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review5 (glob)
-  
-  
-        land it!'
-    - author: reviewer@example.com
-      id: 20
-      tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review7 (glob)
-  
-  
-        there is a problem'
-    - author: reviewer2@example.com
-      id: 21
-      tags: []
-      text: 'Comment on attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        http://*:$HGPORT1/r/10/#review8 (glob)
-  
-  
-        this is not good'
-    component: TestComponent
-    depends_on: []
-    platform: All
-    product: TestProduct
-    resolution: ''
-    status: UNCONFIRMED
-    summary: Parent Reviews
-
-A non-ship-it review on a parent should post a comment only.
-
-  $ exportbzauth reviewer2@example.com password
-  $ rbmanage create-review 9 --body-top 'actually none of this is good' --public
-  created review 9
-
-  $ bugzilla dump-bug 5
-  Bug 5:
-    attachments:
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/10/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews'
-      file_name: reviewboard-10-url.txt
-      flags:
-      - id: 9
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      id: 5
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews'
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/11/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
-      file_name: reviewboard-11-url.txt
-      flags:
-      - id: 10
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      id: 6
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
-    - attacher: author@example.com
-      content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/12/ (glob)
-      description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
-      file_name: reviewboard-12-url.txt
-      flags:
-      - id: 12
-        name: review
-        requestee: reviewer2@example.com
-        setter: author@example.com
-        status: '?'
-      - id: 13
-        name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
-      id: 7
-      is_obsolete: false
-      is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, third commit'
-    blocks: []
-    cc:
-    - reviewer2@example.com
-    - reviewer@example.com
-    comments:
-    - author: author@example.com
-      id: 15
-      tags: []
-      text: ''
-    - author: author@example.com
-      id: 16
-      tags: []
-      text: 'Created attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        Bug 5 - Parent reviews'
-    - author: author@example.com
-      id: 17
-      tags: []
-      text: 'Created attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        Bug 5 - Parent reviews, second commit'
-    - author: author@example.com
-      id: 18
-      tags: []
-      text: 'Created attachment 7
-  
-        MozReview Request: Bug 5 - Parent reviews, third commit
-  
-  
-        Bug 5 - Parent reviews, third commit'
-    - author: reviewer@example.com
-      id: 19
-      tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review5 (glob)
-  
-  
-        land it!'
-    - author: reviewer@example.com
-      id: 20
-      tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review7 (glob)
-  
-  
-        there is a problem'
-    - author: reviewer2@example.com
-      id: 21
-      tags: []
-      text: 'Comment on attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        http://*:$HGPORT1/r/10/#review8 (glob)
-  
-  
-        this is not good'
-    - author: reviewer2@example.com
-      id: 22
-      tags: []
-      text: 'http://*:$HGPORT1/r/9/#review9 (glob)
-  
-  
-        actually none of this is good'
-    component: TestComponent
-    depends_on: []
-    platform: All
-    product: TestProduct
-    resolution: ''
-    status: UNCONFIRMED
-    summary: Parent Reviews
 
   $ cd ..
 

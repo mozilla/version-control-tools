@@ -40,14 +40,14 @@ The globbing is patching over a bug in mach
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
-      file_name: reviewboard-2-url.txt
+      data: http://*:$HGPORT1/r/1/ (glob)
+      description: 'MozReview Request: bz://1/mynick'
+      file_name: reviewboard-1-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: 'MozReview Request: bz://1/mynick'
     blocks: []
     cc: []
     comments:
@@ -60,10 +60,16 @@ The globbing is patching over a bug in mach
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: Bug 1 - Initial commit to review
+        MozReview Request: bz://1/mynick
   
   
-        Bug 1 - Initial commit to review'
+        /r/2 - Bug 1 - Initial commit to review
+  
+  
+        Pull down this commit:
+  
+  
+        hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://*:$HGPORT/test-repo' (glob)
     - author: author@example.com
       id: 3
       tags: []

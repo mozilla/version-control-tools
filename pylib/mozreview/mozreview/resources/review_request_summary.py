@@ -9,7 +9,6 @@ from djblets.webapi.decorators import (webapi_response_errors,
                                        webapi_request_fields)
 from djblets.webapi.errors import (DOES_NOT_EXIST, INVALID_ATTRIBUTE,
                                    NOT_LOGGED_IN, PERMISSION_DENIED)
-
 from reviewboard.reviews.models import ReviewRequest
 from reviewboard.webapi.encoder import status_to_string
 from reviewboard.webapi.resources import WebAPIResource
@@ -19,7 +18,6 @@ from mozreview.extra_data import (COMMITS_KEY,
                                   MOZREVIEW_KEY,
                                   gen_child_rrs,
                                   get_parent_rr)
-from mozreview.models import BugzillaUserMap
 from mozreview.resources.errors import NOT_PARENT
 from mozreview.utils import is_parent
 
@@ -57,7 +55,6 @@ class ReviewRequestSummaryResource(WebAPIResource):
                 q = q & Q(bugs_closed=request.GET.get('bug'))
 
         queryset = ReviewRequest.objects.public(
-            status=None,
             extra_query=q
         )
 
@@ -201,7 +198,6 @@ class ReviewRequestSummaryResource(WebAPIResource):
             'summary': 'Bug 1 - Update README.md.'
         }
         """
-        reviewers = list(review_request.target_people.all())
         d = {}
 
         for field in ('id', 'summary', 'last_updated', 'issue_open_count'):
@@ -209,10 +205,8 @@ class ReviewRequestSummaryResource(WebAPIResource):
 
         d['submitter'] = review_request.submitter.username
         d['status'] = status_to_string(review_request.status)
-        d['reviewers'] = [reviewer.username for reviewer in reviewers]
-        d['reviewers_bmo_ids'] = [bzuser.bugzilla_user_id for bzuser in
-                                  BugzillaUserMap.objects.filter(id__in=[
-                                      reviewer.id for reviewer in reviewers])]
+        d['reviewers'] = [child.username for child in
+                          review_request.target_people.all()]
         d['links'] = self.get_links(obj=review_request, request=request)
 
         if commit:

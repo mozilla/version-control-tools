@@ -60,7 +60,6 @@
 
 .actions {
   #close-review-request-link,
-  #shipit-link,
   #upload-diff-link {
     display: none;
   }
@@ -85,27 +84,3 @@ label[for="mozreview-autoland-try-syntax"] {
   width: 100%;
   height: 8ch;
 }
-
-.commit-request .actions {
-  #shipit-link {
-    display: block;
-  }
-}
-
-.parent-request #id_shipit {
-  display: none;
-}
-
-.parent-request label[for="id_shipit"] {
-  display: none;
-}
-
-.parent-request #review-form .edit-field {
-  // Without the Ship It checkbox, the edit field gets squished up
-  // with the Markdown Reference link unless we clear the latter's float.
-  clear: right;
-}
-
-// TODO: When Review Board 2.0.17 comes out, use the ReviewDialogHookView
-// to also display a message explaining the lack of ship-it functionality
-// from parent review requests.
