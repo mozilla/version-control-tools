@@ -67,6 +67,8 @@ class MozReview(object):
         path = os.path.abspath(path)
         self._path = path
 
+        self.started = False
+
         self.db_image = db_image
         self.web_image = web_image
         self.hgrb_image = hgrb_image
@@ -140,6 +142,9 @@ class MozReview(object):
             rbweb_image=None, ssh_port=None,
             autolanddb_image=None, autoland_image=None, autoland_port=None):
         """Start a MozReview instance."""
+        if self.started:
+            raise Exception('MozReview instance has already been started')
+
         if not bugzilla_port:
             bugzilla_port = get_available_port()
         if not reviewboard_port:
@@ -164,6 +169,7 @@ class MozReview(object):
         autolanddb_image = autolanddb_image or self.autolanddb_image
         autoland_image = autoland_image or self.autoland_image
 
+        self.started = True
         mr_info = self._docker.start_mozreview(
                 cluster=self._name,
                 http_port=bugzilla_port,
@@ -276,6 +282,7 @@ class MozReview(object):
     def stop(self):
         """Stop all services associated with this MozReview instance."""
         self._docker.stop_bmo(self._name)
+        self.started = False
 
         if WATCHMAN:
             with open(os.devnull, 'wb') as devnull:

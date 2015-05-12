@@ -19,6 +19,19 @@ from vcttesting.docker import DockerNotAvailable
 from vcttesting.mozreview import MozReview
 
 
+# The environment variables should be set by the test runner. If
+# they aren't set, you are likely invoking the tests wrong.
+def start_mozreview(mr):
+    mr.start(db_image=os.environ['DOCKER_BMO_DB_IMAGE'],
+         web_image=os.environ['DOCKER_BMO_WEB_IMAGE'],
+         ldap_image=os.environ['DOCKER_LDAP_IMAGE'],
+         pulse_image=os.environ['DOCKER_PULSE_IMAGE'],
+         autolanddb_image=os.environ['DOCKER_AUTOLANDDB_IMAGE'],
+         autoland_image=os.environ['DOCKER_AUTOLAND_IMAGE'],
+         hgrb_image=os.environ['DOCKER_HGRB_IMAGE'],
+         rbweb_image=os.environ['DOCKER_RBWEB_IMAGE'])
+
+
 class MozReviewTest(unittest.TestCase):
     """A base class used for testing MozReview instances.
 
@@ -40,20 +53,12 @@ class MozReviewTest(unittest.TestCase):
             raise unittest.SkipTest('Docker not available')
 
         cls.mr = mr
+
         # If this fails mid-operation, we could have some services running.
         # unittest doesn't call tearDownClass if setUpClass fails. So do it
         # ourselves.
         try:
-            # The environment variables should be set by the test runner. If
-            # they aren't set, you are likely invoking the tests wrong.
-            mr.start(db_image=os.environ['DOCKER_BMO_DB_IMAGE'],
-                     web_image=os.environ['DOCKER_BMO_WEB_IMAGE'],
-                     ldap_image=os.environ['DOCKER_LDAP_IMAGE'],
-                     pulse_image=os.environ['DOCKER_PULSE_IMAGE'],
-                     autolanddb_image=os.environ['DOCKER_AUTOLANDDB_IMAGE'],
-                     autoland_image=os.environ['DOCKER_AUTOLAND_IMAGE'],
-                     hgrb_image=os.environ['DOCKER_HGRB_IMAGE'],
-                     rbweb_image=os.environ['DOCKER_RBWEB_IMAGE'])
+            start_mozreview(mr)
         except Exception:
             mr.stop()
             shutil.rmtree(tmpdir)
@@ -63,6 +68,16 @@ class MozReviewTest(unittest.TestCase):
     def tearDownClass(cls):
         cls.mr.stop()
         shutil.rmtree(cls._tmpdir)
+
+    def run(self, *args, **kwargs):
+        """Wrap run to enable restart between tests mode."""
+        if getattr(self, '_restart_between_tests', False):
+            self.addCleanup(self.mr.stop)
+            # setUpClass always starts.
+            if not self.mr.started:
+                start_mozreview(self.mr)
+
+        return super(MozReviewTest, self).run(*args, **kwargs)
 
     @property
     def bzurl(self):
@@ -207,3 +222,20 @@ class MozReviewWebDriverTest(MozReviewTest):
         results = self.browser.find_elements_by_class_name('ui-autocomplete-results')
         self.assertEqual(len(results), 1)
         return results[0]
+
+
+def restart_between_tests(cls):
+    """A class decorator for MozReviewTest that will restart the cluster.
+
+    Default behavior for MozReviewTest is to start the cluster and keep it
+    running until all tests have executed.
+
+    Some tests may wish to have fresh cluster instances for each test method
+    in the test class. Adding this decorator causes the cluster to restart
+    after each test and gives each test method a clean slate.
+
+    This execution method does add overhead. So considered reusing clusters
+    when possible.
+    """
+    setattr(cls, '_restart_between_tests', True)
+    return cls
