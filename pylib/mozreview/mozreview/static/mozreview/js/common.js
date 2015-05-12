@@ -18,9 +18,9 @@ $(document).ready(function() {
   // and commit review requests.
   var currentID = RB.PageManager.getPage().reviewRequest.id;
   if (currentID == rootID) {
-      $("#review_request").addClass("parent-request");
+      $("body").addClass("parent-request");
   } else {
-      $("#review_request").addClass("commit-request");
+      $("body").addClass("commit-request");
   }
 
   MozReview.rootReviewRequest = new RB.ReviewRequest({id: rootID});
