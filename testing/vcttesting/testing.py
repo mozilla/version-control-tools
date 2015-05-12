@@ -156,7 +156,7 @@ def tests_require_docker(tests):
     return False
 
 
-def get_docker_state(docker, tests, verbose=False):
+def get_docker_state(docker, tests, verbose=False, use_last=False):
     build_docker = tests_require_docker(tests)
 
     env = {}
@@ -164,7 +164,8 @@ def get_docker_state(docker, tests, verbose=False):
     if build_docker:
         print('generating Docker images needed for tests')
         t_start = time.time()
-        mr_images, hgmo_images = docker.build_all_images(verbose=verbose)
+        mr_images, hgmo_images = docker.build_all_images(verbose=verbose,
+                                                         use_last=use_last)
         t_end = time.time()
         print('got Docker images in %.2fs' % (t_end - t_start))
         env['DOCKER_BMO_DB_IMAGE'] = mr_images['bmodb']

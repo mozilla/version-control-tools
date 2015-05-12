@@ -43,13 +43,17 @@ testing harness.
 
 Common tasks are described below.
 
-Run all tests, 8 at a time::
+Run all tests, 4 at a time::
 
-  $ ./run-tests -j8
+  $ ./run-tests -j4
 
 Obtain code coverage results (makes tests run slower)::
 
   $ ./run-tests --cover
+
+Use Docker images from last run (makes tests run faster)::
+
+  $ ./run-tests --use-last-images
 
 Test a single file::
 

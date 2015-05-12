@@ -205,7 +205,7 @@ class Docker(object):
 
         return paths
 
-    def ensure_built(self, name, verbose=False):
+    def ensure_built(self, name, verbose=False, use_last=False):
         """Ensure a Docker image from a builder directory is built and up to date.
 
         This function is docker build++. Under the hood, it talks to the same
@@ -227,7 +227,16 @@ class Docker(object):
         Dockerfile. If the content changes, the Docker image ID changes and the
         cache is invalidated. This effectively allows downstream consumers to
         call ``ensure_built()`` as there *is the image up to date* check.
+
+        If ``use_last`` is true, the last built image will be returned, if
+        available.
         """
+        if use_last:
+            for image in reversed(self.client.images()):
+                for repotag in image['RepoTags']:
+                    repo, tag = repotag.split(':', 1)
+                    if repo == name:
+                        return image['Id']
 
         p = os.path.join(self._ddir, 'builder-%s' % name)
         if not os.path.isdir(p):
@@ -324,7 +333,7 @@ class Docker(object):
         raise Exception('Unable to confirm image was built')
 
     def ensure_images_built(self, names, ansibles=None, existing=None,
-                            verbose=False):
+                            verbose=False, use_last=False):
         """Ensure that multiple images are built.
 
         ``names`` is a list of Docker images to build.
@@ -332,6 +341,9 @@ class Docker(object):
         are repositories. Values are tuples of (playbook, builder). If an
         image in the specified repositories is found, we'll use it as the
         start image. Otherwise, we'll use the configured builder.
+
+        If ``use_last`` is true, we will use the last built image instead
+        of building a new one.
         """
         ansibles = ansibles or {}
         existing = existing or {}
@@ -355,11 +367,15 @@ class Docker(object):
                     start_images[repo] = image['Id']
 
         def build(name, **kwargs):
-            image = self.ensure_built(name, **kwargs)
+            image = self.ensure_built(name, use_last=use_last, **kwargs)
             return name, image
 
         def build_ansible(f_builder, vct_cid, playbook, repository=None,
                           builder=None, start_image=None, verbose=False):
+
+            if start_image and use_last:
+                return repository, start_image
+
             # Wait for the builder image to be built.
             if f_builder:
                 start_image = f_builder.result()
@@ -495,7 +511,7 @@ class Docker(object):
                 iid = self.get_full_image(iid)
                 return iid, repository, tag
 
-    def build_hgmo(self, images=None, verbose=False):
+    def build_hgmo(self, images=None, verbose=False, use_last=False):
         """Ensure the images for a hg.mozilla.org service are built.
 
         hg-master runs the ssh service while hg-slave runs hgweb. The mirroring
@@ -507,7 +523,7 @@ class Docker(object):
         ], ansibles={
             'hgmaster': ('docker-hgmaster', 'centos6'),
             'hgweb': ('docker-hgweb', 'centos6'),
-        }, existing=images, verbose=verbose)
+        }, existing=images, verbose=verbose, use_last=use_last)
 
         self.state['last-hgmaster-id'] = images['hgmaster']
         self.state['last-hgweb-id'] = images['hgweb']
@@ -515,7 +531,7 @@ class Docker(object):
 
         return images
 
-    def build_mozreview(self, images=None, verbose=False):
+    def build_mozreview(self, images=None, verbose=False, use_last=False):
         """Ensure the images for a MozReview service are built.
 
         bmoweb's entrypoint does a lot of setup on first run. This takes many
@@ -536,7 +552,7 @@ class Docker(object):
         ], ansibles={
             'hgrb': ('docker-hgrb', 'centos6'),
             'rbweb': ('docker-rbweb', 'centos6'),
-        }, existing=images, verbose=verbose)
+        }, existing=images, verbose=verbose, use_last=use_last)
 
         self.state['last-autolanddb-id'] = images['autolanddb']
         self.state['last-autoland-id'] = images['autoland']
@@ -918,7 +934,7 @@ class Docker(object):
         except KeyError:
             pass
 
-    def build_all_images(self, verbose=False):
+    def build_all_images(self, verbose=False, use_last=False):
         images = self.ensure_images_built([
             'autolanddb',
             'autoland',
@@ -931,12 +947,13 @@ class Docker(object):
             'hgweb': ('docker-hgweb', 'centos6'),
             'hgrb': ('docker-hgrb', 'centos6'),
             'rbweb': ('docker-rbweb', 'centos6'),
-        }, verbose=verbose)
+        }, verbose=verbose, use_last=use_last)
 
         with futures.ThreadPoolExecutor(2) as e:
             f_mr = e.submit(self.build_mozreview, images=images,
-                            verbose=verbose)
-            f_hgmo = e.submit(self.build_hgmo, images=images, verbose=verbose)
+                            verbose=verbose, use_last=use_last)
+            f_hgmo = e.submit(self.build_hgmo, images=images, verbose=verbose,
+                              use_last=use_last)
 
         self.prune_images()
 

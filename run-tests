@@ -50,12 +50,14 @@ if __name__ == '__main__':
         help='Do not run tests against the @ bookmark of hg')
     parser.add_argument('--no-unit', action='store_true',
         help='Do not run Python unit tests')
+    parser.add_argument('--use-last-images', action='store_true',
+        help='Skip building new images when possible')
 
     options, extra = parser.parse_known_args(sys.argv)
 
     # some arguments belong to us only. Don't pass it along to run-tests.py.
     hg_harness_args = [a for a in sys.argv
-            if a not in {'--all-versions', '--no-hg-tip'}]
+            if a not in {'--all-versions', '--no-hg-tip', '--use-last-images'}]
     hg_harness_args[0] = RUNTESTS
 
     coveragerc = os.path.join(HERE, '.coveragerc')
@@ -151,7 +153,7 @@ if __name__ == '__main__':
         #
         # But only do this if a test we are running utilizes Docker.
         os.environ.update(get_docker_state(docker, run_all_tests,
-                          verbose=verbose))
+                          verbose=verbose, use_last=options.use_last_images))
 
     # Our custom HGHAVE introduces a check for running Mercurial version.
     # This is done by consulting a HGVERSION environment variable.
