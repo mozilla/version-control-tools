@@ -12,6 +12,13 @@ class CommitPublishProhibited(PublishError):
                               'prohibited, please publish parent.')
 
 
+class ParentShipItError(PublishError):
+    def __init__(self):
+        PublishError.__init__(self, '"Ship it" reviews on parent review '
+                              'requests are not allowed.  Please review '
+                              'individual commits.')
+
+
 NOT_PUSHED_PARENT_REVIEW_REQUEST = WebAPIError(
     800,
     'This operation must be performed on the parent of a pushed review '

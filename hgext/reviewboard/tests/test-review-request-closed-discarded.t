@@ -51,14 +51,24 @@
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/1/ (glob)
-      description: 'MozReview Request: bz://1/mynick'
-      file_name: reviewboard-1-url.txt
+      data: http://*:$HGPORT1/r/2/ (glob)
+      description: 'MozReview Request: Bug 1 - Foo 1'
+      file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: bz://1/mynick'
+      summary: 'MozReview Request: Bug 1 - Foo 1'
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://*:$HGPORT1/r/3/ (glob)
+      description: 'MozReview Request: Bug 1 - Foo 2'
+      file_name: reviewboard-3-url.txt
+      flags: []
+      id: 2
+      is_obsolete: false
+      is_patch: false
+      summary: 'MozReview Request: Bug 1 - Foo 2'
     blocks: []
     cc: []
     comments:
@@ -71,18 +81,19 @@
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick
+        MozReview Request: Bug 1 - Foo 1
   
   
-        /r/2 - Bug 1 - Foo 1
+        Bug 1 - Foo 1'
+    - author: default@example.com
+      id: 3
+      tags: []
+      text: 'Created attachment 2
   
-        /r/3 - Bug 1 - Foo 2
+        MozReview Request: Bug 1 - Foo 2
   
   
-        Pull down these commits:
-  
-  
-        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo' (glob)
+        Bug 1 - Foo 2'
     component: TestComponent
     depends_on: []
     platform: All
@@ -170,14 +181,24 @@ The review attachment should be marked as obsolete
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/1/ (glob)
-      description: 'MozReview Request: bz://1/mynick'
-      file_name: reviewboard-1-url.txt
+      data: http://*:$HGPORT1/r/2/ (glob)
+      description: 'MozReview Request: Bug 1 - Foo 1'
+      file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: true
       is_patch: false
-      summary: 'MozReview Request: bz://1/mynick'
+      summary: 'MozReview Request: Bug 1 - Foo 1'
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://*:$HGPORT1/r/3/ (glob)
+      description: 'MozReview Request: Bug 1 - Foo 2'
+      file_name: reviewboard-3-url.txt
+      flags: []
+      id: 2
+      is_obsolete: true
+      is_patch: false
+      summary: 'MozReview Request: Bug 1 - Foo 2'
     blocks: []
     cc: []
     comments:
@@ -190,18 +211,19 @@ The review attachment should be marked as obsolete
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick
+        MozReview Request: Bug 1 - Foo 1
   
   
-        /r/2 - Bug 1 - Foo 1
+        Bug 1 - Foo 1'
+    - author: default@example.com
+      id: 3
+      tags: []
+      text: 'Created attachment 2
   
-        /r/3 - Bug 1 - Foo 2
+        MozReview Request: Bug 1 - Foo 2
   
   
-        Pull down these commits:
-  
-  
-        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo' (glob)
+        Bug 1 - Foo 2'
     component: TestComponent
     depends_on: []
     platform: All
@@ -337,14 +359,24 @@ There should still not be a visible attachment on the bug
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/1/ (glob)
-      description: 'MozReview Request: bz://1/mynick'
-      file_name: reviewboard-1-url.txt
+      data: http://*:$HGPORT1/r/2/ (glob)
+      description: 'MozReview Request: Bug 1 - Foo 1'
+      file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: true
       is_patch: false
-      summary: 'MozReview Request: bz://1/mynick'
+      summary: 'MozReview Request: Bug 1 - Foo 1'
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://*:$HGPORT1/r/3/ (glob)
+      description: 'MozReview Request: Bug 1 - Foo 2'
+      file_name: reviewboard-3-url.txt
+      flags: []
+      id: 2
+      is_obsolete: true
+      is_patch: false
+      summary: 'MozReview Request: Bug 1 - Foo 2'
     blocks: []
     cc: []
     comments:
@@ -357,18 +389,19 @@ There should still not be a visible attachment on the bug
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick
+        MozReview Request: Bug 1 - Foo 1
   
   
-        /r/2 - Bug 1 - Foo 1
+        Bug 1 - Foo 1'
+    - author: default@example.com
+      id: 3
+      tags: []
+      text: 'Created attachment 2
   
-        /r/3 - Bug 1 - Foo 2
+        MozReview Request: Bug 1 - Foo 2
   
   
-        Pull down these commits:
-  
-  
-        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo' (glob)
+        Bug 1 - Foo 2'
     component: TestComponent
     depends_on: []
     platform: All
@@ -455,14 +488,24 @@ The attachment for the review request should be unobsoleted
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/1/ (glob)
-      description: 'MozReview Request: bz://1/mynick'
-      file_name: reviewboard-1-url.txt
+      data: http://*:$HGPORT1/r/2/ (glob)
+      description: 'MozReview Request: Bug 1 - Foo 1'
+      file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: bz://1/mynick'
+      summary: 'MozReview Request: Bug 1 - Foo 1'
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://*:$HGPORT1/r/3/ (glob)
+      description: 'MozReview Request: Bug 1 - Foo 2'
+      file_name: reviewboard-3-url.txt
+      flags: []
+      id: 2
+      is_obsolete: false
+      is_patch: false
+      summary: 'MozReview Request: Bug 1 - Foo 2'
     blocks: []
     cc: []
     comments:
@@ -475,35 +518,37 @@ The attachment for the review request should be unobsoleted
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick
+        MozReview Request: Bug 1 - Foo 1
   
   
-        /r/2 - Bug 1 - Foo 1
-  
-        /r/3 - Bug 1 - Foo 2
-  
-  
-        Pull down these commits:
-  
-  
-        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo' (glob)
+        Bug 1 - Foo 1'
     - author: default@example.com
       id: 3
       tags: []
+      text: 'Created attachment 2
+  
+        MozReview Request: Bug 1 - Foo 2
+  
+  
+        Bug 1 - Foo 2'
+    - author: default@example.com
+      id: 4
+      tags: []
       text: 'Comment on attachment 1
   
-        MozReview Request: bz://1/mynick
+        MozReview Request: Bug 1 - Foo 1
   
   
-        /r/2 - Bug 1 - Foo 1
+        Bug 1 - Foo 1'
+    - author: default@example.com
+      id: 5
+      tags: []
+      text: 'Comment on attachment 2
   
-        /r/3 - Bug 1 - Foo 2
+        MozReview Request: Bug 1 - Foo 2
   
   
-        Pull down these commits:
-  
-  
-        hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo' (glob)
+        Bug 1 - Foo 2'
     component: TestComponent
     depends_on: []
     platform: All

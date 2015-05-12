@@ -24,7 +24,8 @@ from reviewboard.reviews.signals import (reply_publishing,
                                          review_request_reopened)
 from reviewboard.site.urlresolvers import local_site_reverse
 
-from mozreview.errors import CommitPublishProhibited
+from mozreview.errors import (CommitPublishProhibited,
+                              ParentShipItError)
 from mozreview.extra_data import (UNPUBLISHED_RRIDS_KEY,
                                   gen_child_rrs,
                                   gen_rrs_by_rids,
@@ -194,6 +195,58 @@ def bugzilla_to_publish_errors(func):
     return _transform_errors
 
 
+def post_bugzilla_attachment(bugzilla, bug_id, review_request_draft,
+                             review_request):
+    # We publish attachments for each commit/child to Bugzilla so that
+    # reviewers can easily track their requests.
+
+    # The review request exposes a list of usernames for reviewers. We need
+    # to convert these to Bugzilla emails in order to make the request into
+    # Bugzilla.
+    #
+    # It may seem like there is a data syncing problem here where usernames
+    # may get out of sync with the reality from Bugzilla. Fortunately,
+    # Review Board is smarter than that. Internally, the target_people list
+    # is stored with foreign keys into the numeric primary key of the user
+    # table. If the RB username changes, this won't impact target_people
+    # nor the stored mapping to the numeric Bugzilla ID, which is
+    # immutable.
+    #
+    # But we do have a potential data syncing problem with the stored email
+    # address. Review Board's stored email address could be stale. So
+    # instead of using it directly, we query Bugzilla and map the stored,
+    # immutable numeric Bugzilla userid into an email address. This lookup
+    # could be avoided if Bugzilla accepted a numeric userid in the
+    # requestee parameter when modifying an attachment.
+    reviewers = set()
+
+    for u in review_request_draft.target_people.all():
+        bum = BugzillaUserMap.objects.get(user=u)
+
+        user_data = bugzilla.get_user_from_userid(bum.bugzilla_user_id)
+
+        # Since we're making the API call, we might as well ensure the
+        # local database is up to date.
+        users = get_or_create_bugzilla_users(user_data)
+        reviewers.add(users[0].email)
+
+    comment = review_request_draft.description
+
+    if (review_request_draft.changedesc and
+        review_request_draft.changedesc.text):
+        if not comment.endswith('\n'):
+            comment += '\n'
+
+        comment += '\n%s' % review_request_draft.changedesc.text
+
+    bugzilla.post_rb_url(bug_id,
+                         review_request.id,
+                         review_request_draft.summary,
+                         comment,
+                         review_or_request_url(review_request),
+                         reviewers)
+
+
 @bugzilla_to_publish_errors
 def on_review_request_publishing(user, review_request_draft, **kwargs):
     # There have been strange cases (all local, and during development), where
@@ -224,7 +277,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
 
         for receiver, approved in approvals:
             if approved:
-                break;
+                break
         else:
             # This publish is not approved by the parent review request.
             raise CommitPublishProhibited()
@@ -262,68 +315,35 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
     # is valid and accessible.
     review_request_draft.bugs_closed = str(bug_id)
 
-    # The review request exposes a list of usernames for reviewers. We need
-    # to convert these to Bugzilla emails in order to make the request into
-    # Bugzilla.
-    #
-    # It may seem like there is a data syncing problem here where usernames may
-    # get out of sync with the reality from Bugzilla. Fortunately, Review Board
-    # is smarter than that. Internally, the target_people list is stored with
-    # foreign keys into the numeric primary key of the user table. If the
-    # RB username changes, this won't impact target_people nor the stored
-    # mapping to the numeric Bugzilla ID, which is immutable.
-    #
-    # But we do have a potential data syncing problem with the stored email
-    # address. Review Board's stored email address could be stale. So instead
-    # of using it directly, we query Bugzilla and map the stored, immutable
-    # numeric Bugzilla userid into an email address. This lookup could be
-    # avoided if Bugzilla accepted a numeric userid in the requestee parameter
-    # when modifying an attachment.
-    reviewers = set()
-
-    for u in review_request_draft.target_people.all():
-        if not using_bugzilla:
-            reviewers.append(u.get_username())
-
-        bum = BugzillaUserMap.objects.get(user=u)
-
-        user_data = b.get_user_from_userid(bum.bugzilla_user_id)
-
-        # Since we're making the API call, we might as well ensure the local
-        # database is up to date.
-        users = get_or_create_bugzilla_users(user_data)
-        reviewers.add(users[0].email)
-
-    # Don't make attachments for child review requests, otherwise,
-    # Bugzilla gets inundatated with lots of patches, and the squashed
-    # one is the only one we want to post there.
+    # If this is a squashed/parent review request, automatically publish all
+    # relevant children.
     if is_review_request_squashed(review_request):
-        comment = review_request_draft.description
-
-        if (review_request_draft.changedesc and
-            review_request_draft.changedesc.text):
-            if not comment.endswith('\n'):
-                comment += '\n'
-
-            comment += '\n%s' % review_request_draft.changedesc.text
-
-        if using_bugzilla:
-            b.post_rb_url(bug_id,
-                          review_request.id,
-                          review_request_draft.summary,
-                          comment,
-                          review_or_request_url(review_request),
-                          reviewers)
-
         unpublished_rids = map(int, json.loads(
             review_request.extra_data['p2rb.unpublished_rids']))
         discard_on_publish_rids = map(int, json.loads(
             review_request.extra_data['p2rb.discard_on_publish_rids']))
+        child_rrs = list(gen_child_rrs(review_request_draft))
 
-        # Publish any draft commits that have drafts. This will already include
-        # items that are in unpublished_rids, so we'll remove anything we publish
-        # out of unpublished_rids.
-        for child in gen_child_rrs(review_request_draft):
+        # Create or update Bugzilla attachments for each draft commit.  This
+        # is done before the children are published to ensure that MozReview
+        # doesn't get into a strange state if communication with Bugzilla is
+        # broken or attachment creation otherwise fails.  The Bugzilla
+        # attachments will then, of course, be in a weird state, but that
+        # should be fixed by the next successful publish.
+        if using_bugzilla:
+            for child in child_rrs:
+                child_draft = child.get_draft(user=user)
+
+                if child_draft:
+                    if child.id in discard_on_publish_rids:
+                        b.obsolete_review_attachments(
+                            bug_id, review_or_request_url(child))
+                    post_bugzilla_attachment(b, bug_id, child_draft, child)
+
+        # Publish draft commits. This will already include items that are in
+        # unpublished_rids, so we'll remove anything we publish out of
+        # unpublished_rids.
+        for child in child_rrs:
             if child.get_draft(user=user) or not child.public:
                 def approve_publish(sender, user, review_request_draft,
                                     **kwargs):
@@ -376,13 +396,19 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
 
 @bugzilla_to_publish_errors
 def on_review_publishing(user, review, **kwargs):
+    """Comment in the bug and potentially r+ or clear a review flag.
+
+    Note that a reviewer *must* have editbugs to set an attachment flag on
+    someone else's attachment (i.e. the standard BMO review process).
+
+    TODO: Report lack-of-editbugs properly; see bug 1119065.
+    """
     review_request = review.review_request
 
     # skip review requests that were not pushed
     if not is_review_request_pushed(review_request):
         return
 
-    bug_id = int(review_request.get_bug_list()[0])
     site = Site.objects.get_current()
     siteconfig = SiteConfiguration.objects.get_current()
     comment = build_plaintext_review(review,
@@ -391,15 +417,31 @@ def on_review_publishing(user, review, **kwargs):
                                      {"user": user})
     b = Bugzilla(user.bzlogin, user.bzcookie)
 
-    rr_url = review_or_request_url(review_request, site, siteconfig)
+    # TODO: Update all attachments in one call.  This is not possible right
+    # now because we have to potentially mix changing and creating flags.
 
-    if review.ship_it and is_review_request_squashed(review_request):
-        b.r_plus_attachment(bug_id, review.user.email, comment, rr_url)
+    if is_review_request_squashed(review_request):
+        # Mirror the comment to the bug, unless it's a ship-it, in which
+        # case throw an error.  Ship-its are allowed only on child commits.
+        if review.ship_it:
+            raise ParentShipItError
+
+        [b.post_comment(int(bug_id), comment) for bug_id in
+         review_request.get_bug_list()]
     else:
-        cancelled = b.cancel_review_request(bug_id, review.user.email,
-            rr_url, comment)
-        if not cancelled and comment:
+        rr_url = review_or_request_url(review_request, site, siteconfig)
+        bug_id = int(review_request.get_bug_list()[0])
+
+        if review.ship_it:
+            commented = b.r_plus_attachment(bug_id, review.user.email, rr_url,
+                                            comment)
+        else:
+            commented = b.cancel_review_request(bug_id, review.user.email,
+                                                rr_url, comment)
+
+        if comment and not commented:
             b.post_comment(bug_id, comment)
+
 
 @bugzilla_to_publish_errors
 def on_reply_publishing(user, reply, **kwargs):
@@ -418,21 +460,25 @@ def on_reply_publishing(user, reply, **kwargs):
 
 
 def on_review_request_closed_discarded(user, review_request, type, **kwargs):
-    if (not is_review_request_squashed(review_request) or
-        type != ReviewRequest.DISCARDED):
+    if type != ReviewRequest.DISCARDED:
         return
 
-    # close_child_review_requests will call save on this review request, so
-    # we don't have to worry about it.
-    review_request.commit = None
+    if is_review_request_squashed(review_request):
+        # close_child_review_requests will call save on this review request, so
+        # we don't have to worry about it.
+        review_request.commit = None
 
-    close_child_review_requests(user, review_request, ReviewRequest.DISCARDED,
-                                  AUTO_CLOSE_DESCRIPTION)
+        close_child_review_requests(user, review_request,
+                                    ReviewRequest.DISCARDED,
+                                    AUTO_CLOSE_DESCRIPTION)
+    else:
+        # TODO: Remove this once we properly prevent users from closing
+        # commit review requests.
+        b = Bugzilla(user.bzlogin, user.bzcookie)
+        bug = int(review_request.get_bug_list()[0])
+        url = review_or_request_url(review_request)
+        b.obsolete_review_attachments(bug, url)
 
-    b = Bugzilla(user.bzlogin, user.bzcookie)
-    bug = int(review_request.get_bug_list()[0])
-    url = review_or_request_url(review_request)
-    b.obsolete_review_attachments(bug, url)
 
 def on_review_request_closed_submitted(user, review_request, type, **kwargs):
     if (not is_review_request_squashed(review_request) or

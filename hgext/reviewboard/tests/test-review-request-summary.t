@@ -142,7 +142,9 @@ Resolving an issue should decrement the issue count.
     status: pending
     reviewers: []
 
-Verify we can also get the summaries by bug.
+Verify we can also get the summaries by bug, including closed ones.
+
+  $ rbmanage closesubmitted 2
 
   $ rbmanage dump-summaries-by-bug 1
   - parent:
@@ -158,7 +160,7 @@ Verify we can also get the summaries by bug.
       commit: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
       submitter: default+5
       issue_open_count: 0
-      status: pending
+      status: submitted
       reviewers:
       - reviewer
     - summary: Bug 1 - Foo 2

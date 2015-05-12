@@ -56,6 +56,7 @@ class ReviewRequestSummaryResource(WebAPIResource):
                 q = q & Q(bugs_closed=request.GET.get('bug'))
 
         queryset = ReviewRequest.objects.public(
+            status=None,
             extra_query=q
         )
 
@@ -124,8 +125,12 @@ class ReviewRequestSummaryResource(WebAPIResource):
         # Verify that we aren't missing any review requests.  We want
         # complete families, even if some do not match the requested bug,
         # i.e., if some children are associated with different bugs.
+        # Because a few old review requests are currently in weird states,
+        # and since all review requests in a given family should currently
+        # have the same bug ID; we skip this part if we can't get COMMITS_KEY
+        # out of the parent's extra_data.
         for parent_id, family in families.iteritems():
-            if family['parent']:
+            if family['parent'] and COMMITS_KEY in family['parent'].extra_data:
                 commit_tuples = json.loads(
                     family['parent'].extra_data[COMMITS_KEY])
                 [missing_rrids.add(child_rrid) for sha, child_rrid in

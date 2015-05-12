@@ -23,7 +23,7 @@ Create a review
   $ hg commit -m 'Bug 1 - Initial commit to review'
   $ hg --config bugzilla.username=author@example.com push > /dev/null
 
-  $ rbmanage add-reviewer 1 --user reviewer
+  $ rbmanage add-reviewer 2 --user reviewer
   1 people listed on review request
   $ rbmanage publish 1
 
@@ -34,9 +34,9 @@ Sanity check to ensure we have a review flag set
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/1/ (glob)
-      description: 'MozReview Request: bz://1/mynick'
-      file_name: reviewboard-1-url.txt
+      data: http://*:$HGPORT1/r/2/ (glob)
+      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      file_name: reviewboard-2-url.txt
       flags:
       - id: 1
         name: review
@@ -46,7 +46,7 @@ Sanity check to ensure we have a review flag set
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: bz://1/mynick'
+      summary: 'MozReview Request: Bug 1 - Initial commit to review'
     blocks: []
     cc:
     - reviewer@example.com
@@ -60,16 +60,10 @@ Sanity check to ensure we have a review flag set
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick
+        MozReview Request: Bug 1 - Initial commit to review
   
   
-        /r/2 - Bug 1 - Initial commit to review
-  
-  
-        Pull down this commit:
-  
-  
-        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://*:$HGPORT/test-repo' (glob)
+        Bug 1 - Initial commit to review'
     component: TestComponent
     depends_on: []
     platform: All
@@ -81,7 +75,7 @@ Sanity check to ensure we have a review flag set
 Publishing a review will clear the r? flag
 
   $ exportbzauth reviewer@example.com password
-  $ rbmanage create-review 1 --body-top 'I have reservations' --public
+  $ rbmanage create-review 2 --body-top 'I have reservations' --public
   created review 1
 
   $ bugzilla dump-bug 1
@@ -89,14 +83,14 @@ Publishing a review will clear the r? flag
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/1/ (glob)
-      description: 'MozReview Request: bz://1/mynick'
-      file_name: reviewboard-1-url.txt
+      data: http://*:$HGPORT1/r/2/ (glob)
+      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: bz://1/mynick'
+      summary: 'MozReview Request: Bug 1 - Initial commit to review'
     blocks: []
     cc:
     - reviewer@example.com
@@ -110,25 +104,19 @@ Publishing a review will clear the r? flag
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick
+        MozReview Request: Bug 1 - Initial commit to review
   
   
-        /r/2 - Bug 1 - Initial commit to review
-  
-  
-        Pull down this commit:
-  
-  
-        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://*:$HGPORT/test-repo' (glob)
+        Bug 1 - Initial commit to review'
     - author: reviewer@example.com
       id: 3
       tags: []
       text: 'Comment on attachment 1
   
-        MozReview Request: bz://1/mynick
+        MozReview Request: Bug 1 - Initial commit to review
   
   
-        http://*:$HGPORT1/r/1/#review1 (glob)
+        http://*:$HGPORT1/r/2/#review1 (glob)
   
   
         I have reservations'
@@ -142,7 +130,7 @@ Publishing a review will clear the r? flag
 
 Posting a non Ship It review without a review flag adds a comment
 
-  $ rbmanage create-review 1 --body-top 'One more thing...' --public
+  $ rbmanage create-review 2 --body-top 'One more thing...' --public
   created review 2
 
   $ bugzilla dump-bug 1
@@ -150,14 +138,14 @@ Posting a non Ship It review without a review flag adds a comment
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/1/ (glob)
-      description: 'MozReview Request: bz://1/mynick'
-      file_name: reviewboard-1-url.txt
+      data: http://*:$HGPORT1/r/2/ (glob)
+      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: bz://1/mynick'
+      summary: 'MozReview Request: Bug 1 - Initial commit to review'
     blocks: []
     cc:
     - reviewer@example.com
@@ -171,32 +159,26 @@ Posting a non Ship It review without a review flag adds a comment
       tags: []
       text: 'Created attachment 1
   
-        MozReview Request: bz://1/mynick
+        MozReview Request: Bug 1 - Initial commit to review
   
   
-        /r/2 - Bug 1 - Initial commit to review
-  
-  
-        Pull down this commit:
-  
-  
-        hg pull -r 9bc52583656f082a8ff0c5a8994322ba65688ca5 http://*:$HGPORT/test-repo' (glob)
+        Bug 1 - Initial commit to review'
     - author: reviewer@example.com
       id: 3
       tags: []
       text: 'Comment on attachment 1
   
-        MozReview Request: bz://1/mynick
+        MozReview Request: Bug 1 - Initial commit to review
   
   
-        http://*:$HGPORT1/r/1/#review1 (glob)
+        http://*:$HGPORT1/r/2/#review1 (glob)
   
   
         I have reservations'
     - author: reviewer@example.com
       id: 4
       tags: []
-      text: 'http://*:$HGPORT1/r/1/#review2 (glob)
+      text: 'http://*:$HGPORT1/r/2/#review2 (glob)
   
   
         One more thing...'
