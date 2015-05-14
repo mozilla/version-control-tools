@@ -29,5 +29,12 @@
 - name: populate virtualenv
   pip: virtualenv={{ src }}/{{ site }}/venv requirements={{ src }}/{{ site }}/requirements.txt executable={{ src }}/{{ site }}/venv/bin/peep
 
+- name: install djblets package
+  command: "{{ src }}/{{ site }}/venv/bin/easy_install Djblets=={{ djblets_version }}"
+
 - name: install Review Board package
-  command: "{{ src }}/{{ site }}/venv/bin/easy_install ReviewBoard==2.0.15"
+  command: "{{ src }}/{{ site }}/venv/bin/easy_install ReviewBoard=={{ rb_version }}"
+
+# TODO hook up rb-site install/upgrade.
+# Be sure to use --copy-media because symlinks aren't portable with our
+# rsync setup.
