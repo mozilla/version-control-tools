@@ -12,6 +12,16 @@ import yaml
 
 from rbbz.transports import bugzilla_transport
 
+
+def create_xmlrpc_proxy(url, username, password):
+    """Obtain an XMLRPC proxy to the Bugzilla service."""
+    transport = bugzilla_transport(url)
+    proxy = xmlrpclib.ServerProxy(url, transport)
+    proxy.User.login({'login': username, 'password': password})
+
+    return transport, proxy
+
+
 class Bugzilla(object):
     """High-level API to common Bugzilla tasks."""
 
@@ -22,12 +32,12 @@ class Bugzilla(object):
         self.username = username
         self.password = password
 
-        xmlrpc_url = base_url + '/xmlrpc.cgi'
+        self.xmlrpc_url = base_url + '/xmlrpc.cgi'
         rest_url = base_url + '/rest'
 
-        transport = bugzilla_transport(xmlrpc_url)
-        proxy = xmlrpclib.ServerProxy(xmlrpc_url, transport)
-        proxy.User.login({'login': username, 'password': password})
+        transport, proxy = create_xmlrpc_proxy(self.xmlrpc_url, username,
+                                               password)
+        self.proxy = proxy
 
         userid, cookie = transport.bugzilla_cookies()
         assert userid
@@ -36,7 +46,6 @@ class Bugzilla(object):
         client = bugsy.Bugsy(username=username, userid=userid, cookie=cookie,
                              bugzilla_url=rest_url)
 
-        self.proxy = proxy
         self.client = client
 
     def create_bug(self, product, component, summary):
@@ -68,12 +77,22 @@ class Bugzilla(object):
             'user_regexp': '.*',
         })
 
-    def create_user(self, email, password, name):
-        return self.proxy.User.create({
+    def create_user(self, email, password, name, touch=True):
+        u = self.proxy.User.create({
             'email': email,
             'password': password,
             'full_name': name,
         })
+
+        # Bugzilla imposes restrictions on users that haven't been active
+        # in a while (bug 751862). It doesn't count user creation towards
+        # the time period. So, we log in users when they are created to mark
+        # them as active.
+        if touch:
+            # Creating the proxy logs in the user.
+            create_xmlrpc_proxy(self.xmlrpc_url, email, password)
+
+        return u
 
     def add_user_to_group(self, email, group):
         return self.proxy.User.update({
