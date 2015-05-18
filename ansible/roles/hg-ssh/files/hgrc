@@ -26,7 +26,6 @@ changegroup.recordlogs = /repo/hg/scripts/record-pushes.sh
 changegroup.mirrorpush = /repo/hg/scripts/push-repo.sh
 pushkey.mirrorpush = /repo/hg/scripts/push-repo.sh
 #pretxnchangegroup.renamecase = python:mozhghooks.prevent_case_only_renames.hook
-#changegroup.zz_mirrorpush = python:mozhghooks.signal-mirrors.hook
 
 [extensions]
 blackbox =
@@ -35,8 +34,6 @@ pushlog-feed = /repo/hg/extensions/pushlog-feed.py
 pushlog = /repo/hg/extensions/pushlog
 buglink = /repo/hg/extensions/buglink.py
 serverlog = /repo/hg/extensions/serverlog
-#highlight =
-#interhg =
 
 [blackbox]
 track = *
