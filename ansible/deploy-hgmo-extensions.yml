@@ -8,7 +8,7 @@
            channel="#vcs"
            nick=hg-deploy-bot
            color=red
-           msg="Starting deploy of hooks and extensions to hg.mozilla.org"
+           msg="Starting deploy of hooks and extensions to hg.mozilla.org from rev {{ lookup('file', '../.vctnode') }}"
       delegate_to: 127.0.0.1
       run_once: true
 
