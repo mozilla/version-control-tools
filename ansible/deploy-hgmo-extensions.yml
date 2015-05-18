@@ -1,7 +1,5 @@
 ---
-- hosts:
-    - hgssh1.dmz.scl3.mozilla.com
-    - hgweb-prod
+- hosts: hgssh1.dmz.scl3.mozilla.com
   tasks:
     - name: notify IRC of deployment
       irc: server=irc.mozilla.org
@@ -14,7 +12,18 @@
       delegate_to: 127.0.0.1
       run_once: true
 
+- hosts:
+  - hgssh1.dmz.scl3.mozilla.com
+  - hgweb-prod
+
+  tasks:
     - include: tasks/hgmo-extensions.yml
+
+- hosts: hgssh1.dmz.scl3.mozilla.com
+  tasks:
+    # TODO we should integrate the hg-ssh role.
+    - name: install global hgrc
+      copy: src=roles/hg-ssh/files/hgrc dest=/etc/mercurial/hgrc mode=0644 owner=root group=root
 
     - name: notify IRC of deployment
       irc: server=irc.mozilla.org
