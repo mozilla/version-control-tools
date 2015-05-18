@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Copyright (C) 2014 Mozilla Foundation
 #
 # This program is free software; you can redistribute it and/or

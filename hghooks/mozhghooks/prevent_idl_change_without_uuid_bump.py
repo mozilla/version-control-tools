@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Copyright (C) 2015 Mozilla Foundation
 #
 # This software may be used and distributed according to the terms of the
