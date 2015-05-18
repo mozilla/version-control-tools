@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script scans repository paths (specified via stdin) and prints
+# stats on pushes to those repos by consulting the pushlog database.
+
+import datetime
+import os
+import sqlite3
+import sys
+
+repos_by_day = {}
+totals_by_day = {}
+
+
+for path in sys.stdin:
+    path = path.strip()
+    dbpath = os.path.join(path, '.hg', 'pushlog2.db')
+    if not os.path.exists(dbpath):
+        continue
+
+    db = sqlite3.connect(dbpath)
+    try:
+        res = db.execute('SELECT date from pushlog ORDER BY date ASC')
+        for t in res:
+            date = datetime.date.fromtimestamp(t[0])
+
+            repos_by_day.setdefault(path, {}).setdefault(date, 0)
+            repos_by_day[path][date] += 1
+            totals_by_day.setdefault(date, 0)
+            totals_by_day[date] += 1
+    finally:
+        db.close()
+
+for date, count in sorted(totals_by_day.items()):
+    print('%s\t%d' % (date, count))
