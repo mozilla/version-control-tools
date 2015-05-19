@@ -29,6 +29,7 @@ pushkey.mirrorpush = /repo/hg/scripts/push-repo.sh
 
 [extensions]
 blackbox =
+bundleclone = /repo/hg/extensions/bundleclone
 hgwebjson = /repo/hg/extensions/hgwebjson.py
 pushlog-feed = /repo/hg/extensions/pushlog-feed.py
 pushlog = /repo/hg/extensions/pushlog
