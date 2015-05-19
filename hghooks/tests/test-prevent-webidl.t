@@ -82,7 +82,7 @@ Editing a .webidl file without /DOM/ peer review should fail
 
 Editing a .webidl file by DOM peers without review should pass
 
-  $ hg -q commit --amend -u 'Johnny Stenback <jst@mozilla.com>' -m 'Bug 123 - Add Bar'
+  $ hg -q commit --amend -u 'Johnny Stenback <JST@mozilla.com>' -m 'Bug 123 - Add Bar'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -123,7 +123,7 @@ WebIDL change after release uplift fails
   
   ************************** ERROR ****************************
   
-  WebIDL file original.webidl altered in changeset b2b314a9c9d9 without DOM peer review
+  WebIDL file original.webidl altered in changeset 151d6e119242 without DOM peer review
   
   
   Changes to WebIDL files in this repo require review from a DOM peer in the form of r=...

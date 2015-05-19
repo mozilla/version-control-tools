@@ -92,7 +92,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
             # Only Check WebIDL Files
             if file.endswith('.webidl'):
                 message = c.description().lower()
-                email = util.email(c.user())
+                email = util.email(c.user()).lower()
                 def search():
                   matches = re.findall('\Ws?r\s*=\s*(\w+(?:,\w+)*)', message)
                   for match in matches:
