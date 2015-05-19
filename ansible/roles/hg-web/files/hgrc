@@ -23,6 +23,7 @@ git = 1
 unified = 8
 
 [extensions]
+bundleclone = /repo_local/mozilla/extensions/bundleclone
 hgwebjson = /repo_local/mozilla/extensions/hgwebjson.py
 pushlog-feed = /repo_local/mozilla/extensions/pushlog-feed.py
 pushlog = /repo_local/mozilla/extensions/pushlog
