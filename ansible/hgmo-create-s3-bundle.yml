@@ -1,0 +1,30 @@
+---
+- hosts: hgweb10.dmz.scl3.mozilla.com
+  vars_prompt:
+    - name: repo
+      prompt: "Repository to generate bundle for?"
+      private: no
+
+  tasks:
+    - name: Discover heads
+      command: hg -R /repo/hg/mozilla/{{ repo }} heads -t -T '{node|short}\n'
+      register: heads
+
+    - name: Produce bundle file
+      command: hg -R /repo/hg/mozilla/{{ repo }} bundle -a -t gzip /repo/hg/mozilla/{{ repo }}/.hg/bundle.{{ heads.stdout_lines | join("_") }}.hg creates=/repo/hg/mozilla/{{ repo }}/.hg/bundle.{{ heads.stdout_lines | join("_") }}.hg
+
+    - name: Upload bundle to S3
+      s3: mode=put
+          src=/repo/hg/mozilla/{{ repo }}/.hg/bundle.{{ heads.stdout_lines | join("_") }}.hg
+          bucket=moz-hg-bundle
+          object={{ repo }}/{{ heads.stdout_lines | join("_") }}.hg
+          region=us-west-2
+
+    - name: write bundle manifest file
+      copy: dest=/repo/hg/mozilla/{{ repo }}/.hg/bundleclone.manifest
+            owner=hg
+            group=hg
+            content=https://s3-us-west-2.amazonaws.com/moz-hg-bundle/{{ repo }}/{{ heads.stdout_lines | join("_") }}.hg
+
+    - name: delete local bundle file
+      file: path=/repo/hg/mozilla/{{ repo }}/.hg/bundle.{{ heads.stdout_lines | join("_") }}.hg state=absent
