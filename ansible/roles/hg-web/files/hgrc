@@ -36,3 +36,6 @@ bugzilla = s|((?:bug[\s#]*|b=#?|#)(\d{4,}))|<a href="https://bugzilla.mozilla.or
 
 #[serverlog]
 #reporoot = /repo_local/mozilla/
+
+[bundleclone]
+pullmanifest=True
