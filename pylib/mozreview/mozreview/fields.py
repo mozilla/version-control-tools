@@ -132,7 +132,7 @@ class TryField(BaseReviewRequestField):
     def render_change_entry_html(self, info):
         try:
             autoland_id = int(info['new'][0])
-        except ValueError:
+        except (ValueError, TypeError):
             # Something unexpected was recorded as the autoland id in the
             # changedescription. This either means we have a serious bug or
             # someone was attempting to change the field themselves (possibly
