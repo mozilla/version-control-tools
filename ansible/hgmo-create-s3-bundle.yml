@@ -28,7 +28,7 @@
       copy: dest=/repo/hg/mozilla/{{ repo }}/.hg/bundleclone.manifest
             owner=hg
             group=hg
-            content=https://s3-us-west-2.amazonaws.com/moz-hg-bundle/{{ repo }}/{{ hostvars['hgweb10.dmz.scl3.mozilla.com']['heads']['stdout_lines'] | join("_") }}.hg
+            content=https://s3-us-west-2.amazonaws.com/moz-hg-bundle/{{ repo }}/{{ heads.stdout_lines | join("_") }}.hg
 
     # We don't need the bundle file after uploading it to S3.
     - name: delete local bundle file
@@ -38,5 +38,5 @@
   tasks:
     # Force an `hg pull` so the updated manifest syncs to the web heads.
     - name: sync bundle manifest file
-      shell: /usr/bin/sudo -u hg /usr/local/bin/mirror-pull mozilla-central
+      shell: /usr/bin/sudo -u hg /usr/local/bin/mirror-pull {{ repo }}
 
