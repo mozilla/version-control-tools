@@ -1,3 +1,5 @@
+  $ . $TESTDIR/hgext/bundleclone/tests/helpers.sh
+
   $ cat >> $HGRCPATH << EOF
   > [extensions]
   > bundleclone = $TESTDIR/hgext/bundleclone
@@ -77,8 +79,7 @@ Server is not running
 
 Server returns 404
 
-  $ python $TESTDIR/hgext/bundleclone/tests/httpserver.py $HGPORT1 2> server.log &
-  $ while [ ! -f listening ]; do sleep 0; done
+  $ starthttpserver $HGPORT1
   $ hg clone http://localhost:$HGPORT server-404
   downloading bundle http://localhost:$HGPORT1/bundle.hg
   HTTP error fetching bundle; using normal clone: HTTP Error 404: File not found
@@ -96,8 +97,7 @@ Bundle with partial content works
   1 changesets found
 
   $ echo "http://localhost:$HGPORT1/53245c60e682.hg" > server/.hg/bundleclone.manifest
-  $ python $TESTDIR/hgext/bundleclone/tests/httpserver.py $HGPORT1 2> server.log &
-  $ while [ ! -f listening ]; do sleep 0; done
+  $ starthttpserver $HGPORT1
   $ hg clone http://localhost:$HGPORT partial-bundle
   downloading bundle http://localhost:$HGPORT1/53245c60e682.hg
   adding changesets
@@ -119,8 +119,7 @@ Bundle with full content works
   2 changesets found
 
   $ echo "http://localhost:$HGPORT1/aaff8d2ffbbf.hg" > server/.hg/bundleclone.manifest
-  $ python $TESTDIR/hgext/bundleclone/tests/httpserver.py $HGPORT1 2> server.log &
-  $ while [ ! -f listening ]; do sleep 0; done
+  $ starthttpserver $HGPORT1
   $ hg clone http://localhost:$HGPORT full-bundle
   downloading bundle http://localhost:$HGPORT1/aaff8d2ffbbf.hg
   adding changesets
@@ -135,8 +134,7 @@ Bundle with full content works
 
 Clone will copy manifest from server
 
-  $ python $TESTDIR/hgext/bundleclone/tests/httpserver.py $HGPORT1 2> server.log &
-  $ while [ ! -f listening ]; do sleep 0; done
+  $ starthttpserver $HGPORT1
   $ hg --config bundleclone.pullmanifest=True clone http://localhost:$HGPORT clone-copy-manifest
   downloading bundle http://localhost:$HGPORT1/aaff8d2ffbbf.hg
   adding changesets
@@ -154,8 +152,7 @@ Clone will copy manifest from server
 
 Pull will copy manifest from server
 
-  $ python $TESTDIR/hgext/bundleclone/tests/httpserver.py $HGPORT1 2> server.log &
-  $ while [ ! -f listening ]; do sleep 0; done
+  $ starthttpserver $HGPORT1
   $ hg clone http://localhost:$HGPORT pull-copy-manifest
   downloading bundle http://localhost:$HGPORT1/aaff8d2ffbbf.hg
   adding changesets
