@@ -86,6 +86,8 @@ def handle_pending_transplants(logger, dbconn):
         transplant_id, tree, rev, destination, trysyntax = row
 
         if destination == 'try':
+            if not trysyntax.startswith("try: "):
+                trysyntax =  "try: %s" % trysyntax
             landed, result = transplant.transplant_to_try(tree, rev, trysyntax)
             if landed:
                 logger.info(('transplanted from tree: %s rev: %s'
