@@ -40,8 +40,15 @@ create table Transplant (\
     trysyntax text,\
     landed boolean,\
     result text,\
-    review_updated boolean,\
     pingback_url text,\
     primary key(id)\
 );
 grant all privileges on table Transplant to autoland;
+
+create table MozreviewUpdate (\
+    request_id bigint,\
+    pingback_url text,\
+    data text,\
+    primary key(request_id)\
+);
+grant all privileges on table MozreviewUpdate to autoland;

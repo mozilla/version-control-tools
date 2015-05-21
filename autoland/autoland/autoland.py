@@ -2,6 +2,7 @@
 import argparse
 import datetime
 import github
+import json
 import logging
 import mozreview
 import psycopg2
@@ -26,16 +27,18 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
     cursor = dbconn.cursor()
 
     query = """
-        select id,ghuser,repo,pullrequest,destination,bzuserid,bzcookie,bugid
+        select id,ghuser,repo,pullrequest,destination,bzuserid,bzcookie,bugid,
+               pingback_url
         from MozreviewPullRequest
         where landed is null
     """
     cursor.execute(query)
 
     landed_revisions = []
+    mozreview_updates = []
     for row in cursor.fetchall():
         (transplant_id, ghuser, repo, pullrequest, destination, bzuserid,
-         bzcookie, bugid) = row
+         bzcookie, bugid, pingback_url) = row
 
         landed, result = transplant.transplant_to_mozreview(destination,
                                                             ghuser, repo,
@@ -63,6 +66,21 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
 
         landed_revisions.append([landed, result, transplant_id])
 
+        # set up data to be posted back to mozreview
+        data = {
+            'request_id': transplant_id,
+            'landed': landed,
+            'error_msg': '',
+            'result': ''
+        }
+
+        if landed:
+            data['result'] = result
+        else:
+            data['error_msg'] = result
+
+        mozreview_updates.append([transplant_id, pingback_url, json.dumps(data)])
+
     if landed_revisions:
         query = """
             update MozreviewPullRequest set landed=%s,result=%s
@@ -71,19 +89,29 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
         cursor.executemany(query, landed_revisions)
         dbconn.commit()
 
+    if mozreview_updates:
+        query = """
+            insert into MozreviewUpdate(request_id,pingback_url,data)
+            values(%s,%s,%s)
+        """
+        cursor.executemany(query, mozreview_updates)
+        dbconn.commit()
+
 
 def handle_pending_transplants(logger, dbconn):
     cursor = dbconn.cursor()
 
     query = """
-        select id,tree,rev,destination,trysyntax from Transplant
+        select id,tree,rev,destination,trysyntax,pingback_url
+        from Transplant
         where landed is null
     """
     cursor.execute(query)
 
     landed_revisions = []
+    mozreview_updates = []
     for row in cursor.fetchall():
-        transplant_id, tree, rev, destination, trysyntax = row
+        transplant_id, tree, rev, destination, trysyntax, pingback_url = row
 
         if destination == 'try':
             if not trysyntax.startswith("try: "):
@@ -104,6 +132,26 @@ def handle_pending_transplants(logger, dbconn):
                 logger.info(('transplant failed: tree: %s rev: %s'
                              'destination: %s error: %s') %
                             (tree, rev, destination, result))
+
+            # set up data to be posted back to mozreview
+            data = {
+                'request_id': transplant_id,
+                'tree': tree,
+                'rev': rev,
+                'destination': destination,
+                'trysyntax': trysyntax,
+                'landed': landed,
+                'error_msg': '',
+                'result': ''
+            }
+
+            if landed:
+                data['result'] = result
+            else:
+                data['error_msg'] = result
+
+            mozreview_updates.append([transplant_id, pingback_url, json.dumps(data)])
+
         else:
             landed = False
             result = 'unknown destination: %s' % destination
@@ -116,6 +164,14 @@ def handle_pending_transplants(logger, dbconn):
             where id=%s
         """
         cursor.executemany(query, landed_revisions)
+        dbconn.commit()
+
+    if mozreview_updates:
+        query = """
+            insert into MozreviewUpdate(request_id,pingback_url,data)
+            values(%s,%s,%s)
+        """
+        cursor.executemany(query, mozreview_updates)
         dbconn.commit()
 
 
@@ -338,9 +394,8 @@ def handle_pending_mozreview_updates(logger, dbconn):
 
     cursor = dbconn.cursor()
     query = """
-        select id,tree,rev,destination,trysyntax,landed,result,pingback_url
-        from Transplant
-        where landed is not NULL and review_updated is NULL
+        select request_id,pingback_url,data
+        from MozreviewUpdate
         limit %(limit)s
     """
     cursor.execute(query, {'limit': MOZREVIEW_COMMENT_LIMIT})
@@ -349,37 +404,21 @@ def handle_pending_mozreview_updates(logger, dbconn):
 
     updated = []
     for row in cursor.fetchall():
-        landed = row[5]
-        pingback_url = row[7]
-        data = {
-            'request_id': row[0],
-            'tree': row[1],
-            'rev': row[2],
-            'destination': row[3],
-            'trysyntax': row[4],
-            'landed': landed,
-            'error_msg': '',
-            'result': ''
-        }
-
-        if landed:
-            data['result'] = row[6]
-        else:
-            data['error_msg'] = row[6]
-
+        request_id, pingback_url, data = row
         logger.info('trying to post mozreview update to: %s for request: %s' %
-                    (row[7], row[0]))
+                    (pingback_url, request_id))
 
-        status_code, text = mozreview.update_review(mozreview_auth, pingback_url, data)
-        if status_code == 200: 
-            updated.append([row[0]])
+        status_code, text = mozreview.update_review(mozreview_auth,
+                                                    pingback_url, data)
+        if status_code == 200:
+            updated.append([request_id])
         else:
             logger.info('failed: %s - %s' % (status_code, text))
 
     if updated:
         query = """
-            update Transplant set review_updated=TRUE
-            where id=%s
+            delete from MozreviewUpdate
+            where request_id=%s
         """
         cursor.executemany(query, updated)
         dbconn.commit()
