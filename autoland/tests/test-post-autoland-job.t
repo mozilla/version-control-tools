@@ -31,11 +31,11 @@ Posting a pullrequest job with bad credentials should fail
 Post a pullrequest job
 
   $ ottoland post-pullrequest-job $AUTOLAND_URL user repo 1 mozreview 1 cookie 1 http://localhost:9898
-  (200, u'{\n  "request_id": 1\n}')
+  (200, u'{\n  "request_id": 2\n}')
 
 Get pullrequest job status
 
-  $ ottoland pullrequest-job-status $AUTOLAND_URL 1
+  $ ottoland pullrequest-job-status $AUTOLAND_URL 2
   (200, u'{\n  "bugid": 1, \n  "destination": "mozreview", \n  "error_msg": null, \n  "landed": null, \n  "pullrequest": 1, \n  "repo": "repo", \n  "result": "", \n  "user": "user"\n}')
 
 Getting status for an unknown job should return a 404

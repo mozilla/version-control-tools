@@ -1,7 +1,10 @@
 alter user autoland with password 'autoland';
 
+create sequence request_sequence;
+grant usage, select on sequence request_sequence to autoland;
+
 create table MozreviewPullRequest (\
-    id bigserial,\
+    id bigint default nextval('request_sequence'),\
     ghuser varchar(255),\
     repo varchar(255),\
     pullrequest integer,\
@@ -15,8 +18,7 @@ create table MozreviewPullRequest (\
     pingback_url text,\
     primary key(id)\
 );
-grant all privileges on table PullRequest to autoland;
-grant usage, select on sequence mozreviewpullrequest_id_seq to autoland;
+grant all privileges on table MozreviewPullRequest to autoland;
 
 create table Testrun (\
     tree varchar(20),\
@@ -31,7 +33,7 @@ create table Testrun (\
 grant all privileges on table Testrun to autoland;
 
 create table Transplant (\
-    id bigserial,\
+    id bigint default nextval('request_sequence'),\
     tree varchar(20),\
     rev varchar(40),\
     destination varchar(20),\
@@ -43,4 +45,3 @@ create table Transplant (\
     primary key(id)\
 );
 grant all privileges on table Transplant to autoland;
-grant usage, select on sequence transplant_id_seq to autoland;
