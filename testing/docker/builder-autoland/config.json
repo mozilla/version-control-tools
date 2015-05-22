@@ -1,4 +1,5 @@
 {
+  "testing": true,
   "bugzilla": {
     "user": "",
     "passwd": ""
@@ -29,6 +30,7 @@
   },
   "database": "dbname=autoland user=postgres host=db",
   "repos" : {
-    "mozilla-central": "/repos/mozilla-central"
+    "mozilla-central": "/repos/mozilla-central",
+    "mozreview": "/repos/mozilla-central"
   }
 }
