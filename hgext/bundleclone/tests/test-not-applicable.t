@@ -26,3 +26,8 @@ Clone with bundle support but requested heads will not use bundles
 
   $ hg --debug --config extensions.bundleclone=$TESTDIR/hgext/bundleclone clone -r 53245c60e68 http://localhost:$HGPORT1 client2 | grep 'cannot perform bundle clone if heads requested'
   cannot perform bundle clone if heads requested
+
+Clone in streaming mode skips bundle clone mode
+
+  $ hg --debug --config extensions.bundleclone=$TESTDIR/hgext/bundleclone clone --uncompressed -U http://localhost:$HGPORT1 stream | grep 'ignoring bundle clone'
+  ignoring bundle clone because stream was requested

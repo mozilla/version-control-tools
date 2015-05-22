@@ -367,6 +367,10 @@ def reposetup(ui, repo):
             elif heads:
                 supported = False
                 self.ui.debug(_('cannot perform bundle clone if heads requested\n'))
+            elif stream:
+                supported = False
+                self.ui.debug(_('ignoring bundle clone because stream was '
+                                'requested\n'))
 
             if not supported:
                 return super(bundleclonerepo, self).clone(remote, heads=heads,
