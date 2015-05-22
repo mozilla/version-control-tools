@@ -33,11 +33,12 @@ Each line in this file defines an available bundle. Lines have the format:
 
     <URL> [<key>=<value]
 
-That is, a URL followed by extra metadata describing it. This metadata is
-optional. No metadata is currently defined. It is reserved for future use to
-enable things such as clients choosing an appropriate bundle. For example,
-clients on slow connections may wish to choose a bz2 bundle whereas clients
-on fast connections may wish to choose an uncompressed bundle.
+That is, a URL followed by extra metadata describing it. Metadata keys and
+values should be URL encoded.
+
+This metadata is optional. No metadata is currently defined by this extension:
+it is completely up to server operators to define their own metadata. See below
+on use cases.
 
 The server operator is responsible for generating the bundle manifest file.
 
@@ -77,8 +78,45 @@ From there, make the bundle file available where the client can access it and
 place that URL in the ``.hg/bundleclone.manifest`` file. e.g.:
 
     https://example.com/bundles/d31fe614fa1e.hg
+
+Using Attributes to Prefer Bundles
+==================================
+
+Manifest may define attributes next to each entry. Attributes can be used by
+clients to *prefer* one bundle over another. For example, a client on a slow
+internet connection may wish to prefer bzip2 bundles because they are smaller.
+Or, a server operator may wish to hosts bundles in S3 in multiple EC2 regions
+and have clients fetch from the closest EC2 region. Assigning the compression
+format and/or EC2 region to an attribute could allow clients to fetch the best
+bundle for them.
+
+As described above, attributes simply need to be set in the bundle manifest
+file on the server.
+
+To use these attributes, clients will need to define the
+``bundleclone.prefers`` config option. This option is a list of ``key=value``
+pairs that define attribute names and their preferred values. e.g.::
+
+    [bundleclone]
+    prefers = ec2region=us-west-1 ec2region=us-east-1 compression=gzip
+
+The client sorts the server-provided manifest according to preferences defined
+in ``bundleclone.prefers``. The sorting method is very simple: an entry is
+preferred over another the earlier a match in the attributes list occurs.
+
+In the above example, the client will select the first available from the
+following:
+
+1. a gzip2 bundle in the us-west-1 region
+2. a gzip2 bundle in the us-east-1 region
+3. any available bundle in us-west-1
+4. any available bundle in us-east-1
+5. any available gzip bundle in any region
+6. any available bundle
+
 """
 
+import urllib
 import urllib2
 
 from mercurial import (
@@ -158,11 +196,71 @@ def reposetup(ui, repo):
                 return super(bundleclonerepo, self).clone(remote, heads=heads,
                         stream=stream)
 
-            # Eventually we'll support choosing the best options. Until then,
-            # use the first entry.
-            entry = result.splitlines()[0]
-            fields = entry.split()
-            url = fields[0]
+            entries = []
+
+            for line in result.splitlines():
+                fields = line.split()
+                url = fields[0]
+                attrs = {}
+                for rawattr in fields[1:]:
+                    key, value = rawattr.split('=', 1)
+                    attrs[urllib.unquote(key)] = urllib.unquote(value)
+
+                entries.append((url, attrs))
+
+            # The configuration is allowed to define lists of preferred
+            # attributes and values. If this is present, sort results according
+            # to that preference. Otherwise, use manifest order and select the
+            # first entry.
+            prefers = self.ui.configlist('bundleclone', 'prefers', default=[])
+            if prefers:
+                prefers = [p.split('=', 1) for p in prefers]
+
+                def compareentry(a, b):
+                    aattrs = a[1]
+                    battrs = b[1]
+
+                    # Itereate over local preferences.
+                    for pkey, pvalue in prefers:
+                        avalue = aattrs.get(pkey)
+                        bvalue = battrs.get(pkey)
+
+                        # Special case for b is missing attribute and a matches
+                        # exactly.
+                        if avalue is not None and bvalue is None and avalue == pvalue:
+                            return -1
+
+                        # Special case for a missing attribute and b matches
+                        # exactly.
+                        if bvalue is not None and avalue is None and bvalue == pvalue:
+                            return 1
+
+                        # We can't compare unless the attribute is defined on
+                        # both entries.
+                        if avalue is None or bvalue is None:
+                            continue
+
+                        # Same values should fall back to next attribute.
+                        if avalue == bvalue:
+                            continue
+
+                        # Exact matches come first.
+                        if avalue == pvalue:
+                            return -1
+                        if bvalue == pvalue:
+                            return 1
+
+                        # Fall back to next attribute.
+                        continue
+
+                    # Entries could not be sorted based on attributes. This
+                    # says they are equal, which will fall back to index order,
+                    # which is what we want.
+                    return 0
+
+                entries = sorted(entries, cmp=compareentry)
+
+            url = entries[0][0]
 
             if not url:
                 self.ui.note(_('invalid bundle manifest; using normal clone\n'))
