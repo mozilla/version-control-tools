@@ -171,3 +171,25 @@ Pull will copy manifest from server
   pulling bundleclone manifest
   $ cat clone-copy-manifest/.hg/bundleclone.manifest
   http://localhost:$HGPORT1/aaff8d2ffbbf.hg
+
+Stream bundles will work
+
+  $ hg -R server streambundle stream.hg
+  writing stream.hg
+  stream bundle file written successully.
+  include the following in its manifest entry:
+  stream=revlogv1
+
+  $ cat > server/.hg/bundleclone.manifest << EOF
+  > http://localhost:$HGPORT1/stream.hg stream=revlogv1
+  > EOF
+
+  $ starthttpserver $HGPORT1
+  $ hg clone -U http://localhost:$HGPORT stream-bundle
+  downloading bundle http://localhost:$HGPORT1/stream.hg
+  streaming all changes
+  4 files to transfer, 613 bytes of data
+  transferred 613 bytes in *.* seconds (*.* KB/sec) (glob)
+  finishing applying bundle; pulling
+  searching for changes
+  no changes found

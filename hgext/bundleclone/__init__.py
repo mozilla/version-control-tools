@@ -36,14 +36,35 @@ Each line in this file defines an available bundle. Lines have the format:
 That is, a URL followed by extra metadata describing it. Metadata keys and
 values should be URL encoded.
 
-This metadata is optional. No metadata is currently defined by this extension:
-it is completely up to server operators to define their own metadata. See below
-on use cases.
+This metadata is optional. It is up to server operators to populate this
+metadata. See below for use cases.
 
 The server operator is responsible for generating the bundle manifest file.
 
 While the bundle manifest can consist of multiple lines, the client will
-currently only consult the first line.
+currently only consult the first line unless attribute preferences are
+defined. See below.
+
+Using Stream Bundles
+--------------------
+
+Mercurial has an alternative clone mode accessed via
+``hg clone --uncompressed`` that effectively streams raw files across the wire.
+This is conceptually similar to streaming a tar file. Assuming the network is
+not limiting throughput, this clone mode is significantly faster because it
+consumes much less CPU (the client is effectively writing files from a buffer).
+The downside to this approach is total size of transferred data is slightly
+larger. But in environments with plentiful bandwidth and high throughput, this
+trade-off is often worth it.
+
+To produce stream bundles (which aren't technically Mercurial bundles), you'll
+need to run the following command:
+
+    $ hg streambundle <output file>
+
+Manifest entries for stream bundles *must* contain a ``stream`` attribute
+whose value contains a comma delimited list of requirements. This content will
+be printed by the ``streambundle`` command.
 
 Generating the Bundle Manifest
 ------------------------------
@@ -307,6 +328,25 @@ def pull(orig, repo, remote, *args, **kwargs):
 
     return res
 
+
+@command('streambundle', [], _('hg streambundle path'))
+def streambundle(ui, repo, path):
+    """Generate a stream bundle file for a repository."""
+
+    requires = set(repo.requirements) & repo.supportedformats
+    if requires - set(['revlogv1']):
+        raise util.Abort(_('cannot generate stream bundle for this repo '
+            'because of requirement: %s') % (' '.join(requires)))
+
+    ui.status(_('writing %s\n') % path)
+    with open(path, 'w') as fh:
+        for chunk in generatestreamclone(repo):
+            fh.write(chunk)
+
+    ui.write(_('stream bundle file written successully.\n'))
+    ui.write(_('include the following in its manifest entry:\n'))
+    ui.write('stream=%s\n' % ','.join(requires))
+
 def extsetup(ui):
     extensions.wrapfunction(exchange, 'pull', pull)
 
@@ -403,7 +443,7 @@ def reposetup(ui, repo):
 
                 entries = sorted(entries, cmp=compareentry)
 
-            url = entries[0][0]
+            url, attrs = entries[0]
 
             if not url:
                 self.ui.note(_('invalid bundle manifest; using normal clone\n'))
@@ -414,9 +454,14 @@ def reposetup(ui, repo):
 
             try:
                 fh = hgurl.open(self.ui, url)
-                cg = exchange.readbundle(self.ui, fh, 'stream')
-
-                changegroup.addchangegroup(self, cg, 'bundleclone', url)
+                # Stream clone data is not changegroup data. Handle it
+                # specially.
+                if 'stream' in attrs:
+                    reqs = set(attrs['stream'].split(','))
+                    applystreamclone(self, reqs, fh)
+                else:
+                    cg = exchange.readbundle(self.ui, fh, 'stream')
+                    changegroup.addchangegroup(self, cg, 'bundleclone', url)
 
                 self.ui.status(_('finishing applying bundle; pulling\n'))
                 return exchange.pull(self, remote, heads=heads)
