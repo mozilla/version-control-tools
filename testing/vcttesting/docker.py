@@ -13,6 +13,7 @@ import docker
 import json
 import os
 import pickle
+import re
 import requests
 import ssl
 import subprocess
@@ -310,8 +311,9 @@ class Docker(object):
             if verbose:
                 # s has newlines, so don't go through print().
                 sys.stdout.write('%s> %s' % (name, s))
-            if s.startswith('Successfully built '):
-                image = s[len('Successfully built '):]
+            match = re.match('^Successfully built ([a-f0-9]{12})$', s.rstrip())
+            if match:
+                image = match.group(1)
                 # There is likely a trailing newline.
                 full_image = self.get_full_image(image.rstrip())
 
