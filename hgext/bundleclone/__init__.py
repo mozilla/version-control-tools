@@ -116,14 +116,18 @@ following:
 
 """
 
+import time
 import urllib
 import urllib2
 
 from mercurial import (
     changegroup,
     cmdutil,
+    error,
     extensions,
+    store,
     url as hgurl,
+    util,
     wireproto,
 )
 from mercurial.i18n import _
@@ -137,6 +141,145 @@ command = cmdutil.command(cmdtable)
 origcapabilities = wireproto.capabilities
 
 from mercurial import exchange
+
+
+def generatestreamclone(repo):
+    """Emit content for a streaming clone.
+
+    This is a generator of raw chunks that constitute a streaming clone.
+
+    This code is copied from Mercurial. Until Mercurial 3.5, this code was
+    a closure in wireproto.py and not consumeable by extensions.
+    """
+    entries = []
+    total_bytes = 0
+    # Get consistent snapshot of repo, lock during scan.
+    lock = repo.lock()
+    try:
+        repo.ui.debug('scanning\n')
+        for name, ename, size in repo.store.walk():
+            if size:
+                entries.append((name, size))
+                total_bytes += size
+    finally:
+            lock.release()
+
+    repo.ui.debug('%d files, %d bytes to transfer\n' %
+                  (len(entries), total_bytes))
+    yield '%d %d\n' % (len(entries), total_bytes)
+
+    sopener = repo.svfs
+    oldaudit = sopener.mustaudit
+    debugflag = repo.ui.debugflag
+    sopener.mustaudit = False
+
+    try:
+        for name, size in entries:
+            if debugflag:
+                repo.ui.debug('sending %s (%d bytes)\n' % (name, size))
+            # partially encode name over the wire for backwards compat
+            yield '%s\0%d\n' % (store.encodedir(name), size)
+            if size <= 65536:
+                fp = sopener(name)
+                try:
+                    data = fp.read(size)
+                finally:
+                    fp.close()
+                yield data
+            else:
+                for chunk in util.filechunkiter(sopener(name), limit=size):
+                    yield chunk
+    finally:
+        sopener.mustaudit = oldaudit
+
+
+def consumestreamclone(repo, fp):
+    """Apply the contents from a streaming clone file.
+
+    This code is copied from Mercurial. Until Mercurial 3.5, this code was
+    a closure in wireproto.py and not consumeable by extensions.
+    """
+    lock = repo.lock()
+    try:
+        repo.ui.status(_('streaming all changes\n'))
+        l = fp.readline()
+        try:
+            total_files, total_bytes = map(int, l.split(' ', 1))
+        except (ValueError, TypeError):
+            raise error.ResponseError(
+                _('unexpected response from remote server:'), l)
+        repo.ui.status(_('%d files to transfer, %s of data\n') %
+                       (total_files, util.bytecount(total_bytes)))
+        handled_bytes = 0
+        repo.ui.progress(_('clone'), 0, total=total_bytes)
+        start = time.time()
+
+        tr = repo.transaction(_('clone'))
+        try:
+            for i in xrange(total_files):
+                # XXX doesn't support '\n' or '\r' in filenames
+                l = fp.readline()
+                try:
+                    name, size = l.split('\0', 1)
+                    size = int(size)
+                except (ValueError, TypeError):
+                    raise error.ResponseError(
+                        _('unexpected response from remote server:'), l)
+                if repo.ui.debugflag:
+                    repo.ui.debug('adding %s (%s)\n' %
+                                  (name, util.bytecount(size)))
+                # for backwards compat, name was partially encoded
+                ofp = repo.svfs(store.decodedir(name), 'w')
+                for chunk in util.filechunkiter(fp, limit=size):
+                    handled_bytes += len(chunk)
+                    repo.ui.progress(_('clone'), handled_bytes,
+                                     total=total_bytes)
+                    ofp.write(chunk)
+                ofp.close()
+            tr.close()
+        finally:
+            tr.release()
+
+        # Writing straight to files circumvented the inmemory caches
+        repo.invalidate()
+
+        elapsed = time.time() - start
+        if elapsed <= 0:
+            elapsed = 0.001
+        repo.ui.progress(_('clone'), None)
+        repo.ui.status(_('transferred %s in %.1f seconds (%s/sec)\n') %
+                       (util.bytecount(total_bytes), elapsed,
+                        util.bytecount(total_bytes / elapsed)))
+    finally:
+        lock.release()
+
+
+def applystreamclone(repo, remotereqs, fp):
+    """Apply stream clone data to a repository.
+
+    This code is mostly copied from mercurial.repository.stream_in. We needed
+    to copy the code because the original code was tightly coupled to the wire
+    protocol and not suitable for reuse. Code for dealing with the branch map
+    has been removed, as it isn't relevant to our needs.
+    """
+    lock = repo.lock()
+    try:
+        consumestreamclone(repo, fp)
+
+        # new requirements = old non-format requirements +
+        #                    new format-related remote requirements
+        # requirements from the streamed-in repository
+        repo.requirements = list(remotereqs | (
+                set(repo.requirements) - repo.supportedformats))
+        if hasattr(repo, '_applyopenerreqs'):
+            repo._applyopenerreqs()
+        else:
+            repo._applyrequirements(repo.requirements)
+        repo._writerequirements()
+        repo.invalidate()
+    finally:
+        lock.release()
+
 
 def capabilities(*args, **kwargs):
     return origcapabilities(*args, **kwargs) + ' bundles'
