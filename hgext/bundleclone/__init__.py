@@ -135,6 +135,22 @@ following:
 5. any available gzip bundle in any region
 6. any available bundle
 
+Failure Behavior
+================
+
+By default, clients will abort if an error occurred while fetching a bundle.
+The behavior can be changed to fall back to cloning via regular means by
+setting the ``bundleclone.fallbackonerror`` boolean config option.
+
+The reason clients don't fall back to a regular clone on failure is because
+this may overwhelm the Mercurial server. Many reasons for deploying clone from
+bundle support is to help reduce server load. A server may expect that most
+clones are serviced by bundles and thus effectively free for the server to
+handle. If bundles started failing all of a sudden, the server could
+potentially be flooded by tons of new clone requests, drastically increasing
+its load and possibly overwhelming it. Disallowing fallback on failure is a
+safeguard to prevent this from happening.
+
 """
 
 import time
@@ -470,13 +486,20 @@ def reposetup(ui, repo):
                 self.ui.status(_('finishing applying bundle; pulling\n'))
                 return exchange.pull(self, remote, heads=heads)
 
-            except urllib2.HTTPError as e:
-                self.ui.warn(_('HTTP error fetching bundle; using normal clone: %s\n') % str(e))
-                return super(bundleclonerepo, self).clone(remote, heads=heads,
-                        stream=stream)
-            # This typically means a connectivity, DNS, etc problem.
-            except urllib2.URLError as e:
-                self.ui.warn(_('error fetching bundle; using normal clone: %s\n') % e.reason)
+            except (urllib2.HTTPError, urllib2.URLError) as e:
+                if isinstance(e, urllib2.HTTPError):
+                    msg = _('HTTP error fetching bundle: %s') % str(e)
+                else:
+                    msg = _('error fetching bundle: %s') % e.reason
+
+                # Don't fall back to regular clone unless explicitly told to.
+                if not self.ui.configbool('bundleclone', 'fallbackonerror', False):
+                    raise util.Abort(msg, hint=_('consider contacting the '
+                        'server operator if this error persists'))
+
+                self.ui.warn(msg + '\n')
+                self.ui.warn(_('falling back to normal clone\n'))
+
                 return super(bundleclonerepo, self).clone(remote, heads=heads,
                         stream=stream)
 

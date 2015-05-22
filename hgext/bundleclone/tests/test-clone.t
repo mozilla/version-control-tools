@@ -33,7 +33,7 @@ Clone with no available bundles falls back to regular behavior
   getting foo
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
-Empty bundle manifest file
+Empty bundle manifest file falls back to regular clone
 
   $ touch server/.hg/bundleclone.manifest
   $ hg -v clone http://localhost:$HGPORT empty-manifest-file
@@ -49,47 +49,45 @@ Empty bundle manifest file
   getting foo
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
-Manifest file with invalid URL
+Manifest file with invalid URL aborts
 
   $ echo 'http://does.not.exist/bundle.hg' >> server/.hg/bundleclone.manifest
   $ hg clone http://localhost:$HGPORT invalid-bundle-url
   downloading bundle http://does.not.exist/bundle.hg
-  error fetching bundle; using normal clone: [Errno * (glob)
-  requesting all changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 2 changesets with 2 changes to 2 files
-  updating to branch default
-  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  abort: error fetching bundle: [Errno 8] nodename nor servname provided, or not known
+  (consider contacting the server operator if this error persists)
+  [255]
 
-Server is not running
+Server is not running aborts
 
   $ echo "http://localhost:$HGPORT1/bundle.hg" > server/.hg/bundleclone.manifest
   $ hg clone http://localhost:$HGPORT server-not-runner
   downloading bundle http://localhost:$HGPORT1/bundle.hg
-  error fetching bundle; using normal clone: [Errno *] Connection refused (glob)
-  requesting all changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 2 changesets with 2 changes to 2 files
-  updating to branch default
-  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  abort: error fetching bundle: [Errno 61] Connection refused
+  (consider contacting the server operator if this error persists)
+  [255]
 
 Server returns 404
 
   $ starthttpserver $HGPORT1
   $ hg clone http://localhost:$HGPORT server-404
   downloading bundle http://localhost:$HGPORT1/bundle.hg
-  HTTP error fetching bundle; using normal clone: HTTP Error 404: File not found
+  abort: HTTP error fetching bundle: HTTP Error 404: File not found
+  (consider contacting the server operator if this error persists)
+  [255]
+
+We can override failure to fall back to regular clone
+
+  $ starthttpserver $HGPORT1
+  $ hg --config bundleclone.fallbackonerror=True clone -U http://localhost:$HGPORT server-404
+  downloading bundle http://localhost:$HGPORT1/bundle.hg
+  HTTP error fetching bundle: HTTP Error 404: File not found
+  falling back to normal clone
   requesting all changes
   adding changesets
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 2 files
-  updating to branch default
-  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
 Bundle with partial content works
 
