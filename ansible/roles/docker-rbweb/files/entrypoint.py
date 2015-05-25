@@ -65,6 +65,7 @@ mre.settings['autoland_url'] = autoland_url
 mre.settings['autoland_user'] = 'autoland'
 mre.settings['autoland_password'] = 'autoland'
 mre.settings['autoland_testing'] = True
+mre.settings['autoland_import_pullrequest_ui_enabled'] = True
 mre.save()
 
 os.execl(sys.argv[1], *sys.argv[1:])

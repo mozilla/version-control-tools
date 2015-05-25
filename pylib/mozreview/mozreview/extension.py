@@ -1,20 +1,27 @@
 from __future__ import unicode_literals
 
+from django.conf.urls import include, patterns, url
+
 from djblets.webapi.resources import (register_resource_for_model,
                                       unregister_resource_for_model)
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
                                           ReviewRequestFieldsHook,
-                                          TemplateHook)
+                                          TemplateHook,
+                                          URLHook)
 from reviewboard.reviews.builtin_fields import TestingDoneField
 from reviewboard.reviews.fields import (get_review_request_field,
                                         get_review_request_fieldset)
 from reviewboard.urls import (diffviewer_url_names,
                               review_request_url_names)
 
-from mozreview.autoland.models import AutolandRequest
+from mozreview.autoland.models import (AutolandRequest,
+                                       ImportPullRequestRequest)
 from mozreview.autoland.resources import (autoland_request_update_resource,
+                                          import_pullrequest_trigger_resource,
+                                          import_pullrequest_update_resource,
                                           try_autoland_trigger_resource)
+from mozreview.autoland.views import import_pullrequest
 from mozreview.batchreview.resources import batch_review_resource
 from mozreview.pulse import initialize_pulse_handlers
 from mozreview.resources.review_request_summary import (
@@ -41,6 +48,7 @@ class MozReviewExtension(Extension):
         'autoland_user': '',
         'autoland_password': '',
         'autoland_testing': False,
+        'autoland_import_pullrequest_ui_enabled': False,
     }
 
     is_configurable = True
@@ -56,11 +64,16 @@ class MozReviewExtension(Extension):
     }
     js_bundles = {
         'reviews': {
+            #TODO: Everything will break if common.js is not first in this list
             'source_filenames': ['mozreview/js/common.js',
                                  'mozreview/js/commits.js',
-                                 'mozreview/js/ui.mozreviewautocomplete.js',
                                  'mozreview/js/review.js',
-                                 'mozreview/js/try.js'],
+                                 'mozreview/js/try.js',
+                                 'mozreview/js/ui.mozreviewautocomplete.js',]
+        },
+        'import-pullrequest': {
+            'source_filenames': ['mozreview/js/import-pullrequest.js',],
+            'apply_to': ['import_pullrequest',],
         },
     }
 
@@ -69,11 +82,15 @@ class MozReviewExtension(Extension):
         batch_review_resource,
         review_request_summary_resource,
         try_autoland_trigger_resource,
+        import_pullrequest_trigger_resource,
+        import_pullrequest_update_resource,
     ]
 
     def initialize(self):
         register_resource_for_model(AutolandRequest,
                                     try_autoland_trigger_resource)
+        register_resource_for_model(ImportPullRequestRequest,
+                                    import_pullrequest_trigger_resource)
         initialize_pulse_handlers(self)
 
         HeaderDropdownActionHook(self, actions=[{
@@ -125,6 +142,10 @@ class MozReviewExtension(Extension):
         # fields are fine below the Description.
         ReviewRequestFieldsHook(self, 'main', [CombinedReviewersField])
         ReviewRequestFieldsHook(self, 'main', [TryField])
+
+        URLHook(self, patterns('',
+            url(r'^import-pullrequest/(?P<user>.+)/(?P<repo>.+)/(?P<pullrequest>\d+)/$',
+            import_pullrequest, name='import_pullrequest')))
 
     def shutdown(self):
         # We have to put the TestingDone field back before we shut down

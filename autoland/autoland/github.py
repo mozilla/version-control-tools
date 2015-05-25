@@ -8,9 +8,6 @@ class MockGithub3(object):
 
     def pull_request(self, user, repo, pullrequest):
         class PullRequest(object):
-            title = 'A pullrequest'
-            body = 'A body'
-
             def commits(self):
                 class Commit(object):
                     sha = '05830c796e2b0e9049c9e9cd463d987f4aedf4a35'
@@ -34,7 +31,9 @@ new file mode 100644
 
     def issue(self, user, repo, issue):
         class Issue(object):
-           def create_comment(self, comment):
+            title = 'A pullrequest'
+            body = 'A body'
+            def create_comment(self, comment):
                 return True
         return Issue()
 

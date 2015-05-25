@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Import Pull Request" %}{% endblock %}
+
+{% block extrahead %}
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+{% endblock %}
+
+{% block page_class %}new-review-request-page full-page-content has-sidebar mobile-show-page-sidebar{% endblock %}
+
+{% block content %}
+<h1>Import a Pull Request</h1>
+<div id="mozreview-import-pullrequest">
+  <div>
+    <label>Github Pull Request: </label>
+    <a href="https://github.com/{{user}}/{{repo}}/pull/{{pullrequest}}">https://github.com/{{user}}/{{repo}}/pull/{{pullrequest}}</a>
+  </div>
+  <div>
+  <input id="mozreview-import-pullrequest-trigger" type="button" value="{% trans "Import Pull Request" %}" />
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts-post %}
+<script charset="utf-8" type="text/javascript">
+    var GITHUB_USER = "{{user}}";
+    var GITHUB_REPO = "{{repo}}";
+    var GITHUB_PULLREQUEST= {{pullrequest}};
+    var PULLREQUEST_TRIGGER = "{{trigger_url}}";
+</script>
+{{block.super}}
+{% endblock %}

@@ -107,6 +107,7 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
                     # set up data to be posted back to mozreview
                     data = {
                         'request_id': transplant_id,
+                        'bugid': None,
                         'landed': False,
                         'error_msg': 'could not create new bug: ' + e.msg,
                         'result': ''

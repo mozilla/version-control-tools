@@ -18,6 +18,12 @@ class MozReviewSettingsForm(SettingsForm):
     pulse_user = forms.CharField(required=False)
     pulse_password = forms.CharField(required=False,
                                      widget=forms.PasswordInput)
+    autoland_import_pullrequest_ui_enabled = forms.BooleanField(
+        label=_('Enable Autoland Import Pullrequest UI'),
+        help_text=_('This allows access to the web endpoint for importing '
+                    'Github pull requests'),
+        initial=False,
+        required=False)
     autoland_try_ui_enabled = forms.BooleanField(
         label=_('Enable Autoland Try UI'),
         help_text=_('This exposes the field in a push-based review request '

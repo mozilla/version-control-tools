@@ -80,3 +80,36 @@ class AutolandEventLogEntry(models.Model):
 
     class Meta:
         app_label = 'mozreview'
+
+
+class ImportPullRequestRequest(models.Model):
+    autoland_id = models.IntegerField(
+        primary_key=True,
+        help_text=_('The job ID that Autoland returns to us.'))
+    github_user = models.CharField(
+        max_length=255,
+        help_text=_('The github user/org for which Autoland was asked to '
+                    'land the pullrequest (e.g. mozilla).'),
+        db_index=True)
+    github_repo = models.CharField(
+        max_length=255,
+        help_text=_('The github repo name for which Autoland was asked to '
+                    'land the pullrequest (e.g. gecko-dev).'),
+        db_index=True)
+    github_pullrequest = models.IntegerField(
+        help_text=_('The pullrequest number for which Autoland was asked to '
+                    'land the pullrequest (e.g. 42).'),
+        db_index=True)
+    bugid = models.IntegerField(
+        help_text=_('The bugzilla bug id for the pullrequest.'),
+        null=True)
+    # Unfortunately, Review Board extensions can't take advantage of the
+    # ForeignKey ORM magic that Django provides. This is because the extension
+    # loading mechanism doesn't do enough (yet) to flush out the foreign key
+    # caches in Django.
+    review_request_id = models.IntegerField(
+        help_text=_('The ID of the review request that was created from the '
+                    'pullrequest'), null=True)
+
+    class Meta:
+        app_label = 'mozreview'

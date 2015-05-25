@@ -1,8 +1,8 @@
 {
   "testing": true,
   "bugzilla": {
-    "user": "",
-    "passwd": "",
+    "user": "admin@example.com",
+    "passwd": "password",
     "url": "http://bmoweb/rest"
   },
   "github": {
