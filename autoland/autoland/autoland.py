@@ -455,7 +455,7 @@ def main():
             handle_pending_transplants(logger, dbconn)
             handle_pending_github_updates(logger, dbconn)
             handle_pending_mozreview_updates(logger, dbconn)
-            time.sleep(30)
+            time.sleep(0.25)
         except KeyboardInterrupt:
             break
         except:
