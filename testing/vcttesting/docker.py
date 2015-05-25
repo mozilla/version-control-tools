@@ -1070,7 +1070,7 @@ class Docker(object):
 
     def save_state(self):
         with open(self._state_path, 'wb') as fh:
-            json.dump(self.state, fh)
+            json.dump(self.state, fh, indent=4, sort_keys=True)
 
     def all_docker_images(self):
         """Obtain the set of all known Docker image IDs."""
