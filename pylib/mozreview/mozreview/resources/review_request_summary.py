@@ -169,7 +169,13 @@ class ReviewRequestSummaryResource(WebAPIResource):
             if is_parent(rr):
                 families[rr.id]['parent'] = rr
             else:
-                families[get_parent_rr(rr).id]['children'][rr.id] = rr
+                # Some early review requests were orphaned; ignore them.
+                try:
+                    parent_rr = get_parent_rr(rr)
+                except ReviewRequest.DoesNotExist:
+                    continue
+
+                families[parent_rr.id]['children'][rr.id] = rr
 
         return families
 
