@@ -20,6 +20,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import time
 import urlparse
 import uuid
 import warnings
@@ -101,6 +102,8 @@ class Docker(object):
         self._ddir = DOCKER_DIR
         self._state_path = state_path
         self.state = {
+            'clobber-bmobootstrap': None,
+            'clobber-bmofetch': None,
             'images': {},
             'containers': {},
             'last-bmodb-id': None,
@@ -124,6 +127,8 @@ class Docker(object):
                 self.state = json.load(fh)
 
         keys = (
+            'clobber-bmobootstrap',
+            'clobber-bmofetch',
             'last-bmodb-id',
             'last-bmoweb-id',
             'last-pulse-id',
@@ -205,6 +210,29 @@ class Docker(object):
                 paths[f] = full
 
         return paths
+
+    def clobber_needed(self, name):
+        """Test whether a clobber file has been touched.
+
+        We periodically need to force certain actions to occur. There is a
+        "clobber" mechanism to facilitate this.
+
+        There are various ``clobber.<name>`` files on the filesystem. When
+        the files are touched, it signals a clobber is required.
+
+        This function answers the question of whether a clobber is required
+        for a given action. Returns True if yes, False otherwise.
+        """
+        path = os.path.join(ROOT, 'testing', 'clobber.%s' % name)
+        key = 'clobber-%s' % name
+        oldmtime = self.state[key]
+        newmtime = os.path.getmtime(path)
+
+        if oldmtime is None or newmtime > oldmtime:
+            self.state[key] = int(time.time())
+            return True
+
+        return False
 
     def ensure_built(self, name, verbose=False, use_last=False):
         """Ensure a Docker image from a builder directory is built and up to date.
@@ -583,7 +611,8 @@ class Docker(object):
         if bmoweb_bootstrap and bmoweb_bootstrap not in known_images:
             bmoweb_bootstrap = None
 
-        if not bmodb_bootstrap or not bmoweb_bootstrap:
+        if (not bmodb_bootstrap or not bmoweb_bootstrap
+            or self.clobber_needed('bmobootstrap')):
             bmodb_bootstrap, bmoweb_bootstrap = self._bootstrap_bmo(
                     images['bmodb-volatile'], images['bmoweb'])
 
@@ -617,7 +646,7 @@ class Docker(object):
 
         web_environ = {}
 
-        if 'FETCH_BMO' in os.environ:
+        if 'FETCH_BMO' in os.environ or self.clobber_needed('bmofetch'):
             web_environ['FETCH_BMO'] = '1'
 
         web_id = self.client.create_container(web_image,
