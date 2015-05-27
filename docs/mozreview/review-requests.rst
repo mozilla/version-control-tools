@@ -1,46 +1,134 @@
 .. _mozreview_creating:
 
 ========================
-Managing Review Requests
+Creating Review Requests
 ========================
 
-Initiating code review is very simple: just ``hg push``.  If you
-have followed the
+MozReview aims to be a natural extension of your version control tool.
+As such, the first step to create review requests is to create commits
+in your local clone/checkout of a repository.
+
+Once commits are made, initiating code review is very simple: just
+``hg push``. If you have followed the
 :ref:`installation instructions <mozreview_install>`, all you need to do
 is type::
 
   $ hg push review
 
-With no arguments, we assume you are trying to review the working copy
-commit (``.``) and any of its parents that haven't landed yet.
+With no arguments, we assume you are trying to review the current commit
+and all of its ancestor commits that haven't landed yet.
 
-.. note::
+For the simplest use cases, the workflow is simply:
 
-   MozReview handles reviewing multiple commits and has a single
-   workflow no matter how many commits you are submitting for review.
+1. commit
+2. push
+3. publish
 
-.. hint::
+Read on to learn about more features and advanced workflows.
 
-   The default selection of commits for review is equivalent to the
-   Mercurial revset ``::. and draft()``. i.e.  ``hg push review``
-   and ``hg push -r '::. and draft()' review`` are equivalent.
+Commit Message Formatting
+=========================
+
+The contents of commit messages are important to MozReview.
+
+Summary and Description Fields
+------------------------------
+
+The Review Board web interface has *Summary* and *Description* fields
+for each review request. These provide a simple, one-line *summary*
+and more verbose, multi-line *description*, respectively.
+
+The first line of the commit message - the *summary line* - will be
+used to populate the *Summary* field in Review Board. All subsequent
+lines of the commit message will constitute the *Description* field.
+
+.. tip::
+
+   It is recommended to write a descriptive, multiple line commit
+   message.
+
+   Descriptive commit messages can and should be used to let reviewers
+   know what is happening with the commit. Review context should be
+   part of the commit message, not something you type in later
+   in the review interface.
+
+   This is a better approach because it doesn't require you to switch
+   contexts to your web browser to add the information, reviewers know
+   to look in a consistent location for this info (the commit message),
+   and because the information is preserved for all of time in the
+   commit message, where it can be easily referenced later.
+
+Specifying Reviewers in Commit Messages
+---------------------------------------
+
+Special syntax can be added to commit messages to specify the reviewers
+for a commit. This syntax is ``r?<reviewer>`` where ``<reviewer>`` is a
+MozReview username (which is typically the reviewer's Mozilla IRC
+nickname).
+
+For example, to request that ``gps`` review your commit, you would
+format your commit message as such::
+
+   Bug 123 - Fix type coercion in MozReview; r?gps
+
+The commit message parser recognizes simple lists::
+
+   Bug 123 - Fix type coercion in MozReview; r?gps, smacleod
+
+The `test corpus <https://dxr.mozilla.org/hgcustom:version-control-tools/source/pylib/mozautomation/tests/test_commitparser.py>`_
+demonstrates the abilities of reviewer parsing.
+
+When commits are pushed for review, the server will parse the commit
+message and assign reviewers as requested. This should *just work*.
+
+.. important::
+
+   ``r=`` for specifying reviewers, while supported, is not recommended
+   and may result in a warning when submitting review requests.
+
+   This is because ``r=`` is the syntax for denoting that review has
+   been granted. Adding ``r=`` before review has been granted is
+   effectively lying. MozReview doesn't want to encourage this practice,
+   as it may result in confusion. Instead, the ``r?`` syntax should be
+   used to denote that review is pending.
+
+Commit Series
+=============
+
+MozReview handles reviewing multiple commits and has a single
+workflow no matter how many commits you are submitting for review.
+
+.. important::
+
+   This is a significant difference between patch-based review tools
+   like Bugzilla/Splinter. Since MozReview is tightly integrated with
+   version control, things like ordering commits *just works* because
+   the original commit data is obtained directly from a repository.
+
+Choosing What Commits to Review
+-------------------------------
+
+When using ``hg push`` to push to the review repository, your client
+will automatically select for review all *draft* changesets between
+the working copy's commit and the first *public* ancestor. This is
+equivalent to the Mercurial *revset* ``::. and draft()``. i.e.
+``hg push review`` is equivalent to ``hg push -r '::. and draft()'``.
 
 If you would like to control which commits are reviewed, you can pass ``-r
-<rev>`` to specify an explicit *tip* and/or *base* commit. For advanced
-scenario, there is also a ``--from`` argument that can be used to specify
-the base revision.
+<rev>`` to specify a *revset* to select the commits that should be
+reviewed.
 
-With 1 revision specified, you define the *top-most* commit to be reviewed.::
+With 1 revision specified, you define the *tip-most* commit to be reviewed.::
 
   $ hg push -r 77c9ee75117e review
   or
   $ hg push -r 32114 review
 
-In this form, the specified commit and all of its draft ancestors will be
-added to MozReview.
+In this form, the specified commit and all of its *draft* ancestors will
+be added to MozReview.
 
-With 2 revisions or a revset that evaluates to multiple revisions, you define
-both the *base* and *tip* commits to review.::
+With 2 revisions or a revset that evaluates to multiple revisions, you
+define both the *base* and *tip* commits to review.::
 
   $ hg push -r 84e8a1584aad::b55f2b9937c7 review
   or
@@ -53,49 +141,22 @@ both the *base* and *tip* commits to review.::
    an earlier one but you want to keep the reviews separate.
 
    The default selection of all non-public ancestors would include the parent
-   commit(s) against your desires. Specifying an explicit base revision
-   will keep your intentions clear.
+   commit(s) in addition to the ones you wanted. Specifying an explicit
+   base revision will keep your intentions clear and prevent multiple
+   series from interfering with each other.
 
 For the special case where you only want to review a single changeset,
 the ``-c`` argument can be used to specify a single changeset to review.::
 
   $ hg push -c b55f2b9937c7 review
 
-If all goes well, the output of ``hg push`` to a review repository should
-look something like this::
+.. tip::
 
-  $ hg push -r 2 review
-  pushing to review
-  searching for changes
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  submitting 1 changesets for review
-
-  changeset:  2:a21bef69f0d4
-  summary:    Bug 123 - Implement foo
-  review:     https://reviewboard.mozilla.org/r/8 (pending)
-
-  review id:  bz://123/mynick
-  review url: https://reviewboard.mozilla.org/r/7 (pending)
-  (visit review url to publish this review request so others can see it)
-
-.. important::
-
-   You often need to log in to Review Board to publish the review.
-
-   Review requests aren't published to the world by default (yet). If
-   you need to take additional action to enable others to see the review
-   requests, you will be alerted by the command output.
-
-To learn how to manage the review requests in the Review Board web
-interface, read :ref:`mozreview_reviewboard_publishing_commits`. Or,
-continue reading to learn about how the Mercurial client and review
-requests interact.
+   You only need to specify ``-c`` to *cherry-pick* a commit out of a
+   larger series of *draft* changesets.
 
 Review Identifiers
-==================
+------------------
 
 Every push to MozReview must be associated with a *Review Identifier*
 (*Review ID* for short).
@@ -121,6 +182,47 @@ pass ``--reviewid <reviewid>`` to ``hg push``. e.g. ``hg push --reviewid
     It is recommended to use proper commit messages instead of passing
     ``--reviewid``: you have to adjust your commit message before
     landing: you might as well get it out of the way early.
+
+After The Push
+==============
+
+If all goes well, the output of ``hg push`` to a review repository should
+look something like this::
+
+  $ hg push -r a21bef69f0d4 review
+  pushing to review
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  submitting 1 changesets for review
+
+  changeset:  2:a21bef69f0d4
+  summary:    Bug 123 - Implement foo
+  review:     https://reviewboard.mozilla.org/r/8 (pending)
+
+  review id:  bz://123/mynick
+  review url: https://reviewboard.mozilla.org/r/7 (pending)
+  (visit review url to publish this review request so others can see it)
+
+The first first lines of the output is the standard output from
+Mercurial when you push. The lines that follow are from MozReview:
+it tells you how your changesets mapped to review requests and a
+brief summary of the state of those review requests.
+
+.. important::
+
+   You often need to log in to Review Board to publish the review.
+
+   Review requests aren't published to the world by default (yet). If
+   you need to take additional action to enable others to see the review
+   requests, you will be alerted by the command output.
+
+To learn how to manage the review requests in the Review Board web
+interface, read :ref:`mozreview_reviewboard_publishing_commits`. Or,
+continue reading to learn about how the Mercurial client and review
+requests interact.
 
 Updating Review Requests
 ========================
@@ -197,34 +299,6 @@ will impact review requests at the end of the series.
    clients that don't yet have obsolescence enabled and to better
    support Git, which doesn't have a comparable feature to obsolescence.
 
-Commit Message Formatting
-=========================
-
-The contents of commit messages are important to MozReview.
-
-As mentioned earlier, commit messages are parsed to select the *Review
-ID*. In addition, commit messages are also used to populate fields in
-the Review Board web interface that will be used by reviewers and others
-to summarize and describe the code being reviewed.
-
-The first line of the commit message - the *summary line* - will be used
-to populate the *Summary* field in Review Board.
-
-All subsequent lines of the commit message will constitute the
-*Description* field.
-
-.. tip::
-
-   It is recommended to write a multi-line commit message.
-
-   Because the commit message is used to populate fields of a review
-   request (including the summary and description), writing a multi-line
-   commit message will save you time from having to fill out these
-   fields later.
-
-   Diffs of these fields are shown in the web-based review interface, so
-   changes can be followed over time.
-
 Looking Under the Covers
 ========================
 
@@ -276,4 +350,3 @@ The remote Mercurial server then takes this data and turns it into
 review requests on Review Board. The result of this operation is
 communicated back to the client - your machine - where a summary of the
 result is printed.
-
