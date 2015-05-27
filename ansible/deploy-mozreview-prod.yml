@@ -87,6 +87,15 @@
     - name: wait for load balancer to re-add node
       pause: seconds=15
 
+- hosts: reviewboard-hg1.dmz.scl3.mozilla.com
+  tasks:
+    - name: update v-c-t repo
+      hg: repo={{ repo }}
+          dest=/repo/hg/version-control-tools
+          revision={{ rev }}
+          force=yes
+          purge=yes
+
 - hosts: reviewboardadm.private.scl3.mozilla.com
   tasks:
     - name: notify IRC that the deployment has finished
