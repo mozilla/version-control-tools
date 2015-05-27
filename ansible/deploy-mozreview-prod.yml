@@ -87,14 +87,16 @@
     - name: wait for load balancer to re-add node
       pause: seconds=15
 
-- hosts: reviewboard-hg1.dmz.scl3.mozilla.com
-  tasks:
-    - name: update v-c-t repo
-      hg: repo={{ repo }}
-          dest=/repo/hg/version-control-tools
-          revision={{ rev }}
-          force=yes
-          purge=yes
+# TODO this server isn't playing well with Ansible, likely due to pash
+# interaction.
+#- hosts: reviewboard-hg1.dmz.scl3.mozilla.com
+#  tasks:
+#  - name: update v-c-t repo
+#    hg: repo={{ repo }}
+#        dest=/repo/hg/version-control-tools
+#        revision={{ rev }}
+#        force=yes
+#        purge=yes
 
 - hosts: reviewboardadm.private.scl3.mozilla.com
   tasks:
