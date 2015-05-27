@@ -218,7 +218,7 @@ class ReviewRequestSummaryResource(WebAPIResource):
         # one attribute.  See bug 1164756.
         d['reviewers'] = [reviewer.username for reviewer in reviewers]
         d['reviewers_bmo_ids'] = [bzuser.bugzilla_user_id for bzuser in
-                                  BugzillaUserMap.objects.filter(id__in=[
+                                  BugzillaUserMap.objects.filter(user_id__in=[
                                       reviewer.id for reviewer in reviewers])]
 
         d['links'] = self.get_links(obj=review_request, request=request)
