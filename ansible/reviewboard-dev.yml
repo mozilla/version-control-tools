@@ -38,3 +38,10 @@
 
   - name: Restart httpd
     service: name=httpd state=restarted
+
+  - name: update v-c-t repo
+    hg: repo={{ repo }}
+        dest=/repo/hg/version-control-tools
+        revision={{ rev }}
+        force=yes
+        purge=yes
