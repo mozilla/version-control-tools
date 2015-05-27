@@ -26,6 +26,7 @@ changegroup.recordlogs = /repo/hg/scripts/record-pushes.sh
 changegroup.mirrorpush = /repo/hg/scripts/push-repo.sh
 pushkey.mirrorpush = /repo/hg/scripts/push-repo.sh
 #pretxnchangegroup.renamecase = python:mozhghooks.prevent_case_only_renames.hook
+pretxnchangegroup.single_root = python:mozhghooks.single_root.hook
 
 [extensions]
 blackbox =
