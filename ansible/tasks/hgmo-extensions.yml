@@ -10,6 +10,7 @@
     - hg_templates
     - libraries
     - libraries/mozhghooks
+    - scripts
     - webroot_wsgi
 
 - name: install support scripts
