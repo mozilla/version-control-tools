@@ -5,8 +5,9 @@ Cloning from Pre-Generated Bundles
 ==================================
 
 ``hg.mozilla.org`` supports offloading clone requests to pre-generated
-bundle files stored in Amazon S3. This results in drastically reduced server
-load and frequently results in faster clone times.
+bundle files stored in Amazon S3. **This results in drastically reduced
+server load (which helps prevent outages due to accidental, excessive
+load) and frequently results in faster clone times.**
 
 How It Works
 ============
