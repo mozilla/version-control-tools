@@ -1,0 +1,34 @@
+# Installs CRON to periodically generate Mercurial bundles for popular
+# repositories.
+---
+
+- name: install boto Python package
+  yum: name=python-boto
+
+- name: ensure bundles directory exists
+  file: path=/repo/bundles owner=hg group=hg state=directory mode=0775
+
+- name: send CRON mail to developer-services list
+  cronvar: user=hg name=MAILTO value=developer-services@mozilla.org
+
+- name: create CRON to generate S3 bundles
+  cron: name="Generate Mercurial bundles for {{ item.repo }}"
+        user=hg
+        job='/repo/hg/scripts/outputif /repo/hg/scripts/generate-hg-s3-bundles {{ item.repo }}'
+        day=*
+        month=*
+        minute=0
+        hour={{ item.hour }}
+  with_items:
+    # Schedule for when the sun is over the Pacific Ocean, as this is
+    # when the fewest pushes occur. Also, hgssh1 is on PDT not UTC.
+    - { hour: 21, repo: mozilla-central }
+    - { hour: 22, repo: integration/fx-team }
+    - { hour: 23, repo: integration/mozilla-inbound }
+    - { hour: 0, repo: integration/gaia-central }
+    - { hour: 1, repo: releases/mozilla-release }
+    - { hour: 2, repo: releases/mozilla-aurora }
+    - { hour: 3, repo: releases/mozilla-beta }
+    - { hour: 4, repo: build/tools }
+    - { hour: 4, repo: build/mozharness }
+    - { hour: 5, repo: comm-central }

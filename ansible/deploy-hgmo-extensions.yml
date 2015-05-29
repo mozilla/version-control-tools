@@ -29,6 +29,11 @@
     - name: install global hgrc
       copy: src=roles/hg-ssh/files/hgrc dest=/etc/mercurial/hgrc mode=0644 owner=root group=root
 
+    # Install CRON to generate Mercurial bundle files. This only needs
+    # to run on the master.
+    - include: tasks/hgmo-bundle-cron.yml
+      when: ansible_hostname == "hgssh1"
+
     - name: notify IRC of deployment
       irc: server=irc.mozilla.org
            port=6697

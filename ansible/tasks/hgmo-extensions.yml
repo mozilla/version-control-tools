@@ -12,6 +12,14 @@
     - libraries/mozhghooks
     - webroot_wsgi
 
+- name: install support scripts
+  copy: src={{ vct | mandatory }}/scripts/{{ item }}
+        dest=/repo/hg/scripts/{{ item }}
+        mode=0755
+  with_items:
+    - generate-hg-s3-bundles
+    - outputif
+
 - name: install pushlog hgweb files
   copy: src={{ vct | mandatory }}/hgext/pushlog-legacy/{{ item }} dest=/repo/hg/extensions/{{ item }} owner=hg group=hg mode=0644
   with_items:
