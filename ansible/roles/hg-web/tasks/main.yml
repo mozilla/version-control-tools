@@ -38,7 +38,7 @@
 # branch to get some performance enhancements. These enhancements are
 # part of 3.4, so we can install from peep once we deploy 3.4.x.
 - name: clone Mercurial repository
-  hg: repo=http://selenic.com/repo/hg dest=/repo/hg/hg revision=612ed41ae359f458dbdc74f03ce9542d3816859d purge=yes force=yes
+  hg: repo=https://selenic.com/repo/hg dest=/repo/hg/hg revision=612ed41ae359f458dbdc74f03ce9542d3816859d purge=yes force=yes
 
 - name: install Mercurial
   command: "{{ venv_hgweb }}/bin/python setup.py install chdir=/repo/hg/hg"
