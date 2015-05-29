@@ -257,15 +257,15 @@ be preserved.
   remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
   
-  changeset:  5:3299fd5f5fca
+  changeset:  5:609df470f898
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (glob)
   
-  changeset:  6:4fcbb12a36e4
+  changeset:  6:2977dec75fb2
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/4 (glob)
   
-  changeset:  7:d768dcb976de
+  changeset:  7:a92ad7ba0258
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/5 (glob)
   
@@ -315,12 +315,12 @@ on publish.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r d768dcb976decf31b8ac1431701fefdacd31a390 http://*:$HGPORT/test-repo (glob)
+    - hg pull -r a92ad7ba0258da8e9cd3d84f2ec5db098c85e6ad http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["3299fd5f5fca4800c424e989c65615edb52a421b", 3], ["4fcbb12a36e4f7a606c8ad86636e232d2133cfe1",
-        4], ["d768dcb976decf31b8ac1431701fefdacd31a390", 5]]'
+      p2rb.commits: '[["609df470f8980e097192dab10a72a1401dfeca5f", 3], ["2977dec75fb2158cbb102eb4b3cb02b9c59a0227",
+        4], ["a92ad7ba0258da8e9cd3d84f2ec5db098c85e6ad", 5]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -330,17 +330,17 @@ on publish.
       revision: 3
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       patch:
-      - diff -r 93d9429b41ec -r d768dcb976de foo2
+      - diff -r 93d9429b41ec -r a92ad7ba0258 foo2
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo2\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
       - +foo2
-      - diff -r 93d9429b41ec -r d768dcb976de foo3
+      - diff -r 93d9429b41ec -r a92ad7ba0258 foo3
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo3\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
       - +foo3
-      - diff -r 93d9429b41ec -r d768dcb976de foo4
+      - diff -r 93d9429b41ec -r a92ad7ba0258 foo4
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo4\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
@@ -369,7 +369,7 @@ The dropped commit should now be discarded
 
 Try removing a commit in the middle.
 
-  $ hg -q rebase -s d768dcb976de -d 3299fd5f5fca
+  $ hg -q rebase -s 7 -d 5
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
@@ -381,11 +381,11 @@ Try removing a commit in the middle.
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  5:3299fd5f5fca
+  changeset:  5:609df470f898
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (glob)
   
-  changeset:  8:7f4c8af7c6c4
+  changeset:  8:395146e6e0cf
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/5 (glob)
   
@@ -411,11 +411,11 @@ The parent review should have been updated accordingly.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 7f4c8af7c6c440f9ce8a55fd2ab6203bac3cefbe http://*:$HGPORT/test-repo (glob)
+  - hg pull -r 395146e6e0cf4a5d1f774b6817ce44d6cc687403 http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["3299fd5f5fca4800c424e989c65615edb52a421b", 3], ["7f4c8af7c6c440f9ce8a55fd2ab6203bac3cefbe",
+    p2rb.commits: '[["609df470f8980e097192dab10a72a1401dfeca5f", 3], ["395146e6e0cf4a5d1f774b6817ce44d6cc687403",
       5]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick

@@ -54,7 +54,10 @@ except ImportError:
     import hgrb.proto
 demandimport.enable()
 
-from hgrb.util import ReviewID
+from hgrb.util import (
+    genid,
+    ReviewID,
+)
 
 from mozautomation.commitparser import parse_bugs, parse_requal_reviewers
 from mozhg.auth import getbugzillaauth
@@ -793,6 +796,26 @@ def reposetup(ui, repo):
         @localrepo.repofilecache('reviews')
         def reviews(self):
             return reviewstore(self)
+
+        def commit(self, *args, **kwargs):
+            """Override commit to generate a unique commit identifier.
+
+            The commit identifier is used to track a logical commits across
+            history rewrites, including grafting. This is used as an index
+            of sorts in the review tool.
+            """
+            # Some callers of commit() may not pass named arguments. Slurp
+            # extra from positional arguments.
+            if len(args) == 7:
+                assert 'extra' not in kwargs
+                kwargs['extra'] = args[6]
+                args = tuple(args[0:5])
+
+            extra = kwargs.setdefault('extra', {})
+            if 'commitid' not in extra and self.reviews.remoteurl:
+                extra['commitid'] = genid(self)
+
+            return super(reviewboardrepo, self).commit(*args, **kwargs)
 
     repo.__class__ = reviewboardrepo
     repo.noreviewboardpush = False

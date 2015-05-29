@@ -52,7 +52,7 @@ Now publish the review and create a new draft
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  1:c1eb96801052
+  changeset:  1:d525f873800b
   summary:    Bug 1 - Initial commit
   review:     http://*:$HGPORT1/r/2 (glob)
   
@@ -94,11 +94,11 @@ We should have a disagreement between published and draft
     - ''
     - 'Pull down this commit:'
     - ''
-    - hg pull -r c1eb968010521027f51dd6d901d92dc44bfdcd5d http://*:$HGPORT/test-repo (glob)
+    - hg pull -r d525f873800b072bbe8c847d03698b5bd6beff3e http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["c1eb968010521027f51dd6d901d92dc44bfdcd5d", 2]]'
+      p2rb.commits: '[["d525f873800b072bbe8c847d03698b5bd6beff3e", 2]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -108,7 +108,7 @@ We should have a disagreement between published and draft
       revision: 2
       base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
       patch:
-      - diff -r 3a9f6899ef84 -r c1eb96801052 foo
+      - diff -r 3a9f6899ef84 -r d525f873800b foo
       - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -1,1 +1,1 @@'
@@ -140,7 +140,7 @@ We should have a disagreement between published and draft
     target_people: []
     extra:
       p2rb: true
-      p2rb.commit_id: c1eb968010521027f51dd6d901d92dc44bfdcd5d
+      p2rb.commit_id: d525f873800b072bbe8c847d03698b5bd6beff3e
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
     diffs:
@@ -148,7 +148,7 @@ We should have a disagreement between published and draft
       revision: 2
       base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
       patch:
-      - diff -r 3a9f6899ef84 -r c1eb96801052 foo
+      - diff -r 3a9f6899ef84 -r d525f873800b foo
       - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -1,1 +1,1 @@'

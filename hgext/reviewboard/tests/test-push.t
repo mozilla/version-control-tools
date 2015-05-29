@@ -138,7 +138,7 @@ Pushing patches from mq will result in a warning
   (You are using mq to develop patches. *) (glob)
   submitting 1 changesets for review
   
-  changeset:  7:7458cff9569f
+  changeset:  7:a20f4eed81a7
   summary:    mq patch
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
@@ -236,7 +236,7 @@ Specifying a base revision limits reviewed changesets
   $ echo tip > foo
   $ hg commit -m 'Review tip'
 
-  $ hg push -r 84e8a1584aad::b55f2b9937c7 --reviewid 7
+  $ hg push -r 8::10 --reviewid 7
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
@@ -247,15 +247,15 @@ Specifying a base revision limits reviewed changesets
   remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
   
-  changeset:  8:84e8a1584aad
+  changeset:  8:cdb8740f5a3e
   summary:    Review base
   review:     http://*:$HGPORT1/r/14 (draft) (glob)
   
-  changeset:  9:ae66c8223052
+  changeset:  9:17ac354f9d65
   summary:    Middle commit
   review:     http://*:$HGPORT1/r/15 (draft) (glob)
   
-  changeset:  10:b55f2b9937c7
+  changeset:  10:89a6f6628cac
   summary:    Review tip
   review:     http://*:$HGPORT1/r/16 (draft) (glob)
   
@@ -265,21 +265,21 @@ Specifying a base revision limits reviewed changesets
 
 Specifying multiple -r arguments selects base and tip
 
-  $ hg push -r 84e8a1584aad -r b55f2b9937c7 --reviewid 8
+  $ hg push -r 8 -r 10 --reviewid 8
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 3 changesets for review
   
-  changeset:  8:84e8a1584aad
+  changeset:  8:cdb8740f5a3e
   summary:    Review base
   review:     http://*:$HGPORT1/r/18 (draft) (glob)
   
-  changeset:  9:ae66c8223052
+  changeset:  9:17ac354f9d65
   summary:    Middle commit
   review:     http://*:$HGPORT1/r/19 (draft) (glob)
   
-  changeset:  10:b55f2b9937c7
+  changeset:  10:89a6f6628cac
   summary:    Review tip
   review:     http://*:$HGPORT1/r/20 (draft) (glob)
   
@@ -290,21 +290,21 @@ Specifying multiple -r arguments selects base and tip
 
 Specifying multiple -r in reverse order still works
 
-  $ hg push -r b55f2b9937c7 -r 84e8a1584aad --reviewid 9
+  $ hg push -r 10 -r 8 --reviewid 9
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 3 changesets for review
   
-  changeset:  8:84e8a1584aad
+  changeset:  8:cdb8740f5a3e
   summary:    Review base
   review:     http://*:$HGPORT1/r/22 (draft) (glob)
   
-  changeset:  9:ae66c8223052
+  changeset:  9:17ac354f9d65
   summary:    Middle commit
   review:     http://*:$HGPORT1/r/23 (draft) (glob)
   
-  changeset:  10:b55f2b9937c7
+  changeset:  10:89a6f6628cac
   summary:    Review tip
   review:     http://*:$HGPORT1/r/24 (draft) (glob)
   
@@ -315,19 +315,19 @@ Specifying multiple -r in reverse order still works
 
 -r and -c are mutually exclusive
 
-  $ hg push -c ae66c8223052 -r b55f2b9937c7
+  $ hg push -c 8 -r 9
   abort: cannot specify both -r and -c
   [255]
 
 -c can be used to select a single changeset to review
 
-  $ hg push -c ae66c8223052 --reviewid 11
+  $ hg push -c 9 --reviewid 11
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  9:ae66c8223052
+  changeset:  9:17ac354f9d65
   summary:    Middle commit
   review:     http://*:$HGPORT1/r/26 (draft) (glob)
   
@@ -346,7 +346,7 @@ Reviewing merge commits is rejected
   $ echo merge2 > foo
   $ hg commit -m 'Bug 1 - Merge B'
   created new head
-  $ hg merge --tool internal:other 63170dd88642
+  $ hg merge --tool internal:other 11
   0 files updated, 1 files merged, 0 files removed, 0 files unresolved
   (branch merge, don't forget to commit)
   $ hg commit -m 'Bug 1 - Do merge'
@@ -361,7 +361,7 @@ Reviewing merge commits is rejected
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
-  abort: cannot review merge commits (b21a68e5d0e0)
+  abort: cannot review merge commits (9e8b5fedf1a8)
   [255]
 
 Empty changesets show a reviewboard error, not an internal server
@@ -390,7 +390,7 @@ We disallow completely empty revisions.
   $ hg qnew -m 'mq patch' -d '0 0' empty-patch
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
-  abort: not reviewing empty revision 72a12b75c815. please add content.
+  abort: not reviewing empty revision e4f20eae8147. please add content.
   [255]
 
 Cleanup

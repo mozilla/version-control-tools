@@ -189,7 +189,7 @@ code path.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
-  changeset:  12:c15880338a69
+  changeset:  12:c21a7567db5e
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -249,7 +249,7 @@ again.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
-  changeset:  12:c15880338a69
+  changeset:  12:c21a7567db5e
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -311,7 +311,7 @@ Amending a commit will reset the reviewers back to the default.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
-  changeset:  14:29d84e1aa513
+  changeset:  14:55a0fe01b472
   summary:    Bug 1 - Amended stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -338,7 +338,7 @@ Unrecognized reviewers should be ignored
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  15:63bf248dc320
+  changeset:  15:8205c51ec56d
   summary:    Bug 2 - different stuff; r?cthulhu
   review:     http://*:$HGPORT1/r/13 (draft) (glob)
   
@@ -364,11 +364,11 @@ from the client.
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  15:63bf248dc320
+  changeset:  15:8205c51ec56d
   summary:    Bug 2 - different stuff; r?cthulhu
   review:     http://*:$HGPORT1/r/13 (draft) (glob)
   
-  changeset:  16:cc822ad2605d
+  changeset:  16:2d0e7bbce150
   summary:    Bug 2 - different stuff; r=romulus
   (It appears you are using r= to specify reviewers for a patch under review. Please use r? to avoid ambiguity as to whether or not review has been granted.)
   review:     http://*:$HGPORT1/r/14 (draft) (glob)

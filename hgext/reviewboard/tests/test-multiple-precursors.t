@@ -72,11 +72,11 @@ Splitting the changeset results in multiple reviews
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  2:422e7a879de2
+  changeset:  2:910075ba4bfa
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/2 (glob)
   
-  changeset:  3:04215824bc37
+  changeset:  3:3ed8201aa6ee
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   

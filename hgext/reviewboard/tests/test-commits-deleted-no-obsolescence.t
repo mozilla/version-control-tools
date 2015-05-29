@@ -221,15 +221,15 @@ likely gets invalidated.
   remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
   
-  changeset:  1:3299fd5f5fca
+  changeset:  1:609df470f898
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/2 (glob)
   
-  changeset:  2:4fcbb12a36e4
+  changeset:  2:2977dec75fb2
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/3 (glob)
   
-  changeset:  3:d768dcb976de
+  changeset:  3:a92ad7ba0258
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/4 (glob)
   
@@ -263,7 +263,7 @@ The first commit was rewritten (we assume all subsequent were as well).
     target_people: []
     extra:
       p2rb: true
-      p2rb.commit_id: 3299fd5f5fca4800c424e989c65615edb52a421b
+      p2rb.commit_id: 609df470f8980e097192dab10a72a1401dfeca5f
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
     diffs:
@@ -271,7 +271,7 @@ The first commit was rewritten (we assume all subsequent were as well).
       revision: 2
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       patch:
-      - diff -r 93d9429b41ec -r 3299fd5f5fca foo2
+      - diff -r 93d9429b41ec -r 609df470f898 foo2
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo2\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
@@ -321,12 +321,12 @@ request is published.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r d768dcb976decf31b8ac1431701fefdacd31a390 http://*:$HGPORT/test-repo (glob)
+    - hg pull -r a92ad7ba0258da8e9cd3d84f2ec5db098c85e6ad http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["3299fd5f5fca4800c424e989c65615edb52a421b", 2], ["4fcbb12a36e4f7a606c8ad86636e232d2133cfe1",
-        3], ["d768dcb976decf31b8ac1431701fefdacd31a390", 4]]'
+      p2rb.commits: '[["609df470f8980e097192dab10a72a1401dfeca5f", 2], ["2977dec75fb2158cbb102eb4b3cb02b9c59a0227",
+        3], ["a92ad7ba0258da8e9cd3d84f2ec5db098c85e6ad", 4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -336,17 +336,17 @@ request is published.
       revision: 3
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       patch:
-      - diff -r 93d9429b41ec -r d768dcb976de foo2
+      - diff -r 93d9429b41ec -r a92ad7ba0258 foo2
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo2\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
       - +foo2
-      - diff -r 93d9429b41ec -r d768dcb976de foo3
+      - diff -r 93d9429b41ec -r a92ad7ba0258 foo3
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo3\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
       - +foo3
-      - diff -r 93d9429b41ec -r d768dcb976de foo4
+      - diff -r 93d9429b41ec -r a92ad7ba0258 foo4
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo4\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
@@ -373,11 +373,11 @@ Try removing a commit in the middle.
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  1:3299fd5f5fca
+  changeset:  1:609df470f898
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/2 (glob)
   
-  changeset:  2:7f4c8af7c6c4
+  changeset:  2:395146e6e0cf
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/3 (glob)
   

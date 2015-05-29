@@ -69,7 +69,7 @@ Adding commits to old reviews should create new reviews
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:3e4b2ebd3703
+  changeset:  3:f34b8ce40ee8
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
@@ -106,12 +106,12 @@ The parent review should have its description updated.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r 3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11 http://*:$HGPORT/test-repo (glob)
+    - hg pull -r f34b8ce40ee8891a60bfb98614d9ad602993a9ed http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
       p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", 2], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
-        3], ["3e4b2ebd37030e6cce8bf557a7d4f3a8f7219a11", 4]]'
+        3], ["f34b8ce40ee8891a60bfb98614d9ad602993a9ed", 4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -121,7 +121,7 @@ The parent review should have its description updated.
       revision: 1
       base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       patch:
-      - diff -r 7c5bdf0cec4a -r 3e4b2ebd3703 foo
+      - diff -r 7c5bdf0cec4a -r f34b8ce40ee8 foo
       - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -1,1 +1,1 @@'
@@ -153,11 +153,11 @@ rids to be strings and then pushing a new commit.
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:3e4b2ebd3703
+  changeset:  3:f34b8ce40ee8
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
-  changeset:  4:caf358b0a831
+  changeset:  4:6d1a9431c7b1
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/5 (draft) (glob)
   

@@ -64,11 +64,11 @@ Now create a new head and push a rebase
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  2:e7315a409763
+  changeset:  2:031a4a2faa19
   summary:    bar
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:5003cd557db3
+  changeset:  3:8770c32c2116
   summary:    foo2
   review:     http://*:$HGPORT1/r/2 (glob)
   

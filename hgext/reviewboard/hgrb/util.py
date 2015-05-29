@@ -1,6 +1,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import random
+import time
+
 from mercurial import util
 from mercurial.i18n import _
 
@@ -50,3 +53,61 @@ class ReviewID(object):
             s += '/%s' % self.user
 
         return s
+
+
+BASE62_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+
+# (datetime.datetime(2000, 1, 1, 0, 0, 0, 0) - datetime.datetime.utcfromtimestamp(0)).total_seconds()
+EPOCH = 946684800
+
+def genid(repo):
+    """Generate a unique identifier.
+
+    Unique identifiers are treated as a black box. But under the hood, they
+    consist of a time component and a random component.
+
+    Each identifier is up to 64 bits. The first 32 bits are random. The
+    final 32 bits are integer seconds since midnight UTC on January 1, 2000. We
+    don't use UNIX epoch because dates from the 70's aren't interesting to us.
+
+    The birthday paradox says we only need sqrt() attempts before we generate
+    a collision. So for 32 bits, we need 2^16 or 65,536 generations on average
+    before there is a collision. We estimate there will be a commit every 10s
+    for the Firefox repo. The chance of a collision should be very small.
+
+    Base62 is used as the encoding mechanism because it is safe for both
+    URLs and revsets. We could get base66 for URLs, but the characters
+    -~. could conflict with revsets.
+    """
+    # Provide a backdoor to generate deterministic IDs. This is used for
+    # testing purposes because tests want constant output. And since
+    # commit IDs go into the commit and are part of the SHA-1, they need
+    # to be deterministic.
+    if repo.ui.configbool('reviewboard', 'fakeids'):
+        data = repo.vfs.tryread('genid')
+        if data:
+            n = int(data)
+        else:
+            n = 0
+
+        seconds = EPOCH
+        rnd = n
+        repo.vfs.write('genid', str(n + 1))
+    else:
+        now = int(time.time())
+        # May 5, 2015 sometime.
+        if now < 1430860700:
+            raise util.Abort('your system clock is wrong; fix your system '
+                             'clock')
+        seconds = now - EPOCH
+        rnd = random.SystemRandom().getrandbits(32)
+
+    value = (rnd << 32) + seconds
+
+    chars = []
+    while value > 0:
+        quot, remain = divmod(value, 62)
+        chars.append(BASE62_CHARS[remain])
+        value = quot
+
+    return ''.join(reversed(chars))

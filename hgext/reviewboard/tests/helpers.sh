@@ -23,10 +23,15 @@ password = ${BUGZILLA_PASSWORD}
 # We want [extensions] to be last because some tests write
 # ext=path/to/ext lines.
 
+# Make generated IDs deterministic.
+[reviewboard]
+fakeids = true
+
 [extensions]
 strip =
 rebase =
 reviewboard = $TESTDIR/hgext/reviewboard/client.py
+
 EOF
 
 }
