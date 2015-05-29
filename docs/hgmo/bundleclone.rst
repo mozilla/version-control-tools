@@ -72,6 +72,16 @@ stream
    default ``gzip`` bundles, but they consume 4-6x less CPU time to
    process.
 
+.. note::
+
+   ``compression`` and ``stream`` are both used to control the type of
+   bundle file, but they are separate attributes for technical reasons.
+
+   To prefer a *stream bundle*, use ``stream=revlogv1``: there is no
+   need to specify ``compression`` unless you wish to declare a
+   ``gzip`` or ``bzip`` fallback preference in case a *stream bundle*
+   isn't available.
+
 If you are a Mozilla contributor in California, the defaults are
 probably fine.
 
