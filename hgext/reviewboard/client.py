@@ -451,7 +451,6 @@ def doreview(repo, ui, remote, nodes):
         elif t == 'csetreview':
             node, rid = d.split(' ', 1)
             node = bin(node)
-            reviews.addnodereview(node, rid, newparentid)
             reviewdata[rid] = {}
             nodereviews[node] = rid
         elif t == 'reviewdata':
@@ -462,6 +461,9 @@ def doreview(repo, ui, remote, nodes):
             reviews.baseurl = d
 
     reviews.remoteurl = remote.url()
+
+    for node, rid in nodereviews.items():
+        reviews.addnodereview(node, rid, newparentid)
 
     reviews.write()
     for rid, data in reviewdata.iteritems():
