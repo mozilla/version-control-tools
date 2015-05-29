@@ -198,12 +198,15 @@ def _post_reviews(api_root, repoid, identifier, commits):
 
     def update_review_request(rid, commit):
         rr = api_root.get_review_request(review_request_id=rid)
-        draft = rr.get_or_create_draft(**{
+        props = {
             "summary": commit['message'].splitlines()[0],
             "description": commit['message'],
             "extra_data.p2rb.commit_id": commit['id'],
-            "target_people": ','.join(extract_reviewers(commit)),
-        })
+        }
+        reviewers = extract_reviewers(commit)
+        if reviewers:
+            props["target_people"] = ','.join(reviewers)
+        draft = rr.get_or_create_draft(**props)
 
         rr.get_diffs().upload_diff(
             commit['diff'],
@@ -335,10 +338,14 @@ def _post_reviews(api_root, repoid, identifier, commits):
             commit['diff'],
             parent_diff=commit.get('parent_diff', None),
             base_commit_id=commit.get('base_commit_id', None))
-        draft = rr.get_or_create_draft(
-            summary=commit['message'].splitlines()[0],
-            description=commit['message'],
-            target_people=','.join(extract_reviewers(commit)))
+        props = {
+            "summary": commit['message'].splitlines()[0],
+            "description": commit['message'],
+        }
+        reviewers = extract_reviewers(commit)
+        if reviewers:
+            props["target_people"] = ','.join(reviewers)
+        draft = rr.get_or_create_draft(**props)
         processed_nodes.add(commit['id'])
         assert isinstance(rr.id, int)
         node_to_rid[node] = rr.id
@@ -391,13 +398,15 @@ def _post_reviews(api_root, repoid, identifier, commits):
     commit_list_json = json.dumps(commit_list)
     depends = ','.join(str(i) for i in sorted(node_to_rid.values()))
 
-    squashed_draft = squashed_rr.get_or_create_draft(**{
+    props = {
         'summary': identifier,
         'description': '%s\n' % '\n'.join(squashed_description),
         'depends_on': depends,
         'extra_data.p2rb.commits': commit_list_json,
-        'target_people': ','.join(sorted(squashed_reviewers)),
-    })
+    }
+    if squashed_reviewers:
+        props['target_people'] = ','.join(sorted(squashed_reviewers))
+    squashed_draft = squashed_rr.get_or_create_draft(**props)
 
     squashed_rr.update(**{
         'extra_data.p2rb.discard_on_publish_rids': json.dumps(

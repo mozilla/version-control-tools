@@ -261,7 +261,73 @@ again.
   $ rbmanage list-reviewers 11 --draft
   admin+1, remus, romulus
 
-Amending a commit will reset the reviewers back to the default.
+We should not overwrite manually added reviewers if the revision is amended 
+and pushed with no reviewers specified.
+
+  $ rbmanage list-reviewers 11 --draft
+  admin+1, remus, romulus
+  $ echo blah >> foo
+  $ hg commit --amend -m 'Bug 1 - Amended stuff'
+  $ hg push
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
+  submitting 10 changesets for review
+  
+  changeset:  11:fcf566e4c32a
+  summary:    Bug 1 - some stuff; r?romulus
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  
+  changeset:  12:c62a829e2f0a
+  summary:    Bug 1 - More stuff; r?romulus, r?remus
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  
+  changeset:  13:955576a13e6c
+  summary:    Bug 1 - More stuff; r?romulus,r?remus
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  
+  changeset:  14:696e908c00aa
+  summary:    Bug 1 - More stuff; r?romulus, remus
+  review:     http://*:$HGPORT1/r/5 (draft) (glob)
+  
+  changeset:  15:92e037a5e92f
+  summary:    Bug 1 - More stuff; r?romulus,remus
+  review:     http://*:$HGPORT1/r/6 (draft) (glob)
+  
+  changeset:  16:a7c3071c6b54
+  summary:    Bug 1 - More stuff; (r?romulus)
+  review:     http://*:$HGPORT1/r/7 (draft) (glob)
+  
+  changeset:  17:7b03b2560ab0
+  summary:    Bug 1 - More stuff; (r?romulus,remus)
+  review:     http://*:$HGPORT1/r/8 (draft) (glob)
+  
+  changeset:  18:42c4d67a510e
+  summary:    Bug 1 - More stuff; [r?romulus]
+  review:     http://*:$HGPORT1/r/9 (draft) (glob)
+  
+  changeset:  19:2bc874a070ce
+  summary:    Bug 1 - More stuff; [r?remus, r?romulus]
+  review:     http://*:$HGPORT1/r/10 (draft) (glob)
+  
+  changeset:  24:4a950181ffd8
+  summary:    Bug 1 - Amended stuff
+  review:     http://*:$HGPORT1/r/11 (draft) (glob)
+  
+  review id:  bz://1/mynick
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
+
+  $ rbmanage list-reviewers 11 --draft
+  admin+1, remus, romulus
+
+Amending a commit with reviewers specified will reset the reviewers back to
+those specified in the commit summary.
 
   $ echo blah >> foo
   $ hg commit --amend -m 'Bug 1 - Amended stuff; r?romulus, r?remus'
@@ -312,7 +378,7 @@ Amending a commit will reset the reviewers back to the default.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
-  changeset:  24:9a37c8988ef7
+  changeset:  26:3ec3b449ccca
   summary:    Bug 1 - Amended stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -339,7 +405,7 @@ Unrecognized reviewers should be ignored
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  25:8b7822987cba
+  changeset:  27:d9a3b1783a10
   summary:    Bug 2 - different stuff; r?cthulhu
   review:     http://*:$HGPORT1/r/13 (draft) (glob)
   
@@ -365,11 +431,11 @@ from the client.
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  25:8b7822987cba
+  changeset:  27:d9a3b1783a10
   summary:    Bug 2 - different stuff; r?cthulhu
   review:     http://*:$HGPORT1/r/13 (draft) (glob)
   
-  changeset:  26:2d366e692ea2
+  changeset:  28:c486e8175a60
   summary:    Bug 2 - different stuff; r=romulus
   (It appears you are using r= to specify reviewers for a patch under review. Please use r? to avoid ambiguity as to whether or not review has been granted.)
   review:     http://*:$HGPORT1/r/14 (draft) (glob)
