@@ -302,6 +302,21 @@ def wrappedpushdiscovery(orig, pushop):
 
     pushop.reviewnodes = nodes
 
+    # Since we may rewrite changesets to contain review metadata after
+    # push, abort immediately if the working directory state is not
+    # compatible with rewriting. This prevents us from successfully
+    # pushing and failing to update commit metadata after the push. i.e.
+    # it prevents potential loss of metadata.
+    #
+    # There may be some scenarios where we don't rewrite after push.
+    # But coding that here would be complicated. And future server changes
+    # may change things like review request mapping, which may invalidate
+    # client assumptions. So always assume a rewrite is needed.
+    impactedrevs = list(repo.revs('%ln::', nodes))
+    if repo['.'].rev() in impactedrevs:
+        cmdutil.checkunfinished(repo)
+        cmdutil.bailifchanged(repo)
+
     return orig(pushop)
 
 def wrappedpushbookmark(orig, pushop):

@@ -228,7 +228,7 @@ Specifying a revision range works
   (visit review url to publish this review request so others can see it)
   [1]
 
-Specifying a base revision limits reviewed changesets
+Prepare for multi changeset tests
 
   $ hg up -q -r 0
   $ echo ignore > foo
@@ -239,6 +239,25 @@ Specifying a base revision limits reviewed changesets
   $ hg commit -m 'Middle commit'
   $ echo tip > foo
   $ hg commit -m 'Review tip'
+
+A dirty working copy of a reviewed node will abort because of potential rewriting
+
+  $ echo dirty > foo
+  $ hg push -r 8::10 --reviewid 7
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  abort: uncommitted changes
+  [255]
+
+A dirty working copy of a child of a review node will abort
+
+  $ hg push -r 8::9 --reviewid 7
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  abort: uncommitted changes
+  [255]
+
+  $ hg revert -C foo
+
+Specifying a base revision limits reviewed changesets
 
   $ hg push -r 8::10 --reviewid 7
   pushing to ssh://*:$HGPORT6/test-repo (glob)
