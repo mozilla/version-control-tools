@@ -8,8 +8,9 @@
 - name: ensure bundles directory exists
   file: path=/repo/bundles owner=hg group=hg state=directory mode=0775
 
-- name: send CRON mail to developer-services list
-  cronvar: user=hg name=MAILTO value=developer-services@mozilla.org
+# TODO enable once Ansible 2.0 is released.
+#- name: send CRON mail to developer-services list
+#  cronvar: user=hg name=MAILTO value=developer-services@mozilla.org
 
 - name: create CRON to generate S3 bundles
   cron: name="Generate Mercurial bundles for {{ item.repo }}"
