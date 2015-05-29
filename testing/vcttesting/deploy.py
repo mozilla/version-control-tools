@@ -60,7 +60,7 @@ def deploy_reviewboard_prod(repo=None, rev=None, verbosity=0):
                         verbosity=verbosity)
 
 
-def hgmo_deploy_extensions(verbosity=0):
+def hgmo(verbosity=0):
     """Deploy hooks and extensions to hg.mozilla.org servers."""
     extra = {'vct': ROOT}
 

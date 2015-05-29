@@ -39,12 +39,12 @@ class DeployCommands(object):
         from vcttesting.deploy import deploy_reviewboard_prod
         return deploy_reviewboard_prod(repo=repo, rev=rev, verbosity=verbosity)
 
-    @Command('hgmo-extensions', category='deploy',
-             description='Deploy hooks and extensions to hg.mozilla.org')
+    @Command('hgmo', category='deploy',
+             description='Deploy hg.mozilla.org')
     @CommandArgument('--verbosity', type=int,
                      help='How verbose to be with output')
-    def hgmo_extensions(self, verbosity=None):
-        from vcttesting.deploy import hgmo_deploy_extensions as deploy
+    def hgmo(self, verbosity=None):
+        from vcttesting.deploy import hgmo as deploy
         return deploy(verbosity=verbosity)
 
     @Command('hgmo-strip', category='deploy',

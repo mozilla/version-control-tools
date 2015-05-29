@@ -15,7 +15,7 @@ Deployment of new code to hg.mozilla.org is performed via an Ansible
 playbook defined in the version-control-tools repository. To deploy new
 code, simply run::
 
-   $ ./deploy hgmo-extensions
+   $ ./deploy hgmo
 
 .. important::
 
