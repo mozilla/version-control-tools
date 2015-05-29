@@ -1,0 +1,184 @@
+#!/usr/bin/env python2
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import errno
+import os
+import subprocess
+import sys
+
+from boto.s3.connection import S3Connection
+
+# The types of bundles to generate.
+#
+# Define in order bundles should be listed in manifest.
+TYPES = ('gzip', 'stream', 'bzip2')
+
+# Defines hostname and bucket where uploads should go.
+HOSTS = (
+    ('s3-us-west-2.amazonaws.com', 'moz-hg-bundles-us-west-2', 'us-west-2'),
+    ('s3-external-1.amazonaws.com', 'moz-hg-bundles-us-east-1', 'us-east-1'),
+)
+
+# We store bundles on the local filesystem because they may cause chaos
+# with volume snapshots. See bug 1167935.
+BUNDLE_ROOT = '/repo/bundles'
+
+
+def upload_to_s3(host, bucket_name, local_path, remote_path):
+    """Upload a file to S3."""
+
+    c = S3Connection(host=host)
+    # We assume buckets exist already.
+    b = c.get_bucket(bucket_name, validate=False)
+
+    key = b.get_key(remote_path, validate=False)
+
+    if key.exists():
+        print('s3 object already exists; skipping')
+        return
+
+    key.set_contents_from_filename(local_path)
+
+def check_output(*args, **kwargs):
+    """Python 2.6 compatible implementation of subprocess.check_output."""
+    proc = subprocess.Popen(stdout=subprocess.PIPE, *args, **kwargs)
+    output, unused_err = proc.communicate()
+    retcode = proc.poll()
+    if retcode:
+        cmd = kwargs.get('args', args[0])
+        e = subprocess.CalledProcessError(retcode, cmd)
+        e.output = output
+        raise e
+
+    return output
+
+def generate_bundles(repo):
+    """Generate bundle files for a repository at a path."""
+    assert not os.path.isabs(repo)
+    repo_full = os.path.join('/repo/hg/mozilla', repo)
+
+    hg_stat = os.stat(os.path.join(repo_full, '.hg'))
+    uid = hg_stat.st_uid
+    gid = hg_stat.st_gid
+
+    # Bundle files are named after the tip revision in the repository at
+    # the time the bundle was created. This is the easiest way to name
+    # bundle files.
+    tip = check_output(['hg', '-R', repo_full, 'log', '-r', 'tip', '-T', '{node}'])
+    print('tip is %s' % tip)
+
+    bundle_path = os.path.join(BUNDLE_ROOT, repo)
+
+    # Create directory to hold bundle files.
+    try:
+        os.makedirs(bundle_path, 0755)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+    # We keep the last bundle files around so we can reuse them if necessary.
+    # Prune irrelevant files.
+    for p in os.listdir(bundle_path):
+        if p.startswith('.') or p.startswith(tip):
+            continue
+
+        full = os.path.join(bundle_path, p)
+        print('removing old bundle file: %s' % full)
+        os.unlink(full)
+
+    # Bundle generation is pretty straightforward. We simply invoke
+    # `hg bundle` for each type of bundle we're producing. We use ``-a``
+    # to bundle all revisions currently in the repository.
+    #
+    # There is a race condition between discovering the tip revision and
+    # bundling: it's possible for extra revisions beyond observed tip to
+    # sneak into the bundles. This is acceptable. Bundles are best effort
+    # to offload clone load from the server. They don't have to be exactly
+    # identical nor as advertised.
+    #
+    # We write to temporary files then move them into place after generation.
+    # This is because an aborted bundle process may result in a partial file,
+    # which may confuse our don't-write-if-file-exists logic.
+
+    files = []
+
+    for t in TYPES:
+        basename = '%s.%s.hg' % (tip, t)
+        final_path = os.path.join(bundle_path, basename)
+        temp_path = '%s.tmp' % final_path
+        remote_path = '%s/%s' % (repo, basename)
+
+        files.append((t, final_path, temp_path, remote_path))
+
+    for t, final_path, temp_path, remote_path in files:
+        if os.path.exists(final_path):
+            print('bundle already exists, skipping: %s' % final_path)
+            continue
+
+        args = ['hg', '-R', repo_full]
+        if t == 'stream':
+            args.append('streambundle')
+        else:
+            args.extend(['bundle', '-a', '-t', t])
+
+        args.append(temp_path)
+
+        subprocess.check_call(args)
+        os.rename(temp_path, final_path)
+
+    # Object path is keyed off the repository name so we can easily see what
+    # is taking up space on the server.
+    #
+    # We upload directly to each EC2 region. This is worth explaining.
+    #
+    # S3 supports replication. However, replication occurs asynchronously
+    # with the upload. This means there is a window between when upload
+    # complete and when the bundle is available in the other region. We
+    # don't want to advertise the bundle until it is distributed, as this
+    # would result in a 404 and client failure. We could poll and wait for
+    # replication to complete. However, there are similar issues with
+    # using COPY...
+    #
+    # There is a COPY API on S3 that allows you to perform a remote copy
+    # between regions. This seems like a perfect API, as it saves the
+    # client from having to upload the same data to Amazon multiple times.
+    # However, we've seen COPY operations take longer to complete than a
+    # raw upload. See bug 1167732. Since bundles are being generated in a
+    # datacenter that has plentiful bandwidth to S3 and because we
+    # generally like operations to complete faster, we choose to simply
+    # upload the bundle to multiple regions instead of employ COPY.
+    for host, bucket, name in HOSTS:
+        for t, final_path, temp_path, remote_path in files:
+            print('uploading to %s/%s/%s' % (host, bucket, remote_path))
+            upload_to_s3(host, bucket, final_path, remote_path)
+
+    # Now assemble a manifest listing each bundle.
+    manifest = []
+    for t, final_path, temp_path, remote_path in files:
+        for host, bucket, name in HOSTS:
+            entry = 'https://%s/%s/%s ec2region=%s' % (host, bucket,
+                                                       remote_path, name)
+            if t == 'stream':
+                entry += ' stream=revlogv1'
+            else:
+                entry += ' compression=%s' % t
+
+            manifest.append(entry)
+
+    manifest_path = os.path.join(repo_full, '.hg', 'bundleclone.manifest')
+    with open(manifest_path, 'wb') as fh:
+        fh.write('\n'.join(manifest))
+
+    # Ensure manifest is owned by same user who owns repo and has sane
+    # permissions.
+    os.chown(manifest_path, uid, gid)
+    os.chmod(manifest_path, 0664)
+
+    # Replicate manifest to mirrors.
+    subprocess.check_call(['/repo/hg/scripts/push-repo.sh'], cwd=repo_full)
+
+if __name__ == '__main__':
+    for repo in sys.argv[1:]:
+        generate_bundles(repo)
