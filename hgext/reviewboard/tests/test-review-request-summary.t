@@ -21,6 +21,8 @@
   $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 2 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/61e2e5c813d2*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -30,11 +32,11 @@
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  1:24417bc94b2c
+  changeset:  1:a92d53c0ffc7
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:61e2e5c813d2
+  changeset:  2:233b570e5356
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
@@ -57,7 +59,7 @@
   children:
   - summary: Bug 1 - Foo 1
     id: 2
-    commit: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
+    commit: a92d53c0ffc7df0517397a77980e62332552d812
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -65,7 +67,7 @@
     - reviewer
   - summary: Bug 1 - Foo 2
     id: 3
-    commit: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
+    commit: 233b570e5356d0c84bcbf0633de446172012b3b3
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -98,7 +100,7 @@ Opening an issue should be reflected in the summary.
   children:
   - summary: Bug 1 - Foo 1
     id: 2
-    commit: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
+    commit: a92d53c0ffc7df0517397a77980e62332552d812
     submitter: default+5
     issue_open_count: 1
     status: pending
@@ -106,7 +108,7 @@ Opening an issue should be reflected in the summary.
     - reviewer
   - summary: Bug 1 - Foo 2
     id: 3
-    commit: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
+    commit: 233b570e5356d0c84bcbf0633de446172012b3b3
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -128,7 +130,7 @@ Resolving an issue should decrement the issue count.
   children:
   - summary: Bug 1 - Foo 1
     id: 2
-    commit: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
+    commit: a92d53c0ffc7df0517397a77980e62332552d812
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -136,7 +138,7 @@ Resolving an issue should decrement the issue count.
     - reviewer
   - summary: Bug 1 - Foo 2
     id: 3
-    commit: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
+    commit: 233b570e5356d0c84bcbf0633de446172012b3b3
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -157,7 +159,7 @@ Verify we can also get the summaries by bug, including closed ones.
     children:
     - summary: Bug 1 - Foo 1
       id: 2
-      commit: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
+      commit: a92d53c0ffc7df0517397a77980e62332552d812
       submitter: default+5
       issue_open_count: 0
       status: submitted
@@ -165,7 +167,7 @@ Verify we can also get the summaries by bug, including closed ones.
       - reviewer
     - summary: Bug 1 - Foo 2
       id: 3
-      commit: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
+      commit: 233b570e5356d0c84bcbf0633de446172012b3b3
       submitter: default+5
       issue_open_count: 0
       status: pending

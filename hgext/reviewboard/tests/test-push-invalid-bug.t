@@ -9,6 +9,8 @@
   adding foo
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/301fa3db32b6*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests

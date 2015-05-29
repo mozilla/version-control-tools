@@ -19,6 +19,8 @@
   $ hg commit -m 'Bug 1 - Initial commit'
   $ hg --config bugzilla.username=submitter@example.com push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/8c2be86a13c9*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -28,7 +30,7 @@
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  1:8c2be86a13c9
+  changeset:  1:0aca5e441702
   summary:    Bug 1 - Initial commit
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
@@ -52,7 +54,7 @@ Now publish the review and create a new draft
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  1:d525f873800b
+  changeset:  1:b3be3d464d6b
   summary:    Bug 1 - Initial commit
   review:     http://*:$HGPORT1/r/2 (glob)
   
@@ -75,11 +77,11 @@ We should have a disagreement between published and draft
   - ''
   - 'Pull down this commit:'
   - ''
-  - hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://*:$HGPORT/test-repo (glob)
+  - hg pull -r 0aca5e4417025c80407d8f7f22864e8d09fbec50 http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["8c2be86a13c96ceb24c3eaa50cc6ef214c656d50", 2]]'
+    p2rb.commits: '[["0aca5e4417025c80407d8f7f22864e8d09fbec50", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
@@ -94,11 +96,11 @@ We should have a disagreement between published and draft
     - ''
     - 'Pull down this commit:'
     - ''
-    - hg pull -r d525f873800b072bbe8c847d03698b5bd6beff3e http://*:$HGPORT/test-repo (glob)
+    - hg pull -r b3be3d464d6b32130006cbdfa82f9f98a3c57a01 http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["d525f873800b072bbe8c847d03698b5bd6beff3e", 2]]'
+      p2rb.commits: '[["b3be3d464d6b32130006cbdfa82f9f98a3c57a01", 2]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -108,7 +110,7 @@ We should have a disagreement between published and draft
       revision: 2
       base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
       patch:
-      - diff -r 3a9f6899ef84 -r d525f873800b foo
+      - diff -r 3a9f6899ef84 -r b3be3d464d6b foo
       - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -1,1 +1,1 @@'
@@ -128,7 +130,7 @@ We should have a disagreement between published and draft
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commit_id: 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50
+    p2rb.commit_id: 0aca5e4417025c80407d8f7f22864e8d09fbec50
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   draft:
@@ -140,7 +142,7 @@ We should have a disagreement between published and draft
     target_people: []
     extra:
       p2rb: true
-      p2rb.commit_id: d525f873800b072bbe8c847d03698b5bd6beff3e
+      p2rb.commit_id: b3be3d464d6b32130006cbdfa82f9f98a3c57a01
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
     diffs:
@@ -148,7 +150,7 @@ We should have a disagreement between published and draft
       revision: 2
       base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
       patch:
-      - diff -r 3a9f6899ef84 -r d525f873800b foo
+      - diff -r 3a9f6899ef84 -r b3be3d464d6b foo
       - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -1,1 +1,1 @@'
@@ -174,11 +176,11 @@ Discarding the parent review request draft should discard draft on children
   - ''
   - 'Pull down this commit:'
   - ''
-  - hg pull -r 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50 http://*:$HGPORT/test-repo (glob)
+  - hg pull -r 0aca5e4417025c80407d8f7f22864e8d09fbec50 http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["8c2be86a13c96ceb24c3eaa50cc6ef214c656d50", 2]]'
+    p2rb.commits: '[["0aca5e4417025c80407d8f7f22864e8d09fbec50", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
@@ -197,7 +199,7 @@ Discarding the parent review request draft should discard draft on children
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commit_id: 8c2be86a13c96ceb24c3eaa50cc6ef214c656d50
+    p2rb.commit_id: 0aca5e4417025c80407d8f7f22864e8d09fbec50
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 

@@ -23,6 +23,7 @@ Set up the repo
   $ hg commit -m 'foo2'
   $ hg push --reviewid 1
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 1 changesets)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -32,7 +33,7 @@ Set up the repo
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  1:c3480b3f6944
+  changeset:  2:da1efb6eb614
   summary:    foo2
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
@@ -50,7 +51,7 @@ Now create a new head and push a rebase
   $ hg commit -A -m 'bar'
   adding bar
   created new head
-  $ hg -q rebase -s 1 -d .
+  $ hg -q rebase -s 2 -d .
   $ hg up tip
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg push --reviewid 1
@@ -64,11 +65,11 @@ Now create a new head and push a rebase
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  2:031a4a2faa19
+  changeset:  3:850ce71e5f69
   summary:    bar
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:8770c32c2116
+  changeset:  4:15cedbc6da54
   summary:    foo2
   review:     http://*:$HGPORT1/r/2 (glob)
   

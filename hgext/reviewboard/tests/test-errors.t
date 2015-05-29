@@ -49,24 +49,30 @@ Publishing repositories should trigger error
 Pushing when we don't have the client extension installed results in warning.
 
   $ cd client
-  $ echo 'foo' > foo
-  $ hg commit -A -m 'first commit'
+  $ echo initial > foo
+  $ hg commit -A -m initial
   adding foo
+  $ hg phase --public -r .
+
+  $ echo foo > foo
+  $ hg commit -A -m 'first commit'
   $ hg push http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
+  remote: added 2 changesets with 2 changes to 1 files
   remote: REVIEWBOARD: You need to have the reviewboard client extension installed in order to perform code reviews.
   remote: REVIEWBOARD: See https://hg.mozilla.org/hgcustom/version-control-tools/file/tip/hgext/reviewboard/README.rst
 
   $ cat >> .hg/hgrc <<EOF
   > [extensions]
+  > reviewboard = $TESTDIR/hgext/reviewboard/client.py
+  > 
+  > [reviewboard]
+  > fakeids = true
   > EOF
-  $ echo "reviewboard=$(echo $TESTDIR)/hgext/reviewboard/client.py" >> .hg/hgrc
-  $ echo "[reviewboard]" >> .hg/hgrc
 
 Pushing without IRC nick configured will result in a warning
 
@@ -84,13 +90,16 @@ Attempt to push with Bugzilla not configured will result in a warning
 
   $ echo 'bar' > foo
   $ hg commit -m 'second commit'
+
   $ FIREFOX_PROFILES_DIR=$TESTTMP hg push http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
+  (adding commit id to 2 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/54e4f001f1bf*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
+  remote: added 2 changesets with 1 changes to 1 files (+1 heads)
   Bugzilla username: None
   Bugzilla credentials not available. Not submitting review.
 
@@ -140,6 +149,8 @@ Pushing multiple heads is rejected
   created new head
   $ hg push -r 0:tip --reviewid bz://784841 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/2e92ee1083e0*-addcommitid.hg (glob)
   searching for changes
   abort: cannot push multiple heads to remote; limit pushed revisions using the -r argument.
   [255]

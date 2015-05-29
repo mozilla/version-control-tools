@@ -36,6 +36,8 @@ Seed the repo
   adding foo2
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 2 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/19006c154c5f*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -45,11 +47,11 @@ Seed the repo
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  1:2b77e5337389
+  changeset:  1:3a9a9f9a418e
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:19006c154c5f
+  changeset:  2:f7237974e32c
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   

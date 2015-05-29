@@ -24,6 +24,8 @@
   $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 2 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/61e2e5c813d2*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -33,11 +35,11 @@
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  1:24417bc94b2c
+  changeset:  1:a92d53c0ffc7
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:61e2e5c813d2
+  changeset:  2:233b570e5356
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
@@ -69,11 +71,11 @@ Squashed review request with ID 1 should be closed as submitted...
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo (glob)
+  - hg pull -r 233b570e5356d0c84bcbf0633de446172012b3b3 http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", 2], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
+    p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
@@ -95,7 +97,7 @@ Child review request with ID 2 should be closed as submitted...
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commit_id: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
+    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 
@@ -112,7 +114,7 @@ Child review request with ID 2 should be closed as submitted...
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commit_id: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
+    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 
@@ -137,11 +139,11 @@ Squashed review request with ID 1 should be re-opened...
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 61e2e5c813d2c6a3858a22cd8e76ece29195f87d http://*:$HGPORT/test-repo (glob)
+  - hg pull -r 233b570e5356d0c84bcbf0633de446172012b3b3 http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", 2], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
+    p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
@@ -163,7 +165,7 @@ Child review request with ID 2 should be re-opened...
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commit_id: 24417bc94b2c053e8f5dd8c09da33fbbef5404fe
+    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 
@@ -182,7 +184,7 @@ Child review request with ID 3 should be re-opened...
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commit_id: 61e2e5c813d2c6a3858a22cd8e76ece29195f87d
+    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 

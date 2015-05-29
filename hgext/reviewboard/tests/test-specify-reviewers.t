@@ -54,6 +54,7 @@ Try a bunch of different ways of specifying a reviewer
   $ hg commit -m 'Bug 1 - More stuff; r?romulus, a=test-only'
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 10 changesets)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -63,43 +64,43 @@ Try a bunch of different ways of specifying a reviewer
   remote: Inserted into the pushlog db successfully.
   submitting 10 changesets for review
   
-  changeset:  1:1d3e02ea76a8
+  changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:3ea76e5e2747
+  changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:3031ae574ad5
+  changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
-  changeset:  4:6dd1493693a2
+  changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
   review:     http://*:$HGPORT1/r/5 (draft) (glob)
   
-  changeset:  5:f58f477ed98c
+  changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
   review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
-  changeset:  6:d78abc932d4f
+  changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
   review:     http://*:$HGPORT1/r/7 (draft) (glob)
   
-  changeset:  7:962142c32fc8
+  changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
   review:     http://*:$HGPORT1/r/8 (draft) (glob)
   
-  changeset:  8:be705f3f00ba
+  changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
   review:     http://*:$HGPORT1/r/9 (draft) (glob)
   
-  changeset:  9:0c9536c71481
+  changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
-  changeset:  10:7a2c46150c89
+  changeset:  20:9138f440ecac
   summary:    Bug 1 - More stuff; r?romulus, a=test-only
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -153,43 +154,43 @@ code path.
   remote: Inserted into the pushlog db successfully.
   submitting 10 changesets for review
   
-  changeset:  1:1d3e02ea76a8
+  changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:3ea76e5e2747
+  changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:3031ae574ad5
+  changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
-  changeset:  4:6dd1493693a2
+  changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
   review:     http://*:$HGPORT1/r/5 (draft) (glob)
   
-  changeset:  5:f58f477ed98c
+  changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
   review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
-  changeset:  6:d78abc932d4f
+  changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
   review:     http://*:$HGPORT1/r/7 (draft) (glob)
   
-  changeset:  7:962142c32fc8
+  changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
   review:     http://*:$HGPORT1/r/8 (draft) (glob)
   
-  changeset:  8:be705f3f00ba
+  changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
   review:     http://*:$HGPORT1/r/9 (draft) (glob)
   
-  changeset:  9:0c9536c71481
+  changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
-  changeset:  12:c21a7567db5e
+  changeset:  22:f70fd1f0a35e
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -213,43 +214,43 @@ again.
   no changes found
   submitting 10 changesets for review
   
-  changeset:  1:1d3e02ea76a8
+  changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:3ea76e5e2747
+  changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:3031ae574ad5
+  changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
-  changeset:  4:6dd1493693a2
+  changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
   review:     http://*:$HGPORT1/r/5 (draft) (glob)
   
-  changeset:  5:f58f477ed98c
+  changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
   review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
-  changeset:  6:d78abc932d4f
+  changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
   review:     http://*:$HGPORT1/r/7 (draft) (glob)
   
-  changeset:  7:962142c32fc8
+  changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
   review:     http://*:$HGPORT1/r/8 (draft) (glob)
   
-  changeset:  8:be705f3f00ba
+  changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
   review:     http://*:$HGPORT1/r/9 (draft) (glob)
   
-  changeset:  9:0c9536c71481
+  changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
-  changeset:  12:c21a7567db5e
+  changeset:  22:f70fd1f0a35e
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -275,43 +276,43 @@ Amending a commit will reset the reviewers back to the default.
   remote: Inserted into the pushlog db successfully.
   submitting 10 changesets for review
   
-  changeset:  1:1d3e02ea76a8
+  changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:3ea76e5e2747
+  changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:3031ae574ad5
+  changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
-  changeset:  4:6dd1493693a2
+  changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
   review:     http://*:$HGPORT1/r/5 (draft) (glob)
   
-  changeset:  5:f58f477ed98c
+  changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
   review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
-  changeset:  6:d78abc932d4f
+  changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
   review:     http://*:$HGPORT1/r/7 (draft) (glob)
   
-  changeset:  7:962142c32fc8
+  changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
   review:     http://*:$HGPORT1/r/8 (draft) (glob)
   
-  changeset:  8:be705f3f00ba
+  changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
   review:     http://*:$HGPORT1/r/9 (draft) (glob)
   
-  changeset:  9:0c9536c71481
+  changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
-  changeset:  14:55a0fe01b472
+  changeset:  24:9a37c8988ef7
   summary:    Bug 1 - Amended stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -338,7 +339,7 @@ Unrecognized reviewers should be ignored
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  15:8205c51ec56d
+  changeset:  25:8b7822987cba
   summary:    Bug 2 - different stuff; r?cthulhu
   review:     http://*:$HGPORT1/r/13 (draft) (glob)
   
@@ -364,11 +365,11 @@ from the client.
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  15:8205c51ec56d
+  changeset:  25:8b7822987cba
   summary:    Bug 2 - different stuff; r?cthulhu
   review:     http://*:$HGPORT1/r/13 (draft) (glob)
   
-  changeset:  16:2d0e7bbce150
+  changeset:  26:2d366e692ea2
   summary:    Bug 2 - different stuff; r=romulus
   (It appears you are using r= to specify reviewers for a patch under review. Please use r? to avoid ambiguity as to whether or not review has been granted.)
   review:     http://*:$HGPORT1/r/14 (draft) (glob)

@@ -35,6 +35,7 @@
 
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 2 changesets)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -44,11 +45,11 @@
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  1:a252038ad074
+  changeset:  3:6bd3fbee3dfa
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:c3d0947fefb7
+  changeset:  4:dfe48634934b
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
@@ -66,12 +67,12 @@
   $ hg commit -A -m 'Bug 1 - Foo 5'
   adding foo5
 
-  $ hg histedit a252038ad074 --commands - 2>&1 <<EOF
-  > pick a252038ad074 Foo 1
-  > fold c49d0981f633 Foo 3
-  > pick c3d0947fefb7 Foo 2
-  > fold 3e38d3cfe1f8 Foo 4
-  > pick e431ad048924 Foo 5
+  $ hg histedit 6bd3fbee3dfa --commands - 2>&1 <<EOF
+  > pick 6bd3fbee3dfa Foo 1
+  > fold d751d4c04967 Foo 3
+  > pick dfe48634934b Foo 2
+  > fold 98dd6a7335db Foo 4
+  > pick 76088734e3cb Foo 5
   > EOF
   0 files updated, 0 files merged, 4 files removed, 0 files unresolved
   0 files updated, 0 files merged, 2 files removed, 0 files unresolved
@@ -97,15 +98,15 @@
   remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
   
-  changeset:  6:df1802ef98b7
+  changeset:  8:dac4214a563a
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (glob)
   
-  changeset:  7:ce1080d59da3
+  changeset:  9:5b936d238262
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (glob)
   
-  changeset:  8:0dc7c48aa91b
+  changeset:  10:ae82743c8863
   summary:    Bug 1 - Foo 5
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   

@@ -64,6 +64,8 @@ Pushing a single changeset will initiate a single review (no children)
 
   $ hg push -r 1 --reviewid 1
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/6f06b4ac6efe*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -73,7 +75,7 @@ Pushing a single changeset will initiate a single review (no children)
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  1:6f06b4ac6efe
+  changeset:  6:f422841a13f8
   summary:    anonymous head
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
@@ -83,19 +85,19 @@ Pushing a single changeset will initiate a single review (no children)
 
 {reviews} template works
 
-  $ hg log -r 0::1 --template "{node|short} {reviews % '{get(review, \"url\")} {get(review, \"status\")}'}\n"
+  $ hg log -r 0::f422841a13f8 --template "{node|short} {reviews % '{get(review, \"url\")} {get(review, \"status\")}'}\n"
   3a9f6899ef84 
-  6f06b4ac6efe http://*:$HGPORT1/r/2 pending (glob)
+  f422841a13f8 http://*:$HGPORT1/r/2 pending (glob)
 
 Pushing no changesets will do a re-review
 
-  $ hg push -r 1 --reviewid 1
+  $ hg push -r f422841a13f8 --reviewid 1
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:6f06b4ac6efe
+  changeset:  6:f422841a13f8
   summary:    anonymous head
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
@@ -108,13 +110,13 @@ Pushing no changesets will do a re-review but will not reset a published
 review back to draft (See Bug 1096761)
 
   $ rbmanage publish 1
-  $ hg push -r 1 --reviewid 1
+  $ hg push -r f422841a13f8 --reviewid 1
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:6f06b4ac6efe
+  changeset:  6:f422841a13f8
   summary:    anonymous head
   review:     http://*:$HGPORT1/r/2 (glob)
   
@@ -138,7 +140,7 @@ Pushing patches from mq will result in a warning
   (You are using mq to develop patches. *) (glob)
   submitting 1 changesets for review
   
-  changeset:  7:a20f4eed81a7
+  changeset:  7:42cfaa4019d9
   summary:    mq patch
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
@@ -152,13 +154,13 @@ Pushing patches from mq will result in a warning
 
 Custom identifier will create a new review from same changesets.
 
-  $ hg push -r 1 --reviewid 3
+  $ hg push -r f422841a13f8 --reviewid 3
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:6f06b4ac6efe
+  changeset:  6:f422841a13f8
   summary:    anonymous head
   review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
@@ -171,8 +173,10 @@ SSH works
 (This test is now redundant. But removing it completely will impact the
 rest of the test.)
 
-  $ hg push -r 2
+  $ hg push -r 1
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/6a5e03035256*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -182,7 +186,7 @@ rest of the test.)
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  2:6a5e03035256
+  changeset:  6:ec6438e4b8bc
   summary:    Bug 4 - Test identifier
   review:     http://*:$HGPORT1/r/8 (draft) (glob)
   
@@ -192,13 +196,13 @@ rest of the test.)
 
 Specifying multiple -r for the same head works
 
-  $ hg push -r 0 -r 1 --reviewid 5
+  $ hg push -r 0 -r f422841a13f8 --reviewid 5
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:6f06b4ac6efe
+  changeset:  5:f422841a13f8
   summary:    anonymous head
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
@@ -209,13 +213,13 @@ Specifying multiple -r for the same head works
 
 Specifying a revision range works
 
-  $ hg push -r 0::1 --reviewid 6
+  $ hg push -r 0::f422841a13f8 --reviewid 6
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:6f06b4ac6efe
+  changeset:  5:f422841a13f8
   summary:    anonymous head
   review:     http://*:$HGPORT1/r/12 (draft) (glob)
   
@@ -247,15 +251,15 @@ Specifying a base revision limits reviewed changesets
   remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
   
-  changeset:  8:cdb8740f5a3e
+  changeset:  8:2e66eb2fd2ee
   summary:    Review base
   review:     http://*:$HGPORT1/r/14 (draft) (glob)
   
-  changeset:  9:17ac354f9d65
+  changeset:  9:715e2dc94860
   summary:    Middle commit
   review:     http://*:$HGPORT1/r/15 (draft) (glob)
   
-  changeset:  10:89a6f6628cac
+  changeset:  10:37f64667eaf5
   summary:    Review tip
   review:     http://*:$HGPORT1/r/16 (draft) (glob)
   
@@ -271,15 +275,15 @@ Specifying multiple -r arguments selects base and tip
   no changes found
   submitting 3 changesets for review
   
-  changeset:  8:cdb8740f5a3e
+  changeset:  8:2e66eb2fd2ee
   summary:    Review base
   review:     http://*:$HGPORT1/r/18 (draft) (glob)
   
-  changeset:  9:17ac354f9d65
+  changeset:  9:715e2dc94860
   summary:    Middle commit
   review:     http://*:$HGPORT1/r/19 (draft) (glob)
   
-  changeset:  10:89a6f6628cac
+  changeset:  10:37f64667eaf5
   summary:    Review tip
   review:     http://*:$HGPORT1/r/20 (draft) (glob)
   
@@ -296,15 +300,15 @@ Specifying multiple -r in reverse order still works
   no changes found
   submitting 3 changesets for review
   
-  changeset:  8:cdb8740f5a3e
+  changeset:  8:2e66eb2fd2ee
   summary:    Review base
   review:     http://*:$HGPORT1/r/22 (draft) (glob)
   
-  changeset:  9:17ac354f9d65
+  changeset:  9:715e2dc94860
   summary:    Middle commit
   review:     http://*:$HGPORT1/r/23 (draft) (glob)
   
-  changeset:  10:89a6f6628cac
+  changeset:  10:37f64667eaf5
   summary:    Review tip
   review:     http://*:$HGPORT1/r/24 (draft) (glob)
   
@@ -327,7 +331,7 @@ Specifying multiple -r in reverse order still works
   no changes found
   submitting 1 changesets for review
   
-  changeset:  9:17ac354f9d65
+  changeset:  9:715e2dc94860
   summary:    Middle commit
   review:     http://*:$HGPORT1/r/26 (draft) (glob)
   
@@ -361,7 +365,7 @@ Reviewing merge commits is rejected
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
-  abort: cannot review merge commits (9e8b5fedf1a8)
+  abort: cannot review merge commits (52421e5791b1)
   [255]
 
 Empty changesets show a reviewboard error, not an internal server
@@ -390,7 +394,7 @@ We disallow completely empty revisions.
   $ hg qnew -m 'mq patch' -d '0 0' empty-patch
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
-  abort: not reviewing empty revision e4f20eae8147. please add content.
+  abort: not reviewing empty revision 144b04fa85ee. please add content.
   [255]
 
 Cleanup

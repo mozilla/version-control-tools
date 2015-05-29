@@ -25,6 +25,8 @@
   $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 2 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/61e2e5c813d2*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -34,11 +36,11 @@
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  1:24417bc94b2c
+  changeset:  1:a92d53c0ffc7
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:61e2e5c813d2
+  changeset:  2:233b570e5356
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
@@ -61,15 +63,15 @@ Adding commits to old reviews should create new reviews
   remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
   
-  changeset:  1:24417bc94b2c
+  changeset:  1:a92d53c0ffc7
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:61e2e5c813d2
+  changeset:  2:233b570e5356
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:f34b8ce40ee8
+  changeset:  3:4cb601f74de5
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
@@ -106,12 +108,12 @@ The parent review should have its description updated.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r f34b8ce40ee8891a60bfb98614d9ad602993a9ed http://*:$HGPORT/test-repo (glob)
+    - hg pull -r 4cb601f74de529935048816623637fb0ca2812a4 http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["24417bc94b2c053e8f5dd8c09da33fbbef5404fe", 2], ["61e2e5c813d2c6a3858a22cd8e76ece29195f87d",
-        3], ["f34b8ce40ee8891a60bfb98614d9ad602993a9ed", 4]]'
+      p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
+        3], ["4cb601f74de529935048816623637fb0ca2812a4", 4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -121,7 +123,7 @@ The parent review should have its description updated.
       revision: 1
       base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       patch:
-      - diff -r 7c5bdf0cec4a -r f34b8ce40ee8 foo
+      - diff -r 7c5bdf0cec4a -r 4cb601f74de5 foo
       - "--- a/foo\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -1,1 +1,1 @@'
@@ -145,19 +147,19 @@ rids to be strings and then pushing a new commit.
   remote: Inserted into the pushlog db successfully.
   submitting 4 changesets for review
   
-  changeset:  1:24417bc94b2c
+  changeset:  1:a92d53c0ffc7
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:61e2e5c813d2
+  changeset:  2:233b570e5356
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:f34b8ce40ee8
+  changeset:  3:4cb601f74de5
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
-  changeset:  4:6d1a9431c7b1
+  changeset:  4:fea02e8114c8
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/5 (draft) (glob)
   

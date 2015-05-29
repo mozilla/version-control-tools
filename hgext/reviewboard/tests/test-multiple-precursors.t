@@ -30,6 +30,7 @@
   adding foo1
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 1 changesets)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -39,7 +40,7 @@
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  1:a252038ad074
+  changeset:  2:6bd3fbee3dfa
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
@@ -72,11 +73,11 @@ Splitting the changeset results in multiple reviews
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  2:910075ba4bfa
+  changeset:  3:c5bd6809e957
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/2 (glob)
   
-  changeset:  3:3ed8201aa6ee
+  changeset:  4:f142ef54f825
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   

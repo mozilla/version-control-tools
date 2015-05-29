@@ -16,6 +16,8 @@ Pushing a review will create the reviews file
   $ hg commit -m 'Bug 1 - second commit'
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/be8ff4f28043*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -25,7 +27,7 @@ Pushing a review will create the reviews file
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  1:be8ff4f28043
+  changeset:  1:00a4f82beb7c
   summary:    Bug 1 - second commit
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
@@ -37,8 +39,8 @@ Pushing a review will create the reviews file
   u http://*:$HGPORT1 (glob)
   r ssh://*:$HGPORT6/test-repo (glob)
   p bz://1/mynick 1
-  c be8ff4f2804309fdbe6048ff76559f8e391ce765 2
-  pc be8ff4f2804309fdbe6048ff76559f8e391ce765 1
+  c 00a4f82beb7c11fa00dafd1d2e613d979171154f 2
+  pc 00a4f82beb7c11fa00dafd1d2e613d979171154f 1
 
   $ ls .hg/reviewboard/review
   1.state

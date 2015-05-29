@@ -18,6 +18,8 @@ Pushing a review should not touch Bugzilla
   $ hg commit -m 'Bug 1 - Foo 1'
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/24417bc94b2c*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -27,7 +29,7 @@ Pushing a review should not touch Bugzilla
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  1:24417bc94b2c
+  changeset:  1:a92d53c0ffc7
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   

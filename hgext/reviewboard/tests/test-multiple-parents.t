@@ -20,6 +20,8 @@ Do the initial review
 
   $ hg push -r 1 --reviewid 1
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/cd3395bd3f8a*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -29,7 +31,7 @@ Do the initial review
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  1:cd3395bd3f8a
+  changeset:  1:60479d07173e
   summary:    second commit
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
@@ -45,7 +47,7 @@ Pushing with a different review ID will create a "duplicate" review
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:cd3395bd3f8a
+  changeset:  1:60479d07173e
   summary:    second commit
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
@@ -59,10 +61,10 @@ Pushing with a different review ID will create a "duplicate" review
   r ssh://*:$HGPORT6/test-repo (glob)
   p bz://1/mynick 1
   p bz://2/mynick 3
-  c cd3395bd3f8a2108fb3178d6b1ec6077ca2bdbee 2
-  c cd3395bd3f8a2108fb3178d6b1ec6077ca2bdbee 4
-  pc cd3395bd3f8a2108fb3178d6b1ec6077ca2bdbee 1
-  pc cd3395bd3f8a2108fb3178d6b1ec6077ca2bdbee 3
+  c 60479d07173e3914243bacd9b39aae7971a2f909 2
+  c 60479d07173e3914243bacd9b39aae7971a2f909 4
+  pc 60479d07173e3914243bacd9b39aae7971a2f909 1
+  pc 60479d07173e3914243bacd9b39aae7971a2f909 3
 
   $ hg log --template "{reviews % '{get(review, \"url\")}\n'}"
   http://*:$HGPORT1/r/2 (glob)

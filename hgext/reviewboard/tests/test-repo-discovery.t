@@ -6,6 +6,8 @@
   $ cat >> $HGRCPATH << EOF
   > [extensions]
   > reviewboard = $TESTDIR/hgext/reviewboard/client.py
+  > [reviewboard]
+  > fakeids = true
   > [ui]
   > ssh = $TESTDIR/testing/mozreview-ssh
   > [mozilla]
@@ -118,6 +120,8 @@ Pushing to autodiscover repo should redirect
   pushing to ssh://*:$HGPORT6/autoreview (glob)
   searching for appropriate review repository
   redirecting push to ssh://*:$HGPORT6/a (glob)
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/a/.hg/strip-backup/e55631d0cc1a*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -127,7 +131,7 @@ Pushing to autodiscover repo should redirect
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
   
-  changeset:  1:e55631d0cc1a
+  changeset:  1:daa176714e3a
   summary:    Bug 1 - Testing discovery of a
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   

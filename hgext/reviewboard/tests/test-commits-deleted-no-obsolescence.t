@@ -37,6 +37,8 @@
 
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 5 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/d86c61a23fc8*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -46,23 +48,23 @@
   remote: Inserted into the pushlog db successfully.
   submitting 5 changesets for review
   
-  changeset:  1:a252038ad074
+  changeset:  1:6bd3fbee3dfa
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:c3d0947fefb7
+  changeset:  2:dfe48634934b
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:de473ef3c9d2
+  changeset:  3:d751d4c04967
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
-  changeset:  4:f5691a90b4d0
+  changeset:  4:98dd6a7335db
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/5 (draft) (glob)
   
-  changeset:  5:d86c61a23fc8
+  changeset:  5:76088734e3cb
   summary:    Bug 1 - Foo 5
   review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
@@ -82,19 +84,19 @@ Popping the last commit truncates the review set
   no changes found
   submitting 4 changesets for review
   
-  changeset:  1:a252038ad074
+  changeset:  1:6bd3fbee3dfa
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (glob)
   
-  changeset:  2:c3d0947fefb7
+  changeset:  2:dfe48634934b
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (glob)
   
-  changeset:  3:de473ef3c9d2
+  changeset:  3:d751d4c04967
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/4 (glob)
   
-  changeset:  4:f5691a90b4d0
+  changeset:  4:98dd6a7335db
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/5 (glob)
   
@@ -122,13 +124,13 @@ Review request 6 should be added to the list of discard on publish rids.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r d86c61a23fc8978f5d0c59a0ce608dc5d4312da5 http://*:$HGPORT/test-repo (glob)
+  - hg pull -r 76088734e3cba33be80930be14e7cd1e9ee474be http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", 2], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
-      3], ["de473ef3c9d292c8cf419958e4f3a3318a2d6a4d", 4], ["f5691a90b4d0ef04bbf08408d9f214356811db40",
-      5], ["d86c61a23fc8978f5d0c59a0ce608dc5d4312da5", 6]]'
+    p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
+      3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
+      5], ["76088734e3cba33be80930be14e7cd1e9ee474be", 6]]'
     p2rb.discard_on_publish_rids: '[6]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
@@ -146,12 +148,12 @@ Review request 6 should be added to the list of discard on publish rids.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r f5691a90b4d0ef04bbf08408d9f214356811db40 http://*:$HGPORT/test-repo (glob)
+    - hg pull -r 98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", 2], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
-        3], ["de473ef3c9d292c8cf419958e4f3a3318a2d6a4d", 4], ["f5691a90b4d0ef04bbf08408d9f214356811db40",
+      p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
+        3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
         5]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
@@ -162,22 +164,22 @@ Review request 6 should be added to the list of discard on publish rids.
       revision: 2
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       patch:
-      - diff -r 93d9429b41ec -r f5691a90b4d0 foo1
+      - diff -r 93d9429b41ec -r 98dd6a7335db foo1
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo1\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
       - +foo1
-      - diff -r 93d9429b41ec -r f5691a90b4d0 foo2
+      - diff -r 93d9429b41ec -r 98dd6a7335db foo2
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo2\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
       - +foo2
-      - diff -r 93d9429b41ec -r f5691a90b4d0 foo3
+      - diff -r 93d9429b41ec -r 98dd6a7335db foo3
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo3\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
       - +foo3
-      - diff -r 93d9429b41ec -r f5691a90b4d0 foo4
+      - diff -r 93d9429b41ec -r 98dd6a7335db foo4
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo4\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
@@ -200,7 +202,7 @@ Review 6 should be marked as discarded
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commit_id: d86c61a23fc8978f5d0c59a0ce608dc5d4312da5
+    p2rb.commit_id: 76088734e3cba33be80930be14e7cd1e9ee474be
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 
@@ -221,15 +223,15 @@ likely gets invalidated.
   remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
   
-  changeset:  1:609df470f898
+  changeset:  1:e1679d43aceb
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/2 (glob)
   
-  changeset:  2:2977dec75fb2
+  changeset:  2:13cf6665548a
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/3 (glob)
   
-  changeset:  3:a92ad7ba0258
+  changeset:  3:b891c874875b
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/4 (glob)
   
@@ -251,7 +253,7 @@ The first commit was rewritten (we assume all subsequent were as well).
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commit_id: a252038ad0749f90e448cb7384a47ca3642c6362
+    p2rb.commit_id: 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   draft:
@@ -263,7 +265,7 @@ The first commit was rewritten (we assume all subsequent were as well).
     target_people: []
     extra:
       p2rb: true
-      p2rb.commit_id: 609df470f8980e097192dab10a72a1401dfeca5f
+      p2rb.commit_id: e1679d43acebff4b173624488cdf4b5eff1ccd94
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
     diffs:
@@ -271,7 +273,7 @@ The first commit was rewritten (we assume all subsequent were as well).
       revision: 2
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       patch:
-      - diff -r 93d9429b41ec -r 609df470f898 foo2
+      - diff -r 93d9429b41ec -r e1679d43aceb foo2
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo2\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
@@ -298,12 +300,12 @@ request is published.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r f5691a90b4d0ef04bbf08408d9f214356811db40 http://*:$HGPORT/test-repo (glob)
+  - hg pull -r 98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["a252038ad0749f90e448cb7384a47ca3642c6362", 2], ["c3d0947fefb784864eb53620d62c721bf58bbd27",
-      3], ["de473ef3c9d292c8cf419958e4f3a3318a2d6a4d", 4], ["f5691a90b4d0ef04bbf08408d9f214356811db40",
+    p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
+      3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
       5]]'
     p2rb.discard_on_publish_rids: '[5]'
     p2rb.identifier: bz://1/mynick
@@ -321,12 +323,12 @@ request is published.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r a92ad7ba0258da8e9cd3d84f2ec5db098c85e6ad http://*:$HGPORT/test-repo (glob)
+    - hg pull -r b891c874875b046c191a868d55830aa201b28ebe http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
-      p2rb.commits: '[["609df470f8980e097192dab10a72a1401dfeca5f", 2], ["2977dec75fb2158cbb102eb4b3cb02b9c59a0227",
-        3], ["a92ad7ba0258da8e9cd3d84f2ec5db098c85e6ad", 4]]'
+      p2rb.commits: '[["e1679d43acebff4b173624488cdf4b5eff1ccd94", 2], ["13cf6665548ad20d8cb7eed42c3ffc1c7689939f",
+        3], ["b891c874875b046c191a868d55830aa201b28ebe", 4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -336,17 +338,17 @@ request is published.
       revision: 3
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       patch:
-      - diff -r 93d9429b41ec -r a92ad7ba0258 foo2
+      - diff -r 93d9429b41ec -r b891c874875b foo2
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo2\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
       - +foo2
-      - diff -r 93d9429b41ec -r a92ad7ba0258 foo3
+      - diff -r 93d9429b41ec -r b891c874875b foo3
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo3\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
       - +foo3
-      - diff -r 93d9429b41ec -r a92ad7ba0258 foo4
+      - diff -r 93d9429b41ec -r b891c874875b foo4
       - "--- /dev/null\tThu Jan 01 00:00:00 1970 +0000"
       - "+++ b/foo4\tThu Jan 01 00:00:00 1970 +0000"
       - '@@ -0,0 +1,1 @@'
@@ -373,11 +375,11 @@ Try removing a commit in the middle.
   remote: Inserted into the pushlog db successfully.
   submitting 2 changesets for review
   
-  changeset:  1:609df470f898
+  changeset:  1:e1679d43aceb
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/2 (glob)
   
-  changeset:  2:395146e6e0cf
+  changeset:  2:74896d4d6f00
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/3 (glob)
   

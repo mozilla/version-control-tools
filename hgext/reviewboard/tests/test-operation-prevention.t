@@ -46,11 +46,11 @@ Publishing the parent should succeed.
   - ''
   - 'Pull down this commit:'
   - ''
-  - hg pull -r 57755461e85f1e3e66738ec2d57f325249897409 http://*:$HGPORT/test-repo (glob)
+  - hg pull -r 86a712c7f0187fed4c00b99131838610c76e6cc0 http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commits: '[["57755461e85f1e3e66738ec2d57f325249897409", 2]]'
+    p2rb.commits: '[["86a712c7f0187fed4c00b99131838610c76e6cc0", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
@@ -69,7 +69,7 @@ Publishing the parent should succeed.
   target_people: []
   extra_data:
     p2rb: true
-    p2rb.commit_id: 57755461e85f1e3e66738ec2d57f325249897409
+    p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
 

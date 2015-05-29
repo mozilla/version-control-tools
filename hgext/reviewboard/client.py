@@ -25,20 +25,23 @@ import os
 import sys
 import urllib
 
-from mercurial import cmdutil
-from mercurial import commands
-from mercurial import demandimport
-from mercurial import exchange
-from mercurial import extensions
-from mercurial import hg
-from mercurial import httppeer
-from mercurial import localrepo
-from mercurial import obsolete
-from mercurial import phases
-from mercurial import scmutil
-from mercurial import sshpeer
-from mercurial import templatekw
-from mercurial import util
+from mercurial import (
+    cmdutil,
+    commands,
+    context,
+    demandimport,
+    exchange,
+    extensions,
+    hg,
+    httppeer,
+    localrepo,
+    obsolete,
+    phases,
+    scmutil,
+    sshpeer,
+    templatekw,
+    util,
+)
 from mercurial.i18n import _
 from mercurial.node import bin, hex
 
@@ -61,6 +64,10 @@ from hgrb.util import (
 
 from mozautomation.commitparser import parse_bugs, parse_requal_reviewers
 from mozhg.auth import getbugzillaauth
+from mozhg.rewrite import (
+    newparents,
+    replacechangesets,
+)
 
 testedwith = '3.1 3.2 3.3 3.4'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview'
@@ -195,6 +202,7 @@ def wrappedpushdiscovery(orig, pushop):
     if not pushop.remote.capable('reviewboard'):
         return orig(pushop)
 
+    ui = pushop.ui
     repo = pushop.repo
 
     if repo.noreviewboardpush:
@@ -259,6 +267,38 @@ def wrappedpushdiscovery(orig, pushop):
                 break
 
             nodes.insert(0, ctx.node())
+
+    # Ensure all reviewed changesets have commit IDs.
+    replacenodes = []
+    for node in nodes:
+        ctx = repo[node]
+        if 'commitid' not in ctx.extra():
+            replacenodes.append(node)
+
+    def addcommitid(repo, ctx, revmap, copyfilectxfn):
+        parents = newparents(repo, ctx, revmap)
+        # Need to make a copy otherwise modification is made on original,
+        # which is just plain wrong.
+        extra = dict(ctx.extra())
+        assert 'commitid' not in extra
+        extra['commitid'] = genid(repo)
+        memctx = context.memctx(repo, parents,
+                                ctx.description(), ctx.files(),
+                                copyfilectxfn, user=ctx.user(),
+                                date=ctx.date(), extra=extra)
+
+        return memctx
+
+    if replacenodes:
+        ui.status(_('(adding commit id to %d changesets)\n') %
+                  (len(replacenodes)))
+        nodemap = replacechangesets(repo, replacenodes, addcommitid,
+                                    backuptopic='addcommitid')
+
+        # Since we're in the middle of an operation, update references
+        # to rewritten nodes.
+        nodes = [nodemap.get(node, node) for node in nodes]
+        pushop.revs = [nodemap.get(node, node) for node in pushop.revs]
 
     pushop.reviewnodes = nodes
 

@@ -18,6 +18,8 @@ Pushing with unknown username results in sane failure
 
   $ hg --config bugzilla.username=unknown --config bugzilla.password=irrelevant push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/737709d9e5f4*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -61,7 +63,7 @@ Pushing using cookie auth works
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:737709d9e5f4
+  changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
@@ -78,7 +80,7 @@ Pushing using username password auth works
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:737709d9e5f4
+  changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
@@ -105,7 +107,7 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:737709d9e5f4
+  changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
   review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
@@ -121,7 +123,7 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:737709d9e5f4
+  changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
   review:     http://*:$HGPORT1/r/8 (draft) (glob)
   
@@ -196,7 +198,7 @@ Changing the IRC nickname in Bugzilla will update the RB username
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:737709d9e5f4
+  changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
@@ -227,7 +229,7 @@ Changing the email address in Bugzilla will update the RB email
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:737709d9e5f4
+  changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
   review:     http://*:$HGPORT1/r/12 (draft) (glob)
   
@@ -273,7 +275,7 @@ Re-enabling a disabled user will allow them to use Review Board
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:737709d9e5f4
+  changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
   review:     http://*:$HGPORT1/r/14 (draft) (glob)
   
@@ -296,7 +298,7 @@ we fall back to non-IRC RB usernames.
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:737709d9e5f4
+  changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
   review:     http://*:$HGPORT1/r/16 (draft) (glob)
   
@@ -381,7 +383,7 @@ user, they will be assigned the email+id username.
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:737709d9e5f4
+  changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
   review:     http://*:$HGPORT1/r/20 (draft) (glob)
   

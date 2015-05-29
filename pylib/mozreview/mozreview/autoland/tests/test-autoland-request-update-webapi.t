@@ -45,7 +45,7 @@ Force the admin Review Board user to be created by querying for it.
   $ rbmanage dump-autoland-requests
   autoland_id: 1
   last_known_status: R
-  push_revision: 57755461e85f1e3e66738ec2d57f325249897409
+  push_revision: 86a712c7f0187fed4c00b99131838610c76e6cc0
   repository_revision: ''
   repository_url: ''
   review_request_id: 1
@@ -57,7 +57,7 @@ Hit the WebAPI with the Autoland response
   $ rbmanage dump-autoland-requests
   autoland_id: 1
   last_known_status: S
-  push_revision: 57755461e85f1e3e66738ec2d57f325249897409
+  push_revision: 86a712c7f0187fed4c00b99131838610c76e6cc0
   repository_revision: Foo
   repository_url: ''
   review_request_id: 1
