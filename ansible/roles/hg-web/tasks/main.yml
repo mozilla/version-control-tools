@@ -1,3 +1,49 @@
 ---
+- name: install system packages
+  yum: name={{ item }} state=present
+  with_items:
+    # To build mod_wsgi from source so it can be placed in virtualenvs.
+    - httpd-devel
+    # Machines are CentOS 6, which has Python 2.6 installed by default.
+    # The Python 2.7 install from mrepo doesn't conflict with the system
+    # Python.
+    # Note: this requires mrepo, which is a private repository and
+    # requires the Mozilla VPN. We'll want to put the package name
+    # behind a variable in order to support Docker.
+    - python27
+    - python27-virtualenv
+
+# We run hgweb out of a virtualenv because that's how you are supposed
+# to do Python.
+- name: create virtualenv to run hgweb
+  command: /usr/bin/virtualenv-2.7 {{ venv_hgweb }} creates={{ venv_hgweb }}
+
+# We install peep from our own copy because this is more secure than
+# relying on network installations.
+- name: copy peep.py
+  copy: src=files/peep.py dest={{ venv_hgweb }}/bin/peep mode=0755 owner=root group=root
+
+- name: configure shebang in peep
+  replace: dest={{ venv_hgweb }}/bin/peep
+           regexp='^#!\/usr\/bin\/env python$'
+           replace='#!{{ venv_hgweb }}/bin/python2.7'
+
+- name: copy requirements.txt
+  copy: src=requirements.txt dest={{ venv_hgweb }}/requirements.txt mode=0644 owner=root group=root
+
+- name: populate hgweb virtualenv
+  pip: requirements={{ venv_hgweb }}/requirements.txt executable={{ venv_hgweb }}/bin/peep
+
+# We currently run Mercurial 3.3.3 + a few commits from the stable
+# branch to get some performance enhancements. These enhancements are
+# part of 3.4, so we can install from peep once we deploy 3.4.x.
+- name: clone Mercurial repository
+  hg: repo=http://selenic.com/repo/hg dest=/repo/hg/hg revision=612ed41ae359f458dbdc74f03ce9542d3816859d purge=yes force=yes
+
+- name: install Mercurial
+  command: "{{ venv_hgweb }}/bin/python setup.py install chdir=/repo/hg/hg"
+
+# Settings from this file are inherited by every hg command run on the
+# system.
 - name: install global hgrc
   copy: src=hgrc dest=/etc/mercurial/hgrc mode=0644 owner=root group=root
