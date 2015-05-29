@@ -173,7 +173,9 @@ def generate_bundles(repo):
 
     # Ensure manifest is owned by same user who owns repo and has sane
     # permissions.
-    os.chown(manifest_path, uid, gid)
+    # TODO we can't do this yet since the "hg" user isn't a member of the
+    # scm_* groups.
+    #os.chown(manifest_path, uid, gid)
     os.chmod(manifest_path, 0664)
 
     # Replicate manifest to mirrors.
