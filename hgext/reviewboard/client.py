@@ -326,7 +326,17 @@ def wrappedpushbookmark(orig, pushop):
     if not pushop.reviewnodes:
         return result
 
-    doreview(pushop.repo, pushop.ui, pushop.remote, pushop.reviewnodes)
+    # Because doreview may perform history rewriting, we can't call it
+    # when a transaction is opened. Mercurial 3.3 switched behavior so
+    # a transaction is active during most parts of push, including
+    # exchange._pushbookmark. The differences in behavior can be unified
+    # once we drop support for 3.2.
+    if hasattr(pushop, 'trmanager') and pushop.trmanager:
+        def ontrclose(tr):
+            doreview(pushop.repo, pushop.ui, pushop.remote, pushop.reviewnodes)
+        pushop.trmanager._tr.addpostclose('reviewboard.doreview', ontrclose)
+    else:
+        doreview(pushop.repo, pushop.ui, pushop.remote, pushop.reviewnodes)
 
     return result
 
