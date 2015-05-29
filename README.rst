@@ -19,3 +19,10 @@ on Read the Docs. Latest CI reports can be `viewed online
 
 If you are interested in getting in touch with the people who maintain
 this repository, join ``#vcs`` in ``irc.mozilla.org``.
+
+.. note:: A dev environment is needed for performing admin operations
+
+    Before you can use any of the ansible playbooks for administration,
+    you must have a development environment set up already. Best
+    practice is to re-run ``./create-test-environment`` before using
+    ``./deploy`` as your ansible entry point.
