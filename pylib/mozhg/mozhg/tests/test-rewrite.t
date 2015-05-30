@@ -288,34 +288,71 @@ Children are rebased automatically
   $ hg rewritemessage 9834cc961a26::67fabc181c37
   saved backup bundle to $TESTTMP/repo/.hg/strip-backup/5658df40aea0*-replacing.hg (glob)
 
-  $ hg log -G -r 5:
-  @  changeset:   9:69aa52704031
+  $ hg log -G -r 5: --debug
+  @  changeset:   9:69aa52704031593eb89782d661312e37ec7db452
   |  tag:         tip
+  |  phase:       draft
+  |  parent:      8:dcae339901b4908e3bc11170a832e1cb01e10196
+  |  parent:      -1:0000000000000000000000000000000000000000
+  |  manifest:    8:4317639984d05c5b2b5744800237be45b528060b
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     branch 2 commit 2
+  |  extra:       branch=default
+  |  description:
+  |  branch 2 commit 2
   |
-  o  changeset:   8:dcae339901b4
-  |  parent:      5:f9d897b602f9
+  |
+  o  changeset:   8:dcae339901b4908e3bc11170a832e1cb01e10196
+  |  phase:       draft
+  |  parent:      5:f9d897b602f9832703568507b9c240f1cec64688
+  |  parent:      -1:0000000000000000000000000000000000000000
+  |  manifest:    7:d9b1ab986657895e23c65da93b665d8cf87d983c
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     branch 2 commit 1
+  |  extra:       branch=default
+  |  description:
+  |  branch 2 commit 1
   |
-  | o  changeset:   7:7aa335078f5b
+  |
+  | o  changeset:   7:7aa335078f5bcabed61562d1901a0c181b836566
+  | |  phase:       draft
+  | |  parent:      6:fafcf26cf5afa24d69276cd3f5e12a89cd4153d8
+  | |  parent:      -1:0000000000000000000000000000000000000000
+  | |  manifest:    6:99223e52834b792f7e7bad815e22ff18b5df7355
   | |  user:        test
   | |  date:        Thu Jan 01 00:00:00 1970 +0000
-  | |  summary:     branch 1 commit 2
+  | |  extra:       branch=default
+  | |  description:
+  | |  branch 1 commit 2
   | |
-  | o  changeset:   6:fafcf26cf5af
-  |/   user:        test
+  | |
+  | o  changeset:   6:fafcf26cf5afa24d69276cd3f5e12a89cd4153d8
+  |/   phase:       draft
+  |    parent:      5:f9d897b602f9832703568507b9c240f1cec64688
+  |    parent:      -1:0000000000000000000000000000000000000000
+  |    manifest:    5:c162654d82a03e0ea5e390d6091b7fa46f7ac901
+  |    user:        test
   |    date:        Thu Jan 01 00:00:00 1970 +0000
-  |    summary:     branch 1 commit 1
+  |    files:       foo
+  |    extra:       branch=default
+  |    description:
+  |    branch 1 commit 1
+  |    1
   |
-  o  changeset:   5:f9d897b602f9
-  |  parent:      0:96ee1d7354c4
+  |
+  o  changeset:   5:f9d897b602f9832703568507b9c240f1cec64688
+  |  phase:       draft
+  |  parent:      0:96ee1d7354c4ad7372047672c36a1f561e3a6a4c
+  |  parent:      -1:0000000000000000000000000000000000000000
+  |  manifest:    2:93c70231c88572966b1059f6d4b93c9fe6703310
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     base
+  |  files:       foo
+  |  extra:       branch=default
+  |  description:
+  |  base
+  |  0
+  |
   |
 
 Working copy changes to rebased children cause abort
