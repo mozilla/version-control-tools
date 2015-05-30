@@ -223,7 +223,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
                                   oldctx.files(), preservefilectx(oldctx),
                                   user=oldctx.user(), date=oldctx.date(),
                                   extra=oldctx.extra())
-            status = oldctx.status(oldctx)
+            status = oldctx.p1().status(oldctx)
             mctx.modified = lambda: status[0]
             mctx.added = lambda: status[1]
             mctx.removed = lambda: status[2]

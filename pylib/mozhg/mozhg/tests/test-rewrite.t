@@ -289,38 +289,41 @@ Children are rebased automatically
   saved backup bundle to $TESTTMP/repo/.hg/strip-backup/5658df40aea0*-replacing.hg (glob)
 
   $ hg log -G -r 5: --debug
-  @  changeset:   9:69aa52704031593eb89782d661312e37ec7db452
+  @  changeset:   9:c394dc3f2d1115fb420ae477f4dae64de7e0c5fa
   |  tag:         tip
   |  phase:       draft
-  |  parent:      8:dcae339901b4908e3bc11170a832e1cb01e10196
+  |  parent:      8:7370fae131214b82474294dfab01d587a238791e
   |  parent:      -1:0000000000000000000000000000000000000000
-  |  manifest:    8:4317639984d05c5b2b5744800237be45b528060b
+  |  manifest:    8:47ad15e43aecf30a1cbd915ca499cd4b4e2b6e9d
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
+  |  files:       foo
   |  extra:       branch=default
   |  description:
   |  branch 2 commit 2
   |
   |
-  o  changeset:   8:dcae339901b4908e3bc11170a832e1cb01e10196
+  o  changeset:   8:7370fae131214b82474294dfab01d587a238791e
   |  phase:       draft
   |  parent:      5:f9d897b602f9832703568507b9c240f1cec64688
   |  parent:      -1:0000000000000000000000000000000000000000
-  |  manifest:    7:d9b1ab986657895e23c65da93b665d8cf87d983c
+  |  manifest:    7:5009d8356d0833b4438ff789d389646f7fb4a081
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
+  |  files:       foo
   |  extra:       branch=default
   |  description:
   |  branch 2 commit 1
   |
   |
-  | o  changeset:   7:7aa335078f5bcabed61562d1901a0c181b836566
+  | o  changeset:   7:6b4b4301ffcbc80e74c1c7909c17fcd887aeea34
   | |  phase:       draft
   | |  parent:      6:fafcf26cf5afa24d69276cd3f5e12a89cd4153d8
   | |  parent:      -1:0000000000000000000000000000000000000000
-  | |  manifest:    6:99223e52834b792f7e7bad815e22ff18b5df7355
+  | |  manifest:    6:346be06a851f7d8b1a28403e965096861e51802d
   | |  user:        test
   | |  date:        Thu Jan 01 00:00:00 1970 +0000
+  | |  files:       foo
   | |  extra:       branch=default
   | |  description:
   | |  branch 1 commit 2
@@ -399,7 +402,7 @@ Obsolescence, not stripping, should occur when enabled
   $ hg --config extensions.obs=$TESTTMP/obs.py rewritemessage 12
 
   $ hg --config extensions.obs=$TESTTMP/obs.py log -G -r 11:
-  @  changeset:   15:bbfe981e7c92
+  @  changeset:   15:fa1584f69cf7
   |  tag:         tip
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
@@ -411,14 +414,14 @@ Obsolescence, not stripping, should occur when enabled
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     obsolete 1
   |
-  | o  changeset:   11:94879ae69a6f
+  | o  changeset:   11:c8bb49e22bd1
   | |  user:        test
   | |  date:        Thu Jan 01 00:00:00 1970 +0000
   | |  summary:     secret 2
   | |
 
   $ hg --config extensions.obs=$TESTTMP/obs.py --hidden log -G -r 11:
-  @  changeset:   15:bbfe981e7c92
+  @  changeset:   15:fa1584f69cf7
   |  tag:         tip
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
@@ -441,7 +444,7 @@ Obsolescence, not stripping, should occur when enabled
   |    date:        Thu Jan 01 00:00:00 1970 +0000
   |    summary:     obsolete 1
   |
-  | o  changeset:   11:94879ae69a6f
+  | o  changeset:   11:c8bb49e22bd1
   | |  user:        test
   | |  date:        Thu Jan 01 00:00:00 1970 +0000
   | |  summary:     secret 2
@@ -485,11 +488,11 @@ Bookmarks on rewritten changesets should be moved
 
   $ hg bookmarks
      @                         16:1eccffc1b352
-     bm1                       18:c558d9c0729a
-   * bm2                       20:09adebe5d91f
+     bm1                       18:3847242f0f8b
+   * bm2                       20:8b138ced889d
      initial                   0:96ee1d7354c4
 
-  $ hg up 09adebe5d91f
+  $ hg up 8b138ced889d
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   (leaving bookmark bm2)
 
@@ -501,11 +504,11 @@ Rewritten MQ patches should retain metadata
   $ hg qnew -d '0 0' -m 'patch 2' patch-2
 
   $ cat .hg/patches/status
-  a5e67d6e497c00fb8adeeb7323a296c5213f2f1e:patch-1
-  3a73c2aaa65fd57219d9aab020f2ae39e074bc9f:patch-2
+  ff479019e00d7341d67611e8998f7290a1407e23:patch-1
+  cc52d46d2da72567eb42b898206f4cd46a0cd483:patch-2
 
-  $ hg log -G -r 09adebe5d91f::
-  @  changeset:   22:3a73c2aaa65f
+  $ hg log -G -r 8b138ced889d::
+  @  changeset:   22:cc52d46d2da7
   |  tag:         patch-2
   |  tag:         qtip
   |  tag:         tip
@@ -513,14 +516,14 @@ Rewritten MQ patches should retain metadata
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     patch 2
   |
-  o  changeset:   21:a5e67d6e497c
+  o  changeset:   21:ff479019e00d
   |  tag:         patch-1
   |  tag:         qbase
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     patch 1
   |
-  o  changeset:   20:09adebe5d91f
+  o  changeset:   20:8b138ced889d
   |  bookmark:    bm2
   |  tag:         qparent
   |  user:        test
@@ -528,11 +531,11 @@ Rewritten MQ patches should retain metadata
   |  summary:     bm2 commit 2
   |
 
-  $ hg rewritemessage a5e67d6e497c
-  saved backup bundle to $TESTTMP/repo/.hg/strip-backup/3a73c2aaa65f*-replacing.hg (glob)
+  $ hg rewritemessage ff479019e00d
+  saved backup bundle to $TESTTMP/repo/.hg/strip-backup/cc52d46d2da7*-replacing.hg (glob)
 
-  $ hg log -G -r 09adebe5d91f::
-  @  changeset:   22:abed09a143d6
+  $ hg log -G -r 8b138ced889d::
+  @  changeset:   22:265e95091ab1
   |  tag:         patch-2
   |  tag:         qtip
   |  tag:         tip
@@ -540,14 +543,14 @@ Rewritten MQ patches should retain metadata
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     patch 2
   |
-  o  changeset:   21:288e8c606a3f
+  o  changeset:   21:40a869e5c384
   |  tag:         patch-1
   |  tag:         qbase
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     patch 1
   |
-  o  changeset:   20:09adebe5d91f
+  o  changeset:   20:8b138ced889d
   |  bookmark:    bm2
   |  tag:         qparent
   |  user:        test
@@ -556,5 +559,5 @@ Rewritten MQ patches should retain metadata
   |
 
   $ cat .hg/patches/status
-  288e8c606a3f24683f43178379cdd554cd38c058:patch-1
-  abed09a143d6ec1a5a225abfea720ba41eff3b7c:patch-2
+  40a869e5c384a7ca5fe8113e2fb47c80adf45a4c:patch-1
+  265e95091ab1bdbf56d78e6afab8cf5d115e27be:patch-2
