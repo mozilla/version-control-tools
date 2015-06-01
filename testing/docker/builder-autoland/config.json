@@ -2,7 +2,8 @@
   "testing": true,
   "bugzilla": {
     "user": "",
-    "passwd": ""
+    "passwd": "",
+    "url": "http://bmoweb/rest"
   },
   "github": {
     "user": "",

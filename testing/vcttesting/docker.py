@@ -849,7 +849,8 @@ class Docker(object):
             if start_autoland:
                 bind_path = os.path.abspath(os.path.dirname(self._state_path))
                 f_start_autoland = e.submit(self.client.start, autoland_id,
-                        links=[(autolanddb_state['Name'], 'db')],
+                        links=[(autolanddb_state['Name'], 'db'),
+                               (web_state['Name'], 'bmoweb')],
                         port_bindings={80: autoland_port})
                 f_start_autoland.result()
                 autoland_state = self.client.inspect_container(autoland_id)

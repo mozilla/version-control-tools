@@ -53,7 +53,7 @@ class AutolandCommands(object):
     @Command('wait-for-autoland-pingback', category='autoland',
         description='Wait for an autoland job pingback')
     @CommandArgument('host', help='Address on which to listen')
-    @CommandArgument('port', type=int, help='Port oo which to listen')
+    @CommandArgument('port', type=int, help='Port on which to listen')
     @CommandArgument('timeout', type=int, help='Timeout')
     def wait_for_autoland_pingback(self, host, port, timeout):
         import SocketServer
@@ -84,13 +84,13 @@ class AutolandCommands(object):
     @CommandArgument('destination', help='Destination tree for the revision')
     @CommandArgument('bzuserid', help='Bugzilla userid for authentication')
     @CommandArgument('bzcookie', help='Bugzilla cookie for authentication')
-    @CommandArgument('bugid', help='Bugzilla cookie for authentication')
     @CommandArgument('pingback_url', default='http://localhost/',
                      help='URL to which Autoland should post result')
+    @CommandArgument('--bugid', help='Bug id to use for review')
     @CommandArgument('--user', required=False, default='autoland', help='Autoland user')
     @CommandArgument('--password', required=False, default='autoland', help='Autoland password')
     def post_pullrequest_job(self, host, ghuser, repo, pullrequest, destination,
-                             bzuserid, bzcookie, bugid, pingback_url,
+                             bzuserid, bzcookie, pingback_url, bugid=None,
                              user=None, password=None):
         data = {
             'user': ghuser,

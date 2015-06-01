@@ -18,8 +18,8 @@ def get_repo_path(tree):
     return REPO_CONFIG.get(tree, '.')
 
 
-def transplant_to_mozreview(tree, user, repo, pullrequest, bzuserid, bzcookie,
-                            bugid):
+def transplant_to_mozreview(gh, tree, user, repo, pullrequest, bzuserid,
+                            bzcookie, bugid):
 
     """For now, we assume the source for our request is a github pull request.
     """
@@ -39,12 +39,6 @@ def transplant_to_mozreview(tree, user, repo, pullrequest, bzuserid, bzcookie,
             ['hg', 'update', 'transplant']]
 
     repo_path = get_repo_path(tree)
-
-    # create commands to import each github commit
-    gh = github.connect()
-    if not gh:
-        # return None to signify we should retry this next time
-        return None, None
 
     commits = github.retrieve_commits(gh, user, repo, pullrequest, repo_path)
     if not commits:

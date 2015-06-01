@@ -13,6 +13,7 @@ HERE = os.path.split(os.path.realpath(__file__))[0]
 SYS_PATH = copy.copy(sys.path)
 sys.path.append(os.path.join(os.path.split(HERE)[0], 'autoland'))
 import autoland
+import github
 import transplant
 sys.path = SYS_PATH
 
@@ -54,7 +55,6 @@ class TestAutoland(unittest.TestCase):
                 return local_repo_path
             transplant.get_repo_path = get_repo_path
 
-            transplant.github.connect = mock.Mock()
             class RetrieveCommits():
                 def __init__(self):
                     self.files = [['rename-file.patch'],
@@ -72,10 +72,11 @@ class TestAutoland(unittest.TestCase):
                                         local_repo_path)
                     return files
 
-            transplant.github.retrieve_commits = RetrieveCommits()
+            gh = mock.Mock()
+            github.retrieve_commits = RetrieveCommits()
 
             # land a patch with a rename
-            landed, result = transplant.transplant_to_mozreview('mozilla',
+            landed, result = transplant.transplant_to_mozreview(gh, 'mozilla',
                                                                 'cthulhu',
                                                                 'repo', 0,
                                                                 0, 'cookie', 0)
@@ -93,7 +94,7 @@ class TestAutoland(unittest.TestCase):
                 subprocess.check_call(cmd, stderr=subprocess.STDOUT,
                                       cwd=mozreview_repo_path)
 
-            landed, result = transplant.transplant_to_mozreview('mozilla',
+            landed, result = transplant.transplant_to_mozreview(gh, 'mozilla',
                                                                 'cthulhu',
                                                                 'repo', 0, 0,
                                                                 'cookie', 0)

@@ -8,6 +8,9 @@ class MockGithub3(object):
 
     def pull_request(self, user, repo, pullrequest):
         class PullRequest(object):
+            title = 'A pullrequest'
+            body = 'A body'
+
             def commits(self):
                 class Commit(object):
                     sha = '05830c796e2b0e9049c9e9cd463d987f4aedf4a35'
@@ -48,6 +51,19 @@ def connect():
     return github3.login(credentials['user'], password=credentials['passwd'])
 
 
+def retrieve_issue(gh, user, repo, issue):
+    title = None
+    description = None
+    commits = []
+
+    i = gh.issue(user, repo, issue)
+
+    if i:
+        return i.title, i.body
+
+    return None, None
+ 
+
 def retrieve_commits(gh, user, repo, pullrequest, path):
     commits = []
 
@@ -62,9 +78,13 @@ def retrieve_commits(gh, user, repo, pullrequest, path):
     return commits
 
 
-def add_pullrequest_comment(gh, user, repo, pullrequest, message):
+def add_issue_comment(gh, user, repo, pullrequest, message):
     # TODO: presumably this raises something if it fails
     issue = gh.issue(user, repo, pullrequest)
     if issue:
         issue.create_comment(message)
         return True
+
+
+def url_for_pullrequest(user, repo, pullrequest):
+    return 'https://github.com/%s/%s/pull/%s' % (user, repo, pullrequest)

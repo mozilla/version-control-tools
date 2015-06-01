@@ -1,15 +1,20 @@
 #!/usr/bin/env python
 import argparse
+import bugsy
 import datetime
 import github
 import json
 import logging
 import mozreview
+import os
 import psycopg2
 import sys
 import time
 import traceback
 
+sys.path.insert(0, os.path.join(os.path.normpath(os.path.abspath(
+                os.path.dirname(__file__))), '..', '..', 'pylib'))
+from mozautomation.commitparser import parse_bugs
 from mozlog.structured import commandline
 
 import selfserve
@@ -24,6 +29,15 @@ OLD_JOB = datetime.timedelta(minutes=30)
 
 
 def handle_pending_mozreview_pullrequests(logger, dbconn):
+    gh = github.connect()
+    if not gh:
+        return
+
+    with open('config.json') as f:
+        config = json.load(f)
+        bzurl = config['bugzilla']['url']
+        testing = config.get('testing', False)
+
     cursor = dbconn.cursor()
 
     query = """
@@ -40,20 +54,72 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
         (transplant_id, ghuser, repo, pullrequest, destination, bzuserid,
          bzcookie, bugid, pingback_url) = row
 
-        landed, result = transplant.transplant_to_mozreview(destination,
+        logger.info('attempting to import pullrequest: %s' % transplant_id)
+
+        # see if we can extract the bug from the commit message
+        if bugid is None:
+            title, body = github.retrieve_issue(gh, ghuser, repo, pullrequest)
+            bugs = parse_bugs(title)
+            if bugs:
+                bugid = bugs[0]
+                logger.info('using bug %s from issue title' % bugid)
+                landed_revisions.append([bugid, None, None, transplant_id])
+
+        # still no luck, attempt to autofile a bug on the user's behalf
+        if bugid is None:
+            logger.info('attempting to autofile bug for: %s' % transplant_id)
+
+            b = bugsy.Bugsy(userid=bzuserid, cookie=bzcookie,
+                            bugzilla_url=bzurl)
+            if not b:
+                logger.info('could not connect to bugzilla instance at %s for '
+                            'pullrequest id %s' % (bzurl, transplant_id))
+                error = 'could not connect to bugzilla. bad credentials?'
+            else:
+                bug = bugsy.Bug()
+
+                # Summary is required, the rest have defaults or are optional
+                bug.summary = title
+
+                if testing:
+                    bug.product = 'TestProduct'
+                    bug.component = 'TestComponent'
+                else:
+                    # TODO: determine a better product & component than the
+                    # defaults provided by Bugsy
+                    pass
+
+                pr_url = github.url_for_pullrequest(ghuser,repo, pullrequest)
+                bug.add_comment('%s\n\nImported from: %s' % (body, pr_url))
+
+                try:
+                    b.put(bug)
+                    bugid = bug.id
+                    logger.info('created bug: %s ' % bugid)
+                    landed_revisions.append([bugid, None, None, transplant_id])
+                except bugsy.BugsyException as e:
+                    logger.info('transplant failed: could not create new bug: %s '
+                                % e.msg)
+                    landed_revisions.append([None, False, e.msg, transplant_id])
+
+                    # set up data to be posted back to mozreview
+                    data = {
+                        'request_id': transplant_id,
+                        'landed': False,
+                        'error_msg': 'could not create new bug: ' + e.msg,
+                        'result': ''
+                    }
+
+                    mozreview_updates.append([transplant_id, pingback_url,
+                                              json.dumps(data)])
+
+        landed, result = transplant.transplant_to_mozreview(gh, destination,
                                                             ghuser, repo,
                                                             pullrequest,
                                                             bzuserid, bzcookie,
                                                             bugid)
 
-        if landed is None:
-            logger.info(('transplant failed - could not connect to github'
-                         ' for https://github.com/%s/%s/pull/%s'
-                         ' to destination: %s') %
-                        (ghuser, repo, pullrequest, destination))
-            # we'll try again later
-            break
-        elif landed:
+        if landed:
             logger.info(('transplanted from'
                          ' https://github.com/%s/%s/pull/%s'
                          ' to destination: %s new revision: %s') %
@@ -64,11 +130,12 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
                          ' destination: %s error: %s') %
                         (ghuser, repo, pullrequest, destination, result))
 
-        landed_revisions.append([landed, result, transplant_id])
+        landed_revisions.append([bugid, landed, result, transplant_id])
 
         # set up data to be posted back to mozreview
         data = {
             'request_id': transplant_id,
+            'bugid': bugid,
             'landed': landed,
             'error_msg': '',
             'result': ''
@@ -83,7 +150,7 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
 
     if landed_revisions:
         query = """
-            update MozreviewPullRequest set landed=%s,result=%s
+            update MozreviewPullRequest set bugid=%s,landed=%s,result=%s
             where id=%s
         """
         cursor.executemany(query, landed_revisions)
@@ -372,9 +439,8 @@ def handle_pending_github_updates(logger, dbconn):
 
         logger.info('attempting to add comment to pullrequest for request: %s' % row[0])
 
-        worked = github.add_pullrequest_comment(gh, ghuser, repo,
-                                                pullrequest,
-                                                message)
+        worked = github.add_issue_comment(gh, ghuser, repo, pullrequest,
+                                          message)
         if worked:
             updated.append([row[0]])
         else:
