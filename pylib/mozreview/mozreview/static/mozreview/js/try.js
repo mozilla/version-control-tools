@@ -76,5 +76,6 @@ $(document).ready(function() {
     return false;
   });
 
-  $("#mozreview-autoland-try-trigger").enable(MozReview.currentIsMutableByUser);
+  var isDraft = $("#draft-banner").is(":visible")
+  $("#mozreview-autoland-try-trigger").enable(!isDraft && MozReview.currentIsMutableByUser);
 });
