@@ -43,6 +43,10 @@ sc = SiteConfiguration.objects.get_current()
 caches = getattr(settings, 'CACHES', {})
 sc.set('cache_backend', caches)
 
+# Set default logging location
+sc.set('logging_enabled', True)
+sc.set('logging_directory', '/reviewboard/logs')
+
 # Define Bugzilla URL.
 sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % bugzilla_url)
 sc.save()
