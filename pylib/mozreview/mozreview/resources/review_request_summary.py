@@ -216,11 +216,14 @@ class ReviewRequestSummaryResource(WebAPIResource):
         for field in ('id', 'summary', 'last_updated', 'issue_open_count'):
             d[field] = getattr(review_request, field)
 
+        # TODO: 'submitter' and 'submitter_bmo_id' should be combined into one
+        # attribute, likewise with 'reviewers' and 'reviewers_bmo_ids'.  See
+        # bug 1164756.
         d['submitter'] = review_request.submitter.username
+        d['submitter_bmo_id'] = BugzillaUserMap.objects.get(
+            user_id=review_request.submitter.id).bugzilla_user_id
         d['status'] = status_to_string(review_request.status)
 
-        # TODO: 'reviewers' and 'reviewers_bmo_ids' should be combined into
-        # one attribute.  See bug 1164756.
         d['reviewers'] = [reviewer.username for reviewer in reviewers]
         d['reviewers_bmo_ids'] = [bzuser.bugzilla_user_id for bzuser in
                                   BugzillaUserMap.objects.filter(user_id__in=[
