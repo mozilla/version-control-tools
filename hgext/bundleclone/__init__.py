@@ -157,27 +157,31 @@ import time
 import urllib
 import urllib2
 
-from mercurial import (
-    changegroup,
-    cmdutil,
-    error,
-    extensions,
-    store,
-    url as hgurl,
-    util,
-    wireproto,
-)
+import mercurial.changegroup as changegroup
+import mercurial.cmdutil as cmdutil
+import mercurial.demandimport as demandimport
+import mercurial.error as error
+import mercurial.extensions as extensions
 from mercurial.i18n import _
+import mercurial.store as store
+import mercurial.url as hgurl
+import mercurial.util as util
+import mercurial.wireproto as wireproto
 
-testedwith = '3.1 3.2 3.3 3.4'
+demandimport.disable()
+try:
+    from mercurial import exchange
+except ImportError:
+    exchange = None
+demandimport.enable()
+
+testedwith = '2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bundleclone'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
 origcapabilities = wireproto.capabilities
-
-from mercurial import exchange
 
 
 def generatestreamclone(repo):
@@ -364,7 +368,11 @@ def streambundle(ui, repo, path):
     ui.write('stream=%s\n' % ','.join(requires))
 
 def extsetup(ui):
-    extensions.wrapfunction(exchange, 'pull', pull)
+    # exchange isn't available on older Mercurial. Wrapped pull pulls down
+    # the bundle manifest. We don't need this feature on all clients running
+    # <3.3, so we silently ignore the failure.
+    if exchange:
+        extensions.wrapfunction(exchange, 'pull', pull)
 
     wireproto.capabilities = capabilities
     wireproto.commands['capabilities'] = (capabilities, '')
@@ -480,11 +488,22 @@ def reposetup(ui, repo):
                     reqs = set(attrs['stream'].split(','))
                     applystreamclone(self, reqs, fh)
                 else:
-                    cg = exchange.readbundle(self.ui, fh, 'stream')
-                    changegroup.addchangegroup(self, cg, 'bundleclone', url)
+                    if exchange:
+                        cg = exchange.readbundle(self.ui, fh, 'stream')
+                    else:
+                        cg = changegroup.readbundle(fh, 'stream')
+
+                    if hasattr(changegroup, 'addchangegroup'):
+                        changegroup.addchangegroup(self, cg, 'bundleclone', url)
+                    else:
+                        self.addchangegroup(cg, 'bundleclone', url)
 
                 self.ui.status(_('finishing applying bundle; pulling\n'))
-                return exchange.pull(self, remote, heads=heads)
+                # Maintain compatibility with Mercurial 2.x.
+                if exchange:
+                    return exchange.pull(self, remote, heads=heads)
+                else:
+                    return self.pull(remote, heads=heads)
 
             except (urllib2.HTTPError, urllib2.URLError) as e:
                 if isinstance(e, urllib2.HTTPError):
