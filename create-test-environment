@@ -60,7 +60,7 @@ export HGRCPATH=/dev/null
 # Install various Mercurial versions for multi-version testing.
 if [ ! -d venv/hg ]; then
   echo "Cloning Mercurial repository"
-  hg clone http://selenic.com/repo/hg venv/hg
+  hg clone https://selenic.com/repo/hg venv/hg
 fi
 
 hg -R venv/hg pull
