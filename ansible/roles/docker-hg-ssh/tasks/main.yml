@@ -27,6 +27,7 @@
   with_items:
     - /usr/local/bin
     - /repo/hg/extensions
+    - /repo/hg/extensions/bundleclone
     - /repo/hg/extensions/pushlog
     - /repo/hg/extensions/parsedatetime
     - /repo/hg/extensions/serverlog
@@ -62,6 +63,9 @@
 
 - name: Install serverlog extension
   copy: src={{ vct }}/hgext/serverlog/__init__.py dest=/repo/hg/extensions/serverlog/__init__.py
+
+- name: install bundleclone extension
+  copy: src={{ vct }}/hgext/bundleclone/__init__.py dest=/repo/hg/extensions/bundleclone/__init__.py
 
 - name: install hooks
   copy: src={{ vct }}/hghooks/mozhghooks/{{ item }} dest=/repo/hg/libraries/mozhghooks/{{ item }} owner=root group=root mode=0644
