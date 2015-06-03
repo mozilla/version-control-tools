@@ -6,7 +6,7 @@
     - sudo
     - syslog
     - tar
-    - https://people.mozilla.org/~gszorc/mercurial-3.3.2-0.x86_64.rpm
+    - https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm
 
 - name: Create groups for SCM ACLs
   group: name={{ item.name }} gid={{ item.gid }}

@@ -7,7 +7,7 @@
 
 # The yum module is slow. Run commands manually.
 - name: System packages installed
-  command: /usr/bin/yum install -y libjpeg-turbo-devel memcached mod_wsgi nodejs patch zlib-devel https://people.mozilla.org/~gszorc/mercurial-3.3.2-0.x86_64.rpm
+  command: /usr/bin/yum install -y libjpeg-turbo-devel memcached mod_wsgi nodejs patch zlib-devel https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm
 
 - name: Install virtualenv
   pip: name=virtualenv

@@ -50,8 +50,8 @@ kombu==3.0.24
 # sha256: gS7FJJ9F7cMTMLf7BuUqr2qy2DqicEfffLaDfvLSabY
 Markdown==2.4.1
 
-# sha256: pEU2fw3Lrzpieb-nQ7Nk5ym-DR8MhSy2038peRb_rhM
-mercurial==3.3.3
+# sha256: eorPcym-2jjO6inGiSEldNmmv__iTPVlAV6gBm987j8
+mercurial==3.4.1
 
 # sha256: U0_2_u_hzQOYT0ROZBWqzHnAqF87ho7EGi_VADAEwx4
 mimeparse==0.1.3

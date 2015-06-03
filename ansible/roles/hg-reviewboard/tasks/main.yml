@@ -3,7 +3,7 @@
 # overhead to invocations. So, we use low-level commands, which execute
 # much faster.
 - name: System packages installed
-  command: /usr/bin/yum -y install openldap-clients openldap-devel sudo syslog https://people.mozilla.org/~gszorc/mercurial-3.3.2-0.x86_64.rpm https://people.mozilla.org/~gszorc/mod_wsgi-4.4.8-1.el6.x86_64.rpm
+  command: /usr/bin/yum -y install openldap-clients openldap-devel sudo syslog https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm https://people.mozilla.org/~gszorc/mod_wsgi-4.4.8-1.el6.x86_64.rpm
 
 - name: Python package dependencies
   pip: requirements={{ vct }}/ansible/roles/hg-reviewboard/files/requirements.txt
