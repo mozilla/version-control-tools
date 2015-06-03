@@ -35,10 +35,10 @@
 <ul>
 <li><a href="{url|urlescape}help{sessionvars%urlparameter}">help</a></li>
 </ul>
-<p>
 <div class="atom-logo">
 <a href="{url|urlescape}atom-log/{node|short}/{file|urlescape}" title="subscribe to atom feed">
-<img class="atom-logo" src="{staticurl|urlescape}feed-icon-14x14.png" alt="atom feed"></a>
+<img class="atom-logo" src="{staticurl|urlescape}feed-icon-14x14.png" alt="atom feed" />
+</a>
 </div>
 </div>
 
@@ -58,11 +58,13 @@
 | {nav%filenav}</div>
 
 <table class="bigtable">
+<thead>
  <tr>
   <th class="age">age</th>
   <th class="author">author</th>
   <th class="description">description</th>
  </tr>
+</thead>
 <tbody class="stripes2">
 {entries%filelogentry}
 </tbody>

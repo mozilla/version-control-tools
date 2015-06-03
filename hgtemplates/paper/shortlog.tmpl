@@ -30,10 +30,9 @@
 <ul>
  <li><a href="{url|urlescape}help{sessionvars%urlparameter}">help</a></li>
 </ul>
-<p>
 <div class="atom-logo">
 <a href="{url|urlescape}atom-log" title="subscribe to atom feed">
-<img class="atom-logo" src="{staticurl|urlescape}feed-icon-14x14.png" alt="atom feed">
+<img class="atom-logo" src="{staticurl|urlescape}feed-icon-14x14.png" alt="atom feed" />
 </a>
 </div>
 </div>
@@ -55,11 +54,13 @@
 </div>
 
 <table class="bigtable">
+<thead>
  <tr>
   <th class="age">age</th>
   <th class="author">author</th>
   <th class="description">description</th>
  </tr>
+</thead>
 <tbody class="stripes2">
 {entries%shortlogentry}
 </tbody>
@@ -79,7 +80,7 @@
                 var m = htmlText.match(/'(\w+)', <!-- NEXTHASH/);
                 return m ? m[1] : null;
             },
-            '.bigtable > tbody:nth-of-type(2)',
+            '.bigtable > tbody',
             '<tr class="%class%">\\
             <td colspan="3" style="text-align: center;">%text%</td>\\
             </tr>'

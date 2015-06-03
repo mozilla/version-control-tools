@@ -23,10 +23,9 @@
 <ul>
  <li><a href="{url|urlescape}help{sessionvars%urlparameter}">help</a></li>
 </ul>
-<p>
 <div class="atom-logo">
 <a href="{url|urlescape}atom-branches" title="subscribe to atom feed">
-<img class="atom-logo" src="{staticurl|urlescape}feed-icon-14x14.png" alt="atom feed">
+<img class="atom-logo" src="{staticurl|urlescape}feed-icon-14x14.png" alt="atom feed" />
 </a>
 </div>
 </div>
@@ -42,10 +41,12 @@
 </form>
 
 <table class="bigtable">
+<thead>
 <tr>
  <th>branch</th>
  <th>node</th>
 </tr>
+</thead>
 <tbody class="stripes2">
 {entries % branchentry}
 </tbody>
