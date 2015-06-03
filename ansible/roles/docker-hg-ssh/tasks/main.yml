@@ -79,6 +79,7 @@
     - prevent_webidl_changes.py
     - push_printurls.py
     - single_head_per_branch.py
+    - single_root.py
     - treeclosure.py
     - treeclosure_comm_central.py
     - try_mandatory.py
