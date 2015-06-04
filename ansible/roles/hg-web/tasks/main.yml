@@ -4,6 +4,10 @@
   with_items:
     # To build mod_wsgi from source so it can be placed in virtualenvs.
     - httpd-devel
+    # Python dependencies need to be installed until we switch to venv
+    - python-pygments
+    - python-simplejson
+    - python-argparse
     # Machines are CentOS 6, which has Python 2.6 installed by default.
     # The Python 2.7 install from mrepo doesn't conflict with the system
     # Python.
