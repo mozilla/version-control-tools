@@ -8,6 +8,8 @@
     - python-pygments
     - python-simplejson
     - python-argparse
+    # We use logrotate to control log files
+    - logrotate
     # Machines are CentOS 6, which has Python 2.6 installed by default.
     # The Python 2.7 install from mrepo doesn't conflict with the system
     # Python.
@@ -55,3 +57,11 @@
 # system.
 - name: install global hgrc
   copy: src=hgrc dest=/etc/mercurial/hgrc mode=0644 owner=root group=root
+
+# Create and manage log resources
+- name: make logdir
+  file: path=/var/log/httpd/hg.mozilla.org state=directory owner=apache group=apache mode=0755
+
+- name: add logrotate config
+  copy: src=logrotate.conf dest=/etc/logrotate.d/hg-httpd-logrotate
+
