@@ -34,6 +34,14 @@
 - name: populate hgweb virtualenv
   pip: requirements={{ venv_hgweb }}/requirements.txt executable={{ venv_hgweb }}/bin/peep
 
+- name: set up version-control-tools repo
+  hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
+      dest=/repo/hg/version-control-tools
+      revision={{ vctnode }}
+      force=yes
+      purge=yes
+      executable={{ venv_hgweb }}/bin/hg
+
 # Settings from this file are inherited by every hg command run on the
 # system.
 - name: install global hgrc
