@@ -34,9 +34,6 @@
 - name: populate hgweb virtualenv
   pip: requirements={{ venv_hgweb }}/requirements.txt executable={{ venv_hgweb }}/bin/peep
 
-- name: install Mercurial
-  command: "{{ venv_hgweb }}/bin/python setup.py install chdir=/repo/hg/hg"
-
 # Settings from this file are inherited by every hg command run on the
 # system.
 - name: install global hgrc
