@@ -46,6 +46,9 @@ def parse_bugs(s):
 def parse_reviewers(s):
     for r in SPECIFIER_RE.split(s)[1:]:
         # Throw away data after newline.
+        if not r:
+            continue
+
         r = r.splitlines()[0]
         for part in LIST_RE.split(r):
             part = part.strip('[](){} ')
@@ -55,6 +58,9 @@ def parse_reviewers(s):
 
 def parse_requal_reviewers(s):
     for r in REQUAL_SPECIFIER_RE.split(s)[1:]:
+        if not r:
+            continue
+
         # Throw away data after newline.
         r = r.splitlines()[0]
         for part in LIST_RE.split(r):
