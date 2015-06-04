@@ -63,6 +63,13 @@ class TestBugParsing(unittest.TestCase):
         self.assertEqual(list(parse_reviewers('Bug 1 - More stuff.r=romulus, r=remus')), ['romulus', 'remus'])
         self.assertEqual(list(parse_reviewers('Bug 1 - More stuff,r=romulus, remus')), ['romulus', 'remus'])
 
+        self.assertEqual(list(parse_reviewers(
+            'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
+            '- Relevant spec text:\n'
+            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
+            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n')),
+            ['roc', 'ehsan'])
+
     def test_requal_reviewers(self):
 
         # first with r? reviewer request syntax
@@ -88,6 +95,13 @@ class TestBugParsing(unittest.TestCase):
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; [r=romulus]')), ['romulus'])
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; [r=remus, r=romulus]')), ['remus', 'romulus'])
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r=romulus, a=test-only')), ['romulus'])
+
+        self.assertEqual(list(parse_requal_reviewers(
+            'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
+            '- Relevant spec text:\n'
+            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
+            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n')),
+            ['roc', 'ehsan'])
 
     def test_backout_missing(self):
         self.assertIsNone(parse_backouts('Bug 1 - More stuff; r=romulus'))
