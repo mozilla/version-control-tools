@@ -10,17 +10,15 @@ import stat
 import time
 import weakref
 
-from mercurial import (
-    cmdutil,
-    encoding,
-    exchange,
-    extensions,
-    revset,
-    templatekw,
-    transaction,
-    util,
-    wireproto,
-)
+import mercurial.cmdutil as cmdutil
+import mercurial.encoding as encoding
+import mercurial.exchange as exchange
+import mercurial.extensions as extensions
+import mercurial.revset as revset
+import mercurial.templatekw as templatekw
+import mercurial.transaction as transaction
+import mercurial.util as util
+import mercurial.wireproto as wireproto
 
 from mercurial.error import (
     Abort,
