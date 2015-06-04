@@ -311,3 +311,4 @@ hiddenformentry = '<input type="hidden" name="{name}" value="{value|escape}" />'
 
 breadcrumb = '&gt; <a href="{url|urlescape}">{name|escape}</a> '
 pushlog = pushlog.tmpl
+bughyperlink = '<a href="{url}">{no|escape}</a>'
