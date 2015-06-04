@@ -29,7 +29,7 @@ Backed out commits should show warnings
 
   $ grep x1f4a9 body
   <a href="/">Mercurial</a>  / changeset / 6c9721b3b4df &#x1f4a9;
-  <tr><td><strong>&#x1f4a9;&#x1f4a9; backed out by <a style="font-family: monospace" href="/rev/f8c8d5d22c7d">f8c8d5d22c7d</a> &#x1f4a9; &#x1f4a9;</strong></td></tr>
+  <tr><td colspan="2"><strong>&#x1f4a9;&#x1f4a9; backed out by <a style="font-family: monospace" href="/rev/f8c8d5d22c7d">f8c8d5d22c7d</a> &#x1f4a9; &#x1f4a9;</strong></td></tr>
 
 Backout commit links to backed out commit
 

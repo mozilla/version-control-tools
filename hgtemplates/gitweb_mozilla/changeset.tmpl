@@ -31,7 +31,7 @@ changeset |
 </div>
 <div class="title_text">
 <table cellspacing="0">
-{if(backedoutbynode, '<tr><td><strong>&#x1f4a9;&#x1f4a9; backed out by <a style="font-family: monospace" href="{url|urlescape}rev/{backedoutbynode|short}">{backedoutbynode|short}</a> &#x1f4a9; &#x1f4a9;</strong></td></tr>')}
+{if(backedoutbynode, '<tr><td colspan="2"><strong>&#x1f4a9;&#x1f4a9; backed out by <a style="font-family: monospace" href="{url|urlescape}rev/{backedoutbynode|short}">{backedoutbynode|short}</a> &#x1f4a9; &#x1f4a9;</strong></td></tr>')}
 <tr><td>author</td><td>{author|obfuscate}</td></tr>
 <tr><td></td><td class="date age">{date|rfc822date}</td></tr>
 {branch%changesetbranch}
