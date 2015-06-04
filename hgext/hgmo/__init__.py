@@ -5,6 +5,7 @@
 
 import os
 
+import mercurial.errors as errors
 import mercurial.extensions as extensions
 import mercurial.hgweb.webutil as webutil
 
@@ -25,6 +26,21 @@ def addmetadata(repo, ctx, d):
         })
 
     d['reviewers'] = list(commitparser.parse_reviewers(ctx.description()))
+
+    # Obtain the Gecko/app version/milestone.
+    #
+    # We could probably only do this if the repo is a known app repo (by
+    # looking at the initial changeset). But, path based lookup is relatively
+    # fast, so just do it.
+    try:
+        fctx = repo.filectx('config/milestone.txt', changeid=ctx.node())
+        lines = fctx.data().splitlines()
+        lines = [l for l in lines if not l.startswith('#') and l.strip()]
+
+        if lines:
+            d['milestone'] = lines[0].strip()
+    except LookupError:
+        pass
 
 
 def changesetentry(orig, web, req, tmpl, ctx):
