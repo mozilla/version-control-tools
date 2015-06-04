@@ -29,6 +29,7 @@ pushlog-feed = /repo_local/mozilla/extensions/pushlog-feed.py
 pushlog = /repo_local/mozilla/extensions/pushlog
 buglink = /repo_local/mozilla/extensions/buglink.py
 serverlog = /repo_local/mozilla/extensions/serverlog
+hgmo = /repo/hg/version-control-tools/hgext/hgmo
 
 [interhg]
 a_httplinks = s|(https?://\S+)|<a href="\1">\1</a>|i
