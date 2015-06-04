@@ -30,6 +30,14 @@ REQUAL_SPECIFIER_RE = re.compile(r'r=')
 
 LIST_RE = re.compile(r'[;\.,\/\\]')
 
+BACKED_OUT_RE = re.compile('^backed out changeset (?P<node>[0-9a-f]{12}) ',
+                           re.I)
+
+SHORT_RE = re.compile('^[0-9a-f]{12}$', re.I)
+
+BACK_OUT_MULTIPLE_RE = re.compile(
+    '^back(?:ed)? out \d+ changesets \(bug ', re.I)
+
 
 def parse_bugs(s):
     bugs = [int(m[1]) for m in BUG_RE.findall(s)]
@@ -53,3 +61,39 @@ def parse_requal_reviewers(s):
                 # specifier
                 if not SPECIFIER_RE.match(part):
                     yield part
+
+
+def parse_backouts(s):
+    """Look for backout annotations in a string.
+
+    Returns a 2-tuple of (nodes, bugs) where each entry is an iterable of
+    changeset identifiers and bug numbers that were backed out, respectively.
+    Or return None if no backout info is available.
+    """
+    l = s.splitlines()[0].lower()
+
+    m = BACKED_OUT_RE.match(l)
+    if m:
+        return [m.group('node')], parse_bugs(s)
+
+    if BACK_OUT_MULTIPLE_RE.match(l):
+        return [], parse_bugs(s)
+
+    if l.startswith('backed out changesets '):
+        nodes = []
+        remaining = l[len('backed out changesets '):]
+
+        # Consume all the node words that follow, stopping after a non-node
+        # word or separator.
+        for word in remaining.split():
+            word = word.strip(',')
+            if SHORT_RE.match(word):
+                nodes.append(word)
+            elif word == 'and':
+                continue
+            else:
+                break
+
+        return nodes, parse_bugs(s)
+
+    return None

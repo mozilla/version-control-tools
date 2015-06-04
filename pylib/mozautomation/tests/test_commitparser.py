@@ -4,9 +4,12 @@
 
 import unittest
 
-from mozautomation.commitparser import (parse_bugs,
-                                        parse_requal_reviewers,
-                                        parse_reviewers)
+from mozautomation.commitparser import (
+    parse_backouts,
+    parse_bugs,
+    parse_requal_reviewers,
+    parse_reviewers,
+)
 
 
 class TestBugParsing(unittest.TestCase):
@@ -85,3 +88,27 @@ class TestBugParsing(unittest.TestCase):
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; [r=romulus]')), ['romulus'])
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; [r=remus, r=romulus]')), ['remus', 'romulus'])
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r=romulus, a=test-only')), ['romulus'])
+
+    def test_backout_missing(self):
+        self.assertIsNone(parse_backouts('Bug 1 - More stuff; r=romulus'))
+
+    def test_backout_single(self):
+        self.assertEqual(
+            parse_backouts('Backed out changeset 6435d5aab611 (bug 858680)'),
+            (['6435d5aab611'], [858680]))
+        self.assertEqual(parse_backouts(
+            'Backed out changeset 2f9d54c153ed on CLOSED TREE (bug 1067325)'),
+            (['2f9d54c153ed'], [1067325]))
+
+    def test_backout_multiple_changesets(self):
+        self.assertEqual( parse_backouts(
+            'Backed out changesets 4b6aa5c0a1bf and fdf38a41d92b '
+            '(bug 1150549) for Mulet crashes.'),
+            (['4b6aa5c0a1bf', 'fdf38a41d92b'], [1150549]))
+
+    def test_backout_n_changesets(self):
+        self.assertEqual(parse_backouts(
+            'Backed out 6 changesets (bug 1164777, bug 1163207, bug 1156914, '
+            'bug 1164778) for SM(cgc) caused by something in the push.'),
+            ([], [1164777, 1163207, 1156914, 1164778]))
+
