@@ -14,6 +14,7 @@ import mercurial.cmdutil as cmdutil
 import mercurial.encoding as encoding
 import mercurial.exchange as exchange
 import mercurial.extensions as extensions
+import mercurial.hgweb.webutil as webutil
 import mercurial.revset as revset
 import mercurial.templatekw as templatekw
 import mercurial.transaction as transaction
@@ -118,6 +119,32 @@ def playback(orig, journal, report, *args, **kwargs):
     report('rolling back pushlog\n')
 
     return orig(journal, report, *args, **kwargs)
+
+
+def addpushmetadata(repo, ctx, d):
+    if not hasattr(repo, 'pushlog'):
+        return
+
+    pushinfo = repo.pushlog.pushfromchangeset(ctx)
+    if pushinfo:
+        d['pushid'] = pushinfo[0]
+        d['pushuser'] = pushinfo[1]
+        d['pushdate'] = util.makedate(pushinfo[2])
+        d['pushnodes'] = pushinfo[3]
+
+
+def changesetentry(orig, web, req, tmpl, ctx):
+    """Wraps webutil.changesetentry to provide pushlog metadata to template."""
+    d = orig(web, req, tmpl, ctx)
+    addpushmetadata(web.repo, ctx, d)
+    return d
+
+
+def changelistentry(orig, web, ctx, tmpl):
+    """Wraps webutil.changelistentry to provide pushlog metadata to template."""
+    d = orig(web, ctx, tmpl)
+    addpushmetadata(web.repo, ctx, d)
+    return d
 
 
 class pushlog(object):
@@ -341,6 +368,33 @@ class pushlog(object):
 
             if current:
                 yield current
+
+    def pushfromchangeset(self, ctx):
+        """Obtain info about a push that added the specified changeset.
+
+        Returns a tuple of (pushid, who, when, [nodes]) or None if there is
+        no pushlog info for this changeset.
+        """
+        with self.conn(readonly=True) as c:
+            if not c:
+                return None
+
+            res = c.execute('SELECT pushid from changesets WHERE node=?',
+                            (ctx.hex(),)).fetchone()
+            if not res:
+                return None
+
+            pushid = res[0]
+
+            res = c.execute('SELECT id, user, date, node from pushlog '
+                            'LEFT JOIN changesets on id=pushid '
+                            'WHERE id=? ORDER BY rev ASC', (pushid,))
+            nodes = []
+            for pushid, who, when, node in res:
+                who = who.encode('utf-8')
+                nodes.append(node)
+
+            return pushid, who, when, nodes
 
     def verify(self):
         # Attempt to create database (since .pushes below won't).
@@ -602,6 +656,10 @@ def extsetup(ui):
 
     templatekw.keywords.update(keywords)
     templatekw.dockeywords.update(keywords)
+
+    extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
+    extensions.wrapfunction(webutil, 'changelistentry', changelistentry)
+
 
 def reposetup(ui, repo):
     if not repo.local():
