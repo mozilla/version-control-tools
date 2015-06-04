@@ -37,7 +37,7 @@
 - name: set up version-control-tools repo
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
       dest=/repo/hg/version-control-tools
-      revision={{ vctnode }}
+      revision={{ lookup('file', '../../../../.vctnode') }}
       force=yes
       purge=yes
       executable={{ venv_hgweb }}/bin/hg
