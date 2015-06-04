@@ -42,6 +42,11 @@
       purge=yes
       executable={{ venv_hgweb }}/bin/hg
 
+# The hg module's purge doesn't delete ignored files. Boo. Force that
+# because old .pyc files may cause chaos.
+- name: delete ignored files from version-control-tools repo
+  command: "{{ venv_hgweb }}/bin/hg --config extensions.purge= -R /repo/hg/version-control-tools purge --all"
+
 # Settings from this file are inherited by every hg command run on the
 # system.
 - name: install global hgrc
