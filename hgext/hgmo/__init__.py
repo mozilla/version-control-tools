@@ -50,6 +50,16 @@ def addmetadata(repo, ctx, d):
     except LookupError:
         pass
 
+    d['backsoutnodes'] = []
+    backouts = commitparser.parse_backouts(ctx.description())
+    if backouts:
+        for node in backouts[0]:
+            try:
+                bctx = repo[node]
+                d['backsoutnodes'].append({'node': bctx.hex()})
+            except LookupError:
+                pass
+
 
 def changesetentry(orig, web, req, tmpl, ctx):
     """Wraps webutil.changesetentry to provide extra metadata."""

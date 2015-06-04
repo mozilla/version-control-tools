@@ -43,6 +43,7 @@ changeset |
 {if(reviewers, '<tr><td>reviewers</td><td>{join(reviewers%reviewerlink, ", ")}</td></tr>')}
 {if(bugs, '<tr><td>bugs</td><td>{join(bugs%bughyperlink, ", ")}</td></tr>')}
 {if(milestone, '<tr><td>milestone</td><td>{milestone|escape}</td></tr>')}
+{if(backsoutnodes, '<tr><td>backs out</td><td>{join(backsoutnodes%backedoutnodelink, ", ")}</td></tr>')}
 </table></div>
 
 <div class="page_body">
