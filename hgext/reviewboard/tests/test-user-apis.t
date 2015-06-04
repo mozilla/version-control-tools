@@ -11,6 +11,10 @@ Create some users
   created user 7
   $ adminbugzilla create-user jane@example.com password 'Jane Jones [:jenny]'
   created user 8
+  $ adminbugzilla create-user john.mclane@example.com password 'John McLane'
+  created user 9
+  $ adminbugzilla create-user sarah.connor@example.com password 'Sarah Connor'
+  created user 10
 
 Unauthenticated users should not be able to search
 
@@ -18,8 +22,7 @@ Unauthenticated users should not be able to search
   API Error: 500: 226: Bugzilla error: Logged-out users cannot use the "match" argument to this function to access any user information.
   [1]
 
-  $ export BUGZILLA_USERNAME=joe1@example.com
-  $ export BUGZILLA_PASSWORD=password
+  $ exportbzauth joe1@example.com password
 
 Searching with content that doesn't exist should get nothing
 
@@ -41,22 +44,17 @@ An empty query string should not cause database population
     username: mozreview
 
 Searching lowercase and uppercase versions of names returns the same
-results
+results. Also, users without :ircnick syntax won't get populated via
+search.
 
   $ rbmanage get-users joe
   - id: 3
     url: /users/joe1%2B6/
     username: joe1+6
-  - id: 4
-    url: /users/the-real-j-o-e%2B7/
-    username: the-real-j-o-e+7
   $ rbmanage get-users Joe
   - id: 3
     url: /users/joe1%2B6/
     username: joe1+6
-  - id: 4
-    url: /users/the-real-j-o-e%2B7/
-    username: the-real-j-o-e+7
 
 Searching a full name returns results
 
@@ -75,35 +73,49 @@ Searching a last name returns results
 Searching an IRC nick without : returns results
 
   $ rbmanage get-users jenny
-  - id: 5
+  - id: 4
     url: /users/jenny/
     username: jenny
 
 Searching an IRC nick fragment returns results
 
   $ rbmanage get-users :jenn
-  - id: 5
+  - id: 4
     url: /users/jenny/
     username: jenny
 
 Searching an IRC nick with : prefix returns results
 
   $ rbmanage get-users :jenny
-  - id: 5
+  - id: 4
     url: /users/jenny/
     username: jenny
 
 Searching on name for a user with IRC nick returns results
 
   $ rbmanage get-users Jane
-  - id: 5
+  - id: 4
     url: /users/jenny/
     username: jenny
 
   $ rbmanage get-users 'Jane Jones'
-  - id: 5
+  - id: 4
     url: /users/jenny/
     username: jenny
+
+A search on an exact name match will populate the user
+
+  $ rbmanage get-users 'John McLane'
+  - id: 5
+    url: /users/john.mclane%2B9/
+    username: john.mclane+9
+
+A search on an exact email match will populate the user
+
+  $ rbmanage get-users sarah.connor@example.com
+  - id: 6
+    url: /users/sarah.connor%2B10/
+    username: sarah.connor+10
 
 Cleanup
 

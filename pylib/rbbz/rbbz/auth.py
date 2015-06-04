@@ -12,7 +12,10 @@ from django.utils.translation import ugettext as _
 from reviewboard.accounts.backends import AuthBackend
 from reviewboard.accounts.errors import UserQueryError
 
-from mozreview.models import get_or_create_bugzilla_users
+from mozreview.bugzilla.models import (
+    BZ_IRCNICK_RE,
+    get_or_create_bugzilla_users,
+)
 from rbbz.bugzilla import Bugzilla
 from rbbz.errors import BugzillaError, BugzillaUrlError
 from rbbz.forms import BugzillaAuthSettingsForm
@@ -132,7 +135,27 @@ class BugzillaBackend(AuthBackend):
             raise UserQueryError('Bugzilla error: %s' % e.msg)
 
         try:
-            get_or_create_bugzilla_users(bugzilla.query_users(query))
+            # We don't want to auto populate just any user because Bugzilla has
+            # over 300,000 users and most of them aren't relevant to MozReview.
+            #
+            # So, we only auto import users if they have IRC nick syntax or
+            # if the search matches them exactly.
+            def user_relevant(u):
+                if BZ_IRCNICK_RE.search(u['real_name']):
+                    return True
+                if u['email'] == query:
+                    return True
+
+                # This might allow too many users through. Let's not get too
+                # attached to this.
+                if u['real_name'] == query:
+                    return True
+
+                return False
+
+            users = bugzilla.query_users(query)
+            users['users'] = [u for u in users['users'] if user_relevant(u)]
+            get_or_create_bugzilla_users(users)
         except BugzillaError as e:
             raise UserQueryError('Bugzilla error: %s' % e.msg)
 
