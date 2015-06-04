@@ -40,7 +40,7 @@ changeset |
 <tr><td>push id</td><td>{if(pushid, '<a href="{url|urlescape}pushloghtml?changeset={node|short}">{pushid}</a>', 'unknown')}</td></tr>
 <tr><td>push user</td><td>{if(pushuser, pushuser|escape, 'unknown')}</td></tr>
 <tr><td>push date</td><td>{if(pushdate, pushdate|isodate, 'unknown')}</td></tr>
-{if(reviewers, '<tr><td>reviewers</td><td>{join(reviewers, ", ")}</td></tr>')}
+{if(reviewers, '<tr><td>reviewers</td><td>{join(reviewers%reviewerlink, ", ")}</td></tr>')}
 {if(bugs, '<tr><td>bugs</td><td>{join(bugs%bughyperlink, ", ")}</td></tr>')}
 {if(milestone, '<tr><td>milestone</td><td>{milestone|escape}</td></tr>')}
 </table></div>
