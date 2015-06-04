@@ -63,6 +63,7 @@ Try a bunch of different ways of specifying a reviewer
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
   submitting 10 changesets for review
+  unrecognized reviewer: test-only
   
   changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
@@ -404,6 +405,7 @@ Unrecognized reviewers should be ignored
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
   submitting 1 changesets for review
+  unrecognized reviewer: cthulhu
   
   changeset:  27:d9a3b1783a10
   summary:    Bug 2 - different stuff; r?cthulhu

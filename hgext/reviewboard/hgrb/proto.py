@@ -271,7 +271,7 @@ def reviewboard(repo, proto, args=None):
 
     try:
         parentrid, commitmap, reviews = post_reviews(rburl, repoid, identifier,
-                                                     commits,
+                                                     commits, lines,
                                                      username=bzusername,
                                                      password=bzpassword,
                                                      userid=bzuserid,

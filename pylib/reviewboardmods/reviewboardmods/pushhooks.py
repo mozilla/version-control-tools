@@ -18,8 +18,8 @@ from rbtools.api.errors import APIError
 from rbtools.api.transport.sync import SyncTransport
 
 
-def post_reviews(url, repoid, identifier, commits, username=None, password=None,
-                 userid=None, cookie=None):
+def post_reviews(url, repoid, identifier, commits, hgresp,
+                 username=None, password=None, userid=None, cookie=None):
     """Post a set of commits to Review Board.
 
     Repository hooks can use this function to post a set of pushed commits
@@ -126,9 +126,9 @@ def post_reviews(url, repoid, identifier, commits, username=None, password=None,
     """
     with ReviewBoardClient(url, username, password, userid, cookie) as rbc:
         root = rbc.get_root()
-        return _post_reviews(root, repoid, identifier, commits)
+        return _post_reviews(root, repoid, identifier, commits, hgresp)
 
-def _post_reviews(api_root, repoid, identifier, commits):
+def _post_reviews(api_root, repoid, identifier, commits, hgresp):
     # This assumes that we pushed to the repository/URL that Review Board is
     # configured to use. This assumption may not always hold.
     repo = api_root.get_repository(repository_id=repoid)
@@ -176,13 +176,20 @@ def _post_reviews(api_root, repoid, identifier, commits):
                 # Check to see if this user exists (and sync things up
                 # between reviewboard and bugzilla, if necessary).
                 r = api_root.get_users(q=reviewer)
+                rsp_users = r.rsp['users']
 
-                if len(r.rsp['users']) == 1:
+                if not rsp_users:
+                    hgresp.append('display unrecognized reviewer: %s' %
+                                  reviewer)
+                elif len(rsp_users) == 1:
                     username = r.rsp['users'][0]['username']
                     if reviewer == username:
                         reviewers.add(username)
                         squashed_reviewers.add(username)
-                elif len(users) > 1:
+                    else:
+                        hgresp.append('display unrecognized reviewer: %s' %
+                                      reviewer)
+                elif len(rsp_users) > 1:
                     # If we get multiple users, we'll look for an exact match.
                     # It would be nice to use this at first, but we seem to
                     # need the call to get_users in order to synchronize our
@@ -192,7 +199,7 @@ def _post_reviews(api_root, repoid, identifier, commits):
                     reviewers.add(username)
                     squashed_reviewers.add(username)
             except APIError:
-                pass
+                hgresp.append('display unrecognized reviewer: %s' % reviewer)
 
         return sorted(reviewers)
 
