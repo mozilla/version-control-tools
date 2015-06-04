@@ -19,6 +19,10 @@
     - python27
     - python27-virtualenv
 
+# We need to ensure that a hg user exists to own many resources
+- name: create hg user
+  user: name=hg uid=500
+
 # We run hgweb out of a virtualenv because that's how you are supposed
 # to do Python.
 - name: create virtualenv to run hgweb
