@@ -4,6 +4,8 @@
   with_items:
     # To build mod_wsgi from source so it can be placed in virtualenvs.
     - httpd-devel
+    # mod_wsgi installed from system until switched over to venv
+    - mod_wsgi
     # Python dependencies need to be installed until we switch to venv
     - python-pygments
     - python-simplejson
@@ -70,6 +72,9 @@
 - name: install vhost config
   copy: src=vhost.conf dest=/etc/httpd/conf.d/hg-vhost.conf
 
+# Install and manage the mod_wsgi config file
+- name: install wsgi config
+  copy: content="LoadModule wsgi_module modules/mod_wsgi.so" dest=/etc/httpd/conf.d/wsgi.conf
 
 # Create and manage log resources
 - name: make logdir
