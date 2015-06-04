@@ -1,0 +1,47 @@
+# vim: syntax=apache
+
+WSGISocketPrefix /var/run/wsgi
+<VirtualHost *:80>
+    ServerName hg
+    DocumentRoot /repo_local/mozilla/webroot_wsgi
+
+    SetEnv HGENCODING UTF-8
+    SetEnv LC_TYPE UTF-8
+
+    WSGIScriptAlias / /repo_local/mozilla/webroot_wsgi/hgweb.wsgi
+
+    WSGIDaemonProcess hg processes={{ wsgi_processes }} threads=1 maximum-requests=20 deadlock-timeout=60 inactivity-timeout=300 user=hg group=hg display-name=hg
+    WSGIProcessGroup hg
+
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/json
+
+    WSGIScriptAliasMatch ^/(users/[^/]+)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/l10n-mozilla-1.9..)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/l10n-mozilla-2.0)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/l10n-miramar)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/gaia-l10n/[^/]+)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/l10n/mozilla-aurora)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/l10n/mozilla-beta)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/l10n/mozilla-release)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(incubator|testpilot-l10n|weave-l10n|gaia-l10n|build|labs|services|l10n(?!-)|l10n-central|projects|automation|qa|hgcustom|webtools|releases|rewriting-and-analysis|www)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/dist(.*) /repo/hg/webroot_wsgi/dist/hgweb.wsgi$1
+    WSGIScriptAliasMatch ^/integration(.*) /repo/hg/webroot_wsgi/integration/hgweb.wsgi$1
+    WSGIScriptAliasMatch ^(/(?!users|robots).*) /repo/hg/webroot_wsgi/hgweb.wsgi$1
+
+    <Location /users>
+        Options +Indexes
+        Order allow,deny
+        Allow from all
+    </Location>
+
+    #LogLevel debug
+    LogFormat "%h %v %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\""
+    ErrorLog "/var/log/httpd/hg/error_log"
+    CustomLog "/var/log/httpd/hg/access_log" combined env=!image
+</VirtualHost>
+
+# Local variables:
+# mode: apache
+# tab-width: 4
+# indent-tabs-mode: nil
+# end:

@@ -62,6 +62,15 @@
 - name: install global hgrc
   copy: src=hgrc dest=/etc/mercurial/hgrc mode=0644 owner=root group=root
 
+# We control httpd.conf for features like server-status
+- name: install httpd.conf file
+  copy: src=httpd.conf dest=/etc/httpd/conf/httpd.conf
+
+# Install the vhost.conf file for hg.mozilla.org
+- name: install vhost config
+  copy: src=vhost.conf dest=/etc/httpd/conf.d/hg-vhost.conf
+
+
 # Create and manage log resources
 - name: make logdir
   file: path=/var/log/httpd/hg.mozilla.org state=directory owner=apache group=apache mode=0755
