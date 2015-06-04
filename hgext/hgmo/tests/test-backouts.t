@@ -21,11 +21,15 @@ No backout info on initial commit
   $ grep '<td>backs out' body
   [1]
 
-No backout info on backed out commit (yet)
+Backed out commits should show warnings
 
   $ http http://localhost:$HGPORT/rev/6c9721b3b4df --body-file body > /dev/null
   $ grep '<td>backs out' body
   [1]
+
+  $ grep x1f4a9 body
+  <a href="/">Mercurial</a>  / changeset / 6c9721b3b4df &#x1f4a9;
+  <tr><td><strong>&#x1f4a9;&#x1f4a9; backed out by <a style="font-family: monospace" href="/rev/f8c8d5d22c7d">f8c8d5d22c7d</a> &#x1f4a9; &#x1f4a9;</strong></td></tr>
 
 Backout commit links to backed out commit
 

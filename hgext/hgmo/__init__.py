@@ -9,6 +9,7 @@ import mercurial.encoding as encoding
 import mercurial.errors as errors
 import mercurial.extensions as extensions
 import mercurial.hgweb.webutil as webutil
+from mercurial.node import short
 import mercurial.revset as revset
 
 
@@ -18,7 +19,7 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 import mozautomation.commitparser as commitparser
 
 
-def addmetadata(repo, ctx, d):
+def addmetadata(repo, ctx, d, onlycheap=False):
     """Add changeset metadata for hgweb templates."""
     bugs = list(commitparser.parse_bugs(ctx.description()))
     d['bugs'] = []
@@ -60,6 +61,29 @@ def addmetadata(repo, ctx, d):
             except LookupError:
                 pass
 
+    if onlycheap:
+        return
+
+    # Look for changesets that back out this one.
+    #
+    # We limit the distance we search for backouts because an exhaustive
+    # search could be very intensive. e.g. you load up the root commit
+    # on a repository with 200,000 changesets and that commit is never
+    # backed out. This finds most backouts because backouts typically happen
+    # shortly after a bad commit is introduced.
+    thisshort = short(ctx.node())
+    count = 0
+    searchlimit = repo.ui.configint('hgmo', 'backoutsearchlimit', 100)
+    for bctx in repo.set('%ld::', [ctx.rev()]):
+        count += 1
+        if count >= searchlimit:
+            break
+
+        backouts = commitparser.parse_backouts(bctx.description())
+        if backouts and thisshort in backouts[0]:
+            d['backedoutbynode'] = bctx.hex()
+            break
+
 
 def changesetentry(orig, web, req, tmpl, ctx):
     """Wraps webutil.changesetentry to provide extra metadata."""
@@ -70,7 +94,7 @@ def changesetentry(orig, web, req, tmpl, ctx):
 
 def changelistentry(orig, web, ctx, tmpl):
     d = orig(web, ctx, tmpl)
-    addmetadata(web.repo, ctx, d)
+    addmetadata(web.repo, ctx, d, onlycheap=True)
     return d
 
 

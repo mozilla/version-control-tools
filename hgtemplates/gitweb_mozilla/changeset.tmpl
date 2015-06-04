@@ -7,7 +7,7 @@
 
 <div class="page_header">
 <a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
-<a href="/">Mercurial</a> {pathdef%breadcrumb} / changeset / {node|short}
+<a href="/">Mercurial</a> {pathdef%breadcrumb} / changeset / {node|short} {if(backedoutbynode, '&#x1f4a9;')}
 </div>
 
 <div class="page_nav">
@@ -31,6 +31,7 @@ changeset |
 </div>
 <div class="title_text">
 <table cellspacing="0">
+{if(backedoutbynode, '<tr><td><strong>&#x1f4a9;&#x1f4a9; backed out by <a style="font-family: monospace" href="{url|urlescape}rev/{backedoutbynode|short}">{backedoutbynode|short}</a> &#x1f4a9; &#x1f4a9;</strong></td></tr>')}
 <tr><td>author</td><td>{author|obfuscate}</td></tr>
 <tr><td></td><td class="date age">{date|rfc822date}</td></tr>
 {branch%changesetbranch}
