@@ -54,6 +54,3 @@ Push info should show up in changeset view
   $ http http://localhost:$HGPORT/log --body-file body > /dev/null
   $ grep push body
   <a href="/pushloghtml">pushlog</a> |
-  Push <a href="/pushloghtml?changeset=82f53df85e9f">2</a> by user2@example.com at *<br /> (glob)
-  Push <a href="/pushloghtml?changeset=6c9721b3b4df">2</a> by user2@example.com at *<br /> (glob)
-  Push <a href="/pushloghtml?changeset=55482a6fb4b1">1</a> by user1@example.com at *<br /> (glob)
