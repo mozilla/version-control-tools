@@ -94,6 +94,9 @@
 - name: make logdir
   file: path=/var/log/httpd/hg.mozilla.org state=directory mode=0755
 
-- name: add logrotate config
+- name: add logrotate httpd config
   copy: src=logrotate.conf dest=/etc/logrotate.d/hg-httpd-logrotate
+
+- name: add logrotate hg config
+  copy: src=logrotate.conf dest=/etc/logrotate.d/hg
 
