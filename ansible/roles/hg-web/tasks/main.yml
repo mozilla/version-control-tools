@@ -98,5 +98,5 @@
   copy: src=logrotate.conf dest=/etc/logrotate.d/hg-httpd-logrotate
 
 - name: add logrotate hg config
-  copy: src=logrotate.conf dest=/etc/logrotate.d/hg
+  copy: src=logrotate.hg.conf dest=/etc/logrotate.d/hg
 
