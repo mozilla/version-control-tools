@@ -88,7 +88,7 @@
   copy: src=make_user_wsgi_dirs.sh dest=/usr/local/bin/make_user_wsgi_dirs.sh mode=0755
 
 - name: install the cronjob that runs the user repo wsgi file creation script
-  cron: minute="*/2" user=hg job="/usr/local/bin/make_user_wsgi_dirs.sh"
+  cron: minute="*/2" user=hg job="/usr/local/bin/make_user_wsgi_dirs.sh" name="Generate user wsgi files"
 
 # Create and manage log resources
 - name: make logdir
