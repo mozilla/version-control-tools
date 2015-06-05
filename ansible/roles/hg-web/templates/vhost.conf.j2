@@ -1,43 +1,61 @@
 # vim: syntax=apache
 
 WSGISocketPrefix /var/run/wsgi
+LimitRequestFields 250
+
 <VirtualHost *:80>
-    ServerName hg
+    ServerName hg.mozilla.org
     DocumentRoot /repo_local/mozilla/webroot_wsgi
+
+    RewriteEngine on
+    RewriteRule ^/(.*)index.cgi/?(.*) http://hg.mozilla.org/$1$2
 
     SetEnv HGENCODING UTF-8
     SetEnv LC_TYPE UTF-8
 
-    WSGIScriptAlias / /repo_local/mozilla/webroot_wsgi/hgweb.wsgi
-
-    WSGIDaemonProcess hg processes={{ wsgi_processes }} threads=1 maximum-requests=20 deadlock-timeout=60 inactivity-timeout=300 user=hg group=hg display-name=hg
-    WSGIProcessGroup hg
+    WSGIDaemonProcess hg.mozilla.org processes=48 threads=1 maximum-requests=20 deadlock-timeout=60 inactivity-timeout=300 user=hg group=hg display-name=hg.mozilla.org
+    WSGIProcessGroup hg.mozilla.org
 
     AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/json
 
-    WSGIScriptAliasMatch ^/(users/[^/]+)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
-    WSGIScriptAliasMatch ^/(releases/l10n-mozilla-1.9..)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
-    WSGIScriptAliasMatch ^/(releases/l10n-mozilla-2.0)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
-    WSGIScriptAliasMatch ^/(releases/l10n-miramar)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
+    # For https://bugzilla.mozilla.org/show_bug.cgi?id=670781
+    ScriptAlias /repo-group /usr/local/bin/repo-group
+
+    WSGIScriptAliasMatch ^/(users/[^/]+)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/l10n-mozilla-1.9..)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/l10n-mozilla-2.0)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/l10n-miramar)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
     WSGIScriptAliasMatch ^/(releases/gaia-l10n/[^/]+)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
-    WSGIScriptAliasMatch ^/(releases/l10n/mozilla-aurora)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
-    WSGIScriptAliasMatch ^/(releases/l10n/mozilla-beta)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
-    WSGIScriptAliasMatch ^/(releases/l10n/mozilla-release)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
-    WSGIScriptAliasMatch ^/(incubator|testpilot-l10n|weave-l10n|gaia-l10n|build|labs|services|l10n(?!-)|l10n-central|projects|automation|qa|hgcustom|webtools|releases|rewriting-and-analysis|www)(.*) /repo/hg/webroot_wsgi/$1/hgweb.wsgi$2
-    WSGIScriptAliasMatch ^/dist(.*) /repo/hg/webroot_wsgi/dist/hgweb.wsgi$1
-    WSGIScriptAliasMatch ^/integration(.*) /repo/hg/webroot_wsgi/integration/hgweb.wsgi$1
-    WSGIScriptAliasMatch ^(/(?!users|robots).*) /repo/hg/webroot_wsgi/hgweb.wsgi$1
+    WSGIScriptAliasMatch ^/(releases/l10n/mozilla-aurora)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/l10n/mozilla-beta)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(releases/l10n/mozilla-release)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/(incubator|testpilot-l10n|weave-l10n|gaia-l10n|build|labs|services|l10n(?!-)|l10n-central|projects|automation|qa|hgcustom|webtools|releases|rewriting-and-analysis|www|SeaMonkey)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
+    WSGIScriptAliasMatch ^/dist(.*) /repo_local/mozilla/webroot_wsgi/dist/hgweb.wsgi$1
+    WSGIScriptAliasMatch ^/integration(.*) /repo_local/mozilla/webroot_wsgi/integration/hgweb.wsgi$1
+    WSGIScriptAliasMatch ^(/(?!users|robots).*) /repo_local/mozilla/webroot_wsgi/hgweb.wsgi$1
 
     <Location /users>
-        Options +Indexes
-        Order allow,deny
-        Allow from all
+	Options +Indexes
+	Order allow,deny
+	Allow from all
+    </Location>
+
+    <Location /server-status>
+        SetHandler server-status
+        Order deny,allow
+        Deny from all
+        Allow from 127.0.0.1
+        Allow from 10.2.74.123
+        Allow from 10.8.32.5
+        Allow from 10.8.75.19
+        Allow from 10.22.75.42
+        Allow from 10.8.81.5
     </Location>
 
     #LogLevel debug
     LogFormat "%h %v %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\""
-    ErrorLog "/var/log/httpd/hg/error_log"
-    CustomLog "/var/log/httpd/hg/access_log" combined env=!image
+    ErrorLog "/var/log/httpd/hg.mozilla.org/error_log"
+    CustomLog "/var/log/httpd/hg.mozilla.org/access_log" combined env=!image
 </VirtualHost>
 
 # Local variables:
