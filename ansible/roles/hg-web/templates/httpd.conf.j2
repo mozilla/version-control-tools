@@ -104,8 +104,8 @@ KeepAliveTimeout 15
 StartServers       8
 MinSpareServers    5
 MaxSpareServers   20
-ServerLimit      {{ serverlimit }}
-MaxClients       {{ maxclients }}
+ServerLimit      {{ server_limit }}
+MaxClients       {{ max_clients }}
 MaxRequestsPerChild  4000
 </IfModule>
 
