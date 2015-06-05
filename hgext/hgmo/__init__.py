@@ -6,7 +6,7 @@
 import os
 
 import mercurial.encoding as encoding
-import mercurial.errors as errors
+import mercurial.error as error
 import mercurial.extensions as extensions
 import mercurial.hgweb.webutil as webutil
 from mercurial.node import short
@@ -48,7 +48,7 @@ def addmetadata(repo, ctx, d, onlycheap=False):
 
         if lines:
             d['milestone'] = lines[0].strip()
-    except LookupError:
+    except error.LookupError:
         pass
 
     d['backsoutnodes'] = []
@@ -58,7 +58,7 @@ def addmetadata(repo, ctx, d, onlycheap=False):
             try:
                 bctx = repo[node]
                 d['backsoutnodes'].append({'node': bctx.hex()})
-            except LookupError:
+            except error.LookupError:
                 pass
 
     if onlycheap:
