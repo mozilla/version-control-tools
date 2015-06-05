@@ -83,6 +83,13 @@
 - name: install wsgi config
   copy: content="LoadModule wsgi_module modules/mod_wsgi.so" dest=/etc/httpd/conf.d/wsgi.conf
 
+# Install the user repo wsgi creation script, set up a cronjob for it
+- name: install the script that creates user repo wsgi files
+  copy: src=make_user_wsgi_dirs.sh dest=/usr/local/bin/make_user_wsgi_dirs.sh mode=0755
+
+- name: install the cronjob that runs the user repo wsgi file creation script
+  cron: minute="*/2" user=hg job="/usr/local/bin/make_user_wsgi_dirs.sh"
+
 # Create and manage log resources
 - name: make logdir
   file: path=/var/log/httpd/hg.mozilla.org state=directory mode=0755
