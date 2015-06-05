@@ -70,7 +70,7 @@
 
 # Install the vhost.conf file for hg.mozilla.org
 - name: install vhost config
-  template: src=vhost.conf dest=/etc/httpd/conf.d/hg-vhost.conf
+  template: src=vhost.conf.j2 dest=/etc/httpd/conf.d/hg-vhost.conf
 
 # Install and manage the mod_wsgi config file
 - name: install wsgi config
