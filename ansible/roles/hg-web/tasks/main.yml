@@ -66,11 +66,11 @@
 
 # We control httpd.conf for features like server-status
 - name: install httpd.conf file
-  copy: src=httpd.conf dest=/etc/httpd/conf/httpd.conf
+  template: src=httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
 
 # Install the vhost.conf file for hg.mozilla.org
 - name: install vhost config
-  copy: src=vhost.conf dest=/etc/httpd/conf.d/hg-vhost.conf
+  template: src=vhost.conf dest=/etc/httpd/conf.d/hg-vhost.conf
 
 # Install and manage the mod_wsgi config file
 - name: install wsgi config
