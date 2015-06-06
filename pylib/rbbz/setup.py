@@ -1,7 +1,7 @@
 from reviewboard.extensions.packaging import setup
 
 PACKAGE = 'rbbz'
-VERSION = '0.2.8'
+VERSION = '0.2.9'
 
 setup(name=PACKAGE,
       version=VERSION,

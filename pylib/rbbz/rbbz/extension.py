@@ -24,6 +24,8 @@ from reviewboard.reviews.signals import (reply_publishing,
                                          review_request_reopened)
 from reviewboard.site.urlresolvers import local_site_reverse
 
+from mozreview.bugzilla.client import Bugzilla
+from mozreview.bugzilla.errors import BugzillaError
 from mozreview.errors import (CommitPublishProhibited,
                               ParentShipItError)
 from mozreview.extra_data import (UNPUBLISHED_RRIDS_KEY,
@@ -36,10 +38,8 @@ from mozreview.models import (BugzillaUserMap,
                               get_profile)
 from mozreview.signals import commit_request_publishing
 from rbbz.auth import BugzillaBackend
-from rbbz.bugzilla import Bugzilla
 from rbbz.diffs import build_plaintext_review
-from rbbz.errors import (BugzillaError,
-                         ConfidentialBugError,
+from rbbz.errors import (ConfidentialBugError,
                          InvalidBugIdError)
 from rbbz.middleware import (BugzillaCookieAuthMiddleware,
                              CorsHeaderMiddleware)

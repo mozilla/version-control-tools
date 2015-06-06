@@ -10,7 +10,7 @@ import requests
 import xmlrpclib
 import yaml
 
-from rbbz.transports import bugzilla_transport
+from mozreview.bugzilla.transports import bugzilla_transport
 
 
 def create_xmlrpc_proxy(url, username, password):

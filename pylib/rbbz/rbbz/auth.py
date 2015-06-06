@@ -12,12 +12,12 @@ from django.utils.translation import ugettext as _
 from reviewboard.accounts.backends import AuthBackend
 from reviewboard.accounts.errors import UserQueryError
 
+from mozreview.bugzilla.client import Bugzilla
+from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
 from mozreview.bugzilla.models import (
     BZ_IRCNICK_RE,
     get_or_create_bugzilla_users,
 )
-from rbbz.bugzilla import Bugzilla
-from rbbz.errors import BugzillaError, BugzillaUrlError
 from rbbz.forms import BugzillaAuthSettingsForm
 
 

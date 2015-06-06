@@ -8,8 +8,8 @@ import xmlrpclib
 from djblets.siteconfig.models import SiteConfiguration
 from djblets.util.decorators import simple_decorator
 
-from rbbz.errors import BugzillaError, BugzillaUrlError
-from rbbz.transports import bugzilla_transport
+from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
+from mozreview.bugzilla.transports import bugzilla_transport
 
 
 @simple_decorator
@@ -376,6 +376,7 @@ class Bugzilla(object):
     @property
     def proxy(self):
         if self._proxy is None:
-            self._proxy = xmlrpclib.ServerProxy(self.xmlrpc_url, self.transport)
+            self._proxy = xmlrpclib.ServerProxy(self.xmlrpc_url,
+                                                self.transport)
 
         return self._proxy
