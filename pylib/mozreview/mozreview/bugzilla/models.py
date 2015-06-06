@@ -20,8 +20,14 @@ BZ_IRCNICK_RE = re.compile(':([A-Za-z0-9_\-\.]+)')
 
 
 class BugzillaUserMap(models.Model):
+    """Holds Bugzilla-related data about Review Board users.
+
+    This model is deprecated in favour of MozReviewUserProfile; please put
+    any future user data there.
+    """
     user = models.OneToOneField(User)
     bugzilla_user_id = models.IntegerField(unique=True, db_index=True)
+    api_key = models.CharField(max_length=40, null=True)
 
     class Meta:
         app_label = 'mozreview'
