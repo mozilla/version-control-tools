@@ -6,7 +6,8 @@ from django.db import models
 from mozreview.autoland.models import (AutolandEventLogEntry,
                                        AutolandRequest)
 from mozreview.bugzilla.models import (BugzillaUserMap,
-                                       get_or_create_bugzilla_users)
+                                       get_or_create_bugzilla_users,
+                                       set_bugzilla_api_key)
 from mozreview.ldap import query_scm_group
 
 __all__ = [
@@ -15,6 +16,7 @@ __all__ = [
     'BugzillaUserMap',
     'get_or_create_bugzilla_users',
     'MozReviewUserProfile',
+    'set_bugzilla_api_key',
 ]
 
 

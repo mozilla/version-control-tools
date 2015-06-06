@@ -115,6 +115,17 @@ def get_or_create_bugzilla_users(user_data):
     return users
 
 
+def set_bugzilla_api_key(user, api_key):
+    """Assigns a Bugzilla API key to a user.
+
+    The user must exist before this function is called.
+    """
+    bugzilla_user_map = BugzillaUserMap.objects.get(user=user)
+    if bugzilla_user_map.api_key != api_key:
+        bugzilla_user_map.api_key = api_key
+        bugzilla_user_map.save()
+
+
 def prune_inactive_users(commit=False, verbose=False):
     """Delete inactive users.
 
