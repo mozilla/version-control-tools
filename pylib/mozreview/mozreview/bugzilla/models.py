@@ -33,6 +33,21 @@ class BugzillaUserMap(models.Model):
         app_label = 'mozreview'
 
 
+class UnverifiedBugzillaApiKey(models.Model):
+    """Holds unverified Bugzilla API keys.
+
+    This table holds API keys sent from Bugzilla until we are able to verify
+    them, after which they are removed from this table.
+    """
+    bmo_username = models.CharField(max_length=255, db_index=True)
+    api_key = models.CharField(max_length=40)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    callback_result = models.CharField(max_length=36)
+
+    class Meta:
+        app_label = 'mozreview'
+
+
 def placeholder_username(email, bz_user_id):
     return '%s+%s' % (email.split('@')[0], bz_user_id)
 

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load djblets_deco djblets_extensions djblets_utils i18n %}
+
+{% block title %}{% trans "Authentication Error" %}{% endblock %}
+
+{% block content %}
+<div id="error-container" haserror="true">
+  <h1>Error authenticating with Bugzilla:</h1>
+
+  <p>{{login_error}}</p>
+
+  <p>Please try logging in again. If the problem persists,
+  please <a href="http://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview-user.html#getting-in-touch">contact the maintainers</a>
+  and/or <a href="https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview">file a bug</a>.</p>
+</div>
+{% endblock %}

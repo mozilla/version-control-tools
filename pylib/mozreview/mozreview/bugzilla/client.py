@@ -366,6 +366,23 @@ class Bugzilla(object):
         if params['ids']:
             self.proxy.Bug.update_attachment(params)
 
+    @xmlrpc_to_bugzilla_errors
+    def valid_api_key(self, username, api_key):
+        try:
+            return self.proxy.User.valid_login({
+                'login': username,
+                'api_key': api_key,
+            })
+        except xmlrpclib.Fault as e:
+            # Invalid API-key formats (e.g. not 40 characters long) or expired
+            # API keys will raise an error, but for our purposes we just
+            # consider them as invalid proper API keys, particularly so we can
+            # try another type of authentication.
+            if e.faultCode == 306:
+                return False
+
+            raise
+
     @property
     def transport(self):
         if self._transport is None:

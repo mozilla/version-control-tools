@@ -113,6 +113,9 @@ class MozReviewExtension(Extension):
                                     import_pullrequest_trigger_resource)
         initialize_pulse_handlers(self)
 
+        URLHook(self,
+                patterns('', url(r'^mozreview/', include('mozreview.urls'))))
+
         HeaderDropdownActionHook(self, actions=[{
             'label': 'MozReview',
             'items': [

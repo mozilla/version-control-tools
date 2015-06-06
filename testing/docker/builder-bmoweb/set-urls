@@ -19,6 +19,8 @@ with open(pf, 'w') as fh:
     for line in params_lines:
         if "'mozreview_base_url' =>" in line:
             line = "           'mozreview_base_url' => '%s',\n" % rburl
+        elif "'mozreview_auth_callback_url' =>" in line:
+            line = "           'mozreview_auth_callback_url' => '%smozreview/bmo_auth_callback/',\n" % rburl
 
         fh.write(line)
 
