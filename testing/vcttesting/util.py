@@ -28,7 +28,7 @@ def get_available_port():
     return port
 
 
-def wait_for_http(host, port, path='', timeout=60, extra_check_fn=None):
+def wait_for_http(host, port, path='', timeout=240, extra_check_fn=None):
     """Wait for an HTTP server to respond.
 
     If extra_check_fn is defined, it will be called as an extra check to see if
