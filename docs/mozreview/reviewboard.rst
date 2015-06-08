@@ -228,3 +228,48 @@ on the individual commits.
    The behavior of **Ship It** and how we manage review requests in
    Bugzilla is a bit clumsy. It is very likely the workflow will change
    over time. Proposals are very welcome.
+
+Working With "Patches"
+----------------------
+
+   The review description field contains an url to pull down the commits
+   under review. If you want to view the patch as plain text, import it
+   into a mercurial queue, push it to another tree, etc. this is the way
+   to go.
+
+   To pull the commits down use the url provided in the review
+   description, for instance, if the revision is ``foo``::
+
+      $ hg pull -r foo https://reviewboard-hg.mozilla.org/gecko/
+
+   Once it is pulled down you can bookmark it and update to it, which is the
+   recommended way of working with patches::
+
+      $ hg bookmark -r foo foo-review
+      $ hg update foo-review
+
+   Or if you still use mercurial queues, you can import it into a mercurial
+   queue::
+
+      $ hg qimport -r foo
+      $ hg qapplied
+      foo.patch
+
+   To get plain text, just use ``hg export``::
+
+      $ hg export -r foo-review > foo.patch
+
+   or::
+
+      $ hg export qtip > foo.patch
+
+   Once you've finished with a patch, if you're using bookmarks you can just
+   update to another bookmark and remove the review bookmark::
+
+      $ hg update central
+      $ hg bookmark --delete foo-review
+
+   If you're using queues, you can pop it from your queue and then delete it::
+
+      $ hg qpop
+      $ hg qdelete foo.patch
