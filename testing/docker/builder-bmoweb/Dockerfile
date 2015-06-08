@@ -127,11 +127,15 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
   mysql-client patchutils perlmagick pkg-config python3-mysql.connector \
   python-psutil unzip wget
 
-RUN git clone https://git.mozilla.org/webtools/bmo/bugzilla.git $BUGZILLA_HOME/bugzilla
-
 # ElasticSearch isn't available on CPAN. Patch Bugzilla to not install
 # it.
+#
+# This needs to be before we fetch Git source code so that patch changes
+# needed to apply against upstream result in fresh clone.
 ADD elasticsearch.patch $BUGZILLA_HOME/elasticsearch.patch
+
+RUN git clone https://git.mozilla.org/webtools/bmo/bugzilla.git $BUGZILLA_HOME/bugzilla
+
 RUN cd $BUGZILLA_HOME/bugzilla && /usr/bin/patch -p1 < $BUGZILLA_HOME/elasticsearch.patch
 
 # Linux::Pid is a dependency for Apache::SizeLimit that for whatever
