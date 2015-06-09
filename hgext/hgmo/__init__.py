@@ -5,15 +5,18 @@
 
 import os
 
+import mercurial.commands as commands
 import mercurial.encoding as encoding
 import mercurial.error as error
 import mercurial.extensions as extensions
+import mercurial.hg as hg
 import mercurial.hgweb.webutil as webutil
 from mercurial.node import short
 import mercurial.revset as revset
 
 
 OUR_DIR = os.path.dirname(__file__)
+ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 import mozautomation.commitparser as commitparser
@@ -118,9 +121,40 @@ def revset_reviewer(repo, subset, x):
     return subset.filter(hasreviewer)
 
 
+def servehgmo(orig, ui, repo, *args, **kwargs):
+    """Wraps commands.serve to provide --hgmo flag."""
+    if kwargs.get('hgmo', False):
+        kwargs['style'] = 'gitweb_mozilla'
+        kwargs['templates'] = os.path.join(ROOT, 'hgtemplates')
+
+        # ui.copy() is funky. Unless we do this, extension settings get
+        # lost when calling hg.repository().
+        ui = ui.copy()
+
+        def setconfig(name, paths):
+            ui.setconfig('extensions', name,
+                         os.path.join(ROOT, 'hgext', *paths))
+
+        setconfig('pushlog', ['pushlog'])
+        setconfig('buglink', ['pushlog-legacy', 'buglink.py'])
+        setconfig('pushlog-feed', ['pushlog-legacy', 'pushlog-feed.py'])
+        setconfig('hgwebjson', ['pushlog-legacy', 'hgwebjson.py'])
+
+        # Since new extensions may have been flagged for loading, we need
+        # to obtain a new repo instance to a) trigger loading of these
+        # extensions b) force extensions' reposetup function to run.
+        repo = hg.repository(ui, repo.root)
+
+    return orig(ui, repo, *args, **kwargs)
+
+
 def extsetup(ui):
     extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
     extensions.wrapfunction(webutil, 'changelistentry', changelistentry)
 
     revset.symbols['reviewer'] = revset_reviewer
     revset.safesymbols.add('reviewer')
+
+    entry = extensions.wrapcommand(commands.table, 'serve', servehgmo)
+    entry[1].append(('', 'hgmo', False,
+                     'Run a server configured like hg.mozilla.org'))

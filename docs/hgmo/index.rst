@@ -10,3 +10,4 @@ hg.mozilla.org
    pushlog
    managing-repos
    bundleclone
+   contributing
