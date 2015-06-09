@@ -50,7 +50,10 @@ sc.set('cache_backend', caches)
 sc.set('logging_enabled', True)
 sc.set('logging_directory', '/reviewboard/logs')
 
-# Define Bugzilla URL.
+# Define Bugzilla URL. We use the internal IP here to do initial setup.
+# However, for Bugzilla's authentication-delegation system, we later need to
+# reset this to Bugzilla's public IP, which is not available at this point.
+# It is later set via set-site-url by vcttesting.mozreview.MozReview.
 sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % bugzilla_url)
 sc.save()
 

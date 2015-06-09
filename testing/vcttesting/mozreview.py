@@ -253,7 +253,7 @@ class MozReview(object):
             # constructs self-referential URLs properly.
             e.submit(self._docker.execute, self.rbweb_id,
                      ['/set-site-url', self.reviewboard_url,
-                      self.autoland_url])
+                      self.autoland_url, self.bugzilla_url])
 
             # Tell Bugzilla about Review Board URL.
             e.submit(self._docker.execute, mr_info['web_id'],

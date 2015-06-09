@@ -11,7 +11,7 @@ import urlparse
 sys.path.insert(0, '/reviewboard/conf')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'reviewboard.settings'
 
-site_url, autoland_url = sys.argv[1:]
+site_url, autoland_url, bugzilla_url = sys.argv[1:]
 site_url = urlparse.urlsplit(site_url)
 
 # Define hostname.
@@ -26,6 +26,12 @@ from djblets.extensions.models import RegisteredExtension
 mre = RegisteredExtension.objects.get(class_name='mozreview.extension.MozReviewExtension')
 mre.settings['autoland_url'] = autoland_url.rstrip('/')
 mre.save()
+
+# Define Bugzilla URL.
+from djblets.siteconfig.models import SiteConfiguration
+sc = SiteConfiguration.objects.get_current()
+sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % bugzilla_url.rstrip('/'))
+sc.save()
 
 # Django caches the site settings in memory in each process
 # and there doesn't appear to be an easy way to invalidate or
