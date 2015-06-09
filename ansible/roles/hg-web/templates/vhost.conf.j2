@@ -16,6 +16,11 @@ LimitRequestFields 250
     WSGIDaemonProcess hg.mozilla.org processes={{ wsgi_processes }} threads=1 maximum-requests=20 deadlock-timeout=60 inactivity-timeout=300 user=hg group=hg display-name=hg.mozilla.org
     WSGIProcessGroup hg.mozilla.org
 
+    # This is needed so sub-interpreters aren't used. This prevents a
+    # known Mercurial bug (bug 1172739) and should make the server run a
+    # bit faster since it won't have to constantly load modules.
+    WSGIApplicationGroup %{GLOBAL}
+
     AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/json
 
     # For https://bugzilla.mozilla.org/show_bug.cgi?id=670781
