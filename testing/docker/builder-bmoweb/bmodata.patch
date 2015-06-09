@@ -1,13 +1,13 @@
-diff --git a/contrib/docker/generate_bmo_data.pl b/contrib/docker/generate_bmo_data.pl
-index 575729f..6babbfa 100755
---- a/contrib/docker/generate_bmo_data.pl
-+++ b/contrib/docker/generate_bmo_data.pl
+diff --git a/docker/generate_bmo_data.pl b/docker/generate_bmo_data.pl
+index 45cde24..4570d09 100755
+--- a/docker/generate_bmo_data.pl
++++ b/docker/generate_bmo_data.pl
 @@ -27,7 +27,7 @@ my $dbh = Bugzilla->dbh;
  # set Bugzilla usage mode to USAGE_MODE_CMDLINE
  Bugzilla->usage_mode(USAGE_MODE_CMDLINE);
 
--Bugzilla->set_user(Bugzilla::User->check({ name => 'admin@mozilla.bugs' }));
-+Bugzilla->set_user(Bugzilla::User->check({ name => 'admin@example.com' }));
+-Bugzilla->set_user(Bugzilla::User->new({ name => 'admin@mozilla.bugs' }));
++Bugzilla->set_user(Bugzilla::User->new({ name => 'admin@example.com' }));
 
  ##########################################################################
  #  Set Default User Preferences

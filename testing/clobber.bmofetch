@@ -7,6 +7,8 @@
 # The format of the file is not relevant. But we try to keep a log of
 # why we're forcing changes.
 
+2015-06-09 - BMO moved contrib/docker/ to docker/.
+
 2015-05-24 - BMO modified the Docker data generation script in a way
 that caused one of our patches to fail to apply. We refreshed our
 patch, but it only applies against tip.
