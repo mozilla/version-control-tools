@@ -302,6 +302,7 @@ from mercurial import (
     cmdutil,
     demandimport,
     encoding,
+    error,
     extensions,
     hg,
     scmutil,
@@ -997,22 +998,27 @@ def revset_pushhead(repo, subset, x):
         if not uri:
             raise util.Abort(_("Don't know about tree: %s") % tree)
 
-        heads = set(repo[r[4]].rev() for r in
-            repo.changetracker.tree_push_heads(tree))
+        def pushheads():
+            for push_id, head_changeset in repo.changetracker.tree_push_head_changesets(tree):
+                try:
+                    head = repo[head_changeset].rev()
+                    yield head
+                except error.RepoLookupError:
+                    # There are some malformed pushes.  Ignore them.
+                    continue
 
-        return [r for r in subset if r in heads]
+        # Push heads are returned in order of ascending push ID, which
+        # corresponds to ascending commit order in hg.
+        return subset & revset.generatorset(pushheads(), iterasc=True)
+    else:
+        def is_pushhead(r):
+            node = repo[r].node()
+            for push in repo.changetracker.pushes_for_changeset(node):
+                if str(push[4]) == node:
+                    return True
+            return False
 
-    revs = []
-
-    for r in subset:
-        node = repo[r].node()
-
-        for push in repo.changetracker.pushes_for_changeset(node):
-            if str(push[4]) == node:
-                revs.append(r)
-                break
-
-    return revs
+        return subset.filter(is_pushhead)
 
 
 def revset_reviewer(repo, subset, x):

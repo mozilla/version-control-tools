@@ -56,6 +56,9 @@ class ChangeTracker(object):
                 'PRIMARY KEY (push_id, tree_id) '
                 ')')
 
+            self._db.execute('CREATE INDEX IF NOT EXISTS i_pushes_push_id '
+                'ON pushes (push_id)')
+
             self._db.execute('CREATE TABLE IF NOT EXISTS changeset_pushes ('
                 'changeset BLOB, '
                 'head_changeset BLOB, '
@@ -63,6 +66,9 @@ class ChangeTracker(object):
                 'tree_id INTEGER, '
                 'UNIQUE (changeset, tree_id) '
                 ')')
+
+            self._db.execute('CREATE INDEX IF NOT EXISTS i_changeset_pushes_push_id '
+                'ON changeset_pushes (tree_id, push_id)')
 
             self._db.execute('CREATE TABLE IF NOT EXISTS bug_changesets ('
                 'bug INTEGER, '
@@ -128,17 +134,23 @@ class ChangeTracker(object):
             'ORDER BY pushes.time ASC', [buffer(changeset)]):
             yield row
 
-    def tree_push_heads(self, tree):
-        """Obtain all pushes on a given tree."""
-        for name, pid, t, user, head in self._db.execute(
-            'SELECT trees.name, pushes.push_id, '
-            'pushes.time, pushes.user, changeset_pushes.head_changeset '
-            'FROM trees, pushes, changeset_pushes '
-            'WHERE pushes.push_id = changeset_pushes.push_id AND '
-            'pushes.tree_id = changeset_pushes.tree_id AND '
-            'trees.id = pushes.tree_id AND trees.name=? '
-            'ORDER BY pushes.time ASC', [tree]):
-            yield name, pid, t, user, str(head)
+    def tree_push_head_changesets(self, tree):
+        """Obtain all pushes on a given tree.
+
+        Returns pairs (push_id, head_changeset) like
+        `(1, 'a\x00y\x06\xa1\xf8\xad\\0;\x08\x15\xacN\x98!\x16\x8d97')`.
+
+        Use binascii.hexlify to convert to a hexadecimal hash.
+        """
+        tree, url = resolve_trees_to_uris([tree])[0]
+        tree_id = self.tree_id(tree, url)
+        for push_id, head in self._db.execute(
+            'SELECT push_id, head_changeset '
+            'FROM changeset_pushes '
+            'WHERE tree_id = ? '
+            'GROUP BY head_changeset '
+            'ORDER BY push_id ASC', [tree_id]):
+            yield push_id, str(head)
 
     def associate_bugs_with_changeset(self, bugs, changeset):
         """Associate a numeric bug number with a changeset.
