@@ -136,12 +136,12 @@ Usernames for users without the IRC nick syntax are based on email fragment and 
 
   $ exportbzauth user1@example.com password1
   $ rbmanage dump-user 'user1+6'
-  3:
+  4:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user1@example.com
     first_name: Dummy User1
     fullname: Dummy User1
-    id: 3
+    id: 4
     last_name: ''
     url: /users/user1%2B6/
     username: user1+6
@@ -169,19 +169,19 @@ Newly created users should have a suitable profile (e.g. is_private is set)
   submitter_columns: 
   syntax_highlighting: 1
   timezone: UTC
-  user_id: 3
+  user_id: 4
   wordwrapped_diffs: 1
 
 Usernames for users with IRC nicks are the IRC nickname
 
   $ exportbzauth user2@example.com password2
   $ rbmanage dump-user nick
-  4:
+  5:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2@example.com
     first_name: Mozila User [:nick]
     fullname: Mozila User [:nick]
-    id: 4
+    id: 5
     last_name: ''
     url: /users/nick/
     username: nick
@@ -208,12 +208,12 @@ Changing the IRC nickname in Bugzilla will update the RB username
   [1]
 
   $ rbmanage dump-user newnick
-  4:
+  5:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2@example.com
     first_name: Mozilla User [:newnick]
     fullname: Mozilla User [:newnick]
-    id: 4
+    id: 5
     last_name: ''
     url: /users/newnick/
     username: newnick
@@ -239,12 +239,12 @@ Changing the email address in Bugzilla will update the RB email
   [1]
 
   $ rbmanage dump-user newnick
-  4:
+  5:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
     first_name: Mozilla User [:newnick]
     fullname: Mozilla User [:newnick]
-    id: 4
+    id: 5
     last_name: ''
     url: /users/newnick/
     username: newnick
@@ -312,24 +312,24 @@ adding a new user or splitting this test file.)
 
   $ exportbzauth user2-new@example.com password2
   $ rbmanage dump-user newnick
-  4:
+  5:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
     first_name: Mozilla User [:newnick]
     fullname: Mozilla User [:newnick]
-    id: 4
+    id: 5
     last_name: ''
     url: /users/newnick/
     username: newnick
 
   $ exportbzauth user3@example.com password3
   $ rbmanage dump-user user3+8
-  5:
+  6:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user3@example.com
     first_name: Dummy User3 [:newnick]
     fullname: Dummy User3 [:newnick]
-    id: 5
+    id: 6
     last_name: ''
     url: /users/user3%2B8/
     username: user3+8
@@ -347,12 +347,12 @@ user, they will be assigned the email+id username.
   [1]
 
   $ rbmanage dump-user mynick
-  5:
+  6:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user3@example.com
     first_name: Mozilla User3 [:mynick]
     fullname: Mozilla User3 [:mynick]
-    id: 5
+    id: 6
     last_name: ''
     url: /users/mynick/
     username: mynick
@@ -363,12 +363,12 @@ user, they will be assigned the email+id username.
 
   $ exportbzauth user2-new@example.com password2
   $ rbmanage dump-user newnick
-  4:
+  5:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
     first_name: Mozilla User [:newnick]
     fullname: Mozilla User [:newnick]
-    id: 4
+    id: 5
     last_name: ''
     url: /users/newnick/
     username: newnick
@@ -394,24 +394,24 @@ user, they will be assigned the email+id username.
 
   $ exportbzauth user3@example.com password3
   $ rbmanage dump-user mynick
-  5:
+  6:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user3@example.com
     first_name: Mozilla User3 [:mynick]
     fullname: Mozilla User3 [:mynick]
-    id: 5
+    id: 6
     last_name: ''
     url: /users/mynick/
     username: mynick
 
   $ exportbzauth user2-new@example.com password2
   $ rbmanage dump-user user2-new+7
-  4:
+  5:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
     email: user2-new@example.com
     first_name: Mozilla User [:mynick]
     fullname: Mozilla User [:mynick]
-    id: 4
+    id: 5
     last_name: ''
     url: /users/user2-new%2B7/
     username: user2-new+7

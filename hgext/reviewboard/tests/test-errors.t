@@ -25,6 +25,18 @@ Server should complain if the extension is not configured
   $ echo "repoid = 1" >> server/.hg/hgrc
 
   $ hg -R server identify
+  abort: Please set reviewboard.username to the username for priveleged communications with Review Board.
+  [255]
+
+  $ echo "username = mozreview" >> server/.hg/hgrc
+
+  $ hg -R server identify
+  abort: Please set reviewboard.password to the password for priveleged communications with Review Board.
+  [255]
+
+  $ echo "password = password" >> server/.hg/hgrc
+
+  $ hg -R server identify
   abort: Please set bugzilla.url to the URL of the Bugzilla instance to talk to.
   [255]
   $ cat >> server/.hg/hgrc << EOF

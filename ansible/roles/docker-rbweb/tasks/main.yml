@@ -57,7 +57,9 @@
 - name: Install support scripts
   copy: src={{ item }} dest=/{{ item }} owner=reviewboard group=reviewboard mode=0755
   with_items:
+    - create-local-user
     - dump-profile
+    - grant-permission
     - kill-wsgi-procs
     - make-admin
     - refresh

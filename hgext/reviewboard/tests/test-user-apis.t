@@ -33,72 +33,75 @@ An empty query string should not cause database population
   - id: 1
     url: /users/admin%2B1/
     username: admin+1
-  - id: 2
+  - id: 3
     url: /users/joe1%2B6/
     username: joe1+6
+  - id: 2
+    url: /users/mozreview/
+    username: mozreview
 
 Searching lowercase and uppercase versions of names returns the same
 results
 
   $ rbmanage get-users joe
-  - id: 2
+  - id: 3
     url: /users/joe1%2B6/
     username: joe1+6
-  - id: 3
+  - id: 4
     url: /users/the-real-j-o-e%2B7/
     username: the-real-j-o-e+7
   $ rbmanage get-users Joe
-  - id: 2
+  - id: 3
     url: /users/joe1%2B6/
     username: joe1+6
-  - id: 3
+  - id: 4
     url: /users/the-real-j-o-e%2B7/
     username: the-real-j-o-e+7
 
 Searching a full name returns results
 
   $ rbmanage get-users 'Joe Smith'
-  - id: 2
+  - id: 3
     url: /users/joe1%2B6/
     username: joe1+6
 
 Searching a last name returns results
 
   $ rbmanage get-users Smith
-  - id: 2
+  - id: 3
     url: /users/joe1%2B6/
     username: joe1+6
 
 Searching an IRC nick without : returns results
 
   $ rbmanage get-users jenny
-  - id: 4
+  - id: 5
     url: /users/jenny/
     username: jenny
 
 Searching an IRC nick fragment returns results
 
   $ rbmanage get-users :jenn
-  - id: 4
+  - id: 5
     url: /users/jenny/
     username: jenny
 
 Searching an IRC nick with : prefix returns results
 
   $ rbmanage get-users :jenny
-  - id: 4
+  - id: 5
     url: /users/jenny/
     username: jenny
 
 Searching on name for a user with IRC nick returns results
 
   $ rbmanage get-users Jane
-  - id: 4
+  - id: 5
     url: /users/jenny/
     username: jenny
 
   $ rbmanage get-users 'Jane Jones'
-  - id: 4
+  - id: 5
     url: /users/jenny/
     username: jenny
 

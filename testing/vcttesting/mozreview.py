@@ -206,6 +206,9 @@ class MozReview(object):
 
         self.admin_username = bugzilla.username
         self.admin_password = bugzilla.password
+        self.hg_rb_username = "mozreview"
+        self.hg_rb_email = "mozreview@example.com"
+        self.hg_rb_password = "password"
         self.ldap_uri = mr_info['ldap_uri']
         self.hgrb_id = mr_info['hgrb_id']
         self.ssh_hostname = mr_info['ssh_hostname']
@@ -213,13 +216,23 @@ class MozReview(object):
         self.mercurial_url = mr_info['mercurial_url']
 
         # Ensure admin user is present and has admin privileges.
-        def make_admin():
+        def make_users():
             rb = self.get_reviewboard()
+
+            # Ensure admin user is present and has admin privileges.
             rb.login_user(bugzilla.username, bugzilla.password)
             rb.make_admin(bugzilla.username)
 
+            # Ensure the MozReview hg user is present and has privileges.
+            rb.create_local_user(self.hg_rb_username, self.hg_rb_email,
+                                 self.hg_rb_password)
+            rb.grant_permission(self.hg_rb_username,
+                                'Can change ldap assocation for all users')
+
+
+
         with futures.ThreadPoolExecutor(4) as e:
-            e.submit(make_admin)
+            e.submit(make_users)
 
             # Tell hgrb about URLs.
             e.submit(self._docker.client.execute, self.hgrb_id,

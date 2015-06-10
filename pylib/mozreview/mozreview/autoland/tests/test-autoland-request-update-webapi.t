@@ -38,9 +38,12 @@ Force the admin Review Board user to be created by querying for it.
   - id: 1
     url: /users/admin%2B1/
     username: admin+1
-  - id: 2
+  - id: 3
     url: /users/author%2B6/
     username: author+6
+  - id: 2
+    url: /users/mozreview/
+    username: mozreview
 
   $ rbmanage dump-autoland-requests
   autoland_id: 1
@@ -49,7 +52,7 @@ Force the admin Review Board user to be created by querying for it.
   repository_revision: ''
   repository_url: ''
   review_request_id: 1
-  user_id: 2
+  user_id: 3
 
 Hit the WebAPI with the Autoland response
 
@@ -61,7 +64,7 @@ Hit the WebAPI with the Autoland response
   repository_revision: Foo
   repository_url: ''
   review_request_id: 1
-  user_id: 2
+  user_id: 3
 
   $ cd ..
   $ mozreview stop

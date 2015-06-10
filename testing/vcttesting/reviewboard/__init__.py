@@ -69,6 +69,25 @@ class MozReviewBoard(object):
         self._docker.client.execute(self._cid, ['/make-admin', email])
         logger.info('made %s an admin' % email)
 
+    def create_local_user(self, username, email, password):
+        """Make a Review Board user using RBs internal auth."""
+        self._docker.client.execute(self._cid, [
+            '/create-local-user',
+            username,
+            email,
+            password
+        ])
+        logger.info('Create local user %s' % username)
+
+    def grant_permission(self, username, permission):
+        """Grant a user a Review Board permission."""
+        self._docker.client.execute(self._cid, [
+            '/grant-permission',
+            username,
+            permission
+        ])
+        logger.info('Granted %s the %s permission' % (username, permission))
+
     def get_profile_data(self, username):
         """Obtain profile fields from a username.
 

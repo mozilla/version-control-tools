@@ -1,0 +1,30 @@
+#!/venv/bin/python -u
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import os
+import sys
+
+sys.path.insert(0, '/reviewboard/conf')
+os.environ['DJANGO_SETTINGS_MODULE'] = 'reviewboard.settings'
+
+username = sys.argv[1]
+permission_name = sys.argv[2]
+
+# Create the user.
+from django.contrib.auth.models import Permission, User
+try:
+    user = User.objects.get(username=username)
+except User.DoesNotExist:
+    print('User %s does not exist' % username)
+    sys.exit(1)
+
+try:
+    permission = Permission.objects.get(name=permission_name)
+except Permission.DoesNotExist:
+    print('%s is not a valid permission' % permission_name)
+    sys.exit(1)
+
+user.user_permissions.add(permission)
+print('Granted %s the %s permission' % (username, permission_name))

@@ -1,0 +1,19 @@
+#!/venv/bin/python -u
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import os
+import sys
+
+sys.path.insert(0, '/reviewboard/conf')
+os.environ['DJANGO_SETTINGS_MODULE'] = 'reviewboard.settings'
+
+username = sys.argv[1]
+email = sys.argv[2]
+password = sys.argv[3]
+
+# Create the user.
+from django.contrib.auth.models import User
+user = User.objects.create_user(username, email=email, password=password)
+print('Created user %s' % user.id)

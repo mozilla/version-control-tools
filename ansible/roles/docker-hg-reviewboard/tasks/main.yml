@@ -12,3 +12,9 @@
 
 - name: Install psutil
   pip: name=psutil
+
+- name: Configure MozReview user
+  ini_file: dest=/etc/mercurial/hgrc section={{ item.section }} option={{ item.option }} value="{{ item.value }}"
+  with_items:
+    - { section: reviewboard, option: username, value: mozreview }
+    - { section: reviewboard, option: password, value: password }

@@ -2,6 +2,8 @@ repoconfig() {
   cat >> $1 << EOF
 [reviewboard]
 repoid = 1
+username=mozreview
+password=password
 EOF
 }
 

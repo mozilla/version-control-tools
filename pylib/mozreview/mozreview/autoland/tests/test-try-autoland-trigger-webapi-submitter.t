@@ -38,12 +38,15 @@ Force the dummy Review Board user to be created by querying for it.
   - id: 1
     url: /users/admin%2B1/
     username: admin+1
-  - id: 2
+  - id: 3
     url: /users/author%2B6/
     username: author+6
-  - id: 3
+  - id: 4
     url: /users/dummy1%2B7/
     username: dummy1+7
+  - id: 2
+    url: /users/mozreview/
+    username: mozreview
 
   $ rbmanage hit-try-autoland-trigger 1 "try -b do -p all -t none -u all"
   You don't have permission for this (HTTP 403, API Error 101)
@@ -63,12 +66,15 @@ Force the admin Review Board user to be created by querying for it.
   - id: 1
     url: /users/admin%2B1/
     username: admin+1
-  - id: 2
+  - id: 3
     url: /users/author%2B6/
     username: author+6
-  - id: 3
+  - id: 4
     url: /users/dummy1%2B7/
     username: dummy1+7
+  - id: 2
+    url: /users/mozreview/
+    username: mozreview
 
   $ rbmanage dump-autoland-requests
   autoland_id: 1
@@ -77,7 +83,7 @@ Force the admin Review Board user to be created by querying for it.
   repository_revision: ''
   repository_url: ''
   review_request_id: 1
-  user_id: 2
+  user_id: 3
 
 
   $ cd ..

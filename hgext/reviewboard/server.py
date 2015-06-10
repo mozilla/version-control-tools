@@ -12,6 +12,8 @@ The [reviewboard] section in the hgrc must have the following:
 
 * url - the string URL of the Review Board server to talk to.
 * repoid - the integer repository ID of this repository in Review Board.
+* username - the priveleged username used for special Review Board operations.
+* password - the priveleged user account's password.
 
 url is commonly defined in the global hgrc whereas repoid is repository
 local.
@@ -212,6 +214,14 @@ def reposetup(ui, repo):
             not ui.configbool('reviewboard', 'isdiscoveryrepo')):
         raise util.Abort(_('Please set reviewboard.repoid to the numeric ID '
             'of the repository this repo is associated with.'))
+
+    if not ui.config('reviewboard', 'username', None):
+        raise util.Abort(_('Please set reviewboard.username to the username '
+            'for priveleged communications with Review Board.'))
+
+    if not ui.config('reviewboard', 'password', None):
+        raise util.Abort(_('Please set reviewboard.password to the password '
+            'for priveleged communications with Review Board.'))
 
     if not ui.config('bugzilla', 'url', None):
         raise util.Abort(_('Please set bugzilla.url to the URL of the '
