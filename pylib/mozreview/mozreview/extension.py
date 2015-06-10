@@ -33,6 +33,7 @@ from mozreview.extra_data import (get_parent_rr, is_parent, is_pushed,
 from mozreview.fields import (CombinedReviewersField, CommitsListField,
                               TryField)
 from mozreview.hooks import MozReviewApprovalHook
+from mozreview.ldap.resources import ldap_association_resource
 from mozreview.middleware import MozReviewUserProfileMiddleware
 from mozreview.pulse import initialize_pulse_handlers
 from mozreview.resources.review_request_summary import (
@@ -89,6 +90,7 @@ class MozReviewExtension(Extension):
     resources = [
         autoland_request_update_resource,
         batch_review_resource,
+        ldap_association_resource,
         review_request_summary_resource,
         try_autoland_trigger_resource,
         import_pullrequest_trigger_resource,
