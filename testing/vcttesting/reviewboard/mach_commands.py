@@ -146,7 +146,7 @@ class ReviewBoardCommands(object):
         else:
             self.mr = None
 
-    def _get_client(self):
+    def _get_client(self, username=None, password=None):
         from rbtools.api.client import RBClient
         from rbtools.api.transport.sync import SyncTransport
 
@@ -159,8 +159,9 @@ class ReviewBoardCommands(object):
         if not self.mr:
             raise Exception('Could not find MozReview cluster instance')
 
-        username = os.environ.get('BUGZILLA_USERNAME')
-        password = os.environ.get('BUGZILLA_PASSWORD')
+        if username is None or password is None:
+            username = os.environ.get('BUGZILLA_USERNAME')
+            password = os.environ.get('BUGZILLA_PASSWORD')
 
         # RBClient is persisting login cookies from call to call
         # in $HOME/.rbtools-cookies. We want to be able to easily switch
@@ -174,8 +175,8 @@ class ReviewBoardCommands(object):
         return RBClient(self.mr.reviewboard_url, username=username,
                         password=password, transport_cls=NoCacheTransport)
 
-    def _get_root(self):
-        return self._get_client().get_root()
+    def _get_root(self, username=None, password=None):
+        return self._get_client(username=username, password=password).get_root()
 
     def _get_rb(self, path=None):
         from vcttesting.reviewboard import MozReviewBoard
@@ -493,6 +494,21 @@ class ReviewBoardCommands(object):
         data[u.id] = o
 
         print(yaml.safe_dump(data, default_flow_style=False).rstrip())
+
+    @Command('dump-user-ldap', category='reviewboard',
+        description='Print the ldap username of a Review Board user.')
+    @CommandArgument('username', help='Username whose info the print')
+    def dump_user_ldap(self, username):
+        from rbtools.api.errors import APIError
+        root = self._get_root(username="mozreview", password="password")
+        ext = root.get_extension(
+            extension_name='mozreview.extension.MozReviewExtension')
+        user = ext.get_ldap_associations().get_item(username).ldap_username
+
+        if user:
+            print('ldap username: %s' % user)
+        else:
+            print('no ldap username associated with %s' % username)
 
     @Command('hit-try-autoland-trigger', category='reviewboard',
              description='Pass some values to the try-autoland-trigger WebAPI '
