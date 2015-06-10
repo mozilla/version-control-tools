@@ -563,7 +563,9 @@ def critic(ui, repo, rev='.', entire=False, **opts):
         critique(ui, repo, node=r, entire=entire, **opts)
 
 
-@command('pushlogsync', [], _('hg pushlogsync'))
+@command('pushlogsync', [
+    ('', 'reset', False, _('Wipe and repopulate the pushlog database.'), ''),
+], _('hg pushlogsync'))
 def syncpushinfo(ui, repo, tree=None, **opts):
     """Synchronize the pushlog information for all known Gecko trees.
 
@@ -576,6 +578,10 @@ def syncpushinfo(ui, repo, tree=None, **opts):
     if not repo.changetracker:
         ui.warn('Local database appears to be disabled.')
         return 1
+
+    if opts['reset']:
+        repo.changetracker.wipe_pushlog()
+        return
 
     for i, tree in enumerate(sorted(REPOS)):
         repo.changetracker.load_pushlog(tree)

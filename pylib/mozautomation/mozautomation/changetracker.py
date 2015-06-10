@@ -75,6 +75,11 @@ class ChangeTracker(object):
 
             self._db.execute('PRAGMA user_version=2')
 
+    def wipe_pushlog(self):
+        with self._db:
+            for table in ['trees', 'pushes', 'changeset_pushes', 'bug_changesets']:
+                self._db.execute('DELETE FROM ' + table)
+
     def tree_id(self, tree, url=None):
         with self._db:
             field = self._db.execute('SELECT id FROM trees WHERE name=? LIMIT 1',
