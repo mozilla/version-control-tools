@@ -239,6 +239,13 @@ Prepare for multi changeset tests
   $ hg commit -m 'Middle commit'
   $ echo tip > foo
   $ hg commit -m 'Review tip'
+  $ echo beyond > foo
+  $ hg commit -m 'Beyond review tip'
+  $ hg -q up -r .^
+  $ echo newhead > foo
+  $ hg commit -m 'Unrelated head'
+  created new head
+  $ hg -q up -r 37f64667eaf5
 
 A dirty working copy of a reviewed node will abort because of potential rewriting
 
@@ -369,7 +376,7 @@ Reviewing merge commits is rejected
   $ echo merge2 > foo
   $ hg commit -m 'Bug 1 - Merge B'
   created new head
-  $ hg merge --tool internal:other 11
+  $ hg merge --tool internal:other 2489f823cd25
   0 files updated, 1 files merged, 0 files removed, 0 files unresolved
   (branch merge, don't forget to commit)
   $ hg commit -m 'Bug 1 - Do merge'
@@ -384,7 +391,7 @@ Reviewing merge commits is rejected
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
   submitting 3 changesets for review
-  abort: cannot review merge commits (52421e5791b1)
+  abort: cannot review merge commits (35ae0b8f2835)
   [255]
 
 Empty changesets show a reviewboard error, not an internal server
@@ -413,7 +420,7 @@ We disallow completely empty revisions.
   $ hg qnew -m 'mq patch' -d '0 0' empty-patch
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
-  abort: not reviewing empty revision 144b04fa85ee. please add content.
+  abort: not reviewing empty revision 3ccd6e5b29d2. please add content.
   [255]
 
 Cleanup

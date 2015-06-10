@@ -908,8 +908,8 @@ def reposetup(ui, repo):
             # just in case.
             if len(outgoing.missingheads) > 1:
                 # "%ln" is internal revset syntax for "a list of binary nodes."
-                realmissingheads = local.revs('children(%ln) & head()',
-                    outgoing.missingheads)
+                realmissingheads = local.revs('heads(%ln)',
+                                              outgoing.missingheads)
                 if len(realmissingheads) > 1:
                     raise util.Abort(_('cannot push multiple heads to remote; '
                         'limit pushed revisions using the -r argument.'))
