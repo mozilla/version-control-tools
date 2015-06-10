@@ -24,7 +24,7 @@ import mozautomation.commitparser as commitparser
 
 def addmetadata(repo, ctx, d, onlycheap=False):
     """Add changeset metadata for hgweb templates."""
-    bugs = list(commitparser.parse_bugs(ctx.description()))
+    bugs = list(set(commitparser.parse_bugs(ctx.description())))
     d['bugs'] = []
     for bug in commitparser.parse_bugs(ctx.description()):
         d['bugs'].append({
