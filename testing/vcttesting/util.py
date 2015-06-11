@@ -28,8 +28,13 @@ def get_available_port():
     return port
 
 
-def wait_for_http(host, port, path='', timeout=60):
-    """Wait for an HTTP response."""
+def wait_for_http(host, port, path='', timeout=60, extra_check_fn=None):
+    """Wait for an HTTP server to respond.
+
+    If extra_check_fn is defined, it will be called as an extra check to see if
+    we should still poll. If we should not (e.g. the underlying container
+    stopped running), that function should raise an exception.
+    """
 
     start = time.time()
 
@@ -40,13 +45,17 @@ def wait_for_http(host, port, path='', timeout=60):
         except requests.exceptions.RequestException:
             pass
 
+        if extra_check_fn:
+            extra_check_fn()
+
         if time.time() - start > timeout:
             raise Exception('Timeout reached waiting for HTTP')
 
         time.sleep(0.1)
 
 
-def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60):
+def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60,
+                  extra_check_fn=None):
     c = kombu.Connection(hostname=hostname, port=port, userid=userid,
             password=password, ssl=ssl)
 
@@ -59,6 +68,9 @@ def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60):
         except Exception:
             pass
 
+        if extra_check_fn:
+            extra_check_fn()
+
         if time.time() - start > timeout:
             raise Exception('Timeout reached waiting for AMQP')
 
@@ -70,7 +82,7 @@ class IgnoreHostKeyPolicy(paramiko.MissingHostKeyPolicy):
         return
 
 
-def wait_for_ssh(hostname, port, timeout=60):
+def wait_for_ssh(hostname, port, timeout=60, extra_check_fn=None):
     """Wait for an SSH server to start on the specified host and port."""
     start = time.time()
 
@@ -89,6 +101,9 @@ def wait_for_ssh(hostname, port, timeout=60):
             # and wait for an explicit auth failed instead of a generic
             # error.
             return
+
+        if extra_check_fn:
+            extra_check_fn()
 
         if time.time() - start > timeout:
             raise Exception('Timeout reached waiting for SSH')

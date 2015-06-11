@@ -660,7 +660,8 @@ class Docker(object):
             with self.start_container(web_id, **web_params) as web_state:
                 web_hostname, web_port = self._get_host_hostname_port(web_state, '80/tcp')
                 print('waiting for containers to bootstrap')
-                wait_for_http(web_hostname, web_port, path='xmlrpc.cgi')
+                wait_for_http(web_hostname, web_port, path='xmlrpc.cgi',
+                              extra_check_fn=self._get_assert_container_running_fn(web_id))
 
         db_unique_id = str(uuid.uuid1())
         web_unique_id = str(uuid.uuid1())
@@ -900,14 +901,19 @@ class Docker(object):
             rbweb_url = 'http://%s:%s/' % (rbweb_hostname, rbweb_hostport)
 
         print('waiting for Bugzilla to start')
-        wait_for_http(bmoweb_hostname, bmoweb_hostport)
+        wait_for_http(bmoweb_hostname, bmoweb_hostport,
+                      extra_check_fn=self._get_assert_container_running_fn(web_id))
         if start_pulse:
-            wait_for_amqp(rabbit_hostname, rabbit_hostport, 'guest', 'guest')
+            wait_for_amqp(rabbit_hostname, rabbit_hostport, 'guest', 'guest',
+                          extra_check_fn=self._get_assert_container_running_fn(pulse_id))
         if start_hgrb:
-            wait_for_ssh(hgssh_hostname, hgssh_hostport)
-            wait_for_http(hgweb_hostname, hgweb_hostport)
+            wait_for_ssh(hgssh_hostname, hgssh_hostport,
+                         extra_check_fn=self._get_assert_container_running_fn(hgrb_id))
+            wait_for_http(hgweb_hostname, hgweb_hostport,
+                          extra_check_fn=self._get_assert_container_running_fn(hgrb_id))
         if start_rbweb:
-            wait_for_http(rbweb_hostname, rbweb_hostport)
+            wait_for_http(rbweb_hostname, rbweb_hostport,
+                          extra_check_fn=self._get_assert_container_running_fn(rbweb_id))
 
         print('Bugzilla accessible on %s' % bmo_url)
 
@@ -999,7 +1005,8 @@ class Docker(object):
             port = int(state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
 
             print(message)
-            wait_for_http(self.docker_hostname, port, timeout=120)
+            wait_for_http(self.docker_hostname, port, timeout=120,
+                          extra_check_fn=self._get_assert_container_running_fn(container))
 
             res = requests.get('http://%s:%s/' % (self.docker_hostname, port))
 
@@ -1121,7 +1128,15 @@ class Docker(object):
             state = self.client.inspect_container(cid)
             yield state
         finally:
-            self.client.stop(cid, timeout=20)
+            try:
+                self.client.stop(cid, timeout=20)
+            except DockerAPIError as e:
+                # Silently ignore failures if the container doesn't exist, as
+                # the container is obviously stopped.
+                if e.response.status_code != 404:
+                    raise
+
+
 
     @contextmanager
     def create_container(self, image, remove_volumes=False, **kwargs):
@@ -1328,3 +1343,20 @@ class Docker(object):
         # is far from robust.
         gateway = state['NetworkSettings']['Gateway']
         return gateway, host_port
+
+    def _get_assert_container_running_fn(self, cid):
+        """Obtain a function that raises during invocation if a container stops."""
+        def assert_running():
+            try:
+                info = self.client.inspect_container(cid)
+            except DockerAPIError as e:
+                if e.response.status_code == 404:
+                    raise Exception('Container does not exist '
+                                    '(stopped running?): %s' % cid)
+
+                raise
+
+            if not info['State']['Running']:
+                raise Exception('Container stopped running: %s' % cid)
+
+        return assert_running
