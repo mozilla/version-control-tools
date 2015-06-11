@@ -70,6 +70,24 @@ class TestBugParsing(unittest.TestCase):
             '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n')),
             ['roc', 'ehsan'])
 
+        self.assertEqual(list(parse_reviewers(
+            'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
+            'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
+            'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz')),
+            ['bsmedberg', 'dbaron', 'dbaron'])
+
+        self.assertEqual(list(parse_reviewers(
+            'Bug 123 - Blah blah; r=gps DONTBUILD (NPOTB)')),
+            ['gps'])
+
+        self.assertEqual(list(parse_reviewers(
+            'Bug 123 - Blah blah; r=gps DONTBUILD')),
+            ['gps'])
+
+        self.assertEqual(list(parse_reviewers(
+            'Bug 123 - Blah blah; r=gps (DONTBUILD)')),
+            ['gps'])
+
     def test_requal_reviewers(self):
 
         # first with r? reviewer request syntax
@@ -102,6 +120,12 @@ class TestBugParsing(unittest.TestCase):
             '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
             '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n')),
             ['roc', 'ehsan'])
+
+        self.assertEqual(list(parse_requal_reviewers(
+            'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
+            'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
+            'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz')),
+            ['bsmedberg', 'dbaron'])
 
     def test_backout_missing(self):
         self.assertIsNone(parse_backouts('Bug 1 - More stuff; r=romulus'))

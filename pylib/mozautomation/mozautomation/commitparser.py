@@ -24,16 +24,18 @@ BUG_RE = re.compile(
            (?:\s*\#?)(\d+)(?=\b)
          )''', re.I | re.X)
 
-SPECIFIER_RE = re.compile(r'[ra][=?]')
+SPECIFIER_RE = re.compile(r'(?:r|a|sr)[=?]')
 
-REQUAL_SPECIFIER_RE = re.compile(r'r=')
+REQUAL_SPECIFIER_RE = re.compile(r'\Wr=')
 
-LIST_RE = re.compile(r'[;\.,\/\\]')
+LIST_RE = re.compile(r'[;,\/\\]')
 
 BACKED_OUT_RE = re.compile('^backed out changeset (?P<node>[0-9a-f]{12}) ',
                            re.I)
 
 SHORT_RE = re.compile('^[0-9a-f]{12}$', re.I)
+
+DIGIT_RE = re.compile('#?\d+')
 
 BACK_OUT_MULTIPLE_RE = re.compile(
     '^back(?:ed)? out \d+ changesets \(bug ', re.I)
@@ -43,6 +45,30 @@ def parse_bugs(s):
     bugs = [int(m[1]) for m in BUG_RE.findall(s)]
     return [bug for bug in bugs if bug < 100000000]
 
+
+def filter_reviewers(s):
+    """Given a string, extract meaningful reviewer names."""
+    for word in s.strip().split():
+        if not word:
+            continue
+
+        word = word.strip('"[]<>.:')
+
+        if '=' in word:
+            continue
+
+        if word.startswith('(') or word.endswith(')'):
+            continue
+
+        if word == 'DONTBUILD':
+            continue
+
+        if DIGIT_RE.match(word):
+            continue
+
+        yield word
+
+
 def parse_reviewers(s):
     for r in SPECIFIER_RE.split(s)[1:]:
         # Throw away data after newline.
@@ -51,10 +77,12 @@ def parse_reviewers(s):
 
         r = r.splitlines()[0]
         for part in LIST_RE.split(r):
-            part = part.strip('[](){} ')
+            part = part.strip('[](){}. ')
             if part:
                 # strip off the 'specifier' if any
-                yield SPECIFIER_RE.split(part)[-1]
+                for r in filter_reviewers(SPECIFIER_RE.split(part)[-1]):
+                    yield r
+
 
 def parse_requal_reviewers(s):
     for r in REQUAL_SPECIFIER_RE.split(s)[1:]:
@@ -64,13 +92,14 @@ def parse_requal_reviewers(s):
         # Throw away data after newline.
         r = r.splitlines()[0]
         for part in LIST_RE.split(r):
-            part = part.strip('[](){} ')
+            part = part.strip('[](){}. ')
             if part:
-                part = REQUAL_SPECIFIER_RE.split(part)[-1]
+                part = REQUAL_SPECIFIER_RE.split(part)[-1].strip()
                 # we've stripped off 'r=' but we might still have another
                 # specifier
                 if not SPECIFIER_RE.match(part):
-                    yield part
+                    for r in filter_reviewers(part):
+                        yield r
 
 
 def parse_backouts(s):
