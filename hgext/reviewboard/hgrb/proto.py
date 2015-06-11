@@ -1,6 +1,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import os
 import urllib
 from StringIO import StringIO
 import xmlrpclib
@@ -57,6 +58,10 @@ def post_reviews(*args, **kwargs):
         raise AuthorizationError(e, **kwargs)
     except errors.BadRequestError as e:
         raise BadRequestError(e)
+
+def associate_ldap_username(*args, **kwargs):
+    from reviewboardmods.pushhooks import associate_ldap_username as alu
+    return alu(*args, **kwargs)
 
 
 def getpayload(proto, args):
@@ -263,6 +268,16 @@ def reviewboard(repo, proto, args=None):
 
     rburl = repo.ui.config('reviewboard', 'url', None).rstrip('/')
     repoid = repo.ui.configint('reviewboard', 'repoid', None)
+    privleged_rb_username = repo.ui.config('reviewboard', 'username', None)
+    privleged_rb_password = repo.ui.config('reviewboard', 'password', None)
+
+    ldap_username = os.environ.get('USER')
+
+    if ldap_username:
+        associate_ldap_username(rburl, ldap_username, privleged_rb_username,
+                                privleged_rb_password, username=bzusername,
+                                password=bzpassword, userid=bzuserid,
+                                cookie=bzcookie)
 
     lines = [
         'rburl %s' % rburl,
