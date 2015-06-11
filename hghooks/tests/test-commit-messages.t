@@ -436,6 +436,30 @@ Test some bad commit messages
   rollback completed
   abort: pretxnchangegroup.commit_message hook failed
   [255]
+  $ hg strip -r . > /dev/null
+
+  $ echo review > foo
+  $ hg commit -m "Bug 100 - Foo. r?bar"
+  $ hg push
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  
+  
+  ************************** ERROR ****************************
+  Rev 46daa311b1ff contains 'r?' in the commit message. Please use 'r=' instead.
+  test
+  Bug 100 - Foo. r?bar
+  *************************************************************
+  
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.commit_message hook failed
+  [255]
 
 IGNORE BAD COMMIT MESSAGES should work
 

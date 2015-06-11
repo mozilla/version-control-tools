@@ -18,6 +18,8 @@
 import re
 from mercurial.node import hex
 
+INVALID_REVIEW_FLAG_RE = re.compile(r'[\s\.;]r\?\w')
+
 goodMessage = [re.compile(x, re.I) for x in [
     r'bug [0-9]+',
     r'no bug',
@@ -51,6 +53,10 @@ def isGoodMessage(c):
     # Match against [PATCH] and [PATCH n/m]
     if "[PATCH" in desc:
         message("Rev {rev} contains git-format-patch \"[PATCH]\" cruft. Use git-format-patch -k to avoid this.")
+        return False
+
+    if INVALID_REVIEW_FLAG_RE.search(firstline):
+        message("Rev {rev} contains 'r?' in the commit message. Please use 'r=' instead.")
         return False
 
     for r in goodMessage:
