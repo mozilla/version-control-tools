@@ -243,28 +243,6 @@ def handle_pending_transplants(logger, dbconn):
         dbconn.commit()
 
 
-def handle_single_failure(logger, auth, dbconn, tree, rev, buildername,
-                          build_id):
-    """Retrigger a job for a testrun."""
-
-    logger.debug('testrun request %s %s needs to retry job for %s' %
-                 (tree, rev, buildername))
-    job_id = selfserve.rebuild_job(auth, tree, build_id)
-    if job_id:
-        logger.info('submitted rebuild request %s for testrun job %s %s' %
-                    (job_id, tree, rev))
-        cursor = dbconn.cursor()
-        query = """
-            update Testrun set last_updated=%s
-            where tree=%s and revision=%s
-        """
-        cursor.execute(query, (datetime.datetime.now(), tree, rev))
-        dbconn.commit()
-    else:
-        logger.info('could not rebuild %s for testrun job %s %s' %
-                    (build_id, tree, rev))
-
-
 def handle_failure(logger, dbconn, tree, rev, buildernames):
     """Mark testrun as not landable"""
 
@@ -299,6 +277,9 @@ def check_testrun(logger, auth, dbconn, tree, rev):
 
     logger.info('looking at testrun %s %s' % (tree, rev))
 
+    # TODO: We should use Treeherder rather than self serve for this, but
+    # Treeherder wasn't deployed when this code was originally written.
+    # (See Bug 1174124.)
     status = selfserve.job_is_done(auth, tree, rev)
     if not status:
         logger.debug('could not get job status for %s %s' % (tree, rev))
@@ -379,12 +360,6 @@ def check_testrun(logger, auth, dbconn, tree, rev):
     # if there are double failures, the autoland request has failed
     if double_failures:
         return handle_failure(logger, dbconn, tree, rev, double_failures)
-
-    # single failures need to be retried
-    for failure in single_failures:
-        buildername, build_id = failure
-        handle_single_failure(logger, auth, dbconn, tree, rev, buildername,
-                              build_id)
 
     # if no failures, we can land
     if not single_failures:
