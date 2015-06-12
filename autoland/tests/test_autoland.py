@@ -37,6 +37,7 @@ class TestAutoland(unittest.TestCase):
                 subprocess.check_output(cmd, stderr=subprocess.STDOUT,
                                         cwd=local_repo_path)
             with open(os.path.join(local_repo_path, '.hg', 'hgrc'), 'w') as f:
+                f.write('[extensions]\npurge =\n')
                 f.write('[paths]\nmozreview-push = ')
                 f.write(mozreview_repo_path)
                 f.write('\n')

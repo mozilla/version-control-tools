@@ -3,8 +3,9 @@ username = Otto Land <bind-autoland@mozilla.com>
 merge = internal:merge
 
 [extensions]
-mq = 
+mq =
+purge =
 
 [paths]
-mozreview = /repos/mozreview 
-try = /repos/try 
+mozreview = /repos/mozreview
+try = /repos/try
