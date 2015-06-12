@@ -20,13 +20,13 @@ Django==1.6.11
 # sha256: ca3Sb2gsLnZSxD0Bq2rBscaT2Gn2YxQvX3w3sAeI0WI
 django-pipeline==1.3.27
 
-# sha256: 257lSEnMzlRzaxiSa9O4OdWg5hpxMmOFHT4iDEnpbOE
+# sha256: Nv3kS62iU_XEYsDkRT4Da80w0qK3JvdoxOiiJs8MwRM
 django-evolution==0.7.5
 
 # sha256: ow34iO4NoyxIN8Mo7PhZ6ZLtttGF76fUk0HMGUnbsk0
 django-haystack==2.3.1
 
-# sha256: BBIWOa-C6OhurPLcMS6m8hALquoPazWkuI4Yj4OrGDc
+# sha256: qfdMdznM5ZfudDc4ZP1IZKaVmq8uvIXUDJH6LS1zWYg
 Djblets==0.8.19
 
 # sha256: x9txeBCraWX2bIzwOYqYydjfmC2jm0zX8WKRHriVlvo
