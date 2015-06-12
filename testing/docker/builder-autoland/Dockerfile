@@ -23,7 +23,7 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
 # %include pylib/mozautomation/mozautomation/
 ADD extra/vct/autoland/requirements.txt ${AUTOLAND_HOME}/requirements.txt
 ADD extra/vct/autoland/autoland ${AUTOLAND_HOME}/autoland
-ADD extra/vct/pylib/mozautomation/mozautomation/ ${VCT_HOME}/pylib/mozautomation/
+ADD extra/vct/pylib/mozautomation/mozautomation/ ${VCT_HOME}/pylib/mozautomation/mozautomation/
 
 RUN curl -SL 'https://bootstrap.pypa.io/get-pip.py' | python2
 RUN pip install virtualenv

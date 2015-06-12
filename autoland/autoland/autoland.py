@@ -20,6 +20,7 @@ from mozlog.structured import commandline
 
 import selfserve
 import transplant
+import treestatus
 
 GITHUB_COMMENT_LIMIT = 10  # max updates to post to github / iteration
 MOZREVIEW_COMMENT_LIMIT = 10  # max updates to post to reviewboard / iteration
@@ -181,6 +182,9 @@ def handle_pending_transplants(logger, dbconn):
     for row in cursor.fetchall():
         transplant_id, tree, rev, destination, trysyntax, pingback_url = row
 
+        if not treestatus.tree_is_open(destination):
+            continue
+
         if destination == 'try':
             if not trysyntax.startswith("try: "):
                 trysyntax =  "try: %s" % trysyntax
@@ -195,11 +199,18 @@ def handle_pending_transplants(logger, dbconn):
                     values(%s,%s,%s)
                 """
                 cursor.execute(query, ('try', result, datetime.datetime.now()))
-
             else:
-                logger.info(('transplant failed: tree: %s rev: %s'
-                             'destination: %s error: %s') %
-                            (tree, rev, destination, result))
+                if 'is CLOSED!' in result:
+                    logger.info('transplant failed: tree: %s is closed - '
+                                 ' retrying later.' % tree)
+
+                    # continuing here will skip updating the autoland request
+                    # so we will attempt to land it again later.
+                    continue
+                else:
+                    logger.info('transplant failed: tree: %s rev: %s '
+                                'destination: %s error: %s' %
+                                (tree, rev, destination, result))
 
             # set up data to be posted back to mozreview
             data = {

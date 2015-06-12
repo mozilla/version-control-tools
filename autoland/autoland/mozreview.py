@@ -15,4 +15,4 @@ def update_review(auth, pingback_url, data):
                           auth=auth)
         return r.status_code, r.text
     except requests.exceptions.ConnectionError:
-        return
+        return None, 'could not connect'
