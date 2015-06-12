@@ -12,8 +12,9 @@ import sys
 import time
 import traceback
 
-sys.path.insert(0, os.path.join(os.path.normpath(os.path.abspath(
-                os.path.dirname(__file__))), '..', '..', 'pylib'))
+sys.path.insert(0, os.path.normpath(os.path.join(os.path.normpath(
+                os.path.abspath(os.path.dirname(__file__))), '..', '..',
+                'pylib', 'mozautomation')))
 from mozautomation.commitparser import parse_bugs
 from mozlog.structured import commandline
 
