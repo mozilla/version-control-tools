@@ -7,9 +7,9 @@
 
 FROM centos:centos6
 
-ENV DJBLETS_VERSION 0.8/Djblets-0.8.18-py2.6.egg
-ENV REVIEWBOARD_VERSION 2.0/ReviewBoard-2.0.15-py2.6.egg
-ENV DJANGO_EVOLUTION_VERSION 0.7/django_evolution-0.7.4-py2.6.egg
+ENV DJBLETS_VERSION 0.8/Djblets-0.8.19-py2.6.egg
+ENV REVIEWBOARD_VERSION 2.0/ReviewBoard-2.0.16-py2.6.egg
+ENV DJANGO_EVOLUTION_VERSION 0.7/django_evolution-0.7.5-py2.6.egg
 
 RUN yum install -y epel-release && yum update -y && \
     yum install -y gcc \

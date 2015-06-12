@@ -11,8 +11,8 @@
     easy_install: /data/www/reviewboard-dev.allizom.org/venv/bin/easy_install
     python: /data/www/reviewboard-dev.allizom.org/venv/bin/python
     rbsite: /data/www/reviewboard-dev.allizom.org/venv/bin/rb-site
-    djblets_version: 0.8.18
-    rb_version: 2.0.15
+    djblets_version: 0.8.19
+    rb_version: 2.0.16
   tasks:
   - name: Install RBTools
     command: "{{ pip }} install --allow-external RBTools --allow-unverified RBTools --upgrade RBTools==0.6.1"
