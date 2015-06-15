@@ -193,6 +193,8 @@ with open(j(b, 'data', 'params'), 'w') as fh:
             fh.write("           'urlbase' => '" + bmo_url + "',\n")
         elif "'mail_delivery_method' =>" in line:
             fh.write("           'mail_delivery_method' => 'Test',\n")
+        elif "'auth_delegation' =>" in line:
+            fh.write("           'auth_delegation' => 1,\n")
         else:
             fh.write(line)
 
