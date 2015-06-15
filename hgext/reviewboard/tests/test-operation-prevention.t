@@ -25,7 +25,7 @@ Create a review request from a regular user
 Attempting to publish a commit review request should fail.
 
   $ rbmanage publish 2
-  API Error: 500: 225: Publishing commit review requests is prohibited, please publish parent.
+  API Error: 500: 225: Error publishing the review request: Publishing commit review requests is prohibited, please publish parent.
   [1]
 
 Publishing the parent should succeed.

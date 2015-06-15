@@ -12,7 +12,7 @@
     python: /data/www/reviewboard-dev.allizom.org/venv/bin/python
     rbsite: /data/www/reviewboard-dev.allizom.org/venv/bin/rb-site
     djblets_version: 0.8.20
-    rb_version: 2.0.16
+    rb_version: 2.0.17
   tasks:
   - name: Install RBTools
     command: "{{ pip }} install --allow-external RBTools --allow-unverified RBTools --upgrade RBTools==0.6.1"

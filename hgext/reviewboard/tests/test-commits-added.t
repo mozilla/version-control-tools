@@ -129,6 +129,7 @@ The parent review should have its description updated.
       - '@@ -1,1 +1,1 @@'
       - -foo0
       - +foo3
+      - ''
 
 Ensure we are able to deal with rids that are strings by forcing the commit
 rids to be strings and then pushing a new commit.

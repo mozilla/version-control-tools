@@ -116,6 +116,7 @@ We should have a disagreement between published and draft
       - '@@ -1,1 +1,1 @@'
       - -foo
       - +foo3
+      - ''
 
   $ rbmanage dumpreview 2
   id: 2
@@ -156,6 +157,7 @@ We should have a disagreement between published and draft
       - '@@ -1,1 +1,1 @@'
       - -foo
       - +foo3
+      - ''
 
 Discarding the parent review request draft should discard draft on children
 

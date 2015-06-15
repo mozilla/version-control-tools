@@ -188,6 +188,7 @@ Review request 6 should be added to the list of discard on publish rids.
       - +++ b/foo4
       - '@@ -0,0 +1,1 @@'
       - +foo4
+      - ''
 
   $ rbmanage publish 1
 
@@ -283,6 +284,7 @@ The first commit was rewritten (we assume all subsequent were as well).
       - +++ b/foo2
       - '@@ -0,0 +1,1 @@'
       - +foo2
+      - ''
 
 The last review request that got invalidated in the shuffle should
 be in the list of review requests to discard when the squashed review
@@ -361,6 +363,7 @@ request is published.
       - +++ b/foo4
       - '@@ -0,0 +1,1 @@'
       - +foo4
+      - ''
 
 Publish to get us up to date, but we're not going to test the publishing
 behaviour here. We'll save that for other tests.

@@ -194,6 +194,7 @@ on publish.
       - +++ b/foo4
       - '@@ -0,0 +1,1 @@'
       - +foo4
+      - ''
 
   $ rbmanage publish 1
 
@@ -353,6 +354,7 @@ on publish.
       - +++ b/foo4
       - '@@ -0,0 +1,1 @@'
       - +foo4
+      - ''
 
   $ rbmanage publish 1
 

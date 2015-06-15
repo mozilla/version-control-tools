@@ -25,7 +25,7 @@
   command: /usr/bin/npm install -g less uglify-js creates=/usr/bin/lessc
 
 - name: Install Review Board package
-  command: /venv/bin/easy_install ReviewBoard==2.0.16
+  command: /venv/bin/easy_install ReviewBoard==2.0.17
 
 - name: Synchronize version-control-tools
   synchronize: src={{ vct }}/ dest=/version-control-tools/ recursive=yes delete=yes
