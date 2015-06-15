@@ -39,21 +39,6 @@ def addmetadata(repo, ctx, d, onlycheap=False):
             'revset': 'reviewer(%s)' % reviewer,
         })
 
-    # Obtain the Gecko/app version/milestone.
-    #
-    # We could probably only do this if the repo is a known app repo (by
-    # looking at the initial changeset). But, path based lookup is relatively
-    # fast, so just do it.
-    try:
-        fctx = repo.filectx('config/milestone.txt', changeid=ctx.node())
-        lines = fctx.data().splitlines()
-        lines = [l for l in lines if not l.startswith('#') and l.strip()]
-
-        if lines:
-            d['milestone'] = lines[0].strip()
-    except error.LookupError:
-        pass
-
     d['backsoutnodes'] = []
     backouts = commitparser.parse_backouts(ctx.description())
     if backouts:
@@ -66,6 +51,23 @@ def addmetadata(repo, ctx, d, onlycheap=False):
 
     if onlycheap:
         return
+
+    # Obtain the Gecko/app version/milestone.
+    #
+    # We could probably only do this if the repo is a known app repo (by
+    # looking at the initial changeset). But, path based lookup is relatively
+    # fast, so just do it. However, we need this in the "onlycheap"
+    # section because resolving manifests is relatively slow and resolving
+    # several on changelist pages may add seconds to page load times.
+    try:
+        fctx = repo.filectx('config/milestone.txt', changeid=ctx.node())
+        lines = fctx.data().splitlines()
+        lines = [l for l in lines if not l.startswith('#') and l.strip()]
+
+        if lines:
+            d['milestone'] = lines[0].strip()
+    except error.LookupError:
+        pass
 
     # Look for changesets that back out this one.
     #
