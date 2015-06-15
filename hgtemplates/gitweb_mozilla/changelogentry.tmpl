@@ -7,6 +7,7 @@
 <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">browse</a>
 </div>
 <cite>{author|obfuscate}</cite> - {date|rfc822date} - rev {rev}<br/>
+{if(pushid, 'Push <a href="{url|urlescape}pushloghtml?changeset={node|short}">{pushid}</a> by {pushuser|escape} at {pushdate|isodate}<br />')}
 </div>
 <div class="log_body">
 {desc|strip|escape|addbreaks|buglink}

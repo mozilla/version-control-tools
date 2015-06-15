@@ -140,6 +140,13 @@ def changesetentry(orig, web, req, tmpl, ctx):
     return d
 
 
+def changelistentry(orig, web, ctx, tmpl):
+    """Wraps webutil.changelistentry to provide pushlog metadata to template."""
+    d = orig(web, ctx, tmpl)
+    addpushmetadata(web.repo, ctx, d)
+    return d
+
+
 class pushlog(object):
     '''An interface to pushlog data.'''
 
@@ -651,6 +658,7 @@ def extsetup(ui):
     templatekw.dockeywords.update(keywords)
 
     extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
+    extensions.wrapfunction(webutil, 'changelistentry', changelistentry)
 
 
 def reposetup(ui, repo):
