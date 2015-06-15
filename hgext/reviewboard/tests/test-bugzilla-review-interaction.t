@@ -188,7 +188,7 @@ Adding a reply to the review will add a comment to Bugzilla
       id: 4
       tags: []
       text:
-      - http://*:$HGPORT1/r/2/#review2 (glob)
+      - http://*:$HGPORT1/r/2/#review1 (glob)
       - ''
       - Thanks!
     component: TestComponent

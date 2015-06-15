@@ -99,7 +99,7 @@ class BugzillaExtension(Extension):
         SignalHook(self, review_request_reopened, on_review_request_reopened)
 
 
-def review_or_request_url(review_or_request, site=None, siteconfig=None):
+def get_obj_url(obj, site=None, siteconfig=None):
     if not site:
         site = Site.objects.get_current()
 
@@ -109,7 +109,16 @@ def review_or_request_url(review_or_request, site=None, siteconfig=None):
     return '%s://%s%s%s' % (
         siteconfig.get('site_domain_method'), site.domain,
         local_site_reverse('root').rstrip('/'),
-        review_or_request.get_absolute_url())
+        obj.get_absolute_url())
+
+
+def get_reply_url(reply, site=None, siteconfig=None):
+    """ Get the URL for a reply to a review.
+
+    Since replies can have multiple comments, we can't link to a specific
+    comment, so we link to the parent review which the reply is targeted at.
+    """
+    return get_obj_url(reply.base_reply_to, site=site, siteconfig=siteconfig)
 
 
 def is_review_request_pushed(review_request):
@@ -243,7 +252,7 @@ def post_bugzilla_attachment(bugzilla, bug_id, review_request_draft,
                          review_request.id,
                          review_request_draft.summary,
                          comment,
-                         review_or_request_url(review_request),
+                         get_obj_url(review_request),
                          reviewers)
 
 
@@ -337,7 +346,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                 if child_draft:
                     if child.id in discard_on_publish_rids:
                         b.obsolete_review_attachments(
-                            bug_id, review_or_request_url(child))
+                            bug_id, get_obj_url(child))
                     post_bugzilla_attachment(b, bug_id, child_draft, child)
 
         # Publish draft commits. This will already include items that are in
@@ -412,8 +421,8 @@ def on_review_publishing(user, review, **kwargs):
     site = Site.objects.get_current()
     siteconfig = SiteConfiguration.objects.get_current()
     comment = build_plaintext_review(review,
-                                     review_or_request_url(review, site,
-                                                           siteconfig),
+                                     get_obj_url(review, site,
+                                                 siteconfig),
                                      {"user": user})
     b = Bugzilla(user.bzlogin, user.bzcookie)
 
@@ -429,7 +438,7 @@ def on_review_publishing(user, review, **kwargs):
         [b.post_comment(int(bug_id), comment) for bug_id in
          review_request.get_bug_list()]
     else:
-        rr_url = review_or_request_url(review_request, site, siteconfig)
+        rr_url = get_obj_url(review_request, site, siteconfig)
         bug_id = int(review_request.get_bug_list()[0])
 
         if review.ship_it:
@@ -454,7 +463,7 @@ def on_reply_publishing(user, reply, **kwargs):
     bug_id = int(review_request.get_bug_list()[0])
     b = Bugzilla(user.bzlogin, user.bzcookie)
 
-    url = review_or_request_url(reply)
+    url = get_reply_url(reply)
     comment = build_plaintext_review(reply, url, {"user": user})
     b.post_comment(bug_id, comment)
 
@@ -476,7 +485,7 @@ def on_review_request_closed_discarded(user, review_request, type, **kwargs):
         # commit review requests.
         b = Bugzilla(user.bzlogin, user.bzcookie)
         bug = int(review_request.get_bug_list()[0])
-        url = review_or_request_url(review_request)
+        url = get_obj_url(review_request)
         b.obsolete_review_attachments(bug, url)
 
 
