@@ -13,7 +13,7 @@
     easy_install: /data/reviewboard/src/reviewboard.mozilla.org/venv/bin/easy_install
     rbsite: /data/reviewboard/src/reviewboard.mozilla.org/venv/bin/rb-site
     sitehome: /data/reviewboard/src/reviewboard.mozilla.org/reviewboard
-    djblets_version: 0.8.19
+    djblets_version: 0.8.20
     rb_version: 2.0.16
   tasks:
     - name: notify IRC a deployment has been started

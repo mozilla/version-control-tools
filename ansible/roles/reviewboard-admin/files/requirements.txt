@@ -26,8 +26,8 @@ django-evolution==0.7.5
 # sha256: ow34iO4NoyxIN8Mo7PhZ6ZLtttGF76fUk0HMGUnbsk0
 django-haystack==2.3.1
 
-# sha256: qfdMdznM5ZfudDc4ZP1IZKaVmq8uvIXUDJH6LS1zWYg
-Djblets==0.8.19
+# sha256: i0MBxs6iJ7LGeJtk3pS3qndVikyXYONogSzY_Iwrz7Q
+Djblets==0.8.20
 
 # sha256: x9txeBCraWX2bIzwOYqYydjfmC2jm0zX8WKRHriVlvo
 docutils==0.12
