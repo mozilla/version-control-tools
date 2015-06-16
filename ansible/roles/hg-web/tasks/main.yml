@@ -81,7 +81,7 @@
 
 # Install and manage the mod_wsgi config file
 - name: install wsgi config
-  copy: content="LoadModule wsgi_module modules/mod_wsgi.so" dest=/etc/httpd/conf.d/wsgi.conf
+  copy: content="LoadModule wsgi_module /repo/hg/venv_hgweb/lib/python2.7/site-packages/mod_wsgi/server/mod_wsgi-py27.so" dest=/etc/httpd/conf.d/wsgi.conf
 
 # Install the user repo wsgi creation script, set up a cronjob for it
 - name: install the script that creates user repo wsgi files

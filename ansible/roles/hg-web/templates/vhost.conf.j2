@@ -1,6 +1,7 @@
 # vim: syntax=apache
 
 WSGISocketPrefix /var/run/wsgi
+WSGIPythonHome /repo/hg/venv_hgweb
 LimitRequestFields 250
 
 <VirtualHost *:80>
@@ -8,7 +9,7 @@ LimitRequestFields 250
     DocumentRoot /repo_local/mozilla/webroot_wsgi
 
     RewriteEngine on
-    RewriteRule ^/(.*)index.cgi/?(.*) http://hg.mozilla.org/$1$2
+    RewriteRule ^/(.*)index.cgi/?(.*) https://hg.mozilla.org/$1$2
 
     SetEnv HGENCODING UTF-8
     SetEnv LC_TYPE UTF-8
@@ -40,9 +41,9 @@ LimitRequestFields 250
     WSGIScriptAliasMatch ^(/(?!users|robots).*) /repo_local/mozilla/webroot_wsgi/hgweb.wsgi$1
 
     <Location /users>
-	Options +Indexes
-	Order allow,deny
-	Allow from all
+	    Options +Indexes
+	    Order allow,deny
+	    Allow from all
     </Location>
 
     <Location /server-status>
