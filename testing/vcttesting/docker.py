@@ -1018,10 +1018,6 @@ class Docker(object):
 
         return files
 
-    def build_reviewboard_eggs(self):
-        return self._get_files_from_http_container('eggbuild',
-            'Generating eggs...')
-
     def build_mercurial_rpms(self):
         return self._get_files_from_http_container('hgrpm',
             'Generating RPMs...')
