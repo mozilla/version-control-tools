@@ -23,7 +23,6 @@ import tempfile
 import time
 import urlparse
 import uuid
-import warnings
 
 from docker.errors import APIError as DockerAPIError
 from contextlib import contextmanager
@@ -165,26 +164,6 @@ class Docker(object):
         try:
             self.client._get(self.client._url('/version'), timeout=5)
             return True
-
-        # docker-py, urllib3, and Python's ssl packages all seem to have
-        # a difficult time talking to boot2docker under Python 2.7.9. We
-        # report a warning in this case and recommend using Python 2.7.8
-        # until a workaround is known.
-        except requests.exceptions.SSLError as e:
-            if 'CERTIFICATE_VERIFY_FAILED' not in str(e.message):
-                return False
-
-            if sys.version_info[0:3] != (2, 7, 9):
-                return False
-
-            warnings.warn(
-                'SSL error encountered talking to Docker. This is a known '
-                'issue with Python 2.7.9, which you are running. It is '
-                'recommended to use Python 2.7.8 until a workaround is '
-                'identified: %s' % e.message)
-
-            return False
-
         except requests.exceptions.RequestException as e:
             return False
 

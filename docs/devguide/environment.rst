@@ -16,16 +16,6 @@ Many components use `Docker <https://www.docker.com/>`_. You'll need
 Docker to perform many tasks. Functionality requiring Docker should be
 skipped if Docker is not available.
 
-.. warning::
-
-   There are known issues with Python 2.7.9 and our Docker setup. If
-   the underlying problem is detected, you should see a warning.
-
-   To install a different version of Python, we recommend using
-   `pyenv <https://github.com/yyuu/pyenv>`_. Once installed, activate
-   an appropriate Python version in your shell by running
-   ``pyenv local 2.7.8`` or similar.
-
 Aside from the base requirements, the development and testing
 environment should be fully self-contained and won't pollute your
 system.
