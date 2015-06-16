@@ -38,6 +38,13 @@
 - name: install bundleclone extension
   copy: src={{ vct }}/hgext/bundleclone/__init__.py dest=/repo/hg/extensions/bundleclone/__init__.py owner=hg group=hg mode=0644
 
+- name: install pushrebase extension
+  copy: src={{ vct }}/hgext/pushrebase/__init__.py
+        dest=/repo/hg/extensions/pushrebase.py
+        owner=hg
+        group=hg
+        mode=0644
+
 - name: install serverlog extension
   copy: src={{ vct }}/hgext/serverlog/__init__.py dest=/repo/hg/extensions/serverlog/__init__.py owner=hg group=hg mode=0644
 

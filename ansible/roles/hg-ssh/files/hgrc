@@ -36,6 +36,7 @@ pushlog-feed = /repo/hg/extensions/pushlog-feed.py
 pushlog = /repo/hg/extensions/pushlog
 buglink = /repo/hg/extensions/buglink.py
 serverlog = /repo/hg/extensions/serverlog
+pushrebase = /repo/hg/extensions/pushrebase.py
 
 [blackbox]
 track = *
