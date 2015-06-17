@@ -54,7 +54,7 @@ Manifest file with invalid URL aborts
   $ echo 'http://does.not.exist/bundle.hg' >> server/.hg/bundleclone.manifest
   $ hg clone http://localhost:$HGPORT invalid-bundle-url
   downloading bundle http://does.not.exist/bundle.hg
-  abort: error fetching bundle: [Errno 8] nodename nor servname provided, or not known
+  abort: error fetching bundle: [Errno *] * not known (glob)
   (consider contacting the server operator if this error persists)
   [255]
 
@@ -63,7 +63,7 @@ Server is not running aborts
   $ echo "http://localhost:$HGPORT1/bundle.hg" > server/.hg/bundleclone.manifest
   $ hg clone http://localhost:$HGPORT server-not-runner
   downloading bundle http://localhost:$HGPORT1/bundle.hg
-  abort: error fetching bundle: [Errno 61] Connection refused
+  abort: error fetching bundle: [Errno *] Connection refused (glob)
   (consider contacting the server operator if this error persists)
   [255]
 
