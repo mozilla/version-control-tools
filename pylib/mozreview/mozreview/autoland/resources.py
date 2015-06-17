@@ -159,7 +159,8 @@ class TryAutolandTriggerResource(WebAPIResource):
                          % pingback_url)
 
             try:
-                response = requests.post(autoland_url, data=json.dumps({
+                response = requests.post(autoland_url + '/autoland',
+                    data=json.dumps({
                     'tree': TRY_AUTOLAND_TREE,
                     'pingback_url': pingback_url,
                     'rev': last_revision,
