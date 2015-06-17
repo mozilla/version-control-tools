@@ -33,6 +33,8 @@ LIST_RE = re.compile(r'[;,\/\\]')
 BACKED_OUT_RE = re.compile('^backed out changeset (?P<node>[0-9a-f]{12}) ',
                            re.I)
 
+BACKOUT_RE = re.compile('^back\s?out (?P<node>[0-9a-f]{12}) ', re.I)
+
 SHORT_RE = re.compile('^[0-9a-f]{12}$', re.I)
 
 DIGIT_RE = re.compile('#?\d+')
@@ -112,6 +114,10 @@ def parse_backouts(s):
     l = s.splitlines()[0].lower()
 
     m = BACKED_OUT_RE.match(l)
+    if m:
+        return [m.group('node')], parse_bugs(s)
+
+    m = BACKOUT_RE.match(l)
     if m:
         return [m.group('node')], parse_bugs(s)
 

@@ -137,6 +137,13 @@ class TestBugParsing(unittest.TestCase):
         self.assertEqual(parse_backouts(
             'Backed out changeset 2f9d54c153ed on CLOSED TREE (bug 1067325)'),
             (['2f9d54c153ed'], [1067325]))
+        self.assertEqual(
+            parse_backouts('Backout b8601df335c1 (Bug 1174857) for bustage'),
+            (['b8601df335c1'], [1174857]))
+
+        self.assertEqual(
+            parse_backouts('Back out b8601df335c1 (Bug 1174857) for bustage'),
+            (['b8601df335c1'], [1174857]))
 
     def test_backout_multiple_changesets(self):
         self.assertEqual( parse_backouts(
