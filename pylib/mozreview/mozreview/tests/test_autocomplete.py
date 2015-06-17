@@ -96,7 +96,7 @@ class AutocompleteTest(MozReviewWebDriverTest):
         commits = self.get_commits_el()
         reviewers = commits.find_elements_by_class_name('child-rr-reviewers')
         self.assertEqual(len(reviewers), 1)
-        self.assertEqual(reviewers[0].get_attribute('innerHTML'), 'joey, ')
+        self.assertEqual(reviewers[0].get_attribute('innerHTML'), 'joey')
 
         # TODO need a better method to wait for XHR saving the draft to finish.
         time.sleep(1)
