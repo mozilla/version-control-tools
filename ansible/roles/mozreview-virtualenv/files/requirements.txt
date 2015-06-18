@@ -1,9 +1,7 @@
 --find-links http://downloads.reviewboard.org/releases/django-evolution/0.7/
 --find-links http://downloads.reviewboard.org/releases/Djblets/0.8/
---allow-external django-evolution
---allow-unverified django-evolution
---allow-external rbtools
---allow-unverified rbtools
+--find-links http://downloads.reviewboard.org/releases/RBTools/0.6/
+--find-links http://downloads.reviewboard.org/releases/ReviewBoard/2.0/
 
 # sha256: 406XZaYSD0ZkwSD0GYp4bDmg-35KWb0ZotbjqIS2OIk
 amqp==1.4.6
@@ -97,6 +95,9 @@ pycrypto==2.6.1
 
 # sha256: SFxYdfcE05QYN1gC0971KqEk7KP85BG_dgBMsBBodzU
 RBTools==0.6.1
+
+# sha256: UfF5tpHDtS6a2g7HHZpDXcyqxJRU4OE-3WWE76TwmLw
+ReviewBoard==2.0.17
 
 # sha256: EkiQ9BcjyFqoLf4IB0Mq6kbSSusNr840CWnSCJVIwsM
 requests==2.4.3
