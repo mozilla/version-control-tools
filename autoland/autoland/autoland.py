@@ -506,6 +506,7 @@ def main():
         return
 
     dbconn = get_dbconn(args.dsn)
+    last_error_msg = None
     while True:
         try:
             monitor_testruns(logger, auth, dbconn)
@@ -519,8 +520,13 @@ def main():
         except psycopg2.InterfaceError:
             dbconn = get_dbconn(args.dsn)
         except:
-            t, v, tb = sys.exc_info()
-            logger.error('\n'.join(traceback.format_exception(t, v, tb)))
+            # If things go really badly, we might see the same exception
+            # thousands of times in a row. There's not really any point in
+            # logging it more than once.
+            error_msg = traceback.format_exc()
+            if error_msg != last_error_msg:
+                logger.error(error_msg)
+                last_error_msg = error_msg
 
 
 if __name__ == "__main__":
