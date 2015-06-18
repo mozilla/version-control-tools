@@ -406,8 +406,29 @@ class MozReview(object):
                                         bugzilla_username=bugzilla_username,
                                         bugzilla_password=bugzilla_password)
 
-    def create_user(self, email, password, fullname, uid=None, username=None,
-                    scm_level=None):
+    def create_user(self, email, password, fullname, bugzilla_groups=None,
+                    uid=None, username=None, scm_level=None):
+        """Create a new user.
+
+        This will create a user in at least Bugzilla. If the ``uid`` argument
+        is specified, an LDAP user will be created as well.
+
+        ``email`` is the email address of the user.
+        ``password`` is the plain text Bugzilla password.
+        ``fullname`` is the full name of the user. This is stored in both
+        Bugzilla and the system account for the user (if an LDAP user is being
+        created).
+        ``bugzilla_groups`` is an iterable of Bugzilla groups to add the user
+        to.
+        ``uid`` is the numeric UID for the created system/LDAP account.
+        ``username`` is the UNIX username for this user. It defaults to the
+        username part of the email address.
+        ``scm_level`` defines the source code level access to grant to this
+        user. Supported levels are ``1``, ``2``, and ``3``. If not specified,
+        the user won't be able to push to any repos.
+        """
+        bugzilla_groups = bugzilla_groups or []
+
         b = self.get_bugzilla()
 
         if not username:
@@ -416,6 +437,9 @@ class MozReview(object):
         res = {
             'bugzilla': b.create_user(email, password, fullname),
         }
+
+        for g in bugzilla_groups:
+            b.add_user_to_group(email, g)
 
         # Create an LDAP account as well.
         if uid:

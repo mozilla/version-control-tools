@@ -156,10 +156,15 @@ class MozReviewCommands(object):
                      help='Numeric user ID for user')
     @CommandArgument('--scm-level', type=int, choices=(1, 2, 3),
                      help='Source code access level to grant to user')
+    @CommandArgument('--bugzilla-group', action='append',
+                     help='Bugzilla group to add user to.')
     def create_user(self, where, email, password, fullname, uid=None,
-                    scm_level=None):
+                    scm_level=None, bugzilla_group=None):
         mr = self._get_mozreview(where)
-        u = mr.create_user(email, password, fullname, uid=uid, scm_level=None)
+        u = mr.create_user(email, password, fullname,
+                           uid=uid,
+                           scm_level=scm_level,
+                           bugzilla_groups=bugzilla_group)
         print('Created user %s' % u['bugzilla']['id'])
 
     @Command('create-ldap-user', category='mozreview',
