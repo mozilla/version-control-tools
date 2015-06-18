@@ -1,0 +1,38 @@
+---
+
+- name: install dependency packages
+  yum: name={{ item }}
+  with_items:
+    - libjpeg-turbo-devel
+    - mysql-devel
+    - nodejs-less
+    - nodejs-uglify-js
+    - python-devel
+    - python-virtualenv
+    - zlib-devel
+
+- name: create directory structure
+  file: path={{ venv }}
+        state=directory
+        owner=root
+        group=root
+
+- name: create virtualenv
+  command: /usr/bin/virtualenv {{ venv }} creates={{ venv }}/bin/python
+
+- name: ensure packaging packages up to date
+  command: "{{ venv }}/bin/pip install --upgrade pip==6.0.8 peep setuptools"
+
+- name: copy requirements.txt
+  copy: src=requirements.txt
+        dest={{ venv }}/requirements.txt
+        owner=root
+        group=root
+
+- name: populate virtualenv
+  pip: virtualenv={{ venv }}
+       requirements={{ venv }}/requirements.txt
+       executable={{ venv }}/bin/peep
+
+- name: install Review Board package
+  command: "{{ venv }}/bin/easy_install ReviewBoard==2.0.17"

@@ -1,36 +1,10 @@
 ---
-- name: install dependency packages
-  yum: name={{ item }}
-  with_items:
-    - libjpeg-turbo-devel
-    - mysql-devel
-    - nodejs-less
-    - nodejs-uglify-js
-    - python-devel
-    - python-virtualenv
-    - zlib-devel
-
 - name: ensure source directory exists
   file: path={{ item }} owner=root group=root state=directory
   with_items:
     - "{{ src }}"
     - "{{ src }}/{{ site }}"
     - "{{ www }}"
-
-- name: copy requirements.txt
-  copy: src=requirements.txt dest={{ src }}/{{ site }}/requirements.txt owner=root group=root
-
-- name: create virtualenv
-  command: /usr/bin/virtualenv {{ src }}/{{ site }}/venv creates={{ src }}/{{ site}}/venv
-
-- name: ensure packaging packages up to date
-  command: "{{ src }}/{{ site }}/venv/bin/pip install --upgrade pip==6.0.8 peep setuptools"
-
-- name: populate virtualenv
-  pip: virtualenv={{ src }}/{{ site }}/venv requirements={{ src }}/{{ site }}/requirements.txt executable={{ src }}/{{ site }}/venv/bin/peep
-
-- name: install Review Board package
-  command: "{{ src }}/{{ site }}/venv/bin/easy_install ReviewBoard=={{ rb_version }}"
 
 # TODO hook up rb-site install/upgrade.
 # Be sure to use --copy-media because symlinks aren't portable with our

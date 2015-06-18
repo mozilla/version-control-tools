@@ -1,0 +1,3 @@
+---
+dependencies:
+  - { role: mozreview-virtualenv, venv: "{{ src }}/{{ site }}/venv" }
