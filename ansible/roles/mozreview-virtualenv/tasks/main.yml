@@ -1,15 +1,45 @@
 ---
 
+- name: download Node rpm setup script
+  get_url: url=https://raw.githubusercontent.com/nodesource/distributions/9021c9def5fbbf81f610cb61c171f97cb9755542/rpm/setup
+           dest=/var/tmp/node-setup
+           sha256sum=982db69277a23d5be5e8de6524dad85178b682c6e54c9dbe674cb3fa705e22a8
+
+- name: configure Node sources
+  command: /bin/bash /var/tmp/node-setup
+           creates=/etc/yum.repos.d/nodesource-el.repo
+
 - name: install dependency packages
   yum: name={{ item }}
   with_items:
     - libjpeg-turbo-devel
     - mysql-devel
-    - nodejs-less
-    - nodejs-uglify-js
+    - nodejs
     - python-devel
-    - python-virtualenv
+    - tar
     - zlib-devel
+
+# This is required for building Review Board extensions.
+# Make it conditional because it takes a long time to run, making building
+# painfully slow.
+- name: install Node packages
+  command: /usr/bin/npm install -g less uglify-js
+           creates=/usr/bin/lessc
+
+- name: download virtualenv package
+  get_url: url=https://pypi.python.org/packages/source/v/virtualenv/virtualenv-12.0.7.tar.gz
+           dest=/var/tmp/virtualenv-12.0.7.tar.gz
+           sha256sum=d681db1766cdc8aa1b37eb18252c264b775f971166c2bf658a9618c1f3d28741
+
+- name: extract virtualenv package
+  command: /bin/tar -xzf virtualenv-12.0.7.tar.gz
+           chdir=/var/tmp
+           creates=/var/tmp/virtualenv-12.0.7
+
+- name: install virtualenv package
+  command: /usr/bin/python setup.py install
+           chdir=/var/tmp/virtualenv-12.0.7
+           creates=/usr/bin/virtualenv
 
 - name: create directory structure
   file: path={{ venv }}
