@@ -40,7 +40,7 @@ This is the template for the "Commits" list in a push-based review request.
       </td>
       <td class="truncate_text mozreview_min_length">
         <a class="mozreview_commit_summary" title="{{ child_details.summary}}" href="{{child_details.get_review_request.get_absolute_url}}">
-          {{ child_details.summary|truncatechars:25 }}
+          {{ child_details.summary }}
         </a>
       </td>
       {% comment "TODO: show this column when the commit author will be available" %}
