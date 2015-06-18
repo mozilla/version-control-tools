@@ -84,8 +84,18 @@ class MozReview(object):
             os.mkdir(path)
 
         keys_path = os.path.join(path, 'keys')
-        if not os.path.exists(keys_path):
+        try:
             os.mkdir(keys_path)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+        credentials_path = os.path.join(path, 'credentials')
+        try:
+            os.mkdir(credentials_path)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
 
         self._state_path = os.path.join(path, 'state.json')
 
@@ -450,6 +460,10 @@ class MozReview(object):
                                              scm_level=scm_level)
 
             res.update(lr)
+
+        credentials_path = os.path.join(self._path, 'credentials', email)
+        with open(credentials_path, 'wb') as fh:
+            fh.write(password)
 
         return res
 
