@@ -42,8 +42,7 @@ from rbbz.auth import BugzillaBackend
 from rbbz.diffs import build_plaintext_review
 from rbbz.errors import (ConfidentialBugError,
                          InvalidBugIdError)
-from rbbz.middleware import (BugzillaCookieAuthMiddleware,
-                             CorsHeaderMiddleware)
+from rbbz.middleware import CorsHeaderMiddleware
 from rbbz.resources import bugzilla_cookie_login_resource
 
 
@@ -74,7 +73,7 @@ DRAFTED_EXTRA_DATA_KEYS = [
 
 
 class BugzillaExtension(Extension):
-    middleware = [BugzillaCookieAuthMiddleware, CorsHeaderMiddleware]
+    middleware = [CorsHeaderMiddleware]
 
     resources = [
         bugzilla_cookie_login_resource,

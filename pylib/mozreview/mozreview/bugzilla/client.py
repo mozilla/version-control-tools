@@ -70,9 +70,6 @@ class Bugzilla(object):
         if not self.xmlrpc_url:
             raise BugzillaUrlError('no XMLRPC URL')
 
-    def cookies(self):
-        return self.transport.bugzilla_cookies()
-
     @xmlrpc_to_bugzilla_errors
     def log_in(self, username, password, cookie=False):
         if cookie:

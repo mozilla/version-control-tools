@@ -98,8 +98,6 @@ class BugzillaBackend(AuthBackend):
                           % username)
             return None
 
-        (user.bzlogin, user.bzcookie) = bugzilla.cookies()
-
         return user
 
     def get_or_create_user(self, username, request):
@@ -170,7 +168,3 @@ class BugzillaBackend(AuthBackend):
                      Q(last_name__icontains=query))
 
         return q
-
-    def _session_cookies(self, session):
-        return (session.get('Bugzilla_login'),
-                session.get('Bugzilla_logincookie'))
