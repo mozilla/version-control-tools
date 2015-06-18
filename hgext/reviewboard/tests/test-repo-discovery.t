@@ -26,9 +26,21 @@ Create some repositories to discover from
   $ mozreview create-repo a
   HTTP URL (read only): http://*:$HGPORT/a (glob)
   SSH URL (read+write): ssh://*:$HGPORT6/a (glob)
+  
+  Run the following to create a configured clone:
+    ./mozreview clone a /path/to/clone
+  
+  And a clone bound to a particular user:
+    ./mozreview clone a /path/to/clone --user <user>
   $ mozreview create-repo b
   HTTP URL (read only): http://*:$HGPORT/b (glob)
   SSH URL (read+write): ssh://*:$HGPORT6/b (glob)
+  
+  Run the following to create a configured clone:
+    ./mozreview clone b /path/to/clone
+  
+  And a clone bound to a particular user:
+    ./mozreview clone b /path/to/clone --user <user>
 
   $ mkdir repos
   $ cd repos
