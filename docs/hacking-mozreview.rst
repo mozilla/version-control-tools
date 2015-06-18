@@ -90,6 +90,73 @@ working site. If you don't, file a bug!
    The remainder of this document assumes this environment variable
    is defined.
 
+Creating Users
+--------------
+
+There are two primary account systems inside the MozReview cluster:
+Bugzilla and LDAP.
+
+Bugzilla accounts provide authentication and authorization for
+web properties, including Bugzilla, MozReview, and Autoland.
+
+LDAP accounts hold information needed to communicate with the
+Mercurial SSH server. When LDAP accounts are created, an SSH keypair
+is associated with the account. The public key is added to LDAP so SSH
+logins may be validated.
+
+The two account systems are completely separate.
+
+Review Board also has its own account system. But it is linked
+to Bugzilla's user database and should be thought of an extension
+rather than a separate account system.
+
+Creating Universal Users
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+In many scenarios, it is acceptable to create an account in both
+systems. We call these *universal users* because they exist everywhere.
+
+The way to do this is with the ``mozreview create-user`` command::
+
+   $ ./mozreview create-user user1@example.com password 'Example User' \
+       --uid 2000 --scm-level 1 --bugzilla-group editbugs
+
+This creates the ``user1@example.com`` user with password ``password``
+and full name ``Example User``. The LDAP account says to use UID
+``2000`` and give the user access level 1. Finally, the user is added to
+the ``editbugs`` Bugzilla group, which gives the user permission to edit
+bugs.
+
+A SSH keypair for the user is created and configured with LDAP.
+
+Creating LDAP Users
+^^^^^^^^^^^^^^^^^^^
+
+If you would like to create a user in LDAP without a corresponding
+Bugzilla user (this is rare), you can use the
+``mozreview create-ldap-user`` command. e.g.::
+
+   $ ./mozreview create-ldap-user gszorc@mozilla.com gps 2002 'Gregory Szorc' --key-file ~/.ssh/id_rsa --scm-level 3
+
+Here, we create the account ``gszorc@mozilla.com`` with system user
+name ``gps`` with user ID ``2`` with name ``Gregory Szorc`` with an
+existing RSA SSH keypair and with level 3 source code access.
+
+.. note::
+
+   When specifying an existing key file, the public key will be
+   added to the LDAP server running in the cluster. Your private key
+   remains as a secret on your local machine.
+
+Creating Bugzilla Users
+^^^^^^^^^^^^^^^^^^^^^^^
+
+If you would like to create a user in Bugzilla without a corresponding
+LDAP user, you can use ``mozreview create-user`` without the
+``--uid`` argument. e.g.::
+
+   $ ./mozreview create-user me@example.com password 'Joe Smith'
+
 Creating Repositories
 ---------------------
 
@@ -102,77 +169,30 @@ To create an empty repository to hold reviews, use ``mozreview``::
    HTTP URL (read only): http://192.168.59.104:55570/repo_name
    SSH URL (read+write): ssh://192.168.59.104:55572/repo_name
 
+   Run the following to create a configured clone:
+     ./mozreview clone repo_name /path/to/clone
+
+   And a clone bound to a particular user:
+     ./mozreview clone repo_name /path/to/clone --user <user>
+
 Pushing to repositories is done via SSH, as this is how production
 works.
 
-Creating Users
---------------
+Creating Configured Repository Clones
+-------------------------------------
 
-There are two primary account systems inside the MozReview cluster:
-Bugzilla and LDAP.
+It is common to want to configure a local repository clone to talk to a
+review repository from your local MozReview cluster. The ``mozreview
+clone`` command exists to make creating one simple::
 
-Bugzilla accounts provide authentication and authorization for
-web properties, including Bugzilla, MozReview, and Autoland.
+   $ ./mozreview clone repo_name /path/to/dest
 
-LDAP accounts hold information needed to communicate with the
-Mercurial SSH server.
+The ``hgrc`` of the created repository will be configured such that the
+repository is *bound* to the MozReview instance it came from.
 
-The two account systems are completely separate.
-
-Review Board also has its own account system. But it is linked
-to Bugzilla's user database and should be thought of an extension
-rather than a separate account system.
-
-LDAP Accounts
-^^^^^^^^^^^^^
-
-In order to speak to the SSH server, you'll need to create an
-LDAP account and configure it with an SSH key.
-
-.. note::
-
-   This workflow is a bit complicated and should be improved.
-
-SSH accounts are managed via LDAP. So, creating an LDAP user is
-equivalent to configuring SSH access. Run the ``create-ldap-user``
-sub-command to create an LDAP user with an existing SSH key::
-
-  $ ./mozreview create-ldap-user gszorc@mozilla.com gps 2002 'Gregory Szorc' --key-file ~/.ssh/id_rsa --scm-level 3
-
-Here, we create the account ``gszorc@mozilla.com`` with system user
-name ``gps`` with user ID ``2`` with name ``Gregory Szorc`` with an
-existing RSA SSH keypair and with level 3 source code access.
-
-.. note::
-
-   When specifying an existing key file, the public key will be
-   added to the LDAP server running in the cluster. Your private key
-   remains as a secret on your local machine.
-
-You'll likely want your LDAP/SSH username to be shared with your
-login name for hg.mozilla.org. This is to make your Mercurial SSH
-configuration simpler. If the usernames are shared, you can add
-something like the following to your ``hgrc``::
-
-  [ui]
-  ssh = ssh -l gszorc@mozilla.com
-
-This tells Mercurial to use a specified login name for all SSH
-connections.
-
-Alternatively, edit your ``~/.ssh/config`` file and specify an
-alternate ``User`` for the Docker host.
-
-Bugzilla Accounts
-^^^^^^^^^^^^^^^^^
-
-MozReview clusters are provisioned with a single admin user by default.
-Credentials for this user are printed during ``mozreview start``.
-
-You'll almost certainly want to create a regular, non-admin user.
-This can be done with the ``create-user`` sub-command::
-
-   $ ./mozreview create-user me@example.com password 'Joe Smith'
+Passing the ``--user`` argument to the ``clone`` command will further
+bind the repository to a specific user. When used, ``hg push`` commands
+will automatically use the appropriate SSH key and username.
 
 Refreshing Code
 ---------------

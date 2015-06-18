@@ -144,6 +144,36 @@ class MozReviewCommands(object):
         http_url, ssh_url, rbid = mr.create_repository(path)
         print('HTTP URL (read only): %s' % http_url)
         print('SSH URL (read+write): %s' % ssh_url)
+        print('')
+        print('Run the following to create a configured clone:')
+        print('  ./mozreview clone %s /path/to/clone' % path)
+        print('')
+        print('And a clone bound to a particular user:')
+        print('  ./mozreview clone %s /path/to/clone --user <user>' % path)
+
+    @Command('clone', category='mozreview',
+             description='Clone and configure a MozReview repository')
+    @CommandArgument('where', nargs='?',
+                     help='Directory of MozReview instance')
+    @CommandArgument('repo',
+                     help='Name of repository to clone')
+    @CommandArgument('dest',
+                     help='Where to clone repository to')
+    @CommandArgument('--user',
+                     help='User to attach to the repository')
+    def clone(self, where, repo, dest, user=None):
+        """Clone a review repository such that it easily integrates with MozReview.
+
+        The specified review repository is cloned. In addition, appropriate
+        Mercurial configurations are installed to make pushing to the review
+        repository simple.
+
+        If a username is specified via ``--user``, the repository is "bound"
+        to that user: credentials are defined and all operations against the
+        repository are performed as that user.
+        """
+        mr = self._get_mozreview(where)
+        mr.clone(repo, dest, username=user)
 
     @Command('create-user', category='mozreview',
         description='Create a user in a MozReview instance')

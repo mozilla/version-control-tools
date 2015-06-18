@@ -372,9 +372,15 @@ class MozReview(object):
         if res != 0:
             raise Exception('error creating watchman trigger')
 
-    def create_repository(self, name):
+    def repo_urls(self, name):
+        """Obtain the http:// and ssh:// URLs for a review repo."""
         http_url = '%s%s' % (self.mercurial_url, name)
         ssh_url = 'ssh://%s:%d/%s' % (self.ssh_hostname, self.ssh_port, name)
+
+        return http_url, ssh_url
+
+    def create_repository(self, name):
+        http_url, ssh_url = self.repo_urls(name)
 
         rb = self.get_reviewboard()
         rbid = rb.add_repository(os.path.dirname(name) or name, http_url,
@@ -384,6 +390,48 @@ class MozReview(object):
                                     ['/create-repo', name, str(rbid)])
 
         return http_url, ssh_url, rbid
+
+    def clone(self, repo, dest, username=None):
+        """Clone and configure a review repository.
+
+        The specified review repo will be cloned and configured such that it is
+        bound to this MozReview instance. If a username is specified, all
+        operations will be performed as that user.
+        """
+        http_url, ssh_url = self.repo_urls(repo)
+
+        subprocess.check_call([self._hg, 'clone', http_url, dest], cwd='/')
+
+        mrext = os.path.join(ROOT, 'testing', 'mozreview-repo.py')
+        mrssh = os.path.join(ROOT, 'testing', 'mozreview-ssh')
+        rbext = os.path.join(ROOT, 'hgext', 'reviewboard', 'client.py')
+
+        with open(os.path.join(dest, '.hg', 'hgrc'), 'w') as fh:
+            lines = [
+                '[paths]',
+                'default = %s' % http_url,
+                'default-push = %s' % ssh_url,
+                '',
+                '[extensions]',
+                'mozreview-repo = %s' % mrext,
+                'reviewboard = %s' % rbext,
+                '',
+                '[ui]',
+                'ssh = %s' % mrssh,
+                '',
+                # TODO use ircnick from the current user, if available.
+                '[mozilla]',
+                'ircnick = dummy',
+                '',
+                '[mozreview]',
+                'home = %s' % self._path,
+            ]
+
+            if username:
+                lines.append('username = %s' % username)
+
+            fh.write('\n'.join(lines))
+            fh.write('\n')
 
     def get_local_repository(self, path, ircnick=None,
                              bugzilla_username=None,
@@ -396,6 +444,9 @@ class MozReview(object):
 
         If bugzilla credentials are passed, they will be defined in the
         repository's hgrc.
+
+        The repository is configured to be in deterministic mode. Therefore
+        these repositories are suitable for use in tests.
         """
         localrepos = os.path.join(self._path, 'localrepos')
         try:
@@ -406,8 +457,7 @@ class MozReview(object):
 
         local_path = os.path.join(localrepos, os.path.basename(path))
 
-        http_url = '%s%s' % (self.mercurial_url, path)
-        ssh_url = 'ssh://%s:%d/%s' % (self.ssh_hostname, self.ssh_port, path)
+        http_url, ssh_url = self.repo_urls(path)
 
         # TODO make pushes via SSH work (it doesn't work outside of Mercurial
         # tests because dummy expects certain environment variables).
