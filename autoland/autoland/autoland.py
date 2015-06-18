@@ -482,7 +482,7 @@ def get_dbconn(dsn):
     dbconn = None
     while not dbconn:
         try:
-            dbconn = psycopg2.connect(args.dsn)
+            dbconn = psycopg2.connect(dsn)
         except psycopg2.OperationalError:
             time.sleep(0.1)
     return dbconn
