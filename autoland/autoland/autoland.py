@@ -478,6 +478,16 @@ def handle_pending_mozreview_updates(logger, dbconn):
         dbconn.commit()
 
 
+def get_dbconn(dsn):
+    dbconn = None
+    while not dbconn:
+        try:
+            dbconn = psycopg2.connect(args.dsn)
+        except psycopg2.OperationalError:
+            time.sleep(0.1)
+    return dbconn
+
+
 def main():
     parser = argparse.ArgumentParser()
     dsn = 'dbname=autoland user=autoland host=localhost password=autoland'
@@ -495,13 +505,7 @@ def main():
         logger.critical('could not read selfserve credentials. aborting')
         return
 
-    dbconn = None
-    while not dbconn:
-        try:
-            dbconn = psycopg2.connect(args.dsn)
-        except psycopg2.OperationalError:
-            time.sleep(0.1)
-
+    dbconn = get_dbconn(args.dsn)
     while True:
         try:
             monitor_testruns(logger, auth, dbconn)
@@ -512,6 +516,8 @@ def main():
             time.sleep(0.25)
         except KeyboardInterrupt:
             break
+        except psycopg2.InterfaceError:
+            dbconn = get_dbconn(args.dsn)
         except:
             t, v, tb = sys.exc_info()
             logger.error('\n'.join(traceback.format_exception(t, v, tb)))
