@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env python2.7
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -6,22 +6,26 @@
 # This script is used to establish an SSH connection to a Mercurial server
 # running in a Docker container as part of mozreview tests.
 
-set -e
+import os
+import sys
 
-if [ -z "${BUGZILLA_USERNAME}" -a -z "${SSH_KEYNAME}" ]; then
-  echo "BUGZILLA_USERNAME or SSH_KEYNAME must be defined"
-  exit 1
-fi
 
-username=${BUGZILLA_USERNAME}
-if [ ! -z ${SSH_KEYNAME} ]; then
-  username=${SSH_KEYNAME}
-fi
+username = os.environ.get('BUGZILLA_USERNAME')
+if not username:
+    print('BUGZILLA_USERNAME must be defined')
+    sys.exit(1)
 
-if [ ! -f ${MOZREVIEW_HOME}/keys/${username} ]; then
-  echo "No SSH key found for ${username}."
-  echo "You should probably use 'mozreview create-ldap-user' to make one"
-  exit 1
-fi
+key_path = os.path.join(os.environ['MOZREVIEW_HOME'], 'keys', username)
+if not os.path.isfile(key_path):
+    print('No SSH key found for %s' % username)
+    print('You should probably use `mozreview create-user` to create one')
+    sys.exit(1)
 
-ssh -F ${MOZREVIEW_HOME}/ssh_config -i ${MOZREVIEW_HOME}/keys/${username} -l ${username} $@
+args = [
+    'ssh',
+    '-F', os.path.join(os.environ['MOZREVIEW_HOME'], 'ssh_config'),
+    '-i', key_path,
+    '-l', username,
+] + sys.argv[1:]
+
+os.execvp(args[0], args)
