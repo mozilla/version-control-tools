@@ -66,10 +66,12 @@ commonenv() {
 
   export HGSSHHGRCPATH=${MOZREVIEW_HOME}/hgrc
 
-  createandusedefaultuser > /dev/null
-  mozreview create-ldap-user default@example.com defaultuser 2000 'Default User' \
-    --key-file ${MOZREVIEW_HOME}/keys/default@example.com \
-    --scm-level 1
+  mozreview create-user default@example.com password 'Default User' \
+    --bugzilla-group editbugs \
+    --uid 2000 \
+    --scm-level 1 > /dev/null
+
+  exportbzauth default@example.com password
 
   mozreview create-repo test-repo > /dev/null
 
@@ -82,9 +84,4 @@ commonenv() {
 exportbzauth() {
   export BUGZILLA_USERNAME=$1
   export BUGZILLA_PASSWORD=$2
-}
-
-createandusedefaultuser() {
-  adminbugzilla create-user default@example.com password 'Default User' --group editbugs
-  exportbzauth default@example.com password
 }
