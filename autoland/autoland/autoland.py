@@ -490,7 +490,10 @@ def get_dbconn(dsn):
 
 def main():
     parser = argparse.ArgumentParser()
-    dsn = 'dbname=autoland user=autoland host=localhost password=autoland'
+
+    with open('config.json') as f:
+        dsn = json.load(f)['database']
+
     parser.add_argument('--dsn', default=dsn,
                         help="Postgresql DSN connection string")
     commandline.add_logging_group(parser)

@@ -16,7 +16,7 @@ Post a job
 Get job status
 
   $ ottoland autoland-job-status $AUTOLAND_URL 1
-  (200, u'{\n  "destination": "try", \n  "error_msg": null, \n  "landed": null, \n  "result": "", \n  "rev": "1", \n  "tree": "mozilla-central", \n  "trysyntax": ""\n}')
+  (200, u'{\n  "destination": "try", \n  "error_msg": *, \n  "landed": *, \n  "result": *, \n  "rev": "1", \n  "tree": "mozilla-central", \n  "trysyntax": ""\n}') (glob)
 
 Getting status for an unknown job should return a 404
 
@@ -41,8 +41,7 @@ Posting a pullrequest job without a bugid should automatically file a bug for th
 Get pullrequest job status
 
   $ ottoland pullrequest-job-status $AUTOLAND_URL 2
-  (200, u'{\n  "bugid": 1, \n  "destination": "mozreview", \n  "error_msg": *, \n  "landed": *, \n  "pullrequest": 1, \n  "repo": "repo", \n  "result": "", \n  "user": "user"\n}') (glob)
-
+  (200, u'{\n  "bugid": 1, \n  "destination": "mozreview", \n  "error_msg": *, \n  "landed": *, \n  "pullrequest": 1, \n  "repo": "repo", \n  "result": *, \n  "user": "user"\n}') (glob)
 
 Getting status for an unknown job should return a 404
 
