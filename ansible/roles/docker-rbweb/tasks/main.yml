@@ -2,30 +2,16 @@
 - name: Create Review Board user
   user: name=reviewboard
 
-- name: Configure Node sources
-  shell: curl https://rpm.nodesource.com/setup | bash creates=/etc/yum.repos.d/nodesource-el.repo
-
 # The yum module is slow. Run commands manually.
 - name: System packages installed
-  command: /usr/bin/yum install -y libjpeg-turbo-devel memcached mod_wsgi nodejs patch zlib-devel https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm
+  command: /usr/bin/yum install -y memcached mod_wsgi patch https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm
 
-- name: Install virtualenv
-  pip: name=virtualenv
-
-- name: Install pip requirements file
-  copy: src=requirements.txt dest=/requirements.txt
-
-- name: Python package dependencies
-  pip: requirements=/requirements.txt virtualenv=/venv
-
-# This is required for building Review Board extensions.
-# Make it conditional because it takes a long time to run, making building
-# avoidably slow.
-- name: Install Node packages
-  command: /usr/bin/npm install -g less uglify-js creates=/usr/bin/lessc
-
-- name: Install Review Board package
-  command: /venv/bin/easy_install ReviewBoard==2.0.17
+# The kill-wsgi-procs support script requires psutil, which isn't part of
+# the MozReview virtualenv. Install it as a one-off
+- name: install psutil
+  pip: virtualenv=/venv
+       name=psutil
+       version=2.2.1
 
 - name: Synchronize version-control-tools
   synchronize: src={{ vct }}/ dest=/version-control-tools/ recursive=yes delete=yes
