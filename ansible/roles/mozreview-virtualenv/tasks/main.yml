@@ -50,8 +50,14 @@
 - name: create virtualenv
   command: /usr/bin/virtualenv {{ venv }} creates={{ venv }}/bin/python
 
-- name: ensure packaging packages up to date
-  command: "{{ venv }}/bin/pip install --upgrade pip==6.0.8 peep setuptools"
+# peep is copied from our local copy because it is secure and is known
+# to work.
+- name: install peep
+  copy: src=files/peep.py
+        dest={{ venv }}/bin/peep
+        mode=0755
+        owner=root
+        group=root
 
 - name: copy requirements.txt
   copy: src=requirements.txt
