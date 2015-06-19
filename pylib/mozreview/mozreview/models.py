@@ -7,6 +7,7 @@ from mozreview.autoland.models import (AutolandEventLogEntry,
                                        AutolandRequest)
 from mozreview.bugzilla.models import (BugzillaUserMap,
                                        get_or_create_bugzilla_users)
+from mozreview.ldap import query_scm_group
 
 __all__ = [
     'AutolandEventLogEntry',
@@ -36,6 +37,14 @@ class MozReviewUserProfile(models.Model):
     # that ldap username and should be given the permissions
     # associated with its groups in ldap.
     ldap_username = models.CharField(max_length=256, blank=True)
+
+    def has_scm_ldap_group(self, group):
+        """Return True if the user is a member of the provided ldap group."""
+        if not self.ldap_username:
+            return False
+
+        return query_scm_group(self.ldap_username, group)
+
 
     class Meta:
         app_label = 'mozreview'
