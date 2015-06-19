@@ -595,7 +595,7 @@ class ImportPullRequestUpdateResource(WebAPIResource):
 
             ImportPullRequestRequest.objects.filter(
                 pk=fields['request_id']).update(
-                review_request_id=review_request_id, bugid=bugid)
+                review_request_id=review_request_id, bugid=fields['bugid'])
 
             AutolandEventLogEntry.objects.create(
                 autoland_request_id=fields['request_id'],
