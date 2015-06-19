@@ -17,7 +17,8 @@ class MozReviewSettingsForm(SettingsForm):
     pulse_ssl = forms.BooleanField(required=False)
     pulse_user = forms.CharField(required=False)
     pulse_password = forms.CharField(required=False,
-                                     widget=forms.PasswordInput)
+                                     widget=forms.PasswordInput(
+                                        render_value=True))
     autoland_import_pullrequest_ui_enabled = forms.BooleanField(
         label=_('Enable Autoland Import Pullrequest UI'),
         help_text=_('This allows access to the web endpoint for importing '
@@ -37,6 +38,15 @@ class MozReviewSettingsForm(SettingsForm):
         }))
     autoland_user = forms.CharField(required=False)
     autoland_password = forms.CharField(required=False,
-                                        widget=forms.PasswordInput)
-
+                                        widget=forms.PasswordInput(
+                                            render_value=True))
     autoland_testing = forms.BooleanField(initial=False, required=False)
+    ldap_url = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'size': 100,
+        }))
+    ldap_user = forms.CharField(required=False)
+    ldap_password = forms.CharField(required=False,
+                                    widget=forms.PasswordInput(
+                                        render_value=True))

@@ -59,6 +59,9 @@ class MozReviewExtension(Extension):
         'autoland_password': '',
         'autoland_testing': False,
         'autoland_import_pullrequest_ui_enabled': False,
+        'ldap_url': '',
+        'ldap_user': '',
+        'ldap_password': '',
     }
 
     is_configurable = True

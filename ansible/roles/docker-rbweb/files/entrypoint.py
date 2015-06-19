@@ -29,6 +29,9 @@ bugzilla_url = 'http://%s:%s' % (os.environ['BMOWEB_PORT_80_TCP_ADDR'],
 autoland_url = 'http://%s:%s' % (os.environ['AUTOLAND_PORT_80_TCP_ADDR'],
                                  os.environ['AUTOLAND_PORT_80_TCP_PORT'])
 
+ldap_url = 'ldap://%s:%s' % (os.environ['LDAP_PORT_389_TCP_ADDR'],
+                             os.environ['LDAP_PORT_389_TCP_PORT'])
+
 # siteconfig takes priority over settings_local.py. Ensure siteconfig
 # is up to date.
 #
@@ -51,7 +54,7 @@ sc.set('logging_directory', '/reviewboard/logs')
 sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % bugzilla_url)
 sc.save()
 
-# Define Pulse endpoint.
+# Define MozReview settings.
 from djblets.extensions.models import RegisteredExtension
 mre = RegisteredExtension.objects.get(class_name='mozreview.extension.MozReviewExtension')
 mre.settings['enabled'] = True
@@ -66,6 +69,9 @@ mre.settings['autoland_user'] = 'autoland'
 mre.settings['autoland_password'] = 'autoland'
 mre.settings['autoland_testing'] = True
 mre.settings['autoland_import_pullrequest_ui_enabled'] = True
+mre.settings['ldap_url'] = ldap_url
+mre.settings['ldap_user'] = 'uid=bind-mozreview,ou=logins,dc=mozilla'
+mre.settings['ldap_password'] = 'password'
 mre.save()
 
 os.execl(sys.argv[1], *sys.argv[1:])

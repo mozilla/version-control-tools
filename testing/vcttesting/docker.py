@@ -701,6 +701,7 @@ class Docker(object):
         start_rbweb = False
         if rbweb_port or start_autoland or start_hgrb:
             start_rbweb = True
+            start_ldap = True
 
         known_images = self.all_docker_images()
         if db_image and db_image not in known_images:
@@ -856,6 +857,7 @@ class Docker(object):
                                          (pulse_state['Name'], 'pulse'),
                                          (hgrb_state['Name'], 'hgrb'),
                                          (autoland_state['Name'], 'autoland'),
+                                         (ldap_state['Name'], 'ldap')
                                   ],
                                   port_bindings={80: rbweb_port})
                 rbweb_state = self.client.inspect_container(rbweb_id)
