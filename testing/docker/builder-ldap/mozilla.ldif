@@ -59,3 +59,12 @@ gidNumber: 687
 objectClass: posixGroup
 objectClass: top
 cn: scm_ecmascript
+
+dn: uid=bind-mozreview,ou=logins,dc=mozilla
+objectClass: top
+objectClass: account
+objectClass: simpleSecurityObject
+objectClass: uidObject
+uid: bind-mozreview
+userid: bind-mozreview
+userPassword: password
