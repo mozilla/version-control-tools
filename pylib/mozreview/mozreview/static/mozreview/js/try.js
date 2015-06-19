@@ -41,7 +41,7 @@ $(document).on("mozreview_ready", function() {
                 type: "POST",
                 url: TRY_AUTOLAND,
                 data: {
-                  review_request_id: MozReview.rootReviewRequest.id,
+                  review_request_id: MozReview.parentReviewRequest.id,
                   try_syntax: $("#mozreview-autoland-try-syntax").val()
                 }
               })
