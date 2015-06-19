@@ -105,7 +105,11 @@ class TryField(BaseReviewRequestField):
         if not ext or not ext.settings.get('autoland_try_ui_enabled'):
             return False
 
-        return is_parent(self.review_request_details)
+        if not is_parent(self.review_request_details):
+            return False
+
+        mrp = self.request.mozreview_profile
+        return mrp is not None and mrp.has_scm_ldap_group('scm_level_1')
 
     def load_value(self, review_request_details):
         return review_request_details.extra_data.get('p2rb.autoland_try')

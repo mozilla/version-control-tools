@@ -27,6 +27,7 @@ from mozreview.autoland.errors import (AUTOLAND_ERROR,
                                        BAD_AUTOLAND_CREDENTIALS,
                                        BAD_AUTOLAND_URL,
                                        BAD_UPDATE_CREDENTIALS)
+from mozreview.decorators import webapi_scm_groups_required
 from mozreview.errors import NOT_PUSHED_PARENT_REVIEW_REQUEST
 from mozreview.extra_data import is_parent, is_pushed
 
@@ -88,6 +89,7 @@ class TryAutolandTriggerResource(WebAPIResource):
     @webapi_login_required
     @webapi_response_errors(DOES_NOT_EXIST, INVALID_FORM_DATA,
                             NOT_LOGGED_IN, PERMISSION_DENIED)
+    @webapi_scm_groups_required('scm_level_1')
     @webapi_request_fields(
         required={
             'review_request_id': {
