@@ -16,6 +16,7 @@
     - mysql-devel
     - nodejs
     - python-devel
+    - openldap-devel
     - tar
     - zlib-devel
 

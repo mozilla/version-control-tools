@@ -78,6 +78,9 @@ Pygments==2.0.2
 # sha256: bxlzSLRvuM358_z8Kn1al9qV2z4uhmfPZXIWJ0_hsAk
 python-dateutil==1.5
 
+# sha256: Av3bOsy_tU5A_0ellFfkIrJT-fts1kuzhRs0kpX6sEg
+python-ldap==2.4.19
+
 # sha256: Z-HBi2uZykwsjkoC4KlhdL9waJGaWv9Sg2YAl0we9Ng
 python-memcached==1.54
 
