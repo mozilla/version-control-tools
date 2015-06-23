@@ -200,10 +200,11 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
                     squashed_reviewers.add(username)
             except APIError as e:
                 if e.http_status == 404 and e.error_code == 100:
-                    hgresp.append('display unrecognized reviewer: %s' % reviewer)
+                    hgresp.append('display unrecognized reviewer: %s' %
+                                  str(reviewer))
                 else:
                     hgresp.append('display error identifying reviewer: %s: %s' %
-                                  (reviewer, e))
+                                  (str(reviewer), str(e)))
 
         return sorted(reviewers)
 
