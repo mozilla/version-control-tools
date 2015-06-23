@@ -124,21 +124,22 @@ def parse_backouts(s):
     if BACK_OUT_MULTIPLE_RE.match(l):
         return [], parse_bugs(s)
 
-    if l.startswith('backed out changesets '):
-        nodes = []
-        remaining = l[len('backed out changesets '):]
+    for prefix in ('backed out changesets ', 'back out changesets '):
+        if l.startswith(prefix):
+            nodes = []
+            remaining = l[len(prefix):]
 
-        # Consume all the node words that follow, stopping after a non-node
-        # word or separator.
-        for word in remaining.split():
-            word = word.strip(',')
-            if SHORT_RE.match(word):
-                nodes.append(word)
-            elif word == 'and':
-                continue
-            else:
-                break
+            # Consume all the node words that follow, stopping after a non-node
+            # word or separator.
+            for word in remaining.split():
+                word = word.strip(',')
+                if SHORT_RE.match(word):
+                    nodes.append(word)
+                elif word == 'and':
+                    continue
+                else:
+                    break
 
-        return nodes, parse_bugs(s)
+            return nodes, parse_bugs(s)
 
     return None

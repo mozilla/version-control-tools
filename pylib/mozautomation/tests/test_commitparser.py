@@ -146,10 +146,16 @@ class TestBugParsing(unittest.TestCase):
             (['b8601df335c1'], [1174857]))
 
     def test_backout_multiple_changesets(self):
-        self.assertEqual( parse_backouts(
+        self.assertEqual(parse_backouts(
             'Backed out changesets 4b6aa5c0a1bf and fdf38a41d92b '
             '(bug 1150549) for Mulet crashes.'),
             (['4b6aa5c0a1bf', 'fdf38a41d92b'], [1150549]))
+
+        self.assertEqual(parse_backouts(
+            'Back out changesets ed293fc9596c and f18cb4c41578 '
+            '(bug 1174700) for fatal assertions in all Windows debug '
+            'reftest runs.'),
+            (['ed293fc9596c', 'f18cb4c41578'], [1174700]))
 
     def test_backout_n_changesets(self):
         self.assertEqual(parse_backouts(
