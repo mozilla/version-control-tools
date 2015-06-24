@@ -2,7 +2,6 @@ beautifulsoup4
 bugsy
 flask
 github3.py==1.0.0a1
-kombu
 mozillapulse
 mozlog == 2.2
 psycopg2
