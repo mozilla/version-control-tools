@@ -51,11 +51,11 @@ This is the template for the "Commits" list in a push-based review request.
               data-id="{{child_details.get_review_request.id}}">{{ child_details.target_people.all|join:", " }}</span>
       </td>
       <td class="mozreview_min_length">
-        {% if child_details.issue_open_count > 0 %}
-        <span class="issue-count"> <span class="issue-icon">!</span> {{child_details.issue_open_count}}</span>
-        {% elif child_details.shipit_count > 0 %}
+        {% if child_details.get_review_request.issue_open_count > 0 %}
+        <span class="issue-count"> <span class="issue-icon">!</span> {{child_details.get_review_request.issue_open_count}}</span>
+        {% elif child_details.get_review_request.shipit_count > 0 %}
         <span class="shipit-count"> <div class="rb-icon rb-icon-shipit-checkmark" title="Ship It!"></div>
-          {{child_details.shipit_count}}
+          {{child_details.get_review_request.shipit_count}}
         </span>
         {% endif %}
       </td>
