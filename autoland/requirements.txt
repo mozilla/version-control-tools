@@ -6,6 +6,5 @@ kombu
 mozillapulse
 mozlog == 2.2
 psycopg2
-python-ldap
 requests
 responses
