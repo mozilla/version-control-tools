@@ -1,9 +1,13 @@
+import config
 import requests
 
 TREESTATUS_URL = 'https://treestatus.mozilla.org/'
 
 
 def tree_is_open(tree):
+    if config.testing():
+        return True
+
     try:
         r = requests.get(TREESTATUS_URL + tree + '?format=json', verify=False)
         if r.status_code == 200:
