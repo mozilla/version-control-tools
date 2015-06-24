@@ -112,9 +112,23 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
   $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug3
 
   $ echo 2_1 > foo
-  $ hg commit -m 'Bug 2 - First commit'
+  $ cat > message << EOF
+  > Bug 2 - First commit
+  > 
+  > This is a long commit message.
+  > 
+  > With multiple lines in the commit message. This is a long paragraph.
+  > It will test wrapping.
+  > EOF
+  $ hg commit -l message
   $ echo 2_2 > foo
-  $ hg commit -m 'Bug 2 - Second commit'
+  $ cat > message << EOF
+  > Bug 2 - Second commit
+  > 
+  > This is a commit.
+  > EOF
+  $ hg commit -l message
+  $ rm -f message
   $ echo 3_1 > foo
   $ hg commit -m 'Bug 3 - Another bug'
   $ hg push http://localhost:$HGPORT/integration/mozilla-inbound
@@ -140,8 +154,8 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
       id: 5
       tags: []
       text:
-      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/a224eb610808
-      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/e3b5f3c3c45d
+      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/7edeca8d7f49
+      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/d9ef0680b2c0
     component: TestComponent
     depends_on: []
     platform: All
@@ -160,7 +174,7 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
     - author: default@example.com
       id: 6
       tags: []
-      text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/abe0245372d4
+      text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/d2c84e3fb8c7
     component: TestComponent
     depends_on: []
     platform: All
@@ -414,7 +428,7 @@ Verify cookie auth works
     - author: default@example.com
       id: 15
       tags: []
-      text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/377d66b28de0
+      text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/61dd85eacc29
     component: TestComponent
     depends_on: []
     platform: All
