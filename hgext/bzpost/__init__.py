@@ -47,6 +47,7 @@ from mercurial import demandimport
 from mercurial import exchange
 from mercurial import extensions
 from mercurial import phases
+from mercurial import util
 from mercurial.i18n import _
 
 OUR_DIR = os.path.dirname(__file__)
@@ -186,7 +187,17 @@ def wrappedpushbookmark(orig, pushop):
                      bugnumber)
             continue
 
-        lines = ['%s/rev/%s' % (baseuri, node) for node in missing_nodes]
+        lines = []
+
+        for node in missing_nodes:
+            ctx = pushop.repo[node]
+            lines.append('url:        %s/rev/%s' % (baseuri, ctx.hex()))
+            lines.append('changeset:  %s' % ctx.hex())
+            lines.append('user:       %s' % ctx.user())
+            lines.append('date:       %s' % util.datestr(ctx.date()))
+            lines.append('description:')
+            lines.append(ctx.description())
+            lines.append('')
 
         comment = '\n'.join(lines)
 

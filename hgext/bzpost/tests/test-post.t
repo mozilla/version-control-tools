@@ -97,7 +97,13 @@ Pushing to mozilla-inbound will result in bug being updated
     - author: default@example.com
       id: 2
       tags: []
-      text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/b507e8e33160
+      text:
+      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/b507e8e331609b343b4f2207cb9f899ff00aef0c'
+      - 'changeset:  b507e8e331609b343b4f2207cb9f899ff00aef0c'
+      - 'user:       test'
+      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
+      - 'description:'
+      - Bug 1 - Commit to inbound
     component: TestComponent
     depends_on: []
     platform: All
@@ -154,8 +160,26 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
       id: 5
       tags: []
       text:
-      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/7edeca8d7f49
-      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/d9ef0680b2c0
+      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/7edeca8d7f49bf5bc3c979fdc4b094c7854381c3'
+      - 'changeset:  7edeca8d7f49bf5bc3c979fdc4b094c7854381c3'
+      - 'user:       test'
+      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
+      - 'description:'
+      - Bug 2 - First commit
+      - ''
+      - This is a long commit message.
+      - ''
+      - With multiple lines in the commit message. This is a long paragraph.
+      - It will test wrapping.
+      - ''
+      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/d9ef0680b2c01b81a6b1057fb368d4c9ea54d7db'
+      - 'changeset:  d9ef0680b2c01b81a6b1057fb368d4c9ea54d7db'
+      - 'user:       test'
+      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
+      - 'description:'
+      - Bug 2 - Second commit
+      - ''
+      - This is a commit.
     component: TestComponent
     depends_on: []
     platform: All
@@ -174,7 +198,13 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
     - author: default@example.com
       id: 6
       tags: []
-      text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/d2c84e3fb8c7
+      text:
+      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/d2c84e3fb8c79f9699d4eb6537b155e09e290ec4'
+      - 'changeset:  d2c84e3fb8c79f9699d4eb6537b155e09e290ec4'
+      - 'user:       test'
+      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
+      - 'description:'
+      - Bug 3 - Another bug
     component: TestComponent
     depends_on: []
     platform: All
@@ -374,7 +404,13 @@ Pushing commit with bug number to user repo will post comment if enabled
     - author: default@example.com
       id: 13
       tags: []
-      text: http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central/rev/e48ee73711db
+      text:
+      - 'url:        http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central/rev/e48ee73711db53ffbde012f289787998e918ccba'
+      - 'changeset:  e48ee73711db53ffbde012f289787998e918ccba'
+      - 'user:       test'
+      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
+      - 'description:'
+      - Bug 7 - New changeset with bug.
     component: TestComponent
     depends_on: []
     platform: All
@@ -428,7 +464,13 @@ Verify cookie auth works
     - author: default@example.com
       id: 15
       tags: []
-      text: http://localhost:$HGPORT/integration/mozilla-inbound/rev/61dd85eacc29
+      text:
+      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/61dd85eacc29239f31fe4791555a17a8e4590904'
+      - 'changeset:  61dd85eacc29239f31fe4791555a17a8e4590904'
+      - 'user:       test'
+      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
+      - 'description:'
+      - Bug 8 - Test cookie auth
     component: TestComponent
     depends_on: []
     platform: All
