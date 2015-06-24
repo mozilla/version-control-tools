@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import bugsy
+import config
 import datetime
 import github
 import json
@@ -35,10 +36,7 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
     if not gh:
         return
 
-    with open('config.json') as f:
-        config = json.load(f)
-        bzurl = config['bugzilla']['url']
-        testing = config.get('testing', False)
+    bzurl = config.get('bugzilla')['url']
 
     cursor = dbconn.cursor()
 
@@ -83,7 +81,7 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
                 # Summary is required, the rest have defaults or are optional
                 bug.summary = title
 
-                if testing:
+                if config.testing():
                     bug.product = 'TestProduct'
                     bug.component = 'TestComponent'
                 else:
@@ -491,8 +489,7 @@ def get_dbconn(dsn):
 def main():
     parser = argparse.ArgumentParser()
 
-    with open('config.json') as f:
-        dsn = json.load(f)['database']
+    dsn = config.get('database')
 
     parser.add_argument('--dsn', default=dsn,
                         help="Postgresql DSN connection string")

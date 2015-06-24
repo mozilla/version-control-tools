@@ -1,3 +1,4 @@
+import config
 import github3
 import json
 import os
@@ -39,14 +40,10 @@ new file mode 100644
 
 
 def connect():
-    with open('config.json') as f:
-        config = json.load(f)
-        credentials = config['github']
-        testing = config.get('testing', False)
-
-    if testing:
+    if config.testing():
         return MockGithub3()
 
+    credentials = config.get('github')
     return github3.login(credentials['user'], password=credentials['passwd'])
 
 
@@ -61,7 +58,7 @@ def retrieve_issue(gh, user, repo, issue):
         return i.title, i.body
 
     return None, None
- 
+
 
 def retrieve_commits(gh, user, repo, pullrequest, path):
     commits = []

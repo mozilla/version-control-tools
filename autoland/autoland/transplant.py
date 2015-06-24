@@ -1,3 +1,4 @@
+import config
 import github
 import json
 import re
@@ -10,13 +11,7 @@ REPO_CONFIG = {}
 
 
 def get_repo_path(tree):
-    global REPO_CONFIG
-
-    if not REPO_CONFIG:
-        with open('config.json') as f:
-            REPO_CONFIG = json.load(f)['repos']
-
-    return REPO_CONFIG.get(tree, '.')
+    return config.get('repos').get(tree, '.')
 
 
 def formulate_hg_error(cmd, output):

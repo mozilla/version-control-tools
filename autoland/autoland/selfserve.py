@@ -1,4 +1,5 @@
 import bs4
+import config
 import json
 import requests
 
@@ -6,9 +7,7 @@ BUILDAPI_URL = 'https://secure.pub.build.mozilla.org/buildapi/self-serve'
 
 
 def read_credentials():
-    with open('config.json') as f:
-        selfserve = json.load(f)['selfserve']
-    return (selfserve['user'], selfserve['passwd'])
+    return config.get('selfserve')['user'], config.get('selfserve')['passwd']
 
 
 def job_status(auth, job_id):

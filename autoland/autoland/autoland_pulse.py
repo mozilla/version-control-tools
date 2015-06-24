@@ -12,6 +12,7 @@ from mozillapulse import consumers
 
 from mozlog.structured import commandline
 
+import config
 import selfserve
 
 # Some global variables that we need in the 'handle_message' callback
@@ -24,9 +25,7 @@ REV_LENGTH = 12
 
 
 def read_credentials():
-    with open('config.json') as f:
-        pulse = json.load(f)['pulse']
-        return pulse['user'], pulse['passwd']
+    return config.get('pulse')['user'], config.get('pulse')['passwd']
 
 
 def is_known_testrun(dbconn, tree, rev):

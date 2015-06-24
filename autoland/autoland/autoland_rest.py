@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import config
 import json
 import logging
 import os
@@ -9,8 +10,6 @@ from flask import Flask, request, jsonify, Response, abort, make_response
 
 from mozlog.structured import commandline
 
-AUTH = None
-DSN = None
 
 app = Flask(__name__, static_url_path='', static_folder='')
 
@@ -26,25 +25,12 @@ def internal_server_error(error):
 
 
 def get_dbconn():
-    global DSN
-
-    if not DSN:
-        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                               'config.json')) as f:
-            DSN = json.load(f)['database']
-
-    return psycopg2.connect(DSN)
+    return psycopg2.connect(config.get('database'))
 
 
 def check_auth(user, passwd):
-    global AUTH
-
-    if not AUTH:
-        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                               'config.json')) as f:
-            AUTH = json.load(f)['auth']
-
-    if user in AUTH and AUTH[user] == passwd:
+    auth = config.get('auth')
+    if user in auth and auth[user] == passwd:
         return True
 
 
@@ -284,7 +270,6 @@ def hi_there():
 def main():
     import argparse
 
-    global DSN
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8000,
                         help='Port on which to listen')

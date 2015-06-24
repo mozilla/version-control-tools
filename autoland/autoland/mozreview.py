@@ -1,11 +1,10 @@
+import config
 import json
 import requests
 
 
 def read_credentials():
-    with open('config.json') as f:
-        bugzilla = json.load(f)['bugzilla']
-    return (bugzilla['user'], bugzilla['passwd'])
+    return config.get('bugzilla')['user'], config.get('bugzilla')['passwd']
 
 
 def update_review(auth, pingback_url, data):
