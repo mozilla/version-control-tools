@@ -208,26 +208,21 @@ Granting Review via Ship It
    There is currently no equivalent to ``feedback+`` or cancelling
    reviews. This workflow is still being discussed.
 
-Two Types of Ship Its
----------------------
+Reviewing Commits
+-----------------
 
-A **Ship It** on a per-commit review request behaves different from a
-**Ship It** on a parent review request.
+Reviewers should review individual commits, since generally they will
+individually land as-is in the repository of record after review.
+Hence, a reviewer can only leave a **Ship It** on a commit review
+request.  This will change the corresponding ``review?`` attachment
+flag in Bugzilla to a ``review+`` (or create a new ``review+`` flag if
+the reviewer was not specifically requested for review).
 
-Since we only create a Bugzilla ``review?`` attachments/flags for the
-parent review request, setting **Ship It** on a per-commit review will
-not impact Bugzilla flags.
-
-For a ``review+`` flag to be set in Bugzilla, a **Ship It** review must
-be conducted on the parent review request. This means that you may have
-to grant an extra **Ship It** review in addition to granting **Ship It**
-on the individual commits.
-
-.. note::
-
-   The behavior of **Ship It** and how we manage review requests in
-   Bugzilla is a bit clumsy. It is very likely the workflow will change
-   over time. Proposals are very welcome.
+The **Ship It** functionality has been disabled on parent review
+requests.  While the parent review request (available from the **Review
+Summary** link on any commit review request) provides a collapsed view
+of all commits and can be useful to get a global view of the whole
+commit series, reviewers should generally not leave reviews on them.
 
 Working With "Patches"
 ----------------------
