@@ -201,28 +201,26 @@ Conversion to Bugzilla Comments
    the original comments there.)
 
 Granting Review via Ship It
-   There is a **Ship It** checkbox in the reviewer interface. This is
-   Review Board's way of granting review (``r+`` in Bugzilla
-   terminology).
+   There is a **Ship It** checkbox in the reviewer interface of each
+   commit review request. This is Review Board's way of granting
+   review (``r+`` in Bugzilla terminology). Since each commit has an
+   associated attachment with review flags in Bugzilla, they need to
+   be reviewed separately.
 
-   There is currently no equivalent to ``feedback+`` or cancelling
-   reviews. This workflow is still being discussed.
+   While the parent review request (available from the **Review
+   Summary** link on any commit review request) provides a collapsed
+   view of all commits and can be useful to get a global view of the
+   whole commit series, reviewers should generally not leave reviews
+   on it.
 
-Reviewing Commits
------------------
+   There is currently no equivalent to ``feedback+``. This workflow is
+   still being discussed.
 
-Reviewers should review individual commits, since generally they will
-individually land as-is in the repository of record after review.
-Hence, a reviewer can only leave a **Ship It** on a commit review
-request.  This will change the corresponding ``review?`` attachment
-flag in Bugzilla to a ``review+`` (or create a new ``review+`` flag if
-the reviewer was not specifically requested for review).
-
-The **Ship It** functionality has been disabled on parent review
-requests.  While the parent review request (available from the **Review
-Summary** link on any commit review request) provides a collapsed view
-of all commits and can be useful to get a global view of the whole
-commit series, reviewers should generally not leave reviews on them.
+Cancelling Reviews
+   If a reviewer leaves a review without a **Ship It**, an existing
+   ``r?`` or ``r+`` flag on the commit attachment will be cleared. The
+   flag will still be cleared even if the review does not open any
+   issues.
 
 Working With "Patches"
 ----------------------
