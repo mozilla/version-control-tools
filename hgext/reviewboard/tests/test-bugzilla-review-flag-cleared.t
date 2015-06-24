@@ -58,12 +58,11 @@ Sanity check to ensure we have a review flag set
     - author: author@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Initial commit to review
-  
-  
-        Bug 1 - Initial commit to review'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - ''
+      - Bug 1 - Initial commit to review
     component: TestComponent
     depends_on: []
     platform: All
@@ -102,24 +101,21 @@ Publishing a review will clear the r? flag
     - author: author@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Initial commit to review
-  
-  
-        Bug 1 - Initial commit to review'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - ''
+      - Bug 1 - Initial commit to review
     - author: reviewer@example.com
       id: 3
       tags: []
-      text: 'Comment on attachment 1
-  
-        MozReview Request: Bug 1 - Initial commit to review
-  
-  
-        http://*:$HGPORT1/r/2/#review1 (glob)
-  
-  
-        I have reservations'
+      text:
+      - Comment on attachment 1
+      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - ''
+      - http://*:$HGPORT1/r/2/#review1 (glob)
+      - ''
+      - I have reservations
     component: TestComponent
     depends_on: []
     platform: All
@@ -157,31 +153,28 @@ Posting a non Ship It review without a review flag adds a comment
     - author: author@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Initial commit to review
-  
-  
-        Bug 1 - Initial commit to review'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - ''
+      - Bug 1 - Initial commit to review
     - author: reviewer@example.com
       id: 3
       tags: []
-      text: 'Comment on attachment 1
-  
-        MozReview Request: Bug 1 - Initial commit to review
-  
-  
-        http://*:$HGPORT1/r/2/#review1 (glob)
-  
-  
-        I have reservations'
+      text:
+      - Comment on attachment 1
+      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - ''
+      - http://*:$HGPORT1/r/2/#review1 (glob)
+      - ''
+      - I have reservations
     - author: reviewer@example.com
       id: 4
       tags: []
-      text: 'http://*:$HGPORT1/r/2/#review2 (glob)
-  
-  
-        One more thing...'
+      text:
+      - http://*:$HGPORT1/r/2/#review2 (glob)
+      - ''
+      - One more thing...
     component: TestComponent
     depends_on: []
     platform: All

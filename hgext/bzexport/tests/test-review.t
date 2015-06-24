@@ -70,9 +70,9 @@ Specifying a reviewer by IRC nick works
     - author: default@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        Testing reviewer'
+      text:
+      - Created attachment 1
+      - Testing reviewer
     component: TestComponent
     depends_on: []
     platform: All
@@ -122,9 +122,9 @@ Parsing reviewer out of commit message works
     - author: default@example.com
       id: 4
       tags: []
-      text: 'Created attachment 2
-  
-        Auto reviewer'
+      text:
+      - Created attachment 2
+      - Auto reviewer
     component: TestComponent
     depends_on: []
     platform: All
@@ -193,15 +193,15 @@ Changing the reviewer works
     - author: default@example.com
       id: 6
       tags: []
-      text: 'Created attachment 3
-  
-        Switching reviewer'
+      text:
+      - Created attachment 3
+      - Switching reviewer
     - author: default@example.com
       id: 7
       tags: []
-      text: 'Created attachment 4
-  
-        Switching reviewer'
+      text:
+      - Created attachment 4
+      - Switching reviewer
     component: TestComponent
     depends_on: []
     platform: All
@@ -258,9 +258,9 @@ Specifying both reviewer and feedback works
     - author: default@example.com
       id: 9
       tags: []
-      text: 'Created attachment 5
-  
-        Review and feedback'
+      text:
+      - Created attachment 5
+      - Review and feedback
     component: TestComponent
     depends_on: []
     platform: All

@@ -81,21 +81,19 @@
     - author: default@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Foo 1
-  
-  
-        Bug 1 - Foo 1'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Foo 1'
+      - ''
+      - Bug 1 - Foo 1
     - author: default@example.com
       id: 3
       tags: []
-      text: 'Created attachment 2
-  
-        MozReview Request: Bug 1 - Foo 2
-  
-  
-        Bug 1 - Foo 2'
+      text:
+      - Created attachment 2
+      - 'MozReview Request: Bug 1 - Foo 2'
+      - ''
+      - Bug 1 - Foo 2
     component: TestComponent
     depends_on: []
     platform: All
@@ -212,21 +210,19 @@ The review attachment should be marked as obsolete
     - author: default@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Foo 1
-  
-  
-        Bug 1 - Foo 1'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Foo 1'
+      - ''
+      - Bug 1 - Foo 1
     - author: default@example.com
       id: 3
       tags: []
-      text: 'Created attachment 2
-  
-        MozReview Request: Bug 1 - Foo 2
-  
-  
-        Bug 1 - Foo 2'
+      text:
+      - Created attachment 2
+      - 'MozReview Request: Bug 1 - Foo 2'
+      - ''
+      - Bug 1 - Foo 2
     component: TestComponent
     depends_on: []
     platform: All
@@ -392,21 +388,19 @@ There should still not be a visible attachment on the bug
     - author: default@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Foo 1
-  
-  
-        Bug 1 - Foo 1'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Foo 1'
+      - ''
+      - Bug 1 - Foo 1
     - author: default@example.com
       id: 3
       tags: []
-      text: 'Created attachment 2
-  
-        MozReview Request: Bug 1 - Foo 2
-  
-  
-        Bug 1 - Foo 2'
+      text:
+      - Created attachment 2
+      - 'MozReview Request: Bug 1 - Foo 2'
+      - ''
+      - Bug 1 - Foo 2
     component: TestComponent
     depends_on: []
     platform: All
@@ -522,39 +516,35 @@ The attachment for the review request should be unobsoleted
     - author: default@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Foo 1
-  
-  
-        Bug 1 - Foo 1'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Foo 1'
+      - ''
+      - Bug 1 - Foo 1
     - author: default@example.com
       id: 3
       tags: []
-      text: 'Created attachment 2
-  
-        MozReview Request: Bug 1 - Foo 2
-  
-  
-        Bug 1 - Foo 2'
+      text:
+      - Created attachment 2
+      - 'MozReview Request: Bug 1 - Foo 2'
+      - ''
+      - Bug 1 - Foo 2
     - author: default@example.com
       id: 4
       tags: []
-      text: 'Comment on attachment 1
-  
-        MozReview Request: Bug 1 - Foo 1
-  
-  
-        Bug 1 - Foo 1'
+      text:
+      - Comment on attachment 1
+      - 'MozReview Request: Bug 1 - Foo 1'
+      - ''
+      - Bug 1 - Foo 1
     - author: default@example.com
       id: 5
       tags: []
-      text: 'Comment on attachment 2
-  
-        MozReview Request: Bug 1 - Foo 2
-  
-  
-        Bug 1 - Foo 2'
+      text:
+      - Comment on attachment 2
+      - 'MozReview Request: Bug 1 - Foo 2'
+      - ''
+      - Bug 1 - Foo 2
     component: TestComponent
     depends_on: []
     platform: All

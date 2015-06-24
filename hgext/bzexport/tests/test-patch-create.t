@@ -48,9 +48,9 @@ Uploading a simple patch to a bug works
     - author: default@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        First patch'
+      text:
+      - Created attachment 1
+      - First patch
     component: TestComponent
     depends_on: []
     platform: All
@@ -107,15 +107,15 @@ Updating the patch works
     - author: default@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        First patch'
+      text:
+      - Created attachment 1
+      - First patch
     - author: default@example.com
       id: 3
       tags: []
-      text: 'Created attachment 2
-  
-        First patch again'
+      text:
+      - Created attachment 2
+      - First patch again
     component: TestComponent
     depends_on: []
     platform: All
@@ -165,9 +165,9 @@ Uploading a new patch will reassign bug to you
     - author: original-author@example.com
       id: 5
       tags: []
-      text: 'Created attachment 3
-  
-        Initial author'
+      text:
+      - Created attachment 3
+      - Initial author
     component: TestComponent
     depends_on: []
     platform: All

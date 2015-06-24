@@ -58,17 +58,23 @@ The globbing is patching over a bug in mach
     - author: author@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Initial commit to review
-  
-  
-        Bug 1 - Initial commit to review'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - ''
+      - Bug 1 - Initial commit to review
     - author: author@example.com
       id: 3
       tags: []
-      text: "http://*:$HGPORT1/r/1/#review1\n\n::: foo:1\n(Diff revision 1)\n\ (glob)
-        > -foo\n> +initial\n\n\u3053\u3093\u306B\u3061\u306F\u4E16\u754C"
+      text:
+      - http://*:$HGPORT1/r/1/#review1 (glob)
+      - ''
+      - '::: foo:1'
+      - (Diff revision 1)
+      - '> -foo'
+      - '> +initial'
+      - ''
+      - "\u3053\u3093\u306B\u3061\u306F\u4E16\u754C"
     component: TestComponent
     depends_on: []
     platform: All

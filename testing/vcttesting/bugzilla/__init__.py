@@ -161,11 +161,17 @@ class Bugzilla(object):
             )
             r = self.client.request('bug/%s/comment' % bid).json()
             for comment in r['bugs'][bid]['comments']:
+                lines = comment['text'].splitlines()
+                if len(lines) > 1:
+                    ct = lines
+                else:
+                    ct = comment['text']
+
                 d['comments'].append(dict(
                     author=comment['author'],
                     id=comment['id'],
                     tags=sorted(comment['tags']),
-                    text=comment['text'],
+                    text=ct,
                 ))
 
             r = self.client.request('bug/%s/attachment' % bid).json()

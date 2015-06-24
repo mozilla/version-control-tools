@@ -139,9 +139,9 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
     - author: default@example.com
       id: 5
       tags: []
-      text: 'http://localhost:$HGPORT/integration/mozilla-inbound/rev/a224eb610808
-  
-        http://localhost:$HGPORT/integration/mozilla-inbound/rev/e3b5f3c3c45d'
+      text:
+      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/a224eb610808
+      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/e3b5f3c3c45d
     component: TestComponent
     depends_on: []
     platform: All

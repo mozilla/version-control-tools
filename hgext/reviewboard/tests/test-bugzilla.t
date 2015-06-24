@@ -80,12 +80,11 @@ Publishing the review will add an attachment to the bug
     - author: default@example.com
       id: 3
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Foo 1
-  
-  
-        Bug 1 - Foo 1'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Foo 1'
+      - ''
+      - Bug 1 - Foo 1
     component: TestComponent
     depends_on: []
     platform: All

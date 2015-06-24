@@ -63,12 +63,11 @@ Adding a reviewer should result in a r? flag being set
     - author: author@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Initial commit to review
-  
-  
-        Bug 1 - Initial commit to review'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - ''
+      - Bug 1 - Initial commit to review
     component: TestComponent
     depends_on: []
     platform: All
@@ -112,24 +111,21 @@ Adding a "Ship It" review will grant r+
     - author: author@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Initial commit to review
-  
-  
-        Bug 1 - Initial commit to review'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - ''
+      - Bug 1 - Initial commit to review
     - author: reviewer@example.com
       id: 3
       tags: []
-      text: 'Comment on attachment 1
-  
-        MozReview Request: Bug 1 - Initial commit to review
-  
-  
-        http://*:$HGPORT1/r/2/#review1 (glob)
-  
-  
-        LGTM'
+      text:
+      - Comment on attachment 1
+      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - ''
+      - http://*:$HGPORT1/r/2/#review1 (glob)
+      - ''
+      - LGTM
     component: TestComponent
     depends_on: []
     platform: All
@@ -173,31 +169,28 @@ Adding a reply to the review will add a comment to Bugzilla
     - author: author@example.com
       id: 2
       tags: []
-      text: 'Created attachment 1
-  
-        MozReview Request: Bug 1 - Initial commit to review
-  
-  
-        Bug 1 - Initial commit to review'
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - ''
+      - Bug 1 - Initial commit to review
     - author: reviewer@example.com
       id: 3
       tags: []
-      text: 'Comment on attachment 1
-  
-        MozReview Request: Bug 1 - Initial commit to review
-  
-  
-        http://*:$HGPORT1/r/2/#review1 (glob)
-  
-  
-        LGTM'
+      text:
+      - Comment on attachment 1
+      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - ''
+      - http://*:$HGPORT1/r/2/#review1 (glob)
+      - ''
+      - LGTM
     - author: author@example.com
       id: 4
       tags: []
-      text: 'http://*:$HGPORT1/r/2/#review2 (glob)
-  
-  
-        Thanks!'
+      text:
+      - http://*:$HGPORT1/r/2/#review2 (glob)
+      - ''
+      - Thanks!
     component: TestComponent
     depends_on: []
     platform: All
@@ -262,12 +255,11 @@ in the tests.
     - author: author@example.com
       id: 6
       tags: []
-      text: 'Created attachment 2
-  
-        MozReview Request: Bug 2 - Multiple reviewers
-  
-  
-        Bug 2 - Multiple reviewers'
+      text:
+      - Created attachment 2
+      - 'MozReview Request: Bug 2 - Multiple reviewers'
+      - ''
+      - Bug 2 - Multiple reviewers
     component: TestComponent
     depends_on: []
     platform: All
@@ -315,21 +307,19 @@ Removing a reviewer should remove their review flag
     - author: author@example.com
       id: 6
       tags: []
-      text: 'Created attachment 2
-  
-        MozReview Request: Bug 2 - Multiple reviewers
-  
-  
-        Bug 2 - Multiple reviewers'
+      text:
+      - Created attachment 2
+      - 'MozReview Request: Bug 2 - Multiple reviewers'
+      - ''
+      - Bug 2 - Multiple reviewers
     - author: author@example.com
       id: 7
       tags: []
-      text: 'Comment on attachment 2
-  
-        MozReview Request: Bug 2 - Multiple reviewers
-  
-  
-        Bug 2 - Multiple reviewers'
+      text:
+      - Comment on attachment 2
+      - 'MozReview Request: Bug 2 - Multiple reviewers'
+      - ''
+      - Bug 2 - Multiple reviewers
     component: TestComponent
     depends_on: []
     platform: All
@@ -372,30 +362,27 @@ Removing all reviewers should remove all flags
     - author: author@example.com
       id: 6
       tags: []
-      text: 'Created attachment 2
-  
-        MozReview Request: Bug 2 - Multiple reviewers
-  
-  
-        Bug 2 - Multiple reviewers'
+      text:
+      - Created attachment 2
+      - 'MozReview Request: Bug 2 - Multiple reviewers'
+      - ''
+      - Bug 2 - Multiple reviewers
     - author: author@example.com
       id: 7
       tags: []
-      text: 'Comment on attachment 2
-  
-        MozReview Request: Bug 2 - Multiple reviewers
-  
-  
-        Bug 2 - Multiple reviewers'
+      text:
+      - Comment on attachment 2
+      - 'MozReview Request: Bug 2 - Multiple reviewers'
+      - ''
+      - Bug 2 - Multiple reviewers
     - author: author@example.com
       id: 8
       tags: []
-      text: 'Comment on attachment 2
-  
-        MozReview Request: Bug 2 - Multiple reviewers
-  
-  
-        Bug 2 - Multiple reviewers'
+      text:
+      - Comment on attachment 2
+      - 'MozReview Request: Bug 2 - Multiple reviewers'
+      - ''
+      - Bug 2 - Multiple reviewers
     component: TestComponent
     depends_on: []
     platform: All
@@ -460,24 +447,21 @@ review? sticks around when 1 person grants review
     - author: author@example.com
       id: 10
       tags: []
-      text: 'Created attachment 3
-  
-        MozReview Request: Bug 3 - More multiple reviewers
-  
-  
-        Bug 3 - More multiple reviewers'
+      text:
+      - Created attachment 3
+      - 'MozReview Request: Bug 3 - More multiple reviewers'
+      - ''
+      - Bug 3 - More multiple reviewers
     - author: reviewer@example.com
       id: 11
       tags: []
-      text: 'Comment on attachment 3
-  
-        MozReview Request: Bug 3 - More multiple reviewers
-  
-  
-        http://*:$HGPORT1/r/6/#review3 (glob)
-  
-  
-        land it!'
+      text:
+      - Comment on attachment 3
+      - 'MozReview Request: Bug 3 - More multiple reviewers'
+      - ''
+      - http://*:$HGPORT1/r/6/#review3 (glob)
+      - ''
+      - land it!
     component: TestComponent
     depends_on: []
     platform: All
@@ -541,24 +525,21 @@ Random users can come along and grant review
     - author: author@example.com
       id: 13
       tags: []
-      text: 'Created attachment 4
-  
-        MozReview Request: Bug 4 - Unrelated Reviewers
-  
-  
-        Bug 4 - Unrelated Reviewers'
+      text:
+      - Created attachment 4
+      - 'MozReview Request: Bug 4 - Unrelated Reviewers'
+      - ''
+      - Bug 4 - Unrelated Reviewers
     - author: troll@example.com
       id: 14
       tags: []
-      text: 'Comment on attachment 4
-  
-        MozReview Request: Bug 4 - Unrelated Reviewers
-  
-  
-        http://*:$HGPORT1/r/8/#review4 (glob)
-  
-  
-        I am always watching'
+      text:
+      - Comment on attachment 4
+      - 'MozReview Request: Bug 4 - Unrelated Reviewers'
+      - ''
+      - http://*:$HGPORT1/r/8/#review4 (glob)
+      - ''
+      - I am always watching
     component: TestComponent
     depends_on: []
     platform: All
@@ -667,30 +648,27 @@ Test interaction with multiple commits.
     - author: author@example.com
       id: 16
       tags: []
-      text: 'Created attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        Bug 5 - Parent reviews'
+      text:
+      - Created attachment 5
+      - 'MozReview Request: Bug 5 - Parent reviews'
+      - ''
+      - Bug 5 - Parent reviews
     - author: author@example.com
       id: 17
       tags: []
-      text: 'Created attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        Bug 5 - Parent reviews, second commit'
+      text:
+      - Created attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - Bug 5 - Parent reviews, second commit
     - author: author@example.com
       id: 18
       tags: []
-      text: 'Created attachment 7
-  
-        MozReview Request: Bug 5 - Parent reviews, third commit
-  
-  
-        Bug 5 - Parent reviews, third commit'
+      text:
+      - Created attachment 7
+      - 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      - ''
+      - Bug 5 - Parent reviews, third commit
     component: TestComponent
     depends_on: []
     platform: All
@@ -781,42 +759,37 @@ Verify that a single ship-it r+s only that attachment.
     - author: author@example.com
       id: 16
       tags: []
-      text: 'Created attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        Bug 5 - Parent reviews'
+      text:
+      - Created attachment 5
+      - 'MozReview Request: Bug 5 - Parent reviews'
+      - ''
+      - Bug 5 - Parent reviews
     - author: author@example.com
       id: 17
       tags: []
-      text: 'Created attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        Bug 5 - Parent reviews, second commit'
+      text:
+      - Created attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - Bug 5 - Parent reviews, second commit
     - author: author@example.com
       id: 18
       tags: []
-      text: 'Created attachment 7
-  
-        MozReview Request: Bug 5 - Parent reviews, third commit
-  
-  
-        Bug 5 - Parent reviews, third commit'
+      text:
+      - Created attachment 7
+      - 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      - ''
+      - Bug 5 - Parent reviews, third commit
     - author: reviewer@example.com
       id: 19
       tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review5 (glob)
-  
-  
-        land it!'
+      text:
+      - Comment on attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - http://*:$HGPORT1/r/11/#review5 (glob)
+      - ''
+      - land it!
     component: TestComponent
     depends_on: []
     platform: All
@@ -906,54 +879,47 @@ A non-ship-it review on a child should clear only that attachment's r+.
     - author: author@example.com
       id: 16
       tags: []
-      text: 'Created attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        Bug 5 - Parent reviews'
+      text:
+      - Created attachment 5
+      - 'MozReview Request: Bug 5 - Parent reviews'
+      - ''
+      - Bug 5 - Parent reviews
     - author: author@example.com
       id: 17
       tags: []
-      text: 'Created attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        Bug 5 - Parent reviews, second commit'
+      text:
+      - Created attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - Bug 5 - Parent reviews, second commit
     - author: author@example.com
       id: 18
       tags: []
-      text: 'Created attachment 7
-  
-        MozReview Request: Bug 5 - Parent reviews, third commit
-  
-  
-        Bug 5 - Parent reviews, third commit'
+      text:
+      - Created attachment 7
+      - 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      - ''
+      - Bug 5 - Parent reviews, third commit
     - author: reviewer@example.com
       id: 19
       tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review5 (glob)
-  
-  
-        land it!'
+      text:
+      - Comment on attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - http://*:$HGPORT1/r/11/#review5 (glob)
+      - ''
+      - land it!
     - author: reviewer@example.com
       id: 20
       tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review7 (glob)
-  
-  
-        there is a problem'
+      text:
+      - Comment on attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - http://*:$HGPORT1/r/11/#review7 (glob)
+      - ''
+      - there is a problem
     component: TestComponent
     depends_on: []
     platform: All
@@ -1033,66 +999,57 @@ A non-ship-it review on a child should also clear the attachment's r?.
     - author: author@example.com
       id: 16
       tags: []
-      text: 'Created attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        Bug 5 - Parent reviews'
+      text:
+      - Created attachment 5
+      - 'MozReview Request: Bug 5 - Parent reviews'
+      - ''
+      - Bug 5 - Parent reviews
     - author: author@example.com
       id: 17
       tags: []
-      text: 'Created attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        Bug 5 - Parent reviews, second commit'
+      text:
+      - Created attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - Bug 5 - Parent reviews, second commit
     - author: author@example.com
       id: 18
       tags: []
-      text: 'Created attachment 7
-  
-        MozReview Request: Bug 5 - Parent reviews, third commit
-  
-  
-        Bug 5 - Parent reviews, third commit'
+      text:
+      - Created attachment 7
+      - 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      - ''
+      - Bug 5 - Parent reviews, third commit
     - author: reviewer@example.com
       id: 19
       tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review5 (glob)
-  
-  
-        land it!'
+      text:
+      - Comment on attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - http://*:$HGPORT1/r/11/#review5 (glob)
+      - ''
+      - land it!
     - author: reviewer@example.com
       id: 20
       tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review7 (glob)
-  
-  
-        there is a problem'
+      text:
+      - Comment on attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - http://*:$HGPORT1/r/11/#review7 (glob)
+      - ''
+      - there is a problem
     - author: reviewer2@example.com
       id: 21
       tags: []
-      text: 'Comment on attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        http://*:$HGPORT1/r/10/#review8 (glob)
-  
-  
-        this is not good'
+      text:
+      - Comment on attachment 5
+      - 'MozReview Request: Bug 5 - Parent reviews'
+      - ''
+      - http://*:$HGPORT1/r/10/#review8 (glob)
+      - ''
+      - this is not good
     component: TestComponent
     depends_on: []
     platform: All
@@ -1172,73 +1129,64 @@ A non-ship-it review on a parent should post a comment only.
     - author: author@example.com
       id: 16
       tags: []
-      text: 'Created attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        Bug 5 - Parent reviews'
+      text:
+      - Created attachment 5
+      - 'MozReview Request: Bug 5 - Parent reviews'
+      - ''
+      - Bug 5 - Parent reviews
     - author: author@example.com
       id: 17
       tags: []
-      text: 'Created attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        Bug 5 - Parent reviews, second commit'
+      text:
+      - Created attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - Bug 5 - Parent reviews, second commit
     - author: author@example.com
       id: 18
       tags: []
-      text: 'Created attachment 7
-  
-        MozReview Request: Bug 5 - Parent reviews, third commit
-  
-  
-        Bug 5 - Parent reviews, third commit'
+      text:
+      - Created attachment 7
+      - 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      - ''
+      - Bug 5 - Parent reviews, third commit
     - author: reviewer@example.com
       id: 19
       tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review5 (glob)
-  
-  
-        land it!'
+      text:
+      - Comment on attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - http://*:$HGPORT1/r/11/#review5 (glob)
+      - ''
+      - land it!
     - author: reviewer@example.com
       id: 20
       tags: []
-      text: 'Comment on attachment 6
-  
-        MozReview Request: Bug 5 - Parent reviews, second commit
-  
-  
-        http://*:$HGPORT1/r/11/#review7 (glob)
-  
-  
-        there is a problem'
+      text:
+      - Comment on attachment 6
+      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - ''
+      - http://*:$HGPORT1/r/11/#review7 (glob)
+      - ''
+      - there is a problem
     - author: reviewer2@example.com
       id: 21
       tags: []
-      text: 'Comment on attachment 5
-  
-        MozReview Request: Bug 5 - Parent reviews
-  
-  
-        http://*:$HGPORT1/r/10/#review8 (glob)
-  
-  
-        this is not good'
+      text:
+      - Comment on attachment 5
+      - 'MozReview Request: Bug 5 - Parent reviews'
+      - ''
+      - http://*:$HGPORT1/r/10/#review8 (glob)
+      - ''
+      - this is not good
     - author: reviewer2@example.com
       id: 22
       tags: []
-      text: 'http://*:$HGPORT1/r/9/#review9 (glob)
-  
-  
-        actually none of this is good'
+      text:
+      - http://*:$HGPORT1/r/9/#review9 (glob)
+      - ''
+      - actually none of this is good
     component: TestComponent
     depends_on: []
     platform: All
