@@ -20,18 +20,6 @@ create table MozreviewPullRequest (\
 );
 grant all privileges on table MozreviewPullRequest to autoland;
 
-create table Testrun (\
-    tree varchar(20),\
-    revision varchar(40),\
-    pending integer,\
-    running integer,\
-    builds integer,\
-    can_be_landed boolean,\
-    last_updated timestamp,\
-    primary key(tree, revision)\
-);
-grant all privileges on table Testrun to autoland;
-
 create table Transplant (\
     id bigint default nextval('request_sequence'),\
     tree varchar(20),\
