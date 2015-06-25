@@ -80,5 +80,5 @@ Test the uncommited changes made it to our remote (with the right bits set).
   @@ -0,0 +1,1 @@
   +line1
 
-  $ stat file2.txt --format '%a'
-  755
+  $ if [ -x file2.txt ]; then echo "executable"; fi
+  executable
