@@ -133,7 +133,8 @@ def update_parent_rr_reviewers(parent_rr_draft):
         parent_rr_draft.target_people = total_reviewers
         parent_rr_draft.extra_data[REVIEWER_MAP_KEY] = json.dumps(reviewers_map_after)
 
-        if parent_rr_draft.changedesc is None:
+        parent_rr = parent_rr_draft.get_review_request()
+        if parent_rr.public and parent_rr_draft.changedesc is None:
             parent_rr_draft.changedesc = ChangeDescription.objects.create()
 
         parent_rr_draft.save()
