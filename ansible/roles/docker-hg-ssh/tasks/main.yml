@@ -67,6 +67,9 @@
 - name: install bundleclone extension
   copy: src={{ vct }}/hgext/bundleclone/__init__.py dest=/repo/hg/extensions/bundleclone/__init__.py
 
+- name: install pushrebase extension
+  copy: src={{ vct }}/hgext/pushrebase/__init__.py dest=/repo/hg/extensions/pushrebase.py
+
 - name: install hooks
   copy: src={{ vct }}/hghooks/mozhghooks/{{ item }} dest=/repo/hg/libraries/mozhghooks/{{ item }} owner=root group=root mode=0644
   with_items:
