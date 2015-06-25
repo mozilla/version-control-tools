@@ -94,8 +94,7 @@ class BugzillaBackend(AuthBackend):
                           % username)
             return None
 
-        if not cookie:
-            (user.bzlogin, user.bzcookie) = bugzilla.cookies()
+        (user.bzlogin, user.bzcookie) = bugzilla.cookies()
 
         return user
 
