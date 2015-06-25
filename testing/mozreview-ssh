@@ -10,9 +10,10 @@ import os
 import sys
 
 
-username = os.environ.get('BUGZILLA_USERNAME')
+username = os.environ.get('SSH_KEYNAME',
+                          os.environ.get('BUGZILLA_USERNAME'))
 if not username:
-    print('BUGZILLA_USERNAME must be defined')
+    print('BUGZILLA_USERNAME or SSH_KEYNAME must be defined')
     sys.exit(1)
 
 key_path = os.path.join(os.environ['MOZREVIEW_HOME'], 'keys', username)
