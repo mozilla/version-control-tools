@@ -128,6 +128,7 @@ Review request 6 should be added to the list of discard on publish rids.
   target_people: []
   extra_data:
     p2rb: true
+    p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
       3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
       5], ["76088734e3cba33be80930be14e7cd1e9ee474be", 6]]'
@@ -153,6 +154,7 @@ Review request 6 should be added to the list of discard on publish rids.
     target_people: []
     extra:
       p2rb: true
+      p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
         3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
         5]]'
@@ -313,6 +315,7 @@ request is published.
   target_people: []
   extra_data:
     p2rb: true
+    p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
       3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
       5]]'
@@ -337,6 +340,7 @@ request is published.
     target_people: []
     extra:
       p2rb: true
+      p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.commits: '[["e1679d43acebff4b173624488cdf4b5eff1ccd94", 2], ["13cf6665548ad20d8cb7eed42c3ffc1c7689939f",
         3], ["b891c874875b046c191a868d55830aa201b28ebe", 4]]'
       p2rb.discard_on_publish_rids: '[]'

@@ -30,7 +30,9 @@ from mozreview.autoland.views import import_pullrequest
 from mozreview.batchreview.resources import batch_review_resource
 from mozreview.extra_data import (get_parent_rr, is_parent, is_pushed,
                                   update_parent_rr_reviewers)
-from mozreview.fields import (CombinedReviewersField, CommitsListField,
+from mozreview.fields import (BaseCommitField,
+                              CombinedReviewersField,
+                              CommitsListField,
                               TryField)
 from mozreview.hooks import MozReviewApprovalHook
 from mozreview.ldap.resources import ldap_association_resource
@@ -160,6 +162,7 @@ class MozReviewExtension(Extension):
         # fields are fine below the Description.
         ReviewRequestFieldsHook(self, 'main', [CombinedReviewersField])
         ReviewRequestFieldsHook(self, 'main', [TryField])
+        ReviewRequestFieldsHook(self, 'main', [BaseCommitField])
 
         # Use a custom method to calculate a review approval state.
         MozReviewApprovalHook(self)

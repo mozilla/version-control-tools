@@ -80,6 +80,63 @@ class CommitsListField(BaseReviewRequestField):
             'children_details': children_details,
         }))
 
+class BaseCommitField(BaseReviewRequestField):
+    """Field for the commit a review request is based on.
+
+    This field stores the base commit that a parent review request is
+    based on (the parent commit of the first commit in the series).
+
+    A change in this value indicates that the review request series
+    has been rebased or some of the commits in the request have been
+    landed/submitted.
+    """
+    field_id = "p2rb.base_commit"
+    label = _("Base Commit")
+    can_record_change_entry = True
+
+    def should_render(self, value):
+        return (is_pushed(self.review_request_details) and
+                is_parent(self.review_request_details) and
+                False) # TODO: Remove and render hg web link to the base commit.
+
+    def get_change_entry_sections_html(self, info):
+        """Render changes in the base commit as rebases."""
+        old = info.get('old', [None])[0]
+        new = info.get('new', [None])[0]
+
+        if old is None or new is None:
+            # We should always have an old base commit and a new
+            # base commit, except for review requests which were
+            # in flight when this field landed. We'll ignore this
+            # case as it should be rare.
+            return []
+
+        # TODO: When we start partially landing commit series the
+        # base commit may change to one of the landed commits
+        # meaning we'd have a difference here but it wasn't actually
+        # a rebase.
+        return [{
+            'title': 'Rebase',
+            'rendered_html': mark_safe(self.render_change_entry_html(info)),
+        }]
+
+    def render_change_entry_html(self, info):
+        """Render the change of base commit as a rebase."""
+        old_value = info['old'][0]
+        new_value = info['new'][0]
+        repo_path = self._get_repo_path()
+
+        return get_template('mozreview/changedesc-rebase.html').render(Context({
+            'old_base': old_value,
+            'new_base': new_value,
+            'repo_path': repo_path,
+        }))
+
+    def _get_repo_path(self):
+        """Retrieve the path for the repository associated with this request."""
+        review_request = self.review_request_details.get_review_request()
+        return review_request.repository.path.rstrip('/')
+
 
 class TryField(BaseReviewRequestField):
     """The field for kicking off Try builds and showing Try state.

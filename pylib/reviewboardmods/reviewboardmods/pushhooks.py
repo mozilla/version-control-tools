@@ -416,6 +416,11 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
         'depends_on': depends,
         'extra_data.p2rb.commits': commit_list_json,
     }
+
+    if 'base_commit_id' in commits['squashed']:
+        props['extra_data.p2rb.base_commit'] = (
+            commits['squashed']['base_commit_id'])
+
     if squashed_reviewers:
         props['target_people'] = ','.join(sorted(squashed_reviewers))
     squashed_draft = squashed_rr.get_or_create_draft(**props)

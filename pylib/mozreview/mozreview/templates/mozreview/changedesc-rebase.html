@@ -1,0 +1,27 @@
+{% comment %}
+This is the template for rebases shown in the parent review
+request's change description.
+
+We expect the following context arguments:
+ - old_base: The sha of the old base commit.
+ - new_base: The sha of the new base commit.
+ - repo_path: The base path of the repository to link to.
+{% endcomment %}
+<table class="changed">
+  <tr class="old-value">
+    <th class="marker">from</th>
+    <td class="value">
+      <a href="{{ repo_path }}/rev/{{ old_base|escape }}">
+        {{ old_base|escape }}
+      </a>
+    </td>
+  </tr>
+  <tr class="new-value">
+    <th class="marker">to</th>
+    <td class="value">
+      <a href="{{ repo_path }}/rev/{{ new_base|escape }}">
+        {{ new_base|escape }}
+      </a>
+    </td>
+  </tr>
+</table>
