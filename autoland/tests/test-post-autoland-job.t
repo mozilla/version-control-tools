@@ -3,6 +3,11 @@
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv
 
+Ensure Autoland started without errors
+
+  $ mozreview exec autoland tail -n 20 /home/ubuntu/autoland.log
+   0:00.00 LOG: MainThread INFO starting autoland
+
 Posting a job with bad credentials should fail
 
   $ ottoland post-autoland-job $AUTOLAND_URL mozilla-central 1 try http://localhost:9898 --user blah --password blah
