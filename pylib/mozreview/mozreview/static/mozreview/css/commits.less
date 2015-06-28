@@ -22,12 +22,51 @@
 
 #mozreview-child-requests {
   width: 100%;
+  table-layout: fixed;
   border-spacing: 0px;
   border-collapse: collapse;
   margin-top:10px;
+  min-width: 600px;
 
-  & > thead > tr {
-    text-align: left;
+  & > thead,
+  & > tbody {
+    display:block;
+
+    & > tr {
+      display: flex;
+      text-align: left;
+
+      & > td,
+      & > th {
+        display: inline-block;
+      }
+
+      & > .diff {
+        flex: 0 1;
+        min-width: 100px;
+      }
+
+      & > .status {
+        flex: 0 2;
+        min-width: 50px;
+      }
+
+      & > .truncate_text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      & > .reviews {
+        flex: 5 0;
+        min-width: 300px;
+      }
+
+      & > .reviewers {
+        flex: 4 1;
+        min-width: 100px;
+      }
+    }
   }
 
   & > tbody > tr {
@@ -36,7 +75,6 @@
   & > tbody > tr[current="true"],
   & > tbody > tr:hover {
     background-color: #d4e0f3;
-    border: 1px solid grey;
   }
 
    td,
@@ -47,22 +85,6 @@
 
    & > thead > tr {
      background: transparent url("/static/mozreview/header_bg.png") repeat-x scroll left bottom;
-   }
-
-   & > tbody td.mozreview_min_length {
-     width: 1px;
-   }
-
-   & a.mozreview_commit_summary {
-     width: 300px;
-   }
-
-   & > tbody td.truncate_text a,
-   & > tbody td.truncate_text span{
-     white-space: nowrap;
-     overflow: hidden;
-     text-overflow: ellipsis;
-     display: inline-block;
    }
 
    & > tbody td > a.commit_sha {

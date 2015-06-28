@@ -21,24 +21,24 @@ This is the template for the "Commits" list in a push-based review request.
   <table id="mozreview-child-requests">
     <thead>
     <tr>
-      <th>{% trans "Diff" %}</th>
-      <th>{% trans "Reviews" %}</th>
+      <th class="diff">{% trans "Diff" %}</th>
+      <th class="reviews">{% trans "Reviews" %}</th>
       {% comment "TODO: show this column when the commit author will be available" %}
-      <th>{% trans "Submitter" %}</th>
+      <th class="submitter">{% trans "Submitter" %}</th>
       {% endcomment %}
-      <th>{% trans "Reviewers" %}</th>
-      <th><div class="rb-icon rb-icon-shipit" title="Ship It!"></div></th>
+      <th class="reviewers">{% trans "Reviewers" %}</th>
+      <th class="status"><div class="rb-icon rb-icon-shipit" title="Ship It!"></div></th>
     </tr>
     </thead>
     {% for child_details in children_details %}
     <tr {% if child_details.get_review_request.id = review_request_details.get_review_request.id %}current="true"{% endif %}>
-      <td class="mozreview_min_length">
+      <td class="diff">
         <a title="See diff for commit {{child_details.extra_data|getitem:"p2rb.commit_id"|slice:":12"}}"
            class="commit_sha" href="{{child_details.get_review_request.get_absolute_url}}diff/#index_header">
           {{child_details.extra_data|getitem:"p2rb.commit_id"|slice:":12"}}
         </a>
       </td>
-      <td class="truncate_text mozreview_min_length">
+      <td class="reviews truncate_text">
         <a class="mozreview_commit_summary" title="{{ child_details.summary}}" href="{{child_details.get_review_request.get_absolute_url}}">
           {{ child_details.summary }}
         </a>
@@ -46,11 +46,11 @@ This is the template for the "Commits" list in a push-based review request.
       {% comment "TODO: show this column when the commit author will be available" %}
       <td>{{ child_details.submitter }}</td>
       {% endcomment %}
-      <td>
+      <td class="reviewers">
         <span class="mozreview-child-reviewer-list"
               data-id="{{child_details.get_review_request.id}}">{{ child_details.target_people.all|join:", " }}</span>
       </td>
-      <td class="mozreview_min_length">
+      <td class="status">
         {% if child_details.get_review_request.issue_open_count > 0 %}
         <span class="issue-count"> <span class="issue-icon">!</span> {{child_details.get_review_request.issue_open_count}}</span>
         {% elif child_details.get_review_request.shipit_count > 0 %}
