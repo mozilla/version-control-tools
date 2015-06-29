@@ -191,4 +191,4 @@ def prune_inactive_users(commit=False, verbose=False):
         while User.objects.exclude(id__in=active_uids).count():
             ids = User.objects.exclude(id__in=active_uids).values_list(
                 'id', flat=True)[:500]
-            User.objects.filter(id__in = ids).delete()
+            User.objects.filter(id__in=list(ids)).delete()
