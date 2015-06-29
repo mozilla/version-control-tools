@@ -90,6 +90,12 @@
 - name: install the cronjob that runs the user repo wsgi file creation script
   cron: minute="*/2" user=hg job="/usr/local/bin/make_user_wsgi_dirs.sh" name="Generate user wsgi files"
 
+# These files were historically managed by hand and developed
+# inconsistent ownership. Ensure they have consistent and proper
+# ownership.
+- name: set ownership of wsgi files
+  command: /bin/chown -R hg:hg /repo/hg/webroot_wsgi
+
 # Create and manage log resources
 - name: make logdir
   file: path=/var/log/httpd/hg.mozilla.org state=directory mode=0755
