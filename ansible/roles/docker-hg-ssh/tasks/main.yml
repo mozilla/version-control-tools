@@ -89,6 +89,13 @@
     - whitelist_qa.py
     - whitelist_releng.py
 
+- name: ensure mozhghooks directory is importable
+  file: path=/repo/hg/libraries/mozhghooks/__init__.py
+        state=touch
+        owner=root
+        group=root
+        mode=0644
+
 - name: Install push scripts
   copy: src={{ vct }}/scripts/{{ item }} dest=/repo/hg/scripts/{{ item }} mode=0755
   with_items:
