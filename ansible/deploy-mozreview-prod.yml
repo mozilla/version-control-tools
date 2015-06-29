@@ -23,7 +23,7 @@
            channel="#mozreview"
            nick=mozreview-deploy-bot
            color=red
-           msg="Production deployment of MozReview initiated"
+           msg="Production deployment of MozReview initiated from rev {{ lookup('file', '../.vctnode') }}"
 
     - include: tasks/install-mozreview.yml
 
