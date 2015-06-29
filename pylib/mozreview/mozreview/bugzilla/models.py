@@ -2,11 +2,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import datetime
 import re
 
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, transaction
 from reviewboard.accounts.models import Profile
+from reviewboard.reviews.models import ReviewRequest
+
 
 # Note that Review Board only allows a subset of legal IRC-nick characters.
 # Specifically, Review Board does not allow [ \ ] ^ ` { | }
@@ -104,3 +107,88 @@ def get_or_create_bugzilla_users(user_data):
 
         users.append(user)
     return users
+
+
+def prune_inactive_users(commit=False, verbose=False):
+    """Delete inactive users.
+
+    We will delete users which have not done any of the following:
+    - created a review request
+    - been asked to review a request
+    - submitted a review
+    - logged in since their account was created
+
+    By default, this function will perform a dry run and will only
+    commit the user deletion to the database if the commit argument
+    is True.
+    """
+    MAX_LOGIN_DIFFERENCE = datetime.timedelta(0,1) # 1 second
+    SPECIAL_USERNAMES = [
+        'admin',
+        'mozreview',
+    ]
+    SPECIAL_EMAILS = [
+        'autoland@mozilla.bugs',
+        'mozreview+python@mozilla-com.bugs',
+    ]
+
+    active_uids = set()
+    print('Gathering active users.')
+    # There's more efficient ways to do this. But we're optimized for one-time
+    # uses, so performance isn't critical.
+    for rr in ReviewRequest.objects.all():
+        active_uids.add(rr.submitter.id)
+
+        for u in rr.target_people.all():
+            active_uids.add(u.id)
+
+        for u in rr.participants:
+            active_uids.add(u.id)
+
+        draft = rr.get_draft()
+        if draft:
+            for u in draft.target_people.all():
+                active_uids.add(u.id)
+
+    print('%s active users after review request checks.' % len(active_uids))
+
+    for u in User.objects.filter(email__in=SPECIAL_EMAILS):
+        active_uids.add(u.id)
+
+    print('%s active users after special email checks.' % len(active_uids))
+
+    for u in User.objects.filter(username__in=SPECIAL_USERNAMES):
+        active_uids.add(u.id)
+
+    print('%s active users after special username checks.' % len(active_uids))
+
+    for u in User.objects.all():
+        if (u.date_joined - u.last_login) > MAX_LOGIN_DIFFERENCE:
+            active_uids.add(u.id)
+
+    print('%s active users after login time checks.' % len(active_uids))
+
+    print('Detected %s active users.' % len(active_uids))
+
+    if verbose:
+        print('Active Users:')
+        for u in User.objects.filter(id__in=active_uids).order_by('id',
+                                                                  'email'):
+            print('\t%s - %s - %s' % (u.id, u.email, u.first_name))
+
+    print('Detected %s inactive users.' %
+          User.objects.exclude(id__in=active_uids).count())
+
+    if not commit:
+        return
+
+    print('Performing user deletion.')
+    # Now delete all of the inactive users inside of
+    # a transaction.
+    with transaction.atomic():
+        BugzillaUserMap.objects.exclude(user__id__in=active_uids).delete()
+
+        while User.objects.exclude(id__in=active_uids).count():
+            ids = User.objects.exclude(id__in=active_uids).values_list(
+                'id', flat=True)[:500]
+            User.objects.filter(id__in = ids).delete()
