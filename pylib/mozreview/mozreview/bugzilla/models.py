@@ -188,6 +188,9 @@ def prune_inactive_users(commit=False, verbose=False):
     with transaction.atomic():
         BugzillaUserMap.objects.exclude(user__id__in=active_uids).delete()
 
+        from mozreview.models import MozReviewUserProfile
+        MozReviewUserProfile.objects.exclude(user__id__in=active_uids).delete()
+
         while User.objects.exclude(id__in=active_uids).count():
             ids = User.objects.exclude(id__in=active_uids).values_list(
                 'id', flat=True)[:500]
