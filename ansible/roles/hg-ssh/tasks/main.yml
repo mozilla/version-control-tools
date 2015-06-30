@@ -1,4 +1,11 @@
 ---
+# yum will incur network traffic when URLs are specified. Download the
+# package locally first so we can run offline after initial bootstrap.
+- name: download Mercurial package
+  get_url: url=https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm
+           dest=/var/tmp/mercurial-3.4.1-0.x86_64.rpm
+           sha256sum=4e6190232ae217aacc894c0baf8e61900cb55d4ee0406a09a22b70cb9c6dfbd0
+
 - name: Install packages required to run a Mercurial server
   yum: name={{ item }} state=present
   with_items:
@@ -6,7 +13,7 @@
     - sudo
     - syslog
     - tar
-    - https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm
+    - /var/tmp/mercurial-3.4.1-0.x86_64.rpm
 
 - name: Create groups for SCM ACLs
   group: name={{ item.name }} gid={{ item.gid }}

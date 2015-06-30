@@ -1,9 +1,21 @@
 ---
+# yum will incur network traffic when URLs are specified. Download the
+# package locally first so we can run offline after initial bootstrap.
+- name: download Mercurial package
+  get_url: url=https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm
+           dest=/var/tmp/mercurial-3.4.1-0.x86_64.rpm
+           sha256sum=4e6190232ae217aacc894c0baf8e61900cb55d4ee0406a09a22b70cb9c6dfbd0
+
+- name: download mod_wsgi package
+  get_url: url=https://people.mozilla.org/~gszorc/mod_wsgi-4.4.8-1.el6.x86_64.rpm
+           dest=/var/tmp/mod_wsgi-4.4.8-1.el6.x86_64.rpm
+           sha256sum=e2f7e3daad0db47aa875a56a24a2132e5b33211fe78c8bf7b15d6d9bcf0a3cc5
+
 # Measurements revealed that the yum module is slow and adds a few seconds
 # overhead to invocations. So, we use low-level commands, which execute
 # much faster.
 - name: System packages installed
-  command: /usr/bin/yum -y install openldap-clients openldap-devel sudo syslog https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm https://people.mozilla.org/~gszorc/mod_wsgi-4.4.8-1.el6.x86_64.rpm
+  command: /usr/bin/yum -y install openldap-clients openldap-devel sudo syslog /var/tmp/mercurial-3.4.1-0.x86_64.rpm /var/tmp/mod_wsgi-4.4.8-1.el6.x86_64.rpm
 
 - name: Python package dependencies
   pip: requirements={{ vct }}/ansible/roles/hg-reviewboard/files/requirements.txt

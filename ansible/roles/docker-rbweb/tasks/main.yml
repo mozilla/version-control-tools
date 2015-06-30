@@ -2,9 +2,16 @@
 - name: Create Review Board user
   user: name=reviewboard
 
+# yum will incur network traffic when URLs are specified. Download the
+# package locally first so we can run offline after initial bootstrap.
+- name: download Mercurial package
+  get_url: url=https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm
+           dest=/var/tmp/mercurial-3.4.1-0.x86_64.rpm
+           sha256sum=4e6190232ae217aacc894c0baf8e61900cb55d4ee0406a09a22b70cb9c6dfbd0
+
 # The yum module is slow. Run commands manually.
 - name: System packages installed
-  command: /usr/bin/yum install -y memcached mod_wsgi patch https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm
+  command: /usr/bin/yum install -y memcached mod_wsgi patch /var/tmp/mercurial-3.4.1-0.x86_64.rpm
 
 # The kill-wsgi-procs support script requires psutil, which isn't part of
 # the MozReview virtualenv. Install it as a one-off
