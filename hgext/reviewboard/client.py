@@ -81,6 +81,16 @@ clientcapabilities = {
 }
 
 
+def commonrequestlines(ui, bzauth=None):
+    """Obtain a list of lines common in protocol requests."""
+    lines = ['1']
+
+    for p in ('username', 'password', 'userid', 'cookie'):
+        if getattr(bzauth, p, None):
+            lines.append('bz%s %s' % (p, urllib.quote(getattr(bzauth, p))))
+
+    return lines
+
 def getreviewcaps(remote):
     """Obtain a set of review capabilities from the server.
 
@@ -441,14 +451,8 @@ def doreview(repo, ui, remote, nodes):
                     'http://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview-user.html)\n'))
                 break
 
-    lines = [
-        '1',
-        'reviewidentifier %s' % urllib.quote(identifier.full),
-    ]
-
-    for p in ('username', 'password', 'userid', 'cookie'):
-        if getattr(bzauth, p, None):
-            lines.append('bz%s %s' % (p, urllib.quote(getattr(bzauth, p))))
+    lines = commonrequestlines(ui, bzauth)
+    lines.append('reviewidentifier %s' % urllib.quote(identifier.full))
 
     reviews = repo.reviews
     oldparentid = reviews.findparentreview(identifier=identifier.full)
@@ -572,7 +576,7 @@ def _pullreviewidentifiers(repo, identifiers):
         raise util.Abort('cannot pull code review metadata; '
                          'server lacks necessary features')
 
-    lines = ['1']
+    lines = commonrequestlines(repo.ui)
     for identifier in identifiers:
         lines.append('reviewid %s' % identifier)
 
