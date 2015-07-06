@@ -18,7 +18,17 @@ def xmlrpc_to_bugzilla_errors(func):
         try:
             return func(*args, **kwargs)
         except xmlrpclib.Fault as e:
-            raise BugzillaError(e.faultString, e.faultCode)
+            if e.faultCode == 307:
+                # The Bugzilla error message about expired cookies and tokens
+                # is a little confusing in the context of MozReview. Override
+                # it with one that makes more sense to users.
+                fault_string = ('MozReview\'s Bugzilla session has expired. '
+                                'Please log out of Review Board and back in, '
+                                'and then retry your action.')
+            else:
+                fault_string = e.faultString
+
+            raise BugzillaError(fault_string, e.faultCode)
         except xmlrpclib.ProtocolError as e:
             raise BugzillaError('ProtocolError: %s' % e.errmsg, e.errcode)
         except IOError as e:
