@@ -241,7 +241,7 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
         else:
             raise util.Abort(_('do not know how to talk to this remote type\n'))
 
-        return wrappedpush(orig, repo, newremote, force=False, revs=None,
+        return wrappedpush(orig, repo, newremote, force=False, revs=revs,
                            newbranch=False, **kwargs)
 
     ircnick = repo.ui.config('mozilla', 'ircnick', None)
