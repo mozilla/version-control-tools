@@ -228,8 +228,6 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
             parent_diff=commit.get('parent_diff', None),
             base_commit_id=commit.get('base_commit_id', None))
 
-        return rr
-
     # TODO: We need to take into account the commits data from the squashed
     # review request's draft. This data represents the mapping from commit
     # to rid in the event that we would have published. We're overwritting
@@ -348,21 +346,9 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
             'extra_data.p2rb': 'True',
             'extra_data.p2rb.is_squashed': 'False',
             'extra_data.p2rb.identifier': identifier,
-            'extra_data.p2rb.commit_id': commit['id'],
             'repository': repoid,
         })
-        rr.get_diffs().upload_diff(
-            commit['diff'],
-            parent_diff=commit.get('parent_diff', None),
-            base_commit_id=commit.get('base_commit_id', None))
-        props = {
-            "summary": commit['message'].splitlines()[0],
-            "description": commit['message'],
-        }
-        reviewers = extract_reviewers(commit)
-        if reviewers:
-            props["target_people"] = ','.join(reviewers)
-        draft = rr.get_or_create_draft(**props)
+        update_review_request(rr, commit)
         processed_nodes.add(commit['id'])
         assert isinstance(rr.id, int)
         node_to_rid[node] = rr.id
