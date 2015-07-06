@@ -88,6 +88,12 @@ def commonrequestlines(ui, bzauth=None):
     """Obtain a list of lines common in protocol requests."""
     lines = ['%d' % PROTOVERSION]
 
+    # Tell the server we support examining capabilities.
+    #
+    # This is behind a config flag to facilitate testing.
+    if ui.configbool('reviewboard', 'supportscaps', True):
+        lines.append('supportscaps 1')
+
     for p in ('username', 'password', 'userid', 'cookie'):
         if getattr(bzauth, p, None):
             lines.append('bz%s %s' % (p, urllib.quote(getattr(bzauth, p))))

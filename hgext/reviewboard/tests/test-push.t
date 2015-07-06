@@ -403,6 +403,25 @@ We disallow completely empty revisions.
   abort: not reviewing empty revision 1bcdd587da6e. please add content.
   [255]
 
+Old client not supporting capabilities is rejected
+
+  $ hg up -q -r 0
+  $ echo oldclient > foo
+  $ hg commit -m 'Bug 1 - old client'
+  created new head
+  $ hg --config reviewboard.supportscaps=false push
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
+  submitting 1 changesets for review
+  abort: Your reviewboard client extension is too old and does not support newer features. Please pull and update your version-control-tools repo. Firefox users: run `mach mercurial-setup`.
+  [255]
+
 Cleanup
 
   $ mozreview stop

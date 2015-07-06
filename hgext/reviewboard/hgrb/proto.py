@@ -120,6 +120,8 @@ def parsepayload(proto, args):
         'other': []
     }
 
+    supportscaps = False
+
     for line in lines:
         t, d = line.split(' ', 1)
 
@@ -131,8 +133,19 @@ def parsepayload(proto, args):
             o['bzuserid'] = urllib.unquote(d)
         elif t == 'bzcookie':
             o['bzcookie'] = urllib.unquote(d)
+        elif t == 'supportscaps':
+            # Value isn't relevant.
+            supportscaps = True
         else:
             o['other'].append((t, d))
+
+    if not supportscaps:
+        return ServerError(
+            _('Your reviewboard client extension is too old and does not '
+              'support newer features. Please pull and update your '
+              'version-control-tools repo. '
+              'Firefox users: run `mach mercurial-setup`.'))
+
 
     return o
 
