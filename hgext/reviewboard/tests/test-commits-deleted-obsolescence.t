@@ -106,7 +106,8 @@ Popping the last commit truncates the review set
   review:     http://*:$HGPORT1/r/5 (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
   [1]
 
 Review request 6 should be in the list of review requests to discard
@@ -271,18 +272,19 @@ be preserved.
   
   changeset:  10:e1679d43aceb
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   changeset:  11:13cf6665548a
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/4 (glob)
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
   changeset:  12:b891c874875b
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/5 (glob)
+  review:     http://*:$HGPORT1/r/5 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
 
 Review request 2 should be in the list of review requests to discard
 on publish.
@@ -407,10 +409,11 @@ Try removing a commit in the middle.
   
   changeset:  13:74896d4d6f00
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/5 (glob)
+  review:     http://*:$HGPORT1/r/5 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
 
   $ rbmanage publish 1
 

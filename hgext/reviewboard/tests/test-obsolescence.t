@@ -71,10 +71,11 @@ Now create a new head and push a rebase
   
   changeset:  4:15cedbc6da54
   summary:    foo2
-  review:     http://*:$HGPORT1/r/2 (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
 
 Cleanup
 

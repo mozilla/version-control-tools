@@ -236,7 +236,6 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
         Some values may be unicode, not str.
         """
         rd = {
-            'public': rr.public,
             'status': rr.status,
         }
 
@@ -249,6 +248,7 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
                 raise
 
         rd['reviewers'] = [p.title for p in thing.target_people]
+        rd['public'] = thing.public
 
         return rd
 

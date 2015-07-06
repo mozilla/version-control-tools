@@ -107,7 +107,9 @@ Pushing no changesets will do a re-review
   [1]
 
 Pushing no changesets will do a re-review but will not reset a published
-review back to draft (See Bug 1096761)
+review back to draft (See bugs 1096761 and 1179552).
+TODO the behavior here is not correct: a new parent draft should not be
+created if all the review requests didn't change
 
   $ rbmanage publish 1
   $ hg push -r f422841a13f8 --reviewid 1
@@ -121,7 +123,8 @@ review back to draft (See Bug 1096761)
   review:     http://*:$HGPORT1/r/2 (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
   [1]
 
 Pushing patches from mq will result in a warning

@@ -100,18 +100,19 @@
   
   changeset:  8:dac4214a563a
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   changeset:  9:5b936d238262
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   changeset:  10:ae82743c8863
   summary:    Bug 1 - Foo 5
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
 
 Cleanup
 

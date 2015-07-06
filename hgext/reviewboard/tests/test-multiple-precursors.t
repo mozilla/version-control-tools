@@ -75,14 +75,15 @@ Splitting the changeset results in multiple reviews
   
   changeset:  3:c5bd6809e957
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/2 (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   changeset:  4:f142ef54f825
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
 
 Cleanup
 

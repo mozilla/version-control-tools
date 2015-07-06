@@ -101,7 +101,8 @@ Popping the last commit truncates the review set
   review:     http://*:$HGPORT1/r/5 (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
   [1]
 
 Review request 6 should be added to the list of discard on publish rids.
@@ -234,18 +235,19 @@ likely gets invalidated.
   
   changeset:  1:e1679d43aceb
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/2 (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   changeset:  2:13cf6665548a
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/3 (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   changeset:  3:b891c874875b
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/4 (glob)
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
 
 The first commit was rewritten (we assume all subsequent were as well).
 
@@ -400,10 +402,11 @@ Try removing a commit in the middle.
   
   changeset:  2:74896d4d6f00
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/3 (glob)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
 
   $ mozreview stop
   stopped 8 containers

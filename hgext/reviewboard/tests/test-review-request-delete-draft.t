@@ -56,10 +56,11 @@ Now publish the review and create a new draft
   
   changeset:  1:b3be3d464d6b
   summary:    Bug 1 - Initial commit
-  review:     http://*:$HGPORT1/r/2 (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (visit review url to publish this review request so others can see it)
 
 We should have a disagreement between published and draft
 
