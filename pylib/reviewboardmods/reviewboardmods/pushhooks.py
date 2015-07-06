@@ -208,8 +208,11 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
 
         return sorted(reviewers)
 
-    def update_review_request(rid, commit):
-        rr = api_root.get_review_request(review_request_id=rid)
+    def update_review_request(rr, commit):
+        """Synchronize the state of a review request with a commit.
+
+        Updates the commit message, refreshes the diff, etc.
+        """
         props = {
             "summary": commit['message'].splitlines()[0],
             "description": commit['message'],
@@ -292,7 +295,8 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
             del remaining_nodes[precursor]
             unclaimed_rids.remove(rid)
 
-            rr = update_review_request(rid, commit)
+            rr = api_root.get_review_request(review_request_id=rid)
+            update_review_request(rr, commit)
             processed_nodes.add(node)
             node_to_rid[node] = rid
             review_requests[rid] = rr
@@ -325,7 +329,8 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
         if unclaimed_rids:
             assumed_old_rid = unclaimed_rids[0]
             unclaimed_rids.pop(0)
-            rr = update_review_request(assumed_old_rid, commit)
+            rr = api_root.get_review_request(review_request_id=assumed_old_rid)
+            update_review_request(rr, commit)
             processed_nodes.add(commit['id'])
             node_to_rid[node] = assumed_old_rid
             review_requests[assumed_old_rid] = rr
