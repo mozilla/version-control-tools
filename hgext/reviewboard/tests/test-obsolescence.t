@@ -39,7 +39,7 @@ Set up the repo
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
 
   $ rbmanage publish 1
 
@@ -75,7 +75,7 @@ Now create a new head and push a rebase
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
 
 Cleanup
 

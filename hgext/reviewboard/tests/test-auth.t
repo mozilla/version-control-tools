@@ -69,7 +69,7 @@ Pushing using cookie auth works
   
   review id:  bz://1/goodcookie
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
   [1]
 
 Pushing using username password auth works
@@ -86,7 +86,7 @@ Pushing using username password auth works
   
   review id:  bz://1/gooduserpass
   review url: http://*:$HGPORT1/r/3 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
   [1]
 
 Pushing as a user not in Review Board should auto create the RB account
@@ -113,7 +113,7 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
   
   review id:  bz://1/nonick
   review url: http://*:$HGPORT1/r/5 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
   [1]
 
   $ exportbzauth user2@example.com password2
@@ -129,7 +129,7 @@ The other has Mozilla IRC syntax: "First Last [:nick]"
   
   review id:  bz://1/withnick
   review url: http://*:$HGPORT1/r/7 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
   [1]
 
 Usernames for users without the IRC nick syntax are based on email fragment and BZ user id
@@ -204,7 +204,7 @@ Changing the IRC nickname in Bugzilla will update the RB username
   
   review id:  bz://1/user2newnick
   review url: http://*:$HGPORT1/r/9 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
   [1]
 
   $ rbmanage dump-user newnick
@@ -235,7 +235,7 @@ Changing the email address in Bugzilla will update the RB email
   
   review id:  bz://1/user2newemail
   review url: http://*:$HGPORT1/r/11 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
   [1]
 
   $ rbmanage dump-user newnick
@@ -281,7 +281,7 @@ Re-enabling a disabled user will allow them to use Review Board
   
   review id:  bz://1/undisableduser
   review url: http://*:$HGPORT1/r/13 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
   [1]
 
 If a new Review Board user claims the same IRC nick as an existing user,
@@ -304,7 +304,7 @@ we fall back to non-IRC RB usernames.
   
   review id:  bz://1/conflictingircnick
   review url: http://*:$HGPORT1/r/15 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
   [1]
 
 (Recycling user2 for this test is a bit dangerous. We should consider
@@ -389,7 +389,7 @@ user, they will be assigned the email+id username.
   
   review id:  bz://1/user2sharednick
   review url: http://*:$HGPORT1/r/19 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
   [1]
 
   $ exportbzauth user3@example.com password3

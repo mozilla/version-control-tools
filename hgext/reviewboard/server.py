@@ -79,6 +79,7 @@ def capabilities(orig, repo, proto):
     if repo.ui.configint('reviewboard', 'repoid', None):
         reviewcaps.add('pushreview')
         reviewcaps.add('pullreviews')
+        reviewcaps.add('publish')
 
         # Deprecated.
         caps.append('reviewboard')

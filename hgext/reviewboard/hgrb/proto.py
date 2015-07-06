@@ -418,3 +418,43 @@ def pullreviews(repo, proto, args=None):
     assert isinstance(res, str)
 
     return res
+
+@wireproto.wireprotocommand('publishreviewrequests', '*')
+def publishreviewseries(repo, proto, args=None):
+    """Publish review requests.
+
+    Payload consists of line-delimited metadata, just like other commands.
+    Entries for "reviewid %d" correspond to review requests that will be
+    published as part of the request.
+
+    Note: MozReview will publish all children when publishing a parent review
+    request.
+    """
+    from rbtools.api.errors import APIError
+
+    proto.redirect()
+
+    o = parsepayload(proto, args)
+    if isinstance(o, ServerError):
+        return formatresponse(str(o))
+
+    root = getrbapi(repo, o)
+
+    lines = ['1']
+
+    for k, v in o['other']:
+        if k != 'reviewid':
+            continue
+
+        rrid = urllib.unquote(v)
+        try:
+            rr = root.get_review_request(review_request_id=rrid)
+            draft = rr.get_draft()
+            draft.update(public=True)
+            lines.append('success %s' % rrid)
+        except APIError as e:
+            lines.append('error %s %s' % (rrid, str(e)))
+
+    res = '\n'.join(lines)
+    assert isinstance(res, str)
+    return res

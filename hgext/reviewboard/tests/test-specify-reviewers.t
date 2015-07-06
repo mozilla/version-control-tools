@@ -5,8 +5,10 @@
 
 Enable obsolescence so we can test code paths which use it.
 
-  $ echo "[experimental]" >> client/.hg/hgrc
-  $ echo "evolution = all" >> client/.hg/hgrc
+  $ cat >> client/.hg/hgrc << EOF
+  > [experimental]
+  > evolution = all
+  > EOF
 
 Create an initial commit.
 
@@ -52,7 +54,9 @@ Try a bunch of different ways of specifying a reviewer
   $ hg commit -m 'Bug 1 - More stuff; [r?remus, r?romulus]'
   $ echo blah >> foo
   $ hg commit -m 'Bug 1 - More stuff; r?romulus, a=test-only'
-  $ hg push
+  $ hg --config ui.interactive=true push << EOF
+  > n
+  > EOF
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   (adding commit id to 10 changesets)
   searching for changes
@@ -107,7 +111,9 @@ Try a bunch of different ways of specifying a reviewer
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  
+  publish this review request now (Yn)? n
+  (visit review url to publish this review series so others can see it)
 
   $ rbmanage list-reviewers 2 --draft
   romulus
@@ -146,76 +152,8 @@ The review state file should have reviewers recorded
   reviewers remus,romulus
   status pending
 
-Amending a commit should also work. This exercises the update_review_request
-code path.
+Publishing series during push works
 
-  $ echo blah >> foo
-  $ hg commit --amend -m 'Bug 1 - Even more stuff; r?romulus, r?remus'
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
-  searching for changes
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
-  submitting 10 changesets for review
-  
-  changeset:  11:fcf566e4c32a
-  summary:    Bug 1 - some stuff; r?romulus
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
-  
-  changeset:  12:c62a829e2f0a
-  summary:    Bug 1 - More stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
-  
-  changeset:  13:955576a13e6c
-  summary:    Bug 1 - More stuff; r?romulus,r?remus
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
-  
-  changeset:  14:696e908c00aa
-  summary:    Bug 1 - More stuff; r?romulus, remus
-  review:     http://*:$HGPORT1/r/5 (draft) (glob)
-  
-  changeset:  15:92e037a5e92f
-  summary:    Bug 1 - More stuff; r?romulus,remus
-  review:     http://*:$HGPORT1/r/6 (draft) (glob)
-  
-  changeset:  16:a7c3071c6b54
-  summary:    Bug 1 - More stuff; (r?romulus)
-  review:     http://*:$HGPORT1/r/7 (draft) (glob)
-  
-  changeset:  17:7b03b2560ab0
-  summary:    Bug 1 - More stuff; (r?romulus,remus)
-  review:     http://*:$HGPORT1/r/8 (draft) (glob)
-  
-  changeset:  18:42c4d67a510e
-  summary:    Bug 1 - More stuff; [r?romulus]
-  review:     http://*:$HGPORT1/r/9 (draft) (glob)
-  
-  changeset:  19:2bc874a070ce
-  summary:    Bug 1 - More stuff; [r?remus, r?romulus]
-  review:     http://*:$HGPORT1/r/10 (draft) (glob)
-  
-  changeset:  22:f70fd1f0a35e
-  summary:    Bug 1 - Even more stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/11 (draft) (glob)
-  
-  review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
- 
-  $ rbmanage list-reviewers 11 --draft
-  remus, romulus
-
-We should not overwrite manually added reviewers when the revision is pushed
-again.
-
-  $ rbmanage add-reviewer 11 --user admin+1
-  3 people listed on review request
-  $ rbmanage list-reviewers 11 --draft
-  admin+1, remus, romulus
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
@@ -258,21 +196,167 @@ again.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
+  changeset:  20:9138f440ecac
+  summary:    Bug 1 - More stuff; r?romulus, a=test-only
+  review:     http://*:$HGPORT1/r/11 (draft) (glob)
+  
+  review id:  bz://1/mynick
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  
+  publish this review request now (Yn)? y
+  (published review request 1)
+  [1]
+
+  $ rbmanage dumpreview 10
+  id: 10
+  status: pending
+  public: true
+  bugs:
+  - '1'
+  commit: null
+  submitter: default+5
+  summary: Bug 1 - More stuff; [r?remus, r?romulus]
+  description: Bug 1 - More stuff; [r?remus, r?romulus]
+  target_people:
+  - remus
+  - romulus
+  extra_data:
+    p2rb: true
+    p2rb.commit_id: 2bc874a070cef1ff62b63e28f3d40a81655fec77
+    p2rb.identifier: bz://1/mynick
+    p2rb.is_squashed: false
+
+Amending a commit should also work. This exercises the update_review_request
+code path.
+
+  $ echo blah >> foo
+  $ hg commit --amend -m 'Bug 1 - Even more stuff; r?romulus, r?remus'
+  $ hg push
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
+  submitting 10 changesets for review
+  
+  changeset:  11:fcf566e4c32a
+  summary:    Bug 1 - some stuff; r?romulus
+  review:     http://*:$HGPORT1/r/2 (glob)
+  
+  changeset:  12:c62a829e2f0a
+  summary:    Bug 1 - More stuff; r?romulus, r?remus
+  review:     http://*:$HGPORT1/r/3 (glob)
+  
+  changeset:  13:955576a13e6c
+  summary:    Bug 1 - More stuff; r?romulus,r?remus
+  review:     http://*:$HGPORT1/r/4 (glob)
+  
+  changeset:  14:696e908c00aa
+  summary:    Bug 1 - More stuff; r?romulus, remus
+  review:     http://*:$HGPORT1/r/5 (glob)
+  
+  changeset:  15:92e037a5e92f
+  summary:    Bug 1 - More stuff; r?romulus,remus
+  review:     http://*:$HGPORT1/r/6 (glob)
+  
+  changeset:  16:a7c3071c6b54
+  summary:    Bug 1 - More stuff; (r?romulus)
+  review:     http://*:$HGPORT1/r/7 (glob)
+  
+  changeset:  17:7b03b2560ab0
+  summary:    Bug 1 - More stuff; (r?romulus,remus)
+  review:     http://*:$HGPORT1/r/8 (glob)
+  
+  changeset:  18:42c4d67a510e
+  summary:    Bug 1 - More stuff; [r?romulus]
+  review:     http://*:$HGPORT1/r/9 (glob)
+  
+  changeset:  19:2bc874a070ce
+  summary:    Bug 1 - More stuff; [r?remus, r?romulus]
+  review:     http://*:$HGPORT1/r/10 (glob)
+  
   changeset:  22:f70fd1f0a35e
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
-  [1]
+  
+  publish this review request now (Yn)? y
+  (published review request 1)
+ 
+  $ rbmanage list-reviewers 11
+  remus, romulus
+
+We should not overwrite manually added reviewers when the revision is pushed
+again.
+
+  $ rbmanage add-reviewer 11 --user admin+1
+  3 people listed on review request
   $ rbmanage list-reviewers 11 --draft
+  admin+1, remus, romulus
+  $ hg push
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  searching for changes
+  no changes found
+  submitting 10 changesets for review
+  
+  changeset:  11:fcf566e4c32a
+  summary:    Bug 1 - some stuff; r?romulus
+  review:     http://*:$HGPORT1/r/2 (glob)
+  
+  changeset:  12:c62a829e2f0a
+  summary:    Bug 1 - More stuff; r?romulus, r?remus
+  review:     http://*:$HGPORT1/r/3 (glob)
+  
+  changeset:  13:955576a13e6c
+  summary:    Bug 1 - More stuff; r?romulus,r?remus
+  review:     http://*:$HGPORT1/r/4 (glob)
+  
+  changeset:  14:696e908c00aa
+  summary:    Bug 1 - More stuff; r?romulus, remus
+  review:     http://*:$HGPORT1/r/5 (glob)
+  
+  changeset:  15:92e037a5e92f
+  summary:    Bug 1 - More stuff; r?romulus,remus
+  review:     http://*:$HGPORT1/r/6 (glob)
+  
+  changeset:  16:a7c3071c6b54
+  summary:    Bug 1 - More stuff; (r?romulus)
+  review:     http://*:$HGPORT1/r/7 (glob)
+  
+  changeset:  17:7b03b2560ab0
+  summary:    Bug 1 - More stuff; (r?romulus,remus)
+  review:     http://*:$HGPORT1/r/8 (glob)
+  
+  changeset:  18:42c4d67a510e
+  summary:    Bug 1 - More stuff; [r?romulus]
+  review:     http://*:$HGPORT1/r/9 (glob)
+  
+  changeset:  19:2bc874a070ce
+  summary:    Bug 1 - More stuff; [r?remus, r?romulus]
+  review:     http://*:$HGPORT1/r/10 (glob)
+  
+  changeset:  22:f70fd1f0a35e
+  summary:    Bug 1 - Even more stuff; r?romulus, r?remus
+  review:     http://*:$HGPORT1/r/11 (draft) (glob)
+  
+  review id:  bz://1/mynick
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  
+  publish this review request now (Yn)? y
+  (published review request 1)
+  [1]
+  $ rbmanage list-reviewers 11
   admin+1, remus, romulus
 
 We should not overwrite manually added reviewers if the revision is amended 
 and pushed with no reviewers specified.
 
-  $ rbmanage list-reviewers 11 --draft
+  $ rbmanage list-reviewers 11
   admin+1, remus, romulus
   $ echo blah >> foo
   $ hg commit --amend -m 'Bug 1 - Amended stuff'
@@ -289,39 +373,39 @@ and pushed with no reviewers specified.
   
   changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://*:$HGPORT1/r/2 (glob)
   
   changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://*:$HGPORT1/r/3 (glob)
   
   changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://*:$HGPORT1/r/4 (glob)
   
   changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
-  review:     http://*:$HGPORT1/r/5 (draft) (glob)
+  review:     http://*:$HGPORT1/r/5 (glob)
   
   changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
-  review:     http://*:$HGPORT1/r/6 (draft) (glob)
+  review:     http://*:$HGPORT1/r/6 (glob)
   
   changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
-  review:     http://*:$HGPORT1/r/7 (draft) (glob)
+  review:     http://*:$HGPORT1/r/7 (glob)
   
   changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
-  review:     http://*:$HGPORT1/r/8 (draft) (glob)
+  review:     http://*:$HGPORT1/r/8 (glob)
   
   changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
-  review:     http://*:$HGPORT1/r/9 (draft) (glob)
+  review:     http://*:$HGPORT1/r/9 (glob)
   
   changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
-  review:     http://*:$HGPORT1/r/10 (draft) (glob)
+  review:     http://*:$HGPORT1/r/10 (glob)
   
   changeset:  24:4a950181ffd8
   summary:    Bug 1 - Amended stuff
@@ -329,9 +413,11 @@ and pushed with no reviewers specified.
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  
+  publish this review request now (Yn)? y
+  (published review request 1)
 
-  $ rbmanage list-reviewers 11 --draft
+  $ rbmanage list-reviewers 11
   admin+1, remus, romulus
 
 Amending a commit with reviewers specified will reset the reviewers back to
@@ -352,39 +438,39 @@ those specified in the commit summary.
   
   changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://*:$HGPORT1/r/2 (glob)
   
   changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://*:$HGPORT1/r/3 (glob)
   
   changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://*:$HGPORT1/r/4 (glob)
   
   changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
-  review:     http://*:$HGPORT1/r/5 (draft) (glob)
+  review:     http://*:$HGPORT1/r/5 (glob)
   
   changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
-  review:     http://*:$HGPORT1/r/6 (draft) (glob)
+  review:     http://*:$HGPORT1/r/6 (glob)
   
   changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
-  review:     http://*:$HGPORT1/r/7 (draft) (glob)
+  review:     http://*:$HGPORT1/r/7 (glob)
   
   changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
-  review:     http://*:$HGPORT1/r/8 (draft) (glob)
+  review:     http://*:$HGPORT1/r/8 (glob)
   
   changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
-  review:     http://*:$HGPORT1/r/9 (draft) (glob)
+  review:     http://*:$HGPORT1/r/9 (glob)
   
   changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
-  review:     http://*:$HGPORT1/r/10 (draft) (glob)
+  review:     http://*:$HGPORT1/r/10 (glob)
   
   changeset:  26:3ec3b449ccca
   summary:    Bug 1 - Amended stuff; r?romulus, r?remus
@@ -392,8 +478,11 @@ those specified in the commit summary.
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
-  $ rbmanage list-reviewers 11 --draft
+  
+  publish this review request now (Yn)? y
+  (published review request 1)
+
+  $ rbmanage list-reviewers 11
   remus, romulus
 
 Unrecognized reviewers should be ignored
@@ -420,10 +509,10 @@ Unrecognized reviewers should be ignored
   
   review id:  bz://2/mynick
   review url: http://*:$HGPORT1/r/12 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
   $ rbmanage list-reviewers 12 --draft
   
- 
+
 Using r= for a patch under review instead of r? should result in a warning
 from the client.
 
@@ -451,9 +540,8 @@ from the client.
   
   review id:  bz://2/mynick
   review url: http://*:$HGPORT1/r/12 (draft) (glob)
-  (visit review url to publish this review request so others can see it)
- 
- 
+  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+
 Cleanup
 
   $ mozreview stop

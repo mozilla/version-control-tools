@@ -544,6 +544,8 @@ def doreview(repo, ui, remote, nodes):
     for rid, data in reviewdata.iteritems():
         reviews.savereviewrequest(rid, data)
 
+    havedraft = False
+
     ui.write('\n')
     for node in nodes:
         rid = nodereviews[node]
@@ -559,20 +561,70 @@ def doreview(repo, ui, remote, nodes):
                 ' whether or not review has been granted.)\n'))
         ui.write('review:     %s' % reviews.reviewurl(rid))
         if reviewdata[rid].get('public') == 'False':
+            havedraft = True
             ui.write(' (draft)')
         ui.write('\n\n')
 
-    isdraft = reviewdata[newparentid].get('public', None) == 'False'
     ui.write(_('review id:  %s\n') % identifier.full)
     ui.write(_('review url: %s') % reviews.parentreviewurl(identifier.full))
-    if isdraft:
+    if reviewdata[newparentid].get('public', None) == 'False':
+        havedraft = True
         ui.write(' (draft)')
     ui.write('\n')
 
+    havereviewers = bool(nodes)
+    for node in nodes:
+        rd = reviewdata[nodereviews[node]]
+        if not rd.get('reviewers', None):
+            havereviewers = False
+            break
+
     # Make it clear to the user that they need to take action in order for
     # others to see this review series.
-    if isdraft:
-        ui.status(_('(visit review url to publish this review request so others can see it)\n'))
+    if havedraft:
+        # If the series is ready for publishing, prompt the user to perform the
+        # publishing.
+        if havereviewers:
+            caps = getreviewcaps(remote)
+            if 'publish' in caps:
+                ui.write('\n')
+                publish = ui.promptchoice(
+                    _('publish this review request now (Yn)? $$ &Yes $$ &No'))
+                if publish == 0:
+                    publishreviewrequests(ui, remote, bzauth, [newparentid])
+                else:
+                    ui.status(_('(visit review url to publish this review '
+                                'series so others can see it)\n'))
+            else:
+                ui.status(_('(visit review url to publish this review series '
+                            'so others can see it)\n'))
+        else:
+            ui.status(_('(review requests lack reviewers; visit review url '
+                        'to assign reviewers and publish this series)\n'))
+
+def publishreviewrequests(ui, remote, bzauth, rrids):
+    """Publish an iterable of review requests."""
+    lines = commonrequestlines(ui, bzauth)
+    for rrid in rrids:
+        lines.append('reviewid %s' % rrid)
+
+    res = remote._call('publishreviewrequests', data='\n'.join(lines))
+    lines = getpayload(res)
+    errored = False
+
+    for line in lines:
+        k, v = line.split(' ', 1)
+        if k == 'success':
+            ui.status(_('(published review request %s)\n') % v)
+        elif k == 'error':
+            errored = True
+            rrid, error = v.split(' ', 1)
+            ui.warn(_('error publishing review request %s: %s\n') %
+                    (rrid, error))
+
+    if errored:
+        ui.warn(_('(review requests not published; visit review url to '
+                  'attempt publishing there)\n'))
 
 def _pullreviews(repo):
     reviews = repo.reviews
