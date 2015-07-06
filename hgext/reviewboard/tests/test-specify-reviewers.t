@@ -139,6 +139,13 @@ Try a bunch of different ways of specifying a reviewer
   $ rbmanage list-reviewers 11 --draft
   romulus
 
+The review state file should have reviewers recorded
+
+  $ cat .hg/reviewboard/review/10.state
+  public False
+  reviewers remus,romulus
+  status pending
+
 Amending a commit should also work. This exercises the update_review_request
 code path.
 

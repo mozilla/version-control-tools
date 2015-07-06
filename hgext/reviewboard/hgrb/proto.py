@@ -334,6 +334,12 @@ def reviewboard(repo, proto, args=None):
                 urllib.quote(rd['status'].encode('utf-8'))))
             lines.append('reviewdata %s public %s' % (rid, rd['public']))
 
+            if rd['reviewers']:
+                parts = [urllib.quote(r.encode('utf-8'))
+                         for r in rd['reviewers']]
+                lines.append('reviewdata %s reviewers %s' %
+                             (rid, ','.join(parts)))
+
     except AuthorizationError as e:
         lines.append('error %s' % str(e))
     except BadRequestError as e:
@@ -401,6 +407,12 @@ def pullreviews(repo, proto, args=None):
         lines.append('reviewdata %s status %s' % (rr.id,
             urllib.quote(rr.status.encode('utf-8'))))
         lines.append('reviewdata %s public %s' % (rr.id, rr.public))
+
+        reviewers = [urllib.quote(p.title.encode('utf-8'))
+                     for p in rr.target_people]
+        if reviewers:
+            lines.append('reviewdata %s reviewers %s' %
+                         (rid, ','.join(reviewers)))
 
     res = '\n'.join(lines)
     assert isinstance(res, str)

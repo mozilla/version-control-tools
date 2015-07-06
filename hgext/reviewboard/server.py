@@ -58,7 +58,10 @@ command = cmdutil.command(cmdtable)
 
 # Capabilities the server requires in clients.
 requirecaps = set([
+    # Client can speak protocol format 1.
     'proto1',
+    # Client knows how to interpret lists in review data.
+    'listreviewdata',
 ])
 
 

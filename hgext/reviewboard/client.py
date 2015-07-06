@@ -78,8 +78,18 @@ command = cmdutil.command(cmdtable)
 
 clientcapabilities = {
     'proto1',
+    'listreviewdata',
 }
 
+def decodepossiblelistvalue(v):
+    """Decode a wire protocol value that may be a list.
+
+    Values are URL encoded. Lists have literal "," separating elements.
+    """
+    if ',' in v:
+        return [urllib.unquote(p) for p in v.split(',')]
+    else:
+        return urllib.unquote(v)
 
 PROTOVERSION = 1
 
@@ -521,8 +531,7 @@ def doreview(repo, ui, remote, nodes):
             nodereviews[node] = rid
         elif t == 'reviewdata':
             rid, field, value = d.split(' ', 2)
-            value = urllib.unquote(value)
-            reviewdata[rid][field] = value
+            reviewdata[rid][field] = decodepossiblelistvalue(value)
         elif t == 'rburl':
             reviews.baseurl = d
 
@@ -614,7 +623,7 @@ def _pullreviewidentifiers(repo, identifiers):
             reviewdata[rid] = {}
         elif t == 'reviewdata':
             rid, field, value = map(urllib.unquote, d.split(' ', 3))
-            reviewdata.setdefault(rid, {})[field] = value
+            reviewdata.setdefault(rid, {})[field] = decodepossiblelistvalue(value)
         elif t == 'error':
             raise util.Abort(d)
         else:
@@ -761,7 +770,11 @@ class reviewstore(object):
         path = self._vfs.join('review/%s.state' % rid)
         lines = []
         for k, v in sorted(data.iteritems()):
-            lines.append('%s %s' % (k, urllib.quote(v)))
+            if isinstance(v, list):
+                parts = [urllib.quote(p) for p in v]
+                lines.append('%s %s' % (k, ','.join(parts)))
+            else:
+                lines.append('%s %s' % (k, urllib.quote(v)))
 
         self._vfs.write(path, '%s\n' % '\n'.join(lines))
 
@@ -779,7 +792,10 @@ class reviewstore(object):
                 continue
 
             k, v = line.split(' ', 1)
-            d[k] = urllib.unquote(v)
+            if ',' in v:
+                d[k] = [urllib.unquote(p) for p in v.split(',')]
+            else:
+                d[k] = urllib.unquote(v)
 
         return d
 
