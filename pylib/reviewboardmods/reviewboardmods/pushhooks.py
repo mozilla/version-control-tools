@@ -228,6 +228,30 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
             parent_diff=commit.get('parent_diff', None),
             base_commit_id=commit.get('base_commit_id', None))
 
+    def get_review_data(rr):
+        """Obtain a dictionary containing review metadata.
+
+        The dict consists of plain types (as opposed to RBTools types).
+
+        Some values may be unicode, not str.
+        """
+        rd = {
+            'public': rr.public,
+            'status': rr.status,
+        }
+
+        thing = rr
+        try:
+            thing = rr.get_draft()
+        except APIError as e:
+            # error_code 100 is RB API code for "does not exist."
+            if e.http_status != 404 or e.error_code != 100:
+                raise
+
+        rd['reviewers'] = [p.title for p in thing.target_people]
+
+        return rd
+
     # TODO: We need to take into account the commits data from the squashed
     # review request's draft. This data represents the mapping from commit
     # to rid in the event that we would have published. We're overwritting
@@ -252,6 +276,9 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
     # API object.
     review_requests = {}
 
+    # A mapping of review request id to dicts of additional metadata.
+    review_data = {}
+
     # Do a pass and find all commits that map cleanly to old review requests.
     for commit in commits['individual']:
         node = commit['id']
@@ -270,6 +297,7 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
 
         rr = api_root.get_review_request(review_request_id=rid)
         review_requests[rid] = rr
+        review_data[rid] = get_review_data(rr)
 
         try:
             discard_on_publish_rids.remove(rid)
@@ -298,6 +326,7 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
             processed_nodes.add(node)
             node_to_rid[node] = rid
             review_requests[rid] = rr
+            review_data[rid] = get_review_data(rr)
 
             try:
                 discard_on_publish_rids.remove(rid)
@@ -332,6 +361,7 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
             processed_nodes.add(commit['id'])
             node_to_rid[node] = assumed_old_rid
             review_requests[assumed_old_rid] = rr
+            review_data[assumed_old_rid] = get_review_data(rr)
 
             try:
                 discard_on_publish_rids.remove(assumed_old_rid)
@@ -353,6 +383,7 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
         assert isinstance(rr.id, int)
         node_to_rid[node] = rr.id
         review_requests[rr.id] = rr
+        review_data[rr.id] = get_review_data(rr)
         unpublished_rids.append(rr.id)
 
     # At this point every incoming commit has been accounted for.
@@ -424,8 +455,9 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
     })
 
     review_requests[squashed_rr.id] = squashed_rr
+    review_data[squashed_rr.id] = get_review_data(squashed_rr)
 
-    return squashed_rr.id, node_to_rid, review_requests
+    return squashed_rr.id, node_to_rid, review_data
 
 
 def associate_ldap_username(url, ldap_username, privileged_username,

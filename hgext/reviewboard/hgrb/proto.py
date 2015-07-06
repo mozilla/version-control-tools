@@ -319,17 +319,20 @@ def reviewboard(repo, proto, args=None):
                                                      cookie=bzcookie)
         lines.extend([
             'parentreview %s' % parentrid,
-            'reviewdata %s status %s' % (parentrid,
-                urllib.quote(reviews[parentrid].status.encode('utf-8'))),
-            'reviewdata %s public %s' % (parentrid, reviews[parentrid].public),
+            'reviewdata %s status %s' % (
+                parentrid,
+                urllib.quote(reviews[parentrid]['status'].encode('utf-8'))),
+            'reviewdata %s public %s' % (
+                parentrid,
+                reviews[parentrid]['public']),
         ])
 
         for node, rid in commitmap.items():
-            rr = reviews[rid]
+            rd = reviews[rid]
             lines.append('csetreview %s %s' % (node, rid))
             lines.append('reviewdata %s status %s' % (rid,
-                urllib.quote(rr.status.encode('utf-8'))))
-            lines.append('reviewdata %s public %s' % (rid, rr.public))
+                urllib.quote(rd['status'].encode('utf-8'))))
+            lines.append('reviewdata %s public %s' % (rid, rd['public']))
 
     except AuthorizationError as e:
         lines.append('error %s' % str(e))
