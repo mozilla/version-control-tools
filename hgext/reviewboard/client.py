@@ -76,12 +76,30 @@ cmdtable = {}
 command = cmdutil.command(cmdtable)
 
 
+clientcapabilities = {
+    'proto1',
+}
+
+
 def getreviewcaps(remote):
     """Obtain a set of review capabilities from the server.
 
     Returns empty set if no capabilities are defined (and the server presumably
     isn't a review repo).
+
+    As a side effect, this function also validates that the client fulfills the
+    advertised minimum requirements set by the server and aborts if not.
     """
+    requires = remote.capable('mozreviewrequires')
+    if isinstance(requires, str):
+        requires = set(requires.split(','))
+        if requires - clientcapabilities:
+            raise util.Abort(
+                _('reviewboard client extension is too old to speak to this '
+                  'server'),
+                hint=_('upgrade your extension by running `hg -R %s pull -u`') %
+                       os.path.normpath(os.path.join(OUR_DIR, '..', '..')))
+
     caps = remote.capable('mozreview')
     if isinstance(caps, bool):
         caps = ''

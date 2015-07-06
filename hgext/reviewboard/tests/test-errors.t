@@ -170,3 +170,30 @@ Pushing multiple heads is rejected
 Ensure bad imports are detected
 
   $ hg --config extensions.findbadimports=$TESTDIR/testing/find-bad-imports.py findbadimports
+  $ cd ..
+
+Client failing to meet server capabilities is detected
+
+  $ cat > $TESTTMP/fakerequire.py << EOF
+  > from mercurial import extensions
+  > 
+  > def extsetup(ui):
+  >     server = extensions.find('reviewboard')
+  >     assert server
+  >     server.requirecaps.add('fakecapability')
+  > EOF
+
+  $ cat >> server/.hg/hgrc << EOF
+  > [extensions]
+  > fakerequire = $TESTTMP/fakerequire.py
+  > EOF
+
+  $ hg serve -R server -d -p $HGPORT1 --pid-file hg.pid
+  $ cat hg.pid >> $DAEMON_PIDS
+
+  $ cd client
+  $ hg push http://localhost:$HGPORT1
+  pushing to http://localhost:$HGPORT1/
+  abort: reviewboard client extension is too old to speak to this server
+  (upgrade your extension by running `hg -R * pull -u`) (glob)
+  [255]

@@ -56,6 +56,12 @@ cmdtable = {}
 command = cmdutil.command(cmdtable)
 
 
+# Capabilities the server requires in clients.
+requirecaps = set([
+    'proto1',
+])
+
+
 def capabilities(orig, repo, proto):
     """Wraps wireproto._capabilities to advertise reviewboard support."""
     caps = orig(repo, proto)
@@ -83,6 +89,7 @@ def capabilities(orig, repo, proto):
 
     if reviewcaps:
         caps.append('mozreview=%s' % ','.join(sorted(reviewcaps)))
+        caps.append('mozreviewrequires=%s' % ','.join(sorted(requirecaps)))
 
     return caps
 
