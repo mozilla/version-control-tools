@@ -60,12 +60,29 @@ def capabilities(orig, repo, proto):
     """Wraps wireproto._capabilities to advertise reviewboard support."""
     caps = orig(repo, proto)
 
+    # Old versions of the wire protocol exposed separate capabilities for each
+    # feature. New versions expose a list of features in the "mozreview"
+    # capability.
+    #
+    # We keep the old style around for a while until all clients have upgraded.
+    reviewcaps = set()
+
     if repo.ui.configint('reviewboard', 'repoid', None):
+        reviewcaps.add('pushreview')
+        reviewcaps.add('pullreviews')
+
+        # Deprecated.
         caps.append('reviewboard')
         caps.append('pullreviews')
 
     if repo.ui.config('reviewboard', 'isdiscoveryrepo', None):
+        reviewcaps.add('listreviewrepos')
+
+        # Deprecated.
         caps.append('listreviewrepos')
+
+    if reviewcaps:
+        caps.append('mozreview=%s' % ','.join(sorted(reviewcaps)))
 
     return caps
 
