@@ -549,7 +549,10 @@ def _pullreviewidentifiers(repo, identifiers):
     # it do all the heavy lifting.
     # FUTURE Hook up RBTools directly.
     remote = hg.peer(repo, {}, reviews.remoteurl)
-    remote.requirecap('pullreviews', _('obtain code reviews'))
+    caps = getreviewcaps(remote)
+    if 'pullreviews' not in caps:
+        raise util.Abort('cannot pull code review metadata; '
+                         'server lacks necessary features')
 
     lines = ['1']
     for identifier in identifiers:
