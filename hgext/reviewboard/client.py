@@ -352,6 +352,21 @@ def wrappedpushdiscovery(orig, pushop):
 
             nodes.insert(0, ctx.node())
 
+    # Filter out public nodes.
+    publicnodes = []
+    for node in nodes:
+        ctx = repo[node]
+        if ctx.phase() == phases.public:
+            publicnodes.append(node)
+            ui.status(_('(ignoring public changeset %s in review request)\n') %
+                        ctx.hex()[0:12])
+
+    nodes = [n for n in nodes if n not in publicnodes]
+    if not nodes:
+        raise util.Abort(
+            _('no non-public changesets left to review'),
+            hint=_('add or change the -r argument to include draft changesets'))
+
     # Ensure all reviewed changesets have commit IDs.
     replacenodes = []
     for node in nodes:

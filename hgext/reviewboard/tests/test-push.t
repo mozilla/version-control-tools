@@ -60,6 +60,15 @@ Seed the root changeset on the server
   remote: Inserted into the pushlog db successfully.
   $ hg phase --public -r .
 
+Pushing a public changeset will be quick rejected
+
+  $ hg push -r 0 --reviewid 1
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  (ignoring public changeset 3a9f6899ef84 in review request)
+  abort: no non-public changesets left to review
+  (add or change the -r argument to include draft changesets)
+  [255]
+
 Pushing a single changeset will initiate a single review (no children)
 
   $ hg push -r 1 --reviewid 1
