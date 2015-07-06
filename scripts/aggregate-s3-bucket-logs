@@ -1,0 +1,68 @@
+#!/usr/bin/env python2
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script is used to aggregate S3 server logs into per-day files.
+
+import datetime
+import sys
+
+from boto.s3.connection import S3Connection
+
+
+def aggregate_s3_logs(bucket, path):
+    today = datetime.datetime.utcnow().date()
+
+    c = S3Connection()
+    bucket = c.get_bucket(bucket, validate=False)
+
+    if not path.endswith('/'):
+        path += '/'
+
+    current_day = None
+    current_keys = []
+
+    for key in bucket.list(prefix=path):
+        name = key.name
+        name = name[len(path):]
+
+        # Default names are of the form YYYY-MM-DD-HH-MM-SS-<RANDOM>.
+        # Our aggregate logs have a separate naming scheme. Only process
+        # logs belonging to us.
+        parts = name.split('-')
+        if len(parts) != 7:
+            continue
+
+        # A prefix can sneak into the file name. We don't deal with that yet.
+        # Assert the year is in the first component.
+        year = int(parts[0])
+        assert year >= 2014 and year < 2030
+
+        day = datetime.date(int(parts[0]), int(parts[1]), int(parts[2]))
+
+        if day != current_day and current_day is not None and current_keys:
+            dest_name = '%s%s' % (path, current_day.isoformat())
+            print('aggregating %d keys under %s' % (len(current_keys), dest_name))
+
+            data = []
+            for k in current_keys:
+                data.append(k.get_contents_as_string())
+
+            aggregate_key = bucket.new_key(dest_name)
+            aggregate_key.set_metadata('Content-Type', 'text/plain')
+            aggregate_key.set_contents_from_string(''.join(data))
+            bucket.delete_keys(current_keys)
+            current_keys = []
+
+        if day >= today:
+            print('ignoring %s due to incomplete day' % key.name)
+            continue
+
+        current_day = day
+        current_keys.append(key)
+
+
+if __name__ == '__main__':
+    bucket, path = sys.argv[1:]
+    aggregate_s3_logs(bucket, path)
