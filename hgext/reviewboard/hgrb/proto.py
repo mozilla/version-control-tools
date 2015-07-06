@@ -49,6 +49,15 @@ class BadRequestError(Exception):
                 ' encountered a bug.') % str(self.e).splitlines()[0]
 
 
+class ServerError(Exception):
+    """Represents an error that occurred during processing."""
+    def __init__(self, s):
+        assert isinstance(s, str)
+        self.s = s
+
+    def __str__(self):
+        return 'error %s' % self.s
+
 # Wrap reviewboardmods and error types because we don't want to require the
 # clients to import rbtools.
 def post_reviews(*args, **kwargs):
@@ -90,15 +99,15 @@ def parsepayload(proto, args):
         version = int(data[0:off])
 
         if version < 1:
-            return wireproto.pusherr(_('Your reviewboard extension is out '
-                'of date. Please pull and update your version-control-tools '
-                'repo.'))
+            return ServerError(_(
+                'Your reviewboard extension is out of date. Please pull and '
+                'update your version-control-tools repo.'))
         elif version > 1:
-            return wireproto.pusherr(_('Your reviewboard extension is newer '
-                'than what the server supports. Please downgrade to a '
-                'compatible version.'))
+            return ServerError(_(
+                'Your reviewboard extension is newer than what the server '
+                'supports. Please downgrade to a compatible version.'))
     except ValueError:
-        return wireproto.pusherr(_('Invalid payload.'))
+        return ServerError(_('Invalid payload.'))
 
     assert version == 1
     lines = data.split('\n')[1:]
@@ -141,7 +150,8 @@ def parseidentifier(o):
             # release.
             fields = d.split(' ')
             if len(fields) != 1:
-                identifier = wireproto.pusherr(_('old reviewboard client detected; please upgrade'))
+                identifier = ServerError(_(
+                    'old reviewboard client detected; please upgrade'))
             nodes.append(d)
         elif t == 'precursors':
             node, before = d.split(' ', 1)
@@ -173,8 +183,8 @@ def reviewboard(repo, proto, args=None):
     proto.redirect()
 
     o = parsepayload(proto, args)
-    if isinstance(o, wireproto.pusherr):
-        return o
+    if isinstance(o, ServerError):
+        return formatresponse(str(o))
 
     bzusername = o['bzusername']
     bzpassword = o['bzpassword']
@@ -183,7 +193,7 @@ def reviewboard(repo, proto, args=None):
 
     identifier, nodes, precursors = parseidentifier(o)
     if not identifier:
-        return wireproto.pusherr(_('no review identifier in request'))
+        return ['error %s' % _('no review identifier in request')]
 
     diffopts = mdiff.diffopts(context=8, showfunc=True, git=True)
 
@@ -323,8 +333,8 @@ def pullreviews(repo, proto, args=None):
     proto.redirect()
 
     o = parsepayload(proto, args)
-    if isinstance(o, wireproto.pusherr):
-        return o
+    if isinstance(o, ServerError):
+        return formatresponse(str(o))
 
     root = getrbapi(repo, o)
 

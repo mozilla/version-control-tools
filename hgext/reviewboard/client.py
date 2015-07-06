@@ -559,6 +559,8 @@ def _pullreviewidentifiers(repo, identifiers):
         elif t == 'reviewdata':
             rid, field, value = map(urllib.unquote, d.split(' ', 3))
             reviewdata.setdefault(rid, {})[field] = value
+        elif t == 'error':
+            raise util.Abort(d)
         else:
             raise util.Abort(_('unknown value in response payload: %s') % t)
 
