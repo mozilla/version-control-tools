@@ -75,6 +75,20 @@ buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Servic
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
+
+def getreviewcaps(remote):
+    """Obtain a set of review capabilities from the server.
+
+    Returns empty set if no capabilities are defined (and the server presumably
+    isn't a review repo).
+    """
+    caps = remote.capable('mozreview')
+    if isinstance(caps, bool):
+        caps = ''
+
+    return set(caps.split(','))
+
+
 def pushcommand(orig, ui, repo, *args, **kwargs):
     """Wraps commands.push to read the --reviewid argument."""
 
@@ -110,10 +124,11 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
     """Wraps exchange.push to enforce restrictions for review pushes."""
 
     # The repository does not support pushing reviews.
-    if not remote.capable('reviewboard'):
+    caps = getreviewcaps(remote)
+    if 'pushreview' not in caps:
         # See if this repository is a special "discovery" repository
         # and follow the link, if present.
-        if not remote.capable('listreviewrepos'):
+        if 'listreviewrepos' not in caps:
             return orig(repo, remote, force=force, revs=revs,
                         newbranch=newbranch, **kwargs)
 
@@ -199,7 +214,8 @@ def wrappedpushdiscovery(orig, pushop):
 
     pushop.reviewnodes = None
 
-    if not pushop.remote.capable('reviewboard'):
+    caps = getreviewcaps(pushop.remote)
+    if 'pushreview' not in caps:
         return orig(pushop)
 
     ui = pushop.ui
@@ -347,7 +363,7 @@ def doreview(repo, ui, remote, nodes):
     :nodes is a list of nodes to review.
     """
     assert nodes
-    assert remote.capable('reviewboard')
+    assert 'pushreview' in getreviewcaps(remote)
 
     bzauth = getbugzillaauth(ui)
     if not bzauth:
@@ -901,7 +917,7 @@ def reposetup(ui, repo):
     repo.reviewid = None
 
     def prepushoutgoinghook(local, remote, outgoing):
-        if remote.capable('reviewboard'):
+        if 'pushreview' in getreviewcaps(remote):
             # We can't simply look at outgoing.missingheads here because
             # Mercurial treats all revisions to `hg push` as "heads" in the
             # context of discovery. This is arguably a bug in Mercurial and may
