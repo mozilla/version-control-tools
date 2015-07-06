@@ -2,17 +2,20 @@
 # GNU General Public License version 2 or any later version.
 
 import os
-import urllib
 from StringIO import StringIO
+import urllib
 import xmlrpclib
-from mercurial import mdiff
-from mercurial import patch
-from mercurial import wireproto
-from mercurial.node import short
 
-from hgrb.util import ReviewID
+from mercurial.i18n import _
+from mercurial.node import short
+from mercurial import (
+    mdiff,
+    patch,
+    wireproto,
+)
 
 from mozautomation import commitparser
+from hgrb.util import ReviewID
 
 
 class AuthorizationError(Exception):
