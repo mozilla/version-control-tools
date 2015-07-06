@@ -81,14 +81,38 @@ clientcapabilities = {
 }
 
 
+PROTOVERSION = 1
+
+
 def commonrequestlines(ui, bzauth=None):
     """Obtain a list of lines common in protocol requests."""
-    lines = ['1']
+    lines = ['%d' % PROTOVERSION]
 
     for p in ('username', 'password', 'userid', 'cookie'):
         if getattr(bzauth, p, None):
             lines.append('bz%s %s' % (p, urllib.quote(getattr(bzauth, p))))
 
+    return lines
+
+def getpayload(s):
+    """Obtain the payload of a response from the server.
+
+    All responses begin with the protocol version followed by a newline.
+    Currently, we only support version 1.
+
+    Returns a list of lines in the response.
+    """
+    try:
+        off = s.index('\n')
+        version = int(s[0:off])
+
+        if version != PROTOVERSION:
+            raise util.Abort(_('unrecognized protocol version from server'))
+    except ValueError:
+        raise util.Abort(_('invalid response from server'))
+
+    assert version == PROTOVERSION
+    lines = s.split('\n')[1:]
     return lines
 
 def getreviewcaps(remote):
@@ -467,19 +491,7 @@ def doreview(repo, ui, remote, nodes):
     ui.write(_('submitting %d changesets for review\n') % len(nodes))
 
     res = remote._call('pushreview', data='\n'.join(lines))
-
-    # All protocol versions begin with: <version>\n
-    try:
-        off = res.index('\n')
-        version = int(res[0:off])
-
-        if version != 1:
-            raise util.Abort(_('do not know how to handle response from server.'))
-    except ValueError:
-        raise util.Abort(_('invalid response from server.'))
-
-    assert version == 1
-    lines = res.split('\n')[1:]
+    lines = getpayload(res)
 
     newparentid = None
     nodereviews = {}
@@ -581,11 +593,8 @@ def _pullreviewidentifiers(repo, identifiers):
         lines.append('reviewid %s' % identifier)
 
     res = remote._call('pullreviews', data='\n'.join(lines))
+    lines = getpayload(res)
 
-    version = _verifyresponseversion(res)
-    assert version == 1
-
-    lines = res.split('\n')[1:]
     reviewdata = {}
 
     for line in lines:
@@ -609,24 +618,6 @@ def _pullreviewidentifiers(repo, identifiers):
         reviews.savereviewrequest(rid, data)
 
     return reviewdata
-
-def _verifyresponseversion(res):
-    """Verify the format and version of a response from a server."""
-    # Empty responses consist of a single line without a newline.
-    try:
-        off = res.index('\n')
-    except ValueError:
-        off = len(res)
-
-    try:
-        version = int(res[0:off])
-
-        if version != 1:
-            raise util.Abort(_('do not know how to handle response from server.'))
-    except ValueError:
-        raise util.Abort(_('invalid response from server.'))
-
-    return version
 
 class identifierrecord(object):
     """Describes a review identifier in the context of the store."""
