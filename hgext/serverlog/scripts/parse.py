@@ -6,6 +6,7 @@
 # This script parses serverlog events into unified messages.
 
 import datetime
+import optparse
 import sys
 
 class Request(object):
@@ -64,7 +65,7 @@ class SSHSession(object):
         return 'lookup'
 
 
-def parse_events(fh):
+def parse_events(fh, onlydate=None):
     thisyear = datetime.date.today().year
 
     requests = {}
@@ -99,6 +100,8 @@ def parse_events(fh):
             request = ids[0]
 
         if action == 'BEGIN_REQUEST':
+            if onlydate and date.date() != onlydate:
+                continue
             repo, ip, url = parts[2:]
             requests[request] = Request(date, repo, ip, url)
 
@@ -126,6 +129,9 @@ def parse_events(fh):
             yield r
 
         elif action == 'BEGIN_SSH_SESSION':
+            if onlydate and date.date() != onlydate:
+                continue
+
             repo, username = parts[2:]
             assert session
             sessions[session] = SSHSession(session, date, repo, username)
@@ -178,8 +184,8 @@ def parse_events(fh):
             count = parts[2]
             #count = int(count)
 
-def print_stream(fh):
-    for thing in parse_events(fh):
+def print_stream(fh, onlydate=None):
+    for thing in parse_events(fh, onlydate=onlydate):
         if isinstance(thing, Request):
             r = thing
             if r.start_date:
@@ -198,9 +204,19 @@ def print_stream(fh):
                 s.username, s.wall_time, s.cpu_time))
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        for f in sys.argv[1:]:
+    parser = optparse.OptionParser()
+    parser.add_option('--date',
+                      help='Only extract events on the specified date')
+
+    options, args = parser.parse_args()
+    date = None
+    if options.date:
+        dt = datetime.datetime.strptime(options.date, '%Y-%m-%d')
+        date = dt.date()
+
+    if args:
+        for f in args:
             with open(f, 'rb') as fh:
-                print_stream(fh)
+                print_stream(fh, onlydate=date)
     else:
-        print_stream(sys.stdin)
+        print_stream(sys.stdin, onlydate=date)
