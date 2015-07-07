@@ -26,6 +26,8 @@ hgweb_paths = [
     ('/pushloghtml', 'hgweb-pushloghtml'),
     ('/log/', 'hgweb-log'),
     ('/file/', 'hgweb-file'),
+    ('/comparison/', 'hgweb-comparison'),
+    ('/filelog/', 'hgweb-filelog'),
 ]
 
 def normalize_path(path):
