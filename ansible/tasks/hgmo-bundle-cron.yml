@@ -18,18 +18,26 @@
         job='/repo/hg/scripts/outputif /repo/hg/scripts/generate-hg-s3-bundles {{ item.repo }}'
         day=*
         month=*
-        minute=0
+        minute={{ item.minute }}
         hour={{ item.hour }}
   with_items:
     # Schedule for when the sun is over the Pacific Ocean, as this is
     # when the fewest pushes occur. Also, hgssh1 is on PDT not UTC.
-    - { hour: 21, repo: mozilla-central }
-    - { hour: 22, repo: integration/fx-team }
-    - { hour: 23, repo: integration/mozilla-inbound }
-    - { hour: 0, repo: integration/gaia-central }
-    - { hour: 1, repo: releases/mozilla-release }
-    - { hour: 2, repo: releases/mozilla-aurora }
-    - { hour: 3, repo: releases/mozilla-beta }
-    - { hour: 4, repo: build/tools }
-    - { hour: 4, repo: build/mozharness }
-    - { hour: 5, repo: comm-central }
+    - { hour: 21, minute: 0, repo: mozilla-central }
+    - { hour: 21, minute: 30, repo: integration/fx-team }
+    - { hour: 22, minute: 0, repo: integration/mozilla-inbound }
+    - { hour: 22, minute: 30, repo: integration/b2g-inbound }
+    - { hour: 23, minute: 0, repo: integration/gaia-central }
+    - { hour: 23, minute: 30, repo: releases/mozilla-release }
+    - { hour: 0, minute: 0, repo: releases/mozilla-aurora }
+    - { hour: 0, minute: 30, repo: releases/mozilla-beta }
+    - { hour: 1, minute: 0, repo: releases/mozilla-esr38 }
+    - { hour: 1, minute: 30, repo: build/tools }
+    - { hour: 1, minute: 30, repo: build/mozharness }
+    - { hour: 1, minute: 45, repo: build/talos }
+    - { hour: 2, minute: 0, repo: comm-central }
+    - { hour: 2, minute: 30, repo: projects/ash }
+    - { hour: 3, minute: 0, repo: projects/holly }
+    - { hour: 3, minute: 30, repo: projects/jamun }
+    - { hour: 4, minute: 0, repo: projects/larch }
+    - { hour: 4, minute: 30, repo: projects/oak }
