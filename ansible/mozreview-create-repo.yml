@@ -1,0 +1,55 @@
+---
+- hosts: reviewboard-hg1.dmz.scl3.mozilla.com
+  vars:
+    repo_root: /repo/hg/mozilla
+  vars_prompt:
+    - name: relpath
+      prompt: "What is the relative path of the base repo on hg.mozilla.org?"
+      private: no
+
+    - name: repo
+      prompt: "What should the name of the repo be in MozReview?"
+      private: no
+
+    - name: bz_username
+      prompt: "Bugzilla username"
+      private: no
+
+    - name: bz_password
+      prompt: "Bugzilla password"
+
+  tasks:
+    - name: create empty Mercurial repository
+      command: /usr/bin/hg --config extensions.rbserver=! init {{ repo_root }}/{{ repo }} creates={{ repo_root }}/{{ repo }}
+
+    - name: ensure repository permissions are sane
+      command: chown -R hg:scm_level_1 {{ repo_root }}/{{ repo }}
+
+    - name: give group directory permissions
+      shell: find {{ repo_root }}/{{ repo }} -type d | xargs chmod g+ws
+
+    - name: give group file permissions
+      shell: find {{ repo_root }}/{{ repo }} -type f | xargs chmod g+w
+
+    - name: create repository in ReviewBoard
+      shell: "REVIEWBOARD_URL=https://reviewboard.mozilla.org/ BUGZILLA_USERNAME={{ bz_username }} BUGZILLA_PASSWORD='{{ bz_password }}' {{ vct | mandatory }}/reviewboard add-repository {{ repo }} https://reviewboard-hg.mozilla.org/{{ repo }}"
+      delegate_to: 127.0.0.1
+      register: repo_create
+
+    - name: set repo id
+      set_fact: repo_id="{{ repo_create.stdout | regex_replace('^Created repository ', '') }}"
+
+    - name: ensure hgrc contents sane
+      ini_file: dest={{ repo_root}}/{{ repo }}/.hg/hgrc section={{ item.section }} option={{ item.option }} value={{ item.value }} owner=hg group=scm_level_1
+      with_items:
+        - { section: paths, option: default, value: "https://hg.mozilla.org/{{ relpath }}" }
+        - { section: phases, option: publish, value: False }
+        - { section: reviewboard, option: url, value: "https://reviewboard.mozilla.org/" }
+        - { section: reviewboard, option: repoid, value: '{{ repo_id | mandatory }}' }
+
+    - name: seed repository with upstream contents
+      command: hg -R {{ repo_root }}/{{ repo }} pull
+
+    - name: update autoreview repository manifest
+      command: /usr/bin/hg createrepomanifest --search 'https://' --replace 'ssh://'
+               chdir=/repo/hg/mozilla/autoreview

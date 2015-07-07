@@ -60,6 +60,12 @@ def deploy_reviewboard_prod(repo=None, rev=None, verbosity=0):
                         verbosity=verbosity)
 
 
+def mozreview_create_repo(verbosity=0):
+    extra = {'vct': ROOT}
+    return run_playbook('mozreview-create-repo', extra_vars=extra,
+                        verbosity=verbosity)
+
+
 def hgmo(verbosity=0):
     """Deploy hooks and extensions to hg.mozilla.org servers."""
     extra = {'vct': ROOT}

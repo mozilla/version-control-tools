@@ -39,6 +39,14 @@ class DeployCommands(object):
         from vcttesting.deploy import deploy_reviewboard_prod
         return deploy_reviewboard_prod(repo=repo, rev=rev, verbosity=verbosity)
 
+    @Command('mozreview-create-repo', category='deploy',
+             description='Create a new review repository')
+    @CommandArgument('--verbosity', type=int,
+                     help='How verbose to be with output')
+    def mozreview_create_repo(self, verbosity=None):
+        from vcttesting.deploy import mozreview_create_repo as deploy
+        return deploy(verbosity=verbosity)
+
     @Command('hgmo', category='deploy',
              description='Deploy hg.mozilla.org')
     @CommandArgument('--verbosity', type=int,
