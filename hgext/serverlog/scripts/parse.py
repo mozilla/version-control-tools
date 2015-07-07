@@ -9,18 +9,56 @@ import datetime
 import optparse
 import sys
 
+hgweb_paths = [
+    ('/json-pushes', 'hgweb-json-pushes'),
+    ('/raw-rev', 'hgweb-raw-rev'),
+    ('/rev/', 'hgweb-rev'),
+    ('/raw-file/', 'hgweb-raw-file'),
+    ('/atom-log', 'hgweb-atom-log'),
+    ('/static/', 'hgweb-static'),
+    ('/json-info', 'hgweb-json-info'),
+    ('/archive', 'hgweb-archive'),
+    ('/info/refs', 'git'),
+    ('/diff/', 'hgweb-diff'),
+    ('/annotate/', 'hgweb-annotate'),
+    ('/shortlog', 'hgweb-shortlog'),
+    ('/pushlog', 'hgweb-pushlog'),
+    ('/pushloghtml', 'hgweb-pushloghtml'),
+    ('/log/', 'hgweb-log'),
+    ('/file/', 'hgweb-file'),
+]
+
+def normalize_path(path):
+    for search, command in hgweb_paths:
+        try:
+            offset = path.index(search)
+            return path[0:offset], command
+        except ValueError:
+            pass
+
+    return path, None
+
+
 class Request(object):
     def __init__(self, date, repo, ip, url):
+        # The repository path that comes in is relative to the hgweb.wsgi file
+        # for that repository. And, since some repositories in different
+        # directories share the same base name, that means we have to consult
+        # the URL to derive the full repo path. Joy.
+
+        # Start by stripping the query string.
         path = url
         if '?' in path:
             path = path[0:path.find('?')]
         path = path.strip('/')
 
+        path, command = normalize_path(path)
+
         self.start_date = date
         self.repo = path
         self.ip = ip
         self.url = url
-        self.command = None
+        self.command = command
         self.write_count = None
         self.wall_time = None
         self.cpu_time = None
@@ -109,7 +147,8 @@ def parse_events(fh, onlydate=None):
             command = parts[2]
             r = requests.get(request)
             if r:
-                r.command = command
+                if command != 'None':
+                    r.command = command
 
         elif action == 'END_REQUEST':
             r = requests.get(request)
