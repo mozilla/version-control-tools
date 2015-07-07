@@ -96,13 +96,32 @@
 - name: set ownership of wsgi files
   command: /bin/chown -R hg:hg /repo/hg/webroot_wsgi
 
-# Create and manage log resources
+# Create and manage httpd log resources
 - name: make logdir
   file: path=/var/log/httpd/hg.mozilla.org state=directory mode=0755
 
 - name: add logrotate httpd config
   copy: src=logrotate.conf dest=/etc/logrotate.d/hg-httpd-logrotate
 
+# Create and manage hg log resources
+- name: make log dir
+  file: path=/var/log/hg
+        state=directory
+        mode=0755
+        owner=root
+        group=root
+
 - name: add logrotate hg config
   copy: src=logrotate.hg.conf dest=/etc/logrotate.d/hg
 
+# TODO ideally this is integrated into logrotate.
+# We schedule for UTC 0100 to catch any long-running requests that started
+# on the previous UTC day.
+- name: create CRON to generate daily Mercurial log files
+  cron: name='Daily Mercurial log data'
+        user=root
+        job='/repo/hg/scripts/outputif /repo/hg/version-control-tools/hgext/serverlog/generate-daily-logs.py'
+        day=*
+        month=*
+        minute=0
+        hour = 1
