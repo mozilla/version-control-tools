@@ -61,6 +61,17 @@ class MozReviewBoard(object):
             repo = repos.create(name=name, path=url, tool='Mercurial',
                                 bug_tracker=bug_url)
 
+            # This should arguaby be a separate API. But for now we in-line
+            # review group and default reviewers because every repo on
+            # MozReview is configured that way.
+            groups = root.get_groups()
+            group = groups.create(display_name=name, name=name, visible=True,
+                                  invite_only=False)
+
+            reviewers = root.get_default_reviewers()
+            reviewers.create(name=name, file_regex='.*', groups=name,
+                             repositories=str(repo.id))
+
             return repo.id
 
     def make_admin(self, email):

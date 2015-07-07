@@ -184,9 +184,11 @@ class ReviewBoardCommands(object):
         if self.mr:
             return self.mr.get_reviewboard()
         elif 'BUGZILLA_HOME' in os.environ and path:
-            return MozReviewBoard(path, os.environ['BUGZILLA_URL'],
+            return MozReviewBoard(None, os.environ['BUGZILLA_URL'],
                 pulse_host=os.environ.get('PULSE_HOST'),
                 pulse_port=os.environ.get('PULSE_PORT'))
+        elif 'REVIEWBOARD_URL' in os.environ:
+            return MozReviewBoard(None, None, os.environ['REVIEWBOARD_URL'])
         else:
             raise Exception('Do not know about Bugzilla URL. Cannot talk to '
                             'Review Board. Try running `mozreview start` and '
@@ -682,3 +684,17 @@ class ReviewBoardCommands(object):
             rr.get_or_create_draft(**extra_data)
         except APIError:
             pass
+
+    @Command('add-repository', category='reviewboard',
+             description='Add a repository to the server.')
+    @CommandArgument('name', help='Name of repository')
+    @CommandArgument('url', help='URL of repository')
+    @CommandArgument('--bug-tracker',
+                     default='https://bugzilla.mozilla.org/',
+                     help='URL for bug tracker')
+    def add_repository(self, name, url, bug_tracker=None):
+        rb = self._get_rb()
+        rid = rb.add_repository(name, url, bugzilla_url=bug_tracker,
+                                username=os.environ['BUGZILLA_USERNAME'],
+                                password=os.environ['BUGZILLA_PASSWORD'])
+        print('Created repository %s' % rid)
