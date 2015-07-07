@@ -151,7 +151,8 @@ class TryField(BaseReviewRequestField):
     can_record_change_entry = True
 
     _retreive_error_txt = _('There was an error retrieving the try push.')
-    _waiting_txt = _('Waiting for autoland request to execute, hold tight.')
+    _waiting_txt = _('Waiting for autoland to try request to execute, '
+                     'hold tight.')
     _autoland_problem = _('Autoland reported a problem: %s')
     _job_url = 'https://treeherder.mozilla.org/embed/resultset-status/try/%s/'
 
