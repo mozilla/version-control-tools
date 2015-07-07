@@ -260,3 +260,22 @@ If you want to go a level deeper, you can run
 as the hg user.** e.g.::
 
    sudo -u hg /usr/local/bin/repo-push.sh hgcustom/version-control-tools
+
+Creating New Review Repositories
+================================
+
+In order to conduct code review in MozReview, a special review repository
+must be configured.
+
+Creating new review repositories is simple::
+
+  $ ./deploy mozreview-create-repo
+
+Then, simply enter requested data in the prompts and the review repository
+should be created.
+
+.. note::
+
+   This requires root SSH access to reviewboard-hg1.dmz.scl.mozilla.com
+   and for the specified Bugzilla account to have admin privileges on
+   reviewboard.mozilla.org.
