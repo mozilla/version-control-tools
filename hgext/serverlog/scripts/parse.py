@@ -109,14 +109,14 @@ def parse_events(fh):
                 r.command = command
 
         elif action == 'END_REQUEST':
+            r = requests.get(request)
+            if not r:
+                continue
+
             wr_count, t_wall, t_cpu = parts[2:]
             wr_count = int(wr_count)
             t_wall = float(t_wall)
             t_cpu = float(t_cpu)
-
-            r = requests.get(request)
-            if not r:
-                continue
 
             r.write_count = wr_count
             r.wall_time = t_wall
@@ -131,13 +131,13 @@ def parse_events(fh):
             sessions[session] = SSHSession(session, date, repo, username)
 
         elif action == 'END_SSH_SESSION':
-            t_wall, t_cpu = parts[2:]
-            t_wall = float(t_wall)
-            t_cpu = float(t_cpu)
-
             s = sessions.get(session)
             if not s:
                 continue
+
+            t_wall, t_cpu = parts[2:]
+            t_wall = float(t_wall)
+            t_cpu = float(t_cpu)
 
             s.end_date = date
             s.wall_time = t_wall
@@ -153,13 +153,13 @@ def parse_events(fh):
                 s.current_command = (request, command, date)
 
         elif action == 'END_SSH_COMMAND':
-            t_wall, t_cpu = parts[2:]
-            t_wall = float(t_wall)
-            t_cpu = float(t_cpu)
-
             s = sessions.get(session)
             if not s:
                 continue
+
+            t_wall, t_cpu = parts[2:]
+            t_wall = float(t_wall)
+            t_cpu = float(t_cpu)
 
             current = s.current_command
             if current and current[0] == request:
@@ -172,11 +172,11 @@ def parse_events(fh):
 
         elif action == 'CHANGEGROUPSUBSET_START':
             source, count = parts[2:]
-            count = int(count)
+            #count = int(count)
 
         elif action == 'WRITE_PROGRESS':
             count = parts[2]
-            count = int(count)
+            #count = int(count)
 
 def print_stream(fh):
     for thing in parse_events(fh):
