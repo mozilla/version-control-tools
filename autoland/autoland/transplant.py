@@ -1,6 +1,7 @@
 import config
 import github
 import json
+import os
 import re
 import subprocess
 import tempfile
@@ -11,7 +12,8 @@ REPO_CONFIG = {}
 
 
 def get_repo_path(tree):
-    return config.get('repos').get(tree, '.')
+    return config.get('repos').get(tree,
+                                   os.path.join(os.path.sep, 'repos', tree))
 
 
 def formulate_hg_error(cmd, output):
