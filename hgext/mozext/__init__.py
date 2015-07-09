@@ -385,7 +385,11 @@ hg._peerorrepo = peerorrepo
 def exchangepullpushlog(orig, pullop):
     res = orig(pullop)
 
-    if 'pushlog' in pullop.stepsdone or not pullop.remote.capable('pushlog'):
+    if not pullop.remote.capable('pushlog'):
+        return res
+
+    # stepsdone added in Mercurial 3.2.
+    if hasattr(pullop, 'stepsdone') and 'pushlog' in pullop.stepsdone:
         return res
 
     repo = pullop.repo
