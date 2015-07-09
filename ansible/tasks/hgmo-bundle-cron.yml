@@ -41,3 +41,4 @@
     - { hour: 3, minute: 30, repo: projects/jamun }
     - { hour: 4, minute: 0, repo: projects/larch }
     - { hour: 4, minute: 30, repo: projects/oak }
+    - { hour: 5, minute: 0, repo: projects/cedar }
