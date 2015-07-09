@@ -11,8 +11,30 @@ from mach.decorators import (
     Command,
 )
 
+MAX_POLL_ATTEMPTS = 20
+POLL_INTERVAL = 0.1
+
+
 @CommandProvider
 class AutolandCommands(object):
+
+    def _poll_autoland_status(self, poll, url):
+        if not poll:
+            r = requests.get(url)
+            print(r.status_code, r.text)
+        else:
+            import json
+            import time
+            attempts = 0
+            while attempts < MAX_POLL_ATTEMPTS:
+                attempts += 1
+                r = requests.get(url)
+                if r.status_code != 200 or json.loads(r.text)['landed'] is not None:
+                    print(r.status_code, r.text)
+                    break
+                time.sleep(POLL_INTERVAL)
+            else:
+                print('timed out')
 
     @Command('post-autoland-job', category='autoland',
         description='Post a job to autoland')
@@ -45,10 +67,11 @@ class AutolandCommands(object):
         description='Get an autoland job status')
     @CommandArgument('host', help='Host to which to post the job')
     @CommandArgument('requestid', help='Id of the job for which to get status')
-    def autoland_job_status(self, host, requestid):
-        host = host.rstrip('/')
-        r = requests.get(host + '/autoland/status/' + requestid)
-        print(r.status_code, r.text)
+    @CommandArgument('--poll', required=False, action='store_true',
+                     help='Poll the status until the job is serviced')
+    def autoland_job_status(self, host, requestid, poll):
+        url = host.rstrip('/') + '/autoland/status/' + requestid
+        AutolandCommands._poll_autoland_status(self, poll, url)
 
     @Command('wait-for-autoland-pingback', category='autoland',
         description='Wait for an autoland job pingback')
@@ -112,6 +135,8 @@ class AutolandCommands(object):
         description='Get an autoland job status')
     @CommandArgument('host', help='Host to which to post the job')
     @CommandArgument('requestid', help='Id of the job for which to get status')
-    def pullrequest_job_status(self, host, requestid):
-        r = requests.get(host + '/pullrequest/mozreview/status/' + requestid)
-        print(r.status_code, r.text)
+    @CommandArgument('--poll', required=False, action='store_true',
+                     help='Poll the status until the job is serviced')
+    def pullrequest_job_status(self, host, requestid, poll):
+        url = host.rstrip('/') + '/pullrequest/mozreview/status/' + requestid
+        AutolandCommands._poll_autoland_status(self, poll, url)
