@@ -697,6 +697,7 @@ class Docker(object):
         start_autoland = False
         if autoland_port:
             start_autoland = True
+            start_hgrb = True
 
         start_rbweb = False
         if rbweb_port or start_autoland or start_hgrb:
@@ -827,15 +828,6 @@ class Docker(object):
             f_start_web.result()
             web_state = self.client.inspect_container(web_id)
 
-            if start_autoland:
-                bind_path = os.path.abspath(os.path.dirname(self._state_path))
-                f_start_autoland = e.submit(self.client.start, autoland_id,
-                        links=[(autolanddb_state['Name'], 'db'),
-                               (web_state['Name'], 'bmoweb')],
-                        port_bindings={80: autoland_port})
-                f_start_autoland.result()
-                autoland_state = self.client.inspect_container(autoland_id)
-
             if start_pulse:
                 f_start_pulse.result()
                 pulse_state = self.client.inspect_container(pulse_id)
@@ -849,6 +841,16 @@ class Docker(object):
                                   links=[(ldap_state['Name'], 'ldap')],
                                   port_bindings={22: ssh_port, 80: hg_port})
                 hgrb_state = self.client.inspect_container(hgrb_id)
+
+            if start_autoland:
+                assert start_hgrb
+                f_start_autoland = e.submit(self.client.start, autoland_id,
+                        links=[(autolanddb_state['Name'], 'db'),
+                               (web_state['Name'], 'bmoweb'),
+                               (hgrb_state['Name'], 'hgrb')],
+                        port_bindings={80: autoland_port})
+                f_start_autoland.result()
+                autoland_state = self.client.inspect_container(autoland_id)
 
             if start_rbweb:
                 assert start_autoland
