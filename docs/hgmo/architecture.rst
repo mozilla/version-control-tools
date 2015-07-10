@@ -51,3 +51,27 @@ The master SSH server holds its repository data on an NFS volume,
 which is backed by an expensive network appliance. If the master SSH
 server goes down, the warm standby has immediate access to repository
 data.
+
+Handling High Clone Load
+========================
+
+The Firefox repositories are over 1 GB in size. Clones of these
+repositories consume multiple minutes of CPU time on the server per
+clone and eat up considerable bandwidth. Historically, the release
+automation for Firefox (which consists of thousands of machines)
+has been very effective at flooding hg.mozilla.org with high clone
+load, leading to server and network resource exhaustion, making
+hg.mozilla.org extremely slow or intermittently available.
+
+Our primary mechanism for preventing this high load is to defer as
+much of it as possible to a separate, scalable service. In our case,
+Amazon S3. When clients perform an ``hg clone``, Mercurial transparently
+fetches a pre-generated bundle/snapshot/image of the repository from
+Amazon S3 then returns to hg.mozilla.org to pull down the changes
+since that snapshot was generated. This drastically reduces the amount
+of work that hg.mozilla.org needs to perform.
+
+For more, see :ref:`hgmo_bundleclone` and
+the
+`Cloning from S3 <http://gregoryszorc.com/blog/2015/07/08/cloning-from-s3/>`_
+blog post.
