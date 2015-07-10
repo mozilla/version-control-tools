@@ -1,5 +1,5 @@
 [ui]
-username = Otto Land <bind-autoland@mozilla.com>
+username = Otto Länd <autoland@example.com>
 merge = internal:merge
 
 [extensions]

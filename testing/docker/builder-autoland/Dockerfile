@@ -13,7 +13,7 @@ RUN /usr/sbin/groupadd -g 1000 ubuntu
 RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 ubuntu
 
 RUN apt-get update && apt-get --no-install-recommends -y install \
-  apache2 curl gcc libapache2-mod-wsgi postgresql-client \
+  apache2 curl gcc libapache2-mod-wsgi openssh-client postgresql-client \
   python2.7-dev libffi6 libffi-dev libpq-dev libldap2-dev libsasl2-dev \
   mercurial ca-certificates
 
@@ -43,6 +43,12 @@ ADD mozreview.tgz /repos
 ADD hgrc /repos/mozilla-central/.hg/hgrc
 ADD try-hgrc /repos/try/.hg/hgrc
 ADD try_hook.sh /
+
+# SSH
+ADD ssh_config /root/.ssh/config
+ADD autoland_id_rsa /root/.ssh/id_rsa
+ADD autoland_id_rsa.pub /root/.ssh/id_rsa.pub
+RUN chmod 600 -R /root/.ssh
 
 #
 ADD config.json ${AUTOLAND_HOME}/autoland/config.json
