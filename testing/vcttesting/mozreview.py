@@ -389,6 +389,10 @@ class MozReview(object):
         self._docker.client.execute(self.hgrb_id,
                                     ['/create-repo', name, str(rbid)])
 
+        if self.autoland_id:
+            self._docker.client.execute(self.autoland_id, ['/clone-repo',
+                                        name])
+
         return http_url, ssh_url, rbid
 
     def clone(self, repo, dest, username=None):

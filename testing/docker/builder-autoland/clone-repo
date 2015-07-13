@@ -1,0 +1,22 @@
+#!/bin/bash
+
+cd /repos
+hg clone http://hgrb/$1
+cd /repos/$1
+
+cat > .hg/hgrc << EOF
+[extensions]
+evolve = /home/ubuntu/mutable-history/hgext/evolve.py
+mq =
+purge =
+rebase =
+reviewboard = /home/ubuntu/version-control-tools/hgext/reviewboard/client.py
+
+[paths]
+default = http://hgrb/$1
+mozreview = http://hgrb/$1
+mozreview-push = ssh://hgrb/$1
+try = /repos/try
+EOF
+
+hg bookmark central

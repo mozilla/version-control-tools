@@ -85,7 +85,7 @@ hgHome: /tmp
 hgShell: /bin/sh
 homeDirectory: /home/password
 sn: Land
-uid: password
+uid: autoland
 uidNumber: 2000
 structuralObjectClass: inetOrgPerson
 mail: autoland@example.com

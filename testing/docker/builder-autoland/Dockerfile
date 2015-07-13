@@ -14,16 +14,21 @@ RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 ubuntu
 
 RUN apt-get update && apt-get --no-install-recommends -y install \
   apache2 curl gcc libapache2-mod-wsgi openssh-client postgresql-client \
-  python2.7-dev libffi6 libffi-dev libpq-dev libldap2-dev libsasl2-dev \
-  mercurial ca-certificates
+  python2.7-dev libffi6 libffi-dev libpq-dev ca-certificates
 
 # Python
 # %include autoland/requirements.txt
 # %include autoland/autoland/
-# %include pylib/mozautomation/mozautomation/
+# %include hgext/bootstrap.py
+# %include hgext/reviewboard
+# %include pylib
+# %include run-tests
 ADD extra/vct/autoland/requirements.txt ${AUTOLAND_HOME}/requirements.txt
 ADD extra/vct/autoland/autoland ${AUTOLAND_HOME}/autoland
-ADD extra/vct/pylib/mozautomation/mozautomation/ ${VCT_HOME}/pylib/mozautomation/mozautomation/
+ADD extra/vct/run-tests ${VCT_HOME}/run-tests
+ADD extra/vct/hgext/bootstrap.py ${VCT_HOME}/hgext/bootstrap.py
+ADD extra/vct/hgext/reviewboard ${VCT_HOME}/hgext/reviewboard
+ADD extra/vct/pylib/ ${VCT_HOME}/pylib/
 
 RUN curl -SL 'https://bootstrap.pypa.io/get-pip.py' | python2
 RUN pip install virtualenv
@@ -37,10 +42,9 @@ ADD autoland.conf /etc/apache2/sites-enabled/autoland.conf
 EXPOSE 80
 
 # Hg
-RUN mkdir /repos && hg init /repos/mozilla-central && hg init /repos/try
-RUN cd /repos/mozilla-central && hg bookmark central
-ADD mozreview.tgz /repos
-ADD hgrc /repos/mozilla-central/.hg/hgrc
+RUN pip install mercurial==3.4.2
+RUN cd /home/ubuntu && hg clone -r 4140d680784e https://bitbucket.org/marmoute/mutable-history
+RUN mkdir /repos && hg init /repos/try
 ADD try-hgrc /repos/try/.hg/hgrc
 ADD try_hook.sh /
 
@@ -52,5 +56,6 @@ RUN chmod 600 -R /root/.ssh
 
 #
 ADD config.json ${AUTOLAND_HOME}/autoland/config.json
+ADD clone-repo /clone-repo
 ADD start-autoland.sh /start-autoland.sh
 CMD ["/start-autoland.sh"]
