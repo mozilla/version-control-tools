@@ -46,8 +46,11 @@ def autoland():
       "revision": "9cc25f7ac50a",
       "destination": "try",
       "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
+      "push_bookmark": "@",
       "pingback_url": "http://localhost/",
     }
+
+    Both trysyntax and push_bookmark are optional.
 
     Returns an id which can be used to get the status of the autoland
     request.
@@ -84,14 +87,15 @@ def autoland():
     cursor = dbconn.cursor()
 
     query = """
-        insert into Transplant(tree,rev,destination,trysyntax,pingback_url)
-        values (%s,%s,%s,%s,%s)
+        insert into Transplant(tree,rev,destination,trysyntax,push_bookmark,pingback_url)
+        values (%s,%s,%s,%s,%s,%s)
         returning id
     """
 
     cursor.execute(query, (request.json['tree'], request.json['rev'],
                            request.json['destination'],
                            request.json.get('trysyntax', ''),
+                           request.json.get('push_bookmark', ''),
                            request.json['pingback_url']))
     request_id = cursor.fetchone()[0]
     dbconn.commit()
@@ -106,7 +110,7 @@ def autoland_status(request_id):
     cursor = dbconn.cursor()
 
     query = """
-        select tree,rev,destination,trysyntax,landed,result
+        select tree,rev,destination,trysyntax,push_bookmark,landed,result
         from Transplant
         where id = %(request_id)s
     """
@@ -118,22 +122,23 @@ def autoland_status(request_id):
 
     row = cursor.fetchone()
     if row:
-        landed = row[4]
+        landed = row[5]
 
         result = {
             'tree': row[0],
             'rev': row[1],
             'destination': row[2],
             'trysyntax': row[3],
+            'push_bookmark': row[4],
             'landed': landed,
             'result': '',
             'error_msg': ''
         }
 
         if landed:
-            result['result'] = row[5]
+            result['result'] = row[6]
         else:
-            result['error_msg'] = row[5]
+            result['error_msg'] = row[6]
 
         return jsonify(result)
 
