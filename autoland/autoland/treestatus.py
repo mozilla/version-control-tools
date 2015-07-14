@@ -12,6 +12,9 @@ def tree_is_open(tree):
         r = requests.get(TREESTATUS_URL + tree + '?format=json', verify=False)
         if r.status_code == 200:
             return r.json()['status'] == 'open'
+        elif r.status_code == 404:
+            # We assume unrecognized trees are open
+            return True
     except (KeyError, requests.exceptions.ConnectionError):
         return False
 
