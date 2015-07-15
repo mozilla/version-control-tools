@@ -4,6 +4,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import unittest
 import time
 
 import selenium.webdriver.support.expected_conditions as EC
@@ -13,7 +14,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from vcttesting.unittest import MozReviewWebDriverTest
 
-
+@unittest.skip("disabled until bug 1180818 is fixed")
 class AutolandTryTest(MozReviewWebDriverTest):
     def test_autoland_try(self):
         self.create_users([
