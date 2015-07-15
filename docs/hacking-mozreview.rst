@@ -9,7 +9,7 @@ Want to improve MozReview? This article will help you get started.
 Before we begin, let's introduce the components that make up MozReview.
 
 Review Board
-   Django based code review software.
+   Django-based code-review software.
 
 Mercurial Server
    Code reviews are initiated by pushing them to a Mercurial repository.
@@ -17,11 +17,15 @@ Mercurial Server
 Bugzilla
    Review Board actions result in interaction with Bugzilla.
 
-rbbz
-   A Review Board extension that integrates Review Board with Bugzilla.
-
 mozreview
-   A Review Board extension modifying the Review Board user interface.
+   A Review Board extension providing integration with the rest of the
+   MozReview system, including user interface modifications and
+   autoland and Bugzilla support.
+
+rbbz
+   A Review Board extension that integrates Review Board with
+   Bugzilla. The code here is slowly being migrated to the mozreview
+   extension, so rbbz should be considered deprecated.
 
 Review Board Mercurial Extension
    There exist client-oriented and server-oriented Mercurial extensions
@@ -34,8 +38,24 @@ It is possible to run a fully isolated, fully local MozReview instance
 from your machine. This will give you an environment that should behave
 like production.
 
-To get started, you'll need to configure your environment. Run the
-following::
+You will need Docker installed. On Linux, this is generally as simple
+as installing the required package, e.g., on Ubuntu,
+
+  $ sudo apt-get install docker.io
+
+You can also install the very latest release `directly from Docker <http://docs.docker.com/linux/step_one/>`_.
+
+For OS X, you will need to install and start up boot2docker; see
+the official `installation instructions
+<https://docs.docker.com/installation/mac/>`_, particularly the
+section on `starting from the command line
+<https://docs.docker.com/installation/mac/#from-your-command-line>`_.
+
+Running a local MozReview instance in Windows is not yet supported,
+but if you get it working, please :ref:`let us know! <mozreview_getting_in_touch>`
+
+After you have docker up and running, you'll need to configure your
+environment. Run the following::
 
   $ ./create-test-environment
 
@@ -48,6 +68,7 @@ image).
 Now, you can create and start a MozReview instance::
 
   $ ./mozreview start /path/to/instance
+  ...
   waiting for Bugzilla to start
   Bugzilla accessible on http://192.168.59.104:55568/
   Bugzilla URL: http://192.168.59.104:55568/
@@ -71,8 +92,13 @@ Now, you can create and start a MozReview instance::
 
   (autorefresh requires `watchman`)
 
+  Obtain a shell in a container by running:
+    ./mozreview shell <container>
+
+  (valid container names include: rbweb, bmoweb, hgrb, autoland)
+
 You should be able to load the printed URLs in your browser and see a
-working site. If you don't, file a bug!
+working site. If you don't, `file a bug! <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview>`_
 
 .. warning::
 
@@ -386,7 +412,12 @@ Running Tests
 The MozReview tests are all defined as part of the Mercurial extension.
 To run the tests::
 
-   $ ./run-tests -j2 hgext/reviewboard/tests/*
+   $ ./run-tests -j2 hgext/reviewboard/tests/ pylib/mozreview/mozreview/autoland/tests
+
+There are also some Selenium-based tests.  You'll need Firefox
+(release) installed to run them::
+
+  $ ./run-tests pylib/mozreview/mozreview/tests/
 
 Filing Bugs
 ===========
