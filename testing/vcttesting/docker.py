@@ -364,6 +364,18 @@ class Docker(object):
 
         missing = (set(names) | set(ansibles.keys())) - set(images.keys())
 
+        # Collect last images if wanted.
+        # This is also done inside the building functions. But doing it here
+        # as well prevents some overhead to create the vct container. The code
+        # duplication is therefore warranted.
+        if use_last:
+            for image in reversed(self.client.images()):
+                for repotag in image['RepoTags']:
+                    repo, tag = repotag.split(':', 1)
+                    if repo in missing:
+                        images[repo] = image['Id']
+                        missing.remove(repo)
+
         if not missing:
             return images
 
