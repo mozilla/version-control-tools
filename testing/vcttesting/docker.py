@@ -1224,6 +1224,17 @@ class Docker(object):
                     if i['Id'] not in images:
                         e.submit(self.client.remove_image, c['Id'])
 
+    def execute(self, cid, cmd, stderr=True, stream=False):
+        """Execute a command on a container.
+
+        Returns the output of the command.
+
+        This mimics the old docker.execute() API, which was removed in
+        docker-py 1.3.0.
+        """
+        r = self.client.exec_create(cid, cmd, stderr=stderr)
+        return self.client.exec_start(r['Id'], stream=stream)
+
     def get_file_content(self, cid, path):
         """Get the contents of a file from a container."""
         r = self.client.copy(cid, path)
@@ -1241,8 +1252,8 @@ class Docker(object):
 
         This returns an iterable of ``tarfile.TarInfo``, fileobj 2-tuples.
         """
-        data = self.client.execute(cid, [tar, '-c', '-C', path, '-f', '-', '.'],
-                                   stderr=False)
+        data = self.execute(cid, [tar, '-c', '-C', path, '-f', '-', '.'],
+                            stderr=False)
         buf = BytesIO(data)
         t = tarfile.open(mode='r', fileobj=buf)
         for member in t:

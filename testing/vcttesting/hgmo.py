@@ -144,11 +144,11 @@ class HgCluster(object):
                 mirror_public_key,
             ]
             for i in web_ids:
-                e.submit(self._dc.execute(i, cmd))
+                e.submit(self._d.execute(i, cmd))
 
             # Tell the master about all the mirrors.
             mirrors = [s['NetworkSettings']['IPAddress'] for s in web_states]
-            e.submit(self._dc.execute, master_id, ['/set-mirrors.py'] + mirrors)
+            e.submit(self._d.execute, master_id, ['/set-mirrors.py'] + mirrors)
 
         ldap_hostname, ldap_hostport = \
                 self._d._get_host_hostname_port(ldap_state, '389/tcp')
@@ -252,7 +252,7 @@ class HgCluster(object):
 
         cmd = ['/create-repo', name, 'scm_level_%d' % level]
 
-        self._dc.execute(self.master_id, cmd)
+        self._d.execute(self.master_id, cmd)
 
     def aggregate_code_coverage(self, destdir):
         master_map = {}

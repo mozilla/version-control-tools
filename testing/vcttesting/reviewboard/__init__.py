@@ -79,12 +79,12 @@ class MozReviewBoard(object):
 
         This grants superuser and staff privileges to the user.
         """
-        self._docker.client.execute(self._cid, ['/make-admin', email])
+        self._docker.execute(self._cid, ['/make-admin', email])
         logger.info('made %s an admin' % email)
 
     def create_local_user(self, username, email, password):
         """Make a Review Board user using RBs internal auth."""
-        self._docker.client.execute(self._cid, [
+        self._docker.execute(self._cid, [
             '/create-local-user',
             username,
             email,
@@ -94,7 +94,7 @@ class MozReviewBoard(object):
 
     def grant_permission(self, username, permission):
         """Grant a user a Review Board permission."""
-        self._docker.client.execute(self._cid, [
+        self._docker.execute(self._cid, [
             '/grant-permission',
             username,
             permission
@@ -107,7 +107,5 @@ class MozReviewBoard(object):
         This essentially returns a dict mapping columns in the accounts_profile
         table to their values.
         """
-        res = self._docker.client.execute(self._cid,
-                                          ['/dump-profile', username])
-
+        res = self._docker.execute(self._cid, ['/dump-profile', username])
         return json.loads(res)

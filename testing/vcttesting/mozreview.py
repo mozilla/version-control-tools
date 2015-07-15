@@ -245,16 +245,16 @@ class MozReview(object):
             e.submit(make_users)
 
             # Tell hgrb about URLs.
-            e.submit(self._docker.client.execute, self.hgrb_id,
+            e.submit(self._docker.execute, self.hgrb_id,
                      ['/set-urls', self.bugzilla_url, self.reviewboard_url])
 
             # Define site domain and hostname in rbweb. This is necessary so it
             # constructs self-referential URLs properly.
-            e.submit(self._docker.client.execute, self.rbweb_id,
+            e.submit(self._docker.execute, self.rbweb_id,
                      ['/set-site-url', self.reviewboard_url])
 
             # Tell Bugzilla about Review Board URL.
-            e.submit(self._docker.client.execute, mr_info['web_id'],
+            e.submit(self._docker.execute, mr_info['web_id'],
                      ['/set-urls', self.reviewboard_url])
 
         hg_ssh_host_key = self._docker.get_file_content(
@@ -326,7 +326,7 @@ class MozReview(object):
                                                 rsync_port)
 
             def execute(name, cid, command):
-                res = self._docker.client.execute(cid, command, stream=True)
+                res = self._docker.execute(cid, command, stream=True)
                 for msg in res:
                     if verbose:
                         print('%s> %s' % (name, msg), end='')
@@ -386,12 +386,11 @@ class MozReview(object):
         rbid = rb.add_repository(os.path.dirname(name) or name, http_url,
                                  bugzilla_url=self.bugzilla_url)
 
-        self._docker.client.execute(self.hgrb_id,
-                                    ['/create-repo', name, str(rbid)])
+        self._docker.execute(self.hgrb_id,
+                            ['/create-repo', name, str(rbid)])
 
         if self.autoland_id:
-            self._docker.client.execute(self.autoland_id, ['/clone-repo',
-                                        name])
+            self._docker.execute(self.autoland_id, ['/clone-repo', name])
 
         return http_url, ssh_url, rbid
 
