@@ -30,7 +30,7 @@ class TestAutoland(unittest.TestCase):
             cmds = [['hg', 'init'],
                     ['hg', 'import', 'initial.patch'],
                     ['hg', 'phase', '--public', '-r', '.'],
-                    ['hg', 'bookmark', 'central']]
+                    ['hg', 'bookmark', 'upstream']]
 
             for cmd in cmds:
                 # Use check_output to suppress the output from hg import
@@ -41,7 +41,7 @@ class TestAutoland(unittest.TestCase):
                 f.write('[paths]\nmozreview-push = ')
                 f.write(mozreview_repo_path)
                 f.write('\n')
-                f.write('default = .\n')
+                f.write('upstream = .\n')
 
             cmds = [['hg', 'init']]
             for cmd in cmds:
@@ -141,7 +141,7 @@ class TestAutoland(unittest.TestCase):
 
             # Configure 'local' repo
             cmds = [['hg', 'init'],
-                    ['hg', 'bookmark', 'central']]
+                    ['hg', 'bookmark', 'upstream']]
             for cmd in cmds:
                 subprocess.check_call(cmd, cwd=local_repo_path)
 
@@ -150,15 +150,16 @@ class TestAutoland(unittest.TestCase):
                 f.write(try_repo_path)
                 f.write('\nmozreview = ')
                 f.write(mozreview_repo_path)
+                f.write('\nupstream= ')
+                f.write(mozreview_repo_path)
                 f.write('\n')
 
             def get_repo_path(tree):
                 return local_repo_path
             transplant.get_repo_path = get_repo_path
 
-            landed, result = transplant.transplant_to_try('mozilla', '0',
-                                                          'try')
-
+            landed, result = transplant.transplant('mozreview', 'try', '0',
+                                                   'try')
             self.assertEqual(landed, True)
             self.assertEqual(len(result), 12)
             self.assertIsNotNone(re.match('([a-f0-9]+)', result))
@@ -167,6 +168,112 @@ class TestAutoland(unittest.TestCase):
             shutil.rmtree(local_repo_path)
             shutil.rmtree(mozreview_repo_path)
             shutil.rmtree(try_repo_path)
+
+    def test_transplant_to_inbound(self):
+        mozreview_repo_path = tempfile.mkdtemp()
+        inbound_repo_path = tempfile.mkdtemp()
+        local_repo_path = tempfile.mkdtemp()
+
+        try:
+            # Configure 'mozreview' repo
+            shutil.copy(os.path.join(HERE, 'test-data', 'initial.patch'),
+                        mozreview_repo_path)
+            cmds = [['hg', 'init'],
+                    ['hg', 'import', 'initial.patch']]
+            for cmd in cmds:
+                # Use check_output to suppress the output from hg import
+                subprocess.check_output(cmd, stderr=subprocess.STDOUT,
+                                        cwd=mozreview_repo_path)
+            with open(os.path.join(mozreview_repo_path, '.hg', 'hgrc'), 'w') as f:
+                f.write('[phases]\npublish = False\n')
+
+            # Configure 'try' repo
+            cmds = [['hg', 'init']]
+            for cmd in cmds:
+                subprocess.check_call(cmd, cwd=inbound_repo_path)
+
+            # Configure 'local' repo
+            cmds = [['hg', 'init'],
+                    ['hg', 'bookmark', 'upstream']]
+            for cmd in cmds:
+                subprocess.check_call(cmd, cwd=local_repo_path)
+
+            with open(os.path.join(local_repo_path, '.hg', 'hgrc'), 'w') as f:
+                f.write('[paths]\ninbound = ')
+                f.write(inbound_repo_path)
+                f.write('\nmozreview = ')
+                f.write(mozreview_repo_path)
+                f.write('\nupstream= ')
+                f.write(mozreview_repo_path)
+                f.write('\n')
+
+            def get_repo_path(tree):
+                return local_repo_path
+            transplant.get_repo_path = get_repo_path
+
+            landed, result = transplant.transplant('mozreview', 'inbound', '0')
+            self.assertEqual(landed, True)
+            self.assertEqual(len(result), 12)
+            self.assertIsNotNone(re.match('([a-f0-9]+)', result))
+
+        finally:
+            shutil.rmtree(local_repo_path)
+            shutil.rmtree(mozreview_repo_path)
+            shutil.rmtree(inbound_repo_path)
+
+    def test_transplant_using_at_bookmark(self):
+        mozreview_repo_path = tempfile.mkdtemp()
+        inbound_repo_path = tempfile.mkdtemp()
+        local_repo_path = tempfile.mkdtemp()
+
+        try:
+            # Configure 'mozreview' repo
+            shutil.copy(os.path.join(HERE, 'test-data', 'initial.patch'),
+                        mozreview_repo_path)
+            cmds = [['hg', 'init'],
+                    ['hg', 'import', 'initial.patch']]
+            for cmd in cmds:
+                # Use check_output to suppress the output from hg import
+                subprocess.check_output(cmd, stderr=subprocess.STDOUT,
+                                        cwd=mozreview_repo_path)
+            with open(os.path.join(mozreview_repo_path, '.hg', 'hgrc'), 'w') as f:
+                f.write('[phases]\npublish = False\n')
+
+            # Configure 'try' repo
+            cmds = [['hg', 'init']]
+            for cmd in cmds:
+                subprocess.check_call(cmd, cwd=inbound_repo_path)
+
+            # Configure 'local' repo
+            cmds = [['hg', 'init'],
+                    ['hg', 'bookmark', 'upstream']]
+            for cmd in cmds:
+                subprocess.check_call(cmd, cwd=local_repo_path)
+
+            with open(os.path.join(local_repo_path, '.hg', 'hgrc'), 'w') as f:
+                f.write('[paths]\nversion-control-tools = ')
+                f.write(inbound_repo_path)
+                f.write('\nmozreview = ')
+                f.write(mozreview_repo_path)
+                f.write('\nupstream= ')
+                f.write(mozreview_repo_path)
+                f.write('\n')
+
+            def get_repo_path(tree):
+                return local_repo_path
+            transplant.get_repo_path = get_repo_path
+
+            landed, result = transplant.transplant('mozreview',
+                                                   'version-control-tools',
+                                                   '0', '', '@')
+            self.assertEqual(landed, True)
+            self.assertEqual(len(result), 12)
+            self.assertIsNotNone(re.match('([a-f0-9]+)', result))
+
+        finally:
+            shutil.rmtree(local_repo_path)
+            shutil.rmtree(mozreview_repo_path)
+            shutil.rmtree(inbound_repo_path)
 
 
 if __name__ == '__main__':

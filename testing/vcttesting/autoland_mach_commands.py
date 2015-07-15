@@ -44,16 +44,23 @@ class AutolandCommands(object):
     @CommandArgument('destination', help='Destination tree for the revision')
     @CommandArgument('pingback_url', default='http://localhost/',
                      help='URL to which Autoland should post result')
-    @CommandArgument('--trysyntax', required=False, default='', help='Name of queue to create')
-    @CommandArgument('--user', required=False, default='autoland', help='Autoland user')
-    @CommandArgument('--password', required=False, default='autoland', help='Autoland password')
+    @CommandArgument('--trysyntax', required=False, default='',
+                     help='Try syntax to use [optional]')
+    @CommandArgument('--push-bookmark', required=False, default='',
+                     help='Bookmark name to use when pushing [optional]')
+    @CommandArgument('--user', required=False, default='autoland',
+                     help='Autoland user')
+    @CommandArgument('--password', required=False, default='autoland',
+                     help='Autoland password')
     def post_autoland_job(self, host, tree, rev, destination, pingback_url,
-                          trysyntax=None, user=None, password=None):
+                          trysyntax=None, push_bookmark=None, user=None,
+                          password=None):
         data = {
             'tree': tree,
             'rev': rev,
             'destination': destination,
             'trysyntax': trysyntax,
+            'push_bookmark': push_bookmark,
             'pingback_url': pingback_url
         }
 
