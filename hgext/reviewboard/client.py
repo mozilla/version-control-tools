@@ -252,14 +252,19 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
     # We filter the "extension isn't installed" message from the server.
     # This is a bit hacky, but it's easier than sending a signal over the
     # wire protocol (at least until bundle2).
+
+    def filterwrite(messages):
+        if messages[0] == _('remote: ') and len(messages) >= 2 and \
+            messages[1].startswith('REVIEWBOARD: '):
+            return True
+
+        return False
+
     oldcls = remote.ui.__class__
     class filteringwrite(remote.ui.__class__):
         def write(self, *args, **kwargs):
-            if args[0] == _('remote: ') and len(args) >= 2 and \
-                args[1].startswith('REVIEWBOARD: '):
-                return
-
-            return oldcls.write(self, *args, **kwargs)
+            if not filterwrite(args):
+                return oldcls.write(self, *args, **kwargs)
 
     remote.ui.__class__ = filteringwrite
     try:
