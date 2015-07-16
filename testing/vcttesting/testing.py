@@ -221,15 +221,6 @@ def run_nose_tests(tests, process_count=None):
     # sitecustomize.py.
     paths.append(os.path.dirname(sys.executable))
 
-    # We also need our support libraries in sys.path.
-    # TODO shouldn't the virtualenv handle this?
-    for p in os.listdir(os.path.join(ROOT, 'pylib')):
-        p = os.path.join(ROOT, 'pylib', p)
-        if os.path.isdir(p) and p not in paths:
-            paths.insert(0, p)
-
-        env['PYTHONPATH'] = ':'.join(paths)
-
     return subprocess.call(noseargs, env=env)
 
 
