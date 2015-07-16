@@ -206,7 +206,7 @@ def run_nose_tests(tests, process_count=None):
     """Run nose tests and return result code."""
     noseargs = [sys.executable, '-m', 'nose.core', '-s']
 
-    if process_count:
+    if process_count and process_count > 1:
         noseargs.extend([
             '--processes=%d' % process_count,
             '--process-timeout=120',
