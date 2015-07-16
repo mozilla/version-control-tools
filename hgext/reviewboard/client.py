@@ -265,13 +265,24 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
 
         return False
 
-    oldcls = remote.ui.__class__
-    class filteringwrite(remote.ui.__class__):
+    # Starting with Mercurial 3.5 or possibly bundle2, remote messages are
+    # now written to the repo's ui instance as opposed to the remote's. We
+    # wrap both instances until we drop support for Mercurial 3.4.
+    oldrepocls = repo.ui.__class__
+    oldremotecls = remote.ui.__class__
+
+    class repofilteringwrite(repo.ui.__class__):
         def write(self, *args, **kwargs):
             if not filterwrite(args):
-                return oldcls.write(self, *args, **kwargs)
+                return oldrepocls.write(self, *args, **kwargs)
 
-    remote.ui.__class__ = filteringwrite
+    class remotefilteringwrite(remote.ui.__class__):
+        def write(self, *args, **kwargs):
+            if not filterwrite(args):
+                return oldremotecls.write(self, *args, **kwargs)
+
+    repo.ui.__class__ = repofilteringwrite
+    remote.ui.__class__ = remotefilteringwrite
     try:
         # We always do force push because we don't want users to need to
         # specify it. The big danger here is pushing multiple heads or
@@ -280,7 +291,9 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
         return orig(repo, remote, force=True, revs=revs, newbranch=newbranch,
                 **kwargs)
     finally:
-        remote.ui.__class__ = oldcls
+        repo.ui.__class__ = oldrepocls
+        remote.ui.__class__ = oldremotecls
+
 
 def wrappedpushdiscovery(orig, pushop):
     """Wraps exchange._pushdiscovery to add extra review metadata.
