@@ -254,6 +254,11 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
     # wire protocol (at least until bundle2).
 
     def filterwrite(messages):
+        # Mercurial 3.5 sends the output as one string.
+        if messages[0].startswith('%sREVIEWBOARD' % _('remote: ')):
+            return True
+
+        # Older versions have separate components.
         if messages[0] == _('remote: ') and len(messages) >= 2 and \
             messages[1].startswith('REVIEWBOARD: '):
             return True
