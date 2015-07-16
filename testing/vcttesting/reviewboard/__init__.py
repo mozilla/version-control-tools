@@ -107,5 +107,6 @@ class MozReviewBoard(object):
         This essentially returns a dict mapping columns in the accounts_profile
         table to their values.
         """
-        res = self._docker.execute(self._cid, ['/dump-profile', username])
+        res = self._docker.execute(self._cid, ['/dump-profile', username],
+                                   stdout=True, stderr=True)
         return json.loads(res)
