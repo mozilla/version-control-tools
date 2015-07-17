@@ -131,6 +131,7 @@ def addpushmetadata(repo, ctx, d):
         d['pushuser'] = pushinfo[1]
         d['pushdate'] = util.makedate(pushinfo[2])
         d['pushnodes'] = pushinfo[3]
+        d['pushhead'] = pushinfo[3][-1]
 
 
 def changesetentry(orig, web, req, tmpl, ctx):

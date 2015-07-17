@@ -49,6 +49,12 @@ def addmetadata(repo, ctx, d, onlycheap=False):
             except error.LookupError:
                 pass
 
+    # Repositories can define which TreeHerder repository they are associated
+    # with.
+    treeherder = repo.ui.config('mozilla', 'treeherder_repo')
+    if treeherder:
+        d['treeherderrepourl'] = 'https://treeherder.mozilla.org/#/jobs?repo=%s' % treeherder
+
     if onlycheap:
         return
 
