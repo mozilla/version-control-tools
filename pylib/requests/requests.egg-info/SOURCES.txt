@@ -26,6 +26,7 @@ requests.egg-info/PKG-INFO
 requests.egg-info/SOURCES.txt
 requests.egg-info/dependency_links.txt
 requests.egg-info/not-zip-safe
+requests.egg-info/requires.txt
 requests.egg-info/top_level.txt
 requests/packages/__init__.py
 requests/packages/chardet/__init__.py
@@ -88,6 +89,7 @@ requests/packages/urllib3/util/__init__.py
 requests/packages/urllib3/util/connection.py
 requests/packages/urllib3/util/request.py
 requests/packages/urllib3/util/response.py
+requests/packages/urllib3/util/retry.py
 requests/packages/urllib3/util/ssl_.py
 requests/packages/urllib3/util/timeout.py
 requests/packages/urllib3/util/url.py
