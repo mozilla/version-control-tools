@@ -44,6 +44,9 @@ Create some repositories to discover from
 
   $ mkdir repos
   $ cd repos
+The sleep here patches over an apparent race condition. It is a hacky
+workaround to an unidentified root problem.
+  $ sleep 1
   $ hg -q clone ${MERCURIAL_URL}a
   $ cd a
   $ echo foo > foo
