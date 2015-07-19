@@ -18,9 +18,8 @@ Set up repo
 
 Create a user
 
-  $ adminbugzilla create-user user1@example.com password1 'User One [:user1]'
-  created user 6
-  $ mozreview create-ldap-user user1@example.com user1 2001 'User One' --key-file ${MOZREVIEW_HOME}/keys/user1@example.com --scm-level 1
+  $ mozreview create-user user1@example.com password1 'User One [:user1]' --uid 2001 --scm-level 1
+  Created user 6
   $ exportbzauth user1@example.com password1
 
 Dump the user so it gets mirrored over to Review Board

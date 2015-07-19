@@ -9,15 +9,14 @@
   adding foo
   $ hg phase --public -r .
 
-  $ adminbugzilla create-user author@example.com password 'Some Contributor'
-  created user 6
-  $ mozreview create-ldap-user author@example.com contributor 2001 'Some Contributor' --key-file ${MOZREVIEW_HOME}/keys/author@example.com --scm-level 1
-  $ adminbugzilla create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --group editbugs
-  created user 7
-  $ adminbugzilla create-user reviewer2@example.com password 'Another Reviewer [:rev2]' --group editbugs
-  created user 8
-  $ adminbugzilla create-user troll@example.com password 'Reviewer Troll [:troll]' --group editbugs
-  created user 9
+  $ mozreview create-user author@example.com password 'Some Contributor' --uid 2001 --scm-level 1
+  Created user 6
+  $ mozreview create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --bugzilla-group editbugs
+  Created user 7
+  $ mozreview create-user reviewer2@example.com password 'Another Reviewer [:rev2]' --bugzilla-group editbugs
+  Created user 8
+  $ mozreview create-user troll@example.com password 'Reviewer Troll [:troll]' --bugzilla-group editbugs
+  Created user 9
 
 Create a review request from a regular user
 

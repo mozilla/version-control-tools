@@ -10,8 +10,8 @@
   $ hg phase --public -r .
   $ hg push --noreview > /dev/null
 
-  $ adminbugzilla create-user reviewer@example.com password1 'Mozilla Reviewer [:reviewer]' --group editbugs
-  created user 6
+  $ mozreview create-user reviewer@example.com password1 'Mozilla Reviewer [:reviewer]' --bugzilla-group editbugs
+  Created user 6
 
   $ bugzilla create-bug TestProduct TestComponent bug1
 

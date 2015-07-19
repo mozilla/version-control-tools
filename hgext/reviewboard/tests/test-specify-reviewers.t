@@ -20,16 +20,16 @@ Create an initial commit.
 
 Add some potential reviewers.
 
-  $ adminbugzilla create-user romulus@example.com password 'Romulus :romulus'
-  created user 6
-  $ adminbugzilla create-user remus@example.com password 'Remus :remus'
-  created user 7
+  $ mozreview create-user romulus@example.com password 'Romulus :romulus'
+  Created user 6
+  $ mozreview create-user remus@example.com password 'Remus :remus'
+  Created user 7
 
 We create a user with a name which contains another user name as a prefix to
 exercise the code path where multiple users are returned for a query.
 
-  $ adminbugzilla create-user remus2@example.com password 'Remus2 :remus2'
-  created user 8
+  $ mozreview create-user remus2@example.com password 'Remus2 :remus2'
+  Created user 8
 
 Try a bunch of different ways of specifying a reviewer
 

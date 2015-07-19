@@ -9,9 +9,8 @@
   adding foo
   $ hg phase --public -r .
 
-  $ adminbugzilla create-user author@example.com password 'Some Contributor'
-  created user 6
-  $ mozreview create-ldap-user author@example.com contributor 2001 'Some Contributor' --key-file ${MOZREVIEW_HOME}/keys/author@example.com --scm-level 1
+  $ mozreview create-user author@example.com password 'Some Contributor' --username contributor --uid 2001 --scm-level 1
+  Created user 6
 
 Create a review request from a regular user
 

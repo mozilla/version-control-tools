@@ -5,16 +5,16 @@
 
 Create some users
 
-  $ adminbugzilla create-user joe1@example.com password 'Joe Smith'
-  created user 6
-  $ adminbugzilla create-user the-real-j-o-e@example.com password 'Joe Another'
-  created user 7
-  $ adminbugzilla create-user jane@example.com password 'Jane Jones [:jenny]'
-  created user 8
-  $ adminbugzilla create-user john.mclane@example.com password 'John McLane'
-  created user 9
-  $ adminbugzilla create-user sarah.connor@example.com password 'Sarah Connor'
-  created user 10
+  $ mozreview create-user joe1@example.com password 'Joe Smith'
+  Created user 6
+  $ mozreview create-user the-real-j-o-e@example.com password 'Joe Another'
+  Created user 7
+  $ mozreview create-user jane@example.com password 'Jane Jones [:jenny]'
+  Created user 8
+  $ mozreview create-user john.mclane@example.com password 'John McLane'
+  Created user 9
+  $ mozreview create-user sarah.connor@example.com password 'Sarah Connor'
+  Created user 10
 
 Unauthenticated users should not be able to search
 

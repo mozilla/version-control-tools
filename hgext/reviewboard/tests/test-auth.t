@@ -92,12 +92,10 @@ Pushing as a user not in Review Board should auto create the RB account
 We create 2 users here. 1 looks like a normal person: "First Last"
 The other has Mozilla IRC syntax: "First Last [:nick]"
 
-  $ adminbugzilla create-user user1@example.com password1 'Dummy User1'
-  created user 6
-  $ mozreview create-ldap-user user1@example.com user1 2001 'User One' --key-file ${MOZREVIEW_HOME}/keys/user1@example.com --scm-level 1
-  $ adminbugzilla create-user user2@example.com password2 'Mozila User [:nick]'
-  created user 7
-  $ mozreview create-ldap-user user2@example.com user2 2002 'User Two' --key-file ${MOZREVIEW_HOME}/keys/user2@example.com --scm-level 1
+  $ mozreview create-user user1@example.com password1 'Dummy User1' --uid 2001 --scm-level 1
+  Created user 6
+  $ mozreview create-user user2@example.com password2 'Mozila User [:nick]' --uid 2002 --scm-level 1
+  Created user 7
 
   $ exportbzauth user1@example.com password1
   $ hg push --reviewid bz://1/nonick
@@ -286,9 +284,8 @@ Re-enabling a disabled user will allow them to use Review Board
 If a new Review Board user claims the same IRC nick as an existing user,
 we fall back to non-IRC RB usernames.
 
-  $ adminbugzilla create-user user3@example.com password3 'Dummy User3 [:newnick]'
-  created user 8
-  $ mozreview create-ldap-user user3@example.com user3 2003 'User Three' --key-file ${MOZREVIEW_HOME}/keys/user3@example.com --scm-level 1
+  $ mozreview create-user user3@example.com password3 'Dummy User3 [:newnick]' --uid 2003 --scm-level 1
+  Created user 8
 
   $ exportbzauth user3@example.com password3
   $ hg push --reviewid bz://1/conflictingircnick

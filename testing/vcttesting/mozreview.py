@@ -11,8 +11,8 @@ import os
 import subprocess
 import time
 
-import paramiko
 import concurrent.futures as futures
+import paramiko
 
 from vcttesting.bugzilla import Bugzilla
 from vcttesting.docker import (
@@ -474,7 +474,8 @@ class MozReview(object):
                                         bugzilla_password=bugzilla_password)
 
     def create_user(self, email, password, fullname, bugzilla_groups=None,
-                    uid=None, username=None, scm_level=None):
+                    uid=None, username=None, key_filename=None,
+                    scm_level=None):
         """Create a new user.
 
         This will create a user in at least Bugzilla. If the ``uid`` argument
@@ -490,6 +491,9 @@ class MozReview(object):
         ``uid`` is the numeric UID for the created system/LDAP account.
         ``username`` is the UNIX username for this user. It defaults to the
         username part of the email address.
+        ``key_filename`` is a path to an ssh key. This is used only if ``uid``
+        is given. If ``uid`` is given but ``key_filename`` is not specified,
+        the latter defaults to <mozreview path>/keys/<email>.
         ``scm_level`` defines the source code level access to grant to this
         user. Supported levels are ``1``, ``2``, and ``3``. If not specified,
         the user won't be able to push to any repos.
@@ -510,7 +514,9 @@ class MozReview(object):
 
         # Create an LDAP account as well.
         if uid:
-            key_filename = os.path.join(self._path, 'keys', email)
+            if key_filename is None:
+                key_filename = os.path.join(self._path, 'keys', email)
+
             lr = self.get_ldap().create_user(email, username, uid,
                                              fullname,
                                              key_filename=key_filename,

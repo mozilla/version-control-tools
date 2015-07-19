@@ -3,9 +3,8 @@
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv
 
-  $ adminbugzilla create-user submitter@example.com password 'Dummy Submitter'
-  created user 6
-  $ mozreview create-ldap-user submitter@example.com submitter 2001 'Dummy Submitter' --key-file ${MOZREVIEW_HOME}/keys/submitter@example.com --scm-level 1
+  $ mozreview create-user submitter@example.com password 'Dummy Submitter' --username submitter --uid 2001 --scm-level 1
+  Created user 6
   $ exportbzauth submitter@example.com password
   $ bugzilla create-bug TestProduct TestComponent 'Initial Bug'
 

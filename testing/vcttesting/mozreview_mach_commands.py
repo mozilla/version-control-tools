@@ -176,23 +176,31 @@ class MozReviewCommands(object):
         mr.clone(repo, dest, username=user)
 
     @Command('create-user', category='mozreview',
-        description='Create a user in a MozReview instance')
+             description='Create a user in a MozReview instance')
     @CommandArgument('where', nargs='?',
-        help='Directory of MozReview instance')
+                     help='Directory of MozReview instance')
     @CommandArgument('email', help='Email address for user')
     @CommandArgument('password', help='Password for user')
     @CommandArgument('fullname', help='Full name for user')
     @CommandArgument('--uid', type=int,
                      help='Numeric user ID for user')
+    @CommandArgument('--username',
+                     help='System account name; defaults to username part of '
+                     'email address')
+    @CommandArgument('--key-file',
+                     help='Path to SSH key to use or create (if missing)')
     @CommandArgument('--scm-level', type=int, choices=(1, 2, 3),
                      help='Source code access level to grant to user')
     @CommandArgument('--bugzilla-group', action='append',
                      help='Bugzilla group to add user to.')
     def create_user(self, where, email, password, fullname, uid=None,
-                    scm_level=None, bugzilla_group=None):
+                    username=None, key_file=None, scm_level=None,
+                    bugzilla_group=None):
         mr = self._get_mozreview(where)
         u = mr.create_user(email, password, fullname,
                            uid=uid,
+                           username=username,
+                           key_filename=key_file,
                            scm_level=scm_level,
                            bugzilla_groups=bugzilla_group)
         print('Created user %s' % u['bugzilla']['id'])

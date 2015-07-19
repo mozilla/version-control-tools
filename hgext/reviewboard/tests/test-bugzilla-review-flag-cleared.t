@@ -8,11 +8,10 @@
   $ hg -q commit -A -m 'root commit'
   $ hg phase --public -r .
 
-  $ adminbugzilla create-user author@example.com password 'Patch Author'
-  created user 6
-  $ mozreview create-ldap-user author@example.com contributor 2001 'Some Contributor' --key-file ${MOZREVIEW_HOME}/keys/author@example.com --scm-level 1
-  $ adminbugzilla create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --group editbugs
-  created user 7
+  $ mozreview create-user author@example.com password 'Patch Author' --uid 2001 --scm-level 1
+  Created user 6
+  $ mozreview create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --bugzilla-group editbugs
+  Created user 7
 
 Create a review
 
