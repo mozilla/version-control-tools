@@ -155,7 +155,7 @@ class Docker(object):
         # TODO look at network info for Docker and extract IP address instead.
         docker_url = urlparse.urlparse(self.client.base_url)
         self.docker_hostname = docker_url.hostname
-        if 'unix' in docker_url.scheme:
+        if docker_url.hostname == 'localunixsocket':
             self.docker_hostname = 'localhost'
 
     def is_alive(self):
