@@ -16,29 +16,6 @@ from vcttesting.unittest import MozReviewWebDriverTest
 
 class AutocompleteTest(MozReviewWebDriverTest):
 
-    def _assign_reviewer(self, commit_index, reviewer):
-        children = self.browser.find_element_by_id('mozreview-child-requests')
-        WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located(
-                (By.CLASS_NAME, 'mozreview-child-reviewer-list')))
-        editicons = children.find_elements_by_class_name('editicon')
-
-        editicons[commit_index].click()
-
-        autocomplete = children.find_elements_by_class_name('ui-autocomplete-input')
-        autocomplete = autocomplete[commit_index]
-
-        autocomplete.send_keys(reviewer)
-
-        WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located(
-                (By.CLASS_NAME, 'ui-autocomplete-results')))
-        results = self.browser.find_elements_by_class_name('ui-autocomplete-results')
-        self.assertEqual(len(results), 1)
-
-        # If you comment this out and press ENTER from the browser, you
-        # get an error. It works from Selenium. Strange.
-        autocomplete.send_keys(Keys.ENTER)
 
     def test_reviewer_autocomplete(self):
         self.create_users([
@@ -61,7 +38,7 @@ class AutocompleteTest(MozReviewWebDriverTest):
         self.load_rburl('r/1')
 
         # assign a reviewer to the first commit
-        self._assign_reviewer(0, 'jsmith')
+        self.assign_reviewer(0, 'jsmith')
 
         time.sleep(1)
         publish = self.browser.find_element_by_id('btn-draft-publish')
@@ -85,7 +62,7 @@ class AutocompleteTest(MozReviewWebDriverTest):
             EC.presence_of_element_located(
                 (By.CLASS_NAME, 'mozreview-child-reviewer-list')))
 
-        self._assign_reviewer(1, 'jsmith')
+        self.assign_reviewer(1, 'jsmith')
 
         time.sleep(1)
         publish = self.browser.find_element_by_id('btn-draft-publish')

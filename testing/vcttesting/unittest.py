@@ -6,12 +6,14 @@ from __future__ import absolute_import
 
 import os
 import shutil
+import subprocess
 import tempfile
 import unittest
 
 from selenium import webdriver
 import selenium.webdriver.support.expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.switch_to import SwitchTo
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -223,6 +225,40 @@ class MozReviewWebDriverTest(MozReviewTest):
         results = self.browser.find_elements_by_class_name('ui-autocomplete-results')
         self.assertEqual(len(results), 1)
         return results[0]
+
+    def assign_reviewer(self, commit_index, reviewer):
+        children = self.browser.find_element_by_id('mozreview-child-requests')
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located(
+                (By.CLASS_NAME, 'mozreview-child-reviewer-list')))
+        editicons = children.find_elements_by_class_name('editicon')
+
+        editicons[commit_index].click()
+
+        autocomplete = children.find_elements_by_class_name('ui-autocomplete-input')
+        autocomplete = autocomplete[commit_index]
+
+        autocomplete.send_keys(reviewer)
+
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located(
+                (By.CLASS_NAME, 'ui-autocomplete-results')))
+        results = self.browser.find_elements_by_class_name('ui-autocomplete-results')
+        self.assertEqual(len(results), 1)
+
+        # If you comment this out and press ENTER from the browser, you
+        # get an error. It works from Selenium. Strange.
+        autocomplete.send_keys(Keys.ENTER)
+
+    def dump_autoland_log(self):
+        subprocess.call('docker exec %s cat /home/ubuntu/autoland.log' %
+                        self.mr.autoland_id, shell=True)
+
+    def dump_reviewboard_log(self):
+        """Dump the reviewboard log to stdout to help debug failing tests"""
+
+        subprocess.call('docker exec %s cat /reviewboard/logs/reviewboard.log' %
+                        self.mr.rbweb_id, shell=True)
 
 
 def restart_between_tests(cls):
