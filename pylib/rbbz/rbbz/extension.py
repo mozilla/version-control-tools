@@ -32,7 +32,8 @@ from mozreview.extra_data import (UNPUBLISHED_RRIDS_KEY,
                                   gen_rrs_by_extra_data_key,
                                   is_parent)
 from mozreview.models import (BugzillaUserMap,
-                              get_or_create_bugzilla_users)
+                              get_or_create_bugzilla_users,
+                              get_profile)
 from mozreview.signals import commit_request_publishing
 from rbbz.auth import BugzillaBackend
 from rbbz.bugzilla import Bugzilla
@@ -237,10 +238,40 @@ def post_bugzilla_attachment(bugzilla, bug_id, review_request_draft,
         # Since we're making the API call, we might as well ensure the
         # local database is up to date.
         users = get_or_create_bugzilla_users(user_data)
-
-        # TODO: Determine if we should carry forward an r+ for the reviewer.
-        # Never carry forward for now to preserve old behaviour.
         reviewers[users[0].email] = False
+
+    # TODO: This will require a database query per review request we're
+    # publishing, which may cause performance problems. Cache this profile
+    # object somewhere.
+    submitter_profile = get_profile(review_request.submitter)
+
+    # We will only carry forward ship-it reviews if the submitter
+    # of the review request has L3 (They can be trusted to re-request
+    # review if required).
+    #
+    # TODO: We're making an ldap query per review request we're
+    # publishing; we should cache the returned value somewhere
+    # instead.
+    if submitter_profile.has_scm_ldap_group('scm_level_3'):
+        last_user = None
+        relevant_reviews = review_request.get_public_reviews().order_by(
+            'user', '-timestamp')
+
+        for review in relevant_reviews:
+            if review.user == last_user:
+                # We only care about the most recent review for each
+                # particular user.
+                continue
+
+            last_user = review.user
+
+            # The last review given by this reviewer had a ship-it, so we
+            # will carry their r+ forward. If someone had manually changed
+            # their flag on bugzilla, we may be setting it back to r+, but
+            # we will consider the manual flag change on bugzilla user
+            # error for now.
+            if review.ship_it:
+                reviewers[last_user.email] = True
 
     comment = review_request_draft.description
 
