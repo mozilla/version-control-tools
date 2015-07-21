@@ -6,12 +6,25 @@
 
   $ hg init try
   $ cp mozilla-inbound/.hg/hgrc try/.hg/hgrc
+  $ cat >> try/.hg/hgrc << EOF
+  > [mozilla]
+  > treeherder_repo = try
+  > EOF
 
   $ hg init try-comm-central
   $ cp mozilla-inbound/.hg/hgrc try-comm-central/.hg/hgrc
+  $ cat >> try-comm-central/.hg/hgrc << EOF
+  > [mozilla]
+  > treeherder_repo = try-comm-central
+  > EOF
 
   $ hg init unknown
   $ cp mozilla-inbound/.hg/hgrc unknown/.hg/hgrc
+
+  $ cat >> mozilla-inbound/.hg/hgrc << EOF
+  > [mozilla]
+  > treeherder_repo = mozilla-inbound
+  > EOF
 
 Push a single changeset to a non-try repo print the URL
 

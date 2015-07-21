@@ -2,7 +2,7 @@
 import os.path
 from mercurial.node import short
 
-TREEHERDER_REPOS = {
+hgNameToRevURL = {
     # Gecko trunk / integration branches
     'b2g-inbound':      'integration/b2g-inbound/',
     'build-system':     'projects/build-system',
@@ -47,9 +47,7 @@ TREEHERDER_REPOS = {
     'maple':   'projects/maple/',
     'oak':     'projects/oak/',
     'pine':    'projects/pine/',
-}
 
-OTHER_REPOS = {
     # QA repos
     'mozmill-tests':        'qa/mozmill-tests/',
     'testcase-data':        'qa/testcase-data/',
@@ -77,9 +75,6 @@ OTHER_REPOS = {
     'tools':                'build/tools/',
     'twisted':              'build/twisted/',
 }
-
-hgNameToRevURL = dict(TREEHERDER_REPOS)
-hgNameToRevURL.update(OTHER_REPOS)
 
 
 def hook(ui, repo, node, hooktype, source=None, **kwargs):
@@ -109,9 +104,11 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
         print '\nView the pushlog for these changes here:'
         print '  %spushloghtml?changeset=%s' % (url, tip_node)
 
-    # For repositories that report CI results to Treeherder, also output a Treeherder url.
-    if repo_name in TREEHERDER_REPOS:
+    # For repositories that report CI results to Treeherder, also output a
+    # Treeherder url.
+    treeherder_repo = ui.config('mozilla', 'treeherder_repo')
+    if treeherder_repo:
         print '\nFollow the progress of your build on Treeherder:'
-        print '  https://treeherder.mozilla.org/#/jobs?repo=%s&revision=%s' % (repo_name, tip_node)
+        print '  https://treeherder.mozilla.org/#/jobs?repo=%s&revision=%s' % (treeherder_repo, tip_node)
 
     return 0
