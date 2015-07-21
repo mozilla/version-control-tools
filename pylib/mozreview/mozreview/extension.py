@@ -79,8 +79,9 @@ class MozReviewExtension(Extension):
     }
     js_bundles = {
         'reviews': {
-            #TODO: Everything will break if common.js is not first in this list
-            'source_filenames': ['mozreview/js/common.js',
+            # TODO: Everything will break if init_rr.js is not first in this
+            # list.
+            'source_filenames': ['mozreview/js/init_rr.js',
                                  'mozreview/js/commits.js',
                                  'mozreview/js/review.js',
                                  'mozreview/js/try.js',

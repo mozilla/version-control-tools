@@ -3,9 +3,10 @@ var MozReview = {};
 $(document).ready(function() {
   // The back-end should have already supplied us with the parent review
   // request ID (whether or not we're already looking at it), and set it as
-  // the data-id attribute on the mozreview-parent-request element. Let's get that
-  // first - because if we can't get it, we're stuck.
+  // the data-id attribute on the mozreview-parent-request element. Let's get
+  // that first - because if we can't get it, we're stuck.
   var parentID = $("#mozreview-parent-request").data("id");
+
   if (!parentID) {
     console.error("Could not find a valid id for the parent review " +
                   "request.");
@@ -15,9 +16,11 @@ $(document).ready(function() {
   console.log("Found parent review request ID: " + parentID);
 
   var page = RB.PageManager.getPage();
+
   // Setup a CSS class so we can differentiate between parent
   // and commit review requests.
   var currentID = page.reviewRequest.id;
+
   if (currentID == parentID) {
       $("body").addClass("parent-request");
   } else {
@@ -36,5 +39,5 @@ $(document).ready(function() {
                                               : null;
   MozReview.parentView = MozReview.isParent ? pageView
                                             : null;
-  $(document).trigger("mozreview_ready")
+  $(document).trigger("mozreview_ready");
 });
