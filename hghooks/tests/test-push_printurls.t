@@ -73,6 +73,45 @@ Pushing a changeset to Try prints Treeherder URLs
   Follow the progress of your build on Treeherder:
     https://treeherder.mozilla.org/#/jobs?repo=try&revision=3d7d3272d708
 
+Pushing a changeset to Try with talos jobs prints a link to perfherder...
+
+  $ echo '1' > foo
+  $ hg commit -m 'try: -t all'
+  $ hg push ../try
+  pushing to ../try
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  
+  View your change here:
+    https://hg.mozilla.org/try/rev/083142255559
+  
+  Follow the progress of your build on Treeherder:
+    https://treeherder.mozilla.org/#/jobs?repo=try&revision=083142255559
+  
+  It looks like this try push has talos jobs. Compare performance against a baseline revision:
+    https://treeherder.mozilla.org/perf.html#/comparechooser?newProject=try&newRevision=083142255559
+
+and doesn't when it doesn't
+
+  $ echo '2' > foo
+  $ hg commit -m 'try: -t none'
+  $ hg push ../try
+  pushing to ../try
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  
+  View your change here:
+    https://hg.mozilla.org/try/rev/7d0edcba6d85
+  
+  Follow the progress of your build on Treeherder:
+    https://treeherder.mozilla.org/#/jobs?repo=try&revision=7d0edcba6d85
+
 try-comm-central is also special
 
   $ hg push ../try-comm-central
@@ -81,13 +120,15 @@ try-comm-central is also special
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 3 changesets with 3 changes to 1 files
   
-  View your change here:
+  View your changes here:
     https://hg.mozilla.org/try-comm-central/rev/3d7d3272d708
+    https://hg.mozilla.org/try-comm-central/rev/083142255559
+    https://hg.mozilla.org/try-comm-central/rev/7d0edcba6d85
   
   Follow the progress of your build on Treeherder:
-    https://treeherder.mozilla.org/#/jobs?repo=try-comm-central&revision=3d7d3272d708
+    https://treeherder.mozilla.org/#/jobs?repo=try-comm-central&revision=7d0edcba6d85
 
 Push multiple changesets to a non-try repo
 
@@ -101,14 +142,16 @@ Push multiple changesets to a non-try repo
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 2 changes to 1 files
+  added 4 changesets with 4 changes to 1 files
   
   View your changes here:
-    https://hg.mozilla.org/integration/mozilla-inbound/rev/3129f8f30e80
-    https://hg.mozilla.org/integration/mozilla-inbound/rev/e046d8987087
+    https://hg.mozilla.org/integration/mozilla-inbound/rev/083142255559
+    https://hg.mozilla.org/integration/mozilla-inbound/rev/7d0edcba6d85
+    https://hg.mozilla.org/integration/mozilla-inbound/rev/fef473558e05
+    https://hg.mozilla.org/integration/mozilla-inbound/rev/b404b501615b
   
   Follow the progress of your build on Treeherder:
-    https://treeherder.mozilla.org/#/jobs?repo=mozilla-inbound&revision=e046d8987087
+    https://treeherder.mozilla.org/#/jobs?repo=mozilla-inbound&revision=b404b501615b
 
 Push a lot of changesets to a non-try repo
 
@@ -122,8 +165,8 @@ Push a lot of changesets to a non-try repo
   added 21 changesets with 21 changes to 1 files
   
   View the pushlog for these changes here:
-    https://hg.mozilla.org/integration/mozilla-inbound/pushloghtml?changeset=77380cff16a1
+    https://hg.mozilla.org/integration/mozilla-inbound/pushloghtml?changeset=78d884a7fbe7
   
   Follow the progress of your build on Treeherder:
-    https://treeherder.mozilla.org/#/jobs?repo=mozilla-inbound&revision=77380cff16a1
+    https://treeherder.mozilla.org/#/jobs?repo=mozilla-inbound&revision=78d884a7fbe7
 
