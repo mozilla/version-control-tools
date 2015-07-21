@@ -5,14 +5,16 @@
 
 import os
 
-import mercurial.commands as commands
-import mercurial.encoding as encoding
-import mercurial.error as error
-import mercurial.extensions as extensions
-import mercurial.hg as hg
-import mercurial.hgweb.webutil as webutil
 from mercurial.node import short
-import mercurial.revset as revset
+from mercurial import (
+    commands,
+    encoding,
+    error,
+    extensions,
+    hg,
+    revset,
+)
+from mercurial.hgweb import webutil
 
 
 OUR_DIR = os.path.dirname(__file__)
