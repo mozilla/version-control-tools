@@ -14,21 +14,19 @@ TREEHERDER_REPOS = {
     'mozilla-aurora':  'releases/mozilla-aurora/',
     'mozilla-beta':    'releases/mozilla-beta/',
     'mozilla-release': 'releases/mozilla-release/',
-    'mozilla-esr31':   'releases/mozilla-esr31/',
     'mozilla-esr38':   'releases/mozilla-esr38/',
     # Gecko B2G branches
+    'mozilla-b2g37_v2_2r':     'releases/mozilla-b2g37_v2_2r/',
     'mozilla-b2g37_v2_2':      'releases/mozilla-b2g37_v2_2/',
     'mozilla-b2g34_v2_1s':     'releases/mozilla-b2g34_v2_1s/',
     'mozilla-b2g34_v2_1':      'releases/mozilla-b2g34_v2_1/',
     'mozilla-b2g32_v2_0m':     'releases/mozilla-b2g32_v2_0m/',
     'mozilla-b2g32_v2_0':      'releases/mozilla-b2g32_v2_0/',
-    'mozilla-b2g30_v1_4':      'releases/mozilla-b2g30_v1_4/',
     # Thunderbird branches
     'comm-central': 'comm-central/',
     'comm-aurora':  'releases/comm-aurora/',
     'comm-beta':    'releases/comm-beta/',
     'comm-release': 'releases/comm-release/',
-    'comm-esr31':   'releases/comm-esr31/',
     'comm-esr38':   'releases/comm-esr38/',
     # Try repos
     'try':              'try/',
