@@ -1,0 +1,99 @@
+#!/usr/bin/env python2
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script is used to adjust repository permissions. It takes a path
+# to a Mercurial repository, the user owner, group owner, and 3 character
+# file mode. The characters correspond to user, group, and other
+# permissions. 'r' means read access, 'w' write access, and '-' no access.
+# The user owner must have at least read access.
+
+import grp
+import os
+import pwd
+import stat
+import sys
+
+
+repo, user, group, mode = sys.argv[1:]
+
+if len(mode) != 3:
+    print('mode must be 3 characters')
+    sys.exit(1)
+
+for c in mode:
+    if c not in ('r', 'w', '-'):
+        print('invalid mode character. must consist of "rw-"')
+        sys.exit(1)
+
+if mode[0] == '-':
+    print('owner must have permissions')
+    sys.exit(1)
+
+user = pwd.getpwnam(user)
+wanted_uid = user.pw_uid
+group = grp.getgrnam(group)
+wanted_gid = group.gr_gid
+
+file_mode = stat.S_IRUSR
+dir_mode = stat.S_IRUSR | stat.S_IXUSR | stat.S_ISGID
+
+if mode[0] == 'w':
+    file_mode |= stat.S_IWUSR
+    dir_mode |= stat.S_IWUSR
+
+if mode[1] == 'r':
+    file_mode |= stat.S_IRGRP
+    dir_mode |= stat.S_IRGRP | stat.S_IXGRP
+elif mode[1] == 'w':
+    file_mode |= stat.S_IRGRP | stat.S_IWGRP
+    dir_mode |= stat.S_IRGRP | stat.S_IXGRP | stat.S_IWGRP
+
+if mode[2] == 'r':
+    file_mode |= stat.S_IROTH
+    dir_mode |= stat.S_IROTH | stat.S_IXOTH
+elif mode[2] == 'w':
+    file_mode |= stat.S_IROTH | stat.S_IWOTH
+    dir_mode |= stat.S_IROTH | stat.S_IWOTH | stat.IXOTH
+
+
+def ensure(path, mode, uid, gid):
+    st = os.stat(path)
+
+    owner_changed = False
+    if st.st_uid != uid or st.st_gid != gid:
+        os.chown(path, uid, gid)
+        owner_changed = True
+
+    mode_changed = False
+    if stat.S_IMODE(st.st_mode) != mode:
+        os.chmod(path, mode)
+        mode_changed = True
+
+    return owner_changed, mode_changed
+
+
+owner_count = 0
+mode_count = 0
+
+for root, dirs, files in os.walk(repo):
+    for d in dirs:
+        owner, mode = ensure(os.path.join(root, d), dir_mode, wanted_uid, wanted_gid)
+        if owner:
+            owner_count += 1
+        if mode:
+            mode_count += 1
+
+    for f in files:
+        owner, mode = ensure(os.path.join(root, f), file_mode, wanted_uid, wanted_gid)
+        if owner:
+            owner_count += 1
+        if mode:
+            mode_count += 1
+
+if owner_count or mode_count:
+    print('%s: changed owner on %d; mode on %d' % (
+          repo, owner_count, mode_count))
+
+sys.exit(0)
