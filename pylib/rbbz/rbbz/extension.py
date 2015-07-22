@@ -227,7 +227,7 @@ def post_bugzilla_attachment(bugzilla, bug_id, review_request_draft,
     # immutable numeric Bugzilla userid into an email address. This lookup
     # could be avoided if Bugzilla accepted a numeric userid in the
     # requestee parameter when modifying an attachment.
-    reviewers = set()
+    reviewers = {}
 
     for u in review_request_draft.target_people.all():
         bum = BugzillaUserMap.objects.get(user=u)
@@ -237,7 +237,10 @@ def post_bugzilla_attachment(bugzilla, bug_id, review_request_draft,
         # Since we're making the API call, we might as well ensure the
         # local database is up to date.
         users = get_or_create_bugzilla_users(user_data)
-        reviewers.add(users[0].email)
+
+        # TODO: Determine if we should carry forward an r+ for the reviewer.
+        # Never carry forward for now to preserve old behaviour.
+        reviewers[users[0].email] = False
 
     comment = review_request_draft.description
 

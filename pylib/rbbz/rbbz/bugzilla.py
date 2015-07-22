@@ -150,22 +150,21 @@ class Bugzilla(object):
     @xmlrpc_to_bugzilla_errors
     def post_rb_url(self, bug_id, review_id, summary, comment, url,
                     reviewers):
-        """Posts a new attachment containing a review-request URL, or updates
-           an existing one."""
+        """Creates or updates an attachment containing a review-request URL.
+
+        The reviewers argument should be a dictionary mapping reviewer email
+        to a boolean indicating if that reviewer has given an r+ on the
+        attachment in the past that should be left untouched.
+        """
 
         # Copy because we modify it.
-        reviewers = set(reviewers)
+        reviewers = reviewers.copy()
         params = {}
         flags = []
         rb_attachment = None
         attachments = self.get_rb_attachments(bug_id)
 
         # Find the associated attachment, then go through the review flags.
-        # If a review flag status is '?' and the requestee is still in the
-        # given reviewers, then update the flag.
-        # If the review flag status is other than '?', or if it is a feedback
-        # flag, clear it.
-
         for a in attachments:
             if a['data'] != url:
                 continue
@@ -173,17 +172,38 @@ class Bugzilla(object):
             rb_attachment = a
 
             for f in a.get('flags', []):
-                if f['name'] != 'review' and f['name'] != 'feedback':
+                if f['name'] not in ['review', 'feedback']:
+                    # We only care about review and feedback flags.
                     continue
-
-                if (f['name'] == 'review' and 'requestee' in f
-                    and f['requestee'] in reviewers):
-                    flags.append({'id': f['id'], 'name': 'review',
-                                  'status': '?',
-                                  'requestee': f['requestee']})
-                    reviewers.remove(f['requestee'])
-                else:
+                elif f['name'] == 'feedback':
+                    # We always clear feedback flags.
                     flags.append({'id': f['id'], 'status': 'X'})
+                elif f['status'] == '+' and f['setter'] not in reviewers:
+                    # This r+ flag was set manually on bugzilla rather
+                    # then through a review on Review Board. Always
+                    # clear these flags.
+                    flags.append({'id': f['id'], 'status': 'X'})
+                elif f['status'] == '+':
+                    if not reviewers[f['setter']]:
+                        # We should not carry this r+ forward so
+                        # re-request review.
+                        flags.append({
+                            'id': f['id'],
+                            'name': 'review',
+                            'status': '?',
+                            'requestee': f['setter']
+                        })
+
+                    reviewers.pop(f['setter'])
+                elif 'requestee' not in f or f['requestee'] not in reviewers:
+                    # We clear review flags where the requestee is not
+                    # a reviewer or someone has manually set r- on the
+                    # attachment.
+                    flags.append({'id': f['id'], 'status': 'X'})
+                elif f['requestee'] in reviewers:
+                    # We're already waiting for a review from this user
+                    # so don't touch the flag.
+                    reviewers.pop(f['requestee'])
 
             break
 
@@ -191,9 +211,13 @@ class Bugzilla(object):
 
         # Sorted so behavior is deterministic (this mucks with test output
         # otherwise).
-        for r in sorted(reviewers):
-            flags.append({'name': 'review', 'status': '?', 'requestee': r,
-                          'new': True})
+        for r in sorted(reviewers.keys()):
+            flags.append({
+                'name': 'review',
+                'status': '?',
+                'requestee': r,
+                'new': True
+            })
 
         if rb_attachment:
             params['ids'] = [rb_attachment['id']]
