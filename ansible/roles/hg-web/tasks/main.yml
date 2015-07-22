@@ -125,3 +125,12 @@
         month=*
         minute=0
         hour=1
+
+- name: create CRON to ensure file permissions are sane
+  cron: name='Adjust repository permissions'
+        user=root
+        job='/repo/hg/scripts/outputif /repo/hg/version-control-tools/scripts/normalize-hgweb-permissions /repo/hg/mozilla'
+        day=*
+        month=*
+        minute=0
+        hour=4

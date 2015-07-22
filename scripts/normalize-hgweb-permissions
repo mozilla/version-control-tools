@@ -1,0 +1,15 @@
+#!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script normalizes repo permissions on hgweb machines.
+
+set -e
+
+vct=/repo/hg/version-control-tools
+root=$1
+
+for repo in `${vct}/scripts/find-hg-repos.py ${root}/ | sort`; do
+  ${vct}/scripts/repo-permissions ${root}/${repo} hg hg wwr
+done
