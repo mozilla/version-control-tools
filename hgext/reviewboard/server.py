@@ -175,8 +175,7 @@ def listreviewrepos(repo):
 def getreposfromreviewboard(repo):
     from reviewboardmods.pushhooks import ReviewBoardClient
 
-    with (ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/')) as
-          client):
+    with ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/')) as client:
         root = client.get_root()
         urls = set()
 
