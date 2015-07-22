@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import logging
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import six
 from djblets.webapi.decorators import (webapi_login_required,
@@ -147,6 +149,9 @@ class LDAPAssociationResource(WebAPIResource):
         mozreview_profile = get_profile(user)
         mozreview_profile.ldap_username = ldap_username
         mozreview_profile.save()
+
+        logging.info('associating user: %s with ldap_username: %s' % (user,
+            ldap_username))
 
         return 200, self.create_item_payload(request, user, mozreview_profile)
 
