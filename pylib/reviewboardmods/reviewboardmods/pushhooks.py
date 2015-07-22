@@ -534,7 +534,8 @@ class NoCacheTransport(SyncTransport):
 
 
 @contextmanager
-def ReviewBoardClient(url, username, password, userid, cookie):
+def ReviewBoardClient(url, username=None, password=None, userid=None,
+                      cookie=None):
     """Obtain a RBClient instance via a context manager.
 
     This exists as a context manager because of gross hacks necessary for

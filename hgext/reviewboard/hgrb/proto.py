@@ -173,14 +173,6 @@ def parseidentifier(o):
     return identifier, nodes, precursors
 
 
-def getrbapi(repo, o):
-    from rbtools.api.client import RBClient
-
-    url = repo.ui.config('reviewboard', 'url', None).rstrip('/')
-    c = RBClient(url, username=o['bzusername'], password=o['bzpassword'])
-    return c.get_root()
-
-
 def formatresponse(*lines):
     l = ['1'] + list(lines)
     res = '\n'.join(l)
@@ -358,61 +350,67 @@ def pullreviews(repo, proto, args=None):
     if isinstance(o, ServerError):
         return formatresponse(str(o))
 
-    root = getrbapi(repo, o)
-
     lines = ['1']
 
-    for k, v in o['other']:
-        if k != 'reviewid':
-            continue
+    from reviewboardmods.pushhooks import ReviewBoardClient
+    with ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
+                           username=o['bzusername'],
+                           password=o['bzpassword'],
+                           userid=o['bzuserid'],
+                           cookie=o['bzcookie']) as client:
+        root = client.get_root()
 
-        identifier = urllib.unquote(v)
-        rrs = root.get_review_requests(commit_id=identifier)
+        for k, v in o['other']:
+            if k != 'reviewid':
+                continue
 
-        if rrs.total_results != 1:
-            continue
+            identifier = urllib.unquote(v)
+            rrs = root.get_review_requests(commit_id=identifier)
 
-        rr = rrs[0]
-        extra_data = rr.extra_data
+            if rrs.total_results != 1:
+                continue
 
-        try:
-            is_squashed = extra_data['p2rb.is_squashed']
-        except KeyError:
-            is_squashed = None
+            rr = rrs[0]
+            extra_data = rr.extra_data
 
-        # 'True' in RB <= 2.0.11; True in 2.0.11+. We may have old
-        # values in the database, so keep checking for 'True' until we
-        # have a migration.
-        if is_squashed is True or is_squashed == 'True':
-            if 'p2rb.commits' in extra_data:
-                commits = extra_data['p2rb.commits']
-            else:
-                draft = rr.get_draft()
-                if 'p2rb.commits' in draft.extra_data:
-                    commits = draft.extra_data['p2rb.commits']
+            try:
+                is_squashed = extra_data['p2rb.is_squashed']
+            except KeyError:
+                is_squashed = None
+
+            # 'True' in RB <= 2.0.11; True in 2.0.11+. We may have old
+            # values in the database, so keep checking for 'True' until we
+            # have a migration.
+            if is_squashed is True or is_squashed == 'True':
+                if 'p2rb.commits' in extra_data:
+                    commits = extra_data['p2rb.commits']
                 else:
-                    commits = '[]'
+                    draft = rr.get_draft()
+                    if 'p2rb.commits' in draft.extra_data:
+                        commits = draft.extra_data['p2rb.commits']
+                    else:
+                        commits = '[]'
 
-            lines.append('parentreview %s %s' % (
-                urllib.quote(identifier), rr.id))
-            for relation in json.loads(commits):
-                node = relation[0].encode('utf-8')
-                rid = str(relation[1])
+                lines.append('parentreview %s %s' % (
+                    urllib.quote(identifier), rr.id))
+                for relation in json.loads(commits):
+                    node = relation[0].encode('utf-8')
+                    rid = str(relation[1])
 
-                lines.append('csetreview %s %s %s' % (rr.id, node, rid))
-                lines.append('reviewdata %s status %s' % (rid,
-                    urllib.quote(rr.status.encode('utf-8'))))
-                lines.append('reviewdata %s public %s' % (rid, rr.public))
+                    lines.append('csetreview %s %s %s' % (rr.id, node, rid))
+                    lines.append('reviewdata %s status %s' % (rid,
+                        urllib.quote(rr.status.encode('utf-8'))))
+                    lines.append('reviewdata %s public %s' % (rid, rr.public))
 
-        lines.append('reviewdata %s status %s' % (rr.id,
-            urllib.quote(rr.status.encode('utf-8'))))
-        lines.append('reviewdata %s public %s' % (rr.id, rr.public))
+            lines.append('reviewdata %s status %s' % (rr.id,
+                urllib.quote(rr.status.encode('utf-8'))))
+            lines.append('reviewdata %s public %s' % (rr.id, rr.public))
 
-        reviewers = [urllib.quote(p.title.encode('utf-8'))
-                     for p in rr.target_people]
-        if reviewers:
-            lines.append('reviewdata %s reviewers %s' %
-                         (rid, ','.join(reviewers)))
+            reviewers = [urllib.quote(p.title.encode('utf-8'))
+                         for p in rr.target_people]
+            if reviewers:
+                lines.append('reviewdata %s reviewers %s' %
+                             (rid, ','.join(reviewers)))
 
     res = '\n'.join(lines)
     assert isinstance(res, str)
@@ -438,22 +436,28 @@ def publishreviewseries(repo, proto, args=None):
     if isinstance(o, ServerError):
         return formatresponse(str(o))
 
-    root = getrbapi(repo, o)
-
     lines = ['1']
 
-    for k, v in o['other']:
-        if k != 'reviewid':
-            continue
+    from reviewboardmods.pushhooks import ReviewBoardClient
+    with ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
+                           username=o['bzusername'],
+                           password=o['bzpassword'],
+                           userid=o['bzuserid'],
+                           cookie=o['bzcookie']) as client:
+        root = client.get_root()
 
-        rrid = urllib.unquote(v)
-        try:
-            rr = root.get_review_request(review_request_id=rrid)
-            draft = rr.get_draft()
-            draft.update(public=True)
-            lines.append('success %s' % rrid)
-        except APIError as e:
-            lines.append('error %s %s' % (rrid, str(e)))
+        for k, v in o['other']:
+            if k != 'reviewid':
+                continue
+
+            rrid = urllib.unquote(v)
+            try:
+                rr = root.get_review_request(review_request_id=rrid)
+                draft = rr.get_draft()
+                draft.update(public=True)
+                lines.append('success %s' % rrid)
+            except APIError as e:
+                lines.append('error %s %s' % (rrid, str(e)))
 
     res = '\n'.join(lines)
     assert isinstance(res, str)
