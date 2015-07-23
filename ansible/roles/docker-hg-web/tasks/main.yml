@@ -37,15 +37,6 @@
     - mirror-pull
     - repo-group
 
-- name: create .ssh directory for hg user
-  file: path=/home/hg/.ssh owner=hg group=hg mode=0750 state=directory
-
-- name: install ssh config file
-  copy: src=ssh-config dest=/home/hg/.ssh/config owner=hg group=hg mode=0640
-
-- name: ensure hg user known hosts file exists
-  file: path=/home/hg/.ssh/known_hosts state=touch owner=hg group=hg mode=0640
-
 - include: ../../../tasks/hgmo-extensions.yml
 
 - name: install hgweb wsgi files

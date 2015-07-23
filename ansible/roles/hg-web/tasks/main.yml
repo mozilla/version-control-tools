@@ -50,6 +50,29 @@
 - name: create hg user
   user: name=hg
 
+# The hg user performs replication via SSHing into a central server.
+# Set up its SSH configuration.
+- name: create .ssh directory for hg user
+  file: path=/home/hg/.ssh
+        owner=hg
+        group=hg
+        mode=0750
+        state=directory
+
+- name: install hg user ssh config
+  copy: src=hg-ssh-config
+        dest=/home/hg/.ssh/config
+        owner=hg
+        group=hg
+        mode=0640
+
+- name: ensure known hosts file for hg user exists
+  file: path=/home/hg/.ssh/known_hosts
+        state=touch
+        owner=hg
+        group=hg
+        mode=0640
+
 # There are /repo_local and /repo directories for historical reasons.
 # Back in the day /repo was mounted from NFS and was a read-only
 # filesystem and /repo_local was a local, read-write copy. Now, /repo
