@@ -15,14 +15,6 @@
 - name: install Mercurial package
   command: yum localinstall -y /var/tmp/mercurial-3.4.1-0.x86_64.rpm
 
-- name: create directories for hg files
-  file: path={{ item }} state=directory owner=hg group=hg mode=0755
-  with_items:
-    - /repo_local/mozilla/mozilla
-
-- name: symlink /repo to /repo_local
-  file: src=/repo_local dest=/repo state=link
-
 - name: install httpd.conf
   copy: src=httpd.conf dest=/etc/httpd/conf/httpd.conf
 

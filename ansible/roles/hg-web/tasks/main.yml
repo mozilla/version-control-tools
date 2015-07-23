@@ -50,6 +50,25 @@
 - name: create hg user
   user: name=hg
 
+# There are /repo_local and /repo directories for historical reasons.
+# Back in the day /repo was mounted from NFS and was a read-only
+# filesystem and /repo_local was a local, read-write copy. Now, /repo
+# just has symlinks to /repo_local. We carry forward the legacy
+# configuration until we take the effort to move files around on the
+# servers.
+#
+# There is also an unused level of indirection. The servers used to host
+# multiple vhosts and subdirectories of /repo and /repo_local
+# corresponded to the vhost they were serving.
+- name: create directories for hg files
+  file: path={{ item }} state=directory owner=hg group=hg mode=0755
+  with_items:
+    - /repo_local/mozilla/mozilla
+    - /repo
+
+- name: symlink /repo/hg to /repo_local/mozilla
+  file: src=/repo_local/mozilla dest=/repo/hg state=link
+
 # We need to add a ssh auhorized_keys to ensure the master can connect
 # in to trigger a mirror pull
 - name: add authorized_keys for hg user
