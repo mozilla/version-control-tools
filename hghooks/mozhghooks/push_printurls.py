@@ -19,9 +19,6 @@ hgNameToRevURL = {
     'mozilla-b2g37_v2_2r':     'releases/mozilla-b2g37_v2_2r/',
     'mozilla-b2g37_v2_2':      'releases/mozilla-b2g37_v2_2/',
     'mozilla-b2g34_v2_1s':     'releases/mozilla-b2g34_v2_1s/',
-    'mozilla-b2g34_v2_1':      'releases/mozilla-b2g34_v2_1/',
-    'mozilla-b2g32_v2_0m':     'releases/mozilla-b2g32_v2_0m/',
-    'mozilla-b2g32_v2_0':      'releases/mozilla-b2g32_v2_0/',
     # Thunderbird branches
     'comm-central': 'comm-central/',
     'comm-aurora':  'releases/comm-aurora/',
