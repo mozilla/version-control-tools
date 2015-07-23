@@ -46,9 +46,19 @@
     - python27
     - python27-virtualenv
 
-# We need to ensure that a hg user exists to own many resources
+# We need to ensure that a hg user/group exists to own many resources.
+# The uid and gid match what comes from Puppet, since Puppet manages
+# users in production.
+- name: hg group exists
+  group: name=hg
+         gid=5507
+
 - name: create hg user
   user: name=hg
+        group=hg
+        uid=5507
+        shell=/bin/bash
+        comment="Hg user"
 
 # The hg user performs replication via SSHing into a central server.
 # Set up its SSH configuration.

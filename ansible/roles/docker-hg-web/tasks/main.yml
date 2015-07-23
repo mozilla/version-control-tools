@@ -1,7 +1,4 @@
 ---
-- name: create hg user
-  user: name=hg uid=500
-
 - name: install system packages
   command: yum install -y httpd lockfile-progs mod_wsgi openssh-clients openssh-server python-simplejson python-argparse syslog
 
