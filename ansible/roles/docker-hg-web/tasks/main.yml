@@ -24,9 +24,6 @@
 - name: create httpd log directory
   file: path=/var/log/httpd/hg state=directory
 
-- name: install global hgrc config
-  copy: src=hgrc dest=/etc/mercurial/hgrc
-
 - name: install mirroring scripts
   copy: src={{ item }} dest=/usr/local/bin/{{ item }} mode=0755
   with_items:
