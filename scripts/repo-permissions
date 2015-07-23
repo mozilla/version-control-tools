@@ -77,6 +77,12 @@ def ensure(path, mode, uid, gid):
 owner_count = 0
 mode_count = 0
 
+owner, mode = ensure(root, dir_mode, wanted_uid, wanted_gid)
+if owner:
+    owner_count += 1
+if mode:
+    mode_count += 1
+
 for root, dirs, files in os.walk(repo):
     for d in dirs:
         owner, mode = ensure(os.path.join(root, d), dir_mode, wanted_uid, wanted_gid)
