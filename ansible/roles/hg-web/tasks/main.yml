@@ -7,7 +7,6 @@
     # mod_wsgi installed from system until switched over to venv
     - mod_wsgi
     # Python dependencies need to be installed until we switch to venv
-    - python-pygments
     - python-simplejson
     - python-argparse
     # We use logrotate to control log files

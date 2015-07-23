@@ -3,7 +3,7 @@
   user: name=hg uid=500
 
 - name: install system packages
-  command: yum install -y httpd lockfile-progs mod_wsgi openssh-clients openssh-server python-pygments python-simplejson python-argparse syslog
+  command: yum install -y httpd lockfile-progs mod_wsgi openssh-clients openssh-server python-simplejson python-argparse syslog
 
 # yum will incur network traffic when URLs are specified. Download the
 # package locally first so we can run offline after initial bootstrap.
