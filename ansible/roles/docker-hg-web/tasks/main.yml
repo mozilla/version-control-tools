@@ -2,18 +2,6 @@
 - name: install system packages
   command: yum install -y httpd lockfile-progs mod_wsgi openssh-clients openssh-server python-simplejson python-argparse syslog
 
-- name: install httpd.conf
-  copy: src=httpd.conf dest=/etc/httpd/conf/httpd.conf
-
-- name: install vhost config
-  copy: src=vhost.conf dest=/etc/httpd/conf.d/hg-vhost.conf
-
-- name: install wsgi config
-  copy: src=mod_wsgi.conf dest=/etc/httpd/conf.d/wsgi.conf
-
-- name: create httpd log directory
-  file: path=/var/log/httpd/hg state=directory
-
 - name: install mirroring scripts
   copy: src={{ item }} dest=/usr/local/bin/{{ item }} mode=0755
   with_items:
