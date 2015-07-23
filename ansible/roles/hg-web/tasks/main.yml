@@ -116,6 +116,7 @@
   file: path={{ item }} state=directory owner=hg group=hg mode=0755
   with_items:
     - /repo_local/mozilla/mozilla
+    - /repo_local/mozilla/webroot_wsgi
     - /repo
 
 - name: symlink /repo/hg to /repo_local/mozilla
