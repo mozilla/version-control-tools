@@ -31,6 +31,8 @@
 - name: install system packages
   yum: name={{ item }} state=present
   with_items:
+    # This is likely already installed, but needed for Docker.
+    - cronie
     # To build mod_wsgi from source so it can be placed in virtualenvs.
     - httpd-devel
     # mod_wsgi installed from system until switched over to venv
