@@ -2,16 +2,6 @@
 - name: install system packages
   command: yum install -y httpd lockfile-progs mod_wsgi openssh-clients openssh-server python-simplejson python-argparse syslog
 
-# yum will incur network traffic when URLs are specified. Download the
-# package locally first so we can run offline after initial bootstrap.
-- name: download Mercurial package
-  get_url: url=https://people.mozilla.org/~gszorc/mercurial-3.4.1-0.x86_64.rpm
-           dest=/var/tmp/mercurial-3.4.1-0.x86_64.rpm
-           sha256sum=4e6190232ae217aacc894c0baf8e61900cb55d4ee0406a09a22b70cb9c6dfbd0
-
-- name: install Mercurial package
-  command: yum localinstall -y /var/tmp/mercurial-3.4.1-0.x86_64.rpm
-
 - name: install httpd.conf
   copy: src=httpd.conf dest=/etc/httpd/conf/httpd.conf
 

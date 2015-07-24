@@ -46,6 +46,19 @@
     - python27
     - python27-virtualenv
 
+# Some packages aren't available on an public yum repo. Fetch them from
+# a public server and install them manually. This is a bit hacky, but it
+# gets the job done.
+- name: download Mozilla rpms
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/{{ item.path }}
+           dest=/var/tmp/{{ item.path}}
+           sha256sum={{ item.sha256 }}
+  with_items:
+    - { path: mercurial-3.4.1-0.x86_64.rpm, sha256: 4e6190232ae217aacc894c0baf8e61900cb55d4ee0406a09a22b70cb9c6dfbd0 }
+
+- name: install Mozilla rpms
+  command: yum localinstall -y /var/tmp/mercurial-3.4.1-0.x86_64.rpm
+
 # We need to ensure that a hg user/group exists to own many resources.
 # The uid and gid match what comes from Puppet, since Puppet manages
 # users in production.
