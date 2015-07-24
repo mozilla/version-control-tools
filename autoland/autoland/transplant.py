@@ -38,10 +38,10 @@ def transplant_to_mozreview(gh, tree, user, repo, pullrequest, bzuserid,
     # first purge any untracked files
     subprocess.call(['hg', 'purge', '--all'], cwd=repo_path)
 
-    cmds = [['hg', 'update', '--clean', 'central'],
+    cmds = [['hg', 'update', '--clean'],
             ['hg', 'strip', '--no-backup', '-r', 'draft()'],
-            ['hg', 'pull', 'default'],
-            ['hg', 'update', 'central']]
+            ['hg', 'pull', 'upstream'],
+            ['hg', 'update', 'upstream']]
 
     repo_path = get_repo_path(tree)
 
@@ -98,7 +98,7 @@ def transplant_to_mozreview(gh, tree, user, repo, pullrequest, bzuserid,
                        'push', '--reviewid', str(bugid), '-c', '.',
                        'mozreview-push'])
     cmds.append(['hg', 'strip', '--no-backup', '-r', 'draft()'])
-    cmds.append(['hg', 'update', 'central'])
+    cmds.append(['hg', 'update', 'upstream'])
 
     for cmd in cmds:
         try:
@@ -119,31 +119,47 @@ def transplant_to_mozreview(gh, tree, user, repo, pullrequest, bzuserid,
     return landed, result
 
 
-def transplant_to_try(tree, rev, trysyntax):
+def transplant(tree, destination, rev, trysyntax=None, push_bookmark=False):
 
     """ This assumes that the repo has a bookmark for the head revision
-        called 'central' and that the .hg/hgrc config contains links to
-        the try and mozreview repos"""
+        called 'upstream' and that the .hg/hgrc config contains links to
+        the 'try' repo (if any)"""
 
     landed = True
     result = ''
 
     cmds = [['hg', 'update', '--clean'],
-            ['hg', 'update', 'central'],
-            ['hg', 'pull', 'mozreview', '-r', rev],
-            ['hg', 'bookmark', '-f', '-r', rev, 'transplant'],
-            ['hg', 'update', 'transplant'],
-            ['hg', 'qpop', '--all'],
-            ['hg', 'qdelete', 'try'],
-            # TODO: hg is going to add a ui.allowemptycommit flag in 3.5
-            #       which means we can remove the use of queues here
-            ['hg', 'qnew', 'try', '-m', '"' + trysyntax + '"'],
-            ['hg', 'log', '-r', 'qtip', '-T', '{node|short}'],
-            ['hg', 'push', '-r', '.', '-f', 'try'],
-            ['hg', 'qpop'],
-            ['hg', 'qdelete', 'try'],
-            ['hg', 'strip', '--no-backup', '-r', 'draft()'],
-            ['hg', 'update', 'central']]
+            ['hg', 'pull', 'upstream'],
+            ['hg', 'update', 'upstream'],
+            ['hg', 'pull', tree, '-r', rev],
+            ['hg', 'bookmark', '-f', '--hidden', '-r', rev, 'transplant'],
+            ['hg', 'update', 'transplant']]
+
+    if trysyntax:
+        if not trysyntax.startswith("try: "):
+            trysyntax =  "try: %s" % trysyntax
+
+        # TODO: hg is going to add a ui.allowemptycommit flag in 3.5
+        #       which means we can remove the use of queues here
+        cmds.extend([['hg', 'qpop', '--all'],
+                     ['hg', 'qdelete', 'try'],
+                     ['hg', 'qnew', 'try', '-m', '"' + trysyntax + '"'],
+                     ['hg', 'log', '-r', 'qtip', '-T', '{node|short}'],
+                     ['hg', 'push', '-r', '.', '-f', 'try'],
+                     ['hg', 'qpop'],
+                     ['hg', 'qdelete', 'try'],
+                     ['hg', 'strip', '--no-backup', '-r', 'draft()'],])
+    elif push_bookmark:
+        # we assume use of the @ bookmark is mutually exclusive with using
+        # try syntax for now.
+        cmds.extend([['hg', 'rebase', '-b', 'transplant', '-d', 'upstream'],
+                     ['hg', 'log', '-r', 'transplant', '-T', '{node|short}'],
+                     ['hg', 'bookmark', push_bookmark],
+                     ['hg', 'push', '-B', push_bookmark, destination]])
+    else:
+        cmds.extend([['hg', 'rebase', '-b', 'transplant', '-d', 'upstream'],
+                     ['hg', 'log', '-r', 'transplant', '-T', '{node|short}'],
+                     ['hg', 'push', '-r', 'transplant', destination]])
 
     repo_path = get_repo_path(tree)
     qtip_rev = ''
@@ -154,8 +170,16 @@ def transplant_to_try(tree, rev, trysyntax):
             if 'log' in cmd:
                 result = output
         except subprocess.CalledProcessError as e:
-            # in normal circumstances we expect this mq error on delete
-            if 'abort: patch try not in series' not in e.output:
+            if 'abort: patch try not in series' in e.output:
+                # in normal circumstances we expect this mq error on delete
+                continue
+            elif 'no changes found' in e.output:
+                # we've already pulled this revision
+                continue
+            elif 'nothing to rebase' in e.output:
+                # we are already up to date so the rebase fails
+                continue
+            else:
                 return False, formulate_hg_error(cmd, e.output)
 
     return landed, result

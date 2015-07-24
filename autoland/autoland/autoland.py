@@ -165,7 +165,7 @@ def handle_pending_transplants(logger, dbconn):
     cursor = dbconn.cursor()
 
     query = """
-        select id,tree,rev,destination,trysyntax,pingback_url
+        select id,tree,rev,destination,trysyntax,push_bookmark,pingback_url
         from Transplant
         where landed is null
     """
@@ -174,54 +174,49 @@ def handle_pending_transplants(logger, dbconn):
     landed_revisions = []
     mozreview_updates = []
     for row in cursor.fetchall():
-        transplant_id, tree, rev, destination, trysyntax, pingback_url = row
+        (transplant_id, tree, rev, destination, trysyntax, push_bookmark,
+            pingback_url) = row
 
         if not treestatus.tree_is_open(destination):
             continue
 
-        if destination == 'try':
-            if not trysyntax.startswith("try: "):
-                trysyntax =  "try: %s" % trysyntax
-            landed, result = transplant.transplant_to_try(tree, rev, trysyntax)
-            if landed:
-                logger.info(('transplanted from tree: %s rev: %s'
-                             ' to destination: %s new revision: %s') %
-                            (tree, rev, destination, result))
-            else:
-                if 'is CLOSED!' in result:
-                    logger.info('transplant failed: tree: %s is closed - '
-                                 ' retrying later.' % tree)
-
-                    # continuing here will skip updating the autoland request
-                    # so we will attempt to land it again later.
-                    continue
-                else:
-                    logger.info('transplant failed: tree: %s rev: %s '
-                                'destination: %s error: %s' %
-                                (tree, rev, destination, result))
-
-            # set up data to be posted back to mozreview
-            data = {
-                'request_id': transplant_id,
-                'tree': tree,
-                'rev': rev,
-                'destination': destination,
-                'trysyntax': trysyntax,
-                'landed': landed,
-                'error_msg': '',
-                'result': ''
-            }
-
-            if landed:
-                data['result'] = result
-            else:
-                data['error_msg'] = result
-
-            mozreview_updates.append([transplant_id, pingback_url, json.dumps(data)])
-
+        landed, result = transplant.transplant(tree, destination, rev,
+                                               trysyntax, push_bookmark)
+        if landed:
+            logger.info(('transplanted from tree: %s rev: %s'
+                         ' to destination: %s new revision: %s') %
+                        (tree, rev, destination, result))
         else:
-            landed = False
-            result = 'unknown destination: %s' % destination
+            if 'is CLOSED!' in result:
+                logger.info('transplant failed: tree: %s is closed - '
+                             ' retrying later.' % tree)
+
+                # continuing here will skip updating the autoland request
+                # so we will attempt to land it again later.
+                continue
+            else:
+                logger.info('transplant failed: tree: %s rev: %s '
+                            'destination: %s error: %s' %
+                            (tree, rev, destination, result))
+
+        # set up data to be posted back to mozreview
+        data = {
+            'request_id': transplant_id,
+            'tree': tree,
+            'rev': rev,
+            'destination': destination,
+            'trysyntax': trysyntax,
+            'landed': landed,
+            'error_msg': '',
+            'result': ''
+        }
+
+        if landed:
+            data['result'] = result
+        else:
+            data['error_msg'] = result
+
+        mozreview_updates.append([transplant_id, pingback_url, json.dumps(data)])
 
         landed_revisions.append([landed, result, transplant_id])
 

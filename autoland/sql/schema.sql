@@ -26,6 +26,7 @@ create table Transplant (\
     rev varchar(40),\
     destination varchar(20),\
     trysyntax text,\
+    push_bookmark varchar(255),\
     landed boolean,\
     result text,\
     pingback_url text,\

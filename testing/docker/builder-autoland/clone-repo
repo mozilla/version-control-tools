@@ -13,10 +13,10 @@ rebase =
 reviewboard = /home/ubuntu/version-control-tools/hgext/reviewboard/client.py
 
 [paths]
-default = http://hgrb/$1
-mozreview = http://hgrb/$1
+upstream = http://hgrb/$1
+$1 = http://hgrb/$1
 mozreview-push = ssh://hgrb/$1
 try = /repos/try
 EOF
 
-hg bookmark central
+hg bookmark upstream
