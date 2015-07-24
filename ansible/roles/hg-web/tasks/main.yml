@@ -1,4 +1,33 @@
 ---
+
+# We obtain Python 2.7 packages from the IUS Community repositories.
+# More info is at https://iuscommunity.org/pages/Repos.html.
+# Packages in this repo typically have their version in the package
+# name. So, we shouldn't accidentally pick up packages from this repo.
+#
+# We download and verify the checksum of the RPMs otherwise we are
+# susceptible to a MitM attack.
+- name: download IUS community configuration RPMs (RedHat 6)
+  get_url: url=https://dl.iuscommunity.org/pub/ius/stable/Redhat/6/x86_64/{{ item.name }}
+           dest=/var/tmp/{{ item.dest }}
+           sha256sum={{ item.sha256 }}
+  with_items:
+    - { name: epel-release-6-5.noarch.rpm, dest: epel-release-6-5.noarch.rpm, sha256: 1eac9bf24ae252ae4117a309391b532da3f139e4d0eb8ab384a08f5fc0526593 }
+    - { name: ius-release-1.0-14.ius.el6.noarch.rpm, dest: ius-release-1.0-14.rpm, sha256: 147b8d584cff9cb4abc6332999998dc24873fddb0a28b7f505fe993e6331e67c }
+  when: ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: download IUS community configuration RPMs (CentOS 6)
+  get_url: url=https://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/{{ item.name }}
+           dest=/var/tmp/{{ item.dest }}
+           sha256sum={{ item.sha256 }}
+  with_items:
+    - { name: epel-release-6-5.noarch.rpm, dest: epel-release-6-5.noarch.rpm, sha256: 157da55870a119e39cd2aa3d31e3e340b13b3960b6d5b897a48248c38fe8e1b5 }
+    - { name: ius-release-1.0-14.ius.centos6.noarch.rpm, dest: ius-release-1.0-14.rpm, sha256: c2ed9a03f6cbb630a7b4fcdb69a35ddcc4b5d805fbfbd66018996f8df3caa792 }
+  when: ansible_distribution == 'CentOS'
+
+- name: configure IUS Community Repos
+  command: yum localinstall -y /var/tmp/epel-release-6-5.noarch.rpm /var/tmp/ius-release-1.0-14.rpm
+
 - name: install system packages
   yum: name={{ item }} state=present
   with_items:
@@ -11,12 +40,9 @@
     - python-argparse
     # We use logrotate to control log files
     - logrotate
-    # Machines are CentOS 6, which has Python 2.6 installed by default.
-    # The Python 2.7 install from mrepo doesn't conflict with the system
-    # Python.
-    # Note: this requires mrepo, which is a private repository and
-    # requires the Mozilla VPN. We'll want to put the package name
-    # behind a variable in order to support Docker.
+    # Machines are RHEL 6 or CentOS 6, which has Python 2.6 installed by
+    # default. The Python 2.7 packages from IUS don't conflict with the
+    # system Python.
     - python27
     - python27-virtualenv
 
