@@ -44,7 +44,6 @@
     # default. The Python 2.7 packages from IUS don't conflict with the
     # system Python.
     - python27
-    - python27-virtualenv
 
 # Some packages aren't available on an public yum repo. Fetch them from
 # a public server and install them manually. This is a bit hacky, but it
@@ -55,9 +54,14 @@
            sha256sum={{ item.sha256 }}
   with_items:
     - { path: mercurial-3.4.1-0.x86_64.rpm, sha256: 4e6190232ae217aacc894c0baf8e61900cb55d4ee0406a09a22b70cb9c6dfbd0 }
+    # The version of virtualenv in the IUS repo isn't compatible with
+    # peep because it has a pip that is too new. See
+    # https://github.com/erikrose/peep/pull/94. Install an old version
+    # until peep is compatible.
+    - { path: python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm, sha256: a3f6c80d7a83798e4d64827d81dbcc39c1c44ae66c0afa4866bc477baad2cc2c }
 
 - name: install Mozilla rpms
-  command: yum localinstall -y /var/tmp/mercurial-3.4.1-0.x86_64.rpm
+  command: yum localinstall -y /var/tmp/mercurial-3.4.1-0.x86_64.rpm /var/tmp/python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm
 
 # We need to ensure that a hg user/group exists to own many resources.
 # The uid and gid match what comes from Puppet, since Puppet manages
