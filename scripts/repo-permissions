@@ -77,7 +77,7 @@ def ensure(path, mode, uid, gid):
 owner_count = 0
 mode_count = 0
 
-owner, mode = ensure(root, dir_mode, wanted_uid, wanted_gid)
+owner, mode = ensure(repo, dir_mode, wanted_uid, wanted_gid)
 if owner:
     owner_count += 1
 if mode:
