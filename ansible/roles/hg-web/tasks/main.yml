@@ -114,7 +114,7 @@
 # corresponded to the vhost they were serving.
 
 - name: create root directories for hg files
-  files: path={{ item }} state=directory owner=root group=root mode=0755
+  file: path={{ item }} state=directory owner=root group=root mode=0755
   with_item:
     - /repo
     - /repo_local
