@@ -115,7 +115,7 @@
 
 - name: create root directories for hg files
   file: path={{ item }} state=directory owner=root group=root mode=0755
-  with_item:
+  with_items:
     - /repo
     - /repo_local
 
