@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import subprocess
+import time
 
 import paramiko
 import concurrent.futures as futures
@@ -390,6 +391,7 @@ class MozReview(object):
                             ['/create-repo', name, str(rbid)])
 
         if self.autoland_id:
+            time.sleep(1)
             self._docker.execute(self.autoland_id, ['/clone-repo', name])
 
         return http_url, ssh_url, rbid
