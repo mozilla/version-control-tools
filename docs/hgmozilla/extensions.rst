@@ -58,13 +58,15 @@ pager
 progress
    Show progress bars during long-running operations.
 
+   (``progress`` was moved to Mercurial's core and is enabled by default
+   in Mercurial 3.5+.)
+
 Since core extensions are bundled with Mercurial, they have a special
 syntax that makes them easier to install::
 
   [extensions]
   color=
   pager=
-  progress=
 
 Core Extensions to Perform History Rewriting
 ============================================
@@ -147,10 +149,10 @@ background process and executes Mercurial commands.
 
 **chg can drastically speed up Mercurial.** This is because the overhead
 for launching a new Python process is high (often over 50ms) and the
-overhead for loading Mercurial state into that process can also be high,
-especially for larger repositories. With ``chg``, you may this cost once
-and all subsequent commands effectively eliminate the Python and Mercurial
-startup overhead. For example::
+overhead for loading Mercurial state into that process can also be high.
+With ``chg``, you may this cost once and all subsequent commands
+effectively eliminate the Python and Mercurial startup overhead. For
+example::
 
    $ time hg --version
    real    0m0.118s
