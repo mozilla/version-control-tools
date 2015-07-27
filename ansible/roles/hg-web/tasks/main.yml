@@ -17,12 +17,12 @@
   when: ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: download IUS community configuration RPMs (CentOS 6)
-  get_url: url=https://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/{{ item.name }}
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/{{ item.name }}
            dest=/var/tmp/{{ item.dest }}
            sha256sum={{ item.sha256 }}
   with_items:
-    - { name: epel-release-6-5.noarch.rpm, dest: epel-release-6-5.noarch.rpm, sha256: 157da55870a119e39cd2aa3d31e3e340b13b3960b6d5b897a48248c38fe8e1b5 }
-    - { name: ius-release-1.0-14.ius.centos6.noarch.rpm, dest: ius-release-1.0-14.rpm, sha256: c2ed9a03f6cbb630a7b4fcdb69a35ddcc4b5d805fbfbd66018996f8df3caa792 }
+    - { name: epel-release-6-5.20150727.noarch.rpm, dest: epel-release-6-5.noarch.rpm, sha256: 0c42f55f719419fb61caa82fd61ad48b2d32d43bf8c3274197e2506302497b0b }
+    - { name: ius-release-1.0-14.20150727.ius.centos6.noarch.rpm, dest: ius-release-1.0-14.rpm, sha256: 331d255903875f47dac8b6acaf299097e70ace2ef55405efc5adb90f1a61158e }
   when: ansible_distribution == 'CentOS'
 
 - name: configure IUS Community Repos
