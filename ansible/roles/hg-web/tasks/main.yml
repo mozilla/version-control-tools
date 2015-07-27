@@ -1,5 +1,9 @@
 ---
 
+- name: determine if running in Docker
+  stat: path=/vct
+  register: vct_dir
+
 # We obtain Python 2.7 packages from the IUS Community repositories.
 # More info is at https://iuscommunity.org/pages/Repos.html.
 # Packages in this repo typically have their version in the package
@@ -156,18 +160,24 @@
 - name: populate hgweb virtualenv
   pip: requirements={{ venv_hgweb }}/requirements.txt executable={{ venv_hgweb }}/bin/peep
 
-- name: set up version-control-tools repo
+- name: set up version-control-tools repo (server only)
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
       dest=/repo/hg/version-control-tools
       revision={{ lookup('file', '../../../../.vctnode') }}
       force=yes
       purge=yes
       executable={{ venv_hgweb }}/bin/hg
+  when: vct_dir.stat.exists == False
 
 # The hg module's purge doesn't delete ignored files. Boo. Force that
 # because old .pyc files may cause chaos.
 - name: delete ignored files from version-control-tools repo
   command: "{{ venv_hgweb }}/bin/hg --config extensions.purge= -R /repo/hg/version-control-tools purge --all"
+  when: vct_dir.stat.exists == False
+
+- name: rsync version-control-tools repo (Docker only)
+  command: /usr/bin/rsync -a --delete-after /vct/ /repo/hg/version-control-tools/
+  when: vct_dir.stat.exists == True
 
 # Settings from this file are inherited by every hg command run on the
 # system.
