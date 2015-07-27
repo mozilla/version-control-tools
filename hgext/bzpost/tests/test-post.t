@@ -522,6 +522,56 @@ Pushing commit with bug number to excluded tree will not post comment
 
   $ cd ..
 
+Unicode in author and commit message works
+
+  $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug10
+  $ hg -q clone -r 0 mozilla-central unicode
+  $ cd unicode
+
+  $ echo unicode > foo
+  $ cat > message << EOF
+  > Bug 10 - I am Quèze!
+  > EOF
+  $ HGENCODING=utf-8 HGUSER='Quèze' hg commit -l message
+
+  $ hg push -f http://localhost:$HGPORT/integration/mozilla-inbound
+  pushing to http://localhost:$HGPORT/integration/mozilla-inbound
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  recording push at http://*:$HGPORT1/show_bug.cgi?id=10 (glob)
+
+  $ $TESTDIR/bugzilla dump-bug 10
+  Bug 10:
+    blocks: []
+    cc: []
+    comments:
+    - author: default@example.com
+      id: 17
+      tags: []
+      text: ''
+    - author: default@example.com
+      id: 18
+      tags: []
+      text:
+      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/853e7b5582a855a0657750740aef6eee540187bb'
+      - 'changeset:  853e7b5582a855a0657750740aef6eee540187bb'
+      - "user:       Qu\xE8ze"
+      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
+      - 'description:'
+      - "Bug 10 - I am Qu\xE8ze!"
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: bug10
+
+  $ cd ..
+
 Cleanup
 
   $ $TESTDIR/testing/docker-control.py stop-bmo bzpost-test-post

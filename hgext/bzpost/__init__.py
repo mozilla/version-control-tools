@@ -43,12 +43,16 @@ to user repositories, set the following in your hgrc:
 
 import os
 
-from mercurial import demandimport
-from mercurial import exchange
-from mercurial import extensions
-from mercurial import phases
-from mercurial import util
 from mercurial.i18n import _
+from mercurial import (
+    demandimport,
+    encoding,
+    exchange,
+    extensions,
+    phases,
+    util,
+)
+
 
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
@@ -91,7 +95,7 @@ def wrappedpushbookmark(orig, pushop):
         return result
 
     if tree:
-        baseuri = repository.resolve_trees_to_uris([tree])[0][1]
+        baseuri = repository.resolve_trees_to_uris([tree])[0][1].encode('utf-8')
         assert baseuri
     else:
         # This isn't a known Firefox tree. Fall back to resolving URLs by
@@ -193,10 +197,14 @@ def wrappedpushbookmark(orig, pushop):
             ctx = pushop.repo[node]
             lines.append('url:        %s/rev/%s' % (baseuri, ctx.hex()))
             lines.append('changeset:  %s' % ctx.hex())
-            lines.append('user:       %s' % ctx.user())
+            # user and description are using local encodings. Depending on the
+            # configured encoding, replacement characters could be involved. We
+            # use encoding.fromlocal() to get the raw bytes, which should be
+            # valid UTF-8.
+            lines.append('user:       %s' % encoding.fromlocal(ctx.user()))
             lines.append('date:       %s' % util.datestr(ctx.date()))
             lines.append('description:')
-            lines.append(ctx.description())
+            lines.append(encoding.fromlocal(ctx.description()))
             lines.append('')
 
         comment = '\n'.join(lines)
