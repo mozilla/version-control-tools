@@ -133,9 +133,9 @@ Download a `source archive <http://mercurial.selenic.com/downloads>`_
 from Mercurial. Alternatively, clone the Mercurial source code and check
 out the version you wish to install::
 
-  $ hg clone http://selenic.com/repo/hg
+  $ hg clone https://selenic.com/repo/hg
   $ cd hg
-  $ hg up 3.4
+  $ hg up 3.4.2
 
 Once you have the source code, run ``make`` to install Mercurial::
 
