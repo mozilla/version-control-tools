@@ -4,7 +4,7 @@
 
 # This is a Docker container for building Mercurial RPMs.
 
-FROM centos:centos6
+FROM secure:mozsecure:ubuntu14042:sha256 e08475e91c8b342dce147346a11db16357619ed914aaad4d82be2e6ab743a167:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/ubuntu-trusty-core-cloudimg-amd64-docker-20150630.tar.xz
 
 RUN yum install -y createrepo gcc gettext make mercurial python-devel python-docutils rpm-build tar
 

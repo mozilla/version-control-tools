@@ -10,6 +10,7 @@ from __future__ import absolute_import
 import base64
 from collections import deque
 import docker
+import hashlib
 import json
 import os
 import pickle
@@ -213,6 +214,61 @@ class Docker(object):
 
         return False
 
+    def import_base_image(self, repository, tagprefix, url, digest):
+        """Secure Docker base image importing.
+
+        `docker pull` is not secure because it doesn't verify digests before
+        processing data. Instead, it "tees" the image content to the image
+        processing layer and the hasher and verifies the digest matches
+        expected only after all image processing has occurred. While fast
+        (images don't need to be buffered before being applied), it is insecure
+        because a malicious image could exploit a bug in image processing
+        and take control of the Docker daemon and your machine.
+
+        This function takes a repository name, tag prefix, URL, and a SHA-256
+        hex digest as arguments and returns the Docker image ID for the image.
+        The contents of the image are, of course, verified to match the digest
+        before being applied.
+
+        The imported image is "tagged" in the repository specified. The tag of
+        the created image is set to the specified prefix and the SHA-256 of a
+        combination of the URL and digest. This serves as a deterministic cache
+        key so subsequent requests for a (url, digest) can be returned nearly
+        instantly. Of course, this assumes: a) the Docker daemon and its stored
+        images can be trusted b) content of URLs is constant.
+        """
+        tag = '%s-%s' % (tagprefix,
+                         hashlib.sha256('%s%s' % (url, digest)).hexdigest())
+        for image in reversed(self.client.images()):
+            for repotag in image['RepoTags']:
+                r, t = repotag.split(':')
+                if r == repository and t == tag:
+                    return image['Id']
+
+        # We didn't get a cache hit. Download the URL.
+        with tempfile.NamedTemporaryFile() as fh:
+            digester = hashlib.sha256()
+            res = requests.get(url, stream=True)
+            for chunk in res.iter_content(8192):
+                fh.write(chunk)
+                digester.update(chunk)
+
+            # Verify content before doing anything with it.
+            # (This is the part Docker gets wrong.)
+            if digester.hexdigest() != digest:
+                raise Exception('downloaded Docker image does not match digest: '
+                                '%s; got %s expected %s' % (url,
+                                digester.hexdigest(), digest))
+
+            fh.flush()
+            fh.seek(0)
+
+            res = self.client.import_image_from_data(fh,
+                    repository=repository, tag=tag)
+            # docker-py doesn't parse the JSON response in what is almost
+            # certainly a bug. Do it ourselves.
+            return json.loads(res.strip())['status']
+
     def ensure_built(self, name, verbose=False, use_last=False):
         """Ensure a Docker image from a builder directory is built and up to date.
 
@@ -250,14 +306,28 @@ class Docker(object):
         if not os.path.isdir(p):
             raise Exception('Unknown Docker builder name: %s' % name)
 
+        dockerfile_lines = []
         vct_paths = []
         with open(os.path.join(p, 'Dockerfile'), 'rb') as fh:
             for line in fh:
                 line = line.rstrip()
-                if not line.startswith('# %include'):
-                    continue
+                if line.startswith('# %include'):
+                    vct_paths.append(line[len('# %include '):])
 
-                vct_paths.append(line[len('# %include '):])
+                # Detect our security optimized pull mode.
+                if line.startswith('FROM secure:'):
+                    parts = line[len('FROM secure:'):]
+                    repository, tagprefix, digest, url = parts.split(':', 3)
+                    if not digest.startswith('sha256 '):
+                        raise Exception('FROM secure: requires sha256 digests')
+
+                    digest = digest[len('sha256 '):]
+
+                    base_image = self.import_base_image(repository, tagprefix,
+                                                        url, digest)
+                    line = b'FROM %s' % base_image.encode('ascii')
+
+                dockerfile_lines.append(line)
 
         # We build the build context for the image manually because we need to
         # include things outside of the directory containing the Dockerfile.
@@ -271,7 +341,22 @@ class Docker(object):
 
                 full = os.path.join(root, f)
                 rel = full[len(p)+1:]
-                tar.add(full, arcname=rel)
+
+                ti = tar.gettarinfo(full, arcname=rel)
+                fh = None
+
+                # We may modify the content of the Dockerfile. Grab it from
+                # memory.
+                if rel == 'Dockerfile':
+                    df = b'\n'.join(dockerfile_lines)
+                    ti.size = len(df)
+                    fh = BytesIO(df)
+                    fh.seek(0)
+                else:
+                    fh = open(full, 'rb')
+
+                tar.addfile(ti, fileobj=fh)
+                fh.close()
 
         if vct_paths:
             # We grab the set of tracked files in this repository.
