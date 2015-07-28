@@ -101,7 +101,7 @@ echo "Building Docker images."
 echo "This could take a while and may consume a lot of internet bandwidth."
 echo "If you don't want Docker images, it is safe to hit CTRL+c to abort this."
 
-DOCKER_STATE_FILE=.docker-state.json testing/docker-control.py build-all || {
+./d0cker build-all || {
   echo "You will not be able to run tests that require Docker.";
   echo "Please see https://docs.docker.com/installation/ for how to install Docker.";
   echo "When Docker is installed, re-run this script";

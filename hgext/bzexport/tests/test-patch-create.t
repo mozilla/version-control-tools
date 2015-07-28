@@ -1,5 +1,5 @@
 #require docker
-  $ $TESTDIR/testing/docker-control.py start-bmo bzexport-test-patch-create $HGPORT
+  $ $TESTDIR/d0cker start-bmo bzexport-test-patch-create $HGPORT
   waiting for Bugzilla to start
   Bugzilla accessible on http://*:$HGPORT/ (glob)
 
@@ -176,5 +176,5 @@ Uploading a new patch will reassign bug to you
     status: ASSIGNED
     summary: bug2
 
-  $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-patch-create
+  $ $TESTDIR/d0cker stop-bmo bzexport-test-patch-create
   stopped 2 containers

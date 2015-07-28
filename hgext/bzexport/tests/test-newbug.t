@@ -1,5 +1,5 @@
 #require docker
-  $ $TESTDIR/testing/docker-control.py start-bmo bzexport-test-newbug $HGPORT
+  $ $TESTDIR/d0cker start-bmo bzexport-test-newbug $HGPORT
   waiting for Bugzilla to start
   Bugzilla accessible on http://*:$HGPORT/ (glob)
 
@@ -112,5 +112,5 @@ Specifying blockers and dependencies works
 
 Cleanup
 
-  $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-newbug
+  $ $TESTDIR/d0cker stop-bmo bzexport-test-newbug
   stopped 2 containers

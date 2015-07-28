@@ -1,7 +1,7 @@
 #require docker
   $ . $TESTDIR/hgext/bzexport/tests/helpers.sh
 
-  $ $TESTDIR/testing/docker-control.py start-bmo bzexport-test-review $HGPORT
+  $ $TESTDIR/d0cker start-bmo bzexport-test-review $HGPORT
   waiting for Bugzilla to start
   Bugzilla accessible on http://*:$HGPORT/ (glob)
 
@@ -269,6 +269,6 @@ Specifying both reviewer and feedback works
     status: ASSIGNED
     summary: bug4
 
-  $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-review
+  $ $TESTDIR/d0cker stop-bmo bzexport-test-review
   stopped 2 containers
 

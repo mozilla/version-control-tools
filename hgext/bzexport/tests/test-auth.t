@@ -1,7 +1,7 @@
 #require docker
   $ . $TESTDIR/hgext/bzexport/tests/helpers.sh
 
-  $ $TESTDIR/testing/docker-control.py start-bmo bzexport-test-auth $HGPORT
+  $ $TESTDIR/d0cker start-bmo bzexport-test-auth $HGPORT
   waiting for Bugzilla to start
   Bugzilla accessible on http://*:$HGPORT/ (glob)
 
@@ -84,5 +84,5 @@ Cookie authentication works
 
 Cleanup
 
-  $ $TESTDIR/testing/docker-control.py stop-bmo bzexport-test-auth
+  $ $TESTDIR/d0cker stop-bmo bzexport-test-auth
   stopped 2 containers

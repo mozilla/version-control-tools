@@ -1,5 +1,5 @@
 #require docker
-  $ $TESTDIR/testing/docker-control.py start-bmo bzpost-test-post $HGPORT1
+  $ $TESTDIR/d0cker start-bmo bzpost-test-post $HGPORT1
   waiting for Bugzilla to start
   Bugzilla accessible on http://*:$HGPORT1/ (glob)
 
@@ -574,5 +574,5 @@ Unicode in author and commit message works
 
 Cleanup
 
-  $ $TESTDIR/testing/docker-control.py stop-bmo bzpost-test-post
+  $ $TESTDIR/d0cker stop-bmo bzpost-test-post
   stopped 2 containers
