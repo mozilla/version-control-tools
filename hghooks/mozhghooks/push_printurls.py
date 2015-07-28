@@ -107,9 +107,9 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
     if treeherder_repo:
         treeherder_base_url = 'https://treeherder.mozilla.org'
         print '\nFollow the progress of your build on Treeherder:'
-        print '  {}/#/jobs?repo={}&revision={}'.format(treeherder_base_url,
-                                                       treeherder_repo,
-                                                       tip_node)
+        print '  %s/#/jobs?repo=%s&revision=%s' % (treeherder_base_url,
+                                                   treeherder_repo,
+                                                   tip_node)
         # if specifying a try build and talos jobs are enabled, suggest that
         # user use compareperf
         if treeherder_repo == 'try':
@@ -118,7 +118,7 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
                 and '--talos none' not in msg):
                 print ('\nIt looks like this try push has talos jobs. Compare '
                        'performance against a baseline revision:')
-                print ('  {}/perf.html#/comparechooser'
-                       '?newProject=try&newRevision={}'.format(
+                print ('  %s/perf.html#/comparechooser'
+                       '?newProject=try&newRevision=%s' % (
                            treeherder_base_url, tip_node))
     return 0
