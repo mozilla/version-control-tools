@@ -16,5 +16,5 @@ venv/
 \.t.err$
 ~$
 \.vagrant/*
-\.docker-state.json$
+\.dockerstate$
 \.vctnode$

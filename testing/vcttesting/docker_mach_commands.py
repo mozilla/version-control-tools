@@ -16,6 +16,10 @@ from vcttesting.docker import (
     params_from_env,
 )
 
+
+ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+
 @CommandProvider
 class DockerCommands(object):
     def __init__(self, context):
@@ -29,8 +33,7 @@ class DockerCommands(object):
             state_file = os.path.join(os.path.dirname(os.environ['HGRCPATH']),
                                      'docker-state.json')
         else:
-            print('Do not know where to put a Docker state file.')
-            sys.exit(1)
+            state_file = os.path.join(ROOT, '.dockerstate')
 
         docker_url, tls = params_from_env(os.environ)
         d = Docker(state_file, docker_url, tls=tls)
