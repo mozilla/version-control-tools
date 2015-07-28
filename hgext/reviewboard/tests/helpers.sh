@@ -41,7 +41,6 @@ EOF
 alias rbmanage='$TESTDIR/reviewboard'
 alias bugzilla='$TESTDIR/bugzilla'
 alias adminbugzilla='BUGZILLA_USERNAME=admin@example.com BUGZILLA_PASSWORD=password $TESTDIR/bugzilla'
-alias dockercontrol='$TESTDIR/testing/docker-control.py'
 alias pulse='$TESTDIR/pulse'
 alias mozreview='$TESTDIR/mozreview'
 alias ottoland='$TESTDIR/ottoland'
