@@ -93,6 +93,7 @@ hg up @
 make install-bin PREFIX=$mercurials/@
 hg --config extensions.purge= purge --all
 cd ../..
+unset HGRCPATH
 echo finished installing Mercurials
 
 echo ""
