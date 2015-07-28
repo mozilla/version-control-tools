@@ -5,7 +5,7 @@
 # This is a docker container for running a postgres server suitable for
 # powering a autoland instance.
 
-FROM postgres:9.4
+FROM postgres:9.4.3
 
 # override this variable to store data inside the container rather than on a
 # mounted volume.
