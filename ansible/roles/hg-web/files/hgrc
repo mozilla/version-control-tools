@@ -40,3 +40,6 @@ bugzilla = s|((?:bug[\s#]*|b=#?|#)(\d{4,}))|<a href="https://bugzilla.mozilla.or
 
 [bundleclone]
 pullmanifest=True
+
+[hgmo]
+mozbuildinfowrapper = /usr/bin/sudo /usr/local/bin/mozbuild-eval %repo%

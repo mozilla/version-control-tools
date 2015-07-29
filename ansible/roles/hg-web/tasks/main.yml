@@ -39,6 +39,8 @@
     - cronie
     # To build mod_wsgi from source so it can be placed in virtualenvs.
     - httpd-devel
+    # Secures processes, especially moz.build evaluation.
+    - libcgroup
     # mod_wsgi installed from system until switched over to venv
     - mod_wsgi
     # Python dependencies need to be installed until we switch to venv
@@ -50,6 +52,8 @@
     # default. The Python 2.7 packages from IUS don't conflict with the
     # system Python.
     - python27
+    # Needed for hg user to execute mozbuild-eval as root.
+    - sudo
 
 # Some packages aren't available on an public yum repo. Fetch them from
 # a public server and install them manually. This is a bit hacky, but it
@@ -247,3 +251,93 @@
         month=*
         minute=0
         hour=4
+
+# moz.build evaluation occurs in a chroot with a specific control group
+# to limit potential for danger. We have a dedicated user and establish
+# a cgroup policy that all processes for that user go in the limited
+# cgroup.
+#
+# This doesn't currently work in Docker because we don't have cgroups
+# exposed to our Docker containers.
+
+- name: create mozbuild user
+  user: name=mozbuild
+
+- name: control group for mozbuild evaluation
+  copy: src=cgconfig-mozbuild.conf
+        dest=/etc/cgconfig.d/mozbuild.conf
+        owner=root
+        group=root
+        mode=0664
+  notify: restart cgconfig
+  when: vct_dir.stat.exists == False
+
+- name: install control group rules
+  copy: src=cgrules.conf
+        dest=/etc/cgrules.conf
+        owner=root
+        group=root
+        mode=0664
+
+- name: start control group rules service
+  service: name=cgred state=started enabled=yes
+  when: vct_dir.stat.exists == False
+
+- name: directories for mozbuild chroot
+  file: path={{ item }} state=directory owner=root group=root mode=0775
+  with_items:
+    - /repo/hg/chroot_mozbuild
+
+- name: check if chroot is available
+  stat: path={{ vct }}/chroot_mozbuild/chroot.tar.gz
+  register: chroot_mozbuild
+  delegate_to: 127.0.0.1
+
+# Files dropped from the chroot will still exist. This shouldn't be
+# problematic. Ignore it until it becomes a problem.
+- name: upload and extract chroot archive
+  unarchive: src={{ vct }}/chroot_mozbuild/chroot.tar.gz
+             dest=/repo/hg/chroot_mozbuild
+  when: chroot_mozbuild.stat.exists
+
+# It is important for this binary to be located *outside* the chroot
+# because if code inside the chroot is able to modify the binary, it
+# will be able to execute as root given the sudo policy below.
+- name: upload chroot evaluator binary
+  copy: src={{ vct }}/chroot_mozbuild/mozbuild-eval
+        dest=/usr/local/bin/mozbuild-eval
+        owner=root
+        group=root
+        mode=0755
+  when: chroot_mozbuild.stat.exists
+
+- name: install sudoers policy for mozbuild-eval
+  copy: src=sudoers-mozbuild-eval
+        dest=/etc/sudoers.d/mozbuild-eval
+        owner=root
+        group=root
+        mode=0644
+
+- name: mount point for repos
+  file: path={{ item }} state=directory owner=hg group=hg mode=0755
+  with_items:
+    - /repo/hg/chroot_mozbuild/repo/hg/mozilla
+
+# In order to get a read-only bind mount, we have to first do a regular
+# bind mount then do a remount. We can't work this magic with the
+# "mount" ansible module, so do it by hand.
+- name: bind mount repositories into mozbuild chroot (servers only)
+  shell: mount -o bind /repo/hg/mozilla /repo/hg/chroot_mozbuild/repo/hg/mozilla && mount -o remount,ro,bind /repo/hg/mozilla /repo/hg/chroot_mozbuild/repo/hg/mozilla creates=/repo/hg/chroot_mozbuild/repo/hg/mozilla/mozilla-central
+  when: vct_dir.stat.exists == False
+
+- name: create devices mount inside mozbuild chroot (servers only)
+  mount: name=/repo/hg/chroot_mozbuild/dev
+         src=none
+         fstype=tmpfs
+         state=present
+         fstab=/repo/hg/chroot_mozbuild/etc/fstab
+  when: vct_dir.stat.exists == False
+
+- name: configure /dev/urandom in mozbuild chroot (servers only)
+  command: mknod -m 444 /repo_local/mozilla/chroot_mozbuild/dev/urandom c 1 9 creates=/repo_local/mozilla/chroot_mozbuild/dev/urandom
+  when: vct_dir.stat.exists == False

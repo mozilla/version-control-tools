@@ -1,0 +1,5 @@
+# Enable the hg user (presumably from running hgweb processes) to
+# execute `mozbuild-eval` as root. Root permissions are needed in
+# order to perform chroot(). The executable is hard-coded to drop
+# permissions to the "mozbuild" user.
+hg ALL=NOPASSWD: /usr/local/bin/mozbuild-eval

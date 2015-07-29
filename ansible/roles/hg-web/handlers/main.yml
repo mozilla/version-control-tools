@@ -1,0 +1,3 @@
+---
+- name: restart cgconfig
+  service: name=cgconfig state=restarted
