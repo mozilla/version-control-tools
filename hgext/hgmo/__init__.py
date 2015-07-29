@@ -3,10 +3,13 @@
 
 """Provide enhancements to hg.mozilla.org's web interface."""
 
+import json
 import os
 
+from mercurial.i18n import _
 from mercurial.node import short
 from mercurial import (
+    cmdutil,
     commands,
     encoding,
     error,
@@ -22,6 +25,11 @@ ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 import mozautomation.commitparser as commitparser
+import mozhg.mozbuildinfo as mozbuildinfo
+
+
+cmdtable = {}
+command = cmdutil.command(cmdtable)
 
 
 def addmetadata(repo, ctx, d, onlycheap=False):
@@ -156,6 +164,27 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
         repo = hg.repository(ui, repo.root)
 
     return orig(ui, repo, *args, **kwargs)
+
+
+@command('mozbuildinfo', [
+    ('r', 'rev', '.', _('revision to query'), _('REV')),
+    ], _('show files info from moz.build files'))
+def mozbuildinfocommand(ui, repo, *paths, **opts):
+    ctx = repo[opts['rev']]
+
+    try:
+        d = mozbuildinfo.filesinfo(repo, ctx, paths=paths)
+    except Exception as e:
+        d = {'error': 'Exception reading moz.build info: %s' % str(e)}
+
+    if not d:
+        d = {'error': 'no moz.build info available'}
+
+    # TODO send data to templater.
+    # Use stable output and indentation to make testing easier.
+    ui.write(json.dumps(d, indent=2, sort_keys=True))
+    ui.write('\n')
+    return
 
 
 def extsetup(ui):
