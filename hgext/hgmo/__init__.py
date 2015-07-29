@@ -1,10 +1,69 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-"""Provide enhancements to hg.mozilla.org's web interface."""
+"""Provide enhancements to hg.mozilla.org
+
+Config Options
+==============
+
+hgmo.mozbuildinfoenabled
+   Whether evaluation of moz.build files for metadata is enabled from hgweb
+   requests. This is disabled by default.
+
+hgmo.mozbuildinfowrapper
+   A command to execute to obtain moz.build file info.
+
+   The value MUST not contain any quote characters. The value is split on
+   whitespace and a new process is spawned with the result. Therefore, the
+   first argument must be the absolute path to an executable.
+
+   The literal "%repo%" will be replaced with the path of the repository
+   being operated on.
+
+   See "moz.build wrapper commands" for more.
+
+moz.build Wrapper Commands
+==========================
+
+Some moz.build file info lookups are performed via a separate process. The
+process to invoke is defined by the ``hgmo.mozbuildinfowrapper`` option.
+
+The reason for this is security. moz.build files are Python files that must
+be executed in a Python interpreter. Python is notoriously difficult (read:
+impossible) to sandbox properly. Therefore, we cannot trust that moz.build
+files don't contain malicious code which may escape the moz.build execution
+context and compromise the Mercurial server. Wrapper commands exist to
+allow a more secure execution environment/sandbox to be established so escapes
+from the Python moz.build environment can't gain additional permissions.
+
+The program defined by ``hgmo.mozbuildinfowrapper`` is invoked and parameters
+are passed to it as JSON via stdin. The stdin pipe is closed once all JSON
+has been sent. The JSON properties are:
+
+repo
+   Path to repository being operated on.
+
+node
+   40 character hex SHA-1 of changeset being queried.
+
+paths
+   Array of paths we're interested in information about.
+
+Successful executions will emit JSON on stdout and exit with code 0.
+Non-0 exit codes will result in output being logged locally and a generic
+message being returned to the user. stderr is logged in all cases.
+
+Wrapper commands typically read arguments, set up a secure execution
+environment, then invoke the relevant mozbuild APIs to obtain requested info.
+
+Wrapper commands may invoke ``hg mozbuildinfo --pipemode`` to retrieve
+moz.build info. In fact, the wrapper command itself can be defined as this
+string. Of course, no security will be provided.
+"""
 
 import json
 import os
+import subprocess
 
 from mercurial.i18n import _
 from mercurial.node import short
@@ -17,7 +76,11 @@ from mercurial import (
     hg,
     revset,
 )
-from mercurial.hgweb import webutil
+from mercurial.hgweb import (
+    webcommands,
+    webutil,
+)
+from mercurial.hgweb.common import HTTP_OK
 
 
 OUR_DIR = os.path.dirname(__file__)
@@ -119,6 +182,81 @@ def changelistentry(orig, web, ctx, tmpl):
     return d
 
 
+def mozbuildinfowebcommand(web, req, tmpl):
+    """Web command handler for the "mozbuildinfo" command."""
+    repo = web.repo
+
+    # TODO we should be using the templater instead of emitting JSON directly.
+    # But this requires not having the JSON formatter from the
+    # pushlog-legacy.py extension.
+
+    if not repo.ui.configbool('hgmo', 'mozbuildinfoenabled', False):
+        req.respond(HTTP_OK, 'application/json')
+        return json.dumps({'error': 'moz.build evaluation is not enabled for this repo'})
+
+    if not repo.ui.config('hgmo', 'mozbuildinfowrapper'):
+        req.respond(HTTP_OK, 'application/json')
+        return json.dumps({'error': 'moz.build wrapper command not defined; refusing to execute'})
+
+    rev = 'tip'
+    if 'node' in req.form:
+        rev = req.form['node'][0]
+
+    ctx = repo[rev]
+    paths = req.form.get('p', ctx.files())
+
+    pipedata = json.dumps({
+        'repo': repo.root,
+        'node': ctx.hex(),
+        'paths': paths,
+    })
+
+    args = repo.ui.config('hgmo', 'mozbuildinfowrapper')
+    # Should be verified by extsetup. Double check since any process invocation
+    # has security implications.
+    assert '"' not in args
+    assert "'" not in args
+    args = args.split()
+    args = [a.replace('%repo%', repo.root) for a in args]
+
+    # We do not use a shell because it is only a vector for pain and possibly
+    # security issues.
+    # We close file descriptors out of security paranoia.
+    # We switch cwd of the process so state from the current directory isn't
+    # picked up.
+    try:
+        p = subprocess.Popen(args,
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             cwd='/',
+                             shell=False,
+                             close_fds=True)
+    except OSError as e:
+        repo.ui.log('error invoking moz.build info process: %s\n' % e.errno)
+        return json.dumps({'error': 'unable to invoke moz.build info process'})
+
+    stdout, stderr = p.communicate(pipedata)
+
+    req.respond(HTTP_OK, 'application/json')
+
+    if p.returncode:
+        repo.ui.log('failure obtaining moz.build info: stdout: %s; '
+                    'stderr: %s\n' % (stdout, stderr))
+        return json.dumps({'error': 'unable to obtain moz.build info'},
+                          indent=2)
+    elif stderr.strip():
+        repo.ui.log('moz.build evaluation output: %s\n' % stderr.strip())
+
+    # Round trip to ensure we have valid JSON.
+    try:
+        d = json.loads(stdout)
+        return json.dumps(d, indent=2, sort_keys=True)
+    except Exception:
+        return json.dumps({'error': 'invalid JSON returned; report this error'},
+                          indent=2)
+
+
 def revset_reviewer(repo, subset, x):
     """``reviewer(REVIEWER)``
 
@@ -168,9 +306,18 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
 
 @command('mozbuildinfo', [
     ('r', 'rev', '.', _('revision to query'), _('REV')),
-    ], _('show files info from moz.build files'))
+    ('', 'pipemode', False, _('accept arguments from stdin')),
+    ], _('show files info from moz.build files'),
+    optionalrepo=True)
 def mozbuildinfocommand(ui, repo, *paths, **opts):
-    ctx = repo[opts['rev']]
+    if opts['pipemode']:
+        data = json.loads(ui.fin.read())
+
+        repo = hg.repository(ui, path=data['repo'])
+        ctx = repo[data['node']]
+        paths = data['paths']
+    else:
+        ctx = repo[opts['rev']]
 
     try:
         d = mozbuildinfo.filesinfo(repo, ctx, paths=paths)
@@ -197,3 +344,11 @@ def extsetup(ui):
     entry = extensions.wrapcommand(commands.table, 'serve', servehgmo)
     entry[1].append(('', 'hgmo', False,
                      'Run a server configured like hg.mozilla.org'))
+
+    wrapper = ui.config('hgmo', 'mozbuildinfowrapper')
+    if wrapper:
+        if '"' in wrapper or "'" in wrapper:
+            raise util.Abort('quotes may not appear in hgmo.mozbuildinfowrapper')
+
+    setattr(webcommands, 'mozbuildinfo', mozbuildinfowebcommand)
+    webcommands.__all__.append('mozbuildinfo')
