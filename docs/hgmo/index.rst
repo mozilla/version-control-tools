@@ -12,3 +12,4 @@ hg.mozilla.org
    managing-repos
    bundleclone
    contributing
+   mozbuildinfo
