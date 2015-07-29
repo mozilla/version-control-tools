@@ -327,7 +327,8 @@ class MozReview(object):
                                                 rsync_port)
 
             def execute(name, cid, command):
-                res = self._docker.execute(cid, command, stream=True)
+                res = self._docker.execute(cid, command, stream=True,
+                                           stderr=verbose, stdout=verbose)
                 for msg in res:
                     if verbose:
                         print('%s> %s' % (name, msg), end='')
