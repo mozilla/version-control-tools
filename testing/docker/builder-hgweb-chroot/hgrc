@@ -1,0 +1,5 @@
+# .hg/hgrc files inside repositories are owned by hg:hg. They'll be
+# untrusted since we run as mozbuild:mozbuild. The contents of the files
+# shouldn't be important. Silence the untrusted file warnings.
+[ui]
+report_untrusted = false

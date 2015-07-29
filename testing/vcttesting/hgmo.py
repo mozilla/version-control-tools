@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import errno
 import json
@@ -17,6 +17,32 @@ from .util import wait_for_ssh
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
+
+
+def get_hgweb_mozbuild_chroot(d):
+    """Obtain files needed for a moz.build evaluation sandbox.
+
+    Returns contents of binary files as a tuple. Files are:
+
+    * tar.gz of chroot archive
+    * executable for launching the moz.build evaluation process
+    """
+    image = d.ensure_built('hgweb-chroot', verbose=True)
+
+    # The chroot archive contains a copy of version-control-tools. Need to
+    # attach a vct container so we can rsync it over.
+    with d.vct_container(verbose=True) as vct_state:
+        with d.create_container(image) as state:
+            cid = state['Id']
+            d.client.start(cid, volumes_from=[vct_state['Name']])
+
+            for s in d.client.attach(cid, stream=True, logs=True):
+                print(s, end='')
+
+            tarball = d.get_file_content(state['Id'], '/chroot.tar.gz')
+            executable = d.get_file_content(state['Id'], 'mozbuild-eval')
+
+            return tarball, executable
 
 
 class HgCluster(object):

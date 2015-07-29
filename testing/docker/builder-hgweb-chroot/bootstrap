@@ -1,0 +1,24 @@
+#!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script runs when the container starts to produce a chroot
+# archive. It assumes a v-c-t volume is mounted at /vct-mount.
+
+set -e
+
+VCT=/python/repo/hg/version-control-tools
+
+mkdir -p /python/repo/hg
+/usr/bin/rsync -a --delete-after /vct-mount/ ${VCT}/
+
+chown -R root:root ${VCT}
+
+mkdir /python/dev
+
+# setuid or setgid bits could lead to privilege escalation. Unset them.
+find /python -perm -4000 -exec chmod u-s {} \;
+find /python -perm -2000 -exec chmod g-s {} \;
+
+tar -C /python -czf /chroot.tar.gz .

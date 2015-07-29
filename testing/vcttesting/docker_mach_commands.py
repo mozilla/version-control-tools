@@ -128,3 +128,24 @@ class DockerCommands(object):
             with open(outfile, 'wb') as fh:
                 fh.write(data)
             print('Wrote %s' % outfile)
+
+    @Command('generate-hgweb-mozbuild-files', category='docker',
+             description='Generate files for a moz.build evaluation environment')
+    @CommandArgument('dest', help='Directory to write files to')
+    def generate_hgweb_chroot(self, dest):
+        from vcttesting.hgmo import get_hgweb_mozbuild_chroot
+
+        if not os.path.exists(dest):
+            os.mkdir(dest)
+
+        chroot, executable = get_hgweb_mozbuild_chroot(self.d)
+
+        with open(os.path.join(dest, 'chroot.tar.gz'), 'w') as fh:
+            fh.write(chroot)
+            print('wrote %d bytes for chroot archive' % len(chroot))
+
+        with open(os.path.join(dest, 'mozbuild-eval'), 'w') as fh:
+            fh.write(executable)
+            print('wrote %d bytes for mozbuild-eval' % len(executable))
+
+        print('wrote files to %s' % dest)
