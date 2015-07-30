@@ -318,7 +318,7 @@
         dest=/etc/sudoers.d/mozbuild-eval
         owner=root
         group=root
-        mode=0644
+        mode=0440
 
 - name: mount point for repos
   file: path={{ item }} state=directory owner=hg group=hg mode=0755
