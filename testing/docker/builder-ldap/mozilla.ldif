@@ -23,18 +23,21 @@ gidNumber: 673
 objectClass: posixGroup
 objectClass: top
 cn: scm_level_1
+memberUid: autoland@example.com
 
 dn: cn=scm_level_2,ou=groups,dc=mozilla
 gidNumber: 685
 objectClass: posixGroup
 objectClass: top
 cn: scm_level_2
+memberUid: autoland@example.com
 
 dn: cn=scm_level_3,ou=groups,dc=mozilla
 gidNumber: 679
 objectClass: posixGroup
 objectClass: top
 cn: scm_level_3
+memberUid: autoland@example.com
 
 dn: cn=scm_l10n,ou=groups,dc=mozilla
 gidNumber: 678
