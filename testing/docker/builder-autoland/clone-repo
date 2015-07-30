@@ -5,6 +5,9 @@ hg clone http://hgrb/$1
 cd /repos/$1
 
 cat > .hg/hgrc << EOF
+[ui]
+username = Otto Land <autoland@example.com>
+
 [extensions]
 evolve = /home/ubuntu/mutable-history/hgext/evolve.py
 mq =
