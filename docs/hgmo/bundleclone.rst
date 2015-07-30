@@ -24,9 +24,12 @@ Enabling
 ========
 
 To enable cloning from pre-generated bundles, you'll need to install the
-`bundleclone extension <https://hg.mozilla.org/hgcustom/version-control-tools/file/default/hgext/bundleclone/__init__.py>`_.
-Simply download that file then add the following to your global hgrc
-file (likely ``/etc/mercurial/hgrc``)::
+`bundleclone extension
+<https://hg.mozilla.org/hgcustom/version-control-tools/file/default/hgext/bundleclone/__init__.py>`_.
+Simply `download
+<https://hg.mozilla.org/hgcustom/version-control-tools/raw-file/default/hgext/bundleclone/__init__.py>`_
+that file then add the following to your global hgrc file (likely
+``/etc/mercurial/hgrc``)::
 
    [extensions]
    bundleclone = /path/to/bundleclone.py
