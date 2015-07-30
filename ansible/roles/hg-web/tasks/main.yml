@@ -132,6 +132,8 @@
   with_items:
     - /repo_local/mozilla/mozilla
     - /repo_local/mozilla/webroot_wsgi
+    # make_user_wsgi_dirs.sh expects this to exist.
+    - /repo_local/mozilla/webroot_wsgi/users
 
 - name: symlink /repo/hg to /repo_local/mozilla
   file: src=/repo_local/mozilla dest=/repo/hg state=link
