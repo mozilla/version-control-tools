@@ -198,6 +198,13 @@
 - name: install wsgi config
   copy: content="LoadModule wsgi_module /repo/hg/venv_hgweb/lib/python2.7/site-packages/mod_wsgi/server/mod_wsgi-py27.so" dest=/etc/httpd/conf.d/wsgi.conf
 
+- name: install mirror-pull script
+  template: src=mirror-pull.j2
+            dest=/usr/local/bin/mirror-pull
+            owner=root
+            group=root
+            mode=0755
+
 # Install the user repo wsgi creation script, set up a cronjob for it
 - name: install the script that creates user repo wsgi files
   copy: src=make_user_wsgi_dirs.sh dest=/usr/local/bin/make_user_wsgi_dirs.sh mode=0755

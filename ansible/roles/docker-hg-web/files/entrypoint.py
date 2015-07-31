@@ -26,12 +26,7 @@ if not os.path.exists('/etc/ssh/ssh_host_rsa_key'):
                            '-f', '/etc/ssh/ssh_host_rsa_key'])
 
 REPLACEMENTS = {
-    '<%= @mirror_source %>': ssh_hostname,
-    '<%= @repo_serve_path %>': '/repo_local/mozilla/mozilla',
-    '%<= @repo_serve_path %>': '/repo_local/mozilla/mozilla',
-    '<%= @python_lib_path %>': '/repo_local/mozilla/libraries',
-    '<%= @mirror_priv_key_path %>': '/etc/mercurial/mirror',
-    '<%= @mirror_user_name %>': 'hg',
+    '@mirror_source@': ssh_hostname,
 }
 
 mirror_pull = open('/usr/local/bin/mirror-pull', 'rb').readlines()

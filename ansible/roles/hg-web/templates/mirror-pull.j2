@@ -44,14 +44,14 @@ fi
 eval set -- "$TEMP"
 
 # defaults:
-REPO_ROOT=ssh://<%= @mirror_source %>
-REPO_TARGET=<%= @repo_serve_path %>
+REPO_ROOT=ssh://{{ mirror_source }}
+REPO_TARGET=/repo_local/mozilla/mozilla
 LOCK_RETRIES=3 # 3 retries, the first is 5, second is 10, third is 15
 DELETE=false
 HGRC=false
 CHANGESET=""
 
-export PYTHONPATH=<%= @python_lib_path %>
+export PYTHONPATH=/repo_local/mozilla/libraries
 
 while true; do
     case "$1" in 
@@ -96,12 +96,12 @@ else
 fi
 
 repo=`echo "$repo" | sed 's#[^-\._/[:alnum:]]##g'`
-test -z "$repo" && die "need a repo to clone, relative to %<= @repo_serve_path %>" 
+test -z "$repo" && die "need a repo to clone, relative to /repo_local/mozilla/mozilla"
 
 name=`echo $repo | sed 's#^/*##'`
 src=${REPO_ROOT}/$name
 
-GLOBAL_HG_OPTS="--config hooks.pretxnchangegroup.z_linearhistory= --config hooks.pretxnchangegroup.z_loghistory= --config trusted.users=root,hg --config paths.default=ssh://<%= @mirror_source %>/${name}"
+GLOBAL_HG_OPTS="--config hooks.pretnxchangegroup.e_idl_no_uuid= --config hooks.pretxnchangegroup.z_linearhistory= --config hooks.pretxnchangegroup.z_loghistory= --config trusted.users=root,hg --config paths.default=ssh://{{ mirror_source }}/${name}"
 
 if [ "$DELETE" = "true" ]; then
     if [ "$(echo ${repo}|cut -f1 --delimiter=/)" != "users" ]; then
@@ -139,7 +139,7 @@ if [ "$HGRC" = "true" ]; then
     fi
     echo "Updating hgrc for $repo"
     TEMPFILE=$(/bin/mktemp)
-    retry "ssh -i <%= @mirror_priv_key_path %> -l <%= @mirror_user_name %> <%= @mirror_source %> repo-config $name > $TEMPFILE" && /bin/mv $TEMPFILE $repo/.hg/hgrc
+    retry "ssh -i /etc/mercurial/mirror -l {{ mirror_ssh_user }} {{ mirror_source }} repo-config $name > $TEMPFILE" && /bin/mv $TEMPFILE $repo/.hg/hgrc
     exit 0
 fi
 

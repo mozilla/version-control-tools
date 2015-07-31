@@ -6,7 +6,6 @@
   copy: src={{ item }} dest=/usr/local/bin/{{ item }} mode=0755
   with_items:
     - lockfile
-    - mirror-pull
     - repo-group
 
 - include: ../../../tasks/hgmo-extensions.yml

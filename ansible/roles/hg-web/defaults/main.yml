@@ -3,3 +3,7 @@ venv_hgweb: /repo/hg/venv_hgweb
 wsgi_processes: "{{ ansible_processor_cores * 8 }}" # usually 48
 server_limit: "{{ ansible_processor_cores * 10 }}" # 60 or 120
 max_clients: "{{ ansible_processor_cores * 10 }}" # 60 or 120
+
+# Used for replication
+mirror_source: hg.mozilla.org
+mirror_ssh_user: vcs-sync@mozilla.com
