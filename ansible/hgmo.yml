@@ -17,13 +17,20 @@
       slurp: src=/etc/mercurial/mirror
       register: mirror_private_key
 
+    - name: capture host key
+      slurp: src=/etc/ssh/ssh_host_rsa_key.pub
+      register: mirror_host_key
+
 - hosts: hgweb-prod
   roles:
     - { role: hg-web,
         # We have to use hostvars to reference variables on other hosts.
         # slurp captures content in base64 encoded form. Decode it
         # before it is passed in.
-        mirror_private_key: "{{ hostvars['hgssh1.dmz.scl3.mozilla.com'].mirror_private_key.content | b64decode }}"
+        mirror_private_key: "{{ hostvars['hgssh1.dmz.scl3.mozilla.com'].mirror_private_key.content | b64decode }}",
+        mirror_host_key: "{{ hostvars['hgssh1.dmz.scl3.mozilla.com'].mirror_host_key.content | b64decode }}",
+        # hg-zlb.vips.scl3.mozilla.com resolves to multiple IPs.
+        mirror_ips: ["63.245.215.25", "63.245.215.102"],
       }
 
 - hosts:

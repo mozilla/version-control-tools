@@ -231,6 +231,17 @@
         group=hg
         mode=0400
 
+# We don't use the known_hosts module because it can't purge extra
+# entries from the file. We should never have extra entries and extra
+# entries could arguably be a security risk, so replacing the entire
+# file content is acceptable.
+- name: register SSH host keys for mirror host
+  template: dest=/home/hg/.ssh/known_hosts
+            src=known_hosts.j2
+            owner=hg
+            group=hg
+            mode=640
+
 # /repo/hg/webroot_wsgi has most of its content vendored inside
 # version-control-tools. The content of the users/ directory is generated
 # by a CRON that runs every few minutes.
