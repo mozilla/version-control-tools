@@ -1,0 +1,128 @@
+#!/usr/bin/env python2.7
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+"""Synchronize Mercurial repositories from a manifest.
+
+Given a manifest of known repositories, ensure local clones of those
+repositories are up to date.
+"""
+
+import argparse
+import errno
+import grp
+import multiprocessing
+import os
+import pwd
+import subprocess
+
+import concurrent.futures as futures
+
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+repo_permissions = os.path.join(HERE, 'repo-permissions')
+if not os.path.exists(repo_permissions):
+    raise Exception('could not find repo-permissions script')
+
+
+class CloneError(Exception):
+    def __init__(self, path, is_clone, output=None):
+        super(CloneError, self).__init__()
+
+        self.path = path
+        self.is_clone = is_clone
+        self.output = output
+
+
+def clone_or_pull(rel, path, requires, url, user, group):
+    is_clone = False
+
+    try:
+        if not os.path.exists(path):
+            is_clone = True
+            args = ['hg', 'init', path]
+            if 'generaldelta' in requires:
+                args.extend(['--config', 'format.generaldelta=true'])
+
+            print('creating empty repo: %s' % path)
+            subprocess.check_output(args, cwd='/', stderr=subprocess.STDOUT)
+
+        args = ['hg', '-R', path, 'pull', url]
+        subprocess.check_output(args, cwd='/', stderr=subprocess.STDOUT)
+
+        # Synchronize hgrc file via mirror-pull.
+        # This should ideally be part of `hg pull`.
+        args = ['/usr/local/bin/mirror-pull', '--hgrc', rel]
+        subprocess.check_output(args, cwd='/', stderr=subprocess.STDOUT)
+
+        # Adjust repository permissions.
+        args = [repo_permissions, path, user, group, 'wwr']
+        subprocess.check_output(args, cwd='/', stderr=subprocess.STDOUT)
+
+    except subprocess.CalledProcessError as e:
+        raise CloneError(path, is_clone, output=e.output)
+    except Exception as e:
+        raise CloneError(path, is_clone, e.message)
+
+    return rel, is_clone
+
+def synchronize_repos(repos, dest_dir, base_url, user, group):
+    # Do an initial pass to create the directory scaffolding.
+    dirs = set()
+    for rel, requires in repos:
+        full = os.path.join(dest_dir, rel)
+        dirs.add(os.path.dirname(full))
+
+    for d in dirs:
+        try:
+            os.makedirs(d, mode=0775)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+    with futures.ThreadPoolExecutor(multiprocessing.cpu_count()) as e:
+        fs = []
+        for rel, requires in repos:
+            full = os.path.join(dest_dir, rel)
+            url = '%s/%s' % (base_url.rstrip('/'), rel)
+            fs.append(e.submit(clone_or_pull, rel, full, requires, url,
+                               user, group))
+
+        for f in futures.as_completed(fs):
+            if f.exception() is not None:
+                e = f.exception()
+                print('ERROR syncing %s: %s' % (e.path, e.output))
+                continue
+
+            path, is_clone = f.result()
+            if is_clone:
+                print('%s cloned successfully' % path)
+            else:
+                print('%s pulled successfully' % path)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('manifest',
+                        help='File containing list of repos to sync')
+    parser.add_argument('dest_dir',
+                        help='Directory where repositories should be created')
+    parser.add_argument('base_url',
+                        help='Base URL from which to clone repositories')
+
+    args = parser.parse_args()
+
+    repos = []
+    with open(args.manifest, 'rb') as fh:
+        for line in fh:
+            line = line.rstrip('\n')
+            rel, requires = line.split('\t')
+            requires = set(requires.split(','))
+            repos.append((rel, requires))
+
+    user = pwd.getpwuid(os.getuid())
+    group = grp.getgrgid(os.getgid())
+
+    synchronize_repos(repos, args.dest_dir, args.base_url, user.pw_name,
+                      group.gr_name)
