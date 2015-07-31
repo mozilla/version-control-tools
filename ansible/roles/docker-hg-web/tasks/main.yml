@@ -1,7 +1,4 @@
 ---
-- name: install system packages
-  command: yum install -y lockfile-progs openssh-clients openssh-server syslog
-
 - include: ../../../tasks/hgmo-extensions.yml
 
 - name: install hgweb wsgi files

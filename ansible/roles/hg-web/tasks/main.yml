@@ -44,11 +44,14 @@
     - libcgroup
     # We use logrotate to control log files
     - logrotate
+    - openssh-clients
+    - openssh-server
     # Machines are RHEL 6 or CentOS 6, which has Python 2.6 installed by
     # default. The Python 2.7 packages from IUS don't conflict with the
     # system Python.
     - python27
     # Needed for hg user to execute mozbuild-eval as root.
+    - rsyslog
     - sudo
 
 # Some packages aren't available on an public yum repo. Fetch them from
