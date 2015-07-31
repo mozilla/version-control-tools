@@ -89,43 +89,19 @@ MaxKeepAliveRequests 100
 #
 KeepAliveTimeout 15
 
-##
-## Server-Pool Size Regulation (MPM specific)
-## 
-
-# prefork MPM
 # StartServers: number of server processes to start
 # MinSpareServers: minimum number of server processes which are kept spare
 # MaxSpareServers: maximum number of server processes which are kept spare
 # ServerLimit: maximum value for MaxClients for the lifetime of the server
 # MaxClients: maximum number of server processes allowed to start
 # MaxRequestsPerChild: maximum number of requests a server process serves
-<IfModule prefork.c>
-StartServers       8
-MinSpareServers    5
-MaxSpareServers   20
-ServerLimit      {{ server_limit }}
-MaxClients       {{ max_clients }}
+StartServers       {{ httpd_start_servers }}
+MinSpareServers    {{ httpd_min_spare_servers }}
+MaxSpareServers   {{ httpd_max_spare_servers }}
+ServerLimit      {{ httpd_server_limit }}
+MaxClients       {{ httpd_max_clients }}
 MaxRequestsPerChild  4000
-</IfModule>
 
-# worker MPM
-# StartServers: initial number of server processes to start
-# MaxClients: maximum number of simultaneous client connections
-# MinSpareThreads: minimum number of worker threads which are kept spare
-# MaxSpareThreads: maximum number of worker threads which are kept spare
-# ThreadsPerChild: constant number of worker threads in each server process
-# MaxRequestsPerChild: maximum number of requests a server process serves
-<IfModule worker.c>
-StartServers         4
-MaxClients         300
-MinSpareThreads     25
-MaxSpareThreads     75 
-ThreadsPerChild     25
-MaxRequestsPerChild  0
-</IfModule>
-
-#
 # Listen: Allows you to bind Apache to specific IP addresses and/or
 # ports, in addition to the default. See also the <VirtualHost>
 # directive.

@@ -1,8 +1,12 @@
 ---
 venv_hgweb: /repo/hg/venv_hgweb
 wsgi_processes: "{{ ansible_processor_cores * 8 }}" # usually 48
-server_limit: "{{ ansible_processor_cores * 10 }}" # 60 or 120
-max_clients: "{{ ansible_processor_cores * 10 }}" # 60 or 120
+httpd_start_servers: 8
+httpd_min_spare_servers: 5
+httpd_max_spare_servers: 20
+httpd_server_limit: "{{ ansible_processor_cores * 10 }}" # 60 or 120
+httpd_max_clients: "{{ ansible_processor_cores * 10 }}" # 60 or 120
+httpd_max_requests_per_child: 4000
 
 # Used for replication
 mirror_source: hg.mozilla.org
