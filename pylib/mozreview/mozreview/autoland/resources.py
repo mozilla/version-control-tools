@@ -16,6 +16,7 @@ import requests
 from reviewboard.changedescs.models import ChangeDescription
 from reviewboard.extensions.base import get_extension_manager
 from reviewboard.reviews.models import ReviewRequest
+from reviewboard.scmtools.models import Repository
 from reviewboard.site.urlresolvers import local_site_reverse
 from reviewboard.webapi.resources import WebAPIResource
 
@@ -103,18 +104,9 @@ class TryAutolandTriggerResource(WebAPIResource):
                                'will be kicked off',
             },
         },
-        optional={
-            'autoland_request_id_for_testing': {
-                'type': int,
-                'description': 'For testing only. If the MozReview extension '
-                               'is in testing mode, this skips the request to '
-                               'Try Autoland and just uses this request id.'
-            }
-        }
     )
     @transaction.atomic
-    def create(self, request, review_request_id, try_syntax,
-               autoland_request_id_for_testing=None, *args, **kwargs):
+    def create(self, request, review_request_id, try_syntax, *args, **kwargs):
         try:
             rr = ReviewRequest.objects.get(pk=review_request_id)
         except ReviewRequest.DoesNotExist:
@@ -136,67 +128,69 @@ class TryAutolandTriggerResource(WebAPIResource):
 
         testing = ext.settings.get('autoland_testing', False)
 
+        logging.info('Submitting a request to Autoland for review request '
+                     'ID %s for revision %s '
+                     % (review_request_id, last_revision))
+
+        autoland_url = ext.settings.get('autoland_url')
+        if not autoland_url:
+            return BAD_AUTOLAND_URL
+
+        autoland_user = ext.settings.get('autoland_user')
+        autoland_password = ext.settings.get('autoland_password')
+
+        if not autoland_user or not autoland_password:
+            return BAD_AUTOLAND_CREDENTIALS
+
+        pingback_url = autoland_request_update_resource.get_uri(request)
+
+        logging.info('Telling Autoland to give status updates to %s'
+                     % pingback_url)
+
+        # TODO: Ideally we would just pass the repository name here and
+        #       the mapping in Autoland would take care of things for us.
+        #       See Bug 1188542.
+        try_autoland_tree = TRY_AUTOLAND_TREE
         if testing:
-            logging.info('In testing mode - storing autoland request id %s'
-                         % autoland_request_id_for_testing)
-            autoland_request_id = autoland_request_id_for_testing
-        else:
-            logging.info('Submitting a request to Autoland for review request '
-                         'ID %s for revision %s '
-                         % (review_request_id, last_revision))
+            try_autoland_tree = rr.repository.name
 
-            autoland_url = ext.settings.get('autoland_url')
-            if not autoland_url:
-                return BAD_AUTOLAND_URL
+        try:
+            response = requests.post(autoland_url + '/autoland',
+                data=json.dumps({
+                'tree': try_autoland_tree,
+                'pingback_url': pingback_url,
+                'rev': last_revision,
+                'destination': TRY_AUTOLAND_DESTINATION,
+                'trysyntax': try_syntax,
+            }), headers={
+                'content-type': 'application/json',
+            },
+                timeout=AUTOLAND_REQUEST_TIMEOUT,
+                auth=(autoland_user, autoland_password))
+        except requests.exceptions.RequestException:
+            logging.error('We hit a RequestException when submitting a '
+                          'request to Autoland')
+            return AUTOLAND_ERROR
+        except requests.exceptions.Timeout:
+            logging.error('We timed out when submitting a request to '
+                          'Autoland')
+            return AUTOLAND_TIMEOUT
 
-            autoland_user = ext.settings.get('autoland_user')
-            autoland_password = ext.settings.get('autoland_password')
+        if response.status_code != 200:
+            return AUTOLAND_ERROR, {
+                'status_code': response.status_code,
+                'message': response.json().get('error'),
+            }
 
-            if not autoland_user or not autoland_password:
-                return BAD_AUTOLAND_CREDENTIALS
-
-            pingback_url = autoland_request_update_resource.get_uri(request)
-
-            logging.info('Telling Autoland to give status updates to %s'
-                         % pingback_url)
-
-            try:
-                response = requests.post(autoland_url + '/autoland',
-                    data=json.dumps({
-                    'tree': TRY_AUTOLAND_TREE,
-                    'pingback_url': pingback_url,
-                    'rev': last_revision,
-                    'destination': TRY_AUTOLAND_DESTINATION,
-                    'trysyntax': try_syntax,
-                }), headers={
-                    'content-type': 'application/json',
-                },
-                    timeout=AUTOLAND_REQUEST_TIMEOUT,
-                    auth=(autoland_user, autoland_password))
-            except requests.exceptions.RequestException:
-                logging.error('We hit a RequestException when submitting a '
-                              'request to Autoland')
-                return AUTOLAND_ERROR
-            except requests.exceptions.Timeout:
-                logging.error('We timed out when submitting a request to '
-                              'Autoland')
-                return AUTOLAND_TIMEOUT
-
-            if response.status_code != 200:
+        # We succeeded in scheduling the job.
+        try:
+            autoland_request_id = int(response.json().get('request_id', 0))
+        finally:
+            if autoland_request_id is None:
                 return AUTOLAND_ERROR, {
                     'status_code': response.status_code,
-                    'message': response.json().get('error'),
+                    'request_id': autoland_request_id,
                 }
-
-            # We succeeded in scheduling the job.
-            try:
-                autoland_request_id = int(response.json().get('request_id', 0))
-            finally:
-                if autoland_request_id is None:
-                    return AUTOLAND_ERROR, {
-                        'status_code': response.status_code,
-                        'request_id': autoland_request_id,
-                    }
 
         autoland_request = AutolandRequest.objects.create(
             autoland_id=autoland_request_id,
@@ -421,6 +415,8 @@ class ImportPullRequestTriggerResource(WebAPIResource):
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
 
+        testing = ext.settings.get('autoland_testing', False)
+
         autoland_url = ext.settings.get('autoland_url')
         if not autoland_url:
             return BAD_AUTOLAND_URL
@@ -451,13 +447,18 @@ class ImportPullRequestTriggerResource(WebAPIResource):
                      % (github_user, github_repo, pullrequest, bugid,
                         pingback_url))
 
+        destination = IMPORT_PULLREQUEST_DESTINATION
+        if testing:
+            # This is just slightly better than hard coding the repo name
+            destination = Repository.objects.all()[0].name
+
         try:
             response = requests.post(autoland_url + '/pullrequest/mozreview',
                 data=json.dumps({
                 'user': github_user,
                 'repo': github_repo,
                 'pullrequest': pullrequest,
-                'destination': IMPORT_PULLREQUEST_DESTINATION,
+                'destination': destination,
                 'bzuserid': request.session['Bugzilla_login'],
                 'bzcookie': request.session['Bugzilla_logincookie'],
                 'bugid': bugid,
