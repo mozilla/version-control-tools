@@ -37,15 +37,11 @@
   with_items:
     # This is likely already installed, but needed for Docker.
     - cronie
+    - httpd
     # To build mod_wsgi from source so it can be placed in virtualenvs.
     - httpd-devel
     # Secures processes, especially moz.build evaluation.
     - libcgroup
-    # mod_wsgi installed from system until switched over to venv
-    - mod_wsgi
-    # Python dependencies need to be installed until we switch to venv
-    - python-simplejson
-    - python-argparse
     # We use logrotate to control log files
     - logrotate
     # Machines are RHEL 6 or CentOS 6, which has Python 2.6 installed by
