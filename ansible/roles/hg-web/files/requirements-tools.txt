@@ -1,2 +1,4 @@
+# sha256: BK-ioGq33MqdgXF7Qgp6FIJgYemyYUpcd90kx1zPl-Q
+futures==3.0.3
 # sha256: 3MkOSoR2FJ7MivE8CCAoYLTJyYepTE88GLKClLb9js0
 Mercurial==3.4.2
