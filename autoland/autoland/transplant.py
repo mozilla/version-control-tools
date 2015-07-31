@@ -33,7 +33,11 @@ def transplant_to_mozreview(gh, tree, user, repo, pullrequest, bzuserid,
 
     repo_path = get_repo_path(tree)
     if repo_path is None:
-        return False, 'unknown tree: ' % tree
+        return False, 'unknown tree: %s' % tree
+
+    if not os.path.isdir(repo_path):
+        return False, 'bad repository path: %s for tree: %s' % (repo_path,
+                                                                tree)
 
     # first purge any untracked files
     subprocess.call(['hg', 'purge', '--all'], cwd=repo_path)
@@ -42,8 +46,6 @@ def transplant_to_mozreview(gh, tree, user, repo, pullrequest, bzuserid,
             ['hg', 'strip', '--no-backup', '-r', 'draft()'],
             ['hg', 'pull', 'upstream'],
             ['hg', 'update', 'upstream']]
-
-    repo_path = get_repo_path(tree)
 
     commits = github.retrieve_commits(gh, user, repo, pullrequest, repo_path)
     if not commits:
