@@ -1,0 +1,2 @@
+# sha256: 3MkOSoR2FJ7MivE8CCAoYLTJyYepTE88GLKClLb9js0
+Mercurial==3.4.2

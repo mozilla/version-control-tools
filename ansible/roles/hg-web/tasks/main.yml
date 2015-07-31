@@ -144,31 +144,50 @@
                   key_options='command="/usr/local/bin/mirror-pull -t /repo_local/mozilla/mozilla $SSH_ORIGINAL_COMMAND",no-pty,no-x11-forwarding,no-agent-forwarding'
                   key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDoGUKeheEfmCr0GXxt3DyFXjmxzE9y1z0l1laNjNl6X++1ymj9MwrrSPewDJ+fzKWl+/1tFf9LwHlnndJib4DKrcqdzvJeU1CYBQ+xt9sk0DZdizcaCpYJI4Dpk9ysGLUOd3km9dp7LsXjJ/c6NQdZpICOnCWvBOwTgg++wUfBCymMpi2mab+QhUjDcBp/LUbJOtvEE/cppvDLMATmJfIaaGCNfka2TGVRec744UC6RqahZ/mcxe6TnltqujYjo1yBMGJ4gS2rAw5U+0nLqDiBpc6+uU3sjSsAe6/UrwfE+uu6vPFyFTaitK5oHHIt2MDJHkJruyJLNtd3ooqtyXcf"
 
-# We run hgweb out of a virtualenv because that's how you are supposed
-# to do Python.
-- name: create virtualenv to run hgweb
-  command: /usr/bin/virtualenv-2.7 {{ venv_hgweb }} creates={{ venv_hgweb }}
+# We run a lot of our Python out of our virtualenvs because that is how you
+# are supported to do Python.
+- name: create virtualenvs to run hgweb
+  command: /usr/bin/virtualenv-2.7 {{ item }} creates={{ item }}
+  with_items:
+    - "{{ venv_hgweb }}"
+    - "{{ venv_tools }}"
 
 # We install peep from our own copy because this is more secure than
 # relying on network installations.
 - name: copy peep.py
-  copy: src=files/peep.py dest={{ venv_hgweb }}/bin/peep mode=0755 owner=root group=root
+  copy: src=files/peep.py dest={{ item }}/bin/peep mode=0755 owner=root group=root
+  with_items:
+    - "{{ venv_hgweb }}"
+    - "{{ venv_tools }}"
 
 - name: configure shebang in peep
-  replace: dest={{ venv_hgweb }}/bin/peep
+  replace: dest={{ item }}/bin/peep
            regexp='^#!\/usr\/bin\/env python$'
-           replace='#!{{ venv_hgweb }}/bin/python2.7'
+           replace='#!{{ item }}/bin/python2.7'
+  with_items:
+    - "{{ venv_hgweb }}"
+    - "{{ venv_tools }}"
 
-- name: copy requirements.txt
+- name: copy hgweb requirements.txt
   copy: src=requirements-hgweb.txt
         dest={{ venv_hgweb }}/requirements.txt
         mode=0644
         owner=root
         group=root
 
-- name: populate hgweb virtualenv
-  pip: requirements={{ venv_hgweb }}/requirements.txt
-       executable={{ venv_hgweb }}/bin/peep
+- name: copy tools requirements.txt
+  copy: src=requirements-tools.txt
+        dest={{ venv_tools}}/requirements.txt
+        mode=0644
+        owner=root
+        group=root
+
+- name: populate virtualenvs
+  pip: requirements={{ item }}/requirements.txt
+       executable={{ item }}/bin/peep
+  with_items:
+    - "{{ venv_hgweb }}"
+    - "{{ venv_tools }}"
 
 - name: set up version-control-tools repo (server only)
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
