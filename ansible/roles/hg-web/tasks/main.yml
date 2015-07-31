@@ -160,10 +160,15 @@
            replace='#!{{ venv_hgweb }}/bin/python2.7'
 
 - name: copy requirements.txt
-  copy: src=requirements.txt dest={{ venv_hgweb }}/requirements.txt mode=0644 owner=root group=root
+  copy: src=requirements-hgweb.txt
+        dest={{ venv_hgweb }}/requirements.txt
+        mode=0644
+        owner=root
+        group=root
 
 - name: populate hgweb virtualenv
-  pip: requirements={{ venv_hgweb }}/requirements.txt executable={{ venv_hgweb }}/bin/peep
+  pip: requirements={{ venv_hgweb }}/requirements.txt
+       executable={{ venv_hgweb }}/bin/peep
 
 - name: set up version-control-tools repo (server only)
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
