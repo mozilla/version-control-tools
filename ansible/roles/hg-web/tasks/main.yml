@@ -109,6 +109,13 @@
         group=hg
         mode=0640
 
+- name: install rsyslog policy for hg
+  copy: src=rsyslog-hg.conf
+        dest=/etc/rsyslog.d/hg.conf
+        owner=root
+        group=root
+        mode=0644
+
 # There are /repo_local and /repo directories for historical reasons.
 # Back in the day /repo was mounted from NFS and was a read-only
 # filesystem and /repo_local was a local, read-write copy. Now, /repo
