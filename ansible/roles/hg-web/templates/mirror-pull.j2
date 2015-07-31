@@ -101,7 +101,7 @@ test -z "$repo" && die "need a repo to clone, relative to /repo_local/mozilla/mo
 name=`echo $repo | sed 's#^/*##'`
 src=${REPO_ROOT}/$name
 
-GLOBAL_HG_OPTS="--config hooks.pretnxchangegroup.e_idl_no_uuid= --config hooks.pretxnchangegroup.z_linearhistory= --config hooks.pretxnchangegroup.z_loghistory= --config trusted.users=root,hg --config paths.default=ssh://{{ mirror_source }}/${name}"
+GLOBAL_HG_OPTS="--config hooks.pretxnchangegroup.e_idl_no_uuid= --config hooks.pretxnchangegroup.z_linearhistory= --config hooks.pretxnchangegroup.z_loghistory= --config trusted.users=root,hg --config paths.default=ssh://{{ mirror_source }}/${name}"
 
 if [ "$DELETE" = "true" ]; then
     if [ "$(echo ${repo}|cut -f1 --delimiter=/)" != "users" ]; then
