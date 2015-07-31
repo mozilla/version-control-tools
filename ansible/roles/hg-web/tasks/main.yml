@@ -224,6 +224,13 @@
     - lockfile
     - repo-group
 
+- name: install mirroring SSH key
+  copy: dest=/etc/mercurial/mirror
+        content="{{ mirror_private_key }}"
+        owner=hg
+        group=hg
+        mode=0400
+
 # /repo/hg/webroot_wsgi has most of its content vendored inside
 # version-control-tools. The content of the users/ directory is generated
 # by a CRON that runs every few minutes.

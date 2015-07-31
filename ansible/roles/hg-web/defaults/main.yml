@@ -11,3 +11,4 @@ httpd_max_requests_per_child: 4000
 # Used for replication
 mirror_source: hg.mozilla.org
 mirror_ssh_user: vcs-sync@mozilla.com
+mirror_private_key: "undefined"

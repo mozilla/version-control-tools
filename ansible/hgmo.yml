@@ -12,9 +12,19 @@
       delegate_to: 127.0.0.1
       run_once: true
 
+    # We need to write this out on clients.
+    - name: capture mirror key
+      slurp: src=/etc/mercurial/mirror
+      register: mirror_private_key
+
 - hosts: hgweb-prod
   roles:
-    - hg-web
+    - { role: hg-web,
+        # We have to use hostvars to reference variables on other hosts.
+        # slurp captures content in base64 encoded form. Decode it
+        # before it is passed in.
+        mirror_private_key: "{{ hostvars['hgssh1.dmz.scl3.mozilla.com'].mirror_private_key.content | b64decode }}"
+      }
 
 - hosts:
   - hgssh1.dmz.scl3.mozilla.com
