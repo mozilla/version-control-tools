@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+"""Create a manifest of Mercurial repositories.
+
+Given an input directory, find all repositories in that directory tree
+and print a manifest of their important metadata to stdout. These
+manifests are used to e.g. quickly clone all available repositories
+with appropriate settings.
+"""
+
+import errno
+import os
+import sys
+
+
+def find_hg_repos(path):
+    for root, dirs, files in os.walk(path):
+        for d in dirs:
+            if d == '.hg':
+                yield root
+
+        # Don't descent into .hg directories.
+        dirs[:] = [d for d in dirs if d != '.hg']
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print('usage: %s /path/to/root/directory' % sys.argv[0])
+        sys.exit(1)
+
+    base = sys.argv[1].rstrip('/')
+
+    # Sorted so output is deterministic.
+    for full in sorted(find_hg_repos(base)):
+        rel = full[len(base) + 1:]
+
+        requires_path = os.path.join(full, '.hg', 'requires')
+        try:
+            with open(requires_path, 'rb') as fh:
+                requires = set(fh.read().splitlines())
+        except IOError as e:
+            if e.errno != errno.ENOENT:
+                raise
+
+            # This is weird but go with it.
+            requires = set()
+
+        print('%s\t%s' % (rel, ','.join(sorted(requires))))
+
