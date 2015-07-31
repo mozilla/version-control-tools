@@ -37,23 +37,6 @@ with open('/usr/local/bin/mirror-pull', 'wb') as fh:
 
         fh.write(line)
 
-# Lower httpd worker count.
-httpd = open('/etc/httpd/conf/httpd.conf', 'rb').readlines()
-with open('/etc/httpd/conf/httpd.conf', 'wb') as fh:
-    for line in httpd:
-        if line.startswith('StartServers'):
-            line = 'StartServers 2\n'
-        elif line.startswith('MinSpareServers'):
-            line = 'MinSpareServers 2\n'
-
-        fh.write(line)
-
-vhost = open('/etc/httpd/conf.d/hg-vhost.conf', 'rb').readlines()
-with open('/etc/httpd/conf.d/hg-vhost.conf', 'wb') as fh:
-    for line in vhost:
-        line = line.replace('processes=48', 'processes=2')
-        fh.write(line)
-
 # Replace SSH config for master server with the current environment's.
 ssh_config = open('/home/hg/.ssh/config', 'rb').readlines()
 with open('/home/hg/.ssh/config', 'wb') as fh:
