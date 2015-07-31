@@ -218,18 +218,20 @@
     - lockfile
     - repo-group
 
-# Install the user repo wsgi creation script, set up a cronjob for it
+# /repo/hg/webroot_wsgi has most of its content vendored inside
+# version-control-tools. The content of the users/ directory is generated
+# by a CRON that runs every few minutes.
+- name: synchronize wsgi files
+  command: /usr/bin/rsync -a --delete --filter='P users/' /repo/hg/version-control-tools/hgwsgi/ /repo/hg/webroot_wsgi/
+
+- name: set ownership of wsgi files
+  command: /bin/chown -R hg:hg /repo/hg/webroot_wsgi
+
 - name: install the script that creates user repo wsgi files
   copy: src=make_user_wsgi_dirs.sh dest=/usr/local/bin/make_user_wsgi_dirs.sh mode=0755
 
 - name: install the cronjob that runs the user repo wsgi file creation script
   cron: minute="*/2" user=hg job="/usr/local/bin/make_user_wsgi_dirs.sh" name="Generate user wsgi files"
-
-# These files were historically managed by hand and developed
-# inconsistent ownership. Ensure they have consistent and proper
-# ownership.
-- name: set ownership of wsgi files
-  command: /bin/chown -R hg:hg /repo/hg/webroot_wsgi
 
 # Create and manage httpd log resources
 - name: make logdir
