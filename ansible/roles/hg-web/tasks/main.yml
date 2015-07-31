@@ -205,6 +205,16 @@
             group=root
             mode=0755
 
+- name: install scripts for supporting replication
+  copy: src={{ item }}
+        dest=/usr/local/bin/{{ item }}
+        owner=root
+        group=root
+        mode=0755
+  with_items:
+    - lockfile
+    - repo-group
+
 # Install the user repo wsgi creation script, set up a cronjob for it
 - name: install the script that creates user repo wsgi files
   copy: src=make_user_wsgi_dirs.sh dest=/usr/local/bin/make_user_wsgi_dirs.sh mode=0755

@@ -2,12 +2,6 @@
 - name: install system packages
   command: yum install -y lockfile-progs openssh-clients openssh-server syslog
 
-- name: install mirroring scripts
-  copy: src={{ item }} dest=/usr/local/bin/{{ item }} mode=0755
-  with_items:
-    - lockfile
-    - repo-group
-
 - include: ../../../tasks/hgmo-extensions.yml
 
 - name: install hgweb wsgi files
