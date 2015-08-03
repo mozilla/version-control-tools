@@ -52,6 +52,7 @@
 - name: install hooks
   copy: src={{ vct }}/hghooks/mozhghooks/{{ item }} dest=/repo/hg/libraries/mozhghooks/{{ item }} owner=hg group=hg mode=0644
   with_items:
+    - __init__.py
     - changelog_correctness.py
     - commit-message.py
     - prevent_case_only_renames.py
