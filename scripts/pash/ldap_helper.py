@@ -1,5 +1,3 @@
-#! /usr/bin/python
-
 import sys, ldap, datetime
 
 def ldap_connect (ldap_url):
@@ -53,6 +51,3 @@ def update_ldap_attribute (mail, attr, value, conn_string_ro, conn_string_write)
                 ldap_conn_write.modify_s(dn, [(ldap.MOD_REPLACE, attr, value)])
          else:
             raise Exception
-
-if __name__ == '__main__':
-    print get_ldap_attribute ('bkero@mozilla.com', 'loginShell', 'ldap://<%= scope.lookupvar('::ldapvip') %>')
