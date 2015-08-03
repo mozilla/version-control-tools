@@ -22,6 +22,7 @@ unified = 8
 
 [hooks]
 sorthooks = True
+changegroup.push_printurls = python:mozhghooks.push_printurls.hook
 changegroup.recordlogs = /repo/hg/scripts/record-pushes.sh
 changegroup.mirrorpush = /repo/hg/scripts/push-repo.sh
 pushkey.mirrorpush = /repo/hg/scripts/push-repo.sh
