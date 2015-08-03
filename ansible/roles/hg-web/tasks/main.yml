@@ -318,6 +318,26 @@
         minute=0
         hour=1
 
+# logrotate is heavily biased towards rotating logs. We don't explicitly do
+# rotation for /var/log/hg/parsed.YYYY-MM-DD, so logrotate doesn't work as a
+# tool. We've written out own script to do the compression and deletion.
+
+- name: install parsed hg logs cleanup script
+  copy: src=cleanup-parsed-hg-logs
+        dest=/repo/hg/scripts/cleanup-parsed-hg-logs
+        owner=root
+        group=root
+        mode=0755
+
+- name: create CRON to compress and delete old parsed Mercurial log files
+  cron: name='Clean old parsed Mercurial logs'
+        user=root
+        job='/repo/hg/scripts/outputif /repo/hg/scripts/cleanup-parsed-hg-logs'
+        day=*
+        month=*
+        minute=12
+        hour=2
+
 - name: create CRON to ensure file permissions are sane
   cron: name='Adjust repository permissions'
         user=root

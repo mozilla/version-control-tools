@@ -1,0 +1,43 @@
+#!/usr/bin/env python2
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script compresses /var/log/hg/parsed.YYYY-MM-DD files and deletes
+# old files.
+
+import datetime
+import os
+import re
+import subprocess
+
+DIR = '/var/log/hg'
+GZIP = '/bin/gzip'
+RE_PARSED = re.compile('^parsed\.(\d{4}-\d{2}-\d{2})')
+
+today = datetime.datetime.utcnow().date()
+yesterday = today - datetime.timedelta(days=1)
+delete_before = today - datetime.timedelta(180)
+
+
+for f in sorted(os.listdir(DIR)):
+    full = os.path.join(DIR, f)
+
+    m = RE_PARSED.match(f)
+    if not m:
+        continue
+
+    dt = datetime.datetime.strptime(m.group(1), '%Y-%m-%d')
+    date = dt.date()
+
+    if date < delete_before:
+        os.unlink(full)
+        continue
+
+    if f.endswith('.gz'):
+        continue
+
+    if date >= yesterday:
+        continue
+
+    subprocess.check_call([GZIP, full])
