@@ -1,4 +1,3 @@
-#! /usr/bin/python
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -441,12 +440,4 @@ def serve (cname):
                     sys.stdout.write(fh.read())
     else:
         sys.stderr.write ('No interactive commands allowed here!\n')
-        sys.exit (1)
-
-if __name__ == '__main__':
-#    if is_valid_user (os.getenv ('USER')):
-    if is_valid_user ('bkero@mozilla.com'):
-        serve ("hg.mozilla.org")
-    else:
-        sys.stderr.write ('You are not welcome here, go away!\n')
         sys.exit (1)
