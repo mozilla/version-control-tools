@@ -52,7 +52,6 @@ https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&componen
 
 DOC_ROOT = '/repo/hg/mozilla'
 
-verbose_users = [ 'bkero@mozilla.com2', ]
 
 def is_valid_user (mail):
     mail = mail.strip()
@@ -167,11 +166,7 @@ def make_repo_clone (cname, repo_name, quick_src, verbose=False, source_repo='')
   dest_url = "/users/%s" % user_repo_dir
   source_repo = ''
   if quick_src:
-    if(user in verbose_users):
-        verbose=True
-        run_hg_clone (cname, user_repo_dir, repo_name, quick_src, True)
-    else:
-      run_hg_clone (cname, user_repo_dir, repo_name, quick_src)
+    run_hg_clone (cname, user_repo_dir, repo_name, quick_src)
     fix_user_repo_perms (cname, repo_name)
     # New user repositories are non-publishing by default.
     set_repo_publishing(cname, repo_name, False)
@@ -352,8 +347,6 @@ def do_delete(cname, repo_dir, repo_name, verbose=False):
 
 def delete_repo (cname, repo_name, do_quick_delete, verbose=False):
   user = os.getenv ('USER')
-  if(user in verbose_users):
-      verbose = True
   user_repo_dir = user.replace ('@', '_')
   url_path = "/users/%s" % user_repo_dir
   if os.path.exists ('%s/users/%s/%s' % (DOC_ROOT, user_repo_dir, repo_name)):
