@@ -10,15 +10,6 @@
 - name: Create set-mirrors script
   copy: src=set-mirrors.py dest=/set-mirrors.py mode=0755
 
-- name: Install repo-push script
-  copy: src={{ vct }}/scripts/repo-push.sh dest=/usr/local/bin/repo-push.sh mode=0755
-
-- name: Install push scripts
-  copy: src={{ vct }}/scripts/{{ item }} dest=/repo/hg/scripts/{{ item }} mode=0755
-  with_items:
-    - record-pushes.sh
-    - push-repo.sh
-
 # While this file contains credentials, it needs to be world readable
 # because pash is executed as a regular user, since it is what runs as
 # the SSH command. We rely on pash's and Mercurial's security to not

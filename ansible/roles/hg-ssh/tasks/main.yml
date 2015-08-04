@@ -106,3 +106,20 @@
     - repo_group.py
     - sh_helper.py
 
+- name: install repo-push script
+  copy: src={{ vct }}/scripts/repo-push.sh
+        dest=/usr/local/bin/repo-push.sh
+        owner=root
+        group=root
+        mode=0755
+
+- name: install push scripts
+  copy: src={{ vct }}/scripts/{{ item }}
+        dest=/repo/hg/scripts/{{ item }}
+        owner=root
+        group=root
+        mode=0755
+  with_items:
+    - push-repo.sh
+    - record-pushes.sh
+
