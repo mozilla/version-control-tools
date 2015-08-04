@@ -10,15 +10,6 @@
 - name: Create set-mirrors script
   copy: src=set-mirrors.py dest=/set-mirrors.py mode=0755
 
-- name: Install pash
-  copy: src={{ vct }}/scripts/pash/{{ item }} dest=/usr/local/bin/{{ item }} mode=0755
-  with_items:
-    - hg_helper.py
-    - ldap_helper.py
-    - pash.py
-    - repo_group.py
-    - sh_helper.py
-
 - name: Install repo-push script
   copy: src={{ vct }}/scripts/repo-push.sh dest=/usr/local/bin/repo-push.sh mode=0755
 
