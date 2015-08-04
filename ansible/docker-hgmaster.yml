@@ -2,6 +2,8 @@
 - hosts: localhost
   roles:
     - docker-hg-ssh
+  tasks:
+    - include: tasks/hgmo-extensions.yml
   vars:
     ldap_uri: ldap://localhost/
     bind_dn: cn=admin,dc=mozilla
