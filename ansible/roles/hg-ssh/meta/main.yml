@@ -1,4 +1,4 @@
 ---
 dependencies:
   - ius-repo
-  - { role: openssh-lpk, force_command: /usr/local/bin/pash.py }
+  - { role: openssh-lpk, force_command: /usr/local/bin/pash_wrapper }

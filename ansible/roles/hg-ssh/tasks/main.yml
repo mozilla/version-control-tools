@@ -103,6 +103,7 @@
     - hg_helper.py
     - ldap_helper.py
     - pash.py
+    - pash_wrapper
     - repo_group.py
     - sh_helper.py
 
