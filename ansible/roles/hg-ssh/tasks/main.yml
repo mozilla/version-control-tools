@@ -79,6 +79,13 @@
 - name: User repository directories are present
   file: path=/repo/hg/mozilla/users state=directory mode=0775 owner=hg group=scm_level_1
 
+- name: install rsyslog policy for hg
+  copy: src=rsyslog-hg.conf
+        dest=/etc/rsyslog.d/hg.conf
+        owner=root
+        group=root
+        mode=0644
+
 - name: Mercurial log files are present and writable
   file: path={{ item }} mode=0666 state=touch
   with_items:
