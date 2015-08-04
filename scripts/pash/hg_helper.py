@@ -2,13 +2,27 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import os, sys, re, ConfigParser
-from ldap_helper import ldap_connect, get_ldap_attribute
-from sh_helper import run_command, prompt_user
 from cgi import escape
-from subprocess import Popen, PIPE, STDOUT
+import ConfigParser
+import os
+import sys
+import re
 import shlex
+from subprocess import (
+    Popen,
+    PIPE,
+    STDOUT,
+)
+
+from ldap_helper import (
+    ldap_connect,
+    get_ldap_attribute,
+)
 import repo_group
+from sh_helper import (
+    prompt_user,
+    run_command,
+)
 
 USER_REPO_EXISTS = """
 You already have a repo called %s.
