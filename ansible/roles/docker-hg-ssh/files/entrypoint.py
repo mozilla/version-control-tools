@@ -34,20 +34,6 @@ if not os.path.exists('/etc/ssh/ssh_host_rsa_key'):
     subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'rsa', '-b', '2048',
                            '-f', '/etc/ssh/ssh_host_rsa_key'])
 
-REPLACEMENTS = {
-    "<%= scope.function_hiera(['secrets_openldap_moco_bindhg_username']) %>": 'cn=admin,dc=mozilla',
-    "<%= scope.function_hiera(['secrets_openldap_moco_bindhg_password']) %>": 'password',
-    "<%= scope.lookupvar('::ldapvip') %>": '%s:%s/' % (ldap_hostname, ldap_port),
-}
-
-ldap_helper = open('/usr/local/bin/ldap_helper.py', 'rb').readlines()
-with open('/usr/local/bin/ldap_helper.py', 'wb') as fh:
-    for line in ldap_helper:
-        for s, r in REPLACEMENTS.items():
-            line = line.replace(s, r)
-
-        fh.write(line)
-
 hg_helper = open('/usr/local/bin/hg_helper.py', 'rb').readlines()
 with open('/usr/local/bin/hg_helper.py', 'wb') as fh:
     for line in hg_helper:

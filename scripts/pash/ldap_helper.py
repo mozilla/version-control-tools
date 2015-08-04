@@ -2,17 +2,26 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import json
 import sys
-import ldap
 import datetime
+
+import ldap
+
+
+def get_ldap_settings():
+    """Read LDAP settings from a file."""
+    with open('/etc/mercurial/ldap.json', 'rb') as fh:
+        return json.load(fh)
 
 
 def ldap_connect(ldap_url):
     try:
+        settings = get_ldap_settings()
         ldap_conn = ldap.initialize(ldap_url)
-        ldap_conn.simple_bind_s('<%= scope.function_hiera(['secrets_openldap_moco_bindhg_username']) %>', '<%= scope.function_hiera(['secrets_openldap_moco_bindhg_password']) %>')
+        ldap_conn.simple_bind_s(settings['username'], settings['password'])
         return ldap_conn
-    except:
+    except Exception:
         print >>sys.stderr, "Could not connect to the LDAP server at %s" % ldap_url
         sys.exit(1)
 

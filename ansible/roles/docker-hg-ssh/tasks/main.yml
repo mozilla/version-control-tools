@@ -102,5 +102,16 @@
     - record-pushes.sh
     - push-repo.sh
 
+# While this file contains credentials, it needs to be world readable
+# because pash is executed as a regular user, since it is what runs as
+# the SSH command. We rely on pash's and Mercurial's security to not
+# divulge its contents.
+- name: install LDAP configuration for pash
+  copy: src=ldap.json
+        dest=/etc/mercurial/ldap.json
+        owner=root
+        group=root
+        mode=0644
+
 - name: Install entrypoint script
   copy: src=entrypoint.py dest=/entrypoint.py mode=0755
