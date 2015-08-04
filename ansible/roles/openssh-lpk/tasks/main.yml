@@ -12,6 +12,13 @@
 - name: Install packages related to LDAP auth
   command: /usr/bin/yum install -y authconfig nss-pam-ldapd openldap-clients pam_ldap
 
+- name: create directory for LDAP certificates
+  file: path=/etc/openldap/cacerts
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
 - name: install Mozilla certificates
   copy: src={{ item.src }}
         dest=/etc/openldap/cacerts/{{ item.dest }}
