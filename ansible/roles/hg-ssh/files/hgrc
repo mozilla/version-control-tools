@@ -32,10 +32,7 @@ pretxnchangegroup.single_root = python:mozhghooks.single_root.hook
 [extensions]
 blackbox =
 bundleclone = /repo/hg/extensions/bundleclone
-hgwebjson = /repo/hg/extensions/hgwebjson.py
-pushlog-feed = /repo/hg/extensions/pushlog-feed.py
 pushlog = /repo/hg/extensions/pushlog
-buglink = /repo/hg/extensions/buglink.py
 serverlog = /repo/hg/extensions/serverlog
 pushrebase = /repo/hg/extensions/pushrebase.py
 

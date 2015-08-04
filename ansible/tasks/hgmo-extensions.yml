@@ -2,9 +2,7 @@
 - name: hg directories exist
   file: path=/repo/hg/{{ item }} owner=hg group=hg mode=0755 state=directory
   with_items:
-    - extensions
     - extensions/bundleclone
-    - extensions/parsedatetime
     - extensions/pushlog
     - extensions/serverlog
     - libraries
@@ -20,17 +18,6 @@
     - aggregate-s3-bucket-logs
     - generate-hg-s3-bundles
     - outputif
-
-- name: install pushlog hgweb files
-  copy: src={{ vct | mandatory }}/hgext/pushlog-legacy/{{ item }} dest=/repo/hg/extensions/{{ item }} owner=hg group=hg mode=0644
-  with_items:
-    - buglink.py
-    - feedparser.py
-    - hgwebjson.py
-    - pushlog-feed.py
-    - parsedatetime/__init__.py
-    - parsedatetime/parsedatetime.py
-    - parsedatetime/parsedatetime_consts.py
 
 - name: install pushlog extension
   copy: src={{ vct }}/hgext/pushlog/__init__.py dest=/repo/hg/extensions/pushlog/__init__.py owner=hg group=hg mode=0644
