@@ -1,27 +1,28 @@
-  $ hg init mozilla-inbound
-  $ cat >> mozilla-inbound/.hg/hgrc << EOF
+  $ mkdir integration
+  $ hg init integration/mozilla-inbound
+  $ cat >> integration/mozilla-inbound/.hg/hgrc << EOF
   > [hooks]
   > pretxnchangegroup.push_printurls = python:mozhghooks.push_printurls.hook
+  > 
+  > [hgmo]
+  > repo_root = $TESTTMP
   > EOF
 
   $ hg init try
-  $ cp mozilla-inbound/.hg/hgrc try/.hg/hgrc
+  $ cp integration/mozilla-inbound/.hg/hgrc try/.hg/hgrc
   $ cat >> try/.hg/hgrc << EOF
   > [mozilla]
   > treeherder_repo = try
   > EOF
 
   $ hg init try-comm-central
-  $ cp mozilla-inbound/.hg/hgrc try-comm-central/.hg/hgrc
+  $ cp integration/mozilla-inbound/.hg/hgrc try-comm-central/.hg/hgrc
   $ cat >> try-comm-central/.hg/hgrc << EOF
   > [mozilla]
   > treeherder_repo = try-comm-central
   > EOF
 
-  $ hg init unknown
-  $ cp mozilla-inbound/.hg/hgrc unknown/.hg/hgrc
-
-  $ cat >> mozilla-inbound/.hg/hgrc << EOF
+  $ cat >> integration/mozilla-inbound/.hg/hgrc << EOF
   > [mozilla]
   > treeherder_repo = mozilla-inbound
   > EOF
@@ -33,8 +34,8 @@ Push a single changeset to a non-try repo print the URL
   $ touch foo
   $ hg commit -A -m 'Bug 123 - Add foo'
   adding foo
-  $ hg push ../mozilla-inbound
-  pushing to ../mozilla-inbound
+  $ hg push ../integration/mozilla-inbound
+  pushing to ../integration/mozilla-inbound
   searching for changes
   adding changesets
   adding manifests
@@ -46,16 +47,6 @@ Push a single changeset to a non-try repo print the URL
   
   Follow the progress of your build on Treeherder:
     https://treeherder.mozilla.org/#/jobs?repo=mozilla-inbound&revision=3d7d3272d708
-
-Pushing to a non-tree repo does nothing
-
-  $ hg push ../unknown
-  pushing to ../unknown
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 1 changesets with 1 changes to 1 files
 
 Pushing a changeset to Try prints Treeherder URLs
 
@@ -136,8 +127,8 @@ Push multiple changesets to a non-try repo
   $ hg commit -m '1'
   $ echo '2' > foo
   $ hg commit -m '2'
-  $ hg push ../mozilla-inbound
-  pushing to ../mozilla-inbound
+  $ hg push ../integration/mozilla-inbound
+  pushing to ../integration/mozilla-inbound
   searching for changes
   adding changesets
   adding manifests
@@ -156,8 +147,8 @@ Push multiple changesets to a non-try repo
 Push a lot of changesets to a non-try repo
 
   $ for i in $(seq 0 20); do echo $i > foo; hg commit -m $i; done
-  $ hg push ../mozilla-inbound
-  pushing to ../mozilla-inbound
+  $ hg push ../integration/mozilla-inbound
+  pushing to ../integration/mozilla-inbound
   searching for changes
   adding changesets
   adding manifests
