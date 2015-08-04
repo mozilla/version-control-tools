@@ -6,15 +6,6 @@ groups = scm_level_1, scm_level_2, scm_level_3, scm_l10n, scm_private, scm_l10n_
 method = /usr/sbin/sendmail
 from = hg@hg.mozilla.org
 
-[web]
-style = gitweb_mozilla
-allow_archive = bz2 gz zip
-templates = /repo/hg/hg_templates/
-pygments_style = emacs
-encoding = UTF-8
-baseurl = http://hg.mozilla.org/
-maxchanges = 20
-
 [diff]
 showfunc = True
 git = 1
@@ -40,10 +31,6 @@ pushrebase = /repo/hg/extensions/pushrebase.py
 track = *
 maxsize = 10 MB
 maxfiles = 2
-
-[interhg]
-a_httplinks = s|(https?://\S+)|<a href="\1">\1</a>|i
-bugzilla = s|((?:bug[\s#]*|b=#?|#)(\d{4,}))|<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=\2" title="Bug \2">\1</a>|i
 
 [serverlog]
 reporoot = /repo/hg/mozilla/
