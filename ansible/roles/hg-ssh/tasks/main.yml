@@ -39,6 +39,26 @@
 - name: Mercurial config directory is present
   file: path=/etc/mercurial state=directory mode=0775
 
+- name: replication SSH key is present
+  command: /usr/bin/ssh-keygen -b 2048 -f /etc/mercurial/mirror -t rsa creates=/etc/mercurial/mirror
+
+- name: capture content of replication SSH key
+  slurp: src=/etc/mercurial/mirror.pub
+  register: mirror_ssh_key_public
+
+- name: ensure proper permissions on replication key
+  file: path={{ item }} owner=hg group=hg
+  with_items:
+    - /etc/mercurial/mirror
+    - /etc/mercurial/mirror.pub
+
+- name: hg user has replication key configured in authorized_keys
+  copy: dest=/home/hg/.ssh/authorized_keys
+        content={{ mirror_ssh_key_public.content | b64decode }}
+        owner=hg
+        group=hg
+        mode=0640
+
 - name: Mercurial known hosts file is present
   file: path=/etc/mercurial/known_hosts mode=0660 owner=hg group=hg state=touch
 

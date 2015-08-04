@@ -1,16 +1,4 @@
 ---
-- name: Generate replication SSH key
-  command: /usr/bin/ssh-keygen -b 2048 -f /etc/mercurial/mirror -t rsa creates=/etc/mercurial/mirror
-
-- name: Proper permissions on replication private key
-  file: path={{ item }} owner=hg group=hg
-  with_items:
-    - /etc/mercurial/mirror
-    - /etc/mercurial/mirror.pub
-
-- name: hg authorized keys is present
-  command: /bin/cp /etc/mercurial/mirror.pub /home/hg/.ssh/authorized_keys
-
 # Docker doesn't have full TTYs. sudo will fail unless we remove the
 # requirement that a TTY be present.
 - name: Remove SSH TTY requirement
