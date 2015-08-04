@@ -34,10 +34,10 @@ if not os.path.exists('/etc/ssh/ssh_host_rsa_key'):
     subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'rsa', '-b', '2048',
                            '-f', '/etc/ssh/ssh_host_rsa_key'])
 
-hg_helper = open('/usr/local/bin/hg_helper.py', 'rb').readlines()
-with open('/usr/local/bin/hg_helper.py', 'wb') as fh:
-    for line in hg_helper:
-        line = line.replace('ldap://ldap.db.scl3.mozilla.com', ldap_uri)
+ldap_conf = open('/etc/mercurial/ldap.json', 'rb').readlines()
+with open('/etc/mercurial/ldap.json', 'wb') as fh:
+    for line in ldap_conf:
+        line = line.replace('%url%', ldap_uri)
         fh.write(line)
 
 pash = open('/usr/local/bin/pash.py', 'rb').readlines()

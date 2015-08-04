@@ -1,4 +1,5 @@
 {
   "username": "cn=admin,dc=mozilla",
-  "password": "password"
+  "password": "password",
+  "url": "%url%"
 }

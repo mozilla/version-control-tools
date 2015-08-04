@@ -17,6 +17,7 @@ from subprocess import (
 from ldap_helper import (
     ldap_connect,
     get_ldap_attribute,
+    get_ldap_settings,
 )
 import repo_group
 from sh_helper import (
@@ -66,13 +67,15 @@ https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&componen
 DOC_ROOT = '/repo/hg/mozilla'
 
 
-def is_valid_user (mail):
+def is_valid_user(mail):
+    url = get_ldap_settings()['url']
+
     mail = mail.strip()
     ## If the regex search below fails, comment out the conditional and the return. Then Uncomment the following line to atleat sanitize the input
     mail = mail.replace("(",'').replace(")",'').replace("'",'').replace('"','').replace(';','').replace("\"",'')
     #if not re.search("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", mail):
     #     return 'Invalid Email Address'
-    account_status = get_ldap_attribute (mail, 'hgAccountEnabled', 'ldap://ldap.db.scl3.mozilla.com')
+    account_status = get_ldap_attribute(mail, 'hgAccountEnabled', url)
     if account_status == 'TRUE':
         return 1
     elif account_status == 'FALSE':
