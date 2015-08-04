@@ -42,7 +42,7 @@ def process_non_root_login(user):
         sys.stderr.write('Your mercurial account has been disabled due \
                           to inactivity.\nPlease file a bug at \
                           https://bugzilla.mozilla.org (or \
-                          http://tinyurl.com/2aveg9k) to re-activate \
+                          http://tinyurl.com/njcfhma) to re-activate \
                           your account.\n')
         sys.exit(0)
 
