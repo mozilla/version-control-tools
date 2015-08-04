@@ -12,7 +12,7 @@
     - python27
     - python-ldap
     - sudo
-    - syslog
+    - rsyslog
     - tar
     - /var/tmp/mercurial-3.4.1-0.x86_64.rpm
 
