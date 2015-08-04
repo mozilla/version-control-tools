@@ -38,13 +38,7 @@ ldap_conf = open('/etc/mercurial/ldap.json', 'rb').readlines()
 with open('/etc/mercurial/ldap.json', 'wb') as fh:
     for line in ldap_conf:
         line = line.replace('%url%', ldap_uri)
-        fh.write(line)
-
-pash = open('/usr/local/bin/pash.py', 'rb').readlines()
-with open('/usr/local/bin/pash.py', 'wb') as fh:
-    for line in pash:
-        line = line.replace('ldap://ldap.db.scl3.mozilla.com', ldap_uri)
-        line = line.replace('ldap://ldapsync1.db.scl3.mozilla.com', ldap_uri)
+        line = line.replace('%writeurl%', ldap_uri)
         fh.write(line)
 
 # Set up code coverage, if requested.
