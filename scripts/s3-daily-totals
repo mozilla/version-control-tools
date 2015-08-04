@@ -1,0 +1,38 @@
+#!/usr/bin/env python2
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import sys
+
+from boto.s3.connection import S3Connection
+
+
+BUCKETS = (
+    'moz-devservices-logging-us-west-2',
+    'moz-devservices-logging-us-east-1',
+)
+
+def get_s3_daily_totals(day):
+    c = S3Connection()
+    total = 0
+    for bn in BUCKETS:
+        b = c.get_bucket(bn, validate=False)
+        path = 's3/hg-bundles/%s' % day
+        key = b.get_key(path, validate=False)
+
+        data = key.get_contents_as_string()
+        for line in data.splitlines():
+            parts = line.split(' ')
+            if parts[7] != 'REST.GET.OBJECT':
+                continue
+
+            total += int(parts[14])
+
+    return total
+
+
+if __name__ == '__main__':
+    for day in sys.argv[1:]:
+        total = get_s3_daily_totals(day)
+        print('%s\t%d' % (day, total))
