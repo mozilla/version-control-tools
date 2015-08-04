@@ -86,6 +86,13 @@
         group=root
         mode=0644
 
+- name: install logrotate config for hg
+  copy: src=logrotate-hg.conf
+        dest=/etc/logrotate.d/hg
+        owner=root
+        group=root
+        mode=0644
+
 - name: Mercurial log files are present and writable
   file: path={{ item }} mode=0666 state=touch
   with_items:
