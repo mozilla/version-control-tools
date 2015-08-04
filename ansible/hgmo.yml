@@ -44,9 +44,9 @@
   roles:
     - {
         role: hg-ssh,
-        bind_dn: "{{ (ldap_config.content | b64decode | from_json).username }}"
-        bind_pw: "{{ (ldap_config.content | b64decode | from_json).password }}"
-        ldap_uri: "{{ (ldap_config.content | b64decode | from_json).url }}"
+        bind_dn: "{{ (ldap_config.content | b64decode | from_json).username }}",
+        bind_pw: "{{ (ldap_config.content | b64decode | from_json).password }}",
+        ldap_uri: "{{ (ldap_config.content | b64decode | from_json).url }}",
       }
 
   tasks:
