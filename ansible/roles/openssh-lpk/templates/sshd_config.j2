@@ -20,3 +20,11 @@ Subsystem sftp /usr/libexec/openssh/sftp-server
 {% if force_command %}
 ForceCommand {{ force_command }}
 {% endif %}
+
+{% if max_startups %}
+MaxStartups {{ max_startups }}
+{% endif %}
+
+{% if max_sessions %}
+MaxSessions {{ max_sessions }}
+{% endif %}
