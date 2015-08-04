@@ -9,6 +9,7 @@
 - name: Install packages required to run a Mercurial server
   yum: name={{ item }} state=present
   with_items:
+    - python27
     - python-ldap
     - sudo
     - syslog
