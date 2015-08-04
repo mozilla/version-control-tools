@@ -3,6 +3,7 @@ dependencies:
   - ius-repo
   - {
       role: openssh-lpk,
+      home_attribute: fakeHome,
       force_command: /usr/local/bin/pash_wrapper,
       # By default, SSH limits to 10 concurrent connections for
       # individual users. This may interfere with replication if
