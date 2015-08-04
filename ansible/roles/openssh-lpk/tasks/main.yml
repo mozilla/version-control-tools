@@ -12,12 +12,15 @@
 - name: Install packages related to LDAP auth
   command: /usr/bin/yum install -y authconfig nss-pam-ldapd openldap-clients pam_ldap
 
-- name: install Mozilla root CA certificate
-  copy: src=mozilla-root-ca.crt
-        dest=/etc/openldap/cacerts/mozilla.crt
+- name: install Mozilla certificates
+  copy: src={{ item.src }}
+        dest=/etc/openldap/cacerts/{{ item.dest }}
         owner=root
         group=root
         mode=0644
+  with_items:
+    - { src: mozilla-root-ca.crt, dest: mozilla.crt }
+    - { src: mozilla-root-certificate-services.crt, dest: ca.crt }
 
 - name: download RPMs used for LDAP auth
   get_url: url={{ item.url }}
