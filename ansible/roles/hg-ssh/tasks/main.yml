@@ -123,3 +123,6 @@
     - push-repo.sh
     - record-pushes.sh
 
+# Pull in tasks shared between hg-ssh and hg-web.
+# This should run last to ensure all preconditions are met.
+- include: ../../../tasks/hgmo-extensions.yml

@@ -33,13 +33,6 @@
         mirror_ips: ["63.245.215.25", "63.245.215.102"],
       }
 
-- hosts:
-  - hgssh1.dmz.scl3.mozilla.com
-  - hgweb-prod
-
-  tasks:
-    - include: tasks/hgmo-extensions.yml
-
 - hosts: hgssh1.dmz.scl3.mozilla.com
   tasks:
     # TODO we should integrate the hg-ssh role.

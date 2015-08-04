@@ -440,3 +440,7 @@
 
 - name: adjust file permissions for hg templates
   command: /bin/chown -R hg:hg /repo/hg/hg_templates
+
+# Pull in tasks shared between hg-ssh and hg-web.
+# This should run last to ensure all preconditions are met.
+- include: ../../../tasks/hgmo-extensions.yml

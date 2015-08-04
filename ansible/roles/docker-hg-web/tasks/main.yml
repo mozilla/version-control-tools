@@ -1,6 +1,4 @@
 ---
-- include: ../../../tasks/hgmo-extensions.yml
-
 - name: install hgweb wsgi files
   copy: src={{ item }} dest=/repo/hg/webroot_wsgi/{{ item }} owner=hg group=hg
   with_items:
