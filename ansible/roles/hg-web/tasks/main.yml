@@ -435,7 +435,7 @@
            regexp={{ item.search }}
            replace={{ item.replace }}
   with_items:
-    - { search: VCTNODE, replace: "{{ lookup('file', vct + '/.vctnode') }}" }
+    - { search: VCTNODE, replace: "{{ vct_node | mandatory }}" }
     - { search: DEPLOYDATE, replace: "{{ ansible_date_time.iso8601 }}" }
 
 - name: adjust file permissions for hg templates

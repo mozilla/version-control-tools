@@ -9,4 +9,5 @@ dependencies:
       httpd_max_spare_servers: 2,
       httpd_server_limit: 4,
       httpd_max_clients: 4,
+      vct_node: "DOCKER",
     }

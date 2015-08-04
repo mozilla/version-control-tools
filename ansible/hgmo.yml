@@ -32,6 +32,7 @@
         mirror_host_key: "{{ hostvars['hgssh1.dmz.scl3.mozilla.com'].mirror_host_key.content | b64decode }}",
         # hg-zlb.vips.scl3.mozilla.com resolves to multiple IPs.
         mirror_ips: ["63.245.215.25", "63.245.215.102"],
+        vct_node: "{{ lookup('file', '../.vctnode') }}",
       }
 
 - hosts: hgssh1.dmz.scl3.mozilla.com
