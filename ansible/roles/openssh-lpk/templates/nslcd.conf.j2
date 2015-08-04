@@ -13,3 +13,5 @@ map passwd homeDirectory {{ home_attribute | mandatory }}
 uid nslcd
 gid ldap
 ssl no
+tls_cacertdir /etc/openldap/cacerts
+tls_cacertfile /etc/openldap/cacerts/mozilla.crt
