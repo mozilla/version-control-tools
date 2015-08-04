@@ -39,6 +39,13 @@
 - name: Mercurial config directory is present
   file: path=/etc/mercurial state=directory mode=0775
 
+- name: directories for support tools is present
+  file: path=/usr/local/bin
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
 - name: replication SSH key is present
   command: /usr/bin/ssh-keygen -b 2048 -f /etc/mercurial/mirror -t rsa creates=/etc/mercurial/mirror
 
