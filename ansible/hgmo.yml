@@ -1,5 +1,6 @@
 ---
 - hosts: hgssh1.dmz.scl3.mozilla.com
+  gather_facts: no
   tasks:
     - name: notify IRC of deployment
       irc: server=irc.mozilla.org
