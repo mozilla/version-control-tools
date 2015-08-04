@@ -50,10 +50,6 @@
       }
 
   tasks:
-    # TODO we should integrate the hg-ssh role.
-    - name: install global hgrc
-      copy: src=roles/hg-ssh/files/hgrc dest=/etc/mercurial/hgrc mode=0644 owner=root group=root
-
     # Install CRON to generate Mercurial bundle files. This only needs
     # to run on the master.
     - include: tasks/hgmo-bundle-cron.yml
