@@ -34,6 +34,21 @@
       }
 
 - hosts: hgssh1.dmz.scl3.mozilla.com
+  pre_tasks:
+    # Until we integrate secrets with Ansible, the LDAP config is
+    # pre-defined on the server.
+    - name: capture LDAP config
+      slurp: src=/etc/mercurial/ldap.json
+      register: ldap_config
+
+  roles:
+    - {
+        role: hg-ssh,
+        bind_dn: "{{ (ldap_config.content | b64decode | from_json).username }}"
+        bind_pw: "{{ (ldap_config.content | b64decode | from_json).password }}"
+        ldap_uri: "{{ (ldap_config.content | b64decode | from_json).url }}"
+      }
+
   tasks:
     # TODO we should integrate the hg-ssh role.
     - name: install global hgrc
