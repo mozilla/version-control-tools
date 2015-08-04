@@ -8,7 +8,6 @@
     - libraries
     - libraries/mozhghooks
     - scripts
-    - webroot_wsgi
 
 - name: install support scripts
   copy: src={{ vct | mandatory }}/scripts/{{ item }}
