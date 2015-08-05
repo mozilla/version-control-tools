@@ -9,6 +9,8 @@ import subprocess
 import sys
 
 from boto.s3.connection import S3Connection
+import concurrent.futures as futures
+
 
 # The types of bundles to generate.
 #
@@ -24,6 +26,8 @@ HOSTS = (
 # We store bundles on the local filesystem because they may cause chaos
 # with volume snapshots. See bug 1167935.
 BUNDLE_ROOT = '/repo/bundles'
+
+CONCURRENT_THREADS = 3
 
 
 def upload_to_s3(host, bucket_name, local_path, remote_path):
@@ -123,12 +127,13 @@ def generate_bundles(repo):
 
         files.append((t, final_path, temp_path, remote_path))
 
-    for t, final_path, temp_path, remote_path in files:
-        if os.path.exists(final_path):
-            print('bundle already exists, skipping: %s' % final_path)
-            continue
+    with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
+        for t, final_path, temp_path, remote_path in files:
+            if os.path.exists(final_path):
+                print('bundle already exists, skipping: %s' % final_path)
+                continue
 
-        generate_bundle(repo_full, t, temp_path, final_path)
+        e.submit(generate_bundle, repo_full, t, temp_path, final_path)
 
     # Object path is keyed off the repository name so we can easily see what
     # is taking up space on the server.
@@ -151,10 +156,11 @@ def generate_bundles(repo):
     # datacenter that has plentiful bandwidth to S3 and because we
     # generally like operations to complete faster, we choose to simply
     # upload the bundle to multiple regions instead of employ COPY.
-    for host, bucket, name in HOSTS:
-        for t, final_path, temp_path, remote_path in files:
-            print('uploading to %s/%s/%s' % (host, bucket, remote_path))
-            upload_to_s3(host, bucket, final_path, remote_path)
+    with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
+        for host, bucket, name in HOSTS:
+            for t, final_path, temp_path, remote_path in files:
+                print('uploading to %s/%s/%s' % (host, bucket, remote_path))
+                e.submit(upload_to_s3, host, bucket, final_path, remote_path)
 
     # Now assemble a manifest listing each bundle.
     manifest = []
