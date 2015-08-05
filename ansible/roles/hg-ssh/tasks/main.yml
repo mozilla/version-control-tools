@@ -177,6 +177,20 @@
     - push-repo.sh
     - record-pushes.sh
 
+- name: ensure bundles directory exists
+  file: path=/repo/bundles
+        state=directory
+        owner=hg
+        group=hg
+        mode=0775
+
+- name: write list of repositories to generate bundles for
+  copy: src=bundle-repos
+        dest=/repo/bundles/repos
+        owner=hg
+        group=hg
+        mode=0644
+
 # Pull in tasks shared between hg-ssh and hg-web.
 # This should run last to ensure all preconditions are met.
 - include: ../../../tasks/hgmo-extensions.yml

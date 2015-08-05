@@ -2,13 +2,23 @@
 # repositories.
 ---
 
-- name: ensure bundles directory exists
-  file: path=/repo/bundles owner=hg group=hg state=directory mode=0775
-
 # TODO enable once Ansible 2.0 is released.
 #- name: send CRON mail to developer-services list
 #  cronvar: user=hg name=MAILTO value=developer-services@mozilla.org
 
+- name: create CRON to generate S3 bundles
+  cron: name="Generate Mercurial bundles"
+        user=hg
+        job='/repo/hg/scripts/outputif /repo/hg/venv_tools/bin/python /repo/hg/scripts/generate-hg-s3-bundles -f /repo/bundles/repos'
+        day=*
+        month=*
+        # Schedule for when the sun is over the Pacific Ocean, as this is
+        # when the fewest pushes occur. Also, hgssh1 is on PDT, not UTC.
+        minute=0
+        hour=21
+
+# TODO delete this once it has been deployed and remains of old crons are no
+# longer on any systems.
 - name: create CRON to generate S3 bundles
   cron: name="Generate Mercurial bundles for {{ item.repo }}"
         user=hg
@@ -17,9 +27,8 @@
         month=*
         minute={{ item.minute }}
         hour={{ item.hour }}
+        state=absent
   with_items:
-    # Schedule for when the sun is over the Pacific Ocean, as this is
-    # when the fewest pushes occur. Also, hgssh1 is on PDT not UTC.
     - { hour: 21, minute: 0, repo: mozilla-central }
     - { hour: 21, minute: 30, repo: integration/fx-team }
     - { hour: 22, minute: 0, repo: integration/mozilla-inbound }
