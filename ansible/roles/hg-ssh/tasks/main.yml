@@ -15,7 +15,7 @@
            dest=/var/tmp/{{ item.path }}
            sha256sum={{ item.sha256 }}
   with_items:
-    - { path: mercurial-3.4.1-0.x86_64.rpm, sha256: 4e6190232ae217aacc894c0baf8e61900cb55d4ee0406a09a22b70cb9c6dfbd0
+    - { path: mercurial-3.4.1-0.x86_64.rpm, sha256: 4e6190232ae217aacc894c0baf8e61900cb55d4ee0406a09a22b70cb9c6dfbd0 }
     # The version of virtualenv in the IUS repo isn't compatible with
     # peep because it has a pip that is too new. See
     # https://github.com/erikrose/peep/pull/94. Install an old version

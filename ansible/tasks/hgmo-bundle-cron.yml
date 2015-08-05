@@ -6,14 +6,14 @@
 #- name: send CRON mail to developer-services list
 #  cronvar: user=hg name=MAILTO value=developer-services@mozilla.org
 
+# Schedule for when the sun is over the Pacific Ocean, as this is
+# when the fewest pushes occur. Also, hgssh1 is on PDT, not UTC.
 - name: create CRON to generate S3 bundles
   cron: name="Generate Mercurial bundles"
         user=hg
         job='/repo/hg/scripts/outputif /repo/hg/venv_tools/bin/python /repo/hg/scripts/generate-hg-s3-bundles -f /repo/bundles/repos'
         day=*
         month=*
-        # Schedule for when the sun is over the Pacific Ocean, as this is
-        # when the fewest pushes occur. Also, hgssh1 is on PDT, not UTC.
         minute=0
         hour=21
 
