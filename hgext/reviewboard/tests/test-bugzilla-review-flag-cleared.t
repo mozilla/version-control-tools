@@ -193,7 +193,7 @@ Posting a Ship It review will add an r+
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://192.168.59.103:$HGPORT1/r/2/
+      data: http://*:$HGPORT1/r/2/ (glob)
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
@@ -229,14 +229,14 @@ Posting a Ship It review will add an r+
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://192.168.59.103:$HGPORT1/r/2/#review1
+      - http://*:$HGPORT1/r/2/#review1 (glob)
       - ''
       - I have reservations
     - author: reviewer@example.com
       id: 4
       tags: []
       text:
-      - http://192.168.59.103:$HGPORT1/r/2/#review2
+      - http://*:$HGPORT1/r/2/#review2 (glob)
       - ''
       - One more thing...
     - author: reviewer@example.com
@@ -246,7 +246,7 @@ Posting a Ship It review will add an r+
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://192.168.59.103:$HGPORT1/r/2/#review3
+      - http://*:$HGPORT1/r/2/#review3 (glob)
       - ''
       - LGTM
     component: TestComponent
@@ -270,7 +270,7 @@ Updating the review request as an L1 author will re-request review
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://192.168.59.103:$HGPORT1/r/2/
+      data: http://*:$HGPORT1/r/2/ (glob)
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
@@ -306,14 +306,14 @@ Updating the review request as an L1 author will re-request review
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://192.168.59.103:$HGPORT1/r/2/#review1
+      - http://*:$HGPORT1/r/2/#review1 (glob)
       - ''
       - I have reservations
     - author: reviewer@example.com
       id: 4
       tags: []
       text:
-      - http://192.168.59.103:$HGPORT1/r/2/#review2
+      - http://*:$HGPORT1/r/2/#review2 (glob)
       - ''
       - One more thing...
     - author: reviewer@example.com
@@ -323,7 +323,7 @@ Updating the review request as an L1 author will re-request review
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://192.168.59.103:$HGPORT1/r/2/#review3
+      - http://*:$HGPORT1/r/2/#review3 (glob)
       - ''
       - LGTM
     - author: author@example.com
@@ -367,7 +367,7 @@ Sanity check to ensure we have an r? flag
     attachments:
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
-      data: http://192.168.59.103:$HGPORT1/r/4/
+      data: http://*:$HGPORT1/r/4/ (glob)
       description: 'MozReview Request: Bug 2 - Initial commit to review'
       file_name: reviewboard-4-url.txt
       flags:
@@ -417,7 +417,7 @@ Sanity check to ensure we have an r+ flag set
     attachments:
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
-      data: http://192.168.59.103:$HGPORT1/r/4/
+      data: http://*:$HGPORT1/r/4/ (glob)
       description: 'MozReview Request: Bug 2 - Initial commit to review'
       file_name: reviewboard-4-url.txt
       flags:
@@ -453,7 +453,7 @@ Sanity check to ensure we have an r+ flag set
       - Comment on attachment 2
       - 'MozReview Request: Bug 2 - Initial commit to review'
       - ''
-      - http://192.168.59.103:$HGPORT1/r/4/#review4
+      - http://*:$HGPORT1/r/4/#review4 (glob)
       - ''
       - LGTM
     component: TestComponent
@@ -481,7 +481,7 @@ We should have an r+ flag already set.
     attachments:
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
-      data: http://192.168.59.103:$HGPORT1/r/4/
+      data: http://*:$HGPORT1/r/4/ (glob)
       description: 'MozReview Request: Bug 2 - Modified commit to review'
       file_name: reviewboard-4-url.txt
       flags:
@@ -517,7 +517,7 @@ We should have an r+ flag already set.
       - Comment on attachment 2
       - 'MozReview Request: Bug 2 - Modified commit to review'
       - ''
-      - http://192.168.59.103:$HGPORT1/r/4/#review4
+      - http://*:$HGPORT1/r/4/#review4 (glob)
       - ''
       - LGTM
     - author: l3author@example.com
