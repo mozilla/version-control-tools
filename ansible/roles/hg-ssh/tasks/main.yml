@@ -110,7 +110,7 @@
 - name: copy tools requirements.txt
   copy: src=requirements-tools.txt
         dest=/repo/hg/venv_tools/requirements.txt
-        owne=root
+        owner=root
         group=root
         mode=0644
 
