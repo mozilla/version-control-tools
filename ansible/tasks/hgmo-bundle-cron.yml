@@ -2,9 +2,6 @@
 # repositories.
 ---
 
-- name: install boto Python package
-  yum: name=python-boto
-
 - name: ensure bundles directory exists
   file: path=/repo/bundles owner=hg group=hg state=directory mode=0775
 
@@ -15,7 +12,7 @@
 - name: create CRON to generate S3 bundles
   cron: name="Generate Mercurial bundles for {{ item.repo }}"
         user=hg
-        job='/repo/hg/scripts/outputif /repo/hg/scripts/generate-hg-s3-bundles {{ item.repo }}'
+        job='/repo/hg/scripts/outputif /repo/hg/venv_tools/bin/python /repo/hg/scripts/generate-hg-s3-bundles {{ item.repo }}'
         day=*
         month=*
         minute={{ item.minute }}
