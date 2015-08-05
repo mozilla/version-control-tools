@@ -160,7 +160,8 @@ class MozReviewWebDriverTest(MozReviewTest):
         input_password.submit()
 
         if verify:
-            self.verify_rburl('dashboard/')
+            WebDriverWait(self.browser, 10).until(
+                EC.title_is(u'My Dashboard | Review Board'))
 
     def create_users(self, users):
         """Create multiple users at once.
