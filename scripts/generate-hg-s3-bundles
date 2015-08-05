@@ -47,18 +47,6 @@ def upload_to_s3(host, bucket_name, local_path, remote_path):
     else:
         key.set_contents_from_filename(local_path)
 
-def check_output(*args, **kwargs):
-    """Python 2.6 compatible implementation of subprocess.check_output."""
-    proc = subprocess.Popen(stdout=subprocess.PIPE, *args, **kwargs)
-    output, unused_err = proc.communicate()
-    retcode = proc.poll()
-    if retcode:
-        cmd = kwargs.get('args', args[0])
-        e = subprocess.CalledProcessError(retcode, cmd)
-        e.output = output
-        raise e
-
-    return output
 
 def generate_bundles(repo):
     """Generate bundle files for a repository at a path."""
@@ -72,7 +60,7 @@ def generate_bundles(repo):
     # Bundle files are named after the tip revision in the repository at
     # the time the bundle was created. This is the easiest way to name
     # bundle files.
-    tip = check_output(['hg', '-R', repo_full, 'log', '-r', 'tip', '-T', '{node}'])
+    tip = subprocess.check_output(['hg', '-R', repo_full, 'log', '-r', 'tip', '-T', '{node}'])
     print('tip is %s' % tip)
 
     bundle_path = os.path.join(BUNDLE_ROOT, repo)
