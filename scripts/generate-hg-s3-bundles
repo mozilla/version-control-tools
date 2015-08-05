@@ -4,6 +4,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import argparse
+import datetime
 import errno
 import os
 import subprocess
@@ -29,6 +30,45 @@ HOSTS = (
 BUNDLE_ROOT = '/repo/bundles'
 
 CONCURRENT_THREADS = 3
+
+HTML_INDEX = '''
+<html>
+  <head>
+    <title>Mercurial Bundles</title>
+  </head>
+  <body>
+    <h1>Mercurial Bundles</h1>
+    <p>
+       This server contains Mercurial bundle files that can be used to seed
+       repository clones. If your Mercurial client is configured properly,
+       it should fetch one of these bundles automatically.
+    </p>
+    <p>
+      The table below lists all available repositories and their bundles.
+      Only the most recent bundle is shown. Previous bundles are expired 7 days
+      after they are superseded.
+    </p>
+    <p>
+       For more, see
+       <a href="https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/bundleclone.html">the official docs</a>.
+    </p>
+    <table border="1">
+      <tr><th>Repository</th><th>gzip</th><th>bz2</th><th>stream</th></tr>
+      {entries}
+    </table>
+    <p>This page generated at {date}.</p>
+  </body>
+</html>
+'''.strip()
+
+HTML_ENTRY = '''
+<tr>
+  <td>{repo}</td>
+  <td><a href="{gzip_path}">{gzip_size:,}</a></td>
+  <td><a href="{bz2_path}">{bz2_size:,}</a></td>
+  <td><a href="{stream_path}">{stream_size:,}</a></td>
+</tr>
+'''.strip()
 
 
 def upload_to_s3(host, bucket_name, local_path, remote_path):
@@ -164,6 +204,7 @@ def generate_bundles(repo):
                 e.submit(upload_to_s3, host, bucket, final_path, remote_path)
 
     # Now assemble a manifest listing each bundle.
+    paths = {}
     manifest = []
     for t, final_path, temp_path, remote_path in files:
         for host, bucket, name in HOSTS:
@@ -175,6 +216,9 @@ def generate_bundles(repo):
                 entry += ' compression=%s' % t
 
             manifest.append(entry)
+
+            size = os.path.getsize(final_path)
+            paths[t] = ('%s/%s' % (bucket, remote_path), size)
 
     manifest_path = os.path.join(repo_full, '.hg', 'bundleclone.manifest')
     with open(manifest_path, 'wb') as fh:
@@ -190,6 +234,34 @@ def generate_bundles(repo):
     # Replicate manifest to mirrors.
     subprocess.check_call(['/repo/hg/scripts/push-repo.sh'], cwd=repo_full)
 
+    return paths
+
+
+def upload_index(repos):
+    """Upload an index HTML page describing available bundles."""
+    entries = []
+
+    for repo in sorted(repos):
+        p = repos[repo]
+        basename = os.path.basename(p['gzip'][0])
+        entries.append(HTML_ENTRY.format(repo=repo, basename=basename,
+                                         gzip_path=p['gzip'][0],
+                                         gzip_size=p['gzip'][1],
+                                         bz2_path=p['bzip2'][0],
+                                         bz2_size=p['bzip2'][1],
+                                         stream_path=p['stream'][0],
+                                         stream_size=p['stream'][1]))
+
+    html = HTML_INDEX.format(entries='\n'.join(entries),
+                             date=datetime.datetime.utcnow().isoformat())
+    for host, bucket, region in HOSTS:
+        c = S3Connection(host=host)
+        b = c.get_bucket(bucket, validate=False)
+        k = b.get_key('index.html', validate=False)
+        k.content_type = 'text/html'
+        k.set_contents_from_string(html)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', help='file to read repository list from')
@@ -203,5 +275,9 @@ if __name__ == '__main__':
 
     repos.extend(remaining)
 
+    paths = {}
+
     for repo in repos:
-        generate_bundles(repo)
+        paths[repo] = generate_bundles(repo)
+
+    upload_index(paths)
