@@ -66,8 +66,12 @@
         group=hg
         mode=0640
 
-- name: Mercurial known hosts file is present
-  file: path=/etc/mercurial/known_hosts mode=0660 owner=hg group=hg state=touch
+- name: known hosts file for mirrors is populated
+  template: src=known_hosts.j2
+            dest=/etc/mercurial/known_hosts
+            owner=hg
+            group=hg
+            mode=0660
 
 - name: Mercurial repository directories are present
   file: path={{ item }} state=directory mode=0775
