@@ -218,7 +218,7 @@ def generate_bundles(repo):
             manifest.append(entry)
 
             size = os.path.getsize(final_path)
-            paths[t] = ('%s/%s' % (bucket, remote_path), size)
+            paths[t] = (remote_path, size)
 
     manifest_path = os.path.join(repo_full, '.hg', 'bundleclone.manifest')
     with open(manifest_path, 'wb') as fh:
