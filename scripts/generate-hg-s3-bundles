@@ -48,6 +48,23 @@ def upload_to_s3(host, bucket_name, local_path, remote_path):
         key.set_contents_from_filename(local_path)
 
 
+def generate_bundle(repo, typ, temp_path, final_path):
+    """Generate a single bundle of a type.
+
+    Create a bundle of type ``typ`` from repo ``repo`` using temporary file
+    ``temp_path`` before atomically moving it to ``final_path``.
+    """
+    args = ['hg', '-R', repo]
+    if typ == 'stream':
+        args.append('streambundle')
+    else:
+        args.extend(['bundle', '-a', '-t', typ])
+
+    args.append(temp_path)
+    subprocess.check_call(args)
+    os.rename(temp_path, final_path)
+
+
 def generate_bundles(repo):
     """Generate bundle files for a repository at a path."""
     assert not os.path.isabs(repo)
@@ -111,16 +128,7 @@ def generate_bundles(repo):
             print('bundle already exists, skipping: %s' % final_path)
             continue
 
-        args = ['hg', '-R', repo_full]
-        if t == 'stream':
-            args.append('streambundle')
-        else:
-            args.extend(['bundle', '-a', '-t', t])
-
-        args.append(temp_path)
-
-        subprocess.check_call(args)
-        os.rename(temp_path, final_path)
+        generate_bundle(repo_full, t, temp_path, final_path)
 
     # Object path is keyed off the repository name so we can easily see what
     # is taking up space on the server.
