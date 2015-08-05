@@ -30,13 +30,13 @@
     - { src: mozilla-root-certificate-services.crt, dest: ca.crt }
 
 - name: download RPMs used for LDAP auth
-  get_url: url={{ item.url }}
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/{{ item.path }}
            dest=/var/tmp/{{ item.path }}
            sha256sum={{ item.sha256 }}
   with_items:
-    - { url: "https://people.mozilla.org/~gszorc/openssh-lpk-5.4p1-1.x86_64.rpm", path: openssh-lpk-5.4p1-1.x86_64.rpm, sha256: cfd43a14523daa8ac5d9f993d9066db90c9e2ea20fa66fa9636647a5aede876f }
-    - { url: "https://people.mozilla.org/~gszorc/openssh-lpk-clients-5.4p1-1.x86_64.rpm", path: openssh-lpk-clients-5.4p1-1.x86_64.rpm, sha256: f164c7e43614ab3bbc360a34af7d90d6b8ab5aab0d76859a88afd353bb854c3a }
-    - { url: "https://people.mozilla.org/~gszorc/openssh-lpk-server-5.4p1-1.x86_64.rpm", path: openssh-lpk-server-5.4p1-1.x86_64.rpm, sha256: 41f59067d9d41fe04f27c0702b14ed9bced00203cab1e9af2be6e3e7299ef4ee }
+    - { path: openssh-lpk-5.4p1-1.x86_64.rpm, sha256: cfd43a14523daa8ac5d9f993d9066db90c9e2ea20fa66fa9636647a5aede876f }
+    - { path: openssh-lpk-clients-5.4p1-1.x86_64.rpm, sha256: f164c7e43614ab3bbc360a34af7d90d6b8ab5aab0d76859a88afd353bb854c3a }
+    - { path: openssh-lpk-server-5.4p1-1.x86_64.rpm, sha256: 41f59067d9d41fe04f27c0702b14ed9bced00203cab1e9af2be6e3e7299ef4ee }
 
 - name: Install RPMs related to LDAP auth
   command: /usr/bin/yum localinstall -y /var/tmp/openssh-lpk-5.4p1-1.x86_64.rpm /var/tmp/openssh-lpk-clients-5.4p1-1.x86_64.rpm /var/tmp/openssh-lpk-server-5.4p1-1.x86_64.rpm
