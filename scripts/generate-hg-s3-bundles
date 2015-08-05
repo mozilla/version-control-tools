@@ -35,6 +35,12 @@ HTML_INDEX = '''
 <html>
   <head>
     <title>Mercurial Bundles</title>
+    <style>
+      .numeric {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+    </style>
   </head>
   <body>
     <h1>Mercurial Bundles</h1>
@@ -64,9 +70,9 @@ HTML_INDEX = '''
 HTML_ENTRY = '''
 <tr>
   <td>{repo}</td>
-  <td><a href="{gzip_path}">{gzip_size:,}</a></td>
-  <td><a href="{bz2_path}">{bz2_size:,}</a></td>
-  <td><a href="{stream_path}">{stream_size:,}</a></td>
+  <td class="numeric"><a href="{gzip_path}">{gzip_size:,}</a></td>
+  <td class="numeric"><a href="{bz2_path}">{bz2_size:,}</a></td>
+  <td class="numeric"><a href="{stream_path}">{stream_size:,}</a></td>
 </tr>
 '''.strip()
 
