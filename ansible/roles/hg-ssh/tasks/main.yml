@@ -1,11 +1,4 @@
 ---
-# yum will incur network traffic when URLs are specified. Download the
-# package locally first so we can run offline after initial bootstrap.
-- name: download Mercurial package
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/mercurial-3.4.1-0.x86_64.rpm
-           dest=/var/tmp/mercurial-3.4.1-0.x86_64.rpm
-           sha256sum=4e6190232ae217aacc894c0baf8e61900cb55d4ee0406a09a22b70cb9c6dfbd0
-
 - name: Install packages required to run a Mercurial server
   yum: name={{ item }} state=present
   with_items:
@@ -14,7 +7,23 @@
     - sudo
     - rsyslog
     - tar
-    - /var/tmp/mercurial-3.4.1-0.x86_64.rpm
+
+# yum will incur network traffic when URLs are specified. Download the
+# package locally first so we can run offline after initial bootstrap.
+- name: download Mozilla rpms
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/{{ item.path }}
+           dest=/var/tmp/{{ item.path }}
+           sha256sum={{ item.sha256 }}
+  with_items:
+    - { path: mercurial-3.4.1-0.x86_64.rpm, sha256: 4e6190232ae217aacc894c0baf8e61900cb55d4ee0406a09a22b70cb9c6dfbd0
+    # The version of virtualenv in the IUS repo isn't compatible with
+    # peep because it has a pip that is too new. See
+    # https://github.com/erikrose/peep/pull/94. Install an old version
+    # until peep is compatible.
+    - { path: python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm, sha256: a3f6c80d7a83798e4d64827d81dbcc39c1c44ae66c0afa4866bc477baad2cc2c }
+
+- name: install Mozilla rpms
+  command: yum localinstall -y /var/tmp/mercurial-3.4.1-0.x86_64.rpm /var/tmp/python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm
 
 - name: Create groups for SCM ACLs
   group: name={{ item.name }} gid={{ item.gid }}
@@ -82,6 +91,32 @@
 
 - name: User repository directories are present
   file: path=/repo/hg/mozilla/users state=directory mode=0775 owner=hg group=scm_level_1
+
+- name: create virtualenv for Python processes
+  command: /usr/bin/virtualenv-2.7 /repo/hg/venv_tools creates=/repo/hg/venv_tools
+
+- name: copy peep.py to virtualenv
+  copy: src=files/peep.py
+        dest=/repo/hg/venv_tools/bin/peep
+        mode=0755
+        owner=root
+        group=root
+
+- name: configure shebang in peep
+  replace: dest=/repo/hg/venv_tools/bin/peep
+           regexp='^#!\/usr\/bin\/env python$'
+           replace='#!/repo/hg/venv_tools/bin/python2.7'
+
+- name: copy tools requirements.txt
+  copy: src=requirements-tools.txt
+        dest=/repo/hg/venv_tools/requirements.txt
+        owne=root
+        group=root
+        mode=0644
+
+- name: populate virtualenv
+  pip: requirements=/repo/hg/venv_tools/requirements.txt
+       executable=/repo/hg/venv_tools/bin/peep
 
 - name: install rsyslog policy for hg
   copy: src=rsyslog-hg.conf
