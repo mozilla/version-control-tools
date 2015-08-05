@@ -174,7 +174,7 @@ def generate_bundles(repo):
                 print('bundle already exists, skipping: %s' % final_path)
                 continue
 
-        e.submit(generate_bundle, repo_full, t, temp_path, final_path)
+            e.submit(generate_bundle, repo_full, t, temp_path, final_path)
 
     # Object path is keyed off the repository name so we can easily see what
     # is taking up space on the server.
