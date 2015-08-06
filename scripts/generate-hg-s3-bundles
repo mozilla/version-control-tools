@@ -265,6 +265,10 @@ def upload_index(repos):
         b = c.get_bucket(bucket, validate=False)
         k = b.get_key('index.html', validate=False)
         k.content_type = 'text/html'
+        # Without this, the CDN caches objects for an indeterminate amount of
+        # time. We want this page to be fairly current, so establish a less
+        # aggressive caching policy.
+        k.cache_control = 'max-age=60'
         k.set_contents_from_string(html)
 
 
