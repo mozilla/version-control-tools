@@ -60,9 +60,9 @@ HTML_INDEX = '''
     </p>
     <table border="1">
       <tr><th>Repository</th><th>gzip</th><th>bz2</th><th>stream</th></tr>
-      {entries}
+      %s
     </table>
-    <p>This page generated at {date}.</p>
+    <p>This page generated at %s.</p>
   </body>
 </html>
 '''.strip()
@@ -258,8 +258,9 @@ def upload_index(repos):
                                          stream_path=p['stream'][0],
                                          stream_size=p['stream'][1]))
 
-    html = HTML_INDEX.format(entries='\n'.join(entries),
-                             date=datetime.datetime.utcnow().isoformat())
+    html = HTML_INDEX % ('\n'.join(entries),
+                         datetime.datetime.utcnow().isoformat())
+
     for host, bucket, region in HOSTS:
         c = S3Connection(host=host)
         b = c.get_bucket(bucket, validate=False)
