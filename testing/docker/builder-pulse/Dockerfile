@@ -5,6 +5,7 @@ ENV RABBITMQ_CONFIG_FILE /etc/rabbitmq/rabbitmq
 RUN apt-get update && apt-get --no-install-recommends -y install rabbitmq-server
 
 ADD rabbitmq.config /etc/rabbitmq/rabbitmq.config
+RUN chmod 644 /etc/rabbitmq/rabbitmq.config
 
 RUN rabbitmq-plugins enable rabbitmq_management
 
