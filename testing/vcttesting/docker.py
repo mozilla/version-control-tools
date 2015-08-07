@@ -343,6 +343,13 @@ class Docker(object):
                 rel = full[len(p)+1:]
 
                 ti = tar.gettarinfo(full, arcname=rel)
+
+                # Make files owned by root:root to prevent mismatch between
+                # host and container. Without this, files can be owned by
+                # undefined users.
+                ti.uid = 0
+                ti.gid = 0
+
                 fh = None
 
                 # We may modify the content of the Dockerfile. Grab it from
