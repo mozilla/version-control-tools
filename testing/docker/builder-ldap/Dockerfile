@@ -20,6 +20,7 @@ RUN chown -R openldap:openldap /etc/ldap
 RUN mkdir /var/slapd
 RUN chown openldap:openldap /var/slapd
 ADD mozilla.ldif /mozilla.ldif
+RUN chown openldap:openldap /mozilla.ldif
 RUN sudo -u openldap /usr/sbin/slapadd -v -f /etc/ldap/slapd.conf -l /mozilla.ldif
 
 ADD entrypoint.sh /entrypoint.sh
