@@ -1,7 +1,6 @@
 default = 'info'
 mimetype = 'application/json'
 
-heads = '{heads|mozjson}'
 info = '{nodes|mozjson}'
 error = '{error|mozjson}'
 pushes ='{data|mozjson}'

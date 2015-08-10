@@ -59,11 +59,6 @@ def addwebcommand(f, name):
     setattr(webcommands, name, f)
     webcommands.__all__.append(name)
 
-def heads(web, req, tmpl):
-    heads = web.repo.heads()
-    return tmpl('heads', heads=[web.repo.changectx(n) for n in heads])
-
-addwebcommand(heads, 'webheads')
 
 def info(web, req, tmpl):
     """Get JSON information about the specified nodes."""
