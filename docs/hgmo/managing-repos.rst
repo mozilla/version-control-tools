@@ -123,6 +123,42 @@ If you would like to change whether your repository is publishing or
 non-publishing, use the ``edit <repo>`` command and select the
 appropriate option.
 
+Obsolescence
+------------
+
+It is possible to toggle the *obsolescence* feature on individual user
+repositories.
+
+Obsolescence is an **experimental** feature of Mercurial that records how
+changesets evolve over time and allows old, obsoleted commits to disappear
+from the repository.
+
+Obsolescence is an aspect of
+:ref:`changeset evolution <http://evolution.experimentalworks.net/doc/>`.
+
+There are downsides to enabling obsolescence:
+
+* The transfer of obsolescence markers during push isn't optimal and may
+  significantly increase push times.
+* Obsolescence doesn't yet integrate very well with hgweb (the HTTP/HTML
+  repository viewer).
+* We may have to disable this feature or incur data loss due to its
+  experimental nature.
+
+.. important::
+
+   Due to the experimental state of the obsolescence feature, we may have to
+   disable this feature or incur data loss at any time.
+
+.. warning::
+
+   Enable obsolescence at your own risk.
+
+.. tip::
+
+   You do not need to enable obsolescence unless a user of your repository is
+   using the *evolve* extension.
+
 Deleting a User Repository
 ==========================
 

@@ -66,6 +66,15 @@ https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&componen
 
 DOC_ROOT = '/repo/hg/mozilla'
 
+OBSOLESCENCE_ENABLED = """
+Obsolescence is now enabled for this repository.
+
+Obsolescence is currently an experimental feature. It may be disabled at any
+time. Your obsolescence data may be lost at any time. You have been warned.
+
+Enjoy living on the edge.
+""".strip()
+
 
 def is_valid_user(mail):
     url = get_ldap_settings()['url']
@@ -350,6 +359,31 @@ def set_repo_publishing(cname, repo_name, publish):
         sys.stderr.write('Repository marked as non-publishing: draft '
             'changesets will remain in the draft phase when pushed.\n')
 
+def set_repo_obsolescence(cname, repo_name, enabled):
+    """Enable or disable obsolescence support on a repository."""
+    user = os.getenv('USER')
+    user_repo_dir = user.replace('@', '_')
+    repo_path = get_and_validate_user_repo(cname, repo_name)
+    config_path, config = get_user_repo_config(repo_path)
+
+    if not config.has_section('experimental'):
+        config.add_section('experimental')
+
+    if enabled:
+        config.set('experimental', 'evolution', 'all')
+    else:
+        config.remove_option('experimental', 'evolution')
+
+    with open(config_path, 'w') as fh:
+        config.write(fh)
+
+    run_repo_push('-e users/%s/%s --hgrc' % (user_repo_dir, repo_name))
+
+    if enabled:
+        print(OBSOLESCENCE_ENABLED)
+    else:
+        print('Obsolescence is now disabled for this repo.')
+
 def do_delete(cname, repo_dir, repo_name, verbose=False):
     if verbose:
         print "Deleting..."
@@ -389,6 +423,8 @@ def edit_repo (cname, repo_name, do_quick_delete):
             'Edit the description',
             'Mark repository as non-publishing',
             'Mark repository as publishing',
+            'Enable obsolescence support (experimental)',
+            'Disable obsolescence support',
             ])
         if action == 'Edit the description':
             edit_repo_description(cname, repo_name)
@@ -398,6 +434,10 @@ def edit_repo (cname, repo_name, do_quick_delete):
             set_repo_publishing(cname, repo_name, False)
         elif action == 'Mark repository as publishing':
             set_repo_publishing(cname, repo_name, True)
+        elif action == 'Enable obsolescence support (experimental)':
+            set_repo_obsolescence(cname, repo_name, True)
+        elif action == 'Disable obsolescence support':
+            set_repo_obsolescence(cname, repo_name, False)
     return
 
 def serve (cname):
