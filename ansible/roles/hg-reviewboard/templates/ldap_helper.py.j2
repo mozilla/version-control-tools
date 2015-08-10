@@ -3,39 +3,43 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import sys, ldap, datetime
+import sys
+import ldap
 
-def ldap_connect (ldap_url):
-  try:
-    ldap_conn = ldap.initialize (ldap_url)
-    ldap_conn.simple_bind_s ('{{ bind_dn | mandatory }}', '{{ bind_pw | mandatory }}')
-    return ldap_conn
-  except:
-    print >>sys.stderr, "Could not connect to the LDAP server at %s" % ldap_url
-    sys.exit (1)
 
-def get_ldap_attribute (mail, attr, conn_string):
-  ldap_conn = ldap_connect (conn_string)
-  if ldap_conn:
-    result = ldap_conn.search_s ('dc=mozilla', ldap.SCOPE_SUBTREE, '(mail=' + mail + ')', [attr])
-    if (len (result) > 1):
-      print >>sys.stderr, 'More than one match found'
-      ldap_conn.unbind_s ()
-      return False
-    elif (len (result) == 0):
-      print >>sys.stderr, 'No matches found'
-      ldap_conn.unbind_s ()
-      return False
+def ldap_connect(ldap_url):
+    try:
+        ldap_conn = ldap.initialize(ldap_url)
+        ldap_conn.simple_bind_s('{{ bind_dn | mandatory }}', '{{ bind_pw | mandatory }}')
+        return ldap_conn
+    except:
+        print >>sys.stderr, "Could not connect to the LDAP server at %s" % ldap_url
+        sys.exit(1)
+
+
+def get_ldap_attribute(mail, attr, conn_string):
+    ldap_conn = ldap_connect(conn_string)
+    if ldap_conn:
+        result = ldap_conn.search_s('dc=mozilla', ldap.SCOPE_SUBTREE, '(mail=' + mail + ')', [attr])
+        if len(result) > 1:
+            print >>sys.stderr, 'More than one match found'
+            ldap_conn.unbind_s()
+            return False
+        elif len(result) == 0:
+            print >>sys.stderr, 'No matches found'
+            ldap_conn.unbind_s()
+            return False
+        else:
+            if result[0][1].has_key(attr):
+                attr_val = result[0][1][attr][0]
+                ldap_conn.unbind_s()
+                return attr_val
+            else:
+                ldap_conn.unbind_s()
+                return False
     else:
-      if result[0][1].has_key (attr):
-	attr_val = result[0][1][attr][0]
-        ldap_conn.unbind_s ()
-        return attr_val
-      else:
-        ldap_conn.unbind_s ()
-        return False
-  else:
-    print >>sys.stderr, 'Don\'t have a valid ldap connection'
+        print >>sys.stderr, 'Don\'t have a valid ldap connection'
+
 
 if __name__ == '__main__':
-    print get_ldap_attribute ('klibby@mozilla.com', 'loginShell', '{{ ldap_uri | mandatory }}')
+    print get_ldap_attribute('klibby@mozilla.com', 'loginShell', '{{ ldap_uri | mandatory }}')
