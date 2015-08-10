@@ -72,43 +72,6 @@ def tags(web, req, tmpl):
 
 addwebcommand(tags, 'webtags')
 
-def family(web, req, tmpl):
-    """Get all the changesets related to a particular node, both children and
-    parents, by walking backwards/forwards to a limit."""
-
-    if 'node' not in req.form:
-        return tmpl('error', error={'error': "missing parameter 'node'"})
-
-    node = req.form['node'][0]
-    ctx = web.repo.changectx(node)
-
-    try:
-        limit = int(req.form['limit'][0])
-    except KeyError:
-        limit = 2
-
-    nodelist = [ctx]
-
-    def children(n, curlimit):
-        for p in n.children():
-            nodelist.append(p)
-            if curlimit < limit:
-                children(p, curlimit + 1)
-
-    def parents(n, curlimit):
-        for p in n.parents():
-            if p:
-                nodelist.append(p)
-            if curlimit < limit:
-                parents(p, curlimit + 1)
-
-    children(ctx, 1)
-    parents(ctx, 1)
-    return tmpl('family', family={'context': hex(ctx.node()),
-                                  'nodes': nodelist})
-
-addwebcommand(family, 'family')
-
 def info(web, req, tmpl):
     """Get JSON information about the specified nodes."""
     if 'node' not in req.form:
