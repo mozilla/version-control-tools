@@ -39,13 +39,13 @@ def check_repo_name(repo_name):
 
 
 def serve():
-    ssh_command = os.getenv('SSH_ORIGINAL_COMMAND')
+    ssh_command = os.environ.get('SSH_ORIGINAL_COMMAND')
     if not ssh_command:
         sys.stderr.write('No interactive shells allowed here!\n')
         sys.exit(1)
     elif ssh_command.startswith('hg'):
         repo_expr = re.compile('(.*)\s+-R\s+([^\s]+\s+)(.*)')
-        if (repo_expr.search(ssh_command)):
+        if repo_expr.search(ssh_command):
             [(hg_path, repo_path, hg_command)] = repo_expr.findall(ssh_command)
             if hg_command == 'serve --stdio' and check_repo_name(repo_path):
                 hg_arg_string = '/usr/bin/hg -R ' + DOC_ROOT + '/' + repo_path + hg_command
