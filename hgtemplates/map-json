@@ -3,6 +3,5 @@ mimetype = 'application/json'
 
 heads = '{heads|mozjson}'
 info = '{nodes|mozjson}'
-tags = '{tags|mozjson}'
 error = '{error|mozjson}'
 pushes ='{data|mozjson}'

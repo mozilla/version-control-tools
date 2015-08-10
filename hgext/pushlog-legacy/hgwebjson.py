@@ -65,13 +65,6 @@ def heads(web, req, tmpl):
 
 addwebcommand(heads, 'webheads')
 
-def tags(web, req, tmpl):
-    return tmpl('tags', tags=[{'tag': tag,
-                               'changeset': web.repo.changectx(node)}
-                              for tag, node in web.repo.tagslist()])
-
-addwebcommand(tags, 'webtags')
-
 def info(web, req, tmpl):
     """Get JSON information about the specified nodes."""
     if 'node' not in req.form:
