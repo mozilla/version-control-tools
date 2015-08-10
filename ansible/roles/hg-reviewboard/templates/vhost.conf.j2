@@ -6,7 +6,7 @@ WSGISocketPrefix /var/run/wsgi
     SetEnv HGENCODING UTF-8
     SetEnv LC_TYPE UTF-8
 
-    WSGIDaemonProcess hg processes={{ wsgi_processes }} threads=1 maximum-requests=100 deadlock-timeout=60 inactivity-timeout=300 user=hg group=hg display-name=hg
+    WSGIDaemonProcess hg processes={{ wsgi_processes }} threads=1 maximum-requests=20 deadlock-timeout=60 inactivity-timeout=300 user=hg group=hg display-name=hg
     WSGIProcessGroup hg
 
     WSGIPassAuthorization On
