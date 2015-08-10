@@ -42,5 +42,8 @@ A push works
   remote: added 1 changesets with 1 changes to 1 files
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/repo1/rev/96ee1d7354c4
 
   $ cleanup

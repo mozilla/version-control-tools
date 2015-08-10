@@ -21,6 +21,9 @@
   remote: added 1 changesets with 1 changes to 1 files
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/hgcustom/version-control-tools/rev/96ee1d7354c4
   $ cd ..
 
 We should get a prompt saying we are creating a new user repo.
@@ -296,6 +299,9 @@ We are able to push to the new user repo
   remote: added 1 changesets with 1 changes to 1 files
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/384b668fc3c2
 
   $ cd ..
 
