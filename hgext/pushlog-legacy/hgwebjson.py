@@ -43,16 +43,6 @@ class HGJSONEncoder(json.JSONEncoder):
 
 templatefilters.filters['mozjson'] = HGJSONEncoder()
 
-def printjson(ui, repo, *args):
-    e = HGJSONEncoder(repo)
-    print e.encode([repo.changectx(arg) for arg in args])
-
-# For kicks and testing, add a command-line JSON printer
-
-cmdtable = {
-    'printjson': (printjson, [], "hg printjson [rev...]"),
-}
-
 # Add hgweb hooks
 
 def addwebcommand(f, name):
