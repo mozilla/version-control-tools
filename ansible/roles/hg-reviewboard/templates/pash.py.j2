@@ -10,17 +10,20 @@ from sh_helper import QuoteForPOSIX
 
 if __name__ == '__main__':
     os.environ['PYTHONPATH'] = '/repo/hg/libraries/'
-    if os.getenv ('USER') == 'root':
-        root_shell = pwd.getpwuid (0)[6]
-        ssh_command = os.getenv ('SSH_ORIGINAL_COMMAND')
-        if ssh_command:
-            os.system (root_shell + " -c " + QuoteForPOSIX (ssh_command))
-        else:
-            os.execl (root_shell, root_shell)
-    else:
-        server_port = os.getenv('SSH_CONNECTION').split ()[-1]
 
-        user_status = hg_helper.is_valid_user(os.getenv('USER'))
+    user = os.environ.get('USER')
+
+    if user == 'root':
+        root_shell = pwd.getpwuid(0)[6]
+        ssh_command = os.getenv('SSH_ORIGINAL_COMMAND')
+        if ssh_command:
+            os.system(root_shell + " -c " + QuoteForPOSIX(ssh_command))
+        else:
+            os.execl(root_shell, root_shell)
+    else:
+        server_port = os.getenv('SSH_CONNECTION').split()[-1]
+
+        user_status = hg_helper.is_valid_user(user)
         if user_status == 2:
             sys.stderr.write('Your mercurial account has been disabled due \
                               to inactivity.\nPlease file a bug at \
@@ -37,4 +40,4 @@ if __name__ == '__main__':
         if server_port == "22":
             hg_helper.serve()
 
-        sys.exit (0)
+        sys.exit(0)
