@@ -1,4 +1,3 @@
-default = 'info'
 mimetype = 'application/json'
 
 info = '{nodes|mozjson}'
