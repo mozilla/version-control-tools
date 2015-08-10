@@ -35,7 +35,6 @@ def process_non_root_login(user):
     import sys
     import hg_helper
     import ldap_helper
-    server_port = os.environ.get('SSH_CONNECTION').split()[-1]
 
     user_status = hg_helper.is_valid_user(user)
     if user_status == 2:
