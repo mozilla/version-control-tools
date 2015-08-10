@@ -1,11 +1,9 @@
-from mercurial import demandimport, context, util
+from mercurial import context, util
 from mercurial.node import hex, nullid
 from mercurial.hgweb import webcommands
 from mercurial import templatefilters
 
-demandimport.disable()
 import json
-demandimport.enable()
 
 isodate = lambda x: util.datestr(x, '%Y-%m-%d %H:%M %1%2')
 
