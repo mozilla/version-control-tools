@@ -1,4 +1,8 @@
 ---
+- name: determine if running in Docker
+  stat: path=/vct
+  register: vct_dir
+
 # yum will incur network traffic when URLs are specified. Download the
 # package locally first so we can run offline after initial bootstrap.
 - name: download RPMs
@@ -41,8 +45,26 @@
     - /repo/hg/mozilla
     - /repo/hg/webroot_wsgi
 
-- name: Synchronize version-control-tools
-  synchronize: src={{ vct }}/ dest=/repo/hg/version-control-tools/ recursive=yes delete=yes
+- name: set up version-control-tools repo (server only)
+  hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
+      dest=/repo/hg/version-control-tools
+      revision={{ lookup('file', '../../../../.vctnode') }}
+      force=yes
+      purge=yes
+  when: vct_dir.stat.exists == False
+
+# The hg module's purge doesn't delete ignored files. Boo. Force that
+# because old .pyc files may cause chaos.
+- name: delete ignored files from version-control-tools repo
+  command: hg --config extensions.purge= -R /repo/hg/version-control-tools purge --all
+  when: vct_dir.stat.exists == False
+
+- name: synchronize version-control-tools (Docker only)
+  synchronize: src={{ vct | mandatory }}/
+               dest=/repo/hg/version-control-tools/
+               recursive=yes
+               delete=yes
+  when: vct_dir.stat.exists == True
   tags:
     - docker-refresh
 
