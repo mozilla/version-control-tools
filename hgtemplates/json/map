@@ -1,5 +1,19 @@
 mimetype = 'application/json'
 
-info = '{nodes|mozjson}'
 error = '{error|json}'
+info = '\{
+  {join(csets%infocset, ",\n")}
+  }'
+infocset = '"{node|short}": \{
+  "branch": {branch|json},
+  "children": {children|json},
+  "date": {date(date, "%Y-%m-%d %H:%M %1%2")|json},
+  "description": {description|json},
+  "files": {files|json},
+  "node": {node|json},
+  "parents": {parents|json},
+  "rev": {rev|json},
+  "tags": {tags|json},
+  "user": {user|json}
+  }'
 pushes ='{data|mozjson}'
