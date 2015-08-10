@@ -9,11 +9,8 @@ from sh_helper import run_command, prompt_user
 from cgi import escape
 from subprocess import Popen, PIPE, STDOUT
 import shlex
-import repo_group
 
 DOC_ROOT = '/repo/hg/mozilla'
-
-verbose_users = [ 'bkero@mozilla.com2', ]
 
 def is_valid_user (mail):
     mail = mail.strip()
@@ -57,24 +54,6 @@ def serve():
             else:
                 sys.stderr.write ("Thank you dchen! but.. I don't think so!\n")
                 sys.exit (1)
-    elif ssh_command.startswith ('pushlog '):
-        args = ssh_command.replace ('pushlog', '').split()
-        if check_repo_name (args[0]):
-            fh = open("/repo/hg/mozilla/%s/.hg/pushlog2.db" % (args[0]), 'rb')
-            sys.stdout.write(fh.read())
-            fh.close()
-    elif ssh_command.startswith ('repo-group'):
-        args = ssh_command.replace ('repo-group', '').split()
-        if check_repo_name (args[0]):
-            print(repo_group.repo_owner(args[0]))
     else:
         sys.stderr.write ('No interactive commands allowed here!\n') 
-        sys.exit (1)
-
-if __name__ == '__main__':
-#    if is_valid_user (os.getenv ('USER')):
-    if is_valid_user ('klibby@mozilla.com'):
-        serve()
-    else:
-        sys.stderr.write ('You are not welcome here, go away!\n') 
         sys.exit (1)

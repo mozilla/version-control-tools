@@ -81,7 +81,6 @@
     - ldap_helper.py
     - pash.py
     - sh_helper.py
-    - repo_group.py
   tags: docker-startup
 
 - name: Install pash wrapper
