@@ -3,9 +3,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import datetime, os, sys, pwd
-import hg_helper, ldap_helper
-import logging
+import os
+import pwd
 
 
 def QuoteForPOSIX(string):
@@ -29,6 +28,27 @@ def QuoteForPOSIX(string):
     return "\\'".join("'" + p + "'" for p in string.split("'"))
 
 
+def process_non_root_login(user):
+    import sys
+    import hg_helper
+
+    user_status = hg_helper.is_valid_user(user)
+    if user_status == 2:
+        sys.stderr.write('Your mercurial account has been disabled due \
+                          to inactivity.\nPlease file a bug at \
+                          https://bugzilla.mozilla.org (or \
+                          http://tinyurl.com/njcfhma) to re-activate \
+                          your account.\n')
+        sys.exit(0)
+
+    elif user_status != 1:
+        sys.stderr.write('You do not have a valid mercurial account!\n')
+        sys.exit(0)
+
+    hg_helper.serve()
+    sys.exit(0)
+
+
 if __name__ == '__main__':
     os.environ['PYTHONPATH'] = '/repo/hg/libraries/'
 
@@ -42,18 +62,4 @@ if __name__ == '__main__':
         else:
             os.execl(root_shell, root_shell)
     else:
-        user_status = hg_helper.is_valid_user(user)
-        if user_status == 2:
-            sys.stderr.write('Your mercurial account has been disabled due \
-                              to inactivity.\nPlease file a bug at \
-                              https://bugzilla.mozilla.org (or \
-                              http://tinyurl.com/njcfhma) to re-activate \
-                              your account.\n')
-            sys.exit(0)
-
-        elif user_status != 1:
-            sys.stderr.write('You do not have a valid mercurial account!\n')
-            sys.exit(0)
-
-        hg_helper.serve()
-        sys.exit(0)
+        process_non_root_login(user)
