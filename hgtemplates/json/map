@@ -16,4 +16,8 @@ infocset = '"{node|short}": \{
   "tags": {tags|json},
   "user": {user|json}
   }'
-pushes ='{data|mozjson}'
+pushes1 = '{pushes|json}'
+pushes2 = '\{
+  "lastpushid": {lastpushid|json},
+  "pushes": {pushes|json}
+  }'

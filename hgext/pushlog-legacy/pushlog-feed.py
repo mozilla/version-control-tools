@@ -465,6 +465,7 @@ def pushes_worker(query, web = None):
     to a map of data about the push."""
     pushes = {}
     for id, user, date, node in query.entries:
+        id = str(id)
         if web:
             ctx = web.repo.changectx(node)
             n = ctx.node()
@@ -481,20 +482,23 @@ def pushes_worker(query, web = None):
         else:
             pushes[id] = {'user': user,
                           'date': date,
-                          'changesets': [node]
-                          }
+                          'changesets': [node]}
 
-    if query.formatversion == 1:
-        return pushes
-    elif query.formatversion == 2:
-        return {'pushes': pushes, 'lastpushid': query.lastpushid}
-
-    raise ErrorResponse(500, 'unexpected formatversion')
+    return {'pushes': pushes, 'lastpushid': query.lastpushid}
 
 def pushes(web, req, tmpl):
     """WebCommand to return a data structure containing pushes."""
     query = pushlogSetup(web.repo, req)
-    return tmpl('pushes', data=pushes_worker(query, 'full' in req.form and web))
+
+    data = pushes_worker(query, 'full' in req.form and web)
+
+    if query.formatversion == 1:
+        return tmpl('pushes1', **data)
+    elif query.formatversion == 2:
+        return tmpl('pushes2', **data)
+
+    raise ErrorResponse(500, 'unexpected formatversion')
+
 
 addwebcommand(pushlogFeed, 'pushlog')
 addwebcommand(pushlogHTML, 'pushloghtml')
