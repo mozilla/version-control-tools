@@ -11,12 +11,18 @@ if 'LDAP_PORT_389_TCP_ADDR' not in os.environ:
     print('error: contained invoked without link to an ldap contaer')
     sys.exit(1)
 
+ldap_url = 'ldap://%s:%s/' % (os.environ['LDAP_PORT_389_TCP_ADDR'],
+                              os.environ['LDAP_PORT_389_TCP_PORT'])
+
 os.environ['DOCKER_ENTRYPOINT'] = '1'
 
 subprocess.check_call([
     '/usr/bin/python', '-u',
-    '/usr/bin/ansible-playbook', 'docker-hgrb.yml', '-c', 'local',
-    '-t', 'docker-startup'],
+    '/usr/bin/ansible-playbook', 'docker-hgrb.yml',
+        '-c', 'local',
+        '-t', 'docker-startup',
+        '-e', 'ldap_uri=%s' % ldap_url,
+    ],
     cwd='/vct/ansible')
 
 del os.environ['DOCKER_ENTRYPOINT']

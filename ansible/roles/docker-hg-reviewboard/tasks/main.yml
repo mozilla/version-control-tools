@@ -18,3 +18,11 @@
   with_items:
     - { section: reviewboard, option: username, value: mozreview }
     - { section: reviewboard, option: password, value: password }
+
+- name: add LDAP settings file
+  template: src=ldap.json.j2
+            dest=/etc/mercurial/ldap.json
+            owner=root
+            group=root
+            mode=0644
+  tags: docker-startup
