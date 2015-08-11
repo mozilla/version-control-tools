@@ -141,6 +141,15 @@ We recommend the name ``review``. e.g.::
    [paths]
    review = ssh://reviewboard-hg.mozilla.org/autoreview
 
+.. warning::
+
+   Attempting to push to the ``autoreview`` repository without configuring
+   the Mercurial extension (see above) will likely result in your client
+   attempting to push all history to the ``autoreview`` repository. The
+   server will reject the push, but not until all data has been transferred.
+   For Firefox repositories, this could take several minutes and consume
+   over a gigabyte of bandwidth!
+
 Advanced Configuration
 ----------------------
 
