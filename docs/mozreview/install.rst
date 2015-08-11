@@ -193,5 +193,25 @@ You will want to configure your SSH username for
 As of December 2014, the SSH fingerprint for the RSA key is
 ``a6:13:ae:35:2c:20:2b:8d:f4:8d:8e:d7:a8:55:67:97``.
 
+Host Fingerprint in hgrc
+========================
+
+Mercurial allows you to declare key fingerprints in your hgrc.
+
+If you are running Python 2.7.9 or newer (run ``hg debuginstall``
+to see what version of Python Mercurial is using - it may not be
+the Python you expect), Mercurial will automatically verify that
+certificates chain to a trusted certificate authority (CA).
+
+If you are running Python 2.7.8 or older, Python doesn't do these
+checks and will print warnings when connecting to hosts whose
+fingerprints aren't defined. To silence these warnings, or to
+explicitly declare the host fingerprint (a protection against
+spoofing by a certificate issued by another trusted CA), add
+the following to your ``~/.hgrc``::
+
+   [hostfingerprints]
+   reviewboard-hg.mozilla.org = 1b:62:0b:40:35:87:bd:28:5a:a1:43:ce:c8:e6:c0:2f:d0:7f:b6:c3
+
 Now that your client is all configured, it is time to conduct some code
 review. Continue reading the :ref:`mozreview_user`.
