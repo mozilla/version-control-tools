@@ -315,7 +315,7 @@ def build_plaintext_review(review, url, context):
     if review.body_top:
         review_text.append(review.body_top)
 
-    for comment in review.comments.all():
+    for comment in review.comments.order_by('filediff', 'first_line'):
         review_text.append(render_comment_plain(comment, context,
                                                 review.is_reply()))
 
@@ -323,4 +323,3 @@ def build_plaintext_review(review, url, context):
         review_text.append(review.body_bottom)
 
     return "\n\n".join(review_text)
-
