@@ -36,23 +36,23 @@ JSON output should render empty changeset array
   200
   content-type: application/json
 
-  $ cat body
+  $ python -m json.tool < body
   {
-   "1": {
-    "changesets": [
-     "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
-    ], 
-    "date": \d+,\s (re)
-    "user": "*" (glob)
-   }, 
-   "3": {
-    "changesets": [
-     "059b473c43d7e25d6b6f5070dfb1c468b0e9518c"
-    ], 
-    "date": \d+,\s (re)
-    "user": "*" (glob)
-   }
-  } (no-eol)
+      "1": {
+          "changesets": [
+              "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
+          ],
+          "date": \d+, (re)
+          "user": "*" (glob)
+      },
+      "3": {
+          "changesets": [
+              "059b473c43d7e25d6b6f5070dfb1c468b0e9518c"
+          ],
+          "date": \d+, (re)
+          "user": "*" (glob)
+      }
+  }
 
 Full output should do the same
 
@@ -60,40 +60,40 @@ Full output should do the same
   200
   content-type: application/json
 
-  $ cat body
+  $ python -m json.tool < body
   {
-   "1": {
-    "changesets": [
-     {
-      "author": "test", 
-      "branch": "default", 
-      "desc": "initial", 
-      "files": [
-       "foo"
-      ], 
-      "node": "96ee1d7354c4ad7372047672c36a1f561e3a6a4c", 
-      "tags": []
-     }
-    ], 
-    "date": \d+,\s (re)
-    "user": "*" (glob)
-   }, 
-   "3": {
-    "changesets": [
-     {
-      "author": "test", 
-      "branch": "default", 
-      "desc": "c2", 
-      "files": [
-       "foo"
-      ], 
-      "node": "059b473c43d7e25d6b6f5070dfb1c468b0e9518c", 
-      "tags": [
-       "tip"
-      ]
-     }
-    ], 
-    "date": \d+,\s (re)
-    "user": "*" (glob)
-   }
-  } (no-eol)
+      "1": {
+          "changesets": [
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "initial",
+                  "files": [
+                      "foo"
+                  ],
+                  "node": "96ee1d7354c4ad7372047672c36a1f561e3a6a4c",
+                  "tags": []
+              }
+          ],
+          "date": \d+, (re)
+          "user": "*" (glob)
+      },
+      "3": {
+          "changesets": [
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "c2",
+                  "files": [
+                      "foo"
+                  ],
+                  "node": "059b473c43d7e25d6b6f5070dfb1c468b0e9518c",
+                  "tags": [
+                      "tip"
+                  ]
+              }
+          ],
+          "date": \d+, (re)
+          "user": "*" (glob)
+      }
+  }

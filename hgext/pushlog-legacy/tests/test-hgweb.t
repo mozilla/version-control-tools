@@ -82,17 +82,17 @@ Format version 1 works
   200
   content-type: application/json
 
-  $ cat body
+  $ python -m json.tool < body
   {
-   "16": {
-    "changesets": [
-     "91826025c77c6a8e5711735adaa9766dd4eac7fc", 
-     "25f2a69ac7ac2919ef35c0b937b862fbb9e7e1f7"
-    ], 
-    "date": 1227196396, 
-    "user": "luser"
-   }
-  } (no-eol)
+      "16": {
+          "changesets": [
+              "91826025c77c6a8e5711735adaa9766dd4eac7fc",
+              "25f2a69ac7ac2919ef35c0b937b862fbb9e7e1f7"
+          ],
+          "date": 1227196396,
+          "user": "luser"
+      }
+  }
 
 Format version 3 fails
 
@@ -109,17 +109,17 @@ Format version 2 has pushes in a child object and a last push id
   200
   content-type: application/json
 
-  $ cat body
+  $ python -m json.tool < body
   {
-   "lastpushid": 21, 
-   "pushes": {
-    "16": {
-     "changesets": [
-      "91826025c77c6a8e5711735adaa9766dd4eac7fc", 
-      "25f2a69ac7ac2919ef35c0b937b862fbb9e7e1f7"
-     ], 
-     "date": 1227196396, 
-     "user": "luser"
-    }
-   }
-  } (no-eol)
+      "lastpushid": 21,
+      "pushes": {
+          "16": {
+              "changesets": [
+                  "91826025c77c6a8e5711735adaa9766dd4eac7fc",
+                  "25f2a69ac7ac2919ef35c0b937b862fbb9e7e1f7"
+              ],
+              "date": 1227196396,
+              "user": "luser"
+          }
+      }
+  }
