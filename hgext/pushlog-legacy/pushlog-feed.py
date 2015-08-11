@@ -39,19 +39,6 @@ def addwebcommand(f, name):
 
 ATOM_MIMETYPE = 'application/atom+xml'
 
-def raiseHTTPJSONError(httpcode, errorcode, errormessage, lastpushid=None):
-    """Raise an HTTP error for the JSON API.
-
-    We assume version 2 format is used.
-    """
-    o = {
-        'errorcode': errorcode,
-        'errormessage': errormessage,
-    }
-    if lastpushid:
-        o['lastpushid'] = lastpushid
-    raise ErrorResponse(httpcode, o)
-
 # just an enum
 class QueryType:
     DATE, CHANGESET, PUSHID, COUNT = range(4)
@@ -92,15 +79,6 @@ class PushlogQuery(object):
         if not self.conn:
             # we didn't get a connection to the database, return empty
             return
-
-        try:
-            query = 'select id from pushlog order by id desc limit 1'
-            row = self.conn.execute(query).fetchone()
-            if row:
-                self.lastpushid = row[0]
-        except sqlite.OperationalError:
-            pass
-
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
             # Get entries from self.page, using self.querystart_value as
             # the number of pushes per page.
@@ -132,11 +110,6 @@ class PushlogQuery(object):
                 where.append("id > (select c.pushid from changesets c where c.node = :start_node)")
                 params['start_node'] = hex(self.repo.lookup(self.querystart_value))
             elif self.querystart == QueryType.PUSHID:
-                if self.querystart_value > self.lastpushid and self.formatversion == 2:
-                    raiseHTTPJSONError(200, 'PUSH_ID_GREATER_THAN_AVAILABLE',
-                        'Push ID not found: %s' % self.querystart_value,
-                        lastpushid=self.lastpushid)
-
                 where.append("id > :start_id")
                 params['start_id'] = self.querystart_value
 
@@ -186,6 +159,14 @@ class PushlogQuery(object):
             except sqlite.OperationalError:
                 # likely just an empty db, so return an empty result
                 pass
+
+        try:
+            query = 'select id from pushlog order by id desc limit 1'
+            row = self.conn.execute(query).fetchone()
+            if row:
+                self.lastpushid = row[0]
+        except sqlite.OperationalError:
+            pass
 
     def description(self):
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:

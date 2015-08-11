@@ -123,25 +123,3 @@ Format version 2 has pushes in a child object and a last push id
     }
    }
   } (no-eol)
-
-Querying against a startID that is too high results in an error
-
-  $ http "http://localhost:$HGPORT/json-pushes?startID=9999&version=2" --header content-type --body-file body
-  200
-  content-type: application/json
-
-  $ cat body
-  {
-   "errorcode": "PUSH_ID_GREATER_THAN_AVAILABLE", 
-   "errormessage": "Push ID not found: 9999", 
-   "lastpushid": 21
-  } (no-eol)
-
-Same failure on version 1 returns an empty set (for backwards compatibility)
-
-  $ http "http://localhost:$HGPORT/json-pushes?startID=9999" --header content-type --body-file body
-  200
-  content-type: application/json
-
-  $ cat body
-  {} (no-eol)

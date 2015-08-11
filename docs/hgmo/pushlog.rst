@@ -221,8 +221,7 @@ example payload::
      }
    }
 
-For successful requests, the top-level object contains the following
-properties:
+The top-level objects contains the following properties:
 
 pushes
    An object containing push information.
@@ -236,22 +235,6 @@ lastpushid
    available. For example, clients may query for N changesets at a time
    by specifying ``endID``. The value in this property can tell these
    clients when they have exhausted all known pushes.
-
-For errors, the top-level object contains the following properties:
-
-errorcode
-   Machine-readable string indicating the class of the error.
-
-errormessage
-   Human-readable string explaining the error to humans.
-
-In addition, ``lastpushid`` may occur in error responses.
-
-.. important::
-
-   When processing responses to payload version 2, clients should first
-   look for the presence of an ``errorcode`` property. If present, they
-   should likely fail fast.
 
 Push Objects
 ^^^^^^^^^^^^
@@ -317,24 +300,6 @@ Here's an example::
      "node": "ee4fe2ec168e719e822dabcdd797c0cff9ce2407",
      "tags": []
    }
-
-Error Codes
-^^^^^^^^^^^
-
-The following error codes can be encountered:
-
-PUSH_ID_GREATER_THAN_AVAILABLE
-   This error occurs when requesting a ``startID`` whose value is
-   greater than the most recent push ID.
-
-   When this error is encountered, it could mean that the pushlog
-   database was reset. For example, clients polling by ``startID`` (the
-   recommended practice) perform queries from the last seen push ID.
-   This error would be seen if the last seen push ID doesn't exist. This
-   should never happen on properly behaving pushlog databases.
-
-   ``lastpushid`` will be defined if this error is encountered. This
-   enables clients to construct an appropriate follow-up query.
 
 Writing Agents that Consume Pushlog Data
 ========================================
