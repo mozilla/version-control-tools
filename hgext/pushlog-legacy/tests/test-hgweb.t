@@ -25,7 +25,7 @@ Get all JSON data
   200
   content-type: application/json
 
-  $ jsoncompare body $TESTDATA/test-repo-data.json
+  $ jsoncompare $TESTDATA/test-repo-data.json body
 
 Get all JSON data with details
 
@@ -33,7 +33,7 @@ Get all JSON data with details
   200
   content-type: application/json
 
-  $ jsoncompare body $TESTDATA/test-repo-data-full.json
+  $ jsoncompare $TESTDATA/test-repo-data-full.json body
 
 Query with fromchange and an endID
 
@@ -41,7 +41,7 @@ Query with fromchange and an endID
   200
   content-type: application/json
 
-  $ jsoncompare body $TESTDATA/test-repo-fromchange-endid-query.json
+  $ jsoncompare $TESTDATA/test-repo-fromchange-endid-query.json body
 
 Query with a startID and tochange
 
@@ -49,7 +49,7 @@ Query with a startID and tochange
   200
   content-type: application/json
 
-  $ jsoncompare body $TESTDATA/test-repo-startid-tochange-query.json
+  $ jsoncompare $TESTDATA/test-repo-startid-tochange-query.json body
 
 Query for a single changeset
 
@@ -57,7 +57,7 @@ Query for a single changeset
   200
   content-type: application/json
 
-  $ jsoncompare body $TESTDATA/test-repo-changeset-query.json
+  $ jsoncompare $TESTDATA/test-repo-changeset-query.json body
 
 Query for two changesets at once
 
@@ -65,7 +65,7 @@ Query for two changesets at once
   200
   content-type: application/json
 
-  $ jsoncompare body $TESTDATA/test-repo-multi-changeset-query.json
+  $ jsoncompare $TESTDATA/test-repo-multi-changeset-query.json body
 
 Query a changeset that doesn't exist
 
