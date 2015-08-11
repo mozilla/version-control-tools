@@ -1,5 +1,5 @@
 mimetype = 'application/json'
 
 info = '{nodes|mozjson}'
-error = '{error|mozjson}'
+error = '{error|json}'
 pushes ='{data|mozjson}'
