@@ -87,6 +87,7 @@
         owner=root
         group=root
         mode=0644
+  trigger: restart rsyslogd
 
 # There are /repo_local and /repo directories for historical reasons.
 # Back in the day /repo was mounted from NFS and was a read-only

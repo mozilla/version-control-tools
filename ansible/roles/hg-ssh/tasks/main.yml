@@ -124,6 +124,7 @@
         owner=root
         group=root
         mode=0644
+  trigger: restart rsyslogd
 
 - name: install logrotate config for hg
   copy: src=logrotate-hg.conf

@@ -1,6 +1,3 @@
 ---
-- name: restart cgconfig
-  service: name=cgconfig state=restarted
-
 - name: restart rsyslogd
   service: name=rsyslogd state=restarted
