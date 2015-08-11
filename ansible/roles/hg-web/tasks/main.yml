@@ -422,7 +422,6 @@
   with_items:
     - buglink.py
     - feedparser.py
-    - hgwebjson.py
     - pushlog-feed.py
     - parsedatetime/__init__.py
     - parsedatetime/parsedatetime.py

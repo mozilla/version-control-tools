@@ -36,11 +36,10 @@ def write_hgrc(repodir):
         f.write("""[extensions]
 pushlog-feed=%s/pushlog-feed.py
 buglink=%s/buglink.py
-hgwebjson=%s/hgwebjson.py
 [web]
 templates=%s
 style=gitweb_mozilla
-""" % (mydir, mydir, mydir, os.environ['HG_TEMPLATES']))
+""" % (mydir, mydir, os.environ['HG_TEMPLATES']))
 
 def loadjsonfile(f):
     """Given a file path relative to the srcdir, load the file as a JSON object."""

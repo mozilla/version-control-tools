@@ -3,7 +3,6 @@ serverconfig() {
 [extensions]
 pushlog-feed = $TESTDIR/hgext/pushlog-legacy/pushlog-feed.py
 buglink = $TESTDIR/hgext/pushlog-legacy/buglink.py
-hgwebjson = $TESTDIR/hgext/pushlog-legacy/hgwebjson.py
 pushlog = $TESTDIR/hgext/pushlog
 
 [web]

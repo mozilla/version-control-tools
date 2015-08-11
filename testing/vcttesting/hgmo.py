@@ -53,7 +53,6 @@ class HgCluster(object):
     """
     MASTER_FILE_MAP = {
         'hgext/pushlog-legacy/buglink.py': '/repo/hg/extensions/buglink.py',
-        'hgext/pushlog-legacy/hgwebjson.py': '/repo/hg/extensions/hgwebjson.py',
         'hgext/pushlog-legacy/pushlog-feed.py': '/repo/hg/extensions/pushlog-feed.py',
         'hgext/pushlog/__init__.py': '/repo/hg/extensions/pushlog/__init__.py',
         'hgext/serverlog/__init__.py': '/repo/hg/extensions/serverlog/__init__.py',

@@ -1,9 +1,3 @@
-hgwebjson.py:
-
-This is a mercurial extension. It exists to allow hgweb to produce JSON
-output describing revisions. Advanced clients can be built on this output,
-see the www/ directory for an example.
-
 pushlog-feed.py:
 
 This extension works in conjunction with the hg_record_changeset_info hook,
@@ -15,7 +9,6 @@ To install these extensions for use in apache, place the following .hgrc
 file in the apache home directory (/var/www/.hgrc on FC8):
 
 [extensions]
-hgwebjson = /path/to/hgwebjson.py
 pushlog-feed = /path/to/pushlog-feed.py
 buglink = /path/to/buglink.py
 

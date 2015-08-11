@@ -38,15 +38,10 @@ require a bit more effort to configure. This code lives in
 this code into ``hgext/pushlog`` so there is a unified pushlog
 experience.
 
-The web component will require the following extensions::
+The web component will require the following extension::
 
    [extensions]
-   hgwebjson = /path/to/version-control-tools/hgext/pushlog-legacy/hgwebjson.py
    pushlog-feed = /path/to/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py
-
-``hgwebjson`` defines a mechanism for exposing JSON for certain
-Mercurial commands. (This should really be merged into core Mercurial.)
-It is utilized by ``pushlog-feed.py``.
 
 ``pushlog-feed.py`` exposes some hgweb endpoints that expose pushlog
 data.

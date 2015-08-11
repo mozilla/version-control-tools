@@ -1,12 +1,6 @@
-  $ . $TESTDIR/hgext/pushlog-legacy/tests/helpers.sh
+  $ . $TESTDIR/hgext/hgmo/tests/helpers.sh
 
-  $ hg init server
-  $ cd server
-  $ serverconfig .hg/hgrc
-
-  $ hg serve -d -p $HGPORT --pid-file hg.pid -A access.log -E error.log
-  $ cat hg.pid >> $DAEMON_PIDS
-  $ cd ..
+  $ startserver
 
   $ hg clone http://localhost:$HGPORT repo
   no changes found

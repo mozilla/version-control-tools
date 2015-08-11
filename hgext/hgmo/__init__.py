@@ -257,6 +257,35 @@ def mozbuildinfowebcommand(web, req, tmpl):
                           indent=2)
 
 
+def infowebcommand(web, req, tmpl):
+    """Get information about the specified changeset(s).
+
+    This is a legacy API from before the days of Mercurial's built-in JSON
+    API. It is used by unidentified parts of automation. Over time these
+    consumers should transition to the modern/native JSON API.
+    """
+    if 'node' not in req.form:
+        return tmpl('error', error={'error': "missing parameter 'node'"})
+
+    csets = []
+    for node in req.form['node']:
+        ctx = web.repo[node]
+        csets.append({
+            'rev': ctx.rev(),
+            'node': ctx.hex(),
+            'user': ctx.user(),
+            'date': ctx.date(),
+            'description': ctx.description(),
+            'branch': ctx.branch(),
+            'tags': ctx.tags(),
+            'parents': [p.hex() for p in ctx.parents()],
+            'children': [c.hex() for c in ctx.children()],
+            'files': ctx.files(),
+        })
+
+    return tmpl('info', csets=csets)
+
+
 def revset_reviewer(repo, subset, x):
     """``reviewer(REVIEWER)``
 
@@ -294,7 +323,6 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
         setconfig('pushlog', ['pushlog'])
         setconfig('buglink', ['pushlog-legacy', 'buglink.py'])
         setconfig('pushlog-feed', ['pushlog-legacy', 'pushlog-feed.py'])
-        setconfig('hgwebjson', ['pushlog-legacy', 'hgwebjson.py'])
 
         # Since new extensions may have been flagged for loading, we need
         # to obtain a new repo instance to a) trigger loading of these
@@ -352,3 +380,6 @@ def extsetup(ui):
 
     setattr(webcommands, 'mozbuildinfo', mozbuildinfowebcommand)
     webcommands.__all__.append('mozbuildinfo')
+
+    setattr(webcommands, 'info', infowebcommand)
+    webcommands.__all__.append('info')
