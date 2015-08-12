@@ -1,0 +1,84 @@
+# -*- Mode: python; c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 40 -*-
+# vim: set filetype=python:
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+with Files('**'):
+    BUG_COMPONENT = ('Developer Services', 'General')
+
+with Files('hgext/bundleclone/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: bundleclone')
+    FINAL = True
+
+with Files('hgext/bzexport/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: bzexport')
+    FINAL = True
+
+with Files('hgext/bzpost/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: bzpost')
+    FINAL = True
+
+with Files('hgext/firefoxtree/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: firefoxtree')
+    FINAL = True
+
+with Files('hgext/hgmo/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
+    FINAL = True
+
+with Files('hgext/mozext/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: mozext')
+    FINAL = True
+
+with Files('hgext/pushlog-legacy/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: Pushlog')
+    FINAL = True
+
+with Files('hgext/pushlog/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: Pushlog')
+    FINAL = True
+
+with Files('hgext/qbackout/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: qbackout')
+    FINAL = True
+
+with Files('hgext/qimportbz/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: qimportbz')
+    FINAL = True
+
+with Files('hgext/reviewboard/**'):
+    BUG_COMPONENT = ('Developer Services', 'MozReview')
+    FINAL = True
+
+with Files('hghooks/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
+    FINAL = True
+
+with Files('hgtemplates/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
+    FINAL = True
+
+with Files('hghooks/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
+    FINAL = True
+
+with Files('hgtemplates/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
+    FINAL = True
+
+with Files('hgwsgi/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
+    FINAL = True
+
+with Files('pylib/rbbz/**'):
+    BUG_COMPONENT = ('Developer Services', 'MozReview')
+    FINAL = True
+
+with Files('pylib/reviewboardmods/**'):
+    BUG_COMPONENT = ('Developer Services', 'MozReview')
+    FINAL = True
+
+with Files('scripts/pash/**'):
+    BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
+    FINAL = True
