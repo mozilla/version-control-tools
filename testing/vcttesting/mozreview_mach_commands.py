@@ -193,16 +193,19 @@ class MozReviewCommands(object):
                      help='Source code access level to grant to user')
     @CommandArgument('--bugzilla-group', action='append',
                      help='Bugzilla group to add user to.')
+    @CommandArgument('--no-api-key', action='store_true',
+                     help='Do not create an API key for this user.')
     def create_user(self, where, email, password, fullname, uid=None,
                     username=None, key_file=None, scm_level=None,
-                    bugzilla_group=None):
+                    bugzilla_group=None, no_api_key=False):
         mr = self._get_mozreview(where)
         u = mr.create_user(email, password, fullname,
                            uid=uid,
                            username=username,
                            key_filename=key_file,
                            scm_level=scm_level,
-                           bugzilla_groups=bugzilla_group)
+                           bugzilla_groups=bugzilla_group,
+                           api_key=not no_api_key)
         print('Created user %s' % u['bugzilla']['id'])
 
     @Command('create-ldap-user', category='mozreview',

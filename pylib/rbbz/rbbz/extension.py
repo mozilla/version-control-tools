@@ -34,6 +34,7 @@ from mozreview.extra_data import (UNPUBLISHED_RRIDS_KEY,
                                   gen_rrs_by_extra_data_key,
                                   is_parent)
 from mozreview.models import (BugzillaUserMap,
+                              get_bugzilla_api_key,
                               get_or_create_bugzilla_users,
                               get_profile)
 from mozreview.signals import commit_request_publishing
@@ -341,7 +342,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
         raise InvalidBugIdError(bug_id)
 
     if using_bugzilla:
-        b = Bugzilla(user.bzlogin, user.bzcookie)
+        b = Bugzilla(get_bugzilla_api_key(user))
 
         try:
             if b.is_bug_confidential(bug_id):
@@ -458,7 +459,7 @@ def on_review_publishing(user, review, **kwargs):
                                      get_obj_url(review, site,
                                                  siteconfig),
                                      {"user": user})
-    b = Bugzilla(user.bzlogin, user.bzcookie)
+    b = Bugzilla(get_bugzilla_api_key(user))
 
     # TODO: Update all attachments in one call.  This is not possible right
     # now because we have to potentially mix changing and creating flags.
@@ -495,7 +496,7 @@ def on_reply_publishing(user, reply, **kwargs):
         return
 
     bug_id = int(review_request.get_bug_list()[0])
-    b = Bugzilla(user.bzlogin, user.bzcookie)
+    b = Bugzilla(get_bugzilla_api_key(user))
 
     url = get_reply_url(reply)
     comment = build_plaintext_review(reply, url, {"user": user})
@@ -517,7 +518,7 @@ def on_review_request_closed_discarded(user, review_request, type, **kwargs):
     else:
         # TODO: Remove this once we properly prevent users from closing
         # commit review requests.
-        b = Bugzilla(user.bzlogin, user.bzcookie)
+        b = Bugzilla(get_bugzilla_api_key(user))
         bug = int(review_request.get_bug_list()[0])
         url = get_obj_url(review_request)
         b.obsolete_review_attachments(bug, url)

@@ -130,6 +130,16 @@ def get_or_create_bugzilla_users(user_data):
     return users
 
 
+def get_bugzilla_api_key(user):
+    if not user or not user.is_authenticated():
+        return None
+
+    try:
+        return BugzillaUserMap.objects.get(user=user).api_key
+    except BugzillaUserMap.DoesNotExist:
+        return None
+
+
 def set_bugzilla_api_key(user, api_key):
     """Assigns a Bugzilla API key to a user.
 

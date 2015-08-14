@@ -13,6 +13,7 @@ import time
 
 import concurrent.futures as futures
 import paramiko
+import requests
 
 from vcttesting.bugzilla import Bugzilla
 from vcttesting.docker import (
@@ -259,6 +260,8 @@ class MozReview(object):
             e.submit(self._docker.execute, mr_info['web_id'],
                      ['/set-urls', self.reviewboard_url])
 
+        self.create_user_api_key(bugzilla.username)
+
         hg_ssh_host_key = self._docker.get_file_content(
                 mr_info['hgrb_id'],
                 '/etc/ssh/ssh_host_rsa_key.pub').rstrip()
@@ -473,9 +476,50 @@ class MozReview(object):
                                         bugzilla_username=bugzilla_username,
                                         bugzilla_password=bugzilla_password)
 
+    def create_user_api_key(self, email):
+        """Creates an API key for the given user.
+
+        This creates an API key in Bugzilla and then triggers the
+        auth-delegation callback to register the key with Review Board. Note
+        that this also logs the user in, although we don't record the session
+        cookie anywhere so this shouldn't have an effect on subsequent
+        interactions with Review Board.
+        """
+        api_key = self._docker.execute(
+            self.bmoweb_id,
+            ['/var/lib/bugzilla/bugzilla/scripts/issue-api-key.pl',
+             email], stdout=True).strip()
+
+        assert len(api_key) == 40
+
+        # When running tests in parallel, the auth callback can time out.
+        # Try up to 3 times before giving up.
+        url = self.reviewboard_url + 'mozreview/bmo_auth_callback/'
+        data = {'client_api_login': email, 'client_api_key': api_key}
+
+        for i in range(3):
+            response = requests.post(url, data=json.dumps(data))
+            if response.status_code == 200:
+                result = response.json()['result']
+                break
+        else:
+            raise Exception('Failed to successfully run the BMO auth POST '
+                            'callback.')
+
+        params = {'client_api_login': email, 'callback_result': result}
+
+        for i in range(3):
+            if requests.get(url, params=params).status_code == 200:
+                break
+        else:
+            raise Exception('Failed to successfully run the BMO auth GET '
+                            'callback.')
+
+        return api_key
+
     def create_user(self, email, password, fullname, bugzilla_groups=None,
                     uid=None, username=None, key_filename=None,
-                    scm_level=None):
+                    scm_level=None, api_key=True):
         """Create a new user.
 
         This will create a user in at least Bugzilla. If the ``uid`` argument
@@ -511,6 +555,9 @@ class MozReview(object):
 
         for g in bugzilla_groups:
             b.add_user_to_group(email, g)
+
+        if api_key:
+            res['bugzilla']['api_key'] = self.create_user_api_key(email)
 
         # Create an LDAP account as well.
         if uid:

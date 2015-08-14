@@ -16,6 +16,7 @@ from mozreview.bugzilla.client import Bugzilla
 from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
 from mozreview.bugzilla.models import (
     BZ_IRCNICK_RE,
+    get_bugzilla_api_key,
     get_or_create_bugzilla_users,
 )
 from rbbz.forms import BugzillaAuthSettingsForm
@@ -106,7 +107,7 @@ class BugzillaBackend(AuthBackend):
         username = username.strip()
 
         try:
-            bugzilla = Bugzilla(*self._session_cookies(request.session))
+            bugzilla = Bugzilla(get_bugzilla_api_key(request.user))
         except BugzillaUrlError:
             return None
         except BugzillaError:
@@ -130,7 +131,7 @@ class BugzillaBackend(AuthBackend):
             return
 
         try:
-            bugzilla = Bugzilla(*self._session_cookies(request.session))
+            bugzilla = Bugzilla(get_bugzilla_api_key(request.user))
         except BugzillaError as e:
             raise UserQueryError('Bugzilla error: %s' % e.msg)
 

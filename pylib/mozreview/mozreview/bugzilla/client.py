@@ -56,7 +56,11 @@ class Bugzilla(object):
 
     user_fields = ['id', 'email', 'real_name', 'can_login']
 
-    def __init__(self, login=None, logincookie=None, xmlrpc_url=None):
+    def __init__(self, api_key=None, xmlrpc_url=None):
+        self.api_key = api_key
+        self._transport = None
+        self._proxy = None
+
         if xmlrpc_url:
             self.xmlrpc_url = xmlrpc_url
         else:
@@ -65,12 +69,6 @@ class Bugzilla(object):
 
         if not self.xmlrpc_url:
             raise BugzillaUrlError('no XMLRPC URL')
-
-        self._transport = None
-        self._proxy = None
-
-        if logincookie:
-            self.transport.set_bugzilla_cookies(login, logincookie)
 
     def cookies(self):
         return self.transport.bugzilla_cookies()
@@ -112,30 +110,41 @@ class Bugzilla(object):
 
     @xmlrpc_to_bugzilla_errors
     def get_user(self, username):
-        params = {'names': [username], 'include_fields': self.user_fields}
+        params = self._auth_params({
+            'names': [username],
+            'include_fields': self.user_fields
+        })
         return self.proxy.User.get(params)
 
     @xmlrpc_to_bugzilla_errors
     def query_users(self, query):
-        params = {'match': [query], 'include_fields': self.user_fields}
+        params = self._auth_params({
+            'match': [query],
+            'include_fields': self.user_fields
+        })
         return self.proxy.User.get(params)
 
     @xmlrpc_to_bugzilla_errors
     def get_user_from_userid(self, userid):
         """Convert an integer user ID to string username."""
-        params = {'ids': [userid], 'include_fields': self.user_fields}
+        params = self._auth_params({
+            'ids': [userid],
+            'include_fields': self.user_fields
+        })
         return self.proxy.User.get(params)
 
     @xmlrpc_to_bugzilla_errors
     def post_comment(self, bug_id, comment):
-        params = {
+        params = self._auth_params({
             'id': bug_id,
             'comment': comment
-        }
+        })
         return self.proxy.Bug.add_comment(params)
 
     @xmlrpc_to_bugzilla_errors
     def is_bug_confidential(self, bug_id):
+        # We don't need to authenticate here; if we can't get the bug,
+        # that itself means it's confidential.
         params = {'ids': [bug_id], 'include_fields': ['groups']}
 
         try:
@@ -159,7 +168,7 @@ class Bugzilla(object):
 
         # Copy because we modify it.
         reviewers = reviewers.copy()
-        params = {}
+        params = self._auth_params({})
         flags = []
         rb_attachment = None
         attachments = self.get_rb_attachments(bug_id)
@@ -244,11 +253,11 @@ class Bugzilla(object):
     def get_rb_attachments(self, bug_id):
         """Get all attachments that contain review-request URLs."""
 
-        params = {
+        params = self._auth_params({
             'ids': [bug_id],
             'include_fields': ['id', 'data', 'content_type', 'is_obsolete',
                                'flags']
-        }
+        })
 
         return [a for a
                 in self.proxy.Bug.attachments(params)['bugs'][str(bug_id)]
@@ -296,10 +305,10 @@ class Bugzilla(object):
             flag['new'] = True
             flag['requestee'] = reviewer
 
-        params = {
+        params = self._auth_params({
             'ids': [rb_attachment['id']],
             'flags': [flag],
-        }
+        })
 
         if comment:
             params['comment'] = comment
@@ -336,10 +345,10 @@ class Bugzilla(object):
         else:
             return False
 
-        params = {
+        params = self._auth_params({
             'ids': [rb_attachment['id']],
             'flags': [flag],
-        }
+        })
 
         if comment:
             params['comment'] = comment
@@ -354,10 +363,10 @@ class Bugzilla(object):
         This is called when review requests are discarded or deleted. We don't
         want to leave any lingering references in Bugzilla.
         """
-        params = {
+        params = self._auth_params({
             'ids': [],
             'is_obsolete': True,
-        }
+        })
 
         for a in self.get_rb_attachments(bug_id):
             if a.get('data') == rb_url and not a.get('is_obsolete'):
@@ -382,6 +391,15 @@ class Bugzilla(object):
                 return False
 
             raise
+
+    def _auth_params(self, params):
+        if not self.api_key:
+            raise BugzillaError('There is no Bugzilla API key on record for '
+                                'this user. Please log into MozReview\'s '
+                                'UI to have one generated.')
+
+        params['api_key'] = self.api_key
+        return params
 
     @property
     def transport(self):

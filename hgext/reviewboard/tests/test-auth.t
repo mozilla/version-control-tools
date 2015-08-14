@@ -147,19 +147,19 @@ Newly created users should have a suitable profile (e.g. is_private is set)
 
   $ rbmanage dump-account-profile 'user1+6'
   collapsed_diffs: 1
-  dashboard_columns: 
+  dashboard_columns: selected,new_updates,ship_it,my_comments,summary,submitter,last_updated_since
   default_use_rich_text: None
   extra_data: {}
   first_time_setup_done: 0
   group_columns: 
-  id: 2
+  id: 3
   is_private: 1
   open_an_issue: 1
   review_request_columns: 
   should_send_email: 1
   should_send_own_updates: 1
   show_closed: 1
-  sort_dashboard_columns: 
+  sort_dashboard_columns: -last_updated
   sort_group_columns: 
   sort_review_request_columns: 
   sort_submitter_columns: 
