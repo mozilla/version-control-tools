@@ -120,16 +120,7 @@ on publish.
   commit: bz://1/mynick
   submitter: default+5
   summary: bz://1/mynick
-  description:
-  - /r/2 - Bug 1 - Foo 1
-  - /r/3 - Bug 1 - Foo 2
-  - /r/4 - Bug 1 - Foo 3
-  - /r/5 - Bug 1 - Foo 4
-  - /r/6 - Bug 1 - Foo 5
-  - ''
-  - 'Pull down these commits:'
-  - ''
-  - hg pull -r 76088734e3cba33be80930be14e7cd1e9ee474be http://*:$HGPORT/test-repo (glob)
+  description: This is the parent review request
   target_people: []
   extra_data:
     p2rb: true
@@ -149,15 +140,7 @@ on publish.
     - '1'
     commit: bz://1/mynick
     summary: bz://1/mynick
-    description:
-    - /r/2 - Bug 1 - Foo 1
-    - /r/3 - Bug 1 - Foo 2
-    - /r/4 - Bug 1 - Foo 3
-    - /r/5 - Bug 1 - Foo 4
-    - ''
-    - 'Pull down these commits:'
-    - ''
-    - hg pull -r 98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb http://*:$HGPORT/test-repo (glob)
+    description: This is the parent review request
     target_people: []
     extra:
       p2rb: true
@@ -214,15 +197,7 @@ The parent review should have dropped the reference to /r/6
   commit: bz://1/mynick
   submitter: default+5
   summary: bz://1/mynick
-  description:
-  - /r/2 - Bug 1 - Foo 1
-  - /r/3 - Bug 1 - Foo 2
-  - /r/4 - Bug 1 - Foo 3
-  - /r/5 - Bug 1 - Foo 4
-  - ''
-  - 'Pull down these commits:'
-  - ''
-  - hg pull -r 98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb http://*:$HGPORT/test-repo (glob)
+  description: This is the parent review request
   target_people: []
   extra_data:
     p2rb: true
@@ -301,15 +276,7 @@ on publish.
   commit: bz://1/mynick
   submitter: default+5
   summary: bz://1/mynick
-  description:
-  - /r/2 - Bug 1 - Foo 1
-  - /r/3 - Bug 1 - Foo 2
-  - /r/4 - Bug 1 - Foo 3
-  - /r/5 - Bug 1 - Foo 4
-  - ''
-  - 'Pull down these commits:'
-  - ''
-  - hg pull -r 98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb http://*:$HGPORT/test-repo (glob)
+  description: This is the parent review request
   target_people: []
   extra_data:
     p2rb: true
@@ -329,14 +296,7 @@ on publish.
     - '1'
     commit: bz://1/mynick
     summary: bz://1/mynick
-    description:
-    - /r/3 - Bug 1 - Foo 2
-    - /r/4 - Bug 1 - Foo 3
-    - /r/5 - Bug 1 - Foo 4
-    - ''
-    - 'Pull down these commits:'
-    - ''
-    - hg pull -r b5473ad606f40840715d6b378dacc1a37f6263b1 http://*:$HGPORT/test-repo (glob)
+    description: This is the parent review request
     target_people: []
     extra:
       p2rb: true
@@ -434,13 +394,7 @@ The parent review should have been updated accordingly.
   commit: bz://1/mynick
   submitter: default+5
   summary: bz://1/mynick
-  description:
-  - /r/3 - Bug 1 - Foo 2
-  - /r/5 - Bug 1 - Foo 4
-  - ''
-  - 'Pull down these commits:'
-  - ''
-  - hg pull -r 2fbc30f77859fa4be2e173866fa71c52d394f2c4 http://*:$HGPORT/test-repo (glob)
+  description: This is the parent review request
   target_people: []
   extra_data:
     p2rb: true

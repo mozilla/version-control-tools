@@ -100,14 +100,7 @@ The parent review should have its description updated.
     bugs: []
     commit: bz://1/mynick
     summary: bz://1/mynick
-    description:
-    - /r/2 - Bug 1 - Foo 1
-    - /r/3 - Bug 1 - Foo 2
-    - /r/4 - Bug 1 - Foo 3
-    - ''
-    - 'Pull down these commits:'
-    - ''
-    - hg pull -r 4cb601f74de529935048816623637fb0ca2812a4 http://*:$HGPORT/test-repo (glob)
+    description: This is the parent review request
     target_people: []
     extra:
       p2rb: true

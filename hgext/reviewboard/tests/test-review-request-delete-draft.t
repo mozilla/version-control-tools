@@ -71,12 +71,7 @@ We should have a disagreement between published and draft
   commit: bz://1/mynick
   submitter: submitter+6
   summary: bz://1/mynick
-  description:
-  - /r/2 - Bug 1 - Initial commit
-  - ''
-  - 'Pull down this commit:'
-  - ''
-  - hg pull -r 0aca5e4417025c80407d8f7f22864e8d09fbec50 http://*:$HGPORT/test-repo (glob)
+  description: This is the parent review request
   target_people: []
   extra_data:
     p2rb: true
@@ -94,12 +89,7 @@ We should have a disagreement between published and draft
     - '1'
     commit: bz://1/mynick
     summary: bz://1/mynick
-    description:
-    - /r/2 - Bug 1 - Initial commit
-    - ''
-    - 'Pull down this commit:'
-    - ''
-    - hg pull -r b3be3d464d6b32130006cbdfa82f9f98a3c57a01 http://*:$HGPORT/test-repo (glob)
+    description: This is the parent review request
     target_people: []
     extra:
       p2rb: true
@@ -180,12 +170,7 @@ Discarding the parent review request draft should discard draft on children
   commit: bz://1/mynick
   submitter: submitter+6
   summary: bz://1/mynick
-  description:
-  - /r/2 - Bug 1 - Initial commit
-  - ''
-  - 'Pull down this commit:'
-  - ''
-  - hg pull -r 0aca5e4417025c80407d8f7f22864e8d09fbec50 http://*:$HGPORT/test-repo (glob)
+  description: This is the parent review request
   target_people: []
   extra_data:
     p2rb: true

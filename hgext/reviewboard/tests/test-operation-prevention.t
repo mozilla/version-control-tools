@@ -41,12 +41,7 @@ Publishing the parent should succeed.
   commit: bz://1/mynick
   submitter: author+6
   summary: bz://1/mynick
-  description:
-  - /r/2 - Bug 1 - Initial commit to review
-  - ''
-  - 'Pull down this commit:'
-  - ''
-  - hg pull -r 86a712c7f0187fed4c00b99131838610c76e6cc0 http://*:$HGPORT/test-repo (glob)
+  description: This is the parent review request
   target_people: []
   extra_data:
     p2rb: true

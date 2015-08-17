@@ -33,6 +33,8 @@ from mozreview.extra_data import (get_parent_rr, is_parent, is_pushed,
 from mozreview.fields import (BaseCommitField,
                               CombinedReviewersField,
                               CommitsListField,
+                              ImportCommitField,
+                              PullCommitField,
                               TryField)
 from mozreview.hooks import MozReviewApprovalHook
 from mozreview.ldap.resources import ldap_association_resource
@@ -165,6 +167,14 @@ class MozReviewExtension(Extension):
         if testing_done_field:
             main_fieldset.remove_field(testing_done_field)
 
+        # We "monkey patch" (yes, I feel dirty) the should_render method on
+        # the description field so that it is not rendered for parent review
+        # requests.
+        description_field = get_review_request_field('description')
+        if description_field:
+            description_field.should_render = (lambda self, value:
+                not is_parent(self.review_request_details))
+
         # All of our review request styling is injected via
         # review-stylings-css, which in turn loads the review.css static
         # bundle.
@@ -195,6 +205,9 @@ class MozReviewExtension(Extension):
         ReviewRequestFieldsHook(self, 'main', [CombinedReviewersField])
         ReviewRequestFieldsHook(self, 'main', [TryField])
         ReviewRequestFieldsHook(self, 'main', [BaseCommitField])
+
+        ReviewRequestFieldsHook(self, 'info', [ImportCommitField])
+        ReviewRequestFieldsHook(self, 'info', [PullCommitField])
 
         # Use a custom method to calculate a review approval state.
         MozReviewApprovalHook(self)

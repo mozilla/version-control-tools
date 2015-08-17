@@ -12,7 +12,13 @@ from reviewboard.reviews.fields import BaseReviewRequestField
 from reviewboard.reviews.models import ReviewRequest, ReviewRequestDraft
 
 from mozreview.autoland.models import AutolandEventLogEntry, AutolandRequest
-from mozreview.extra_data import gen_child_rrs, get_parent_rr, is_parent, is_pushed
+from mozreview.extra_data import (
+    COMMIT_ID_KEY,
+    gen_child_rrs,
+    get_parent_rr,
+    is_parent,
+    is_pushed,
+)
 
 
 def ensure_review_request(review_request_details):
@@ -79,6 +85,73 @@ class CommitsListField(BaseReviewRequestField):
             'parent_details': parent_details,
             'children_details': children_details,
         }))
+
+
+class ImportCommitField(BaseReviewRequestField):
+    """This field provides some information on how to pull down the commit"""
+    # RB validation requires this to be unique, so we fake a field id
+    field_id = "p2rb.ImportCommitField"
+    label = _("Import")
+
+    def should_render(self, value):
+        return not is_parent(self.review_request_details)
+
+    def as_html(self):
+        commit_id = self.review_request_details.extra_data.get(COMMIT_ID_KEY)
+        review_request = self.review_request_details.get_review_request()
+        repo_path = review_request.repository.path
+
+        command = 'hg import'
+
+        if not commit_id:
+            logging.error('No commit_id for review request: %d' % (
+                review_request.id))
+            command = ''
+            commit_id = ''
+            repo_path = ''
+
+        return get_template('mozreview/commit-info.html').render(Context({
+                'command': command, 
+                'commit_id': commit_id,
+                'repo_path': repo_path,
+        }))
+
+
+class PullCommitField(BaseReviewRequestField):
+    """This field provides some information on how to pull down the commit"""
+    # RB validation requires this to be unique, so we fake a field id
+    field_id = "p2rb.PullCommitField"
+    label = _("Pull")
+
+    def as_html(self):
+        commit_id = self.review_request_details.extra_data.get(COMMIT_ID_KEY)
+
+        if is_parent(self.review_request_details):
+            user = self.request.user
+            parent = get_parent_rr(self.review_request_details.get_review_request())
+            parent_details = parent.get_draft() or parent
+            children = [
+                child for child in gen_child_rrs(parent_details, user)
+                if child.is_accessible_by(user)]
+            commit_id = children[-1].extra_data.get(COMMIT_ID_KEY)
+
+        review_request = self.review_request_details.get_review_request()
+        repo_path = review_request.repository.path
+        command = 'hg pull -r'
+
+        if not commit_id:
+            logging.error('No commit_id for review request: %d' % (
+                review_request.id))
+            command = ''
+            commit_id = ''
+            repo_path = ''
+
+        return get_template('mozreview/commit-info.html').render(Context({
+                'command': command,
+                'commit_id': commit_id,
+                'repo_path': repo_path,
+        }))
+
 
 class BaseCommitField(BaseReviewRequestField):
     """Field for the commit a review request is based on.

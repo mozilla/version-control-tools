@@ -1,0 +1,8 @@
+{% comment %}
+This is the template for the instructions on how to deal with commits.
+{% endcomment %}
+
+{% load i18n %}
+{% load djblets_utils %}
+
+<input style="font-size: smaller; position: relative; top:-3px" value="{{command}} {{commit_id}} {{repo_path}}" onclick="this.select();" readonly>

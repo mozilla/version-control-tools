@@ -114,16 +114,7 @@ Review request 6 should be added to the list of discard on publish rids.
   commit: bz://1/mynick
   submitter: default+5
   summary: bz://1/mynick
-  description:
-  - /r/2 - Bug 1 - Foo 1
-  - /r/3 - Bug 1 - Foo 2
-  - /r/4 - Bug 1 - Foo 3
-  - /r/5 - Bug 1 - Foo 4
-  - /r/6 - Bug 1 - Foo 5
-  - ''
-  - 'Pull down these commits:'
-  - ''
-  - hg pull -r 76088734e3cba33be80930be14e7cd1e9ee474be http://*:$HGPORT/test-repo (glob)
+  description: This is the parent review request
   target_people: []
   extra_data:
     p2rb: true
@@ -143,15 +134,7 @@ Review request 6 should be added to the list of discard on publish rids.
     - '1'
     commit: bz://1/mynick
     summary: bz://1/mynick
-    description:
-    - /r/2 - Bug 1 - Foo 1
-    - /r/3 - Bug 1 - Foo 2
-    - /r/4 - Bug 1 - Foo 3
-    - /r/5 - Bug 1 - Foo 4
-    - ''
-    - 'Pull down these commits:'
-    - ''
-    - hg pull -r 98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb http://*:$HGPORT/test-repo (glob)
+    description: This is the parent review request
     target_people: []
     extra:
       p2rb: true
@@ -308,15 +291,7 @@ request is published.
   commit: bz://1/mynick
   submitter: default+5
   summary: bz://1/mynick
-  description:
-  - /r/2 - Bug 1 - Foo 1
-  - /r/3 - Bug 1 - Foo 2
-  - /r/4 - Bug 1 - Foo 3
-  - /r/5 - Bug 1 - Foo 4
-  - ''
-  - 'Pull down these commits:'
-  - ''
-  - hg pull -r 98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb http://*:$HGPORT/test-repo (glob)
+  description: This is the parent review request
   target_people: []
   extra_data:
     p2rb: true
@@ -336,14 +311,7 @@ request is published.
     - '1'
     commit: bz://1/mynick
     summary: bz://1/mynick
-    description:
-    - /r/2 - Bug 1 - Foo 2
-    - /r/3 - Bug 1 - Foo 3
-    - /r/4 - Bug 1 - Foo 4
-    - ''
-    - 'Pull down these commits:'
-    - ''
-    - hg pull -r b5473ad606f40840715d6b378dacc1a37f6263b1 http://*:$HGPORT/test-repo (glob)
+    description: This is the parent review request
     target_people: []
     extra:
       p2rb: true

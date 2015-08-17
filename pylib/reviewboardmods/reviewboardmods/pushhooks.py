@@ -406,24 +406,6 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
             # in a previous push, so do nothing.
             pass
 
-
-    squashed_description = []
-    for commit in commits['individual']:
-        squashed_description.append('/r/%s - %s' % (
-            node_to_rid[commit['id']],
-            commit['message'].splitlines()[0]))
-
-    squashed_description.extend(['', 'Pull down '])
-    if len(commits['individual']) == 1:
-        squashed_description[-1] += 'this commit:'
-    else:
-        squashed_description[-1] += 'these commits:'
-
-    squashed_description.extend([
-        '',
-        'hg pull -r %s %s' % (commits['individual'][-1]['id'], repo_url),
-    ])
-
     commit_list = []
     for commit in commits['individual']:
         node = commit['id']
@@ -434,7 +416,9 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
 
     props = {
         'summary': identifier,
-        'description': '%s\n' % '\n'.join(squashed_description),
+        # Reviewboard does not allow review requests with empty descriptions to
+        # be published, so we insert some filler here.
+        'description': 'This is the parent review request',
         'depends_on': depends,
         'extra_data.p2rb.commits': commit_list_json,
     }

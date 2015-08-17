@@ -63,13 +63,7 @@ Squashed review request with ID 1 should be closed as submitted...
   commit: bz://1/mynick
   submitter: default+5
   summary: bz://1/mynick
-  description:
-  - /r/2 - Bug 1 - Foo 1
-  - /r/3 - Bug 1 - Foo 2
-  - ''
-  - 'Pull down these commits:'
-  - ''
-  - hg pull -r 233b570e5356d0c84bcbf0633de446172012b3b3 http://*:$HGPORT/test-repo (glob)
+  description: This is the parent review request
   target_people: []
   extra_data:
     p2rb: true
@@ -139,13 +133,7 @@ Squashed review request with ID 1 should be re-opened...
   commit: bz://1/mynick
   submitter: default+5
   summary: bz://1/mynick
-  description:
-  - /r/2 - Bug 1 - Foo 1
-  - /r/3 - Bug 1 - Foo 2
-  - ''
-  - 'Pull down these commits:'
-  - ''
-  - hg pull -r 233b570e5356d0c84bcbf0633de446172012b3b3 http://*:$HGPORT/test-repo (glob)
+  description: This is the parent review request
   target_people: []
   extra_data:
     p2rb: true
