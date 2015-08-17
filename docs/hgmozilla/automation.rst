@@ -10,6 +10,12 @@ article attempts to answer common questions and to suggest best practices.
 Best Practices
 ==============
 
+Read the Scripting Help Topic
+-----------------------------
+
+``hg help scripting`` (introduced in Mercurial 3.5) gives a Mercurial
+generic overview of how machines should consume Mercurial.
+
 Get Design and Code Review from Someone Who Knows Mercurial
 -----------------------------------------------------------
 
