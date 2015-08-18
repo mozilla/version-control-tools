@@ -415,6 +415,29 @@ We disallow completely empty revisions.
   abort: not reviewing empty revision 1bcdd587da6e. please add content.
   [255]
 
+Check for empty commits not at the tip
+
+  $ echo after-empty > foo
+  $ hg qnew -m 'Bug 1 - after empty' -d '0 0' after-empty
+  $ hg push
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 2 changesets with 1 changes to 1 files (+1 heads)
+  remote: Trying to insert into pushlog.
+  remote: Inserted into the pushlog db successfully.
+  (You are using mq to develop patches. For the best code review experience, use bookmark-based development with changeset evolution. Read more at http://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview-user.html)
+  submitting 2 changesets for review
+  abort: reviewboard error: "The specified diff file is empty. (HTTP 400, API Error 219)". please try submitting the review again. if that doesn't work, you've likely encountered a bug.
+  [255]
+
+  $ hg qpop -a
+  popping after-empty
+  popping empty-patch
+  patch queue now empty
+
 Old client not supporting capabilities is rejected
 
   $ hg up -q -r 0
