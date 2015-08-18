@@ -421,7 +421,7 @@ def reposetup(ui, repo):
                         stream=stream)
 
             pyver = sys.version_info
-            pyver = (pyver.major, pyver.minor, pyver.micro)
+            pyver = (pyver[0], pyver[1], pyver[2])
 
             # Testing backdoor.
             if ui.config('bundleclone', 'fakepyver'):
