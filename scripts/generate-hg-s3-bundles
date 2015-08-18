@@ -229,8 +229,8 @@ def generate_bundles(repo):
             paths[t] = (remote_path, size)
 
         # TODO make CDN first entry so it is preferred by default.
-        manifest.append('%s/%s/%s %s cdn=true requiresni=true' % (
-            CDN, remote_path, name, params))
+        manifest.append('%s/%s %s cdn=true requiresni=true' % (
+            CDN, remote_path, params))
 
     manifest_path = os.path.join(repo_full, '.hg', 'bundleclone.manifest')
     with open(manifest_path, 'wb') as fh:
