@@ -324,13 +324,6 @@ def wrappedpushdiscovery(orig, pushop):
     if not pushop.revs:
         pushop.revs = [repo['.'].node()]
 
-    # We stop completely empty changesets prior to review.
-    for rev in pushop.revs:
-        ctx = repo[rev]
-        if not ctx.files():
-            raise util.Abort(_('not reviewing empty revision %s. please add'
-                               ' content.' % hex(rev)[:12]))
-
     tipnode = None
     basenode = None
 
@@ -389,6 +382,14 @@ def wrappedpushdiscovery(orig, pushop):
         raise util.Abort(
             _('no non-public changesets left to review'),
             hint=_('add or change the -r argument to include draft changesets'))
+
+    # We stop completely empty changesets prior to review.
+    for node in nodes:
+        ctx = repo[node]
+        if not ctx.files():
+            raise util.Abort(
+                    _('cannot review empty changeset %s') % ctx.hex()[:12],
+                    hint=_('add files to or remove changeset'))
 
     # Ensure all reviewed changesets have commit IDs.
     replacenodes = []
