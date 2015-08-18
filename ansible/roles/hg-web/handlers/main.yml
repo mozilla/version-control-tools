@@ -2,5 +2,7 @@
 - name: restart cgconfig
   service: name=cgconfig state=restarted
 
+# Fails in Docker.
 - name: restart rsyslogd
   service: name=rsyslogd state=restarted
+  ignore_errors: True
