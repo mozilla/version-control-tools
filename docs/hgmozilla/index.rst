@@ -13,9 +13,12 @@ to the right place!
    installing
    extensions
    auth
-   common
+   dag
+   workflows
    bookmarks
+   common
    firefoxtree
    unifiedrepo
+   firefoxworkflow
    automation
    issues
