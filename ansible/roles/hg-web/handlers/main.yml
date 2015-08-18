@@ -4,5 +4,5 @@
 
 # Fails in Docker.
 - name: restart rsyslogd
-  service: name=rsyslogd state=restarted
+  service: name=rsyslog state=restarted
   ignore_errors: True
