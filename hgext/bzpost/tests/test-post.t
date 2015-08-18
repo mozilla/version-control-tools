@@ -98,11 +98,7 @@ Pushing to mozilla-inbound will result in bug being updated
       id: 2
       tags: []
       text:
-      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/b507e8e331609b343b4f2207cb9f899ff00aef0c'
-      - 'changeset:  b507e8e331609b343b4f2207cb9f899ff00aef0c'
-      - 'user:       test'
-      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
-      - 'description:'
+      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/b507e8e331609b343b4f2207cb9f899ff00aef0c
       - Bug 1 - Commit to inbound
     component: TestComponent
     depends_on: []
@@ -160,26 +156,11 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
       id: 5
       tags: []
       text:
-      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/7edeca8d7f49bf5bc3c979fdc4b094c7854381c3'
-      - 'changeset:  7edeca8d7f49bf5bc3c979fdc4b094c7854381c3'
-      - 'user:       test'
-      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
-      - 'description:'
+      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/7edeca8d7f49bf5bc3c979fdc4b094c7854381c3
       - Bug 2 - First commit
       - ''
-      - This is a long commit message.
-      - ''
-      - With multiple lines in the commit message. This is a long paragraph.
-      - It will test wrapping.
-      - ''
-      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/d9ef0680b2c01b81a6b1057fb368d4c9ea54d7db'
-      - 'changeset:  d9ef0680b2c01b81a6b1057fb368d4c9ea54d7db'
-      - 'user:       test'
-      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
-      - 'description:'
+      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/d9ef0680b2c01b81a6b1057fb368d4c9ea54d7db
       - Bug 2 - Second commit
-      - ''
-      - This is a commit.
     component: TestComponent
     depends_on: []
     platform: All
@@ -199,11 +180,7 @@ Pushing multiple changesets with multiple bugs will result in bug being updated
       id: 6
       tags: []
       text:
-      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/d2c84e3fb8c79f9699d4eb6537b155e09e290ec4'
-      - 'changeset:  d2c84e3fb8c79f9699d4eb6537b155e09e290ec4'
-      - 'user:       test'
-      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
-      - 'description:'
+      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/d2c84e3fb8c79f9699d4eb6537b155e09e290ec4
       - Bug 3 - Another bug
     component: TestComponent
     depends_on: []
@@ -405,11 +382,7 @@ Pushing commit with bug number to user repo will post comment if enabled
       id: 13
       tags: []
       text:
-      - 'url:        http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central/rev/e48ee73711db53ffbde012f289787998e918ccba'
-      - 'changeset:  e48ee73711db53ffbde012f289787998e918ccba'
-      - 'user:       test'
-      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
-      - 'description:'
+      - http://localhost:$HGPORT/users/bzpost_mozilla.com/mozilla-central/rev/e48ee73711db53ffbde012f289787998e918ccba
       - Bug 7 - New changeset with bug.
     component: TestComponent
     depends_on: []
@@ -465,11 +438,7 @@ Verify cookie auth works
       id: 15
       tags: []
       text:
-      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/61dd85eacc29239f31fe4791555a17a8e4590904'
-      - 'changeset:  61dd85eacc29239f31fe4791555a17a8e4590904'
-      - 'user:       test'
-      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
-      - 'description:'
+      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/61dd85eacc29239f31fe4791555a17a8e4590904
       - Bug 8 - Test cookie auth
     component: TestComponent
     depends_on: []
@@ -522,7 +491,7 @@ Pushing commit with bug number to excluded tree will not post comment
 
   $ cd ..
 
-Unicode in author and commit message works
+Unicode in commit message works
 
   $ $TESTDIR/bugzilla create-bug TestProduct TestComponent bug10
   $ hg -q clone -r 0 mozilla-central unicode
@@ -532,7 +501,7 @@ Unicode in author and commit message works
   $ cat > message << EOF
   > Bug 10 - I am Quèze!
   > EOF
-  $ HGENCODING=utf-8 HGUSER='Quèze' hg commit -l message
+  $ HGENCODING=utf-8 hg commit -l message
 
   $ hg push -f http://localhost:$HGPORT/integration/mozilla-inbound
   pushing to http://localhost:$HGPORT/integration/mozilla-inbound
@@ -556,11 +525,7 @@ Unicode in author and commit message works
       id: 18
       tags: []
       text:
-      - 'url:        http://localhost:$HGPORT/integration/mozilla-inbound/rev/853e7b5582a855a0657750740aef6eee540187bb'
-      - 'changeset:  853e7b5582a855a0657750740aef6eee540187bb'
-      - "user:       Qu\xE8ze"
-      - 'date:       Thu Jan 01 00:00:00 1970 +0000'
-      - 'description:'
+      - http://localhost:$HGPORT/integration/mozilla-inbound/rev/e1e3dc0fcc924337e1fb76df828ce14c19d12339
       - "Bug 10 - I am Qu\xE8ze!"
     component: TestComponent
     depends_on: []

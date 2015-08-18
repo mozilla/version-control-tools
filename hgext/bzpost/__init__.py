@@ -195,16 +195,12 @@ def wrappedpushbookmark(orig, pushop):
 
         for node in missing_nodes:
             ctx = pushop.repo[node]
-            lines.append('url:        %s/rev/%s' % (baseuri, ctx.hex()))
-            lines.append('changeset:  %s' % ctx.hex())
-            # user and description are using local encodings. Depending on the
+            lines.append('%s/rev/%s' % (baseuri, ctx.hex()))
+            # description is using local encodings. Depending on the
             # configured encoding, replacement characters could be involved. We
             # use encoding.fromlocal() to get the raw bytes, which should be
             # valid UTF-8.
-            lines.append('user:       %s' % encoding.fromlocal(ctx.user()))
-            lines.append('date:       %s' % util.datestr(ctx.date()))
-            lines.append('description:')
-            lines.append(encoding.fromlocal(ctx.description()))
+            lines.append(encoding.fromlocal(ctx.description()).splitlines()[0])
             lines.append('')
 
         comment = '\n'.join(lines)
