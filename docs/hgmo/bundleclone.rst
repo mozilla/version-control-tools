@@ -75,6 +75,16 @@ stream
    default ``gzip`` bundles, but they consume 4-6x less CPU time to
    process.
 
+cdn
+   Indicates whether the URL is on a CDN. Value is ``true`` to indicate
+   the URL is a CDN. All other values or undefined values are to be
+   interpretted as not a CDN.
+
+requiresni
+   Indicates whether the URL requires SNI (a TLS extension). This is set
+   to ``true`` for URLs where multiple certificates are installed on the
+   same IP and SNI is required. It is undefined everywhere else.
+
 .. note::
 
    ``compression`` and ``stream`` are both used to control the type of

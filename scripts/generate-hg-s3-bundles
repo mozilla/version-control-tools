@@ -25,6 +25,8 @@ HOSTS = (
     ('s3-external-1.amazonaws.com', 'moz-hg-bundles-us-east-1', 'us-east-1'),
 )
 
+CDN = 'https://hg.cdn.mozilla.net'
+
 # We store bundles on the local filesystem because they may cause chaos
 # with volume snapshots. See bug 1167935.
 BUNDLE_ROOT = '/repo/bundles'
@@ -213,18 +215,22 @@ def generate_bundles(repo):
     paths = {}
     manifest = []
     for t, final_path, temp_path, remote_path in files:
-        for host, bucket, name in HOSTS:
-            entry = 'https://%s/%s/%s ec2region=%s' % (host, bucket,
-                                                       remote_path, name)
-            if t == 'stream':
-                entry += ' stream=revlogv1'
-            else:
-                entry += ' compression=%s' % t
+        if t == 'stream':
+            params = 'stream=revlogv1'
+        else:
+            params = 'compression=%s' % t
 
+        for host, bucket, name in HOSTS:
+            entry = 'https://%s/%s/%s ec2region=%s %s' % (
+                host, bucket, remote_path, name, params)
             manifest.append(entry)
 
             size = os.path.getsize(final_path)
             paths[t] = (remote_path, size)
+
+        # TODO make CDN first entry so it is preferred by default.
+        manifest.append('%s/%s/%s %s cdn=true requiresni=true' % (
+            CDN, remote_path, name, params))
 
     manifest_path = os.path.join(repo_full, '.hg', 'bundleclone.manifest')
     with open(manifest_path, 'wb') as fh:
