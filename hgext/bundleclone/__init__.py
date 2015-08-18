@@ -151,8 +151,21 @@ potentially be flooded by tons of new clone requests, drastically increasing
 its load and possibly overwhelming it. Disallowing fallback on failure is a
 safeguard to prevent this from happening.
 
+SNI
+===
+
+Python < 2.7.9 does not support SNI, a TLS extension that allows multiple
+SSL certificates to be installed on the same IP. Hosting services often
+use SNI to enable multiple services to exist on the same IP.
+
+The ``requiresni`` manifest attribute can be defined on the server to
+indicate whether an entry requires SNI. If it is ``true`` and the client
+doesn't support SNI, the entry is automatically discarded. For this reason,
+server operators may want to ensure that there is a non-SNI entry in the
+manifest to ensure all clients can fetch the bundles.
 """
 
+import sys
 import time
 import urllib
 import urllib2
@@ -407,7 +420,16 @@ def reposetup(ui, repo):
                 return super(bundleclonerepo, self).clone(remote, heads=heads,
                         stream=stream)
 
+            pyver = sys.version_info
+            pyver = (pyver.major, pyver.minor, pyver.micro)
+
+            # Testing backdoor.
+            if ui.config('bundleclone', 'fakepyver'):
+                pyver = ui.configlist('bundleclone', 'fakepyver')
+                pyver = tuple(int(v) for v in pyver)
+
             entries = []
+            snifiltered = False
 
             for line in result.splitlines():
                 fields = line.split()
@@ -417,7 +439,29 @@ def reposetup(ui, repo):
                     key, value = rawattr.split('=', 1)
                     attrs[urllib.unquote(key)] = urllib.unquote(value)
 
+                # Filter out SNI entries if we don't support SNI.
+                if attrs.get('requiresni') == 'true' and pyver < (2, 7, 9):
+                    # Take this opportunity to inform people they are using an
+                    # old, insecure Python.
+                    if not snifiltered:
+                        self.ui.warn(_('(ignoring URL on server that requires '
+                                       'SNI)\n'))
+                        self.ui.warn(_('(your Python is older than 2.7.9 and '
+                                       'does not support modern and secure '
+                                       'SSL/TLS; please consider upgrading '
+                                       'your Python to a secure version)\n'))
+                    snifiltered = True
+                    continue
+
                 entries.append((url, attrs))
+
+            if not entries:
+                # Don't fall back to normal clone because we don't want mass
+                # fallback in the wild to barage servers expecting bundle
+                # offload.
+                raise util.Abort(_('no appropriate bundles available'),
+                                 hint=_('you may wish to complain to the '
+                                        'server operator'))
 
             # The configuration is allowed to define lists of preferred
             # attributes and values. If this is present, sort results according
