@@ -28,6 +28,7 @@ PYTHON_COVERAGE_DIRS = (
 UNIT_TEST_DIRS = [
     'autoland/tests',
     'scripts/pash/tests',
+    'hgserver/tests',
     'pylib',
 ]
 
