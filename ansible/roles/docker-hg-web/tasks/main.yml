@@ -1,10 +1,4 @@
 ---
-- name: install hgweb wsgi files
-  copy: src={{ item }} dest=/repo/hg/webroot_wsgi/{{ item }} owner=hg group=hg
-  with_items:
-    - hgweb.config
-    - hgweb.wsgi
-
 - name: install Docker support files
   copy: src={{ item }} dest=/{{ item }} owner=root group=root mode=0755
   with_items:
