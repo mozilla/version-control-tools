@@ -153,12 +153,14 @@ class HgCluster(object):
 
             web_states = [f.result() for f in f_web_states]
 
-        with futures.ThreadPoolExecutor(4) as e:
+        with futures.ThreadPoolExecutor(2) as e:
             f_private_key = e.submit(self._d.get_file_content, master_id, '/etc/mercurial/mirror')
             f_public_key = e.submit(self._d.get_file_content, master_id, '/etc/mercurial/mirror.pub')
 
         mirror_private_key = f_private_key.result()
         mirror_public_key = f_public_key.result()
+
+        f_mirror_host_keys = []
 
         # Reconcile state across all the containers.
         with futures.ThreadPoolExecutor(web_count + 1) as e:
@@ -171,9 +173,20 @@ class HgCluster(object):
             for i in web_ids:
                 e.submit(self._d.execute(i, cmd))
 
-            # Tell the master about all the mirrors.
-            mirrors = [s['NetworkSettings']['IPAddress'] for s in web_states]
-            e.submit(self._d.execute, master_id, ['/set-mirrors.py'] + mirrors)
+            # Obtain host keys from mirrors.
+            for s in web_states:
+                f_mirror_host_keys.append((
+                    s['NetworkSettings']['IPAddress'],
+                    e.submit(self._d.get_file_content, s['Id'],
+                             '/etc/ssh/ssh_host_rsa_key.pub')))
+
+        # Tell the master about all the mirrors.
+        args = ['/set-mirrors.py']
+        for ip, f_key in f_mirror_host_keys:
+            key = f_key.result().strip()
+            key = ' '.join(key.split()[0:2])
+            args.extend([ip, key])
+        self._d.execute(master_id, args)
 
         ldap_hostname, ldap_hostport = \
                 self._d._get_host_hostname_port(ldap_state, '389/tcp')
