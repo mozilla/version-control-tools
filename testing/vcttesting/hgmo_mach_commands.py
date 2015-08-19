@@ -4,7 +4,9 @@
 
 from __future__ import print_function, unicode_literals
 
+import argparse
 import os
+import subprocess
 import sys
 
 from mach.decorators import (
@@ -113,3 +115,23 @@ class HgmoCommands(object):
                      help='Directory where to save code coverage files')
     def aggregate_code_coverage(self, destdir):
         self.c.aggregate_code_coverage(destdir)
+
+    @Command('exec', category='hgmo',
+             description='Execute a command in a Docker container')
+    @CommandArgument('name', help='Name of container to execute inside')
+    @CommandArgument('command', help='Command to execute',
+                     nargs=argparse.REMAINDER)
+    def execute(self, name, command):
+        if name == 'hgssh':
+            cid = self.c.master_id
+        elif name.startswith('hgweb'):
+            i = int(name[5:])
+            cid = self.c.web_ids[i]
+        else:
+            print('invalid name. must be "hgssh" or "hgwebN"')
+            return 1
+
+        args = '' if 'TESTTMP' in os.environ else '-it'
+        return subprocess.call('docker exec %s %s %s' % (
+                               args, cid, ' '.join(command)),
+                               shell=True)
