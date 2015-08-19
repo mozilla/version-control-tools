@@ -9,7 +9,7 @@ import pwd
 import stat
 import sys
 
-priv, pub = sys.argv[1:]
+priv, pub, master_ip, master_key = sys.argv[1:]
 
 with open('/etc/mercurial/mirror', 'wb') as fh:
     fh.write(priv)
@@ -33,5 +33,10 @@ with open('/home/hg/.ssh/authorized_keys', 'wb') as fh:
     fh.write(pub.strip())
     fh.write('\n')
 
+with open('/home/hg/.ssh/known_hosts', 'wb') as fh:
+    fh.write('%s %s\n' % (master_ip, master_key))
+
 os.chown('/home/hg/.ssh/authorized_keys', uhg.pw_uid, ghg.gr_gid)
 os.chmod('/home/hg/.ssh/authorized_keys', stat.S_IRUSR | stat.S_IWUSR)
+os.chown('/home/hg/.ssh/known_hosts', uhg.pw_uid, ghg.gr_gid)
+os.chmod('/home/hg/.ssh/known_hosts', stat.S_IRUSR | stat.S_IWUSR)

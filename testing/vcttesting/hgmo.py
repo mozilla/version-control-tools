@@ -153,22 +153,27 @@ class HgCluster(object):
 
             web_states = [f.result() for f in f_web_states]
 
-        with futures.ThreadPoolExecutor(2) as e:
+        with futures.ThreadPoolExecutor(3) as e:
             f_private_key = e.submit(self._d.get_file_content, master_id, '/etc/mercurial/mirror')
             f_public_key = e.submit(self._d.get_file_content, master_id, '/etc/mercurial/mirror.pub')
+            f_master_host_key = e.submit(self._d.get_file_content, master_id,
+                                         '/etc/ssh/ssh_host_rsa_key.pub')
 
         mirror_private_key = f_private_key.result()
         mirror_public_key = f_public_key.result()
+        master_host_key = f_master_host_key.result()
+        master_host_key = ' '.join(master_host_key.split()[0:2])
 
         f_mirror_host_keys = []
 
-        # Reconcile state across all the containers.
         with futures.ThreadPoolExecutor(web_count + 1) as e:
-            # Update the SSH key for the "hg" user on the web containers.
+            # Set SSH keys on hgweb instances.
             cmd = [
                 '/set-mirror-key.py',
                 mirror_private_key,
                 mirror_public_key,
+                master_state['NetworkSettings']['IPAddress'],
+                master_host_key,
             ]
             for i in web_ids:
                 e.submit(self._d.execute(i, cmd))
