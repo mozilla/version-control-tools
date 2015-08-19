@@ -10,11 +10,6 @@ source venv/bin/activate
 pip install --upgrade pip
 pip install --upgrade -r test-requirements.txt
 
-# ReviewBoard doesn't work with pip, sadly.
-# TODO: As of version 2.0.16 Wheel packages are being
-# released and Review Board should now work with pip.
-easy_install ReviewBoard==2.0.17
-
 cd pylib/Bugsy
 python setup.py develop
 cd ../..

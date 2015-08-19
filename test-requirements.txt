@@ -1,9 +1,7 @@
---find-links http://downloads.reviewboard.org/releases/Djblets/0.8/
---find-links http://downloads.reviewboard.org/releases/django-evolution/0.7/
---allow-external rbtools
---allow-unverified rbtools
---allow-external django-evolution
---allow-unverified django-evolution
+--find-links https://downloads.reviewboard.org/releases/Djblets/0.8/
+--find-links https://downloads.reviewboard.org/releases/django-evolution/0.7/
+--find-links https://downloads.reviewboard.org/releases/RBTools/0.6/
+--find-links https://downloads.reviewboard.org/releases/ReviewBoard/2.0/
 alabaster==0.7.3
 amqp==1.4.6
 ansible==1.9.0.1
@@ -63,6 +61,7 @@ RBTools==0.6.1
 recaptcha-client==1.0.6
 requests==2.7.0
 responses==0.3.0
+ReviewBoard==2.0.17
 selenium==2.45.0
 setuptools==14.3.1
 six==1.9.0
