@@ -72,4 +72,4 @@ It got replicated to mirrors
   "phase": "public"
   }
 
-  $ hgmo clean
+  $ hgmo stop
