@@ -24,6 +24,23 @@ PYTHON_COVERAGE_DIRS = (
     'hghooks',
 )
 
+# Directories containing Python unit tests.
+UNIT_TEST_DIRS = [
+    'autoland/tests',
+    'scripts/pash/tests',
+    'pylib',
+]
+
+# Directories whose Python unit tests we should ignore.
+UNIT_TEST_IGNORES = (
+    'pylib/Bugsy',
+    'pylib/flake8',
+    'pylib/mccabe',
+    'pylib/pep8',
+    'pylib/pyflakes',
+    'pylib/requests',
+)
+
 COVERAGE_OMIT = (
     'venv/*',
     'pylib/Bugsy/*',
@@ -97,29 +114,12 @@ def get_test_files(extensions):
                    for f in os.listdir(hooks_test_dir)
                    if is_test_filename(f)]
 
-    # Directories containing Python unit tests.
-    unit_test_dirs = [
-        'autoland/tests',
-        'scripts/pash/tests',
-        'pylib',
-    ]
-
-    # Directories whose Python unit tests we should ignore.
-    unit_test_ignores = (
-        'pylib/Bugsy',
-        'pylib/flake8',
-        'pylib/mccabe',
-        'pylib/pep8',
-        'pylib/pyflakes',
-        'pylib/requests',
-    )
-
     unit_tests = []
-    for base in unit_test_dirs:
+    for base in UNIT_TEST_DIRS:
         base = os.path.join(ROOT, base)
         for root, dirs, files in os.walk(base):
             relative = root[len(ROOT) + 1:]
-            if relative.startswith(unit_test_ignores):
+            if relative.startswith(UNIT_TEST_IGNORES):
                 continue
 
             for f in files:
