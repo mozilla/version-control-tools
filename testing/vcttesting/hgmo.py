@@ -84,6 +84,7 @@ class HgCluster(object):
             self.ldap_uri = None
             self.master_ssh_hostname = None
             self.master_ssh_port = None
+            self.master_host_key = None
             self.web_urls = []
 
     def start(self, ldap_port=None, master_ssh_port=None, web_count=2,
@@ -212,6 +213,7 @@ class HgCluster(object):
         self.web_ids = web_ids
         self.master_ssh_hostname = master_ssh_hostname
         self.master_ssh_port = master_ssh_hostport
+        self.master_host_key = master_host_key
         self.web_urls = []
         for s in web_states:
             hostname, hostport = self._d._get_host_hostname_port(s, '80/tcp')
@@ -269,6 +271,7 @@ class HgCluster(object):
                 'ldap_uri': self.ldap_uri,
                 'master_ssh_hostname': self.master_ssh_hostname,
                 'master_ssh_port': self.master_ssh_port,
+                'master_host_key': self.master_host_key,
                 'web_urls': self.web_urls,
         }
         with open(self.state_path, 'wb') as fh:

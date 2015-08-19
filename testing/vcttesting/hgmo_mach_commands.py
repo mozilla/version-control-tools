@@ -57,6 +57,8 @@ class HgmoCommands(object):
     def shellinit(self):
         print('export SSH_SERVER=%s' % self.c.master_ssh_hostname)
         print('export SSH_PORT=%d' % self.c.master_ssh_port)
+        # Don't export the full value because spaces.
+        print('export SSH_HOST_KEY=%s' % self.c.master_host_key.split()[1])
         for i, url in enumerate(self.c.web_urls):
             print('export HGWEB_%d_URL=%s' % (i, url))
 
