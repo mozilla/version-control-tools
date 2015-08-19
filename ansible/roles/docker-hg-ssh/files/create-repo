@@ -1,4 +1,7 @@
 #!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 set -e
 
@@ -6,3 +9,6 @@ hg init /repo/hg/mozilla/$1
 chown -R hg:$2 /repo/hg/mozilla/$1
 find /repo/hg/mozilla/$1 | xargs chmod g+w
 find /repo/hg/mozilla/$1 -type d | xargs chmod g+s
+
+# Ensure repo exists on mirrors.
+sudo -u hg /usr/local/bin/repo-push.sh $1
