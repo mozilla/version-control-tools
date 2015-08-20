@@ -172,6 +172,10 @@
   command: /usr/bin/rsync -a --delete-after /vct/ /repo/hg/version-control-tools/
   when: vct_dir.stat.exists == True
 
+- name: ensure version-control-tools permissions are sane (Docker only)
+  command: /bin/chmod -R a+r /repo/hg/version-control-tools
+  when: vct_dir.stat.exists == True
+
 - name: install rsyslog policy for hg
   copy: src=rsyslog-hg.conf
         dest=/etc/rsyslog.d/hg.conf
