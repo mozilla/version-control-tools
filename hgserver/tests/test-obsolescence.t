@@ -1,6 +1,6 @@
 #require docker
 
-  $ . $TESTDIR/scripts/pash/tests/helpers.sh
+  $ . $TESTDIR/hgserver/tests/helpers.sh
   $ hgmoenv
   $ standarduser
 
@@ -8,7 +8,7 @@
   $ hg -q clone ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
 
 Mark repo as non-publishing
-  $ testuserssh $SSH_SERVER edit repo-1 << EOF
+  $ standarduserssh $SSH_SERVER edit repo-1 << EOF
   > 3
   > EOF
   
@@ -24,7 +24,7 @@ Mark repo as non-publishing
 
 Enable obsolescence on the repo
 
-  $ testuserssh $SSH_SERVER edit repo-1 << EOF
+  $ standarduserssh $SSH_SERVER edit repo-1 << EOF
   > 5
   > EOF
   
@@ -124,4 +124,4 @@ Pulling should get the obsmarkers
 
   $ cd ..
 
-  $ cleanup
+  $ hgmo stop
