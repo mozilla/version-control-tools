@@ -1,6 +1,6 @@
 #require docker
 
-  $ . $TESTDIR/scripts/pash/tests/helpers.sh
+  $ . $TESTDIR/hgserver/tests/helpers.sh
   $ hgmoenv
   $ standarduser
 
@@ -29,7 +29,7 @@
 We should get a prompt saying we are creating a new user repo.
 This also tests the exit choice.
 
-  $ testuserssh $SSH_SERVER clone repo-1 << EOF
+  $ standarduserssh $SSH_SERVER clone repo-1 << EOF
   > 0
   > EOF
   Making repo repo-1 for user@example.com.
@@ -48,7 +48,7 @@ This also tests the exit choice.
 
 Choosing "no" should have the same effect as exiting
 
-  $ testuserssh $SSH_SERVER clone repo-1 << EOF
+  $ standarduserssh $SSH_SERVER clone repo-1 << EOF
   > 2
   > EOF
   Making repo repo-1 for user@example.com.
@@ -67,7 +67,7 @@ Choosing "no" should have the same effect as exiting
 
 Choosing "yes" will prompt us how to create the new repo
 
-  $ testuserssh $SSH_SERVER clone repo-1 << EOF
+  $ standarduserssh $SSH_SERVER clone repo-1 << EOF
   > 1
   > 0
   > EOF
@@ -95,7 +95,7 @@ Choosing "yes" will prompt us how to create the new repo
 
 Cloning a public repo will show a list of existing repos
 
-  $ testuserssh $SSH_SERVER clone repo-1 << EOF
+  $ standarduserssh $SSH_SERVER clone repo-1 << EOF
   > 1
   > 1
   > 0
@@ -133,7 +133,7 @@ Cloning a public repo will show a list of existing repos
 
 Selecting a repo will result in a prompt
 
-  $ testuserssh $SSH_SERVER clone repo-1 << EOF
+  $ standarduserssh $SSH_SERVER clone repo-1 << EOF
   > 1
   > 1
   > 2
@@ -179,7 +179,7 @@ Selecting a repo will result in a prompt
 Saying "no" is handled properly
 (TODO this is buggy)
 
-  $ testuserssh $SSH_SERVER clone repo-1 << EOF
+  $ standarduserssh $SSH_SERVER clone repo-1 << EOF
   > 1
   > 1
   > 2
@@ -227,7 +227,7 @@ Saying "no" is handled properly
 
 Saying "yes" to clone the repo will clone it.
 
-  $ testuserssh $SSH_SERVER clone repo-1 << EOF
+  $ standarduserssh $SSH_SERVER clone repo-1 << EOF
   > 1
   > 1
   > 2
@@ -309,7 +309,7 @@ TODO verify the new user repo shows up in hgweb
 
 Specifying the source path when doing a clone command works
 
-  $ testuserssh $SSH_SERVER clone repo-2 hgcustom/version-control-tools
+  $ standarduserssh $SSH_SERVER clone repo-2 hgcustom/version-control-tools
   Please wait.  Cloning /hgcustom/version-control-tools to /users/user_example.com/repo-2
   Clone complete.
   Fixing permissions, don't interrupt.
@@ -320,6 +320,6 @@ TODO verify new user repo shows up in hgweb
 Specifying an invalid source repo to clone will result in error
 TODO this behavior is wrong (bug 758608)
 
-  $ testuserssh $SSH_SERVER clone repo-missing does-not-exist
+  $ standarduserssh $SSH_SERVER clone repo-missing does-not-exist
 
-  $ cleanup
+  $ hgmo stop

@@ -28,3 +28,13 @@ Host *
   ForwardX11 no
 EOF
 }
+
+standarduser() {
+  hgmo create-ldap-user user@example.com testuser 1500 'Test User' --key-file testuser --scm-level 1
+  cat >> $HGRCPATH << EOF
+[ui]
+ssh = ssh -F `pwd`/ssh_config -i `pwd`/testuser -l user@example.com
+EOF
+}
+
+alias standarduserssh='ssh -F ssh_config -i testuser -l user@example.com -p $HGPORT'
