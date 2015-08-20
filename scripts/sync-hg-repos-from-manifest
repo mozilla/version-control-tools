@@ -48,18 +48,8 @@ def clone_or_pull(rel, path, requires, url, user, group):
             print('creating empty repo: %s' % path)
             subprocess.check_output(args, cwd='/', stderr=subprocess.STDOUT)
 
-        # Some repos reference Python hooks in the mozhghooks package. We
-        # need to explicitly list the path to this directory in the
-        # environment.
-        # TODO a better way to do this is to install the hooks inside the
-        # virtualenv or to convert the hooks to an extension that is globally
-        # enabled.
-        env = dict(os.environ)
-        env['PYTHONPATH'] = '/repo/hg/libraries'
-
         args = ['hg', '-R', path, 'pull', url]
-        subprocess.check_output(args, cwd='/', env=env,
-                                stderr=subprocess.STDOUT)
+        subprocess.check_output(args, cwd='/', stderr=subprocess.STDOUT)
 
         # Synchronize hgrc file via mirror-pull.
         # This should ideally be part of `hg pull`.
