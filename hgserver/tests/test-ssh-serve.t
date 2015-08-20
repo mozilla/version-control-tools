@@ -1,6 +1,6 @@
 #require docker
 
-  $ . $TESTDIR/scripts/pash/tests/helpers.sh
+  $ . $TESTDIR/hgserver/tests/helpers.sh
   $ hgmoenv
 
   $ hgmo create-ldap-user user@example.com testuser 1000 'Test User' --key-file testuser --scm-level 1
@@ -14,7 +14,6 @@ We are able to clone via SSH
 
   $ hgmo create-repo repo1 1
   $ hg clone ssh://$SSH_SERVER:$HGPORT/repo1
-  remote: Warning: Permanently added '[*]:$HGPORT' (RSA) to the list of known hosts. (glob)
   destination directory: repo1
   no changes found
   updating to branch default
@@ -46,4 +45,4 @@ A push works
   remote: View your change here:
   remote:   https://hg.mozilla.org/repo1/rev/96ee1d7354c4
 
-  $ cleanup
+  $ hgmo stop
