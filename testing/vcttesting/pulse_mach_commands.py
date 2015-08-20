@@ -73,6 +73,7 @@ class PulseCommands(object):
                 d[k] = v
 
             data.append(d)
+            message.ack()
 
         with conn.Consumer([q], callbacks=[onmessage], auto_declare=False):
             try:
