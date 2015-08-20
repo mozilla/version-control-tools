@@ -24,6 +24,8 @@ from sh_helper import (
     run_command,
 )
 
+HG = '/usr/bin/hg'
+
 USER_REPO_EXISTS = """
 You already have a repo called %s.
 
@@ -115,12 +117,12 @@ def run_hg_clone(cname, user_repo_dir, repo_name, source_repo_path, verbose=Fals
         run_command('mkdir %s' % userdir)
       print 'Please wait.  Cloning /%s to %s' % (source_repo_path, dest_url)
       if(verbose):
-        run_command('nohup /usr/bin/hg clone --debug --verbose --time --pull -U %s/%s %s' %
-                    (DOC_ROOT, source_repo_path, dest_dir),
+        run_command('nohup %s clone --debug --verbose --time --pull -U %s/%s %s' %
+                    (HG, DOC_ROOT, source_repo_path, dest_dir),
                     verbose=True)
       else:
-        run_command('nohup /usr/bin/hg clone --pull -U %s/%s %s' %
-                    (DOC_ROOT, source_repo_path, dest_dir))
+        run_command('nohup %s clone --pull -U %s/%s %s' %
+                    (HG, DOC_ROOT, source_repo_path, dest_dir))
 
       print "Clone complete."
     else:
@@ -261,7 +263,7 @@ def make_repo_clone(cname, repo_name, quick_src, verbose=False, source_repo=''):
             except Exception, e:
               print "Exception %s" % (e)
 
-          run_command('/usr/bin/nohup /usr/bin/hg init %s/users/%s/%s' % (DOC_ROOT, user_repo_dir, repo_name))
+          run_command('/usr/bin/nohup %s init %s/users/%s/%s' % (HG, DOC_ROOT, user_repo_dir, repo_name))
           run_repo_push('-e users/%s/%s' % (user_repo_dir, repo_name))
       fix_user_repo_perms(cname, repo_name)
       # New user repositories are non-publishing by default.
@@ -457,9 +459,9 @@ def serve(cname):
         if repo_expr.search(ssh_command):
             [(hg_path, repo_path, hg_command)] = repo_expr.findall(ssh_command)
             if hg_command == 'serve --stdio' and check_repo_name(repo_path):
-                hg_arg_string = '/usr/bin/hg -R ' + DOC_ROOT + '/' + repo_path + hg_command
+                hg_arg_string = HG + ' -R ' + DOC_ROOT + '/' + repo_path + hg_command
                 hg_args = hg_arg_string.split()
-                os.execv('/usr/bin/hg', hg_args)
+                os.execv(HG, hg_args)
             else:
                 sys.stderr.write("Thank you dchen! but.. I don't think so!\n")
                 sys.exit(1)
