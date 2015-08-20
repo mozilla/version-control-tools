@@ -2,6 +2,8 @@
 - name: Install packages required to run a Mercurial server
   yum: name={{ item }} state=present
   with_items:
+    # Needed to build python-ldap package for virtualenv.
+    - openldap-devel
     - python27
     - python-ldap
     - sudo
@@ -93,30 +95,45 @@
   file: path=/repo/hg/mozilla/users state=directory mode=0775 owner=hg group=scm_level_1
 
 - name: create virtualenv for Python processes
-  command: /usr/bin/virtualenv-2.7 /repo/hg/venv_tools creates=/repo/hg/venv_tools
+  command: /usr/bin/virtualenv-2.7 /repo/hg/{{ item }} creates=/repo/hg/{{ item }}
+  with_items:
+    - venv_pash
+    - venv_tools
 
 - name: copy peep.py to virtualenv
   copy: src=files/peep.py
-        dest=/repo/hg/venv_tools/bin/peep
+        dest=/repo/hg/{{ item }}/bin/peep
         mode=0755
         owner=root
         group=root
+  with_items:
+    - venv_pash
+    - venv_tools
 
 - name: configure shebang in peep
-  replace: dest=/repo/hg/venv_tools/bin/peep
+  replace: dest=/repo/hg/{{ item }}/bin/peep
            regexp='^#!\/usr\/bin\/env python$'
-           replace='#!/repo/hg/venv_tools/bin/python2.7'
+           replace='#!/repo/hg/{{ item }}/bin/python2.7'
+  with_items:
+    - venv_pash
+    - venv_tools
 
-- name: copy tools requirements.txt
-  copy: src=requirements-tools.txt
-        dest=/repo/hg/venv_tools/requirements.txt
+- name: copy requirements.txt
+  copy: src=requirements-{{ item }}.txt
+        dest=/repo/hg/venv_{{ item }}/requirements.txt
         owner=root
         group=root
         mode=0644
+  with_items:
+    - pash
+    - tools
 
 - name: populate virtualenv
-  pip: requirements=/repo/hg/venv_tools/requirements.txt
-       executable=/repo/hg/venv_tools/bin/peep
+  pip: requirements=/repo/hg/{{ item }}/requirements.txt
+       executable=/repo/hg/{{ item }}/bin/peep
+  with_items:
+    - venv_pash
+    - venv_tools
 
 - name: install rsyslog policy for hg
   copy: src=rsyslog-hg.conf
