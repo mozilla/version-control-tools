@@ -24,7 +24,7 @@ from sh_helper import (
     run_command,
 )
 
-HG = '/usr/bin/hg'
+HG = '/repo/hg/venv_pash/bin/hg'
 
 USER_REPO_EXISTS = """
 You already have a repo called %s.
