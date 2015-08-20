@@ -25,9 +25,9 @@ from mercurial.error import (
     Abort,
     RepoLookupError,
 )
-from mercurial.node import bin, hex
+from mercurial.node import bin
 
-testedwith = '3.2 3.3 3.4'
+testedwith = '3.4 3.5'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
@@ -225,30 +225,13 @@ class pushlog(object):
         # callbacks. When we run, the transaction object comes from
         # localrepository.transaction().
         #
-        # The transaction API changed significantly in Mercurial 3.3. It added
-        # various add* APIs to register callbacks to be called after various
-        # transaction events. We have 2 versions of our monkeypatch: one for
-        # 3.2 and another for 3.3+.
-        #
         # The code here essentially wraps transaction close/commit to DB
         # commit + close and transaction abort/rollback to DB close.
         # If the database is closed without a commit, the active database
         # transaction (our inserts) will be rolled back.
         tr = self.repo._transref()
-        newapi = hasattr(tr, 'addpostclose')
-        oldafter = None
-        oldabort = None
-
-        if not newapi:
-            assert tr.onabort is None
-            assert tr.after
-            oldafter = tr.after
-
-        oldabort = tr._abort
-
         c = self._getconn()
 
-        # New API.
         def onpostclose(tr):
             c.commit()
             c.close()
@@ -259,21 +242,8 @@ class pushlog(object):
                 tr.report('rolling back pushlog\n')
             c.close()
 
-        # Old API.
-        def abort():
-            onabort(None)
-            oldabort()
-
-        def commit():
-            oldafter()
-            onpostclose(None)
-
-        if newapi:
-            tr.addpostclose('pushlog', onpostclose)
-            tr.addabort('pushlog', onabort)
-        else:
-            tr.after = commit
-            tr._abort = abort
+        tr.addpostclose('pushlog', onpostclose)
+        tr.addabort('pushlog', onabort)
 
         # Now that the hooks are installed, any exceptions will result in db
         # close via one of our abort handlers.
