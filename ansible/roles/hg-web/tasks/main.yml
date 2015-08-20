@@ -202,6 +202,16 @@
   command: /usr/bin/rsync -a --delete-after /vct/ /repo/hg/version-control-tools/
   when: vct_dir.stat.exists == True
 
+# Various hgrc files reference hooks via "python:mozhghooks.*". Install
+# a link in the replication virtualenv to the path to these hooks inside
+# the version-control-tools checkout.
+- name: add mozhghooks to virtualenv
+  copy: dest=/repo/hg/venv_replication/lib/python2.7/site-packages/mozhghooks.pth
+        content=/repo/hg/version-control-tools/hghooks
+        owner=root
+        group=root
+        mode=0644
+
 # Settings from this file are inherited by every hg command run on the
 # system.
 - name: install global hgrc
