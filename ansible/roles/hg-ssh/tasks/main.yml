@@ -148,7 +148,7 @@
 # pash is a collection of Python files handling SSH connections. They behave
 # like a Python module but are installed not as such for historical reasons.
 - name: install pash
-  copy: src={{ vct }}/scripts/pash/{{ item }}
+  copy: src={{ vct }}/hgserver/pash/{{ item }}
         dest=/usr/local/bin/{{ item }}
         owner=root
         group=root

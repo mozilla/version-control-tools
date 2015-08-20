@@ -59,11 +59,7 @@ with Files('hgtemplates/**'):
     BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
     FINAL = True
 
-with Files('hghooks/**'):
-    BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
-    FINAL = True
-
-with Files('hgtemplates/**'):
+with Files('hgserver/**'):
     BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
     FINAL = True
 
@@ -77,8 +73,4 @@ with Files('pylib/rbbz/**'):
 
 with Files('pylib/reviewboardmods/**'):
     BUG_COMPONENT = ('Developer Services', 'MozReview')
-    FINAL = True
-
-with Files('scripts/pash/**'):
-    BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
     FINAL = True
