@@ -65,8 +65,6 @@ def process_non_root_login(user):
 
 
 if __name__ == '__main__':
-    os.environ['PYTHONPATH'] = '/repo/hg/libraries/'
-
     user = os.environ.get('USER')
 
     if user == 'root':

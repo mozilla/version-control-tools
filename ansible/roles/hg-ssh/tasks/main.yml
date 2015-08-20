@@ -158,6 +158,17 @@
   command: /usr/bin/rsync -a --delete-after /vct/ /repo/hg/version-control-tools/
   when: vct_dir.stat.exists == True
 
+# Hooks are referenced in various hgrc files via "python:mozhghooks.*".
+# This means they are imported as Python modules from the "mozhghooks"
+# package. We create a .pth file telling the pash virtualenv that
+# all hooks are located in the version-control-tools checkout.
+- name: add mozhghooks to virtualenv
+  copy: dest=/repo/hg/venv_pash/lib/python2.7/site-packages/mozhghooks.pth
+        content=/repo/hg/version-control-tools/hghooks
+        owner=root
+        group=root
+        mode=0644
+
 - name: install rsyslog policy for hg
   copy: src=rsyslog-hg.conf
         dest=/etc/rsyslog.d/hg.conf
