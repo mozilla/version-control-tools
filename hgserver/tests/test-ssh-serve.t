@@ -41,6 +41,7 @@ A push works
   remote: added 1 changesets with 1 changes to 1 files
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
+  remote: replication to mirrors completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/repo1/rev/96ee1d7354c4

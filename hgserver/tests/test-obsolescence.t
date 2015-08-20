@@ -78,6 +78,7 @@ Create initial repo content
   remote: added 3 changesets with 3 changes to 3 files (+1 heads)
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
+  remote: replication to mirrors completed successfully in \d+.\ds (re)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/96ee1d7354c4
@@ -110,9 +111,11 @@ Create some obsolescence markers
   remote: added 1 changesets with 0 changes to 1 files
   remote: Trying to insert into pushlog.
   remote: Inserted into the pushlog db successfully.
+  remote: replication to mirrors completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/d22031ed19ec
+  remote: replication to mirrors completed successfully in \d+.\ds (re)
   $ cd ..
 
 Pulling should get the obsmarkers
