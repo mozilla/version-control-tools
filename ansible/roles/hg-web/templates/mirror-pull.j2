@@ -53,9 +53,7 @@ LOCK_RETRIES=3 # 3 retries, the first is 5, second is 10, third is 15
 DELETE=false
 HGRC=false
 CHANGESET=""
-HG=/usr/bin/hg
-
-export PYTHONPATH=/repo_local/mozilla/libraries
+HG=/repo/hg/venv_replication/bin/hg
 
 while true; do
     case "$1" in 
