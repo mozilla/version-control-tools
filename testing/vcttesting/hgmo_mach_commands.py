@@ -126,6 +126,8 @@ class HgmoCommands(object):
     def execute(self, name, command):
         if name == 'hgssh':
             cid = self.c.master_id
+        elif name == 'pulse':
+            cid = self.c.pulse_id
         elif name.startswith('hgweb'):
             i = int(name[5:])
             cid = self.c.web_ids[i]
