@@ -1,4 +1,7 @@
 #!/bin/sh
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 die() {
     echo "$1" 1>&2
@@ -50,6 +53,7 @@ LOCK_RETRIES=3 # 3 retries, the first is 5, second is 10, third is 15
 DELETE=false
 HGRC=false
 CHANGESET=""
+HG=/usr/bin/hg
 
 export PYTHONPATH=/repo_local/mozilla/libraries
 
@@ -146,13 +150,13 @@ fi
 exit_code=0
 if [ -d "$name" ]; then
     echo "$name already exists, pulling"
-    retry hg -R $name pull $GLOBAL_HG_OPTS $CHANGESET
+    retry $HG -R $name pull $GLOBAL_HG_OPTS $CHANGESET
     exit_code=$?
 elif [ \! -e $name ]; then
     mkdir -p `dirname $name` 
     echo "$name does not yet exist, cloning"
     lockfile -r $LOCK_RETRIES ${PWD}/syncing.lck || die "Could not lock destination"
-    retry hg clone $GLOBAL_HG_OPTS -U -v "$src" $name
+    retry $HG clone $GLOBAL_HG_OPTS -U -v "$src" $name
     exit_code=$?
     rm ${PWD}/syncing.lck
 else
@@ -166,4 +170,3 @@ exit $exit_code
 # tab-width: 4
 # indent-tabs-mode: nil
 # end:
-
