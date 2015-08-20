@@ -14,7 +14,6 @@ logourl = https://developer.mozilla.org/en/docs/Mercurial
 style = gitweb_mozilla
 allow_archive = bz2 gz zip
 templates = /repo_local/mozilla/hg_templates/
-pygments_style = emacs
 encoding = UTF-8
 baseurl = http://hg.mozilla.org/
 maxchanges = 20
@@ -26,6 +25,7 @@ git = 1
 unified = 8
 
 [extensions]
+highlight =
 bundleclone = /repo_local/mozilla/extensions/bundleclone
 pushlog-feed = /repo_local/mozilla/extensions/pushlog-feed.py
 pushlog = /repo_local/mozilla/extensions/pushlog
