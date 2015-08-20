@@ -72,4 +72,11 @@ It got replicated to mirrors
   "phase": "public"
   }
 
+Pushlog should be replicated
+
+  $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-pushes
+  200
+  
+  {"1": {"changesets": ["96ee1d7354c4ad7372047672c36a1f561e3a6a4c"], "date": *, "user": "user1@example.com"}} (glob)
+
   $ hgmo stop
