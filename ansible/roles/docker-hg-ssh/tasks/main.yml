@@ -4,11 +4,12 @@
 - name: Remove SSH TTY requirement
   replace: dest=/etc/sudoers regexp='^Defaults    requiretty.*$' replace=''
 
-- name: Create create-repo script
-  copy: src=create-repo dest=/create-repo mode=0755
-
-- name: Create set-mirrors script
-  copy: src=set-mirrors.py dest=/set-mirrors.py mode=0755
+- name: install support scripts
+  copy: src={{ item }} dest=/{{ item }} mode=0755
+  with_items:
+    - activate-hook
+    - create-repo
+    - set-mirrors.py
 
 # While this file contains credentials, it needs to be world readable
 # because pash is executed as a regular user, since it is what runs as

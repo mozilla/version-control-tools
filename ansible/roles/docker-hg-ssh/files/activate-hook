@@ -1,0 +1,25 @@
+#!/repo/hg/venv_tools/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import ConfigParser
+import os
+import sys
+
+repo, key, value = sys.argv[1:]
+
+hgrc = '/repo/hg/mozilla/%s/.hg/hgrc' % repo
+
+c = ConfigParser.ConfigParser()
+
+if os.path.exists(hgrc):
+    c.read(hgrc)
+
+if not c.has_section('hooks'):
+    c.add_section('hooks')
+
+c.set('hooks', key, value)
+
+with open(hgrc, 'wb') as fh:
+    c.write(fh)
