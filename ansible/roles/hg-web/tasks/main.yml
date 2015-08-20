@@ -133,6 +133,7 @@
   command: /usr/bin/virtualenv-2.7 {{ item }} creates={{ item }}
   with_items:
     - "{{ venv_hgweb }}"
+    - "{{ venv_replication }}"
     - "{{ venv_tools }}"
 
 # We install peep from our own copy because this is more secure than
@@ -141,6 +142,7 @@
   copy: src=files/peep.py dest={{ item }}/bin/peep mode=0755 owner=root group=root
   with_items:
     - "{{ venv_hgweb }}"
+    - "{{ venv_replication }}"
     - "{{ venv_tools }}"
 
 - name: configure shebang in peep
@@ -149,11 +151,19 @@
            replace='#!{{ item }}/bin/python2.7'
   with_items:
     - "{{ venv_hgweb }}"
+    - "{{ venv_replication }}"
     - "{{ venv_tools }}"
 
 - name: copy hgweb requirements.txt
   copy: src=requirements-hgweb.txt
         dest={{ venv_hgweb }}/requirements.txt
+        mode=0644
+        owner=root
+        group=root
+
+- name: copy replication requirements.txt
+  copy: src=requirements-replication.txt
+        dest={{ venv_replication}}/requirements.txt
         mode=0644
         owner=root
         group=root
@@ -170,6 +180,7 @@
        executable={{ item }}/bin/peep
   with_items:
     - "{{ venv_hgweb }}"
+    - "{{ venv_replication }}"
     - "{{ venv_tools }}"
 
 - name: set up version-control-tools repo (server only)

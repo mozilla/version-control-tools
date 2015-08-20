@@ -1,5 +1,6 @@
 ---
 venv_hgweb: /repo/hg/venv_hgweb
+venv_replication: /repo/hg/venv_replication
 venv_tools: /repo/hg/venv_tools
 wsgi_processes: "{{ ansible_processor_cores * 8 }}" # usually 48
 httpd_start_servers: 8
