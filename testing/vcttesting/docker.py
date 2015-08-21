@@ -1326,7 +1326,8 @@ class Docker(object):
                     if i['Id'] not in images:
                         e.submit(self.client.remove_image, c['Id'])
 
-    def execute(self, cid, cmd, stdout=False, stderr=False, stream=False):
+    def execute(self, cid, cmd, stdout=False, stderr=False, stream=False,
+                detach=False):
         """Execute a command on a container.
 
         Returns the output of the command.
@@ -1335,7 +1336,7 @@ class Docker(object):
         docker-py 1.3.0.
         """
         r = self.client.exec_create(cid, cmd, stdout=stdout, stderr=stderr)
-        return self.client.exec_start(r['Id'], stream=stream)
+        return self.client.exec_start(r['Id'], stream=stream, detach=detach)
 
     def get_file_content(self, cid, path):
         """Get the contents of a file from a container."""

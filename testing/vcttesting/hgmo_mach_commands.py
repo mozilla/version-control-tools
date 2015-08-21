@@ -120,10 +120,12 @@ class HgmoCommands(object):
 
     @Command('exec', category='hgmo',
              description='Execute a command in a Docker container')
+    @CommandArgument('--detach', action='store_true',
+                     help='Do not wait for process to finish')
     @CommandArgument('name', help='Name of container to execute inside')
     @CommandArgument('command', help='Command to execute',
                      nargs=argparse.REMAINDER)
-    def execute(self, name, command):
+    def execute(self, name, command, detach=False):
         if name == 'hgssh':
             cid = self.c.master_id
         elif name == 'pulse':
@@ -136,6 +138,10 @@ class HgmoCommands(object):
             return 1
 
         args = '' if 'TESTTMP' in os.environ else '-it'
+        if detach:
+            args += ' -d '
+        args = args.strip()
+
         return subprocess.call('docker exec %s %s %s' % (
                                args, cid, ' '.join(command)),
                                shell=True)
