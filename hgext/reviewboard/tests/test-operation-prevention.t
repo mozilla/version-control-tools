@@ -56,6 +56,8 @@ Publishing the parent should succeed.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{"2": []}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
 
   $ rbmanage dumpreview 2
   id: 2
@@ -73,6 +75,8 @@ Publishing the parent should succeed.
     p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
   $ cd ..
 

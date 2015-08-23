@@ -224,6 +224,8 @@ Publishing series during push works
     p2rb.commit_id: 2bc874a070cef1ff62b63e28f3d40a81655fec77
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
 Amending a commit should also work. This exercises the update_review_request
 code path.

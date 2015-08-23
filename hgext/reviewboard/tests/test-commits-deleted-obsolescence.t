@@ -142,6 +142,8 @@ on publish.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
   draft:
     bugs:
     - '1'
@@ -233,6 +235,8 @@ The parent review should have dropped the reference to /r/6
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
 
 Review 6 should be marked as discarded
 
@@ -252,6 +256,8 @@ Review 6 should be marked as discarded
     p2rb.commit_id: 76088734e3cba33be80930be14e7cd1e9ee474be
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
 Dropping the first commit should drop its review. Subsequent reviews should
 be preserved.
@@ -316,6 +322,8 @@ on publish.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
   draft:
     bugs:
     - '1'
@@ -385,6 +393,8 @@ The dropped commit should now be discarded
     p2rb.commit_id: 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
 Try removing a commit in the middle.
 
@@ -442,6 +452,8 @@ The parent review should have been updated accordingly.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{"3": [], "5": [], "4": []}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
 
 Cleanup
 

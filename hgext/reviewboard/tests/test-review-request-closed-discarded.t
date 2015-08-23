@@ -135,6 +135,8 @@ no Commit ID set.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
 
 Child review request with ID 2 should be closed as discarded...
 
@@ -154,6 +156,8 @@ Child review request with ID 2 should be closed as discarded...
     p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
 Child review request with ID 3 should be closed as discarded...
 
@@ -173,6 +177,8 @@ Child review request with ID 3 should be closed as discarded...
     p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
 The review attachment should be marked as obsolete
 
@@ -265,6 +271,8 @@ Commit ID re-instated.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
   draft:
     bugs:
     - '1'
@@ -308,6 +316,8 @@ Child review request with ID 2 should be re-opened...
     p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
   draft:
     bugs:
     - '1'
@@ -340,6 +350,8 @@ Child review request with ID 3 should be re-opened...
     p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
   draft:
     bugs:
     - '1'
@@ -444,6 +456,8 @@ Squashed review request should be published.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
 
 Child review request with ID 2 should be published.
 
@@ -463,6 +477,8 @@ Child review request with ID 2 should be published.
     p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
 Child review request with ID 3 should be published.
 
@@ -482,6 +498,8 @@ Child review request with ID 3 should be published.
     p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
 The attachment for the review request should be unobsoleted
 

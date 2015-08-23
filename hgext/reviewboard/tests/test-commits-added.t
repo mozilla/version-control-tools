@@ -94,6 +94,8 @@ The parent review should have its description updated.
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[2, 3, 4]'
+  approved: false
+  approval_failure: Pending Review
   draft:
     bugs: []
     commit: bz://1/mynick

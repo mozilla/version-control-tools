@@ -86,6 +86,8 @@ We should have a disagreement between published and draft
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
   draft:
     bugs:
     - '1'
@@ -136,6 +138,8 @@ We should have a disagreement between published and draft
     p2rb.commit_id: 0aca5e4417025c80407d8f7f22864e8d09fbec50
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
   draft:
     bugs:
     - '1'
@@ -191,6 +195,8 @@ Discarding the parent review request draft should discard draft on children
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
 
   $ rbmanage dumpreview 2
   id: 2
@@ -208,6 +214,8 @@ Discarding the parent review request draft should discard draft on children
     p2rb.commit_id: 0aca5e4417025c80407d8f7f22864e8d09fbec50
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
 Cleanup
 

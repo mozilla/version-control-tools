@@ -81,6 +81,8 @@ Squashed review request with ID 1 should be closed as submitted...
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
 
 Child review request with ID 2 should be closed as submitted...
 
@@ -100,6 +102,8 @@ Child review request with ID 2 should be closed as submitted...
     p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
   $ rbmanage dumpreview 3
   id: 3
@@ -117,6 +121,8 @@ Child review request with ID 2 should be closed as submitted...
     p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
 Re-opening the parent review request should re-open all of the children.
 
@@ -151,6 +157,8 @@ Squashed review request with ID 1 should be re-opened...
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  approved: false
+  approval_failure: Pending Review
 
 Child review request with ID 2 should be re-opened...
 
@@ -170,6 +178,8 @@ Child review request with ID 2 should be re-opened...
     p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
 Child review request with ID 3 should be re-opened...
 
@@ -189,6 +199,8 @@ Child review request with ID 3 should be re-opened...
     p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  approved: false
+  approval_failure: Pending Review
 
 Cleanup
 

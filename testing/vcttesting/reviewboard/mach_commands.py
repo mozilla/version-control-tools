@@ -41,6 +41,8 @@ def serialize_review_requests(rr):
     d['description'] = _serialize_text(rr.description)
     d['target_people'] = [p.get().username for p in rr.target_people]
     d['extra_data'] = dict(rr.extra_data.iteritems())
+    d['approved'] = rr.approved
+    d['approval_failure'] = rr.approval_failure
 
     review_list = rr.get_reviews(review_request_id=rr.id)
     reviews = []
