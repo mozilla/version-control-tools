@@ -8,10 +8,15 @@ import pwd
 import subprocess
 import time
 
+def changegrouphook(ui, repo, **kwargs):
+    return _replicate(ui, repo, 'changegroup')
 
-# This is installed as both a changegroup and pushkey hook. They have
-# different arguments.
-def hook(ui, repo, **kwargs):
+
+def pushkeyhook(ui, repo, namespace, **kwargs):
+    return _replicate(ui, repo, namespace)
+
+
+def _replicate(ui, repo, what):
     if not repo.root.startswith('/repo/hg/mozilla'):
         ui.write('repository not eligible for replication\n')
         return 0
@@ -31,7 +36,9 @@ def hook(ui, repo, **kwargs):
 
     t1 = time.time()
     status = 'completed successfully' if res == 0 else 'errored'
-    ui.write('replication to mirrors %s in %.1fs\n' % (status, t1 - t0))
+    msg = 'replication of %s data %s in %.1fs\n' % (what, status, t1 - t0)
+    ui.write(msg)
+    ui.log('replication', msg)
 
     # We don't currently let replication success dictate the result of the
     # hook. This is a post transaction hook anyway, so failure likely doesn't

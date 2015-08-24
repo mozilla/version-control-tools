@@ -20,7 +20,7 @@
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: replication to mirrors completed successfully in \d+.\ds (re)
+  remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/hgcustom/version-control-tools/rev/96ee1d7354c4
@@ -298,7 +298,7 @@ We are able to push to the new user repo
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: replication to mirrors completed successfully in \d+.\ds (re)
+  remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/384b668fc3c2

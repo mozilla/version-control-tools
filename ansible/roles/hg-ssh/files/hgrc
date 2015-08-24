@@ -14,9 +14,9 @@ unified = 8
 [hooks]
 sorthooks = True
 changegroup.a_recordlogs = /repo/hg/scripts/record-pushes.sh
-changegroup.b_mirrorpush = python:mozhghooks.replicate.hook
+changegroup.b_replicate = python:mozhghooks.replicate.changegrouphook
 changegroup.push_printurls = python:mozhghooks.push_printurls.hook
-pushkey.mirrorpush = python:mozhghooks.replicate.hook
+pushkey.replicate = python:mozhghooks.replicate.pushkeyhook
 #pretxnchangegroup.renamecase = python:mozhghooks.prevent_case_only_renames.hook
 pretxnchangegroup.single_root = python:mozhghooks.single_root.hook
 
