@@ -120,12 +120,12 @@ RUN /usr/sbin/groupadd -g 1000 bugzilla
 RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 bugzilla
 
 RUN apt-get update && apt-get --no-install-recommends -y install \
-  apache2 build-essential cvs g++ git graphviz \
+  apache2 build-essential cpanminus cvs g++ git graphviz \
   libapache2-mod-perl2 \
   libdaemon-generic-perl libfile-slurp-perl \
   libgd-dev libssl-dev \
   mysql-client patchutils perlmagick pkg-config python3-mysql.connector \
-  python-psutil unzip wget
+  python-psutil supervisor unzip wget
 
 # ElasticSearch isn't available on CPAN. Patch Bugzilla to not install
 # it.
@@ -138,18 +138,28 @@ RUN git clone https://git.mozilla.org/webtools/bmo/bugzilla.git $BUGZILLA_HOME/b
 
 RUN cd $BUGZILLA_HOME/bugzilla && /usr/bin/patch -p1 < $BUGZILLA_HOME/elasticsearch.patch
 
+# cpanm has problems with some packages. Install them from the OS.
+RUN apt-get -y install \
+  libsoap-lite-perl \
+  libmath-bigint-gmp-perl \
+  libmath-mpfr-perl \
+  libmath-prime-util-gmp-perl
+
+RUN cd $BUGZILLA_HOME/bugzilla && ./checksetup.pl --cpanfile
+
 # Linux::Pid is a dependency for Apache::SizeLimit that for whatever
 # reason isn't detected by CPAN.
 # XPLRPC::Transport::HTTP is needed by xmlrpc.cgi. For whatever reason,
 # this dependency isn't installed.
-RUN cd $BUGZILLA_HOME/bugzilla && ./install-module.pl Linux::Pid XMLRPC::Transport::HTTP
-RUN cd $BUGZILLA_HOME/bugzilla && ./install-module.pl --all
-
-# SOAP::Lite 1.12 is buggy.
-# Install 1.11 explicitly until it is fixed.
-RUN cd $BUGZILLA_HOME && wget http://search.cpan.org/CPAN/authors/id/P/PH/PHRED/SOAP-Lite-1.11.tar.gz
-RUN tar -C $BUGZILLA_HOME -xvz -f $BUGZILLA_HOME/SOAP-Lite-1.11.tar.gz
-RUN cd $BUGZILLA_HOME/SOAP-Lite-1.11 && perl Makefile.PL INSTALLSITELIB=$BUGZILLA_HOME/bugzilla/lib && make install
+RUN cd $BUGZILLA_HOME/bugzilla && cpanm Linux::Pid XMLRPC::Transport::HTTP
+RUN cd $BUGZILLA_HOME/bugzilla && cpanm \
+  --installdeps \
+  --with-recommends \
+  --with-all-features \
+  --without-feature oracle --without-feature sqlite \
+  --without-feature pg \
+  --notest \
+  .
 
 ADD checksetup_answers.txt $BUGZILLA_HOME/checksetup_answers.txt
 
@@ -176,8 +186,6 @@ ADD set-urls /set-urls
 ADD entrypoint.py /bmoweb_entrypoint.py
 ADD run-apache.sh /run-apache.sh
 
-# TODO move this above once we modify package list next.
-RUN apt-get -y install supervisor
 ADD supervisord.conf /etc/supervisor/conf.d/docker.conf
 
 EXPOSE 80

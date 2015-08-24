@@ -106,7 +106,7 @@ while True:
         print('could not connect to database before timeout; giving up')
         sys.exit(1)
 
-    time.sleep(0.250)
+    time.sleep(0.100)
 
 j = os.path.join
 h = os.environ['BUGZILLA_HOME']
@@ -114,7 +114,11 @@ b = j(h, 'bugzilla')
 answers = j(h, 'checksetup_answers.txt')
 
 if install_module:
-    cc([j(b, 'install-module.pl'), '--all'], cwd=b)
+    cc([j(b, 'checksetup.pl'), '-cpanfile'], cwd=b)
+    cc(['cpanm', '--installdeps', '--with-recommends', '--with-all-features',
+        '--without-feature', 'oracle', '--without-feature', 'sqlite',
+        '--without-feature', 'pg',
+        '.'], cwd=b)
 
 # We aren't allowed to embed environment variable references in Perl code in
 # checksetup_answers.txt because Perl executes that file in a sandbox. So we
