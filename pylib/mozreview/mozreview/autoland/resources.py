@@ -43,7 +43,7 @@ class TryAutolandTriggerResource(WebAPIResource):
     """Only reviewers or reviewees can start a Try Build."""
 
     name = 'try_autoland_trigger'
-    allowed_methods = ('GET', 'POST',)
+    allowed_methods = ('POST',)
     model = AutolandRequest
 
     fields = {
@@ -80,9 +80,6 @@ class TryAutolandTriggerResource(WebAPIResource):
             'description': 'The last known status for this request.',
         },
     }
-
-    def has_access_permissions(self, request, *args, **kwargs):
-        return False
 
     def has_list_access_permissions(self, request, *args, **kwargs):
         return True
