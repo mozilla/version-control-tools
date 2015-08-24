@@ -9,6 +9,7 @@ from djblets.webapi.resources import (register_resource_for_model,
                                       unregister_resource_for_model)
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
+                                          ReviewRequestDropdownActionHook,
                                           ReviewRequestFieldsHook,
                                           SignalHook,
                                           TemplateHook,
@@ -147,6 +148,20 @@ class MozReviewExtension(Extension):
             ],
         }])
 
+        ReviewRequestDropdownActionHook(self, actions=[
+        {
+            'label': 'Automation',
+            'id': 'automation-menu',
+            'items': [
+                {
+                    'id': 'autoland-try-trigger',
+                    'label': 'Trigger a Try Build',
+                    'url': '#'
+                }
+            ]
+        }
+        ])
+
         # Start by hiding the Testing Done field in all review requests,
         # since Mozilla developers will not be using it.
         main_fieldset = get_review_request_fieldset('main')
@@ -171,6 +186,8 @@ class MozReviewExtension(Extension):
                      'mozreview/before-login-form.html', apply_to=['login'])
         TemplateHook(self, 'after-login-form',
                      'mozreview/after-login-form.html', apply_to=['login'])
+        TemplateHook(self, 'base-after-content',
+                     'mozreview/scm_level.html')
 
         ReviewRequestFieldsHook(self, 'main', [CommitsListField])
         # This forces the Commits field to be the top item.

@@ -13,6 +13,11 @@ $(document).ready(function() {
     return;
   }
 
+  // The current user's scm level has been injected in an invisible div.
+  MozReview.scmLevel = $("#scm-level").data("scm-level");
+  MozReview.hasScmLevel1 = MozReview.scmLevel >= 1;
+  MozReview.hasScmLevel3 = MozReview.scmLevel == 3;
+
   console.log("Found parent review request ID: " + parentID);
 
   var page = RB.PageManager.getPage();

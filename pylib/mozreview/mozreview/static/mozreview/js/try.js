@@ -1,7 +1,7 @@
 $(document).on("mozreview_ready", function() {
   var TRY_AUTOLAND = "/api/extensions/mozreview.extension.MozReviewExtension/try-autoland-triggers/";
 
-  $("#mozreview-autoland-try-trigger").click(function() {
+  $("#autoland-try-trigger").click(function() {
     var box = $("<div/>")
         .addClass("formdlg")
         .keypress(function(e) {
@@ -86,5 +86,7 @@ $(document).on("mozreview_ready", function() {
   });
 
   var isDraft = $("#draft-banner").is(":visible");
-  $("#mozreview-autoland-try-trigger").enable(!isDraft && MozReview.currentIsMutableByUser);
+  if (!isDraft && MozReview.currentIsMutableByUser && MozReview.hasScmLevel1) {
+    $("#automation-menu").css('display', 'block');
+  }
 });

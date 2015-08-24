@@ -20,3 +20,13 @@ def reviewer_list(review_request):
 @register.filter()
 def extra_data(review_request, key):
     return review_request.extra_data[key]
+
+
+@register.filter()
+def scm_level(mozreview_profile):
+    if mozreview_profile is None:
+        return ""
+    elif mozreview_profile.has_scm_ldap_group('scm_level_3'):
+        return "3"
+    elif mozreview_profile.has_scm_ldap_group('scm_level_1'):
+        return "1"

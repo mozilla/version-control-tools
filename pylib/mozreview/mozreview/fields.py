@@ -158,17 +158,7 @@ class TryField(BaseReviewRequestField):
     _job_url = 'https://treeherder.mozilla.org/embed/resultset-status/try/%s/'
 
     def should_render(self, value):
-        ext = get_extension_manager().get_enabled_extension(
-            'mozreview.extension.MozReviewExtension')
-
-        if not ext or not ext.settings.get('autoland_try_ui_enabled'):
-            return False
-
-        if not is_parent(self.review_request_details):
-            return False
-
-        mrp = self.request.mozreview_profile
-        return mrp is not None and mrp.has_scm_ldap_group('scm_level_1')
+        return False
 
     def load_value(self, review_request_details):
         return review_request_details.extra_data.get('p2rb.autoland_try')
@@ -215,16 +205,3 @@ class TryField(BaseReviewRequestField):
             return template.render(Context({'url': url}))
         else:
             return self._retreive_error_txt
-
-    def as_html(self):
-        rr = ensure_review_request(self.review_request_details)
-
-        template = get_template('mozreview/try.html')
-        current_autoland_try = rr.extra_data.get('p2rb.autoland_try', None)
-
-        if current_autoland_try is not None:
-            current_autoland_try = int(current_autoland_try)
-
-        return template.render(Context({
-            'autoland_try': current_autoland_try,
-        }))
