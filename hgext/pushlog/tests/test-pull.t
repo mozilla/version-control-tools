@@ -28,8 +28,7 @@
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
 Pulling from a remote that has pushlog will fetch pushlog data
 
@@ -52,15 +51,13 @@ Pulling from a remote that has pushlog will fetch pushlog data
   $ echo foo2 > foo
   $ hg commit -m 'second'
   $ hg -q push ../server
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
   $ echo foo3 > foo
   $ hg commit -m 'third'
   $ echo foo4 > foo
   $ hg commit -m 'fourth'
   $ hg -q push ../server
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
   $ cd ..
 
   $ cd client
@@ -106,8 +103,7 @@ Incremental pushlog fetch works over SSH
   $ echo ssh-incremental > foo
   $ hg commit -m 'ssh-incremental'
   $ hg -q push ../server
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
   $ cd ../clone-ssh
   $ hg --config extensions.pushlog=$TESTDIR/hgext/pushlog pull

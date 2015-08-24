@@ -33,8 +33,7 @@
   remote: adding manifests
   remote: adding file changes
   remote: added 5 changesets with 5 changes to 4 files (+2 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
 
 json-info requires a rev argument
 

@@ -475,15 +475,14 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
         ui.status('(not updating pushlog since changesets come from %s)\n' % source)
         return 0
 
-    ui.write('Trying to insert into pushlog.\n')
     try:
         t = int(time.time())
         revs = range(repo[node].rev(), len(repo))
         repo.pushlog.recordpush(revs, os.environ['USER'], t)
-        ui.write('Inserted into the pushlog db successfully.\n')
+        ui.write('recorded push in pushlog\n')
         return 0
     except Exception:
-        ui.write('Error inserting into pushlog. Please retry your push.\n')
+        ui.write('error recording into pushlog; please retry your push\n')
 
     return 1
 

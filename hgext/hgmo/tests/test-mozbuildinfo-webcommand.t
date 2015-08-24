@@ -21,8 +21,7 @@
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 2 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
 
   $ cd ..
 

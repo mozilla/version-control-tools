@@ -21,8 +21,7 @@ Populate the repo with some data
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
 
   $ hg branch branch_foo > /dev/null
   $ echo foo1 > foo

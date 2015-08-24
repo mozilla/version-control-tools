@@ -44,8 +44,7 @@ globally
   remote: adding manifests
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 2 changesets for review
   
   changeset:  3:f5dc8e52d068
@@ -69,8 +68,7 @@ globally
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 2 changesets for review
   
   changeset:  3:d03da7877f4b

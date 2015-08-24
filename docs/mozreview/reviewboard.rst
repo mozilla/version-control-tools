@@ -64,9 +64,7 @@ created in Review Board. As a refresher::
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 2 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Please do not interrupt...
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 2 changesets for review
 
   changeset:  227233:8943dd91f4c0

@@ -28,8 +28,7 @@ Pushing single changesets at a time works
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
   $ dumppushlog server
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 12cb2e907074dd3f8a985a0bb3713836bae731d8 (re)
@@ -43,8 +42,7 @@ Pushing single changesets at a time works
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
   $ dumppushlog server
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 12cb2e907074dd3f8a985a0bb3713836bae731d8 (re)
@@ -69,8 +67,7 @@ Pushing multiple changesets at a time works
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
   $ dumppushlog server
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 12cb2e907074dd3f8a985a0bb3713836bae731d8 (re)
@@ -104,8 +101,7 @@ Pushing to an empty db file works (bug 466149)
   adding manifests
   adding file changes
   added 4 changesets with 4 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
   $ dumppushlog empty
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 12cb2e907074dd3f8a985a0bb3713836bae731d8 (re)
@@ -136,8 +132,7 @@ Pushing to a locked DB errors out (bug 508863)
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files
-  Trying to insert into pushlog.
-  Error inserting into pushlog. Please retry your push.
+  error recording into pushlog; please retry your push
   transaction abort!
   rolling back pushlog
   rollback completed
@@ -152,8 +147,7 @@ Pushing to a locked DB errors out (bug 508863)
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
   $ dumppushlog locked
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 12cb2e907074dd3f8a985a0bb3713836bae731d8 (re)

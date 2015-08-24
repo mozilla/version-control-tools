@@ -23,8 +23,7 @@ Pushing a review will create the reviews file
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 1 changesets for review
   
   changeset:  1:00a4f82beb7c

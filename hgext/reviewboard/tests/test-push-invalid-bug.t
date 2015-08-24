@@ -16,8 +16,7 @@
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 1 changesets for review
   abort: bug 100 does not exist; please change the review id (bz://100/mynick)
   [255]

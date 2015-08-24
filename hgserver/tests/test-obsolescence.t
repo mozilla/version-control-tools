@@ -76,8 +76,7 @@ Create initial repo content
   remote: adding manifests
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 3 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   remote: replication to mirrors completed successfully in \d+.\ds (re)
   remote: 
   remote: View your changes here:
@@ -109,8 +108,7 @@ Create some obsolescence markers
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 0 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   remote: replication to mirrors completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:

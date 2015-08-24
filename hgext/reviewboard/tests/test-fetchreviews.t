@@ -24,8 +24,7 @@ Seed the repo
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   $ hg phase --public -r .
 
   $ echo 'foo1' > foo1
@@ -43,8 +42,7 @@ Seed the repo
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 2 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 2 changesets for review
   
   changeset:  1:3a9a9f9a418e

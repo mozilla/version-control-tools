@@ -22,8 +22,7 @@
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   $ hg phase --public -r .
 
   $ echo 'foo1' > foo1
@@ -41,8 +40,7 @@
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 2 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 2 changesets for review
   
   changeset:  3:6bd3fbee3dfa
@@ -94,8 +92,7 @@
   remote: adding manifests
   remote: adding file changes
   remote: added 3 changesets with 3 changes to ? files (+1 heads) (glob)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 3 changesets for review
   
   changeset:  8:dac4214a563a

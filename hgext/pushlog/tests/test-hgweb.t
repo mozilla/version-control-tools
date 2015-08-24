@@ -20,16 +20,14 @@
   $ echo initial > foo
   $ hg -q commit -A -m initial
   $ hg -q push
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
   $ echo second > foo
   $ hg commit -m second
   $ echo third > foo
   $ hg commit -m third
   $ export USER=user2@example.com
   $ hg -q push
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
   $ cd ../server
   $ hg serve -d -p $HGPORT --pid-file hg.pid

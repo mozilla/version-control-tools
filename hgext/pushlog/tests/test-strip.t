@@ -16,8 +16,7 @@
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
   $ echo foo2 > foo
   $ hg commit -m 'second'
   $ hg push ../server
@@ -27,8 +26,7 @@
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
 Stripping changesets should result in pushlog getting stripped
 
@@ -73,8 +71,7 @@ being stripped. This tests rev reordering in pushlog database
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
   $ hg -q up -r 0
   $ echo c3 > foo
@@ -89,8 +86,7 @@ being stripped. This tests rev reordering in pushlog database
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files (+1 heads)
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
   $ cd ../server
 

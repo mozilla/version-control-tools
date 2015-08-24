@@ -29,8 +29,7 @@ Set up the repo
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 1 changesets for review
   
   changeset:  2:da1efb6eb614
@@ -61,8 +60,7 @@ Now create a new head and push a rebase
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 1 changes to ? files (+1 heads) (glob)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 2 changesets for review
   
   changeset:  3:850ce71e5f69

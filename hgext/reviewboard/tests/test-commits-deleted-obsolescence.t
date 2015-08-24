@@ -21,8 +21,7 @@
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   $ hg phase --public -r .
 
   $ echo 'foo1' > foo1
@@ -49,8 +48,7 @@
   remote: adding manifests
   remote: adding file changes
   remote: added 5 changesets with 5 changes to 5 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 5 changesets for review
   
   changeset:  6:6bd3fbee3dfa
@@ -266,8 +264,7 @@ be preserved.
   remote: adding manifests
   remote: adding file changes
   remote: added 3 changesets with 0 changes to ? files (+1 heads) (glob)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 3 changesets for review
   
   changeset:  10:e1679d43aceb
@@ -399,8 +396,7 @@ Try removing a commit in the middle.
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 0 changes to ? files (+1 heads) (glob)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 2 changesets for review
   
   changeset:  10:e1679d43aceb

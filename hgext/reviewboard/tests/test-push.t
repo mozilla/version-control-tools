@@ -56,8 +56,7 @@ Seed the root changeset on the server
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   $ hg phase --public -r .
 
 Pushing a public changeset will be quick rejected
@@ -80,8 +79,7 @@ Pushing a single changeset will initiate a single review (no children)
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 1 changesets for review
   
   changeset:  6:f422841a13f8
@@ -147,8 +145,7 @@ Pushing patches from mq will result in a warning
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   (You are using mq to develop patches. *) (glob)
   submitting 1 changesets for review
   
@@ -194,8 +191,7 @@ rest of the test.)
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 1 changesets for review
   
   changeset:  6:ec6438e4b8bc
@@ -285,8 +281,7 @@ Specifying a base revision limits reviewed changesets
   remote: adding manifests
   remote: adding file changes
   remote: added 4 changesets with 4 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 3 changesets for review
   
   changeset:  8:2e66eb2fd2ee
@@ -400,8 +395,7 @@ Reviewing merge commits is rejected
   remote: adding manifests
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 3 changesets for review
   abort: cannot review merge commits (35ae0b8f2835)
   [255]
@@ -444,8 +438,7 @@ Old client not supporting capabilities is rejected
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 1 changesets for review
   abort: Your reviewboard client extension is too old and does not support newer features. Please pull and update your version-control-tools repo. Firefox users: run `mach mercurial-setup`.
   [255]

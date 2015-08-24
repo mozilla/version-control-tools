@@ -17,8 +17,7 @@ Single valid pushlog verifies OK
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
   $ echo second > foo
   $ hg commit -m 'second'
@@ -31,8 +30,7 @@ Single valid pushlog verifies OK
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
   $ hg -R ../server verifypushlog
   pushlog contains all 3 changesets across 2 pushes

@@ -39,8 +39,7 @@ A push works
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   remote: replication to mirrors completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:

@@ -15,8 +15,7 @@
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   $ hg phase --public -r .
 
   $ echo 'foo1' > foo
@@ -32,8 +31,7 @@
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 2 changesets for review
   
   changeset:  1:a92d53c0ffc7
@@ -59,8 +57,7 @@ Adding commits to old reviews should create new reviews
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 3 changesets for review
   
   changeset:  1:a92d53c0ffc7
@@ -146,8 +143,7 @@ rids to be strings and then pushing a new commit.
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 4 changesets for review
   
   changeset:  1:a92d53c0ffc7

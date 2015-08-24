@@ -26,8 +26,7 @@
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 1 changesets for review
   
   changeset:  1:0aca5e441702
@@ -50,8 +49,7 @@ Now publish the review and create a new draft
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 1 changesets for review
   
   changeset:  1:b3be3d464d6b

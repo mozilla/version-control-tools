@@ -59,8 +59,7 @@ workaround to an unidentified root problem.
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
 
   $ hg log -r 0 -T '{node}\n'
   4016108b6e06add4c0ddde40dee8c7b9aa410f58
@@ -79,8 +78,7 @@ workaround to an unidentified root problem.
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
 
   $ hg log -r 0 -T '{node}\n'
   36d47cf7c6cbd312de3aeb3b2f770c650b014053
@@ -142,8 +140,7 @@ Pushing to autodiscover repo should redirect
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 1 changesets for review
   
   changeset:  1:daa176714e3a

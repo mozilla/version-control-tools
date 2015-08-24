@@ -18,8 +18,7 @@
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
 
 A failure during the transaction should cause the pushlog to not
 record
@@ -39,8 +38,7 @@ record
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
   fake hook failure
   transaction abort!
   rolling back pushlog
@@ -63,8 +61,7 @@ Remove the abort hook and ensure pushing again works as expected
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  Trying to insert into pushlog.
-  Inserted into the pushlog db successfully.
+  recorded push in pushlog
   fake hook success
 
   $ dumppushlog server

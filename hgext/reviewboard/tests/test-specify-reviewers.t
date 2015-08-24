@@ -64,8 +64,7 @@ Try a bunch of different ways of specifying a reviewer
   remote: adding manifests
   remote: adding file changes
   remote: added 11 changesets with 11 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 10 changesets for review
   unrecognized reviewer: test-only
   
@@ -238,8 +237,7 @@ code path.
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 10 changesets for review
   
   changeset:  11:fcf566e4c32a
@@ -367,8 +365,7 @@ and pushed with no reviewers specified.
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 10 changesets for review
   
   changeset:  11:fcf566e4c32a
@@ -432,8 +429,7 @@ those specified in the commit summary.
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 10 changesets for review
   
   changeset:  11:fcf566e4c32a
@@ -498,8 +494,7 @@ Unrecognized reviewers should be ignored
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 1 changesets for review
   unrecognized reviewer: cthulhu
   
@@ -525,8 +520,7 @@ from the client.
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
   submitting 2 changesets for review
   
   changeset:  27:d9a3b1783a10

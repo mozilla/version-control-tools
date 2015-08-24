@@ -39,8 +39,7 @@ Seed the pushlog for our next test
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Inserted into the pushlog db successfully.
+  remote: recorded push in pushlog
 
 Lack of permissions on pushlog should prevent pushes from completing
 
@@ -54,8 +53,7 @@ Lack of permissions on pushlog should prevent pushes from completing
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Trying to insert into pushlog.
-  remote: Error inserting into pushlog. Please retry your push.
+  remote: error recording into pushlog; please retry your push
   remote: transaction abort!
   remote: rolling back pushlog
   remote: rollback completed
