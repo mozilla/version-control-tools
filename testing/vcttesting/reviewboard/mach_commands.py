@@ -503,7 +503,6 @@ class ReviewBoardCommands(object):
         description='Print the ldap username of a Review Board user.')
     @CommandArgument('username', help='Username whose info the print')
     def dump_user_ldap(self, username):
-        from rbtools.api.errors import APIError
         root = self._get_root(username="mozreview", password="password")
         ext = root.get_extension(
             extension_name='mozreview.extension.MozReviewExtension')
@@ -513,6 +512,22 @@ class ReviewBoardCommands(object):
             print('ldap username: %s' % user)
         else:
             print('no ldap username associated with %s' % username)
+
+    @Command('associate-ldap-user', category='reviewboard',
+        description='Associate an LDAP email address with a user.')
+    @CommandArgument('username', help='Username to associate with ldap')
+    @CommandArgument('email', help='LDAP email to associate')
+    def associate_ldap_user(self, username, email):
+        # We use the "mozreview" account which has the special permission
+        # to read / associate ldap email addresses.
+        root = self._get_root(username="mozreview", password="password")
+        ext = root.get_extension(
+            extension_name='mozreview.extension.MozReviewExtension')
+
+        association = ext.get_ldap_associations().get_item(username)
+        association.update(ldap_username=email)
+
+        print('%s associated with %s' % (email, username))
 
     @Command('dump-autoland-requests', category='reviewboard',
              description='Dump the table of autoland requests.')
