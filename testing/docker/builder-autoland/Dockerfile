@@ -21,14 +21,12 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
 # %include autoland/autoland/
 # %include hgext/bootstrap.py
 # %include hgext/reviewboard
-# %include pylib
-# %include run-tests
+# %include pylib/mozautomation
 ADD extra/vct/autoland/requirements.txt ${AUTOLAND_HOME}/requirements.txt
 ADD extra/vct/autoland/autoland ${AUTOLAND_HOME}/autoland
 ADD extra/vct/run-tests ${VCT_HOME}/run-tests
 ADD extra/vct/hgext/bootstrap.py ${VCT_HOME}/hgext/bootstrap.py
 ADD extra/vct/hgext/reviewboard ${VCT_HOME}/hgext/reviewboard
-ADD extra/vct/pylib/ ${VCT_HOME}/pylib/
 
 RUN curl -SL 'https://bootstrap.pypa.io/get-pip.py' | python2
 RUN pip install virtualenv
@@ -59,3 +57,8 @@ ADD config.json ${AUTOLAND_HOME}/autoland/config.json
 ADD clone-repo /clone-repo
 ADD start-autoland.sh /start-autoland.sh
 CMD ["/start-autoland.sh"]
+
+# %include pylib/mozhg
+# %include run-tests
+ADD extra/vct/pylib/mozautomation ${VCT_HOME}/pylib/mozautomation
+ADD extra/vct/pylib/mozhg ${VCT_HOME}/pylib/mozhg
