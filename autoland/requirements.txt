@@ -4,4 +4,5 @@ github3.py==1.0.0a1
 mozillapulse
 mozlog == 2.2
 psycopg2
+python-hglib==1.7
 requests
