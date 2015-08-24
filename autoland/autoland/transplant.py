@@ -122,20 +122,32 @@ def transplant_to_mozreview(gh, tree, user, repo, pullrequest, bzuserid,
 
 
 def transplant(tree, destination, rev, trysyntax=None, push_bookmark=False):
+    """Transplant a specified revision and ancestors to the specified tree.
 
-    """ This assumes that the repo has a bookmark for the head revision
-        called 'upstream' and that the .hg/hgrc config contains links to
-        the 'try' repo (if any)"""
-
+    If ``trysyntax`` is specified, a Try commit will be created using the
+    syntax specified.
+    """
     landed = True
     result = ''
 
+    repo_path = get_repo_path(tree)
+
+    def run_hg(args):
+        return subprocess.check_output(args, stderr=subprocess.STDOUT,
+                                       cwd=repo_path)
+
+    # Obtain remote tip. We assume there is only a single head.
+    # Output can contain bookmark or branch name after a space. Only take
+    # first component.
+    remote_tip = run_hg(['hg', 'identify', 'upstream'])
+    remote_tip = remote_tip.split()[0]
+    assert len(remote_tip) == 12, remote_tip
+
     cmds = [['hg', 'update', '--clean'],
             ['hg', 'pull', 'upstream'],
-            ['hg', 'update', 'upstream'],
+            ['hg', 'update', remote_tip],
             ['hg', 'pull', tree, '-r', rev],
-            ['hg', 'bookmark', '-f', '--hidden', '-r', rev, 'transplant'],
-            ['hg', 'update', 'transplant']]
+            ['hg', 'update', rev]]
 
     if trysyntax:
         if not trysyntax.startswith("try: "):
@@ -154,21 +166,21 @@ def transplant(tree, destination, rev, trysyntax=None, push_bookmark=False):
     elif push_bookmark:
         # we assume use of the @ bookmark is mutually exclusive with using
         # try syntax for now.
-        cmds.extend([['hg', 'rebase', '-b', 'transplant', '-d', 'upstream'],
-                     ['hg', 'log', '-r', 'transplant', '-T', '{node|short}'],
+        # We are updated to the head we are rebasing, so no need to specify
+        # source or base revision.
+        cmds.extend([['hg', 'rebase', '-d', remote_tip],
+                     ['hg', 'log', '-r', 'tip', '-T', '{node|short}'],
                      ['hg', 'bookmark', push_bookmark],
                      ['hg', 'push', '-B', push_bookmark, destination]])
     else:
-        cmds.extend([['hg', 'rebase', '-b', 'transplant', '-d', 'upstream'],
-                     ['hg', 'log', '-r', 'transplant', '-T', '{node|short}'],
-                     ['hg', 'push', '-r', 'transplant', destination]])
+        cmds.extend([['hg', 'rebase', '-d', remote_tip],
+                     ['hg', 'log', '-r', 'tip', '-T', '{node|short}'],
+                     ['hg', 'push', '-r', 'tip', destination]])
 
     repo_path = get_repo_path(tree)
-    qtip_rev = ''
     for cmd in cmds:
         try:
-            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT,
-                                             cwd=repo_path)
+            output = run_hg(cmd)
             if 'log' in cmd:
                 result = output
         except subprocess.CalledProcessError as e:
