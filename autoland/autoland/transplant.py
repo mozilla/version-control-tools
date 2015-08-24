@@ -1,6 +1,6 @@
 import config
 import github
-import json
+import hglib
 import os
 import re
 import subprocess
@@ -127,27 +127,37 @@ def transplant(tree, destination, rev, trysyntax=None, push_bookmark=False):
     If ``trysyntax`` is specified, a Try commit will be created using the
     syntax specified.
     """
+    with hglib.open(get_repo_path(tree)) as client:
+        return _transplant(client, tree, destination, rev, trysyntax=trysyntax,
+                           push_bookmark=push_bookmark)
+
+def _transplant(client, tree, destination, rev, trysyntax=None,
+                push_bookmark=False):
     landed = True
     result = ''
 
-    repo_path = get_repo_path(tree)
-
     def run_hg(args):
-        return subprocess.check_output(args, stderr=subprocess.STDOUT,
-                                       cwd=repo_path)
+        out = hglib.util.BytesIO()
+        out_channels = {b'o': out.write, b'e': out.write}
+        ret = client.runcommand(args, {}, out_channels)
+
+        if ret:
+            raise hglib.error.CommandError(args, ret, out, None)
+
+        return out.getvalue()
 
     # Obtain remote tip. We assume there is only a single head.
     # Output can contain bookmark or branch name after a space. Only take
     # first component.
-    remote_tip = run_hg(['hg', 'identify', 'upstream'])
+    remote_tip = run_hg(['identify', 'upstream'])
     remote_tip = remote_tip.split()[0]
     assert len(remote_tip) == 12, remote_tip
 
-    cmds = [['hg', 'update', '--clean'],
-            ['hg', 'pull', 'upstream'],
-            ['hg', 'update', remote_tip],
-            ['hg', 'pull', tree, '-r', rev],
-            ['hg', 'update', rev]]
+    cmds = [['update', '--clean'],
+            ['pull', 'upstream'],
+            ['update', remote_tip],
+            ['pull', tree, '-r', rev],
+            ['update', rev]]
 
     if trysyntax:
         if not trysyntax.startswith("try: "):
@@ -155,45 +165,45 @@ def transplant(tree, destination, rev, trysyntax=None, push_bookmark=False):
 
         # TODO: hg is going to add a ui.allowemptycommit flag in 3.5
         #       which means we can remove the use of queues here
-        cmds.extend([['hg', 'qpop', '--all'],
-                     ['hg', 'qdelete', 'try'],
-                     ['hg', 'qnew', 'try', '-m', '"' + trysyntax + '"'],
-                     ['hg', 'log', '-r', 'qtip', '-T', '{node|short}'],
-                     ['hg', 'push', '-r', '.', '-f', 'try'],
-                     ['hg', 'qpop'],
-                     ['hg', 'qdelete', 'try'],
-                     ['hg', 'strip', '--no-backup', '-r', 'draft()'],])
+        cmds.extend([['qpop', '--all'],
+                     ['qdelete', 'try'],
+                     ['qnew', 'try', '-m', '"' + trysyntax + '"'],
+                     ['log', '-r', 'qtip', '-T', '{node|short}'],
+                     ['push', '-r', '.', '-f', 'try'],
+                     ['qpop'],
+                     ['qdelete', 'try'],
+                     ['strip', '--no-backup', '-r', 'draft()'],])
     elif push_bookmark:
         # we assume use of the @ bookmark is mutually exclusive with using
         # try syntax for now.
         # We are updated to the head we are rebasing, so no need to specify
         # source or base revision.
-        cmds.extend([['hg', 'rebase', '-d', remote_tip],
-                     ['hg', 'log', '-r', 'tip', '-T', '{node|short}'],
-                     ['hg', 'bookmark', push_bookmark],
-                     ['hg', 'push', '-B', push_bookmark, destination]])
+        cmds.extend([['rebase', '-d', remote_tip],
+                     ['log', '-r', 'tip', '-T', '{node|short}'],
+                     ['bookmark', push_bookmark],
+                     ['push', '-B', push_bookmark, destination]])
     else:
-        cmds.extend([['hg', 'rebase', '-d', remote_tip],
-                     ['hg', 'log', '-r', 'tip', '-T', '{node|short}'],
-                     ['hg', 'push', '-r', 'tip', destination]])
+        cmds.extend([['rebase', '-d', remote_tip],
+                     ['log', '-r', 'tip', '-T', '{node|short}'],
+                     ['push', '-r', 'tip', destination]])
 
-    repo_path = get_repo_path(tree)
     for cmd in cmds:
         try:
             output = run_hg(cmd)
             if 'log' in cmd:
                 result = output
-        except subprocess.CalledProcessError as e:
-            if 'abort: patch try not in series' in e.output:
+        except hglib.error.CommandError as e:
+            output = e.out.getvalue()
+            if 'abort: patch try not in series' in output:
                 # in normal circumstances we expect this mq error on delete
                 continue
-            elif 'no changes found' in e.output:
+            elif 'no changes found' in output:
                 # we've already pulled this revision
                 continue
-            elif 'nothing to rebase' in e.output:
+            elif 'nothing to rebase' in output:
                 # we are already up to date so the rebase fails
                 continue
             else:
-                return False, formulate_hg_error(cmd, e.output)
+                return False, formulate_hg_error(['hg'] + cmd, output)
 
     return landed, result
