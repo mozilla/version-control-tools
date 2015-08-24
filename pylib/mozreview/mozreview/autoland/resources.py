@@ -38,9 +38,10 @@ TRY_AUTOLAND_DESTINATION = 'try'
 
 
 class TryAutolandTriggerResource(WebAPIResource):
-    """Resource to kick off Try Builds for a particular review request."""
+    """Resource to kick off Try Builds for a particular review request.
 
-    """Only reviewers or reviewees can start a Try Build."""
+    Only reviewers can start a Try Build.
+    """
 
     name = 'try_autoland_trigger'
     allowed_methods = ('POST',)
@@ -181,7 +182,7 @@ class TryAutolandTriggerResource(WebAPIResource):
             if autoland_request_id is None:
                 return AUTOLAND_ERROR, {
                     'status_code': response.status_code,
-                    'request_id': autoland_request_id,
+                    'request_id': None,
                 }
 
         autoland_request = AutolandRequest.objects.create(
@@ -269,9 +270,6 @@ class AutolandRequestUpdateResource(WebAPIResource):
                            'off'
         }
     }
-
-    def has_access_permissions(self, request, *args, **kwargs):
-        return False
 
     def has_list_access_permissions(self, request, *args, **kwargs):
         return True
