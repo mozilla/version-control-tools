@@ -20,16 +20,16 @@ from reviewboard.scmtools.models import Repository
 from reviewboard.site.urlresolvers import local_site_reverse
 from reviewboard.webapi.resources import WebAPIResource
 
-from mozreview.autoland.errors import (AUTOLAND_ERROR,
-                                       AUTOLAND_TIMEOUT,
-                                       BAD_AUTOLAND_CREDENTIALS,
-                                       BAD_AUTOLAND_URL,
-                                       BAD_UPDATE_CREDENTIALS)
 from mozreview.autoland.models import (AutolandEventLogEntry,
                                        AutolandRequest,
                                        ImportPullRequestRequest)
 from mozreview.decorators import webapi_scm_groups_required
-from mozreview.errors import NOT_PUSHED_PARENT_REVIEW_REQUEST
+from mozreview.errors import (AUTOLAND_ERROR,
+                              AUTOLAND_TIMEOUT,
+                              BAD_AUTOLAND_CREDENTIALS,
+                              BAD_AUTOLAND_URL,
+                              BAD_UPDATE_CREDENTIALS,
+                              NOT_PUSHED_PARENT_REVIEW_REQUEST)
 from mozreview.extra_data import is_parent, is_pushed
 
 AUTOLAND_REQUEST_TIMEOUT = 10.0
