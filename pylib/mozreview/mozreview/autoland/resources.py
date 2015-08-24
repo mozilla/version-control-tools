@@ -27,7 +27,6 @@ from mozreview.decorators import webapi_scm_groups_required
 from mozreview.errors import (AUTOLAND_CONFIGURATION_ERROR,
                               AUTOLAND_ERROR,
                               AUTOLAND_TIMEOUT,
-                              BAD_UPDATE_CREDENTIALS,
                               NOT_PUSHED_PARENT_REVIEW_REQUEST)
 from mozreview.extra_data import is_parent, is_pushed
 
@@ -291,7 +290,7 @@ class AutolandRequestUpdateResource(WebAPIResource):
 
         if not testing and not request.user.has_perm(
                 'mozreview.add_autolandeventlogentry'):
-            return BAD_UPDATE_CREDENTIALS
+            return PERMISSION_DENIED
 
         try:
             fields = json.loads(request.body)
@@ -562,7 +561,7 @@ class ImportPullRequestUpdateResource(WebAPIResource):
 
         if not testing and not request.user.has_perm(
                 'mozreview.add_autolandeventlogentry'):
-            return BAD_UPDATE_CREDENTIALS
+            return PERMISSION_DENIED
 
         try:
             fields = json.loads(request.body)

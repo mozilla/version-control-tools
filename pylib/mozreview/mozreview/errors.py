@@ -48,8 +48,3 @@ AUTOLAND_TIMEOUT = WebAPIError(
     1006,
     "Autoland failed to respond within the allowed time",
     http_status=504)  # 504 Gateway Timeout
-
-BAD_UPDATE_CREDENTIALS = WebAPIError(
-    1008,
-    "Bad or missing AutolandRequest update credentials.",
-    http_status=401)  # 401 Unauthorized
