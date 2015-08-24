@@ -50,7 +50,7 @@ except ImportError:
     import hgrb.proto
 demandimport.enable()
 
-testedwith = '3.3 3.4'
+testedwith = '3.3 3.4 3.5'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)

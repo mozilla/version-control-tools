@@ -69,7 +69,7 @@ from mozhg.rewrite import (
     replacechangesets,
 )
 
-testedwith = '3.1 3.2 3.3 3.4'
+testedwith = '3.1 3.2 3.3 3.4 3.5'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview'
 
 cmdtable = {}

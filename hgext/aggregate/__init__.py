@@ -29,7 +29,7 @@ from mercurial.error import (
     Abort,
 )
 
-testedwith = '3.2 3.3 3.4'
+testedwith = '3.2 3.3 3.4 3.5'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)

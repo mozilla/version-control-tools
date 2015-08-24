@@ -188,7 +188,7 @@ except ImportError:
     exchange = None
 demandimport.enable()
 
-testedwith = '2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4'
+testedwith = '2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bundleclone'
 
 cmdtable = {}

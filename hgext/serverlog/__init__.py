@@ -177,7 +177,7 @@ are running, CPU time calculations will not be accurate. Other state may get
 mixed up.
 """
 
-testedwith = '2.5.4'
+testedwith = '3.4'
 
 import mercurial.hgweb.protocol as protocol
 import mercurial.hgweb.hgweb_mod as hgweb_mod

@@ -24,7 +24,7 @@ if not getattr(cmdutil, 'bailifchanged', None):
 if 'mercurial.scmutil' not in sys.modules:
     import mercurial.cmdutil as scmutil
 
-testedwith = '3.1 3.2 3.3 3.4'
+testedwith = '3.1 3.2 3.3 3.4 3.5'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qbackout'
 
 backout_re = re.compile(r'[bB]ack(?:ed)?(?: ?out) (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})')
