@@ -38,8 +38,9 @@ TRY_AUTOLAND_DESTINATION = 'try'
 
 
 class TryAutolandTriggerResource(WebAPIResource):
-    """Resource for reviewers or reviewees to kick off Try Builds
-    for a particular review request."""
+    """Resource to kick off Try Builds for a particular review request."""
+
+    """Only reviewers or reviewees can start a Try Build."""
 
     name = 'try_autoland_trigger'
     allowed_methods = ('GET', 'POST',)
@@ -231,7 +232,8 @@ try_autoland_trigger_resource = TryAutolandTriggerResource()
 
 
 class AutolandRequestUpdateResource(WebAPIResource):
-    """Resource for notifications of Autoland requests status update"""
+    """Resource for notifications of Autoland requests status update."""
+
     name = 'autoland_request_update'
     allowed_methods = ('POST',)
     fields = {
@@ -336,7 +338,7 @@ autoland_request_update_resource = AutolandRequestUpdateResource()
 
 
 class ImportPullRequestTriggerResource(WebAPIResource):
-    """Resource to allow pullrequests to be imported"""
+    """Resource to import pullrequests."""
 
     name = 'import_pullrequest_trigger'
     allowed_methods = ('POST',)
@@ -514,8 +516,8 @@ import_pullrequest_trigger_resource = ImportPullRequestTriggerResource()
 
 
 class ImportPullRequestUpdateResource(WebAPIResource):
-    """Resource for notifications of Autoland import pullrequest status
-       update"""
+    """Resource for notifications of pullrequest import status update."""
+
     name = 'import_pullrequest_update'
     allowed_methods = ('POST',)
     fields = {
