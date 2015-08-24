@@ -35,7 +35,6 @@ from mozreview.extra_data import is_parent, is_pushed
 AUTOLAND_REQUEST_TIMEOUT = 10.0
 IMPORT_PULLREQUEST_DESTINATION = 'mozreview'
 TRY_AUTOLAND_DESTINATION = 'try'
-TRY_AUTOLAND_TREE = 'mozilla-central'
 
 
 class TryAutolandTriggerResource(WebAPIResource):
@@ -147,12 +146,7 @@ class TryAutolandTriggerResource(WebAPIResource):
         logging.info('Telling Autoland to give status updates to %s'
                      % pingback_url)
 
-        # TODO: Ideally we would just pass the repository name here and
-        #       the mapping in Autoland would take care of things for us.
-        #       See Bug 1188542.
-        try_autoland_tree = TRY_AUTOLAND_TREE
-        if testing:
-            try_autoland_tree = rr.repository.name
+        try_autoland_tree = rr.repository.name
 
         try:
             response = requests.post(autoland_url + '/autoland',
