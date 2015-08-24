@@ -24,10 +24,9 @@ from mozreview.autoland.models import (AutolandEventLogEntry,
                                        AutolandRequest,
                                        ImportPullRequestRequest)
 from mozreview.decorators import webapi_scm_groups_required
-from mozreview.errors import (AUTOLAND_ERROR,
+from mozreview.errors import (AUTOLAND_CONFIGURATION_ERROR,
+                              AUTOLAND_ERROR,
                               AUTOLAND_TIMEOUT,
-                              BAD_AUTOLAND_CREDENTIALS,
-                              BAD_AUTOLAND_URL,
                               BAD_UPDATE_CREDENTIALS,
                               NOT_PUSHED_PARENT_REVIEW_REQUEST)
 from mozreview.extra_data import is_parent, is_pushed
@@ -132,13 +131,13 @@ class TryAutolandTriggerResource(WebAPIResource):
 
         autoland_url = ext.settings.get('autoland_url')
         if not autoland_url:
-            return BAD_AUTOLAND_URL
+            return AUTOLAND_CONFIGURATION_ERROR
 
         autoland_user = ext.settings.get('autoland_user')
         autoland_password = ext.settings.get('autoland_password')
 
         if not autoland_user or not autoland_password:
-            return BAD_AUTOLAND_CREDENTIALS
+            return AUTOLAND_CONFIGURATION_ERROR
 
         pingback_url = autoland_request_update_resource.get_uri(request)
 
@@ -410,13 +409,13 @@ class ImportPullRequestTriggerResource(WebAPIResource):
 
         autoland_url = ext.settings.get('autoland_url')
         if not autoland_url:
-            return BAD_AUTOLAND_URL
+            return AUTOLAND_CONFIGURATION_ERROR
 
         autoland_user = ext.settings.get('autoland_user')
         autoland_password = ext.settings.get('autoland_password')
 
         if not autoland_user or not autoland_password:
-            return BAD_AUTOLAND_CREDENTIALS
+            return AUTOLAND_CONFIGURATION_ERROR
 
 
         # if we've seen an import for this pullrequest before, see if we have

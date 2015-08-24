@@ -34,7 +34,7 @@ NOT_PUSHED_PARENT_REVIEW_REQUEST = WebAPIError(
     'request.',
     http_status=405)  # 405 Method Not Allowed
 
-BAD_AUTOLAND_URL = WebAPIError(
+AUTOLAND_CONFIGURATION_ERROR = WebAPIError(
     1004,
     "Autoland has not been configured with a proper URL endpoint.",
     http_status=500)  # 500 Internal Server Error
@@ -47,12 +47,7 @@ AUTOLAND_ERROR = WebAPIError(
 AUTOLAND_TIMEOUT = WebAPIError(
     1006,
     "Autoland failed to respond within the allowed time",
-    http_status=502)  # 502 Bad Gateway
-
-BAD_AUTOLAND_CREDENTIALS = WebAPIError(
-    1007,
-    "Bad or missing Autoland credentials.",
-    http_status=401)  # 401 Unauthorized
+    http_status=504)  # 504 Gateway Timeout
 
 BAD_UPDATE_CREDENTIALS = WebAPIError(
     1008,
