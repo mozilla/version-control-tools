@@ -114,7 +114,7 @@ b = j(h, 'bugzilla')
 answers = j(h, 'checksetup_answers.txt')
 
 if install_module:
-    cc([j(b, 'checksetup.pl'), '-cpanfile'], cwd=b)
+    cc([j(b, 'checksetup.pl'), '--cpanfile'], cwd=b)
     cc(['cpanm', '--installdeps', '--with-recommends', '--with-all-features',
         '--without-feature', 'oracle', '--without-feature', 'sqlite',
         '--without-feature', 'pg',
