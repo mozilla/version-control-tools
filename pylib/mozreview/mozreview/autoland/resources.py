@@ -108,6 +108,13 @@ class TryAutolandTriggerResource(WebAPIResource):
         except ReviewRequest.DoesNotExist:
             return DOES_NOT_EXIST
 
+        if not try_syntax.startswith('try: '):
+            return INVALID_FORM_DATA, {
+                'fields': {
+                    'try_syntax': ['The provided try syntax was invalid']
+                }
+            }
+
         if not is_pushed(rr) or not is_parent(rr):
             logging.error('Failed triggering Autoland because the review '
                           'request is not pushed, or not the parent review '
