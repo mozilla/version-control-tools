@@ -1,0 +1,10 @@
+Because Review Board's support for Django Evolutions in extensions is shaky,
+we unfortunately need to execute SQL schema changes directly on the database
+when models change.  This directory contains such migration scripts.
+
+Furthermore, because Django Evolution will complain if the schema is
+changed manually, we have to reset the Evolution-related tables.  This needs
+to be done each time migrations are performed, by executing the SQL
+commands in clear-evolution-sigs.sql.
+
+You must do a database backup before applying any migrations.
