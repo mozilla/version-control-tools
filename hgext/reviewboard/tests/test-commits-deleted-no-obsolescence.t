@@ -137,7 +137,7 @@ Review request 6 should be added to the list of discard on publish rids.
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: Commit 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e is not approved.
   draft:
     bugs:
     - '1'
@@ -216,7 +216,7 @@ Review 6 should be marked as discarded
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
 Dropping the first commit should shuffle all the reviews down the line.
 NOTE: If we ever employ heuristic matching on the server, this test
@@ -269,7 +269,7 @@ The first commit was rewritten (we assume all subsequent were as well).
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
   draft:
     bugs:
     - '1'
@@ -330,7 +330,7 @@ request is published.
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: Commit 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e is not approved.
   draft:
     bugs:
     - '1'

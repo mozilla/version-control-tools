@@ -225,7 +225,7 @@ Publishing series during push works
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
 Amending a commit should also work. This exercises the update_review_request
 code path.

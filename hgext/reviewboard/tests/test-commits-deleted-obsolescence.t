@@ -143,7 +143,7 @@ on publish.
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: Commit 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e is not approved.
   draft:
     bugs:
     - '1'
@@ -236,7 +236,7 @@ The parent review should have dropped the reference to /r/6
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: Commit 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e is not approved.
 
 Review 6 should be marked as discarded
 
@@ -257,7 +257,7 @@ Review 6 should be marked as discarded
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
 Dropping the first commit should drop its review. Subsequent reviews should
 be preserved.
@@ -323,7 +323,7 @@ on publish.
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: Commit 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e is not approved.
   draft:
     bugs:
     - '1'
@@ -394,7 +394,7 @@ The dropped commit should now be discarded
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
 Try removing a commit in the middle.
 
@@ -453,7 +453,7 @@ The parent review should have been updated accordingly.
     p2rb.reviewer_map: '{"3": [], "5": [], "4": []}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: Commit e1679d43acebff4b173624488cdf4b5eff1ccd94 is not approved.
 
 Cleanup
 

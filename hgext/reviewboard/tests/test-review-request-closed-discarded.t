@@ -136,7 +136,7 @@ no Commit ID set.
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: Commit a92d53c0ffc7df0517397a77980e62332552d812 is not approved.
 
 Child review request with ID 2 should be closed as discarded...
 
@@ -157,7 +157,7 @@ Child review request with ID 2 should be closed as discarded...
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
 Child review request with ID 3 should be closed as discarded...
 
@@ -178,7 +178,7 @@ Child review request with ID 3 should be closed as discarded...
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
 The review attachment should be marked as obsolete
 
@@ -272,7 +272,7 @@ Commit ID re-instated.
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: The review request is not public.
   draft:
     bugs:
     - '1'
@@ -317,7 +317,7 @@ Child review request with ID 2 should be re-opened...
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: The review request is not public.
   draft:
     bugs:
     - '1'
@@ -351,7 +351,7 @@ Child review request with ID 3 should be re-opened...
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: The review request is not public.
   draft:
     bugs:
     - '1'
@@ -457,7 +457,7 @@ Squashed review request should be published.
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: Commit a92d53c0ffc7df0517397a77980e62332552d812 is not approved.
 
 Child review request with ID 2 should be published.
 
@@ -478,7 +478,7 @@ Child review request with ID 2 should be published.
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
 Child review request with ID 3 should be published.
 
@@ -499,7 +499,7 @@ Child review request with ID 3 should be published.
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
 The attachment for the review request should be unobsoleted
 

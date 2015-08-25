@@ -82,7 +82,7 @@ Squashed review request with ID 1 should be closed as submitted...
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: Commit a92d53c0ffc7df0517397a77980e62332552d812 is not approved.
 
 Child review request with ID 2 should be closed as submitted...
 
@@ -103,7 +103,7 @@ Child review request with ID 2 should be closed as submitted...
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
   $ rbmanage dumpreview 3
   id: 3
@@ -122,7 +122,7 @@ Child review request with ID 2 should be closed as submitted...
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
 Re-opening the parent review request should re-open all of the children.
 
@@ -158,7 +158,7 @@ Squashed review request with ID 1 should be re-opened...
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: Commit a92d53c0ffc7df0517397a77980e62332552d812 is not approved.
 
 Child review request with ID 2 should be re-opened...
 
@@ -179,7 +179,7 @@ Child review request with ID 2 should be re-opened...
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
 Child review request with ID 3 should be re-opened...
 
@@ -200,7 +200,7 @@ Child review request with ID 3 should be re-opened...
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
 Cleanup
 

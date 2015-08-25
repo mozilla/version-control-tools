@@ -57,7 +57,7 @@ Publishing the parent should succeed.
     p2rb.reviewer_map: '{"2": []}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Pending Review
+  approval_failure: Commit 86a712c7f0187fed4c00b99131838610c76e6cc0 is not approved.
 
   $ rbmanage dumpreview 2
   id: 2
@@ -76,7 +76,7 @@ Publishing the parent should succeed.
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
-  approval_failure: Pending Review
+  approval_failure: A suitable reviewer has not given a "Ship It!"
 
   $ cd ..
 
