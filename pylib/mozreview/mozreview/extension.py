@@ -69,6 +69,9 @@ class MozReviewExtension(Extension):
     is_configurable = True
 
     css_bundles = {
+        'default': {
+            'source_filenames': ['mozreview/css/common.less'],
+        },
         'review': {
             'source_filenames': ['mozreview/css/review.less',
                                  'mozreview/css/commits.less'],
@@ -78,6 +81,9 @@ class MozReviewExtension(Extension):
         },
     }
     js_bundles = {
+        'default': {
+            'source_filenames': ['mozreview/js/logout.js'],
+        },
         'reviews': {
             # TODO: Everything will break if init_rr.js is not first in this
             # list.
@@ -156,6 +162,13 @@ class MozReviewExtension(Extension):
         TemplateHook(self, 'base-scripts-post',
                      'mozreview/review-scripts-js.html',
                      apply_to=review_request_url_names)
+        TemplateHook(self, 'base-extrahead',
+                     'mozreview/base-extrahead-login-form.html',
+                     apply_to=['login'])
+        TemplateHook(self, 'before-login-form',
+                     'mozreview/before-login-form.html', apply_to=['login'])
+        TemplateHook(self, 'after-login-form',
+                     'mozreview/after-login-form.html', apply_to=['login'])
 
         ReviewRequestFieldsHook(self, 'main', [CommitsListField])
         # This forces the Commits field to be the top item.

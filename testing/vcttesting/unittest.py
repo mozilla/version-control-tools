@@ -8,7 +8,9 @@ import os
 import shutil
 import subprocess
 import tempfile
+import time
 import unittest
+from urllib import urlencode
 
 from selenium import webdriver
 import selenium.webdriver.support.expected_conditions as EC
@@ -145,18 +147,45 @@ class MozReviewWebDriverTest(MozReviewTest):
         """Load the specified Review Board URL."""
         self.browser.get('%s%s' % (self.rburl, path))
 
+    def load_bzurl(self, path):
+        """Load the specified Bugzilla URL."""
+        self.browser.get('%s%s' % (self.bzurl, path))
+
     def verify_rburl(self, path):
         """Verify the current URL is the specified Review Board URL."""
         current = self.browser.current_url
         self.assertEqual(current, '%s%s' % (self.rburl, path))
 
+    def verify_bzurl(self, path):
+        """Verify the current URL is the specified Bugzilla URL."""
+        current = self.browser.current_url
+        self.assertEqual(current, '%s%s' % (self.bzurl, path))
+
     def reviewboard_login(self, username, password, verify=True):
         """Log into Review Board with the specified credentials."""
-        self.load_rburl('account/login')
+        # Ensure that we're logged out of both Review Board and Bugzilla;
+        # otherwise we will be automatically logged back in.
+        self.load_rburl('mozreview/logout/')
+        self.load_bzurl('index.cgi?logout=1')
+        self.load_rburl('account/login/')
 
-        input_username = self.browser.find_element_by_id('id_username')
+        # Wait for redirect to Bugzilla login.
+        bz_auth_url_path = 'auth.cgi?%s' % urlencode({
+            'callback': '%smozreview/bmo_auth_callback/' % self.rburl,
+            'description': 'mozreview'
+        })
+        bz_auth_url = '%s%s' % (self.bzurl, bz_auth_url_path)
+
+        for _ in xrange(0, 5):
+            if self.browser.current_url == bz_auth_url:
+                break
+            time.sleep(1)
+
+        self.verify_bzurl(bz_auth_url_path)
+
+        input_username = self.browser.find_element_by_id('Bugzilla_login')
         input_username.send_keys(username)
-        input_password = self.browser.find_element_by_id('id_password')
+        input_password = self.browser.find_element_by_id('Bugzilla_password')
         input_password.send_keys(password)
 
         input_password.submit()

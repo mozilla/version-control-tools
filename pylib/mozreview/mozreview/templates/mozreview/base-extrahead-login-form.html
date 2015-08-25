@@ -1,0 +1,6 @@
+{% load bugzilla %}
+{% get_full as full %}
+
+{% if not full and not request.user.is_authenticated %}
+  <meta http-equiv="refresh" content="0;URL={% bugzilla_auth_uri %}">
+{% endif %}

@@ -1,0 +1,6 @@
+{% load bugzilla %}
+{% get_full as full %}
+
+{% if request.user.is_authenticated or not full %}
+  <!-- disable login form
+{% endif %}

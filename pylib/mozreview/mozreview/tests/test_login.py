@@ -8,19 +8,20 @@ from vcttesting.unittest import MozReviewWebDriverTest
 
 
 class LoginTest(MozReviewWebDriverTest):
-    def assertInvalidLogin(self):
-        self.verify_rburl('account/login/')
-        el = self.browser.find_elements_by_class_name('errorlist')
-        self.assertEqual(len(el), 1)
-        li = el[0].find_elements_by_tag_name('li')
-        self.assertEqual(len(li), 1)
-        self.assertIn('Please enter a correct username and password',
-            li[0].text)
-
+    def assertInvalidLogin(self, verify_error_msg=True):
+        self.verify_bzurl('auth.cgi')
+        if verify_error_msg:
+            el = self.browser.find_element_by_id('error_msg')
+            self.assertIn('The username or password you entered is not valid',
+                          el.text)
 
     def test_invalid_login(self):
         self.reviewboard_login('nobody', 'invalid', verify=False)
-        self.assertInvalidLogin()
+        # The Bugzilla login form uses type="email" in the login field.
+        # Since this means we can't submit the form with the username
+        # 'nobody' (not a valid email address), we won't get the standard
+        # invalid-login error message.
+        self.assertInvalidLogin(verify_error_msg=False)
 
     def test_username_login_disallowed(self):
         self.bugzilla().create_user('baduser@example.com', 'password1',

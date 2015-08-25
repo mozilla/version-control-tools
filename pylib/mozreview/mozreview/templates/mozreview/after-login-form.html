@@ -1,0 +1,17 @@
+{% load bugzilla %}
+{% get_full as full %}
+
+{% if user_authenticated or not full %}
+  end of standard login form -->
+
+  <div class="auth-header">
+    {% if request.user.is_authenticated %}
+      <p>You must <a href="{% url 'logout' %}">log out</a> before
+         logging back in.</p>
+    {% else %}
+      <p>You are being redirected to
+        <a href="{% bugzilla_auth_uri %}">Bugzilla</a> to log in...
+      </p>
+    {% endif %}
+  </div>
+{% endif %}
