@@ -6,7 +6,7 @@ alias hgmo='$TESTDIR/hgmo'
 alias http=$TESTDIR/testing/http-request.py
 
 hgmoenv() {
-  export DOCKER_STATE_FILE=`pwd`/docker-state.json
+  export DOCKER_STATE_FILE=`pwd`/.dockerstate
   export HGMO_STATE_FILE=`pwd`/hgmo.json
 
   hgmo start --master-ssh-port $HGPORT > /dev/null

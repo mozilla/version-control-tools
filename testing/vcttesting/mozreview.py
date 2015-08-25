@@ -100,7 +100,7 @@ class MozReview(object):
 
         self._state_path = os.path.join(path, 'state.json')
 
-        docker_state = os.path.join(path, 'docker-state.json')
+        docker_state = os.path.join(path, '.dockerstate')
 
         self._docker_state = docker_state
 

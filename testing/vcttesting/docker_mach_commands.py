@@ -31,7 +31,7 @@ class DockerCommands(object):
         # use HGRCPATH as a base, since it is in a test-specific directory.
         elif 'HGRCPATH' in os.environ:
             state_file = os.path.join(os.path.dirname(os.environ['HGRCPATH']),
-                                     'docker-state.json')
+                                     '.dockerstate')
         else:
             state_file = os.path.join(ROOT, '.dockerstate')
 
