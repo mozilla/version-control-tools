@@ -3,7 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import logging
+import posixpath
 import xmlrpclib
+
+from urlparse import urlparse, urlunparse
 
 from djblets.siteconfig.models import SiteConfiguration
 from djblets.util.decorators import simple_decorator
@@ -61,14 +64,21 @@ class Bugzilla(object):
         self._transport = None
         self._proxy = None
 
+        siteconfig = SiteConfiguration.objects.get_current()
+
         if xmlrpc_url:
             self.xmlrpc_url = xmlrpc_url
         else:
-            siteconfig = SiteConfiguration.objects.get_current()
             self.xmlrpc_url = siteconfig.get('auth_bz_xmlrpc_url')
 
         if not self.xmlrpc_url:
             raise BugzillaUrlError('no XMLRPC URL')
+
+        # We only store the xmlrpc URL currently. We should eventually store
+        # the Bugzilla base URL and derive the XMLRPC URL from it.
+        u = urlparse(self.xmlrpc_url)
+        root = posixpath.dirname(u.path).rstrip('/') + '/'
+        self.base_url = urlunparse((u.scheme, u.netloc, root, '', '', ''))
 
     @xmlrpc_to_bugzilla_errors
     def log_in(self, username, password, cookie=False):

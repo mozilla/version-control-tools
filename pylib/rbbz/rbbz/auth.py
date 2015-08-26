@@ -15,9 +15,14 @@ from reviewboard.accounts.errors import UserQueryError
 from mozreview.bugzilla.client import Bugzilla
 from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
 from mozreview.bugzilla.models import (
+    BugzillaUserMap,
     BZ_IRCNICK_RE,
     get_bugzilla_api_key,
     get_or_create_bugzilla_users,
+)
+from mozreview.errors import (
+    BugzillaAPIKeyNeededError,
+    WebLoginNeededError,
 )
 from rbbz.forms import BugzillaAuthSettingsForm
 
@@ -97,6 +102,84 @@ class BugzillaBackend(AuthBackend):
             logging.error('Login failure for user %s: user is not active.'
                           % username)
             return None
+
+        return user
+
+    def authenticate_api_key(self, username, api_key):
+        """Authenticate a user from a username and API key.
+
+        This is intended to be used by the Web API and not a user-facing
+        login form. We enforce that the user already exists and has an
+        API key - not necessarily the same API key - on file. The API key
+        passed in is only used for authentication: all subsequent communication
+        with Bugzilla should be performed using the API key on file.
+
+        We require the user already exist in the database because having
+        the user go through the browser-facing login flow is the most sane
+        (and secure) way to obtain an API key. We don't want to store the
+        API key provided to us from the client because API keys obtained by
+        the browser login may have special permissions not granted to normal
+        API keys.
+        """
+        username = username.strip()
+
+        try:
+            bugzilla = Bugzilla()
+        except BugzillaUrlError:
+            logging.warn('Login failure for user %s: Bugzilla URL not set.' %
+                         username)
+
+        try:
+            valid = bugzilla.valid_api_key(username, api_key)
+        except BugzillaError as e:
+            logging.error('Login failure for user %s: %s' % (username, e))
+            return None
+
+        if not valid:
+            logging.error('Login failure for user %s: invalid API key' %
+                          username)
+            assert bugzilla.base_url.endswith('/')
+            raise BugzillaAPIKeyNeededError(
+                    bugzilla.base_url + 'userprefs.cgi?tab=apikey')
+
+        # Assign the API key to the Bugzilla connection so the user info
+        # lookup uses it.
+        # TODO can we skip valid_api_key() and just get user info straight up?
+        bugzilla.api_key = api_key
+
+        try:
+            user_data = bugzilla.get_user(username)
+        except BugzillaError as e:
+            logging.error('Login failure for user %s: unable to retrieve '
+                          'Bugzilla user info: %s' % (username, e))
+            return None
+
+        if not user_data:
+            logging.warning('Could not retrieve user info for %s after '
+                            'validating API key' % username)
+            return None
+
+        bz_user = user_data['users'][0]
+
+        try:
+            bum = BugzillaUserMap.get(bugzilla_user_id=bz_user['id'])
+            user = bum.user
+        except BugzillaUserMap.DoesNotExist:
+            logging.warning('Login failure for user %s: API key valid but '
+                            'user missing from database' % username)
+            raise WebLoginNeededError()
+
+        if not user.is_active:
+            logging.error('Login failure for user %s: user not active' %
+                          username)
+            return None
+
+        # We require a local API key to be on file, as it will be used for
+        # subsequent requests.
+        if not get_bugzilla_api_key(user):
+            logging.warning('Login failure for user %s: no API key in '
+                            'database' % username)
+            raise WebLoginNeededError()
 
         return user
 

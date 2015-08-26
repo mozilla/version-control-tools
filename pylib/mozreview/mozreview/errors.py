@@ -28,6 +28,16 @@ CHILD_DOES_NOT_EXIST = WebAPIError(
     "Child review request does not exist",
     http_status=500)  # 500 Internal Server Error
 
+class WebLoginNeededError(Exception):
+    """Raised when a request requires the user to log in via the web site."""
+
+
+class BugzillaAPIKeyNeededError(Exception):
+    """User should visit Bugzilla to obtain an API key."""
+    def __init__(self, url):
+        self.url = url
+
+
 NOT_PUSHED_PARENT_REVIEW_REQUEST = WebAPIError(
     1003,
     'This operation must be performed on the parent of a pushed review '
