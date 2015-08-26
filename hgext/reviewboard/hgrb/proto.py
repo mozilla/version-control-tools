@@ -27,12 +27,9 @@ API_KEY_NEEDED = (
 class AuthorizationError(Exception):
     """Represents an error authenticating or authorizing to Bugzilla."""
 
-    def __init__(self, e, username, password, userid, cookie, apikey, **kwargs):
+    def __init__(self, e, username=None, apikey=None, **kwargs):
         self.e = e
         self.username = username
-        self.password = password
-        self.userid = userid
-        self.cookie = cookie
         self.apikey = apikey
 
         self.web_login_needed = e.rsp.get('web_login_needed', False)
@@ -47,10 +44,6 @@ class AuthorizationError(Exception):
         if self.web_login_needed:
             return 'web login needed; log in at %s then try again' % self.login_url
 
-        if self.password:
-            return 'invalid Bugzilla username/password; check your settings'
-        if self.cookie:
-            return 'invalid Bugzilla login cookie; is it expired?'
         if self.apikey:
             return 'invalid Bugzilla API key; visit Bugzilla to obtain a new API key'
         else:
@@ -77,6 +70,16 @@ class ServerError(Exception):
 
     def __str__(self):
         return 'error %s' % self.s
+
+
+class NoAPITokenAuthError(ServerError):
+    """Error when client sends deprecated authentication credential types."""
+    def __init__(self):
+        super(NoAPITokenAuthError, self).__init__('irrelevant')
+
+    def __str__(self):
+        return 'error %s' % API_KEY_NEEDED
+
 
 # Wrap reviewboardmods and error types because we don't want to require the
 # clients to import rbtools.
@@ -134,9 +137,6 @@ def parsepayload(proto, args):
 
     o = {
         'bzusername': None,
-        'bzpassword': None,
-        'bzcookie': None,
-        'bzuserid': None,
         'bzapikey': None,
         'other': []
     }
@@ -149,11 +149,11 @@ def parsepayload(proto, args):
         if t == 'bzusername':
             o['bzusername'] = urllib.unquote(d)
         elif t == 'bzpassword':
-            o['bzpassword'] = urllib.unquote(d)
+            return NoAPITokenAuthError()
         elif t == 'bzuserid':
-            o['bzuserid'] = urllib.unquote(d)
+            return NoAPITokenAuthError()
         elif t == 'bzcookie':
-            o['bzcookie'] = urllib.unquote(d)
+            return NoAPITokenAuthError()
         elif t == 'bzapikey':
             o['bzapikey'] = urllib.unquote(d)
         elif t == 'supportscaps':
@@ -215,9 +215,6 @@ def reviewboard(repo, proto, args=None):
         return formatresponse(str(o))
 
     bzusername = o['bzusername']
-    bzpassword = o['bzpassword']
-    bzuserid = o['bzuserid']
-    bzcookie = o['bzcookie']
     bzapikey = o['bzapikey']
 
     identifier, nodes, precursors = parseidentifier(o)
@@ -318,8 +315,7 @@ def reviewboard(repo, proto, args=None):
     if ldap_username:
         associate_ldap_username(rburl, ldap_username, privleged_rb_username,
                                 privleged_rb_password, username=bzusername,
-                                password=bzpassword, userid=bzuserid,
-                                cookie=bzcookie, apikey=bzapikey)
+                                apikey=bzapikey)
 
     lines = [
         'rburl %s' % rburl,
@@ -330,9 +326,6 @@ def reviewboard(repo, proto, args=None):
         parentrid, commitmap, reviews = post_reviews(rburl, repoid, identifier,
                                                      commits, lines,
                                                      username=bzusername,
-                                                     password=bzpassword,
-                                                     userid=bzuserid,
-                                                     cookie=bzcookie,
                                                      apikey=bzapikey)
         lines.extend([
             'parentreview %s' % parentrid,
@@ -380,9 +373,6 @@ def pullreviews(repo, proto, args=None):
     from reviewboardmods.pushhooks import ReviewBoardClient
     with ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
                            username=o['bzusername'],
-                           password=o['bzpassword'],
-                           userid=o['bzuserid'],
-                           cookie=o['bzcookie'],
                            apikey=o['bzapikey']) as client:
         root = client.get_root()
 
@@ -467,9 +457,6 @@ def publishreviewseries(repo, proto, args=None):
     from reviewboardmods.pushhooks import ReviewBoardClient
     with ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
                            username=o['bzusername'],
-                           password=o['bzpassword'],
-                           userid=o['bzuserid'],
-                           cookie=o['bzcookie'],
                            apikey=o['bzapikey']) as client:
         root = client.get_root()
 

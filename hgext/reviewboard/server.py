@@ -62,6 +62,8 @@ requirecaps = set([
     'proto1',
     # Client knows how to interpret lists in review data.
     'listreviewdata',
+    # Client knows how to send API keys for authentication.
+    'bzapikeys',
 ])
 
 

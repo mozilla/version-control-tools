@@ -2,6 +2,7 @@
 
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv
+  $ apikey=`mozreview create-api-key ${BUGZILLA_USERNAME}`
 
   $ cat >> $HGRCPATH << EOF
   > [extensions]
@@ -14,8 +15,9 @@
   > ircnick = dummy
   > [bugzilla]
   > username = ${BUGZILLA_USERNAME}
-  > password = ${BUGZILLA_PASSWORD}
+  > apikey = ${apikey}
   > EOF
+
 
   $ bugzilla create-bug TestProduct TestComponent bug1
 

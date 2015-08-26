@@ -79,6 +79,7 @@ command = cmdutil.command(cmdtable)
 clientcapabilities = {
     'proto1',
     'listreviewdata',
+    'bzapikeys',
 }
 
 def decodepossiblelistvalue(v):

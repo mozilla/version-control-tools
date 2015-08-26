@@ -55,42 +55,21 @@ Mozilla's Review Board deployment uses
 for user authentication and authorization. In order to talk to Review
 Board, you will need to provide valid Bugzilla credentials.
 
-If no configuration is defined, the *reviewboard* extension will
-automatically try to find Bugzilla credentials by looking for a login
-cookie in Firefox profiles on your machine. If it finds one, it will try
-to use it.
+Bugzila credentials consist of a Bugzilla username (email address)
+and API key. To obtain an API key:
 
-If you would like to explicitly define credentials to use, copy the
-following Mercurial configuration snippet into your global ``~/.hgrc``
-or per-repository ``.hg/hgrc`` file and adjust to your liking::
+1. Visit https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey in your
+   browser.
+2. Generate a new API key
+3. Add your username/email and API key to your hgrc file.
+
+A template to put in your hgrc file is as follows::
 
   [bugzilla]
   ; Your Bugzilla username. This is an email address.
   username = me@example.com
-  ; Your Bugzilla password (in plain text)
-  password = MySecretPassword
-
-  ; or
-
-  ; Your numeric Bugzilla user id.
-  userid = 24113
-  ; A valid Bugzilla login cookie.
-  cookie = ihsLJHF308hd
-
-You will likely need to go snooping around your browser's cookies to
-find a valid login cookie to use with ``userid`` and ``cookie``.
-``userid`` comes from the value of the ``Bugzilla_login`` cookie and
-``cookie`` comes from the value of the ``Bugzilla_logincookie`` cookie.
-
-.. note:: Using cookies over your username and password is preferred.
-
-   For security reasons, it is recommended to use cookies instead of
-   password for authentication. The reason is that cookies are transient
-   and can be revoked. Your password is your *master key* and it should
-   ideally be guarded.
-
-   Bugzilla and Review Board will eventually support API tokens for an
-   even better security story.
+  ; A Bugzilla API key
+  apikey = ojQBGzhDmFYRFSX4xWNCSyOEsJKqisU0l0EJqXh6
 
 IRC Nickname
 ------------

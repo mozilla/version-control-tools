@@ -14,7 +14,7 @@
 
   $ bugzilla create-bug TestProduct TestComponent bug1
 
-Pushing with unknown username with password results in sane failure
+Pushing with a password results in server rejection
 
   $ hg --config bugzilla.username=unknown --config bugzilla.password=irrelevant --config bugzilla.apikey= push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
@@ -27,7 +27,17 @@ Pushing with unknown username with password results in sane failure
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
   submitting 1 changesets for review
-  abort: invalid Bugzilla username/password; check your settings
+  abort: Bugzilla API keys are now used by MozReview; see https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html#bugzilla-credentials for instructions on how to configure your client
+  [255]
+
+Pushing with a cookie results in server rejection
+
+  $ hg --config bugzilla.userid=baduserid --config bugzilla.cookie=irrelevant --config bugzilla.apikey= push
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  searching for changes
+  no changes found
+  submitting 1 changesets for review
+  abort: Bugzilla API keys are now used by MozReview; see https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html#bugzilla-credentials for instructions on how to configure your client
   [255]
 
 Pushing with unknown username with API key results in sane failure
@@ -82,64 +92,6 @@ User in database without API key requires web login
   submitting 1 changesets for review
   abort: web login needed; log in at http://*:$HGPORT1/account/login then try again (glob)
   [255]
-
-Pushing with invalid password results in sane failure
-
-  $ hg --config bugzilla.username=${BUGZILLA_USERNAME} --config bugzilla.password=badpass --config bugzilla.apikey= push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
-  searching for changes
-  no changes found
-  submitting 1 changesets for review
-  abort: invalid Bugzilla username/password; check your settings
-  [255]
-
-Pushing with invalid cookie results in sane failure
-
-  $ hg --config bugzilla.userid=baduserid --config bugzilla.cookie=irrelevant --config bugzilla.apikey= push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
-  searching for changes
-  no changes found
-  submitting 1 changesets for review
-  abort: invalid Bugzilla login cookie; is it expired?
-  [255]
-
-Pushing using cookie auth works
-
-  $ out=`bugzilla create-login-cookie`
-  $ userid=`echo ${out} | awk '{print $1}'`
-  $ cookie=`echo ${out} | awk '{print $2}'`
-
-  $ hg --config bugzilla.userid=${userid} --config bugzilla.cookie=${cookie} --config bugzilla.apikey= push --reviewid bz://1/goodcookie
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
-  searching for changes
-  no changes found
-  submitting 1 changesets for review
-  
-  changeset:  1:d97f9c20be62
-  summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
-  
-  review id:  bz://1/goodcookie
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
-  [1]
-
-Pushing using username password auth works
-
-  $ hg --config bugzilla.username=${BUGZILLA_USERNAME} --config bugzilla.password=${BUGZILLA_PASSWORD} --config bugzilla.apikey= push --reviewid bz://1/gooduserpass
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
-  searching for changes
-  no changes found
-  submitting 1 changesets for review
-  
-  changeset:  1:d97f9c20be62
-  summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
-  
-  review id:  bz://1/gooduserpass
-  review url: http://*:$HGPORT1/r/3 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
-  [1]
 
 Usernames for users without the IRC nick syntax are based on email fragment and BZ user id
 
@@ -215,10 +167,10 @@ Changing the IRC nickname in Bugzilla will update the RB username
   
   changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/6 (draft) (glob)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/user2newnick
-  review url: http://*:$HGPORT1/r/5 (draft) (glob)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
@@ -246,10 +198,10 @@ Changing the email address in Bugzilla will update the RB email
   
   changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/8 (draft) (glob)
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
   review id:  bz://1/user2newemail
-  review url: http://*:$HGPORT1/r/7 (draft) (glob)
+  review url: http://*:$HGPORT1/r/3 (draft) (glob)
   (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
@@ -293,7 +245,7 @@ Re-enabling a disabled user will allow them to use Review Board
   
   changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/10 (draft) (glob)
+  review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
   review id:  bz://1/undisableduser
   review url: http://*:$HGPORT1/r/5 (draft) (glob)
