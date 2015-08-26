@@ -658,7 +658,7 @@ class LocalMercurialRepository(object):
             ]))
 
     def run(self, args):
-        cmd = [self.hg]
+        cmd = [self.hg, '--config', 'ui.interactive=false']
         cmd.extend(args)
 
         env = dict(os.environ)
