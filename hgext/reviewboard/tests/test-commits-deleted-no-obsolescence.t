@@ -234,15 +234,15 @@ likely gets invalidated.
   remote: recorded push in pushlog
   submitting 3 changesets for review
   
-  changeset:  1:e1679d43aceb
+  changeset:  1:7050183d97d5
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:13cf6665548a
+  changeset:  2:d7a5827a584d
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  3:b891c874875b
+  changeset:  3:b5473ad606f4
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
@@ -279,7 +279,7 @@ The first commit was rewritten (we assume all subsequent were as well).
     target_people: []
     extra:
       p2rb: true
-      p2rb.commit_id: e1679d43acebff4b173624488cdf4b5eff1ccd94
+      p2rb.commit_id: 7050183d97d5f601da86fb313dd8783ccf1ade18
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
     diffs:
@@ -343,13 +343,13 @@ request is published.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r b891c874875b046c191a868d55830aa201b28ebe http://*:$HGPORT/test-repo (glob)
+    - hg pull -r b5473ad606f40840715d6b378dacc1a37f6263b1 http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
       p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-      p2rb.commits: '[["e1679d43acebff4b173624488cdf4b5eff1ccd94", 2], ["13cf6665548ad20d8cb7eed42c3ffc1c7689939f",
-        3], ["b891c874875b046c191a868d55830aa201b28ebe", 4]]'
+      p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 2], ["d7a5827a584db609f6a9ca2bd3d43aa3afa6b86e",
+        3], ["b5473ad606f40840715d6b378dacc1a37f6263b1", 4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -400,11 +400,11 @@ Try removing a commit in the middle.
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:e1679d43aceb
+  changeset:  1:7050183d97d5
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/2 (glob)
   
-  changeset:  2:74896d4d6f00
+  changeset:  2:2fbc30f77859
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   

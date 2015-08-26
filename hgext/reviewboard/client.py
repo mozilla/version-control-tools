@@ -30,6 +30,7 @@ from mercurial import (
     commands,
     context,
     demandimport,
+    error,
     exchange,
     extensions,
     hg,
@@ -156,6 +157,25 @@ def getreviewcaps(remote):
         caps = ''
 
     return set(caps.split(','))
+
+
+def rebasecommand(orig, ui, repo, *args, **kwargs):
+    """Wraps rebase command to preserve commit id across rebases.
+
+    Mercurial doesn't preserve all "extra" fields from changectx during
+    rebase by default. However, the rebase command takes a hidden named
+    argument that specifies a function to be called to carry over extras.
+    We hook into this mechanism.
+    """
+    def extrafn(ctx, extra):
+        # Make sure to call original one, if defined.
+        if 'extrafn' in kwargs:
+            kwargs['extrafn'](ctx, extra)
+
+        if 'commitid' in ctx.extra():
+            extra['commitid'] = ctx.extra()['commitid']
+
+    return orig(ui, repo, extrafn=extrafn, *args, **kwargs)
 
 
 def pushcommand(orig, ui, repo, *args, **kwargs):
@@ -659,9 +679,9 @@ def publishreviewrequests(ui, remote, bzauth, rrids):
             ui.status(_('(published review request %s)\n') % v)
         elif k == 'error':
             errored = True
-            rrid, error = v.split(' ', 1)
+            rrid, errstr = v.split(' ', 1)
             ui.warn(_('error publishing review request %s: %s\n') %
-                    (rrid, error))
+                    (rrid, errstr))
 
     if errored:
         ui.warn(_('(review requests not published; visit review url to '
@@ -1011,6 +1031,24 @@ def extsetup(ui):
     entry[1].append(('', 'reviewid', '', _('Review identifier')))
     entry[1].append(('c', 'changeset', '',
                     _('Review this specific changeset only')))
+
+    # Value may be empty. So check config source to see if key is present.
+    if (ui.configsource('extensions', 'rebase') != 'none' and
+        ui.config('extensions', 'rebase') != '!'):
+        # The extensions.afterloaded mechanism is busted. So we can't
+        # reliably wrap the rebase command in case it hasn't loaded yet. So
+        # just load the rebase extension and wrap the function directly
+        # from its commands table.
+        try:
+            cmdutil.findcmd('rebase', commands.table, strict=True)
+        except error.UnknownCommand:
+            extensions.load(ui, 'rebase', '')
+
+        # Extensions' cmdtable entries aren't merged with commands.table.
+        # Instead, dispatch just looks at each module. So it is safe to wrap
+        # the command on the extension module.
+        rebase = extensions.find('rebase')
+        extensions.wrapcommand(rebase.cmdtable, 'rebase', rebasecommand)
 
     templatekw.keywords['reviews'] = template_reviews
 

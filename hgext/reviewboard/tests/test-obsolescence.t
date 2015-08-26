@@ -67,7 +67,7 @@ Now create a new head and push a rebase
   summary:    bar
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  4:15cedbc6da54
+  changeset:  4:0bdd81f5fee5
   summary:    foo2
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   

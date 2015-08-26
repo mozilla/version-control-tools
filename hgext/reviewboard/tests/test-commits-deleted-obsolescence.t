@@ -273,15 +273,15 @@ be preserved.
   remote: recorded push in pushlog
   submitting 3 changesets for review
   
-  changeset:  10:e1679d43aceb
+  changeset:  10:7050183d97d5
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  11:13cf6665548a
+  changeset:  11:d7a5827a584d
   summary:    Bug 1 - Foo 3
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
-  changeset:  12:b891c874875b
+  changeset:  12:b5473ad606f4
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/5 (draft) (glob)
   
@@ -336,13 +336,13 @@ on publish.
     - ''
     - 'Pull down these commits:'
     - ''
-    - hg pull -r b891c874875b046c191a868d55830aa201b28ebe http://*:$HGPORT/test-repo (glob)
+    - hg pull -r b5473ad606f40840715d6b378dacc1a37f6263b1 http://*:$HGPORT/test-repo (glob)
     target_people: []
     extra:
       p2rb: true
       p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-      p2rb.commits: '[["e1679d43acebff4b173624488cdf4b5eff1ccd94", 3], ["13cf6665548ad20d8cb7eed42c3ffc1c7689939f",
-        4], ["b891c874875b046c191a868d55830aa201b28ebe", 5]]'
+      p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 3], ["d7a5827a584db609f6a9ca2bd3d43aa3afa6b86e",
+        4], ["b5473ad606f40840715d6b378dacc1a37f6263b1", 5]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
@@ -398,7 +398,7 @@ The dropped commit should now be discarded
 
 Try removing a commit in the middle.
 
-  $ hg -q rebase -s b891c874875b -d e1679d43aceb
+  $ hg -q rebase -s b5473ad606f4 -d 7050183d97d5
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
@@ -409,11 +409,11 @@ Try removing a commit in the middle.
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  10:e1679d43aceb
+  changeset:  10:7050183d97d5
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (glob)
   
-  changeset:  13:74896d4d6f00
+  changeset:  13:2fbc30f77859
   summary:    Bug 1 - Foo 4
   review:     http://*:$HGPORT1/r/5 (draft) (glob)
   
@@ -440,12 +440,12 @@ The parent review should have been updated accordingly.
   - ''
   - 'Pull down these commits:'
   - ''
-  - hg pull -r 74896d4d6f00bcd490131c146eeae800e3822e0d http://*:$HGPORT/test-repo (glob)
+  - hg pull -r 2fbc30f77859fa4be2e173866fa71c52d394f2c4 http://*:$HGPORT/test-repo (glob)
   target_people: []
   extra_data:
     p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-    p2rb.commits: '[["e1679d43acebff4b173624488cdf4b5eff1ccd94", 3], ["74896d4d6f00bcd490131c146eeae800e3822e0d",
+    p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 3], ["2fbc30f77859fa4be2e173866fa71c52d394f2c4",
       5]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.identifier: bz://1/mynick
@@ -453,7 +453,7 @@ The parent review should have been updated accordingly.
     p2rb.reviewer_map: '{"3": [], "5": [], "4": []}'
     p2rb.unpublished_rids: '[]'
   approved: false
-  approval_failure: Commit e1679d43acebff4b173624488cdf4b5eff1ccd94 is not approved.
+  approval_failure: Commit 7050183d97d5f601da86fb313dd8783ccf1ade18 is not approved.
 
 Cleanup
 
