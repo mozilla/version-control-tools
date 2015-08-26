@@ -141,48 +141,10 @@ Pushing using username password auth works
   (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
-Pushing as a user not in Review Board should auto create the RB account
-We create 2 users here. 1 looks like a normal person: "First Last"
-The other has Mozilla IRC syntax: "First Last [:nick]"
+Usernames for users without the IRC nick syntax are based on email fragment and BZ user id
 
   $ mozreview create-user user1@example.com password1 'Dummy User1' --uid 2001 --scm-level 1
   Created user 8
-  $ mozreview create-user user2@example.com password2 'Mozila User [:nick]' --uid 2002 --scm-level 1
-  Created user 9
-
-  $ exportbzauth user1@example.com password1
-  $ hg push --reviewid bz://1/nonick
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
-  searching for changes
-  no changes found
-  submitting 1 changesets for review
-  
-  changeset:  1:d97f9c20be62
-  summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/6 (draft) (glob)
-  
-  review id:  bz://1/nonick
-  review url: http://*:$HGPORT1/r/5 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
-  [1]
-
-  $ exportbzauth user2@example.com password2
-  $ hg push --reviewid bz://1/withnick
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
-  searching for changes
-  no changes found
-  submitting 1 changesets for review
-  
-  changeset:  1:d97f9c20be62
-  summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/8 (draft) (glob)
-  
-  review id:  bz://1/withnick
-  review url: http://*:$HGPORT1/r/7 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
-  [1]
-
-Usernames for users without the IRC nick syntax are based on email fragment and BZ user id
 
   $ exportbzauth user1@example.com password1
   $ rbmanage dump-user 'user1+8'
@@ -224,6 +186,9 @@ Newly created users should have a suitable profile (e.g. is_private is set)
 
 Usernames for users with IRC nicks are the IRC nickname
 
+  $ mozreview create-user user2@example.com password2 'Mozila User [:nick]' --uid 2002 --scm-level 1
+  Created user 9
+
   $ exportbzauth user2@example.com password2
   $ rbmanage dump-user nick
   6:
@@ -250,10 +215,10 @@ Changing the IRC nickname in Bugzilla will update the RB username
   
   changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/10 (draft) (glob)
+  review:     http://*:$HGPORT1/r/6 (draft) (glob)
   
   review id:  bz://1/user2newnick
-  review url: http://*:$HGPORT1/r/9 (draft) (glob)
+  review url: http://*:$HGPORT1/r/5 (draft) (glob)
   (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
@@ -281,10 +246,10 @@ Changing the email address in Bugzilla will update the RB email
   
   changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/12 (draft) (glob)
+  review:     http://*:$HGPORT1/r/8 (draft) (glob)
   
   review id:  bz://1/user2newemail
-  review url: http://*:$HGPORT1/r/11 (draft) (glob)
+  review url: http://*:$HGPORT1/r/7 (draft) (glob)
   (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
@@ -306,12 +271,13 @@ Disabling a user in Bugzilla will prevent them from using Review Board
 
 (This error message isn't terrific. It can be improved later.)
   $ exportbzauth user1@example.com
-  $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 --config bugzilla.apikey= push --reviewid bz://1/disableduser
+  $ user1key=`mozreview create-api-key user1@example.com`
+  $ hg --config bugzilla.username=user1@example.com --config bugzilla.apikey=${user1key} push --reviewid bz://1/disableduser
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: invalid Bugzilla username/password; check your settings
+  abort: invalid Bugzilla API key; visit Bugzilla to obtain a new API key
   [255]
 
 Re-enabling a disabled user will allow them to use Review Board
@@ -319,7 +285,7 @@ Re-enabling a disabled user will allow them to use Review Board
   $ adminbugzilla update-user-login-denied-text user1@example.com ''
   updated user 8
   $ exportbzauth user1@example.com password1
-  $ hg push --reviewid bz://1/undisableduser
+  $ hg push --config bugzilla.username=user1@example.com --config bugzilla.apikey=${user1key} --reviewid bz://1/undisableduser
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
@@ -327,10 +293,10 @@ Re-enabling a disabled user will allow them to use Review Board
   
   changeset:  1:d97f9c20be62
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/14 (draft) (glob)
+  review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
   review id:  bz://1/undisableduser
-  review url: http://*:$HGPORT1/r/13 (draft) (glob)
+  review url: http://*:$HGPORT1/r/5 (draft) (glob)
   (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
@@ -339,22 +305,6 @@ we fall back to non-IRC RB usernames.
 
   $ mozreview create-user user3@example.com password3 'Dummy User3 [:newnick]' --uid 2003 --scm-level 1
   Created user 10
-
-  $ exportbzauth user3@example.com password3
-  $ hg push --reviewid bz://1/conflictingircnick
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
-  searching for changes
-  no changes found
-  submitting 1 changesets for review
-  
-  changeset:  1:d97f9c20be62
-  summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/16 (draft) (glob)
-  
-  review id:  bz://1/conflictingircnick
-  review url: http://*:$HGPORT1/r/15 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
-  [1]
 
 (Recycling user2 for this test is a bit dangerous. We should consider
 adding a new user or splitting this test file.)
@@ -389,12 +339,7 @@ user, they will be assigned the email+id username.
   $ adminbugzilla update-user-fullname user3@example.com 'Mozilla User3 [:mynick]'
   updated user 10
 
-(We need to push to get the RB username updated)
-
   $ exportbzauth user3@example.com password3
-  $ hg push --reviewid bz://1/user3newnick > /dev/null
-  [1]
-
   $ rbmanage dump-user mynick
   7:
     avatar_url: http://www.gravatar.com/avatar/* (glob)
@@ -424,22 +369,6 @@ user, they will be assigned the email+id username.
 
   $ adminbugzilla update-user-fullname user2-new@example.com 'Mozilla User [:mynick]'
   updated user 9
-
-  $ exportbzauth user2-new@example.com password2
-  $ SSH_KEYNAME=user2@example.com hg push --reviewid bz://1/user2sharednick
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
-  searching for changes
-  no changes found
-  submitting 1 changesets for review
-  
-  changeset:  1:d97f9c20be62
-  summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/20 (draft) (glob)
-  
-  review id:  bz://1/user2sharednick
-  review url: http://*:$HGPORT1/r/19 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
-  [1]
 
   $ exportbzauth user3@example.com password3
   $ rbmanage dump-user mynick
