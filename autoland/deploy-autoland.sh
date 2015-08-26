@@ -7,5 +7,4 @@ virtualenv venv
 . venv/bin/activate
 pip install -r requirements.txt
 cd autoland
-nohup ./autoland_pulse.py --log-mach=/home/ubuntu/autoland-pulse.log &
 nohup ./autoland.py --log-mach=/home/ubuntu/autoland.log &

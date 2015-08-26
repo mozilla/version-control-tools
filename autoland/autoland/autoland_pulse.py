@@ -57,6 +57,7 @@ def main():
     unique_label = 'autoland-%s' % platform.node()
     pulse = consumers.BuildConsumer(applabel=unique_label, user=user,
                                     password=password)
+    pulse.configure(topic=['build.#.finished'], callback=handle_message)
     logger.debug('applabel: %s' % unique_label)
     while True:
         try:

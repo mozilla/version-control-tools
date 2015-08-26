@@ -54,6 +54,7 @@ pycrypto==2.6.1
 Pygments==2.0.2
 pyOpenSSL==0.15.1
 python-dateutil==1.5
+python-hglib==1.7
 python-ldap==2.4.19
 python-memcached==1.54
 pytz==2015.2
