@@ -52,7 +52,20 @@ import urlparse
 from cStringIO import StringIO
 
 from mercurial.i18n import _
-from mercurial import cmdutil, commands, context, encoding, error, node, patch, scmutil, util
+from mercurial import (
+    cmdutil,
+    commands,
+    context,
+    encoding,
+    error,
+    extensions,
+    node,
+    obsolete,
+    patch,
+    revset,
+    scmutil,
+    util,
+)
 from hgext import mq, histedit
 
 OUR_DIR = os.path.dirname(__file__)
@@ -93,6 +106,46 @@ newbug_opts = [
     ('P', 'ffprofile', '',
      'Name of Firefox profile to pull bugzilla cookies from'),
 ]
+
+def _basechange(repo, subset):
+    repo = repo.unfiltered()
+
+    result = set()
+    for n in subset:
+        base = repo[n].node()
+        while True:
+            precursors = [obsolete.marker(repo, m)
+                          for m in repo.obsstore.precursors.get(base, ())]
+            if len(precursors) == 0:
+                break
+
+            # Multiple precursors means a join point. Pick the first precursor.
+            pre = min(precursors, key=lambda m: m.date())
+
+            # Multiple successors means a split. If we are the first successor,
+            # keep going. Otherwise, stop here.
+            if base != min(pre.succnodes(), key=lambda n: repo[n].date()):
+                break
+
+            base = pre.precnode()
+
+        result.add(base)
+
+    return result
+
+def revset_bzbasechange(repo, subset, x):
+    """``bzbasechange(NODE)``
+    (EXPERIMENTAL) A precursor changeset that uniquely represents the given node. Computed by
+    tracing back through precursors' first successors until a divergent fork is
+    found, or there are no more precursors (in which case the final precursor
+    is used). A divergent fork is where a node is not its precursor's first
+    successor.
+
+    """
+
+    s = revset.getset(repo, revset.fullreposet(repo), x)
+    s = revset.baseset(_basechange(repo, s))
+    return subset & s
 
 def get_default_version(ui, api_server, product):
     c = bzauth.load_configuration(ui, api_server, BINARY_CACHE_FILENAME)
@@ -848,6 +901,41 @@ def create_attachment(ui, api_server, auth, bug,
                                 comment=comment,
                                 **opts)
 
+def patch_id(ui, repo, rev):
+    """The patch_id is used for determining whether to obsolete an existing patch
+    in bugzilla. For mq, you want this to be the patch name. Otherwise, if
+    obsolescence markers are available, use them to track back to a unique base
+    changeset. This isn't completely guaranteed (eg if you split a patch, it
+    makes assumptions about which patch is the "original"), but it ought to be
+    a good default for evolve users. If obsolescence markers are unavailable,
+    use a bookmark name if given (under the assumption you're doing
+    bookmark-based feature branches and the common case is one patch per
+    feature). Failing all that, use the hash.
+    """
+
+    try:
+        if rev in repo.mq.series:
+            ui.debug("Using mq patch name\n")
+            return rev
+    except AttributeError:
+        # mq is not loaded
+        pass
+
+    ctx = scmutil.revsingle(repo, rev)
+    fullrepo = repo.unfiltered()
+
+    if repo.obsstore.precursors.get(ctx.node()):
+        base = scmutil.revsingle(fullrepo, 'bzbasechange(%s)' % rev)
+        return 'base-' + node.short(base)
+
+    try:
+        bookmarks = repo.names['bookmarks'].names(repo, ctx.node())
+        if len(bookmarks) > 0:
+            return 'book-' + bookmarks[0]
+    except error.RepoLookupError:
+        ui.debug("revision is not a bookmark\n")
+
+    return 'base-' + node.short(ctx.node())
 
 @command('bzexport', [
          ('d', 'description', '', 'Bugzilla attachment description'),
@@ -930,10 +1018,8 @@ def bzexport(ui, repo, *args, **opts):
             # Support older hg versions
             patch.export(repo, [rev], fp=contents, opts=diffopts)
 
-    # Just always use the rev name as the patch name. Doesn't matter much,
-    # unless you want to avoid obsoleting existing patches when uploading a
-    # version that doesn't include whitespace changes.
-    filename = rev
+    filename = patch_id(ui, repo, rev)
+
     if opts['ignore_all_space']:
         filename += "_ws"
 
@@ -1290,3 +1376,7 @@ def newbug(ui, repo, *args, **opts):
 
     bug = result['id']
     ui.write("Created bug %s at %sshow_bug.cgi?id=%s\n" % (bug, bugzilla, bug))
+
+def reposetup(ui, repo):
+    if obsolete.isenabled(repo, 'bzexport'):
+        revset.symbols['bzbasechange'] = revset_bzbasechange
