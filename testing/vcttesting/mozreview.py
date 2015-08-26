@@ -476,7 +476,7 @@ class MozReview(object):
                                         bugzilla_username=bugzilla_username,
                                         bugzilla_password=bugzilla_password)
 
-    def create_user_api_key(self, email):
+    def create_user_api_key(self, email, sync_to_reviewboard=True):
         """Creates an API key for the given user.
 
         This creates an API key in Bugzilla and then triggers the
@@ -491,6 +491,9 @@ class MozReview(object):
              email], stdout=True).strip()
 
         assert len(api_key) == 40
+
+        if not sync_to_reviewboard:
+            return api_key
 
         # When running tests in parallel, the auth callback can time out.
         # Try up to 3 times before giving up.

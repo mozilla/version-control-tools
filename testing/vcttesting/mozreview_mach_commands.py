@@ -230,6 +230,16 @@ class MozReviewCommands(object):
         mr.get_ldap().create_user(email, username, uid, fullname,
                                   key_filename=key_file, scm_level=scm_level)
 
+    @Command('create-api-key', category='mozreview',
+             description='Create a Bugzilla API key for a user')
+    @CommandArgument('where', nargs='?',
+                     help='Directory of MozReview instance')
+    @CommandArgument('email',
+                     help='Bugzilla account to create API key for')
+    def create_api_key(self, where, email):
+        mr = self._get_mozreview(where)
+        print(mr.create_user_api_key(email, sync_to_reviewboard=False))
+
     @Command('exec', category='mozreview',
              description='Execute a command in a Docker container')
     @CommandArgument('name', help='Name of container to shell into',
