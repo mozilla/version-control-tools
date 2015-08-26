@@ -6,5 +6,6 @@ rm -rf venv
 virtualenv venv
 . venv/bin/activate
 pip install -r requirements.txt
+sudo apachectl restart
 cd autoland
 nohup ./autoland.py --log-mach=/home/ubuntu/autoland.log &
