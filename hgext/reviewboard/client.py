@@ -628,18 +628,19 @@ def doreview(repo, ui, remote, nodes):
             if 'publish' in caps:
                 ui.write('\n')
                 publish = ui.promptchoice(
-                    _('publish this review request now (Yn)? $$ &Yes $$ &No'))
+                    _('publish these review requests now (Yn)? $$ &Yes $$ &No'))
                 if publish == 0:
                     publishreviewrequests(ui, remote, bzauth, [newparentid])
                 else:
-                    ui.status(_('(visit review url to publish this review '
-                                'series so others can see it)\n'))
+                    ui.status(_('(visit review url to publish these review '
+                                'requests so others can see them)\n'))
             else:
-                ui.status(_('(visit review url to publish this review series '
-                            'so others can see it)\n'))
+                ui.status(_('(visit review url to publish these review requests'
+                            'so others can see them)\n'))
         else:
             ui.status(_('(review requests lack reviewers; visit review url '
-                        'to assign reviewers and publish this series)\n'))
+                        'to assign reviewers and publish these review '
+                        'requests)\n'))
 
 def publishreviewrequests(ui, remote, bzauth, rrids):
     """Publish an iterable of review requests."""

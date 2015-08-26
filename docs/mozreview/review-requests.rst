@@ -204,7 +204,7 @@ look something like this::
 
   review id:  bz://123/mynick
   review url: https://reviewboard.mozilla.org/r/7 (pending)
-  (visit review url to publish this review request so others can see it)
+  (visit review url to publish these review requests so others can see them)
 
 The first first lines of the output is the standard output from
 Mercurial when you push. The lines that follow are from MozReview:

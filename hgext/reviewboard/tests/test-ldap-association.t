@@ -51,7 +51,7 @@ Perform a push with the user
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
 
 The user should now have an associated ldap_username
 

@@ -77,7 +77,7 @@ created in Review Board. As a refresher::
 
   review id:  bz://448604/MattN
   review url: https://reviewboard.mozilla.org/r/3359 (pending)
-  (visit review url to publish this review request so others can see it)
+  (visit review url to publish these review requests so others can see them)
 
 The *pending* in the output says that the review requests are in an
 unpublished *draft* state. In other words, only you can see the content

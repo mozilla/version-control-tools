@@ -111,8 +111,8 @@ Try a bunch of different ways of specifying a reviewer
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
   
-  publish this review request now (Yn)? n
-  (visit review url to publish this review series so others can see it)
+  publish these review requests now (Yn)? n
+  (visit review url to publish these review requests so others can see them)
 
   $ rbmanage list-reviewers 2 --draft
   romulus
@@ -202,7 +202,7 @@ Publishing series during push works
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
   
-  publish this review request now (Yn)? y
+  publish these review requests now (Yn)? y
   (published review request 1)
   [1]
 
@@ -285,7 +285,7 @@ code path.
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
   
-  publish this review request now (Yn)? y
+  publish these review requests now (Yn)? y
   (published review request 1)
  
   $ rbmanage list-reviewers 11
@@ -347,7 +347,7 @@ again.
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
   
-  publish this review request now (Yn)? y
+  publish these review requests now (Yn)? y
   (published review request 1)
   [1]
   $ rbmanage list-reviewers 11
@@ -413,7 +413,7 @@ and pushed with no reviewers specified.
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
   
-  publish this review request now (Yn)? y
+  publish these review requests now (Yn)? y
   (published review request 1)
 
   $ rbmanage list-reviewers 11
@@ -477,7 +477,7 @@ those specified in the commit summary.
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
   
-  publish this review request now (Yn)? y
+  publish these review requests now (Yn)? y
   (published review request 1)
 
   $ rbmanage list-reviewers 11
@@ -506,7 +506,7 @@ Unrecognized reviewers should be ignored
   
   review id:  bz://2/mynick
   review url: http://*:$HGPORT1/r/12 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   $ rbmanage list-reviewers 12 --draft
   
 
@@ -536,7 +536,7 @@ from the client.
   
   review id:  bz://2/mynick
   review url: http://*:$HGPORT1/r/12 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
 
 Cleanup
 

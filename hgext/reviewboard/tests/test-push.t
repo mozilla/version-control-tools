@@ -88,7 +88,7 @@ Pushing a single changeset will initiate a single review (no children)
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
 
 {reviews} template works
 
@@ -110,7 +110,7 @@ Pushing no changesets will do a re-review
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
 Pushing no changesets will do a re-review but will not reset a published
@@ -131,7 +131,7 @@ created if all the review requests didn't change
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
 Pushing patches from mq will result in a warning
@@ -155,7 +155,7 @@ Pushing patches from mq will result in a warning
   
   review id:  bz://2/mynick
   review url: http://*:$HGPORT1/r/3 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
 
   $ hg qpop
   popping patch1
@@ -175,7 +175,7 @@ Custom identifier will create a new review from same changesets.
   
   review id:  bz://3/mynick
   review url: http://*:$HGPORT1/r/5 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
 SSH works
@@ -200,7 +200,7 @@ rest of the test.)
   
   review id:  bz://4/mynick
   review url: http://*:$HGPORT1/r/7 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
 
 Specifying multiple -r for the same head works
 
@@ -216,7 +216,7 @@ Specifying multiple -r for the same head works
   
   review id:  bz://5/mynick
   review url: http://*:$HGPORT1/r/9 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
 Specifying a revision range works
@@ -233,7 +233,7 @@ Specifying a revision range works
   
   review id:  bz://6/mynick
   review url: http://*:$HGPORT1/r/11 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
 Prepare for multi changeset tests
@@ -298,7 +298,7 @@ Specifying a base revision limits reviewed changesets
   
   review id:  bz://7/mynick
   review url: http://*:$HGPORT1/r/13 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
 
 Specifying multiple -r arguments selects base and tip
 
@@ -322,7 +322,7 @@ Specifying multiple -r arguments selects base and tip
   
   review id:  bz://8/mynick
   review url: http://*:$HGPORT1/r/17 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
 Specifying multiple -r in reverse order still works
@@ -347,7 +347,7 @@ Specifying multiple -r in reverse order still works
   
   review id:  bz://9/mynick
   review url: http://*:$HGPORT1/r/21 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
 -r and -c are mutually exclusive
@@ -370,7 +370,7 @@ Specifying multiple -r in reverse order still works
   
   review id:  bz://11/mynick
   review url: http://*:$HGPORT1/r/25 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish this series)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
   [1]
 
 Reviewing merge commits is rejected
