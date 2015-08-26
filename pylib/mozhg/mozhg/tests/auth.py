@@ -37,6 +37,7 @@ def bzauth(ui, require=False, fakegetpass=None, ffprofile=None):
         ui.write('cookie: %s\n' % a.cookie)
         ui.write('username: %s\n' % a.username)
         ui.write('password: %s\n' % a.password)
+        ui.write('apikey: %s\n' % a.apikey)
     else:
         ui.write('no auth\n')
 

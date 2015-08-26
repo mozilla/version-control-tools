@@ -33,6 +33,16 @@ If nothing defined, we get prompted for username and password
   cookie: None
   username: user-i
   password: fakepass
+  apikey: None
+
+If username and api key are in config, they get used
+
+  $ hg --config bugzilla.username=user1 --config bugzilla.apikey=apikey1 bzauth
+  userid: None
+  cookie: None
+  username: user1
+  password: None
+  apikey: apikey1
 
 If userid and cookie are in config, they get used
 
@@ -41,6 +51,7 @@ If userid and cookie are in config, they get used
   cookie: cookie1
   username: None
   password: None
+  apikey: None
 
 If username and password are in config, they get used
 
@@ -49,6 +60,16 @@ If username and password are in config, they get used
   cookie: None
   username: user1
   password: pass1
+  apikey: None
+
+If everything is present, we prefer the API key
+
+  $ hg --config bugzilla.username=user1 --config bugzilla.apikey=apikey1 --config bugzilla.password=pass1 --config bugzilla.userid=uid1 --config bugzilla.cookie=cookie1 bzauth
+  userid: None
+  cookie: None
+  username: user1
+  password: None
+  apikey: apikey1
 
 If cookie and u/p are in config, we prefer the cookie
 
@@ -57,6 +78,7 @@ If cookie and u/p are in config, we prefer the cookie
   cookie: cookie1
   username: None
   password: None
+  apikey: None
 
 If just username is in config, we get prompted for password
 
@@ -65,6 +87,7 @@ If just username is in config, we get prompted for password
   cookie: None
   username: justuser
   password: justuserpass
+  apikey: None
 
 If just username and not interactive, we get no auth
 
@@ -81,6 +104,7 @@ If just password in config, we get prompted for username
   cookie: None
   username: justpass
   password: pass1
+  apikey: None
 
 Now we set up some Firefox profiles to test cookie extraction
 
@@ -122,6 +146,7 @@ Profile with cookie from BMO should be returned
   cookie: bmocookie
   username: None
   password: None
+  apikey: None
 
 If there is just a username specified in config, but we can find a profile with a cookie we should use the cookie.
 
@@ -130,6 +155,7 @@ If there is just a username specified in config, but we can find a profile with 
   cookie: bmocookie
   username: None
   password: None
+  apikey: None
 
 Custom bugzilla.url should be respected
 
@@ -139,6 +165,7 @@ Custom bugzilla.url should be respected
   cookie: bzcookie
   username: None
   password: None
+  apikey: None
 
 Requesting a specific profile works
 
@@ -148,6 +175,7 @@ Requesting a specific profile works
   cookie: bmocookie2
   username: None
   password: None
+  apikey: None
 
 Specifying a profile via config option works
 
@@ -166,12 +194,14 @@ Specifying a profile via config option works
   cookie: bmocookie3
   username: None
   password: None
+  apikey: None
 
   $ hg --config bugzilla.firefoxprofile=profile2,profile3 bzauth
   userid: bmouser2
   cookie: bmocookie2
   username: None
   password: None
+  apikey: None
 
 The default profile should be chosen over other profiles.
 
@@ -191,6 +221,7 @@ The default profile should be chosen over other profiles.
   cookie: bmocookie4
   username: None
   password: None
+  apikey: None
 
 But profile selection in config should override default.
 
@@ -199,3 +230,4 @@ But profile selection in config should override default.
   cookie: bmocookie3
   username: None
   password: None
+  apikey: None

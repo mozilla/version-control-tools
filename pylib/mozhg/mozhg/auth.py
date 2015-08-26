@@ -16,8 +16,11 @@ from mercurial.i18n import _
 class BugzillaAuth(object):
     """Holds Bugzilla authentication credentials."""
 
-    def __init__(self, userid=None, cookie=None, username=None, password=None):
-        if userid:
+    def __init__(self, userid=None, cookie=None, username=None, password=None,
+                 apikey=None):
+        if apikey:
+            self._type = 'apikey'
+        elif userid:
             self._type = 'cookie'
         else:
             self._type = 'explicit'
@@ -26,6 +29,8 @@ class BugzillaAuth(object):
         self.cookie = cookie
         self.username = username
         self.password = password
+        self.apikey = apikey
+
 
 def getbugzillaauth(ui, require=False, profile=None):
     """Obtain Bugzilla authentication credentials from any possible source.
@@ -40,10 +45,11 @@ def getbugzillaauth(ui, require=False, profile=None):
 
     The order of preference for Bugzilla credentials is as follows:
 
-      1) bugzilla.userid and bugzilla.cookie from hgrc
-      2) bugzilla.username and bugzilla.password from hgrc
-      3) login cookies from Firefox profiles
-      4) prompt the user
+      1) bugzilla.username and bugzilla.apikey from hgrc
+      2) bugzilla.userid and bugzilla.cookie from hgrc
+      3) bugzilla.username and bugzilla.password from hgrc
+      4) login cookies from Firefox profiles
+      5) prompt the user
 
     The ``bugzilla.firefoxprofile`` option is interpreted as a list of Firefox
     profiles from which data should be read. This overrides the default sort
@@ -51,10 +57,14 @@ def getbugzillaauth(ui, require=False, profile=None):
     """
 
     username = ui.config('bugzilla', 'username')
+    apikey = ui.config('bugzilla', 'apikey')
     password = ui.config('bugzilla', 'password')
     userid = ui.config('bugzilla', 'userid')
     cookie = ui.config('bugzilla', 'cookie')
     profileorder = ui.configlist('bugzilla', 'firefoxprofile', [])
+
+    if username and apikey:
+        return BugzillaAuth(username=username, apikey=apikey)
 
     if userid and cookie:
         return BugzillaAuth(userid=userid, cookie=cookie)
