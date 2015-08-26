@@ -18,21 +18,41 @@ from mozautomation import commitparser
 from hgrb.util import ReviewID
 
 
+API_KEY_NEEDED = (
+    'Bugzilla API keys are now used by MozReview; '
+    'see https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html#bugzilla-credentials '
+    'for instructions on how to configure your client')
+
+
 class AuthorizationError(Exception):
     """Represents an error authenticating or authorizing to Bugzilla."""
 
-    def __init__(self, e, username, password, userid, cookie, **kwargs):
+    def __init__(self, e, username, password, userid, cookie, apikey, **kwargs):
         self.e = e
         self.username = username
         self.password = password
         self.userid = userid
         self.cookie = cookie
+        self.apikey = apikey
+
+        self.web_login_needed = e.rsp.get('web_login_needed', False)
+        self.login_url = e.rsp.get('login_url', None)
+        self.bugzilla_api_key_needed = e.rsp.get('bugzilla_api_key_needed', False)
+        self.bugzilla_api_key_url = e.rsp.get('bugzilla_api_key_url', False)
 
     def __str__(self):
+        if self.bugzilla_api_key_needed:
+            return API_KEY_NEEDED
+
+        if self.web_login_needed:
+            return 'web login needed; log in at %s then try again' % self.login_url
+
         if self.password:
             return 'invalid Bugzilla username/password; check your settings'
         if self.cookie:
             return 'invalid Bugzilla login cookie; is it expired?'
+        if self.apikey:
+            return 'invalid Bugzilla API key; visit Bugzilla to obtain a new API key'
         else:
             return 'unknown failure'
 
@@ -117,6 +137,7 @@ def parsepayload(proto, args):
         'bzpassword': None,
         'bzcookie': None,
         'bzuserid': None,
+        'bzapikey': None,
         'other': []
     }
 
@@ -133,6 +154,8 @@ def parsepayload(proto, args):
             o['bzuserid'] = urllib.unquote(d)
         elif t == 'bzcookie':
             o['bzcookie'] = urllib.unquote(d)
+        elif t == 'bzapikey':
+            o['bzapikey'] = urllib.unquote(d)
         elif t == 'supportscaps':
             # Value isn't relevant.
             supportscaps = True
@@ -195,6 +218,7 @@ def reviewboard(repo, proto, args=None):
     bzpassword = o['bzpassword']
     bzuserid = o['bzuserid']
     bzcookie = o['bzcookie']
+    bzapikey = o['bzapikey']
 
     identifier, nodes, precursors = parseidentifier(o)
     if not identifier:
@@ -295,7 +319,7 @@ def reviewboard(repo, proto, args=None):
         associate_ldap_username(rburl, ldap_username, privleged_rb_username,
                                 privleged_rb_password, username=bzusername,
                                 password=bzpassword, userid=bzuserid,
-                                cookie=bzcookie)
+                                cookie=bzcookie, apikey=bzapikey)
 
     lines = [
         'rburl %s' % rburl,
@@ -308,7 +332,8 @@ def reviewboard(repo, proto, args=None):
                                                      username=bzusername,
                                                      password=bzpassword,
                                                      userid=bzuserid,
-                                                     cookie=bzcookie)
+                                                     cookie=bzcookie,
+                                                     apikey=bzapikey)
         lines.extend([
             'parentreview %s' % parentrid,
             'reviewdata %s status %s' % (
@@ -357,7 +382,8 @@ def pullreviews(repo, proto, args=None):
                            username=o['bzusername'],
                            password=o['bzpassword'],
                            userid=o['bzuserid'],
-                           cookie=o['bzcookie']) as client:
+                           cookie=o['bzcookie'],
+                           apikey=o['bzapikey']) as client:
         root = client.get_root()
 
         for k, v in o['other']:
@@ -443,7 +469,8 @@ def publishreviewseries(repo, proto, args=None):
                            username=o['bzusername'],
                            password=o['bzpassword'],
                            userid=o['bzuserid'],
-                           cookie=o['bzcookie']) as client:
+                           cookie=o['bzcookie'],
+                           apikey=o['bzapikey']) as client:
         root = client.get_root()
 
         for k, v in o['other']:

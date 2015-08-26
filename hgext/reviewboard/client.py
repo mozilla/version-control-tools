@@ -104,7 +104,7 @@ def commonrequestlines(ui, bzauth=None):
     if ui.configbool('reviewboard', 'supportscaps', True):
         lines.append('supportscaps 1')
 
-    for p in ('username', 'password', 'userid', 'cookie'):
+    for p in ('username', 'password', 'userid', 'cookie', 'apikey'):
         if getattr(bzauth, p, None):
             lines.append('bz%s %s' % (p, urllib.quote(getattr(bzauth, p))))
 

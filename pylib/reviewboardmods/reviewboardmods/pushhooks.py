@@ -19,7 +19,8 @@ from rbtools.api.transport.sync import SyncTransport
 
 
 def post_reviews(url, repoid, identifier, commits, hgresp,
-                 username=None, password=None, userid=None, cookie=None):
+                 username=None, password=None, userid=None, cookie=None,
+                 apikey=None):
     """Post a set of commits to Review Board.
 
     Repository hooks can use this function to post a set of pushed commits
@@ -124,7 +125,7 @@ def post_reviews(url, repoid, identifier, commits, hgresp,
 
     * TODO Bug 1047465
     """
-    with ReviewBoardClient(url, username, password, userid, cookie) as rbc:
+    with ReviewBoardClient(url, username, password, userid, cookie, apikey) as rbc:
         root = rbc.get_root()
         return _post_reviews(root, repoid, identifier, commits, hgresp)
 
@@ -462,7 +463,7 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
 
 def associate_ldap_username(url, ldap_username, privileged_username,
                             privileged_password, username=None, password=None,
-                            userid=None, cookie=None):
+                            userid=None, cookie=None, apikey=None):
     """Associate a Review Board user with an ldap username.
 
     Will return True if an ldap_username is successfully associated
@@ -493,15 +494,18 @@ def associate_ldap_username(url, ldap_username, privileged_username,
     if ldap_username == 'bind-autoland@mozilla.com':
         return False
 
-    if not ((username is not None and password is not None) or
-            (userid is not None and cookie is not None)):
+    if not username and not userid:
+        return False
+
+    if (username and (not password and not apikey) or
+        (userid and not cookie)):
         return False
 
     try:
         # We first verify that the provided credentials are valid and
         # retrieve the username associated with that Review Board
         # account.
-        with ReviewBoardClient(url, username, password, userid, cookie) as rbc:
+        with ReviewBoardClient(url, username, password, userid, cookie, apikey) as rbc:
             root = rbc.get_root()
             session = root.get_session()
 
@@ -513,8 +517,8 @@ def associate_ldap_username(url, ldap_username, privileged_username,
 
         # Now that we have proven ownership over the user, take the provided
         # ldap_username and associate it with the account.
-        with ReviewBoardClient(url, privileged_username, privileged_password,
-                               None, None) as rbc:
+        with ReviewBoardClient(url, username=privileged_username,
+                               password=privileged_password):
             root = rbc.get_root()
             ext = root.get_extension(
                 extension_name='mozreview.extension.MozReviewExtension')
@@ -535,7 +539,7 @@ class NoCacheTransport(SyncTransport):
 
 @contextmanager
 def ReviewBoardClient(url, username=None, password=None, userid=None,
-                      cookie=None):
+                      cookie=None, apikey=None):
     """Obtain a RBClient instance via a context manager.
 
     This exists as a context manager because of gross hacks necessary for
@@ -551,7 +555,14 @@ def ReviewBoardClient(url, username=None, password=None, userid=None,
     fd, path = tempfile.mkstemp()
     os.close(fd)
     try:
-        if userid and cookie:
+        if username and apikey:
+            rbc = RBClient(url, cookie_file=path,
+                           transport_cls=NoCacheTransport)
+            login_resource = rbc.get_path(
+                'extensions/mozreview.extension.MozReviewExtension/'
+                'bugzilla-api-key-logins/')
+            login_resource.create(username=username, api_key=apikey)
+        elif userid and cookie:
             # TODO: This is bugzilla specific code that really shouldn't be inside
             # of this file. The whole bugzilla cookie resource is a hack anyways
             # though so we'll deal with this for now.

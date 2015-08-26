@@ -162,7 +162,7 @@ class BugzillaBackend(AuthBackend):
         bz_user = user_data['users'][0]
 
         try:
-            bum = BugzillaUserMap.get(bugzilla_user_id=bz_user['id'])
+            bum = BugzillaUserMap.objects.get(bugzilla_user_id=bz_user['id'])
             user = bum.user
         except BugzillaUserMap.DoesNotExist:
             logging.warning('Login failure for user %s: API key valid but '
