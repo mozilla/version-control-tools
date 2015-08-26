@@ -33,55 +33,171 @@ from mozreview.extra_data import is_parent, is_pushed
 AUTOLAND_REQUEST_TIMEOUT = 10.0
 IMPORT_PULLREQUEST_DESTINATION = 'mozreview'
 TRY_AUTOLAND_DESTINATION = 'try'
+INBOUND_AUTOLAND_DESTINATION = 'mozilla-inbound'
 
+class BaseAutolandTriggerResource(WebAPIResource):
+    """Base resource for Autoland trigger resources.
 
-class TryAutolandTriggerResource(WebAPIResource):
-    """Resource to kick off Try Builds for a particular review request.
-
-    Only reviewers can start a Try Build.
+       Subclasses should inherit from this and provide their own create
+       methods with the necessary request fields and scm_level validation.
     """
 
-    name = 'try_autoland_trigger'
     allowed_methods = ('POST',)
     model = AutolandRequest
 
-    fields = {
-        'autoland_id': {
-            'type': int,
-            'description': 'The request ID that Autoland gave back.'
-        },
-        'push_revision': {
-            'type': six.text_type,
-            'description': 'The revision of what got pushed for Autoland to '
-                           'land.',
-        },
-        'repository_url': {
-            'type': six.text_type,
-            'description': 'The repository that Autoland was asked to land '
-                           'on.',
-        },
-        'repository_revision': {
-            'type': six.text_type,
-            'description': 'The revision of what Autoland landed on the '
-                           'repository.',
-        },
-        'review_request_id': {
-            'type': int,
-            'description': 'The review request associated with this Autoland '
-                           'request.',
-        },
-        'user_id': {
-            'type': int,
-            'description': 'The user that initiated the Autoland request.',
-        },
-        'last_known_status': {
-            'type': six.text_type,
-            'description': 'The last known status for this request.',
-        },
-    }
-
     def has_list_access_permissions(self, request, *args, **kwargs):
         return True
+
+    def serialize_last_known_status_field(self, obj, **kwargs):
+        return obj.last_known_status
+
+    def save_autolandrequest_id(self, fieldname, rr, autoland_request_id):
+        # TODO: this method is only required while we are using change
+        #       descriptions to render autoland results. Once Bug 1176330 is
+        #       fixed this code can be removed.
+
+        # There's possibly a race condition here with multiple web-heads. If
+        # two requests come in at the same time to this endpoint, the request
+        # that saves their value first here will get overwritten by the second
+        # but the first request will have their changedescription come below
+        # the second. In that case you'd have the "most recent" try build stats
+        # appearing at the top be for a changedescription that has a different
+        # try build below it (Super rare, not a big deal really).
+        old_request_id = rr.extra_data.get(fieldname, None)
+        rr.extra_data[fieldname] = autoland_request_id
+        rr.save()
+
+        # In order to display the fact that a build was kicked off in the UI,
+        # we construct a change description that our TryField can render.
+        changedesc = ChangeDescription(public=True, text='', rich_text=False)
+        changedesc.record_field_change(fieldname,
+                                       old_request_id, autoland_request_id)
+        changedesc.save()
+        rr.changedescs.add(changedesc)
+
+
+class AutolandTriggerResource(BaseAutolandTriggerResource):
+    """Resource to kick off Autoland to inbound for a particular review request."""
+
+    name = 'autoland_trigger'
+
+    @webapi_login_required
+    @webapi_response_errors(DOES_NOT_EXIST, INVALID_FORM_DATA,
+                            NOT_LOGGED_IN, PERMISSION_DENIED)
+    @webapi_scm_groups_required('scm_level_3')
+    @webapi_request_fields(
+        required={
+            'review_request_id': {
+                'type': int,
+                'description': 'The review request for which to trigger a Try '
+                               'build',
+            },
+        },
+    )
+    @transaction.atomic
+    def create(self, request, review_request_id, *args, **kwargs):
+        try:
+            rr = ReviewRequest.objects.get(pk=review_request_id)
+        except ReviewRequest.DoesNotExist:
+            return DOES_NOT_EXIST
+
+        if not is_pushed(rr) or not is_parent(rr):
+            logging.error('Failed triggering Autoland because the review '
+                          'request is not pushed, or not the parent review '
+                          'request.')
+            return NOT_PUSHED_PARENT_REVIEW_REQUEST
+
+        if not rr.is_mutable_by(request.user):
+            return PERMISSION_DENIED
+
+        last_revision = json.loads(rr.extra_data.get('p2rb.commits'))[-1][0]
+
+        ext = get_extension_manager().get_enabled_extension(
+            'mozreview.extension.MozReviewExtension')
+
+        logging.info('Submitting a request to Autoland for review request '
+                     'ID %s for revision %s '
+                     % (review_request_id, last_revision))
+
+        autoland_url = ext.settings.get('autoland_url')
+        if not autoland_url:
+            return AUTOLAND_CONFIGURATION_ERROR
+
+        autoland_user = ext.settings.get('autoland_user')
+        autoland_password = ext.settings.get('autoland_password')
+
+        if not autoland_user or not autoland_password:
+            return AUTOLAND_CONFIGURATION_ERROR
+
+        pingback_url = autoland_request_update_resource.get_uri(request)
+
+        logging.info('Telling Autoland to give status updates to %s'
+                     % pingback_url)
+
+        try:
+            # Rather than hard coding the destination it would make sense
+            # to extract it from metadata about the repository. That will have
+            # to wait until we fix Bug 1168486.
+            response = requests.post(autoland_url + '/autoland',
+                data=json.dumps({
+                'tree': rr.repository.name,
+                'pingback_url': pingback_url,
+                'rev': last_revision,
+                'destination': INBOUND_AUTOLAND_DESTINATION,
+            }), headers={
+                'content-type': 'application/json',
+            },
+                timeout=AUTOLAND_REQUEST_TIMEOUT,
+                auth=(autoland_user, autoland_password))
+        except requests.exceptions.RequestException:
+            logging.error('We hit a RequestException when submitting a '
+                          'request to Autoland')
+            return AUTOLAND_ERROR
+        except requests.exceptions.Timeout:
+            logging.error('We timed out when submitting a request to '
+                          'Autoland')
+            return AUTOLAND_TIMEOUT
+
+        if response.status_code != 200:
+            return AUTOLAND_ERROR, {
+                'status_code': response.status_code,
+                'message': response.json().get('error'),
+            }
+
+        # We succeeded in scheduling the job.
+        try:
+            autoland_request_id = int(response.json().get('request_id', 0))
+        finally:
+            if autoland_request_id is None:
+                return AUTOLAND_ERROR, {
+                    'status_code': response.status_code,
+                    'request_id': None,
+                }
+
+        autoland_request = AutolandRequest.objects.create(
+            autoland_id=autoland_request_id,
+            push_revision=last_revision,
+            review_request_id=rr.id,
+            user_id=request.user.id,
+        )
+
+        AutolandEventLogEntry.objects.create(
+            status=AutolandEventLogEntry.REQUESTED,
+            autoland_request_id=autoland_request_id)
+
+        self.save_autolandrequest_id('p2rb.autoland_inbound', rr,
+            autoland_request_id)
+
+        return 200, {}
+
+
+autoland_trigger_resource = AutolandTriggerResource()
+
+
+class TryAutolandTriggerResource(BaseAutolandTriggerResource):
+    """Resource to kick off Try Builds for a particular review request."""
+
+    name = 'try_autoland_trigger'
 
     @webapi_login_required
     @webapi_response_errors(DOES_NOT_EXIST, INVALID_FORM_DATA,
@@ -129,8 +245,6 @@ class TryAutolandTriggerResource(WebAPIResource):
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
 
-        testing = ext.settings.get('autoland_testing', False)
-
         logging.info('Submitting a request to Autoland for review request '
                      'ID %s for revision %s '
                      % (review_request_id, last_revision))
@@ -150,12 +264,15 @@ class TryAutolandTriggerResource(WebAPIResource):
         logging.info('Telling Autoland to give status updates to %s'
                      % pingback_url)
 
-        try_autoland_tree = rr.repository.name
-
         try:
+            # We use a hard-coded destination here. If we ever open this up
+            # to make the destination a parameter to this resource, we need to
+            # verify that the destination is in fact an "scm_level_1"
+            # repository to ensure that people don't try to land to inbound
+            # using this resource.
             response = requests.post(autoland_url + '/autoland',
                 data=json.dumps({
-                'tree': try_autoland_tree,
+                'tree': rr.repository.name,
                 'pingback_url': pingback_url,
                 'rev': last_revision,
                 'destination': TRY_AUTOLAND_DESTINATION,
@@ -204,31 +321,10 @@ class TryAutolandTriggerResource(WebAPIResource):
             status=AutolandEventLogEntry.REQUESTED,
             autoland_request_id=autoland_request_id)
 
-        # There's possibly a race condition here with multiple web-heads. If
-        # two requests come in at the same time to this endpoint, the request
-        # that saves their value first here will get overwritten by the second
-        # but the first request will have their changedescription come below
-        # the second. In that case you'd have the "most recent" try build stats
-        # appearing at the top be for a changedescription that has a different
-        # try build below it (Super rare, not a big deal really).
-        old_request_id = rr.extra_data.get('p2rb.autoland_try', None)
-        rr.extra_data['p2rb.autoland_try'] = autoland_request_id
-        rr.save()
+        self.save_autolandrequest_id('p2rb.autoland_try', rr,
+            autoland_request_id)
 
-        # In order to display the fact that a build was kicked off in the UI,
-        # we construct a change description that our TryField can render.
-        changedesc = ChangeDescription(public=True, text='', rich_text=False)
-        changedesc.record_field_change('p2rb.autoland_try',
-                                       old_request_id, autoland_request_id)
-        changedesc.save()
-        rr.changedescs.add(changedesc)
-
-        return 200, {
-            self.item_result_key: autoland_request,
-        }
-
-    def serialize_last_known_status_field(self, obj, **kwargs):
-        return obj.last_known_status
+        return 200, {}
 
 
 try_autoland_trigger_resource = TryAutolandTriggerResource()

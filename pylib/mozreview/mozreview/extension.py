@@ -5,8 +5,6 @@ import logging
 from django.conf.urls import include, patterns, url
 from django.db.models.signals import post_save
 
-from djblets.webapi.resources import (register_resource_for_model,
-                                      unregister_resource_for_model)
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
                                           ReviewRequestDropdownActionHook,
@@ -24,6 +22,7 @@ from reviewboard.urls import (diffviewer_url_names,
 from mozreview.autoland.models import (AutolandRequest,
                                        ImportPullRequestRequest)
 from mozreview.autoland.resources import (autoland_request_update_resource,
+                                          autoland_trigger_resource,
                                           import_pullrequest_trigger_resource,
                                           import_pullrequest_update_resource,
                                           try_autoland_trigger_resource)
@@ -103,13 +102,14 @@ class MozReviewExtension(Extension):
 
     resources = [
         autoland_request_update_resource,
+        autoland_trigger_resource,
         batch_review_resource,
         bugzilla_api_key_login_resource,
+        import_pullrequest_trigger_resource,
+        import_pullrequest_update_resource,
         ldap_association_resource,
         review_request_summary_resource,
         try_autoland_trigger_resource,
-        import_pullrequest_trigger_resource,
-        import_pullrequest_update_resource,
     ]
 
     middleware = [
@@ -117,10 +117,6 @@ class MozReviewExtension(Extension):
     ]
 
     def initialize(self):
-        register_resource_for_model(AutolandRequest,
-                                    try_autoland_trigger_resource)
-        register_resource_for_model(ImportPullRequestRequest,
-                                    import_pullrequest_trigger_resource)
         initialize_pulse_handlers(self)
 
         URLHook(self,
@@ -219,7 +215,6 @@ class MozReviewExtension(Extension):
         if not testing_done_field:
             main_fieldset.add_field(TestingDoneField)
 
-        unregister_resource_for_model(AutolandRequest)
         super(MozReviewExtension, self).shutdown()
 
 
