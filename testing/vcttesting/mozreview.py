@@ -252,7 +252,8 @@ class MozReview(object):
             # Define site domain and hostname in rbweb. This is necessary so it
             # constructs self-referential URLs properly.
             e.submit(self._docker.execute, self.rbweb_id,
-                     ['/set-site-url', self.reviewboard_url])
+                     ['/set-site-url', self.reviewboard_url,
+                      self.autoland_url])
 
             # Tell Bugzilla about Review Board URL.
             e.submit(self._docker.execute, mr_info['web_id'],

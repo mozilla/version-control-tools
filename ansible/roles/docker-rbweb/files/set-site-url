@@ -11,14 +11,21 @@ import urlparse
 sys.path.insert(0, '/reviewboard/conf')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'reviewboard.settings'
 
-url = urlparse.urlsplit(sys.argv[1])
+site_url, autoland_url = sys.argv[1:]
+site_url = urlparse.urlsplit(site_url)
 
 # Define hostname.
 from django.contrib.sites.models import Site as DjangoSite
 site = DjangoSite.objects.get(pk=1)
-site.domain = url.netloc
-site.name = url.hostname
+site.domain = site_url.netloc
+site.name = site_url.hostname
 site.save()
+
+# Define Autoland public URL.
+from djblets.extensions.models import RegisteredExtension
+mre = RegisteredExtension.objects.get(class_name='mozreview.extension.MozReviewExtension')
+mre.settings['autoland_url'] = autoland_url.rstrip('/')
+mre.save()
 
 # Django caches the site settings in memory in each process
 # and there doesn't appear to be an easy way to invalidate or
