@@ -10,6 +10,7 @@
 
   $ mozreview create-user author@example.com password 'Patch Author' --uid 2001 --scm-level 1
   Created user 6
+  $ authorkey=`mozreview create-api-key author@example.com`
   $ mozreview create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --bugzilla-group editbugs
   Created user 7
 
@@ -20,7 +21,7 @@ Create a review
 
   $ echo bug > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com push > /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push > /dev/null
 
   $ rbmanage add-reviewer 2 --user reviewer
   1 people listed on review request
@@ -262,7 +263,7 @@ Updating the review request as an L1 author will re-request review
 
   $ echo newcontents > foo
   $ hg commit --amend > /dev/null
-  $ hg --config bugzilla.username=author@example.com push > /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push > /dev/null
 
   $ bugzilla dump-bug 1
   Bug 1:
@@ -346,6 +347,7 @@ Create a new author with level 3 commit access
 
   $ mozreview create-user l3author@example.com password 'L3 Contributor'  --uid 2002 --scm-level 3
   Created user 8
+  $ l3key=`mozreview create-api-key l3author@example.com`
 
 Create a review
 
@@ -353,7 +355,7 @@ Create a review
   $ bugzilla create-bug TestProduct TestComponent 'Second Bug'
 
   $ hg commit --amend -m 'Bug 2 - Initial commit to review' > /dev/null
-  $ hg --config bugzilla.username=l3author@example.com push > /dev/null
+  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=${l3key} push > /dev/null
 
   $ rbmanage add-reviewer 4 --user reviewer
   1 people listed on review request
@@ -471,7 +473,7 @@ Updating the review request as an L3 author will carry forward the r+
 
 We publish on push since we already have a reviewer
 
-  $ hg --config bugzilla.username=l3author@example.com push > /dev/null
+  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=${l3key} push > /dev/null
 
 We should have an r+ flag already set.
 

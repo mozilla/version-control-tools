@@ -202,7 +202,8 @@ class MozReviewWebDriverTest(MozReviewTest):
         b = self.bugzilla(username='admin@example.com', password='password')
         for (email, password, name) in users:
             b.create_user(email, password, name)
-            self.users[email] = (password, name)
+            api_key = self.mr.create_user_api_key(email)
+            self.users[email] = (password, name, api_key)
 
     def create_ldap(self, email, username, uid, name, scm_level=1):
         kf = os.path.join(self.mr._path, 'keys', email)
@@ -219,7 +220,7 @@ class MozReviewWebDriverTest(MozReviewTest):
             'test_repo',
             ircnick=nick,
             bugzilla_username=email,
-            bugzilla_password=self.users[email][0])
+            bugzilla_apikey=self.users[email][2])
         lr.touch('foo')
         lr.run(['commit', '-A', '-m', 'initial'])
         lr.run(['phase', '--public', '-r', '0'])

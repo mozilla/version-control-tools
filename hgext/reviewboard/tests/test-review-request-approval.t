@@ -13,6 +13,7 @@ Create both an l3 and l1 user so we can test approval in each case
 
   $ mozreview create-user l3@example.com password 'L3 Contributor [:level3]'  --uid 2002 --scm-level 3 --bugzilla-group editbugs
   Created user 6
+  $ l3apikey=`mozreview create-api-key l3@example.com`
   $ exportbzauth l3@example.com password
 We dump l3 using the l3 user so that it's imported into the RB database
   $ rbmanage dump-user level3 > /dev/null
@@ -20,6 +21,7 @@ We dump l3 using the l3 user so that it's imported into the RB database
   l3@example.com associated with level3
   $ mozreview create-user l1a@example.com password 'L1 ContributorA [:level1a]'  --uid 2003 --scm-level 1
   Created user 7
+  $ l1aapikey=`mozreview create-api-key l1a@example.com`
   $ mozreview create-user l1b@example.com password 'L1 ContributorB [:level1b]'  --uid 2004 --scm-level 1
   Created user 8
 
@@ -32,7 +34,7 @@ Create a review request from an L1 user
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
   $ export SSH_KEYNAME=l1a@example.com
-  $ hg --config bugzilla.username=l1a@example.com push > /dev/null
+  $ hg --config bugzilla.username=l1a@example.com --config bugzilla.apikey=${l1aapikey} push > /dev/null
   $ rbmanage add-reviewer 2 --user level3
   1 people listed on review request
   $ rbmanage add-reviewer 2 --user level1b
@@ -233,7 +235,7 @@ Since the author is L1, adding a new diff should cancel approval
   $ echo modified > foo
   $ hg commit --amend > /dev/null
   $ export SSH_KEYNAME=l1a@example.com
-  $ hg --config bugzilla.username=l1a@example.com push > /dev/null
+  $ hg --config bugzilla.username=l1a@example.com --config bugzilla.apikey=${l1aapikey} push > /dev/null
   $ rbmanage dumpreview 2
   id: 2
   status: pending
@@ -499,7 +501,7 @@ Review requests created by L3 users
   $ echo author2 > foo
   $ hg commit --amend -m "Bug 2 - initial commit to review" > /dev/null
   $ export SSH_KEYNAME=l3@example.com
-  $ hg --config bugzilla.username=l3@example.com push > /dev/null
+  $ hg --config bugzilla.username=l3@example.com --config bugzilla.apikey=${l3apikey} push > /dev/null
   $ rbmanage add-reviewer 4 --user level1a
   1 people listed on review request
   $ rbmanage add-reviewer 4 --user level1b
@@ -567,7 +569,7 @@ ship-its. Posting a new diff should not clear approval
   $ echo modified2 > foo
   $ hg commit --amend > /dev/null
   $ export SSH_KEYNAME=l3@example.com
-  $ hg --config bugzilla.username=l3@example.com push > /dev/null
+  $ hg --config bugzilla.username=l3@example.com --config bugzilla.apikey=${l3apikey} push > /dev/null
   $ rbmanage dumpreview 4
   id: 4
   status: pending

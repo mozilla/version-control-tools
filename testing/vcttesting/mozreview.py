@@ -445,7 +445,7 @@ class MozReview(object):
 
     def get_local_repository(self, path, ircnick=None,
                              bugzilla_username=None,
-                             bugzilla_password=None):
+                             bugzilla_apikey=None):
         """Obtain a LocalMercurialRepository for the named server repository.
 
         Call this with the same argument passed to ``create_repository()``
@@ -474,7 +474,7 @@ class MozReview(object):
         return LocalMercurialRepository(self._path, self._hg, local_path,
                                         http_url, push_url=ssh_url, ircnick=ircnick,
                                         bugzilla_username=bugzilla_username,
-                                        bugzilla_password=bugzilla_password)
+                                        bugzilla_apikey=bugzilla_apikey)
 
     def create_user_api_key(self, email, sync_to_reviewboard=True):
         """Creates an API key for the given user.
@@ -597,7 +597,7 @@ class LocalMercurialRepository(object):
     repository from the context of Python.
     """
     def __init__(self, mrpath, hg, path, default_url, push_url=None,
-                 ircnick=None, bugzilla_username=None, bugzilla_password=None):
+                 ircnick=None, bugzilla_username=None, bugzilla_apikey=None):
         """Create a local Mercurial repository.
 
         ``mrpath`` is the home directory of the MozReview installation.
@@ -606,7 +606,7 @@ class LocalMercurialRepository(object):
         ``default_url`` is the URL for the default path to the repository.
         ``push_url`` is the default URL to be used for pushing.
         ``ircnick`` is the IRC nickname to use.
-        ``bugzilla_username`` and ``bugzilla_password`` define the credentials
+        ``bugzilla_username`` and ``bugzilla_apikey`` define the credentials
         to use when talking to Bugzilla or MozReview.
         """
         self.mrpath = mrpath
@@ -629,12 +629,12 @@ class LocalMercurialRepository(object):
                 fh.write('default-push = %s\n' % push_url)
             fh.write('\n')
 
-            if bugzilla_username or bugzilla_password:
+            if bugzilla_username or bugzilla_apikey:
                 fh.write('[bugzilla]\n')
                 if bugzilla_username:
                     fh.write('username = %s\n' % bugzilla_username)
-                if bugzilla_password:
-                    fh.write('password = %s\n' % bugzilla_password)
+                if bugzilla_apikey:
+                    fh.write('apikey = %s\n' % bugzilla_apikey)
                 fh.write('\n')
 
             if ircnick:

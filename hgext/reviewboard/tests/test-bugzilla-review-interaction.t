@@ -11,6 +11,8 @@
 
   $ mozreview create-user author@example.com password 'Some Contributor' --uid 2001 --scm-level 1
   Created user 6
+  $ authorkey=`mozreview create-api-key author@example.com`
+  $ alias hgauthor='hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey}'
   $ mozreview create-user reviewer@example.com password 'Mozilla Reviewer [:reviewer]' --bugzilla-group editbugs
   Created user 7
   $ mozreview create-user reviewer2@example.com password 'Another Reviewer [:rev2]' --bugzilla-group editbugs
@@ -25,7 +27,7 @@ Create a review request from a regular user
 
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com push > /dev/null
+  $ hgauthor push > /dev/null
 
 Adding a reviewer should result in a r? flag being set
 
@@ -207,7 +209,7 @@ Ensure multiple reviewers works as expected
   $ echo b2 > foo
   $ hg commit -m 'Bug 2 - Multiple reviewers'
   created new head
-  $ hg --config bugzilla.username=author@example.com push > /dev/null
+  $ hgauthor push > /dev/null
 
 Emulate the JavaScript by setting the reviewers on both parent and commit.
 TODO: Implement the JavaScript bits on the server so we don't need to do this
@@ -399,7 +401,7 @@ review? sticks around when 1 person grants review
   $ echo more_multiple_reviewers > foo
   $ hg commit -m 'Bug 3 - More multiple reviewers'
   created new head
-  $ hg --config bugzilla.username=author@example.com push > /dev/null
+  $ hgauthor push > /dev/null
 
   $ rbmanage add-reviewer 5 --user reviewer --user rev2
   2 people listed on review request
@@ -478,7 +480,7 @@ Random users can come along and grant review
   $ echo unrelated_reviewer > foo
   $ hg commit -m 'Bug 4 - Unrelated Reviewers'
   created new head
-  $ hg --config bugzilla.username=author@example.com push > /dev/null
+  $ hgauthor push > /dev/null
 
   $ rbmanage add-reviewer 7 --user reviewer
   1 people listed on review request
@@ -560,7 +562,7 @@ Test interaction with multiple commits.
   $ hg commit -m 'Bug 5 - Parent reviews, second commit'
   $ echo parent_reviews_3 >> foo
   $ hg commit -m 'Bug 5 - Parent reviews, third commit'
-  $ hg --config bugzilla.username=author@example.com push > /dev/null
+  $ hgauthor push > /dev/null
 
   $ rbmanage add-reviewer 9 --user reviewer --user rev2
   2 people listed on review request

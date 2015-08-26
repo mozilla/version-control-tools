@@ -11,6 +11,7 @@
 
   $ mozreview create-user author@example.com password 'Patch Author' --username contributor --uid 2001 --scm-level 1
   Created user 6
+  $ authorkey=`mozreview create-api-key author@example.com`
 
 Create a review request
 
@@ -18,7 +19,7 @@ Create a review request
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com push > /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push > /dev/null
   $ rbmanage publish 1
 
 Add a comment with unicode

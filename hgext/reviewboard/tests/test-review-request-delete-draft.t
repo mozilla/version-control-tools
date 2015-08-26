@@ -5,6 +5,7 @@
 
   $ mozreview create-user submitter@example.com password 'Dummy Submitter' --username submitter --uid 2001 --scm-level 1
   Created user 6
+  $ submitterkey=`mozreview create-api-key submitter@example.com`
   $ exportbzauth submitter@example.com password
   $ bugzilla create-bug TestProduct TestComponent 'Initial Bug'
 
@@ -16,7 +17,7 @@
 
   $ echo foo1 > foo
   $ hg commit -m 'Bug 1 - Initial commit'
-  $ hg --config bugzilla.username=submitter@example.com push
+  $ hg --config bugzilla.username=submitter@example.com --config bugzilla.apikey=${submitterkey} push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/8c2be86a13c9*-addcommitid.hg (glob)
@@ -41,7 +42,7 @@ Now publish the review and create a new draft
   $ rbmanage publish 1
   $ echo foo3 > foo
   $ hg commit --amend > /dev/null
-  $ hg --config bugzilla.username=submitter@example.com push
+  $ hg --config bugzilla.username=submitter@example.com --config bugzilla.apikey=${submitterkey} push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets

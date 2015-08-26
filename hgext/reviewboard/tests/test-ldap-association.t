@@ -20,6 +20,7 @@ Create a user
 
   $ mozreview create-user user1@example.com password1 'User One [:user1]' --uid 2001 --scm-level 1
   Created user 6
+  $ user1key=`mozreview create-api-key user1@example.com`
   $ exportbzauth user1@example.com password1
 
 Dump the user so it gets mirrored over to Review Board
@@ -33,7 +34,7 @@ The user should not have an ldap username associated with them
 
 Perform a push with the user
 
-  $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push -r 1 --reviewid 1
+  $ hg --config bugzilla.username=user1@example.com --config bugzilla.apikey=${user1key} push -r 1 --reviewid 1
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/cd3395bd3f8a*-addcommitid.hg (glob)

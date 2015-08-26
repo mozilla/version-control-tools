@@ -16,7 +16,7 @@
 
 Pushing with unknown username with password results in sane failure
 
-  $ hg --config bugzilla.username=unknown --config bugzilla.password=irrelevant push
+  $ hg --config bugzilla.username=unknown --config bugzilla.password=irrelevant --config bugzilla.apikey= push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/737709d9e5f4*-addcommitid.hg (glob)
@@ -85,7 +85,7 @@ User in database without API key requires web login
 
 Pushing with invalid password results in sane failure
 
-  $ hg --config bugzilla.username=${BUGZILLA_USERNAME} --config bugzilla.password=badpass push
+  $ hg --config bugzilla.username=${BUGZILLA_USERNAME} --config bugzilla.password=badpass --config bugzilla.apikey= push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
@@ -95,7 +95,7 @@ Pushing with invalid password results in sane failure
 
 Pushing with invalid cookie results in sane failure
 
-  $ hg --config bugzilla.userid=baduserid --config bugzilla.cookie=irrelevant push
+  $ hg --config bugzilla.userid=baduserid --config bugzilla.cookie=irrelevant --config bugzilla.apikey= push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
@@ -109,7 +109,7 @@ Pushing using cookie auth works
   $ userid=`echo ${out} | awk '{print $1}'`
   $ cookie=`echo ${out} | awk '{print $2}'`
 
-  $ hg --config bugzilla.userid=${userid} --config bugzilla.cookie=${cookie} push --reviewid bz://1/goodcookie
+  $ hg --config bugzilla.userid=${userid} --config bugzilla.cookie=${cookie} --config bugzilla.apikey= push --reviewid bz://1/goodcookie
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
@@ -126,7 +126,7 @@ Pushing using cookie auth works
 
 Pushing using username password auth works
 
-  $ hg --config bugzilla.username=${BUGZILLA_USERNAME} --config bugzilla.password=${BUGZILLA_PASSWORD} push --reviewid bz://1/gooduserpass
+  $ hg --config bugzilla.username=${BUGZILLA_USERNAME} --config bugzilla.password=${BUGZILLA_PASSWORD} --config bugzilla.apikey= push --reviewid bz://1/gooduserpass
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
@@ -306,7 +306,7 @@ Disabling a user in Bugzilla will prevent them from using Review Board
 
 (This error message isn't terrific. It can be improved later.)
   $ exportbzauth user1@example.com
-  $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 push --reviewid bz://1/disableduser
+  $ hg --config bugzilla.username=user1@example.com --config bugzilla.password=password1 --config bugzilla.apikey= push --reviewid bz://1/disableduser
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found

@@ -20,7 +20,7 @@ default-push = ssh://${HGSSH_HOST}:${HGSSH_PORT}/test-repo
 
 [bugzilla]
 username = ${BUGZILLA_USERNAME}
-password = ${BUGZILLA_PASSWORD}
+apikey = $2
 
 # We want [extensions] to be last because some tests write
 # ext=path/to/ext lines.
@@ -70,12 +70,14 @@ commonenv() {
     --uid 2000 \
     --scm-level 1 > /dev/null
 
+  apikey=`mozreview create-api-key default@example.com`
+
   exportbzauth default@example.com password
 
   mozreview create-repo test-repo > /dev/null
 
   hg init client
-  clientconfig client/.hg/hgrc
+  clientconfig client/.hg/hgrc ${apikey}
 
   pulse create-queue exchange/mozreview/ all
 }
