@@ -50,7 +50,7 @@
 
       & > .status {
         flex: 0 2;
-        min-width: 50px;
+        min-width: 40px;
       }
 
       & > .truncate_text {
@@ -95,28 +95,55 @@
    }
 
    /* This was copied from the rb dashboard less file.*/
-   .issue-count,
-   .shipit-count {
-     display: inline-block;
-     font-weight: bold;
-     padding: 0.05em 0.8em;
-     white-space: nowrap;
-     .border-radius(10px);
-   }
-
-   .issue-count {
-     border: 1px darken(@issue-opened-bg, 50%) solid;
-     color: #205003;
-     background-repeat: no-repeat;
-     background-image: linear-gradient(#FFF49C, #FFF49C 25%, #FFE303);
-
-     .issue-icon {
-       color: darken(@issue-opened-bg, 60%);
-       display: inline-block;
-       padding: 0 3px 0 1px;
-       text-align: center;
-      }
+    .approval,
+    .issue-count,
+    .no-approval,
+    .shipit-count {
+      min-width: 38px;
+      text-align: center;
+      display: inline-block;
+      white-space: nowrap;
+      min-height: 10pt;
+      .border-radius(2px);
     }
+
+    .no-approval {
+      background-repeat: no-repeat;
+      cursor: default;
+      background-image: linear-gradient(#F0F0F0, #F0F0F0 25%, #C3C3C3);
+      border: 1px solid #6F6F6F;
+      color: #151515;
+      font-size: 9pt;
+      font-family: monospace;
+    }
+
+    .approval {
+      background-repeat: no-repeat;
+      cursor: default;
+      border: 1px #478a06 solid;
+      color: #205003;
+      font-size: 9pt;
+      font-family: monospace;
+      background-repeat: no-repeat;
+      background-image: linear-gradient(#FFF49C, #FFF49C 25%, #FFE303);
+      background-image: linear-gradient(#DFFFD7, #DFFFD7 25%, #ACEE9C);
+      color: #0A1B00;
+    }
+
+    .issue-count {
+      border: 1px darken(@issue-opened-bg, 50%) solid;
+      color: #205003;
+      background-repeat: no-repeat;
+      background-image: linear-gradient(#FFF49C, #FFF49C 25%, #FFE303);
+
+      .issue-icon {
+        color: darken(@issue-opened-bg, 60%);
+        display: inline-block;
+        padding: 0 3px 0 1px;
+        text-align: center;
+        font-weight: bold
+       }
+     }
 
     .shipit-count {
       background-image: url("/static/mozreview/shipit_bg.png");

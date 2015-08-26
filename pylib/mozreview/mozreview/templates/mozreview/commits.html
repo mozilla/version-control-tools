@@ -27,7 +27,7 @@ This is the template for the "Commits" list in a push-based review request.
       <th class="submitter">{% trans "Submitter" %}</th>
       {% endcomment %}
       <th class="reviewers">{% trans "Reviewers" %}</th>
-      <th class="status"><div class="rb-icon rb-icon-shipit" title="Ship It!"></div></th>
+      <th class="status">{% trans "Status" %}</th>
     </tr>
     </thead>
     {% for child_details in children_details %}
@@ -53,10 +53,10 @@ This is the template for the "Commits" list in a push-based review request.
       <td class="status">
         {% if child_details.get_review_request.issue_open_count > 0 %}
         <span class="issue-count"> <span class="issue-icon">!</span> {{child_details.get_review_request.issue_open_count}}</span>
-        {% elif child_details.get_review_request.shipit_count > 0 %}
-        <span class="shipit-count"> <div class="rb-icon rb-icon-shipit-checkmark" title="Ship It!"></div>
-          {{child_details.get_review_request.shipit_count}}
-        </span>
+        {% elif child_details.get_review_request.approved %}
+        <div class="approval" title="Approved For Landing - You have at least one valid ship it!">r+</div>
+        {% else %}
+        <div class="no-approval" title="{{child_details.get_review_request.approval_failure}}">r?</div>
         {% endif %}
       </td>
     </tr>
