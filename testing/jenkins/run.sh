@@ -27,6 +27,6 @@ mv docs/_build /version-control-tools/sphinx-docs
 
 # Ideally this would be part of running tests. Until then, add it here
 # so Jenkins doesn't bloat.
-./d0cker prune-images
+# ./d0cker prune-images
 
 exit $result

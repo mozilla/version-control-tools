@@ -8,29 +8,29 @@ fi
 swapon /var/swap
 
 apt-get -y remove chef puppet && apt-get -y autoremove
-apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
-sh -c "echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
+# apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
+# sh -c "echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
 apt-get update
 apt-get -y dist-upgrade
-apt-get -y install btrfs-tools
+# apt-get -y install btrfs-tools
 
-if [ ! -e /var/btrfs ]; then
-  dd if=/dev/zero of=/var/btrfs bs=1048576 count=12000
-  mkfs.btrfs /var/btrfs
-fi
+# if [ ! -e /var/btrfs ]; then
+#   dd if=/dev/zero of=/var/btrfs bs=1048576 count=12000
+#   mkfs.btrfs /var/btrfs
+# fi
 
-if [ ! -d /var/lib/docker ]; then
-  mkdir /var/lib/docker
-fi
+# if [ ! -d /var/lib/docker ]; then
+#   mkdir /var/lib/docker
+# fi
 
-mount /var/btrfs /var/lib/docker
+# mount /var/btrfs /var/lib/docker
 
 # Docker may have been started before btrfs was mounted. If so, it would
 # have started in devicemapper mode. Force a restart to pick up btrfs.
-restart docker
+# restart docker
 
-apt-get -y install libffi-dev libldap2-dev libsasl2-dev libssl-dev libxslt1-dev lxc-docker mercurial python-dev python-virtualenv sqlite3 unzip zlib1g-dev
-usermod --append -G docker vagrant
+apt-get -y install libffi-dev libldap2-dev libsasl2-dev libssl-dev libxslt1-dev mercurial python-dev python-virtualenv sqlite3 unzip zlib1g-dev
+# usermod --append -G docker vagrant
 SCRIPT
 
 Vagrant.configure('2') do |config|
