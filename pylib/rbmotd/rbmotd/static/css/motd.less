@@ -1,0 +1,26 @@
+@import (reference) "@{STATIC_ROOT}rb/css/defs.less";
+
+@bg-color: #FFFA99;
+
+#motd {
+  background: @bg-color;
+  border-bottom: 1px darken(@bg-color, 55%) solid;
+  font-size: 110%;
+  padding: @headerbar-padding;
+  padding-left: @headerbar-padding-left - 20px;
+}
+
+#motd-close {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#motd-message {
+  vertical-align: middle;
+
+  a {
+    color: blue;
+    font-weight: bold;
+    text-decoration: none;
+  }
+}

@@ -1,0 +1,29 @@
+{% if motd_enabled %}
+<div id="motd" style="display: none;">
+ <a href="#" id="motd-close" class="ui-icon ui-icon-closethick"
+    title="Dismiss"></a>
+ <span id="motd-message">{{motd_message|safe}}</span>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var $motd = $('#motd');
+
+        $('#motd-close').click(function() {
+            $.cookie('{{motd_cookie}}', '{{motd_close_value}}', {
+                path: SITE_ROOT
+            });
+
+            $motd.remove();
+
+            return false;
+        });
+
+        if ($.cookie('{{motd_cookie}}') !== '{{motd_close_value}}') {
+            $motd.show();
+        } else {
+            $motd.remove();
+        }
+    });
+</script>
+{% endif %}
