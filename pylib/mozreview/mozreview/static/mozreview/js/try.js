@@ -13,7 +13,7 @@ $(document).on("mozreview_ready", function() {
       '<label for="mozreview-autoland-try-syntax">TryChooser Syntax</label>',
       '<textarea id="mozreview-autoland-try-syntax" name="mozreview-autoland-try-syntax" placeholder="try: -b do -p win32 -u all -t none"/>',
       '<p>Enter TryChooser syntax here for your Try build. <a href="http://trychooser.pub.build.mozilla.org/" target="_blank">You can graphically build TryChooser syntax here.</a></p>',
-      '<span id="try-error">You have an error in your try syntax</span>'
+      '<span id="try-syntax-error">You have an error in your try syntax</span>'
     ];
 
     for (var i = 0; i < html.length; ++i) {
