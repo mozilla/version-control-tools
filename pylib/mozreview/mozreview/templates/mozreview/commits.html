@@ -52,7 +52,9 @@ This is the template for the "Commits" list in a push-based review request.
       </td>
       <td class="status">
         {% if child_details.get_review_request.issue_open_count > 0 %}
-        <span class="issue-count"> <span class="issue-icon">!</span> {{child_details.get_review_request.issue_open_count}}</span>
+        <a class="issue-count" href="{{child_details.get_review_request.get_absolute_url}}#issue-summary" title="{{child_details.get_review_request.issue_open_count}} open issues">
+          <span class="issue-icon">!</span>{{child_details.get_review_request.issue_open_count}}
+        </a>
         {% elif child_details.get_review_request.approved %}
         <div class="approval" title="Approved For Landing - You have at least one valid ship it!">r+</div>
         {% else %}
