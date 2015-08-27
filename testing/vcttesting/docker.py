@@ -758,14 +758,11 @@ class Docker(object):
             }
             with self.start_container(web_id, **web_params) as web_state:
                 web_hostname, web_port = self._get_host_hostname_port(web_state, '80/tcp')
-                print('waiting for containers to bootstrap')
                 wait_for_http(web_hostname, web_port, path='xmlrpc.cgi',
                               extra_check_fn=self._get_assert_container_running_fn(web_id))
 
         db_unique_id = str(uuid.uuid1())
         web_unique_id = str(uuid.uuid1())
-
-        print('committing bootstrapped images')
 
         # Save an image of the stopped containers.
         # We tag with a unique ID so we can identify all bootrapped images
@@ -783,13 +780,9 @@ class Docker(object):
         db_bootstrap = db_future.result()['Id']
         web_bootstrap = web_future.result()['Id']
 
-        print('removing non-bootstrapped containers')
-
         with futures.ThreadPoolExecutor(2) as e:
             e.submit(self.client.remove_container, web_id)
             e.submit(self.client.remove_container, db_id)
-
-        print('bootstrapped images created')
 
         return db_bootstrap, web_bootstrap
 
