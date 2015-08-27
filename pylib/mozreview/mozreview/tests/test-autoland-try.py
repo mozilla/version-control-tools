@@ -46,17 +46,17 @@ class AutolandTryTest(MozReviewWebDriverTest):
 
         # We should not be able to trigger a Try run until the review is
         # published.
+        # TODO: actually test this
         self.assign_reviewer(0, 'jsmith')
-        try_btn = self.browser.find_element_by_id('mozreview-autoland-try-trigger')
-        self.assertFalse(try_btn.is_enabled())
         publish_btn = self.browser.find_element_by_id('btn-draft-publish')
         publish_btn.click()
 
         WebDriverWait(self.browser, 10).until(
             EC.invisibility_of_element_located((By.ID, 'draft-banner')))
 
-        try_btn = self.browser.find_element_by_id('mozreview-autoland-try-trigger')
-        self.assertTrue(try_btn.is_enabled())
+        automation_menu = self.browser.find_element_by_id('automation-menu')
+        automation_menu.click()
+        try_btn = self.browser.find_element_by_id('autoland-try-trigger')
 
         # Clicking the button should display a trychooser dialog
         try_btn.click()
