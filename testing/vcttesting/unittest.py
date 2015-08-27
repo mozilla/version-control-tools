@@ -33,7 +33,8 @@ def start_mozreview(mr):
          autolanddb_image=os.environ['DOCKER_AUTOLANDDB_IMAGE'],
          autoland_image=os.environ['DOCKER_AUTOLAND_IMAGE'],
          hgrb_image=os.environ['DOCKER_HGRB_IMAGE'],
-         rbweb_image=os.environ['DOCKER_RBWEB_IMAGE'])
+         rbweb_image=os.environ['DOCKER_RBWEB_IMAGE'],
+         hgweb_image=os.environ['DOCKER_HGWEB_IMAGE'])
 
 
 class MozReviewTest(unittest.TestCase):

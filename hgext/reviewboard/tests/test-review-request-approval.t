@@ -604,4 +604,4 @@ ship-its. Posting a new diff should not clear approval
 Cleanup
 
   $ mozreview stop
-  stopped 8 containers
+  stopped 9 containers

@@ -1,0 +1,34 @@
+#!/usr/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script is used to start hgweb containers in isolation from a
+# master.
+
+import os
+import subprocess
+import sys
+
+REPOS = (
+    'mozilla-central',
+    'hgcustom/version-control-tools',
+)
+
+# Create dummy repos.
+for r in REPOS:
+    root = os.path.join('/repo/hg/mozilla', r)
+
+    if not os.path.exists(root):
+        subprocess.check_call(['/usr/bin/hg', 'init', root])
+
+    with open(os.path.join(root, '.hg/hgrc'), 'wb') as fh:
+        fh.write(b'[hgmo]\n')
+        fh.write(b'mozbuildinfoenabled = True\n')
+        fh.write(b'mozbuildinfowrapper = /repo/hg/venv_mozbuild/bin/hg mozbuildinfo --pipemode\n')
+
+    subprocess.check_call([
+        '/repo/hg/version-control-tools/scripts/repo-permissions',
+        root, 'hg', 'hg', 'wwr'])
+
+os.execl(sys.argv[1], *sys.argv[1:])

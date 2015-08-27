@@ -3,5 +3,39 @@
   copy: src={{ item }} dest=/{{ item }} owner=root group=root mode=0755
   with_items:
     - entrypoint.py
+    - entrypoint-solo
     - run.sh
     - set-mirror-key.py
+
+# We have an additional virtualenv in Docker to run moz.build info
+# directly from hgweb without the secure execution environment we
+# run in production. We do this because we can't execute the secure
+# wrapper inside Docker because of limited privileges of Docker
+# containers. This is unfortunate. But it's what we have to do for
+# now.
+
+- name: create virtualenv to run moz.build info
+  command: /usr/bin/virtualenv-2.7 /repo/hg/venv_mozbuild creates=/repo/hg/venv_mozbuild
+
+- name: copy peep.py
+  copy: src=files/peep.py
+        dest=/repo/hg/venv_mozbuild/bin/peep
+        mode=0755
+        owner=root
+        group=root
+
+- name: configure shebang in peep
+  replace: dest=/repo/hg/venv_mozbuild/bin/peep
+           regexp='^#!\/usr\/bin\/env python$'
+           replace='#!/repo/hg/venv_mozbuild/bin/python2.7'
+
+- name: copy requirements.txt
+  copy: src=requirements-mozbuild.txt
+        dest=/repo/hg/venv_mozbuild/requirements.txt
+        mode=0644
+        owner=root
+        group=root
+
+- name: populate virtualenv
+  pip: requirements=/repo/hg/venv_mozbuild/requirements.txt
+       executable=/repo/hg/venv_mozbuild/bin/peep

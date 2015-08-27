@@ -54,6 +54,7 @@ commonenv() {
     --autoland-port $HGPORT4 \
     --ldap-port $HGPORT5 \
     --ssh-port $HGPORT6 \
+    --hgweb-port $HGPORT7 \
     > /dev/null
 
   # MozReview randomly fails to start. Handle it elegantly.

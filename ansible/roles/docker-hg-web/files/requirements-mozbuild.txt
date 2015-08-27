@@ -1,0 +1,6 @@
+# sha256: XnEOnbFPIQ39VevsQ7ylyBLTTFthedvLouYdn5Zb9OE
+jsmin==2.1.2
+# sha256: 3MkOSoR2FJ7MivE8CCAoYLTJyYepTE88GLKClLb9js0
+Mercurial==3.4.2
+# sha256: JCJ2CPw8c1-7XGKdBUCmADaMHV5XAT3TknKgpcnMyxM
+mozbuild==0.2

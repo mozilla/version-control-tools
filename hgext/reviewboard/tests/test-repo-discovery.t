@@ -186,4 +186,4 @@ Redirecting to different hostname should be disallowed (security protection)
 Cleanup
 
   $ mozreview stop
-  stopped 8 containers
+  stopped 9 containers

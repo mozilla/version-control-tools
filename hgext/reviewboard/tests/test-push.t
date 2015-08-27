@@ -446,4 +446,4 @@ Old client not supporting capabilities is rejected
 Cleanup
 
   $ mozreview stop
-  stopped 8 containers
+  stopped 9 containers

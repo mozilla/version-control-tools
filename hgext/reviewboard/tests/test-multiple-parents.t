@@ -72,4 +72,4 @@ Pushing with a different review ID will create a "duplicate" review
 Cleanup
 
   $ mozreview stop
-  stopped 8 containers
+  stopped 9 containers

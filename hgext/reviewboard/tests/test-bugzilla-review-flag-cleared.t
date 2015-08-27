@@ -542,4 +542,4 @@ We should have an r+ flag already set.
 Cleanup
 
   $ mozreview stop
-  stopped 8 containers
+  stopped 9 containers

@@ -26,13 +26,15 @@ class MozReviewCommands(object):
         rbweb_image = os.environ.get('DOCKER_RBWEB_IMAGE')
         autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE')
         autoland_image = os.environ.get('DOCKER_AUTOLAND_IMAGE')
+        hgweb_image = os.environ.get('DOCKER_HGWEB_IMAGE')
 
         from vcttesting.mozreview import MozReview
         return MozReview(where, db_image=db_image, web_image=web_image,
                          hgrb_image=hgrb_image, ldap_image=ldap_image,
                          pulse_image=pulse_image, rbweb_image=rbweb_image,
                          autolanddb_image=autolanddb_image,
-                         autoland_image=autoland_image)
+                         autoland_image=autoland_image,
+                         hgweb_image=hgweb_image)
 
     @Command('start', category='mozreview',
         description='Start a MozReview instance')
@@ -52,9 +54,11 @@ class MozReviewCommands(object):
                      help='Port LDAP server should listen on.')
     @CommandArgument('--ssh-port', type=int,
                      help='Port Mercurial SSH server should listen on.')
+    @CommandArgument('--hgweb-port', type=int,
+                     help='Port hg.mo HTTP server should listen on.')
     def start(self, where, bugzilla_port=None, reviewboard_port=None,
             mercurial_port=None, pulse_port=None, autoland_port=None,
-            ldap_port=None, ssh_port=None):
+            ldap_port=None, ssh_port=None, hgweb_port=None):
         mr = self._get_mozreview(where)
         mr.start(bugzilla_port=bugzilla_port,
                 reviewboard_port=reviewboard_port,
@@ -63,11 +67,13 @@ class MozReviewCommands(object):
                 autoland_port=autoland_port,
                 ldap_port=ldap_port,
                 ssh_port=ssh_port,
+                hgweb_port=hgweb_port,
                 verbose=True)
 
         print('Bugzilla URL: %s' % mr.bugzilla_url)
         print('Review Board URL: %s' % mr.reviewboard_url)
-        print('Mercurial URL: %s' % mr.mercurial_url)
+        print('Mercurial RB URL: %s' % mr.mercurial_url)
+        print('hg.mo URL: %s' % mr.hgweb_url)
         print('Pulse endpoint: %s:%s' % (mr.pulse_host, mr.pulse_port))
         print('Autoland URL: %s' % mr.autoland_url)
         print('Admin username: %s' % mr.admin_username)
@@ -102,6 +108,7 @@ class MozReviewCommands(object):
         print('export BUGZILLA_URL=%s' % mr.bugzilla_url)
         print('export REVIEWBOARD_URL=%s' % mr.reviewboard_url)
         print('export MERCURIAL_URL=%s' % mr.mercurial_url)
+        print('export HGWEB_URL=%s' % mr.hgweb_url)
         print('export AUTOLAND_URL=%s' % mr.autoland_url)
         print('export ADMIN_USERNAME=%s' % mr.admin_username)
         print('export ADMIN_PASSWORD=%s' % mr.admin_password)

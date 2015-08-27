@@ -67,4 +67,4 @@ details from the parent review request
 Cleanup
 
   $ mozreview stop
-  stopped 8 containers
+  stopped 9 containers

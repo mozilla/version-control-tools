@@ -84,4 +84,4 @@ Publishing the parent should succeed.
 Cleanup
 
   $ mozreview stop
-  stopped 8 containers
+  stopped 9 containers

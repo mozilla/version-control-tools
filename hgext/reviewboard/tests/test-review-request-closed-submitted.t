@@ -205,4 +205,4 @@ Child review request with ID 3 should be re-opened...
 Cleanup
 
   $ mozreview stop
-  stopped 8 containers
+  stopped 9 containers

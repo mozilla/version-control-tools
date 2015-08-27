@@ -644,7 +644,8 @@ class Docker(object):
 
         return images
 
-    def build_mozreview(self, images=None, verbose=False, use_last=False):
+    def build_mozreview(self, images=None, verbose=False, use_last=False,
+                        build_hgweb=True):
         """Ensure the images for a MozReview service are built.
 
         bmoweb's entrypoint does a lot of setup on first run. This takes many
@@ -666,15 +667,20 @@ class Docker(object):
                 'bmoweb',
             ], existing=images, verbose=verbose, use_last=use_last)
 
+            ansibles = {
+                'hgrb': ('docker-hgrb', 'centos6'),
+                'rbweb': ('docker-rbweb', 'centos6'),
+            }
+            if build_hgweb:
+                ansibles['hgweb'] = ('docker-hgweb', 'centos6')
+
             f_images = e.submit(self.ensure_images_built, [
                 'autolanddb',
                 'autoland',
                 'ldap',
                 'pulse',
-            ], ansibles={
-                'hgrb': ('docker-hgrb', 'centos6'),
-                'rbweb': ('docker-rbweb', 'centos6'),
-            }, existing=images, verbose=verbose, use_last=use_last)
+            ], ansibles=ansibles,
+            existing=images, verbose=verbose, use_last=use_last)
 
             bmo_images = f_bmo_images.result()
 
@@ -718,10 +724,12 @@ class Docker(object):
         self.state['last-ldap-id'] = images['ldap']
         self.state['last-pulse-id'] = images['pulse']
         self.state['last-rbweb-id'] = images['rbweb']
+        if build_hgweb:
+            self.state['last-hgweb-id'] = images['hgweb']
 
         self.save_state()
 
-        return {
+        r = {
             'autolanddb': images['autolanddb'],
             'autoland': images['autoland'],
             'bmodb': bmodb_bootstrap,
@@ -731,6 +739,10 @@ class Docker(object):
             'pulse': images['pulse'],
             'rbweb': images['rbweb'],
         }
+        if build_hgweb:
+            r['hgweb'] = images['hgweb']
+
+        return r
 
     def _bootstrap_bmo(self, db_image, web_image):
         """Build bootstrapped BMO images.
@@ -789,8 +801,9 @@ class Docker(object):
     def start_mozreview(self, cluster, http_port=80,
             hgrb_image=None, ldap_image=None, ldap_port=None, pulse_port=None,
             rbweb_port=None, db_image=None, web_image=None, pulse_image=None,
-            rbweb_image=None, autolanddb_image=None, ssh_port=None,
-            hg_port=None, autoland_image=None, autoland_port=None,
+            rbweb_image=None, ssh_port=None, hg_port=None,
+            autolanddb_image=None, autoland_image=None, autoland_port=None,
+            hgweb_image=None, hgweb_port=None,
             verbose=False):
 
         start_ldap = False
@@ -817,6 +830,10 @@ class Docker(object):
             start_rbweb = True
             start_ldap = True
 
+        start_hgweb = False
+        if hgweb_port or start_rbweb:
+            start_hgweb = True
+
         known_images = self.all_docker_images()
         if db_image and db_image not in known_images:
             db_image = None
@@ -832,10 +849,12 @@ class Docker(object):
             autoland_image = None
         if autolanddb_image and autolanddb_image not in known_images:
             autolanddb_image = None
+        if hgweb_image and hgweb_image not in known_images:
+            hgweb_image = None
 
         if (not db_image or not web_image or not hgrb_image or not ldap_image
                 or not pulse_image or not autolanddb_image
-                or not autoland_image or not rbweb_image):
+                or not autoland_image or not rbweb_image or not hgweb_image):
             images = self.build_mozreview(verbose=verbose)
             autolanddb_image = images['autolanddb']
             autoland_image = images['autoland']
@@ -845,10 +864,11 @@ class Docker(object):
             web_image = images['bmoweb']
             pulse_image = images['pulse']
             rbweb_image = images['rbweb']
+            hgweb_image = images['hgweb']
 
         containers = self.state['containers'].setdefault(cluster, [])
 
-        with futures.ThreadPoolExecutor(5) as e:
+        with futures.ThreadPoolExecutor(6) as e:
             # Create containers concurrently - no race conditions here.
             f_db_create = e.submit(self.client.create_container, db_image,
                     environment={'MYSQL_ROOT_PASSWORD': 'password'})
@@ -878,6 +898,13 @@ class Docker(object):
                                          command=['/run.sh'],
                                          entrypoint=['/entrypoint.py'],
                                          ports=[22, 80])
+
+            if start_hgweb:
+                f_hgweb_create = e.submit(self.client.create_container,
+                                          hgweb_image,
+                                          ports=[80],
+                                          entrypoint=['/entrypoint-solo'],
+                                          command=['/run.sh'])
 
             if start_autoland:
                 f_autolanddb_create = e.submit(self.client.create_container,
@@ -932,6 +959,10 @@ class Docker(object):
                 rbweb_id = f_rbweb_create.result()['Id']
                 containers.append(rbweb_id)
 
+            if start_hgweb:
+                hgweb_id = f_hgweb_create.result()['Id']
+                containers.append(hgweb_id)
+
             # At this point, all containers have been created.
             self.save_state()
 
@@ -954,6 +985,11 @@ class Docker(object):
                                   links=[(ldap_state['Name'], 'ldap')],
                                   port_bindings={22: ssh_port, 80: hg_port})
                 hgrb_state = self.client.inspect_container(hgrb_id)
+
+            if start_hgweb:
+                self.client.start(hgweb_id,
+                                  port_bindings={80: hgweb_port})
+                hgweb_state = self.client.inspect_container(hgweb_id)
 
             if start_autoland:
                 assert start_hgrb
@@ -988,13 +1024,17 @@ class Docker(object):
         if start_hgrb:
             hgssh_hostname, hgssh_hostport = \
                 self._get_host_hostname_port(hgrb_state, '22/tcp')
-            hgweb_hostname, hgweb_hostport = \
+            hgrbweb_hostname, hgrbweb_hostport = \
                 self._get_host_hostname_port(hgrb_state, '80/tcp')
 
         if start_rbweb:
             rbweb_hostname, rbweb_hostport = \
                 self._get_host_hostname_port(rbweb_state, '80/tcp')
             rbweb_url = 'http://%s:%s/' % (rbweb_hostname, rbweb_hostport)
+
+        if start_hgweb:
+            hgweb_hostname, hgweb_hostport = \
+                self._get_host_hostname_port(hgweb_state, '80/tcp')
 
         print('waiting for Bugzilla to start')
         wait_for_http(bmoweb_hostname, bmoweb_hostport,
@@ -1005,11 +1045,15 @@ class Docker(object):
         if start_hgrb:
             wait_for_ssh(hgssh_hostname, hgssh_hostport,
                          extra_check_fn=self._get_assert_container_running_fn(hgrb_id))
-            wait_for_http(hgweb_hostname, hgweb_hostport,
+            wait_for_http(hgrbweb_hostname, hgrbweb_hostport,
                           extra_check_fn=self._get_assert_container_running_fn(hgrb_id))
         if start_rbweb:
             wait_for_http(rbweb_hostname, rbweb_hostport,
                           extra_check_fn=self._get_assert_container_running_fn(rbweb_id))
+
+        if start_hgweb:
+            wait_for_http(hgweb_hostname, hgweb_hostport,
+                          extra_check_fn=self._get_assert_container_running_fn(hgweb_id))
 
         print('Bugzilla accessible on %s' % bmo_url)
 
@@ -1043,12 +1087,16 @@ class Docker(object):
             result['hgrb_id'] = hgrb_id
             result['ssh_hostname'] = hgssh_hostname
             result['ssh_port'] = hgssh_hostport
-            result['mercurial_url'] = 'http://%s:%d/' % (hgweb_hostname,
-                                                         hgweb_hostport)
+            result['mercurial_url'] = 'http://%s:%d/' % (hgrbweb_hostname,
+                                                         hgrbweb_hostport)
 
         if start_rbweb:
             result['rbweb_id'] = rbweb_id
             result['reviewboard_url'] = rbweb_url
+
+        if start_hgweb:
+            result['hgweb_id'] = hgweb_id
+            result['hgweb_url'] = 'http://%s:%d/' % (hgweb_hostname, hgweb_hostport),
 
         return result
 
@@ -1085,7 +1133,8 @@ class Docker(object):
 
         with futures.ThreadPoolExecutor(2) as e:
             f_mr = e.submit(self.build_mozreview, images=images,
-                            verbose=verbose, use_last=use_last)
+                            verbose=verbose, use_last=use_last,
+                            build_hgweb=False)
             f_hgmo = e.submit(self.build_hgmo, images=images, verbose=verbose,
                               use_last=use_last)
 

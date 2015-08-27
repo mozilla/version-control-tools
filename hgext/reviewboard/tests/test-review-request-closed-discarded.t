@@ -576,4 +576,4 @@ The attachment for the review request should be unobsoleted
 Cleanup
 
   $ mozreview stop
-  stopped 8 containers
+  stopped 9 containers
