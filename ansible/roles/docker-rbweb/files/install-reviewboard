@@ -62,10 +62,13 @@ site.run_manage_command('disable-extension',
                         ['mozreview.extension.MozReviewExtension'])
 site.run_manage_command('disable-extension',
                         ['rbbz.extension.BugzillaExtension'])
+site.run_manage_command('disable-extension',
+                        ['rbmotd.extension.MotdExtension'])
 
 print('enabling extensions')
 site.run_manage_command('enable-extension', ['mozreview.extension.MozReviewExtension'])
 site.run_manage_command('enable-extension', ['rbbz.extension.BugzillaExtension'])
+site.run_manage_command('enable-extension', ['rbmotd.extension.MotdExtension'])
 
 print('generating static assets')
 site.run_manage_command('collectstatic', ['--noinput'])

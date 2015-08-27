@@ -17,5 +17,11 @@
 - name: install rbbz egg
   shell: "{{ easy_install }} -U dist/*.egg chdir={{ vct }}/pylib/rbbz"
 
+- name: build rbmotd egg
+  command: "{{ python }} setup.py bdist_egg chdir={{ vct }}/pylib/rbmotd"
+
+- name: install rbmotd egg
+  shell: "{{ easy_install }} -U dist/*.egg chdir={{ vct }}/pylib/rbmotd"
+
 - name: Generate static Review Board files
   command: "{{ rbsite }} manage {{ sitehome }} -- collectstatic --noinput"

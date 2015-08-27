@@ -29,6 +29,9 @@
 - name: Install rbbz extension
   command: /venv/bin/python setup.py develop chdir=/version-control-tools/pylib/rbbz
 
+- name: Install rbmotd extension
+  command: /venv/bin/python setup.py develop chdir=/version-control-tools/pylib/rbmotd
+
 - name: Remove default httpd configs
   file: path={{ item }} state=absent
   with_items:
