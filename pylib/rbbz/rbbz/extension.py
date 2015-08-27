@@ -354,9 +354,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                 raise InvalidBugIdError(bug_id)
             raise
 
-    # At this point, we know that the bug ID that we've got
-    # is valid and accessible.
-    review_request_draft.bugs_closed = str(bug_id)
+    # Note that the bug ID has already been set when the review was created.
 
     # If this is a squashed/parent review request, automatically publish all
     # relevant children.

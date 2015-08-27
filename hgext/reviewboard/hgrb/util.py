@@ -34,6 +34,9 @@ class ReviewID(object):
             raise util.Abort(_('first path component of review identifier must be a bug number'))
         self.bug = int(bug)
 
+        if bug == 0:
+            raise util.Abort(_('bug number must not be zero'))
+
         if len(paths) > 1:
             self.user = paths[1]
 

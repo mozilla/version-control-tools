@@ -46,6 +46,7 @@ def post_reviews(url, repoid, identifier, commits, hgresp,
                     'precursors': [<previous changeset>],
                     'message': <commit-message>,
                     'diff': <diff>,
+                    'bug': <bug-id>,
                     'parent_diff': <diff-from-base-to-commit> (optional),
                     'base_commit_id': <commit-id-to-apply-diffs-to> (optional),
                     'reviewers': [<user1>, <user2>, ...] (optional),
@@ -215,6 +216,7 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
         """
         props = {
             "summary": commit['message'].splitlines()[0],
+            "bugs_closed": commit['bug'],
             "description": commit['message'],
             "extra_data.p2rb.commit_id": commit['id'],
         }
@@ -413,9 +415,11 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
 
     commit_list_json = json.dumps(commit_list)
     depends = ','.join(str(i) for i in sorted(node_to_rid.values()))
+    all_bugs = ','.join(set(commit['bug'] for commit in commits['individual']))
 
     props = {
         'summary': identifier,
+        'bugs_closed': all_bugs,
         # Reviewboard does not allow review requests with empty descriptions to
         # be published, so we insert some filler here.
         'description': 'This is the parent review request',
