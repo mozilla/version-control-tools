@@ -2,6 +2,8 @@
 - name: determine if running in Docker
   stat: path=/vct
   register: vct_dir
+  tags:
+    - docker-refresh
 
 # yum will incur network traffic when URLs are specified. Download the
 # package locally first so we can run offline after initial bootstrap.
