@@ -251,7 +251,7 @@ class MozReviewCommands(object):
              description='Execute a command in a Docker container')
     @CommandArgument('name', help='Name of container to shell into',
                      choices={'bmoweb', 'bmodb', 'pulse', 'rbweb', 'hgrb',
-                              'autoland'})
+                              'autoland', 'hgweb'})
     @CommandArgument('command', help='Command to execute',
                      nargs=argparse.REMAINDER)
     def execute(self, name, command):
