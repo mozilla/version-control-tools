@@ -1096,7 +1096,7 @@ class Docker(object):
 
         if start_hgweb:
             result['hgweb_id'] = hgweb_id
-            result['hgweb_url'] = 'http://%s:%d/' % (hgweb_hostname, hgweb_hostport),
+            result['hgweb_url'] = 'http://%s:%d/' % (hgweb_hostname, hgweb_hostport)
 
         return result
 
