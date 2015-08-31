@@ -14,13 +14,15 @@ RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 ubuntu
 
 RUN apt-get update && apt-get --no-install-recommends -y install \
   apache2 curl gcc libapache2-mod-wsgi openssh-client postgresql-client \
-  python2.7-dev libffi6 libffi-dev libpq-dev ca-certificates
+  python2.7-dev python-pip libffi6 libffi-dev libpq-dev ca-certificates
 
 # Python
 # %include autoland/requirements.txt
 ADD extra/vct/autoland/requirements.txt ${AUTOLAND_HOME}/requirements.txt
 
-RUN curl -SL 'https://bootstrap.pypa.io/get-pip.py' | python2
+# TODO: We should install pip this way rather than through the python-pip
+#       package, but this has failed consistently for a week.
+#RUN curl -SL 'https://bootstrap.pypa.io/get-pip.py' | python2
 RUN pip install virtualenv
 RUN virtualenv ${AUTOLAND_HOME}/venv
 RUN ${AUTOLAND_HOME}/venv/bin/pip install -r ${AUTOLAND_HOME}/requirements.txt
