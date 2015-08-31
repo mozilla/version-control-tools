@@ -431,7 +431,7 @@ class Docker(object):
 
                 return full_image
 
-        raise Exception('Unable to confirm image was built')
+        raise Exception('Unable to confirm image was built: %s' % name)
 
     def ensure_images_built(self, names, ansibles=None, existing=None,
                             verbose=False, use_last=False):
