@@ -1073,7 +1073,7 @@ def reposetup(ui, repo):
             if len(args) == 7:
                 assert 'extra' not in kwargs
                 kwargs['extra'] = args[6]
-                args = tuple(args[0:5])
+                args = tuple(args[0:6])
 
             extra = kwargs.setdefault('extra', {})
             if 'commitid' not in extra and self.reviews.remoteurl:
