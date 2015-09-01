@@ -220,6 +220,9 @@ def generate_bundles(repo):
         else:
             params = 'compression=%s' % t
 
+        manifest.append('%s/%s %s cdn=true requiresni=true' % (
+            CDN, remote_path, params))
+
         for host, bucket, name in HOSTS:
             entry = 'https://%s/%s/%s ec2region=%s %s' % (
                 host, bucket, remote_path, name, params)
@@ -227,10 +230,6 @@ def generate_bundles(repo):
 
             size = os.path.getsize(final_path)
             paths[t] = (remote_path, size)
-
-        # TODO make CDN first entry so it is preferred by default.
-        manifest.append('%s/%s %s cdn=true requiresni=true' % (
-            CDN, remote_path, params))
 
     manifest_path = os.path.join(repo_full, '.hg', 'bundleclone.manifest')
     with open(manifest_path, 'wb') as fh:
