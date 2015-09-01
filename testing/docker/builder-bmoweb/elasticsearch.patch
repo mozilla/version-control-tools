@@ -1,12 +1,11 @@
 diff --git a/Bugzilla/Install/Requirements.pm b/Bugzilla/Install/Requirements.pm
-index 22eb4f0..b1cac45 100644
+index e653e5f..20026fd 100644
 --- a/Bugzilla/Install/Requirements.pm
 +++ b/Bugzilla/Install/Requirements.pm
-@@ -389,14 +389,6 @@ sub OPTIONAL_MODULES {
-         version => '0',
+@@ -404,14 +404,6 @@ sub OPTIONAL_MODULES {
          feature => ['memcached'],
      },
--
+
 -    # BMO - metrics
 -    {
 -        package => 'ElasticSearch',
@@ -14,6 +13,7 @@ index 22eb4f0..b1cac45 100644
 -        version => '0',
 -        feature => ['elasticsearch'],
 -    },
-     );
-
-     my $extra_modules = _get_extension_requirements('OPTIONAL_MODULES');
+-
+     # multi factor auth - totp
+     {
+         package => 'Auth-GoogleAuth',
