@@ -14,15 +14,16 @@
   with_items:
     - { path: mercurial-3.4.1-0.x86_64.rpm, sha256: 4e6190232ae217aacc894c0baf8e61900cb55d4ee0406a09a22b70cb9c6dfbd0 }
     - { path: mod_wsgi-4.4.8-1.el6.x86_64.rpm, sha256: e2f7e3daad0db47aa875a56a24a2132e5b33211fe78c8bf7b15d6d9bcf0a3cc5 }
+    - { path: python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm, sha256: a3f6c80d7a83798e4d64827d81dbcc39c1c44ae66c0afa4866bc477baad2cc2c }
 
 # Measurements revealed that the yum module is slow and adds a few seconds
 # overhead to invocations. So, we use low-level commands, which execute
 # much faster.
 - name: System packages installed
-  command: /usr/bin/yum -y install openldap-clients openldap-devel sudo syslog
+  command: /usr/bin/yum -y install openldap-clients openldap-devel python27 sudo syslog
 
 - name: local RPMs installed
-  command: /usr/bin/yum -y localinstall /var/tmp/mercurial-3.4.1-0.x86_64.rpm /var/tmp/mod_wsgi-4.4.8-1.el6.x86_64.rpm
+  command: /usr/bin/yum -y localinstall /var/tmp/mercurial-3.4.1-0.x86_64.rpm /var/tmp/mod_wsgi-4.4.8-1.el6.x86_64.rpm /var/tmp/python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm
 
 - name: Python package dependencies
   pip: requirements={{ vct }}/ansible/roles/hg-reviewboard/files/requirements.txt
@@ -49,6 +50,32 @@
     - /repo/hg/library
     - /repo/hg/mozilla
     - /repo/hg/webroot_wsgi
+
+- name: create virtualenv for pash
+  command: /usr/bin/virtualenv-2.7 /repo/hg/venv_pash creates=/repo/hg/venv_pash
+
+- name: copy peep.py into virtualenv
+  copy: src=files/peep.py
+        dest=/repo/hg/venv_pash/bin/peep
+        mode=0755
+        owner=root
+        group=root
+
+- name: configure shebang in peep
+  replace: dest=/repo/hg/venv_pash/bin/peep
+           regexp='^#!\/usr\/bin\/env python$'
+           replace='#!/repo/hg/venv_pash/bin/python2.7'
+
+- name: copy pip requirements file
+  copy: src=requirements-pash.txt
+        dest=/repo/hg/venv_pash/requirements.txt
+        owner=root
+        group=root
+        mode=0644
+
+- name: populate virtualenv
+  pip: requirements=/repo/hg/venv_pash/requirements.txt
+       executable=/repo/hg/venv_pash/bin/peep
 
 - name: install pash configuration file
   template: src=pash.json.j2
