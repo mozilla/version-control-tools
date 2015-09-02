@@ -87,7 +87,6 @@
         mode=0755
   with_items:
     - hg_helper.py
-    - ldap_helper.py
     - pash.py
 
 - name: install vct pash files
@@ -97,6 +96,7 @@
         group=root
         mode=0755
   with_items:
+    - ldap_helper.py
     - sh_helper.py
 
 - name: Install pash wrapper
