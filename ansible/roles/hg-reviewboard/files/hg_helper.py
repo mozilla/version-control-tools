@@ -44,7 +44,7 @@ def check_repo_name(repo_name):
     return True
 
 
-def serve():
+def serve(cname=None):
     ssh_command = os.environ.get('SSH_ORIGINAL_COMMAND')
     if not ssh_command:
         sys.stderr.write('No interactive shells allowed here!\n')
