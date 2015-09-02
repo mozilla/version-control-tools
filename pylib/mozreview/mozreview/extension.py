@@ -196,6 +196,8 @@ class MozReviewExtension(Extension):
                      'mozreview/after-login-form.html', apply_to=['login'])
         TemplateHook(self, 'base-after-content',
                      'mozreview/scm_level.html')
+        TemplateHook(self, 'base-after-content',
+                     'mozreview/repository.html')
 
         ReviewRequestFieldsHook(self, 'main', [CommitsListField])
         # This forces the Commits field to be the top item.

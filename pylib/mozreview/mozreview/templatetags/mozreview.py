@@ -25,8 +25,22 @@ def extra_data(review_request, key):
 @register.filter()
 def scm_level(mozreview_profile):
     if mozreview_profile is None:
-        return ""
+        return ''
     elif mozreview_profile.has_scm_ldap_group('scm_level_3'):
-        return "3"
+        return '3'
     elif mozreview_profile.has_scm_ldap_group('scm_level_1'):
-        return "1"
+        return '1'
+
+@register.filter()
+def required_ldap_group(repository):
+    try:
+        return repository.extra_data['required_ldap_group']
+    except AttributeError, KeyError:
+        return ''
+
+@register.filter()
+def try_repository_url(repository):
+    try:
+        return repository.extra_data['try_repository_url']
+    except AttributeError, KeyError:
+        return ''
