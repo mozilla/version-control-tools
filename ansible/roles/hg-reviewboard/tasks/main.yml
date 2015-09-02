@@ -97,10 +97,8 @@
         mode=0755
   with_items:
     - ldap_helper.py
+    - pash_wrapper
     - sh_helper.py
-
-- name: Install pash wrapper
-  copy: src=pash_wrapper dest=/usr/local/bin/pash_wrapper mode=0755
 
 - name: hgweb wsgi and config in place
   copy: src={{ item }} dest=/repo/hg/webroot_wsgi/{{ item }}
