@@ -196,79 +196,82 @@ def make_repo_clone(cname, repo_name, quick_src, verbose=False, source_repo=''):
     # New user repositories are non-publishing by default.
     set_repo_publishing(repo_name, False)
     sys.exit(0)
-  else:
-    print(MAKING_REPO.format(repo=repo_name, user=user, cname=cname,
-                             user_dir=user_repo_dir))
-    selection = prompt_user('Proceed?', ['yes', 'no'])
-    if (selection == 'yes'):
-      print 'You can clone an existing public repo or a users private repo.'
-      print 'You can also create an empty repository.'
-      selection = prompt_user('Source repository:', ['Clone a public repository', 'Clone a private repository', 'Create an empty repository'])
-      if (selection == 'Clone a public repository'):
-        exec_command = "/usr/bin/find " + DOC_ROOT + " -maxdepth 3 -mindepth 2 -type d -name .hg"
-        args = shlex.split(exec_command)
-        p = Popen(args, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
-        repo_list = p.communicate()[0].split("\n")
-        if repo_list:
-          print "We have the repo_list"
-          repo_list = map(lambda x: x.replace(DOC_ROOT + '/', ''), repo_list)
-          repo_list = map(lambda x: x.replace('/.hg', ''), repo_list)
-          repo_list = sorted(repo_list)
-          print 'List of available public repos'
-          source_repo = prompt_user('Pick a source repo:', repo_list, period=False)
-      elif (selection == 'Clone a private repository'):
-        source_user = raw_input('Please enter the e-mail address of the user owning the repo: ')
-        valid_user = is_valid_user(source_user)
-        if valid_user == True:
-          source_user = source_user.replace('@', '_')
-        elif valid_user == False:
-          sys.stderr.write('Unknown user.\n')
-          sys.exit(1)
-        elif valid_user == 'Invalid Email Address':
-          sys.stderr.write('Invalid Email Address.\n')
-          sys.exit(1)
-        source_user_path = run_command('find ' + DOC_ROOT + '/users/' + source_user + ' -maxdepth 1 -mindepth 1 -type d')
-        if not source_user_path:
-          print 'That user does not have any private repositories.'
-          print 'Check https://' + cname + '/users for a list of valid users.'
-          sys.exit(1)
-        else:
-          user_repo_list = run_command('find ' + DOC_ROOT + '/users/' + source_user + ' -maxdepth 3 -mindepth 2 -type d -name .hg')
-          user_repo_list = map(lambda x: x.replace(DOC_ROOT + '/users/' + source_user, ''), user_repo_list)
-          user_repo_list = map(lambda x: x.replace('/.hg', ''), user_repo_list)
-          user_repo_list = map(lambda x: x.strip('/'), user_repo_list)
-          user_repo_list = sorted(user_repo_list)
-          print 'Select the users repo you wish to clone.'
-          source_repo = prompt_user('Pick a source repo:', user_repo_list, period=False)
-          source_repo = 'users/' + source_user + '/' + source_repo
-      elif (selection == 'Create an empty repository'):
-        source_repo=''
-      else:
-          # We should not get here
-          source_repo=''
-      if source_repo != '':
-        print 'About to clone /%s to /users/%s/%s' % (source_repo, user_repo_dir, repo_name)
-        response = prompt_user('Proceed?', ['yes', 'no'])
-        if (response == 'yes'):
-          print 'Please do not interrupt this operation.'
-          run_hg_clone(user_repo_dir, repo_name, source_repo)
-      else:
-        print "About to create an empty repository at /users/%s/%s" % (user_repo_dir, repo_name)
-        response = prompt_user('Proceed?', ['yes', 'no'])
-        if (response == 'yes'):
-          if not os.path.exists('%s/users/%s' % (DOC_ROOT, user_repo_dir)):
-            try:
-              exec_command = '/bin/mkdir %s/users/%s' % (DOC_ROOT, user_repo_dir)
-              run_command(exec_command)
-            except Exception, e:
-              print "Exception %s" % (e)
+    return
 
-          run_command('/usr/bin/nohup %s init %s/users/%s/%s' % (HG, DOC_ROOT, user_repo_dir, repo_name))
-          run_repo_push('-e users/%s/%s' % (user_repo_dir, repo_name))
-      fix_user_repo_perms(repo_name)
-      # New user repositories are non-publishing by default.
-      set_repo_publishing(repo_name, False)
-      sys.exit(0)
+  print(MAKING_REPO.format(repo=repo_name, user=user, cname=cname,
+                           user_dir=user_repo_dir))
+  selection = prompt_user('Proceed?', ['yes', 'no'])
+  if selection != 'yes':
+      return
+
+  print 'You can clone an existing public repo or a users private repo.'
+  print 'You can also create an empty repository.'
+  selection = prompt_user('Source repository:', ['Clone a public repository', 'Clone a private repository', 'Create an empty repository'])
+  if (selection == 'Clone a public repository'):
+    exec_command = "/usr/bin/find " + DOC_ROOT + " -maxdepth 3 -mindepth 2 -type d -name .hg"
+    args = shlex.split(exec_command)
+    p = Popen(args, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
+    repo_list = p.communicate()[0].split("\n")
+    if repo_list:
+      print "We have the repo_list"
+      repo_list = map(lambda x: x.replace(DOC_ROOT + '/', ''), repo_list)
+      repo_list = map(lambda x: x.replace('/.hg', ''), repo_list)
+      repo_list = sorted(repo_list)
+      print 'List of available public repos'
+      source_repo = prompt_user('Pick a source repo:', repo_list, period=False)
+  elif (selection == 'Clone a private repository'):
+    source_user = raw_input('Please enter the e-mail address of the user owning the repo: ')
+    valid_user = is_valid_user(source_user)
+    if valid_user == True:
+      source_user = source_user.replace('@', '_')
+    elif valid_user == False:
+      sys.stderr.write('Unknown user.\n')
+      sys.exit(1)
+    elif valid_user == 'Invalid Email Address':
+      sys.stderr.write('Invalid Email Address.\n')
+      sys.exit(1)
+    source_user_path = run_command('find ' + DOC_ROOT + '/users/' + source_user + ' -maxdepth 1 -mindepth 1 -type d')
+    if not source_user_path:
+      print 'That user does not have any private repositories.'
+      print 'Check https://' + cname + '/users for a list of valid users.'
+      sys.exit(1)
+    else:
+      user_repo_list = run_command('find ' + DOC_ROOT + '/users/' + source_user + ' -maxdepth 3 -mindepth 2 -type d -name .hg')
+      user_repo_list = map(lambda x: x.replace(DOC_ROOT + '/users/' + source_user, ''), user_repo_list)
+      user_repo_list = map(lambda x: x.replace('/.hg', ''), user_repo_list)
+      user_repo_list = map(lambda x: x.strip('/'), user_repo_list)
+      user_repo_list = sorted(user_repo_list)
+      print 'Select the users repo you wish to clone.'
+      source_repo = prompt_user('Pick a source repo:', user_repo_list, period=False)
+      source_repo = 'users/' + source_user + '/' + source_repo
+  elif (selection == 'Create an empty repository'):
+    source_repo=''
+  else:
+      # We should not get here
+      source_repo=''
+  if source_repo != '':
+    print 'About to clone /%s to /users/%s/%s' % (source_repo, user_repo_dir, repo_name)
+    response = prompt_user('Proceed?', ['yes', 'no'])
+    if (response == 'yes'):
+      print 'Please do not interrupt this operation.'
+      run_hg_clone(user_repo_dir, repo_name, source_repo)
+  else:
+    print "About to create an empty repository at /users/%s/%s" % (user_repo_dir, repo_name)
+    response = prompt_user('Proceed?', ['yes', 'no'])
+    if (response == 'yes'):
+      if not os.path.exists('%s/users/%s' % (DOC_ROOT, user_repo_dir)):
+        try:
+          exec_command = '/bin/mkdir %s/users/%s' % (DOC_ROOT, user_repo_dir)
+          run_command(exec_command)
+        except Exception, e:
+          print "Exception %s" % (e)
+
+      run_command('/usr/bin/nohup %s init %s/users/%s/%s' % (HG, DOC_ROOT, user_repo_dir, repo_name))
+      run_repo_push('-e users/%s/%s' % (user_repo_dir, repo_name))
+  fix_user_repo_perms(repo_name)
+  # New user repositories are non-publishing by default.
+  set_repo_publishing(repo_name, False)
+  sys.exit(0)
 
 
 def get_and_validate_user_repo(repo_name):
