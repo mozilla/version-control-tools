@@ -103,7 +103,7 @@ def check_repo_name(repo_name):
     return True
 
 
-def run_hg_clone(cname, user_repo_dir, repo_name, source_repo_path, verbose=False):
+def run_hg_clone(user_repo_dir, repo_name, source_repo_path, verbose=False):
   userdir = "%s/users/%s" % (DOC_ROOT, user_repo_dir)
   dest_dir = "%s/%s" % (userdir, repo_name)
   dest_url = "/users/%s/%s" % (user_repo_dir, repo_name)
@@ -170,7 +170,7 @@ def make_wsgi_dir(cname, user_repo_dir):
       hgwsgi.close()
 
 
-def fix_user_repo_perms(cname, repo_name):
+def fix_user_repo_perms(repo_name):
     user = os.getenv('USER')
     user_repo_dir = user.replace('@', '_')
     print "Fixing permissions, don't interrupt."
@@ -191,10 +191,10 @@ def make_repo_clone(cname, repo_name, quick_src, verbose=False, source_repo=''):
   dest_url = "/users/%s" % user_repo_dir
   source_repo = ''
   if quick_src:
-    run_hg_clone(cname, user_repo_dir, repo_name, quick_src)
-    fix_user_repo_perms(cname, repo_name)
+    run_hg_clone(user_repo_dir, repo_name, quick_src)
+    fix_user_repo_perms(repo_name)
     # New user repositories are non-publishing by default.
-    set_repo_publishing(cname, repo_name, False)
+    set_repo_publishing(repo_name, False)
     sys.exit(0)
   else:
     print(MAKING_REPO.format(repo=repo_name, user=user, cname=cname,
@@ -251,7 +251,7 @@ def make_repo_clone(cname, repo_name, quick_src, verbose=False, source_repo=''):
         response = prompt_user('Proceed?', ['yes', 'no'])
         if (response == 'yes'):
           print 'Please do not interrupt this operation.'
-          run_hg_clone(cname, user_repo_dir, repo_name, source_repo)
+          run_hg_clone(user_repo_dir, repo_name, source_repo)
       else:
         print "About to create an empty repository at /users/%s/%s" % (user_repo_dir, repo_name)
         response = prompt_user('Proceed?', ['yes', 'no'])
@@ -265,13 +265,13 @@ def make_repo_clone(cname, repo_name, quick_src, verbose=False, source_repo=''):
 
           run_command('/usr/bin/nohup %s init %s/users/%s/%s' % (HG, DOC_ROOT, user_repo_dir, repo_name))
           run_repo_push('-e users/%s/%s' % (user_repo_dir, repo_name))
-      fix_user_repo_perms(cname, repo_name)
+      fix_user_repo_perms(repo_name)
       # New user repositories are non-publishing by default.
-      set_repo_publishing(cname, repo_name, False)
+      set_repo_publishing(repo_name, False)
       sys.exit(0)
 
 
-def get_and_validate_user_repo(cname, repo_name):
+def get_and_validate_user_repo(repo_name):
     user = os.getenv('USER')
     user_repo_dir = user.replace('@', '_')
     rel_path = '/users/%s/%s' % (user_repo_dir, repo_name)
@@ -304,13 +304,13 @@ def get_user_repo_config(repo_dir):
     return path, config
 
 
-def edit_repo_description(cname, repo_name):
+def edit_repo_description(repo_name):
     user = os.getenv('USER')
     user_repo_dir = user.replace('@', '_')
     print(EDIT_DESCRIPTION % (user_repo_dir, repo_name))
     selection = prompt_user('Proceed?', ['yes', 'no'])
     if (selection == 'yes'):
-        repo_path = get_and_validate_user_repo(cname, repo_name)
+        repo_path = get_and_validate_user_repo(repo_name)
         repo_description =  raw_input('Enter a one line descripton for the repository: ')
         if repo_description == '':
             return
@@ -330,7 +330,7 @@ def edit_repo_description(cname, repo_name):
         run_repo_push('-e users/%s/%s --hgrc' % (user_repo_dir, repo_name))
 
 
-def set_repo_publishing(cname, repo_name, publish):
+def set_repo_publishing(repo_name, publish):
     """Set the publishing flag on a repository.
 
     A publishing repository turns its pushed commits into public
@@ -341,7 +341,7 @@ def set_repo_publishing(cname, repo_name, publish):
     """
     user = os.getenv('USER')
     user_repo_dir = user.replace('@', '_')
-    repo_path = get_and_validate_user_repo(cname, repo_name)
+    repo_path = get_and_validate_user_repo(repo_name)
     config_path, config = get_user_repo_config(repo_path)
 
     if not config.has_section('phases'):
@@ -364,11 +364,11 @@ def set_repo_publishing(cname, repo_name, publish):
             'changesets will remain in the draft phase when pushed.\n')
 
 
-def set_repo_obsolescence(cname, repo_name, enabled):
+def set_repo_obsolescence(repo_name, enabled):
     """Enable or disable obsolescence support on a repository."""
     user = os.getenv('USER')
     user_repo_dir = user.replace('@', '_')
-    repo_path = get_and_validate_user_repo(cname, repo_name)
+    repo_path = get_and_validate_user_repo(repo_name)
     config_path, config = get_user_repo_config(repo_path)
 
     if not config.has_section('experimental'):
@@ -390,7 +390,7 @@ def set_repo_obsolescence(cname, repo_name, enabled):
         print('Obsolescence is now disabled for this repo.')
 
 
-def do_delete(cname, repo_dir, repo_name, verbose=False):
+def do_delete(repo_dir, repo_name, verbose=False):
     if verbose:
         print "Deleting..."
     run_command('rm -rf %s/users/%s/%s' % (DOC_ROOT, repo_dir, repo_name))
@@ -408,13 +408,13 @@ def delete_repo(cname, repo_name, do_quick_delete, verbose=False):
   url_path = "/users/%s" % user_repo_dir
   if os.path.exists('%s/users/%s/%s' % (DOC_ROOT, user_repo_dir, repo_name)):
     if do_quick_delete:
-      do_delete(cname, user_repo_dir, repo_name, verbose)
+      do_delete(user_repo_dir, repo_name, verbose)
     else:
       print '\nAre you sure you want to delete /users/%s/%s?' % (user_repo_dir, repo_name)
       print '\nThis action is IRREVERSIBLE.'
       selection = prompt_user('Proceed?', ['yes', 'no'])
       if (selection == 'yes'):
-        do_delete(cname, user_repo_dir, repo_name, verbose)
+        do_delete(user_repo_dir, repo_name, verbose)
   else:
     sys.stderr.write('Could not find the repository at /users/%s/%s.\n' % (user_repo_dir, repo_name))
     sys.stderr.write('Please check the list at https://%s/users/%s\n' % (cname, user_repo_dir))
@@ -435,17 +435,17 @@ def edit_repo(cname, repo_name, do_quick_delete):
             'Disable obsolescence support',
             ])
         if action == 'Edit the description':
-            edit_repo_description(cname, repo_name)
+            edit_repo_description(repo_name)
         elif action == 'Delete the repository':
             delete_repo(cname, repo_name, False)
         elif action == 'Mark repository as non-publishing':
-            set_repo_publishing(cname, repo_name, False)
+            set_repo_publishing(repo_name, False)
         elif action == 'Mark repository as publishing':
-            set_repo_publishing(cname, repo_name, True)
+            set_repo_publishing(repo_name, True)
         elif action == 'Enable obsolescence support (experimental)':
-            set_repo_obsolescence(cname, repo_name, True)
+            set_repo_obsolescence(repo_name, True)
         elif action == 'Disable obsolescence support':
-            set_repo_obsolescence(cname, repo_name, False)
+            set_repo_obsolescence(repo_name, False)
     return
 
 
