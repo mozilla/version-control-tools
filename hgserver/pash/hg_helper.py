@@ -474,7 +474,8 @@ def edit_repo(cname, repo_name, do_quick_delete):
     return
 
 
-def serve(cname):
+def serve(cname, enable_repo_config=False, enable_repo_group=False,
+          enable_user_repos=False):
     ssh_command = os.getenv('SSH_ORIGINAL_COMMAND')
     if not ssh_command:
         sys.stderr.write('No interactive shells allowed here!\n')
@@ -491,6 +492,10 @@ def serve(cname):
                 sys.stderr.write("Thank you dchen! but.. I don't think so!\n")
                 sys.exit(1)
     elif ssh_command.startswith('clone '):
+        if not enable_user_repos:
+            print('user repository management is not enabled')
+            sys.exit(1)
+
         args = ssh_command.replace('clone', '').split()
         if check_repo_name(args[0]):
             if len(args) == 1:
@@ -503,6 +508,10 @@ def serve(cname):
                          '[srcrepo]\n')
         sys.exit(1)
     elif ssh_command.startswith('edit '):
+        if not enable_user_repos:
+            print('user repository management is not enabled')
+            sys.exit(1)
+
         args = ssh_command.replace('edit', '',  1).split()
         if check_repo_name(args[0]):
             if len(args) == 1:
@@ -515,10 +524,18 @@ def serve(cname):
                                  'prompt!\n')
                 sys.exit(1)
     elif ssh_command.startswith('repo-group'):
+        if not enable_repo_group:
+            print('repo-group command not available')
+            sys.exit(1)
+
         args = ssh_command.replace('repo-group', '').split()
         if check_repo_name(args[0]):
             print(repo_group.repo_owner(args[0]))
     elif ssh_command.startswith('repo-config '):
+        if not enable_repo_config:
+            print('repo-config command not available')
+            sys.exit(1)
+
         args = ssh_command.split()[1:]
         repo = args[0]
         if check_repo_name(repo):
