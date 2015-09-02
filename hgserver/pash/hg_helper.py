@@ -111,23 +111,24 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path, verbose=False):
     if os.path.exists(dest_dir):
         print(USER_REPO_EXISTS % repo_name)
         sys.exit(1)
-    else:
-        if (os.path.exists('%s/%s' % (DOC_ROOT, source_repo_path))) and (check_repo_name(source_repo_path)):
-            if not os.path.exists(userdir):
-                run_command('mkdir %s' % userdir)
-            print 'Please wait.  Cloning /%s to %s' % (source_repo_path, dest_url)
-            if(verbose):
-                run_command('nohup %s clone --debug --verbose --time --pull -U %s/%s %s' %
-                            (HG, DOC_ROOT, source_repo_path, dest_dir),
-                            verbose=True)
-            else:
-                run_command('nohup %s clone --pull -U %s/%s %s' %
-                            (HG, DOC_ROOT, source_repo_path, dest_dir))
 
-            print "Clone complete."
-        else:
-            print(NO_SOURCE_REPO % source_repo_path)
-            sys.exit(1)
+    if (not os.path.exists('%s/%s' % (DOC_ROOT, source_repo_path)) or
+            not check_repo_name(source_repo_path)):
+        print(NO_SOURCE_REPO % source_repo_path)
+        sys.exit(1)
+
+    if not os.path.exists(userdir):
+        run_command('mkdir %s' % userdir)
+    print 'Please wait.  Cloning /%s to %s' % (source_repo_path, dest_url)
+    if(verbose):
+        run_command('nohup %s clone --debug --verbose --time --pull -U %s/%s %s' %
+                    (HG, DOC_ROOT, source_repo_path, dest_dir),
+                    verbose=True)
+    else:
+        run_command('nohup %s clone --pull -U %s/%s %s' %
+                    (HG, DOC_ROOT, source_repo_path, dest_dir))
+
+    print "Clone complete."
 
 
 def run_repo_push(args):
@@ -312,25 +313,27 @@ def edit_repo_description(repo_name):
     user_repo_dir = user.replace('@', '_')
     print(EDIT_DESCRIPTION % (user_repo_dir, repo_name))
     selection = prompt_user('Proceed?', ['yes', 'no'])
-    if (selection == 'yes'):
-        repo_path = get_and_validate_user_repo(repo_name)
-        repo_description =  raw_input('Enter a one line descripton for the repository: ')
-        if repo_description == '':
-            return
+    if selection != 'yes':
+        return
 
-        repo_description = escape(repo_description)
+    repo_path = get_and_validate_user_repo(repo_name)
+    repo_description =  raw_input('Enter a one line descripton for the repository: ')
+    if repo_description == '':
+        return
 
-        config_path, config = get_user_repo_config(repo_path)
+    repo_description = escape(repo_description)
 
-        if not config.has_section('web'):
-            config.add_section('web')
+    config_path, config = get_user_repo_config(repo_path)
 
-        config.set('web', 'description', repo_description)
+    if not config.has_section('web'):
+        config.add_section('web')
 
-        with open(config_path, 'w+') as fh:
-            config.write(fh)
+    config.set('web', 'description', repo_description)
 
-        run_repo_push('-e users/%s/%s --hgrc' % (user_repo_dir, repo_name))
+    with open(config_path, 'w+') as fh:
+        config.write(fh)
+
+    run_repo_push('-e users/%s/%s --hgrc' % (user_repo_dir, repo_name))
 
 
 def set_repo_publishing(repo_name, publish):
