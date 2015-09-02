@@ -50,7 +50,8 @@ def get_ldap_attribute(mail, attr, conn_string):
         print >>sys.stderr, 'Don\'t have a valid ldap connection'
 
 
-def update_ldap_attribute(mail, attr, value, conn_string_ro, conn_string_write):
+def update_ldap_attribute(mail, attr, value, conn_string_ro,
+                          conn_string_write):
     ldap_conn_ro = ldap_connect(conn_string_ro)
     ldap_conn_write = ldap_connect(conn_string_write)
     entry_filter = '(&(mail=' + mail + ')(hgAccountEnabled=TRUE))'
@@ -63,12 +64,14 @@ def update_ldap_attribute(mail, attr, value, conn_string_ro, conn_string_write):
     if not results:
         return
 
-    (dn, old_entry) = results[0]
-    if results[0][1].has_key(attr):
+    dn, old_entry = results[0]
+    if attr in old_entry:
         try:
-            access_time = datetime.datetime.strptime(results[0][1][attr][0], "%Y%m%d%H%M%SZ")
+            access_time = datetime.datetime.strptime(old_entry[attr][0],
+                                                     "%Y%m%d%H%M%SZ")
         except ValueError:
-            access_time = datetime.datetime.strptime(results[0][1][attr][0], "%Y%m%d%H%M%S.%fZ")
+            access_time = datetime.datetime.strptime(old_entry[attr][0],
+                                                     "%Y%m%d%H%M%S.%fZ")
         yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
         if access_time < yesterday:
             ldap_conn_write.modify_s(dn, [(ldap.MOD_REPLACE, attr, value)])
