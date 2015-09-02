@@ -55,17 +55,22 @@ def update_ldap_attribute(mail, attr, value, conn_string_ro, conn_string_write):
     ldap_conn_write = ldap_connect(conn_string_write)
     entry_filter = '(&(mail=' + mail + ')(hgAccountEnabled=TRUE))'
 
-    if ldap_conn_ro and ldap_conn_write:
-        results = ldap_conn_ro.search_s('dc=mozilla', ldap.SCOPE_SUBTREE, entry_filter, [attr])
-        if results:
-            (dn, old_entry) = results[0]
-            if results[0][1].has_key(attr):
-                try:
-                    access_time = datetime.datetime.strptime(results[0][1][attr][0], "%Y%m%d%H%M%SZ")
-                except ValueError:
-                    access_time = datetime.datetime.strptime(results[0][1][attr][0], "%Y%m%d%H%M%S.%fZ")
-                yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-                if access_time < yesterday:
-                    ldap_conn_write.modify_s(dn, [(ldap.MOD_REPLACE, attr, value)])
-            else:
-                raise Exception
+    if not ldap_conn_ro or not ldap_conn_write:
+        return
+
+    results = ldap_conn_ro.search_s('dc=mozilla', ldap.SCOPE_SUBTREE,
+                                    entry_filter, [attr])
+    if not results:
+        return
+
+    (dn, old_entry) = results[0]
+    if results[0][1].has_key(attr):
+        try:
+            access_time = datetime.datetime.strptime(results[0][1][attr][0], "%Y%m%d%H%M%SZ")
+        except ValueError:
+            access_time = datetime.datetime.strptime(results[0][1][attr][0], "%Y%m%d%H%M%S.%fZ")
+        yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        if access_time < yesterday:
+            ldap_conn_write.modify_s(dn, [(ldap.MOD_REPLACE, attr, value)])
+    else:
+        raise Exception()
