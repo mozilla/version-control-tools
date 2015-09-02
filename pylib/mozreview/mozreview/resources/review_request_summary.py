@@ -169,6 +169,9 @@ class ReviewRequestSummaryResource(WebAPIResource):
             families = defaultdict(lambda: dict(parent=None, children={}))
 
         for rr in rrs:
+            if rr.status == ReviewRequest.DISCARDED:
+                continue
+
             if not self.has_access_permissions(request, rr):
                 continue
 
