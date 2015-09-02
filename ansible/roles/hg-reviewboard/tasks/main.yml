@@ -50,6 +50,13 @@
     - /repo/hg/mozilla
     - /repo/hg/webroot_wsgi
 
+- name: install pash configuration file
+  template: src=pash.json.j2
+            dest=/etc/mercurial/pash.json
+            owner=root
+            group=root
+            mode=0644
+
 - name: set up version-control-tools repo (server only)
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
       dest=/repo/hg/version-control-tools

@@ -31,6 +31,7 @@ def QuoteForPOSIX(string):
 def process_non_root_login(user):
     # Delay import so these don't interfere with root login code path.
     from datetime import datetime
+    import json
     import logging
     import sys
     import hg_helper
@@ -60,9 +61,10 @@ def process_non_root_login(user):
          logging.basicConfig(filename='/var/log/pash.log', level=logging.DEBUG)
          logging.exception('Failed to update LDAP attributes for %s' % user)
 
-    # TODO obtain cname from settings file, since pash is used by multiple
-    # services.
-    hg_helper.serve('hg.mozilla.org')
+    with open('/etc/mercurial/pash.json', 'rb') as fh:
+        pash_settings = json.load(fh)
+
+    hg_helper.serve(cname=pash_settings['hostname'])
     sys.exit(0)
 
 

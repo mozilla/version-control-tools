@@ -1,2 +1,3 @@
 ---
+pash_hostname: "reviewboard-hg.mozilla.org"
 wsgi_processes: 20

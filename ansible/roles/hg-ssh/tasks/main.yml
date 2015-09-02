@@ -61,6 +61,13 @@
         group=root
         mode=0755
 
+- name: install pash configuration file
+  template: src=pash.json.j2
+            dest=/etc/mercurial/pash.json
+            owner=root
+            group=root
+            mode=0644
+
 - name: replication SSH key is present
   command: /usr/bin/ssh-keygen -b 2048 -f /etc/mercurial/mirror -t rsa creates=/etc/mercurial/mirror
 
