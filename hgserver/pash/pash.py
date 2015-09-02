@@ -51,7 +51,7 @@ def process_non_root_login(user):
 
     # Run ldap access date toucher, silently fail and log if we're unable to write
     try:
-        settings = ldap_helper.get_settings()
+        settings = ldap_helper.get_ldap_settings()
         ldap_helper.update_ldap_attribute(user, 'hgAccessDate',
                                           datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ"),
                                           settings['url'],
