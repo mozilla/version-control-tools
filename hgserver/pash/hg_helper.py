@@ -514,12 +514,6 @@ def serve(cname):
                                  '[userrepo delete] - WARNING: will not '
                                  'prompt!\n')
                 sys.exit(1)
-    elif ssh_command.startswith('pushlog '):
-        args = ssh_command.replace('pushlog', '').split()
-        if check_repo_name(args[0]):
-            fh = open("/repo/hg/mozilla/%s/.hg/pushlog2.db" % (args[0]), 'rb')
-            sys.stdout.write(fh.read())
-            fh.close()
     elif ssh_command.startswith('repo-group'):
         args = ssh_command.replace('repo-group', '').split()
         if check_repo_name(args[0]):
