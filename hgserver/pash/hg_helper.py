@@ -81,8 +81,15 @@ def is_valid_user(mail):
     url = get_ldap_settings()['url']
 
     mail = mail.strip()
-    # If the regex search below fails, comment out the conditional and the return. Then Uncomment the following line to atleat sanitize the input
-    mail = mail.replace("(", '').replace(")", '').replace("'", '').replace('"', '').replace(';', '').replace("\"", '')
+    replacements = {
+        '(': '',
+        ')': '',
+        "'": '',
+        '"': '',
+        ';': '',
+    }
+    for search, replace in replacements.items():
+        mail = mail.replace(search, replace)
     account_status = get_ldap_attribute(mail, 'hgAccountEnabled', url)
     if account_status == 'TRUE':
         return 1
