@@ -87,7 +87,6 @@
         mode=0755
   with_items:
     - hg_helper.py
-    - pash.py
 
 - name: install vct pash files
   copy: src={{ vct }}/hgserver/pash/{{ item }}
@@ -97,6 +96,7 @@
         mode=0755
   with_items:
     - ldap_helper.py
+    - pash.py
     - pash_wrapper
     - sh_helper.py
 

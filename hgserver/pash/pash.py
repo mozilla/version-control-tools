@@ -60,6 +60,8 @@ def process_non_root_login(user):
          logging.basicConfig(filename='/var/log/pash.log', level=logging.DEBUG)
          logging.exception('Failed to update LDAP attributes for %s' % user)
 
+    # TODO obtain cname from settings file, since pash is used by multiple
+    # services.
     hg_helper.serve('hg.mozilla.org')
     sys.exit(0)
 
