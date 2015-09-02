@@ -52,10 +52,10 @@ def process_non_root_login(user):
     # Run ldap access date toucher, silently fail and log if we're unable to write
     try:
         settings = ldap_helper.get_ldap_settings()
-        ldap_helper.update_ldap_attribute(user, 'hgAccessDate',
-                                          datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ"),
-                                          settings['url'],
-                                          settings['write_url'])
+        ldap_helper.update_access_date(user, 'hgAccessDate',
+                                       datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ"),
+                                       settings['url'],
+                                       settings['write_url'])
     except Exception:
          logging.basicConfig(filename='/var/log/pash.log', level=logging.DEBUG)
          logging.exception('Failed to update LDAP attributes for %s' % user)
