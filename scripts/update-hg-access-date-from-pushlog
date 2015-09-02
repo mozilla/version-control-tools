@@ -1,0 +1,82 @@
+#!/usr/bin/env python2
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script updates the hgAccessDate LDAP attribute from pushlog
+# data if the pushlog date is newer than LDAP.
+
+import datetime
+import os
+import sqlite3
+import sys
+
+import ldap
+
+user_last_push = {}
+
+ldap_ro_url, ldap_rw_url, username, password = sys.argv[1:]
+
+# We receive list of repo paths on stdin.
+for repo in sys.stdin:
+    repo = repo.rstrip()
+    if not repo.startswith('/repo/hg/mozilla'):
+        repo = '/repo/hg/mozilla/%s' % repo
+
+    pushlog_path = os.path.join(repo, '.hg', 'pushlog2.db')
+    if not os.path.exists(pushlog_path):
+        continue
+
+    conn = sqlite3.connect(pushlog_path)
+    res = conn.execute('SELECT user, date FROM pushlog')
+    for user, date in res:
+        user_last_push[user] = max(user_last_push.get(user, 0), date)
+    conn.close()
+
+ldap_ro = ldap.initialize(ldap_ro_url)
+ldap_ro.simple_bind_s(username, password)
+ldap_rw = ldap.initialize(ldap_rw_url)
+ldap_rw.simple_bind_s(username, password)
+
+for user, date in sorted(user_last_push.items()):
+    res = ldap_ro.search_s('dc=mozilla', ldap.SCOPE_SUBTREE,
+                           '(mail=%s)' % user,
+                           ['objectClass', 'hgAccessDate'])
+
+    if not res:
+        print('%s not in LDAP' % user)
+        continue
+
+    dn, entry = res[0]
+    if 'hgAccount' not in entry['objectClass']:
+        print('%s missing hgAccount objectClass' % user)
+        continue
+
+    last_push = datetime.datetime.utcfromtimestamp(date)
+    last_access = None
+
+    if 'hgAccessDate' in entry:
+        try:
+            last_access = datetime.datetime.strptime(entry['hgAccessDate'][0],
+                                                     '%Y%m%d%H%M%S.%fZ')
+        except ValueError:
+            last_access = datetime.datetime.strptime(entry['hgAccessDate'][0],
+                                                     '%Y%m%d%H%M%SZ')
+
+    max_range = datetime.timedelta(days=1)
+    if last_access and (last_access > last_push - max_range):
+        print('%s is up to date; last access %s' % (user,
+            last_access.isoformat()))
+        continue
+
+    if not last_access:
+        print('%s missing hgAccessDate' % user)
+    elif last_access < last_push:
+        print('%s hgAccessDate is out of date; %s < %s' % (user,
+              last_access.isoformat(), last_push.isoformat()))
+    else:
+        assert False
+
+    value = last_push.strftime('%Y%m%d%H%M%S.%fZ')
+    print('Updating %s hgAccessDate to %s' % (user, value))
+    ldap_rw.modify_s(dn, [(ldap.MOD_REPLACE, 'hgAccessDate', value)])
