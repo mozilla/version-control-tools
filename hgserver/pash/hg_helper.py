@@ -104,7 +104,8 @@ def is_valid_user(mail):
 def check_repo_name(repo_name):
     good_chars = re.compile('^(\w|-|/|\.\w)+\s*$')
     if not good_chars.search(repo_name):
-        sys.stderr.write('Only alpha-numeric characters, ".", and "-" are allowed in the repository names.\n')
+        sys.stderr.write('Only alpha-numeric characters, ".", and "-" are '
+                         'allowed in the repository names.\n')
         sys.stderr.write('Please try again with only those characters.\n')
         sys.exit(1)
     return True
@@ -183,12 +184,18 @@ def fix_user_repo_perms(repo_name):
     user_repo_dir = user.replace('@', '_')
     print "Fixing permissions, don't interrupt."
     try:
-        run_command('chown %s:scm_level_1 %s/users/%s' % (user, DOC_ROOT, user_repo_dir))
-        run_command('chmod g+w %s/users/%s' % (DOC_ROOT, user_repo_dir))
-        run_command('chmod g+s %s/users/%s' % (DOC_ROOT, user_repo_dir))
-        run_command('chown -R %s:scm_level_1 %s/users/%s/%s' % (user, DOC_ROOT, user_repo_dir, repo_name))
-        run_command('chmod -R g+w %s/users/%s/%s' % (DOC_ROOT, user_repo_dir, repo_name))
-        run_command('find %s/users/%s/%s -depth -type d | xargs chmod g+s' % (DOC_ROOT, user_repo_dir, repo_name))
+        run_command('chown %s:scm_level_1 %s/users/%s' %
+                    (user, DOC_ROOT, user_repo_dir))
+        run_command('chmod g+w %s/users/%s' %
+                    (DOC_ROOT, user_repo_dir))
+        run_command('chmod g+s %s/users/%s' %
+                    (DOC_ROOT, user_repo_dir))
+        run_command('chown -R %s:scm_level_1 %s/users/%s/%s' %
+                    (user, DOC_ROOT, user_repo_dir, repo_name))
+        run_command('chmod -R g+w %s/users/%s/%s' %
+                    (DOC_ROOT, user_repo_dir, repo_name))
+        run_command('find %s/users/%s/%s -depth -type d | xargs chmod g+s' %
+                    (DOC_ROOT, user_repo_dir, repo_name))
     except Exception, e:
         print "Exception %s" % (e)
 
@@ -196,7 +203,6 @@ def fix_user_repo_perms(repo_name):
 def make_repo_clone(cname, repo_name, quick_src, verbose=False, source_repo=''):
     user = os.getenv('USER')
     user_repo_dir = user.replace('@', '_')
-    dest_url = "/users/%s" % user_repo_dir
     source_repo = ''
     if quick_src:
         run_hg_clone(user_repo_dir, repo_name, quick_src)
@@ -214,7 +220,10 @@ def make_repo_clone(cname, repo_name, quick_src, verbose=False, source_repo=''):
 
     print 'You can clone an existing public repo or a users private repo.'
     print 'You can also create an empty repository.'
-    selection = prompt_user('Source repository:', ['Clone a public repository', 'Clone a private repository', 'Create an empty repository'])
+    selection = prompt_user('Source repository:', [
+                            'Clone a public repository',
+                            'Clone a private repository',
+                            'Create an empty repository'])
     if (selection == 'Clone a public repository'):
         exec_command = "/usr/bin/find " + DOC_ROOT + " -maxdepth 3 -mindepth 2 -type d -name .hg"
         args = shlex.split(exec_command)
@@ -228,7 +237,8 @@ def make_repo_clone(cname, repo_name, quick_src, verbose=False, source_repo=''):
             print 'List of available public repos'
             source_repo = prompt_user('Pick a source repo:', repo_list, period=False)
     elif (selection == 'Clone a private repository'):
-        source_user = raw_input('Please enter the e-mail address of the user owning the repo: ')
+        source_user = raw_input('Please enter the e-mail address of the user '
+                                'owning the repo: ')
         valid_user = is_valid_user(source_user)
         if valid_user == True:
             source_user = source_user.replace('@', '_')
@@ -253,10 +263,10 @@ def make_repo_clone(cname, repo_name, quick_src, verbose=False, source_repo=''):
             source_repo = prompt_user('Pick a source repo:', user_repo_list, period=False)
         source_repo = 'users/' + source_user + '/' + source_repo
     elif (selection == 'Create an empty repository'):
-        source_repo=''
+        source_repo = ''
     else:
         # We should not get here
-        source_repo=''
+        source_repo = ''
     if source_repo != '':
         print 'About to clone /%s to /users/%s/%s' % (source_repo, user_repo_dir, repo_name)
         response = prompt_user('Proceed?', ['yes', 'no'])
@@ -324,7 +334,8 @@ def edit_repo_description(repo_name):
         return
 
     repo_path = get_and_validate_user_repo(repo_name)
-    repo_description =  raw_input('Enter a one line descripton for the repository: ')
+    repo_description = raw_input('Enter a one line descripton for the '
+                                 'repository: ')
     if repo_description == '':
         return
 
@@ -418,7 +429,6 @@ def do_delete(repo_dir, repo_name, verbose=False):
 def delete_repo(cname, repo_name, do_quick_delete, verbose=False):
     user = os.getenv('USER')
     user_repo_dir = user.replace('@', '_')
-    url_path = "/users/%s" % user_repo_dir
     if os.path.exists('%s/users/%s/%s' % (DOC_ROOT, user_repo_dir, repo_name)):
         if do_quick_delete:
             do_delete(user_repo_dir, repo_name, verbose)
@@ -429,8 +439,10 @@ def delete_repo(cname, repo_name, do_quick_delete, verbose=False):
             if (selection == 'yes'):
                 do_delete(user_repo_dir, repo_name, verbose)
     else:
-        sys.stderr.write('Could not find the repository at /users/%s/%s.\n' % (user_repo_dir, repo_name))
-        sys.stderr.write('Please check the list at https://%s/users/%s\n' % (cname, user_repo_dir))
+        sys.stderr.write('Could not find the repository at /users/%s/%s.\n' %
+                         (user_repo_dir, repo_name))
+        sys.stderr.write('Please check the list at https://%s/users/%s\n' %
+                         (cname, user_repo_dir))
         sys.exit(1)
     sys.exit(0)
 
@@ -487,7 +499,8 @@ def serve(cname):
                 if os.path.isdir('%s/%s/.hg' % (DOC_ROOT, args[1])):
                     make_repo_clone(cname, args[0], args[1])
             sys.exit(0)
-        sys.stderr.write('clone usage: ssh hg.mozilla.org clone newrepo [srcrepo]\n')
+        sys.stderr.write('clone usage: ssh hg.mozilla.org clone newrepo '
+                         '[srcrepo]\n')
         sys.exit(1)
     elif ssh_command.startswith('edit '):
         args = ssh_command.replace('edit', '',  1).split()
@@ -497,7 +510,9 @@ def serve(cname):
             elif len(args) == 3 and args[1] == 'delete' and args[2] == 'YES':
                 edit_repo(cname, args[0], True)
             else:
-                sys.stderr.write('edit usage: ssh hg.mozilla.org edit [userrepo delete] - WARNING: will not prompt!\n')
+                sys.stderr.write('edit usage: ssh hg.mozilla.org edit '
+                                 '[userrepo delete] - WARNING: will not '
+                                 'prompt!\n')
                 sys.exit(1)
     elif ssh_command.startswith('pushlog '):
         args = ssh_command.replace('pushlog', '').split()
