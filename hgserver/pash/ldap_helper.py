@@ -30,16 +30,16 @@ def get_ldap_attribute(mail, attr, conn_string):
     ldap_conn = ldap_connect(conn_string)
     if ldap_conn:
         result = ldap_conn.search_s('dc=mozilla', ldap.SCOPE_SUBTREE, '(mail=' + mail + ')', [attr])
-        if (len(result) > 1):
+        if len(result) > 1:
             print >>sys.stderr, 'More than one match found'
             ldap_conn.unbind_s()
             return False
-        elif (len(result) == 0):
+        elif len(result) == 0:
             print >>sys.stderr, 'No matches found'
             ldap_conn.unbind_s()
             return False
         else:
-            if result[0][1].has_key(attr):
+            if attr in result[0][1]:
                 attr_val = result[0][1][attr][0]
                 ldap_conn.unbind_s()
                 return attr_val
