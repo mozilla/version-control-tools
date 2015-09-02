@@ -407,18 +407,18 @@ def delete_repo(cname, repo_name, do_quick_delete, verbose=False):
   user_repo_dir = user.replace('@', '_')
   url_path = "/users/%s" % user_repo_dir
   if os.path.exists('%s/users/%s/%s' % (DOC_ROOT, user_repo_dir, repo_name)):
-    if do_quick_delete:
-      do_delete(user_repo_dir, repo_name, verbose)
-    else:
-      print '\nAre you sure you want to delete /users/%s/%s?' % (user_repo_dir, repo_name)
-      print '\nThis action is IRREVERSIBLE.'
-      selection = prompt_user('Proceed?', ['yes', 'no'])
-      if (selection == 'yes'):
-        do_delete(user_repo_dir, repo_name, verbose)
+      if do_quick_delete:
+          do_delete(user_repo_dir, repo_name, verbose)
+      else:
+          print '\nAre you sure you want to delete /users/%s/%s?' % (user_repo_dir, repo_name)
+          print '\nThis action is IRREVERSIBLE.'
+          selection = prompt_user('Proceed?', ['yes', 'no'])
+          if (selection == 'yes'):
+              do_delete(user_repo_dir, repo_name, verbose)
   else:
-    sys.stderr.write('Could not find the repository at /users/%s/%s.\n' % (user_repo_dir, repo_name))
-    sys.stderr.write('Please check the list at https://%s/users/%s\n' % (cname, user_repo_dir))
-    sys.exit(1)
+      sys.stderr.write('Could not find the repository at /users/%s/%s.\n' % (user_repo_dir, repo_name))
+      sys.stderr.write('Please check the list at https://%s/users/%s\n' % (cname, user_repo_dir))
+      sys.exit(1)
   sys.exit(0)
 
 
