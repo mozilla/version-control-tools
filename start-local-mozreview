@@ -1,0 +1,48 @@
+#!/bin/bash
+# This script starts the mozreview servers, creates a default user, some bugs
+# and a properly configured mercurial repository for pushing reviews.
+# You need to source this script (e.g. run with ". start-local-mozreview") in
+# order for the environment variables to be set correctly.
+set -e
+
+TEST_MOZREVIEW_NAME=../mozreview-test
+TEST_REPO_NAME=local-mozreview-test-repo
+
+VCT_PATH=`pwd`
+cd ..
+PARENT_PATH=`pwd`
+cd $VCT_PATH
+
+REPO_PATH=$PARENT_PATH/$TEST_REPO_NAME
+TEST_MOZREVIEW_PATH=$PARENT_PATH/$TEST_MOZREVIEW_NAME
+
+export MOZREVIEW_HOME=$TEST_MOZREVIEW_PATH
+. venv/bin/activate
+
+./mozreview stop $TEST_MOZREVIEW_PATH
+./mozreview start --reviewboard-port=55556 $TEST_MOZREVIEW_PATH
+
+$(./mozreview shellinit)
+
+./mozreview create-repo test-repo
+
+./mozreview create-user default@example.com password 'Default User :default' \
+    --uid 2000 --scm-level 1 --bugzilla-group editbugs
+./mozreview create-user level1@example.com password 'Level 1 User :level1' \
+    --uid 2001 --scm-level 1 --bugzilla-group editbugs
+./mozreview create-user level2@example.com password 'Level 2 User :level2' \
+    --uid 2002 --scm-level 2 --bugzilla-group editbugs
+./mozreview create-user level3@example.com password 'Level 3 User :level3' \
+    --uid 2003 --scm-level 3 --bugzilla-group editbugs
+
+rm -rf $REPO_PATH
+./mozreview clone test-repo $REPO_PATH --user default@example.com
+
+API_KEY=$(./mozreview create-api-key default@example.com)
+echo "
+[bugzilla]
+username = default@example.com
+apikey = $API_KEY
+" >> $REPO_PATH/.hg/hgrc
+
+BUGZILLA_USERNAME=admin@example.com BUGZILLA_PASSWORD=password ./bugzilla create-bug-range firefox general 11
