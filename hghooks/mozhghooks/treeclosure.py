@@ -22,7 +22,7 @@ import re
 import json
 
 magicwords = "CLOSED TREE"
-treestatus_base_url = "https://treestatus.mozilla.org"
+treestatus_base_url = "https://api.pub.build.mozilla.org/treestatus/trees/%s"
 
 
 def printError(message):
@@ -32,19 +32,19 @@ def printError(message):
 
 
 def isPushAllowed(repo, name):
-    url = "%s/%s?format=json" % (treestatus_base_url, name)
+    url = treestatus_base_url % (name,)
     try:
         u = urlopen(url)
         data = json.load(u)
-        if data['status'] == 'closed':
-            closure_text = "%s is CLOSED! Reason: %s" % (name, data['reason'])
+        if data['result']['status'] == 'closed':
+            closure_text = "%s is CLOSED! Reason: %s" % (name, data['result']['reason'])
             # Block the push unless they know the magic words
             if repo.changectx('tip').description().find(magicwords) == -1:
                 printError("%s\nTo push despite the closed tree, include \"%s\" in your push comment" % (closure_text, magicwords))
                 return False
 
             print "%s\nBut you included the magic words.  Hope you had permission!" % closure_text
-        elif data['status'] == 'approval required':
+        elif data['result']['status'] == 'approval required':
             # Block the push unless they have approval or are backing out
             dlower = repo.changectx('tip').description().lower()
             if not (re.search('a\S*=', dlower) or dlower.startswith('back') or dlower.startswith('revert')):
