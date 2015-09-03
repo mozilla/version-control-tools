@@ -256,7 +256,7 @@ class ReviewRequestSummaryResource(WebAPIResource):
 
         for family in families.itervalues():
             child_rrids = [
-                rrid for commit_id, rrid in
+                int(rrid) for commit_id, rrid in
                 json.loads(family['parent'].extra_data[COMMITS_KEY])
             ]
             summaries.append({
