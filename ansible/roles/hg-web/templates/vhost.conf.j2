@@ -24,9 +24,6 @@ LimitRequestFields 250
 
     AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/json
 
-    # For https://bugzilla.mozilla.org/show_bug.cgi?id=670781
-    ScriptAlias /repo-group /usr/local/bin/repo-group
-
     WSGIScriptAliasMatch ^/(users/[^/]+)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
     WSGIScriptAliasMatch ^/(releases/l10n-mozilla-1.9..)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
     WSGIScriptAliasMatch ^/(releases/l10n-mozilla-2.0)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2

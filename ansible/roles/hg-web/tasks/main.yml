@@ -250,7 +250,6 @@
         mode=0755
   with_items:
     - lockfile
-    - repo-group
 
 - name: install mirroring SSH key
   copy: dest=/etc/mercurial/mirror
