@@ -113,25 +113,18 @@
 - name: Global hgrc installed
   template: src=hgrc.j2 dest=/etc/mercurial/hgrc mode=0444
 
-- name: install local pash
-  copy: src={{ item }}
-        dest=/usr/local/bin/{{ item }}
-        owner=root
-        group=root
-        mode=0755
-  with_items:
-    - hg_helper.py
-
-- name: install vct pash files
+- name: install pash
   copy: src={{ vct }}/hgserver/pash/{{ item }}
         dest=/usr/local/bin/{{ item }}
         owner=root
         group=root
         mode=0755
   with_items:
+    - hg_helper.py
     - ldap_helper.py
     - pash.py
     - pash_wrapper
+    - repo_group.py
     - sh_helper.py
 
 - name: hgweb wsgi and config in place
