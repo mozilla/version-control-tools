@@ -1,0 +1,8 @@
+{% comment %}
+This is the template for the hg import commit command.
+{% endcomment %}
+
+{% load i18n %}
+{% load djblets_utils %}
+
+<input style="font-size: smaller; position: relative; top:-3px" value="hg import {{repo_path}}/rev/{{commit_id}}" onclick="this.select();" readonly>

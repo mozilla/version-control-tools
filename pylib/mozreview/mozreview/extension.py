@@ -206,8 +206,10 @@ class MozReviewExtension(Extension):
         ReviewRequestFieldsHook(self, 'main', [TryField])
         ReviewRequestFieldsHook(self, 'main', [BaseCommitField])
 
-        ReviewRequestFieldsHook(self, 'info', [ImportCommitField])
+        # We want pull to appear first as it is the more robust way of
+        # retrieving changesets.
         ReviewRequestFieldsHook(self, 'info', [PullCommitField])
+        ReviewRequestFieldsHook(self, 'info', [ImportCommitField])
 
         # Use a custom method to calculate a review approval state.
         MozReviewApprovalHook(self)

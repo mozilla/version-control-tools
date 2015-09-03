@@ -101,17 +101,12 @@ class ImportCommitField(BaseReviewRequestField):
         review_request = self.review_request_details.get_review_request()
         repo_path = review_request.repository.path
 
-        command = 'hg import'
-
         if not commit_id:
             logging.error('No commit_id for review request: %d' % (
                 review_request.id))
-            command = ''
-            commit_id = ''
-            repo_path = ''
+            return ''
 
-        return get_template('mozreview/commit-info.html').render(Context({
-                'command': command, 
+        return get_template('mozreview/hg-import.html').render(Context({
                 'commit_id': commit_id,
                 'repo_path': repo_path,
         }))
@@ -137,17 +132,13 @@ class PullCommitField(BaseReviewRequestField):
 
         review_request = self.review_request_details.get_review_request()
         repo_path = review_request.repository.path
-        command = 'hg pull -r'
 
         if not commit_id:
             logging.error('No commit_id for review request: %d' % (
                 review_request.id))
-            command = ''
-            commit_id = ''
-            repo_path = ''
+            return ''
 
-        return get_template('mozreview/commit-info.html').render(Context({
-                'command': command,
+        return get_template('mozreview/hg-pull.html').render(Context({
                 'commit_id': commit_id,
                 'repo_path': repo_path,
         }))
