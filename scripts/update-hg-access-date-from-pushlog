@@ -15,6 +15,8 @@ import ldap
 
 user_last_push = {}
 
+# We use 2 LDAP URLs because the master doesn't allow reading:
+# only setting of hgAccessDate. See bug 1200847 comment 35.
 ldap_ro_url, ldap_rw_url, username, password = sys.argv[1:]
 
 # We receive list of repo paths on stdin.
@@ -80,3 +82,32 @@ for user, date in sorted(user_last_push.items()):
     value = last_push.strftime('%Y%m%d%H%M%S.%fZ')
     print('Updating %s hgAccessDate to %s' % (user, value))
     ldap_rw.modify_s(dn, [(ldap.MOD_REPLACE, 'hgAccessDate', value)])
+
+# Now set hgAccessDate on users that don't have it.
+res = ldap_ro.search_s('dc=mozilla', ldap.SCOPE_SUBTREE,
+                       '(objectClass=hgAccount)',
+                       ['hgAccessDate', 'hgAccountEnabled'])
+for dn, entry in sorted(res):
+    if dn.startswith('uid='):
+        print('ignoring system account %s' % dn)
+        continue
+
+    assert dn.startswith('mail=')
+    mail = dn[5:]
+    mail = mail.split(',')[0]
+
+    # Entry has hgAccessDate. Nothing to do.
+    if 'hgAccessDate' in entry:
+        continue
+
+    # There is a race condition between setting the value above
+    # and querying from a replica here. Ignore all entries that may have
+    # been modified above.
+    if mail in user_last_push:
+        continue
+
+    # Set the access date to a dummy value long in the past. This
+    # ensures the account gets deactivated within 24 hours.
+    print('Setting hgAccessDate on %s' % dn)
+    ldap_rw.modify_s(dn, [(ldap.MOD_REPLACE, 'hgAccessDate',
+                           '20100101000000.000000Z')])
