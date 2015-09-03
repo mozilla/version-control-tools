@@ -21,6 +21,7 @@ This is the template for the "Commits" list in a push-based review request.
   <table id="mozreview-child-requests">
     <thead>
     <tr>
+      <th class="hg">{% trans "Hg" %}</th>
       <th class="diff">{% trans "Diff" %}</th>
       <th class="reviews">{% trans "Reviews" %}</th>
       {% comment "TODO: show this column when the commit author will be available" %}
@@ -32,6 +33,11 @@ This is the template for the "Commits" list in a push-based review request.
     </thead>
     {% for child_details in children_details %}
     <tr {% if child_details.get_review_request.id = review_request_details.get_review_request.id %}current="true"{% endif %}>
+      <td class="hg">
+        <a href="{{child_details.get_review_request.repository.path}}/rev/{{child_details.extra_data|getitem:"p2rb.commit_id"|slice:":12"}}">
+          <div class="rb-icon rb-icon-jump-to"></div>
+        </a>
+      </td>
       <td class="diff">
         <a title="See diff for commit {{child_details.extra_data|getitem:"p2rb.commit_id"|slice:":12"}}"
            class="commit_sha" href="{{child_details.get_review_request.get_absolute_url}}diff/#index_header">
