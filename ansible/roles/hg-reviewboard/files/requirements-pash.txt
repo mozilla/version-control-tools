@@ -1,7 +1,7 @@
 --find-links http://downloads.reviewboard.org/releases/RBTools/0.7/
 
-# sha256: 3MkOSoR2FJ7MivE8CCAoYLTJyYepTE88GLKClLb9js0
-Mercurial==3.4.2
+# sha256: mX2kXaMD45lnjFvM1745sPq_KcfgL9PIdRwv-IyKJZ0
+Mercurial==3.5.1
 
 # sha256: S4iRU5oxcdmTz3iWtjL_CIpMcHroWsPHfbFFT3lJ8-I
 python-ldap==2.4.20

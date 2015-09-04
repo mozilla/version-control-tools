@@ -1,6 +1,8 @@
 # sha256: dYSYx38W4muLYa8m-NDbsRm3E_LY0WZoHsiSMR81IMQ
 boto==2.38.0
+
 # sha256: BK-ioGq33MqdgXF7Qgp6FIJgYemyYUpcd90kx1zPl-Q
 futures==3.0.3
-# sha256: 3MkOSoR2FJ7MivE8CCAoYLTJyYepTE88GLKClLb9js0
-Mercurial==3.4.2
+
+# sha256: mX2kXaMD45lnjFvM1745sPq_KcfgL9PIdRwv-IyKJZ0
+Mercurial==3.5.1

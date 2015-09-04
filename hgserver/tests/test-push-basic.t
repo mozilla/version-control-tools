@@ -35,6 +35,7 @@ Pushing a commit to a repo works
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
+  remote: replication of phases data completed successfully in \d+.\ds (re)
   remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
@@ -48,6 +49,8 @@ Blackbox logging recorded appropriate entries
   * user1@example.com> pythonhook-pretxnchangegroup: hgext_pushlog.pretxnchangegrouphook finished in * seconds (glob)
   * user1@example.com> updated base branch cache in * seconds (glob)
   * user1@example.com> wrote base branch cache with 1 labels and 1 nodes (glob)
+  * user1@example.com> replication of phases data completed successfully in * (glob)
+  * user1@example.com> pythonhook-pushkey: mozhghooks.replicate.pushkeyhook finished in * seconds (glob)
   * user1@example.com> exthook-changegroup.a_recordlogs: /repo/hg/scripts/record-pushes.sh finished in * seconds (glob)
   * user1@example.com> replication of changegroup data completed successfully in *s (glob)
   * user1@example.com> pythonhook-changegroup: mozhghooks.replicate.changegrouphook finished in * seconds (glob)
