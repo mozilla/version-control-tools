@@ -31,17 +31,30 @@
       command: /usr/bin/rsync -aq --exclude '.git*' --exclude '.hg*' --delete /data/reviewboard/src/ /data/reviewboard/www/
 
 - hosts: reviewboard-hg1.dmz.scl3.mozilla.com
-  # Ideally these variables would be shared with above.
-  vars:
-    repo: https://hg.mozilla.org/hgcustom/version-control-tools
-    rev: "@"
-  tasks:
-  - name: update v-c-t repo
-    hg: repo={{ repo }}
-        dest=/repo/hg/version-control-tools
-        revision={{ rev }}
-        force=yes
-        purge=yes
+  pre_tasks:
+    # Until we integrate secrets with Ansible, the LDAP config is
+    # pre-defined on the server.
+    - name: capture LDAP config
+      slurp: src=/etc/mercurial/ldap.json
+      register: ldap_config
+
+    # Ditto for the username and password of the privileged MozReview
+    # account
+    - name: capture MozReview credentials
+      slurp: src=/etc/mercurial/mozreview.json
+      register: mozreview_config
+
+  roles:
+    - {
+        role: hg-reviewboard,
+        domain: "reviewboard-hg.mozilla.org",
+        bind_dn: "{{ (ldap_config.content | b64decode | from_json).username }}",
+        bind_pw: "{{ (ldap_config.content | b64decode | from_json).password }}",
+        ldap_uri: "{{ (ldap_config.content | b64decode | from_json).url }}",
+        reviewboard_url: "https://reviewboard.mozilla.org",
+        reviewboard_username: "{{ (mozreview_config.content | b64decode | from_json).username }}",
+        reviewboard_password: "{{ (mozreview_config.content | b64decode | from_json).password }}",
+      }
 
 - hosts: rbweb-prod
   serial: 1
