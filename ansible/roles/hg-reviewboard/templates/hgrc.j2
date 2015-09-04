@@ -27,7 +27,9 @@ generaldelta = true
 publish = False
 
 [bugzilla]
-url =
+url = {{ bugzilla_url | mandatory }}
 
 [reviewboard]
-url =
+url = {{ reviewboard_url | mandatory }}
+username = {{ reviewboard_username | mandatory }}
+password = {{ reviewboard_password | mandatory }}

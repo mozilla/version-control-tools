@@ -1,3 +1,7 @@
 ---
+bugzilla_url: "https://bugzilla.mozilla.org/"
+reviewboard_url: "https://reviewboard.mozilla.org"
+reviewboard_username: "mozreview"
+reviewboard_password: "default"
 pash_hostname: "reviewboard-hg.mozilla.org"
-wsgi_processes: 20
+wsgi_processes: 10
