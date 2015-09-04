@@ -5,3 +5,8 @@ reviewboard_username: "mozreview"
 reviewboard_password: "default"
 pash_hostname: "reviewboard-hg.mozilla.org"
 wsgi_processes: 10
+httpd_start_servers: 8
+httpd_min_spare_servers: 5
+httpd_max_spare_servers: 20
+httpd_server_limit: 256
+httpd_max_clients: 256

@@ -1,7 +1,9 @@
 WSGISocketPrefix /var/run/wsgi
+WSGIPythonHome /repo/hg/venv_hgweb
+
 <VirtualHost *:80>
     ServerName {{ domain | mandatory }}
-    DocumentRoot /repo/hg/mozilla
+    DocumentRoot /repo/hg/webroot_wsgi
 
     SetEnv HGENCODING UTF-8
     SetEnv LC_TYPE UTF-8
@@ -9,8 +11,12 @@ WSGISocketPrefix /var/run/wsgi
     WSGIDaemonProcess hg processes={{ wsgi_processes }} threads=1 maximum-requests=20 deadlock-timeout=60 inactivity-timeout=300 user=hg group=hg display-name=hg
     WSGIProcessGroup hg
 
+    # This is needed so sub-interpreters aren't used. This prevents a
+    # known Mercurial bug (bug 1172739) and should make the server run a
+    # bit faster since it won't have to constantly load modules.
+    WSGIApplicationGroup %{GLOBAL}
+
     WSGIPassAuthorization On
-    WSGIScriptAlias "/hg" "/repo/hg/webroot_wsgi/hgweb.wsgi"
     WSGIScriptAlias "/" "/repo/hg/webroot_wsgi/hgweb.wsgi"
 
     LogFormat "%h %v %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\""
