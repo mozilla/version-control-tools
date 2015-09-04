@@ -43,18 +43,25 @@ global_cache = None
 
 class bzAuth:
     """
-    A helper class to abstract away authentication details.  There are two
-    allowable types of authentication: userid/cookie and username/password.
-    We encapsulate it here so that functions that interact with bugzilla
-    need only call the 'auth' method on the token to get a correct URL.
+    A helper class to abstract away authentication details.  There are three
+    allowable types of authentication: apikey, userid/cookie, and
+    username/password.  We encapsulate it here so that functions that
+    interact with bugzilla need only call the 'auth' method on the token
+    to get a correct URL.
     """
     typeCookie = 1
     typeExplicit = 2
+    typeAPIKey = 3
 
-    def __init__(self, url, userid=None, cookie=None, username=None, password=None):
-        assert (userid and cookie) or (username and password)
+    def __init__(self, url, userid=None, cookie=None, username=None,
+                 password=None, apikey=None):
+        assert (userid and cookie) or (username and password) or apikey
         assert not ((userid or cookie) and (username or password))
-        if userid:
+        if apikey:
+            self._type = self.typeAPIKey
+            self._username = username
+            self._apikey = apikey
+        elif userid:
             self._type = self.typeCookie
             self._userid = userid
             self._cookie = cookie
@@ -68,7 +75,9 @@ class bzAuth:
         self._session = None
 
     def auth(self):
-        if self._type == self.typeCookie:
+        if self._type == self.typeAPIKey:
+            return 'api_key=%s' % self._apikey
+        elif self._type == self.typeCookie:
             return "userid=%s&cookie=%s" % (self._userid, self._cookie)
         else:
             return "username=%s&password=%s" % (urllib.quote(self._username), urllib.quote(self._password))
@@ -90,7 +99,9 @@ class bzAuth:
         s = requests.Session()
         s.headers['User-Agent'] = 'bzexport'
 
-        if self._type == self.typeCookie:
+        if self._type == self.typeAPIKey:
+            s.params['api_key'] = self._apikey
+        elif self._type == self.typeCookie:
             s.cookies['Bugzilla_login'] = self._userid
             s.cookies['Bugzilla_logincookie'] = self._cookie
 
@@ -224,6 +235,8 @@ def load_configuration(ui, api_server, filename):
 
 def get_auth(ui, bugzilla, profile):
     auth = getbugzillaauth(ui, require=True, profile=profile)
+    if auth.apikey:
+        return bzAuth(bugzilla, apikey=auth.apikey, username=auth.username)
     if auth.userid:
         return bzAuth(bugzilla, userid=auth.userid, cookie=auth.cookie)
     return bzAuth(bugzilla, username=auth.username, password=auth.password)

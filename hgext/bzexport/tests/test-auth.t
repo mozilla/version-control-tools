@@ -82,6 +82,14 @@ Cookie authentication works
   $ hg --config bugzilla.userid=${userid} --config bugzilla.cookie=${cookie} bzexport
   cookie-patch uploaded as http://*:$HGPORT/attachment.cgi?id=1&action=edit (glob)
 
+Bad API key results in failure
+
+  $ hg --config bugzilla.username=user --config bugzilla.apikey=badkey newbug --product TestProduct --component TestComponen -t 'Bad Key' 'dummy'
+  Using default version 'unspecified' of product TestProduct
+  abort: error creating bug: REST error on POST to http://*:$HGPORT/rest/bug: The API key you specified is invalid. Please check that you typed it correctly. (glob)
+  [255]
+t
+
 Cleanup
 
   $ $TESTDIR/d0cker stop-bmo bzexport-test-auth
