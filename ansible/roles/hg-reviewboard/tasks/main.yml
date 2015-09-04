@@ -157,7 +157,7 @@
     - hgweb.wsgi
 
 - name: install httpd.conf file
-  template: src=httpd.conf.js
+  template: src=httpd.conf.j2
             dest=/etc/httpd/conf/httpd.conf
             owner=root
             group=root
