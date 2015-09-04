@@ -68,6 +68,7 @@ class DockerCommands(object):
         db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
         hgrb_image = os.environ.get('DOCKER_HGRB_IMAGE')
+        hgweb_image = os.environ.get('DOCKER_HGWEB_IMAGE')
         ldap_image = os.environ.get('DOCKER_LDAP_IMAGE')
         pulse_image = os.environ.get('DOCKER_PULSE_IMAGE')
         rbweb_image = os.environ.get('DOCKER_RBWEB_IMAGE')
@@ -80,7 +81,8 @@ class DockerCommands(object):
                 db_image=db_image, web_image=web_image,
                 pulse_image=pulse_image, rbweb_image=rbweb_image,
                 autolanddb_image=autolanddb_image,
-                autoland_image=autoland_image, autoland_port=autoland_port)
+                autoland_image=autoland_image, autoland_port=autoland_port,
+                hgweb_image=hgweb_image)
 
     @Command('stop-bmo', category='docker',
         description='Stop a bugzilla.mozilla.org instance')
