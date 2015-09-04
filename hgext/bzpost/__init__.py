@@ -149,7 +149,7 @@ def wrappedpushbookmark(orig, pushop):
 
     bugsy = Bugsy(username=bzauth.username, password=bzauth.password,
                   userid=bzauth.userid, cookie=bzauth.cookie,
-                  bugzilla_url=bzurl)
+                  api_key=bzauth.apikey, bugzilla_url=bzurl)
 
     def public_url_for_bug(bug):
         '''Turn 123 into "https://bugzilla.mozilla.org/show_bug.cgi?id=123".'''
