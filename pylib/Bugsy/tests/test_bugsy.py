@@ -1,4 +1,5 @@
 import bugsy
+from . import rest_url
 from bugsy import Bugsy, BugsyException, LoginException
 from bugsy import Bug
 
@@ -43,6 +44,27 @@ def test_we_get_a_login_exception_when_details_are_wrong():
         assert str(e) == "Message: The username or password you entered is not valid."
 
 @responses.activate
+def test_bad_api_key():
+    responses.add(responses.GET,
+                  'https://bugzilla.mozilla.org/rest/valid_login?login=foo&api_key=badkey',
+                  body='{"documentation":"http://www.bugzilla.org/docs/tip/en/html/api/","error":true,"code":306,"message":"The API key you specified is invalid. Please check that you typed it correctly."}',
+                  status=400,
+                  content_type='application/json', match_querystring=True)
+    try:
+        Bugsy(username='foo', api_key='badkey')
+        assert False, 'Should have thrown'
+    except LoginException as e:
+        assert str(e) == 'Message: The API key you specified is invalid. Please check that you typed it correctly.'
+
+@responses.activate
+def test_validate_api_key():
+    responses.add(responses.GET,
+                  'https://bugzilla.mozilla.org/rest/valid_login?login=foo&api_key=goodkey',
+                  body='true', status=200, content_type='application/json',
+                  match_querystring=True)
+    Bugsy(username='foo', api_key='goodkey')
+
+@responses.activate
 def test_we_cant_post_without_passing_a_bug_object():
     responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/login?login=foo&password=bar',
                       body='{"token": "foobar"}', status=200,
@@ -56,7 +78,7 @@ def test_we_cant_post_without_passing_a_bug_object():
 
 @responses.activate
 def test_we_can_get_a_bug():
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+    responses.add(responses.GET, rest_url('bug', 1017315),
                       body=json.dumps(example_return), status=200,
                       content_type='application/json', match_querystring=True)
     bugzilla = Bugsy()
@@ -71,7 +93,7 @@ def test_we_can_get_a_bug_with_login_token():
                         body='{"token": "foobar"}', status=200,
                         content_type='application/json', match_querystring=True)
 
-  responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?token=foobar&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+  responses.add(responses.GET, rest_url('bug', 1017315, token='foobar'),
                     body=json.dumps(example_return), status=200,
                     content_type='application/json', match_querystring=True)
   bugzilla = Bugsy("foo", "bar")
@@ -112,7 +134,7 @@ def test_we_can_put_a_current_bug():
                       content_type='application/json', match_querystring=True)
     bug_dict = example_return.copy()
     bug_dict['summary'] = 'I love foo but hate bar'
-    responses.add(responses.POST, 'https://bugzilla.mozilla.org/rest/bug/1017315',
+    responses.add(responses.PUT, 'https://bugzilla.mozilla.org/rest/bug/1017315',
                       body=json.dumps(bug_dict), status=200,
                       content_type='application/json')
     bugzilla = Bugsy("foo", "bar")
@@ -145,7 +167,7 @@ def test_we_handle_errors_from_bugzilla_when_updating_a_bug():
   responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/login?login=foo&password=bar',
                     body='{"token": "foobar"}', status=200,
                     content_type='application/json', match_querystring=True)
-  responses.add(responses.POST, 'https://bugzilla.mozilla.org/rest/bug/1017315',
+  responses.add(responses.PUT, 'https://bugzilla.mozilla.org/rest/bug/1017315',
                     body='{"error":true,"code":50,"message":"You must select/enter a component."}', status=200,
                     content_type='application/json')
   bugzilla = Bugsy("foo", "bar")
@@ -165,5 +187,3 @@ def test_we_can_set_the_user_agent_to_bugsy():
                     content_type='application/json', match_querystring=True)
   Bugsy("foo", "bar")
   assert responses.calls[0].request.headers['User-Agent'] == "Bugsy"
-
-

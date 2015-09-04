@@ -24,6 +24,7 @@ in the review process.
     `master` branch.
 * Make commits of logical units.
 * Check for unnecessary whitespace with `git diff --check` before committing.
+* Check for python pep8 compliance: `flake8 bugsy`
 * Make sure you have added the necessary tests for your changes.
 * Run _all_ the tests to assure nothing else was accidentally broken.
 

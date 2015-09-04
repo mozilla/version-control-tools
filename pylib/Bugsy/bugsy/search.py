@@ -37,8 +37,9 @@ class Search(object):
 
     def include_fields(self, *args):
         r"""
-            Include fields is the fields that you want to be returned when searching. These
-            are in addition to the fields that are always included below.
+            Include fields is the fields that you want to be returned when
+            searching. These are in addition to the fields that are always
+            included below.
 
             :param args: items passed in will be turned into a list
             :returns: :class:`Search`
@@ -55,7 +56,8 @@ class Search(object):
 
     def keywords(self, *args):
         r"""
-            When search() is called it will search for the keywords passed in here
+            When search() is called it will search for the keywords passed
+            in here
 
             :param args: items passed in will be turned into a list
             :returns: :class:`Search`
@@ -67,7 +69,8 @@ class Search(object):
 
     def assigned_to(self, *args):
         r"""
-            When search() is called it will search for bugs assigned to these users
+            When search() is called it will search for bugs assigned to these
+            users
 
             :param args: items passed in will be turned into a list
             :returns: :class:`Search`
@@ -79,8 +82,8 @@ class Search(object):
 
     def summary(self, *args):
         r"""
-            When search is called it will search for bugs with the words passed into the
-            methods
+            When search is called it will search for bugs with the words
+            passed into the methods
 
             :param args: items passed in will be turned into a list
             :returns: :class:`Search`
@@ -92,8 +95,8 @@ class Search(object):
 
     def whiteboard(self, *args):
         r"""
-            When search is called it will search for bugs with the words passed into the
-            methods
+            When search is called it will search for bugs with the words
+            passed into the methods
 
             :param args: items passed in will be turned into a list
             :returns: :class:`Search`
@@ -105,9 +108,11 @@ class Search(object):
 
     def bug_number(self, bug_numbers):
         r"""
-            When you want to search for a bugs and be able to change the fields returned.
+            When you want to search for a bugs and be able to change the fields
+            returned.
 
-            :param bug_numbers: A string for the bug number or a list of strings
+            :param bug_numbers: A string for the bug number or a list of
+                                strings
             :returns: :class:`Search`
 
             >>> bugzilla.search_for.bug_number(['123123', '123456'])
@@ -144,9 +149,10 @@ class Search(object):
 
     def search(self):
         r"""
-            Call the Bugzilla endpoint that will do the search. It will take the information
-            used in other methods on the Search object and build up the query string. If no
-            bugs are found then an empty list is returned.
+            Call the Bugzilla endpoint that will do the search. It will take
+            the information used in other methods on the Search object and
+            build up the query string. If no bugs are found then an empty list
+            is returned.
 
             >>> bugs = bugzilla.search_for\
             ...                .keywords("checkin-needed")\
@@ -161,7 +167,8 @@ class Search(object):
         if self._bug_numbers:
             bugs = []
             for bug in self._bug_numbers:
-                result = self._bugsy.request('bug/%s' % bug, params=params).json()
+                result = self._bugsy.request('bug/%s' % bug,
+                                             params=params).json()
                 bugs.append(Bug(self._bugsy, **result['bugs'][0]))
 
             return bugs

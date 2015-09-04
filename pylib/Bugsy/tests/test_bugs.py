@@ -2,6 +2,7 @@ import datetime
 import responses
 import json
 
+from . import rest_url
 from bugsy import Bugsy, Bug
 from bugsy import BugException
 
@@ -127,7 +128,7 @@ def test_we_can_get_a_dict_version_of_the_bug():
 
 @responses.activate
 def test_we_can_update_a_bug_from_bugzilla():
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+    responses.add(responses.GET, rest_url('bug', 1017315),
                       body=json.dumps(example_return), status=200,
                       content_type='application/json', match_querystring=True)
     bugzilla = Bugsy()
@@ -155,7 +156,7 @@ def test_we_can_update_a_bug_with_login_token():
                         body='{"token": "foobar"}', status=200,
                         content_type='application/json', match_querystring=True)
 
-  responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?token=foobar&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+  responses.add(responses.GET, rest_url('bug', 1017315, token='foobar'),
                     body=json.dumps(example_return), status=200,
                     content_type='application/json', match_querystring=True)
   bugzilla = Bugsy("foo", "bar")
@@ -200,7 +201,7 @@ def test_that_we_can_add_a_comment_to_an_existing_bug():
                           body='{"token": "foobar"}', status=200,
                           content_type='application/json', match_querystring=True)
 
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?token=foobar&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+    responses.add(responses.GET, rest_url('bug', 1017315, token='foobar'),
                       body=json.dumps(example_return), status=200,
                       content_type='application/json', match_querystring=True)
     bugzilla = Bugsy("foo", "bar")
@@ -219,7 +220,7 @@ def test_comment_retrieval():
     responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/login?login=foo&password=bar',
                         body='{"token": "foobar"}', status=200,
                         content_type='application/json', match_querystring=True)
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?token=foobar&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+    responses.add(responses.GET, rest_url('bug', 1017315, token='foobar'),
                       body=json.dumps(example_return), status=200,
                       content_type='application/json', match_querystring=True)
     responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315/comment?token=foobar',

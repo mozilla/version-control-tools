@@ -1,12 +1,14 @@
 import datetime
-import requests
 
 
 VALID_STATUS = ["RESOLVED", "ASSIGNED", "NEW", "UNCONFIRMED"]
-VALID_RESOLUTION = ["FIXED", "INCOMPLETE", "INVALID", "WORKSFORME", "DUPLICATE", "WONTFIX"]
+VALID_RESOLUTION = ["FIXED", "INCOMPLETE", "INVALID", "WORKSFORME",
+                    "DUPLICATE", "WONTFIX"]
+
 
 def str2datetime(s):
     return datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%SZ')
+
 
 class BugException(Exception):
     """
@@ -92,7 +94,8 @@ class Bug(object):
             else:
                 raise BugException("Invalid status type was used")
         else:
-            raise BugException("Can not set status unless there is a bug id. Please call Update() before setting")
+            raise BugException("Can not set status unless there is a bug id."
+                               " Please call Update() before setting")
 
     @property
     def OS(self):
@@ -228,7 +231,7 @@ class Bug(object):
             >>> bug.status
             'FIXED'
         """
-        if self._bug.has_key('id'):
+        if 'id' in self._bug:
             result = self._bugsy.request('bug/%s' % self._bug['id']).json()
             self._bug = dict(**result['bugs'][0])
         else:
@@ -243,12 +246,13 @@ class Bug(object):
         bug = unicode(self._bug['id'])
         res = self._bugsy.request('bug/%s/comment' % bug).json()
 
-        return [Comment(**comments) for comments in res['bugs'][bug]['comments']]
+        return [Comment(**comments) for comments
+                in res['bugs'][bug]['comments']]
 
     def add_comment(self, comment):
         """
-            Adds a comment to a bug. If a bug does not have a bug ID then you need
-            call `put` on the :class:`Bugsy` class.
+            Adds a comment to a bug. If a bug does not have a bug ID then
+            you need call `put` on the :class:`Bugsy` class.
 
             >>> bug.add_comment("I like sausages")
             >>> bugzilla.put(bug)
@@ -257,18 +261,16 @@ class Bug(object):
 
             >>> bug.add_comment("I like eggs too")
         """
-        # If we have a key post immediately otherwise hold onto it until put(bug)
-        # is called
-        if self._bug.has_key('id'):
-            self._bugsy.session.post('%s/bug/%s/comment' % (self._bugsy.bugzilla_url, self._bug['id']), data={"comment": comment}, )
+        # If we have a key post immediately otherwise hold onto it until
+        # put(bug) is called
+        if 'id' in self._bug:
+            self._bugsy.session.post(
+                '%s/bug/%s/comment' % (self._bugsy.bugzilla_url,
+                                       self._bug['id']),
+                data={"comment": comment}
+            )
         else:
             self._bug['comment'] = comment
-
-    def to_dict(self):
-        """
-            Return the raw dict that is used inside this object
-        """
-        return self._bug
 
 
 class Comment(object):
@@ -279,23 +281,18 @@ class Comment(object):
 
         >>> bugs = bugzilla.search_for.keywords("checkin-needed").search()
         >>> comments = bugs[0].get_comments()
-        >>> comments[0].text # Returns the comment 0 of the first checkin-needed bug
+        >>> # Returns the comment 0 of the first checkin-needed bug
+        >>> comments[0].text
     """
 
     def __init__(self, **kwargs):
-
-        self.attachment_id = kwargs['attachment_id']
-        self.author = kwargs['author']
-        self.bug_id = kwargs['bug_id']
-        self.creation_time = str2datetime(kwargs['creation_time'])
-        self.creator = kwargs['creator']
-        self._id = kwargs['id']
-        self.is_private = kwargs['is_private']
-        self._text = kwargs['text']
-        self.time = str2datetime(kwargs['time'])
-
+        kwargs['time'] = str2datetime(kwargs['time'])
+        kwargs['creation_time'] = str2datetime(kwargs['creation_time'])
         if 'tags' in kwargs:
-            self.tags = set(kwargs['tags'])
+            kwargs['tags'] = set(kwargs['tags'])
+        else:
+            kwargs['tags'] = set()
+        self._comment = kwargs
 
     @property
     def text(self):
@@ -305,11 +302,75 @@ class Comment(object):
             >>> comment.text # David really likes cheese apparently
 
         """
-        return self._text
+        return self._comment['text']
 
     @property
     def id(self):
         r"""
             Return the comment id that is associated with Bugzilla.
         """
-        return self._id
+        return self._comment['id']
+
+    @property
+    def attachment_id(self):
+        """
+            If the comment was made on an attachment, return the ID of that
+            attachment. Otherwise it will return None.
+        """
+        return self._comment['attachment_id']
+
+    @property
+    def author(self):
+        """
+            Return the login name of the comment's author.
+        """
+        return self._comment['author']
+
+    @property
+    def creator(self):
+        """
+            Return the login name of the comment's author.
+        """
+        return self._comment['creator']
+
+    @property
+    def bug_id(self):
+        """
+            Return the ID of the bug that this comment is on.
+        """
+        return self._comment['bug_id']
+
+    @property
+    def time(self):
+        """
+            This is exactly same as :attr:`creation_time`.
+
+            For compatibility, time is still usable. However, please note
+            that time may be deprecated and removed in a future release.
+
+            Prefer :attr:`creation_time` instead.
+        """
+        return self._comment['time']
+
+    @property
+    def creation_time(self):
+        """
+            Return the time (in Bugzilla's timezone) that the comment was
+            added.
+        """
+        return self._comment['creation_time']
+
+    @property
+    def is_private(self):
+        """
+            Return True if this comment is private (only visible to a certain
+            group called the "insidergroup").
+        """
+        return self._comment['is_private']
+
+    @property
+    def tags(self):
+        """
+            Return a set of comment tags currently set for the comment.
+        """
+        return self._comment['tags']

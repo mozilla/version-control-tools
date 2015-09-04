@@ -1,4 +1,5 @@
 import bugsy
+from . import rest_url
 from bugsy import Bugsy, BugsyException, LoginException
 from bugsy import Bug
 from bugsy.search import SearchException
@@ -48,7 +49,13 @@ def test_we_only_ask_for_the_include_fields():
          ]
       }
 
-  responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?assigned_to=dburns@mozilla.com&whiteboard=affects&short_desc_type=allwordssubstr&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform&include_fields=flags',
+  url_params = dict(
+    assigned_to='dburns@mozilla.com',
+    whiteboard='affects',
+    short_desc_type='allwordssubstr',
+    include_fields=Bugsy.DEFAULT_SEARCH + ['flags'],
+  )
+  responses.add(responses.GET, rest_url('bug', **url_params),
                     body=json.dumps(include_return), status=200,
                     content_type='application/json', match_querystring=True)
 
@@ -108,7 +115,11 @@ def test_we_only_ask_for_the_include_fields_while_logged_in():
                     body='{"token": "foobar"}', status=200,
                     content_type='application/json', match_querystring=True)
 
-  responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform&include_fields=flags&token=foobar',
+  url_params = dict(
+    token='foobar',
+    include_fields=Bugsy.DEFAULT_SEARCH + ['flags'],
+  )
+  responses.add(responses.GET, rest_url('bug', **url_params),
                     body=json.dumps(include_return), status=200,
                     content_type='application/json', match_querystring=True)
 
@@ -152,7 +163,7 @@ def test_we_can_return_keyword_search():
       }]
     }
 
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform&keywords=checkin-needed&',
+    responses.add(responses.GET, rest_url('bug', keywords='checkin-needed'),
                     body=json.dumps(keyword_return), status=200,
                     content_type='application/json', match_querystring=True)
 
@@ -188,7 +199,7 @@ def test_that_we_can_search_for_a_specific_user():
             }
            ]
         }
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform&assigned_to=dburns@mozilla.com&',
+    responses.add(responses.GET, rest_url('bug', assigned_to='dburns@mozilla.com'),
                     body=json.dumps(user_return), status=200,
                     content_type='application/json', match_querystring=True)
 
@@ -214,8 +225,12 @@ def test_we_can_search_summary_fields():
       ]
     }
 
-
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?assigned_to=dburns@mozilla.com&short_desc=rebecca&short_desc_type=allwordssubstr&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform&',
+    url_params = dict(
+        assigned_to='dburns@mozilla.com',
+        short_desc='rebecca',
+        short_desc_type='allwordssubstr',
+    )
+    responses.add(responses.GET, rest_url('bug', **url_params),
                     body=json.dumps(summary_return), status=200,
                     content_type='application/json', match_querystring=True)
 
@@ -248,8 +263,12 @@ def test_we_can_search_whiteboard_fields():
        ]
     }
 
-
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?assigned_to=dburns@mozilla.com&whiteboard=affects&short_desc_type=allwordssubstr&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform&',
+    url_params = dict(
+        assigned_to='dburns@mozilla.com',
+        whiteboard='affects',
+        short_desc_type='allwordssubstr',
+    )
+    responses.add(responses.GET, rest_url('bug', **url_params),
                     body=json.dumps(whiteboard_return), status=200,
                     content_type='application/json', match_querystring=True)
 
@@ -285,11 +304,11 @@ def test_we_can_search_for_a_list_of_bug_numbers():
         }
       ]
     }
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315?include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+    responses.add(responses.GET, rest_url('bug', 1017315),
                       body=json.dumps(return_1), status=200,
                       content_type='application/json', match_querystring=True)
 
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017316?include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+    responses.add(responses.GET, rest_url('bug', 1017316),
                       body=json.dumps(return_2), status=200,
                       content_type='application/json', match_querystring=True)
     bugzilla = Bugsy()
@@ -314,7 +333,11 @@ def test_we_can_search_for_a_list_of_bug_numbers_with_start_finish_dates():
       ]
     }
 
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?chfieldfrom=2014-12-01&chfieldto=2014-12-05&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+    url_params = dict(
+        chfieldfrom='2014-12-01',
+        chfieldto='2014-12-05',
+    )
+    responses.add(responses.GET, rest_url('bug', **url_params),
                       body=json.dumps(return_1), status=200,
                       content_type='application/json', match_querystring=True)
 
@@ -367,7 +390,13 @@ def test_we_can_search_with_change_history_field_gets_bugs():
       ]
     }
 
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?chfield=%5BBug+creation%5D&chfield=Alias&chfieldvalue=foo&chfieldfrom=2014-12-01&chfieldto=2014-12-05&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+    url_params = dict(
+        chfield=['[Bug creation]', 'Alias'],
+        chfieldvalue='foo',
+        chfieldfrom='2014-12-01',
+        chfieldto='2014-12-05',
+    )
+    responses.add(responses.GET, rest_url('bug', **url_params),
                       body=json.dumps(return_1), status=200,
                       content_type='application/json', match_querystring=True)
 
@@ -391,7 +420,13 @@ def test_we_can_handle_errors_coming_back_from_search():
         "message" : "Can't use [Bug Creation] as a field name."
     }
 
-    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug?chfield=%5BBug+Creation%5D&chfield=Alias&chfieldvalue=foo&chfieldfrom=2014-12-01&chfieldto=2014-12-05&include_fields=version&include_fields=id&include_fields=summary&include_fields=status&include_fields=op_sys&include_fields=resolution&include_fields=product&include_fields=component&include_fields=platform',
+    url_params = dict(
+        chfield=['[Bug Creation]', 'Alias'],
+        chfieldvalue='foo',
+        chfieldfrom='2014-12-01',
+        chfieldto='2014-12-05',
+    )
+    responses.add(responses.GET, rest_url('bug', **url_params),
                       body=json.dumps(error_return), status=200,
                       content_type='application/json', match_querystring=True)
 
