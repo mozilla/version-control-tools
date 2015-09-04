@@ -39,7 +39,7 @@ def run_playbook(name, extra_vars=None, verbosity=0):
 
 
 def deploy_reviewboard_dev(repo=None, rev=None, verbosity=0):
-    extra = {}
+    extra = {'vct': ROOT}
     if repo:
         extra['repo'] = repo
     if rev:
@@ -50,7 +50,7 @@ def deploy_reviewboard_dev(repo=None, rev=None, verbosity=0):
 
 
 def deploy_reviewboard_prod(repo=None, rev=None, verbosity=0):
-    extra = {}
+    extra = {'vct': ROOT}
     if repo:
         extra['repo'] = repo
     if rev:
