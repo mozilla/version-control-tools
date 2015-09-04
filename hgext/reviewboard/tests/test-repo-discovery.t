@@ -88,13 +88,13 @@ workaround to an unidentified root problem.
 
 hg createrepomanifest will create and print a manifest of review repos
 
-  $ mozreview exec hgrb hg -R /repo/hg/mozilla/autoreview createrepomanifest
+  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest
   4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a (glob)
   36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b (glob)
 
 Search and replace works
 
-  $ mozreview exec hgrb hg -R /repo/hg/mozilla/autoreview createrepomanifest --search ${MERCURIAL_URL} --replace ${PUSHPREFIX}/
+  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest --search ${MERCURIAL_URL} --replace ${PUSHPREFIX}/
   4016108b6e06add4c0ddde40dee8c7b9aa410f58 ssh://*:$HGPORT6/a (glob)
   36d47cf7c6cbd312de3aeb3b2f770c650b014053 ssh://*:$HGPORT6/b (glob)
 
@@ -157,7 +157,7 @@ Pushing to autodiscover repo should redirect
 
 Redirecting ssh:// to http:// should be disallowed (security protection)
 
-  $ mozreview exec hgrb hg -R /repo/hg/mozilla/autoreview createrepomanifest
+  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest
   4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a (glob)
   36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b (glob)
 
@@ -173,7 +173,7 @@ Redirecting ssh:// to http:// should be disallowed (security protection)
 
 Redirecting to different hostname should be disallowed (security protection)
 
-  $ mozreview exec hgrb hg -R /repo/hg/mozilla/autoreview createrepomanifest --search ${MERCURIAL_URL} --replace ssh://bad.host/
+  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest --search ${MERCURIAL_URL} --replace ssh://bad.host/
   4016108b6e06add4c0ddde40dee8c7b9aa410f58 ssh://bad.host/a (glob)
   36d47cf7c6cbd312de3aeb3b2f770c650b014053 ssh://bad.host/b (glob)
 
