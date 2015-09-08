@@ -187,7 +187,7 @@ Stream bundles will work
   downloading bundle http://localhost:$HGPORT1/stream.hg
   streaming all changes
   4 files to transfer, 613 bytes of data
-  transferred 613 bytes in *.* seconds (*.* KB/sec) (glob)
+  transferred 613 bytes in *.* seconds (* KB/sec) (glob)
   finishing applying bundle; pulling
   searching for changes
   no changes found
