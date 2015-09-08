@@ -35,7 +35,10 @@
         vct_node: "{{ lookup('file', '../.vctnode') }}",
       }
 
-- hosts: hgssh1.dmz.scl3.mozilla.com
+- hosts:
+    - hgssh1.dmz.scl3.mozilla.com
+    - hgssh2.dmz.scl3.mozilla.com
+
   pre_tasks:
     # Until we integrate secrets with Ansible, the LDAP config is
     # pre-defined on the server.
