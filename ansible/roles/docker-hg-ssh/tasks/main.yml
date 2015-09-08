@@ -1,4 +1,15 @@
 ---
+- name: install supervisor
+  yum: name=supervisor
+       state=present
+
+- name: install supervisor config
+  copy: src=supervisord.conf
+        dest=/etc/supervisord.conf
+        owner=root
+        group=root
+        mode=0644
+
 # Docker doesn't have full TTYs. sudo will fail unless we remove the
 # requirement that a TTY be present.
 - name: Remove SSH TTY requirement

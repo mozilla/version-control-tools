@@ -1,4 +1,15 @@
 ---
+- name: install supervisor
+  yum: name=supervisor
+       state=present
+
+- name: install supervisor config
+  copy: src=supervisord.conf
+        dest=/etc/supervisord.conf
+        owner=root
+        group=root
+        mode=0644
+
 - name: install Docker support files
   copy: src={{ item }} dest=/{{ item }} owner=root group=root mode=0755
   with_items:
