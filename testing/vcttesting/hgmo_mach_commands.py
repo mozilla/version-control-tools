@@ -109,7 +109,9 @@ class HgmoCommands(object):
     @CommandArgument('level', type=int, choices=[1, 2, 3], default=1,
                      help='SCM level access for this repository')
     def create_repo(self, name, level):
-        self.c.create_repo(name, level=level)
+        out = self.c.create_repo(name, level=level)
+        if out:
+            sys.stdout.write(out)
 
     @Command('aggregate-code-coverage', category='hgmo',
              description='Aggregate code coverage results to a directory')

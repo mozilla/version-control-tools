@@ -298,7 +298,7 @@ class HgCluster(object):
 
         cmd = ['/create-repo', name, 'scm_level_%d' % level]
 
-        self._d.execute(self.master_id, cmd)
+        return self._d.execute(self.master_id, cmd, stdout=True, stderr=True)
 
     def aggregate_code_coverage(self, destdir):
         master_map = {}
