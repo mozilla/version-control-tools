@@ -26,6 +26,19 @@ class Config(object):
 
         self._consumer = None
 
+        if self.c.has_section('path_rewrites'):
+            self._path_rewrites = self.c.items('path_rewrites')
+        else:
+            self._path_rewrites = []
+
+    def parse_wire_repo_path(self, path):
+        """Parse a normalized repository path into a local path."""
+        for source, dest in self._path_rewrites:
+            if path.startswith(source):
+                return path.replace(source, dest)
+
+        return path
+
     def _get_client_from_section(self, section):
         hosts = self.c.get(section, 'hosts')
         client_id = self.c.get(section, 'client_id')

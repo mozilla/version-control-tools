@@ -15,6 +15,9 @@ connect_timeout = 5
 client_id = pull0
 topic = pushdata
 group = ttest
+
+[path_rewrites]
+{moz} = $TESTTMP/repos
 EOF
 
 }

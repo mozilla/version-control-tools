@@ -73,6 +73,7 @@ def process_message(config, payload):
 
 def process_hg_repo_init(config, path):
     """Process a Mercurial repository initialization message."""
+    path = config.parse_wire_repo_path(path)
     print('TODO got a hg init message for %s' % path)
 
 

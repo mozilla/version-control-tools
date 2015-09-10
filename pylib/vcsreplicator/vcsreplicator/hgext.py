@@ -102,6 +102,8 @@ def reposetup(ui, repo):
     if not repo.local():
         return
 
+    # TODO add support for only replicating repositories under certain paths.
+
     class replicatingrepo(repo.__class__):
         @property
         def replicationwireprotopath(self):

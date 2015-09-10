@@ -15,7 +15,7 @@ Creating a repository should record an event saying so
 
   $ python -m vcsreplicator.consumer $TESTTMP/vcsreplicator.ini --onetime
   $ python -m vcsreplicator.consumer $TESTTMP/vcsreplicator.ini --onetime
-  TODO got a hg init message for {moz}/mozilla-central
+  TODO got a hg init message for $TESTTMP/repos/mozilla-central
 
 Cleanup
 
