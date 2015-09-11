@@ -31,6 +31,11 @@ class Config(object):
         else:
             self._path_rewrites = []
 
+        if self.c.has_section('pull_url_rewrites'):
+            self._pull_url_rewrites = self.c.items('pull_url_rewrites')
+        else:
+            self._pull_url_rewrites = []
+
     def parse_wire_repo_path(self, path):
         """Parse a normalized repository path into a local path."""
         for source, dest in self._path_rewrites:
@@ -38,6 +43,15 @@ class Config(object):
                 return path.replace(source, dest)
 
         return path
+
+    def get_pull_url_from_repo_path(self, path):
+        """Obtain a URL to be used for pulling from a local repo path."""
+        lower = path.lower()
+        for source, dest in self._pull_url_rewrites:
+            if lower.startswith(source):
+                return dest + path[len(source):]
+
+        return None
 
     def _get_client_from_section(self, section):
         hosts = self.c.get(section, 'hosts')

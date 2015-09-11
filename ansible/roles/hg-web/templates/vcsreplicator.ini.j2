@@ -13,3 +13,6 @@ group = {{ ansible_hostname }}
 
 [path_rewrites]
 {moz} = /repo/hg/mozilla
+
+[pull_url_rewrites]
+{moz}/ = ssh://{{ mirror_source }}/

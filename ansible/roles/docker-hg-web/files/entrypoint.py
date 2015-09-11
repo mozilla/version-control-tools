@@ -37,6 +37,14 @@ with open('/usr/local/bin/mirror-pull', 'wb') as fh:
 
         fh.write(line)
 
+vcsreplicator = open('/etc/mercurial/vcsreplicator.ini', 'rb').readlines()
+with open('/etc/mercurial/vcsreplicator.ini', 'wb') as fh:
+    for line in vcsreplicator:
+        for k, v in REPLACEMENTS.items():
+            line = line.replace(k, v)
+
+        fh.write(line)
+
 # Replace SSH config for master server with the current environment's.
 ssh_config = open('/home/hg/.ssh/config', 'rb').readlines()
 with open('/home/hg/.ssh/config', 'wb') as fh:
