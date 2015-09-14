@@ -80,10 +80,15 @@ class CommitsListField(BaseReviewRequestField):
             child for child in gen_child_rrs(parent_details, user)
             if child.is_accessible_by(user)]
 
+        latest_autoland_request = AutolandRequest.objects.filter(
+            review_request_id=parent.id,
+        ).last()
+
         return get_template('mozreview/commits.html').render(Context({
             'review_request_details': self.review_request_details,
             'parent_details': parent_details,
             'children_details': children_details,
+            'latest_autoland_request': latest_autoland_request,
         }))
 
 

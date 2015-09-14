@@ -192,3 +192,66 @@
 #automation-menu {
     display: none;
 }
+
+
+#ci-actions {
+    border: 1px solid #B8B5A0;
+    margin-top: 20px;
+    padding: 5px;
+    background-color: #FFFFFF;
+
+    .action{
+        height:32px;
+
+        & > .action-icon {
+            float: left;
+            margin-right: 5px;
+        }
+
+        & > .rounded-icon {
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            margin: 1px 3px 4px 0px;
+        }
+
+        &.action-success {
+            & > .rounded-icon {
+                background-color: #B0EFA0;
+                border: 1px solid #478A06;
+            }
+        }
+
+        &.action-pending {
+            & > .rounded-icon {
+                background-color: #E6E316;
+                border: 1px solid #6F6F6F;
+            }
+        }
+
+        &.action-failure {
+            & > .rounded-icon {
+                background-color: #A9020C;
+                border: 1px solid #90010A;
+            }
+            & .action-heading {
+                color: #90010A;
+            }
+        }
+
+        & > .action-info {
+            a {
+                float:right;
+            }
+            h4 {
+                margin: 0;
+            }
+        }
+    }
+
+    .action-separator{
+        background-color: #E4E3DD;
+        height:1px;
+        margin: 5px;
+    }
+}

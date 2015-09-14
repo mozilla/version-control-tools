@@ -70,4 +70,56 @@ This is the template for the "Commits" list in a push-based review request.
     </tr>
     {% endfor %}
   </table>
+  {% if latest_autoland_request %}
+  <div id="ci-actions">
+      {% if latest_autoland_request.last_known_status == 'F' %}
+      <div class="action action-failure">
+        <div class="action-icon rounded-icon"></div>
+        <div class="action-info">
+          <h4 class="action-heading">
+              There was an error executing the Autoland to Try request.
+          </h4>
+          <span class="action-meta">
+            {{ latest_autoland_request.last_error_msg }}
+          </span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if latest_autoland_request.last_known_status == 'R' %}
+      <div class="action action-requested">
+        <div class="action-icon rounded-icon"></div>
+        <div class="action-info">
+          <h4 class="action-heading">
+            Waiting for the Autoland to Try request to execute, hold tight
+          </h4>
+          <span class="action-meta">
+            If the try tree is closed autoland will retry your push for you until the tree opens.
+          </span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if latest_autoland_request.last_known_status == 'S' %}
+      <div class="action action-landed"
+           data-repository="try"
+           data-revision="{{latest_autoland_request.repository_revision}}">
+        <div class="action-icon rounded-icon"></div>
+        <div class="action-info">
+          <a href="https://treeherder.mozilla.org/embed/resultset-status/try/{{latest_autoland_request.repository_revision}}/">
+            See it in Treeherder
+          </a>
+          <h4 class="action-heading">
+          </h4>
+          <span class="action-meta"></span>
+        </div>
+      </div>
+      {% endif %}
+    {% comment %}
+    This is the action separator to use when we have more than one
+    destination repository
+    <div class="action-separator"></div>
+    {% endcomment %}
+  </div>
+  {% endif %}
 </div>
