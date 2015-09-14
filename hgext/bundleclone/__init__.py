@@ -158,6 +158,10 @@ Python < 2.7.9 does not support SNI, a TLS extension that allows multiple
 SSL certificates to be installed on the same IP. Hosting services often
 use SNI to enable multiple services to exist on the same IP.
 
+In addition, Mercurial < 3.3 did not support using the modern SSL capabilities
+exposed by modern Python versions. Therefore SNI does not work on Mercurial <
+3.3.
+
 The ``requiresni`` manifest attribute can be defined on the server to
 indicate whether an entry requires SNI. If it is ``true`` and the client
 doesn't support SNI, the entry is automatically discarded. For this reason,
@@ -423,13 +427,26 @@ def reposetup(ui, repo):
             pyver = sys.version_info
             pyver = (pyver[0], pyver[1], pyver[2])
 
-            # Testing backdoor.
+            hgver = util.version()
+            # Discard bit after '+'.
+            hgver = hgver.split('+')[0]
+            try:
+                hgver = tuple([int(i) for i in hgver.split('.')[0:2]])
+            except ValueError:
+                hgver = (0, 0)
+
+            # Testing backdoors.
             if ui.config('bundleclone', 'fakepyver'):
                 pyver = ui.configlist('bundleclone', 'fakepyver')
                 pyver = tuple(int(v) for v in pyver)
 
+            if ui.config('bundleclone', 'fakehgver'):
+                hgver = ui.configlist('bundleclone', 'fakehgver')
+                hgver = tuple(int(v) for v in hgver[0:2])
+
             entries = []
-            snifiltered = False
+            snifilteredfrompython = False
+            snifilteredfromhg = False
 
             for line in result.splitlines():
                 fields = line.split()
@@ -440,18 +457,35 @@ def reposetup(ui, repo):
                     attrs[urllib.unquote(key)] = urllib.unquote(value)
 
                 # Filter out SNI entries if we don't support SNI.
-                if attrs.get('requiresni') == 'true' and pyver < (2, 7, 9):
-                    # Take this opportunity to inform people they are using an
-                    # old, insecure Python.
-                    if not snifiltered:
+                if attrs.get('requiresni') == 'true':
+                    skip = False
+                    if pyver < (2, 7, 9):
+                        # Take this opportunity to inform people they are using an
+                        # old, insecure Python.
+                        if not snifilteredfrompython:
+                            self.ui.warn(_('(your Python is older than 2.7.9 '
+                                           'and does not support modern and '
+                                           'secure SSL/TLS; please consider '
+                                           'upgrading your Python to a secure '
+                                           'version)\n'))
+                        snifilteredfrompython = True
+                        skip = True
+
+                    if hgver < (3, 3):
+                        if not snifilteredfromhg:
+                            self.ui.warn(_('(you Mercurial is old and does '
+                                           'not support modern and secure '
+                                           'SSL/TLS; please consider '
+                                           'upgrading your Mercurial to 3.3+ '
+                                           'which supports modern and secure '
+                                           'SSL/TLS\n'))
+                        snifilteredfromhg = True
+                        skip = True
+
+                    if skip:
                         self.ui.warn(_('(ignoring URL on server that requires '
                                        'SNI)\n'))
-                        self.ui.warn(_('(your Python is older than 2.7.9 and '
-                                       'does not support modern and secure '
-                                       'SSL/TLS; please consider upgrading '
-                                       'your Python to a secure version)\n'))
-                    snifiltered = True
-                    continue
+                        continue
 
                 entries.append((url, attrs))
 
