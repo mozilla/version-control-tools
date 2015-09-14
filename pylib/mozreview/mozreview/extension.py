@@ -7,6 +7,7 @@ from django.db.models.signals import post_save
 
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
+                                          HostingServiceHook,
                                           ReviewRequestDropdownActionHook,
                                           ReviewRequestFieldsHook,
                                           SignalHook,
@@ -37,6 +38,7 @@ from mozreview.fields import (BaseCommitField,
                               PullCommitField,
                               TryField)
 from mozreview.hooks import MozReviewApprovalHook
+from mozreview.hostingservice.hmo_repository import HMORepository
 from mozreview.ldap.resources import ldap_association_resource
 from mozreview.middleware import MozReviewUserProfileMiddleware
 from mozreview.pulse import initialize_pulse_handlers
@@ -217,6 +219,7 @@ class MozReviewExtension(Extension):
         SignalHook(self, post_save, self.on_draft_changed,
                    sender=ReviewRequestDraft)
 
+        HostingServiceHook(self, HMORepository)
 
         URLHook(self, patterns('',
             url(r'^import-pullrequest/(?P<user>.+)/(?P<repo>.+)/(?P<pullrequest>\d+)/$',
