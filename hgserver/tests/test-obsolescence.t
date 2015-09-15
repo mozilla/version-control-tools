@@ -109,11 +109,11 @@ Create some obsolescence markers
   remote: adding file changes
   remote: added 1 changesets with 0 changes to 1 files
   remote: recorded push in pushlog
+  remote: 1 new obsolescence markers
   remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/d22031ed19ec
-  remote: replication of obsolete data completed successfully in \d+.\ds (re)
   $ cd ..
 
 Pulling should get the obsmarkers
@@ -126,6 +126,7 @@ Pulling should get the obsmarkers
   adding manifests
   adding file changes
   added 1 changesets with 0 changes to 1 files
+  1 new obsolescence markers
   (run 'hg update' to get a working copy)
   $ hg debugobsolete
   c7176a0c153ec7dd9c5aab8b6bc42d742d1ed1f4 d22031ed19ecc068e154a6c307c63adbb316dbb2 0 (* +0000) {'user': 'test'} (glob)

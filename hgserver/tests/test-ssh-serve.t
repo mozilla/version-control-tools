@@ -40,6 +40,7 @@ A push works
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
+  remote: replication of phases data completed successfully in \d+\.\ds (re)
   remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
