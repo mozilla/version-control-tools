@@ -18,6 +18,10 @@ $(document).ready(function() {
   MozReview.hasScmLevel1 = MozReview.scmLevel >= 1;
   MozReview.hasScmLevel3 = MozReview.scmLevel == 3;
 
+  // Whether or not the repository has an associated try repository is also
+  // in an invisible div.
+  MozReview.hasTryRepository = $("#repository").data("has-try-repository");
+
   console.log("Found parent review request ID: " + parentID);
 
   var page = RB.PageManager.getPage();

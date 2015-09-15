@@ -7,7 +7,8 @@ from __future__ import absolute_import, unicode_literals
 import time
 
 import selenium.webdriver.support.expected_conditions as EC
-from selenium.common.exceptions import (NoSuchElementException,
+from selenium.common.exceptions import (ElementNotVisibleException,
+                                        NoSuchElementException,
                                         StaleElementReferenceException)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -40,13 +41,33 @@ class AutolandTryTest(MozReviewWebDriverTest):
             MozReviewWebDriverTest.tearDownClass()
             raise
 
+
     def test_autoland_try(self):
+        # We currently have four conditions for enabling the 'automation' menu
+        # and try button (see static/mozreview/js/try.js):
+        # 1. The review must be published
+        # 2. The review must be mutable by the current user
+        # 3. The user must have scm_level_1 or higher
+        # 4. The repository must have an associated try repository
+        # TODO: Ideally we'd test these conditions independently to ensure that
+        #       the 'try' button will only show up when all four are met
+        #       and not otherwise.
+
+        # We should not be able to trigger a Try run without a HostingService
+        # with an associated try repository.
         self.reviewboard_login('mjane@example.com', 'password2')
         self.load_rburl('r/1')
+        automation_menu = self.browser.find_element_by_id('automation-menu')
+        self.assertFalse(automation_menu.is_displayed())
+        self.add_hostingservice(1, 'Sirius Black', 'scm_level_1',
+                                'ssh://hg.example.com/try')
 
-        # We should not be able to trigger a Try run until the review is
+        # We should also not be able to trigger a Try run unless the review is
         # published.
-        # TODO: actually test this
+        self.reviewboard_login('mjane@example.com', 'password2')
+        self.load_rburl('r/1')
+        automation_menu = self.browser.find_element_by_id('automation-menu')
+        self.assertFalse(automation_menu.is_displayed())
         self.assign_reviewer(0, 'jsmith')
         publish_btn = self.browser.find_element_by_id('btn-draft-publish')
         publish_btn.click()

@@ -6,9 +6,6 @@ from __future__ import absolute_import, unicode_literals
 
 from selenium.common.exceptions import ElementNotVisibleException
 
-import selenium.webdriver.support.expected_conditions as EC
-
-from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.wait import WebDriverWait
@@ -40,9 +37,9 @@ class HostingServiceTest(MozReviewWebDriverTest):
 
         el = self.browser.find_element_by_id('repository')
         self.assertEqual(el.get_attribute('data-required-ldap-group'),
-            'scm_level_3')
-        self.assertEqual(el.get_attribute('data-try-repository-url'),
-            'ssh://hg.example.com/try')
+                         'scm_level_3')
+        self.assertEqual(el.get_attribute('data-has-try-repository'),
+                         'true')
 
     def test_create_hostingservice(self):
         self.reviewboard_login('admin@example.com', 'password')

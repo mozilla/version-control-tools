@@ -31,16 +31,19 @@ def scm_level(mozreview_profile):
     elif mozreview_profile.has_scm_ldap_group('scm_level_1'):
         return '1'
 
+
 @register.filter()
 def required_ldap_group(repository):
     try:
         return repository.extra_data['required_ldap_group']
-    except AttributeError, KeyError:
+    except (AttributeError, KeyError):
         return ''
 
+
 @register.filter()
-def try_repository_url(repository):
+def has_try_repository(repository):
     try:
-        return repository.extra_data['try_repository_url']
-    except AttributeError, KeyError:
-        return ''
+        return ('true' if repository.extra_data['try_repository_url']
+                else 'false')
+    except (AttributeError, KeyError):
+        return 'false'
