@@ -21,6 +21,11 @@ pushes2 = '\{
   "lastpushid": {lastpushid|json},
   "pushes": {pushes|json}
   }'
+headdivergence = '\{
+  "commitsbehind": {commitsbehind|json},
+  "filemerges": {filemerges|json},
+  "filemergesignored": {filemergesignored|json}
+  }'
 
 filerevision = '"not yet implemented"'
 search = '"not yet implemented"'

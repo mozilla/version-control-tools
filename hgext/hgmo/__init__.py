@@ -75,6 +75,7 @@ from mercurial import (
     extensions,
     hg,
     revset,
+    util,
 )
 from mercurial.hgweb import (
     webcommands,
@@ -286,6 +287,72 @@ def infowebcommand(web, req, tmpl):
     return tmpl('info', csets=csets)
 
 
+def headdivergencewebcommand(web, req, tmpl):
+    """Get information about divergence between this repo and a changeset.
+
+    This API was invented to be used by MozReview to obtain information about
+    how a repository/head has progressed/diverged since a commit was submitted
+    for review.
+
+    It is assumed that this is running on the canonical/mainline repository.
+    Changes in other repositories must be rebased onto or merged into
+    this repository.
+    """
+    if 'node' not in req.form:
+        return tmpl('error', error={'error': "missing parameter 'node'"})
+
+    repo = web.repo
+
+    paths = set(req.form.get('p', []))
+    basectx = repo[req.form['node'][0]]
+
+    # Find how much this repo has changed since the requested changeset.
+    # Our heuristic is to find the descendant head with the highest revision
+    # number. Most (all?) repositories we care about for this API should have
+    # a single head per branch. And we assume the newest descendant head is
+    # the one we care about the most. We don't care about branches because
+    # if a descendant is on different branch, then the repo has likely
+    # transitioned to said branch.
+    #
+    # If we ever consolidate Firefox repositories, we'll need to reconsider
+    # this logic, especially if release repos with their extra branches/heads
+    # are involved.
+
+    # Specifying "start" only gives heads that are descendants of "start."
+    headnodes = repo.changelog.heads(start=basectx.node())
+
+    headrev = max(repo[n].rev() for n in headnodes)
+    headnode = repo[headrev].node()
+
+    betweennodes, outroots, outheads = \
+        repo.changelog.nodesbetween([basectx.node()], [headnode])
+
+    # nodesbetween returns base node. So prune.
+    betweennodes = betweennodes[1:]
+
+    commitsbehind = len(betweennodes)
+
+    # If rev 0 or a really old revision is passed in, we could DoS the server
+    # by having to iterate nearly all changesets. Establish a cap for number
+    # of changesets to examine.
+    maxnodes = repo.ui.configint('hgmo', 'headdivergencemaxnodes', 1000)
+    filemergesignored = False
+    if len(betweennodes) > maxnodes:
+        betweennodes = []
+        filemergesignored = True
+
+    filemerges = {}
+    for node in betweennodes:
+        ctx = repo[node]
+
+        files = set(ctx.files())
+        for p in files & paths:
+            filemerges.setdefault(p, []).append(ctx.hex())
+
+    return tmpl('headdivergence', commitsbehind=commitsbehind,
+                filemerges=filemerges, filemergesignored=filemergesignored)
+
+
 def revset_reviewer(repo, subset, x):
     """``reviewer(REVIEWER)``
 
@@ -383,3 +450,6 @@ def extsetup(ui):
 
     setattr(webcommands, 'info', infowebcommand)
     webcommands.__all__.append('info')
+
+    setattr(webcommands, 'headdivergence', headdivergencewebcommand)
+    webcommands.__all__.append('headdivergence')
