@@ -11,6 +11,7 @@ from mercurial.node import short
 from mercurial import (
     mdiff,
     patch,
+    phases,
     wireproto,
 )
 
@@ -273,6 +274,16 @@ def reviewboard(repo, proto, args=None):
         return formatresponse('error server error verifying bug %s exists; '
             'please retry or report a bug' % reviewid.bug)
 
+    # Find the first public node in the ancestry of this series. This is
+    # used by MozReview to query the upstream repo for additional context.
+    first_public_ancestor = None
+    for node in repo[nodes[0]].ancestors():
+        ctx = repo[node]
+        if ctx.phase() == phases.public:
+            first_public_ancestor = ctx.hex()
+            break
+    commits['squashed']['first_public_ancestor'] = first_public_ancestor
+
     # Note patch.diff() appears to accept anything that can be fed into
     # repo[]. However, it blindly does a hex() on the argument as opposed
     # to the changectx, so we need to pass in the binary node.
@@ -290,6 +301,7 @@ def reviewboard(repo, proto, args=None):
             base_commit_id = nodes[i-1]
         else:
             base_commit_id = base_ctx.hex()
+
         summary = ctx.description().splitlines()[0]
         commits['individual'].append({
             'id': node,
@@ -298,6 +310,7 @@ def reviewboard(repo, proto, args=None):
             'diff': diff,
             'bug': str(reviewid.bug),
             'base_commit_id': base_commit_id,
+            'first_public_ancestor': first_public_ancestor,
             'reviewers': list(commitparser.parse_reviewers(summary))
         })
 

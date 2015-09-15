@@ -39,6 +39,7 @@ def post_reviews(url, repoid, identifier, commits, hgresp,
             'squashed': {
                 'diff': <squashed-diff-string>,
                 'base_commit_id': <commit-id-to-apply-diff-to> (optional),
+                'first_public_ancestor': <commit of first public ancestor> (optional),
             },
             'individual': [
                 {
@@ -49,6 +50,7 @@ def post_reviews(url, repoid, identifier, commits, hgresp,
                     'bug': <bug-id>,
                     'parent_diff': <diff-from-base-to-commit> (optional),
                     'base_commit_id': <commit-id-to-apply-diffs-to> (optional),
+                    'first_public_ancestor': <commit of first public ancestor> (optional),
                     'reviewers': [<user1>, <user2>, ...] (optional),
                 },
                 {
@@ -156,6 +158,7 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
             "extra_data.p2rb.identifier": identifier,
             "extra_data.p2rb.discard_on_publish_rids": '[]',
             "extra_data.p2rb.unpublished_rids": '[]',
+            "extra_data.p2rb.first_public_ancestor": commits['squashed']['first_public_ancestor'],
             "commit_id": identifier,
             "repository": repoid,
         })
@@ -219,6 +222,7 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
             "bugs_closed": commit['bug'],
             "description": commit['message'],
             "extra_data.p2rb.commit_id": commit['id'],
+            "extra_data.p2rb.first_public_ancestor": commit['first_public_ancestor'],
         }
         reviewers = extract_reviewers(commit)
         if reviewers:
@@ -440,6 +444,7 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
             discard_on_publish_rids),
         'extra_data.p2rb.unpublished_rids': json.dumps(
             unpublished_rids),
+        'extra_data.p2rb.first_public_ancestor': commits['squashed']['first_public_ancestor'],
     })
 
     review_requests[squashed_rr.id] = squashed_rr

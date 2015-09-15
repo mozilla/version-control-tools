@@ -66,10 +66,11 @@ Discarded because this change is no longer required.
 
 # Extra data fields which should be automatically copied from
 # the draft to the review request on publish.
-DRAFTED_EXTRA_DATA_KEYS = [
+DRAFTED_EXTRA_DATA_KEYS = (
     'p2rb.commit_id',
+    'p2rb.first_public_ancestor',
     'p2rb.identifier',
-]
+)
 
 
 class BugzillaExtension(Extension):

@@ -129,6 +129,7 @@ on publish.
       3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
       5], ["76088734e3cba33be80930be14e7cd1e9ee474be", 6]]'
     p2rb.discard_on_publish_rids: '[6]'
+    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
@@ -149,6 +150,7 @@ on publish.
         3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
         5]]'
       p2rb.discard_on_publish_rids: '[]'
+      p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{}'
@@ -206,6 +208,7 @@ The parent review should have dropped the reference to /r/6
       3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
       5]]'
     p2rb.discard_on_publish_rids: '[]'
+    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
@@ -229,6 +232,7 @@ Review 6 should be marked as discarded
   extra_data:
     p2rb: true
     p2rb.commit_id: 76088734e3cba33be80930be14e7cd1e9ee474be
+    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
@@ -285,6 +289,7 @@ on publish.
       3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
       5]]'
     p2rb.discard_on_publish_rids: '[2]'
+    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
@@ -304,6 +309,7 @@ on publish.
       p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 3], ["d7a5827a584db609f6a9ca2bd3d43aa3afa6b86e",
         4], ["b5473ad606f40840715d6b378dacc1a37f6263b1", 5]]'
       p2rb.discard_on_publish_rids: '[]'
+      p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{"3": [], "2": [], "5": [], "4": []}'
@@ -351,6 +357,7 @@ The dropped commit should now be discarded
   extra_data:
     p2rb: true
     p2rb.commit_id: 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e
+    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   approved: false
@@ -402,6 +409,7 @@ The parent review should have been updated accordingly.
     p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 3], ["2fbc30f77859fa4be2e173866fa71c52d394f2c4",
       5]]'
     p2rb.discard_on_publish_rids: '[]'
+    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{"3": [], "5": [], "4": []}'
