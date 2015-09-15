@@ -45,11 +45,15 @@ as installing the required package, e.g., on Ubuntu,
 
 You can also install the very latest release `directly from Docker <http://docs.docker.com/linux/step_one/>`_.
 
-For OS X, you will need to install and start up boot2docker; see
+For OS X, you will need to install and start up docker-machine; see
 the official `installation instructions
-<https://docs.docker.com/installation/mac/>`_, particularly the
-section on `starting from the command line
-<https://docs.docker.com/installation/mac/#from-your-command-line>`_.
+<https://docs.docker.com/installation/mac/>`_.  Make sure you specify
+more than the default 1024 MB of RAM, which is insufficient for a
+local MozReview installation, given the number of containers that are
+created.  If you're using VirtualBox as your driver, this should work
+(creating a docker machine called "default"):
+
+  docker-machine create --driver virtualbox --virtualbox-memory 4096 default
 
 Running a local MozReview instance in Windows is not yet supported,
 but if you get it working, please :ref:`let us know! <mozreview_getting_in_touch>`
