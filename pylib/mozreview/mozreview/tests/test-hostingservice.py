@@ -30,33 +30,8 @@ class HostingServiceTest(MozReviewWebDriverTest):
         lr.run(['commit', '-m', 'Bug 1 - Test try'])
         lr.run(['push'])
 
-        self.reviewboard_login('admin@example.com', 'password')
-        self.load_rburl('/admin/db/scmtools/repository/1/')
-
-        el = self.browser.find_element_by_id('id_path')
-        path = el.get_attribute('value')
-
-        select = Select(self.browser.find_element_by_id('id_hosting_type'))
-        select.select_by_visible_text('hmo')
-
-        # If the account exists (i.e. another test ran first), this will fail
-        try:
-            el = self.browser.find_element_by_id('id_hosting_account_username')
-            el.send_keys('Sirius Black')
-        except ElementNotVisibleException:
-            pass
-
-        el = self.browser.find_element_by_id('id_repository_url')
-        el.send_keys(path)
-
-        el = self.browser.find_element_by_id('id_try_repository_url')
-        el.send_keys('ssh://hg.example.com/try')
-
-        el.send_keys(Keys.RETURN)
-
-        # If this succeeds, we should be redirected to the repositories page
-        WebDriverWait(self.browser, 10).until(
-            lambda x: 'Select repository to change' in self.browser.title)
+        self.add_hostingservice(1, 'Sirius Black', 'scm_level_3',
+                                'ssh://hg.example.com/try')
 
         # If we visit the review url, we should be able to find repository
         # information

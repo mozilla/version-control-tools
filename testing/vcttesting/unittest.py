@@ -16,6 +16,7 @@ from selenium import webdriver
 import selenium.webdriver.support.expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.remote.switch_to import SwitchTo
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -290,6 +291,43 @@ class MozReviewWebDriverTest(MozReviewTest):
 
         subprocess.call('docker exec %s cat /reviewboard/logs/reviewboard.log' %
                         self.mr.rbweb_id, shell=True)
+
+    def add_hostingservice(self, repo, account_username, required_ldap_group,
+                           try_repository_url):
+        """This adds a hosting service to an existing account"""
+
+        self.reviewboard_login('admin@example.com', 'password')
+        self.load_rburl('/admin/db/scmtools/repository/%s/' % repo)
+
+        el = self.browser.find_element_by_id('id_path')
+        path = el.get_attribute('value')
+
+        select = Select(self.browser.find_element_by_id('id_hosting_type'))
+        select.select_by_visible_text('hmo')
+
+        # If the account exists (i.e. another test ran first), this will fail.
+        try:
+            el = self.browser.find_element_by_id('id_hosting_account_username')
+            el.send_keys(account_username)
+        except ElementNotVisibleException:
+            pass
+
+        el = self.browser.find_element_by_id('id_repository_url')
+        el.send_keys(path)
+
+        el = self.browser.find_element_by_id('id_try_repository_url')
+        el.send_keys(try_repository_url)
+
+        el = self.browser.find_element_by_id('id_required_ldap_group')
+        for c in el.get_attribute('value'):
+            el.send_keys(Keys.BACKSPACE)
+        el.send_keys(required_ldap_group)
+
+        el.send_keys(Keys.RETURN)
+
+        # If this succeeds, we should be redirected to the repositories page
+        WebDriverWait(self.browser, 10).until(
+            lambda x: 'Select repository to change' in self.browser.title)
 
 
 def restart_between_tests(cls):
