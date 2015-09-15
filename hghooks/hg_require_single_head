@@ -1,6 +1,0 @@
-#!/bin/sh
-
-if test $(hg heads -t --template 'Test_Head\n' | grep -c "^Test_Head") != "1"; then
-    printf "You may not push multiple heads to this repository.\n" 1>&2;
-    exit 1;
-fi
