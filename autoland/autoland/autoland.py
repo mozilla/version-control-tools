@@ -176,7 +176,11 @@ def handle_pending_transplants(logger, dbconn):
         where landed is null and (last_updated is null
             or last_updated<=%(time)s)
     """
-    cursor.execute(query, ({'time': now - TRANSPLANT_RETRY_DELAY}))
+    transplant_retry_delay = TRANSPLANT_RETRY_DELAY
+    if config.testing():
+        transplant_retry_delay = datetime.timedelta(seconds=1)
+
+    cursor.execute(query, ({'time': now - transplant_retry_delay}))
 
     current_treestatus = {}
     finished_revisions = []

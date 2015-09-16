@@ -5,11 +5,12 @@ TREESTATUS_URL = 'https://treestatus.mozilla.org/'
 
 
 def tree_is_open(tree):
+    treestatus_url = TREESTATUS_URL
     if config.testing():
-        return True
+        treestatus_url = 'http://treestatus/'
 
     try:
-        r = requests.get(TREESTATUS_URL + tree + '?format=json', verify=False)
+        r = requests.get(treestatus_url + tree + '?format=json', verify=False)
         if r.status_code == 200:
             return r.json()['status'] == 'open'
         elif r.status_code == 404:
