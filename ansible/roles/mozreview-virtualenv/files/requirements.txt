@@ -25,8 +25,8 @@ django-evolution==0.7.5
 # sha256: ow34iO4NoyxIN8Mo7PhZ6ZLtttGF76fUk0HMGUnbsk0
 django-haystack==2.3.1
 
-# sha256: i0MBxs6iJ7LGeJtk3pS3qndVikyXYONogSzY_Iwrz7Q
-Djblets==0.8.20
+# sha256: 3s51UxD-KLkPiZpQ7iSJ5CqotLhBGShfB6T8IW7FbEM
+Djblets==0.8.22
 
 # sha256: x9txeBCraWX2bIzwOYqYydjfmC2jm0zX8WKRHriVlvo
 docutils==0.12
@@ -100,8 +100,8 @@ pycrypto==2.6.1
 # sha256: SFxYdfcE05QYN1gC0971KqEk7KP85BG_dgBMsBBodzU
 RBTools==0.6.1
 
-# sha256: UfF5tpHDtS6a2g7HHZpDXcyqxJRU4OE-3WWE76TwmLw
-ReviewBoard==2.0.17
+# sha256: X2xQ4h9WvqrQBtn1zW97NwLuDRDBnNhI0l114UqVmcE
+ReviewBoard==2.0.20
 
 # sha256: EkiQ9BcjyFqoLf4IB0Mq6kbSSusNr840CWnSCJVIwsM
 requests==2.4.3

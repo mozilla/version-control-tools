@@ -802,7 +802,7 @@ Verify that a single ship-it r+s only that attachment.
 Ship-it reviews are not allowed on the parent.
 
   $ rbmanage create-review 9 --body-top 'all good!' --public --ship-it
-  API Error: 500: 225: Error publishing the review request: "Ship it" reviews on parent review requests are not allowed.  Please review individual commits.
+  API Error: 500: 225: Error publishing: "Ship it" reviews on parent review requests are not allowed.  Please review individual commits.
   [1]
 
 A non-ship-it review on a child should clear only that attachment's r+.
