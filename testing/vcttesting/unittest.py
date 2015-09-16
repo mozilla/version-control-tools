@@ -117,6 +117,9 @@ class MozReviewWebDriverTest(MozReviewTest):
 
     @classmethod
     def setUpClass(cls):
+        if 'ONLY_HEADLESS_TESTS' in os.environ:
+            raise unittest.SkipTest('Only running headless tests')
+
         try:
             cls.browser = webdriver.Firefox()
         except Exception:

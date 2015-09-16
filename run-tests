@@ -52,12 +52,20 @@ if __name__ == '__main__':
         help='Do not run Python unit tests')
     parser.add_argument('--use-last-images', action='store_true',
         help='Skip building new images when possible')
+    parser.add_argument('--headless', action='store_true',
+        help='Only run tests that do not require a framebuffer '
+             '(skips Selenium tests)')
 
     options, extra = parser.parse_known_args(sys.argv)
 
     # some arguments belong to us only. Don't pass it along to run-tests.py.
-    hg_harness_args = [a for a in sys.argv
-            if a not in {'--all-versions', '--no-hg-tip', '--use-last-images'}]
+    filter_args = {
+        '--all-versions',
+        '--no-hg-tip',
+        '--use-last-images',
+        '--headless',
+    }
+    hg_harness_args = [a for a in sys.argv if a not in filter_args]
     hg_harness_args[0] = RUNTESTS
 
     coveragerc = os.path.join(HERE, '.coveragerc')
@@ -70,6 +78,9 @@ if __name__ == '__main__':
     if options.cover:
         os.environ['COVERAGE_DIR'] = coverdir
         os.environ['CODE_COVERAGE'] = '1'
+
+    if options.headless:
+        os.environ['ONLY_HEADLESS_TESTS'] = '1'
 
     # We do our own code coverage. Strip it so run-tests.py doesn't try to do
     # it's own.
