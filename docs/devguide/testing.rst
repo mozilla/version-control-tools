@@ -75,6 +75,14 @@ Run tests with a specific Mercurial installation::
 
   $ ./run-tests --with-hg=/path/to/hg
 
+Do not run Selenium tests::
+
+  $ ./run-tests --headless
+
+Do not run tests that require Docker::
+
+  $ ./run-tests --no-docker
+
 Authoring Tests
 ===============
 
