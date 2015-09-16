@@ -7,7 +7,7 @@
   vars:
     repo: https://hg.mozilla.org/hgcustom/version-control-tools
     rev: "@"
-    vct: /data/reviewboard/src/version-control-tools
+    rb_vct: /data/reviewboard/src/version-control-tools
     venv: /data/reviewboard/src/reviewboard.mozilla.org/venv
     python: /data/reviewboard/src/reviewboard.mozilla.org/venv/bin/python
     easy_install: /data/reviewboard/src/reviewboard.mozilla.org/venv/bin/easy_install

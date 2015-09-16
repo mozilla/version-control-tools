@@ -6,7 +6,7 @@
     repo: https://hg.mozilla.org/hgcustom/version-control-tools
     sitehome: /data/www/reviewboard-dev.allizom.org/reviewboard
     venv: /data/www/reviewboard-dev.allizom.org/venv
-    vct: /data/www/reviewboard-dev.allizom.org/version-control-tools
+    rb_vct: /data/www/reviewboard-dev.allizom.org/version-control-tools
     pip: /data/www/reviewboard-dev.allizom.org/venv/bin/pip
     easy_install: /data/www/reviewboard-dev.allizom.org/venv/bin/easy_install
     python: /data/www/reviewboard-dev.allizom.org/venv/bin/python
@@ -39,3 +39,6 @@
         revision={{ rev }}
         force=yes
         purge=yes
+
+  - name: delete ignored files from version-control-tools repo
+    command: "{{ venv }}/bin/hg --config extensions.purge= -R /repo/hg/version-control-tools purge --all"

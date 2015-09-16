@@ -1,27 +1,37 @@
 ---
 - name: prepare v-c-t repo
-  hg: repo={{ repo }} dest={{ vct }} revision={{ rev }} force=yes purge=yes executable={{ venv }}/bin/hg
+  hg: repo={{ repo }}
+      dest={{ rb_vct }}
+      revision={{ rev }}
+      force=yes
+      purge=yes
+      executable={{ venv }}/bin/hg
+
+# The hg module's purge doesn't delete ignored files. Boo. Force that
+# because old files may cause chaos.
+- name: delete ignored files from version-control-tools repo
+  command: "{{ venv }}/bin/hg --config extensions.purge= -R {{ rb_vct }} purge --all"
 
 # rbbz imports from mozreview package. So, we need to install mozreview before
 # rbbz can be built.
 
 - name: build mozreview egg
-  command: "{{ python }} setup.py bdist_egg chdir={{ vct }}/pylib/mozreview"
+  command: "{{ python }} setup.py bdist_egg chdir={{ rb_vct }}/pylib/mozreview"
 
 - name: install mozreview egg
-  shell: "{{ easy_install }} -U dist/*.egg chdir={{ vct }}/pylib/mozreview"
+  shell: "{{ easy_install }} -U dist/*.egg chdir={{ rb_vct }}/pylib/mozreview"
 
 - name: build rbbz egg
-  command: "{{ python }} setup.py bdist_egg chdir={{ vct }}/pylib/rbbz"
+  command: "{{ python }} setup.py bdist_egg chdir={{ rb_vct }}/pylib/rbbz"
 
 - name: install rbbz egg
-  shell: "{{ easy_install }} -U dist/*.egg chdir={{ vct }}/pylib/rbbz"
+  shell: "{{ easy_install }} -U dist/*.egg chdir={{ rb_vct }}/pylib/rbbz"
 
 - name: build rbmotd egg
-  command: "{{ python }} setup.py bdist_egg chdir={{ vct }}/pylib/rbmotd"
+  command: "{{ python }} setup.py bdist_egg chdir={{ rb_vct }}/pylib/rbmotd"
 
 - name: install rbmotd egg
-  shell: "{{ easy_install }} -U dist/*.egg chdir={{ vct }}/pylib/rbmotd"
+  shell: "{{ easy_install }} -U dist/*.egg chdir={{ rb_vct }}/pylib/rbmotd"
 
 - name: Generate static Review Board files
   command: "{{ rbsite }} manage {{ sitehome }} -- collectstatic --noinput"
