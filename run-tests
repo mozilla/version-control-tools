@@ -55,6 +55,8 @@ if __name__ == '__main__':
     parser.add_argument('--headless', action='store_true',
         help='Only run tests that do not require a framebuffer '
              '(skips Selenium tests)')
+    parser.add_argument('--no-docker', action='store_true',
+        help='Only run tests that do not require Docker')
 
     options, extra = parser.parse_known_args(sys.argv)
 
@@ -64,6 +66,7 @@ if __name__ == '__main__':
         '--no-hg-tip',
         '--use-last-images',
         '--headless',
+        '--no-docker',
     }
     hg_harness_args = [a for a in sys.argv if a not in filter_args]
     hg_harness_args[0] = RUNTESTS
@@ -81,6 +84,9 @@ if __name__ == '__main__':
 
     if options.headless:
         os.environ['ONLY_HEADLESS_TESTS'] = '1'
+
+    if options.no_docker:
+        os.environ['SKIP_DOCKER_TESTS'] = '1'
 
     # We do our own code coverage. Strip it so run-tests.py doesn't try to do
     # it's own.
@@ -155,7 +161,7 @@ if __name__ == '__main__':
     docker_state = os.path.join(HERE, '.dockerstate')
     docker_url, docker_tls = vctdocker.params_from_env(os.environ)
     docker = vctdocker.Docker(docker_state, docker_url, tls=docker_tls)
-    if docker.is_alive():
+    if not options.no_docker and docker.is_alive():
         os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
 
         # We build the base BMO images in the test runner because doing it

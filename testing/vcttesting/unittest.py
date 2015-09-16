@@ -50,6 +50,9 @@ class MozReviewTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        if 'SKIP_DOCKER_TESTS' in os.environ:
+            raise unittest.SkipTest('Skipping tests that require Docker')
+
         tmpdir = tempfile.mkdtemp()
         cls._tmpdir = tmpdir
 

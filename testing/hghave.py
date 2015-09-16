@@ -33,6 +33,9 @@ sys.path.insert(0, os.path.join(REPO_ROOT, 'testing'))
 # Define custom checks for our environment.
 @check('docker', 'We can talk to Docker')
 def has_docker():
+    if 'SKIP_DOCKER_TESTS' in os.environ:
+        return False
+
     from vcttesting.docker import Docker, params_from_env
 
     url, tls = params_from_env(os.environ)
