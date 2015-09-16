@@ -87,7 +87,7 @@ $(document).on("mozreview_ready", function() {
 
   var isDraft = $("#draft-banner").is(":visible");
   if (!isDraft && MozReview.currentIsMutableByUser
-        && MozReview.hasScmLevel1 && MozReview.hasTryRepository) {
+        && MozReview.hasScmLevel1) {
     $("#automation-menu").css('display', 'block');
   }
 });
