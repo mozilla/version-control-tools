@@ -38,12 +38,13 @@ EOF
 
 }
 
-alias rbmanage='$TESTDIR/reviewboard'
-alias bugzilla='$TESTDIR/bugzilla'
 alias adminbugzilla='BUGZILLA_USERNAME=admin@example.com BUGZILLA_PASSWORD=password $TESTDIR/bugzilla'
+alias bugzilla='$TESTDIR/bugzilla'
 alias pulse='$TESTDIR/pulse'
 alias mozreview='$TESTDIR/mozreview'
 alias ottoland='$TESTDIR/ottoland'
+alias treestatus='$TESTDIR/treestatus'
+alias rbmanage='$TESTDIR/reviewboard'
 
 commonenv() {
   mozreview start `pwd` \
@@ -55,6 +56,7 @@ commonenv() {
     --ldap-port $HGPORT5 \
     --ssh-port $HGPORT6 \
     --hgweb-port $HGPORT7 \
+    --treestatus-port $HGPORT8 \
     > /dev/null
 
   # MozReview randomly fails to start. Handle it elegantly.
