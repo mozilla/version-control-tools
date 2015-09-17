@@ -27,6 +27,7 @@ class MozReviewCommands(object):
         autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE')
         autoland_image = os.environ.get('DOCKER_AUTOLAND_IMAGE')
         hgweb_image = os.environ.get('DOCKER_HGWEB_IMAGE')
+        treestatus_image = os.environ.get('DOCKER_TREESTATUS_IMAGE')
 
         from vcttesting.mozreview import MozReview
         return MozReview(where, db_image=db_image, web_image=web_image,
@@ -34,7 +35,8 @@ class MozReviewCommands(object):
                          pulse_image=pulse_image, rbweb_image=rbweb_image,
                          autolanddb_image=autolanddb_image,
                          autoland_image=autoland_image,
-                         hgweb_image=hgweb_image)
+                         hgweb_image=hgweb_image,
+                         treestatus_image=treestatus_image)
 
     @Command('start', category='mozreview',
         description='Start a MozReview instance')
@@ -56,9 +58,12 @@ class MozReviewCommands(object):
                      help='Port Mercurial SSH server should listen on.')
     @CommandArgument('--hgweb-port', type=int,
                      help='Port hg.mo HTTP server should listen on.')
+    @CommandArgument('--treestatus-port', type=int,
+                     help='Port treestatus HTTP server should listen on.')
     def start(self, where, bugzilla_port=None, reviewboard_port=None,
             mercurial_port=None, pulse_port=None, autoland_port=None,
-            ldap_port=None, ssh_port=None, hgweb_port=None):
+            ldap_port=None, ssh_port=None, hgweb_port=None,
+            treestatus_port=None):
         mr = self._get_mozreview(where)
         mr.start(bugzilla_port=bugzilla_port,
                 reviewboard_port=reviewboard_port,
@@ -68,6 +73,7 @@ class MozReviewCommands(object):
                 ldap_port=ldap_port,
                 ssh_port=ssh_port,
                 hgweb_port=hgweb_port,
+                treestatus_port=treestatus_port,
                 verbose=True)
 
         print('Bugzilla URL: %s' % mr.bugzilla_url)
@@ -76,6 +82,7 @@ class MozReviewCommands(object):
         print('hg.mo URL: %s' % mr.hgweb_url)
         print('Pulse endpoint: %s:%s' % (mr.pulse_host, mr.pulse_port))
         print('Autoland URL: %s' % mr.autoland_url)
+        print('Treestatus URL: %s' % mr.treestatus_url)
         print('Admin username: %s' % mr.admin_username)
         print('Admin password: %s' % mr.admin_password)
         print('LDAP URI: %s' % mr.ldap_uri)
@@ -110,6 +117,7 @@ class MozReviewCommands(object):
         print('export MERCURIAL_URL=%s' % mr.mercurial_url)
         print('export HGWEB_URL=%s' % mr.hgweb_url)
         print('export AUTOLAND_URL=%s' % mr.autoland_url)
+        print('export TREESTATUS_URL=%s' % mr.treestatus_url)
         print('export ADMIN_USERNAME=%s' % mr.admin_username)
         print('export ADMIN_PASSWORD=%s' % mr.admin_password)
         print('export HGSSH_HOST=%s' % mr.ssh_hostname)
@@ -251,7 +259,7 @@ class MozReviewCommands(object):
              description='Execute a command in a Docker container')
     @CommandArgument('name', help='Name of container to shell into',
                      choices={'bmoweb', 'bmodb', 'pulse', 'rbweb', 'hgrb',
-                              'autoland', 'hgweb'})
+                              'autoland', 'hgweb', 'treestatus'})
     @CommandArgument('command', help='Command to execute',
                      nargs=argparse.REMAINDER)
     def execute(self, name, command):
@@ -272,6 +280,6 @@ class MozReviewCommands(object):
              description='Start a shell inside a running container')
     @CommandArgument('name', help='Name of container to shell into',
                      choices={'bmoweb', 'bmodb', 'pulse', 'rbweb', 'hgrb',
-                              'autoland'})
+                              'autoland', 'treestatus'})
     def shell(self, name):
         return self.execute(name, ['/bin/bash'])

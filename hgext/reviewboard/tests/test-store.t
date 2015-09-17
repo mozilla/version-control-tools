@@ -55,4 +55,4 @@ Pushing a review will create the reviews file
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 10 containers

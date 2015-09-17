@@ -388,4 +388,4 @@ Try removing a commit in the middle.
   (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 10 containers

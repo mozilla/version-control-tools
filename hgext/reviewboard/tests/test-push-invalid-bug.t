@@ -26,4 +26,4 @@ TODO Test for confidential bugs when Bugzilla's API enables it
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 10 containers

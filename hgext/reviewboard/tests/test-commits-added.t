@@ -167,4 +167,4 @@ rids to be strings and then pushing a new commit.
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 10 containers

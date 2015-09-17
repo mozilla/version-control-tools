@@ -175,6 +175,7 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
         env['DOCKER_AUTOLANDDB_IMAGE'] = mr_images['autolanddb']
         env['DOCKER_AUTOLAND_IMAGE'] = mr_images['autoland']
         env['DOCKER_RBWEB_IMAGE'] = mr_images['rbweb']
+        env['DOCKER_TREESTATUS_IMAGE'] = mr_images['treestatus']
         env['DOCKER_HGMASTER_IMAGE'] = hgmo_images['hgmaster']
         env['DOCKER_HGWEB_IMAGE'] = hgmo_images['hgweb']
         env['DOCKER_LDAP_IMAGE'] = hgmo_images['ldap']

@@ -78,4 +78,4 @@ Now create a new head and push a rebase
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 10 containers

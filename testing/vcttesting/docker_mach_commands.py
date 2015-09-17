@@ -76,6 +76,7 @@ class DockerCommands(object):
         rbweb_image = os.environ.get('DOCKER_RBWEB_IMAGE')
         autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE')
         autoland_image = os.environ.get('DOCKER_AUTOLAND_IMAGE')
+        treestatus_image = os.environ.get('DOCKER_TREESTATUS_IMAGE')
 
         res = self.d.start_mozreview(cluster=cluster,
                 http_port=http_port, pulse_port=pulse_port,
@@ -84,7 +85,7 @@ class DockerCommands(object):
                 pulse_image=pulse_image, rbweb_image=rbweb_image,
                 autolanddb_image=autolanddb_image,
                 autoland_image=autoland_image, autoland_port=autoland_port,
-                hgweb_image=hgweb_image)
+                hgweb_image=hgweb_image, treestatus_image=treestatus_image)
 
         if web_id_file:
             with open(web_id_file, 'wb') as fh:

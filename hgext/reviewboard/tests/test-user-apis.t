@@ -123,4 +123,4 @@ A search on an exact email match will populate the user
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 10 containers

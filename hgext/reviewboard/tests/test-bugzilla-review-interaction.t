@@ -1201,4 +1201,4 @@ A non-ship-it review on a parent should post a comment only.
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 10 containers

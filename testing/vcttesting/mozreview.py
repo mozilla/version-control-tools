@@ -64,7 +64,7 @@ class MozReview(object):
     def __init__(self, path, web_image=None, db_image=None, hgrb_image=None,
                  ldap_image=None, pulse_image=None, rbweb_image=None,
                  autolanddb_image=None, autoland_image=None,
-                 hgweb_image=None):
+                 hgweb_image=None, treestatus_image=None):
         if not path:
             raise Exception('You must specify a path to create an instance')
         path = os.path.abspath(path)
@@ -81,6 +81,7 @@ class MozReview(object):
         self.autolanddb_image = autolanddb_image
         self.autoland_image = autoland_image
         self.hgweb_image = hgweb_image
+        self.treestatus_image = treestatus_image
 
         self._name = os.path.dirname(path)
 
@@ -155,7 +156,8 @@ class MozReview(object):
             ldap_image=None, ldap_port=None, pulse_image=None,
             rbweb_image=None, ssh_port=None,
             hgweb_image=None, hgweb_port=None,
-            autolanddb_image=None, autoland_image=None, autoland_port=None):
+            autolanddb_image=None, autoland_image=None, autoland_port=None,
+            treestatus_image=None, treestatus_port=None):
         """Start a MozReview instance."""
         if self.started:
             raise Exception('MozReview instance has already been started')
@@ -176,6 +178,8 @@ class MozReview(object):
             autoland_port = get_available_port()
         if not hgweb_port:
             hgweb_port = get_available_port()
+        if not treestatus_port:
+            treestatus_port = get_available_port()
 
         db_image = db_image or self.db_image
         web_image = web_image or self.web_image
@@ -186,6 +190,7 @@ class MozReview(object):
         autolanddb_image = autolanddb_image or self.autolanddb_image
         autoland_image = autoland_image or self.autoland_image
         hgweb_image = hgweb_image or self.hgweb_image
+        treestatus_image = treestatus_image or self.treestatus_image
 
         self.started = True
         mr_info = self._docker.start_mozreview(
@@ -207,6 +212,8 @@ class MozReview(object):
                 autoland_port=autoland_port,
                 hgweb_image=hgweb_image,
                 hgweb_port=hgweb_port,
+                treestatus_image=treestatus_image,
+                treestatus_port=treestatus_port,
                 verbose=verbose)
 
         self.bmoweb_id = mr_info['web_id']
@@ -236,6 +243,9 @@ class MozReview(object):
         self.mercurial_url = mr_info['mercurial_url']
         self.hgweb_id = mr_info['hgweb_id']
         self.hgweb_url = mr_info['hgweb_url']
+
+        self.treestatus_id = mr_info['treestatus_id']
+        self.treestatus_url = mr_info['treestatus_url']
 
         # Ensure admin user is present and has admin privileges.
         def make_users():
@@ -311,6 +321,8 @@ class MozReview(object):
             'hgweb_id': self.hgweb_id,
             'ssh_hostname': self.ssh_hostname,
             'ssh_port': self.ssh_port,
+            'treestatus_url': self.treestatus_url,
+            'treestatus_id': self.treestatus_id,
             'docker_env': {k: v for k, v in os.environ.items() if k.startswith('DOCKER')}
         }
 

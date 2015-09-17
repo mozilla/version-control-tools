@@ -119,6 +119,7 @@ class Docker(object):
             'last-hgweb-id': None,
             'last-ldap-id': None,
             'last-vct-id': None,
+            'last-treestatus-id': None,
             'vct-cid': None,
         }
 
@@ -142,6 +143,7 @@ class Docker(object):
             'last-hgweb-id',
             'last-ldap-id',
             'last-vct-id',
+            'last-treestatus-id',
             'vct-cid',
         )
         for k in keys:
@@ -679,6 +681,7 @@ class Docker(object):
                 'autoland',
                 'ldap',
                 'pulse',
+                'treestatus',
             ], ansibles=ansibles,
             existing=images, verbose=verbose, use_last=use_last)
 
@@ -724,6 +727,7 @@ class Docker(object):
         self.state['last-ldap-id'] = images['ldap']
         self.state['last-pulse-id'] = images['pulse']
         self.state['last-rbweb-id'] = images['rbweb']
+        self.state['last-treestatus-id'] = images['treestatus']
         if build_hgweb:
             self.state['last-hgweb-id'] = images['hgweb']
 
@@ -738,6 +742,7 @@ class Docker(object):
             'ldap': images['ldap'],
             'pulse': images['pulse'],
             'rbweb': images['rbweb'],
+            'treestatus': images['treestatus'],
         }
         if build_hgweb:
             r['hgweb'] = images['hgweb']
@@ -804,6 +809,7 @@ class Docker(object):
             rbweb_image=None, ssh_port=None, hg_port=None,
             autolanddb_image=None, autoland_image=None, autoland_port=None,
             hgweb_image=None, hgweb_port=None,
+            treestatus_image=None, treestatus_port=None,
             verbose=False):
 
         start_ldap = False
@@ -834,6 +840,10 @@ class Docker(object):
         if hgweb_port or start_rbweb:
             start_hgweb = True
 
+        start_treestatus = False
+        if treestatus_port or start_autoland:
+            start_treestatus = True
+
         known_images = self.all_docker_images()
         if db_image and db_image not in known_images:
             db_image = None
@@ -851,10 +861,13 @@ class Docker(object):
             autolanddb_image = None
         if hgweb_image and hgweb_image not in known_images:
             hgweb_image = None
+        if treestatus_image and treestatus_image not in known_images:
+            treestatus_image = None
 
         if (not db_image or not web_image or not hgrb_image or not ldap_image
                 or not pulse_image or not autolanddb_image
-                or not autoland_image or not rbweb_image or not hgweb_image):
+                or not autoland_image or not rbweb_image or not hgweb_image
+                or not treestatus_image):
             images = self.build_mozreview(verbose=verbose)
             autolanddb_image = images['autolanddb']
             autoland_image = images['autoland']
@@ -865,6 +878,7 @@ class Docker(object):
             pulse_image = images['pulse']
             rbweb_image = images['rbweb']
             hgweb_image = images['hgweb']
+            treestatus_image = images['treestatus']
 
         containers = self.state['containers'].setdefault(cluster, [])
 
@@ -912,6 +926,10 @@ class Docker(object):
 
                 f_autoland_create = e.submit(self.client.create_container,
                         autoland_image)
+
+            if start_treestatus:
+                f_treestatus_create = e.submit(self.client.create_container,
+                                               treestatus_image)
 
             # We expose the database to containers. Start it first.
             db_id = f_db_create.result()['Id']
@@ -963,6 +981,10 @@ class Docker(object):
                 hgweb_id = f_hgweb_create.result()['Id']
                 containers.append(hgweb_id)
 
+            if start_treestatus:
+                treestatus_id = f_treestatus_create.result()['Id']
+                containers.append(treestatus_id)
+
             # At this point, all containers have been created.
             self.save_state()
 
@@ -980,6 +1002,7 @@ class Docker(object):
                 f_start_ldap.result()
                 ldap_state = self.client.inspect_container(ldap_id)
 
+            # TODO: Use futures for hgrb, hgweb and treestatus
             if start_hgrb:
                 self.client.start(hgrb_id,
                                   links=[(ldap_state['Name'], 'ldap')],
@@ -991,12 +1014,19 @@ class Docker(object):
                                   port_bindings={80: hgweb_port})
                 hgweb_state = self.client.inspect_container(hgweb_id)
 
+            if start_treestatus:
+                self.client.start(treestatus_id,
+                                  port_bindings={80: treestatus_port})
+                treestatus_state = self.client.inspect_container(treestatus_id)
+
             if start_autoland:
                 assert start_hgrb
+                assert start_treestatus
                 f_start_autoland = e.submit(self.client.start, autoland_id,
                         links=[(autolanddb_state['Name'], 'db'),
                                (web_state['Name'], 'bmoweb'),
-                               (hgrb_state['Name'], 'hgrb')],
+                               (hgrb_state['Name'], 'hgrb'),
+                               (treestatus_state['Name'], 'treestatus')],
                         port_bindings={80: autoland_port})
                 f_start_autoland.result()
                 autoland_state = self.client.inspect_container(autoland_id)
@@ -1036,6 +1066,10 @@ class Docker(object):
             hgweb_hostname, hgweb_hostport = \
                 self._get_host_hostname_port(hgweb_state, '80/tcp')
 
+        if start_treestatus:
+            treestatus_hostname, treestatus_hostport = \
+                self._get_host_hostname_port(treestatus_state, '80/tcp')
+
         print('waiting for Bugzilla to start')
         wait_for_http(bmoweb_hostname, bmoweb_hostport,
                       extra_check_fn=self._get_assert_container_running_fn(web_id))
@@ -1054,6 +1088,10 @@ class Docker(object):
         if start_hgweb:
             wait_for_http(hgweb_hostname, hgweb_hostport,
                           extra_check_fn=self._get_assert_container_running_fn(hgweb_id))
+
+        if start_treestatus:
+            wait_for_http(treestatus_hostname, treestatus_hostport,
+                          extra_check_fn=self._get_assert_container_running_fn(treestatus_id))
 
         print('Bugzilla accessible on %s' % bmo_url)
 
@@ -1098,6 +1136,10 @@ class Docker(object):
             result['hgweb_id'] = hgweb_id
             result['hgweb_url'] = 'http://%s:%d/' % (hgweb_hostname, hgweb_hostport)
 
+        if start_treestatus:
+            result['treestatus_id'] = treestatus_id
+            result['treestatus_url'] = 'http://%s:%d/' % (treestatus_hostname, treestatus_hostport)
+
         return result
 
     def stop_bmo(self, cluster):
@@ -1124,6 +1166,7 @@ class Docker(object):
             'bmoweb',
             'ldap',
             'pulse',
+            'treestatus',
         ], ansibles={
             'hgmaster': ('docker-hgmaster', 'centos6'),
             'hgweb': ('docker-hgweb', 'centos6'),
@@ -1193,6 +1236,7 @@ class Docker(object):
             self.state['last-hgweb-id'],
             self.state['last-ldap-id'],
             self.state['last-vct-id'],
+            self.state['last-treestatus-id'],
         ])
 
         relevant_repos = set([
@@ -1211,6 +1255,7 @@ class Docker(object):
             'hgweb',
             'ldap',
             'vct',
+            'treestatus',
         ])
 
         to_delete = {}
