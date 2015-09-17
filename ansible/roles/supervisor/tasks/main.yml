@@ -1,0 +1,35 @@
+---
+- name: determine if running in Docker
+  stat: path=/vct
+  register: vct_dir
+
+- name: install system packages
+  yum: name=python-setuptools
+       state=present
+
+- name: obtain supervisor RPM
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/supervisor-3.1.3-2.el6.noarch.rpm
+           dest=/var/tmp/supervisor-3.1.3-2.el6.noarch.rpm
+           sha256sum=236c9f3f1b4204c6a38d9604a64539332cb6c3204fb00973c282b6d169f4ca17
+
+- name: install supervisor
+  command: yum localinstall -y /var/tmp/supervisor-3.1.3-2.el6.noarch.rpm
+
+- name: create supervisor config directory
+  file: path=/etc/supervisor.d
+        state=directory
+        mode=0755
+        owner=root
+        group=root
+
+- name: install main supervisor config
+  copy: src=supervisord.conf
+        dest=/etc/supervisord.conf
+        owner=root
+        group=root
+        mode=0644
+
+- name: ensure supervisor service is started
+  service: name=supervisord
+           state=started
+  when: vct_dir.stat.exists == False
