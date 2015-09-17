@@ -63,8 +63,10 @@ class DockerCommands(object):
         help='Port Pulse should be exposed on.')
     @CommandArgument('--autoland-port', type=int,
         help='Port Autoland should be exposed on.')
+    @CommandArgument('--web-id-file',
+        help='File to store the bmoweb container ID in')
     def start_bmo(self, cluster, http_port, pulse_port=None,
-                  autoland_port=None):
+                  autoland_port=None, web_id_file=None):
         db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
         hgrb_image = os.environ.get('DOCKER_HGRB_IMAGE')
@@ -75,7 +77,7 @@ class DockerCommands(object):
         autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE')
         autoland_image = os.environ.get('DOCKER_AUTOLAND_IMAGE')
 
-        self.d.start_mozreview(cluster=cluster,
+        res = self.d.start_mozreview(cluster=cluster,
                 http_port=http_port, pulse_port=pulse_port,
                 hgrb_image=hgrb_image, ldap_image=ldap_image,
                 db_image=db_image, web_image=web_image,
@@ -83,6 +85,10 @@ class DockerCommands(object):
                 autolanddb_image=autolanddb_image,
                 autoland_image=autoland_image, autoland_port=autoland_port,
                 hgweb_image=hgweb_image)
+
+        if web_id_file:
+            with open(web_id_file, 'wb') as fh:
+                fh.write(res['web_id'])
 
     @Command('stop-bmo', category='docker',
         description='Stop a bugzilla.mozilla.org instance')
@@ -151,3 +157,15 @@ class DockerCommands(object):
             print('wrote %d bytes for mozbuild-eval' % len(executable))
 
         print('wrote files to %s' % dest)
+
+    # This should ideally be elsewhere. This was introduced at a time when
+    # start-bmo didn't track the bmoweb container ID explicitly.
+    @Command('create-bugzilla-api-key', category='docker',
+             description='Create and print an API key for a user')
+    @CommandArgument('cid', help='bmoweb container ID')
+    @CommandArgument('user', help='User to create key for')
+    def create_api_key(self, cid, user):
+        print(self.d.execute(cid, [
+            '/var/lib/bugzilla/bugzilla/scripts/issue-api-key.pl',
+            user,
+        ], stdout=True).strip())
