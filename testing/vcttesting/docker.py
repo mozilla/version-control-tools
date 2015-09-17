@@ -895,16 +895,16 @@ class Docker(object):
             if start_hgrb:
                 f_hgrb_create = e.submit(self.client.create_container,
                                          hgrb_image,
-                                         command=['/run.sh'],
+                                         ports=[22, 80],
                                          entrypoint=['/entrypoint.py'],
-                                         ports=[22, 80])
+                                         command=['/usr/bin/supervisord', '-n'])
 
             if start_hgweb:
                 f_hgweb_create = e.submit(self.client.create_container,
                                           hgweb_image,
                                           ports=[80],
                                           entrypoint=['/entrypoint-solo'],
-                                          command=['/run.sh'])
+                                          command=['/usr/bin/supervisord', '-n'])
 
             if start_autoland:
                 f_autolanddb_create = e.submit(self.client.create_container,

@@ -1,12 +1,18 @@
 ---
-- name: Install Docker support scripts
+- name: install supervisor config
+  copy: src=supervisor-docker.conf
+        dest=/etc/supervisor.d/docker.conf
+        owner=root
+        group=root
+        mode=0644
+
+- name: install Docker support scripts
   copy: src={{ item }} dest=/{{ item }} mode=0755
   with_items:
     - create-repo
     - entrypoint.py
     - kill-wsgi-procs
     - refresh
-    - run.sh
     - set-strip-users
     - set-urls
 

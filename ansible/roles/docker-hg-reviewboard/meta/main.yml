@@ -1,3 +1,4 @@
 ---
 dependencies:
+  - supervisor
   - { role: hg-reviewboard, wsgi_processes: 2 }
