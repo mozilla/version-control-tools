@@ -1,5 +1,6 @@
 ---
 dependencies:
+  - supervisor
   - { role: hg-web,
       mirror_source: "@mirror_source@",
       mirror_ssh_user: hg,

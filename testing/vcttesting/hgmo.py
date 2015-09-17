@@ -124,7 +124,7 @@ class HgCluster(object):
                                               web_image,
                                               ports=[22, 80],
                                               entrypoint=['/entrypoint.py'],
-                                              command=['/run.sh']))
+                                              command=['/usr/bin/supervisord', '-n']))
 
             ldap_id = f_ldap_create.result()['Id']
             master_id = f_master_create.result()['Id']
