@@ -1,11 +1,7 @@
 ---
-- name: install supervisor
-  yum: name=supervisor
-       state=present
-
 - name: install supervisor config
-  copy: src=supervisord.conf
-        dest=/etc/supervisord.conf
+  copy: src=supervisor-docker.conf
+        dest=/etc/supervisor.d/docker.conf
         owner=root
         group=root
         mode=0644

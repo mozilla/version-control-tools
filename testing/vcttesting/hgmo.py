@@ -116,7 +116,7 @@ class HgCluster(object):
                                        master_image,
                                        environment=env,
                                        entrypoint=['/entrypoint.py'],
-                                       command=['/usr/bin/supervisord'],
+                                       command=['/usr/bin/supervisord', '-n'],
                                        ports=[22])
             f_web_creates = []
             for i in range(web_count):

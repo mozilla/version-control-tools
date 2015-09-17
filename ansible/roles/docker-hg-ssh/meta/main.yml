@@ -1,5 +1,6 @@
 ---
 dependencies:
+  - supervisor
   # hgweb_hosts is used to populate SSH host keys. We don't know these
   # until Docker containers have started, so make it empty.
   - { role: hg-ssh, hgweb_hosts: [] }
