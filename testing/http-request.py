@@ -29,6 +29,8 @@ def main(args):
         help='HTTP Basic auth username to add to request')
     parser.add_argument('--basic-password',
         help='HTTP Basic auth password to add to request')
+    parser.add_argument('--request-header', action='append', default=[],
+        help='HTTP request header to add')
     parser.add_argument('url',
         help='URL to fetch')
 
@@ -48,6 +50,10 @@ def main(args):
         path = '%s?%s' % (path, url.query)
 
     headers = {}
+
+    for h in args.request_header:
+        key, value = h.split(':', 1)
+        headers[key] = value.strip()
 
     if args.basic_username and args.basic_password:
         s = '%s:%s' % (args.basic_username, args.basic_password)
