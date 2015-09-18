@@ -7,6 +7,7 @@
 
 from __future__ import print_function
 
+import base64
 import httplib
 import sys
 import urlparse
@@ -24,6 +25,10 @@ def main(args):
         help='Do not display any header info.')
     parser.add_argument('--method', default='GET',
         help='HTTP method')
+    parser.add_argument('--basic-username',
+        help='HTTP Basic auth username to add to request')
+    parser.add_argument('--basic-password',
+        help='HTTP Basic auth password to add to request')
     parser.add_argument('url',
         help='URL to fetch')
 
@@ -41,7 +46,15 @@ def main(args):
     path = url.path
     if url.query:
         path = '%s?%s' % (path, url.query)
-    conn.request(args.method, path)
+
+    headers = {}
+
+    if args.basic_username and args.basic_password:
+        s = '%s:%s' % (args.basic_username, args.basic_password)
+        s = base64.encodestring(s).replace('\n', '')
+        headers['Authorization'] = 'Basic %s' % s
+
+    conn.request(args.method, path, headers=headers)
     response = conn.getresponse()
     print(response.status)
 
