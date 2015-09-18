@@ -98,7 +98,8 @@ The parent review should have its description updated.
   approved: false
   approval_failure: The review request is not public.
   draft:
-    bugs: []
+    bugs:
+    - '1'
     commit: bz://1/mynick
     summary: bz://1/mynick
     description: This is the parent review request
