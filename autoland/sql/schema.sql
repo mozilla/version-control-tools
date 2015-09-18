@@ -30,6 +30,7 @@ create table Transplant (\
     landed boolean,\
     result text,\
     pingback_url text,\
+    last_updated timestamp,\
     primary key(id)\
 );
 grant all privileges on table Transplant to autoland;

@@ -22,8 +22,14 @@ from mozlog.structured import commandline
 import transplant
 import treestatus
 
-GITHUB_COMMENT_LIMIT = 10  # max updates to post to github / iteration
-MOZREVIEW_COMMENT_LIMIT = 10  # max updates to post to reviewboard / iteration
+# max updates to post to github / iteration
+GITHUB_COMMENT_LIMIT = 10
+
+# max updates to post to reviewboard / iteration
+MOZREVIEW_COMMENT_LIMIT = 10
+
+# time to wait before retrying a transplant
+TRANSPLANT_RETRY_DELAY = datetime.timedelta(minutes=5)
 
 
 def handle_pending_mozreview_pullrequests(logger, dbconn):
@@ -43,7 +49,7 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
     """
     cursor.execute(query)
 
-    landed_revisions = []
+    finished_revisions = []
     mozreview_updates = []
     for row in cursor.fetchall():
         (transplant_id, ghuser, repo, pullrequest, destination, bzuserid,
@@ -58,7 +64,7 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
             if bugs:
                 bugid = bugs[0]
                 logger.info('using bug %s from issue title' % bugid)
-                landed_revisions.append([bugid, None, None, transplant_id])
+                finished_revisions.append([bugid, None, None, transplant_id])
 
         # still no luck, attempt to autofile a bug on the user's behalf
         if bugid is None:
@@ -91,11 +97,11 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
                     b.put(bug)
                     bugid = bug.id
                     logger.info('created bug: %s ' % bugid)
-                    landed_revisions.append([bugid, None, None, transplant_id])
+                    finished_revisions.append([bugid, None, None, transplant_id])
                 except bugsy.BugsyException as e:
                     logger.info('transplant failed: could not create new bug: %s '
                                 % e.msg)
-                    landed_revisions.append([None, False, e.msg, transplant_id])
+                    finished_revisions.append([None, False, e.msg, transplant_id])
 
                     # set up data to be posted back to mozreview
                     data = {
@@ -126,7 +132,7 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
                          ' destination: %s error: %s') %
                         (ghuser, repo, pullrequest, destination, result))
 
-        landed_revisions.append([bugid, landed, result, transplant_id])
+        finished_revisions.append([bugid, landed, result, transplant_id])
 
         # set up data to be posted back to mozreview
         data = {
@@ -144,12 +150,12 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
 
         mozreview_updates.append([transplant_id, pingback_url, json.dumps(data)])
 
-    if landed_revisions:
+    if finished_revisions:
         query = """
             update MozreviewPullRequest set bugid=%s,landed=%s,result=%s
             where id=%s
         """
-        cursor.executemany(query, landed_revisions)
+        cursor.executemany(query, finished_revisions)
         dbconn.commit()
 
     if mozreview_updates:
@@ -163,21 +169,41 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
 
 def handle_pending_transplants(logger, dbconn):
     cursor = dbconn.cursor()
-
+    now = datetime.datetime.now()
     query = """
         select id,tree,rev,destination,trysyntax,push_bookmark,pingback_url
         from Transplant
-        where landed is null
+        where landed is null and (last_updated is null
+            or last_updated<=%(time)s)
     """
-    cursor.execute(query)
+    cursor.execute(query, ({'time': now - TRANSPLANT_RETRY_DELAY}))
 
-    landed_revisions = []
+    current_treestatus = {}
+    finished_revisions = []
     mozreview_updates = []
+    retry_revisions = []
+
+    # This code is a bit messy because we have to deal with the fact that the
+    # the tree could close between the call to tree_is_open and when we
+    # actually attempt the revision.
+    #
+    # We keep a list of revisions to retry called retry_revisions which we
+    # append to whenever we detect a closed tree. These revisions have their
+    # last_updated field updated so we will retry them after a suitable delay.
+    #
+    # The other list we keep is for transplant attempts that either succeeded
+    # or failed due to a reason other than a closed tree, which is called
+    # finished_revisions. Successful or not, we're finished with them, they
+    # will not be retried.
     for row in cursor.fetchall():
         (transplant_id, tree, rev, destination, trysyntax, push_bookmark,
             pingback_url) = row
 
-        if not treestatus.tree_is_open(destination):
+        tree_open = current_treestatus.setdefault(destination,
+                                                  treestatus.tree_is_open(destination))
+
+        if not tree_open:
+            retry_revisions.append((now, transplant_id))
             continue
 
         landed, result = transplant.transplant(tree, destination, rev,
@@ -189,10 +215,9 @@ def handle_pending_transplants(logger, dbconn):
         else:
             if 'is CLOSED!' in result:
                 logger.info('transplant failed: tree: %s is closed - '
-                             ' retrying later.' % tree)
-
-                # continuing here will skip updating the autoland request
-                # so we will attempt to land it again later.
+                            ' retrying later.' % tree)
+                current_treestatus[destination] = False
+                retry_revisions.append((now, transplant_id))
                 continue
             else:
                 logger.info('transplant failed: tree: %s rev: %s '
@@ -218,14 +243,22 @@ def handle_pending_transplants(logger, dbconn):
 
         mozreview_updates.append([transplant_id, pingback_url, json.dumps(data)])
 
-        landed_revisions.append([landed, result, transplant_id])
+        finished_revisions.append([landed, result, transplant_id])
 
-    if landed_revisions:
+    if retry_revisions:
+        query = """
+            update Transplant set last_updated=%s
+            where id=%s
+        """
+        cursor.executemany(query, retry_revisions)
+        dbconn.commit()
+
+    if finished_revisions:
         query = """
             update Transplant set landed=%s,result=%s
             where id=%s
         """
-        cursor.executemany(query, landed_revisions)
+        cursor.executemany(query, finished_revisions)
         dbconn.commit()
 
     if mozreview_updates:
