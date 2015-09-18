@@ -22,6 +22,8 @@ def main(args):
         help='Display only headers in this list. Values can be comma delimited.')
     parser.add_argument('--no-headers', action='store_true',
         help='Do not display any header info.')
+    parser.add_argument('--method', default='GET',
+        help='HTTP method')
     parser.add_argument('url',
         help='URL to fetch')
 
@@ -39,11 +41,11 @@ def main(args):
     path = url.path
     if url.query:
         path = '%s?%s' % (path, url.query)
-    conn.request('GET', path)
+    conn.request(args.method, path)
     response = conn.getresponse()
     print(response.status)
 
-    for header, value in response.getheaders():
+    for header, value in sorted(response.getheaders()):
         if not args.no_headers and (all_headers or header in display_headers):
             print('%s: %s' % (header, value))
 
