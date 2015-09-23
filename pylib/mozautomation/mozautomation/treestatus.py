@@ -66,7 +66,7 @@ class TreeStatusClient(object):
     open or closed.
     """
 
-    def __init__(self, base_uri='https://treestatus.mozilla.org/', opener=None):
+    def __init__(self, base_uri='https://api.pub.build.mozilla.org/treestatus/', opener=None):
         self._base_uri = base_uri
 
         if opener is None:
@@ -77,7 +77,7 @@ class TreeStatusClient(object):
     def _request(self, path):
         request = urllib2.Request('%s%s' % (self._base_uri, path), None)
         response = self._opener.open(request)
-        return json.load(response)
+        return json.load(response)['result']
 
     def all(self):
         """Obtain the status of all trees.
@@ -85,7 +85,7 @@ class TreeStatusClient(object):
         Returns a dict of tree names to TreeStatus instances.
         """
 
-        o = self._request('?format=json')
+        o = self._request('/trees')
         trees = {}
         for k, v in o.items():
             trees[k] = TreeStatus(v)
@@ -97,12 +97,12 @@ class TreeStatusClient(object):
 
         Returns a TreeStatus instance.
         """
-        o = self._request('%s?format=json' % tree)
+        o = self._request('/trees/%s' % tree)
         return TreeStatus(o)
 
     def tree_logs(self, tree):
-        o = self._request('%s/logs?format=json' % tree)
+        o = self._request('/trees/%s/logs' % tree)
 
-        for d in o['logs']:
+        for d in o:
             yield TreeLog(d)
 
