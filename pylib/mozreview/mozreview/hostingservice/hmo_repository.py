@@ -50,3 +50,14 @@ class HMORepository(HostingService):
 
     def is_authorized(self):
         return True
+
+    # This needs to be overridden here because the version defined in
+    # HostingService drops kwargs which causes the base_commit_id to be lost,
+    # which in turns causes the tip revision to always be retrieved, breaking
+    # diffs. To be safe, we also override get_file_exists which could also be
+    # affected by this. See Bug 1208213.
+    def get_file(self, repository, path, revision, *args, **kwargs):
+        return repository.get_scmtool().get_file(path, revision, **kwargs)
+
+    def get_file_exists(self, repository, path, revision, *args, **kwargs):
+        return repository.get_scmtool().file_exists(path, revision, **kwargs)

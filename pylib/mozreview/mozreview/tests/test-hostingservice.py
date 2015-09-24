@@ -41,6 +41,17 @@ class HostingServiceTest(MozReviewWebDriverTest):
         self.assertEqual(el.get_attribute('data-has-try-repository'),
                          'true')
 
+        # Make sure that diffs work as expected
+        lr.write('foo', 'second change')
+        lr.run(['commit', '-m', 'Bug 1 - Test try'])
+        lr.run(['push'])
+
+        self.load_rburl('r/3/diff')
+        diff_box = self.browser.find_element_by_class_name('diff-box')
+
+        self.assertFalse('There was an error displaying this diff.'
+                         in diff_box.text)
+
     def test_create_hostingservice(self):
         self.reviewboard_login('admin@example.com', 'password')
         self.load_rburl('/admin/db/scmtools/repository/add/')
