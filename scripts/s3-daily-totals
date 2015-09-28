@@ -27,6 +27,9 @@ def get_s3_daily_totals(day):
             if parts[7] != 'REST.GET.OBJECT':
                 continue
 
+            if parts[12] == '304':
+                continue
+
             total += int(parts[14])
 
     return total
