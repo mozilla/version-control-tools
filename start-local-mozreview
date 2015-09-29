@@ -5,7 +5,7 @@
 # order for the environment variables to be set correctly.
 set -e
 
-TEST_MOZREVIEW_NAME=../mozreview-test
+TEST_MOZREVIEW_NAME=mozreview-test
 TEST_REPO_NAME=local-mozreview-test-repo
 
 VCT_PATH=`pwd`
