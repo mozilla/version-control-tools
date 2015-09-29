@@ -167,7 +167,7 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
         #       which means we can remove the use of queues here
         cmds.extend([['qpop', '--all'],
                      ['qdelete', 'try'],
-                     ['qnew', 'try', '-m', '"' + trysyntax + '"'],
+                     ['qnew', 'try', '-m', trysyntax],
                      ['log', '-r', 'qtip', '-T', '{node|short}'],
                      ['push', '-r', '.', '-f', 'try'],
                      ['qpop'],
