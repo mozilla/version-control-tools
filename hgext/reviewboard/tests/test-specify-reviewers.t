@@ -31,6 +31,11 @@ exercise the code path where multiple users are returned for a query.
   $ mozreview create-user remus2@example.com password 'Remus2 :remus2'
   Created user 8
 
+We create a user who has decided to capitalize their ircnick.
+
+  $ mozreview create-user ryanvm@example.com password 'Ryan :RyanVM'
+  Created user 9
+
 Try a bunch of different ways of specifying a reviewer
 
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
@@ -354,7 +359,7 @@ again.
   $ rbmanage list-reviewers 11
   admin+1, remus, romulus
 
-We should not overwrite manually added reviewers if the revision is amended 
+We should not overwrite manually added reviewers if the revision is amended
 and pushed with no reviewers specified.
 
   $ rbmanage list-reviewers 11
@@ -538,6 +543,33 @@ from the client.
   review id:  bz://2/mynick
   review url: http://*:$HGPORT1/r/12 (draft) (glob)
   (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
+
+Reviewer identification should be case insensitive.
+
+  $ echo blah >> foo
+  $ hg commit -m 'Bug 2 - better stuff; r?ryanvm'
+  $ hg push -c 29
+  pushing to ssh://172.17.42.1:$HGPORT6/test-repo
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+  submitting 1 changesets for review
+  
+  changeset:  29:ba1b0ae3cf0a
+  summary:    Bug 2 - better stuff; r?ryanvm
+  review:     http://172.17.42.1:$HGPORT1/r/13 (draft)
+  
+  review id:  bz://2/mynick
+  review url: http://172.17.42.1:$HGPORT1/r/12 (draft)
+  
+  publish these review requests now (Yn)? y
+  (published review request 12)
+
+  $ rbmanage list-reviewers 13
+  RyanVM
 
 Cleanup
 

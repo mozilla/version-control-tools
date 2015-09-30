@@ -182,26 +182,24 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
                 r = api_root.get_users(q=reviewer)
                 rsp_users = r.rsp['users']
 
-                if not rsp_users:
-                    hgresp.append('display unrecognized reviewer: %s' %
-                                  reviewer)
-                elif len(rsp_users) == 1:
-                    username = r.rsp['users'][0]['username']
-                    if reviewer == username:
+                # first try exact match
+                for user in rsp_users:
+                    username = user['username']
+                    if username == reviewer:
                         reviewers.add(username)
                         squashed_reviewers.add(username)
+                        break
+                else:
+                    # then attempt case insensitive match
+                    for user in rsp_users:
+                        username = user['username']
+                        if username.lower() == reviewer.lower():
+                            reviewers.add(username)
+                            squashed_reviewers.add(username)
+                            break
                     else:
                         hgresp.append('display unrecognized reviewer: %s' %
                                       reviewer)
-                elif len(rsp_users) > 1:
-                    # If we get multiple users, we'll look for an exact match.
-                    # It would be nice to use this at first, but we seem to
-                    # need the call to get_users in order to synchronize our
-                    # users with bugzilla.
-                    r = users.get_item(reviewer)
-                    username = r.rsp['user']['username']
-                    reviewers.add(username)
-                    squashed_reviewers.add(username)
             except APIError as e:
                 if e.http_status == 404 and e.error_code == 100:
                     hgresp.append('display unrecognized reviewer: %s' %
