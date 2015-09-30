@@ -1,7 +1,10 @@
 $(document).on("mozreview_ready", function() {
   // TODO: Stop hardcoding endpoint urls and provide them in a template.
   var TRY_AUTOLAND_URL = "/api/extensions/mozreview.extension.MozReviewExtension/try-autoland-triggers/";
+  var AUTOLAND_URL = "/api/extensions/mozreview.extension.MozReviewExtension/autoland-triggers/";
+
   var try_trigger = $("#autoland-try-trigger");
+  var autoland_trigger = $("#autoland-trigger");
 
   if ($("#draft-banner").is(":visible")) {
     try_trigger.attr('title', 'Try builds cannot be triggered on draft review requests');
@@ -103,4 +106,6 @@ $(document).on("mozreview_ready", function() {
       return false;
     });
   }
+
+  autoland_trigger.attr('title', 'Autolanding is disabled');
 });

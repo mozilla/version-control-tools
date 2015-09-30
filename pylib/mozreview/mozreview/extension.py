@@ -156,10 +156,15 @@ class MozReviewExtension(Extension):
                 {
                     'id': 'autoland-try-trigger',
                     'label': 'Trigger a Try Build',
-                    'url': '#'
-                }
-            ]
-        }
+                    'url': '#',
+                },
+                {
+                    'id': 'autoland-trigger',
+                    'label': 'Land Commits',
+                    'url': '#',
+                },
+            ],
+        },
         ])
 
         # Start by hiding the Testing Done field in all review requests,
