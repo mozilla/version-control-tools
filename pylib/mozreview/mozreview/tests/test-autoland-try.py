@@ -57,8 +57,9 @@ class AutolandTryTest(MozReviewWebDriverTest):
         # with an associated try repository.
         self.reviewboard_login('mjane@example.com', 'password2')
         self.load_rburl('r/1')
-        automation_menu = self.browser.find_element_by_id('automation-menu')
-        self.assertFalse(automation_menu.is_displayed())
+        try_btn = self.browser.find_element_by_id('autoland-try-trigger')
+        self.assertEqual(
+            try_btn.value_of_css_property('opacity'), '0.5')
         self.add_hostingservice(1, 'Sirius Black', 'scm_level_1',
                                 'ssh://hg.example.com/try')
 
@@ -66,8 +67,9 @@ class AutolandTryTest(MozReviewWebDriverTest):
         # published.
         self.reviewboard_login('mjane@example.com', 'password2')
         self.load_rburl('r/1')
-        automation_menu = self.browser.find_element_by_id('automation-menu')
-        self.assertFalse(automation_menu.is_displayed())
+        try_btn = self.browser.find_element_by_id('autoland-try-trigger')
+        self.assertEqual(
+            try_btn.value_of_css_property('opacity'), '0.5')
         self.assign_reviewer(0, 'jsmith')
         publish_btn = self.browser.find_element_by_id('btn-draft-publish')
         publish_btn.click()
@@ -78,6 +80,8 @@ class AutolandTryTest(MozReviewWebDriverTest):
         automation_menu = self.browser.find_element_by_id('automation-menu')
         automation_menu.click()
         try_btn = self.browser.find_element_by_id('autoland-try-trigger')
+        self.assertEqual(
+            try_btn.value_of_css_property('opacity'), '1')
 
         # Clicking the button should display a trychooser dialog
         try_btn.click()
