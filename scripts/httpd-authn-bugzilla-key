@@ -1,0 +1,123 @@
+#!/usr/bin/env python2.7
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script authenticates a Bugzilla username and API key.
+# It was originally invented to be used by mod_authnz_external in httpd
+# to validate HTTP requests.
+#
+# mod_authnz_external will execute this script with a Bugzilla URL (which we
+# configure in httpd.conf). It will pass the username and password on separate
+# lines via stdin. It will close the stdin pipe once these credentials are
+# written. Exit 0 means authentication success. Other codes mean failure.
+
+from __future__ import absolute_import, print_function, unicode_literals
+
+import argparse
+import os
+import sys
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+ROOT = os.path.normpath(os.path.join(HERE, '..'))
+
+sys.path.insert(0, os.path.join(ROOT, 'pylib/requests'))
+
+import requests
+from requests.packages.urllib3.poolmanager import PoolManager
+
+USER_AGENT = 'MozReview API Key Validator'
+BMO_FINGERPRINT = 'f9:7e:62:42:4e:38:79:96:ca:87:71:2a:f8:51:38:c8:16:92:5c:a7'
+
+
+class FingerprintAdaptor(requests.adapters.HTTPAdapter):
+    """Verifies pinned certificate fingerprint."""
+    def __init__(self, fingerprint, **kwargs):
+        self.fingerprint = fingerprint
+        super(FingerprintAdaptor, self).__init__(**kwargs)
+
+    def init_poolmanager(self, connections, maxsize, **kwargs):
+        self.poolmanager = PoolManager(num_pools=connections,
+                                       maxsize=maxsize,
+                                       assert_fingerprint=self.fingerprint,
+                                       strict=True,
+                                       **kwargs)
+
+
+def validate_api_key(bugzilla_url, username, api_key):
+    """Validate a Bugzilla username and API key.
+
+    Returns 0 if successful. 1 otherwise.
+
+    May raise in case of exception errors.
+    """
+    session = requests.Session()
+
+    # Pin BMO certificate out of paranoia, otherwise a MiTM could intercept valid
+    # API Keys.
+    if bugzilla_url == 'https://bugzilla.mozilla.org':
+        session.mount('https://', FingerprintAdaptor(BMO_FINGERPRINT))
+
+    url = '%s/rest/valid_login' % bugzilla_url
+
+    params = {
+        'login': username,
+        'api_key': api_key,
+    }
+
+    headers = {
+        'Accept': 'application/json',
+        'User-Agent': USER_AGENT,
+    }
+
+    r = session.get(url, headers=headers, params=params)
+
+    if not r.headers['Content-Type'].startswith('application/json'):
+        print('did not receive JSON response: %s' % r.headers['Content-Type'],
+              file=sys.stderr)
+        return 1
+
+    j = r.json()
+
+    if r.status_code != 200:
+        code = j.get('code', None)
+        print('received HTTP status code %s; Bugzilla code %s' % (
+            r.status_code, code), file=sys.stderr)
+        return 1
+
+    if r.json() is not True:
+        print('not valid API key')
+        return 1
+
+    return 0
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('url', help='Bugzilla URL')
+    parser.add_argument('--allow-plaintext', action='store_true',
+            help='Allow plain text HTTP requests')
+
+    args = parser.parse_args()
+
+    bugzilla_url = args.url.rstrip()
+
+    if not bugzilla_url.startswith(('http://', 'https://')):
+        print('Bugzilla URL is not HTTP: %s' % bugzilla_url, file=sys.stderr)
+        sys.exit(1)
+
+    if not bugzilla_url.startswith('https://') and not args.allow_plaintext:
+        print('Refusing to use plain text URL for security reasons: %s' %
+              bugzilla_url)
+        sys.exit(1)
+
+    stdin = sys.stdin.read()
+    lines = stdin.splitlines()
+    if len(lines) != 2:
+        print('Expected 2 lines on stdin; got %d' % len(lines),
+              file=sys.stderr)
+        sys.exit(1)
+
+    username, api_key = lines
+
+    sys.exit(validate_api_key(bugzilla_url, username, api_key))
