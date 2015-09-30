@@ -475,10 +475,38 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
         ui.status('(not updating pushlog since changesets come from %s)\n' % source)
         return 0
 
+    # REMOTE_USER comes from authenticated Apache httpd request.
+    # USER comes from SSH.
+    # Both are implicitly trusted.
+    # Since the usernames could come from separate auth databases, we support
+    # prefixing the user with an identifier to distinguish which source the
+    # user came from.
+
+    # WSGI environment variables are passed in as part of the request data.
+    # hgweb sets the WSGI environment variables on ui.environ but not in
+    # os.environ. For SSH, ui.environ should be equivalent to os.environ.
+    remoteuser = ui.environ.get('REMOTE_USER', os.environ.get('REMOTE_USER'))
+    user = os.environ.get('USER')
+    if not remoteuser and not user:
+        ui.write('authenticated user not found; '
+                 'refusing to write into pushlog\n')
+        return 1
+
+    remoteprefix = ui.config('pushlog', 'remoteuserprefix')
+    userprefix = ui.config('pushlog', 'userprefix')
+
+    if remoteprefix and remoteuser:
+        remoteuser = '%s:%s' % (remoteprefix, remoteuser)
+
+    if userprefix and user:
+        user = '%s:%s' % (userprefix, user)
+
+    pushuser = remoteuser or user
+
     try:
         t = int(time.time())
         revs = range(repo[node].rev(), len(repo))
-        repo.pushlog.recordpush(revs, os.environ['USER'], t)
+        repo.pushlog.recordpush(revs, pushuser, t)
         ui.write('recorded push in pushlog\n')
         return 0
     except Exception:
