@@ -95,7 +95,7 @@ class MozReviewExtension(Extension):
             'source_filenames': ['mozreview/js/init_rr.js',
                                  'mozreview/js/commits.js',
                                  'mozreview/js/review.js',
-                                 'mozreview/js/try.js',
+                                 'mozreview/js/autoland.js',
                                  'mozreview/js/ui.mozreviewautocomplete.js',]
         },
         'import-pullrequest': {

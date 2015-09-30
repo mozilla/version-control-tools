@@ -44,7 +44,7 @@ class AutolandTryTest(MozReviewWebDriverTest):
 
     def test_autoland_try(self):
         # We currently have four conditions for enabling the 'automation' menu
-        # and try button (see static/mozreview/js/try.js):
+        # and try button (see static/mozreview/js/autoland.js):
         # 1. The review must be published
         # 2. The review must be mutable by the current user
         # 3. The user must have scm_level_1 or higher
