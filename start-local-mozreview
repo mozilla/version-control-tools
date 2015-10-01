@@ -3,7 +3,6 @@
 # and a properly configured mercurial repository for pushing reviews.
 # You need to source this script (e.g. run with ". start-local-mozreview") in
 # order for the environment variables to be set correctly.
-set -e
 
 TEST_MOZREVIEW_NAME=mozreview-test
 TEST_REPO_NAME=local-mozreview-test-repo
