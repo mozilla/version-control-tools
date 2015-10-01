@@ -283,3 +283,44 @@ class MozReviewCommands(object):
                               'autoland', 'treestatus'})
     def shell(self, name):
         return self.execute(name, ['/bin/bash'])
+
+    @Command('use-local-reviewboard', category='mozreview',
+             description='Replace version of reviewboard on rbweb container '
+                         'with version from specified path')
+    @CommandArgument('where', nargs='?',
+                     help='Directory of MozReview instance')
+    @CommandArgument('path', help='Relative path of repository')
+    def use_local_reviewboard(self, where, path):
+        import glob
+        import tarfile
+
+        # TODO: We should automatically determine the version of python on
+        #       rbweb and attempt to build using the same version, rather than
+        #       hard coding the destination and building with the system
+        #       python.
+        # TODO: We should also make it possible to update djblets, either from
+        #       this command or through another one.
+        # TODO: This whole thing is a bit of a hack, use at your own risk.
+        rbweb_site_packages = '/venv/lib/python2.6/site-packages'
+
+        print('building reviewboard package')
+        subprocess.check_call(['python', 'setup.py', 'build'], cwd=path)
+        built_path = glob.glob(os.path.join(path, 'build', 'lib*'))[0]
+        cwd = os.getcwd()
+        os.chdir(built_path)
+        with tarfile.open(os.path.join(cwd, 'rb.tgz'), 'w|gz') as tar:
+            tar.add('reviewboard')
+        os.chdir(cwd)
+
+        mr = self._get_mozreview(where)
+
+        print('copying files to rbweb container')
+        subprocess.check_call('docker cp rb.tgz %s:rb.tgz' % mr.rbweb_id,
+                              shell=True)
+        subprocess.check_call('docker exec %s tar -C %s -zxf /rb.tgz' % (
+                              mr.rbweb_id, rbweb_site_packages),
+                              shell=True)
+
+        print('restarting rbweb container')
+        subprocess.check_call('docker exec %s /kill-wsgi-procs' % mr.rbweb_id,
+                              shell=True)
