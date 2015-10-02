@@ -18,4 +18,8 @@ $(document).on("mozreview_ready", function() {
   // Change string of "Review" button to be a verb so people better
   // understand what clicking it does.
   $("#review-link").text("Finish Review...");
+
+  if (MozReview.isParent) {
+    $('#review_request_extra').prepend(MRParents.parentWarning);
+  }
 });

@@ -5,7 +5,7 @@ import logging
 from django.conf.urls import include, patterns, url
 from django.db.models.signals import post_save
 
-from reviewboard.extensions.base import Extension
+from reviewboard.extensions.base import Extension, JSExtension
 from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
                                           HostingServiceHook,
                                           ReviewRequestDropdownActionHook,
@@ -50,6 +50,11 @@ from mozreview.resources.review_request_summary import (
     review_request_summary_resource,)
 
 
+class ParentJSExtension(JSExtension):
+    model_class = 'MRParents.Extension'
+    apply_to = review_request_url_names
+
+
 class MozReviewExtension(Extension):
     metadata = {
         'Name': 'mozreview',
@@ -76,6 +81,8 @@ class MozReviewExtension(Extension):
 
     is_configurable = True
 
+    js_extensions = [ParentJSExtension]
+
     css_bundles = {
         'default': {
             'source_filenames': ['mozreview/css/common.less'],
@@ -100,6 +107,10 @@ class MozReviewExtension(Extension):
                                  'mozreview/js/review.js',
                                  'mozreview/js/autoland.js',
                                  'mozreview/js/ui.mozreviewautocomplete.js',]
+        },
+        'parent-review-requests': {
+            'source_filenames': ['mozreview/js/parents.js'],
+            'apply_to': review_request_url_names,
         },
         'import-pullrequest': {
             'source_filenames': ['mozreview/js/import-pullrequest.js',],
