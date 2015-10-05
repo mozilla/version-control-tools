@@ -421,7 +421,10 @@ def extsetup(ui):
     }
 
     templatekw.keywords.update(keywords)
-    templatekw.dockeywords.update(keywords)
+
+    # dockeywords was removed in 3.6.
+    if hasattr(templatekw, 'dockeywords'):
+        templatekw.dockeywords.update(keywords)
 
 
 def reposetup(ui, repo):
