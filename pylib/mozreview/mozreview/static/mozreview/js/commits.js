@@ -270,7 +270,7 @@ $(document).on("mozreview_ready", function() {
       if (response.results.length != 1) {
         $(actionHeading).text('Error fetching the results for '+revision+' from Treeherder');
         $(elem).addClass('action-failure')
-        if (response.results.lenght == 0) {
+        if (response.results.length == 0) {
           $(actionMeta).text('Revision not found');
         } else {
           $(actionMeta).text('Too many results found');
