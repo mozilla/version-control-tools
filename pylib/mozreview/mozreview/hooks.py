@@ -56,7 +56,16 @@ class MozReviewApprovalHook(ReviewRequestApprovalHook):
 
     def is_approved_parent(self, review_request):
         """Check approval for a parent review request"""
-        for rr in gen_child_rrs(review_request):
+        children = [gen_child_rrs(review_request)]
+
+        if not children:
+            # This parent review request had no children, so it's either
+            # private or something has gone seriously wrong.
+            logging.error('Review request %s has no children' %
+                          review_request.id)
+            return False, 'Review request has no children.'
+
+        for rr in children:
             if not rr.approved:
                 commit_id = rr.extra_data.get(COMMIT_ID_KEY, None)
 
@@ -65,12 +74,6 @@ class MozReviewApprovalHook(ReviewRequestApprovalHook):
                     return False, 'A Commit is not approved.'
 
                 return False, 'Commit %s is not approved.' % commit_id
-        else:
-            # This parent review request had no children, so it's either
-            # private or something has gone seriously wrong.
-            logging.error('Review request %s has no children' %
-                          review_request.id)
-            return False, 'Review request has no children.'
 
         return True
 
