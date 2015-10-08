@@ -4,6 +4,62 @@
 Configuring Your Machine to Use MozReview
 =========================================
 
+Obtaining Accounts, Credentials, and Privileges
+===============================================
+
+Pushing to MozReview to **initiate** code review requires the following:
+
+* An active ``bugzilla.mozilla.org`` (BMO) account
+* A BMO API Key
+* A Mozilla LDAP account with Mercurial access
+
+A BMO account can be created at https://bugzilla.mozilla.org/createaccount.cgi.
+
+Once you have an account, visit
+https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey to generate a new
+API Key. The API Key can have any description you want. We recommend
+something like ``mercurial``. The API Key won't be used until later, so
+you don't have to generate it right away.
+
+Instructions for obtaining a Mozilla LDAP account with Mercurial access
+are documented at
+`Becoming A Mozilla Contributor <https://www.mozilla.org/en-US/about/governance/policies/commit/>`_.
+
+Once you have all these accounts and privileges, you are ready to
+configure your client.
+
+Updating SSH Config
+===================
+
+You will want to configure your SSH username for
+``reviewboard-hg.mozilla.org``. See :ref:`auth_ssh` for instructions.
+
+.. tip::
+
+   If you have already configured ``hg.mozilla.org`` in your SSH config,
+   just copy the settings to ``reviewboard-hg.mozilla.org``.
+
+As of October 2015, the SSH fingerprint for the RSA key is
+``a6:13:ae:35:2c:20:2b:8d:f4:8d:8e:d7:a8:55:67:97``.
+
+Simple Client Configuration
+===========================
+
+If you already have a Firefox repository like
+`mozilla-central <https://hg.mozilla.org/mozilla-central>`_ cloned, you
+can run ``mach mercurial-setup`` from it and a guided wizard will walk
+you through configuring Mercurial for optimal use at Mozilla.
+Configuring Mercurial for MozReview is part of this wizard.
+
+.. important::
+
+   The wizard currently does not configure the ``autoreview``
+   repository. See :ref:`mozreview_install_autoreview` for how to do
+   this manually.
+
+If you don't have a Firefox repository, have no fear: just follow the
+instructions below.
+
 Installing the Mercurial Extension
 ==================================
 
@@ -21,49 +77,27 @@ your ``hgrc``. For example::
   reviewboard = ~/version-control-tools/hgext/reviewboard/client.py
   EOF
 
-.. tip::
+.. note::
 
-   If you already have a Firefox repository like
-   `mozilla-central <https://hg.mozilla.org/mozilla-central>`_ cloned, you
-   can run ``mach mercurial-setup`` and the guided wizard will prompt you
-   for code review settings. Follow the prompts and this configuration
-   will be done for you.
-
-.. note:: The Mercurial extension requires Mercurial 3.0 or above.
-
-   Running the most recent released version of Mercurial is strongly
-   recommended. New major releases come out every 3 months. New minor
-   releases come every month.
-
-   As of November 2014, Mercurial 3.2 is the most recent and recommended
-   version.
-
-   If you are running an older Mercurial, please obtain a modern version
-   from the `official project page <http://mercurial.selenic.com/>`_.
+   You likely already have an ``[extensions]`` section in your Mercurial
+   configuration. Run ``hg config --edit --global`` (or ``hg config -e
+   -g`` for short) to open your global configuration in an editor and
+   add the aforementioned extension under the ``[extensions]`` section.
 
 Configuring the Mercurial Extension
 ===================================
 
-The *reviewboard* Mercurial extension requires some configuration before
-it can be used.
+The Mercurial extension requires additional Mercurial configuration file
+options before it can be used.
 
 Bugzilla Credentials
 --------------------
 
-Mozilla's Review Board deployment uses
-`Mozilla's Bugzilla deployment <https://bugzilla.mozilla.org/>`_ (BMO)
-for user authentication and authorization. In order to talk to Review
-Board, you will need to provide valid Bugzilla credentials.
-
-Bugzila credentials consist of a Bugzilla username (email address)
-and API key. To obtain an API key:
-
-1. Visit https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey in your
-   browser.
-2. Generate a new API key
-3. Add your username/email and API key to your hgrc file.
-
-A template to put in your hgrc file is as follows::
+You will need to define your BMO credentials in your Mercurial
+configuration in order to authenticate with MozReview. These are placed
+under the ``[bugzilla]`` section in your configuration file. Again,
+``hg config -e -g`` to open an editor and place something like the
+following in your config file::
 
   [bugzilla]
   ; Your Bugzilla username. This is an email address.
@@ -71,106 +105,82 @@ A template to put in your hgrc file is as follows::
   ; A Bugzilla API key
   apikey = ojQBGzhDmFYRFSX4xWNCSyOEsJKqisU0l0EJqXh6
 
+.. note::
+
+   You can generate or obtain an already-generated API Key from
+   https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey.
+
 IRC Nickname
 ------------
 
-The Mercurial extension and Review Board uses your IRC nickname as an
-identifier when creating reviews. You'll need to define it in your
-Mercurial config file. Add the following snippet to an ``hgrc`` file
-(likely the global one at ``~/.hgrc`` since your IRC nick is likely
-global)::
+MozReview currently uses your IRC nickname as an identifier when
+creating reviews. You will need to define it in your Mercurial
+configuration file under the ``[mozilla]`` section.
+
+Use the following as a template::
 
   [mozilla]
   ircnick = mynick
 
-Don't worry if you forget this: the extension will abort with an
-actionable message if it isn't set.
+Configuring Review Repositories/Paths
+=====================================
 
-.. note:: This requirement will eventually go away.
+You initiate code review in MozReview via ``hg push`` to a special
+review repository. You almost certainly want to define the URL you will
+be pushing to in your Mercurial configuration so you can type a short
+name (e.g. ``review``) rather than a full URL (which is longer and
+harder to remember).
 
-   Don't worry, the extension will tell you if your configuration needs
-   updating.
+The sections below describe how to do this.
 
-Review Repositories
-===================
+.. _mozreview_install_autoreview:
 
-The Mercurial extension initiates code review with Review Board by
-pushing changesets to a special code review repository that is attached
-to ``MozReview``.
+Configuring the Auto Review Repository
+--------------------------------------
 
-There are multiple code review repositories, one per *canonical*
-repository.
+There is a special repository called the ``autoreview`` repository that
+will automatically see what you are pushing and *redirect* your push to
+the appropriate code review repository. In other words, you don't need
+to configure a review path/remote for each clone: you simply define an
+alias to the ``autoreview`` repository in your global Mercurial
+configuration file and it should *just work*.
 
-Unless you like typing full URLs every time you push, you will want
-to configure a *path* in your ``hgrc`` file.
-
-Simple Configuration
---------------------
-
-If you push to ``ssh://reviewboard-hg.mozilla.org/autoreview``, your
-client will automatically figure out which review repository to push to.
-It doesn't matter which repository you are using: if there is a review
-repository configured, things will *just work*. If a review repository
-is not known, the push will fail.
-
-To configure the *auto review* repository, add an entry for this URL
-under the ``[paths]`` section of your ``~/.hgrc`` or ``.hg/hgrc`` file.
-We recommend the name ``review``. e.g.::
+Using ``hg config -e -g`` to edit your global Mercurial configuration
+file, add an entry under the ``[paths]`` section like so::
 
    [paths]
    review = ssh://reviewboard-hg.mozilla.org/autoreview
 
-.. warning::
+Now, you can ``hg push review`` from any Mercurial repository and it
+will go to the ``autoreview`` repository and redirect to the appropriate
+review repository automatically!
 
-   Attempting to push to the ``autoreview`` repository without configuring
-   the Mercurial extension (see above) will likely result in your client
-   attempting to push all history to the ``autoreview`` repository. The
-   server will reject the push, but not until all data has been transferred.
-   For Firefox repositories, this could take several minutes and consume
-   over a gigabyte of bandwidth!
-
-Advanced Configuration
-----------------------
+Advanced Paths Configuration
+----------------------------
 
 If the *auto review* repository is too much magic for you, you can
 define the review URL for each repository you wish to review from.
 
-You will want to define a named path in your per-repository ``.hg/hgrc``
-to the code review Mercurial repository. We recommend the name
-``review``. The URL for the repository should be
+.. important::
+
+   We highly recommend the ``autoreview`` repository because it is much
+   simpler to manage.
+
+You will want to define a named path in your per-repository hgrc file.
+We recommend the name ``review``. The URL for the repository should be
 ``ssh://reviewboard-hg.mozilla.org/<repo>`` where ``<repo>`` is
 the name of a repository. You can find the list of available repositories
 at https://reviewboard-hg.mozilla.org/. Just swap ``https://`` with
 ``ssh://``.
 
-An example ``.hg/hgrc`` fragment may look like::
+Edit your repository-local config via ``hg config -e`` and adjust your
+``[paths]`` section to resemble something like::
 
   [paths]
   default = https://hg.mozilla.org/hgcustom/version-control-tools
   default-push = ssh://hg.mozilla.org/hgcustom/version-control-tools
 
   review = ssh://reviewboard-hg.mozilla.org/version-control-tools
-
-.. tip::
-
-   If you have the `firefoxtree <firefoxtree>`_ Mercurial extension installed
-   and are working on a Firefox repository, you don't need to define the
-   ``review`` path: it is automatically defined when operating on a Firefox
-   repository.
-
-Updating SSH Config
-===================
-
-You will want to configure your SSH username for
-``reviewboard-hg.mozilla.org``. See :ref:`auth_ssh` for instructions.
-
-.. tip::
-
-   If you have already configured ``hg.mozilla.org`` in your SSH config,
-   just copy the settings to ``reviewboard-hg.mozilla.org``.
-
-As of December 2014, the SSH fingerprint for the RSA key is
-``a6:13:ae:35:2c:20:2b:8d:f4:8d:8e:d7:a8:55:67:97``.
 
 Host Fingerprint in hgrc
 ========================
