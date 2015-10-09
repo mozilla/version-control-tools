@@ -22,8 +22,8 @@
 Pushing to an open Thunderbird tree should succeed
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/comm-central-thunderbird?format=json
-  > {"status": "open", "reason": ""}
+  > https://api.pub.build.mozilla.org/treestatus/trees/comm-central-thunderbird
+  > {"result": {"status": "open", "reason": ""}}
   > EOF
 
   $ echo thunderbird > testfile
@@ -42,8 +42,8 @@ Pushing to an open SeaMonkey tree should succeed
 Note that paths under suite/ are treated as seamonkey
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/comm-central-seamonkey?format=json
-  > {"status": "open", "reason": ""}
+  > https://api.pub.build.mozilla.org/treestatus/trees/comm-central-seamonkey
+  > {"result": {"status": "open", "reason": ""}}
   > EOF
 
   $ mkdir -p suite/build
@@ -63,8 +63,8 @@ Pushing to an open calendar tree should succeed
 Note that paths under calendar/ query thunderbird
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/comm-central-thunderbird?format=json
-  > {"status": "open", "reason": ""}
+  > https://api.pub.build.mozilla.org/treestatus/trees/comm-central-thunderbird
+  > {"result": {"status": "open", "reason": ""}}
   > EOF
 
   $ mkdir -p calendar/app
@@ -83,8 +83,8 @@ Note that paths under calendar/ query thunderbird
 Pushing to a closed Thunderbird tree should fail
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/comm-central-thunderbird?format=json
-  > {"status": "closed", "reason": "splines won't reticulate"}
+  > https://api.pub.build.mozilla.org/treestatus/trees/comm-central-thunderbird
+  > {"result": {"status": "closed", "reason": "splines won't reticulate"}}
   > EOF
 
   $ echo closed > testfile
@@ -115,8 +115,8 @@ Pushing to a closed Thunderbird tree should fail
 Test pushing when SeaMonkey is closed
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/comm-central-seamonkey?format=json
-  > {"status": "closed", "reason": "splines won't reticulate"}
+  > https://api.pub.build.mozilla.org/treestatus/trees/comm-central-seamonkey
+  > {"result": {"status": "closed", "reason": "splines won't reticulate"}}
   > EOF
 
   $ echo closed > suite/build/test
@@ -147,8 +147,8 @@ Test pushing when SeaMonkey is closed
 Test pushing when calendar is closed
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/comm-central-thunderbird?format=json
-  > {"status": "closed", "reason": "splines won't reticulate"}
+  > https://api.pub.build.mozilla.org/treestatus/trees/comm-central-thunderbird
+  > {"result": {"status": "closed", "reason": "splines won't reticulate"}}
   > EOF
 
   $ echo calendarclosed > calendar/app/test
@@ -191,8 +191,8 @@ Adding CLOSED TREE allows the push to go through
 And the same for SeaMonkey
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/comm-central-seamonkey?format=json
-  > {"status": "closed", "reason": "splines won't reticulate"}
+  > https://api.pub.build.mozilla.org/treestatus/trees/comm-central-seamonkey
+  > {"result": {"status": "closed", "reason": "splines won't reticulate"}}
   > EOF
 
   $ echo forcing > suite/build/test
@@ -230,8 +230,8 @@ CLOSED TREE only needed on tip commit
 Approval required is enforced
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/comm-central-thunderbird?format=json
-  > {"status": "approval required", "reason": ""}
+  > https://api.pub.build.mozilla.org/treestatus/trees/comm-central-thunderbird
+  > {"result": {"status": "approval required", "reason": ""}}
   > EOF
 
   $ echo approval > testfile

@@ -18,8 +18,8 @@
 Pushing to an open tree should succeed
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/mozilla-central?format=json
-  > {"status": "open", "reason": ""}
+  > https://api.pub.build.mozilla.org/treestatus/trees/mozilla-central
+  > {"result": {"status": "open", "reason": ""}}
   > EOF
 
   $ touch foo
@@ -37,8 +37,8 @@ Pushing to an open tree should succeed
 Pushing to a closed tree should fail
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/mozilla-central?format=json
-  > {"status": "closed", "reason": "splines won't reticulate"}
+  > https://api.pub.build.mozilla.org/treestatus/trees/mozilla-central
+  > {"result": {"status": "closed", "reason": "splines won't reticulate"}}
   > EOF
 
   $ echo closed > foo
@@ -101,8 +101,8 @@ is on the tip commit
 Pushing to an approval required tree should fail
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/mozilla-central?format=json
-  > {"status": "approval required", "reason": "be verrrry careful"}
+  > https://api.pub.build.mozilla.org/treestatus/trees/mozilla-central
+  > {"result": {"status": "approval required", "reason": "be verrrry careful"}}
   > EOF
 
   $ echo noapproval > foo
@@ -197,8 +197,8 @@ Hook should not run when stripping
   > EOF
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla.org/striptest?format=json
-  > {"status": "approval required", "reason": "it does not matter"}
+  > https://api.pub.build.mozilla.org/treestatus/trees/striptest
+  > {"result": {"status": "approval required", "reason": "it does not matter"}}
   > EOF
 
   $ hg strip -r 1 --no-backup
