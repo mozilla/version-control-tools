@@ -1,18 +1,7 @@
 import copy
 
 from bug import Bug
-
-
-class SearchException(Exception):
-    """
-        If while interacting with Bugzilla and we try do something that is not
-        supported this error will be raised.
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return "%s" % self.msg
+from errors import SearchException
 
 
 class Search(object):
@@ -168,7 +157,7 @@ class Search(object):
             bugs = []
             for bug in self._bug_numbers:
                 result = self._bugsy.request('bug/%s' % bug,
-                                             params=params).json()
+                                             params=params)
                 bugs.append(Bug(self._bugsy, **result['bugs'][0]))
 
             return bugs
@@ -188,7 +177,7 @@ class Search(object):
             if self._change_history.get('value', None):
                 params['chfieldvalue'] = self._change_history['value']
 
-            results = self._bugsy.request('bug', params=params).json()
+            results = self._bugsy.request('bug', params=params)
             error = results.get("error", None)
             if error:
                 raise SearchException(results['message'])

@@ -6,5 +6,6 @@
 .. automodule:: bugsy
 .. autoclass:: Bug
    :members:
+   :special-members:
 .. autoclass:: BugException
    :members:

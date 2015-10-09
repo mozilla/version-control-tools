@@ -159,7 +159,7 @@ class Bugzilla(object):
                 blocks=sorted(bug['blocks']),
                 depends_on=sorted(bug['depends_on']),
             )
-            r = self.client.request('bug/%s/comment' % bid).json()
+            r = self.client.request('bug/%s/comment' % bid)
             for comment in r['bugs'][bid]['comments']:
                 lines = comment['text'].splitlines()
                 if len(lines) > 1:
@@ -174,7 +174,7 @@ class Bugzilla(object):
                     text=ct,
                 ))
 
-            r = self.client.request('bug/%s/attachment' % bid).json()
+            r = self.client.request('bug/%s/attachment' % bid)
             for a in r['bugs'].get(bid, []):
                 flags = []
                 for f in a['flags']:

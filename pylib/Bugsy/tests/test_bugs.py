@@ -4,7 +4,7 @@ import json
 
 from . import rest_url
 from bugsy import Bugsy, Bug
-from bugsy import BugException
+from bugsy.errors import (BugsyException, BugException)
 
 example_return = {u'faults': [], u'bugs': [{u'cf_tracking_firefox29': u'---', u'classification': u'Other', u'creator': u'jgriffin@mozilla.com', u'cf_status_firefox30':
 u'---', u'depends_on': [], u'cf_status_firefox32': u'---', u'creation_time': u'2014-05-28T23:57:58Z', u'product': u'Release Engineering', u'cf_user_story': u'', u'dupe_of': None, u'cf_tracking_firefox_relnote': u'---', u'keywords': [], u'cf_tracking_b2g18': u'---', u'summary': u'Schedule Mn tests on o\
@@ -120,6 +120,7 @@ def test_we_can_pass_in_dict_and_get_a_bug():
     assert bug.id == 1017315
     assert bug.status == 'RESOLVED'
     assert bug.summary == 'Schedule Mn tests on opt Linux builds on cedar'
+    assert bug.assigned_to == "jgriffin@mozilla.com"
 
 def test_we_can_get_a_dict_version_of_the_bug():
     bug = Bug(**example_return['bugs'][0])
@@ -243,3 +244,107 @@ def test_comment_retrieval():
     assert c1.tags == set([u'tag1', u'tag2'])
     assert c1.time == datetime.datetime(2014, 03, 27, 23, 47, 45)
 
+@responses.activate
+def test_we_raise_an_exception_when_getting_comments_and_bugzilla_errors():
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/login?login=foo&password=bar',
+                          body='{"token": "foobar"}', status=200,
+                          content_type='application/json', match_querystring=True)
+
+    responses.add(responses.GET, rest_url('bug', 1017315, token='foobar'),
+                      body=json.dumps(example_return), status=200,
+                      content_type='application/json', match_querystring=True)
+    bugzilla = Bugsy("foo", "bar")
+    bug = bugzilla.get(1017315)
+
+    error_response = {'code': 67399,
+                      'message': "The requested method 'Bug.comments' was not found.",
+                      'documentation': u'http://www.bugzilla.org/docs/tip/en/html/api/',
+                       'error': True}
+
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315/comment?token=foobar',
+                    body=json.dumps(error_response), status=400,
+                    content_type='application/json', match_querystring=True)
+    try:
+        comments = bug.get_comments()
+        assert False, "Should have raised an BugException for the bug not existing"
+    except BugsyException as e:
+        assert str(e) == "Message: The requested method 'Bug.comments' was not found."
+
+@responses.activate
+def test_we_raise_an_exception_if_commenting_on_a_bug_that_returns_an_error():
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/login?login=foo&password=bar',
+                          body='{"token": "foobar"}', status=200,
+                          content_type='application/json', match_querystring=True)
+
+    responses.add(responses.GET, rest_url('bug', 1017315, token='foobar'),
+                      body=json.dumps(example_return), status=200,
+                      content_type='application/json', match_querystring=True)
+    bugzilla = Bugsy("foo", "bar")
+    bug = bugzilla.get(1017315)
+
+    # will now return the following error. This could happen if the bug was open
+    # when we did a `get()` but is now hidden
+    error_response = {'code': 101,
+                      'message': 'Bug 1017315 does not exist.',
+                      'documentation': 'http://www.bugzilla.org/docs/tip/en/html/api/',
+                      'error': True}
+    responses.add(responses.POST, 'https://bugzilla.mozilla.org/rest/bug/1017315/comment?token=foobar',
+                      body=json.dumps(error_response), status=404,
+                      content_type='application/json', match_querystring=True)
+    try:
+        bug.add_comment("I like sausages")
+        assert False, "Should have raised an BugException for the bug not existing"
+    except BugsyException as e:
+        assert str(e) == "Message: Bug 1017315 does not exist."
+
+    assert len(responses.calls) == 3
+
+@responses.activate
+def test_we_can_add_tags_to_bug_comments():
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/login?login=foo&password=bar',
+                          body='{"token": "foobar"}', status=200,
+                          content_type='application/json', match_querystring=True)
+
+    responses.add(responses.GET, rest_url('bug', 1017315, token='foobar'),
+                      body=json.dumps(example_return), status=200,
+                      content_type='application/json', match_querystring=True)
+    bugzilla = Bugsy("foo", "bar")
+    bug = bugzilla.get(1017315)
+
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315/comment?token=foobar',
+                    body=json.dumps(comments_return), status=200,
+                    content_type='application/json', match_querystring=True)
+
+    comments = bug.get_comments()
+
+    responses.add(responses.PUT, 'https://bugzilla.mozilla.org/rest/bug/comment/8589785/tags?token=foobar',
+                    body=json.dumps(["spam","foo"]), status=200,
+                    content_type='application/json', match_querystring=True)
+    comments[0].add_tags("foo")
+
+    assert len(responses.calls) == 4
+
+@responses.activate
+def test_we_can_remove_tags_to_bug_comments():
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/login?login=foo&password=bar',
+                          body='{"token": "foobar"}', status=200,
+                          content_type='application/json', match_querystring=True)
+
+    responses.add(responses.GET, rest_url('bug', 1017315, token='foobar'),
+                      body=json.dumps(example_return), status=200,
+                      content_type='application/json', match_querystring=True)
+    bugzilla = Bugsy("foo", "bar")
+    bug = bugzilla.get(1017315)
+
+    responses.add(responses.GET, 'https://bugzilla.mozilla.org/rest/bug/1017315/comment?token=foobar',
+                    body=json.dumps(comments_return), status=200,
+                    content_type='application/json', match_querystring=True)
+
+    comments = bug.get_comments()
+
+    responses.add(responses.PUT, 'https://bugzilla.mozilla.org/rest/bug/comment/8589785/tags?token=foobar',
+                    body=json.dumps(["spam","foo"]), status=200,
+                    content_type='application/json', match_querystring=True)
+    comments[0].remove_tags("foo")
+
+    assert len(responses.calls) == 4

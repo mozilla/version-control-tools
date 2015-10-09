@@ -1,12 +1,41 @@
 
-n.n.n / 2015-06-01
+0.6.0 / 2015-10-08
 ==================
 
- * add test coverage link in README.md
- * Add unit test coverage report on coveralls
- * create documented properties for available comment data
- * run flake8 on travis and ask contributors to do so
- * flake8 fixes in bugsy package
+  * Update flake8 config to only check the correct items.
+  * Fix flake8 errors.
+  * Move final requests to use central request and handler methods
+  * Move Exception to BugsyException
+  * Add more tests for resiliency against HTTP errors during API requests
+  * Remove support for Python 2.6. I won't be actively working against it but won't be mindful of errors
+  * Fix formatting to work with python 2.6
+  * Update error handling for the majority of cases so that it is handled centrally
+  * Clean up imports of tests
+  * Remove duplication in Exception handling
+  * Move Errors to their own file and update imports for others.
+  * Move JSON handling into request method
+  * Use correct response HTTP code for Bugzilla error handling tests
+
+0.5.0 / 2015-09-26
+==================
+
+  * Add the ability to set tags on comments. Fixes #5
+  * Add the ability to set and get assignee on a bug. Fixes #17
+  * Raise an error when posting a comment and we get a error back from Bugzilla. Fixes #25
+  * Raise an exception when `get()` is called and Bugzilla can not return it. Fixes #24
+  * Add configuration for flake8
+  * Improve the docs & examples for add_comment()
+  * Make sure the docs index page is listed in the sidebar table of contents
+  * Make sure Sphinx autodoc generates docs for Class __init__ methods
+  * Make the Bugsy PyPI page link to GitHub
+  * Add Bugzilla API keys support
+  * fix unit tests by using all defaults include_fields into requests
+  * include whiteboard when pulling bug data from bugzilla
+  * add test coverage link in README.md
+  * Add unit test coverage report on coveralls
+  * create documented properties for available comment data
+  * run flake8 on travis and ask contributors to do so
+  * flake8 fixes in bugsy package
 
 0.4.1 / 2014-05-26
 ==================

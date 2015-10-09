@@ -1,4 +1,5 @@
 import datetime
+from errors import BugException
 
 
 VALID_STATUS = ["RESOLVED", "ASSIGNED", "NEW", "UNCONFIRMED"]
@@ -8,18 +9,6 @@ VALID_RESOLUTION = ["FIXED", "INCOMPLETE", "INVALID", "WORKSFORME",
 
 def str2datetime(s):
     return datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%SZ')
-
-
-class BugException(Exception):
-    """
-        If we try do something that is not allowed to a bug then
-        this error is raised
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return "Message: %s" % self.msg
 
 
 class Bug(object):
@@ -214,6 +203,25 @@ class Bug(object):
         """
         self._bug['version'] = value
 
+    @property
+    def assigned_to(self):
+        """
+            Property for getting the bug assignee
+
+            >>> bug.assigned_to
+            "automatedtester@mozilla.com"
+        """
+        return self._bug['assigned_to']
+
+    @assigned_to.setter
+    def assigned_to(self, value):
+        """
+            Property to set the bug assignee
+
+            >>> bug.assigned_to = "automatedtester@mozilla.com"
+        """
+        self._bug['assigned_to'] = value
+
     def to_dict(self):
         """
             Return the raw dict that is used inside this object
@@ -232,7 +240,7 @@ class Bug(object):
             'FIXED'
         """
         if 'id' in self._bug:
-            result = self._bugsy.request('bug/%s' % self._bug['id']).json()
+            result = self._bugsy.request('bug/%s' % self._bug['id'])
             self._bug = dict(**result['bugs'][0])
         else:
             raise BugException("Unable to update bug that isn't in Bugzilla")
@@ -244,31 +252,33 @@ class Bug(object):
             Returns a list of Comment instances.
         """
         bug = unicode(self._bug['id'])
-        res = self._bugsy.request('bug/%s/comment' % bug).json()
+        res = self._bugsy.request('bug/%s/comment' % bug)
 
-        return [Comment(**comments) for comments
+        return [Comment(bugsy=self._bugsy, **comments) for comments
                 in res['bugs'][bug]['comments']]
 
     def add_comment(self, comment):
         """
-            Adds a comment to a bug. If a bug does not have a bug ID then
-            you need call `put` on the :class:`Bugsy` class.
+            Adds a comment to a bug. If the bug object does not have a bug ID
+            (ie you are creating a bug) then you will need to also call `put`
+            on the :class:`Bugsy` class.
 
             >>> bug.add_comment("I like sausages")
             >>> bugzilla.put(bug)
 
-            If it does have a bug id then this will do a post to the server
+            If it does have a bug id then this will immediately post to the server
 
             >>> bug.add_comment("I like eggs too")
+
+            More examples can be found at:
+            https://github.com/AutomatedTester/Bugsy/blob/master/example/add_comments.py
         """
         # If we have a key post immediately otherwise hold onto it until
         # put(bug) is called
         if 'id' in self._bug:
-            self._bugsy.session.post(
-                '%s/bug/%s/comment' % (self._bugsy.bugzilla_url,
-                                       self._bug['id']),
-                data={"comment": comment}
-            )
+            self._bugsy.request('bug/{}/comment'.format(self._bug['id']),
+                                method='POST', data={"comment": comment}
+                                )
         else:
             self._bug['comment'] = comment
 
@@ -285,7 +295,8 @@ class Comment(object):
         >>> comments[0].text
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, bugsy=None, **kwargs):
+        self._bugsy = bugsy
         kwargs['time'] = str2datetime(kwargs['time'])
         kwargs['creation_time'] = str2datetime(kwargs['creation_time'])
         if 'tags' in kwargs:
@@ -374,3 +385,21 @@ class Comment(object):
             Return a set of comment tags currently set for the comment.
         """
         return self._comment['tags']
+
+    def add_tags(self, tags):
+        """
+            Add tags to the comments
+        """
+        if not isinstance(tags, list):
+            tags = [tags]
+        self._bugsy.request('bug/comment/%s/tags' % self._comment['id'],
+                            method='PUT', data={"add": tags})
+
+    def remove_tags(self, tags):
+        """
+            Add tags to the comments
+        """
+        if not isinstance(tags, list):
+            tags = [tags]
+        self._bugsy.request('bug/comment/%s/tags' % self._comment['id'],
+                            method='PUT', data={"remove": tags})

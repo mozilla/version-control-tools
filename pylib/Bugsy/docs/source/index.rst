@@ -74,7 +74,7 @@ Searching Bugzilla
 
 To search for bugs you will need to create a :class:`Bugsy` object and then you can call
 `search_for` and chain the search. The :class:`Search` API is a `Fluent API <https://en.wikipedia.org/wiki/Fluent_interface>`_
-o you just chain the items that you need and then call `search` when the search is complete.
+- you just chain the items that you need and then call `search` when the search is complete.
 
 .. code-block:: python
 
@@ -114,6 +114,7 @@ To see further details look at:
 .. toctree::
    :maxdepth: 2
 
+   index.rst
    bugsy.rst
    bug.rst
    comment.rst

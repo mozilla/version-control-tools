@@ -7,3 +7,4 @@
 .. automodule:: bugsy
 .. autoclass:: Search
    :members:
+   :special-members:

@@ -1,30 +1,7 @@
 import requests
 from bug import Bug
+from errors import (BugsyException, LoginException)
 from search import Search
-
-
-class BugsyException(Exception):
-    """
-        If while interacting with Bugzilla and we try do something that is not
-        supported this error will be raised.
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return "Message: %s" % self.msg
-
-
-class LoginException(Exception):
-    """
-        If a username and password are passed in but we don't receive a token
-        then this error will be raised.
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return "Message: %s" % self.msg
 
 
 class Bugsy(object):
@@ -89,8 +66,8 @@ class Bugsy(object):
                     params={'login': username, 'api_key': api_key}
                 )
 
-                if result.json() is not True:
-                    raise LoginException(result.json()['message'])
+                if result is not True:
+                    raise LoginException(result['message'])
 
             self.session.params['api_key'] = self.api_key
             self._have_auth = True
@@ -99,7 +76,6 @@ class Bugsy(object):
                 'login',
                 params={'login': username, 'password': password}
             )
-            result = result.json()
             if 'token' in result:
                 self.session.params['token'] = result['token']
                 self.token = result['token']
@@ -111,7 +87,7 @@ class Bugsy(object):
             self.token = '%s-%s' % (self.userid, self.cookie)
             self.session.params['token'] = self.token
             if not self.username:
-                result = self.request('user/%s' % self.userid).json()
+                result = self.request('user/%s' % self.userid)
                 if result.get('users', []):
                     self.username = result['users'][0]['name']
                 else:
@@ -134,7 +110,7 @@ class Bugsy(object):
         bug = self.request(
             'bug/%s' % bug_number,
             params={"include_fields": self. DEFAULT_SEARCH}
-        ).json()
+        )
         return Bug(self, **bug['bugs'][0])
 
     def put(self, bug):
@@ -164,7 +140,7 @@ class Bugsy(object):
                                  " to Bugzilla")
 
         if not bug.id:
-            result = self.request('bug', 'POST', data=bug.to_dict()).json()
+            result = self.request('bug', 'POST', data=bug.to_dict())
             if 'error' not in result:
                 bug._bug['id'] = result['id']
                 bug._bugsy = self
@@ -172,9 +148,7 @@ class Bugsy(object):
                 raise BugsyException(result['message'])
         else:
             result = self.request('bug/%s' % bug.id, 'PUT',
-                                  data=bug.to_dict()).json()
-            if "error" in result:
-                raise BugsyException(result['message'])
+                                  data=bug.to_dict())
 
     @property
     def search_for(self):
@@ -190,4 +164,16 @@ class Bugsy(object):
         headers = {"User-Agent": "Bugsy"}
         kwargs['headers'] = headers
         url = '%s/%s' % (self.bugzilla_url, path)
-        return self.session.request(method, url, **kwargs)
+        return self._handle_errors(self.session.request(method, url, **kwargs))
+
+    def _handle_errors(self, response):
+        if response.status_code >= 500:
+            raise BugsyException("We received a {0} error with the following: {1}"
+                                 .format(response.status_code, response.text))
+        if response.status_code > 399 and response.status_code < 500:
+            result = response.json()
+            if "API key" in result['message'] or "username or password" in result['message']:
+                raise LoginException(result['message'])
+            else:
+                raise BugsyException(result["message"])
+        return response.json()

@@ -1,9 +1,6 @@
-import bugsy
 from . import rest_url
-from bugsy import Bugsy, BugsyException, LoginException
-from bugsy import Bug
-from bugsy.search import SearchException
-
+from bugsy import (Bugsy, Bug)
+from bugsy.errors import SearchException
 import responses
 import json
 
@@ -437,4 +434,4 @@ def test_we_can_handle_errors_coming_back_from_search():
                 .timeframe('2014-12-01', '2014-12-05')\
                 .search()
     except SearchException as e:
-        assert str(e) == "Can't use [Bug Creation] as a field name."
+        assert str(e) == "Message: Can't use [Bug Creation] as a field name."
