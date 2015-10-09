@@ -135,7 +135,7 @@ out the version you wish to install::
 
   $ hg clone https://selenic.com/repo/hg
   $ cd hg
-  $ hg up 3.4.2
+  $ hg up 3.5.2
 
 Once you have the source code, run ``make`` to install Mercurial::
 
