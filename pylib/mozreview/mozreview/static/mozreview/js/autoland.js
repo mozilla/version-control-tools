@@ -109,5 +109,75 @@ $(document).on("mozreview_ready", function() {
     });
   }
 
-  autoland_trigger.attr('title', 'Autolanding is disabled');
+  var trigger_autoland_handler = function() {
+    autoland_trigger.off("click", trigger_autoland_handler);
+
+    var activityIndicator = $("#activity-indicator")
+      .removeClass("error")
+      .text(gettext("Triggering landing..."))
+      .show();
+
+    $.ajax({
+      type: "POST",
+      url: AUTOLAND_URL,
+      data: { review_request_id: MozReview.parentReviewRequest.id }
+    })
+    .done(function(){
+      // There may be a better way to get the review request updates
+      // but this is probably good enough for now
+      window.location.reload()
+    })
+    .fail(function(jqXHR, textStatus, errorThrown){
+      var error_text = "";
+
+      try {
+        error_text = jQuery.parseJSON(jqXHR.responseText).err.msg
+      } catch(e) {
+        error_text = jqXHR.responseText
+      }
+
+      activityIndicator.addClass("error")
+        .text(gettext("A server error occurred: " + error_text))
+        .append(
+          $("<a/>")
+            .text(gettext("Dismiss"))
+            .attr("href", "#")
+            .click(function() {
+              activityIndicator.fadeOut("fast");
+              return false;
+            })
+        );
+
+      // Add the handler back in case it was an intermittent
+      // failure and we want to allow a retry.
+      autoland_trigger.click(trigger_autoland_handler);
+    });
+  }
+
+  if (!MozReview.hasLandingRepository) {
+    autoland_trigger.attr('title', 'Landing is not supported for this repository');
+  } else if ($("#draft-banner").is(":visible")) {
+    autoland_trigger.attr('title', 'Draft review requests cannot be landed');
+  } else if (!MozReview.hasScmLevel3) {
+    autoland_trigger.attr('title', 'You must have scm_level_3 access to land');
+  } else if (!MozReview.currentIsMutableByUser) {
+    autoland_trigger.attr('title', 'Only the author may land commits at this time');
+  } else {
+    MozReview.parentReviewRequest.ready({
+      error: function () {
+        autoland_trigger.attr('title', 'Error determining approval');
+      },
+      ready: function () {
+        if (!MozReview.parentReviewRequest.get('approved')) {
+          autoland_trigger.attr(
+            'title',
+            'Review request not approved for landing: ' +
+            MozReview.parentReviewRequest.get('approvalFailure'));
+        } else {
+          autoland_trigger.css('text-decoration', 'none');
+          autoland_trigger.click(trigger_autoland_handler);
+        }
+      }
+    });
+  }
 });

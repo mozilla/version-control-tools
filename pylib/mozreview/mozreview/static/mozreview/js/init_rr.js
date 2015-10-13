@@ -18,9 +18,10 @@ $(document).ready(function() {
   MozReview.hasScmLevel1 = MozReview.scmLevel >= 1;
   MozReview.hasScmLevel3 = MozReview.scmLevel == 3;
 
-  // Whether or not the repository has an associated try repository is also
-  // in an invisible div.
+  // Whether or not the repository has associated try and landing repositories
+  // is in an invisible div.
   MozReview.hasTryRepository = $("#repository").data("has-try-repository");
+  MozReview.hasLandingRepository = $("#repository").data("has-landing-repository");
 
   console.log("Found parent review request ID: " + parentID);
 
@@ -36,8 +37,6 @@ $(document).ready(function() {
       $("body").addClass("commit-request");
   }
 
-  MozReview.parentReviewRequest = new RB.ReviewRequest({id: parentID});
-
   var pageReviewRequest = page.reviewRequest;
   var pageEditor = page.reviewRequestEditor;
   var pageView = page.reviewRequestEditorView;
@@ -48,5 +47,31 @@ $(document).ready(function() {
                                               : null;
   MozReview.parentView = MozReview.isParent ? pageView
                                             : null;
+
+  // Review Board doesn't currently expose approval status in the
+  // review request model so we extend it and use our own model
+  // for the parent so we can access it.
+  var patchedRR = RB.ReviewRequest.extend({
+    defaults: function () {
+      return _.defaults({
+        approved: false,
+        approvalFailure: null
+      }, RB.ReviewRequest.prototype.defaults());
+    },
+
+    attrToJsonMap: _.defaults({
+      approvalFailure: 'approval_failure'
+    }, RB.ReviewRequest.prototype.attrToJsonMap),
+
+    deserializedAttrs: [
+      'approved',
+      'approvalFailure'
+    ].concat(RB.ReviewRequest.prototype.deserializedAttrs)
+  });
+  MozReview.parentReviewRequest = new patchedRR({id: parentID});
+  // Kick off the fetch here so the data is ready ASAP,
+  // we'll use it eventually.
+  MozReview.parentReviewRequest.fetch();
+
   $(document).trigger("mozreview_ready");
 });
