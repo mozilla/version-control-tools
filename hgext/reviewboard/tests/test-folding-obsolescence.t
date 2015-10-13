@@ -53,7 +53,8 @@
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
+  (review requests lack reviewers; visit review url to assign reviewers)
+  (visit review url to publish these review requests so others can see them)
 
   $ echo 'foo3' > foo3
   $ hg commit -A -m 'Bug 1 - Foo 3'
@@ -109,7 +110,8 @@
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
+  (review requests lack reviewers; visit review url to assign reviewers)
+  (visit review url to publish these review requests so others can see them)
 
 Cleanup
 

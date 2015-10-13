@@ -9,6 +9,7 @@
   > reviewboard = $TESTDIR/hgext/reviewboard/client.py
   > [reviewboard]
   > fakeids = true
+  > autopublish = false
   > [ui]
   > ssh = $TESTDIR/testing/mozreview-ssh
   > [mozilla]
@@ -138,7 +139,8 @@ Pushing to autodiscover repo should redirect
   
   review id:  bz://1/dummy
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
+  (review requests lack reviewers; visit review url to assign reviewers)
+  (visit review url to publish these review requests so others can see them)
 
   $ cd ..
 
@@ -190,7 +192,8 @@ Redirecting works when pushing over HTTP
   
   review id:  bz://1/dummy
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
+  (review requests lack reviewers; visit review url to assign reviewers)
+  (visit review url to publish these review requests so others can see them)
 
 Pushing to autoreview repo without client extension results in sane failure
 (Test with both SSH and HTTP because peer handling of errors is

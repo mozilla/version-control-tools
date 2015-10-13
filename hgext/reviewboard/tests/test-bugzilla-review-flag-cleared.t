@@ -263,7 +263,7 @@ Updating the review request as an L1 author will re-request review
 
   $ echo newcontents > foo
   $ hg commit --amend > /dev/null
-  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push > /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} --config reviewboard.autopublish=true push > /dev/null
 
   $ bugzilla dump-bug 1
   Bug 1:
@@ -473,7 +473,7 @@ Updating the review request as an L3 author will carry forward the r+
 
 We publish on push since we already have a reviewer
 
-  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=${l3key} push > /dev/null
+  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=${l3key} --config reviewboard.autopublish=true push > /dev/null
 
 We should have an r+ flag already set.
 

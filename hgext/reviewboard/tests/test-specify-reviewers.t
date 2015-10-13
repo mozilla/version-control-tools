@@ -59,9 +59,7 @@ Try a bunch of different ways of specifying a reviewer
   $ hg commit -m 'Bug 1 - More stuff; [r?remus, r?romulus]'
   $ echo blah >> foo
   $ hg commit -m 'Bug 1 - More stuff; r?romulus, a=test-only'
-  $ hg --config ui.interactive=true push << EOF
-  > n
-  > EOF
+  $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   (adding commit id to 10 changesets)
   searching for changes
@@ -115,8 +113,6 @@ Try a bunch of different ways of specifying a reviewer
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  
-  publish these review requests now (Yn)? n
   (visit review url to publish these review requests so others can see them)
 
   $ rbmanage list-reviewers 2 --draft
@@ -158,7 +154,7 @@ The review state file should have reviewers recorded
 
 Publishing series during push works
 
-  $ hg push
+  $ hg push --config reviewboard.autopublish=true
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
@@ -238,7 +234,7 @@ code path.
 
   $ echo blah >> foo
   $ hg commit --amend -m 'Bug 1 - Even more stuff; r?romulus, r?remus'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=true
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
@@ -304,7 +300,7 @@ again.
   3 people listed on review request
   $ rbmanage list-reviewers 11 --draft
   admin+1, remus, romulus
-  $ hg push
+  $ hg push --config reviewboard.autopublish=true
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   no changes found
@@ -366,7 +362,7 @@ and pushed with no reviewers specified.
   admin+1, remus, romulus
   $ echo blah >> foo
   $ hg commit --amend -m 'Bug 1 - Amended stuff'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=true
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
@@ -430,7 +426,7 @@ those specified in the commit summary.
 
   $ echo blah >> foo
   $ hg commit --amend -m 'Bug 1 - Amended stuff; r?romulus, r?remus'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=true
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
@@ -495,7 +491,7 @@ Unrecognized reviewers should be ignored
   $ bugzilla create-bug TestProduct TestComponent 'Second Bug'
   $ echo blah >> foo
   $ hg commit -m 'Bug 2 - different stuff; r?cthulhu'
-  $ hg push --reviewid 2
+  $ hg push --config reviewboard.autopublish=true --reviewid 2
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
@@ -512,8 +508,11 @@ Unrecognized reviewers should be ignored
   
   review id:  bz://2/mynick
   review url: http://*:$HGPORT1/r/12 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
-  $ rbmanage list-reviewers 12 --draft
+  (review requests lack reviewers; visit review url to assign reviewers)
+  
+  publish these review requests now (Yn)? y
+  (published review request 12)
+  $ rbmanage list-reviewers 12
   
 
 Using r= for a patch under review instead of r? should result in a warning
@@ -533,7 +532,7 @@ from the client.
   
   changeset:  27:d9a3b1783a10
   summary:    Bug 2 - different stuff; r?cthulhu
-  review:     http://*:$HGPORT1/r/13 (draft) (glob)
+  review:     http://*:$HGPORT1/r/13 (glob)
   
   changeset:  28:c486e8175a60
   summary:    Bug 2 - different stuff; r=romulus
@@ -542,13 +541,13 @@ from the client.
   
   review id:  bz://2/mynick
   review url: http://*:$HGPORT1/r/12 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
-
+  (review requests lack reviewers; visit review url to assign reviewers)
+  (visit review url to publish these review requests so others can see them)
 Reviewer identification should be case insensitive.
 
   $ echo blah >> foo
   $ hg commit -m 'Bug 2 - better stuff; r?ryanvm'
-  $ hg push -c 29
+  $ hg push --config reviewboard.autopublish=true -c 29
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets

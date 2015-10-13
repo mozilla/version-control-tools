@@ -306,7 +306,7 @@ Test creating a review via HTTP
   $ mozreview create-user reviewer@example.com password 'Reviewer :reviewer'
   Created user 7
 
-  $ hg --config bugzilla.username=user2@example.com --config bugzilla.apikey=${user2key} push ${MERCURIAL_URL}test-repo
+  $ hg --config bugzilla.username=user2@example.com --config bugzilla.apikey=${user2key} --config reviewboard.autopublish=true push ${MERCURIAL_URL}test-repo
   pushing to http://*:$HGPORT/test-repo (glob)
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/e9bba109755f-920db7c0-addcommitid.hg (glob)

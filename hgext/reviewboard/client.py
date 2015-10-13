@@ -650,36 +650,32 @@ def doreview(repo, ui, remote, nodes):
         ui.write(' (draft)')
     ui.write('\n')
 
-    havereviewers = bool(nodes)
+    # Warn people that they have not assigned reviewers for at least some
+    # of their commits.
     for node in nodes:
         rd = reviewdata[nodereviews[node]]
         if not rd.get('reviewers', None):
-            havereviewers = False
+            ui.status(_('(review requests lack reviewers; visit review url '
+                        'to assign reviewers)\n'))
             break
 
     # Make it clear to the user that they need to take action in order for
     # others to see this review series.
     if havedraft:
-        # If the series is ready for publishing, prompt the user to perform the
-        # publishing.
-        if havereviewers:
-            caps = getreviewcaps(remote)
-            if 'publish' in caps:
-                ui.write('\n')
-                publish = ui.promptchoice(
-                    _('publish these review requests now (Yn)? $$ &Yes $$ &No'))
-                if publish == 0:
-                    publishreviewrequests(ui, remote, bzauth, [newparentid])
-                else:
-                    ui.status(_('(visit review url to publish these review '
-                                'requests so others can see them)\n'))
+        # At some point we may want an yes/no/prompt option for autopublish
+        # but for safety reasons we only allow no/prompt for now.
+        if ui.configbool('reviewboard', 'autopublish', True):
+            ui.write('\n')
+            publish = ui.promptchoice(
+                _('publish these review requests now (Yn)? $$ &Yes $$ &No'))
+            if publish == 0:
+                publishreviewrequests(ui, remote, bzauth, [newparentid])
             else:
-                ui.status(_('(visit review url to publish these review requests'
-                            'so others can see them)\n'))
+                ui.status(_('(visit review url to publish these review '
+                            'requests so others can see them)\n'))
         else:
-            ui.status(_('(review requests lack reviewers; visit review url '
-                        'to assign reviewers and publish these review '
-                        'requests)\n'))
+            ui.status(_('(visit review url to publish these review requests '
+                        'so others can see them)\n'))
 
 def publishreviewrequests(ui, remote, bzauth, rrids):
     """Publish an iterable of review requests."""

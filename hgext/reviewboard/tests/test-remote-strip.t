@@ -57,7 +57,8 @@ globally
   
   review id:  bz://1/mynick-1
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
+  (review requests lack reviewers; visit review url to assign reviewers)
+  (visit review url to publish these review requests so others can see them)
 
   $ hg push -r . --reviewid bz://1/mynick-2
   pushing to ssh://*:$HGPORT6/test-repo (glob)
@@ -81,7 +82,8 @@ globally
   
   review id:  bz://1/mynick-2
   review url: http://*:$HGPORT1/r/4 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
+  (review requests lack reviewers; visit review url to assign reviewers)
+  (visit review url to publish these review requests so others can see them)
 
 User can't remote strip unless allowed
 

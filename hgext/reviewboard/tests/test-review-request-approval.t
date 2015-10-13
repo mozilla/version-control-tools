@@ -34,7 +34,7 @@ Create a review request from an L1 user
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
   $ export SSH_KEYNAME=l1a@example.com
-  $ hg --config bugzilla.username=l1a@example.com --config bugzilla.apikey=${l1aapikey} push > /dev/null
+  $ hg --config bugzilla.username=l1a@example.com --config bugzilla.apikey=${l1aapikey} --config reviewboard.autopublish=true push > /dev/null
   $ rbmanage add-reviewer 2 --user level3
   1 people listed on review request
   $ rbmanage add-reviewer 2 --user level1b
@@ -240,7 +240,7 @@ Since the author is L1, adding a new diff should cancel approval
   $ echo modified > foo
   $ hg commit --amend > /dev/null
   $ export SSH_KEYNAME=l1a@example.com
-  $ hg --config bugzilla.username=l1a@example.com --config bugzilla.apikey=${l1aapikey} push > /dev/null
+  $ hg --config bugzilla.username=l1a@example.com --config bugzilla.apikey=${l1aapikey} --config reviewboard.autopublish=true push > /dev/null
   $ rbmanage dumpreview 2
   id: 2
   status: pending
@@ -510,7 +510,7 @@ Review requests created by L3 users
   $ echo author2 > foo
   $ hg commit --amend -m "Bug 2 - initial commit to review" > /dev/null
   $ export SSH_KEYNAME=l3@example.com
-  $ hg --config bugzilla.username=l3@example.com --config bugzilla.apikey=${l3apikey} push > /dev/null
+  $ hg --config bugzilla.username=l3@example.com --config bugzilla.apikey=${l3apikey} --config reviewboard.autopublish=true push > /dev/null
   $ rbmanage add-reviewer 4 --user level1a
   1 people listed on review request
   $ rbmanage add-reviewer 4 --user level1b
@@ -580,7 +580,7 @@ ship-its. Posting a new diff should not clear approval
   $ echo modified2 > foo
   $ hg commit --amend > /dev/null
   $ export SSH_KEYNAME=l3@example.com
-  $ hg --config bugzilla.username=l3@example.com --config bugzilla.apikey=${l3apikey} push > /dev/null
+  $ hg --config bugzilla.username=l3@example.com --config bugzilla.apikey=${l3apikey} --config reviewboard.autopublish=true push > /dev/null
   $ rbmanage dumpreview 4
   id: 4
   status: pending

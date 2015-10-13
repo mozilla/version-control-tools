@@ -21,9 +21,11 @@ default-push = ssh://${HGSSH_HOST}:${HGSSH_PORT}/test-repo
 # We want [extensions] to be last because some tests write
 # ext=path/to/ext lines.
 
-# Make generated IDs deterministic.
 [reviewboard]
+# Make generated IDs deterministic.
 fakeids = true
+# Disable automatic publishing
+autopublish = false
 
 [extensions]
 strip =
