@@ -15,9 +15,9 @@ $(document).on("mozreview_ready", function() {
 
   // Change string of "Edit Review" button in the review banner that
   // shows up when a pending review is waiting to be published.
-  $("#review-banner-edit").val("Finish");
+  $("#review-banner-edit").val("Finish...");
 
   // Change string of "Review" button to be a verb so people better
   // understand what clicking it does.
-  $("#review-link").text("Finish Review");
+  $("#review-link").text("Finish Review...");
 });
