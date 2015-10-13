@@ -28,7 +28,8 @@ class HostingServiceTest(MozReviewWebDriverTest):
         lr.run(['push'])
 
         self.add_hostingservice(1, 'Sirius Black', 'scm_level_3',
-                                'ssh://hg.example.com/try')
+                                'ssh://hg.example.com/try',
+                                'ssh://hg.example.com/mainline')
 
         # If we visit the review url, we should be able to find repository
         # information
@@ -74,6 +75,9 @@ class HostingServiceTest(MozReviewWebDriverTest):
 
         el = self.browser.find_element_by_id('id_try_repository_url')
         el.send_keys('https://new-try-repo.example.com')
+
+        el = self.browser.find_element_by_id('id_landing_repository_url')
+        el.send_keys('https://new-landing-repo.example.com')
 
         el = self.browser.find_element_by_id('id_required_ldap_group')
         el.send_keys(Keys.BACKSPACE)

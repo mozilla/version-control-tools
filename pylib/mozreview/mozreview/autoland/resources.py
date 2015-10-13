@@ -110,6 +110,13 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
         if not rr.is_mutable_by(request.user):
             return PERMISSION_DENIED
 
+        target_repository = rr.repository.extra_data.get(
+            'landing_repository_url')
+
+        if not target_repository:
+            return AUTOLAND_CONFIGURATION_ERROR.with_message(
+                'Autoland has not been configured with a proper landing URL.')
+
         last_revision = json.loads(rr.extra_data.get('p2rb.commits'))[-1][0]
 
         ext = get_extension_manager().get_enabled_extension(
@@ -177,6 +184,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
         autoland_request = AutolandRequest.objects.create(
             autoland_id=autoland_request_id,
             push_revision=last_revision,
+            repository_url=target_repository,
             review_request_id=rr.id,
             user_id=request.user.id,
         )
@@ -239,6 +247,13 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
 
         if not rr.is_mutable_by(request.user):
             return PERMISSION_DENIED
+
+        target_repository = rr.repository.extra_data.get(
+            'try_repository_url')
+
+        if not target_repository:
+            return AUTOLAND_CONFIGURATION_ERROR.with_message(
+                'Autoland has not been configured with a proper try URL.')
 
         last_revision = json.loads(rr.extra_data.get('p2rb.commits'))[-1][0]
 
@@ -310,6 +325,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
         autoland_request = AutolandRequest.objects.create(
             autoland_id=autoland_request_id,
             push_revision=last_revision,
+            repository_url=target_repository,
             review_request_id=rr.id,
             user_id=request.user.id,
             extra_data=json.dumps({

@@ -47,3 +47,12 @@ def has_try_repository(repository):
                 else 'false')
     except (AttributeError, KeyError):
         return 'false'
+
+
+@register.filter()
+def has_landing_repository(repository):
+    try:
+        return ('true' if repository.extra_data['landing_repository_url']
+                else 'false')
+    except (AttributeError, KeyError):
+        return 'false'
