@@ -70,7 +70,7 @@ class CommitsListField(BaseReviewRequestField):
     def as_html(self):
         user = self.request.user
         parent = get_parent_rr(self.review_request_details.get_review_request())
-        parent_details = parent.get_draft() or parent
+        parent_details = parent.get_draft(user) or parent
 
         # If a user can view the parent draft they should also have
         # permission to view every child. We check if the child is
