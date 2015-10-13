@@ -83,8 +83,10 @@
     - name: sync code from admin node
       command: /data/bin/update-www.sh reviewboard.mozilla.org
 
-    - name: restart memcached
-      service: name=memcached state=restarted
+    # We previously restarted memcached here. But this appears to clear
+    # all sessions and logs people out. This is super annoying,
+    # especially when we deploy multiple times per day. So we stopped
+    # doing it.
 
     - name: restart httpd
       service: name=httpd state=restarted

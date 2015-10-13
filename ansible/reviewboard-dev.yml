@@ -27,9 +27,6 @@
   - name: Set proper file permissions for web files
     file: path={{ sitehome }}/htdocs/static/ext owner=apache group=apache recurse=true
 
-  - name: Restart memcached
-    service: name=memcached state=restarted
-
   - name: Restart httpd
     service: name=httpd state=restarted
 
