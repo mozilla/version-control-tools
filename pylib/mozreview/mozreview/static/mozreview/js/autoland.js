@@ -6,7 +6,9 @@ $(document).on("mozreview_ready", function() {
   var try_trigger = $("#autoland-try-trigger");
   var autoland_trigger = $("#autoland-trigger");
 
-  if ($("#draft-banner").is(":visible")) {
+  if (!MozReview.hasTryRepository) {
+    try_trigger.attr('title', 'Try builds cannot be triggered for this repository');
+  } else if ($("#draft-banner").is(":visible")) {
     try_trigger.attr('title', 'Try builds cannot be triggered on draft review requests');
   } else if (!MozReview.currentIsMutableByUser) {
     try_trigger.attr('title', 'Only the author may trigger a try build at this time');
