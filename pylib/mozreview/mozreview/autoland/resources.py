@@ -193,7 +193,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
             status=AutolandEventLogEntry.REQUESTED,
             autoland_request_id=autoland_request_id)
 
-        self.save_autolandrequest_id('p2rb.autoland_inbound', rr,
+        self.save_autolandrequest_id('p2rb.autoland', rr,
             autoland_request_id)
 
         return 200, {}

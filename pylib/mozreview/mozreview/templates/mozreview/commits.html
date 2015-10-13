@@ -4,6 +4,7 @@ This is the template for the "Commits" list in a push-based review request.
 
 {% load i18n %}
 {% load djblets_utils %}
+{% load mozreview %}
 
 <div id="error-container">
   <h1>Well, this is embarassing...</h1>
@@ -70,43 +71,48 @@ This is the template for the "Commits" list in a push-based review request.
     </tr>
     {% endfor %}
   </table>
-  {% if latest_autoland_request %}
+  {% if latest_autoland_requests %}
   <div id="ci-actions">
-      {% if latest_autoland_request.last_known_status == 'F' %}
+    {% for autoland_request in latest_autoland_requests %}
+      {% if not forloop.first %}
+      <div class="action-separator"></div>
+      {% endif %}
+
+      {% if autoland_request.last_known_status == 'F' %}
       <div class="action action-failure">
         <div class="action-icon rounded-icon"></div>
         <div class="action-info">
           <h4 class="action-heading">
-              There was an error executing the Autoland to Try request.
+              There was an error executing the Autoland request.
           </h4>
           <span class="action-meta">
-            {{ latest_autoland_request.last_error_msg }}
+            {{ autoland_request.last_error_msg }}
           </span>
         </div>
       </div>
       {% endif %}
 
-      {% if latest_autoland_request.last_known_status == 'R' %}
+      {% if autoland_request.last_known_status == 'R' %}
       <div class="action action-requested">
         <div class="action-icon rounded-icon"></div>
         <div class="action-info">
           <h4 class="action-heading">
-            Waiting for the Autoland to Try request to execute, hold tight
+            Waiting for the Autoland request to execute, hold tight
           </h4>
           <span class="action-meta">
-            If the try tree is closed autoland will retry your push for you until the tree opens.
+            If the tree is closed autoland will retry your push for you until the tree opens.
           </span>
         </div>
       </div>
       {% endif %}
 
-      {% if latest_autoland_request.last_known_status == 'S' %}
+      {% if autoland_request.last_known_status == 'S' %}
       <div class="action action-landed"
-           data-repository="try"
-           data-revision="{{latest_autoland_request.repository_revision}}">
+           data-repository="{{autoland_request.repository_url|treeherder_repo}}"
+           data-revision="{{autoland_request.repository_revision}}">
         <div class="action-icon rounded-icon"></div>
         <div class="action-info">
-          <a href="https://treeherder.mozilla.org/#/jobs?repo=try&revision={{latest_autoland_request.repository_revision}}">
+          <a href="https://treeherder.mozilla.org/#/jobs?repo={{autoland_request|treeherder_repo}}&revision={{latest_autoland_request.repository_revision}}">
             See it in Treeherder
           </a>
           <h4 class="action-heading">
@@ -115,11 +121,7 @@ This is the template for the "Commits" list in a push-based review request.
         </div>
       </div>
       {% endif %}
-    {% comment %}
-    This is the action separator to use when we have more than one
-    destination repository
-    <div class="action-separator"></div>
-    {% endcomment %}
+    {% endfor %}
   </div>
   {% endif %}
 </div>

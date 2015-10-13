@@ -80,15 +80,27 @@ class CommitsListField(BaseReviewRequestField):
             child for child in gen_child_rrs(parent_details, user)
             if child.is_accessible_by(user)]
 
-        latest_autoland_request = AutolandRequest.objects.filter(
-            review_request_id=parent.id,
-        ).last()
+        autoland_requests = AutolandRequest.objects.filter(
+            review_request_id=parent.id).order_by('-autoland_id')
+
+        repo_urls = set()
+        latest_autoland_requests = []
+
+
+        # We would like to fetch the latest AutolandRequest for each
+        # different repository.
+        for request in autoland_requests:
+            if request.repository_url in repo_urls:
+                continue
+
+            repo_urls.add(request.repository_url)
+            latest_autoland_requests.append(request)
 
         return get_template('mozreview/commits.html').render(Context({
             'review_request_details': self.review_request_details,
             'parent_details': parent_details,
             'children_details': children_details,
-            'latest_autoland_request': latest_autoland_request,
+            'latest_autoland_requests': latest_autoland_requests,
         }))
 
 

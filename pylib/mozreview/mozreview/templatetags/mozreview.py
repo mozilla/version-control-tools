@@ -56,3 +56,14 @@ def has_landing_repository(repository):
                 else 'false')
     except (AttributeError, KeyError):
         return 'false'
+
+
+@register.filter()
+def treeherder_repo(landing_url):
+    mapping = {
+        '': 'try',
+        'ssh://hg.mozilla.org/try': 'try',
+        'ssh://hg.mozilla.org/integration/mozilla-inbound/': 'mozilla-inbound',
+    }
+
+    return mapping.get(landing_url)
