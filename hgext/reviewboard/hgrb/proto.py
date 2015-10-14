@@ -9,6 +9,7 @@ import xmlrpclib
 from mercurial.i18n import _
 from mercurial.node import short
 from mercurial import (
+    encoding,
     mdiff,
     patch,
     phases,
@@ -302,11 +303,11 @@ def reviewboard(repo, proto, args=None):
         else:
             base_commit_id = base_ctx.hex()
 
-        summary = ctx.description().splitlines()[0]
+        summary = encoding.fromlocal(ctx.description().splitlines()[0])
         commits['individual'].append({
             'id': node,
             'precursors': precursors.get(node, []),
-            'message': ctx.description(),
+            'message': encoding.fromlocal(ctx.description()),
             'diff': diff,
             'bug': str(reviewid.bug),
             'base_commit_id': base_commit_id,

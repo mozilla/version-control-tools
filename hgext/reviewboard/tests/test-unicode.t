@@ -18,7 +18,7 @@ Create a review request
   $ exportbzauth author@example.com password
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
   $ echo initial > foo
-  $ hg commit -m 'Bug 1 - Initial commit to review'
+  $ hg --encoding utf-8 commit -m 'Bug 1 - Initial commit to review ’ こ'
   $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push > /dev/null
   $ rbmanage publish 1
 
@@ -35,19 +35,39 @@ The globbing is patching over a bug in mach
   $ rbmanage publish-review 1 1
   published review 1
 
+  $ rbmanage dumpreview 2
+  id: 2
+  status: pending
+  public: true
+  bugs:
+  - '1'
+  commit: null
+  submitter: author+6
+  summary: "Bug 1 - Initial commit to review \u2019 \u3053"
+  description: "Bug 1 - Initial commit to review \u2019 \u3053"
+  target_people: []
+  extra_data:
+    p2rb: true
+    p2rb.commit_id: f03366314c7798387fcd3e367afaa6ba472feb5d
+    p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
+    p2rb.identifier: bz://1/mynick
+    p2rb.is_squashed: false
+  approved: false
+  approval_failure: A suitable reviewer has not given a "Ship It!"
+
   $ bugzilla dump-bug 1
   Bug 1:
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://*:$HGPORT1/r/2/ (glob)
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      description: "MozReview Request: Bug 1 - Initial commit to review \u2019 \u3053"
       file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: "MozReview Request: Bug 1 - Initial commit to review \u2019 \u3053"
     blocks: []
     cc: []
     comments:
@@ -60,9 +80,9 @@ The globbing is patching over a bug in mach
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - "MozReview Request: Bug 1 - Initial commit to review \u2019 \u3053"
       - ''
-      - Bug 1 - Initial commit to review
+      - "Bug 1 - Initial commit to review \u2019 \u3053"
     - author: author@example.com
       id: 3
       tags: []

@@ -216,9 +216,11 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
         Updates the commit message, refreshes the diff, etc.
         """
         props = {
-            "summary": commit['message'].splitlines()[0],
+            # Mercurial guarantees UTF-8 internally, so no need to "replace"
+            # during decode.
+            "summary": commit['message'].decode('utf-8').splitlines()[0],
             "bugs_closed": commit['bug'],
-            "description": commit['message'],
+            "description": commit['message'].decode('utf-8'),
             "extra_data.p2rb.commit_id": commit['id'],
             "extra_data.p2rb.first_public_ancestor": commit['first_public_ancestor'],
         }
@@ -424,7 +426,7 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
         'bugs_closed': all_bugs,
         # Reviewboard does not allow review requests with empty descriptions to
         # be published, so we insert some filler here.
-        'description': 'This is the parent review request',
+        'description': u'This is the parent review request',
         'depends_on': depends,
         'extra_data.p2rb.commits': commit_list_json,
     }
