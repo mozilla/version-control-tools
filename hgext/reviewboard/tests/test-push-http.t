@@ -159,6 +159,23 @@ Vanilla push will prompt for credentials
   user: abort: response expected
   [255]
 
+Credentials are automagically found if [bugzilla] configs are defined
+
+  $ hg -q up -r 0
+  $ echo autocreds > foo
+  $ hg commit -m 'auto find bugzilla credentials'
+  created new head
+  $ hg --config mozilla.trustedbmoapikeyservices=${MERCURIAL_URL} push ${MERCURIAL_URL}test-repo --noreview -r .
+  pushing to http://*:$HGPORT/test-repo (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+
+  $ hg -q up -r 1
+
 Vanilla push with invalid credentials fails
 
   $ cat >> .hg/hgrc << EOF
@@ -180,13 +197,13 @@ Vanilla push with proper credentials works
   > t.password = ${defaultkey}
   > EOF
 
-  $ hg push ${MERCURIAL_URL}test-repo --noreview
+  $ hg push ${MERCURIAL_URL}test-repo --noreview -r .
   pushing to http://*:$HGPORT/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   remote: recorded push in pushlog
 
 The Bugzilla user should have been recorded in the pushlog
@@ -204,6 +221,13 @@ The Bugzilla user should have been recorded in the pushlog
           "user": "default@example.com"
       },
       "2": {
+          "changesets": [
+              "12ee4d2b76f57e27a8bcacd2063487a6bde7d7fd"
+          ],
+          "date": *, (glob)
+          "user": "bmo:default@example.com"
+      },
+      "3": {
           "changesets": [
               "7e2199dc77b02fc9b43dcf0a7faf18e6051025fc"
           ],
@@ -227,7 +251,7 @@ Test with a second user, just so we are comprehensive
   > t.password = ${user2key}
   > EOF
 
-  $ hg push --noreview ${MERCURIAL_URL}test-repo
+  $ hg push --noreview ${MERCURIAL_URL}test-repo -r .
   pushing to http://*:$HGPORT/test-repo (glob)
   searching for changes
   remote: adding changesets
@@ -250,12 +274,19 @@ Test with a second user, just so we are comprehensive
       },
       "2": {
           "changesets": [
-              "7e2199dc77b02fc9b43dcf0a7faf18e6051025fc"
+              "12ee4d2b76f57e27a8bcacd2063487a6bde7d7fd"
           ],
           "date": *, (glob)
           "user": "bmo:default@example.com"
       },
       "3": {
+          "changesets": [
+              "7e2199dc77b02fc9b43dcf0a7faf18e6051025fc"
+          ],
+          "date": *, (glob)
+          "user": "bmo:default@example.com"
+      },
+      "4": {
           "changesets": [
               "6432ccd4579e0fdc337b6dc55b827cbcc7fee397"
           ],
@@ -287,11 +318,11 @@ Test creating a review via HTTP
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  3:9a6457fbda8f
+  changeset:  4:9a6457fbda8f
   summary:    Bug 1 - Review 1; r?reviewer
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  4:b41b3bd650cb
+  changeset:  5:b41b3bd650cb
   summary:    Bug 1 - Review 2; r?reviewer
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   

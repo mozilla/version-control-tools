@@ -280,3 +280,34 @@ def get_bugzilla_login_cookie_from_profile(profile, url):
     finally:
         if tempdir:
             shutil.rmtree(tempdir)
+
+TRUSTEDAPIKEYSERVICES = {
+    'https://reviewboard-hg.mozilla.org',
+}
+
+def configureautobmoapikeyauth(ui):
+    """Automatically use Bugzilla API Key auth over HTTP for known services.
+
+    Bugzilla credentials are stored in the [bugzilla] section. Mercurial has
+    its own [auth] section for declaring credentials for remotes. This function
+    carries over the [bugzilla] entries to [auth] entries for trusted services.
+    """
+    services = ui.configlist('mozilla', 'trustedbmoapikeyservices',
+                             TRUSTEDAPIKEYSERVICES)
+    if not services:
+        ui.debug('no trusted services to auto define credentials on\n')
+        return
+
+    username = ui.config('bugzilla', 'username')
+    apikey = ui.config('bugzilla', 'apikey')
+    if not username:
+        ui.debug('Bugzilla username not defined; cannot define credentials\n')
+        return
+
+    for i, service in enumerate(services):
+        ui.debug('automatically setting Bugzilla API Key auth %s\n' % service)
+        key = 'autobmoapikey%d' % i
+        ui.setconfig('auth', '%s.prefix' % key, service)
+        ui.setconfig('auth', '%s.username' % key, username)
+        if apikey:
+            ui.setconfig('auth', '%s.password' % key, apikey)

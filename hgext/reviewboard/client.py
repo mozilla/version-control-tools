@@ -64,7 +64,10 @@ from hgrb.util import (
 )
 
 from mozautomation.commitparser import parse_bugs, parse_requal_reviewers
-from mozhg.auth import getbugzillaauth
+from mozhg.auth import (
+    getbugzillaauth,
+    configureautobmoapikeyauth,
+)
 from mozhg.rewrite import (
     newparents,
     replacechangesets,
@@ -1102,3 +1105,7 @@ def reposetup(ui, repo):
                         'limit pushed revisions using the -r argument.'))
 
     repo.prepushoutgoinghooks.add('reviewboard', prepushoutgoinghook)
+
+    # Need to use baseui because peers inherit the non-repo ui and the peer's
+    # ui is what Mercurial's built-in HTTP auth uses for lookups.
+    configureautobmoapikeyauth(repo.baseui)

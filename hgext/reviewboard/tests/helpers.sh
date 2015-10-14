@@ -18,10 +18,6 @@ ircnick = mynick
 [paths]
 default-push = ssh://${HGSSH_HOST}:${HGSSH_PORT}/test-repo
 
-[bugzilla]
-username = ${BUGZILLA_USERNAME}
-apikey = $2
-
 # We want [extensions] to be last because some tests write
 # ext=path/to/ext lines.
 
@@ -34,6 +30,14 @@ strip =
 rebase =
 reviewboard = $TESTDIR/hgext/reviewboard/client.py
 
+EOF
+
+  # Put Bugzilla credentials in global hgrc because not all parts of hg
+  # (like password manager) load config options from the repo hgrc.
+  cat >> $HGRCPATH << EOF
+[bugzilla]
+username = ${BUGZILLA_USERNAME}
+apikey = $2
 EOF
 
 }
