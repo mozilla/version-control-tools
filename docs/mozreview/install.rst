@@ -11,7 +11,8 @@ Pushing to MozReview to **initiate** code review requires the following:
 
 * An active ``bugzilla.mozilla.org`` (BMO) account
 * A BMO API Key
-* A Mozilla LDAP account with Mercurial access
+* (optional) A Mozilla LDAP account with Mercurial access and a
+  registered SSH key
 
 A BMO account can be created at https://bugzilla.mozilla.org/createaccount.cgi.
 
@@ -25,14 +26,35 @@ Instructions for obtaining a Mozilla LDAP account with Mercurial access
 are documented at
 `Becoming A Mozilla Contributor <https://www.mozilla.org/en-US/about/governance/policies/commit/>`_.
 
-Once you have all these accounts and privileges, you are ready to
-configure your client.
+LDAP/SSH Versus HTTP
+====================
+
+Reviews are initiated with MozReview by pushing to a Mercurial *review*
+repository using ``hg push``. Pushing via both SSH and HTTP are supported.
+
+Pushing via HTTP is the easiest to configure **and is recommended for
+new contributors**. All you need to push via HTTP is an active Bugzilla
+account and Bugzilla API Key.
+
+Pushing via SSH requires a Mozilla LDAP account configured with
+Mercurial access and with a registered SSH key. This involves a little
+more time and work to obtain. **This is recommended for Mozilla staff and
+beyond-casual contributors.**
+
+.. important::
+
+   Pushing via SSH grants additional privileges in the MozReview web
+   interface, such as the ability to trigger *Try* jobs and interact
+   with the *Autoland* code landing service. If you push things via HTTP
+   and have never pushed via SSH before, you will need someone else to
+   trigger *Try* jobs for you.
 
 Updating SSH Config
-===================
+-------------------
 
-You will want to configure your SSH username for
-``reviewboard-hg.mozilla.org``. See :ref:`auth_ssh` for instructions.
+If you are using SSH to push to MozReview, you will want to configure your
+SSH username for ``reviewboard-hg.mozilla.org``. See :ref:`auth_ssh` for
+instructions on updating your SSH client configuration..
 
 .. tip::
 
@@ -125,11 +147,10 @@ Use the following as a template::
 Configuring Review Repositories/Paths
 =====================================
 
-You initiate code review in MozReview via ``hg push`` to a special
-review repository. You almost certainly want to define the URL you will
-be pushing to in your Mercurial configuration so you can type a short
-name (e.g. ``review``) rather than a full URL (which is longer and
-harder to remember).
+You almost certainly want to define the URL you will be pushing to in
+your Mercurial configuration so you can type a short name (e.g.
+``review``) rather than a full URL (which is longer and harder to
+remember).
 
 The sections below describe how to do this.
 
@@ -146,9 +167,14 @@ alias to the ``autoreview`` repository in your global Mercurial
 configuration file and it should *just work*.
 
 Using ``hg config -e -g`` to edit your global Mercurial configuration
-file, add an entry under the ``[paths]`` section like so::
+file, add an entry under the ``[paths]`` section like so (be sure to use
+the appropriate HTTP or SSH URL depending on what you have configured)::
 
    [paths]
+   # For HTTP pushing
+   review = https://reviewboard-hg.mozilla.org/autoreview
+
+   # For SSH pushing
    review = ssh://reviewboard-hg.mozilla.org/autoreview
 
 Now, you can ``hg push review`` from any Mercurial repository and it
@@ -167,11 +193,15 @@ define the review URL for each repository you wish to review from.
    simpler to manage.
 
 You will want to define a named path in your per-repository hgrc file.
-We recommend the name ``review``. The URL for the repository should be
-``ssh://reviewboard-hg.mozilla.org/<repo>`` where ``<repo>`` is
-the name of a repository. You can find the list of available repositories
-at https://reviewboard-hg.mozilla.org/. Just swap ``https://`` with
-``ssh://``.
+We recommend the name ``review``. The URL for the repository is
+``https://reviewboard-hg.mozilla.org/<repo>`` or
+``ssh://reviewboard-hg.mozilla.org/<repo>`` (depending on whether you
+are pushing over HTTP or SSH, respectively) where ``<repo>`` is
+the name of a repository.
+
+You can find the list of available repositories at
+https://reviewboard-hg.mozilla.org/. For SSH URls, Just replace ``https://``
+with ``ssh://``.
 
 Edit your repository-local config via ``hg config -e`` and adjust your
 ``[paths]`` section to resemble something like::
@@ -180,6 +210,10 @@ Edit your repository-local config via ``hg config -e`` and adjust your
   default = https://hg.mozilla.org/hgcustom/version-control-tools
   default-push = ssh://hg.mozilla.org/hgcustom/version-control-tools
 
+  # For HTTP pushing
+  review = https://reviewboard-hg.mozilla.org/version-control-tools
+
+  # For SSH pushing
   review = ssh://reviewboard-hg.mozilla.org/version-control-tools
 
 Host Fingerprint in hgrc
