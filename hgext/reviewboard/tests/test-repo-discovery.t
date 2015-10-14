@@ -88,28 +88,15 @@ workaround to an unidentified root problem.
 
 hg createrepomanifest will create and print a manifest of review repos
 
-  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest
-  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a (glob)
-  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b (glob)
-
-Search and replace works
-
-  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest --search ${MERCURIAL_URL} --replace ${PUSHPREFIX}/
-  4016108b6e06add4c0ddde40dee8c7b9aa410f58 ssh://*:$HGPORT6/a (glob)
-  36d47cf7c6cbd312de3aeb3b2f770c650b014053 ssh://*:$HGPORT6/b (glob)
+  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ${PUSHPREFIX}/
+  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b ssh://*:$HGPORT6/b (glob)
+  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a ssh://*:$HGPORT6/a (glob)
 
 createrepomanifest should have created a file
 
   $ mozreview exec hgrb cat /repo/hg/mozilla/autoreview/.hg/reviewrepos
-  4016108b6e06add4c0ddde40dee8c7b9aa410f58 ssh://*:$HGPORT6/a (glob)
-  36d47cf7c6cbd312de3aeb3b2f770c650b014053 ssh://*:$HGPORT6/b (glob)
-
-listkeys should give a list of available repositories
-(listkeys output isn't stable, hence the excessive globs)
-
-  $ hg debugpushkey ${MERCURIAL_URL}autoreview reviewrepos
-  ssh://*:$HGPORT6/*	* (glob)
-  ssh://*:$HGPORT6/*	* (glob)
+  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b ssh://*:$HGPORT6/b (glob)
+  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a ssh://*:$HGPORT6/a (glob)
 
 Pushing a repository unrelated to any known repo should result in error message
 
@@ -155,11 +142,11 @@ Pushing to autodiscover repo should redirect
 
   $ cd ..
 
-Redirecting ssh:// to http:// should be disallowed (security protection)
+Redirecting to different hostname should be disallowed (security protection)
 
-  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest
-  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a (glob)
-  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b (glob)
+  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ssh://bad.host/
+  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b ssh://bad.host/b (glob)
+  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a ssh://bad.host/a (glob)
 
   $ hg -q clone ${MERCURIAL_URL}b
   $ cd b
@@ -168,20 +155,44 @@ Redirecting ssh:// to http:// should be disallowed (security protection)
   $ hg push ${PUSHPREFIX}/autoreview
   pushing to ssh://*:$HGPORT6/autoreview (glob)
   searching for appropriate review repository
-  abort: refusing to redirect due to URL mismatch: http://*:$HGPORT/b (glob)
-  [255]
-
-Redirecting to different hostname should be disallowed (security protection)
-
-  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest --search ${MERCURIAL_URL} --replace ssh://bad.host/
-  4016108b6e06add4c0ddde40dee8c7b9aa410f58 ssh://bad.host/a (glob)
-  36d47cf7c6cbd312de3aeb3b2f770c650b014053 ssh://bad.host/b (glob)
-
-  $ hg push ${PUSHPREFIX}/autoreview
-  pushing to ssh://*:$HGPORT6/autoreview (glob)
-  searching for appropriate review repository
   abort: refusing to redirect due to URL mismatch: ssh://bad.host/b (glob)
   [255]
+
+  $ cd ..
+
+Redirecting works when pushing over HTTP
+
+  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ${PUSHPREFIX}/
+  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b ssh://*:$HGPORT6/b (glob)
+  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a ssh://*:$HGPORT6/a (glob)
+
+  $ hg -q clone ${MERCURIAL_URL}a http-redirect
+  $ cd http-redirect
+  $ echo http_redirect > foo
+  $ hg commit -m 'Bug 1 - Testing discovery via HTTP pushes'
+  $ hg --config mozilla.trustedbmoapikeyservices=${MERCURIAL_URL} push ${MERCURIAL_URL}autoreview -c .
+  pushing to http://*:$HGPORT/autoreview (glob)
+  searching for appropriate review repository
+  redirecting push to http://*:$HGPORT/a (glob)
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/http-redirect/.hg/strip-backup/5f3de01b6263-bb45f39e-addcommitid.hg (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+  submitting 1 changesets for review
+  
+  changeset:  2:e94691c71b1a
+  summary:    Bug 1 - Testing discovery via HTTP pushes
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  
+  review id:  bz://1/dummy
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
+
+  $ cd ..
 
 Cleanup
 

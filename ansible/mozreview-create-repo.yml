@@ -51,5 +51,5 @@
       command: hg -R {{ repo_root }}/{{ repo }} pull
 
     - name: update autoreview repository manifest
-      command: /usr/bin/hg createrepomanifest --search 'https://' --replace 'ssh://'
+      command: /usr/bin/hg createrepomanifest 'https://' 'ssh://'
                chdir=/repo/hg/mozilla/autoreview

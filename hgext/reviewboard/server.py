@@ -57,6 +57,9 @@ command = cmdutil.command(cmdtable)
 
 
 # Capabilities the server requires in clients.
+#
+# Add to this and add a corresponding entry in the client extension to force
+# the client to pull latest code.
 requirecaps = set([
     # Client can speak protocol format 1.
     'proto1',
@@ -64,6 +67,8 @@ requirecaps = set([
     'listreviewdata',
     # Client knows how to send API keys for authentication.
     'bzapikeys',
+    # Client knows how to perform autodiscovery of review repos.
+    'listreviewrepos',
 ])
 
 
@@ -88,10 +93,7 @@ def capabilities(orig, repo, proto):
         caps.append('pullreviews')
 
     if repo.ui.config('reviewboard', 'isdiscoveryrepo', None):
-        reviewcaps.add('listreviewrepos')
-
-        # Deprecated.
-        caps.append('listreviewrepos')
+        reviewcaps.add('listreviewrepos2')
 
     if reviewcaps:
         caps.append('mozreview=%s' % ','.join(sorted(reviewcaps)))
@@ -168,8 +170,8 @@ def listreviewrepos(repo):
         if not line:
             continue
 
-        node, url = line.split(None, 1)
-        repos[url] = node
+        root, urls = line.split(None, 1)
+        repos[root] = urls
 
     return repos
 
@@ -196,11 +198,13 @@ def getreposfromreviewboard(repo):
 
 
 @command('createrepomanifest', [
-    ('-s', 'search', '', _('string to replace in URLs')),
-    ('-r', 'replace', '', _('replacement string for URLs'))
-    ],
-    _('hg createrepomanifest'))
+], _('hg createrepomanifest SEARCH REPLACE'))
 def createrepomanifest(ui, repo, search=None, replace=None):
+    """Create a manifest of available review repositories.
+
+    The arguments define literal string search and replace values to use to
+    convert assumed http(s):// repo URLs into ssh:// URLs.
+    """
     repos = {}
     for url in getreposfromreviewboard(repo):
         peer = hg.peer(ui, {}, url)
@@ -209,14 +213,16 @@ def createrepomanifest(ui, repo, search=None, replace=None):
         if root == nullid:
             continue
 
-        if search and replace:
-            url = url.replace(search, replace)
+        if not url.startswith(('http://', 'https://')):
+            raise util.Abort('Expected http:// or https:// repo: %s' % url)
 
-        repos[url] = root
+        sshurl = url.replace(search, replace)
+
+        repos[root] = (url, sshurl)
 
     lines = []
-    for url, root in sorted(repos.items()):
-        lines.append('%s %s\n' % (hex(root), url))
+    for root, (http, ssh) in sorted(repos.items()):
+        lines.append('%s %s %s\n' % (hex(root), http, ssh))
 
     data = ''.join(lines)
     repo.vfs.write('reviewrepos', data)
@@ -226,10 +232,6 @@ def createrepomanifest(ui, repo, search=None, replace=None):
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     pushkey.register('strip', pushstrip, liststrip)
-
-    # Add a pushkey namespace to obtain the list of available review
-    # repositories. This is used for repository discovery.
-    pushkey.register('reviewrepos', lambda *x: False, listreviewrepos)
 
 
 def reposetup(ui, repo):

@@ -83,6 +83,7 @@ command = cmdutil.command(cmdtable)
 clientcapabilities = {
     'proto1',
     'listreviewdata',
+    'listreviewrepos',
     'bzapikeys',
 }
 
@@ -220,29 +221,39 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
     if 'pushreview' not in caps:
         # See if this repository is a special "discovery" repository
         # and follow the link, if present.
-        if 'listreviewrepos' not in caps:
+        if 'listreviewrepos2' not in caps:
             return orig(repo, remote, force=force, revs=revs,
                         newbranch=newbranch, **kwargs)
 
-        repo.ui.status(_('searching for appropriate review repository\n'))
-        repos = remote.listkeys('reviewrepos')
         rootnode = repo[0].hex()
-        newurl = None
-        for url, node in repos.items():
-            if rootnode == node:
-                newurl = url
+
+        repo.ui.status(_('searching for appropriate review repository\n'))
+        for line in remote._call('listreviewrepos').splitlines():
+            node, urls = line.split(' ', 1)
+            if node == rootnode:
+                newurls = urls.split(' ')
                 break
         else:
             raise util.Abort(_('no review repository found'))
 
-        newurl = util.url(newurl)
         oldurl = util.url(remote._url)
 
-        # We don't currently allow redirecting to different protocols
-        # or hosts. This is due to abundance of caution around
-        # security concerns.
+        if oldurl.scheme in ('http', 'https'):
+            newurl = newurls[0]
+        elif oldurl.scheme == 'ssh':
+            newurl = newurls[1]
+        else:
+            raise util.Abort('can only use autoreview repos over HTTP or SSH')
 
-        if newurl.scheme != oldurl.scheme or newurl.host != oldurl.host:
+        newurl = util.url(newurl)
+
+        # We don't currently allow redirecting to different hosts out of an
+        # abundance of caution around security concerns. In theory, this should
+        # be OK since if we talked to the host, we presumably trusted it. So
+        # why shouldn't we trust a redirect?
+        # If this ever changes, watch out for credential copying when modifying
+        # the remote below.
+        if newurl.host != oldurl.host:
             raise util.Abort(_('refusing to redirect due to URL mismatch: %s' %
                 newurl))
 
@@ -254,6 +265,10 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
             newurl.user = oldurl.user
             newurl.passwd = oldurl.passwd
             remote.path = str(newurl)
+
+            # Wipe out cached capabilities.
+            remote.caps = None
+
             newremote = remote
 
         elif isinstance(remote, sshpeer.sshpeer):

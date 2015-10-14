@@ -501,3 +501,13 @@ def publishreviewseries(repo, proto, args=None):
     res = '\n'.join(lines)
     assert isinstance(res, str)
     return res
+
+@wireproto.wireprotocommand('listreviewrepos')
+def listreviewrepos(repo, proto, args=None):
+    """List review repositories we can push to.
+
+    Should only be called by clients pushing to a repo that doesn't support
+    pushing reviews. Returns empty string if nothing is defined, which is
+    harmless.
+    """
+    return repo.vfs.tryread('reviewrepos')
