@@ -39,6 +39,16 @@ to user repositories, set the following in your hgrc:
 
     [bzpost]
     updateuserrepo = True
+
+Excluding Trees from Automatic Updates
+======================================
+
+To prevent bzpost from automatically updating certain trees, set the
+``bzpost.excludetrees`` config option to a list of tree names. e.g.
+
+    [bzpost]
+    excludetrees = try
+
 """
 
 import os
