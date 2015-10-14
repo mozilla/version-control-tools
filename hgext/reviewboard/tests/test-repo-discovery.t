@@ -192,6 +192,86 @@ Redirecting works when pushing over HTTP
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
 
+Pushing to autoreview repo without client extension results in sane failure
+(Test with both SSH and HTTP because peer handling of errors is
+different)
+
+  $ hg --config extensions.reviewboard=! push ${PUSHPREFIX}/autoreview
+  pushing to ssh://*:$HGPORT6/autoreview (glob)
+  remote: 
+  remote: Pushing and pull review discovery repos is not allowed!
+  remote: 
+  remote: You are likely seeing this error because:
+  remote: 
+  remote: 1) You do not have the appropriate Mercurial extension installed
+  remote: 2) The extension is out of date
+  remote: 
+  remote: See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html
+  remote: for instructions on how to configure your machine to use MozReview.
+  remote: 
+  remote: -
+  abort: remote error
+  (check previous remote output)
+  [255]
+
+  $ cat >> .hg/hgrc << EOF
+  > [auth]
+  > t.prefix = ${MERCURIAL_URL}
+  > t.username = ${BUGZILLA_USERNAME}
+  > t.password = ${apikey}
+  > EOF
+
+  $ hg --config extensions.reviewboard=! --config mozilla.trustedbmoapikeyservices=${MERCURIAL_URL} push ${MERCURIAL_URL}autoreview
+  pushing to http://*:$HGPORT/autoreview (glob)
+  abort: remote error:
+  
+  Pushing and pull review discovery repos is not allowed!
+  
+  You are likely seeing this error because:
+  
+  1) You do not have the appropriate Mercurial extension installed
+  2) The extension is out of date
+  
+  See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html
+  for instructions on how to configure your machine to use MozReview.
+  [255]
+
+Pulling from autoreview repos also error
+(although we don't expect to see this much in the wild)
+
+  $ hg --config extensions.reviewboard=! pull ${PUSHPREFIX}/autoreview
+  pulling from ssh://*:$HGPORT6/autoreview (glob)
+  remote: 
+  remote: Pushing and pull review discovery repos is not allowed!
+  remote: 
+  remote: You are likely seeing this error because:
+  remote: 
+  remote: 1) You do not have the appropriate Mercurial extension installed
+  remote: 2) The extension is out of date
+  remote: 
+  remote: See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html
+  remote: for instructions on how to configure your machine to use MozReview.
+  remote: 
+  remote: -
+  abort: remote error
+  (check previous remote output)
+  [255]
+
+  $ hg --config extensions.reviewboard=! --config mozilla.trustedbmoapikeyservices=${MERCURIAL_URL} pull ${MERCURIAL_URL}autoreview
+  pulling from http://*:$HGPORT/autoreview (glob)
+  abort: remote error:
+  
+  Pushing and pull review discovery repos is not allowed!
+  
+  You are likely seeing this error because:
+  
+  1) You do not have the appropriate Mercurial extension installed
+  2) The extension is out of date
+  
+  See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html
+  for instructions on how to configure your machine to use MozReview.
+  [255]
+
   $ cd ..
 
 Cleanup

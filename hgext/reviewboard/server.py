@@ -72,6 +72,18 @@ requirecaps = set([
 ])
 
 
+nopushdiscoveryrepos = '''
+Pushing and pull review discovery repos is not allowed!
+
+You are likely seeing this error because:
+
+1) You do not have the appropriate Mercurial extension installed
+2) The extension is out of date
+
+See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html
+for instructions on how to configure your machine to use MozReview.
+'''
+
 def capabilities(orig, repo, proto):
     """Wraps wireproto._capabilities to advertise reviewboard support."""
     caps = orig(repo, proto)
@@ -114,9 +126,7 @@ def changegrouphook(ui, repo, source, url, **kwargs):
 
 
 def disallowpushhook(ui, repo, **kwargs):
-    repo.ui.write('Pushing to discovery repos is not allowed!\n')
-    repo.ui.write('You likely are seeing this error because your '
-                  '"reviewboard" Mercurial extension is out of date.\n')
+    repo.ui.write(nopushdiscoveryrepos)
     return 1
 
 
@@ -197,6 +207,29 @@ def getreposfromreviewboard(repo):
         return urls
 
 
+def wrappedwireprotoheads(orig, repo, proto, *args, **kwargs):
+    """Wraps "heads" wire protocol command.
+
+    This will short circuit pushes and pulls on discovery repos. If we don't do
+    this, clients will waste time uploading a bundle only to find out that the
+    server doesn't support pushing!
+
+    Ideally, we'd short circuit "unbundle." However, there are the following
+    issues:
+
+    1) A client will create a bundle before sending it to the server. This will
+       take minutes on mozilla-central.
+    2) Bundle2 aware HTTP clients don't like receiving a "pusherr" response from
+       unbundle - they insist on receiving a bundle2 payload. However, the
+       server doesn't know if the client supports bundle2 until it reads the
+       header from the bundle submission!
+    """
+    if not repo.ui.configbool('reviewboard', 'isdiscoveryrepo'):
+        return orig(repo, proto, *args, **kwargs)
+
+    return wireproto.ooberror(nopushdiscoveryrepos)
+
+
 @command('createrepomanifest', [
 ], _('hg createrepomanifest SEARCH REPLACE'))
 def createrepomanifest(ui, repo, search=None, replace=None):
@@ -233,6 +266,8 @@ def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     pushkey.register('strip', pushstrip, liststrip)
 
+    # To short circuit operations with discovery repos.
+    extensions.wrapcommand(wireproto.commands, 'heads', wrappedwireprotoheads)
 
 def reposetup(ui, repo):
     if not repo.local():
@@ -265,6 +300,9 @@ def reposetup(ui, repo):
 
     ui.setconfig('hooks', 'changegroup.reviewboard', changegrouphook)
 
+    # This shouldn't be needed to prevent pushes, as the "heads" wireproto
+    # wrapping should kill them. However, this is defense in depth and will
+    # kill all changegroup additions, even if the server operator is dumb.
     if ui.configbool('reviewboard', 'isdiscoveryrepo'):
         ui.setconfig('hooks', 'pretxnchangegroup.disallowpush',
                      disallowpushhook)
