@@ -22,4 +22,23 @@ WSGIPythonHome /repo/hg/venv_hgweb
     LogFormat "%h %v %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\""
     ErrorLog "/var/log/httpd/{{ domain | mandatory }}/error_log"
     CustomLog "/var/log/httpd/{{ domain | mandatory }}/access_log" combined env=!image
+
+    # Add basic auth using Bugzilla username and API Key as credentials
+    # to enable non-LDAP/SSH users to push.
+    #
+    # Mercurial performs all mutations on the not safe HTTP methods. We want
+    # anonymous users to be able to use the server. So don't require auth for
+    # GET and HEAD methods.
+    # TODO require TLS for pushing, since a credential leak could ensue.
+    # Bug 1210177.
+    DefineExternalAuth bmoapikey pipe "/usr/bin/python2.7 /repo/hg/version-control-tools/scripts/httpd-authn-bugzilla-key {{ bugzilla_url | mandatory }}"
+    <Directory />
+        AuthType Basic
+        AuthName "{{ bugzilla_url | mandatory }} username and API Key"
+        AuthBasicProvider external
+        AuthExternal bmoapikey
+        <LimitExcept GET HEAD>
+            Require valid-user
+        </LimitExcept>
+    </Directory>
 </VirtualHost>

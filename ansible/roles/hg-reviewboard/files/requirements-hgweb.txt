@@ -1,6 +1,22 @@
+# We need RBTools in the hgweb venv because we support pushing via HTTP.
+# This is different from hg.mozilla.org's configuration.
+
+--find-links http://downloads.reviewboard.org/releases/RBTools/0.7/
+
 # sha256: eorPcym-2jjO6inGiSEldNmmv__iTPVlAV6gBm987j8
 Mercurial==3.4.1
+
 # sha256: fdlUDbl5fypbSR6v9jRGQwUFU-vLti93V2LL46A0PCU
 mod-wsgi==4.4.11
+
 # sha256: CjoiZeHvsN76ci0fQpcw3J35da3DxgrH0rQyvfA8BB0
 Pygments==2.0.2
+
+# sha256: S4iRU5oxcdmTz3iWtjL_CIpMcHroWsPHfbFFT3lJ8-I
+python-ldap==2.4.20
+
+# sha256: kSiLHMPs02tkBXISiNVaH2gZyecJu6PpEJ8F1Bmi6Nk
+RBTools==0.7.2
+
+# sha256: QYqTw5en7asj5ViNvAZ6x0pyPts9VBvUk295R252Rdo
+six==1.9.0

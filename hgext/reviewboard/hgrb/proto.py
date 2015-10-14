@@ -324,9 +324,20 @@ def reviewboard(repo, proto, args=None):
     privleged_rb_username = repo.ui.config('reviewboard', 'username', None)
     privleged_rb_password = repo.ui.config('reviewboard', 'password', None)
 
+    # We support pushing via HTTP and SSH. REMOTE_USER will be set via HTTP.
+    # USER via SSH. But USER is a common variable and could also sneak into
+    # the HTTP environment.
+    #
+    # REMOTE_USER values come from Bugzilla. USER values come from LDAP.
+    # There is a potential privilege escalation vulnerability if someone
+    # obtains a Bugzilla account overlapping with a LDAP user having
+    # special privileges. So, we explicitly don't perform an LDAP lookup
+    # if REMOTE_USER is present because we could be crossing the user
+    # stores.
     ldap_username = os.environ.get('USER')
+    remote_user = repo.ui.environ.get('REMOTE_USER', os.environ.get('REMOTE_USER'))
 
-    if ldap_username:
+    if ldap_username and not remote_user:
         associate_ldap_username(rburl, ldap_username, privleged_rb_username,
                                 privleged_rb_password, username=bzusername,
                                 apikey=bzapikey)

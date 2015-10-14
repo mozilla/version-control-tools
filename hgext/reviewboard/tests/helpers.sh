@@ -45,6 +45,7 @@ alias mozreview='$TESTDIR/mozreview'
 alias ottoland='$TESTDIR/ottoland'
 alias treestatus='$TESTDIR/treestatus'
 alias rbmanage='$TESTDIR/reviewboard'
+alias http='$TESTDIR/testing/http-request.py'
 
 commonenv() {
   mozreview start `pwd` \

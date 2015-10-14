@@ -9,3 +9,8 @@ ANSIBLE='/usr/bin/ansible local -c local'
 
 ${ANSIBLE} -m ini_file -a "dest=/etc/mercurial/hgrc section=bugzilla option=url value=$1"
 ${ANSIBLE} -m ini_file -a "dest=/etc/mercurial/hgrc section=reviewboard option=url value=$2"
+# We assume we aren't using TLS in Docker and enable plaintext support.
+${ANSIBLE} -m replace -a "dest=/etc/httpd/conf.d/hg.conf regexp='httpd-authn-bugzilla-key .*$' replace='httpd-authn-bugzilla-key --allow-plaintext $1\"'"
+${ANSIBLE} -m replace -a "dest=/etc/httpd/conf.d/hg.conf regexp='AuthName \"([^ ]+)' replace='AuthName \"$1'"
+
+/usr/bin/supervisorctl restart httpd

@@ -15,6 +15,14 @@ rbserver = /repo/hg/version-control-tools/hgext/reviewboard/server.py
 
 [web]
 templates = /repo/hg/version-control-tools/hgtemplates
+allow_push = *
+
+# In production, the entire http:// URL space is redirected to https://.
+# And, the load balancer terminates TLS and forwards plain text HTTP to
+# the origin HTTP server. In the Docker test environment, we don't run TLS.
+# So, we're not terminating TLS on a Mercurial server anywhere and never
+# need to enforce the TLS requirement.
+push_ssl = False
 
 [interhg]
 a_httplinks = s|(https?://\S+)|<a href="\1">\1</a>|i
@@ -36,3 +44,6 @@ url = {{ bugzilla_url | mandatory }}
 url = {{ reviewboard_url | mandatory }}
 username = {{ reviewboard_username | mandatory }}
 password = {{ reviewboard_password | mandatory }}
+
+[pushlog]
+remoteuserprefix = bmo

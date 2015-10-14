@@ -21,6 +21,8 @@
     - httpd
     # To build mod_wsgi from source.
     - httpd-devel
+    # Used for validating Bugzilla API keys through HTTP pushes.
+    - mod_authnz_external
     # Needed to build python-ldap package for virtualenv.
     - openldap-devel
     - python27
@@ -182,7 +184,11 @@
   file: path=/var/log/httpd/{{ domain | mandatory }} state=directory mode=0755
 
 - name: Prune system httpd configs
-  file: path=/etc/httpd/conf.d/welcome.conf state=absent
+  file: path={{ item }}
+        state=absent
+  with_items:
+    - /etc/httpd/conf.d/authnz_external.conf
+    - /etc/httpd/conf.d/welcome.conf
 
 - name: ensure httpd service is started
   service: name=httpd state=started
