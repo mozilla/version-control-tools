@@ -13,7 +13,12 @@ from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
                                           SignalHook,
                                           TemplateHook,
                                           URLHook)
-from reviewboard.reviews.builtin_fields import TestingDoneField
+from reviewboard.reviews.builtin_fields import (TestingDoneField,
+                                                BranchField,
+                                                DependsOnField,
+                                                BlocksField,
+                                                TargetGroupsField,
+                                                TargetPeopleField)
 from reviewboard.reviews.fields import (get_review_request_field,
                                         get_review_request_fieldset)
 from reviewboard.reviews.models import ReviewRequestDraft
@@ -167,12 +172,24 @@ class MozReviewExtension(Extension):
         },
         ])
 
-        # Start by hiding the Testing Done field in all review requests,
-        # since Mozilla developers will not be using it.
+        # Hide fields from all review requests that are not used by Mozilla
+        # developers.
         main_fieldset = get_review_request_fieldset('main')
         testing_done_field = get_review_request_field('testing_done')
         if testing_done_field:
             main_fieldset.remove_field(testing_done_field)
+
+        info_fieldset = get_review_request_fieldset('info')
+        for field_name in ('branch', 'depends_on', 'blocks'):
+            field = get_review_request_field(field_name)
+            if field:
+                info_fieldset.remove_field(field)
+
+        reviewers_fieldset = get_review_request_fieldset('reviewers')
+        for field_name in ('target_groups', 'target_people'):
+            field = get_review_request_field(field_name)
+            if field:
+                reviewers_fieldset.remove_field(field)
 
         # We "monkey patch" (yes, I feel dirty) the should_render method on
         # the description field so that it is not rendered for parent review
@@ -236,9 +253,22 @@ class MozReviewExtension(Extension):
         # We have to put the TestingDone field back before we shut down
         # in order to get the instance back to its original state.
         main_fieldset = get_review_request_fieldset('main')
-        testing_done_field = get_review_request_field('testing_done')
-        if not testing_done_field:
+        if not get_review_request_field('testing_done'):
             main_fieldset.add_field(TestingDoneField)
+
+        info_fieldset = get_review_request_fieldset('info')
+        if not get_review_request_field('branch'):
+            info_fieldset.add_field(BranchField)
+        if not get_review_request_field('depends_on'):
+            info_fieldset.add_field(DependsOnField)
+        if not get_review_request_field('blocks'):
+            info_fieldset.add_field(BlocksField)
+
+        reviewers_fieldset = get_review_request_fieldset('reviewers')
+        if not get_review_request_field('target_groups'):
+            reviewers_fieldset.add_field(TargetGroupsField)
+        if not get_review_request_field('target_people'):
+            reviewers_fieldset.add_field(TargetPeopleField)
 
         super(MozReviewExtension, self).shutdown()
 
