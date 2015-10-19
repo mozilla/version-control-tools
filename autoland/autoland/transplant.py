@@ -149,7 +149,10 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
     # Obtain remote tip. We assume there is only a single head.
     # Output can contain bookmark or branch name after a space. Only take
     # first component.
-    remote_tip = run_hg(['identify', 'upstream'])
+    try:
+        remote_tip = run_hg(['identify', 'upstream'])
+    except hglib.error.CommandError as e:
+        return False, formulate_hg_error(['hg'] + cmd, remote_tip)
     remote_tip = remote_tip.split()[0]
     assert len(remote_tip) == 12, remote_tip
 
