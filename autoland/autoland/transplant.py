@@ -153,7 +153,7 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
         cmd = ['identify', 'upstream']
         remote_tip = run_hg(cmd)
     except hglib.error.CommandError as e:
-        return False, formulate_hg_error(['hg'] + cmd, remote_tip)
+        return False, formulate_hg_error(['hg'] + cmd, '')
     remote_tip = remote_tip.split()[0]
     assert len(remote_tip) == 12, remote_tip
 
