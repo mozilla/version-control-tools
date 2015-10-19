@@ -33,7 +33,6 @@ from mozreview.extra_data import is_parent, is_pushed
 AUTOLAND_REQUEST_TIMEOUT = 10.0
 IMPORT_PULLREQUEST_DESTINATION = 'mozreview'
 TRY_AUTOLAND_DESTINATION = 'try'
-INBOUND_AUTOLAND_DESTINATION = 'mozilla-inbound'
 
 class BaseAutolandTriggerResource(WebAPIResource):
     """Base resource for Autoland trigger resources.
@@ -150,7 +149,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
                 'tree': rr.repository.name,
                 'pingback_url': pingback_url,
                 'rev': last_revision,
-                'destination': INBOUND_AUTOLAND_DESTINATION,
+                'destination': target_repository,
             }), headers={
                 'content-type': 'application/json',
             },
