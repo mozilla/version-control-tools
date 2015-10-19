@@ -274,14 +274,21 @@ def post_bugzilla_attachment(bugzilla, bug_id, review_request_draft,
             if review.ship_it:
                 reviewers[last_user.email] = True
 
-    comment = review_request_draft.description
+    diffset_count = review_request.diffset_history.diffsets.count()
+    if diffset_count < 1:
+        comment = review_request_draft.description
 
-    if (review_request_draft.changedesc and
-        review_request_draft.changedesc.text):
-        if not comment.endswith('\n'):
-            comment += '\n'
+        if (review_request_draft.changedesc and
+            review_request_draft.changedesc.text):
+            if not comment.endswith('\n'):
+                comment += '\n'
 
-        comment += '\n%s' % review_request_draft.changedesc.text
+            comment += '\n%s' % review_request_draft.changedesc.text
+    else:
+        comment = ('Review request updated; see interdiff: '
+                   '%sdiff/%d-%d/\n' % (get_obj_url(review_request),
+                                        diffset_count,
+                                        diffset_count + 1))
 
     bugzilla.post_rb_url(bug_id,
                          review_request.id,

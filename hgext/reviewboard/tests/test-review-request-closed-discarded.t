@@ -545,7 +545,7 @@ The attachment for the review request should be unobsoleted
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - Bug 1 - Foo 1
+      - 'Review request updated; see interdiff: http://*/r/2/diff/1-2/' (glob)
     - author: default@example.com
       id: 5
       tags: []
@@ -553,7 +553,7 @@ The attachment for the review request should be unobsoleted
       - Comment on attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - Bug 1 - Foo 2
+      - 'Review request updated; see interdiff: http://*/r/3/diff/1-2/' (glob)
     component: TestComponent
     depends_on: []
     platform: All

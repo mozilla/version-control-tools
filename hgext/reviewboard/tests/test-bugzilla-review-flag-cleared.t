@@ -333,7 +333,7 @@ Updating the review request as an L1 author will re-request review
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - Bug 1 - Initial commit to review
+      - 'Review request updated; see interdiff: http://*/r/2/diff/1-2/' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -528,7 +528,7 @@ We should have an r+ flag already set.
       - Comment on attachment 2
       - 'MozReview Request: Bug 2 - Modified commit to review'
       - ''
-      - Bug 2 - Modified commit to review
+      - 'Review request updated; see interdiff: http://*/r/4/diff/1-2/' (glob)
     component: TestComponent
     depends_on: []
     platform: All

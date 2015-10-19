@@ -320,7 +320,7 @@ Removing a reviewer should remove their review flag
       - Comment on attachment 2
       - 'MozReview Request: Bug 2 - Multiple reviewers'
       - ''
-      - Bug 2 - Multiple reviewers
+      - 'Review request updated; see interdiff: http://*/r/4/diff/1-2/' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -375,7 +375,7 @@ Removing all reviewers should remove all flags
       - Comment on attachment 2
       - 'MozReview Request: Bug 2 - Multiple reviewers'
       - ''
-      - Bug 2 - Multiple reviewers
+      - 'Review request updated; see interdiff: http://*/r/4/diff/1-2/' (glob)
     - author: author@example.com
       id: 8
       tags: []
@@ -383,7 +383,7 @@ Removing all reviewers should remove all flags
       - Comment on attachment 2
       - 'MozReview Request: Bug 2 - Multiple reviewers'
       - ''
-      - Bug 2 - Multiple reviewers
+      - 'Review request updated; see interdiff: http://*/r/4/diff/1-2/' (glob)
     component: TestComponent
     depends_on: []
     platform: All
