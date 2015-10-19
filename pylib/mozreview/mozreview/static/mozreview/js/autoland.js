@@ -174,7 +174,7 @@ $(document).on("mozreview_ready", function() {
             'Review request not approved for landing: ' +
             MozReview.parentReviewRequest.get('approvalFailure'));
         } else {
-          autoland_trigger.css('text-decoration', 'none');
+          autoland_trigger.css('opacity', '1');
           autoland_trigger.click(trigger_autoland_handler);
         }
       }
