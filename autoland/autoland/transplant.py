@@ -168,15 +168,9 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
         if not trysyntax.startswith("try: "):
             trysyntax =  "try: %s" % trysyntax
 
-        # TODO: hg is going to add a ui.allowemptycommit flag in 3.5
-        #       which means we can remove the use of queues here
-        cmds.extend([['qpop', '--all'],
-                     ['qdelete', 'try'],
-                     ['qnew', 'try', '-m', trysyntax],
-                     ['log', '-r', 'qtip', '-T', '{node|short}'],
+        cmds.extend([['--config', 'ui.allowemptycommit=true', 'commit', '-m', trysyntax],
+                     ['log', '-r', 'tip', '-T', '{node|short}'],
                      ['push', '-r', '.', '-f', 'try'],
-                     ['qpop'],
-                     ['qdelete', 'try'],
                      ['strip', '--no-backup', '-r', 'draft()'],])
     elif push_bookmark:
         # we assume use of the @ bookmark is mutually exclusive with using
