@@ -150,7 +150,8 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
     # Output can contain bookmark or branch name after a space. Only take
     # first component.
     try:
-        remote_tip = run_hg(['identify', 'upstream'])
+        cmd = ['identify', 'upstream']
+        remote_tip = run_hg(cmd)
     except hglib.error.CommandError as e:
         return False, formulate_hg_error(['hg'] + cmd, remote_tip)
     remote_tip = remote_tip.split()[0]
