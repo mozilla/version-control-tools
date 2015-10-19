@@ -156,7 +156,8 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
     remote_tip = remote_tip.split()[0]
     assert len(remote_tip) == 12, remote_tip
 
-    cmds = [['update', '--clean'],
+    cmds = [['rebase', '--abort'],
+            ['update', '--clean'],
             ['pull', 'upstream'],
             ['update', remote_tip],
             ['pull', tree, '-r', rev],
@@ -205,6 +206,9 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
                 continue
             elif 'nothing to rebase' in output:
                 # we are already up to date so the rebase fails
+                continue
+            elif 'abort: no rebase in progress' in output:
+                # there was no rebase in progress, nothing to see here
                 continue
             else:
                 return False, formulate_hg_error(['hg'] + cmd, output)
