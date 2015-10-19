@@ -549,7 +549,7 @@ Reviewer identification should be case insensitive.
   $ echo blah >> foo
   $ hg commit -m 'Bug 2 - better stuff; r?ryanvm'
   $ hg push -c 29
-  pushing to ssh://172.17.42.1:$HGPORT6/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -560,10 +560,10 @@ Reviewer identification should be case insensitive.
   
   changeset:  29:ba1b0ae3cf0a
   summary:    Bug 2 - better stuff; r?ryanvm
-  review:     http://172.17.42.1:$HGPORT1/r/13 (draft)
+  review:     http://*:$HGPORT1/r/13 (draft) (glob)
   
   review id:  bz://2/mynick
-  review url: http://172.17.42.1:$HGPORT1/r/12 (draft)
+  review url: http://*:$HGPORT1/r/12 (draft) (glob)
   
   publish these review requests now (Yn)? y
   (published review request 12)
