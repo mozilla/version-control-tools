@@ -56,7 +56,7 @@ class MozReviewApprovalHook(ReviewRequestApprovalHook):
 
     def is_approved_parent(self, review_request):
         """Check approval for a parent review request"""
-        children = [gen_child_rrs(review_request)]
+        children = list(gen_child_rrs(review_request))
 
         if not children:
             # This parent review request had no children, so it's either
