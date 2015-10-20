@@ -22,14 +22,10 @@ grant all privileges on table MozreviewPullRequest to autoland;
 
 create table Transplant (\
     id bigint default nextval('request_sequence'),\
-    tree varchar(255),\
-    rev varchar(40),\
     destination varchar(255),\
-    trysyntax text,\
-    push_bookmark varchar(255),\
+    request json,\
     landed boolean,\
     result text,\
-    pingback_url text,\
     last_updated timestamp,\
     primary key(id)\
 );

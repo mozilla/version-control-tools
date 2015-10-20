@@ -43,11 +43,11 @@ def autoland():
 
     {
       "tree": "mozilla-central",
-      "revision": "9cc25f7ac50a",
+      "rev": "9cc25f7ac50a",
       "destination": "try",
       "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
       "push_bookmark": "@",
-      "pingback_url": "http://localhost/",
+      "pingback_url": "http://localhost/"
     }
 
     Both trysyntax and push_bookmark are optional.
@@ -87,16 +87,14 @@ def autoland():
     cursor = dbconn.cursor()
 
     query = """
-        insert into Transplant(tree,rev,destination,trysyntax,push_bookmark,pingback_url)
-        values (%s,%s,%s,%s,%s,%s)
+        insert into Transplant(destination, request)
+        values (%s, %s)
         returning id
     """
 
-    cursor.execute(query, (request.json['tree'], request.json['rev'],
-                           request.json['destination'],
-                           request.json.get('trysyntax', ''),
-                           request.json.get('push_bookmark', ''),
-                           request.json['pingback_url']))
+    cursor.execute(query, (request.json['destination'],
+                           json.dumps(request.json)))
+
     request_id = cursor.fetchone()[0]
     dbconn.commit()
 
@@ -110,7 +108,7 @@ def autoland_status(request_id):
     cursor = dbconn.cursor()
 
     query = """
-        select tree,rev,destination,trysyntax,push_bookmark,landed,result
+        select destination, request, landed, result
         from Transplant
         where id = %(request_id)s
     """
@@ -122,25 +120,16 @@ def autoland_status(request_id):
 
     row = cursor.fetchone()
     if row:
-        landed = row[5]
+        destination, request, landed, result = row
 
-        result = {
-            'tree': row[0],
-            'rev': row[1],
-            'destination': row[2],
-            'trysyntax': row[3],
-            'push_bookmark': row[4],
-            'landed': landed,
-            'result': '',
-            'error_msg': ''
-        }
+        status = request.copy()
+        del status['pingback_url']
+        status['destination'] = destination
+        status['landed'] = landed
+        status['result'] = result if landed else ''
+        status['error_msg'] = result if not landed else ''
 
-        if landed:
-            result['result'] = row[6]
-        else:
-            result['error_msg'] = row[6]
-
-        return jsonify(result)
+        return jsonify(status)
 
     abort(404)
 

@@ -171,7 +171,7 @@ def handle_pending_transplants(logger, dbconn):
     cursor = dbconn.cursor()
     now = datetime.datetime.now()
     query = """
-        select id,tree,rev,destination,trysyntax,push_bookmark,pingback_url
+        select id, destination, request
         from Transplant
         where landed is null and (last_updated is null
             or last_updated<=%(time)s)
@@ -200,9 +200,13 @@ def handle_pending_transplants(logger, dbconn):
     # finished_revisions. Successful or not, we're finished with them, they
     # will not be retried.
     for row in cursor.fetchall():
-        (transplant_id, tree, rev, destination, trysyntax, push_bookmark,
-            pingback_url) = row
+        transplant_id, destination, request = row
 
+        tree = request['tree']
+        rev = request['rev']
+        trysyntax = request.get('trysyntax', '')
+        push_bookmark = request.get('push_bookmark', '')
+        pingback_url = request.get('pingback_url')
         tree_open = current_treestatus.setdefault(destination,
                                                   treestatus.tree_is_open(destination))
 
