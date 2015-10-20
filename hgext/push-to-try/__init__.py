@@ -73,5 +73,8 @@ def push_to_try(ui, repo, server, message=None):
         # And rollback to the previous state.
         tr.abort()
     finally:
-        lock.release()
+        if tr:
+            tr.release()
+        if lock:
+            lock.release()
         ui.status("temporary commit removed, repository restored\n")
