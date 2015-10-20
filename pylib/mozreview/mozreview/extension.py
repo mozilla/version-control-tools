@@ -16,9 +16,7 @@ from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
 from reviewboard.reviews.builtin_fields import (TestingDoneField,
                                                 BranchField,
                                                 DependsOnField,
-                                                BlocksField,
-                                                TargetGroupsField,
-                                                TargetPeopleField)
+                                                BlocksField)
 from reviewboard.reviews.fields import (get_review_request_field,
                                         get_review_request_fieldset)
 from reviewboard.reviews.models import ReviewRequestDraft
@@ -185,12 +183,6 @@ class MozReviewExtension(Extension):
             if field:
                 info_fieldset.remove_field(field)
 
-        reviewers_fieldset = get_review_request_fieldset('reviewers')
-        for field_name in ('target_groups', 'target_people'):
-            field = get_review_request_field(field_name)
-            if field:
-                reviewers_fieldset.remove_field(field)
-
         # We "monkey patch" (yes, I feel dirty) the should_render method on
         # the description field so that it is not rendered for parent review
         # requests.
@@ -263,12 +255,6 @@ class MozReviewExtension(Extension):
             info_fieldset.add_field(DependsOnField)
         if not get_review_request_field('blocks'):
             info_fieldset.add_field(BlocksField)
-
-        reviewers_fieldset = get_review_request_fieldset('reviewers')
-        if not get_review_request_field('target_groups'):
-            reviewers_fieldset.add_field(TargetGroupsField)
-        if not get_review_request_field('target_people'):
-            reviewers_fieldset.add_field(TargetPeopleField)
 
         super(MozReviewExtension, self).shutdown()
 
