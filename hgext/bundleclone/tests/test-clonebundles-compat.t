@@ -104,6 +104,26 @@ Actually doing a clone bundle will work with built-in feature
 
 #endif
 
+
+Clone will copy both manifests from the server
+(We only care about this on modern clients because we only care about
+this on the server, which is a modern version.)
+#if hg33+
+  $ starthttpserver $HGPORT1
+
+  $ hg --config bundleclone.pullmanifest=true clone -U http://localhost:$HGPORT clone-copy-manifest | grep pulling
+  * (glob)
+  pulling bundleclone manifest
+  pulling clonebundles manifest
+
+  $ cat clone-copy-manifest/.hg/bundleclone.manifest
+  http://localhost:$HGPORT1/fullgz.hg compression=gzip
+
+  $ cat clone-copy-manifest/.hg/clonebundles.manifest
+  http://localhost:$HGPORT1/fullgz.hg BUNDLESPEC=gzip-v1
+
+#endif
+
 Stream bundles support. bundleclone and clonebundles use slightly
 different stream bundles formats. The latter has a more formal format
 with different file headers.

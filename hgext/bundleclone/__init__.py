@@ -589,14 +589,25 @@ def bundles(repo, proto):
 def pull(orig, repo, remote, *args, **kwargs):
     res = orig(repo, remote, *args, **kwargs)
 
-    if remote.capable('bundles') and \
-            repo.ui.configbool('bundleclone', 'pullmanifest', False):
+    if not repo.ui.configbool('bundleclone', 'pullmanifest', False):
+        return res
 
+    if remote.capable('bundles'):
         lock = repo.lock()
         repo.ui.status(_('pulling bundleclone manifest\n'))
         manifest = remote._call('bundles')
         try:
             repo.opener.write('bundleclone.manifest', manifest)
+        finally:
+            lock.release()
+
+    # This functionality isn't in upstream Mercurial yet.
+    if remote.capable('clonebundles'):
+        lock = repo.lock()
+        repo.ui.status(_('pulling clonebundles manifest\n'))
+        manifest = remote._call('clonebundles')
+        try:
+            repo.opener.write('clonebundles.manifest', manifest)
         finally:
             lock.release()
 
