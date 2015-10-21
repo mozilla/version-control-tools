@@ -83,6 +83,7 @@ HTML_INDEX = '''
         <th>gzip</th>
         <th>bz2</th>
         <th>stream</th>
+        <th>stream-legacy</th>
       </tr>
       %s
     </table>
@@ -96,7 +97,7 @@ HTML_ENTRY = '''
   <td>{repo}</td>
   <td class="numeric"><a href="{gzip_path}">{gzip_size:,}</a></td>
   <td class="numeric"><a href="{bz2_path}">{bz2_size:,}</a></td>
-  <td class="numeric"><a href="{packed1_path}">{packed1_size,}</a></td>
+  <td class="numeric"><a href="{packed1_path}">{packed1_size:,}</a></td>
   <td class="numeric"><a href="{stream_path}">{stream_size:,}</a></td>
 </tr>
 '''.strip()
