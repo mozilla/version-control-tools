@@ -573,7 +573,10 @@ def applybundlev1(repo, fp):
 
 def capabilities(repo, proto):
     caps = origcapabilities(repo, proto)
-    caps += ' bundles'
+
+    if repo.opener.exists('bundleclone.manifest'):
+        caps += ' bundles'
+
     return caps
 
 def bundles(repo, proto):

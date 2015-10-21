@@ -21,7 +21,6 @@
 Clone with no available bundles falls back to regular behavior
 
   $ hg -v clone http://localhost:$HGPORT no-manifest-file
-  no bundles available; using normal clone
   requesting all changes
   adding changesets
   adding manifests

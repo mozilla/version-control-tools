@@ -21,6 +21,9 @@ Clone with bundle support but requested heads will not use bundles
   > [extensions]
   > bundleclone = $TESTDIR/hgext/bundleclone
   > EOF
+  $ cat > server/.hg/bundleclone.manifest << EOF
+  > http://irrelevant
+  > EOF
   $ hg -R server serve -d -p $HGPORT1 --pid-file hg.pid
   $ cat hg.pid >> $DAEMON_PIDS
 
