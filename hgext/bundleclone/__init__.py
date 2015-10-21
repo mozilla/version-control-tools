@@ -571,8 +571,10 @@ def applybundlev1(repo, fp):
 
 # END COPY OF mercurial/streamclone.py
 
-def capabilities(*args, **kwargs):
-    return origcapabilities(*args, **kwargs) + ' bundles'
+def capabilities(repo, proto):
+    caps = origcapabilities(repo, proto)
+    caps += ' bundles'
+    return caps
 
 def bundles(repo, proto):
     """Server command for returning info for available bundles.
