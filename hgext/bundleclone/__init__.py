@@ -639,7 +639,24 @@ def reposetup(ui, repo):
     class bundleclonerepo(repo.__class__):
         def clone(self, remote, heads=[], stream=False):
             supported = True
-            if not remote.capable('bundles'):
+
+            if (exchange and hasattr(exchange, '_maybeapplyclonebundle')
+                    and remote.capable('clonebundles')):
+                supported = False
+                self.ui.warn(_('(mercurial client has built-in support for '
+                               'bundle clone features; the "bundleclone" '
+                               'extension can likely safely be removed)\n'))
+
+                if not self.ui.configbool('experimental', 'clonebundles', False):
+                    self.ui.warn(_('(but the experimental.clonebundles config '
+                                   'flag is not enabled: enable it before '
+                                   'disabling bundleclone or cloning from '
+                                   'pre-generated bundles may not work)\n'))
+                    # We assume that presence of the bundleclone extension
+                    # means they want clonebundles enabled. Otherwise, why do
+                    # they have bundleclone enabled? So silently enable it.
+                    ui.setconfig('experimental', 'clonebundles', True)
+            elif not remote.capable('bundles'):
                 supported = False
                 self.ui.debug(_('bundle clone not supported\n'))
             elif heads:
