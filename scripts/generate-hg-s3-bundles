@@ -257,7 +257,7 @@ def generate_bundles(repo):
         for host, bucket, name in HOSTS:
             entry = 'https://%s/%s/%s %s ec2region=%s' % (
                 host, bucket, remote_path, params, name)
-            bundleclone_manifest.append(entry)
+            clonebundles_manifest.append(entry)
 
     bundleclone_path = os.path.join(repo_full, '.hg', 'bundleclone.manifest')
     clonebundles_path = os.path.join(repo_full, '.hg', 'clonebundles.manifest')
