@@ -17,7 +17,17 @@ import concurrent.futures as futures
 # The types of bundles to generate.
 #
 # Define in order bundles should be listed in manifest.
-TYPES = ('gzip', 'stream', 'bzip2')
+CREATES = [
+    ('gzip', ['bundle', '-a', '-t', 'gzip']),
+    ('bzip2', ['bundle', '-a', '-t', 'bzip2']),
+    ('stream', ['streambundle']),
+]
+
+ORDER = [
+    ('gzip', 'compression=gzip'),
+    ('bzip2', 'compression=bzip2'),
+    ('stream', 'stream=revlogv1'),
+]
 
 # Defines hostname and bucket where uploads should go.
 HOSTS = (
@@ -100,20 +110,20 @@ def upload_to_s3(host, bucket_name, local_path, remote_path):
     else:
         key.set_contents_from_filename(local_path)
 
+def bundle_paths(root, repo, tag, typ):
+    basename = '%s.%s.hg' % (tag, typ)
+    final_path = os.path.join(root, basename)
+    remote_path = '%s/%s' % (repo, basename)
 
-def generate_bundle(repo, typ, temp_path, final_path):
-    """Generate a single bundle of a type.
+    return final_path, remote_path
 
-    Create a bundle of type ``typ`` from repo ``repo`` using temporary file
-    ``temp_path`` before atomically moving it to ``final_path``.
+def generate_bundle(repo, temp_path, final_path, extra_args):
+    """Generate a single bundle from arguments.
+
+    Generates using the command specified by ``extra_args`` into ``temp_path``
+    before moving the fully created bundle to ``final_path``.
     """
-    args = ['hg', '-R', repo]
-    if typ == 'stream':
-        args.append('streambundle')
-    else:
-        args.extend(['bundle', '-a', '-t', typ])
-
-    args.append(temp_path)
+    args = ['hg', '-R', repo] + extra_args + [temp_path]
     subprocess.check_call(args)
     os.rename(temp_path, final_path)
 
@@ -166,23 +176,16 @@ def generate_bundles(repo):
     # This is because an aborted bundle process may result in a partial file,
     # which may confuse our don't-write-if-file-exists logic.
 
-    files = []
-
-    for t in TYPES:
-        basename = '%s.%s.hg' % (tip, t)
-        final_path = os.path.join(bundle_path, basename)
-        temp_path = '%s.tmp' % final_path
-        remote_path = '%s/%s' % (repo, basename)
-
-        files.append((t, final_path, temp_path, remote_path))
-
     with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
-        for t, final_path, temp_path, remote_path in files:
+        for t, args in CREATES:
+            final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
+            temp_path = '%s.tmp' % final_path
+
             if os.path.exists(final_path):
                 print('bundle already exists, skipping: %s' % final_path)
                 continue
 
-            e.submit(generate_bundle, repo_full, t, temp_path, final_path)
+            e.submit(generate_bundle, repo_full, temp_path, final_path, args)
 
     # Object path is keyed off the repository name so we can easily see what
     # is taking up space on the server.
@@ -191,7 +194,7 @@ def generate_bundles(repo):
     #
     # S3 supports replication. However, replication occurs asynchronously
     # with the upload. This means there is a window between when upload
-    # complete and when the bundle is available in the other region. We
+    # completes and when the bundle is available in the other region. We
     # don't want to advertise the bundle until it is distributed, as this
     # would result in a 404 and client failure. We could poll and wait for
     # replication to complete. However, there are similar issues with
@@ -207,18 +210,17 @@ def generate_bundles(repo):
     # upload the bundle to multiple regions instead of employ COPY.
     with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
         for host, bucket, name in HOSTS:
-            for t, final_path, temp_path, remote_path in files:
+            for t, _args in CREATES:
+                final_path, remote_path = bundle_paths(bundle_path, repo,
+                                                       tip, t)
                 print('uploading to %s/%s/%s' % (host, bucket, remote_path))
                 e.submit(upload_to_s3, host, bucket, final_path, remote_path)
 
     # Now assemble a manifest listing each bundle.
     paths = {}
     manifest = []
-    for t, final_path, temp_path, remote_path in files:
-        if t == 'stream':
-            params = 'stream=revlogv1'
-        else:
-            params = 'compression=%s' % t
+    for t, params in ORDER:
+        final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
 
         manifest.append('%s/%s %s cdn=true requiresni=true' % (
             CDN, remote_path, params))
