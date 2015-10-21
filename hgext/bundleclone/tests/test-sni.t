@@ -25,14 +25,14 @@ Generate bundle
   $ hg -R server bundle --type gzip -a server-nosni.gz.hg
   2 changesets found
 
-Require SNI works if Python version is new enough
+Require SNI works if Python and Mercurial version is new enough
 
   $ cat > server/.hg/bundleclone.manifest << EOF
   > http://localhost:$HGPORT1/server-sni.gz.hg compression=gzip requiresni=true
   > EOF
 
   $ starthttpserver $HGPORT1
-  $ hg --config bundleclone.fakepyver=2,7,10 clone -U http://localhost:$HGPORT/ clone-working-sni
+  $ hg --config bundleclone.fakepyver=2,7,10 --config bundleclone.fakehgver=3,3 clone -U http://localhost:$HGPORT/ clone-working-sni
   downloading bundle http://localhost:$HGPORT1/server-sni.gz.hg
   adding changesets
   adding manifests
@@ -44,7 +44,7 @@ Require SNI works if Python version is new enough
 
 Old Python without SNI fails with no non-SNI URL
 
-  $ hg --config bundleclone.fakepyver=2,7,8 clone -U http://localhost:$HGPORT/ clone-no-sni
+  $ hg --config bundleclone.fakepyver=2,7,8 --config bundleclone.fakehgver=3,3 clone -U http://localhost:$HGPORT/ clone-no-sni
   (your Python is older than 2.7.9 and does not support modern and secure SSL/TLS; please consider upgrading your Python to a secure version)
   (ignoring URL on server that requires SNI)
   abort: no appropriate bundles available
@@ -53,7 +53,7 @@ Old Python without SNI fails with no non-SNI URL
 
 Old Mercurial without SNI fails with no non-SNI URL
 
-  $ hg --config bundleclone.fakehgver=3,0 clone -U http://localhost:$HGPORT/ clone-no-hg-sni
+  $ hg --config bundleclone.fakepyver=2,7,10 --config bundleclone.fakehgver=3,0 clone -U http://localhost:$HGPORT/ clone-no-hg-sni
   (you Mercurial is old and does not support modern and secure SSL/TLS; please consider upgrading your Mercurial to 3.3+ which supports modern and secure SSL/TLS
   (ignoring URL on server that requires SNI)
   abort: no appropriate bundles available
@@ -78,7 +78,7 @@ Old Python without SNI filters SNI URLs
   > EOF
 
   $ starthttpserver $HGPORT1
-  $ hg --config bundleclone.fakepyver=2,7,8 clone -U http://localhost:$HGPORT/ clone-no-sni-fallback
+  $ hg --config bundleclone.fakepyver=2,7,8 --config bundleclone.fakehgver=3,3 clone -U http://localhost:$HGPORT/ clone-no-sni-fallback
   (your Python is older than 2.7.9 and does not support modern and secure SSL/TLS; please consider upgrading your Python to a secure version)
   (ignoring URL on server that requires SNI)
   downloading bundle http://localhost:$HGPORT1/server-nosni.gz.hg
@@ -93,7 +93,7 @@ Old Python without SNI filters SNI URLs
 Old Mercurial without SNI filters SNI URLs
 
   $ starthttpserver $HGPORT1
-  $ hg --config bundleclone.fakehgver=3,0 clone -U http://localhost:$HGPORT/ clone-old-hg-fallback
+  $ hg --config bundleclone.fakepyver=2,7,10 --config bundleclone.fakehgver=3,0 clone -U http://localhost:$HGPORT/ clone-old-hg-fallback
   (you Mercurial is old and does not support modern and secure SSL/TLS; please consider upgrading your Mercurial to 3.3+ which supports modern and secure SSL/TLS
   (ignoring URL on server that requires SNI)
   downloading bundle http://localhost:$HGPORT1/server-nosni.gz.hg
