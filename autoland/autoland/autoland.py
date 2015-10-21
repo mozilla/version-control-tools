@@ -25,6 +25,9 @@ import treestatus
 # max updates to post to github / iteration
 GITHUB_COMMENT_LIMIT = 10
 
+# max attempts to transplant before bailing
+MAX_TRANSPLANT_ATTEMPTS = 50
+
 # max updates to post to reviewboard / iteration
 MOZREVIEW_COMMENT_LIMIT = 10
 
@@ -214,8 +217,21 @@ def handle_pending_transplants(logger, dbconn):
             retry_revisions.append((now, transplant_id))
             continue
 
-        landed, result = transplant.transplant(tree, destination, rev,
-                                               trysyntax, push_bookmark)
+        attempts = 0
+        while attempts < MAX_TRANSPLANT_ATTEMPTS:
+            # TODO: We should break the transplant call into two steps, one
+            #       to pull down the commits to transplant, and another
+            #       one to rebase it and attempt to push so we don't
+            #       duplicate work unnecessarily if we have to rebase more
+            #       than once.
+            landed, result = transplant.transplant(tree, destination, rev,
+                                                   trysyntax, push_bookmark)
+
+            if landed or 'abort: push creates new remote head' not in result:
+                break
+
+            attempts += 1
+
         if landed:
             logger.info(('transplanted from tree: %s rev: %s'
                          ' to destination: %s new revision: %s') %
@@ -225,6 +241,10 @@ def handle_pending_transplants(logger, dbconn):
                 logger.info('transplant failed: tree: %s is closed - '
                             ' retrying later.' % tree)
                 current_treestatus[destination] = False
+                retry_revisions.append((now, transplant_id))
+                continue
+            elif 'abort: push creates new remote head' in result:
+                logger.info('transplant failed: we lost a push race')
                 retry_revisions.append((now, transplant_id))
                 continue
             else:
