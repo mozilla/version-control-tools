@@ -111,6 +111,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
 
         target_repository = rr.repository.extra_data.get(
             'landing_repository_url')
+        push_bookmark = rr.repository.extra_data.get('landing_bookmark')
 
         if not target_repository:
             return AUTOLAND_CONFIGURATION_ERROR.with_message(
@@ -150,6 +151,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
                 'pingback_url': pingback_url,
                 'rev': last_revision,
                 'destination': target_repository,
+                'push_bookmark': push_bookmark,
             }), headers={
                 'content-type': 'application/json',
             },

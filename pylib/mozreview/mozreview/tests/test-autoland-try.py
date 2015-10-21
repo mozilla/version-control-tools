@@ -62,7 +62,7 @@ class AutolandTryTest(MozReviewWebDriverTest):
             try_btn.value_of_css_property('opacity'), '0.5')
         self.add_hostingservice(1, 'Sirius Black', 'scm_level_1',
                                 'ssh://hg.example.com/try',
-                                'ssh://hg.example.com/mainline')
+                                'ssh://hg.example.com/mainline', '')
 
         # We should also not be able to trigger a Try run unless the review is
         # published.

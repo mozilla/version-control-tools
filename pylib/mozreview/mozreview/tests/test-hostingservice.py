@@ -29,7 +29,7 @@ class HostingServiceTest(MozReviewWebDriverTest):
 
         self.add_hostingservice(1, 'Sirius Black', 'scm_level_3',
                                 'ssh://hg.example.com/try',
-                                'ssh://hg.example.com/mainline')
+                                'ssh://hg.example.com/mainline', '')
 
         # If we visit the review url, we should be able to find repository
         # information

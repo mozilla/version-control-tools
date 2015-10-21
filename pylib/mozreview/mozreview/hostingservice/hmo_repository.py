@@ -29,6 +29,13 @@ class HMORepositoryForm(HostingServiceForm):
         widget=forms.TextInput(attrs={'size': '60'}),
         help_text=_('URL for repository to land completed work (if any)'))
 
+    landing_bookmark = forms.CharField(
+        label=_('Autoland Bookmark'),
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'size': '60'}),
+        help_text=_('Bookmark to update and push when autolanding (if any)'))
+
     required_ldap_group = forms.CharField(
         label=_('Required LDAP group'),
         # Default to a restrictive group just to be safe.
@@ -49,6 +56,7 @@ class HMORepository(HostingService):
             'path': '%(repository_url)s',
             'try_repository_url': '%(try_repository_url)s',
             'landing_repository_url': '%(landing_repository_url)s',
+            'landing_bookmark': '%(landing_bookmark)s',
             'required_ldap_group': '%(required_ldap_group)s',
         },
     }
