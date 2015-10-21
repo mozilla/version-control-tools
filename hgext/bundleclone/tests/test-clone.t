@@ -130,6 +130,11 @@ Bundle with full content works
   updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
+(We only care about manifest copying on servers, which are gauranteed to
+be modern Mercurial versions. Don't test this functionality on super old
+client versions.)
+#if hg33+
+
 Clone will copy manifest from server
 
   $ starthttpserver $HGPORT1
@@ -169,6 +174,8 @@ Pull will copy manifest from server
   pulling bundleclone manifest
   $ cat clone-copy-manifest/.hg/bundleclone.manifest
   http://localhost:$HGPORT1/aaff8d2ffbbf.hg
+
+#endif
 
 Stream bundles will work
 
