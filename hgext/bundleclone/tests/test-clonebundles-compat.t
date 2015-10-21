@@ -103,3 +103,49 @@ Actually doing a clone bundle will work with built-in feature
   no changes found
 
 #endif
+
+Stream bundles support. bundleclone and clonebundles use slightly
+different stream bundles formats. The latter has a more formal format
+with different file headers.
+
+  $ hg -R server streambundle stream-legacy.hg
+  writing stream-legacy.hg
+  stream bundle file written successully.
+  include the following in its manifest entry:
+  stream=revlogv1
+
+  $ cat > server/.hg/bundleclone.manifest << EOF
+  > http://localhost:$HGPORT1/stream-legacy.hg stream=revlogv1
+  > EOF
+
+  $ hg -R server streambundle --type s1 stream-s1.hg
+  writing 613 bytes for 4 files
+  bundle requirements: revlogv1
+
+  $ cat > server/.hg/clonebundles.manifest << EOF
+  > http://localhost:$HGPORT1/stream-s1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1
+  > EOF
+
+  $ starthttpserver $HGPORT1
+
+#if hg36+
+  $ hg clone -U http://localhost:$HGPORT stream-bundle
+  (mercurial client has built-in support for bundle clone features; the "bundleclone" extension can likely safely be removed)
+  applying clone bundle from http://localhost:$HGPORT1/stream-s1.hg
+  4 files to transfer, 613 bytes of data
+  transferred 613 bytes in *.* seconds (*) (glob)
+  finished applying clone bundle
+  searching for changes
+  no changes found
+
+#else
+  $ hg clone -U http://localhost:$HGPORT stream-legacy
+  downloading bundle http://localhost:$HGPORT1/stream-legacy.hg
+  streaming all changes
+  4 files to transfer, 613 bytes of data
+  transferred 613 bytes in * seconds (*) (glob)
+  finishing applying bundle; pulling
+  searching for changes
+  no changes found
+
+#endif

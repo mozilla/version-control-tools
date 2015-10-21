@@ -603,23 +603,43 @@ def pull(orig, repo, remote, *args, **kwargs):
     return res
 
 
-@command('streambundle', [], _('hg streambundle path'))
-def streambundle(ui, repo, path):
-    """Generate a stream bundle file for a repository."""
+@command('streambundle', [
+    ('t', 'type', '', 'type of bundle', 'TYPE'),
+], _('hg streambundle [-t TYPE] path'))
+def streambundle(ui, repo, path, **opts):
+    """Generate a stream bundle file for a repository.
 
-    requires = set(repo.requirements) & repo.supportedformats
-    if requires - set(['revlogv1']):
-        raise util.Abort(_('cannot generate stream bundle for this repo '
-            'because of requirement: %s') % (' '.join(requires)))
+    If ``--type`` is not defined (the default), produce a legacy bundle format.
+    Else, produce the requested bundle format, which currently is limited to
+    ``S1``.
+    """
+    typ = opts.get('type', None)
+    if not typ:
+        requires = set(repo.requirements) & repo.supportedformats
+        if requires - set(['revlogv1']):
+            raise util.Abort(_('cannot generate stream bundle for this repo '
+                'because of requirement: %s') % (' '.join(requires)))
 
-    ui.status(_('writing %s\n') % path)
-    with open(path, 'w') as fh:
-        for chunk in generatev1wireproto(repo):
+        ui.status(_('writing %s\n') % path)
+        with open(path, 'w') as fh:
+            for chunk in generatev1wireproto(repo):
+                fh.write(chunk)
+
+        ui.write(_('stream bundle file written successully.\n'))
+        ui.write(_('include the following in its manifest entry:\n'))
+        ui.write('stream=%s\n' % ','.join(requires))
+        return
+
+    if typ.lower() != 's1':
+        raise error.Abort(_('can only produce s1 bundles'))
+
+    requirements, gen = generatebundlev1(repo)
+    with open(path, 'wb') as fh:
+        for chunk in gen:
             fh.write(chunk)
 
-    ui.write(_('stream bundle file written successully.\n'))
-    ui.write(_('include the following in its manifest entry:\n'))
-    ui.write('stream=%s\n' % ','.join(requires))
+    ui.write(_('bundle requirements: %s\n') % ', '.join(sorted(requirements)))
+
 
 def extsetup(ui):
     # exchange isn't available on older Mercurial. Wrapped pull pulls down
