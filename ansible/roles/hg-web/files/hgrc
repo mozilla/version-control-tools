@@ -26,6 +26,9 @@ unified = 8
 
 [extensions]
 highlight =
+# TODO use built-in extension when running 3.6.
+clonebundles = /repo/hg/version-control-tools/hgserver/clonebundles.py
+
 bundleclone = /repo_local/mozilla/extensions/bundleclone
 pushlog-feed = /repo_local/mozilla/extensions/pushlog-feed.py
 pushlog = /repo_local/mozilla/extensions/pushlog
