@@ -194,7 +194,7 @@ except ImportError:
     exchange = None
 demandimport.enable()
 
-testedwith = '2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5'
+testedwith = '2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bundleclone'
 
 cmdtable = {}
@@ -806,7 +806,12 @@ def reposetup(ui, repo):
                     else:
                         cg = changegroup.readbundle(fh, 'stream')
 
-                    if hasattr(changegroup, 'addchangegroup'):
+                    # Mercurial 3.6 introduced cgNunpacker.apply().
+                    # Before that, there was changegroup.addchangegroup().
+                    # Before that, there was localrepository.addchangegroup().
+                    if hasattr(cg, 'apply'):
+                        cg.apply(self, 'bundleclone', url)
+                    elif hasattr(changegroup, 'addchangegroup'):
                         changegroup.addchangegroup(self, cg, 'bundleclone', url)
                     else:
                         self.addchangegroup(cg, 'bundleclone', url)
