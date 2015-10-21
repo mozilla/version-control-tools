@@ -20,13 +20,20 @@ import concurrent.futures as futures
 CREATES = [
     ('gzip', ['bundle', '-a', '-t', 'gzip']),
     ('bzip2', ['bundle', '-a', '-t', 'bzip2']),
-    ('stream', ['streambundle']),
+    ('stream-legacy', ['streambundle']),
+    ('packed1', ['streambundle', '--type', 's1']),
 ]
 
-ORDER = [
+BUNDLECLONE_ORDER = [
     ('gzip', 'compression=gzip'),
     ('bzip2', 'compression=bzip2'),
-    ('stream', 'stream=revlogv1'),
+    ('stream-legacy', 'stream=revlogv1'),
+]
+
+CLONEBUNDLES_ORDER = [
+    ('gzip', 'BUNDLESPEC=gzip-v1'),
+    ('bzip2', 'BUNDLESPEC=bzip2-v1'),
+    ('packed1', 'BUNDLESPEC=none-packed1;requirements%3Drevlogv1'),
 ]
 
 # Defines hostname and bucket where uploads should go.
@@ -41,7 +48,7 @@ CDN = 'https://hg.cdn.mozilla.net'
 # with volume snapshots. See bug 1167935.
 BUNDLE_ROOT = '/repo/bundles'
 
-CONCURRENT_THREADS = 3
+CONCURRENT_THREADS = 4
 
 HTML_INDEX = '''
 <html>
@@ -71,7 +78,12 @@ HTML_INDEX = '''
        <a href="https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/bundleclone.html">the official docs</a>.
     </p>
     <table border="1">
-      <tr><th>Repository</th><th>gzip</th><th>bz2</th><th>stream</th></tr>
+      <tr>
+        <th>Repository</th>
+        <th>gzip</th>
+        <th>bz2</th>
+        <th>stream</th>
+      </tr>
       %s
     </table>
     <p>This page generated at %s.</p>
@@ -84,6 +96,7 @@ HTML_ENTRY = '''
   <td>{repo}</td>
   <td class="numeric"><a href="{gzip_path}">{gzip_size:,}</a></td>
   <td class="numeric"><a href="{bz2_path}">{bz2_size:,}</a></td>
+  <td class="numeric"><a href="{packed1_path}">{packed1_size,}</a></td>
   <td class="numeric"><a href="{stream_path}">{stream_size:,}</a></td>
 </tr>
 '''.strip()
@@ -218,31 +231,48 @@ def generate_bundles(repo):
 
     # Now assemble a manifest listing each bundle.
     paths = {}
-    manifest = []
-    for t, params in ORDER:
+    for t, _args in CREATES:
+        final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
+        paths[t] = (remote_path, os.path.getsize(final_path))
+
+    bundleclone_manifest = []
+    for t, params in BUNDLECLONE_ORDER:
         final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
 
-        manifest.append('%s/%s %s cdn=true requiresni=true' % (
+        bundleclone_manifest.append('%s/%s %s cdn=true requiresni=true' % (
             CDN, remote_path, params))
 
         for host, bucket, name in HOSTS:
             entry = 'https://%s/%s/%s ec2region=%s %s' % (
                 host, bucket, remote_path, name, params)
-            manifest.append(entry)
+            bundleclone_manifest.append(entry)
 
-            size = os.path.getsize(final_path)
-            paths[t] = (remote_path, size)
+    clonebundles_manifest = []
+    for t, params in CLONEBUNDLES_ORDER:
+        final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
+        clonebundles_manifest.append('%s/%s %s REQUIRESNI=true cdn=true' % (
+            CDN, remote_path, params))
 
-    manifest_path = os.path.join(repo_full, '.hg', 'bundleclone.manifest')
-    with open(manifest_path, 'wb') as fh:
-        fh.write('\n'.join(manifest))
+        for host, bucket, name in HOSTS:
+            entry = 'https://%s/%s/%s %s ec2region=%s' % (
+                host, bucket, remote_path, params, name)
+            bundleclone_manifest.append(entry)
+
+    bundleclone_path = os.path.join(repo_full, '.hg', 'bundleclone.manifest')
+    clonebundles_path = os.path.join(repo_full, '.hg', 'clonebundles.manifest')
+    with open(bundleclone_path, 'wb') as fh:
+        fh.write('\n'.join(bundleclone_manifest))
+    with open(clonebundles_path, 'wb') as fh:
+        fh.write('\n'.join(clonebundles_manifest))
 
     # Ensure manifest is owned by same user who owns repo and has sane
     # permissions.
     # TODO we can't do this yet since the "hg" user isn't a member of the
     # scm_* groups.
-    #os.chown(manifest_path, uid, gid)
-    os.chmod(manifest_path, 0664)
+    #os.chown(bundleclone_path, uid, gid)
+    #os.chown(clonebundles_path, uid, gid)
+    os.chmod(bundleclone_path, 0664)
+    os.chmod(clonebundles_path, 0664)
 
     # Replicate manifest to mirrors.
     subprocess.check_call(['/repo/hg/scripts/push-repo.sh'], cwd=repo_full)
@@ -262,8 +292,10 @@ def upload_index(repos):
                                          gzip_size=p['gzip'][1],
                                          bz2_path=p['bzip2'][0],
                                          bz2_size=p['bzip2'][1],
-                                         stream_path=p['stream'][0],
-                                         stream_size=p['stream'][1]))
+                                         packed1_path=p['packed1'][0],
+                                         packed1_size=p['packed1'][1],
+                                         stream_path=p['stream-legacy'][0],
+                                         stream_size=p['stream-legacy'][1]))
 
     html = HTML_INDEX % ('\n'.join(entries),
                          datetime.datetime.utcnow().isoformat())
