@@ -447,22 +447,20 @@ class AutolandRequestUpdateResource(WebAPIResource):
 
         try:
             fields = json.loads(request.body)
-            landed = fields['landed']
-            # result and error_msg are mutually exclusive
-            filtered_field = 'error_msg' if landed else 'result'
-            mandatory_fields = [f for f in self.fields if f != filtered_field]
-            for field_name in mandatory_fields:
-                assert type(fields[field_name]) == self.fields[field_name]['type']
-        except (ValueError, IndexError, AssertionError) as e:
+
+            for field_name in self.fields:
+                assert (type(fields[field_name]) ==
+                        self.fields[field_name]['type'])
+        except (ValueError, IndexError, KeyError, AssertionError) as e:
             return INVALID_FORM_DATA, {
-                'error': e,
+                'error': '%s' % e,
                 }
         try:
             AutolandRequest.objects.get(pk=fields['request_id'])
         except AutolandRequest.DoesNotExist:
             return DOES_NOT_EXIST
 
-        if landed:
+        if fields['landed']:
             autoland_request = AutolandRequest.objects.filter(pk=fields['request_id'])
             autoland_request.update(repository_revision=fields['result'])
 
@@ -480,16 +478,23 @@ class AutolandRequestUpdateResource(WebAPIResource):
                 status=AutolandEventLogEntry.SERVED,
                 details=fields['result'])
 
+        elif not fields.get('error_msg') and fields.get('result'):
+            AutolandEventLogEntry.objects.create(
+                autoland_request_id=fields['request_id'],
+                status=AutolandEventLogEntry.REQUESTED,
+                details=fields['result'])
         else:
             AutolandEventLogEntry.objects.create(
                 autoland_request_id=fields['request_id'],
                 status=AutolandEventLogEntry.PROBLEM,
                 error_msg=fields['error_msg']
             )
+
         lock_id = get_autoland_lock_id(rr.id,
                                        autoland_request[0].repository_url,
                                        autoland_request[0].push_revision)
         release_lock(lock_id)
+
         return 200, {}
 
 
