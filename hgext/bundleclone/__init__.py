@@ -763,7 +763,7 @@ def reposetup(ui, repo):
                                            'SSL/TLS; please consider '
                                            'upgrading your Mercurial to 3.3+ '
                                            'which supports modern and secure '
-                                           'SSL/TLS\n'))
+                                           'SSL/TLS)\n'))
                         snifilteredfromhg = True
                         skip = True
 
