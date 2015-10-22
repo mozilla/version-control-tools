@@ -1,4 +1,4 @@
-#require docker
+#require mozreviewdocker
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ commonenv rb-test-bugzilla
 

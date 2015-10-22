@@ -1,4 +1,4 @@
-#require docker
+#require mozreviewdocker
 
   $ $TESTDIR/d0cker start-bmo httpd-bugzilla-auth $HGPORT --web-id-file web_id
   waiting for Bugzilla to start

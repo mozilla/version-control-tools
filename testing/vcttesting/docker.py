@@ -1158,32 +1158,49 @@ class Docker(object):
         except KeyError:
             pass
 
-    def build_all_images(self, verbose=False, use_last=False):
-        images = self.ensure_images_built([
-            'autolanddb',
-            'autoland',
-            'bmodb-volatile',
-            'bmoweb',
-            'ldap',
-            'pulse',
-            'treestatus',
-        ], ansibles={
-            'hgmaster': ('docker-hgmaster', 'centos6'),
-            'hgweb': ('docker-hgweb', 'centos6'),
-            'hgrb': ('docker-hgrb', 'centos6'),
-            'rbweb': ('docker-rbweb', 'centos6'),
-        }, verbose=verbose, use_last=use_last)
+    def build_all_images(self, verbose=False, use_last=False, mozreview=True,
+                         hgmo=True):
+        docker_images = set()
+        ansible_images = {}
+        if mozreview:
+            docker_images |= {
+                'autolanddb',
+                'autoland',
+                'bmodb-volatile',
+                'bmoweb',
+                'ldap',
+                'pulse',
+                'treestatus',
+            }
+            ansible_images['hgrb'] = ('docker-hgrb', 'centos6')
+            ansible_images['rbweb'] = ('docker-rbweb', 'centos6')
+            ansible_images['hgweb'] = ('docker-hgweb', 'centos6')
+
+        if hgmo:
+            docker_images |= {
+                'ldap',
+            }
+            ansible_images['hgmaster'] = ('docker-hgmaster', 'centos6')
+            ansible_images['hgweb'] = ('docker-hgweb', 'centos6')
+
+        images = self.ensure_images_built(docker_images,
+                ansibles=ansible_images, verbose=verbose, use_last=use_last)
 
         with futures.ThreadPoolExecutor(2) as e:
-            f_mr = e.submit(self.build_mozreview, images=images,
-                            verbose=verbose, use_last=use_last,
-                            build_hgweb=False)
-            f_hgmo = e.submit(self.build_hgmo, images=images, verbose=verbose,
-                              use_last=use_last)
+            if mozreview:
+                f_mr = e.submit(self.build_mozreview, images=images,
+                                verbose=verbose, use_last=use_last,
+                                build_hgweb=not hgmo)
+            if hgmo:
+                f_hgmo = e.submit(self.build_hgmo, images=images, verbose=verbose,
+                                  use_last=use_last)
+
+        mr_result = f_mr.result() if mozreview else None
+        hgmo_result = f_hgmo.result() if hgmo else None
 
         self.prune_images()
 
-        return f_mr.result(), f_hgmo.result()
+        return mr_result, hgmo_result
 
     def _get_files_from_http_container(self, builder, message):
         image = self.ensure_built(builder, verbose=True)

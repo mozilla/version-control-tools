@@ -45,6 +45,14 @@ def has_docker():
     d = Docker(tf.name, url, tls=tls)
     return d.is_alive()
 
+@check('hgmodocker', 'Require hgmo Docker pieces')
+def has_hgmodocker():
+    return has_docker()
+
+@check('mozreviewdocker', 'Request mozreview Docker pieces')
+def has_mozreviewdocker():
+    return has_docker()
+
 def hgversion():
     v = os.environ['HGVERSION']
     v = v.split('+')[0]

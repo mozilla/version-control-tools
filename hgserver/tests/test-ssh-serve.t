@@ -1,4 +1,4 @@
-#require docker
+#require hgmodocker
 
   $ . $TESTDIR/hgserver/tests/helpers.sh
   $ hgmoenv
