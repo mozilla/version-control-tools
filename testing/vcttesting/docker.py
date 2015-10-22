@@ -1138,7 +1138,6 @@ class Docker(object):
             treestatus_hostname, treestatus_hostport = \
                 self._get_host_hostname_port(treestatus_state, '80/tcp')
 
-        print('waiting for Bugzilla to start')
         wait_for_http(bmoweb_hostname, bmoweb_hostport,
                       extra_check_fn=self._get_assert_container_running_fn(web_id))
         if start_pulse:
@@ -1160,8 +1159,6 @@ class Docker(object):
         if start_treestatus:
             wait_for_http(treestatus_hostname, treestatus_hostport,
                           extra_check_fn=self._get_assert_container_running_fn(treestatus_id))
-
-        print('Bugzilla accessible on %s' % bmo_url)
 
         result = {
             'bugzilla_url': bmo_url,
