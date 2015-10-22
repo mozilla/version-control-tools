@@ -950,7 +950,7 @@ class Docker(object):
 
         containers = self.state['containers'].setdefault(cluster, [])
 
-        with futures.ThreadPoolExecutor(6) as e:
+        with futures.ThreadPoolExecutor(10) as e:
             # Create containers concurrently - no race conditions here.
             f_db_create = e.submit(self.client.create_container, db_image,
                     environment={'MYSQL_ROOT_PASSWORD': 'password'})
