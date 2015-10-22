@@ -75,12 +75,12 @@ commonenv() {
 
   export HGSSHHGRCPATH=${MOZREVIEW_HOME}/hgrc
 
-  mozreview create-user default@example.com password 'Default User' \
+  apikey=`mozreview create-user default@example.com password 'Default User' \
     --bugzilla-group editbugs \
     --uid 2000 \
-    --scm-level 1 > /dev/null
-
-  apikey=`mozreview create-api-key default@example.com`
+    --scm-level 1 \
+    --print-api-key \
+    | tail -1`
 
   exportbzauth default@example.com password
 

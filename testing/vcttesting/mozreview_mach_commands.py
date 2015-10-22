@@ -210,9 +210,12 @@ class MozReviewCommands(object):
                      help='Bugzilla group to add user to.')
     @CommandArgument('--no-api-key', action='store_true',
                      help='Do not create an API key for this user.')
+    @CommandArgument('--print-api-key', action='store_true',
+                     help='Print the created API key')
     def create_user(self, where, email, password, fullname, uid=None,
                     username=None, key_file=None, scm_level=None,
-                    bugzilla_group=None, no_api_key=False):
+                    bugzilla_group=None, no_api_key=False,
+                    print_api_key=False):
         mr = self._get_mozreview(where)
         u = mr.create_user(email, password, fullname,
                            uid=uid,
@@ -222,6 +225,9 @@ class MozReviewCommands(object):
                            bugzilla_groups=bugzilla_group,
                            api_key=not no_api_key)
         print('Created user %s' % u['bugzilla']['id'])
+
+        if print_api_key:
+            print(u['bugzilla']['api_key'])
 
     @Command('create-ldap-user', category='mozreview',
              description='Create a user in the LDAP server')
