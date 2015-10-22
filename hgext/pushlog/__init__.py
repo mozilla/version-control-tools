@@ -653,7 +653,10 @@ def extsetup(ui):
     }
 
     templatekw.keywords.update(keywords)
-    templatekw.dockeywords.update(keywords)
+
+    # dockeywords was removed in Mercurial 3.6.
+    if hasattr(templatekw, 'dockeywords'):
+        templatekw.dockeywords.update(keywords)
 
     extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
     extensions.wrapfunction(webutil, 'changelistentry', changelistentry)
