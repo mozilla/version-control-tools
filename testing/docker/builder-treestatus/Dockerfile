@@ -15,7 +15,8 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
   ca-certificates git python2.7-dev python-pip sqlite3
 
 RUN git clone https://github.com/mozilla/treestatus.git ${TREESTATUS_HOME}
-RUN cd ${TREESTATUS_HOME} && git submodule update --init vendor
+RUN cd ${TREESTATUS_HOME} && git checkout cc3fb83f41cb65da3595275f39ec6448f4816dff \
+    && git submodule update --init vendor
 
 RUN pip install -r ${TREESTATUS_HOME}/requirements/compiled.txt
 
