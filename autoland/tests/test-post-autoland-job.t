@@ -34,7 +34,8 @@ Create a commit to test on Try
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
+  (review requests lack reviewers; visit review url to assign reviewers)
+  (visit review url to publish these review requests so others can see them)
 
 Ensure Autoland started without errors
 
@@ -91,7 +92,8 @@ Post a job using a bookmark
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers and publish these review requests)
+  (review requests lack reviewers; visit review url to assign reviewers)
+  (visit review url to publish these review requests so others can see them)
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` try http://localhost:9898 --push-bookmark "bookmark"
   (200, u'{\n  "request_id": 4\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 4 --poll
