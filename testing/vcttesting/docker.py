@@ -1210,8 +1210,10 @@ class Docker(object):
     def stop_bmo(self, cluster):
         count = 0
 
-        with futures.ThreadPoolExecutor(4) as e:
-            for container in reversed(self.state['containers'].get(cluster, [])):
+        ids = self.state['containers'].get(cluster, [])
+
+        with futures.ThreadPoolExecutor(max(1, len(ids))) as e:
+            for container in reversed(ids):
                 count += 1
                 e.submit(self.client.remove_container, container, force=True)
 
