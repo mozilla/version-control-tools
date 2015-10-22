@@ -646,6 +646,50 @@ class Docker(object):
 
         return images
 
+    def build_bmo(self, images=None, verbose=False):
+        bmo_images = self.ensure_images_built([
+            'bmodb-volatile',
+            'bmoweb',
+        ], existing=images, verbose=verbose)
+
+        self.state['last-bmodb-id'] = bmo_images['bmodb-volatile']
+        self.state['last-bmoweb-id'] = bmo_images['bmoweb']
+        self.save_state()
+
+        state_images = self.state['images']
+
+        # The keys for the bootstrapped images are derived from the base
+        # images they depend on. This means that if we regenerate a new
+        # base image, the bootstrapped images will be regenerated.
+        bmodb_bootstrapped_key = 'bmodb-bootstrapped:%s' % bmo_images['bmodb-volatile']
+        bmoweb_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (
+                bmo_images['bmodb-volatile'], bmo_images['bmoweb'])
+
+        bmodb_bootstrap = state_images.get(bmodb_bootstrapped_key)
+        bmoweb_bootstrap = state_images.get(bmoweb_bootstrapped_key)
+
+        known_images = self.all_docker_images()
+        if bmodb_bootstrap and bmodb_bootstrap not in known_images:
+            bmodb_bootstrap = None
+        if bmoweb_bootstrap and bmoweb_bootstrap not in known_images:
+            bmoweb_bootstrap = None
+
+        if (not bmodb_bootstrap or not bmoweb_bootstrap
+            or self.clobber_needed('bmobootstrap')):
+            bmodb_bootstrap, bmoweb_bootstrap = self._bootstrap_bmo(
+                    bmo_images['bmodb-volatile'], bmo_images['bmoweb'])
+
+        state_images[bmodb_bootstrapped_key] = bmodb_bootstrap
+        state_images[bmoweb_bootstrapped_key] = bmoweb_bootstrap
+        self.state['last-bmodb-bootstrap-id'] = bmodb_bootstrap
+        self.state['last-bmoweb-bootstrap-id'] = bmoweb_bootstrap
+        self.save_state()
+
+        return {
+                'bmodb': bmodb_bootstrap,
+                'bmoweb': bmoweb_bootstrap,
+        }
+
     def build_mozreview(self, images=None, verbose=False, use_last=False,
                         build_hgweb=True):
         """Ensure the images for a MozReview service are built.
@@ -664,10 +708,7 @@ class Docker(object):
         # building, we build BMO images separately and initiate bootstrap
         # as soon as it is ready.
         with futures.ThreadPoolExecutor(2) as e:
-            f_bmo_images = e.submit(self.ensure_images_built, [
-                'bmodb-volatile',
-                'bmoweb',
-            ], existing=images, verbose=verbose, use_last=use_last)
+            f_bmo_images = e.submit(self.build_bmo, images=images, verbose=verbose)
 
             ansibles = {
                 'hgrb': ('docker-hgrb', 'centos6'),
@@ -686,38 +727,8 @@ class Docker(object):
             existing=images, verbose=verbose, use_last=use_last)
 
             bmo_images = f_bmo_images.result()
-
-            images.update(bmo_images)
-            self.state['last-bmodb-id'] = bmo_images['bmodb-volatile']
-            self.state['last-bmoweb-id'] = bmo_images['bmoweb']
-            self.save_state()
-
-            # The keys for the bootstrapped images are derived from the base
-            # images they depend on. This means that if we regenerate a new
-            # base image, the bootstrapped images will be regenerated.
-            bmodb_bootstrapped_key = 'bmodb-bootstrapped:%s' % bmo_images['bmodb-volatile']
-            bmoweb_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (
-                    bmo_images['bmodb-volatile'], bmo_images['bmoweb'])
-
-            bmodb_bootstrap = state_images.get(bmodb_bootstrapped_key)
-            bmoweb_bootstrap = state_images.get(bmoweb_bootstrapped_key)
-
-            known_images = self.all_docker_images()
-            if bmodb_bootstrap and bmodb_bootstrap not in known_images:
-                bmodb_bootstrap = None
-            if bmoweb_bootstrap and bmoweb_bootstrap not in known_images:
-                bmoweb_bootstrap = None
-
-            if (not bmodb_bootstrap or not bmoweb_bootstrap
-                or self.clobber_needed('bmobootstrap')):
-                bmodb_bootstrap, bmoweb_bootstrap = self._bootstrap_bmo(
-                        bmo_images['bmodb-volatile'], bmo_images['bmoweb'])
-
-            state_images[bmodb_bootstrapped_key] = bmodb_bootstrap
-            state_images[bmoweb_bootstrapped_key] = bmoweb_bootstrap
-            self.state['last-bmodb-bootstrap-id'] = bmodb_bootstrap
-            self.state['last-bmoweb-bootstrap-id'] = bmoweb_bootstrap
-            self.save_state()
+            bmodb_bootstrap = bmo_images['bmodb']
+            bmoweb_bootstrap = bmo_images['bmoweb']
 
         images.update(f_images.result())
 
