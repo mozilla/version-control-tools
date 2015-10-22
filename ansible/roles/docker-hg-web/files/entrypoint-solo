@@ -31,4 +31,11 @@ for r in REPOS:
         '/repo/hg/version-control-tools/scripts/repo-permissions',
         root, 'hg', 'hg', 'wwr'])
 
+# Disable ZooKeeper and Kafka.
+for f in ('kafka.conf', 'zookeeper.conf'):
+    try:
+        os.unlink('/etc/supervisor.d/%s' % f)
+    except OSError:
+        pass
+
 os.execl(sys.argv[1], *sys.argv[1:])
