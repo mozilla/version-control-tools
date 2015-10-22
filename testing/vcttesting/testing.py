@@ -147,6 +147,7 @@ def docker_requirements(tests):
 
     hgmo = False
     mozreview = False
+    bmo = False
     d = False
 
     for t in tests:
@@ -160,11 +161,15 @@ def docker_requirements(tests):
             if b'#require mozreviewdocker' in content:
                 d = True
                 mozreview = True
+                bmo = True
+
+            if b'#require bmodocker' in content:
+                d = True
+                bmo = True
 
             if b'#require docker' in content:
-                d = True
-                hgmo = True
-                mozreview = True
+                raise Exception('"#require docker" is not longer supported: '
+                                'use "#require {hgmo,mozreview,bmo}docker"')
 
             for keyword in docker_keywords:
                 if keyword in content:
@@ -173,11 +178,11 @@ def docker_requirements(tests):
                     hgmo = True
                     mozreview = True
 
-    return d, hgmo, mozreview
+    return d, hgmo, mozreview, bmo
 
 
 def get_docker_state(docker, tests, verbose=False, use_last=False):
-    build_docker, hgmo, mozreview = docker_requirements(tests)
+    build_docker, hgmo, mozreview, bmo = docker_requirements(tests)
 
     if not build_docker:
         return {}
@@ -185,15 +190,16 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
     env = {}
     print('generating Docker images needed for tests')
     t_start = time.time()
-    mr_images, hgmo_images = docker.build_all_images(verbose=verbose,
-                                                     use_last=use_last,
-                                                     hgmo=hgmo,
-                                                     mozreview=mozreview)
+    mr_images, hgmo_images, bmo_images = docker.build_all_images(
+            verbose=verbose,
+            use_last=use_last,
+            hgmo=hgmo,
+            mozreview=mozreview,
+            bmo=bmo)
+
     t_end = time.time()
     print('got Docker images in %.2fs' % (t_end - t_start))
     if mozreview:
-        env['DOCKER_BMO_DB_IMAGE'] = mr_images['bmodb']
-        env['DOCKER_BMO_WEB_IMAGE'] = mr_images['bmoweb']
         env['DOCKER_PULSE_IMAGE'] = mr_images['pulse']
         env['DOCKER_HGRB_IMAGE'] = mr_images['hgrb']
         env['DOCKER_AUTOLANDDB_IMAGE'] = mr_images['autolanddb']
@@ -203,11 +209,18 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
         env['DOCKER_LDAP_IMAGE'] = mr_images['ldap']
         if not hgmo:
             env['DOCKER_HGWEB_IMAGE'] = mr_images['hgweb']
+        if not bmo:
+            env['DOCKER_BMO_DB_IMAGE'] = mr_images['bmodb']
+            env['DOCKER_BMO_WEB_IMAGE'] = mr_images['bmoweb']
 
     if hgmo:
         env['DOCKER_HGMASTER_IMAGE'] = hgmo_images['hgmaster']
         env['DOCKER_HGWEB_IMAGE'] = hgmo_images['hgweb']
         env['DOCKER_LDAP_IMAGE'] = hgmo_images['ldap']
+
+    if bmo:
+        env['DOCKER_BMO_DB_IMAGE'] = bmo_images['bmodb']
+        env['DOCKER_BMO_WEB_IMAGE'] = bmo_images['bmoweb']
 
     return env
 

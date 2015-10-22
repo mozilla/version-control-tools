@@ -1,4 +1,4 @@
-#require docker
+#require bmodocker
   $ $TESTDIR/d0cker start-bmo bzexport-test-newbug $HGPORT
   waiting for Bugzilla to start
   Bugzilla accessible on http://*:$HGPORT/ (glob)

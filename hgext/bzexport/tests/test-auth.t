@@ -1,4 +1,4 @@
-#require docker
+#require bmodocker
   $ . $TESTDIR/hgext/bzexport/tests/helpers.sh
 
   $ $TESTDIR/d0cker start-bmo bzexport-test-auth $HGPORT

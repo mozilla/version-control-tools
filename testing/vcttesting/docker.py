@@ -691,7 +691,7 @@ class Docker(object):
         }
 
     def build_mozreview(self, images=None, verbose=False, use_last=False,
-                        build_hgweb=True):
+                        build_hgweb=True, build_bmo=True):
         """Ensure the images for a MozReview service are built.
 
         bmoweb's entrypoint does a lot of setup on first run. This takes many
@@ -708,7 +708,9 @@ class Docker(object):
         # building, we build BMO images separately and initiate bootstrap
         # as soon as it is ready.
         with futures.ThreadPoolExecutor(2) as e:
-            f_bmo_images = e.submit(self.build_bmo, images=images, verbose=verbose)
+            if build_bmo:
+                f_bmo_images = e.submit(self.build_bmo, images=images,
+                        verbose=verbose)
 
             ansibles = {
                 'hgrb': ('docker-hgrb', 'centos6'),
@@ -726,9 +728,10 @@ class Docker(object):
             ], ansibles=ansibles,
             existing=images, verbose=verbose, use_last=use_last)
 
-            bmo_images = f_bmo_images.result()
-            bmodb_bootstrap = bmo_images['bmodb']
-            bmoweb_bootstrap = bmo_images['bmoweb']
+            if build_bmo:
+                bmo_images = f_bmo_images.result()
+                bmodb_bootstrap = bmo_images['bmodb']
+                bmoweb_bootstrap = bmo_images['bmoweb']
 
         images.update(f_images.result())
 
@@ -747,8 +750,6 @@ class Docker(object):
         r = {
             'autolanddb': images['autolanddb'],
             'autoland': images['autoland'],
-            'bmodb': bmodb_bootstrap,
-            'bmoweb': bmoweb_bootstrap,
             'hgrb': images['hgrb'],
             'ldap': images['ldap'],
             'pulse': images['pulse'],
@@ -757,6 +758,9 @@ class Docker(object):
         }
         if build_hgweb:
             r['hgweb'] = images['hgweb']
+        if build_bmo:
+            r['bmodb'] = bmodb_bootstrap
+            r['bmoweb'] = bmoweb_bootstrap
 
         return r
 
@@ -813,6 +817,59 @@ class Docker(object):
             e.submit(self.client.remove_container, db_id)
 
         return db_bootstrap, web_bootstrap
+
+    def start_bmo(self, cluster, http_port=80,
+            db_image=None, web_image=None, verbose=False):
+        """Start a bugzilla.mozilla.org cluster.
+
+        Code in this function is pretty much inlined in self.start_mozreview
+        for performance reasons because we don't want start_mozreview to have
+        to wait for complete initialization before it is unblocked. We could
+        probably factor functionality into smaller pieces.
+        """
+
+        if not db_image or not web_image:
+            images = self.build_bmo(verbose=verbose)
+            db_image = images['bmodb']
+            web_image = images['bmoweb']
+
+        containers = self.state['containers'].setdefault(cluster, [])
+
+        with futures.ThreadPoolExecutor(2) as e:
+            f_db_create = e.submit(self.client.create_container, db_image,
+                    environment={'MYSQL_ROOT_PASSWORD': 'password'})
+            bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
+            f_web_create = e.submit(self.client.create_container,
+                    web_image, environment={'BMO_URL': bmo_url})
+
+            db_id = f_db_create.result()['Id']
+            containers.append(db_id)
+            self.client.start(db_id)
+            db_state = self.client.inspect_container(db_id)
+
+            web_id = f_web_create.result()['Id']
+            containers.append(web_id)
+            self.client.start( web_id,
+                    links=[(db_state['Name'], 'bmodb')],
+                    port_bindings={80: http_port})
+            web_state = self.client.inspect_container(web_id)
+
+        self.save_state()
+
+        hostname, hostport = \
+                self._get_host_hostname_port(web_state, '80/tcp')
+        bmo_url = 'http://%s:%d/' % (hostname, hostport)
+
+        print('waiting for Bugzilla to start')
+        wait_for_http(hostname, hostport,
+                      extra_check_fn=self._get_assert_container_running_fn(web_id))
+        print('Bugzilla accessible on %s' % bmo_url)
+
+        return {
+            'bugzilla_url': bmo_url,
+            'db_id': db_id,
+            'web_id': web_id,
+        }
 
     def start_mozreview(self, cluster, http_port=80,
             hgrb_image=None, ldap_image=None, ldap_port=None, pulse_port=None,
@@ -1170,7 +1227,7 @@ class Docker(object):
             pass
 
     def build_all_images(self, verbose=False, use_last=False, mozreview=True,
-                         hgmo=True):
+                         hgmo=True, bmo=True):
         docker_images = set()
         ansible_images = {}
         if mozreview:
@@ -1194,24 +1251,36 @@ class Docker(object):
             ansible_images['hgmaster'] = ('docker-hgmaster', 'centos6')
             ansible_images['hgweb'] = ('docker-hgweb', 'centos6')
 
+        if bmo:
+            docker_images |= {
+                'bmodb-volatile',
+                'bmoweb',
+            }
+
         images = self.ensure_images_built(docker_images,
                 ansibles=ansible_images, verbose=verbose, use_last=use_last)
 
-        with futures.ThreadPoolExecutor(2) as e:
+        with futures.ThreadPoolExecutor(3) as e:
             if mozreview:
                 f_mr = e.submit(self.build_mozreview, images=images,
                                 verbose=verbose, use_last=use_last,
-                                build_hgweb=not hgmo)
+                                build_hgweb=not hgmo,
+                                build_bmo=not bmo)
             if hgmo:
                 f_hgmo = e.submit(self.build_hgmo, images=images, verbose=verbose,
                                   use_last=use_last)
 
+            if bmo:
+                f_bmo = e.submit(self.build_bmo, images=images,
+                                 verbose=verbose)
+
         mr_result = f_mr.result() if mozreview else None
         hgmo_result = f_hgmo.result() if hgmo else None
+        bmo_result = f_bmo.result() if bmo else None
 
         self.prune_images()
 
-        return mr_result, hgmo_result
+        return mr_result, hgmo_result, bmo_result
 
     def _get_files_from_http_container(self, builder, message):
         image = self.ensure_built(builder, verbose=True)

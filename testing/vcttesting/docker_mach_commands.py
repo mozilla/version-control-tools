@@ -59,33 +59,16 @@ class DockerCommands(object):
     @CommandArgument('cluster', help='Name to give to this instance')
     @CommandArgument('http_port',
         help='HTTP port the server should be exposed on')
-    @CommandArgument('--pulse-port', type=int,
-        help='Port Pulse should be exposed on.')
-    @CommandArgument('--autoland-port', type=int,
-        help='Port Autoland should be exposed on.')
     @CommandArgument('--web-id-file',
         help='File to store the bmoweb container ID in')
-    def start_bmo(self, cluster, http_port, pulse_port=None,
-                  autoland_port=None, web_id_file=None):
+    def start_bmo(self, cluster, http_port, web_id_file=None):
         db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
-        hgrb_image = os.environ.get('DOCKER_HGRB_IMAGE')
-        hgweb_image = os.environ.get('DOCKER_HGWEB_IMAGE')
-        ldap_image = os.environ.get('DOCKER_LDAP_IMAGE')
-        pulse_image = os.environ.get('DOCKER_PULSE_IMAGE')
-        rbweb_image = os.environ.get('DOCKER_RBWEB_IMAGE')
-        autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE')
-        autoland_image = os.environ.get('DOCKER_AUTOLAND_IMAGE')
-        treestatus_image = os.environ.get('DOCKER_TREESTATUS_IMAGE')
 
-        res = self.d.start_mozreview(cluster=cluster,
-                http_port=http_port, pulse_port=pulse_port,
-                hgrb_image=hgrb_image, ldap_image=ldap_image,
-                db_image=db_image, web_image=web_image,
-                pulse_image=pulse_image, rbweb_image=rbweb_image,
-                autolanddb_image=autolanddb_image,
-                autoland_image=autoland_image, autoland_port=autoland_port,
-                hgweb_image=hgweb_image, treestatus_image=treestatus_image)
+        res = self.d.start_bmo(cluster=cluster,
+                http_port=http_port,
+                db_image=db_image,
+                web_image=web_image)
 
         if web_id_file:
             with open(web_id_file, 'wb') as fh:

@@ -49,8 +49,12 @@ def has_docker():
 def has_hgmodocker():
     return has_docker()
 
-@check('mozreviewdocker', 'Request mozreview Docker pieces')
+@check('mozreviewdocker', 'Require mozreview Docker pieces')
 def has_mozreviewdocker():
+    return has_docker()
+
+@check('bmodocker', 'Require BMO Docker pieces')
+def has_bmodocker():
     return has_docker()
 
 def hgversion():
