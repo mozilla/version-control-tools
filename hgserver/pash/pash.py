@@ -7,6 +7,19 @@ import os
 import pwd
 
 
+NO_HG_ACCESS = '''
+A SSH connection has been established and your account (%s)
+was found in LDAP.
+
+However, Mercurial access is not currently enabled on your LDAP account.
+
+Please follow the instructions at the following URL to gain Mercurial
+access:
+
+    https://www.mozilla.org/en-US/about/governance/policies/commit/
+'''.lstrip()
+
+
 def QuoteForPOSIX(string):
     '''quote a string so it can be used as an argument in a  posix shell
 
@@ -47,7 +60,7 @@ def process_non_root_login(user):
         sys.exit(0)
 
     elif user_status != 1:
-        sys.stderr.write('You do not have a valid mercurial account!\n')
+        sys.stderr.write(NO_HG_ACCESS % user)
         sys.exit(0)
 
     # Run ldap access date toucher, silently fail and log if we're unable to write
