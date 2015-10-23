@@ -54,11 +54,31 @@ SSH as a valid user without proper key
   Permission denied (publickey).\r (esc)
   [255]
 
-SSH with a valid key gives us warning about no interactive shells
+SSH with a valid key gives us warning about no command
 
   $ hgmo add-ssh-key user1@example.com - < key1.pub
   $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER
-  No interactive shells allowed here!
+  A SSH connection has been successfully established.
+  
+  Your account (user1@example.com) has privileges to access Mercurial over
+  SSH.
+  
+  You did not specify a command to run on the server. This server only
+  supports running specific commands. Since there is nothing to do, you
+  are being disconnected.
+  [1]
+
+SSH with invalid command prints appropriate error message
+
+  $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER foobar
+  A SSH connection has been successfully established.
+  
+  Your account (user1@example.com) has privileges to access Mercurial over
+  SSH.
+  
+  The command you specified is not allowed on this server.
+  
+  Goodbye.
   [1]
 
 Successful login should set hgAccessDate LDAP attribute
@@ -165,7 +185,14 @@ No HG access prints helpful error message
 Do another login to verify no pash errors are present
 
   $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER
-  No interactive shells allowed here!
+  A SSH connection has been successfully established.
+  
+  Your account (user1@example.com) has privileges to access Mercurial over
+  SSH.
+  
+  You did not specify a command to run on the server. This server only
+  supports running specific commands. Since there is nothing to do, you
+  are being disconnected.
   [1]
 
   $ hgmo exec hgssh cat /var/log/pash.log

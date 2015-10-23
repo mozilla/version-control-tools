@@ -30,7 +30,14 @@ Verify your SSH settings are working by attempting to SSH into a server.
 Your terminal output should resemble the following::
 
    $ ssh hg.mozilla.org
-   No interactive shells allowed here!
+   A SSH connection has been successfully established.
+
+   Your account (me@example.com) has privileges to access Mercurial over
+   SSH.
+
+   You did not specify a command to run on the server. This server only
+   supports running specific commands. Since there is nothing to do, you
+   are being disconnected.
    Connection to hg.mozilla.org closed.
 
 Authenticating with Services

@@ -26,6 +26,26 @@ from sh_helper import (
 
 HG = '/repo/hg/venv_pash/bin/hg'
 
+SUCCESSFUL_AUTH = '''
+A SSH connection has been successfully established.
+
+Your account (%s) has privileges to access Mercurial over
+SSH.
+
+'''.lstrip()
+
+NO_SSH_COMMAND = '''
+You did not specify a command to run on the server. This server only
+supports running specific commands. Since there is nothing to do, you
+are being disconnected.
+'''.lstrip()
+
+INVALID_SSH_COMMAND = '''
+The command you specified is not allowed on this server.
+
+Goodbye.
+'''.lstrip()
+
 USER_REPO_EXISTS = """
 You already have a repo called %s.
 
@@ -478,7 +498,8 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
           enable_user_repos=False):
     ssh_command = os.getenv('SSH_ORIGINAL_COMMAND')
     if not ssh_command:
-        sys.stderr.write('No interactive shells allowed here!\n')
+        sys.stderr.write(SUCCESSFUL_AUTH % os.environ['USER'])
+        sys.stderr.write(NO_SSH_COMMAND)
         sys.exit(1)
     elif ssh_command.startswith('hg'):
         repo_expr = re.compile('(.*)\s+-R\s+([^\s]+\s+)(.*)')
@@ -544,5 +565,6 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
                 with open(hgrc, 'rb') as fh:
                     sys.stdout.write(fh.read())
     else:
-        sys.stderr.write('No interactive commands allowed here!\n')
+        sys.stderr.write(SUCCESSFUL_AUTH % os.environ['USER'])
+        sys.stderr.write(INVALID_SSH_COMMAND)
         sys.exit(1)
