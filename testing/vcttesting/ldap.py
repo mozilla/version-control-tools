@@ -20,7 +20,8 @@ class LDAP(object):
             self.c.simple_bind_s(username, password)
 
     def create_user(self, email, username, uid, fullname,
-                         key_filename=None, scm_level=None):
+                         key_filename=None, scm_level=None,
+                         hg_access=True):
         """Create a new user in LDAP.
 
         The user has an ``email`` address, a full ``name``, a
@@ -31,7 +32,6 @@ class LDAP(object):
 
         r = [
             (b'objectClass', [
-                b'hgAccount',
                 b'inetOrgPerson',
                 b'organizationalPerson',
                 b'person',
@@ -39,16 +39,21 @@ class LDAP(object):
                 b'top',
             ]),
             (b'cn', [fullname]),
-            (b'fakeHome', [b'/tmp']),
             (b'gidNumber', [b'100']),
-            (b'hgAccountEnabled', [b'TRUE']),
-            (b'hgHome', [b'/tmp']),
-            (b'hgShell', [b'/bin/sh']),
             (b'homeDirectory', [b'/home/%s' % username]),
             (b'sn', [fullname.split()[-1]]),
             (b'uid', [username]),
             (b'uidNumber', [str(uid)]),
         ]
+
+        if hg_access:
+            r[0][1].append(b'hgAccount')
+            r.extend([
+                (b'fakeHome', [b'/tmp']),
+                (b'hgAccountEnabled', [b'TRUE']),
+                (b'hgHome', [b'/tmp']),
+                (b'hgShell', [b'/bin/sh']),
+            ])
 
         self.c.add_s(dn, r)
 

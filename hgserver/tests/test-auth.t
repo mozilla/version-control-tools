@@ -25,22 +25,22 @@ SSH as a valid user without proper key
   
   # user1@example.com, com, mozilla
   dn: mail=user1@example.com,o=com,dc=mozilla
-  objectClass: hgAccount
   objectClass: inetOrgPerson
   objectClass: organizationalPerson
   objectClass: person
   objectClass: posixAccount
   objectClass: top
+  objectClass: hgAccount
   cn: Some User
-  fakeHome: /tmp
   gidNumber: 100
-  hgAccountEnabled: TRUE
-  hgHome: /tmp
-  hgShell: /bin/sh
   homeDirectory: /home/user1
   sn: User
   uid: user1
   uidNumber: 1000
+  fakeHome: /tmp
+  hgAccountEnabled: TRUE
+  hgHome: /tmp
+  hgShell: /bin/sh
   mail: user1@example.com
   
   # search result
@@ -74,23 +74,23 @@ Successful login should set hgAccessDate LDAP attribute
   
   # user1@example.com, com, mozilla
   dn: mail=user1@example.com,o=com,dc=mozilla
-  objectClass: hgAccount
   objectClass: inetOrgPerson
   objectClass: organizationalPerson
   objectClass: person
   objectClass: posixAccount
   objectClass: top
+  objectClass: hgAccount
   objectClass: ldapPublicKey
   cn: Some User
-  fakeHome: /tmp
   gidNumber: 100
-  hgAccountEnabled: TRUE
-  hgHome: /tmp
-  hgShell: /bin/sh
   homeDirectory: /home/user1
   sn: User
   uid: user1
   uidNumber: 1000
+  fakeHome: /tmp
+  hgAccountEnabled: TRUE
+  hgHome: /tmp
+  hgShell: /bin/sh
   mail: user1@example.com
   sshPublicKey: ssh-rsa * (glob)
    * (glob)
