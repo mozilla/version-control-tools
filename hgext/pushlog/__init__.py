@@ -8,7 +8,6 @@ import os
 import sqlite3
 import stat
 import time
-import weakref
 
 import mercurial.cmdutil as cmdutil
 import mercurial.encoding as encoding
@@ -27,7 +26,7 @@ from mercurial.error import (
 )
 from mercurial.node import bin
 
-testedwith = '3.4 3.5'
+testedwith = '3.4 3.5 3.6'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
@@ -155,7 +154,7 @@ class pushlog(object):
         '''Create an instance bound to a sqlite database in a path.'''
         # Use a weak ref to avoid cycle. This object's lifetime should be no
         # greater than the repo's.
-        self.repo = weakref.proxy(repo)
+        self.repo = repo
 
     def _getconn(self, readonly=False):
         """Get a SQLite connection to the pushlog.
@@ -671,10 +670,7 @@ def reposetup(ui, repo):
     class pushlogrepo(repo.__class__):
         @property
         def pushlog(self):
-            if not hasattr(self, '_pushlog'):
-                self._pushlog = pushlog(self)
-
-            return self._pushlog
+            return pushlog(self)
 
         def destroyed(self):
             super(pushlogrepo, self).destroyed()
