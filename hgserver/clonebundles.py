@@ -193,6 +193,7 @@ experimental.clonebundleprefers
 from mercurial.i18n import _
 from mercurial.node import nullid
 from mercurial import (
+    error,
     exchange,
     extensions,
     wireproto,
@@ -246,7 +247,7 @@ def advertiseclonebundlespart(bundler, repo, source, bundlecaps=None,
         return
 
     # And when the client didn't attempt a clone bundle as part of this pull.
-    if cbattempted:
+    if cbattempted != '0':
         return
 
     # And when a full clone is requested.
@@ -264,3 +265,11 @@ def advertiseclonebundlespart(bundler, repo, source, bundlecaps=None,
 
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
+
+    # MOZILLA HACK
+    # This enables the extension to work with hg < 3.6.
+    if 'cbattempted' in wireproto.gboptsmap:
+        raise error.Abort('use built-in clonebundles extension with '
+                          'Mercurial 3.6+')
+
+    wireproto.gboptsmap['cbattempted'] = 'plain'
