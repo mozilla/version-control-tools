@@ -193,6 +193,22 @@ def handle_pending_transplants(logger, dbconn):
     mozreview_updates = []
     retry_revisions = []
 
+    def handle_treeclosed(transplant_id, tree, rev, destination, trysyntax,
+                          pingback_url):
+        retry_revisions.append((now, transplant_id))
+
+        data = {
+            'request_id': transplant_id,
+            'tree': tree,
+            'rev': rev,
+            'destination': destination,
+            'trysyntax': trysyntax,
+            'landed': False,
+            'error_msg': '',
+            'result': 'Tree %s is closed - retrying later.' % tree
+        }
+        mozreview_updates.append([transplant_id, json.dumps(data)])
+
     # This code is a bit messy because we have to deal with the fact that the
     # the tree could close between the call to tree_is_open and when we
     # actually attempt the revision.
@@ -218,7 +234,8 @@ def handle_pending_transplants(logger, dbconn):
                                                   treestatus.tree_is_open(destination))
 
         if not tree_open:
-            retry_revisions.append((now, transplant_id))
+            handle_treeclosed(transplant_id, tree, rev, destination,
+                              trysyntax, pingback_url)
             continue
 
         attempts = 0
@@ -246,7 +263,8 @@ def handle_pending_transplants(logger, dbconn):
                 logger.info('transplant failed: tree: %s is closed - '
                             ' retrying later.' % tree)
                 current_treestatus[destination] = False
-                retry_revisions.append((now, transplant_id))
+                handle_treeclosed(transplant_id, tree, rev, destination,
+                                  trysyntax, pingback_url)
                 continue
             elif 'abort: push creates new remote head' in result:
                 logger.info('transplant failed: we lost a push race')
