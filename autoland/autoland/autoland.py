@@ -31,6 +31,9 @@ MAX_TRANSPLANT_ATTEMPTS = 50
 # max updates to post to reviewboard / iteration
 MOZREVIEW_COMMENT_LIMIT = 10
 
+# time to wait before attempting to update MozReview after a failure to post
+MOZREVIEW_RETRY_DELAY = datetime.timedelta(minutes=5)
+
 # time to wait before retrying a transplant
 TRANSPLANT_RETRY_DELAY = datetime.timedelta(minutes=5)
 
@@ -360,17 +363,25 @@ def handle_pending_mozreview_updates(logger, dbconn):
     mozreview_auth = mozreview.read_credentials()
 
     updated = []
+    all_posted = True
     for row in cursor.fetchall():
         request_id, pingback_url, data = row
         logger.info('trying to post mozreview update to: %s for request: %s' %
                     (pingback_url, request_id))
 
-        status_code, text = mozreview.update_review(mozreview_auth,
-                                                    pingback_url, data)
-        if status_code == 200:
-            updated.append([request_id])
+        # We allow empty pingback_urls as they make testing easier. We can
+        # always check the logs for misconfigured pingback_urls.
+        if pingback_url:
+            status_code, text = mozreview.update_review(mozreview_auth,
+                                                        pingback_url, data)
+            if status_code == 200:
+                updated.append([request_id])
+            else:
+                logger.info('failed: %s - %s' % (status_code, text))
+                all_posted = False
+                break
         else:
-            logger.info('failed: %s - %s' % (status_code, text))
+            updated.append([request_id])
 
     if updated:
         query = """
@@ -380,6 +391,7 @@ def handle_pending_mozreview_updates(logger, dbconn):
         cursor.executemany(query, updated)
         dbconn.commit()
 
+    return all_posted
 
 def get_dbconn(dsn):
     dbconn = None
@@ -407,13 +419,25 @@ def main():
 
     dbconn = get_dbconn(args.dsn)
     last_error_msg = None
+    next_mozreview_update = datetime.datetime.now()
     while True:
         try:
             handle_pending_mozreview_pullrequests(logger, dbconn)
             handle_pending_transplants(logger, dbconn)
             handle_pending_github_updates(logger, dbconn)
-            handle_pending_mozreview_updates(logger, dbconn)
-            time.sleep(0.25)
+
+            # TODO: In normal configuration, all updates will be posted to the
+            # same MozReview instance, so we don't bother tracking failure to
+            # post for individual urls. In the future, we might need to
+            # support this.
+            if datetime.datetime.now() > next_mozreview_update:
+                ok = handle_pending_mozreview_updates(logger, dbconn)
+                if ok:
+                    next_mozreview_update += datetime.timedelta(seconds=1)
+                else:
+                    next_mozreview_update += MOZREVIEW_RETRY_DELAY
+
+            time.sleep(0.1)
         except KeyboardInterrupt:
             break
         except psycopg2.InterfaceError:

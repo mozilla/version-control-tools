@@ -172,15 +172,6 @@ def pullrequest_mozreview():
             error = 'Bad request: missing json field: %s' % field
             return make_response(jsonify({'error': error}), 400)
 
-    try:
-        parsed = urlparse.urlparse(request.json['pingback_url'])
-        if 'http' not in parsed.scheme:
-            error = 'Bad request: bad pingback_url'
-            return make_response(jsonify({'error': error}), 400)
-    except:
-        error = 'Bad request: bad pingback_url'
-        return make_response(jsonify({'error': error}), 400)
-
     app.logger.info('received transplant request: %s' %
                     json.dumps(request.json))
 
