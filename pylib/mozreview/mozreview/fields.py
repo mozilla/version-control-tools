@@ -231,7 +231,7 @@ class TryField(BaseReviewRequestField):
 
     can_record_change_entry = True
 
-    _retreive_error_txt = _('There was an error retrieving the try push.')
+    _retrieve_error_txt = _('There was an error retrieving the try push.')
     _waiting_txt = _('Waiting for the autoland to try request to execute, '
                      'hold tight. If the try tree is closed autoland will '
                      'retry your push for you until the tree opens.')
@@ -267,14 +267,14 @@ class TryField(BaseReviewRequestField):
             # maliciously).
             logging.error('A malformed autoland_id was detected: %s' %
                           info['new'][0])
-            return self._retreive_error_txt
+            return self._retrieve_error_txt
 
         try:
             ar = AutolandRequest.objects.get(pk=autoland_id)
         except:
             logging.error('An unknown autoland_id was detected: %s' %
                 info['new'][0])
-            return self._retreive_error_txt
+            return self._retrieve_error_txt
 
         if ar.last_known_status == AutolandEventLogEntry.REQUESTED:
             return self._waiting_txt
@@ -285,4 +285,4 @@ class TryField(BaseReviewRequestField):
             template = get_template('mozreview/try_result.html')
             return template.render(Context({'url': url}))
         else:
-            return self._retreive_error_txt
+            return self._retrieve_error_txt
