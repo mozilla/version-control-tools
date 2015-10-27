@@ -212,7 +212,8 @@ def handle_pending_transplants(logger, dbconn):
         rev = request['rev']
         trysyntax = request.get('trysyntax', '')
         push_bookmark = request.get('push_bookmark', '')
-        pingback_url = request.get('pingback_url')
+        pingback_url = request.get('pingback_url', '')
+        commit_descriptions = request.get('commit_descriptions')
         tree_open = current_treestatus.setdefault(destination,
                                                   treestatus.tree_is_open(destination))
 

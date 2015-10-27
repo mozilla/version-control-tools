@@ -1,6 +1,7 @@
 import config
 import github
 import hglib
+import json
 import os
 import re
 import subprocess
@@ -121,7 +122,8 @@ def transplant_to_mozreview(gh, tree, user, repo, pullrequest, bzuserid,
     return landed, result
 
 
-def transplant(tree, destination, rev, trysyntax=None, push_bookmark=False):
+def transplant(tree, destination, rev, trysyntax=None, push_bookmark=False,
+               commit_descriptions=None):
     """Transplant a specified revision and ancestors to the specified tree.
 
     If ``trysyntax`` is specified, a Try commit will be created using the
@@ -129,10 +131,11 @@ def transplant(tree, destination, rev, trysyntax=None, push_bookmark=False):
     """
     with hglib.open(get_repo_path(tree)) as client:
         return _transplant(client, tree, destination, rev, trysyntax=trysyntax,
-                           push_bookmark=push_bookmark)
+                           push_bookmark=push_bookmark,
+                           commit_descriptions=commit_descriptions)
 
 def _transplant(client, tree, destination, rev, trysyntax=None,
-                push_bookmark=False):
+                push_bookmark=False, commit_descriptions=None):
     landed = True
     result = ''
 
@@ -163,6 +166,14 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
             ['update', remote_tip],
             ['pull', tree, '-r', rev],
             ['update', rev]]
+
+    commit_descriptions_file = None
+    if commit_descriptions:
+        commit_descriptions_file = tempfile.NamedTemporaryFile()
+        json.dump(commit_descriptions, commit_descriptions_file)
+        commit_descriptions_file.flush()
+        cmds.append(['rewritecommitdescriptions',
+                     '--descriptions=%s' % commit_descriptions_file.name, rev])
 
     if trysyntax:
         if not trysyntax.startswith("try: "):
@@ -206,6 +217,12 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
                 # there was no rebase in progress, nothing to see here
                 continue
             else:
+                if commit_descriptions_file:
+                    commit_descriptions_file.close()
+
                 return False, formulate_hg_error(['hg'] + cmd, output)
+
+    if commit_descriptions_file:
+        commit_descriptions_file.close()
 
     return landed, result
