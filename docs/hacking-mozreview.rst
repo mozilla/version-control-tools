@@ -224,6 +224,28 @@ Passing the ``--user`` argument to the ``clone`` command will further
 bind the repository to a specific user. When used, ``hg push`` commands
 will automatically use the appropriate SSH key and username.
 
+Configuring a Hosting Service for a Repository
+----------------------------------------------
+
+Using Autoland functionality from within MozReview requires configuring a
+hosting service for your test repository. The hosting service contains the
+try repository URL, the landing repository URL
+
+You will need to login as the admin user in your reviewboard instance. To
+avoid the bugzilla login, visit ``/admin`` in your browser. Once logged in,
+click on ``Repositories`` and then the name of your repo, e.g. ``test-repo``.
+Copy the current URL and then click on ``Hosting Service`` and select the
+``hmo`` hosting service.
+
+Enter a username for the hosting service, paste the URL to the repository in
+the ``Repository URL`` field. Enter ``try`` into the ``Try Repository URL``
+field will work for local testing with Autoland.
+
+You should end up with something like the following:
+
+.. image:: hosting-service.png
+
+
 Refreshing Code
 ---------------
 
