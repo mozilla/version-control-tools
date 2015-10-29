@@ -52,21 +52,21 @@ Posting a job with an unknown revision should fail
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo 42 try http://localhost:9898
   (200, u'{\n  "request_id": 1\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 1 --poll
-  (200, u'{\n  "destination": "try", \n  "error_msg": "hg error in cmd: hg pull test-repo -r 42: pulling from http://hgrb/test-repo\\nabort: unknown revision \'42\'!\\n", \n  "landed": false, \n  "push_bookmark": "", \n  "result": "", \n  "rev": "42", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
+  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "hg error in cmd: hg pull test-repo -r 42: pulling from http://hgrb/test-repo\\nabort: unknown revision \'42\'!\\n", \n  "landed": false, \n  "push_bookmark": "", \n  "result": "", \n  "rev": "42", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
 
 Post a job
 
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` try http://localhost:9898
   (200, u'{\n  "request_id": 2\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 2 --poll
-  (200, u'{\n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "7194ef3a2eac", \n  "tree": "test-repo", \n  "trysyntax": ""\n}') (glob)
+  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "7194ef3a2eac", \n  "tree": "test-repo", \n  "trysyntax": ""\n}') (glob)
 
 Post a job with try syntax
 
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` try http://localhost:9898 --trysyntax "stuff"
   (200, u'{\n  "request_id": 3\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 3 --poll
-  (200, u'{\n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "7194ef3a2eac", \n  "tree": "test-repo", \n  "trysyntax": "stuff"\n}') (glob)
+  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "7194ef3a2eac", \n  "tree": "test-repo", \n  "trysyntax": "stuff"\n}') (glob)
 
 Post a job using a bookmark
 
@@ -97,7 +97,15 @@ Post a job using a bookmark
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` try http://localhost:9898 --push-bookmark "bookmark"
   (200, u'{\n  "request_id": 4\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 4 --poll
-  (200, u'{\n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "bookmark", \n  "result": "*", \n  "rev": "53b624fb3597", \n  "tree": "test-repo", \n  "trysyntax": ""\n}') (glob)
+  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "bookmark", \n  "result": "*", \n  "rev": "53b624fb3597", \n  "tree": "test-repo", \n  "trysyntax": ""\n}') (glob)
+
+Post a job with commit descriptions to be rewritten
+
+  $ REV=`hg log -r . --template "{node|short}"`
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --commit-descriptions "{\"$REV\": \"even better description\"}"
+  (200, u'{\n  "request_id": 5\n}')
+  $ ottoland autoland-job-status $AUTOLAND_URL 5 --poll
+  (200, u'{\n  "commit_descriptions": {\n    "53b624fb3597": "even better description"\n  }, \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "53b624fb3597", \n  "tree": "test-repo", \n  "trysyntax": ""\n}') (glob)
 
 Getting status for an unknown job should return a 404
 
@@ -115,8 +123,8 @@ tokens prior to deploying this anyway, so there is not much point in fixing
 things here.
 
   $ ottoland post-pullrequest-job $AUTOLAND_URL user repo 1 test-repo 1 cookie http://localhost:9898 --bugid 1
-  (200, u'{\n  "request_id": 5\n}')
-  $ ottoland pullrequest-job-status $AUTOLAND_URL 5
+  (200, u'{\n  "request_id": 6\n}')
+  $ ottoland pullrequest-job-status $AUTOLAND_URL 6
   (200, u'{\n  "bugid": 1, \n  "destination": "test-repo", \n  "error_msg": null, \n  "landed": null, \n  "pullrequest": 1, \n  "repo": "repo", \n  "result": "", \n  "user": "user"\n}')
 
 Posting a pullrequest job without a bugid should automatically file a bug for the user.
@@ -124,8 +132,8 @@ TODO: We should verify that the bug is created once we are using tokens and this
 command can succeed.
 
   $ ottoland post-pullrequest-job $AUTOLAND_URL user repo 1 test-repo 1 cookie http://localhost:9898
-  (200, u'{\n  "request_id": 6\n}')
-  $ ottoland pullrequest-job-status $AUTOLAND_URL 6
+  (200, u'{\n  "request_id": 7\n}')
+  $ ottoland pullrequest-job-status $AUTOLAND_URL 7
   (200, u'{\n  "bugid": null, \n  "destination": "test-repo", \n  "error_msg": null, \n  "landed": null, \n  "pullrequest": 1, \n  "repo": "repo", \n  "result": "", \n  "user": "user"\n}')
 
 Getting status for an unknown job should return a 404

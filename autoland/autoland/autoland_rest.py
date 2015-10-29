@@ -47,10 +47,11 @@ def autoland():
       "destination": "try",
       "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
       "push_bookmark": "@",
+      "commit_descriptions": {"9cc25f7ac50a": "bug 1 - did stuff r=gps"},
       "pingback_url": "http://localhost/"
     }
 
-    Both trysyntax and push_bookmark are optional.
+    Trysyntax, push_bookmark and commit_descriptions are optional.
 
     Returns an id which can be used to get the status of the autoland
     request.
