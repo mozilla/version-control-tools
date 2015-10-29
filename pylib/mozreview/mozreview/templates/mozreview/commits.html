@@ -85,7 +85,7 @@ This is the template for the "Commits" list in a push-based review request.
           <h4 class="action-heading">
               There was an error executing the Autoland request.
           </h4>
-          <span class="action-meta">
+          <span class="action-meta" title="{{ autoland_request.last_error_msg|escape }}">
             {{ autoland_request.last_error_msg }}
           </span>
         </div>

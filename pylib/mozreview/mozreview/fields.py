@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import json
 import logging
 
+from django.template.defaultfilters import linebreaksbr
 from django.template.loader import Context, get_template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
@@ -279,10 +280,10 @@ class TryField(BaseReviewRequestField):
         if ar.last_known_status == AutolandEventLogEntry.REQUESTED:
             return self._waiting_txt
         elif ar.last_known_status == AutolandEventLogEntry.PROBLEM:
-            return self._autoland_problem % ar.last_error_msg
+            return linebreaksbr(self._autoland_problem % ar.last_error_msg)
         elif ar.last_known_status == AutolandEventLogEntry.SERVED:
             url = self._job_url % ar.repository_revision
             template = get_template('mozreview/try_result.html')
             return template.render(Context({'url': url}))
         else:
-            return self._retrieve_error_txt
+            return linebreaksbr(self._retrieve_error_txt)
