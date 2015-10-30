@@ -30,6 +30,8 @@ TREE_ALIASES = {
     'mozilla-beta': ('beta',),
     'mozilla-b2g32': ('b2g32',),
     'mozilla-b2g34': ('b2g34',),
+    'mozilla-b2g37': ('b2g37',),
+    'mozilla-b2g44': ('b2g44',),
     'b2g-inbound': ('b2ginbound',),
     'b2g': ('b2ginbound',),
     'b-i': ('b2ginbound',),
@@ -43,12 +45,13 @@ TREE_ALIASES = {
     'c-r': ('comm-release',),
     'cr': ('comm-release',),
 
-    'releases': ('esr31', 'esr38', 'b2g32', 'b2g34', 'b2g37', 'release',
+    'releases': ('esr38', 'b2g34', 'b2g37', 'b2g44', 'release',
                  'beta', 'aurora', 'central'),
     'integration': ('inbound', 'fx-team', 'b2ginbound'),
     'twigs': ('alder', 'ash', 'birch', 'cedar', 'cypress', 'date', 'elm',
-        'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine'),
-    'obsolete': ('esr10', 'esr17', 'b2g18', 'esr24', 'b2g26', 'b2g28', 'b2g30'),
+              'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine'),
+    'obsolete': ('esr10', 'esr17', 'b2g18', 'esr24', 'b2g26', 'b2g28',
+                 'b2g30', 'esr31', 'b2g32'),
 }
 
 # Aliases that map to multiple repositories.
@@ -78,6 +81,7 @@ REPOS = {
     'b2g32': 'releases/mozilla-b2g32_v2_0',
     'b2g34': 'releases/mozilla-b2g34_v2_1',
     'b2g37': 'releases/mozilla-b2g37_v2_2',
+    'b2g44': 'releases/mozilla-b2g44_v2_5',
 
     # Integration repositories.
     'b2ginbound': 'integration/b2g-inbound',
@@ -151,6 +155,7 @@ RELEASE_TREES = set([
     'b2g32',
     'b2g34',
     'b2g37',
+    'b2g44',
 ])
 
 
