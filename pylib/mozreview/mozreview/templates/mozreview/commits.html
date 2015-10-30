@@ -99,7 +99,11 @@ This is the template for the "Commits" list in a push-based review request.
             Waiting for the Autoland request to execute, hold tight
           </h4>
           <span class="action-meta">
+            {% if autoland_request.last_details %}
+            {{autoland_request.last_details}}
+            {% else %}
             If the tree is closed autoland will retry your push for you until the tree opens.
+            {% endif %}
           </span>
         </div>
       </div>
