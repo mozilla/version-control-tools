@@ -430,13 +430,23 @@ class AutolandRequestUpdateResource(WebAPIResource):
             return DOES_NOT_EXIST
 
         if landed:
-            AutolandRequest.objects.filter(pk=fields['request_id'])\
-            .update(repository_revision=fields['result'])
+            autoland_request = AutolandRequest.objects.filter(pk=fields['request_id'])
+            autoland_request.update(repository_revision=fields['result'])
+
+            assert len(autoland_request) == 1
+
+            # If we've landed to the "inbound" repository, we'll close the
+            # review request automatically.
+            rr = ReviewRequest.objects.get(pk=autoland_request[0].review_request_id)
+            landing_repo = rr.repository.extra_data.get('landing_repository_url')
+            if autoland_request[0].repository_url == landing_repo:
+                rr.close(ReviewRequest.SUBMITTED)
 
             AutolandEventLogEntry.objects.create(
                 autoland_request_id=fields['request_id'],
                 status=AutolandEventLogEntry.SERVED,
                 details=fields['result'])
+
         else:
             AutolandEventLogEntry.objects.create(
                 autoland_request_id=fields['request_id'],

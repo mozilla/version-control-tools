@@ -41,7 +41,6 @@ class AutolandTryTest(MozReviewWebDriverTest):
             MozReviewWebDriverTest.tearDownClass()
             raise
 
-
     def test_autoland_try(self):
         # We currently have four conditions for enabling the 'automation' menu
         # and try button (see static/mozreview/js/autoland.js):
@@ -73,8 +72,8 @@ class AutolandTryTest(MozReviewWebDriverTest):
             try_btn.value_of_css_property('opacity'), '0.5')
         self.assign_reviewer(0, 'jsmith')
         publish_btn = WebDriverWait(self.browser, 3).until(
-                        EC.visibility_of_element_located((By.ID,
-                        'btn-draft-publish')))
+            EC.visibility_of_element_located((By.ID,
+            'btn-draft-publish')))
         publish_btn.click()
 
         WebDriverWait(self.browser, 10).until(
@@ -102,7 +101,7 @@ class AutolandTryTest(MozReviewWebDriverTest):
         # clicking the Submit button should display an activity indicator
         try_submit.click()
 
-        element = WebDriverWait(self.browser, 3).until(
+        element = WebDriverWait(self.browser, 5).until(
             EC.visibility_of_element_located((By.ID, 'activity-indicator'))
         )
         try:
@@ -118,11 +117,15 @@ class AutolandTryTest(MozReviewWebDriverTest):
             EC.visibility_of_element_located((By.CLASS_NAME, 'changedesc'))
         )
 
-        time.sleep(5)
+        time.sleep(10)
         self.browser.refresh()
         changedesc = self.browser.find_elements_by_class_name('changedesc')[2]
         self.assertTrue('https://treeherder.mozilla.org/'
             in changedesc.get_attribute('innerHTML'))
+
+        # We should not have closed the review automatically
+        with self.assertRaises(NoSuchElementException):
+            self.browser.find_element_by_id('submitted-banner')
 
         # We should not be able to trigger a Try run for another user.
         self.reviewboard_login('jsmith@example.com', 'password1')

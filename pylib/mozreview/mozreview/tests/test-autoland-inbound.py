@@ -78,9 +78,9 @@ class AutolandInboundTest(MozReviewWebDriverTest):
         # with an associated inbound repository.
         self.reviewboard_login('mjane@example.com', 'password2')
         self.load_rburl('r/1')
-        try_btn = self.browser.find_element_by_id('autoland-try-trigger')
+        autoland_btn = self.browser.find_element_by_id('autoland-trigger')
         self.assertEqual(
-            try_btn.value_of_css_property('opacity'), '0.5')
+            autoland_btn.value_of_css_property('opacity'), '0.5')
         self.add_hostingservice(1, 'Sirius Black', 'scm_level_1',
                                 'try',
                                 'inbound', '')
@@ -136,3 +136,8 @@ class AutolandInboundTest(MozReviewWebDriverTest):
         )
         self.assertTrue('https://treeherder.mozilla.org/'
             in action_info.get_attribute('innerHTML'))
+
+        # We should have closed the review request automatically
+        submitted_banner = self.browser.find_element_by_id('submitted-banner')
+        self.assertTrue('This change has been marked as submitted.' in
+                        submitted_banner.get_attribute('innerHTML'))
