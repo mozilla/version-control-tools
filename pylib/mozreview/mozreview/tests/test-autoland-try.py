@@ -72,11 +72,18 @@ class AutolandTryTest(MozReviewWebDriverTest):
         self.assertEqual(
             try_btn.value_of_css_property('opacity'), '0.5')
         self.assign_reviewer(0, 'jsmith')
-        publish_btn = self.browser.find_element_by_id('btn-draft-publish')
+        publish_btn = WebDriverWait(self.browser, 3).until(
+                        EC.visibility_of_element_located((By.ID,
+                        'btn-draft-publish')))
         publish_btn.click()
 
         WebDriverWait(self.browser, 10).until(
             EC.invisibility_of_element_located((By.ID, 'draft-banner')))
+
+        # Attempt to make intermittent failure with opacity of 'try' button
+        # less common. See Bug 1220733.
+        self.load_rburl('r/2')
+        self.load_rburl('r/1')
 
         automation_menu = self.browser.find_element_by_id('automation-menu')
         automation_menu.click()
@@ -113,10 +120,10 @@ class AutolandTryTest(MozReviewWebDriverTest):
 
         time.sleep(5)
         self.browser.refresh()
-        changedesc = self.browser.find_element_by_class_name('changedesc')
-        iframe = changedesc.find_element_by_tag_name('iframe')
+        self.browser.get_screenshot_as_file('/home/dminor/Desktop/mozreview.png')
+        changedesc = self.browser.find_elements_by_class_name('changedesc')[2]
         self.assertTrue('https://treeherder.mozilla.org/'
-            in iframe.get_attribute('src'))
+            in changedesc.get_attribute('innerHTML'))
 
         # We should not be able to trigger a Try run for another user.
         self.reviewboard_login('jsmith@example.com', 'password1')
