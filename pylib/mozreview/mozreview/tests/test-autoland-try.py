@@ -120,7 +120,6 @@ class AutolandTryTest(MozReviewWebDriverTest):
 
         time.sleep(5)
         self.browser.refresh()
-        self.browser.get_screenshot_as_file('/home/dminor/Desktop/mozreview.png')
         changedesc = self.browser.find_elements_by_class_name('changedesc')[2]
         self.assertTrue('https://treeherder.mozilla.org/'
             in changedesc.get_attribute('innerHTML'))
