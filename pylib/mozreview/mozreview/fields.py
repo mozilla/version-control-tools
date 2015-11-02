@@ -237,7 +237,7 @@ class TryField(BaseReviewRequestField):
                      'hold tight. If the try tree is closed autoland will '
                      'retry your push for you until the tree opens.')
     _autoland_problem = _('Autoland reported a problem: %s')
-    _job_url = 'https://treeherder.mozilla.org/embed/resultset-status/try/%s/'
+    _job_url = 'https://treeherder.mozilla.org/#/jobs?repo=try&revision=%s'
 
     def should_render(self, value):
         return False
