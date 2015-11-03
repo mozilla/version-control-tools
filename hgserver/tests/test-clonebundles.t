@@ -21,13 +21,12 @@ Create a clonebundles manifest
 
 Cloning with a client that supports clonebundles should advertise the
 feature
+TODO bug 1221268 temporarily disabled because of bug in 3.6 (will be fixed in 3.6.1)
 
 #if hg36+
 
   $ hg clone -U ${HGWEB_0_URL}mozilla-central clonebundles-advertise
   requesting all changes
-  remote: this server supports the experimental "clone bundles" feature that should enable faster and more reliable cloning
-  remote: help test it by setting the "experimental.clonebundles" config flag to "true"
   adding changesets
   adding manifests
   adding file changes
