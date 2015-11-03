@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cd /repos
+hg clone http://hgrb/$1 inbound-$1
 hg clone http://hgrb/$1
 cd /repos/$1
 
@@ -20,6 +21,7 @@ upstream = http://hgrb/$1
 $1 = http://hgrb/$1
 mozreview-push = ssh://hgrb/$1
 try = /repos/try
+inbound = /repos/inbound-$1
 EOF
 
 hg bookmark upstream
