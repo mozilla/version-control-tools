@@ -50,7 +50,8 @@ USER_REPO_EXISTS = """
 You already have a repo called %s.
 
 If you think this is wrong, please file a Developer Services :: hg.mozilla.org
-bug at https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
+bug at
+https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%%20Services&component=Mercurial%%3A%%20hg.mozilla.org
 """.strip()
 
 NO_SOURCE_REPO = """

@@ -323,4 +323,14 @@ TODO this behavior is wrong (bug 758608)
 
   $ standarduserssh $SSH_SERVER clone repo-missing does-not-exist
 
+Attempting to create a user repo that already exists results in error
+
+  $ standarduserssh $SSH_SERVER clone repo-2 hgcustom/version-control-tools
+  You already have a repo called repo-2.
+  
+  If you think this is wrong, please file a Developer Services :: hg.mozilla.org
+  bug at
+  https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
+  [1]
+
   $ hgmo stop
