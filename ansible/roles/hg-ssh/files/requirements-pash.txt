@@ -1,5 +1,5 @@
-# sha256: mX2kXaMD45lnjFvM1745sPq_KcfgL9PIdRwv-IyKJZ0
-Mercurial==3.5.1
+# sha256: I_3AOFA5EbIdyeVWEYgD97HUFQ6xSTPS6j0P8Nxgq10
+Mercurial==3.5.2
 
 # sha256: S4iRU5oxcdmTz3iWtjL_CIpMcHroWsPHfbFFT3lJ8-I
 python-ldap==2.4.20

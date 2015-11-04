@@ -1,5 +1,5 @@
 # sha256: BK-ioGq33MqdgXF7Qgp6FIJgYemyYUpcd90kx1zPl-Q
 futures==3.0.3
 
-# sha256: mX2kXaMD45lnjFvM1745sPq_KcfgL9PIdRwv-IyKJZ0
-Mercurial==3.5.1
+# sha256: I_3AOFA5EbIdyeVWEYgD97HUFQ6xSTPS6j0P8Nxgq10
+Mercurial==3.5.2
