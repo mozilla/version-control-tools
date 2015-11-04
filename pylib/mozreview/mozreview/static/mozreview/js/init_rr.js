@@ -73,5 +73,7 @@ $(document).ready(function() {
   // we'll use it eventually.
   MozReview.parentReviewRequest.fetch();
 
+  MozReview.reviewRequestPending = page.reviewRequest.attributes.state == RB.ReviewRequest.PENDING;
+
   $(document).trigger("mozreview_ready");
 });

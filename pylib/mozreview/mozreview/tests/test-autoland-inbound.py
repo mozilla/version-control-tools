@@ -141,3 +141,11 @@ class AutolandInboundTest(MozReviewWebDriverTest):
         submitted_banner = self.browser.find_element_by_id('submitted-banner')
         self.assertTrue('This change has been marked as submitted.' in
                         submitted_banner.get_attribute('innerHTML'))
+
+        # We should not be able to autoland from a closed review request
+        try_btn = self.browser.find_element_by_id('autoland-try-trigger')
+        self.assertEqual(
+            try_btn.value_of_css_property('opacity'), '0.5')
+        autoland_btn = self.browser.find_element_by_id('autoland-trigger')
+        self.assertEqual(
+            autoland_btn.value_of_css_property('opacity'), '0.5')

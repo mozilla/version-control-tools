@@ -14,6 +14,8 @@ $(document).on("mozreview_ready", function() {
     try_trigger.attr('title', 'Only the author may trigger a try build at this time');
   } else if (!MozReview.hasScmLevel1) {
     try_trigger.attr('title', 'You do not have the required scm level to trigger a try build');
+  } else if (!MozReview.reviewRequestPending) {
+    try_trigger.attr('title', 'You can not trigger a try build on a closed review request');
   } else {
     try_trigger.css('opacity', '1');
 
@@ -162,6 +164,8 @@ $(document).on("mozreview_ready", function() {
     autoland_trigger.attr('title', 'You must have scm_level_3 access to land');
   } else if (!MozReview.currentIsMutableByUser) {
     autoland_trigger.attr('title', 'Only the author may land commits at this time');
+  } else if (!MozReview.reviewRequestPending) {
+    try_trigger.attr('title', 'You can not autoland from a closed review request');
   } else {
     MozReview.parentReviewRequest.ready({
       error: function () {
