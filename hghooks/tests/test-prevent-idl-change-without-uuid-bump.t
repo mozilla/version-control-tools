@@ -416,6 +416,7 @@ Comments and changes outside interface blocks should be ignored.
   > /* test
   >  * test
   >  */
+  > [ptr] native x(x);
   > [uuid(1f341018-521a-49de-b806-1bef5c9a00b0)]
   > interface B {
   > };
@@ -469,7 +470,7 @@ UUID is not bumped.
   *************************** ERROR ***************************
   Push rejected because the following IDL interfaces were
   modified without changing the UUID:
-    - nsISupports in changeset c4abf967d1fe
+    - nsISupports in changeset 9476522f2cea
   
   To update the UUID for all of the above interfaces and their
   descendants, run:

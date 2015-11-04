@@ -38,7 +38,7 @@ IDL_UUID_PATTERN = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 IDL_IDENT_PATTERN = r'_?[A-Za-z][A-Za-z_0-9]*'
 
 IDL_MATCH_ATTRIBUTE_LIST_AND_CAPTURE_UUID_PATTERN = \
-    r'\[.*?\buuid\s*?\(\s*?(' + IDL_UUID_PATTERN + r')\s*?\).*?\]'
+    r'\[[^\[]*?\buuid\s*?\(\s*?(' + IDL_UUID_PATTERN + r')\s*?\)[^\[]*?\]'
 
 IDL_MATCH_INTERFACE_BODY_AND_CAPTURE_NAME_PATTERN = \
     r'\s+?interface\s+?(' + IDL_IDENT_PATTERN + r').*?\};'
