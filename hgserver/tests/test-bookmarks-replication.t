@@ -137,7 +137,6 @@ Push a bookmark update
   }
 
 Push a non-forward bookmark update
-TODO this is currently buggy: bmo2@default should not exist
 
   $ hg up -r 1
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -162,13 +161,51 @@ TODO this is currently buggy: bmo2@default should not exist
   "date": [0.0, 0]
   }, {
   "bookmark": "bm2",
-  "node": "95fa38d78880f6d477de646b441e7ca4c5ca7015",
-  "date": [0.0, 0]
-  }, {
-  "bookmark": "bm2@default",
   "node": "b8c2ad26671f334ec09767ea7505c5253863232b",
   "date": [0.0, 0]
   }]
+  }
+
+Push a bookmark delete
+
+  $ hg bookmark -d bm1
+  $ hg push -B bm1
+  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  searching for changes
+  no changes found
+  remote: replication of bookmarks data completed successfully in \d+\.\ds (re)
+  deleting remote bookmark bm1
+  [1]
+
+  $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-bookmarks
+  200
+  
+  {
+  "node": "95fa38d78880f6d477de646b441e7ca4c5ca7015",
+  "bookmarks": [{
+  "bookmark": "bm2",
+  "node": "b8c2ad26671f334ec09767ea7505c5253863232b",
+  "date": [0.0, 0]
+  }]
+  }
+
+Remove all bookmarks
+
+  $ hg bookmark -d bm2
+  $ hg push -B bm2
+  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  searching for changes
+  no changes found
+  remote: replication of bookmarks data completed successfully in \d+\.\ds (re)
+  deleting remote bookmark bm2
+  [1]
+
+  $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-bookmarks
+  200
+  
+  {
+  "node": "95fa38d78880f6d477de646b441e7ca4c5ca7015",
+  "bookmarks": []
   }
 
 Cleanup

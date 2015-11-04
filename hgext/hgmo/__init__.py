@@ -22,6 +22,11 @@ hgmo.mozbuildinfowrapper
 
    See "moz.build wrapper commands" for more.
 
+hgmo.replacebookmarks
+   When set, `hg pull` and other bookmark application operations will replace
+   local bookmarks with incoming bookmarks instead of doing the more
+   complicated default behavior, which includes creating diverged bookmarks.
+
 moz.build Wrapper Commands
 ==========================
 
@@ -66,8 +71,9 @@ import os
 import subprocess
 
 from mercurial.i18n import _
-from mercurial.node import short
+from mercurial.node import bin, short
 from mercurial import (
+    bookmarks,
     cmdutil,
     commands,
     encoding,
@@ -373,6 +379,30 @@ def revset_reviewer(repo, subset, x):
     return subset.filter(hasreviewer)
 
 
+def bmupdatefromremote(orig, ui, repo, remotemarks, path, trfunc, explicit=()):
+    """Custom bookmarks applicator that overwrites with remote state.
+
+    The default bookmarks merging code adds divergence. When replicating from
+    master to mirror, a bookmark force push could result in divergence on the
+    mirror during `hg pull` operations. We install our own code that replaces
+    the complicated merging algorithm with a simple "remote wins" version.
+    """
+    if not ui.configbool('hgmo', 'replacebookmarks', False):
+        return orig(ui, repo, remotemarks, path, trfunc, explicit=explicit)
+
+    localmarks = repo._bookmarks
+
+    if localmarks == remotemarks:
+        return
+
+    ui.status('remote bookmarks changed; overwriting\n')
+    localmarks.clear()
+    for bm, node in remotemarks.items():
+        localmarks[bm] = bin(node)
+    tr = trfunc()
+    localmarks.recordchange(tr)
+
+
 def servehgmo(orig, ui, repo, *args, **kwargs):
     """Wraps commands.serve to provide --hgmo flag."""
     if kwargs.get('hgmo', False):
@@ -432,6 +462,7 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
 def extsetup(ui):
     extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
     extensions.wrapfunction(webutil, 'changelistentry', changelistentry)
+    extensions.wrapfunction(bookmarks, 'updatefromremote', bmupdatefromremote)
 
     revset.symbols['reviewer'] = revset_reviewer
     revset.safesymbols.add('reviewer')

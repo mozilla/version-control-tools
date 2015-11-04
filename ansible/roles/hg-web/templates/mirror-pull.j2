@@ -129,7 +129,7 @@ fi
 exit_code=0
 if [ -d "$name" ]; then
     echo "$name already exists, pulling"
-    retry $HG -R $name pull $GLOBAL_HG_OPTS $CHANGESET
+    retry $HG -R $name --config hgmo.replacebookmarks=true pull $GLOBAL_HG_OPTS $CHANGESET
     exit_code=$?
 elif [ \! -e $name ]; then
     mkdir -p `dirname $name` 
