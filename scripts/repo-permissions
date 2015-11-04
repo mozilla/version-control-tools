@@ -9,6 +9,7 @@
 # permissions. 'r' means read access, 'w' write access, and '-' no access.
 # The user owner must have at least read access.
 
+import errno
 import grp
 import os
 import pwd
@@ -59,20 +60,26 @@ elif mode[2] == 'w':
 
 
 def ensure(path, mode, uid, gid):
-    st = os.stat(path)
+    try:
+        st = os.stat(path)
 
-    owner_changed = False
-    if st.st_uid != uid or st.st_gid != gid:
-        os.chown(path, uid, gid)
-        owner_changed = True
+        owner_changed = False
+        if st.st_uid != uid or st.st_gid != gid:
+            os.chown(path, uid, gid)
+            owner_changed = True
 
-    mode_changed = False
-    if stat.S_IMODE(st.st_mode) != mode:
-        os.chmod(path, mode)
-        mode_changed = True
+        mode_changed = False
+        if stat.S_IMODE(st.st_mode) != mode:
+            os.chmod(path, mode)
+            mode_changed = True
 
-    return owner_changed, mode_changed
+        return owner_changed, mode_changed
+    except OSError as e:
+        # Files could disappear during operation. Silently ignore.
+        if e.errno != errno.ENOENT:
+            raise
 
+        return False, False
 
 owner_count = 0
 mode_count = 0
