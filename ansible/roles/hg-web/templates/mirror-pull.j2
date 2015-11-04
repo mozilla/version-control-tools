@@ -34,6 +34,7 @@ DELETE=false
 HGRC=false
 CHANGESET=""
 HG=/repo/hg/venv_replication/bin/hg
+VCT=/repo/hg/version-control-tools
 
 while true; do
     case "$1" in 
@@ -136,6 +137,10 @@ elif [ \! -e $name ]; then
     lockfile -r $LOCK_RETRIES ${PWD}/syncing.lck || die "Could not lock destination"
     retry $HG clone $GLOBAL_HG_OPTS -U -v "$src" $name
     exit_code=$?
+    # Ensure permissions are sane. If we don't do this, our nightly cron
+    # ensuring proper permissions may spew output for newly-created
+    # repos.
+    ${VCT}/scripts/repo-permissions $name hg hg wwr
     rm ${PWD}/syncing.lck
 else
     die "WTF is $REPO_TARGET/$name"
