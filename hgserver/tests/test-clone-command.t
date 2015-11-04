@@ -322,6 +322,12 @@ Specifying an invalid source repo to clone will result in error
 TODO this behavior is wrong (bug 758608)
 
   $ standarduserssh $SSH_SERVER clone repo-missing does-not-exist
+  Sorry, there is no source repo called does-not-exist.
+  
+  If you think this is wrong, please file a Developer Services :: hg.mozilla.org
+  bug at
+  https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
+  [1]
 
 Attempting to create a user repo that already exists results in error
 

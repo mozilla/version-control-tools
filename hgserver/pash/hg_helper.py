@@ -58,7 +58,8 @@ NO_SOURCE_REPO = """
 Sorry, there is no source repo called %s.
 
 If you think this is wrong, please file a Developer Services :: hg.mozilla.org
-bug at https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
+bug at
+https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%%20Services&component=Mercurial%%3A%%20hg.mozilla.org
 """.strip()
 
 HGWEB_ERROR = """
@@ -523,8 +524,7 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
             if len(args) == 1:
                 make_repo_clone(cname, args[0], None)
             elif len(args) == 2:
-                if os.path.isdir('%s/%s/.hg' % (DOC_ROOT, args[1])):
-                    make_repo_clone(cname, args[0], args[1])
+                make_repo_clone(cname, args[0], args[1])
             sys.exit(0)
         sys.stderr.write('clone usage: ssh hg.mozilla.org clone newrepo '
                          '[srcrepo]\n')
