@@ -14,15 +14,15 @@
 
 <div class="page_nav">
 <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-<a href="{url|urlescape}shortlog/{rev}{sessionvars%urlparameter}">shortlog</a> |
-<a href="{url|urlescape}log/{rev}{sessionvars%urlparameter}">changelog</a> |
+<a href="{url|urlescape}shortlog/{symrev}{sessionvars%urlparameter}">shortlog</a> |
+<a href="{url|urlescape}log/{symrev}{sessionvars%urlparameter}">changelog</a> |
 <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
 <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
 <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
 <a href="{url|urlescape}branches{sessionvars%urlparameter}">branches</a> |
-<a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">files</a> |
+<a href="{url|urlescape}file/{symrev}{sessionvars%urlparameter}">files</a> |
 changeset |
-<a href="{url|urlescape}raw-rev/{node|short}">raw</a> {archives%archiveentry} |
+<a href="{url|urlescape}raw-rev/{symrev}">raw</a> {archives%archiveentry} |
 <a href="{url|urlescape}help{sessionvars%urlparameter}">help</a>
 <br/>
 </div>
@@ -35,7 +35,10 @@ changeset |
 <tr><td>author</td><td>{author|obfuscate}</td></tr>
 <tr><td></td><td class="date age">{date|rfc822date}</td></tr>
 {branch%changesetbranch}
-<tr><td>changeset {rev}</td><td style="font-family:monospace">{node|short}</td></tr>
+<tr>
+ <td>changeset {rev}</td>
+ <td style="font-family:monospace"><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a></td>
+</tr>
 {ifeq(count(parent), '2', parent%changesetparentdiff, parent%changesetparent)}
 {child%changesetchild}
 </table></div>

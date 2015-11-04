@@ -44,10 +44,10 @@ filenav = '{before%filenaventry}{after%filenaventry}'
 direntry = '
   <tr class="fileline">
     <td class="name">
-      <a href="{url|urlescape}file/{node|short}{path|urlescape}{sessionvars%urlparameter}">
+      <a href="{url|urlescape}file/{symrev}{path|urlescape}{sessionvars%urlparameter}">
         <img src="{staticurl|urlescape}coal-folder.png" alt="dir."/> {basename|escape}/
       </a>
-      <a href="{url|urlescape}file/{node|short}{path|urlescape}/{emptydirs|urlescape}{sessionvars%urlparameter}">
+      <a href="{url|urlescape}file/{symrev}{path|urlescape}/{emptydirs|urlescape}{sessionvars%urlparameter}">
         {emptydirs|escape}
       </a>
     </td>
@@ -58,7 +58,7 @@ direntry = '
 fileentry = '
   <tr class="fileline">
     <td class="filename">
-      <a href="{url|urlescape}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">
+      <a href="{url|urlescape}file/{symrev}/{file|urlescape}{sessionvars%urlparameter}">
         <img src="{staticurl|urlescape}coal-file.png" alt="file"/> {basename|escape}
       </a>
     </td>
@@ -161,36 +161,42 @@ tags = tags.tmpl
 tagentry = '
   <tr class="tagEntry">
     <td>
-      <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">
+      <a href="{url|urlescape}rev/{tag|revescape}{sessionvars%urlparameter}">
         {tag|escape}
       </a>
     </td>
     <td class="node">
-      {node|short}
+      <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">
+        {node|short}
+      </a>
     </td>
   </tr>'
 bookmarks = bookmarks.tmpl
 bookmarkentry = '
   <tr class="tagEntry">
     <td>
-      <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">
+      <a href="{url|urlescape}rev/{bookmark|revescape}{sessionvars%urlparameter}">
         {bookmark|escape}
       </a>
     </td>
     <td class="node">
-      {node|short}
+      <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">
+        {node|short}
+      </a>
     </td>
   </tr>'
 branches = branches.tmpl
 branchentry = '
   <tr class="tagEntry">
     <td>
-      <a href="{url|urlescape}shortlog/{node|short}{sessionvars%urlparameter}" class="{status}">
+      <a href="{url|urlescape}shortlog/{branch|revescape}{sessionvars%urlparameter}" class="{status}">
         {branch|escape}
       </a>
     </td>
     <td class="node">
-      {node|short}
+      <a href="{url|urlescape}shortlog/{node|short}{sessionvars%urlparameter}" class="{status}">
+        {node|short}
+      </a>
     </td>
   </tr>'
 changelogtag = '<span class="tag">{name|escape}</span> '
@@ -240,7 +246,7 @@ indexarchiveentry = '<a href="{url|urlescape}archive/{node|short}{extension|urle
 index = index.tmpl
 archiveentry = '
   <li>
-    <a href="{url|urlescape}archive/{node|short}{extension|urlescape}{ifeq(path,'/','',path|urlescape)}">{type|escape}</a>
+    <a href="{url|urlescape}archive/{symrev}{extension|urlescape}{ifeq(path,'/','',path|urlescape)}">{type|escape}</a>
   </li>'
 notfound = notfound.tmpl
 error = error.tmpl
