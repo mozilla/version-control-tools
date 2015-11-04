@@ -14,26 +14,6 @@ usage() {
     echo
 }
 
-check_nowait_lock() {
-    if [ -e $1 ]; then
-        return 1
-    fi
-
-    return 0
-}
-
-check_wait_lock() {
-    if [ -e $1 ]; then
-        sleep 5
-        check_wait_lock $1
-    fi
-    return 0
-}
-
-create_lock() {
-    check_nowait_lock $1 && touch $1
-}
-
 if [ -n "$SSH_ORIGINAL_COMMAND" ]; then
     set -- $SSH_ORIGINAL_COMMAND
 fi
