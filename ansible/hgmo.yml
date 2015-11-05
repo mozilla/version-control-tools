@@ -67,7 +67,7 @@
       run_once: true
 
     - name: create push data kafka topic
-      command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --create --topic pushdata --partitions 1 --replication-factor 5 --config min.insync.replicas=3 --config unclean.leader.election.enable=false --config max.message.bytes=104857600
+      command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --create --topic pushdata --partitions 1 --replication-factor {{ kafka_replication_factor }} --config min.insync.replicas={{ kafka_min_insync_replicas }} --config unclean.leader.election.enable=false --config max.message.bytes=104857600
       when: "'pushdata' not in kafka_topics.stdout_lines"
       run_once: true
 
