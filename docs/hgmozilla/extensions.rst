@@ -183,7 +183,7 @@ Additional 3rd Party Extensions to Consider
 evolve
 ------
 
-The `evolve extension <http://mercurial.selenic.com/wiki/EvolveExtension>`_
+The `evolve extension <https://www.mercurial-scm.org/wiki/EvolveExtension>`_
 opens up new workflows that harness Mercurial's ability to record how
 changesets *evolve* over time.
 

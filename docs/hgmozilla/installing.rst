@@ -22,7 +22,7 @@ Recommended Versions
 
 Mozilla recommends running the latest stable release of Mercurial. The
 latest stable release is always listed at
-`http://mercurial.selenic.com/ <http://mercurial.selenic.com/>`_.
+`https://www.mercurial-scm.org/ <https://www.mercurial-scm.org/>`_.
 
 Mercurial makes a major *X.Y* release every three months, typically around
 the first of the month. Release months are February, May, August, and
@@ -88,7 +88,7 @@ If you are a Firefox developer, you should install Mercurial indirectly
 through `MozillaBuild <https://wiki.mozilla.org/MozillaBuild>`_.
 
 If you are not a Firefox developer, download a Windows installer
-`direct from the Mercurial project <http://mercurial.selenic.com/downloads>`_.
+`direct from the Mercurial project <https://www.mercurial-scm.org/downloads>`_.
 
 Installing on OS X
 ==================
@@ -119,7 +119,7 @@ Installing on Linux, BSD, and other UNIX-style OSs
 ==================================================
 
 The instructions for installing Mercurial on many popular distributions
-are available on `Mercurial's web site <http://mercurial.selenic.com/downloads>`_.
+are available on `Mercurial's web site <https://www.mercurial-scm.org/downloads>`_.
 However, many distros don't keep their Mercurial package reasonably
 current. You often need to perform a source install.
 
@@ -129,7 +129,7 @@ Installing from Source
 Installing Mercurial from source is simple and should not be dismissed
 because it isn't coming from a package.
 
-Download a `source archive <http://mercurial.selenic.com/downloads>`_
+Download a `source archive <https://www.mercurial-scm.org/downloads>`_
 from Mercurial. Alternatively, clone the Mercurial source code and check
 out the version you wish to install::
 

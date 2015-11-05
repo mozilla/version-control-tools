@@ -69,7 +69,7 @@ see something like the following:
    abort: unresolved conflicts, can't continue
    (use hg resolve and hg graft --continue)
 
-Read `Mercurial's conflict docs <http://mercurial.selenic.com/wiki/TutorialConflict>`_
+Read `Mercurial's conflict docs <https://www.mercurial-scm.org/wiki/TutorialConflict>`_
 for how to resolve conflicts. When you are done resolving conflicts,
 simply run ``hg graft --continue`` to continue the graft where it left
 off.

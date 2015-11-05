@@ -113,7 +113,7 @@ filename wouldn't get discovered, an error will be raised saying so.
 Choice of Test Flavor
 ---------------------
 
-Mercurial `t tests <http://mercurial.selenic.com/wiki/WritingTests>`_
+Mercurial `t tests <https://www.mercurial-scm.org/wiki/WritingTests>`_
 are recommended for most tests.
 
 Mercurial *t tests* are glorified shell scripts. Tests consist of a

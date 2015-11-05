@@ -39,7 +39,7 @@ at reproducing their work here.
 
 Recommending reading for using bookmarks includes:
 
-* `The official Mercurial wiki <http://mercurial.selenic.com/wiki/Bookmarks>`_
+* `The official Mercurial wiki <https://www.mercurial-scm.org/wiki/Bookmarks>`_
 * `Bookmarks Kick Start Guide <http://mercurial.aragost.com/kick-start/en/bookmarks/>`_
 * `A Guide to Branching in Mercurial <http://stevelosh.com/blog/2009/08/a-guide-to-branching-in-mercurial/#branching-with-bookmarks>`_
 
@@ -61,7 +61,7 @@ Integrate the Active Bookmark into the Shell Prompt
 If you find yourself forgetting which bookmark is active and you
 want a constant reminder, consider printing the active bookmark as
 part of your shell prompt. To do this, use the
-`prompt extension <http://mercurial.selenic.com/wiki/PromptExtension>`_
+`prompt extension <https://www.mercurial-scm.org/wiki/PromptExtension>`_
 or the *scm-prompt.sh* script from Facebook's
 `hg-experimental repository <https://bitbucket.org/facebook/hg-experimental>`_.
 

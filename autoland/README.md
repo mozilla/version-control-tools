@@ -114,7 +114,7 @@ Many of the defaults here assume that Autoland is installed under
 configuration if this is not the case.
 
 If not already present, install mercurial from
-http://mercurial.selenic.com/downloads rather than relying upon the version
+https://www.mercurial-scm.org/downloads rather than relying upon the version
 present in the ubuntu packages.
 
 Install required ubuntu packages:

@@ -51,7 +51,7 @@ Templates
 
 It isn't enough to activate the ``pushlog-feed`` extension: you'll also
 need to configure some
-`Mercurial theming <http://mercurial.selenic.com/wiki/Theming>`_
+`Mercurial theming <https://www.mercurial-scm.org/wiki/Theming>`_
 to render pushlog data.
 
 The Atom output will require the existence of an ``atom`` style. You are

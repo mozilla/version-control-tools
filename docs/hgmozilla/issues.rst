@@ -35,7 +35,7 @@ With Core Mercurial
 -------------------
 
 Found a bug in Mercurial? Have a performance concern? File a bug in
-`Mercurial's Bugzilla <http://bz.selenic.com/>`_. Choose the *Mercurial*
+`Mercurial's Bugzilla <https://bz.mercurial-scm.org/`_. Choose the *Mercurial*
 component if you are unsure what component to use.
 
 Before filing bugs, ensure you are using the latest Mercurial release. If not,
@@ -53,7 +53,7 @@ to reproduce.
 
 If you are unsure whether something is a bug, hop in to #mercurial on the
 Freenode IRC network and ask around. Or, post to one of the Mercurial
-`mailing lists <http://mercurial.selenic.com/wiki/MailingLists>`_.
+`mailing lists <https://www.mercurial-scm.org/wiki/MailingLists>`_.
 
 With a Mozilla Extensions
 -------------------------

@@ -68,7 +68,7 @@ checkout``. You'll also want to read the logs between versions.
 
 .. code:: sh
 
-   $ hg clone http://selenic.com/hg mercurial-repo
+   $ hg clone https://selenic.com/hg mercurial-repo
    $ cd mercurial-repo
    $ hg checkout 3.2.2
    $ hg log -r 3.2.1:3.2.2
