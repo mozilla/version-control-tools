@@ -279,3 +279,17 @@ should be created.
    This requires root SSH access to reviewboard-hg1.dmz.scl.mozilla.com
    and for the specified Bugzilla account to have admin privileges on
    reviewboard.mozilla.org.
+
+Marking Repositories as Read-only
+=================================
+
+Repositories can be marked as read-only. When a repository is read-only,
+pushes are denied with a message saying the repository is read-only.
+
+To mark an individual repository as read-only, create a
+``.hg/readonlyreason`` file. If the file has content, it will be printed
+to the user as the reason the repository is read-only.
+
+To mark all repositories on hg.mozilla.org as read-only, create the
+``/etc/mercurial/readonlyreason`` file. If the file has content, it will
+be printed to the user.
