@@ -1,2 +1,11 @@
+# sha256: bNRjtojZj-wcH2AuMW63dFrvDlXcV_6f8vIDzwhlyMc
+kafka-python==0.9.4
+
 # sha256: I_3AOFA5EbIdyeVWEYgD97HUFQ6xSTPS6j0P8Nxgq10
 Mercurial==3.5.2
+
+# sha256: w2yTiocuX_SUk4szsUqqFWy0OexnVI_Ks1Nbt4sIRug
+PyYAML==3.11
+
+# sha256: QYqTw5en7asj5ViNvAZ6x0pyPts9VBvUk295R252Rdo
+six==1.9.0
