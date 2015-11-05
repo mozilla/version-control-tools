@@ -7,3 +7,4 @@
     bind_dn: cn=admin,dc=mozilla
     bind_pw: password
     home_attribute: fakeHome
+    zk_listen_on_all_ips: true

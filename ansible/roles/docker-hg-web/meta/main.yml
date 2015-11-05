@@ -1,6 +1,8 @@
 ---
 dependencies:
-  - supervisor
+  - docker-kafkabroker
+  # Docker startup routines plug in proper values for ZooKeeper and
+  # Kafka settings.
   - { role: hg-web,
       mirror_source: "@mirror_source@",
       mirror_ssh_user: hg,
@@ -11,4 +13,8 @@ dependencies:
       httpd_server_limit: 4,
       httpd_max_clients: 4,
       vct_node: "DOCKER",
+      kafka_broker_id: 2014,
+      kafka_host_name: dummyhost,
+      kafka_zookeeper_connect: dummyhostports,
+      zk_servers: { localhost: dummy },
     }

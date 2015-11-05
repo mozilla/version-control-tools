@@ -13,3 +13,7 @@ hgssh[1:2].dmz.scl3.mozilla.com ansible_ssh_user=root
 
 [hgssh-stage]
 hgssh.stage.dmz.scl3.mozilla.com ansible_ssh_user=root
+
+[hgmo:children]
+hgssh-prod
+hgweb-prod

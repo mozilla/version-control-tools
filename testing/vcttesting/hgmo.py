@@ -12,7 +12,10 @@ import uuid
 import concurrent.futures as futures
 
 from .ldap import LDAP
-from .util import wait_for_ssh
+from .util import (
+    wait_for_kafka,
+    wait_for_ssh,
+)
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -86,6 +89,7 @@ class HgCluster(object):
             self.master_ssh_port = None
             self.master_host_key = None
             self.web_urls = []
+            self.kafka_hostports = []
 
     def start(self, ldap_port=None, master_ssh_port=None, web_count=2,
               coverage=False):
@@ -105,10 +109,17 @@ class HgCluster(object):
             web_image = images['hgweb']
             ldap_image = images['ldap']
 
+        zookeeper_id = 0
+
         with futures.ThreadPoolExecutor(4) as e:
             f_ldap_create = e.submit(self._dc.create_container, ldap_image)
 
-            env = {}
+            env = {
+                'ZOOKEEPER_ID': '%d' % zookeeper_id,
+                'KAFKA_BROKER_ID': '%d' % zookeeper_id,
+            }
+            zookeeper_id += 1
+
             if coverage:
                 env['CODE_COVERAGE'] = '1'
 
@@ -117,12 +128,18 @@ class HgCluster(object):
                                        environment=env,
                                        entrypoint=['/entrypoint.py'],
                                        command=['/usr/bin/supervisord', '-n'],
-                                       ports=[22])
+                                       ports=[22, 2181, 2888, 3888, 9092])
             f_web_creates = []
             for i in range(web_count):
+                env = {
+                    'ZOOKEEPER_ID': '%d' % zookeeper_id,
+                    'KAFKA_BROKER_ID': '%d' % zookeeper_id,
+                }
+                zookeeper_id += 1
                 f_web_creates.append(e.submit(self._dc.create_container,
                                               web_image,
-                                              ports=[22, 80],
+                                              environment=env,
+                                              ports=[22, 80, 2181, 2888, 3888, 9092],
                                               entrypoint=['/entrypoint.py'],
                                               command=['/usr/bin/supervisord', '-n']))
 
@@ -136,7 +153,10 @@ class HgCluster(object):
 
             self._dc.start(master_id,
                            links=[(ldap_state['Name'], 'ldap')],
-                           port_bindings={22: master_ssh_port})
+                           port_bindings={
+                               22: master_ssh_port,
+                               9092: None,
+                           })
 
             master_state = self._dc.inspect_container(master_id)
 
@@ -145,7 +165,11 @@ class HgCluster(object):
             for i in web_ids:
                 fs.append(e.submit(self._dc.start, i,
                                    links=[(master_state['Name'], 'master')],
-                                   port_bindings={22: None, 80: None}))
+                                   port_bindings={
+                                       22: None,
+                                       80: None,
+                                       9092: None,
+                                    }))
             [f.result() for f in fs]
 
             f_web_states = []
@@ -154,6 +178,26 @@ class HgCluster(object):
 
             web_states = [f.result() for f in f_web_states]
 
+        all_states = [master_state] + web_states
+
+        # ZooKeeper and Kafka can't be started until the endpoints of nodes in
+        # the cluster are known. The entrypoint script waits for a file created
+        # by a process execution to come into existence before these daemons
+        # are started. So do this early after startup.
+        zookeeper_hostports = ['%s:2888:3888' % s['NetworkSettings']['IPAddress']
+                               for s in [master_state] + web_states]
+        with futures.ThreadPoolExecutor(web_count + 1) as e:
+            for s in all_states:
+                host, port = self._d._get_host_hostname_port(s, '9092/tcp')
+                command = [
+                    '/set-kafka-servers',
+                    host,
+                    str(port),
+                ] + zookeeper_hostports
+                e.submit(self._d.execute, s['Id'], command)
+
+        # Obtain replication SSH key from master. This key is random since it
+        # is generated at container build time.
         with futures.ThreadPoolExecutor(3) as e:
             f_private_key = e.submit(self._d.get_file_content, master_id, '/etc/mercurial/mirror')
             f_public_key = e.submit(self._d.get_file_content, master_id, '/etc/mercurial/mirror.pub')
@@ -201,9 +245,13 @@ class HgCluster(object):
 
         self.ldap_uri = 'ldap://%s:%d/' % (ldap_hostname,
                                            ldap_hostport)
-        with futures.ThreadPoolExecutor(2) as e:
+        with futures.ThreadPoolExecutor(4) as e:
             e.submit(self.ldap.create_vcs_sync_login, mirror_public_key)
             e.submit(wait_for_ssh, master_ssh_hostname, master_ssh_hostport)
+
+            for s in all_states:
+                hostname, hostport = self._d._get_host_hostname_port(s, '9092/tcp')
+                e.submit(wait_for_kafka, '%s:%s' % (hostname, hostport), 20)
 
         self.ldap_image = ldap_image
         self.master_image = master_image
@@ -215,6 +263,10 @@ class HgCluster(object):
         self.master_ssh_port = master_ssh_hostport
         self.master_host_key = master_host_key
         self.web_urls = []
+        self.kafka_hostports = []
+        for s in all_states:
+            hostname, hostport = self._d._get_host_hostname_port(s, '9092/tcp')
+            self.kafka_hostports.append('%s:%d' % (hostname, hostport))
         for s in web_states:
             hostname, hostport = self._d._get_host_hostname_port(s, '80/tcp')
             self.web_urls.append('http://%s:%d/' % (hostname, hostport))
@@ -258,6 +310,7 @@ class HgCluster(object):
         self.ldap_uri = None
         self.master_ssh_hostname = None
         self.master_ssh_port = None
+        self.kafka_hostports = []
 
     def _write_state(self):
         assert self.state_path
@@ -273,6 +326,7 @@ class HgCluster(object):
                 'master_ssh_port': self.master_ssh_port,
                 'master_host_key': self.master_host_key,
                 'web_urls': self.web_urls,
+                'kafka_hostports': self.kafka_hostports,
         }
         with open(self.state_path, 'wb') as fh:
             json.dump(s, fh, sort_keys=True, indent=4)

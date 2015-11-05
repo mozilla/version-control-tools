@@ -1,7 +1,15 @@
 ---
 dependencies:
-  - supervisor
+  - docker-kafkabroker
+  - docker-python-coverage
   # hgweb_hosts is used to populate SSH host keys. We don't know these
   # until Docker containers have started, so make it empty.
-  - { role: hg-ssh, hgweb_hosts: [] }
-  - { role: docker-python-coverage }
+  # Something similar applies to ZooKeeper and Kafka settings.
+  - {
+      role: hg-ssh,
+      hgweb_hosts: [],
+      kafka_broker_id: 1024,
+      kafka_host_name: dummyhost,
+      kafka_zookeeper_connect: dummyhostports,
+      zk_servers: { localhost: dummy }
+    }

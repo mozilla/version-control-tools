@@ -1,0 +1,94 @@
+#!/usr/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import os
+import sys
+import time
+
+if 'ZOOKEEPER_ID' not in os.environ:
+    print('error: ZOOKEEPER_ID not in environment')
+    sys.exit(1)
+
+if 'KAFKA_BROKER_ID' not in os.environ:
+    print('error: KAFKA_BROKER_ID not in environment')
+    sys.exit(1)
+
+zk_id = os.environ['ZOOKEEPER_ID']
+broker_id = os.environ['KAFKA_BROKER_ID']
+server_properties = '/etc/kafka/server.properties'
+zoo_cfg = '/etc/zookeeper/zoo.cfg'
+servers_path = '/kafka-servers'
+
+# Wait for the list of servers to become available.
+# The file will be installed by the process starting this container.
+print('wait for server info file')
+t_start = time.time()
+while True:
+    if os.path.exists(servers_path):
+        break
+
+    if time.time() - t_start > 60:
+        sys.exit('server file not available before timeout. giving up')
+    time.sleep(0.1)
+
+with open(servers_path, 'r') as fh:
+    lines = fh.read().splitlines()
+print('read server info file')
+
+advertise_host = lines[0]
+advertise_port = lines[1]
+servers = lines[2:]
+hostnames = [s.split(':')[0] for s in servers]
+
+# Tell ZooKeeper what the servers are.
+lines = []
+with open(zoo_cfg, 'rb') as fh:
+    for line in fh:
+        if not line.startswith(b'server.'):
+            lines.append(line.rstrip())
+
+for i, server in enumerate(servers):
+    line = 'server.%d=%s' % (i, server)
+    lines.append(line.encode('utf-8'))
+
+with open(zoo_cfg, 'wb') as fh:
+    fh.write(b'\n'.join(lines))
+
+print('wrote zookeeper server list')
+
+# Set the ZooKeeper current server ID.
+with open('/var/lib/zookeeper/myid', 'w') as fh:
+    fh.write(zk_id)
+
+print('wrote zookeeper id')
+
+# Set the Kafka broker ID and ZooKeeper server list.
+lines = []
+with open(server_properties, 'rb') as fh:
+    for line in fh:
+        if line.startswith(b'advertised.host.name='):
+            continue
+        if line.startswith(b'advertised.port='):
+            continue
+        if line.startswith(b'broker.id='):
+            continue
+        if line.startswith(b'zookeeper.connect='):
+            continue
+
+        lines.append(line.rstrip())
+
+lines.append(b'broker.id=' + broker_id.encode('utf-8'))
+lines.append(b'advertised.host.name=' + advertise_host.encode('utf-8'))
+lines.append(b'advertised.port=' + advertise_port.encode('utf-8'))
+
+hostports = ['%s:2181/hgmoreplication' % h for h in hostnames]
+connect = ','.join(hostports)
+connect = connect.encode('utf-8')
+lines.append(b'zookeeper.connect=' + connect)
+
+with open(server_properties, 'wb') as fh:
+    fh.write(b'\n'.join(lines))
+
+print('wrote kafka server.properties')

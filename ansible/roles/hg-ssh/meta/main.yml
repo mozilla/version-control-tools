@@ -1,6 +1,7 @@
 ---
 dependencies:
   - ius-repo
+  - supervisor
   - {
       role: openssh-lpk,
       home_attribute: fakeHome,
@@ -11,4 +12,10 @@ dependencies:
       # See bug 1038478.
       max_startups: 50,
       max_sessions: 50,
+    }
+  - {
+      role: kafka-broker,
+      kafka_host_name: "{{ inventory_hostname }}",
+      kafka_broker_id: "{{ zk_servers[inventory_hostname] }}",
+      when: "{{ inventory_hostname in zk_servers }}",
     }

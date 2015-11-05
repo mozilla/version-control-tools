@@ -9,6 +9,7 @@ import socket
 import subprocess
 import time
 
+from kafka.client import KafkaClient
 import kombu
 import paramiko
 import requests
@@ -107,6 +108,22 @@ def wait_for_ssh(hostname, port, timeout=60, extra_check_fn=None):
 
         if time.time() - start > timeout:
             raise Exception('Timeout reached waiting for SSH')
+
+        time.sleep(0.1)
+
+
+def wait_for_kafka(hostport, timeout=60):
+    """Wait for Kafka to start responding on the specified host:port string."""
+    start = time.time()
+    while True:
+        try:
+            KafkaClient(hostport, client_id=b'dummy', timeout=1)
+            return
+        except Exception:
+            pass
+
+        if time.time() - start > timeout:
+            raise Exception('Timeout reached waiting for Kafka')
 
         time.sleep(0.1)
 

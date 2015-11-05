@@ -51,6 +51,8 @@ else:
     except OSError:
         pass
 
+subprocess.check_call(['/entrypoint-kafkabroker'])
+
 subprocess.check_call(['/sbin/service', 'rsyslog', 'start'])
 
 os.execl(sys.argv[1], *sys.argv[1:])

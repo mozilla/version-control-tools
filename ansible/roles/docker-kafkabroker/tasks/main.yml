@@ -1,0 +1,10 @@
+---
+- name: install Docker support files
+  copy: src={{ item }}
+        dest=/{{ item }}
+        mode=0755
+        owner=root
+        group=root
+  with_items:
+    - entrypoint-kafkabroker
+    - set-kafka-servers

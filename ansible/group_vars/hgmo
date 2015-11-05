@@ -1,0 +1,10 @@
+---
+zk_servers: {
+  "hgssh1.dmz.scl3.mozilla.com": 1,
+  "hgssh2.dmz.scl3.mozilla.com": 2,
+  # Only run on hgweb9 and 10 because they are beefier servers. hgweb1-8
+  # will likely get decomissioned first.
+  "hgweb9.dmz.scl3.mozilla.com": 11,
+  "hgweb10.dmz.scl3.mozilla.com": 12,
+}
+kafka_zookeeper_connect: "hgssh1.dmz.scl3.mozilla.com:2181/hgmoreplication,hgssh2.dmz.scl3.mozilla.com:2181/hgmoreplication"

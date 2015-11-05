@@ -1,0 +1,30 @@
+# The number of milliseconds of each tick
+tickTime = {{ zk_tick_time | default(2000) }}
+# The number of ticks that the initial
+# synchronization phase can take
+initLimit = {{ zk_init_limit | default(5) }}
+# The number of ticks that can pass between
+# sending a request and getting an acknowledgement
+syncLimit = {{ zk_sync_limit | default(2) }}
+# the directory where the snapshot is stored.
+dataDir = {{ zk_data_dir | default("/var/lib/zookeeper") }}
+# the port at which the clients will connect
+clientPort = {{ zk_client_port | default(2181) }}
+
+# Automatically purge old snapshots every 24 hours.
+autopurge.purgeInterval = 24
+autopurge.snapRetainCount = 5
+
+# We need to listen on all IPs inside Docker because otherwise Java
+# has a difficult time choosing which interface to bind to.
+{% if zk_listen_on_all_ips | default(False) %}
+quorumListenOnAllIPs = true
+{% else %}
+clientPortAddress = {{ inventory_hostname }}
+{% endif %}
+
+{% if zk_servers is defined %}
+{% for host, sid in zk_servers.items() %}
+server.{{ sid }} = {{ host }}:2888:3888
+{% endfor %}
+{% endif %}

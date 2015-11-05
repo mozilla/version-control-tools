@@ -1,0 +1,110 @@
+---
+- name: install system packages
+  yum: name={{ item }} state=present
+  with_items:
+    - java-1.8.0-openjdk-headless
+    - tar
+
+- name: download ZooKeeper and Kafka
+  get_url: url=http://apache.osuosl.org/{{ item.url }}
+           dest=/var/tmp/{{ item.path }}
+           sha256sum={{ item.sha256 }}
+  with_items:
+    - { url: zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz, path: zookeeper-3.4.6.tar.gz, sha256: 01b3938547cd620dc4c93efe07c0360411f4a66962a70500b163b59014046994 }
+    - { url: kafka/0.8.2.2/kafka_2.10-0.8.2.2.tgz, path: kafka_2.10-0.8.2.2.tgz, sha256: 3ba1967ee88c7f364964c8a8fdf6f5075dcf7572f8c9eb74f0285b308363ecab }
+
+- name: uncompress ZooKeeper and Kafka
+  unarchive: src=/var/tmp/{{ item.src }}
+             dest=/opt
+             copy=no
+             creates={{ item.creates }}
+             owner=root
+             group=root
+  with_items:
+    - { src: zookeeper-3.4.6.tar.gz, creates: zookeeper-3.4.6 }
+    - { src: kafka_2.10-0.8.2.2.tgz, creates: kafka_2.10-0.8.2.2 }
+
+- user: name=zookeeper
+        uid=2321
+        shell=/sbin/nologin
+        createhome=no
+        home=/
+
+- name: create config directories for Kafka and ZooKeeper
+  file: path={{ item }}
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+  with_items:
+    - /etc/kafka
+    - /etc/zookeeper
+
+- name: create directories for Kafka
+  file: path={{ item }}
+        state=directory
+        owner=zookeeper
+        group=zookeeper
+        mode=0755
+        recurse=yes
+  with_items:
+    - /var/lib/kafka
+    - /var/lib/zookeeper
+    - /var/log/kafka
+    - /var/log/zookeeper
+
+- name: create Kafka symlink
+  file: src=/opt/kafka_2.10-0.8.2.2
+        path=/opt/kafka
+        state=link
+
+- name: create ZooKeeper symlink
+  file: src=/opt/zookeeper-3.4.6
+        path=/opt/zookeeper
+        state=link
+
+- name: install ZooKeeper config
+  template: src=zoo.cfg.j2
+            dest=/etc/zookeeper/zoo.cfg
+            owner=root
+            group=root
+            mode=0644
+
+- name: install config files
+  copy: src={{ item.src }}
+        dest=/etc/{{ item.dest }}
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - { src: kafka-log4j.properties, dest: kafka/log4j.properties }
+    - { src: zookeeper-log4j.properties, dest: zookeeper/log4j.properties }
+
+- name: install Kafka config
+  template: src=kafka-server.properties.j2
+            dest=/etc/kafka/server.properties
+            owner=root
+            group=root
+            mode=0644
+
+- name: see if ZooKeeper ID set
+  stat: path=/var/lib/zookeeper/myid
+  register: zk_myid
+
+- name: set ZooKeeper ID
+  copy: dest=/var/lib/zookeeper/myid
+        content={{ zk_servers[inventory_hostname] }}
+        owner=root
+        group=root
+        mode=0644
+  when: zk_myid.stat.exists == False and inventory_hostname in zk_servers
+
+- name: install supervisor configs
+  copy: src=supervisor-{{ item }}.conf
+        dest=/etc/supervisor.d/{{ item }}.conf
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - kafka
+    - zookeeper
