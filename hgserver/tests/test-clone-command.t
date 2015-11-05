@@ -125,10 +125,9 @@ Cloning a public repo will show a list of existing repos
   List of available public repos
   
   0) Exit.
-  1) 
-  2) hgcustom/version-control-tools
-  3) integration/mozilla-inbound
-  4) mozilla-central
+  1) hgcustom/version-control-tools
+  2) integration/mozilla-inbound
+  3) mozilla-central
   
   Pick a source repo:  (no-eol)
 
@@ -137,7 +136,7 @@ Selecting a repo will result in a prompt
   $ standarduserssh $SSH_SERVER clone repo-1 << EOF
   > 1
   > 1
-  > 2
+  > 1
   > 0
   > EOF
   Making repo repo-1 for user@example.com.
@@ -164,10 +163,9 @@ Selecting a repo will result in a prompt
   List of available public repos
   
   0) Exit.
-  1) 
-  2) hgcustom/version-control-tools
-  3) integration/mozilla-inbound
-  4) mozilla-central
+  1) hgcustom/version-control-tools
+  2) integration/mozilla-inbound
+  3) mozilla-central
   
   Pick a source repo: About to clone /hgcustom/version-control-tools to /users/user_example.com/repo-1
   
@@ -183,7 +181,7 @@ Saying "no" is handled properly
   $ standarduserssh $SSH_SERVER clone repo-1 << EOF
   > 1
   > 1
-  > 2
+  > 1
   > 2
   > 0
   > EOF
@@ -211,10 +209,9 @@ Saying "no" is handled properly
   List of available public repos
   
   0) Exit.
-  1) 
-  2) hgcustom/version-control-tools
-  3) integration/mozilla-inbound
-  4) mozilla-central
+  1) hgcustom/version-control-tools
+  2) integration/mozilla-inbound
+  3) mozilla-central
   
   Pick a source repo: About to clone /hgcustom/version-control-tools to /users/user_example.com/repo-1
   
@@ -231,7 +228,7 @@ Saying "yes" to clone the repo will clone it.
   $ standarduserssh $SSH_SERVER clone repo-1 << EOF
   > 1
   > 1
-  > 2
+  > 1
   > 1
   > EOF
   Making repo repo-1 for user@example.com.
@@ -258,10 +255,9 @@ Saying "yes" to clone the repo will clone it.
   List of available public repos
   
   0) Exit.
-  1) 
-  2) hgcustom/version-control-tools
-  3) integration/mozilla-inbound
-  4) mozilla-central
+  1) hgcustom/version-control-tools
+  2) integration/mozilla-inbound
+  3) mozilla-central
   
   Pick a source repo: About to clone /hgcustom/version-control-tools to /users/user_example.com/repo-1
   

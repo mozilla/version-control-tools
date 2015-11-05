@@ -249,13 +249,14 @@ def make_repo_clone(cname, repo_name, quick_src, verbose=False, source_repo=''):
     if (selection == 'Clone a public repository'):
         exec_command = "/usr/bin/find " + DOC_ROOT + " -maxdepth 3 -mindepth 2 -type d -name .hg"
         args = shlex.split(exec_command)
-        p = Popen(args, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
-        repo_list = p.communicate()[0].split("\n")
+        with open(os.devnull, 'wb') as devnull:
+            p = Popen(args, stdout=PIPE, stdin=PIPE, stderr=devnull)
+            repo_list = p.communicate()[0].split("\n")
         if repo_list:
             print "We have the repo_list"
             repo_list = map(lambda x: x.replace(DOC_ROOT + '/', ''), repo_list)
             repo_list = map(lambda x: x.replace('/.hg', ''), repo_list)
-            repo_list = sorted(repo_list)
+            repo_list = [x.strip() for x in sorted(repo_list) if x.strip()]
             print 'List of available public repos'
             source_repo = prompt_user('Pick a source repo:', repo_list, period=False)
     elif (selection == 'Clone a private repository'):
