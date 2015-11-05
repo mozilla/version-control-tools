@@ -8,3 +8,10 @@ zk_servers: {
   "hgweb10.dmz.scl3.mozilla.com": 4,
 }
 kafka_zookeeper_connect: "hgssh1.dmz.scl3.mozilla.com:2181/hgmoreplication,hgssh2.dmz.scl3.mozilla.com:2181/hgmoreplication"
+
+# LDAP integration on hgssh servers combined with a zookeeper user
+# defined in LDAP means that Ansible's muckery of the zookeeper user
+# doesn't work. So ignore it on these hosts.
+ignore_zookeeper_user:
+  - hgssh1.dmz.scl3.mozilla.com
+  - hgssh2.dmz.scl3.mozilla.com

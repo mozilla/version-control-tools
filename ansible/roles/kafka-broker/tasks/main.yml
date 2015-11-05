@@ -29,6 +29,7 @@
         shell=/sbin/nologin
         createhome=no
         home=/
+  when: "{{ inventory_hostname not in ignore_zookeeper_user | default([]) }}"
 
 - name: create config directories for Kafka and ZooKeeper
   file: path={{ item }}
