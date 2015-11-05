@@ -43,6 +43,23 @@ releases. These are compelling reasons to stay up to date.
 
 Avoid Mercurial versions older than 3.2.4 due to issues below.
 
+Cloning and Pulling Performance
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Mercurial 3.6 contains a number of enhancements to performance of
+cloning and pull operations, especially on Windows. Clone times for
+mozilla-central on Windows can be several minutes faster with 3.6.
+
+Revset Performance
+^^^^^^^^^^^^^^^^^^
+
+Mercurial 3.5 and 3.6 contained a number of performance improvements to
+revision sets. If you are a user of ``hg wip`` or ``hg smartlog``, these
+commands will likely be at least 4x faster on Mercurial 3.6.
+
+Revsets are used internally by Mercurial. So these improvements result
+in performance improvements for a hodgepodge of operations.
+
 Tags Cache Performance
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -135,7 +152,7 @@ out the version you wish to install::
 
   $ hg clone https://selenic.com/repo/hg
   $ cd hg
-  $ hg up 3.5.2
+  $ hg up 3.6
 
 Once you have the source code, run ``make`` to install Mercurial::
 
