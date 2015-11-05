@@ -30,8 +30,8 @@ Verify hooks are working by pushing something that should be rejected
   remote: 
   remote: 
   remote: ************************** ERROR ****************************
-  remote: Rev c8f5cf7b64fa needs "Bug N" or "No bug" in the commit message.
-  remote: test
+  remote: Rev ad1fb17c23be needs "Bug N" or "No bug" in the commit message.
+  remote: Test User <someone@example.com>
   remote: This is a bad commit message
   remote: *************************************************************
   remote: 

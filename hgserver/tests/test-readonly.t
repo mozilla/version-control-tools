@@ -27,7 +27,7 @@ Pushing works as expected
   remote: replication of changegroup data completed successfully in *s (glob)
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/96ee1d7354c4
+  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
 
 Marking individual repo as read-only works
 

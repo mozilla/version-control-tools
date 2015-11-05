@@ -44,6 +44,6 @@ A push works
   remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/repo1/rev/96ee1d7354c4
+  remote:   https://hg.mozilla.org/repo1/rev/77538e1ce4be
 
   $ hgmo stop

@@ -80,9 +80,9 @@ Create initial repo content
   remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your changes here:
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/96ee1d7354c4
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/c7176a0c153e
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/316dccdaed3c
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/77538e1ce4be
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/ba1c6c2be69c
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/a9e729deb87c
   $ cd ..
 
 Create another clone
@@ -97,9 +97,9 @@ Create some obsolescence markers
 
   $ cd repo-1
   $ hg rebase -s 1 -d 2
-  rebasing 1:c7176a0c153e "bar"
+  rebasing 1:ba1c6c2be69c "bar"
   $ hg debugobsolete
-  c7176a0c153ec7dd9c5aab8b6bc42d742d1ed1f4 d22031ed19ecc068e154a6c307c63adbb316dbb2 0 (* +0000) {'user': 'test'} (glob)
+  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (* +0000) {'user': 'Test User <someone@example.com>'} (glob)
 
   $ hg push ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
   pushing to ssh://*:$HGPORT/users/user_example.com/repo-1 (glob)
@@ -113,7 +113,7 @@ Create some obsolescence markers
   remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/d22031ed19ec
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/5217e2ac5b15
   $ cd ..
 
 Pulling should get the obsmarkers
@@ -129,7 +129,7 @@ Pulling should get the obsmarkers
   1 new obsolescence markers
   (run 'hg update' to get a working copy)
   $ hg debugobsolete
-  c7176a0c153ec7dd9c5aab8b6bc42d742d1ed1f4 d22031ed19ecc068e154a6c307c63adbb316dbb2 0 (* +0000) {'user': 'test'} (glob)
+  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (* +0000) {'user': 'Test User <someone@example.com>'} (glob)
 
   $ cd ..
 

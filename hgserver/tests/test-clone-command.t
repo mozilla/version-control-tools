@@ -24,7 +24,7 @@
   remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/hgcustom/version-control-tools/rev/96ee1d7354c4
+  remote:   https://hg.mozilla.org/hgcustom/version-control-tools/rev/77538e1ce4be
   $ cd ..
 
 We should get a prompt saying we are creating a new user repo.
@@ -298,7 +298,7 @@ We are able to push to the new user repo
   remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/384b668fc3c2
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/72a8548a894a
 
   $ cd ..
 

@@ -2,6 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+# Server-side hook enforces requirement that users have name and email
+# address. Mercurial's test harness doesn't pass by default.
+export HGUSER='Test User <someone@example.com>'
+
 alias hgmo='$TESTDIR/hgmo'
 alias http=$TESTDIR/testing/http-request.py
 
