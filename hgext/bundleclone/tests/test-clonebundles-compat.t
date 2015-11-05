@@ -12,8 +12,7 @@
   $ touch bar
   $ hg -q commit -A -m 'add bar'
 
-TODO use explicit 3.6+ version when available
-  $ $TESTDIR/venv/mercurials/@/bin/hg --config extensions.clonebundles= serve -d -p $HGPORT --pid-file hg.pid -A access.log -E error.log
+  $ $TESTDIR/venv/mercurials/3.6/bin/hg --config extensions.clonebundles= serve -d -p $HGPORT --pid-file hg.pid -A access.log -E error.log
   $ cat hg.pid >> $DAEMON_PIDS
   $ cd ..
 
