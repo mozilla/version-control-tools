@@ -55,6 +55,7 @@ Blackbox logging recorded appropriate entries
   * user1@example.com> replication of changegroup data completed successfully in *s (glob)
   * user1@example.com> pythonhook-changegroup: mozhghooks.replicate.changegrouphook finished in * seconds (glob)
   * user1@example.com> pythonhook-changegroup: mozhghooks.push_printurls.hook finished in * seconds (glob)
+  * user1@example.com> pythonhook-changegroup: mozhghooks.advertise_upgrade.hook finished in * seconds (glob)
   * user1@example.com> 1 incoming changes - new heads: 96ee1d7354c4 (glob)
   * user1@example.com> -R /repo/hg/mozilla/mozilla-central serve --stdio exited 0 after * seconds (glob)
 
@@ -96,5 +97,29 @@ Pushlog should be replicated
   200
   
   {"1": {"changesets": ["96ee1d7354c4ad7372047672c36a1f561e3a6a4c"], "date": *, "user": "user1@example.com"}} (glob)
+
+Upgrade notice is advertised to clients not running bundle2
+
+  $ echo upgrade > foo
+  $ hg commit -m 'upgrade notice'
+  $ hg --config experimental.bundle2-exp=false push ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
+  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+  remote: replication of changegroup data completed successfully in 0.6s
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/mozilla-central/rev/1193d3346338
+  remote: 
+  remote: YOU ARE PUSHING WITH AN OUT OF DATE MERCURIAL CLIENT!
+  remote: newer versions are faster and have numerous bug fixes
+  remote: upgrade instructions are at the following URL:
+  remote: https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/installing.html
+
+Cleanup
 
   $ hgmo stop
