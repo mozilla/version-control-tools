@@ -22,6 +22,10 @@ def hook(ui, repo, node, source=None, **kwargs):
         ctx = repo[rev]
         user = ctx.user()
 
+        # "ffbld" is frequently used in automation. Ignore it for now.
+        if user == 'ffxbld':
+            continue
+
         if not RE_PROPER_AUTHOR.match(user):
             ui.write('malformed user field in changeset %s: %s\n' % (
                 short(ctx.node()), user))
