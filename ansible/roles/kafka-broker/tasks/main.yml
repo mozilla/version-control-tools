@@ -26,9 +26,9 @@
 
 - user: name=zookeeper
         uid=2321
-        shell=/sbin/nologin
+        shell=/bin/bash
         createhome=no
-        home=/
+        home=/var/run/zookeeper
   when: "{{ inventory_hostname not in ignore_zookeeper_user | default([]) }}"
 
 - name: create config directories for Kafka and ZooKeeper
