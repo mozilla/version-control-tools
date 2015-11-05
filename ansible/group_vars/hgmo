@@ -2,12 +2,16 @@
 zk_servers: {
   "hgssh1.dmz.scl3.mozilla.com": 1,
   "hgssh2.dmz.scl3.mozilla.com": 2,
-  # Only run on hgweb9 and 10 because they are beefier servers. hgweb1-8
-  # will likely get decomissioned first.
+  # hgweb9 and 10 are beefier and will likely stick around longer.
+  # ZK likes clusters of odd numbers. So through hgweb1 in as well.
   "hgweb9.dmz.scl3.mozilla.com": 3,
   "hgweb10.dmz.scl3.mozilla.com": 4,
+  "hgweb1.dmz.scl3.mozilla.com": 5,
 }
 kafka_zookeeper_connect: "hgssh1.dmz.scl3.mozilla.com:2181/hgmoreplication,hgssh2.dmz.scl3.mozilla.com:2181/hgmoreplication"
+
+kafka_replication_factor: 5
+kafka_min_insync_replicas: 3
 
 # LDAP integration on hgssh servers combined with a zookeeper user
 # defined in LDAP means that Ansible's muckery of the zookeeper user
