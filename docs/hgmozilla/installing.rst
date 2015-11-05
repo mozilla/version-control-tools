@@ -23,6 +23,7 @@ Recommended Versions
 Mozilla recommends running the latest stable release of Mercurial. The
 latest stable release is always listed at
 `https://www.mercurial-scm.org/ <https://www.mercurial-scm.org/>`_.
+**As of November 2015, the latest stable release is 3.6.**
 
 Mercurial makes a major *X.Y* release every three months, typically around
 the first of the month. Release months are February, May, August, and
