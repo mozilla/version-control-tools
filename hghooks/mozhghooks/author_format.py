@@ -49,4 +49,9 @@ def hook(ui, repo, node, source=None, **kwargs):
             tip=short(repo['tip'].node())
         ))
 
+    # Make non-fatal on l10n repos for now because their tools are known to not
+    # use proper values.
+    if 'l10n' in repo.path:
+        havebad = False
+
     return 1 if havebad else 0
