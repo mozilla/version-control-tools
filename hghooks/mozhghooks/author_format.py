@@ -22,8 +22,8 @@ def hook(ui, repo, node, source=None, **kwargs):
         ctx = repo[rev]
         user = ctx.user()
 
-        # "ffbld" is frequently used in automation. Ignore it for now.
-        if user == 'ffxbld':
+        # These are frequently used in automation. Ignore them for now.
+        if user in ('ffxbld', 'tbirdbld', 'seabld'):
             continue
 
         if not RE_PROPER_AUTHOR.match(user):
