@@ -45,10 +45,12 @@ Blackbox logging recorded appropriate entries
 
   $ hgmo exec hgssh cat /repo/hg/mozilla/mozilla-central/.hg/blackbox.log
   * user1@example.com> serve --stdio (glob)
+  * user1@example.com> pythonhook-prechangegroup: hgext_readonly.prechangegrouphook finished in * seconds (glob)
   * user1@example.com> pythonhook-pretxnchangegroup: mozhghooks.single_root.hook finished in * seconds (glob)
   * user1@example.com> pythonhook-pretxnchangegroup: hgext_pushlog.pretxnchangegrouphook finished in * seconds (glob)
   * user1@example.com> updated base branch cache in * seconds (glob)
   * user1@example.com> wrote base branch cache with 1 labels and 1 nodes (glob)
+  * user1@example.com> pythonhook-prepushkey: hgext_readonly.prepushkeyhook finished in * seconds (glob)
   * user1@example.com> replication of phases data completed successfully in * (glob)
   * user1@example.com> pythonhook-pushkey: mozhghooks.replicate.pushkeyhook finished in * seconds (glob)
   * user1@example.com> exthook-changegroup.a_recordlogs: /repo/hg/scripts/record-pushes.sh finished in * seconds (glob)
