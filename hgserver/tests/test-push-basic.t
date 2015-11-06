@@ -137,6 +137,7 @@ vcsreplicator short circuits existing replication hook when loaded
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/d219c2f75f91
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
 
 vcsreplicator isn't doing anything yet. verify that.
 
