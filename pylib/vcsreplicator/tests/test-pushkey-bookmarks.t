@@ -85,6 +85,111 @@ Consuming the pushkey message will create a bookmark
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      my-bookmark               0:77538e1ce4be
 
+Simulate a client that is behind processing
+We send a changegroup and a pushkey but don't process them immediately
+
+  $ echo laggy-mirror > foo
+  $ hg commit -m 'simulate laggy mirror'
+  $ hg push
+  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+  remote: legacy replication of phases disabled because vcsreplicator is loaded
+  remote: legacy replication of bookmarks disabled because vcsreplicator is loaded
+  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/mozilla-central/rev/2777163b5938
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
+  updating bookmark my-bookmark
+
+  $ consumer --dump
+  - name: heartbeat-1
+  - name: heartbeat-1
+  - heads:
+    - 2777163b593873bfa63c7129e02a21becc299ff0
+    name: hg-changegroup-1
+    nodes:
+    - 2777163b593873bfa63c7129e02a21becc299ff0
+    path: '{moz}/mozilla-central'
+    source: serve
+
+Mirror gets bookmark updates when pulling the changegroup.
+
+  $ consumer --onetime
+  $ consumer --onetime
+  $ consumer --onetime
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+
+  $ hg -R $TESTTMP/repos/mozilla-central bookmarks
+     my-bookmark               1:2777163b5938
+
+Now try something more advanced. Let's do 2 pushes to the server and
+see what happens when the mirror pulls a non-tip that no longer has a
+bookmark attached.
+
+  $ echo double-laggy-1 > foo
+  $ hg commit -m 'double laggy 1'
+  $ hg -q push
+  $ echo double-laggy-2 > foo
+  $ hg commit -m 'double laggy 2'
+  $ hg -q push
+
+We should have 2 changegroup messages
+
+  $ consumer --dump
+  - name: heartbeat-1
+  - name: heartbeat-1
+  - heads:
+    - 031adcaa8ee7e23dd05ce5900645e771a3637682
+    name: hg-changegroup-1
+    nodes:
+    - 031adcaa8ee7e23dd05ce5900645e771a3637682
+    path: '{moz}/mozilla-central'
+    source: serve
+  - name: heartbeat-1
+  - name: heartbeat-1
+  - heads:
+    - e20ecd72ffa991598a1b26333788345377318231
+    name: hg-changegroup-1
+    nodes:
+    - e20ecd72ffa991598a1b26333788345377318231
+    path: '{moz}/mozilla-central'
+    source: serve
+
+If the mirror pulls, it will see the bookmark attached to a changeset
+it doesn't know about since it hasn't pulled it yet. It shouldn't touch
+the bookmark.
+
+  $ consumer --onetime
+  $ consumer --onetime
+
+  $ hg -R $TESTTMP/repos/mozilla-central bookmarks
+     my-bookmark               1:2777163b5938
+
+  $ consumer --onetime
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+
+  $ hg -R $TESTTMP/repos/mozilla-central bookmarks
+     my-bookmark               1:2777163b5938
+
+But processing the next changegroup message should advance the bookmark by 1
+
+  $ consumer --onetime
+  $ consumer --onetime
+  $ consumer --onetime
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+
+  $ hg -R $TESTTMP/repos/mozilla-central bookmarks
+     my-bookmark               3:e20ecd72ffa9
+
 Cleanup
 
   $ hgmo stop
