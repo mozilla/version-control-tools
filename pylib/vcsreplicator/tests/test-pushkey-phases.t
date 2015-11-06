@@ -94,6 +94,118 @@ Locally bumping changeset to public will trigger a pushkey
   $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
   0 public
 
+Simulate a consumer that is behind
+We wait until both the changegroup and pushkey are on the server before
+processing on the mirror.
+
+  $ echo laggy-mirror-1 > foo
+  $ hg commit -m 'laggy mirror 1'
+  $ hg phase --public -r .
+  $ echo laggy-mirror-2 > foo
+  $ hg commit -m 'laggy mirror 2'
+  $ hg push
+  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 2 changesets with 2 changes to 1 files
+  remote: recorded push in pushlog
+  remote: legacy replication of phases disabled because vcsreplicator is loaded
+  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
+  remote: 
+  remote: View your changes here:
+  remote:   https://hg.mozilla.org/mozilla-central/rev/7dea706c1724
+  remote:   https://hg.mozilla.org/mozilla-central/rev/fde0c4117655
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
+
+  $ consumer --dump
+  - name: heartbeat-1
+  - name: heartbeat-1
+  - heads:
+    - fde0c41176556d1ec1bcf85e66706e5e76012508
+    name: hg-changegroup-1
+    nodes:
+    - 7dea706c17247788835d1987dc7103ffc365c338
+    - fde0c41176556d1ec1bcf85e66706e5e76012508
+    path: '{moz}/mozilla-central'
+    source: serve
+
+Mirror gets phase update when pulling the changegroup, moving it ahead
+of the replication log. (this should be harmless since the state is
+accurate)
+
+  $ consumer --onetime
+  $ consumer --onetime
+  $ consumer --onetime
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 2 changesets into $TESTTMP/repos/mozilla-central
+
+  $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
+  2 draft
+  1 public
+  0 public
+
+Now simulate a consumer that is multiple pushes behind
+
+  $ echo double-laggy-1 > foo
+  $ hg commit -m 'double laggy 1'
+  $ hg phase --public -r .
+  $ hg -q push
+  $ echo double-laggy-2 > foo
+  $ hg commit -m 'double laggy 2'
+  $ hg phase --public -r .
+  $ hg -q push
+
+  $ consumer --dump
+  - name: heartbeat-1
+  - name: heartbeat-1
+  - heads:
+    - 58017affcc6559ab3237457a5fb1e0e3bde306b1
+    name: hg-changegroup-1
+    nodes:
+    - 58017affcc6559ab3237457a5fb1e0e3bde306b1
+    path: '{moz}/mozilla-central'
+    source: serve
+  - name: heartbeat-1
+  - name: heartbeat-1
+  - heads:
+    - 601c8c0d17b02057475d528f022cf5d85da89825
+    name: hg-changegroup-1
+    nodes:
+    - 601c8c0d17b02057475d528f022cf5d85da89825
+    path: '{moz}/mozilla-central'
+    source: serve
+
+Pulling first changegroup will find its phase
+
+  $ consumer --onetime
+  $ consumer --onetime
+  $ consumer --onetime
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+
+  $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
+  3 public
+  2 public
+  1 public
+  0 public
+
+Similar behavior for second changegroup
+
+  $ consumer --onetime
+  $ consumer --onetime
+  $ consumer --onetime
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+
+  $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
+  4 public
+  3 public
+  2 public
+  1 public
+  0 public
+
 Cleanup
 
   $ hgmo stop
