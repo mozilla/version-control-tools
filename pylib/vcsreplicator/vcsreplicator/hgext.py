@@ -48,6 +48,46 @@ def pretxnopenhook(ui, repo, **kwargs):
         ui.warn('replication log not available; all writes disabled\n')
         return 1
 
+    repo._replicationinfo = {
+        'pushkey': [],
+        'changegroup': False,
+    }
+
+
+def pushkeyhook(ui, repo, namespace=None, key=None, old=None, new=None,
+                ret=None, **kwargs):
+    """Records that a pushkey update occurred.
+
+    Pushkey updates should always occur inside a transaction. We don't write
+    the pushkey update to the log inside the transaction because the
+    transaction could get rolled back. Instead, we record the details of the
+    pushkey and write messages after the transaction has closed.
+    """
+    # TODO assert we're in a transaction.
+    repo._replicationinfo['pushkey'].append(
+        (namespace, key, old, new, ret))
+
+
+def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
+    repo._replicationinfo['changegroup'] = True
+
+
+
+def pretxnclosehook(ui, repo, **kwargs):
+    try:
+        vcsrproducer.send_heartbeat(ui.replicationproducer)
+    except Exception:
+        ui.warn('replication log not available; cannot close transaction\n')
+        return True
+
+
+def txnclosehook(ui, repo, **kwargs):
+    # Only send messages if a changegroup isn't present. This is
+    # because our changegroup message handler performs an `hg pull`,
+    # which will pull in pushkey data automatically.
+    if not repo._replicationinfo['changegroup']:
+        sendpushkeymessages(ui, repo)
+
 
 def changegrouphook(ui, repo, node=None, source=None, **kwargs):
     start = time.time()
@@ -71,6 +111,22 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
                                        pushheads)
     duration = time.time() - start
     ui.status(_('recorded changegroup in replication log in %.3fs\n') % duration)
+
+
+def sendpushkeymessages(ui, repo):
+    for namespace, key, old, new, ret in repo._replicationinfo['pushkey']:
+
+        start = time.time()
+        vcsrproducer.record_hg_pushkey(ui.replicationproducer,
+                                       repo.replicationwireprotopath,
+                                       namespace,
+                                       key,
+                                       old,
+                                       new,
+                                       ret)
+        duration = time.time() - start
+        ui.status(_('recorded updates to %s in replication log in %.3fs\n') % (
+                    namespace, duration))
 
 
 def initcommand(orig, ui, dest, **opts):
@@ -179,9 +235,17 @@ def reposetup(ui, repo):
 
     ui.setconfig('hooks', 'precommit.vcsreplicator', precommithook,
                  'vcsreplicator')
-    ui.setconfig('hooks', 'changegroup.vcsreplicator', changegrouphook,
-                 'vcsreplicator')
     ui.setconfig('hooks', 'pretxnopen.vcsreplicator', pretxnopenhook,
+                 'vcsreplicator')
+    ui.setconfig('hooks', 'pushkey.vcsreplicator', pushkeyhook,
+                 'vcsreplicator')
+    ui.setconfig('hooks', 'pretxnchangegroup.vcsreplicator',
+                 pretxnchangegrouphook, 'vcsreplicator')
+    ui.setconfig('hooks', 'pretxnclose.vcsreplicator', pretxnclosehook,
+                 'vcsreplicator')
+    ui.setconfig('hooks', 'txnclose.vcsreplicator', txnclosehook,
+                 'vcsreplicator')
+    ui.setconfig('hooks', 'changegroup.vcsreplicator', changegrouphook,
                  'vcsreplicator')
 
     class replicatingrepo(repo.__class__):

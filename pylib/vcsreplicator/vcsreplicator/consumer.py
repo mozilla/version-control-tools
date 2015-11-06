@@ -77,6 +77,13 @@ def process_message(config, payload):
                                       payload['source'],
                                       payload['nodes'],
                                       payload['heads'])
+    elif name == 'hg-pushkey-1':
+        return process_hg_pushkey(config, payload['path'],
+                                  payload['namespace'],
+                                  payload['key'],
+                                  payload['old'],
+                                  payload['new'],
+                                  payload['ret'])
 
     raise ValueError('unrecognized message type: %s' % payload['name'])
 
@@ -128,8 +135,7 @@ def process_hg_changegroup(config, path, source, nodes, heads):
     local_path = config.parse_wire_repo_path(path)
     url = config.get_pull_url_from_repo_path(path)
 
-    c = hglib.open(local_path, encoding='UTF-8',
-                   configs=['vcsreplicator.disableproduce=true'])
+    c = get_hg_client(local_path)
     oldtip = int(c.log('tip')[0].rev)
 
     logger.warn('pulling %d heads from %s into %s' % (len(heads), url,
@@ -143,6 +149,20 @@ def process_hg_changegroup(config, path, source, nodes, heads):
                     'expected %d, got %d' % (len(nodes), newtip - oldtip))
 
     logger.warn('pulled %d changesets into %s' % (newtip - oldtip, local_path))
+
+
+def process_hg_pushkey(config, path, namespace, key, old, new, ret):
+    path = config.parse_wire_repo_path(path)
+    c = get_hg_client(path)
+
+    logger.info('executing pushkey on %s for %s[%s]' % (path, namespace, key))
+    c.rawcommand(['debugpushkey', path, namespace, key, old, new])
+    logger.info('finished pushkey on %s for %s[%s]' % (path, namespace, key))
+
+
+def get_hg_client(path):
+    return hglib.open(path, encoding='UTF-8',
+                      configs=['vcsreplicator.disableproduce=true'])
 
 
 if __name__ == '__main__':

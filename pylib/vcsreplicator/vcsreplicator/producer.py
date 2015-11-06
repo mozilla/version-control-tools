@@ -86,3 +86,16 @@ def record_hg_changegroup(producer, path, source, nodes, heads):
         'nodes': nodes,
         'heads': heads,
     })
+
+
+def record_hg_pushkey(producer, path, namespace, key, old, new, ret):
+    """Produce a message saying that a pushkey change was processed."""
+    return producer.send_message({
+        'name': 'hg-pushkey-1',
+        'path': path,
+        'namespace': namespace,
+        'key': key,
+        'old': old,
+        'new': new,
+        'ret': ret,
+    })

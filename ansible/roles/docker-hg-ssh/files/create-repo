@@ -5,11 +5,33 @@
 
 set -e
 
-/repo/hg/venv_tools/bin/hg init /repo/hg/mozilla/$1
-chown -R hg:$2 /repo/hg/mozilla/$1
-find /repo/hg/mozilla/$1 | xargs chmod g+w
-find /repo/hg/mozilla/$1 -type d | xargs chmod g+s
+REPO=$1
+GROUP=$2
+
+/repo/hg/venv_tools/bin/hg init /repo/hg/mozilla/${REPO}
+chown -R hg:${GROUP} /repo/hg/mozilla/${REPO}
+find /repo/hg/mozilla/${REPO} | xargs chmod g+w
+find /repo/hg/mozilla/${REPO} -type d | xargs chmod g+s
+
+for arg in "$@"
+do
+    case $arg in
+        --non-publishing)
+        NONPUBLISHING=1
+        ;;
+        *)
+        ;;
+    esac
+done
+
+if [ -n "${NONPUBLISHING}" ]; then
+  echo "marking repo as non-publishing"
+  cat >> /repo/hg/mozilla/${REPO}/.hg/hgrc << EOF
+[phases]
+publish = False
+EOF
+fi
 
 # Ensure repo exists on mirrors.
 # TODO this can go away once vcsreplicator is deployed by default.
-sudo -u hg /usr/local/bin/repo-push.sh $1
+sudo -u hg /usr/local/bin/repo-push.sh ${REPO}

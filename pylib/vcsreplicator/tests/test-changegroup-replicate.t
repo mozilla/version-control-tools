@@ -37,6 +37,7 @@ Pushing the initial commit will result in replication messages
   - name: hg-repo-init-1
     path: '{moz}/mozilla-central'
   - name: heartbeat-1
+  - name: heartbeat-1
   - heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
     name: hg-changegroup-1
@@ -48,6 +49,7 @@ Pushing the initial commit will result in replication messages
   $ consumer --onetime
   $ consumer --onetime
   WARNING:vcsreplicator.consumer:created Mercurial repository: $TESTTMP/repos/mozilla-central
+  $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
   WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
@@ -85,7 +87,8 @@ Pushing multiple commits results in sane behavior
   remote:   https://hg.mozilla.org/mozilla-central/rev/4f52aeca631d
   remote: recorded changegroup in replication log in \d.\d+s (re)
 
-  $ consumer --dump --start-from 4
+  $ consumer --dump --start-from 5
+  - name: heartbeat-1
   - name: heartbeat-1
   - heads:
     - 4f52aeca631dfa94331d93cfeaf069526926385a
@@ -97,6 +100,7 @@ Pushing multiple commits results in sane behavior
     path: '{moz}/mozilla-central'
     source: serve
 
+  $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
   WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
@@ -148,7 +152,8 @@ Pushing multiple heads results in appropriate behavior
   remote:   https://hg.mozilla.org/mozilla-central/rev/4b11352745a6
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
-  $ consumer --dump --start-from 6
+  $ consumer --dump --start-from 8
+  - name: heartbeat-1
   - name: heartbeat-1
   - heads:
     - 4c9443886fe84db9a4a5f29a5777517d2890d308
@@ -162,6 +167,7 @@ Pushing multiple heads results in appropriate behavior
     path: '{moz}/mozilla-central'
     source: serve
 
+  $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
   WARNING:vcsreplicator.consumer:pulling 2 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
