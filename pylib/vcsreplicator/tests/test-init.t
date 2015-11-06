@@ -5,6 +5,8 @@
 
 Creating a repository should record an event saying so
 
+  $ hgmo exec hgweb0 ls /repo/hg/mozilla
+
   $ hgmo create-repo mozilla-central 3
   (recorded repository creation in replication log)
 
@@ -15,7 +17,14 @@ Creating a repository should record an event saying so
 
   $ python -m vcsreplicator.consumer $TESTTMP/vcsreplicator.ini --onetime
   $ python -m vcsreplicator.consumer $TESTTMP/vcsreplicator.ini --onetime
-  TODO got a hg init message for $TESTTMP/repos/mozilla-central
+  WARNING:vcsreplicator.consumer:created Mercurial repository: $TESTTMP/repos/mozilla-central
+
+  $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
+  No handlers could be found for logger "kafka.conn"
+  WARNING:vcsreplicator.consumer:created Mercurial repository: /repo/hg/mozilla/mozilla-central
+
+  $ hgmo exec hgweb0 ls /repo/hg/mozilla
+  mozilla-central
 
 Cleanup
 

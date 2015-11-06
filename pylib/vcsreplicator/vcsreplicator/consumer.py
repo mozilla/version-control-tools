@@ -6,7 +6,9 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 import logging
+import os
 
+import hglib
 from kafka.consumer import SimpleConsumer
 
 
@@ -73,8 +75,24 @@ def process_message(config, payload):
 
 def process_hg_repo_init(config, path):
     """Process a Mercurial repository initialization message."""
+    logger.debug('received request to create repo: %s' % path)
+
     path = config.parse_wire_repo_path(path)
-    print('TODO got a hg init message for %s' % path)
+    hgpath = os.path.join(path, '.hg')
+    if os.path.exists(hgpath):
+        logger.warn('repository already exists: %s' % path)
+        return
+
+    # We can't use hglib.init() because it doesn't pass config options
+    # as part of the `hg init` call.
+    args = hglib.util.cmdbuilder('init', path)
+    args.insert(0, hglib.HGPATH)
+    proc = hglib.util.popen(args)
+    out, err = proc.communicate()
+    if proc.returncode:
+        raise Exception('error creating Mercurial repo %s: %s' % (path, out))
+
+    logger.warn('created Mercurial repository: %s' % path)
 
 
 if __name__ == '__main__':

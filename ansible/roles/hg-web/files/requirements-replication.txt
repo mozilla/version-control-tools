@@ -4,6 +4,9 @@ kafka-python==0.9.4
 # sha256: I_3AOFA5EbIdyeVWEYgD97HUFQ6xSTPS6j0P8Nxgq10
 Mercurial==3.5.2
 
+# sha256: 9DAokrK4KHzzJlhscoC56t_D0MfNP-upV0KajZsaYM4
+python-hglib==1.9
+
 # sha256: w2yTiocuX_SUk4szsUqqFWy0OexnVI_Ks1Nbt4sIRug
 PyYAML==3.11
 
