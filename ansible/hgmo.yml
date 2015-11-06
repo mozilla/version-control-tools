@@ -20,8 +20,8 @@
       register: vct_changes
       delegate_to: 127.0.0.1
 
-    - name: print changes since last time
-      debug: msg={{ vct_changes.stdout }}
+    #- name: print changes since last time
+    #  debug: msg={{ vct_changes.stdout }}
 
     - name: notify IRC of deployment
       irc: server=irc.mozilla.org
