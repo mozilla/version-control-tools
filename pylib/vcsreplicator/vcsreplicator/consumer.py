@@ -72,6 +72,11 @@ def process_message(config, payload):
     elif name == 'hg-hgrc-update-1':
         return process_hg_hgrc_update(config, payload['path'],
                                       payload['content'])
+    elif name == 'hg-changegroup-1':
+        return process_hg_changegroup(config, payload['path'],
+                                      payload['source'],
+                                      payload['nodes'],
+                                      payload['heads'])
 
     raise ValueError('unrecognized message type: %s' % payload['name'])
 
@@ -117,6 +122,27 @@ def process_hg_hgrc_update(config, path, content):
         fh.write(content)
 
     logger.warn('wrote hgrc: %s' % hgrc_path)
+
+
+def process_hg_changegroup(config, path, source, nodes, heads):
+    local_path = config.parse_wire_repo_path(path)
+    url = config.get_pull_url_from_repo_path(path)
+
+    c = hglib.open(local_path, encoding='UTF-8',
+                   configs=['vcsreplicator.disableproduce=true'])
+    oldtip = int(c.log('tip')[0].rev)
+
+    logger.warn('pulling %d heads from %s into %s' % (len(heads), url,
+                                                      local_path))
+
+    c.pull(source=url or 'default', rev=heads)
+    newtip = int(c.log('tip')[0].rev)
+
+    if newtip - oldtip != len(nodes):
+        logger.warn('mismatch between expected and actual changeset count: '
+                    'expected %d, got %d' % (len(nodes), newtip - oldtip))
+
+    logger.warn('pulled %d changesets into %s' % (newtip - oldtip, local_path))
 
 
 if __name__ == '__main__':

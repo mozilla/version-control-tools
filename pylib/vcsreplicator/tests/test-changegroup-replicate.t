@@ -45,6 +45,20 @@ Pushing the initial commit will result in replication messages
     path: '{moz}/mozilla-central'
     source: serve
 
+  $ consumer --onetime
+  $ consumer --onetime
+  WARNING:vcsreplicator.consumer:created Mercurial repository: $TESTTMP/repos/mozilla-central
+  $ consumer --onetime
+  $ consumer --onetime
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+
+  $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
+  No handlers could be found for logger "kafka.conn"
+  WARNING:vcsreplicator.consumer:created Mercurial repository: /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 1 changesets into /repo/hg/mozilla/mozilla-central
+
 Pushing multiple commits results in sane behavior
 
   $ echo 1 > foo
@@ -82,6 +96,25 @@ Pushing multiple commits results in sane behavior
     - 4f52aeca631dfa94331d93cfeaf069526926385a
     path: '{moz}/mozilla-central'
     source: serve
+
+  $ consumer --onetime
+  $ consumer --onetime
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 3 changesets into $TESTTMP/repos/mozilla-central
+
+  $ hg log -R $TESTTMP/repos/mozilla-central -T '{rev}:{node}\n'
+  3:4f52aeca631dfa94331d93cfeaf069526926385a
+  2:e79f1fe30cb27c83477cbb2880367ca8ed54367e
+  1:e325efa1b1fb7cb9e7f231851436db4de63e0a26
+  0:77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+
+  $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
+  No handlers could be found for logger "kafka.conn"
+  WARNING:vcsreplicator.consumer:created Mercurial repository: /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 1 changesets into /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://172.17.0.146/mozilla-central into /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulled 3 changesets into /repo/hg/mozilla/mozilla-central
 
 Pushing multiple heads results in appropriate behavior
 
@@ -128,6 +161,31 @@ Pushing multiple heads results in appropriate behavior
     - 4b11352745a6b3eb429ca8cd486dfdc221a4bc62
     path: '{moz}/mozilla-central'
     source: serve
+
+  $ consumer --onetime
+  $ consumer --onetime
+  WARNING:vcsreplicator.consumer:pulling 2 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 4 changesets into $TESTTMP/repos/mozilla-central
+
+  $ hg log -R $TESTTMP/repos/mozilla-central -T '{rev}:{node}\n'
+  7:4b11352745a6b3eb429ca8cd486dfdc221a4bc62
+  6:a7e1131c1b7cda934c8eef30932718654c7b4671
+  5:4c9443886fe84db9a4a5f29a5777517d2890d308
+  4:5d9ed3f8efffe0777be762f2a35927cc3be3eeef
+  3:4f52aeca631dfa94331d93cfeaf069526926385a
+  2:e79f1fe30cb27c83477cbb2880367ca8ed54367e
+  1:e325efa1b1fb7cb9e7f231851436db4de63e0a26
+  0:77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+
+  $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
+  No handlers could be found for logger "kafka.conn"
+  WARNING:vcsreplicator.consumer:created Mercurial repository: /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
+  WARNING:vcsreplicator.consumer:pulled 1 changesets into /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://172.17.0.146/mozilla-central into /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulled 3 changesets into /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulling 2 heads from ssh://172.17.0.146/mozilla-central into /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulled 4 changesets into /repo/hg/mozilla/mozilla-central
 
 Cleanup
 

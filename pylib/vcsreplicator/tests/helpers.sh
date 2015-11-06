@@ -18,6 +18,9 @@ group = ttest
 
 [path_rewrites]
 {moz} = $TESTTMP/repos
+
+[pull_url_rewrites]
+{moz} = ssh://${SSH_SERVER}:${SSH_PORT}
 EOF
 
 }
