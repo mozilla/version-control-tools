@@ -1,0 +1,20 @@
+# This is a standalone config file to configure the vcsreplicator.
+# It can be included by individual repositories to test vcsreplicator.
+
+[extensions]
+vcsreplicator = /repo/hg/version-control-tools/pylib/vcsreplicator/vcsreplicator/hgext.py
+
+[replication]
+role = producer
+
+[replicationproducer]
+# TODO make dynamic
+hosts = localhost:9092
+clientid = 1
+topic = pushdata
+partition = 0
+reqacks = -1
+acktimeout = 10000
+
+[replicationpathrewrites]
+/repo/hg/mozilla/ = {moz}/
