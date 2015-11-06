@@ -1,0 +1,22 @@
+#!/usr/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import sys
+
+if '--global' in sys.argv:
+    with open('/etc/mercurial/hgrc', 'ab') as fh:
+        fh.write('\n%include /etc/mercurial/hgrc-vcsreplicator\n')
+    print('activated vcsreplicator globally')
+    sys.exit(0)
+
+for r in sys.argv[1:]:
+    if r.startswith('-'):
+        continue
+
+    full = os.path.join('/repo/hg/mozilla', r, '.hg', 'hgrc')
+    with open(full, 'ab') as fh:
+        fh.write('\n%include /etc/mercurial/hgrc-vcsreplicator\n')
+
+    print('activated vcsreplicator for %s' % r)
