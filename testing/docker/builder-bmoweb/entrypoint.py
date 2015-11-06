@@ -57,14 +57,12 @@ patches = {
     'apache24.patch',
     'bmodata.patch',
     'elasticsearch.patch',
-    'mod_perl.patch',
 }
 patched_files = {
     '.htaccess',
     'Bugzilla/DB.pm',
     'Bugzilla/Install/Requirements.pm',
     'docker/generate_bmo_data.pl',
-    'mod_perl.pl',
 }
 
 # Ensure Bugzilla Git clone is up to date.
@@ -215,6 +213,10 @@ with open(j(b, 'localconfig'), 'w') as fh:
             write_variable('db_port', db_port)
         elif line.startswith('$db_name'):
             write_variable('db_name', db_name)
+        # The default memory limit is not sufficient to run the BMO
+        # configuration. Bump it up.
+        elif line.startswith('$apache_size_limit'):
+            fh.write('$apache_size_limit = 700_000;\n')
         else:
             fh.write(line)
 

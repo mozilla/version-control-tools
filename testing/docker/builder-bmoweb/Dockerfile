@@ -175,10 +175,6 @@ RUN /usr/sbin/a2enmod rewrite
 
 ADD bmodata.patch $BUGZILLA_HOME/bmodata.patch
 
-# Default memory limit is too small. Bump it up otherwise processes get killed
-# after serving requests.
-ADD mod_perl.patch $BUGZILLA_HOME/mod_perl.patch
-
 ADD bugzilla.conf /etc/apache2/sites-enabled/25-bugzilla.conf
 ADD prefork.conf /etc/apache2/mods-available/mpm_prefork.conf
 
