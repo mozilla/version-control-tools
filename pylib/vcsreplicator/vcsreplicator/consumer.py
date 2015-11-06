@@ -135,29 +135,31 @@ def process_hg_changegroup(config, path, source, nodes, heads):
     local_path = config.parse_wire_repo_path(path)
     url = config.get_pull_url_from_repo_path(path)
 
-    c = get_hg_client(local_path)
-    oldtip = int(c.log('tip')[0].rev)
+    with get_hg_client(local_path) as c:
+        oldtip = int(c.log('tip')[0].rev)
 
-    logger.warn('pulling %d heads from %s into %s' % (len(heads), url,
+        logger.warn('pulling %d heads from %s into %s' % (len(heads), url,
+                                                          local_path))
+
+        c.pull(source=url or 'default', rev=heads)
+        newtip = int(c.log('tip')[0].rev)
+
+        if newtip - oldtip != len(nodes):
+            logger.warn('mismatch between expected and actual changeset count: '
+                        'expected %d, got %d' % (len(nodes), newtip - oldtip))
+
+        logger.warn('pulled %d changesets into %s' % (newtip - oldtip,
                                                       local_path))
-
-    c.pull(source=url or 'default', rev=heads)
-    newtip = int(c.log('tip')[0].rev)
-
-    if newtip - oldtip != len(nodes):
-        logger.warn('mismatch between expected and actual changeset count: '
-                    'expected %d, got %d' % (len(nodes), newtip - oldtip))
-
-    logger.warn('pulled %d changesets into %s' % (newtip - oldtip, local_path))
 
 
 def process_hg_pushkey(config, path, namespace, key, old, new, ret):
     path = config.parse_wire_repo_path(path)
-    c = get_hg_client(path)
-
-    logger.info('executing pushkey on %s for %s[%s]' % (path, namespace, key))
-    c.rawcommand(['debugpushkey', path, namespace, key, old, new])
-    logger.info('finished pushkey on %s for %s[%s]' % (path, namespace, key))
+    with get_hg_client(path) as c:
+        logger.info('executing pushkey on %s for %s[%s]' %
+                    (path, namespace, key))
+        c.rawcommand(['debugpushkey', path, namespace, key, old, new])
+        logger.info('finished pushkey on %s for %s[%s]' %
+                    (path, namespace, key))
 
 
 def get_hg_client(path):
