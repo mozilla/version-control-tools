@@ -52,7 +52,7 @@ import urlparse
 from cStringIO import StringIO
 
 from mercurial.i18n import _
-from mercurial import cmdutil, util, patch
+from mercurial import cmdutil, util, patch, commands
 from hgext import mq
 
 OUR_DIR = os.path.dirname(__file__)
@@ -639,13 +639,14 @@ def fill_values(values, ui, api_server, finalize=False):
 
 
 def update_patch(ui, repo, rev, bug, update_patch, rename_patch, interactive):
-    q = repo.mq
     try:
-        rev = q.lookup(rev)
-    except util.error.Abort:
+        rev = repo.mq.lookup(rev)
+        update_patch = 'mq'
+        q = repo.mq
+    except (util.error.Abort, AttributeError):
         # If the patch is not coming from mq, don't complain that the name is not found
-        update_patch = False
         rename_patch = False
+        update_patch = 'amend'
 
     todo = []
     if rename_patch:
@@ -671,16 +672,42 @@ def update_patch(ui, repo, rev, bug, update_patch, rename_patch, interactive):
                 raise
             rev = newname
 
-    if update_patch:
-        # Add "Bug nnnn - " to the beginning of the description
+    # Add "Bug nnnn - " to the beginning of the description
+    if update_patch == 'mq':
         ph = mq.patchheader(q.join(rev), q.plainmode)
         msg = [s.decode('utf-8') for s in ph.message]
         if not msg:
             msg = ["Bug %s patch" % bug]
         elif not BUG_RE.search(msg[0]):
             msg[0] = "Bug %s - %s" % (bug, msg[0])
-        opts = {'git': True, 'message': '\n'.join(msg).encode('utf-8'), 'include': ["re:."]}
+        opts = {
+            'amend': True,
+            'git': True,
+            'message': '\n'.join(msg).encode('utf-8'), 'include': ["re:."]
+        }
         mq.refresh(ui, repo, **opts)
+    elif update_patch == 'amend':
+        msg = repo[rev].description().splitlines()
+        changed = False
+        if msg:
+            orig = msg[0]
+            if not BUG_RE.search(msg[0]):
+                msg[0] = "Bug %s - %s" % (bug, msg[0])
+            changed = msg[0] != orig
+        else:
+            msg = ["Bug %s patch" % bug]
+
+        if changed:
+            if repo[rev] == repo['.']:
+                opts = {
+                    'amend': True,
+                    'git': True,
+                    'message': '\n'.join(msg).encode('utf-8'),
+                    'logfile': None,
+                }
+                commands.commit(ui, repo, **opts)
+            else:
+                ui.write("WARNING: Can only update description of working directory's parent rev\n")
 
     return rev
 
@@ -688,7 +715,7 @@ def update_patch(ui, repo, rev, bug, update_patch, rename_patch, interactive):
 def obsolete_old_patches(ui, auth, bugid, bugzilla, filename, ignore_id, pre_hook=None):
     try:
         bug_attachments = bz.get_attachments(auth, bugid)
-        attachments = bug_attachments['bugs'][bugid]
+        attachments = bug_attachments['bugs'].get(bugid, [])
     except Exception as e:
         raise util.Abort(e.message)
 
