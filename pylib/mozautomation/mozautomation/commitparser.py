@@ -24,11 +24,25 @@ BUG_RE = re.compile(
            (?:\s*\#?)(\d+)(?=\b)
          )''', re.I | re.X)
 
-SPECIFIER_RE = re.compile(r'(?:r|a|sr)[=?]')
+SPECIFIER           = r'(?:r|a|sr|rs|ui-r)[=?]'
+REQUAL_SPECIFIER_RE = re.compile(r'r=')
 
-REQUAL_SPECIFIER_RE = re.compile(r'\Wr=')
+LIST    = r'[;,\/\\]\s*'
+LIST_RE = re.compile(LIST)
 
-LIST_RE = re.compile(r'[;,\/\\]')
+REVIEWER = r'[a-zA-Z0-9\-\_]+'         # this needs to match irc nicks
+
+REVIEWERS_RE = re.compile(
+    r'([\s\(\.\[;,])' +                # before 'r' delimiter
+    r'(' + SPECIFIER + r')' +          # flag
+    r'(' +                             # capture all reviewers
+        REVIEWER +                     # reviewer
+        r'(?:' +                       # additional reviewers
+            LIST +                     # delimiter
+            r'(?![a-z0-9\.\-]+[=?])' + # don't extend match into next flag
+            REVIEWER  +                # reviewer
+        r')*' +
+    r')')
 
 BACKED_OUT_RE = re.compile('^backed out changeset (?P<node>[0-9a-f]{12}) ',
                            re.I)
@@ -71,37 +85,19 @@ def filter_reviewers(s):
         yield word
 
 
-def parse_reviewers(s):
-    for r in SPECIFIER_RE.split(s)[1:]:
-        # Throw away data after newline.
-        if not r:
-            continue
-
-        r = r.splitlines()[0]
-        for part in LIST_RE.split(r):
-            part = part.strip('[](){}. ')
-            if part:
-                # strip off the 'specifier' if any
-                for r in filter_reviewers(SPECIFIER_RE.split(part)[-1]):
-                    yield r
+def parse_reviewers(commit_description, flag_re=None):
+    commit_summary = commit_description.splitlines().pop(0)
+    for match in re.finditer(REVIEWERS_RE, commit_summary):
+        for reviewer in re.split(LIST_RE, match.group(3)):
+            if flag_re == None:
+                yield reviewer
+            elif flag_re.match(match.group(2)):
+                yield reviewer
 
 
-def parse_requal_reviewers(s):
-    for r in REQUAL_SPECIFIER_RE.split(s)[1:]:
-        if not r:
-            continue
-
-        # Throw away data after newline.
-        r = r.splitlines()[0]
-        for part in LIST_RE.split(r):
-            part = part.strip('[](){}. ')
-            if part:
-                part = REQUAL_SPECIFIER_RE.split(part)[-1].strip()
-                # we've stripped off 'r=' but we might still have another
-                # specifier
-                if not SPECIFIER_RE.match(part):
-                    for r in filter_reviewers(part):
-                        yield r
+def parse_requal_reviewers(commit_description):
+    for reviewer in parse_reviewers(commit_description, flag_re=REQUAL_SPECIFIER_RE):
+        yield reviewer
 
 
 def parse_backouts(s):

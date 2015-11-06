@@ -37,6 +37,7 @@ class TestBugParsing(unittest.TestCase):
         self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; [r?romulus]')), ['romulus'])
         self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; [r?remus, r?romulus]')), ['remus', 'romulus'])
         self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r?romulus, a=test-only')), ['romulus', 'test-only'])
+        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r?romulus, ux-r=test-only')), ['romulus'])
 
         # now with r= review granted syntax
         self.assertEqual(list(parse_reviewers('Bug 1 - some stuff; r=romulus')), ['romulus'])
@@ -63,6 +64,7 @@ class TestBugParsing(unittest.TestCase):
         self.assertEqual(list(parse_reviewers('Bug 1 - More stuff.r=romulus, r=remus')), ['romulus', 'remus'])
         self.assertEqual(list(parse_reviewers('Bug 1 - More stuff,r=romulus, remus')), ['romulus', 'remus'])
 
+        # oddball real-world examples
         self.assertEqual(list(parse_reviewers(
             'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
             '- Relevant spec text:\n'
@@ -87,6 +89,37 @@ class TestBugParsing(unittest.TestCase):
         self.assertEqual(list(parse_reviewers(
             'Bug 123 - Blah blah; r=gps (DONTBUILD)')),
             ['gps'])
+
+        self.assertEqual(list(parse_reviewers(
+             'Bug 1181382: move declaration into namespace to resolve conflict. r=hsinyi. try: -b d -p all -u none -t none')),
+             ['hsinyi'])
+
+        self.assertEqual(list(parse_reviewers(
+            'Bug 1024110 - Change Aurora\'s default profile behavior to use channel-specific profiles. r=bsmedberg f=gavin,markh')),
+            ['bsmedberg'])
+
+        self.assertEqual(list(parse_reviewers(
+            'Bug 1199050 - Round off the corners of browser-extension-panel\'s content. ui-r=maritz, r=gijs')),
+            ['maritz', 'gijs'])
+
+        self.assertEqual(list(parse_reviewers(
+            'Bug 1197422 - Part 2: [webext] Implement the pageAction API. r=billm ui-r=bwinton')),
+            ['billm', 'bwinton'])
+
+        # 'ui-reviewer=' isn't supported (less than 4% of ui-review commits use
+        # it, 'ui-r=' being the preferred syntax)
+        self.assertEqual(list(parse_reviewers(
+            'Bug 1217369 - "Welcome to ..." has extra padding on Loop''s standalone UI making it feel strange. r=mikedeboer,ui-review=sevaan')),
+            ['mikedeboer'])
+
+        self.assertEqual(list(parse_reviewers(
+            'Bug 1182996 - Fix and add missing namespace comments. rs=ehsan\n'
+            'run-clang-tidy.py \\\n'
+            '-checks=\'-*,llvm-namespace-comment\' \\\n'
+            '-header-filter=^/.../mozilla-central/.* \\\n'
+            '-fix')),
+            ['ehsan'])
+
 
     def test_requal_reviewers(self):
 
@@ -114,6 +147,7 @@ class TestBugParsing(unittest.TestCase):
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; [r=remus, r=romulus]')), ['remus', 'romulus'])
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r=romulus, a=test-only')), ['romulus'])
 
+        # oddball real-world examples
         self.assertEqual(list(parse_requal_reviewers(
             'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
             '- Relevant spec text:\n'
@@ -126,6 +160,20 @@ class TestBugParsing(unittest.TestCase):
             'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
             'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz')),
             ['bsmedberg', 'dbaron'])
+
+        self.assertEqual(list(parse_requal_reviewers(
+             'Bumping gaia.json for 2 gaia revision(s) a=gaia-bump\n'
+             '\n'
+             'https://hg.mozilla.org/integration/gaia-central/rev/2b738dae9970\n'
+             'Author: Francisco Jordano <arcturus@ardeenelinfierno.com>\n'
+             'Desc: Merge pull request #30407 from arcturus/fix-contacts-test\n'
+             'Fixing form test for date fields r=me\n')),
+             [])
+
+        self.assertEqual(list(parse_requal_reviewers(
+            'Bug 1024110 - Change Aurora\'s default profile behavior to use channel-specific profiles. r=bsmedberg f=gavin,markh')),
+            ['bsmedberg'])
+
 
     def test_backout_missing(self):
         self.assertIsNone(parse_backouts('Bug 1 - More stuff; r=romulus'))
