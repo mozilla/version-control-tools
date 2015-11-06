@@ -7,4 +7,14 @@
 vcsrenv() {
   hgmoenv
   hgmo exec hgssh /activate-vcsreplicator --global > /dev/null
+
+  cat >> vcsreplicator.ini << EOF
+[consumer]
+hosts = ${KAFKA_0_HOSTPORT}, ${KAFKA_1_HOSTPORT}, ${KAFKA_2_HOSTPORT}
+connect_timeout = 5
+client_id = pull0
+topic = pushdata
+group = ttest
+EOF
+
 }
