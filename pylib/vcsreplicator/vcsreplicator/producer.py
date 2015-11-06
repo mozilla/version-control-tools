@@ -33,3 +33,25 @@ class Producer(KafkaProducer):
 
         return super(Producer, self).send_messages(
             self.topic, self.partition, msg)
+
+
+def send_heartbeat(producer):
+    """Sends a dummy message to confirm that the queue is running."""
+    return producer.send_message({
+        'name': 'heartbeat-1',
+    })
+
+
+def record_new_hg_repo(producer, path):
+    """Produce a message saying a Mercurial repository was created.
+
+    This should be called when a new repository is to become under the
+    control of the replication service.
+
+    When this message is received by consumers, it is equivalent to
+    cloning the repository.
+    """
+    return producer.send_message({
+        'name': 'hg-repo-init-1',
+        'path': path,
+    })

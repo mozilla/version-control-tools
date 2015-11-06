@@ -31,6 +31,8 @@ Host *
   UserKnownHostsFile `pwd`/ssh-known-hosts
   ForwardX11 no
 EOF
+
+  hgmo exec hgssh /opt/kafka/bin/kafka-topics.sh --create --topic pushdata --zookeeper ${ZOOKEEPER_CONNECT} --partitions 1 --replication-factor 3 --config min.insync.replicas=2 --config unclean.leader.election.enable=false --config max.message.bytes=104857600 > /dev/null
 }
 
 standarduser() {
