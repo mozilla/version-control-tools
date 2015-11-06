@@ -145,9 +145,28 @@ Pulling an old changeset only pulls relevant changesets
   adding file changes
   added 1 changesets with 1 changes to 1 files
   (not updating pushlog since changesets come from pull)
-  transaction abort!
-  rollback completed
-  abort: unknown revision '2e70e96c7d550e541406a47d87df354309fe9a72'!
-  [255]
+  received pushlog entry for unknown changeset; ignoring
+  added 1 pushes
+  (run 'hg update' to get a working copy)
+
+  $ hg --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
+  pulling from ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  (not updating pushlog since changesets come from pull)
+  added 1 pushes
+  (run 'hg update' to get a working copy)
+
+  $ dumppushlog clone-ssh
+  ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
+  ID: 2; user: hguser; Date: \d+; Rev: 1; Node: d0fddd3a3fb51076c33010ecf66692621f989a2c (re)
+  ID: 3; user: hguser; Date: \d+; Rev: 2; Node: 53532d3f0b038c6e7bf435c45f28c1be1ab97049 (re)
+  ID: 3; user: hguser; Date: \d+; Rev: 3; Node: 77a9042f9fafe759713d8e76d027e55fee784512 (re)
+  ID: 4; user: hguser; Date: \d+; Rev: 4; Node: f77647c7d4e3e4728ad0de09ffd09f8cf5a160a1 (re)
+  ID: 5; user: hguser; Date: \d+; Rev: 5; Node: 1a68e4eb4da64077dc08fdcf278d075a9234f0a5 (re)
+  ID: 6; user: hguser; Date: \d+; Rev: 6; Node: 2e70e96c7d550e541406a47d87df354309fe9a72 (re)
 
   $ cd ..

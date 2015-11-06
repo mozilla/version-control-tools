@@ -11,6 +11,7 @@ import time
 
 import mercurial.cmdutil as cmdutil
 import mercurial.encoding as encoding
+import mercurial.error as error
 import mercurial.exchange as exchange
 import mercurial.extensions as extensions
 import mercurial.hgweb.webutil as webutil
@@ -106,6 +107,16 @@ def exchangepullpushlog(orig, pullop):
     for line in lines:
         pushid, who, when, nodes = line.split(' ', 3)
         nodes = [bin(n) for n in nodes.split()]
+
+        # Verify incoming changesets are known and stop processing when we see
+        # an unknown changeset. This can happen when we're pulling a former
+        # head instead of all changesets.
+        try:
+            [repo[n] for n in nodes]
+        except error.RepoLookupError:
+            repo.ui.warn('received pushlog entry for unknown changeset; ignoring\n')
+            break
+
         pushes.append((int(pushid), who, int(when), nodes))
 
     repo.pushlog.recordpushes(pushes)
