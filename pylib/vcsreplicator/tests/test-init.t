@@ -10,13 +10,13 @@ Creating a repository should record an event saying so
   $ hgmo create-repo mozilla-central 3
   (recorded repository creation in replication log)
 
-  $ python -m vcsreplicator.consumer $TESTTMP/vcsreplicator.ini --dump
+  $ consumer --dump
   - name: heartbeat-1
   - name: hg-repo-init-1
     path: '{moz}/mozilla-central'
 
-  $ python -m vcsreplicator.consumer $TESTTMP/vcsreplicator.ini --onetime
-  $ python -m vcsreplicator.consumer $TESTTMP/vcsreplicator.ini --onetime
+  $ consumer --onetime
+  $ consumer --onetime
   WARNING:vcsreplicator.consumer:created Mercurial repository: $TESTTMP/repos/mozilla-central
 
   $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
