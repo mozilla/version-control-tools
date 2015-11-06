@@ -70,7 +70,7 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
                                        pushnodes,
                                        pushheads)
     duration = time.time() - start
-    ui.status(_('recorded changegroup in replication log in %.1fs\n') % duration)
+    ui.status(_('recorded changegroup in replication log in %.3fs\n') % duration)
 
 
 def initcommand(orig, ui, dest, **opts):

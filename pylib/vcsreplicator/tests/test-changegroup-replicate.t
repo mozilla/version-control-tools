@@ -30,7 +30,7 @@ Pushing the initial commit will result in replication messages
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
-  remote: recorded changegroup in replication log in \d+\.\ds (re)
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ consumer --dump
   - name: heartbeat-1
@@ -83,7 +83,7 @@ Pushing multiple commits results in sane behavior
   remote:   https://hg.mozilla.org/mozilla-central/rev/e325efa1b1fb
   remote:   https://hg.mozilla.org/mozilla-central/rev/e79f1fe30cb2
   remote:   https://hg.mozilla.org/mozilla-central/rev/4f52aeca631d
-  remote: recorded changegroup in replication log in \d+\.\ds (re)
+  remote: recorded changegroup in replication log in \d.\d+s (re)
 
   $ consumer --dump --start-from 4
   - name: heartbeat-1
@@ -113,7 +113,7 @@ Pushing multiple commits results in sane behavior
   WARNING:vcsreplicator.consumer:created Mercurial repository: /repo/hg/mozilla/mozilla-central
   WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   WARNING:vcsreplicator.consumer:pulled 1 changesets into /repo/hg/mozilla/mozilla-central
-  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://172.17.0.146/mozilla-central into /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   WARNING:vcsreplicator.consumer:pulled 3 changesets into /repo/hg/mozilla/mozilla-central
 
 Pushing multiple heads results in appropriate behavior
@@ -146,7 +146,7 @@ Pushing multiple heads results in appropriate behavior
   remote:   https://hg.mozilla.org/mozilla-central/rev/4c9443886fe8
   remote:   https://hg.mozilla.org/mozilla-central/rev/a7e1131c1b7c
   remote:   https://hg.mozilla.org/mozilla-central/rev/4b11352745a6
-  remote: recorded changegroup in replication log in \d+\.\ds (re)
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ consumer --dump --start-from 6
   - name: heartbeat-1
@@ -182,9 +182,9 @@ Pushing multiple heads results in appropriate behavior
   WARNING:vcsreplicator.consumer:created Mercurial repository: /repo/hg/mozilla/mozilla-central
   WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   WARNING:vcsreplicator.consumer:pulled 1 changesets into /repo/hg/mozilla/mozilla-central
-  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://172.17.0.146/mozilla-central into /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   WARNING:vcsreplicator.consumer:pulled 3 changesets into /repo/hg/mozilla/mozilla-central
-  WARNING:vcsreplicator.consumer:pulling 2 heads from ssh://172.17.0.146/mozilla-central into /repo/hg/mozilla/mozilla-central
+  WARNING:vcsreplicator.consumer:pulling 2 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   WARNING:vcsreplicator.consumer:pulled 4 changesets into /repo/hg/mozilla/mozilla-central
 
 Cleanup
