@@ -33,7 +33,7 @@ Editing a UUID without ba= should fail
   
   ************************** ERROR ****************************
   
-  *** IDL file original.idl altered in this changeset***
+  *** IDL file original.idl altered in changeset 5475ca91db3f***
   
   Changes to IDL files in this repo require you to provide binary change approval in your top comment in the form of ba=... (or, more accurately, ba\S*=...)
   This is to ensure that UUID changes (or method changes missing corresponding UUID change) are caught early, before release.
@@ -77,7 +77,7 @@ Editing .idl file with UUID with other files and no ba= should fail
   
   ************************** ERROR ****************************
   
-  *** IDL file testfile1.idl altered in this changeset***
+  *** IDL file testfile1.idl altered in changeset ddac17c4b26e***
   
   Changes to IDL files in this repo require you to provide binary change approval in your top comment in the form of ba=... (or, more accurately, ba\S*=...)
   This is to ensure that UUID changes (or method changes missing corresponding UUID change) are caught early, before release.
@@ -130,7 +130,7 @@ Removing uuid() from an .idl file without ba= should fail
   
   ************************** ERROR ****************************
   
-  *** IDL file original.idl altered in this changeset***
+  *** IDL file original.idl altered in changeset 72d6c9de6844***
   
   Changes to IDL files in this repo require you to provide binary change approval in your top comment in the form of ba=... (or, more accurately, ba\S*=...)
   This is to ensure that UUID changes (or method changes missing corresponding UUID change) are caught early, before release.
@@ -174,7 +174,7 @@ Removing an .idl with UUID without approval should fail
   
   ************************** ERROR ****************************
   
-  *** IDL file existing.idl altered in this changeset***
+  *** IDL file existing.idl altered in changeset d6eafdbb87e1***
   
   Changes to IDL files in this repo require you to provide binary change approval in your top comment in the form of ba=... (or, more accurately, ba\S*=...)
   This is to ensure that UUID changes (or method changes missing corresponding UUID change) are caught early, before release.

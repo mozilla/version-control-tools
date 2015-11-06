@@ -20,6 +20,9 @@ This hook is to prevent changes to IID or UUID in pushes to trees where such cha
 
 import re
 
+from mercurial.node import short
+
+
 def hook(ui, repo, hooktype, node, source=None, **kwargs):
     if source in ('pull', 'strip'):
         return 0
@@ -28,13 +31,15 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
     bc = False
     # Loop through each changeset being added to the repository
     for change_id in xrange(repo[node].rev(), len(repo)):
+        ctx = repo[change_id]
         # Loop through each file for the current changeset
-        for file in repo[change_id].files():
+        for f in ctx.files():
             # Only Check IDL Files
-            if file.endswith('.idl'):
+            if f.endswith('.idl'):
                 bc = True
                 if not re.search('ba\S*=', repo.changectx('tip').description().lower()):
-                        error += "IDL file %s altered in this changeset" % file
+                        error += "IDL file %s altered in changeset %s" % (
+                                f, short(ctx.node()))
     # Check if an error occured in any of the files that were changed
     if error != "":
         print "\n\n************************** ERROR ****************************"
