@@ -63,6 +63,7 @@ class HgmoCommands(object):
             print('export HGWEB_%d_URL=%s' % (i, url))
         for i, hostport in enumerate(self.c.kafka_hostports):
             print('export KAFKA_%d_HOSTPORT=%s' % (i, hostport))
+        print('export ZOOKEEPER_CONNECT=%s' % self.c.zookeeper_connect)
 
     @Command('stop', category='hgmo',
              description='Stop a hg.mozilla.org cluster')

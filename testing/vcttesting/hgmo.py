@@ -90,6 +90,7 @@ class HgCluster(object):
             self.master_host_key = None
             self.web_urls = []
             self.kafka_hostports = []
+            self.zookeeper_connect = None
 
     def start(self, ldap_port=None, master_ssh_port=None, web_count=2,
               coverage=False):
@@ -184,8 +185,11 @@ class HgCluster(object):
         # the cluster are known. The entrypoint script waits for a file created
         # by a process execution to come into existence before these daemons
         # are started. So do this early after startup.
-        zookeeper_hostports = ['%s:2888:3888' % s['NetworkSettings']['IPAddress']
-                               for s in [master_state] + web_states]
+        zk_ips = [s['NetworkSettings']['IPAddress']
+                  for s in [master_state] + web_states]
+        zookeeper_hostports = ['%s:2888:3888' % ip for ip in zk_ips]
+        zookeeper_connect = ','.join('%s:2181/hgmoreplication' % ip for ip in zk_ips)
+
         with futures.ThreadPoolExecutor(web_count + 1) as e:
             for s in all_states:
                 host, port = self._d._get_host_hostname_port(s, '9092/tcp')
@@ -270,6 +274,7 @@ class HgCluster(object):
         for s in web_states:
             hostname, hostport = self._d._get_host_hostname_port(s, '80/tcp')
             self.web_urls.append('http://%s:%d/' % (hostname, hostport))
+        self.zookeeper_connect = zookeeper_connect
 
         return self._write_state()
 
@@ -311,6 +316,7 @@ class HgCluster(object):
         self.master_ssh_hostname = None
         self.master_ssh_port = None
         self.kafka_hostports = []
+        self.zookeeper_connect = None
 
     def _write_state(self):
         assert self.state_path
@@ -327,6 +333,7 @@ class HgCluster(object):
                 'master_host_key': self.master_host_key,
                 'web_urls': self.web_urls,
                 'kafka_hostports': self.kafka_hostports,
+                'zookeeper_connect': self.zookeeper_connect,
         }
         with open(self.state_path, 'wb') as fh:
             json.dump(s, fh, sort_keys=True, indent=4)
