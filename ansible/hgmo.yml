@@ -2,6 +2,27 @@
 - hosts: hgssh1.dmz.scl3.mozilla.com
   gather_facts: no
   tasks:
+    - name: verify deploying changeset is available on server
+      command: hg -R {{ vct }} log -r {{ lookup('file', '../.vctnode') }} -T '{phase}'
+      register: vct_node_phase
+      delegate_to: 127.0.0.1
+
+    - name: require public vct node
+      fail: msg='the v-c-t changeset being deployed is not public; cannot continue'
+      when: vct_node_phase.stdout != 'public'
+
+    - name: obtain previously-deployed changeset
+      slurp: src=/etc/mercurial/deployed_vct_changeset
+      register: previous_vct_node
+
+    - name: capture changes since last time
+      command: hg --cwd {{ vct }} log -r {{ previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
+      register: vct_changes
+      delegate_to: 127.0.0.1
+
+    - name: print changes since last time
+      debug: msg={{ vct_changes.stdout }}
+
     - name: notify IRC of deployment
       irc: server=irc.mozilla.org
            port=6697
@@ -9,7 +30,7 @@
            channel="#vcs"
            nick=hg-deploy-bot
            color=red
-           msg="Starting deploy of hooks and extensions to hg.mozilla.org from rev {{ lookup('file', '../.vctnode') }}"
+           msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ previous_vct_node.content | b64decode }}"
       delegate_to: 127.0.0.1
       run_once: true
 
@@ -70,6 +91,14 @@
       command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --create --topic pushdata --partitions 1 --replication-factor {{ kafka_replication_factor }} --config min.insync.replicas={{ kafka_min_insync_replicas }} --config unclean.leader.election.enable=false --config max.message.bytes=104857600
       when: "'pushdata' not in kafka_topics.stdout_lines"
       run_once: true
+
+    - name: record deployment of this changeset
+      copy: dest=/etc/mercurial/deployed_vct_changeset
+            content={{ lookup('file', '../.vctnode') }}
+            owner=root
+            group=root
+            mode=0644
+      when: ansible_hostname == 'hgssh1'
 
     - name: notify IRC of deployment
       irc: server=irc.mozilla.org
