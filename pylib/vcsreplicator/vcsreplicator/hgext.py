@@ -25,6 +25,15 @@ cmdtable = {}
 command = cmdutil.command(cmdtable)
 
 
+def precommithook(ui, repo, **kwargs):
+    # We could probably handle local commits. But our target audience is
+    # server environments, where local commits shouldn't be happening.
+    # All new changesets should be added through addchangegroup. Enforce
+    # that.
+    ui.warn(_('cannot commit to replicating repositories; push instead\n'))
+    return True
+
+
 def initcommand(orig, ui, dest, **opts):
     # Send a heartbeat before we create the repo to ensure the replication
     # system is online. This helps guard against us creating the repo
@@ -128,6 +137,9 @@ def reposetup(ui, repo):
         return
 
     # TODO add support for only replicating repositories under certain paths.
+
+    ui.setconfig('hooks', 'precommit.vcsreplicator', precommithook,
+                 'vcsreplicator')
 
     class replicatingrepo(repo.__class__):
         @property
