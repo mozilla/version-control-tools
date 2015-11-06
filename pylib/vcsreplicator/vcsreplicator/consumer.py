@@ -26,7 +26,8 @@ class Consumer(SimpleConsumer):
     def __init__(self, client, group, topic, partitions):
         super(Consumer, self).__init__(
             client, group, topic, partitions=partitions,
-            auto_commit=False)
+            auto_commit=False,
+            max_buffer_size=104857600)
 
         self.fetch_last_known_offsets(partitions)
 
