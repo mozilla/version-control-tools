@@ -184,6 +184,15 @@
     - "{{ venv_replication }}"
     - "{{ venv_tools }}"
 
+- name: add packages to virtualenvs
+  copy: dest=/repo/hg/{{ item.venv }}/lib/python2.7/site-packages/{{ item.pth }}.pth
+        content=/repo/hg/version-control-tools/{{ item.path }}
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - { venv: venv_replication, path: pylib/vcsreplicator, pth: vcsreplicator }
+
 - name: set up version-control-tools repo (server only)
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
       dest=/repo/hg/version-control-tools
@@ -461,6 +470,22 @@
 
 - name: adjust file permissions for hg templates
   command: /bin/chown -R hg:hg /repo/hg/hg_templates
+
+- name: copy vcsreplicator config
+  template: src=vcsreplicator.ini.j2
+            dest=/etc/mercurial/vcsreplicator.ini
+            owner=root
+            group=root
+            mode=0644
+
+- name: add replication daemon config to supervisor
+  copy: src=supervisor-vcsreplicator.conf
+        dest=/etc/supervisor.d/vcsreplicator.conf
+        owner=root
+        group=root
+        mode=0644
+
+# TODO restart vcsreplicator daemon.
 
 # Pull in tasks shared between hg-ssh and hg-web.
 # This should run last to ensure all preconditions are met.
