@@ -55,3 +55,19 @@ def record_new_hg_repo(producer, path):
         'name': 'hg-repo-init-1',
         'path': path,
     })
+
+
+def record_hgrc_update(producer, path, content):
+    """Produce a message saying a Mercurial config file was updated.
+
+    When called, the passed hgrc content will be written along with the
+    path to the repository. Mirrors are expected to overwrite the
+    repository's hgrc with the content provided.
+
+    If content is None, an existing hgrc file will be deleted.
+    """
+    return producer.send_message({
+        'name': 'hg-hgrc-update-1',
+        'path': path,
+        'content': content,
+    })

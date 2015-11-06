@@ -69,6 +69,9 @@ def process_message(config, payload):
         return
     elif name == 'hg-repo-init-1':
         return process_hg_repo_init(config, payload['path'])
+    elif name == 'hg-hgrc-update-1':
+        return process_hg_hgrc_update(config, payload['path'],
+                                      payload['content'])
 
     raise ValueError('unrecognized message type: %s' % payload['name'])
 
@@ -93,6 +96,27 @@ def process_hg_repo_init(config, path):
         raise Exception('error creating Mercurial repo %s: %s' % (path, out))
 
     logger.warn('created Mercurial repository: %s' % path)
+
+
+def process_hg_hgrc_update(config, path, content):
+    """Process a message indicating the hgrc is to be updated."""
+    logger.debug('received hgrc update for repo: %s' % path)
+
+    path = config.parse_wire_repo_path(path)
+    hgrc_path = os.path.join(path, '.hg', 'hgrc')
+
+    if content is None:
+        if os.path.exists(hgrc_path):
+            logger.warn('deleted hgrc from %s' % path)
+            os.unlink(hgrc_path)
+
+        return
+
+
+    with open(hgrc_path, 'w') as fh:
+        fh.write(content)
+
+    logger.warn('wrote hgrc: %s' % hgrc_path)
 
 
 if __name__ == '__main__':

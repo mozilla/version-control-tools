@@ -12,6 +12,7 @@ import vcsreplicator.producer as vcsrproducer
 
 from mercurial.i18n import _
 from mercurial import (
+    cmdutil,
     commands,
     extensions,
     hg,
@@ -19,6 +20,9 @@ from mercurial import (
 )
 
 testedwith = '3.5'
+
+cmdtable = {}
+command = cmdutil.command(cmdtable)
 
 
 def initcommand(orig, ui, dest, **opts):
@@ -43,6 +47,27 @@ def initcommand(orig, ui, dest, **opts):
     ui.status(_('(recorded repository creation in replication log)\n'))
 
     return res
+
+
+@command('replicatehgrc', [], 'replicate the hgrc for this repository')
+def replicatehgrc(ui, repo):
+    """Replicate the hgrc for this repository.
+
+    When called, the content of the hgrc file for this repository will be
+    sent to the replication service. Downstream mirrors will apply that
+    hgrc.
+
+    This command should be called when the hgrc of the repository changes.
+    """
+    if repo.vfs.exists('hgrc'):
+        content = repo.vfs.read('hgrc')
+    else:
+        content = None
+
+    producer = ui.replicationproducer
+    vcsrproducer.record_hgrc_update(producer, repo.replicationwireprotopath,
+                                    content)
+    ui.status(_('recorded hgrc in replication log\n'))
 
 
 def extsetup(ui):
