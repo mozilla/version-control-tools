@@ -6,6 +6,7 @@
 from __future__ import absolute_import
 
 import os
+import time
 
 import kafka.client as kafkaclient
 import vcsreplicator.producer as vcsrproducer
@@ -32,6 +33,44 @@ def precommithook(ui, repo, **kwargs):
     # that.
     ui.warn(_('cannot commit to replicating repositories; push instead\n'))
     return True
+
+
+def pretxnopenhook(ui, repo, **kwargs):
+    """Verify replication log is working before starting transaction.
+
+    It doesn't make sense to perform a lot of work only to find out that the
+    replication log can not be written to. So we check replication log
+    writability when we open transactions so we fail fast.
+    """
+    try:
+        vcsrproducer.send_heartbeat(ui.replicationproducer)
+    except Exception:
+        ui.warn('replication log not available; all writes disabled\n')
+        return 1
+
+
+def changegrouphook(ui, repo, node=None, source=None, **kwargs):
+    start = time.time()
+
+    heads = set(repo.heads())
+    pushnodes = []
+    pushheads = []
+
+    for rev in range(repo[node].rev(), len(repo)):
+        ctx = repo[rev]
+
+        pushnodes.append(ctx.hex())
+
+        if ctx.node() in heads:
+            pushheads.append(ctx.hex())
+
+    vcsrproducer.record_hg_changegroup(ui.replicationproducer,
+                                       repo.replicationwireprotopath,
+                                       source,
+                                       pushnodes,
+                                       pushheads)
+    duration = time.time() - start
+    ui.status(_('recorded changegroup in replication log in %.1fs\n') % duration)
 
 
 def initcommand(orig, ui, dest, **opts):
@@ -139,6 +178,10 @@ def reposetup(ui, repo):
     # TODO add support for only replicating repositories under certain paths.
 
     ui.setconfig('hooks', 'precommit.vcsreplicator', precommithook,
+                 'vcsreplicator')
+    ui.setconfig('hooks', 'changegroup.vcsreplicator', changegrouphook,
+                 'vcsreplicator')
+    ui.setconfig('hooks', 'pretxnopen.vcsreplicator', pretxnopenhook,
                  'vcsreplicator')
 
     class replicatingrepo(repo.__class__):

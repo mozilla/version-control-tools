@@ -71,3 +71,18 @@ def record_hgrc_update(producer, path, content):
         'path': path,
         'content': content,
     })
+
+
+def record_hg_changegroup(producer, path, source, nodes, heads):
+    """Produce a message saying a changegroup has been added to the repository.
+
+    The message records a list of introduced changesets, which ones are heads,
+    and the source of the changesets (as reported by Mercurial).
+    """
+    return producer.send_message({
+        'name': 'hg-changegroup-1',
+        'path': path,
+        'source': source,
+        'nodes': nodes,
+        'heads': heads,
+    })
