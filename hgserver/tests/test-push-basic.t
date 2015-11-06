@@ -117,6 +117,34 @@ Upgrade notice is advertised to clients not running bundle2
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/425a9d45c43d
 
+vcsreplicator short circuits existing replication hook when loaded
+
+  $ hgmo exec hgssh /activate-vcsreplicator mozilla-central
+  activated vcsreplicator for mozilla-central
+  $ hg -q up -r 0
+  $ echo vcsreplicator > foo
+  $ hg -q commit -m 'vcsreplicator enabled'
+  $ hg push -f -r . ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
+  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  remote: recorded push in pushlog
+  remote: legacy replication of phases disabled because vcsreplicator is loaded
+  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/mozilla-central/rev/d219c2f75f91
+
+vcsreplicator isn't doing anything yet. verify that.
+
+  $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-rev/d219c2f75f91
+  404
+  
+  "revision not found: d219c2f75f91"
+
 Cleanup
 
   $ hgmo stop

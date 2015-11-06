@@ -8,6 +8,11 @@ import pwd
 import subprocess
 import time
 
+from mercurial import (
+    extensions,
+)
+
+
 def changegrouphook(ui, repo, **kwargs):
     return _replicate(ui, repo, 'changegroup')
 
@@ -20,6 +25,17 @@ def _replicate(ui, repo, what):
     if not repo.root.startswith('/repo/hg/mozilla'):
         ui.write('repository not eligible for replication\n')
         return 0
+
+    # Do not perform replication when the experimental vcsreplicator extension
+    # is loaded. (The extension should be loaded by per-repo .hg/hgrc files for
+    # until it is generally deployed.)
+    try:
+        extensions.find('vcsreplicator')
+        ui.write('legacy replication of %s disabled because vcsreplicator '
+                 'is loaded\n' % what)
+        return 0
+    except Exception:
+        pass
 
     relpath = repo.root[len('/repo/hg/mozilla/'):]
     args = ['/usr/local/bin/repo-push.sh', relpath]
