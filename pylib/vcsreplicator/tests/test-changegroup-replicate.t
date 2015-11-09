@@ -52,13 +52,13 @@ Pushing the initial commit will result in replication messages
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  * vcsreplicator.consumer pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
   * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
   No handlers could be found for logger "kafka.conn"
   * vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central (glob)
-  * vcsreplicator.consumer pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central (glob)
 
 Pushing multiple commits results in sane behavior
@@ -103,7 +103,7 @@ Pushing multiple commits results in sane behavior
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  * vcsreplicator.consumer pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 1 heads (4f52aeca631dfa94331d93cfeaf069526926385a) and 3 nodes from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
   * vcsreplicator.consumer pulled 3 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg log -R $TESTTMP/repos/mozilla-central -T '{rev}:{node}\n'
@@ -115,9 +115,9 @@ Pushing multiple commits results in sane behavior
   $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
   No handlers could be found for logger "kafka.conn"
   * vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central (glob)
-  * vcsreplicator.consumer pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central (glob)
-  * vcsreplicator.consumer pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 1 heads (4f52aeca631dfa94331d93cfeaf069526926385a) and 3 nodes from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulled 3 changesets into /repo/hg/mozilla/mozilla-central (glob)
 
 Pushing multiple heads results in appropriate behavior
@@ -170,7 +170,7 @@ Pushing multiple heads results in appropriate behavior
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  * vcsreplicator.consumer pulling 2 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 2 heads (4c9443886fe84db9a4a5f29a5777517d2890d308, 4b11352745a6b3eb429ca8cd486dfdc221a4bc62) and 4 nodes from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
   * vcsreplicator.consumer pulled 4 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg log -R $TESTTMP/repos/mozilla-central -T '{rev}:{node}\n'
@@ -186,11 +186,11 @@ Pushing multiple heads results in appropriate behavior
   $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
   No handlers could be found for logger "kafka.conn"
   * vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central (glob)
-  * vcsreplicator.consumer pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central (glob)
-  * vcsreplicator.consumer pulling 1 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 1 heads (4f52aeca631dfa94331d93cfeaf069526926385a) and 3 nodes from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulled 3 changesets into /repo/hg/mozilla/mozilla-central (glob)
-  * vcsreplicator.consumer pulling 2 heads from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 2 heads (4c9443886fe84db9a4a5f29a5777517d2890d308, 4b11352745a6b3eb429ca8cd486dfdc221a4bc62) and 4 nodes from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulled 4 changesets into /repo/hg/mozilla/mozilla-central (glob)
 
 Cleanup

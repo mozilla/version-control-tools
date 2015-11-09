@@ -141,8 +141,8 @@ def process_hg_changegroup(config, path, source, nodes, heads):
     with get_hg_client(local_path) as c:
         oldtip = int(c.log('tip')[0].rev)
 
-        logger.warn('pulling %d heads from %s into %s' % (len(heads), url,
-                                                          local_path))
+        logger.warn('pulling %d heads (%s) and %d nodes from %s into %s' % (
+            len(heads), ', '.join(heads), len(nodes), url, local_path))
 
         c.pull(source=url or 'default', rev=heads)
         newtip = int(c.log('tip')[0].rev)
