@@ -17,11 +17,11 @@ Creating a repository should record an event saying so
 
   $ consumer --onetime
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:created Mercurial repository: $TESTTMP/repos/mozilla-central
+  * vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central (glob)
 
   $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
   No handlers could be found for logger "kafka.conn"
-  WARNING:vcsreplicator.consumer:created Mercurial repository: /repo/hg/mozilla/mozilla-central
+  * vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central (glob)
 
   $ hgmo exec hgweb0 ls /repo/hg/mozilla
   mozilla-central

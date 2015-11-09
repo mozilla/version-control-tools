@@ -13,9 +13,9 @@ Create the repository and push a change
   $ standarduser
   $ consumer --onetime
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:created Mercurial repository: $TESTTMP/repos/mozilla-central
+  * vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central (glob)
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:wrote hgrc: $TESTTMP/repos/mozilla-central/.hg/hgrc
+  * vcsreplicator.consumer wrote hgrc: $TESTTMP/repos/mozilla-central/.hg/hgrc (glob)
 
   $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
   $ cd mozilla-central
@@ -58,8 +58,8 @@ There should be no pushkey on a push with a draft changeset
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
-  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+  * vcsreplicator.consumer pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
   0 draft
@@ -138,8 +138,8 @@ accurate)
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
-  WARNING:vcsreplicator.consumer:pulled 2 changesets into $TESTTMP/repos/mozilla-central
+  * vcsreplicator.consumer pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
   2 draft
@@ -182,8 +182,8 @@ Pulling first changegroup will find its phase
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
-  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+  * vcsreplicator.consumer pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
   3 public
@@ -196,8 +196,8 @@ Similar behavior for second changegroup
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
-  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+  * vcsreplicator.consumer pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
   4 public

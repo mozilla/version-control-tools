@@ -7,6 +7,8 @@ from __future__ import absolute_import, unicode_literals
 import json
 import logging
 import os
+import sys
+import time
 
 import hglib
 from kafka.consumer import SimpleConsumer
@@ -203,5 +205,13 @@ if __name__ == '__main__':
         print(yaml.safe_dump(messages, default_flow_style=False).rstrip())
         sys.exit(0)
 
-    logging.basicConfig()
+    root = logging.getLogger()
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter(
+            '%(asctime)s %(process)d %(name)s %(message)s',
+            '%Y-%m-%dT%H:%M:%SZ')
+    formatter.converter = time.gmtime
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
+
     consume(config, consumer, onetime=args.onetime)

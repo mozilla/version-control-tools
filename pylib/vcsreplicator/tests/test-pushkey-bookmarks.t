@@ -10,7 +10,7 @@ Create the repository and push a change
   (recorded repository creation in replication log)
   $ consumer --onetime
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:created Mercurial repository: $TESTTMP/repos/mozilla-central
+  * vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central (glob)
 
   $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
   $ cd mozilla-central
@@ -47,8 +47,8 @@ Phases should be updated on normal push
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
-  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+  * vcsreplicator.consumer pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
 Creating a bookmark will write a pushkey message
 
@@ -123,8 +123,8 @@ Mirror gets bookmark updates when pulling the changegroup.
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
-  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+  * vcsreplicator.consumer pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      my-bookmark               1:2777163b5938
@@ -173,8 +173,8 @@ the bookmark.
      my-bookmark               1:2777163b5938
 
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
-  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+  * vcsreplicator.consumer pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      my-bookmark               1:2777163b5938
@@ -184,8 +184,8 @@ But processing the next changegroup message should advance the bookmark by 1
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  WARNING:vcsreplicator.consumer:pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
-  WARNING:vcsreplicator.consumer:pulled 1 changesets into $TESTTMP/repos/mozilla-central
+  * vcsreplicator.consumer pulling 1 heads from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      my-bookmark               3:e20ecd72ffa9
