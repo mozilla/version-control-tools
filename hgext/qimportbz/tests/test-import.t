@@ -6,7 +6,7 @@
   > qimportbz = $TESTDIR/hgext/qimportbz
   > 
   > [qimportbz]
-  > bugzilla = ${DOCKER_HOSTNAME}:$HGPORT
+  > bugzilla = http://${DOCKER_HOSTNAME}:$HGPORT
   > EOF
 
   $ $TESTDIR/d0cker start-bmo qimportbz-test-import $HGPORT
@@ -34,7 +34,10 @@
   $ hg qrm first-patch
 
   $ hg qimport bz://1
-  [1]
+  Fetching... done
+  Parsing... done
+  adding 1 to series file
+  renamed 1 -> first-patch
 
   $ $TESTDIR/d0cker stop-bmo qimportbz-test-import
   stopped 2 containers

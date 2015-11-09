@@ -39,6 +39,11 @@ class Handler(urllib2.BaseHandler):
         self.base = ui.config('qimportbz', 'bugzilla',
                               os.environ.get('BUGZILLA', "bugzilla.mozilla.org"))
 
+        if not self.base.startswith(('http://', 'https://')):
+            self.base = 'https://%s' % self.base
+
+        self.base = self.base.rstrip('/')
+
         self.autoChoose = ui.config('qimportbz', 'auto_choose_all', False)
 
     # Change the request to the https for the bug XML
@@ -54,7 +59,7 @@ class Handler(urllib2.BaseHandler):
             return ObjectResponse(bug)
 
         # Normal case, return a stream of text
-        url = "https://%s/show_bug.cgi?ctype=xml&id=%s" % (self.base, num)
+        url = "%s/show_bug.cgi?ctype=xml&id=%s" % (self.base, num)
         self.ui.status("Fetching...")
         return self.parent.open(url)
 
