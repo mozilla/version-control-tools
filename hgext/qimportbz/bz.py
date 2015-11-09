@@ -93,8 +93,22 @@ class Patch(Attachment):
         Attachment.__init__(self, bug, node)
         self.flags = list(sorted(Flag(bug, n) for n in node.findall('flag')))
         rawtext = base64.b64decode(node.find('data').text)
-        filename, message, user, date, branch, nodeid, p1, p2 = \
-            patch.extract(bug.settings.ui, StringIO.StringIO(rawtext))
+
+        data = patch.extract(bug.settings.ui, StringIO.StringIO(rawtext))
+        # Mercurial 3.6 returns a dict. Previous versions a tuple.
+        if isinstance(data, dict):
+            filename = data.get('filename')
+            message = data.get('message')
+            user = data.get('user')
+            date = data.get('date')
+            branch = data.get('branch')
+            nodeid = data.get('node')
+            p1 = data.get('p1')
+            p2 = data.get('p2')
+        else:
+            assert isinstance(data, tuple)
+            filename, message, user, date, branch, nodeid, p1, p2 = data
+
         # for some reason, patch.extract writes a temporary file with the diff hunks
         if filename:
             fp = file(filename)
