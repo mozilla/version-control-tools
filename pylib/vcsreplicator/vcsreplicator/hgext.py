@@ -5,6 +5,7 @@
 
 from __future__ import absolute_import
 
+import logging
 import os
 import time
 
@@ -176,6 +177,12 @@ def replicatehgrc(ui, repo):
 
 def extsetup(ui):
     extensions.wrapcommand(commands.table, 'init', initcommand)
+
+    # Configure null handler for kafka.* loggers to prevent "No handlers could
+    # be found" messages from creeping into output.
+    kafkalogger = logging.getLogger('kafka')
+    if not kafkalogger.handlers:
+        kafkalogger.addHandler(logging.NullHandler())
 
 
 def uisetup(ui):
