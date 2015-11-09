@@ -62,7 +62,7 @@ patched_files = {
     '.htaccess',
     'Bugzilla/DB.pm',
     'Bugzilla/Install/Requirements.pm',
-    'docker/generate_bmo_data.pl',
+    'docker/scripts/generate_bmo_data.pl',
 }
 
 # Ensure Bugzilla Git clone is up to date.
@@ -173,7 +173,7 @@ if not os.path.exists(j(h, 'checksetup.done')):
     args = [
         'perl',
         '-I', j(b, 'lib'),
-        j(b, 'docker', 'generate_bmo_data.pl'),
+        j(b, 'docker', 'scripts', 'generate_bmo_data.pl'),
     ]
 
     subprocess.check_call(args, cwd=b)
