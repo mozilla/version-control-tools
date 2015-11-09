@@ -246,6 +246,24 @@ class pushlog(object):
             c.commit()
             c.close()
 
+            # Try to insert into Kafka-based unified pushlog.
+            # This log is opportunistic. If it isn't available, don't worry
+            # about it.
+            ui = self.repo.ui
+            if hasattr(ui, 'kafkaproducer'):
+                try:
+                    producer = ui.kafkaproducer('pushlog')
+                    producer.send_message({
+                        'name': 'hg-pushlog-1',
+                        'path': self.repo.replicationwireprotopath,
+                        'user': user,
+                        'date': when,
+                        'nodes': [self.repo[n].hex() for n in nodes],
+                    })
+                    ui.status('recorded push in unified pushlog\n')
+                except Exception as e:
+                    ui.warn('error writing to unified pushlog\n' % e)
+
         def onabort(tr):
             # Only false when called from commit() below.
             if tr:

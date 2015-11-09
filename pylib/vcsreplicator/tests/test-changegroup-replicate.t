@@ -25,6 +25,7 @@ Pushing the initial commit will result in replication messages
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
+  remote: recorded push in unified pushlog
   remote: legacy replication of phases disabled because vcsreplicator is loaded
   remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
@@ -78,6 +79,7 @@ Pushing multiple commits results in sane behavior
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 1 files
   remote: recorded push in pushlog
+  remote: recorded push in unified pushlog
   remote: legacy replication of phases disabled because vcsreplicator is loaded
   remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
@@ -85,7 +87,7 @@ Pushing multiple commits results in sane behavior
   remote:   https://hg.mozilla.org/mozilla-central/rev/e325efa1b1fb
   remote:   https://hg.mozilla.org/mozilla-central/rev/e79f1fe30cb2
   remote:   https://hg.mozilla.org/mozilla-central/rev/4f52aeca631d
-  remote: recorded changegroup in replication log in \d.\d+s (re)
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ consumer --dump --start-from 5
   - name: heartbeat-1
@@ -141,6 +143,7 @@ Pushing multiple heads results in appropriate behavior
   remote: adding file changes
   remote: added 4 changesets with 4 changes to 1 files (+1 heads)
   remote: recorded push in pushlog
+  remote: recorded push in unified pushlog
   remote: legacy replication of phases disabled because vcsreplicator is loaded
   remote: legacy replication of phases disabled because vcsreplicator is loaded
   remote: legacy replication of changegroup disabled because vcsreplicator is loaded

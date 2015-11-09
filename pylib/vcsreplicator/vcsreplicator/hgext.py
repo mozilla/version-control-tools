@@ -231,6 +231,18 @@ def uisetup(ui):
 
             return self._replicationproducer
 
+        def kafkaproducer(self, topic):
+            """Obtain a Kafka producer for a topic.
+
+            Uses some of the settings for ``replcationproducer`` but with a
+            different topic.
+            """
+            client = kafkaclient.KafkaClient(hosts, client_id=clientid,
+                                             timeout=timeout)
+            return vcsrproducer.Producer(client, topic, 0, batch_send=False,
+                                         req_acks=reqacks,
+                                         ack_timeout=acktimeout)
+
     ui.__class__ = replicatingui
 
 

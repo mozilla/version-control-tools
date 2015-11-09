@@ -28,6 +28,7 @@ Disabling a single Kafka node should still allow push to go through
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
+  remote: recorded push in unified pushlog
   remote: legacy replication of phases disabled because vcsreplicator is loaded
   remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
@@ -62,6 +63,7 @@ Adding node back in should result in being able to push again
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
+  remote: recorded push in unified pushlog
   remote: legacy replication of phases disabled because vcsreplicator is loaded
   remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
