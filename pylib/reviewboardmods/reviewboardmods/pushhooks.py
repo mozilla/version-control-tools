@@ -9,6 +9,7 @@ details.
 """
 
 from contextlib import contextmanager
+import datetime
 import os
 import json
 import tempfile
@@ -52,6 +53,7 @@ def post_reviews(url, repoid, identifier, commits, hgresp,
                     'base_commit_id': <commit-id-to-apply-diffs-to> (optional),
                     'first_public_ancestor': <commit of first public ancestor> (optional),
                     'reviewers': [<user1>, <user2>, ...] (optional),
+                    'requal_reviewers': [<user1>, <user2>, ...] (optional),
                 },
                 {
                     ...
@@ -167,9 +169,9 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
         commits["squashed"]["diff"],
         base_commit_id=commits["squashed"].get('base_commit_id', None))
 
-    def extract_reviewers(commit):
+    def extract_reviewers(requested_reviewers):
         reviewers = set()
-        for reviewer in commit.get('reviewers', []):
+        for reviewer in requested_reviewers:
             # we've already seen this reviewer so we can just add them as a
             # reviewer for this commit.
             if reviewer in squashed_reviewers:
@@ -224,7 +226,22 @@ def _post_reviews(api_root, repoid, identifier, commits, hgresp):
             "extra_data.p2rb.commit_id": commit['id'],
             "extra_data.p2rb.first_public_ancestor": commit['first_public_ancestor'],
         }
-        reviewers = extract_reviewers(commit)
+        reviewers = extract_reviewers(commit.get('reviewers', []))
+
+        requal_reviewers = extract_reviewers(commit.get('requal_reviewers', []))
+        if requal_reviewers:
+            pr = previous_reviewers(rr)
+            for reviewer in requal_reviewers:
+                # We've claimed a r=, but the most recent review was not
+                # a ship-it
+                if not pr.get(reviewer, False):
+                    hgresp.append('display commit message for %s has r=%s '
+                                  'but they have not granted a ship-it. '
+                                  'review will be requested on your behalf'
+                                  % ((str(commit['id'][:12]), str(reviewer))))
+
+        reviewers.extend(requal_reviewers)
+
         if reviewers:
             props["target_people"] = ','.join(reviewers)
         draft = rr.get_or_create_draft(**props)
@@ -638,3 +655,38 @@ def get_unclaimed_rids(previous_commits, discard_on_publish_rids,
             unclaimed_rids.append(rid)
 
     return unclaimed_rids
+
+
+def previous_reviewers(rr):
+    """Return the result of the most recent review given by each reviewer"""
+
+    # TODO: Ideally this would hit an API endpoint that exposes the approval
+    #       state for each reviewer as calculated in the MozReviewApprovalHook
+    #       to be absolutely sure we're consistent. For now, we duplicate that
+    #       logic here.
+    start = 0
+    reviews = []
+    while True:
+        some_reviews = rr.get_reviews(start=start, max_results=50)
+        for review in some_reviews:
+            # We could use username = review.get_user()['username'] at a cost
+            # of one extra request per reviewer. For a review request with
+            # four reviews, this was twice as slow.
+            username = review.rsp['links']['user']['title']
+            if review['public']:
+                reviews.append((username, review['ship_it'], review['id']))
+        start += some_reviews.num_items
+        if start >= some_reviews.total_results:
+            break
+
+    # We seem to get reviews in sorted order already, but sort them anyway
+    # to be safe.
+    reviews = sorted(reviews, key=lambda x: int(x[2]))
+
+    pr = {}
+    for review in reviews:
+        # We only consider the most recent review from each reviewer, so we
+        # can overwrite any previous results here.
+        pr[review[0]] = review[1]
+
+    return pr

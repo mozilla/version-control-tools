@@ -312,7 +312,8 @@ def reviewboard(repo, proto, args=None):
             'bug': str(reviewid.bug),
             'base_commit_id': base_commit_id,
             'first_public_ancestor': first_public_ancestor,
-            'reviewers': list(commitparser.parse_reviewers(summary))
+            'reviewers': list(commitparser.parse_rquestion_reviewers(summary)),
+            'requal_reviewers': list(commitparser.parse_requal_reviewers(summary))
         })
 
     commits['squashed']['diff'] = ''.join(patch.diff(repo, node1=base_parent_node,
