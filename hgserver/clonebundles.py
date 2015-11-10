@@ -259,7 +259,9 @@ def advertiseclonebundlespart(bundler, repo, source, bundlecaps=None,
     msg = _('this server supports the experimental "clone bundles" feature '
             'that should enable faster and more reliable cloning\n'
             'help test it by setting the "experimental.clonebundles" config '
-            'flag to "true"')
+            'flag to "true"\n'
+            'IMPORTANT: verify you are running Mercurial 3.6.1 or newer or '
+            '`hg pull` will be broken if you enable the feature\n')
 
     bundler.newpart('output', data=msg)
 

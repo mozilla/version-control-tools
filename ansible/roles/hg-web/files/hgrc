@@ -1,8 +1,4 @@
 # This file is managed by Ansible. Do not modify by hand.
-
-[ui]
-clonebundleadvertise = false
-
 [trusted]
 users = hg
 
