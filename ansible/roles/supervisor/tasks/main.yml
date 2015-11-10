@@ -29,6 +29,9 @@
         group=root
         mode=0644
 
+- name: configure supervisor to run at system startup
+  command: /sbin/chkconfig --level 2345 supervisord on
+
 - name: ensure supervisor service is started
   service: name=supervisord
            state=started
