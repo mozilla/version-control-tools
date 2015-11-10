@@ -23,9 +23,18 @@ drastically reduced load on the Mercurial server.
 Enabling
 ========
 
-To enable cloning from pre-generated bundles, you'll need to install the
-`bundleclone extension
-<https://hg.mozilla.org/hgcustom/version-control-tools/file/default/hgext/bundleclone/__init__.py>`_.
+If you are running Mercurial 3.6.1 or newer, support for cloning from
+pre-generated bundles is built-in to Mercurial itself. However, it
+requires enabling a config option::
+
+   [experimental]
+   clonebundles = true
+
+If you are running a Mercurial older than 3.6, first please consider
+upgrading to 3.6.1 or newer, as 3.6 contains a number of performance
+enhancements to cloning. If you absolutely must run a Mercurial older
+than 3.6, you can install the
+`bundleclone extension <https://hg.mozilla.org/hgcustom/version-control-tools/file/default/hgext/bundleclone/__init__.py>`_.
 Simply `download
 <https://hg.mozilla.org/hgcustom/version-control-tools/raw-file/default/hgext/bundleclone/__init__.py>`_
 that file then add the following to your global hgrc file (likely
@@ -38,12 +47,6 @@ that file then add the following to your global hgrc file (likely
 
    You can rename the ``__init__.py`` file as you see fit.
 
-.. note::
-
-   Functionality from the ``bundleclone`` extension is being added to
-   core Mercurial. Eventually, a vanilla Mercurial install will be able
-   to do everything ``bundleclone`` can do today.
-
 Configuring
 ===========
 
@@ -52,61 +55,128 @@ server is configured so the first entry is the best choice for the most
 people. However, various audiences will want to prioritize certain
 bundles over others.
 
-The ``bundleclone`` extension allows the client to define preferences
-for which bundle to fetch. The way this works is the client defines some
-key-value pairs and it upweights entries having these attributes. Read
-the source of the ``bundleclone`` extension for more.
+Both the built-in *clone bundles* feature and *bundleclone* allow the
+client to define preferences of which bundles to fetch. The way this
+works is the client defines some key-value pairs in its config and
+bundles having these attributes will be upweighted.
 
-On ``hg.mozilla.org``, we define the following attributes:
+On ``hg.mozilla.org``, we define the following attributes are defined in
+the manifest:
 
-ec2region
+BUNDLESPEC (clonebundles only)
+   This defines the type of bundle.
+
+   We currently generate bundles with the following specifications:
+   ``gzip-v1``, ``bzip2-v1``, ``none-packed1``.
+
+REQUIRESNI (clonebundles only)
+   Indicates whether the URL requires SNI (a TLS extension). This is set
+   to ``true`` for URLs where multiple certificates are installed on the
+   same IP and SNI is required. It is undefined if SNI is not required.
+
+requiresni (bundleclone only)
+   This behaves exactly the same as ``REQUIRESNI``. It is how
+   *bundleclone* defines the SNI requirement.
+
+ec2region (clonebundles and bundleclone)
    The EC2 region the bundle file should be served from. We support
    ``us-west-2`` and ``us-east-1``. You should prefer the region that is
    closest to you.
 
-compression
+compression (bundleclone only)
    The compression mode used in the bundle. ``gzip`` is the default.
    ``bzip2`` is available if you want to transfer less data but utilize
    more CPU cycles to clone.
 
-stream
+   This metadata is captured by the ``BUNDLESPEC`` attribute when using
+   the built-in clone bundles feature.
+
+stream (bundleclone only)
    Indicates that a *stream bundle* is available. These files are
    essentially tar archives. They typically run 30-50% larger than the
    default ``gzip`` bundles, but they consume 4-6x less CPU time to
    process.
 
-cdn
+   This is captured by the ``BUNDLESPEC`` attribute in *clone bundles*.
+
+cdn (clonebundles and bundleclone)
    Indicates whether the URL is on a CDN. Value is ``true`` to indicate
    the URL is a CDN. All other values or undefined values are to be
    interpretted as not a CDN.
 
-requiresni
-   Indicates whether the URL requires SNI (a TLS extension). This is set
-   to ``true`` for URLs where multiple certificates are installed on the
-   same IP and SNI is required. It is undefined everywhere else.
+Here is an example *clone bundles* manifest::
 
-.. note::
+   https://hg.cdn.mozilla.net/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
+   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
+   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
+   https://hg.cdn.mozilla.net/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.bzip2.hg BUNDLESPEC=bzip2-v1 REQUIRESNI=true cdn=true
+   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.bzip2.hg BUNDLESPEC=bzip2-v1 ec2region=us-west-2
+   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.bzip2.hg BUNDLESPEC=bzip2-v1 ec2region=us-east-1
+   https://hg.cdn.mozilla.net/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
+   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
+   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
 
-   ``compression`` and ``stream`` are both used to control the type of
-   bundle file, but they are separate attributes for technical reasons.
+And here is the same logic manifest but for *bundleclone*::
 
-   To prefer a *stream bundle*, use ``stream=revlogv1``: there is no
-   need to specify ``compression`` unless you wish to declare a
-   ``gzip`` or ``bzip`` fallback preference in case a *stream bundle*
-   isn't available.
+   https://hg.cdn.mozilla.net/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.gzip.hg compression=gzip cdn=true requiresni=true
+   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.gzip.hg ec2region=us-west-2 compression=gzip
+   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.gzip.hg ec2region=us-east-1 compression=gzip
+   https://hg.cdn.mozilla.net/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.bzip2.hg compression=bzip2 cdn=true requiresni=true
+   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.bzip2.hg ec2region=us-west-2 compression=bzip2
+   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.bzip2.hg ec2region=us-east-1 compression=bzip2
+   https://hg.cdn.mozilla.net/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.stream-legacy.hg stream=revlogv1 cdn=true requiresni=true
+   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.stream-legacy.hg ec2region=us-west-2 stream=revlogv1
+   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.stream-legacy.hg ec2region=us-east-1 stream=revlogv1
 
-If you are a Mozilla contributor in California, the defaults are
-probably fine.
+As you can see, listed bundle URLs vary by bundle type (compression and
+format) and location. For each repository we generate bundles for, we
+generate:
 
-If you are a Mozilla contributor in Europe, you may want to prefer the
-``us-east-1`` EC2 region like so::
+1. A gzip bundle (the default compression format)
+2. A bzip2 bundle (smaller, but slower)
+3. A *streaming* bundle file (larger but faster)
+
+For each of these bundles, we upload them to 3 locations:
+
+1. CloudFront CDN
+2. S3 in us-west-2 region
+3. S3 in us-east-1 region
+
+The gzipped bundle hosted on CloudFront is the first entry and is thus
+preferred by clients by default. **This is optimized for developers on
+high speed network connections.**
+
+If you have a slower internet connection, you may want to prefer bzip2
+bundles. While they take several more minutes of CPU time to apply, this
+could be cancelled out from the shorter time required to download them.
+To prefer bzip2 bundles::
+
+   # clone bundles config
+   [experimental]
+   clonebundleprefers = COMPRESSION=bzip2
+
+   # bundleclone config
+   [bundleclone]
+   prefers = compression=bzip2
+
+If you have a super fast internet connection, you can prefer the
+*packed*/*streaming* bundles. This will transfer 30-40% more data on
+average, but will require almost no CPU to apply. If you can fetch from
+S3 or CloudFront at 1 Gbps speeds, you should be able to clone Firefox
+in under 60s.::
+
+   [experimental]
+   clonebundleprefers = VERSION=packed1
 
    [bundleclone]
-   prefers = ec2region=us-east-1
+   prefers = stream=revlogv1
 
 If you are in EC2, you should **always** pin your EC2 region as the
 first entry. You should also prefer *stream bundle* mode, as network
 bandwidth is plentiful and clones will be faster. e.g.::
+
+   [experimental]
+   clonebundleprefers = ec2region=us-west-2, VERSION=packed1
 
    [bundleclone]
    prefers = ec2region=us-west-2, stream=revlogv1
@@ -131,5 +201,5 @@ from ``hg.mozilla.org``, bundles probably aren't being generated for
 that repository.
 
 If you think bundles should be made available, let a server operator
-know by filing a ``Developer Services :: hg.mozilla.org`` bug or by joining
-#vcs on irc.mozilla.org.
+know by filing a ``Developer Services :: hg.mozilla.org`` bug or by
+asking in #vcs on irc.mozilla.org.
