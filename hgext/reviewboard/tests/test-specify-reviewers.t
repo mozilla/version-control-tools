@@ -515,39 +515,11 @@ Unrecognized reviewers should be ignored
   $ rbmanage list-reviewers 12
   
 
-Using r= for a patch under review instead of r? should result in a warning
-from the client.
-
-  $ echo blah >> foo
-  $ hg commit -m 'Bug 2 - different stuff; r=romulus'
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
-  searching for changes
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
-  submitting 2 changesets for review
-  
-  changeset:  27:d9a3b1783a10
-  summary:    Bug 2 - different stuff; r?cthulhu
-  review:     http://*:$HGPORT1/r/13 (glob)
-  
-  changeset:  28:c486e8175a60
-  summary:    Bug 2 - different stuff; r=romulus
-  (It appears you are using r= to specify reviewers for a patch under review. Please use r? to avoid ambiguity as to whether or not review has been granted.)
-  review:     http://*:$HGPORT1/r/14 (draft) (glob)
-  
-  review id:  bz://2/mynick
-  review url: http://*:$HGPORT1/r/12 (draft) (glob)
-  (review requests lack reviewers; visit review url to assign reviewers)
-  (visit review url to publish these review requests so others can see them)
 Reviewer identification should be case insensitive.
 
   $ echo blah >> foo
   $ hg commit -m 'Bug 2 - better stuff; r?ryanvm'
-  $ hg push --config reviewboard.autopublish=true -c 29
+  $ hg push --config reviewboard.autopublish=true -c 28
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
@@ -557,7 +529,7 @@ Reviewer identification should be case insensitive.
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  29:ba1b0ae3cf0a
+  changeset:  28:465e40c6747b
   summary:    Bug 2 - better stuff; r?ryanvm
   review:     http://*:$HGPORT1/r/13 (draft) (glob)
   

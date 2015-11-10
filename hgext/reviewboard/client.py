@@ -63,7 +63,7 @@ from hgrb.util import (
     ReviewID,
 )
 
-from mozautomation.commitparser import parse_bugs, parse_requal_reviewers
+from mozautomation.commitparser import parse_bugs
 from mozhg.auth import (
     getbugzillaauth,
     configureautobmoapikeyauth,
@@ -631,12 +631,6 @@ def doreview(repo, ui, remote, nodes):
         # Bug 1065024 use cmdutil.show_changeset() here.
         ui.write('changeset:  %s:%s\n' % (ctx.rev(), ctx.hex()[0:12]))
         ui.write('summary:    %s\n' % ctx.description().splitlines()[0])
-        # We want to encourage people to use r? when asking for a review rather
-        # than r=.
-        if list(parse_requal_reviewers(ctx.description())):
-            ui.warn(_('(It appears you are using r= to specify reviewers for a'
-                ' patch under review. Please use r? to avoid ambiguity as to'
-                ' whether or not review has been granted.)\n'))
         ui.write('review:     %s' % reviews.reviewurl(rid))
         if reviewdata[rid].get('public') == 'False':
             havedraft = True
