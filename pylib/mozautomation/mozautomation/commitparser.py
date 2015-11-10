@@ -26,6 +26,7 @@ BUG_RE = re.compile(
 
 SPECIFIER           = r'(?:r|a|sr|rs|ui-r)[=?]'
 REQUAL_SPECIFIER_RE = re.compile(r'r=')
+RQUESTION_SPECIFIER_RE = re.compile(r'r\?')
 
 LIST    = r'[;,\/\\]\s*'
 LIST_RE = re.compile(LIST)
@@ -97,6 +98,11 @@ def parse_reviewers(commit_description, flag_re=None):
 
 def parse_requal_reviewers(commit_description):
     for reviewer in parse_reviewers(commit_description, flag_re=REQUAL_SPECIFIER_RE):
+        yield reviewer
+
+
+def parse_rquestion_reviewers(commit_description):
+    for reviewer in parse_reviewers(commit_description, flag_re=RQUESTION_SPECIFIER_RE):
         yield reviewer
 
 

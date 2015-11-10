@@ -9,15 +9,13 @@ HERE = os.path.split(os.path.realpath(__file__))[0]
 sys.path.append(os.path.split(HERE)[0])
 
 
-import unittest
-
 from mozautomation.commitparser import (
     parse_backouts,
     parse_bugs,
     parse_requal_reviewers,
     parse_reviewers,
+    parse_rquestion_reviewers,
 )
-
 
 class TestBugParsing(unittest.TestCase):
     def test_bug(self):
@@ -181,6 +179,58 @@ class TestBugParsing(unittest.TestCase):
             'Bug 1024110 - Change Aurora\'s default profile behavior to use channel-specific profiles. r=bsmedberg f=gavin,markh')),
             ['bsmedberg'])
 
+    def test_rquestion_reviewers(self):
+
+        # first with r? reviewer request syntax
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - some stuff; r?romulus')), ['romulus'])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r?romulus, r?remus')), ['romulus', 'remus'])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r?romulus,r?remus')), ['romulus', 'remus'])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r?romulus, remus')), ['romulus', 'remus'])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r?romulus,remus')), ['romulus', 'remus'])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; (r?romulus)')), ['romulus'])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; (r?romulus,remus)')),['romulus', 'remus'])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; [r?romulus]')), ['romulus'])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; [r?remus, r?romulus]')), ['remus', 'romulus'])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r?romulus, a=test-only')), ['romulus'])
+
+        # now with r= review granted syntax
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - some stuff; r=romulus')), [])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r=romulus, r=remus')), [])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r=romulus,r=remus')), [])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r=romulus, remus')), [])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r=romulus,remus')), [])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; (r=romulus)')),[])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; (r=romulus,remus)')), [])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; [r=romulus]')), [])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; [r=remus, r=romulus]')), [])
+        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r=romulus, a=test-only')), [])
+
+        # oddball real-world examples
+        self.assertEqual(list(parse_rquestion_reviewers(
+            'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
+            '- Relevant spec text:\n'
+            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
+            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n')),
+            [])
+
+        self.assertEqual(list(parse_rquestion_reviewers(
+            'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
+            'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
+            'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz')),
+            [])
+
+        self.assertEqual(list(parse_rquestion_reviewers(
+             'Bumping gaia.json for 2 gaia revision(s) a=gaia-bump\n'
+             '\n'
+             'https://hg.mozilla.org/integration/gaia-central/rev/2b738dae9970\n'
+             'Author: Francisco Jordano <arcturus@ardeenelinfierno.com>\n'
+             'Desc: Merge pull request #30407 from arcturus/fix-contacts-test\n'
+             'Fixing form test for date fields r=me\n')),
+             [])
+
+        self.assertEqual(list(parse_rquestion_reviewers(
+            'Bug 1024110 - Change Aurora\'s default profile behavior to use channel-specific profiles. r=bsmedberg f=gavin,markh')),
+            [])
 
     def test_backout_missing(self):
         self.assertIsNone(parse_backouts('Bug 1 - More stuff; r=romulus'))
