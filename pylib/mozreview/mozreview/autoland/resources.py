@@ -4,6 +4,7 @@ import json
 import logging
 
 from django.db import transaction
+from django.core.cache import cache
 from django.utils import six
 from djblets.webapi.decorators import (webapi_login_required,
                                        webapi_request_fields,
@@ -26,6 +27,7 @@ from mozreview.autoland.models import (AutolandEventLogEntry,
 from mozreview.decorators import webapi_scm_groups_required
 from mozreview.errors import (AUTOLAND_CONFIGURATION_ERROR,
                               AUTOLAND_ERROR,
+                              AUTOLAND_REQUEST_IN_PROGRESS,
                               AUTOLAND_TIMEOUT,
                               NOT_PUSHED_PARENT_REVIEW_REQUEST)
 from mozreview.extra_data import is_parent, is_pushed
@@ -33,6 +35,25 @@ from mozreview.extra_data import is_parent, is_pushed
 AUTOLAND_REQUEST_TIMEOUT = 10.0
 IMPORT_PULLREQUEST_DESTINATION = 'mozreview'
 TRY_AUTOLAND_DESTINATION = 'try'
+
+AUTOLAND_LOCK_TIMEOUT = 60 * 60 * 24
+
+def acquire_lock(lock_id):
+    """Use the memcached add operation to acquire a global lock"""
+    logging.info("Acquiring lock for {0}".format(lock_id))
+    return cache.add(lock_id, "true", AUTOLAND_LOCK_TIMEOUT)
+
+
+def release_lock(lock_id):
+    """Release memcached lock with key lock_id"""
+    logging.info("Releasing lock for {0}".format(lock_id))
+    cache.delete(lock_id)
+
+
+def get_autoland_lock_id(review_request_id, repository_url, revision):
+    """Returns a lock id based on the given parameters"""
+    return 'autoland_lock:{0}:{1}:{2}'.format(review_request_id, repository_url,
+                                              revision)
 
 class BaseAutolandTriggerResource(WebAPIResource):
     """Base resource for Autoland trigger resources.
@@ -141,6 +162,9 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
         logging.info('Telling Autoland to give status updates to %s'
                      % pingback_url)
 
+        lock_id = get_autoland_lock_id(rr.id, target_repository, last_revision)
+        if not acquire_lock(lock_id):
+            return AUTOLAND_REQUEST_IN_PROGRESS
         try:
             # Rather than hard coding the destination it would make sense
             # to extract it from metadata about the repository. That will have
@@ -160,13 +184,16 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
         except requests.exceptions.RequestException:
             logging.error('We hit a RequestException when submitting a '
                           'request to Autoland')
+            release_lock(lock_id)
             return AUTOLAND_ERROR
         except requests.exceptions.Timeout:
             logging.error('We timed out when submitting a request to '
                           'Autoland')
+            release_lock(lock_id)
             return AUTOLAND_TIMEOUT
 
         if response.status_code != 200:
+            release_lock(lock_id)
             return AUTOLAND_ERROR, {
                 'status_code': response.status_code,
                 'message': response.json().get('error'),
@@ -177,6 +204,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
             autoland_request_id = int(response.json().get('request_id', 0))
         finally:
             if autoland_request_id is None:
+                release_lock(lock_id)
                 return AUTOLAND_ERROR, {
                     'status_code': response.status_code,
                     'request_id': None,
@@ -280,6 +308,10 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
         logging.info('Telling Autoland to give status updates to %s'
                      % pingback_url)
 
+        lock_id = get_autoland_lock_id(rr.id, target_repository, last_revision)
+        if not acquire_lock(lock_id):
+            return AUTOLAND_REQUEST_IN_PROGRESS
+
         try:
             # We use a hard-coded destination here. If we ever open this up
             # to make the destination a parameter to this resource, we need to
@@ -301,13 +333,16 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
         except requests.exceptions.RequestException:
             logging.error('We hit a RequestException when submitting a '
                           'request to Autoland')
+            release_lock(lock_id)
             return AUTOLAND_ERROR
         except requests.exceptions.Timeout:
             logging.error('We timed out when submitting a request to '
                           'Autoland')
+            release_lock(lock_id)
             return AUTOLAND_TIMEOUT
 
         if response.status_code != 200:
+            release_lock(lock_id)
             return AUTOLAND_ERROR, {
                 'status_code': response.status_code,
                 'message': response.json().get('error'),
@@ -318,6 +353,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
             autoland_request_id = int(response.json().get('request_id', 0))
         finally:
             if autoland_request_id is None:
+                release_lock(lock_id)
                 return AUTOLAND_ERROR, {
                     'status_code': response.status_code,
                     'request_id': None,
@@ -453,7 +489,10 @@ class AutolandRequestUpdateResource(WebAPIResource):
                 status=AutolandEventLogEntry.PROBLEM,
                 error_msg=fields['error_msg']
             )
-
+        lock_id = get_autoland_lock_id(rr.id,
+                                       autoland_request[0].repository_url,
+                                       autoland_request[0].push_revision)
+        release_lock(lock_id)
         return 200, {}
 
 

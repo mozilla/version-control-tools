@@ -58,3 +58,9 @@ AUTOLAND_TIMEOUT = WebAPIError(
     1006,
     "Autoland failed to respond within the allowed time",
     http_status=504)  # 504 Gateway Timeout
+
+AUTOLAND_REQUEST_IN_PROGRESS = WebAPIError(
+    1007,
+    "An autoland request for this review request is already in progress. "
+    "Please wait for that request to finish.",
+    http_status=405)  # 405 Method Not Allowed
