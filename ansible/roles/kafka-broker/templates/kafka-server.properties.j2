@@ -30,7 +30,8 @@ min.insync.replicas={{ kafka_min_insync_replicas | default(2) }}
 # Disable cluster to come back online if data loss may occur.
 unclean.leader.election.enable=false
 
-zookeeper.connection.timeout.ms={{ kafka_zookeeper_connection_timeout | default(1000000) }}
+zookeeper.session.timeout.ms={{ kafka_zookeeper_session_timeout | default(3000) }}
+zookeeper.connection.timeout.ms={{ kafka_zookeeper_connection_timeout | default(3000) }}
 
 broker.id={{ kafka_broker_id | mandatory }}
 advertised.host.name={{ kafka_host_name | mandatory }}
