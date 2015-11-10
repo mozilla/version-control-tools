@@ -15,6 +15,7 @@ mq =
 purge =
 rebase =
 reviewboard = /home/ubuntu/version-control-tools/hgext/reviewboard/client.py
+rewritecommitdescriptions = /home/ubuntu/version-control-tools/autoland/hgext/rewritecommitdescriptions.py
 
 [paths]
 upstream = http://hgrb/$1
