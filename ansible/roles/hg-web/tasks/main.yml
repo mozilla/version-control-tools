@@ -239,6 +239,9 @@
 - name: install wsgi config
   copy: content="LoadModule wsgi_module /repo/hg/venv_hgweb/lib/python2.7/site-packages/mod_wsgi/server/mod_wsgi-py27.so" dest=/etc/httpd/conf.d/wsgi.conf
 
+- name: configure httpd to start at system startup
+  command: /sbin/chkconfig --level 2345 httpd on
+
 - name: ensure httpd service is started
   service: name=httpd state=started
   # Don't do this on Docker because it has its own mechanism for
