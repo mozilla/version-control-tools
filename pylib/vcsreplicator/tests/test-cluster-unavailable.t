@@ -14,10 +14,17 @@
   $ hg -q commit -A -m initial
   $ hg -q push
 
+  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
+  wrote heartbeat message into replication log
+
 Disabling a single Kafka node should still allow push to go through
 
   $ hgmo exec hgweb0 /usr/bin/supervisorctl stop kafka
   kafka: stopped
+
+  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
+  wrote heartbeat message into replication log
+
   $ echo 1 > foo
   $ hg commit -m 'disabled 1/3 nodes'
   $ hg push
@@ -40,6 +47,10 @@ Disabling 2 Kafka nodes should result in no quorum and failure to push
 
   $ hgmo exec hgweb1 /usr/bin/supervisorctl stop kafka
   kafka: stopped
+  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
+  abort: error sending heartbeat: UNKNOWN
+  [255]
+
   $ echo 2 > foo
   $ hg commit -m 'disabled 2/3 nodes'
   $ hg push
@@ -55,6 +66,9 @@ Adding node back in should result in being able to push again
   kafka: started
   $ hgmo exec hgweb1 /usr/bin/supervisorctl start kafka
   kafka: started
+  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
+  wrote heartbeat message into replication log
+
   $ hg push
   pushing to ssh://*:$HGPORT/mozilla-central (glob)
   searching for changes

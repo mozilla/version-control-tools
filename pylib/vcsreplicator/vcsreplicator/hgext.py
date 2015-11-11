@@ -10,12 +10,14 @@ import os
 import time
 
 import kafka.client as kafkaclient
+import kafka.common as kafkacommon
 import vcsreplicator.producer as vcsrproducer
 
 from mercurial.i18n import _
 from mercurial import (
     cmdutil,
     commands,
+    error,
     extensions,
     hg,
     util,
@@ -173,6 +175,22 @@ def replicatehgrc(ui, repo):
     vcsrproducer.record_hgrc_update(producer, repo.replicationwireprotopath,
                                     content)
     ui.status(_('recorded hgrc in replication log\n'))
+
+
+@command('sendheartbeat', [],
+         'send a heartbeat message to the replication system',
+         norepo=True)
+def sendheartbeat(ui):
+    """Send a heartbeat message through the replication system.
+
+    This is useful to see if the replication mechanism is writable.
+    """
+    try:
+        vcsrproducer.send_heartbeat(ui.replicationproducer)
+    except kafkacommon.KafkaError as e:
+        raise error.Abort('error sending heartbeat: %s' % e.message)
+
+    ui.status(_('wrote heartbeat message into replication log\n'))
 
 
 def extsetup(ui):
