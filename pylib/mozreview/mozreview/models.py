@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.models import User
 from django.db import models
+from reviewboard.diffviewer.models import FileDiff
 
 from mozreview.autoland.models import (AutolandEventLogEntry,
                                        AutolandRequest)
@@ -12,10 +13,13 @@ from mozreview.bugzilla.models import (BugzillaUserMap,
                                        UnverifiedBugzillaApiKey)
 from mozreview.ldap import query_scm_group
 
+from mozreview.file_diff_reviewer.models import FileDiffReviewer
+
 __all__ = [
     'AutolandEventLogEntry',
     'AutolandRequest',
     'BugzillaUserMap',
+    'FileDiffReviewer',
     'get_bugzilla_api_key',
     'get_or_create_bugzilla_users',
     'MozReviewUserProfile',
