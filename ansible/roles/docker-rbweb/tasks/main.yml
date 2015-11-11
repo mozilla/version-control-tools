@@ -23,14 +23,13 @@
 - name: Synchronize version-control-tools
   synchronize: src={{ vct }}/ dest=/version-control-tools/ recursive=yes delete=yes
 
-- name: Install mozreview extension
-  command: /venv/bin/python setup.py develop chdir=/version-control-tools/pylib/mozreview
-
-- name: Install rbbz extension
-  command: /venv/bin/python setup.py develop chdir=/version-control-tools/pylib/rbbz
-
-- name: Install rbmotd extension
-  command: /venv/bin/python setup.py develop chdir=/version-control-tools/pylib/rbmotd
+- name: Install python libraries
+  command: /venv/bin/python setup.py develop chdir=/version-control-tools/pylib/{{ item }}
+  with_items:
+    - mozautomation
+    - mozreview
+    - rbbz
+    - rbmotd
 
 - name: Remove default httpd configs
   file: path={{ item }} state=absent

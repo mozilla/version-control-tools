@@ -34,6 +34,10 @@ cd pylib/vcsreplicator
 python setup.py develop
 cd ../..
 
+cd pylib/mozautomation
+python setup.py develop
+cd ../..
+
 cd hghooks
 python setup.py develop
 cd ..

@@ -2,6 +2,7 @@ coverage/
 docs/_build/
 hghooks/Mozilla_Hg_Hooks.egg-info/
 pylib/mozansible/mozansible.egg-info/
+pylib/mozautomation/mozautomation.egg-info/
 pylib/mozreview/mozreview.egg-info/
 pylib/rbbz/rbbz.egg-info/
 pylib/Bugsy/bugsy.egg-info/
