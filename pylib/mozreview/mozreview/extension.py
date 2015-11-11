@@ -40,6 +40,7 @@ from mozreview.fields import (BaseCommitField,
                               ImportCommitField,
                               PullCommitField,
                               TryField)
+from mozreview.file_diff_reviewer.resources import file_diff_reviewer_resource
 from mozreview.hooks import MozReviewApprovalHook
 from mozreview.hostingservice.hmo_repository import HMORepository
 from mozreview.ldap.resources import ldap_association_resource
@@ -123,6 +124,7 @@ class MozReviewExtension(Extension):
         autoland_trigger_resource,
         batch_review_resource,
         bugzilla_api_key_login_resource,
+        file_diff_reviewer_resource,
         import_pullrequest_trigger_resource,
         import_pullrequest_update_resource,
         ldap_association_resource,
