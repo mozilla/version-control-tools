@@ -49,7 +49,7 @@ def deploy_mozreview_dev(repo=None, rev=None, verbosity=0):
                         verbosity=verbosity)
 
 
-def deploy_reviewboard_prod(repo=None, rev=None, verbosity=0):
+def deploy_mozreview_prod(repo=None, rev=None, verbosity=0):
     extra = {'vct': ROOT}
     if repo:
         extra['repo'] = repo

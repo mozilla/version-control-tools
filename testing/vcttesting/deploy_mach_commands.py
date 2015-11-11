@@ -27,8 +27,8 @@ class DeployCommands(object):
         from vcttesting.deploy import deploy_mozreview_dev
         return deploy_mozreview_dev(repo=repo, rev=rev, verbosity=verbosity)
 
-    @Command('reviewboard-prod', category='deploy',
-             description='Deploy Review Board to production')
+    @Command('mozreview-prod', category='deploy',
+             description='Deploy MozReview to production')
     @CommandArgument('--repo',
                      help='Alternative repository URL to deploy from')
     @CommandArgument('--rev',
@@ -36,8 +36,8 @@ class DeployCommands(object):
     @CommandArgument('--verbosity', type=int,
                      help='How verbose to be with output')
     def reviewboard_prod(self, repo=None, rev=None, verbosity=None):
-        from vcttesting.deploy import deploy_reviewboard_prod
-        return deploy_reviewboard_prod(repo=repo, rev=rev, verbosity=verbosity)
+        from vcttesting.deploy import deploy_mozreview_prod
+        return deploy_mozreview_prod(repo=repo, rev=rev, verbosity=verbosity)
 
     @Command('mozreview-create-repo', category='deploy',
              description='Create a new review repository')
