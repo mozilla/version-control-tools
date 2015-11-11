@@ -101,6 +101,16 @@ class MozReviewExtension(Extension):
         'default': {
             'source_filenames': ['mozreview/js/logout.js'],
         },
+        'filediffreviewer': {
+            'source_filenames': ['mozreview/js/models/filediffreviewermodel.js',
+                                 'mozreview/js/collections/filediffreviewercollection.js',
+                                 'mozreview/js/init_filediffreviewer.js'],
+            'apply_to': diffviewer_url_names,
+        },
+        'import-pullrequest': {
+            'source_filenames': ['mozreview/js/import-pullrequest.js',],
+            'apply_to': ['import_pullrequest',],
+        },
         'reviews': {
             # TODO: Everything will break if init_rr.js is not first in this
             # list.
@@ -113,10 +123,6 @@ class MozReviewExtension(Extension):
         'parent-review-requests': {
             'source_filenames': ['mozreview/js/parents.js'],
             'apply_to': review_request_url_names,
-        },
-        'import-pullrequest': {
-            'source_filenames': ['mozreview/js/import-pullrequest.js',],
-            'apply_to': ['import_pullrequest',],
         },
     }
 

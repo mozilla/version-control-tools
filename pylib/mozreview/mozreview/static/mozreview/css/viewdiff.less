@@ -1,0 +1,29 @@
+button.diff-file-btn {
+    position: absolute;
+    background-color: #DDD;
+    font-weight: bold;
+    text-align: right;
+    top: 7px;
+    right: 7px;
+    padding: 5px;
+    border-radius: 2px;
+    border: 1px solid #6F6F6F;
+    &:hover {
+        cursor: pointer;
+        background-color: #A5A5A5;
+    }
+    &:active {
+        cursor: pointer;
+        background-color: #8F8E8E;
+    }
+    &.reviewed {
+        background-color: #DFFFD7;
+        border: 1px solid #478A06;
+        &:hover {
+            background-color: rgba(1, 153, 1, 0.5);
+        }
+        &:active {
+            background-color: rgba(0, 92, 0, 0.5);
+        }
+    }
+}
