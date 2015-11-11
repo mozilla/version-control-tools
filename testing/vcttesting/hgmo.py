@@ -58,7 +58,7 @@ class HgCluster(object):
         'hgext/pushlog-legacy/buglink.py': '/repo/hg/extensions/buglink.py',
         'hgext/pushlog-legacy/pushlog-feed.py': '/repo/hg/extensions/pushlog-feed.py',
         'hgext/pushlog/__init__.py': '/repo/hg/extensions/pushlog/__init__.py',
-        'hgext/serverlog/__init__.py': '/repo/hg/extensions/serverlog/__init__.py',
+        'hgext/serverlog/__init__.py': '/repo/hg/version-control-tools/hgext/serverlog/__init__.py',
         'hgserver/pash/pash.py': '/usr/local/bin/pash.py',
         'hgserver/pash/hg_helper.py': '/usr/local/bin/hg_helper.py',
         'hgserver/pash/ldap_helper.py': '/usr/local/bin/ldap_helper.py',

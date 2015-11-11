@@ -7,7 +7,6 @@
         state=directory
   with_items:
     - extensions/pushlog
-    - extensions/serverlog
     - scripts
 
 - name: install support scripts
@@ -22,13 +21,6 @@
 - name: install pushlog extension
   copy: src={{ vct }}/hgext/pushlog/__init__.py
         dest=/repo/hg/extensions/pushlog/__init__.py
-        owner=hg
-        group=hg
-        mode=0644
-
-- name: install serverlog extension
-  copy: src={{ vct }}/hgext/serverlog/__init__.py
-        dest=/repo/hg/extensions/serverlog/__init__.py
         owner=hg
         group=hg
         mode=0644

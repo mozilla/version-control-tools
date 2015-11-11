@@ -30,7 +30,7 @@ clonebundles = /repo/hg/version-control-tools/hgserver/clonebundles.py
 
 bundleclone = /repo/hg/version-control-tools/hgext/bundleclone
 pushlog = /repo/hg/extensions/pushlog
-serverlog = /repo/hg/extensions/serverlog
+serverlog = /repo/hg/version-control-tools/hgext/serverlog
 pushrebase = /repo/hg/version-control-tools/hgext/pushrebase
 readonly = /repo/hg/version-control-tools/hgext/readonly
 
