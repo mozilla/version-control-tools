@@ -15,8 +15,8 @@ class DeployCommands(object):
         lm = context.log_manager
         lm.enable_unstructured()
 
-    @Command('reviewboard-dev', category='deploy',
-             description='Deploy updates to the Review Board dev server')
+    @Command('mozreview-dev', category='deploy',
+             description='Deploy updates to the MozReview dev service')
     @CommandArgument('--repo',
                      help='Alternative repository URL to deploy from')
     @CommandArgument('--rev',
@@ -24,8 +24,8 @@ class DeployCommands(object):
     @CommandArgument('--verbosity', type=int,
                      help='How verbose to be with output')
     def reviewboard_dev(self, repo=None, rev=None, verbosity=None):
-        from vcttesting.deploy import deploy_reviewboard_dev
-        return deploy_reviewboard_dev(repo=repo, rev=rev, verbosity=verbosity)
+        from vcttesting.deploy import deploy_mozreview_dev
+        return deploy_mozreview_dev(repo=repo, rev=rev, verbosity=verbosity)
 
     @Command('reviewboard-prod', category='deploy',
              description='Deploy Review Board to production')
