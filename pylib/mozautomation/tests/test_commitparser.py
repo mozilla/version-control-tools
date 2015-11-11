@@ -1,6 +1,9 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# flake8: noqa
+
 import os
 import unittest
 import sys
@@ -15,7 +18,9 @@ from mozautomation.commitparser import (
     parse_requal_reviewers,
     parse_reviewers,
     parse_rquestion_reviewers,
+    replace_reviewers,
 )
+
 
 class TestBugParsing(unittest.TestCase):
     def test_bug(self):
@@ -231,6 +236,85 @@ class TestBugParsing(unittest.TestCase):
         self.assertEqual(list(parse_rquestion_reviewers(
             'Bug 1024110 - Change Aurora\'s default profile behavior to use channel-specific profiles. r=bsmedberg f=gavin,markh')),
             [])
+
+    def test_replace_reviewers(self):
+        # first with r? reviewer request syntax
+        self.assertEqual(replace_reviewers('Bug 1 - some stuff; r?romulus', ['remus']), 'Bug 1 - some stuff; r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus, r?remus', ['remus']), 'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus,r?remus', ['remus']), 'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus, remus', ['remus']), 'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus,remus', ['remus']), 'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; (r?romulus)', ['remus']), 'Bug 1 - More stuff; (r=remus)')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; (r?romulus,remus)', ['remus']), 'Bug 1 - More stuff; (r=remus)')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; [r?romulus]', ['remus']), 'Bug 1 - More stuff; [r=remus]')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; [r?remus, r?romulus]', ['remus']), 'Bug 1 - More stuff; [r=remus]')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus, a=test-only', ['remus']), 'Bug 1 - More stuff; r=remus, a=test-only')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus, ux-r=test-only', ['remus', 'romulus']), 'Bug 1 - More stuff; r=remus,romulus, ux-r=test-only')
+
+        # now with r= review granted syntax
+        self.assertEqual(replace_reviewers('Bug 1 - some stuff; r=romulus', ['remus']), 'Bug 1 - some stuff; r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r=romulus, r=remus', ['remus']), 'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r=romulus,r=remus', ['remus']), 'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r=romulus, remus', ['remus']), 'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r=romulus,remus', ['remus']), 'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; (r=romulus)',['remus']), 'Bug 1 - More stuff; (r=remus)')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; (r=romulus,remus)', ['remus']), 'Bug 1 - More stuff; (r=remus)')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; [r=romulus]', ['remus']), 'Bug 1 - More stuff; [r=remus]')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; [r=remus, r=romulus]', ['remus']), 'Bug 1 - More stuff; [r=remus]')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r=romulus, a=test-only', ['remus']), 'Bug 1 - More stuff; r=remus, a=test-only')
+
+        # try some other separators than ;
+        self.assertEqual(replace_reviewers('Bug 1 - some stuff r=romulus', ['remus']), 'Bug 1 - some stuff r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff. r=romulus, r=remus', ['remus']), 'Bug 1 - More stuff. r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff - r=romulus,r=remus', ['remus']), 'Bug 1 - More stuff - r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff, r=romulus, remus', ['remus']), 'Bug 1 - More stuff, r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff.. r=romulus,remus', ['remus']), 'Bug 1 - More stuff.. r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff | (r=romulus)',['remus']), 'Bug 1 - More stuff | (r=remus)')
+
+        # make sure things work with different spacing
+        self.assertEqual(replace_reviewers('Bug 1 - some stuff;r=romulus,r=remus', ['remus']), 'Bug 1 - some stuff;r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff.r=romulus, r=remus', ['remus']), 'Bug 1 - More stuff.r=remus')
+        self.assertEqual(replace_reviewers('Bug 1 - More stuff,r=romulus, remus', ['remus']), 'Bug 1 - More stuff,r=remus')
+
+        self.assertEqual(replace_reviewers(
+            'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
+            '- Relevant spec text:\n'
+            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
+            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n',
+            ['remus']),
+            'Bug 1094764 - Implement AudioContext.suspend and friends.  r=remus\n'
+            '- Relevant spec text:\n'
+            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
+            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise')
+
+        self.assertEqual(replace_reviewers(
+            'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
+            'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
+            'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz',
+            ['remus']),
+            'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
+            'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
+            'r=remus, sr=dbaron, a1.9=bz')
+
+        self.assertEqual(replace_reviewers(
+            'Bug 1 - blah r?dminor, r?gps, r?abc, sr=abc',
+            ['dminor', 'glob', 'gps', 'abc']),
+            'Bug 1 - blah r=dminor,glob,gps,abc, sr=abc')
+
+        self.assertEqual(replace_reviewers(
+            'Bug 1 - blah r?dminor r?gps r?abc sr=abc',
+            ['dminor', 'glob', 'gps', 'abc']),
+            'Bug 1 - blah r=dminor,glob,gps,abc sr=abc')
+
+        self.assertEqual(replace_reviewers(
+            'Bug 1 - blah r?dminor,r?gps,r?abc,sr=abc',
+            ['dminor', 'glob', 'gps', 'abc']),
+            'Bug 1 - blah r=dminor,glob,gps,abc,sr=abc')
+
+        self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r=gps DONTBUILD (NPOTB)', ['remus']), 'Bug 123 - Blah blah; r=remus DONTBUILD (NPOTB)')
+        self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r=gps DONTBUILD', ['remus']), 'Bug 123 - Blah blah; r=remus DONTBUILD')
+        self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r=gps (DONTBUILD)', ['remus']), 'Bug 123 - Blah blah; r=remus (DONTBUILD)')
+
 
     def test_backout_missing(self):
         self.assertIsNone(parse_backouts('Bug 1 - More stuff; r=romulus'))

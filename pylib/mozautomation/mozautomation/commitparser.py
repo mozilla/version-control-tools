@@ -24,26 +24,28 @@ BUG_RE = re.compile(
            (?:\s*\#?)(\d+)(?=\b)
          )''', re.I | re.X)
 
-SPECIFIER           = r'(?:r|a|sr|rs|ui-r)[=?]'
+SPECIFIER = r'(?:r|a|sr|rs|ui-r)[=?]'
+R_SPECIFIER = r'\br[=?]'
+R_SPECIFIER_RE = re.compile(R_SPECIFIER)
 REQUAL_SPECIFIER_RE = re.compile(r'r=')
 RQUESTION_SPECIFIER_RE = re.compile(r'r\?')
 
-LIST    = r'[;,\/\\]\s*'
+LIST = r'[;,\/\\]\s*'
 LIST_RE = re.compile(LIST)
 
 REVIEWER = r'[a-zA-Z0-9\-\_]+'         # this needs to match irc nicks
 
 REVIEWERS_RE = re.compile(
-    r'([\s\(\.\[;,])' +                # before 'r' delimiter
-    r'(' + SPECIFIER + r')' +          # flag
-    r'(' +                             # capture all reviewers
-        REVIEWER +                     # reviewer
-        r'(?:' +                       # additional reviewers
-            LIST +                     # delimiter
-            r'(?![a-z0-9\.\-]+[=?])' + # don't extend match into next flag
-            REVIEWER  +                # reviewer
+    r'([\s\(\.\[;,])' +                 # before 'r' delimiter
+    r'(' + SPECIFIER + r')' +           # flag
+    r'(' +                              # capture all reviewers
+        REVIEWER +                      # reviewer
+        r'(?:' +                        # additional reviewers
+            LIST +                      # delimiter
+            r'(?![a-z0-9\.\-]+[=?])' +  # don't extend match into next flag
+            REVIEWER +                  # reviewer
         r')*' +
-    r')')
+    r')')                               # noqa
 
 BACKED_OUT_RE = re.compile('^backed out changeset (?P<node>[0-9a-f]{12}) ',
                            re.I)
@@ -90,20 +92,64 @@ def parse_reviewers(commit_description, flag_re=None):
     commit_summary = commit_description.splitlines().pop(0)
     for match in re.finditer(REVIEWERS_RE, commit_summary):
         for reviewer in re.split(LIST_RE, match.group(3)):
-            if flag_re == None:
+            if flag_re is None:
                 yield reviewer
             elif flag_re.match(match.group(2)):
                 yield reviewer
 
 
 def parse_requal_reviewers(commit_description):
-    for reviewer in parse_reviewers(commit_description, flag_re=REQUAL_SPECIFIER_RE):
+    for reviewer in parse_reviewers(commit_description,
+                                    flag_re=REQUAL_SPECIFIER_RE):
         yield reviewer
 
 
 def parse_rquestion_reviewers(commit_description):
-    for reviewer in parse_reviewers(commit_description, flag_re=RQUESTION_SPECIFIER_RE):
+    for reviewer in parse_reviewers(commit_description,
+                                    flag_re=RQUESTION_SPECIFIER_RE):
         yield reviewer
+
+
+def replace_reviewers(commit_description, reviewers):
+    if not reviewers:
+        return commit_description
+    reviewers = 'r=' + ','.join(reviewers)
+
+    commit_description = commit_description.splitlines()
+    commit_summary = commit_description.pop(0)
+    commit_description = '\n'.join(commit_description)
+
+    if not R_SPECIFIER_RE.search(commit_summary):
+        commit_summary += ' ' + reviewers
+    else:
+        # replace the first r? with the reviewer list, and all subsequent
+        # occurences with a marker to mark the blocks we need to remove
+        # later
+        d = {'first': True}
+
+        def replace_first_reviewer(matchobj):
+            if R_SPECIFIER_RE.match(matchobj.group(2)):
+                if d['first']:
+                    d['first'] = False
+                    return matchobj.group(1) + reviewers
+                else:
+                    return '\0'
+            else:
+                return matchobj.group(0)
+
+        commit_summary = re.sub(REVIEWERS_RE, replace_first_reviewer,
+                                commit_summary)
+
+        # remove marker values as well as leading separators.  this allows us
+        # to remove runs of multiple reviewers and retain the trailing
+        # separator.
+        commit_summary = re.sub(LIST + '\0', '', commit_summary)
+        commit_summary = re.sub('\0', '', commit_summary)
+
+    if commit_description == "":
+        return commit_summary.strip()
+    else:
+        return commit_summary.strip() + "\n" + commit_description
 
 
 def parse_backouts(s):
