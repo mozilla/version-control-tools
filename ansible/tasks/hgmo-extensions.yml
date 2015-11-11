@@ -6,7 +6,6 @@
         mode=0755
         state=directory
   with_items:
-    - extensions/pushlog
     - scripts
 
 - name: install support scripts
@@ -17,10 +16,3 @@
     - aggregate-s3-bucket-logs
     - generate-hg-s3-bundles
     - outputif
-
-- name: install pushlog extension
-  copy: src={{ vct }}/hgext/pushlog/__init__.py
-        dest=/repo/hg/extensions/pushlog/__init__.py
-        owner=hg
-        group=hg
-        mode=0644

@@ -31,7 +31,7 @@ clonebundles = /repo/hg/version-control-tools/hgserver/clonebundles.py
 
 bundleclone = /repo/hg/version-control-tools/hgext/bundleclone
 pushlog-feed = /repo_local/mozilla/extensions/pushlog-feed.py
-pushlog = /repo_local/mozilla/extensions/pushlog
+pushlog = /repo/hg/version-control-tools/hgext/pushlog
 buglink = /repo_local/mozilla/extensions/buglink.py
 serverlog = /repo/hg/version-control-tools/hgext/serverlog
 hgmo = /repo/hg/version-control-tools/hgext/hgmo
