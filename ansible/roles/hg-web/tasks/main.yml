@@ -110,8 +110,6 @@
 - name: create directories for hg files
   file: path={{ item }} state=directory owner=hg group=hg mode=0755
   with_items:
-    - /repo_local/mozilla/extensions
-    - /repo_local/mozilla/extensions/parsedatetime
     - /repo_local/mozilla/mozilla
     - /repo_local/mozilla/scripts
     - /repo_local/mozilla/webroot_wsgi
@@ -449,19 +447,6 @@
 - name: configure /dev/urandom in mozbuild chroot (servers only)
   command: mknod -m 444 /repo_local/mozilla/chroot_mozbuild/dev/urandom c 1 9 creates=/repo_local/mozilla/chroot_mozbuild/dev/urandom
   when: vct_dir.stat.exists == False
-
-- name: install pushlog hgweb files
-  copy: src={{ vct }}/hgext/pushlog-legacy/{{ item }}
-        dest=/repo/hg/extensions/{{ item }}
-        owner=hg
-        group=hg
-        mode=0644
-  with_items:
-    - feedparser.py
-    - pushlog-feed.py
-    - parsedatetime/__init__.py
-    - parsedatetime/parsedatetime.py
-    - parsedatetime/parsedatetime_consts.py
 
 - name: synchronize hg templates
   synchronize: src={{ vct }}/hgtemplates/ dest=/repo/hg/hg_templates/ recursive=yes delete=yes
