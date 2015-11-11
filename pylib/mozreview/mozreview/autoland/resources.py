@@ -166,9 +166,6 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
         if not acquire_lock(lock_id):
             return AUTOLAND_REQUEST_IN_PROGRESS
         try:
-            # Rather than hard coding the destination it would make sense
-            # to extract it from metadata about the repository. That will have
-            # to wait until we fix Bug 1168486.
             response = requests.post(autoland_url + '/autoland',
                 data=json.dumps({
                 'tree': rr.repository.name,
