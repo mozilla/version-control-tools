@@ -59,6 +59,14 @@ We shouldn't see the message if we attempted to use clonebundles
   adding file changes
   added 1 changesets with 1 changes to 1 files
 
+#else
+
+  $ hg --config extensions.bundleclone=$TESTDIR/hgext/bundleclone clone -U ${HGWEB_0_URL}mozilla-central bundleclone
+  downloading bundle https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
+  abort: HTTP error fetching bundle: HTTP Error 403: Forbidden
+  (consider contacting the server operator if this error persists)
+  [255]
+
 #endif
 
   $ hgmo stop
