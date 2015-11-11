@@ -8,6 +8,7 @@ from collections import OrderedDict
 import mercurial.bookmarks as bookmarks
 import mercurial.cmdutil as cmdutil
 import mercurial.context as context
+import mercurial.error as error
 import mercurial.hg as hg
 import mercurial.lock as lockmod
 import mercurial.obsolete as obsolete
@@ -110,6 +111,9 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
     Before any changes are made, we verify the state of the repo is sufficient
     for transformation to occur and abort otherwise.
     """
+    if not oldnodes:
+        return {}
+
     repo = repo.unfiltered()
 
     # Validate function called properly.
