@@ -457,7 +457,6 @@
         group=hg
         mode=0644
   with_items:
-    - buglink.py
     - feedparser.py
     - pushlog-feed.py
     - parsedatetime/__init__.py
