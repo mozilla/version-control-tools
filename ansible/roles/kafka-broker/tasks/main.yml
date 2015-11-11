@@ -47,7 +47,6 @@
         owner=zookeeper
         group=zookeeper
         mode=0755
-        recurse=yes
   with_items:
     - /var/lib/kafka
     - /var/lib/zookeeper
