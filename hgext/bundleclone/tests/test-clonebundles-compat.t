@@ -12,7 +12,10 @@
   $ touch bar
   $ hg -q commit -A -m 'add bar'
 
-  $ $TESTDIR/venv/mercurials/3.6/bin/hg --config extensions.clonebundles= serve -d -p $HGPORT --pid-file hg.pid -A access.log -E error.log
+  $ MODERNHG=$TESTDIR/venv/mercurials/3.6.1/bin/hg
+  $ if [ ! -f ${MODERNHG} ]; then echo "missing hg: ${MODERNHG}"; exit 1; fi
+
+  $ ${MODERNHG} --config extensions.clonebundles= serve -d -p $HGPORT --pid-file hg.pid -A access.log -E error.log
   $ cat hg.pid >> $DAEMON_PIDS
   $ cd ..
 
