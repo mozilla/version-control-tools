@@ -66,11 +66,11 @@ def mozreview_create_repo(verbosity=0):
                         verbosity=verbosity)
 
 
-def hgmo(verbosity=0):
-    """Deploy hooks and extensions to hg.mozilla.org servers."""
+def deploy_hgmo(verbosity=0):
+    """Deploy to hg.mozilla.org."""
     extra = {'vct': ROOT}
 
-    return run_playbook('hgmo', extra_vars=extra,
+    return run_playbook('deploy-hgmo', extra_vars=extra,
                         verbosity=verbosity)
 
 

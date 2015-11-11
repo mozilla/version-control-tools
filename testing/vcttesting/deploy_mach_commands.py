@@ -52,7 +52,7 @@ class DeployCommands(object):
     @CommandArgument('--verbosity', type=int,
                      help='How verbose to be with output')
     def hgmo(self, verbosity=None):
-        from vcttesting.deploy import hgmo as deploy
+        from vcttesting.deploy import deploy_hgmo as deploy
         return deploy(verbosity=verbosity)
 
     @Command('hgmo-strip', category='deploy',
