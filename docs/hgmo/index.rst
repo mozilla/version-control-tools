@@ -13,3 +13,4 @@ hg.mozilla.org
    bundleclone
    contributing
    mozbuildinfo
+   replication
