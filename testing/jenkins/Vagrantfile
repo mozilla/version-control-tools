@@ -29,7 +29,7 @@ apt-get -y dist-upgrade
 # have started in devicemapper mode. Force a restart to pick up btrfs.
 # restart docker
 
-apt-get -y install libffi-dev libldap2-dev libsasl2-dev libssl-dev libxslt1-dev mercurial python-dev python-virtualenv sqlite3 unzip zlib1g-dev
+apt-get -y install git libbz2-dev libffi-dev libldap2-dev libreadline-dev libsasl2-dev libsqlite3-0 libsqlite3-dev libssl-dev libxslt1-dev python-dev sqlite3 unzip zlib1g-dev
 # usermod --append -G docker vagrant
 SCRIPT
 
