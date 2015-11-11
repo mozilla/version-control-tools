@@ -7,7 +7,7 @@ if [ ! -e /var/swap ]; then
 fi
 swapon /var/swap
 
-apt-get -y remove chef puppet && apt-get -y autoremove
+apt-get -y remove chef puppet python-pip python-virtualenv && apt-get -y autoremove
 # apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
 # sh -c "echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
 apt-get update
@@ -29,7 +29,7 @@ apt-get -y dist-upgrade
 # have started in devicemapper mode. Force a restart to pick up btrfs.
 # restart docker
 
-apt-get -y install git libbz2-dev libffi-dev libldap2-dev libreadline-dev libsasl2-dev libsqlite3-0 libsqlite3-dev libssl-dev libxslt1-dev python-dev sqlite3 unzip zlib1g-dev
+apt-get -y install git libbz2-dev libffi-dev libldap2-dev libncurses5-dev libreadline-dev libsasl2-dev libsqlite3-0 libsqlite3-dev libssl-dev libxslt1-dev python-dev sqlite3 tcl-dev unzip zlib1g-dev
 # usermod --append -G docker vagrant
 SCRIPT
 
