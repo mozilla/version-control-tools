@@ -28,7 +28,7 @@ blackbox =
 # TODO use built-in extension when running 3.6.
 clonebundles = /repo/hg/version-control-tools/hgserver/clonebundles.py
 
-bundleclone = /repo/hg/extensions/bundleclone
+bundleclone = /repo/hg/version-control-tools/hgext/bundleclone
 pushlog = /repo/hg/extensions/pushlog
 serverlog = /repo/hg/extensions/serverlog
 pushrebase = /repo/hg/extensions/pushrebase.py

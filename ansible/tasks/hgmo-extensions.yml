@@ -6,7 +6,6 @@
         mode=0755
         state=directory
   with_items:
-    - extensions/bundleclone
     - extensions/pushlog
     - extensions/serverlog
     - scripts
@@ -23,13 +22,6 @@
 - name: install pushlog extension
   copy: src={{ vct }}/hgext/pushlog/__init__.py
         dest=/repo/hg/extensions/pushlog/__init__.py
-        owner=hg
-        group=hg
-        mode=0644
-
-- name: install bundleclone extension
-  copy: src={{ vct }}/hgext/bundleclone/__init__.py
-        dest=/repo/hg/extensions/bundleclone/__init__.py
         owner=hg
         group=hg
         mode=0644
