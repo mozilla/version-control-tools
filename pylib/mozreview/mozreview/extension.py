@@ -37,6 +37,7 @@ from mozreview.extra_data import (get_parent_rr, is_parent, is_pushed,
 from mozreview.fields import (BaseCommitField,
                               CombinedReviewersField,
                               CommitsListField,
+                              FileDiffReviewerField,
                               ImportCommitField,
                               PullCommitField,
                               TryField)
@@ -236,6 +237,7 @@ class MozReviewExtension(Extension):
         ReviewRequestFieldsHook(self, 'main', [CombinedReviewersField])
         ReviewRequestFieldsHook(self, 'main', [TryField])
         ReviewRequestFieldsHook(self, 'main', [BaseCommitField])
+        ReviewRequestFieldsHook(self, 'main', [FileDiffReviewerField])
 
         # We want pull to appear first as it is the more robust way of
         # retrieving changesets.

@@ -20,6 +20,7 @@ from mozreview.extra_data import (
     is_parent,
     is_pushed,
 )
+from mozreview.file_diff_reviewer.models import FileDiffReviewer
 
 
 def ensure_review_request(review_request_details):
@@ -287,3 +288,41 @@ class TryField(BaseReviewRequestField):
             return template.render(Context({'url': url}))
         else:
             return linebreaksbr(self._retrieve_error_txt)
+
+
+class FileDiffReviewerField(BaseReviewRequestField):
+    """This field initializes a FileDiffReviewer collection.
+
+    Create the collection of FileDiffReviewer for this specific user/review if
+    not present.
+    """
+    # RB validation requires this to be unique, so we fake a field id
+    field_id = "p2rb.FileDiffReviewerField"
+    label = ""
+
+    def as_html(self):
+        user = self.request.user
+        file_diff_reviewer_list = []
+        reviewer_ids = self.review_request_details.target_people.values_list(
+            'id', flat=True
+        )
+
+        if user.id in reviewer_ids:
+            diffset = self.review_request_details.get_latest_diffset()
+
+            for item in diffset.files.all():
+                file_diff_reviewer, _ = FileDiffReviewer.objects.get_or_create(
+                    reviewer_id=user.id,
+                    file_diff_id=item.id
+                )
+                file_diff_reviewer_list.append({
+                    'id': file_diff_reviewer.id,
+                    'reviewer_id': file_diff_reviewer.reviewer_id,
+                    'file_diff_id': file_diff_reviewer.file_diff_id,
+                    'last_modified': file_diff_reviewer.last_modified,
+                    'reviewed': file_diff_reviewer.reviewed
+                })
+
+        return get_template('mozreview/file_diff_reviewer_data.html').render(
+            Context({'file_diff_reviewer_list': file_diff_reviewer_list})
+        )
