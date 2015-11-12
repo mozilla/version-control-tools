@@ -90,29 +90,6 @@ of Mercurial.
 Assuming all tests pass you can do a little dance, then move on to the
 next step.
 
-Deploying the Mercurial Package
--------------------------------
-
-This information was basically copied from Mana:
-https://mana.mozilla.org/wiki/display/SYSADMIN/Building+and+Deploying+Mercurial+packages
-
-RPMs for Mercurial are built as part of continuous integration. You
-should be able to find some RPMs at
-https://ci.mozilla.org/job/version-control-tools/.
-
-.. code:: sh
-
-     ssh $ wget https://ci.mozilla.org/job/version-control-tools/lastSuccessfulBuild/artifact/rpms/<version>.rpm
-     ssh $ scp mercurial-${HG_VERSION}*.rpm mrepo1.dmz.scl3.mozilla.com:
-     ssh $ ssh -A mrepo1.dmz.scl3.mozilla.com
-     mrepo1 $ sudo mv mercurial-${HG_VERSION}*.rpm /data/mrepo-src/6Server-x86_64/mozilla
-     mrepo1 $ sudo update-mrepo mozilla # This part takes a few minutes
-     mrepo1 $ exit
-
-The package should now be built and live on Mozilla's yum repository.
-Now all that's left to do is coordinate the upgrade with other folks and
-do the actual upgrade.
-
 Coordinating the upgrade
 ------------------------
 
@@ -159,8 +136,6 @@ host and perform the upgrade.
 
    $ ssh ssh.mozilla.com -A
    ssh $ ssh hgweb1.dmz.scl3.mozilla.com
-   hgweb1 $ yum-wrapper clean metadata
-   hgweb1 $ yum-wrapper upgrade mercurial # (say Yes at the prompt or pass -y here)
    hgweb1 $ service httpd restart
 
 Repeat this procedure until all webheads have been upgraded.
