@@ -1,3 +1,7 @@
+TODO bug 1224320 moz.build doesn't work with code coverage enabled.
+Ensure code coverage isn't enabled
+  $ unset CODE_COVERAGE
+
   $ . $TESTDIR/hgext/hgmo/tests/helpers.sh
   $ startserver
 
