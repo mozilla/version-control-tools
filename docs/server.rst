@@ -8,8 +8,7 @@ hg.mozilla.org Hooks, Extensions, and Customizations Upgrade
 ============================================================
 
 All code running on the servers behind hg.mozilla.org is in the
-version-control-tools repository (or at least it should be - there are
-still some components coming from sysadmins Puppet).
+version-control-tools repository.
 
 Deployment of new code to hg.mozilla.org is performed via an Ansible
 playbook defined in the version-control-tools repository. To deploy new
@@ -52,41 +51,6 @@ This process has a few steps. You'll need to:
 *  Remove hosts from the Zeus load balancer
 *  Upgrade each host individually
 *  Re-add and confirm correctness
-
-Doing pre-upgrade tests
------------------------
-
-In this section we'll make sure that the Mercurial version upgrade isn't
-going to inadvertantly break things.
-
-You should start by having a checked out copy of mercurial-repo on your
-system. Once you have it, you'll want to ``hg pull`` to obtain the latest
-code, find the correct tag with ``hg tags``, then check it out with ``hg
-checkout``. You'll also want to read the logs between versions.
-
-.. code:: sh
-
-   $ hg clone https://selenic.com/hg mercurial-repo
-   $ cd mercurial-repo
-   $ hg checkout 3.2.2
-   $ hg log -r 3.2.1:3.2.2
-   ...
-
-Afterwards you'll want to run all the automated checks against this new
-code. See :ref:`devguide_testing`.
-
-The version-control-tools repository uses its own Mercurial version
-separate from your system (or previously cloned) Mercurial. As such,
-you'll have to specify it before the tests will run against the correct
-version. Afterwards, you can run the test suite against your new version
-of Mercurial.
-
-.. code:: sh
-
-   $ ./run-tests --with-hg=/path/to/system/hg
-
-Assuming all tests pass you can do a little dance, then move on to the
-next step.
 
 Coordinating the upgrade
 ------------------------
@@ -157,35 +121,6 @@ If you have cause for concern, the httpd's logs should be checked. These are
 located in /var/log/httpd/hg.mozilla.org/.
 
 If everything looks good, then re-add the host back to the node pool in Zeus.
-
-SSH Master hosts
-^^^^^^^^^^^^^^^^
-
-These hosts are also in Zeus, but belong to two different pools. The
-active one (typically pointing at ``hgssh1.dmz.scl3.mozilla.com``) and the
-``failover`` pool for when the active pool is not available (or
-intentionally disabled).
-
-First, start by upgading the failover host in a manner similar to the
-procedure described for the webheads (sans restarting httpd). Next,
-you'll need to wait until there is a period of no hg activity (described
-below), then ``Disable`` the host in Zeus. This will cause the failover
-pool to activate, directing traffic to ``hgssh2`` while you upgrade hgssh1.
-Repeat the upgrade procedure for hgssh1.
-
-Finding a period of inactivity on hgssh
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-There's no automated way of waiting for a period of inactivity here.
-You'll simply need to SSH into the running host (``hg.mozilla.org``) and run
-
-.. code:: sh
-
-   $ ps aux|grep hg
-
-Looking for currently running processes. If you can't find any, then
-it's safe to perform the Zeus SSH pool failover. If there are existing
-jobs running, plesae wait for them to finish.
 
 Forcing a hgweb Repository Re-clone
 ===================================
