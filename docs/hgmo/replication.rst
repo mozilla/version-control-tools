@@ -125,6 +125,25 @@ mirror goes offline for an extended period of time, it will resume
 applying the replication log where it left off when it reconnects to
 Kafka.
 
+Comparison to Legacy Replication System
+=======================================
+
+* Writing to replication log is synchronous with pushing but actual
+  replication is asynchronous. This means that pushes from the perspective
+  of clients are much faster.
+* Mirrors that are down will not slow down pushes since push operations
+  don't directly communicate with mirrors.
+* Mirrors that go down will recover and catch up on replication backlog
+  when they return to service (as opposed to requiring manual intervention
+  to correct).
+* Repository creation events will be automatically replicated.
+* hgrc changes will be replicated.
+* It will be much easier to write tools that key off the replication log
+  for performing additional actions (IRC notifications, e-mail notifications,
+  Git mirroring, bug updates, etc).
+* (Eventually) The window where inconsistent state is exposed on mirrors
+  will be shrunk drastically.
+
 Installation and Configuring
 ============================
 
