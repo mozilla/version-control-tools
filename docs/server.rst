@@ -47,8 +47,6 @@ This process has a few steps. You'll need to:
 *  Set up a version-control-tools testing environment
 *  Run tests against the new version in the version-control-tools
    testing environment
-*  Upload the system package to mrepo (Mozilla's internal RHEL yum
-   repository)
 *  Coordinate with build-sheriffs (and other releng folk) for an
    appropriate time to do the upgrade
 *  Remove hosts from the Zeus load balancer
