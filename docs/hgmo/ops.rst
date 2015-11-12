@@ -150,3 +150,114 @@ to the user as the reason the repository is read-only.
 To mark all repositories on hg.mozilla.org as read-only, create the
 ``/etc/mercurial/readonlyreason`` file. If the file has content, it will
 be printed to the user.
+
+.. _hgmo_ops_monitoring:
+
+Monitoring and Alerts
+=====================
+
+hg.mozilla.org is monitored by Nagios.
+
+check_zookeeper
+---------------
+
+check_zookeeper monitors the health of the ZooKeeper ensemble running on
+various servers. The check is installed on each server running
+ZooKeeper.
+
+The check verifies 2 distinct things: the health of an individual ZooKeeper
+node and the overall health of the ZooKeeper ensemble (cluster of nodes).
+Both types of checks should be configured where this check is running.
+
+Expected Output
+^^^^^^^^^^^^^^^
+
+When everything is functioning as intended, the output of this check
+should be::
+
+   zookeeper node and ensemble OK
+
+Failures of Individual Nodes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A series of checks will be performed against the individual ZooKeeper
+node. The following error conditions are possible:
+
+NODE CRITICAL - not responding "imok": <response>
+   The check sent a ``ruok`` request to ZooKeeper and the server failed to
+   respond with ``imok``. This typically means the node is in some kind of
+   failure state.
+
+NODE CRITICAL - not in read/write mode: <mode>
+   The check sent a ``isro`` request to ZooKeeper and the server did not
+   respond with ``rw``. This means the server is not accepting writes. This
+   typically means the node is in some kind of failure state.
+
+NODE WARNING - average latency higher than expected: <got> > <expected>
+   The average latency to service requests since last query is higher than
+   the configured limit. This node is possibly under higher-than-expected
+   load.
+
+NODE WARNING - open file descriptors above percentage limit: <value>
+   The underlying Java process is close to running out of available file
+   descriptors.
+
+   We should never see this alert in production.
+
+If any of these node errors is seen, ``#vcs`` should be notified and the
+on call person for these servers should be notified.
+
+Failures of Overall Ensemble
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A series of checks is performed against the ZooKeeper ensemble to check for
+overall health. These checks are installed on each server running ZooKeeper
+even though the check is seemingly redundant. The reason is each server may
+have a different perspective on ensemble state due to things like network
+partitions. It is therefore important for each server to perform the check
+from its own perspective.
+
+The following error conditions are possible:
+
+ENSEMBLE WARNING - node (HOST) not OK: <state>
+   A node in the ZooKeeper ensemble is not returning ``imok`` to an ``ruok``
+   request.
+
+   As long as this only occurs on a single node at a time, the overall
+   availability of the ZooKeeper ensemble is not compromised: things should
+   continue to work without service operation. If the operation of the
+   ensemble is compromised, a different error condition with a critical
+   failure should be raised.
+
+ENSEMBLE WARNING - socket error connecting to HOST: <error>
+   We were unable to speak to a host in the ensemble.
+
+   This error can occur if ZooKeeper is not running on a node it should be
+   running on.
+
+   As long as this only occurs on a single node at a time, the overall
+   availability of the ZooKeeper ensemble is not compromised.
+
+ENSEMBLE WARNING - node (HOST) is alive but not available
+   A ZooKeeper server is running but it isn't healthy.
+
+   This likely only occurs when the ZooKeeper ensemble is not fully available.
+
+ENSEMBLE CRITICAL - unable to find leader node; ensemble likely not writable
+   We were unable to identify a leader node in the ZooKeeper ensemble.
+
+   This error almost certainly means the ZooKeeper ensemble is down.
+
+ENSEMBLE WARNING - only have X/Y expected followers
+   This warning occurs when one or more nodes in the ZooKeeper ensemble
+   isn't present and following the leader node.
+
+   As long as we still have a quorum of nodes in sync with the leader,
+   the overall state of the ensemble should not be compromised.
+
+ENSEMBLE WARNING - only have X/Y in sync followers
+   This warning occurs when one or more nodes in the ZooKeeper ensemble
+   isn't in sync with the leader node.
+
+   This warning likely occurs after a node was restarted or experienced some
+   kind of event that caused it to get out of sync.

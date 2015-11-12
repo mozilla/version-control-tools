@@ -108,3 +108,19 @@
   with_items:
     - kafka
     - zookeeper
+
+# We can remove this is we ever install NRPE in Docker.
+- name: create directory for NRPE check configs
+  file: path=/etc/nagios/nrpe.d
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
+- name: install NRPE check config
+  copy: src=check_zookeeper.cfg
+        dest=/etc/nagios/nrpe.d/check_zookeeper.cfg
+        owner=root
+        group=root
+        mode=0644
+  notify: restart nrpe

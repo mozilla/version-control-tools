@@ -1,0 +1,229 @@
+#!/usr/bin/env python2.7
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This is a NRPE check for a Zookeeper cluster.
+
+import argparse
+import socket
+import sys
+
+
+class ZookeeperUnavailable(Exception):
+    """Raised when ZooKeeper isn't available."""
+
+def parse_zoocfg(p):
+    """Parse a zoo.cfg into a dict of key-value pairs."""
+    attrs = {}
+
+    with open(p, 'rb') as fh:
+        for line in fh:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+
+            k, v = line.split('=', 1)
+            attrs[k.strip()] = v.strip()
+
+    return attrs
+
+
+def get_servers_from_config(attrs):
+    """Return a dict of zk servers from a parsed zoo.cfg."""
+    s = {}
+    for k, v in attrs.items():
+        if not k.startswith('server.'):
+            continue
+
+        # Parse out port numbers.
+        v = v.split(':')[0]
+
+        s[k[len('server.'):]] = v
+
+    return s
+
+
+def send_zk_command(host, port, command):
+    """Send a ZooKeeper 4 letter command to a host:port."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(5.0)
+    s.connect((host, int(port)))
+    result = []
+    try:
+        s.sendall(command)
+        s.shutdown(socket.SHUT_WR)
+
+        while True:
+            data = s.recv(4096)
+            if not data:
+                break
+            result.append(data)
+    finally:
+        s.close()
+
+    res = ''.join(result)
+    if res.startswith('This ZooKeeper instance is not currently'):
+        raise ZookeeperUnavailable()
+
+    return res
+
+
+def send_monitor_command(host, port):
+    """Send and parse the "mntr" command to a host:port."""
+    res = send_zk_command(host, port, 'mntr').rstrip()
+
+    attrs = {}
+    for line in res.splitlines():
+        k, v = line.split('\t')
+
+        if k not in ('zk_version', 'zk_server_state'):
+            v = int(v)
+
+        attrs[k] = v
+
+    return attrs
+
+
+if __name__ == '__main__':
+    p = argparse.ArgumentParser()
+    p.add_argument('-H', '--host',
+                   help='host:port to verify zookeeper is healthy on')
+    p.add_argument('--max-average-latency', default=5000,
+                   help='maximum average latency before alerting')
+    p.add_argument('--max-file-descriptor-percentage', default=50,
+                   help='maximum percentage of file descriptors in use')
+    p.add_argument('-c', '--config', help='Path to zoo.cfg to read')
+
+    args = p.parse_args()
+
+    if not args.host and not args.config:
+        print('ERROR: must specify -H or -c')
+        sys.exit(2)
+
+    # We buffer warnings in case a critical failure comes along because we want
+    # the most important failure to be printed first.
+    exit = 0
+    warnings = []
+    notices = []
+
+    if args.host:
+        host, port = args.host.split(':')
+
+        # First verify "ruok" says node is healthy.
+        try:
+            res = send_zk_command(host, port, 'ruok').strip()
+            if res != 'imok':
+                print('NODE CRITICAL - not responding "imok": %s' % (
+                      args.host, res))
+                exit = 2
+
+            res = send_zk_command(host, port, 'isro').strip()
+            if res != 'rw':
+                print('NODE CRITICAL - not in read/write mode: %s' % (
+                      args.host, res))
+                exit = 2
+
+            state = send_monitor_command(host, port)
+            if state['zk_avg_latency'] >= args.max_average_latency:
+                print('NODE WARNING - average latency higher than expected: '
+                      '%d > %d' % (state['zk_avg_latency'],
+                                   args.max_average_latency))
+                exit = max(exit, 1)
+
+            fd_percent = (float(state['zk_open_file_descriptor_count']) /
+                          float(state['zk_max_file_descriptor_count']))
+            if fd_percent >= args.max_file_descriptor_percentage:
+                print('NODE WARNING - open file descriptors above percentage '
+                      'limit: %d' % state['zk_open_file_descriptor_count'])
+                exit = max(exit, 1)
+        except socket.error as e:
+            print('socket error connecting to %s: %s' % (host, e))
+            exit = 2
+
+    # Now verify cluster state.
+    if args.config:
+        config = parse_zoocfg(args.config)
+        servers = get_servers_from_config(config)
+
+        port = config.get('clientPort', '2181')
+        leader_state = None
+
+        # We should be able to reach every server.
+        for server_id, hostname in sorted(servers.items()):
+            try:
+                res = send_zk_command(hostname, port, 'ruok').strip()
+                if res != 'imok':
+                    warnings.append('ENSEMBLE WARNING - node (%s) not OK: '
+                                    '%s' % (hostname, res))
+                    exit = max(exit, 1)
+                    continue
+
+                state = send_monitor_command(hostname, port)
+                if state['zk_server_state'] == 'leader':
+                    leader_state = state
+                elif state['zk_server_state'] != 'follower':
+                    # This should never occur - I think.
+                    warnings.append('invalid server state on %s: %s' % (
+                                    hostname, state['zk_server_state']))
+                    exit = max(exit, 1)
+            except socket.error as e:
+                notices.append('ENSEMBLE WARNING - socket error connecting to '
+                               '%s: %s' % (hostname, e))
+                exit = max(exit, 1)
+            except ZookeeperUnavailable:
+                warnings.append('ENSEMBLE WARNING - node (%s) is alive but not '
+                                'available' % hostname)
+                exit = max(exit, 1)
+
+        if not leader_state:
+            print('ENSEMBLE CRITICAL - unable to find leader node; ensemble '
+                  'likely not writable')
+            exit = 2
+        else:
+            expected_followers = len(servers) - 1
+            if leader_state['zk_followers'] != expected_followers:
+                warnings.append('ENSEMBLE WARNING - only have %d/%d expected '
+                                'followers' % (leader_state['zk_followers'],
+                                               expected_followers))
+                exit = max(exit, 1)
+
+            if leader_state['zk_followers'] != leader_state['zk_synced_followers']:
+                warnings.append('ENSEMBLE WARNING - only have %d/%d in sync '
+                                'followers' % (
+                                    leader_state['zk_synced_followers'],
+                                    leader_state['zk_followers']))
+                exit = max(exit, 1)
+
+    # Reset stats.
+    # If we ever wish to collect ZK stats into Graphite, etc, then this is
+    # wrong, as it will impact metrics consumers.
+    if args.host:
+        host, port = args.host.split(':')
+        try:
+            send_zk_command(host, port, 'srst')
+        except socket.error:
+            pass
+
+    if not exit:
+        msg = ['zookeeper']
+        if args.host and args.config:
+            msg.append('node and ensemble')
+        elif args.host:
+            msg.append('node')
+        elif args.config:
+            msg.append('ensemble')
+        msg.append('OK')
+
+        print(' '.join(msg))
+
+    for w in warnings:
+        print(w)
+    for n in notices:
+        print(n)
+
+    print('')
+    print('See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html')
+    print('for more info on monitor and alerts.')
+
+    sys.exit(exit)
