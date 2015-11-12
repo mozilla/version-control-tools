@@ -17,7 +17,7 @@ import github
 import transplant
 sys.path = SYS_PATH
 
-
+@unittest.skip('this test needs to be rewritten as a .t test')
 class TestAutoland(unittest.TestCase):
 
     def test_transplant_to_mozreview(self):
