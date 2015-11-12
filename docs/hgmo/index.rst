@@ -14,3 +14,4 @@ hg.mozilla.org
    contributing
    mozbuildinfo
    replication
+   ops

@@ -1,8 +1,8 @@
-.. _server:
+.. _hgmo_ops:
 
-================================
-Mozilla Server Operational Guide
-================================
+=================
+Operational Guide
+=================
 
 hg.mozilla.org Hooks, Extensions, and Customizations Upgrade
 ============================================================
