@@ -257,7 +257,7 @@ learned how to create label-less DAG branches. Various Mercurial
 workflows use labels because they are more human friendly than
 SHA-1 fragments. But, they aren't required.
 
-.. info::
+.. note::
 
    The concept of label-less heads does not exist in Git: Git
    requires all heads to have a label (a Git branch name) or the

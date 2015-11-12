@@ -35,7 +35,7 @@ With Core Mercurial
 -------------------
 
 Found a bug in Mercurial? Have a performance concern? File a bug in
-`Mercurial's Bugzilla <https://bz.mercurial-scm.org/`_. Choose the *Mercurial*
+`Mercurial's Bugzilla <https://bz.mercurial-scm.org/>`_. Choose the *Mercurial*
 component if you are unsure what component to use.
 
 Before filing bugs, ensure you are using the latest Mercurial release. If not,

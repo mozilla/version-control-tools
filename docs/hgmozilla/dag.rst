@@ -93,7 +93,7 @@ This constitutes the *edge* and since the edge is directional
 *DAG*).
 
 Directed graphs borrow terminology from biology to represent
-relationships between nodes::
+relationships between nodes:
 
 parent node
    A node that came before another (is referred to by another node).
