@@ -4,8 +4,8 @@
 Operational Guide
 =================
 
-hg.mozilla.org Hooks, Extensions, and Customizations Upgrade
-============================================================
+Deploying to hg.mozilla.org
+===========================
 
 All code running on the servers behind hg.mozilla.org is in the
 version-control-tools repository.
@@ -22,105 +22,54 @@ code, simply run::
    will be installed on servers. Be aware of any local changes you have
    performed, as they might be reflected on the server.
 
-Mercurial Software Upgrade Instructions
-=======================================
+For minor deployments, pre-announcement of changes is not necessary: just do
+the deployment. As part of the deployment, an IRC notification will be issued
+in #vcs by Ansible.
 
-Targetted machines
-------------------
+For major upgrades (upgrading the Mercurial release or other major changes
+such as reconfiguring SSH settings or other changes that have a higher chance
+of fallout, pre-announcement is highly recommended.
 
-These instructions should enable anybody with the correct access and
-authorization to safely deploy a new version of Mercurial into
-production on:
+Pre-announcements should be made to
+`dev-version-control <mailto:dev-version-control@lists.mozilla.org>`_.
 
-*  hgwebXX.dmz.scl3.mozilla.com
-*  hgsshX.dmz.scl3.mozilla.com
-*  hgssh.stage.dmz.scl3.mozilla.com
-
-Overview
---------
-
-This process has a few steps. You'll need to:
-
-*  Read Mercurial's commit/change log to determine if there are any
-   concerning changes (optional)
-*  Set up a version-control-tools testing environment
-*  Run tests against the new version in the version-control-tools
-   testing environment
-*  Coordinate with build-sheriffs (and other releng folk) for an
-   appropriate time to do the upgrade
-*  Remove hosts from the Zeus load balancer
-*  Upgrade each host individually
-*  Re-add and confirm correctness
-
-Coordinating the upgrade
-------------------------
-
-Please get in touch with the sheriffs and person on build-duty about the
-work that you're doing. Tell them that you're upgrading Mercurial on the
-hg.mozilla.org servers and that you're following the instructions
-located here.
-
-You can find the on-duty Sheriff in ``#releng`` (they will have
-``|Sheriffduty`` appended to their name). You'll want to ping that person
-and anybody who has ``|buildduty`` next to their name as well. These will
-be the people who are the likeliest to tell you if something goes wrong
-with the upgrade. You'll also likely want to send an email to
-``sheriffs@mozilla.org`` explaining the work, so those thare are on duty
-next will be able to tell you if they find something funny later.
+Deployment-time announcements should be made in ``#vcs``. In addition, the
+on-duty Sheriff (they will have ``|Sheriffduty`` appended to their IRC nick)
+should be notified. Anyone in ``#releng`` with ``|buildduty`` in their IRC
+nick should also be notified. Sending an email to ``sheriffs@mozilla.org``
+can't also hurt.
 
 If extra caution is warranted, a bug should be filed against the Change Advisory
 Board. This board will help you schedule the upgrade work. Details can be found
 at https://wiki.mozilla.org/IT/ChangeControl.
 
-Performing the upgrade
-----------------------
+Deployment Gotchas
+------------------
 
-Webheads
-^^^^^^^^
+Not all processes are restarted as part of upgrades. Notably, the ``httpd`` +
+WSGI process trees are not restarted. This means that Python or Mercurial
+upgrades may not been seen until the next ``httpd`` service restart. For this
+reason, deployments of Mercurial upgrades should be followed by manually
+restarting ``httpd`` when each server is out of the load balancer.
 
-The next part will involve taking the hosts out of load balancer
-rotation an, upgrading their software, then adding them back in. Zeus is
-our internal load balancer, and each host has an entry in a *pool*. You
-can access the Zeus load balancer web interface at
-https://zlb1.ops.scl3.mozilla.com:9090. This is an IT-controlled host
-and thus the password is in the sysadmins gpg-encrypted keyring.
+Restarting httpd/wsgi Processes
+-------------------------------
 
-Using the Zeus web interface, you'll want to find the ``hgweb-http`` pool
-and open its pool page. After this, you'll change the first host's
-status to ``draining``, then click ``Update``. After the page reloads you'll
-see a little faucet next to the host. This means that the host is
-draining. If you hover your mouse over the faucet icon you'll see a
-tooltip saying ``X Connections``. When X reaches 0, no remaining HTTP
-connections exist to the host. This means it is safe to SSH into the
-host and perform the upgrade.
+.. note:: this should be codified in an Ansible playbook
 
-.. code:: sh
+If a restart of the ``httpd`` and WSGI process tree is needed, perform the
+following:
 
-   $ ssh ssh.mozilla.com -A
-   ssh $ ssh hgweb1.dmz.scl3.mozilla.com
-   hgweb1 $ service httpd restart
-
-Repeat this procedure until all webheads have been upgraded.
-
-Re-add and confirm correctness
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-After the host has been upgraded, it should be tested to ensure that the host is
-still serving correctly. There is no formal process to do this, as the testing
-is done previously through the v-c-t testing framework. Still, a good test is to
-run elinks against the localhost to ensure that the front page and a single
-repository will load.
-
-.. code:: sh
-
-   $ elinks -dump http://localhost/
-   ...
-   $ elinks -dump http://localhost/mozilla-central
-
-If you have cause for concern, the httpd's logs should be checked. These are
-located in /var/log/httpd/hg.mozilla.org/.
-
-If everything looks good, then re-add the host back to the node pool in Zeus.
+1. Log in to the Zeus load balancer at https://zlb1.ops.scl3.mozilla.com:9090
+2. Find the ``hgweb-http`` pool.
+3. Mark as host as ``draining`` then click ``Update``.
+4. Poll the *draining* host for active connections by SSHing into the host
+   and curling ``http://localhost/server-status?auto``. If you see more than
+   1 active connection (the connection performing server-status), repeat until
+   it goes away.
+5. ``service httpd restart``
+6. Put the host back in service in Zeus.
+7. Repeat 3 to 6 until done with all hosts.
 
 Forcing a hgweb Repository Re-clone
 ===================================
