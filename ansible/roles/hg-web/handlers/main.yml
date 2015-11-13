@@ -6,3 +6,6 @@
 - name: restart rsyslogd
   service: name=rsyslog state=restarted
   ignore_errors: True
+
+- name: reread supervisor
+  command: /usr/bin/supervisorctl reread

@@ -475,6 +475,7 @@
         owner=root
         group=root
         mode=0644
+  notify: reread supervisor
 
 # TODO restart vcsreplicator daemon.
 
