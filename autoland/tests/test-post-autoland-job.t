@@ -71,7 +71,7 @@ Post a job with try syntax
 Post a job using a bookmark
 
   $ echo foo2 > foo
-  $ hg commit -m 'Bug 1 - some stuff'
+  $ hg commit --encoding utf-8 -m 'Bug 1 - こんにちは'
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
@@ -86,8 +86,8 @@ Post a job using a bookmark
   summary:    Bug 1 - some stuff
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  2:53b624fb3597
-  summary:    Bug 1 - some stuff
+  changeset:  2:7561731d264a
+  summary:    Bug 1 - ?????
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   review id:  bz://1/mynick
@@ -97,15 +97,15 @@ Post a job using a bookmark
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` try http://localhost:9898 --push-bookmark "bookmark"
   (200, u'{\n  "request_id": 4\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 4 --poll
-  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "bookmark", \n  "result": "*", \n  "rev": "53b624fb3597", \n  "tree": "test-repo", \n  "trysyntax": ""\n}') (glob)
+  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "bookmark", \n  "result": "7561731d264a", \n  "rev": "7561731d264a", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
 
 Post a job with commit descriptions to be rewritten
 
   $ REV=`hg log -r . --template "{node|short}"`
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --commit-descriptions "{\"$REV\": \"even better description\"}"
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --commit-descriptions "{\"$REV\": \"even better \\u3053\\u3093\\u306b\\u3061\\u306f\"}"
   (200, u'{\n  "request_id": 5\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 5 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "53b624fb3597": "even better description"\n  }, \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "53b624fb3597", \n  "tree": "test-repo", \n  "trysyntax": ""\n}') (glob)
+  (200, u'{\n  "commit_descriptions": {\n    "7561731d264a": "even better \\u3053\\u3093\\u306b\\u3061\\u306f"\n  }, \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "7561731d264a", \n  "rev": "7561731d264a", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
 
 Getting status for an unknown job should return a 404
 
