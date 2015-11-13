@@ -1,3 +1,6 @@
+# Uncomment to enable new experimental replication system.
+#%include /etc/mercurial/hgrc-vcsreplicator
+
 [trusted]
 users = hg, root
 groups = scm_level_1, scm_level_2, scm_level_3, scm_l10n, scm_private, scm_l10n_infra, scm_sec_sensitive, scm_l10n_drivers, scm_nss
