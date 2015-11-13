@@ -53,40 +53,41 @@ class Config(object):
 
         return None
 
-    def get_client_from_section(self, section):
+    def get_client_from_section(self, section, timeout=-1):
         """Obtain a KafkaClient from a config section.
 
         The config section must have a ``hosts`` and ``client_id`` option.
         An optional ``connect_timeout`` defines the connection timeout.
+
+        ``timeout`` specifies how many seconds to retry attempting to connect
+        to Kafka in case the initial connection failed. -1 indicates to not
+        retry. This is useful when attempting to connect to a cluster that may
+        still be coming online, for example.
         """
         hosts = self.c.get(section, 'hosts')
         client_id = self.c.get(section, 'client_id')
-        timeout = 60
+        connect_timeout = 60
         if self.c.has_option(section, 'connect_timeout'):
-            timeout = self.c.getint(section, 'connect_timeout')
+            connect_timeout = self.c.getint(section, 'connect_timeout')
 
-        return KafkaClient(hosts, client_id=client_id, timeout=timeout)
+        start = time.time()
+        while True:
+            try:
+                return KafkaClient(hosts, client_id=client_id,
+                        timeout=connect_timeout)
+            except KafkaUnavailableError:
+                if timeout == -1:
+                    raise
+
+            if time.time() - start > timeout:
+                raise Exception('timeout reached trying to connect to Kafka')
+
+            time.sleep(0.1)
 
     @property
     def consumer(self):
         if not self._consumer:
-            # We manually catch KafkaUnavailableError because it occurs when
-            # all hosts in the cluster are not responding. We shouldn't see
-            # this in production. However, it does happen quite a lot when
-            # Docker containers start. It is easiest to not have the log spam.
-            start = time.time()
-            while True:
-                try:
-                    client = self.get_client_from_section('consumer')
-                    break
-                except KafkaUnavailableError:
-                    pass
-
-                if time.time() - start > 30:
-                    raise Exception('timeout reached trying to connect to Kafka')
-
-                time.sleep(0.1)
-
+            client = self.get_client_from_section('consumer', timeout=30)
             topic = self.c.get('consumer', 'topic')
             group = self.c.get('consumer', 'group')
 
