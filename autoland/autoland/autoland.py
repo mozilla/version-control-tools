@@ -222,6 +222,9 @@ def handle_pending_transplants(logger, dbconn):
             continue
 
         attempts = 0
+        logger.info('initiating transplant from tree: %s rev: %s '
+                    'to destination: %s' % (tree, rev, destination))
+        started = datetime.datetime.now()
         while attempts < MAX_TRANSPLANT_ATTEMPTS:
             # TODO: We should break the transplant call into two steps, one
             #       to pull down the commits to transplant, and another
@@ -237,9 +240,7 @@ def handle_pending_transplants(logger, dbconn):
             attempts += 1
 
         if landed:
-            logger.info(('transplanted from tree: %s rev: %s'
-                         ' to destination: %s new revision: %s') %
-                        (tree, rev, destination, result))
+            logger.info('transplant successful - new revision: %s' % result)
         else:
             if 'is CLOSED!' in result:
                 logger.info('transplant failed: tree: %s is closed - '
@@ -255,6 +256,9 @@ def handle_pending_transplants(logger, dbconn):
                 logger.info('transplant failed: tree: %s rev: %s '
                             'destination: %s error: %s' %
                             (tree, rev, destination, result))
+
+        completed = datetime.datetime.now()
+        logger.info('elapsed transplant time: %s' % (completed - started))
 
         # set up data to be posted back to mozreview
         data = {
