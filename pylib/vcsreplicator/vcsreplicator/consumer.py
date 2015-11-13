@@ -37,20 +37,23 @@ class Consumer(SimpleConsumer):
     def get_message(self, timeout=0.1):
         """Obtain and decode a message.
 
-        If a message is available, it returns a tuple of the original
-        OffsetAndMessage and the decoded payload, as a Python type.
-        If a message is not available, None is returned.
+        If a message is available, it returns a tuple of the partition,
+        original ``OffsetAndMessage`` and the decoded payload, as a Python
+        type. If a message is not available, ``None`` is returned.
         """
-        message = super(Consumer, self).get_message(timeout=timeout)
-        if not message:
-            return message
+        res = super(Consumer, self).get_message(timeout=timeout,
+                get_partition_info=True)
+        if res is None:
+            return None
+
+        partition, message = res
 
         d = message.message.value
         if not d.startswith('1\n'):
             raise ValueError('unrecognized message payload. this is bad')
 
         payload = json.loads(d[2:])
-        return message, payload
+        return partition, message, payload
 
 
 def consume(config, consumer, timeout=0.1, onetime=False):
@@ -58,8 +61,10 @@ def consume(config, consumer, timeout=0.1, onetime=False):
     while True:
         r = consumer.get_message(timeout=timeout)
         if r:
-            process_message(config, r[1])
-            consumer.commit()
+            partition, message, payload = r
+            process_message(config, payload)
+            # Only commit offset from partition message came from.
+            consumer.commit(partitions=[partition])
 
         if onetime:
             break
@@ -204,7 +209,7 @@ if __name__ == '__main__':
             m = consumer.get_message()
             if not m:
                 break
-            messages.append(m[1])
+            messages.append(m[2])
 
         print(yaml.safe_dump(messages, default_flow_style=False).rstrip())
         sys.exit(0)
