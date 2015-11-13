@@ -53,7 +53,12 @@ class Config(object):
 
         return None
 
-    def _get_client_from_section(self, section):
+    def get_client_from_section(self, section):
+        """Obtain a KafkaClient from a config section.
+
+        The config section must have a ``hosts`` and ``client_id`` option.
+        An optional ``connect_timeout`` defines the connection timeout.
+        """
         hosts = self.c.get(section, 'hosts')
         client_id = self.c.get(section, 'client_id')
         timeout = 60
@@ -72,7 +77,7 @@ class Config(object):
             start = time.time()
             while True:
                 try:
-                    client = self._get_client_from_section('consumer')
+                    client = self.get_client_from_section('consumer')
                     break
                 except KafkaUnavailableError:
                     pass
