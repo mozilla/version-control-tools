@@ -46,7 +46,8 @@ def pretxnopenhook(ui, repo, **kwargs):
     writability when we open transactions so we fail fast.
     """
     try:
-        vcsrproducer.send_heartbeat(ui.replicationproducer)
+        vcsrproducer.send_heartbeat(ui.replicationproducer,
+                                    partition=repo.replicationpartition)
     except Exception:
         ui.warn('replication log not available; all writes disabled\n')
         return 1
@@ -78,7 +79,8 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
 
 def pretxnclosehook(ui, repo, **kwargs):
     try:
-        vcsrproducer.send_heartbeat(ui.replicationproducer)
+        vcsrproducer.send_heartbeat(ui.replicationproducer,
+                                    repo.replicationpartition)
     except Exception:
         ui.warn('replication log not available; cannot close transaction\n')
         return True
@@ -111,7 +113,8 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
                                        repo.replicationwireprotopath,
                                        source,
                                        pushnodes,
-                                       pushheads)
+                                       pushheads,
+                                       partition=repo.replicationpartition)
     duration = time.time() - start
     ui.status(_('recorded changegroup in replication log in %.3fs\n') % duration)
 
@@ -126,7 +129,8 @@ def sendpushkeymessages(ui, repo):
                                        key,
                                        old,
                                        new,
-                                       ret)
+                                       ret,
+                                       partition=repo.replicationpartition)
         duration = time.time() - start
         ui.status(_('recorded updates to %s in replication log in %.3fs\n') % (
                     namespace, duration))
@@ -150,7 +154,8 @@ def initcommand(orig, ui, dest, **opts):
     repo = hg.repository(ui, path)
 
     # TODO we should delete the repo if we can't write this message.
-    vcsrproducer.record_new_hg_repo(producer, repo.replicationwireprotopath)
+    vcsrproducer.record_new_hg_repo(producer, repo.replicationwireprotopath,
+                                    partition=repo.replicationpartition)
     ui.status(_('(recorded repository creation in replication log)\n'))
 
     return res
@@ -173,7 +178,8 @@ def replicatehgrc(ui, repo):
 
     producer = ui.replicationproducer
     vcsrproducer.record_hgrc_update(producer, repo.replicationwireprotopath,
-                                    content)
+                                    content,
+                                    partition=repo.replicationpartition)
     ui.status(_('recorded hgrc in replication log\n'))
 
 
@@ -318,5 +324,15 @@ def reposetup(ui, repo):
                     return dest + self.root[len(source):]
 
             return self.root
+
+        @property
+        def replicationpartition(self):
+            """The partition to use when writing replication messages.
+
+            The partition is derived from the repo's wire protocol path and
+            an optional partition mapping declaration.
+            """
+            # TODO implement mapping.
+            return 0
 
     repo.__class__ = replicatingrepo
