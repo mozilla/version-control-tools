@@ -52,7 +52,7 @@ Just a user name with no email is rejected
 Just an email address is rejected
 
   $ hg commit --amend -u 'someone@example.com' -m invalid
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/d28cf3d35b22-3e561411-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/d28cf3d35b22-*amend-backup.hg (glob)
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -81,7 +81,7 @@ Just an email address is rejected
 Just an email address in brackets is rejected
 
   $ hg commit --amend -u '<someone@example.com>' -m invalid
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/7912d5cf9855-ac6aad27-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/7912d5cf9855-*amend-backup.hg (glob)
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -110,7 +110,7 @@ Just an email address in brackets is rejected
 No space between author and email is rejected
 
   $ hg commit --amend -u 'No Space<someone@example.com>' -m invalid
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/171604c7eccc-0285e4c9-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/171604c7eccc-*amend-backup.hg (glob)
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -139,7 +139,7 @@ No space between author and email is rejected
 Multiple angle brackets are rejected
 
   $ hg commit --amend -u 'Multiple LessThan <<someone@example.com>' -m invalid
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/c7bd56f10523-a3c3737b-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/c7bd56f10523-*amend-backup.hg (glob)
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -166,7 +166,7 @@ Multiple angle brackets are rejected
   [255]
 
   $ hg commit --amend -u 'Multiple GreaterTHan <someone@example.com>>' -m invalid
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/3ff22b11fa53-a2861ff2-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/3ff22b11fa53-*amend-backup.hg (glob)
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -195,7 +195,7 @@ Multiple angle brackets are rejected
 More complicated strings are rejected
 
   $ hg commit --amend -u 'First Author <someone1@example.com>, Second Author <someone@example.com>' -m invalid
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/57a242fa12b7-1da20aa0-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/57a242fa12b7-*amend-backup.hg (glob)
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -222,7 +222,7 @@ More complicated strings are rejected
   [255]
 
   $ hg commit --amend -u 'First Author <someone1@example.com> with tweaks by Second Author <someone2@example.com>' -m invalid
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/ee5f32d2fdc3-17e4c454-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/ee5f32d2fdc3-*amend-backup.hg (glob)
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -251,7 +251,7 @@ More complicated strings are rejected
 Emails without @<domain> are rejected
 
   $ hg commit --amend -u 'Valid Author <someone>' -m invalid
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/ccd3d34a2a22-590fe923-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/ccd3d34a2a22-*amend-backup.hg (glob)
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -280,7 +280,7 @@ Emails without @<domain> are rejected
 Multiple changesets are listed in error message
 
   $ hg commit --amend -u 'Valid User <valid@example.com>' -m valid
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/514432ecc4d9-4a80f047-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/514432ecc4d9-*amend-backup.hg (glob)
   $ echo invalid1 > foo
   $ hg commit -u 'Invalid' -m invalid1
   $ echo invalid2 > foo
