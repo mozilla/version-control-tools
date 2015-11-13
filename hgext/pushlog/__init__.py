@@ -261,8 +261,8 @@ class pushlog(object):
                         'nodes': [self.repo[n].hex() for n in nodes],
                     })
                     ui.status('recorded push in unified pushlog\n')
-                except Exception as e:
-                    ui.warn('error writing to unified pushlog\n' % e)
+                except Exception:
+                    ui.warn('error writing to unified pushlog\n')
 
         def onabort(tr):
             # Only false when called from commit() below.
