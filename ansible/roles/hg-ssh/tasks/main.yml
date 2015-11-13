@@ -270,6 +270,30 @@
         group=hg
         mode=0644
 
+- name: create directory for Nagios files
+  file: path={{ item }}
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+  with_items:
+    - /etc/nagios/nrpe.d
+    - /usr/lib64/nagios/plugins/custom
+
+- name: install Nagios check for hg writing into kafka
+  copy: src=check_kafka_hg_heartbeat
+        dest=/usr/lib64/nagios/plugins/custom/check_kafka_hg_heartbeat
+        owner=root
+        group=root
+        mode=0755
+
+- name: install NRPE check config
+  copy: src=check_kafka_hg_heartbeat.cfg
+        dest=/etc/nagios/nrpe.d/check_kafka_hg_heartbeat.cfg
+        owner=root
+        group=root
+        mode=0644
+
 # Pull in tasks shared between hg-ssh and hg-web.
 # This should run last to ensure all preconditions are met.
 - include: ../../../tasks/hgmo-extensions.yml

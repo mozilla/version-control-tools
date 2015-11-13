@@ -1,0 +1,26 @@
+#!/repo/hg/venv_tools/bin/python2.7
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This is a NRPE check that verifies we can write a heartbeat message to
+# the VCS replication topic.
+
+import subprocess
+import sys
+
+args = ['/repo/hg/venv_tools/bin/hg', 'sendheartbeat']
+
+try:
+    out = subprocess.check_output(args, stderr=subprocess.STDOUT)
+    print('OK - %s' % out.strip())
+    exit = 0
+except subprocess.CalledProcessError as e:
+    print('CRITICAL - %s' % e.output.strip())
+    print('')
+    print('Unable to write message into replication log. This likely ')
+    print('means incoming pushes will be denied since they will unable to ')
+    print('be replicated.')
+    exit = 2
+
+sys.exit(exit)
