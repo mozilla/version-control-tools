@@ -13,6 +13,7 @@ import time
 import hglib
 from kafka.consumer import SimpleConsumer
 
+from .util import wait_for_topic
 
 logger = logging.getLogger('vcsreplicator.consumer')
 
@@ -188,8 +189,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     config = Config(filename=args.config)
-
-    consumer = config.consumer
+    client = config.get_client_from_section('consumer', timeout=30)
+    topic = config.c.get('consumer', 'topic')
+    group = config.c.get('consumer', 'group')
+    wait_for_topic(client, topic, 30)
+    consumer = Consumer(client, group, topic, None)
 
     if args.start_from:
         consumer.seek(args.start_from, 0)

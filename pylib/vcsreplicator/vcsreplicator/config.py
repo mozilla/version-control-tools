@@ -11,9 +11,6 @@ import time
 from kafka.client import KafkaClient
 from kafka.common import KafkaUnavailableError
 
-from .consumer import Consumer
-from .util import wait_for_topic
-
 
 class Config(object):
     def __init__(self, filename=None):
@@ -24,8 +21,6 @@ class Config(object):
                 raise ValueError('config file does not exist: %s' % filename)
 
             self.c.read(filename)
-
-        self._consumer = None
 
         if self.c.has_section('path_rewrites'):
             self._path_rewrites = self.c.items('path_rewrites')
@@ -84,15 +79,3 @@ class Config(object):
                 raise Exception('timeout reached trying to connect to Kafka')
 
             time.sleep(0.1)
-
-    @property
-    def consumer(self):
-        if not self._consumer:
-            client = self.get_client_from_section('consumer', timeout=30)
-            topic = self.c.get('consumer', 'topic')
-            group = self.c.get('consumer', 'group')
-
-            wait_for_topic(client, topic, timeout=30)
-            self._consumer = Consumer(client, group, topic, None)
-
-        return self._consumer
