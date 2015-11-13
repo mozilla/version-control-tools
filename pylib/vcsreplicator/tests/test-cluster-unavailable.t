@@ -103,9 +103,8 @@ Fully stopping the cluster shoud result in sane error message
   abort: pretxnopen.vcsreplicator hook failed
   [255]
 
-Starting the cluster after full stop should still error because cluster
-is configured to not restart after full state loss without human
-intervention
+Starting the cluster after full stop should work as long as there was a
+clean shutdown (which there was).
 
   $ hgmo exec hgssh /usr/bin/supervisorctl start kafka
   kafka: started
@@ -114,14 +113,21 @@ intervention
   $ hgmo exec hgweb1 /usr/bin/supervisorctl start kafka
   kafka: started
 
-  $ sleep 3
-
   $ hg push
   pushing to ssh://*:$HGPORT/mozilla-central (glob)
   searching for changes
-  remote: replication log not available; all writes disabled
-  abort: pretxnopen.vcsreplicator hook failed
-  [255]
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+  remote: recorded push in unified pushlog
+  remote: legacy replication of phases disabled because vcsreplicator is loaded
+  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/mozilla-central/rev/324ebd5068e8
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
 
 Cleanup
 
