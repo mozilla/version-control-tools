@@ -8,24 +8,6 @@
 No config with extension installed should cause immediate abort
 
   $ hg st
-  abort: replication.role config option not set
-  [255]
-
-Invalid replication.role results in error
-
-  $ hg --config replication.role=invalid st
-  abort: unsupported value for replication.role: invalid
-  (expected "producer" or "consumer")
-  [255]
-
-  $ cat >> .hg/hgrc << EOF
-  > [replication]
-  > role = producer
-  > EOF
-
-Missing hosts
-
-  $ hg st
   abort: replicationproducer.hosts config option not set
   [255]
 

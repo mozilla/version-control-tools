@@ -4,9 +4,6 @@
 [extensions]
 vcsreplicator = /repo/hg/version-control-tools/pylib/vcsreplicator/vcsreplicator/hgext.py
 
-[replication]
-role = producer
-
 [replicationproducer]
 hosts = {% for host in zk_servers %}{{ host}}:9092{% if not loop.last%}, {% endif %}{% endfor %}
 

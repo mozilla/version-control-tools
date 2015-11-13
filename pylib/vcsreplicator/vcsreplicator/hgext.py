@@ -219,42 +219,36 @@ def extsetup(ui):
 def uisetup(ui):
     # We assume that if the extension is loaded that we want replication
     # support enabled. Validate required config options are present.
-    role = ui.config('replication', 'role')
-    if not role:
-        raise util.Abort('replication.role config option not set')
-
-    if role not in ('producer', 'consumer'):
-        raise util.Abort('unsupported value for replication.role: %s' % role,
-                         hint='expected "producer" or "consumer"')
-
-    section = 'replication%s' % role
-    hosts = ui.configlist(section, 'hosts')
+    hosts = ui.configlist('replicationproducer', 'hosts')
     if not hosts:
-        raise util.Abort('%s.hosts config option not set' % section)
-    clientid = ui.config(section, 'clientid')
+        raise util.Abort('replicationproducer.hosts config option not set')
+
+    clientid = ui.config('replicationproducer', 'clientid')
     if not clientid:
-        raise util.Abort('%s.clientid config option not set' % section)
-    timeout = ui.configint(section, 'connecttimeout', 10)
+        raise util.Abort('replicationproducer.clientid config option not set')
+
+    timeout = ui.configint('replicationproducer', 'connecttimeout', 10)
+
+    topic = ui.config('replicationproducer', 'topic')
+    if not topic:
+        raise util.Abort('replicationproducer.topic config option not set')
 
     def havepartitionmap():
-        for k, v in ui.configitems(section):
+        for k, v in ui.configitems('replicationproducer'):
             if k.startswith('partitionmap.'):
                 return True
         return False
 
-    if role == 'producer':
-        topic = ui.config(section, 'topic')
-        if not topic:
-            raise util.Abort('%s.topic config option not set' % section)
-        if not havepartitionmap():
-            raise util.Abort('%s.partitionmap.* config options not set' %
-                             section)
-        reqacks = ui.configint(section, 'reqacks', default=999)
-        if reqacks not in (-1, 0, 1):
-            raise util.Abort('%s.reqacks must be set to -1, 0, or 1' % section)
-        acktimeout = ui.configint(section, 'acktimeout')
-        if not acktimeout:
-            raise util.Abort('%s.acktimeout config option not set' % section)
+    if not havepartitionmap():
+        raise util.Abort('replicationproducer.partitionmap.* config options not set')
+
+    reqacks = ui.configint('replicationproducer', 'reqacks', default=999)
+    if reqacks not in (-1, 0, 1):
+        raise util.Abort('replicationproducer.reqacks must be set to -1, 0, or 1')
+
+    acktimeout = ui.configint('replicationproducer', 'acktimeout')
+    if not acktimeout:
+        raise util.Abort('replicationproducer.acktimeout config option not set')
 
     class replicatingui(ui.__class__):
         @property
