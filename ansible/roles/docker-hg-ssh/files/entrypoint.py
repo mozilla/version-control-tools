@@ -53,6 +53,17 @@ else:
 
 subprocess.check_call(['/entrypoint-kafkabroker'])
 
+# Update the Kafka connect servers in the vcsreplicator config.
+kafka_servers = open('/kafka-servers', 'rb').read().splitlines()[2:]
+kafka_servers = ['%s:9092' % s.split(':')[0] for s in kafka_servers]
+hgrc_lines = open('/etc/mercurial/hgrc-vcsreplicator', 'rb').readlines()
+with open('/etc/mercurial/hgrc-vcsreplicator', 'wb') as fh:
+    for line in hgrc_lines:
+        if line.startswith('hosts = '):
+            line = 'hosts = %s\n' % ', '.join(kafka_servers)
+
+        fh.write(line)
+
 subprocess.check_call(['/sbin/service', 'rsyslog', 'start'])
 
 os.execl(sys.argv[1], *sys.argv[1:])

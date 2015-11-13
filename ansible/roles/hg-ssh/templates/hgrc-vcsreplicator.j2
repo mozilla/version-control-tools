@@ -8,8 +8,8 @@ vcsreplicator = /repo/hg/version-control-tools/pylib/vcsreplicator/vcsreplicator
 role = producer
 
 [replicationproducer]
-# TODO make dynamic
-hosts = localhost:9092
+hosts = {% for host in zk_servers %}{{ host}}:9092{% if not loop.last%}, {% endif %}{% endfor %}
+
 clientid = 1
 topic = pushdata
 partition = 0

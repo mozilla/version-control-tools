@@ -129,6 +129,33 @@ clean shutdown (which there was).
   remote:   https://hg.mozilla.org/mozilla-central/rev/324ebd5068e8
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
+Stopping Kafka on hgssh node doesn't break pushes
+(hgssh is special because it is listed first in the connection string)
+
+  $ hgmo exec hgssh /usr/bin/supervisorctl stop kafka
+  kafka: stopped
+
+  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
+  wrote heartbeat message into replication log
+
+  $ echo disabled-hgssh > foo
+  $ hg commit -m 'disabled hgssh'
+  $ hg push
+  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+  remote: recorded push in unified pushlog
+  remote: legacy replication of phases disabled because vcsreplicator is loaded
+  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/mozilla-central/rev/145bfa9e3455
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
+
 Cleanup
 
   $ hgmo stop

@@ -216,11 +216,11 @@
   copy: src=hgrc dest=/etc/mercurial/hgrc mode=0664 owner=root group=root
 
 - name: install one-off vcsreplicator config until it is merged into global one
-  copy: src=hgrc-vcsreplicator
-        dest=/etc/mercurial/hgrc-vcsreplicator
-        mode=0644
-        owner=root
-        group=root
+  template: src=hgrc-vcsreplicator.j2
+            dest=/etc/mercurial/hgrc-vcsreplicator
+            mode=0644
+            owner=root
+            group=root
 
 # pash is a collection of Python files handling SSH connections. They behave
 # like a Python module but are installed not as such for historical reasons.
