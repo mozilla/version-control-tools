@@ -88,12 +88,12 @@
       run_once: true
 
     - name: create kafka topics
-      command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --create --topic {{ item }} --partitions 1 --replication-factor {{ kafka_replication_factor }} --config min.insync.replicas={{ kafka_min_insync_replicas }} --config unclean.leader.election.enable=false --config max.message.bytes=104857600
+      command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --create --topic {{ item.topic }} --partitions {{ item.partitions }} --replication-factor {{ kafka_replication_factor }} --config min.insync.replicas={{ kafka_min_insync_replicas }} --config unclean.leader.election.enable=false --config max.message.bytes=104857600
       when: "'{{ item }}' not in kafka_topics.stdout_lines"
       run_once: true
       with_items:
-        - pushdata
-        - pushlog
+        - { topic: pushdata, partitions: 8 }
+        - { topic: pushlog, partitions: 1 }
 
     - name: record deployment of this changeset
       copy: dest=/etc/mercurial/deployed_vct_changeset

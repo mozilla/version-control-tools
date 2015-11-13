@@ -21,7 +21,21 @@ Creating a repository should record an event saying so
 
   $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
   No handlers could be found for logger "kafka.conn"
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=all (glob)
+  No handlers could be found for logger "kafka.conn"
+  No handlers could be found for logger "kafka.conn"
+  No handlers could be found for logger "kafka.conn"
+  No handlers could be found for logger "kafka.conn"
+  No handlers could be found for logger "kafka.conn"
+  No handlers could be found for logger "kafka.conn"
+  No handlers could be found for logger "kafka.conn"
+  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   * vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central (glob)
 
   $ hgmo exec hgweb0 ls /repo/hg/mozilla

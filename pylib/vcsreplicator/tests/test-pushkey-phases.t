@@ -45,7 +45,7 @@ Create the repository and push a change
 
 There should be no pushkey on a push with a draft changeset
 
-  $ consumer --dump
+  $ consumer --dump --partition 2
   - name: heartbeat-1
   - name: heartbeat-1
   - heads:
@@ -76,7 +76,7 @@ Locally bumping changeset to public will trigger a pushkey
   remote: recorded updates to phases in replication log in \d\.\d+s (re)
   [1]
 
-  $ consumer --dump
+  $ consumer --dump --partition 2
   - name: heartbeat-1
   - name: heartbeat-1
   - key: 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -121,7 +121,7 @@ processing on the mirror.
   remote:   https://hg.mozilla.org/mozilla-central/rev/fde0c4117655
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
-  $ consumer --dump
+  $ consumer --dump --partition 2
   - name: heartbeat-1
   - name: heartbeat-1
   - heads:
@@ -159,7 +159,7 @@ Now simulate a consumer that is multiple pushes behind
   $ hg phase --public -r .
   $ hg -q push
 
-  $ consumer --dump
+  $ consumer --dump --partition 2
   - name: heartbeat-1
   - name: heartbeat-1
   - heads:

@@ -34,7 +34,7 @@ Create the repository and push a change
 
 Phases should be updated on normal push
 
-  $ consumer --dump
+  $ consumer --dump --partition 2
   - name: heartbeat-1
   - name: heartbeat-1
   - heads:
@@ -63,7 +63,7 @@ Creating a bookmark will write a pushkey message
   exporting bookmark my-bookmark
   [1]
 
-  $ consumer --dump
+  $ consumer --dump --partition 2
   - name: heartbeat-1
   - name: heartbeat-1
   - key: my-bookmark
@@ -144,7 +144,7 @@ bookmark attached.
 
 We should have 2 changegroup messages
 
-  $ consumer --dump
+  $ consumer --dump --partition 2
   - name: heartbeat-1
   - name: heartbeat-1
   - heads:

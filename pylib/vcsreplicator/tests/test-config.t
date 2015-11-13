@@ -57,7 +57,7 @@ No partition
   > EOF
 
   $ hg st
-  abort: replicationproducer.partition config option not set
+  abort: replicationproducer.partition or replicationproducer.partitionmap.* config options not set
   [255]
 
 Non-integer partition

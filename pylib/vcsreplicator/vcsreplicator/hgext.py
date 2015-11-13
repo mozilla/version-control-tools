@@ -5,8 +5,10 @@
 
 from __future__ import absolute_import
 
+import hashlib
 import logging
 import os
+import re
 import time
 
 import kafka.client as kafkaclient
@@ -141,7 +143,10 @@ def initcommand(orig, ui, dest, **opts):
     # system is online. This helps guard against us creating the repo
     # and replication being offline.
     producer = ui.replicationproducer
-    vcsrproducer.send_heartbeat(producer)
+    # TODO this should ideally go to same partition as replication event.
+    for partition in sorted(ui.replicationpartitions):
+        vcsrproducer.send_heartbeat(producer, partition=partition)
+        break
 
     res = orig(ui, dest=dest, **opts)
 
@@ -192,7 +197,9 @@ def sendheartbeat(ui):
     This is useful to see if the replication mechanism is writable.
     """
     try:
-        vcsrproducer.send_heartbeat(ui.replicationproducer)
+        for partition in ui.replicationpartitions:
+            vcsrproducer.send_heartbeat(ui.replicationproducer,
+                                        partition=partition)
     except kafkacommon.KafkaError as e:
         raise error.Abort('error sending heartbeat: %s' % e.message)
 
@@ -229,13 +236,20 @@ def uisetup(ui):
         raise util.Abort('%s.clientid config option not set' % section)
     timeout = ui.configint(section, 'connecttimeout', 10)
 
+    def havepartitionmap():
+        for k, v in ui.configitems(section):
+            if k.startswith('partitionmap.'):
+                return True
+        return False
+
     if role == 'producer':
         topic = ui.config(section, 'topic')
         if not topic:
             raise util.Abort('%s.topic config option not set' % section)
         partition = ui.configint(section, 'partition', -1)
-        if partition == -1:
-            raise util.Abort('%s.partition config option not set' % section)
+        if partition == -1 and not havepartitionmap():
+            raise util.Abort('%s.partition or %s.partitionmap.* config '
+                             'options not set' % (section, section))
         reqacks = ui.configint(section, 'reqacks', default=999)
         if reqacks not in (-1, 0, 1):
             raise util.Abort('%s.reqacks must be set to -1, 0, or 1' % section)
@@ -266,6 +280,32 @@ def uisetup(ui):
             return vcsrproducer.Producer(client, topic, 0, batch_send=False,
                                          req_acks=reqacks,
                                          ack_timeout=acktimeout)
+
+        @property
+        def replicationpartitionmap(self):
+            pm = {}
+            for k, v in self.configitems('replicationproducer'):
+                if not k.startswith('partitionmap.'):
+                    continue
+
+                parts, expr = v.split(':', 1)
+                parts = [int(x.strip()) for x in parts.split(',')]
+                pm[k[len('partitionmap.'):]] = (parts, re.compile(expr))
+
+            if not pm:
+                explicit = self.configint('replicationproducer', 'partition', -1)
+                if explicit == -1:
+                    raise error.Abort(_('partitions not defined'))
+                pm['0'] = (explicit, re.compile('.*'))
+
+            return pm
+
+        @property
+        def replicationpartitions(self):
+            s = set()
+            for partitions, expr in self.replicationpartitionmap.values():
+                s |= set(partitions)
+            return s
 
     ui.__class__ = replicatingui
 
@@ -332,7 +372,23 @@ def reposetup(ui, repo):
             The partition is derived from the repo's wire protocol path and
             an optional partition mapping declaration.
             """
-            # TODO implement mapping.
-            return 0
+            pm = self.ui.replicationpartitionmap
+            path = self.replicationwireprotopath
+
+            for k, (parts, expr) in sorted(pm.items()):
+                if not expr.match(path):
+                    continue
+
+                # Hash path to determine bucket/partition.
+                # This isn't used for cryptography, so MD5 is sufficient.
+                h = hashlib.md5()
+                h.update(path)
+                i = int(h.hexdigest(), 16)
+                offset = i % len(parts)
+                return parts[offset]
+
+            raise error.Abort(_('unable to map repo to partition'),
+                              hint=_('define a partition map with a ".*" '
+                                     'fallback'))
 
     repo.__class__ = replicatingrepo

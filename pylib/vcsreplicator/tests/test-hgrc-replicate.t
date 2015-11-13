@@ -12,8 +12,7 @@ hgrc file content is sent in a message
   $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
 
-  $ consumer --dump
-  - name: heartbeat-1
+  $ consumer --dump --partition 2
   - name: hg-repo-init-1
     path: '{moz}/mozilla-central'
   - content: '[hooks]
@@ -38,8 +37,7 @@ Replicating hgrc without hgrc file will delete file
   $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
 
-  $ consumer --dump
-  - name: heartbeat-1
+  $ consumer --dump --partition 2
   - name: hg-repo-init-1
     path: '{moz}/mozilla-central'
   - content: '[hooks]

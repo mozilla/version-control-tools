@@ -12,9 +12,17 @@ hosts = {% for host in zk_servers %}{{ host}}:9092{% if not loop.last%}, {% endi
 
 clientid = 1
 topic = pushdata
-partition = 0
 reqacks = -1
 acktimeout = 10000
+
+# Mapping of wire proto paths to partition number.
+# Our allocation is as follows:
+# 4 partitions for the main pool of repos
+# 1 dedicated partition for Try repo (it is special)
+# 3 partitions for all user repos
+partitionmap.0try = 4:\{moz\}\/try
+partitionmap.1user = 5,6,7:\{moz\}\/users\/.*
+partitionmap.2main = 0,1,2,3:.*
 
 [replicationpathrewrites]
 /repo/hg/mozilla/ = {moz}/
