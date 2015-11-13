@@ -50,30 +50,20 @@ Missing topic
   abort: replicationproducer.topic config option not set
   [255]
 
-No partition
+No partition map
 
   $ cat >> .hg/hgrc << EOF
   > topic = topic
   > EOF
 
   $ hg st
-  abort: replicationproducer.partition or replicationproducer.partitionmap.* config options not set
-  [255]
-
-Non-integer partition
-
-  $ cat >> .hg/hgrc << EOF
-  > partition = foobar
-  > EOF
-
-  $ hg st
-  abort: replicationproducer.partition is not an integer ('foobar')
+  abort: replicationproducer.partitionmap.* config options not set
   [255]
 
 No reqacks
 
   $ cat >> .hg/hgrc << EOF
-  > partition = 1
+  > partitionmap.0 = 0:.*
   > EOF
 
   $ hg st

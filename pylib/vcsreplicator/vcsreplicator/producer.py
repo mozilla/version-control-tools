@@ -14,23 +14,19 @@ logger = logging.getLogger(__name__)
 
 
 class Producer(KafkaProducer):
-    """A Kafka Producer that writes to a pre-defined topic and partition."""
+    """A Kafka Producer that writes to a pre-defined topic."""
 
-    def __init__(self, client, topic, partition, **kwargs):
+    def __init__(self, client, topic, **kwargs):
         super(Producer, self).__init__(client, **kwargs)
 
         self.topic = topic
-        self.partition = partition
 
-    def send_message(self, o, partition=None):
+    def send_message(self, o, partition):
         """Send a single message from a Python object.
 
         The partition, if specified, overwrites whatever the default partition
         is configured as.
         """
-        if partition is None:
-            partition = self.partition
-
         # We currently only support 1 message format. It is
         # "1\n" followed by a JSON payload. No length is encoded,
         # as Kafka does this for us.
@@ -41,14 +37,14 @@ class Producer(KafkaProducer):
             self.topic, partition, msg)
 
 
-def send_heartbeat(producer, partition=None):
+def send_heartbeat(producer, partition):
     """Sends a dummy message to confirm that the queue is running."""
     return producer.send_message({
         'name': 'heartbeat-1',
     }, partition=partition)
 
 
-def record_new_hg_repo(producer, path, partition=None):
+def record_new_hg_repo(producer, path, partition):
     """Produce a message saying a Mercurial repository was created.
 
     This should be called when a new repository is to become under the
@@ -63,7 +59,7 @@ def record_new_hg_repo(producer, path, partition=None):
     }, partition=partition)
 
 
-def record_hgrc_update(producer, path, content, partition=None):
+def record_hgrc_update(producer, path, content, partition):
     """Produce a message saying a Mercurial config file was updated.
 
     When called, the passed hgrc content will be written along with the
@@ -80,7 +76,7 @@ def record_hgrc_update(producer, path, content, partition=None):
 
 
 def record_hg_changegroup(producer, path, source, nodes, heads,
-                          partition=None):
+                          partition):
     """Produce a message saying a changegroup has been added to the repository.
 
     The message records a list of introduced changesets, which ones are heads,
@@ -96,7 +92,7 @@ def record_hg_changegroup(producer, path, source, nodes, heads,
 
 
 def record_hg_pushkey(producer, path, namespace, key, old, new, ret,
-        partition=None):
+        partition):
     """Produce a message saying that a pushkey change was processed."""
     return producer.send_message({
         'name': 'hg-pushkey-1',

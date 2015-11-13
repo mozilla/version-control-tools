@@ -246,10 +246,9 @@ def uisetup(ui):
         topic = ui.config(section, 'topic')
         if not topic:
             raise util.Abort('%s.topic config option not set' % section)
-        partition = ui.configint(section, 'partition', -1)
-        if partition == -1 and not havepartitionmap():
-            raise util.Abort('%s.partition or %s.partitionmap.* config '
-                             'options not set' % (section, section))
+        if not havepartitionmap():
+            raise util.Abort('%s.partitionmap.* config options not set' %
+                             section)
         reqacks = ui.configint(section, 'reqacks', default=999)
         if reqacks not in (-1, 0, 1):
             raise util.Abort('%s.reqacks must be set to -1, 0, or 1' % section)
@@ -264,7 +263,7 @@ def uisetup(ui):
                 client = kafkaclient.KafkaClient(hosts, client_id=clientid,
                                                  timeout=timeout)
                 self._replicationproducer = vcsrproducer.Producer(
-                    client, topic, partition, batch_send=False,
+                    client, topic, batch_send=False,
                     req_acks=reqacks, ack_timeout=acktimeout)
 
             return self._replicationproducer
@@ -293,10 +292,7 @@ def uisetup(ui):
                 pm[k[len('partitionmap.'):]] = (parts, re.compile(expr))
 
             if not pm:
-                explicit = self.configint('replicationproducer', 'partition', -1)
-                if explicit == -1:
-                    raise error.Abort(_('partitions not defined'))
-                pm['0'] = (explicit, re.compile('.*'))
+                raise error.Abort(_('partitions not defined'))
 
             return pm
 
