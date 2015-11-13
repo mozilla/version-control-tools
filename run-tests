@@ -202,7 +202,8 @@ if __name__ == '__main__':
 
     if run_unit_tests:
         with docker.auto_clean_orphans():
-            noseres = run_nose_tests(run_unit_tests, options.jobs)
+            noseres = run_nose_tests(run_unit_tests, options.jobs,
+                                     verbose=verbose)
         if noseres:
             res = noseres
 

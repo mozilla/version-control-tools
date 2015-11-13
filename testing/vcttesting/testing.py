@@ -245,7 +245,7 @@ def produce_coverage_reports(coverdir):
                    ignore_errors=True, omit=omit)
 
 
-def run_nose_tests(tests, process_count=None):
+def run_nose_tests(tests, process_count=None, verbose=False):
     """Run nose tests and return result code."""
     noseargs = [sys.executable, '-m', 'nose.core', '-s']
 
@@ -254,6 +254,10 @@ def run_nose_tests(tests, process_count=None):
             '--processes=%d' % process_count,
             '--process-timeout=120',
         ])
+
+    if verbose:
+        noseargs.append('-v')
+
     noseargs.extend(tests)
 
     env = dict(os.environ)
