@@ -24,7 +24,6 @@ Create the repository and push a change
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: recorded push in unified pushlog
   remote: legacy replication of phases disabled because vcsreplicator is loaded
   remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
@@ -99,7 +98,6 @@ We send a changegroup and a pushkey but don't process them immediately
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: recorded push in unified pushlog
   remote: legacy replication of phases disabled because vcsreplicator is loaded
   remote: legacy replication of bookmarks disabled because vcsreplicator is loaded
   remote: legacy replication of changegroup disabled because vcsreplicator is loaded
