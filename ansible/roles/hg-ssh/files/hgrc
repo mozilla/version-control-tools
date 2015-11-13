@@ -20,7 +20,9 @@ changegroup.push_printurls = python:mozhghooks.push_printurls.hook
 #changegroup.z_advertize_upgrade = python:mozhghooks.advertise_upgrade.hook
 pushkey.replicate = python:mozhghooks.replicate.pushkeyhook
 #pretxnchangegroup.renamecase = python:mozhghooks.prevent_case_only_renames.hook
-pretxnchangegroup.author_format = python:mozhghooks.author_format.hook
+# Disabled because too many people are running into issues. Need more
+# granular checking for now. Bug 787620.
+#pretxnchangegroup.author_format = python:mozhghooks.author_format.hook
 pretxnchangegroup.single_root = python:mozhghooks.single_root.hook
 
 [extensions]
