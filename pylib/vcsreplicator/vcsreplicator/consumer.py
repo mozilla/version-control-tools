@@ -183,13 +183,16 @@ if __name__ == '__main__':
     from .config import Config
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('config', help='Path to config file to load')
+    parser.add_argument('config',
+            help='Path to config file to load')
     parser.add_argument('--dump', action='store_true',
-                        help='Dump available messages and exit')
+            help='Dump available messages and exit')
     parser.add_argument('--onetime', action='store_true',
-                        help='Process a single message and exit')
+            help='Process a single message and exit')
     parser.add_argument('--start-from', type=int,
-                        help='Start N records from the beginning')
+            help='Start N records from the beginning')
+    parser.add_argument('--partition', type=int,
+            help='Partition to fetch from. Defaults to all partitions.')
 
     args = parser.parse_args()
 
@@ -198,7 +201,12 @@ if __name__ == '__main__':
     topic = config.c.get('consumer', 'topic')
     group = config.c.get('consumer', 'group')
     wait_for_topic(client, topic, 30)
-    consumer = Consumer(client, group, topic, None)
+
+    partitions = None
+    if args.partition is not None:
+        partitions = [args.partition]
+
+    consumer = Consumer(client, group, topic, partitions)
 
     if args.start_from:
         consumer.seek(args.start_from, 0)
