@@ -113,6 +113,8 @@ clean shutdown (which there was).
   $ hgmo exec hgweb1 /usr/bin/supervisorctl start kafka
   kafka: started
 
+  $ sleep 3
+
   $ hg push
   pushing to ssh://*:$HGPORT/mozilla-central (glob)
   searching for changes
