@@ -49,9 +49,15 @@ def rewrite_commit_descriptions(ui, repo, node, descriptions=None):
         sha1 = repo[node].hex()[:12]
         description = repo[node].description()
         revised_description = description_map.get(sha1, description)
-        return description != revised_description
+        if description == revised_description:
+            ui.write(_('not rewriting %s - description unchanged\n' % sha1))
+            return False
+        return True
 
     nodes = filter(prune_unchanged, nodes)
+    if not nodes:
+        ui.write(_('no commits found to be rewritten\n'))
+        return 1
 
     def createfn(repo, ctx, revmap, filectxfn):
         parents = rewrite.newparents(repo, ctx, revmap)
