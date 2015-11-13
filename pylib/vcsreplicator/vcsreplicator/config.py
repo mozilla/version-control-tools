@@ -12,6 +12,7 @@ from kafka.client import KafkaClient
 from kafka.common import KafkaUnavailableError
 
 from .consumer import Consumer
+from .util import wait_for_topic
 
 
 class Config(object):
@@ -91,20 +92,7 @@ class Config(object):
             topic = self.c.get('consumer', 'topic')
             group = self.c.get('consumer', 'group')
 
-            # Wait for topic to exist before trying to instantiate consumer.
-            # There is a ``ensure_topic_exists`` on KafkaClient. However, it
-            # will create the topic. We don't want that.
-            start = time.time()
-            while not client.has_metadata_for_topic(topic):
-                if time.time() - start > 30:
-                    raise Exception('timeout reached waiting for topic')
-
-                time.sleep(0.1)
-
-                # Don't pass topic name to function or it will attempt to
-                # create.
-                client.load_metadata_for_topics()
-
+            wait_for_topic(client, topic, timeout=30)
             self._consumer = Consumer(client, group, topic, None)
 
         return self._consumer
