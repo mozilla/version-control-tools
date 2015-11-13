@@ -231,4 +231,7 @@ if __name__ == '__main__':
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
+    if not args.onetime:
+        logger.warn('starting consumer for topic=%s group=%s partitions=%s' % (
+            topic, group, partitions or 'all'))
     consume(config, consumer, onetime=args.onetime)

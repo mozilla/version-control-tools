@@ -58,6 +58,7 @@ Pushing the initial commit will result in replication messages
 
   $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
   No handlers could be found for logger "kafka.conn"
+  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=all (glob)
   * vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central (glob)
@@ -116,6 +117,7 @@ Pushing multiple commits results in sane behavior
 
   $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
   No handlers could be found for logger "kafka.conn"
+  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=all (glob)
   * vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central (glob)
@@ -188,6 +190,7 @@ Pushing multiple heads results in appropriate behavior
 
   $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
   No handlers could be found for logger "kafka.conn"
+  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=all (glob)
   * vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://*/mozilla-central into /repo/hg/mozilla/mozilla-central (glob)
   * vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central (glob)
