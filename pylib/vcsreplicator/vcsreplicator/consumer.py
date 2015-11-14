@@ -207,9 +207,10 @@ def update_hgrc(repo_path, content):
 
         return
 
+    assert isinstance(content, unicode)
     logger.warn('writing hgrc: %s' % p)
     with open(p, 'wb') as fh:
-        fh.write(content)
+        fh.write(content.encode('utf-8'))
 
 
 if __name__ == '__main__':
