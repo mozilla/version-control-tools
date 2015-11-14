@@ -15,7 +15,7 @@ Create the repository and push a change
   $ consumer --onetime
   * vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central (glob)
   $ consumer --onetime
-  * vcsreplicator.consumer wrote hgrc: $TESTTMP/repos/mozilla-central/.hg/hgrc (glob)
+  * vcsreplicator.consumer writing hgrc: $TESTTMP/repos/mozilla-central/.hg/hgrc (glob)
 
   $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
   $ cd mozilla-central

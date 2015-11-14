@@ -103,3 +103,13 @@ def record_hg_pushkey(producer, path, namespace, key, old, new, ret,
         'new': new,
         'ret': ret,
     }, partition=partition)
+
+def record_hg_repo_sync(producer, path, hgrc, heads, requirements, partition):
+    """Produce a message that will synchronize a repository."""
+    return producer.send_message({
+        'name': 'hg-repo-sync-1',
+        'path': path,
+        'requirements': sorted(list(requirements)),
+        'hgrc': hgrc,
+        'heads': heads,
+    }, partition=partition)

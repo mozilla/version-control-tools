@@ -93,6 +93,11 @@ def process_message(config, payload):
                                   payload['old'],
                                   payload['new'],
                                   payload['ret'])
+    elif name == 'hg-repo-sync-1':
+        return process_hg_sync(config, payload['path'],
+                               payload['requirements'],
+                               payload['hgrc'],
+                               payload['heads'])
 
     raise ValueError('unrecognized message type: %s' % payload['name'])
 
@@ -124,20 +129,7 @@ def process_hg_hgrc_update(config, path, content):
     logger.debug('received hgrc update for repo: %s' % path)
 
     path = config.parse_wire_repo_path(path)
-    hgrc_path = os.path.join(path, '.hg', 'hgrc')
-
-    if content is None:
-        if os.path.exists(hgrc_path):
-            logger.warn('deleted hgrc from %s' % path)
-            os.unlink(hgrc_path)
-
-        return
-
-
-    with open(hgrc_path, 'w') as fh:
-        fh.write(content)
-
-    logger.warn('wrote hgrc: %s' % hgrc_path)
+    update_hgrc(path, content)
 
 
 def process_hg_changegroup(config, path, source, nodes, heads):
@@ -171,9 +163,53 @@ def process_hg_pushkey(config, path, namespace, key, old, new, ret):
                     (path, namespace, key))
 
 
+def process_hg_sync(config, path, requirements, hgrc, heads):
+    local_path = config.parse_wire_repo_path(path)
+    url = config.get_pull_url_from_repo_path(path)
+
+    # TODO create repo when missing.
+    if not os.path.exists(local_path):
+        logger.warn('repository does not exist: %s' % local_path)
+        return
+
+    # TODO set or warn about different requirements.
+
+    update_hgrc(local_path, hgrc)
+
+    with get_hg_client(local_path) as c:
+        oldtip = int(c.log('tip')[0].rev)
+
+        logger.warn('pulling %d heads into %s' % (
+            len(heads), local_path))
+        c.pull(source=url or 'default')
+
+        newtip = int(c.log('tip')[0].rev)
+
+        logger.warn('pulled %d changesets into %s' % (newtip - oldtip,
+                                                      local_path))
+
+
 def get_hg_client(path):
     return hglib.open(path, encoding='UTF-8',
                       configs=['vcsreplicator.disableproduce=true'])
+
+
+def update_hgrc(repo_path, content):
+    """Update the .hg/hgrc file for a repo with content.
+
+    If ``content`` is None, the file will be removed.
+    """
+    p = os.path.join(repo_path, '.hg', 'hgrc')
+    if content is None:
+        if os.path.exists(p):
+            logger.warn('deleting hgrc from %s' % repo_path)
+            os.unlink(p)
+
+        return
+
+    logger.warn('writing hgrc: %s' % p)
+    with open(p, 'wb') as fh:
+        fh.write(content)
 
 
 if __name__ == '__main__':
