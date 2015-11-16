@@ -7,6 +7,7 @@ from __future__ import absolute_import, unicode_literals
 import json
 import logging
 import os
+import signal
 import sys
 import time
 
@@ -57,17 +58,44 @@ class Consumer(SimpleConsumer):
 
 
 def consume(config, consumer, timeout=0.1, onetime=False):
-    """Read messages from a consumer and process them as they arrive."""
-    while True:
-        r = consumer.get_message(timeout=timeout)
-        if r:
-            partition, message, payload = r
-            process_message(config, payload)
-            # Only commit offset from partition message came from.
-            consumer.commit(partitions=[partition])
+    """Read messages from a consumer and process them as they arrive.
 
-        if onetime:
-            break
+    This loop runs forever until asked to exit via a SIGINT or SIGTERM.
+    """
+    count = [0]
+
+    def signal_exit(signum, frame):
+        logger.warn('received signal %d' % signum)
+        count[0] += 1
+
+        if count[0] == 1:
+            logger.warn('exiting gracefully')
+            return
+
+        # If this is a subsequent signal, convert to forceful exit.
+        logger.warn('already received exit signal; forcefully aborting')
+        sys.exit(1)
+
+    oldint = signal.signal(signal.SIGINT, signal_exit)
+    oldterm = signal.signal(signal.SIGTERM, signal_exit)
+
+    try:
+        while not count[0]:
+            r = consumer.get_message(timeout=timeout)
+            if r:
+                partition, message, payload = r
+                process_message(config, payload)
+                # Only commit offset from partition message came from.
+                consumer.commit(partitions=[partition])
+
+            if onetime:
+                break
+
+        if not onetime:
+            logger.warn('exiting from main consume loop')
+    finally:
+        signal.signal(signal.SIGINT, oldint)
+        signal.signal(signal.SIGTERM, oldterm)
 
 
 def process_message(config, payload):
@@ -271,4 +299,10 @@ if __name__ == '__main__':
     if not args.onetime:
         logger.warn('starting consumer for topic=%s group=%s partitions=%s' % (
             topic, group, partitions or 'all'))
-    consume(config, consumer, onetime=args.onetime)
+    try:
+        consume(config, consumer, onetime=args.onetime)
+        if not args.onetime:
+            logger.warn('process exiting gracefully')
+    except BaseException:
+        logger.error('exiting main consume loop with error')
+        raise
