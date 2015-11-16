@@ -58,6 +58,36 @@ Replicating hgrc without hgrc file will delete file
   requires
   store
 
+Unicode in hgrc is preserved
+
+  $ docker exec ${SSH_CID} /activate-hook mozilla-central dummy 'こんにちは'
+
+  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
+  recorded hgrc in replication log
+
+  $ consumer --dump --partition 2
+  - name: hg-repo-init-1
+    path: '{moz}/mozilla-central'
+  - content: '[hooks]
+  
+      dummy = value
+  
+  
+      '
+    name: hg-hgrc-update-1
+    path: '{moz}/mozilla-central'
+  - content: null
+    name: hg-hgrc-update-1
+    path: '{moz}/mozilla-central'
+  - content: "[hooks]\ndummy = \u3053\u3093\u306B\u3061\u306F\n\n"
+    name: hg-hgrc-update-1
+    path: '{moz}/mozilla-central'
+
+  $ hgmo exec hgweb0 cat /repo/hg/mozilla/mozilla-central/.hg/hgrc
+  [hooks]
+  dummy = \xe3\x81\x93\xe3\x82\x93\xe3\x81\xab\xe3\x81\xa1\xe3\x81\xaf (esc)
+  
+
 Cleanup
 
   $ hgmo stop
