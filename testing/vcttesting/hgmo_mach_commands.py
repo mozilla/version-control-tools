@@ -55,12 +55,15 @@ class HgmoCommands(object):
     @Command('shellinit', category='hgmo',
              description='Print shell commands to export variables')
     def shellinit(self):
+        print('export SSH_CID=%s' % self.c.master_id)
         print('export SSH_SERVER=%s' % self.c.master_ssh_hostname)
         print('export SSH_PORT=%d' % self.c.master_ssh_port)
         # Don't export the full value because spaces.
         print('export SSH_HOST_KEY=%s' % self.c.master_host_key.split()[1])
         for i, url in enumerate(self.c.web_urls):
             print('export HGWEB_%d_URL=%s' % (i, url))
+        for i, cid in enumerate(self.c.web_ids):
+            print('export HGWEB_%d_CID=%s' % (i, cid))
         for i, hostport in enumerate(self.c.kafka_hostports):
             print('export KAFKA_%d_HOSTPORT=%s' % (i, hostport))
         print('export ZOOKEEPER_CONNECT=%s' % self.c.zookeeper_connect)
