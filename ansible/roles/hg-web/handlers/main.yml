@@ -9,3 +9,4 @@
 
 - name: reread supervisor
   command: /usr/bin/supervisorctl reread
+  ignore_errors: True
