@@ -126,8 +126,8 @@ class MozReviewWebDriverTest(MozReviewTest):
 
         try:
             cls.browser = webdriver.Firefox()
-        except Exception:
-            raise unittest.SkipTest('Unable to start Firefox')
+        except Exception as e:
+            raise unittest.SkipTest('Unable to start Firefox: %s' % e)
 
         # Exceptions during setUpClass don't result in calls to tearDownClass,
         # so do it ourselves.
