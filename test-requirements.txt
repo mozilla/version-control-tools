@@ -65,7 +65,7 @@ recaptcha-client==1.0.6
 requests==2.7.0
 responses==0.3.0
 ReviewBoard==2.0.20
-selenium==2.45.0
+selenium==2.48.0
 setuptools==14.3.1
 six==1.9.0
 snowballstemmer==1.2.0
