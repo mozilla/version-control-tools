@@ -8,8 +8,8 @@
 
 Gracefully shut down a consumer daemon
 
-  $ hgmo exec hgweb0 /usr/bin/supervisorctl stop vcsreplicator:vcsreplicator_2
-  vcsreplicator:vcsreplicator_2: stopped
+  $ hgmo exec hgweb0 /usr/bin/supervisorctl stop vcsreplicator:2
+  vcsreplicator:2: stopped
 
   $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
   No handlers could be found for logger "kafka.conn"
@@ -49,8 +49,8 @@ Send a message to the replication system
 
 Start consumer daemon and verify it picks up where it left off
 
-  $ hgmo exec hgweb0 /usr/bin/supervisorctl start vcsreplicator:vcsreplicator_2
-  vcsreplicator:vcsreplicator_2: started
+  $ hgmo exec hgweb0 /usr/bin/supervisorctl start vcsreplicator:2
+  vcsreplicator:2: started
 
   $ sleep 1
   $ hgmo exec hgweb0 tail -n 3 /var/log/supervisor/vcsreplicator.log
