@@ -4,6 +4,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import socket
 import subprocess
 import sys
 
@@ -16,6 +17,7 @@ if 'MASTER_PORT_22_TCP_ADDR' not in os.environ:
     sys.exit(1)
 
 ssh_hostname = os.environ['MASTER_PORT_22_TCP_ADDR']
+hostname = socket.gethostname()
 
 if not os.path.exists('/etc/ssh/ssh_host_dsa_key'):
     subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'dsa',
@@ -42,6 +44,16 @@ with open('/etc/mercurial/vcsreplicator.ini', 'wb') as fh:
     for line in vcsreplicator:
         for k, v in REPLACEMENTS.items():
             line = line.replace(k, v)
+
+        # The client config file defines the client ID and group, which are
+        # used for offset management. Since the file contents come from
+        # the same container, we need to update the per-container values
+        # at container start time to something unique. We choose the
+        # hostname of the container, which should be unique.
+        if line.startswith('client_id ='):
+            line = 'client_id = %s\n' % hostname
+        elif line.startswith('group = '):
+            line = 'group = %s\n' % hostname
 
         fh.write(line)
 
