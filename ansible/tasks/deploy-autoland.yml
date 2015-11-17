@@ -1,0 +1,19 @@
+# TODO: ideally we would stop Apache here, wait for all pending Autoland
+#       requests to be serviced and stop Autoland before continuing.
+
+- name: update version-control-tools
+  hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
+      dest=/home/ubuntu/version-control-tools
+      revision={{ rev }}
+
+- name: install autoland dependencies
+  sudo: yes
+  command: /home/ubuntu/peep install -r /home/ubuntu/version-control-tools/autoland/requirements.txt
+
+- name: restart apache
+  ignore_errors: yes
+  command: apache2ctl restart
+
+- name: restart autoland
+  sudo: yes
+  service: name=autoland state=restarted

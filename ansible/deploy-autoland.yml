@@ -1,0 +1,7 @@
+# Deploy changes to an autoland instance.
+- hosts: autoland
+  vars:
+    rev: "@"
+- gather_facts: False
+- tasks:
+  - include: tasks/deploy-autoland.yml

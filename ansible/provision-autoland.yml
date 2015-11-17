@@ -1,0 +1,124 @@
+# Provision and configure an autoland instance.
+#
+# This script is not complete because some of the configuration requires
+# secrets that are kept locally.
+#
+# Because we hide autoland instances behind a jumphost, this script needs to
+# be run with additional ssh arguments on the command line, for instance:
+# ANSIBLE_SSH_ARGS="-o ProxyCommand='ssh <user>@54.215.201.230 nc %h %p' -o StrictHostKeyChecking=no -i /home/<user>/.ssh/autoland.pem"
+
+---
+- name: provision autoland
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: create instance
+      ec2:
+        key_name: autoland
+        instance_type: m3.medium
+        image: ami-df6a8b9b #Ubuntu 14.04 Server AMD64
+        wait: yes
+        group: autoland-security-group
+        count: 1
+        instance_tags: '{"Name":"new-autoland-instance"}'
+        region: us-west-1
+        volumes:
+          - device_name: /dev/sdb
+            volume_type: gp2
+            volume_size: 32
+            delete_on_termination: true
+      register: ec2
+    - name: Add new instance to host group
+      add_host: hostname={{ item.public_ip }} groupname=instances
+      with_items: ec2.instances
+    # This is kind of lame, but because we're behind a jumphost we can't
+    # really use wait_for to see if ssh is available.
+    - pause: seconds=90
+
+- name: configure instance
+  remote_user: ubuntu
+  hosts: instances
+  vars:
+    rev: "@"
+  sudo: True
+  gather_facts: True
+  tasks:
+  - name: install packages required to run Autoland
+    apt: name={{ item }} state=present update_cache=yes
+    with_items:
+      - apache2
+      - gcc
+      - libapache2-mod-wsgi
+      - mercurial
+      - openssh-client
+      - postgresql
+      - postgresql-client
+      - python2.7-dev
+      - python-pip
+      - libffi6
+      - libffi-dev
+      - libpq-dev
+      - ca-certificates
+
+  - name: copy peep.py
+    copy: src=files/peep.py
+          dest=/home/ubuntu/peep
+          mode=0755
+
+  - name: clone version-control-tools
+    sudo: no
+    hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
+        dest=/home/ubuntu/version-control-tools
+        revision={{ rev }}
+
+  - name: install autoland dependencies
+    command: /home/ubuntu/peep install -r /home/ubuntu/version-control-tools/autoland/requirements.txt
+
+  # Apache configuration
+  # We don't currently have a way to store secrets, so the ssl certs will have
+  # to be copied manually before apache can be restarted.
+  - name: enable apache headers module
+    command: a2enmod headers
+
+  - name: enable ssl module
+    command: a2enmod ssl
+
+  - name: remove apache default sites
+    shell: rm /etc/apache2/sites-enabled/*
+
+  - name: install autoland site
+    shell: cp /home/ubuntu/version-control-tools/autoland/apache/autoland.conf /etc/apache2/sites-enabled/autoland.conf
+
+  # Mercurial configuration
+  - name: install autoland site
+    shell: cp /home/ubuntu/version-control-tools/autoland/hg/autoland_hgrc /home/ubuntu/.hgrc
+
+  # Repository configuration
+  # The remainder of the repository configuration is manual and depends upon
+  # whether this is a dev or production instance. Ideally, autoland would do
+  # this configuration automatically when it receives a request for a
+  # repository.
+  - name: format drive
+    command: mkfs.ext4 /dev/xvdb
+
+  - name: create mount point
+    command: mkdir /repos
+
+  - name: mount drive
+    mount: name=/repos src=/dev/xvdb fstype=ext4 state=mounted
+
+  - name: set permissions on /repos
+    command: chmod 777 /repos
+
+  # Autoland service
+  # We can't start the autoland service until the config.json configuration file
+  # is manually installed.
+  - name: install autoland service
+    command: cp /home/ubuntu/version-control-tools/autoland/upstart/autoland.conf /etc/init/autoland.conf
+
+  - name: reload service configuration
+    command: initctl reload-configuration
+
+  - name: create autoland database
+    shell: sudo -u postgres /home/ubuntu/version-control-tools/autoland/sql/createdb.sh chdir=/home/ubuntu/version-control-tools/autoland/sql
