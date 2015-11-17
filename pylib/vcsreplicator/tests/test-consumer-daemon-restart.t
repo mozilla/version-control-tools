@@ -11,7 +11,7 @@ Gracefully shut down a consumer daemon
   $ hgmo exec hgweb0 /usr/bin/supervisorctl stop vcsreplicator:2
   vcsreplicator:2: stopped
 
-  $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
+  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log
   No handlers could be found for logger "kafka.conn"
   No handlers could be found for logger "kafka.conn"
   No handlers could be found for logger "kafka.conn"
@@ -53,7 +53,7 @@ Start consumer daemon and verify it picks up where it left off
   vcsreplicator:2: started
 
   $ sleep 1
-  $ hgmo exec hgweb0 tail -n 3 /var/log/supervisor/vcsreplicator.log
+  $ hgmo exec hgweb0 tail -n 3 /var/log/vcsreplicator/consumer.log
   * vcsreplicator.consumer process exiting gracefully (glob)
   * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   * vcsreplicator.consumer writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc (glob)

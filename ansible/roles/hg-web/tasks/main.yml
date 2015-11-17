@@ -469,6 +469,13 @@
             group=root
             mode=0644
 
+- name: directory for vcsreplicator logs
+  file: path=/var/log/vcsreplicator
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
 - name: add replication daemon config to supervisor
   copy: src=supervisor-vcsreplicator.conf
         dest=/etc/supervisor.d/vcsreplicator.conf

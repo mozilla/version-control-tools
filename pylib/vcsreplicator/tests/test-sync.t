@@ -35,7 +35,7 @@
 Race condition between applying messages and printing log
   $ sleep 2
 
-  $ hgmo exec hgweb0 cat /var/log/supervisor/vcsreplicator.log
+  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log
   No handlers could be found for logger "kafka.conn"
   No handlers could be found for logger "kafka.conn"
   No handlers could be found for logger "kafka.conn"
