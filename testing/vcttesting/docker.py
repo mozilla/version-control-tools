@@ -241,7 +241,7 @@ class Docker(object):
         """
         tag = '%s-%s' % (tagprefix,
                          hashlib.sha256('%s%s' % (url, digest)).hexdigest())
-        for image in reversed(self.client.images()):
+        for image in self._get_sorted_images():
             for repotag in image['RepoTags']:
                 r, t = repotag.split(':')
                 if r == repository and t == tag:
@@ -298,7 +298,7 @@ class Docker(object):
         available.
         """
         if use_last:
-            for image in reversed(self.client.images()):
+            for image in self._get_sorted_images():
                 for repotag in image['RepoTags']:
                     repo, tag = repotag.split(':', 1)
                     if repo == name:
@@ -463,7 +463,7 @@ class Docker(object):
         # as well prevents some overhead to create the vct container. The code
         # duplication is therefore warranted.
         if use_last:
-            for image in reversed(self.client.images()):
+            for image in self._get_sorted_images():
                 for repotag in image['RepoTags']:
                     repo, tag = repotag.split(':', 1)
                     if repo in missing:
@@ -475,7 +475,7 @@ class Docker(object):
 
         ma = {k: ansibles[k] for k in missing if k in ansibles}
         start_images = {}
-        for image in reversed(self.client.images()):
+        for image in self._get_sorted_images():
             for repotag in image['RepoTags']:
                 repo, tag = repotag.split(':', 1)
                 if repo in ma:
@@ -1655,3 +1655,7 @@ class Docker(object):
                 raise Exception('Container stopped running: %s' % cid)
 
         return assert_running
+
+    def _get_sorted_images(self):
+        return sorted(self.client.images(), key=lambda x: x['Created'],
+                      reverse=True)
