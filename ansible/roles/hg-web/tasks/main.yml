@@ -486,6 +486,21 @@
 
 # TODO restart vcsreplicator daemon.
 
+- name: create Nagios config directory
+  file: path=/etc/nagios/nrpe.d
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
+- name: install check_vcsreplicator_lag NRPE config
+  copy: src=check_vcsreplicator_lag.cfg
+        dest=/etc/nagios/nrpe.d/check_vcsreplicator_lag.cfg
+        owner=root
+        group=root
+        mode=0644
+  notify: restart nrpe
+
 # Pull in tasks shared between hg-ssh and hg-web.
 # This should run last to ensure all preconditions are met.
 - include: ../../../tasks/hgmo-extensions.yml

@@ -261,3 +261,118 @@ ENSEMBLE WARNING - only have X/Y in sync followers
 
    This warning likely occurs after a node was restarted or experienced some
    kind of event that caused it to get out of sync.
+
+check_vcsreplicator_lag
+-----------------------
+
+``check_vcsreplicator_lag`` monitors the replication log to see if
+consumers are in sync.
+
+This check runs on every host that runs the replication log consumer
+daemon, which is every *hgweb* machine. The check is only monitoring the
+state of the host it runs on.
+
+The replication log consists of N independent partitions. Each partition
+is its own log of replication events. There exist N daemon processes
+on each consumer host. Each daemon process consumes a specific partition.
+Events for any given repository are always routed to the same partition.
+
+Consumers maintain an offset into the replication log marking how many
+messages they've consumed. When there are more messages in the log than
+the consumer has marked as applied, the log is said to be *lagging*. A
+lagging consumer is measured by the count of messages it has failed to
+consume and by the elapsed time since the first unconsumed message was
+created. Time is the more important lag indicator because the replication
+log can contain many small messages that apply instantaneously and thus
+don't really constitute a notable lag.
+
+When the replication system is working correctly, messages written by
+producers are consumed within milliseconds on consumers. However, some
+messages may take several seconds to apply. Consumers do not mark a message
+as consumed until it has successfully applied it. Therefore, there is
+always a window between event production and marking it as consumed where
+consumers are out of sync.
+
+Expected Output
+^^^^^^^^^^^^^^^
+
+When a host is fully in sync with the replication log, the check will
+output the following::
+
+   OK - 8/8 consumers completely in sync
+
+   OK - partition 0 is completely in sync (X/Y)
+   OK - partition 1 is completely in sync (W/Z)
+   ...
+
+This prints the count of partitions in the replication log and the
+consuming offset of each partition.
+
+When a host has some partitions that are slightly out of sync with the
+replication log, we get a slightly different output::
+
+   OK - 2/8 consumers out of sync but within tolerances
+
+   OK - partition 0 is 1 messages behind (0/1)
+   OK - partition 0 is 1.232 seconds behind
+   OK - partition 1 is completely in sync (32/32)
+   ...
+
+Even though consumers are slightly behind replaying the replication log,
+the drift is within tolerances, so the check is reporting OK. However,
+the state of each partition's lag is printed for forensic purposes.
+
+Warning and Critical Output
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The monitor alerts when the lag of any one partition of the replication
+log is too great. As mentioned above, lag is measured in message count
+and time since the first unconsumed message was created. Time is the more
+important lag indicator.
+
+When a partition/consumer is too far behind, the monitor will issue a
+**WARNING** or **CRITICAL** alert depending on how far behind consumers
+are. The output will look like::
+
+   WARNING - 2/8 partitions out of sync
+
+   WARNING - partition 0 is 15 messages behind (10/25)
+   OK - partition 0 is 5.421 seconds behind
+   OK - partition 1 is completely in sync (34/34)
+   ...
+
+The first line will contain a summary of all partitions' sync status. The
+following lines will print per-partition state.
+
+Remediation to Consumer Lag
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If everything is functioning properly, a lagging consumer will self
+correct on its own: the consumer daemon is just behind (due to high
+load, slow network, etc) and it will catch up over time.
+
+In some rare scenarios, there may be a bug in the consumer daemon that
+has caused it to crash or enter a endless loop or some such. To check
+for this, first look at *supervisor* to see if all the consumer daemons
+are running::
+
+   $ supervisorctl status vcsreplicator:*
+   vcsreplicator:0    RUNNING   pid 32217, uptime 4 days, 21:59:24
+   vcsreplicator:1    RUNNING   pid 32216, uptime 4 days, 21:59:24
+   vcsreplicator:2    RUNNING   pid 32219, uptime 4 days, 21:59:23
+   vcsreplicator:3    RUNNING   pid 32218, uptime 4 days, 21:59:24
+   vcsreplicator:4    RUNNING   pid 32221, uptime 4 days, 21:59:23
+   vcsreplicator:5    RUNNING   pid 16430, uptime 4 days, 21:30:44
+   vcsreplicator:6    RUNNING   pid 1809, uptime 4 days, 21:50:55
+   vcsreplicator:7    RUNNING   pid 14568, uptime 4 days, 21:36:29
+
+If any of the processes aren't in the ``RUNNING`` state, the consumer
+for that partition has crashed for some reason. Try to start it back up:
+
+   $ supervisorctl start vcsreplicator:*
+
+You might want to take a look at the logs in ``/var/log/vcsreplicator`` to
+make sure the process is happy.
+
+TODO provide remediation step for skipping bad messages.
+

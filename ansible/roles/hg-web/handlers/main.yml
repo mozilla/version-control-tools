@@ -3,6 +3,12 @@
   service: name=cgconfig state=restarted
 
 # Fails in Docker.
+- name: restart nrpe
+  service: name=nrpe
+           state=restarted
+  ignore_errors: True
+
+# Fails in Docker.
 - name: restart rsyslogd
   service: name=rsyslog state=restarted
   ignore_errors: True
