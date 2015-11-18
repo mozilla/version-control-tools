@@ -127,16 +127,7 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
   mysql-client patchutils perlmagick pkg-config python3-mysql.connector \
   python-psutil supervisor unzip wget
 
-# ElasticSearch isn't available on CPAN. Patch Bugzilla to not install
-# it.
-#
-# This needs to be before we fetch Git source code so that patch changes
-# needed to apply against upstream result in fresh clone.
-ADD elasticsearch.patch $BUGZILLA_HOME/elasticsearch.patch
-
 RUN git clone https://git.mozilla.org/webtools/bmo/bugzilla.git $BUGZILLA_HOME/bugzilla
-
-RUN cd $BUGZILLA_HOME/bugzilla && /usr/bin/patch -p1 < $BUGZILLA_HOME/elasticsearch.patch
 
 # cpanm has problems with some packages. Install them from the OS.
 RUN apt-get -y install \
@@ -157,7 +148,7 @@ RUN cd $BUGZILLA_HOME/bugzilla && cpanm \
   --with-recommends \
   --with-all-features \
   --without-feature oracle --without-feature sqlite \
-  --without-feature pg \
+  --without-feature pg --without-feature elasticsearch \
   --notest \
   .
 

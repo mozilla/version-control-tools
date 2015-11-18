@@ -55,7 +55,6 @@ cc = subprocess.check_call
 
 patches = {
     'apache24.patch',
-    'elasticsearch.patch',
 }
 patched_files = {
     '.htaccess',
@@ -117,7 +116,8 @@ if install_module:
     cc([j(b, 'checksetup.pl'), '--cpanfile'], cwd=b)
     cc(['cpanm', '--installdeps', '--with-recommends', '--with-all-features',
         '--without-feature', 'oracle', '--without-feature', 'sqlite',
-        '--without-feature', 'pg',
+        '--without-feature', 'pg', '--without-feature', 'elasticsearch',
+        '--notest',
         '.'], cwd=b)
 
 # We aren't allowed to embed environment variable references in Perl code in
