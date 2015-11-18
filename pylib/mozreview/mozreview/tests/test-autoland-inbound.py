@@ -4,13 +4,13 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
+import time
 
 from rbtools.api.client import RBClient
 from rbtools.api.transport.sync import SyncTransport
 
 import selenium.webdriver.support.expected_conditions as EC
-from selenium.common.exceptions import (NoSuchElementException,
-                                        StaleElementReferenceException)
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -94,8 +94,7 @@ class AutolandInboundTest(MozReviewWebDriverTest):
             autoland_btn.value_of_css_property('opacity'), '0.5')
         self.assign_reviewer(0, 'jsmith')
         publish_btn = WebDriverWait(self.browser, 3).until(
-                        EC.visibility_of_element_located((By.ID,
-                        'btn-draft-publish')))
+            EC.visibility_of_element_located((By.ID, 'btn-draft-publish')))
         publish_btn.click()
 
         WebDriverWait(self.browser, 10).until(
@@ -116,8 +115,14 @@ class AutolandInboundTest(MozReviewWebDriverTest):
         self.assertEqual(
             autoland_btn.value_of_css_property('opacity'), '1')
 
-        # Clicking the button should display a trychooser dialog
+        # Clicking the button should display the autoland dialog
         autoland_btn.click()
+
+        # Wait for commit rewrite response, which enables the submit btn
+        autoland_submit_btn = WebDriverWait(self.browser, 10).until(
+            EC.element_to_be_clickable((By.ID, 'autoland-submit'))
+        )
+        autoland_submit_btn.click()
 
         element = WebDriverWait(self.browser, 10).until(
             EC.visibility_of_element_located((By.ID, 'activity-indicator'))
@@ -130,12 +135,27 @@ class AutolandInboundTest(MozReviewWebDriverTest):
             # error if it shows up.
             pass
 
-        self.browser.refresh()
-        action_info = WebDriverWait(self.browser, 10).until(
+        # autoland submission triggers a browser refresh, wait for that
+        WebDriverWait(self.browser, 10).until(
             EC.visibility_of_element_located((By.CLASS_NAME, 'action-info'))
         )
-        self.assertTrue('https://treeherder.mozilla.org/'
-            in action_info.get_attribute('innerHTML'))
+
+        # Wait for autoland to process the request
+        loading = True
+        iteration = 0
+        while loading and iteration < 10:
+            action_info = WebDriverWait(self.browser, 10).until(
+                EC.visibility_of_element_located(
+                    (By.CLASS_NAME, 'action-info')
+                )
+            )
+            loading = action_info.get_attribute('innerHTML').find(
+                'Waiting for the Autoland request') != -1
+            if loading:
+                time.sleep(1)
+                self.browser.refresh()
+                iteration += 1
+        self.assertFalse(loading)
 
         # We should have closed the review request automatically
         submitted_banner = self.browser.find_element_by_id('submitted-banner')

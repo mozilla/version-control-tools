@@ -1,7 +1,8 @@
 $(document).on("mozreview_ready", function() {
   // TODO: Stop hardcoding endpoint urls and provide them in a template.
-  var TRY_AUTOLAND_URL = "/api/extensions/mozreview.extension.MozReviewExtension/try-autoland-triggers/";
-  var AUTOLAND_URL = "/api/extensions/mozreview.extension.MozReviewExtension/autoland-triggers/";
+  var TRY_AUTOLAND_URL   = "/api/extensions/mozreview.extension.MozReviewExtension/try-autoland-triggers/";
+  var AUTOLAND_URL       = "/api/extensions/mozreview.extension.MozReviewExtension/autoland-triggers/";
+  var COMMIT_REWRITE_URL = "/api/extensions/mozreview.extension.MozReviewExtension/commit_rewrite/";
 
   var try_trigger = $("#autoland-try-trigger");
   var autoland_trigger = $("#autoland-trigger");
@@ -54,7 +55,7 @@ $(document).on("mozreview_ready", function() {
                   $('#try-syntax-error').css('display', 'block');
                   return false;
                 } else {
-                  $('#try-syntax-error').css('display', 'none')
+                  $('#try-syntax-error').css('display', 'none');
                   submit.enable(false);
                   tryInput.enable(false);
 
@@ -74,32 +75,18 @@ $(document).on("mozreview_ready", function() {
                   .done(function(){
                     // There may be a better way to get the review request updates
                     // but this is probably good enough for now
-                    window.location.reload()
+                    window.location.reload();
                   })
-                  .fail(function(jqXHR, textStatus, errorThrown){
-                    var error_text = "";
+                  .fail(function(jqXHR, textStatus, errorThrown) {
                     submit.enable(true);
                     tryInput.enable(true);
-
                     try {
-                      error_text = jQuery.parseJSON(jqXHR.responseText).err.msg
+                      show_error(jQuery.parseJSON(jqXHR.responseText).err.msg);
                     } catch(e) {
-                      error_text = jqXHR.responseText
+                      show_error(jqXHR.responseText);
                     }
-
-                    activityIndicator.addClass("error")
-                      .text(gettext("A server error occurred: " + error_text))
-                      .append(
-                        $("<a/>")
-                          .text(gettext("Dismiss"))
-                          .attr("href", "#")
-                          .click(function() {
-                            activityIndicator.fadeOut("fast");
-                            return false;
-                          })
-                      );
                   });
-                    return false;
+                  return false;
                 }
               })
           ]
@@ -111,10 +98,86 @@ $(document).on("mozreview_ready", function() {
     });
   }
 
-  var trigger_autoland_handler = function() {
-    autoland_trigger.off("click", trigger_autoland_handler);
-
+  var autoland_confirm = function() {
     var activityIndicator = $("#activity-indicator")
+      .removeClass("error")
+      .text(gettext("Loading commits..."))
+      .show();
+
+    // confirmation UI
+    var box = $("<div/>")
+      .addClass("formdlg")
+      .keypress(function(e) {
+        e.stopPropagation();
+      })
+      .width('60em')
+      .append(
+        $('<div id="autoland-content"/>)')
+          .append('<i>Loading commits...</i>'))
+      .modalBox({
+        title: "Land Commits",
+        buttons: [
+          $('<input type="button"/>')
+            .val(gettext("Cancel")),
+          $('<input type="button" id="autoland-submit" disabled/>')
+            .val("Land")
+            .click(send_to_autoland)
+        ]
+      });
+
+    // fetch rewritten commit messages
+    RB.apiCall({
+      type: 'GET',
+      url: COMMIT_REWRITE_URL + MozReview.parentReviewRequest.id + '/',
+      success: function(rsp) {
+        // build confirmation dialog
+        activityIndicator.hide();
+        $('#autoland-content')
+          .html(
+            '<p>About to land the following commits to <span id="autoland-repo">?</span>.<br>' +
+            'Please confirm these commit descriptions are correct before landing.<br>' +
+            'If corrections are required please <b>amend</b> the commit ' +
+            'message and try again.</p>' +
+            '<div id="autoland-commits"/>'
+          );
+        $('#autoland-repo').text(MozReview.landingRepository);
+        $.each(rsp.commits, function() {
+          $('#autoland-commits')
+            .append(
+              $('<div/>')
+                .addClass('autoland-commit-desc')
+                .text(this.summary.split("\n")[0]))
+            .append(
+              $('<div/>')
+                .append(
+                  $('<span/>')
+                    .addClass('autoland-commit-rev')
+                    .text(this.commit.substr(0, 12)))
+                .append(
+                  $('<span/>')
+                    .addClass('autoland-commit-reviewers')
+                    .text(
+                      this.approved ? 'reviewers: ' + this.reviewers.join(', ')
+                        : 'NOT APPROVED')));
+          $('#autoland-submit')
+            .prop('disabled', false);
+        });
+      },
+      error: function(res) {
+        box.modalBox('destroy');
+        try {
+          show_error(jQuery.parseJSON(res.responseText).err.msg);
+        } catch(e) {
+          show_error(res.responseText);
+        }
+      }
+    });
+  };
+
+  function send_to_autoland() {
+    autoland_trigger.off("click", autoland_confirm);
+
+    activityIndicator = $("#activity-indicator")
       .removeClass("error")
       .text(gettext("Triggering landing..."))
       .show();
@@ -127,15 +190,15 @@ $(document).on("mozreview_ready", function() {
     .done(function(){
       // There may be a better way to get the review request updates
       // but this is probably good enough for now
-      window.location.reload()
+      window.location.reload();
     })
     .fail(function(jqXHR, textStatus, errorThrown){
       var error_text = "";
 
       try {
-        error_text = jQuery.parseJSON(jqXHR.responseText).err.msg
+        error_text = jQuery.parseJSON(jqXHR.responseText).err.msg;
       } catch(e) {
-        error_text = jqXHR.responseText
+        error_text = jqXHR.responseText;
       }
 
       activityIndicator.addClass("error")
@@ -152,11 +215,11 @@ $(document).on("mozreview_ready", function() {
 
       // Add the handler back in case it was an intermittent
       // failure and we want to allow a retry.
-      autoland_trigger.click(trigger_autoland_handler);
+      autoland_trigger.click(autoland_confirm);
     });
   }
 
-  if (!MozReview.hasLandingRepository) {
+  if (MozReview.landingRepository === '') {
     autoland_trigger.attr('title', 'Landing is not supported for this repository');
   } else if ($("#draft-banner").is(":visible")) {
     autoland_trigger.attr('title', 'Draft review requests cannot be landed');
@@ -179,7 +242,7 @@ $(document).on("mozreview_ready", function() {
             MozReview.parentReviewRequest.get('approvalFailure'));
         } else {
           autoland_trigger.css('opacity', '1');
-          autoland_trigger.click(trigger_autoland_handler);
+          autoland_trigger.click(autoland_confirm);
         }
       }
     });
@@ -197,14 +260,14 @@ $(document).on("mozreview_ready", function() {
     .done(function(response) {
       if (response.results.length != 1) {
         $(actionHeading).text('Error fetching the results for '+revision+' from Treeherder');
-        $(elem).addClass('action-failure')
-        if (response.results.length == 0) {
+        $(elem).addClass('action-failure');
+        if (response.results.length === 0) {
           $(actionMeta).text('Revision not found');
         } else {
           $(actionMeta).text('Too many results found');
         }
       } else {
-        var resultset = response.results[0]
+        var resultset = response.results[0];
         $.ajax({
           url: 'https://treeherder.mozilla.org/api/project/'+repository+'/resultset/'+resultset.id+'/status/'
         }).done(function(status){
@@ -224,9 +287,35 @@ $(document).on("mozreview_ready", function() {
             return num+' jobs '+s;
           });
           $(actionMeta).text(actionMetaText.join());
-        })
+        });
       }
         $( this ).addClass( "done" );
     });
-  })
+
+  function show_error(error_text) {
+    $("#activity-indicator")
+      .addClass("error")
+      .text('')
+      .append(
+        $('<div/>').text(gettext('An error occurred:'))
+      )
+      .append(
+        $('<div/>').text(error_text)
+      )
+      .append(
+        $('<div/>')
+        .append(
+          $("<a/>")
+            .text(gettext("Dismiss"))
+            .attr("href", "#")
+            .click(function(event) {
+              event.preventDefault();
+              $("#activity-indicator").fadeOut("fast");
+            })
+        )
+      )
+      .show();
+  }
+
+  });
 });
