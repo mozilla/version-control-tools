@@ -645,3 +645,33 @@ class ReviewBoardCommands(object):
                                 username=os.environ['BUGZILLA_USERNAME'],
                                 password=os.environ['BUGZILLA_PASSWORD'])
         print('Created repository %s' % rid)
+
+    @Command('dump-rewrite-commit', category='reviewboard',
+             description='Return the rewritten commit summaries')
+    @CommandArgument('rrid', help='Parent review request id')
+    def dump_rewrite_commit(self, rrid):
+        from rbtools.api.errors import APIError
+        c = self._get_client()
+
+        try:
+            r = c.get_path('/extensions/mozreview.extension.MozReviewExtension'
+                           '/commit_rewrite/%s/' % rrid)
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                                             e.rsp['err']['msg']))
+            return 1
+
+        result = OrderedDict()
+        result['commits'] = []
+        for commit in r:
+            d = {}
+            d['summary'] = _serialize_text(commit['summary'])
+            d['id'] = commit['id']
+            d['commit'] = commit['commit']
+            for k in ('id', 'commit'):
+                if k in commit:
+                    d[k] = commit[k]
+            d['reviewers'] = list(commit['reviewers'])
+            result['commits'].append(d)
+
+        print(yaml.safe_dump(result, default_flow_style=False).rstrip())

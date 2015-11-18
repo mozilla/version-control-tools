@@ -48,6 +48,7 @@ from mozreview.ldap.resources import ldap_association_resource
 from mozreview.middleware import MozReviewUserProfileMiddleware
 from mozreview.pulse import initialize_pulse_handlers
 from mozreview.resources.bugzilla_login import bugzilla_api_key_login_resource
+from mozreview.resources.commit_rewrite import commit_rewrite_resource
 from mozreview.resources.review_request_summary import (
     review_request_summary_resource,)
 
@@ -132,6 +133,7 @@ class MozReviewExtension(Extension):
         autoland_trigger_resource,
         batch_review_resource,
         bugzilla_api_key_login_resource,
+        commit_rewrite_resource,
         file_diff_reviewer_resource,
         import_pullrequest_trigger_resource,
         import_pullrequest_update_resource,

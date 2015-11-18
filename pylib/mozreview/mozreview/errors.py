@@ -28,6 +28,7 @@ CHILD_DOES_NOT_EXIST = WebAPIError(
     "Child review request does not exist",
     http_status=500)  # 500 Internal Server Error
 
+
 class WebLoginNeededError(Exception):
     """Raised when a request requires the user to log in via the web site."""
 
@@ -63,4 +64,9 @@ AUTOLAND_REQUEST_IN_PROGRESS = WebAPIError(
     1007,
     "An autoland request for this review request is already in progress. "
     "Please wait for that request to finish.",
+    http_status=405)  # 405 Method Not Allowed
+
+AUTOLAND_REVIEW_NOT_APPROVED = WebAPIError(
+    1008,
+    "Unable to continue as the review has not been approved.",
     http_status=405)  # 405 Method Not Allowed
