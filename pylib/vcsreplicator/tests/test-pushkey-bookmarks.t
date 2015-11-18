@@ -34,9 +34,12 @@ Create the repository and push a change
 Phases should be updated on normal push
 
   $ consumer --dump --partition 2
-  - name: heartbeat-1
-  - name: heartbeat-1
-  - heads:
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
     name: hg-changegroup-1
     nodes:
@@ -63,9 +66,12 @@ Creating a bookmark will write a pushkey message
   [1]
 
   $ consumer --dump --partition 2
-  - name: heartbeat-1
-  - name: heartbeat-1
-  - key: my-bookmark
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    key: my-bookmark
     name: hg-pushkey-1
     namespace: bookmarks
     new: 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -108,9 +114,12 @@ We send a changegroup and a pushkey but don't process them immediately
   updating bookmark my-bookmark
 
   $ consumer --dump
-  - name: heartbeat-1
-  - name: heartbeat-1
-  - heads:
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
     - 2777163b593873bfa63c7129e02a21becc299ff0
     name: hg-changegroup-1
     nodes:
@@ -143,18 +152,24 @@ bookmark attached.
 We should have 2 changegroup messages
 
   $ consumer --dump --partition 2
-  - name: heartbeat-1
-  - name: heartbeat-1
-  - heads:
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
     - 031adcaa8ee7e23dd05ce5900645e771a3637682
     name: hg-changegroup-1
     nodes:
     - 031adcaa8ee7e23dd05ce5900645e771a3637682
     path: '{moz}/mozilla-central'
     source: serve
-  - name: heartbeat-1
-  - name: heartbeat-1
-  - heads:
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
     - e20ecd72ffa991598a1b26333788345377318231
     name: hg-changegroup-1
     nodes:

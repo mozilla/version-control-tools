@@ -33,11 +33,15 @@ Pushing the initial commit will result in replication messages
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ consumer --dump --partition 2
-  - name: hg-repo-init-1
+  - _created: \d+\.\d+ (re)
+    name: hg-repo-init-1
     path: '{moz}/mozilla-central'
-  - name: heartbeat-1
-  - name: heartbeat-1
-  - heads:
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
     name: hg-changegroup-1
     nodes:
@@ -102,8 +106,10 @@ Pushing multiple commits results in sane behavior
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ consumer --dump --partition 2 --start-from 5
-  - name: heartbeat-1
-  - heads:
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
     - 4f52aeca631dfa94331d93cfeaf069526926385a
     name: hg-changegroup-1
     nodes:
@@ -181,8 +187,10 @@ Pushing multiple heads results in appropriate behavior
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ consumer --dump --partition 2 --start-from 8
-  - name: heartbeat-1
-  - heads:
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
     - 4c9443886fe84db9a4a5f29a5777517d2890d308
     - 4b11352745a6b3eb429ca8cd486dfdc221a4bc62
     name: hg-changegroup-1

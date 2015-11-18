@@ -6,6 +6,7 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 import logging
+import time
 
 from kafka.producer.base import Producer as KafkaProducer
 
@@ -27,6 +28,9 @@ class Producer(KafkaProducer):
         The partition, if specified, overwrites whatever the default partition
         is configured as.
         """
+        # Add the message created time to all messages. This is used to monitor
+        # latency.
+        o['_created'] = time.time()
         # We currently only support 1 message format. It is
         # "1\n" followed by a JSON payload. No length is encoded,
         # as Kafka does this for us.

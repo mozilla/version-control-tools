@@ -11,8 +11,10 @@ Creating a repository should record an event saying so
   (recorded repository creation in replication log)
 
   $ consumer --dump
-  - name: heartbeat-1
-  - name: hg-repo-init-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: hg-repo-init-1
     path: '{moz}/mozilla-central'
 
   $ consumer --onetime

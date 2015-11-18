@@ -14,9 +14,11 @@
   wrote synchronization message into replication log
 
   $ consumer --dump --partition 2
-  - name: hg-repo-init-1
+  - _created: \d+\.\d+ (re)
+    name: hg-repo-init-1
     path: '{moz}/mozilla-central'
-  - heads:
+  - _created: \d+\.\d+ (re)
+    heads:
     - '0000000000000000000000000000000000000000'
     hgrc: '[hooks]
   

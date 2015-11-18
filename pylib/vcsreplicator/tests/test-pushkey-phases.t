@@ -45,9 +45,12 @@ Create the repository and push a change
 There should be no pushkey on a push with a draft changeset
 
   $ consumer --dump --partition 2
-  - name: heartbeat-1
-  - name: heartbeat-1
-  - heads:
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
     name: hg-changegroup-1
     nodes:
@@ -76,9 +79,12 @@ Locally bumping changeset to public will trigger a pushkey
   [1]
 
   $ consumer --dump --partition 2
-  - name: heartbeat-1
-  - name: heartbeat-1
-  - key: 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    key: 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
     name: hg-pushkey-1
     namespace: phases
     new: '0'
@@ -120,9 +126,12 @@ processing on the mirror.
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ consumer --dump --partition 2
-  - name: heartbeat-1
-  - name: heartbeat-1
-  - heads:
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
     - fde0c41176556d1ec1bcf85e66706e5e76012508
     name: hg-changegroup-1
     nodes:
@@ -158,18 +167,24 @@ Now simulate a consumer that is multiple pushes behind
   $ hg -q push
 
   $ consumer --dump --partition 2
-  - name: heartbeat-1
-  - name: heartbeat-1
-  - heads:
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
     - 58017affcc6559ab3237457a5fb1e0e3bde306b1
     name: hg-changegroup-1
     nodes:
     - 58017affcc6559ab3237457a5fb1e0e3bde306b1
     path: '{moz}/mozilla-central'
     source: serve
-  - name: heartbeat-1
-  - name: heartbeat-1
-  - heads:
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
     - 601c8c0d17b02057475d528f022cf5d85da89825
     name: hg-changegroup-1
     nodes:

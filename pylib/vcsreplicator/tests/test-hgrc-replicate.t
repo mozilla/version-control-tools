@@ -13,9 +13,11 @@ hgrc file content is sent in a message
   recorded hgrc in replication log
 
   $ consumer --dump --partition 2
-  - name: hg-repo-init-1
+  - _created: \d+\.\d+ (re)
+    name: hg-repo-init-1
     path: '{moz}/mozilla-central'
-  - content: '[hooks]
+  - _created: \d+\.\d+ (re)
+    content: '[hooks]
   
       dummy = value
   
@@ -38,9 +40,11 @@ Replicating hgrc without hgrc file will delete file
   recorded hgrc in replication log
 
   $ consumer --dump --partition 2
-  - name: hg-repo-init-1
+  - _created: \d+\.\d+ (re)
+    name: hg-repo-init-1
     path: '{moz}/mozilla-central'
-  - content: '[hooks]
+  - _created: \d+\.\d+ (re)
+    content: '[hooks]
   
       dummy = value
   
@@ -48,7 +52,8 @@ Replicating hgrc without hgrc file will delete file
       '
     name: hg-hgrc-update-1
     path: '{moz}/mozilla-central'
-  - content: null
+  - _created: \d+\.\d+ (re)
+    content: null
     name: hg-hgrc-update-1
     path: '{moz}/mozilla-central'
 
@@ -66,9 +71,11 @@ Unicode in hgrc is preserved
   recorded hgrc in replication log
 
   $ consumer --dump --partition 2
-  - name: hg-repo-init-1
+  - _created: \d+\.\d+ (re)
+    name: hg-repo-init-1
     path: '{moz}/mozilla-central'
-  - content: '[hooks]
+  - _created: \d+\.\d+ (re)
+    content: '[hooks]
   
       dummy = value
   
@@ -76,10 +83,12 @@ Unicode in hgrc is preserved
       '
     name: hg-hgrc-update-1
     path: '{moz}/mozilla-central'
-  - content: null
+  - _created: \d+\.\d+ (re)
+    content: null
     name: hg-hgrc-update-1
     path: '{moz}/mozilla-central'
-  - content: "[hooks]\ndummy = \u3053\u3093\u306B\u3061\u306F\n\n"
+  - _created: \d+\.\d+ (re)
+    content: "[hooks]\ndummy = \u3053\u3093\u306B\u3061\u306F\n\n"
     name: hg-hgrc-update-1
     path: '{moz}/mozilla-central'
 
