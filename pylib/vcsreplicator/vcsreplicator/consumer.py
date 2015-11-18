@@ -14,7 +14,10 @@ import time
 import hglib
 from kafka.consumer import SimpleConsumer
 
-from .util import wait_for_topic
+from .util import (
+    consumer_offsets,
+    wait_for_topic,
+)
 
 logger = logging.getLogger('vcsreplicator.consumer')
 
@@ -241,6 +244,39 @@ def update_hgrc(repo_path, content):
         fh.write(content.encode('utf-8'))
 
 
+def consumer_offsets_and_lag(client, topic, groups):
+    """Obtain consumer fetch offsets and lag.
+
+    Returns a dict mapping group name to dict of partition to consumer
+    information. The consumer information is a tuple of:
+
+        (current_offset, available_offset, lag_time)
+
+    ``lag_time`` will be 0.0 if the consumer is fully caught up.
+    """
+    offsets = consumer_offsets(client, topic, groups)
+    res = {}
+
+    # Replace the consume offset with offset + time lag.
+    for group in offsets['group']:
+        res[group] = {}
+        for partition, offset in sorted(offsets['group'][group].items()):
+            available = offsets['available'][partition]
+            lag = available - offset
+            if lag > 0:
+                consumer = Consumer(client, group, topic,
+                        partitions=[partition])
+                consumer.seek(offset, 0)
+                p, message, payload = consumer.get_message()
+                lag_time = time.time() - payload['_created']
+            else:
+                lag_time = 0.0
+
+            res[group][partition] = (offset, available, lag_time)
+
+    return res
+
+
 if __name__ == '__main__':
     import argparse
     import sys
@@ -258,6 +294,11 @@ if __name__ == '__main__':
             help='Start N records from the beginning')
     parser.add_argument('--partition', type=int,
             help='Partition to fetch from. Defaults to all partitions.')
+    parser.add_argument('--print-offsets', action='store_true',
+            help='Print offsets of consumers of the configured topic')
+    parser.add_argument('--offset-group', action='append',
+            help='Comma delimited list of consumer groups to print offsets '
+                 'for')
 
     args = parser.parse_args()
 
@@ -266,6 +307,28 @@ if __name__ == '__main__':
     topic = config.c.get('consumer', 'topic')
     group = config.c.get('consumer', 'group')
     wait_for_topic(client, topic, 30)
+
+    if args.print_offsets:
+        import tabulate
+        groups = args.offset_group or [group]
+        d = consumer_offsets_and_lag(client, topic, groups)
+
+        headers = (
+            'topic',
+            'group',
+            'partition',
+            'offset',
+            'available',
+            'lag (s)',
+        )
+
+        data = []
+        for group in groups:
+            for partition, (offset, available, lag_time) in sorted(d[group].items()):
+                data.append((topic, group, partition, offset, available, lag_time))
+
+        print(tabulate.tabulate(data, headers))
+        sys.exit(0)
 
     partitions = None
     if args.partition is not None:
