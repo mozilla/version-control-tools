@@ -1,10 +1,12 @@
 ---
 - hosts: hgssh1.dmz.scl3.mozilla.com
+  gather_facts: no
   tasks:
     - name: Strip repo on master
       command: /repo/hg/venv_pash/bin/hg --config extensions.strip= -R /repo/hg/mozilla/{{ repo | mandatory }} strip -r {{ rev | mandatory }}
 
 - hosts: hgweb-prod
+  gather_facts: no
   tasks:
     - name: Strip repo on mirrors
       shell: "/repo/hg/venv_replication/bin/hg --config extensions.strip= -R /repo_local/mozilla/mozilla/{{ repo }} strip -r {{ rev }}"
