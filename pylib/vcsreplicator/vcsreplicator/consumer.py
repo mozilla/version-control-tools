@@ -327,7 +327,6 @@ def print_offsets():
 
 if __name__ == '__main__':
     import argparse
-    import sys
     import yaml
 
     parser = argparse.ArgumentParser()
