@@ -370,7 +370,6 @@
 
 - name: configure cgconfig to run at system startup
   command: /sbin/chkconfig --level 2345 cgconfig on
-
   notify: restart cgconfig
   when: vct_dir.stat.exists == False
 
