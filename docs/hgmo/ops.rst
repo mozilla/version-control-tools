@@ -374,5 +374,42 @@ for that partition has crashed for some reason. Try to start it back up:
 You might want to take a look at the logs in ``/var/log/vcsreplicator`` to
 make sure the process is happy.
 
-TODO provide remediation step for skipping bad messages.
+If there are errors starting the consumer process (including if the
+consumer process keeps restarting due to crashing applying the next
+available message), then we've encountered a scenario that will
+require a bit more human involvement.
 
+.. important::
+
+   At this point, it might be a good idea to ping people in #vcs or
+   page Developer Services on Call, as they are the domain experts.
+
+If the consumer daemon is stuck in an endless loop trying to apply
+the replication log, there are generally two ways out:
+
+1. Fix the condition causing the endless loop.
+2. Skip the message.
+
+We don't yet know of correctable conditions causing endless loops. So,
+for now the best we can do is skip the message and hope the condition
+doesn't come back::
+
+   $ /repo/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --skip
+
+.. important::
+
+   Skipping messages could result in the repository replication state
+   getting out of whack.
+
+   If this only occurred on a single machine, consider taking the
+   machine out of the load balancer until the incident is investigated
+   by someone in #vcs.
+
+   If this occurred globally, please raise awareness ASAP.
+
+.. important::
+
+   If you skip a message, please file a bug in
+   `Developer Services :: hg.mozilla.org <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org>`_
+   with details of the incident so the root cause can be tracked down
+   and the underlying bug fixed.

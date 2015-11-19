@@ -345,6 +345,8 @@ def cli():
             help='Start N records from the beginning')
     parser.add_argument('--partition', type=int,
             help='Partition to fetch from. Defaults to all partitions.')
+    parser.add_argument('--skip', action='store_true',
+            help='Skip the consuming of the next message then exit')
 
     args = parser.parse_args()
 
@@ -372,6 +374,18 @@ def cli():
             messages.append(m[2])
 
         print(yaml.safe_dump(messages, default_flow_style=False).rstrip())
+        sys.exit(0)
+
+    if args.skip:
+        r = consumer.get_message()
+        if not r:
+            print('no message available; nothing to skip')
+            sys.exit(1)
+
+        partition, message, payload = r
+        consumer.commit(partitions=[partition])
+        print('skipped message in partition %d for group %s' % (
+            partition, group))
         sys.exit(0)
 
     root = logging.getLogger()
