@@ -9,8 +9,8 @@ from __future__ import absolute_import, unicode_literals
 import argparse
 import sys
 
-from ..config import Config
-from ..consumer import consumer_offsets_and_lag
+from .config import Config
+from .consumer import consumer_offsets_and_lag
 
 
 def check_consumer_lag():
@@ -96,7 +96,3 @@ def check_consumer_lag():
     print('for details about this check.')
 
     sys.exit(exit)
-
-
-if __name__ == '__main__':
-    check_consumer_lag()

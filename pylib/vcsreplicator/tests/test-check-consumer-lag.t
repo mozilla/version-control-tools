@@ -3,7 +3,7 @@
   $ . $TESTDIR/pylib/vcsreplicator/tests/helpers.sh
   $ vcsrenv
 
-  $ alias check='hgmo exec hgweb0 /repo/hg/venv_replication/bin/python -m vcsreplicator.nagios.check_consumer_lag /etc/mercurial/vcsreplicator.ini'
+  $ alias check='hgmo exec hgweb0 /repo/hg/venv_replication/bin/check_vcsreplicator_lag /etc/mercurial/vcsreplicator.ini'
 
 Check should be OK by default
 

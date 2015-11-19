@@ -14,5 +14,10 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
     packages=find_packages(),
+    entry_points={
+        'console_scripts': [
+            'check_vcsreplicator_lag=vcsreplicator.nagios:check_consumer_lag',
+        ],
+    },
     install_requires=['kafka-python', 'Mercurial'],
 )

@@ -182,15 +182,6 @@
     - "{{ venv_replication }}"
     - "{{ venv_tools }}"
 
-- name: add packages to virtualenvs
-  copy: dest=/repo/hg/{{ item.venv }}/lib/python2.7/site-packages/{{ item.pth }}.pth
-        content=/repo/hg/version-control-tools/{{ item.path }}
-        owner=root
-        group=root
-        mode=0644
-  with_items:
-    - { venv: venv_replication, path: pylib/vcsreplicator, pth: vcsreplicator }
-
 - name: set up version-control-tools repo (server only)
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
       dest=/repo/hg/version-control-tools
@@ -209,6 +200,14 @@
 - name: rsync version-control-tools repo (Docker only)
   command: /usr/bin/rsync -a --delete-after /vct/ /repo/hg/version-control-tools/
   when: vct_dir.stat.exists == True
+
+# pip doesn't reinstall the same version unless --upgrade is passed.
+# We need to pass --no-deps to prevent dependencies from getting pulled
+# in. If we did pull in dependencies, there is a potential MITM since
+# peep secures download of 3rd party packages.
+# --force-reinstall is there for completeness.
+- name: install vcsreplicator into virtualenv
+  command: /repo/hg/venv_replication/bin/pip install --upgrade --no-deps --force-reinstall /repo/hg/version-control-tools/pylib/vcsreplicator
 
 # Various hgrc files reference hooks via "python:mozhghooks.*". Install
 # a link in the replication virtualenv to the path to these hooks inside
