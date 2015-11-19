@@ -118,7 +118,7 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
                         'result': ''
                     }
 
-                    mozreview_updates.append([transplant_id, pingback_url,
+                    mozreview_updates.append([transplant_id,
                                               json.dumps(data)])
 
         landed, result = transplant.transplant_to_mozreview(gh, destination,
@@ -154,7 +154,7 @@ def handle_pending_mozreview_pullrequests(logger, dbconn):
         else:
             data['error_msg'] = result
 
-        mozreview_updates.append([transplant_id, pingback_url, json.dumps(data)])
+        mozreview_updates.append([transplant_id, json.dumps(data)])
 
     if finished_revisions:
         query = """
@@ -277,7 +277,7 @@ def handle_pending_transplants(logger, dbconn):
         else:
             data['error_msg'] = result
 
-        mozreview_updates.append([transplant_id, pingback_url, json.dumps(data)])
+        mozreview_updates.append([transplant_id, json.dumps(data)])
 
         finished_revisions.append([landed, result, transplant_id])
 
@@ -299,8 +299,8 @@ def handle_pending_transplants(logger, dbconn):
 
     if mozreview_updates:
         query = """
-            insert into MozreviewUpdate(request_id,pingback_url,data)
-            values(%s,%s,%s)
+            insert into MozreviewUpdate(transplant_id,data)
+            values(%s,%s)
         """
         cursor.executemany(query, mozreview_updates)
         dbconn.commit()
@@ -359,8 +359,9 @@ def handle_pending_mozreview_updates(logger, dbconn):
 
     cursor = dbconn.cursor()
     query = """
-        select request_id,pingback_url,data
-        from MozreviewUpdate
+        select MozreviewUpdate.id,transplant_id,request,data
+        from MozreviewUpdate inner join Transplant
+        on (Transplant.id = MozreviewUpdate.transplant_id)
         limit %(limit)s
     """
     cursor.execute(query, {'limit': MOZREVIEW_COMMENT_LIMIT})
@@ -370,9 +371,11 @@ def handle_pending_mozreview_updates(logger, dbconn):
     updated = []
     all_posted = True
     for row in cursor.fetchall():
-        request_id, pingback_url, data = row
+        update_id, transplant_id, request, data = row
+        pingback_url = request.get('pingback_url')
+
         logger.info('trying to post mozreview update to: %s for request: %s' %
-                    (pingback_url, request_id))
+                    (pingback_url, transplant_id))
 
         # We allow empty pingback_urls as they make testing easier. We can
         # always check the logs for misconfigured pingback_urls.
@@ -380,18 +383,18 @@ def handle_pending_mozreview_updates(logger, dbconn):
             status_code, text = mozreview.update_review(mozreview_auth,
                                                         pingback_url, data)
             if status_code == 200:
-                updated.append([request_id])
+                updated.append([update_id])
             else:
                 logger.info('failed: %s - %s' % (status_code, text))
                 all_posted = False
                 break
         else:
-            updated.append([request_id])
+            updated.append([update_id])
 
     if updated:
         query = """
             delete from MozreviewUpdate
-            where request_id=%s
+            where id=%s
         """
         cursor.executemany(query, updated)
         dbconn.commit()

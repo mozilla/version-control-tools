@@ -32,9 +32,8 @@ create table Transplant (\
 grant all privileges on table Transplant to autoland;
 
 create table MozreviewUpdate (\
-    request_id bigint,\
-    pingback_url text,\
-    data text,\
-    primary key(request_id)\
+    id bigserial primary key,\
+    transplant_id bigint references transplant(id),\
+    data text\
 );
 grant all privileges on table MozreviewUpdate to autoland;
