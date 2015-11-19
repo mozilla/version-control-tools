@@ -26,6 +26,13 @@ if not os.path.exists(repo_permissions):
     raise Exception('could not find repo-permissions script')
 
 
+# We need to use the hg that is configured for replication otherwise
+# hooks and other Python dependencies may not load properly.
+HG = '/repo/hg/venv_replication/bin/hg'
+if not os.path.exists(HG):
+    raise Exception('could not find %s' % HG)
+
+
 class CloneError(Exception):
     def __init__(self, path, is_clone, output=None):
         super(CloneError, self).__init__()
@@ -41,14 +48,14 @@ def clone_or_pull(rel, path, requires, url, user, group):
     try:
         if not os.path.exists(path):
             is_clone = True
-            args = ['hg', 'init', path]
+            args = [HG, 'init', path]
             if 'generaldelta' in requires:
                 args.extend(['--config', 'format.generaldelta=true'])
 
             print('creating empty repo: %s' % path)
             subprocess.check_output(args, cwd='/', stderr=subprocess.STDOUT)
 
-        args = ['hg', '-R', path, 'pull', url]
+        args = [HG, '-R', path, 'pull', url]
         subprocess.check_output(args, cwd='/', stderr=subprocess.STDOUT)
 
         # Synchronize hgrc file via mirror-pull.
