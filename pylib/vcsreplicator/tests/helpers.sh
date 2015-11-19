@@ -25,4 +25,4 @@ EOF
 
 }
 
-alias consumer='python -m vcsreplicator.consumer $TESTTMP/vcsreplicator.ini'
+alias consumer='vcsreplicator-consumer $TESTTMP/vcsreplicator.ini'
