@@ -25,14 +25,14 @@ Check should be OK by default
 Stop the replication consumers to test failure scenarios
 
   $ hgmo exec hgweb0 /usr/bin/supervisorctl stop vcsreplicator:*
-  vcsreplicator:1: stopped
-  vcsreplicator:0: stopped
-  vcsreplicator:3: stopped
-  vcsreplicator:2: stopped
-  vcsreplicator:5: stopped
-  vcsreplicator:4: stopped
-  vcsreplicator:7: stopped
-  vcsreplicator:6: stopped
+  vcsreplicator:\d: stopped (re)
+  vcsreplicator:\d: stopped (re)
+  vcsreplicator:\d: stopped (re)
+  vcsreplicator:\d: stopped (re)
+  vcsreplicator:\d: stopped (re)
+  vcsreplicator:\d: stopped (re)
+  vcsreplicator:\d: stopped (re)
+  vcsreplicator:\d: stopped (re)
 
 No issues reported when thresholds aren't met
 
@@ -141,14 +141,14 @@ Critical reported when lag time hits threshold
 Resuming consumers clears check
 
   $ hgmo exec hgweb0 /usr/bin/supervisorctl start vcsreplicator:*
-  vcsreplicator:0: started
-  vcsreplicator:3: started
-  vcsreplicator:2: started
-  vcsreplicator:5: started
-  vcsreplicator:4: started
-  vcsreplicator:7: started
-  vcsreplicator:6: started
-  vcsreplicator:1: started
+  vcsreplicator:\d: started (re)
+  vcsreplicator:\d: started (re)
+  vcsreplicator:\d: started (re)
+  vcsreplicator:\d: started (re)
+  vcsreplicator:\d: started (re)
+  vcsreplicator:\d: started (re)
+  vcsreplicator:\d: started (re)
+  vcsreplicator:\d: started (re)
 
   $ check --warning-lag-count 0 --warning-lag-time 1.0
   OK - 8/8 consumers completely in sync
