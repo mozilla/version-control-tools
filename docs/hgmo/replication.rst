@@ -81,11 +81,13 @@ The distributed transaction log is built on top of
 delivery systems (such as AMQP/RabbitMQ), Kafka provides guarantees that
 satisfy our requirements. Notably:
 
-* Kafka stores data to local disk and is durable against single node failure.
+* Kafka is a distributed system and can survive a failure in a single node
+  (no single point of failure).
 * Clients can robustly and independently store the last fetch offset. This
   allows independent replication mirrors.
-* Kafka can provide delivery guarantees matching what is desired.
-* It's fast and battle tested.
+* Kafka can provide delivery guarantees matching what is desired (order
+  preserving, no message loss for acknowledged writes).
+* It's fast and battle tested by a lot of notable companies.
 
 For more on the subject of distributed transaction logs, please read
 `this excellent article from the people behind Kafka <https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying>`_.
@@ -107,14 +109,16 @@ Mercurial extension is installed on the leader server (the server where
 writes go). When data is written to a Mercurial repository, that data or
 metadata is written into Kafka.
 
-On each mirror, a daemon is watching the Kafka topic. When it sees a
-replication event, it reacts to it and applies the data or performs
-actions that will apply the data.
+On each mirror, a daemon is watching the Kafka topic. When a new message
+is written, it reacts to it. This typically involves applying data or
+performing some action in reaction to an upstream event.
 
 Each mirror operates independently of the leader. There is no direct
 signaling from leader to mirror when new data arrives. Instead, each
 consumer/daemon independently reacts to the availability of new data in
-Kafka. This reaction occurs practically instantaneously.
+Kafka. This reaction occurs practically instantaneously, as clients are
+continuously polling and Kafka will send data to *subscribed* clients
+as soon as it arrives.
 
 A Kafka cluster requires a quorum of servers in order to acknowledge and
 thus accept writes. Pushes to Mercurial will fail if quorum is not
@@ -124,6 +128,127 @@ Each mirror maintains its own offset into the replication log. If a
 mirror goes offline for an extended period of time, it will resume
 applying the replication log where it left off when it reconnects to
 Kafka.
+
+The Kafka topic is partitioned. Data for a particular repository is
+consistently routed to a specific partition based on the routing
+scheme defined on the server. There exist a pool of consumer processes
+on the mirror. Each process consumes exactly 1 partition. This enables
+concurrent consumption on clients (as opposed to having 1 process that
+consumes 1 message at a time) without having to invent a message
+acknowledgement and ordering system in addition to what Kafka supports.
+
+Architectural Deficiencies
+--------------------------
+
+Shared Replication Log and Sequential Consumption
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Consumer processes can only process 1 event at a time. Events from multiple
+repositories are written to a shared replication log. Therefore, replication
+of repository X may be waiting on an event in repository Y to finish
+processing. This can add unwanted replication latency. Or, if a consuming
+processes crashes or gets in an endless loop trying to apply an event,
+consuming stalls.
+
+Ideally, each repository would have its own replication event log and
+a pool of processes could consume events from any available replication
+log. There would need to be locking on consumers to ensure multiple
+processes aren't operating on the same repository. Such a system may not
+be possible with Kafka since apparently Kafka does not scale to thousands
+of topics and/or partitions. Although, hg.mozilla.org might be small enough
+for this to work. Alternate message delivery systems could potentially
+address this drawback. Although many message delivery systems don't provide
+the strong guarantees about delivery and ordering that Kafka does.
+
+Reliance on hg pull
+^^^^^^^^^^^^^^^^^^^
+
+Currently, pushing of new changegroup data results in ``hg pull`` being
+executed on mirrors. ``hg pull`` is robust and mostly deterministic. However,
+it does mean that mirrors must connect to the leader server to perform
+the replication. This means the leader's availability is necessary to perform
+replication.
+
+A replication system more robust to failure of the leader would store all
+data in Kafka. As long as Kafka is up, mirrors would be able to synchronize.
+Another benefit of this model is that it would likely be faster: mirrors
+would have all to-be-applied data immediately available and wouldn't need
+to fetch it from a central server. Keep in mind that fetching large amounts
+of data can add significant load on the remote server, especially if
+several machines are connecting at once.
+
+Another benefit of having all data in the replication log is that we could
+potentially store this *bundle* data in a key-value store (like S3)
+and leverage Mercurial's built in mechanism for serving bundles from remote
+URLs. The Mercurial server would essentially serve ``hg pull`` requests by
+telling clients to fetch data from a scalable, possibly distributed
+key-value store (such as a CDN).
+
+A benefit of relying on ``hg pull`` based replication is it is simple:
+we don't need to reinvent Mercurial data storage. If we stop using ``hg
+pull``, various types of data updates potentially fall through the cracks,
+especially if 3rd party extensions are involved. Also, storing data in
+the replication log could explode the size of the replication log, leading
+to its own scaling challenges.
+
+Inconsistency Window on Mirrors
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Mirrors replicate independently. And data applied by mirrors is available
+immediately. Therefore, there is a window (hopefully small) where mirrors
+have inconsistent state of a repository.
+
+If 2 mirrors are behind the same load balancer and requests are randomly
+routed to each of the mirrors, there is a chance a client may encounter
+inconsistent state. For example, a client may poll the pushlog to see
+what changesets are available then initiate a ``hg pull -r <rev>`` to
+fetch a just-pushed changeset. The pushlog from an in sync mirror may
+expose the changeset. But the ``hg pull`` hits an out-of-date mirror and
+is unable to find the requested changeset.
+
+There are a few potential mechanisms to rectify this problem.
+
+Mirrors could use shared storage. Mercurial's built-in transaction semantics
+ensure that clients don't read data that hasn't been fully committed yet.
+This is done at the filesystem level so any networked filesystem (like
+NFS) that honors atomic file moves should enable consistent state to be
+exposed to multiple consumers. However, networked filesystems have their
+own set of problems, including performance and possibly single points of
+failure. Not all environments are able to support networked filesystems
+either.
+
+A potential (and yet unexplored) solution leverages ZooKeeper and
+Mercurial's *filtered repository* mechanism. Mercurial's repository
+access layer goes through a *filter* that can hide changesets from the
+consumer. This is frequently encountered in the context of obsolescence
+markers: obsolescence markers hide changesets from normal view. However,
+the changesets can still be accessed via the *unfiltered* view, which can
+be accessed by calling a ``hg`` command with the ``--hidden`` argument.
+
+It might be possible to store the set of fully replicated heads for a
+given repository in ZooKeeper. When a request comes in, we look up which
+heads have been fully replicated and only expose changesets up to that
+point, even if the local repository has additional data available.
+
+We would like to avoid an operational dependency on ZooKeeper (and Kafka)
+for repository read requests. (Currently, reads have no direct dependency
+on the availability of the ZooKeeper and Kafka clusters and we'd like to
+keep it this way so points of failure are minimized.) Figuring out how
+to track replicated heads in ZooKeeper so mirrors can expose consistent
+state could potentially introduce a read-time dependency.
+
+Related to this problem of inconsistent state of mirrors is knowing
+when to remove a failing mirror from service. If a mirror encounters a
+catastrophic failure of its replication mechanism but the Mercurial server
+is still functioning, we would ideally detect when the mirror is drifting
+out of sync and remove it from the pool of mirrors so clients don't
+encounter inconsistent state across the mirror pool. This sounds like
+an obvious thing to do. But automatically removing machines can be
+dangerous, as being too liberal in yanking machines from service could
+result in removing machines necessary to service current load. When you
+consider that replication issues tend to occur during periods of high
+load, you can imagine what bad situations automatic decisions could get us
+in. Extreme care must be practices when going down this road.
 
 Comparison to Legacy Replication System
 =======================================
