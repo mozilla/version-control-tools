@@ -1,8 +1,26 @@
-bugsy
-flask
+# sha256: YRAWO83XAcLC3sZkiLsHjJmOkCDkYlNHg0X0DLESN-w
+bugsy==0.6.0
+
+# sha256: TIOCn_g9QIteHUmVRyJlQR0sQUESKY8utLNZ2eRWM3M
+flask==0.10.1
+
+# sha256: ugYzfln0e7rE05246EYE9iue8EuAvgfWIeG_VvlVVLs
 github3.py==1.0.0a1
-mozillapulse
-mozlog == 2.2
-psycopg2
+
+# sha256: 1GR5QxZa_9EbrwcFVWkgSB1TRrl2BLq6tq128XREdMY
+mercurial==3.6.1
+
+# sha256: dQzlorS9IlvQCzOeGsUzwWsYfAgEaVuz2HjGme4rMig
+mozillapulse==1.2.2
+
+# sha256: AQCIYcygr7ac0w3NOJhD_rgX57nRRtU0UClUTPA73nI
+mozlog==2.2
+
+# sha256: as-au751fvddwuzZ2RunSVR5Qauv--af8ghqnjfUkEw
+psycopg2==2.6.1
+
+# sha256: DcCH0Vt3TNqC08gJb7DlFMrrLdtg7tOOkFaxbiebo8U
 python-hglib==1.7
-requests
+
+# sha256: ifGx8l3Ne2j1FOjTQaWy60ZvlgrnVoIuqrSAo8GoHCg
+requests==2.8.1
