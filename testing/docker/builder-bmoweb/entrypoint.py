@@ -55,7 +55,6 @@ cc = subprocess.check_call
 
 patches = {
     'apache24.patch',
-    'bmodata.patch',
     'elasticsearch.patch',
 }
 patched_files = {
@@ -65,10 +64,13 @@ patched_files = {
     'docker/scripts/generate_bmo_data.pl',
 }
 
+existing_patched_files = [p for p in patched_files
+                          if os.path.exists(os.path.join(bz_dir, p))]
+
 # Ensure Bugzilla Git clone is up to date.
 
 # First unpatch changed files just in case they get modified.
-cc(['/usr/bin/git', 'checkout', '--'] + list(patched_files), cwd=bz_dir)
+cc(['/usr/bin/git', 'checkout', '--'] + existing_patched_files, cwd=bz_dir)
 
 # We want container startup to work when offline. So put this behind
 # an environment variable that can be specified by automation.
@@ -173,7 +175,8 @@ if not os.path.exists(j(h, 'checksetup.done')):
     args = [
         'perl',
         '-I', j(b, 'lib'),
-        j(b, 'docker', 'scripts', 'generate_bmo_data.pl'),
+        j(b, 'docker', 'generate_bmo_data.pl'),
+        'admin@example.com',
     ]
 
     subprocess.check_call(args, cwd=b)

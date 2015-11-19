@@ -7,6 +7,9 @@
 # The format of the file is not relevant. But we try to keep a log of
 # why we're forcing changes.
 
+2015-11-19 - generate_bmo_data.pl path changed. script no longer requires
+patching since it accepts argument for admin email address.
+
 2015-11-06 - mod_perl.pl upstream changes
 
 2015-08-24 - install-module.pl was deleted.
