@@ -236,14 +236,15 @@
 - name: install wsgi config
   copy: content="LoadModule wsgi_module /repo/hg/venv_hgweb/lib/python2.7/site-packages/mod_wsgi/server/mod_wsgi-py27.so" dest=/etc/httpd/conf.d/wsgi.conf
 
+- name: directory for httpd logs
+  file: path=/var/log/httpd/hg.mozilla.org
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
 - name: configure httpd to start at system startup
   command: /sbin/chkconfig --level 2345 httpd on
-
-- name: ensure httpd service is started
-  service: name=httpd state=started
-  # Don't do this on Docker because it has its own mechanism for
-  # starting.
-  when: vct_dir.stat.exists == False
 
 - name: install mirror-pull script
   template: src=mirror-pull.j2
@@ -293,10 +294,6 @@
 
 - name: install the cronjob that runs the user repo wsgi file creation script
   cron: minute="*/2" user=hg job="/usr/local/bin/make_user_wsgi_dirs.sh" name="Generate user wsgi files"
-
-# Create and manage httpd log resources
-- name: make logdir
-  file: path=/var/log/httpd/hg.mozilla.org state=directory mode=0755
 
 - name: add logrotate httpd config
   copy: src=logrotate.conf dest=/etc/logrotate.d/hg-httpd-logrotate
@@ -499,6 +496,14 @@
         group=root
         mode=0644
   notify: restart nrpe
+
+# Needs to come near end for fresh server provisioning scenario to work
+# right.
+- name: ensure httpd service is started
+  service: name=httpd state=started
+  # Don't do this on Docker because it has its own mechanism for
+  # starting.
+  when: vct_dir.stat.exists == False
 
 # Pull in tasks shared between hg-ssh and hg-web.
 # This should run last to ensure all preconditions are met.
