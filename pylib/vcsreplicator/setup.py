@@ -17,6 +17,7 @@ setup(
     entry_points={
         'console_scripts': [
             'check_vcsreplicator_lag=vcsreplicator.nagios:check_consumer_lag',
+            'vcsreplicator-print-offsets=vcsreplicator.consumer:print_offsets',
         ],
     },
     install_requires=['kafka-python', 'Mercurial'],
