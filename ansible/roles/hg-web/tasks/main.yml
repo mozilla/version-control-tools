@@ -213,7 +213,7 @@
 # a link in the replication virtualenv to the path to these hooks inside
 # the version-control-tools checkout.
 - name: add mozhghooks to virtualens
-  copy: dest=/repo/hg/{{ item }} /lib/python2.7/site-packages/mozhghooks.pth
+  copy: dest=/repo/hg/{{ item }}/lib/python2.7/site-packages/mozhghooks.pth
         content=/repo/hg/version-control-tools/hghooks
         owner=root
         group=root
