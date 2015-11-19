@@ -75,7 +75,7 @@ The commit message parser recognizes simple lists::
 
    Bug 123 - Fix type coercion in MozReview; r?gps, smacleod
 
-The `test corpus <https://dxr.mozilla.org/hgcustom:version-control-tools/source/pylib/mozautomation/tests/test_commitparser.py>`_
+The `test corpus <https://dxr.mozilla.org/hgcustom_version-control-tools/source/pylib/mozautomation/tests/test_commitparser.py>`_
 demonstrates the abilities of reviewer parsing.
 
 When commits are pushed for review, the server will parse the commit
