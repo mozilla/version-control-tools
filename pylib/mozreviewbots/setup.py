@@ -15,5 +15,5 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
     packages=find_packages(),
-    install_requires=['RBTools', 'kombu'],
+    install_requires=['RBTools', 'flake8', 'kombu', 'pep8'],
 )
