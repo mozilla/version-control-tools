@@ -395,7 +395,7 @@ def exchangepullpushlog(orig, pullop):
     repo = pullop.repo
 
     tree = resolve_uri_to_tree(pullop.remote.url())
-    if not tree or not repo.changetracker:
+    if not tree or not repo.changetracker or tree == "try":
         return res
 
     repo.ui.status('fetching pushlog\n')
