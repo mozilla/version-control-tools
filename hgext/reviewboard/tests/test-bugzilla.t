@@ -62,7 +62,7 @@ Publishing the review will add an attachment to the bug
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -84,7 +84,8 @@ Publishing the review will add an attachment to the bug
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - Bug 1 - Foo 1
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -124,7 +125,7 @@ published.
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -146,7 +147,8 @@ published.
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - Bug 1 - Foo 1
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
     - author: default@example.com
       id: 4
       tags: []

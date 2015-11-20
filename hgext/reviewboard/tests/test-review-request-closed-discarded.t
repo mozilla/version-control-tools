@@ -52,7 +52,7 @@
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -62,7 +62,7 @@
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/ (glob)
+      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -84,7 +84,8 @@
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - Bug 1 - Foo 1
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
     - author: default@example.com
       id: 3
       tags: []
@@ -92,7 +93,8 @@
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - Bug 1 - Foo 2
+      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -185,7 +187,7 @@ The review attachment should be marked as obsolete
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -195,7 +197,7 @@ The review attachment should be marked as obsolete
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/ (glob)
+      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -217,7 +219,8 @@ The review attachment should be marked as obsolete
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - Bug 1 - Foo 1
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
     - author: default@example.com
       id: 3
       tags: []
@@ -225,7 +228,8 @@ The review attachment should be marked as obsolete
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - Bug 1 - Foo 2
+      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -365,7 +369,7 @@ There should still not be a visible attachment on the bug
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -375,7 +379,7 @@ There should still not be a visible attachment on the bug
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/ (glob)
+      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -397,7 +401,8 @@ There should still not be a visible attachment on the bug
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - Bug 1 - Foo 1
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
     - author: default@example.com
       id: 3
       tags: []
@@ -405,7 +410,8 @@ There should still not be a visible attachment on the bug
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - Bug 1 - Foo 2
+      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -497,7 +503,7 @@ The attachment for the review request should be unobsoleted
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -507,7 +513,7 @@ The attachment for the review request should be unobsoleted
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/ (glob)
+      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -529,7 +535,8 @@ The attachment for the review request should be unobsoleted
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - Bug 1 - Foo 1
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
     - author: default@example.com
       id: 3
       tags: []
@@ -537,7 +544,8 @@ The attachment for the review request should be unobsoleted
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - Bug 1 - Foo 2
+      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
     - author: default@example.com
       id: 4
       tags: []

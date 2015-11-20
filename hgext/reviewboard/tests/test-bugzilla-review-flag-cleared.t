@@ -34,7 +34,7 @@ Sanity check to ensure we have a review flag set
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
@@ -62,7 +62,8 @@ Sanity check to ensure we have a review flag set
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - Bug 1 - Initial commit to review
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -82,7 +83,7 @@ Publishing a review will clear the r? flag
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -105,7 +106,8 @@ Publishing a review will clear the r? flag
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - Bug 1 - Initial commit to review
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -134,7 +136,7 @@ Posting a non Ship It review without a review flag adds a comment
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -157,7 +159,8 @@ Posting a non Ship It review without a review flag adds a comment
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - Bug 1 - Initial commit to review
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -193,7 +196,7 @@ Posting a Ship It review will add an r+
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
@@ -221,7 +224,8 @@ Posting a Ship It review will add an r+
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - Bug 1 - Initial commit to review
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -270,7 +274,7 @@ Updating the review request as an L1 author will not re-request review
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/ (glob)
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
@@ -298,7 +302,8 @@ Updating the review request as an L1 author will not re-request review
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - Bug 1 - Initial commit to review
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -368,7 +373,7 @@ Sanity check to ensure we have an r? flag
     attachments:
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/ (glob)
+      data: http://*:$HGPORT1/r/4/diff/#index_header (glob)
       description: 'MozReview Request: Bug 2 - Initial commit to review'
       file_name: reviewboard-4-url.txt
       flags:
@@ -396,7 +401,8 @@ Sanity check to ensure we have an r? flag
       - Created attachment 2
       - 'MozReview Request: Bug 2 - Initial commit to review'
       - ''
-      - Bug 2 - Initial commit to review
+      - 'Review commit: http://*:$HGPORT1/r/4/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/4/' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -418,7 +424,7 @@ Sanity check to ensure we have an r+ flag set
     attachments:
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/ (glob)
+      data: http://*:$HGPORT1/r/4/diff/#index_header (glob)
       description: 'MozReview Request: Bug 2 - Initial commit to review'
       file_name: reviewboard-4-url.txt
       flags:
@@ -446,7 +452,8 @@ Sanity check to ensure we have an r+ flag set
       - Created attachment 2
       - 'MozReview Request: Bug 2 - Initial commit to review'
       - ''
-      - Bug 2 - Initial commit to review
+      - 'Review commit: http://*:$HGPORT1/r/4/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/4/' (glob)
     - author: reviewer@example.com
       id: 9
       tags: []
@@ -482,7 +489,7 @@ We should have an r+ flag already set.
     attachments:
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/ (glob)
+      data: http://*:$HGPORT1/r/4/diff/#index_header (glob)
       description: 'MozReview Request: Bug 2 - Modified commit to review'
       file_name: reviewboard-4-url.txt
       flags:
@@ -510,7 +517,8 @@ We should have an r+ flag already set.
       - Created attachment 2
       - 'MozReview Request: Bug 2 - Modified commit to review'
       - ''
-      - Bug 2 - Initial commit to review
+      - 'Review commit: http://*:$HGPORT1/r/4/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/4/' (glob)
     - author: reviewer@example.com
       id: 9
       tags: []

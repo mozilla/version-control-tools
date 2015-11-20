@@ -261,19 +261,16 @@ def post_bugzilla_attachment(bugzilla, bug_id, review_request_draft,
         if review.ship_it:
             reviewers[last_user.email] = True
 
+    rr_url = get_obj_url(review_request)
+    diff_url = '%sdiff/#index_header' % rr_url
     diffset_count = review_request.diffset_history.diffsets.count()
+
     if diffset_count < 1:
-        comment = review_request_draft.description
-
-        if (review_request_draft.changedesc and
-            review_request_draft.changedesc.text):
-            if not comment.endswith('\n'):
-                comment += '\n'
-
-            comment += '\n%s' % review_request_draft.changedesc.text
+        comment = 'Review commit: %s\nSee other reviews: %s' % (diff_url,
+                                                                rr_url)
     else:
         comment = ('Review request updated; see interdiff: '
-                   '%sdiff/%d-%d/\n' % (get_obj_url(review_request),
+                   '%sdiff/%d-%d/\n' % (rr_url,
                                         diffset_count,
                                         diffset_count + 1))
 
@@ -281,7 +278,7 @@ def post_bugzilla_attachment(bugzilla, bug_id, review_request_draft,
                          review_request.id,
                          review_request_draft.summary,
                          comment,
-                         get_obj_url(review_request),
+                         diff_url,
                          reviewers)
 
 
@@ -465,15 +462,15 @@ def on_review_publishing(user, review, **kwargs):
         [b.post_comment(int(bug_id), comment) for bug_id in
          review_request.get_bug_list()]
     else:
-        rr_url = get_obj_url(review_request, site, siteconfig)
+        diff_url = '%sdiff/#index_header' % get_obj_url(review_request)
         bug_id = int(review_request.get_bug_list()[0])
 
         if review.ship_it:
-            commented = b.r_plus_attachment(bug_id, review.user.email, rr_url,
-                                            comment)
+            commented = b.r_plus_attachment(bug_id, review.user.email,
+                                            diff_url, comment)
         else:
             commented = b.cancel_review_request(bug_id, review.user.email,
-                                                rr_url, comment)
+                                                diff_url, comment)
 
         if comment and not commented:
             b.post_comment(bug_id, comment)
@@ -512,8 +509,8 @@ def on_review_request_closed_discarded(user, review_request, type, **kwargs):
         # commit review requests.
         b = Bugzilla(get_bugzilla_api_key(user))
         bug = int(review_request.get_bug_list()[0])
-        url = get_obj_url(review_request)
-        b.obsolete_review_attachments(bug, url)
+        diff_url = '%sdiff/#index_header' % get_obj_url(review_request)
+        b.obsolete_review_attachments(bug, diff_url)
 
 
 def on_review_request_closed_submitted(user, review_request, type, **kwargs):
