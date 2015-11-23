@@ -114,6 +114,7 @@
       pause: seconds=15
 
 - hosts: reviewboardadm.private.scl3.mozilla.com
+  gather_facts: no
   tasks:
     - name: notify IRC that the deployment has finished
       irc: server=irc.mozilla.org
