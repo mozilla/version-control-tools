@@ -3,23 +3,6 @@ alter user autoland with password 'autoland';
 create sequence request_sequence;
 grant usage, select on sequence request_sequence to autoland;
 
-create table MozreviewPullRequest (\
-    id bigint default nextval('request_sequence'),\
-    ghuser varchar(255),\
-    repo varchar(255),\
-    pullrequest integer,\
-    destination varchar(20),\
-    bzuserid integer,\
-    bzcookie varchar(255),\
-    bugid integer,\
-    landed boolean,\
-    result text,\
-    pullrequest_updated boolean,\
-    pingback_url text,\
-    primary key(id)\
-);
-grant all privileges on table MozreviewPullRequest to autoland;
-
 create table Transplant (\
     id bigint default nextval('request_sequence'),\
     destination varchar(255),\

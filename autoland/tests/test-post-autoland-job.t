@@ -112,34 +112,5 @@ Getting status for an unknown job should return a 404
   $ ottoland autoland-job-status $AUTOLAND_URL 42
   (404, u'{\n  "error": "Not found"\n}')
 
-Posting a pullrequest job with bad credentials should fail
-
-  $ ottoland post-pullrequest-job $AUTOLAND_URL user repo 1 mozreview 1 cookie http://localhost:9898 --bugid 1 --user blah --password blah
-  (401, u'Login required')
-
-Post a pullrequest job. We should generate a login cookie here, but this
-functionality is broken (see Bug 1159271). We plan to change over to Bugzilla
-tokens prior to deploying this anyway, so there is not much point in fixing
-things here.
-
-  $ ottoland post-pullrequest-job $AUTOLAND_URL user repo 1 test-repo 1 cookie http://localhost:9898 --bugid 1
-  (200, u'{\n  "request_id": 6\n}')
-  $ ottoland pullrequest-job-status $AUTOLAND_URL 6
-  (200, u'{\n  "bugid": 1, \n  "destination": "test-repo", \n  "error_msg": null, \n  "landed": null, \n  "pullrequest": 1, \n  "repo": "repo", \n  "result": "", \n  "user": "user"\n}')
-
-Posting a pullrequest job without a bugid should automatically file a bug for the user.
-TODO: We should verify that the bug is created once we are using tokens and this
-command can succeed.
-
-  $ ottoland post-pullrequest-job $AUTOLAND_URL user repo 1 test-repo 1 cookie http://localhost:9898
-  (200, u'{\n  "request_id": 7\n}')
-  $ ottoland pullrequest-job-status $AUTOLAND_URL 7
-  (200, u'{\n  "bugid": null, \n  "destination": "test-repo", \n  "error_msg": null, \n  "landed": null, \n  "pullrequest": 1, \n  "repo": "repo", \n  "result": "", \n  "user": "user"\n}')
-
-Getting status for an unknown job should return a 404
-
-  $ ottoland pullrequest-job-status $AUTOLAND_URL 42
-  (404, u'{\n  "error": "Not found"\n}')
-
   $ mozreview stop
   stopped 10 containers
