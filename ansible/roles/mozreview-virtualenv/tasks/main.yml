@@ -60,6 +60,11 @@
         owner=root
         group=root
 
+- name: configure shebang in peep
+  replace: dest={{ venv }}/bin/peep
+           regexp='^#!\/usr\/bin\/env python$'
+           replace='#!{{ venv }}/bin/python'
+
 - name: copy requirements.txt
   copy: src=requirements.txt
         dest={{ venv }}/requirements.txt
