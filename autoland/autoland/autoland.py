@@ -132,6 +132,18 @@ def handle_pending_transplants(logger, dbconn):
                 logger.info('transplant failed: we lost a push race')
                 retry_revisions.append((now, transplant_id))
                 continue
+            elif 'unresolved conflicts (see hg resolve' in result:
+                logger.info('transplant failed - manual rebase required: '
+                            'tree: %s rev: %s destination: %s error: %s' %
+                            (tree, rev, destination, result))
+                # This is the only autoland error for which we expect the
+                # user to take action. We should make things nicer than the
+                # raw mercurial error.
+                # TODO: sad trombone sound
+                header = ('We\'re sorry, Autoland could not rebase your '
+                          'commits for you automatically. Please manually '
+                          'rebase your commits and try again.\n\n')
+                result = header + result
             else:
                 logger.info('transplant failed: tree: %s rev: %s '
                             'destination: %s error: %s' %
