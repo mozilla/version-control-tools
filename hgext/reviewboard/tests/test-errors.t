@@ -10,19 +10,27 @@
   > EOF
   $ echo "reviewboard=$(echo $TESTDIR)/hgext/reviewboard/server.py" >> server/.hg/hgrc
 
-Server should complain if the extension is not configured
+Extension shouldn't complain if repos are not affiliated with a review
+repo
 
+  $ hg -R server identify
+  000000000000 tip
+
+reviewboard.repobasepath will trigger validation
+
+  $ hg --config reviewboard.repobasepath=$TESTTMP -R server identify
+  abort: Please set reviewboard.repoid to the numeric ID of the repository this repo is associated with.
+  [255]
+
+  $ cat >> server/.hg/hgrc << EOF
+  > [reviewboard]
+  > repoid = 1
+  > EOF
   $ hg -R server identify
   abort: Please set reviewboard.url to the URL of the Review Board instance to talk to.
   [255]
 
-  $ echo "[reviewboard]" >> server/.hg/hgrc
   $ echo "url = http://localhost/" >> server/.hg/hgrc
-  $ hg -R server identify
-  abort: Please set reviewboard.repoid to the numeric ID of the repository this repo is associated with.
-  [255]
-
-  $ echo "repoid = 1" >> server/.hg/hgrc
 
   $ hg -R server identify
   abort: Please set reviewboard.username to the username for priveleged communications with Review Board.

@@ -273,14 +273,32 @@ def reposetup(ui, repo):
     if not repo.local():
         return
 
-    if not ui.config('reviewboard', 'url', None):
-        raise util.Abort(_('Please set reviewboard.url to the URL of the '
-            'Review Board instance to talk to.'))
+    # The extension requires configuration when enabled. But we don't
+    # want to require configuration for every repository because it
+    # essentially makes `hg` useless unless certain config options are
+    # present. So, we only validate the configuration if reviewboard.repoid
+    # is set or if the repository's path falls under the configured base
+    # path for review repos.
+    active = False
+
+    if ui.config('reviewboard', 'repoid', None):
+        active = True
+    else:
+        basepath = ui.config('reviewboard', 'repobasepath', None)
+        if basepath and repo.root.startswith(basepath):
+            active = True
+
+    if not active:
+        return
 
     if (not ui.configint('reviewboard', 'repoid', None) and
             not ui.configbool('reviewboard', 'isdiscoveryrepo')):
         raise util.Abort(_('Please set reviewboard.repoid to the numeric ID '
             'of the repository this repo is associated with.'))
+
+    if not ui.config('reviewboard', 'url', None):
+        raise util.Abort(_('Please set reviewboard.url to the URL of the '
+            'Review Board instance to talk to.'))
 
     if not ui.config('reviewboard', 'username', None):
         raise util.Abort(_('Please set reviewboard.username to the username '
