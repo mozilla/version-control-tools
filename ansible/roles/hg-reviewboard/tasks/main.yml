@@ -102,6 +102,10 @@
     - venv_hgweb
     - venv_pash
 
+# Install a custom Pygments distribution. See pygments.yml for reasons.
+- include: ../../../tasks/pygments.yml
+           pip=/repo/hg/venv_hgweb/bin/pip
+
 - name: install pash configuration file
   template: src=pash.json.j2
             dest=/etc/mercurial/pash.json
