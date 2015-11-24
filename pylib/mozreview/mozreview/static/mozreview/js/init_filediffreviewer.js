@@ -51,4 +51,5 @@ $(document).ready(function() {
         }
       });
     });
+    $.funcQueue('diff_files').next();
 });
