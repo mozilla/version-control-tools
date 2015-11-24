@@ -22,6 +22,10 @@ cd pylib/mozreview
 python setup.py develop
 cd ../..
 
+cd pylib/mozreviewbots
+python setup.py develop
+cd ../..
+
 cd pylib/rbbz
 python setup.py develop
 cd ../..
