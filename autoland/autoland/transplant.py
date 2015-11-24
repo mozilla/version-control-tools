@@ -79,7 +79,7 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
         if not trysyntax.startswith("try: "):
             trysyntax =  "try: %s" % trysyntax
 
-        cmds.extend([['--config', 'ui.allowemptycommit=true', 'commit', '-m', trysyntax],
+        cmds.extend([['--encoding=utf-8', '--config', 'ui.allowemptycommit=true', 'commit', '-m', trysyntax],
                      ['log', '-r', 'tip', '-T', '{node|short}'],
                      ['push', '-r', '.', '-f', 'try'],
                      ['strip', '--no-backup', '-r', 'draft()'],])
