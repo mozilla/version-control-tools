@@ -60,6 +60,7 @@ details from the parent review request
     - diffset_revision: 1
       rev: 233b570e5356d0c84bcbf0633de446172012b3b3
       review_request_id: 3
+    landing_repository_url: null
     parent_diffset_revision: 1
     parent_review_request_id: 1
     repository_url: http://*:$HGPORT/test-repo (glob)

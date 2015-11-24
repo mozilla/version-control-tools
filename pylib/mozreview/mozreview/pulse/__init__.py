@@ -51,10 +51,13 @@ def handle_commits_published(extension=None, **kwargs):
                             'added' not in cd.fields_changed['diff'])):
         return
 
-    # TODO: Find a better place to retrieve the repository url since we might
-    # want it to be different from path here. This will require a new convention
-    # for where to store it, mirror_path might work.
-    repo_url = review_request.repository.path
+    # We publish both the review repository url as well as the landing
+    # ("inbound") repository url. This gives consumers which perform hg
+    # operations the option to avoid cloning the review repository, which may
+    # be large.
+    repo = review_request.repository
+    repo_url = repo.path
+    landing_repo_url = repo.extra_data.get('landing_repository_url')
 
     child_rrids = []
     commits = []
@@ -90,6 +93,7 @@ def handle_commits_published(extension=None, **kwargs):
     msg.data['parent_diffset_revision'] = review_request.get_latest_diffset().revision
     msg.data['commits'] = commits
     msg.data['repository_url'] = repo_url
+    msg.data['landing_repository_url'] = landing_repo_url
 
     # TODO: Make work with RB localsites.
     msg.data['review_board_url'] = get_server_url()
