@@ -2,5 +2,3 @@
 Mercurial==3.5.2
 # sha256: fdlUDbl5fypbSR6v9jRGQwUFU-vLti93V2LL46A0PCU
 mod-wsgi==4.4.11
-# sha256: CjoiZeHvsN76ci0fQpcw3J35da3DxgrH0rQyvfA8BB0
-Pygments==2.0.2

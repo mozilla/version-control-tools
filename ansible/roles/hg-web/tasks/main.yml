@@ -182,6 +182,10 @@
     - "{{ venv_replication }}"
     - "{{ venv_tools }}"
 
+# Install a custom Pygments distribution. See pygments.yml for reasons.
+- include: ../../../tasks/pygments.yml
+           pip={{ venv_hgweb }}/bin/pip
+
 - name: set up version-control-tools repo (server only)
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
       dest=/repo/hg/version-control-tools
