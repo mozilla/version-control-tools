@@ -456,21 +456,21 @@ class AutolandRequestUpdateResource(WebAPIResource):
                 'error': '%s' % e,
                 }
         try:
-            AutolandRequest.objects.get(pk=fields['request_id'])
+            autoland_request = AutolandRequest.objects.get(
+                pk=fields['request_id'])
         except AutolandRequest.DoesNotExist:
             return DOES_NOT_EXIST
 
-        if fields['landed']:
-            autoland_request = AutolandRequest.objects.filter(pk=fields['request_id'])
-            autoland_request.update(repository_revision=fields['result'])
+        rr = ReviewRequest.objects.get(pk=autoland_request.review_request_id)
 
-            assert len(autoland_request) == 1
+        if fields['landed']:
+            autoland_request.repository_revision=fields['result']
+            autoland_request.save()
 
             # If we've landed to the "inbound" repository, we'll close the
             # review request automatically.
-            rr = ReviewRequest.objects.get(pk=autoland_request[0].review_request_id)
             landing_repo = rr.repository.extra_data.get('landing_repository_url')
-            if autoland_request[0].repository_url == landing_repo:
+            if autoland_request.repository_url == landing_repo:
                 rr.close(ReviewRequest.SUBMITTED)
 
             AutolandEventLogEntry.objects.create(
@@ -491,8 +491,8 @@ class AutolandRequestUpdateResource(WebAPIResource):
             )
 
         lock_id = get_autoland_lock_id(rr.id,
-                                       autoland_request[0].repository_url,
-                                       autoland_request[0].push_revision)
+                                       autoland_request.repository_url,
+                                       autoland_request.push_revision)
         release_lock(lock_id)
 
         return 200, {}
