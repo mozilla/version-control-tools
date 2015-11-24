@@ -20,3 +20,4 @@ create table MozreviewUpdate (\
     data text\
 );
 grant all privileges on table MozreviewUpdate to autoland;
+grant usage, select on sequence mozreviewupdate_id_seq to autoland;

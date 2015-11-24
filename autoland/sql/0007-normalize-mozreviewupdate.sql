@@ -8,3 +8,4 @@ alter table mozreviewupdate drop constraint mozreviewupdate_pkey;
 alter table mozreviewupdate add column id bigserial primary key;
 alter table mozreviewupdate rename column request_id to transplant_id;
 alter table mozreviewupdate add foreign key(transplant_id) references transplant(id);
+grant usage, select on sequence mozreviewupdate_id_seq to autoland;
