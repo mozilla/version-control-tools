@@ -50,6 +50,6 @@ $(document).ready(function() {
           console.debug('no diff table found')
         }
       });
+      $.funcQueue('diff_files').next();
     });
-    $.funcQueue('diff_files').next();
 });
