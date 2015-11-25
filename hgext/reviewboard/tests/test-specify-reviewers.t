@@ -58,7 +58,7 @@ Try a bunch of different ways of specifying a reviewer
   $ echo blah >> foo
   $ hg commit -m 'Bug 1 - More stuff; [r?remus, r?romulus]'
   $ echo blah >> foo
-  $ hg commit -m 'Bug 1 - More stuff; r?romulus, a=test-only'
+  $ hg commit -m 'Bug 1 - More stuff; r?romulus, r=test-only'
   $ hg push
   pushing to ssh://*:$HGPORT6/test-repo (glob)
   (adding commit id to 10 changesets)
@@ -107,8 +107,8 @@ Try a bunch of different ways of specifying a reviewer
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
-  changeset:  20:9138f440ecac
-  summary:    Bug 1 - More stuff; r?romulus, a=test-only
+  changeset:  20:bb63798ced0f
+  summary:    Bug 1 - More stuff; r?romulus, r=test-only
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
   review id:  bz://1/mynick
@@ -196,8 +196,8 @@ Publishing series during push works
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (draft) (glob)
   
-  changeset:  20:9138f440ecac
-  summary:    Bug 1 - More stuff; r?romulus, a=test-only
+  changeset:  20:bb63798ced0f
+  summary:    Bug 1 - More stuff; r?romulus, r=test-only
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
   review id:  bz://1/mynick
@@ -280,7 +280,7 @@ code path.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (glob)
   
-  changeset:  22:f70fd1f0a35e
+  changeset:  22:4edf42122107
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -342,7 +342,7 @@ again.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (glob)
   
-  changeset:  22:f70fd1f0a35e
+  changeset:  22:4edf42122107
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -408,7 +408,7 @@ and pushed with no reviewers specified.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (glob)
   
-  changeset:  24:4a950181ffd8
+  changeset:  24:6f4a14de0f3d
   summary:    Bug 1 - Amended stuff
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -472,7 +472,7 @@ those specified in the commit summary.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://*:$HGPORT1/r/10 (glob)
   
-  changeset:  26:3ec3b449ccca
+  changeset:  26:3d7e903b90b0
   summary:    Bug 1 - Amended stuff; r?romulus, r?remus
   review:     http://*:$HGPORT1/r/11 (draft) (glob)
   
@@ -502,7 +502,7 @@ Unrecognized reviewers should be ignored
   submitting 1 changesets for review
   unrecognized reviewer: cthulhu
   
-  changeset:  27:d9a3b1783a10
+  changeset:  27:3e01c2b3cff2
   summary:    Bug 2 - different stuff; r?cthulhu
   review:     http://*:$HGPORT1/r/13 (draft) (glob)
   
@@ -529,7 +529,7 @@ Reviewer identification should be case insensitive.
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  28:465e40c6747b
+  changeset:  28:46d3dc1774f5
   summary:    Bug 2 - better stuff; r?ryanvm
   review:     http://*:$HGPORT1/r/13 (draft) (glob)
   
