@@ -1,0 +1,8 @@
+[ui]
+username = Otto Länd <bind-autoland@mozilla.com>
+merge = internal:fail
+
+[extensions]
+purge =
+rebase =
+strip =
