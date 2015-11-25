@@ -57,6 +57,7 @@ Blackbox logging recorded appropriate entries
   * user1@example.com> replication of changegroup data completed successfully in *s (glob)
   * user1@example.com> pythonhook-changegroup: mozhghooks.replicate.changegrouphook finished in * seconds (glob)
   * user1@example.com> pythonhook-changegroup: mozhghooks.push_printurls.hook finished in * seconds (glob)
+  * user1@example.com> pythonhook-changegroup: mozhghooks.advertise_upgrade.hook finished in * seconds (glob)
   * user1@example.com> 1 incoming changes - new heads: 77538e1ce4be (glob)
   * user1@example.com> -R /repo/hg/mozilla/mozilla-central serve --stdio exited 0 after * seconds (glob)
 
@@ -115,6 +116,11 @@ Upgrade notice is advertised to clients not running bundle2
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/425a9d45c43d
+  remote: 
+  remote: YOU ARE PUSHING WITH AN OUT OF DATE MERCURIAL CLIENT!
+  remote: newer versions are faster and have numerous bug fixes
+  remote: upgrade instructions are at the following URL:
+  remote: https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/installing.html
 
 vcsreplicator short circuits existing replication hook when loaded
 
