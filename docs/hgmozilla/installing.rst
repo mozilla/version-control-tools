@@ -48,6 +48,14 @@ Installing on OS X
 Mercurial is not installed on OS X by default. You will need to install
 it from a package manager or install it from source.
 
+mach bootstrap
+--------------
+
+If you have a clone of a Firefox repository, simply run `mach bootstrap`
+to install/upgrade Mercurial. Keep in mind this will install all
+packages required for Firefox development. If this is not wanted,
+follow a set of instructions below.
+
 Homebrew
 --------
 
@@ -66,6 +74,11 @@ MacPorts typically keeps their Mercurial package up to date. Install
 through MacPorts by running::
 
   $ port install mercurial
+
+From Source
+-----------
+
+See the section below about how to install Mercurial from source.
 
 Installing on Linux, BSD, and other UNIX-style OSs
 ==================================================
@@ -87,7 +100,7 @@ out the version you wish to install::
 
   $ hg clone https://selenic.com/repo/hg
   $ cd hg
-  $ hg up 3.6
+  $ hg up 3.6.1
 
 Once you have the source code, run ``make`` to install Mercurial::
 
@@ -124,6 +137,10 @@ in place, run::
   $ hg debuginstall
 
 If it detects problems, correct them.
+
+If you have a clone of the Firefox repository, you are highly encouraged
+to run `mach mercurial-setup` to launch an interactive wizard that will
+help you optimally configure Mercurial for use at Mozilla.
 
 Reasons to Upgrade
 ==================
