@@ -307,7 +307,7 @@ class FileDiffReviewerField(BaseReviewRequestField):
             'id', flat=True
         )
 
-        if user.id in reviewer_ids:
+        if user.is_authenticated():
             diffset = self.review_request_details.get_latest_diffset()
 
             for item in diffset.files.all():
