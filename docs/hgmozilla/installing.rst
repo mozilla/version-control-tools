@@ -33,86 +33,6 @@ needed (if a severe issue is encountered).
 If you are conservative about software updates, it is OK to wait to
 upgrade until the *X.Y.1* point release following a major version bump.
 
-Reasons to Upgrade
-==================
-
-General Advice
---------------
-
-Mercurial releases tend to be faster and have fewer bugs than previous
-releases. These are compelling reasons to stay up to date.
-
-Avoid Mercurial versions older than 3.5 due to issues below.
-
-Cloning and Pulling Performance
--------------------------------
-
-Mercurial 3.6 contains a number of enhancements to performance of
-cloning and pull operations, especially on Windows. Clone times for
-mozilla-central on Windows can be several minutes faster with 3.6.
-
-Revset Performance
-------------------
-
-Mercurial 3.5 and 3.6 contained a number of performance improvements to
-revision sets. If you are a user of ``hg wip`` or ``hg smartlog``, these
-commands will likely be at least 4x faster on Mercurial 3.6.
-
-Revsets are used internally by Mercurial. So these improvements result
-in performance improvements for a hodgepodge of operations.
-
-Tags Cache Performance
-----------------------
-
-Mercurial 3.4 contains improvements to the tags cache that prevent
-it from frequently doing CPU-intensive computations in some workflows.
-
-.. important::
-
-   Users of evolve will have horrible performance due to the tags
-   cache implementation in versions older than 3.4 and should upgrade
-   to 3.4+.
-
-Performance Issues with Large Repositories
-------------------------------------------
-
-Mercurial 3.0 through 3.1.1 contained a significant performance
-regression that manifests when cloning or pulling tens of thousands
-of changesets. These versions of Mercurial should be avoided
-when interacting with large repositories, such as mozilla-central.
-
-Mercurial 3.3 introduced a class of performance regressions most
-likely encountered as part of running ``hg blame`` or ``hg graft``.
-The regressions are largely fixed in 3.4.
-
-CVE-2014-9390
--------------
-
-Mercurial versions older than 3.2.3 should be avoided due to a security
-issue (CVE-2014-9390) impacting Windows and OS X users.
-
-Supporting Old Versions
------------------------
-
-Mozilla has written a handful of Mercurial extensions. Supporting
-N versions of Mercurial is easier than supporting N+1 versions,
-especially as Mercurial's API is rapidly evolving. It is extra work
-to support old versions when new versions work just fine.
-
-Newer Wire Protocol
--------------------
-
-Mercurial 3.5 featured a new wire protocol that performs pushes and
-pulls more efficiently.
-
-Cloning from Pre-Generated Bundle Files
----------------------------------------
-
-Mercurial 3.6 supports transparently cloning from pre-generated bunle
-files. When you clone from hg.mozilla.org, many of the larger
-repositories will be served from a CDN. This results in a faster
-and more reliable clone.
-
 Installing on Windows
 =====================
 
@@ -204,3 +124,83 @@ in place, run::
   $ hg debuginstall
 
 If it detects problems, correct them.
+
+Reasons to Upgrade
+==================
+
+General Advice
+--------------
+
+Mercurial releases tend to be faster and have fewer bugs than previous
+releases. These are compelling reasons to stay up to date.
+
+Avoid Mercurial versions older than 3.5 due to issues below.
+
+Cloning and Pulling Performance
+-------------------------------
+
+Mercurial 3.6 contains a number of enhancements to performance of
+cloning and pull operations, especially on Windows. Clone times for
+mozilla-central on Windows can be several minutes faster with 3.6.
+
+Revset Performance
+------------------
+
+Mercurial 3.5 and 3.6 contained a number of performance improvements to
+revision sets. If you are a user of ``hg wip`` or ``hg smartlog``, these
+commands will likely be at least 4x faster on Mercurial 3.6.
+
+Revsets are used internally by Mercurial. So these improvements result
+in performance improvements for a hodgepodge of operations.
+
+Tags Cache Performance
+----------------------
+
+Mercurial 3.4 contains improvements to the tags cache that prevent
+it from frequently doing CPU-intensive computations in some workflows.
+
+.. important::
+
+   Users of evolve will have horrible performance due to the tags
+   cache implementation in versions older than 3.4 and should upgrade
+   to 3.4+.
+
+Performance Issues with Large Repositories
+------------------------------------------
+
+Mercurial 3.0 through 3.1.1 contained a significant performance
+regression that manifests when cloning or pulling tens of thousands
+of changesets. These versions of Mercurial should be avoided
+when interacting with large repositories, such as mozilla-central.
+
+Mercurial 3.3 introduced a class of performance regressions most
+likely encountered as part of running ``hg blame`` or ``hg graft``.
+The regressions are largely fixed in 3.4.
+
+CVE-2014-9390
+-------------
+
+Mercurial versions older than 3.2.3 should be avoided due to a security
+issue (CVE-2014-9390) impacting Windows and OS X users.
+
+Supporting Old Versions
+-----------------------
+
+Mozilla has written a handful of Mercurial extensions. Supporting
+N versions of Mercurial is easier than supporting N+1 versions,
+especially as Mercurial's API is rapidly evolving. It is extra work
+to support old versions when new versions work just fine.
+
+Newer Wire Protocol
+-------------------
+
+Mercurial 3.5 featured a new wire protocol that performs pushes and
+pulls more efficiently.
+
+Cloning from Pre-Generated Bundle Files
+---------------------------------------
+
+Mercurial 3.6 supports transparently cloning from pre-generated bunle
+files. When you clone from hg.mozilla.org, many of the larger
+repositories will be served from a CDN. This results in a faster
+and more reliable clone.
