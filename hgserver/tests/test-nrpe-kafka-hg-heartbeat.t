@@ -10,21 +10,44 @@
 Check should pass by default
 
   $ check
-  OK - wrote heartbeat message into replication log
+  OK - heartbeat message sent successfully
+  
+  sending heartbeat to partition 0
+  sending heartbeat to partition 1
+  sending heartbeat to partition 2
+  sending heartbeat to partition 3
+  sending heartbeat to partition 4
+  sending heartbeat to partition 5
+  sending heartbeat to partition 6
+  sending heartbeat to partition 7
+  wrote heartbeat message into 8 partitions
 
 Check should still pass with a node out of the cluster
 
   $ hgmo exec hgweb0 /usr/bin/supervisorctl stop kafka
   kafka: stopped
   $ check
-  OK - wrote heartbeat message into replication log
+  OK - heartbeat message sent successfully
+  
+  sending heartbeat to partition 0
+  sending heartbeat to partition 1
+  sending heartbeat to partition 2
+  sending heartbeat to partition 3
+  sending heartbeat to partition 4
+  sending heartbeat to partition 5
+  sending heartbeat to partition 6
+  sending heartbeat to partition 7
+  wrote heartbeat message into 8 partitions
 
 Check should fail with no quorum in cluster
 
   $ hgmo exec hgweb1 /usr/bin/supervisorctl stop kafka
   kafka: stopped
   $ check
-  CRITICAL - abort: error sending heartbeat: UNKNOWN
+  CRITICAL - error sending heartbeat
+  
+  sending heartbeat to partition 0
+  abort: error sending heartbeat: UNKNOWN
   
   Unable to write message into replication log. This likely 
   means incoming pushes will be denied since they will unable to 

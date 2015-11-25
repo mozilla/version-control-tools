@@ -15,7 +15,15 @@
   $ hg -q push
 
   $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
-  wrote heartbeat message into replication log
+  sending heartbeat to partition 0
+  sending heartbeat to partition 1
+  sending heartbeat to partition 2
+  sending heartbeat to partition 3
+  sending heartbeat to partition 4
+  sending heartbeat to partition 5
+  sending heartbeat to partition 6
+  sending heartbeat to partition 7
+  wrote heartbeat message into 8 partitions
 
 Disabling a single Kafka node should still allow push to go through
 
@@ -23,7 +31,15 @@ Disabling a single Kafka node should still allow push to go through
   kafka: stopped
 
   $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
-  wrote heartbeat message into replication log
+  sending heartbeat to partition 0
+  sending heartbeat to partition 1
+  sending heartbeat to partition 2
+  sending heartbeat to partition 3
+  sending heartbeat to partition 4
+  sending heartbeat to partition 5
+  sending heartbeat to partition 6
+  sending heartbeat to partition 7
+  wrote heartbeat message into 8 partitions
 
   $ echo 1 > foo
   $ hg commit -m 'disabled 1/3 nodes'
@@ -47,6 +63,7 @@ Disabling 2 Kafka nodes should result in no quorum and failure to push
   $ hgmo exec hgweb1 /usr/bin/supervisorctl stop kafka
   kafka: stopped
   $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
+  sending heartbeat to partition 0
   abort: error sending heartbeat: UNKNOWN
   [255]
 
@@ -66,7 +83,15 @@ Adding node back in should result in being able to push again
   $ hgmo exec hgweb1 /usr/bin/supervisorctl start kafka
   kafka: started
   $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
-  wrote heartbeat message into replication log
+  sending heartbeat to partition 0
+  sending heartbeat to partition 1
+  sending heartbeat to partition 2
+  sending heartbeat to partition 3
+  sending heartbeat to partition 4
+  sending heartbeat to partition 5
+  sending heartbeat to partition 6
+  sending heartbeat to partition 7
+  wrote heartbeat message into 8 partitions
 
   $ hg push
   pushing to ssh://*:$HGPORT/mozilla-central (glob)
@@ -135,7 +160,15 @@ Stopping Kafka on hgssh node doesn't break pushes
   kafka: stopped
 
   $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
-  wrote heartbeat message into replication log
+  sending heartbeat to partition 0
+  sending heartbeat to partition 1
+  sending heartbeat to partition 2
+  sending heartbeat to partition 3
+  sending heartbeat to partition 4
+  sending heartbeat to partition 5
+  sending heartbeat to partition 6
+  sending heartbeat to partition 7
+  wrote heartbeat message into 8 partitions
 
   $ echo disabled-hgssh > foo
   $ hg commit -m 'disabled hgssh'

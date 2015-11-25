@@ -13,10 +13,14 @@ args = ['/repo/hg/venv_tools/bin/hg', 'sendheartbeat']
 
 try:
     out = subprocess.check_output(args, stderr=subprocess.STDOUT)
-    print('OK - %s' % out.strip())
+    print('OK - heartbeat message sent successfully')
+    print('')
+    print(out.strip())
     exit = 0
 except subprocess.CalledProcessError as e:
-    print('CRITICAL - %s' % e.output.strip())
+    print('CRITICAL - error sending heartbeat')
+    print('')
+    print(e.output.strip())
     print('')
     print('Unable to write message into replication log. This likely ')
     print('means incoming pushes will be denied since they will unable to ')

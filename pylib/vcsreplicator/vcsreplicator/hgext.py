@@ -197,13 +197,16 @@ def sendheartbeat(ui):
     This is useful to see if the replication mechanism is writable.
     """
     try:
-        for partition in ui.replicationpartitions:
+        partitions = ui.replicationpartitions
+        for partition in partitions:
+            ui.status('sending heartbeat to partition %d\n' % partition)
             vcsrproducer.send_heartbeat(ui.replicationproducer,
                                         partition=partition)
     except kafkacommon.KafkaError as e:
         raise error.Abort('error sending heartbeat: %s' % e.message)
 
-    ui.status(_('wrote heartbeat message into replication log\n'))
+    ui.status(_('wrote heartbeat message into %d partitions\n') %
+            len(partitions))
 
 
 @command('replicatesync', [], 'replicate this repository to mirrors')
