@@ -257,7 +257,7 @@ Posting a Ship It review will add an r+
     status: UNCONFIRMED
     summary: First Bug
 
-Updating the review request as an L1 author will re-request review
+Updating the review request as an L1 author will not re-request review
 
   $ exportbzauth author@example.com password
 
@@ -276,9 +276,9 @@ Updating the review request as an L1 author will re-request review
       flags:
       - id: 2
         name: review
-        requestee: reviewer@example.com
-        setter: author@example.com
-        status: '?'
+        requestee: null
+        setter: reviewer@example.com
+        status: +
       id: 1
       is_obsolete: false
       is_patch: false
