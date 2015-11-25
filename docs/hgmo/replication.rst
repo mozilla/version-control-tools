@@ -304,11 +304,6 @@ Producer hgrc Config
 
 You'll need to configure your hgrc file to work with vcsreplicator::
 
-   # Tell vcsreplicator that we are a producer node (performing writes).
-   [replication]
-   role = producer
-
-   # Configure the producer.
    [replicationproducer]
 
    # Kafka host(s) to connect to.
@@ -320,14 +315,31 @@ You'll need to configure your hgrc file to work with vcsreplicator::
    # Kafka topic to write pushed data to
    topic = pushdata
 
-   # Partition to write data to.
-   partition = 0
+   # How to map local repository paths to partions. You can:
+   #
+   # * Have a single partition for all repos
+   # * Map a single repo to a single partition
+   # * Map multiple repos to multiple partitions
+   #
+   # The partition map is read in sorted order of the key names.
+   # Values are <partition>:<regexp>. If the partitions are a comma
+   # delimited list of integers, then the repo path will be hashed and
+   # routed to the same partition over time. This ensures that all
+   # messages for a specific repo are routed to the same partition and
+   # thus consumed in a strict first in first out ordering.
+   #
+   # Map {repos}/foo to partition 0
+   # Map everything else to partitions 1, 2, 3, and 4.
+   partitionmap.0foo = 0:\{repos\}/foo
+   partitionmap.1bar = 1,2,3,4:.*
 
    # Required acknowledgement for writes. See the Kafka docs. -1 is
    # strongly preferred in order to not lose data.
    reqacks = -1
 
    # How long (in MS) to wait for acknowledgements on write requests.
+   # If a write isn't acknowledged in this time, the write is cancelled
+   # and Mercurial rolls back its transaction.
    acktimeout = 10000
 
    # Normalize local filesystem paths for representation on the wire.
