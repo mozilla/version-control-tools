@@ -27,6 +27,13 @@ command = cmdutil.command(cmdtable)
            'path to json file with new commit descriptions', 'string')],
          _('hg rewritecommitdescriptions'))
 def rewrite_commit_descriptions(ui, repo, node, descriptions=None):
+
+    description_map = {}
+    with open(descriptions, 'rb') as f:
+        raw_descriptions = json.load(f)
+        for k in raw_descriptions:
+            description_map[k] = encoding.tolocal(raw_descriptions[k].encode('utf-8'))
+
     if not node:
         node = 'tip'
 
@@ -36,14 +43,16 @@ def rewrite_commit_descriptions(ui, repo, node, descriptions=None):
         ctx = repo[ancestor]
         if ctx.phase() != phases.draft:
             break
-        nodes.append(ctx.node())
+        sha1 = repo[ctx.node()].hex()[:12]
+        if sha1 in description_map:
+            nodes.append(ctx.node())
     nodes.reverse()
 
-    description_map = {}
-    with open(descriptions, 'rb') as f:
-        raw_descriptions = json.load(f)
-        for k in raw_descriptions:
-            description_map[k] = encoding.tolocal(raw_descriptions[k].encode('utf-8'))
+    if not nodes:
+        ui.write(_('no commits found to be rewritten\n'))
+        return 1
+
+    oldest_relevant_commit = repo[nodes[0]].hex()[:12]
 
     def prune_unchanged(node):
         sha1 = repo[node].hex()[:12]
@@ -57,7 +66,10 @@ def rewrite_commit_descriptions(ui, repo, node, descriptions=None):
     nodes = filter(prune_unchanged, nodes)
     if not nodes:
         ui.write(_('no commits found to be rewritten\n'))
-        return 1
+        # in this case, we need to output the sha1 of the oldest commit
+        # present in commit descriptions
+        ui.write('base: ' + oldest_relevant_commit + '\n')
+        return 0
 
     def createfn(repo, ctx, revmap, filectxfn):
         parents = rewrite.newparents(repo, ctx, revmap)
@@ -78,4 +90,7 @@ def rewrite_commit_descriptions(ui, repo, node, descriptions=None):
 
         return memctx
 
-    rewrite.replacechangesets(repo, nodes, createfn)
+    # we output the sha1 of the oldest modified commit
+    nodemap = rewrite.replacechangesets(repo, nodes, createfn)
+    ui.write('base: ' + repo[nodemap[nodes[0]]].hex()[:12] + '\n')
+    return 0
