@@ -45,7 +45,9 @@ from mozreview.file_diff_reviewer.resources import file_diff_reviewer_resource
 from mozreview.hooks import MozReviewApprovalHook
 from mozreview.hostingservice.hmo_repository import HMORepository
 from mozreview.ldap.resources import ldap_association_resource
-from mozreview.middleware import MozReviewUserProfileMiddleware
+from mozreview.middleware import (
+    MozReviewCacheDisableMiddleware,
+    MozReviewUserProfileMiddleware,)
 from mozreview.pulse import initialize_pulse_handlers
 from mozreview.resources.bugzilla_login import bugzilla_api_key_login_resource
 from mozreview.resources.commit_rewrite import commit_rewrite_resource
@@ -143,6 +145,7 @@ class MozReviewExtension(Extension):
     ]
 
     middleware = [
+        MozReviewCacheDisableMiddleware,
         MozReviewUserProfileMiddleware,
     ]
 
