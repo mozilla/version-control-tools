@@ -111,7 +111,8 @@ def handle_pending_transplants(logger, dbconn):
             #       duplicate work unnecessarily if we have to rebase more
             #       than once.
             landed, result = transplant.transplant(tree, destination, rev,
-                                                   trysyntax, push_bookmark)
+                                                   trysyntax, push_bookmark,
+                                                   commit_descriptions)
 
             if landed or 'abort: push creates new remote head' not in result:
                 break

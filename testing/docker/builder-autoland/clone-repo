@@ -10,19 +10,15 @@ cat > .hg/hgrc << EOF
 username = Otto Land <autoland@example.com>
 
 [extensions]
-evolve = /home/ubuntu/mutable-history/hgext/evolve.py
-mq =
 purge =
 rebase =
-reviewboard = /home/ubuntu/version-control-tools/hgext/reviewboard/client.py
 rewritecommitdescriptions = /home/ubuntu/version-control-tools/autoland/hgext/rewritecommitdescriptions.py
+strip =
 
 [paths]
-upstream = http://hgrb/$1
+upstream = /repos/inbound-$1
 $1 = http://hgrb/$1
 mozreview-push = ssh://hgrb/$1
 try = /repos/try
 inbound = /repos/inbound-$1
 EOF
-
-hg bookmark upstream

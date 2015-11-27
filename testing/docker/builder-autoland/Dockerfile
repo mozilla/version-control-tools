@@ -53,12 +53,14 @@ ADD start-autoland.sh /start-autoland.sh
 CMD ["/start-autoland.sh"]
 
 # %include autoland/autoland/
+# %include autoland/hgext/
 # %include hgext/bootstrap.py
 # %include hgext/reviewboard
 # %include pylib/mozautomation
 # %include pylib/mozhg
 # %include run-tests
 ADD extra/vct/autoland/autoland ${AUTOLAND_HOME}/autoland
+ADD extra/vct/autoland/hgext ${AUTOLAND_HOME}/hgext
 ADD extra/vct/run-tests ${VCT_HOME}/run-tests
 ADD extra/vct/hgext/bootstrap.py ${VCT_HOME}/hgext/bootstrap.py
 ADD extra/vct/hgext/reviewboard ${VCT_HOME}/hgext/reviewboard

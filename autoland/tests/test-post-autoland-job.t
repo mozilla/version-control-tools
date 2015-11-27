@@ -56,10 +56,10 @@ Posting a job with an unknown revision should fail
 
 Post a job
 
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` try http://localhost:9898
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` inbound http://localhost:9898
   (200, u'{\n  "request_id": 2\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 2 --poll
-  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "7194ef3a2eac", \n  "tree": "test-repo", \n  "trysyntax": ""\n}') (glob)
+  (200, u'{\n  "commit_descriptions": "", \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "7194ef3a2eac", \n  "tree": "test-repo", \n  "trysyntax": ""\n}') (glob)
 
 Post a job with try syntax
 
@@ -69,6 +69,13 @@ Post a job with try syntax
   (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "7194ef3a2eac", \n  "tree": "test-repo", \n  "trysyntax": "stuff"\n}') (glob)
 
 Post a job using a bookmark
+
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` inbound http://localhost:9898 --push-bookmark "bookmark"
+  (200, u'{\n  "request_id": 4\n}')
+  $ ottoland autoland-job-status $AUTOLAND_URL 4 --poll
+  (200, u'{\n  "commit_descriptions": "", \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "bookmark", \n  "result": "*", \n  "rev": "7194ef3a2eac", \n  "tree": "test-repo", \n  "trysyntax": ""\n}') (glob)
+
+Post a job with commit descriptions to be rewritten
 
   $ echo foo2 > foo
   $ hg commit --encoding utf-8 -m 'Bug 1 - こんにちは'
@@ -94,23 +101,32 @@ Post a job using a bookmark
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` try http://localhost:9898 --push-bookmark "bookmark"
-  (200, u'{\n  "request_id": 4\n}')
-  $ ottoland autoland-job-status $AUTOLAND_URL 4 --poll
-  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "bookmark", \n  "result": "7561731d264a", \n  "rev": "7561731d264a", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
-
-Post a job with commit descriptions to be rewritten
 
   $ REV=`hg log -r . --template "{node|short}"`
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --commit-descriptions "{\"$REV\": \"even better \\u3053\\u3093\\u306b\\u3061\\u306f\"}"
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"even better \\u3053\\u3093\\u306b\\u3061\\u306f\"}"
   (200, u'{\n  "request_id": 5\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 5 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "7561731d264a": "even better \\u3053\\u3093\\u306b\\u3061\\u306f"\n  }, \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "7561731d264a", \n  "rev": "7561731d264a", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
+  (200, u'{\n  "commit_descriptions": {\n    "7561731d264a": "even better \\u3053\\u3093\\u306b\\u3061\\u306f"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "push_bookmark": "", \n  "result": "342d164b4282", \n  "rev": "7561731d264a", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
 
 Getting status for an unknown job should return a 404
 
   $ ottoland autoland-job-status $AUTOLAND_URL 42
   (404, u'{\n  "error": "Not found"\n}')
+
+  $ mozreview exec autoland hg log /repos/test-repo/ --template '{rev}:{desc\|firstline}\\n'
+  2:even better ?????
+  1:Bug 1 - some stuff
+  0:root commit
+
+  $ mozreview exec autoland hg log /repos/try/ --template '{rev}:{desc\|firstline}\\n'
+  2:try: stuff
+  1:Bug 1 - some stuff
+  0:root commit
+
+  $ mozreview exec autoland hg log /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}\\n'
+  2:even better ?????
+  1:Bug 1 - some stuff
+  0:root commit
 
   $ mozreview stop
   stopped 10 containers
