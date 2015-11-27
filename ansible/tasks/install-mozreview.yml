@@ -12,6 +12,12 @@
 - name: delete ignored files from version-control-tools repo
   command: "{{ venv }}/bin/hg --config extensions.purge= -R {{ rb_vct }} purge --all"
 
+# mozreview imports from mozautomation package. So, we need to install
+# mozautomation before mozreview can be built.
+
+- name: install mozautomation egg
+  command: "{{ venv }}/bin/pip install --upgrade --no-deps --force-reinstall {{ rb_vct }}/pylib/mozautomation"
+
 # rbbz imports from mozreview package. So, we need to install mozreview before
 # rbbz can be built.
 
