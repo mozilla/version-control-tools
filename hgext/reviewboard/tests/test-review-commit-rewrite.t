@@ -23,7 +23,7 @@ Create bug and review
   $ echo bug > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
   $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=$l3key --config reviewboard.autopublish=true push
-  pushing to ssh://10.211.55.42:$HGPORT6/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/*-addcommitid.hg (glob)
   searching for changes
@@ -36,10 +36,10 @@ Create bug and review
   
   changeset:  1:04d9ab193e26
   summary:    Bug 1 - Initial commit to review
-  review:     http://10.211.55.42:$HGPORT1/r/2 (draft)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://10.211.55.42:$HGPORT1/r/1 (draft)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (review requests lack reviewers; visit review url to assign reviewers)
   
   publish these review requests now (Yn)? y
