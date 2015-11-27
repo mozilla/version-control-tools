@@ -168,10 +168,13 @@ class AutolandConcurrentTest(MozReviewWebDriverTest):
         # We should not be able to trigger a second Try run because the trees
         # are closed so the previous request is still pending.
         self.send_autoland_try_request()
-        activity_indicator = WebDriverWait(self.browser, 5).until(
-            EC.visibility_of_element_located((By.ID, 'activity-indicator'))
+        error_msg = WebDriverWait(self.browser, 10).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#activity-indicator .error_msg')
+            )
         )
-        self.assertTrue(activity_indicator.text.startswith((
-            'A server error occurred: '
-            'An autoland request for this review request is already in progress'
-        )))
+
+        self.assertEqual(error_msg.text,
+                        ('An autoland request for this review '
+                         'request is already in progress. '
+                         'Please wait for that request to finish.'))

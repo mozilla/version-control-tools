@@ -7,6 +7,31 @@ $(document).on("mozreview_ready", function() {
   var try_trigger = $("#autoland-try-trigger");
   var autoland_trigger = $("#autoland-trigger");
 
+  function show_error(error_text) {
+    $("#activity-indicator")
+      .addClass("error")
+      .text('')
+      .append(
+        $('<div/>').text(gettext('An error occurred:'))
+      )
+      .append(
+        $('<div/>').addClass("error_msg").text(error_text)
+      )
+      .append(
+        $('<div/>')
+        .append(
+          $("<a/>")
+            .text(gettext("Dismiss"))
+            .attr("href", "#")
+            .click(function(event) {
+              event.preventDefault();
+              $("#activity-indicator").fadeOut("fast");
+            })
+        )
+      )
+      .show();
+  }
+
   if (!MozReview.hasTryRepository) {
     try_trigger.attr('title', 'Try builds cannot be triggered for this repository');
   } else if ($("#draft-banner").is(":visible")) {
@@ -291,31 +316,6 @@ $(document).on("mozreview_ready", function() {
       }
         $( this ).addClass( "done" );
     });
-
-  function show_error(error_text) {
-    $("#activity-indicator")
-      .addClass("error")
-      .text('')
-      .append(
-        $('<div/>').text(gettext('An error occurred:'))
-      )
-      .append(
-        $('<div/>').text(error_text)
-      )
-      .append(
-        $('<div/>')
-        .append(
-          $("<a/>")
-            .text(gettext("Dismiss"))
-            .attr("href", "#")
-            .click(function(event) {
-              event.preventDefault();
-              $("#activity-indicator").fadeOut("fast");
-            })
-        )
-      )
-      .show();
-  }
 
   });
 });
