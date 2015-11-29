@@ -2,12 +2,12 @@
 venv_hgweb: /repo/hg/venv_hgweb
 venv_replication: /repo/hg/venv_replication
 venv_tools: /repo/hg/venv_tools
-wsgi_processes: "{{ ansible_processor_cores * 8 }}" # usually 48
+wsgi_processes: "{{ ansible_processor_cores * 4 }}" # usually 24
 httpd_start_servers: 8
 httpd_min_spare_servers: 5
 httpd_max_spare_servers: 20
-httpd_server_limit: "{{ ansible_processor_cores * 10 }}" # 60 or 120
-httpd_max_clients: "{{ ansible_processor_cores * 10 }}" # 60 or 120
+httpd_server_limit: "{{ ansible_processor_cores * 5 }}" # 30 or 60
+httpd_max_clients: "{{ ansible_processor_cores * 5 }}" # 30 or 60
 httpd_max_requests_per_child: 4000
 
 # Used for replication
