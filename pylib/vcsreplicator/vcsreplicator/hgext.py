@@ -5,6 +5,7 @@
 
 from __future__ import absolute_import
 
+import contextlib
 import hashlib
 import logging
 import os
@@ -31,6 +32,7 @@ cmdtable = {}
 command = cmdutil.command(cmdtable)
 
 
+
 def precommithook(ui, repo, **kwargs):
     # We could probably handle local commits. But our target audience is
     # server environments, where local commits shouldn't be happening.
@@ -47,12 +49,13 @@ def pretxnopenhook(ui, repo, **kwargs):
     replication log can not be written to. So we check replication log
     writability when we open transactions so we fail fast.
     """
-    try:
-        vcsrproducer.send_heartbeat(ui.replicationproducer,
-                                    partition=repo.replicationpartition)
-    except Exception:
-        ui.warn('replication log not available; all writes disabled\n')
-        return 1
+    with ui.kafkainteraction():
+        try:
+            vcsrproducer.send_heartbeat(ui.replicationproducer,
+                                        partition=repo.replicationpartition)
+        except Exception:
+            ui.warn('replication log not available; all writes disabled\n')
+            return 1
 
     repo._replicationinfo = {
         'pushkey': [],
@@ -80,12 +83,13 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
 
 
 def pretxnclosehook(ui, repo, **kwargs):
-    try:
-        vcsrproducer.send_heartbeat(ui.replicationproducer,
-                                    repo.replicationpartition)
-    except Exception:
-        ui.warn('replication log not available; cannot close transaction\n')
-        return True
+    with ui.kafkainteraction():
+        try:
+            vcsrproducer.send_heartbeat(ui.replicationproducer,
+                                        repo.replicationpartition)
+        except Exception:
+            ui.warn('replication log not available; cannot close transaction\n')
+            return True
 
 
 def txnclosehook(ui, repo, **kwargs):
@@ -111,59 +115,62 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
         if ctx.node() in heads:
             pushheads.append(ctx.hex())
 
-    vcsrproducer.record_hg_changegroup(ui.replicationproducer,
-                                       repo.replicationwireprotopath,
-                                       source,
-                                       pushnodes,
-                                       pushheads,
-                                       partition=repo.replicationpartition)
-    duration = time.time() - start
-    ui.status(_('recorded changegroup in replication log in %.3fs\n') % duration)
+    with ui.kafkainteraction():
+        vcsrproducer.record_hg_changegroup(ui.replicationproducer,
+                                           repo.replicationwireprotopath,
+                                           source,
+                                           pushnodes,
+                                           pushheads,
+                                           partition=repo.replicationpartition)
+        duration = time.time() - start
+        ui.status(_('recorded changegroup in replication log in %.3fs\n') %
+                    duration)
 
 
 def sendpushkeymessages(ui, repo):
     for namespace, key, old, new, ret in repo._replicationinfo['pushkey']:
-
-        start = time.time()
-        vcsrproducer.record_hg_pushkey(ui.replicationproducer,
-                                       repo.replicationwireprotopath,
-                                       namespace,
-                                       key,
-                                       old,
-                                       new,
-                                       ret,
-                                       partition=repo.replicationpartition)
-        duration = time.time() - start
-        ui.status(_('recorded updates to %s in replication log in %.3fs\n') % (
-                    namespace, duration))
+        with ui.kafkainteraction():
+            start = time.time()
+            vcsrproducer.record_hg_pushkey(ui.replicationproducer,
+                                           repo.replicationwireprotopath,
+                                           namespace,
+                                           key,
+                                           old,
+                                           new,
+                                           ret,
+                                           partition=repo.replicationpartition)
+            duration = time.time() - start
+            ui.status(_('recorded updates to %s in replication log in %.3fs\n') % (
+                        namespace, duration))
 
 
 def initcommand(orig, ui, dest, **opts):
-    # Send a heartbeat before we create the repo to ensure the replication
-    # system is online. This helps guard against us creating the repo
-    # and replication being offline.
-    producer = ui.replicationproducer
-    # TODO this should ideally go to same partition as replication event.
-    for partition in sorted(ui.replicationpartitions):
-        vcsrproducer.send_heartbeat(producer, partition=partition)
-        break
+    with ui.kafkainteraction():
+        # Send a heartbeat before we create the repo to ensure the replication
+        # system is online. This helps guard against us creating the repo
+        # and replication being offline.
+        producer = ui.replicationproducer
+        # TODO this should ideally go to same partition as replication event.
+        for partition in sorted(ui.replicationpartitions):
+            vcsrproducer.send_heartbeat(producer, partition=partition)
+            break
 
-    res = orig(ui, dest=dest, **opts)
+        res = orig(ui, dest=dest, **opts)
 
-    # init aborts if the repo already existed or in case of error. So we
-    # can only get here if we created a repo.
-    path = os.path.normpath(os.path.abspath(os.path.expanduser(dest)))
-    if not os.path.exists(path):
-        raise util.Abort('could not find created repo at %s' % path)
+        # init aborts if the repo already existed or in case of error. So we
+        # can only get here if we created a repo.
+        path = os.path.normpath(os.path.abspath(os.path.expanduser(dest)))
+        if not os.path.exists(path):
+            raise util.Abort('could not find created repo at %s' % path)
 
-    repo = hg.repository(ui, path)
+        repo = hg.repository(ui, path)
 
-    # TODO we should delete the repo if we can't write this message.
-    vcsrproducer.record_new_hg_repo(producer, repo.replicationwireprotopath,
-                                    partition=repo.replicationpartition)
-    ui.status(_('(recorded repository creation in replication log)\n'))
+        # TODO we should delete the repo if we can't write this message.
+        vcsrproducer.record_new_hg_repo(producer, repo.replicationwireprotopath,
+                                        partition=repo.replicationpartition)
+        ui.status(_('(recorded repository creation in replication log)\n'))
 
-    return res
+        return res
 
 
 @command('replicatehgrc', [], 'replicate the hgrc for this repository')
@@ -181,10 +188,12 @@ def replicatehgrc(ui, repo):
     else:
         content = None
 
-    producer = ui.replicationproducer
-    vcsrproducer.record_hgrc_update(producer, repo.replicationwireprotopath,
-                                    content,
-                                    partition=repo.replicationpartition)
+    with ui.kafkainteraction():
+        producer = ui.replicationproducer
+        vcsrproducer.record_hgrc_update(producer, repo.replicationwireprotopath,
+                                        content,
+                                        partition=repo.replicationpartition)
+
     ui.status(_('recorded hgrc in replication log\n'))
 
 
@@ -196,14 +205,15 @@ def sendheartbeat(ui):
 
     This is useful to see if the replication mechanism is writable.
     """
-    try:
-        partitions = ui.replicationpartitions
-        for partition in partitions:
-            ui.status('sending heartbeat to partition %d\n' % partition)
-            vcsrproducer.send_heartbeat(ui.replicationproducer,
-                                        partition=partition)
-    except kafkacommon.KafkaError as e:
-        raise error.Abort('error sending heartbeat: %s' % e.message)
+    with ui.kafkainteraction():
+        try:
+            partitions = ui.replicationpartitions
+            for partition in partitions:
+                ui.status('sending heartbeat to partition %d\n' % partition)
+                vcsrproducer.send_heartbeat(ui.replicationproducer,
+                                            partition=partition)
+        except kafkacommon.KafkaError as e:
+            raise error.Abort('error sending heartbeat: %s' % e.message)
 
     ui.status(_('wrote heartbeat message into %d partitions\n') %
             len(partitions))
@@ -224,10 +234,11 @@ def replicatecommand(ui, repo):
 
     heads = [repo[h].hex() for h in repo.heads()]
 
-    producer = ui.replicationproducer
-    vcsrproducer.record_hg_repo_sync(producer, repo.replicationwireprotopath,
-                                     hgrc, heads, repo.requirements,
-                                     partition=repo.replicationpartition)
+    with ui.kafkainteraction():
+        producer = ui.replicationproducer
+        vcsrproducer.record_hg_repo_sync(producer, repo.replicationwireprotopath,
+                                         hgrc, heads, repo.requirements,
+                                         partition=repo.replicationpartition)
     ui.status(_('wrote synchronization message into replication log\n'))
 
 
@@ -321,6 +332,20 @@ def uisetup(ui):
             for partitions, expr in self.replicationpartitionmap.values():
                 s |= set(partitions)
             return s
+
+        @contextlib.contextmanager
+        def kafkainteraction(self):
+            """Perform interactions with Kafka with error handling.
+
+            All interactions with Kafka should occur inside this context
+            manager. Kafka exceptions will be caught and handled specially.
+            """
+            try:
+                yield
+            except kafkacommon.KafkaError as e:
+                # TODO do stuff
+                raise
+
 
     ui.__class__ = replicatingui
 
