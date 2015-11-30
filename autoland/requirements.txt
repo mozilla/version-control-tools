@@ -19,8 +19,8 @@ mozlog==2.2
 # sha256: as-au751fvddwuzZ2RunSVR5Qauv--af8ghqnjfUkEw
 psycopg2==2.6.1
 
-# sha256: DcCH0Vt3TNqC08gJb7DlFMrrLdtg7tOOkFaxbiebo8U
-python-hglib==1.7
+# sha256: 9DAokrK4KHzzJlhscoC56t_D0MfNP-upV0KajZsaYM4
+python-hglib==1.9
 
 # sha256: ifGx8l3Ne2j1FOjTQaWy60ZvlgrnVoIuqrSAo8GoHCg
 requests==2.8.1

@@ -51,7 +51,8 @@ def autoland():
       "pingback_url": "http://localhost/"
     }
 
-    Trysyntax, push_bookmark and commit_descriptions are optional.
+    The trysyntax, push_bookmark and commit_descriptions fields are
+    optional, but one of trysyntax or commit_descriptions must be specified.
 
     Returns an id which can be used to get the status of the autoland
     request.
@@ -79,6 +80,12 @@ def autoland():
             return make_response(jsonify({'error': error}), 400)
     except:
         error = 'Bad request: bad pingback_url'
+        return make_response(jsonify({'error': error}), 400)
+
+    if not (request.json.get('trysyntax') or
+            request.json.get('commit_descriptions')):
+        error = ('Bad request: one of trysyntax or commit_descriptions must '
+                 'be specified.')
         return make_response(jsonify({'error': error}), 400)
 
     app.logger.info('received transplant request: %s' %
