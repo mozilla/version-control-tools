@@ -227,13 +227,11 @@ class syslogmixin(object):
         if not hasattr(self, '_serverlog'):
             return
 
-        if not self._serverlog['syslogconfigured']:
-            ident = self.repo.ui.config('syslog', 'ident', 'hgweb')
-            facility = self.repo.ui.config('syslog', 'facility', 'LOG_LOCAL2')
-            facility = getattr(syslog, facility)
+        ident = self.repo.ui.config('syslog', 'ident', 'hgweb')
+        facility = self.repo.ui.config('syslog', 'facility', 'LOG_LOCAL2')
+        facility = getattr(syslog, facility)
 
-            syslog.openlog(ident, 0, facility)
-            self._serverlog['syslogconfigured'] = True
+        syslog.openlog(ident, 0, facility)
 
         fmt = '%s %s %s'
         formatters = (self._serverlog['requestid'], action, ' '.join(args))
@@ -246,7 +244,6 @@ class syslogmixin(object):
 class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
     def run_wsgi(self, req):
         self._serverlog = {
-            'syslogconfigured': False,
             'requestid': str(uuid.uuid1()),
             'writecount': 0,
         }
@@ -302,7 +299,6 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
                 '%.3f' % deltacpu)
 
             syslog.closelog()
-            self._serverlog['syslogconfigured'] = False
 
 class sshserverwrapped(sshserver.sshserver, syslogmixin):
     """Wrap sshserver class to record events."""
@@ -311,7 +307,6 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
         self._serverlog = {
             'sessionid': str(uuid.uuid1()),
             'requestid': '',
-            'syslogconfigured': False,
         }
 
         self._populaterepopath()
@@ -343,7 +338,6 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
                 '%.3f' % deltacpu)
 
             syslog.closelog()
-            self._serverlog['syslogconfigured'] = False
 
     def serve_one(self):
         self._serverlog['requestid'] = str(uuid.uuid1())
