@@ -102,7 +102,7 @@ class AutolandConcurrentTest(MozReviewWebDriverTest):
         try_submit.click()
 
 
-    def test_autoland_try(self):
+    def test_autoland_try_concurrent(self):
         # We currently have four conditions for enabling the 'automation' menu
         # and try button (see static/mozreview/js/autoland.js):
         # 1. The review must be published
