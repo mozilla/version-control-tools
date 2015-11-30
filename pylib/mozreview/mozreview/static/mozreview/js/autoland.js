@@ -273,18 +273,17 @@ $(document).on("mozreview_ready", function() {
     });
   }
 
-  $('.action-landed').each(function(index, elem){
+  $('.action-landed[data-repository][data-revision]').each(function(index, elem){
     var repository = $(elem).data('repository');
     var revision = $(elem).data('revision');
     var actionHeading = $(elem).find('.action-info > .action-heading')[0];
     var actionMeta = $(elem).find('.action-info > .action-meta')[0];
-
     $.ajax({
       url: 'https://treeherder.mozilla.org/api/project/'+repository+'/resultset/?revision='+revision,
     })
     .done(function(response) {
       if (response.results.length != 1) {
-        $(actionHeading).text('Error fetching the results for '+revision+' from Treeherder');
+        $(actionHeading).text('Error fetching the results for '+revision+' on '+repository+' from Treeherder');
         $(elem).addClass('action-failure');
         if (response.results.length === 0) {
           $(actionMeta).text('Revision not found');

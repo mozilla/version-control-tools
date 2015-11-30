@@ -110,19 +110,32 @@ This is the template for the "Commits" list in a push-based review request.
       {% endif %}
 
       {% if autoland_request.last_known_status == 'S' %}
-      <div class="action action-landed"
-           data-repository="{{autoland_request.repository_url|treeherder_repo}}"
-           data-revision="{{autoland_request.repository_revision}}">
+      <div class="action action-landed">
         <div class="action-icon rounded-icon"></div>
         <div class="action-info">
-          <a href="https://treeherder.mozilla.org/#/jobs?repo={{autoland_request.repository_url|treeherder_repo}}&revision={{autoland_request.repository_revision}}">
-            See it in Treeherder
+          <a href="{{autoland_request.repository_url|ssh_to_https}}/rev/{{autoland_request.repository_revision}}">
+            See it in Mercurial
           </a>
           <h4 class="action-heading">
+            Commit(s) successfully landed on {{autoland_request.repository_url|mercurial_repo_name}}
           </h4>
-          <span class="action-meta"></span>
         </div>
       </div>
+        {% if autoland_request.repository_url|treeherder_repo %}
+        <div class="action-separator"></div>
+        <div class="action action-landed"
+             data-repository="{{autoland_request.repository_url|treeherder_repo}}"
+             data-revision="{{autoland_request.repository_revision}}">
+          <div class="action-icon rounded-icon"></div>
+          <div class="action-info">
+            <a href="https://treeherder.mozilla.org/#/jobs?repo={{autoland_request.repository_url|treeherder_repo}}&revision={{autoland_request.repository_revision}}">
+              See it in Treeherder
+            </a>
+            <h4 class="action-heading"></h4>
+            <span class="action-meta"></span>
+          </div>
+        </div>
+        {% endif%}
       {% endif %}
     {% endfor %}
   </div>

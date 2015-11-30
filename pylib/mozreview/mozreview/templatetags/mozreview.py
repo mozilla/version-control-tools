@@ -60,9 +60,18 @@ def landing_repository(repository):
 @register.filter()
 def treeherder_repo(landing_url):
     mapping = {
-        '': 'try',
+        'try': 'try',
         'ssh://hg.mozilla.org/try': 'try',
         'ssh://hg.mozilla.org/integration/mozilla-inbound/': 'mozilla-inbound',
     }
 
-    return mapping.get(landing_url)
+    return mapping.get(landing_url, '')
+
+@register.filter()
+def mercurial_repo_name(landing_url):
+    return landing_url.split('/')[-1]
+
+
+@register.filter()
+def ssh_to_https(landing_url):
+    return landing_url.replace('ssh://', 'https://')
