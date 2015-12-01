@@ -35,6 +35,7 @@ TREE_ALIASES = {
     'b2g-inbound': ('b2ginbound',),
     'b2g': ('b2ginbound',),
     'b-i': ('b2ginbound',),
+    'b2g-ota': ('b2g-ota'),
     'comm-central': ('comm',),
     'c-c': ('comm',),
     'cc': ('comm',),
@@ -45,8 +46,8 @@ TREE_ALIASES = {
     'c-r': ('comm-release',),
     'cr': ('comm-release',),
 
-    'releases': ('esr38', 'b2g34', 'b2g37', 'b2g44', 'release',
-                 'beta', 'aurora', 'central'),
+    'releases': ('esr38', 'b2g34', 'b2g37', 'b2g44', 'b2g-ota',
+                 'release', 'beta', 'aurora', 'central'),
     'integration': ('inbound', 'fx-team', 'b2ginbound'),
     'twigs': ('alder', 'ash', 'birch', 'cedar', 'cypress', 'date', 'elm',
               'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine'),
@@ -82,6 +83,7 @@ REPOS = {
     'b2g34': 'releases/mozilla-b2g34_v2_1',
     'b2g37': 'releases/mozilla-b2g37_v2_2',
     'b2g44': 'releases/mozilla-b2g44_v2_5',
+    'b2g-ota': 'releases/b2g-ota',
 
     # Integration repositories.
     'b2ginbound': 'integration/b2g-inbound',
@@ -156,6 +158,7 @@ RELEASE_TREES = set([
     'b2g34',
     'b2g37',
     'b2g44',
+    'b2g-ota',
 ])
 
 
