@@ -137,8 +137,8 @@ concurrent consumption on clients (as opposed to having 1 process that
 consumes 1 message at a time) without having to invent a message
 acknowledgement and ordering system in addition to what Kafka supports.
 
-Architectural Deficiencies
---------------------------
+Known Deficiencies
+------------------
 
 Shared Replication Log and Sequential Consumption
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -249,6 +249,36 @@ result in removing machines necessary to service current load. When you
 consider that replication issues tend to occur during periods of high
 load, you can imagine what bad situations automatic decisions could get us
 in. Extreme care must be practices when going down this road.
+
+Data Loss
+^^^^^^^^^
+
+Data loss can occur in a few scenarios.
+
+Depending on what data is changed in the push, a single push may result
+in multiple replication messages being sent. For example, there could be
+a changegroup message and a pushkey message. The messages aren't written
+to Kafka as an atomic unit. Therefore, it's possible for 1 message to
+succeed, the cluster to fail, and the next message to fail, leaving the
+replication log in an inconsistent state.
+
+In addition, messages aren't sent until *after* Mercurial closes the
+transaction committing data to the repository. It's therefore possible
+for the transaction to succeed but the message send to fail.
+
+Both scenarios are mitigated by writing a no-op *heartbeat* message into
+the replication log as one of the final steps before transaction close.
+If this heartbeat can't be send, the transaction is aborted. The
+reasoning here is that by testing the replication log before closing the
+transaction, we have a pretty good indication whether the replication
+log will be writeable after transaction close. However, there is still
+a window for failure.
+
+In the future, we should write a single replication event to Kafka for
+each push (requires bundle2 on the client) or write events to Kafka as a
+single unit (if that's even supported). We should also support rolling
+back the previous transaction in Mercurial if the post transaction
+close message(s) fails to write.
 
 Comparison to Legacy Replication System
 =======================================
