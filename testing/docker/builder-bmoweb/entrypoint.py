@@ -7,23 +7,25 @@
 # database and start an HTTP server.
 
 import os
-import shutil
-import socket
 import subprocess
 import sys
 import time
 
 import mysql.connector
 
+
 # Dirty hack to make stdout unbuffered. This matters for Docker log viewing.
 class Unbuffered(object):
-   def __init__(self, s):
-       self.s = s
-   def write(self, d):
-       self.s.write(d)
-       self.s.flush()
-   def __getattr__(self, a):
-       return getattr(self.s, a)
+    def __init__(self, s):
+        self.s = s
+
+    def write(self, d):
+        self.s.write(d)
+        self.s.flush()
+
+    def __getattr__(self, a):
+        return getattr(self.s, a)
+
 sys.stdout = Unbuffered(sys.stdout)
 
 # We also assign stderr to stdout because Docker sometimes doesn't capture
@@ -31,7 +33,8 @@ sys.stdout = Unbuffered(sys.stdout)
 sys.stderr = sys.stdout
 
 if 'BMODB_PORT_3306_TCP_ADDR' not in os.environ:
-    print('error: container invoked improperly. please link to a bmodb container')
+    print('error: container invoked improperly. ' +
+          'please link to a bmodb container')
     sys.exit(1)
 
 bz_home = os.environ['BUGZILLA_HOME']
@@ -53,22 +56,18 @@ install_module = False
 
 cc = subprocess.check_call
 
-patches = {
-    'apache24.patch',
-}
+# Ensure Bugzilla Git clone is up to date.
+
+# First unpatch files that we used to modify.
 patched_files = {
     '.htaccess',
     'Bugzilla/DB.pm',
     'Bugzilla/Install/Requirements.pm',
+    'docker/generate_bmo_data.pl',
     'docker/scripts/generate_bmo_data.pl',
 }
-
 existing_patched_files = [p for p in patched_files
                           if os.path.exists(os.path.join(bz_dir, p))]
-
-# Ensure Bugzilla Git clone is up to date.
-
-# First unpatch changed files just in case they get modified.
 cc(['/usr/bin/git', 'checkout', '--'] + existing_patched_files, cwd=bz_dir)
 
 # We want container startup to work when offline. So put this behind
@@ -80,23 +79,20 @@ if 'FETCH_BMO' in os.environ:
 bmo_commit = os.environ.get('BMO_COMMIT', 'origin/master')
 cc(['/usr/bin/git', 'checkout', bmo_commit], cwd=bz_dir)
 
-for patch in sorted(patches):
-    print('applying patch %s' % patch)
-    cc(['/usr/bin/git', 'apply', os.path.join(bz_home, patch)], cwd=bz_dir)
-
 # If we start this and the BMODB container at the same time, MySQL may not be
 # running yet. Wait for it.
 
 time_start = time.time()
 while True:
     try:
-        print('attempting to connect to database...', end='')
+        print('attempting to connect to database...')
         # There appear to be race conditions between MySQL opening the socket
-        # and MySQL actually responding. So, we on a successful MySQL
+        # and MySQL actually responding. So we wait on a successful MySQL
         # connection before continuing.
         mysql.connector.connect(user=db_user, password=db_pass, host=db_host,
-                port=db_port)
-        print('connected to database at %s:%s as %s' % (db_host, db_port, db_user))
+                                port=db_port)
+        print('connected to database at %s:%s as %s'
+              % (db_host, db_port, db_user))
         break
     except (ConnectionError, mysql.connector.errors.Error):
         print('error')
@@ -129,6 +125,7 @@ with open(answers, 'rb') as fh:
 
 lines = [l for l in lines if b'#prune' not in l]
 
+
 def writeanswer(fh, name, value):
     line = "$answer{'%s'} = '%s'; #prune\n" % (name, value)
     fh.write(line.encode('utf-8'))
@@ -156,7 +153,7 @@ mysql_args = [
 ]
 
 fresh_database = bool(subprocess.call(mysql_args + ['bugs'],
-    stdin=subprocess.DEVNULL))
+                                      stdin=subprocess.DEVNULL))
 
 if reset_database and not fresh_database:
     print(subprocess.check_output(mysql_args, input=b'DROP DATABASE bugs;'))

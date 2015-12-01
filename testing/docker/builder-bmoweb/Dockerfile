@@ -127,7 +127,7 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
   mysql-client patchutils perlmagick pkg-config python3-mysql.connector \
   python-psutil supervisor unzip wget
 
-RUN git clone https://git.mozilla.org/webtools/bmo/bugzilla.git $BUGZILLA_HOME/bugzilla
+RUN git clone --depth 1 https://git.mozilla.org/webtools/bmo/bugzilla.git $BUGZILLA_HOME/bugzilla
 
 # cpanm has problems with some packages. Install them from the OS.
 RUN apt-get -y install \
@@ -153,9 +153,6 @@ RUN cd $BUGZILLA_HOME/bugzilla && cpanm \
   .
 
 ADD checksetup_answers.txt $BUGZILLA_HOME/checksetup_answers.txt
-
-# The .htaccess isn't compatible with Apache 2.4. We fix that.
-ADD apache24.patch $BUGZILLA_HOME/apache24.patch
 
 # Configure Apache
 RUN rm /etc/apache2/sites-enabled/*
