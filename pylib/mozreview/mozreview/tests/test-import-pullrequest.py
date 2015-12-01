@@ -4,6 +4,8 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import unittest
+
 import selenium.webdriver.support.expected_conditions as EC
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
@@ -11,7 +13,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from vcttesting.unittest import MozReviewWebDriverTest
 
-
+@unittest.skip('importing pull requests not supported')
 class ImportPullrequestTest(MozReviewWebDriverTest):
     @classmethod
     def setUpClass(cls):
