@@ -6,13 +6,18 @@
 # This is a NRPE check that verifies we can write a heartbeat message to
 # the VCS replication topic.
 
+import os
 import subprocess
 import sys
 
 args = ['/repo/hg/venv_tools/bin/hg', 'sendheartbeat']
 
+# This is only needed until vcsreplicator is enabled by default.
+env = dict(os.environ)
+env['HGRCPATH'] = '/etc/mercurial/hgrc-all'
+
 try:
-    out = subprocess.check_output(args, stderr=subprocess.STDOUT)
+    out = subprocess.check_output(args, stderr=subprocess.STDOUT, env=env)
     print('OK - heartbeat message sent successfully')
     print('')
     print(out.strip())

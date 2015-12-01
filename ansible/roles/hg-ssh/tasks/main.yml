@@ -294,6 +294,14 @@
         group=root
         mode=0644
 
+# This is only needed until the new replication system is enabled by default.
+- name: install config file with replication enabled
+  copy: src=hgrc-all
+        dest=/etc/mercurial/hgrc-all
+        owner=root
+        group=root
+        mode=0644
+
 # Pull in tasks shared between hg-ssh and hg-web.
 # This should run last to ensure all preconditions are met.
 - include: ../../../tasks/hgmo-extensions.yml
