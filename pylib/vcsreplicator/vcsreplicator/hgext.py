@@ -10,7 +10,10 @@ import hashlib
 import logging
 import os
 import re
+import sys
+import syslog
 import time
+import traceback
 
 import kafka.client as kafkaclient
 import kafka.common as kafkacommon
@@ -32,7 +35,6 @@ cmdtable = {}
 command = cmdutil.command(cmdtable)
 
 
-
 def precommithook(ui, repo, **kwargs):
     # We could probably handle local commits. But our target audience is
     # server environments, where local commits shouldn't be happening.
@@ -51,9 +53,12 @@ def pretxnopenhook(ui, repo, **kwargs):
     """
     with ui.kafkainteraction():
         try:
+            repo.producerlog('PRETXNOPEN_HEARTBEATSENDING')
             vcsrproducer.send_heartbeat(ui.replicationproducer,
                                         partition=repo.replicationpartition)
+            repo.producerlog('PRETXNOPEN_HEARTBEATSENT')
         except Exception:
+            repo.producerlog('EXCEPTION', traceback.format_exc())
             ui.warn('replication log not available; all writes disabled\n')
             return 1
 
@@ -85,9 +90,12 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
 def pretxnclosehook(ui, repo, **kwargs):
     with ui.kafkainteraction():
         try:
+            repo.producerlog('PRETXNCLOSE_HEARTBEATSENDING')
             vcsrproducer.send_heartbeat(ui.replicationproducer,
                                         repo.replicationpartition)
+            repo.producerlog('PRETXNCLOSE_HEARTBEATSENT')
         except Exception:
+            repo.producerlog('EXCEPTION', traceback.format_exc())
             ui.warn('replication log not available; cannot close transaction\n')
             return True
 
@@ -116,6 +124,7 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
             pushheads.append(ctx.hex())
 
     with ui.kafkainteraction():
+        repo.producerlog('CHANGEGROUPHOOK_SENDING')
         vcsrproducer.record_hg_changegroup(ui.replicationproducer,
                                            repo.replicationwireprotopath,
                                            source,
@@ -123,6 +132,7 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
                                            pushheads,
                                            partition=repo.replicationpartition)
         duration = time.time() - start
+        repo.producerlog('CHANGEGROUPHOOK_SENT')
         ui.status(_('recorded changegroup in replication log in %.3fs\n') %
                     duration)
 
@@ -130,6 +140,7 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
 def sendpushkeymessages(ui, repo):
     for namespace, key, old, new, ret in repo._replicationinfo['pushkey']:
         with ui.kafkainteraction():
+            repo.producerlog('PUSHKEY_SENDING')
             start = time.time()
             vcsrproducer.record_hg_pushkey(ui.replicationproducer,
                                            repo.replicationwireprotopath,
@@ -140,6 +151,7 @@ def sendpushkeymessages(ui, repo):
                                            ret,
                                            partition=repo.replicationpartition)
             duration = time.time() - start
+            repo.producerlog('PUSHKEY_SENT')
             ui.status(_('recorded updates to %s in replication log in %.3fs\n') % (
                         namespace, duration))
 
@@ -190,9 +202,11 @@ def replicatehgrc(ui, repo):
 
     with ui.kafkainteraction():
         producer = ui.replicationproducer
+        repo.producerlog('HGRC_SENDING')
         vcsrproducer.record_hgrc_update(producer, repo.replicationwireprotopath,
                                         content,
                                         partition=repo.replicationpartition)
+        repo.producerlog('HGRC_SENT')
 
     ui.status(_('recorded hgrc in replication log\n'))
 
@@ -213,6 +227,7 @@ def sendheartbeat(ui):
                 vcsrproducer.send_heartbeat(ui.replicationproducer,
                                             partition=partition)
         except kafkacommon.KafkaError as e:
+            ui.producerlog('<unknown>', 'EXCEPTION', traceback.format_exc())
             raise error.Abort('error sending heartbeat: %s' % e.message)
 
     ui.status(_('wrote heartbeat message into %d partitions\n') %
@@ -235,10 +250,12 @@ def replicatecommand(ui, repo):
     heads = [repo[h].hex() for h in repo.heads()]
 
     with ui.kafkainteraction():
+        repo.producerlog('SYNC_SENDING')
         producer = ui.replicationproducer
         vcsrproducer.record_hg_repo_sync(producer, repo.replicationwireprotopath,
                                          hgrc, heads, repo.requirements,
                                          partition=repo.replicationpartition)
+        repo.producerlog('SYNC_SENT')
     ui.status(_('wrote synchronization message into replication log\n'))
 
 
@@ -343,8 +360,23 @@ def uisetup(ui):
             try:
                 yield
             except kafkacommon.KafkaError as e:
-                # TODO do stuff
+                self.producerlog('<unknown>', 'KAFKA_EXCEPTION',
+                        traceback.format_exc())
                 raise
+
+        def producerlog(self, repo, action, *args):
+            """Write to the producer syslog facility."""
+            ident = self.config('replicationproducer', 'syslogident', 'vcsreplicator')
+            facility = self.config('replicationproducer', 'syslogfacility', 'LOG_LOCAL2')
+            facility = getattr(syslog, facility)
+            syslog.openlog(ident, 0, facility)
+
+            if not isinstance(repo, str):
+                repo = repo.replicationwireprotopath
+
+            pre = '%s %s %s' % (os.environ.get('USER', '<unknown>'), repo, action)
+            syslog.syslog(syslog.LOG_NOTICE, '%s %s' % (pre, ' '.join(args)))
+            syslog.closelog()
 
 
     ui.__class__ = replicatingui
@@ -430,5 +462,8 @@ def reposetup(ui, repo):
             raise error.Abort(_('unable to map repo to partition'),
                               hint=_('define a partition map with a ".*" '
                                      'fallback'))
+
+        def producerlog(self, action, *args):
+            return self.ui.producerlog(self, action, *args)
 
     repo.__class__ = replicatingrepo
