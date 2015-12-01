@@ -257,6 +257,8 @@ def run_nose_tests(tests, process_count=None, verbose=False):
 
     if verbose:
         noseargs.append('-v')
+    else:
+        noseargs.append('--nologcapture')
 
     noseargs.extend(tests)
 
