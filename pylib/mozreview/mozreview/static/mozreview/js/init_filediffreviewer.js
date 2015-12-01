@@ -27,6 +27,8 @@ $(document).ready(function() {
 
           if (diff_box_table != null) {
             var reviewButton = document.createElement('button');
+            reviewButton.title = 'Click here to change the review status' +
+                                 ' of this file';
             reviewButton.textContent = getButtonText(elem);
             reviewButton.classList.add('diff-file-btn');
             if (elem.get('reviewed')) {
