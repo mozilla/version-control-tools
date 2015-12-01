@@ -35,7 +35,7 @@ TREE_ALIASES = {
     'b2g-inbound': ('b2ginbound',),
     'b2g': ('b2ginbound',),
     'b-i': ('b2ginbound',),
-    'b2g-ota': ('b2g-ota'),
+    'b2g-ota': ('b2g-ota',),
     'comm-central': ('comm',),
     'c-c': ('comm',),
     'cc': ('comm',),
