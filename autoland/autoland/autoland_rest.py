@@ -42,6 +42,7 @@ def autoland():
     Example request json:
 
     {
+      "ldap_username": "cthulhu@mozilla.org",
       "tree": "mozilla-central",
       "rev": "9cc25f7ac50a",
       "destination": "try",
@@ -68,7 +69,8 @@ def autoland():
         error = 'Bad request: missing json'
         return make_response(jsonify({'error': error}), 400)
 
-    for field in ['tree', 'rev', 'destination', 'pingback_url']:
+    for field in ['ldap_username', 'tree', 'rev', 'destination',
+                  'pingback_url']:
         if not field in request.json:
             error = 'Bad request: missing json field: %s' % field
             return make_response(jsonify({'error': error}), 400)
@@ -80,6 +82,10 @@ def autoland():
             return make_response(jsonify({'error': error}), 400)
     except:
         error = 'Bad request: bad pingback_url'
+        return make_response(jsonify({'error': error}), 400)
+
+    if not request.json.get('ldap_username'):
+        error = 'Bad request: ldap_username must be specified'
         return make_response(jsonify({'error': error}), 400)
 
     if not (request.json.get('trysyntax') or

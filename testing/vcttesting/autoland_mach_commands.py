@@ -50,18 +50,22 @@ class AutolandCommands(object):
                      help='Bookmark name to use when pushing [optional]')
     @CommandArgument('--commit-descriptions', required=False, default='',
                      help='Commit descriptions to use when rewriting [optional]')
+    @CommandArgument('--ldap-username', required=False, default='autolanduser@example.com',
+                     help='Commit descriptions to use when rewriting [optional]')
     @CommandArgument('--user', required=False, default='autoland',
                      help='Autoland user')
     @CommandArgument('--password', required=False, default='autoland',
                      help='Autoland password')
     def post_autoland_job(self, host, tree, rev, destination, pingback_url,
                           trysyntax=None, push_bookmark=None,
-                          commit_descriptions=None, user=None, password=None):
+                          commit_descriptions=None, ldap_username=None,
+                          user=None, password=None):
 
         if commit_descriptions:
             commit_descriptions = json.loads(commit_descriptions)
 
         data = {
+            'ldap_username': ldap_username,
             'tree': tree,
             'rev': rev,
             'destination': destination,
