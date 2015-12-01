@@ -83,11 +83,19 @@ def pushkeyhook(ui, repo, namespace=None, key=None, old=None, new=None,
 
 
 def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
+    # Record that a changegroup is part of the transaction. We only emit
+    # events after transaction close. Set a variable to indicate we should
+    # emit a changegroup event.
     repo._replicationinfo['changegroup'] = True
 
 
-
 def pretxnclosehook(ui, repo, **kwargs):
+    """Check for writeable replication log before transaction close.
+
+    We perform one final check for replication log writeability immediately
+    before the transaction closes. We'll abort the transaction if the
+    replication log can't be written to.
+    """
     with ui.kafkainteraction():
         try:
             repo.producerlog('PRETXNCLOSE_HEARTBEATSENDING')
@@ -109,6 +117,7 @@ def txnclosehook(ui, repo, **kwargs):
 
 
 def changegrouphook(ui, repo, node=None, source=None, **kwargs):
+    """Record replication events after a changegroup has been added."""
     start = time.time()
 
     heads = set(repo.heads())
@@ -138,6 +147,7 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
 
 
 def sendpushkeymessages(ui, repo):
+    """Send messages indicating updates to pushkey values."""
     for namespace, key, old, new, ret in repo._replicationinfo['pushkey']:
         with ui.kafkainteraction():
             repo.producerlog('PUSHKEY_SENDING')
@@ -156,6 +166,7 @@ def sendpushkeymessages(ui, repo):
                         namespace, duration))
 
 
+# Wraps ``hg init`` to send a replication event.
 def initcommand(orig, ui, dest, **opts):
     with ui.kafkainteraction():
         # Send a heartbeat before we create the repo to ensure the replication
