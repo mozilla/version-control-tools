@@ -100,3 +100,31 @@ We handle unicode commit descriptions properly
   date:        Thu Jan 01 00:00:00 1970 +0000
   summary:     root commit
   
+
+We handle long sha1s properly
+
+  $ REV=`hg log -r . --template "{node}"`
+  $ cat > descriptions.json << EOF
+  > {"$REV": "bug 1 - long sha1 is ok"}
+  > EOF
+  $ hg rewritecommitdescriptions --descriptions descriptions.json .
+  saved backup bundle to $TESTTMP/clone/.hg/strip-backup/99d16379ed19-6e1da412-replacing.hg (glob)
+  base: 2c6f2ddf672a
+
+  $ hg --encoding utf-8 log
+  changeset:   2:2c6f2ddf672a
+  tag:         tip
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     bug 1 - long sha1 is ok
+  
+  changeset:   1:a1dea3050632
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     bug 1 - stuff++
+  
+  changeset:   0:3a9f6899ef84
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     root commit
+  
