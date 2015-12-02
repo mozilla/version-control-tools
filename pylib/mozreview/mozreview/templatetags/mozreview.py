@@ -62,6 +62,7 @@ def treeherder_repo(landing_url):
     mapping = {
         'try': 'try',
         'ssh://hg.mozilla.org/try': 'try',
+        'ssh://hg.mozilla.org/projects/cedar': 'cedar',
         'ssh://hg.mozilla.org/integration/mozilla-inbound/': 'mozilla-inbound',
     }
 
