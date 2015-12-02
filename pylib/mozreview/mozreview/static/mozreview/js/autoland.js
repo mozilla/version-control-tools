@@ -166,6 +166,7 @@ $(document).on("mozreview_ready", function() {
             '<div id="autoland-commits"/>'
           );
         $('#autoland-repo').text(MozReview.landingRepository);
+        var commit_descriptions = {};
         $.each(rsp.commits, function() {
           $('#autoland-commits')
             .append(
@@ -181,12 +182,13 @@ $(document).on("mozreview_ready", function() {
                 .append(
                   $('<span/>')
                     .addClass('autoland-commit-reviewers')
-                    .text(
-                      this.approved ? 'reviewers: ' + this.reviewers.join(', ')
-                        : 'NOT APPROVED')));
-          $('#autoland-submit')
-            .prop('disabled', false);
+                    .text('reviewers: ' + this.reviewers.join(', '))));
+          // store commit descriptions in a form ready to pass to autoland
+          commit_descriptions[this.commit.substr(0, 12)] = this.summary;
         });
+        $('#autoland-submit')
+          .data('commits', commit_descriptions)
+          .prop('disabled', false);
       },
       error: function(res) {
         box.modalBox('destroy');
@@ -210,7 +212,11 @@ $(document).on("mozreview_ready", function() {
     $.ajax({
       type: "POST",
       url: AUTOLAND_URL,
-      data: { review_request_id: MozReview.parentReviewRequest.id }
+      data: {
+          review_request_id: MozReview.parentReviewRequest.id,
+          commit_descriptions: JSON.stringify(
+              $('#autoland-submit').data('commits'))
+      }
     })
     .done(function(){
       // There may be a better way to get the review request updates

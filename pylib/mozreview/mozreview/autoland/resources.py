@@ -112,10 +112,16 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
                 'description': 'The review request for which to trigger a Try '
                                'build',
             },
+            'commit_descriptions': {
+                'type': six.text_type,
+                'description': 'Commit descriptions which overwrite the repo '
+                               'commit message. JSON encoded string.  See '
+                               '/autoland route for details.',
+            }
         },
     )
     @transaction.atomic
-    def create(self, request, review_request_id, *args, **kwargs):
+    def create(self, request, review_request_id, commit_descriptions, *args, **kwargs):
         try:
             rr = ReviewRequest.objects.get(pk=review_request_id)
         except ReviewRequest.DoesNotExist:
@@ -166,16 +172,19 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
         if not acquire_lock(lock_id):
             return AUTOLAND_REQUEST_IN_PROGRESS
         try:
-            response = requests.post(autoland_url + '/autoland',
+            response = requests.post(
+                autoland_url + '/autoland',
                 data=json.dumps({
-                'tree': rr.repository.name,
-                'pingback_url': pingback_url,
-                'rev': last_revision,
-                'destination': target_repository,
-                'push_bookmark': push_bookmark,
-            }), headers={
-                'content-type': 'application/json',
-            },
+                    'tree': rr.repository.name,
+                    'pingback_url': pingback_url,
+                    'rev': last_revision,
+                    'destination': target_repository,
+                    'push_bookmark': push_bookmark,
+                    'commit_descriptions': json.loads(commit_descriptions),
+                }),
+                headers={
+                    'content-type': 'application/json',
+                },
                 timeout=AUTOLAND_REQUEST_TIMEOUT,
                 auth=(autoland_user, autoland_password))
         except requests.exceptions.RequestException:
