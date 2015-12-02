@@ -63,16 +63,16 @@ def treeherder_repo(landing_url):
         'try': 'try',
         'ssh://hg.mozilla.org/try': 'try',
         'ssh://hg.mozilla.org/projects/cedar': 'cedar',
-        'ssh://hg.mozilla.org/integration/mozilla-inbound/': 'mozilla-inbound',
+        'ssh://hg.mozilla.org/integration/mozilla-inbound': 'mozilla-inbound',
     }
 
-    return mapping.get(landing_url, '')
+    return mapping.get(landing_url.rstrip('/'), '')
 
 @register.filter()
 def mercurial_repo_name(landing_url):
-    return landing_url.split('/')[-1]
+    return landing_url.rstrip('/').split('/')[-1]
 
 
 @register.filter()
 def ssh_to_https(landing_url):
-    return landing_url.replace('ssh://', 'https://')
+    return landing_url.rstrip('/').replace('ssh://', 'https://')
