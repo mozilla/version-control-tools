@@ -83,7 +83,7 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
                 continue
             else:
                 output = e.out.getvalue()
-                return False, formulate_hg_error(['hg'] + cmd, output)
+                return False, formulate_hg_error(['hg'] + cmd, str(output))
 
     # If we are given commit_descriptions, we rewrite the commits based
     # upon this. We also determine the oldest commit that is part of the

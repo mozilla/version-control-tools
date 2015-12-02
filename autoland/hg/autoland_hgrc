@@ -6,3 +6,4 @@ merge = internal:fail
 purge =
 rebase =
 strip =
+rewritecommitdescriptions = /home/ubuntu/version-control-tools/autoland/hgext/rewritecommitdescriptions.py
