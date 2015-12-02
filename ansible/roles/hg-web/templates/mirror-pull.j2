@@ -123,6 +123,8 @@ if [ "$HGRC" = "true" ]; then
     echo "Updating hgrc for $repo"
     TEMPFILE=$(/bin/mktemp)
     retry "ssh -i /etc/mercurial/mirror -l {{ mirror_ssh_user }} {{ mirror_source }} repo-config $name > $TEMPFILE" && /bin/mv $TEMPFILE $repo/.hg/hgrc
+    chown hg:hg $repo/.hg/hgrc
+    chmod 664 $repo/.hg/hgrc
     exit 0
 fi
 
