@@ -114,6 +114,10 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
                            base_revision)
 
         base_revision = m.groups()[0]
+        logger.info('base revision: %s' % base_revision)
+
+    if not trysyntax and not base_revision:
+        return False, 'Could not determine base revision for rebase'
 
     # Now we rebase (if necessary) and push to the destination
     if trysyntax:
