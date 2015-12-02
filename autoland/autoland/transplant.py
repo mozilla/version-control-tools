@@ -20,7 +20,8 @@ def formulate_hg_error(cmd, output):
     return 'hg error in cmd: ' + ' '.join(cmd) + ': ' + output
 
 
-def transplant(tree, destination, rev, trysyntax=None, push_bookmark=False,
+def transplant(logger, tree, destination, rev, trysyntax=None,
+               push_bookmark=False,
                commit_descriptions=None):
     """Transplant a specified revision and ancestors to the specified tree.
 
@@ -29,11 +30,11 @@ def transplant(tree, destination, rev, trysyntax=None, push_bookmark=False,
     """
     configs = ['ui.interactive=False']
     with hglib.open(get_repo_path(tree), configs=configs) as client:
-        return _transplant(client, tree, destination, rev, trysyntax=trysyntax,
-                           push_bookmark=push_bookmark,
+        return _transplant(logger, client, tree, destination, rev,
+                           trysyntax=trysyntax, push_bookmark=push_bookmark,
                            commit_descriptions=commit_descriptions)
 
-def _transplant(client, tree, destination, rev, trysyntax=None,
+def _transplant(logger, client, tree, destination, rev, trysyntax=None,
                 push_bookmark=False, commit_descriptions=None):
     landed = True
     result = ''
