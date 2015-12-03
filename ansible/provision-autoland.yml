@@ -91,7 +91,7 @@
     shell: cp /home/ubuntu/version-control-tools/autoland/apache/autoland.conf /etc/apache2/sites-enabled/autoland.conf
 
   # Mercurial configuration
-  - name: install autoland site
+  - name: install autoland site hgrc
     shell: cp /home/ubuntu/version-control-tools/autoland/hg/autoland_hgrc /home/ubuntu/.hgrc
 
   # Repository configuration
