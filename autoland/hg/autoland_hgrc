@@ -1,6 +1,7 @@
 [ui]
 username = Otto Länd <bind-autoland@mozilla.com>
 merge = internal:fail
+ssh = ssh -o "SendEnv AUTOLAND_REQUEST_USER"
 
 [extensions]
 purge =

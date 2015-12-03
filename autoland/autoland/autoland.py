@@ -86,6 +86,7 @@ def handle_pending_transplants(logger, dbconn):
     for row in cursor.fetchall():
         transplant_id, destination, request = row
 
+        requester = request['ldap_username']
         tree = request['tree']
         rev = request['rev']
         trysyntax = request.get('trysyntax', '')
@@ -110,10 +111,12 @@ def handle_pending_transplants(logger, dbconn):
             #       one to rebase it and attempt to push so we don't
             #       duplicate work unnecessarily if we have to rebase more
             #       than once.
-            landed, result = transplant.transplant(logger, tree, destination,
-                                                   rev, trysyntax,
-                                                   push_bookmark,
+            os.environ['AUTOLAND_REQUEST_USER'] = requester
+            landed, result = transplant.transplant(logger, tree,
+                                                   destination, rev,
+                                                   trysyntax, push_bookmark,
                                                    commit_descriptions)
+            del os.environ['AUTOLAND_REQUEST_USER']
 
             if landed or 'abort: push creates new remote head' not in result:
                 break

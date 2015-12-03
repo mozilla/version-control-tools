@@ -21,8 +21,7 @@ def formulate_hg_error(cmd, output):
 
 
 def transplant(logger, tree, destination, rev, trysyntax=None,
-               push_bookmark=False,
-               commit_descriptions=None):
+               push_bookmark=False, commit_descriptions=None):
     """Transplant a specified revision and ancestors to the specified tree.
 
     If ``trysyntax`` is specified, a Try commit will be created using the
