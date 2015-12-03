@@ -3,7 +3,11 @@ PermitRootLogin without-password
 PasswordAuthentication no
 Protocol 2
 
+{% if accept_env is defined %}
+AcceptEnv {{ accept_env }}
+{% else %}
 AcceptEnv LANG LC_ALL LC_MESSAGES
+{% endif %}
 ChallengeResponseAuthentication no
 
 UseLPK yes

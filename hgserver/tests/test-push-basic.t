@@ -13,7 +13,8 @@ Create repository and user
   > EOF
 
 Needed so hgweb_dir refreshes.
-TODO we should fix this in hgweb_dir or a hack of hgweb_dir
+TODO we should fix this in hgweb_dir or a hack of hgweb_dir, support for
+this is in Mercurial 3.6
   $ sleep 1
 
 Pushing a commit to a repo works
