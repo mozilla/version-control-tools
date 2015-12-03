@@ -132,6 +132,14 @@ following in your config file::
    You can generate or obtain an already-generated API Key from
    https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey.
 
+.. important::
+
+   Logging into MozReview will create a Bugzilla API Key named
+   ``mozreview``. This API Key has limited permissions and isn't
+   suitable for general use. It is recommended to create an API
+   Key named ``mercurial`` or ``hg`` and define that in your Mercurial
+   config.
+
 IRC Nickname
 ------------
 
