@@ -95,7 +95,7 @@ from mozautomation.repository import (
     resolve_uri_to_tree,
 )
 
-testedwith = '3.1 3.2 3.3 3.4 3.5'
+testedwith = '3.1 3.2 3.3 3.4 3.5 3.6'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
 # The root revisions in mozilla-central and comm-central, respectively.
 MOZ_ROOT_REV = '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
