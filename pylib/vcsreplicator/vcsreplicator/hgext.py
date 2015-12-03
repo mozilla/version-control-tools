@@ -77,7 +77,6 @@ def pushkeyhook(ui, repo, namespace=None, key=None, old=None, new=None,
     transaction could get rolled back. Instead, we record the details of the
     pushkey and write messages after the transaction has closed.
     """
-    # TODO assert we're in a transaction.
     repo._replicationinfo['pushkey'].append(
         (namespace, key, old, new, ret))
 
@@ -315,8 +314,11 @@ def uisetup(ui):
         raise util.Abort('replicationproducer.acktimeout config option not set')
 
     class replicatingui(ui.__class__):
+        """Custom ui class that provides access to replication primitives."""
+
         @property
         def replicationproducer(self):
+            """Obtain a ``Producer`` instance to write to the replication log."""
             if not getattr(self, '_replicationproducer', None):
                 client = kafkaclient.KafkaClient(hosts, client_id=clientid,
                                                  timeout=timeout)
@@ -326,22 +328,11 @@ def uisetup(ui):
 
             return self._replicationproducer
 
-        def kafkaproducer(self, topic):
-            """Obtain a Kafka producer for a topic.
-
-            Uses some of the settings for ``replcationproducer`` but with a
-            different topic.
-            """
-            client = kafkaclient.KafkaClient(hosts, client_id=clientid,
-                                             timeout=timeout)
-            return vcsrproducer.Producer(client, topic, 0, batch_send=False,
-                                         req_acks=reqacks,
-                                         ack_timeout=acktimeout)
-
         @property
         def replicationpartitionmap(self):
             pm = {}
             for k, v in self.configitems('replicationproducer'):
+                # Ignore unrelated options in this section.
                 if not k.startswith('partitionmap.'):
                     continue
 
@@ -415,6 +406,8 @@ def reposetup(ui, repo):
                  'vcsreplicator')
 
     class replicatingrepo(repo.__class__):
+        """Custom repository class providing access to replication primitives."""
+
         @property
         def replicationwireprotopath(self):
             """Return the path to this repo as it is represented over wire.

@@ -344,6 +344,15 @@ are. The output will look like::
 The first line will contain a summary of all partitions' sync status. The
 following lines will print per-partition state.
 
+The check will also emit a warning when there appears to be clock drift
+between the producer and the consumer.::
+
+   WARNING - 0/8 partitions out of sync
+   OK - partition 0 is completely in sync (25/25)
+   WARNING - clock drift of -1.234s between producer and consumer
+   OK - partition 1 is completely in sync (34/34)
+   ...
+
 Remediation to Consumer Lag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

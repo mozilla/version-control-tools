@@ -37,10 +37,11 @@ def check_consumer_lag():
 
     offsets = consumer_offsets_and_lag(client, topic, [group])[group]
 
-    exit = 0
+    exitcode = 0
     good = 0
     bad = 0
     output = []
+    drift_warned = False
 
     for partition, (offset, available, lag_time) in sorted(offsets.items()):
         # Consumer is fully caught up.
@@ -53,10 +54,10 @@ def check_consumer_lag():
         bad += 1
         lag = available - offset
         if lag >= args.critical_lag_count:
-            exit = 2
+            exitcode = 2
             label = 'CRITICAL'
         elif lag >= args.warning_lag_count:
-            exit = max(exit, 1)
+            exitcode = max(exitcode, 1)
             label = 'WARNING'
         else:
             label = 'OK'
@@ -65,10 +66,10 @@ def check_consumer_lag():
             label, partition, lag, offset, available))
 
         if lag_time >= args.critical_lag_time:
-            exit = 2
+            exitcode = 2
             label = 'CRITICAL'
         elif lag_time >= args.warning_lag_time:
-            exit = max(exit, 1)
+            exitcode = max(exitcode, 1)
             label = 'WARNING'
         else:
             label = 'OK'
@@ -76,9 +77,16 @@ def check_consumer_lag():
         output.append('%s - partition %d is %0.3f seconds behind' % (
             label, partition, lag_time))
 
-    if exit == 2:
+        # Clock drift between producer and consumer.
+        if lag_time < 0.0 and not drift_warned:
+            exitcode = max(exitcode, 1)
+            output.append('WARNING - clock drift of %.3f seconds between '
+                          'producer and consumer; check NTP sync' % lag_time)
+            drift_warned = True
+
+    if exitcode == 2:
         print('CRITICAL - %d/%d partitions out of sync' % (bad, len(offsets)))
-    elif exit:
+    elif exitcode:
         print('WARNING - %d/%d partitions out of sync' % (bad, len(offsets)))
     elif good == len(offsets):
         print('OK - %d/%d consumers completely in sync' % (good, len(offsets)))
@@ -95,4 +103,4 @@ def check_consumer_lag():
     print('See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html')
     print('for details about this check.')
 
-    sys.exit(exit)
+    sys.exit(exitcode)

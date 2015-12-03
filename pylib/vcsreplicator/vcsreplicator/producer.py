@@ -13,6 +13,8 @@ from kafka.producer.base import Producer as KafkaProducer
 
 logger = logging.getLogger(__name__)
 
+MESSAGE_HEADER_V1 = b'1\n'
+
 
 class Producer(KafkaProducer):
     """A Kafka Producer that writes to a pre-defined topic."""
@@ -35,7 +37,7 @@ class Producer(KafkaProducer):
         # "1\n" followed by a JSON payload. No length is encoded,
         # as Kafka does this for us.
         j = json.dumps(o, sort_keys=True)
-        msg = b'1\n%s' % j
+        msg = b''.join([MESSAGE_HEADER_V1, j])
 
         return super(Producer, self).send_messages(
             self.topic, partition, msg)

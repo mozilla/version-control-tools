@@ -13,6 +13,11 @@ from kafka.common import KafkaUnavailableError
 
 
 class Config(object):
+    """Hold configuration state and utility functions related to config state.
+
+    This is kind of a catch all for functionality related to the current
+    configuration.
+    """
     def __init__(self, filename=None):
         self.c = RawConfigParser()
 
@@ -70,7 +75,7 @@ class Config(object):
         while True:
             try:
                 return KafkaClient(hosts, client_id=client_id,
-                        timeout=connect_timeout)
+                                   timeout=connect_timeout)
             except KafkaUnavailableError:
                 if timeout == -1:
                     raise

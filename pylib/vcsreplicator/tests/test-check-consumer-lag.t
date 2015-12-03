@@ -100,7 +100,7 @@ Warning reported when lag time hits threshold
 
   $ sleep 1
 
-  $ check --warning-lag-time 1.0
+  $ check --warning-lag-time 0.9
   WARNING - 2/8 partitions out of sync
   
   OK - partition 0 is 1 messages behind (0/1)
@@ -120,7 +120,7 @@ Warning reported when lag time hits threshold
 
 Critical reported when lag time hits threshold
 
-  $ check --critical-lag-time 1.0
+  $ check --critical-lag-time 0.9
   CRITICAL - 2/8 partitions out of sync
   
   OK - partition 0 is 1 messages behind (0/1)

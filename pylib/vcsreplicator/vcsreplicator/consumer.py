@@ -22,6 +22,10 @@ from .util import (
 
 logger = logging.getLogger('vcsreplicator.consumer')
 
+MAX_BUFFER_SIZE = 104857600 # 100 MB
+
+MESSAGE_HEADER_V1 = b'1\n'
+
 
 class Consumer(SimpleConsumer):
     """A Kafka Consumer with sane defaults.
@@ -35,7 +39,7 @@ class Consumer(SimpleConsumer):
         super(Consumer, self).__init__(
             client, group, topic, partitions=partitions,
             auto_commit=False,
-            max_buffer_size=104857600)
+            max_buffer_size=MAX_BUFFER_SIZE)
 
         self.fetch_last_known_offsets(partitions)
 
@@ -47,14 +51,14 @@ class Consumer(SimpleConsumer):
         type. If a message is not available, ``None`` is returned.
         """
         res = super(Consumer, self).get_message(timeout=timeout,
-                get_partition_info=True)
+                                                get_partition_info=True)
         if res is None:
             return None
 
         partition, message = res
 
         d = message.message.value
-        if not d.startswith('1\n'):
+        if not d.startswith(MESSAGE_HEADER_V1):
             raise ValueError('unrecognized message payload. this is bad')
 
         payload = json.loads(d[2:])
@@ -266,7 +270,7 @@ def consumer_offsets_and_lag(client, topic, groups):
             lag = available - offset
             if lag > 0:
                 consumer = Consumer(client, group, topic,
-                        partitions=[partition])
+                                    partitions=[partition])
                 consumer.seek(offset, 0)
                 p, message, payload = consumer.get_message()
                 lag_time = time.time() - payload['_created']

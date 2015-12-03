@@ -24,7 +24,7 @@ def wait_for_topic(client, topic, timeout=-1):
 
         time.sleep(0.1)
 
-        # Don't pass topic name to function or it will attempt to create.
+        # Don't pass topic name to function or it will attempt to create it.
         client.load_metadata_for_topics()
 
 
