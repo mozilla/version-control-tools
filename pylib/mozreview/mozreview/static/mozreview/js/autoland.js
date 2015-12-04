@@ -302,14 +302,14 @@ $(document).on("mozreview_ready", function() {
           url: 'https://treeherder.mozilla.org/api/project/'+repository+'/resultset/'+resultset.id+'/status/'
         }).done(function(status){
           if (status.testfailed || status.busted || status.exception) {
-            $(actionHeading).text('Some jobs failed on Try');
+            $(actionHeading).text('Some jobs failed on ' + repository);
             $(elem).addClass('action-failure');
           } else {
             if (status.pending || status.running) {
-              $(actionHeading).text('Some jobs are still in progress on Try');
+              $(actionHeading).text('Some jobs are still in progress on ' + repository);
               $(elem).addClass('action-pending');
             } else {
-              $(actionHeading).text('All the jobs passed on Try');
+              $(actionHeading).text('All the jobs passed on ' + repository);
               $(elem).addClass('action-success');
             }
           }
