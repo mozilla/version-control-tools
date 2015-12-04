@@ -149,7 +149,7 @@ class Docker(object):
         for k in keys:
             self.state.setdefault(k, None)
 
-        self.client = docker.Client(base_url=url, tls=tls)
+        self.client = docker.Client(base_url=url, tls=tls, version='auto')
 
         # Try to obtain a network hostname for the Docker server. We use this
         # for determining where to look for opened ports.
