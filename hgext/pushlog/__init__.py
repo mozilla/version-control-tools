@@ -43,6 +43,9 @@ SCHEMA = [
     'CREATE INDEX IF NOT EXISTS pushlog_user ON pushlog (user)',
 ]
 
+AUTOLAND_USER = 'bind-autoland@mozilla.com'
+
+
 # Wraps capabilities wireproto command to advertise pushlog availability.
 def capabilities(orig, repo, proto):
     caps = orig(repo, proto)
@@ -501,6 +504,15 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
         ui.write('authenticated user not found; '
                  'refusing to write into pushlog\n')
         return 1
+
+    # If the push user is the AUTOLAND_USER we check the AUTOLAND_REQUEST_USER
+    # environment variable. If set, we use that as the user in the pushlog
+    # rather than the pusher. This allows us to track who actually
+    # initiated the push.
+    autoland_user = ui.config('pushlog', 'autolanduser', AUTOLAND_USER)
+    if user == autoland_user:
+        ui.write('autoland push detected\n')
+        user = os.environ.get('AUTOLAND_REQUEST_USER', user)
 
     remoteprefix = ui.config('pushlog', 'remoteuserprefix')
     userprefix = ui.config('pushlog', 'userprefix')

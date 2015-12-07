@@ -58,3 +58,22 @@
   1 6c9721b3b4df 82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce
   0 55482a6fb4b1 55482a6fb4b1881fa8f746fd52cf6f096bb21c89
 
+Test autolanded pushes
+
+  $ cd ../client
+  $ export USER=bind-autoland@mozilla.com
+  $ export AUTOLAND_REQUEST_USER=user3@example.com
+  $ echo autoland > foo
+  $ hg commit -m autoland
+  $ hg -q push
+  autoland push detected
+  recorded push in pushlog
+  $ cd ../server
+
+{pushuser} shows who did the push
+
+  $ hg log -T '{rev} {pushuser}\n'
+  3 user3@example.com
+  2 user2@example.com
+  1 user2@example.com
+  0 user1@example.com
