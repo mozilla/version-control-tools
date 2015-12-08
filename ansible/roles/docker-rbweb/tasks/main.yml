@@ -16,12 +16,35 @@
   synchronize: src={{ vct }}/ dest=/version-control-tools/ recursive=yes delete=yes
 
 - name: Install python libraries
-  command: /venv/bin/python setup.py develop chdir=/version-control-tools/pylib/{{ item }}
+  command: /venv/bin/python setup.py install chdir=/version-control-tools/pylib/{{ item }}
   with_items:
     - mozautomation
-    - mozreview
+
+- name: Build mozreview extension
+  command: /venv/bin/python setup.py bdist_egg chdir=/version-control-tools/pylib/mozreview
+  tags:
+    - docker-refresh
+
+- name: Install mozreview extension
+  shell: /venv/bin/easy_install -U dist/*.egg chdir=/version-control-tools/pylib/mozreview
+  tags:
+    - docker-refresh
+
+- name: Build other extension
+  command: /venv/bin/python setup.py bdist_egg chdir=/version-control-tools/pylib/{{ item }}
+  with_items:
     - rbbz
     - rbmotd
+  tags:
+    - docker-refresh
+
+- name: Install other extensions
+  shell: /venv/bin/easy_install -U dist/*.egg chdir=/version-control-tools/pylib/{{ item }}
+  with_items:
+    - rbbz
+    - rbmotd
+  tags:
+    - docker-refresh
 
 - name: Remove default httpd configs
   file: path={{ item }} state=absent
@@ -40,6 +63,13 @@
 
 - name: Configure Review Board
   command: /install-reviewboard
+  tags:
+    - docker-refresh
+
+- name: Install extension media
+  command: /venv/bin/rb-site manage /reviewboard install-extension-media -- --force
+  tags:
+    - docker-refresh
 
 - name: Install support scripts
   copy: src={{ item }} dest=/{{ item }} owner=reviewboard group=reviewboard mode=0755

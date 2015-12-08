@@ -24,7 +24,7 @@ with open('%s/conf/settings_local.py' % ROOT, 'wb') as fh:
         elif line.startswith(b'PRODUCTION'):
             line = b'PRODUCTION = False\n'
         elif line.startswith(b'DEBUG ='):
-            line = b'DEBUG = True\n'
+            line = b'DEBUG = False\n'
         elif line.startswith(b'LOGGING_DIRECTORY'):
             line = b'LOGGING_DIRECTORY = "%s/logs"\n' % ROOT
             log_directory_found = True
@@ -42,8 +42,6 @@ class FakeOptions(object):
     copy_media = False
 
 site = Site(ROOT, FakeOptions())
-
-site.rebuild_site_directory()
 
 site.run_manage_command('syncdb', ['--noinput'])
 
@@ -70,8 +68,6 @@ site.run_manage_command('enable-extension', ['mozreview.extension.MozReviewExten
 site.run_manage_command('enable-extension', ['rbbz.extension.BugzillaExtension'])
 site.run_manage_command('enable-extension', ['rbmotd.extension.MotdExtension'])
 
-print('generating static assets')
-site.run_manage_command('collectstatic', ['--noinput'])
 
 # Hook up Bugzilla authentication.
 site.run_manage_command('set-siteconfig', ['--key=auth_backend',
