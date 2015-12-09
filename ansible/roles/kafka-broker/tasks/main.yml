@@ -6,12 +6,12 @@
     - tar
 
 - name: download ZooKeeper and Kafka
-  get_url: url=http://apache.osuosl.org/{{ item.url }}
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/{{ item.path }}
            dest=/var/tmp/{{ item.path }}
            sha256sum={{ item.sha256 }}
   with_items:
-    - { url: zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz, path: zookeeper-3.4.6.tar.gz, sha256: 01b3938547cd620dc4c93efe07c0360411f4a66962a70500b163b59014046994 }
-    - { url: kafka/0.8.2.2/kafka_2.10-0.8.2.2.tgz, path: kafka_2.10-0.8.2.2.tgz, sha256: 3ba1967ee88c7f364964c8a8fdf6f5075dcf7572f8c9eb74f0285b308363ecab }
+    - { path: zookeeper-3.4.6.tar.gz, sha256: 01b3938547cd620dc4c93efe07c0360411f4a66962a70500b163b59014046994 }
+    - { path: kafka_2.10-0.8.2.2.tgz, sha256: 3ba1967ee88c7f364964c8a8fdf6f5075dcf7572f8c9eb74f0285b308363ecab }
 
 - name: uncompress ZooKeeper and Kafka
   unarchive: src=/var/tmp/{{ item.src }}
