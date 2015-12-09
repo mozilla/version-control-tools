@@ -62,7 +62,7 @@ def query_revisions_range(repo_url, from_revision, to_revision, version=2, tipso
 
 def query_pushid_range(repo_url, start_id, end_id, version=2):
     """
-    Return an ordered list of revisions (newest push id first).
+    Return an ordered list of revisions (oldest revision first).
 
     repo     - represents the URL to clone a repo
     start_id - from which pushid to start with (oldest)
@@ -81,7 +81,7 @@ def query_pushid_range(repo_url, start_id, end_id, version=2):
     pushes = req.json()["pushes"]
     # pushes.keys() is a list of strings which we need to map to integers
     # We use reverse in order to return list sorted from newest to oldest push id
-    for push_id in sorted(map(int, pushes.keys()), reverse=True):
+    for push_id in sorted(map(int, pushes.keys())):
         # Querying by push ID is preferred because date ordering is
         # not guaranteed (due to system clock skew)
         # We can interact with self-serve with the 12 char representation

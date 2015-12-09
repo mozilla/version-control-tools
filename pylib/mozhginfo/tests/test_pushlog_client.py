@@ -87,8 +87,8 @@ class TestQueries(unittest.TestCase):
     def test_query_pushid_range(self, get):
         self.assertEqual(
             query_pushid_range(self.repo_url, 55560, 55564),
-            ['724f0a71d62171da1357e6c1f93453359e54206b', '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
-             'eb15e3f893453d6a4472f8905271aba33f8b68d5']
+            ['eb15e3f893453d6a4472f8905271aba33f8b68d5', '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
+             '724f0a71d62171da1357e6c1f93453359e54206b']
         )
 
     @patch('requests.get', return_value=mock_response(REVISION_INFO_REPOSITORIES, 200))
@@ -118,8 +118,8 @@ class TestQueries(unittest.TestCase):
         self.assertEqual(
             query_revisions_range_from_revision_before_and_after(self.repo_url, self.revision,
                                                                  1, 1),
-            ['724f0a71d62171da1357e6c1f93453359e54206b', '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
-             'eb15e3f893453d6a4472f8905271aba33f8b68d5']
+            ['eb15e3f893453d6a4472f8905271aba33f8b68d5', '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
+             '724f0a71d62171da1357e6c1f93453359e54206b']
         )
 
 
