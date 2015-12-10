@@ -16,6 +16,7 @@ This is the template for the "Commits" list in a push-based review request.
 </div>
 <div id="mozreview-request-series">
   <div id="mozreview-parent-request" data-id="{{parent_details.get_review_request.id}}">
+    <a href="{{parent_details.get_review_request.get_absolute_url}}">Review Summary</a>
     <a href="{{parent_details.get_review_request.get_absolute_url}}diff/#index_header">Squashed Diff</a>
   </div>
   <table id="mozreview-child-requests">
