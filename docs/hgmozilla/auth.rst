@@ -26,6 +26,11 @@ In your SSH config (likely ``~/.ssh/config``), add the following::
    Be sure to replace ``me@mozilla.com`` with your Mozilla-registered
    LDAP account that is configured for SSH access to Mercurial.
 
+The first time you connect, you will be asked to verify the host SSH
+key. The host key fingerprints are:
+
+* hg.mozilla.org RSA: ``SHA256:usOyGXYDSaMWHhfvVeySzUD0yYxzmAvT+dVziygWsVQ.``
+
 Verify your SSH settings are working by attempting to SSH into a server.
 Your terminal output should resemble the following::
 
