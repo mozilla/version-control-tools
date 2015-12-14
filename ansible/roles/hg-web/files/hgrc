@@ -19,6 +19,10 @@ baseurl = http://hg.mozilla.org/
 maxchanges = 20
 guessmime = True
 
+[server]
+# Default is 1024. Our server environment can support longer.
+maxhttpheaderlen = 6144
+
 [diff]
 showfunc = True
 git = 1
