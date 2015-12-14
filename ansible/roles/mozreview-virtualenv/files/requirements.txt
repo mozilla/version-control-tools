@@ -82,8 +82,8 @@ python-ldap==2.4.19
 # sha256: Z-HBi2uZykwsjkoC4KlhdL9waJGaWv9Sg2YAl0we9Ng
 python-memcached==1.54
 
-# sha256: NYsFoMJgXBXPgzfRcBbrla_qrQfJAN-cLN524hlKklg
-pytz==2015.2
+# sha256: Pt5HDT0XujwHY436DRBFK8G25a0yYSemW6d-aq6xG-w
+pytz==2015.7
 
 # sha256: KMaFPB0T02W33HGmsF5f-1ZHH3CoUN4xivUNPXwN6i8
 recaptcha-client==1.0.6

@@ -62,7 +62,7 @@ python-dateutil==1.5
 python-hglib==1.7
 python-ldap==2.4.19
 python-memcached==1.54
-pytz==2015.2
+pytz==2015.7
 PyYAML==3.11
 RBTools==0.6.1
 recaptcha-client==1.0.6
