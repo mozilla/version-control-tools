@@ -4,8 +4,8 @@
 --find-links http://downloads.reviewboard.org/releases/RBTools/0.6/
 --find-links http://downloads.reviewboard.org/releases/ReviewBoard/2.0/
 
-# sha256: 406XZaYSD0ZkwSD0GYp4bDmg-35KWb0ZotbjqIS2OIk
-amqp==1.4.6
+# sha256: lNKmgifnmEvUD19xxoOXMGIq_4pGM_Ke3h_90NJAeV4
+amqp==1.4.8
 
 # sha256: N4Ethjya0-NcBzTELgvwMgzow77YLNIK1UyzTRWBV7o
 anyjson==0.3.3
@@ -43,8 +43,8 @@ futures==2.2.0
 # sha256: fLtRSjUvghxpuOi9qmsuWXKFR6iWVQPHWGUsKCbRV7U
 importlib==1.0.3
 
-# sha256: SGL3SQ8T4GJXMS9X6BVT85jMcboDXQJjL_QXOcVy1K0
-kombu==3.0.24
+# sha256: _ss07fSFIGTzhdv1OWkEeyI1PTYIpXZJfdBfcblD-uY
+kombu==3.0.30
 
 # sha256: gS7FJJ9F7cMTMLf7BuUqr2qy2DqicEfffLaDfvLSabY
 Markdown==2.4.1
