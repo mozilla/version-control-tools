@@ -16,8 +16,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 This hook is to prevent changes to strings in string frozen branches without
-explicit approval from l10n-drivers. Can be bypassed adding L10NOK to the
-commit message (case sensitive), see bug 859358 for further details.
+explicit approval from l10n-drivers. Can be bypassed adding l10n= followed by
+an approver to the commit message (case sensitive), see bug 859358 for further
+details.
 """
 
 import re
