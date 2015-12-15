@@ -100,7 +100,6 @@ class BrowserCacheTest(MozReviewWebDriverTest):
         status_el = self.get_commit_status(2)
         self.assertEqual(status_el.get_attribute('class'), 'issue-count')
 
-
     def get_commit_status(self, i):
         return WebDriverWait(self.browser, 3).until(
             EC.visibility_of_element_located((

@@ -65,7 +65,6 @@ class MozReviewUserProfile(models.Model):
 
         return query_scm_group(self.ldap_username, group)
 
-
     class Meta:
         app_label = 'mozreview'
         permissions = (

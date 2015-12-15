@@ -607,7 +607,6 @@ class ImportPullRequestTriggerResource(WebAPIResource):
         if not autoland_user or not autoland_password:
             return AUTOLAND_CONFIGURATION_ERROR
 
-
         # if we've seen an import for this pullrequest before, see if we have
         # an existing bugid we can reuse. Otherwise, Autoland will attempt to
         # extract one from the pullrequest title and if that fails, file a new

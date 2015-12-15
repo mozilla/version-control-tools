@@ -13,6 +13,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from vcttesting.unittest import MozReviewWebDriverTest
 
+
 @unittest.skip('importing pull requests not supported')
 class ImportPullrequestTest(MozReviewWebDriverTest):
     @classmethod

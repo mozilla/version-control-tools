@@ -115,7 +115,6 @@ class CommitsListField(CommitDataBackedField):
         repo_urls = set()
         latest_autoland_requests = []
 
-
         # We would like to fetch the latest AutolandRequest for each
         # different repository.
         for request in autoland_requests:

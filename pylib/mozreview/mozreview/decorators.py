@@ -5,6 +5,7 @@ from djblets.webapi.decorators import (_find_httprequest,
                                        webapi_response_errors)
 from djblets.webapi.errors import PERMISSION_DENIED
 
+
 @simple_decorator
 def if_ext_enabled(fn):
     """Only execute the function if the extension is enabled.

@@ -16,6 +16,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from vcttesting.unittest import MozReviewWebDriverTest
 
+
 class AutolandTryTest(MozReviewWebDriverTest):
     @classmethod
     def setUpClass(cls):

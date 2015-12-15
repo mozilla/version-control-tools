@@ -32,6 +32,7 @@ def commit_id(review_request_details):
     return str(commit_data.get_for(review_request_details, COMMIT_ID_KEY))
 
 
+
 def reviewer_list(review_request):
     return ', '.join([user.username
                       for user in review_request.target_people.all()])

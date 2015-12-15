@@ -4,6 +4,7 @@ from django.template.loader import Context, get_template
 from mozreview.autoland.resources import import_pullrequest_trigger_resource
 from reviewboard.extensions.base import get_extension_manager
 
+
 @login_required
 def import_pullrequest(request, user, repo, pullrequest):
     ext = get_extension_manager().get_enabled_extension(
