@@ -11,7 +11,7 @@
 - name: create CRON to generate S3 bundles
   cron: name="Generate Mercurial bundles"
         user=hg
-        job='/repo/hg/scripts/outputif /repo/hg/venv_tools/bin/python /repo/hg/scripts/generate-hg-s3-bundles -f /repo/bundles/repos'
+        job='/bin/nice -n 10 /repo/hg/scripts/outputif /repo/hg/venv_tools/bin/python /repo/hg/scripts/generate-hg-s3-bundles -f /repo/bundles/repos'
         day=*
         month=*
         minute=0
