@@ -8,6 +8,7 @@ cd /repos/$1
 cat > .hg/hgrc << EOF
 [ui]
 username = Otto Land <autoland@example.com>
+merge = internal:merge
 
 [extensions]
 purge =
