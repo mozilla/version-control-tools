@@ -37,8 +37,8 @@ def check_consumer_lag():
 
     try:
         offsets = consumer_offsets_and_lag(client, topic, [group])[group]
-    except Exception:
-        print('CRITICAL - exception fetching offsets')
+    except Exception as e:
+        print('WARNING - exception fetching offsets: %s' % e)
         print('')
         raise
 
