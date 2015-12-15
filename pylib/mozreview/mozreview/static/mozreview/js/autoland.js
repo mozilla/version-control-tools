@@ -288,14 +288,12 @@ $(document).on("mozreview_ready", function() {
       url: 'https://treeherder.mozilla.org/api/project/'+repository+'/resultset/?revision='+revision,
     })
     .done(function(response) {
-      if (response.results.length != 1) {
+      if (response.results.length === 0) {
+        $(actionHeading).text('Waiting for revision to appear in Treeherder');
+        $(elem).addClass('action-pending');
+      } else if (response.results.length > 1) {
         $(actionHeading).text('Error fetching the results for '+revision+' on '+repository+' from Treeherder');
-        $(elem).addClass('action-failure');
-        if (response.results.length === 0) {
-          $(actionMeta).text('Revision not found');
-        } else {
-          $(actionMeta).text('Too many results found');
-        }
+        $(actionMeta).text('Too many results found');
       } else {
         var resultset = response.results[0];
         $.ajax({
