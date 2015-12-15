@@ -322,7 +322,7 @@
 - name: create CRON to generate daily Mercurial log files
   cron: name='Daily Mercurial log data'
         user=root
-        job='/repo/hg/scripts/outputif /repo/hg/version-control-tools/hgext/serverlog/scripts/generate-daily-logs.py'
+        job='/bin/nice -n 10 /repo/hg/scripts/outputif /repo/hg/version-control-tools/hgext/serverlog/scripts/generate-daily-logs.py'
         day=*
         month=*
         minute=0
@@ -351,7 +351,7 @@
 - name: create CRON to ensure file permissions are sane
   cron: name='Adjust repository permissions'
         user=root
-        job='/repo/hg/version-control-tools/scripts/normalize-hgweb-permissions /repo/hg/mozilla'
+        job='/bin/nice -n 10 /repo/hg/version-control-tools/scripts/normalize-hgweb-permissions /repo/hg/mozilla'
         day=*
         month=*
         minute=0
