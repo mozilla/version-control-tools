@@ -35,7 +35,12 @@ def check_consumer_lag():
     topic = config.c.get('consumer', 'topic')
     group = config.c.get('consumer', 'group')
 
-    offsets = consumer_offsets_and_lag(client, topic, [group])[group]
+    try:
+        offsets = consumer_offsets_and_lag(client, topic, [group])[group]
+    except Exception:
+        print('CRITICAL - exception fetching offsets')
+        print('')
+        raise
 
     exitcode = 0
     good = 0
