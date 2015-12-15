@@ -327,6 +327,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
             # using this resource.
             response = requests.post(autoland_url + '/autoland',
                 data=json.dumps({
+                'ldap_username': request.mozreview_profile.ldap_username,
                 'tree': rr.repository.name,
                 'pingback_url': pingback_url,
                 'rev': last_revision,
