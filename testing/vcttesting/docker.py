@@ -25,7 +25,10 @@ import time
 import urlparse
 import uuid
 
-from docker.errors import APIError as DockerAPIError
+from docker.errors import (
+    APIError as DockerAPIError,
+    DockerException,
+)
 from contextlib import contextmanager
 from io import BytesIO
 
@@ -149,7 +152,10 @@ class Docker(object):
         for k in keys:
             self.state.setdefault(k, None)
 
-        self.client = docker.Client(base_url=url, tls=tls, version='auto')
+        try:
+            self.client = docker.Client(base_url=url, tls=tls, version='auto')
+        except DockerException:
+            self.client = None
 
         # Try to obtain a network hostname for the Docker server. We use this
         # for determining where to look for opened ports.
@@ -163,11 +169,14 @@ class Docker(object):
 
     def is_alive(self):
         """Whether the connection to Docker is alive."""
+        if not self.client:
+            return False
+
         # This is a layering violation with docker.client, but meh.
         try:
             self.client._get(self.client._url('/version'), timeout=5)
             return True
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             return False
 
     def _get_vct_files(self):
