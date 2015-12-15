@@ -114,14 +114,12 @@ if __name__ == '__main__':
         try:
             res = send_zk_command(host, port, 'ruok').strip()
             if res != 'imok':
-                print('NODE CRITICAL - not responding "imok": %s' % (
-                      args.host, res))
+                print('NODE CRITICAL - not responding "imok": %s' % res)
                 exit = 2
 
             res = send_zk_command(host, port, 'isro').strip()
             if res != 'rw':
-                print('NODE CRITICAL - not in read/write mode: %s' % (
-                      args.host, res))
+                print('NODE CRITICAL - not in read/write mode: %s' % res)
                 exit = 2
 
             state = send_monitor_command(host, port)
