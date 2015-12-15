@@ -813,8 +813,8 @@ class Docker(object):
         web_bootstrap = web_future.result()['Id']
 
         with futures.ThreadPoolExecutor(2) as e:
-            e.submit(self.client.remove_container, web_id)
-            e.submit(self.client.remove_container, db_id)
+            e.submit(self.client.remove_container, web_id, v=True)
+            e.submit(self.client.remove_container, db_id, v=True)
 
         return db_bootstrap, web_bootstrap
 
@@ -1218,7 +1218,8 @@ class Docker(object):
         with futures.ThreadPoolExecutor(max(1, len(ids))) as e:
             for container in reversed(ids):
                 count += 1
-                e.submit(self.client.remove_container, container, force=True)
+                e.submit(self.client.remove_container, container, force=True,
+                         v=True)
 
         print('stopped %d containers' % count)
 
@@ -1301,7 +1302,7 @@ class Docker(object):
             for filename, data in res.json().items():
                 files[filename] = base64.b64decode(data)
 
-        self.client.remove_container(container)
+        self.client.remove_container(container, v=True)
 
         return files
 
@@ -1521,7 +1522,7 @@ class Docker(object):
                 for c in self.client.containers(all=True):
                     if c['Id'] not in containers:
                         e.submit(self.client.remove_container, c['Id'],
-                                 force=True)
+                                 force=True, v=True)
 
             with futures.ThreadPoolExecutor(8) as e:
                 for i in self.client.images(all=True):

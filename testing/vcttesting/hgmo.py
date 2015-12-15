@@ -298,10 +298,10 @@ class HgCluster(object):
         """
         c = self._d.client
         with futures.ThreadPoolExecutor(4) as e:
-            e.submit(c.remove_container, self.master_id, force=True)
-            e.submit(c.remove_container, self.ldap_id, force=True)
+            e.submit(c.remove_container, self.master_id, force=True, v=True)
+            e.submit(c.remove_container, self.ldap_id, force=True, v=True)
             for i in self.web_ids:
-                e.submit(c.remove_container, i, force=True)
+                e.submit(c.remove_container, i, force=True, v=True)
 
         try:
             os.unlink(self.state_path)
