@@ -66,4 +66,4 @@ Race condition between applying messages and printing log
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

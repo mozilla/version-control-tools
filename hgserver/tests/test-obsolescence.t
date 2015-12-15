@@ -133,4 +133,4 @@ Pulling should get the obsmarkers
 
   $ cd ..
 
-  $ hgmo stop
+  $ hgmo clean

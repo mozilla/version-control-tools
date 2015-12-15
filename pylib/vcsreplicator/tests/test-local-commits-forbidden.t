@@ -20,4 +20,4 @@ Adding a commit locally is not allowed
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

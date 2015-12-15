@@ -20,4 +20,4 @@
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

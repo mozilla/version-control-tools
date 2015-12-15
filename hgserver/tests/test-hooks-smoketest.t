@@ -41,4 +41,4 @@ Verify hooks are working by pushing something that should be rejected
   abort: pretxnchangegroup.c_commitmessage hook failed
   [255]
 
-  $ hgmo stop
+  $ hgmo clean

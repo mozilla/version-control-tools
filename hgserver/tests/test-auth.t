@@ -197,4 +197,4 @@ Do another login to verify no pash errors are present
 
   $ hgmo exec hgssh cat /var/log/pash.log
 
-  $ hgmo stop
+  $ hgmo clean

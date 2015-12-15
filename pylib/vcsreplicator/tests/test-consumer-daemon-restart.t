@@ -60,4 +60,4 @@ Start consumer daemon and verify it picks up where it left off
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

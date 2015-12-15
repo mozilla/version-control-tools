@@ -245,4 +245,4 @@ Pushing multiple heads results in appropriate behavior
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

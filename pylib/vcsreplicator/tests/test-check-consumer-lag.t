@@ -167,4 +167,4 @@ Resuming consumers clears check
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

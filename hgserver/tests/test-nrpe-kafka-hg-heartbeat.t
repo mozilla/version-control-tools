@@ -54,4 +54,4 @@ Check should fail with no quorum in cluster
   be replicated.
   [2]
 
-  $ hgmo stop
+  $ hgmo clean

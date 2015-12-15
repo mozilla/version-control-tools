@@ -45,4 +45,4 @@ Creating a repository should record an event saying so
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

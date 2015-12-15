@@ -148,4 +148,4 @@ vcsreplicator isn't doing anything yet. verify that.
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

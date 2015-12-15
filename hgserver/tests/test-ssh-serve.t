@@ -46,4 +46,4 @@ A push works
   remote: View your change here:
   remote:   https://hg.mozilla.org/repo1/rev/77538e1ce4be
 
-  $ hgmo stop
+  $ hgmo clean

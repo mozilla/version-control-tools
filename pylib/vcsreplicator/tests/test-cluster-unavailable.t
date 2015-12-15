@@ -189,4 +189,4 @@ Stopping Kafka on hgssh node doesn't break pushes
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

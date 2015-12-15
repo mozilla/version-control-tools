@@ -52,4 +52,4 @@ Create a repository
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

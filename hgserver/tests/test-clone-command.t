@@ -335,4 +335,4 @@ Attempting to create a user repo that already exists results in error
   https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
   [1]
 
-  $ hgmo stop
+  $ hgmo clean

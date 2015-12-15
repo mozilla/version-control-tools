@@ -211,4 +211,4 @@ Remove all bookmarks
 Cleanup
 
   $ cd ..
-  $ hgmo stop
+  $ hgmo clean

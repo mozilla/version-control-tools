@@ -53,4 +53,4 @@ Pushlog should be replicated
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

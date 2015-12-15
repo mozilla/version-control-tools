@@ -223,4 +223,4 @@ Similar behavior for second changegroup
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

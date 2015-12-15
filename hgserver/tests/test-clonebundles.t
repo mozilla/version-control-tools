@@ -69,4 +69,4 @@ We shouldn't see the message if we attempted to use clonebundles
 
 #endif
 
-  $ hgmo stop
+  $ hgmo clean

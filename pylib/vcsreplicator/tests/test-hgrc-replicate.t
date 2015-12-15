@@ -99,4 +99,4 @@ Unicode in hgrc is preserved
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

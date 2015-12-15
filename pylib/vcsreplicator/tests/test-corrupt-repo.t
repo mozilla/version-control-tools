@@ -114,4 +114,4 @@ We can skip over the message
 
 Cleanuo
 
-  $ hgmo stop
+  $ hgmo clean

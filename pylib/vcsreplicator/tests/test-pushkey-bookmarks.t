@@ -207,4 +207,4 @@ But processing the next changegroup message should advance the bookmark by 1
 
 Cleanup
 
-  $ hgmo stop
+  $ hgmo clean

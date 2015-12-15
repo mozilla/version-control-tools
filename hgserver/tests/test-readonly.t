@@ -55,4 +55,4 @@ Global read only file works
   abort: prechangegroup.readonly hook failed
   [255]
 
-  $ hgmo stop
+  $ hgmo clean

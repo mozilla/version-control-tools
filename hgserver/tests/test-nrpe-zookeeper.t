@@ -103,4 +103,4 @@ Stopping multiple nodes should result in loss of quorum
   for more info on monitor and alerts.
   [2]
 
-  $ hgmo stop
+  $ hgmo clean
