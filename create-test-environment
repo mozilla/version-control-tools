@@ -2,6 +2,12 @@
 
 set -e
 
+vercheck=`python -c 'import sys; print(sys.version_info[0:3] >= (2, 7, 9))'`
+if [ "x${vercheck}" != "xTrue" ]; then
+  echo "Python version too old. Test environment requires 2.7.9+"
+  exit 1
+fi
+
 if [ ! -d venv ]; then
   virtualenv venv
 fi
