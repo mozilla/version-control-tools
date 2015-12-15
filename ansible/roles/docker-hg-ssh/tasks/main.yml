@@ -17,6 +17,7 @@
     - activate-hook
     - activate-vcsreplicator
     - create-repo
+    - set-ldap-property
     - set-mirrors.py
 
 # While this file contains credentials, it needs to be world readable

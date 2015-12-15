@@ -23,31 +23,33 @@ def ldap_connect(ldap_url):
         return ldap_conn
     except Exception:
         print >>sys.stderr, "Could not connect to the LDAP server at %s" % ldap_url
-        sys.exit(1)
+        return None
 
 
 def get_ldap_attribute(mail, attr, conn_string):
     ldap_conn = ldap_connect(conn_string)
-    if ldap_conn:
-        result = ldap_conn.search_s('dc=mozilla', ldap.SCOPE_SUBTREE, '(mail=' + mail + ')', [attr])
-        if len(result) > 1:
-            print >>sys.stderr, 'More than one match found'
-            ldap_conn.unbind_s()
-            return False
-        elif len(result) == 0:
-            print >>sys.stderr, 'No matches found'
-            ldap_conn.unbind_s()
-            return False
-        else:
-            if attr in result[0][1]:
-                attr_val = result[0][1][attr][0]
-                ldap_conn.unbind_s()
-                return attr_val
-            else:
-                ldap_conn.unbind_s()
-                return False
+    if not ldap_conn:
+        # This is a bit hacky. Ideally we'd have proper exception
+        # handling everywhere.
+        sys.exit(1)
+
+    result = ldap_conn.search_s('dc=mozilla', ldap.SCOPE_SUBTREE, '(mail=' + mail + ')', [attr])
+    if len(result) > 1:
+        print >>sys.stderr, 'More than one match found'
+        ldap_conn.unbind_s()
+        return False
+    elif len(result) == 0:
+        print >>sys.stderr, 'No matches found'
+        ldap_conn.unbind_s()
+        return False
     else:
-        print >>sys.stderr, 'Don\'t have a valid ldap connection'
+        if attr in result[0][1]:
+            attr_val = result[0][1][attr][0]
+            ldap_conn.unbind_s()
+            return attr_val
+        else:
+            ldap_conn.unbind_s()
+            return False
 
 
 def update_access_date(mail, attr, value, conn_string_ro,

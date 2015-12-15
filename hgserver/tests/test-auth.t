@@ -197,4 +197,48 @@ Do another login to verify no pash errors are present
 
   $ hgmo exec hgssh cat /var/log/pash.log
 
+Failure to connect to LDAP mirror is fatal
+
+  $ hgmo exec hgssh /set-ldap-property url ldap://localhost:6000
+  $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER
+  Could not connect to the LDAP server at ldap://localhost:6000
+  [1]
+
+  $ hgmo exec hgssh /set-ldap-property url real
+
+Failure to connect to LDAP master server is not fatal
+
+  $ hgmo exec hgssh /set-ldap-property write_url ldap://localhost:6000
+
+  $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER
+  Could not connect to the LDAP server at ldap://localhost:6000
+  A SSH connection has been successfully established.
+  
+  Your account (user1@example.com) has privileges to access Mercurial over
+  SSH.
+  
+  You did not specify a command to run on the server. This server only
+  supports running specific commands. Since there is nothing to do, you
+  are being disconnected.
+  [1]
+
+Can pull when LDAP master is not available
+
+  $ hgmo create-repo mozilla-central 3
+  $ cat >> $HGRCPATH << EOF
+  > [ui]
+  > ssh = ssh -F `pwd`/ssh_config -i `pwd`/key1 -l user1@example.com
+  > EOF
+
+  $ hg clone ssh://${SSH_SERVER}:${HGPORT}/mozilla-central
+  remote: Could not connect to the LDAP server at ldap://localhost:6000
+  destination directory: mozilla-central
+  no changes found
+  updating to branch default
+  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+
+  $ hgmo exec hgssh /set-ldap-property write_url real
+
+Cleanup
+
   $ hgmo clean

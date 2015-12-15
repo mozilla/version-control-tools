@@ -1,0 +1,26 @@
+#!/usr/bin/python -u
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+from __future__ import absolute_import
+
+import json
+import os
+import sys
+
+what, value = sys.argv[1:]
+
+real = 'ldap://%s:%s/' % (os.environ['LDAP_PORT_389_TCP_ADDR'],
+                          os.environ['LDAP_PORT_389_TCP_PORT'])
+
+if value == 'real':
+    value = real
+
+with open('/etc/mercurial/ldap.json', 'rb') as fh:
+    d = json.load(fh)
+
+d[what] = value
+
+with open('/etc/mercurial/ldap.json', 'wb') as fh:
+    json.dump(d, fh)
