@@ -34,6 +34,9 @@ class HgmoCommands(object):
 
         docker_url, tls = params_from_env(os.environ)
         docker = Docker(os.environ['DOCKER_STATE_FILE'], docker_url, tls=tls)
+        if not docker.is_alive():
+            print('Docker not available')
+            sys.exit(1)
         self.c = HgCluster(docker, os.environ['HGMO_STATE_FILE'],
                            ldap_image=os.environ.get('DOCKER_LDAP_IMAGE'),
                            master_image=os.environ.get('DOCKER_HGMASTER_IMAGE'),
