@@ -272,8 +272,20 @@ def consumer_offsets_and_lag(client, topic, groups):
                 consumer = Consumer(client, group, topic,
                                     partitions=[partition])
                 consumer.seek(offset, 0)
-                p, message, payload = consumer.get_message()
-                lag_time = time.time() - payload['_created']
+                # We may not always be able to fetch a message, surprisingly.
+                # Use a higher timeout to try harder.
+                raw_message = consumer.get_message(timeout=10.0)
+                if raw_message:
+                    p, message, payload = raw_message
+                    lag_time = time.time() - payload['_created']
+                else:
+                    # If we failed to get a message, something is wrong.
+                    # Report high lag time so we alert.
+                    # TODO there is probably room to return NaN or some other
+                    # special value to indicate the special case of "unknown."
+                    # This should be implemented if this code path is seen
+                    # frequently in the wild.
+                    lag_time = 999.9
             else:
                 lag_time = 0.0
 
