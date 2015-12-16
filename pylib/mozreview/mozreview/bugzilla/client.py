@@ -182,7 +182,9 @@ class Bugzilla(object):
 
         # Find the associated attachment, then go through the review flags.
         for a in attachments:
-            if a['data'] != url:
+
+            # Make sure we check for old-style URLs as well.
+            if not self._rb_attach_url_matches(a['data'], url):
                 continue
 
             rb_attachment = a
@@ -270,10 +272,15 @@ class Bugzilla(object):
                 in self.proxy.Bug.attachments(params)['bugs'][str(bug_id)]
                 if a['content_type'] == 'text/x-review-board-request']
 
+    def _rb_attach_url_matches(self, attach_url, rb_url):
+        # Make sure we check for old-style URLs as well.
+        return (attach_url == rb_url or
+                '%sdiff/#index_header' % attach_url == rb_url)
+
     def _get_review_request_attachment(self, bug_id, rb_url):
         """Obtain a Bugzilla attachment for a review request."""
         for a in self.get_rb_attachments(bug_id):
-            if a.get('data') == rb_url:
+            if self._rb_attach_url_matches(a.get('data'), rb_url):
                 return a
 
         return None
@@ -376,7 +383,8 @@ class Bugzilla(object):
         })
 
         for a in self.get_rb_attachments(bug_id):
-            if a.get('data') == rb_url and not a.get('is_obsolete'):
+            if (self._rb_attach_url_matches(a.get('data'), rb_url) and
+                not a.get('is_obsolete')):
                 params['ids'].append(a['id'])
 
         if params['ids']:
