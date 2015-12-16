@@ -29,7 +29,7 @@ class ImportPullrequestTest(MozReviewWebDriverTest):
             self.create_ldap(b'mjane@example.com', b'mjane', 2001,
                              b'Mary Jane')
 
-            lr = self.create_basic_repo('mjane@example.com', 'mjane')
+            self.create_basic_repo('mjane@example.com', 'mjane')
         except Exception:
             MozReviewWebDriverTest.tearDownClass()
             raise

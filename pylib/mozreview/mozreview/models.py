@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.models import User
 from django.db import models
-from reviewboard.diffviewer.models import FileDiff
 
 from mozreview.autoland.models import (
     AutolandEventLogEntry,

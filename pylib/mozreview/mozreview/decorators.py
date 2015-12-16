@@ -1,3 +1,5 @@
+import logging
+
 from djblets.util.decorators import simple_decorator
 from djblets.webapi.decorators import (_find_httprequest,
                                        webapi_decorator,
