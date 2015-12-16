@@ -24,4 +24,3 @@ def import_pullrequest(request, user, repo, pullrequest):
         'pullrequest': pullrequest,
         'trigger_url': trigger_url,
     })))
-
