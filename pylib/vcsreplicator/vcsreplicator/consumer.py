@@ -370,6 +370,7 @@ def cli():
     client = config.get_client_from_section('consumer', timeout=30)
     topic = config.c.get('consumer', 'topic')
     group = config.c.get('consumer', 'group')
+    poll_timeout = config.c.getfloat('consumer', 'poll_timeout')
     wait_for_topic(client, topic, 30)
 
     partitions = None
@@ -417,7 +418,8 @@ def cli():
         logger.warn('starting consumer for topic=%s group=%s partitions=%s' % (
             topic, group, partitions or 'all'))
     try:
-        consume(config, consumer, onetime=args.onetime)
+        consume(config, consumer, onetime=args.onetime,
+                timeout=poll_timeout)
         if not args.onetime:
             logger.warn('process exiting gracefully')
     except BaseException:

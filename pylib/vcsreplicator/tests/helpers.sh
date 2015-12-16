@@ -12,6 +12,7 @@ vcsrenv() {
 [consumer]
 hosts = ${KAFKA_0_HOSTPORT}, ${KAFKA_1_HOSTPORT}, ${KAFKA_2_HOSTPORT}
 connect_timeout = 5
+poll_timeout = 0.2
 client_id = pull0
 topic = pushdata
 group = ttest
