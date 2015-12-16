@@ -1,0 +1,9 @@
+/home/ubuntu/autoland.log {
+    rotate 7
+    weekly
+    olddir /var/log
+    missingok
+    notifempty
+    copytruncate
+    compress
+}

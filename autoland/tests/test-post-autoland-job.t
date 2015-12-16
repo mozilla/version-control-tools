@@ -41,7 +41,7 @@ Create a commit to test on Try
 Ensure Autoland started without errors
 
   $ mozreview exec autoland tail -n 20 /home/ubuntu/autoland.log
-   0:00.* LOG: MainThread INFO starting autoland (glob)
+  * autoland INFO starting autoland (glob)
 
 Posting a job with bad credentials should fail
 

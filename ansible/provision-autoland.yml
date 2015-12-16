@@ -122,3 +122,6 @@
 
   - name: create autoland database
     shell: sudo -u postgres /home/ubuntu/version-control-tools/autoland/sql/createdb.sh chdir=/home/ubuntu/version-control-tools/autoland/sql
+
+  - name: configure autoland log rotation
+    command: cp /home/ubuntu/version-control-tools/autoland/logrotate/autoland /etc/logrotate.d/autoland

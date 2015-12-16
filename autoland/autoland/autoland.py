@@ -16,7 +16,6 @@ sys.path.insert(0, os.path.normpath(os.path.join(os.path.normpath(
                 os.path.abspath(os.path.dirname(__file__))), '..', '..',
                 'pylib', 'mozautomation')))
 from mozautomation.commitparser import parse_bugs
-from mozlog.structured import commandline
 
 import transplant
 import treestatus
@@ -266,12 +265,17 @@ def main():
     dsn = config.get('database')
 
     parser.add_argument('--dsn', default=dsn,
-                        help="Postgresql DSN connection string")
-    commandline.add_logging_group(parser)
+                        help='Postgresql DSN connection string')
+    parser.add_argument('--log-path', default='autoland.log',
+                        help='Path to which to log')
     args = parser.parse_args()
 
-    logging.basicConfig()
-    logger = commandline.setup_logging('autoland', vars(args), {})
+    logging.basicConfig(filename=args.log_path,
+                        filemode='a',
+                        format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                        datefmt='%H:%M:%S',
+                        level=logging.DEBUG)
+    logger = logging.getLogger('autoland')
     logger.info('starting autoland')
 
     dbconn = get_dbconn(args.dsn)

@@ -13,9 +13,6 @@ mercurial==3.6.1
 # sha256: dQzlorS9IlvQCzOeGsUzwWsYfAgEaVuz2HjGme4rMig
 mozillapulse==1.2.2
 
-# sha256: AQCIYcygr7ac0w3NOJhD_rgX57nRRtU0UClUTPA73nI
-mozlog==2.2
-
 # sha256: as-au751fvddwuzZ2RunSVR5Qauv--af8ghqnjfUkEw
 psycopg2==2.6.1
 
