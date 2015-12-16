@@ -483,7 +483,7 @@ class AutolandRequestUpdateResource(WebAPIResource):
         rr = ReviewRequest.objects.get(pk=autoland_request.review_request_id)
 
         if fields['landed']:
-            autoland_request.repository_revision=fields['result']
+            autoland_request.repository_revision = fields['result']
             autoland_request.save()
 
             # If we've landed to the "inbound" repository, we'll close the

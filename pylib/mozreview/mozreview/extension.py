@@ -149,8 +149,8 @@ class MozReviewExtension(Extension):
             'apply_to': diffviewer_url_names,
         },
         'import-pullrequest': {
-            'source_filenames': ['mozreview/js/import-pullrequest.js',],
-            'apply_to': ['import_pullrequest',],
+            'source_filenames': ['mozreview/js/import-pullrequest.js', ],
+            'apply_to': ['import_pullrequest', ],
         },
         'reviews': {
             # TODO: Everything will break if init_rr.js is not first in this
@@ -159,7 +159,7 @@ class MozReviewExtension(Extension):
                                  'mozreview/js/commits.js',
                                  'mozreview/js/review.js',
                                  'mozreview/js/autoland.js',
-                                 'mozreview/js/ui.mozreviewautocomplete.js',]
+                                 'mozreview/js/ui.mozreviewautocomplete.js', ]
         },
         'parent-review-requests': {
             'source_filenames': ['mozreview/js/parents.js'],

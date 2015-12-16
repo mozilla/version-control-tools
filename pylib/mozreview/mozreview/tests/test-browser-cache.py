@@ -61,7 +61,7 @@ class BrowserCacheTest(MozReviewWebDriverTest):
 
         ActionChains(self.browser).move_to_element(ln).click(ln).perform()
 
-        time.sleep(1) # Give time for the comment box to become focused
+        time.sleep(1)  # Give time for the comment box to become focused
         ActionChains(self.browser).send_keys("Comment!").perform()
 
         save = self.browser.find_element_by_xpath(
