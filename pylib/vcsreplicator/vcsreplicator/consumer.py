@@ -274,7 +274,9 @@ def consumer_offsets_and_lag(client, topic, groups):
                 consumer.seek(offset, 0)
                 # We may not always be able to fetch a message, surprisingly.
                 # Use a higher timeout to try harder.
-                raw_message = consumer.get_message(timeout=10.0)
+                # NRPE requires a response within 10s or it complains. So keep
+                # the timeout low.
+                raw_message = consumer.get_message(timeout=2.0)
                 if raw_message:
                     p, message, payload = raw_message
                     lag_time = time.time() - payload['_created']
