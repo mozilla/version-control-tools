@@ -3,13 +3,12 @@ import unittest
 
 from mock import patch, Mock
 from mozhginfo import pushlog_client
+from mozhginfo.push import Push
 from mozhginfo.pushlog_client import (
-    query_revisions_range,
-    query_revision_info,
-    query_full_revision_info,
-    query_pushid_range,
+    query_pushes_by_pushid_range,
+    query_pushes_by_revision_range,
+    query_push_by_revision,
     query_repo_tip,
-    query_revisions_range_from_revision_before_and_after
 )
 
 LIST_REVISION = """
@@ -67,6 +66,10 @@ def mock_response(content, status):
 
 
 class TestQueries(unittest.TestCase):
+    # Mock response for query_push_by_revision
+    push_id, push_info = json.loads(REVISION_INFO_REPOSITORIES).popitem()
+    push = Push(push_id=push_id, push_info=push_info)
+    MOCK_PUSH = json.dumps(json.loads(LIST_REVISION)['pushes'])
 
     def setUp(self):
         self.repo_url = "https://hg.mozilla.org/integration/mozilla-inbound"
@@ -75,52 +78,59 @@ class TestQueries(unittest.TestCase):
         self.end_revision = '2a193b7fd62171da1357e6c1f93453359e54206b'
 
     @patch('requests.get', return_value=mock_response(LIST_REVISION, 200))
-    def test_query_revisions_range(self, get):
-        self.assertEqual(
-            query_revisions_range(self.repo_url, self.start_revision,
-                                  self.end_revision, version=2, tipsonly=1),
-            ['8850aa0f93453d6a4472f8905271aba33f8b68d5', 'eb15e3f893453d6a4472f8905271aba33f8b68d5',
-             '1c5b4332e2f1b73fe03977b69371e9a08503bff3', '724f0a71d62171da1357e6c1f93453359e54206b']
-        )
+    @patch('mozhginfo.pushlog_client.query_push_by_revision',
+           return_value=push)
+    def test_query_pushes_by_revision_range(self, get, query_push_by_revision):
+        pushes = query_pushes_by_revision_range(repo_url=self.repo_url,
+                                                from_revision=self.start_revision,
+                                                to_revision=self.end_revision,
+                                                version=2, tipsonly=1)
+        assert len(pushes) == 4
+        push_id_list = []
+        changeset_list = []
+        # We want to ensure the push list we got is ordered.
+        for push in pushes:
+            push_id_list.append(push.id)
+            changeset_list.append(push.changesets[0].node)
+        assert push_id_list == ['87833', '53348', '53349', '53350']
+        assert changeset_list == ['71e69424094d2f86c51ba544fd861d65a578a0f2',
+                                  'eb15e3f893453d6a4472f8905271aba33f8b68d5',
+                                  '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
+                                  '724f0a71d62171da1357e6c1f93453359e54206b']
 
     @patch('requests.get', return_value=mock_response(LIST_REVISION, 200))
-    def test_query_pushid_range(self, get):
-        self.assertEqual(
-            query_pushid_range(self.repo_url, 55560, 55564),
-            ['724f0a71d62171da1357e6c1f93453359e54206b', '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
-             'eb15e3f893453d6a4472f8905271aba33f8b68d5']
-        )
+    def test_query_pushes_by_pushid_range(self, get):
+        pushes = query_pushes_by_pushid_range(repo_url=self.repo_url, start_id=55560,
+                                              end_id=55564)
+        assert len(pushes) == 3
+
+        # Duplicate with test_query_pushes_by_revision_range,
+        # but I don't think we need to write a separate function for it.
+        push_id_list = []
+        changeset_list = []
+        for push in pushes:
+            push_id_list.append(push.id)
+            changeset_list.append(push.changesets[0].node)
+        assert push_id_list == ['53348', '53349', '53350']
+        assert changeset_list == ['eb15e3f893453d6a4472f8905271aba33f8b68d5',
+                                  '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
+                                  '724f0a71d62171da1357e6c1f93453359e54206b']
 
     @patch('requests.get', return_value=mock_response(REVISION_INFO_REPOSITORIES, 200))
-    def test_query_revision_info(self, get):
-        push_info = {"date": 1441983569,
-                     "changesets": ["71e69424094d2f86c51ba544fd861d65a578a0f2"],
-                     "pushid": "87833",
-                     "user": "nobody@mozilla.com"}
-        self.assertEqual(
-            query_revision_info(self.repo_url, self.revision), push_info)
+    def test_query_push_by_revision(self, get):
+        push = query_push_by_revision(repo_url=self.repo_url, revision=self.revision)
+        assert push is not None
+        assert push.id == '87833'
+        assert len(push.changesets) == 1
+        changeset = push.changesets[0]
+        assert changeset.node == "71e69424094d2f86c51ba544fd861d65a578a0f2"
 
-    @patch('requests.get', return_value=mock_response(REVISION_INFO_REPOSITORIES, 200))
-    def test_query_full_revision_info(self, get):
-        self.assertEqual(
-            query_full_revision_info(self.repo_url, '71e69424094'),
-            '71e69424094d2f86c51ba544fd861d65a578a0f2'
-        )
-
-    @patch('requests.get', return_value=mock_response(REVISION_INFO_REPOSITORIES, 200))
+    @patch('requests.get', return_value=mock_response(MOCK_PUSH, 200))
     def test_query_repo_tip(self, get):
-        self.assertEqual(
-            query_repo_tip(self.repo_url), "71e69424094d2f86c51ba544fd861d65a578a0f2")
-
-    @patch('requests.get', return_value=mock_response(LIST_REVISION, 200))
-    @patch('mozhginfo.pushlog_client.query_revision_info', return_value={"pushid": "55561"})
-    def test_query_revisions_range_from_revision_before_and_after(self, query_revision_info, get):
-        self.assertEqual(
-            query_revisions_range_from_revision_before_and_after(self.repo_url, self.revision,
-                                                                 1, 1),
-            ['724f0a71d62171da1357e6c1f93453359e54206b', '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
-             'eb15e3f893453d6a4472f8905271aba33f8b68d5']
-        )
+        push = query_repo_tip(repo_url=self.repo_url)
+        assert push is not None
+        assert push.id == '53350'
+        assert push.changesets[0].node == '724f0a71d62171da1357e6c1f93453359e54206b'
 
 
 class TestValidRevision(unittest.TestCase):

@@ -19,6 +19,8 @@ import logging
 
 import requests
 
+from push import Push
+
 
 LOG = logging.getLogger('pushlog_client')
 JSON_PUSHES = "%(repo_url)s/json-pushes"
@@ -29,16 +31,16 @@ class PushlogError(Exception):
     pass
 
 
-def query_revisions_range(repo_url, from_revision, to_revision, version=2, tipsonly=1):
+def query_pushes_by_revision_range(repo_url, from_revision, to_revision, version=2, tipsonly=1):
     """
-    Return an ordered list of revisions (by date - oldest (starting) first).
+    Return an ordered list of pushes (by date - oldest (starting) first).
 
-    repo           - represents the URL to clone a repo
+    repo_url      - represents the URL to clone a repo
     from_revision - from which revision to start with (oldest)
     to_revision   - from which revision to end with (newest)
-    version        - version of json-pushes to use (see docs)
+    version       - version of json-pushes to use (see docs)
     """
-    revisions = []
+    push_list = []
     url = "%s?fromchange=%s&tochange=%s&version=%d&tipsonly=%d" % (
         JSON_PUSHES % {"repo_url": repo_url},
         from_revision,
@@ -50,26 +52,27 @@ def query_revisions_range(repo_url, from_revision, to_revision, version=2, tipso
     req = requests.get(url)
     pushes = req.json()["pushes"]
     # json-pushes does not include the starting revision
-    revisions.append(from_revision)
+    push_list.append(query_push_by_revision(repo_url, from_revision))
+
     for push_id in sorted(pushes.keys()):
         # Querying by push ID is perferred because date ordering is
         # not guaranteed (due to system clock skew)
         # We can interact with self-serve with the full char representation
-        revisions.append(pushes[push_id]["changesets"][-1])
+        push_list.append(Push(push_id=push_id, push_info=pushes[push_id]))
 
-    return revisions
+    return push_list
 
 
-def query_pushid_range(repo_url, start_id, end_id, version=2):
+def query_pushes_by_pushid_range(repo_url, start_id, end_id, version=2):
     """
-    Return an ordered list of revisions (newest push id first).
+    Return an ordered list of pushes (oldest first).
 
-    repo     - represents the URL to clone a repo
+    repo_url - represents the URL to clone a repo
     start_id - from which pushid to start with (oldest)
     end_id   - from which pushid to end with (most recent)
     version  - version of json-pushes to use (see docs)
     """
-    revisions = []
+    push_list = []
     url = "%s?startID=%s&endID=%s&version=%s&tipsonly=1" % (
         JSON_PUSHES % {"repo_url": repo_url},
         start_id - 1,  # off by one to compensate for pushlog as it skips start_id
@@ -79,38 +82,17 @@ def query_pushid_range(repo_url, start_id, end_id, version=2):
     LOG.debug("About to fetch %s" % url)
     req = requests.get(url)
     pushes = req.json()["pushes"]
-    # pushes.keys() is a list of strings which we need to map to integers
-    # We use reverse in order to return list sorted from newest to oldest push id
-    for push_id in sorted(map(int, pushes.keys()), reverse=True):
+
+    for push_id in sorted(pushes.keys()):
         # Querying by push ID is preferred because date ordering is
         # not guaranteed (due to system clock skew)
         # We can interact with self-serve with the 12 char representation
-        revisions.append(pushes[str(push_id)]["changesets"][0])
+        push_list.append(Push(push_id=push_id, push_info=pushes[push_id]))
 
-    return revisions
-
-
-def query_revisions_range_from_revision_before_and_after(repo_url, revision, before, after):
-    """
-    Get the start and end revisions based on the number of revisions before and after.
-
-    Raises PushlogError if pushlog data cannot be retrieved.
-    """
-    try:
-        push_info = query_revision_info(repo_url, revision)
-        pushid = int(push_info["pushid"])
-        start_id = pushid - before
-        end_id = pushid + after
-        revlist = query_pushid_range(repo_url, start_id, end_id)
-    except:
-        raise PushlogError('Unable to retrieve pushlog data. '
-                           'Please check repo_url %s and revision %s specified.'
-                           % (repo_url, revision))
-
-    return revlist
+    return push_list
 
 
-def query_revision_info(repo_url, revision, full=False):
+def query_push_by_revision(repo_url, revision, full=False):
     """
     Return a dictionary with meta-data about a push including:
 
@@ -125,47 +107,27 @@ def query_revision_info(repo_url, revision, full=False):
     req = requests.get(url)
     data = req.json()
     assert len(data) == 1, "We should only have information about one push"
-    push_id, push_info = data.popitem()
-    push_info["pushid"] = push_id
+
     if not full:
-        LOG.debug("Push info: %s" % str(push_info))
+        LOG.debug("Push info: %s" % str(data))
+        push_id, push_info = data.popitem()
+        push = Push(push_id=push_id, push_info=push_info)
     else:
         LOG.debug("Requesting the info with full=1 can yield too much unnecessary output "
                   "to debug anything properly")
-    return push_info
-
-
-def query_full_revision_info(repo_url, revision):
-    """
-    Return the full 40 chars revision number which correspond to the revision
-    number we given, and throw an error out if found collision in there.
-
-    :param repo_url: The repo url of a repository
-                     e.g. http://hg.mozilla.org/integration/mozilla-inbound
-    :param revision: push revision (40 chars)
-    :type revision: str
-    :return:
-    """
-    push_info = query_revision_info(repo_url, revision)
-    if not push_info:
-        raise PushlogError("Unable to retrieve pushlog info by repo_url: %s"
-                           " and revision: %s. Maybe The revision doesn't exist in the repo"
-                           " or We don't have enough characters to determine the revision "
-                           "Please check repo_url and revision secified."
-                           % (repo_url, revision))
-    return push_info['changesets'][0]
+    return push
 
 
 def query_repo_tip(repo_url):
-    """Return the tip of a branch."""
+    """Return the tip of a branch URL."""
     url = "%s?tipsonly=1" % (JSON_PUSHES % {"repo_url": repo_url})
     recent_commits = requests.get(url).json()
-    tip_id = sorted(map(int, recent_commits.keys()))[-1]
-    return recent_commits[str(tip_id)]["changesets"][0]
+    tip_id = sorted(recent_commits.keys())[-1]
+    return Push(push_id=tip_id, push_info=recent_commits[tip_id])
 
 
 def valid_revision(repo_url, revision):
-    """Verify that a revision exists in the given repository."""
+    """Verify that a revision exists in the given repository URL."""
 
     global VALID_CACHE
     if (repo_url, revision) in VALID_CACHE:
