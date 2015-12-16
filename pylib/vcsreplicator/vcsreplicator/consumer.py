@@ -281,13 +281,9 @@ def consumer_offsets_and_lag(client, topic, groups):
                     p, message, payload = raw_message
                     lag_time = time.time() - payload['_created']
                 else:
-                    # If we failed to get a message, something is wrong.
-                    # Report high lag time so we alert.
-                    # TODO there is probably room to return NaN or some other
-                    # special value to indicate the special case of "unknown."
-                    # This should be implemented if this code path is seen
-                    # frequently in the wild.
-                    lag_time = 999.9
+                    # If we failed to get a message, something is wrong. Store
+                    # None as a special value.
+                    lag_time = None
             else:
                 lag_time = 0.0
 
@@ -337,6 +333,8 @@ def print_offsets():
     data = []
     for group in groups:
         for partition, (offset, available, lag_time) in sorted(d[group].items()):
+            if lag_time is None:
+                lag_time = 'error'
             data.append((topic, group, partition, offset, available, lag_time))
 
     print(tabulate.tabulate(data, headers))

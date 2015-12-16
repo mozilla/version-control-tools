@@ -70,24 +70,29 @@ def check_consumer_lag():
         output.append('%s - partition %d is %d messages behind (%d/%d)' % (
             label, partition, lag, offset, available))
 
-        if lag_time >= args.critical_lag_time:
-            exitcode = 2
-            label = 'CRITICAL'
-        elif lag_time >= args.warning_lag_time:
+        if lag_time is None:
+            output.append('WARNING - could not determine lag time for '
+                          'partition %d' % partition)
             exitcode = max(exitcode, 1)
-            label = 'WARNING'
         else:
-            label = 'OK'
+            if lag_time >= args.critical_lag_time:
+                exitcode = 2
+                label = 'CRITICAL'
+            elif lag_time >= args.warning_lag_time:
+                exitcode = max(exitcode, 1)
+                label = 'WARNING'
+            else:
+                label = 'OK'
 
-        output.append('%s - partition %d is %0.3f seconds behind' % (
-            label, partition, lag_time))
+            output.append('%s - partition %d is %0.3f seconds behind' % (
+                label, partition, lag_time))
 
-        # Clock drift between producer and consumer.
-        if lag_time < 0.0 and not drift_warned:
-            exitcode = max(exitcode, 1)
-            output.append('WARNING - clock drift of %.3f seconds between '
-                          'producer and consumer; check NTP sync' % lag_time)
-            drift_warned = True
+            # Clock drift between producer and consumer.
+            if lag_time < 0.0 and not drift_warned:
+                exitcode = max(exitcode, 1)
+                output.append('WARNING - clock drift of %.3f seconds between '
+                              'producer and consumer; check NTP sync' % lag_time)
+                drift_warned = True
 
     if exitcode == 2:
         print('CRITICAL - %d/%d partitions out of sync' % (bad, len(offsets)))
