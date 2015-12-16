@@ -139,7 +139,7 @@ class AutolandConcurrentTest(MozReviewWebDriverTest):
         self.assign_reviewer(0, 'jsmith')
         publish_btn = WebDriverWait(self.browser, 3).until(
             EC.visibility_of_element_located((By.ID,
-            'btn-draft-publish')))
+                                              'btn-draft-publish')))
         publish_btn.click()
 
         WebDriverWait(self.browser, 10).until(
@@ -180,6 +180,6 @@ class AutolandConcurrentTest(MozReviewWebDriverTest):
         )
 
         self.assertEqual(error_msg.text,
-                        ('An autoland request for this review '
-                         'request is already in progress. '
-                         'Please wait for that request to finish.'))
+                         ('An autoland request for this review '
+                          'request is already in progress. '
+                          'Please wait for that request to finish.'))

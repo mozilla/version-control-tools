@@ -158,8 +158,8 @@ class ImportCommitField(BaseReviewRequestField):
             return ''
 
         return get_template('mozreview/hg-import.html').render(Context({
-                'commit_id': commit_id,
-                'repo_path': repo_path,
+            'commit_id': commit_id,
+            'repo_path': repo_path,
         }))
 
 
@@ -200,8 +200,8 @@ class PullCommitField(BaseReviewRequestField):
             return ''
 
         return get_template('mozreview/hg-pull.html').render(Context({
-                'commit_id': commit_id,
-                'repo_path': repo_path,
+            'commit_id': commit_id,
+            'repo_path': repo_path,
         }))
 
 
@@ -317,7 +317,7 @@ class TryField(BaseReviewRequestField):
             ar = AutolandRequest.objects.get(pk=autoland_id)
         except:
             logging.error('An unknown autoland_id was detected: %s' %
-                info['new'][0])
+                          info['new'][0])
             return self._retrieve_error_txt
 
         if ar.last_known_status == AutolandEventLogEntry.REQUESTED:

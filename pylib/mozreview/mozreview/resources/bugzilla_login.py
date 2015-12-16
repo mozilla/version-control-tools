@@ -102,6 +102,38 @@ class BugzillaAPIKeyLoginResource(WebAPIResource):
     )
     def create(self, request, username, api_key, *args, **kwargs):
         """Authenticate a user from a username and API key."""
+        backend_cls = get_registered_auth_backend('bugzilla')
+        if not backend_cls:
+            return SERVICE_NOT_CONFIGURED
+
+        backend = backend_cls()
+
+        try:
+            user = backend.authenticate_api_key(username, api_key)
+            if user is None:
+                return LOGIN_FAILED
+
+        # The user will need to visit Bugzilla to obtain an API key.
+        except BugzillaAPIKeyNeededError as e:
+            return WebAPIResponseError(request, LOGIN_FAILED, extra_params={
+                'bugzilla_api_key_needed': True,
+                'bugzilla_api_key_url': e.url,
+            })
+
+        # The user hasn't logged in via the HTML interface yet. This
+        # error response should be interpretted by clients to direct
+        # them to log in to the web site.
+        except WebLoginNeededError:
+            protocol = SiteConfiguration.objects.get_current().get(
+                'site_domain_method')
+            domain = Site.objects.get_current().domain
+            login_url = '%s://%s%saccount/login' % (
+                protocol, domain, settings.SITE_ROOT)
+
+            extra = {
+                'web_login_needed': True,
+                'login_url': login_url,
+            }
         result = auth_api_key(request, username, api_key)
 
         if not isinstance(result, User):

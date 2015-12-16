@@ -238,7 +238,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
             autoland_request_id=autoland_request_id)
 
         self.save_autolandrequest_id('p2rb.autoland', rr,
-            autoland_request_id)
+                                     autoland_request_id)
 
         return 200, {}
 
@@ -333,17 +333,17 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
             # verify that the destination is in fact an "scm_level_1"
             # repository to ensure that people don't try to land to inbound
             # using this resource.
-            response = requests.post(autoland_url + '/autoland',
+            response = requests.post(
+                autoland_url + '/autoland',
                 data=json.dumps({
-                'ldap_username': request.mozreview_profile.ldap_username,
-                'tree': rr.repository.name,
-                'pingback_url': pingback_url,
-                'rev': last_revision,
-                'destination': TRY_AUTOLAND_DESTINATION,
-                'trysyntax': try_syntax,
-            }), headers={
-                'content-type': 'application/json',
-            },
+                    'ldap_username': request.mozreview_profile.ldap_username,
+                    'tree': rr.repository.name,
+                    'pingback_url': pingback_url,
+                    'rev': last_revision,
+                    'destination': TRY_AUTOLAND_DESTINATION,
+                    'trysyntax': try_syntax,
+                    }),
+                headers={'content-type': 'application/json'},
                 timeout=AUTOLAND_REQUEST_TIMEOUT,
                 auth=(autoland_user, autoland_password))
         except requests.exceptions.RequestException:
@@ -391,7 +391,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
             autoland_request_id=autoland_request_id)
 
         self.save_autolandrequest_id('p2rb.autoland_try', rr,
-            autoland_request_id)
+                                     autoland_request_id)
 
         return 200, {}
 

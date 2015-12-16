@@ -27,15 +27,15 @@ class MozReviewCacheDisableMiddleware(object):
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         if (request.resolver_match and
-            request.resolver_match.url_name in self.URLNAME_BLACKLIST and
-            'HTTP_IF_NONE_MATCH' in request.META):
+                request.resolver_match.url_name in self.URLNAME_BLACKLIST and
+                'HTTP_IF_NONE_MATCH' in request.META):
             # Clear the etag provided by the client
             del request.META['HTTP_IF_NONE_MATCH']
 
     def process_response(self, request, response):
         if (request.resolver_match and
-            request.resolver_match.url_name in self.URLNAME_BLACKLIST and
-            'ETag' in response):
+                request.resolver_match.url_name in self.URLNAME_BLACKLIST and
+                'ETag' in response):
             # Clear the etag Review Board generated
             del response['ETag']
 

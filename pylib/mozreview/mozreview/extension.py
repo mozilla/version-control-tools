@@ -221,22 +221,22 @@ class MozReviewExtension(Extension):
         }])
 
         ReviewRequestDropdownActionHook(self, actions=[
-        {
-            'label': 'Automation',
-            'id': 'automation-menu',
-            'items': [
-                {
-                    'id': 'autoland-try-trigger',
-                    'label': 'Trigger a Try Build',
-                    'url': '#',
+            {
+                'label': 'Automation',
+                'id': 'automation-menu',
+                'items': [
+                    {
+                        'id': 'autoland-try-trigger',
+                        'label': 'Trigger a Try Build',
+                        'url': '#',
+                        },
+                    {
+                        'id': 'autoland-trigger',
+                        'label': 'Land Commits',
+                        'url': '#',
+                        },
+                    ],
                 },
-                {
-                    'id': 'autoland-trigger',
-                    'label': 'Land Commits',
-                    'url': '#',
-                },
-            ],
-        },
         ])
 
         # Hide fields from all review requests that are not used by Mozilla

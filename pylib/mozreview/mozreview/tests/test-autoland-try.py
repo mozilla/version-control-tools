@@ -82,7 +82,7 @@ class AutolandTryTest(MozReviewWebDriverTest):
         self.assign_reviewer(0, 'jsmith')
         publish_btn = WebDriverWait(self.browser, 3).until(
             EC.visibility_of_element_located((By.ID,
-            'btn-draft-publish')))
+                                              'btn-draft-publish')))
         publish_btn.click()
 
         WebDriverWait(self.browser, 10).until(
@@ -164,7 +164,7 @@ class AutolandTryTest(MozReviewWebDriverTest):
         self.browser.refresh()
         changedesc = self.browser.find_elements_by_class_name('changedesc')[1]
         self.assertTrue('https://treeherder.mozilla.org/'
-            in changedesc.get_attribute('innerHTML'))
+                        in changedesc.get_attribute('innerHTML'))
 
         # We should not have closed the review automatically
         with self.assertRaises(NoSuchElementException):
