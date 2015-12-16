@@ -1,5 +1,7 @@
 port={{ kafka_port | default(9092) }}
-num.network.threads={{ kafka_network_threads | default(2) }}
+# Too few network threads could result in requests getting starved and timing
+# out.
+num.network.threads={{ kafka_network_threads | default(8) }}
 num.io.threads={{ kafka_io_threads | default(8) }}
 socket.send.buffer.bytes={{ kafka_socket_send_buffer | default(1048576) }}
 socket.receive.buffer.bytes={{ kafka_socket_receive_buffer | default(1048576) }}
