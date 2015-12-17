@@ -175,11 +175,31 @@ def readfirefoxtrees(repo):
 def writefirefoxtrees(repo):
     """Write the firefoxtrees node mapping to the filesystem."""
     lines = []
+    trees = {}
     for tree, node in sorted(repo.firefoxtrees.items()):
         assert len(node) == 20
         lines.append('%s %s' % (tree, hex(node)))
+        trees[tree] = hex(node)
 
     repo.vfs.write('firefoxtrees', '\n'.join(lines))
+
+    # repo.tag will produce multiple entries for a tag. Prune the old ones.
+    localtags = repo.opener.tryread('localtags')
+    seentags = set()
+    tagslines = []
+    for line in localtags.splitlines():
+        line = line.strip()
+        node, tag = line.split()
+
+        if tag not in trees or trees[tag] != node or tag in seentags:
+            continue
+
+        seentags.add(tag)
+        tagslines.append(line)
+    if tagslines:
+        tagslines.append('')
+    if tagslines:
+        repo.vfs.write('localtags', '\n'.join(tagslines))
 
 
 def get_firefoxtrees(repo):
@@ -285,23 +305,6 @@ def pull(orig, repo, remote, *args, **kwargs):
                     msg += _(' (+%d commits)') % between
                 msg += '\n'
                 repo.ui.status(msg)
-
-            # repo.tag will produce multiple entries for a tag. Prune
-            # the old ones.
-            localdata = repo.opener.tryread('localtags')
-            newlines = []
-            for line in localdata.splitlines():
-                line = line.strip()
-                node, tag = line.split()
-
-                if tag not in newtags or newtags[tag] != node:
-                    continue
-
-                newlines.append(line)
-            if newlines:
-                newlines.append('')
-            if newlines:
-                repo.opener.write('localtags', '\n'.join(newlines))
 
             writefirefoxtrees(repo)
 
