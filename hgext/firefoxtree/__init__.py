@@ -181,14 +181,18 @@ def writefirefoxtrees(repo):
     repo.vfs.write('firefoxtrees', '\n'.join(lines))
 
 
-# Generator for firefox tree tags in this repo.
 def get_firefoxtrees(repo):
-    for tag, node in sorted(repo.tags().items()):
+    """Generator for Firefox tree labels defined in this repository.
+
+    Returns a tuple of (tag, node, tree, uri)
+    """
+    for tag, node in sorted(repo.firefoxtrees.items()):
         result = resolve_trees_to_uris([tag])[0]
         if not result[1]:
             continue
         tree, uri = result
         yield tag, node, tree, uri
+
 
 @wireproto.wireprotocommand('firefoxtrees', '')
 def firefoxtrees(repo, proto):
