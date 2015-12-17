@@ -73,7 +73,8 @@ def check_consumer_lag():
         if lag_time is None:
             output.append('WARNING - could not determine lag time for '
                           'partition %d' % partition)
-            exitcode = max(exitcode, 1)
+            # TODO raise warning for inability to determine lag time if persistent.
+            #exitcode = max(exitcode, 1)
         else:
             if lag_time >= args.critical_lag_time:
                 exitcode = 2
