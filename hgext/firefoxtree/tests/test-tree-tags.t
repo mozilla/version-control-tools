@@ -36,7 +36,6 @@ Pulled Firefox repos show up as tags
 
   $ hg log
   changeset:   3:1b348279b0e9
-  tag:         inbound
   tag:         tip
   fxtree:      inbound
   user:        test
@@ -49,7 +48,6 @@ Pulled Firefox repos show up as tags
   summary:     Bug 458 - Commit to inbound
   
   changeset:   1:994ec05999da
-  tag:         central
   fxtree:      central
   user:        test
   date:        Thu Jan 01 00:00:00 1970 +0000
@@ -71,14 +69,12 @@ hg fxheads revset gives known tree commits
 
   $ hg log -r "fxheads()"
   changeset:   1:994ec05999da
-  tag:         central
   fxtree:      central
   user:        test
   date:        Thu Jan 01 00:00:00 1970 +0000
   summary:     Bug 457 - second commit to m-c; r=ted
   
   changeset:   3:1b348279b0e9
-  tag:         inbound
   tag:         tip
   fxtree:      inbound
   user:        test

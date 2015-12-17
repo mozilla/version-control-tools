@@ -290,8 +290,6 @@ def pull(orig, repo, remote, *args, **kwargs):
 
                 repo.firefoxtrees[tag] = node
 
-                repo.tag(tag, node, message=None, local=True,
-                        user=None, date=None)
                 between = None
                 if tag in oldtags:
                     between = len(list(repo.revs('%s::%s' % (
@@ -334,7 +332,6 @@ def updateremoterefs(repo, remote, tree):
     # default branch.
     defaultnodes = branchmap['default']
     node = defaultnodes[-1]
-    repo.tag(tree, node, message=None, local=True, user=None, date=None)
 
     repo.firefoxtrees[tree] = node
     writefirefoxtrees(repo)
