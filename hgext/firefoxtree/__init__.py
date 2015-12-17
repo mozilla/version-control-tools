@@ -110,7 +110,7 @@ shorttemplate = ''.join([
     '{label("log.changeset", ":")}',
     '{label("log.changeset", node|short)}',
     ' ',
-    '{label("log.tag", tags)}',
+    '{label("log.tag", join(fxheads, " "))}',
     ' ',
     '{label("log.summary", firstline(desc))}',
     '\n',
@@ -413,7 +413,11 @@ def fxheads(ui, repo, **opts):
         raise util.Abort(_('fxheads is only available on Firefox repos'))
 
     displayer = cmdutil.show_changeset(ui, repo, opts)
+    seen = set()
     for tag, node, tree, uri in get_firefoxtrees(repo):
+        if node in seen:
+            continue
+        seen.add(node)
         ctx = repo[node]
         displayer.show(ctx)
 

@@ -35,7 +35,7 @@ We can pull from the special multiple tree aliases
 
   $ hg fxheads
   1:994ec05999da b2ginbound Bug 457 - second commit to m-c; r=ted
-  4:3057abf99ee2 fx-team tip Bug 460 - Create bar on fx-team
+  4:3057abf99ee2 fx-team Bug 460 - Create bar on fx-team
   3:1b348279b0e9 inbound Bug 459 - Second commit to inbound
 
   $ cat .hg/firefoxtrees
@@ -55,7 +55,7 @@ fxtrees is a special alias that expands to trees that have been pulled before
   $ hg -q pull fx-team
 
   $ hg fxheads
-  4:3057abf99ee2 fx-team tip Bug 460 - Create bar on fx-team
+  4:3057abf99ee2 fx-team Bug 460 - Create bar on fx-team
   3:1b348279b0e9 inbound Bug 459 - Second commit to inbound
 
   $ hg pull fxtrees

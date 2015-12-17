@@ -26,7 +26,7 @@
 Pushing to a known tree should update the local tag
 
   $ hg fxheads
-  1:994ec05999da central tip Bug 457 - second commit to m-c; r=ted
+  1:994ec05999da central Bug 457 - second commit to m-c; r=ted
 
   $ cat .hg/firefoxtrees
   central 994ec05999daf04fb3c01a8cb0dea1458a7d4d3d (no-eol)
@@ -43,7 +43,7 @@ Pushing to a known tree should update the local tag
   remote: added 1 changesets with 1 changes to 1 files
 
   $ hg fxheads
-  2:683791dab932 central tip Bug 789 - Testing push1
+  2:683791dab932 central Bug 789 - Testing push1
 
   $ cat .hg/firefoxtrees
   central 683791dab9323f2f3c7730260806c9cf8560995f (no-eol)
