@@ -212,23 +212,22 @@ def protocolcall(repo, req, cmd):
 
     return origcall(repo, req, cmd)
 
+
+def repopath(repo):
+    root = repo.ui.config('serverlog', 'reporoot', '')
+    if root and not root.endswith('/'):
+        root += '/'
+
+    path = repo.path
+    if root and path.startswith(root):
+        path = path[len(root):]
+    path = path.rstrip('/').rstrip('/.hg')
+
+    return path
+
+
 class syslogmixin(object):
     """Shared class providing an API to do syslog writing."""
-    def _populaterepopath(self):
-        repopath = self._serverlog.get('path', None)
-
-        if not repopath:
-            reporoot = self.repo.ui.config('serverlog', 'reporoot', '')
-            if reporoot and not reporoot.endswith('/'):
-                reporoot += '/'
-
-            repopath = self.repo.path
-            if reporoot and repopath.startswith(reporoot):
-                repopath = repopath[len(reporoot):]
-            repopath = repopath.rstrip('/').rstrip('/.hg')
-
-        self._serverlog['path'] = repopath
-
     def _syslog(self, action, *args):
         if not hasattr(self, '_serverlog'):
             return
@@ -257,8 +256,7 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
         # Resolve the repository path.
         # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
         # set to the relative path of the repo (I think).
-        self._serverlog['path'] = req.env.get('REPO_NAME')
-        self._populaterepopath()
+        self._serverlog['path'] = req.env.get('REPO_NAME') or repopath(self.repo)
 
         self._serverlog['ip'] = req.env.get('HTTP_X_CLUSTER_CLIENT_IP') or \
             req.env.get('REMOTE_ADDR') or 'UNKNOWN'
@@ -313,9 +311,8 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
         self._serverlog = {
             'sessionid': str(uuid.uuid1()),
             'requestid': '',
+            'path': repopath(self.repo),
         }
-
-        self._populaterepopath()
 
         # Stuff a reference to the state so we can do logging within repo
         # methods.
