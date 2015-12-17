@@ -255,7 +255,9 @@ def pull(orig, repo, remote, *args, **kwargs):
     try:
         if remote.capable('firefoxtrees'):
             lines = remote._call('firefoxtrees').splitlines()
-            oldtags = repo.tags()
+            oldtags = {}
+            for tag, node, tree, uri in get_firefoxtrees(repo):
+                oldtags[tag] = node
             newtags = {}
             for line in lines:
                 tag, node = line.split()
