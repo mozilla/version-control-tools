@@ -76,6 +76,7 @@ from mercurial import (
     hg,
     namespaces,
     revset,
+    scmutil,
     templatekw,
     util,
     wireproto,
@@ -143,6 +144,46 @@ def peerorrepo(orig, ui, path, *args, **kwargs):
 
         return orig(ui, uri, *args, **kwargs)
 
+def share(orig, ui, source, *args, **kwargs):
+    """Wraps hg.share to mark the firefoxtrees file as shared.
+
+    The .hg/shared file lists things that are shared. We add firefoxtrees
+    to it if we are a Firefox repo.
+    """
+    res = orig(ui, source, *args, **kwargs)
+
+    # TODO Mercurial 3.7 introduces a standalone function that receives the
+    # proper arguments so we can avoid this boilerplate.
+    if isinstance(source, str):
+        origsource = ui.expandpath(source)
+        source, branches = hg.parseurl(origsource)
+        srcrepo = hg.repository(ui, source)
+    else:
+        srcrepo = source.local()
+
+    if not isfirefoxrepo(srcrepo):
+        return res
+
+    if args:
+        dest = args[0]
+    elif 'dest' in kwargs:
+        dest = kwargs['dest']
+    else:
+        dest = None
+
+    if not dest:
+        dest = hg.defaultdest(source)
+    else:
+        dest = ui.expandpath(dest)
+
+    destwvfs = scmutil.vfs(dest, realpath=True)
+    r = hg.repository(ui, destwvfs.base)
+
+    with r.vfs('shared', 'ab') as fh:
+        fh.write('firefoxtrees\n')
+
+    return res
+
 # Wraps capabilities wireproto command to advertise firefoxtree existence.
 def capabilities(orig, repo, proto):
     caps = orig(repo, proto)
@@ -154,8 +195,26 @@ def capabilities(orig, repo, proto):
     return caps
 
 
+def _firefoxtreesrepo(repo):
+    """Obtain a repo that can open the firefoxtrees file.
+
+    Will return the passed ``repo`` in most cases. But if ``repo``
+    is shared, we may return the repo from the share source.
+    """
+    shared = {s.strip() for s in repo.vfs.tryread('shared').splitlines()}
+
+    if 'firefoxtrees' in shared and repo.sharedpath != repo.path:
+        source = repo.vfs.split(repo.sharedpath)[0]
+        srcurl, branches = hg.parseurl(source)
+        return hg.repository(repo.ui, srcurl)
+    else:
+        return repo
+
+
 def readfirefoxtrees(repo):
     """Read the firefoxtrees node mapping from the filesystem."""
+    repo = _firefoxtreesrepo(repo)
+
     trees = {}
     data = repo.vfs.tryread('firefoxtrees')
     if not data:
@@ -181,7 +240,7 @@ def writefirefoxtrees(repo):
         lines.append('%s %s' % (tree, hex(node)))
         trees[tree] = hex(node)
 
-    repo.vfs.write('firefoxtrees', '\n'.join(lines))
+    _firefoxtreesrepo(repo).vfs.write('firefoxtrees', '\n'.join(lines))
 
     # Old versions of firefoxtrees stored labels in the localtags file. Since
     # this file is read by Mercurial and has no relevance to us any more, we
@@ -455,6 +514,7 @@ def template_fxheads(repo, ctx, templ, cache, **args):
 
 def extsetup(ui):
     extensions.wrapfunction(hg, '_peerorrepo', peerorrepo)
+    extensions.wrapfunction(hg, 'share', share)
     extensions.wrapfunction(exchange, 'push', push)
     extensions.wrapfunction(exchange, 'pull', pull)
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
