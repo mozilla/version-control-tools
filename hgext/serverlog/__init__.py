@@ -177,14 +177,7 @@ are running, CPU time calculations will not be accurate. Other state may get
 mixed up.
 """
 
-testedwith = '3.4'
-
-import mercurial.hgweb.protocol as protocol
-import mercurial.hgweb.hgweb_mod as hgweb_mod
-import mercurial.hgweb.hgwebdir_mod as hgwebdir_mod
-import mercurial.localrepo as localrepo
-import mercurial.sshserver as sshserver
-import mercurial.wireproto as wireproto
+from __future__ import absolute_import
 
 import inspect
 import os
@@ -192,6 +185,19 @@ import resource
 import syslog
 import time
 import uuid
+
+from mercurial import (
+    localrepo,
+    sshserver,
+    wireproto,
+)
+from mercurial.hgweb import (
+    protocol,
+    hgweb_mod,
+    hgwebdir_mod,
+)
+
+testedwith = '3.4'
 
 origcall = protocol.call
 origdispatch = wireproto.dispatch
