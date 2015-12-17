@@ -183,23 +183,22 @@ def writefirefoxtrees(repo):
 
     repo.vfs.write('firefoxtrees', '\n'.join(lines))
 
-    # repo.tag will produce multiple entries for a tag. Prune the old ones.
+    # Old versions of firefoxtrees stored labels in the localtags file. Since
+    # this file is read by Mercurial and has no relevance to us any more, we
+    # prune relevant entries from this file so the data isn't redundant with
+    # what we now write.
     localtags = repo.opener.tryread('localtags')
-    seentags = set()
-    tagslines = []
+    havedata = len(localtags) > 0
+    taglines  = []
     for line in localtags.splitlines():
         line = line.strip()
         node, tag = line.split()
+        tree, uri = resolve_trees_to_uris([tag])[0]
+        if not uri:
+            taglines.append(line)
 
-        if tag not in trees or trees[tag] != node or tag in seentags:
-            continue
-
-        seentags.add(tag)
-        tagslines.append(line)
-    if tagslines:
-        tagslines.append('')
-    if tagslines:
-        repo.vfs.write('localtags', '\n'.join(tagslines))
+    if havedata:
+        repo.vfs.write('localtags', '\n'.join(taglines))
 
 
 def get_firefoxtrees(repo):
