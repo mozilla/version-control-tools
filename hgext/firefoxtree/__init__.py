@@ -266,6 +266,8 @@ def pull(orig, repo, remote, *args, **kwargs):
                 if oldtags.get(tag, None) == node:
                     continue
 
+                repo.firefoxtrees[tag] = node
+
                 repo.tag(tag, node, message=None, local=True,
                         user=None, date=None)
                 between = None
@@ -298,6 +300,8 @@ def pull(orig, repo, remote, *args, **kwargs):
                 newlines.append('')
             if newlines:
                 repo.opener.write('localtags', '\n'.join(newlines))
+
+            writefirefoxtrees(repo)
 
         tree = resolve_uri_to_tree(remote.url())
         if tree:

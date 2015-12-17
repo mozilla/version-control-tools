@@ -63,6 +63,10 @@ Pulling from the unified repo will pull the Firefox tree tags
   994ec05999daf04fb3c01a8cb0dea1458a7d4d3d central
   3057abf99ee2f9d810425f7eb1828f408be2c71f fx-team
   1b348279b0e9b3c29568b6abc8a1776a68d39261 inbound
+  $ cat .hg/firefoxtrees
+  central 994ec05999daf04fb3c01a8cb0dea1458a7d4d3d
+  fx-team 3057abf99ee2f9d810425f7eb1828f408be2c71f
+  inbound 1b348279b0e9b3c29568b6abc8a1776a68d39261 (no-eol)
   $ cd ..
 
 Doing an incremental pull will print commit count change
@@ -94,3 +98,7 @@ Doing an incremental pull will print commit count change
   994ec05999daf04fb3c01a8cb0dea1458a7d4d3d central
   a4521c3750458afd82406ac87977b3fdc2fdc62a fx-team
   388ff24b5456e83175491ae321bceb89aad2259f inbound
+  $ cat .hg/firefoxtrees
+  central 994ec05999daf04fb3c01a8cb0dea1458a7d4d3d
+  fx-team a4521c3750458afd82406ac87977b3fdc2fdc62a
+  inbound 388ff24b5456e83175491ae321bceb89aad2259f (no-eol)
