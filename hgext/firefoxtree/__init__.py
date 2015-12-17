@@ -152,6 +152,35 @@ def capabilities(orig, repo, proto):
 
     return caps
 
+
+def readfirefoxtrees(repo):
+    """Read the firefoxtrees node mapping from the filesystem."""
+    trees = {}
+    data = repo.vfs.tryread('firefoxtrees')
+    if not data:
+        return trees
+
+    for line in data.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+
+        tree, hexnode = line.split()
+        trees[tree] = bin(hexnode)
+
+    return trees
+
+
+def writefirefoxtrees(repo):
+    """Write the firefoxtrees node mapping to the filesystem."""
+    lines = []
+    for tree, node in sorted(repo.firefoxtrees.items()):
+        assert len(node) == 20
+        lines.append('%s %s' % (tree, hex(node)))
+
+    repo.vfs.write('firefoxtrees', '\n'.join(lines))
+
+
 # Generator for firefox tree tags in this repo.
 def get_firefoxtrees(repo):
     for tag, node in sorted(repo.tags().items()):
@@ -292,6 +321,10 @@ def updateremoterefs(repo, remote, tree):
     defaultnodes = branchmap['default']
     node = defaultnodes[-1]
     repo.tag(tree, node, message=None, local=True, user=None, date=None)
+
+    repo.firefoxtrees[tree] = node
+    writefirefoxtrees(repo)
+
 
 def pullcommand(orig, ui, repo, source='default', **opts):
     """Wraps built-in pull command to expand special aliases."""
@@ -437,3 +470,5 @@ def reposetup(ui, repo):
         return
 
     repo.prepushoutgoinghooks.add('firefoxtree', prepushoutgoinghook)
+
+    repo.firefoxtrees = readfirefoxtrees(repo)

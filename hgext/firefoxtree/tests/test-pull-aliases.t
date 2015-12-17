@@ -38,6 +38,11 @@ We can pull from the special multiple tree aliases
   4:3057abf99ee2 fx-team tip Bug 460 - Create bar on fx-team
   3:1b348279b0e9 inbound Bug 459 - Second commit to inbound
 
+  $ cat .hg/firefoxtrees
+  b2ginbound 994ec05999daf04fb3c01a8cb0dea1458a7d4d3d
+  fx-team 3057abf99ee2f9d810425f7eb1828f408be2c71f
+  inbound 1b348279b0e9b3c29568b6abc8a1776a68d39261 (no-eol)
+
   $ cd ..
 
 fxtrees is a special alias that expands to trees that have been pulled before
