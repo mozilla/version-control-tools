@@ -103,7 +103,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
 
     @webapi_login_required
     @webapi_response_errors(DOES_NOT_EXIST, INVALID_FORM_DATA,
-                            NOT_LOGGED_IN, PERMISSION_DENIED)
+                            NOT_LOGGED_IN)
     @webapi_scm_groups_required('scm_level_3')
     @webapi_request_fields(
         required={
@@ -132,9 +132,6 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
                           'request is not pushed, or not the parent review '
                           'request.')
             return NOT_PUSHED_PARENT_REVIEW_REQUEST
-
-        if not rr.is_mutable_by(request.user):
-            return PERMISSION_DENIED
 
         target_repository = rr.repository.extra_data.get(
             'landing_repository_url')
@@ -245,7 +242,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
 
     @webapi_login_required
     @webapi_response_errors(DOES_NOT_EXIST, INVALID_FORM_DATA,
-                            NOT_LOGGED_IN, PERMISSION_DENIED)
+                            NOT_LOGGED_IN)
     @webapi_scm_groups_required('scm_level_1')
     @webapi_request_fields(
         required={
@@ -280,9 +277,6 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
                           'request is not pushed, or not the parent review '
                           'request.')
             return NOT_PUSHED_PARENT_REVIEW_REQUEST
-
-        if not rr.is_mutable_by(request.user):
-            return PERMISSION_DENIED
 
         target_repository = rr.repository.extra_data.get(
             'try_repository_url')
@@ -562,7 +556,7 @@ class ImportPullRequestTriggerResource(WebAPIResource):
 
     @webapi_login_required
     @webapi_response_errors(DOES_NOT_EXIST, INVALID_FORM_DATA,
-                            NOT_LOGGED_IN, PERMISSION_DENIED)
+                            NOT_LOGGED_IN)
     @webapi_request_fields(
         required={
             'github_user': {

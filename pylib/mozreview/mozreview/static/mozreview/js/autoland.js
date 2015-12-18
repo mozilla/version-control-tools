@@ -36,8 +36,6 @@ $(document).on("mozreview_ready", function() {
     try_trigger.attr('title', 'Try builds cannot be triggered for this repository');
   } else if ($("#draft-banner").is(":visible")) {
     try_trigger.attr('title', 'Try builds cannot be triggered on draft review requests');
-  } else if (!MozReview.currentIsMutableByUser) {
-    try_trigger.attr('title', 'Only the author may trigger a try build at this time');
   } else if (!MozReview.hasScmLevel1) {
     try_trigger.attr('title', 'You do not have the required scm level to trigger a try build');
   } else if (!MozReview.reviewRequestPending) {
@@ -256,8 +254,6 @@ $(document).on("mozreview_ready", function() {
     autoland_trigger.attr('title', 'Draft review requests cannot be landed');
   } else if (!MozReview.hasScmLevel3) {
     autoland_trigger.attr('title', 'You must have scm_level_3 access to land');
-  } else if (!MozReview.currentIsMutableByUser) {
-    autoland_trigger.attr('title', 'Only the author may land commits at this time');
   } else if (!MozReview.reviewRequestPending) {
     try_trigger.attr('title', 'You can not autoland from a closed review request');
   } else {
