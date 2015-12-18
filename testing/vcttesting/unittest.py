@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 import time
 import unittest
+from contextlib import contextmanager
 from urllib import urlencode
 
 from selenium import webdriver
@@ -18,6 +19,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.remote.switch_to import SwitchTo
+from selenium.webdriver.support.expected_conditions import staleness_of
 from selenium.webdriver.support.wait import WebDriverWait
 
 from vcttesting.docker import DockerNotAvailable
@@ -288,6 +290,36 @@ class MozReviewWebDriverTest(MozReviewTest):
         # If you comment this out and press ENTER from the browser, you
         # get an error. It works from Selenium. Strange.
         autocomplete.send_keys(Keys.ENTER)
+
+    @contextmanager
+    def wait_for_page_load(self, timeout=30):
+        old_page = self.browser.find_element_by_tag_name('html')
+        yield
+        WebDriverWait(self.browser, timeout).until(
+            staleness_of(old_page)
+        )
+
+    def add_review(self, review_request_id, text='', ship_it=False):
+        self.load_rburl('r/{0}'.format(review_request_id))
+        self.browser.find_element_by_id('review-link').click()
+        WebDriverWait(self.browser, 10).until(
+            EC.visibility_of_element_located(
+                (By.ID, 'review-form-comments')))
+        if ship_it:
+            self.browser.find_element_by_id('id_shipit').click()
+
+        if text:
+            text_editor = WebDriverWait(self.browser, 10).until(
+                EC.visibility_of_element_located(
+                    (By.CSS_SELECTOR, "div.CodeMirror")))
+            self.browser.execute_script(
+                'arguments[0].CodeMirror.setValue("'+text+'");',
+                text_editor)
+
+        with self.wait_for_page_load(timeout=10):
+            publish_button = self.browser.find_element_by_css_selector(
+                "div.modalbox-buttons > input[type=button][value='Publish Review']")
+            publish_button.click()
 
     def dump_autoland_log(self):
         subprocess.call('docker exec %s cat /home/ubuntu/autoland.log' %

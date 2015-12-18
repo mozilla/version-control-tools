@@ -55,7 +55,12 @@ This is the template for the "Commits" list in a push-based review request.
       {% endcomment %}
       <td class="reviewers">
         <span class="mozreview-child-reviewer-list"
-              data-id="{{child_details.get_review_request.id}}">{{ child_details.target_people.all|join:", " }}</span>
+              data-id="{{child_details.get_review_request.id}}">
+          {% for reviewer, status in child_details|reviewers_status %}
+            {% if not forloop.first %}, {% endif %}
+            <span class="reviewer-name{% if status.ship_it %} reviewer-ship-it{% endif %}">{{ reviewer }}</span>
+          {% endfor %}
+        </span>
       </td>
       <td class="status">
         {% if child_details.get_review_request.issue_open_count > 0 %}

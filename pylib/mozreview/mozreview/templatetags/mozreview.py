@@ -1,7 +1,11 @@
+from __future__ import absolute_import
+
 import logging
 
 from django import template
 from django.contrib.auth.models import User
+
+from mozreview.review_helpers import get_reviewers_status
 
 register = template.Library()
 
@@ -77,6 +81,11 @@ def mercurial_repo_name(landing_url):
 @register.filter()
 def ssh_to_https(landing_url):
     return landing_url.rstrip('/').replace('ssh://', 'https://')
+
+
+@register.filter()
+def reviewers_status(review_request):
+    return get_reviewers_status(review_request).items()
 
 @register.filter()
 def userid_to_user(user_id):

@@ -93,13 +93,14 @@ class AutocompleteTest(MozReviewWebDriverTest):
         self.wait_for_autocomplete_results()
         ac.send_keys(Keys.RETURN)
 
+        # TODO need a better method to wait for XHR saving the draft to finish.
+        time.sleep(1)
+
         commits = self.get_commits_el()
         reviewers = commits.find_elements_by_class_name('mozreview-child-reviewer-list')
         self.assertEqual(len(reviewers), 1)
-        self.assertEqual(reviewers[0].get_attribute('innerHTML'), 'joey')
-
-        # TODO need a better method to wait for XHR saving the draft to finish.
-        time.sleep(1)
+        reviewer = reviewers[0].find_elements_by_class_name('reviewer-name')
+        self.assertEqual(reviewer[0].get_attribute('innerHTML'), 'joey')
 
         # Loading the page again will have the reviewer preserved.
         self.load_rburl('r/1')
@@ -107,7 +108,8 @@ class AutocompleteTest(MozReviewWebDriverTest):
         commits = self.get_commits_el()
         reviewers = commits.find_elements_by_class_name('mozreview-child-reviewer-list')
         self.assertEqual(len(reviewers), 1)
-        self.assertEqual(reviewers[0].get_attribute('innerHTML'), 'joey')
+        reviewer = reviewers[0].find_elements_by_class_name('reviewer-name')
+        self.assertEqual(reviewer[0].get_attribute('innerHTML'), 'joey')
 
         # Sending backspace should wipe out the reviewer.
         ac = self.prepare_edit_reviewers(0)
@@ -118,6 +120,8 @@ class AutocompleteTest(MozReviewWebDriverTest):
         reviewers = commits.find_elements_by_class_name('mozreview-child-reviewer-list')
         self.assertEqual(len(reviewers), 1)
         self.assertEqual(reviewers[0].get_attribute('innerHTML'), '')
+        ac.send_keys(Keys.ESCAPE)
+        self.switch_to.alert.accept()
 
     def test_irc_syntax(self):
         """:nick syntax auto complete works."""
