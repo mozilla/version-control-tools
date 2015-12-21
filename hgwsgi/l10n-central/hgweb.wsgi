@@ -2,7 +2,6 @@
 
 config = "/repo/hg/webroot_wsgi/l10n-central/hgweb.config"
 
-from mercurial import demandimport; demandimport.enable()
 from mercurial.hgweb import hgweb
 
 import os
