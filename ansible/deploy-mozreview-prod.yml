@@ -56,25 +56,11 @@
 
 - hosts: rbweb-prod
   serial: 1
-  vars_prompt:
-  - name: ldap_username
-    prompt: "What is your Mozilla LDAP username?"
-    private: no
-
-  - name: ldap_password
-    prompt: "What is your Mozilla LDAP password?"
-    private: yes
 
   pre_tasks:
     - name: take node out of load balancer
-      stingray_node:
-        pool: "reviewboard.mozilla.org-http"
-        node: "{{ inventory_hostname }}:80"
-        state: draining
-        url: https://zlb1.ops.scl3.mozilla.com:9070/
-        username: "{{ ldap_username }}"
-        password: "{{ ldap_password }}"
-      delegate_to: 127.0.0.1
+      command: sudo /root/bin/zxtmpool drain {{ inventory_hostname }}
+      delegate_to: reviewboardadm.private.scl3.mozilla.com
 
     - name: wait for HTTP server to drain
       apache_worker_drain: url=http://localhost/server-status timeout=300
@@ -99,14 +85,8 @@
       shell: "for n in `seq 20`; do curl -H 'Host: reviewboard.mozilla.org' http://localhost/r/ > /dev/null; done"
 
     - name: add node back in load balancer
-      stingray_node:
-        pool: "reviewboard.mozilla.org-http"
-        node: "{{ inventory_hostname }}:80"
-        state: active
-        url: https://zlb1.ops.scl3.mozilla.com:9070/
-        username: "{{ ldap_username }}"
-        password: "{{ ldap_password }}"
-      delegate_to: 127.0.0.1
+      command: sudo /root/bin/zxtmpool undrain {{ inventory_hostname }}
+      delegate_to: reviewboardadm.private.scl3.mozilla.com
 
     # We should ideally send HTTP requests through load balancer until
     # we see a request on the origin server.
