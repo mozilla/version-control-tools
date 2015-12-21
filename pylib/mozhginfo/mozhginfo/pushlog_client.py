@@ -92,6 +92,27 @@ def query_pushes_by_pushid_range(repo_url, start_id, end_id, version=2):
     return push_list
 
 
+def query_pushes_by_specified_revision_range(repo_url, revision, before, after):
+    """
+    Get the start and end revisions' pushlog based on the number of revisions before and after.
+    Raises PushlogError if pushlog data cannot be retrieved.
+    repo_url - represents the URL to clone a rep
+    revision - the revision used to set the query range
+    before   - the number before the revision given
+    after    - the number after the revision given
+    """
+    try:
+        push = query_push_by_revision(repo_url, revision)
+        pushid = int(push.id)
+        start_id = pushid - before
+        end_id = pushid + after
+        push_list = query_pushes_by_pushid_range(repo_url, start_id, end_id)
+    except:
+        raise PushlogError('Unable to retrieve pushlog data. '
+                           'Please check repo_url and revision specified.')
+    return push_list
+
+
 def query_push_by_revision(repo_url, revision, full=False):
     """
     Return a dictionary with meta-data about a push including:
