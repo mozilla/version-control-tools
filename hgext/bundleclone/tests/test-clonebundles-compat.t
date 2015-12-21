@@ -12,7 +12,7 @@
   $ touch bar
   $ hg -q commit -A -m 'add bar'
 
-  $ MODERNHG=$TESTDIR/venv/mercurials/3.6.1/bin/hg
+  $ MODERNHG=$TESTDIR/venv/mercurials/3.6.2/bin/hg
   $ if [ ! -f ${MODERNHG} ]; then echo "missing hg: ${MODERNHG}"; exit 1; fi
 
   $ ${MODERNHG} --config extensions.clonebundles= serve -d -p $HGPORT --pid-file hg.pid -A access.log -E error.log

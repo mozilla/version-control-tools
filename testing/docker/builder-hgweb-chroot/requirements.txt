@@ -1,8 +1,8 @@
 # sha256: XnEOnbFPIQ39VevsQ7ylyBLTTFthedvLouYdn5Zb9OE
 jsmin==2.1.2
 
-# sha256: I_3AOFA5EbIdyeVWEYgD97HUFQ6xSTPS6j0P8Nxgq10
-Mercurial==3.5.2
+# sha256: CcVnBJw-MPeR2wz1k3NGx_81aN6t9OsdTi98gAAcs9Y
+Mercurial==3.6.2
 
 # sha256: JCJ2CPw8c1-7XGKdBUCmADaMHV5XAT3TknKgpcnMyxM
 mozbuild==0.2

@@ -7,8 +7,8 @@ flask==0.10.1
 # sha256: ugYzfln0e7rE05246EYE9iue8EuAvgfWIeG_VvlVVLs
 github3.py==1.0.0a1
 
-# sha256: 1GR5QxZa_9EbrwcFVWkgSB1TRrl2BLq6tq128XREdMY
-mercurial==3.6.1
+# sha256: CcVnBJw-MPeR2wz1k3NGx_81aN6t9OsdTi98gAAcs9Y
+mercurial==3.6.2
 
 # sha256: dQzlorS9IlvQCzOeGsUzwWsYfAgEaVuz2HjGme4rMig
 mozillapulse==1.2.2
