@@ -1,16 +1,16 @@
-mozilla-central
+mozilla-central bzip2
 integration/fx-team
 integration/mozilla-inbound
 integration/b2g-inbound
 integration/gaia-central
-releases/mozilla-release
-releases/mozilla-aurora
-releases/mozilla-beta
-releases/mozilla-esr38
+releases/mozilla-release bzip2
+releases/mozilla-aurora bzip2
+releases/mozilla-beta bzip2
+releases/mozilla-esr38 bzip2
 build/tools
 build/mozharness
 build/talos
-comm-central
+comm-central bzip2
 projects/ash
 projects/cedar
 projects/holly

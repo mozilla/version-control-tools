@@ -145,7 +145,7 @@ def generate_bundle(repo, temp_path, final_path, extra_args):
     os.rename(temp_path, final_path)
 
 
-def generate_bundles(repo, upload=True, bzip2=True):
+def generate_bundles(repo, upload=True, bzip2=False):
     """Generate bundle files for a repository at a path."""
     assert not os.path.isabs(repo)
     repo_full = os.path.join('/repo/hg/mozilla', repo)
@@ -355,16 +355,19 @@ if __name__ == '__main__':
     args, remaining = parser.parse_known_args()
     if args.f:
         with open(args.f, 'rb') as fh:
-            repos = [l.strip() for l in fh.readlines() if not l.startswith('#')]
+            for line in fh:
+                fields = line.strip().split()
+                repos.append(fields[0], {x: True for x in fields[1:]})
 
-    repos.extend(remaining)
+    for repo in remaining:
+        repos.append((repo, {}))
 
     upload = not args.no_upload
 
     paths = {}
 
-    for repo in repos:
-        paths[repo] = generate_bundles(repo, upload=upload)
+    for repo, opts in repos:
+        paths[repo] = generate_bundles(repo, upload=upload, **opts)
 
     if upload:
         upload_index(paths)
