@@ -82,8 +82,6 @@
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  saved backup bundle to * (glob)
-  saved backup bundle to * (glob)
 
   $ rbmanage publish 1
   $ hg push
@@ -96,15 +94,15 @@
   remote: recorded push in pushlog
   submitting 3 changesets for review
   
-  changeset:  8:dac4214a563a
+  changeset:  9:dac4214a563a
   summary:    Bug 1 - Foo 1
   review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
-  changeset:  9:5b936d238262
+  changeset:  12:5b936d238262
   summary:    Bug 1 - Foo 2
   review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
-  changeset:  10:ae82743c8863
+  changeset:  13:ae82743c8863
   summary:    Bug 1 - Foo 5
   review:     http://*:$HGPORT1/r/4 (draft) (glob)
   

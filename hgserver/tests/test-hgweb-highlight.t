@@ -38,17 +38,17 @@ Create a repository
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
   remote:   https://hg.mozilla.org/mozilla-central/rev/eefea2647aef
 
-  $ http --no-headers ${HGWEB_0_URL}mozilla-central/file/eefea2647aef/foo.js | grep linenr
-  <pre><a class="linenr" href="#l1" id="l1">     1</a> <span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="s2">&quot;bar&quot;</span><span class="p">;</span></pre>
-  <pre><a class="linenr" href="#l2" id="l2">     2</a> <span class="kd">function</span> <span class="nx">sum</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span></pre>
-  <pre><a class="linenr" href="#l3" id="l3">     3</a>   <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span></pre>
-  <pre><a class="linenr" href="#l4" id="l4">     4</a> <span class="p">}</span></pre>
+  $ http --no-headers ${HGWEB_0_URL}mozilla-central/file/eefea2647aef/foo.js | grep 'href="#l'
+  <a href="#l1"></a><span id="l1"><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="s2">&quot;bar&quot;</span><span class="p">;</span></span>
+  <a href="#l2"></a><span id="l2"><span class="kd">function</span> <span class="nx">sum</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span></span>
+  <a href="#l3"></a><span id="l3">  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span></span>
+  <a href="#l4"></a><span id="l4"><span class="p">}</span></span></pre>
 
-  $ http --no-headers ${HGWEB_0_URL}mozilla-central/file/eefea2647aef/foo.jsm | grep linenr
-  <pre><a class="linenr" href="#l1" id="l1">     1</a> <span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="s2">&quot;bar&quot;</span><span class="p">;</span></pre>
-  <pre><a class="linenr" href="#l2" id="l2">     2</a> <span class="kd">function</span> <span class="nx">sum</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span></pre>
-  <pre><a class="linenr" href="#l3" id="l3">     3</a>   <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span></pre>
-  <pre><a class="linenr" href="#l4" id="l4">     4</a> <span class="p">}</span></pre>
+  $ http --no-headers ${HGWEB_0_URL}mozilla-central/file/eefea2647aef/foo.jsm | grep 'href="#l'
+  <a href="#l1"></a><span id="l1"><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="s2">&quot;bar&quot;</span><span class="p">;</span></span>
+  <a href="#l2"></a><span id="l2"><span class="kd">function</span> <span class="nx">sum</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span></span>
+  <a href="#l3"></a><span id="l3">  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span></span>
+  <a href="#l4"></a><span id="l4"><span class="p">}</span></span></pre>
 
 Cleanup
 

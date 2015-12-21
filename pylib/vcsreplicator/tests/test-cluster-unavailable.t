@@ -73,7 +73,8 @@ Disabling 2 Kafka nodes should result in no quorum and failure to push
   pushing to ssh://*:$HGPORT/mozilla-central (glob)
   searching for changes
   remote: replication log not available; all writes disabled
-  abort: pretxnopen.vcsreplicator hook failed
+  remote: pretxnopen.vcsreplicator hook failed
+  abort: push failed on remote
   [255]
 
 Adding node back in should result in being able to push again
@@ -123,7 +124,8 @@ Fully stopping the cluster shoud result in sane error message
   pushing to ssh://*:$HGPORT/mozilla-central (glob)
   searching for changes
   remote: replication log not available; all writes disabled
-  abort: pretxnopen.vcsreplicator hook failed
+  remote: pretxnopen.vcsreplicator hook failed
+  abort: push failed on remote
   [255]
 
 Starting the cluster after full stop should work as long as there was a

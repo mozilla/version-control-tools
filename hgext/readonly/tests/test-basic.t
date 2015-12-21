@@ -43,7 +43,8 @@ Empty local reason file prints generic message
   searching for changes
   remote: repository is read only
   remote: refusing to add changesets
-  abort: prechangegroup.readonly hook failed
+  remote: prechangegroup.readonly hook failed
+  abort: push failed on remote
   [255]
 
 Pushing a bookmark fails
@@ -71,7 +72,8 @@ Local reason file with content prints message
   remote: repository is read only
   remote: repository is no longer active
   remote: refusing to add changesets
-  abort: prechangegroup.readonly hook failed
+  remote: prechangegroup.readonly hook failed
+  abort: push failed on remote
   [255]
 
 Global and local reason file should print local reason
@@ -83,7 +85,8 @@ Global and local reason file should print local reason
   remote: repository is read only
   remote: repository is no longer active
   remote: refusing to add changesets
-  abort: prechangegroup.readonly hook failed
+  remote: prechangegroup.readonly hook failed
+  abort: push failed on remote
   [255]
 
 Global reason file in isolation works
@@ -94,7 +97,8 @@ Global reason file in isolation works
   searching for changes
   remote: all repositories currently read only
   remote: refusing to add changesets
-  abort: prechangegroup.readonly hook failed
+  remote: prechangegroup.readonly hook failed
+  abort: push failed on remote
   [255]
 
 Global reason file reason is printed
@@ -109,5 +113,6 @@ Global reason file reason is printed
   remote: all repositories currently read only
   remote: this is the global reason
   remote: refusing to add changesets
-  abort: prechangegroup.readonly hook failed
+  remote: prechangegroup.readonly hook failed
+  abort: push failed on remote
   [255]

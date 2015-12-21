@@ -57,5 +57,6 @@ Lack of permissions on pushlog should prevent pushes from completing
   remote: transaction abort!
   remote: rolling back pushlog
   remote: rollback completed
-  abort: pretxnchangegroup.pushlog hook failed
+  remote: pretxnchangegroup.pushlog hook failed
+  abort: push failed on remote
   [255]

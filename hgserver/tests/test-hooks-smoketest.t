@@ -38,7 +38,8 @@ Verify hooks are working by pushing something that should be rejected
   remote: 
   remote: transaction abort!
   remote: rollback completed
-  abort: pretxnchangegroup.c_commitmessage hook failed
+  remote: pretxnchangegroup.c_commitmessage hook failed
+  abort: push failed on remote
   [255]
 
   $ hgmo clean

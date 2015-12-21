@@ -39,7 +39,8 @@ Marking individual repo as read-only works
   searching for changes
   remote: repository is read only
   remote: refusing to add changesets
-  abort: prechangegroup.readonly hook failed
+  remote: prechangegroup.readonly hook failed
+  abort: push failed on remote
   [255]
 
   $ hgmo exec hgssh rm -f /repo/hg/mozilla/mozilla-central/.hg/readonlyreason
@@ -52,7 +53,8 @@ Global read only file works
   searching for changes
   remote: all repositories currently read only
   remote: refusing to add changesets
-  abort: prechangegroup.readonly hook failed
+  remote: prechangegroup.readonly hook failed
+  abort: push failed on remote
   [255]
 
   $ hgmo clean
