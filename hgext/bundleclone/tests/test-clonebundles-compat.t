@@ -171,9 +171,3 @@ with different file headers.
   no changes found
 
 #endif
-
-Hacked up clonebundles extension should fail on 3.6+
-
-  $ $TESTDIR/venv/mercurials/@/bin/hg --config extensions.clonebundles=$TESTDIR/hgserver/clonebundles.py version
-  abort: use built-in clonebundles extension with Mercurial 3.6+
-  [255]

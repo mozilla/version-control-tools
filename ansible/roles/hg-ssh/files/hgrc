@@ -30,8 +30,7 @@ pretxnchangegroup.single_root = python:mozhghooks.single_root.hook
 
 [extensions]
 blackbox =
-# TODO use built-in extension when running 3.6.
-clonebundles = /repo/hg/version-control-tools/hgserver/clonebundles.py
+clonebundles =
 
 bundleclone = /repo/hg/version-control-tools/hgext/bundleclone
 pushlog = /repo/hg/version-control-tools/hgext/pushlog

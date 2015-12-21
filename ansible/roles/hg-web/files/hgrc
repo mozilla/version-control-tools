@@ -30,8 +30,7 @@ unified = 8
 
 [extensions]
 highlight =
-# TODO use built-in extension when running 3.6.
-clonebundles = /repo/hg/version-control-tools/hgserver/clonebundles.py
+clonebundles =
 
 bundleclone = /repo/hg/version-control-tools/hgext/bundleclone
 pushlog-feed = /repo/hg/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py

@@ -28,7 +28,6 @@ feature
   requesting all changes
   remote: this server supports the experimental "clone bundles" feature that should enable faster and more reliable cloning
   remote: help test it by setting the "experimental.clonebundles" config flag to "true"
-  remote: IMPORTANT: verify you are running Mercurial 3.6.1 or newer or `hg pull` will be broken if you enable the feature
   adding changesets
   adding manifests
   adding file changes
