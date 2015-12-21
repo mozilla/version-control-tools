@@ -5,6 +5,7 @@ from mock import patch, Mock
 from mozhginfo import pushlog_client
 from mozhginfo.push import Push
 from mozhginfo.pushlog_client import (
+    query_pushes_by_specified_revision_range,
     query_pushes_by_pushid_range,
     query_pushes_by_revision_range,
     query_push_by_revision,
@@ -111,6 +112,27 @@ class TestQueries(unittest.TestCase):
         for push in pushes:
             push_id_list.append(push.id)
             changeset_list.append(push.changesets[0].node)
+        assert push_id_list == ['53348', '53349', '53350']
+        assert changeset_list == ['eb15e3f893453d6a4472f8905271aba33f8b68d5',
+                                  '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
+                                  '724f0a71d62171da1357e6c1f93453359e54206b']
+
+    @patch('requests.get', return_value=mock_response(LIST_REVISION, 200))
+    @patch('mozhginfo.pushlog_client.query_push_by_revision', return_value=push)
+    def test_query_pushes_by_specified_revision_range(self, get, query_push_by_revision):
+        pushes = query_pushes_by_specified_revision_range(repo_url=self.repo_url,
+                                                          revision=self.revision,
+                                                          before=1,
+                                                          after=1)
+        # This part is totally duplicate with the test_query_pushes_by_pushid_range,
+        # because we are calling query_pushes_by_pushid_range inside this function.
+        assert len(pushes) == 3
+        push_id_list = []
+        changeset_list = []
+        for push in pushes:
+            push_id_list.append(push.id)
+            changeset_list.append(push.changesets[0].node)
+
         assert push_id_list == ['53348', '53349', '53350']
         assert changeset_list == ['eb15e3f893453d6a4472f8905271aba33f8b68d5',
                                   '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
