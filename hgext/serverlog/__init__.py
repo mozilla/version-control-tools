@@ -184,7 +184,8 @@ from mercurial.hgweb import (
     hgwebdir_mod,
 )
 
-testedwith = '3.4'
+testedwith = '3.6'
+minimumhgversion = '3.6'
 
 origcall = protocol.call
 origdispatch = wireproto.dispatch
@@ -232,17 +233,17 @@ def logsyslog(context, action, *args):
 
 
 class hgwebwrapped(hgweb_mod.hgweb):
-    def run_wsgi(self, req):
+    def _runwsgi(self, req, repo):
         serverlog = {
             'requestid': str(uuid.uuid1()),
             'writecount': 0,
         }
-        setsyslogkeys(serverlog, self.repo.ui)
+        setsyslogkeys(serverlog, repo.ui)
 
         # Resolve the repository path.
         # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
         # set to the relative path of the repo (I think).
-        serverlog['path'] = req.env.get('REPO_NAME') or repopath(self.repo)
+        serverlog['path'] = req.env.get('REPO_NAME') or repopath(repo)
 
         serverlog['ip'] = req.env.get('HTTP_X_CLUSTER_CLIENT_IP') or \
             req.env.get('REMOTE_ADDR') or 'UNKNOWN'
@@ -251,7 +252,7 @@ class hgwebwrapped(hgweb_mod.hgweb):
         # record and log inside request handling.
         self._serverlog = serverlog
         req._serverlog = serverlog
-        self.repo._serverlog = serverlog
+        repo._serverlog = serverlog
 
         # TODO REQUEST_URI may not be defined in all WSGI environments,
         # including wsgiref. We /could/ copy code from hgweb_mod here.
@@ -264,12 +265,12 @@ class hgwebwrapped(hgweb_mod.hgweb):
         startcpu = startusage.ru_utime + startusage.ru_stime
         starttime = time.time()
 
-        datasizeinterval = self.repo.ui.configint('serverlog',
+        datasizeinterval = repo.ui.configint('serverlog',
             'datalogsizeinterval', 10000000)
         lastlogamount = 0
 
         try:
-            for what in super(hgwebwrapped, self).run_wsgi(req):
+            for what in super(hgwebwrapped, self)._runwsgi(req, repo):
                 sl['writecount'] += len(what)
                 yield what
 
