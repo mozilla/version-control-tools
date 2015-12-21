@@ -244,16 +244,7 @@ def logsyslog(context, action, *args):
     syslog.syslog(syslog.LOG_NOTICE, fmt % formatters)
 
 
-class syslogmixin(object):
-    """Shared class providing an API to do syslog writing."""
-    def _syslog(self, action, *args):
-        if not hasattr(self, '_serverlog'):
-            return
-
-        logsyslog(self._serverlog, action, *args)
-
-
-class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
+class hgwebwrapped(hgweb_mod.hgweb):
     def run_wsgi(self, req):
         self._serverlog = {
             'requestid': str(uuid.uuid1()),
@@ -312,7 +303,7 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
             syslog.closelog()
 
 
-class sshserverwrapped(sshserver.sshserver, syslogmixin):
+class sshserverwrapped(sshserver.sshserver):
     """Wrap sshserver class to record events."""
 
     def serve_forever(self):
@@ -381,7 +372,7 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
             self._serverlog['requestid'] = ''
 
 
-class wrappedlocalrepo(localrepo.localrepository, syslogmixin):
+class wrappedlocalrepo(localrepo.localrepository):
     def _changegroupsubset(self, commonrevs, csets, heads, source):
         logsyslog(self._serverlog, 'CHANGEGROUPSUBSET_START',
             source,
