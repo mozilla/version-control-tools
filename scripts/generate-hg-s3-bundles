@@ -21,8 +21,8 @@ HG = '/repo/hg/venv_tools/bin/hg'
 #
 # Define in order bundles should be listed in manifest.
 CREATES = [
-    ('gzip', ['bundle', '-a', '-t', 'gzip']),
-    ('bzip2', ['bundle', '-a', '-t', 'bzip2']),
+    ('gzip', ['bundle', '-a', '-t', 'gzip-v1']),
+    ('bzip2', ['bundle', '-a', '-t', 'bzip2-v1']),
     ('stream-legacy', ['streambundle']),
     ('packed1', ['streambundle', '--type', 's1']),
 ]
