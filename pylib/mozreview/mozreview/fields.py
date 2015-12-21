@@ -307,7 +307,8 @@ class FileDiffReviewerField(BaseReviewRequestField):
             'id', flat=True
         )
 
-        if user.is_authenticated():
+        if (user.is_authenticated() and
+                isinstance(self.review_request_details, ReviewRequest)):
             diffsets = self.review_request_details.get_diffsets()
             # Merge all the FileDiffs together
             files = sum([list(diff.files.all()) for diff in diffsets], [])
