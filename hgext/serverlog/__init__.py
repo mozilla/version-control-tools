@@ -233,30 +233,31 @@ def logsyslog(context, action, *args):
 
 class hgwebwrapped(hgweb_mod.hgweb):
     def run_wsgi(self, req):
-        self._serverlog = {
+        serverlog = {
             'requestid': str(uuid.uuid1()),
             'writecount': 0,
         }
-        setsyslogkeys(self._serverlog, self.repo.ui)
+        setsyslogkeys(serverlog, self.repo.ui)
 
         # Resolve the repository path.
         # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
         # set to the relative path of the repo (I think).
-        self._serverlog['path'] = req.env.get('REPO_NAME') or repopath(self.repo)
+        serverlog['path'] = req.env.get('REPO_NAME') or repopath(self.repo)
 
-        self._serverlog['ip'] = req.env.get('HTTP_X_CLUSTER_CLIENT_IP') or \
+        serverlog['ip'] = req.env.get('HTTP_X_CLUSTER_CLIENT_IP') or \
             req.env.get('REMOTE_ADDR') or 'UNKNOWN'
 
         # Stuff a reference to the state and the bound logging method so we can
         # record and log inside request handling.
-        req._serverlog = self._serverlog
-        self.repo._serverlog = self._serverlog
+        self._serverlog = serverlog
+        req._serverlog = serverlog
+        self.repo._serverlog = serverlog
 
         # TODO REQUEST_URI may not be defined in all WSGI environments,
         # including wsgiref. We /could/ copy code from hgweb_mod here.
         uri = req.env.get('REQUEST_URI', 'UNKNOWN')
 
-        sl = self._serverlog
+        sl = serverlog
         logsyslog(sl, 'BEGIN_REQUEST', sl['path'], sl['ip'], uri)
 
         startusage = resource.getrusage(resource.RUSAGE_SELF)
@@ -294,20 +295,22 @@ class sshserverwrapped(sshserver.sshserver):
     """Wrap sshserver class to record events."""
 
     def serve_forever(self):
-        self._serverlog = {
+        serverlog = {
             'sessionid': str(uuid.uuid1()),
             'requestid': '',
             'path': repopath(self.repo),
         }
-        setsyslogkeys(self._serverlog, self.repo.ui)
+        setsyslogkeys(serverlog, self.repo.ui)
 
         # Stuff a reference to the state so we can do logging within repo
         # methods.
-        self.repo._serverlog = self._serverlog
+        self.repo._serverlog = serverlog
 
-        logsyslog(self._serverlog, 'BEGIN_SSH_SESSION',
-                  self._serverlog['path'],
+        logsyslog(serverlog, 'BEGIN_SSH_SESSION',
+                  serverlog['path'],
                   os.environ['USER'])
+
+        self._serverlog = serverlog
 
         startusage = resource.getrusage(resource.RUSAGE_SELF)
         startcpu = startusage.ru_utime + startusage.ru_stime
@@ -323,11 +326,12 @@ class sshserverwrapped(sshserver.sshserver):
             deltatime = endtime - starttime
             deltacpu = endcpu - startcpu
 
-            logsyslog(self._serverlog, 'END_SSH_SESSION',
+            logsyslog(serverlog, 'END_SSH_SESSION',
                 '%.3f' % deltatime,
                 '%.3f' % deltacpu)
 
             syslog.closelog()
+            self._serverlog = None
 
     def serve_one(self):
         self._serverlog['requestid'] = str(uuid.uuid1())
