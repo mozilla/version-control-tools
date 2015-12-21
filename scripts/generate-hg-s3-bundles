@@ -15,6 +15,8 @@ from boto.s3.connection import S3Connection
 import concurrent.futures as futures
 
 
+HG = '/repo/hg/venv_tools/bin/hg'
+
 # The types of bundles to generate.
 #
 # Define in order bundles should be listed in manifest.
@@ -138,7 +140,7 @@ def generate_bundle(repo, temp_path, final_path, extra_args):
     Generates using the command specified by ``extra_args`` into ``temp_path``
     before moving the fully created bundle to ``final_path``.
     """
-    args = ['hg', '-R', repo] + extra_args + [temp_path]
+    args = [HG, '-R', repo] + extra_args + [temp_path]
     subprocess.check_call(args)
     os.rename(temp_path, final_path)
 
@@ -155,7 +157,7 @@ def generate_bundles(repo, upload=True):
     # Bundle files are named after the tip revision in the repository at
     # the time the bundle was created. This is the easiest way to name
     # bundle files.
-    tip = subprocess.check_output(['hg', '-R', repo_full, 'log', '-r', 'tip', '-T', '{node}'])
+    tip = subprocess.check_output([HG, '-R', repo_full, 'log', '-r', 'tip', '-T', '{node}'])
     print('tip is %s' % tip)
 
     bundle_path = os.path.join(BUNDLE_ROOT, repo)
