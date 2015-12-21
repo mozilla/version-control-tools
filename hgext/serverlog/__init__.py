@@ -232,21 +232,26 @@ def repopath(repo):
     return path
 
 
+def logsyslog(context, action, *args):
+    syslog.openlog(context['ident'], 0, context['facility'])
+
+    fmt = '%s %s %s'
+    formatters = (context['requestid'], action, ' '.join(args))
+    if context.get('sessionid'):
+        fmt = '%s:' + fmt
+        formatters = tuple([context['sessionid']] + list(formatters))
+
+    syslog.syslog(syslog.LOG_NOTICE, fmt % formatters)
+
+
 class syslogmixin(object):
     """Shared class providing an API to do syslog writing."""
     def _syslog(self, action, *args):
         if not hasattr(self, '_serverlog'):
             return
 
-        syslog.openlog(self._serverlog['ident'], 0, self._serverlog['facility'])
+        logsyslog(self._serverlog, action, *args)
 
-        fmt = '%s %s %s'
-        formatters = (self._serverlog['requestid'], action, ' '.join(args))
-        if self._serverlog.get('sessionid'):
-            fmt = '%s:' + fmt
-            formatters = tuple([self._serverlog['sessionid']] + list(formatters))
-
-        syslog.syslog(syslog.LOG_NOTICE, fmt % formatters)
 
 class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
     def run_wsgi(self, req):
