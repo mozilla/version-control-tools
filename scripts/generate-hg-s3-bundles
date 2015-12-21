@@ -99,7 +99,7 @@ HTML_ENTRY = '''
 <tr>
   <td>{repo}</td>
   <td class="numeric"><a href="{gzip_path}">{gzip_size:,}</a></td>
-  <td class="numeric"><a href="{bz2_path}">{bz2_size:,}</a></td>
+  <td class="numeric">{bzip2_entry}</td>
   <td class="numeric"><a href="{packed1_path}">{packed1_size:,}</a></td>
   <td class="numeric"><a href="{stream_path}">{stream_size:,}</a></td>
 </tr>
@@ -145,7 +145,7 @@ def generate_bundle(repo, temp_path, final_path, extra_args):
     os.rename(temp_path, final_path)
 
 
-def generate_bundles(repo, upload=True):
+def generate_bundles(repo, upload=True, bzip2=True):
     """Generate bundle files for a repository at a path."""
     assert not os.path.isabs(repo)
     repo_full = os.path.join('/repo/hg/mozilla', repo)
@@ -195,6 +195,9 @@ def generate_bundles(repo, upload=True):
 
     with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
         for t, args in CREATES:
+            if t == 'bzip2' and not bzip2:
+                continue
+
             final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
             temp_path = '%s.tmp' % final_path
 
@@ -229,6 +232,9 @@ def generate_bundles(repo, upload=True):
         with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
             for host, bucket, name in HOSTS:
                 for t, _args in CREATES:
+                    if t == 'bzip2' and not bzip2:
+                        continue
+
                     final_path, remote_path = bundle_paths(bundle_path, repo,
                                                            tip, t)
                     print('uploading to %s/%s/%s' % (host, bucket, remote_path))
@@ -237,11 +243,17 @@ def generate_bundles(repo, upload=True):
     # Now assemble a manifest listing each bundle.
     paths = {}
     for t, _args in CREATES:
+        if t == 'bzip2' and not bzip2:
+            continue
+
         final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
         paths[t] = (remote_path, os.path.getsize(final_path))
 
     bundleclone_manifest = []
     for t, params in BUNDLECLONE_ORDER:
+        if t == 'bzip2' and not bzip2:
+            continue
+
         final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
 
         bundleclone_manifest.append('%s/%s %s cdn=true requiresni=true' % (
@@ -254,6 +266,9 @@ def generate_bundles(repo, upload=True):
 
     clonebundles_manifest = []
     for t, params in CLONEBUNDLES_ORDER:
+        if t == 'bzip2' and not bzip2:
+            continue
+
         final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
         clonebundles_manifest.append('%s/%s %s REQUIRESNI=true cdn=true' % (
             CDN, remote_path, params))
@@ -292,15 +307,27 @@ def upload_index(repos):
     for repo in sorted(repos):
         p = repos[repo]
         basename = os.path.basename(p['gzip'][0])
-        entries.append(HTML_ENTRY.format(repo=repo, basename=basename,
-                                         gzip_path=p['gzip'][0],
-                                         gzip_size=p['gzip'][1],
-                                         bz2_path=p['bzip2'][0],
-                                         bz2_size=p['bzip2'][1],
-                                         packed1_path=p['packed1'][0],
-                                         packed1_size=p['packed1'][1],
-                                         stream_path=p['stream-legacy'][0],
-                                         stream_size=p['stream-legacy'][1]))
+
+        opts = dict(
+            repo=repo,
+            basename=basename,
+            gzip_path=p['gzip'][0],
+            gzip_size=p['gzip'][1],
+            packed1_path=p['packed1'][0],
+            packed1_size=p['packed1'][1],
+            stream_path=p['stream-legacy'][0],
+            stream_size=p['stream-legacy'][1],
+        )
+
+        if 'bzip2' in p:
+            opts['bzip2_entry'] = '<a href="{path}">{size:,}</a>'.format(
+                path=p['bzip2'][0],
+                size=p['bzip2'][1],
+            )
+        else:
+            opts['bzip2_entry'] = '-'
+
+        entries.append(HTML_ENTRY.format(**opts))
 
     html = HTML_INDEX % ('\n'.join(entries),
                          datetime.datetime.utcnow().isoformat())
