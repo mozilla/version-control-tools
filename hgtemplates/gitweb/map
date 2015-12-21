@@ -93,31 +93,33 @@ filediff = filediff.tmpl
 filecomparison = filecomparison.tmpl
 filelog = filelog.tmpl
 fileline = '
-  <div style="font-family:monospace" class="parity{parity}">
-    <pre><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</pre>
-  </div>'
+  <a href="#{lineid}"></a><span id="{lineid}">{strip(line|escape, '\r\n')}</span>'
 annotateline = '
-  <tr style="font-family:monospace" class="parity{parity}">
+  <tr id="{lineid}" style="font-family:monospace" class="parity{parity}">
     <td class="linenr" style="text-align: right;">
       <a href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}#l{targetline}"
          title="{node|short}: {desc|escape|firstline}">{author|user}@{rev}</a>
     </td>
-    <td><pre><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a></pre></td>
+    <td><pre><a class="linenr" href="#{lineid}">{linenumber}</a></pre></td>
     <td><pre>{line|escape}</pre></td>
   </tr>'
-difflineplus = '<span class="difflineplus"><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
-difflineminus = '<span class="difflineminus"><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
-difflineat = '<span class="difflineat"><a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}</span>'
-diffline = '<a class="linenr" href="#{lineid}" id="{lineid}">{linenumber}</a> {line|escape}'
+difflineplus = '
+  <a href="#{lineid}"></a><span id="{lineid}" class="difflineplus">{strip(line|escape, '\r\n')}</span>'
+difflineminus = '
+  <a href="#{lineid}"></a><span id="{lineid}" class="difflineminus">{strip(line|escape, '\r\n')}</span>'
+difflineat = '
+  <a href="#{lineid}"></a><span id="{lineid}" class="difflineat">{strip(line|escape, '\r\n')}</span>'
+diffline = '
+  <a href="#{lineid}"></a><span id="{lineid}">{strip(line|escape, '\r\n')}</span>'
 
 comparisonblock ='
   <tbody class="block">
   {lines}
   </tbody>'
 comparisonline = '
-  <tr style="font-family:monospace">
-    <td class="{type}"><pre><a class="linenr" href="#{lineid}" id="{lineid}">{leftlinenumber}</a> {leftline|escape}</pre></td>
-    <td class="{type}"><pre><a class="linenr" href="#{lineid}" id="{lineid}">{rightlinenumber}</a> {rightline|escape}</pre></td>
+  <tr id="{lineid}" style="font-family:monospace">
+    <td class="{type}"><pre><a class="linenr" href="#{lineid}">{leftlinenumber}</a> {leftline|escape}</pre></td>
+    <td class="{type}"><pre><a class="linenr" href="#{lineid}">{rightlinenumber}</a> {rightline|escape}</pre></td>
   </tr>'
 
 changelogparent = '
@@ -193,7 +195,7 @@ tags = tags.tmpl
 tagentry = '
   <tr class="parity{parity}">
     <td class="age"><i class="age">{date|rfc822date}</i></td>
-    <td><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}"><b>{tag|escape}</b></a></td>
+    <td><a class="list" href="{url|urlescape}rev/{tag|revescape}{sessionvars%urlparameter}"><b>{tag|escape}</b></a></td>
     <td class="link">
       <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">changeset</a> |
       <a href="{url|urlescape}log/{node|short}{sessionvars%urlparameter}">changelog</a> |
@@ -204,7 +206,7 @@ bookmarks = bookmarks.tmpl
 bookmarkentry = '
   <tr class="parity{parity}">
     <td class="age"><i class="age">{date|rfc822date}</i></td>
-    <td><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}"><b>{bookmark|escape}</b></a></td>
+    <td><a class="list" href="{url|urlescape}rev/{bookmark|revescape}{sessionvars%urlparameter}"><b>{bookmark|escape}</b></a></td>
     <td class="link">
       <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">changeset</a> |
       <a href="{url|urlescape}log/{node|short}{sessionvars%urlparameter}">changelog</a> |
@@ -215,15 +217,14 @@ branches = branches.tmpl
 branchentry = '
   <tr class="parity{parity}">
     <td class="age"><i class="age">{date|rfc822date}</i></td>
-    <td><a class="list" href="{url|urlescape}shortlog/{node|short}{sessionvars%urlparameter}"><b>{node|short}</b></a></td>
-    <td class="{status}">{branch|escape}</td>
+    <td class="{status}"><a class="list" href="{url|urlescape}shortlog/{branch|revescape}{sessionvars%urlparameter}"><b>{branch|escape}</b></a></td>
     <td class="link">
       <a href="{url|urlescape}changeset/{node|short}{sessionvars%urlparameter}">changeset</a> |
       <a href="{url|urlescape}log/{node|short}{sessionvars%urlparameter}">changelog</a> |
       <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">files</a>
     </td>
   </tr>'
-diffblock = '<pre>{lines}</pre>'
+diffblock = '<div class="diffblock"><pre class="sourcelines">{lines}</pre></div>'
 filediffparent = '
   <tr>
     <td>parent {rev}</td>
@@ -290,6 +291,7 @@ shortlogentry = '
 filelogentry = '
   <tr class="parity{parity}">
     <td class="age"><i class="age">{date|rfc822date}</i></td>
+    <td><i>{author|person}</i></td>
     <td>
       <a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">
         <b>{desc|strip|firstline|escape|nonempty}</b>
