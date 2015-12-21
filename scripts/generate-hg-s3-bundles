@@ -357,7 +357,7 @@ if __name__ == '__main__':
         with open(args.f, 'rb') as fh:
             for line in fh:
                 fields = line.strip().split()
-                repos.append(fields[0], {x: True for x in fields[1:]})
+                repos.append((fields[0], {x: True for x in fields[1:]}))
 
     for repo in remaining:
         repos.append((repo, {}))
