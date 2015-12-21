@@ -213,6 +213,12 @@ def protocolcall(repo, req, cmd):
     return origcall(repo, req, cmd)
 
 
+def setsyslogkeys(context, ui):
+    context['ident'] = ui.config('syslog', 'ident', 'hgweb')
+    facility = ui.config('syslog', 'facility', 'LOG_LOCAL2')
+    context['facility'] = getattr(syslog, facility)
+
+
 def repopath(repo):
     root = repo.ui.config('serverlog', 'reporoot', '')
     if root and not root.endswith('/'):
@@ -232,11 +238,7 @@ class syslogmixin(object):
         if not hasattr(self, '_serverlog'):
             return
 
-        ident = self.repo.ui.config('syslog', 'ident', 'hgweb')
-        facility = self.repo.ui.config('syslog', 'facility', 'LOG_LOCAL2')
-        facility = getattr(syslog, facility)
-
-        syslog.openlog(ident, 0, facility)
+        syslog.openlog(self._serverlog['ident'], 0, self._serverlog['facility'])
 
         fmt = '%s %s %s'
         formatters = (self._serverlog['requestid'], action, ' '.join(args))
@@ -252,6 +254,7 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
             'requestid': str(uuid.uuid1()),
             'writecount': 0,
         }
+        setsyslogkeys(self._serverlog, self.repo.ui)
 
         # Resolve the repository path.
         # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
@@ -313,6 +316,7 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
             'requestid': '',
             'path': repopath(self.repo),
         }
+        setsyslogkeys(self._serverlog, self.repo.ui)
 
         # Stuff a reference to the state so we can do logging within repo
         # methods.
