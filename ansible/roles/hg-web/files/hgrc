@@ -19,6 +19,12 @@ baseurl = http://hg.mozilla.org/
 maxchanges = 20
 guessmime = True
 
+# Pygments does content based analysis to determine the language for
+# unknown file extensions. Unfortunately, it is overly aggressive about
+# matching and nearly any text will cause it to think it knows what the
+# file type is. This is more wrong than right, so disable that feature.
+highlightonlymatchfilename = true
+
 [server]
 # Default is 1024. Our server environment can support longer.
 maxhttpheaderlen = 6144
