@@ -207,8 +207,8 @@ def protocolcall(repo, req, cmd):
 
     # TODO figure out why our custom attribute is getting lost in
     # production.
-    if hasattr(req, '_syslog'):
-        req._syslog('BEGIN_PROTOCOL', cmd)
+    if hasattr(req, '_serverlog'):
+        logsyslog(req._serverlog, 'BEGIN_PROTOCOL', cmd)
 
     return origcall(repo, req, cmd)
 
@@ -272,7 +272,6 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
         # Stuff a reference to the state and the bound logging method so we can
         # record and log inside request handling.
         req._serverlog = self._serverlog
-        req._syslog = self._syslog
         self.repo._serverlog = self._serverlog
 
         # TODO REQUEST_URI may not be defined in all WSGI environments,
@@ -280,7 +279,7 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
         uri = req.env.get('REQUEST_URI', 'UNKNOWN')
 
         sl = self._serverlog
-        self._syslog('BEGIN_REQUEST', sl['path'], sl['ip'], uri)
+        logsyslog(sl, 'BEGIN_REQUEST', sl['path'], sl['ip'], uri)
 
         startusage = resource.getrusage(resource.RUSAGE_SELF)
         startcpu = startusage.ru_utime + startusage.ru_stime
@@ -292,13 +291,12 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
 
         try:
             for what in super(hgwebwrapped, self).run_wsgi(req):
-                self._serverlog['writecount'] += len(what)
+                sl['writecount'] += len(what)
                 yield what
 
-                if self._serverlog['writecount'] - lastlogamount > datasizeinterval:
-                    self._syslog('WRITE_PROGRESS',
-                        '%d' % self._serverlog['writecount'])
-                    lastlogamount = self._serverlog['writecount']
+                if sl['writecount'] - lastlogamount > datasizeinterval:
+                    logsyslog(sl, 'WRITE_PROGRESS', '%d' % sl['writecount'])
+                    lastlogamount = sl['writecount']
         finally:
             endtime = time.time()
             endusage = resource.getrusage(resource.RUSAGE_SELF)
@@ -307,10 +305,12 @@ class hgwebwrapped(hgweb_mod.hgweb, syslogmixin):
             deltatime = endtime - starttime
             deltacpu = endcpu - startcpu
 
-            self._syslog('END_REQUEST', '%d' % sl['writecount'], '%.3f' % deltatime,
-                '%.3f' % deltacpu)
+            logsyslog(sl, 'END_REQUEST', '%d' % sl['writecount'],
+                      '%.3f' % deltatime,
+                      '%.3f' % deltacpu)
 
             syslog.closelog()
+
 
 class sshserverwrapped(sshserver.sshserver, syslogmixin):
     """Wrap sshserver class to record events."""
@@ -327,9 +327,9 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
         # methods.
         self.repo._serverlog = self._serverlog
 
-        self._syslog('BEGIN_SSH_SESSION',
-            self._serverlog['path'],
-            os.environ['USER'])
+        logsyslog(self._serverlog, 'BEGIN_SSH_SESSION',
+                  self._serverlog['path'],
+                  os.environ['USER'])
 
         startusage = resource.getrusage(resource.RUSAGE_SELF)
         startcpu = startusage.ru_utime + startusage.ru_stime
@@ -345,7 +345,7 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
             deltatime = endtime - starttime
             deltacpu = endcpu - startcpu
 
-            self._syslog('END_SSH_SESSION',
+            logsyslog(self._serverlog, 'END_SSH_SESSION',
                 '%.3f' % deltatime,
                 '%.3f' % deltacpu)
 
@@ -355,7 +355,7 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
         self._serverlog['requestid'] = str(uuid.uuid1())
 
         def dispatch(repo, proto, cmd):
-            self._syslog('BEGIN_SSH_COMMAND', cmd)
+            logsyslog(self._serverlog, 'BEGIN_SSH_COMMAND', cmd)
             return origdispatch(repo, proto, cmd)
 
         startusage = resource.getrusage(resource.RUSAGE_SELF)
@@ -373,21 +373,23 @@ class sshserverwrapped(sshserver.sshserver, syslogmixin):
             deltatime = endtime - starttime
             deltacpu = endcpu - startcpu
 
-            self._syslog('END_SSH_COMMAND',
+            logsyslog(self._serverlog, 'END_SSH_COMMAND',
                 '%.3f' % deltatime,
                 '%.3f' % deltacpu)
 
             wireproto.dispatch = origdispatch
             self._serverlog['requestid'] = ''
 
+
 class wrappedlocalrepo(localrepo.localrepository, syslogmixin):
     def _changegroupsubset(self, commonrevs, csets, heads, source):
-        self._syslog('CHANGEGROUPSUBSET_START',
+        logsyslog(self._serverlog, 'CHANGEGROUPSUBSET_START',
             source,
             '%d' % len(csets))
 
         return super(wrappedlocalrepo, self)._changegroupsubset(commonrevs,
             csets, heads, source)
+
 
 def extsetup(ui):
     protocol.call = protocolcall
