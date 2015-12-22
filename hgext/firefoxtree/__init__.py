@@ -379,6 +379,12 @@ def updateremoterefs(repo, remote, tree):
     This is called during pull to create the remote tracking tags for
     Firefox repos.
     """
+    # TODO Somehow the custom repo class is lost and the firefoxtrees attribute
+    # isn't accessible. This is possibly a result of repo filter and/or clone
+    # bundles interaction. See bug 1234396.
+    if not getattr(repo, 'firefoxtrees', None):
+        return
+
     # We only care about the default branch. We could import
     # RELBRANCH and other branches if we really cared about it.
     # Maybe later.
