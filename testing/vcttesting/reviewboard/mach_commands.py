@@ -294,13 +294,17 @@ class ReviewBoardCommands(object):
 
     @Command('get-users', category='reviewboard',
         description='Query the Review Board user list')
-    @CommandArgument('q', help='Query string')
+    @CommandArgument('q', nargs='?', help='Query string')
     def query_users(self, q=None):
         from rbtools.api.errors import APIError
 
         root = self._get_root()
         try:
-            r = root.get_users(q=q, fullname=True)
+            args = {}
+            # q=None will pass literal 'None' to the HTTP query!
+            if q:
+                args['q'] = q
+            r = root.get_users(fullname=True, **args)
         except APIError as e:
             print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
                 e.rsp['err']['msg']))
