@@ -247,22 +247,30 @@ class MozReview(object):
         self.treestatus_id = mr_info['treestatus_id']
         self.treestatus_url = mr_info['treestatus_url']
 
-        # Ensure admin user is present and has admin privileges.
-        def make_users():
-            rb = self.get_reviewboard()
+        rb = self.get_reviewboard()
 
-            # Ensure admin user is present and has admin privileges.
-            rb.login_user(bugzilla.username, bugzilla.password)
-            rb.make_admin(bugzilla.username)
+        # It is tempting to put the user creation inside the futures
+        # block so it runs concurrently. However, there appeared to be
+        # race conditions here. The hg_rb_username ("mozreview") user
+        # was sometimes not getting created and this led to intermittent
+        # test failures in test-auth.t.
 
-            # Ensure the MozReview hg user is present and has privileges.
-            rb.create_local_user(self.hg_rb_username, self.hg_rb_email,
-                                 self.hg_rb_password)
-            rb.grant_permission(self.hg_rb_username,
-                                'Can change ldap assocation for all users')
+        # Ensure admin user is present.
+        rb.login_user(bugzilla.username, bugzilla.password)
 
-        with futures.ThreadPoolExecutor(4) as e:
-            e.submit(make_users)
+        # Ensure the mozreview hg user is present and has privileges.
+        # This has to occur after the admin user is logged in to avoid
+        # race conditions with user IDs.
+        rb.create_local_user(self.hg_rb_username, self.hg_rb_email,
+                             self.hg_rb_password)
+
+        with futures.ThreadPoolExecutor(5) as e:
+            # Ensure admin user had admin privileges.
+            e.submit(rb.make_admin, bugzilla.username)
+
+            # Ensure mozreview user has LDAP privileges.
+            e.submit(rb.grant_permission, self.hg_rb_username,
+                     'Can change ldap assocation for all users')
 
             # Tell hgrb about URLs.
             e.submit(self._docker.execute, self.hgrb_id,
