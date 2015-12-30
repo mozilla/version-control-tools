@@ -549,9 +549,10 @@ def treestatus(ui, *trees, **opts):
     trees = resolve_trees_to_official(trees)
 
     if trees:
-        irrelevant = [k for k in status if k not in trees]
-        for k in irrelevant:
+        for k in set(status.keys()) - set(trees):
             del status[k]
+    if not status:
+        raise util.Abort('No status info found.')
 
     longest = max(len(s) for s in status)
 
