@@ -116,7 +116,7 @@ Newly created users should have a suitable profile (e.g. is_private is set)
   collapsed_diffs: 1
   dashboard_columns: selected,new_updates,ship_it,my_comments,summary,submitter,last_updated_since
   default_use_rich_text: None
-  extra_data: {}
+  extra_data: {"show_archived": false}
   first_time_setup_done: 0
   group_columns: 
   id: 4

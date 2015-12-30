@@ -345,6 +345,7 @@ Test creating a review via HTTP
   target_people:
   - reviewer
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.base_commit: 6432ccd4579e0fdc337b6dc55b827cbcc7fee397
     p2rb.commits: '[["9a6457fbda8fb4e5afaa3e0ab831f34a3de285af", 2], ["b41b3bd650cb5b456e611e2eeb77705e4c41cb83",

@@ -125,6 +125,7 @@ on publish.
   description: This is the parent review request
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
@@ -146,6 +147,7 @@ on publish.
     description: This is the parent review request
     target_people: []
     extra:
+      calculated_trophies: true
       p2rb: true
       p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
@@ -204,6 +206,7 @@ The parent review should have dropped the reference to /r/6
   description: This is the parent review request
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
@@ -232,6 +235,7 @@ Review 6 should be marked as discarded
   description: Bug 1 - Foo 5
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.commit_id: 76088734e3cba33be80930be14e7cd1e9ee474be
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
@@ -286,6 +290,7 @@ on publish.
   description: This is the parent review request
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
@@ -307,6 +312,7 @@ on publish.
     description: This is the parent review request
     target_people: []
     extra:
+      calculated_trophies: true
       p2rb: true
       p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 3], ["d7a5827a584db609f6a9ca2bd3d43aa3afa6b86e",
@@ -358,6 +364,7 @@ The dropped commit should now be discarded
   description: Bug 1 - Foo 1
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.commit_id: 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
@@ -408,6 +415,7 @@ The parent review should have been updated accordingly.
   description: This is the parent review request
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 3], ["2fbc30f77859fa4be2e173866fa71c52d394f2c4",

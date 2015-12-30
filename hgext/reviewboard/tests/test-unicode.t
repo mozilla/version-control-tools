@@ -47,6 +47,7 @@ The globbing is patching over a bug in mach
   description: "Bug 1 - Initial commit to review \u2019 \u3053"
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.commit_id: f03366314c7798387fcd3e367afaa6ba472feb5d
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
