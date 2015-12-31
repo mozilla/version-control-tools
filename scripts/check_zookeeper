@@ -138,6 +138,11 @@ if __name__ == '__main__':
         except socket.error as e:
             print('socket error connecting to %s: %s' % (host, e))
             exit = 2
+        # This will likely occur as part of sending the monitor command
+        # to a node that is in a degraded state.
+        except ZookeeperUnavailable:
+            warnings.append('NODE CRITICAL - not available: %s' % host)
+            exit = 2
 
     # Now verify cluster state.
     if args.config:
