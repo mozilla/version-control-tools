@@ -1,7 +1,7 @@
   $ hg init server
   $ cat >> server/.hg/hgrc << EOF
   > [hooks]
-  > pretxnchangegroup.verify-css-image-only-approvals = python:mozhghooks.verify-css-image-only-approvals.hook
+  > pretxnchangegroup.verify_css_image_only_approvals = python:mozhghooks.verify_css_image_only_approvals.hook
   > pretxnchangegroup.treeclosure = python:mozhghooks.treeclosure.hook
   > 
   > [extensions]
@@ -125,7 +125,7 @@ Add file (untracked extension), approval flag, should fail
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.verify-css-image-only-approvals hook failed
+  abort: pretxnchangegroup.verify_css_image_only_approvals hook failed
   [255]
 
 Add file (untracked extension), generic approval flag, should work
