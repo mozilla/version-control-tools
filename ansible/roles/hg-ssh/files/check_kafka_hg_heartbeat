@@ -6,30 +6,93 @@
 # This is a NRPE check that verifies we can write a heartbeat message to
 # the VCS replication topic.
 
+import logging
 import os
 import subprocess
 import sys
 
-args = ['/repo/hg/venv_tools/bin/hg', 'sendheartbeat']
+from kafka.client import KafkaClient
+from kafka.common import KafkaError
+import vcsreplicator.producer as vcsrproducer
 
-# This is only needed until vcsreplicator is enabled by default.
-env = dict(os.environ)
-env['HGRCPATH'] = '/etc/mercurial/hgrc-all'
+HG = '/repo/hg/venv_tools/bin/hg'
+
+# Prevent "No handlers could be found" warnings.
+kafkalogger = logging.getLogger('kafka')
+if not kafkalogger.handlers:
+    kafkalogger.addHandler(logging.NullHandler())
+
+config = {}
 
 try:
-    out = subprocess.check_output(args, stderr=subprocess.STDOUT, env=env)
-    print('OK - heartbeat message sent successfully')
-    print('')
-    print(out.strip())
-    exit = 0
-except subprocess.CalledProcessError as e:
-    print('CRITICAL - error sending heartbeat')
-    print('')
-    print(e.output.strip())
-    print('')
-    print('Unable to write message into replication log. This likely ')
-    print('means incoming pushes will be denied since they will unable to ')
-    print('be replicated.')
-    exit = 2
+    # This is only needed until vcsreplicator is enabled by default.
+    env = dict(os.environ)
+    env['HGRCPATH'] = '/etc/mercurial/hgrc-all'
+    out = subprocess.check_output([HG, 'config'], env=env)
 
-sys.exit(exit)
+    for line in out.splitlines():
+        k, v = line.split('=', 1)
+        config[k] = v
+except subprocess.CalledProcessError as e:
+    print('CRITICAL - unable to load hgrc')
+    sys.exit(2)
+except ValueError:
+    print('CRITICAL - unable to parse hg config')
+    sys.exit(2)
+
+try:
+    client_id = config['replicationproducer.clientid']
+    topic = config['replicationproducer.topic']
+    hosts = config['replicationproducer.hosts']
+    req_acks = int(config['replicationproducer.reqacks'])
+    ack_timeout = int(config['replicationproducer.acktimeout'])
+except (KeyError, ValueError):
+    print('CRITICAL - replication configuration not present')
+    sys.exit(2)
+
+try:
+    client = KafkaClient(hosts, client_id=client_id, timeout=10)
+    producer = vcsrproducer.Producer(
+        client, topic, batch_send=False, req_acks=req_acks,
+        ack_timeout=ack_timeout
+    )
+except KafkaError as e:
+    print('CRITICAL - cannot establish connection to Kafka')
+    print('')
+    print(e)
+    print('')
+    print('This error should only occur if the Kafka cluster is down or')
+    print('if the server configuration is invalid. Please report this error')
+    print('in #vcs or to oncall ASAP.')
+    sys.exit(2)
+
+total_count = len(client.topic_partitions[topic])
+success_count = 0
+for partition, pm in sorted(client.topic_partitions[topic].items()):
+    try:
+        vcsrproducer.send_heartbeat(producer, partition=partition)
+        success_count += 1
+    except KafkaError as e:
+        leader = client.brokers[pm.leader]
+
+        if hasattr(e, 'errno') and hasattr(e, 'message'):
+            message = e.message
+        else:
+            message = 'unknown'
+
+        print('CRITICAL - error writing to partition %d (leader: %s): %s' %
+              (partition, leader.host, message))
+        print(e)
+
+if success_count == total_count:
+    print('OK - heartbeat message sent to %d/%d partitions successfully' %
+          (success_count, total_count))
+    sys.exit(0)
+
+print('We were unable to write a heartbeat message into the replication')
+print('log. This likely means incoming pushes will not complete since they')
+print('will not be able to write to the replication log.')
+print('')
+print('Please report this failure to #vcs or notify oncall ASAP.')
+
+sys.exit(2)
