@@ -6,6 +6,11 @@ groups = scm_level_1
 method = /usr/sbin/sendmail
 from = hg@{{ domain | mandatory }}
 
+[diff]
+# Enable git-style diffs in order to show binary files, other
+# metadata provided by Git's diff format.
+git = true
+
 [extensions]
 pushlog = /repo/hg/version-control-tools/hgext/pushlog/
 pushlog-feed = /repo/hg/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py
