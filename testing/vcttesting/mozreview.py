@@ -686,6 +686,9 @@ class LocalMercurialRepository(object):
                 '[extensions]',
                 'reviewboard = %s' % reviewboard,
                 '',
+                '[reviewboard]',
+                'autopublish = false',
+                '',
             ]))
 
     def run(self, args):

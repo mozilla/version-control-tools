@@ -119,7 +119,7 @@ class AutolandTryTest(MozReviewWebDriverTest):
 
         time.sleep(10)
         self.browser.refresh()
-        changedesc = self.browser.find_elements_by_class_name('changedesc')[2]
+        changedesc = self.browser.find_elements_by_class_name('changedesc')[1]
         self.assertTrue('https://treeherder.mozilla.org/'
             in changedesc.get_attribute('innerHTML'))
 

@@ -33,10 +33,10 @@ class BrowserCacheTest(MozReviewWebDriverTest):
 
             lr = self.create_basic_repo('user1@example.com', 'user1')
             lr.write('foo', 'first change')
-            lr.run(['commit', '-m', 'Bug 1 - Commit 1'])
+            lr.run(['commit', '-m', 'Bug 1 - Commit 1. r?user2'])
             lr.write('foo', 'second change')
-            lr.run(['commit', '-m', 'Bug 1 - Commit 2'])
-            lr.run(['push'])
+            lr.run(['commit', '-m', 'Bug 1 - Commit 2. r?user2'])
+            lr.run(['push', '--config', 'reviewboard.autopublish=true'])
         except Exception:
             MozReviewWebDriverTest.tearDownClass()
             raise
@@ -76,7 +76,7 @@ class BrowserCacheTest(MozReviewWebDriverTest):
             )))
         finish_btn.click()
 
-        publish_btn = WebDriverWait(self.browser, 3).until(
+        publish_btn = WebDriverWait(self.browser, 5).until(
             EC.visibility_of_element_located((
                 By.XPATH,
                 "id('review-form-modalbox')/div[1]/div[2]/input[1]"
