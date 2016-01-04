@@ -112,6 +112,6 @@ We can skip over the message
 
   $ consumer --onetime
 
-Cleanuo
+Cleanup
 
   $ hgmo clean
