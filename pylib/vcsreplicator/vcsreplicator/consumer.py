@@ -232,7 +232,7 @@ def process_hg_sync(config, path, requirements, hgrc, heads):
 
         logger.warn('pulling %d heads into %s' % (
             len(heads), local_path))
-        c.pull(source=url or 'default')
+        c.pull(source=url or 'default', rev=heads)
 
         newtip = int(c.log('tip')[0].rev)
 
