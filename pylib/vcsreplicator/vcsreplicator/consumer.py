@@ -241,8 +241,7 @@ def process_hg_sync(config, path, requirements, hgrc, heads):
 
 
 def get_hg_client(path):
-    return hglib.open(path, encoding='UTF-8',
-                      configs=['vcsreplicator.disableproduce=true'])
+    return hglib.open(path, encoding='UTF-8')
 
 
 def update_hgrc(repo_path, content):
