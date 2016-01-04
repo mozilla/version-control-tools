@@ -165,5 +165,64 @@ published.
     status: NEW
     summary: bug1
 
+We should not post an interdiff link if there are no code changes. This
+can happen if a reviewer is manually added (see Bug 1229789).
+
+  $ mozreview create-user reviewer@example.com password1 'Mozilla Reviewer [:reviewer]' --bugzilla-group editbugs
+  Created user 6
+  $ rbmanage add-reviewer 2 --user reviewer
+  1 people listed on review request
+  $ rbmanage publish 1
+  $ bugzilla dump-bug 1
+  Bug 1:
+    attachments:
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      description: 'MozReview Request: Bug 1 - Foo 1'
+      file_name: reviewboard-2-url.txt
+      flags:
+      - id: 1
+        name: review
+        requestee: reviewer@example.com
+        setter: default@example.com
+        status: '?'
+      id: 1
+      is_obsolete: false
+      is_patch: false
+      summary: 'MozReview Request: Bug 1 - Foo 1'
+    blocks: []
+    cc:
+    - reviewer@example.com
+    comments:
+    - author: default@example.com
+      id: 1
+      tags: []
+      text: ''
+    - author: default@example.com
+      id: 3
+      tags: []
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Foo 1'
+      - ''
+      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
+      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+    - author: default@example.com
+      id: 4
+      tags: []
+      text:
+      - Comment on attachment 1
+      - 'MozReview Request: Bug 1 - Foo 1'
+      - ''
+      - 'Review request updated; see interdiff: http://*:$HGPORT1/r/2/diff/1-2/' (glob)
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: bug1
+
   $ mozreview stop
   stopped 10 containers

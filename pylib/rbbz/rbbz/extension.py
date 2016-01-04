@@ -263,27 +263,30 @@ def post_bugzilla_attachment(bugzilla, bug_id, review_request_draft,
 
     rr_url = get_obj_url(review_request)
     diff_url = '%sdiff/#index_header' % rr_url
-    diffset_count = review_request.diffset_history.diffsets.count()
 
-    if diffset_count < 1:
-        # We don't need the first line, since it is also the attachment
-        # summary, which is displayed in the comment.
-        extended_commit_msg = review_request_draft.description.partition(
-            '\n')[2].lstrip('\n')
+    # Only post a comment if the diffset has actually changed
+    comment = ''
+    if review_request_draft.get_latest_diffset():
+        diffset_count = review_request.diffset_history.diffsets.count()
+        if diffset_count < 1:
+            # We don't need the first line, since it is also the attachment
+            # summary, which is displayed in the comment.
+            extended_commit_msg = review_request_draft.description.partition(
+                '\n')[2].lstrip('\n')
 
-        if extended_commit_msg:
-            extended_commit_msg += '\n\n'
+            if extended_commit_msg:
+                extended_commit_msg += '\n\n'
 
-        comment = '%sReview commit: %s\nSee other reviews: %s' % (
-            extended_commit_msg,
-            diff_url,
-            rr_url
-        )
-    else:
-        comment = ('Review request updated; see interdiff: '
-                   '%sdiff/%d-%d/\n' % (rr_url,
-                                        diffset_count,
-                                        diffset_count + 1))
+            comment = '%sReview commit: %s\nSee other reviews: %s' % (
+                extended_commit_msg,
+                diff_url,
+                rr_url
+            )
+        else:
+            comment = ('Review request updated; see interdiff: '
+                       '%sdiff/%d-%d/\n' % (rr_url,
+                                            diffset_count,
+                                            diffset_count + 1))
 
     bugzilla.post_rb_url(bug_id,
                          review_request.id,

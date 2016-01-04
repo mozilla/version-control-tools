@@ -318,14 +318,6 @@ Removing a reviewer should remove their review flag
       - ''
       - 'Review commit: http://*:$HGPORT1/r/4/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/4/' (glob)
-    - author: author@example.com
-      id: 7
-      tags: []
-      text:
-      - Comment on attachment 2
-      - 'MozReview Request: Bug 2 - Multiple reviewers'
-      - ''
-      - 'Review request updated; see interdiff: http://*/r/4/diff/1-2/' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -374,22 +366,6 @@ Removing all reviewers should remove all flags
       - ''
       - 'Review commit: http://*:$HGPORT1/r/4/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/4/' (glob)
-    - author: author@example.com
-      id: 7
-      tags: []
-      text:
-      - Comment on attachment 2
-      - 'MozReview Request: Bug 2 - Multiple reviewers'
-      - ''
-      - 'Review request updated; see interdiff: http://*/r/4/diff/1-2/' (glob)
-    - author: author@example.com
-      id: 8
-      tags: []
-      text:
-      - Comment on attachment 2
-      - 'MozReview Request: Bug 2 - Multiple reviewers'
-      - ''
-      - 'Review request updated; see interdiff: http://*/r/4/diff/1-2/' (glob)
     component: TestComponent
     depends_on: []
     platform: All
@@ -448,11 +424,11 @@ review? sticks around when 1 person grants review
     - reviewer@example.com
     comments:
     - author: author@example.com
-      id: 9
+      id: 7
       tags: []
       text: ''
     - author: author@example.com
-      id: 10
+      id: 8
       tags: []
       text:
       - Created attachment 3
@@ -461,7 +437,7 @@ review? sticks around when 1 person grants review
       - 'Review commit: http://*:$HGPORT1/r/6/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/6/' (glob)
     - author: reviewer@example.com
-      id: 11
+      id: 9
       tags: []
       text:
       - Comment on attachment 3
@@ -527,11 +503,11 @@ Random users can come along and grant review
     - reviewer@example.com
     comments:
     - author: author@example.com
-      id: 12
+      id: 10
       tags: []
       text: ''
     - author: author@example.com
-      id: 13
+      id: 11
       tags: []
       text:
       - Created attachment 4
@@ -540,7 +516,7 @@ Random users can come along and grant review
       - 'Review commit: http://*:$HGPORT1/r/8/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/8/' (glob)
     - author: troll@example.com
-      id: 14
+      id: 12
       tags: []
       text:
       - Comment on attachment 4
@@ -651,11 +627,11 @@ Test interaction with multiple commits.
     - reviewer@example.com
     comments:
     - author: author@example.com
-      id: 15
+      id: 13
       tags: []
       text: ''
     - author: author@example.com
-      id: 16
+      id: 14
       tags: []
       text:
       - Created attachment 5
@@ -664,7 +640,7 @@ Test interaction with multiple commits.
       - 'Review commit: http://*:$HGPORT1/r/10/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/10/' (glob)
     - author: author@example.com
-      id: 17
+      id: 15
       tags: []
       text:
       - Created attachment 6
@@ -673,7 +649,7 @@ Test interaction with multiple commits.
       - 'Review commit: http://*:$HGPORT1/r/11/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/11/' (glob)
     - author: author@example.com
-      id: 18
+      id: 16
       tags: []
       text:
       - Created attachment 7
@@ -765,11 +741,11 @@ Verify that a single ship-it r+s only that attachment.
     - reviewer@example.com
     comments:
     - author: author@example.com
-      id: 15
+      id: 13
       tags: []
       text: ''
     - author: author@example.com
-      id: 16
+      id: 14
       tags: []
       text:
       - Created attachment 5
@@ -778,7 +754,7 @@ Verify that a single ship-it r+s only that attachment.
       - 'Review commit: http://*:$HGPORT1/r/10/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/10/' (glob)
     - author: author@example.com
-      id: 17
+      id: 15
       tags: []
       text:
       - Created attachment 6
@@ -787,7 +763,7 @@ Verify that a single ship-it r+s only that attachment.
       - 'Review commit: http://*:$HGPORT1/r/11/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/11/' (glob)
     - author: author@example.com
-      id: 18
+      id: 16
       tags: []
       text:
       - Created attachment 7
@@ -796,7 +772,7 @@ Verify that a single ship-it r+s only that attachment.
       - 'Review commit: http://*:$HGPORT1/r/12/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/12/' (glob)
     - author: reviewer@example.com
-      id: 19
+      id: 17
       tags: []
       text:
       - Comment on attachment 6
@@ -888,11 +864,11 @@ A non-ship-it review on a child should clear only that attachment's r+.
     - reviewer@example.com
     comments:
     - author: author@example.com
-      id: 15
+      id: 13
       tags: []
       text: ''
     - author: author@example.com
-      id: 16
+      id: 14
       tags: []
       text:
       - Created attachment 5
@@ -901,7 +877,7 @@ A non-ship-it review on a child should clear only that attachment's r+.
       - 'Review commit: http://*:$HGPORT1/r/10/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/10/' (glob)
     - author: author@example.com
-      id: 17
+      id: 15
       tags: []
       text:
       - Created attachment 6
@@ -910,7 +886,7 @@ A non-ship-it review on a child should clear only that attachment's r+.
       - 'Review commit: http://*:$HGPORT1/r/11/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/11/' (glob)
     - author: author@example.com
-      id: 18
+      id: 16
       tags: []
       text:
       - Created attachment 7
@@ -919,7 +895,7 @@ A non-ship-it review on a child should clear only that attachment's r+.
       - 'Review commit: http://*:$HGPORT1/r/12/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/12/' (glob)
     - author: reviewer@example.com
-      id: 19
+      id: 17
       tags: []
       text:
       - Comment on attachment 6
@@ -929,7 +905,7 @@ A non-ship-it review on a child should clear only that attachment's r+.
       - ''
       - land it!
     - author: reviewer@example.com
-      id: 20
+      id: 18
       tags: []
       text:
       - Comment on attachment 6
@@ -1011,11 +987,11 @@ A non-ship-it review on a child should also clear the attachment's r?.
     - reviewer@example.com
     comments:
     - author: author@example.com
-      id: 15
+      id: 13
       tags: []
       text: ''
     - author: author@example.com
-      id: 16
+      id: 14
       tags: []
       text:
       - Created attachment 5
@@ -1024,7 +1000,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
       - 'Review commit: http://*:$HGPORT1/r/10/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/10/' (glob)
     - author: author@example.com
-      id: 17
+      id: 15
       tags: []
       text:
       - Created attachment 6
@@ -1033,7 +1009,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
       - 'Review commit: http://*:$HGPORT1/r/11/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/11/' (glob)
     - author: author@example.com
-      id: 18
+      id: 16
       tags: []
       text:
       - Created attachment 7
@@ -1042,7 +1018,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
       - 'Review commit: http://*:$HGPORT1/r/12/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/12/' (glob)
     - author: reviewer@example.com
-      id: 19
+      id: 17
       tags: []
       text:
       - Comment on attachment 6
@@ -1052,7 +1028,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
       - ''
       - land it!
     - author: reviewer@example.com
-      id: 20
+      id: 18
       tags: []
       text:
       - Comment on attachment 6
@@ -1062,7 +1038,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
       - ''
       - there is a problem
     - author: reviewer2@example.com
-      id: 21
+      id: 19
       tags: []
       text:
       - Comment on attachment 5
@@ -1144,11 +1120,11 @@ A non-ship-it review on a parent should post a comment only.
     - reviewer@example.com
     comments:
     - author: author@example.com
-      id: 15
+      id: 13
       tags: []
       text: ''
     - author: author@example.com
-      id: 16
+      id: 14
       tags: []
       text:
       - Created attachment 5
@@ -1157,7 +1133,7 @@ A non-ship-it review on a parent should post a comment only.
       - 'Review commit: http://*:$HGPORT1/r/10/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/10/' (glob)
     - author: author@example.com
-      id: 17
+      id: 15
       tags: []
       text:
       - Created attachment 6
@@ -1166,7 +1142,7 @@ A non-ship-it review on a parent should post a comment only.
       - 'Review commit: http://*:$HGPORT1/r/11/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/11/' (glob)
     - author: author@example.com
-      id: 18
+      id: 16
       tags: []
       text:
       - Created attachment 7
@@ -1175,7 +1151,7 @@ A non-ship-it review on a parent should post a comment only.
       - 'Review commit: http://*:$HGPORT1/r/12/diff/#index_header' (glob)
       - 'See other reviews: http://*:$HGPORT1/r/12/' (glob)
     - author: reviewer@example.com
-      id: 19
+      id: 17
       tags: []
       text:
       - Comment on attachment 6
@@ -1185,7 +1161,7 @@ A non-ship-it review on a parent should post a comment only.
       - ''
       - land it!
     - author: reviewer@example.com
-      id: 20
+      id: 18
       tags: []
       text:
       - Comment on attachment 6
@@ -1195,7 +1171,7 @@ A non-ship-it review on a parent should post a comment only.
       - ''
       - there is a problem
     - author: reviewer2@example.com
-      id: 21
+      id: 19
       tags: []
       text:
       - Comment on attachment 5
@@ -1205,7 +1181,7 @@ A non-ship-it review on a parent should post a comment only.
       - ''
       - this is not good
     - author: reviewer2@example.com
-      id: 22
+      id: 20
       tags: []
       text:
       - http://*:$HGPORT1/r/9/#review9 (glob)
