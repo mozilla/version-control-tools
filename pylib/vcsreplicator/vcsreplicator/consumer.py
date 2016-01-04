@@ -201,9 +201,17 @@ def process_hg_pushkey(config, path, namespace, key, old, new, ret):
     with get_hg_client(path) as c:
         logger.info('executing pushkey on %s for %s[%s]' %
                     (path, namespace, key))
-        c.rawcommand(['debugpushkey', path, namespace, key, old, new])
-        logger.info('finished pushkey on %s for %s[%s]' %
-                    (path, namespace, key))
+        try:
+            c.rawcommand(['debugpushkey', path, namespace, key, old, new])
+            logger.info('finished pushkey on %s for %s[%s]' %
+                        (path, namespace, key))
+
+        except hglib.error.CommandError as e:
+            if e.ret != ret:
+                logger.warn('unexpected exit code from pushkey on %s for '
+                            '%s[%s]: %s' %
+                            (path, namespace, key, e.ret))
+                raise
 
 
 def process_hg_sync(config, path, requirements, hgrc, heads):
