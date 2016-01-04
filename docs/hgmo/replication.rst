@@ -248,7 +248,7 @@ dangerous, as being too liberal in yanking machines from service could
 result in removing machines necessary to service current load. When you
 consider that replication issues tend to occur during periods of high
 load, you can imagine what bad situations automatic decisions could get us
-in. Extreme care must be practices when going down this road.
+in. Extreme care must be practiced when going down this road.
 
 Data Loss
 ^^^^^^^^^
