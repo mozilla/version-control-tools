@@ -47,9 +47,8 @@ class Config(object):
 
     def get_pull_url_from_repo_path(self, path):
         """Obtain a URL to be used for pulling from a local repo path."""
-        lower = path.lower()
         for source, dest in self._pull_url_rewrites:
-            if lower.startswith(source):
+            if path.startswith(source):
                 return dest + path[len(source):]
 
         return None
