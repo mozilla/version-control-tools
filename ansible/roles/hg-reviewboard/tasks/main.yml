@@ -162,6 +162,7 @@
   with_items:
     - hgweb.config
     - hgweb.wsgi
+    - robots.txt
 
 - name: install httpd.conf file
   template: src=httpd.conf.j2
