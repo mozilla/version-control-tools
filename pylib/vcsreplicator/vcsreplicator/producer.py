@@ -50,7 +50,7 @@ def send_heartbeat(producer, partition):
     }, partition=partition)
 
 
-def record_new_hg_repo(producer, path, partition):
+def record_new_hg_repo(producer, path, partition, generaldelta=False):
     """Produce a message saying a Mercurial repository was created.
 
     This should be called when a new repository is to become under the
@@ -60,8 +60,9 @@ def record_new_hg_repo(producer, path, partition):
     cloning the repository.
     """
     return producer.send_message({
-        'name': 'hg-repo-init-1',
+        'name': 'hg-repo-init-2',
         'path': path,
+        'generaldelta': generaldelta,
     }, partition=partition)
 
 

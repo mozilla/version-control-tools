@@ -34,7 +34,8 @@ Pushing the initial commit will result in replication messages
 
   $ consumer --dump --partition 2
   - _created: \d+\.\d+ (re)
-    name: hg-repo-init-1
+    generaldelta: false
+    name: hg-repo-init-2
     path: '{moz}/mozilla-central'
   - _created: \d+\.\d+ (re)
     name: heartbeat-1

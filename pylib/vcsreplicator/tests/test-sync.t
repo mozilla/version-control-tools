@@ -15,7 +15,8 @@
 
   $ consumer --dump --partition 2
   - _created: \d+\.\d+ (re)
-    name: hg-repo-init-1
+    generaldelta: false
+    name: hg-repo-init-2
     path: '{moz}/mozilla-central'
   - _created: \d+\.\d+ (re)
     heads:

@@ -114,6 +114,9 @@ def process_message(config, payload):
         return
     elif name == 'hg-repo-init-1':
         return process_hg_repo_init(config, payload['path'])
+    elif name == 'hg-repo-init-2':
+        return process_hg_repo_init(config, payload['path'],
+                                    generaldelta=payload['generaldelta'])
     elif name == 'hg-hgrc-update-1':
         return process_hg_hgrc_update(config, payload['path'],
                                       payload['content'])
@@ -138,7 +141,7 @@ def process_message(config, payload):
     raise ValueError('unrecognized message type: %s' % payload['name'])
 
 
-def process_hg_repo_init(config, path):
+def process_hg_repo_init(config, path, generaldelta=False):
     """Process a Mercurial repository initialization message."""
     logger.debug('received request to create repo: %s' % path)
 
@@ -152,6 +155,10 @@ def process_hg_repo_init(config, path):
     # as part of the `hg init` call.
     args = hglib.util.cmdbuilder('init', path)
     args.insert(0, hglib.HGPATH)
+
+    if generaldelta:
+        args.extend(['--config', 'format.generaldelta=true'])
+
     proc = hglib.util.popen(args)
     out, err = proc.communicate()
     if proc.returncode:

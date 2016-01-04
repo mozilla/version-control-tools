@@ -186,10 +186,12 @@ def initcommand(orig, ui, dest, **opts):
             raise util.Abort('could not find created repo at %s' % path)
 
         repo = hg.repository(ui, path)
+        gd = 'generaldelta' in repo.requirements
 
         # TODO we should delete the repo if we can't write this message.
         vcsrproducer.record_new_hg_repo(producer, repo.replicationwireprotopath,
-                                        partition=repo.replicationpartition)
+                                        partition=repo.replicationpartition,
+                                        generaldelta=gd)
         ui.status(_('(recorded repository creation in replication log)\n'))
 
         return res

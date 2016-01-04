@@ -10,11 +10,18 @@ Creating a repository should record an event saying so
   $ hgmo create-repo mozilla-central 3
   (recorded repository creation in replication log)
 
+  $ hgmo exec hgssh cat /repo/hg/mozilla/mozilla-central/.hg/requires
+  dotencode
+  fncache
+  revlogv1
+  store
+
   $ consumer --dump
   - _created: \d+\.\d+ (re)
     name: heartbeat-1
   - _created: \d+\.\d+ (re)
-    name: hg-repo-init-1
+    generaldelta: false
+    name: hg-repo-init-2
     path: '{moz}/mozilla-central'
 
   $ consumer --onetime
@@ -42,6 +49,43 @@ Creating a repository should record an event saying so
 
   $ hgmo exec hgweb0 ls /repo/hg/mozilla
   mozilla-central
+
+  $ hgmo exec hgweb0 cat /repo/hg/mozilla/mozilla-central/.hg/requires
+  dotencode
+  fncache
+  revlogv1
+  store
+
+generaldelta is preserved
+
+  $ hgmo create-repo mcgd 3 --generaldelta
+  (recorded repository creation in replication log)
+
+  $ hgmo exec hgssh cat /repo/hg/mozilla/mcgd/.hg/requires
+  dotencode
+  fncache
+  generaldelta
+  revlogv1
+  store
+
+  $ consumer --dump
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    generaldelta: true
+    name: hg-repo-init-2
+    path: '{moz}/mcgd'
+
+  $ consumer --onetime
+  $ consumer --onetime
+  * vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mcgd (glob)
+
+  $ hgmo exec hgweb0 cat /repo/hg/mozilla/mcgd/.hg/requires
+  dotencode
+  fncache
+  generaldelta
+  revlogv1
+  store
 
 Cleanup
 
