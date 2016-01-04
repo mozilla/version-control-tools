@@ -8,21 +8,29 @@ set -e
 REPO=$1
 GROUP=$2
 
-/repo/hg/venv_tools/bin/hg init /repo/hg/mozilla/${REPO}
-chown -R hg:${GROUP} /repo/hg/mozilla/${REPO}
-find /repo/hg/mozilla/${REPO} | xargs chmod g+w
-find /repo/hg/mozilla/${REPO} -type d | xargs chmod g+s
-
 for arg in "$@"
 do
     case $arg in
         --non-publishing)
         NONPUBLISHING=1
         ;;
+        --generaldelta)
+        GENERALDELTA=1
+        ;;
         *)
         ;;
     esac
 done
+
+INITFLAGS=
+if [ -n "${GENERALDELTA}" ]; then
+  INITFLAGS="--config format.generaldelta=true"
+fi
+
+/repo/hg/venv_tools/bin/hg init /repo/hg/mozilla/${REPO} ${INITFLAGS}
+chown -R hg:${GROUP} /repo/hg/mozilla/${REPO}
+find /repo/hg/mozilla/${REPO} | xargs chmod g+w
+find /repo/hg/mozilla/${REPO} -type d | xargs chmod g+s
 
 if [ -n "${NONPUBLISHING}" ]; then
   echo "marking repo as non-publishing"

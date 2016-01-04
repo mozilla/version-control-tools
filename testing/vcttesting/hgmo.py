@@ -345,7 +345,7 @@ class HgCluster(object):
         assert self.ldap_uri
         return LDAP(self.ldap_uri, 'cn=admin,dc=mozilla', 'password')
 
-    def create_repo(self, name, level=1):
+    def create_repo(self, name, level=1, generaldelta=False):
         """Create a repository on the cluster.
 
         ``path`` is the path fragment the repository would be accessed under
@@ -358,6 +358,9 @@ class HgCluster(object):
             raise ValueError('level must be between 1 and 3')
 
         cmd = ['/create-repo', name, 'scm_level_%d' % level]
+
+        if generaldelta:
+            cmd.append('--generaldelta')
 
         return self._d.execute(self.master_id, cmd, stdout=True, stderr=True)
 
