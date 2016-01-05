@@ -149,7 +149,7 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
     if not os.path.exists(userdir):
         run_command('mkdir %s' % userdir)
     print 'Please wait.  Cloning /%s to %s' % (source_repo_path, dest_url)
-    run_command('nohup %s clone --pull -U %s/%s %s'
+    run_command('nohup %s clone --pull -U %s/%s %s' %
                 (HG, DOC_ROOT, source_repo_path, dest_dir))
 
     print "Clone complete."
