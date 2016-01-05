@@ -70,13 +70,21 @@ def pretxnopenhook(ui, repo, **kwargs):
 
 def pushkeyhook(ui, repo, namespace=None, key=None, old=None, new=None,
                 ret=None, **kwargs):
-    """Records that a pushkey update occurred.
-
-    Pushkey updates should always occur inside a transaction. We don't write
-    the pushkey update to the log inside the transaction because the
-    transaction could get rolled back. Instead, we record the details of the
-    pushkey and write messages after the transaction has closed.
-    """
+    """Records that a pushkey update occurred."""
+    # The way pushkey updates work with regards to transactions is wonky.
+    # repo.pushkey() is the main function called to perform pushkey updates.
+    # It's what calls hooks (like this function). However, it does not
+    # necessarily have a transaction opened when called. This means that
+    # there may not be an active transaction# when we're called! However,
+    # the low-level pushkey namespace implementations (e.g. phases.pushphase())
+    # do obtain a transaction. So a transaction is involved with pushkey
+    # updates.
+    #
+    # We don't write messages into the replication log until a transaction
+    # has closed. Otherwise, transaction rollback could result in downstream
+    # consumers seeing updates they shouldn't. So, we queue our messages for
+    # writing. They will get flushed when the transaction associated with
+    # the low-level pushkey update completes.
     repo._replicationinfo['pushkey'].append(
         (namespace, key, old, new, ret))
 
