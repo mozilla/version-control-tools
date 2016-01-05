@@ -8,6 +8,9 @@ WSGIPythonHome /repo/hg/venv_hgweb
     SetEnv HGENCODING UTF-8
     SetEnv LC_TYPE UTF-8
 
+    # This bot uses dozens of IP addresses and overwhelms the server. Ban it.
+    SetEnvIfNoCase User-Agent "AhrefsBot" bad_bot
+
     WSGIDaemonProcess hg processes={{ wsgi_processes }} threads=1 maximum-requests=20 deadlock-timeout=60 inactivity-timeout=300 user=hg group=hg display-name=hg
     WSGIProcessGroup hg
 
@@ -33,6 +36,10 @@ WSGIPythonHome /repo/hg/venv_hgweb
     # Bug 1210177.
     DefineExternalAuth bmoapikey pipe "/usr/bin/python2.7 /repo/hg/version-control-tools/scripts/httpd-authn-bugzilla-key {{ bugzilla_url | mandatory }}"
     <Directory />
+        Order allow,deny
+        Allow from all
+        Deny from env=bad_bot
+
         AuthType Basic
         AuthName "{{ bugzilla_url | mandatory }} username and API Key"
         AuthBasicProvider external
