@@ -133,7 +133,7 @@ def check_repo_name(repo_name):
     return True
 
 
-def run_hg_clone(user_repo_dir, repo_name, source_repo_path, verbose=False):
+def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
     userdir = "%s/users/%s" % (DOC_ROOT, user_repo_dir)
     dest_dir = "%s/%s" % (userdir, repo_name)
     dest_url = "/users/%s/%s" % (user_repo_dir, repo_name)
@@ -150,13 +150,8 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path, verbose=False):
     if not os.path.exists(userdir):
         run_command('mkdir %s' % userdir)
     print 'Please wait.  Cloning /%s to %s' % (source_repo_path, dest_url)
-    if(verbose):
-        run_command('nohup %s clone --debug --verbose --time --pull -U %s/%s %s' %
-                    (HG, DOC_ROOT, source_repo_path, dest_dir),
-                    verbose=True)
-    else:
-        run_command('nohup %s clone --pull -U %s/%s %s' %
-                    (HG, DOC_ROOT, source_repo_path, dest_dir))
+    run_command('nohup %s clone --pull -U %s/%s %s'
+                (HG, DOC_ROOT, source_repo_path, dest_dir))
 
     print "Clone complete."
 
@@ -222,7 +217,7 @@ def fix_user_repo_perms(repo_name):
         print "Exception %s" % (e)
 
 
-def make_repo_clone(cname, repo_name, quick_src, verbose=False, source_repo=''):
+def make_repo_clone(cname, repo_name, quick_src, source_repo=''):
     user = os.getenv('USER')
     user_repo_dir = user.replace('@', '_')
     source_repo = ''
@@ -437,30 +432,26 @@ def set_repo_obsolescence(repo_name, enabled):
         print('Obsolescence is now disabled for this repo.')
 
 
-def do_delete(repo_dir, repo_name, verbose=False):
-    if verbose:
-        print "Deleting..."
+def do_delete(repo_dir, repo_name):
     run_command('rm -rf %s/users/%s/%s' % (DOC_ROOT, repo_dir, repo_name))
     run_repo_push('-d -e users/%s/%s' % (repo_dir, repo_name))
-    if verbose:
-        print "Finished deleting"
     purge_log = open('/tmp/pushlog_purge.%s' % os.getpid(), "a")
     purge_log.write('echo users/%s/%s\n' % (repo_dir, repo_name))
     purge_log.close()
 
 
-def delete_repo(cname, repo_name, do_quick_delete, verbose=False):
+def delete_repo(cname, repo_name, do_quick_delete):
     user = os.getenv('USER')
     user_repo_dir = user.replace('@', '_')
     if os.path.exists('%s/users/%s/%s' % (DOC_ROOT, user_repo_dir, repo_name)):
         if do_quick_delete:
-            do_delete(user_repo_dir, repo_name, verbose)
+            do_delete(user_repo_dir, repo_name)
         else:
             print '\nAre you sure you want to delete /users/%s/%s?' % (user_repo_dir, repo_name)
             print '\nThis action is IRREVERSIBLE.'
             selection = prompt_user('Proceed?', ['yes', 'no'])
             if (selection == 'yes'):
-                do_delete(user_repo_dir, repo_name, verbose)
+                do_delete(user_repo_dir, repo_name)
     else:
         sys.stderr.write('Could not find the repository at /users/%s/%s.\n' %
                          (user_repo_dir, repo_name))
