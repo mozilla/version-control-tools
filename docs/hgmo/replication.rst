@@ -446,12 +446,3 @@ of a repository later.
    from is unfortunate. Ideally all repository data would be
    self-contained within the log itself. Look for a future feature
    addition to vcsreplicator to provide self-contained logs.
-
-Current and Planned Project State
-=================================
-
-The project is currently in its early stages. The immediate goal of the
-project is to take control of replication for hg.mozilla.org, replacing
-the synchronous-with-push and non-robust replication described above. The
-existing solution is prone to many failures, so fortunately the bar is set
-low.
