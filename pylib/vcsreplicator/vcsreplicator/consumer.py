@@ -377,6 +377,8 @@ def cli():
             help='Partition to fetch from. Defaults to all partitions.')
     parser.add_argument('--skip', action='store_true',
             help='Skip the consuming of the next message then exit')
+    parser.add_argument('--wait-for-no-lag', action='store_true',
+            help='Wait for consumer lag to be 0 messages and exit')
 
     args = parser.parse_args()
 
@@ -386,6 +388,21 @@ def cli():
     group = config.c.get('consumer', 'group')
     poll_timeout = config.c.getfloat('consumer', 'poll_timeout')
     wait_for_topic(client, topic, 30)
+
+    if args.wait_for_no_lag:
+        while True:
+            d = consumer_offsets_and_lag(client, topic, [group])
+            partitions = d[group]
+            lagging = False
+            for partition, (offset, available, lag_time) in partitions.items():
+                lag = available - offset
+                if lag > 0:
+                    lagging = True
+
+            if lagging:
+                time.sleep(0.1)
+            else:
+                sys.exit(0)
 
     partitions = None
     if args.partition is not None:
