@@ -75,7 +75,7 @@ def pushkeyhook(ui, repo, namespace=None, key=None, old=None, new=None,
     # repo.pushkey() is the main function called to perform pushkey updates.
     # It's what calls hooks (like this function). However, it does not
     # necessarily have a transaction opened when called. This means that
-    # there may not be an active transaction# when we're called! However,
+    # there may not be an active transaction when we're called! However,
     # the low-level pushkey namespace implementations (e.g. phases.pushphase())
     # do obtain a transaction. So a transaction is involved with pushkey
     # updates.
