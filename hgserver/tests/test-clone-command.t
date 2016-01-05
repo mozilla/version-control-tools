@@ -346,4 +346,49 @@ Attempting to create a user repo that already exists results in error
   https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
   [1]
 
+We can create a new empty repo
+
+  $ standarduserssh $SSH_SERVER clone empty-1 << EOF
+  > 1
+  > 3
+  > 1
+  > EOF
+  Making repo empty-1 for user@example.com.
+  
+  This repo will appear as hg.mozilla.org/users/user_example.com/empty-1.
+  
+  If you need a top level repo, please quit now and file a
+  Developer Services :: hg.mozilla.org bug at
+  https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
+  
+  0) Exit.
+  1) yes.
+  2) no.
+  
+  Proceed? You can clone an existing public repo or a users private repo.
+  You can also create an empty repository.
+  
+  0) Exit.
+  1) Clone a public repository.
+  2) Clone a private repository.
+  3) Create an empty repository.
+  
+  Source repository: About to create an empty repository at /users/user_example.com/empty-1
+  
+  0) Exit.
+  1) yes.
+  2) no.
+  
+  Proceed? Fixing permissions, don't interrupt.
+  Repository marked as non-publishing: draft changesets will remain in the draft phase when pushed.
+
+  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 cat /repo/hg/mozilla/users/user_example.com/empty-1/.hg/hgrc
+  [phases]
+  publish = False
+  
+
+
+Cleanup
+
   $ hgmo clean

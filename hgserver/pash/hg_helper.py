@@ -294,7 +294,6 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=''):
                     print "Exception %s" % (e)
 
             run_command('/usr/bin/nohup %s init %s/users/%s/%s' % (HG, DOC_ROOT, user_repo_dir, repo_name))
-            run_repo_push('-e users/%s/%s' % (user_repo_dir, repo_name))
     fix_user_repo_perms(repo_name)
     # New user repositories are non-publishing by default.
     set_repo_publishing(repo_name, False)
