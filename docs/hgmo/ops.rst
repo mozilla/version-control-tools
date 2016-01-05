@@ -92,31 +92,34 @@ should thus complete without any client-perceived downtime.
 Repository Mirroring
 ====================
 
-On mirrors (hgweb machines), replication of a single repository
-can be initiated by running ``/usr/local/bin/mirror-pull``. This
-script takes the argument of a repository path, relative to its
-home on ``hg.mozilla.org``. e.g. ``hgcustom/version-control-tools``.
+The replication/mirroring of repositories is initiated on the master/SSH
+server. An event is written into a distributed replication log and it is
+replayed on all available mirrors. See :ref:`hgmo_replication` for more.
 
-**It is important to run this script as the hg user.**
+Most repository interactions result in replication occurring automatically.
+In a few scenarios, you'll need to manually trigger replication.
 
-Here is how it is typically used::
+The ``vcsreplicator`` Mercurial extension defines commands for creating
+replication messages. For a full list of available commands run
+``hg help -r vcsreplicator``. The following commands are common.
 
-   sudo -u hg /usr/local/bin/mirror-pull releases/mozilla-beta
+hg replicatehgrc
+   Replicate the hgrc file for the repository. The ``.hg/hgrc`` file will
+   effectively be copied to mirrors verbatim.
 
-On the *hgssh* machines, you can run a single script to have all
-mirrors pull. It works the same way and takes an argument that
-is the repository's relative path. e.g.::
+hg replicatesync
+   Force mirrors to synchronize against the master. This ensures the repo
+   is present on mirrors, the hgrc is in sync, and all repository data from
+   the master is present.
 
-   /repo/hg/scripts/push-repo.sh hgcustom/version-control-tools
+   Run this if mirrors ever get out of sync with the master. It should be
+   harmless to run this on any repo at any time.
 
-It is safe to run this script as root - it will ``su`` to the correct
-user.
+.. important::
 
-If you want to go a level deeper, you can run
-``/usr/local/bin/repo-push.sh``. **This script should be executed
-as the hg user.** e.g.::
-
-   sudo -u hg /usr/local/bin/repo-push.sh hgcustom/version-control-tools
+   You will need to run ``/repo/hg/venv_tools/bin/hg`` instead of
+   ``/usr/bin/hg`` so Python package dependencies required for
+   replication are loaded.
 
 Creating New Review Repositories
 ================================
