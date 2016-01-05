@@ -200,18 +200,8 @@ def fix_user_repo_perms(repo_name):
     user_repo_dir = user.replace('@', '_')
     print "Fixing permissions, don't interrupt."
     try:
-        run_command('chown %s:scm_level_1 %s/users/%s' %
-                    (user, DOC_ROOT, user_repo_dir))
-        run_command('chmod g+w %s/users/%s' %
-                    (DOC_ROOT, user_repo_dir))
-        run_command('chmod g+s %s/users/%s' %
-                    (DOC_ROOT, user_repo_dir))
-        run_command('chown -R %s:scm_level_1 %s/users/%s/%s' %
-                    (user, DOC_ROOT, user_repo_dir, repo_name))
-        run_command('chmod -R g+w %s/users/%s/%s' %
-                    (DOC_ROOT, user_repo_dir, repo_name))
-        run_command('find %s/users/%s/%s -depth -type d | xargs chmod g+s' %
-                    (DOC_ROOT, user_repo_dir, repo_name))
+        run_command('/repo/hg/version-control-tools/scripts/repo-permissions %s/users/%s/%s %s scm_level_1 wwr' %
+                    (DOC_ROOT, user_repo_dir, repo_name, user))
     except Exception, e:
         print "Exception %s" % (e)
 
