@@ -157,12 +157,6 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
     print "Clone complete."
 
 
-def run_repo_push(args):
-    """Run repo-push.sh, signaling mirror-pull on mirrors to do something."""
-    command = '/usr/bin/sudo -u hg /usr/local/bin/repo-push.sh %s' % args
-    return run_command(command)
-
-
 def make_wsgi_dir(cname, user_repo_dir):
     wsgi_dir = "/repo/hg/webroot_wsgi/users/%s" % user_repo_dir
     # Create user's webroot_wsgi folder if it doesn't already exist
@@ -424,7 +418,9 @@ def set_repo_obsolescence(repo_name, enabled):
 
 def do_delete(repo_dir, repo_name):
     run_command('rm -rf %s/users/%s/%s' % (DOC_ROOT, repo_dir, repo_name))
-    run_repo_push('-d -e users/%s/%s' % (repo_dir, repo_name))
+    # TODO implement vcsreplicator support for deleting repos
+    run_command('/usr/bin/sudo -u hg /usr/local/bin/repo-push.sh -d -e users/%s/%s' %
+                (repo_dir, repo_name))
     purge_log = open('/tmp/pushlog_purge.%s' % os.getpid(), "a")
     purge_log.write('echo users/%s/%s\n' % (repo_dir, repo_name))
     purge_log.close()
