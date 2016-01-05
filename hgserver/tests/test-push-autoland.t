@@ -13,10 +13,7 @@ Create repository and user
   > ssh = ssh -o "SendEnv AUTOLAND_REQUEST_USER" -F `pwd`/ssh_config -i `pwd`/autoland -l bind-autoland@mozilla.com
   > EOF
 
-Needed so hgweb_dir refreshes.
-TODO we should fix this in hgweb_dir or a hack of hgweb_dir, support for
-this is in Mercurial 3.6
-  $ sleep 1
+  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
 Pushing a commit to a repo works
 
@@ -43,6 +40,8 @@ Pushing a commit to a repo works
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
+
+  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
 Pushlog should be replicated
 

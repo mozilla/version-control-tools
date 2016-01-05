@@ -73,6 +73,8 @@
   remote:   https://hg.mozilla.org/mozilla-central/rev/e7d8e0aefcf6
   exporting bookmark bm2
 
+  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
 Bookmarks get replicated to mirrors
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-bookmarks
@@ -120,6 +122,8 @@ Push a bookmark update
   remote:   https://hg.mozilla.org/mozilla-central/rev/b222465a31a1
   updating bookmark bm2
 
+  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-bookmarks
   200
   
@@ -150,6 +154,8 @@ Push a non-forward bookmark update
   updating bookmark bm2
   [1]
 
+  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-bookmarks
   200
   
@@ -177,6 +183,8 @@ Push a bookmark delete
   deleting remote bookmark bm1
   [1]
 
+  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-bookmarks
   200
   
@@ -199,6 +207,8 @@ Remove all bookmarks
   remote: replication of bookmarks data completed successfully in \d+\.\ds (re)
   deleting remote bookmark bm2
   [1]
+
+  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-bookmarks
   200
