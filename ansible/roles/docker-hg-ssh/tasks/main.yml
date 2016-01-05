@@ -15,7 +15,6 @@
   copy: src={{ item }} dest=/{{ item }} mode=0755
   with_items:
     - activate-hook
-    - activate-vcsreplicator
     - create-repo
     - set-ldap-property
     - set-mirrors.py

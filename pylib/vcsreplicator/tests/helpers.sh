@@ -6,7 +6,6 @@
 
 vcsrenv() {
   hgmoenv
-  hgmo exec hgssh /activate-vcsreplicator --global > /dev/null
 
   cat >> vcsreplicator.ini << EOF
 [consumer]

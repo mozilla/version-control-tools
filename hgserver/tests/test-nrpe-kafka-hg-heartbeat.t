@@ -2,8 +2,6 @@
 
   $ . $TESTDIR/hgserver/tests/helpers.sh
   $ hgmoenv
-  $ hgmo exec hgssh /activate-vcsreplicator --global
-  activated vcsreplicator globally
 
   $ alias check='hgmo exec hgssh /usr/lib64/nagios/plugins/custom/check_kafka_hg_heartbeat'
 

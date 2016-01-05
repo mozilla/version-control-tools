@@ -2,8 +2,6 @@
 
   $ . $TESTDIR/hgserver/tests/helpers.sh
   $ hgmoenv
-  $ hgmo exec hgssh /activate-vcsreplicator --global
-  activated vcsreplicator globally
 
 check_zookeeper without any arguments will error
 
