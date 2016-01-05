@@ -132,8 +132,6 @@ vcsreplicator short circuits existing replication hook when loaded
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   remote: recorded push in pushlog
-  remote: legacy replication of phases disabled because vcsreplicator is loaded
-  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/d219c2f75f91

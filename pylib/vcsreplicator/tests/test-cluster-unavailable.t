@@ -51,8 +51,6 @@ Disabling a single Kafka node should still allow push to go through
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: legacy replication of phases disabled because vcsreplicator is loaded
-  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/40a8cea9915c
@@ -102,8 +100,6 @@ Adding node back in should result in being able to push again
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: legacy replication of phases disabled because vcsreplicator is loaded
-  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/f783dc6187dd
@@ -148,8 +144,6 @@ clean shutdown (which there was).
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: legacy replication of phases disabled because vcsreplicator is loaded
-  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/324ebd5068e8
@@ -182,8 +176,6 @@ Stopping Kafka on hgssh node doesn't break pushes
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: legacy replication of phases disabled because vcsreplicator is loaded
-  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/145bfa9e3455

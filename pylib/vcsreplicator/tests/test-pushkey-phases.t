@@ -33,7 +33,6 @@ Create the repository and push a change
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
@@ -74,7 +73,6 @@ Locally bumping changeset to public will trigger a pushkey
   pushing to ssh://*:$HGPORT/mozilla-central (glob)
   searching for changes
   no changes found
-  remote: legacy replication of phases disabled because vcsreplicator is loaded
   remote: recorded updates to phases in replication log in \d\.\d+s (re)
   [1]
 
@@ -117,8 +115,6 @@ processing on the mirror.
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
   remote: recorded push in pushlog
-  remote: legacy replication of phases disabled because vcsreplicator is loaded
-  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/7dea706c1724

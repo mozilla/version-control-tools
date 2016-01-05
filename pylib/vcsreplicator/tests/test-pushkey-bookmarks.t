@@ -24,8 +24,6 @@ Create the repository and push a change
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: legacy replication of phases disabled because vcsreplicator is loaded
-  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
@@ -60,7 +58,6 @@ Creating a bookmark will write a pushkey message
   pushing to ssh://*:$HGPORT/mozilla-central (glob)
   searching for changes
   no changes found
-  remote: legacy replication of bookmarks disabled because vcsreplicator is loaded
   remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
   exporting bookmark my-bookmark
   [1]
@@ -104,9 +101,6 @@ We send a changegroup and a pushkey but don't process them immediately
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: legacy replication of phases disabled because vcsreplicator is loaded
-  remote: legacy replication of bookmarks disabled because vcsreplicator is loaded
-  remote: legacy replication of changegroup disabled because vcsreplicator is loaded
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/2777163b5938

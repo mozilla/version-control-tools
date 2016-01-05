@@ -31,8 +31,6 @@ def _replicate(ui, repo, what):
     # until it is generally deployed.)
     try:
         extensions.find('vcsreplicator')
-        ui.write('legacy replication of %s disabled because vcsreplicator '
-                 'is loaded\n' % what)
         return 0
     except Exception:
         pass
