@@ -11,7 +11,6 @@ import shlex
 from subprocess import (
     Popen,
     PIPE,
-    STDOUT,
 )
 
 from ldap_helper import (
