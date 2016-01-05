@@ -54,8 +54,20 @@ class CommitRewriteResource(WebAPIResource):
             if not child_request.approved:
                 return AUTOLAND_REVIEW_NOT_APPROVED
 
-            reviewers = map(lambda review: review.user.username,
-                            gen_latest_reviews(child_request))
+            reviewers = [
+                r.user.username for r in gen_latest_reviews(child_request) if
+                r.ship_it and
+                r.user != child_request.submitter
+            ]
+
+            if not reviewers and child_request.approved:
+                # This review request is approved (the repeated check is
+                # to ensure this is guaranteed if other parts of the code
+                # change) but we have an empty list of reviewers. We'll
+                # assume the author has just approved this themself and
+                # set r=me
+                reviewers.append('me')
+
             result.append({
                 'commit': child[0],
                 'id': child[1],
