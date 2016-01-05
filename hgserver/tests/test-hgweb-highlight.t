@@ -5,6 +5,7 @@
   $ standarduser
 
   $ hgmo create-repo mozilla-central 1
+  (recorded repository creation in replication log)
   $ hg -q clone ssh://${SSH_SERVER}:$HGPORT/mozilla-central
   $ cd mozilla-central
 
@@ -31,12 +32,11 @@ Create a repository
   remote: adding file changes
   remote: added 2 changesets with 3 changes to 3 files
   remote: recorded push in pushlog
-  remote: replication of phases data completed successfully in \d+\.\d+s (re)
-  remote: replication of changegroup data completed successfully in \d+\.\d+s (re)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
   remote:   https://hg.mozilla.org/mozilla-central/rev/eefea2647aef
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 

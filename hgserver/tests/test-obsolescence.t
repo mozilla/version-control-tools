@@ -12,6 +12,7 @@ as a workaround.
   $ hgmo exec hgssh /set-mirrors.py
 
   $ hgmo create-repo users/user_example.com/repo-1 1
+  (recorded repository creation in replication log)
   $ hg -q clone ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
 
 Mark repo as non-publishing
@@ -77,12 +78,12 @@ Create initial repo content
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 3 files (+1 heads)
   remote: recorded push in pushlog
-  remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/77538e1ce4be
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/ba1c6c2be69c
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/a9e729deb87c
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
   $ cd ..
 
 Create another clone
@@ -110,10 +111,10 @@ Create some obsolescence markers
   remote: added 1 changesets with 0 changes to 1 files
   remote: recorded push in pushlog
   remote: 1 new obsolescence markers
-  remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/5217e2ac5b15
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
   $ cd ..
 
 Pulling should get the obsmarkers

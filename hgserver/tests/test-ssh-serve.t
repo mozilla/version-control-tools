@@ -13,6 +13,7 @@
 We are able to clone via SSH
 
   $ hgmo create-repo repo1 1
+  (recorded repository creation in replication log)
   $ hg clone ssh://$SSH_SERVER:$HGPORT/repo1
   destination directory: repo1
   no changes found
@@ -40,10 +41,9 @@ A push works
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: replication of phases data completed successfully in \d+\.\ds (re)
-  remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/repo1/rev/77538e1ce4be
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ hgmo clean

@@ -7,6 +7,7 @@
 Create and seed repository
 
   $ hgmo create-repo mozilla-central 1
+  (recorded repository creation in replication log)
 
   $ hg clone ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central > /dev/null
   $ cd mozilla-central

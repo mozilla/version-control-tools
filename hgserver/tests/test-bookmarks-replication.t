@@ -5,6 +5,7 @@
   $ standarduser
 
   $ hgmo create-repo mozilla-central 1
+  (recorded repository creation in replication log)
   $ hg -q clone ssh://$SSH_SERVER:$HGPORT/mozilla-central
   $ cd mozilla-central
 
@@ -48,13 +49,11 @@
   remote: adding file changes
   remote: added 2 changesets with 2 changes to 1 files
   remote: recorded push in pushlog
-  remote: replication of phases data completed successfully in \d+\.\ds (re)
-  remote: replication of bookmarks data completed successfully in \d+\.\ds (re)
-  remote: replication of changegroup data completed successfully in \d+\.\ds (re)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
   remote:   https://hg.mozilla.org/mozilla-central/rev/04da6c25817b
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
   exporting bookmark bm1
 
   $ hg push -B bm2
@@ -65,12 +64,10 @@
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   remote: recorded push in pushlog
-  remote: replication of phases data completed successfully in \d+\.\ds (re)
-  remote: replication of bookmarks data completed successfully in \d+\.\ds (re)
-  remote: replication of changegroup data completed successfully in \d+\.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/e7d8e0aefcf6
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
   exporting bookmark bm2
 
   $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
@@ -114,12 +111,10 @@ Push a bookmark update
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: replication of phases data completed successfully in \d+\.\ds (re)
-  remote: replication of bookmarks data completed successfully in \d+\.\ds (re)
-  remote: replication of changegroup data completed successfully in \d+\.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/b222465a31a1
+  remote: recorded changegroup in replication log in \d\.\d+s (re)
   updating bookmark bm2
 
   $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
@@ -150,7 +145,7 @@ Push a non-forward bookmark update
   pushing to ssh://*:$HGPORT/mozilla-central (glob)
   searching for changes
   no changes found
-  remote: replication of bookmarks data completed successfully in \d+\.\ds (re)
+  remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
   updating bookmark bm2
   [1]
 
@@ -179,7 +174,7 @@ Push a bookmark delete
   pushing to ssh://*:$HGPORT/mozilla-central (glob)
   searching for changes
   no changes found
-  remote: replication of bookmarks data completed successfully in \d+\.\ds (re)
+  remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
   deleting remote bookmark bm1
   [1]
 
@@ -204,7 +199,7 @@ Remove all bookmarks
   pushing to ssh://*:$HGPORT/mozilla-central (glob)
   searching for changes
   no changes found
-  remote: replication of bookmarks data completed successfully in \d+\.\ds (re)
+  remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
   deleting remote bookmark bm2
   [1]
 

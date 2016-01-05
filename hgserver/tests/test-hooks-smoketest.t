@@ -4,6 +4,7 @@
   $ hgmoenv
 
   $ hgmo create-repo mozilla-central 1
+  (recorded repository creation in replication log)
   $ standarduser
 
 Install hooks that mimic production

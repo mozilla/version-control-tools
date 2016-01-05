@@ -1,5 +1,4 @@
-# Uncomment to enable new experimental replication system.
-#%include /etc/mercurial/hgrc-vcsreplicator
+%include /etc/mercurial/hgrc-vcsreplicator
 
 [trusted]
 users = hg, root

@@ -7,6 +7,7 @@ Create repository and user
 
   $ export AUTOLAND_REQUEST_USER="autolandrequester@example.com"
   $ hgmo create-repo mozilla-central 3
+  (recorded repository creation in replication log)
   $ hgmo create-ldap-user bind-autoland@mozilla.com user1 1500 'Otto Land' --scm-level 3 --key-file autoland
   $ cat >> $HGRCPATH << EOF
   > [ui]
@@ -35,11 +36,10 @@ Pushing a commit to a repo works
   remote: added 1 changesets with 1 changes to 1 files
   remote: autoland push detected
   remote: recorded push in pushlog
-  remote: replication of phases data completed successfully in \d+.\ds (re)
-  remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
   $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 

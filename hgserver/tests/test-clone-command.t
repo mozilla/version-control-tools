@@ -5,8 +5,11 @@
   $ standarduser
 
   $ hgmo create-repo mozilla-central 3
+  (recorded repository creation in replication log)
   $ hgmo create-repo integration/mozilla-inbound 3
+  (recorded repository creation in replication log)
   $ hgmo create-repo hgcustom/version-control-tools 1
+  (recorded repository creation in replication log)
 
   $ hg -q clone ssh://$SSH_SERVER:$HGPORT/hgcustom/version-control-tools vct
   $ cd vct
@@ -20,11 +23,10 @@
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: replication of phases data completed successfully in \d+\.\ds (re)
-  remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/hgcustom/version-control-tools/rev/77538e1ce4be
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
   $ cd ..
 
 We should get a prompt saying we are creating a new user repo.
@@ -295,10 +297,10 @@ We are able to push to the new user repo
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  remote: replication of changegroup data completed successfully in \d+.\ds (re)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/72a8548a894a
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
   $ cd ..
 
