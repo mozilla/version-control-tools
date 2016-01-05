@@ -1,2 +1,0 @@
-%include /etc/mercurial/hgrc-vcsreplicator
-%include /etc/mercurial/hgrc

@@ -7,7 +7,6 @@
 # the VCS replication topic.
 
 import logging
-import os
 import subprocess
 import sys
 
@@ -25,10 +24,7 @@ if not kafkalogger.handlers:
 config = {}
 
 try:
-    # This is only needed until vcsreplicator is enabled by default.
-    env = dict(os.environ)
-    env['HGRCPATH'] = '/etc/mercurial/hgrc-all'
-    out = subprocess.check_output([HG, 'config'], env=env)
+    out = subprocess.check_output([HG, 'config'])
 
     for line in out.splitlines():
         k, v = line.split('=', 1)
