@@ -358,7 +358,7 @@ def edit_repo_description(repo_name):
     with open(config_path, 'w+') as fh:
         config.write(fh)
 
-    run_repo_push('-e users/%s/%s --hgrc' % (user_repo_dir, repo_name))
+    run_command('%s -R %s replicatehgrc' % (HG, repo_path))
 
 
 def set_repo_publishing(repo_name, publish):
@@ -385,7 +385,7 @@ def set_repo_publishing(repo_name, publish):
     with open(config_path, 'w') as fh:
         config.write(fh)
 
-    run_repo_push('-e users/%s/%s --hgrc' % (user_repo_dir, repo_name))
+    run_command('%s -R %s replicatehgrc' % (HG, repo_path))
 
     if publish:
         sys.stderr.write('Repository marked as publishing: changesets will '
@@ -413,7 +413,7 @@ def set_repo_obsolescence(repo_name, enabled):
     with open(config_path, 'w') as fh:
         config.write(fh)
 
-    run_repo_push('-e users/%s/%s --hgrc' % (user_repo_dir, repo_name))
+    run_command('%s -R %s replicatehgrc' % (HG, repo_path))
 
     if enabled:
         print(OBSOLESCENCE_ENABLED)
