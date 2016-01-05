@@ -213,7 +213,11 @@
   copy: src=repo-push.sudoers dest=/etc/sudoers.d/repo-push
 
 - name: global Mercurial config is in place
-  copy: src=hgrc dest=/etc/mercurial/hgrc mode=0664 owner=root group=root
+  template: src=hgrc.j2
+            dest=/etc/mercurial/hgrc
+            mode=0664
+            owner=root
+            group=root
 
 - name: install one-off vcsreplicator config until it is merged into global one
   template: src=hgrc-vcsreplicator.j2
