@@ -149,9 +149,11 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
     if not os.path.exists(userdir):
         run_command('mkdir %s' % userdir)
     print 'Please wait.  Cloning /%s to %s' % (source_repo_path, dest_url)
-    run_command('nohup %s clone --pull -U %s/%s %s' %
-                (HG, DOC_ROOT, source_repo_path, dest_dir))
-
+    run_command('nohup %s init %s' % (HG, dest_dir))
+    run_command('nohup %s -R %s pull %s/%s' % (HG, dest_dir, DOC_ROOT, source_repo_path))
+    run_command('nohup %s -R %s replicatesync' % (HG, dest_dir))
+    # TODO ensure user WSGI files are in place on hgweb machine.
+    # (even better don't rely on per-use WSGI files)
     print "Clone complete."
 
 

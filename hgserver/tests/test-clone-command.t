@@ -273,9 +273,18 @@ Saying "yes" to clone the repo will clone it.
   Fixing permissions, don't interrupt.
   Repository marked as non-publishing: draft changesets will remain in the draft phase when pushed.
 
+  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 cat /repo/hg/mozilla/users/user_example.com/repo-1/.hg/hgrc
+  [phases]
+  publish = False
+  
+
+TODO build user WSGI file generation into replication system
+  $ hgmo exec hgweb0 /usr/local/bin/make_user_wsgi_dirs.sh
+
 We are able to clone from the newly-created repo
 
-  $ hg clone ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1 user-repo-1
+  $ hg clone ${HGWEB_0_URL}users/user_example.com/repo-1 user-repo-1
   requesting all changes
   adding changesets
   adding manifests
@@ -289,7 +298,7 @@ We are able to push to the new user repo
   $ cd user-repo-1
   $ echo commit2 > foo
   $ hg commit -m 'commit 2'
-  $ hg push
+  $ hg push ssh://${SSH_SERVER}:${HGPORT}/users/user_example.com/repo-1
   pushing to ssh://*:$HGPORT/users/user_example.com/repo-1 (glob)
   searching for changes
   remote: adding changesets
