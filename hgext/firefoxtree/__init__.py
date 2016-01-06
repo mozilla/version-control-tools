@@ -382,7 +382,7 @@ def updateremoterefs(repo, remote, tree):
     # TODO Somehow the custom repo class is lost and the firefoxtrees attribute
     # isn't accessible. This is possibly a result of repo filter and/or clone
     # bundles interaction. See bug 1234396.
-    if not getattr(repo, 'firefoxtrees', None):
+    if getattr(repo, 'firefoxtrees', None) is None:
         return
 
     # We only care about the default branch. We could import
