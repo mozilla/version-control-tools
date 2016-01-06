@@ -144,6 +144,12 @@ $(document).on("mozreview_ready", function() {
             success: function() {
               MozReview.parentEditor.decr("editCount");
               MozReview.parentEditor.set('public', false);
+              // Our draft relies on a field that isn't part of RB's front-end
+              // model, so changes aren't picked up by the model automatically.
+              // Manually record a draft exists so the banner will be displayed.
+              var view = RB.PageManager.getPage().reviewRequestEditorView;
+              view.model.set("hasDraft", true);
+
               MozReview.parentEditor.trigger('saved');
 
             }
