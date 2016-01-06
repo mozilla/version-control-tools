@@ -16,11 +16,15 @@ Create some users
   $ mozreview create-user sarah.connor@example.com password 'Sarah Connor' --no-api-key
   Created user 10
 
-Unauthenticated users should not be able to search
+Unauthenticated users can search, but they will not cause any syncing of
+information from Bugzilla since an API key isn't available. Only the local
+Review Board user data is used.
+TODO this may change in future versions of ReviewBoard 2.5
 
   $ BUGZILLA_USERNAME= BUGZILLA_PASSWORD= rbmanage get-users joe
-  API Error: 500: 226: Bugzilla error: There is no Bugzilla API key on record for this user. Please log into MozReview's UI to have one generated.
-  [1]
+  - id: 4
+    url: /users/joe1%2B6/
+    username: joe1+6
 
   $ exportbzauth joe1@example.com password
 
