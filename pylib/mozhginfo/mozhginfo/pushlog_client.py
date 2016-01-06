@@ -155,7 +155,10 @@ def valid_revision(repo_url, revision):
         return VALID_CACHE[(repo_url, revision)]
 
     LOG.debug("Determine if the revision is valid.")
-    url = "%s?changeset=%s&tipsonly=1" % (repo_url, revision)
+    url = "%s?changeset=%s&tipsonly=1" % (
+        JSON_PUSHES % {"repo_url": repo_url},
+        revision
+    )
     data = requests.get(url).json()
     ret = True
 
