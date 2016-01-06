@@ -235,7 +235,7 @@ class MozReview(object):
         self.admin_password = bugzilla.password
         self.hg_rb_username = "mozreview"
         self.hg_rb_email = "mozreview@example.com"
-        self.hg_rb_password = "password"
+        self.hg_rb_password = "mrpassword"
         self.ldap_uri = mr_info['ldap_uri']
         self.hgrb_id = mr_info['hgrb_id']
         self.ssh_hostname = mr_info['ssh_hostname']

@@ -507,7 +507,7 @@ class ReviewBoardCommands(object):
         description='Print the ldap username of a Review Board user.')
     @CommandArgument('username', help='Username whose info the print')
     def dump_user_ldap(self, username):
-        root = self._get_root(username="mozreview", password="password")
+        root = self._get_root(username="mozreview", password="mrpassword")
         ext = root.get_extension(
             extension_name='mozreview.extension.MozReviewExtension')
         user = ext.get_ldap_associations().get_item(username).ldap_username
@@ -524,7 +524,7 @@ class ReviewBoardCommands(object):
     def associate_ldap_user(self, username, email):
         # We use the "mozreview" account which has the special permission
         # to read / associate ldap email addresses.
-        root = self._get_root(username="mozreview", password="password")
+        root = self._get_root(username="mozreview", password="mrpassword")
         ext = root.get_extension(
             extension_name='mozreview.extension.MozReviewExtension')
 

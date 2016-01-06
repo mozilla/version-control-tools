@@ -3,7 +3,7 @@ repoconfig() {
 [reviewboard]
 repoid = 1
 username=mozreview
-password=password
+password=mrpassword
 EOF
 }
 
