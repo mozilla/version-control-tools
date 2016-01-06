@@ -162,6 +162,11 @@ RELEASE_TREES = set([
 ])
 
 
+TRY_TREES = set([
+    'try',
+    'try-comm',
+])
+
 def resolve_trees_to_official(trees):
     mapped = []
     for tree in trees:

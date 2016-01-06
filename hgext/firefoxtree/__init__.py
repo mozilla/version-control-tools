@@ -95,6 +95,7 @@ from mozautomation.repository import (
     MULTI_TREE_ALIASES,
     resolve_trees_to_uris,
     resolve_uri_to_tree,
+    TRY_TREES,
 )
 
 testedwith = '3.3 3.4 3.5 3.6'
@@ -226,6 +227,11 @@ def readfirefoxtrees(repo):
             continue
 
         tree, hexnode = line.split()
+
+        # Filter out try repos because they are special.
+        if tree in TRY_TREES:
+            continue
+
         trees[tree] = bin(hexnode)
 
     return trees
@@ -236,6 +242,10 @@ def writefirefoxtrees(repo):
     lines = []
     trees = {}
     for tree, node in sorted(repo.firefoxtrees.items()):
+        # Filter out try repos because they are special.
+        if tree in TRY_TREES:
+            continue
+
         assert len(node) == 20
         lines.append('%s %s' % (tree, hex(node)))
         trees[tree] = hex(node)
@@ -383,6 +393,10 @@ def updateremoterefs(repo, remote, tree):
     # isn't accessible. This is possibly a result of repo filter and/or clone
     # bundles interaction. See bug 1234396.
     if getattr(repo, 'firefoxtrees', None) is None:
+        return
+
+    # Ignore try repos because they are special.
+    if tree in TRY_TREES:
         return
 
     # We only care about the default branch. We could import

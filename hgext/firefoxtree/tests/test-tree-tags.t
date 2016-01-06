@@ -98,3 +98,26 @@ hg fxheads revset gives known tree commits
   2 
   1 b2ginbound central
   0 
+
+"try" is filtered from firefoxtrees
+
+  $ cat >> .hg/firefoxtrees << EOF
+  > 
+  > try 994ec05999daf04fb3c01a8cb0dea1458a7d4d3d
+  > EOF
+
+  $ hg pull fxtrees
+  pulling from b2ginbound
+  searching for changes
+  no changes found
+  pulling from central
+  searching for changes
+  no changes found
+  pulling from inbound
+  searching for changes
+  no changes found
+
+  $ cat .hg/firefoxtrees
+  b2ginbound 994ec05999daf04fb3c01a8cb0dea1458a7d4d3d
+  central 994ec05999daf04fb3c01a8cb0dea1458a7d4d3d
+  inbound 1b348279b0e9b3c29568b6abc8a1776a68d39261 (no-eol)
