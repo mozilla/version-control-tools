@@ -4,6 +4,9 @@ from mozautomation.commitparser import (
     strip_commit_metadata,
 )
 
+from mozreview.bugzilla.client import (
+    BugzillaAttachmentUpdates,
+)
 from mozreview.models import (
     BugzillaUserMap,
     get_or_create_bugzilla_users,
@@ -18,8 +21,10 @@ from mozreview.review_helpers import (
 
 def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
                                 children_to_obsolete):
+    attachment_updates = BugzillaAttachmentUpdates(bugzilla, bug_id)
+
     for child in children_to_obsolete:
-        bugzilla.obsolete_review_attachments(bug_id, get_obj_url(child))
+        attachment_updates.obsolete_review_attachments(get_obj_url(child))
 
     # We publish attachments for each commit/child to Bugzilla so that
     # reviewers can easily track their requests.
@@ -100,9 +105,11 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
                                                 diffset_count,
                                                 diffset_count + 1))
 
-        bugzilla.post_rb_url(bug_id,
-                             review_request.id,
-                             review_request_draft.summary,
-                             comment,
-                             diff_url,
-                             reviewers)
+        attachment_updates.create_or_update_attachment(
+            review_request.id,
+            review_request_draft.summary,
+            comment,
+            diff_url,
+            reviewers)
+
+    attachment_updates.do_updates()

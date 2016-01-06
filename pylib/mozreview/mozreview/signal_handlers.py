@@ -33,6 +33,7 @@ from mozreview.bugzilla.attachments import (
 )
 from mozreview.bugzilla.client import (
     Bugzilla,
+    BugzillaAttachmentUpdates,
 )
 from mozreview.bugzilla.errors import (
     BugzillaError,
@@ -496,7 +497,9 @@ def on_review_request_closed_discarded(user, review_request, type, **kwargs):
         b = Bugzilla(get_bugzilla_api_key(user))
         bug = int(review_request.get_bug_list()[0])
         diff_url = '%sdiff/#index_header' % get_obj_url(review_request)
-        b.obsolete_review_attachments(bug, diff_url)
+        attachment_updates = BugzillaAttachmentUpdates(b, bug)
+        attachment_updates.obsolete_review_attachments(diff_url)
+        attachment_updates.do_updates()
 
 
 def on_review_request_closed_submitted(user, review_request, type, **kwargs):
