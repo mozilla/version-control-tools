@@ -1,6 +1,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import json
 import os
 from StringIO import StringIO
 import urllib
@@ -535,6 +536,7 @@ def publishreviewseries(repo, proto, args=None):
     assert isinstance(res, str)
     return res
 
+
 @wireproto.wireprotocommand('listreviewrepos')
 def listreviewrepos(repo, proto, args=None):
     """List review repositories we can push to.
@@ -543,4 +545,11 @@ def listreviewrepos(repo, proto, args=None):
     pushing reviews. Returns empty string if nothing is defined, which is
     harmless.
     """
-    return repo.vfs.tryread('reviewrepos')
+    # TODO convert on disk format to JSON
+    d = {}
+    for line in repo.vfs.tryreadlines('reviewrepos'):
+        line = line.strip()
+        node, urls = line.split(' ', 1)
+        urls = urls.split(' ')
+        d[node] = urls
+    return json.dumps(d, sort_keys=True)

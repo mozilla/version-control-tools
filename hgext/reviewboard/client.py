@@ -21,6 +21,7 @@ This extension adds new options to the `push` command:
 """
 
 import errno
+import json
 import os
 import sys
 import urllib
@@ -87,6 +88,11 @@ clientcapabilities = {
     'bzapikeys',
     'jsonproto',
 }
+
+def calljsoncommand(remote, command):
+    """Call a wire protocol command parse the response as JSON."""
+    return json.loads(remote._call(command))
+
 
 def decodepossiblelistvalue(v):
     """Decode a wire protocol value that may be a list.
@@ -229,10 +235,10 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
         rootnode = repo[0].hex()
 
         repo.ui.status(_('searching for appropriate review repository\n'))
-        for line in remote._call('listreviewrepos').splitlines():
-            node, urls = line.split(' ', 1)
+        data = calljsoncommand(remote, 'listreviewrepos')
+        for node, urls in data.iteritems():
             if node == rootnode:
-                newurls = urls.split(' ')
+                newurls = urls
                 break
         else:
             raise util.Abort(_('no review repository found'))
