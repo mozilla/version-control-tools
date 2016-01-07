@@ -522,7 +522,7 @@ def associate_ldap_username(url, ldap_username, privileged_username,
         # Now that we have proven ownership over the user, take the provided
         # ldap_username and associate it with the account.
         with ReviewBoardClient(url, username=privileged_username,
-                               password=privileged_password):
+                               password=privileged_password) as rbc:
             root = rbc.get_root()
             ext = root.get_extension(
                 extension_name='mozreview.extension.MozReviewExtension')
