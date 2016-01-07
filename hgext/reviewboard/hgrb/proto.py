@@ -423,27 +423,20 @@ def reviewboard(repo, proto, args=None):
 
 @wireproto.wireprotocommand('pullreviews', '*')
 def pullreviews(repo, proto, args=None):
-    import json
-
     proto.redirect()
-
-    o = parsepayload(proto, args)
-    if isinstance(o, ServerError):
-        return formatresponse(str(o))
-
-    lines = ['1']
+    req = parsejsonpayload(proto, args)
 
     from reviewboardmods.pushhooks import ReviewBoardClient
     client = ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
-                               username=o['bzusername'],
-                               apikey=o['bzapikey'])
+                               username=req.get('bzusername'),
+                               apikey=req.get('bzapikey'))
     root = client.get_root()
 
-    for k, v in o['other']:
-        if k != 'reviewid':
-            continue
+    res = {
+        'reviewrequests': {},
+    }
 
-        identifier = urllib.unquote(v)
+    for identifier in req.get('identifiers', []):
         rrs = root.get_review_requests(commit_id=identifier)
 
         if rrs.total_results != 1:
@@ -470,31 +463,22 @@ def pullreviews(repo, proto, args=None):
                 else:
                     commits = '[]'
 
-            lines.append('parentreview %s %s' % (
-                urllib.quote(identifier), rr.id))
             for relation in json.loads(commits):
-                node = relation[0].encode('utf-8')
                 rid = str(relation[1])
 
-                lines.append('csetreview %s %s %s' % (rr.id, node, rid))
-                lines.append('reviewdata %s status %s' % (rid,
-                    urllib.quote(rr.status.encode('utf-8'))))
-                lines.append('reviewdata %s public %s' % (rid, rr.public))
+                res['reviewrequests'][str(rid)] = {
+                    'status': rr.status,
+                    'public': rr.public,
+                }
 
-        lines.append('reviewdata %s status %s' % (rr.id,
-            urllib.quote(rr.status.encode('utf-8'))))
-        lines.append('reviewdata %s public %s' % (rr.id, rr.public))
+        res['reviewrequests'][str(rr.id)] = {
+            'status': rr.status,
+            'public': rr.public,
+            'reviewers': [p.title for p in rr.target_people],
+        }
 
-        reviewers = [urllib.quote(p.title.encode('utf-8'))
-                     for p in rr.target_people]
-        if reviewers:
-            lines.append('reviewdata %s reviewers %s' %
-                         (rid, ','.join(reviewers)))
+    return json.dumps(res, sort_keys=True)
 
-    res = '\n'.join(lines)
-    assert isinstance(res, str)
-
-    return res
 
 @wireproto.wireprotocommand('publishreviewrequests', '*')
 def publishreviewseries(repo, proto, args=None):

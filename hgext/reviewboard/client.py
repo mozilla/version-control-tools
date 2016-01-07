@@ -747,36 +747,15 @@ def _pullreviewidentifiers(repo, identifiers):
         raise util.Abort('cannot pull code review metadata; '
                          'server lacks necessary features')
 
-    lines = commonrequestlines(repo.ui)
-    for identifier in identifiers:
-        lines.append('reviewid %s' % identifier)
+    req = commonrequestdict(repo.ui)
+    req['identifiers'] = [str(i) for i in identifiers]
+    res = calljsoncommand(remote, 'pullreviews', data=req)
 
-    res = remote._call('pullreviews', data='\n'.join(lines))
-    lines = getpayload(res)
-
-    reviewdata = {}
-
-    for line in lines:
-        t, d = line.split(' ', 1)
-
-        if t == 'parentreview':
-            identifier, parentid = map(urllib.unquote, d.split(' ', 2))
-            reviewdata[parentid] = {}
-        elif t == 'csetreview':
-            parentid, node, rid = map(urllib.unquote, d.split(' ', 3))
-            reviewdata[rid] = {}
-        elif t == 'reviewdata':
-            rid, field, value = map(urllib.unquote, d.split(' ', 3))
-            reviewdata.setdefault(rid, {})[field] = decodepossiblelistvalue(value)
-        elif t == 'error':
-            raise util.Abort(d)
-        else:
-            raise util.Abort(_('unknown value in response payload: %s') % t)
-
-    for rid, data in reviewdata.iteritems():
+    for rid, data in sorted(res['reviewrequests'].iteritems()):
         reviews.savereviewrequest(rid, data)
 
-    return reviewdata
+    return res['reviewrequests']
+
 
 class identifierrecord(object):
     """Describes a review identifier in the context of the store."""
@@ -917,6 +896,8 @@ class reviewstore(object):
             if isinstance(v, list):
                 parts = [urllib.quote(p) for p in v]
                 lines.append('%s %s' % (k, ','.join(parts)))
+            elif isinstance(v, bool):
+                lines.append('%s %s' % (k, v))
             else:
                 lines.append('%s %s' % (k, urllib.quote(v)))
 
