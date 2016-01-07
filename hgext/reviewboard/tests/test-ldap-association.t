@@ -60,6 +60,67 @@ The user should now have an associated ldap_username
   $ rbmanage dump-user-ldap user1
   ldap username: user1@example.com
 
+Create another user
+
+  $ mozreview create-user user2@example.com tastypassword 'User Two [:user2]' --uid 2001 --scm-level 1
+  Created user 7
+  $ user1key=`mozreview create-api-key user2@example.com`
+  $ exportbzauth user2@example.com tastypassword
+
+Dump the user so it gets mirrored over to Review Board
+
+  $ rbmanage dump-user user2 > /dev/null
+
+The user should not have an ldap username associated with them
+
+  $ rbmanage dump-user-ldap user2
+  no ldap username associated with user2
+
+The user should not be able to change their own ldap email association
+
+  $ rbmanage associate-ldap-user user2 user2@example.com --request-username=user2 --request-password=tastypassword
+  API Error: 403: 101: You don't have permission for this
+  [1]
+
+The user should still have no ldap username associated with them
+
+  $ rbmanage dump-user-ldap user2
+  no ldap username associated with user2
+
+A user without the special permission should not be able to change the association of
+another user
+
+  $ rbmanage associate-ldap-user user2 user2@example.com --request-username=user1 --request-password=password1
+  API Error: 403: 101: You don't have permission for this
+  [1]
+
+The user should still have no ldap username associated with them
+
+  $ rbmanage dump-user-ldap user2
+  no ldap username associated with user2
+
+An unauthenticated request should not be able to change an association
+
+  $ rbmanage associate-ldap-user user2 user2@example.com --anonymous
+  API Error: 401: 103: You are not logged in
+  [1]
+
+The user should still have no ldap username associated with them
+
+  $ rbmanage dump-user-ldap user2
+  no ldap username associated with user2
+
+The special user should be able to associate the ldap account after all of
+the failed attempts
+
+  $ rbmanage associate-ldap-user user2 user2@example.com
+  user2@example.com associated with user2
+
+The user should now have an associated ldap_username
+
+  $ rbmanage dump-user-ldap user2
+  ldap username: user2@example.com
+
 Cleanup
 
   $ mozreview stop

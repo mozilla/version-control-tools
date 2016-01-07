@@ -148,7 +148,7 @@ class ReviewBoardCommands(object):
         else:
             self.mr = None
 
-    def _get_client(self, username=None, password=None):
+    def _get_client(self, username=None, password=None, anonymous=False):
         from rbtools.api.client import RBClient
         from rbtools.api.transport.sync import SyncTransport
 
@@ -174,11 +174,16 @@ class ReviewBoardCommands(object):
         except Exception:
             pass
 
+        if anonymous:
+            return RBClient(self.mr.reviewboard_url,
+                            transport_cls=NoCacheTransport)
+
         return RBClient(self.mr.reviewboard_url, username=username,
                         password=password, transport_cls=NoCacheTransport)
 
-    def _get_root(self, username=None, password=None):
-        return self._get_client(username=username, password=password).get_root()
+    def _get_root(self, username=None, password=None, anonymous=False):
+        return self._get_client(username=username, password=password,
+                                anonymous=anonymous).get_root()
 
     def _get_rb(self, path=None):
         from vcttesting.reviewboard import MozReviewBoard
@@ -521,15 +526,35 @@ class ReviewBoardCommands(object):
         description='Associate an LDAP email address with a user.')
     @CommandArgument('username', help='Username to associate with ldap')
     @CommandArgument('email', help='LDAP email to associate')
-    def associate_ldap_user(self, username, email):
-        # We use the "mozreview" account which has the special permission
-        # to read / associate ldap email addresses.
-        root = self._get_root(username="mozreview", password="mrpassword")
+    @CommandArgument('--request-username',
+                     default='mozreview',
+                     help='Username to make request with')
+    @CommandArgument('--request-password',
+                     default='mrpassword',
+                     help='Password to make request with')
+    @CommandArgument('--anonymous',
+                     action='store_true',
+                     default=False,
+                     help='Make the request anonymously')
+    def associate_ldap_user(self, username, email, request_username,
+                            request_password, anonymous):
+        from rbtools.api.errors import APIError
+
+        # We use the "mozreview" account by default which has the special
+        # permission to read / associate ldap email addresses.
+        root = self._get_root(username=request_username,
+                              password=request_password,
+                              anonymous=anonymous)
         ext = root.get_extension(
             extension_name='mozreview.extension.MozReviewExtension')
 
-        association = ext.get_ldap_associations().get_item(username)
-        association.update(ldap_username=email)
+        try:
+            association = ext.get_ldap_associations().get_item(username)
+            association.update(ldap_username=email)
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                e.rsp['err']['msg']))
+            return 1
 
         print('%s associated with %s' % (email, username))
 
