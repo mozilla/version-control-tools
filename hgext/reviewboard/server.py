@@ -68,6 +68,8 @@ requirecaps = set([
     'bzapikeys',
     # Client knows how to perform autodiscovery of review repos.
     'listreviewrepos',
+    # client-server exchange uses JSON.
+    'jsonproto',
 ])
 
 

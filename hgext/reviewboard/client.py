@@ -85,6 +85,7 @@ clientcapabilities = {
     'listreviewdata',
     'listreviewrepos',
     'bzapikeys',
+    'jsonproto',
 }
 
 def decodepossiblelistvalue(v):
