@@ -60,6 +60,20 @@ Create a review request from an L1 user
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
@@ -88,6 +102,20 @@ Have an L1 user provide a ship it review which should not grant approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1
@@ -124,6 +152,20 @@ Have an L3 user provide a ship it review which should grant approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: true
   approval_failure: null
   review_count: 2
@@ -164,6 +206,20 @@ Posting a new review without ship it should cancel the previous approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 3
@@ -211,6 +267,20 @@ One more ship it should switch it back to approved
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: true
   approval_failure: null
   review_count: 4
@@ -266,6 +336,33 @@ Since the author is L1, adding a new diff should cancel approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
+  - id: 4
+    revision: 2
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +modified
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 4
@@ -319,6 +416,33 @@ A new ship-it from L3 should give approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
+  - id: 4
+    revision: 2
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +modified
+    - ''
   approved: true
   approval_failure: null
   review_count: 5
@@ -383,6 +507,33 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
+  - id: 4
+    revision: 2
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +modified
+    - ''
   approved: false
   approval_failure: The review request has open issues.
   review_count: 6
@@ -460,6 +611,33 @@ Fixing the issue should restore approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
+  - id: 4
+    revision: 2
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +modified
+    - ''
   approved: true
   approval_failure: null
   review_count: 6
@@ -545,6 +723,20 @@ Review requests created by L3 users
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 6
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +author2
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
@@ -573,6 +765,20 @@ Even a ship-it from an L1 user will give approval to an L3 author
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 6
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +author2
+    - ''
   approved: true
   approval_failure: null
   review_count: 1
@@ -612,6 +818,33 @@ ship-its. Posting a new diff should not clear approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 6
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +author2
+    - ''
+  - id: 8
+    revision: 2
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +modified2
+    - ''
   approved: true
   approval_failure: null
   review_count: 1

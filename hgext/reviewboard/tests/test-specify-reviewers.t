@@ -227,6 +227,27 @@ Publishing series during push works
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 10
+    revision: 1
+    base_commit_id: 42c4d67a510ecafa656b9410af8a274b7b9e2edb
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,8 +1,9 @@'
+    - ' initial'
+    - ' blah'
+    - ' blah'
+    - ' blah'
+    - ' blah'
+    - ' blah'
+    - ' blah'
+    - ' blah'
+    - +blah
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 

@@ -97,6 +97,26 @@ Create and publish a review for SnarkBot
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo0
+    - +foo1
+    - diff --git a/foo1 b/foo1
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo1
+    - '@@ -0,0 +1,1 @@'
+    - +foo1
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1

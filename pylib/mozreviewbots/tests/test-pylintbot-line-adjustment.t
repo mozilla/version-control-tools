@@ -100,6 +100,66 @@ Line numbers for these failures should be adjusted -= 1 and cover 2 lines
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/e121.py b/e121.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e121.py
+    - '@@ -0,0 +1,2 @@'
+    - +sorted(
+    - +  [1, 2])
+    - diff --git a/e122.py b/e122.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e122.py
+    - '@@ -0,0 +1,2 @@'
+    - +sorted(
+    - +[1, 2])
+    - diff --git a/e126.py b/e126.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e126.py
+    - '@@ -0,0 +1,2 @@'
+    - +sorted(
+    - +        [1, 2])
+    - diff --git a/e127.py b/e127.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e127.py
+    - '@@ -0,0 +1,2 @@'
+    - +sorted([1, 2],
+    - +        cmp=None)
+    - diff --git a/e128.py b/e128.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e128.py
+    - '@@ -0,0 +1,2 @@'
+    - +sorted([1, 2],
+    - +    cmp=None)
+    - diff --git a/e131.py b/e131.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e131.py
+    - '@@ -0,0 +1,3 @@'
+    - +l = [
+    - +    1,
+    - +   2]
+    - diff --git a/e301.py b/e301.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e301.py
+    - '@@ -0,0 +1,4 @@'
+    - '+class Foo(object):'
+    - +    x = None
+    - '+    def foo():'
+    - +        pass
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1
@@ -243,6 +303,24 @@ Create tests for line -= 2
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 4
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/e302.py b/e302.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e302.py
+    - '@@ -0,0 +1,5 @@'
+    - '+def foo():'
+    - +    pass
+    - +
+    - '+def bar():'
+    - +    pass
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1

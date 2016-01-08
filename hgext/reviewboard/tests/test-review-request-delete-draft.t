@@ -86,6 +86,20 @@ We should have a disagreement between published and draft
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +foo1
+    - ''
   approved: false
   approval_failure: Commit 0aca5e4417025c80407d8f7f22864e8d09fbec50 is not approved.
   draft:
@@ -110,6 +124,8 @@ We should have a disagreement between published and draft
     - id: 3
       revision: 2
       base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+      name: diff
+      extra: {}
       patch:
       - diff --git a/foo b/foo
       - '--- a/foo'
@@ -137,6 +153,20 @@ We should have a disagreement between published and draft
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +foo1
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   draft:
@@ -157,6 +187,8 @@ We should have a disagreement between published and draft
     - id: 4
       revision: 2
       base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+      name: diff
+      extra: {}
       patch:
       - diff --git a/foo b/foo
       - '--- a/foo'
@@ -193,6 +225,20 @@ Discarding the parent review request draft should discard draft on children
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +foo1
+    - ''
   approved: false
   approval_failure: Commit 0aca5e4417025c80407d8f7f22864e8d09fbec50 is not approved.
 
@@ -214,6 +260,20 @@ Discarding the parent review request draft should discard draft on children
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +foo1
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 

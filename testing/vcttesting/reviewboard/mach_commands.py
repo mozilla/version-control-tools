@@ -28,6 +28,17 @@ def _serialize_text(s):
     return s
 
 
+def dict_from_diff(diff):
+    d = OrderedDict()
+    d['id'] = diff.id
+    d['revision'] = diff.revision
+    d['base_commit_id'] = diff.base_commit_id
+    d['name'] = diff.name
+    d['extra'] = dict(diff.extra_data.iteritems())
+    d['patch'] = diff.get_patch().data.splitlines()
+    return d
+
+
 def serialize_review_requests(rr):
     from rbtools.api.errors import APIError
     d = OrderedDict()
@@ -41,6 +52,10 @@ def serialize_review_requests(rr):
     d['description'] = _serialize_text(rr.description)
     d['target_people'] = [p.get().username for p in rr.target_people]
     d['extra_data'] = dict(rr.extra_data.iteritems())
+    d['diffs'] = []
+    for diff in rr.get_diffs():
+        d['diffs'].append(dict_from_diff(diff))
+
     d['approved'] = rr.approved
     d['approval_failure'] = rr.approval_failure
 
@@ -112,12 +127,7 @@ def serialize_review_requests(rr):
 
         ddraft['diffs'] = []
         for diff in draft.get_draft_diffs():
-            diffd = OrderedDict()
-            diffd['id'] = diff.id
-            diffd['revision'] = diff.revision
-            diffd['base_commit_id'] = diff.base_commit_id
-            diffd['patch'] = diff.get_patch().data.splitlines()
-            ddraft['diffs'].append(diffd)
+            ddraft['diffs'].append(dict_from_diff(diff))
 
     except APIError:
         pass

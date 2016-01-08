@@ -137,6 +137,44 @@ on publish.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo1 b/foo1
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo1
+    - '@@ -0,0 +1,1 @@'
+    - +foo1
+    - diff --git a/foo2 b/foo2
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo2
+    - '@@ -0,0 +1,1 @@'
+    - +foo2
+    - diff --git a/foo3 b/foo3
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo3
+    - '@@ -0,0 +1,1 @@'
+    - +foo3
+    - diff --git a/foo4 b/foo4
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo4
+    - '@@ -0,0 +1,1 @@'
+    - +foo4
+    - diff --git a/foo5 b/foo5
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo5
+    - '@@ -0,0 +1,1 @@'
+    - +foo5
+    - ''
   approved: false
   approval_failure: Commit 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e is not approved.
   draft:
@@ -163,6 +201,8 @@ on publish.
     - id: 7
       revision: 2
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+      name: diff
+      extra: {}
       patch:
       - diff --git a/foo1 b/foo1
       - new file mode 100644
@@ -218,6 +258,75 @@ The parent review should have dropped the reference to /r/6
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo1 b/foo1
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo1
+    - '@@ -0,0 +1,1 @@'
+    - +foo1
+    - diff --git a/foo2 b/foo2
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo2
+    - '@@ -0,0 +1,1 @@'
+    - +foo2
+    - diff --git a/foo3 b/foo3
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo3
+    - '@@ -0,0 +1,1 @@'
+    - +foo3
+    - diff --git a/foo4 b/foo4
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo4
+    - '@@ -0,0 +1,1 @@'
+    - +foo4
+    - diff --git a/foo5 b/foo5
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo5
+    - '@@ -0,0 +1,1 @@'
+    - +foo5
+    - ''
+  - id: 7
+    revision: 2
+    base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo1 b/foo1
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo1
+    - '@@ -0,0 +1,1 @@'
+    - +foo1
+    - diff --git a/foo2 b/foo2
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo2
+    - '@@ -0,0 +1,1 @@'
+    - +foo2
+    - diff --git a/foo3 b/foo3
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo3
+    - '@@ -0,0 +1,1 @@'
+    - +foo3
+    - diff --git a/foo4 b/foo4
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo4
+    - '@@ -0,0 +1,1 @@'
+    - +foo4
+    - ''
   approved: false
   approval_failure: Commit 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e is not approved.
 
@@ -241,6 +350,20 @@ Review 6 should be marked as discarded
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 6
+    revision: 1
+    base_commit_id: 98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo5 b/foo5
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo5
+    - '@@ -0,0 +1,1 @@'
+    - +foo5
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
@@ -302,6 +425,75 @@ on publish.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo1 b/foo1
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo1
+    - '@@ -0,0 +1,1 @@'
+    - +foo1
+    - diff --git a/foo2 b/foo2
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo2
+    - '@@ -0,0 +1,1 @@'
+    - +foo2
+    - diff --git a/foo3 b/foo3
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo3
+    - '@@ -0,0 +1,1 @@'
+    - +foo3
+    - diff --git a/foo4 b/foo4
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo4
+    - '@@ -0,0 +1,1 @@'
+    - +foo4
+    - diff --git a/foo5 b/foo5
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo5
+    - '@@ -0,0 +1,1 @@'
+    - +foo5
+    - ''
+  - id: 7
+    revision: 2
+    base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo1 b/foo1
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo1
+    - '@@ -0,0 +1,1 @@'
+    - +foo1
+    - diff --git a/foo2 b/foo2
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo2
+    - '@@ -0,0 +1,1 @@'
+    - +foo2
+    - diff --git a/foo3 b/foo3
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo3
+    - '@@ -0,0 +1,1 @@'
+    - +foo3
+    - diff --git a/foo4 b/foo4
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo4
+    - '@@ -0,0 +1,1 @@'
+    - +foo4
+    - ''
   approved: false
   approval_failure: Commit 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e is not approved.
   draft:
@@ -327,6 +519,8 @@ on publish.
     - id: 8
       revision: 3
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+      name: diff
+      extra: {}
       patch:
       - diff --git a/foo2 b/foo2
       - new file mode 100644
@@ -370,6 +564,20 @@ The dropped commit should now be discarded
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo1 b/foo1
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo1
+    - '@@ -0,0 +1,1 @@'
+    - +foo1
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
@@ -426,6 +634,119 @@ The parent review should have been updated accordingly.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{"3": [], "5": [], "4": []}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo1 b/foo1
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo1
+    - '@@ -0,0 +1,1 @@'
+    - +foo1
+    - diff --git a/foo2 b/foo2
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo2
+    - '@@ -0,0 +1,1 @@'
+    - +foo2
+    - diff --git a/foo3 b/foo3
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo3
+    - '@@ -0,0 +1,1 @@'
+    - +foo3
+    - diff --git a/foo4 b/foo4
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo4
+    - '@@ -0,0 +1,1 @@'
+    - +foo4
+    - diff --git a/foo5 b/foo5
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo5
+    - '@@ -0,0 +1,1 @@'
+    - +foo5
+    - ''
+  - id: 7
+    revision: 2
+    base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo1 b/foo1
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo1
+    - '@@ -0,0 +1,1 @@'
+    - +foo1
+    - diff --git a/foo2 b/foo2
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo2
+    - '@@ -0,0 +1,1 @@'
+    - +foo2
+    - diff --git a/foo3 b/foo3
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo3
+    - '@@ -0,0 +1,1 @@'
+    - +foo3
+    - diff --git a/foo4 b/foo4
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo4
+    - '@@ -0,0 +1,1 @@'
+    - +foo4
+    - ''
+  - id: 8
+    revision: 3
+    base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo2 b/foo2
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo2
+    - '@@ -0,0 +1,1 @@'
+    - +foo2
+    - diff --git a/foo3 b/foo3
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo3
+    - '@@ -0,0 +1,1 @@'
+    - +foo3
+    - diff --git a/foo4 b/foo4
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo4
+    - '@@ -0,0 +1,1 @@'
+    - +foo4
+    - ''
+  - id: 12
+    revision: 4
+    base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo2 b/foo2
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo2
+    - '@@ -0,0 +1,1 @@'
+    - +foo2
+    - diff --git a/foo4 b/foo4
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo4
+    - '@@ -0,0 +1,1 @@'
+    - +foo4
+    - ''
   approved: false
   approval_failure: Commit 7050183d97d5f601da86fb313dd8783ccf1ade18 is not approved.
 

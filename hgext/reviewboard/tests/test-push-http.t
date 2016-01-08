@@ -356,6 +356,20 @@ Test creating a review via HTTP
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 6432ccd4579e0fdc337b6dc55b827cbcc7fee397
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -user2
+    - +review2
+    - ''
   approved: false
   approval_failure: Commit 9a6457fbda8fb4e5afaa3e0ab831f34a3de285af is not approved.
 

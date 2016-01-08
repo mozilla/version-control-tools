@@ -54,6 +54,20 @@ Publishing the parent should succeed.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{"2": []}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: false
   approval_failure: Commit 86a712c7f0187fed4c00b99131838610c76e6cc0 is not approved.
 
@@ -75,6 +89,20 @@ Publishing the parent should succeed.
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
