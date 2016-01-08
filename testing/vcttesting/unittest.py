@@ -223,10 +223,10 @@ class MozReviewWebDriverTest(MozReviewTest):
         """Obtain a Bugzilla handle for a given user, specified by email address."""
         return self.bugzilla(username=email, password=self.users[email][0])
 
-    def create_basic_repo(self, email, nick):
-        self.mr.create_repository('test_repo')
+    def create_basic_repo(self, email, nick, name='test_repo'):
+        self.mr.create_repository(name)
         lr = self.mr.get_local_repository(
-            'test_repo',
+            name,
             ircnick=nick,
             bugzilla_username=email,
             bugzilla_apikey=self.users[email][2])
