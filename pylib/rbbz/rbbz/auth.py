@@ -27,6 +27,9 @@ from mozreview.errors import (
 from rbbz.forms import BugzillaAuthSettingsForm
 
 
+logger = logging.getLogger(__name__)
+
+
 class BugzillaBackend(AuthBackend):
     """
     Authenticate a user via Bugzilla XMLRPC.
@@ -237,6 +240,9 @@ class BugzillaBackend(AuthBackend):
 
             users = bugzilla.query_users(query)
             users['users'] = [u for u in users['users'] if user_relevant(u)]
+            logger.info('importing Bugzilla users from query "%s": %s' % (
+                        query,
+                        ' ,'.join(sorted(u['email'] for u in users['users']))))
             get_or_create_bugzilla_users(users)
         except BugzillaError as e:
             raise UserQueryError('Bugzilla error: %s' % e.msg)
