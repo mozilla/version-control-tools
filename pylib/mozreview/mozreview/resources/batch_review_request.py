@@ -342,6 +342,7 @@ class BatchReviewRequestResource(WebAPIResource):
         review_data = {}
 
         squashed_reviewers = set()
+        reviewer_cache = ReviewerCache(request)
 
         warnings = []
 
@@ -388,7 +389,8 @@ class BatchReviewRequestResource(WebAPIResource):
                 unclaimed_rids.remove(rid)
 
                 rr = ReviewRequest.objects.get(pk=rid)
-                draft, warns = update_review_request(local_site, request, rr, commit)
+                draft, warns = update_review_request(local_site, request,
+                                                     reviewer_cache, rr, commit)
                 squashed_reviewers.update(u for u in draft.target_people.all())
                 warnings.extend(warns)
                 processed_nodes.add(node)
@@ -424,7 +426,8 @@ class BatchReviewRequestResource(WebAPIResource):
             if unclaimed_rids:
                 assumed_old_rid = unclaimed_rids.pop(0)
                 rr = ReviewRequest.objects.get(pk=assumed_old_rid)
-                draft, warns = update_review_request(local_site, request, rr, commit)
+                draft, warns = update_review_request(local_site, request,
+                                                     reviewer_cache, rr, commit)
                 squashed_reviewers.update(u for u in draft.target_people.all())
                 warnings.extend(warns)
                 processed_nodes.add(commit['id'])
@@ -451,7 +454,8 @@ class BatchReviewRequestResource(WebAPIResource):
             rr.extra_data['p2rb.identifier'] = identifier
             rr.save(update_fields=['extra_data'])
             logger.info('created commit review request #%d' % rr.id)
-            draft, warns = update_review_request(local_site, request, rr, commit)
+            draft, warns = update_review_request(local_site, request,
+                                                 reviewer_cache, rr, commit)
             squashed_reviewers.update(u for u in draft.target_people.all())
             warnings.extend(warns)
             processed_nodes.add(commit['id'])
@@ -586,6 +590,29 @@ def previous_reviewers(rr):
     return pr
 
 
+class ReviewerCache(object):
+    """Caches lookups from reviewer/username to User instances.
+
+    Resolving a username string to a User potentially requires querying
+    Bugzilla via an HTTP request. To minimize the number of HTTP requests,
+    we cache lookups.
+    """
+
+    def __init__(self, request):
+        self._request = request
+        self._d = {}
+
+    def resolve_reviewer(self, reviewer):
+        """Try to obtain a User for a reviewer.
+
+        Returns None if the reviewer/user is unknown.
+        """
+        if reviewer not in self._d:
+            self._d[reviewer] = get_user_from_reviewer(self._request, reviewer)
+
+        return self._d[reviewer]
+
+
 def get_user_from_reviewer(request, reviewer):
     for backend in get_enabled_auth_backends():
         backend.query_users(reviewer, request)
@@ -607,12 +634,12 @@ def get_user_from_reviewer(request, reviewer):
     return None
 
 
-def resolve_reviewers(request, requested_reviewers):
+def resolve_reviewers(cache, requested_reviewers):
     reviewers = set()
     unrecognized = set()
     # TODO track mapping for multiple review requests and cache results.
     for reviewer in requested_reviewers:
-        user = get_user_from_reviewer(request, reviewer)
+        user = cache.resolve_reviewer(reviewer)
         if user:
             if not any(u.username == user.username for u in reviewers):
                 reviewers.add(user)
@@ -622,7 +649,7 @@ def resolve_reviewers(request, requested_reviewers):
     return reviewers, unrecognized
 
 
-def update_review_request(local_site, request, rr, commit):
+def update_review_request(local_site, request, reviewer_cache, rr, commit):
     """Synchronize the state of a review request with a commit.
 
     Updates the commit message, refreshes the diff, etc.
@@ -639,9 +666,9 @@ def update_review_request(local_site, request, rr, commit):
     draft.extra_data['p2rb.first_public_ancestor'] = commit['first_public_ancestor']
 
     reviewer_users, unrecognized_reviewers = \
-        resolve_reviewers(request, commit.get('reviewers', []))
+        resolve_reviewers(reviewer_cache, commit.get('reviewers', []))
     requal_reviewer_users, unrecognized_requal_reviewers = \
-        resolve_reviewers(request, commit.get('requal_reviewers', []))
+        resolve_reviewers(reviewer_cache, commit.get('requal_reviewers', []))
 
     warnings = []
 
