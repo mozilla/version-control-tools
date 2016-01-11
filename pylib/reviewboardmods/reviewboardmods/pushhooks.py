@@ -10,43 +10,11 @@ details.
 
 from contextlib import contextmanager
 import os
-import json
 import tempfile
 
 from rbtools.api.client import RBClient
 from rbtools.api.errors import APIError
 from rbtools.api.transport.sync import SyncTransport
-
-
-def post_reviews(url, repoid, identifier, commits, hgresp,
-                 username=None, apikey=None):
-    """Post a set of commits to Review Board.
-
-    Repository hooks can use this function to post a set of pushed commits
-    to Review Board.
-    """
-    with ReviewBoardClient(url, username=username, apikey=apikey) as rbc:
-        root = rbc.get_root()
-        return _post_reviews(root, repoid, identifier, commits, hgresp)
-
-def _post_reviews(api_root, repoid, identifier, commits, hgresp):
-    batch_request_resource = api_root.get_extension(
-        extension_name='mozreview.extension.MozReviewExtension')\
-        .get_batch_review_requests()
-    series_result = batch_request_resource.create(
-        # This assumes that we pushed to the repository/URL that Review Board is
-        # configured to use. This assumption may not always hold.
-        repo_id=repoid,
-        identifier=identifier,
-        commits=json.dumps(commits, encoding='utf-8'))
-
-    for w in series_result.warnings:
-        hgresp.append(b'display %s' % w.encode('utf-8'))
-
-    nodes = {node.encode('utf-8'): str(rid)
-             for node, rid in series_result.nodes.iteritems()}
-
-    return str(series_result.squashed_rr), nodes, series_result.review_requests
 
 
 def associate_ldap_username(url, ldap_username, privileged_username,

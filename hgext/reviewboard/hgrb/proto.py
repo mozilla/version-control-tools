@@ -86,15 +86,47 @@ class NoAPITokenAuthError(ServerError):
 # Wrap reviewboardmods and error types because we don't want to require the
 # clients to import rbtools.
 def post_reviews(*args, **kwargs):
-    from reviewboardmods.pushhooks import post_reviews as pr
     from rbtools.api import errors
 
     try:
-        return pr(*args, **kwargs)
+        return submit_reviews(*args, **kwargs)
     except errors.AuthorizationError as e:
         raise AuthorizationError(e, **kwargs)
     except errors.BadRequestError as e:
         raise BadRequestError(e)
+
+
+def submit_reviews(url, repoid, identifier, commits, hgresp,
+                   username=None, apikey=None):
+    """Submit commits to Review Board."""
+    import json
+    from reviewboardmods.pushhooks import ReviewBoardClient
+
+    with ReviewBoardClient(url, username=username, apikey=apikey) as client:
+        root = client.get_root()
+
+        batch_request_resource = root.get_extension(
+            extension_name='mozreview.extension.MozReviewExtension')\
+            .get_batch_review_requests()
+        series_result = batch_request_resource.create(
+            # This assumes that we pushed to the repository/URL that Review Board is
+            # configured to use. This assumption may not always hold.
+            repo_id=repoid,
+            identifier=identifier,
+            commits=json.dumps(commits, encoding='utf-8'))
+
+        for w in series_result.warnings:
+            hgresp.append(b'display %s' % w.encode('utf-8'))
+
+        nodes = {node.encode('utf-8'): str(rid)
+                 for node, rid in series_result.nodes.iteritems()}
+
+        return (
+            str(series_result.squashed_rr),
+            nodes,
+            series_result.review_requests,
+        )
+
 
 def associate_ldap_username(*args, **kwargs):
     from reviewboardmods.pushhooks import associate_ldap_username as alu
