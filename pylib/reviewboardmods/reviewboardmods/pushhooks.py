@@ -9,8 +9,6 @@ details.
 """
 
 from contextlib import contextmanager
-import os
-import tempfile
 
 from rbtools.api.client import RBClient
 from rbtools.api.errors import APIError
@@ -85,32 +83,16 @@ def associate_ldap_username(url, ldap_username, privileged_username,
 def ReviewBoardClient(url, username=None, password=None, apikey=None):
     """Obtain a RBClient instance via a context manager.
 
-    This exists as a context manager because of gross hacks necessary for
-    dealing with cookies. ``RBClient`` is coded such that it assumes it is
-    being used under a user account and storing cookies is always acceptable.
-    There is no way to disable cookie file writing or to tell it to use a file
-    object (such as BytesIO) as the cookies database.
-
-    We work around this deficiency by creating a temporary file and using it as
-    the cookies database for the lifetime of the context manager. When the
-    context manager exits, the temporary cookies file is deleted.
+    This exists as a context manager for historical reasons.
     """
-    fd, path = tempfile.mkstemp()
-    os.close(fd)
-    try:
-        if username and apikey:
-            rbc = RBClient(url, cookie_file=path, allow_caching=False)
-            login_resource = rbc.get_path(
-                'extensions/mozreview.extension.MozReviewExtension/'
-                'bugzilla-api-key-logins/')
-            login_resource.create(username=username, api_key=apikey)
-        else:
-            rbc = RBClient(url, username=username, password=password,
-                           cookie_file=path, allow_caching=False)
+    if username and apikey:
+        rbc = RBClient(url, save_cookies=False, allow_caching=False)
+        login_resource = rbc.get_path(
+            'extensions/mozreview.extension.MozReviewExtension/'
+            'bugzilla-api-key-logins/')
+        login_resource.create(username=username, api_key=apikey)
+    else:
+        rbc = RBClient(url, username=username, password=password,
+                       save_cookies=False, allow_caching=False)
 
-        yield rbc
-    finally:
-        try:
-            os.unlink(path)
-        except Exception:
-            pass
+    yield rbc

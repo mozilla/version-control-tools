@@ -4,9 +4,6 @@
 
 import json
 import logging
-import os
-import shutil
-import tempfile
 
 from contextlib import contextmanager
 
@@ -18,15 +15,11 @@ logger = logging.getLogger(__name__)
 
 @contextmanager
 def ReviewBoardClient(url, username, password):
-    tempd = tempfile.mkdtemp()
-    try:
-        cookie_file = os.path.join(tempd, 'cookies')
-        rbclient = RBClient(url, cookie_file=cookie_file,
-                            allow_caching=False,
-                            username=username, password=password)
-        yield rbclient
-    finally:
-        shutil.rmtree(tempd)
+
+    rbclient = RBClient(url, save_cookies=False,
+                        allow_caching=False,
+                        username=username, password=password)
+    yield rbclient
 
 
 class MozReviewBoard(object):
