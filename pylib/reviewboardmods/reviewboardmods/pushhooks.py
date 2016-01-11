@@ -8,8 +8,6 @@ Review Board install. Please abstract away Mozilla implementation
 details.
 """
 
-from contextlib import contextmanager
-
 from rbtools.api.client import RBClient
 from rbtools.api.errors import APIError
 
@@ -53,25 +51,25 @@ def associate_ldap_username(url, ldap_username, privileged_username,
         # We first verify that the provided credentials are valid and
         # retrieve the username associated with that Review Board
         # account.
-        with ReviewBoardClient(url, username=username, apikey=apikey) as rbc:
-            root = rbc.get_root()
-            session = root.get_session()
+        rbc = ReviewBoardClient(url, username=username, apikey=apikey)
+        root = rbc.get_root()
+        session = root.get_session()
 
-            if not session.authenticated:
-                return False
+        if not session.authenticated:
+            return False
 
-            user = session.get_user()
-            username = user.username
+        user = session.get_user()
+        username = user.username
 
         # Now that we have proven ownership over the user, take the provided
         # ldap_username and associate it with the account.
-        with ReviewBoardClient(url, username=privileged_username,
-                               password=privileged_password) as rbc:
-            root = rbc.get_root()
-            ext = root.get_extension(
-                extension_name='mozreview.extension.MozReviewExtension')
-            ldap = ext.get_ldap_associations().get_item(username)
-            ldap.update(ldap_username=ldap_username)
+        rbc = ReviewBoardClient(url, username=privileged_username,
+                                password=privileged_password)
+        root = rbc.get_root()
+        ext = root.get_extension(
+            extension_name='mozreview.extension.MozReviewExtension')
+        ldap = ext.get_ldap_associations().get_item(username)
+        ldap.update(ldap_username=ldap_username)
 
     except APIError:
         return False
@@ -79,12 +77,8 @@ def associate_ldap_username(url, ldap_username, privileged_username,
     return True
 
 
-@contextmanager
 def ReviewBoardClient(url, username=None, password=None, apikey=None):
-    """Obtain a RBClient instance via a context manager.
-
-    This exists as a context manager for historical reasons.
-    """
+    """Obtain a RBClient instance."""
     if username and apikey:
         rbc = RBClient(url, save_cookies=False, allow_caching=False)
         login_resource = rbc.get_path(
@@ -95,4 +89,4 @@ def ReviewBoardClient(url, username=None, password=None, apikey=None):
         rbc = RBClient(url, username=username, password=password,
                        save_cookies=False, allow_caching=False)
 
-    yield rbc
+    return rbc

@@ -102,30 +102,30 @@ def submit_reviews(url, repoid, identifier, commits, hgresp,
     import json
     from reviewboardmods.pushhooks import ReviewBoardClient
 
-    with ReviewBoardClient(url, username=username, apikey=apikey) as client:
-        root = client.get_root()
+    client = ReviewBoardClient(url, username=username, apikey=apikey)
+    root = client.get_root()
 
-        batch_request_resource = root.get_extension(
-            extension_name='mozreview.extension.MozReviewExtension')\
-            .get_batch_review_requests()
-        series_result = batch_request_resource.create(
-            # This assumes that we pushed to the repository/URL that Review Board is
-            # configured to use. This assumption may not always hold.
-            repo_id=repoid,
-            identifier=identifier,
-            commits=json.dumps(commits, encoding='utf-8'))
+    batch_request_resource = root.get_extension(
+        extension_name='mozreview.extension.MozReviewExtension')\
+        .get_batch_review_requests()
+    series_result = batch_request_resource.create(
+        # This assumes that we pushed to the repository/URL that Review Board is
+        # configured to use. This assumption may not always hold.
+        repo_id=repoid,
+        identifier=identifier,
+        commits=json.dumps(commits, encoding='utf-8'))
 
-        for w in series_result.warnings:
-            hgresp.append(b'display %s' % w.encode('utf-8'))
+    for w in series_result.warnings:
+        hgresp.append(b'display %s' % w.encode('utf-8'))
 
-        nodes = {node.encode('utf-8'): str(rid)
-                 for node, rid in series_result.nodes.iteritems()}
+    nodes = {node.encode('utf-8'): str(rid)
+             for node, rid in series_result.nodes.iteritems()}
 
-        return (
-            str(series_result.squashed_rr),
-            nodes,
-            series_result.review_requests,
-        )
+    return (
+        str(series_result.squashed_rr),
+        nodes,
+        series_result.review_requests,
+    )
 
 
 def associate_ldap_username(*args, **kwargs):
@@ -429,62 +429,62 @@ def pullreviews(repo, proto, args=None):
     lines = ['1']
 
     from reviewboardmods.pushhooks import ReviewBoardClient
-    with ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
-                           username=o['bzusername'],
-                           apikey=o['bzapikey']) as client:
-        root = client.get_root()
+    client = ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
+                               username=o['bzusername'],
+                               apikey=o['bzapikey'])
+    root = client.get_root()
 
-        for k, v in o['other']:
-            if k != 'reviewid':
-                continue
+    for k, v in o['other']:
+        if k != 'reviewid':
+            continue
 
-            identifier = urllib.unquote(v)
-            rrs = root.get_review_requests(commit_id=identifier)
+        identifier = urllib.unquote(v)
+        rrs = root.get_review_requests(commit_id=identifier)
 
-            if rrs.total_results != 1:
-                continue
+        if rrs.total_results != 1:
+            continue
 
-            rr = rrs[0]
-            extra_data = rr.extra_data
+        rr = rrs[0]
+        extra_data = rr.extra_data
 
-            try:
-                is_squashed = extra_data['p2rb.is_squashed']
-            except KeyError:
-                is_squashed = None
+        try:
+            is_squashed = extra_data['p2rb.is_squashed']
+        except KeyError:
+            is_squashed = None
 
-            # 'True' in RB <= 2.0.11; True in 2.0.11+. We may have old
-            # values in the database, so keep checking for 'True' until we
-            # have a migration.
-            if is_squashed is True or is_squashed == 'True':
-                if 'p2rb.commits' in extra_data:
-                    commits = extra_data['p2rb.commits']
+        # 'True' in RB <= 2.0.11; True in 2.0.11+. We may have old
+        # values in the database, so keep checking for 'True' until we
+        # have a migration.
+        if is_squashed is True or is_squashed == 'True':
+            if 'p2rb.commits' in extra_data:
+                commits = extra_data['p2rb.commits']
+            else:
+                draft = rr.get_draft()
+                if 'p2rb.commits' in draft.extra_data:
+                    commits = draft.extra_data['p2rb.commits']
                 else:
-                    draft = rr.get_draft()
-                    if 'p2rb.commits' in draft.extra_data:
-                        commits = draft.extra_data['p2rb.commits']
-                    else:
-                        commits = '[]'
+                    commits = '[]'
 
-                lines.append('parentreview %s %s' % (
-                    urllib.quote(identifier), rr.id))
-                for relation in json.loads(commits):
-                    node = relation[0].encode('utf-8')
-                    rid = str(relation[1])
+            lines.append('parentreview %s %s' % (
+                urllib.quote(identifier), rr.id))
+            for relation in json.loads(commits):
+                node = relation[0].encode('utf-8')
+                rid = str(relation[1])
 
-                    lines.append('csetreview %s %s %s' % (rr.id, node, rid))
-                    lines.append('reviewdata %s status %s' % (rid,
-                        urllib.quote(rr.status.encode('utf-8'))))
-                    lines.append('reviewdata %s public %s' % (rid, rr.public))
+                lines.append('csetreview %s %s %s' % (rr.id, node, rid))
+                lines.append('reviewdata %s status %s' % (rid,
+                    urllib.quote(rr.status.encode('utf-8'))))
+                lines.append('reviewdata %s public %s' % (rid, rr.public))
 
-            lines.append('reviewdata %s status %s' % (rr.id,
-                urllib.quote(rr.status.encode('utf-8'))))
-            lines.append('reviewdata %s public %s' % (rr.id, rr.public))
+        lines.append('reviewdata %s status %s' % (rr.id,
+            urllib.quote(rr.status.encode('utf-8'))))
+        lines.append('reviewdata %s public %s' % (rr.id, rr.public))
 
-            reviewers = [urllib.quote(p.title.encode('utf-8'))
-                         for p in rr.target_people]
-            if reviewers:
-                lines.append('reviewdata %s reviewers %s' %
-                             (rid, ','.join(reviewers)))
+        reviewers = [urllib.quote(p.title.encode('utf-8'))
+                     for p in rr.target_people]
+        if reviewers:
+            lines.append('reviewdata %s reviewers %s' %
+                         (rid, ','.join(reviewers)))
 
     res = '\n'.join(lines)
     assert isinstance(res, str)
@@ -513,23 +513,23 @@ def publishreviewseries(repo, proto, args=None):
     lines = ['1']
 
     from reviewboardmods.pushhooks import ReviewBoardClient
-    with ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
-                           username=o['bzusername'],
-                           apikey=o['bzapikey']) as client:
-        root = client.get_root()
+    client = ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
+                               username=o['bzusername'],
+                               apikey=o['bzapikey'])
+    root = client.get_root()
 
-        for k, v in o['other']:
-            if k != 'reviewid':
-                continue
+    for k, v in o['other']:
+        if k != 'reviewid':
+            continue
 
-            rrid = urllib.unquote(v)
-            try:
-                rr = root.get_review_request(review_request_id=rrid)
-                draft = rr.get_draft()
-                draft.update(public=True)
-                lines.append('success %s' % rrid)
-            except APIError as e:
-                lines.append('error %s %s' % (rrid, str(e)))
+        rrid = urllib.unquote(v)
+        try:
+            rr = root.get_review_request(review_request_id=rrid)
+            draft = rr.get_draft()
+            draft.update(public=True)
+            lines.append('success %s' % rrid)
+        except APIError as e:
+            lines.append('error %s %s' % (rrid, str(e)))
 
     res = '\n'.join(lines)
     assert isinstance(res, str)

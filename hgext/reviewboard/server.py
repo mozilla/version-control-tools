@@ -189,22 +189,22 @@ def listreviewrepos(repo):
 def getreposfromreviewboard(repo):
     from reviewboardmods.pushhooks import ReviewBoardClient
 
-    with ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/')) as client:
-        root = client.get_root()
-        urls = set()
+    client = ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'))
+    root = client.get_root()
+    urls = set()
 
-        repos = root.get_repositories(max_results=250, tool='Mercurial')
-        try:
-            while True:
-                for r in repos:
-                    urls.add(r.path)
+    repos = root.get_repositories(max_results=250, tool='Mercurial')
+    try:
+        while True:
+            for r in repos:
+                urls.add(r.path)
 
-                repos = repos.get_next()
+            repos = repos.get_next()
 
-        except StopIteration:
-            pass
+    except StopIteration:
+        pass
 
-        return urls
+    return urls
 
 
 def wrappedwireprotoheads(orig, repo, proto, *args, **kwargs):
