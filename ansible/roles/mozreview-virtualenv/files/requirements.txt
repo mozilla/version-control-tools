@@ -1,7 +1,7 @@
 --find-links http://downloads.reviewboard.org/releases/Django/1.6/
 --find-links http://downloads.reviewboard.org/releases/django-evolution/0.7/
 --find-links http://downloads.reviewboard.org/releases/Djblets/0.9/
---find-links http://downloads.reviewboard.org/releases/RBTools/0.6/
+--find-links http://downloads.reviewboard.org/releases/RBTools/0.7/
 --find-links http://downloads.reviewboard.org/releases/ReviewBoard/2.5/
 
 # sha256: lNKmgifnmEvUD19xxoOXMGIq_4pGM_Ke3h_90NJAeV4
@@ -97,8 +97,8 @@ Whoosh==2.6.0
 # sha256: 8s4emJsnLPy2d2FnY-Ci5-xlnv-meoiqkrOmVSj2Cjw
 pycrypto==2.6.1
 
-# sha256: SFxYdfcE05QYN1gC0971KqEk7KP85BG_dgBMsBBodzU
-RBTools==0.6.1
+# sha256: KICd7yflMLpcE9N76OucoxokeGzA0L1taC8ACdlIkaQ
+RBTools==0.7.5
 
 # sha256: xEzBQPEqEq0pduwgBSqSc5LJ9UnX0Z-E5ioj9vSFjMw
 ReviewBoard==2.5.2
