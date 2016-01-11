@@ -22,6 +22,7 @@ def ReviewBoardClient(url, username, password):
     try:
         cookie_file = os.path.join(tempd, 'cookies')
         rbclient = RBClient(url, cookie_file=cookie_file,
+                            allow_caching=False,
                             username=username, password=password)
         yield rbclient
     finally:

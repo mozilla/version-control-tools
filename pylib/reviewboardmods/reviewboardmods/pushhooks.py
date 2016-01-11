@@ -14,7 +14,6 @@ import tempfile
 
 from rbtools.api.client import RBClient
 from rbtools.api.errors import APIError
-from rbtools.api.transport.sync import SyncTransport
 
 
 def associate_ldap_username(url, ldap_username, privileged_username,
@@ -82,12 +81,6 @@ def associate_ldap_username(url, ldap_username, privileged_username,
     return True
 
 
-class NoCacheTransport(SyncTransport):
-    """API transport with disabled caching."""
-    def enable_cache(self):
-        pass
-
-
 @contextmanager
 def ReviewBoardClient(url, username=None, password=None, apikey=None):
     """Obtain a RBClient instance via a context manager.
@@ -106,15 +99,14 @@ def ReviewBoardClient(url, username=None, password=None, apikey=None):
     os.close(fd)
     try:
         if username and apikey:
-            rbc = RBClient(url, cookie_file=path,
-                           transport_cls=NoCacheTransport)
+            rbc = RBClient(url, cookie_file=path, allow_caching=False)
             login_resource = rbc.get_path(
                 'extensions/mozreview.extension.MozReviewExtension/'
                 'bugzilla-api-key-logins/')
             login_resource.create(username=username, api_key=apikey)
         else:
             rbc = RBClient(url, username=username, password=password,
-                           cookie_file=path, transport_cls=NoCacheTransport)
+                           cookie_file=path, allow_caching=False)
 
         yield rbc
     finally:
