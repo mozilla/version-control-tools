@@ -61,8 +61,10 @@ instructions on updating your SSH client configuration..
    If you have already configured ``hg.mozilla.org`` in your SSH config,
    just copy the settings to ``reviewboard-hg.mozilla.org``.
 
-As of October 2015, the SSH fingerprint for the RSA key is
-``a6:13:ae:35:2c:20:2b:8d:f4:8d:8e:d7:a8:55:67:97``.
+As of January 2016, the SSH fingerprints for the RSA keys are:
+
+* ``SHA256:O6C9zLi4leD/mb4lPNmR50R1ampZgeEi7StDEbZDmyA``
+* ``MD5:a6:13:ae:35:2c:20:2b:8d:f4:8d:8e:d7:a8:55:67:97``
 
 Simple Client Configuration
 ===========================

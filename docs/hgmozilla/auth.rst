@@ -30,6 +30,7 @@ The first time you connect, you will be asked to verify the host SSH
 key. The host key fingerprints are:
 
 * hg.mozilla.org RSA: ``SHA256:usOyGXYDSaMWHhfvVeySzUD0yYxzmAvT+dVziygWsVQ.``
+* reviewboard-hg.mozilla.org RSA: ``SHA256:O6C9zLi4leD/mb4lPNmR50R1ampZgeEi7StDEbZDmyA``
 
 Verify your SSH settings are working by attempting to SSH into a server.
 Your terminal output should resemble the following::
