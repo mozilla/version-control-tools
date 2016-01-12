@@ -167,6 +167,15 @@ Child review request with ID 2 should be closed as submitted...
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
+Submitting against a published review request results in error
+TODO Fix the error output (bug 1169664)
+
+  $ echo foo3 > foo
+  $ hg commit -m 'Bug 1 - Foo 3'
+  $ hg push > /dev/null
+  abort: unexpected response: empty string
+  [255]
+
 Re-opening the parent review request should re-open all of the children.
 
   $ rbmanage reopen 1
