@@ -99,7 +99,16 @@ class BatchReviewRequestResource(WebAPIResource):
                     'fields': {
                         'commits': 'Squashed commit does not contain %s key' % key}}
 
-        # TODO validate individual commits.
+        for commit in commits['individual']:
+            for key in ('id', 'message', 'bug', 'diff', 'precursors', 'first_public_ancestor'):
+                if key not in commit:
+                    logger.error('commit (%s) missing key %s' % (
+                                 commit.get('id', '<id>') ,key))
+                    return INVALID_FORM_DATA, {
+                        'fields': {
+                            'commits': 'Individual commit (%s) missing key %s' % (
+                                commit.get('id', '<id>'), key)
+                        }}
 
         try:
             repo = Repository.objects.get(pk=int(repo_id), local_site=local_site)
@@ -191,6 +200,89 @@ class BatchReviewRequestResource(WebAPIResource):
 
         update_review_request_draft_diffset(squashed_rr, diffset)
 
+        # TODO: We need to take into account the commits data from the squashed
+        # review request's draft. This data represents the mapping from commit
+        # to rid in the event that we would have published. We're overwritting
+        # this data. This will only come into play if we start trusting the server
+        # instead of the client when matching review request ids. Bug 1047516
+
+        previous_commits = get_previous_commits(squashed_rr)
+        remaining_nodes = get_remaining_nodes(previous_commits)
+        discard_on_publish_rids = get_discard_on_publish_rids(squashed_rr)
+        unpublished_rids = get_unpublished_rids(squashed_rr)
+        unclaimed_rids = get_unclaimed_rids(previous_commits,
+                                            discard_on_publish_rids,
+                                            unpublished_rids)
+
+        # Previously pushed nodes which have been processed and had their review
+        # request updated or did not require updating.
+        processed_nodes = set()
+
+        node_to_rid = {}
+
+        # A mapping from review request id to the corresponding ReviewRequest.
+        review_requests = {}
+
+        # A mapping of review request id to dicts of additional metadata.
+        review_data = {}
+
+        # Do a pass and find all commits that map cleanly to old review requests.
+        for commit in commits['individual']:
+            node = commit['id']
+
+            if node not in remaining_nodes:
+                continue
+
+            # If the commit appears in an old review request, by definition of
+            # commits deriving from content, the commit has not changed and there
+            # is nothing to update. Update our accounting and move on.
+            rid = remaining_nodes[node]
+            del remaining_nodes[node]
+            unclaimed_rids.remove(rid)
+            processed_nodes.add(node)
+            node_to_rid[node] = rid
+
+            rr = ReviewRequest.objects.get(pk=rid)
+            review_requests[rid] = rr
+            review_data[rid] = get_review_request_data(rr)
+
+            try:
+                discard_on_publish_rids.remove(rid)
+            except ValueError:
+                pass
+
+        # Find commits that map to a previous version.
+        for commit in commits['individual']:
+            node = commit['id']
+            if node in processed_nodes:
+                continue
+
+            # The client may have sent obsolescence data saying which commit this
+            # commit has derived from. Use that data (if available) to try to find
+            # a mapping to an old review request.
+            for precursor in commit['precursors']:
+                rid = remaining_nodes.get(precursor)
+                if not rid:
+                    continue
+
+                del remaining_nodes[precursor]
+                unclaimed_rids.remove(rid)
+
+                rr = ReviewRequest.objects.get(pk=rid)
+                # TODO implement
+                #update_review_request(rr, commit)
+                processed_nodes.add(node)
+                node_to_rid[node] = rid
+                review_requests[rid] = rr
+                review_data[rid] = get_review_request_data(rr)
+
+                try:
+                    discard_on_publish_rids.remove(rid)
+                except ValueError:
+                    pass
+
+                break
+
         return squashed_rr
 
 batch_review_request_resource = BatchReviewRequestResource()
@@ -236,3 +328,104 @@ def update_review_request_draft_diffset(rr, diffset):
         discarded_diffset.delete()
 
     return draft
+
+
+def get_review_request_data(rr):
+    """Obtain a dictionary containing review request metadata.
+
+    The dict consists of plain types (as opposed to ReviewBoard types).
+
+    Some values may be unicode, not str.
+    """
+    rd = {
+        'status': rr.status,
+    }
+
+    thing = rr
+    try:
+        thing = rr.draft.get()
+        rd['public'] = False
+    except ReviewRequestDraft.DoesNotExist:
+        rd['public'] = rr.public
+
+    rd['reviewers'] = [p.username for p in thing.target_people.all()]
+
+    return rd
+
+
+def get_previous_commits(squashed_rr):
+    """Retrieve the previous commits from a squashed review request.
+
+    This will return a list of tuples specifying the previous commit
+    id as well as the review request it is represented by. ex::
+
+        [
+            # (<commit-id>, <review-request-id>),
+            ('d4bd89322f54', 13),
+            ('373537353134', 14),
+        ]
+    """
+    if not squashed_rr.public:
+        extra_data = squashed_rr.get_draft().extra_data
+    else:
+        extra_data = squashed_rr.extra_data
+
+    if 'p2rb.commits' not in extra_data:
+        return []
+
+    commits = []
+    for node, rid in json.loads(extra_data['p2rb.commits']):
+        # JSON decoding likes to give us unicode types. We speak str
+        # internally, so convert.
+        if isinstance(node, unicode):
+            node = node.encode('utf-8')
+
+        assert isinstance(node, str)
+
+        commits.append((node, int(rid)))
+
+    return commits
+
+
+def get_remaining_nodes(previous_commits):
+    """A mapping from previously pushed node, which has not been processed
+    yet, to the review request id associated with that node.
+    """
+    return dict((t[0], t[1]) for i, t in enumerate(previous_commits))
+
+
+def get_discard_on_publish_rids(squashed_rr):
+    """A list of review request ids that should be discarded when publishing.
+    Adding to this list will mark a review request as to-be-discarded when
+    the squashed draft is published on Review Board.
+    """
+    return map(int, json.loads(
+               squashed_rr.extra_data['p2rb.discard_on_publish_rids']))
+
+
+def get_unpublished_rids(squashed_rr):
+    """A list of review request ids that have been created for individual commits
+    but have not been published. If this list contains an item, it should be
+    re-used for indiviual commits instead of creating a brand new review
+    request.
+    """
+    return map(int, json.loads(
+               squashed_rr.extra_data['p2rb.unpublished_rids']))
+
+
+def get_unclaimed_rids(previous_commits, discard_on_publish_rids,
+                       unpublished_rids):
+    """Set of review request ids which have not been matched to a commit
+    from the current push. We use a list to represent this set because
+    if any entries are left over we need to process them in order.
+    This list includes currently published rids that were part of the
+    previous push and rids which have been used for drafts on this
+    reviewid but have not been published.
+    """
+    unclaimed_rids = [t[1] for t in previous_commits]
+
+    for rid in (discard_on_publish_rids + unpublished_rids):
+        if rid not in unclaimed_rids:
+            unclaimed_rids.append(rid)
+
+    return unclaimed_rids
