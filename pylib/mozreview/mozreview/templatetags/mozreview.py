@@ -1,6 +1,7 @@
 import logging
 
 from django import template
+from django.contrib.auth.models import User
 
 register = template.Library()
 
@@ -76,3 +77,10 @@ def mercurial_repo_name(landing_url):
 @register.filter()
 def ssh_to_https(landing_url):
     return landing_url.rstrip('/').replace('ssh://', 'https://')
+
+@register.filter()
+def userid_to_user(user_id):
+    try:
+        return User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return 'Unknown user'

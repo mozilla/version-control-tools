@@ -83,8 +83,11 @@ This is the template for the "Commits" list in a push-based review request.
         <div class="action-icon rounded-icon"></div>
         <div class="action-info">
           <h4 class="action-heading">
-              There was an error executing the Autoland request.
+              There was an error executing the Autoland request on {{autoland_request.repository_url|mercurial_repo_name}}
           </h4>
+          <span class="action-meta">
+            Requested by {{autoland_request.user_id|userid_to_user}}
+          </span>
           <span class="action-meta" title="{{ autoland_request.last_error_msg|escape }}">
             {{ autoland_request.last_error_msg }}
           </span>
@@ -97,8 +100,11 @@ This is the template for the "Commits" list in a push-based review request.
         <div class="action-icon rounded-icon"></div>
         <div class="action-info">
           <h4 class="action-heading">
-            Waiting for the Autoland request to execute, hold tight
+            Waiting for the Autoland request to execute on {{autoland_request.repository_url|mercurial_repo_name}}, hold tight
           </h4>
+          <span class="action-meta">
+            Requested by {{autoland_request.user_id|userid_to_user}}
+          </span>
           <span class="action-meta">
             {% if autoland_request.last_details %}
             {{autoland_request.last_details}}
@@ -120,6 +126,9 @@ This is the template for the "Commits" list in a push-based review request.
           <h4 class="action-heading">
             Commit(s) successfully landed on {{autoland_request.repository_url|mercurial_repo_name}}
           </h4>
+          <span class="action-meta">
+            Requested by {{autoland_request.user_id|userid_to_user}}
+          </span>
         </div>
       </div>
         {% if autoland_request.repository_url|treeherder_repo %}
