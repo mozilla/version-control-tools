@@ -77,6 +77,8 @@ def get_or_create_bugzilla_users(user_data):
             bugzilla_user_map = BugzillaUserMap.objects.get(
                 bugzilla_user_id=bz_user_id)
         except BugzillaUserMap.DoesNotExist:
+            logger.info('bugzilla user %s/%s not present; creating %s' % (
+                        bz_user_id, email, username))
             user = User(username=username, password='!', first_name=real_name,
                         email=email, is_active=can_login)
 
@@ -86,6 +88,8 @@ def get_or_create_bugzilla_users(user_data):
                 # Blanket exceptions are terrible, but there appears to
                 # be no way to catch a generic IntegrityError.
                 user.username = placeholder_username(email, bz_user_id)
+                logger.info('could not create user %s; trying %s' % (
+                            username, user.username))
                 user.save()
 
             bugzilla_user_map = BugzillaUserMap(user=user,
