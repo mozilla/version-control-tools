@@ -15,6 +15,8 @@
 
 /*******************************************************/
 
+@approval-bg: #DFFFD7;
+@approval-border-color: #478A06;
 
 #mozreview-request-series{
   margin-top:5px;
@@ -77,9 +79,9 @@
       & .reviewer-name {
         min-height: 10px;
 
-        & .reviewer-ship-it {
-          background-color: #DFFFD7;
-          border: 1px solid #478A06;
+        &.reviewer-ship-it {
+          background-color: @approval-bg;
+          border: 1px solid @approval-border-color;
           padding: 1px 5px;
           .border-radius(2px);
         }
@@ -136,11 +138,11 @@
     .approval {
       background-repeat: no-repeat;
       cursor: default;
-      border: 1px #478a06 solid;
+      border: 1px solid @approval-border-color;
       font-size: 9pt;
       font-family: monospace;
       background-repeat: no-repeat;
-      background-color: #DFFFD7;
+      background-color: @approval-bg;
       color: #0A1B00;
     }
 
@@ -166,7 +168,7 @@
       background-position: top left;
       background-repeat: repeat-x;
       background-color: #6bc810;
-      border: 1px #478a06 solid;
+      border: 1px solid @approval-border-color;
       color: #205003;
     }
 }
@@ -227,7 +229,7 @@
         &.action-success {
             & > .rounded-icon {
                 background-color: #B0EFA0;
-                border: 1px solid #478A06;
+                border: 1px solid @approval-border-color;
             }
         }
 
