@@ -54,17 +54,14 @@ Updating SSH Config
 
 If you are using SSH to push to MozReview, you will want to configure your
 SSH username for ``reviewboard-hg.mozilla.org``. See :ref:`auth_ssh` for
-instructions on updating your SSH client configuration..
+instructions on updating your SSH client configuration, including the SSH host
+key fingerprints.
 
 .. tip::
 
    If you have already configured ``hg.mozilla.org`` in your SSH config,
-   just copy the settings to ``reviewboard-hg.mozilla.org``.
-
-As of January 2016, the SSH fingerprints for the RSA keys are:
-
-* ``SHA256:O6C9zLi4leD/mb4lPNmR50R1ampZgeEi7StDEbZDmyA``
-* ``MD5:a6:13:ae:35:2c:20:2b:8d:f4:8d:8e:d7:a8:55:67:97``
+   it is typically sufficient to copy the settings to
+   ``reviewboard-hg.mozilla.org``.
 
 Simple Client Configuration
 ===========================
