@@ -134,40 +134,23 @@ def post_reviews(url, repoid, identifier, commits, hgresp,
         return _post_reviews(root, repoid, identifier, commits, hgresp)
 
 def _post_reviews(api_root, repoid, identifier, commits, hgresp):
-    # This assumes that we pushed to the repository/URL that Review Board is
-    # configured to use. This assumption may not always hold.
-    repo = api_root.get_repository(repository_id=repoid)
-    repo_url = repo.path
+    batch_request_resource = api_root.get_extension(
+        extension_name='mozreview.extension.MozReviewExtension')\
+        .get_batch_review_requests()
+    series_result = batch_request_resource.create(
+        # This assumes that we pushed to the repository/URL that Review Board is
+        # configured to use. This assumption may not always hold.
+        repo_id=repoid,
+        identifier=identifier,
+        commits=json.dumps(commits, encoding='utf-8'))
 
     # Retrieve the squashed review request or create it.
-    previous_commits = []
-    squashed_rr = None
     rrs = api_root.get_review_requests(commit_id=identifier,
                                        repository=repoid)
-    users = api_root.get_users()
 
     squashed_reviewers = set()
-
-    if rrs.total_results > 0:
-        squashed_rr = rrs[0]
-    else:
-        # A review request for that identifier doesn't exist - this
-        # is the first push to this identifier and we'll need to create
-        # it from scratch.
-        squashed_rr = rrs.create(**{
-            "extra_data.p2rb": "True",
-            "extra_data.p2rb.is_squashed": "True",
-            "extra_data.p2rb.identifier": identifier,
-            "extra_data.p2rb.discard_on_publish_rids": '[]',
-            "extra_data.p2rb.unpublished_rids": '[]',
-            "extra_data.p2rb.first_public_ancestor": commits['squashed']['first_public_ancestor'],
-            "commit_id": identifier,
-            "repository": repoid,
-        })
-
-    squashed_rr.get_diffs().upload_diff(
-        commits["squashed"]["diff"],
-        base_commit_id=commits["squashed"].get('base_commit_id', None))
+    squashed_rr = rrs[0]
+    assert squashed_rr.id == series_result.squashed_rr
 
     def extract_reviewers(requested_reviewers):
         reviewers = set()
