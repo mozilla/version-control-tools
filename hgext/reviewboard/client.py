@@ -536,12 +536,18 @@ def doreview(repo, ui, remote, nodes):
     #    identifier = repo.dirstate.branch()
 
     if not identifier:
+        identifiers = set()
         for node in nodes:
             ctx = repo[node]
-            bugs = parse_bugs(ctx.description())
+            bugs = parse_bugs(ctx.description().split('\n')[0])
             if bugs:
                 identifier = 'bz://%s' % bugs[0]
-                break
+                identifiers.add(identifier)
+
+        if len(identifiers) > 1:
+            raise util.Abort('cannot submit reviews referencing multiple '
+                             'bugs', hint='limit reviewed changesets '
+                             'with "-c" or "-r" arguments')
 
     identifier = ReviewID(identifier)
 
