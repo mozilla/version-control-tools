@@ -42,13 +42,12 @@ from mercurial.node import (
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
-demandimport.disable()
-try:
-    import hgrb.proto
-except ImportError:
-    sys.path.insert(0, OUR_DIR)
-    import hgrb.proto
-demandimport.enable()
+with demandimport.deactivated():
+    try:
+        import hgrb.proto
+    except ImportError:
+        sys.path.insert(0, OUR_DIR)
+        import hgrb.proto
 
 testedwith = '3.3 3.4 3.5 3.6'
 
