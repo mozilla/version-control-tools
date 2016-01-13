@@ -66,6 +66,9 @@
     status: pending
     reviewers:
     - reviewer
+    reviewers_status:
+      reviewer:
+        ship_it: false
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 233b570e5356d0c84bcbf0633de446172012b3b3
@@ -73,6 +76,7 @@
     issue_open_count: 0
     status: pending
     reviewers: []
+    reviewers_status: {}
 
 Only parents have summaries.
 
@@ -108,6 +112,9 @@ Opening an issue should be reflected in the summary.
     status: pending
     reviewers:
     - reviewer
+    reviewers_status:
+      reviewer:
+        ship_it: false
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 233b570e5356d0c84bcbf0633de446172012b3b3
@@ -115,6 +122,7 @@ Opening an issue should be reflected in the summary.
     issue_open_count: 0
     status: pending
     reviewers: []
+    reviewers_status: {}
 
 Resolving an issue should decrement the issue count.
 
@@ -139,6 +147,9 @@ Resolving an issue should decrement the issue count.
     status: pending
     reviewers:
     - reviewer
+    reviewers_status:
+      reviewer:
+        ship_it: false
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 233b570e5356d0c84bcbf0633de446172012b3b3
@@ -146,6 +157,45 @@ Resolving an issue should decrement the issue count.
     issue_open_count: 0
     status: pending
     reviewers: []
+    reviewers_status: {}
+
+Giving a ship-it should result in a change in the reviewer status
+
+  $ exportbzauth reviewer@example.com password1
+  $ rbmanage create-review 2 --ship-it --public
+  created review 2
+
+  $ rbmanage dump-summary 1
+  parent:
+    summary: bz://1/mynick
+    id: 1
+    submitter: default+5
+    issue_open_count: 0
+    status: pending
+    reviewers:
+    - reviewer
+  children:
+  - summary: Bug 1 - Foo 1
+    id: 2
+    commit: a92d53c0ffc7df0517397a77980e62332552d812
+    submitter: default+5
+    issue_open_count: 0
+    status: pending
+    reviewers:
+    - reviewer
+    reviewers_status:
+      reviewer:
+        ship_it: true
+  - summary: Bug 1 - Foo 2
+    id: 3
+    commit: 233b570e5356d0c84bcbf0633de446172012b3b3
+    submitter: default+5
+    issue_open_count: 0
+    status: pending
+    reviewers: []
+    reviewers_status: {}
+
+  $ exportbzauth default@example.com password
 
 Verify we can also get the summaries by bug, including closed ones.
 
@@ -169,6 +219,9 @@ Verify we can also get the summaries by bug, including closed ones.
       status: submitted
       reviewers:
       - reviewer
+      reviewers_status:
+        reviewer:
+          ship_it: true
     - summary: Bug 1 - Foo 2
       id: 3
       commit: 233b570e5356d0c84bcbf0633de446172012b3b3
@@ -176,6 +229,7 @@ Verify we can also get the summaries by bug, including closed ones.
       issue_open_count: 0
       status: pending
       reviewers: []
+      reviewers_status: {}
 
 Verify that we get nothing from non-existent bugs.
 

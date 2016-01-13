@@ -21,6 +21,7 @@ from mozreview.extra_data import (COMMITS_KEY,
 from mozreview.models import BugzillaUserMap
 from mozreview.errors import NOT_PARENT
 from mozreview.extra_data import is_parent
+from mozreview.review_helpers import get_reviewers_status
 
 
 class ReviewRequestSummaryResource(WebAPIResource):
@@ -208,6 +209,11 @@ class ReviewRequestSummaryResource(WebAPIResource):
             'reviewers': [
                 'jrandom'
             ],
+            'reviewers_status': {
+                'jrandom': {
+                    'ship_it': True
+                }
+            },
             'status': 'pending',
             'submitter': 'mcote',
             'summary': 'Bug 1 - Update README.md.'
@@ -226,8 +232,12 @@ class ReviewRequestSummaryResource(WebAPIResource):
         d['submitter_bmo_id'] = BugzillaUserMap.objects.get(
             user_id=review_request.submitter.id).bugzilla_user_id
         d['status'] = status_to_string(review_request.status)
-
         d['reviewers'] = [reviewer.username for reviewer in reviewers]
+
+        # If we have a commit (i.e. we are on a child) add reviewer_status.
+        if commit:
+            d['reviewers_status'] = get_reviewers_status(review_request,
+                                                         reviewers)
         d['reviewers_bmo_ids'] = [bzuser.bugzilla_user_id for bzuser in
                                   BugzillaUserMap.objects.filter(user_id__in=[
                                       reviewer.id for reviewer in reviewers])]

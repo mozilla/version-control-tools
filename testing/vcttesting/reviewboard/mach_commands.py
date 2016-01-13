@@ -146,6 +146,10 @@ def short_review_request_dict(rr):
 
     d['reviewers'] = [x for x in rr['reviewers']]
 
+    if 'reviewers_status' in rr:
+        d['reviewers_status'] = dict()
+        for reviewer, status in rr[u'reviewers_status'].iteritems():
+            d['reviewers_status'][reviewer] = dict(status.iteritems())
     return d
 
 
