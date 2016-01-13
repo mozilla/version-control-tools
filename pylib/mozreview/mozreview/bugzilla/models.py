@@ -82,19 +82,22 @@ def get_or_create_bugzilla_users(user_data):
             user = User(username=username, password='!', first_name=real_name,
                         email=email, is_active=can_login)
 
-            # Django kind of "corrupts" the DB transaction when an integrity
-            # error occurs. So, we possibly need to wrap in a sub-transaction
-            # to prevent the "corruption" from tainting the outer transaction.
-            with transaction.atomic():
-                try:
+            try:
+                # Django kind of "corrupts" the DB transaction when an
+                # integrity error occurs. So, we need to wrap in a
+                # sub-transaction to prevent the "corruption" from
+                # tainting the outer transaction.
+                with transaction.atomic():
                     user.save()
-                except:
-                    # Blanket exceptions are terrible, but there appears to
-                    # be no way to catch a generic IntegrityError.
-                    user.username = placeholder_username(email, bz_user_id)
-                    logger.info('could not create user %s; trying %s' % (
-                                username, user.username))
-                    user.save()
+            except:
+                # Blanket exceptions are terrible, but there appears to
+                # be no way to catch a generic IntegrityError since SQLite
+                # and MySQL apparently share different exception class
+                # hierarchies?!
+                user.username = placeholder_username(email, bz_user_id)
+                logger.info('could not create user %s; trying %s' % (
+                            username, user.username))
+                user.save()
 
             bugzilla_user_map = BugzillaUserMap(user=user,
                                                 bugzilla_user_id=bz_user_id)
@@ -120,22 +123,23 @@ def get_or_create_bugzilla_users(user_data):
                 ))
                 user.username = username
 
-                with transaction.atomic():
-                    try:
+                try:
+                    with transaction.atomic():
                         user.save()
-                    except:
-                        # Blank exceptions are terrible.
-                        new_username = placeholder_username(email, bz_user_id)
-                        if new_username != old_username:
-                            logger.info('could not set preferred username to %s; '
-                                        'updating username of %s from %s to %s' % (
-                                        username, user.id, old_username,
-                                        new_username))
-                            user.username = new_username
-                            user.save()
-                        else:
-                            logger.info('could not update username of %s; keeping '
-                                        'as is' % user.id)
+                except:
+                    # Blanket exceptions are terrible.
+                    new_username = placeholder_username(email, bz_user_id)
+                    if new_username != old_username:
+                        logger.info('could not set preferred username to %s; '
+                                    'updating username of %s from %s to %s' % (
+                                    username, user.id, old_username,
+                                    new_username))
+                        user.username = new_username
+                        user.save()
+                    else:
+                        logger.info('could not update username of %s; keeping '
+                                    'as %s' % (user.id, old_username))
+                        user.username = old_username
 
             if user.email != email:
                 logger.info('updating email of %s:%s from %s to %s' % (
