@@ -149,6 +149,10 @@ def getpayload(proto, args):
     return data
 
 
+def parsejsonpayload(proto, args):
+    return json.loads(getpayload(proto, args), encoding='utf-8')
+
+
 def parsepayload(proto, args):
     data = getpayload(proto, args)
 
@@ -506,35 +510,28 @@ def publishreviewseries(repo, proto, args=None):
     from rbtools.api.errors import APIError
 
     proto.redirect()
-
-    o = parsepayload(proto, args)
-    if isinstance(o, ServerError):
-        return formatresponse(str(o))
-
-    lines = ['1']
+    req = parsejsonpayload(proto, args)
 
     from reviewboardmods.pushhooks import ReviewBoardClient
     client = ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
-                               username=o['bzusername'],
-                               apikey=o['bzapikey'])
+                               username=req['bzusername'],
+                               apikey=req['bzapikey'])
     root = client.get_root()
 
-    for k, v in o['other']:
-        if k != 'reviewid':
-            continue
+    res = {
+        'results': [],
+    }
 
-        rrid = urllib.unquote(v)
+    for rrid in req.get('rrids', []):
         try:
             rr = root.get_review_request(review_request_id=rrid)
             draft = rr.get_draft()
             draft.update(public=True)
-            lines.append('success %s' % rrid)
+            res['results'].append({'rrid': rrid, 'success': True})
         except APIError as e:
-            lines.append('error %s %s' % (rrid, str(e)))
+            res['results'].append({'rrid': rrid, 'error': str(e)})
 
-    res = '\n'.join(lines)
-    assert isinstance(res, str)
-    return res
+    return json.dumps(res)
 
 
 @wireproto.wireprotocommand('listreviewrepos')

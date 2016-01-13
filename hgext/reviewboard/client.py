@@ -89,9 +89,12 @@ clientcapabilities = {
     'jsonproto',
 }
 
-def calljsoncommand(remote, command):
+def calljsoncommand(remote, command, data=None):
     """Call a wire protocol command parse the response as JSON."""
-    return json.loads(remote._call(command))
+    if data:
+        data = json.dumps(data, sort_keys=True)
+
+    return json.loads(remote._call(command, data=data))
 
 
 def decodepossiblelistvalue(v):
@@ -122,6 +125,16 @@ def commonrequestlines(ui, bzauth=None):
             lines.append('bz%s %s' % (p, urllib.quote(getattr(bzauth, p))))
 
     return lines
+
+
+def commonrequestdict(ui, bzauth=None):
+    """Obtain a request dict with common keys set."""
+    r = {}
+    for p in ('username', 'apikey'):
+        if util.safehasattr(bzauth, p):
+            r['bz%s' % p] = getattr(bzauth, p)
+
+    return r
 
 def getpayload(s):
     """Obtain the payload of a response from the server.
@@ -686,27 +699,24 @@ def doreview(repo, ui, remote, nodes):
 
 def publishreviewrequests(ui, remote, bzauth, rrids):
     """Publish an iterable of review requests."""
-    lines = commonrequestlines(ui, bzauth)
-    for rrid in rrids:
-        lines.append('reviewid %s' % rrid)
+    req = commonrequestdict(ui, bzauth)
+    req['rrids'] = [str(rrid) for rrid in rrids]
 
-    res = remote._call('publishreviewrequests', data='\n'.join(lines))
-    lines = getpayload(res)
+    res = calljsoncommand(remote, 'publishreviewrequests', data=req)
+
     errored = False
-
-    for line in lines:
-        k, v = line.split(' ', 1)
-        if k == 'success':
-            ui.status(_('(published review request %s)\n') % v)
-        elif k == 'error':
+    for item in res['results']:
+        if 'success' in item:
+            ui.status(_('(published review request %s)\n') % item['rrid'])
+        elif 'error' in item:
             errored = True
-            rrid, errstr = v.split(' ', 1)
             ui.warn(_('error publishing review request %s: %s\n') %
-                    (rrid, errstr))
+                    (item['rrid'], item['error']))
 
     if errored:
         ui.warn(_('(review requests not published; visit review url to '
                   'attempt publishing there)\n'))
+
 
 def _pullreviews(repo):
     reviews = repo.reviews
