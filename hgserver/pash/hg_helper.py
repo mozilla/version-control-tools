@@ -79,7 +79,7 @@ https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&componen
 """.strip()
 
 EDIT_DESCRIPTION = """
-You are about to edit the description for hg.mozilla.org/users/%s/%s.
+You are about to edit the description for hg.mozilla.org/users/{user_dir}/{repo}.
 
 If you need to edit the description for a top level repo, please quit now
 and file a Developer Services :: hg.mozilla.org bug at
@@ -330,7 +330,7 @@ def get_user_repo_config(repo_dir):
 def edit_repo_description(repo_name):
     user = os.getenv('USER')
     user_repo_dir = user.replace('@', '_')
-    print(EDIT_DESCRIPTION % (user_repo_dir, repo_name))
+    print(EDIT_DESCRIPTION.format(user_dir=user_repo_dir, repo=repo_name))
     selection = prompt_user('Proceed?', ['yes', 'no'])
     if selection != 'yes':
         return
