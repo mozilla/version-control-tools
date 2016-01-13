@@ -536,12 +536,22 @@ def doreview(repo, ui, remote, nodes):
     #    identifier = repo.dirstate.branch()
 
     if not identifier:
+        identifiers = set()
         for node in nodes:
             ctx = repo[node]
             bugs = parse_bugs(ctx.description())
             if bugs:
                 identifier = 'bz://%s' % bugs[0]
-                break
+                identifiers.add(identifier)
+
+        if len(identifiers) > 1:
+            ui.write(_('It appears you are pushing commits for '
+               'multiple bugs for review. Unfortunately, this is not '
+               'currently supported (and bad things will happen.) You '
+               'can use the -c option to specify an individual commit '
+               'to be reviewed or use -r to restrict what is '
+               'pushed.\n'))
+            return
 
     identifier = ReviewID(identifier)
 
