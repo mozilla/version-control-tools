@@ -97,36 +97,6 @@ def calljsoncommand(remote, command, data=None):
     return json.loads(remote._call(command, data=data))
 
 
-def decodepossiblelistvalue(v):
-    """Decode a wire protocol value that may be a list.
-
-    Values are URL encoded. Lists have literal "," separating elements.
-    """
-    if ',' in v:
-        return [urllib.unquote(p) for p in v.split(',')]
-    else:
-        return urllib.unquote(v)
-
-PROTOVERSION = 1
-
-
-def commonrequestlines(ui, bzauth=None):
-    """Obtain a list of lines common in protocol requests."""
-    lines = ['%d' % PROTOVERSION]
-
-    # Tell the server we support examining capabilities.
-    #
-    # This is behind a config flag to facilitate testing.
-    if ui.configbool('reviewboard', 'supportscaps', True):
-        lines.append('supportscaps 1')
-
-    for p in ('username', 'password', 'userid', 'cookie', 'apikey'):
-        if getattr(bzauth, p, None):
-            lines.append('bz%s %s' % (p, urllib.quote(getattr(bzauth, p))))
-
-    return lines
-
-
 def commonrequestdict(ui, bzauth=None):
     """Obtain a request dict with common keys set."""
     r = {}
@@ -136,26 +106,6 @@ def commonrequestdict(ui, bzauth=None):
 
     return r
 
-def getpayload(s):
-    """Obtain the payload of a response from the server.
-
-    All responses begin with the protocol version followed by a newline.
-    Currently, we only support version 1.
-
-    Returns a list of lines in the response.
-    """
-    try:
-        off = s.index('\n')
-        version = int(s[0:off])
-
-        if version != PROTOVERSION:
-            raise util.Abort(_('unrecognized protocol version from server'))
-    except ValueError:
-        raise util.Abort(_('invalid response from server'))
-
-    assert version == PROTOVERSION
-    lines = s.split('\n')[1:]
-    return lines
 
 def getreviewcaps(remote):
     """Obtain a set of review capabilities from the server.
@@ -595,8 +545,9 @@ def doreview(repo, ui, remote, nodes):
                     'http://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview-user.html)\n'))
                 break
 
-    lines = commonrequestlines(ui, bzauth)
-    lines.append('reviewidentifier %s' % urllib.quote(identifier.full))
+    req = commonrequestdict(ui, bzauth)
+    req['identifier'] = identifier.full
+    req['changesets'] = []
 
     reviews = repo.reviews
     oldparentid = reviews.findparentreview(identifier=identifier.full)
@@ -604,40 +555,41 @@ def doreview(repo, ui, remote, nodes):
     # Include obsolescence data so server can make intelligent decisions.
     obsstore = repo.obsstore
     for node in nodes:
-        lines.append('csetreview %s' % hex(node))
         precursors = [hex(n) for n in obsolete.allprecursors(obsstore, [node])]
-        lines.append('precursors %s %s' % (hex(node), ' '.join(precursors)))
+        req['changesets'].append({
+            'node': hex(node),
+            'precursors': precursors,
+        })
 
     ui.write(_('submitting %d changesets for review\n') % len(nodes))
 
-    res = remote._call('pushreview', data='\n'.join(lines))
-    lines = getpayload(res)
+    res = calljsoncommand(remote, 'pushreview', data=req)
 
-    newparentid = None
+    if 'error' in res:
+        raise error.Abort(res['error'])
+
+    for w in res['display']:
+        ui.write('%s\n' % w)
+
+    reviews.baseurl = res['rburl']
+    newparentid = res['parentrrid']
+    reviews.addparentreview(identifier.full, newparentid)
+
     nodereviews = {}
     reviewdata = {}
 
-    for line in lines:
-        t, d = line.split(' ', 1)
-
-        if t == 'display':
-            ui.write('%s\n' % d)
-        elif t == 'error':
-            raise util.Abort(d)
-        elif t == 'parentreview':
-            newparentid = d
-            reviews.addparentreview(identifier.full, newparentid)
-            reviewdata[newparentid] = {}
-        elif t == 'csetreview':
-            node, rid = d.split(' ', 1)
-            node = bin(node)
-            reviewdata[rid] = {}
+    for rid, info in sorted(res['reviewrequests'].iteritems()):
+        if 'node' in info:
+            node = bin(info['node'])
             nodereviews[node] = rid
-        elif t == 'reviewdata':
-            rid, field, value = d.split(' ', 2)
-            reviewdata[rid][field] = decodepossiblelistvalue(value)
-        elif t == 'rburl':
-            reviews.baseurl = d
+
+        reviewdata[rid] = {
+            'status': info['status'],
+            'public': info['public'],
+        }
+
+        if 'reviewers' in info:
+            reviewdata[rid]['reviewers'] = info['reviewers']
 
     reviews.remoteurl = remote.url()
 
@@ -658,14 +610,14 @@ def doreview(repo, ui, remote, nodes):
         ui.write('changeset:  %s:%s\n' % (ctx.rev(), ctx.hex()[0:12]))
         ui.write('summary:    %s\n' % ctx.description().splitlines()[0])
         ui.write('review:     %s' % reviews.reviewurl(rid))
-        if reviewdata[rid].get('public') == 'False':
+        if not reviewdata[rid].get('public'):
             havedraft = True
             ui.write(' (draft)')
         ui.write('\n\n')
 
     ui.write(_('review id:  %s\n') % identifier.full)
     ui.write(_('review url: %s') % reviews.parentreviewurl(identifier.full))
-    if reviewdata[newparentid].get('public', None) == 'False':
+    if not reviewdata[newparentid].get('public'):
         havedraft = True
         ui.write(' (draft)')
     ui.write('\n')
@@ -696,6 +648,7 @@ def doreview(repo, ui, remote, nodes):
         else:
             ui.status(_('(visit review url to publish these review requests '
                         'so others can see them)\n'))
+
 
 def publishreviewrequests(ui, remote, bzauth, rrids):
     """Publish an iterable of review requests."""
