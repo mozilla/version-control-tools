@@ -10,7 +10,8 @@ RUN curl https://bootstrap.pypa.io/get-pip.py | python
 # where they broke imp module importing. Pin to old, known working,
 # versions.
 RUN pip install -U pip==6.0.8 setuptools==15.2
-RUN pip install ansible
+# Pinned to 1.9 because 2.0 is ~2x slower :/
+RUN pip install ansible==1.9.4
 RUN mkdir /etc/ansible && echo -e '[local]\nlocalhost\n' > /etc/ansible/hosts
 RUN mkdir /vct
 ADD sync-and-build /sync-and-build
