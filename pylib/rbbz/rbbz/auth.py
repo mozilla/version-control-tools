@@ -242,7 +242,7 @@ class BugzillaBackend(AuthBackend):
             users['users'] = [u for u in users['users'] if user_relevant(u)]
             logger.info('importing Bugzilla users from query "%s": %s' % (
                         query,
-                        ' ,'.join(sorted(u['email'] for u in users['users']))))
+                        ', '.join(sorted(u['email'] for u in users['users']))))
             get_or_create_bugzilla_users(users)
         except BugzillaError as e:
             raise UserQueryError('Bugzilla error: %s' % e.msg)
