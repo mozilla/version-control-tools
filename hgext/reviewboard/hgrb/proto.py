@@ -97,7 +97,7 @@ def post_reviews(*args, **kwargs):
         raise BadRequestError(e)
 
 
-def submit_reviews(url, repoid, identifier, commits, hgresp,
+def submit_reviews(url, repoid, identifier, commits,
                    username=None, apikey=None):
     """Submit commits to Review Board."""
     import json
@@ -116,9 +116,6 @@ def submit_reviews(url, repoid, identifier, commits, hgresp,
         identifier=identifier,
         commits=json.dumps(commits, encoding='utf-8'))
 
-    for w in series_result.warnings:
-        hgresp.append(b'display %s' % w.encode('utf-8'))
-
     nodes = {node.encode('utf-8'): str(rid)
              for node, rid in series_result.nodes.iteritems()}
 
@@ -126,6 +123,7 @@ def submit_reviews(url, repoid, identifier, commits, hgresp,
         str(series_result.squashed_rr),
         nodes,
         series_result.review_requests,
+        series_result.warnings,
     )
 
 
@@ -386,10 +384,13 @@ def reviewboard(repo, proto, args=None):
     ]
 
     try:
-        parentrid, commitmap, reviews = post_reviews(rburl, repoid, identifier,
-                                                     commits, lines,
-                                                     username=bzusername,
-                                                     apikey=bzapikey)
+        parentrid, commitmap, reviews, warnings = \
+            post_reviews(rburl, repoid, identifier, commits,
+                         username=bzusername, apikey=bzapikey)
+
+        for w in warnings:
+            lines.append(b'display %s' % w.encode('utf-8'))
+
         lines.extend([
             'parentreview %s' % parentrid,
             'reviewdata %s status %s' % (
