@@ -569,6 +569,12 @@ def update_review_request_draft_diffset(rr, diffset, draft=None):
         discarded_diffset = draft.diffset
 
     draft.diffset = diffset
+
+    # Only add default reviewers if this is the first time a diffset has
+    # been added.
+    if rr.diffset_history.diffsets.count() == 0:
+        draft.add_default_reviewers()
+
     draft.save()
 
     if discarded_diffset:
