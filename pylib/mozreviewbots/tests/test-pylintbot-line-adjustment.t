@@ -95,6 +95,7 @@ Line numbers for these failures should be adjusted -= 1 and cover 2 lines
   description: Bug 1 - Line adjustment minus 1
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.commit_id: 5eedd6ade4e72a9bec6dd82ef5b566337a44adcf
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
@@ -298,6 +299,7 @@ Create tests for line -= 2
   description: Bug 2 - Line adjustment minus 2
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.commit_id: 8da44ae24d4625e0339ed0287a6c61f7288ad5d5
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829

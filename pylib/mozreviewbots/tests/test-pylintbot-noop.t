@@ -30,6 +30,7 @@ No review should be left if no Python files were changed.
   description: Bug 1 - No Python changes
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.commit_id: 9408145328c39ed1fe384e35788b069524ca71a6
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
@@ -69,6 +70,7 @@ Expecting 0 reviews
   description: This is the parent review request
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.base_commit: f5e6079765d8be2554c86ef044e269f048871f1d
     p2rb.commits: '[["dddca45a4bedd629833af826c138bd7e302e5807", 4]]'

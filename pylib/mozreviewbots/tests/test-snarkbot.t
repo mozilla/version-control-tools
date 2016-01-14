@@ -92,6 +92,7 @@ Create and publish a review for SnarkBot
   description: Bug 1 - Foo 1
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.commit_id: 93b21e22593fc0a96331d5357aa5835b7db407e3
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829

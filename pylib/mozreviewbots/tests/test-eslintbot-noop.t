@@ -52,6 +52,7 @@ Create a review request that doesn't touch any Javascript files
   description: Bug 1 - No Javascript changes
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.commit_id: d69b315f2ab1fd46892adbebcadef52f09449906
     p2rb.first_public_ancestor: dc42edca6edd9dd5a8346b1a881281263d3a10ad
