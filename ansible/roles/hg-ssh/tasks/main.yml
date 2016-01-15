@@ -31,6 +31,13 @@
 - name: install Mozilla rpms
   command: yum localinstall -y /var/tmp/mercurial-3.6.2-1.x86_64.rpm /var/tmp/python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm
 
+- name: install global ssh config
+  copy: src=ssh_config
+        dest=/etc/ssh/ssh_config
+        owner=root
+        group=root
+        mode=0640
+
 - name: Create groups for SCM ACLs
   group: name={{ item.name }} gid={{ item.gid }}
   with_items:
