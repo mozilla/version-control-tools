@@ -159,11 +159,33 @@ def pushreviewwireprotocommand(repo, proto, args=None):
     proto.redirect()
     req = parsejsonpayload(proto, args)
 
-    res = _processpushreview(repo, req)
+    # We support pushing via HTTP and SSH. REMOTE_USER will be set via HTTP.
+    # USER via SSH. But USER is a common variable and could also sneak into
+    # the HTTP environment.
+    #
+    # REMOTE_USER values come from Bugzilla. USER values come from LDAP.
+    # There is a potential privilege escalation vulnerability if someone
+    # obtains a Bugzilla account overlapping with a LDAP user having
+    # special privileges. So, we explicitly don't perform an LDAP lookup
+    # if REMOTE_USER is present because we could be crossing the user
+    # stores.
+    ldap_username = os.environ.get('USER')
+    remote_user = repo.ui.environ.get('REMOTE_USER', os.environ.get('REMOTE_USER'))
+    if remote_user:
+        ldap_username = None
+
+    res = _processpushreview(repo, req, ldap_username)
     return json.dumps(res, sort_keys=True)
 
 
-def _processpushreview(repo, req):
+def _processpushreview(repo, req, ldap_username):
+    """Handle a request to turn changesets into review requests.
+
+    ``ldap_username`` is the LDAP username to associate with the MozReview
+    account whose credentials are passed as part of the request. We implicitly
+    trust the passed LDAP username has been authenticated to belong to the
+    MozReview account.
+    """
     bzusername = req.get('bzusername')
     bzapikey = req.get('bzapikey')
 
@@ -281,20 +303,7 @@ def _processpushreview(repo, req):
     privleged_rb_username = repo.ui.config('reviewboard', 'username', None)
     privleged_rb_password = repo.ui.config('reviewboard', 'password', None)
 
-    # We support pushing via HTTP and SSH. REMOTE_USER will be set via HTTP.
-    # USER via SSH. But USER is a common variable and could also sneak into
-    # the HTTP environment.
-    #
-    # REMOTE_USER values come from Bugzilla. USER values come from LDAP.
-    # There is a potential privilege escalation vulnerability if someone
-    # obtains a Bugzilla account overlapping with a LDAP user having
-    # special privileges. So, we explicitly don't perform an LDAP lookup
-    # if REMOTE_USER is present because we could be crossing the user
-    # stores.
-    ldap_username = os.environ.get('USER')
-    remote_user = repo.ui.environ.get('REMOTE_USER', os.environ.get('REMOTE_USER'))
-
-    if ldap_username and not remote_user:
+    if ldap_username:
         associate_ldap_username(rburl, ldap_username, privleged_rb_username,
                                 privleged_rb_password, username=bzusername,
                                 apikey=bzapikey)
