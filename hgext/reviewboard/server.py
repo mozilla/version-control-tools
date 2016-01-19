@@ -108,6 +108,7 @@ def capabilities(orig, repo, proto):
         reviewcaps.add('pullreviews')
         reviewcaps.add('publish')
         reviewcaps.add('submithttp')
+        reviewcaps.add('publishhttp')
 
         # Deprecated.
         caps.append('reviewboard')
@@ -330,6 +331,18 @@ def submitserieswebcommand(web, req, tmpl):
     return sendjsonresponse(req, res)
 
 
+def publishwebcommand(web, req, tmpl):
+    repo = web.repo
+
+    try:
+        body = parsejsonpayload(req)
+    except InvalidRequestException as e:
+        return sendjsonresponse(req, {'error': e.args[0]})
+
+    res = hgrb.proto._processpublishreview(repo, body)
+    return sendjsonresponse(req, res)
+
+
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     pushkey.register('strip', pushstrip, liststrip)
@@ -339,6 +352,9 @@ def extsetup(ui):
 
     setattr(webcommands, 'mozreviewsubmitseries', submitserieswebcommand)
     webcommands.__all__.append('mozreviewsubmitseries')
+
+    setattr(webcommands, 'mozreviewpublish', publishwebcommand)
+    webcommands.__all__.append('mozreviewpublish')
 
 
 def reposetup(ui, repo):

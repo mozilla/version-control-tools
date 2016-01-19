@@ -667,7 +667,8 @@ def publishreviewrequests(ui, remote, bzauth, rrids):
     req = commonrequestdict(ui, bzauth)
     req['rrids'] = [str(rrid) for rrid in rrids]
 
-    res = calljsoncommand(ui, remote, 'publishreviewrequests', data=req)
+    res = calljsoncommand(ui, remote, 'publishreviewrequests', data=req,
+                          httpcap='publishhttp', httpcommand='mozreviewpublish')
 
     errored = False
     for item in res['results']:
