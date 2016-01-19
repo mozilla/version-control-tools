@@ -89,7 +89,7 @@ clientcapabilities = {
     'jsonproto',
 }
 
-def calljsoncommand(remote, command, data=None):
+def calljsoncommand(ui, remote, command, data=None):
     """Call a wire protocol command parse the response as JSON."""
     if data:
         data = json.dumps(data, sort_keys=True)
@@ -198,7 +198,7 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
         rootnode = repo[0].hex()
 
         repo.ui.status(_('searching for appropriate review repository\n'))
-        data = calljsoncommand(remote, 'listreviewrepos')
+        data = calljsoncommand(repo.ui, remote, 'listreviewrepos')
         for node, urls in data.iteritems():
             if node == rootnode:
                 newurls = urls
@@ -563,7 +563,7 @@ def doreview(repo, ui, remote, nodes):
 
     ui.write(_('submitting %d changesets for review\n') % len(nodes))
 
-    res = calljsoncommand(remote, 'pushreview', data=req)
+    res = calljsoncommand(ui, remote, 'pushreview', data=req)
 
     if 'error' in res:
         raise error.Abort(res['error'])
@@ -655,7 +655,7 @@ def publishreviewrequests(ui, remote, bzauth, rrids):
     req = commonrequestdict(ui, bzauth)
     req['rrids'] = [str(rrid) for rrid in rrids]
 
-    res = calljsoncommand(remote, 'publishreviewrequests', data=req)
+    res = calljsoncommand(ui, remote, 'publishreviewrequests', data=req)
 
     errored = False
     for item in res['results']:
@@ -702,7 +702,7 @@ def _pullreviewidentifiers(repo, identifiers):
 
     req = commonrequestdict(repo.ui)
     req['identifiers'] = [str(i) for i in identifiers]
-    res = calljsoncommand(remote, 'pullreviews', data=req)
+    res = calljsoncommand(repo.ui, remote, 'pullreviews', data=req)
 
     for rid, data in sorted(res['reviewrequests'].iteritems()):
         reviews.savereviewrequest(rid, data)
