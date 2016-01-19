@@ -151,14 +151,19 @@ def parsejsonpayload(proto, args):
 
 
 def errorresponse(msg):
-    return json.dumps({'error': msg})
+    return {'error': msg}
 
 
 @wireproto.wireprotocommand('pushreview', '*')
-def reviewboard(repo, proto, args=None):
+def pushreviewwireprotocommand(repo, proto, args=None):
     proto.redirect()
     req = parsejsonpayload(proto, args)
 
+    res = _processpushreview(repo, req)
+    return json.dumps(res, sort_keys=True)
+
+
+def _processpushreview(repo, req):
     bzusername = req.get('bzusername')
     bzapikey = req.get('bzapikey')
 
@@ -329,7 +334,7 @@ def reviewboard(repo, proto, args=None):
     except BadRequestError as e:
         return errorresponse(str(e))
 
-    return json.dumps(res, sort_keys=True)
+    return res
 
 
 @wireproto.wireprotocommand('pullreviews', '*')
