@@ -416,11 +416,14 @@ def publishreviewseries(repo, proto, args=None):
     Note: MozReview will publish all children when publishing a parent review
     request.
     """
-    from rbtools.api.errors import APIError
-
     proto.redirect()
     req = parsejsonpayload(proto, args)
+    res = _processpublishreview(repo, req)
+    return json.dumps(res, sort_keys=True)
 
+
+def _processpublishreview(repo, req):
+    from rbtools.api.errors import APIError
     from reviewboardmods.pushhooks import ReviewBoardClient
     client = ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
                                username=req['bzusername'],
@@ -440,7 +443,7 @@ def publishreviewseries(repo, proto, args=None):
         except APIError as e:
             res['results'].append({'rrid': rrid, 'error': str(e)})
 
-    return json.dumps(res)
+    return res
 
 
 @wireproto.wireprotocommand('listreviewrepos')
