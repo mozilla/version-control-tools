@@ -113,6 +113,13 @@ cd ../..
 unset HGRCPATH
 echo finished installing Mercurials
 
+if [ ! -d venv/git-cinnabar ]; then
+  echo "Cloning git-cinnabar"
+  git clone --branch release https://github.com/glandium/git-cinnabar.git venv/git-cinnabar
+fi
+
+git -C venv/git-cinnabar pull
+
 echo ""
 echo "Building Docker images."
 echo "This could take a while and may consume a lot of internet bandwidth."
