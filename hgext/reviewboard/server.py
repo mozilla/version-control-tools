@@ -19,6 +19,7 @@ url is commonly defined in the global hgrc whereas repoid is repository
 local.
 """
 
+import json
 import os
 import sys
 
@@ -37,6 +38,12 @@ from mercurial.i18n import _
 from mercurial.node import (
     hex,
     nullid,
+)
+from mercurial.hgweb import (
+    webcommands,
+)
+from mercurial.hgweb.common import (
+    HTTP_OK,
 )
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
@@ -100,6 +107,7 @@ def capabilities(orig, repo, proto):
         reviewcaps.add('pushreview')
         reviewcaps.add('pullreviews')
         reviewcaps.add('publish')
+        reviewcaps.add('submithttp')
 
         # Deprecated.
         caps.append('reviewboard')
@@ -231,6 +239,26 @@ def wrappedwireprotoheads(orig, repo, proto, *args, **kwargs):
     return wireproto.ooberror(nopushdiscoveryrepos)
 
 
+def sendjsonresponse(req, obj):
+    req.respond(HTTP_OK, 'application/json')
+    return [json.dumps(obj, indent=2, sort_keys=True, encoding='utf-8')]
+
+
+class InvalidRequestException(Exception):
+    """Represents in invalid request payload."""
+
+
+def parsejsonpayload(req):
+    body = req.read()
+    if not body:
+        raise InvalidRequestException('request payload missing')
+
+    try:
+        return json.loads(body, encoding='utf-8')
+    except ValueError:
+        raise InvalidRequestException('malformed JSON')
+
+
 @command('createrepomanifest', [
 ], _('hg createrepomanifest SEARCH REPLACE'))
 def createrepomanifest(ui, repo, search=None, replace=None):
@@ -263,12 +291,55 @@ def createrepomanifest(ui, repo, search=None, replace=None):
     ui.write(data)
 
 
+def submitserieswebcommand(web, req, tmpl):
+    """Submit changesets to MozReview for review.
+
+    The HTTP request body is a JSON object describing what to submit. The
+    object has the following keys:
+
+    bzusername
+       The Bugzilla username to use for authentication
+    bzapikey
+       The Bugzilla API key to use for authentication
+    identifier
+       The review identifier creating/updating. This is effectively the series
+       ID.
+    changesets
+       An array of objects describing the changesets being submitted for
+       review. See the section below on the format of each object.
+
+    Each changeset object has the following keys:
+
+    node
+       40 character hex SHA-1 of changeset being reviewed
+    precursors
+       Array of 40 character hex SHA-1 strings corresponding to precursors
+       of this node.
+
+       This array is populated by users with obsolescence enabled. It can be
+       used to map old commits to new commits.
+    """
+    repo = web.repo
+
+    try:
+        body = parsejsonpayload(req)
+    except InvalidRequestException as e:
+        return sendjsonresponse(req, {'error': e.args[0]})
+
+    res = hgrb.proto._processpushreview(repo, body, ldap_username=None)
+    return sendjsonresponse(req, res)
+
+
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     pushkey.register('strip', pushstrip, liststrip)
 
     # To short circuit operations with discovery repos.
     extensions.wrapcommand(wireproto.commands, 'heads', wrappedwireprotoheads)
+
+    setattr(webcommands, 'mozreviewsubmitseries', submitserieswebcommand)
+    webcommands.__all__.append('mozreviewsubmitseries')
+
 
 def reposetup(ui, repo):
     if not repo.local():

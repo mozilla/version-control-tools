@@ -25,6 +25,7 @@ import json
 import os
 import sys
 import urllib
+import urllib2
 
 from mercurial import (
     cmdutil,
@@ -42,6 +43,7 @@ from mercurial import (
     scmutil,
     sshpeer,
     templatekw,
+    url as urlmod,
     util,
 )
 from mercurial.i18n import _
@@ -89,12 +91,22 @@ clientcapabilities = {
     'jsonproto',
 }
 
-def calljsoncommand(ui, remote, command, data=None):
+def calljsoncommand(ui, remote, command, data=None, httpcap=None, httpcommand=None):
     """Call a wire protocol command parse the response as JSON."""
     if data:
-        data = json.dumps(data, sort_keys=True)
+        data = json.dumps(data, sort_keys=True, encoding='utf-8')
 
-    return json.loads(remote._call(command, data=data))
+    if (httpcap and httpcommand and httpcap in getreviewcaps(remote) and
+        isinstance(remote, httppeer.httppeer)):
+        url = '%s/%s' % (remote._url, httpcommand)
+        request = remote.requestbuilder(url, data=data,
+                                        headers={'Content-Type': 'application/json'})
+        fh = remote.urlopener.open(request)
+        res = fh.read()
+    else:
+        res = remote._call(command, data=data)
+
+    return json.loads(res)
 
 
 def commonrequestdict(ui, bzauth=None):
@@ -563,8 +575,8 @@ def doreview(repo, ui, remote, nodes):
 
     ui.write(_('submitting %d changesets for review\n') % len(nodes))
 
-    res = calljsoncommand(ui, remote, 'pushreview', data=req)
-
+    res = calljsoncommand(ui, remote, 'pushreview', data=req, httpcap='submithttp',
+                          httpcommand='mozreviewsubmitseries')
     if 'error' in res:
         raise error.Abort(res['error'])
 
