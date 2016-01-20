@@ -4,9 +4,7 @@
 
 from __future__ import unicode_literals
 
-import json
-import urllib2
-
+import requests
 
 TREE_ALIASES = {
     'mozilla-central': ('central',),
@@ -263,18 +261,14 @@ class MercurialRepository(object):
 
     def __init__(self, url):
         self.url = url
-        self._opener = urllib2.build_opener()
 
     def push_info_for_changeset(self, changeset):
         """Obtain the push information for a single changeset.
 
         Returns a PushInfo on success or None if no push info is available.
         """
-        request = urllib2.Request('%s/json-pushes?full=1&changeset=%s' % ( self.url,
-            changeset))
-
-        response = self._opener.open(request)
-        o = json.load(response)
+        o = requests.get('%s/json-pushes?full=1&changeset=%s' % ( self.url,
+            changeset)).json()
 
         if not o:
             return None
@@ -288,10 +282,7 @@ class MercurialRepository(object):
         url = '%s/json-pushes?startID=%d' % (self.url, start_id)
         if full:
             url += '&full=1'
-        request = urllib2.Request(url)
-
-        response = self._opener.open(request)
-        pushes = json.load(response)
+        pushes = requests.get(url).json()
 
         for push_id in sorted(int(k) for k in pushes):
             yield push_id, pushes[str(push_id)]
