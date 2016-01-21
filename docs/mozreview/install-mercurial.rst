@@ -95,20 +95,10 @@ Use the following as a template::
   [mozilla]
   ircnick = mynick
 
-Configuring Review Repositories/Paths
-=====================================
-
-You almost certainly want to define the URL you will be pushing to in
-your Mercurial configuration so you can type a short name (e.g.
-``review``) rather than a full URL (which is longer and harder to
-remember).
-
-The sections below describe how to do this.
-
 .. _mozreview_install_autoreview:
 
-Configuring the Auto Review Repository
---------------------------------------
+Configuring The Auto Review Repository
+======================================
 
 There is a special repository called the ``autoreview`` repository that
 will automatically see what you are pushing and *redirect* your push to
@@ -131,38 +121,3 @@ the appropriate HTTP or SSH URL depending on what you have configured)::
 Now, you can ``hg push review`` from any Mercurial repository and it
 will go to the ``autoreview`` repository and redirect to the appropriate
 review repository automatically!
-
-Advanced Paths Configuration
-----------------------------
-
-If the *auto review* repository is too much magic for you, you can
-define the review URL for each repository you wish to review from.
-
-.. important::
-
-   We highly recommend the ``autoreview`` repository because it is much
-   simpler to manage.
-
-You will want to define a named path in your per-repository hgrc file.
-We recommend the name ``review``. The URL for the repository is
-``https://reviewboard-hg.mozilla.org/<repo>`` or
-``ssh://reviewboard-hg.mozilla.org/<repo>`` (depending on whether you
-are pushing over HTTP or SSH, respectively) where ``<repo>`` is
-the name of a repository.
-
-You can find the list of available repositories at
-https://reviewboard-hg.mozilla.org/. For SSH URls, Just replace ``https://``
-with ``ssh://``.
-
-Edit your repository-local config via ``hg config -e`` and adjust your
-``[paths]`` section to resemble something like::
-
-  [paths]
-  default = https://hg.mozilla.org/hgcustom/version-control-tools
-  default-push = ssh://hg.mozilla.org/hgcustom/version-control-tools
-
-  # For HTTP pushing
-  review = https://reviewboard-hg.mozilla.org/version-control-tools
-
-  # For SSH pushing
-  review = ssh://reviewboard-hg.mozilla.org/version-control-tools
