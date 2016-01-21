@@ -11,8 +11,8 @@ from reviewboard.webapi.resources import WebAPIResource
 
 from mozreview.extra_data import (COMMITS_KEY, is_parent, get_parent_rr)
 from mozreview.errors import (NOT_PARENT, AUTOLAND_REVIEW_NOT_APPROVED)
-from mozreview.review_helpers import (gen_latest_reviews)
-
+from mozreview.review_helpers import (gen_latest_reviews,
+                                      has_shipit_carryforward)
 
 from mozautomation.commitparser import (replace_reviewers,)
 
@@ -68,10 +68,14 @@ class CommitRewriteResource(WebAPIResource):
                 # set r=me
                 reviewers.append('me')
 
+            # Detect if the commit has been changed since the last review.
+            shipit_carryforward = has_shipit_carryforward(child_request)
+
             result.append({
                 'commit': child[0],
                 'id': child[1],
                 'reviewers': reviewers,
+                'shipit_carryforward': shipit_carryforward,
                 'summary': replace_reviewers(child_request.description,
                                              reviewers)
             })

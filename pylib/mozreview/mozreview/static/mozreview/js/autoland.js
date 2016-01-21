@@ -140,7 +140,7 @@ $(document).on("mozreview_ready", function() {
       .modalBox({
         title: "Land Commits",
         buttons: [
-          $('<input type="button"/>')
+          $('<input type="button" id="autoland-cancel"/>')
             .val(gettext("Cancel")),
           $('<input type="button" id="autoland-submit" disabled/>')
             .val("Land")
@@ -181,6 +181,16 @@ $(document).on("mozreview_ready", function() {
                   $('<span/>')
                     .addClass('autoland-commit-reviewers')
                     .text('reviewers: ' + this.reviewers.join(', '))));
+          if (this.shipit_carryforward === true) {
+            $('#autoland-commits')
+              .append(
+                $('<span/>')
+                  .addClass('rb-icon rb-icon-warning'))
+              .append(
+                $('<span/>')
+                  .addClass('autoland-commit-warning')
+                  .text('Warning: commit has changed since review was granted'));
+          }
           // store commit descriptions in a form ready to pass to autoland
           commit_descriptions[this.commit.substr(0, 12)] = this.summary;
         });
