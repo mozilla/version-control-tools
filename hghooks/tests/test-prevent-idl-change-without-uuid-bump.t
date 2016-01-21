@@ -402,12 +402,12 @@ Adding and modifying multiple IDL files should fail if UUID is not bumped.
   abort: pretxnchangegroup.prevent_idl_change_without_uuid_bump hook failed
   [255]
 
-Comments and changes outside interface blocks should be ignored.
+Comments, whitespaces, and changes outside interface blocks should be ignored.
 
   $ cat > a.idl << EOF
   > /* test */[uuid(00000000-0000-0000-c000-000000000046)]
-  > interface A {// foo
-  >   void /* bar */test();// baz
+  > interface A { // foo
+  >   void /* bar */ test(); // baz
   > };
   > EOF
 
@@ -419,6 +419,7 @@ Comments and changes outside interface blocks should be ignored.
   > [ptr] native x(x);
   > [uuid(1f341018-521a-49de-b806-1bef5c9a00b0)]
   > interface B {
+  > 
   > };
   > test
   > EOF
