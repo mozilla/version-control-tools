@@ -9,13 +9,13 @@ a repository-based code-review system based on
 `Review Board <https://www.reviewboard.org/>`_.
 
 For the quick and impatient who just want to look at the web interface,
-it lives at https://reviewboard.mozilla.org/. Log in with your Bugzilla
-credentials. Read on to learn how to create new review requests and to
-conduct code review using the web interface.
+it lives at https://reviewboard.mozilla.org/. Log in via Bugzilla. Read
+on to learn how to create new review requests and to conduct code review
+using the web interface.
 
 Before you start code review, you need some code to review. This article
-assumes you have at least basic knowledge of Mercurial and can create
-commits that should be reviewed.
+assumes you have at least basic knowledge of version control and can
+create commits that should be reviewed.
 
 Please drill down into one of the following sections to continue.
 
