@@ -4,58 +4,59 @@
 Configuring Your Machine to Use MozReview
 =========================================
 
+Configuring your machine to submit patches to MozReview requires the following
+steps:
+
+1. Obtain accounts and access privileges (those already active with Mozilla
+   have likely already done this)
+2. Configure your version control tool to connect with MozReview
+
 Obtaining Accounts, Credentials, and Privileges
 ===============================================
 
-Pushing to MozReview to **initiate** code review requires the following:
+To submit patches to MozReview, you will need:
 
 * An active ``bugzilla.mozilla.org`` (BMO) account
 * A BMO API Key
-* (optional) A Mozilla LDAP account with Mercurial access and a
-  registered SSH key
+
+Those wishing to use advanced and more privileged features of MozReview will
+need:
+
+* A Mozilla LDAP account with Mercurial access and a registered SSH key
+
+.. important::
+
+   First time contributors don't require an LDAP account and can use most
+   parts of MozReview with just a Bugzilla account.
 
 A BMO account can be created at https://bugzilla.mozilla.org/createaccount.cgi.
-
-Once you have an account, visit
-https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey to generate a new
-API Key. The API Key can have any description you want. We recommend
-something like ``mercurial`` or ``git``. The API Key won't be used until
-later, so you don't have to generate it right away.
+(Instructions for creating BMO API Keys are described later.)
 
 Instructions for obtaining a Mozilla LDAP account with Mercurial access
 are documented at
 `Becoming A Mozilla Contributor <https://www.mozilla.org/en-US/about/governance/policies/commit/>`_.
 
-LDAP/SSH Versus HTTP
-====================
+Benefits of Having an LDAP Account
+----------------------------------
 
-Reviews are initiated with MozReview by pushing to a Mercurial *review*
-repository. Pushing via both SSH and HTTP are supported.
+Having an LDAP account associated with MozReview grants the following
+additional privileges:
 
-Pushing via HTTP is the easiest to configure **and is recommended for
-new contributors**. All you need to push via HTTP is an active Bugzilla
-account and Bugzilla API Key.
-
-Pushing via SSH requires a Mozilla LDAP account configured with
-Mercurial access and with a registered SSH key. This involves a little
-more time and work to obtain. **This is recommended for Mozilla staff and
-beyond-casual contributors.**
+* Ability to trigger *Try* jobs from MozReview
+* Ability to land commits from the MozReview
 
 .. important::
 
-   Pushing via SSH grants additional privileges in the MozReview web
-   interface, such as the ability to trigger *Try* jobs and interact
-   with the *Autoland* code landing service. If you push things via HTTP
-   and have never pushed via SSH before, you will need someone else to
-   trigger *Try* jobs for you.
+   Non-casual contributors are strongly encouraged to obtain and configure
+   an LDAP account.
 
 Updating SSH Config
 -------------------
 
-If you are using SSH to push to MozReview, you will want to configure your
-SSH username for ``reviewboard-hg.mozilla.org``. See :ref:`auth_ssh` for
-instructions on updating your SSH client configuration, including the SSH host
-key fingerprints.
+If you are using SSH to push to MozReview (requires an LDAP account), you will
+want to configure your SSH username for ``reviewboard-hg.mozilla.org``.
+See :ref:`auth_ssh` for instructions on updating your SSH client configuration,
+including the SSH host key fingerprints.
 
 .. tip::
 
