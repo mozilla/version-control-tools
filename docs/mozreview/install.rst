@@ -19,8 +19,8 @@ A BMO account can be created at https://bugzilla.mozilla.org/createaccount.cgi.
 Once you have an account, visit
 https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey to generate a new
 API Key. The API Key can have any description you want. We recommend
-something like ``mercurial``. The API Key won't be used until later, so
-you don't have to generate it right away.
+something like ``mercurial`` or ``git``. The API Key won't be used until
+later, so you don't have to generate it right away.
 
 Instructions for obtaining a Mozilla LDAP account with Mercurial access
 are documented at
@@ -30,7 +30,7 @@ LDAP/SSH Versus HTTP
 ====================
 
 Reviews are initiated with MozReview by pushing to a Mercurial *review*
-repository using ``hg push``. Pushing via both SSH and HTTP are supported.
+repository. Pushing via both SSH and HTTP are supported.
 
 Pushing via HTTP is the easiest to configure **and is recommended for
 new contributors**. All you need to push via HTTP is an active Bugzilla
