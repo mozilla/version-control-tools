@@ -294,6 +294,7 @@ from mercurial.localrepo import (
     repofilecache,
 )
 from mercurial.node import (
+    bin,
     hex,
     short,
 )
@@ -398,8 +399,38 @@ def exchangepullpushlog(orig, pullop):
     if not tree or not repo.changetracker or tree == "try":
         return res
 
-    repo.ui.status('fetching pushlog\n')
-    repo.changetracker.load_pushlog(tree)
+    lastpushid = repo.changetracker.last_push_id(tree)
+    fetchfrom = lastpushid + 1 if lastpushid is not None else 0
+
+    lines = pullop.remote._call('pushlog', firstpush=str(fetchfrom))
+    lines = iter(lines.splitlines())
+
+    statusline = lines.next()
+    if statusline[0] == '0':
+        raise error.Abort('remote error fetching pushlog: %s' % lines.next())
+    elif statusline != '1':
+        raise error.Abort('error fetching pushlog: unexpected response: %s\n' %
+            statusline)
+
+    pushes = []
+    for line in lines:
+        pushid, who, when, nodes = line.split(' ', 3)
+        nodes = [bin(n) for n in nodes.split()]
+
+        # Verify incoming changesets are known and stop processing when we see
+        # an unknown changeset. This can happen when we're pulling a former
+        # head instead of all changesets.
+        try:
+            [repo[n] for n in nodes]
+        except error.RepoLookupError:
+            repo.ui.warn('received pushlog entry for unknown changeset; ignoring\n')
+            break
+
+        pushes.append((int(pushid), who, int(when), nodes))
+
+    if pushes:
+        repo.changetracker.add_pushes(tree, pushes)
+        repo.ui.status('added %d pushes\n' % len(pushes))
 
     return res
 
