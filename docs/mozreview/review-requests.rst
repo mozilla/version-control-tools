@@ -92,6 +92,9 @@ message and assign reviewers as requested. This should *just work*.
    as it may result in confusion. Instead, the ``r?`` syntax should be
    used to denote that review is pending.
 
+   Autoland will automatically rewrite ``r?`` to ``r=``, so using ``r?``
+   should be no extra work for you.
+
 Commit Series
 =============
 
