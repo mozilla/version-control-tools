@@ -136,6 +136,29 @@ class ChangeTracker(object):
                 self._db.executemany('INSERT INTO changeset_pushes VALUES '
                     '(?, ?, ?, ?)', params)
 
+    def add_pushes(self, tree, pushes):
+        """Insert an iterable of pushes for a tree.
+
+        ``pushes`` is an iterable of tuples of (pushid, who, when, nodes).
+        """
+        tree_id = self.tree_id(tree)
+
+        with self._db:
+            for push_id, who, when, nodes in pushes:
+                for node in nodes:
+                    assert len(node) == 20
+
+                self._db.execute(
+                        'INSERT INTO pushes (push_id, tree_id, user, time) '
+                        'VALUES (?, ?, ?, ?)', [push_id, tree_id, who, when])
+                if nodes:
+                    head = buffer(nodes[-1])
+                    params = [(buffer(c), head, push_id, tree_id) for c in nodes]
+                    self._db.executemany(
+                            'INSERT INTO changeset_pushes '
+                            '(changeset, head_changeset, push_id, tree_id) '
+                            'VALUES (?, ?, ?, ?)', params)
+
     def pushes_for_changeset(self, changeset):
         for row in self._db.execute('SELECT trees.name, pushes.push_id, '
             'pushes.time, pushes.user, changeset_pushes.head_changeset '
