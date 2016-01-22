@@ -17,9 +17,14 @@ import mercurial.repair as repair
 import mercurial.util as util
 
 
-# Mercurial 3.5 renamed readcurrent to readactive.
+# Mercurial 3.5 renamed bookmarks.readcurrent to bookmarks.readactive.
+# Mercurial 3.7 renamed bookmarks.readactive to bookmarks._readactive.
+# localrepository._activebookmark is the easiest way to access the
+# active bookmark since it already has a bookmarks instance loaded.
 def activebookmark(repo):
-    if hasattr(bookmarks, 'readactive'):
+    if hasattr(repo, '_activebookmark'):
+        return repo._activebookmark
+    elif hasattr(bookmarks, 'readactive'):
         return bookmarks.readactive(repo)
     else:
         return bookmarks.readcurrent(repo)
