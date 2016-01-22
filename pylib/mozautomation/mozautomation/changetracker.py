@@ -100,16 +100,28 @@ class ChangeTracker(object):
             return self._db.execute('SELECT id FROM trees WHERE name=? LIMIT 1',
                 [tree]).fetchone()[0]
 
+    def last_push_id(self, tree):
+        """Return the push ID of the last recorded push to a tree.
+
+        Returns an integer or None if no pushes are recorded.
+        """
+        tree, url = resolve_trees_to_uris([tree])[0]
+        tree_id = self.tree_id(tree, url)
+
+        last_push_id = self._db.execute('SELECT push_id FROM pushes WHERE '
+            'tree_id=? ORDER BY push_id DESC LIMIT 1', [tree_id]).fetchone()
+
+        return last_push_id[0] if last_push_id else None
+
     def load_pushlog(self, tree):
         tree, url = resolve_trees_to_uris([tree])[0]
         repo = MercurialRepository(url)
 
         tree_id = self.tree_id(tree, url)
 
-        last_push_id = self._db.execute('SELECT push_id FROM pushes WHERE '
-            'tree_id=? ORDER BY push_id DESC LIMIT 1', [tree_id]).fetchone()
-
-        last_push_id = last_push_id[0] if last_push_id else -1
+        last_push_id = self.last_push_id(tree)
+        if last_push_id is None:
+            last_push_id = -1
 
         with self._db:
             for push_id, push in repo.push_info(start_id=last_push_id + 1):
