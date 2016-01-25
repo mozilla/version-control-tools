@@ -278,6 +278,7 @@ import sys
 from operator import methodcaller
 
 from mercurial import (
+    demandimport,
     exchange,
     revset,
     templatefilters,
@@ -317,26 +318,34 @@ for p in ('flake8', 'mccabe', 'mozautomation', 'pep8', 'pyflakes'):
     sys.path.insert(0, os.path.join(PYLIB, p))
 
 
-from mozautomation.changetracker import (
-    ChangeTracker,
-)
+# Disable demand importing for mozautomation because "requests" doesn't
+# play nice with the demand importer.
+demandenabled = demandimport.isenabled()
+try:
+    demandimport.disable()
 
-from mozautomation.commitparser import (
-    parse_bugs,
-    parse_reviewers,
-)
+    from mozautomation.changetracker import (
+        ChangeTracker,
+    )
 
-from mozautomation.repository import (
-    MercurialRepository,
-    RELEASE_TREES,
-    REPOS,
-    resolve_trees_to_official,
-    resolve_trees_to_uris,
-    resolve_uri_to_tree,
-    treeherder_url,
-    TREE_ALIASES,
-)
+    from mozautomation.commitparser import (
+        parse_bugs,
+        parse_reviewers,
+    )
 
+    from mozautomation.repository import (
+        MercurialRepository,
+        RELEASE_TREES,
+        REPOS,
+        resolve_trees_to_official,
+        resolve_trees_to_uris,
+        resolve_uri_to_tree,
+        treeherder_url,
+        TREE_ALIASES,
+    )
+finally:
+    if demandenabled:
+        demandimport.enable()
 
 bz_available = False
 
