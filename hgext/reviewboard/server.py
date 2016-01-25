@@ -355,12 +355,23 @@ def reviewreposwebcommand(web, req, tmpl):
     return sendjsonresponse(req, listreviewrepos(web.repo))
 
 
+def capabilitieswebcommand(web, req, tmpl):
+    """Obtain the review capabilities for this repo."""
+    return sendjsonresponse(req, {
+        'reviewcaps': sorted(reviewcapabilities(web.repo)),
+        'reviewrequires': sorted(requirecaps),
+    })
+
+
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     pushkey.register('strip', pushstrip, liststrip)
 
     # To short circuit operations with discovery repos.
     extensions.wrapcommand(wireproto.commands, 'heads', wrappedwireprotoheads)
+
+    setattr(webcommands, 'mozreviewcapabilities', capabilitieswebcommand)
+    webcommands.__all__.append('mozreviewcapabilities')
 
     setattr(webcommands, 'mozreviewsubmitseries', submitserieswebcommand)
     webcommands.__all__.append('mozreviewsubmitseries')

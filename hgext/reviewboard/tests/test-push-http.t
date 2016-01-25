@@ -31,6 +31,28 @@ A HTTP GET request should not require authentication
   
   {"1": {"changesets": ["96ee1d7354c4ad7372047672c36a1f561e3a6a4c"], "date": *, "user": "default@example.com"}} (glob)
 
+Capabilities are exposed via JSON API
+
+  $ http --no-headers ${MERCURIAL_URL}test-repo/json-mozreviewcapabilities
+  200
+  
+  {
+    "reviewcaps": [
+      "publish", 
+      "publishhttp", 
+      "pullreviews", 
+      "pushreview", 
+      "submithttp"
+    ], 
+    "reviewrequires": [
+      "bzapikeys", 
+      "jsonproto", 
+      "listreviewdata", 
+      "listreviewrepos", 
+      "proto1"
+    ]
+  }
+
 hg pull does not require authentication
 
   $ hg --config extensions.strip= strip -r tip
