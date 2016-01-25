@@ -343,6 +343,10 @@ def publishwebcommand(web, req, tmpl):
     return sendjsonresponse(req, res)
 
 
+def reviewreposwebcommand(web, req, tmpl):
+    return sendjsonresponse(req, listreviewrepos(web.repo))
+
+
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     pushkey.register('strip', pushstrip, liststrip)
@@ -355,6 +359,9 @@ def extsetup(ui):
 
     setattr(webcommands, 'mozreviewpublish', publishwebcommand)
     webcommands.__all__.append('mozreviewpublish')
+
+    setattr(webcommands, 'mozreviewreviewrepos', reviewreposwebcommand)
+    webcommands.__all__.append('mozreviewreviewrepos')
 
 
 def reposetup(ui, repo):

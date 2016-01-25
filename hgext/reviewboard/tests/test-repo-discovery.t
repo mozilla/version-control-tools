@@ -99,6 +99,17 @@ createrepomanifest should have created a file
   36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b ssh://*:$HGPORT6/b (glob)
   4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a ssh://*:$HGPORT6/a (glob)
 
+repo list accessible via JSON API
+
+  $ http --no-headers ${MERCURIAL_URL}autoreview/json-mozreviewreviewrepos
+  200
+  
+  {
+    "36d47cf7c6cbd312de3aeb3b2f770c650b014053": "http://*:$HGPORT/b ssh://*:$HGPORT6/b",  (glob)
+    "4016108b6e06add4c0ddde40dee8c7b9aa410f58": "http://*:$HGPORT/a ssh://*:$HGPORT6/a" (glob)
+  }
+
+
 Pushing a repository unrelated to any known repo should result in error message
 
   $ hg init unrelated
