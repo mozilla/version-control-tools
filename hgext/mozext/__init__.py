@@ -799,8 +799,6 @@ def pull(orig, repo, remote, *args, **kwargs):
 
         if tree:
             repo._update_remote_refs(remote, tree)
-            if repo.changetracker:
-                repo.changetracker.load_pushlog(tree)
 
         # Sync bug info.
         for rev in repo.changelog.revs(old_rev + 1):
