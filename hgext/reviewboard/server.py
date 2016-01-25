@@ -92,6 +92,23 @@ See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/in
 for instructions on how to configure your machine to use MozReview.
 '''
 
+def reviewcapabilities(repo):
+    """Obtain the set of review capabilities for a repo."""
+    caps = set()
+
+    if repo.ui.configint('reviewboard', 'repoid', None):
+        caps.add('pushreview')
+        caps.add('pullreviews')
+        caps.add('publish')
+        caps.add('submithttp')
+        caps.add('publishhttp')
+
+    if repo.ui.config('reviewboard', 'isdiscoveryrepo', None):
+        caps.add('listreviewrepos2')
+
+    return caps
+
+
 def capabilities(orig, repo, proto):
     """Wraps wireproto._capabilities to advertise reviewboard support."""
     caps = orig(repo, proto)
@@ -101,21 +118,12 @@ def capabilities(orig, repo, proto):
     # capability.
     #
     # We keep the old style around for a while until all clients have upgraded.
-    reviewcaps = set()
+    reviewcaps = reviewcapabilities(repo)
 
     if repo.ui.configint('reviewboard', 'repoid', None):
-        reviewcaps.add('pushreview')
-        reviewcaps.add('pullreviews')
-        reviewcaps.add('publish')
-        reviewcaps.add('submithttp')
-        reviewcaps.add('publishhttp')
-
         # Deprecated.
         caps.append('reviewboard')
         caps.append('pullreviews')
-
-    if repo.ui.config('reviewboard', 'isdiscoveryrepo', None):
-        reviewcaps.add('listreviewrepos2')
 
     if reviewcaps:
         caps.append('mozreview=%s' % ','.join(sorted(reviewcaps)))
