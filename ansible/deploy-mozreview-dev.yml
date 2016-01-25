@@ -12,8 +12,93 @@
     python: /data/www/reviewboard-dev.allizom.org/venv/bin/python
     rbsite: /data/www/reviewboard-dev.allizom.org/venv/bin/rb-site
   roles:
+    - ius-repo
     - { role: mozreview-virtualenv, venv: /data/www/reviewboard-dev.allizom.org/venv }
   tasks:
+  - name: install system packages
+    yum: name={{ item }} state=present
+    with_items:
+      - httpd
+      - httpd-devel
+      - openldap-devel
+      - python27
+      - sudo
+      - rsyslog
+      - tar
+
+  - name: download Mozilla rpms
+    get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/{{ item.path }}
+             dest=/var/tmp/{{ item.path }}
+             sha256sum={{ item.sha256 }}
+    with_items:
+      - { path: mercurial-3.6.2-1.x86_64.rpm, sha256: ecb4848807c1fe0ce059de079c235ba22885c4cc900dcbff9165cb10ec4ad885 }
+      # The version of virtualenv in the IUS repo isn't compatible with
+      # peep because it has a pip that is too new. See
+      # https://github.com/erikrose/peep/pull/94. Install an old version
+      # until peep is compatible.
+      - { path: python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm, sha256: a3f6c80d7a83798e4d64827d81dbcc39c1c44ae66c0afa4866bc477baad2cc2c }
+
+  - name: install Mozilla rpms
+    command: yum localinstall -y /var/tmp/mercurial-3.6.2-1.x86_64.rpm /var/tmp/python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm
+
+  - name: create virtualenv for Python processes
+    command: /usr/bin/virtualenv-2.7 /repo/hg/{{ item }} creates=/repo/hg/{{ item }}
+    with_items:
+      - venv_hgweb
+      - venv_pash
+
+  - name: copy peep.py to virtualenv
+    copy: src=files/peep.py
+          dest=/repo/hg/{{ item }}/bin/peep
+          mode=0755
+          owner=root
+          group=root
+    with_items:
+      - venv_hgweb
+      - venv_pash
+
+  - name: configure shebang in peep
+    replace: dest=/repo/hg/{{ item }}/bin/peep
+             regexp='^#!\/usr\/bin\/env python$'
+             replace='#!/repo/hg/{{ item }}/bin/python2.7'
+    with_items:
+      - venv_hgweb
+      - venv_pash
+
+  - name: copy requirements.txt
+    copy: src=roles/hg-reviewboard/files/requirements-{{ item }}.txt
+          dest=/repo/hg/venv_{{ item }}/requirements.txt
+          owner=root
+          group=root
+          mode=0644
+    with_items:
+      - hgweb
+      - pash
+
+  - name: populate virtualenv
+    pip: requirements=/repo/hg/{{ item }}/requirements.txt
+         executable=/repo/hg/{{ item }}/bin/peep
+    with_items:
+      - venv_hgweb
+      - venv_pash
+
+  # pash is a collection of Python files handling SSH connections. They behave
+  # like a Python module but are installed not as such for historical reasons.
+  - name: install pash
+    copy: src={{ vct }}/hgserver/pash/{{ item }}
+          dest=/usr/local/bin/{{ item }}
+          owner=root
+          group=root
+          mode=0755
+    with_items:
+      # Install pash.py first to ensure SSH root login works.
+      - pash.py
+      - hg_helper.py
+      - ldap_helper.py
+      - pash_wrapper
+      - repo_group.py
+      - sh_helper.py
+
   - name: Upgrade the Review Board site
     command: "{{ rbsite }} upgrade {{ sitehome }}"
     register: site_upgrade
