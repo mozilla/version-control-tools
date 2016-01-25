@@ -310,7 +310,7 @@ One more ship it should switch it back to approved
     body_top_text_type: plain
     diff_comments: []
 
-Since the author is L1, adding a new diff should cancel approval
+Even though the author is L1, adding a new diff will not cancel approval
 
   $ echo modified > foo
   $ hg commit --amend > /dev/null
@@ -363,8 +363,8 @@ Since the author is L1, adding a new diff should cancel approval
     - -foo
     - +modified
     - ''
-  approved: false
-  approval_failure: A suitable reviewer has not given a "Ship It!"
+  approved: true
+  approval_failure: null
   review_count: 4
   reviews:
   - id: 1
