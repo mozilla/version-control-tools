@@ -55,7 +55,7 @@ Post a job with a bad merge
   $ echo foo3 > foo
   $ hg commit -m 'Bug 1 - more stuff; r?cthulhu'
   $ hg push
-  pushing to ssh://172.17.0.1:$HGPORT6/test-repo
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -66,18 +66,18 @@ Post a job with a bad merge
   
   changeset:  1:b92ab6726259
   summary:    Bug 1 - some stuff; r?cthulhu
-  review:     http://172.17.0.1:$HGPORT1/r/2 (draft)
+  review:     http://*:$HGPORT1/r/2 (draft) (glob)
   
   changeset:  2:c698e9b61b34
   summary:    trouble
-  review:     http://172.17.0.1:$HGPORT1/r/3 (draft)
+  review:     http://*:$HGPORT1/r/3 (draft) (glob)
   
   changeset:  3:b28c57a24a9e
   summary:    Bug 1 - more stuff; r?cthulhu
-  review:     http://172.17.0.1:$HGPORT1/r/4 (draft)
+  review:     http://*:$HGPORT1/r/4 (draft) (glob)
   
   review id:  bz://1/mynick
-  review url: http://172.17.0.1:$HGPORT1/r/1 (draft)
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   $ REV=`hg log -r . --template "{node|short}"`
