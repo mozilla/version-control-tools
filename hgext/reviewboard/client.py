@@ -1053,9 +1053,11 @@ def reposetup(ui, repo):
                 kwargs['extra'] = args[6]
                 args = tuple(args[0:6])
 
-            extra = kwargs.setdefault('extra', {})
-            if 'commitid' not in extra and self.reviews.remoteurl:
-                extra['commitid'] = genid(self)
+            if not kwargs['extra']:
+                kwargs['extra'] = {}
+
+            if 'commitid' not in kwargs['extra'] and self.reviews.remoteurl:
+                kwargs['extra']['commitid'] = genid(self)
 
             return super(reviewboardrepo, self).commit(*args, **kwargs)
 
