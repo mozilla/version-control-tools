@@ -25,7 +25,7 @@ a shipit.
 
   $ echo foo >> foo
   $ hg commit -m 'bug 1 - stuff; r=cthulhu'
-  $ hg push --config reviewboard.autopublish=true
+  $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/165ec4a3fc81-1c3847cc-addcommitid.hg (glob)
@@ -64,7 +64,7 @@ There are no warnings for reviewers who haved granted a ship-it when using r=
   > MozReview-Commit-ID: 124Bxg
   > EOF
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/9131d64aca84-c977e83b-amend-backup.hg (glob)
-  $ hg push --config reviewboard.autopublish=true
+  $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -103,7 +103,7 @@ using r=.
   > MozReview-Commit-ID: APOgLo
   > EOF
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/f6ca9a9341fc-3ca96401-amend-backup.hg (glob)
-  $ hg push --config reviewboard.autopublish=true
+  $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets

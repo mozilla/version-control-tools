@@ -40,7 +40,7 @@
   $ hg commit -A -m 'Bug 1 - Foo 5'
   adding foo5
 
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 5 changesets)
   searching for changes
@@ -82,7 +82,7 @@ Popping the last commit truncates the review set
 
   $ hg strip -r 4e50148c492d --no-backup
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -378,7 +378,7 @@ Dropping the first commit should drop its review. Subsequent reviews should
 be preserved.
 
   $ hg -q rebase -s bce658a3f6d6 -d 0
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -597,7 +597,7 @@ The dropped commit should now be discarded
 Try removing a commit in the middle.
 
   $ hg -q rebase -s 81ee86efd38f -d eeb6d49dcb09
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -771,7 +771,7 @@ because the new commit is logically different
 
   $ echo foo6 > foo6
   $ hg -q commit -A -m 'Bug 1 - Foo 6'
-  $ hg --config mozreview.autopublish=true push
+  $ hg --config reviewboard.autopublish=false push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets

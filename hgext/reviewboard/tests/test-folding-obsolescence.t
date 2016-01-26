@@ -32,7 +32,7 @@
   $ hg commit -A -m 'Bug 1 - Foo 2'
   adding foo2
 
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   searching for changes
@@ -84,7 +84,7 @@
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ rbmanage publish 1
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets

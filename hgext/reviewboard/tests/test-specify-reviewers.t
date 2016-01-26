@@ -59,7 +59,7 @@ Try a bunch of different ways of specifying a reviewer
   $ hg commit -m 'Bug 1 - More stuff; [r?remus, r?romulus]'
   $ echo blah >> foo
   $ hg commit -m 'Bug 1 - More stuff; r?romulus, r=test-only'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 10 changesets)
   searching for changes
@@ -154,7 +154,7 @@ The review state file should have reviewers recorded
 
 Publishing series during push works
 
-  $ hg push --config reviewboard.autopublish=true
+  $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -264,7 +264,7 @@ code path.
   > 
   > MozReview-Commit-ID: hE3OiG
   > EOF
-  $ hg push --config reviewboard.autopublish=true
+  $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -330,7 +330,7 @@ again.
   3 people listed on review request
   $ rbmanage list-reviewers 11 --draft
   admin+1, remus, romulus
-  $ hg push --config reviewboard.autopublish=true
+  $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -396,7 +396,7 @@ and pushed with no reviewers specified.
   > 
   > MozReview-Commit-ID: hE3OiG
   > EOF
-  $ hg push --config reviewboard.autopublish=true
+  $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -464,7 +464,7 @@ those specified in the commit summary.
   > 
   > MozReview-Commit-ID: vI38IS
   > EOF
-  $ hg push --config reviewboard.autopublish=true
+  $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -529,7 +529,7 @@ Unrecognized reviewers should be ignored
   $ bugzilla create-bug TestProduct TestComponent 'Second Bug'
   $ echo blah >> foo
   $ hg commit -m 'Bug 2 - different stuff; r?cthulhu'
-  $ hg push --config reviewboard.autopublish=true --reviewid 2
+  $ hg push --reviewid 2
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -557,7 +557,7 @@ Reviewer identification should be case insensitive.
 
   $ echo blah >> foo
   $ hg commit -m 'Bug 2 - better stuff; r?ryanvm'
-  $ hg push --config reviewboard.autopublish=true -c 28
+  $ hg push -c 28
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets

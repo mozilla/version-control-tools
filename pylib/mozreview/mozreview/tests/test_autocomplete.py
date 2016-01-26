@@ -34,7 +34,7 @@ class AutocompleteTest(MozReviewWebDriverTest):
 
             lr.write('foo', 'first')
             lr.run(['commit', '-m', 'Bug 1 - First commit'])
-            lr.run(['push'])
+            lr.run(['push', '--config', 'reviewboard.autopublish=false'])
         except Exception:
             MozReviewWebDriverTest.tearDownClass()
             raise

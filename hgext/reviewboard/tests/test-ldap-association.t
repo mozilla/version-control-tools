@@ -34,7 +34,7 @@ The user should not have an ldap username associated with them
 
 Perform a push with the user
 
-  $ hg --config bugzilla.username=user1@example.com --config bugzilla.apikey=${user1key} push -r 1 --reviewid 1
+  $ hg --config bugzilla.username=user1@example.com --config bugzilla.apikey=${user1key} push -r 1 --reviewid 1 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/cd3395bd3f8a*-addcommitid.hg (glob)

@@ -22,7 +22,7 @@ Create bug and review
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
   $ echo bug > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=$l3key --config reviewboard.autopublish=true push
+  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=$l3key push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/*-addcommitid.hg (glob)

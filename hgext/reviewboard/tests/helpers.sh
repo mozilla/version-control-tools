@@ -24,8 +24,6 @@ default-push = ssh://${HGSSH_HOST}:${HGSSH_PORT}/test-repo
 [reviewboard]
 # Make generated IDs deterministic.
 fakeids = true
-# Disable automatic publishing
-autopublish = false
 
 [extensions]
 strip =

@@ -159,7 +159,7 @@ Changing the IRC nickname in Bugzilla will update the RB username
   updated user 9
 
   $ exportbzauth user2@example.com password2
-  $ hg push --reviewid bz://1/user2newnick
+  $ hg push --reviewid bz://1/user2newnick --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -191,7 +191,7 @@ Changing the email address in Bugzilla will update the RB email
   $ adminbugzilla update-user-email user2@example.com user2-new@example.com
   updated user 9
   $ exportbzauth user2-new@example.com password2
-  $ SSH_KEYNAME=user2@example.com hg push --reviewid bz://1/user2newemail
+  $ SSH_KEYNAME=user2@example.com hg push --reviewid bz://1/user2newemail --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -239,7 +239,7 @@ Re-enabling a disabled user will allow them to use Review Board
   $ adminbugzilla update-user-login-denied-text user1@example.com ''
   updated user 8
   $ exportbzauth user1@example.com password1
-  $ hg push --config bugzilla.username=user1@example.com --config bugzilla.apikey=${user1key} --reviewid bz://1/undisableduser
+  $ hg push --config bugzilla.username=user1@example.com --config bugzilla.apikey=${user1key} --reviewid bz://1/undisableduser --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found

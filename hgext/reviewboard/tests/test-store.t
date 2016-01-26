@@ -14,7 +14,7 @@ Pushing a review will create the reviews file
 
   $ echo "foo" >> foo
   $ hg commit -m 'Bug 1 - second commit'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/be8ff4f28043*-addcommitid.hg (glob)

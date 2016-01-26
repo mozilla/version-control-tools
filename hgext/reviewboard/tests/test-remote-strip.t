@@ -35,7 +35,7 @@ globally
   cd04635afb3cc9f4d8b8d074465a7e3d0d70908e h1c1
   55482a6fb4b1881fa8f746fd52cf6f096bb21c89 initial
 
-  $ hg push -r 2 --reviewid bz://1/mynick-1
+  $ hg push -r 2 --reviewid bz://1/mynick-1 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/0050780911c8*-addcommitid.hg (glob)
@@ -60,7 +60,7 @@ globally
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
-  $ hg push -r . --reviewid bz://1/mynick-2
+  $ hg push -r . --reviewid bz://1/mynick-2 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/85811c4bd2cd*-addcommitid.hg (glob)

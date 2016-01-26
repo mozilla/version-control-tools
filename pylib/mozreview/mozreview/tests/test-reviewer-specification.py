@@ -31,7 +31,7 @@ class ReviewerSpecificationTest(MozReviewWebDriverTest):
         lr = self.create_basic_repo('mjane@example.com', 'mjane')
         lr.write('foo', 'first change\n')
         lr.run(['commit', '-m', 'Bug 1 - Test reviewer specification; r=jsmith'])
-        lr.run(['push'])
+        lr.run(['push', '--config', 'reviewboard.autopublish=false'])
 
         self.reviewboard_login('mjane@example.com', 'password2')
 

@@ -27,7 +27,7 @@
   $ echo 'foo1' > foo1
   $ hg commit -A -m 'Bug 1 - Foo 1'
   adding foo1
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   searching for changes
@@ -61,7 +61,7 @@ Splitting the changeset results in multiple reviews
   $ hg debugobsolete -d '0 0' 0b3e14fe3ff19019110705e72dcf563c0ef551f6 8cfe623ffa827c2382e41f8cd479005984c94e76 02a9514408b763f7534d4f250046b513799ffe4c
 
   $ rbmanage publish 1
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets

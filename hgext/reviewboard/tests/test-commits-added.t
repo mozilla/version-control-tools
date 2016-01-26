@@ -22,7 +22,7 @@
   $ hg commit -m 'Bug 1 - Foo 1'
   $ echo 'foo2' > foo
   $ hg commit -m 'Bug 1 - Foo 2'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/61e2e5c813d2*-addcommitid.hg (glob)
@@ -51,7 +51,7 @@ Adding commits to old reviews should create new reviews
 
   $ echo 'foo3' > foo
   $ hg commit -m 'Bug 1 - Foo 3'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -141,7 +141,7 @@ rids to be strings and then pushing a new commit.
   $ rbmanage convert-draft-rids-to-str 1
   $ echo 'foo4' > foo
   $ hg commit -m 'Bug 1 - Foo 4'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets

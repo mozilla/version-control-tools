@@ -633,20 +633,22 @@ def doreview(repo, ui, remote, nodes):
     # Make it clear to the user that they need to take action in order for
     # others to see this review series.
     if havedraft:
-        # At some point we may want an yes/no/prompt option for autopublish
-        # but for safety reasons we only allow no/prompt for now.
-        if ui.configbool('reviewboard', 'autopublish', True):
+        # If there is no configuration value specified for
+        # reviewboard.autopublish, prompt the user. Otherwise, publish
+        # automatically or not based on this value.
+        if ui.config('reviewboard', 'autopublish', None) is None:
             ui.write('\n')
-            publish = ui.promptchoice(
-                _('publish these review requests now (Yn)? $$ &Yes $$ &No'))
-            if publish == 0:
-                publishreviewrequests(ui, remote, bzauth, [newparentid])
-            else:
-                ui.status(_('(visit review url to publish these review '
-                            'requests so others can see them)\n'))
+            publish = ui.promptchoice(_('publish these review '
+                                        'requests now (Yn)? '
+                                        '$$ &Yes $$ &No')) == 0
         else:
-            ui.status(_('(visit review url to publish these review requests '
-                        'so others can see them)\n'))
+            publish = ui.configbool('reviewboard', 'autopublish')
+
+        if publish:
+            publishreviewrequests(ui, remote, bzauth, [newparentid])
+        else:
+            ui.status(_('(visit review url to publish these review '
+                        'requests so others can see them)\n'))
 
 
 def publishreviewrequests(ui, remote, bzauth, rrids):

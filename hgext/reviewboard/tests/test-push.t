@@ -70,7 +70,7 @@ Pushing a public changeset will be quick rejected
 
 Pushing a single changeset will initiate a single review (no children)
 
-  $ hg push -r 1 --reviewid 1
+  $ hg push -r 1 --reviewid 1 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/6f06b4ac6efe*-addcommitid.hg (glob)
@@ -99,7 +99,7 @@ Pushing a single changeset will initiate a single review (no children)
 
 Pushing no changesets will do a re-review
 
-  $ hg push -r 6b33f0dbef02 --reviewid 1
+  $ hg push -r 6b33f0dbef02 --reviewid 1 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -121,7 +121,7 @@ TODO the behavior here is not correct: a new parent draft should not be
 created if all the review requests didn't change
 
   $ rbmanage publish 1
-  $ hg push -r 6b33f0dbef02 --reviewid 1
+  $ hg push -r 6b33f0dbef02 --reviewid 1 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -141,7 +141,7 @@ Pushing patches from mq will result in a warning
 
   $ echo 'mq patch' > foo
   $ hg qnew -m 'mq patch' -d '0 0' patch1
-  $ hg push -r . --reviewid 2
+  $ hg push -r . --reviewid 2 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -167,7 +167,7 @@ Pushing patches from mq will result in a warning
 
 Custom identifier will create a new review from same changesets.
 
-  $ hg push -r 6b33f0dbef02 --reviewid 3
+  $ hg push -r 6b33f0dbef02 --reviewid 3 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -187,7 +187,7 @@ SSH works
 (This test is now redundant. But removing it completely will impact the
 rest of the test.)
 
-  $ hg push -r 1
+  $ hg push -r 1 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/6a5e03035256*-addcommitid.hg (glob)
@@ -210,7 +210,7 @@ rest of the test.)
 
 Specifying multiple -r for the same head works
 
-  $ hg push -r 0 -r 6b33f0dbef02 --reviewid 5
+  $ hg push -r 0 -r 6b33f0dbef02 --reviewid 5 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -228,7 +228,7 @@ Specifying multiple -r for the same head works
 
 Specifying a revision range works
 
-  $ hg push -r 0::6b33f0dbef02 --reviewid 6
+  $ hg push -r 0::6b33f0dbef02 --reviewid 6 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -282,7 +282,7 @@ A dirty working copy of a child of a review node will abort
 
 Specifying a base revision limits reviewed changesets
 
-  $ hg push -r 8::10 --reviewid 7
+  $ hg push -r 8::10 --reviewid 7 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -311,7 +311,7 @@ Specifying a base revision limits reviewed changesets
 
 Specifying multiple -r arguments selects base and tip
 
-  $ hg push -r 8 -r 10 --reviewid 8
+  $ hg push -r 8 -r 10 --reviewid 8 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -337,7 +337,7 @@ Specifying multiple -r arguments selects base and tip
 
 Specifying multiple -r in reverse order still works
 
-  $ hg push -r 10 -r 8 --reviewid 9
+  $ hg push -r 10 -r 8 --reviewid 9 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -369,7 +369,7 @@ Specifying multiple -r in reverse order still works
 
 -c can be used to select a single changeset to review
 
-  $ hg push -c 9 --reviewid 11
+  $ hg push -c 9 --reviewid 11 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -436,6 +436,24 @@ Check for empty commits not at the tip
   popping after-empty
   popping empty-patch
   patch queue now empty
+
+You can choose to publish automatically without a prompt
+
+  $ hg push -r 6b33f0dbef02 --reviewid 1 --config reviewboard.autopublish=true
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  searching for changes
+  no changes found
+  submitting 1 changesets for review
+  
+  changeset:  5:6b33f0dbef02
+  summary:    anonymous head
+  review:     http://*:$HGPORT1/r/2
+  
+  review id:  bz://1/mynick
+  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  (review requests lack reviewers; visit review url to assign reviewers)
+  (published review request 1)
+  [1]
 
 Cleanup
 

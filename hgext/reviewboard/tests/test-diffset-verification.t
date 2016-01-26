@@ -17,7 +17,7 @@
 
   $ echo foo1 > foo
   $ hg commit -m 'Bug 1 - Foo 1'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/24417bc94b2c*-addcommitid.hg (glob)

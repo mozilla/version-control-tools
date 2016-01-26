@@ -18,7 +18,7 @@ Set up repo
 
 Do the initial review
 
-  $ hg push -r 1 --reviewid 1
+  $ hg push -r 1 --reviewid 1 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/cd3395bd3f8a*-addcommitid.hg (glob)
@@ -41,7 +41,7 @@ Do the initial review
 
 Pushing with a different review ID will create a "duplicate" review
 
-  $ hg push -r 1 --reviewid 2
+  $ hg push -r 1 --reviewid 2 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found

@@ -17,7 +17,7 @@
 
   $ echo foo1 > foo
   $ hg commit -m 'Bug 1 - Initial commit'
-  $ hg --config bugzilla.username=submitter@example.com --config bugzilla.apikey=${submitterkey} push
+  $ hg --config bugzilla.username=submitter@example.com --config bugzilla.apikey=${submitterkey} --config reviewboard.autopublish=false push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/8c2be86a13c9*-addcommitid.hg (glob)
@@ -43,7 +43,7 @@ Now publish the review and create a new draft
   $ rbmanage publish 1
   $ echo foo3 > foo
   $ hg commit --amend > /dev/null
-  $ hg --config bugzilla.username=submitter@example.com --config bugzilla.apikey=${submitterkey} push
+  $ hg --config bugzilla.username=submitter@example.com --config bugzilla.apikey=${submitterkey} --config reviewboard.autopublish=false push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets

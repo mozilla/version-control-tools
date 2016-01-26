@@ -31,7 +31,7 @@ class ReviewerStatusTest(MozReviewWebDriverTest):
             lr.run(['commit', '-m', 'This is the second commit; r?jsmith'])
             lr.write('foo', 'third change\n')
             lr.run(['commit', '-m', 'This is the third commit; r?jsmith'])
-            lr.run(['push', '--config', 'reviewboard.autopublish=true'])
+            lr.run(['push'])
         except Exception:
             MozReviewWebDriverTest.tearDownClass()
             raise

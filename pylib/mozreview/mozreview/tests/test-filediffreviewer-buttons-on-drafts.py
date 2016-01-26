@@ -35,10 +35,10 @@ class FileDiffReviewerDraftTest(MozReviewWebDriverTest):
             lr = self.create_basic_repo('mjane@example.com', 'mjane')
             lr.write('foo', 'first change')
             lr.run(['commit', '-m', 'Bug 1 - Test try;r=jsmith'])
-            lr.run(['push'])
+            lr.run(['push', '--config', 'reviewboard.autopublish=false'])
             lr.write('foo', 'second change')
             lr.run(['commit', '-m', 'second change;r=jsmith'])
-            lr.run(['push'])
+            lr.run(['push', '--config', 'reviewboard.autopublish=false'])
         except Exception:
             MozReviewWebDriverTest.tearDownClass()
             raise

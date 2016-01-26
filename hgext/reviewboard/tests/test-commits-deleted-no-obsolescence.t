@@ -34,7 +34,7 @@
   $ hg commit -A -m 'Bug 1 - Foo 5'
   adding foo5
 
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 5 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/d86c61a23fc8*-addcommitid.hg (glob)
@@ -77,7 +77,7 @@ Popping the last commit truncates the review set
 
   $ hg strip -r 5 --no-backup
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
@@ -274,7 +274,7 @@ appropriate review requests
 
   $ hg -q rebase -s 2 -d 0
   $ hg strip -r 1 --no-backup
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -497,7 +497,7 @@ Try removing a commit in the middle.
   $ hg -q rebase -s 3 -d 1
   $ hg strip -r 2 --no-backup
 
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -692,7 +692,7 @@ recycling behavior when commit IDs are present.
 
   $ echo foo6 > foo6
   $ hg -q commit -A -m 'Bug 1 - Foo 6'
-  $ hg --config mozreview.autopublish=true push
+  $ hg --config reviewboard.autopublish=false push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets

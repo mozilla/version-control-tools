@@ -74,7 +74,7 @@ class AutolandConcurrentTest(MozReviewWebDriverTest):
             lr = self.create_basic_repo('mjane@example.com', 'mjane')
             lr.write('foo', 'first change')
             lr.run(['commit', '-m', 'Bug 1 - Test try'])
-            lr.run(['push'])
+            lr.run(['push', '--config', 'reviewboard.autopublish=false'])
 
             # create try tree
             add_tree(self.mr.treestatus_url, 'try')

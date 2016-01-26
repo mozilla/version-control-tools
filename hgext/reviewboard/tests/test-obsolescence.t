@@ -21,7 +21,7 @@ Set up the repo
   $ hg phase --public -r .
   $ echo 'foo2' > foo
   $ hg commit -m 'foo2'
-  $ hg push --reviewid 1
+  $ hg push --reviewid 1 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   searching for changes
@@ -54,7 +54,7 @@ Now create a new head and push a rebase
   $ hg -q rebase -s 2 -d .
   $ hg up tip
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  $ hg push --reviewid 1
+  $ hg push --reviewid 1 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
