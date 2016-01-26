@@ -1053,7 +1053,7 @@ def reposetup(ui, repo):
                 kwargs['extra'] = args[6]
                 args = tuple(args[0:6])
 
-            if not kwargs['extra']:
+            if 'extra' not in kwargs or not kwargs['extra']:
                 kwargs['extra'] = {}
 
             if 'commitid' not in kwargs['extra'] and self.reviews.remoteurl:
