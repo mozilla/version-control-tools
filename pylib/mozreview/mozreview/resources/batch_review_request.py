@@ -199,24 +199,29 @@ class BatchReviewRequestResource(WebAPIResource):
             commits = json.loads(commits)
         except ValueError:
             logger.error('invalid JSON in commits field')
-            return INVALID_FORM_DATA, {'fields': {'commits': 'Not valid JSON.'}}
+            return INVALID_FORM_DATA, {
+                'fields': {
+                    'commits': ['Not valid JSON.']}}
 
         if not isinstance(commits, dict):
             logger.error('commits field does not decode to dict')
-            return INVALID_FORM_DATA, {'fields': {'commits': 'Does not decode to a dict'}}
+            return INVALID_FORM_DATA, {
+                'fields': {
+                    'commits': ['Does not decode to a dict']}}
 
         for key in ('squashed', 'individual'):
             if key not in commits:
                 logger.error('commits field does not contain %s' % key)
                 return INVALID_FORM_DATA, {
-                    'fields': {'commits': 'Does not contain %s key' % key}}
+                    'fields': {
+                        'commits': ['Does not contain %s key' % key]}}
 
         for key in ('base_commit_id', 'diff', 'first_public_ancestor'):
             if key not in commits['squashed']:
                 logger.error('squashed key missing %s' % key)
                 return INVALID_FORM_DATA, {
                     'fields': {
-                        'commits': 'Squashed commit does not contain %s key' % key}}
+                        'commits': ['Squashed commit does not contain %s key' % key]}}
 
         for commit in commits['individual']:
             for key in ('id', 'message', 'bug', 'diff', 'precursors', 'first_public_ancestor'):
@@ -225,18 +230,22 @@ class BatchReviewRequestResource(WebAPIResource):
                                  commit.get('id', '<id>') ,key))
                     return INVALID_FORM_DATA, {
                         'fields': {
-                            'commits': 'Individual commit (%s) missing key %s' % (
-                                commit.get('id', '<id>'), key)
+                            'commits': ['Individual commit (%s) missing key %s' % (
+                                commit.get('id', '<id>'), key)]
                         }}
 
         try:
             repo = Repository.objects.get(pk=int(repo_id), local_site=local_site)
         except ValueError:
             logger.warn('repo_id not an integer: %s' % repo_id)
-            return INVALID_FORM_DATA, {'fields': {'repo_id': 'Not an integer'}}
+            return INVALID_FORM_DATA, {
+                'fields': {
+                    'repo_id': ['Not an integer']}}
         except Repository.DoesNotExist:
             logger.warn('repo %d does not exist' % repo_id)
-            return INVALID_FORM_DATA, {'fields': {'repo_id': 'Invalid repo_id'}}
+            return INVALID_FORM_DATA, {
+                'fields': {
+                    'repo_id': ['Invalid repo_id']}}
 
         if not repo.is_accessible_by(user):
             return self.get_no_access_error(request)
@@ -256,7 +265,8 @@ class BatchReviewRequestResource(WebAPIResource):
         # Need to catch outside the transaction so db changes are rolled back.
         except DiffProcessingException:
             return INVALID_FORM_DATA, {
-                'fields': {'commits': 'error processing squashed diff'}}
+                'fields': {
+                    'commits': ['error processing squashed diff']}}
         except SubmissionException as e:
             return e.value
 
@@ -273,8 +283,9 @@ class BatchReviewRequestResource(WebAPIResource):
                 logger.warn('%s is not a pending review request; cannot edit' %
                             squashed_rr.id)
                 raise SubmissionException((INVALID_FORM_DATA, {
-                    'fields': {'identifier': 'Parent review request is '
-                               'submitted or discarded'}}))
+                    'fields': {
+                        'identifier': ['Parent review request is '
+                               'submitted or discarded']}}))
 
         except ReviewRequest.DoesNotExist:
             squashed_rr = ReviewRequest.objects.create(

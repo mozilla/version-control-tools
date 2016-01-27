@@ -108,14 +108,14 @@ class BatchReviewResource(WebAPIResource):
             except ValueError:
                 return INVALID_FORM_DATA, {
                     'fields': {
-                        'diff_comments': 'Not valid JSON.',
+                        'diff_comments': ['Not valid JSON.'],
                     },
                 }
 
             if not isinstance(diff_comments, list):
                 return INVALID_FORM_DATA, {
                     'fields': {
-                        'diff_comments': 'Does not decode to a list.',
+                        'diff_comments': ['Does not decode to a list.'],
                     },
                 }
         else:
@@ -159,14 +159,14 @@ class BatchReviewResource(WebAPIResource):
         except KeyError:
             return INVALID_FORM_DATA, {
                 'fields': {
-                    'diff_comments': 'Diff comments were malformed',
+                    'diff_comments': ['Diff comments were malformed'],
                 },
             }
 
         except ObjectDoesNotExist:
             return INVALID_FORM_DATA, {
                 'fields': {
-                    'diff_comments': 'Invalid filediff_id',
+                    'diff_comments': ['Invalid filediff_id'],
                 },
             }
 
