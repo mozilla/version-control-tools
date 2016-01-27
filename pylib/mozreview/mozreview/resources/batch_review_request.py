@@ -50,6 +50,11 @@ class DiffProcessingException(Exception):
     pass
 
 
+class SubmissionException(Exception):
+    def __init__(self, value):
+        self.value = value
+
+
 class BatchReviewRequestResource(WebAPIResource):
     """Resource for creating a series of review requests with a single request.
 
@@ -248,10 +253,12 @@ class BatchReviewRequestResource(WebAPIResource):
                         'warnings': warnings,
                     }}
 
-        # Need to catch this outside the transaction so db changes are rolled back.
+        # Need to catch outside the transaction so db changes are rolled back.
         except DiffProcessingException:
             return INVALID_FORM_DATA, {
                 'fields': {'commits': 'error processing squashed diff'}}
+        except SubmissionException as e:
+            return e.value
 
     def _process_submission(self, request, local_site, repo, identifier, commits):
         user = request.user
@@ -260,14 +267,14 @@ class BatchReviewRequestResource(WebAPIResource):
                                                     repository=repo)
             if not squashed_rr.is_mutable_by(user):
                 logger.warn('%s not mutable by %s' % (squashed_rr.id, user))
-                return self.get_no_access_error(request)
+                raise SubmissionException(self.get_no_access_error(request))
 
             if squashed_rr.status != ReviewRequest.PENDING_REVIEW:
                 logger.warn('%s is not a pending review request; cannot edit' %
                             squashed_rr.id)
-                return INVALID_FORM_DATA, {
+                raise SubmissionException((INVALID_FORM_DATA, {
                     'fields': {'identifier': 'Parent review request is '
-                               'submitted or discarded'}}
+                               'submitted or discarded'}}))
 
         except ReviewRequest.DoesNotExist:
             squashed_rr = ReviewRequest.objects.create(
