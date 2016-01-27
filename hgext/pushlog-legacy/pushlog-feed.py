@@ -26,6 +26,8 @@ except ImportError:
     from pysqlite2 import dbapi2 as sqlite
 demandimport.enable()
 
+testedwith = '3.6'
+
 cal = pdt.Calendar()
 PUSHES_PER_PAGE = 10
 
