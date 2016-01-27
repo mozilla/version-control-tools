@@ -23,7 +23,7 @@ Please drill down into one of the following sections to continue.
    :maxdepth: 2
 
    mozreview/install
-   mozreview/review-requests
+   mozreview/commits
    mozreview/reviewboard
    mozreview/bugzilla
 
