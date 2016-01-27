@@ -3,7 +3,6 @@ import hglib
 import json
 import os
 import re
-import subprocess
 import tempfile
 
 REPO_CONFIG = {}
@@ -27,11 +26,13 @@ def transplant(logger, tree, destination, rev, trysyntax=None,
     If ``trysyntax`` is specified, a Try commit will be created using the
     syntax specified.
     """
+    path = get_repo_path(tree)
     configs = ['ui.interactive=False']
-    with hglib.open(get_repo_path(tree), configs=configs) as client:
+    with hglib.open(path, encoding='utf-8', configs=configs) as client:
         return _transplant(logger, client, tree, destination, rev,
                            trysyntax=trysyntax, push_bookmark=push_bookmark,
                            commit_descriptions=commit_descriptions)
+
 
 def _transplant(logger, client, tree, destination, rev, trysyntax=None,
                 push_bookmark=False, commit_descriptions=None):
@@ -58,6 +59,12 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
         return False, formulate_hg_error(['hg'] + cmd, '')
     remote_tip = remote_tip.split()[0]
     assert len(remote_tip) == 12, remote_tip
+
+    # Strip any lingering draft changesets
+    try:
+        run_hg(['strip', '--no-backup', '-r', 'not public()'])
+    except hglib.error.CommandError as e:
+        pass
 
     # Pull "upstream" and update to remote tip. Pull revisions to land and
     # update to them.
@@ -87,13 +94,7 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
     # If we are given commit_descriptions, we rewrite the commits based
     # upon this. We also determine the oldest commit that is part of the
     # commit descriptions and use this as the source revision when we we
-    # rebase. This could push unreviewed commits if these were present
-    # between reviewed commits but MozReview will create a review request
-    # for every draft revision after a specified commit so this can not
-    # (currently) happen.
-    # TODO: we could run 'hg out' and ensure that every revision there
-    #       is either present or was rewritten from a commit in
-    #       commit_descriptions and refuse to land if that is not the case.
+    # rebase.
     base_revision = None
     if commit_descriptions:
         with tempfile.NamedTemporaryFile() as f:
@@ -118,29 +119,54 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
     if not trysyntax and not base_revision:
         return False, 'Could not determine base revision for rebase'
 
-    # Now we rebase (if necessary) and push to the destination
+    # Perform rebase if necessary
+    if not trysyntax:
+        try:
+            run_hg(['rebase', '-s', base_revision, '-d', remote_tip])
+        except hglib.error.CommandError as e:
+            output = e.out.getvalue()
+            if 'nothing to rebase' not in output:
+                return False, formulate_hg_error(['hg'] + cmd, output)
+
+        try:
+            result = run_hg(['log', '-r', 'tip', '-T', '{node|short}'])
+        except hglib.error.CommandError as e:
+            output = e.out.getvalue()
+            return False, formulate_hg_error(['hg'] + cmd, output)
+
+        logger.info('rebased (tip) revision: %s' % result)
+
+        # Match outgoing commit descriptions against incoming commit
+        # descriptions. If these don't match exactly, prevent the landing
+        # from occurring.
+        incoming_descriptions = set([c.encode(client.encoding)
+                                     for c in commit_descriptions.values()])
+        outgoing = client.outgoing('tip', destination)
+        outgoing_descriptions = set([commit[5] for commit in outgoing])
+
+        if incoming_descriptions ^ outgoing_descriptions:
+            logger.error('unexpected outgoing commits:')
+            for commit in outgoing:
+                logger.error('outgoing: %s: %s' % (commit[1], commit[5]))
+
+            return False, ('We\'re sorry - something has gone wrong while '
+                           'rewriting or rebasing your commits. The commits '
+                           'being pushed no longer match what was requested. '
+                           'Please file a bug.')
+
+    # Now we push to the destination
     if trysyntax:
         if not trysyntax.startswith("try: "):
-            trysyntax =  "try: %s" % trysyntax
+            trysyntax = "try: %s" % trysyntax
 
         cmds = [['--encoding=utf-8', '--config', 'ui.allowemptycommit=true', 'commit', '-m', trysyntax],
                 ['log', '-r', 'tip', '-T', '{node|short}'],
                 ['push', '-r', '.', '-f', 'try']]
     elif push_bookmark:
-        # we assume use of the @ bookmark is mutually exclusive with using
-        # try syntax for now.
-        # We are updated to the head we are rebasing, so no need to specify
-        # source or base revision.
-        cmds = [['rebase', '-s', base_revision, '-d', remote_tip],
-                ['log', '-r', 'tip', '-T', '{node|short}'],
-                ['bookmark', push_bookmark],
-                ['push', '-B', push_bookmark, destination]]
+        cmds =  [['bookmark', push_bookmark],
+                 ['push', '-B', push_bookmark, destination]]
     else:
-        cmds = [['rebase', '-s', base_revision, '-d', remote_tip],
-                ['log', '-r', 'tip', '-T', '{node|short}'],
-                ['push', '-r', 'tip', destination]]
-
-    cmds.append(['strip', '--no-backup', '-r', 'not public()'])
+        cmds = [['push', '-r', 'tip', destination]]
 
     for cmd in cmds:
         try:
@@ -149,13 +175,13 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
                 result = output
         except hglib.error.CommandError as e:
             output = e.out.getvalue()
-            if 'nothing to rebase' in output:
-                # we are already up to date so the rebase fails
-                continue
-            elif 'abort: empty revision set' in output:
-                # no draft revisions so the strip fails
-                continue
-            else:
-                return False, formulate_hg_error(['hg'] + cmd, output)
+            return False, formulate_hg_error(['hg'] + cmd, output)
+
+    # Strip any lingering draft changesets
+    try:
+        run_hg(['strip', '--no-backup', '-r', 'not public()'])
+    except hglib.error.CommandError as e:
+        pass
+
 
     return landed, result
