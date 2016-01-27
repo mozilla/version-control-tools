@@ -94,6 +94,8 @@ def post_reviews(*args, **kwargs):
         raise AuthorizationError(e, **kwargs)
     except errors.BadRequestError as e:
         raise BadRequestError(e)
+    except errors.APIError as e:
+        raise BadRequestError(e)
 
 
 def submit_reviews(url, repoid, identifier, commits,

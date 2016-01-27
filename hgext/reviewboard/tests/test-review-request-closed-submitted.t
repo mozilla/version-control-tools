@@ -172,8 +172,16 @@ TODO Fix the error output (bug 1169664)
 
   $ echo foo3 > foo
   $ hg commit -m 'Bug 1 - Foo 3'
-  $ hg push > /dev/null
-  abort: unexpected response: empty string
+  $ hg push
+  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+  submitting 3 changesets for review
+  abort: reviewboard error: "HTTP 500". please try submitting the review again. if that doesn't work, you've likely encountered a bug.
   [255]
 
 Re-opening the parent review request should re-open all of the children.
