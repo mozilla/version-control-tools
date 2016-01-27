@@ -59,9 +59,13 @@ class BadRequestError(Exception):
         self.e = e
 
     def __str__(self):
-        return ('reviewboard error: "%s". please try submitting the'
-                ' review again. if that doesn\'t work, you\'ve likely'
-                ' encountered a bug.') % str(self.e).splitlines()[0]
+        lines = str(self.e).splitlines()
+
+        s = lines[0]
+        if len(lines) > 1:
+            s += '; %s' % lines[-1].strip()
+
+        return 'reviewboard error: %s' % s
 
 
 class ServerError(Exception):
