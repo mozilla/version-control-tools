@@ -1,6 +1,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import errno
 import random
 import time
 
@@ -63,7 +64,7 @@ BASE62_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 # (datetime.datetime(2000, 1, 1, 0, 0, 0, 0) - datetime.datetime.utcfromtimestamp(0)).total_seconds()
 EPOCH = 946684800
 
-def genid(repo):
+def genid(repo=None, fakeidpath=None):
     """Generate a unique identifier.
 
     Unique identifiers are treated as a black box. But under the hood, they
@@ -86,8 +87,19 @@ def genid(repo):
     # testing purposes because tests want constant output. And since
     # commit IDs go into the commit and are part of the SHA-1, they need
     # to be deterministic.
-    if repo.ui.configbool('reviewboard', 'fakeids'):
-        data = repo.vfs.tryread('genid')
+    if repo and repo.ui.configbool('reviewboard', 'fakeids'):
+        fakeidpath = repo.vfs.join('genid')
+
+    if fakeidpath:
+        try:
+            with open(fakeidpath, 'rb') as fh:
+                data = fh.read()
+        except IOError as e:
+            if e.errno != errno.ENOENT:
+                raise
+
+            data = None
+
         if data:
             n = int(data)
         else:
@@ -95,7 +107,8 @@ def genid(repo):
 
         seconds = EPOCH
         rnd = n
-        repo.vfs.write('genid', str(n + 1))
+        with open(fakeidpath, 'wb') as fh:
+            fh.write(str(n + 1))
     else:
         now = int(time.time())
         # May 5, 2015 sometime.
