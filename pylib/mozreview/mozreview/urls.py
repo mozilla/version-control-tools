@@ -7,6 +7,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = patterns(
     'mozreview.views',
 
-    url(r'^bmo_auth_callback/$', 'bmo_auth_callback', name='bmo-auth-callback'),
+    url(r'^bmo_auth_callback/$', 'bmo_auth_callback',
+        name='bmo-auth-callback'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/r/'}),
 )

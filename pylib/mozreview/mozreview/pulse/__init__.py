@@ -89,15 +89,17 @@ def handle_commits_published(extension=None, **kwargs):
     for commit_info in commits:
         # TODO: Every call to get_latest_diffset() makes its own query to the
         # database. It is probably possible to retrieve the diffsets we care
-        # about using a single query through Django's ORM, but it's not trivial.
+        # about using a single query through Django's ORM, but it's not
+        # trivial.
         commit_info['diffset_revision'] = review_requests[
             commit_info['review_request_id']
         ].get_latest_diffset().revision
 
+    latest_diffset = review_request.get_latest_diffset()
     msg = base.GenericMessage()
     msg.routing_parts.append('mozreview.commits.published')
     msg.data['parent_review_request_id'] = review_request.id
-    msg.data['parent_diffset_revision'] = review_request.get_latest_diffset().revision
+    msg.data['parent_diffset_revision'] = latest_diffset.revision
     msg.data['commits'] = commits
     msg.data['repository_url'] = repo_url
     msg.data['landing_repository_url'] = landing_repo_url

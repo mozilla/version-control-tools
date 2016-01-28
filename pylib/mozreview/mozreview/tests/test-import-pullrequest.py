@@ -25,7 +25,8 @@ class ImportPullrequestTest(MozReviewWebDriverTest):
                 ('mjane@example.com', 'password2', 'Mary Jane [:mary]'),
             ])
 
-            self.create_ldap(b'mjane@example.com', b'mjane', 2001, b'Mary Jane')
+            self.create_ldap(b'mjane@example.com', b'mjane', 2001,
+                             b'Mary Jane')
 
             lr = self.create_basic_repo('mjane@example.com', 'mjane')
         except Exception:
@@ -37,7 +38,8 @@ class ImportPullrequestTest(MozReviewWebDriverTest):
 
         self.load_rburl('import-pullrequest/dminor/gecko-dev/1')
 
-        btn = self.browser.find_element_by_id('mozreview-import-pullrequest-trigger');
+        btn = self.browser.find_element_by_id(
+            'mozreview-import-pullrequest-trigger');
         btn.click()
 
         # Clicking the button should display the activity indicator
@@ -64,7 +66,8 @@ class ImportPullrequestTest(MozReviewWebDriverTest):
         # It is possible to import a pull request again.
         self.load_rburl('import-pullrequest/dminor/gecko-dev/1')
 
-        btn = self.browser.find_element_by_id('mozreview-import-pullrequest-trigger');
+        btn = self.browser.find_element_by_id(
+            'mozreview-import-pullrequest-trigger');
         btn.click()
 
         WebDriverWait(self.browser, 10).until(

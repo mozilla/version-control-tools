@@ -27,7 +27,8 @@ def get_treestatus_login_token(treestatus_url, user, password):
     return r.headers['x-treestatus-token']
 
 
-def add_tree(treestatus_url, tree, user='sheriff@example.com', password='password'):
+def add_tree(treestatus_url, tree,
+             user='sheriff@example.com', password='password'):
     login_token = get_treestatus_login_token(treestatus_url, user, password)
     data = {
         'newtree': tree,
@@ -38,7 +39,8 @@ def add_tree(treestatus_url, tree, user='sheriff@example.com', password='passwor
     r.raise_for_status()
 
 
-def close_tree(treestatus_url, tree, user='sheriff@example.com', password='password'):
+def close_tree(treestatus_url, tree,
+               user='sheriff@example.com', password='password'):
     login_token = get_treestatus_login_token(treestatus_url, user, password)
     data = {
         'status': 'closed',
@@ -66,7 +68,8 @@ class AutolandConcurrentTest(MozReviewWebDriverTest):
                 ('mjane@example.com', 'password2', 'Mary Jane [:mary]'),
             ])
 
-            self.create_ldap(b'mjane@example.com', b'mjane', 2001, b'Mary Jane')
+            self.create_ldap(b'mjane@example.com', b'mjane', 2001,
+                             b'Mary Jane')
 
             bb = self.user_bugzilla('mjane@example.com')
             bb.create_bug('TestProduct', 'TestComponent', 'First Bug')
@@ -95,10 +98,12 @@ class AutolandConcurrentTest(MozReviewWebDriverTest):
         # Clicking the button should display a trychooser dialog
         try_btn.click()
         try_text = WebDriverWait(self.browser, 3).until(
-            EC.visibility_of_element_located((By.ID,
-            'mozreview-autoland-try-syntax')))
+            EC.visibility_of_element_located(
+                (By.ID, 'mozreview-autoland-try-syntax'))
+            )
         try_text.send_keys(try_syntax)
-        try_submit = self.browser.find_element_by_xpath('//input[@value="Submit"]')
+        try_submit = self.browser.find_element_by_xpath(
+            '//input[@value="Submit"]')
 
         # clicking the Submit button should display an activity indicator
         try_submit.click()

@@ -150,8 +150,9 @@ class LDAPAssociationResource(WebAPIResource):
         mozreview_profile.ldap_username = ldap_username
         mozreview_profile.save()
 
-        logging.info('associating user: %s with ldap_username: %s' % (user,
-            ldap_username))
+        logging.info(
+            'associating user: %s with ldap_username: %s' % (user,
+                                                             ldap_username))
 
         return 200, self.create_item_payload(request, user, mozreview_profile)
 

@@ -58,8 +58,8 @@ def release_lock(lock_id):
 
 def get_autoland_lock_id(review_request_id, repository_url, revision):
     """Returns a lock id based on the given parameters"""
-    return 'autoland_lock:{0}:{1}:{2}'.format(review_request_id, repository_url,
-                                              revision)
+    return 'autoland_lock:{0}:{1}:{2}'.format(
+        review_request_id, repository_url, revision)
 
 
 class BaseAutolandTriggerResource(WebAPIResource):
@@ -104,7 +104,7 @@ class BaseAutolandTriggerResource(WebAPIResource):
 
 
 class AutolandTriggerResource(BaseAutolandTriggerResource):
-    """Resource to kick off Autoland to inbound for a particular review request."""
+    """Resource to kick off Autoland to inbound"""
 
     name = 'autoland_trigger'
 
@@ -128,7 +128,8 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
         },
     )
     @transaction.atomic
-    def create(self, request, review_request_id, commit_descriptions, *args, **kwargs):
+    def create(self, request, review_request_id,
+               commit_descriptions, *args, **kwargs):
         try:
             rr = ReviewRequest.objects.get(pk=review_request_id)
         except ReviewRequest.DoesNotExist:
@@ -487,7 +488,8 @@ class AutolandRequestUpdateResource(WebAPIResource):
 
             # If we've landed to the "inbound" repository, we'll close the
             # review request automatically.
-            landing_repo = rr.repository.extra_data.get('landing_repository_url')
+            landing_repo = rr.repository.extra_data.get(
+                'landing_repository_url')
             if autoland_request.repository_url == landing_repo:
                 rr.close(ReviewRequest.SUBMITTED)
 
@@ -611,9 +613,10 @@ class ImportPullRequestTriggerResource(WebAPIResource):
         # extract one from the pullrequest title and if that fails, file a new
         # bug.
         bugid = None
-        prs = ImportPullRequestRequest.objects.filter(github_user=github_user,
-                                                      github_repo=github_repo,
-                                                      github_pullrequest=pullrequest)
+        prs = ImportPullRequestRequest.objects.filter(
+            github_user=github_user,
+            github_repo=github_repo,
+            github_pullrequest=pullrequest)
         prs = prs.order_by('-pk')[0:1]
         if prs:
             bugid = prs[0].bugid
@@ -631,19 +634,19 @@ class ImportPullRequestTriggerResource(WebAPIResource):
             destination = Repository.objects.all()[0].name
 
         try:
-            response = requests.post(autoland_url + '/pullrequest/mozreview',
+            response = requests.post(
+                autoland_url + '/pullrequest/mozreview',
                 data=json.dumps({
-                'user': github_user,
-                'repo': github_repo,
-                'pullrequest': pullrequest,
-                'destination': destination,
-                'bzuserid': request.session['Bugzilla_login'],
-                'bzcookie': request.session['Bugzilla_logincookie'],
-                'bugid': bugid,
-                'pingback_url': pingback_url
-            }), headers={
-                'content-type': 'application/json',
-            },
+                    'user': github_user,
+                    'repo': github_repo,
+                    'pullrequest': pullrequest,
+                    'destination': destination,
+                    'bzuserid': request.session['Bugzilla_login'],
+                    'bzcookie': request.session['Bugzilla_logincookie'],
+                    'bugid': bugid,
+                    'pingback_url': pingback_url
+                }),
+                headers={'content-type': 'application/json'},
                 timeout=AUTOLAND_REQUEST_TIMEOUT,
                 auth=(autoland_user, autoland_password))
         except requests.exceptions.RequestException:
@@ -755,8 +758,8 @@ class ImportPullRequestUpdateResource(WebAPIResource):
         try:
             fields = json.loads(request.body)
             landed = fields['landed']
-            for field_name in fields:
-                assert type(fields[field_name]) == self.fields[field_name]['type']
+            for name in fields:
+                assert type(fields[name]) == self.fields[name]['type']
         except (ValueError, IndexError, AssertionError) as e:
             return INVALID_FORM_DATA, {
                 'error': e,

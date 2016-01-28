@@ -179,10 +179,11 @@ def update_parent_rr_reviewers(parent_rr_draft):
     extra_data. In this way we can publish a parent draft even if the only
     change is on the reviewer list of one of the children.
     """
-    # TODO: Add an optional child_rr_draft parameter to speed things up when we know
-    # which child changed.
+    # TODO: Add an optional child_rr_draft parameter to speed things up when
+    # we know which child changed.
     child_rr_list = gen_child_rrs(parent_rr_draft)
-    reviewers_map_before = parent_rr_draft.extra_data.get(REVIEWER_MAP_KEY, None)
+    reviewers_map_before = parent_rr_draft.extra_data.get(
+        REVIEWER_MAP_KEY, None)
 
     reviewers_map_after = {}
 
@@ -195,7 +196,8 @@ def update_parent_rr_reviewers(parent_rr_draft):
     if reviewers_map_after != reviewers_map_before:
         total_reviewers = set(sum(reviewers_map_after.values(), []))
         parent_rr_draft.target_people = total_reviewers
-        parent_rr_draft.extra_data[REVIEWER_MAP_KEY] = json.dumps(reviewers_map_after)
+        parent_rr_draft.extra_data[REVIEWER_MAP_KEY] = json.dumps(
+            reviewers_map_after)
 
         parent_rr = parent_rr_draft.get_review_request()
         if parent_rr.public and parent_rr_draft.changedesc is None:

@@ -30,7 +30,8 @@ class ReviewerSpecificationTest(MozReviewWebDriverTest):
 
         lr = self.create_basic_repo('mjane@example.com', 'mjane')
         lr.write('foo', 'first change\n')
-        lr.run(['commit', '-m', 'Bug 1 - Test reviewer specification; r=jsmith'])
+        lr.run(['commit', '-m',
+                'Bug 1 - Test reviewer specification; r=jsmith'])
         lr.run(['push'])
 
         self.reviewboard_login('mjane@example.com', 'password2')
@@ -41,6 +42,7 @@ class ReviewerSpecificationTest(MozReviewWebDriverTest):
             EC.text_to_be_present_in_element(
                 (By.CLASS_NAME, 'mozreview-child-reviewer-list'), 'jsmith'))
 
-        reviewers = self.browser.find_elements_by_class_name('mozreview-child-reviewer-list')
+        reviewers = self.browser.find_elements_by_class_name(
+            'mozreview-child-reviewer-list')
         self.assertEqual(len(reviewers), 1)
         self.assertEqual(reviewers[0].text, 'jsmith')

@@ -140,10 +140,12 @@ class MozReviewExtension(Extension):
             'source_filenames': ['mozreview/js/logout.js'],
         },
         'filediffreviewer': {
-            'source_filenames': ['mozreview/js/models/filediffreviewermodel.js',
-                                 'mozreview/js/collections/filediffreviewercollection.js',
-                                 'mozreview/js/init_filediffreviewer.js',
-                                 'mozreview/js/diffviewer_customizations.js'],
+            'source_filenames': [
+                'mozreview/js/models/filediffreviewermodel.js',
+                'mozreview/js/collections/filediffreviewercollection.js',
+                'mozreview/js/init_filediffreviewer.js',
+                'mozreview/js/diffviewer_customizations.js',
+            ],
             'apply_to': diffviewer_url_names,
         },
         'import-pullrequest': {
@@ -197,19 +199,23 @@ class MozReviewExtension(Extension):
             'items': [
                 {
                     'label': 'User Guide',
-                    'url': 'https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview-user.html',
+                    'url': 'https://mozilla-version-control-tools'
+                           '.readthedocs.org/en/latest/mozreview-user.html',
                 },
                 {
                     'label': 'Mercurial for Mozillians',
-                    'url': 'https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/index.html',
+                    'url': 'https://mozilla-version-control-tools'
+                           '.readthedocs.org/en/latest/hgmozilla/index.html',
                 },
                 {
                     'label': 'Hacking MozReview',
-                    'url': 'https://mozilla-version-control-tools.readthedocs.org/en/latest/hacking-mozreview.html',
+                    'url': 'https://mozilla-version-control-tools'
+                           '.readthedocs.org/en/latest/hacking-mozreview.html',
                 },
                 {
                     'label': 'File a Bug',
-                    'url': 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview',
+                    'url': 'https://bugzilla.mozilla.org/enter_bug.cgi'
+                           '?product=Developer%20Services&component=MozReview',
                 },
             ],
         }])
@@ -251,8 +257,9 @@ class MozReviewExtension(Extension):
         # requests.
         description_field = get_review_request_field('description')
         if description_field:
-            description_field.should_render = (lambda self, value:
-                not is_parent(self.review_request_details))
+            description_field.should_render = (
+                lambda self, value: not is_parent(self.review_request_details)
+            )
 
         # All of our review request styling is injected via
         # review-stylings-css, which in turn loads the review.css static
@@ -302,8 +309,10 @@ class MozReviewExtension(Extension):
         HostingServiceHook(self, HMORepository)
 
         URLHook(self, patterns('',
-            url(r'^import-pullrequest/(?P<user>.+)/(?P<repo>.+)/(?P<pullrequest>\d+)/$',
-            import_pullrequest, name='import_pullrequest')))
+                url(r'^import-pullrequest/(?P<user>.+)/(?P<repo>.+)/'
+                    '(?P<pullrequest>\d+)/$',
+                    import_pullrequest,
+                    name='import_pullrequest')))
 
     def shutdown(self):
         # We have to put the TestingDone field back before we shut down

@@ -50,7 +50,8 @@ class AutocompleteTest(MozReviewWebDriverTest):
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located(
                 (By.CLASS_NAME, 'mozreview-child-reviewer-list')))
-        reviewers = self.browser.find_elements_by_class_name('mozreview-child-reviewer-list')
+        reviewers = self.browser.find_elements_by_class_name(
+            'mozreview-child-reviewer-list')
         self.assertEqual(len(reviewers), 2)
         self.assertEqual(reviewers[0].text, 'jsmith')
         self.assertEqual(reviewers[1].text, '')
@@ -74,7 +75,8 @@ class AutocompleteTest(MozReviewWebDriverTest):
         WebDriverWait(self.browser, 10).until(
             EC.presence_of_element_located(
                 (By.CLASS_NAME, 'mozreview-child-reviewer-list')))
-        reviewers = self.browser.find_elements_by_class_name('mozreview-child-reviewer-list')
+        reviewers = self.browser.find_elements_by_class_name(
+            'mozreview-child-reviewer-list')
 
         self.assertEqual(len(reviewers), 2)
         self.assertEqual(reviewers[0].text, 'jsmith')

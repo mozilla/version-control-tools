@@ -209,7 +209,9 @@ class ReviewRequestSummaryResource(WebAPIResource):
             'last_updated': '2015-04-13T18:58:25Z',
             'links': {
                     'self': {
-                        'href': 'http://127.0.0.1:50936/api/extensions/mozreview.extension.MozReviewExtension/summary/3/',
+                        'href': 'http://127.0.0.1:50936/api/extensions/'
+                                'mozreview.extension.MozReviewExtension/'
+                                'summary/3/',
                         'method': 'GET'
                     }
             },

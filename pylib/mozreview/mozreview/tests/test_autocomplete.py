@@ -97,7 +97,8 @@ class AutocompleteTest(MozReviewWebDriverTest):
         time.sleep(1)
 
         commits = self.get_commits_el()
-        reviewers = commits.find_elements_by_class_name('mozreview-child-reviewer-list')
+        reviewers = commits.find_elements_by_class_name(
+            'mozreview-child-reviewer-list')
         self.assertEqual(len(reviewers), 1)
         reviewer = reviewers[0].find_elements_by_class_name('reviewer-name')
         self.assertEqual(reviewer[0].get_attribute('innerHTML'), 'joey')
@@ -106,7 +107,8 @@ class AutocompleteTest(MozReviewWebDriverTest):
         self.load_rburl('r/1')
         self.wait_for_reviewers_to_load()
         commits = self.get_commits_el()
-        reviewers = commits.find_elements_by_class_name('mozreview-child-reviewer-list')
+        reviewers = commits.find_elements_by_class_name(
+            'mozreview-child-reviewer-list')
         self.assertEqual(len(reviewers), 1)
         reviewer = reviewers[0].find_elements_by_class_name('reviewer-name')
         self.assertEqual(reviewer[0].get_attribute('innerHTML'), 'joey')
@@ -117,7 +119,8 @@ class AutocompleteTest(MozReviewWebDriverTest):
         ac.send_keys(Keys.RETURN)
 
         commits = self.get_commits_el()
-        reviewers = commits.find_elements_by_class_name('mozreview-child-reviewer-list')
+        reviewers = commits.find_elements_by_class_name(
+            'mozreview-child-reviewer-list')
         self.assertEqual(len(reviewers), 1)
         self.assertEqual(reviewers[0].get_attribute('innerHTML'), '')
         ac.send_keys(Keys.ESCAPE)
