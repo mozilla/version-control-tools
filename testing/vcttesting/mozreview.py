@@ -260,13 +260,16 @@ class MozReview(object):
         rb.create_local_user(self.hg_rb_username, self.hg_rb_email,
                              self.hg_rb_password)
 
-        with futures.ThreadPoolExecutor(5) as e:
+        with futures.ThreadPoolExecutor(6) as e:
             # Ensure admin user had admin privileges.
             e.submit(rb.make_admin, bugzilla.username)
 
             # Ensure mozreview user has LDAP privileges.
             e.submit(rb.grant_permission, self.hg_rb_username,
                      'Can change ldap assocation for all users')
+
+            e.submit(rb.grant_permission, self.hg_rb_username,
+                     'Can verify DiffSet legitimacy')
 
             # Tell hgrb about URLs.
             e.submit(self._docker.execute, self.hgrb_id,
