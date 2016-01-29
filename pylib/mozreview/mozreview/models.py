@@ -15,6 +15,9 @@ from mozreview.bugzilla.models import (
     set_bugzilla_api_key,
     UnverifiedBugzillaApiKey
 )
+from mozreview.commits.models import (
+    DiffSetVerification,
+)
 from mozreview.ldap import query_scm_group
 
 from mozreview.file_diff_reviewer.models import FileDiffReviewer
@@ -23,6 +26,7 @@ __all__ = [
     'AutolandEventLogEntry',
     'AutolandRequest',
     'BugzillaUserMap',
+    'DiffSetVerification',
     'FileDiffReviewer',
     'get_bugzilla_api_key',
     'get_or_create_bugzilla_users',
