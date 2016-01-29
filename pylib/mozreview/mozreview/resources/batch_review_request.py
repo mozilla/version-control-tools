@@ -13,8 +13,10 @@ from djblets.webapi.decorators import (
 )
 from djblets.webapi.errors import (
     INVALID_FORM_DATA,
+    LOGIN_FAILED,
     NOT_LOGGED_IN,
     PERMISSION_DENIED,
+    SERVICE_NOT_CONFIGURED,
 )
 from reviewboard.accounts.backends import (
     get_enabled_auth_backends,
@@ -39,6 +41,9 @@ from reviewboard.webapi.resources import (
     WebAPIResource,
 )
 
+from mozreview.resources.bugzilla_login import (
+    auth_api_key
+)
 from mozreview.review_helpers import (
     gen_latest_reviews,
 )
@@ -172,9 +177,23 @@ class BatchReviewRequestResource(WebAPIResource):
 
     @webapi_check_local_site
     @webapi_login_required
-    @webapi_response_errors(INVALID_FORM_DATA, NOT_LOGGED_IN, PERMISSION_DENIED)
+    @webapi_response_errors(
+        INVALID_FORM_DATA,
+        LOGIN_FAILED,
+        NOT_LOGGED_IN,
+        PERMISSION_DENIED,
+        SERVICE_NOT_CONFIGURED,
+    )
     @webapi_request_fields(
         required={
+            'username': {
+                'type': str,
+                'description': 'Bugzilla username/email',
+            },
+            'api_key': {
+                'type': str,
+                'description': 'Bugzilla API key',
+            },
             'repo_id': {
                 'type': int,
                 'description': 'Repository to which to submit reviews',
@@ -188,10 +207,28 @@ class BatchReviewRequestResource(WebAPIResource):
                 'description': 'JSON describing commits to submit.',
             },
         })
-    def create(self, request, repo_id, identifier, commits,
+    def create(self, request, username, api_key, repo_id, identifier, commits,
                local_site_name=None, **kwargs):
         """Create or update a review request series."""
-        user = request.user
+        if not request.user.has_perm('mozreview.verify_diffset'):
+            return PERMISSION_DENIED
+
+        result = auth_api_key(request, username, api_key)
+
+        if not isinstance(result, User):
+            return result
+
+        # Now that we've confirmed permissions and credentials we will
+        # spoof the authenticated User in the request object. This
+        # prevents us from accidentally carrying out any operations
+        # as the special privileged User and means we don't need to
+        # change any of the AuthBackend code that relies on request.user
+        # for contacting Bugzilla. We'll also flush the session to make
+        # sure nothing is hanging around there from the privileged User.
+        user = result
+        request.user = user
+        request.session.flush()
+
         local_site = self._get_local_site(local_site_name)
         logger.info('processing BatchReviewRequest for %s' % user)
 
@@ -254,7 +291,7 @@ class BatchReviewRequestResource(WebAPIResource):
         try:
             with transaction.atomic():
                 squashed_rr, node_to_rid, review_data, warnings = self._process_submission(
-                    request, local_site, repo, identifier, commits)
+                    request, local_site, user, repo, identifier, commits)
                 logger.info('%s: finished processing %d' % (
                             identifier, squashed_rr.id))
                 return 200, {
@@ -275,9 +312,8 @@ class BatchReviewRequestResource(WebAPIResource):
             logging.exception('submission exception')
             return e.value
 
-    def _process_submission(self, request, local_site, repo, identifier, commits):
-        user = request.user
-
+    def _process_submission(self, request, local_site, user, repo, identifier,
+                            commits):
         logger.info('processing batch submission %s to %s with %d commits' % (
                     identifier, repo.name, len(commits)))
 

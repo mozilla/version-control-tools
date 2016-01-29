@@ -102,19 +102,22 @@ def post_reviews(*args, **kwargs):
         raise BadRequestError(e)
 
 
-def submit_reviews(url, repoid, identifier, commits,
-                   username=None, apikey=None):
+def submit_reviews(url, repoid, identifier, commits, privileged_username,
+                   privileged_password, username=None, apikey=None):
     """Submit commits to Review Board."""
     import json
     from reviewboardmods.pushhooks import ReviewBoardClient
 
-    client = ReviewBoardClient(url, username=username, apikey=apikey)
+    client = ReviewBoardClient(url, username=privileged_username,
+                               password=privileged_password)
     root = client.get_root()
 
     batch_request_resource = root.get_extension(
         extension_name='mozreview.extension.MozReviewExtension')\
         .get_batch_review_requests()
     series_result = batch_request_resource.create(
+        username=username,
+        api_key=apikey,
         # This assumes that we pushed to the repository/URL that Review Board is
         # configured to use. This assumption may not always hold.
         repo_id=repoid,
@@ -306,12 +309,12 @@ def _processpushreview(repo, req, ldap_username):
 
     rburl = repo.ui.config('reviewboard', 'url', None).rstrip('/')
     repoid = repo.ui.configint('reviewboard', 'repoid', None)
-    privleged_rb_username = repo.ui.config('reviewboard', 'username', None)
-    privleged_rb_password = repo.ui.config('reviewboard', 'password', None)
+    privileged_rb_username = repo.ui.config('reviewboard', 'username', None)
+    privileged_rb_password = repo.ui.config('reviewboard', 'password', None)
 
     if ldap_username:
-        associate_ldap_username(rburl, ldap_username, privleged_rb_username,
-                                privleged_rb_password, username=bzusername,
+        associate_ldap_username(rburl, ldap_username, privileged_rb_username,
+                                privileged_rb_password, username=bzusername,
                                 apikey=bzapikey)
 
     res = {
@@ -324,6 +327,7 @@ def _processpushreview(repo, req, ldap_username):
     try:
         parentrid, commitmap, reviews, warnings = \
             post_reviews(rburl, repoid, identifier, commits,
+                         privileged_rb_username, privileged_rb_password,
                          username=bzusername, apikey=bzapikey)
 
         res['display'].extend(warnings)
