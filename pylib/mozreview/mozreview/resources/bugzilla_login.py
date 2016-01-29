@@ -7,6 +7,7 @@ from __future__ import absolute_import
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.auth import login
+from django.contrib.auth.models import User
 from djblets.webapi.decorators import (
     webapi_request_fields,
     webapi_response_errors,
@@ -27,6 +28,53 @@ from mozreview.errors import (
     BugzillaAPIKeyNeededError,
     WebLoginNeededError,
 )
+
+
+def auth_api_key(request, username, api_key):
+    """Attempt to authenticate an API key.
+
+    Will return either the User associated with the API key
+    or a WebAPIResponseError which should be sent to the
+    client.
+    """
+    backend_cls = get_registered_auth_backend('bugzilla')
+    if not backend_cls:
+        return SERVICE_NOT_CONFIGURED
+
+    backend = backend_cls()
+
+    try:
+        user = backend.authenticate_api_key(username, api_key)
+        if user is None:
+            return LOGIN_FAILED
+
+    # The user will need to visit Bugzilla to obtain an API key.
+    except BugzillaAPIKeyNeededError as e:
+        return WebAPIResponseError(request, LOGIN_FAILED, extra_params={
+            'bugzilla_api_key_needed': True,
+            'bugzilla_api_key_url': e.url,
+        })
+
+    # The user hasn't logged in via the HTML interface yet. This
+    # error response should be interpretted by clients to direct
+    # them to log in to the web site.
+    except WebLoginNeededError:
+        protocol = SiteConfiguration.objects.get_current().get(
+            'site_domain_method')
+        domain = Site.objects.get_current().domain
+        login_url = '%s://%s%saccount/login' % (
+                protocol, domain, settings.SITE_ROOT)
+
+        extra = {
+            'web_login_needed': True,
+            'login_url': login_url,
+        }
+        return WebAPIResponseError(request, LOGIN_FAILED,
+                                   extra_params=extra)
+
+    # Django housekeeping.
+    user.backend = 'rbbz.auth.BugzillaBackend'
+    return user
 
 
 class BugzillaAPIKeyLoginResource(WebAPIResource):
@@ -54,51 +102,18 @@ class BugzillaAPIKeyLoginResource(WebAPIResource):
     )
     def create(self, request, username, api_key, *args, **kwargs):
         """Authenticate a user from a username and API key."""
-        backend_cls = get_registered_auth_backend('bugzilla')
-        if not backend_cls:
-            return SERVICE_NOT_CONFIGURED
+        result = auth_api_key(request, username, api_key)
 
-        backend = backend_cls()
-
-        try:
-            user = backend.authenticate_api_key(username, api_key)
-            if user is None:
-                return LOGIN_FAILED
-
-        # The user will need to visit Bugzilla to obtain an API key.
-        except BugzillaAPIKeyNeededError as e:
-            return WebAPIResponseError(request, LOGIN_FAILED, extra_params={
-                'bugzilla_api_key_needed': True,
-                'bugzilla_api_key_url': e.url,
-            })
-
-        # The user hasn't logged in via the HTML interface yet. This
-        # error response should be interpretted by clients to direct
-        # them to log in to the web site.
-        except WebLoginNeededError:
-            protocol = SiteConfiguration.objects.get_current().get(
-                'site_domain_method')
-            domain = Site.objects.get_current().domain
-            login_url = '%s://%s%saccount/login' % (
-                    protocol, domain, settings.SITE_ROOT)
-
-            extra = {
-                'web_login_needed': True,
-                'login_url': login_url,
-            }
-            return WebAPIResponseError(request, LOGIN_FAILED,
-                                       extra_params=extra)
-
-        # Django housekeeping.
-        user.backend = 'rbbz.auth.BugzillaBackend'
+        if not isinstance(result, User):
+            return result
 
         # Authentication succeeded. Persist the returned user for the
         # session.
-        login(request, user)
+        login(request, result)
 
         return 201, {
             self.item_result_key: {
-                'email': user.email,
+                'email': result.email,
             },
         }
 
