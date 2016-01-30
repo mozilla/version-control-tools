@@ -41,6 +41,9 @@ from reviewboard.webapi.resources import (
     WebAPIResource,
 )
 
+from mozreview.models import (
+    DiffSetVerification,
+)
 from mozreview.resources.bugzilla_login import (
     auth_api_key
 )
@@ -213,6 +216,13 @@ class BatchReviewRequestResource(WebAPIResource):
         if not request.user.has_perm('mozreview.verify_diffset'):
             return PERMISSION_DENIED
 
+        # The requesting user has the `verify_diffset` permission
+        # indicating they are a privileged user and allowed to access
+        # this resource.
+        privileged_user = request.user
+
+        # Now check the provided Bugzilla credentials to authenticate
+        # the user the privileged_user is speaking on behalf of.
         result = auth_api_key(request, username, api_key)
 
         if not isinstance(result, User):
@@ -290,10 +300,15 @@ class BatchReviewRequestResource(WebAPIResource):
 
         try:
             with transaction.atomic():
-                squashed_rr, node_to_rid, review_data, warnings = self._process_submission(
-                    request, local_site, user, repo, identifier, commits)
+                res = self._process_submission(
+                    request, local_site, user, privileged_user, repo,
+                    identifier, commits)
+
+                squashed_rr, node_to_rid, review_data, warnings = res
+
                 logger.info('%s: finished processing %d' % (
                             identifier, squashed_rr.id))
+
                 return 200, {
                     self.item_result_key: {
                         'nodes': node_to_rid,
@@ -312,8 +327,8 @@ class BatchReviewRequestResource(WebAPIResource):
             logging.exception('submission exception')
             return e.value
 
-    def _process_submission(self, request, local_site, user, repo, identifier,
-                            commits):
+    def _process_submission(self, request, local_site, user, privileged_user,
+                            repo, identifier, commits):
         logger.info('processing batch submission %s to %s with %d commits' % (
                     identifier, repo.name, len(commits)))
 
@@ -376,6 +391,12 @@ class BatchReviewRequestResource(WebAPIResource):
             update_diffset_history(squashed_rr, diffset)
             diffset.save()
 
+            # We pass `force_insert=True` to save to make sure Django generates
+            # an SQL INSERT rather than an UPDATE if the DiffSetVerification
+            # already exists. It should never already exist so we want the
+            # exception `force_insert=True` will cause if that's the case.
+            DiffSetVerification(diffset=diffset).save(
+                authorized_user=privileged_user, force_insert=True)
         except Exception:
             logger.exception('error processing squashed diff')
             raise DiffProcessingException()
@@ -475,7 +496,9 @@ class BatchReviewRequestResource(WebAPIResource):
 
                 rr = ReviewRequest.objects.get(pk=rid)
                 draft, warns = update_review_request(local_site, request,
-                                                     reviewer_cache, rr, commit)
+                                                     privileged_user,
+                                                     reviewer_cache, rr,
+                                                     commit)
                 squashed_reviewers.update(u for u in draft.target_people.all())
                 warnings.extend(warns)
                 processed_nodes.add(node)
@@ -520,7 +543,9 @@ class BatchReviewRequestResource(WebAPIResource):
 
                 rr = ReviewRequest.objects.get(pk=assumed_old_rid)
                 draft, warns = update_review_request(local_site, request,
-                                                     reviewer_cache, rr, commit)
+                                                     privileged_user,
+                                                     reviewer_cache, rr,
+                                                     commit)
                 squashed_reviewers.update(u for u in draft.target_people.all())
                 warnings.extend(warns)
                 processed_nodes.add(commit['id'])
@@ -549,6 +574,7 @@ class BatchReviewRequestResource(WebAPIResource):
             logger.info('%s: created review request %d for commit %s' % (
                         identifier, rr.id, node))
             draft, warns = update_review_request(local_site, request,
+                                                 privileged_user,
                                                  reviewer_cache, rr, commit)
             squashed_reviewers.update(u for u in draft.target_people.all())
             warnings.extend(warns)
@@ -674,6 +700,15 @@ def update_review_request_draft_diffset(rr, diffset, draft=None):
     draft.save()
 
     if discarded_diffset:
+        # We need to delete the DiffSetVerification manually because
+        # we can't rely on the model relationship from a built-in model
+        # to our extension's model.
+        try:
+            DiffSetVerification.objects.get(diffset=discarded_diffset).delete()
+        except DiffSetVerification.DoesNotExist:
+            logger.error('A DiffSetVerification did not exist when cleaning '
+                         'up a draft DiffSet for review request %i' % rr.id)
+
         discarded_diffset.delete()
 
     return draft
@@ -751,7 +786,8 @@ def resolve_reviewers(cache, requested_reviewers):
     return reviewers, unrecognized
 
 
-def update_review_request(local_site, request, reviewer_cache, rr, commit):
+def update_review_request(local_site, request, privileged_user, reviewer_cache,
+                          rr, commit):
     """Synchronize the state of a review request with a commit.
 
     Updates the commit message, refreshes the diff, etc.
@@ -811,6 +847,9 @@ def update_review_request(local_site, request, reviewer_cache, rr, commit):
         )
         update_diffset_history(rr, diffset)
         diffset.save()
+
+        DiffSetVerification(diffset=diffset).save(
+            authorized_user=privileged_user, force_insert=True)
     except Exception:
         logger.exeption('error processing diff')
         raise DiffProcessingException()
