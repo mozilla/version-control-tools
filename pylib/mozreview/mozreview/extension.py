@@ -1,16 +1,12 @@
 from __future__ import unicode_literals
 
-import logging
-
 from django.conf.urls import include, patterns, url
-from django.db.models.signals import post_save
 
 from reviewboard.extensions.base import Extension, JSExtension
 from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
                                           HostingServiceHook,
                                           ReviewRequestDropdownActionHook,
                                           ReviewRequestFieldsHook,
-                                          SignalHook,
                                           TemplateHook,
                                           URLHook)
 from reviewboard.reviews.builtin_fields import (TestingDoneField,
@@ -19,41 +15,68 @@ from reviewboard.reviews.builtin_fields import (TestingDoneField,
                                                 BlocksField)
 from reviewboard.reviews.fields import (get_review_request_field,
                                         get_review_request_fieldset)
-from reviewboard.reviews.models import ReviewRequestDraft
 from reviewboard.urls import (diffviewer_url_names,
                               review_request_url_names)
 
-from mozreview.autoland.models import (AutolandRequest,
-                                       ImportPullRequestRequest)
-from mozreview.autoland.resources import (autoland_request_update_resource,
-                                          autoland_trigger_resource,
-                                          import_pullrequest_trigger_resource,
-                                          import_pullrequest_update_resource,
-                                          try_autoland_trigger_resource)
-from mozreview.autoland.views import import_pullrequest
-from mozreview.batchreview.resources import batch_review_resource
-from mozreview.extra_data import (get_parent_rr, is_parent, is_pushed,
-                                  update_parent_rr_reviewers)
-from mozreview.fields import (BaseCommitField,
-                              CombinedReviewersField,
-                              CommitsListField,
-                              FileDiffReviewerField,
-                              ImportCommitField,
-                              PullCommitField,
-                              TryField)
-from mozreview.file_diff_reviewer.resources import file_diff_reviewer_resource
-from mozreview.hooks import MozReviewApprovalHook
-from mozreview.hostingservice.hmo_repository import HMORepository
-from mozreview.ldap.resources import ldap_association_resource
+from mozreview.autoland.resources import (
+    autoland_request_update_resource,
+    autoland_trigger_resource,
+    import_pullrequest_trigger_resource,
+    import_pullrequest_update_resource,
+    try_autoland_trigger_resource,
+)
+from mozreview.autoland.views import (
+    import_pullrequest,
+)
+from mozreview.batchreview.resources import (
+    batch_review_resource,
+)
+from mozreview.extra_data import (
+    is_parent,
+)
+from mozreview.fields import (
+    BaseCommitField,
+    CombinedReviewersField,
+    CommitsListField,
+    FileDiffReviewerField,
+    ImportCommitField,
+    PullCommitField,
+    TryField,
+)
+from mozreview.file_diff_reviewer.resources import (
+    file_diff_reviewer_resource,
+)
+from mozreview.hooks import (
+    MozReviewApprovalHook,
+)
+from mozreview.hostingservice.hmo_repository import (
+    HMORepository,
+)
+from mozreview.ldap.resources import (
+    ldap_association_resource,
+)
 from mozreview.middleware import (
     MozReviewCacheDisableMiddleware,
-    MozReviewUserProfileMiddleware,)
-from mozreview.pulse import initialize_pulse_handlers
-from mozreview.resources.bugzilla_login import bugzilla_api_key_login_resource
-from mozreview.resources.commit_rewrite import commit_rewrite_resource
-from mozreview.resources.batch_review_request import batch_review_request_resource
+    MozReviewUserProfileMiddleware,
+)
+from mozreview.pulse import (
+    initialize_pulse_handlers,
+)
+from mozreview.resources.bugzilla_login import (
+    bugzilla_api_key_login_resource,
+)
+from mozreview.resources.commit_rewrite import (
+    commit_rewrite_resource,
+)
+from mozreview.resources.batch_review_request import (
+    batch_review_request_resource,
+)
 from mozreview.resources.review_request_summary import (
-    review_request_summary_resource,)
+    review_request_summary_resource,
+)
+from mozreview.signal_handlers import (
+    initialize_signal_handlers,
+)
 
 
 class ParentJSExtension(JSExtension):
@@ -261,8 +284,8 @@ class MozReviewExtension(Extension):
         # Use a custom method to calculate a review approval state.
         MozReviewApprovalHook(self)
 
-        SignalHook(self, post_save, self.on_draft_changed,
-                   sender=ReviewRequestDraft)
+        # Instantiate the various signal handlers
+        initialize_signal_handlers(self)
 
         HostingServiceHook(self, HMORepository)
 
@@ -286,17 +309,3 @@ class MozReviewExtension(Extension):
             info_fieldset.add_field(BlocksField)
 
         super(MozReviewExtension, self).shutdown()
-
-
-    def on_draft_changed(self, sender, **kwargs):
-        instance = kwargs["instance"]
-        rr = instance.get_review_request()
-
-        if is_pushed(instance) and not is_parent(rr):
-            parent_rr = get_parent_rr(rr)
-            parent_rr_draft = parent_rr.get_draft()
-
-            if parent_rr_draft is None:
-                parent_rr_draft = ReviewRequestDraft.create(parent_rr)
-
-            update_parent_rr_reviewers(parent_rr_draft)
