@@ -2,51 +2,48 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import json
 import logging
-import re
 
 from django.contrib.sites.models import Site
 from django.db.models.signals import pre_delete
 
 from djblets.siteconfig.models import SiteConfiguration
-from djblets.util.decorators import simple_decorator
 
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import AuthBackendHook, SignalHook
-from reviewboard.reviews.errors import PublishError
 from reviewboard.reviews.models import (ReviewRequest,
                                         ReviewRequestDraft)
 from reviewboard.reviews.signals import (reply_publishing,
                                          review_publishing,
                                          review_request_closed,
-                                         review_request_publishing,
                                          review_request_reopened)
-from reviewboard.site.urlresolvers import local_site_reverse
 
 from mozreview.bugzilla.client import Bugzilla
-from mozreview.bugzilla.errors import BugzillaError
-from mozreview.errors import (CommitPublishProhibited,
-                              ParentShipItError)
-from mozreview.extra_data import (UNPUBLISHED_RRIDS_KEY,
-                                  gen_child_rrs,
-                                  gen_rrs_by_rids,
-                                  gen_rrs_by_extra_data_key,
-                                  is_parent)
-from mozreview.models import (BugzillaUserMap,
-                              get_bugzilla_api_key,
-                              get_or_create_bugzilla_users,
-                              get_profile)
-from mozreview.signals import commit_request_publishing
+from mozreview.bugzilla.errors import (
+    bugzilla_to_publish_errors,
+)
+from mozreview.errors import (
+    ParentShipItError,
+)
+from mozreview.extra_data import (
+    UNPUBLISHED_RRIDS_KEY,
+    gen_child_rrs,
+    gen_rrs_by_extra_data_key,
+)
+from mozreview.messages import (
+    NEVER_USED_DESCRIPTION,
+)
+from mozreview.models import (
+    get_bugzilla_api_key,
+)
+from mozreview.rb_utils import (
+    get_obj_url,
+)
 from rbbz.auth import BugzillaBackend
 from rbbz.diffs import build_plaintext_review
-from rbbz.errors import (ConfidentialBugError,
-                         InvalidBugIdError)
 from rbbz.middleware import CorsHeaderMiddleware
 from rbbz.resources import bugzilla_cookie_login_resource
 
-
-REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')
 
 AUTO_CLOSE_DESCRIPTION = """
 Discarded automatically because parent review request was discarded.
@@ -55,22 +52,6 @@ Discarded automatically because parent review request was discarded.
 AUTO_SUBMITTED_DESCRIPTION = """
 Submitted because the parent review request was submitted.
 """
-
-NEVER_USED_DESCRIPTION = """
-Discarded because this review request ended up not being needed.
-"""
-
-OBSOLETE_DESCRIPTION = """
-Discarded because this change is no longer required.
-"""
-
-# Extra data fields which should be automatically copied from
-# the draft to the review request on publish.
-DRAFTED_EXTRA_DATA_KEYS = (
-    'p2rb.commit_id',
-    'p2rb.first_public_ancestor',
-    'p2rb.identifier',
-)
 
 
 class BugzillaExtension(Extension):
@@ -87,9 +68,6 @@ class BugzillaExtension(Extension):
         # sandbox_errors=False, since we don't want to complete the action if
         # updating Bugzilla failed for any reason.
         SignalHook(self, pre_delete, on_draft_pre_delete)
-        SignalHook(self, review_request_publishing,
-                   on_review_request_publishing,
-                   sandbox_errors=False)
         SignalHook(self, review_publishing, on_review_publishing,
                    sandbox_errors=False)
         SignalHook(self, reply_publishing, on_reply_publishing,
@@ -99,19 +77,6 @@ class BugzillaExtension(Extension):
         SignalHook(self, review_request_closed,
                    on_review_request_closed_submitted)
         SignalHook(self, review_request_reopened, on_review_request_reopened)
-
-
-def get_obj_url(obj, site=None, siteconfig=None):
-    if not site:
-        site = Site.objects.get_current()
-
-    if not siteconfig:
-        siteconfig = SiteConfiguration.objects.get_current()
-
-    return '%s://%s%s%s' % (
-        siteconfig.get('site_domain_method'), site.domain,
-        local_site_reverse('root').rstrip('/'),
-        obj.get_absolute_url())
 
 
 def get_reply_url(reply, site=None, siteconfig=None):
@@ -193,251 +158,6 @@ def on_draft_pre_delete(sender, instance, using, **kwargs):
 
     review_request.extra_data['p2rb.discard_on_publish_rids'] = '[]'
     review_request.extra_data['p2rb.unpublished_rids'] = '[]'
-    review_request.save()
-
-
-@simple_decorator
-def bugzilla_to_publish_errors(func):
-    def _transform_errors(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except BugzillaError as e:
-            raise PublishError('Bugzilla error: %s' % e.msg)
-    return _transform_errors
-
-
-def post_bugzilla_attachment(bugzilla, bug_id, review_request_draft,
-                             review_request):
-    # We publish attachments for each commit/child to Bugzilla so that
-    # reviewers can easily track their requests.
-
-    # The review request exposes a list of usernames for reviewers. We need
-    # to convert these to Bugzilla emails in order to make the request into
-    # Bugzilla.
-    #
-    # It may seem like there is a data syncing problem here where usernames
-    # may get out of sync with the reality from Bugzilla. Fortunately,
-    # Review Board is smarter than that. Internally, the target_people list
-    # is stored with foreign keys into the numeric primary key of the user
-    # table. If the RB username changes, this won't impact target_people
-    # nor the stored mapping to the numeric Bugzilla ID, which is
-    # immutable.
-    #
-    # But we do have a potential data syncing problem with the stored email
-    # address. Review Board's stored email address could be stale. So
-    # instead of using it directly, we query Bugzilla and map the stored,
-    # immutable numeric Bugzilla userid into an email address. This lookup
-    # could be avoided if Bugzilla accepted a numeric userid in the
-    # requestee parameter when modifying an attachment.
-    reviewers = {}
-
-    for u in review_request_draft.target_people.all():
-        bum = BugzillaUserMap.objects.get(user=u)
-
-        user_data = bugzilla.get_user_from_userid(bum.bugzilla_user_id)
-
-        # Since we're making the API call, we might as well ensure the
-        # local database is up to date.
-        users = get_or_create_bugzilla_users(user_data)
-        reviewers[users[0].email] = False
-
-    last_user = None
-    relevant_reviews = review_request.get_public_reviews().order_by(
-        'user', '-timestamp')
-
-    for review in relevant_reviews:
-        if review.user == last_user:
-            # We only care about the most recent review for each
-            # particular user.
-            continue
-
-        last_user = review.user
-
-        # The last review given by this reviewer had a ship-it, so we
-        # will carry their r+ forward. If someone had manually changed
-        # their flag on bugzilla, we may be setting it back to r+, but
-        # we will consider the manual flag change on bugzilla user
-        # error for now.
-        if review.ship_it:
-            reviewers[last_user.email] = True
-
-    rr_url = get_obj_url(review_request)
-    diff_url = '%sdiff/#index_header' % rr_url
-
-    # Only post a comment if the diffset has actually changed
-    comment = ''
-    if review_request_draft.get_latest_diffset():
-        diffset_count = review_request.diffset_history.diffsets.count()
-        if diffset_count < 1:
-            # We don't need the first line, since it is also the attachment
-            # summary, which is displayed in the comment.
-            extended_commit_msg = review_request_draft.description.partition(
-                '\n')[2].lstrip('\n')
-
-            if extended_commit_msg:
-                extended_commit_msg += '\n\n'
-
-            comment = '%sReview commit: %s\nSee other reviews: %s' % (
-                extended_commit_msg,
-                diff_url,
-                rr_url
-            )
-        else:
-            comment = ('Review request updated; see interdiff: '
-                       '%sdiff/%d-%d/\n' % (rr_url,
-                                            diffset_count,
-                                            diffset_count + 1))
-
-    bugzilla.post_rb_url(bug_id,
-                         review_request.id,
-                         review_request_draft.summary,
-                         comment,
-                         diff_url,
-                         reviewers)
-
-
-@bugzilla_to_publish_errors
-def on_review_request_publishing(user, review_request_draft, **kwargs):
-    # There have been strange cases (all local, and during development), where
-    # when attempting to publish a review request, this handler will fail
-    # because the draft does not exist. This is a really strange case, and not
-    # one we expect to happen in production. However, since we've seen it
-    # locally, we handle it here, and log.
-    if not review_request_draft:
-        logging.error('Strangely, there was no review request draft on the '
-                      'review request we were attempting to publish.')
-        return
-
-    review_request = review_request_draft.get_review_request()
-
-    # skip review requests that were not pushed
-    if not is_review_request_pushed(review_request):
-        return
-
-    if not is_parent(review_request):
-        # Send a signal asking for approval to publish this review request.
-        # We only want to publish this commit request if we are in the middle
-        # of publishing the parent. If the parent is publishing it will be
-        # listening for this signal to approve it.
-        approvals = commit_request_publishing.send_robust(
-            sender=review_request,
-            user=user,
-            review_request_draft=review_request_draft)
-
-        for receiver, approved in approvals:
-            if approved:
-                break
-        else:
-            # This publish is not approved by the parent review request.
-            raise CommitPublishProhibited()
-
-    # The reviewid passed through p2rb is, for Mozilla's instance anyway,
-    # bz://<bug id>/<irc nick>.
-    reviewid = review_request_draft.extra_data.get('p2rb.identifier', None)
-    m = REVIEWID_RE.match(reviewid)
-
-    if not m:
-        raise InvalidBugIdError('<unknown>')
-
-    bug_id = m.group(1)
-    using_bugzilla = we_are_using_bugzilla()
-    try:
-        bug_id = int(bug_id)
-    except (TypeError, ValueError):
-        raise InvalidBugIdError(bug_id)
-
-    if using_bugzilla:
-        b = Bugzilla(get_bugzilla_api_key(user))
-
-        try:
-            if b.is_bug_confidential(bug_id):
-                raise ConfidentialBugError
-        except BugzillaError as e:
-            # Special cases:
-            #   100: Invalid Bug Alias
-            #   101: Bug does not exist
-            if e.fault_code and (e.fault_code == 100 or e.fault_code == 101):
-                raise InvalidBugIdError(bug_id)
-            raise
-
-    # Note that the bug ID has already been set when the review was created.
-
-    # If this is a squashed/parent review request, automatically publish all
-    # relevant children.
-    if is_review_request_squashed(review_request):
-        unpublished_rids = map(int, json.loads(
-            review_request.extra_data['p2rb.unpublished_rids']))
-        discard_on_publish_rids = map(int, json.loads(
-            review_request.extra_data['p2rb.discard_on_publish_rids']))
-        child_rrs = list(gen_child_rrs(review_request_draft))
-
-        # Create or update Bugzilla attachments for each draft commit.  This
-        # is done before the children are published to ensure that MozReview
-        # doesn't get into a strange state if communication with Bugzilla is
-        # broken or attachment creation otherwise fails.  The Bugzilla
-        # attachments will then, of course, be in a weird state, but that
-        # should be fixed by the next successful publish.
-        if using_bugzilla:
-            for child in child_rrs:
-                child_draft = child.get_draft(user=user)
-
-                if child_draft:
-                    if child.id in discard_on_publish_rids:
-                        b.obsolete_review_attachments(
-                            bug_id, get_obj_url(child))
-                    post_bugzilla_attachment(b, bug_id, child_draft, child)
-
-        # Publish draft commits. This will already include items that are in
-        # unpublished_rids, so we'll remove anything we publish out of
-        # unpublished_rids.
-        for child in child_rrs:
-            if child.get_draft(user=user) or not child.public:
-                def approve_publish(sender, user, review_request_draft,
-                                    **kwargs):
-                    return child is sender
-
-                # Setup the parent signal handler to approve the publish
-                # and then publish the child.
-                commit_request_publishing.connect(approve_publish, sender=child,
-                                                  weak=False)
-                try:
-                    child.publish(user=user)
-                finally:
-                    commit_request_publishing.disconnect(
-                        receiver=approve_publish,
-                        sender=child,
-                        weak=False)
-
-                if child.id in unpublished_rids:
-                    unpublished_rids.remove(child.id)
-
-        # The remaining unpubished_rids need to be closed as discarded because
-        # they have never been published, and they will appear in the user's
-        # dashboard unless closed.
-        for child in gen_rrs_by_rids(unpublished_rids):
-            child.close(ReviewRequest.DISCARDED,
-                        user=user,
-                        description=NEVER_USED_DESCRIPTION)
-
-        # We also close the discard_on_publish review requests because, well,
-        # we don't need them anymore. We use a slightly different message
-        # though.
-        for child in gen_rrs_by_rids(discard_on_publish_rids):
-            child.close(ReviewRequest.DISCARDED,
-                        user=user,
-                        description=OBSOLETE_DESCRIPTION)
-
-        review_request.extra_data['p2rb.unpublished_rids'] = '[]'
-        review_request.extra_data['p2rb.discard_on_publish_rids'] = '[]'
-
-    # Copy p2rb extra data from the draft, overwriting the current
-    # values on the review request.
-    draft_extra_data = review_request_draft.extra_data
-
-    for key in DRAFTED_EXTRA_DATA_KEYS:
-        if key in draft_extra_data:
-            review_request.extra_data[key] = draft_extra_data[key]
-
     review_request.save()
 
 
@@ -611,8 +331,3 @@ def on_review_request_reopened(user, review_request, **kwargs):
     if draft:
         draft.commit = identifier
         draft.save()
-
-
-def we_are_using_bugzilla():
-    siteconfig = SiteConfiguration.objects.get_current()
-    return siteconfig.settings.get("auth_backend", "builtin") == "bugzilla"

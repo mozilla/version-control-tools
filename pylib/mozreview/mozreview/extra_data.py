@@ -4,6 +4,7 @@
 
 import json
 import logging
+import re
 
 from reviewboard.changedescs.models import ChangeDescription
 from reviewboard.reviews.models import ReviewRequest
@@ -15,6 +16,16 @@ COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
 IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
 UNPUBLISHED_RRIDS_KEY = MOZREVIEW_KEY + '.unpublished_rids'
+
+# Extra data fields which should be automatically copied from
+# the draft to the review request on publish.
+DRAFTED_EXTRA_DATA_KEYS = (
+    COMMIT_ID_KEY,
+    'p2rb.first_public_ancestor',
+    IDENTIFIER_KEY,
+)
+
+REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')
 
 
 def is_pushed(review_request):
