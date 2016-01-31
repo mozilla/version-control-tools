@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import sys
 from collections import OrderedDict
 
 from mach.decorators import (
@@ -308,6 +309,32 @@ class ReviewBoardCommands(object):
             # TODO: Dump the response code?
         except APIError as e:
             print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                e.rsp['err']['msg']))
+            return 1
+
+    @Command(
+        'upload-diff',
+        category='reviewboard',
+        description='Upload a diff, read from stdin, to a review request')
+    @CommandArgument(
+        'rrid',
+        help='Review request id to upload diff to')
+    @CommandArgument(
+        '--base-commit',
+        help='Base commit id to apply diff to')
+    def upload_diff(self, rrid, base_commit=None):
+        from rbtools.api.errors import APIError
+        root = self._get_root()
+        diffs = root.get_diffs(only_fields='', review_request_id=rrid)
+
+        try:
+            diffs.upload_diff(
+                sys.stdin.read(),
+                base_commit_id=base_commit)
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (
+                e.http_status,
+                e.error_code,
                 e.rsp['err']['msg']))
             return 1
 

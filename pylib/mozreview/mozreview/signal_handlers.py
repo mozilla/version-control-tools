@@ -10,6 +10,9 @@ from django.db.models.signals import (
 from djblets.siteconfig.models import (
     SiteConfiguration,
 )
+from reviewboard.reviews.errors import (
+    PublishError,
+)
 from reviewboard.extensions.hooks import (
     SignalHook,
 )
@@ -51,6 +54,7 @@ from mozreview.messages import (
     OBSOLETE_DESCRIPTION,
 )
 from mozreview.models import (
+    DiffSetVerification,
     get_bugzilla_api_key,
 )
 from mozreview.rb_utils import (
@@ -123,6 +127,28 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
         logging.error('Strangely, there was no review request draft on the '
                       'review request we were attempting to publish.')
         return
+
+    # If the review request draft has a new DiffSet we will only allow
+    # publishing if that DiffSet has been verified. It is important to
+    # do this for every review request, not just pushed ones, because
+    # we can't trust the storage mechanism which indicates it was pushed.
+    # TODO: This will be fixed when we transition away from extra_data.
+    if review_request_draft.diffset:
+        try:
+            DiffSetVerification.objects.get(
+                diffset=review_request_draft.diffset)
+        except DiffSetVerification.DoesNotExist:
+            logging.error(
+                'An attempt was made by User %s to publish an unverified '
+                'DiffSet with id %s',
+                user.id,
+                review_request_draft.diffset.id)
+
+            raise PublishError(
+                'This review request draft contained a manually uploaded '
+                'diff, which is prohibited. Please push to the review server '
+                'to create review requests. If you believe you received this '
+                'message in error, please file a bug.')
 
     review_request = review_request_draft.get_review_request()
 
