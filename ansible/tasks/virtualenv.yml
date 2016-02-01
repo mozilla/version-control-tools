@@ -1,0 +1,35 @@
+---
+
+- name: download python packaging tools
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/{{ item.path }}
+           dest=/var/tmp/{{ item.path }}
+           sha256sum={{ item.shasum }}
+  with_items:
+    - { path: get-pip-8.0.2.py, shasum: 85a499fbd52603045812df8ca1c0491483e5f28eca15a3b3025507a66f225acf }
+    - { path: virtualenv-14.0.1.tar.gz, shasum: 715aa5ff9c055ed5c864accdbab6a75331b2040d5666ec8707c48559c7ea3b88 }
+
+- name: extract virtualenv package
+  unarchive: src=/var/tmp/virtualenv-14.0.1.tar.gz
+             dest=/var/tmp
+             copy=no
+
+- name: create virtualenv in {{ venv }}
+  command: /usr/bin/python2.7 /var/tmp/virtualenv-14.0.1/virtualenv.py {{ venv }} creates={{ venv }}
+
+# If the virtualenv is fresh, Python packaging packages should be up to date.
+# But if the virtualenv is left over from a previous install, the packaging
+# files may be out of date. We install the newest packaging packages via
+# get-pip.py, which is a self-contained version of `pip install`. We can't
+# blindly use {{ venv }}/bin/pip because it may not support wheels!
+- name: upgrade python packaging packages
+  command: "{{ venv }}/bin/python /var/tmp/get-pip-8.0.2.py --upgrade --no-index --find-links /var/tmp/virtualenv-14.0.1/virtualenv_support pip setuptools wheel"
+
+- name: copy requirements.txt
+  copy: src={{ requirements }}
+        dest={{ venv }}/requirements.txt
+        owner=root
+        group=root
+        mode=0644
+
+- name: populate virtualenv {{ venv }}
+  command: "{{ venv }}/bin/pip install --require-hashes -r {{ venv }}/requirements.txt"

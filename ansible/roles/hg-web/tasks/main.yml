@@ -36,14 +36,9 @@
            sha256sum={{ item.sha256 }}
   with_items:
     - { path: mercurial-3.6.2-1.x86_64.rpm, sha256: ecb4848807c1fe0ce059de079c235ba22885c4cc900dcbff9165cb10ec4ad885 }
-    # The version of virtualenv in the IUS repo isn't compatible with
-    # peep because it has a pip that is too new. See
-    # https://github.com/erikrose/peep/pull/94. Install an old version
-    # until peep is compatible.
-    - { path: python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm, sha256: a3f6c80d7a83798e4d64827d81dbcc39c1c44ae66c0afa4866bc477baad2cc2c }
 
 - name: install Mozilla rpms
-  command: yum localinstall -y /var/tmp/mercurial-3.6.2-1.x86_64.rpm /var/tmp/python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm
+  command: yum localinstall -y /var/tmp/mercurial-3.6.2-1.x86_64.rpm
 
 - name: install global ssh config
   copy: src=ssh_config
@@ -135,59 +130,21 @@
 
 # We run a lot of our Python out of our virtualenvs because that is how you
 # are supported to do Python.
-- name: create virtualenvs to run hgweb
-  command: /usr/bin/virtualenv-2.7 {{ item }} creates={{ item }}
-  with_items:
-    - "{{ venv_hgweb }}"
-    - "{{ venv_replication }}"
-    - "{{ venv_tools }}"
 
-# We install peep from our own copy because this is more secure than
-# relying on network installations.
-- name: copy peep.py
-  copy: src=files/peep.py dest={{ item }}/bin/peep mode=0755 owner=root group=root
-  with_items:
-    - "{{ venv_hgweb }}"
-    - "{{ venv_replication }}"
-    - "{{ venv_tools }}"
+- name: create virtualenv for hgweb
+  include: ../../../tasks/virtualenv.yml
+           venv=/repo/hg/venv_hgweb
+           requirements=../roles/hg-web/files/requirements-hgweb.txt
 
-- name: configure shebang in peep
-  replace: dest={{ item }}/bin/peep
-           regexp='^#!\/usr\/bin\/env python$'
-           replace='#!{{ item }}/bin/python2.7'
-  with_items:
-    - "{{ venv_hgweb }}"
-    - "{{ venv_replication }}"
-    - "{{ venv_tools }}"
+- name: create virtualenv for replication
+  include: ../../../tasks/virtualenv.yml
+           venv=/repo/hg/venv_replication
+           requirements=../roles/hg-web/files/requirements-replication.txt
 
-- name: copy hgweb requirements.txt
-  copy: src=requirements-hgweb.txt
-        dest={{ venv_hgweb }}/requirements.txt
-        mode=0644
-        owner=root
-        group=root
-
-- name: copy replication requirements.txt
-  copy: src=requirements-replication.txt
-        dest={{ venv_replication}}/requirements.txt
-        mode=0644
-        owner=root
-        group=root
-
-- name: copy tools requirements.txt
-  copy: src=requirements-tools.txt
-        dest={{ venv_tools}}/requirements.txt
-        mode=0644
-        owner=root
-        group=root
-
-- name: populate virtualenvs
-  pip: requirements={{ item }}/requirements.txt
-       executable={{ item }}/bin/peep
-  with_items:
-    - "{{ venv_hgweb }}"
-    - "{{ venv_replication }}"
-    - "{{ venv_tools }}"
+- name: create virtualenv for tools
+  include: ../../../tasks/virtualenv.yml
+           venv=/repo/hg/venv_tools
+           requirements=../roles/hg-web/files/requirements-tools.txt
 
 # Install a custom Pygments distribution. See pygments.yml for reasons.
 - include: ../../../tasks/pygments.yml

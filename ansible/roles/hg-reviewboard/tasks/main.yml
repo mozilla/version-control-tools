@@ -13,7 +13,6 @@
            sha256sum={{ item.sha256 }}
   with_items:
     - { path: mercurial-3.6.2-1.x86_64.rpm, sha256: ecb4848807c1fe0ce059de079c235ba22885c4cc900dcbff9165cb10ec4ad885 }
-    - { path: python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm, sha256: a3f6c80d7a83798e4d64827d81dbcc39c1c44ae66c0afa4866bc477baad2cc2c }
 
 - name: system packages installed
   yum: name={{ item }} state=present
@@ -30,9 +29,10 @@
     - python-ldap
     - rsyslog
     - sudo
+    - tar
 
 - name: local RPMs installed
-  command: /usr/bin/yum -y localinstall /var/tmp/mercurial-3.6.2-1.x86_64.rpm /var/tmp/python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm
+  command: /usr/bin/yum -y localinstall /var/tmp/mercurial-3.6.2-1.x86_64.rpm
 
 - name: Source code groups
   group: name={{ item.name }} gid={{ item.gid }}
@@ -57,50 +57,15 @@
     - /repo/hg/mozilla
     - /repo/hg/webroot_wsgi
 
-- name: create virtualenvs
-  command: /usr/bin/virtualenv-2.7 /repo/hg/{{ item }} creates=/repo/hg/{{ item }}
-  with_items:
-    - venv_hgweb
-    - venv_pash
+- name: create virtualenv for hgweb
+  include: ../../../tasks/virtualenv.yml
+           venv=/repo/hg/venv_hgweb
+           requirements=../roles/hg-reviewboard/files/requirements-hgweb.txt
 
-- name: copy peep.py into virtualenvs
-  copy: src=files/peep.py
-        dest=/repo/hg/{{ item }}/bin/peep
-        mode=0755
-        owner=root
-        group=root
-  with_items:
-    - venv_hgweb
-    - venv_pash
-
-- name: configure shebang in peep
-  replace: dest=/repo/hg/{{ item }}/bin/peep
-           regexp='^#!\/usr\/bin\/env python$'
-           replace='#!/repo/hg/{{ item }}/bin/python2.7'
-  with_items:
-    - venv_hgweb
-    - venv_pash
-
-- name: copy pash requirements file
-  copy: src=requirements-pash.txt
-        dest=/repo/hg/venv_pash/requirements.txt
-        owner=root
-        group=root
-        mode=0644
-
-- name: copy hgweb requirements file
-  copy: src=requirements-hgweb.txt
-        dest=/repo/hg/venv_hgweb/requirements.txt
-        owner=root
-        group=root
-        mode=0644
-
-- name: populate virtualenvs
-  pip: requirements=/repo/hg/{{ item }}/requirements.txt
-       executable=/repo/hg/{{ item }}/bin/peep
-  with_items:
-    - venv_hgweb
-    - venv_pash
+- name: create virtualenv for pash
+  include: ../../../tasks/virtualenv.yml
+           venv=/repo/hg/venv_pash
+           requirements=../roles/hg-reviewboard/files/requirements-pash.txt
 
 # Install a custom Pygments distribution. See pygments.yml for reasons.
 - include: ../../../tasks/pygments.yml

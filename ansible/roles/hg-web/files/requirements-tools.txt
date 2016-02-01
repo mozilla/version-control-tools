@@ -1,8 +1,8 @@
-# sha256: BK-ioGq33MqdgXF7Qgp6FIJgYemyYUpcd90kx1zPl-Q
-futures==3.0.3
+futures==3.0.3 \
+    --hash=sha256:04afa2a06ab7dcca9d81717b420a7a14826061e9b2614a5c77dd24c75ccf97e4
 
-# sha256: CcVnBJw-MPeR2wz1k3NGx_81aN6t9OsdTi98gAAcs9Y
-Mercurial==3.6.2
+Mercurial==3.6.2 \
+    --hash=sha256:09c567049c3e30f791db0cf5937346c7ff3568deadf4eb1d4e2f7c80001cb3d6
 
-# sha256: kHGqy9l6mpFQlsGq8NxoSsJnKQTNh221kECF1trJgQ4
-tabulate==0.7.5
+tabulate==0.7.5 \
+    --hash=sha256:9071aacbd97a9a915096c1aaf0dc684ac2672904cd876db5904085d6dac9810e
