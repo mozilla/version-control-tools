@@ -10,8 +10,14 @@ from django.utils.translation import (
     ugettext_lazy as _,
 )
 
+from djblets.db.fields import (
+    JSONField,
+)
 from reviewboard.diffviewer.models import (
     DiffSet,
+)
+from reviewboard.reviews.models import (
+    ReviewRequest,
 )
 
 
@@ -55,3 +61,31 @@ class DiffSetVerification(models.Model):
         permissions = (
             ('verify_diffset', 'Can verify DiffSet legitimacy'),
         )
+
+
+class CommitData(models.Model):
+    """A non user modifiable store for data about commits.
+
+    This acts as a simple store for data about commits which
+    a review request owner may not modify themselves. A simple
+    JSONField is used to mimic the extra_data present on many
+    built-in Review Board models to make transitioning as quick
+    as possible. Eventually we'll want to replace this with
+    something more sensible.
+
+    We use a second JSONField to represent extra_data for the
+    ReviewRequestDraft rather than deal with two tables.
+    """
+    review_request = models.OneToOneField(
+        ReviewRequest,
+        primary_key=True)
+
+    extra_data = JSONField(
+        default='{}',
+        blank=False)
+    draft_extra_data = JSONField(
+        default='{}',
+        blank=False)
+
+    class Meta:
+        app_label = 'mozreview'
