@@ -35,7 +35,7 @@ The user should not have an ldap username associated with them
 Perform a push with the user
 
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.apikey=${user1key} push -r 1 --reviewid 1
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/cd3395bd3f8a*-addcommitid.hg (glob)
   searching for changes
@@ -48,10 +48,10 @@ Perform a push with the user
   
   changeset:  1:60479d07173e
   summary:    second commit
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

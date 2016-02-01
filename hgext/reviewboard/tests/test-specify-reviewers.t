@@ -60,7 +60,7 @@ Try a bunch of different ways of specifying a reviewer
   $ echo blah >> foo
   $ hg commit -m 'Bug 1 - More stuff; r?romulus, r=test-only'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 10 changesets)
   searching for changes
   remote: adding changesets
@@ -73,46 +73,46 @@ Try a bunch of different ways of specifying a reviewer
   
   changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
   changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
-  review:     http://*:$HGPORT1/r/5 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
   changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
-  review:     http://*:$HGPORT1/r/6 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
   
   changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
-  review:     http://*:$HGPORT1/r/7 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7 (draft)
   
   changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
-  review:     http://*:$HGPORT1/r/8 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8 (draft)
   
   changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
-  review:     http://*:$HGPORT1/r/9 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9 (draft)
   
   changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
-  review:     http://*:$HGPORT1/r/10 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10 (draft)
   
   changeset:  20:bb63798ced0f
   summary:    Bug 1 - More stuff; r?romulus, r=test-only
-  review:     http://*:$HGPORT1/r/11 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (visit review url to publish these review requests so others can see them)
 
   $ rbmanage list-reviewers 2 --draft
@@ -155,53 +155,53 @@ The review state file should have reviewers recorded
 Publishing series during push works
 
   $ hg push --config reviewboard.autopublish=true
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 10 changesets for review
   
   changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
   changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
-  review:     http://*:$HGPORT1/r/5 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
   changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
-  review:     http://*:$HGPORT1/r/6 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
   
   changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
-  review:     http://*:$HGPORT1/r/7 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7 (draft)
   
   changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
-  review:     http://*:$HGPORT1/r/8 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8 (draft)
   
   changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
-  review:     http://*:$HGPORT1/r/9 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9 (draft)
   
   changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
-  review:     http://*:$HGPORT1/r/10 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10 (draft)
   
   changeset:  20:bb63798ced0f
   summary:    Bug 1 - More stuff; r?romulus, r=test-only
-  review:     http://*:$HGPORT1/r/11 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
   publish these review requests now (Yn)? y
   (published review request 1)
@@ -257,7 +257,7 @@ code path.
   $ echo blah >> foo
   $ hg commit --amend -m 'Bug 1 - Even more stuff; r?romulus, r?remus'
   $ hg push --config reviewboard.autopublish=true
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -268,46 +268,46 @@ code path.
   
   changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
-  review:     http://*:$HGPORT1/r/2 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
   changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/3 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
   changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
-  review:     http://*:$HGPORT1/r/4 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4
   
   changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
-  review:     http://*:$HGPORT1/r/5 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5
   
   changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
-  review:     http://*:$HGPORT1/r/6 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6
   
   changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
-  review:     http://*:$HGPORT1/r/7 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7
   
   changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
-  review:     http://*:$HGPORT1/r/8 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8
   
   changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
-  review:     http://*:$HGPORT1/r/9 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9
   
   changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
-  review:     http://*:$HGPORT1/r/10 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
   changeset:  22:4edf42122107
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/11 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
   publish these review requests now (Yn)? y
   (published review request 1)
@@ -323,53 +323,53 @@ again.
   $ rbmanage list-reviewers 11 --draft
   admin+1, remus, romulus
   $ hg push --config reviewboard.autopublish=true
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 10 changesets for review
   
   changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
-  review:     http://*:$HGPORT1/r/2 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
   changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/3 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
   changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
-  review:     http://*:$HGPORT1/r/4 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4
   
   changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
-  review:     http://*:$HGPORT1/r/5 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5
   
   changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
-  review:     http://*:$HGPORT1/r/6 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6
   
   changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
-  review:     http://*:$HGPORT1/r/7 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7
   
   changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
-  review:     http://*:$HGPORT1/r/8 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8
   
   changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
-  review:     http://*:$HGPORT1/r/9 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9
   
   changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
-  review:     http://*:$HGPORT1/r/10 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
   changeset:  22:4edf42122107
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/11 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
   publish these review requests now (Yn)? y
   (published review request 1)
@@ -385,7 +385,7 @@ and pushed with no reviewers specified.
   $ echo blah >> foo
   $ hg commit --amend -m 'Bug 1 - Amended stuff'
   $ hg push --config reviewboard.autopublish=true
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -396,46 +396,46 @@ and pushed with no reviewers specified.
   
   changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
-  review:     http://*:$HGPORT1/r/2 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
   changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/3 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
   changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
-  review:     http://*:$HGPORT1/r/4 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4
   
   changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
-  review:     http://*:$HGPORT1/r/5 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5
   
   changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
-  review:     http://*:$HGPORT1/r/6 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6
   
   changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
-  review:     http://*:$HGPORT1/r/7 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7
   
   changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
-  review:     http://*:$HGPORT1/r/8 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8
   
   changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
-  review:     http://*:$HGPORT1/r/9 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9
   
   changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
-  review:     http://*:$HGPORT1/r/10 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
   changeset:  24:6f4a14de0f3d
   summary:    Bug 1 - Amended stuff
-  review:     http://*:$HGPORT1/r/11 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
   publish these review requests now (Yn)? y
   (published review request 1)
@@ -449,7 +449,7 @@ those specified in the commit summary.
   $ echo blah >> foo
   $ hg commit --amend -m 'Bug 1 - Amended stuff; r?romulus, r?remus'
   $ hg push --config reviewboard.autopublish=true
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -460,46 +460,46 @@ those specified in the commit summary.
   
   changeset:  11:fcf566e4c32a
   summary:    Bug 1 - some stuff; r?romulus
-  review:     http://*:$HGPORT1/r/2 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
   changeset:  12:c62a829e2f0a
   summary:    Bug 1 - More stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/3 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
   changeset:  13:955576a13e6c
   summary:    Bug 1 - More stuff; r?romulus,r?remus
-  review:     http://*:$HGPORT1/r/4 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4
   
   changeset:  14:696e908c00aa
   summary:    Bug 1 - More stuff; r?romulus, remus
-  review:     http://*:$HGPORT1/r/5 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5
   
   changeset:  15:92e037a5e92f
   summary:    Bug 1 - More stuff; r?romulus,remus
-  review:     http://*:$HGPORT1/r/6 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6
   
   changeset:  16:a7c3071c6b54
   summary:    Bug 1 - More stuff; (r?romulus)
-  review:     http://*:$HGPORT1/r/7 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7
   
   changeset:  17:7b03b2560ab0
   summary:    Bug 1 - More stuff; (r?romulus,remus)
-  review:     http://*:$HGPORT1/r/8 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8
   
   changeset:  18:42c4d67a510e
   summary:    Bug 1 - More stuff; [r?romulus]
-  review:     http://*:$HGPORT1/r/9 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9
   
   changeset:  19:2bc874a070ce
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
-  review:     http://*:$HGPORT1/r/10 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
   changeset:  26:3d7e903b90b0
   summary:    Bug 1 - Amended stuff; r?romulus, r?remus
-  review:     http://*:$HGPORT1/r/11 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
   publish these review requests now (Yn)? y
   (published review request 1)
@@ -514,7 +514,7 @@ Unrecognized reviewers should be ignored
   $ echo blah >> foo
   $ hg commit -m 'Bug 2 - different stuff; r?cthulhu'
   $ hg push --config reviewboard.autopublish=true --reviewid 2
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -526,10 +526,10 @@ Unrecognized reviewers should be ignored
   
   changeset:  27:3e01c2b3cff2
   summary:    Bug 2 - different stuff; r?cthulhu
-  review:     http://*:$HGPORT1/r/13 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/13 (draft)
   
   review id:  bz://2/mynick
-  review url: http://*:$HGPORT1/r/12 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/12 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   
   publish these review requests now (Yn)? y
@@ -542,7 +542,7 @@ Reviewer identification should be case insensitive.
   $ echo blah >> foo
   $ hg commit -m 'Bug 2 - better stuff; r?ryanvm'
   $ hg push --config reviewboard.autopublish=true -c 28
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -553,10 +553,10 @@ Reviewer identification should be case insensitive.
   
   changeset:  28:46d3dc1774f5
   summary:    Bug 2 - better stuff; r?ryanvm
-  review:     http://*:$HGPORT1/r/13 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/13 (draft)
   
   review id:  bz://2/mynick
-  review url: http://*:$HGPORT1/r/12 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/12 (draft)
   
   publish these review requests now (Yn)? y
   (published review request 12)

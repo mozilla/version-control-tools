@@ -80,7 +80,7 @@ Create initial repo content
   $ hg -q commit -A -m baz
 
   $ hg push -f
-  pushing to ssh://*:$HGPORT/users/user_example.com/repo-1 (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/users/user_example.com/repo-1
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -112,7 +112,7 @@ Create some obsolescence markers
   ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (* +0000) {'user': 'Test User <someone@example.com>'} (glob)
 
   $ hg push ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
-  pushing to ssh://*:$HGPORT/users/user_example.com/repo-1 (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/users/user_example.com/repo-1
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -130,7 +130,7 @@ Pulling should get the obsmarkers
 
   $ cd repo-1-clone
   $ hg pull
-  pulling from ssh://*:$HGPORT/users/user_example.com/repo-1 (glob)
+  pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/users/user_example.com/repo-1
   searching for changes
   adding changesets
   adding manifests

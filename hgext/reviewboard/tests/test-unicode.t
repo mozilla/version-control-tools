@@ -75,7 +75,7 @@ The globbing is patching over a bug in mach
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: "MozReview Request: Bug 1 - Initial commit to review \u2019 \u3053"
       file_name: reviewboard-2-url.txt
       flags: []
@@ -97,13 +97,13 @@ The globbing is patching over a bug in mach
       - Created attachment 1
       - "MozReview Request: Bug 1 - Initial commit to review \u2019 \u3053"
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: author@example.com
       id: 3
       tags: []
       text:
-      - http://*:$HGPORT1/r/1/#review1 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/1/#review1
       - ''
       - '::: foo:1'
       - (Diff revision 1)

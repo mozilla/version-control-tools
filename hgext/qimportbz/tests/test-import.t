@@ -11,7 +11,7 @@
 
   $ $TESTDIR/d0cker start-bmo qimportbz-test-import $HGPORT
   waiting for Bugzilla to start
-  Bugzilla accessible on http://*:$HGPORT/ (glob)
+  Bugzilla accessible on http://$DOCKER_HOSTNAME:$HGPORT/
 
   $ . $TESTDIR/hgext/bzexport/tests/helpers.sh
   $ configurebzexport $HGPORT $HGRCPATH
@@ -25,8 +25,8 @@
   $ echo foo > foo
   $ hg qnew -d '0 0' -m 'Bug 1 - First patch' first-patch
   $ hg bzexport
-  Refreshing configuration cache for http://*:$HGPORT/bzapi/ (glob)
-  first-patch uploaded as http://*:$HGPORT/attachment.cgi?id=1&action=edit (glob)
+  Refreshing configuration cache for http://$DOCKER_HOSTNAME:$HGPORT/bzapi/
+  first-patch uploaded as http://$DOCKER_HOSTNAME:$HGPORT/attachment.cgi?id=1&action=edit
 
   $ hg qpop -a
   popping first-patch

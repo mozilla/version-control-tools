@@ -40,7 +40,7 @@ Create and publish a review for SnarkBot
   $ hg add foo2
   $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/a4f23bfb8f88-0ce7b28d-addcommitid.hg (glob)
   searching for changes
@@ -53,14 +53,14 @@ Create and publish a review for SnarkBot
   
   changeset:  1:93b21e22593f
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  2:10c6acff83c0
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

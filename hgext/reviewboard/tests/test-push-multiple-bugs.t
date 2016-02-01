@@ -10,7 +10,7 @@
   $ echo foo2 > foo
   $ hg commit -A -m 'Bug 2 - Also an outstanding bug'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/809a72bb9607-4f7b536f-addcommitid.hg (glob)
   searching for changes

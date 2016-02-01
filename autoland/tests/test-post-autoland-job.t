@@ -19,7 +19,7 @@ Create a commit to test on Try
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - some stuff; r?cthulhu'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/633b0929fc18-25aef645-addcommitid.hg (glob)
   searching for changes
@@ -32,10 +32,10 @@ Create a commit to test on Try
   
   changeset:  1:b92ab6726259
   summary:    Bug 1 - some stuff; r?cthulhu
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (visit review url to publish these review requests so others can see them)
 
 Ensure Autoland started without errors
@@ -86,7 +86,7 @@ Post a job using a bookmark
   $ echo foo2 > foo
   $ hg commit -m 'Bug 1 - more goodness; r?cthulhu'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -97,14 +97,14 @@ Post a job using a bookmark
   
   changeset:  1:b92ab6726259
   summary:    Bug 1 - some stuff; r?cthulhu
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  2:58bfdda6ffde
   summary:    Bug 1 - more goodness; r?cthulhu
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (visit review url to publish these review requests so others can see them)
 
   $ REV=`hg log -r . --template "{node|short}"`
@@ -121,7 +121,7 @@ Post a job with unicode commit descriptions to be rewritten
   $ echo foo3 > foo
   $ hg commit --encoding utf-8 -m 'Bug 1 - こんにちは; r?cthulhu'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -132,18 +132,18 @@ Post a job with unicode commit descriptions to be rewritten
   
   changeset:  1:b92ab6726259
   summary:    Bug 1 - some stuff; r?cthulhu
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  2:58bfdda6ffde
   summary:    Bug 1 - more goodness; r?cthulhu
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   changeset:  3:e0c2a1307ae6
   summary:    Bug 1 - ?????; r?cthulhu
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (visit review url to publish these review requests so others can see them)
   $ REV=`hg log -r . --template "{node|short}"`
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - \\u3053\\u3093\\u306b\\u3061\\u306f; r=cthulhu\"}"

@@ -27,8 +27,8 @@
 Create some repositories to discover from
 
   $ mozreview create-repo a
-  HTTP URL (read only): http://*:$HGPORT/a (glob)
-  SSH URL (read+write): ssh://*:$HGPORT6/a (glob)
+  HTTP URL (read only): http://$DOCKER_HOSTNAME:$HGPORT/a
+  SSH URL (read+write): ssh://$DOCKER_HOSTNAME:$HGPORT6/a
   
   Run the following to create a configured clone:
     ./mozreview clone a /path/to/clone
@@ -36,8 +36,8 @@ Create some repositories to discover from
   And a clone bound to a particular user:
     ./mozreview clone a /path/to/clone --user <user>
   $ mozreview create-repo b
-  HTTP URL (read only): http://*:$HGPORT/b (glob)
-  SSH URL (read+write): ssh://*:$HGPORT6/b (glob)
+  HTTP URL (read only): http://$DOCKER_HOSTNAME:$HGPORT/b
+  SSH URL (read+write): ssh://$DOCKER_HOSTNAME:$HGPORT6/b
   
   Run the following to create a configured clone:
     ./mozreview clone b /path/to/clone
@@ -56,7 +56,7 @@ workaround to an unidentified root problem.
   $ hg -q commit -A -m 'Repo a initial'
   $ hg phase --public -r .
   $ hg push --noreview ${PUSHPREFIX}/a
-  pushing to ssh://*:$HGPORT6/a (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/a
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -75,7 +75,7 @@ workaround to an unidentified root problem.
   $ hg phase --public -r .
 
   $ hg push --noreview ${PUSHPREFIX}/b
-  pushing to ssh://*:$HGPORT6/b (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/b
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -90,14 +90,14 @@ workaround to an unidentified root problem.
 hg createrepomanifest will create and print a manifest of review repos
 
   $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ${PUSHPREFIX}/
-  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b ssh://*:$HGPORT6/b (glob)
-  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a ssh://*:$HGPORT6/a (glob)
+  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://$DOCKER_HOSTNAME:$HGPORT/b ssh://$DOCKER_HOSTNAME:$HGPORT6/b
+  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://$DOCKER_HOSTNAME:$HGPORT/a ssh://$DOCKER_HOSTNAME:$HGPORT6/a
 
 createrepomanifest should have created a file
 
   $ mozreview exec hgrb cat /repo/hg/mozilla/autoreview/.hg/reviewrepos
-  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b ssh://*:$HGPORT6/b (glob)
-  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a ssh://*:$HGPORT6/a (glob)
+  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://$DOCKER_HOSTNAME:$HGPORT/b ssh://$DOCKER_HOSTNAME:$HGPORT6/b
+  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://$DOCKER_HOSTNAME:$HGPORT/a ssh://$DOCKER_HOSTNAME:$HGPORT6/a
 
 repo list accessible via JSON API
 
@@ -105,8 +105,8 @@ repo list accessible via JSON API
   200
   
   {
-    "36d47cf7c6cbd312de3aeb3b2f770c650b014053": "http://*:$HGPORT/b ssh://*:$HGPORT6/b",  (glob)
-    "4016108b6e06add4c0ddde40dee8c7b9aa410f58": "http://*:$HGPORT/a ssh://*:$HGPORT6/a" (glob)
+    "36d47cf7c6cbd312de3aeb3b2f770c650b014053": "http://$DOCKER_HOSTNAME:$HGPORT/b ssh://$DOCKER_HOSTNAME:$HGPORT6/b", 
+    "4016108b6e06add4c0ddde40dee8c7b9aa410f58": "http://$DOCKER_HOSTNAME:$HGPORT/a ssh://$DOCKER_HOSTNAME:$HGPORT6/a"
   }
 
 
@@ -117,7 +117,7 @@ Pushing a repository unrelated to any known repo should result in error message
   $ echo unrelated > foo
   $ hg -q commit -A -m 'Bug 1 - Unrelated repo'
   $ hg push ${PUSHPREFIX}/autoreview
-  pushing to ssh://*:$HGPORT6/autoreview (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/autoreview
   searching for appropriate review repository
   abort: no review repository found
   [255]
@@ -131,9 +131,9 @@ Pushing to autodiscover repo should redirect
   $ echo discovery > foo
   $ hg commit -m 'Bug 1 - Testing discovery of a'
   $ hg push ${PUSHPREFIX}/autoreview
-  pushing to ssh://*:$HGPORT6/autoreview (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/autoreview
   searching for appropriate review repository
-  redirecting push to ssh://*:$HGPORT6/a (glob)
+  redirecting push to ssh://$DOCKER_HOSTNAME:$HGPORT6/a
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/a/.hg/strip-backup/e55631d0cc1a*-addcommitid.hg (glob)
   searching for changes
@@ -146,10 +146,10 @@ Pushing to autodiscover repo should redirect
   
   changeset:  1:daa176714e3a
   summary:    Bug 1 - Testing discovery of a
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/dummy
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -158,17 +158,17 @@ Pushing to autodiscover repo should redirect
 Redirecting to different hostname should be disallowed (security protection)
 
   $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ssh://bad.host/
-  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b ssh://bad.host/b (glob)
-  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a ssh://bad.host/a (glob)
+  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://$DOCKER_HOSTNAME:$HGPORT/b ssh://bad.host/b
+  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://$DOCKER_HOSTNAME:$HGPORT/a ssh://bad.host/a
 
   $ hg -q clone ${MERCURIAL_URL}b
   $ cd b
   $ echo bad_redirect > foo
   $ hg commit -m 'Bug 1 - Testing discovery of b'
   $ hg push ${PUSHPREFIX}/autoreview
-  pushing to ssh://*:$HGPORT6/autoreview (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/autoreview
   searching for appropriate review repository
-  abort: refusing to redirect due to URL mismatch: ssh://bad.host/b (glob)
+  abort: refusing to redirect due to URL mismatch: ssh://bad.host/b
   [255]
 
   $ cd ..
@@ -176,17 +176,17 @@ Redirecting to different hostname should be disallowed (security protection)
 Redirecting works when pushing over HTTP
 
   $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ${PUSHPREFIX}/
-  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://*:$HGPORT/b ssh://*:$HGPORT6/b (glob)
-  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://*:$HGPORT/a ssh://*:$HGPORT6/a (glob)
+  36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://$DOCKER_HOSTNAME:$HGPORT/b ssh://$DOCKER_HOSTNAME:$HGPORT6/b
+  4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://$DOCKER_HOSTNAME:$HGPORT/a ssh://$DOCKER_HOSTNAME:$HGPORT6/a
 
   $ hg -q clone ${MERCURIAL_URL}a http-redirect
   $ cd http-redirect
   $ echo http_redirect > foo
   $ hg commit -m 'Bug 1 - Testing discovery via HTTP pushes'
   $ hg --config mozilla.trustedbmoapikeyservices=${MERCURIAL_URL} push ${MERCURIAL_URL}autoreview -c .
-  pushing to http://*:$HGPORT/autoreview (glob)
+  pushing to http://$DOCKER_HOSTNAME:$HGPORT/autoreview
   searching for appropriate review repository
-  redirecting push to http://*:$HGPORT/a (glob)
+  redirecting push to http://$DOCKER_HOSTNAME:$HGPORT/a
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/http-redirect/.hg/strip-backup/5f3de01b6263-bb45f39e-addcommitid.hg (glob)
   searching for changes
@@ -199,10 +199,10 @@ Redirecting works when pushing over HTTP
   
   changeset:  2:e94691c71b1a
   summary:    Bug 1 - Testing discovery via HTTP pushes
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/dummy
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -211,7 +211,7 @@ Pushing to autoreview repo without client extension results in sane failure
 different)
 
   $ hg --config extensions.reviewboard=! push ${PUSHPREFIX}/autoreview
-  pushing to ssh://*:$HGPORT6/autoreview (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/autoreview
   remote: 
   remote: Pushing and pull review discovery repos is not allowed!
   remote: 
@@ -236,7 +236,7 @@ different)
   > EOF
 
   $ hg --config extensions.reviewboard=! --config mozilla.trustedbmoapikeyservices=${MERCURIAL_URL} push ${MERCURIAL_URL}autoreview
-  pushing to http://*:$HGPORT/autoreview (glob)
+  pushing to http://$DOCKER_HOSTNAME:$HGPORT/autoreview
   abort: remote error:
   
   Pushing and pull review discovery repos is not allowed!
@@ -254,7 +254,7 @@ Pulling from autoreview repos also error
 (although we don't expect to see this much in the wild)
 
   $ hg --config extensions.reviewboard=! pull ${PUSHPREFIX}/autoreview
-  pulling from ssh://*:$HGPORT6/autoreview (glob)
+  pulling from ssh://$DOCKER_HOSTNAME:$HGPORT6/autoreview
   remote: 
   remote: Pushing and pull review discovery repos is not allowed!
   remote: 
@@ -272,7 +272,7 @@ Pulling from autoreview repos also error
   [255]
 
   $ hg --config extensions.reviewboard=! --config mozilla.trustedbmoapikeyservices=${MERCURIAL_URL} pull ${MERCURIAL_URL}autoreview
-  pulling from http://*:$HGPORT/autoreview (glob)
+  pulling from http://$DOCKER_HOSTNAME:$HGPORT/autoreview
   abort: remote error:
   
   Pushing and pull review discovery repos is not allowed!

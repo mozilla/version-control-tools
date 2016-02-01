@@ -17,7 +17,7 @@ Pushing a review should not touch Bugzilla
   $ echo foo1 > foo
   $ hg commit -m 'Bug 1 - Foo 1'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/24417bc94b2c*-addcommitid.hg (glob)
   searching for changes
@@ -30,10 +30,10 @@ Pushing a review should not touch Bugzilla
   
   changeset:  1:a92d53c0ffc7
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -62,7 +62,7 @@ Publishing the review will add an attachment to the bug
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -84,8 +84,8 @@ Publishing the review will add an attachment to the bug
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -101,7 +101,7 @@ published.
   $ hg commit --amend
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/a92d53c0ffc7-1dd3de76-amend-backup.hg (glob)
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -112,10 +112,10 @@ published.
   
   changeset:  1:ad7618cd44de
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -125,7 +125,7 @@ published.
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -147,8 +147,8 @@ published.
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 4
       tags: []
@@ -156,7 +156,7 @@ published.
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review request updated; see interdiff: http://*/r/2/diff/1-2/' (glob)
+      - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/1-2/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -178,7 +178,7 @@ can happen if a reviewer is manually added (see Bug 1229789).
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags:
@@ -206,8 +206,8 @@ can happen if a reviewer is manually added (see Bug 1229789).
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 4
       tags: []
@@ -215,7 +215,7 @@ can happen if a reviewer is manually added (see Bug 1229789).
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review request updated; see interdiff: http://*:$HGPORT1/r/2/diff/1-2/' (glob)
+      - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/1-2/'
     component: TestComponent
     depends_on: []
     platform: All

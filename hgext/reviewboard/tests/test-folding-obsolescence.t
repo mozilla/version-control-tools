@@ -16,7 +16,7 @@
   $ hg commit -A -m 'root commit'
   adding foo0
   $ hg push --noreview
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -33,7 +33,7 @@
   adding foo2
 
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   searching for changes
   remote: adding changesets
@@ -45,14 +45,14 @@
   
   changeset:  3:6bd3fbee3dfa
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  4:dfe48634934b
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -85,7 +85,7 @@
 
   $ rbmanage publish 1
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -96,18 +96,18 @@
   
   changeset:  9:dac4214a563a
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  12:5b936d238262
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   changeset:  13:ae82743c8863
   summary:    Bug 1 - Foo 5
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

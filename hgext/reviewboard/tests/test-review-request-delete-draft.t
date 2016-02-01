@@ -18,7 +18,7 @@
   $ echo foo1 > foo
   $ hg commit -m 'Bug 1 - Initial commit'
   $ hg --config bugzilla.username=submitter@example.com --config bugzilla.apikey=${submitterkey} push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/8c2be86a13c9*-addcommitid.hg (glob)
   searching for changes
@@ -31,10 +31,10 @@
   
   changeset:  1:0aca5e441702
   summary:    Bug 1 - Initial commit
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -44,7 +44,7 @@ Now publish the review and create a new draft
   $ echo foo3 > foo
   $ hg commit --amend > /dev/null
   $ hg --config bugzilla.username=submitter@example.com --config bugzilla.apikey=${submitterkey} push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -55,10 +55,10 @@ Now publish the review and create a new draft
   
   changeset:  1:b3be3d464d6b
   summary:    Bug 1 - Initial commit
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

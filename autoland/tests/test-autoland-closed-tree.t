@@ -21,7 +21,7 @@ Create a commit to test on Try
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - some stuff'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/99de87c26bf8-5c89fdb9-addcommitid.hg (glob)
   searching for changes
@@ -34,10 +34,10 @@ Create a commit to test on Try
   
   changeset:  1:7194ef3a2eac
   summary:    Bug 1 - some stuff
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

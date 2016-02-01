@@ -36,7 +36,7 @@ globally
   55482a6fb4b1881fa8f746fd52cf6f096bb21c89 initial
 
   $ hg push -r 2 --reviewid bz://1/mynick-1
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/0050780911c8*-addcommitid.hg (glob)
   searching for changes
@@ -49,19 +49,19 @@ globally
   
   changeset:  3:f5dc8e52d068
   summary:    h1c1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  4:ad01e35ad0d8
   summary:    h1c2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick-1
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
   $ hg push -r . --reviewid bz://1/mynick-2
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/85811c4bd2cd*-addcommitid.hg (glob)
   searching for changes
@@ -74,14 +74,14 @@ globally
   
   changeset:  3:d03da7877f4b
   summary:    h2c1
-  review:     http://*:$HGPORT1/r/5 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
   changeset:  4:d9181bb0ade7
   summary:    h2c2
-  review:     http://*:$HGPORT1/r/6 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
   
   review id:  bz://1/mynick-2
-  review url: http://*:$HGPORT1/r/4 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

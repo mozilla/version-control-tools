@@ -40,7 +40,7 @@ Adding a reviewer should result in a r? flag being set
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
@@ -68,8 +68,8 @@ Adding a reviewer should result in a r? flag being set
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -89,7 +89,7 @@ Adding a "Ship It" review will grant r+
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
@@ -117,8 +117,8 @@ Adding a "Ship It" review will grant r+
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -126,7 +126,7 @@ Adding a "Ship It" review will grant r+
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://*:$HGPORT1/r/2/#review1 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - LGTM
     component: TestComponent
@@ -148,7 +148,7 @@ Adding a reply to the review will add a comment to Bugzilla
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
@@ -176,8 +176,8 @@ Adding a reply to the review will add a comment to Bugzilla
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -185,14 +185,14 @@ Adding a reply to the review will add a comment to Bugzilla
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://*:$HGPORT1/r/2/#review1 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - LGTM
     - author: author@example.com
       id: 4
       tags: []
       text:
-      - http://*:$HGPORT1/r/2/#review1 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - Thanks!
     component: TestComponent
@@ -229,7 +229,7 @@ in the tests.
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
       description: 'MozReview Request: Bug 2 - Multiple reviewers'
       file_name: reviewboard-4-url.txt
       flags:
@@ -263,8 +263,8 @@ in the tests.
       - Created attachment 2
       - 'MozReview Request: Bug 2 - Multiple reviewers'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/4/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/4/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -287,7 +287,7 @@ Removing a reviewer should remove their review flag
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
       description: 'MozReview Request: Bug 2 - Multiple reviewers'
       file_name: reviewboard-4-url.txt
       flags:
@@ -316,8 +316,8 @@ Removing a reviewer should remove their review flag
       - Created attachment 2
       - 'MozReview Request: Bug 2 - Multiple reviewers'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/4/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/4/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -340,7 +340,7 @@ Removing all reviewers should remove all flags
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
       description: 'MozReview Request: Bug 2 - Multiple reviewers'
       file_name: reviewboard-4-url.txt
       flags: []
@@ -364,8 +364,8 @@ Removing all reviewers should remove all flags
       - Created attachment 2
       - 'MozReview Request: Bug 2 - Multiple reviewers'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/4/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/4/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -400,7 +400,7 @@ review? sticks around when 1 person grants review
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/6/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header
       description: 'MozReview Request: Bug 3 - More multiple reviewers'
       file_name: reviewboard-6-url.txt
       flags:
@@ -434,8 +434,8 @@ review? sticks around when 1 person grants review
       - Created attachment 3
       - 'MozReview Request: Bug 3 - More multiple reviewers'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/6/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/6/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
     - author: reviewer@example.com
       id: 9
       tags: []
@@ -443,7 +443,7 @@ review? sticks around when 1 person grants review
       - Comment on attachment 3
       - 'MozReview Request: Bug 3 - More multiple reviewers'
       - ''
-      - http://*:$HGPORT1/r/6/#review3 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/6/#review3
       - ''
       - land it!
     component: TestComponent
@@ -480,7 +480,7 @@ Random users can come along and grant review
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/8/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/8/diff/#index_header
       description: 'MozReview Request: Bug 4 - Unrelated Reviewers'
       file_name: reviewboard-8-url.txt
       flags:
@@ -513,8 +513,8 @@ Random users can come along and grant review
       - Created attachment 4
       - 'MozReview Request: Bug 4 - Unrelated Reviewers'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/8/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/8/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/8/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/8/'
     - author: troll@example.com
       id: 12
       tags: []
@@ -522,7 +522,7 @@ Random users can come along and grant review
       - Comment on attachment 4
       - 'MozReview Request: Bug 4 - Unrelated Reviewers'
       - ''
-      - http://*:$HGPORT1/r/8/#review4 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/8/#review4
       - ''
       - I am always watching
     component: TestComponent
@@ -563,7 +563,7 @@ Test interaction with multiple commits.
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/10/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews'
       file_name: reviewboard-10-url.txt
       flags:
@@ -583,7 +583,7 @@ Test interaction with multiple commits.
       summary: 'MozReview Request: Bug 5 - Parent reviews'
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/11/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
       file_name: reviewboard-11-url.txt
       flags:
@@ -603,7 +603,7 @@ Test interaction with multiple commits.
       summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/12/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
       file_name: reviewboard-12-url.txt
       flags:
@@ -637,8 +637,8 @@ Test interaction with multiple commits.
       - Created attachment 5
       - 'MozReview Request: Bug 5 - Parent reviews'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/10/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/10/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
     - author: author@example.com
       id: 15
       tags: []
@@ -646,8 +646,8 @@ Test interaction with multiple commits.
       - Created attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/11/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/11/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
     - author: author@example.com
       id: 16
       tags: []
@@ -655,8 +655,8 @@ Test interaction with multiple commits.
       - Created attachment 7
       - 'MozReview Request: Bug 5 - Parent reviews, third commit'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/12/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/12/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -677,7 +677,7 @@ Verify that a single ship-it r+s only that attachment.
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/10/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews'
       file_name: reviewboard-10-url.txt
       flags:
@@ -697,7 +697,7 @@ Verify that a single ship-it r+s only that attachment.
       summary: 'MozReview Request: Bug 5 - Parent reviews'
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/11/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
       file_name: reviewboard-11-url.txt
       flags:
@@ -717,7 +717,7 @@ Verify that a single ship-it r+s only that attachment.
       summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/12/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
       file_name: reviewboard-12-url.txt
       flags:
@@ -751,8 +751,8 @@ Verify that a single ship-it r+s only that attachment.
       - Created attachment 5
       - 'MozReview Request: Bug 5 - Parent reviews'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/10/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/10/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
     - author: author@example.com
       id: 15
       tags: []
@@ -760,8 +760,8 @@ Verify that a single ship-it r+s only that attachment.
       - Created attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/11/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/11/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
     - author: author@example.com
       id: 16
       tags: []
@@ -769,8 +769,8 @@ Verify that a single ship-it r+s only that attachment.
       - Created attachment 7
       - 'MozReview Request: Bug 5 - Parent reviews, third commit'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/12/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/12/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
     - author: reviewer@example.com
       id: 17
       tags: []
@@ -778,7 +778,7 @@ Verify that a single ship-it r+s only that attachment.
       - Comment on attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - http://*:$HGPORT1/r/11/#review5 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review5
       - ''
       - land it!
     component: TestComponent
@@ -805,7 +805,7 @@ A non-ship-it review on a child should clear only that attachment's r+.
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/10/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews'
       file_name: reviewboard-10-url.txt
       flags:
@@ -825,7 +825,7 @@ A non-ship-it review on a child should clear only that attachment's r+.
       summary: 'MozReview Request: Bug 5 - Parent reviews'
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/11/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
       file_name: reviewboard-11-url.txt
       flags:
@@ -840,7 +840,7 @@ A non-ship-it review on a child should clear only that attachment's r+.
       summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/12/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
       file_name: reviewboard-12-url.txt
       flags:
@@ -874,8 +874,8 @@ A non-ship-it review on a child should clear only that attachment's r+.
       - Created attachment 5
       - 'MozReview Request: Bug 5 - Parent reviews'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/10/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/10/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
     - author: author@example.com
       id: 15
       tags: []
@@ -883,8 +883,8 @@ A non-ship-it review on a child should clear only that attachment's r+.
       - Created attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/11/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/11/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
     - author: author@example.com
       id: 16
       tags: []
@@ -892,8 +892,8 @@ A non-ship-it review on a child should clear only that attachment's r+.
       - Created attachment 7
       - 'MozReview Request: Bug 5 - Parent reviews, third commit'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/12/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/12/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
     - author: reviewer@example.com
       id: 17
       tags: []
@@ -901,7 +901,7 @@ A non-ship-it review on a child should clear only that attachment's r+.
       - Comment on attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - http://*:$HGPORT1/r/11/#review5 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review5
       - ''
       - land it!
     - author: reviewer@example.com
@@ -911,7 +911,7 @@ A non-ship-it review on a child should clear only that attachment's r+.
       - Comment on attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - http://*:$HGPORT1/r/11/#review7 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review7
       - ''
       - there is a problem
     component: TestComponent
@@ -933,7 +933,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/10/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews'
       file_name: reviewboard-10-url.txt
       flags:
@@ -948,7 +948,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
       summary: 'MozReview Request: Bug 5 - Parent reviews'
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/11/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
       file_name: reviewboard-11-url.txt
       flags:
@@ -963,7 +963,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
       summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/12/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
       file_name: reviewboard-12-url.txt
       flags:
@@ -997,8 +997,8 @@ A non-ship-it review on a child should also clear the attachment's r?.
       - Created attachment 5
       - 'MozReview Request: Bug 5 - Parent reviews'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/10/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/10/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
     - author: author@example.com
       id: 15
       tags: []
@@ -1006,8 +1006,8 @@ A non-ship-it review on a child should also clear the attachment's r?.
       - Created attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/11/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/11/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
     - author: author@example.com
       id: 16
       tags: []
@@ -1015,8 +1015,8 @@ A non-ship-it review on a child should also clear the attachment's r?.
       - Created attachment 7
       - 'MozReview Request: Bug 5 - Parent reviews, third commit'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/12/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/12/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
     - author: reviewer@example.com
       id: 17
       tags: []
@@ -1024,7 +1024,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
       - Comment on attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - http://*:$HGPORT1/r/11/#review5 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review5
       - ''
       - land it!
     - author: reviewer@example.com
@@ -1034,7 +1034,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
       - Comment on attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - http://*:$HGPORT1/r/11/#review7 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review7
       - ''
       - there is a problem
     - author: reviewer2@example.com
@@ -1044,7 +1044,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
       - Comment on attachment 5
       - 'MozReview Request: Bug 5 - Parent reviews'
       - ''
-      - http://*:$HGPORT1/r/10/#review8 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/10/#review8
       - ''
       - this is not good
     component: TestComponent
@@ -1066,7 +1066,7 @@ A non-ship-it review on a parent should post a comment only.
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/10/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews'
       file_name: reviewboard-10-url.txt
       flags:
@@ -1081,7 +1081,7 @@ A non-ship-it review on a parent should post a comment only.
       summary: 'MozReview Request: Bug 5 - Parent reviews'
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/11/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
       file_name: reviewboard-11-url.txt
       flags:
@@ -1096,7 +1096,7 @@ A non-ship-it review on a parent should post a comment only.
       summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/12/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header
       description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
       file_name: reviewboard-12-url.txt
       flags:
@@ -1130,8 +1130,8 @@ A non-ship-it review on a parent should post a comment only.
       - Created attachment 5
       - 'MozReview Request: Bug 5 - Parent reviews'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/10/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/10/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
     - author: author@example.com
       id: 15
       tags: []
@@ -1139,8 +1139,8 @@ A non-ship-it review on a parent should post a comment only.
       - Created attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/11/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/11/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
     - author: author@example.com
       id: 16
       tags: []
@@ -1148,8 +1148,8 @@ A non-ship-it review on a parent should post a comment only.
       - Created attachment 7
       - 'MozReview Request: Bug 5 - Parent reviews, third commit'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/12/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/12/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
     - author: reviewer@example.com
       id: 17
       tags: []
@@ -1157,7 +1157,7 @@ A non-ship-it review on a parent should post a comment only.
       - Comment on attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - http://*:$HGPORT1/r/11/#review5 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review5
       - ''
       - land it!
     - author: reviewer@example.com
@@ -1167,7 +1167,7 @@ A non-ship-it review on a parent should post a comment only.
       - Comment on attachment 6
       - 'MozReview Request: Bug 5 - Parent reviews, second commit'
       - ''
-      - http://*:$HGPORT1/r/11/#review7 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review7
       - ''
       - there is a problem
     - author: reviewer2@example.com
@@ -1177,14 +1177,14 @@ A non-ship-it review on a parent should post a comment only.
       - Comment on attachment 5
       - 'MozReview Request: Bug 5 - Parent reviews'
       - ''
-      - http://*:$HGPORT1/r/10/#review8 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/10/#review8
       - ''
       - this is not good
     - author: reviewer2@example.com
       id: 20
       tags: []
       text:
-      - http://*:$HGPORT1/r/9/#review9 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/9/#review9
       - ''
       - actually none of this is good
     component: TestComponent

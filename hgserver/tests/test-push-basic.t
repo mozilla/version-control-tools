@@ -30,7 +30,7 @@ Pushing a commit to a repo works
   $ touch foo
   $ hg -q commit -A -m initial
   $ hg push ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -109,7 +109,7 @@ Upgrade notice is advertised to clients not running bundle2
   $ echo upgrade > foo
   $ hg commit -m 'upgrade notice'
   $ hg --config experimental.bundle2-exp=false push ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests

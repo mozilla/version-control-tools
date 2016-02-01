@@ -34,7 +34,7 @@ Sanity check to ensure we have a review flag set
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
@@ -62,8 +62,8 @@ Sanity check to ensure we have a review flag set
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -83,7 +83,7 @@ Publishing a review will clear the r? flag
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -106,8 +106,8 @@ Publishing a review will clear the r? flag
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -115,7 +115,7 @@ Publishing a review will clear the r? flag
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://*:$HGPORT1/r/2/#review1 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
     component: TestComponent
@@ -136,7 +136,7 @@ Posting a non Ship It review without a review flag adds a comment
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -159,8 +159,8 @@ Posting a non Ship It review without a review flag adds a comment
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -168,14 +168,14 @@ Posting a non Ship It review without a review flag adds a comment
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://*:$HGPORT1/r/2/#review1 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
     - author: reviewer@example.com
       id: 4
       tags: []
       text:
-      - http://*:$HGPORT1/r/2/#review2 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review2
       - ''
       - One more thing...
     component: TestComponent
@@ -196,7 +196,7 @@ Posting a Ship It review will add an r+
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
@@ -224,8 +224,8 @@ Posting a Ship It review will add an r+
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -233,14 +233,14 @@ Posting a Ship It review will add an r+
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://*:$HGPORT1/r/2/#review1 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
     - author: reviewer@example.com
       id: 4
       tags: []
       text:
-      - http://*:$HGPORT1/r/2/#review2 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review2
       - ''
       - One more thing...
     - author: reviewer@example.com
@@ -250,7 +250,7 @@ Posting a Ship It review will add an r+
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://*:$HGPORT1/r/2/#review3 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review3
       - ''
       - LGTM
     component: TestComponent
@@ -274,7 +274,7 @@ Updating the review request as an L1 author will not re-request review
     attachments:
     - attacher: author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
@@ -302,8 +302,8 @@ Updating the review request as an L1 author will not re-request review
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
       tags: []
@@ -311,14 +311,14 @@ Updating the review request as an L1 author will not re-request review
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://*:$HGPORT1/r/2/#review1 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
     - author: reviewer@example.com
       id: 4
       tags: []
       text:
-      - http://*:$HGPORT1/r/2/#review2 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review2
       - ''
       - One more thing...
     - author: reviewer@example.com
@@ -328,7 +328,7 @@ Updating the review request as an L1 author will not re-request review
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - http://*:$HGPORT1/r/2/#review3 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review3
       - ''
       - LGTM
     - author: author@example.com
@@ -338,7 +338,7 @@ Updating the review request as an L1 author will not re-request review
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Initial commit to review'
       - ''
-      - 'Review request updated; see interdiff: http://*/r/2/diff/1-2/' (glob)
+      - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/1-2/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -373,7 +373,7 @@ Sanity check to ensure we have an r? flag
     attachments:
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
       description: 'MozReview Request: Bug 2 - Initial commit to review'
       file_name: reviewboard-4-url.txt
       flags:
@@ -401,8 +401,8 @@ Sanity check to ensure we have an r? flag
       - Created attachment 2
       - 'MozReview Request: Bug 2 - Initial commit to review'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/4/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/4/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -424,7 +424,7 @@ Sanity check to ensure we have an r+ flag set
     attachments:
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
       description: 'MozReview Request: Bug 2 - Initial commit to review'
       file_name: reviewboard-4-url.txt
       flags:
@@ -452,8 +452,8 @@ Sanity check to ensure we have an r+ flag set
       - Created attachment 2
       - 'MozReview Request: Bug 2 - Initial commit to review'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/4/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/4/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
     - author: reviewer@example.com
       id: 9
       tags: []
@@ -461,7 +461,7 @@ Sanity check to ensure we have an r+ flag set
       - Comment on attachment 2
       - 'MozReview Request: Bug 2 - Initial commit to review'
       - ''
-      - http://*:$HGPORT1/r/4/#review4 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/4/#review4
       - ''
       - LGTM
     component: TestComponent
@@ -489,7 +489,7 @@ We should have an r+ flag already set.
     attachments:
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/4/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
       description: 'MozReview Request: Bug 2 - Modified commit to review'
       file_name: reviewboard-4-url.txt
       flags:
@@ -517,8 +517,8 @@ We should have an r+ flag already set.
       - Created attachment 2
       - 'MozReview Request: Bug 2 - Modified commit to review'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/4/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/4/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
     - author: reviewer@example.com
       id: 9
       tags: []
@@ -526,7 +526,7 @@ We should have an r+ flag already set.
       - Comment on attachment 2
       - 'MozReview Request: Bug 2 - Modified commit to review'
       - ''
-      - http://*:$HGPORT1/r/4/#review4 (glob)
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/4/#review4
       - ''
       - LGTM
     - author: l3author@example.com
@@ -536,7 +536,7 @@ We should have an r+ flag already set.
       - Comment on attachment 2
       - 'MozReview Request: Bug 2 - Modified commit to review'
       - ''
-      - 'Review request updated; see interdiff: http://*/r/4/diff/1-2/' (glob)
+      - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/1-2/'
     component: TestComponent
     depends_on: []
     platform: All

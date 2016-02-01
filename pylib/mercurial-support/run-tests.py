@@ -645,6 +645,10 @@ class Test(unittest.TestCase):
         else:
             r.append((re.escape(self._testtmp), '$TESTTMP'))
 
+        if 'DOCKER_HOSTNAME' in os.environ:
+            r.append((re.escape(os.environ['DOCKER_HOSTNAME']),
+                      '$DOCKER_HOSTNAME'))
+
         return r
 
     def _getenv(self):

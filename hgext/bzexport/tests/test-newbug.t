@@ -1,7 +1,7 @@
 #require bmodocker
   $ $TESTDIR/d0cker start-bmo bzexport-test-newbug $HGPORT
   waiting for Bugzilla to start
-  Bugzilla accessible on http://*:$HGPORT/ (glob)
+  Bugzilla accessible on http://$DOCKER_HOSTNAME:$HGPORT/
 
   $ . $TESTDIR/hgext/bzexport/tests/helpers.sh
   $ configurebzexport $HGPORT $HGRCPATH
@@ -12,9 +12,9 @@
 Creating a bug with basic options works
 
   $ hg newbug --product TestProduct --component TestComponent -t 'First Bug' 'Description'
-  Refreshing configuration cache for http://*:$HGPORT/bzapi/ (glob)
+  Refreshing configuration cache for http://$DOCKER_HOSTNAME:$HGPORT/bzapi/
   Using default version 'unspecified' of product TestProduct
-  Created bug 1 at http://*:$HGPORT/show_bug.cgi?id=1 (glob)
+  Created bug 1 at http://$DOCKER_HOSTNAME:$HGPORT/show_bug.cgi?id=1
 
   $ bugzilla dump-bug 1
   Bug 1:
@@ -37,7 +37,7 @@ Assigning a bug works
 
   $ hg newbug --take-bug --product TestProduct --component TestComponent -t 'Assign it' 'dummy'
   Using default version 'unspecified' of product TestProduct
-  Created bug 2 at http://*:$HGPORT/show_bug.cgi?id=2 (glob)
+  Created bug 2 at http://$DOCKER_HOSTNAME:$HGPORT/show_bug.cgi?id=2
   $ bugzilla dump-bug 2
   Bug 2:
     blocks: []
@@ -64,7 +64,7 @@ Specifying a CC list works
 
   $ hg newbug --cc ':mary,:bob' --product TestProduct --component TestComponent -t 'CC list' 'dummy'
   Using default version 'unspecified' of product TestProduct
-  Created bug 3 at http://*:$HGPORT/show_bug.cgi?id=3 (glob)
+  Created bug 3 at http://$DOCKER_HOSTNAME:$HGPORT/show_bug.cgi?id=3
 
   $ bugzilla dump-bug 3
   Bug 3:
@@ -89,7 +89,7 @@ Specifying blockers and dependencies works
 
   $ hg newbug -B 1 -D 2 --product TestProduct --component TestComponent -t 'Dependencies' 'dummy'
   Using default version 'unspecified' of product TestProduct
-  Created bug 4 at http://*:$HGPORT/show_bug.cgi?id=4 (glob)
+  Created bug 4 at http://$DOCKER_HOSTNAME:$HGPORT/show_bug.cgi?id=4
 
   $ bugzilla dump-bug 4
   Bug 4:

@@ -8,7 +8,7 @@
   $ hg commit -A -m 'root commit'
   adding foo
   $ hg push --noreview
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -22,7 +22,7 @@
   $ echo 'foo2' > foo
   $ hg commit -m 'Bug 1 - Foo 2'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/61e2e5c813d2*-addcommitid.hg (glob)
   searching for changes
@@ -35,14 +35,14 @@
   
   changeset:  1:a92d53c0ffc7
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  2:233b570e5356
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -52,7 +52,7 @@
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -62,7 +62,7 @@
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -84,8 +84,8 @@
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
       tags: []
@@ -93,8 +93,8 @@
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -232,7 +232,7 @@ The review attachment should be marked as obsolete
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -242,7 +242,7 @@ The review attachment should be marked as obsolete
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -264,8 +264,8 @@ The review attachment should be marked as obsolete
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
       tags: []
@@ -273,8 +273,8 @@ The review attachment should be marked as obsolete
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -462,7 +462,7 @@ There should still not be a visible attachment on the bug
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -472,7 +472,7 @@ There should still not be a visible attachment on the bug
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -494,8 +494,8 @@ There should still not be a visible attachment on the bug
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
       tags: []
@@ -503,8 +503,8 @@ There should still not be a visible attachment on the bug
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -641,7 +641,7 @@ The attachment for the review request should be unobsoleted
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -651,7 +651,7 @@ The attachment for the review request should be unobsoleted
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -673,8 +673,8 @@ The attachment for the review request should be unobsoleted
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
       tags: []
@@ -682,8 +682,8 @@ The attachment for the review request should be unobsoleted
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -699,7 +699,7 @@ Pushing to a discarded review series will create a new series
   $ echo foo3 > foo
   $ hg commit -m 'Bug 1 - Foo 3'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -710,18 +710,18 @@ Pushing to a discarded review series will create a new series
   
   changeset:  1:a92d53c0ffc7
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/5 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
   changeset:  2:233b570e5356
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/6 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
   
   changeset:  3:4cb601f74de5
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/7 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/4 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -812,7 +812,7 @@ Pushing to a discarded review series will create a new series
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -822,7 +822,7 @@ Pushing to a discarded review series will create a new series
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -832,7 +832,7 @@ Pushing to a discarded review series will create a new series
       summary: 'MozReview Request: Bug 1 - Foo 2'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/5/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/5/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-5-url.txt
       flags: []
@@ -842,7 +842,7 @@ Pushing to a discarded review series will create a new series
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/6/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-6-url.txt
       flags: []
@@ -852,7 +852,7 @@ Pushing to a discarded review series will create a new series
       summary: 'MozReview Request: Bug 1 - Foo 2'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/7/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/7/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 3'
       file_name: reviewboard-7-url.txt
       flags: []
@@ -874,8 +874,8 @@ Pushing to a discarded review series will create a new series
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
       tags: []
@@ -883,8 +883,8 @@ Pushing to a discarded review series will create a new series
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
     - author: default@example.com
       id: 4
       tags: []
@@ -892,8 +892,8 @@ Pushing to a discarded review series will create a new series
       - Created attachment 3
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/5/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/5/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/5/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/5/'
     - author: default@example.com
       id: 5
       tags: []
@@ -901,8 +901,8 @@ Pushing to a discarded review series will create a new series
       - Created attachment 4
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/6/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/6/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
     - author: default@example.com
       id: 6
       tags: []
@@ -910,8 +910,8 @@ Pushing to a discarded review series will create a new series
       - Created attachment 5
       - 'MozReview Request: Bug 1 - Foo 3'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/7/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/7/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/7/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/7/'
     component: TestComponent
     depends_on: []
     platform: All

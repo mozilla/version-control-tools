@@ -9,7 +9,7 @@
   $ hg commit -A -m 'root commit'
   adding foo0
   $ hg push --noreview
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -35,7 +35,7 @@
   adding foo5
 
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 5 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/d86c61a23fc8*-addcommitid.hg (glob)
   searching for changes
@@ -48,26 +48,26 @@
   
   changeset:  1:6bd3fbee3dfa
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  2:dfe48634934b
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   changeset:  3:d751d4c04967
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
   changeset:  4:98dd6a7335db
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/5 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
   changeset:  5:76088734e3cb
   summary:    Bug 1 - Foo 5
-  review:     http://*:$HGPORT1/r/6 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -78,29 +78,29 @@ Popping the last commit truncates the review set
   $ hg strip -r 5 --no-backup
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 4 changesets for review
   
   changeset:  1:6bd3fbee3dfa
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
   changeset:  2:dfe48634934b
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
   changeset:  3:d751d4c04967
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/4 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4
   
   changeset:  4:98dd6a7335db
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/5 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -270,7 +270,7 @@ likely gets invalidated.
   $ hg -q rebase -s 2 -d 0
   $ hg strip -r 1 --no-backup
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -281,18 +281,18 @@ likely gets invalidated.
   
   changeset:  1:7050183d97d5
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  2:d7a5827a584d
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   changeset:  3:b5473ad606f4
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -517,7 +517,7 @@ Try removing a commit in the middle.
   $ hg strip -r 2 --no-backup
 
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -528,14 +528,14 @@ Try removing a commit in the middle.
   
   changeset:  1:7050183d97d5
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/2 (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
   changeset:  2:2fbc30f77859
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

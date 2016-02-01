@@ -19,7 +19,7 @@ Create a commit to test on Try
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - some stuff; r?cthulhu'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/633b0929fc18-25aef645-addcommitid.hg (glob)
   searching for changes
@@ -32,10 +32,10 @@ Create a commit to test on Try
   
   changeset:  1:b92ab6726259
   summary:    Bug 1 - some stuff; r?cthulhu
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (visit review url to publish these review requests so others can see them)
 
 Post a job
@@ -55,7 +55,7 @@ Post a job with a bad merge
   $ echo foo3 > foo
   $ hg commit -m 'Bug 1 - more stuff; r?cthulhu'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -66,18 +66,18 @@ Post a job with a bad merge
   
   changeset:  1:b92ab6726259
   summary:    Bug 1 - some stuff; r?cthulhu
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   changeset:  2:c698e9b61b34
   summary:    trouble
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   changeset:  3:b28c57a24a9e
   summary:    Bug 1 - more stuff; r?cthulhu
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   $ REV=`hg log -r . --template "{node|short}"`

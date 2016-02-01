@@ -3,7 +3,7 @@
 
   $ $TESTDIR/d0cker start-bmo bzexport-test-review $HGPORT
   waiting for Bugzilla to start
-  Bugzilla accessible on http://*:$HGPORT/ (glob)
+  Bugzilla accessible on http://$DOCKER_HOSTNAME:$HGPORT/
 
   $ configurebzexport $HGPORT $HGRCPATH
 
@@ -33,9 +33,9 @@ Specifying a reviewer by IRC nick works
   $ cookie=`echo ${out} | awk '{print $2}'`
 
   $ hg --config bugzilla.userid=${userid} --config bugzilla.cookie=${cookie} bzexport --review ':mary'
-  Refreshing configuration cache for http://*:$HGPORT/bzapi/ (glob)
+  Refreshing configuration cache for http://$DOCKER_HOSTNAME:$HGPORT/bzapi/
   Requesting review from user1@example.com
-  test-reviewer uploaded as http://*:$HGPORT/attachment.cgi?id=1&action=edit (glob)
+  test-reviewer uploaded as http://$DOCKER_HOSTNAME:$HGPORT/attachment.cgi?id=1&action=edit
 
   $ bugzilla dump-bug 1
   Bug 1:
@@ -87,7 +87,7 @@ Parsing reviewer out of commit message works
   $ hg qref -m 'Bug 2 - Auto reviewer; r=bob'
   $ hg bzexport --review auto
   Requesting review from user2@example.com
-  test-reviewer uploaded as http://*:$HGPORT/attachment.cgi?id=2&action=edit (glob)
+  test-reviewer uploaded as http://$DOCKER_HOSTNAME:$HGPORT/attachment.cgi?id=2&action=edit
 
   $ bugzilla dump-bug 2
   Bug 2:
@@ -139,11 +139,11 @@ Changing the reviewer works
   $ hg qref -m 'Bug 3 - Switching reviewer'
   $ hg bzexport --review :mary
   Requesting review from user1@example.com
-  test-reviewer uploaded as http://*:$HGPORT/attachment.cgi?id=3&action=edit (glob)
+  test-reviewer uploaded as http://$DOCKER_HOSTNAME:$HGPORT/attachment.cgi?id=3&action=edit
 
   $ hg bzexport --review :bob
   Requesting review from user2@example.com
-  test-reviewer uploaded as http://*:$HGPORT/attachment.cgi?id=4&action=edit (glob)
+  test-reviewer uploaded as http://$DOCKER_HOSTNAME:$HGPORT/attachment.cgi?id=4&action=edit
 
   $ bugzilla dump-bug 3
   Bug 3:
@@ -217,7 +217,7 @@ Specifying both reviewer and feedback works
   $ hg bzexport --review :mary --feedback :bob
   Requesting review from user1@example.com
   Requesting feedback from user2@example.com
-  test-reviewer uploaded as http://*:$HGPORT/attachment.cgi?id=5&action=edit (glob)
+  test-reviewer uploaded as http://$DOCKER_HOSTNAME:$HGPORT/attachment.cgi?id=5&action=edit
 
   $ bugzilla dump-bug 4
   Bug 4:

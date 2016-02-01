@@ -26,7 +26,7 @@ a shipit.
   $ echo foo >> foo
   $ hg commit -m 'bug 1 - stuff; r=cthulhu'
   $ hg push --config reviewboard.autopublish=true
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/165ec4a3fc81-1c3847cc-addcommitid.hg (glob)
   searching for changes
@@ -40,10 +40,10 @@ a shipit.
   
   changeset:  1:4b8b122bb501
   summary:    bug 1 - stuff; r=cthulhu
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
   publish these review requests now (Yn)? y
   (published review request 1)
@@ -61,7 +61,7 @@ There are no warnings for reviewers who haved granted a ship-it when using r=
   $ hg commit --amend -m "bug 1 - serious changes; r=cthulhu"
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/4b8b122bb501-afed4b13-amend-backup.hg (glob)
   $ hg push --config reviewboard.autopublish=true
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -72,10 +72,10 @@ There are no warnings for reviewers who haved granted a ship-it when using r=
   
   changeset:  1:e47b87b1a589
   summary:    bug 1 - serious changes; r=cthulhu
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
   publish these review requests now (Yn)? y
   (published review request 1)
@@ -96,7 +96,7 @@ using r=.
   $ hg commit --amend -m "bug 1 - even better stuff; r=cthulhu"
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/e47b87b1a589-8fe56fc5-amend-backup.hg (glob)
   $ hg push --config reviewboard.autopublish=true
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -108,10 +108,10 @@ using r=.
   
   changeset:  1:b3fb18cc7421
   summary:    bug 1 - even better stuff; r=cthulhu
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
   publish these review requests now (Yn)? y
   (published review request 1)

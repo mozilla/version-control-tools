@@ -2,7 +2,7 @@
 
   $ $TESTDIR/d0cker start-bmo httpd-bugzilla-auth $HGPORT --web-id-file web_id
   waiting for Bugzilla to start
-  Bugzilla accessible on http://*:$HGPORT/ (glob)
+  Bugzilla accessible on http://$DOCKER_HOSTNAME:$HGPORT/
 
   $ export BMOWEB_ID=`cat web_id`
 

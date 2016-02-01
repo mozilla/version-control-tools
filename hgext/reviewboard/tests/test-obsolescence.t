@@ -22,7 +22,7 @@ Set up the repo
   $ echo 'foo2' > foo
   $ hg commit -m 'foo2'
   $ hg push --reviewid 1
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   searching for changes
   remote: adding changesets
@@ -34,10 +34,10 @@ Set up the repo
   
   changeset:  2:da1efb6eb614
   summary:    foo2
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -55,25 +55,25 @@ Now create a new head and push a rebase
   $ hg up tip
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg push --reviewid 1
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 2 changesets with 1 changes to ? files (+1 heads) (glob)
+  remote: added 2 changesets with 1 changes to 2 files (+1 heads)
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
   changeset:  3:850ce71e5f69
   summary:    bar
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   changeset:  4:0bdd81f5fee5
   summary:    foo2
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

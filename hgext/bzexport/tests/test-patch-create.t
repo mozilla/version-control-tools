@@ -1,7 +1,7 @@
 #require bmodocker
   $ $TESTDIR/d0cker start-bmo bzexport-test-patch-create $HGPORT
   waiting for Bugzilla to start
-  Bugzilla accessible on http://*:$HGPORT/ (glob)
+  Bugzilla accessible on http://$DOCKER_HOSTNAME:$HGPORT/
 
   $ . $TESTDIR/hgext/bzexport/tests/helpers.sh
   $ configurebzexport $HGPORT $HGRCPATH
@@ -18,8 +18,8 @@ Uploading a simple patch to a bug works
   $ echo first > foo
   $ hg qnew -d '0 0' -m 'Bug 1 - First patch' first-patch
   $ hg bzexport
-  Refreshing configuration cache for http://*:$HGPORT/bzapi/ (glob)
-  first-patch uploaded as http://*:$HGPORT/attachment.cgi?id=1&action=edit (glob)
+  Refreshing configuration cache for http://$DOCKER_HOSTNAME:$HGPORT/bzapi/
+  first-patch uploaded as http://$DOCKER_HOSTNAME:$HGPORT/attachment.cgi?id=1&action=edit
 
   $ bugzilla dump-bug 1
   Bug 1:
@@ -64,7 +64,7 @@ Updating the patch works
   $ echo first2 > foo
   $ hg qref -m 'Bug 1 - First patch again'
   $ hg bzexport
-  first-patch uploaded as http://*:$HGPORT/attachment.cgi?id=2&action=edit (glob)
+  first-patch uploaded as http://$DOCKER_HOSTNAME:$HGPORT/attachment.cgi?id=2&action=edit
 
   $ bugzilla dump-bug 1
   Bug 1:
@@ -136,7 +136,7 @@ Uploading a new patch will reassign bug to you
   $ echo initial-author > foo
   $ hg qnew -d '0 0' -m 'Bug 2 - Initial author' some-patch
   $ hg --config bugzilla.username=original-author@example.com --config bugzilla.password=password1 bzexport
-  some-patch uploaded as http://*:$HGPORT/attachment.cgi?id=3&action=edit (glob)
+  some-patch uploaded as http://$DOCKER_HOSTNAME:$HGPORT/attachment.cgi?id=3&action=edit
 
   $ bugzilla dump-bug 2
   Bug 2:

@@ -15,7 +15,7 @@ Pushing a review will create the reviews file
   $ echo "foo" >> foo
   $ hg commit -m 'Bug 1 - second commit'
   $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/be8ff4f28043*-addcommitid.hg (glob)
   searching for changes
@@ -28,16 +28,16 @@ Pushing a review will create the reviews file
   
   changeset:  1:00a4f82beb7c
   summary:    Bug 1 - second commit
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
   $ cat .hg/reviews
-  u http://*:$HGPORT1 (glob)
-  r ssh://*:$HGPORT6/test-repo (glob)
+  u http://$DOCKER_HOSTNAME:$HGPORT1
+  r ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   p bz://1/mynick 1
   c 00a4f82beb7c11fa00dafd1d2e613d979171154f 2
   pc 00a4f82beb7c11fa00dafd1d2e613d979171154f 1

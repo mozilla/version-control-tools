@@ -17,7 +17,7 @@ Pushing works as expected
   $ touch foo
   $ hg -q commit -A -m initial
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -35,7 +35,7 @@ Marking individual repo as read-only works
   $ hg commit -m readonly
   $ hgmo exec hgssh touch /repo/hg/mozilla/mozilla-central/.hg/readonlyreason
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: repository is read only
   remote: refusing to add changesets
@@ -49,7 +49,7 @@ Global read only file works
 
   $ hgmo exec hgssh touch /etc/mercurial/readonlyreason
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: all repositories currently read only
   remote: refusing to add changesets
