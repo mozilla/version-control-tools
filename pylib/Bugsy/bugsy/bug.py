@@ -222,6 +222,53 @@ class Bug(object):
         """
         self._bug['assigned_to'] = value
 
+    @property
+    def cc(self):
+        """
+            Property to get the cc list for the bug. It returns emails for people
+
+            >>> bug.cc
+            [u'dburns@mozilla.com', u'automatedtester@mozilla.com']
+        """
+        cc_list = [cc_detail['email'] for cc_detail in self._bug['cc_detail']]
+        return cc_list
+
+    @property
+    def keywords(self):
+        """
+            Property to get the keywords list for the bug. It returns multiple
+            keywords in a list.
+
+            >>> bug.keywords
+            [u"ateam-marionette-runner", u"regression"]
+        """
+        keywords = [keyword for keyword in self._bug['keywords']]
+        return keywords
+
+    @property
+    def depends_on(self):
+        """
+            Property to get the bug numbers that depend on the current bug. It returns multiple
+            bug numbers in a list.
+
+            >>> bug.depends_on
+            [123456, 678901]
+        """
+        depends_on = [dep for dep in self._bug['depends_on']]
+        return depends_on
+
+    @property
+    def blocks(self):
+        """
+            Property to get the bug numbers that block on the current bug. It returns multiple
+            bug numbers in a list.
+
+            >>> bug.blocks
+            [123456, 678901]
+        """
+        depends_on = [dep for dep in self._bug['blocks']]
+        return depends_on
+
     def to_dict(self):
         """
             Return the raw dict that is used inside this object

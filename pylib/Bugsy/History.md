@@ -1,3 +1,15 @@
+0.7.0 / 2016-02-01
+==================
+
+  * Correct pyflakes error
+  * Add error codes returned from Bugzilla to errror messages
+  * Handle when Bugzilla returns errors with a 200 status code
+  * Correct test when ting into an existing bug
+  * Handle the case where  isnt on the
+  * Add the ability to get the blockers and dependent bugs
+  * Pop messages on the bug that were added for creation otherwise you get an error
+  * Get the ability to get keywords associated to the bug.
+  * Add the ability to get the cc list of a bug
 
 0.6.0 / 2015-10-08
 ==================

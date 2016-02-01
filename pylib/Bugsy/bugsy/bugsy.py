@@ -144,11 +144,19 @@ class Bugsy(object):
             if 'error' not in result:
                 bug._bug['id'] = result['id']
                 bug._bugsy = self
+                try:
+                    bug._bug.pop('comment')
+                except Exception:
+                    # If we don't have a `comment` we will error so let's just
+                    # swallow it.
+                    pass
             else:
                 raise BugsyException(result['message'])
         else:
             result = self.request('bug/%s' % bug.id, 'PUT',
                                   data=bug.to_dict())
+            updated_bug = self.get(bug.id)
+            return updated_bug
 
     @property
     def search_for(self):
@@ -170,10 +178,13 @@ class Bugsy(object):
         if response.status_code >= 500:
             raise BugsyException("We received a {0} error with the following: {1}"
                                  .format(response.status_code, response.text))
-        if response.status_code > 399 and response.status_code < 500:
-            result = response.json()
+        result = response.json()
+        if (response.status_code > 399 and response.status_code < 500) \
+            or (isinstance(result, dict) and 'error' in result and
+                result.get('error', False) is True):
+
             if "API key" in result['message'] or "username or password" in result['message']:
-                raise LoginException(result['message'])
+                raise LoginException(result['message'], result.get("code"))
             else:
-                raise BugsyException(result["message"])
-        return response.json()
+                raise BugsyException(result["message"], result.get("code"))
+        return result

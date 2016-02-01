@@ -29,7 +29,7 @@ def test_we_cant_post_without_a_username_or_password():
         bugzilla.put("foo")
         assert 1 == 0, "Should have thrown when calling put"
     except BugsyException as e:
-        assert str(e) == "Message: Unfortunately you can't put bugs in Bugzilla without credentials"
+        assert str(e) == "Message: Unfortunately you can't put bugs in Bugzilla without credentials Code: None"
 
 @responses.activate
 def test_we_get_a_login_exception_when_details_are_wrong():
@@ -40,7 +40,7 @@ def test_we_get_a_login_exception_when_details_are_wrong():
         Bugsy("foo", "bar")
         assert 1 == 0, "Should have thrown an error"
     except LoginException as e:
-        assert str(e) == "Message: The username or password you entered is not valid."
+        assert str(e) == "Message: The username or password you entered is not valid. Code: None"
 
 @responses.activate
 def test_bad_api_key():
@@ -53,7 +53,7 @@ def test_bad_api_key():
         Bugsy(username='foo', api_key='badkey')
         assert False, 'Should have thrown'
     except LoginException as e:
-        assert str(e) == 'Message: The API key you specified is invalid. Please check that you typed it correctly.'
+        assert str(e) == 'Message: The API key you specified is invalid. Please check that you typed it correctly. Code: 306'
 
 @responses.activate
 def test_validate_api_key():
@@ -73,7 +73,7 @@ def test_we_cant_post_without_passing_a_bug_object():
         bugzilla.put("foo")
         assert 1 == 0, "Should have thrown an error about type when calling put"
     except BugsyException as e:
-        assert str(e) == "Message: Please pass in a Bug object when posting to Bugzilla"
+        assert str(e) == "Message: Please pass in a Bug object when posting to Bugzilla Code: None"
 
 @responses.activate
 def test_we_can_get_a_bug():
@@ -136,6 +136,9 @@ def test_we_can_put_a_current_bug():
     responses.add(responses.PUT, 'https://bugzilla.mozilla.org/rest/bug/1017315',
                       body=json.dumps(bug_dict), status=200,
                       content_type='application/json')
+    responses.add(responses.GET, rest_url('bug', 1017315, token="foobar"),
+                      body=json.dumps(example_return), status=200,
+                      content_type='application/json', match_querystring=True)
     bugzilla = Bugsy("foo", "bar")
     bug = Bug(**example_return['bugs'][0])
     bug.summary = 'I love foo but hate bar'
@@ -160,7 +163,7 @@ def test_we_handle_errors_from_bugzilla_when_posting():
       bugzilla.put(bug)
       assert 1 == 0, "Put should have raised an error"
   except BugsyException as e:
-      assert str(e) == "Message: You must select/enter a component."
+      assert str(e) == "Message: You must select/enter a component. Code: 50"
 
 @responses.activate
 def test_we_handle_errors_from_bugzilla_when_updating_a_bug():
@@ -178,7 +181,7 @@ def test_we_handle_errors_from_bugzilla_when_updating_a_bug():
   try:
       bugzilla.put(bug)
   except BugsyException as e:
-      assert str(e) == "Message: You must select/enter a component."
+      assert str(e) == "Message: You must select/enter a component. Code: 50"
 
 @responses.activate
 def test_we_can_set_the_user_agent_to_bugsy():
@@ -204,6 +207,6 @@ def test_we_can_handle_errors_when_retrieving_bugs():
         bug = bugzilla.get(111111111)
         assert False, "A BugsyException should have been thrown"
     except BugsyException as e:
-        assert str(e) == "Message: Bug 111111111111 does not exist."
+        assert str(e) == "Message: Bug 111111111111 does not exist. Code: 101"
     except Exception as e:
         assert False, "Wrong type of exception was thrown"
