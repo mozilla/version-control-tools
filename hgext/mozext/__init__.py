@@ -311,11 +311,8 @@ from mercurial import (
     util,
 )
 
-OUR_DIR = os.path.dirname(__file__)
-REPO_ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
-PYLIB = os.path.join(REPO_ROOT, 'pylib')
-for p in ('flake8', 'mccabe', 'mozautomation', 'pep8', 'pyflakes'):
-    sys.path.insert(0, os.path.join(PYLIB, p))
+OUR_DIR = os.path.normpath(os.path.dirname(__file__))
+execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 
 # Disable demand importing for mozautomation because "requests" doesn't
