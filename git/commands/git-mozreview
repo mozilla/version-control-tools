@@ -1,0 +1,771 @@
+#!/usr/bin/env python2.7
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2 or any later version.
+
+from __future__ import absolute_import, print_function, unicode_literals
+
+import argparse
+import collections
+import json
+import os
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import tempfile
+import urlparse
+
+
+HERE = os.path.dirname(__file__)
+ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
+
+sys.path.insert(0, os.path.join(ROOT, 'hgext', 'reviewboard'))
+sys.path.insert(0, os.path.join(ROOT, 'pylib', 'mozautomation'))
+sys.path.insert(0, os.path.join(ROOT, 'pylib', 'requests'))
+
+import requests
+from requests.auth import (
+    AuthBase,
+    _basic_auth_str,
+)
+
+from mozautomation.commitparser import (
+    parse_bugs,
+)
+from hgrb.util import (
+    genid,
+    ReviewID,
+)
+
+
+# Endpoints that we implicitly trust to send our Bugzilla API key to.
+TRUSTED_API_KEY_SERVICES = {
+    'https://reviewboard-hg.mozilla.org',
+}
+
+# Capabilities the client supports. Some of these are lies. But that's
+# OK because the capabilities set behaves more like a lifetime version.
+CLIENT_CAPABILITIES = {
+    'proto1',
+    'listreviewdata',
+    'listreviewrepos',
+    'bzapikeys',
+    'jsonproto',
+}
+
+MAX_REVIEW_COMMITS = 100
+
+
+git_dir = os.environ.get('GIT_DIR')
+if not git_dir:
+    git_dir = subprocess.check_output(
+            ['git', 'rev-parse', '--git-dir']).rstrip('\n')
+
+
+def gethgui():
+    """Obtain a Mercurial ui instance.
+
+    If a .git/hgrc file exists, it will be loaded.
+    """
+    from mercurial import ui as hgui
+    ui = hgui.ui()
+
+    if os.path.exists(os.path.join(git_dir, 'hgrc')):
+        ui.readconfig(os.path.join(git_dir, 'hgrc'), trust=True)
+
+    return ui
+
+
+class AbortError(Exception):
+    """Raised when we wish to abort command execution."""
+
+
+class BugzillaAPIKeyAuth(AuthBase):
+    """Requests auth class that automatically adds Bugzilla API key credentials.
+
+    But it will only add them if the target URL is trusted.
+    """
+    def __init__(self, git_config):
+        for k in ('bz.username', 'bz.apikey'):
+            if k not in git_config:
+                raise Exception('%s not defined in git config' % k)
+
+        self.username = git_config['bz.username']
+        self.password = git_config['bz.apikey']
+        self.trusted_services = set(TRUSTED_API_KEY_SERVICES)
+        extra = git_config.get('bz.trustedapikeyservices')
+        if extra:
+            for s in extra.split(', '):
+                self.trusted_services.add(s.strip())
+
+    def __call__(self, r):
+        # We only add credentials for services that are trusted. This helps
+        # prevent accidentally disclosing credentials to untrusted servers.
+        #
+        # We only compare the scheme and hostname/netloc components of the URL.
+        # This prevents the use of path prefixes in trust roots. We shouldn't
+        # care for our use case.
+        parsed = urlparse.urlparse(r.url)
+        dest = urlparse.urlunparse((parsed.scheme, parsed.netloc, '', '', '', ''))
+
+        for trusted in self.trusted_services:
+            t_parsed = urlparse.urlparse(trusted)
+            source = urlparse.urlunparse((t_parsed.scheme, t_parsed.netloc, '', '', '', ''))
+
+            if source == dest:
+                r.headers['Authorization'] = _basic_auth_str(self.username,
+                                                            self.password)
+                break
+
+        return r
+
+
+# Copied from cinnabar.hg.
+def munge_url(url):
+    parsed_url = urlparse.urlparse(url)
+    if not parsed_url.scheme:
+        return urlparse.ParseResult('file', '', parsed_url.path, '', '', '')
+
+    if parsed_url.scheme != 'hg':
+        return parsed_url
+
+    proto = 'https'
+    host = parsed_url.netloc
+    if ':' in host:
+        host, port = host.rsplit(':', 1)
+        if '.' in port:
+            port, proto = port.split('.', 1)
+        if not port.isdigit():
+            proto = port
+            port = None
+        if port:
+            host = host + ':' + port
+    return urlparse.ParseResult(proto, host, parsed_url.path, parsed_url.params,
+                       parsed_url.query, parsed_url.fragment)
+
+
+def sendauthenticatedhttprequest(git_config, session, url, **kwargs):
+    """Send a Bugzilla authenticated HTTP request to a URL."""
+    if not session:
+        session = requests.Session()
+
+    req = requests.Request(url=url, auth=BugzillaAPIKeyAuth(git_config),
+                           **kwargs)
+    return session.send(req.prepare())
+
+
+def get_output(args):
+    try:
+        output = subprocess.check_output(args, stderr=subprocess.STDOUT)
+        return 0, output
+    except subprocess.CalledProcessError as e:
+        return e.returncode, e.output
+
+
+def get_git_config():
+    res, output = get_output(['git', 'config', '--list'])
+    if res:
+        raise AbortError('could not obtain git config')
+
+    c = {}
+    for line in output.splitlines():
+        k, v = line.split('=', 1)
+        c[k] = v
+
+    return c
+
+
+def get_commit_info(commits):
+    """Obtain info about Git commits.
+
+    A list of 2-tuples of commits in topological order oldest to newest will
+    be returned. The tuple contains the 40 byte hex commit SHA-1 and the commit
+    summary line.
+    """
+    args = [
+        'git',
+        'log',
+        '--topo-order',
+        '--format=%H\t%p\t%s',
+        '--no-walk',
+    ]
+    args.extend(commits)
+
+    err, output = get_output(args)
+    if err:
+        raise AbortError('error querying for commits to review:\n%s' % output)
+
+    commits = []
+    for i, line in enumerate(output.splitlines()):
+        fields = line.split('\t', 3)
+        commit, parents, summary = fields
+        parents = parents.split()
+
+        if len(parents) > 1:
+            raise AbortError('merge commits are not reviewable: %s' %
+                             commit[0:7])
+
+        commits.append((commit, summary))
+
+    return reversed(commits)
+
+
+def resolve_commitish(s):
+    res, output = get_output(['git', 'rev-parse', '--revs-only', '--verify', s])
+    if res:
+        raise AbortError('could not resolve commit-ish "%s": %s' % (s, output))
+
+    return output.strip().splitlines()[0]
+
+
+def publish_review_request(git_config, session, base_url, username, api_key, rid):
+    publish_url = '%s/mozreviewpublish' % base_url
+    publish_request = {
+        'bzusername': username,
+        'bzapikey': api_key,
+        'rrids': [rid],
+    }
+    res = sendauthenticatedhttprequest(git_config, session, publish_url,
+                                       method='POST', json=publish_request)
+    if res.status_code != 200:
+        raise AbortError('server error when publishing review requests')
+
+    return res.json()
+
+
+def push_command(args):
+    ui = gethgui()
+    git_config = get_git_config()
+
+    for k in ('bz.username', 'bz.apikey', 'mozreview.nickname'):
+        if k not in git_config:
+            raise AbortError('%s config variable must be defined; '
+                             'run `git mozreview configure`' % k)
+
+    username = git_config['bz.username']
+    apikey = git_config['bz.apikey']
+    nick = git_config['mozreview.nickname']
+
+    remote_name = git_config.get('mozreview.remote', 'review')
+
+    url = None
+    for key in ('remote.%s.pushurl', 'remote.%s.url'):
+        if key % remote_name in git_config:
+            url = git_config[key % remote_name]
+            break
+
+    if not url:
+        raise AbortError('no review remote defined; run `git mozreview configure`')
+
+    if not url.startswith(('hg::', 'hg://')):
+        raise AbortError('cannot push to %s; only pushing to hg:: or hg:// remotes is supported' % url)
+
+    if url.startswith('hg::'):
+        url_s = url[4:]
+        url = urlparse.urlparse(url_s)
+    else:
+        url = munge_url(url)
+        url_s = urlparse.urlunparse(url)
+
+    # We force pushes to go through HTTP because we want to nudge clients
+    # away from SSH since it is single homed and we have plans to make
+    # HTTP submission multi-homed.
+    if url.scheme == 'ssh':
+        raise AbortError('pushing to MozReview via SSH is not supported')
+
+    if url.scheme not in ('http', 'https'):
+        raise AbortError('unsupported scheme: %s' % url.scheme)
+
+    requested_commits = None
+    if args.revisions:
+        res, output = get_output([
+            'git', 'rev-list',
+            '--max-count=%d' % MAX_REVIEW_COMMITS,
+            '--no-walk',
+            args.revisions])
+        if res:
+            raise AbortError('could not resolve revisions "%s": %s' % (
+                             args.revisions, output))
+        requested_commits = list(reversed(output.strip().splitlines()))
+        if len(requested_commits) > MAX_REVIEW_COMMITS:
+            raise AbortError('review commit limit reached; '
+                             'cannot review more than %d commits' %
+                             MAX_REVIEW_COMMITS)
+
+        push_commit = requested_commits[-1]
+    else:
+        # Default to pushing/review all commits from current commit.
+        push_commit = resolve_commitish('HEAD')
+
+    session = requests.Session()
+    res = session.get('%s/mozreviewcapabilities' % url_s)
+    if res.status_code != 200:
+        raise AbortError('unable to determine review capabilities (HTTP %d); '
+                         'are you sure the remote is a MozReview review repo?' %
+                         res.status_code)
+    caps = res.json()
+    required_capabilities = set(caps['reviewrequires'])
+    if required_capabilities - CLIENT_CAPABILITIES:
+        raise AbortError('git-mozreview is out of date and needs updating to '
+                         'speak to this server; upgrade it by fetching the '
+                         'repo at %s' % ROOT)
+
+    # Do the Git push.
+
+    # We have a Python script that calls the internal cinnabar APIs to get the
+    # commit map. This allows us to push without storing the commit map in the
+    # git repo, which isn't necessary.
+    #
+    # We *always* push HEAD. Selection of what to actually submit for review is
+    # determined from the command arguments. This could be changed. But for now
+    # it is the easiest implementation.
+
+    # We need to pass MozReview credentials to Mercurial. We do this by writing
+    # an ini file and telling Mercurial to load it. We don't pass these as
+    # arguments because command arguments are exposed to all users on a system.
+    #
+    # We can't use tempfile.NamedTemporaryFile because other processes on
+    # Windows can't open it.
+    fh, path = tempfile.mkstemp()
+    try:
+        os.chmod(path, stat.S_IRUSR | stat.S_IWUSR)
+        os.write(fh, b'[auth]\n')
+        os.write(fh, b'mozreview.prefix = %s\n' % url_s)
+        os.write(fh, b'mozreview.username = %s\n' % username)
+        os.write(fh, b'mozreview.password = %s\n' % apikey)
+        os.close(fh)
+
+        push_args = [
+            'git',
+            'cinnabar',
+            'python',
+            os.path.join(ROOT, 'git', 'cinnabar-debug-push.py'),
+            '--config-file', path,
+            url_s,
+            push_commit,
+        ]
+
+        res, output = get_output(push_args)
+    finally:
+        os.unlink(path)
+
+    if res:
+        raise AbortError('error performing cinnabar push; '
+                         'please report this bug: %s' % output)
+
+    output = json.loads(output, encoding='utf-8')
+
+    if 'error' in output:
+        raise AbortError('error performing cinnabar push: %s' % output['error'])
+
+    # Filter "remote: REVIEWBOARD: " lines from output because they are the
+    # server advertisement about requiring a special client extension to push
+    # and we satisfy those requirements.
+    for l in output['output'].splitlines():
+        if not l.startswith('remote: REVIEWBOARD: '):
+            ui.write('%s\n' % l)
+
+    if not output['commits']:
+        raise AbortError('no commits pushed; '
+                         '`git checkout` to the commit to review')
+
+    ui.write('\n')
+
+    # Filter commits against what user requested.
+    review_commits = []
+    for git_commit, hg_changeset, new_data in output['commits']:
+        if requested_commits and git_commit not in requested_commits:
+            continue
+
+        # A ref was already on file for the pushed commit. Don't review it.
+        if not new_data:
+            continue
+
+        review_commits.append(git_commit)
+
+    # Now filter against what is allowed to be reviewed.
+    commit_info = list(get_commit_info(review_commits))
+    review_commits = set(t[0] for t in commit_info)
+
+    if not review_commits:
+        raise AbortError('unable to obtain info on commits to be reviewed; weird')
+
+    hg2git = collections.OrderedDict(
+        (hg_changeset, git_commit)
+        for git_commit, hg_changeset, new_data in output['commits']
+        if git_commit in review_commits
+    )
+    hg_changesets = hg2git.keys()
+    git_commits = hg2git.values()
+
+    identifier = args.reviewid
+    if not identifier:
+        identifiers = set()
+        for commit, summary in commit_info:
+            bugs = parse_bugs(summary)
+            if bugs:
+                identifier = 'bz://%s' % bugs[0]
+                identifiers.add(identifier)
+
+        if len(identifiers) > 1:
+            ui.write('error: cannot submit reviews referencing multiple bugs\n')
+            ui.write('hint: limit reviewed commits by specifying a commit '
+                  'or revrange as an argument\n')
+            return 1
+
+    if not identifier:
+        ui.write('error: could not determine review identifier\n')
+        ui.write('hint: try to put "bug XXXXXX" in your commit message or use '
+              '--reviewid\n')
+        return 1
+
+    identifier = ReviewID(identifier)
+
+    if not identifier.user:
+        identifier.user = nick
+
+    submit_request = {
+        'bzusername': username,
+        'bzapikey': apikey,
+        'identifier': identifier.full,
+        'changesets': [{'node': n} for n in hg_changesets],
+    }
+
+    ui.write('submitting %d commits for review\n' % len(hg_changesets))
+
+    submit_url = '%s/mozreviewsubmitseries' % url_s
+
+    res = sendauthenticatedhttprequest(git_config, session, submit_url,
+                                       method='POST', json=submit_request)
+
+    if res.status_code != 200:
+        ui.write('error: non-200 HTTP status code (%d) when submitting series\n' %
+                 res.status_code)
+        return 1
+
+    data = res.json()
+    if 'error' in data:
+        ui.write('error: %s\n' % data['error'])
+        return 1
+
+    ui.write('\n')
+
+    for w in data['display']:
+        ui.write('%s\n' % w)
+
+    base_url = data['rburl']
+    parent_rid = data['parentrrid']
+
+    commit_to_review_id = {}
+    review_data = {}
+
+    for rid, info in data['reviewrequests'].iteritems():
+        if 'node' in info:
+            node = info['node']
+            commit = hg2git[node]
+            commit_to_review_id[commit] = rid
+
+        review_data[rid] = {
+            'status': info['status'],
+            'public': info['public'],
+        }
+
+        if 'reviewers' in info:
+            review_data[rid]['reviewers'] = info['reviewers']
+
+    have_draft = False
+    git_summaries = dict(commit_info)
+
+    for commit in git_commits:
+        rid = commit_to_review_id[commit]
+        short = commit[0:7]
+
+        ui.write('commit: %s %s\n' % (short, git_summaries[commit]))
+        ui.write('review: %s/r/%s' % (base_url, rid))
+        if not review_data[rid].get('public'):
+            have_draft = True
+            ui.write(' (draft)')
+        ui.write('\n\n')
+
+    if not review_data[parent_rid].get('public'):
+        have_draft = True
+
+    for commit in git_commits:
+        rid = commit_to_review_id[commit]
+        if not review_data[rid].get('reviewers'):
+            ui.write('(review requests lack reviewers; visit review url to '
+                     'assign reviewers)\n')
+            break
+
+    if have_draft:
+        ui.write('\n')
+        publish = ui.promptchoice(
+            'publish these review requests now (Yn)? $$ &Yes $$ &No')
+        if publish == 0:
+            data = publish_review_request(git_config, session, url_s, username,
+                                          apikey, parent_rid)
+            errored = False
+            for item in data['results']:
+                if 'success' in item:
+                    ui.write('(published review request %s)\n' % item['rrid'])
+                elif 'error' in item:
+                    errored = True
+                    ui.write('(error publishing review request %s: %s)\n' % (
+                             item['rrid'], item['error']))
+                else:
+                    raise AbortError('unexpected formatting of response: %s; '
+                                     'please file a bug' % item)
+
+            if errored:
+                ui.write('(review requests not published; visit review url to '
+                         'attempt publishing there)\n')
+        else:
+            ui.write('(visit review url to publish these review requests so others '
+                  'can see them)\n')
+
+
+def configure_command(args):
+    """Configure the local repository to submit to MozReview."""
+    args.bugzilla_url = args.bugzilla_url.rstrip('/')
+    args.mercurial_url = args.mercurial_url.rstrip('/')
+
+    git_config = get_git_config()
+    ui = gethgui()
+
+    if os.path.exists(os.path.join(git_dir, 'hgrc')):
+        ui.readconfig(os.path.join(git_dir, 'hgrc'), trust=True)
+
+    if 'bz.username' not in git_config or 'bz.apikey' not in git_config:
+        ui.write('MozReview uses Bugzilla credentials to communicate with servers. '
+                 'These credentials will be stored in your .git/config file in '
+                 'plain text.\n\n')
+
+    username = git_config.get('bugzilla.username')
+    if 'bz.username' not in git_config:
+        username = ui.prompt('Enter your Bugzilla username / e-mail address:',
+                             default=None)
+        if username:
+            subprocess.check_call(['git', 'config', 'bz.username',
+                                   username])
+        ui.write('\n')
+
+    if username and 'bz.apikey' not in git_config:
+        ui.write('A Bugzilla API Key is used to authenticate communication. To '
+                 'generate an API Key, go to %s/userprefs.cgi?tab=apikey\n\n' %
+                 args.bugzilla_url)
+
+        apikey = ui.prompt('Enter a Bugzilla API Key:', default=None)
+        if apikey:
+            subprocess.check_call(['git', 'config', 'bz.apikey', apikey])
+        ui.write('\n')
+
+    if 'mozreview.nickname' not in git_config:
+        ui.write('A nickname must be attached to submitted reviews. ')
+        ui.write('(IRC nicknames are typically used)\n\n')
+        nick = ui.prompt('Enter a nickname:', default=None)
+        if nick:
+            subprocess.check_call(['git', 'config', 'mozreview.nickname', nick])
+        ui.write('\n')
+        git_config['mozreview.nickname'] = nick
+
+    # Define the default remote name to use for pushing to MozReview.
+    if 'mozreview.remote' not in git_config:
+        subprocess.check_call(['git', 'config', 'mozreview.remote',
+                               args.remote_name])
+        git_config['mozreview.remote'] = args.remote_name
+
+    remote_name = git_config['mozreview.remote']
+
+    # Configure the Git remote if it isn't defined already.
+    key = 'remote.%s.url' % git_config['mozreview.remote']
+    if key not in git_config:
+        ui.write('searching for appropriate review repository...\n')
+        # Query the special "autoreview" repo for the list of review repos.
+        url = '%s/autoreview/mozreviewreviewrepos' % args.mercurial_url
+        res = requests.get(url)
+        if res.status_code == 200:
+            data = res.json()
+            hg_shas = sorted(data.keys())
+            res, output = get_output(['git', 'cinnabar', 'hg2git'] + hg_shas)
+            if res:
+                ui.warn('warning: error trying to resolve Mercurial changesets\n')
+            else:
+                git_commits = output.strip().split()
+                for i, node in enumerate(git_commits):
+                    if node == b'0' * 40:
+                        continue
+                    remote_url = data[hg_shas[i]].split()[0]
+                    remote_url = 'hg::%s' % remote_url
+                    ui.write('adding %s as remote "%s"\n' % (
+                          remote_url, remote_name))
+                    # TODO configure remote.%s.fetch to disable fetching?
+                    subprocess.check_call(['git', 'remote', 'add', '--no-tags',
+                                           remote_name, remote_url])
+
+        else:
+            ui.warn('warning: unable to fetch list of review repos; '
+                    'manual configuration of review remote will be required\n')
+
+    # Now install the commit-msg hook.
+    source_hook = os.path.join(ROOT, 'git', 'hooks', 'commit-msg-mozreview')
+    dest_hook = os.path.join(git_dir, 'hooks', 'commit-msg')
+    have_symlinks = hasattr(os, 'symlink')
+    install_hook = True
+
+    if os.path.exists(dest_hook):
+        with open(dest_hook, 'rb') as fh:
+            dest_content = fh.read()
+            if 'MozReview' not in dest_content:
+                ui.warn('warning: existing commit-msg hook does not appear related '
+                      'to MozReview; unable to install custom hook\n')
+                ui.warn('(MozReview may lose track of commits when rewriting)\n')
+                install_hook = False
+
+            with open(source_hook, 'rb') as fh:
+                source_content = fh.read()
+
+            # No need to do anything if the hook is up to date.
+            if source_content == dest_content:
+                install_hook = False
+
+        if install_hook:
+            # We could leave as is if a symlink. But this is easier.
+            os.unlink(dest_hook)
+
+    if install_hook:
+        ui.write('installing commit-msg hook\n')
+        if have_symlinks:
+            os.symlink(source_hook, dest_hook)
+        else:
+            shutil.copy(source_hook, dest_hook)
+
+    with open(os.path.join(git_dir, 'mozreviewconfigversion'), 'wb') as fh:
+        fh.write(b'1\n')
+
+
+def commit_msg_hook(args):
+    """git commit-msg hook that adds a commit identifier to commit messages."""
+    lines = []
+
+    with open(args.path, 'rb') as fh:
+        for line in fh:
+            line = line.rstrip()
+
+            # Ignore comments.
+            if line.startswith('#'):
+                continue
+
+            # Ignore the inline git diff.
+            if line.startswith('diff --git'):
+                break
+
+            lines.append(line)
+
+    # Prune blank lines at end.
+    while lines and not lines[-1].strip():
+        lines.pop()
+
+    if not lines:
+        return 0
+
+    # Ignore temporary commits.
+    if lines[0].startswith(('fixup', 'squash')):
+        return 0
+
+    # Look for existing review identifier.
+    if any(l.startswith('MozReview-Commit-ID: ') for l in lines):
+        return 0
+
+    # Insert empty line between main commit message and metadata.
+    if not re.match('^[a-zA-Z-]+: ', lines[-1]):
+        lines.append('')
+
+    cid = genid(fakeidpath=os.environ.get('FAKEIDPATH'))
+    lines.append('MozReview-Commit-ID: %s' % cid)
+
+    with open(args.path, 'wb') as fh:
+        fh.write('\n'.join(lines))
+
+    return 0
+
+
+def main(args):
+    if sys.platform == 'win32':
+        import msvcrt
+        msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
+
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(title='subcommands', dest='command')
+
+    sp = subparsers.add_parser(
+            'push',
+            help='push commits to MozReview for review')
+    sp.add_argument(
+            '--reviewid',
+            help='Review identifier for patch series')
+    sp.add_argument(
+            'revisions',
+            help='commit-ish to review',
+            nargs='?')
+
+    sp = subparsers.add_parser(
+            'configure',
+            help='configure mozreview integration for this repo')
+    sp.add_argument(
+            '--bugzilla-url',
+            help='URL of Bugzilla instance',
+            default='https://bugzilla.mozilla.org')
+    sp.add_argument(
+            '--mercurial-url',
+            help='URL of Mercurial server with review repos',
+            default='https://reviewboard-hg.mozilla.org')
+    sp.add_argument(
+            '--remote-name',
+            help='Name of remote to use for MozReview',
+            default='review')
+
+    sp = subparsers.add_parser(
+            'commit-msg-hook',
+            help='commit-msg hook to add commit identifier to commit messages')
+    sp.add_argument(
+            'path',
+            help='File containing commit message')
+
+    args = parser.parse_args(args)
+
+    command = args.command
+
+    try:
+        # Verify configuration is up to date.
+        if command not in ('configure', 'commit-msg-hook'):
+            need_configure = True
+            try:
+                with open(os.path.join(git_dir, 'mozreviewconfigversion'), 'rb') as fh:
+                    data = fh.read()
+                    data = data.splitlines()
+                    version = int(data[0])
+                    if version >= 1:
+                        need_configure = False
+            except (IOError, ValueError):
+                pass
+
+            if need_configure:
+                raise AbortError('configuration needed; run `git mozreview configure`')
+
+        if command == 'push':
+            return push_command(args)
+        elif command == 'configure':
+            return configure_command(args)
+        elif command == 'commit-msg-hook':
+            return commit_msg_hook(args)
+        else:
+            print('error: unknown command: %s' % command)
+            return 1
+    except AbortError as e:
+        print('abort: %s' % e)
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))

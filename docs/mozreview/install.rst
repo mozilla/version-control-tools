@@ -67,4 +67,4 @@ including the SSH host key fingerprints.
 Configuring Your Version Control Client
 =======================================
 
-See :ref:`mozreview_install_mercurial`.
+See :ref:`mozreview_install_mercurial` or :ref:`mozreview_install_git`.

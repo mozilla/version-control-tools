@@ -306,6 +306,36 @@ the ``-c`` argument can be used to specify a single changeset to review.::
    You only need to specify ``-c`` to *cherry-pick* a commit out of a
    larger series of *draft* changesets.
 
+Using Git
+---------
+
+Initiating code review with Git requires the ``git mozreview`` command.
+See its :ref:`installation instructions <mozreview_install_git>`.
+
+Once you have your local Git repo configured to use MozReview, submitting
+to MozReview is performed via::
+
+   $ git mozreview push
+
+This command behaves almost exactly the same as the equivalent Mercurial
+command.
+
+Choosing Which Commits to Submit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default, ``git mozreview push`` will submit for review ``HEAD`` and
+all its ancestors not existing on any known remote ref.
+
+To control which commits are submitted for review, specify a commit-ish
+or revision range (e.g. ``HEAD~2..HEAD`` or ``7accd95..6834f7e``) of commits
+to review as an additional command argument. e.g.::
+
+   $ git mozreview push HEAD~2..HEAD
+
+If a single commit is specified, a single commit will be submitted for review.
+If a range is specified, the behavior is the same as selecting commits via
+``git log`` or ``git rev-list``. See the Git help/man pages for more.
+
 Publishing Review Requests
 ==========================
 
