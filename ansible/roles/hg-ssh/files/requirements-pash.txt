@@ -1,11 +1,11 @@
-kafka-python==0.9.4 \
-    --hash=sha256:6cd463b688d98fec1c1f602e316eb7745aef0e55dc57fe9ff2f203cf0865c8c7
+# sha256: bNRjtojZj-wcH2AuMW63dFrvDlXcV_6f8vIDzwhlyMc
+kafka-python==0.9.4
 
-Mercurial==3.6.2 \
-    --hash=sha256:09c567049c3e30f791db0cf5937346c7ff3568deadf4eb1d4e2f7c80001cb3d6
+# sha256: CcVnBJw-MPeR2wz1k3NGx_81aN6t9OsdTi98gAAcs9Y
+Mercurial==3.6.2
 
-python-ldap==2.4.20 \
-    --hash=sha256:4b8891539a3171d993cf7896b632ff088a4c707ae85ac3c77db1454f7949f3e2
+# sha256: S4iRU5oxcdmTz3iWtjL_CIpMcHroWsPHfbFFT3lJ8-I
+python-ldap==2.4.20
 
-six==1.9.0 \
-    --hash=sha256:418a93c397a7edab23e5588dbc067ac74a723edb3d541bd4936f79476e7645da
+# sha256: QYqTw5en7asj5ViNvAZ6x0pyPts9VBvUk295R252Rdo
+six==1.9.0

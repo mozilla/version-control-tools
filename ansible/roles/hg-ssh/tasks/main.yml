@@ -22,9 +22,14 @@
            sha256sum={{ item.sha256 }}
   with_items:
     - { path: mercurial-3.6.2-1.x86_64.rpm, sha256: ecb4848807c1fe0ce059de079c235ba22885c4cc900dcbff9165cb10ec4ad885 }
+    # The version of virtualenv in the IUS repo isn't compatible with
+    # peep because it has a pip that is too new. See
+    # https://github.com/erikrose/peep/pull/94. Install an old version
+    # until peep is compatible.
+    - { path: python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm, sha256: a3f6c80d7a83798e4d64827d81dbcc39c1c44ae66c0afa4866bc477baad2cc2c }
 
 - name: install Mozilla rpms
-  command: yum localinstall -y /var/tmp/mercurial-3.6.2-1.x86_64.rpm
+  command: yum localinstall -y /var/tmp/mercurial-3.6.2-1.x86_64.rpm /var/tmp/python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm
 
 - name: install global ssh config
   copy: src=ssh_config
@@ -107,15 +112,46 @@
 - name: User repository directories are present
   file: path=/repo/hg/mozilla/users state=directory mode=0775 owner=hg group=scm_level_1
 
-- name: create virtualenv for pash
-  include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_pash
-           requirements=../roles/hg-ssh/files/requirements-pash.txt
+- name: create virtualenv for Python processes
+  command: /usr/bin/virtualenv-2.7 /repo/hg/{{ item }} creates=/repo/hg/{{ item }}
+  with_items:
+    - venv_pash
+    - venv_tools
 
-- name: create virtualenv for tools
-  include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_tools
-           requirements=../roles/hg-ssh/files/requirements-tools.txt
+- name: copy peep.py to virtualenv
+  copy: src=files/peep.py
+        dest=/repo/hg/{{ item }}/bin/peep
+        mode=0755
+        owner=root
+        group=root
+  with_items:
+    - venv_pash
+    - venv_tools
+
+- name: configure shebang in peep
+  replace: dest=/repo/hg/{{ item }}/bin/peep
+           regexp='^#!\/usr\/bin\/env python$'
+           replace='#!/repo/hg/{{ item }}/bin/python2.7'
+  with_items:
+    - venv_pash
+    - venv_tools
+
+- name: copy requirements.txt
+  copy: src=requirements-{{ item }}.txt
+        dest=/repo/hg/venv_{{ item }}/requirements.txt
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - pash
+    - tools
+
+- name: populate virtualenv
+  pip: requirements=/repo/hg/{{ item }}/requirements.txt
+       executable=/repo/hg/{{ item }}/bin/peep
+  with_items:
+    - venv_pash
+    - venv_tools
 
 # Hooks are referenced in various hgrc files via "python:mozhghooks.*".
 # This means they are imported as Python modules from the "mozhghooks"
