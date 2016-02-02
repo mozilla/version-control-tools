@@ -5,14 +5,12 @@
 import logging
 
 from django.contrib.sites.models import Site
-from django.db.models.signals import pre_delete
 
 from djblets.siteconfig.models import SiteConfiguration
 
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import AuthBackendHook, SignalHook
-from reviewboard.reviews.models import (ReviewRequest,
-                                        ReviewRequestDraft)
+from reviewboard.reviews.models import ReviewRequest
 from reviewboard.reviews.signals import (reply_publishing,
                                          review_publishing,
                                          review_request_closed,
@@ -71,7 +69,6 @@ class BugzillaExtension(Extension):
         # Any abortable signal hooks that talk to Bugzilla should have
         # sandbox_errors=False, since we don't want to complete the action if
         # updating Bugzilla failed for any reason.
-        SignalHook(self, pre_delete, on_draft_pre_delete)
         SignalHook(self, review_publishing, on_review_publishing,
                    sandbox_errors=False)
         SignalHook(self, reply_publishing, on_reply_publishing,
@@ -99,70 +96,6 @@ def is_review_request_pushed(review_request):
 def is_review_request_squashed(review_request):
     squashed = str(review_request.extra_data.get(SQUASHED_KEY, False))
     return squashed == "True"
-
-
-def on_draft_pre_delete(sender, instance, using, **kwargs):
-    """ Handle draft discards.
-
-    There are no handy signals built into Review Board (yet) for us to detect
-    when a squashed Review Request Draft is discarded. Instead, we monitor for
-    deletions of models, and handle cases where the models being deleted are
-    ReviewRequestDrafts. We then do some processing to ensure that the draft
-    is indeed a draft of a squashed review request that we want to handle,
-    and then propagate the discard down to the child review requests.
-    """
-    if not sender == ReviewRequestDraft:
-        return
-
-    # Drafts can get deleted for a number of reasons. They get deleted when
-    # drafts are discarded, obviously, but also whenever review requests are
-    # published, because the data gets copied over to the review request, and
-    # then the draft is blown away. Unfortunately, on_pre_delete doesn't give
-    # us too many clues about which scenario we're in, so we have to infer it
-    # based on other things attached to the model. This is a temporary fix until
-    # we get more comprehensive draft deletion signals built into Review Board.
-    #
-    # In the case where the review request is NOT public yet, the draft will
-    # not have a change description. In this case, we do not need to
-    # differentiate between publish and discard because discards of non-public
-    # review request's drafts will always cause the review request to be closed
-    # as discarded, and this case is handled by on_review_request_closed().
-    #
-    # In the case where the review request has a change description, but it's
-    # set to public, we must have just published this draft before deleting it,
-    # so there's nothing to do here.
-    if (instance.changedesc is None or instance.changedesc.public):
-        return
-
-    review_request = instance.review_request
-
-    if not review_request:
-        return
-
-    if not is_review_request_squashed(review_request):
-        return
-
-    # If the review request is marked as discarded, then we must be closing
-    # it, and so the on_review_request_closed() handler will take care of it.
-    if review_request.status == ReviewRequest.DISCARDED:
-        return
-
-    user = review_request.submitter
-
-    for child in gen_child_rrs(review_request):
-        draft = child.get_draft()
-        if draft:
-            draft.delete()
-
-    for child in gen_rrs_by_extra_data_key(review_request,
-                                           UNPUBLISHED_KEY):
-        child.close(ReviewRequest.DISCARDED,
-                    user=user,
-                    description=NEVER_USED_DESCRIPTION)
-
-    review_request.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
-    review_request.extra_data[UNPUBLISHED_KEY] = '[]'
-    review_request.save()
 
 
 @bugzilla_to_publish_errors
