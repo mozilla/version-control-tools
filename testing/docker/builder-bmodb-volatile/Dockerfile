@@ -7,7 +7,7 @@
 # volume garbage collection in Docker where the old volumes don't get
 # deleted on container deletion.
 
-FROM mysql:5.6.20
+FROM mysql:5.6.28
 
 RUN mkdir /var/lib/mysql-local
 
