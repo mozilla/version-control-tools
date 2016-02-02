@@ -40,13 +40,16 @@ from mozreview.errors import (
     InvalidBugIdError,
 )
 from mozreview.extra_data import (
+    DISCARD_ON_PUBLISH_KEY,
     DRAFTED_EXTRA_DATA_KEYS,
     gen_child_rrs,
     gen_rrs_by_rids,
     get_parent_rr,
+    IDENTIFIER_KEY,
     is_parent,
     is_pushed,
     REVIEWID_RE,
+    UNPUBLISHED_KEY,
     update_parent_rr_reviewers,
 )
 from mozreview.messages import (
@@ -175,7 +178,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
 
     # The reviewid passed through p2rb is, for Mozilla's instance anyway,
     # bz://<bug id>/<irc nick>.
-    reviewid = review_request_draft.extra_data.get('p2rb.identifier', None)
+    reviewid = review_request_draft.extra_data.get(IDENTIFIER_KEY, None)
     m = REVIEWID_RE.match(reviewid)
 
     if not m:
@@ -212,9 +215,9 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
     # relevant children.
     if is_parent(review_request):
         unpublished_rids = map(int, json.loads(
-            review_request.extra_data['p2rb.unpublished_rids']))
+            review_request.extra_data[UNPUBLISHED_KEY]))
         discard_on_publish_rids = map(int, json.loads(
-            review_request.extra_data['p2rb.discard_on_publish_rids']))
+            review_request.extra_data[DISCARD_ON_PUBLISH_KEY]))
         child_rrs = list(gen_child_rrs(review_request_draft))
 
         # Create or update Bugzilla attachments for each draft commit.  This
@@ -274,8 +277,8 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                         user=user,
                         description=OBSOLETE_DESCRIPTION)
 
-        review_request.extra_data['p2rb.unpublished_rids'] = '[]'
-        review_request.extra_data['p2rb.discard_on_publish_rids'] = '[]'
+        review_request.extra_data[UNPUBLISHED_KEY] = '[]'
+        review_request.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
 
     # Copy p2rb extra data from the draft, overwriting the current
     # values on the review request.

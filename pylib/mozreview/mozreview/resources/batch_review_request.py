@@ -41,6 +41,18 @@ from reviewboard.webapi.resources import (
     WebAPIResource,
 )
 
+from mozreview.extra_data import (
+    BASE_COMMIT_KEY,
+    COMMITS_KEY,
+    COMMIT_ID_KEY,
+    DISCARD_ON_PUBLISH_KEY,
+    FIRST_PUBLIC_ANCESTOR_KEY,
+    IDENTIFIER_KEY,
+    MOZREVIEW_KEY,
+    REVIEWER_MAP_KEY,
+    SQUASHED_KEY,
+    UNPUBLISHED_KEY,
+)
 from mozreview.models import (
     DiffSetVerification,
 )
@@ -355,12 +367,12 @@ class BatchReviewRequestResource(WebAPIResource):
                     local_site=local_site)
 
             squashed_rr.extra_data.update({
-                'p2rb': True,
-                'p2rb.is_squashed': True,
-                'p2rb.identifier': identifier,
-                'p2rb.discard_on_publish_rids': '[]',
-                'p2rb.unpublished_rids': '[]',
-                'p2rb.first_public_ancestor': commits['squashed']['first_public_ancestor'],
+                MOZREVIEW_KEY: True,
+                SQUASHED_KEY: True,
+                IDENTIFIER_KEY: identifier,
+                DISCARD_ON_PUBLISH_KEY: '[]',
+                UNPUBLISHED_KEY: '[]',
+                FIRST_PUBLIC_ANCESTOR_KEY: commits['squashed']['first_public_ancestor'],
             })
             squashed_rr.save(update_fields=['extra_data'])
             logger.info('created squashed review request #%d' % squashed_rr.id)
@@ -567,9 +579,9 @@ class BatchReviewRequestResource(WebAPIResource):
                                               commit_id=None,
                                               local_site=local_site)
 
-            rr.extra_data['p2rb'] = True
-            rr.extra_data['p2rb.is_squashed'] = False
-            rr.extra_data['p2rb.identifier'] = identifier
+            rr.extra_data[MOZREVIEW_KEY] = True
+            rr.extra_data[SQUASHED_KEY] = False
+            rr.extra_data[IDENTIFIER_KEY] = identifier
             rr.save(update_fields=['extra_data'])
             logger.info('%s: created review request %d for commit %s' % (
                         identifier, rr.id, node))
@@ -632,15 +644,15 @@ class BatchReviewRequestResource(WebAPIResource):
         for user in sorted(squashed_reviewers):
             squashed_draft.target_people.add(user)
 
-        squashed_draft.extra_data['p2rb.commits'] = json.dumps(commit_list)
+        squashed_draft.extra_data[COMMITS_KEY] = json.dumps(commit_list)
 
         if 'base_commit_id' in commits['squashed']:
-            squashed_draft.extra_data['p2rb.base_commit'] = commits['squashed']['base_commit_id']
+            squashed_draft.extra_data[BASE_COMMIT_KEY] = commits['squashed']['base_commit_id']
 
         squashed_rr.extra_data.update({
-            'p2rb.discard_on_publish_rids': json.dumps(discard_on_publish_rids),
-            'p2rb.unpublished_rids': json.dumps(unpublished_rids),
-            'p2rb.first_public_ancestor': commits['squashed']['first_public_ancestor'],
+            DISCARD_ON_PUBLISH_KEY: json.dumps(discard_on_publish_rids),
+            UNPUBLISHED_KEY: json.dumps(unpublished_rids),
+            FIRST_PUBLIC_ANCESTOR_KEY: commits['squashed']['first_public_ancestor'],
         })
 
         squashed_draft.save()
@@ -800,8 +812,8 @@ def update_review_request(local_site, request, privileged_user, reviewer_cache,
     draft.summary = commit['message'].splitlines()[0]
     draft.description = commit['message']
     draft.bugs_closed = commit['bug']
-    draft.extra_data['p2rb.commit_id'] = commit['id']
-    draft.extra_data['p2rb.first_public_ancestor'] = commit['first_public_ancestor']
+    draft.extra_data[COMMIT_ID_KEY] = commit['id']
+    draft.extra_data[FIRST_PUBLIC_ANCESTOR_KEY] = commit['first_public_ancestor']
 
     reviewer_users, unrecognized_reviewers = \
         resolve_reviewers(reviewer_cache, commit.get('reviewers', []))
@@ -899,11 +911,11 @@ def get_previous_commits(squashed_rr):
     else:
         extra_data = squashed_rr.extra_data
 
-    if 'p2rb.commits' not in extra_data:
+    if COMMITS_KEY not in extra_data:
         return []
 
     commits = []
-    for node, rid in json.loads(extra_data['p2rb.commits']):
+    for node, rid in json.loads(extra_data[COMMITS_KEY]):
         # JSON decoding likes to give us unicode types. We speak str
         # internally, so convert.
         if isinstance(node, unicode):
@@ -929,7 +941,7 @@ def get_discard_on_publish_rids(squashed_rr):
     the squashed draft is published on Review Board.
     """
     return map(int, json.loads(
-               squashed_rr.extra_data['p2rb.discard_on_publish_rids']))
+               squashed_rr.extra_data[DISCARD_ON_PUBLISH_KEY]))
 
 
 def get_unpublished_rids(squashed_rr):
@@ -939,7 +951,7 @@ def get_unpublished_rids(squashed_rr):
     request.
     """
     return map(int, json.loads(
-               squashed_rr.extra_data['p2rb.unpublished_rids']))
+               squashed_rr.extra_data[UNPUBLISHED_KEY]))
 
 
 def get_unclaimed_rids(previous_commits, discard_on_publish_rids,

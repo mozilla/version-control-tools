@@ -5,6 +5,11 @@ import logging
 from django import template
 from django.contrib.auth.models import User
 
+from mozreview.extra_data import (
+    COMMIT_ID_KEY,
+    MOZREVIEW_KEY,
+    SQUASHED_KEY,
+)
 from mozreview.review_helpers import get_reviewers_status
 
 register = template.Library()
@@ -12,11 +17,18 @@ register = template.Library()
 
 @register.filter()
 def isSquashed(aReviewRequest):
-    return str(aReviewRequest.extra_data.get('p2rb.is_squashed', 'False')).lower() == 'true'
+    return str(aReviewRequest.extra_data.get(SQUASHED_KEY, 'False')).lower() == 'true'
 
 @register.filter()
 def isPush(aReviewRequest):
-    return str(aReviewRequest.extra_data.get('p2rb', 'False')).lower() == 'true'
+    return str(aReviewRequest.extra_data.get(MOZREVIEW_KEY, 'False')).lower() == 'true'
+
+
+@register.filter()
+def commit_id(review_request_details):
+    """Return the commit id of a review request or review request draft"""
+    return str(review_request_details.extra_data.get(COMMIT_ID_KEY))
+
 
 def reviewer_list(review_request):
     return ', '.join([user.username

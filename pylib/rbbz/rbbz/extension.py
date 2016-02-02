@@ -26,9 +26,13 @@ from mozreview.errors import (
     ParentShipItError,
 )
 from mozreview.extra_data import (
-    UNPUBLISHED_RRIDS_KEY,
+    DISCARD_ON_PUBLISH_KEY,
     gen_child_rrs,
     gen_rrs_by_extra_data_key,
+    IDENTIFIER_KEY,
+    MOZREVIEW_KEY,
+    SQUASHED_KEY,
+    UNPUBLISHED_KEY,
 )
 from mozreview.messages import (
     NEVER_USED_DESCRIPTION,
@@ -89,11 +93,11 @@ def get_reply_url(reply, site=None, siteconfig=None):
 
 
 def is_review_request_pushed(review_request):
-    return str(review_request.extra_data.get('p2rb', False)) == "True"
+    return str(review_request.extra_data.get(MOZREVIEW_KEY, False)) == "True"
 
 
 def is_review_request_squashed(review_request):
-    squashed = str(review_request.extra_data.get('p2rb.is_squashed', False))
+    squashed = str(review_request.extra_data.get(SQUASHED_KEY, False))
     return squashed == "True"
 
 
@@ -151,13 +155,13 @@ def on_draft_pre_delete(sender, instance, using, **kwargs):
             draft.delete()
 
     for child in gen_rrs_by_extra_data_key(review_request,
-                                           UNPUBLISHED_RRIDS_KEY):
+                                           UNPUBLISHED_KEY):
         child.close(ReviewRequest.DISCARDED,
                     user=user,
                     description=NEVER_USED_DESCRIPTION)
 
-    review_request.extra_data['p2rb.discard_on_publish_rids'] = '[]'
-    review_request.extra_data['p2rb.unpublished_rids'] = '[]'
+    review_request.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
+    review_request.extra_data[UNPUBLISHED_KEY] = '[]'
     review_request.save()
 
 
@@ -274,13 +278,13 @@ def close_child_review_requests(user, review_request, status,
     # request never got to publish, so were never part of its "commits"
     # list.
     for child in gen_rrs_by_extra_data_key(review_request,
-                                           UNPUBLISHED_RRIDS_KEY):
+                                           UNPUBLISHED_KEY):
         child.close(ReviewRequest.DISCARDED,
                     user=user,
                     description=NEVER_USED_DESCRIPTION)
 
-    review_request.extra_data['p2rb.unpublished_rids'] = '[]'
-    review_request.extra_data['p2rb.discard_on_publish_rids'] = '[]'
+    review_request.extra_data[UNPUBLISHED_KEY] = '[]'
+    review_request.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
     review_request.save()
 
 
@@ -288,7 +292,7 @@ def on_review_request_reopened(user, review_request, **kwargs):
     if not is_review_request_squashed(review_request):
         return
 
-    identifier = review_request.extra_data['p2rb.identifier']
+    identifier = review_request.extra_data[IDENTIFIER_KEY]
 
     # If we're reviving a squashed review request that was discarded, it means
     # we're going to want to restore the commit ID field back, since we remove

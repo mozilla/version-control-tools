@@ -11,17 +11,21 @@ from reviewboard.reviews.models import ReviewRequest
 
 MOZREVIEW_KEY = 'p2rb'
 
+BASE_COMMIT_KEY = MOZREVIEW_KEY + '.base_commit'
 COMMITS_KEY = MOZREVIEW_KEY + '.commits'
 COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
+DISCARD_ON_PUBLISH_KEY = MOZREVIEW_KEY + '.discard_on_publish_rids'
+FIRST_PUBLIC_ANCESTOR_KEY = MOZREVIEW_KEY + '.first_public_ancestor'
 IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
-UNPUBLISHED_RRIDS_KEY = MOZREVIEW_KEY + '.unpublished_rids'
+SQUASHED_KEY = MOZREVIEW_KEY + '.is_squashed'
+UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
 
 # Extra data fields which should be automatically copied from
 # the draft to the review request on publish.
 DRAFTED_EXTRA_DATA_KEYS = (
     COMMIT_ID_KEY,
-    'p2rb.first_public_ancestor',
+    FIRST_PUBLIC_ANCESTOR_KEY,
     IDENTIFIER_KEY,
 )
 
@@ -41,7 +45,7 @@ def is_parent(review_request):
     child review requests (or a request which was not pushed).
     """
     return str(review_request.extra_data.get(
-        'p2rb.is_squashed', False)).lower() == 'true'
+        SQUASHED_KEY, False)).lower() == 'true'
 
 
 def get_parent_rr(review_request):

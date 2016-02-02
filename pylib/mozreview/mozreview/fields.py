@@ -14,11 +14,14 @@ from reviewboard.reviews.models import ReviewRequest, ReviewRequestDraft
 
 from mozreview.autoland.models import AutolandEventLogEntry, AutolandRequest
 from mozreview.extra_data import (
+    BASE_COMMIT_KEY,
     COMMIT_ID_KEY,
+    COMMITS_KEY,
     gen_child_rrs,
     get_parent_rr,
     is_parent,
     is_pushed,
+    REVIEWER_MAP_KEY,
 )
 from mozreview.file_diff_reviewer.models import FileDiffReviewer
 
@@ -32,7 +35,7 @@ def ensure_review_request(review_request_details):
 
 class CombinedReviewersField(BaseReviewRequestField):
     """ This field allows for empty pushes on the parent request"""
-    field_id = "p2rb.reviewer_map"
+    field_id = REVIEWER_MAP_KEY
     is_editable = True
     can_record_change_entry = True
 
@@ -52,7 +55,7 @@ class CommitsListField(BaseReviewRequestField):
     This field is injected in the details of a review request that
     is a "push" based review request.
     """
-    field_id = "p2rb.commits"
+    field_id = COMMITS_KEY
     label = _("Commits")
 
     can_record_change_entry = True
@@ -173,7 +176,7 @@ class BaseCommitField(BaseReviewRequestField):
     has been rebased or some of the commits in the request have been
     landed/submitted.
     """
-    field_id = "p2rb.base_commit"
+    field_id = BASE_COMMIT_KEY
     label = _("Base Commit")
     can_record_change_entry = True
 

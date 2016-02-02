@@ -11,7 +11,11 @@ from mozillapulse import publishers
 from mozillapulse.messages import base
 
 from mozreview.decorators import if_ext_enabled
-from mozreview.extra_data import is_parent, is_pushed
+from mozreview.extra_data import (
+    COMMITS_KEY,
+    is_parent,
+    is_pushed,
+)
 
 
 def initialize_pulse_handlers(extension):
@@ -62,7 +66,7 @@ def handle_commits_published(extension=None, **kwargs):
     child_rrids = []
     commits = []
     ext_commits = json.loads(
-        review_request.extra_data.get('p2rb.commits', '[]'))
+        review_request.extra_data.get(COMMITS_KEY, '[]'))
 
     for rev, rrid in ext_commits:
         child_rrids.append(int(rrid))

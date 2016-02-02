@@ -30,7 +30,11 @@ from mozreview.errors import (AUTOLAND_CONFIGURATION_ERROR,
                               AUTOLAND_REQUEST_IN_PROGRESS,
                               AUTOLAND_TIMEOUT,
                               NOT_PUSHED_PARENT_REVIEW_REQUEST)
-from mozreview.extra_data import is_parent, is_pushed
+from mozreview.extra_data import (
+    COMMITS_KEY,
+    is_parent,
+    is_pushed
+)
 
 AUTOLAND_REQUEST_TIMEOUT = 10.0
 IMPORT_PULLREQUEST_DESTINATION = 'mozreview'
@@ -141,7 +145,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
             return AUTOLAND_CONFIGURATION_ERROR.with_message(
                 'Autoland has not been configured with a proper landing URL.')
 
-        last_revision = json.loads(rr.extra_data.get('p2rb.commits'))[-1][0]
+        last_revision = json.loads(rr.extra_data.get(COMMITS_KEY))[-1][0]
 
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
@@ -285,7 +289,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
             return AUTOLAND_CONFIGURATION_ERROR.with_message(
                 'Autoland has not been configured with a proper try URL.')
 
-        last_revision = json.loads(rr.extra_data.get('p2rb.commits'))[-1][0]
+        last_revision = json.loads(rr.extra_data.get(COMMITS_KEY))[-1][0]
 
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')

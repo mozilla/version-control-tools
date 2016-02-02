@@ -35,14 +35,14 @@ This is the template for the "Commits" list in a push-based review request.
     {% for child_details in children_details %}
     <tr {% if child_details.get_review_request.id = review_request_details.get_review_request.id %}current="true"{% endif %}>
       <td class="hg">
-        <a href="{{child_details.get_review_request.repository.path}}/rev/{{child_details.extra_data|getitem:"p2rb.commit_id"|slice:":12"}}">
+        <a href="{{child_details.get_review_request.repository.path}}/rev/{{child_details|commit_id|slice:":12"}}">
           <div class="rb-icon rb-icon-jump-to"></div>
         </a>
       </td>
       <td class="diff">
-        <a title="See diff for commit {{child_details.extra_data|getitem:"p2rb.commit_id"|slice:":12"}}"
+        <a title="See diff for commit {{child_details|commit_id|slice:":12"}}"
            class="commit_sha" href="{{child_details.get_review_request.get_absolute_url}}diff/#index_header">
-          {{child_details.extra_data|getitem:"p2rb.commit_id"|slice:":12"}}
+          {{child_details|commit_id|slice:":12"}}
         </a>
       </td>
       <td class="reviews truncate_text">
