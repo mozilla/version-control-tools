@@ -378,6 +378,7 @@ Test creating a review via HTTP
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  commit_extra_data: {}
   diffs:
   - id: 1
     revision: 1

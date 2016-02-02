@@ -65,11 +65,14 @@ from mozreview.pulse import (
 from mozreview.resources.bugzilla_login import (
     bugzilla_api_key_login_resource,
 )
-from mozreview.resources.commit_rewrite import (
-    commit_rewrite_resource,
-)
 from mozreview.resources.batch_review_request import (
     batch_review_request_resource,
+)
+from mozreview.resources.commit_data import (
+    commit_data_resource,
+)
+from mozreview.resources.commit_rewrite import (
+    commit_rewrite_resource,
 )
 from mozreview.resources.review_request_summary import (
     review_request_summary_resource,
@@ -160,6 +163,7 @@ class MozReviewExtension(Extension):
         batch_review_request_resource,
         batch_review_resource,
         bugzilla_api_key_login_resource,
+        commit_data_resource,
         commit_rewrite_resource,
         file_diff_reviewer_resource,
         import_pullrequest_trigger_resource,

@@ -86,6 +86,7 @@ We should have a disagreement between published and draft
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  commit_extra_data: {}
   diffs:
   - id: 1
     revision: 1
@@ -120,6 +121,7 @@ We should have a disagreement between published and draft
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{"2": []}'
       p2rb.unpublished_rids: '[]'
+    commit_extra_data: {}
     diffs:
     - id: 3
       revision: 2
@@ -153,6 +155,7 @@ We should have a disagreement between published and draft
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -183,6 +186,7 @@ We should have a disagreement between published and draft
       p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
+    commit_extra_data: {}
     diffs:
     - id: 4
       revision: 2
@@ -225,6 +229,7 @@ Discarding the parent review request draft should discard draft on children
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  commit_extra_data: {}
   diffs:
   - id: 1
     revision: 1
@@ -260,6 +265,7 @@ Discarding the parent review request draft should discard draft on children
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1

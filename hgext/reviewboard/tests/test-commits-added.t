@@ -97,6 +97,7 @@ The parent review should have its description updated.
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[2, 3, 4]'
+  commit_extra_data: {}
   diffs: []
   approved: false
   approval_failure: The review request is not public.
@@ -118,6 +119,7 @@ The parent review should have its description updated.
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{"3": [], "2": []}'
       p2rb.unpublished_rids: '[]'
+    commit_extra_data: {}
     diffs:
     - id: 4
       revision: 1

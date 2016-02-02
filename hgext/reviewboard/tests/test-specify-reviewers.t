@@ -227,6 +227,7 @@ Publishing series during push works
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 10
     revision: 1

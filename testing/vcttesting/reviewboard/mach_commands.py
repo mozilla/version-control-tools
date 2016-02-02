@@ -40,7 +40,7 @@ def dict_from_diff(diff):
     return d
 
 
-def serialize_review_requests(rr):
+def serialize_review_requests(api_client, rr):
     from rbtools.api.errors import APIError
     d = OrderedDict()
     d['id'] = rr.id
@@ -53,6 +53,12 @@ def serialize_review_requests(rr):
     d['description'] = _serialize_text(rr.description)
     d['target_people'] = [p.get().username for p in rr.target_people]
     d['extra_data'] = dict(rr.extra_data.iteritems())
+
+    commit_data = api_client.get_path(
+        '/extensions/mozreview.extension.MozReviewExtension/commit-data/%s/' %
+        rr.id)
+    d['commit_extra_data'] = dict(commit_data.extra_data.iteritems())
+
     d['diffs'] = []
     for diff in rr.get_diffs():
         d['diffs'].append(dict_from_diff(diff))
@@ -125,6 +131,8 @@ def serialize_review_requests(rr):
         ddraft['description'] = _serialize_text(draft.description)
         ddraft['target_people'] = [p.get().username for p in draft.target_people]
         ddraft['extra'] = dict(draft.extra_data.iteritems())
+        ddraft['commit_extra_data'] = dict(
+            commit_data.draft_extra_data.iteritems())
 
         ddraft['diffs'] = []
         for diff in draft.get_draft_diffs():
@@ -220,9 +228,10 @@ class ReviewBoardCommands(object):
         description='Print a representation of a review request.')
     @CommandArgument('rrid', help='Review request id to dump')
     def dumpreview(self, rrid):
-        root = self._get_root()
+        client = self._get_client()
+        root = client.get_root()
         r = root.get_review_request(review_request_id=rrid)
-        print(serialize_review_requests(r))
+        print(serialize_review_requests(client, r))
 
     @Command('add-reviewer', category='reviewboard',
         description='Add a reviewer to a review request')

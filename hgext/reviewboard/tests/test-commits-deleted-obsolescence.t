@@ -137,6 +137,7 @@ on publish.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  commit_extra_data: {}
   diffs:
   - id: 1
     revision: 1
@@ -197,6 +198,7 @@ on publish.
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{}'
       p2rb.unpublished_rids: '[]'
+    commit_extra_data: {}
     diffs:
     - id: 7
       revision: 2
@@ -258,6 +260,7 @@ The parent review should have dropped the reference to /r/6
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  commit_extra_data: {}
   diffs:
   - id: 1
     revision: 1
@@ -350,6 +353,7 @@ Review 6 should be marked as discarded
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 6
     revision: 1
@@ -425,6 +429,7 @@ on publish.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  commit_extra_data: {}
   diffs:
   - id: 1
     revision: 1
@@ -515,6 +520,7 @@ on publish.
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{"3": [], "2": [], "5": [], "4": []}'
       p2rb.unpublished_rids: '[]'
+    commit_extra_data: {}
     diffs:
     - id: 8
       revision: 3
@@ -564,6 +570,7 @@ The dropped commit should now be discarded
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -634,6 +641,7 @@ The parent review should have been updated accordingly.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{"3": [], "5": [], "4": []}'
     p2rb.unpublished_rids: '[]'
+  commit_extra_data: {}
   diffs:
   - id: 1
     revision: 1

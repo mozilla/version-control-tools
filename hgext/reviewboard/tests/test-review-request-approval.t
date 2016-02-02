@@ -60,6 +60,7 @@ Create a review request from an L1 user
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -102,6 +103,7 @@ Have an L1 user provide a ship it review which should not grant approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -152,6 +154,7 @@ Have an L3 user provide a ship it review which should grant approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -206,6 +209,7 @@ Posting a new review without ship it should cancel the previous approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -267,6 +271,7 @@ One more ship it should switch it back to approved
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -336,6 +341,7 @@ Even though the author is L1, adding a new diff will not cancel approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -416,6 +422,7 @@ A new ship-it from L3 should give approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -507,6 +514,7 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -611,6 +619,7 @@ Fixing the issue should restore approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -723,6 +732,7 @@ Review requests created by L3 users
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 6
     revision: 1
@@ -765,6 +775,7 @@ Even a ship-it from an L1 user will give approval to an L3 author
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 6
     revision: 1
@@ -818,6 +829,7 @@ ship-its. Posting a new diff should not clear approval
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 6
     revision: 1

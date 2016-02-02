@@ -131,6 +131,7 @@ Review request 6 should be added to the list of discard on publish rids.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  commit_extra_data: {}
   diffs:
   - id: 1
     revision: 1
@@ -191,6 +192,7 @@ Review request 6 should be added to the list of discard on publish rids.
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{}'
       p2rb.unpublished_rids: '[]'
+    commit_extra_data: {}
     diffs:
     - id: 7
       revision: 2
@@ -246,6 +248,7 @@ Review 6 should be marked as discarded
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 6
     revision: 1
@@ -316,6 +319,7 @@ The first commit was rewritten (we assume all subsequent were as well).
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
@@ -346,6 +350,7 @@ The first commit was rewritten (we assume all subsequent were as well).
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
+    commit_extra_data: {}
     diffs:
     - id: 9
       revision: 2
@@ -389,6 +394,7 @@ request is published.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  commit_extra_data: {}
   diffs:
   - id: 1
     revision: 1
@@ -479,6 +485,7 @@ request is published.
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{"3": [], "2": [], "5": [], "4": []}'
       p2rb.unpublished_rids: '[]'
+    commit_extra_data: {}
     diffs:
     - id: 8
       revision: 3

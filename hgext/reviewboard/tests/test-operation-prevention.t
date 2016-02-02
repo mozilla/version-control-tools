@@ -54,6 +54,7 @@ Publishing the parent should succeed.
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{"2": []}'
     p2rb.unpublished_rids: '[]'
+  commit_extra_data: {}
   diffs:
   - id: 1
     revision: 1
@@ -89,6 +90,7 @@ Publishing the parent should succeed.
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  commit_extra_data: {}
   diffs:
   - id: 2
     revision: 1
