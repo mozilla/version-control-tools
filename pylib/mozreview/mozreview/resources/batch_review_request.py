@@ -248,12 +248,15 @@ class BatchReviewRequestResource(WebAPIResource):
                     'repo_id': ['Invalid repo_id']}}
 
         if not repo.is_accessible_by(user):
+            logger.warn('repo %s not accessible by %s' % (repo.id, user))
             return self.get_no_access_error(request)
 
         try:
             with transaction.atomic():
                 squashed_rr, node_to_rid, review_data, warnings = self._process_submission(
                     request, local_site, repo, identifier, commits)
+                logger.info('%s: finished processing %d' % (
+                            identifier, squashed_rr.id))
                 return 200, {
                     self.item_result_key: {
                         'nodes': node_to_rid,
@@ -264,14 +267,20 @@ class BatchReviewRequestResource(WebAPIResource):
 
         # Need to catch outside the transaction so db changes are rolled back.
         except DiffProcessingException:
+            logging.exception('diff processing exception')
             return INVALID_FORM_DATA, {
                 'fields': {
                     'commits': ['error processing squashed diff']}}
         except SubmissionException as e:
+            logging.exception('submission exception')
             return e.value
 
     def _process_submission(self, request, local_site, repo, identifier, commits):
         user = request.user
+
+        logger.info('processing batch submission %s to %s with %d commits' % (
+                    identifier, repo.name, len(commits)))
+
         try:
             squashed_rr = ReviewRequest.objects.get(commit_id=identifier,
                                                     repository=repo)
@@ -286,6 +295,8 @@ class BatchReviewRequestResource(WebAPIResource):
                     'fields': {
                         'identifier': ['Parent review request is '
                                'submitted or discarded']}}))
+
+            logger.info('using squashed review request %d' % squashed_rr.id)
 
         except ReviewRequest.DoesNotExist:
             squashed_rr = ReviewRequest.objects.create(
@@ -311,6 +322,8 @@ class BatchReviewRequestResource(WebAPIResource):
             # since it can be quite time consuming.
             # Calling create_from_data() instead of create_from_upload() skips
             # diff size validation. We allow unlimited diff sizes, so no biggie.
+            logger.info('%s: generating squashed diffset for %d' % (
+                        identifier, squashed_rr.id))
             diffset = DiffSet.objects.create_from_data(
                 repository=repo,
                 diff_file_name='diff',
@@ -332,6 +345,8 @@ class BatchReviewRequestResource(WebAPIResource):
             raise DiffProcessingException()
 
         update_review_request_draft_diffset(squashed_rr, diffset)
+        logger.info('%s: updated squashed diffset for %d' % (
+                    identifier, squashed_rr.id))
 
         # TODO: We need to take into account the commits data from the squashed
         # review request's draft. This data represents the mapping from commit
@@ -346,6 +361,11 @@ class BatchReviewRequestResource(WebAPIResource):
         unclaimed_rids = get_unclaimed_rids(previous_commits,
                                             discard_on_publish_rids,
                                             unpublished_rids)
+
+        logger.info('%s: %d previous commits; %d discard on publish; '
+                    '%d unpublished' % (identifier, len(previous_commits),
+                                        len(discard_on_publish_rids),
+                                        len(unpublished_rids)))
 
         # Previously pushed nodes which have been processed and had their review
         # request updated or did not require updating.
@@ -375,6 +395,9 @@ class BatchReviewRequestResource(WebAPIResource):
             # commits deriving from content, the commit has not changed and there
             # is nothing to update. Update our accounting and move on.
             rid = remaining_nodes[node]
+            logger.info('%s: commit %s unchanged; using existing request %d' % (
+                        identifier, node, rid))
+
             del remaining_nodes[node]
             unclaimed_rids.remove(rid)
             processed_nodes.add(node)
@@ -389,6 +412,10 @@ class BatchReviewRequestResource(WebAPIResource):
             except ValueError:
                 pass
 
+        logger.info('%s: %d/%d commits mapped exactly' % (
+                    identifier, len(processed_nodes),
+                    len(commits['individual'])))
+
         # Find commits that map to a previous version.
         for commit in commits['individual']:
             node = commit['id']
@@ -402,6 +429,10 @@ class BatchReviewRequestResource(WebAPIResource):
                 rid = remaining_nodes.get(precursor)
                 if not rid:
                     continue
+
+                logger.info('%s: found precursor to commit %s; '
+                            'using existing review request %d' % (
+                            identifier, node, rid))
 
                 del remaining_nodes[precursor]
                 unclaimed_rids.remove(rid)
@@ -423,6 +454,10 @@ class BatchReviewRequestResource(WebAPIResource):
 
                 break
 
+        logger.info('%s: %d/%d mapped exactly or to precursors' % (
+                    identifier, len(processed_nodes),
+                    len(commits['individual'])))
+
         # Now do a pass over the commits that didn't map cleanly.
         for commit in commits['individual']:
             node = commit['id']
@@ -443,6 +478,10 @@ class BatchReviewRequestResource(WebAPIResource):
             # reusing these private review requests before creating new ones.
             if unclaimed_rids:
                 assumed_old_rid = unclaimed_rids.pop(0)
+
+                logger.info('%s: mapping %s to unclaimed request %d' % (
+                            identifier, node, assumed_old_rid))
+
                 rr = ReviewRequest.objects.get(pk=assumed_old_rid)
                 draft, warns = update_review_request(local_site, request,
                                                      reviewer_cache, rr, commit)
@@ -471,7 +510,8 @@ class BatchReviewRequestResource(WebAPIResource):
             rr.extra_data['p2rb.is_squashed'] = False
             rr.extra_data['p2rb.identifier'] = identifier
             rr.save(update_fields=['extra_data'])
-            logger.info('created commit review request #%d' % rr.id)
+            logger.info('%s: created review request %d for commit %s' % (
+                        identifier, rr.id, node))
             draft, warns = update_review_request(local_site, request,
                                                  reviewer_cache, rr, commit)
             squashed_reviewers.update(u for u in draft.target_people.all())
@@ -486,6 +526,8 @@ class BatchReviewRequestResource(WebAPIResource):
         # If there are any remaining review requests, they must belong to
         # deleted commits. (Or, we made a mistake and updated the wrong review
         # request)
+        logger.info('%s: %d unclaimed review requests left over' % (
+                    identifier, len(unclaimed_rids)))
         for rid in unclaimed_rids:
             rr = ReviewRequest.objects.get(pk=rid)
 
