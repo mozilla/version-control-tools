@@ -19,6 +19,7 @@ from mozautomation.commitparser import (
     parse_reviewers,
     parse_rquestion_reviewers,
     replace_reviewers,
+    strip_commit_metadata,
 )
 
 
@@ -352,3 +353,24 @@ class TestBugParsing(unittest.TestCase):
             'bug 1164778) for SM(cgc) caused by something in the push.'),
             ([], [1164777, 1163207, 1156914, 1164778]))
 
+    def test_strip_commit_metadata(self):
+        self.assertEqual(strip_commit_metadata('foo'), 'foo')
+
+        self.assertEqual(strip_commit_metadata('foo\n\nbar'), 'foo\n\nbar')
+
+        self.assertEqual(strip_commit_metadata(
+            'Bug 1 - foo\n\nMozReview-Commit-ID: abcdef'),
+            'Bug 1 - foo')
+
+        self.assertEqual(strip_commit_metadata(
+            'Bug 1 - foo\n\nMore description\n\nFoo-Bar: baz\n\n'),
+            'Bug 1 - foo\n\nMore description')
+
+        self.assertEqual(strip_commit_metadata(
+            'Bug 1 - foo\n\nMozReview-Commit-ID: abcdef\n\nTrailing desc'),
+            'Bug 1 - foo\n\n\nTrailing desc')
+
+        # unicode in should get unicode out
+        res = strip_commit_metadata(u'foo\n\nbar')
+        self.assertEqual(res, u'foo\n\nbar')
+        self.assertIsInstance(res, unicode)

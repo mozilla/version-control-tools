@@ -59,6 +59,8 @@ DIGIT_RE = re.compile('#?\d+')
 BACK_OUT_MULTIPLE_RE = re.compile(
     '^back(?:ed)? out \d+ changesets \(bug ', re.I)
 
+METADATA_RE = re.compile('^[a-zA-Z-]+: ')
+
 
 def parse_bugs(s):
     bugs = [int(m[1]) for m in BUG_RE.findall(s)]
@@ -191,3 +193,26 @@ def parse_backouts(s):
             return nodes, parse_bugs(s)
 
     return None
+
+
+def strip_commit_metadata(s):
+    """Strips metadata related to commit tracking.
+
+    Will strip lines like "MozReview-Commit-ID: foo" from the commit
+    message.
+    """
+    # TODO this parsing is overly simplied. There is room to handle
+    # empty lines before the metadata.
+    lines = [l for l in s.splitlines() if not METADATA_RE.match(l)]
+
+    while lines and not lines[-1].strip():
+        lines.pop(-1)
+
+    if type(s) == str:
+        joiner = b'\n'
+    elif type(s) == unicode:
+        joiner = u'\n'
+    else:
+        raise TypeError('do not know type of commit message: %s' % type(s))
+
+    return joiner.join(lines)
