@@ -34,6 +34,7 @@ from mozautomation.commitparser import (
     parse_bugs,
 )
 from hgrb.util import (
+    addcommitid,
     genid,
     ReviewID,
 )
@@ -662,10 +663,6 @@ def commit_msg_hook(args):
 
             lines.append(line)
 
-    # Prune blank lines at end.
-    while lines and not lines[-1].strip():
-        lines.pop()
-
     if not lines:
         return 0
 
@@ -673,19 +670,14 @@ def commit_msg_hook(args):
     if lines[0].startswith(('fixup', 'squash')):
         return 0
 
-    # Look for existing review identifier.
-    if any(l.startswith('MozReview-Commit-ID: ') for l in lines):
+    msg, changed = addcommitid('\n'.join(lines),
+                               fakeidpath=os.environ.get('FAKEIDPATH'))
+
+    if not changed:
         return 0
 
-    # Insert empty line between main commit message and metadata.
-    if not re.match('^[a-zA-Z-]+: ', lines[-1]):
-        lines.append('')
-
-    cid = genid(fakeidpath=os.environ.get('FAKEIDPATH'))
-    lines.append('MozReview-Commit-ID: %s' % cid)
-
     with open(args.path, 'wb') as fh:
-        fh.write('\n'.join(lines))
+        fh.write(msg)
 
     return 0
 

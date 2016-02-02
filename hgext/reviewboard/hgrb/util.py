@@ -3,6 +3,7 @@
 
 import errno
 import random
+import re
 import time
 
 from mercurial import util
@@ -127,3 +128,27 @@ def genid(repo=None, fakeidpath=None):
         value = quot
 
     return ''.join(reversed(chars))
+
+
+def addcommitid(msg, repo=None, fakeidpath=None):
+    """Add a commit ID to a commit message."""
+    lines = msg.splitlines()
+
+    # Prune blank lines at the end.
+    while lines and not lines[-1].strip():
+        lines.pop()
+
+    if not lines:
+        return msg, False
+
+    if any(l.startswith('MozReview-Commit-ID: ') for l in lines):
+        return msg, False
+
+    # Insert empty line between main commit message and metadata.
+    if not re.match('^[a-zA-Z-]+: ', lines[-1]):
+        lines.append('')
+
+    cid = genid(repo=repo, fakeidpath=fakeidpath)
+    lines.append('MozReview-Commit-ID: %s' % cid)
+
+    return '\n'.join(lines), True
