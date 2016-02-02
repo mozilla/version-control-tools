@@ -13,12 +13,22 @@ class HMORepositoryForm(HostingServiceForm):
         widget=forms.TextInput(attrs={'size': '60'}),
         help_text=_('Canonical url for repository'))
 
+    autolanding_to_try_enabled = forms.BooleanField(
+        initial=False,
+        label=_('Autoland to try'),
+        help_text=_('Allow Autolanding to try repository'))
+
     try_repository_url = forms.CharField(
         label=_('Try Repository URL'),
         max_length=255,
         required=False,
         widget=forms.TextInput(attrs={'size': '60'}),
         help_text=_('URL for associated Try repository (if any)'))
+
+    autolanding_enabled = forms.BooleanField(
+        initial=False,
+        label=_('Autoland to landing repository'),
+        help_text=_('Allow Autolanding to landing repository'))
 
     landing_repository_url = forms.CharField(
         label=_('Autoland Repository URL'),

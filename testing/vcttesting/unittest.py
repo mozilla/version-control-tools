@@ -332,7 +332,8 @@ class MozReviewWebDriverTest(MozReviewTest):
                         self.mr.rbweb_id, shell=True)
 
     def add_hostingservice(self, repo, account_username, required_ldap_group,
-                           try_repository_url, landing_repository_url,
+                           autolanding_to_try_enabled, try_repository_url,
+                           autolanding_enabled, landing_repository_url,
                            landing_bookmark):
         """This adds a hosting service to an existing account"""
 
@@ -355,8 +356,16 @@ class MozReviewWebDriverTest(MozReviewTest):
         el = self.browser.find_element_by_id('id_repository_url')
         el.send_keys(path)
 
+        el = self.browser.find_element_by_id('id_autolanding_to_try_enabled')
+        if el.get_attribute('checked') != autolanding_to_try_enabled:
+            el.click()
+
         el = self.browser.find_element_by_id('id_try_repository_url')
         el.send_keys(try_repository_url)
+
+        el = self.browser.find_element_by_id('id_autolanding_enabled')
+        if el.get_attribute('checked') != autolanding_enabled:
+            el.click()
 
         el = self.browser.find_element_by_id('id_landing_repository_url')
         el.send_keys(landing_repository_url)

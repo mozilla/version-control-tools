@@ -82,8 +82,7 @@ class AutolandInboundTest(MozReviewWebDriverTest):
         self.assertEqual(
             autoland_btn.value_of_css_property('opacity'), '0.5')
         self.add_hostingservice(1, 'Sirius Black', 'scm_level_1',
-                                'try',
-                                'inbound', '')
+                                True, 'try', True, 'inbound', '')
 
         # We should also not be able to land to inbound unless the review is
         # published.
