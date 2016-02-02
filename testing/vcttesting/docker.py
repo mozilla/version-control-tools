@@ -685,7 +685,8 @@ class Docker(object):
             bmoweb_bootstrap = None
 
         if (not bmodb_bootstrap or not bmoweb_bootstrap
-            or self.clobber_needed('bmobootstrap')):
+            or self.clobber_needed('bmobootstrap')
+            or self.clobber_needed('bmofetch')):
             bmodb_bootstrap, bmoweb_bootstrap = self._bootstrap_bmo(
                     bmo_images['bmodb-volatile'], bmo_images['bmoweb'])
 
