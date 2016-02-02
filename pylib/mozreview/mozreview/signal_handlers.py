@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import copy
 import json
 import logging
 
@@ -59,6 +60,7 @@ from mozreview.messages import (
     OBSOLETE_DESCRIPTION,
 )
 from mozreview.models import (
+    CommitData,
     DiffSetVerification,
     get_bugzilla_api_key,
 )
@@ -84,7 +86,7 @@ def initialize_signal_handlers(extension):
     SignalHook(
         extension,
         post_save,
-        ensure_parent_draft,
+        post_save_review_request_draft,
         sender=ReviewRequestDraft)
 
     SignalHook(
@@ -99,10 +101,35 @@ def initialize_signal_handlers(extension):
         sandbox_errors=False)
 
 
-def ensure_parent_draft(sender, **kwargs):
+def post_save_review_request_draft(sender, **kwargs):
+    """Handle post_save for a ReviewRequestDraft."""
+    draft = kwargs["instance"]
+
+    if kwargs["created"] and not kwargs["raw"]:
+        copy_commit_data(draft)
+
+    ensure_parent_draft(draft)
+
+
+def copy_commit_data(draft):
+    """Copy CommitData for the draft.
+
+    When a new draft is created we need to copy over extra_data
+    to draft_extra_data inside the associated CommitData object.
+    This makes our two extra_data fields mimic the built-in
+    extra_data for ReviewRequest and ReviewRequestDraft.
+    """
+    commit_data = CommitData.objects.get_or_create(
+        review_request_id=draft.review_request_id)[0]
+
+    commit_data.draft_extra_data = copy.deepcopy(commit_data.extra_data)
+    commit_data.save()
+
+
+def ensure_parent_draft(draft):
     """Ensure parent draft exists when child has a draft.
 
-    This is intended to handle the post_save signal for the
+    This is intended to be called in the post_save signal for the
     ReviewRequestDraft model and ensure the parent review request
     has a draft if a child draft is saved. We need to do this so
     that the parent may always be published when a child requires
@@ -113,10 +140,9 @@ def ensure_parent_draft(sender, **kwargs):
     will create a parent draft - even if the reviewer change does
     not alter the overall set of reviewers for the series.
     """
-    instance = kwargs["instance"]
-    rr = instance.get_review_request()
+    rr = draft.get_review_request()
 
-    if is_pushed(instance) and not is_parent(rr):
+    if is_pushed(draft) and not is_parent(rr):
         parent_rr = get_parent_rr(rr)
         parent_rr_draft = parent_rr.get_draft()
 
