@@ -36,6 +36,20 @@ No review should be left if no Python files were changed.
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo0
+    - +irrelevant
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
@@ -80,6 +94,20 @@ Expecting 0 reviews
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 3
+    revision: 1
+    base_commit_id: f5e6079765d8be2554c86ef044e269f048871f1d
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/test.py b/test.py
+    - deleted file mode 100644
+    - '--- a/test.py'
+    - +++ /dev/null
+    - '@@ -1,1 +0,0 @@'
+    - -dummy
+    - ''
   approved: false
   approval_failure: Commit dddca45a4bedd629833af826c138bd7e302e5807 is not approved.
 

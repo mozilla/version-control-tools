@@ -54,6 +54,22 @@ be ignored
     p2rb.first_public_ancestor: 3edbb5ae6222fc9890db26538597a9b417cb7b94
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3edbb5ae6222fc9890db26538597a9b417cb7b94
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo.py b/foo.py
+    - '--- a/foo.py'
+    - +++ b/foo.py
+    - '@@ -1,3 +1,4 @@'
+    - ' import subprocess'
+    - ' subprocess.check_call([''program'','
+    - '     ''arg''])'
+    - +subprocess.check_call(['program2', 'arg2'])
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1

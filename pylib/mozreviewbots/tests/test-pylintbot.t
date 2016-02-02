@@ -40,6 +40,24 @@ Create a review with Python style violations
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo.py b/foo.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo.py
+    - '@@ -0,0 +1,5 @@'
+    - '+def a(): pass'
+    - +
+    - '+  '
+    - '+def b():'
+    - +    foo = True
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1
@@ -126,6 +144,20 @@ Ensure pyflakes warnings are handled
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 4
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/f401.py b/f401.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/f401.py
+    - '@@ -0,0 +1,1 @@'
+    - +import sys
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1

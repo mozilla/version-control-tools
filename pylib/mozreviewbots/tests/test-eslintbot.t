@@ -56,11 +56,39 @@ Create a review request with some busted Javascript in it
   description: Bug 1 - Some busted Javascript
   target_people: []
   extra_data:
+    calculated_trophies: true
     p2rb: true
     p2rb.commit_id: 265cd5106b1c8895cad7b3772214fca31619d65b
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/.eslintrc b/.eslintrc
+    - new file mode 100644
+    - diff --git a/mach b/mach
+    - new file mode 100755
+    - '--- /dev/null'
+    - +++ b/mach
+    - '@@ -0,0 +1,4 @@'
+    - +#!/usr/bin/env python
+    - +import sys
+    - +import subprocess
+    - +subprocess.call(["eslint"] + sys.argv[1:])
+    - diff --git a/test.js b/test.js
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/test.js
+    - '@@ -0,0 +1,3 @@'
+    - +if (foo {
+    - +  var bar
+    - +}
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1
