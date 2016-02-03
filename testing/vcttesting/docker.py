@@ -1322,7 +1322,11 @@ class Docker(object):
 
     def get_full_image(self, image):
         for i in self.client.images():
-            if i['Id'][0:12] == image:
+            iid = i['Id']
+            if iid.startswith('sha256:'):
+                iid = iid[7:]
+
+            if iid[0:12] == image:
                 return i['Id']
 
         return image
