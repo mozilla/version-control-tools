@@ -12,8 +12,9 @@ derivatives).
 Install Recommended Extensions
 ==============================
 
-If you want the fastest clones possible, install the
-:ref:`bundleclone extension <hgmo_bundleclone>`.
+If you don't have Mercurial 3.7 or newer, install the
+:ref:`bundleclone extension <hgmo_bundleclone>` to make clones faster
+and more robust.
 
 Installing the
 `hgwatchman extension <https://bitbucket.org/facebook/hgwatchman>`_
