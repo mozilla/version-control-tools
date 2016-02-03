@@ -471,7 +471,7 @@ UUID is not bumped.
   *************************** ERROR ***************************
   Push rejected because the following IDL interfaces were
   modified without changing the UUID:
-    - nsISupports in changeset 9476522f2cea
+    - nsISupports in changeset 06ce567ad247
   
   To update the UUID for all of the above interfaces and their
   descendants, run:
