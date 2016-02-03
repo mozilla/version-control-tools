@@ -177,4 +177,4 @@ Uploading a new patch will reassign bug to you
     summary: bug2
 
   $ $TESTDIR/d0cker stop-bmo bzexport-test-patch-create
-  stopped 2 containers
+  stopped 1 containers

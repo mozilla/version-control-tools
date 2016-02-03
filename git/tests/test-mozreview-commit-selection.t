@@ -240,4 +240,4 @@ We don't review merge commits
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

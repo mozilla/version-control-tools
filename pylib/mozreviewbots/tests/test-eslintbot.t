@@ -120,4 +120,4 @@ Create a review request with some busted Javascript in it
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

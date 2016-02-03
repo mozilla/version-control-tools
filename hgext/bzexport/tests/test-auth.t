@@ -93,4 +93,4 @@ t
 Cleanup
 
   $ $TESTDIR/d0cker stop-bmo bzexport-test-auth
-  stopped 2 containers
+  stopped 1 containers

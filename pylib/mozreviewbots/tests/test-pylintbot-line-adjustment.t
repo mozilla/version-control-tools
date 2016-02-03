@@ -356,4 +356,4 @@ Create tests for line -= 2
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

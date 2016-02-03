@@ -239,4 +239,4 @@ Verify that we get nothing from non-existent bugs.
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

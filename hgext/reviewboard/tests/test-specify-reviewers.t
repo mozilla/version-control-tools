@@ -568,4 +568,4 @@ Reviewer identification should be case insensitive.
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

@@ -62,12 +62,10 @@ class DockerCommands(object):
     @CommandArgument('--web-id-file',
         help='File to store the bmoweb container ID in')
     def start_bmo(self, cluster, http_port, web_id_file=None):
-        db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
 
         res = self.d.start_bmo(cluster=cluster,
                 http_port=http_port,
-                db_image=db_image,
                 web_image=web_image)
 
         if web_id_file:

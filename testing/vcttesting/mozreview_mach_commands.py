@@ -18,7 +18,6 @@ class MozReviewCommands(object):
         if not where and 'MOZREVIEW_HOME' in os.environ:
             where = os.environ['MOZREVIEW_HOME']
 
-        db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
         hgrb_image = os.environ.get('DOCKER_HGRB_IMAGE')
         ldap_image = os.environ.get('DOCKER_LDAP_IMAGE')
@@ -30,7 +29,7 @@ class MozReviewCommands(object):
         treestatus_image = os.environ.get('DOCKER_TREESTATUS_IMAGE')
 
         from vcttesting.mozreview import MozReview
-        return MozReview(where, db_image=db_image, web_image=web_image,
+        return MozReview(where, web_image=web_image,
                          hgrb_image=hgrb_image, ldap_image=ldap_image,
                          pulse_image=pulse_image, rbweb_image=rbweb_image,
                          autolanddb_image=autolanddb_image,

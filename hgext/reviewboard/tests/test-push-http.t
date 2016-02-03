@@ -413,4 +413,4 @@ which actually does create an LDAP user: we're just not using it here.)
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

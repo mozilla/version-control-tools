@@ -40,4 +40,4 @@
   renamed 1 -> first-patch
 
   $ $TESTDIR/d0cker stop-bmo qimportbz-test-import
-  stopped 2 containers
+  stopped 1 containers

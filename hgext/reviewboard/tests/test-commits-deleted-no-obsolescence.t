@@ -540,4 +540,4 @@ Try removing a commit in the middle.
   (visit review url to publish these review requests so others can see them)
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

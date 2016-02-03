@@ -29,7 +29,7 @@ from vcttesting.mozreview import MozReview
 # The environment variables should be set by the test runner. If
 # they aren't set, you are likely invoking the tests wrong.
 def start_mozreview(mr):
-    mr.start(db_image=os.environ['DOCKER_BMO_DB_IMAGE'],
+    mr.start(
          web_image=os.environ['DOCKER_BMO_WEB_IMAGE'],
          ldap_image=os.environ['DOCKER_LDAP_IMAGE'],
          pulse_image=os.environ['DOCKER_PULSE_IMAGE'],

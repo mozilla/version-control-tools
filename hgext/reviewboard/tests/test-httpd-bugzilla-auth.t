@@ -111,4 +111,4 @@ Request against local server with valid API key should work
   > EOF
 
   $ $TESTDIR/d0cker stop-bmo httpd-bugzilla-auth
-  stopped 2 containers
+  stopped 1 containers

@@ -109,11 +109,9 @@ class Docker(object):
             'clobber-bmofetch': None,
             'images': {},
             'containers': {},
-            'last-bmodb-id': None,
             'last-bmoweb-id': None,
             'last-pulse-id': None,
             'last-rbweb-id': None,
-            'last-bmodb-bootstrap-id': None,
             'last-bmoweb-bootstrap-id': None,
             'last-rbweb-bootstrap-id': None,
             'last-autolanddb-id': None,
@@ -133,11 +131,9 @@ class Docker(object):
         keys = (
             'clobber-bmobootstrap',
             'clobber-bmofetch',
-            'last-bmodb-id',
             'last-bmoweb-id',
             'last-pulse-id',
             'last-rbweb-id',
-            'last-bmodb-bootstrap-id',
             'last-bmoweb-bootstrap-id',
             'last-rbweb-bootstrap-id',
             'last-autolanddb-id',
@@ -658,11 +654,9 @@ class Docker(object):
 
     def build_bmo(self, images=None, verbose=False):
         bmo_images = self.ensure_images_built([
-            'bmodb-volatile',
             'bmoweb',
         ], existing=images, verbose=verbose)
 
-        self.state['last-bmodb-id'] = bmo_images['bmodb-volatile']
         self.state['last-bmoweb-id'] = bmo_images['bmoweb']
         self.save_state()
 
@@ -671,32 +665,23 @@ class Docker(object):
         # The keys for the bootstrapped images are derived from the base
         # images they depend on. This means that if we regenerate a new
         # base image, the bootstrapped images will be regenerated.
-        bmodb_bootstrapped_key = 'bmodb-bootstrapped:%s' % bmo_images['bmodb-volatile']
-        bmoweb_bootstrapped_key = 'bmoweb-bootstrapped:%s:%s' % (
-                bmo_images['bmodb-volatile'], bmo_images['bmoweb'])
+        bmoweb_bootstrapped_key = 'bmoweb-bootstrapped:%s' % (
+                bmo_images['bmoweb'])
 
-        bmodb_bootstrap = state_images.get(bmodb_bootstrapped_key)
         bmoweb_bootstrap = state_images.get(bmoweb_bootstrapped_key)
 
         known_images = self.all_docker_images()
-        if bmodb_bootstrap and bmodb_bootstrap not in known_images:
-            bmodb_bootstrap = None
         if bmoweb_bootstrap and bmoweb_bootstrap not in known_images:
             bmoweb_bootstrap = None
 
-        if (not bmodb_bootstrap or not bmoweb_bootstrap
-            or self.clobber_needed('bmobootstrap')):
-            bmodb_bootstrap, bmoweb_bootstrap = self._bootstrap_bmo(
-                    bmo_images['bmodb-volatile'], bmo_images['bmoweb'])
+        if not bmoweb_bootstrap or self.clobber_needed('bmobootstrap'):
+            bmoweb_bootstrap = self._bootstrap_bmo(bmo_images['bmoweb'])
 
-        state_images[bmodb_bootstrapped_key] = bmodb_bootstrap
         state_images[bmoweb_bootstrapped_key] = bmoweb_bootstrap
-        self.state['last-bmodb-bootstrap-id'] = bmodb_bootstrap
         self.state['last-bmoweb-bootstrap-id'] = bmoweb_bootstrap
         self.save_state()
 
         return {
-                'bmodb': bmodb_bootstrap,
                 'bmoweb': bmoweb_bootstrap,
         }
 
@@ -740,7 +725,6 @@ class Docker(object):
 
             if build_bmo:
                 bmo_images = f_bmo_images.result()
-                bmodb_bootstrap = bmo_images['bmodb']
                 bmoweb_bootstrap = bmo_images['bmoweb']
 
         images.update(f_images.result())
@@ -769,22 +753,17 @@ class Docker(object):
         if build_hgweb:
             r['hgweb'] = images['hgweb']
         if build_bmo:
-            r['bmodb'] = bmodb_bootstrap
             r['bmoweb'] = bmoweb_bootstrap
 
         return r
 
-    def _bootstrap_bmo(self, db_image, web_image):
+    def _bootstrap_bmo(self, web_image):
         """Build bootstrapped BMO images.
 
         BMO's first run time takes several seconds. It isn't practical to wait
         for this every time the containers start. So, we do the first run code
         once and commit the result to a new image.
         """
-        db_id = self.client.create_container(
-                db_image,
-                environment={'MYSQL_ROOT_PASSWORD': 'password'})['Id']
-
         web_environ = {}
 
         if 'FETCH_BMO' in os.environ or self.clobber_needed('bmofetch'):
@@ -793,17 +772,14 @@ class Docker(object):
         web_id = self.client.create_container(web_image,
                                               environment=web_environ)['Id']
 
-        with self.start_container(db_id) as db_state:
-            web_params = {
-                'links': [(db_state['Name'], 'bmodb')],
-                'port_bindings': {80: None},
-            }
-            with self.start_container(web_id, **web_params) as web_state:
-                web_hostname, web_port = self._get_host_hostname_port(web_state, '80/tcp')
-                wait_for_http(web_hostname, web_port, path='xmlrpc.cgi',
-                              extra_check_fn=self._get_assert_container_running_fn(web_id))
+        web_params = {
+            'port_bindings': {80: None},
+        }
+        with self.start_container(web_id, **web_params) as web_state:
+            web_hostname, web_port = self._get_host_hostname_port(web_state, '80/tcp')
+            wait_for_http(web_hostname, web_port, path='xmlrpc.cgi',
+                          extra_check_fn=self._get_assert_container_running_fn(web_id))
 
-        db_unique_id = str(uuid.uuid1())
         web_unique_id = str(uuid.uuid1())
 
         # Save an image of the stopped containers.
@@ -811,25 +787,17 @@ class Docker(object):
         # easily from Docker's own metadata. We have to give a tag becaue
         # Docker will forget the repository name if a name image has only a
         # repository name as well.
-        with futures.ThreadPoolExecutor(2) as e:
-            db_future = e.submit(self.client.commit, db_id,
-                                 repository='bmodb-volatile-bootstrapped',
-                                 tag=db_unique_id)
-            web_future = e.submit(self.client.commit, web_id,
-                                  repository='bmoweb-bootstrapped',
-                                  tag=web_unique_id)
 
-        db_bootstrap = db_future.result()['Id']
-        web_bootstrap = web_future.result()['Id']
+        web_bootstrap = self.client.commit( web_id,
+                              repository='bmoweb-bootstrapped',
+                              tag=web_unique_id)['Id']
 
-        with futures.ThreadPoolExecutor(2) as e:
-            e.submit(self.client.remove_container, web_id, v=True)
-            e.submit(self.client.remove_container, db_id, v=True)
+        self.client.remove_container(web_id, v=True)
 
-        return db_bootstrap, web_bootstrap
+        return web_bootstrap
 
     def start_bmo(self, cluster, http_port=80,
-            db_image=None, web_image=None, verbose=False):
+                  web_image=None, verbose=False):
         """Start a bugzilla.mozilla.org cluster.
 
         Code in this function is pretty much inlined in self.start_mozreview
@@ -838,31 +806,19 @@ class Docker(object):
         probably factor functionality into smaller pieces.
         """
 
-        if not db_image or not web_image:
+        if not web_image:
             images = self.build_bmo(verbose=verbose)
-            db_image = images['bmodb']
             web_image = images['bmoweb']
 
         containers = self.state['containers'].setdefault(cluster, [])
 
-        with futures.ThreadPoolExecutor(2) as e:
-            f_db_create = e.submit(self.client.create_container, db_image,
-                    environment={'MYSQL_ROOT_PASSWORD': 'password'})
-            bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
-            f_web_create = e.submit(self.client.create_container,
-                    web_image, environment={'BMO_URL': bmo_url})
-
-            db_id = f_db_create.result()['Id']
-            containers.append(db_id)
-            self.client.start(db_id)
-            db_state = self.client.inspect_container(db_id)
-
-            web_id = f_web_create.result()['Id']
-            containers.append(web_id)
-            self.client.start( web_id,
-                    links=[(db_state['Name'], 'bmodb')],
-                    port_bindings={80: http_port})
-            web_state = self.client.inspect_container(web_id)
+        bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
+        web_id = self.client.create_container(
+                web_image, environment={'BMO_URL': bmo_url})['Id']
+        containers.append(web_id)
+        self.client.start(web_id,
+                port_bindings={80: http_port})
+        web_state = self.client.inspect_container(web_id)
 
         self.save_state()
 
@@ -877,13 +833,12 @@ class Docker(object):
 
         return {
             'bugzilla_url': bmo_url,
-            'db_id': db_id,
             'web_id': web_id,
         }
 
     def start_mozreview(self, cluster, http_port=80,
             hgrb_image=None, ldap_image=None, ldap_port=None, pulse_port=None,
-            rbweb_port=None, db_image=None, web_image=None, pulse_image=None,
+            rbweb_port=None, web_image=None, pulse_image=None,
             rbweb_image=None, ssh_port=None, hg_port=None,
             autolanddb_image=None, autoland_image=None, autoland_port=None,
             hgweb_image=None, hgweb_port=None,
@@ -923,8 +878,6 @@ class Docker(object):
             start_treestatus = True
 
         known_images = self.all_docker_images()
-        if db_image and db_image not in known_images:
-            db_image = None
         if web_image and web_image not in known_images:
             web_image = None
         if hgrb_image and hgrb_image not in known_images:
@@ -942,14 +895,13 @@ class Docker(object):
         if treestatus_image and treestatus_image not in known_images:
             treestatus_image = None
 
-        if (not db_image or not web_image or not hgrb_image or not ldap_image
+        if (not web_image or not hgrb_image or not ldap_image
                 or not pulse_image or not autolanddb_image
                 or not autoland_image or not rbweb_image or not hgweb_image
                 or not treestatus_image):
             images = self.build_mozreview(verbose=verbose)
             autolanddb_image = images['autolanddb']
             autoland_image = images['autoland']
-            db_image = images['bmodb']
             hgrb_image = images['hgrb']
             ldap_image = images['ldap']
             web_image = images['bmoweb']
@@ -961,9 +913,6 @@ class Docker(object):
         containers = self.state['containers'].setdefault(cluster, [])
 
         with futures.ThreadPoolExecutor(10) as e:
-            # Create containers concurrently - no race conditions here.
-            f_db_create = e.submit(self.client.create_container, db_image,
-                    environment={'MYSQL_ROOT_PASSWORD': 'password'})
             if start_pulse:
                 f_pulse_create = e.submit(self.client.create_container,
                         pulse_image)
@@ -1009,11 +958,6 @@ class Docker(object):
                 f_treestatus_create = e.submit(self.client.create_container,
                                                treestatus_image)
 
-            # We expose the database to containers. Start it first.
-            db_id = f_db_create.result()['Id']
-            containers.append(db_id)
-            f_db_start = e.submit(self.client.start, db_id)
-
             if start_autoland:
                 autolanddb_id = f_autolanddb_create.result()['Id']
                 containers.append(autolanddb_id)
@@ -1033,9 +977,6 @@ class Docker(object):
                 containers.append(ldap_id)
                 f_start_ldap = e.submit(self.client.start, ldap_id,
                                         port_bindings={389: ldap_port})
-
-            f_db_start.result()
-            db_state = self.client.inspect_container(db_id)
 
             web_id = f_web_create.result()['Id']
             containers.append(web_id)
@@ -1067,7 +1008,6 @@ class Docker(object):
             self.save_state()
 
             f_start_web = e.submit(self.client.start, web_id,
-                    links=[(db_state['Name'], 'bmodb')],
                     port_bindings={80: http_port})
             f_start_web.result()
             web_state = self.client.inspect_container(web_id)
@@ -1175,7 +1115,6 @@ class Docker(object):
 
         result = {
             'bugzilla_url': bmo_url,
-            'db_id': db_id,
             'web_id': web_id,
         }
 
@@ -1247,7 +1186,6 @@ class Docker(object):
             docker_images |= {
                 'autolanddb',
                 'autoland',
-                'bmodb-volatile',
                 'bmoweb',
                 'ldap',
                 'pulse',
@@ -1266,7 +1204,6 @@ class Docker(object):
 
         if bmo:
             docker_images |= {
-                'bmodb-volatile',
                 'bmoweb',
             }
 
@@ -1339,12 +1276,10 @@ class Docker(object):
         ignore_images = set([
             self.state['last-autoland-id'],
             self.state['last-autolanddb-id'],
-            self.state['last-bmodb-id'],
             self.state['last-bmoweb-id'],
             self.state['last-hgrb-id'],
             self.state['last-pulse-id'],
             self.state['last-rbweb-id'],
-            self.state['last-bmodb-bootstrap-id'],
             self.state['last-bmoweb-bootstrap-id'],
             self.state['last-hgmaster-id'],
             self.state['last-hgweb-id'],
@@ -1356,8 +1291,6 @@ class Docker(object):
         relevant_repos = set([
             'bmoweb',
             'bmoweb-bootstrapped',
-            'bmodb-volatile',
-            'bmodb-volatile-bootstrapped',
             'pulse',
             'rbweb',
             'autolanddb',

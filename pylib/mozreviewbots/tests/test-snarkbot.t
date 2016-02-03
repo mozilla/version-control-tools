@@ -155,4 +155,4 @@ Create and publish a review for SnarkBot
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

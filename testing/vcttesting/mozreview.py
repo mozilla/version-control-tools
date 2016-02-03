@@ -61,7 +61,7 @@ class MozReview(object):
     This class can be used to create and control MozReview instances.
     """
 
-    def __init__(self, path, web_image=None, db_image=None, hgrb_image=None,
+    def __init__(self, path, web_image=None, hgrb_image=None,
                  ldap_image=None, pulse_image=None, rbweb_image=None,
                  autolanddb_image=None, autoland_image=None,
                  hgweb_image=None, treestatus_image=None):
@@ -72,7 +72,6 @@ class MozReview(object):
 
         self.started = False
 
-        self.db_image = db_image
         self.web_image = web_image
         self.hgrb_image = hgrb_image
         self.ldap_image = ldap_image
@@ -152,7 +151,7 @@ class MozReview(object):
 
     def start(self, bugzilla_port=None, reviewboard_port=None,
             mercurial_port=None, pulse_port=None, verbose=False,
-            db_image=None, web_image=None, hgrb_image=None,
+            web_image=None, hgrb_image=None,
             ldap_image=None, ldap_port=None, pulse_image=None,
             rbweb_image=None, ssh_port=None,
             hgweb_image=None, hgweb_port=None,
@@ -181,7 +180,6 @@ class MozReview(object):
         if not treestatus_port:
             treestatus_port = get_available_port()
 
-        db_image = db_image or self.db_image
         web_image = web_image or self.web_image
         hgrb_image = hgrb_image or self.hgrb_image
         ldap_image = ldap_image or self.ldap_image
@@ -197,7 +195,6 @@ class MozReview(object):
                 cluster=self._name,
                 http_port=bugzilla_port,
                 pulse_port=pulse_port,
-                db_image=db_image,
                 web_image=web_image,
                 hgrb_image=hgrb_image,
                 ldap_image=ldap_image,
@@ -217,7 +214,6 @@ class MozReview(object):
                 verbose=verbose)
 
         self.bmoweb_id = mr_info['web_id']
-        self.bmodb_id = mr_info['db_id']
 
         self.bugzilla_url = mr_info['bugzilla_url']
         bugzilla = self.get_bugzilla()
@@ -311,7 +307,6 @@ class MozReview(object):
 
         state = {
             'bmoweb_id': self.bmoweb_id,
-            'bmodb_id': self.bmodb_id,
             'bugzilla_url': self.bugzilla_url,
             'reviewboard_url': self.reviewboard_url,
             'rbweb_id': self.rbweb_id,

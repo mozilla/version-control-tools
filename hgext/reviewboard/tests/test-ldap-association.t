@@ -124,4 +124,4 @@ The user should now have an associated ldap_username
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

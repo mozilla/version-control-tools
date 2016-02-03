@@ -59,4 +59,4 @@ Open the tree
   (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "7194ef3a2eac", \n  "tree": "test-repo", \n  "trysyntax": "stuff"\n}') (glob)
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

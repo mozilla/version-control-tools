@@ -225,4 +225,4 @@ can happen if a reviewer is manually added (see Bug 1229789).
     summary: bug1
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

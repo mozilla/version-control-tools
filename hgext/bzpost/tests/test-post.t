@@ -540,4 +540,4 @@ Unicode in commit message works
 Cleanup
 
   $ $TESTDIR/d0cker stop-bmo bzpost-test-post
-  stopped 2 containers
+  stopped 1 containers

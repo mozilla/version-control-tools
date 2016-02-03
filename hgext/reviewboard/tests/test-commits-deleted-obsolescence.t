@@ -753,4 +753,4 @@ The parent review should have been updated accordingly.
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

@@ -32,17 +32,12 @@ sys.stdout = Unbuffered(sys.stdout)
 # stderr by default.
 sys.stderr = sys.stdout
 
-if 'BMODB_PORT_3306_TCP_ADDR' not in os.environ:
-    print('error: container invoked improperly. ' +
-          'please link to a bmodb container')
-    sys.exit(1)
-
 bz_home = os.environ['BUGZILLA_HOME']
 bz_dir = os.path.join(bz_home, 'bugzilla')
-db_host = os.environ['BMODB_PORT_3306_TCP_ADDR']
-db_port = os.environ['BMODB_PORT_3306_TCP_PORT']
-db_user = os.environ.get('DB_USER', 'root')
-db_pass = os.environ.get('DB_PASS', 'password')
+db_host = 'localhost'
+db_port = '3306'
+db_user = 'root'
+db_pass = 'password'
 db_name = os.environ.get('DB_NAME', 'bugs')
 db_timeout = int(os.environ.get('DB_TIMEOUT', '60'))
 admin_email = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
@@ -55,6 +50,13 @@ reset_database = 'RESET_DATABASE' in os.environ
 install_module = False
 
 cc = subprocess.check_call
+
+# Start a MySQL process.
+mysqld = subprocess.Popen([
+    '/usr/bin/mysqld_safe',
+    '--datadir=/var/lib/mysql',
+    '--user=mysql',
+    '--init-file=/tmp/mysql-init.sh'])
 
 # Ensure Bugzilla Git clone is up to date.
 
@@ -219,6 +221,8 @@ with open(j(b, 'localconfig'), 'w') as fh:
             fh.write('$apache_size_limit = 700_000;\n')
         else:
             fh.write(line)
+
+mysqld.terminate()
 
 cc(['/bin/chown', '-R', 'bugzilla:bugzilla', b])
 

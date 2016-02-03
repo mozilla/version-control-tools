@@ -178,4 +178,4 @@ Getting status for an unknown job should return a 404
   0:Bug 1 - some stuff; r=cthulhu:public
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

@@ -270,5 +270,5 @@ Specifying both reviewer and feedback works
     summary: bug4
 
   $ $TESTDIR/d0cker stop-bmo bzexport-test-review
-  stopped 2 containers
+  stopped 1 containers
 

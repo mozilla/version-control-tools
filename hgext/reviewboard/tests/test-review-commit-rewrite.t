@@ -75,4 +75,4 @@ Rewriting on a child should work against the parent
     summary: Bug 1 - Initial commit to review r=reviewer
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

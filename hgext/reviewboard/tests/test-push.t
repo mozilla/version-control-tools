@@ -440,4 +440,4 @@ Check for empty commits not at the tip
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers
