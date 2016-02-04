@@ -21,8 +21,8 @@ from mozreview.errors import (
     ParentShipItError,
 )
 from mozreview.extra_data import (
-    MOZREVIEW_KEY,
-    SQUASHED_KEY,
+    is_parent,
+    is_pushed,
 )
 from mozreview.models import (
     get_bugzilla_api_key,
@@ -64,15 +64,6 @@ def get_reply_url(reply, site=None, siteconfig=None):
     return get_obj_url(reply.base_reply_to, site=site, siteconfig=siteconfig)
 
 
-def is_review_request_pushed(review_request):
-    return str(review_request.extra_data.get(MOZREVIEW_KEY, False)) == "True"
-
-
-def is_review_request_squashed(review_request):
-    squashed = str(review_request.extra_data.get(SQUASHED_KEY, False))
-    return squashed == "True"
-
-
 @bugzilla_to_publish_errors
 def on_review_publishing(user, review, **kwargs):
     """Comment in the bug and potentially r+ or clear a review flag.
@@ -85,7 +76,7 @@ def on_review_publishing(user, review, **kwargs):
     review_request = review.review_request
 
     # skip review requests that were not pushed
-    if not is_review_request_pushed(review_request):
+    if not is_pushed(review_request):
         return
 
     site = Site.objects.get_current()
@@ -99,7 +90,7 @@ def on_review_publishing(user, review, **kwargs):
     # TODO: Update all attachments in one call.  This is not possible right
     # now because we have to potentially mix changing and creating flags.
 
-    if is_review_request_squashed(review_request):
+    if is_parent(review_request):
         # Mirror the comment to the bug, unless it's a ship-it, in which
         # case throw an error.  Ship-its are allowed only on child commits.
         if review.ship_it:
@@ -127,7 +118,7 @@ def on_reply_publishing(user, reply, **kwargs):
     review_request = reply.review_request
 
     # skip review requests that were not pushed
-    if not is_review_request_pushed(review_request):
+    if not is_pushed(review_request):
         return
 
     bug_id = int(review_request.get_bug_list()[0])
