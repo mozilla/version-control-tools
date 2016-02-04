@@ -43,6 +43,7 @@ from mozreview.errors import (
 )
 from mozreview.extra_data import (
     DISCARD_ON_PUBLISH_KEY,
+    DRAFTED_COMMIT_DATA_KEYS,
     DRAFTED_EXTRA_DATA_KEYS,
     gen_child_rrs,
     gen_rrs_by_extra_data_key,
@@ -320,6 +321,16 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
     for key in DRAFTED_EXTRA_DATA_KEYS:
         if key in draft_extra_data:
             review_request.extra_data[key] = draft_extra_data[key]
+
+    commit_data = CommitData.objects.get_or_create(
+        review_request=review_request)[0]
+
+    # Copy any drafted CommitData from draft_extra_data to extra_data.
+    for key in DRAFTED_COMMIT_DATA_KEYS:
+        if key in commit_data.draft_extra_data:
+            commit_data.extra_data[key] = commit_data.draft_extra_data[key]
+
+    commit_data.save(update_fields=['extra_data'])
 
     review_request.save()
 

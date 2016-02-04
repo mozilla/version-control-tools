@@ -29,6 +29,11 @@ DRAFTED_EXTRA_DATA_KEYS = (
     IDENTIFIER_KEY,
 )
 
+# CommitData fields which should be automatically copied from
+# draft_extra_data to extra_data when a review request is published.
+DRAFTED_COMMIT_DATA_KEYS = (
+)
+
 REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')
 
 
