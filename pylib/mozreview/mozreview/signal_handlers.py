@@ -46,7 +46,6 @@ from mozreview.errors import (
 from mozreview.extra_data import (
     DISCARD_ON_PUBLISH_KEY,
     DRAFTED_COMMIT_DATA_KEYS,
-    DRAFTED_EXTRA_DATA_KEYS,
     fetch_commit_data,
     gen_child_rrs,
     gen_rrs_by_extra_data_key,
@@ -334,14 +333,6 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
 
         review_request.extra_data[UNPUBLISHED_KEY] = '[]'
         review_request.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
-
-    # Copy p2rb extra data from the draft, overwriting the current
-    # values on the review request.
-    draft_extra_data = review_request_draft.extra_data
-
-    for key in DRAFTED_EXTRA_DATA_KEYS:
-        if key in draft_extra_data:
-            review_request.extra_data[key] = draft_extra_data[key]
 
     commit_data = CommitData.objects.get_or_create(
         review_request=review_request)[0]

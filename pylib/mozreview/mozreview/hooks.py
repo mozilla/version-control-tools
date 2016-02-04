@@ -4,13 +4,20 @@ import logging
 
 from reviewboard.extensions.hooks import ReviewRequestApprovalHook
 
-from mozreview.extra_data import (COMMIT_ID_KEY,
-                                  gen_child_rrs,
-                                  is_parent,
-                                  is_pushed)
-from mozreview.models import get_profile
-from mozreview.review_helpers import (has_valid_shipit,
-                                      has_l3_shipit)
+from mozreview.extra_data import (
+    COMMIT_ID_KEY,
+    fetch_commit_data,
+    gen_child_rrs,
+    is_parent,
+    is_pushed,
+)
+from mozreview.models import (
+    get_profile,
+)
+from mozreview.review_helpers import (
+    has_valid_shipit,
+    has_l3_shipit,
+)
 
 
 class MozReviewApprovalHook(ReviewRequestApprovalHook):
@@ -68,7 +75,8 @@ class MozReviewApprovalHook(ReviewRequestApprovalHook):
 
         for rr in children:
             if not rr.approved:
-                commit_id = rr.extra_data.get(COMMIT_ID_KEY, None)
+                commit_data = fetch_commit_data(rr)
+                commit_id = commit_data.extra_data.get(COMMIT_ID_KEY, None)
 
                 if commit_id is None:
                     logging.error('Review request %s missing commit_id'

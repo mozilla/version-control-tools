@@ -18,6 +18,7 @@ from reviewboard.diffviewer.models import (
 )
 from reviewboard.reviews.models import (
     ReviewRequest,
+    ReviewRequestDraft,
 )
 
 
@@ -86,6 +87,30 @@ class CommitData(models.Model):
     draft_extra_data = JSONField(
         default='{}',
         blank=False)
+
+    def get_for(self, review_request_details, key, default=None):
+        """Return the extra data value for either a review request or a draft.
+
+        This helper method allows a caller to fetch a key from either
+        extra_data or draft_extra_data when they want the data associated
+        with a ReviewRequest or a ReviewRequestDraft respectively.
+        """
+        if isinstance(review_request_details, ReviewRequestDraft):
+            return self.draft_extra_data.get(key, default)
+
+        return self.extra_data.get(key, default)
+
+    def set_for(self, review_request_details, key, value):
+        """Set the extra data value for either a review request or a draft.
+
+        This helper method allows a caller to set a key on either
+        extra_data or draft_extra_data when they want the data associated
+        with a ReviewRequest or a ReviewRequestDraft respectively.
+        """
+        if isinstance(review_request_details, ReviewRequestDraft):
+            self.draft_extra_data[key] = value
+        else:
+            self.extra_data[key] = value
 
     class Meta:
         app_label = 'mozreview'

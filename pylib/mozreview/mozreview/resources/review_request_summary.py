@@ -13,11 +13,14 @@ from reviewboard.reviews.models import ReviewRequest
 from reviewboard.webapi.encoder import status_to_string
 from reviewboard.webapi.resources import WebAPIResource
 
-from mozreview.extra_data import (COMMITS_KEY,
-                                  COMMIT_ID_KEY,
-                                  MOZREVIEW_KEY,
-                                  gen_child_rrs,
-                                  get_parent_rr)
+from mozreview.extra_data import (
+    COMMITS_KEY,
+    COMMIT_ID_KEY,
+    MOZREVIEW_KEY,
+    fetch_commit_data,
+    gen_child_rrs,
+    get_parent_rr,
+)
 from mozreview.models import BugzillaUserMap
 from mozreview.errors import NOT_PARENT
 from mozreview.extra_data import is_parent
@@ -276,8 +279,9 @@ class ReviewRequestSummaryResource(WebAPIResource):
                     self._summarize_review_request(
                         request,
                         family['children'][child_rrid],
-                        family['children'][child_rrid].extra_data[
-                            COMMIT_ID_KEY]
+                        fetch_commit_data(
+                            family['children'][child_rrid]
+                        ).extra_data[COMMIT_ID_KEY]
                     )
                     for child_rrid in child_rrids
                 ]

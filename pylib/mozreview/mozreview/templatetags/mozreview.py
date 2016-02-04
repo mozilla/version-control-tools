@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 
 from mozreview.extra_data import (
     COMMIT_ID_KEY,
+    fetch_commit_data,
     MOZREVIEW_KEY,
     SQUASHED_KEY,
 )
@@ -27,7 +28,8 @@ def isPush(aReviewRequest):
 @register.filter()
 def commit_id(review_request_details):
     """Return the commit id of a review request or review request draft"""
-    return str(review_request_details.extra_data.get(COMMIT_ID_KEY))
+    commit_data = fetch_commit_data(review_request_details)
+    return str(commit_data.get_for(review_request_details, COMMIT_ID_KEY))
 
 
 def reviewer_list(review_request):

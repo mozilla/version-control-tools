@@ -837,10 +837,9 @@ def update_review_request(local_site, request, privileged_user, reviewer_cache,
     draft.description = commit['message']
     draft.bugs_closed = commit['bug']
 
-    draft.extra_data[COMMIT_ID_KEY] = commit['id']
-
     commit_data = fetch_commit_data(draft)
     commit_data.draft_extra_data.update({
+        COMMIT_ID_KEY: commit['id'],
         FIRST_PUBLIC_ANCESTOR_KEY: commit['first_public_ancestor'],
     })
     commit_data.save(

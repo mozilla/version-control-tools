@@ -17,6 +17,7 @@ from mozreview.extra_data import (
     BASE_COMMIT_KEY,
     COMMIT_ID_KEY,
     COMMITS_KEY,
+    fetch_commit_data,
     gen_child_rrs,
     get_parent_rr,
     is_parent,
@@ -115,11 +116,17 @@ class ImportCommitField(BaseReviewRequestField):
     field_id = "p2rb.ImportCommitField"
     label = _("Import")
 
+    def __init__(self, review_request_details, *args, **kwargs):
+        self.commit_data = fetch_commit_data(review_request_details)
+
+        super(ImportCommitField, self).__init__(review_request_details,
+                                                *args, **kwargs)
+
     def should_render(self, value):
-        return not is_parent(self.review_request_details)
+        return not is_parent(self.review_request_details, self.commit_data)
 
     def as_html(self):
-        commit_id = self.review_request_details.extra_data.get(COMMIT_ID_KEY)
+        commit_id = self.commit_data.extra_data.get(COMMIT_ID_KEY)
         review_request = self.review_request_details.get_review_request()
         repo_path = review_request.repository.path
 
@@ -140,17 +147,27 @@ class PullCommitField(BaseReviewRequestField):
     field_id = "p2rb.PullCommitField"
     label = _("Pull")
 
-    def as_html(self):
-        commit_id = self.review_request_details.extra_data.get(COMMIT_ID_KEY)
+    def __init__(self, review_request_details, *args, **kwargs):
+        self.commit_data = fetch_commit_data(review_request_details)
 
-        if is_parent(self.review_request_details):
+        super(PullCommitField, self).__init__(review_request_details,
+                                              *args, **kwargs)
+
+    def as_html(self):
+        commit_id = self.commit_data.extra_data.get(COMMIT_ID_KEY)
+
+        if is_parent(self.review_request_details, self.commit_data):
             user = self.request.user
-            parent = get_parent_rr(self.review_request_details.get_review_request())
+            parent = get_parent_rr(
+                self.review_request_details.get_review_request(),
+                self.commit_data)
             parent_details = parent.get_draft() or parent
             children = [
                 child for child in gen_child_rrs(parent_details, user)
                 if child.is_accessible_by(user)]
-            commit_id = children[-1].extra_data.get(COMMIT_ID_KEY)
+
+            commit_data = fetch_commit_data(children[-1])
+            commit_id = commit_data.extra_data.get(COMMIT_ID_KEY)
 
         review_request = self.review_request_details.get_review_request()
         repo_path = review_request.repository.path

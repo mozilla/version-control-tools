@@ -151,9 +151,9 @@ We should have a disagreement between published and draft
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: 0aca5e4417025c80407d8f7f22864e8d09fbec50
     p2rb.is_squashed: false
   commit_extra_data:
+    p2rb.commit_id: 0aca5e4417025c80407d8f7f22864e8d09fbec50
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
   diffs:
@@ -182,9 +182,9 @@ We should have a disagreement between published and draft
     extra:
       calculated_trophies: true
       p2rb: true
-      p2rb.commit_id: b3be3d464d6b32130006cbdfa82f9f98a3c57a01
       p2rb.is_squashed: false
     commit_extra_data:
+      p2rb.commit_id: b3be3d464d6b32130006cbdfa82f9f98a3c57a01
       p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
       p2rb.identifier: bz://1/mynick
     diffs:
@@ -261,9 +261,9 @@ Discarding the parent review request draft should discard draft on children
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: 0aca5e4417025c80407d8f7f22864e8d09fbec50
     p2rb.is_squashed: false
   commit_extra_data:
+    p2rb.commit_id: 0aca5e4417025c80407d8f7f22864e8d09fbec50
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
   diffs:

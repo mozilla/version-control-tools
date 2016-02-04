@@ -168,9 +168,9 @@ Child review request with ID 2 should be closed as discarded...
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.is_squashed: false
   commit_extra_data:
+    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
   diffs:
@@ -206,9 +206,9 @@ Child review request with ID 3 should be closed as discarded...
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.is_squashed: false
   commit_extra_data:
+    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
   diffs:
@@ -372,9 +372,9 @@ Child review request with ID 2 should be re-opened...
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.is_squashed: false
   commit_extra_data:
+    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
   diffs:
@@ -403,9 +403,9 @@ Child review request with ID 2 should be re-opened...
     extra:
       calculated_trophies: true
       p2rb: true
-      p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
       p2rb.is_squashed: false
     commit_extra_data:
+      p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
     diffs: []
@@ -426,9 +426,9 @@ Child review request with ID 3 should be re-opened...
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.is_squashed: false
   commit_extra_data:
+    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
   diffs:
@@ -457,9 +457,9 @@ Child review request with ID 3 should be re-opened...
     extra:
       calculated_trophies: true
       p2rb: true
-      p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
       p2rb.is_squashed: false
     commit_extra_data:
+      p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
     diffs: []
@@ -586,9 +586,9 @@ Child review request with ID 2 should be published.
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.is_squashed: false
   commit_extra_data:
+    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
   diffs:
@@ -624,9 +624,9 @@ Child review request with ID 3 should be published.
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.is_squashed: false
   commit_extra_data:
+    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
   diffs:

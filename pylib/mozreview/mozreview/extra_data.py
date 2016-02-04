@@ -20,19 +20,13 @@ MOZREVIEW_KEY = 'p2rb'
 
 BASE_COMMIT_KEY = MOZREVIEW_KEY + '.base_commit'
 COMMITS_KEY = MOZREVIEW_KEY + '.commits'
-COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
 DISCARD_ON_PUBLISH_KEY = MOZREVIEW_KEY + '.discard_on_publish_rids'
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
 SQUASHED_KEY = MOZREVIEW_KEY + '.is_squashed'
 UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
 
-# Extra data fields which should be automatically copied from
-# the draft to the review request on publish.
-DRAFTED_EXTRA_DATA_KEYS = (
-    COMMIT_ID_KEY,
-)
-
 # CommitData field keys:
+COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
 FIRST_PUBLIC_ANCESTOR_KEY = MOZREVIEW_KEY + '.first_public_ancestor'
 IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
 
@@ -41,6 +35,7 @@ IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
 DRAFTED_COMMIT_DATA_KEYS = (
     FIRST_PUBLIC_ANCESTOR_KEY,
     IDENTIFIER_KEY,
+    COMMIT_ID_KEY,
 )
 
 REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')
@@ -78,36 +73,35 @@ def is_pushed(review_request, commit_data=None):
             (is_draft and IDENTIFIER_KEY in commit_data.draft_extra_data))
 
 
-def is_parent(review_request):
+def is_parent(review_request, commit_data=None):
     """Is this a MozReview 'parent' review request.
 
     If this review request represents the folded diff parent of each child
     review request we will return True. This will return false on each of the
     child review requests (or a request which was not pushed).
+
+    TODO: Use commit_data when SQUASHED_KEY is migrated to
+    CommitData.
     """
     return str(review_request.extra_data.get(
         SQUASHED_KEY, False)).lower() == 'true'
 
 
-def get_parent_rr(review_request_details):
+def get_parent_rr(review_request_details, commit_data=None):
     """Retrieve the `review_request` parent.
 
     If `review_request` is a parent, return it directly.
     Otherwise return its parent based on the identifier in extra_data.
     """
-    is_draft = isinstance(review_request_details, ReviewRequestDraft)
-    commit_data = fetch_commit_data(review_request_details)
+    commit_data = fetch_commit_data(review_request_details, commit_data)
 
     if not is_pushed(review_request_details, commit_data):
         return None
 
-    if is_parent(review_request_details):
+    if is_parent(review_request_details, commit_data):
         return review_request_details
 
-    if is_draft:
-        identifier = commit_data.draft_extra_data[IDENTIFIER_KEY]
-    else:
-        identifier = commit_data.extra_data[IDENTIFIER_KEY]
+    identifier = commit_data.get_for(review_request_details, IDENTIFIER_KEY)
 
     return ReviewRequest.objects.get(
         commit_id=identifier,
