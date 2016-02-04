@@ -223,11 +223,11 @@ Publishing series during push works
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.is_squashed: false
   commit_extra_data:
     p2rb.commit_id: 2bc874a070cef1ff62b63e28f3d40a81655fec77
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
+    p2rb.is_squashed: false
   diffs:
   - id: 10
     revision: 1

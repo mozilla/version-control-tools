@@ -8,8 +8,8 @@ from django.contrib.auth.models import User
 from mozreview.extra_data import (
     COMMIT_ID_KEY,
     fetch_commit_data,
+    is_parent,
     MOZREVIEW_KEY,
-    SQUASHED_KEY,
 )
 from mozreview.review_helpers import get_reviewers_status
 
@@ -17,8 +17,8 @@ register = template.Library()
 
 
 @register.filter()
-def isSquashed(aReviewRequest):
-    return str(aReviewRequest.extra_data.get(SQUASHED_KEY, 'False')).lower() == 'true'
+def isSquashed(review_request):
+    return is_parent(review_request)
 
 @register.filter()
 def isPush(aReviewRequest):

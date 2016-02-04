@@ -371,6 +371,7 @@ class BatchReviewRequestResource(WebAPIResource):
                 IDENTIFIER_KEY: identifier,
                 FIRST_PUBLIC_ANCESTOR_KEY: (
                     commits['squashed']['first_public_ancestor']),
+                SQUASHED_KEY: True,
             })
             squashed_commit_data.draft_extra_data.update({
                 IDENTIFIER_KEY: identifier,
@@ -380,7 +381,6 @@ class BatchReviewRequestResource(WebAPIResource):
 
             squashed_rr.extra_data.update({
                 MOZREVIEW_KEY: True,
-                SQUASHED_KEY: True,
                 DISCARD_ON_PUBLISH_KEY: '[]',
                 UNPUBLISHED_KEY: '[]',
             })
@@ -592,6 +592,7 @@ class BatchReviewRequestResource(WebAPIResource):
             commit_data = fetch_commit_data(rr)
             commit_data.extra_data.update({
                 IDENTIFIER_KEY: identifier,
+                SQUASHED_KEY: False,
             })
             commit_data.draft_extra_data.update({
                 IDENTIFIER_KEY: identifier,
@@ -600,7 +601,6 @@ class BatchReviewRequestResource(WebAPIResource):
                 update_fields=['extra_data', 'draft_extra_data'])
 
             rr.extra_data[MOZREVIEW_KEY] = True
-            rr.extra_data[SQUASHED_KEY] = False
             rr.save(update_fields=['extra_data'])
             logger.info('%s: created review request %d for commit %s' % (
                         identifier, rr.id, node))

@@ -378,10 +378,13 @@ def pullreviews(repo, proto, args=None):
             continue
 
         rr = rrs[0]
+        commit_data = client.get_path(
+            '/extensions/mozreview.extension.MozReviewExtension/'
+            'commit-data/%s/' % rr.id)
         extra_data = rr.extra_data
 
         try:
-            is_squashed = extra_data['p2rb.is_squashed']
+            is_squashed = commit_data.extra_data['p2rb.is_squashed']
         except KeyError:
             is_squashed = None
 
