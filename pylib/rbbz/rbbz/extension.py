@@ -2,8 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import logging
-
 from django.contrib.sites.models import Site
 
 from djblets.siteconfig.models import SiteConfiguration
@@ -11,10 +9,11 @@ from djblets.siteconfig.models import SiteConfiguration
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import AuthBackendHook, SignalHook
 from reviewboard.reviews.models import ReviewRequest
-from reviewboard.reviews.signals import (reply_publishing,
-                                         review_publishing,
-                                         review_request_closed,
-                                         review_request_reopened)
+from reviewboard.reviews.signals import (
+    reply_publishing,
+    review_publishing,
+    review_request_closed,
+)
 
 from mozreview.bugzilla.client import Bugzilla
 from mozreview.bugzilla.errors import (
@@ -27,7 +26,6 @@ from mozreview.extra_data import (
     DISCARD_ON_PUBLISH_KEY,
     gen_child_rrs,
     gen_rrs_by_extra_data_key,
-    IDENTIFIER_KEY,
     MOZREVIEW_KEY,
     SQUASHED_KEY,
     UNPUBLISHED_KEY,
@@ -77,7 +75,6 @@ class BugzillaExtension(Extension):
                    on_review_request_closed_discarded)
         SignalHook(self, review_request_closed,
                    on_review_request_closed_submitted)
-        SignalHook(self, review_request_reopened, on_review_request_reopened)
 
 
 def get_reply_url(reply, site=None, siteconfig=None):
@@ -219,52 +216,3 @@ def close_child_review_requests(user, review_request, status,
     review_request.extra_data[UNPUBLISHED_KEY] = '[]'
     review_request.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
     review_request.save()
-
-
-def on_review_request_reopened(user, review_request, **kwargs):
-    if not is_review_request_squashed(review_request):
-        return
-
-    identifier = review_request.extra_data[IDENTIFIER_KEY]
-
-    # If we're reviving a squashed review request that was discarded, it means
-    # we're going to want to restore the commit ID field back, since we remove
-    # it on discarding. This might be a problem if there's already a review
-    # request with the same commit ID somewhere on Review Board, since commit
-    # IDs are unique.
-    #
-    # When this signal fires, the state of the review request has already
-    # changed, so we query for a review request with the same commit ID that is
-    # not equal to the revived review request.
-    try:
-        preexisting_review_request = ReviewRequest.objects.get(
-            commit_id=identifier, repository=review_request.repository)
-        if preexisting_review_request != review_request:
-            logging.error("Could not revive review request with ID %s "
-                          "because its commit id (%s) is already being used by "
-                          "a review request with ID %s."
-                          % (review_request.id, identifier,
-                             preexisting_review_request.id))
-            # TODO: We need Review Board to recognize exceptions in these signal
-            # handlers so that the UI can print out a useful message.
-            raise Exception("Revive failed because a review request with commit ID %s "
-                            "already exists." % identifier)
-    except ReviewRequest.DoesNotExist:
-        # Great! This is a success case.
-        pass
-
-    for child in gen_child_rrs(review_request):
-        child.reopen(user=user)
-
-    # If the review request had been discarded, then the commit ID would
-    # have been cleared out. If the review request had been submitted,
-    # this is a no-op, since the commit ID would have been there already.
-    review_request.commit = identifier
-    review_request.save()
-
-    # If the review request has a draft, we have to set the commit ID there as
-    # well, otherwise it'll get overwritten on publish.
-    draft = review_request.get_draft(user)
-    if draft:
-        draft.commit = identifier
-        draft.save()
