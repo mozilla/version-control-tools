@@ -17,9 +17,9 @@ def get_ldap_connection():
     """
     ext = get_extension_manager().get_enabled_extension(
         'mozreview.extension.MozReviewExtension')
-    url = ext.settings.get('ldap_url')
-    user = ext.settings.get('ldap_user')
-    password = ext.settings.get('ldap_password')
+    url = ext.get_settings('ldap_url')
+    user = ext.get_settings('ldap_user')
+    password = ext.get_settings('ldap_password')
 
     if any([not url, not user, not password]):
         logging.error("MozReview ldap support configured incorrectly.")

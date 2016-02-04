@@ -1,5 +1,9 @@
 from __future__ import unicode_literals
 
+import json
+import logging
+import os
+
 from django.conf.urls import include, patterns, url
 
 from reviewboard.extensions.base import Extension, JSExtension
@@ -80,6 +84,10 @@ from mozreview.resources.review_request_summary import (
 from mozreview.signal_handlers import (
     initialize_signal_handlers,
 )
+
+
+SETTINGS_PATH = os.path.join('/', 'mozreview-settings.json')
+SETTINGS = None
 
 
 class ParentJSExtension(JSExtension):
@@ -313,3 +321,24 @@ class MozReviewExtension(Extension):
             info_fieldset.add_field(BlocksField)
 
         super(MozReviewExtension, self).shutdown()
+
+    def get_settings(self, key, default=None):
+        """This gets settings from the mozreview-settings.json file
+
+        It caches the settings in memory and reloads them if changes are
+        detected on disk.
+
+        This code is derived from autoland/autoland/config.py.
+        """
+
+        global SETTINGS
+
+        try:
+            if SETTINGS is None:
+                with open(SETTINGS_PATH, 'r') as f:
+                    SETTINGS = json.load(f)
+            return SETTINGS.get(key, self.default_settings.get(key, default))
+        except IOError:
+            logging.error('Could not access settings file (using defaults)'
+                          ': %s' % SETTINGS_PATH)
+            return self.default_settings.get(key, default)

@@ -160,12 +160,12 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
                      'ID %s for revision %s '
                      % (review_request_id, last_revision))
 
-        autoland_url = ext.settings.get('autoland_url')
+        autoland_url = ext.get_settings('autoland_url')
         if not autoland_url:
             return AUTOLAND_CONFIGURATION_ERROR
 
-        autoland_user = ext.settings.get('autoland_user')
-        autoland_password = ext.settings.get('autoland_password')
+        autoland_user = ext.get_settings('autoland_user')
+        autoland_password = ext.get_settings('autoland_password')
 
         if not autoland_user or not autoland_password:
             return AUTOLAND_CONFIGURATION_ERROR
@@ -307,12 +307,12 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
                      'ID %s for revision %s '
                      % (review_request_id, last_revision))
 
-        autoland_url = ext.settings.get('autoland_url')
+        autoland_url = ext.get_settings('autoland_url')
         if not autoland_url:
             return AUTOLAND_CONFIGURATION_ERROR
 
-        autoland_user = ext.settings.get('autoland_user')
-        autoland_password = ext.settings.get('autoland_password')
+        autoland_user = ext.get_settings('autoland_user')
+        autoland_password = ext.get_settings('autoland_password')
 
         if not autoland_user or not autoland_password:
             return AUTOLAND_CONFIGURATION_ERROR
@@ -457,7 +457,7 @@ class AutolandRequestUpdateResource(WebAPIResource):
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
 
-        testing = ext.settings.get('autoland_testing', False)
+        testing = ext.get_settings('autoland_testing', False)
 
         if not testing and not request.user.has_perm(
                 'mozreview.add_autolandeventlogentry'):
@@ -593,14 +593,14 @@ class ImportPullRequestTriggerResource(WebAPIResource):
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
 
-        testing = ext.settings.get('autoland_testing', False)
+        testing = ext.get_settings('autoland_testing', False)
 
-        autoland_url = ext.settings.get('autoland_url')
+        autoland_url = ext.get_settings('autoland_url')
         if not autoland_url:
             return AUTOLAND_CONFIGURATION_ERROR
 
-        autoland_user = ext.settings.get('autoland_user')
-        autoland_password = ext.settings.get('autoland_password')
+        autoland_user = ext.get_settings('autoland_user')
+        autoland_password = ext.get_settings('autoland_password')
 
         if not autoland_user or not autoland_password:
             return AUTOLAND_CONFIGURATION_ERROR
@@ -746,7 +746,7 @@ class ImportPullRequestUpdateResource(WebAPIResource):
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
 
-        testing = ext.settings.get('autoland_testing', False)
+        testing = ext.get_settings('autoland_testing', False)
 
         if not testing and not request.user.has_perm(
                 'mozreview.add_autolandeventlogentry'):

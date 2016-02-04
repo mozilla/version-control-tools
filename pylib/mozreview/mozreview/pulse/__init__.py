@@ -120,9 +120,9 @@ def publish_message(extension, msg):
 
 def get_pulse_config(extension):
     return {
-        'host': extension.settings['pulse_host'] or None,
-        'port': extension.settings['pulse_port'] or None,
-        'ssl': extension.settings['pulse_ssl'] or False,
-        'user': extension.settings['pulse_user'] or None,
-        'password': extension.settings['pulse_password'] or None,
+        'host': extension.get_settings('pulse_host'),
+        'port': extension.get_settings('pulse_port'),
+        'ssl': extension.get_settings('pulse_ssl', False),
+        'user': extension.get_settings('pulse_user'),
+        'password': extension.get_settings('pulse_password')
     }

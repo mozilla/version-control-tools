@@ -8,7 +8,7 @@ from reviewboard.extensions.base import get_extension_manager
 def import_pullrequest(request, user, repo, pullrequest):
     ext = get_extension_manager().get_enabled_extension(
         'mozreview.extension.MozReviewExtension')
-    enabled = ext.settings.get('autoland_import_pullrequest_ui_enabled', False)
+    enabled = ext.get_settings('autoland_import_pullrequest_ui_enabled', False)
 
     if not enabled:
         return HttpResponseForbidden('Importing pullrequests is disabled')

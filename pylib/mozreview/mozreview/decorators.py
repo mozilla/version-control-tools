@@ -23,7 +23,7 @@ def if_ext_enabled(fn):
         if ext is None:
             return
 
-        if not ext.settings.get('enabled', False):
+        if not ext.get_settings('enabled', False):
             return
 
         return fn(*args, **kwargs)
