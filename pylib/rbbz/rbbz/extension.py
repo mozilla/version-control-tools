@@ -8,11 +8,9 @@ from djblets.siteconfig.models import SiteConfiguration
 
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import AuthBackendHook, SignalHook
-from reviewboard.reviews.models import ReviewRequest
 from reviewboard.reviews.signals import (
     reply_publishing,
     review_publishing,
-    review_request_closed,
 )
 
 from mozreview.bugzilla.client import Bugzilla
@@ -23,15 +21,8 @@ from mozreview.errors import (
     ParentShipItError,
 )
 from mozreview.extra_data import (
-    DISCARD_ON_PUBLISH_KEY,
-    gen_child_rrs,
-    gen_rrs_by_extra_data_key,
     MOZREVIEW_KEY,
     SQUASHED_KEY,
-    UNPUBLISHED_KEY,
-)
-from mozreview.messages import (
-    NEVER_USED_DESCRIPTION,
 )
 from mozreview.models import (
     get_bugzilla_api_key,
@@ -43,15 +34,6 @@ from rbbz.auth import BugzillaBackend
 from rbbz.diffs import build_plaintext_review
 from rbbz.middleware import CorsHeaderMiddleware
 from rbbz.resources import bugzilla_cookie_login_resource
-
-
-AUTO_CLOSE_DESCRIPTION = """
-Discarded automatically because parent review request was discarded.
-"""
-
-AUTO_SUBMITTED_DESCRIPTION = """
-Submitted because the parent review request was submitted.
-"""
 
 
 class BugzillaExtension(Extension):
@@ -71,10 +53,6 @@ class BugzillaExtension(Extension):
                    sandbox_errors=False)
         SignalHook(self, reply_publishing, on_reply_publishing,
                    sandbox_errors=False)
-        SignalHook(self, review_request_closed,
-                   on_review_request_closed_discarded)
-        SignalHook(self, review_request_closed,
-                   on_review_request_closed_submitted)
 
 
 def get_reply_url(reply, site=None, siteconfig=None):
@@ -158,61 +136,3 @@ def on_reply_publishing(user, reply, **kwargs):
     url = get_reply_url(reply)
     comment = build_plaintext_review(reply, url, {"user": user})
     b.post_comment(bug_id, comment)
-
-
-def on_review_request_closed_discarded(user, review_request, type, **kwargs):
-    if type != ReviewRequest.DISCARDED:
-        return
-
-    if is_review_request_squashed(review_request):
-        # close_child_review_requests will call save on this review request, so
-        # we don't have to worry about it.
-        review_request.commit = None
-
-        close_child_review_requests(user, review_request,
-                                    ReviewRequest.DISCARDED,
-                                    AUTO_CLOSE_DESCRIPTION)
-    else:
-        # TODO: Remove this once we properly prevent users from closing
-        # commit review requests.
-        b = Bugzilla(get_bugzilla_api_key(user))
-        bug = int(review_request.get_bug_list()[0])
-        diff_url = '%sdiff/#index_header' % get_obj_url(review_request)
-        b.obsolete_review_attachments(bug, diff_url)
-
-
-def on_review_request_closed_submitted(user, review_request, type, **kwargs):
-    if (not is_review_request_squashed(review_request) or
-        type != ReviewRequest.SUBMITTED):
-        return
-
-    close_child_review_requests(user, review_request, ReviewRequest.SUBMITTED,
-                                  AUTO_SUBMITTED_DESCRIPTION)
-
-
-def close_child_review_requests(user, review_request, status,
-                                  child_close_description):
-    """Closes all child review requests for a squashed review request."""
-    # At the point of closing, it's possible that if this review
-    # request was never published, that most of the fields are empty
-    # (See https://code.google.com/p/reviewboard/issues/detail?id=3465).
-    # Luckily, the extra_data is still around, and more luckily, it's
-    # not exposed in the UI for user-meddling. We can find all of the
-    # child review requests via extra_data.p2rb.commits.
-    for child in gen_child_rrs(review_request):
-        child.close(status,
-                    user=user,
-                    description=child_close_description)
-
-    # We want to discard any review requests that this squashed review
-    # request never got to publish, so were never part of its "commits"
-    # list.
-    for child in gen_rrs_by_extra_data_key(review_request,
-                                           UNPUBLISHED_KEY):
-        child.close(ReviewRequest.DISCARDED,
-                    user=user,
-                    description=NEVER_USED_DESCRIPTION)
-
-    review_request.extra_data[UNPUBLISHED_KEY] = '[]'
-    review_request.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
-    review_request.save()

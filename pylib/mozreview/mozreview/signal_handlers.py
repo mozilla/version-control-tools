@@ -23,6 +23,7 @@ from reviewboard.reviews.models import (
     ReviewRequestDraft,
 )
 from reviewboard.reviews.signals import (
+    review_request_closed,
     review_request_publishing,
     review_request_reopened,
 )
@@ -58,6 +59,8 @@ from mozreview.extra_data import (
     update_parent_rr_reviewers,
 )
 from mozreview.messages import (
+    AUTO_CLOSE_DESCRIPTION,
+    AUTO_SUBMITTED_DESCRIPTION,
     NEVER_USED_DESCRIPTION,
     OBSOLETE_DESCRIPTION,
 )
@@ -100,6 +103,16 @@ def initialize_signal_handlers(extension):
         extension,
         review_request_reopened,
         on_review_request_reopened)
+
+    SignalHook(
+        extension,
+        review_request_closed,
+        on_review_request_closed_discarded)
+
+    SignalHook(
+        extension,
+        review_request_closed,
+        on_review_request_closed_submitted)
 
     SignalHook(
         extension,
@@ -456,3 +469,61 @@ def on_review_request_reopened(user, review_request, **kwargs):
     if draft:
         draft.commit = identifier
         draft.save()
+
+
+def on_review_request_closed_discarded(user, review_request, type, **kwargs):
+    if type != ReviewRequest.DISCARDED:
+        return
+
+    if is_parent(review_request):
+        # close_child_review_requests will call save on this review request, so
+        # we don't have to worry about it.
+        review_request.commit = None
+
+        _close_child_review_requests(user, review_request,
+                                     ReviewRequest.DISCARDED,
+                                     AUTO_CLOSE_DESCRIPTION)
+    else:
+        # TODO: Remove this once we properly prevent users from closing
+        # commit review requests.
+        b = Bugzilla(get_bugzilla_api_key(user))
+        bug = int(review_request.get_bug_list()[0])
+        diff_url = '%sdiff/#index_header' % get_obj_url(review_request)
+        b.obsolete_review_attachments(bug, diff_url)
+
+
+def on_review_request_closed_submitted(user, review_request, type, **kwargs):
+    if (not is_parent(review_request) or
+            type != ReviewRequest.SUBMITTED):
+        return
+
+    _close_child_review_requests(user, review_request, ReviewRequest.SUBMITTED,
+                                 AUTO_SUBMITTED_DESCRIPTION)
+
+
+def _close_child_review_requests(user, review_request, status,
+                                 child_close_description):
+    """Closes all child review requests for a squashed review request."""
+    # At the point of closing, it's possible that if this review
+    # request was never published, that most of the fields are empty
+    # (See https://code.google.com/p/reviewboard/issues/detail?id=3465).
+    # Luckily, the extra_data is still around, and more luckily, it's
+    # not exposed in the UI for user-meddling. We can find all of the
+    # child review requests via extra_data.p2rb.commits.
+    for child in gen_child_rrs(review_request):
+        child.close(status,
+                    user=user,
+                    description=child_close_description)
+
+    # We want to discard any review requests that this squashed review
+    # request never got to publish, so were never part of its "commits"
+    # list.
+    for child in gen_rrs_by_extra_data_key(review_request,
+                                           UNPUBLISHED_KEY):
+        child.close(ReviewRequest.DISCARDED,
+                    user=user,
+                    description=NEVER_USED_DESCRIPTION)
+
+    review_request.extra_data[UNPUBLISHED_KEY] = '[]'
+    review_request.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
+    review_request.save()
