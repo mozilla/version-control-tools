@@ -7,7 +7,14 @@ import logging
 import re
 
 from reviewboard.changedescs.models import ChangeDescription
-from reviewboard.reviews.models import ReviewRequest
+from reviewboard.reviews.models import (
+    ReviewRequest,
+    ReviewRequestDraft,
+)
+
+from mozreview.models import (
+    CommitData,
+)
 
 MOZREVIEW_KEY = 'p2rb'
 
@@ -16,7 +23,6 @@ COMMITS_KEY = MOZREVIEW_KEY + '.commits'
 COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
 DISCARD_ON_PUBLISH_KEY = MOZREVIEW_KEY + '.discard_on_publish_rids'
 FIRST_PUBLIC_ANCESTOR_KEY = MOZREVIEW_KEY + '.first_public_ancestor'
-IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
 SQUASHED_KEY = MOZREVIEW_KEY + '.is_squashed'
 UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
@@ -26,20 +32,50 @@ UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
 DRAFTED_EXTRA_DATA_KEYS = (
     COMMIT_ID_KEY,
     FIRST_PUBLIC_ANCESTOR_KEY,
-    IDENTIFIER_KEY,
 )
+
+# CommitData field keys:
+IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
 
 # CommitData fields which should be automatically copied from
 # draft_extra_data to extra_data when a review request is published.
 DRAFTED_COMMIT_DATA_KEYS = (
+    IDENTIFIER_KEY,
 )
 
 REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')
 
 
-def is_pushed(review_request):
+def fetch_commit_data(review_request_details, commit_data=None):
+    """fetch the CommitData object associated with a review request details
+
+    If a CommitData object is also provided we will verify that it represents
+    the provided review_request_details.
+    """
+    is_draft = isinstance(review_request_details, ReviewRequestDraft)
+
+    if commit_data is None and is_draft:
+        commit_data = CommitData.objects.get_or_create(
+            review_request_id=review_request_details.review_request_id)[0]
+    elif commit_data is None:
+        commit_data = CommitData.objects.get_or_create(
+            review_request_id=review_request_details.id)[0]
+    elif is_draft:
+        assert (commit_data.review_request_id ==
+                review_request_details.review_request_id)
+    else:
+        assert commit_data.review_request_id == review_request_details.id
+
+    return commit_data
+
+
+def is_pushed(review_request, commit_data=None):
     """Is this a review request that was pushed to MozReview."""
-    return IDENTIFIER_KEY in review_request.extra_data
+    commit_data = fetch_commit_data(review_request, commit_data=commit_data)
+
+    is_draft = isinstance(review_request, ReviewRequestDraft)
+    return ((not is_draft and IDENTIFIER_KEY in commit_data.extra_data) or
+            (is_draft and IDENTIFIER_KEY in commit_data.draft_extra_data))
 
 
 def is_parent(review_request):
@@ -53,21 +89,29 @@ def is_parent(review_request):
         SQUASHED_KEY, False)).lower() == 'true'
 
 
-def get_parent_rr(review_request):
+def get_parent_rr(review_request_details):
     """Retrieve the `review_request` parent.
 
     If `review_request` is a parent, return it directly.
     Otherwise return its parent based on the identifier in extra_data.
     """
-    if not is_pushed(review_request):
+    is_draft = isinstance(review_request_details, ReviewRequestDraft)
+    commit_data = fetch_commit_data(review_request_details)
+
+    if not is_pushed(review_request_details, commit_data):
         return None
 
-    if is_parent(review_request):
-        return review_request
+    if is_parent(review_request_details):
+        return review_request_details
+
+    if is_draft:
+        identifier = commit_data.draft_extra_data[IDENTIFIER_KEY]
+    else:
+        identifier = commit_data.extra_data[IDENTIFIER_KEY]
 
     return ReviewRequest.objects.get(
-        commit_id=review_request.extra_data[IDENTIFIER_KEY],
-        repository=review_request.repository)
+        commit_id=identifier,
+        repository=review_request_details.repository)
 
 
 def gen_child_rrs(review_request, user=None):

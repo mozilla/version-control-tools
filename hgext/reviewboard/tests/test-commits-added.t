@@ -94,10 +94,10 @@ The parent review should have its description updated.
     p2rb: true
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[2, 3, 4]'
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs: []
   approved: false
   approval_failure: The review request is not public.
@@ -115,11 +115,11 @@ The parent review should have its description updated.
         3], ["4cb601f74de529935048816623637fb0ca2812a4", 4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-      p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{"3": [], "2": []}'
       p2rb.unpublished_rids: '[]'
-    commit_extra_data: {}
+    commit_extra_data:
+      p2rb.identifier: bz://1/mynick
     diffs:
     - id: 4
       revision: 1

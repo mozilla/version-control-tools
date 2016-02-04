@@ -374,11 +374,11 @@ Test creating a review via HTTP
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 6432ccd4579e0fdc337b6dc55b827cbcc7fee397
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 1
     revision: 1

@@ -51,9 +51,9 @@ The globbing is patching over a bug in mach
     p2rb: true
     p2rb.commit_id: f03366314c7798387fcd3e367afaa6ba472feb5d
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 2
     revision: 1

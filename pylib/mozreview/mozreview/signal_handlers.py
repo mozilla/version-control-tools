@@ -47,6 +47,7 @@ from mozreview.extra_data import (
     DISCARD_ON_PUBLISH_KEY,
     DRAFTED_COMMIT_DATA_KEYS,
     DRAFTED_EXTRA_DATA_KEYS,
+    fetch_commit_data,
     gen_child_rrs,
     gen_rrs_by_extra_data_key,
     gen_rrs_by_rids,
@@ -207,9 +208,10 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                 'message in error, please file a bug.')
 
     review_request = review_request_draft.get_review_request()
+    commit_data = fetch_commit_data(review_request)
 
     # skip review requests that were not pushed
-    if not is_pushed(review_request):
+    if not is_pushed(review_request, commit_data=commit_data):
         return
 
     if not is_parent(review_request):
@@ -231,7 +233,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
 
     # The reviewid passed through p2rb is, for Mozilla's instance anyway,
     # bz://<bug id>/<irc nick>.
-    reviewid = review_request_draft.extra_data.get(IDENTIFIER_KEY, None)
+    reviewid = commit_data.draft_extra_data.get(IDENTIFIER_KEY, None)
     m = REVIEWID_RE.match(reviewid)
 
     if not m:
@@ -423,7 +425,8 @@ def on_review_request_reopened(user, review_request, **kwargs):
     if not is_parent(review_request):
         return
 
-    identifier = review_request.extra_data[IDENTIFIER_KEY]
+    commit_data = fetch_commit_data(review_request)
+    identifier = commit_data.extra_data[IDENTIFIER_KEY]
 
     # If we're reviving a squashed review request that was discarded, it means
     # we're going to want to restore the commit ID field back, since we remove

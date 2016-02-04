@@ -127,11 +127,11 @@ Review request 6 should be added to the list of discard on publish rids.
       5], ["76088734e3cba33be80930be14e7cd1e9ee474be", 6]]'
     p2rb.discard_on_publish_rids: '[6]'
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 1
     revision: 1
@@ -188,11 +188,11 @@ Review request 6 should be added to the list of discard on publish rids.
         5]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-      p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{}'
       p2rb.unpublished_rids: '[]'
-    commit_extra_data: {}
+    commit_extra_data:
+      p2rb.identifier: bz://1/mynick
     diffs:
     - id: 7
       revision: 2
@@ -246,9 +246,9 @@ Review 6 should be marked as discarded
     p2rb: true
     p2rb.commit_id: 76088734e3cba33be80930be14e7cd1e9ee474be
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 6
     revision: 1
@@ -317,9 +317,9 @@ The first commit was rewritten (we assume all subsequent were as well).
     p2rb: true
     p2rb.commit_id: 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 2
     revision: 1
@@ -348,9 +348,9 @@ The first commit was rewritten (we assume all subsequent were as well).
       p2rb: true
       p2rb.commit_id: 7050183d97d5f601da86fb313dd8783ccf1ade18
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-      p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
-    commit_extra_data: {}
+    commit_extra_data:
+      p2rb.identifier: bz://1/mynick
     diffs:
     - id: 9
       revision: 2
@@ -390,11 +390,11 @@ request is published.
       5]]'
     p2rb.discard_on_publish_rids: '[5]'
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 1
     revision: 1
@@ -481,11 +481,11 @@ request is published.
         3], ["b5473ad606f40840715d6b378dacc1a37f6263b1", 4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-      p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{"3": [], "2": [], "5": [], "4": []}'
       p2rb.unpublished_rids: '[]'
-    commit_extra_data: {}
+    commit_extra_data:
+      p2rb.identifier: bz://1/mynick
     diffs:
     - id: 8
       revision: 3

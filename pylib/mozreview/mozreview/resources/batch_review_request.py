@@ -46,10 +46,10 @@ from mozreview.extra_data import (
     COMMITS_KEY,
     COMMIT_ID_KEY,
     DISCARD_ON_PUBLISH_KEY,
+    fetch_commit_data,
     FIRST_PUBLIC_ANCESTOR_KEY,
     IDENTIFIER_KEY,
     MOZREVIEW_KEY,
-    REVIEWER_MAP_KEY,
     SQUASHED_KEY,
     UNPUBLISHED_KEY,
 )
@@ -366,10 +366,19 @@ class BatchReviewRequestResource(WebAPIResource):
                     user=user, repository=repo, commit_id=identifier,
                     local_site=local_site)
 
+            squashed_commit_data = fetch_commit_data(squashed_rr)
+            squashed_commit_data.extra_data.update({
+                IDENTIFIER_KEY: identifier,
+            })
+            squashed_commit_data.draft_extra_data.update({
+                IDENTIFIER_KEY: identifier,
+            })
+            squashed_commit_data.save(
+                update_fields=['extra_data', 'draft_extra_data'])
+
             squashed_rr.extra_data.update({
                 MOZREVIEW_KEY: True,
                 SQUASHED_KEY: True,
-                IDENTIFIER_KEY: identifier,
                 DISCARD_ON_PUBLISH_KEY: '[]',
                 UNPUBLISHED_KEY: '[]',
                 FIRST_PUBLIC_ANCESTOR_KEY: commits['squashed']['first_public_ancestor'],
@@ -579,9 +588,18 @@ class BatchReviewRequestResource(WebAPIResource):
                                               commit_id=None,
                                               local_site=local_site)
 
+            commit_data = fetch_commit_data(rr)
+            commit_data.extra_data.update({
+                IDENTIFIER_KEY: identifier,
+            })
+            commit_data.draft_extra_data.update({
+                IDENTIFIER_KEY: identifier,
+            })
+            commit_data.save(
+                update_fields=['extra_data', 'draft_extra_data'])
+
             rr.extra_data[MOZREVIEW_KEY] = True
             rr.extra_data[SQUASHED_KEY] = False
-            rr.extra_data[IDENTIFIER_KEY] = identifier
             rr.save(update_fields=['extra_data'])
             logger.info('%s: created review request %d for commit %s' % (
                         identifier, rr.id, node))

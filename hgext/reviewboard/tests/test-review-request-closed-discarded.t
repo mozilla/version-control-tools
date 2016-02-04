@@ -130,11 +130,11 @@ no Commit ID set.
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 1
     revision: 1
@@ -170,9 +170,9 @@ Child review request with ID 2 should be closed as discarded...
     p2rb: true
     p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 2
     revision: 1
@@ -208,9 +208,9 @@ Child review request with ID 3 should be closed as discarded...
     p2rb: true
     p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 3
     revision: 1
@@ -313,11 +313,11 @@ Commit ID re-instated.
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 1
     revision: 1
@@ -349,11 +349,11 @@ Commit ID re-instated.
         3]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-      p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{}'
       p2rb.unpublished_rids: '[]'
-    commit_extra_data: {}
+    commit_extra_data:
+      p2rb.identifier: bz://1/mynick
     diffs: []
 
 Child review request with ID 2 should be re-opened...
@@ -374,9 +374,9 @@ Child review request with ID 2 should be re-opened...
     p2rb: true
     p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 2
     revision: 1
@@ -405,9 +405,9 @@ Child review request with ID 2 should be re-opened...
       p2rb: true
       p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-      p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
-    commit_extra_data: {}
+    commit_extra_data:
+      p2rb.identifier: bz://1/mynick
     diffs: []
 
 Child review request with ID 3 should be re-opened...
@@ -428,9 +428,9 @@ Child review request with ID 3 should be re-opened...
     p2rb: true
     p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 3
     revision: 1
@@ -459,9 +459,9 @@ Child review request with ID 3 should be re-opened...
       p2rb: true
       p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-      p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
-    commit_extra_data: {}
+    commit_extra_data:
+      p2rb.identifier: bz://1/mynick
     diffs: []
 
 There should still not be a visible attachment on the bug
@@ -548,11 +548,11 @@ Squashed review request should be published.
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 1
     revision: 1
@@ -588,9 +588,9 @@ Child review request with ID 2 should be published.
     p2rb: true
     p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 2
     revision: 1
@@ -626,9 +626,9 @@ Child review request with ID 3 should be published.
     p2rb: true
     p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 3
     revision: 1
@@ -758,11 +758,11 @@ Pushing to a discarded review series will create a new series
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 1
     revision: 1
@@ -799,11 +799,11 @@ Pushing to a discarded review series will create a new series
       6], ["4cb601f74de529935048816623637fb0ca2812a4", 7]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
-  commit_extra_data: {}
+  commit_extra_data:
+    p2rb.identifier: bz://1/mynick
   diffs:
   - id: 4
     revision: 1
