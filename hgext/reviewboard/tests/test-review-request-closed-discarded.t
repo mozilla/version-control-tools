@@ -125,7 +125,6 @@ no Commit ID set.
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
@@ -133,6 +132,7 @@ no Commit ID set.
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   commit_extra_data:
+    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
   diffs:
@@ -308,7 +308,6 @@ Commit ID re-instated.
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
@@ -316,6 +315,7 @@ Commit ID re-instated.
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   commit_extra_data:
+    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
   diffs:
@@ -344,7 +344,6 @@ Commit ID re-instated.
     extra:
       calculated_trophies: true
       p2rb: true
-      p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
         3]]'
       p2rb.discard_on_publish_rids: '[]'
@@ -352,6 +351,7 @@ Commit ID re-instated.
       p2rb.reviewer_map: '{}'
       p2rb.unpublished_rids: '[]'
     commit_extra_data:
+      p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
     diffs: []
@@ -543,7 +543,6 @@ Squashed review request should be published.
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
@@ -551,6 +550,7 @@ Squashed review request should be published.
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   commit_extra_data:
+    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
   diffs:
@@ -753,7 +753,6 @@ Pushing to a discarded review series will create a new series
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
@@ -761,6 +760,7 @@ Pushing to a discarded review series will create a new series
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   commit_extra_data:
+    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
   diffs:
@@ -794,7 +794,6 @@ Pushing to a discarded review series will create a new series
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 5], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       6], ["4cb601f74de529935048816623637fb0ca2812a4", 7]]'
     p2rb.discard_on_publish_rids: '[]'
@@ -802,6 +801,7 @@ Pushing to a discarded review series will create a new series
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   commit_extra_data:
+    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
   diffs:

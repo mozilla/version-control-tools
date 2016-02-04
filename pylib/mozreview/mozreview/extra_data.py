@@ -18,7 +18,6 @@ from mozreview.models import (
 
 MOZREVIEW_KEY = 'p2rb'
 
-BASE_COMMIT_KEY = MOZREVIEW_KEY + '.base_commit'
 COMMITS_KEY = MOZREVIEW_KEY + '.commits'
 DISCARD_ON_PUBLISH_KEY = MOZREVIEW_KEY + '.discard_on_publish_rids'
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
@@ -26,6 +25,7 @@ SQUASHED_KEY = MOZREVIEW_KEY + '.is_squashed'
 UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
 
 # CommitData field keys:
+BASE_COMMIT_KEY = MOZREVIEW_KEY + '.base_commit'
 COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
 FIRST_PUBLIC_ANCESTOR_KEY = MOZREVIEW_KEY + '.first_public_ancestor'
 IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'

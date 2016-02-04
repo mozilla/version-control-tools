@@ -667,7 +667,8 @@ class BatchReviewRequestResource(WebAPIResource):
         squashed_draft.extra_data[COMMITS_KEY] = json.dumps(commit_list)
 
         if 'base_commit_id' in commits['squashed']:
-            squashed_draft.extra_data[BASE_COMMIT_KEY] = commits['squashed']['base_commit_id']
+            squashed_commit_data.draft_extra_data[BASE_COMMIT_KEY] = (
+                commits['squashed']['base_commit_id'])
 
         squashed_commit_data.extra_data.update({
             FIRST_PUBLIC_ANCESTOR_KEY: (
@@ -680,7 +681,8 @@ class BatchReviewRequestResource(WebAPIResource):
 
         squashed_draft.save()
         squashed_rr.save(update_fields=['extra_data'])
-        squashed_commit_data.save(update_fields=['extra_data'])
+        squashed_commit_data.save(
+            update_fields=['extra_data', 'draft_extra_data'])
 
         review_requests[squashed_rr.id] = squashed_rr
         review_data[squashed_rr.id] = get_review_request_data(squashed_rr)

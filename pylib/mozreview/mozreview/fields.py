@@ -34,6 +34,28 @@ def ensure_review_request(review_request_details):
     return review_request_details
 
 
+class CommitDataBackedField(BaseReviewRequestField):
+    """Base class field backed by CommitData rather then built-in extra_data.
+
+    This Field class will emulate the behavior of normal review
+    request fields but stores its data in CommitData.extra_data
+    and CommitData.draft_extra_data instead of the built-in
+    extra_data fields on ReviewRequest and ReviewRequestDraft.
+    """
+
+    def load_value(self, review_request_details):
+        # This must use a CommitData for ``review_request_details`` instead
+        # of the one stored in ``self.commit_data``. See comment on
+        # BaseReviewRequestField
+        commit_data = fetch_commit_data(review_request_details)
+        return commit_data.get_for(review_request_details, self.field_id)
+
+    def save_value(self, value):
+        commit_data = fetch_commit_data(self.review_request_details)
+        commit_data.set_for(self.review_request_details, self.field_id, value)
+        commit_data.save(update_fields=['extra_data', 'draft_extra_data'])
+
+
 class CombinedReviewersField(BaseReviewRequestField):
     """ This field allows for empty pushes on the parent request"""
     field_id = REVIEWER_MAP_KEY
@@ -183,7 +205,7 @@ class PullCommitField(BaseReviewRequestField):
         }))
 
 
-class BaseCommitField(BaseReviewRequestField):
+class BaseCommitField(CommitDataBackedField):
     """Field for the commit a review request is based on.
 
     This field stores the base commit that a parent review request is
