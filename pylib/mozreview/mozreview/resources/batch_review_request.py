@@ -369,6 +369,8 @@ class BatchReviewRequestResource(WebAPIResource):
             squashed_commit_data = fetch_commit_data(squashed_rr)
             squashed_commit_data.extra_data.update({
                 IDENTIFIER_KEY: identifier,
+                FIRST_PUBLIC_ANCESTOR_KEY: (
+                    commits['squashed']['first_public_ancestor']),
             })
             squashed_commit_data.draft_extra_data.update({
                 IDENTIFIER_KEY: identifier,
@@ -381,7 +383,6 @@ class BatchReviewRequestResource(WebAPIResource):
                 SQUASHED_KEY: True,
                 DISCARD_ON_PUBLISH_KEY: '[]',
                 UNPUBLISHED_KEY: '[]',
-                FIRST_PUBLIC_ANCESTOR_KEY: commits['squashed']['first_public_ancestor'],
             })
             squashed_rr.save(update_fields=['extra_data'])
             logger.info('created squashed review request #%d' % squashed_rr.id)
@@ -645,6 +646,7 @@ class BatchReviewRequestResource(WebAPIResource):
         # in ReviewBoard result in magical changes to some of its fields.
         squashed_rr = ReviewRequest.objects.get(pk=squashed_rr.id)
         squashed_draft = squashed_rr.draft.get()
+        squashed_commit_data = fetch_commit_data(squashed_rr)
 
         squashed_draft.summary = identifier
 
@@ -667,14 +669,18 @@ class BatchReviewRequestResource(WebAPIResource):
         if 'base_commit_id' in commits['squashed']:
             squashed_draft.extra_data[BASE_COMMIT_KEY] = commits['squashed']['base_commit_id']
 
+        squashed_commit_data.extra_data.update({
+            FIRST_PUBLIC_ANCESTOR_KEY: (
+                commits['squashed']['first_public_ancestor']),
+        })
         squashed_rr.extra_data.update({
             DISCARD_ON_PUBLISH_KEY: json.dumps(discard_on_publish_rids),
             UNPUBLISHED_KEY: json.dumps(unpublished_rids),
-            FIRST_PUBLIC_ANCESTOR_KEY: commits['squashed']['first_public_ancestor'],
         })
 
         squashed_draft.save()
         squashed_rr.save(update_fields=['extra_data'])
+        squashed_commit_data.save(update_fields=['extra_data'])
 
         review_requests[squashed_rr.id] = squashed_rr
         review_data[squashed_rr.id] = get_review_request_data(squashed_rr)
@@ -830,8 +836,15 @@ def update_review_request(local_site, request, privileged_user, reviewer_cache,
     draft.summary = commit['message'].splitlines()[0]
     draft.description = commit['message']
     draft.bugs_closed = commit['bug']
+
     draft.extra_data[COMMIT_ID_KEY] = commit['id']
-    draft.extra_data[FIRST_PUBLIC_ANCESTOR_KEY] = commit['first_public_ancestor']
+
+    commit_data = fetch_commit_data(draft)
+    commit_data.draft_extra_data.update({
+        FIRST_PUBLIC_ANCESTOR_KEY: commit['first_public_ancestor'],
+    })
+    commit_data.save(
+        update_fields=['draft_extra_data'])
 
     reviewer_users, unrecognized_reviewers = \
         resolve_reviewers(reviewer_cache, commit.get('reviewers', []))

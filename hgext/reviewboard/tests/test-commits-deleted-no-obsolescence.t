@@ -126,11 +126,11 @@ Review request 6 should be added to the list of discard on publish rids.
       3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
       5], ["76088734e3cba33be80930be14e7cd1e9ee474be", 6]]'
     p2rb.discard_on_publish_rids: '[6]'
-    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   commit_extra_data:
+    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
   diffs:
   - id: 1
@@ -187,11 +187,11 @@ Review request 6 should be added to the list of discard on publish rids.
         3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
         5]]'
       p2rb.discard_on_publish_rids: '[]'
-      p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{}'
       p2rb.unpublished_rids: '[]'
     commit_extra_data:
+      p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.identifier: bz://1/mynick
     diffs:
     - id: 7
@@ -245,9 +245,9 @@ Review 6 should be marked as discarded
     calculated_trophies: true
     p2rb: true
     p2rb.commit_id: 76088734e3cba33be80930be14e7cd1e9ee474be
-    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.is_squashed: false
   commit_extra_data:
+    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
   diffs:
   - id: 6
@@ -316,9 +316,9 @@ The first commit was rewritten (we assume all subsequent were as well).
     calculated_trophies: true
     p2rb: true
     p2rb.commit_id: 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e
-    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.is_squashed: false
   commit_extra_data:
+    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
   diffs:
   - id: 2
@@ -347,9 +347,9 @@ The first commit was rewritten (we assume all subsequent were as well).
       calculated_trophies: true
       p2rb: true
       p2rb.commit_id: 7050183d97d5f601da86fb313dd8783ccf1ade18
-      p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.is_squashed: false
     commit_extra_data:
+      p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.identifier: bz://1/mynick
     diffs:
     - id: 9
@@ -389,11 +389,11 @@ request is published.
       3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
       5]]'
     p2rb.discard_on_publish_rids: '[5]'
-    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   commit_extra_data:
+    p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
   diffs:
   - id: 1
@@ -480,11 +480,11 @@ request is published.
       p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 2], ["d7a5827a584db609f6a9ca2bd3d43aa3afa6b86e",
         3], ["b5473ad606f40840715d6b378dacc1a37f6263b1", 4]]'
       p2rb.discard_on_publish_rids: '[]'
-      p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.is_squashed: true
       p2rb.reviewer_map: '{"3": [], "2": [], "5": [], "4": []}'
       p2rb.unpublished_rids: '[]'
     commit_extra_data:
+      p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.identifier: bz://1/mynick
     diffs:
     - id: 8

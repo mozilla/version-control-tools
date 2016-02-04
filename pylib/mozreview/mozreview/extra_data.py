@@ -22,7 +22,6 @@ BASE_COMMIT_KEY = MOZREVIEW_KEY + '.base_commit'
 COMMITS_KEY = MOZREVIEW_KEY + '.commits'
 COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
 DISCARD_ON_PUBLISH_KEY = MOZREVIEW_KEY + '.discard_on_publish_rids'
-FIRST_PUBLIC_ANCESTOR_KEY = MOZREVIEW_KEY + '.first_public_ancestor'
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
 SQUASHED_KEY = MOZREVIEW_KEY + '.is_squashed'
 UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
@@ -31,15 +30,16 @@ UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
 # the draft to the review request on publish.
 DRAFTED_EXTRA_DATA_KEYS = (
     COMMIT_ID_KEY,
-    FIRST_PUBLIC_ANCESTOR_KEY,
 )
 
 # CommitData field keys:
+FIRST_PUBLIC_ANCESTOR_KEY = MOZREVIEW_KEY + '.first_public_ancestor'
 IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
 
 # CommitData fields which should be automatically copied from
 # draft_extra_data to extra_data when a review request is published.
 DRAFTED_COMMIT_DATA_KEYS = (
+    FIRST_PUBLIC_ANCESTOR_KEY,
     IDENTIFIER_KEY,
 )
 

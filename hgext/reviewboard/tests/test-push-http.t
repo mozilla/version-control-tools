@@ -373,11 +373,11 @@ Test creating a review via HTTP
     p2rb.commits: '[["9a6457fbda8fb4e5afaa3e0ab831f34a3de285af", 2], ["b41b3bd650cb5b456e611e2eeb77705e4c41cb83",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
-    p2rb.first_public_ancestor: 6432ccd4579e0fdc337b6dc55b827cbcc7fee397
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   commit_extra_data:
+    p2rb.first_public_ancestor: 6432ccd4579e0fdc337b6dc55b827cbcc7fee397
     p2rb.identifier: bz://1/mynick
   diffs:
   - id: 1
