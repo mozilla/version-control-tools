@@ -602,7 +602,8 @@ def configure_command(args):
                     # TODO configure remote.%s.fetch to disable fetching?
                     subprocess.check_call(['git', 'remote', 'add', '--no-tags',
                                            remote_name, remote_url])
-
+                    subprocess.check_call(['git', 'config',
+                      'remote.%s.skipDefaultUpdate' % remote_name, 'true'])
         else:
             ui.warn('warning: unable to fetch list of review repos; '
                     'manual configuration of review remote will be required\n')
