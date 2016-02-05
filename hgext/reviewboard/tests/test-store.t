@@ -26,7 +26,7 @@ Pushing a review will create the reviews file
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:00a4f82beb7c
+  changeset:  1:84e198ba06fc
   summary:    Bug 1 - second commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -39,8 +39,8 @@ Pushing a review will create the reviews file
   u http://$DOCKER_HOSTNAME:$HGPORT1
   r ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   p bz://1/mynick 1
-  c 00a4f82beb7c11fa00dafd1d2e613d979171154f 2
-  pc 00a4f82beb7c11fa00dafd1d2e613d979171154f 1
+  c 84e198ba06fc92fb9912186d0e240593abe885f8 2
+  pc 84e198ba06fc92fb9912186d0e240593abe885f8 1
 
   $ ls .hg/reviewboard/review
   1.state

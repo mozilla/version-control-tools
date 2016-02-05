@@ -49,7 +49,10 @@ Create a review request from an L1 user
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
@@ -57,7 +60,7 @@ Create a review request from an L1 user
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
+    p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -92,7 +95,10 @@ Have an L1 user provide a ship it review which should not grant approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
@@ -100,7 +106,7 @@ Have an L1 user provide a ship it review which should not grant approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
+    p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -143,7 +149,10 @@ Have an L3 user provide a ship it review which should grant approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
@@ -151,7 +160,7 @@ Have an L3 user provide a ship it review which should grant approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
+    p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -198,7 +207,10 @@ Posting a new review without ship it should cancel the previous approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
@@ -206,7 +218,7 @@ Posting a new review without ship it should cancel the previous approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
+    p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -260,7 +272,10 @@ One more ship it should switch it back to approved
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
@@ -268,7 +283,7 @@ One more ship it should switch it back to approved
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
+    p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -330,7 +345,10 @@ Even though the author is L1, adding a new diff will not cancel approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
@@ -338,7 +356,7 @@ Even though the author is L1, adding a new diff will not cancel approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
+    p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -411,7 +429,10 @@ A new ship-it from L3 should give approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
@@ -419,7 +440,7 @@ A new ship-it from L3 should give approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
+    p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -503,7 +524,10 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
@@ -511,7 +535,7 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
+    p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -608,7 +632,10 @@ Fixing the issue should restore approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
@@ -616,7 +643,7 @@ Fixing the issue should restore approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
+    p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -721,7 +748,10 @@ Review requests created by L3 users
   commit: null
   submitter: level3
   summary: Bug 2 - initial commit to review
-  description: Bug 2 - initial commit to review
+  description:
+  - Bug 2 - initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: F63vXs'
   target_people:
   - level1a
   - level1b
@@ -729,7 +759,7 @@ Review requests created by L3 users
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: c1ebcda638274d5217801b7f05e33b848ff39be1
+    p2rb.commit_id: b366ef9913208b4030857319aa20520f229a74f3
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
@@ -764,7 +794,10 @@ Even a ship-it from an L1 user will give approval to an L3 author
   commit: null
   submitter: level3
   summary: Bug 2 - initial commit to review
-  description: Bug 2 - initial commit to review
+  description:
+  - Bug 2 - initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: F63vXs'
   target_people:
   - level1a
   - level1b
@@ -772,7 +805,7 @@ Even a ship-it from an L1 user will give approval to an L3 author
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: c1ebcda638274d5217801b7f05e33b848ff39be1
+    p2rb.commit_id: b366ef9913208b4030857319aa20520f229a74f3
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
@@ -818,7 +851,10 @@ ship-its. Posting a new diff should not clear approval
   commit: null
   submitter: level3
   summary: Bug 2 - initial commit to review
-  description: Bug 2 - initial commit to review
+  description:
+  - Bug 2 - initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: F63vXs'
   target_people:
   - level1a
   - level1b
@@ -826,7 +862,7 @@ ship-its. Posting a new diff should not clear approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: bccc4c4e590eeefbb42491f1bb061143a49bdaf8
+    p2rb.commit_id: bedcf57f515ad540f582962e37ecd424d82424fd
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false

@@ -32,7 +32,7 @@ Set up the repo
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  2:da1efb6eb614
+  changeset:  2:0a5d4c4a7b76
   summary:    foo2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -64,11 +64,11 @@ Now create a new head and push a rebase
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  3:850ce71e5f69
+  changeset:  3:696cdea118f5
   summary:    bar
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  4:0bdd81f5fee5
+  changeset:  4:d699fd7a906a
   summary:    foo2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   

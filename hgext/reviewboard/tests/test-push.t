@@ -82,7 +82,7 @@ Pushing a single changeset will initiate a single review (no children)
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  6:f422841a13f8
+  changeset:  6:6b33f0dbef02
   summary:    anonymous head
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -93,19 +93,19 @@ Pushing a single changeset will initiate a single review (no children)
 
 {reviews} template works
 
-  $ hg log -r 0::f422841a13f8 --template "{node|short} {reviews % '{get(review, \"url\")} {get(review, \"status\")}'}\n"
+  $ hg log -r 0::6b33f0dbef02 --template "{node|short} {reviews % '{get(review, \"url\")} {get(review, \"status\")}'}\n"
   3a9f6899ef84 
-  f422841a13f8 http://$DOCKER_HOSTNAME:$HGPORT1/r/2 pending
+  6b33f0dbef02 http://$DOCKER_HOSTNAME:$HGPORT1/r/2 pending
 
 Pushing no changesets will do a re-review
 
-  $ hg push -r f422841a13f8 --reviewid 1
+  $ hg push -r 6b33f0dbef02 --reviewid 1
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  6:f422841a13f8
+  changeset:  6:6b33f0dbef02
   summary:    anonymous head
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -121,13 +121,13 @@ TODO the behavior here is not correct: a new parent draft should not be
 created if all the review requests didn't change
 
   $ rbmanage publish 1
-  $ hg push -r f422841a13f8 --reviewid 1
+  $ hg push -r 6b33f0dbef02 --reviewid 1
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  6:f422841a13f8
+  changeset:  6:6b33f0dbef02
   summary:    anonymous head
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
@@ -152,7 +152,7 @@ Pushing patches from mq will result in a warning
   (You are using mq to develop patches. *) (glob)
   submitting 1 changesets for review
   
-  changeset:  7:42cfaa4019d9
+  changeset:  7:cccd43f18cec
   summary:    mq patch
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
@@ -167,13 +167,13 @@ Pushing patches from mq will result in a warning
 
 Custom identifier will create a new review from same changesets.
 
-  $ hg push -r f422841a13f8 --reviewid 3
+  $ hg push -r 6b33f0dbef02 --reviewid 3
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  6:f422841a13f8
+  changeset:  6:6b33f0dbef02
   summary:    anonymous head
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
   
@@ -199,7 +199,7 @@ rest of the test.)
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  6:ec6438e4b8bc
+  changeset:  6:62eca46e88fb
   summary:    Bug 4 - Test identifier
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8 (draft)
   
@@ -210,13 +210,13 @@ rest of the test.)
 
 Specifying multiple -r for the same head works
 
-  $ hg push -r 0 -r f422841a13f8 --reviewid 5
+  $ hg push -r 0 -r 6b33f0dbef02 --reviewid 5
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  5:f422841a13f8
+  changeset:  5:6b33f0dbef02
   summary:    anonymous head
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10 (draft)
   
@@ -228,13 +228,13 @@ Specifying multiple -r for the same head works
 
 Specifying a revision range works
 
-  $ hg push -r 0::f422841a13f8 --reviewid 6
+  $ hg push -r 0::6b33f0dbef02 --reviewid 6
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  5:f422841a13f8
+  changeset:  5:6b33f0dbef02
   summary:    anonymous head
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/12 (draft)
   
@@ -261,7 +261,7 @@ Prepare for multi changeset tests
   $ echo newhead > foo
   $ hg commit -m 'Unrelated head'
   created new head
-  $ hg -q up -r 37f64667eaf5
+  $ hg -q up -r 946b2ccfbcc1
 
 A dirty working copy of a reviewed node will abort because of potential rewriting
 
@@ -292,15 +292,15 @@ Specifying a base revision limits reviewed changesets
   remote: recorded push in pushlog
   submitting 3 changesets for review
   
-  changeset:  8:2e66eb2fd2ee
+  changeset:  8:29cc7959baba
   summary:    Review base
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/14 (draft)
   
-  changeset:  9:715e2dc94860
+  changeset:  9:6d5a65ca7a91
   summary:    Middle commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/15 (draft)
   
-  changeset:  10:37f64667eaf5
+  changeset:  10:946b2ccfbcc1
   summary:    Review tip
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/16 (draft)
   
@@ -317,15 +317,15 @@ Specifying multiple -r arguments selects base and tip
   no changes found
   submitting 3 changesets for review
   
-  changeset:  8:2e66eb2fd2ee
+  changeset:  8:29cc7959baba
   summary:    Review base
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/18 (draft)
   
-  changeset:  9:715e2dc94860
+  changeset:  9:6d5a65ca7a91
   summary:    Middle commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/19 (draft)
   
-  changeset:  10:37f64667eaf5
+  changeset:  10:946b2ccfbcc1
   summary:    Review tip
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/20 (draft)
   
@@ -343,15 +343,15 @@ Specifying multiple -r in reverse order still works
   no changes found
   submitting 3 changesets for review
   
-  changeset:  8:2e66eb2fd2ee
+  changeset:  8:29cc7959baba
   summary:    Review base
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/22 (draft)
   
-  changeset:  9:715e2dc94860
+  changeset:  9:6d5a65ca7a91
   summary:    Middle commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/23 (draft)
   
-  changeset:  10:37f64667eaf5
+  changeset:  10:946b2ccfbcc1
   summary:    Review tip
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/24 (draft)
   
@@ -375,7 +375,7 @@ Specifying multiple -r in reverse order still works
   no changes found
   submitting 1 changesets for review
   
-  changeset:  9:715e2dc94860
+  changeset:  9:6d5a65ca7a91
   summary:    Middle commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/26 (draft)
   
@@ -395,7 +395,7 @@ Reviewing merge commits is rejected
   $ echo merge2 > foo
   $ hg commit -m 'Bug 1 - Merge B'
   created new head
-  $ hg merge --tool internal:other 2489f823cd25
+  $ hg merge --tool internal:other 47aed783df21
   0 files updated, 1 files merged, 0 files removed, 0 files unresolved
   (branch merge, don't forget to commit)
   $ hg commit -m 'Bug 1 - Do merge'
@@ -409,7 +409,7 @@ Reviewing merge commits is rejected
   remote: added 3 changesets with 3 changes to 1 files (+1 heads)
   remote: recorded push in pushlog
   submitting 3 changesets for review
-  abort: cannot review merge commits (35ae0b8f2835)
+  abort: cannot review merge commits (abd430935a8b)
   [255]
 
 We disallow completely empty revisions.
@@ -418,7 +418,7 @@ We disallow completely empty revisions.
   $ hg qnew -m 'mq patch' -d '0 0' empty-patch
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
-  abort: cannot review empty changeset 1bcdd587da6e
+  abort: cannot review empty changeset e3b1b495a7d2
   (add files to or remove changeset)
   [255]
 
@@ -428,7 +428,7 @@ Check for empty commits not at the tip
   $ hg qnew -m 'Bug 1 - after empty' -d '0 0' after-empty
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
-  abort: cannot review empty changeset 1bcdd587da6e
+  abort: cannot review empty changeset e3b1b495a7d2
   (add files to or remove changeset)
   [255]
 

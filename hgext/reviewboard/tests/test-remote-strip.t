@@ -47,11 +47,11 @@ globally
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  3:f5dc8e52d068
+  changeset:  3:51c15ef8210f
   summary:    h1c1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  4:ad01e35ad0d8
+  changeset:  4:b560312f6487
   summary:    h1c2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
@@ -72,11 +72,11 @@ globally
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  3:d03da7877f4b
+  changeset:  3:172c9543f80c
   summary:    h2c1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
-  changeset:  4:d9181bb0ade7
+  changeset:  4:e8c63e38a772
   summary:    h2c2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
   
@@ -98,18 +98,18 @@ User in whitelist can strip
   $ export SSH_KEYNAME=adminuser@example.com
   $ mozreview exec hgrb /set-strip-users test-repo adminuser@example.com > /dev/null
 
-  $ hg debugpushkey ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo strip dummy '' f5dc8e52d06801d11b624f3bf4d742240ed200e9 
-  remote: saved backup bundle to /repo/hg/mozilla/test-repo/.hg/strip-backup/f5dc8e52d068*-remotestrip.hg (glob)
-  remote: changeset will be deleted from pushlog: f5dc8e52d06801d11b624f3bf4d742240ed200e9
-  remote: changeset will be deleted from pushlog: ad01e35ad0d8dad239748349dfe96c16914cc37b
-  remote: changeset rev will be updated in pushlog: d03da7877f4b0533ede2b5e2cc8a0d4816e6d9b1
-  remote: changeset rev will be updated in pushlog: d9181bb0ade7f2362db2f6a195642148c2d48820
+  $ hg debugpushkey ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo strip dummy '' 51c15ef8210ffd51361c9197c85d5a4aa1bdd4a5
+  remote: saved backup bundle to /repo/hg/mozilla/test-repo/.hg/strip-backup/51c15ef8210f-7eb5dc8a-remotestrip.hg
+  remote: changeset will be deleted from pushlog: 51c15ef8210ffd51361c9197c85d5a4aa1bdd4a5
+  remote: changeset will be deleted from pushlog: b560312f64877bf0f5261d9cd1d71e71637be899
+  remote: changeset rev will be updated in pushlog: 172c9543f80cfa7f85ad5a0a6ad9b005cd18825c
+  remote: changeset rev will be updated in pushlog: e8c63e38a772cd7da20caff013d5ec3f85a02fd5
   True
 
   $ hg -q clone ssh://${HGSSH_HOST}:${HGSSH_PORT}/test-repo new-repo
-  $ hg -R new-repo log -T '{node} {desc}\n'
-  d9181bb0ade7f2362db2f6a195642148c2d48820 h2c2
-  d03da7877f4b0533ede2b5e2cc8a0d4816e6d9b1 h2c1
+  $ hg -R new-repo log -T '{node} {desc|firstline}\n'
+  e8c63e38a772cd7da20caff013d5ec3f85a02fd5 h2c2
+  172c9543f80cfa7f85ad5a0a6ad9b005cd18825c h2c1
   55482a6fb4b1881fa8f746fd52cf6f096bb21c89 initial
 
 Stripping of public changesets is disallowed

@@ -23,6 +23,7 @@ This extension adds new options to the `push` command:
 import errno
 import json
 import os
+import re
 import sys
 import urllib
 import urllib2
@@ -32,6 +33,7 @@ from mercurial import (
     commands,
     context,
     demandimport,
+    encoding,
     error,
     exchange,
     extensions,
@@ -62,7 +64,7 @@ except ImportError:
 demandimport.enable()
 
 from hgrb.util import (
-    genid,
+    addcommitid,
     ReviewID,
 )
 
@@ -143,25 +145,6 @@ def getreviewcaps(remote):
         caps = ''
 
     return set(caps.split(','))
-
-
-def rebasecommand(orig, ui, repo, *args, **kwargs):
-    """Wraps rebase command to preserve commit id across rebases.
-
-    Mercurial doesn't preserve all "extra" fields from changectx during
-    rebase by default. However, the rebase command takes a hidden named
-    argument that specifies a function to be called to carry over extras.
-    We hook into this mechanism.
-    """
-    def extrafn(ctx, extra):
-        # Make sure to call original one, if defined.
-        if 'extrafn' in kwargs:
-            kwargs['extrafn'](ctx, extra)
-
-        if 'commitid' in ctx.extra():
-            extra['commitid'] = ctx.extra()['commitid']
-
-    return orig(ui, repo, extrafn=extrafn, *args, **kwargs)
 
 
 def pushcommand(orig, ui, repo, *args, **kwargs):
@@ -416,27 +399,27 @@ def wrappedpushdiscovery(orig, pushop):
     replacenodes = []
     for node in nodes:
         ctx = repo[node]
-        if 'commitid' not in ctx.extra():
+        if not re.search('^MozReview-Commit-ID: ', ctx.description(), re.MULTILINE):
             replacenodes.append(node)
 
-    def addcommitid(repo, ctx, revmap, copyfilectxfn):
+    def makememctx(repo, ctx, revmap, copyfilectxfn):
         parents = newparents(repo, ctx, revmap)
         # Need to make a copy otherwise modification is made on original,
         # which is just plain wrong.
-        extra = dict(ctx.extra())
-        assert 'commitid' not in extra
-        extra['commitid'] = genid(repo)
+        msg = encoding.fromlocal(ctx.description())
+        new_msg, changed = addcommitid(msg, repo=repo)
+
         memctx = context.memctx(repo, parents,
-                                ctx.description(), ctx.files(),
+                                encoding.tolocal(new_msg), ctx.files(),
                                 copyfilectxfn, user=ctx.user(),
-                                date=ctx.date(), extra=extra)
+                                date=ctx.date(), extra=dict(ctx.extra()))
 
         return memctx
 
     if replacenodes:
         ui.status(_('(adding commit id to %d changesets)\n') %
                   (len(replacenodes)))
-        nodemap = replacechangesets(repo, replacenodes, addcommitid,
+        nodemap = replacechangesets(repo, replacenodes, makememctx,
                                     backuptopic='addcommitid')
 
         # Since we're in the middle of an operation, update references
@@ -1010,24 +993,6 @@ def extsetup(ui):
     entry[1].append(('c', 'changeset', '',
                     _('Review this specific changeset only')))
 
-    # Value may be empty. So check config source to see if key is present.
-    if (ui.configsource('extensions', 'rebase') != 'none' and
-        ui.config('extensions', 'rebase') != '!'):
-        # The extensions.afterloaded mechanism is busted. So we can't
-        # reliably wrap the rebase command in case it hasn't loaded yet. So
-        # just load the rebase extension and wrap the function directly
-        # from its commands table.
-        try:
-            cmdutil.findcmd('rebase', commands.table, strict=True)
-        except error.UnknownCommand:
-            extensions.load(ui, 'rebase', '')
-
-        # Extensions' cmdtable entries aren't merged with commands.table.
-        # Instead, dispatch just looks at each module. So it is safe to wrap
-        # the command on the extension module.
-        rebase = extensions.find('rebase')
-        extensions.wrapcommand(rebase.cmdtable, 'rebase', rebasecommand)
-
     templatekw.keywords['reviews'] = template_reviews
 
 def reposetup(ui, repo):
@@ -1046,20 +1011,17 @@ def reposetup(ui, repo):
             history rewrites, including grafting. This is used as an index
             of sorts in the review tool.
             """
-            # Some callers of commit() may not pass named arguments. Slurp
-            # extra from positional arguments.
-            if len(args) == 7:
-                assert 'extra' not in kwargs
-                kwargs['extra'] = args[6]
-                args = tuple(args[0:6])
+            msg = ''
+            if args:
+                msg = args[0]
+            elif kwargs and 'text' in kwargs:
+                msg = kwargs['text']
+                del kwargs['text']
 
-            if 'extra' not in kwargs or not kwargs['extra']:
-                kwargs['extra'] = {}
+            if self.reviews.remoteurl and msg:
+                msg, changed = addcommitid(msg, repo=self)
 
-            if 'commitid' not in kwargs['extra'] and self.reviews.remoteurl:
-                kwargs['extra']['commitid'] = genid(self)
-
-            return super(reviewboardrepo, self).commit(*args, **kwargs)
+            return super(reviewboardrepo, self).commit(msg, *args[1:], **kwargs)
 
     repo.__class__ = reviewboardrepo
     repo.noreviewboardpush = False

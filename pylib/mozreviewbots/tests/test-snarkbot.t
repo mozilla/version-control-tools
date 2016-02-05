@@ -51,11 +51,11 @@ Create and publish a review for SnarkBot
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:93b21e22593f
+  changeset:  1:729692c35796
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:10c6acff83c0
+  changeset:  2:fb16157e773b
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
@@ -66,14 +66,14 @@ Create and publish a review for SnarkBot
 
   $ rbmanage publish 1
   $ python -m snarkbot --config-path ../snarkbot.ini
-  INFO:mozreviewbot:reviewing commit: 93b21e22593f for review request: 2 diff_revision: 1
+  INFO:mozreviewbot:reviewing commit: 729692c35796 for review request: 2 diff_revision: 1
   INFO:mozreviewbot:looking at file: foo (foo)
   INFO:mozreviewbot:foo1
   
   INFO:mozreviewbot:looking at file: foo1 (foo1)
   INFO:mozreviewbot:foo1
   
-  INFO:mozreviewbot:reviewing commit: 10c6acff83c0 for review request: 3 diff_revision: 1
+  INFO:mozreviewbot:reviewing commit: fb16157e773b for review request: 3 diff_revision: 1
   INFO:mozreviewbot:looking at file: foo (foo)
   INFO:mozreviewbot:foo2
   
@@ -89,12 +89,15 @@ Create and publish a review for SnarkBot
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 1
-  description: Bug 1 - Foo 1
+  description:
+  - Bug 1 - Foo 1
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: 93b21e22593fc0a96331d5357aa5835b7db407e3
+    p2rb.commit_id: 729692c35796d9cbd453ccef97ee0d14139c4a09
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false

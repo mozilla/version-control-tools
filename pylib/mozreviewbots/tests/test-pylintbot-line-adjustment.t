@@ -81,7 +81,7 @@ Line numbers for these failures should be adjusted -= 1 and cover 2 lines
   $ rbmanage publish 1
 
   $ python -m pylintbot --config-path ../pylintbot.ini
-  INFO:mozreviewbot:reviewing revision: 5eedd6ade4e7 (review request: 2)
+  INFO:mozreviewbot:reviewing revision: c45aead0c4d6 (review request: 2)
 
   $ rbmanage dumpreview 2
   id: 2
@@ -92,12 +92,15 @@ Line numbers for these failures should be adjusted -= 1 and cover 2 lines
   commit: null
   submitter: default+5
   summary: Bug 1 - Line adjustment minus 1
-  description: Bug 1 - Line adjustment minus 1
+  description:
+  - Bug 1 - Line adjustment minus 1
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: 5eedd6ade4e72a9bec6dd82ef5b566337a44adcf
+    p2rb.commit_id: c45aead0c4d66a05a22fce427658fba6f3e20f9c
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -285,7 +288,7 @@ Create tests for line -= 2
   $ hg push > /dev/null
   $ rbmanage publish 3
   $ python -m pylintbot --config-path ../pylintbot.ini
-  INFO:mozreviewbot:reviewing revision: 8da44ae24d46 (review request: 4)
+  INFO:mozreviewbot:reviewing revision: 51dfa0ded22a (review request: 4)
 
   $ rbmanage dumpreview 4
   id: 4
@@ -296,12 +299,15 @@ Create tests for line -= 2
   commit: null
   submitter: default+5
   summary: Bug 2 - Line adjustment minus 2
-  description: Bug 2 - Line adjustment minus 2
+  description:
+  - Bug 2 - Line adjustment minus 2
+  - ''
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people: []
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: 8da44ae24d4625e0339ed0287a6c61f7288ad5d5
+    p2rb.commit_id: 51dfa0ded22aa53d3e7c3d7b5342ba8734c4c6ce
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false

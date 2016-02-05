@@ -36,9 +36,9 @@ a shipit.
   remote: added 2 changesets with 2 changes to 1 files
   remote: recorded push in pushlog
   submitting 1 changesets for review
-  commit message for 4b8b122bb501 has r=cthulhu but they have not granted a ship-it. review will be requested on your behalf
+  commit message for 9131d64aca84 has r=cthulhu but they have not granted a ship-it. review will be requested on your behalf
   
-  changeset:  1:4b8b122bb501
+  changeset:  1:9131d64aca84
   summary:    bug 1 - stuff; r=cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -58,8 +58,12 @@ There are no warnings for reviewers who haved granted a ship-it when using r=
   created review 1
   $ exportbzauth default@example.com password
   $ echo foo >> foo
-  $ hg commit --amend -m "bug 1 - serious changes; r=cthulhu"
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/4b8b122bb501-afed4b13-amend-backup.hg (glob)
+  $ hg commit --amend -l - << EOF
+  > bug 1 - serious changes; r=cthulhu
+  > 
+  > MozReview-Commit-ID: 124Bxg
+  > EOF
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/9131d64aca84-c977e83b-amend-backup.hg (glob)
   $ hg push --config reviewboard.autopublish=true
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
@@ -70,7 +74,7 @@ There are no warnings for reviewers who haved granted a ship-it when using r=
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:e47b87b1a589
+  changeset:  1:f6ca9a9341fc
   summary:    bug 1 - serious changes; r=cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -93,8 +97,12 @@ using r=.
 
   $ exportbzauth default@example.com password
   $ echo foo >> foo
-  $ hg commit --amend -m "bug 1 - even better stuff; r=cthulhu"
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/e47b87b1a589-8fe56fc5-amend-backup.hg (glob)
+  $ hg commit --amend -l - << EOF
+  > bug 1 - even better stuff; r=cthulhu
+  > 
+  > MozReview-Commit-ID: APOgLo
+  > EOF
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/f6ca9a9341fc-3ca96401-amend-backup.hg (glob)
   $ hg push --config reviewboard.autopublish=true
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
@@ -104,9 +112,9 @@ using r=.
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   remote: recorded push in pushlog
   submitting 1 changesets for review
-  commit message for b3fb18cc7421 has r=cthulhu but they have not granted a ship-it. review will be requested on your behalf
+  commit message for 3b546de1b11a has r=cthulhu but they have not granted a ship-it. review will be requested on your behalf
   
-  changeset:  1:b3fb18cc7421
+  changeset:  1:3b546de1b11a
   summary:    bug 1 - even better stuff; r=cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   

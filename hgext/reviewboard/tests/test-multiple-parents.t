@@ -30,7 +30,7 @@ Do the initial review
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:60479d07173e
+  changeset:  1:d5b7a3621249
   summary:    second commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -47,7 +47,7 @@ Pushing with a different review ID will create a "duplicate" review
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:60479d07173e
+  changeset:  1:d5b7a3621249
   summary:    second commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
@@ -62,10 +62,10 @@ Pushing with a different review ID will create a "duplicate" review
   r ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   p bz://1/mynick 1
   p bz://2/mynick 3
-  c 60479d07173e3914243bacd9b39aae7971a2f909 2
-  c 60479d07173e3914243bacd9b39aae7971a2f909 4
-  pc 60479d07173e3914243bacd9b39aae7971a2f909 1
-  pc 60479d07173e3914243bacd9b39aae7971a2f909 3
+  c d5b7a3621249b0f1973c0daf64248a4b77fe52e8 2
+  c d5b7a3621249b0f1973c0daf64248a4b77fe52e8 4
+  pc d5b7a3621249b0f1973c0daf64248a4b77fe52e8 1
+  pc d5b7a3621249b0f1973c0daf64248a4b77fe52e8 3
 
   $ hg log --template "{reviews % '{get(review, \"url\")}\n'}"
   http://$DOCKER_HOSTNAME:$HGPORT1/r/2

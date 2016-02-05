@@ -34,11 +34,11 @@
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:233b570e5356
+  changeset:  2:3a446ae43820
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
@@ -61,15 +61,15 @@ Adding commits to old reviews should create new reviews
   remote: recorded push in pushlog
   submitting 3 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:233b570e5356
+  changeset:  2:3a446ae43820
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  3:4cb601f74de5
+  changeset:  3:1ec9946fd47f
   summary:    Bug 1 - Foo 3
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
@@ -113,8 +113,8 @@ The parent review should have its description updated.
     commit_extra_data:
       p2rb: true
       p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-      p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
-        3], ["4cb601f74de529935048816623637fb0ca2812a4", 4]]'
+      p2rb.commits: '[["98467d80785ec84dd871f213c167ed704a6d974d", 2], ["3a446ae4382006c43cdfa5aa33c494f582736f35",
+        3], ["1ec9946fd47ff9b5cb07e9d9c8b4d393b688e01b", 4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
@@ -151,19 +151,19 @@ rids to be strings and then pushing a new commit.
   remote: recorded push in pushlog
   submitting 4 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:233b570e5356
+  changeset:  2:3a446ae43820
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  3:4cb601f74de5
+  changeset:  3:1ec9946fd47f
   summary:    Bug 1 - Foo 3
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
-  changeset:  4:fea02e8114c8
+  changeset:  4:6b1149879047
   summary:    Bug 1 - Foo 4
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   

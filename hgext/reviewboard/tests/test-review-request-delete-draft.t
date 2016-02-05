@@ -29,7 +29,7 @@
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:0aca5e441702
+  changeset:  1:65e5c536f9cc
   summary:    Bug 1 - Initial commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -53,7 +53,7 @@ Now publish the review and create a new draft
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:b3be3d464d6b
+  changeset:  1:2c68bc327689
   summary:    Bug 1 - Initial commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -81,7 +81,7 @@ We should have a disagreement between published and draft
   commit_extra_data:
     p2rb: true
     p2rb.base_commit: 3a9f6899ef84c99841f546030b036d0124a863cf
-    p2rb.commits: '[["0aca5e4417025c80407d8f7f22864e8d09fbec50", 2]]'
+    p2rb.commits: '[["65e5c536f9cc5816ef28ebaff6a0db47b9af0fee", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -102,7 +102,7 @@ We should have a disagreement between published and draft
     - +foo1
     - ''
   approved: false
-  approval_failure: Commit 0aca5e4417025c80407d8f7f22864e8d09fbec50 is not approved.
+  approval_failure: Commit 65e5c536f9cc5816ef28ebaff6a0db47b9af0fee is not approved.
   draft:
     bugs:
     - '1'
@@ -116,7 +116,7 @@ We should have a disagreement between published and draft
     commit_extra_data:
       p2rb: true
       p2rb.base_commit: 3a9f6899ef84c99841f546030b036d0124a863cf
-      p2rb.commits: '[["b3be3d464d6b32130006cbdfa82f9f98a3c57a01", 2]]'
+      p2rb.commits: '[["2c68bc327689343c967bcb80b9a3fd8d9bc50eb4", 2]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
       p2rb.identifier: bz://1/mynick
@@ -146,13 +146,16 @@ We should have a disagreement between published and draft
   commit: null
   submitter: submitter+6
   summary: Bug 1 - Initial commit
-  description: Bug 1 - Initial commit
+  description:
+  - Bug 1 - Initial commit
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 0aca5e4417025c80407d8f7f22864e8d09fbec50
+    p2rb.commit_id: 65e5c536f9cc5816ef28ebaff6a0db47b9af0fee
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -177,13 +180,16 @@ We should have a disagreement between published and draft
     - '1'
     commit: null
     summary: Bug 1 - Initial commit
-    description: Bug 1 - Initial commit
+    description:
+    - Bug 1 - Initial commit
+    - ''
+    - 'MozReview-Commit-ID: 124Bxg'
     target_people: []
     extra:
       calculated_trophies: true
     commit_extra_data:
       p2rb: true
-      p2rb.commit_id: b3be3d464d6b32130006cbdfa82f9f98a3c57a01
+      p2rb.commit_id: 2c68bc327689343c967bcb80b9a3fd8d9bc50eb4
       p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
@@ -224,7 +230,7 @@ Discarding the parent review request draft should discard draft on children
   commit_extra_data:
     p2rb: true
     p2rb.base_commit: 3a9f6899ef84c99841f546030b036d0124a863cf
-    p2rb.commits: '[["0aca5e4417025c80407d8f7f22864e8d09fbec50", 2]]'
+    p2rb.commits: '[["65e5c536f9cc5816ef28ebaff6a0db47b9af0fee", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -245,7 +251,7 @@ Discarding the parent review request draft should discard draft on children
     - +foo1
     - ''
   approved: false
-  approval_failure: Commit 0aca5e4417025c80407d8f7f22864e8d09fbec50 is not approved.
+  approval_failure: Commit 65e5c536f9cc5816ef28ebaff6a0db47b9af0fee is not approved.
 
   $ rbmanage dumpreview 2
   id: 2
@@ -256,13 +262,16 @@ Discarding the parent review request draft should discard draft on children
   commit: null
   submitter: submitter+6
   summary: Bug 1 - Initial commit
-  description: Bug 1 - Initial commit
+  description:
+  - Bug 1 - Initial commit
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 0aca5e4417025c80407d8f7f22864e8d09fbec50
+    p2rb.commit_id: 65e5c536f9cc5816ef28ebaff6a0db47b9af0fee
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false

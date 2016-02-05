@@ -15,8 +15,8 @@ Create a review request that doesn't touch any Python files
 No review should be left if no Python files were changed.
 
   $ python -m pylintbot --config-path ../pylintbot.ini
-  INFO:mozreviewbot:reviewing revision: 9408145328c3 (review request: 2)
-  INFO:mozreviewbot:not reviewing revision: 9408145328c39ed1fe384e35788b069524ca71a6 no relevant python changes in commit
+  INFO:mozreviewbot:reviewing revision: 97bc3c7259df (review request: 2)
+  INFO:mozreviewbot:not reviewing revision: 97bc3c7259dfe4c83e2d1ac3e6b252a5331da9cd no relevant python changes in commit
 
   $ rbmanage dumpreview 2
   id: 2
@@ -27,12 +27,15 @@ No review should be left if no Python files were changed.
   commit: null
   submitter: default+5
   summary: Bug 1 - No Python changes
-  description: Bug 1 - No Python changes
+  description:
+  - Bug 1 - No Python changes
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: 9408145328c39ed1fe384e35788b069524ca71a6
+    p2rb.commit_id: 97bc3c7259dfe4c83e2d1ac3e6b252a5331da9cd
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -67,8 +70,8 @@ If only changes are deletions, then no review should be posted
   $ rbmanage publish 3
 
   $ python -m pylintbot --config-path ../pylintbot.ini
-  INFO:mozreviewbot:reviewing revision: dddca45a4bed (review request: 4)
-  INFO:mozreviewbot:not reviewing revision: dddca45a4bedd629833af826c138bd7e302e5807 no relevant python changes in commit
+  INFO:mozreviewbot:reviewing revision: bbd1278082cf (review request: 4)
+  INFO:mozreviewbot:not reviewing revision: bbd1278082cfb76d7c5c4422748d5cf8679a5bcd no relevant python changes in commit
 
 Expecting 0 reviews
 
@@ -86,10 +89,10 @@ Expecting 0 reviews
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.base_commit: f5e6079765d8be2554c86ef044e269f048871f1d
-    p2rb.commits: '[["dddca45a4bedd629833af826c138bd7e302e5807", 4]]'
+    p2rb.base_commit: 98dca3b6ee0c2e2bfa0921991abd87ed7abe7baf
+    p2rb.commits: '[["bbd1278082cfb76d7c5c4422748d5cf8679a5bcd", 4]]'
     p2rb.discard_on_publish_rids: '[]'
-    p2rb.first_public_ancestor: f5e6079765d8be2554c86ef044e269f048871f1d
+    p2rb.first_public_ancestor: 98dca3b6ee0c2e2bfa0921991abd87ed7abe7baf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: true
     p2rb.reviewer_map: '{}'
@@ -97,7 +100,7 @@ Expecting 0 reviews
   diffs:
   - id: 3
     revision: 1
-    base_commit_id: f5e6079765d8be2554c86ef044e269f048871f1d
+    base_commit_id: 98dca3b6ee0c2e2bfa0921991abd87ed7abe7baf
     name: diff
     extra: {}
     patch:
@@ -109,7 +112,7 @@ Expecting 0 reviews
     - -dummy
     - ''
   approved: false
-  approval_failure: Commit dddca45a4bedd629833af826c138bd7e302e5807 is not approved.
+  approval_failure: Commit bbd1278082cfb76d7c5c4422748d5cf8679a5bcd is not approved.
 
 Cleanup
 

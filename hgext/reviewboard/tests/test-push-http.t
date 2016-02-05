@@ -251,7 +251,7 @@ The Bugzilla user should have been recorded in the pushlog
       },
       "3": {
           "changesets": [
-              "7e2199dc77b02fc9b43dcf0a7faf18e6051025fc"
+              "6ab4007f52489a76cbff3f80e3d7baa5d99fbb3c"
           ],
           "date": *, (glob)
           "user": "bmo:default@example.com"
@@ -303,14 +303,14 @@ Test with a second user, just so we are comprehensive
       },
       "3": {
           "changesets": [
-              "7e2199dc77b02fc9b43dcf0a7faf18e6051025fc"
+              "6ab4007f52489a76cbff3f80e3d7baa5d99fbb3c"
           ],
           "date": *, (glob)
           "user": "bmo:default@example.com"
       },
       "4": {
           "changesets": [
-              "6432ccd4579e0fdc337b6dc55b827cbcc7fee397"
+              "8d7f5c4152d8f67d67500d3b92903e365c0122f1"
           ],
           "date": *, (glob)
           "user": "bmo:user2@example.com"
@@ -331,7 +331,7 @@ Test creating a review via HTTP
   $ hg --config bugzilla.username=user2@example.com --config bugzilla.apikey=${user2key} --config reviewboard.autopublish=true push ${MERCURIAL_URL}test-repo
   pushing to http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   (adding commit id to 2 changesets)
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/e9bba109755f-920db7c0-addcommitid.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/e528ead97c56-8d25fba9-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -340,11 +340,11 @@ Test creating a review via HTTP
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  4:9a6457fbda8f
+  changeset:  4:9d326020e0dc
   summary:    Bug 1 - Review 1; r?reviewer
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  5:b41b3bd650cb
+  changeset:  5:c6548fe14585
   summary:    Bug 1 - Review 2; r?reviewer
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
@@ -371,18 +371,18 @@ Test creating a review via HTTP
     p2rb.reviewer_map: '{}'
   commit_extra_data:
     p2rb: true
-    p2rb.base_commit: 6432ccd4579e0fdc337b6dc55b827cbcc7fee397
-    p2rb.commits: '[["9a6457fbda8fb4e5afaa3e0ab831f34a3de285af", 2], ["b41b3bd650cb5b456e611e2eeb77705e4c41cb83",
+    p2rb.base_commit: 8d7f5c4152d8f67d67500d3b92903e365c0122f1
+    p2rb.commits: '[["9d326020e0dcd3e421680e4b78bf80c9e30df0e6", 2], ["c6548fe145857055779b23d94ef3f911e8d261b0",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
-    p2rb.first_public_ancestor: 6432ccd4579e0fdc337b6dc55b827cbcc7fee397
+    p2rb.first_public_ancestor: 8d7f5c4152d8f67d67500d3b92903e365c0122f1
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
   diffs:
   - id: 1
     revision: 1
-    base_commit_id: 6432ccd4579e0fdc337b6dc55b827cbcc7fee397
+    base_commit_id: 8d7f5c4152d8f67d67500d3b92903e365c0122f1
     name: diff
     extra: {}
     patch:
@@ -394,7 +394,7 @@ Test creating a review via HTTP
     - +review2
     - ''
   approved: false
-  approval_failure: Commit 9a6457fbda8fb4e5afaa3e0ab831f34a3de285af is not approved.
+  approval_failure: Commit 9d326020e0dcd3e421680e4b78bf80c9e30df0e6 is not approved.
 
   $ rbmanage dump-user user2
   4:

@@ -30,7 +30,7 @@ Create a commit to test on Try
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:b92ab6726259
+  changeset:  1:e2507be7827c
   summary:    Bug 1 - some stuff; r?cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -66,7 +66,7 @@ Post a job
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 2\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 2 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "b92ab6726259": "Bug 1 - some stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "9dc773c72939", \n  "rev": "b92ab6726259", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
+  (200, u'{\n  "commit_descriptions": {\n    "e2507be7827c": "Bug 1 - some stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "3bce87fd55d0", \n  "rev": "e2507be7827c", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
   $ mozreview exec autoland hg log /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   0:Bug 1 - some stuff; r=cthulhu:public
 
@@ -75,7 +75,7 @@ Post a job with try syntax
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` try http://localhost:9898 --trysyntax "stuff"
   (200, u'{\n  "request_id": 3\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 3 --poll
-  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "b92ab6726259", \n  "tree": "test-repo", \n  "trysyntax": "stuff"\n}') (glob)
+  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "e2507be7827c", \n  "tree": "test-repo", \n  "trysyntax": "stuff"\n}') (glob)
   $ mozreview exec autoland hg log /repos/try/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   2:try: stuff:draft
   1:Bug 1 - some stuff; r?cthulhu:draft
@@ -95,11 +95,11 @@ Post a job using a bookmark
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:b92ab6726259
+  changeset:  1:e2507be7827c
   summary:    Bug 1 - some stuff; r?cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:58bfdda6ffde
+  changeset:  2:373b6ff60965
   summary:    Bug 1 - more goodness; r?cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
@@ -111,7 +111,7 @@ Post a job using a bookmark
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --push-bookmark "bookmark" --commit-descriptions "{\"$REV\": \"Bug 1 - more goodness; r=cthulhu\"}"
   (200, u'{\n  "request_id": 4\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 4 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "58bfdda6ffde": "Bug 1 - more goodness; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "bookmark", \n  "result": "7580c6c90ff2", \n  "rev": "58bfdda6ffde", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
+  (200, u'{\n  "commit_descriptions": {\n    "373b6ff60965": "Bug 1 - more goodness; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "bookmark", \n  "result": "aba7cf08f2e4", \n  "rev": "373b6ff60965", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
   $ mozreview exec autoland hg log /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   1:Bug 1 - more goodness; r=cthulhu:public
   0:Bug 1 - some stuff; r=cthulhu:public
@@ -130,15 +130,15 @@ Post a job with unicode commit descriptions to be rewritten
   remote: recorded push in pushlog
   submitting 3 changesets for review
   
-  changeset:  1:b92ab6726259
+  changeset:  1:e2507be7827c
   summary:    Bug 1 - some stuff; r?cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:58bfdda6ffde
+  changeset:  2:373b6ff60965
   summary:    Bug 1 - more goodness; r?cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  3:e0c2a1307ae6
+  changeset:  3:e7f4a0f07be3
   summary:    Bug 1 - ?????; r?cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
@@ -149,7 +149,7 @@ Post a job with unicode commit descriptions to be rewritten
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - \\u3053\\u3093\\u306b\\u3061\\u306f; r=cthulhu\"}"
   (200, u'{\n  "request_id": 5\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 5 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "e0c2a1307ae6": "Bug 1 - \\u3053\\u3093\\u306b\\u3061\\u306f; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "23dfa19ab773", \n  "rev": "e0c2a1307ae6", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
+  (200, u'{\n  "commit_descriptions": {\n    "e7f4a0f07be3": "Bug 1 - \\u3053\\u3093\\u306b\\u3061\\u306f; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "8ec6d9d32147", \n  "rev": "e7f4a0f07be3", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
 
   $ mozreview exec autoland hg log --encoding=utf-8 /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   2:Bug 1 - \xe3\x81\x93\xe3\x82\x93\xe3\x81\xab\xe3\x81\xa1\xe3\x81\xaf; r=cthulhu:public (esc)

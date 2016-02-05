@@ -45,11 +45,11 @@ Seed the repo
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:3a9a9f9a418e
+  changeset:  1:195abc5f0958
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:f7237974e32c
+  changeset:  2:d7ee728aac75
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   

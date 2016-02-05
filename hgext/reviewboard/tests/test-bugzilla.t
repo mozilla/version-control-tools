@@ -28,7 +28,7 @@ Pushing a review should not touch Bugzilla
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -99,7 +99,7 @@ published.
 
   $ echo foo1 >> foo
   $ hg commit --amend
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/a92d53c0ffc7-1dd3de76-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/98467d80785e-96ff1ede-amend-backup.hg (glob)
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
@@ -110,7 +110,7 @@ published.
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:ad7618cd44de
+  changeset:  1:c84f52fcaead
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   

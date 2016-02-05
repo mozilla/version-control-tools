@@ -42,7 +42,7 @@ Create a review request with some busted Javascript in it
   $ rbmanage publish 1
 
   $ python -m eslintbot --config-path ../eslintbot.ini
-  INFO:mozreviewbot:reviewing revision: 265cd5106b1c (review request: 2)
+  INFO:mozreviewbot:reviewing revision: 719ed7ed9e3e (review request: 2)
 
   $ rbmanage dumpreview 2
   id: 2
@@ -53,12 +53,15 @@ Create a review request with some busted Javascript in it
   commit: null
   submitter: default+5
   summary: Bug 1 - Some busted Javascript
-  description: Bug 1 - Some busted Javascript
+  description:
+  - Bug 1 - Some busted Javascript
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: 265cd5106b1c8895cad7b3772214fca31619d65b
+    p2rb.commit_id: 719ed7ed9e3e1a340f443981aa91125b68598369
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false

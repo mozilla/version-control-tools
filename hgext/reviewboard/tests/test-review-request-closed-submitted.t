@@ -33,11 +33,11 @@
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:233b570e5356
+  changeset:  2:3a446ae43820
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
@@ -72,7 +72,7 @@ Squashed review request with ID 1 should be closed as submitted...
   commit_extra_data:
     p2rb: true
     p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
+    p2rb.commits: '[["98467d80785ec84dd871f213c167ed704a6d974d", 2], ["3a446ae4382006c43cdfa5aa33c494f582736f35",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
@@ -94,7 +94,7 @@ Squashed review request with ID 1 should be closed as submitted...
     - +foo2
     - ''
   approved: false
-  approval_failure: Commit a92d53c0ffc7df0517397a77980e62332552d812 is not approved.
+  approval_failure: Commit 98467d80785ec84dd871f213c167ed704a6d974d is not approved.
 
 Child review request with ID 2 should be closed as submitted...
 
@@ -107,13 +107,16 @@ Child review request with ID 2 should be closed as submitted...
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 1
-  description: Bug 1 - Foo 1
+  description:
+  - Bug 1 - Foo 1
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
+    p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -143,20 +146,23 @@ Child review request with ID 2 should be closed as submitted...
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 2
-  description: Bug 1 - Foo 2
+  description:
+  - Bug 1 - Foo 2
+  - ''
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people: []
   extra_data:
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
+    p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
   - id: 3
     revision: 1
-    base_commit_id: a92d53c0ffc7df0517397a77980e62332552d812
+    base_commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     name: diff
     extra: {}
     patch:
@@ -210,7 +216,7 @@ Squashed review request with ID 1 should be re-opened...
   commit_extra_data:
     p2rb: true
     p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
+    p2rb.commits: '[["98467d80785ec84dd871f213c167ed704a6d974d", 2], ["3a446ae4382006c43cdfa5aa33c494f582736f35",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
@@ -232,7 +238,7 @@ Squashed review request with ID 1 should be re-opened...
     - +foo2
     - ''
   approved: false
-  approval_failure: Commit a92d53c0ffc7df0517397a77980e62332552d812 is not approved.
+  approval_failure: Commit 98467d80785ec84dd871f213c167ed704a6d974d is not approved.
 
 Child review request with ID 2 should be re-opened...
 
@@ -245,13 +251,16 @@ Child review request with ID 2 should be re-opened...
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 1
-  description: Bug 1 - Foo 1
+  description:
+  - Bug 1 - Foo 1
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
+    p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -283,20 +292,23 @@ Child review request with ID 3 should be re-opened...
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 2
-  description: Bug 1 - Foo 2
+  description:
+  - Bug 1 - Foo 2
+  - ''
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people: []
   extra_data:
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
+    p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
   - id: 3
     revision: 1
-    base_commit_id: a92d53c0ffc7df0517397a77980e62332552d812
+    base_commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     name: diff
     extra: {}
     patch:

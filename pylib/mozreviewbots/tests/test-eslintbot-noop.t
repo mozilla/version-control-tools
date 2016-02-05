@@ -37,8 +37,8 @@ Create a review request that doesn't touch any Javascript files
   $ rbmanage publish 1
 
   $ python -m eslintbot --config-path ../eslintbot.ini
-  INFO:mozreviewbot:reviewing revision: d69b315f2ab1 (review request: 2)
-  INFO:mozreviewbot:not reviewing revision: d69b315f2ab1fd46892adbebcadef52f09449906 no relevant Javascript changes in commit
+  INFO:mozreviewbot:reviewing revision: 27ed10e6e90a (review request: 2)
+  INFO:mozreviewbot:not reviewing revision: 27ed10e6e90a514ad461a5a7147a9134de0ca799 no relevant Javascript changes in commit
 
   $ rbmanage dumpreview 2
   id: 2
@@ -49,12 +49,15 @@ Create a review request that doesn't touch any Javascript files
   commit: null
   submitter: default+5
   summary: Bug 1 - No Javascript changes
-  description: Bug 1 - No Javascript changes
+  description:
+  - Bug 1 - No Javascript changes
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: d69b315f2ab1fd46892adbebcadef52f09449906
+    p2rb.commit_id: 27ed10e6e90a514ad461a5a7147a9134de0ca799
     p2rb.first_public_ancestor: dc42edca6edd9dd5a8346b1a881281263d3a10ad
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false

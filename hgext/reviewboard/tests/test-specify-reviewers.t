@@ -71,43 +71,43 @@ Try a bunch of different ways of specifying a reviewer
   submitting 10 changesets for review
   unrecognized reviewer: test-only
   
-  changeset:  11:fcf566e4c32a
+  changeset:  11:7122d7b3a455
   summary:    Bug 1 - some stuff; r?romulus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  12:c62a829e2f0a
+  changeset:  12:1cac575c1bc7
   summary:    Bug 1 - More stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  13:955576a13e6c
+  changeset:  13:39c50951b7d1
   summary:    Bug 1 - More stuff; r?romulus,r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
-  changeset:  14:696e908c00aa
+  changeset:  14:b4ea260242b6
   summary:    Bug 1 - More stuff; r?romulus, remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
-  changeset:  15:92e037a5e92f
+  changeset:  15:a67020c63164
   summary:    Bug 1 - More stuff; r?romulus,remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
   
-  changeset:  16:a7c3071c6b54
+  changeset:  16:9c52c338c619
   summary:    Bug 1 - More stuff; (r?romulus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7 (draft)
   
-  changeset:  17:7b03b2560ab0
+  changeset:  17:b04b8d95503b
   summary:    Bug 1 - More stuff; (r?romulus,remus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8 (draft)
   
-  changeset:  18:42c4d67a510e
+  changeset:  18:ccfcf9b70a65
   summary:    Bug 1 - More stuff; [r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9 (draft)
   
-  changeset:  19:2bc874a070ce
+  changeset:  19:214fce360842
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10 (draft)
   
-  changeset:  20:bb63798ced0f
+  changeset:  20:1bc0bf6f1f8b
   summary:    Bug 1 - More stuff; r?romulus, r=test-only
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
@@ -160,43 +160,43 @@ Publishing series during push works
   no changes found
   submitting 10 changesets for review
   
-  changeset:  11:fcf566e4c32a
+  changeset:  11:7122d7b3a455
   summary:    Bug 1 - some stuff; r?romulus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  12:c62a829e2f0a
+  changeset:  12:1cac575c1bc7
   summary:    Bug 1 - More stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  13:955576a13e6c
+  changeset:  13:39c50951b7d1
   summary:    Bug 1 - More stuff; r?romulus,r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
-  changeset:  14:696e908c00aa
+  changeset:  14:b4ea260242b6
   summary:    Bug 1 - More stuff; r?romulus, remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
-  changeset:  15:92e037a5e92f
+  changeset:  15:a67020c63164
   summary:    Bug 1 - More stuff; r?romulus,remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
   
-  changeset:  16:a7c3071c6b54
+  changeset:  16:9c52c338c619
   summary:    Bug 1 - More stuff; (r?romulus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7 (draft)
   
-  changeset:  17:7b03b2560ab0
+  changeset:  17:b04b8d95503b
   summary:    Bug 1 - More stuff; (r?romulus,remus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8 (draft)
   
-  changeset:  18:42c4d67a510e
+  changeset:  18:ccfcf9b70a65
   summary:    Bug 1 - More stuff; [r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9 (draft)
   
-  changeset:  19:2bc874a070ce
+  changeset:  19:214fce360842
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10 (draft)
   
-  changeset:  20:bb63798ced0f
+  changeset:  20:1bc0bf6f1f8b
   summary:    Bug 1 - More stuff; r?romulus, r=test-only
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
@@ -216,7 +216,10 @@ Publishing series during push works
   commit: null
   submitter: default+5
   summary: Bug 1 - More stuff; [r?remus, r?romulus]
-  description: Bug 1 - More stuff; [r?remus, r?romulus]
+  description:
+  - Bug 1 - More stuff; [r?remus, r?romulus]
+  - ''
+  - 'MozReview-Commit-ID: cXO9WC'
   target_people:
   - remus
   - romulus
@@ -224,14 +227,14 @@ Publishing series during push works
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 2bc874a070cef1ff62b63e28f3d40a81655fec77
+    p2rb.commit_id: 214fce3608426755a50ae60ae8645eb9bc1f7537
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
   - id: 10
     revision: 1
-    base_commit_id: 42c4d67a510ecafa656b9410af8a274b7b9e2edb
+    base_commit_id: ccfcf9b70a65731d01240f24815edf0cf6b64739
     name: diff
     extra: {}
     patch:
@@ -256,7 +259,11 @@ Amending a commit should also work. This exercises the update_review_request
 code path.
 
   $ echo blah >> foo
-  $ hg commit --amend -m 'Bug 1 - Even more stuff; r?romulus, r?remus'
+  $ hg commit --amend -l - << EOF
+  > Bug 1 - Even more stuff; r?romulus, r?remus
+  > 
+  > MozReview-Commit-ID: hE3OiG
+  > EOF
   $ hg push --config reviewboard.autopublish=true
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
@@ -267,43 +274,43 @@ code path.
   remote: recorded push in pushlog
   submitting 10 changesets for review
   
-  changeset:  11:fcf566e4c32a
+  changeset:  11:7122d7b3a455
   summary:    Bug 1 - some stuff; r?romulus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
-  changeset:  12:c62a829e2f0a
+  changeset:  12:1cac575c1bc7
   summary:    Bug 1 - More stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
-  changeset:  13:955576a13e6c
+  changeset:  13:39c50951b7d1
   summary:    Bug 1 - More stuff; r?romulus,r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4
   
-  changeset:  14:696e908c00aa
+  changeset:  14:b4ea260242b6
   summary:    Bug 1 - More stuff; r?romulus, remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5
   
-  changeset:  15:92e037a5e92f
+  changeset:  15:a67020c63164
   summary:    Bug 1 - More stuff; r?romulus,remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6
   
-  changeset:  16:a7c3071c6b54
+  changeset:  16:9c52c338c619
   summary:    Bug 1 - More stuff; (r?romulus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7
   
-  changeset:  17:7b03b2560ab0
+  changeset:  17:b04b8d95503b
   summary:    Bug 1 - More stuff; (r?romulus,remus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8
   
-  changeset:  18:42c4d67a510e
+  changeset:  18:ccfcf9b70a65
   summary:    Bug 1 - More stuff; [r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9
   
-  changeset:  19:2bc874a070ce
+  changeset:  19:214fce360842
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
-  changeset:  22:4edf42122107
+  changeset:  22:47ac4d7af91f
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
@@ -329,43 +336,43 @@ again.
   no changes found
   submitting 10 changesets for review
   
-  changeset:  11:fcf566e4c32a
+  changeset:  11:7122d7b3a455
   summary:    Bug 1 - some stuff; r?romulus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
-  changeset:  12:c62a829e2f0a
+  changeset:  12:1cac575c1bc7
   summary:    Bug 1 - More stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
-  changeset:  13:955576a13e6c
+  changeset:  13:39c50951b7d1
   summary:    Bug 1 - More stuff; r?romulus,r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4
   
-  changeset:  14:696e908c00aa
+  changeset:  14:b4ea260242b6
   summary:    Bug 1 - More stuff; r?romulus, remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5
   
-  changeset:  15:92e037a5e92f
+  changeset:  15:a67020c63164
   summary:    Bug 1 - More stuff; r?romulus,remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6
   
-  changeset:  16:a7c3071c6b54
+  changeset:  16:9c52c338c619
   summary:    Bug 1 - More stuff; (r?romulus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7
   
-  changeset:  17:7b03b2560ab0
+  changeset:  17:b04b8d95503b
   summary:    Bug 1 - More stuff; (r?romulus,remus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8
   
-  changeset:  18:42c4d67a510e
+  changeset:  18:ccfcf9b70a65
   summary:    Bug 1 - More stuff; [r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9
   
-  changeset:  19:2bc874a070ce
+  changeset:  19:214fce360842
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
-  changeset:  22:4edf42122107
+  changeset:  22:47ac4d7af91f
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
@@ -384,7 +391,11 @@ and pushed with no reviewers specified.
   $ rbmanage list-reviewers 11
   admin+1, remus, romulus
   $ echo blah >> foo
-  $ hg commit --amend -m 'Bug 1 - Amended stuff'
+  $ hg commit --amend -l - << EOF
+  > Bug 1 - Amended stuff
+  > 
+  > MozReview-Commit-ID: hE3OiG
+  > EOF
   $ hg push --config reviewboard.autopublish=true
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
@@ -395,43 +406,43 @@ and pushed with no reviewers specified.
   remote: recorded push in pushlog
   submitting 10 changesets for review
   
-  changeset:  11:fcf566e4c32a
+  changeset:  11:7122d7b3a455
   summary:    Bug 1 - some stuff; r?romulus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
-  changeset:  12:c62a829e2f0a
+  changeset:  12:1cac575c1bc7
   summary:    Bug 1 - More stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
-  changeset:  13:955576a13e6c
+  changeset:  13:39c50951b7d1
   summary:    Bug 1 - More stuff; r?romulus,r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4
   
-  changeset:  14:696e908c00aa
+  changeset:  14:b4ea260242b6
   summary:    Bug 1 - More stuff; r?romulus, remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5
   
-  changeset:  15:92e037a5e92f
+  changeset:  15:a67020c63164
   summary:    Bug 1 - More stuff; r?romulus,remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6
   
-  changeset:  16:a7c3071c6b54
+  changeset:  16:9c52c338c619
   summary:    Bug 1 - More stuff; (r?romulus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7
   
-  changeset:  17:7b03b2560ab0
+  changeset:  17:b04b8d95503b
   summary:    Bug 1 - More stuff; (r?romulus,remus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8
   
-  changeset:  18:42c4d67a510e
+  changeset:  18:ccfcf9b70a65
   summary:    Bug 1 - More stuff; [r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9
   
-  changeset:  19:2bc874a070ce
+  changeset:  19:214fce360842
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
-  changeset:  24:6f4a14de0f3d
+  changeset:  24:cf273a4d0f27
   summary:    Bug 1 - Amended stuff
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
@@ -448,7 +459,11 @@ Amending a commit with reviewers specified will reset the reviewers back to
 those specified in the commit summary.
 
   $ echo blah >> foo
-  $ hg commit --amend -m 'Bug 1 - Amended stuff; r?romulus, r?remus'
+  $ hg commit --amend -l - << EOF
+  > Bug 1 - Amended stuff; r?romulus, r?remus
+  > 
+  > MozReview-Commit-ID: vI38IS
+  > EOF
   $ hg push --config reviewboard.autopublish=true
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
@@ -459,43 +474,43 @@ those specified in the commit summary.
   remote: recorded push in pushlog
   submitting 10 changesets for review
   
-  changeset:  11:fcf566e4c32a
+  changeset:  11:7122d7b3a455
   summary:    Bug 1 - some stuff; r?romulus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
-  changeset:  12:c62a829e2f0a
+  changeset:  12:1cac575c1bc7
   summary:    Bug 1 - More stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
-  changeset:  13:955576a13e6c
+  changeset:  13:39c50951b7d1
   summary:    Bug 1 - More stuff; r?romulus,r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4
   
-  changeset:  14:696e908c00aa
+  changeset:  14:b4ea260242b6
   summary:    Bug 1 - More stuff; r?romulus, remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5
   
-  changeset:  15:92e037a5e92f
+  changeset:  15:a67020c63164
   summary:    Bug 1 - More stuff; r?romulus,remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6
   
-  changeset:  16:a7c3071c6b54
+  changeset:  16:9c52c338c619
   summary:    Bug 1 - More stuff; (r?romulus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7
   
-  changeset:  17:7b03b2560ab0
+  changeset:  17:b04b8d95503b
   summary:    Bug 1 - More stuff; (r?romulus,remus)
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/8
   
-  changeset:  18:42c4d67a510e
+  changeset:  18:ccfcf9b70a65
   summary:    Bug 1 - More stuff; [r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/9
   
-  changeset:  19:2bc874a070ce
+  changeset:  19:214fce360842
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
-  changeset:  26:3d7e903b90b0
+  changeset:  26:7a590575b558
   summary:    Bug 1 - Amended stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
@@ -525,7 +540,7 @@ Unrecognized reviewers should be ignored
   submitting 1 changesets for review
   unrecognized reviewer: cthulhu
   
-  changeset:  27:3e01c2b3cff2
+  changeset:  27:e0c35a6f9fc6
   summary:    Bug 2 - different stuff; r?cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/13 (draft)
   
@@ -552,7 +567,7 @@ Reviewer identification should be case insensitive.
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  28:46d3dc1774f5
+  changeset:  28:dce90596f792
   summary:    Bug 2 - better stuff; r?ryanvm
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/13 (draft)
   

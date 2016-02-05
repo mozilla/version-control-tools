@@ -34,7 +34,7 @@ Create bug and review
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:04d9ab193e26
+  changeset:  1:63c61970184b
   summary:    Bug 1 - Initial commit to review
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -58,21 +58,27 @@ Check for rewrite on parent
 
   $ rbmanage dump-rewrite-commit 1
   commits:
-  - commit: 04d9ab193e26da839c4addacfc5ce68f62696300
+  - commit: 63c61970184bac9e9ae1660344e26e98587b0103
     id: 2
     reviewers:
     - reviewer
-    summary: Bug 1 - Initial commit to review r=reviewer
+    summary:
+    - Bug 1 - Initial commit to review r=reviewer
+    - ''
+    - 'MozReview-Commit-ID: 124Bxg'
 
 Rewriting on a child should work against the parent
 
   $ rbmanage dump-rewrite-commit 2
   commits:
-  - commit: 04d9ab193e26da839c4addacfc5ce68f62696300
+  - commit: 63c61970184bac9e9ae1660344e26e98587b0103
     id: 2
     reviewers:
     - reviewer
-    summary: Bug 1 - Initial commit to review r=reviewer
+    summary:
+    - Bug 1 - Initial commit to review r=reviewer
+    - ''
+    - 'MozReview-Commit-ID: 124Bxg'
 
   $ mozreview stop
   stopped 9 containers

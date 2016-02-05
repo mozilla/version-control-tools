@@ -34,7 +34,7 @@ be ignored
   $ rbmanage publish 1
 
   $ python -m pylintbot --config-path ../pylintbot.ini
-  INFO:mozreviewbot:reviewing revision: a89ebf13fcac (review request: 2)
+  INFO:mozreviewbot:reviewing revision: 3a773b9e226c (review request: 2)
 
   $ rbmanage dumpreview 2
   id: 2
@@ -45,12 +45,15 @@ be ignored
   commit: null
   submitter: default+5
   summary: Bug 1 - Verify diff context
-  description: Bug 1 - Verify diff context
+  description:
+  - Bug 1 - Verify diff context
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: a89ebf13fcac33a90fe92db070bc96cb56a0f9db
+    p2rb.commit_id: 3a773b9e226cc5486fdd724372938f77204ff12c
     p2rb.first_public_ancestor: 3edbb5ae6222fc9890db26538597a9b417cb7b94
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false

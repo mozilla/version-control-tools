@@ -20,7 +20,7 @@ Create a review with Python style violations
   $ hg push > /dev/null
   $ rbmanage publish 1
   $ python -m pylintbot --config-path ../pylintbot.ini
-  INFO:mozreviewbot:reviewing revision: f3ef2e7e2bda (review request: 2)
+  INFO:mozreviewbot:reviewing revision: 1978e5417012 (review request: 2)
 
   $ rbmanage dumpreview 2
   id: 2
@@ -31,12 +31,15 @@ Create a review with Python style violations
   commit: null
   submitter: default+5
   summary: Bug 1 - Bad Python
-  description: Bug 1 - Bad Python
+  description:
+  - Bug 1 - Bad Python
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: f3ef2e7e2bdab983cc9b20db210bc8a78d77c394
+    p2rb.commit_id: 1978e5417012a5f63128d09cfd52c52077c761cb
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -124,7 +127,7 @@ Ensure pyflakes warnings are handled
   $ rbmanage publish 3
 
   $ python -m pylintbot --config-path ../pylintbot.ini
-  INFO:mozreviewbot:reviewing revision: ce8807640e8b (review request: 4)
+  INFO:mozreviewbot:reviewing revision: c768227fc261 (review request: 4)
 
   $ rbmanage dumpreview 4
   id: 4
@@ -135,12 +138,15 @@ Ensure pyflakes warnings are handled
   commit: null
   submitter: default+5
   summary: Bug 2 - pyflakes
-  description: Bug 2 - pyflakes
+  description:
+  - Bug 2 - pyflakes
+  - ''
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people: []
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commit_id: ce8807640e8b7a4c42f18fd50f722f8443b92018
+    p2rb.commit_id: c768227fc261de5a93e0c813e0ba4a54e24d2697
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false

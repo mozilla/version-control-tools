@@ -29,11 +29,11 @@ Pushing a review should not publish to Pulse
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:233b570e5356
+  changeset:  2:3a446ae43820
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
@@ -55,10 +55,10 @@ details from the parent review request
       routing_key: mozreview.commits.published
     commits:
     - diffset_revision: 1
-      rev: a92d53c0ffc7df0517397a77980e62332552d812
+      rev: 98467d80785ec84dd871f213c167ed704a6d974d
       review_request_id: 2
     - diffset_revision: 1
-      rev: 233b570e5356d0c84bcbf0633de446172012b3b3
+      rev: 3a446ae4382006c43cdfa5aa33c494f582736f35
       review_request_id: 3
     landing_repository_url: null
     parent_diffset_revision: 1

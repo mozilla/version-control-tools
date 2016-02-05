@@ -144,7 +144,7 @@ Pushing to autodiscover repo should redirect
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:daa176714e3a
+  changeset:  1:b8f5a5d75ffb
   summary:    Bug 1 - Testing discovery of a
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -188,7 +188,7 @@ Redirecting works when pushing over HTTP
   searching for appropriate review repository
   redirecting push to http://$DOCKER_HOSTNAME:$HGPORT/a
   (adding commit id to 1 changesets)
-  saved backup bundle to $TESTTMP/http-redirect/.hg/strip-backup/5f3de01b6263-bb45f39e-addcommitid.hg (glob)
+  saved backup bundle to $TESTTMP/http-redirect/.hg/strip-backup/30e798db0d86-dc510bb5-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -197,7 +197,7 @@ Redirecting works when pushing over HTTP
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  2:e94691c71b1a
+  changeset:  2:e60ac86a2b70
   summary:    Bug 1 - Testing discovery via HTTP pushes
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   

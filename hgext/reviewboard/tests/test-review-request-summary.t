@@ -31,11 +31,11 @@
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:233b570e5356
+  changeset:  2:3a446ae43820
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
@@ -60,7 +60,7 @@
   children:
   - summary: Bug 1 - Foo 1
     id: 2
-    commit: a92d53c0ffc7df0517397a77980e62332552d812
+    commit: 98467d80785ec84dd871f213c167ed704a6d974d
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -71,7 +71,7 @@
         ship_it: false
   - summary: Bug 1 - Foo 2
     id: 3
-    commit: 233b570e5356d0c84bcbf0633de446172012b3b3
+    commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -106,7 +106,7 @@ Opening an issue should be reflected in the summary.
   children:
   - summary: Bug 1 - Foo 1
     id: 2
-    commit: a92d53c0ffc7df0517397a77980e62332552d812
+    commit: 98467d80785ec84dd871f213c167ed704a6d974d
     submitter: default+5
     issue_open_count: 1
     status: pending
@@ -117,7 +117,7 @@ Opening an issue should be reflected in the summary.
         ship_it: false
   - summary: Bug 1 - Foo 2
     id: 3
-    commit: 233b570e5356d0c84bcbf0633de446172012b3b3
+    commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -141,7 +141,7 @@ Resolving an issue should decrement the issue count.
   children:
   - summary: Bug 1 - Foo 1
     id: 2
-    commit: a92d53c0ffc7df0517397a77980e62332552d812
+    commit: 98467d80785ec84dd871f213c167ed704a6d974d
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -152,7 +152,7 @@ Resolving an issue should decrement the issue count.
         ship_it: false
   - summary: Bug 1 - Foo 2
     id: 3
-    commit: 233b570e5356d0c84bcbf0633de446172012b3b3
+    commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -177,7 +177,7 @@ Giving a ship-it should result in a change in the reviewer status
   children:
   - summary: Bug 1 - Foo 1
     id: 2
-    commit: a92d53c0ffc7df0517397a77980e62332552d812
+    commit: 98467d80785ec84dd871f213c167ed704a6d974d
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -188,7 +188,7 @@ Giving a ship-it should result in a change in the reviewer status
         ship_it: true
   - summary: Bug 1 - Foo 2
     id: 3
-    commit: 233b570e5356d0c84bcbf0633de446172012b3b3
+    commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
     submitter: default+5
     issue_open_count: 0
     status: pending
@@ -213,7 +213,7 @@ Verify we can also get the summaries by bug, including closed ones.
     children:
     - summary: Bug 1 - Foo 1
       id: 2
-      commit: a92d53c0ffc7df0517397a77980e62332552d812
+      commit: 98467d80785ec84dd871f213c167ed704a6d974d
       submitter: default+5
       issue_open_count: 0
       status: submitted
@@ -224,7 +224,7 @@ Verify we can also get the summaries by bug, including closed ones.
           ship_it: true
     - summary: Bug 1 - Foo 2
       id: 3
-      commit: 233b570e5356d0c84bcbf0633de446172012b3b3
+      commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
       submitter: default+5
       issue_open_count: 0
       status: pending

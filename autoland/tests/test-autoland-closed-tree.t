@@ -32,7 +32,7 @@ Create a commit to test on Try
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:7194ef3a2eac
+  changeset:  1:f363e17530eb
   summary:    Bug 1 - some stuff
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -56,7 +56,7 @@ Open the tree
 
   $ treestatus set-status $TREESTATUS_URL try open
   $ ottoland autoland-job-status $AUTOLAND_URL 1 --poll
-  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "7194ef3a2eac", \n  "tree": "test-repo", \n  "trysyntax": "stuff"\n}') (glob)
+  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "f363e17530eb", \n  "tree": "test-repo", \n  "trysyntax": "stuff"\n}') (glob)
 
   $ mozreview stop
   stopped 9 containers

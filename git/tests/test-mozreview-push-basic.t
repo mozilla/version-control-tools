@@ -163,9 +163,6 @@ Reviews should be published and Bugzilla attachments should be present
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'MozReview-Commit-ID: 124Bxg'
-      - ''
-      - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
@@ -174,9 +171,6 @@ Reviews should be published and Bugzilla attachments should be present
       text:
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
-      - ''
-      - 'MozReview-Commit-ID: 5ijR9k'
-      - ''
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'

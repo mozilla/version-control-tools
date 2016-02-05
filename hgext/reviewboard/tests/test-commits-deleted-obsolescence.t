@@ -51,23 +51,23 @@
   remote: recorded push in pushlog
   submitting 5 changesets for review
   
-  changeset:  6:6bd3fbee3dfa
+  changeset:  6:0b3e14fe3ff1
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  7:dfe48634934b
+  changeset:  7:bce658a3f6d6
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  8:d751d4c04967
+  changeset:  8:713878e22d95
   summary:    Bug 1 - Foo 3
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
-  changeset:  9:98dd6a7335db
+  changeset:  9:4d0f846364eb
   summary:    Bug 1 - Foo 4
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
-  changeset:  10:76088734e3cb
+  changeset:  10:4e50148c492d
   summary:    Bug 1 - Foo 5
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
   
@@ -80,7 +80,7 @@
 
 Popping the last commit truncates the review set
 
-  $ hg strip -r 76088734e3cb --no-backup
+  $ hg strip -r 4e50148c492d --no-backup
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
@@ -88,19 +88,19 @@ Popping the last commit truncates the review set
   no changes found
   submitting 4 changesets for review
   
-  changeset:  6:6bd3fbee3dfa
+  changeset:  6:0b3e14fe3ff1
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
-  changeset:  7:dfe48634934b
+  changeset:  7:bce658a3f6d6
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
-  changeset:  8:d751d4c04967
+  changeset:  8:713878e22d95
   summary:    Bug 1 - Foo 3
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4
   
-  changeset:  9:98dd6a7335db
+  changeset:  9:4d0f846364eb
   summary:    Bug 1 - Foo 4
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5
   
@@ -130,9 +130,9 @@ on publish.
   commit_extra_data:
     p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-    p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
-      3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
-      5], ["76088734e3cba33be80930be14e7cd1e9ee474be", 6]]'
+    p2rb.commits: '[["0b3e14fe3ff19019110705e72dcf563c0ef551f6", 2], ["bce658a3f6d6aa04bf5c449e0e779e839de4690e",
+      3], ["713878e22d952d478e88bfdef897fdfc73060351", 4], ["4d0f846364eb509a1b6ae3294f05439101f6e7d3",
+      5], ["4e50148c492dde95397cd666f2d4e4ad4fd2176f", 6]]'
     p2rb.discard_on_publish_rids: '[6]'
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
@@ -177,7 +177,7 @@ on publish.
     - +foo5
     - ''
   approved: false
-  approval_failure: Commit 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e is not approved.
+  approval_failure: Commit 0b3e14fe3ff19019110705e72dcf563c0ef551f6 is not approved.
   draft:
     bugs:
     - '1'
@@ -191,8 +191,8 @@ on publish.
     commit_extra_data:
       p2rb: true
       p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-      p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
-        3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
+      p2rb.commits: '[["0b3e14fe3ff19019110705e72dcf563c0ef551f6", 2], ["bce658a3f6d6aa04bf5c449e0e779e839de4690e",
+        3], ["713878e22d952d478e88bfdef897fdfc73060351", 4], ["4d0f846364eb509a1b6ae3294f05439101f6e7d3",
         5]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
@@ -253,8 +253,8 @@ The parent review should have dropped the reference to /r/6
   commit_extra_data:
     p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-    p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
-      3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
+    p2rb.commits: '[["0b3e14fe3ff19019110705e72dcf563c0ef551f6", 2], ["bce658a3f6d6aa04bf5c449e0e779e839de4690e",
+      3], ["713878e22d952d478e88bfdef897fdfc73060351", 4], ["4d0f846364eb509a1b6ae3294f05439101f6e7d3",
       5]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
@@ -331,7 +331,7 @@ The parent review should have dropped the reference to /r/6
     - +foo4
     - ''
   approved: false
-  approval_failure: Commit 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e is not approved.
+  approval_failure: Commit 0b3e14fe3ff19019110705e72dcf563c0ef551f6 is not approved.
 
 Review 6 should be marked as discarded
 
@@ -344,20 +344,23 @@ Review 6 should be marked as discarded
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 5
-  description: Bug 1 - Foo 5
+  description:
+  - Bug 1 - Foo 5
+  - ''
+  - 'MozReview-Commit-ID: JmjAjw'
   target_people: []
   extra_data:
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 76088734e3cba33be80930be14e7cd1e9ee474be
+    p2rb.commit_id: 4e50148c492dde95397cd666f2d4e4ad4fd2176f
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
   - id: 6
     revision: 1
-    base_commit_id: 98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb
+    base_commit_id: 4d0f846364eb509a1b6ae3294f05439101f6e7d3
     name: diff
     extra: {}
     patch:
@@ -374,7 +377,7 @@ Review 6 should be marked as discarded
 Dropping the first commit should drop its review. Subsequent reviews should
 be preserved.
 
-  $ hg -q rebase -s dfe48634934b -d 0
+  $ hg -q rebase -s bce658a3f6d6 -d 0
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
@@ -385,15 +388,15 @@ be preserved.
   remote: recorded push in pushlog
   submitting 3 changesets for review
   
-  changeset:  10:7050183d97d5
+  changeset:  10:eeb6d49dcb09
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  11:d7a5827a584d
+  changeset:  11:607f375f35c0
   summary:    Bug 1 - Foo 3
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
-  changeset:  12:b5473ad606f4
+  changeset:  12:81ee86efd38f
   summary:    Bug 1 - Foo 4
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
@@ -422,8 +425,8 @@ on publish.
   commit_extra_data:
     p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-    p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
-      3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
+    p2rb.commits: '[["0b3e14fe3ff19019110705e72dcf563c0ef551f6", 2], ["bce658a3f6d6aa04bf5c449e0e779e839de4690e",
+      3], ["713878e22d952d478e88bfdef897fdfc73060351", 4], ["4d0f846364eb509a1b6ae3294f05439101f6e7d3",
       5]]'
     p2rb.discard_on_publish_rids: '[2]'
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
@@ -500,7 +503,7 @@ on publish.
     - +foo4
     - ''
   approved: false
-  approval_failure: Commit 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e is not approved.
+  approval_failure: Commit 0b3e14fe3ff19019110705e72dcf563c0ef551f6 is not approved.
   draft:
     bugs:
     - '1'
@@ -514,8 +517,8 @@ on publish.
     commit_extra_data:
       p2rb: true
       p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-      p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 3], ["d7a5827a584db609f6a9ca2bd3d43aa3afa6b86e",
-        4], ["b5473ad606f40840715d6b378dacc1a37f6263b1", 5]]'
+      p2rb.commits: '[["eeb6d49dcb0950d771959358f662cf2e5ddc9dc1", 3], ["607f375f35c0866a8e08bc1d6aaecc6ad259ed6e",
+        4], ["81ee86efd38ff60717aeeeff153292e84e58be0b", 5]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.identifier: bz://1/mynick
@@ -561,13 +564,16 @@ The dropped commit should now be discarded
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 1
-  description: Bug 1 - Foo 1
+  description:
+  - Bug 1 - Foo 1
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e
+    p2rb.commit_id: 0b3e14fe3ff19019110705e72dcf563c0ef551f6
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -590,7 +596,7 @@ The dropped commit should now be discarded
 
 Try removing a commit in the middle.
 
-  $ hg -q rebase -s b5473ad606f4 -d 7050183d97d5
+  $ hg -q rebase -s 81ee86efd38f -d eeb6d49dcb09
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
@@ -601,11 +607,11 @@ Try removing a commit in the middle.
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  10:7050183d97d5
+  changeset:  10:eeb6d49dcb09
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
-  changeset:  13:2fbc30f77859
+  changeset:  13:a27a94c54524
   summary:    Bug 1 - Foo 4
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
@@ -635,7 +641,7 @@ The parent review should have been updated accordingly.
   commit_extra_data:
     p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
-    p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 3], ["2fbc30f77859fa4be2e173866fa71c52d394f2c4",
+    p2rb.commits: '[["eeb6d49dcb0950d771959358f662cf2e5ddc9dc1", 3], ["a27a94c54524d4331dec2f92f647067bfd6dfbd4",
       5]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
@@ -756,7 +762,7 @@ The parent review should have been updated accordingly.
     - +foo4
     - ''
   approved: false
-  approval_failure: Commit 7050183d97d5f601da86fb313dd8783ccf1ade18 is not approved.
+  approval_failure: Commit eeb6d49dcb0950d771959358f662cf2e5ddc9dc1 is not approved.
 
 Cleanup
 

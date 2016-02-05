@@ -170,7 +170,7 @@ Pushing multiple heads is rejected
   $ hg push -r 0:tip --reviewid bz://784841 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   (adding commit id to 1 changesets)
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/2e92ee1083e0*-addcommitid.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/d7b7d7300bc6-3588c900-addcommitid.hg (glob)
   searching for changes
   abort: cannot push multiple heads to remote; limit pushed revisions using the -r argument.
   [255]
