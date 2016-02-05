@@ -1,7 +1,5 @@
 from __future__ import absolute_import
 
-import logging
-
 from django import template
 from django.contrib.auth.models import User
 
@@ -9,7 +7,7 @@ from mozreview.extra_data import (
     COMMIT_ID_KEY,
     fetch_commit_data,
     is_parent,
-    MOZREVIEW_KEY,
+    is_pushed,
 )
 from mozreview.review_helpers import get_reviewers_status
 
@@ -20,9 +18,10 @@ register = template.Library()
 def isSquashed(review_request):
     return is_parent(review_request)
 
+
 @register.filter()
-def isPush(aReviewRequest):
-    return str(aReviewRequest.extra_data.get(MOZREVIEW_KEY, 'False')).lower() == 'true'
+def isPush(review_request):
+    return is_pushed(review_request)
 
 
 @register.filter()
@@ -35,6 +34,7 @@ def commit_id(review_request_details):
 def reviewer_list(review_request):
     return ', '.join([user.username
                       for user in review_request.target_people.all()])
+
 
 @register.filter()
 def extra_data(review_request, key):
@@ -87,6 +87,7 @@ def treeherder_repo(landing_url):
 
     return mapping.get(landing_url.rstrip('/'), '')
 
+
 @register.filter()
 def mercurial_repo_name(landing_url):
     return landing_url.rstrip('/').split('/')[-1]
@@ -100,6 +101,7 @@ def ssh_to_https(landing_url):
 @register.filter()
 def reviewers_status(review_request):
     return get_reviewers_status(review_request).items()
+
 
 @register.filter()
 def userid_to_user(user_id):
