@@ -45,6 +45,14 @@ as installing the required package, e.g., on Ubuntu,
 
 You can also install the very latest release `directly from Docker <http://docs.docker.com/linux/step_one/>`_.
 
+On Linux, it is necessary to configure Docker to listen on a tcp socket
+rather than the default configuration, which uses an unix domain socket,
+in order to get test results which match the expected results. This can be
+done by editing your configuration file to start docker with the following
+option:
+
+  -H tcp://127.0.0.1:4243
+
 For OS X, you will need to install and start up docker-machine; see
 the official `installation instructions
 <https://docs.docker.com/installation/mac/>`_.  Make sure you specify

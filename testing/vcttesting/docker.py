@@ -24,6 +24,7 @@ import tempfile
 import time
 import urlparse
 import uuid
+import warnings
 
 import backports.lzma as lzma
 
@@ -160,11 +161,27 @@ class Docker(object):
         # for determining where to look for opened ports.
         # This is a bit complicated because Docker can be running from a local
         # socket or or another host via something like boot2docker.
-        # TODO look at network info for Docker and extract IP address instead.
         docker_url = urlparse.urlparse(self.client.base_url)
         self.docker_hostname = docker_url.hostname
         if docker_url.hostname == 'localunixsocket':
-            self.docker_hostname = 'localhost'
+            networks = self.client.networks()
+            for network in networks:
+                if network['Name'] == 'bridge':
+                    ipam = network['IPAM']
+                    try:
+                        addr = ipam['Config'][0]['Gateway']
+                    except KeyError:
+                        warnings.warn('Warning: Unable to determine ip '
+                                      'address of the docker gateway. Please '
+                                      'ensure docker is listening on a tcp '
+                                      'socket by setting -H '
+                                      'tcp://127.0.0.1:4243 in your docker '
+                                      'configuration file.')
+                        self.client = None
+                        break
+
+                    self.docker_hostname = addr
+                    break
 
     def is_alive(self):
         """Whether the connection to Docker is alive."""
