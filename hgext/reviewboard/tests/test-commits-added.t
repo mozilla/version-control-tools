@@ -90,9 +90,9 @@ The parent review should have its description updated.
   summary: ''
   description: ''
   target_people: []
-  extra_data:
-    p2rb: true
+  extra_data: {}
   commit_extra_data:
+    p2rb: true
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -109,9 +109,9 @@ The parent review should have its description updated.
     description: This is the parent review request
     target_people: []
     extra:
-      p2rb: true
       p2rb.reviewer_map: '{"3": [], "2": []}'
     commit_extra_data:
+      p2rb: true
       p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
         3], ["4cb601f74de529935048816623637fb0ca2812a4", 4]]'

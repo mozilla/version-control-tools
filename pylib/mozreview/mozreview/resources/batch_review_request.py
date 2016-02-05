@@ -368,6 +368,7 @@ class BatchReviewRequestResource(WebAPIResource):
 
             squashed_commit_data = fetch_commit_data(squashed_rr)
             squashed_commit_data.extra_data.update({
+                MOZREVIEW_KEY: True,
                 IDENTIFIER_KEY: identifier,
                 FIRST_PUBLIC_ANCESTOR_KEY: (
                     commits['squashed']['first_public_ancestor']),
@@ -381,10 +382,6 @@ class BatchReviewRequestResource(WebAPIResource):
             squashed_commit_data.save(
                 update_fields=['extra_data', 'draft_extra_data'])
 
-            squashed_rr.extra_data.update({
-                MOZREVIEW_KEY: True,
-            })
-            squashed_rr.save(update_fields=['extra_data'])
             logger.info('created squashed review request #%d' % squashed_rr.id)
 
         # The diffs on diffsets can't be updated, only replaced. So always
@@ -595,6 +592,7 @@ class BatchReviewRequestResource(WebAPIResource):
 
             commit_data = fetch_commit_data(rr)
             commit_data.extra_data.update({
+                MOZREVIEW_KEY: True,
                 IDENTIFIER_KEY: identifier,
                 SQUASHED_KEY: False,
             })
@@ -604,8 +602,6 @@ class BatchReviewRequestResource(WebAPIResource):
             commit_data.save(
                 update_fields=['extra_data', 'draft_extra_data'])
 
-            rr.extra_data[MOZREVIEW_KEY] = True
-            rr.save(update_fields=['extra_data'])
             logger.info('%s: created review request %d for commit %s' % (
                         identifier, rr.id, node))
             draft, warns = update_review_request(local_site, request,

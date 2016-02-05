@@ -126,9 +126,9 @@ on publish.
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
     p2rb.reviewer_map: '{}'
   commit_extra_data:
+    p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
       3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
@@ -187,9 +187,9 @@ on publish.
     target_people: []
     extra:
       calculated_trophies: true
-      p2rb: true
       p2rb.reviewer_map: '{}'
     commit_extra_data:
+      p2rb: true
       p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
         3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
@@ -249,9 +249,9 @@ The parent review should have dropped the reference to /r/6
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
     p2rb.reviewer_map: '{}'
   commit_extra_data:
+    p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
       3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
@@ -348,8 +348,8 @@ Review 6 should be marked as discarded
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 76088734e3cba33be80930be14e7cd1e9ee474be
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
@@ -418,9 +418,9 @@ on publish.
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
     p2rb.reviewer_map: '{}'
   commit_extra_data:
+    p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.commits: '[["6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e", 2], ["dfe48634934bd5d856a937479aadf54800c242c5",
       3], ["d751d4c04967ba4ec08425f618ba8d2c1b9d161a", 4], ["98dd6a7335dbea4bd3d2f2d1662fd6db45f1ddfb",
@@ -510,9 +510,9 @@ on publish.
     target_people: []
     extra:
       calculated_trophies: true
-      p2rb: true
       p2rb.reviewer_map: '{"3": [], "2": [], "5": [], "4": []}'
     commit_extra_data:
+      p2rb: true
       p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 3], ["d7a5827a584db609f6a9ca2bd3d43aa3afa6b86e",
         4], ["b5473ad606f40840715d6b378dacc1a37f6263b1", 5]]'
@@ -565,8 +565,8 @@ The dropped commit should now be discarded
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 6bd3fbee3dfaa83a6fe253b5a9bdc625a5d0be0e
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
@@ -631,9 +631,9 @@ The parent review should have been updated accordingly.
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
     p2rb.reviewer_map: '{"3": [], "5": [], "4": []}'
   commit_extra_data:
+    p2rb: true
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.commits: '[["7050183d97d5f601da86fb313dd8783ccf1ade18", 3], ["2fbc30f77859fa4be2e173866fa71c52d394f2c4",
       5]]'

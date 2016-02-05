@@ -21,7 +21,10 @@ from mozreview.extra_data import (
     gen_child_rrs,
     get_parent_rr,
 )
-from mozreview.models import BugzillaUserMap
+from mozreview.models import (
+    BugzillaUserMap,
+    CommitData,
+)
 from mozreview.errors import NOT_PARENT
 from mozreview.extra_data import is_parent
 from mozreview.review_helpers import get_reviewers_status
@@ -49,7 +52,8 @@ class ReviewRequestSummaryResource(WebAPIResource):
         Note that this presumes that bugs_closed only ever contains one
         bug, which in MozReview, at the moment, is always true.
         """
-        q = Q(extra_data__contains=MOZREVIEW_KEY)
+        q = Q(id__in=CommitData.objects.filter(
+            extra_data__contains=MOZREVIEW_KEY))
 
         # TODO: Then may get slow as the db size increase, particularly
         # when we support multiple bugs in one parent.  We should use a
@@ -59,12 +63,9 @@ class ReviewRequestSummaryResource(WebAPIResource):
             if 'bug' in request.GET:
                 q = q & Q(bugs_closed=request.GET.get('bug'))
 
-        queryset = ReviewRequest.objects.public(
+        return ReviewRequest.objects.public(
             status=None,
-            extra_query=q
-        )
-
-        return queryset
+            extra_query=q)
 
     @webapi_response_errors(DOES_NOT_EXIST, INVALID_ATTRIBUTE, NOT_LOGGED_IN,
                             NOT_PARENT, PERMISSION_DENIED)

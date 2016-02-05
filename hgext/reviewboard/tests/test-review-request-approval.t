@@ -55,8 +55,8 @@ Create a review request from an L1 user
   - level3
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -98,8 +98,8 @@ Have an L1 user provide a ship it review which should not grant approval
   - level3
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -149,8 +149,8 @@ Have an L3 user provide a ship it review which should grant approval
   - level3
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -204,8 +204,8 @@ Posting a new review without ship it should cancel the previous approval
   - level3
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -266,8 +266,8 @@ One more ship it should switch it back to approved
   - level3
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -336,8 +336,8 @@ Even though the author is L1, adding a new diff will not cancel approval
   - level3
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -417,8 +417,8 @@ A new ship-it from L3 should give approval
   - level3
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -509,8 +509,8 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
   - level3
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -614,8 +614,8 @@ Fixing the issue should restore approval
   - level3
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -727,8 +727,8 @@ Review requests created by L3 users
   - level1b
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: c1ebcda638274d5217801b7f05e33b848ff39be1
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
@@ -770,8 +770,8 @@ Even a ship-it from an L1 user will give approval to an L3 author
   - level1b
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: c1ebcda638274d5217801b7f05e33b848ff39be1
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
@@ -824,8 +824,8 @@ ship-its. Posting a new diff should not clear approval
   - level1b
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: bccc4c4e590eeefbb42491f1bb061143a49bdaf8
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick

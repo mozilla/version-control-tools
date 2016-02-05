@@ -124,9 +124,9 @@ no Commit ID set.
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
     p2rb.reviewer_map: '{}'
   commit_extra_data:
+    p2rb: true
     p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       3]]'
@@ -167,8 +167,8 @@ Child review request with ID 2 should be closed as discarded...
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -205,8 +205,8 @@ Child review request with ID 3 should be closed as discarded...
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -307,9 +307,9 @@ Commit ID re-instated.
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
     p2rb.reviewer_map: '{}'
   commit_extra_data:
+    p2rb: true
     p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       3]]'
@@ -343,9 +343,9 @@ Commit ID re-instated.
     target_people: []
     extra:
       calculated_trophies: true
-      p2rb: true
       p2rb.reviewer_map: '{}'
     commit_extra_data:
+      p2rb: true
       p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
         3]]'
@@ -371,8 +371,8 @@ Child review request with ID 2 should be re-opened...
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -402,8 +402,8 @@ Child review request with ID 2 should be re-opened...
     target_people: []
     extra:
       calculated_trophies: true
-      p2rb: true
     commit_extra_data:
+      p2rb: true
       p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
@@ -425,8 +425,8 @@ Child review request with ID 3 should be re-opened...
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -456,8 +456,8 @@ Child review request with ID 3 should be re-opened...
     target_people: []
     extra:
       calculated_trophies: true
-      p2rb: true
     commit_extra_data:
+      p2rb: true
       p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
@@ -542,9 +542,9 @@ Squashed review request should be published.
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
     p2rb.reviewer_map: '{}'
   commit_extra_data:
+    p2rb: true
     p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       3]]'
@@ -585,8 +585,8 @@ Child review request with ID 2 should be published.
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -623,8 +623,8 @@ Child review request with ID 3 should be published.
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
   commit_extra_data:
+    p2rb: true
     p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -752,9 +752,9 @@ Pushing to a discarded review series will create a new series
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
     p2rb.reviewer_map: '{}'
   commit_extra_data:
+    p2rb: true
     p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       3]]'
@@ -793,9 +793,9 @@ Pushing to a discarded review series will create a new series
   target_people: []
   extra_data:
     calculated_trophies: true
-    p2rb: true
     p2rb.reviewer_map: '{}'
   commit_extra_data:
+    p2rb: true
     p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 5], ["233b570e5356d0c84bcbf0633de446172012b3b3",
       6], ["4cb601f74de529935048816623637fb0ca2812a4", 7]]'
