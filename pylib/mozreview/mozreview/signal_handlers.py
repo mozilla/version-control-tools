@@ -213,7 +213,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
     if not is_pushed(review_request, commit_data=commit_data):
         return
 
-    if not is_parent(review_request):
+    if not is_parent(review_request, commit_data):
         # Send a signal asking for approval to publish this review request.
         # We only want to publish this commit request if we are in the middle
         # of publishing the parent. If the parent is publishing it will be
@@ -267,11 +267,11 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
 
     # If this is a squashed/parent review request, automatically publish all
     # relevant children.
-    if is_parent(review_request):
+    if is_parent(review_request, commit_data):
         unpublished_rids = map(int, json.loads(
-            review_request.extra_data[UNPUBLISHED_KEY]))
+            commit_data.extra_data[UNPUBLISHED_KEY]))
         discard_on_publish_rids = map(int, json.loads(
-            review_request.extra_data[DISCARD_ON_PUBLISH_KEY]))
+            commit_data.extra_data[DISCARD_ON_PUBLISH_KEY]))
         child_rrs = list(gen_child_rrs(review_request_draft))
 
         # Create or update Bugzilla attachments for each draft commit.  This
@@ -331,11 +331,8 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                         user=user,
                         description=OBSOLETE_DESCRIPTION)
 
-        review_request.extra_data[UNPUBLISHED_KEY] = '[]'
-        review_request.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
-
-    commit_data = CommitData.objects.get_or_create(
-        review_request=review_request)[0]
+        commit_data.extra_data[UNPUBLISHED_KEY] = '[]'
+        commit_data.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
 
     # Copy any drafted CommitData from draft_extra_data to extra_data.
     for key in DRAFTED_COMMIT_DATA_KEYS:
@@ -386,7 +383,9 @@ def on_draft_pre_delete(sender, instance, using, **kwargs):
     if not review_request:
         return
 
-    if not is_parent(review_request):
+    commit_data = fetch_commit_data(review_request)
+
+    if not is_parent(review_request, commit_data):
         return
 
     # If the review request is marked as discarded, then we must be closing
@@ -396,20 +395,21 @@ def on_draft_pre_delete(sender, instance, using, **kwargs):
 
     user = review_request.submitter
 
-    for child in gen_child_rrs(review_request):
+    for child in gen_child_rrs(review_request, commit_data=commit_data):
         draft = child.get_draft()
         if draft:
             draft.delete()
 
     for child in gen_rrs_by_extra_data_key(review_request,
-                                           UNPUBLISHED_KEY):
+                                           UNPUBLISHED_KEY,
+                                           commit_data=commit_data):
         child.close(ReviewRequest.DISCARDED,
                     user=user,
                     description=NEVER_USED_DESCRIPTION)
 
-    review_request.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
-    review_request.extra_data[UNPUBLISHED_KEY] = '[]'
-    review_request.save()
+    commit_data.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
+    commit_data.extra_data[UNPUBLISHED_KEY] = '[]'
+    commit_data.save(update_fields=['extra_data'])
 
 
 def on_review_request_reopened(user, review_request, **kwargs):
@@ -469,14 +469,17 @@ def on_review_request_closed_discarded(user, review_request, type, **kwargs):
     if type != ReviewRequest.DISCARDED:
         return
 
-    if is_parent(review_request):
+    commit_data = fetch_commit_data(review_request)
+
+    if is_parent(review_request, commit_data):
         # close_child_review_requests will call save on this review request, so
         # we don't have to worry about it.
         review_request.commit = None
 
         _close_child_review_requests(user, review_request,
                                      ReviewRequest.DISCARDED,
-                                     AUTO_CLOSE_DESCRIPTION)
+                                     AUTO_CLOSE_DESCRIPTION,
+                                     commit_data=commit_data)
     else:
         # TODO: Remove this once we properly prevent users from closing
         # commit review requests.
@@ -487,24 +490,30 @@ def on_review_request_closed_discarded(user, review_request, type, **kwargs):
 
 
 def on_review_request_closed_submitted(user, review_request, type, **kwargs):
-    if (not is_parent(review_request) or
-            type != ReviewRequest.SUBMITTED):
+    if type != ReviewRequest.SUBMITTED:
+        return
+
+    commit_data = fetch_commit_data(review_request)
+
+    if not is_parent(review_request, commit_data):
         return
 
     _close_child_review_requests(user, review_request, ReviewRequest.SUBMITTED,
-                                 AUTO_SUBMITTED_DESCRIPTION)
+                                 AUTO_SUBMITTED_DESCRIPTION,
+                                 commit_data=commit_data)
 
 
 def _close_child_review_requests(user, review_request, status,
-                                 child_close_description):
+                                 child_close_description, commit_data=None):
     """Closes all child review requests for a squashed review request."""
+    commit_data = fetch_commit_data(review_request, commit_data)
     # At the point of closing, it's possible that if this review
     # request was never published, that most of the fields are empty
     # (See https://code.google.com/p/reviewboard/issues/detail?id=3465).
     # Luckily, the extra_data is still around, and more luckily, it's
     # not exposed in the UI for user-meddling. We can find all of the
     # child review requests via extra_data.p2rb.commits.
-    for child in gen_child_rrs(review_request):
+    for child in gen_child_rrs(review_request, commit_data=commit_data):
         child.close(status,
                     user=user,
                     description=child_close_description)
@@ -513,11 +522,12 @@ def _close_child_review_requests(user, review_request, status,
     # request never got to publish, so were never part of its "commits"
     # list.
     for child in gen_rrs_by_extra_data_key(review_request,
-                                           UNPUBLISHED_KEY):
+                                           UNPUBLISHED_KEY,
+                                           commit_data=commit_data):
         child.close(ReviewRequest.DISCARDED,
                     user=user,
                     description=NEVER_USED_DESCRIPTION)
 
-    review_request.extra_data[UNPUBLISHED_KEY] = '[]'
-    review_request.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
-    review_request.save()
+    commit_data.extra_data[UNPUBLISHED_KEY] = '[]'
+    commit_data.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
+    commit_data.save(update_fields=['extra_data'])

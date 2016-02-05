@@ -18,17 +18,18 @@ from mozreview.models import (
 
 MOZREVIEW_KEY = 'p2rb'
 
-DISCARD_ON_PUBLISH_KEY = MOZREVIEW_KEY + '.discard_on_publish_rids'
+# Built-in extra_data keys:
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
-UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
 
 # CommitData field keys:
 BASE_COMMIT_KEY = MOZREVIEW_KEY + '.base_commit'
 COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
 COMMITS_KEY = MOZREVIEW_KEY + '.commits'
+DISCARD_ON_PUBLISH_KEY = MOZREVIEW_KEY + '.discard_on_publish_rids'
 FIRST_PUBLIC_ANCESTOR_KEY = MOZREVIEW_KEY + '.first_public_ancestor'
 IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
 SQUASHED_KEY = MOZREVIEW_KEY + '.is_squashed'
+UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
 
 # CommitData fields which should be automatically copied from
 # draft_extra_data to extra_data when a review request is published.
@@ -143,11 +144,14 @@ def gen_child_rrs(review_request_details, user=None, commit_data=None):
             yield child.get_draft(user) or child
 
 
-def gen_rrs_by_extra_data_key(review_request, key):
-    if key not in review_request.extra_data:
+def gen_rrs_by_extra_data_key(review_request_details, key, commit_data=None):
+    commit_data = fetch_commit_data(review_request_details, commit_data)
+    rrs_json = commit_data.get_for(review_request_details, key)
+
+    if key is None:
         return
 
-    return gen_rrs_by_rids(json.loads(review_request.extra_data[key]))
+    return gen_rrs_by_rids(json.loads(rrs_json))
 
 
 def gen_rrs_by_rids(rrids):

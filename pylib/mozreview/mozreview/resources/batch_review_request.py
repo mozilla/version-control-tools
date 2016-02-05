@@ -372,6 +372,8 @@ class BatchReviewRequestResource(WebAPIResource):
                 FIRST_PUBLIC_ANCESTOR_KEY: (
                     commits['squashed']['first_public_ancestor']),
                 SQUASHED_KEY: True,
+                DISCARD_ON_PUBLISH_KEY: '[]',
+                UNPUBLISHED_KEY: '[]',
             })
             squashed_commit_data.draft_extra_data.update({
                 IDENTIFIER_KEY: identifier,
@@ -381,8 +383,6 @@ class BatchReviewRequestResource(WebAPIResource):
 
             squashed_rr.extra_data.update({
                 MOZREVIEW_KEY: True,
-                DISCARD_ON_PUBLISH_KEY: '[]',
-                UNPUBLISHED_KEY: '[]',
             })
             squashed_rr.save(update_fields=['extra_data'])
             logger.info('created squashed review request #%d' % squashed_rr.id)
@@ -437,8 +437,10 @@ class BatchReviewRequestResource(WebAPIResource):
         previous_commits = get_previous_commits(squashed_rr,
                                                 squashed_commit_data)
         remaining_nodes = get_remaining_nodes(previous_commits)
-        discard_on_publish_rids = get_discard_on_publish_rids(squashed_rr)
-        unpublished_rids = get_unpublished_rids(squashed_rr)
+        discard_on_publish_rids = get_discard_on_publish_rids(
+            squashed_rr, squashed_commit_data)
+        unpublished_rids = get_unpublished_rids(
+            squashed_rr, squashed_commit_data)
         unclaimed_rids = get_unclaimed_rids(previous_commits,
                                             discard_on_publish_rids,
                                             unpublished_rids)
@@ -674,12 +676,9 @@ class BatchReviewRequestResource(WebAPIResource):
                 commits['squashed']['base_commit_id'])
 
         squashed_commit_data.extra_data.update({
+            DISCARD_ON_PUBLISH_KEY: json.dumps(discard_on_publish_rids),
             FIRST_PUBLIC_ANCESTOR_KEY: (
                 commits['squashed']['first_public_ancestor']),
-        })
-
-        squashed_rr.extra_data.update({
-            DISCARD_ON_PUBLISH_KEY: json.dumps(discard_on_publish_rids),
             UNPUBLISHED_KEY: json.dumps(unpublished_rids),
         })
 
@@ -973,23 +972,24 @@ def get_remaining_nodes(previous_commits):
     return dict((t[0], t[1]) for i, t in enumerate(previous_commits))
 
 
-def get_discard_on_publish_rids(squashed_rr):
+def get_discard_on_publish_rids(squashed_rr, commit_data=None):
     """A list of review request ids that should be discarded when publishing.
     Adding to this list will mark a review request as to-be-discarded when
     the squashed draft is published on Review Board.
     """
+    commit_data = fetch_commit_data(squashed_rr, commit_data)
     return map(int, json.loads(
-               squashed_rr.extra_data[DISCARD_ON_PUBLISH_KEY]))
+               commit_data.extra_data[DISCARD_ON_PUBLISH_KEY]))
 
 
-def get_unpublished_rids(squashed_rr):
+def get_unpublished_rids(squashed_rr, commit_data=None):
     """A list of review request ids that have been created for individual commits
     but have not been published. If this list contains an item, it should be
     re-used for indiviual commits instead of creating a brand new review
     request.
     """
-    return map(int, json.loads(
-               squashed_rr.extra_data[UNPUBLISHED_KEY]))
+    commit_data = fetch_commit_data(squashed_rr, commit_data)
+    return map(int, json.loads(commit_data.extra_data[UNPUBLISHED_KEY]))
 
 
 def get_unclaimed_rids(previous_commits, discard_on_publish_rids,
