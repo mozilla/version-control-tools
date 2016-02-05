@@ -13,6 +13,7 @@ from mozillapulse.messages import base
 from mozreview.decorators import if_ext_enabled
 from mozreview.extra_data import (
     COMMITS_KEY,
+    fetch_commit_data,
     is_parent,
     is_pushed,
 )
@@ -35,9 +36,13 @@ def handle_commits_published(extension=None, **kwargs):
     """
     review_request = kwargs.get('review_request')
 
-    if (review_request is None or
-        not is_pushed(review_request) or
-        not is_parent(review_request)):
+    if review_request is None:
+        return
+
+    commit_data = fetch_commit_data(review_request)
+
+    if (not is_pushed(review_request, commit_data) or
+            not is_parent(review_request, commit_data)):
         return
 
     # Check the change description and only continue if it contains a change
@@ -65,8 +70,7 @@ def handle_commits_published(extension=None, **kwargs):
 
     child_rrids = []
     commits = []
-    ext_commits = json.loads(
-        review_request.extra_data.get(COMMITS_KEY, '[]'))
+    ext_commits = json.loads(commit_data.extra_data.get(COMMITS_KEY, '[]'))
 
     for rev, rrid in ext_commits:
         child_rrids.append(int(rrid))
@@ -75,7 +79,6 @@ def handle_commits_published(extension=None, **kwargs):
             'review_request_id': int(rrid),
             'diffset_revision': None
         })
-
 
     # In order to retrieve the diff revision for each commit we need to fetch
     # their correpsonding child review request.

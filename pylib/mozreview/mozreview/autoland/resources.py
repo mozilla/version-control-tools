@@ -32,6 +32,7 @@ from mozreview.errors import (AUTOLAND_CONFIGURATION_ERROR,
                               NOT_PUSHED_PARENT_REVIEW_REQUEST)
 from mozreview.extra_data import (
     COMMITS_KEY,
+    fetch_commit_data,
     is_parent,
     is_pushed
 )
@@ -41,6 +42,7 @@ IMPORT_PULLREQUEST_DESTINATION = 'mozreview'
 TRY_AUTOLAND_DESTINATION = 'try'
 
 AUTOLAND_LOCK_TIMEOUT = 60 * 60 * 24
+
 
 def acquire_lock(lock_id):
     """Use the memcached add operation to acquire a global lock"""
@@ -58,6 +60,7 @@ def get_autoland_lock_id(review_request_id, repository_url, revision):
     """Returns a lock id based on the given parameters"""
     return 'autoland_lock:{0}:{1}:{2}'.format(review_request_id, repository_url,
                                               revision)
+
 
 class BaseAutolandTriggerResource(WebAPIResource):
     """Base resource for Autoland trigger resources.
@@ -131,7 +134,9 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
         except ReviewRequest.DoesNotExist:
             return DOES_NOT_EXIST
 
-        if not is_pushed(rr) or not is_parent(rr):
+        commit_data = fetch_commit_data(rr)
+
+        if not is_pushed(rr, commit_data) or not is_parent(rr, commit_data):
             logging.error('Failed triggering Autoland because the review '
                           'request is not pushed, or not the parent review '
                           'request.')
@@ -145,7 +150,8 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
             return AUTOLAND_CONFIGURATION_ERROR.with_message(
                 'Autoland has not been configured with a proper landing URL.')
 
-        last_revision = json.loads(rr.extra_data.get(COMMITS_KEY))[-1][0]
+        last_revision = json.loads(
+            commit_data.extra_data.get(COMMITS_KEY))[-1][0]
 
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
@@ -276,7 +282,9 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
                 }
             }
 
-        if not is_pushed(rr) or not is_parent(rr):
+        commit_data = fetch_commit_data(rr)
+
+        if not is_pushed(rr, commit_data) or not is_parent(rr, commit_data):
             logging.error('Failed triggering Autoland because the review '
                           'request is not pushed, or not the parent review '
                           'request.')
@@ -289,7 +297,8 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
             return AUTOLAND_CONFIGURATION_ERROR.with_message(
                 'Autoland has not been configured with a proper try URL.')
 
-        last_revision = json.loads(rr.extra_data.get(COMMITS_KEY))[-1][0]
+        last_revision = json.loads(
+            commit_data.extra_data.get(COMMITS_KEY))[-1][0]
 
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')

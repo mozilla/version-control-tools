@@ -134,9 +134,12 @@ class ReviewRequestSummaryResource(WebAPIResource):
         # have the same bug ID; we skip this part if we can't get COMMITS_KEY
         # out of the parent's extra_data.
         for parent_id, family in families.iteritems():
-            if family['parent'] and COMMITS_KEY in family['parent'].extra_data:
-                commit_tuples = json.loads(
-                    family['parent'].extra_data[COMMITS_KEY])
+            parent_commit_data = fetch_commit_data(family['parent'])
+            commits_json = parent_commit_data.get_for(family['parent'],
+                                                      COMMITS_KEY)
+
+            if family['parent'] and commits_json is not None:
+                commit_tuples = json.loads(commits_json)
                 [missing_rrids.add(child_rrid) for sha, child_rrid in
                  commit_tuples if child_rrid not in family['children']]
             else:
@@ -270,7 +273,8 @@ class ReviewRequestSummaryResource(WebAPIResource):
         for family in families.itervalues():
             child_rrids = [
                 int(rrid) for commit_id, rrid in
-                json.loads(family['parent'].extra_data[COMMITS_KEY])
+                json.loads(fetch_commit_data(family['parent']).get_for(
+                    family['parent'], COMMITS_KEY))
             ]
             summaries.append({
                 'parent': self._summarize_review_request(

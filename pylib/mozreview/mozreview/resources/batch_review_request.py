@@ -433,7 +433,9 @@ class BatchReviewRequestResource(WebAPIResource):
         # this data. This will only come into play if we start trusting the server
         # instead of the client when matching review request ids. Bug 1047516
 
-        previous_commits = get_previous_commits(squashed_rr)
+        squashed_commit_data = fetch_commit_data(squashed_rr)
+        previous_commits = get_previous_commits(squashed_rr,
+                                                squashed_commit_data)
         remaining_nodes = get_remaining_nodes(previous_commits)
         discard_on_publish_rids = get_discard_on_publish_rids(squashed_rr)
         unpublished_rids = get_unpublished_rids(squashed_rr)
@@ -664,7 +666,8 @@ class BatchReviewRequestResource(WebAPIResource):
         for user in sorted(squashed_reviewers):
             squashed_draft.target_people.add(user)
 
-        squashed_draft.extra_data[COMMITS_KEY] = json.dumps(commit_list)
+        squashed_commit_data.draft_extra_data[COMMITS_KEY] = json.dumps(
+            commit_list)
 
         if 'base_commit_id' in commits['squashed']:
             squashed_commit_data.draft_extra_data[BASE_COMMIT_KEY] = (
@@ -674,6 +677,7 @@ class BatchReviewRequestResource(WebAPIResource):
             FIRST_PUBLIC_ANCESTOR_KEY: (
                 commits['squashed']['first_public_ancestor']),
         })
+
         squashed_rr.extra_data.update({
             DISCARD_ON_PUBLISH_KEY: json.dumps(discard_on_publish_rids),
             UNPUBLISHED_KEY: json.dumps(unpublished_rids),
@@ -926,7 +930,7 @@ def get_review_request_data(rr):
     return rd
 
 
-def get_previous_commits(squashed_rr):
+def get_previous_commits(squashed_rr, commit_data=None):
     """Retrieve the previous commits from a squashed review request.
 
     This will return a list of tuples specifying the previous commit
@@ -938,10 +942,12 @@ def get_previous_commits(squashed_rr):
             ('373537353134', 14),
         ]
     """
+    commit_data = fetch_commit_data(squashed_rr, commit_data)
+
     if not squashed_rr.public:
-        extra_data = squashed_rr.get_draft().extra_data
+        extra_data = commit_data.draft_extra_data
     else:
-        extra_data = squashed_rr.extra_data
+        extra_data = commit_data.extra_data
 
     if COMMITS_KEY not in extra_data:
         return []

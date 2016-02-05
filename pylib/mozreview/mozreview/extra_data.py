@@ -18,7 +18,6 @@ from mozreview.models import (
 
 MOZREVIEW_KEY = 'p2rb'
 
-COMMITS_KEY = MOZREVIEW_KEY + '.commits'
 DISCARD_ON_PUBLISH_KEY = MOZREVIEW_KEY + '.discard_on_publish_rids'
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
 UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
@@ -26,6 +25,7 @@ UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
 # CommitData field keys:
 BASE_COMMIT_KEY = MOZREVIEW_KEY + '.base_commit'
 COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
+COMMITS_KEY = MOZREVIEW_KEY + '.commits'
 FIRST_PUBLIC_ANCESTOR_KEY = MOZREVIEW_KEY + '.first_public_ancestor'
 IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
 SQUASHED_KEY = MOZREVIEW_KEY + '.is_squashed'
@@ -107,7 +107,7 @@ def get_parent_rr(review_request_details, commit_data=None):
         repository=review_request_details.repository)
 
 
-def gen_child_rrs(review_request, user=None):
+def gen_child_rrs(review_request_details, user=None, commit_data=None):
     """ Generate child review requests.
 
     For some review request (draft or normal) that has a p2rb.commits
@@ -121,10 +121,13 @@ def gen_child_rrs(review_request, user=None):
     If a review request is not found for the listed ID, get_rr_for_id will
     log this, and we'll skip that ID.
     """
-    if COMMITS_KEY not in review_request.extra_data:
+    commit_data = fetch_commit_data(review_request_details, commit_data)
+    commits_json = commit_data.get_for(review_request_details, COMMITS_KEY)
+
+    if commits_json is None:
         return
 
-    commit_tuples = json.loads(review_request.extra_data[COMMITS_KEY])
+    commit_tuples = json.loads(commits_json)
     for commit_tuple in commit_tuples:
         child = get_rr_for_id(commit_tuple[1])
 

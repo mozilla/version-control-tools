@@ -46,12 +46,12 @@ Publishing the parent should succeed.
   extra_data:
     calculated_trophies: true
     p2rb: true
-    p2rb.commits: '[["86a712c7f0187fed4c00b99131838610c76e6cc0", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.reviewer_map: '{"2": []}'
     p2rb.unpublished_rids: '[]'
   commit_extra_data:
     p2rb.base_commit: 3a9f6899ef84c99841f546030b036d0124a863cf
+    p2rb.commits: '[["86a712c7f0187fed4c00b99131838610c76e6cc0", 2]]'
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true

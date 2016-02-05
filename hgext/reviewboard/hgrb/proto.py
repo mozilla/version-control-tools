@@ -381,7 +381,6 @@ def pullreviews(repo, proto, args=None):
         commit_data = client.get_path(
             '/extensions/mozreview.extension.MozReviewExtension/'
             'commit-data/%s/' % rr.id)
-        extra_data = rr.extra_data
 
         try:
             is_squashed = commit_data.extra_data['p2rb.is_squashed']
@@ -392,12 +391,12 @@ def pullreviews(repo, proto, args=None):
         # values in the database, so keep checking for 'True' until we
         # have a migration.
         if is_squashed is True or is_squashed == 'True':
-            if 'p2rb.commits' in extra_data:
-                commits = extra_data['p2rb.commits']
+            if 'p2rb.commits' in commit_data.extra_data:
+                commits = commit_data.extra_data['p2rb.commits']
             else:
                 draft = rr.get_draft()
-                if 'p2rb.commits' in draft.extra_data:
-                    commits = draft.extra_data['p2rb.commits']
+                if 'p2rb.commits' in commit_data.draft_extra_data:
+                    commits = commit_data.draft_extra_data['p2rb.commits']
                 else:
                     commits = '[]'
 

@@ -72,7 +72,7 @@ class CombinedReviewersField(BaseReviewRequestField):
         }]
 
 
-class CommitsListField(BaseReviewRequestField):
+class CommitsListField(CommitDataBackedField):
     """The commits list field for review requests.
 
     This field is injected in the details of a review request that
@@ -105,7 +105,7 @@ class CommitsListField(BaseReviewRequestField):
         # accessible anyways in case it has been restricted for other
         # reasons.
         children_details = [
-            child for child in gen_child_rrs(parent_details, user)
+            child for child in gen_child_rrs(parent_details, user=user)
             if child.is_accessible_by(user)]
 
         autoland_requests = AutolandRequest.objects.filter(
@@ -185,7 +185,7 @@ class PullCommitField(BaseReviewRequestField):
                 self.commit_data)
             parent_details = parent.get_draft() or parent
             children = [
-                child for child in gen_child_rrs(parent_details, user)
+                child for child in gen_child_rrs(parent_details, user=user)
                 if child.is_accessible_by(user)]
 
             commit_data = fetch_commit_data(children[-1])

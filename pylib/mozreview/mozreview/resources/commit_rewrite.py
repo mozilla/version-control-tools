@@ -9,7 +9,12 @@ from djblets.webapi.errors import (DOES_NOT_EXIST, INVALID_ATTRIBUTE,
 from reviewboard.reviews.models import ReviewRequest
 from reviewboard.webapi.resources import WebAPIResource
 
-from mozreview.extra_data import (COMMITS_KEY, is_parent, get_parent_rr)
+from mozreview.extra_data import (
+    COMMITS_KEY,
+    fetch_commit_data,
+    get_parent_rr,
+    is_parent,
+)
 from mozreview.errors import (NOT_PARENT, AUTOLAND_REVIEW_NOT_APPROVED)
 from mozreview.review_helpers import (gen_latest_reviews,
                                       has_shipit_carryforward)
@@ -35,17 +40,20 @@ class CommitRewriteResource(WebAPIResource):
             return DOES_NOT_EXIST
         if parent_request is None:
             return DOES_NOT_EXIST
-        if not is_parent(parent_request):
+
+        commit_data = fetch_commit_data(parent_request)
+
+        if not is_parent(parent_request, commit_data):
             return NOT_PARENT
         if not parent_request.is_accessible_by(request.user):
             return PERMISSION_DENIED
-        if COMMITS_KEY not in parent_request.extra_data:
+        if COMMITS_KEY not in commit_data.extra_data:
             logging.error('Parent review request %s missing COMMIT_KEY'
                           % parent_request.id)
             return NOT_PARENT
 
         result = []
-        children = json.loads(parent_request.extra_data[COMMITS_KEY])
+        children = json.loads(commit_data.extra_data[COMMITS_KEY])
         for child in children:
             try:
                 child_request = ReviewRequest.objects.get(id=child[1])
