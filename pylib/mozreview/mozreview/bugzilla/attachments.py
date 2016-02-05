@@ -1,5 +1,9 @@
 from __future__ import unicode_literals
 
+from mozautomation.commitparser import (
+    strip_commit_metadata,
+)
+
 from mozreview.models import (
     BugzillaUserMap,
     get_or_create_bugzilla_users,
@@ -75,7 +79,9 @@ def post_bugzilla_attachment(bugzilla, bug_id, review_request_draft,
             # We don't need the first line, since it is also the attachment
             # summary, which is displayed in the comment.
             extended_commit_msg = review_request_draft.description.partition(
-                '\n')[2].lstrip('\n')
+                '\n')[2].strip()
+
+            extended_commit_msg = strip_commit_metadata(extended_commit_msg)
 
             if extended_commit_msg:
                 extended_commit_msg += '\n\n'
