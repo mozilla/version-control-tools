@@ -135,9 +135,6 @@ class AutolandInboundTest(MozReviewWebDriverTest):
             # error if it shows up.
             pass
 
-        self.dump_reviewboard_log()
-        self.browser.get_screenshot_as_file('/home/dminor/mozreview.png')
-
         # autoland submission triggers a browser refresh, wait for that
         WebDriverWait(self.browser, 10).until(
             EC.visibility_of_element_located((By.CLASS_NAME, 'action-info'))
