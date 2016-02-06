@@ -25,6 +25,8 @@ import time
 import urlparse
 import uuid
 
+import backports.lzma as lzma
+
 from docker.errors import (
     APIError as DockerAPIError,
     DockerException,
@@ -270,6 +272,11 @@ class Docker(object):
 
             fh.flush()
             fh.seek(0)
+
+            # Docker 1.10 no longer appears to allow import of .xz files
+            # directly. Do the decompress locally.
+            if url.endswith('.xz'):
+                fh = lzma.decompress(fh.read())
 
             res = self.client.import_image_from_data(fh,
                     repository=repository, tag=tag)
