@@ -373,8 +373,8 @@ You'll need to configure your hgrc file to work with vcsreplicator::
    acktimeout = 10000
 
    # Normalize local filesystem paths for representation on the wire.
-   # This enables leader and mirrors to have different local filesystem
-   # paths.
+   # This both enables replication for listed paths and enables leader
+   # and mirrors to have different local filesystem paths.
    [replicationpathrewrites]
    /var/repos/ = {repos}/
 

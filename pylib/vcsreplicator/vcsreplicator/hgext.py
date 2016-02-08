@@ -397,8 +397,6 @@ def reposetup(ui, repo):
     if not repo.local():
         return
 
-    # TODO add support for only replicating repositories under certain paths.
-
     ui.setconfig('hooks', 'precommit.vcsreplicator', precommithook,
                  'vcsreplicator')
     ui.setconfig('hooks', 'pretxnopen.vcsreplicator', pretxnopenhook,
@@ -448,7 +446,8 @@ def reposetup(ui, repo):
                 if lower.startswith(source):
                     return dest + self.root[len(source):]
 
-            return self.root
+            raise util.Abort('repository path not configured for replication',
+                             hint='add entry to [replicationpathrewrites]')
 
         @property
         def replicationpartition(self):
