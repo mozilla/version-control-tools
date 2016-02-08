@@ -216,3 +216,15 @@ def strip_commit_metadata(s):
         raise TypeError('do not know type of commit message: %s' % type(s))
 
     return joiner.join(lines)
+
+
+def parse_commit_id(s):
+    """Parse a MozReview-Commit-ID value out of a string.
+
+    Returns None if the commit ID is not found.
+    """
+    m = re.search('^MozReview-Commit-ID: ([a-zA-Z0-9]+)$', s, re.MULTILINE)
+    if not m:
+        return None
+
+    return m.group(1)

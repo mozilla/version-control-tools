@@ -15,6 +15,7 @@ sys.path.append(os.path.split(HERE)[0])
 from mozautomation.commitparser import (
     parse_backouts,
     parse_bugs,
+    parse_commit_id,
     parse_requal_reviewers,
     parse_reviewers,
     parse_rquestion_reviewers,
@@ -374,3 +375,13 @@ class TestBugParsing(unittest.TestCase):
         res = strip_commit_metadata(u'foo\n\nbar')
         self.assertEqual(res, u'foo\n\nbar')
         self.assertIsInstance(res, unicode)
+
+    def test_parse_commit_id(self):
+        self.assertIsNone(parse_commit_id('foo'))
+        self.assertIsNone(parse_commit_id('foo\n\nMozReview-Commit-ID\nbar'))
+
+        self.assertEqual(parse_commit_id('MozReview-Commit-ID: foo123'),
+                         'foo123')
+        self.assertEqual(parse_commit_id(
+            'Bug 1 - foo\n\nMozReview-Commit-ID: abc456'),
+            'abc456')
