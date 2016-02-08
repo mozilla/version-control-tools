@@ -408,13 +408,6 @@ the same as submitting new commits. If all goes according to plan,
 your rewritten commits map up to their previous versions and the
 reviewer sees the new diffs!
 
-.. danger::
-
-   There are some scenarios where updates to existing commits don't
-   map cleanly to existing review requests. This can result in a
-   horrible experience that will make you contemplate not using
-   MozReview. Read on for details.
-
 Understanding How Commits are Mapped to Review Requests
 -------------------------------------------------------
 
@@ -446,65 +439,27 @@ through history rewriting is a non-exact science. It must be based on
 heuristics (such as commit message or diff similarity) or some other
 tracking mechanism.
 
-Mercurial's experimental changeset evolution feature is one such
-tracking mechanism. Unlike vanilla Mercurial or Git, this feature
-records that commit Y is a logical successor to commit X. Basically,
-when commit X is seen, Mercurial knows that Y is a newer version of it
-and should be used instead.
+This can be problematic for MozReview because it is important for the
+same logical commit to consistently get mapped to the same review
+request. If this doesn't work, a review request could shift its focus
+to completely different commits during its lifetime!
 
-.. important::
+MozReview has a mechanism for mapping incoming commits to existing review
+requests. It looks something like the following:
 
-   MozReview doesn't yet make an attempt to intelligently map old
-   commits to their new versions using heuristics.
+1. Obtain all review requests currently associated with the group of commits
+   being altered.
+2. Map exact commit SHA-1 matches to existing review requests (i.e. if
+   the commit didn't change and a review request is already on file, use it)
+3. Map commits using Mercurial's obsolescence data. If a Mercurial client
+   says it rewrote commit ``X`` to ``Y`` and a review request for ``X``
+   exists, map ``Y`` to that existing review request.
+4. Map commits according to matching ``MozReview-Commit-ID`` annotations.
+   The Mercurial and Git MozReview clients automatically add unique
+   *commit ID* annotations to commit messages. If an incoming commit has the
+   same *commit ID* as an existing review request, use that review request.
+5. Recycle existing review requests or create new review requests as needed.
 
-   This means that reordering, inserting, or dropping commits can
-   result in review requests getting mapped to different logical
-   commits.
-
-Unless you have Mercurial's changeset evolution feature enabled,
-the behavior of MozReview to map commits to review requests is
-very simple: review requests and commits are paired in their existing
-topological order.
-
-For example, you have 2 commits, X and Y. These are allocated
-review requests 20 and 21 when first submitted. You make updates to both
-and re-submit. X' is allocated to 20 and Y' to 21. Nothing unexpected there.
-
-Now you add a new commit, Z. When you submit the series of X', Y', Z,
-X' is allocated to 20, Y' to 21, and a new review request - 22 - is created
-for Z. This also *just works*.
-
-But what happens when you remove X'? We now have Y'' and Z'. Since 20 is
-the first available review request, Y'' goes to 20 and Z' goes to 21. 22
-is left unused and is discarded. Comments about X and X' linger on 20,
-which is now tracking Y''. This is horribly sub-optimal.
-
-Avoiding Pitfall When Rewriting History
----------------------------------------
-
-As the above section demonstrates, the lack of heuristics for
-mapping logical commits to existing review requests can result in
-badness.
-
-While this sounds like a massive deficiency in MozReview, in practice
-people tend to learn to work around it by not practicing workflows that
-result in things getting in a wonky state. (Again, yes, we need to
-implement the heuristics so the tracking is better.)
-
-The easiest way to avoid issues with history rewriting is to use
-Mercurial's changeset evolution feature by installing the
-`evolve extension <https://bitbucket.org/marmoute/mutable-history>`_.
-The tracking it performs *just works*. It will change your Mercurial
-workflow significantly and will likely be a bit confusing initially.
-But people tend to love it once they get over the steep learning
-curve (it's no worse than Git's learning curve).
-
-If you don't want to use Mercurial + changeset evolution, you can work
-around the limitation by not inserting or removing commits at the
-beginning or middle of a commit series. As long as the offsets of commits
-within a series remain constant, MozReview will keep mapping commits
-to the same review request. If you keep adding commits to the end, these
-will be dealt with properly as well.
-
-Of course, commit series consisting of a single commit don't have any
-issues with offset remapping, so there is nothing to worry about there.
+In most scenarios, the commit mapping mechanism should *just work*. If
+you find a scenario where commits are being mapped to incorrect
+review requests, please file a bug.

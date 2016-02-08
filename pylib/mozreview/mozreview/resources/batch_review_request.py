@@ -18,6 +18,9 @@ from djblets.webapi.errors import (
     PERMISSION_DENIED,
     SERVICE_NOT_CONFIGURED,
 )
+from mozautomation.commitparser import (
+    parse_commit_id,
+)
 from reviewboard.accounts.backends import (
     get_enabled_auth_backends,
 )
@@ -539,6 +542,63 @@ class BatchReviewRequestResource(WebAPIResource):
         logger.info('%s: %d/%d mapped exactly or to precursors' % (
                     identifier, len(processed_nodes),
                     len(commits['individual'])))
+
+        # Clients should add "MozReview-Commit-ID" unique identifiers to
+        # commit messages. Search for them and match up accordingly.
+
+        unclaimed_rrs = [ReviewRequest.objects.get(pk=rid)
+                         for rid in unclaimed_rids]
+
+        for commit in commits['individual']:
+            node = commit['id']
+            if node in processed_nodes:
+                continue
+
+            commit_id = parse_commit_id(commit['message'])
+            if not commit_id:
+                logger.warn('%s: commit %s does not have commit id' % (
+                            identifier, node))
+                continue
+
+            for rr in unclaimed_rrs:
+                rr_commit_id = parse_commit_id(rr.description)
+                if commit_id != rr_commit_id:
+                    continue
+
+                # commit ID in commit found in existing review request. Map
+                # it up.
+                logger.info('%s: commit ID %s for %s found in review request %d' % (
+                            identifier, commit_id, node, rr.id))
+
+                try:
+                    del remaining_nodes[node]
+                except KeyError:
+                    pass
+
+                unclaimed_rids.remove(rr.id)
+                unclaimed_rrs.remove(rr)
+                draft, warns = update_review_request(local_site, request,
+                                                     privileged_user,
+                                                     reviewer_cache, rr,
+                                                     commit)
+                squashed_reviewers.update(u for u in draft.target_people.all())
+                warnings.extend(warns)
+                processed_nodes.add(node)
+                node_to_rid[node] = rr.id
+                review_requests[rr.id] = rr
+                review_data[rr.id] = get_review_request_data(rr)
+                try:
+                    discard_on_publish_rids.remove(rr.id)
+                except ValueError:
+                    pass
+
+                break
+
+        logger.info('%s: %d/%d mapped after commit ID matching' % (
+                    identifier, len(processed_nodes),
+                    len(commits['individual'])))
+
+        logger.info('%s: %d unclaimed review requests' % (identifier, len(unclaimed_rids)))
 
         # Now do a pass over the commits that didn't map cleanly.
         for commit in commits['individual']:
