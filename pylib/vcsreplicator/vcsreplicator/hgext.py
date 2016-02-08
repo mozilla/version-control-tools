@@ -10,7 +10,6 @@ import hashlib
 import logging
 import os
 import re
-import sys
 import syslog
 import time
 import traceback
