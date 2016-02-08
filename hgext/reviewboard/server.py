@@ -316,6 +316,8 @@ def submitserieswebcommand(web, req, tmpl):
     changesets
        An array of objects describing the changesets being submitted for
        review. See the section below on the format of each object.
+    obsolescence (optional)
+       Bool indicating whether the client supports obsolescence.
 
     Each changeset object has the following keys:
 

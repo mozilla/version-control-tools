@@ -216,7 +216,8 @@ def _processpushreview(repo, req, ldap_username):
 
     commits = {
         'individual': [],
-        'squashed': {}
+        'squashed': {},
+        'obsolescence': req.get('obsolescence', False),
     }
 
     # We do multiple passes over the changesets requested for review because

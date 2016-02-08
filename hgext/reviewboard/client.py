@@ -543,6 +543,7 @@ def doreview(repo, ui, remote, nodes):
     req = commonrequestdict(ui, bzauth)
     req['identifier'] = identifier.full
     req['changesets'] = []
+    req['obsolescence'] = obsolete.isenabled(repo, obsolete.createmarkersopt)
 
     reviews = repo.reviews
     oldparentid = reviews.findparentreview(identifier=identifier.full)
