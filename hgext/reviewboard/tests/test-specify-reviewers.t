@@ -569,7 +569,7 @@ Reviewer identification should be case insensitive.
   
   changeset:  28:dce90596f792
   summary:    Bug 2 - better stuff; r?ryanvm
-  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/13 (draft)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/14 (draft)
   
   review id:  bz://2/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/12 (draft)
@@ -577,7 +577,7 @@ Reviewer identification should be case insensitive.
   publish these review requests now (Yn)? y
   (published review request 12)
 
-  $ rbmanage list-reviewers 13
+  $ rbmanage list-reviewers 14
   RyanVM
 
 

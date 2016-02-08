@@ -766,7 +766,6 @@ The parent review should have been updated accordingly.
 
 Deleting a commit and adding a commit will not recycle a review request
 because the new commit is logically different
-(TODO this is wrong - bug 1242246)
 
   $ hg -q up eeb6d49dcb09
 
@@ -788,7 +787,7 @@ because the new commit is logically different
   
   changeset:  14:3b99865d1bab
   summary:    Bug 1 - Foo 6
-  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7 (draft)
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
@@ -814,11 +813,11 @@ because the new commit is logically different
     p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.commits: '[["eeb6d49dcb0950d771959358f662cf2e5ddc9dc1", 3], ["a27a94c54524d4331dec2f92f647067bfd6dfbd4",
       5]]'
-    p2rb.discard_on_publish_rids: '[]'
+    p2rb.discard_on_publish_rids: '[5]'
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
-    p2rb.unpublished_rids: '[]'
+    p2rb.unpublished_rids: '[7]'
   diffs:
   - id: 1
     revision: 1
@@ -948,7 +947,7 @@ because the new commit is logically different
       p2rb: true
       p2rb.base_commit: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.commits: '[["eeb6d49dcb0950d771959358f662cf2e5ddc9dc1", 3], ["3b99865d1bab8480235d913f4bcfc951fd9e3032",
-        5]]'
+        7]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.identifier: bz://1/mynick
@@ -976,7 +975,6 @@ because the new commit is logically different
       - ''
 
 Review request 5 (whose commit was deleted) should be discarded
-(TODO this is wrong)
 
   $ rbmanage dumpreview 5
   id: 5
@@ -1042,6 +1040,25 @@ Review request 5 (whose commit was deleted) should be discarded
     - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
+
+  $ rbmanage dumpreview 7
+  id: 7
+  status: pending
+  public: false
+  bugs: []
+  commit: null
+  submitter: default+5
+  summary: ''
+  description: ''
+  target_people: []
+  extra_data: {}
+  commit_extra_data:
+    p2rb: true
+    p2rb.identifier: bz://1/mynick
+    p2rb.is_squashed: false
+  diffs: []
+  approved: false
+  approval_failure: The review request is not public.
   draft:
     bugs:
     - '1'
@@ -1052,8 +1069,7 @@ Review request 5 (whose commit was deleted) should be discarded
     - ''
     - 'MozReview-Commit-ID: OTOPw0'
     target_people: []
-    extra:
-      calculated_trophies: true
+    extra: {}
     commit_extra_data:
       p2rb: true
       p2rb.commit_id: 3b99865d1bab8480235d913f4bcfc951fd9e3032
@@ -1062,7 +1078,7 @@ Review request 5 (whose commit was deleted) should be discarded
       p2rb.is_squashed: false
     diffs:
     - id: 15
-      revision: 4
+      revision: 1
       base_commit_id: eeb6d49dcb0950d771959358f662cf2e5ddc9dc1
       name: diff
       extra: {}

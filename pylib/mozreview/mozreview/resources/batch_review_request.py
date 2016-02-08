@@ -558,7 +558,13 @@ class BatchReviewRequestResource(WebAPIResource):
             # when previously updating this review identifier, but not published.
             # If we have more commits than were previously published we'll start
             # reusing these private review requests before creating new ones.
-            if unclaimed_rids:
+            #
+            # We don't reuse existing review requests when obsolescence data is
+            # available because the lack of a clean commit mapping (from above)
+            # means that the commit is logically new and shouldn't be
+            # associated with a review request that belonged to a different
+            # logical commit.
+            if unclaimed_rids and not commits.get('obsolescence', False):
                 assumed_old_rid = unclaimed_rids.pop(0)
 
                 logger.info('%s: mapping %s to unclaimed request %d' % (
