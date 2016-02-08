@@ -342,7 +342,7 @@ class BatchReviewRequestResource(WebAPIResource):
     def _process_submission(self, request, local_site, user, privileged_user,
                             repo, identifier, commits):
         logger.info('processing batch submission %s to %s with %d commits' % (
-                    identifier, repo.name, len(commits)))
+                    identifier, repo.name, len(commits['individual'])))
 
         try:
             squashed_rr = ReviewRequest.objects.get(commit_id=identifier,
