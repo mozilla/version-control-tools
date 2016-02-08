@@ -60,6 +60,7 @@ Create a review request with some busted Javascript in it
   target_people: []
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
     p2rb.commit_id: 719ed7ed9e3e1a340f443981aa91125b68598369
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829

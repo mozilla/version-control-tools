@@ -63,6 +63,8 @@ Reviews should be published and Bugzilla attachments should be present
   target_people: []
   extra_data:
     calculated_trophies: true
+    p2rb.reviewer_map: '{}'
+  commit_extra_data:
     p2rb: true
     p2rb.base_commit: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c
     p2rb.commits: '[["f7ac6c88ab11801e6f7e22b2de292ed6bd1932a4", 2], ["fc8ecbaed44d222dcc9735a5019f21ca00e003b4",
@@ -71,7 +73,6 @@ Reviews should be published and Bugzilla attachments should be present
     p2rb.first_public_ancestor: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
-    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   diffs:
   - id: 1
@@ -105,6 +106,7 @@ Reviews should be published and Bugzilla attachments should be present
   target_people: []
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
     p2rb.commit_id: f7ac6c88ab11801e6f7e22b2de292ed6bd1932a4
     p2rb.first_public_ancestor: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c

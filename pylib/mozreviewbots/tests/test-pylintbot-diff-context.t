@@ -52,6 +52,7 @@ be ignored
   target_people: []
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
     p2rb.commit_id: 3a773b9e226cc5486fdd724372938f77204ff12c
     p2rb.first_public_ancestor: 3edbb5ae6222fc9890db26538597a9b417cb7b94

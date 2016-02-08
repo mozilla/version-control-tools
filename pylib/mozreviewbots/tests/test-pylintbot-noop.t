@@ -34,6 +34,7 @@ No review should be left if no Python files were changed.
   target_people: []
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
     p2rb.commit_id: 97bc3c7259dfe4c83e2d1ac3e6b252a5331da9cd
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
@@ -88,6 +89,8 @@ Expecting 0 reviews
   target_people: []
   extra_data:
     calculated_trophies: true
+    p2rb.reviewer_map: '{}'
+  commit_extra_data:
     p2rb: true
     p2rb.base_commit: 98dca3b6ee0c2e2bfa0921991abd87ed7abe7baf
     p2rb.commits: '[["bbd1278082cfb76d7c5c4422748d5cf8679a5bcd", 4]]'
@@ -95,7 +98,6 @@ Expecting 0 reviews
     p2rb.first_public_ancestor: 98dca3b6ee0c2e2bfa0921991abd87ed7abe7baf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: true
-    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
   diffs:
   - id: 3

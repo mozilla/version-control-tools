@@ -96,6 +96,7 @@ Create and publish a review for SnarkBot
   target_people: []
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
     p2rb.commit_id: 729692c35796d9cbd453ccef97ee0d14139c4a09
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
