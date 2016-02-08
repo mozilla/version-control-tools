@@ -23,7 +23,6 @@ This extension adds new options to the `push` command:
 import errno
 import json
 import os
-import re
 import sys
 import urllib
 import urllib2
@@ -68,7 +67,10 @@ from hgrb.util import (
     ReviewID,
 )
 
-from mozautomation.commitparser import parse_bugs
+from mozautomation.commitparser import (
+    parse_bugs,
+    parse_commit_id,
+)
 from mozhg.auth import (
     getbugzillaauth,
     configureautobmoapikeyauth,
@@ -399,7 +401,7 @@ def wrappedpushdiscovery(orig, pushop):
     replacenodes = []
     for node in nodes:
         ctx = repo[node]
-        if not re.search('^MozReview-Commit-ID: ', ctx.description(), re.MULTILINE):
+        if not parse_commit_id(encoding.fromlocal(ctx.description())):
             replacenodes.append(node)
 
     def makememctx(repo, ctx, revmap, copyfilectxfn):
