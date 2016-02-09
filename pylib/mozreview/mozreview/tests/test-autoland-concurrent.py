@@ -5,6 +5,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import time
+import unittest
 
 import requests
 import selenium.webdriver.support.expected_conditions as EC
@@ -52,6 +53,7 @@ def close_tree(treestatus_url, tree, user='sheriff@example.com', password='passw
     r.raise_for_status()
 
 
+@unittest.skip('Skipped due to Bug 1246950')
 class AutolandConcurrentTest(MozReviewWebDriverTest):
     @classmethod
     def setUpClass(cls):

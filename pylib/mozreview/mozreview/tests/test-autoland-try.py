@@ -104,17 +104,6 @@ class AutolandTryTest(MozReviewWebDriverTest):
         # clicking the Submit button should display an activity indicator
         try_submit.click()
 
-        element = WebDriverWait(self.browser, 10).until(
-            EC.visibility_of_element_located((By.ID, 'activity-indicator'))
-        )
-        try:
-            self.assertTrue('A server error occurred' not in element.text)
-        except StaleElementReferenceException:
-            # The activity indicator may already have disappeared by the time
-            # we check the text, but we want to be able to catch the server
-            # error if it shows up.
-            pass
-
         # the try job should eventually create a new change description
         WebDriverWait(self.browser, 10).until(
             EC.visibility_of_element_located((By.CLASS_NAME, 'changedesc'))
