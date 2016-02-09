@@ -16,6 +16,7 @@ from vcttesting.unittest import MozReviewWebDriverTest
 
 class AutocompleteTest(MozReviewWebDriverTest):
 
+
     def test_reviewer_autocomplete(self):
         self.create_users([
             ('jsmith@example.com', 'password1', 'Jeremy Smith [:jsmith]'),

@@ -87,6 +87,7 @@ class AutolandConcurrentTest(MozReviewWebDriverTest):
             MozReviewWebDriverTest.tearDownClass()
             raise
 
+
     def send_autoland_try_request(self, try_syntax='try: stuff'):
         automation_menu = self.browser.find_element_by_id('automation-menu')
         automation_menu.click()
@@ -106,6 +107,7 @@ class AutolandConcurrentTest(MozReviewWebDriverTest):
 
         # clicking the Submit button should display an activity indicator
         try_submit.click()
+
 
     def test_autoland_try_concurrent(self):
         # We currently have four conditions for enabling the 'automation' menu
