@@ -1,2 +1,2 @@
+DROP USER IF EXISTS autoland;
 CREATE USER autoland;
-CREATE DATABASE autoland;
