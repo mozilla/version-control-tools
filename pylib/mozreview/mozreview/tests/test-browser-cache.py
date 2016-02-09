@@ -85,8 +85,7 @@ class BrowserCacheTest(MozReviewWebDriverTest):
 
         # Wait until we've been redirected to the reviews page
         WebDriverWait(self.browser, 3).until(
-            EC.visibility_of_element_located((
-                By.XPATH, "id('issue-summary')")))
+            EC.visibility_of_element_located((By.XPATH, "id('issue-summary')")))
 
         # The Commit Table should show an issue count for the current
         # review requests status.
@@ -108,3 +107,4 @@ class BrowserCacheTest(MozReviewWebDriverTest):
                 "//table[@id='mozreview-child-requests']"
                 "/tbody/tr[%s]/td[@class='status']/*[1]" % i
             )))
+

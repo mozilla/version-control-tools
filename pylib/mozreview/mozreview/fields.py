@@ -97,8 +97,7 @@ class CommitsListField(CommitDataBackedField):
 
     def as_html(self):
         user = self.request.user
-        parent = get_parent_rr(
-            self.review_request_details.get_review_request())
+        parent = get_parent_rr(self.review_request_details.get_review_request())
         parent_details = parent.get_draft(user) or parent
 
         # If a user can view the parent draft they should also have
@@ -221,8 +220,9 @@ class BaseCommitField(CommitDataBackedField):
     can_record_change_entry = True
 
     def should_render(self, value):
-        # TODO: Remove and render hg web link to the base commit.
-        return False
+        return (is_pushed(self.review_request_details) and
+                is_parent(self.review_request_details) and
+                False) # TODO: Remove and render hg web link to the base commit.
 
     def get_change_entry_sections_html(self, info):
         """Render changes in the base commit as rebases."""
@@ -251,15 +251,14 @@ class BaseCommitField(CommitDataBackedField):
         new_value = info['new'][0]
         repo_path = self._get_repo_path()
 
-        return get_template('mozreview/changedesc-rebase.html').render(
-            Context({
-                'old_base': old_value,
-                'new_base': new_value,
-                'repo_path': repo_path,
-            }))
+        return get_template('mozreview/changedesc-rebase.html').render(Context({
+            'old_base': old_value,
+            'new_base': new_value,
+            'repo_path': repo_path,
+        }))
 
     def _get_repo_path(self):
-        """Retrieve the path to the repository associated with this request."""
+        """Retrieve the path for the repository associated with this request."""
         review_request = self.review_request_details.get_review_request()
         return review_request.repository.path.rstrip('/')
 

@@ -17,7 +17,6 @@ register = template.Library()
 @register.filter()
 def isSquashed(review_request):
     return is_parent(review_request)
-               'p2rb.is_squashed', 'False')).lower() == 'true'
 
 
 @register.filter()
