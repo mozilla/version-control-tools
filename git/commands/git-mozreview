@@ -611,7 +611,6 @@ def configure_command(args):
     # Now install the commit-msg hook.
     source_hook = os.path.join(ROOT, 'git', 'hooks', 'commit-msg-mozreview')
     dest_hook = os.path.join(git_dir, 'hooks', 'commit-msg')
-    have_symlinks = hasattr(os, 'symlink')
     install_hook = True
 
     if os.path.exists(dest_hook):
@@ -631,15 +630,11 @@ def configure_command(args):
                 install_hook = False
 
         if install_hook:
-            # We could leave as is if a symlink. But this is easier.
             os.unlink(dest_hook)
 
     if install_hook:
         ui.write('installing commit-msg hook\n')
-        if have_symlinks:
-            os.symlink(source_hook, dest_hook)
-        else:
-            shutil.copy(source_hook, dest_hook)
+        shutil.copy(source_hook, dest_hook)
 
     with open(os.path.join(git_dir, 'mozreviewconfigversion'), 'wb') as fh:
         fh.write(b'1\n')
