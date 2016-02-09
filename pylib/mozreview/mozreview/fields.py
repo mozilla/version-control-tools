@@ -9,10 +9,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from reviewboard.reviews.fields import BaseReviewRequestField
-from reviewboard.reviews.models import (
-    ReviewRequest,
-    ReviewRequestDraft,
-)
+from reviewboard.reviews.models import ReviewRequestDraft
 
 from mozreview.autoland.models import AutolandEventLogEntry, AutolandRequest
 from mozreview.extra_data import (
