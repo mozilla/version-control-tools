@@ -33,8 +33,7 @@ Commit ID should be present after review URL is defined.
   MozReview-Commit-ID: 124Bxg
   0:96ee1d7354c4 initial
 
-Mercurial doesn't preserve extras on rebase by default. Verify our
-monkeypatch works.
+Verify commit IDs survive rebasing
 
   $ hg -q up -r 0
   $ touch bar
@@ -115,5 +114,29 @@ Graft will preserve commit id.
   @  6:7eb940c47356 histedit3
   |
   |  MozReview-Commit-ID: JmjAjw
+  o  0:96ee1d7354c4 initial
+  
+"topic: foo" commit messages result in empty line
+
+  $ hg -q up -r 0
+  $ echo empty > foo
+  $ hg -q commit -m 'foo: empty'
+
+"key: value *" on a line doesn't get interpretted as metadata
+(TODO this output is wrong)
+
+  $ echo metadata > foo
+  $ hg commit -l - << EOF
+  > topic: foo
+  > 
+  > foo: bar baz
+  > EOF
+  $ hg log -G -T '{rev}:{node|short} {desc}\n' -r '::.'
+  @  8:ad9558f7cd71 topic: foo
+  |
+  |  foo: bar baz
+  |  MozReview-Commit-ID: TA3f84
+  o  7:12881bf6ca0a foo: empty
+  |  MozReview-Commit-ID: OTOPw0
   o  0:96ee1d7354c4 initial
   
