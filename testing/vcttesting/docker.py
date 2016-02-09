@@ -423,8 +423,8 @@ class Docker(object):
 
             s = s['stream']
             if verbose:
-                # s has newlines, so don't go through print().
-                sys.stdout.write('%s> %s' % (name, s))
+                for l in s.strip().splitlines():
+                    sys.stdout.write('%s> %s\n' % (name, l))
             match = re.match('^Successfully built ([a-f0-9]{12})$', s.rstrip())
             if match:
                 image = match.group(1)
