@@ -173,16 +173,13 @@
     - { venv: venv_tools, path: pylib/vcsreplicator, pth: vcsreplicator }
 
 - name: set up version-control-tools repo (server only)
-  hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
-      dest=/repo/hg/version-control-tools
-      revision={{ lookup('file', '../../../../.vctnode') }}
-      force=yes
-      purge=yes
-      executable=/repo/hg/venv_tools/bin/hg
+  command: /repo/hg/venv_tools/bin/hg --config extensions.vcsreplicator=! -R /repo/hg/version-control-tools pull https://hg.mozilla.org/hgcustom/version-control-tools
   when: vct_dir.stat.exists == False
 
-# The hg module's purge doesn't delete ignored files. Boo. Force that
-# because old .pyc files may cause chaos.
+- name: update version-control-tools repo (server only)
+  command: /repo/hg/venv_tools/bin/hg -R /repo/hg/version-control-tools up -r {{ lookup('file', '../../../../.vctnode') }}
+  when: vct_dir.stat.exists == False
+
 - name: delete ignored files from version-control-tools repo
   command: /repo/hg/venv_tools/bin/hg --config extensions.purge= -R /repo/hg/version-control-tools purge --all
   when: vct_dir.stat.exists == False
