@@ -48,8 +48,19 @@ Create autoreview repo manifest
   adding hg::http://$DOCKER_HOSTNAME:$HGPORT/test-repo as remote "review"
   installing commit-msg hook
 
+commit-msg hook installed
+
   $ ls .git/hooks/commit-msg
   .git/hooks/commit-msg
+
+the hook is executable
+
+  $ test -x .git/hooks/commit-msg
+
+"git mozreview" replaced with the full path to "git-mozreview"
+
+  $ grep git-mozreview .git/hooks/commit-msg
+  */git/commands/git-mozreview commit-msg-hook "$@" (glob)
 
 We should have created a config file
 

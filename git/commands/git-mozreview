@@ -9,7 +9,6 @@ import collections
 import json
 import os
 import re
-import shutil
 import stat
 import subprocess
 import sys
@@ -613,6 +612,15 @@ def configure_command(args):
     dest_hook = os.path.join(git_dir, 'hooks', 'commit-msg')
     install_hook = True
 
+    with open(source_hook, 'rb') as fh:
+        source_content = fh.read()
+
+    # Not all environments invoke `git` with the user's custom PATH. e.g.
+    # Xcode. To avoid issues where the environment does have the PATH
+    # set properly, encode the full path to `git-mozreview` in the hook.
+    source_content = re.sub('^git mozreview', __file__, source_content,
+                            flags=re.MULTILINE)
+
     if os.path.exists(dest_hook):
         with open(dest_hook, 'rb') as fh:
             dest_content = fh.read()
@@ -621,9 +629,6 @@ def configure_command(args):
                       'to MozReview; unable to install custom hook\n')
                 ui.warn('(MozReview may lose track of commits when rewriting)\n')
                 install_hook = False
-
-            with open(source_hook, 'rb') as fh:
-                source_content = fh.read()
 
             # No need to do anything if the hook is up to date.
             if source_content == dest_content:
@@ -634,7 +639,12 @@ def configure_command(args):
 
     if install_hook:
         ui.write('installing commit-msg hook\n')
-        shutil.copy(source_hook, dest_hook)
+        with open(dest_hook, 'wb') as fh:
+            fh.write(source_content)
+
+        os.chmod(dest_hook, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
+                            stat.S_IRGRP | stat.S_IXGRP |
+                            stat.S_IROTH | stat.S_IXOTH)
 
     with open(os.path.join(git_dir, 'mozreviewconfigversion'), 'wb') as fh:
         fh.write(b'1\n')
