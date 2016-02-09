@@ -1,8 +1,8 @@
---find-links https://downloads.reviewboard.org/releases/Django/1.6/
---find-links https://downloads.reviewboard.org/releases/django-evolution/0.7/
---find-links https://downloads.reviewboard.org/releases/Djblets/0.9/
---find-links https://downloads.reviewboard.org/releases/RBTools/0.7/
---find-links https://downloads.reviewboard.org/releases/ReviewBoard/2.5/
+--find-links http://downloads.reviewboard.org/releases/Django/1.6/
+--find-links http://downloads.reviewboard.org/releases/django-evolution/0.7/
+--find-links http://downloads.reviewboard.org/releases/Djblets/0.9/
+--find-links http://downloads.reviewboard.org/releases/RBTools/0.7/
+--find-links http://downloads.reviewboard.org/releases/ReviewBoard/2.5/
 
 # sha256: lNKmgifnmEvUD19xxoOXMGIq_4pGM_Ke3h_90NJAeV4
 amqp==1.4.8
