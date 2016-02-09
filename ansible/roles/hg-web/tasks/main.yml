@@ -355,15 +355,6 @@
         minute=12
         hour=2
 
-- name: create CRON to ensure file permissions are sane
-  cron: name='Adjust repository permissions'
-        user=root
-        job='/bin/nice -n 10 /repo/hg/version-control-tools/scripts/normalize-hgweb-permissions /repo/hg/mozilla'
-        day=*
-        month=*
-        minute=0
-        hour=4
-
 # moz.build evaluation occurs in a chroot with a specific control group
 # to limit potential for danger. We have a dedicated user and establish
 # a cgroup policy that all processes for that user go in the limited
