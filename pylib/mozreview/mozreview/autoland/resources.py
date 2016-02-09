@@ -225,7 +225,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
                     'request_id': None,
                 }
 
-        AutolandRequest.objects.create(
+        autoland_request = AutolandRequest.objects.create(
             autoland_id=autoland_request_id,
             push_revision=last_revision,
             repository_url=target_repository,
@@ -375,7 +375,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
                     'request_id': None,
                 }
 
-        AutolandRequest.objects.create(
+        autoland_request = AutolandRequest.objects.create(
             autoland_id=autoland_request_id,
             push_revision=last_revision,
             repository_url=target_repository,
@@ -666,10 +666,13 @@ class ImportPullRequestTriggerResource(WebAPIResource):
         # We succeeded in scheduling the job.
         try:
             request_id = int(response.json()['request_id'])
-        except (KeyError, ValueError):
-            return AUTOLAND_ERROR, {'status_code': response.status_code}
+        except KeyError, ValueError:
+            return AUTOLAND_ERROR, {
+                'status_code': response.status_code,
+                'request_id': autoland_request_id,
+            }
 
-        ImportPullRequestRequest.objects.create(
+        import_pullrequest_request = ImportPullRequestRequest.objects.create(
             autoland_id=request_id,
             github_user=github_user,
             github_repo=github_repo,

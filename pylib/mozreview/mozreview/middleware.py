@@ -1,4 +1,4 @@
-from mozreview.models import get_profile
+from mozreview.models import get_profile, MozReviewUserProfile
 
 
 class MozReviewUserProfileMiddleware(object):

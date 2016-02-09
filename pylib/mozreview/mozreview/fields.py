@@ -8,8 +8,9 @@ from django.template.loader import Context, get_template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
+from reviewboard.extensions.base import get_extension_manager
 from reviewboard.reviews.fields import BaseReviewRequestField
-from reviewboard.reviews.models import ReviewRequestDraft
+from reviewboard.reviews.models import ReviewRequest, ReviewRequestDraft
 
 from mozreview.autoland.models import AutolandEventLogEntry, AutolandRequest
 from mozreview.extra_data import (
@@ -344,6 +345,9 @@ class FileDiffReviewerField(BaseReviewRequestField):
     def as_html(self):
         user = self.request.user
         file_diff_reviewer_list = []
+        reviewer_ids = self.review_request_details.target_people.values_list(
+            'id', flat=True
+        )
 
         if (user.is_authenticated() and
                 isinstance(self.review_request_details, ReviewRequest)):
