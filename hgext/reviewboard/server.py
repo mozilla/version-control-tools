@@ -77,6 +77,8 @@ requirecaps = set([
     'listreviewrepos',
     # client-server exchange uses JSON.
     'jsonproto',
+    # Client writes MozReview-Commit-ID in commit message
+    'commitid',
 ])
 
 

@@ -52,6 +52,7 @@ CLIENT_CAPABILITIES = {
     'listreviewrepos',
     'bzapikeys',
     'jsonproto',
+    'commitid',
 }
 
 MAX_REVIEW_COMMITS = 100

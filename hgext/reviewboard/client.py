@@ -93,6 +93,7 @@ clientcapabilities = {
     'listreviewrepos',
     'bzapikeys',
     'jsonproto',
+    'commitid',
 }
 
 def calljsoncommand(ui, remote, command, data=None, httpcap=None, httpcommand=None):
