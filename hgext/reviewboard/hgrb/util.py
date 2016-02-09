@@ -145,7 +145,9 @@ def addcommitid(msg, repo=None, fakeidpath=None):
         return msg, False
 
     # Insert empty line between main commit message and metadata.
-    if not re.match('^[a-zA-Z-]+: ', lines[-1]):
+    # Metadata lines are have-defined keys and values not containing
+    # whitespaces.
+    if not re.match('^[a-zA-Z-]+: \S+$', lines[-1]) or len(lines) == 1:
         lines.append('')
 
     cid = genid(repo=repo, fakeidpath=fakeidpath)

@@ -123,7 +123,6 @@ Graft will preserve commit id.
   $ hg -q commit -m 'foo: empty'
 
 "key: value *" on a line doesn't get interpretted as metadata
-(TODO this output is wrong)
 
   $ echo metadata > foo
   $ hg commit -l - << EOF
@@ -132,11 +131,13 @@ Graft will preserve commit id.
   > foo: bar baz
   > EOF
   $ hg log -G -T '{rev}:{node|short} {desc}\n' -r '::.'
-  @  8:ad9558f7cd71 topic: foo
+  @  8:0d95b59bce48 topic: foo
   |
   |  foo: bar baz
+  |
   |  MozReview-Commit-ID: TA3f84
-  o  7:12881bf6ca0a foo: empty
+  o  7:acd457e707fc foo: empty
+  |
   |  MozReview-Commit-ID: OTOPw0
   o  0:96ee1d7354c4 initial
   
