@@ -40,7 +40,7 @@ class ImportPullrequestTest(MozReviewWebDriverTest):
         self.load_rburl('import-pullrequest/dminor/gecko-dev/1')
 
         btn = self.browser.find_element_by_id(
-            'mozreview-import-pullrequest-trigger')
+            'mozreview-import-pullrequest-trigger');
         btn.click()
 
         # Clicking the button should display the activity indicator
@@ -68,7 +68,7 @@ class ImportPullrequestTest(MozReviewWebDriverTest):
         self.load_rburl('import-pullrequest/dminor/gecko-dev/1')
 
         btn = self.browser.find_element_by_id(
-            'mozreview-import-pullrequest-trigger')
+            'mozreview-import-pullrequest-trigger');
         btn.click()
 
         WebDriverWait(self.browser, 10).until(
