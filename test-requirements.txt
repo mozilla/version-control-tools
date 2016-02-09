@@ -69,7 +69,6 @@ pytz==2015.7
 PyYAML==3.11
 RBTools==0.7.5
 recaptcha-client==1.0.6
-requests==2.7.0
 responses==0.3.0
 ReviewBoard==2.5.2
 selenium==2.48.0
