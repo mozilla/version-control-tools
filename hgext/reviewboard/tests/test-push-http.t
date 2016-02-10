@@ -46,6 +46,7 @@ Capabilities are exposed via JSON API
     ], 
     "reviewrequires": [
       "bzapikeys", 
+      "commitid", 
       "jsonproto", 
       "listreviewdata", 
       "listreviewrepos", 
