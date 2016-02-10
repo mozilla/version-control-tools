@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import logging
+
 from django.contrib.sites.models import Site
 
 from djblets.siteconfig.models import SiteConfiguration
@@ -34,6 +36,9 @@ from rbbz.auth import BugzillaBackend
 from rbbz.diffs import build_plaintext_review
 from rbbz.middleware import CorsHeaderMiddleware
 from rbbz.resources import bugzilla_cookie_login_resource
+
+
+logger = logging.getLogger(__name__)
 
 
 class BugzillaExtension(Extension):
@@ -74,9 +79,14 @@ def on_review_publishing(user, review, **kwargs):
     TODO: Report lack-of-editbugs properly; see bug 1119065.
     """
     review_request = review.review_request
+    logger.info('Publishing review for user: %s review id: %s '
+                'review request id: %s' % (user, review.id,
+                                            review_request.id))
 
     # skip review requests that were not pushed
     if not is_pushed(review_request):
+        logger.info('Did not publish review: %s: for user: %d: review not '
+                    'pushed.' % (user, review.id))
         return
 
     site = Site.objects.get_current()
@@ -116,6 +126,8 @@ def on_review_publishing(user, review, **kwargs):
 @bugzilla_to_publish_errors
 def on_reply_publishing(user, reply, **kwargs):
     review_request = reply.review_request
+    logger.info('Posting bugzilla reply for review request %s' % (
+                review_request.id))
 
     # skip review requests that were not pushed
     if not is_pushed(review_request):

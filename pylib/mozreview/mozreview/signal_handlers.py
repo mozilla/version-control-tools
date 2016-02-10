@@ -77,6 +77,9 @@ from mozreview.signals import (
 )
 
 
+logger = logging.getLogger(__name__)
+
+
 def initialize_signal_handlers(extension):
     """Initialize signal handlers.
 
@@ -180,8 +183,8 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
     # one we expect to happen in production. However, since we've seen it
     # locally, we handle it here, and log.
     if not review_request_draft:
-        logging.error('Strangely, there was no review request draft on the '
-                      'review request we were attempting to publish.')
+        logger.error('Strangely, there was no review request draft on the '
+                     'review request we were attempting to publish.')
         return
 
     # If the review request draft has a new DiffSet we will only allow
@@ -194,7 +197,7 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
             DiffSetVerification.objects.get(
                 diffset=review_request_draft.diffset)
         except DiffSetVerification.DoesNotExist:
-            logging.error(
+            logger.error(
                 'An attempt was made by User %s to publish an unverified '
                 'DiffSet with id %s',
                 user.id,
@@ -432,7 +435,7 @@ def on_review_request_reopened(user, review_request, **kwargs):
         preexisting_review_request = ReviewRequest.objects.get(
             commit_id=identifier, repository=review_request.repository)
         if preexisting_review_request != review_request:
-            logging.error(
+            logger.error(
                 'Could not revive review request with ID %s because its '
                 'commit id (%s) is already being used by a review request '
                 'with ID %s.' % (

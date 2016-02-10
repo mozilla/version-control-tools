@@ -15,6 +15,9 @@ from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
 from mozreview.bugzilla.transports import bugzilla_transport
 
 
+logger = logging.getLogger(__name__)
+
+
 @simple_decorator
 def xmlrpc_to_bugzilla_errors(func):
     def _transform_errors(*args, **kwargs):
@@ -94,12 +97,12 @@ class Bugzilla(object):
                                                 'password': password})
             except xmlrpclib.Fault as e:
                 if e.faultCode == 300:
-                    logging.error('Login failure for user %s: '
-                                  'invalid username or password.' % username)
+                    logger.error('Login failure for user %s: '
+                                 'invalid username or password.' % username)
                     return None
                 elif e.faultCode == 301:
-                    logging.error('Login failure for user %s: '
-                                  'user is disabled.' % username)
+                    logger.error('Login failure for user %s: '
+                                 'user is disabled.' % username)
                     return None
                 raise
 
@@ -146,6 +149,7 @@ class Bugzilla(object):
             'id': bug_id,
             'comment': comment
         })
+        logger.info('Posting comment on bug %d.' % bug_id)
         return self.proxy.Bug.add_comment(params)
 
     @xmlrpc_to_bugzilla_errors
@@ -154,17 +158,20 @@ class Bugzilla(object):
         # that itself means it's confidential.
         params = {'ids': [bug_id], 'include_fields': ['groups']}
 
+        logger.info('Checking if bug %d is confidential.' % bug_id)
         try:
             groups = self.proxy.Bug.get(params)['bugs'][0]['groups']
         except xmlrpclib.Fault as e:
             if e.faultCode == 102:
+                logger.info('Bug %d is confidential.' % bug_id)
                 return True
             raise
 
+        logger.info('Bug %d confidential: %s.' % (bug_id, bool(groups)))
         return bool(groups)
 
     @xmlrpc_to_bugzilla_errors
-    def post_rb_url(self, bug_id, review_id, summary, comment, url,
+    def post_rb_url(self, bug_id, review_request_id, summary, comment, url,
                     reviewers):
         """Creates or updates an attachment containing a review-request URL.
 
@@ -173,6 +180,8 @@ class Bugzilla(object):
         attachment in the past that should be left untouched.
         """
 
+        logger.info('Posting review request %s to bug %d.' %
+                    (review_request_id, bug_id))
         # Copy because we modify it.
         reviewers = reviewers.copy()
         params = self._auth_params({})
@@ -247,7 +256,7 @@ class Bugzilla(object):
             params['data'] = url
             params['content_type'] = 'text/x-review-board-request'
 
-        params['file_name'] = 'reviewboard-%d-url.txt' % review_id
+        params['file_name'] = 'reviewboard-%d-url.txt' % review_request_id
         params['summary'] = "MozReview Request: %s" % summary
         params['comment'] = comment
         if flags:
@@ -296,12 +305,12 @@ class Bugzilla(object):
         We return a boolean indicating whether we r+ed the attachment.
         """
 
-        logging.info('r+ from %s on bug %d.' % (reviewer, bug_id))
+        logger.info('r+ from %s on bug %d.' % (reviewer, bug_id))
 
         rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
         if not rb_attachment:
-            logging.error('Could not find attachment for Review Board URL %s '
-                          'in bug %s.' % (rb_url, bug_id))
+            logger.error('Could not find attachment for Review Board URL %s '
+                         'in bug %s.' % (rb_url, bug_id))
             return False
 
         flags = rb_attachment.get('flags', [])
@@ -313,7 +322,7 @@ class Bugzilla(object):
                 break
             elif (f['name'] == 'review' and f.get('setter') == reviewer and
                   f['status'] == '+'):
-                logging.info('r+ already set.')
+                logger.info('r+ already set.')
                 return False
         else:
             flag['new'] = True
@@ -338,8 +347,8 @@ class Bugzilla(object):
         This is so callers can do something with the comment (which won't get
         posted unless the review flag was cleared).
         """
-        logging.info('maybe cancelling r? from %s on bug %d.' % (reviewer,
-                                                                 bug_id))
+        logger.info('maybe cancelling r? from %s on bug %d.' % (reviewer,
+                                                                bug_id))
 
         rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
 
@@ -350,7 +359,7 @@ class Bugzilla(object):
         flag = {'name': 'review', 'status': 'X'}
 
         for f in flags:
-            logging.info("Flag %s" % f)
+            logger.info("Flag %s" % f)
             if f['name'] == 'review' and (f.get('requestee') == reviewer or
                                           (f.get('setter') == reviewer and
                                            f.get('status') == '+')):
@@ -388,6 +397,8 @@ class Bugzilla(object):
                 params['ids'].append(a['id'])
 
         if params['ids']:
+            logger.info('Obsoleting attachments on bug %d: %s' % (
+                        bug_id, params['ids']))
             self.proxy.Bug.update_attachment(params)
 
     @xmlrpc_to_bugzilla_errors

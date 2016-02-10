@@ -4,6 +4,8 @@
 
 from __future__ import absolute_import
 
+import logging
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.auth import login
@@ -28,6 +30,9 @@ from mozreview.errors import (
     BugzillaAPIKeyNeededError,
     WebLoginNeededError,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 def auth_api_key(request, username, api_key):
@@ -56,7 +61,7 @@ def auth_api_key(request, username, api_key):
         })
 
     # The user hasn't logged in via the HTML interface yet. This
-    # error response should be interpretted by clients to direct
+    # error response should be interpreted by clients to direct
     # them to log in to the web site.
     except WebLoginNeededError:
         protocol = SiteConfiguration.objects.get_current().get(
@@ -105,12 +110,16 @@ class BugzillaAPIKeyLoginResource(WebAPIResource):
         result = auth_api_key(request, username, api_key)
 
         if not isinstance(result, User):
+            logger.info('Login attempt failed for username: %s' %
+                        username)
             return result
 
         # Authentication succeeded. Persist the returned user for the
         # session.
         login(request, result)
 
+        logger.info('Login attempt succeeded for username: %s' %
+                     username)
         return 201, {
             self.item_result_key: {
                 'email': result.email,

@@ -41,6 +41,8 @@ DRAFTED_COMMIT_DATA_KEYS = (
 
 REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')
 
+logger = logging.getLogger(__name__)
+
 
 def fetch_commit_data(review_request_details, commit_data=None):
     """fetch the CommitData object associated with a review request details
@@ -165,9 +167,9 @@ def get_rr_for_id(id):
     try:
         return ReviewRequest.objects.get(pk=id)
     except ReviewRequest.DoesNotExist:
-        logging.error('Could not retrieve child review request with '
-                      'id %s because it does not appear to exist.'
-                      % id)
+        logger.error('Could not retrieve child review request with '
+                     'id %s because it does not appear to exist.'
+                     % id)
 
 
 def update_parent_rr_reviewers(parent_rr_draft):

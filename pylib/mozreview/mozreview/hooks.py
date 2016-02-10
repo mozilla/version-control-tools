@@ -20,6 +20,9 @@ from mozreview.review_helpers import (
 )
 
 
+logger = logging.getLogger(__name__)
+
+
 class MozReviewApprovalHook(ReviewRequestApprovalHook):
     """Calculates landing approval for review requests.
 
@@ -58,8 +61,8 @@ class MozReviewApprovalHook(ReviewRequestApprovalHook):
             # We catch all exceptions because any error will make
             # Review Board revert to it's default behaviour which
             # is much more relaxed than ours.
-            logging.error('Failed to calculate approval for review '
-                          'request %s: %s' % (review_request.id, e))
+            logger.error('Failed to calculate approval for review '
+                         'request %s: %s' % (review_request.id, e))
             return False, "Error when calculating approval."
 
     def is_approved_parent(self, review_request):
@@ -69,8 +72,8 @@ class MozReviewApprovalHook(ReviewRequestApprovalHook):
         if not children:
             # This parent review request had no children, so it's either
             # private or something has gone seriously wrong.
-            logging.error('Review request %s has no children' %
-                          review_request.id)
+            logger.error('Review request %s has no children' %
+                         review_request.id)
             return False, 'Review request has no children.'
 
         for rr in children:
@@ -79,8 +82,8 @@ class MozReviewApprovalHook(ReviewRequestApprovalHook):
                 commit_id = commit_data.extra_data.get(COMMIT_ID_KEY, None)
 
                 if commit_id is None:
-                    logging.error('Review request %s missing commit_id'
-                                  % rr.id)
+                    logger.error('Review request %s missing commit_id'
+                                 % rr.id)
                     return False, 'A Commit is not approved.'
 
                 return False, 'Commit %s is not approved.' % commit_id

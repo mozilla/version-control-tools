@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import json
+import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
@@ -14,6 +15,9 @@ from djblets.webapi.errors import (DOES_NOT_EXIST,
 from reviewboard.diffviewer.models import FileDiff
 from reviewboard.reviews.models import BaseComment, Review
 from reviewboard.webapi.resources import resources, WebAPIResource
+
+
+logger = logging.getLogger(__name__)
 
 
 class BatchReviewResource(WebAPIResource):
@@ -85,15 +89,21 @@ class BatchReviewResource(WebAPIResource):
                 ...
             ]
         """
+        logger.info('Attempting to create batchreview on: %s '
+                    'for user: %s' % (review_request_id, request.user.id))
         try:
             review_request = resources.review_request.get_object(
                 request,
                 review_request_id=review_request_id,
                 *args, **kwargs)
         except ObjectDoesNotExist:
+            logger.info('Review Request %s does not exist. User %s' %
+                        (review_request_id, request.user.id))
             return DOES_NOT_EXIST
 
         if not review_request.is_accessible_by(request.user):
+            logger.info('Review Request %s not accessible by %s' %
+                        (review_request_id, request.user.id))
             return PERMISSION_DENIED
 
         if body_top is None:
@@ -106,6 +116,9 @@ class BatchReviewResource(WebAPIResource):
             try:
                 diff_comments = json.loads(diff_comments)
             except ValueError:
+                logger.info('Could not create batchreview on: %s '
+                            'for user: %s: bad diff comments' %
+                            (review_request_id, request.user.id))
                 return INVALID_FORM_DATA, {
                     'fields': {
                         'diff_comments': ['Not valid JSON.'],
@@ -113,6 +126,9 @@ class BatchReviewResource(WebAPIResource):
                 }
 
             if not isinstance(diff_comments, list):
+                logger.info('Could not create batchreview on: %s '
+                            'for user: %s: bad diff comments' %
+                            (review_request_id, request.user.id))
                 return INVALID_FORM_DATA, {
                     'fields': {
                         'diff_comments': ['Does not decode to a list.'],
@@ -157,6 +173,9 @@ class BatchReviewResource(WebAPIResource):
                 review.publish(user=request.user)
 
         except KeyError:
+            logger.info('Could not create batchreview on: %s '
+                        'for user: %s: bad diff comments' %
+                        (review_request_id, request.user.id))
             return INVALID_FORM_DATA, {
                 'fields': {
                     'diff_comments': ['Diff comments were malformed'],
@@ -164,11 +183,17 @@ class BatchReviewResource(WebAPIResource):
             }
 
         except ObjectDoesNotExist:
+            logger.info('Could not create batchreview on: %s '
+                        'for user: %s: bad filediff_id' %
+                        (review_request_id, request.user.id))
             return INVALID_FORM_DATA, {
                 'fields': {
                     'diff_comments': ['Invalid filediff_id'],
                 },
             }
+
+        logger.info('Created batchreview on: %s for user: %s' %
+                    (review_request_id, request.user.id))
 
         return 201, {
             self.item_result_key: review,

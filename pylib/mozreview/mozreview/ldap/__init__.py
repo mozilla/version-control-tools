@@ -7,6 +7,7 @@ from reviewboard.extensions.base import get_extension_manager
 
 
 LDAP_QUERY_TIMEOUT = 5
+logger = logging.getLogger(__name__)
 
 
 def get_ldap_connection():
@@ -22,14 +23,14 @@ def get_ldap_connection():
     password = ext.get_settings('ldap_password')
 
     if any([not url, not user, not password]):
-        logging.error("MozReview ldap support configured incorrectly.")
+        logger.error("MozReview ldap support configured incorrectly.")
         return None
 
     try:
         c = ldap.initialize(url)
         c.simple_bind_s(user, password)
     except ldap.LDAPError as e:
-        logging.error('Failed to connect to ldap: %s' % e)
+        logger.error('Failed to connect to ldap: %s' % e)
         return None
 
     return c
@@ -44,6 +45,8 @@ def query_scm_group(username, group):
     We are cautious and will return false in cases where we
     failed to actually query ldap for the group membership.
     """
+    logger.info('Querying ldap group association: %s in %s' % (
+                 username, group))
     l = get_ldap_connection()
 
     if not l:
@@ -56,7 +59,10 @@ def query_scm_group(username, group):
         # The memberUid attribute will only exist if there is
         # at least one member of the group.
         members = result[1][0][1].get('memberUid') or []
-        return username in members
+        in_group = username in members
+        logger.info('Ldap group association: %s in %s: %s' % (
+                    username, group, in_group))
+        return in_group
     except ldap.LDAPError as e:
-        logging.error('Failed to query ldap for group membership: %s' % e)
+        logger.error('Failed to query ldap for group membership: %s' % e)
         return False

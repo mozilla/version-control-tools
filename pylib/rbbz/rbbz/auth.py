@@ -47,6 +47,8 @@ class BugzillaBackend(AuthBackend):
     def authenticate(self, username, password, cookie=False):
         username = username.strip()
 
+        logger.info('Login attempt (password) for user %s: ' % username)
+
         # If the user provides an email address when authenticating,
         # it is checked against Review Board's email field in the User
         # Model.  If a match is found, the email will be translated into
@@ -79,14 +81,15 @@ class BugzillaBackend(AuthBackend):
         try:
             bugzilla = Bugzilla()
         except BugzillaUrlError:
-            logging.warn('Login failure for user %s: Bugzilla URL not set.'
-                         % username)
+            logger.warn('Login failure (password) for user %s: Bugzilla URL '
+                        ' not set.' % username)
             return None
 
         try:
             user_data = bugzilla.log_in(username, password, cookie)
         except BugzillaError as e:
-            logging.error('Login failure for user %s: %s' % (username, e))
+            logger.error('Login failure (password) for user %s: %s' %
+                         (username, e))
             return None
 
         if not user_data:
@@ -95,17 +98,18 @@ class BugzillaBackend(AuthBackend):
         users = get_or_create_bugzilla_users(user_data)
 
         if not users:
-            logging.error('Login failure for user %s: failed to create user.'
-                          % username)
+            logger.error('Login failure (password) for user %s: failed to '
+                         'create user.' % username)
             return None
 
         user = users[0]
 
         if not user.is_active:
-            logging.error('Login failure for user %s: user is not active.'
-                          % username)
+            logger.error('Login failure (password) for user %s: user is not '
+                         'active.' % username)
             return None
 
+        logger.info('Login successful (password) for user %s: ' % username)
         return user
 
     def authenticate_api_key(self, username, api_key):
@@ -126,20 +130,23 @@ class BugzillaBackend(AuthBackend):
         """
         username = username.strip()
 
+        logger.info('Login attempt (apikey) for user %s: ' % username)
+
         try:
             bugzilla = Bugzilla()
         except BugzillaUrlError:
-            logging.warn('Login failure for user %s: Bugzilla URL not set.' %
-                         username)
+            logger.warn('Login failure (apikey) for user %s: Bugzilla URL '
+                        'not set.' % username)
 
         try:
             valid = bugzilla.valid_api_key(username, api_key)
         except BugzillaError as e:
-            logging.error('Login failure for user %s: %s' % (username, e))
+            logger.error('Login failure (apikey) for user %s: %s' %
+                         (username, e))
             return None
 
         if not valid:
-            logging.error('Login failure for user %s: invalid API key' %
+            logger.error('Login failure for user %s: invalid API key' %
                           username)
             assert bugzilla.base_url.endswith('/')
             raise BugzillaAPIKeyNeededError(
@@ -153,13 +160,14 @@ class BugzillaBackend(AuthBackend):
         try:
             user_data = bugzilla.get_user(username)
         except BugzillaError as e:
-            logging.error('Login failure for user %s: unable to retrieve '
-                          'Bugzilla user info: %s' % (username, e))
+            logger.error('Login failure (apikey) for user %s: unable to '
+                         'retrieve Bugzilla user info: %s' %
+                         (username, e))
             return None
 
         if not user_data:
-            logging.warning('Could not retrieve user info for %s after '
-                            'validating API key' % username)
+            logger.warning('Could not retrieve user info for %s after '
+                           'validating API key' % username)
             return None
 
         bz_user = user_data['users'][0]
@@ -168,21 +176,23 @@ class BugzillaBackend(AuthBackend):
             bum = BugzillaUserMap.objects.get(bugzilla_user_id=bz_user['id'])
             user = bum.user
         except BugzillaUserMap.DoesNotExist:
-            logging.warning('Login failure for user %s: API key valid but '
-                            'user missing from database' % username)
+            logger.warning('Login failure for user %s: API key valid but '
+                           'user missing from database' % username)
             raise WebLoginNeededError()
 
         if not user.is_active:
-            logging.error('Login failure for user %s: user not active' %
-                          username)
+            logger.error('Login failure (apikey) for user %s: user not '
+                         'active' % username)
             return None
 
         # We require a local API key to be on file, as it will be used for
         # subsequent requests.
         if not get_bugzilla_api_key(user):
-            logging.warning('Login failure for user %s: no API key in '
-                            'database' % username)
+            logger.warning('Login failure for user %s: no API key in '
+                           'database' % username)
             raise WebLoginNeededError()
+
+        logger.info('Login successful (apikey) for user %s: ' % username)
 
         return user
 

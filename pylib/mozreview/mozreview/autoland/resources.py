@@ -44,15 +44,18 @@ TRY_AUTOLAND_DESTINATION = 'try'
 AUTOLAND_LOCK_TIMEOUT = 60 * 60 * 24
 
 
+logger = logging.getLogger(__name__)
+
+
 def acquire_lock(lock_id):
     """Use the memcached add operation to acquire a global lock"""
-    logging.info("Acquiring lock for {0}".format(lock_id))
+    logger.info("Acquiring lock for {0}".format(lock_id))
     return cache.add(lock_id, "true", AUTOLAND_LOCK_TIMEOUT)
 
 
 def release_lock(lock_id):
     """Release memcached lock with key lock_id"""
-    logging.info("Releasing lock for {0}".format(lock_id))
+    logger.info("Releasing lock for {0}".format(lock_id))
     cache.delete(lock_id)
 
 
@@ -137,9 +140,9 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
         commit_data = fetch_commit_data(rr)
 
         if not is_pushed(rr, commit_data) or not is_parent(rr, commit_data):
-            logging.error('Failed triggering Autoland because the review '
-                          'request is not pushed, or not the parent review '
-                          'request.')
+            logger.error('Failed triggering Autoland because the review '
+                         'request is not pushed, or not the parent review '
+                         'request.')
             return NOT_PUSHED_PARENT_REVIEW_REQUEST
 
         target_repository = rr.repository.extra_data.get(
@@ -156,9 +159,9 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
 
-        logging.info('Submitting a request to Autoland for review request '
-                     'ID %s for revision %s '
-                     % (review_request_id, last_revision))
+        logger.info('Submitting a request to Autoland for review request '
+                    'ID %s for revision %s destination %s'
+                     % (review_request_id, last_revision, target_repository))
 
         autoland_url = ext.get_settings('autoland_url')
         if not autoland_url:
@@ -171,9 +174,6 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
             return AUTOLAND_CONFIGURATION_ERROR
 
         pingback_url = autoland_request_update_resource.get_uri(request)
-
-        logging.info('Telling Autoland to give status updates to %s'
-                     % pingback_url)
 
         lock_id = get_autoland_lock_id(rr.id, target_repository, last_revision)
         if not acquire_lock(lock_id):
@@ -196,13 +196,13 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
                 timeout=AUTOLAND_REQUEST_TIMEOUT,
                 auth=(autoland_user, autoland_password))
         except requests.exceptions.RequestException:
-            logging.error('We hit a RequestException when submitting a '
-                          'request to Autoland')
+            logger.error('We hit a RequestException when submitting a '
+                         'request to Autoland')
             release_lock(lock_id)
             return AUTOLAND_ERROR
         except requests.exceptions.Timeout:
-            logging.error('We timed out when submitting a request to '
-                          'Autoland')
+            logger.error('We timed out when submitting a request to '
+                         'Autoland')
             release_lock(lock_id)
             return AUTOLAND_TIMEOUT
 
@@ -285,9 +285,9 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
         commit_data = fetch_commit_data(rr)
 
         if not is_pushed(rr, commit_data) or not is_parent(rr, commit_data):
-            logging.error('Failed triggering Autoland because the review '
-                          'request is not pushed, or not the parent review '
-                          'request.')
+            logger.error('Failed triggering Autoland because the review '
+                         'request is not pushed, or not the parent review '
+                         'request.')
             return NOT_PUSHED_PARENT_REVIEW_REQUEST
 
         target_repository = rr.repository.extra_data.get(
@@ -303,9 +303,9 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
 
-        logging.info('Submitting a request to Autoland for review request '
-                     'ID %s for revision %s '
-                     % (review_request_id, last_revision))
+        logger.info('Submitting a request to Autoland for review request '
+                    'ID %s for revision %s destination try'
+                    % (review_request_id, last_revision))
 
         autoland_url = ext.get_settings('autoland_url')
         if not autoland_url:
@@ -318,9 +318,6 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
             return AUTOLAND_CONFIGURATION_ERROR
 
         pingback_url = autoland_request_update_resource.get_uri(request)
-
-        logging.info('Telling Autoland to give status updates to %s'
-                     % pingback_url)
 
         lock_id = get_autoland_lock_id(rr.id, target_repository, last_revision)
         if not acquire_lock(lock_id):
@@ -346,13 +343,13 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
                 timeout=AUTOLAND_REQUEST_TIMEOUT,
                 auth=(autoland_user, autoland_password))
         except requests.exceptions.RequestException:
-            logging.error('We hit a RequestException when submitting a '
-                          'request to Autoland')
+            logger.error('We hit a RequestException when submitting a '
+                         'request to Autoland')
             release_lock(lock_id)
             return AUTOLAND_ERROR
         except requests.exceptions.Timeout:
-            logging.error('We timed out when submitting a request to '
-                          'Autoland')
+            logger.error('We timed out when submitting a request to '
+                         'Autoland')
             release_lock(lock_id)
             return AUTOLAND_TIMEOUT
 
@@ -620,10 +617,10 @@ class ImportPullRequestTriggerResource(WebAPIResource):
 
         pingback_url = import_pullrequest_update_resource.get_uri(request)
 
-        logging.info('Submitting a request to Autoland for pull request'
-                     '%s/%s/%s for bug %s with pingback_url %s'
-                     % (github_user, github_repo, pullrequest, bugid,
-                        pingback_url))
+        logger.info('Submitting a request to Autoland for pull request'
+                    '%s/%s/%s for bug %s with pingback_url %s'
+                    % (github_user, github_repo, pullrequest, bugid,
+                       pingback_url))
 
         destination = IMPORT_PULLREQUEST_DESTINATION
         if testing:
@@ -647,12 +644,12 @@ class ImportPullRequestTriggerResource(WebAPIResource):
                 timeout=AUTOLAND_REQUEST_TIMEOUT,
                 auth=(autoland_user, autoland_password))
         except requests.exceptions.RequestException:
-            logging.error('We hit a RequestException when submitting a '
-                          'request to Autoland')
+            logger.error('We hit a RequestException when submitting a '
+                         'request to Autoland')
             return AUTOLAND_ERROR
         except requests.exceptions.Timeout:
-            logging.error('We timed out when submitting a request to '
-                          'Autoland')
+            logger.error('We timed out when submitting a request to '
+                         'Autoland')
             return AUTOLAND_TIMEOUT
 
         if response.status_code != 200:

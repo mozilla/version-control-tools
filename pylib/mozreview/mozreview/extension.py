@@ -90,6 +90,9 @@ SETTINGS_PATH = os.path.join('/', 'mozreview-settings.json')
 SETTINGS = None
 
 
+logger = logging.getLogger(__name__)
+
+
 class ParentJSExtension(JSExtension):
     model_class = 'MRParents.Extension'
     apply_to = review_request_url_names
@@ -339,6 +342,6 @@ class MozReviewExtension(Extension):
                     SETTINGS = json.load(f)
             return SETTINGS.get(key, self.default_settings.get(key, default))
         except IOError:
-            logging.error('Could not access settings file (using defaults)'
-                          ': %s' % SETTINGS_PATH)
+            logger.error('Could not access settings file (using defaults)'
+                         ': %s' % SETTINGS_PATH)
             return self.default_settings.get(key, default)

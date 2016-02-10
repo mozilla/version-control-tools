@@ -17,6 +17,9 @@ from mozreview.models import (get_or_create_bugzilla_users,
                               UnverifiedBugzillaApiKey)
 
 
+logger = logging.getLogger(__name__)
+
+
 def show_error_page(request):
     return render_to_response(
         'mozreview/login-error.html', RequestContext(request, {
@@ -50,9 +53,11 @@ def post_bmo_auth_callback(request):
     bmo_api_key = body.get('client_api_key', None)
 
     if not (bmo_username and bmo_api_key):
-        logging.error('Bugzilla auth callback called without required '
-                      'parameters.')
+        logger.error('Bugzilla auth callback called without required '
+                     'parameters.')
         return show_error_page(request)
+
+    logger.info('Received unverified apikey for user: %s' % bmo_username)
 
     unverified_key = UnverifiedBugzillaApiKey(
         bmo_username=bmo_username,
@@ -85,8 +90,8 @@ def get_bmo_auth_callback(request):
     redirect = request.GET.get('redirect', None)
 
     if not (bmo_username and callback_result):
-        logging.error('Bugzilla auth callback called without required '
-                      'parameters.')
+        logger.error('Bugzilla auth callback called without required '
+                     'parameters.')
         return show_error_page(request)
 
     if not redirect:
@@ -96,20 +101,20 @@ def get_bmo_auth_callback(request):
         bmo_username=bmo_username).order_by('timestamp')
 
     if not unverified_keys:
-        logging.error('No unverified keys found for BMO user %s.' %
-                      bmo_username)
+        logger.error('No unverified keys found for BMO user %s.' %
+                     bmo_username)
         return show_error_page(request)
 
     unverified_key = unverified_keys.last()
 
     if len(unverified_keys) > 1:
-        logging.warning('Multiple unverified keys on file for BMO user %s. '
-                        'Using most recent, from %s.' %
+        logger.warning('Multiple unverified keys on file for BMO user %s. '
+                       'Using most recent, from %s.' %
                         (bmo_username, unverified_key.timestamp))
 
     if callback_result != unverified_key.callback_result:
-        logging.error('Callback result does not match for BMO user %s.' %
-                      bmo_username)
+        logger.error('Callback result does not match for BMO user %s.' %
+                     bmo_username)
         return show_error_page(request)
 
     bmo_api_key = unverified_key.api_key
@@ -119,10 +124,10 @@ def get_bmo_auth_callback(request):
 
     try:
         if not b.valid_api_key(bmo_username, bmo_api_key):
-            logging.error('Invalid API key for %s.' % bmo_username)
+            logger.error('Invalid API key for %s.' % bmo_username)
             return show_error_page(request)
     except BugzillaError as e:
-        logging.error('Error validating API key: %s' % e.msg)
+        logger.error('Error validating API key: %s' % e.msg)
         return show_error_page(request)
 
     b.api_key = bmo_api_key
@@ -130,30 +135,31 @@ def get_bmo_auth_callback(request):
     try:
         user_data = b.get_user(bmo_username)
     except BugzillaError as e:
-        logging.error('Error getting user data: %s' % e.msg)
+        logger.error('Error getting user data: %s' % e.msg)
         return show_error_page(request)
 
     if not user_data:
-        logging.warning('Could not retrieve user info for %s after '
-                        'validating API key.' % bmo_username)
+        logger.warning('Could not retrieve user info for %s after '
+                       'validating API key.' % bmo_username)
         return show_error_page(request)
 
     users = get_or_create_bugzilla_users(user_data)
 
     if not users:
-        logging.warning('Failed to create user %s after validating API key.' %
-                        bmo_username)
+        logger.warning('Failed to create user %s after validating API key.' %
+                       bmo_username)
         return show_error_page(request)
 
     user = users[0]
     assert user.email == bmo_username
 
     if not user.is_active:
-        logging.warning('Validated API key but user %s is inactive.' %
-                        bmo_username)
+        logger.warning('Validated API key but user %s is inactive.' %
+                       bmo_username)
         return show_error_page(request)
 
     set_bugzilla_api_key(user, bmo_api_key)
     user.backend = 'rbbz.auth.BugzillaBackend'
+    logger.info('BMO Auth callback succeeded for user: %s' % bmo_username)
     login(request, user)
     return HttpResponseRedirect(redirect)

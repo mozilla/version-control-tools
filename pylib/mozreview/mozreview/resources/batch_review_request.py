@@ -334,12 +334,12 @@ class BatchReviewRequestResource(WebAPIResource):
 
         # Need to catch outside the transaction so db changes are rolled back.
         except DiffProcessingException:
-            logging.exception('diff processing exception')
+            logger.exception('diff processing exception')
             return INVALID_FORM_DATA, {
                 'fields': {
                     'commits': ['error processing squashed diff']}}
         except SubmissionException as e:
-            logging.exception('submission exception')
+            logger.exception('submission exception')
             return e.value
 
     def _process_submission(self, request, local_site, user, privileged_user,

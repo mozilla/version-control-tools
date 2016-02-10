@@ -27,6 +27,9 @@ from mozreview.extra_data import (
 from mozreview.file_diff_reviewer.models import FileDiffReviewer
 
 
+logger = logging.getLogger(__name__)
+
+
 def ensure_review_request(review_request_details):
     if isinstance(review_request_details, ReviewRequestDraft):
         review_request_details = review_request_details.get_review_request()
@@ -153,7 +156,7 @@ class ImportCommitField(BaseReviewRequestField):
         repo_path = review_request.repository.path
 
         if not commit_id:
-            logging.error('No commit_id for review request: %d' % (
+            logger.error('No commit_id for review request: %d' % (
                 review_request.id))
             return ''
 
@@ -195,7 +198,7 @@ class PullCommitField(BaseReviewRequestField):
         repo_path = review_request.repository.path
 
         if not commit_id:
-            logging.error('No commit_id for review request: %d' % (
+            logger.error('No commit_id for review request: %d' % (
                 review_request.id))
             return ''
 
@@ -309,14 +312,14 @@ class TryField(BaseReviewRequestField):
             # changedescription. This either means we have a serious bug or
             # someone was attempting to change the field themselves (possibly
             # maliciously).
-            logging.error('A malformed autoland_id was detected: %s' %
-                          info['new'][0])
+            logger.error('A malformed autoland_id was detected: %s' %
+                         info['new'][0])
             return self._retrieve_error_txt
 
         try:
             ar = AutolandRequest.objects.get(pk=autoland_id)
         except:
-            logging.error('An unknown autoland_id was detected: %s' %
+            logger.error('An unknown autoland_id was detected: %s' %
                 info['new'][0])
             return self._retrieve_error_txt
 

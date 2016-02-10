@@ -5,6 +5,12 @@ from djblets.webapi.decorators import (_find_httprequest,
                                        webapi_response_errors)
 from djblets.webapi.errors import PERMISSION_DENIED
 
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+
 @simple_decorator
 def if_ext_enabled(fn):
     """Only execute the function if the extension is enabled.
@@ -47,15 +53,22 @@ def webapi_scm_groups_required(*groups):
                 # should mean they are authenticated and our middleware
                 # has added the profile to the request. Check it just
                 # to make sure nothing went wrong with the middleware.
-                logging.error('No MozReviewUserProfile for authenticated user')
+                logger.error('No MozReviewUserProfile for authenticated user: %s',
+                             request.user.id)
                 return PERMISSION_DENIED
 
             if not mrp.ldap_username:
+                logger.info('No ldap_username for user: %s when '
+                            'attempting to access protected resource',
+                            request.user.id)
                 return PERMISSION_DENIED.with_message(
                     'You are not associated with an ldap account')
 
             for group in groups:
                 if not mrp.has_scm_ldap_group(group):
+                    logger.info('Missing group membership for user: %s '
+                                'when attempting to access protected '
+                                'resource', request.user.id)
                     return PERMISSION_DENIED.with_message(
                         'You do not have the required ldap permissions')
 
