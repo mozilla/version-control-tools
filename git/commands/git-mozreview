@@ -165,14 +165,15 @@ def get_output(args):
 
 
 def get_git_config():
-    res, output = get_output(['git', 'config', '--list'])
+    res, output = get_output(['git', 'config', '--list', '-z'])
     if res:
         raise AbortError('could not obtain git config')
 
     c = {}
-    for line in output.splitlines():
-        k, v = line.split('=', 1)
-        c[k] = v
+    for line in output.split('\0'):
+        if line:
+            k, v = line.split('\n', 1)
+            c[k] = v
 
     return c
 
