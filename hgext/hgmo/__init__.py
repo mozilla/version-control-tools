@@ -458,11 +458,45 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
     ui.write('\n')
     return
 
+def filelog(orig, web, req, tmpl):
+    """Wraps webcommands.filelog to provide pushlog metadata to template."""
+
+    if hasattr(web.repo, 'pushlog'):
+
+        class _tmpl(object):
+
+            def __init__(self):
+                self.defaults = tmpl.defaults
+
+            def __call__(self, *args, **kwargs):
+                self.args = args
+                self.kwargs = kwargs
+                return self
+
+        class _ctx(object):
+
+            def __init__(self, hex):
+                self._hex = hex
+
+            def hex(self):
+                return self._hex
+
+        t = orig(web, req, _tmpl())
+        for entry in t.kwargs['entries']:
+            pushinfo = web.repo.pushlog.pushfromchangeset(_ctx(entry['node']))
+            entry['pushid'] = pushinfo[0]
+            entry['pushdate'] = util.makedate(pushinfo[2])
+
+        return tmpl(*t.args, **t.kwargs)
+    else:
+        return orig(web, req, tmpl)
+
 
 def extsetup(ui):
     extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
     extensions.wrapfunction(webutil, 'changelistentry', changelistentry)
     extensions.wrapfunction(bookmarks, 'updatefromremote', bmupdatefromremote)
+    extensions.wrapfunction(webcommands, 'filelog', filelog)
 
     revset.symbols['reviewer'] = revset_reviewer
     revset.safesymbols.add('reviewer')

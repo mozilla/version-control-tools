@@ -183,7 +183,18 @@ fileannotation = '\{
   "lineno": {lineno|json},
   "revdate": {revdate|json}
   }'
-filelog = '"not yet implemented"'
+filelogentry = '\{
+  "node": {node|json},
+  "author": {author|json},
+  "date": {date|json},
+  "pushid": {pushid},
+  "pushdate": {pushdate|json},
+  "desc": {desc|json}
+  }'
+filelog = '\{
+  "file": {file|json},
+   "entries": [{join(entries%filelogentry, ", ")}]
+   }'
 graph = '"not yet implemented"'
 helptopics = '\{
   "topics": [{join(topics%helptopicentry, ", ")}],

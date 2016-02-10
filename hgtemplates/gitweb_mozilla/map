@@ -293,7 +293,10 @@ filelogentry = '
       <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">browse</a><br/>
       <a href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">annotate</a>
     </td>
-    <td class="age">{node|short}<br/><i>{date|isodate}</i>{rename%filelogrename}</td>
+    <td class="age">
+      {node|short}<br/>created <i>{date|isodate}</i>{rename%filelogrename}
+      {if(pushdate, '<br/>pushed <i>{pushdate|isodate}</i>')}
+    </td>
     <td><i>{author|person}</i></td>
     <td>
       <strong><cite>{author|person}</cite> - {desc|strip|firstline|escape|buglink}</strong>
