@@ -120,7 +120,7 @@ Attempt to push with Bugzilla not configured will result in a warning
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 1 changes to 1 files (+1 heads)
-  Bugzilla username: None
+  Bugzilla username: 
   Bugzilla credentials not available. Not submitting review.
 
 Configure authentication

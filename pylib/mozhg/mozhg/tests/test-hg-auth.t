@@ -14,13 +14,13 @@ Dummy out the profiles directory to prevent running system from leaking in
 If nothing defined and not interactive, we get no auth
 
   $ hg bzauth
-  Bugzilla username: None
+  Bugzilla username: 
   no auth
 
 If nothing defined and not interactive and we require input, we should abort
 
   $ hg bzauth --require
-  Bugzilla username: None
+  Bugzilla username: 
   abort: unable to obtain Bugzilla authentication.
   [255]
 
@@ -128,14 +128,14 @@ Now we set up some Firefox profiles to test cookie extraction
 Empty profile should have no cookies and should get nothing
 
   $ hg bzauth
-  Bugzilla username: None
+  Bugzilla username: 
   no auth
 
 Profile with cookie from an unknown Bugzilla should get nothing
 
   $ hg bzcreatecookie profiles/foo http://dummy/ dummyuser dummypass
   $ hg bzauth
-  Bugzilla username: None
+  Bugzilla username: 
   no auth
 
 Profile with cookie from BMO should be returned
