@@ -300,6 +300,7 @@ from mercurial import (
     hg,
     revset,
     scmutil,
+    sshpeer,
     templatefilters,
     templatekw,
     templater,
@@ -399,6 +400,18 @@ def exchangepullpushlog(orig, pullop):
 
     tree = resolve_uri_to_tree(pullop.remote.url())
     if not tree or not repo.changetracker or tree == "try":
+        return res
+
+    # Calling wire protocol commands via SSH requires the server-side wire
+    # protocol code to be known by the client. The server-side code is defined
+    # by the pushlog extension, so we effectively need the pushlog extension
+    # enabled to call the wire protocol method when pulling via SSH. We don't
+    # (yet) recommend installing the pushlog extension locally. Furthermore,
+    # pulls from hg.mozilla.org should be performed via https://, not ssh://.
+    # So just bail on pushlog fetching if pulling via ssh://.
+    if isinstance(pullop.remote, sshpeer.sshpeer):
+        pullop.repo.ui.warn('cannot fetch pushlog when pulling via ssh://; '
+                            'you should be pulling via https://\n')
         return res
 
     lastpushid = repo.changetracker.last_push_id(tree)
