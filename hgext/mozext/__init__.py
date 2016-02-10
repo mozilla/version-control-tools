@@ -273,18 +273,8 @@ import datetime
 import errno
 import os
 import shutil
-import sys
 
 from operator import methodcaller
-
-from mercurial import (
-    demandimport,
-    exchange,
-    revset,
-    templatefilters,
-    templatekw,
-    templater,
-)
 
 from mercurial.i18n import _
 from mercurial.error import (
@@ -305,11 +295,17 @@ from mercurial import (
     demandimport,
     encoding,
     error,
+    exchange,
     extensions,
     hg,
+    revset,
     scmutil,
+    templatefilters,
+    templatekw,
+    templater,
     util,
 )
+
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
