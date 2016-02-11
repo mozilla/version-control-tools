@@ -58,7 +58,14 @@ CLIENT_CAPABILITIES = {
 MAX_REVIEW_COMMITS = 100
 
 
-git_dir = os.environ.get('GIT_DIR')
+git_dir = os.environ.get('GIT_COMMON_DIR')
+if not git_dir:
+    git_dir = os.environ.get('GIT_DIR')
+if not git_dir:
+    git_dir = subprocess.check_output(
+            ['git', 'rev-parse', '--no-flags', '--git-common-dir']).rstrip('\n')
+# git versions before 2.5 don't support --git-common-dir, so fallback to
+# --git-dir
 if not git_dir:
     git_dir = subprocess.check_output(
             ['git', 'rev-parse', '--git-dir']).rstrip('\n')
