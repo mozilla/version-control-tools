@@ -104,23 +104,7 @@ class MozReviewExtension(Extension):
         'Summary': 'MozReview extension to Review Board',
     }
 
-    default_settings = {
-        'enabled': False,
-        'pulse_host': '',
-        'pulse_port': '',
-        'pulse_user': '',
-        'pulse_password': '',
-        'pulse_ssl': False,
-        'autoland_try_ui_enabled': False,
-        'autoland_url': '',
-        'autoland_user': '',
-        'autoland_password': '',
-        'autoland_testing': False,
-        'autoland_import_pullrequest_ui_enabled': False,
-        'ldap_url': '',
-        'ldap_user': '',
-        'ldap_password': '',
-    }
+    default_settings = {}
 
     is_configurable = True
 
@@ -136,6 +120,9 @@ class MozReviewExtension(Extension):
         },
         'viewdiff': {
             'source_filenames': ['mozreview/css/viewdiff.less'],
+        },
+        'admin': {
+            'source_filenames': ['mozreview/css/admin.less'],
         },
     }
     js_bundles = {
@@ -264,6 +251,8 @@ class MozReviewExtension(Extension):
                      apply_to=review_request_url_names)
         TemplateHook(self, 'base-css', 'mozreview/viewdiff-stylings-css.html',
                      apply_to=diffviewer_url_names)
+        TemplateHook(self, 'base-css', 'mozreview/admin-stylings-css.html',
+                     apply_to=['reviewboard.extensions.views.configure_extension'])
         TemplateHook(self, 'base-scripts-post',
                      'mozreview/review-scripts-js.html',
                      apply_to=review_request_url_names)
@@ -342,6 +331,6 @@ class MozReviewExtension(Extension):
                     SETTINGS = json.load(f)
             return SETTINGS.get(key, self.default_settings.get(key, default))
         except IOError:
-            logger.error('Could not access settings file (using defaults)'
-                         ': %s' % SETTINGS_PATH)
-            return self.default_settings.get(key, default)
+            logger.error('Could not access settings file (returning None): %s'
+                         % SETTINGS_PATH)
+            return None
