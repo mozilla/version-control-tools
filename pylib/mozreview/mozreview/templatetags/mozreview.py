@@ -60,9 +60,18 @@ def required_ldap_group(repository):
 
 
 @register.filter()
-def has_try_repository(repository):
+def autolanding_to_try_enabled(repository):
     try:
-        return ('true' if repository.extra_data['try_repository_url']
+        return ('true' if repository.extra_data['autolanding_to_try_enabled']
+                else 'false')
+    except (AttributeError, KeyError):
+        return 'false'
+
+
+@register.filter()
+def autolanding_enabled(repository):
+    try:
+        return ('true' if repository.extra_data['autolanding_enabled']
                 else 'false')
     except (AttributeError, KeyError):
         return 'false'

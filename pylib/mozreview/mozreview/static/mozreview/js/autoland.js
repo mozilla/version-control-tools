@@ -32,7 +32,7 @@ $(document).on("mozreview_ready", function() {
       .show();
   }
 
-  if (!MozReview.hasTryRepository) {
+  if (!MozReview.autolandingToTryEnabled) {
     try_trigger.attr('title', 'Try builds cannot be triggered for this repository');
   } else if ($("#draft-banner").is(":visible")) {
     try_trigger.attr('title', 'Try builds cannot be triggered on draft review requests');
@@ -258,7 +258,7 @@ $(document).on("mozreview_ready", function() {
     });
   }
 
-  if (MozReview.landingRepository === '') {
+  if (!MozReview.autolandingEnabled) {
     autoland_trigger.attr('title', 'Landing is not supported for this repository');
   } else if ($("#draft-banner").is(":visible")) {
     autoland_trigger.attr('title', 'Draft review requests cannot be landed');
