@@ -258,14 +258,17 @@ def push_command(args):
 
     remote_name = git_config.get('mozreview.remote', 'review')
 
-    url = None
-    for key in ('remote.%s.pushurl', 'remote.%s.url'):
-        if key % remote_name in git_config:
-            url = git_config[key % remote_name]
-            break
+    if remote_name.startswith(('hg::', 'hg://')):
+        url = remote_name
+    else:
+        url = None
+        for key in ('remote.%s.pushurl', 'remote.%s.url'):
+            if key % remote_name in git_config:
+                url = git_config[key % remote_name]
+                break
 
     if not url:
-        raise AbortError('no review remote defined; run `git mozreview configure`')
+        raise AbortError('no review repository defined; run `git mozreview configure`')
 
     if not url.startswith(('hg::', 'hg://')):
         raise AbortError('cannot push to %s; only pushing to hg:: or hg:// remotes is supported' % url)
@@ -578,17 +581,22 @@ def configure_command(args):
         ui.write('\n')
         git_config['mozreview.nickname'] = nick
 
-    # Define the default remote name to use for pushing to MozReview.
+    # If we already have a mozreview.remote configuration, but it's not a url,
+    # upgrade to using a url.
+    if 'mozreview.remote' in git_config:
+        remote = git_config['mozreview.remote']
+        if 'hg::' not in remote:
+            key = 'remote.%s.url' % remote
+            if key in git_config:
+                subprocess.check_call(['git', 'config', 'mozreview.remote',
+                                       git_config[key]])
+                git_config['mozreview.remote'] = git_config[key]
+                ui.warn('warning: will not need the "%s" remote anymore;\n'
+                        'You may remove it with `git remote remove %s`.\n'
+                        % (remote, remote))
+
+    # Define the default remote url to use for pushing to MozReview.
     if 'mozreview.remote' not in git_config:
-        subprocess.check_call(['git', 'config', 'mozreview.remote',
-                               args.remote_name])
-        git_config['mozreview.remote'] = args.remote_name
-
-    remote_name = git_config['mozreview.remote']
-
-    # Configure the Git remote if it isn't defined already.
-    key = 'remote.%s.url' % git_config['mozreview.remote']
-    if key not in git_config:
         ui.write('searching for appropriate review repository...\n')
         # Query the special "autoreview" repo for the list of review repos.
         url = '%s/autoreview/mozreviewreviewrepos' % args.mercurial_url
@@ -606,13 +614,10 @@ def configure_command(args):
                         continue
                     remote_url = data[hg_shas[i]].split()[0]
                     remote_url = 'hg::%s' % remote_url
-                    ui.write('adding %s as remote "%s"\n' % (
-                          remote_url, remote_name))
-                    # TODO configure remote.%s.fetch to disable fetching?
-                    subprocess.check_call(['git', 'remote', 'add', '--no-tags',
-                                           remote_name, remote_url])
-                    subprocess.check_call(['git', 'config',
-                      'remote.%s.skipDefaultUpdate' % remote_name, 'true'])
+                    subprocess.check_call(['git', 'config', 'mozreview.remote',
+                                           remote_url])
+                    git_config['mozreview.remote'] = remote_url
+                    ui.warn('using %s\n' % remote_url)
         else:
             ui.warn('warning: unable to fetch list of review repos; '
                     'manual configuration of review remote will be required\n')
@@ -727,10 +732,6 @@ def main(args):
             '--mercurial-url',
             help='URL of Mercurial server with review repos',
             default='https://reviewboard-hg.mozilla.org')
-    sp.add_argument(
-            '--remote-name',
-            help='Name of remote to use for MozReview',
-            default='review')
 
     sp = subparsers.add_parser(
             'commit-msg-hook',

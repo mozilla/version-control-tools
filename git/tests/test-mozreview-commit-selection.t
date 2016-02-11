@@ -8,7 +8,7 @@
   $ cd gitrepo
   $ git mozreview configure --mercurial-url ${MERCURIAL_URL} --bugzilla-url ${BUGZILLA_URL}
   searching for appropriate review repository...
-  adding hg::http://$DOCKER_HOSTNAME:$HGPORT/test-repo as remote "review"
+  using hg::http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   installing commit-msg hook
 
   $ bugzilla create-bug-range TestProduct TestComponent 3

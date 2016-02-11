@@ -45,7 +45,7 @@ Create autoreview repo manifest
   Enter a nickname: mynick
   
   searching for appropriate review repository...
-  adding hg::http://$DOCKER_HOSTNAME:$HGPORT/test-repo as remote "review"
+  using hg::http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   installing commit-msg hook
 
 commit-msg hook installed
@@ -83,6 +83,18 @@ Configuring when an existing commit-msg hook is installed will issue a warning
   $ configure
   warning: existing commit-msg hook does not appear related to MozReview; unable to install custom hook
   (MozReview may lose track of commits when rewriting)
+
+Configuring with an existing old configuration using a git remote will issue a warning
+
+  $ rm -f .git/hooks/commit-msg
+  $ git config mozreview.remote foo
+  $ git remote add foo hg::http://$DOCKER_HOSTNAME:$HGPORT/test-repo
+  $ configure
+  warning: will not need the "foo" remote anymore;
+  You may remove it with `git remote remove foo`.
+  installing commit-msg hook
+  $ git config mozreview.remote
+  hg::http://$DOCKER_HOSTNAME:$HGPORT/test-repo
 
 Cleanup
 

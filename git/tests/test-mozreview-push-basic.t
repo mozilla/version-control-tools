@@ -8,9 +8,16 @@
   $ git -c fetch.prune=true clone hg::${MERCURIAL_URL}test-repo gitrepo
   Cloning into 'gitrepo'...
   $ cd gitrepo
+
+Using mozreview push before configure complains
+
+  $ git mozreview push
+  abort: configuration needed; run `git mozreview configure`
+  [1]
+
   $ git mozreview configure --mercurial-url ${MERCURIAL_URL} --bugzilla-url ${BUGZILLA_URL}
   searching for appropriate review repository...
-  adding hg::http://$DOCKER_HOSTNAME:$HGPORT/test-repo as remote "review"
+  using hg::http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   installing commit-msg hook
 
 Create some commits to review
@@ -186,7 +193,30 @@ Reviews should be published and Bugzilla attachments should be present
 
 hg:// URLs work
 
-  $ git remote set-url review hg://${DOCKER_HOSTNAME}:${HGPORT}:http/test-repo
+  $ git config mozreview.remote hg://${DOCKER_HOSTNAME}:${HGPORT}:http/test-repo
+  $ git mozreview push
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 0 changesets with 0 changes to 1 files
+  
+  submitting 2 commits for review
+  
+  commit: 4ba654c Bug 1 - Foo 1
+  review: http://$DOCKER_HOSTNAME:$HGPORT1/r/2
+  
+  commit: f6c6fd8 Bug 1 - Foo 2
+  review: http://$DOCKER_HOSTNAME:$HGPORT1/r/3
+  
+  (review requests lack reviewers; visit review url to assign reviewers)
+  
+  publish these review requests now (Yn)? y
+  (published review request 1)
+
+Old configuration using an actual git remote works gracefully
+
+  $ git config mozreview.remote review
+  $ git remote add review hg::http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   $ git mozreview push
   remote: adding changesets
   remote: adding manifests
@@ -227,6 +257,13 @@ No "mozreview.remote" defaults to "review"
   
   publish these review requests now (Yn)? y
   (published review request 1)
+
+No "mozreview.remote" and no remote tells to run configure
+
+  $ git remote remove review
+  $ git mozreview push
+  abort: no review repository defined; run `git mozreview configure`
+  [1]
 
 Cleanup
 
