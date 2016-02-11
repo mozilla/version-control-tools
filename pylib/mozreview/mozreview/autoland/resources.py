@@ -145,6 +145,11 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
                          'request.')
             return NOT_PUSHED_PARENT_REVIEW_REQUEST
 
+        enabled = rr.repository.extra_data.get('autolanding_enabled')
+        if not enabled:
+            return AUTOLAND_CONFIGURATION_ERROR.with_message(
+                'Autolanding not enabled.')
+
         target_repository = rr.repository.extra_data.get(
             'landing_repository_url')
         push_bookmark = rr.repository.extra_data.get('landing_bookmark')
@@ -289,6 +294,11 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
                          'request is not pushed, or not the parent review '
                          'request.')
             return NOT_PUSHED_PARENT_REVIEW_REQUEST
+
+        enabled = rr.repository.extra_data.get('autolanding_to_try_enabled')
+        if not enabled:
+            return AUTOLAND_CONFIGURATION_ERROR.with_message(
+                'Autolanding to try not enabled.')
 
         target_repository = rr.repository.extra_data.get(
             'try_repository_url')
