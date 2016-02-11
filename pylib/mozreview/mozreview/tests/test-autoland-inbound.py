@@ -80,7 +80,8 @@ class AutolandInboundTest(MozReviewWebDriverTest):
         self.load_rburl('r/1')
         autoland_btn = self.browser.find_element_by_id('autoland-trigger')
         self.assertEqual(
-            autoland_btn.value_of_css_property('opacity'), '0.5')
+            autoland_btn.get_attribute('title'),
+            'Landing is not supported for this repository')
         self.add_hostingservice(1, 'Sirius Black', 'scm_level_1',
                                 True, 'try', True, 'inbound', '')
 
@@ -90,7 +91,8 @@ class AutolandInboundTest(MozReviewWebDriverTest):
         self.load_rburl('r/1')
         autoland_btn = self.browser.find_element_by_id('autoland-trigger')
         self.assertEqual(
-            autoland_btn.value_of_css_property('opacity'), '0.5')
+            autoland_btn.get_attribute('title'),
+            'Draft review requests cannot be landed')
         self.assign_reviewer(0, 'jsmith')
         publish_btn = WebDriverWait(self.browser, 3).until(
             EC.visibility_of_element_located((By.ID, 'btn-draft-publish')))
@@ -101,9 +103,11 @@ class AutolandInboundTest(MozReviewWebDriverTest):
 
         # We should also not be able to land to inbound unless ship-it has
         # been granted.
+        time.sleep(2)
+
         autoland_btn = self.browser.find_element_by_id('autoland-trigger')
-        self.assertEqual(
-            autoland_btn.value_of_css_property('opacity'), '0.5')
+        self.assertEqual(autoland_btn.get_attribute('title')[:39],
+            'Review request not approved for landing')
 
         self.ship_it(2, 'mjane@example.com', 'password2')
         self.load_rburl('r/1')
@@ -111,8 +115,7 @@ class AutolandInboundTest(MozReviewWebDriverTest):
         automation_menu = self.browser.find_element_by_id('automation-menu')
         automation_menu.click()
         autoland_btn = self.browser.find_element_by_id('autoland-trigger')
-        self.assertEqual(
-            autoland_btn.value_of_css_property('opacity'), '1')
+        self.assertEqual(autoland_btn.get_attribute('title'), '')
 
         # Clicking the button should display the autoland dialog
         autoland_btn.click()
@@ -153,7 +156,9 @@ class AutolandInboundTest(MozReviewWebDriverTest):
         # We should not be able to autoland from a closed review request
         try_btn = self.browser.find_element_by_id('autoland-try-trigger')
         self.assertEqual(
-            try_btn.value_of_css_property('opacity'), '0.5')
+            try_btn.get_attribute('title'),
+            'You can not trigger a try build on a closed review request')
         autoland_btn = self.browser.find_element_by_id('autoland-trigger')
         self.assertEqual(
-            autoland_btn.value_of_css_property('opacity'), '0.5')
+            autoland_btn.get_attribute('title'),
+            'You can not autoland from a closed review request')

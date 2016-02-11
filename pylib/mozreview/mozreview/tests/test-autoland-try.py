@@ -59,13 +59,14 @@ class AutolandTryTest(MozReviewWebDriverTest):
         #       the 'try' button will only show up when all four are met
         #       and not otherwise.
 
-        # We should not be able to trigger a Try run without a HostingService
-        # with an associated try repository.
+        # We should not be able to trigger a Try run unless try is enabled
+        # for this repository.
         self.reviewboard_login('mjane@example.com', 'password2')
         self.load_rburl('r/1')
         try_btn = self.browser.find_element_by_id('autoland-try-trigger')
         self.assertEqual(
-            try_btn.value_of_css_property('opacity'), '0.5')
+            try_btn.get_attribute('title'),
+            'Try builds cannot be triggered for this repository')
         self.add_hostingservice(1, 'Sirius Black', 'scm_level_1',
                                 True, 'try', True, 'inbound', '')
 
@@ -75,7 +76,8 @@ class AutolandTryTest(MozReviewWebDriverTest):
         self.load_rburl('r/1')
         try_btn = self.browser.find_element_by_id('autoland-try-trigger')
         self.assertEqual(
-            try_btn.value_of_css_property('opacity'), '0.5')
+            try_btn.get_attribute('title'),
+            'Try builds cannot be triggered on draft review requests')
         self.assign_reviewer(0, 'jsmith')
         publish_btn = WebDriverWait(self.browser, 3).until(
             EC.visibility_of_element_located((By.ID,
@@ -88,9 +90,7 @@ class AutolandTryTest(MozReviewWebDriverTest):
         automation_menu = self.browser.find_element_by_id('automation-menu')
         automation_menu.click()
         try_btn = self.browser.find_element_by_id('autoland-try-trigger')
-        self.assertEqual(
-            try_btn.value_of_css_property('opacity'), '1',
-            'Autoland to try should be enabled')
+        self.assertEqual(try_btn.get_attribute('title'), '')
 
         # Clicking the button should display a trychooser dialog
         try_btn.click()
@@ -125,8 +125,7 @@ class AutolandTryTest(MozReviewWebDriverTest):
         automation_menu = self.browser.find_element_by_id('automation-menu')
         automation_menu.click()
         try_btn = self.browser.find_element_by_id('autoland-try-trigger')
-        self.assertEqual(
-            try_btn.value_of_css_property('opacity'), '1')
+        self.assertEqual(try_btn.get_attribute('title'), '')
 
         # Clicking the button should display a trychooser dialog
         try_btn.click()
