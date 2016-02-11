@@ -127,7 +127,7 @@ class MozReviewExtension(Extension):
     }
     js_bundles = {
         'default': {
-            'source_filenames': ['mozreview/js/logout.js'],
+            'source_filenames': ['mozreview/js/default.js'],
         },
         'filediffreviewer': {
             'source_filenames': ['mozreview/js/models/filediffreviewermodel.js',
