@@ -191,6 +191,52 @@ Reviews should be published and Bugzilla attachments should be present
     status: NEW
     summary: bug1
 
+Pushing from a subdirectory works
+
+  $ mkdir subdir
+  $ cd subdir && git mozreview push
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 0 changesets with 0 changes to 1 files
+  
+  submitting 2 commits for review
+  
+  commit: 4ba654c Bug 1 - Foo 1
+  review: http://$DOCKER_HOSTNAME:$HGPORT1/r/2
+  
+  commit: f6c6fd8 Bug 1 - Foo 2
+  review: http://$DOCKER_HOSTNAME:$HGPORT1/r/3
+  
+  (review requests lack reviewers; visit review url to assign reviewers)
+  
+  publish these review requests now (Yn)? y
+  (published review request 1)
+
+Pushing from a worktree works
+
+  $ git worktree add -b foo ../worktree
+  Preparing subdir/../worktree (identifier worktree)
+  HEAD is now at f6c6fd8 Bug 1 - Foo 2
+  $ cd ../worktree && git mozreview push
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 0 changesets with 0 changes to 1 files
+  
+  submitting 2 commits for review
+  
+  commit: 4ba654c Bug 1 - Foo 1
+  review: http://$DOCKER_HOSTNAME:$HGPORT1/r/2
+  
+  commit: f6c6fd8 Bug 1 - Foo 2
+  review: http://$DOCKER_HOSTNAME:$HGPORT1/r/3
+  
+  (review requests lack reviewers; visit review url to assign reviewers)
+  
+  publish these review requests now (Yn)? y
+  (published review request 1)
+
 hg:// URLs work
 
   $ git config mozreview.remote hg://${DOCKER_HOSTNAME}:${HGPORT}:http/test-repo

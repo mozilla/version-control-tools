@@ -64,6 +64,14 @@ if not git_dir:
 if not git_dir:
     git_dir = subprocess.check_output(
             ['git', 'rev-parse', '--no-flags', '--git-common-dir']).rstrip('\n')
+    # Up to version 2.8, git rev-parse --git-common-dir returns '.git' when in
+    # a subdirectory of a non worktree.
+    # In this case, we can just fall through to --git-dir.
+    # git rev-parse --show-cdup will return an empty string if we are at the
+    # top-level, and '../' * depth otherwise.
+    if git_dir == '.git' and subprocess.check_output(
+                ['git', 'rev-parse', '--show-cdup']).strip():
+        git_dir = None
 # git versions before 2.5 don't support --git-common-dir, so fallback to
 # --git-dir
 if not git_dir:
@@ -163,9 +171,10 @@ def sendauthenticatedhttprequest(git_config, session, url, **kwargs):
     return session.send(req.prepare())
 
 
-def get_output(args):
+def get_output(args, cwd=None):
     try:
-        output = subprocess.check_output(args, stderr=subprocess.STDOUT)
+        output = subprocess.check_output(args, stderr=subprocess.STDOUT,
+                                         cwd=cwd)
         return 0, output
     except subprocess.CalledProcessError as e:
         return e.returncode, e.output
@@ -358,7 +367,14 @@ def push_command(args):
             push_commit,
         ]
 
-        res, output = get_output(push_args)
+        # git doesn't invoke git-remote-hg and git-cinnabar the same way.
+        # Notably, it changes the current directory before running
+        # git-remote-hg, and the push code in cinnabar doesn't work
+        # properly from another directory as of 0.3.1.
+        cdup = subprocess.check_output(
+            ['git', 'rev-parse', '--show-cdup']).strip() or None
+
+        res, output = get_output(push_args, cwd=cdup)
     finally:
         os.unlink(path)
 
