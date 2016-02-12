@@ -484,8 +484,12 @@ def filelog(orig, web, req, tmpl):
         t = orig(web, req, _tmpl())
         for entry in t.kwargs['entries']:
             pushinfo = web.repo.pushlog.pushfromchangeset(_ctx(entry['node']))
-            entry['pushid'] = pushinfo[0]
-            entry['pushdate'] = util.makedate(pushinfo[2])
+            if pushinfo:
+                entry['pushid'] = pushinfo[0]
+                entry['pushdate'] = util.makedate(pushinfo[2])
+            else:
+                entry['pushid'] = None
+                entry['pushdate'] = None
 
         return tmpl(*t.args, **t.kwargs)
     else:

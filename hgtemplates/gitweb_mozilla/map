@@ -295,7 +295,7 @@ filelogentry = '
     </td>
     <td class="age">
       {node|short}<br/>created <i>{date|isodate}</i>{rename%filelogrename}
-      {if(pushdate, '<br/>pushed <i>{pushdate|isodate}</i>')}
+      {if(pushdate, '<br/>pushed <i>{pushdate|isodate}</i>', '<br/>pushed <i>unknown</i>')}
     </td>
     <td><i>{author|person}</i></td>
     <td>
