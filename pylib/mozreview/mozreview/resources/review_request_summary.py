@@ -289,6 +289,7 @@ class ReviewRequestSummaryResource(WebAPIResource):
                         ).extra_data[COMMIT_ID_KEY]
                     )
                     for child_rrid in child_rrids
+                    if child_rrid in family['children']
                 ]
             })
 
