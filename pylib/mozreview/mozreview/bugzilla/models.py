@@ -132,8 +132,8 @@ def get_or_create_bugzilla_users(user_data):
                     if new_username != old_username:
                         logger.info('could not set preferred username to %s; '
                                     'updating username of %s from %s to %s' % (
-                                    username, user.id, old_username,
-                                    new_username))
+                                        username, user.id, old_username,
+                                        new_username))
                         user.username = new_username
                         user.save()
                     else:
@@ -210,7 +210,7 @@ def prune_inactive_users(commit=False, verbose=False):
     commit the user deletion to the database if the commit argument
     is True.
     """
-    MAX_LOGIN_DIFFERENCE = datetime.timedelta(0,1) # 1 second
+    MAX_LOGIN_DIFFERENCE = datetime.timedelta(0, 1)  # 1 second
     SPECIAL_USERNAMES = [
         'admin',
         'mozreview',
