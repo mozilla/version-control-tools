@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.utils.translation import ugettext as _
+from mozautomation.commitparser import BMO_IRC_NICK_RE
 from reviewboard.accounts.backends import AuthBackend
 from reviewboard.accounts.errors import UserQueryError
 
@@ -16,7 +17,6 @@ from mozreview.bugzilla.client import Bugzilla
 from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
 from mozreview.bugzilla.models import (
     BugzillaUserMap,
-    BZ_IRCNICK_RE,
     get_bugzilla_api_key,
     get_or_create_bugzilla_users,
 )
@@ -236,7 +236,7 @@ class BugzillaBackend(AuthBackend):
             # So, we only auto import users if they have IRC nick syntax or
             # if the search matches them exactly.
             def user_relevant(u):
-                if BZ_IRCNICK_RE.search(u['real_name']):
+                if BMO_IRC_NICK_RE.search(u['real_name']):
                     return True
                 if u['email'] == query:
                     return True

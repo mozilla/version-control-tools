@@ -4,22 +4,14 @@
 
 import datetime
 import logging
-import re
 
 from django.contrib.auth.models import User
 from django.db import models, transaction
+from mozautomation.commitparser import BMO_IRC_NICK_RE
 from reviewboard.accounts.models import Profile
 from reviewboard.reviews.models import ReviewRequest
 
-
 logger = logging.getLogger(__name__)
-
-# Note that Review Board only allows a subset of legal IRC-nick characters.
-# Specifically, Review Board does not allow [ \ ] ^ ` { | }
-# Anyone with those in their :ircnicks will have them truncated at the last
-# legal character.  Not great, but we can later implement a UI for letting
-# people change their usernames in Review Board.
-BZ_IRCNICK_RE = re.compile(':([A-Za-z0-9_\-\.]+)')
 
 
 class BugzillaUserMap(models.Model):
@@ -66,7 +58,7 @@ def get_or_create_bugzilla_users(user_data):
         real_name = user['real_name']
         can_login = user['can_login']
 
-        ircnick_match = BZ_IRCNICK_RE.search(real_name)
+        ircnick_match = BMO_IRC_NICK_RE.search(real_name)
 
         if ircnick_match:
             username = ircnick_match.group(1)

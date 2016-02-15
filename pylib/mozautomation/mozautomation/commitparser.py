@@ -33,17 +33,20 @@ RQUESTION_SPECIFIER_RE = re.compile(r'r\?')
 LIST = r'[;,\/\\]\s*'
 LIST_RE = re.compile(LIST)
 
-REVIEWER = r'[a-zA-Z0-9\-\_]+'         # this needs to match irc nicks
+# Note that we only allows a subset of legal IRC-nick characters.
+# Specifically we not allow [ \ ] ^ ` { | }
+IRC_NICK = r'[a-zA-Z0-9\-\_]+'          # this needs to match irc nicks
+BMO_IRC_NICK_RE = re.compile(r':(' + IRC_NICK + r')')
 
 REVIEWERS_RE = re.compile(
     r'([\s\(\.\[;,])' +                 # before 'r' delimiter
     r'(' + SPECIFIER + r')' +           # flag
     r'(' +                              # capture all reviewers
-        REVIEWER +                      # reviewer
+        IRC_NICK +                      # reviewer
         r'(?:' +                        # additional reviewers
             LIST +                      # delimiter
             r'(?![a-z0-9\.\-]+[=?])' +  # don't extend match into next flag
-            REVIEWER +                  # reviewer
+            IRC_NICK +                  # reviewer
         r')*' +
     r')')                               # noqa
 
