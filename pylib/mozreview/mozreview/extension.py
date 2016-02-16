@@ -25,12 +25,7 @@ from reviewboard.urls import (diffviewer_url_names,
 from mozreview.autoland.resources import (
     autoland_request_update_resource,
     autoland_trigger_resource,
-    import_pullrequest_trigger_resource,
-    import_pullrequest_update_resource,
     try_autoland_trigger_resource,
-)
-from mozreview.autoland.views import (
-    import_pullrequest,
 )
 from mozreview.batchreview.resources import (
     batch_review_resource,
@@ -135,10 +130,6 @@ class MozReviewExtension(Extension):
                                  'mozreview/js/init_filediffreviewer.js'],
             'apply_to': diffviewer_url_names,
         },
-        'import-pullrequest': {
-            'source_filenames': ['mozreview/js/import-pullrequest.js',],
-            'apply_to': ['import_pullrequest',],
-        },
         'reviews': {
             # TODO: Everything will break if init_rr.js is not first in this
             # list.
@@ -163,8 +154,6 @@ class MozReviewExtension(Extension):
         commit_data_resource,
         commit_rewrite_resource,
         file_diff_reviewer_resource,
-        import_pullrequest_trigger_resource,
-        import_pullrequest_update_resource,
         ldap_association_resource,
         review_request_summary_resource,
         try_autoland_trigger_resource,
@@ -291,10 +280,6 @@ class MozReviewExtension(Extension):
         initialize_signal_handlers(self)
 
         HostingServiceHook(self, HMORepository)
-
-        URLHook(self, patterns('',
-            url(r'^import-pullrequest/(?P<user>.+)/(?P<repo>.+)/(?P<pullrequest>\d+)/$',
-            import_pullrequest, name='import_pullrequest')))
 
     def shutdown(self):
         # We have to put the TestingDone field back before we shut down
