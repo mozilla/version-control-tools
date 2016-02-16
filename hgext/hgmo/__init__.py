@@ -69,6 +69,7 @@ string. Of course, no security will be provided.
 import json
 import os
 import subprocess
+import types
 
 from mercurial.i18n import _
 from mercurial.node import bin, short
@@ -359,6 +360,31 @@ def headdivergencewebcommand(web, req, tmpl):
                 filemerges=filemerges, filemergesignored=filemergesignored)
 
 
+def automationrelevancewebcommand(web, req, tmpl):
+    if 'node' not in req.form:
+        return tmpl('error', error={'error': "missing parameter 'node'"})
+
+    repo = web.repo
+
+    csets = []
+    for ctx in repo.set('automationrelevant(%r)', req.form['node'][0]):
+        entry = webutil.changelistentry(web, ctx, tmpl)
+        # Some items in changelistentry are generators, which json.dumps()
+        # can't handle. So we expand them.
+        for k, v in entry.items():
+            # "files" is a generator that attempts to call a template.
+            # Don't even bother and just repopulate it.
+            if k == 'files':
+                entry['files'] = sorted(ctx.files())
+            elif isinstance(v, types.GeneratorType):
+                entry[k] = list(v)
+
+        csets.append(entry)
+
+    req.respond(HTTP_OK, 'application/json')
+    return json.dumps({'changesets': csets}, indent=2, sort_keys=True)
+
+
 def revset_reviewer(repo, subset, x):
     """``reviewer(REVIEWER)``
 
@@ -558,3 +584,6 @@ def extsetup(ui):
 
     setattr(webcommands, 'headdivergence', headdivergencewebcommand)
     webcommands.__all__.append('headdivergence')
+
+    setattr(webcommands, 'automationrelevance', automationrelevancewebcommand)
+    webcommands.__all__.append('automationrelevance')
