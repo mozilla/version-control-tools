@@ -379,6 +379,39 @@ def revset_reviewer(repo, subset, x):
     return subset.filter(hasreviewer)
 
 
+def revset_automationrelevant(repo, subset, x):
+    """``automationrelevant(set)``
+
+    Changesets relevant to scheduling in automation.
+
+    Given a revset that evaluates to a single revision, will return that
+    revision and any ancestors that are part of the same push unioned with
+    non-public ancestors.
+    """
+    s = revset.getset(repo, revset.fullreposet(repo), x)
+    if len(s) > 1:
+        raise util.Abort('can only evaluate single changeset')
+
+    ctx = repo[s.first()]
+    revs = {ctx.rev()}
+
+    # The pushlog is used to get revisions part of the same push as
+    # the requested revision.
+    pushlog = getattr(repo, 'pushlog', None)
+    if pushlog:
+        pushinfo = repo.pushlog.pushfromchangeset(ctx)
+        for n in pushinfo[3]:
+            pctx = repo[n]
+            if pctx.rev() <= ctx.rev():
+                revs.add(pctx.rev())
+
+    # Union with non-public ancestors.
+    for rev in repo.revs('::%d & not public()', ctx.rev()):
+        revs.add(rev)
+
+    return subset & revset.baseset(revs)
+
+
 def bmupdatefromremote(orig, ui, repo, remotemarks, path, trfunc, explicit=()):
     """Custom bookmarks applicator that overwrites with remote state.
 
@@ -504,6 +537,9 @@ def extsetup(ui):
 
     revset.symbols['reviewer'] = revset_reviewer
     revset.safesymbols.add('reviewer')
+
+    revset.symbols['automationrelevant'] = revset_automationrelevant
+    revset.safesymbols.add('automationrelevant')
 
     entry = extensions.wrapcommand(commands.table, 'serve', servehgmo)
     entry[1].append(('', 'hgmo', False,
