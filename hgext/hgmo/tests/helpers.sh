@@ -10,7 +10,7 @@ push_ssl = False
 allow_push = *
 EOF
 
-  hg serve -d -p $HGPORT --pid-file hg.pid --hgmo
+  hg serve -d -p $HGPORT --pid-file hg.pid --hgmo -E error.log
   cat hg.pid >> $DAEMON_PIDS
   cd ..
 }

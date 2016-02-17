@@ -376,6 +376,11 @@ def automationrelevancewebcommand(web, req, tmpl):
             # Don't even bother and just repopulate it.
             if k == 'files':
                 entry['files'] = sorted(ctx.files())
+            # These aren't interesting to us, so prune them. The
+            # original impetus for this was because "changelogtag"
+            # isn't part of the json template and adding it is non-trivial.
+            elif k in ('bookmarks', 'branches', 'changelogtag', 'child', 'inbranch', 'tags'):
+                del entry[k]
             elif isinstance(v, types.GeneratorType):
                 entry[k] = list(v)
 

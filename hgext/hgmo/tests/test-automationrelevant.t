@@ -112,7 +112,7 @@ Previous push base to draft should add it to relevant list
 
 web command for exposing automation relevance works
 
-  $ http http://localhost:$HGPORT/json-automationrelevance/3 --header content-type
+  $ http http://localhost:$HGPORT/json-automationrelevance/tip --header content-type
   200
   content-type: application/json
   
@@ -121,11 +121,7 @@ web command for exposing automation relevance works
       {
         "author": "test", 
         "backsoutnodes": [], 
-        "bookmarks": [], 
-        "branches": [], 
         "bugs": [], 
-        "changelogtag": [], 
-        "child": [], 
         "date": [
           0.0, 
           0
@@ -137,7 +133,6 @@ web command for exposing automation relevance works
         "files": [
           "foo"
         ], 
-        "inbranch": [], 
         "node": "0a971221ac36075c184743cba0490681eadca983", 
         "parent": [], 
         "pushdate": [
@@ -152,17 +147,12 @@ web command for exposing automation relevance works
         ], 
         "pushuser": "testuser", 
         "rev": 1, 
-        "reviewers": [], 
-        "tags": []
+        "reviewers": []
       }, 
       {
         "author": "test", 
         "backsoutnodes": [], 
-        "bookmarks": [], 
-        "branches": [], 
         "bugs": [], 
-        "changelogtag": [], 
-        "child": [], 
         "date": [
           0.0, 
           0
@@ -174,7 +164,6 @@ web command for exposing automation relevance works
         "files": [
           "foo"
         ], 
-        "inbranch": [], 
         "node": "cb5c79007e91b09a4ba7ebe9210311491d09e96e", 
         "parent": [], 
         "pushdate": [
@@ -189,17 +178,12 @@ web command for exposing automation relevance works
         ], 
         "pushuser": "testuser", 
         "rev": 2, 
-        "reviewers": [], 
-        "tags": []
+        "reviewers": []
       }, 
       {
         "author": "test", 
         "backsoutnodes": [], 
-        "bookmarks": [], 
-        "branches": [], 
         "bugs": [], 
-        "changelogtag": [], 
-        "child": [], 
         "date": [
           0.0, 
           0
@@ -211,7 +195,6 @@ web command for exposing automation relevance works
         "files": [
           "foo"
         ], 
-        "inbranch": [], 
         "node": "13855aae8fb3291c663ff46a8510c0e3fa673a4c", 
         "parent": [], 
         "pushdate": [
@@ -227,8 +210,73 @@ web command for exposing automation relevance works
         ], 
         "pushuser": "testuser", 
         "rev": 3, 
-        "reviewers": [], 
-        "tags": []
+        "reviewers": []
+      }, 
+      {
+        "author": "test", 
+        "backsoutnodes": [], 
+        "bugs": [], 
+        "date": [
+          0.0, 
+          0
+        ], 
+        "desc": "push 2 commit 2", 
+        "extra": {
+          "branch": "default"
+        }, 
+        "files": [
+          "foo"
+        ], 
+        "node": "66a66c6c6ae312ec88240754300468a6cea8f71d", 
+        "parent": [], 
+        "pushdate": [
+          \d+,  (re)
+          0
+        ], 
+        "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8", 
+        "pushid": 3, 
+        "pushnodes": [
+          "13855aae8fb3291c663ff46a8510c0e3fa673a4c", 
+          "66a66c6c6ae312ec88240754300468a6cea8f71d", 
+          "5d04c4fd236c19e241d1587e120b39840344eee8"
+        ], 
+        "pushuser": "testuser", 
+        "rev": 4, 
+        "reviewers": []
+      }, 
+      {
+        "author": "test", 
+        "backsoutnodes": [], 
+        "bugs": [], 
+        "date": [
+          0.0, 
+          0
+        ], 
+        "desc": "push 2 commit 3", 
+        "extra": {
+          "branch": "default"
+        }, 
+        "files": [
+          "foo"
+        ], 
+        "node": "5d04c4fd236c19e241d1587e120b39840344eee8", 
+        "parent": [], 
+        "pushdate": [
+          \d+,  (re)
+          0
+        ], 
+        "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8", 
+        "pushid": 3, 
+        "pushnodes": [
+          "13855aae8fb3291c663ff46a8510c0e3fa673a4c", 
+          "66a66c6c6ae312ec88240754300468a6cea8f71d", 
+          "5d04c4fd236c19e241d1587e120b39840344eee8"
+        ], 
+        "pushuser": "testuser", 
+        "rev": 5, 
+        "reviewers": []
       }
     ]
   }
+
+  $ cat error.log
