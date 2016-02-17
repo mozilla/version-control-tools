@@ -71,4 +71,6 @@ class MozReviewUserProfile(models.Model):
         permissions = (
             ("modify_ldap_association",
              "Can change ldap assocation for all users"),
+            ("enable_autoland",
+             "Can enable or disable autoland for a repository"),
         )

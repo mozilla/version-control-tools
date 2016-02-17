@@ -23,6 +23,7 @@ from reviewboard.urls import (diffviewer_url_names,
                               review_request_url_names)
 
 from mozreview.autoland.resources import (
+    autoland_enable_resource,
     autoland_request_update_resource,
     autoland_trigger_resource,
     try_autoland_trigger_resource,
@@ -146,6 +147,7 @@ class MozReviewExtension(Extension):
     }
 
     resources = [
+        autoland_enable_resource,
         autoland_request_update_resource,
         autoland_trigger_resource,
         batch_review_request_resource,

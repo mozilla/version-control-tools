@@ -17,6 +17,7 @@ import requests
 from reviewboard.changedescs.models import ChangeDescription
 from reviewboard.extensions.base import get_extension_manager
 from reviewboard.reviews.models import ReviewRequest
+from reviewboard.scmtools.models import Repository
 from reviewboard.site.urlresolvers import local_site_reverse
 from reviewboard.webapi.resources import WebAPIResource
 
@@ -522,3 +523,69 @@ class AutolandRequestUpdateResource(WebAPIResource):
 
 
 autoland_request_update_resource = AutolandRequestUpdateResource()
+
+
+class AutolandEnableResource(WebAPIResource):
+    """Provides interface to enable or disable Autoland for a repository."""
+
+    name = 'autoland_enable'
+    uri_name = 'autoland_enable'
+    uri_object_key = 'repository'
+    allowed_methods = ('GET', 'PUT')
+
+    @webapi_response_errors(DOES_NOT_EXIST, PERMISSION_DENIED)
+    def get(self, request, *args, **kwargs):
+        try:
+            repo = Repository.objects.get(id=kwargs[self.uri_object_key])
+        except Repository.DoesNotExist:
+            return DOES_NOT_EXIST
+
+        try_enabled = repo.extra_data.get('autolanding_to_try_enabled', False)
+        enabled = repo.extra_data.get('autolanding_enabled', False)
+        return 200, {
+            'autolanding_to_try_enabled': try_enabled,
+            'autolanding_enabled': enabled,
+        }
+
+    @webapi_response_errors(DOES_NOT_EXIST, PERMISSION_DENIED)
+    @webapi_request_fields(
+        required={
+            'autolanding_to_try_enabled': {
+                'type': bool,
+                'description': 'Enable autolanding to try',
+            },
+            'autolanding_enabled': {
+                'type': bool,
+                'description': 'Enable autolanding',
+            },
+        },
+    )
+    def update(self, request, autolanding_to_try_enabled,
+               autolanding_enabled,*args, **kwargs):
+        if not request.user.has_perm('mozreview.enable_autoland'):
+            logger.info('Could not set autoland enable: permission '
+                        'denied for user: %s' % (request.user.id))
+            return PERMISSION_DENIED
+
+        try:
+            repo = Repository.objects.get(id=kwargs[self.uri_object_key])
+        except Repository.DoesNotExist:
+            logger.info('Could not set autoland enable: repository %s'
+                        'unknown.' % (kwargs[self.uri_object_key]))
+            return DOES_NOT_EXIST
+
+        logger.info('Setting autoland enable: repository %s: try: %s '
+                    'landing: %s at request of user: %s' % (
+                    kwargs[self.uri_object_key], autolanding_to_try_enabled,
+                    autolanding_enabled, request.user.id))
+        repo.extra_data['autolanding_to_try_enabled'] = autolanding_to_try_enabled
+        repo.extra_data['autolanding_enabled'] = autolanding_enabled
+        repo.save(update_fields=['extra_data'])
+
+        return 200, {
+            'autolanding_to_try_enabled': autolanding_to_try_enabled,
+            'autolanding_enabled': autolanding_enabled,
+        }
+
+
+autoland_enable_resource = AutolandEnableResource()
