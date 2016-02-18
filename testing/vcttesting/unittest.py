@@ -15,6 +15,7 @@ from urllib import urlencode
 
 from selenium import webdriver
 import selenium.webdriver.support.expected_conditions as EC
+from selenium.common.exceptions import ElementNotVisibleException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
