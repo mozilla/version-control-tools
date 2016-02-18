@@ -8,5 +8,11 @@
 {%     ext_js_bundle extension "try" %}
 {%   endif %}
 
+{% comment %}
+TODO: This should get moved into the "diffviewer only" TemplateHook once
+bug 1248364 is closed.
+{% endcomment %}
+<div id="mozreview-dblclick-comment" data-value="{{ user_profile|dblclick_comment|yesno:'true,false' }}"></div>
+
 {% endif %}
 

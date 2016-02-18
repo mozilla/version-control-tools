@@ -7,6 +7,11 @@ RB.TextCommentRowSelector = RB.TextCommentRowSelector.extend({
     'dblclick': '_onDoubleClick',
   }, RB.TextCommentRowSelector.prototype.events),
 
+  initialize: function() {
+    _super(this).initialize.apply(this, arguments);
+    this._isEnabled = $('#mozreview-dblclick-comment').data('value');
+  },
+
   /*
    * Returns whether a node represents source code in the diff viewer.
    *
@@ -34,6 +39,10 @@ RB.TextCommentRowSelector = RB.TextCommentRowSelector.extend({
    * double-clicked on.
    */
   _onDoubleClick: function(e) {
+    if (!this._isEnabled) {
+      return;
+    }
+
     var node = e.target,
         $row,
         lineNum;

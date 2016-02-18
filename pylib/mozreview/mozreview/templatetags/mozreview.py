@@ -37,8 +37,11 @@ def reviewer_list(review_request):
 
 
 @register.filter()
-def extra_data(review_request, key):
-    return review_request.extra_data[key]
+def dblclick_comment(user_profile):
+    try:
+        return user_profile.extra_data['mozreview_dblclick_comment']
+    except (AttributeError, KeyError):
+        return 'true'
 
 
 @register.filter()

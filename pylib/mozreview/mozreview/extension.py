@@ -7,7 +7,8 @@ import os
 from django.conf.urls import include, patterns, url
 
 from reviewboard.extensions.base import Extension, JSExtension
-from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
+from reviewboard.extensions.hooks import (AccountPagesHook,
+                                          HeaderDropdownActionHook,
                                           HostingServiceHook,
                                           ReviewRequestDropdownActionHook,
                                           ReviewRequestFieldsHook,
@@ -63,6 +64,7 @@ from mozreview.middleware import (
     MozReviewCacheDisableMiddleware,
     MozReviewUserProfileMiddleware,
 )
+
 from mozreview.pulse import (
     initialize_pulse_handlers,
 )
@@ -296,6 +298,11 @@ class MozReviewExtension(Extension):
         URLHook(self, patterns('',
             url(r'^import-pullrequest/(?P<user>.+)/(?P<repo>.+)/(?P<pullrequest>\d+)/$',
             import_pullrequest, name='import_pullrequest')))
+
+        # Importing here to avoid an import loop
+        from mozreview.pages import MozReviewAccountSettingsPage
+
+        AccountPagesHook(self, [MozReviewAccountSettingsPage])
 
     def shutdown(self):
         # We have to put the TestingDone field back before we shut down
