@@ -265,7 +265,7 @@ $(document).on("mozreview_ready", function() {
   } else if (!MozReview.hasScmLevel3) {
     autoland_trigger.attr('title', 'You must have scm_level_3 access to land');
   } else if (!MozReview.reviewRequestPending) {
-    try_trigger.attr('title', 'You can not autoland from a closed review request');
+    autoland_trigger.attr('title', 'You can not autoland from a closed review request');
   } else {
     MozReview.parentReviewRequest.ready({
       error: function () {
