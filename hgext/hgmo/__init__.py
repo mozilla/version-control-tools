@@ -559,7 +559,7 @@ def processbundlesmanifest(repo, proto, manifest):
     # Mozilla's load balancers add a X-Cluster-Client-IP header to identify the
     # actual source IP, so prefer it.
     sourceip = proto.req.env.get('HTTP_X_CLUSTER_CLIENT_IP',
-                              proto.req.env.get('REMOTE_ADDR'))
+                                 proto.req.env.get('REMOTE_ADDR'))
     if not sourceip:
         return manifest
 
