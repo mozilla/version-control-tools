@@ -1,9 +1,10 @@
 ---
-# Until there is a Pygments >2.0.2, we run our own distribution with
-# cherry picked patches to get the functionality developers want.
+# Pygments doesn't release very often and we've historically had to cherry
+# pick upstream patches so they are deployed sooner. So we install
+# Pygments from source control.
 #
 # We need --upgrade and --force-reinstall to ensure existing installed
 # are overwritten. --no-deps is present to prevent unverified
 # dependencies from slipping in (we should use peep for those).
 - name: install custom pygments distribution into virtualenv
-  command: "{{ pip | mandatory }} install --upgrade --no-deps --force-reinstall hg+https://hg.mozilla.org/users/gszorc_mozilla.com/pygments@04db54f27b466caa40e7bbfcf25c67579b5ecff9#egg=Pygments"
+  command: "{{ pip | mandatory }} install --upgrade --no-deps --force-reinstall hg+https://hg.mozilla.org/users/gszorc_mozilla.com/pygments@2935c3a59672e8ae74ffb7ea66ea6567f49782f6#egg=Pygments"
