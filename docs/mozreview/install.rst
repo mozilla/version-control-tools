@@ -44,11 +44,13 @@ additional privileges:
 
 * Ability to trigger *Try* jobs from MozReview
 * Ability to land commits from the MozReview
+* Reviews from people with level 3 will enable *Ship Its* (r+) to be
+  carried forward.
 
 .. important::
 
    Non-casual contributors are strongly encouraged to obtain and configure
-   an LDAP account.
+   an LDAP account. This includes reviewers.
 
 Updating SSH Config
 -------------------
@@ -63,6 +65,45 @@ including the SSH host key fingerprints.
    If you have already configured ``hg.mozilla.org`` in your SSH config,
    it is typically sufficient to copy the settings to
    ``reviewboard-hg.mozilla.org``.
+
+.. _mozreview_install_ldap_associate:
+
+Manually Associating Your LDAP Account with MozReview
+=====================================================
+
+If pushing to MozReview via HTTP (this includes all Git users) and you have
+a Mozilla LDAP account, you will need to perform a one-time step to associate
+your LDAP account with MozReview.
+
+1. Ensure you have an account in MozReview by logging in at
+   https://reviewboard.mozilla.org/
+2. Execute the LDAP association command via SSH and follow the interactive
+   wizard: ``$ ssh reviewboard-hg.mozilla.org mozreview-ldap-associate``
+
+Successful association will resemble the following::
+
+    $ ssh reviewboard-hg.mozilla.org mozreview-ldap-associate
+    The following LDAP account will be associated with MozReview:
+
+      me@example.com
+
+    By SSHing into this machine, you have proved ownership of that
+    LDAP account. We will need Bugzilla credentials to prove ownership
+    of a Bugzilla account. These credentials are NOT stored on the
+    server.
+
+    Enter your Bugzilla e-mail address: me@example.com
+    Enter a Bugzilla API Key: aslkhfr23rhl213j
+    associating LDAP account me@example.com with Bugzilla account me@example.com...
+    LDAP account successfully associated!
+    exiting
+
+.. tip::
+
+   Your SSH username for ``reviewboard-hg.mozilla.org`` is your Mozilla LDAP
+   username, which is an e-mail address. You may need to specify the
+   ``-l`` argument to ``ssh` to specify a username. e.g.
+   ``ssh -l me@example.com reviewboard-hg.mozilla.org mozreview-ldap-associate``.
 
 Configuring Your Version Control Client
 =======================================

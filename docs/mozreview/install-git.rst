@@ -111,6 +111,16 @@ this nickname::
 
    $ git config --global mozreview.nickname mynick
 
+
+.. important::
+
+   Git users having a Mozilla LDAP account configured for version control access
+   will need to associate that LDAP account with MozReview to gain access to
+   certain MozReview features.
+
+   See :ref:`mozreview_install_ldap_associate`.
+
+
 Configuring a Repository to Submit to MozReview
 ===============================================
 

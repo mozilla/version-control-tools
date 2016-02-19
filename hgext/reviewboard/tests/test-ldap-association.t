@@ -121,6 +121,148 @@ The user should now have an associated ldap_username
   $ rbmanage dump-user-ldap user2
   ldap username: user2@example.com
 
+Create another user
+
+  $ mozreview create-user user3@example.com user3password  'User Three [:user3]' --uid 2002 --scm-level 3
+  Created user 8
+  $ user3key=`mozreview create-api-key user3@example.com`
+
+Dump the user so it gets mirrored over to Review Board
+
+  $ rbmanage dump-user user3 > /dev/null
+
+The user should not have an ldap username associated with them
+
+  $ rbmanage dump-user-ldap user3
+  no ldap username associated with user3
+
+Calling the mozreview-ldap-associate pash command will prompt for username
+
+  $ alias user3ssh="ssh -F ${MOZREVIEW_HOME}/ssh_config -i ${MOZREVIEW_HOME}/keys/user3@example.com -l user3@example.com -p ${HGSSH_PORT} ${HGSSH_HOST}"
+  $ user3ssh mozreview-ldap-associate << EOF
+  > EOF
+  The following LDAP account will be associated with MozReview:
+  
+    user3@example.com
+  
+  By SSHing into this machine, you have proved ownership of that
+  LDAP account. We will need Bugzilla credentials to prove ownership
+  of a Bugzilla account. These credentials are NOT stored on the
+  server.
+  
+  Enter your Bugzilla e-mail address:
+  No username; aborting
+  [1]
+
+Entering a username will prompt for API Key
+
+  $ user3ssh mozreview-ldap-associate << EOF
+  > user3
+  > EOF
+  The following LDAP account will be associated with MozReview:
+  
+    user3@example.com
+  
+  By SSHing into this machine, you have proved ownership of that
+  LDAP account. We will need Bugzilla credentials to prove ownership
+  of a Bugzilla account. These credentials are NOT stored on the
+  server.
+  
+  Enter your Bugzilla e-mail address:
+  Enter a Bugzilla API Key:
+  No API Key; aborting
+  [1]
+
+Username as command argument skips straight to API Key prompt
+
+  $ user3ssh mozreview-ldap-associate user3 << EOF
+  > EOF
+  The following LDAP account will be associated with MozReview:
+  
+    user3@example.com
+  
+  By SSHing into this machine, you have proved ownership of that
+  LDAP account. We will need Bugzilla credentials to prove ownership
+  of a Bugzilla account. These credentials are NOT stored on the
+  server.
+  
+  Bugzilla e-mail address: user3
+  Enter a Bugzilla API Key:
+  No API Key; aborting
+  [1]
+
+Specifying an invalid username results in error at association time
+
+  $ user3ssh mozreview-ldap-associate << EOF
+  > baduser@example.com
+  > ${user3key}
+  > EOF
+  The following LDAP account will be associated with MozReview:
+  
+    user3@example.com
+  
+  By SSHing into this machine, you have proved ownership of that
+  LDAP account. We will need Bugzilla credentials to prove ownership
+  of a Bugzilla account. These credentials are NOT stored on the
+  server.
+  
+  Enter your Bugzilla e-mail address:
+  Enter a Bugzilla API Key:
+  associating LDAP account user3@example.com with Bugzilla account baduser@example.com...
+  error occurred!
+  Verify you can log into MozReview at http://$DOCKER_HOSTNAME:$HGPORT1/
+  Verify the Bugzilla API Key specified is valid.
+  Seek help in #mozreview if this error persists
+  [1]
+
+Specifying an invalid API Key results in error
+
+  $ user3ssh mozreview-ldap-associate << EOF
+  > user3@example.com
+  > badapikey
+  > EOF
+  The following LDAP account will be associated with MozReview:
+  
+    user3@example.com
+  
+  By SSHing into this machine, you have proved ownership of that
+  LDAP account. We will need Bugzilla credentials to prove ownership
+  of a Bugzilla account. These credentials are NOT stored on the
+  server.
+  
+  Enter your Bugzilla e-mail address:
+  Enter a Bugzilla API Key:
+  associating LDAP account user3@example.com with Bugzilla account user3@example.com...
+  error occurred!
+  Verify you can log into MozReview at http://$DOCKER_HOSTNAME:$HGPORT1/
+  Verify the Bugzilla API Key specified is valid.
+  Seek help in #mozreview if this error persists
+  [1]
+
+Specifying a valid username and API Key will associate LDAP account
+
+  $ user3ssh mozreview-ldap-associate << EOF
+  > user3@example.com
+  > ${user3key}
+  > EOF
+  The following LDAP account will be associated with MozReview:
+  
+    user3@example.com
+  
+  By SSHing into this machine, you have proved ownership of that
+  LDAP account. We will need Bugzilla credentials to prove ownership
+  of a Bugzilla account. These credentials are NOT stored on the
+  server.
+  
+  Enter your Bugzilla e-mail address:
+  Enter a Bugzilla API Key:
+  associating LDAP account user3@example.com with Bugzilla account user3@example.com...
+  LDAP account successfully associated!
+  exiting
+
+  $ rbmanage dump-user-ldap user3
+  ldap username: user3@example.com
+
 Cleanup
 
   $ mozreview stop

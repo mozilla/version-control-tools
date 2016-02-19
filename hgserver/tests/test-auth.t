@@ -197,6 +197,12 @@ Do another login to verify no pash errors are present
 
   $ hgmo exec hgssh cat /var/log/pash.log
 
+mozreview-ldap-associate isn't enabled on hgssh
+
+  $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER mozreview-ldap-associate
+  mozreview-ldap-associate command not available
+  [1]
+
 Failure to connect to LDAP mirror is fatal
 
   $ hgmo exec hgssh /set-ldap-property url ldap://localhost:6000
