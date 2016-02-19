@@ -83,12 +83,18 @@ from mercurial import (
     hg,
     revset,
     util,
+    wireproto,
 )
 from mercurial.hgweb import (
     webcommands,
     webutil,
 )
-from mercurial.hgweb.common import HTTP_OK
+from mercurial.hgweb.common import (
+    HTTP_OK,
+)
+from mercurial.hgweb.protocol import (
+    webproto,
+)
 
 
 OUR_DIR = os.path.dirname(__file__)
@@ -424,7 +430,7 @@ def revset_automationrelevant(repo, subset, x):
         raise util.Abort('can only evaluate single changeset')
 
     ctx = repo[s.first()]
-    revs = {ctx.rev()}
+    revs = set([ctx.rev()])
 
     # The pushlog is used to get revisions part of the same push as
     # the requested revision.
@@ -522,6 +528,98 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
     ui.write('\n')
     return
 
+
+def clonebundleswireproto(orig, repo, proto):
+    """Wraps wireproto.clonebundles."""
+    return processbundlesmanifest(repo, proto, orig(repo, proto))
+
+
+def bundleclonewireproto(orig, repo, proto):
+    """Wraps wireproto.bundles."""
+    return processbundlesmanifest(repo, proto, orig(repo, proto))
+
+
+def processbundlesmanifest(repo, proto, manifest):
+    """Processes a bundleclone/clonebundles manifest.
+
+    We examine source IP addresses and advertise URLs for the same
+    AWS region if the source is in AWS.
+    """
+    # Delay import because this extension can be run on local
+    # developer machines.
+    import ipaddress
+
+    if not isinstance(proto, webproto):
+        return manifest
+
+    awspath = repo.ui.config('hgmo', 'awsippath')
+    if not awspath:
+        return manifest
+
+    # Mozilla's load balancers add a X-Cluster-Client-IP header to identify the
+    # actual source IP, so prefer it.
+    sourceip = proto.req.env.get('HTTP_X_CLUSTER_CLIENT_IP',
+                              proto.req.env.get('REMOTE_ADDR'))
+    if not sourceip:
+        return manifest
+
+    origlines = [l for l in manifest.splitlines()]
+    # ec2 region not listed in any manifest entries. This is weird but it means
+    # there is nothing for us to do.
+    if not any('ec2region=' in l for l in origlines):
+        return manifest
+
+    try:
+        # constructor insists on unicode instances.
+        sourceip = ipaddress.IPv4Address(sourceip.decode('ascii'))
+
+        with open(awspath, 'rb') as fh:
+            awsdata = json.load(fh)
+
+        for ipentry in awsdata['prefixes']:
+            network = ipaddress.IPv4Network(ipentry['ip_prefix'])
+
+            if sourceip not in network:
+                continue
+
+            region = ipentry['region']
+
+            filtered = [l for l in origlines if 'ec2region=%s' % region in l]
+            # No manifest entries for this region. Ignore match and try others.
+            if not filtered:
+                continue
+
+            # We prioritize stream clone bundles to AWS clients because they are
+            # the fastest way to clone and we want our automation to be fast.
+            def mancmp(a, b):
+                packed = 'BUNDLESPEC=none-packed1'
+                stream = 'stream='
+
+                if packed in a and packed not in b:
+                    return -1
+                if packed in b and packed not in a:
+                    return 1
+
+                if stream in a and stream not in b:
+                    return -1
+                if stream in b and stream not in a:
+                    return 1
+
+                return 0
+
+            filtered = sorted(filtered, cmp=mancmp)
+
+            # We got a match. Write out the filtered manifest (with a trailing newline).
+            filtered.append('')
+            return '\n'.join(filtered)
+
+        return manifest
+
+    except Exception as e:
+        repo.ui.log('hgmo', 'exception filtering bundle source IPs: %s\n', e)
+        return manifest
+
+
 def filelog(orig, web, req, tmpl):
     """Wraps webcommands.filelog to provide pushlog metadata to template."""
 
@@ -571,6 +669,16 @@ def extsetup(ui):
 
     revset.symbols['automationrelevant'] = revset_automationrelevant
     revset.safesymbols.add('automationrelevant')
+
+    # Install IP filtering for bundle URLs.
+
+    # Build-in command from core Mercurial.
+    extensions.wrapcommand(wireproto.commands, 'clonebundles', clonebundleswireproto)
+
+    # Legacy bundleclone command. Need to support until all clients run
+    # 3.6+.
+    if 'bundles' in wireproto.commands:
+        extensions.wrapcommand(wireproto.commands, 'bundles', bundleclonewireproto)
 
     entry = extensions.wrapcommand(commands.table, 'serve', servehgmo)
     entry[1].append(('', 'hgmo', False,

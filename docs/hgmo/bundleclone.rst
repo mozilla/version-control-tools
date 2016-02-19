@@ -5,9 +5,9 @@ Cloning from Pre-Generated Bundles
 ==================================
 
 ``hg.mozilla.org`` supports offloading clone requests to pre-generated
-bundle files stored in Amazon S3. **This results in drastically reduced
-server load (which helps prevent outages due to accidental, excessive
-load) and frequently results in faster clone times.**
+bundle files stored in a CDN and Amazon S3. **This results in drastically
+reduced server load (which helps prevent outages due to accidental,
+excessive load) and frequently results in faster clone times.**
 
 How It Works
 ============
@@ -23,17 +23,20 @@ drastically reduced load on the Mercurial server.
 Enabling
 ========
 
-If you are running Mercurial 3.6.1 or newer, support for cloning from
-pre-generated bundles is built-in to Mercurial itself. However, it
-requires enabling a config option::
+If you are running Mercurial 3.7 or newer, support for cloning from
+pre-generated bundles is built-in to Mercurial itself and enabled
+by default.
+
+If you are running Mercurial 3.6, support is built-in but requires
+enabling a config option::
 
    [experimental]
    clonebundles = true
 
 If you are running a Mercurial older than 3.6, first please consider
-upgrading to 3.6.1 or newer, as 3.6 contains a number of performance
-enhancements to cloning. If you absolutely must run a Mercurial older
-than 3.6, you can install the
+upgrading to 3.7 or newer, as newer versions contain a number of
+performance enhancements to cloning. If you absolutely must run a
+Mercurial older than 3.6, you can install the
 `bundleclone extension <https://hg.mozilla.org/hgcustom/version-control-tools/file/default/hgext/bundleclone/__init__.py>`_.
 Simply `download
 <https://hg.mozilla.org/hgcustom/version-control-tools/raw-file/default/hgext/bundleclone/__init__.py>`_
@@ -50,18 +53,24 @@ that file then add the following to your global hgrc file (likely
 Configuring
 ===========
 
-By default, the first entry in the bundles file list will be used. The
-server is configured so the first entry is the best choice for the most
-people. However, various audiences will want to prioritize certain
-bundles over others.
+hg.mozilla.org will advertise multiple bundles/URLs for each repository.
+Each listing varies by:
+
+* Bundle type
+* Server location
+
+By default, Mercurial uses the first entry in the server-advertised
+bundles list.
 
 Both the built-in *clone bundles* feature and *bundleclone* allow the
 client to define preferences of which bundles to fetch. The way this
 works is the client defines some key-value pairs in its config and
 bundles having these attributes will be upweighted.
 
-On ``hg.mozilla.org``, we define the following attributes are defined in
-the manifest:
+Bundle Attributes on hg.mozilla.org
+-----------------------------------
+
+On ``hg.mozilla.org``, following attributes are defined in the manifest:
 
 BUNDLESPEC (clonebundles only)
    This defines the type of bundle.
@@ -104,6 +113,9 @@ cdn (clonebundles and bundleclone)
    the URL is a CDN. All other values or undefined values are to be
    interpretted as not a CDN.
 
+Example Manifests
+-----------------
+
 Here is an example *clone bundles* manifest::
 
    https://hg.cdn.mozilla.net/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
@@ -142,6 +154,9 @@ For each of these bundles, we upload them to 3 locations:
 2. S3 in us-west-2 region
 3. S3 in us-east-1 region
 
+Which Bundles to Prefer
+-----------------------
+
 The gzipped bundle hosted on CloudFront is the first entry and is thus
 preferred by clients by default. **This is optimized for developers on
 high speed network connections.**
@@ -171,19 +186,22 @@ in under 60s.::
    [bundleclone]
    prefers = stream=revlogv1
 
-If you are in EC2, you should **always** pin your EC2 region as the
-first entry. You should also prefer *stream bundle* mode, as network
-bandwidth is plentiful and clones will be faster. e.g.::
+Manifest Advertisement to AWS Clients
+-------------------------------------
 
-   [experimental]
-   clonebundleprefers = ec2region=us-west-2, VERSION=packed1
+If a client in Amazon Web Services (e.g. EC2) is requesting a bundle
+manifest and that client is in an AWS region where bundles are hosted
+in S3, the advertised manifest will only show S3 URLs for the same AWS
+region. In addition, stream clone bundles are the highest priority bundle.
 
-   [bundleclone]
-   prefers = ec2region=us-west-2, stream=revlogv1
+This behavior ensures that AWS transfer are intra-region (which means
+they are fast and don't result in a billable AWS event) and that ``hg
+clone`` completes as fast as possible (stream clone bundles are faster
+than gzip bundles).
 
 .. important::
 
-   If you have machinery in an EC2 region where we don't host bundles,
+   If you have machinery in an AWS region where we don't host bundles,
    please let us know. There's a good chance that establishing bundles
    in your region is cheaper than paying the cross-region transfer costs
    (intra-region transfer is free).
@@ -195,11 +213,10 @@ Bundles are automatically generated for repositories that are high
 volume (in terms of repository size and clone frequency) or have a need
 for bundles.
 
-If you have the ``bundleclone`` extension installed and Mercurial doesn't
-print information about downloading a bundle file when you ``hg clone``
-from ``hg.mozilla.org``, bundles probably aren't being generated for
-that repository.
+The list of repositories with bundles enabled can be found at
+https://hg.cdn.mozilla.net/.
 
-If you think bundles should be made available, let a server operator
-know by filing a ``Developer Services :: hg.mozilla.org`` bug or by
-asking in #vcs on irc.mozilla.org.
+If you think bundles should be made available for a particular
+repository, let a server operator know by filing a
+``Developer Services :: hg.mozilla.org`` bug or by asking in #vcs
+on irc.mozilla.org.
