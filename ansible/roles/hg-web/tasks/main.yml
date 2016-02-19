@@ -238,6 +238,14 @@
 - name: install global hgrc
   copy: src=hgrc dest=/etc/mercurial/hgrc mode=0644 owner=root group=root
 
+# Needed to sniff clients as coming from AWS.
+- name: install AWS IP ranges file
+  copy: src=files/aws-ip-ranges.json
+        dest=/etc/mercurial/aws-ip-ranges.json
+        mode=0644
+        owner=root
+        group=root
+
 # We control httpd.conf for features like server-status
 - name: install httpd.conf file
   template: src=httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
