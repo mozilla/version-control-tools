@@ -132,8 +132,7 @@ class MozReviewExtension(Extension):
         'filediffreviewer': {
             'source_filenames': ['mozreview/js/models/filediffreviewermodel.js',
                                  'mozreview/js/collections/filediffreviewercollection.js',
-                                 'mozreview/js/init_filediffreviewer.js',
-                                 'mozreview/js/diffviewer_customizations.js'],
+                                 'mozreview/js/init_filediffreviewer.js'],
             'apply_to': diffviewer_url_names,
         },
         'import-pullrequest': {
