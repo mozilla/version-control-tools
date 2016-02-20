@@ -41,3 +41,34 @@ button.diff-file-btn {
     background-color: #ffe0e5;
     outline: 1px solid #ffe0e5;
 }
+
+.sidebyside {
+    tbody {
+        tr {
+            &:hover {
+                pre:before {
+                    content: '';
+                    display: relative;
+                    box-shadow: 1px 1px 3px black;
+                    border: 1px solid grey;
+                    height: 15px;
+                    width: 15px;
+                    margin: -2px -10px -2px -20px;
+                    float: left;
+                    pointer-events: none;
+                    background: url("../plus.svg") no-repeat 50%,
+                                linear-gradient(to bottom, #88bfe8 0%,#70b0e0 100%);
+                    transform: scale(0.8);
+                }
+            }
+
+            th {
+                padding-right: 20px;
+            }
+        }
+    }
+}
+
+span.ghost-commentflag {
+    display: none !important;
+}
