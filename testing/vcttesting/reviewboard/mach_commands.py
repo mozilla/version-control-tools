@@ -233,6 +233,36 @@ class ReviewBoardCommands(object):
         r = root.get_review_request(review_request_id=rrid)
         print(serialize_review_requests(client, r))
 
+    @Command('dump-raw-diff', category='reviewboard',
+             description='Dump the raw content of a diff from the server')
+    @CommandArgument('rrid', help='Review request id of diffs to dump')
+    def dump_raw_diff(self, rrid):
+        from rbtools.api.errors import APIError
+
+        client = self._get_client()
+        root = client.get_root()
+        rr = root.get_review_request(review_request_id=rrid)
+
+        # mach wraps sys.stdout with a transparent UTF-8 writer. This
+        # will interfere with our printing of raw data. So bypass it.
+        stdout = os.fdopen(sys.stdout.fileno(), 'w')
+
+        for diff in rr.get_diffs():
+            stdout.write(b'ID: %d\n' % diff.id)
+            stdout.write(diff.get_patch().data)
+            stdout.write(b'\n')
+
+        try:
+            draft = rr.get_draft()
+            for diff in draft.get_draft_diffs():
+                stdout.write(b'ID: %d (draft)\n' % diff.id)
+                stdout.write(diff.get_patch().data)
+                stdout.write(b'\n')
+        except APIError:
+            pass
+
+        stdout.close()
+
     @Command('add-reviewer', category='reviewboard',
         description='Add a reviewer to a review request')
     @CommandArgument('rrid', help='Review request id to modify')

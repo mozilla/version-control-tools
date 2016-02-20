@@ -296,7 +296,11 @@ def _processpushreview(repo, req, ldap_username):
             'id': node,
             'precursors': precursors.get(node, []),
             'message': encoding.fromlocal(ctx.description()),
-            'diff': diff,
+            # Diffs are arbitrary byte sequences. json.dump() will try to
+            # interpret str as UTF-8, which could fail. Instead of trying
+            # to coerce the str to a unicode or use ensure_ascii=False (which
+            # is a giant pain), just base64 encode the diff in the JSON.
+            'diff_b64': diff.encode('base64'),
             'bug': str(reviewid.bug),
             'base_commit_id': base_commit_id,
             'first_public_ancestor': first_public_ancestor,
@@ -304,8 +308,12 @@ def _processpushreview(repo, req, ldap_username):
             'requal_reviewers': list(commitparser.parse_requal_reviewers(summary))
         })
 
-    commits['squashed']['diff'] = ''.join(patch.diff(repo, node1=base_parent_node,
-        node2=repo[nodes[-1]].node(), opts=diffopts)) + '\n'
+    squashed_diff = b''.join(patch.diff(repo,
+                                        node1=base_parent_node,
+                                        node2=repo[nodes[-1]].node(),
+                                        opts=diffopts)) + '\n'
+
+    commits['squashed']['diff_b64'] = squashed_diff.encode('base64')
     commits['squashed']['base_commit_id'] = base_ctx.hex()
 
     rburl = repo.ui.config('reviewboard', 'url', None).rstrip('/')

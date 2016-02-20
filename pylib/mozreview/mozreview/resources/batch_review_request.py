@@ -101,7 +101,7 @@ class BatchReviewRequestResource(WebAPIResource):
 
         {
             'squashed': {
-                'diff': <squashed-diff-string>,
+                'diff_b64': <squashed-diff-string encoded as base64>,
                 'base_commit_id': <commit-id-to-apply-diff-to> (optional),
                 'first_public_ancestor': <commit of first public ancestor> (optional),
             },
@@ -110,9 +110,8 @@ class BatchReviewRequestResource(WebAPIResource):
                     'id': <commit-id>,
                     'precursors': [<previous changeset>],
                     'message': <commit-message>,
-                    'diff': <diff>,
+                    'diff_b64': <diff encoded as base64>,
                     'bug': <bug-id>,
-                    'parent_diff': <diff-from-base-to-commit> (optional),
                     'base_commit_id': <commit-id-to-apply-diffs-to> (optional),
                     'first_public_ancestor': <commit of first public ancestor> (optional),
                     'reviewers': [<user1>, <user2>, ...] (optional),
@@ -278,7 +277,7 @@ class BatchReviewRequestResource(WebAPIResource):
                     'fields': {
                         'commits': ['Does not contain %s key' % key]}}
 
-        for key in ('base_commit_id', 'diff', 'first_public_ancestor'):
+        for key in ('base_commit_id', 'diff_b64', 'first_public_ancestor'):
             if key not in commits['squashed']:
                 logger.error('squashed key missing %s' % key)
                 return INVALID_FORM_DATA, {
@@ -286,7 +285,7 @@ class BatchReviewRequestResource(WebAPIResource):
                         'commits': ['Squashed commit does not contain %s key' % key]}}
 
         for commit in commits['individual']:
-            for key in ('id', 'message', 'bug', 'diff', 'precursors', 'first_public_ancestor'):
+            for key in ('id', 'message', 'bug', 'diff_b64', 'precursors', 'first_public_ancestor'):
                 if key not in commit:
                     logger.error('commit (%s) missing key %s' % (
                                  commit.get('id', '<id>') ,key))
@@ -400,7 +399,9 @@ class BatchReviewRequestResource(WebAPIResource):
             diffset = DiffSet.objects.create_from_data(
                 repository=repo,
                 diff_file_name='diff',
-                diff_file_contents=commits['squashed']['diff'],
+                # The original value is a unicode instance. Python 3 can't
+                # .encode() a unicode instance, so go to str first.
+                diff_file_contents=commits['squashed']['diff_b64'].encode('ascii').decode('base64'),
                 parent_diff_file_name=None,
                 parent_diff_file_contents=None,
                 diffset_history=None,
@@ -945,9 +946,9 @@ def update_review_request(local_site, request, privileged_user, reviewer_cache,
         diffset = DiffSet.objects.create_from_data(
             repository=rr.repository,
             diff_file_name='diff',
-            diff_file_contents=commit['diff'],
+            diff_file_contents=commit['diff_b64'].encode('ascii').decode('base64'),
             parent_diff_file_name='diff',
-            parent_diff_file_contents=commit.get('parent_diff'),
+            parent_diff_file_contents=None,
             diffset_history=None,
             basedir='',
             request=request,
