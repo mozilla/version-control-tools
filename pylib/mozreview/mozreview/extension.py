@@ -201,7 +201,7 @@ class MozReviewExtension(Extension):
                 },
                 {
                     'label': 'File a Bug',
-                    'url': 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview',
+                    'url': 'https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=General',
                 },
             ],
         }])

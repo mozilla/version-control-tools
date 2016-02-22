@@ -81,7 +81,7 @@ from mozhg.rewrite import (
 )
 
 testedwith = '3.3 3.4 3.5 3.6'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Integration%3A%20Mercurial'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)

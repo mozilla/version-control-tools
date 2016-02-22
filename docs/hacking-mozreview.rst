@@ -110,7 +110,7 @@ Now, you can create and start a MozReview instance::
   (valid container names include: rbweb, bmoweb, hgrb, autoland)
 
 You should be able to load the printed URLs in your browser and see a
-working site. If you don't, `file a bug! <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview>`_
+working site. If you don't, `file a bug! <https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Testing%20%2F%20Development%20Environment>`_
 
 .. warning::
 
@@ -457,8 +457,8 @@ Filing Bugs
 ===========
 
 Found a bug in MozReview or want to create a bug to track an
-improvement? File bugs against ``Developer Services :: MozReview``
-at https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview.
+improvement? File bugs against ``MozReview :: General``
+at https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Testing%20%2F%20Development%20Environment.
 
 Discussion
 ==========

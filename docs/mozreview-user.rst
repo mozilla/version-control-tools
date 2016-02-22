@@ -31,8 +31,8 @@ Filing Bugs
 ===========
 
 Did you find a bug in MozReview? Do you have a feature request to make
-it better? `File a bug <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview>`_
-in the ``Developer Services :: MozReview`` component.
+it better? `File a bug <https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=General>`_
+in the ``MozReview :: General`` component.
 
 .. tip::
 
@@ -68,5 +68,5 @@ repository must have a corresponding code review repository configured
 to receive reviews.
 
 To request creation of a new code review repository,
-`file a bug <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview>`_
+`file a bug <https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=General>`_
 with the source repository URL and your request will likely be granted.
