@@ -41,7 +41,10 @@ CLONEBUNDLES_ORDER = [
 
 # Defines hostname and bucket where uploads should go.
 HOSTS = (
+    # We list Oregon (us-west-2) before N. California (us-west-1) because it is
+    # cheaper.
     ('s3-us-west-2.amazonaws.com', 'moz-hg-bundles-us-west-2', 'us-west-2'),
+    ('s3-us-west-1.amazonaws.com', 'moz-hg-bundles-us-west-1', 'us-west-1'),
     ('s3-external-1.amazonaws.com', 'moz-hg-bundles-us-east-1', 'us-east-1'),
 )
 
