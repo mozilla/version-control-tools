@@ -1,3 +1,5 @@
+@import (reference) "@{STATIC_ROOT}rb/css/defs.less";
+
 button.diff-file-btn {
     position: absolute;
     background-color: #DDD;
@@ -42,6 +44,8 @@ button.diff-file-btn {
     outline: 1px solid #ffe0e5;
 }
 
+/* add comment icon which follows cursor */
+
 .sidebyside {
     tbody {
         tr {
@@ -71,4 +75,13 @@ button.diff-file-btn {
 
 span.ghost-commentflag {
     display: none !important;
+}
+
+/* make review comments more noticable */
+
+.comment-block-container {
+  border-top: 2px dotted @comment-flag-color;
+}
+.comment-block-container-draft {
+  border-top: 2px dotted @comment-flag-draft-color;
 }
