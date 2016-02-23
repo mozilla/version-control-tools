@@ -76,6 +76,9 @@ Pillow==2.7.0
 # sha256: Fbzhklo9ZpQM65ozw8Vd6NlUYs4TbE1G6Gc_KRm0AdY
 pillowfight==0.2
 
+# sha256: Ba7iXEM9YVXe-_vLbC4rDr8p0oE4YEhntiowS9a7tB0
+Pygments==2.1.1
+
 # sha256: bxlzSLRvuM358_z8Kn1al9qV2z4uhmfPZXIWJ0_hsAk
 python-dateutil==1.5
 

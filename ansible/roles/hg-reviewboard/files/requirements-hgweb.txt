@@ -9,6 +9,9 @@ Mercurial==3.6.2
 # sha256: fdlUDbl5fypbSR6v9jRGQwUFU-vLti93V2LL46A0PCU
 mod-wsgi==4.4.11
 
+# sha256: Ba7iXEM9YVXe-_vLbC4rDr8p0oE4YEhntiowS9a7tB0
+Pygments==2.1.1
+
 # sha256: S4iRU5oxcdmTz3iWtjL_CIpMcHroWsPHfbFFT3lJ8-I
 python-ldap==2.4.20
 

@@ -76,6 +76,3 @@
        requirements={{ venv }}/requirements.txt
        executable={{ venv }}/bin/peep
 
-# Install a custom Pygments distribution. See pygments.yml for reasons.
-- include: ../../../tasks/pygments.yml
-           pip={{ venv }}/bin/pip
