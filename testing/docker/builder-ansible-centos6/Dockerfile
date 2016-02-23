@@ -24,7 +24,9 @@ RUN /tmp/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/pip-8.0
     cd /tmp/pip-8.0.3 && python setup.py install
 
 # Pinned to 1.9 because 2.0 is ~2x slower :/
-RUN pip install ansible==1.9.4
+# %include ansible/files/requirements-ansible-1.9.txt
+ADD extra/vct/ansible/files/requirements-ansible-1.9.txt /tmp/
+RUN pip install --require-hashes -r /tmp/requirements-ansible-1.9.txt
 RUN mkdir /etc/ansible && echo -e '[local]\nlocalhost\n' > /etc/ansible/hosts
 RUN mkdir /vct
 ADD sync-and-build /sync-and-build
