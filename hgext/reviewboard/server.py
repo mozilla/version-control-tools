@@ -207,7 +207,9 @@ def listreviewrepos(repo):
 
 
 def getreposfromreviewboard(repo):
-    from reviewboardmods.pushhooks import ReviewBoardClient
+    # Workaround an issue with "import _imp" in pkg_resources.
+    with demandimport.deactivated():
+        from reviewboardmods.pushhooks import ReviewBoardClient
 
     client = ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'))
     root = client.get_root()

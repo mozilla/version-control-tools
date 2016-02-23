@@ -8,6 +8,7 @@ import xmlrpclib
 
 from mercurial.node import short
 from mercurial import (
+    demandimport,
     encoding,
     error,
     mdiff,
@@ -105,8 +106,9 @@ def post_reviews(*args, **kwargs):
 def submit_reviews(url, repoid, identifier, commits, privileged_username,
                    privileged_password, username=None, apikey=None):
     """Submit commits to Review Board."""
-    import json
-    from reviewboardmods.pushhooks import ReviewBoardClient
+    # Workaround an issue with "import _imp" in pkg_resources.
+    with demandimport.deactivated():
+        from reviewboardmods.pushhooks import ReviewBoardClient
 
     client = ReviewBoardClient(url, username=privileged_username,
                                password=privileged_password)
@@ -136,7 +138,9 @@ def submit_reviews(url, repoid, identifier, commits, privileged_username,
 
 
 def associate_ldap_username(*args, **kwargs):
-    from reviewboardmods.pushhooks import associate_ldap_username as alu
+    # Workaround an issue with "import _imp" in pkg_resources.
+    with demandimport.deactivated():
+        from reviewboardmods.pushhooks import associate_ldap_username as alu
     return alu(*args, **kwargs)
 
 
@@ -370,7 +374,9 @@ def pullreviews(repo, proto, args=None):
     proto.redirect()
     req = parsejsonpayload(proto, args)
 
-    from reviewboardmods.pushhooks import ReviewBoardClient
+    # Workaround an issue with "import _imp" in pkg_resources.
+    with demandimport.deactivated():
+        from reviewboardmods.pushhooks import ReviewBoardClient
     client = ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
                                username=req.get('bzusername'),
                                apikey=req.get('bzapikey'))
@@ -445,7 +451,9 @@ def publishreviewseries(repo, proto, args=None):
 
 def _processpublishreview(repo, req):
     from rbtools.api.errors import APIError
-    from reviewboardmods.pushhooks import ReviewBoardClient
+    # Workaround an issue with "import _imp" in pkg_resources.
+    with demandimport.deactivated():
+        from reviewboardmods.pushhooks import ReviewBoardClient
     client = ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'),
                                username=req['bzusername'],
                                apikey=req['bzapikey'])
