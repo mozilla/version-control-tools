@@ -33,6 +33,10 @@ cd pylib/mozhginfo
 python setup.py develop
 cd ../..
 
+cd pylib/mozautomation
+python setup.py develop
+cd ../..
+
 cd pylib/mozreview
 python setup.py develop
 cd ../..
@@ -46,10 +50,6 @@ python setup.py develop
 cd ../..
 
 cd pylib/vcsreplicator
-python setup.py develop
-cd ../..
-
-cd pylib/mozautomation
 python setup.py develop
 cd ../..
 
