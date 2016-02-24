@@ -16,6 +16,7 @@ class HMORepositoryForm(HostingServiceForm):
     autolanding_to_try_enabled = forms.BooleanField(
         initial=False,
         label=_('Autoland to try'),
+        required=False,
         help_text=_('Allow Autolanding to try repository'))
 
     try_repository_url = forms.CharField(
@@ -28,6 +29,7 @@ class HMORepositoryForm(HostingServiceForm):
     autolanding_enabled = forms.BooleanField(
         initial=False,
         label=_('Autoland to landing repository'),
+        required=False,
         help_text=_('Allow Autolanding to landing repository'))
 
     landing_repository_url = forms.CharField(
