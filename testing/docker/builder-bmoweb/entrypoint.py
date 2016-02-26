@@ -51,9 +51,10 @@ install_module = False
 
 cc = subprocess.check_call
 
-# Start a MySQL process.
+# Start a MySQL process. mysqld_safe restarts the process when it
+# terminates, so don't use that.
 mysqld = subprocess.Popen([
-    '/usr/bin/mysqld_safe',
+    '/usr/sbin/mysqld',
     '--datadir=/var/lib/mysql',
     '--user=mysql',
     '--init-file=/tmp/mysql-init.sh'])
