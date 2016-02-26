@@ -223,6 +223,7 @@ with open(j(b, 'localconfig'), 'w') as fh:
             fh.write(line)
 
 mysqld.terminate()
+mysqld.wait()
 
 cc(['/bin/chown', '-R', 'bugzilla:bugzilla', b])
 
