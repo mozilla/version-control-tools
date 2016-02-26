@@ -34,8 +34,6 @@ sys.stderr = sys.stdout
 
 bz_home = os.environ['BUGZILLA_HOME']
 bz_dir = os.path.join(bz_home, 'bugzilla')
-db_host = 'localhost'
-db_port = '3306'
 db_user = 'root'
 db_pass = 'password'
 db_name = os.environ.get('DB_NAME', 'bugs')
@@ -108,8 +106,6 @@ with open(answers, 'wb') as fh:
 
     writeanswer(fh, 'db_user', db_user)
     writeanswer(fh, 'db_pass', db_pass)
-    writeanswer(fh, 'db_host', db_host)
-    writeanswer(fh, 'db_port', db_port)
     writeanswer(fh, 'db_name', db_name)
     writeanswer(fh, 'ADMIN_EMAIL', admin_email)
     writeanswer(fh, 'ADMIN_PASSWORD', admin_password)
@@ -132,10 +128,9 @@ while True:
         # There appear to be race conditions between MySQL opening the socket
         # and MySQL actually responding. So we wait on a successful MySQL
         # connection before continuing.
-        mysql.connector.connect(user=db_user, password=db_pass, host=db_host,
-                                port=db_port)
-        print('connected to database at %s:%s as %s'
-              % (db_host, db_port, db_user))
+        mysql.connector.connect(user=db_user, password=db_pass,
+                                unix_socket='/var/run/mysqld/mysqld.sock')
+        print('connected to MySQL database as %s' % db_user)
         break
     except (ConnectionError, mysql.connector.errors.Error):
         print('error')
@@ -150,8 +145,7 @@ mysql_args = [
     '/usr/bin/mysql',
     '-u%s' % db_user,
     '-p%s' % db_pass,
-    '-h', db_host,
-    '-P', db_port,
+    '-S', '/var/run/mysqld/mysqld.sock',
 ]
 
 fresh_database = bool(subprocess.call(mysql_args + ['bugs'],
@@ -209,10 +203,6 @@ with open(j(b, 'localconfig'), 'w') as fh:
             write_variable('db_user', db_user)
         elif line.startswith('$db_pass'):
             write_variable('db_pass', db_pass)
-        elif line.startswith('$db_host'):
-            write_variable('db_host', db_host)
-        elif line.startswith('$db_port'):
-            write_variable('db_port', db_port)
         elif line.startswith('$db_name'):
             write_variable('db_name', db_name)
         # The default memory limit is not sufficient to run the BMO
