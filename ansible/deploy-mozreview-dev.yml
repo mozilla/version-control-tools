@@ -22,6 +22,7 @@
       - httpd-devel
       - openldap-devel
       - python27
+      - python27-dev
       - sudo
       - rsyslog
       - tar
@@ -32,55 +33,19 @@
              sha256sum={{ item.sha256 }}
     with_items:
       - { path: mercurial-3.6.2-1.x86_64.rpm, sha256: ecb4848807c1fe0ce059de079c235ba22885c4cc900dcbff9165cb10ec4ad885 }
-      # The version of virtualenv in the IUS repo isn't compatible with
-      # peep because it has a pip that is too new. See
-      # https://github.com/erikrose/peep/pull/94. Install an old version
-      # until peep is compatible.
-      - { path: python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm, sha256: a3f6c80d7a83798e4d64827d81dbcc39c1c44ae66c0afa4866bc477baad2cc2c }
 
   - name: install Mozilla rpms
-    command: yum localinstall -y /var/tmp/mercurial-3.6.2-1.x86_64.rpm /var/tmp/python27-virtualenv-12.0.7-1.ius.el6.noarch.rpm
+    command: yum localinstall -y /var/tmp/mercurial-3.6.2-1.x86_64.rpm
 
-  - name: create virtualenv for Python processes
-    command: /usr/bin/virtualenv-2.7 /repo/hg/{{ item }} creates=/repo/hg/{{ item }}
-    with_items:
-      - venv_hgweb
-      - venv_pash
+- name: create virtualenv for hgweb
+  include: ../../../tasks/virtualenv.yml
+           venv=/repo/hg/venv_hgweb
+           requirements=../roles/hg-reviewboard/files/requirements-hgweb.txt
 
-  - name: copy peep.py to virtualenv
-    copy: src=files/peep.py
-          dest=/repo/hg/{{ item }}/bin/peep
-          mode=0755
-          owner=root
-          group=root
-    with_items:
-      - venv_hgweb
-      - venv_pash
-
-  - name: configure shebang in peep
-    replace: dest=/repo/hg/{{ item }}/bin/peep
-             regexp='^#!\/usr\/bin\/env python$'
-             replace='#!/repo/hg/{{ item }}/bin/python2.7'
-    with_items:
-      - venv_hgweb
-      - venv_pash
-
-  - name: copy requirements.txt
-    copy: src=roles/hg-reviewboard/files/requirements-{{ item }}.txt
-          dest=/repo/hg/venv_{{ item }}/requirements.txt
-          owner=root
-          group=root
-          mode=0644
-    with_items:
-      - hgweb
-      - pash
-
-  - name: populate virtualenv
-    pip: requirements=/repo/hg/{{ item }}/requirements.txt
-         executable=/repo/hg/{{ item }}/bin/peep
-    with_items:
-      - venv_hgweb
-      - venv_pash
+- name: create virtualenv for pash
+  include: ../../../tasks/virtualenv.yml
+           venv=/repo/hg/venv_pash
+           requirements=../roles/hg-reviewboard/files/requirements-pash.txt
 
   # pash is a collection of Python files handling SSH connections. They behave
   # like a Python module but are installed not as such for historical reasons.

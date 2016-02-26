@@ -21,8 +21,21 @@ RUN gpg --verify /Python-2.7.10.tgz.asc
 RUN tar -xzf /Python-2.7.10.tgz
 RUN cd /Python-2.7.10 && ./configure --prefix=/usr && make -j4 && make install DESTDIR=/python
 
+# %include scripts/download-verify
+ADD extra/vct/scripts/download-verify /var/tmp/download-verify
+
 # Install pip
-RUN /python/usr/bin/python -m ensurepip
+RUN /var/tmp/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/setuptools-20.1.1.tar.gz \
+      /vartmp/setuptools-20.1.1.tar.gz \
+      2663ce0b0e742ee27c3a06b2da14563e4f6f713eaf5509b932a31793f9dea9a3 && \
+    cd /var/tmp && tar -xzf setuptools-20.1.1.tar.gz && \
+    cd /var/tmp/setuptools-20.1.1 && /python/usr/bin/python setup.py install
+
+RUN /var/tmp/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/pip-8.0.3.tar.gz \
+      /var/tmp/pip-8.0.3.tar.gz \
+      30f98b66f3fe1069c529a491597d34a1c224a68640c82caf2ade5f88aa1405e8 && \
+    cd /var/tmp && tar -xzf pip-8.0.3.tar.gz && \
+    cd /var/tmp/pip-8.0.3 && /python/usr/bin/python setup.py install
 
 # Copy library dependencies.
 RUN mkdir -p /python/lib64 /python/usr/lib64
@@ -48,13 +61,9 @@ RUN cp /usr/lib64/libssl.so.10 \
        /usr/lib64/libcrypto.so.10 \
        /python/usr/lib64/
 
-# Install peep
-# %include ansible/files/peep.py
-ADD extra/vct/ansible/files/peep.py /python/usr/bin/peep.py
-
 # Install packages in virtualenv.
 ADD requirements.txt /requirements.txt
-RUN /python/usr/bin/python /python/usr/bin/peep.py install -r /requirements.txt
+RUN /python/usr/bin/python /python/usr/bin/pip install --require-hashes -r /requirements.txt
 
 # Add additional support files and paths.
 ADD hgrc /python/etc/mercurial/hgrc

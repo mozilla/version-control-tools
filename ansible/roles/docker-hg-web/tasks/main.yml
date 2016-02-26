@@ -20,28 +20,8 @@
 # containers. This is unfortunate. But it's what we have to do for
 # now.
 
-- name: create virtualenv to run moz.build info
-  command: /usr/bin/virtualenv-2.7 /repo/hg/venv_mozbuild creates=/repo/hg/venv_mozbuild
+- name: create virtualenv for moz.build info
+  include: ../../../tasks/virtualenv.yml
+           venv=/repo/hg/venv_mozbuild
+           requirements=../roles/docker-hg-web/files/requirements-mozbuild.txt
 
-- name: copy peep.py
-  copy: src=files/peep.py
-        dest=/repo/hg/venv_mozbuild/bin/peep
-        mode=0755
-        owner=root
-        group=root
-
-- name: configure shebang in peep
-  replace: dest=/repo/hg/venv_mozbuild/bin/peep
-           regexp='^#!\/usr\/bin\/env python$'
-           replace='#!/repo/hg/venv_mozbuild/bin/python2.7'
-
-- name: copy requirements.txt
-  copy: src=requirements-mozbuild.txt
-        dest=/repo/hg/venv_mozbuild/requirements.txt
-        mode=0644
-        owner=root
-        group=root
-
-- name: populate virtualenv
-  pip: requirements=/repo/hg/venv_mozbuild/requirements.txt
-       executable=/repo/hg/venv_mozbuild/bin/peep

@@ -28,18 +28,18 @@
            creates=/usr/bin/lessc
 
 - name: download virtualenv package
-  get_url: url=https://pypi.python.org/packages/source/v/virtualenv/virtualenv-12.0.7.tar.gz
-           dest=/var/tmp/virtualenv-12.0.7.tar.gz
-           sha256sum=d681db1766cdc8aa1b37eb18252c264b775f971166c2bf658a9618c1f3d28741
+  get_url: url=https://pypi.python.org/packages/source/v/virtualenv/virtualenv-14.0.6.tar.gz
+           dest=/var/tmp/virtualenv-14.0.6.tar.gz
+           sha256sum=1ffb6a02d8999e9c97ad8f04b1d2ba44421dfb8f8a98b54aea5c6fdfb53bc526
 
 - name: extract virtualenv package
-  command: /bin/tar -xzf virtualenv-12.0.7.tar.gz
+  command: /bin/tar -xzf virtualenv-14.0.6.tar.gz
            chdir=/var/tmp
-           creates=/var/tmp/virtualenv-12.0.7
+           creates=/var/tmp/virtualenv-14.0.6
 
 - name: install virtualenv package
   command: /usr/bin/python setup.py install
-           chdir=/var/tmp/virtualenv-12.0.7
+           chdir=/var/tmp/virtualenv-14.0.6
            creates=/usr/bin/virtualenv
 
 - name: create directory structure
@@ -51,20 +51,6 @@
 - name: create virtualenv
   command: /usr/bin/virtualenv {{ venv }} creates={{ venv }}/bin/python
 
-# peep is copied from our local copy because it is secure and is known
-# to work.
-- name: install peep
-  copy: src=files/peep.py
-        dest={{ venv }}/bin/peep
-        mode=0755
-        owner=root
-        group=root
-
-- name: configure shebang in peep
-  replace: dest={{ venv }}/bin/peep
-           regexp='^#!\/usr\/bin\/env python$'
-           replace='#!{{ venv }}/bin/python'
-
 - name: copy requirements.txt
   copy: src=requirements.txt
         dest={{ venv }}/requirements.txt
@@ -72,7 +58,4 @@
         group=root
 
 - name: populate virtualenv
-  pip: virtualenv={{ venv }}
-       requirements={{ venv }}/requirements.txt
-       executable={{ venv }}/bin/peep
-
+  command: "{{ venv }}/bin/pip install --require-hashes -r {{ venv }}/requirements.txt"

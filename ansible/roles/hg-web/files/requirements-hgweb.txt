@@ -1,11 +1,11 @@
-# sha256: k1cSgAzkdgcB2JrWd2Zs1SaR_S9vCzQMi0I5o8F5iKU
-ipaddress==1.0.16
+ipaddress==1.0.16 \
+    --hash=sha256:935712800ce4760701d89ad677666cd52691fd2f6f0b340c8b4239a3c17988a5
 
-# sha256: CcVnBJw-MPeR2wz1k3NGx_81aN6t9OsdTi98gAAcs9Y
-Mercurial==3.6.2
+Mercurial==3.6.2 \
+    --hash=sha256:09c567049c3e30f791db0cf5937346c7ff3568deadf4eb1d4e2f7c80001cb3d6
 
-# sha256: fdlUDbl5fypbSR6v9jRGQwUFU-vLti93V2LL46A0PCU
-mod-wsgi==4.4.11
+mod-wsgi==4.4.11 \
+    --hash=sha256:7dd9540db9797f2a5b491eaff6344643050553ebcbb62f775762cbe3a0343c25
 
-# sha256: Ba7iXEM9YVXe-_vLbC4rDr8p0oE4YEhntiowS9a7tB0
-Pygments==2.1.1
+Pygments==2.1.1 \
+    --hash=sha256:05aee25c433d6155defbfbcb6c2e2b0ebf29d28138604867b62a304bd6bbb41d

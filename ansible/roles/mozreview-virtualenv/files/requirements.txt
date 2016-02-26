@@ -1,113 +1,115 @@
+# Python 2.6 can't verify the x509 cert. So do straight HTTP for now.
+--trusted-host downloads.reviewboard.org
 --find-links http://downloads.reviewboard.org/releases/Django/1.6/
 --find-links http://downloads.reviewboard.org/releases/django-evolution/0.7/
 --find-links http://downloads.reviewboard.org/releases/Djblets/0.9/
 --find-links http://downloads.reviewboard.org/releases/RBTools/0.7/
 --find-links http://downloads.reviewboard.org/releases/ReviewBoard/2.5/
 
-# sha256: lNKmgifnmEvUD19xxoOXMGIq_4pGM_Ke3h_90NJAeV4
-amqp==1.4.8
+amqp==1.4.8 \
+    --hash=sha256:94d2a68227e7984bd40f5f71c6839730622aff8a4633f29ede1ffdd0d240795e
 
-# sha256: N4Ethjya0-NcBzTELgvwMgzow77YLNIK1UyzTRWBV7o
-anyjson==0.3.3
+anyjson==0.3.3 \
+    --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba
 
-# sha256: 0Bl46ajFHqezTscfP87RMmQ3zTZrnC4ZJlrOBQkk4OI
-argparse==1.3.0
+argparse==1.3.0 \
+    --hash=sha256:d01978e9a8c51ea7b34ec71f3fced1326437cd366b9c2e19265ace050924e0e2
 
-# sha256: TCDbOsB6WpISkrIjFzQQitt5kjxtBmGWGVwPAsAxltM
-Django==1.6.11.2
+Django==1.6.11.2 \
+    --hash=sha256:4c20db3ac07a5a921292b2231734108adb79923c6d066196195c0f02c03196d3
 
-# sha256: ca3Sb2gsLnZSxD0Bq2rBscaT2Gn2YxQvX3w3sAeI0WI
-django-pipeline==1.3.27
+django-pipeline==1.3.27 \
+    --hash=sha256:71add26f682c2e7652c43d01ab6ac1b1c693d869f663142f5f7c37b00788d162
 
-# sha256: WChUkMgGmM9kL_3RXyheU4UDgJKJw8i3sLwUu9bt990
-django-evolution==0.7.6
+django-evolution==0.7.6 \
+    --hash=sha256:58285490c80698cf642ffdd15f285e538503809289c3c8b7b0bc14bbd6edf7dd
 
-# sha256: ow34iO4NoyxIN8Mo7PhZ6ZLtttGF76fUk0HMGUnbsk0
-django-haystack==2.3.1
+django-haystack==2.3.1 \
+    --hash=sha256:a30df888ee0da32c4837c328ecf859e992edb6d185efa7d49341cc1949dbb24d
 
-# sha256: O36VAyPUd-QGYNc3v3l3fZEiw5YqVa9b1ggZ5ARy_Gw
-django-multiselectfield==0.1.3
+django-multiselectfield==0.1.3 \
+    --hash=sha256:3b7e950323d477e40660d737bf79777d9122c3962a55af5bd60819e40472fc6c
 
-# sha256: mB1aH66OqVReFq96EIDemGr5lIxjdf-A_ez8m6Js4WM
-Djblets==0.9
+Djblets==0.9 \
+    --hash=sha256:981d5a1fae8ea9545e16af7a1080de986af9948c6375ff80fdecfc9ba26ce163
 
-# sha256: x9txeBCraWX2bIzwOYqYydjfmC2jm0zX8WKRHriVlvo
-docutils==0.12
+docutils==0.12 \
+    --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
 
-# sha256: QNACzzYNDgNc8suYXhMI1BqqCHy_wTWy3C2EQpbqVGw
-ecdsa==0.13
+ecdsa==0.13 \
+    --hash=sha256:40d002cf360d0e035cf2cb985e1308d41aaa087cbfc135b2dc2d844296ea546c
 
-# sha256: f2UH1ADQft_R6oIF2jaAgAmwxTn1uKbgq1Qze5VebcM
-feedparser==5.1.3
+feedparser==5.1.3 \
+    --hash=sha256:7f6507d400d07edfd1ea8205da36808009b0c539f5b8a6e0ab54337b955e6dc3
 
-# sha256: n9IrNUpMR1WtjH0WHZP1AmrKTP6Zm9LlMWjxR2XALNY
-futures==2.2.0
+futures==2.2.0 \
+    --hash=sha256:9fd22b354a4c4755ad8c7d161d93f5026aca4cfe999bd2e53168f14765c02cd6
 
-# sha256: fLtRSjUvghxpuOi9qmsuWXKFR6iWVQPHWGUsKCbRV7U
-importlib==1.0.3
+importlib==1.0.3 \
+    --hash=sha256:7cbb514a352f821c69b8e8bdaa6b2e59728547a8965503c758652c2826d157b5
 
-# sha256: _ss07fSFIGTzhdv1OWkEeyI1PTYIpXZJfdBfcblD-uY
-kombu==3.0.30
+kombu==3.0.30 \
+    --hash=sha256:fecb34edf4852064f385dbf53969047b22353d3608a576497dd05f71b943fae6
 
-# sha256: gS7FJJ9F7cMTMLf7BuUqr2qy2DqicEfffLaDfvLSabY
-Markdown==2.4.1
+Markdown==2.4.1 \
+    --hash=sha256:812ec5249f45edc31330b7fb06e52aaf6ab2d83aa27047df7cb6837ef2d269b6
 
-# sha256: CcVnBJw-MPeR2wz1k3NGx_81aN6t9OsdTi98gAAcs9Y
-Mercurial==3.6.2
+Mercurial==3.6.2 \
+    --hash=sha256:09c567049c3e30f791db0cf5937346c7ff3568deadf4eb1d4e2f7c80001cb3d6
 
-# sha256: U0_2_u_hzQOYT0ROZBWqzHnAqF87ho7EGi_VADAEwx4
-mimeparse==0.1.3
+mimeparse==0.1.3 \
+    --hash=sha256:534ff6feefe1cd03984f444e6415aacc79c0a85f3b868ec41a2fd5003004c31e
 
-# sha256: 3Fi2CrGs4V9Safiq-CebD25SXZLec7D2ts-Hh6z7Uww
-MozillaPulse==1.0.1
+MozillaPulse==1.0.1 \
+    --hash=sha256:dc58b60ab1ace15f5269f8aaf8279b0f6e525d92de73b0f6b6cf8787acfb530c
 
-# sha256: gRBAtkfl1WhvhNtBXv1pfmJQAIsRK2kJunesBZ4UDHQ
-MySQL-python==1.2.5
+MySQL-python==1.2.5 \
+    --hash=sha256:811040b647e5d5686f84db415efd697e6250008b112b6909ba77ac059e140c74
 
-# sha256: HDW0rCBs7y0kgWyJ-Jzyid09OM98RJuz-re_bUPwGx8
-ordereddict==1.1
+ordereddict==1.1 \
+    --hash=sha256:1c35b4ac206cef2d24816c89f89cf289dd3d38cf7c449bb3fab7bf6d43f01b1f
 
-# sha256: xnVVjqRXwUdce4L0rkBL31bERj9vJiZloxvfi5yahZw
-paramiko==1.15.2
+paramiko==1.15.2 \
+    --hash=sha256:c675558ea457c1475c7b82f4ae404bdf56c4463f6f262665a31bdf8b9c9a859c
 
-# sha256: JukyDnP1ghgmtrJAijv_Cowp5FFZUwBpoRfv0572Gfg
-Pillow==2.7.0
+Pillow==2.7.0 \
+    --hash=sha256:26e9320e73f5821826b6b2408a3bff0a8c29e45159530069a117efd39ef619f8
 
-# sha256: Fbzhklo9ZpQM65ozw8Vd6NlUYs4TbE1G6Gc_KRm0AdY
-pillowfight==0.2
+pillowfight==0.2 \
+    --hash=sha256:15bce1925a3d66940ceb9a33c3c55de8d95462ce136c4d46e8673f2919b401d6
 
-# sha256: Ba7iXEM9YVXe-_vLbC4rDr8p0oE4YEhntiowS9a7tB0
-Pygments==2.1.1
+Pygments==2.1.1 \
+    --hash=sha256:05aee25c433d6155defbfbcb6c2e2b0ebf29d28138604867b62a304bd6bbb41d
 
-# sha256: bxlzSLRvuM358_z8Kn1al9qV2z4uhmfPZXIWJ0_hsAk
-python-dateutil==1.5
+python-dateutil==1.5 \
+    --hash=sha256:6f197348b46fb8cdf9f3fcfc2a7d5a97da95db3e2e8667cf657216274fe1b009
 
-# sha256: Av3bOsy_tU5A_0ellFfkIrJT-fts1kuzhRs0kpX6sEg
-python-ldap==2.4.19
+python-ldap==2.4.19 \
+    --hash=sha256:02fddb3accbfb54e40ff47a59457e422b253f9fb6cd64bb3851b349295fab048
 
-# sha256: Z-HBi2uZykwsjkoC4KlhdL9waJGaWv9Sg2YAl0we9Ng
-python-memcached==1.54
+python-memcached==1.54 \
+    --hash=sha256:67e1c18b6b99ca4c2c8e4a02e0a96174bf7068919a5aff52836600974c1ef4d8
 
-# sha256: Pt5HDT0XujwHY436DRBFK8G25a0yYSemW6d-aq6xG-w
-pytz==2015.7
+pytz==2015.7 \
+    --hash=sha256:3ede470d3d17ba3c07638dfa0d10452bc1b6e5ad326127a65ba77e6aaeb11bec
 
-# sha256: KMaFPB0T02W33HGmsF5f-1ZHH3CoUN4xivUNPXwN6i8
-recaptcha-client==1.0.6
+recaptcha-client==1.0.6 \
+    --hash=sha256:28c6853c1d13d365b7dc71a6b05e5ffb56471f70a850de318af50d3d7c0dea2f
 
-# sha256: fee8TQCm0FHbs2C0jrfzzQAjc9hyUvsLKEo8nEU6dnc
-Whoosh==2.6.0
+pycrypto==2.6.1 \
+    --hash=sha256:f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c
 
-# sha256: 8s4emJsnLPy2d2FnY-Ci5-xlnv-meoiqkrOmVSj2Cjw
-pycrypto==2.6.1
+RBTools==0.7.5 \
+    --hash=sha256:28809def27e530ba5c13d37be8eb9ca31a24786cc0d0bd6d682f0009d94891a4
 
-# sha256: KICd7yflMLpcE9N76OucoxokeGzA0L1taC8ACdlIkaQ
-RBTools==0.7.5
+ReviewBoard==2.5.2 \
+    --hash=sha256:c44cc140f12a12ad2976ec20052a927392c9f549d7d19f84e62a23f6f4858ccc
 
-# sha256: xEzBQPEqEq0pduwgBSqSc5LJ9UnX0Z-E5ioj9vSFjMw
-ReviewBoard==2.5.2
+requests==2.4.3 \
+    --hash=sha256:124890f41723c85aa82dfe0807432aea46d24aeb0dafce340969d2089548c2c3
 
-# sha256: EkiQ9BcjyFqoLf4IB0Mq6kbSSusNr840CWnSCJVIwsM
-requests==2.4.3
+six==1.9.0 \
+    --hash=sha256:418a93c397a7edab23e5588dbc067ac74a723edb3d541bd4936f79476e7645da
 
-# sha256: QYqTw5en7asj5ViNvAZ6x0pyPts9VBvUk295R252Rdo
-six==1.9.0
+Whoosh==2.6.0 \
+    --hash=sha256:7de7bc4d00a6d051dbb360b48eb7f3cd002373d87252fb0b284a3c9c453a7677
