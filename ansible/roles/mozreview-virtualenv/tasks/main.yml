@@ -12,6 +12,7 @@
 - name: install dependency packages
   yum: name={{ item }}
   with_items:
+    - httpd-devel
     - libjpeg-turbo-devel
     - mysql-devel
     - nodejs
