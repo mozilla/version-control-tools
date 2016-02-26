@@ -4,15 +4,24 @@
 
 FROM secure:mozsecure:centos6:sha256 88cc1475bd58f6ff6f41d50b813c9998c4d3a7167a8a45f8bd0b4a8342dec0db:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-6-20150615_2019-docker.tar.xz
 
-RUN yum update -y && yum install -y gcc libyaml-devel python-devel rsync tar unzip wget && yum clean all
-# peep does not yet work with pip 7. Also, setuptools had a few releases
-# where they broke imp module importing. Pin to old, known working,
-# versions.
-RUN wget -q -O /tmp/setuptools-15.2.zip https://pypi.python.org/packages/source/s/setuptools/setuptools-15.2.zip
-RUN wget -q -O /tmp/pip-6.0.8.tar.gz https://github.com/pypa/pip/archive/6.0.8.tar.gz
+RUN yum update -y && yum install -y gcc libyaml-devel python-devel rsync tar && yum clean all
 
-RUN cd /tmp && unzip setuptools-15.2.zip && cd setuptools-15.2 && python setup.py install
-RUN cd /tmp && tar -xzf pip-6.0.8.tar.gz && cd pip-6.0.8 && python setup.py install
+# Pin setuptools and pip because we've historically had issues with newer versions.
+# Plus, pinning ensures reproducibility over time.
+# %include scripts/download-verify
+ADD extra/vct/scripts/download-verify /tmp/download-verify
+
+RUN /tmp/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/setuptools-20.1.1.tar.gz \
+      /tmp/setuptools-20.1.1.tar.gz \
+      2663ce0b0e742ee27c3a06b2da14563e4f6f713eaf5509b932a31793f9dea9a3 && \
+    cd /tmp && tar -xzf setuptools-20.1.1.tar.gz && \
+    cd /tmp/setuptools-20.1.1 && python setup.py install
+
+RUN /tmp/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/pip-8.0.3.tar.gz \
+      /tmp/pip-8.0.3.tar.gz \
+      30f98b66f3fe1069c529a491597d34a1c224a68640c82caf2ade5f88aa1405e8 && \
+    cd /tmp && tar -xzf pip-8.0.3.tar.gz && \
+    cd /tmp/pip-8.0.3 && python setup.py install
 
 # Pinned to 1.9 because 2.0 is ~2x slower :/
 RUN pip install ansible==1.9.4
