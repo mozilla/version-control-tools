@@ -26,7 +26,7 @@ ADD extra/vct/scripts/download-verify /var/tmp/download-verify
 
 # Install pip
 RUN /var/tmp/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/setuptools-20.1.1.tar.gz \
-      /vartmp/setuptools-20.1.1.tar.gz \
+      /var/tmp/setuptools-20.1.1.tar.gz \
       2663ce0b0e742ee27c3a06b2da14563e4f6f713eaf5509b932a31793f9dea9a3 && \
     cd /var/tmp && tar -xzf setuptools-20.1.1.tar.gz && \
     cd /var/tmp/setuptools-20.1.1 && /python/usr/bin/python setup.py install
