@@ -65,6 +65,9 @@
     - name: wait for HTTP server to drain
       apache_worker_drain: url=http://localhost/server-status timeout=300
 
+  roles:
+    - rbweb
+
   tasks:
     - name: sync code from admin node
       command: /data/bin/update-www.sh reviewboard.mozilla.org

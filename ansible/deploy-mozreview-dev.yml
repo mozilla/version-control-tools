@@ -12,7 +12,7 @@
     python: /data/www/reviewboard-dev.allizom.org/venv/bin/python
     rbsite: /data/www/reviewboard-dev.allizom.org/venv/bin/rb-site
   roles:
-    - ius-repo
+    - rbweb
     - { role: mozreview-virtualenv, venv: /data/www/reviewboard-dev.allizom.org/venv }
   tasks:
   - name: install system packages

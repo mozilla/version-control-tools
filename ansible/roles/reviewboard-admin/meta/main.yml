@@ -1,3 +1,4 @@
 ---
 dependencies:
+  - ius-repo
   - { role: mozreview-virtualenv, venv: "{{ src }}/{{ site }}/venv" }

@@ -18,6 +18,7 @@
     - nodejs
     - python-devel
     - openldap-devel
+    - python27
     - tar
     - zlib-devel
 
