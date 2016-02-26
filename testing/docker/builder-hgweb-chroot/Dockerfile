@@ -6,6 +6,8 @@
 
 FROM secure:mozsecure:centos6:sha256 88cc1475bd58f6ff6f41d50b813c9998c4d3a7167a8a45f8bd0b4a8342dec0db:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-6-20150615_2019-docker.tar.xz
 
+RUN yum update -y
+
 # Install build dependencies.
 RUN yum install -y bzip2-devel gcc libcgroup-devel make openssl-devel rsync tar wget zlib-devel
 
