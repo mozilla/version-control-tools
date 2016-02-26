@@ -51,14 +51,6 @@ install_module = False
 
 cc = subprocess.check_call
 
-# Start a MySQL process. mysqld_safe restarts the process when it
-# terminates, so don't use that.
-mysqld = subprocess.Popen([
-    '/usr/sbin/mysqld',
-    '--datadir=/var/lib/mysql',
-    '--user=mysql',
-    '--init-file=/tmp/mysql-init.sh'])
-
 # Ensure Bugzilla Git clone is up to date.
 
 # First unpatch files that we used to modify.
@@ -81,30 +73,6 @@ if 'FETCH_BMO' in os.environ:
 
 bmo_commit = os.environ.get('BMO_COMMIT', 'origin/master')
 cc(['/usr/bin/git', 'checkout', bmo_commit], cwd=bz_dir)
-
-# If we start this and the BMODB container at the same time, MySQL may not be
-# running yet. Wait for it.
-
-time_start = time.time()
-while True:
-    try:
-        print('attempting to connect to database...')
-        # There appear to be race conditions between MySQL opening the socket
-        # and MySQL actually responding. So we wait on a successful MySQL
-        # connection before continuing.
-        mysql.connector.connect(user=db_user, password=db_pass, host=db_host,
-                                port=db_port)
-        print('connected to database at %s:%s as %s'
-              % (db_host, db_port, db_user))
-        break
-    except (ConnectionError, mysql.connector.errors.Error):
-        print('error')
-
-    if time.time() - time_start > db_timeout:
-        print('could not connect to database before timeout; giving up')
-        sys.exit(1)
-
-    time.sleep(0.100)
 
 j = os.path.join
 h = os.environ['BUGZILLA_HOME']
@@ -146,6 +114,37 @@ with open(answers, 'wb') as fh:
     writeanswer(fh, 'ADMIN_EMAIL', admin_email)
     writeanswer(fh, 'ADMIN_PASSWORD', admin_password)
     writeanswer(fh, 'urlbase', bmo_url)
+
+# Start a MySQL process. mysqld_safe restarts the process when it
+# terminates, so don't use that.
+mysqld = subprocess.Popen([
+    '/usr/sbin/mysqld',
+    '--datadir=/var/lib/mysql',
+    '--user=mysql',
+    '--init-file=/tmp/mysql-init.sh'])
+
+# Wait for database to start or we may attempt to connect before it is
+# ready.
+time_start = time.time()
+while True:
+    try:
+        print('attempting to connect to database...')
+        # There appear to be race conditions between MySQL opening the socket
+        # and MySQL actually responding. So we wait on a successful MySQL
+        # connection before continuing.
+        mysql.connector.connect(user=db_user, password=db_pass, host=db_host,
+                                port=db_port)
+        print('connected to database at %s:%s as %s'
+              % (db_host, db_port, db_user))
+        break
+    except (ConnectionError, mysql.connector.errors.Error):
+        print('error')
+
+    if time.time() - time_start > db_timeout:
+        print('could not connect to database before timeout; giving up')
+        sys.exit(1)
+
+    time.sleep(0.100)
 
 mysql_args = [
     '/usr/bin/mysql',
