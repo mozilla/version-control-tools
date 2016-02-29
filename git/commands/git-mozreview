@@ -690,11 +690,11 @@ def commit_msg_hook(args):
             line = line.rstrip()
 
             # Ignore comments.
-            if line.startswith('#'):
+            if line.startswith(b'#'):
                 continue
 
             # Ignore the inline git diff.
-            if line.startswith('diff --git'):
+            if line.startswith(b'diff --git'):
                 break
 
             lines.append(line)
@@ -703,10 +703,10 @@ def commit_msg_hook(args):
         return 0
 
     # Ignore temporary commits.
-    if lines[0].startswith(('fixup', 'squash')):
+    if lines[0].startswith((b'fixup', b'squash')):
         return 0
 
-    msg, changed = addcommitid('\n'.join(lines),
+    msg, changed = addcommitid(b'\n'.join(lines),
                                fakeidpath=os.environ.get('FAKEIDPATH'))
 
     if not changed:

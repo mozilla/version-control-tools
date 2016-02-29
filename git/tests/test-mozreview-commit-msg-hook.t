@@ -208,3 +208,38 @@ Inline diff in commit message is ignored
       Extra content.
       
       MozReview-Commit-ID: F63vXs
+
+Unicode in commit message is preserved
+
+  $ git checkout -b unicode a547cc07
+  Switched to a new branch 'unicode'
+  $ echo unicode > foo
+  $ git add foo
+  $ cat > message << EOF
+  > Bug 5 - unicode in commit message
+  > 
+  > こんにちは世界
+  > commençant par seront ignorées, et un message vide abandonne la validation.
+  > EOF
+
+  $ git commit -F message
+  [unicode 7d76947] Bug 5 - unicode in commit message
+   1 file changed, 1 insertion(+)
+
+  $ cat message
+  Bug 5 - unicode in commit message
+  
+  \xe3\x81\x93\xe3\x82\x93\xe3\x81\xab\xe3\x81\xa1\xe3\x81\xaf\xe4\xb8\x96\xe7\x95\x8c (esc)
+  commen\xc3\xa7ant par seront ignor\xc3\xa9es, et un message vide abandonne la validation. (esc)
+
+  $ git log -n 1 HEAD
+  commit 7d76947383ca24ac244341b11950350185ab4004
+  Author: test <test@example.com>
+  Date:   Thu Jan 1 00:00:00 1970 +0000
+  
+      Bug 5 - unicode in commit message
+      
+      \xe3\x81\x93\xe3\x82\x93\xe3\x81\xab\xe3\x81\xa1\xe3\x81\xaf\xe4\xb8\x96\xe7\x95\x8c (esc)
+      commen\xc3\xa7ant par seront ignor\xc3\xa9es, et un message vide abandonne la validation. (esc)
+      
+      MozReview-Commit-ID: JmjAjw
