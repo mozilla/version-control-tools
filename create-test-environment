@@ -8,18 +8,49 @@ if [ "x${vercheck}" != "xTrue" ]; then
   exit 1
 fi
 
-if [ ! -d venv ]; then
-  virtualenv venv
+ROOT=`pwd`
+VENV=${ROOT}/venv
+
+if [ ! -d ${VENV} ]; then
+  # There is a bug in pycrypto where it tries to invoke `configure` instead
+  # of a path qualified configure. So if there is a "configure" on $PATH
+  # it will invoke the wrong one.
+  configure=which configure &>/dev/null || true
+  if [ "x" != "x${configure}" ]; then
+    echo "configure in PATH; pycrypto install will fail!"
+    echo "Remove the path containing ${configure} from PATH"
+    exit 1
+  fi
+
+  mkdir ${VENV}
+
+  # Securely download virtualenv, setuptools, and pip.
+  ${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/virtualenv-14.0.6.tar.gz \
+        ${VENV}/virtualenv-14.0.6.tar.gz \
+        1ffb6a02d8999e9c97ad8f04b1d2ba44421dfb8f8a98b54aea5c6fdfb53bc526 && \
+      cd ${VENV} && tar -xzf virtualenv-14.0.6.tar.gz && \
+      rm -f ${VENV}/virtualenv-14.0.6/virtualenv_support/setuptools-20.0-py2.py3-none-any.whl \
+            ${VENV}/virtualenv-14.0.6/virtualenv_support/pip-8.0.2-py2.py3-none-any.whl
+
+  ${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/pip-8.0.3-py2.py3-none-any.whl \
+        ${VENV}/virtualenv-14.0.6/virtualenv_support/pip-8.0.3-py2.py3-none-any.whl \
+        b0335bc837f9edb5aad03bd43d0973b084a1cbe616f8188dc23ba13234dbd552
+
+  ${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/setuptools-20.1.1-py2.py3-none-any.whl \
+        ${VENV}/virtualenv-14.0.6/virtualenv_support/setuptools-20.1.1-py2.py3-none-any.whl \
+        dfdbc643f8900d9e617e48a42ae389aa18fd6fbd2846f24f2a4678b8d9412acb
+
+  ${VENV}/virtualenv-14.0.6/virtualenv.py --no-download ${VENV}
+  cd ${ROOT}
 fi
 
-source venv/bin/activate
-pip install --upgrade pip
+source ${VENV}/bin/activate
 
 cd pylib/requests
 python setup.py develop
 cd ../..
 
-pip install --upgrade -r test-requirements.txt
+pip install --upgrade --require-hashes -r test-requirements.txt
 
 cd pylib/Bugsy
 python setup.py develop
