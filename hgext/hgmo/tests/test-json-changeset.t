@@ -24,7 +24,7 @@
 
 Last changeset
 
-  $ http http://localhost:$HGPORT/json-changeset/tip --header content-type --body-file body
+  $ http http://localhost:$HGPORT/json-rev/tip --header content-type --body-file body
   200
   content-type: application/json
 
