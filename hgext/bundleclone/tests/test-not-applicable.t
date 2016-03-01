@@ -1,3 +1,5 @@
+#require no-hg37+
+
   $ hg init server
   $ cd server
   $ touch foo
