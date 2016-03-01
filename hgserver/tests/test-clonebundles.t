@@ -20,32 +20,7 @@ Create a clonebundles manifest
 
   $ hgmo exec hgssh sudo -u hg /repo/hg/venv_tools/bin/python /repo/hg/version-control-tools/scripts/generate-hg-s3-bundles --no-upload mozilla-central &> /dev/null
 
-Cloning with a client that supports clonebundles should advertise the
-feature
-
-#if hg36+
-
-  $ hg clone -U ${HGWEB_0_URL}mozilla-central clonebundles-advertise
-  requesting all changes
-  remote: this server supports the experimental "clone bundles" feature that should enable faster and more reliable cloning
-  remote: help test it by setting the "experimental.clonebundles" config flag to "true"
-  adding changesets
-  adding manifests
-  adding file changes
-  added 1 changesets with 1 changes to 1 files
-
-#else
-
-  $ hg clone -U ${HGWEB_0_URL}mozilla-central clonebundles-no-support
-  requesting all changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 1 changesets with 1 changes to 1 files
-
-#endif
-
-We shouldn't see the message if we attempted to use clonebundles
+Cloning will fetch bundle
 
 #if hg36+
 
