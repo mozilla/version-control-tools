@@ -7,8 +7,13 @@ import os
 import sys
 
 port = int(sys.argv[1])
-httpd = BaseHTTPServer.HTTPServer(('', port), SimpleHTTPRequestHandler)
-fh = open('listening', 'w')
-fh.close()
-httpd.handle_request()
-os.unlink('listening')
+
+try:
+    httpd = BaseHTTPServer.HTTPServer(('', port), SimpleHTTPRequestHandler)
+    fh = open('listening', 'w')
+    fh.close()
+    httpd.handle_request()
+    os.unlink('listening')
+except Exception:
+    with open('errored', 'a'):
+        pass
