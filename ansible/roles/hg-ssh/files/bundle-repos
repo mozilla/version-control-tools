@@ -6,7 +6,9 @@ integration/gaia-central
 releases/mozilla-release bzip2
 releases/mozilla-aurora bzip2
 releases/mozilla-beta bzip2
+releases/mozilla-esr45 bzip2
 releases/mozilla-esr38 bzip2
+releases/mozilla-esr31
 build/tools
 build/mozharness
 build/talos
@@ -23,4 +25,3 @@ releases/mozilla-b2g37_v2_2r
 releases/mozilla-b2g32_v2_0
 releases/mozilla-b2g32_v2_0m
 releases/mozilla-b2g44_v2_5
-releases/mozilla-esr31
