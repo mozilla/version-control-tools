@@ -1,44 +1,6 @@
 $(document).ready(function() {
   var page = RB.PageManager.getPage();
 
-  // Adjust the styling of comment blocks to draw attention to their
-  // existance.  Unfortunately the template is opaque to us, so we
-  // have to resort to MutationObserver shenanigans.
-  try {
-    var observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        var $target = $(mutation.target);
-        if ($target.hasClass('diff-box')) {
-          // initial page layout
-          var $flags = $target.find('.commentflag');
-          $flags
-            .filter(':not(.draft)')
-            .parents('tr')
-            .addClass('comment-block-container');
-          $flags
-            .filter('.draft')
-            .parents('tr')
-            .addClass('comment-block-container-draft');
-        } else if ($target.prop('nodeName') === 'TH') {
-          // comment added/removed
-          var $tr = $target.parent('tr');
-          $tr
-            .removeClass('comment-block-container')
-            .removeClass('comment-block-container-draft');
-          if ($target.find('.commentflag').length) {
-            $tr.addClass($target.find('.commentflag.draft').length ?
-                         'comment-block-container-draft' :
-                         'comment-block-container');
-          }
-        }
-      });
-    });
-    observer.observe(document.querySelector('#diffs'),
-                     { childList: true, subtree: true });
-  } catch(e) {
-    // we don't care if this fails
-  }
-
   var FileDiffReviewerData = $('#file-diff-reviewer-data')
                              .data('file-diff-reviewer');
   var fileDiffReviewerModels = FileDiffReviewerData.map(function(item){
