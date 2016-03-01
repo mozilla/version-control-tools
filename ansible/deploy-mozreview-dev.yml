@@ -37,15 +37,15 @@
   - name: install Mozilla rpms
     command: yum localinstall -y /var/tmp/mercurial-3.6.2-1.x86_64.rpm
 
-- name: create virtualenv for hgweb
-  include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_hgweb
-           requirements=../roles/hg-reviewboard/files/requirements-hgweb.txt
+  - name: create virtualenv for hgweb
+    include: tasks/virtualenv.yml
+             venv=/repo/hg/venv_hgweb
+             requirements=../roles/hg-reviewboard/files/requirements-hgweb.txt
 
-- name: create virtualenv for pash
-  include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_pash
-           requirements=../roles/hg-reviewboard/files/requirements-pash.txt
+  - name: create virtualenv for pash
+    include: tasks/virtualenv.yml
+             venv=/repo/hg/venv_pash
+             requirements=../roles/hg-reviewboard/files/requirements-pash.txt
 
   # pash is a collection of Python files handling SSH connections. They behave
   # like a Python module but are installed not as such for historical reasons.
