@@ -267,7 +267,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
             repo._bookmarks[mark] = newnode
 
         if bmchanges:
-            repo._bookmarks.write()
+            repo._bookmarks.recordchange(tr)
 
         # Update references to rewritten MQ patches.
         if hasattr(repo, 'mq'):
