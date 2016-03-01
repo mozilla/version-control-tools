@@ -64,13 +64,16 @@ Push should complain about new head
 
 Push rebase should work
 
-  $ hg push --onto default
+  $ hg push --to default
   pushing to http://localhost:$HGPORT/
   searching for changes
   adding changesets
   adding manifests
   adding file changes
   added 2 changesets with 1 changes to 2 files (+1 heads)
+  remote: pushing 1 commit:
+  remote:     58917bc08918  unrelated divergent commit
+  remote: 2 new commits from the server will be downloaded
 
 It leaves an orphan head, but that's how pushrebase works without
 obsolescence :/
