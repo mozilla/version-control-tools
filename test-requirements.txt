@@ -214,7 +214,8 @@ ReviewBoard==2.5.2 \
 selenium==2.48.0 \
     --hash=sha256:30b97338c0d9f1e60e72ecee0579b0f0845d55025342c3d5ccb224fb8a07b787
 
-setuptools==20.1.1
+setuptools==20.1.1 \
+    --hash=sha256:dfdbc643f8900d9e617e48a42ae389aa18fd6fbd2846f24f2a4678b8d9412acb
 
 six==1.10.0 \
     --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
