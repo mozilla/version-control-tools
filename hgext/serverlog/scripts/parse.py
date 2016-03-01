@@ -118,10 +118,13 @@ def parse_events(fh, onlydate=None):
             date = line[0:15]
             if date[4] == ' ':
                 date = date[0:4] + '0' + date[5:]
-            date = datetime.datetime.strptime(date, '%b %d %H:%M:%S')
+
             # Year isn't in the logs and Python defaults to 1900.
-            date = date.combine(datetime.date(thisyear, date.month, date.day),
-                                date.time())
+            # This can cause a problem during leap years because strptime
+            # will raise a "ValueError: day is out of range for month" for
+            # Feb 29. So we add the year to the string before parsing.
+            date = '%d %s' % (thisyear, date)
+            date = datetime.datetime.strptime(date, '%Y %b %d %H:%M:%S')
 
             hostaction, line = line[16:].split(':', 1)
             host, action = hostaction.split()
