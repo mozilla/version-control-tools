@@ -22,7 +22,7 @@
       - httpd-devel
       - openldap-devel
       - python27
-      - python27-dev
+      - python27-devel
       - sudo
       - rsyslog
       - tar
