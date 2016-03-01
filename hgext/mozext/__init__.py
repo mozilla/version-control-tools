@@ -1542,7 +1542,16 @@ def reposetup(ui, repo):
                 ui.warn('Removing bookmark %s\n' % bm)
                 del self._bookmarks[bm]
 
-            self._bookmarks.write()
+            lock = self.lock()
+            try:
+                tr = repo.transaction('prunerelbranch')
+                try:
+                    self._bookmarks.recordchange(tr)
+                    tr.close()
+                finally:
+                    tr.release()
+            finally:
+                lock.release()
 
             todelete = [ref for ref in self.remoterefs.keys()
                         if ref.endswith('RELBRANCH')]
