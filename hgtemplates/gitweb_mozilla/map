@@ -14,7 +14,7 @@ helptopics = helptopics.tmpl
 helpentry = '
   <tr><td>
     <a href="{url|urlescape}help/{topic|escape}{sessionvars%urlparameter}">
-      {topic|escape}
+      {if(basename, '{basename|escape}', '{topic|escape}')}
     </a>
   </td><td>
     {summary|escape}
@@ -303,20 +303,28 @@ filelogentry = '
       <span class="logtags">{inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}{bookmarks%bookmarktag}</span>
     </td>
   </tr>'
-archiveentry = ' | <a href="{url|urlescape}archive/{symrev}{extension}">{type|escape}</a> '
+archiveentry = ' | <a href="{url|urlescape}archive/{symrev}{extension}{ifeq(path,'/','',path|urlescape)}">{type|escape}</a> '
 indexentry = '
   <tr class="parity{parity}">
-    <td><a class="list" href="{url|urlescape}{sessionvars%urlparameter}"><b>{name|escape}</b></a></td>
+    <td>
+      <a class="list" href="{url|urlescape}{sessionvars%urlparameter}">
+        <b>{name|escape}</b>
+      </a>
+    </td>
     <td>{description}</td>
     <td class="age">at {lastchange|date}</td>
     <td class="indexlinks">{archives%indexarchiveentry}</td>
-    <td><a href="{url|urlescape}atom-log"><img src="{staticurl}livemarks16.png" alt="Feed" title="Feed of repository changes"/></a></td>
+    <td>{if(isdirectory, '',
+            '<div class="rss_logo">
+                <a href="{url|urlescape}rss-log">RSS</a> <a href="{url|urlescape}atom-log">Atom</a>
+            </div>'
+            )}
+    </td>
   </tr>\n'
 indexarchiveentry = ' <a href="{url|urlescape}archive/{node|short}{extension}">{type|escape}</a> '
 index = index.tmpl
 urlparameter = '{separator}{name}={value|urlescape}'
 hiddenformentry = '<input type="hidden" name="{name}" value="{value|escape}" />'
-
 breadcrumb = '&gt; <a href="{url|urlescape}">{name|escape}</a> '
 pushlog = pushlog.tmpl
 bughyperlink = '<a href="{url}">{no|escape}</a>'
