@@ -8,10 +8,10 @@ FROM secure:mozsecure:centos6:sha256 88cc1475bd58f6ff6f41d50b813c9998c4d3a7167a8
 
 RUN yum install -y createrepo gcc gettext make mercurial python-devel python-docutils rpm-build tar
 
-RUN hg clone http://selenic.com/repo/hg /hg
+RUN hg clone https://selenic.com/repo/hg /hg
 RUN mkdir /hg-packages
 
-ENV HG_VERSIONS 3.6.2
+ENV HG_VERSIONS 3.7.2
 
 ADD entrypoint.sh /entrypoint.sh
 ADD rpmserver.py /rpmserver.py
