@@ -371,6 +371,16 @@ def automationrelevancewebcommand(web, req, tmpl):
         return tmpl('error', error={'error': "missing parameter 'node'"})
 
     repo = web.repo
+    deletefields = set([
+        'bookmarks',
+        'branch',
+        'branches',
+        'changelogtag',
+        'child',
+        'inbranch',
+        'phase',
+        'tags',
+    ])
 
     csets = []
     for ctx in repo.set('automationrelevant(%r)', req.form['node'][0]):
@@ -382,10 +392,13 @@ def automationrelevancewebcommand(web, req, tmpl):
             # Don't even bother and just repopulate it.
             if k == 'files':
                 entry['files'] = sorted(ctx.files())
+            # "parent" is a generator in 3.6 and a lambda in 3.7+.
+            elif k == 'parent' and not isinstance(v, types.GeneratorType):
+                entry['parent'] = list(v())
             # These aren't interesting to us, so prune them. The
             # original impetus for this was because "changelogtag"
             # isn't part of the json template and adding it is non-trivial.
-            elif k in ('bookmarks', 'branches', 'changelogtag', 'child', 'inbranch', 'tags'):
+            elif k in deletefields:
                 del entry[k]
             elif isinstance(v, types.GeneratorType):
                 entry[k] = list(v)
