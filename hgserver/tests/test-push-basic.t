@@ -79,7 +79,10 @@ It got replicated to mirrors
   "tags": ["tip"],
   "user": "Test User \u003csomeone@example.com\u003e",
   "parents": [],
-  "phase": "public"
+  "phase": "public",
+  "pushid": 1,
+  "pushdate": [*, 0], (glob)
+  "pushuser": "user1@example.com"
   }
 
   $ http --no-headers ${HGWEB_1_URL}mozilla-central/json-rev/77538e1ce4be
@@ -94,7 +97,10 @@ It got replicated to mirrors
   "tags": ["tip"],
   "user": "Test User \u003csomeone@example.com\u003e",
   "parents": [],
-  "phase": "public"
+  "phase": "public",
+  "pushid": 1,
+  "pushdate": [*, 0], (glob)
+  "pushuser": "user1@example.com"
   }
 
 Pushlog should be replicated
