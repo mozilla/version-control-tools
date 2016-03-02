@@ -36,7 +36,7 @@
 <li><a href="{url|urlescape}help{sessionvars%urlparameter}">help</a></li>
 </ul>
 <div class="atom-logo">
-<a href="{url|urlescape}atom-log/{node|short}/{file|urlescape}" title="subscribe to atom feed">
+<a href="{url|urlescape}atom-log/tip/{file|urlescape}" title="subscribe to atom feed">
 <img class="atom-logo" src="{staticurl|urlescape}feed-icon-14x14.png" alt="atom feed" />
 </a>
 </div>
@@ -44,7 +44,10 @@
 
 <div class="main">
 <h2 class="breadcrumb"><a href="/">Mercurial</a> {pathdef%breadcrumb}</h2>
-<h3>log {file|escape}</h3>
+<h3>
+ log {file|escape} @ {rev}:<a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a>
+ {branch%changelogbranchname}{tags%changelogtag}{bookmarks%changelogtag}
+</h3>
 
 <form class="search" action="{url|urlescape}log">
 {sessionvars%hiddenformentry}
