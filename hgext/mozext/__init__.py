@@ -880,18 +880,20 @@ def revset_bug(repo, subset, x):
     except Exception:
         raise ParseError(err)
 
-    # We do a simple string test first because avoiding regular expressions
-    # is good for performance.
-    return [r for r in subset
-            if bugstring in repo[r].description() and
-                bug in parse_bugs(repo[r].description())]
+    def fltr(x):
+        # We do a simple string test first because avoiding regular expressions
+        # is good for performance.
+        desc = repo[x].description()
+        return bugstring in desc and bug in parse_bugs(desc)
+
+    return subset.filter(fltr)
 
 
 def revset_dontbuild(repo, subset, x):
     if x:
         raise ParseError(_('dontbuild() does not take any arguments'))
 
-    return [r for r in subset if 'DONTBUILD' in repo[r].description()]
+    return subset.filter(lambda x: 'DONTBUILD' in repo[x].description())
 
 
 def revset_me(repo, subset, x):
@@ -910,26 +912,21 @@ def revset_me(repo, subset, x):
     n = encoding.lower(me)
     kind, pattern, matcher = revset._substringmatcher(n)
 
-    revs = []
-
-    for r in subset:
-        ctx = repo[r]
+    def fltr(x):
+        ctx = repo[x]
         if matcher(encoding.lower(ctx.user())):
-            revs.append(r)
-            continue
+            return True
 
-        if ircnick in parse_reviewers(ctx.description()):
-            revs.append(r)
-            continue
+        return ircnick in parse_reviewers(ctx.description())
 
-    return revs
+    return subset.filter(fltr)
 
 
 def revset_nobug(repo, subset, x):
     if x:
         raise ParseError(_('nobug() does not take any arguments'))
 
-    return [r for r in subset if not parse_bugs(repo[r].description())]
+    return subset.filter(lambda x: not parse_bugs(repo[x].description()))
 
 
 def revset_tree(repo, subset, x):
@@ -950,7 +947,7 @@ def revset_tree(repo, subset, x):
     head = repo[ref].rev()
     ancestors = set(repo.changelog.ancestors([head], inclusive=True))
 
-    return [r for r in subset if r in ancestors]
+    return subset & revset.baseset(ancestors)
 
 
 def revset_firstpushdate(repo, subset, x):
@@ -960,20 +957,17 @@ def revset_firstpushdate(repo, subset, x):
     ds = revset.getstring(x, _('firstpushdate() requires a string'))
     dm = util.matchdate(ds)
 
-    revs = []
-
-    for rev in subset:
-        pushes = list(repo.changetracker.pushes_for_changeset(repo[rev].node()))
+    def fltr(x):
+        pushes = list(repo.changetracker.pushes_for_changeset(repo[x].node()))
 
         if not pushes:
-            continue
+            return False
 
         when = pushes[0][2]
 
-        if dm(when):
-            revs.append(rev)
+        return dm(when)
 
-    return revs
+    return subset.filter(fltr)
 
 
 def revset_firstpushtree(repo, subset, x):
@@ -986,19 +980,16 @@ def revset_firstpushtree(repo, subset, x):
     if not uri:
         raise util.Abort(_("Don't know about tree: %s") % tree)
 
-    revs = []
-
-    for rev in subset:
+    def fltr(x):
         pushes = list(repo.changetracker.pushes_for_changeset(
-            repo[rev].node()))
+            repo[x].node()))
 
         if not pushes:
-            continue
+            return False
 
-        if pushes[0][0] == tree:
-            revs.append(rev)
+        return pushes[0][0] == tree
 
-    return revs
+    return subset.filter(fltr)
 
 
 def revset_pushdate(repo, subset, x):
@@ -1010,17 +1001,16 @@ def revset_pushdate(repo, subset, x):
     ds = revset.getstring(x, _('pushdate() requires a string'))
     dm = util.matchdate(ds)
 
-    revs = []
-
-    for rev in subset:
-        for push in repo.changetracker.pushes_for_changeset(repo[rev].node()):
+    def fltr(x):
+        for push in repo.changetracker.pushes_for_changeset(repo[x].node()):
             when = push[2]
 
             if dm(when):
-                revs.append(rev)
-                break
+                return True
 
-    return revs
+        return False
+
+    return subset.filter(fltr)
 
 
 def revset_pushhead(repo, subset, x):
@@ -1076,7 +1066,7 @@ def revset_reviewer(repo, subset, x):
     """
     n = revset.getstring(x, _('reviewer() requires a string argument.'))
 
-    return [r for r in subset if n in parse_reviewers(repo[r].description())]
+    return subset.filter(lambda x: n in parse_reviewers(repo[x].description()))
 
 
 def revset_reviewed(repo, subset, x):
@@ -1086,7 +1076,7 @@ def revset_reviewed(repo, subset, x):
     if x:
         raise ParseError(_('reviewed() does not take an argument'))
 
-    return [r for r in subset if list(parse_reviewers(repo[r].description()))]
+    return subset.filter(lambda x: list(parse_reviewers(repo[x].description())))
 
 
 def template_bug(repo, ctx, **args):
