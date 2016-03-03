@@ -29,7 +29,7 @@ from reviewboard.reviews.signals import (
 )
 
 from mozreview.bugzilla.attachments import (
-    post_bugzilla_attachment,
+    update_bugzilla_attachments,
 )
 from mozreview.bugzilla.client import (
     Bugzilla,
@@ -284,14 +284,21 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
         # attachments will then, of course, be in a weird state, but that
         # should be fixed by the next successful publish.
         if using_bugzilla:
+            children_to_post = []
+            children_to_obsolete = []
+
             for child in child_rrs:
                 child_draft = child.get_draft(user=user)
 
                 if child_draft:
                     if child.id in discard_on_publish_rids:
-                        b.obsolete_review_attachments(
-                            bug_id, get_obj_url(child))
-                    post_bugzilla_attachment(b, bug_id, child_draft, child)
+                        children_to_obsolete.append(child)
+
+                    children_to_post.append((child_draft, child))
+
+            if children_to_post or children_to_obsolete:
+                update_bugzilla_attachments(b, bug_id, children_to_post,
+                                            children_to_obsolete)
 
         # Publish draft commits. This will already include items that are in
         # unpublished_rids, so we'll remove anything we publish out of
