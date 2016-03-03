@@ -855,10 +855,10 @@ def uisetup(ui):
     try:
         mq = extensions.find('mq')
         if mq is None:
-            ui.warn("mqext extension is mostly disabled when mq is disabled")
+            ui.debug("mqext extension is mostly disabled when mq is disabled\n")
             return
     except KeyError:
-        ui.warn("mqext extension is mostly disabled when mq is not installed")
+        ui.debug("mqext extension is mostly disabled when mq is not installed\n")
         return # mq not loaded at all
 
     # check whether mq is loaded before mqext. If not, do a nasty hack to set
@@ -913,13 +913,16 @@ def uisetup_post_mq(ui, mq):
     entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
                      ('M', 'mqmessage', '%a: %p <- %n%Q', 'commit message for patch folding')])
 
-def extsetup():
+def find_extension(ext):
     try:
-        crecord_ext = extensions.find('crecord')
-        if crecord_ext is None:
-            return  # crecord is not enabled; no need to handle qcrecord
+        return extensions.find(ext)
     except KeyError:
-        return  # crecord not loaded at all; no need to handle qcrecord
+        return
+
+def extsetup():
+    crecord_ext = find_extension('crecord')
+    if not crecord_ext:
+        return
 
     # check whether qcrecord is loaded before mqext. If not, do a nasty hack to
     # set it up first so that mqext can modify what it does and not have the
@@ -941,10 +944,12 @@ def deferred_extsetup(orig):
     extsetup_post_crecord()
 
 def extsetup_post_crecord():
-    crecord_ext = extensions.find('crecord')
-    entry = extensions.wrapcommand(crecord_ext.cmdtable, 'qcrecord', qcrecord_wrapper)
-    entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
-                     ('M', 'mqmessage', '%a: %p%Q', 'commit message for patch creation')])
+    crecord_ext = find_extension('crecord')
+    mq_ext = find_extension('mq')
+    if crecord_ext and mq_ext:
+        entry = extensions.wrapcommand(crecord_ext.cmdtable, 'qcrecord', qcrecord_wrapper)
+        entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
+                         ('M', 'mqmessage', '%a: %p%Q', 'commit message for patch creation')])
 
 
 def prechangegroup_hook(ui, repo, source=None, **kwargs):
