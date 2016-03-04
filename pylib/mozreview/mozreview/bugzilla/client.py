@@ -8,10 +8,12 @@ import xmlrpclib
 
 from urlparse import urlparse, urlunparse
 
+from django.contrib.auth.models import User
 from djblets.siteconfig.models import SiteConfiguration
 from djblets.util.decorators import simple_decorator
 
 from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
+from mozreview.bugzilla.models import get_or_create_bugzilla_users
 from mozreview.bugzilla.transports import bugzilla_transport
 
 from mozautomation.commitparser import replace_reviewers
@@ -338,6 +340,15 @@ class Bugzilla(object):
             'include_fields': self.user_fields
         })
         return self.proxy.User.get(params)
+
+    @xmlrpc_to_bugzilla_errors
+    def get_user_from_irc_nick(self, irc_nick):
+        irc_nick = irc_nick.lstrip(":").lower()
+        users = get_or_create_bugzilla_users(self.query_users(":" + irc_nick))
+        for user in users:
+            if user.username.lower() == irc_nick:
+                return user
+        raise User.DoesNotExist()
 
     @xmlrpc_to_bugzilla_errors
     def post_comment(self, bug_id, comment):

@@ -32,6 +32,7 @@ FIRST_PUBLIC_ANCESTOR_KEY = MOZREVIEW_KEY + '.first_public_ancestor'
 IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
 SQUASHED_KEY = MOZREVIEW_KEY + '.is_squashed'
 UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
+PUBLISH_AS_KEY = MOZREVIEW_KEY + '.publish_as'
 
 # CommitData fields which should be automatically copied from
 # draft_extra_data to extra_data when a review request is published.
@@ -207,3 +208,24 @@ def update_parent_rr_reviewers(parent_rr_draft):
             parent_rr_draft.changedesc = ChangeDescription.objects.create()
 
         parent_rr_draft.save()
+
+
+def set_publish_as(parent_rr, user, commit_data=None):
+    """Set PUBLISH_AS to the specified user.
+
+    When the specified review request is published, updates to Bugzilla
+    will be performed as the specified user.
+    """
+    commit_data = fetch_commit_data(parent_rr, commit_data)
+    commit_data.draft_extra_data.update({
+        PUBLISH_AS_KEY: user.id
+    })
+    commit_data.save(update_fields=['draft_extra_data'])
+
+
+def clear_publish_as(parent_rr, commit_data=None):
+    """Clears a previously set PUBLISH_AS."""
+    commit_data = fetch_commit_data(parent_rr, commit_data)
+    if PUBLISH_AS_KEY in commit_data.draft_extra_data:
+        del commit_data.draft_extra_data[PUBLISH_AS_KEY]
+        commit_data.save(update_fields=['draft_extra_data'])

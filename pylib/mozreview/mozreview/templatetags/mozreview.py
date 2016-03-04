@@ -57,8 +57,12 @@ def scm_level(mozreview_profile):
         return ''
     elif mozreview_profile.has_scm_ldap_group('scm_level_3'):
         return '3'
+    elif mozreview_profile.has_scm_ldap_group('scm_level_2'):
+        return '2'
     elif mozreview_profile.has_scm_ldap_group('scm_level_1'):
         return '1'
+    else:
+        return ''
 
 
 @register.filter()

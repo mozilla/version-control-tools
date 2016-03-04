@@ -82,3 +82,8 @@ AUTOLAND_REVIEW_NOT_APPROVED = WebAPIError(
     1008,
     "Unable to continue as the review has not been approved.",
     http_status=405)  # 405 Method Not Allowed
+
+REVIEW_REQUEST_UPDATE_NOT_ALLOWED = WebAPIError(
+    1009,
+    "Updating review request not allowed at this time.",
+    http_status=405)  # 405 Method not Allowed

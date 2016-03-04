@@ -790,3 +790,53 @@ class ReviewBoardCommands(object):
             result['commits'].append(d)
 
         print(yaml.safe_dump(result, default_flow_style=False).rstrip())
+
+    @Command('modify-reviewers', category='reviewboard',
+             description='Update reviewers on a child review request')
+    @CommandArgument('parent_rrid', help='Parent review request id')
+    @CommandArgument('child_rrid', help='Child review request id')
+    @CommandArgument('reviewers', help='Comma delimited list of reviewers')
+    def modify_reviewers(self, parent_rrid, child_rrid, reviewers):
+        from rbtools.api.errors import APIError
+        import json
+        c = self._get_client()
+        try:
+            r = c.get_path('/extensions/mozreview.extension.MozReviewExtension'
+                           '/modify-reviewers/')
+            reviewers = {child_rrid: reviewers.split(',')}
+            r.create(parent_request_id=parent_rrid,
+                     reviewers=json.dumps(reviewers))
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                                             e.rsp['err']['msg']))
+            return 1
+
+    @Command('verify-reviewers', category='reviewboard',
+             description='Update reviewers on a child review request')
+    @CommandArgument('reviewers', help='Comma delimited list of reviewers')
+    def verify_reviewers(self, reviewers):
+        from rbtools.api.errors import APIError
+        c = self._get_client()
+        try:
+            r = c.get_path('/extensions/mozreview.extension.MozReviewExtension'
+                           '/verify-reviewers/')
+            r.create(reviewers=reviewers)
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                                             e.rsp['err']['msg']))
+            return 1
+
+    @Command('ensure-drafts', category='reviewboard',
+             description='Create drafts on all review request children')
+    @CommandArgument('parent_rrid', help='Parent review request id')
+    def ensure_drafts(self, parent_rrid):
+        from rbtools.api.errors import APIError
+        c = self._get_client()
+        try:
+            r = c.get_path('/extensions/mozreview.extension.MozReviewExtension'
+                           '/ensure-drafts/')
+            r.create(parent_request_id=parent_rrid)
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                                             e.rsp['err']['msg']))
+            return 1

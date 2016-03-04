@@ -13,18 +13,18 @@ $(document).ready(function() {
     return;
   }
 
-  // The current user's scm level has been injected in an invisible div.
-  MozReview.scmLevel = $("#scm-level").data("scm-level");
+  // Load injected user data>
+  var $userData = $("#user_data");
+  MozReview.scmLevel = $userData.data("scm-level");
   MozReview.hasScmLevel1 = MozReview.scmLevel >= 1;
   MozReview.hasScmLevel3 = MozReview.scmLevel == 3;
+  MozReview.isSubmitter = !!$userData.data("is-submitter");
 
   // Whether or not the repository has associated try and landing repositories
   // is in an invisible div.
   MozReview.autolandingToTryEnabled = $("#repository").data("autolanding-to-try-enabled");
   MozReview.autolandingEnabled = $("#repository").data("autolanding-enabled");
   MozReview.landingRepository = $("#repository").data("landing-repository");
-
-  console.log("Found parent review request ID: " + parentID);
 
   var page = RB.PageManager.getPage();
 
@@ -44,8 +44,7 @@ $(document).ready(function() {
 
   MozReview.currentIsMutableByUser = pageEditor.get("mutableByUser");
   MozReview.isParent = (parentID == pageReviewRequest.id);
-  MozReview.parentEditor = MozReview.isParent ? pageEditor
-                                              : null;
+  MozReview.reviewEditor = pageEditor;
   MozReview.parentView = MozReview.isParent ? pageView
                                             : null;
 

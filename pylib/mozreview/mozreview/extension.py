@@ -85,8 +85,17 @@ from mozreview.resources.commit_data import (
 from mozreview.resources.commit_rewrite import (
     commit_rewrite_resource,
 )
+from mozreview.resources.ensure_drafts import (
+    ensure_drafts_resource,
+)
+from mozreview.resources.modify_reviewer import (
+    modify_reviewer_resource,
+)
 from mozreview.resources.review_request_summary import (
     review_request_summary_resource,
+)
+from mozreview.resources.verify_reviewer import (
+    verify_reviewer_resource,
 )
 from mozreview.signal_handlers import (
     initialize_signal_handlers,
@@ -177,10 +186,13 @@ class MozReviewExtension(Extension):
         bugzilla_api_key_login_resource,
         commit_data_resource,
         commit_rewrite_resource,
+        ensure_drafts_resource,
         file_diff_reviewer_resource,
         ldap_association_resource,
+        modify_reviewer_resource,
         review_request_summary_resource,
         try_autoland_trigger_resource,
+        verify_reviewer_resource,
     ]
 
     middleware = [
@@ -280,7 +292,7 @@ class MozReviewExtension(Extension):
         TemplateHook(self, 'after-login-form',
                      'mozreview/after-login-form.html', apply_to=['login'])
         TemplateHook(self, 'base-after-content',
-                     'mozreview/scm_level.html')
+                     'mozreview/user-data.html')
         TemplateHook(self, 'base-after-content',
                      'mozreview/repository.html')
         TemplateHook(self, 'base-after-content',

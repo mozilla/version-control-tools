@@ -4,6 +4,9 @@ import copy
 import json
 import logging
 
+from django.contrib.auth.models import (
+    User,
+)
 from django.db.models.signals import (
     post_save,
     pre_delete,
@@ -14,6 +17,7 @@ from djblets.siteconfig.models import (
     SiteConfiguration,
 )
 from reviewboard.reviews.errors import (
+    NotModifiedError,
     PublishError,
 )
 from reviewboard.extensions.hooks import (
@@ -60,6 +64,7 @@ from mozreview.extra_data import (
     REVIEWID_RE,
     REVIEW_FLAG_KEY,
     UNPUBLISHED_KEY,
+    PUBLISH_AS_KEY,
     update_parent_rr_reviewers,
 )
 from mozreview.messages import (
@@ -266,7 +271,13 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
         siteconfig.settings.get("auth_backend", "builtin") == "bugzilla")
 
     if using_bugzilla:
-        b = Bugzilla(get_bugzilla_api_key(user))
+        commit_data = fetch_commit_data(review_request_draft)
+        publish_as_id = commit_data.draft_extra_data.get(PUBLISH_AS_KEY)
+        if publish_as_id:
+            u = User.objects.get(id=publish_as_id)
+            b = Bugzilla(get_bugzilla_api_key(u))
+        else:
+            b = Bugzilla(get_bugzilla_api_key(user))
 
         try:
             if b.is_bug_confidential(bug_id):
@@ -329,6 +340,11 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                                                   weak=False)
                 try:
                     child.publish(user=user)
+                except NotModifiedError:
+                    # As we create empty drafts as part of allowing reviewer
+                    # delegation, delete these empty drafts instead of
+                    # throwing an error.
+                    child.get_draft(user=user).delete()
                 finally:
                     commit_request_publishing.disconnect(
                         receiver=approve_publish,

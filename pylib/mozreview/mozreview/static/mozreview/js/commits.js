@@ -24,138 +24,367 @@
  */
 
 $(document).on("mozreview_ready", function() {
-  if (!MozReview.isParent) {
-    // At this time, there's no need to set up the editors for the reviewers if
-    // we're not looking at the parent review request.
+  if (!RB.UserSession.instance.get("username")) {
     return;
   }
 
-  console.assert(MozReview.parentEditor, "We should have a parent commit editor");
-  console.assert(MozReview.parentView, "We should have a parent commit editor view");
-
-  /**
-   * A not-amazing error reporting mechanism that depends on a DOM
-   * node with ID "error-container" existing on the page somewhere.
-   */
-  var $ErrorContainer = $("#error-container");
-  function reportError(aMsg) {
-    if (typeof(aMsg) == "object") {
-      if (aMsg.errorText) {
-        aMsg = aMsg.errorText;
-      } else {
-        aMsg = JSON.stringify(aMsg, null, "\t");
+  // Simple case-insensitive array of strings comparison
+  function arraysEqualsCI(a, b) {
+    var i = a.length;
+    if (i != b.length) {
+      return false;
+    }
+    while (i--) {
+      if (a[i].toLowerCase() != b[i].toLowerCase()) {
+        return false;
       }
     }
+    return true;
+   }
 
-    $("#error-info").text(aMsg);
-    $("#error-stack").text(new Error().stack);
-    $ErrorContainer.attr("haserror", "true");
-    RB.PageManager.getPage().reviewRequestEditorView._scheduleResizeLayout();
+  function showError(errorMessage, xhr) {
+    if (xhr && xhr.responseJSON && xhr.responseJSON.err) {
+      errorMessage = xhr.responseJSON.err.msg;
+    }
+    $("#review-request-warning")
+      .delay(6000)
+      .fadeOut(400, function() {
+        $(this).hide();
+      })
+      .show()
+      .text(errorMessage);
   }
 
   $("#error-close").click(function() {
-    $ErrorContainer.attr("haserror", "false");
+    $("#error-container").attr("haserror", "false");
   });
 
   $("#error-stack-toggle").click(function() {
     $("#error-stack").toggle();
   });
 
-  // Hook up the inline editor for each commit's reviewer list. This inline editor
-  // code is mostly copied from Review Board itself - please see the copyright
-  // notice in the header.
-  var editorOptions = {
-    editIconClass: "rb-icon rb-icon-edit",
-    useEditIconOnly: true,
-    enabled: true
-  };
+  /*
+   * Review Board only allows the review request submitter to change the
+   * target reviewers.  As MozReview wants to allow 'anyone' to change the
+   * reviewers, we expose the editor to all users (Bugzilla will perform the
+   * permissions check for us).
+   *
+   * In order for this to work correctly there are two separate paths depending
+   * on if the user is the submitter or not.
+   *
+   * Submitters use Review Board's normal draft mechanism, with a small tweak
+   * that creates a draft on all children when any reviewers are updated.  This
+   * causes Review Board to show the draft banner when viewing any review
+   * request in the series.
+   *
+   * Non-submitters can't use a normal draft, as a review request can only have
+   * one, and it's used by the submitter.  Instead we create a client-side
+   * fake draft in local storage, and display a fake draft banner above the
+   * commits table.
+   */
 
-  var reviewerList = $(".mozreview-child-reviewer-list");
-  var editors = {};
+  //
+  // Local Drafts
+  //
 
-  if (MozReview.currentIsMutableByUser) {
-  var reviewerListEditors = reviewerList
-    .inlineEditor(editorOptions)
-    .on({
-      beginEdit: function() {
-        // The editCount is used to determine if we should warn the user before
-        // unloading the page because they still have an editor open.
-        console.log("beginning edit " + $(this).data("id"));
-        MozReview.parentEditor.incr("editCount");
+  function getLocalDraft() {
+    var localDrafts = window.localStorage.localDrafts ?
+      JSON.parse(window.localStorage.localDrafts) : {};
+    var parent_rrid = $("#mozreview-parent-request").data("id");
+    return localDrafts[parent_rrid] ? localDrafts[parent_rrid] : {};
+  }
+
+  function setLocalDraft(draft) {
+    var localDrafts = window.localStorage.localDrafts ?
+      JSON.parse(window.localStorage.localDrafts) : {};
+    var parent_rrid = $("#mozreview-parent-request").data("id");
+    if (draft) {
+      localDrafts[parent_rrid] = draft;
+    }
+    else {
+      delete localDrafts[parent_rrid];
+    }
+    window.localStorage.localDrafts = JSON.stringify(localDrafts);
+  }
+
+  function hasLocalDraft() {
+    return Object.keys(getLocalDraft()).length !== 0;
+  }
+
+  function publishLocalDraft() {
+    if (!hasLocalDraft()) {
+      discardLocalDraft();
+      return;
+    }
+    var draft = getLocalDraft();
+    RB.setActivityIndicator(true, {});
+    $.ajax({
+      type: "POST",
+      data: {
+        parent_request_id: $("#mozreview-parent-request").data("id"),
+        reviewers: JSON.stringify(draft)
       },
-      cancel: function() {
-        MozReview.parentEditor.decr("editCount");
+      url: "/api/extensions/mozreview.extension.MozReviewExtension/modify-reviewers/",
+      success: function(rsp) {
+        discardLocalDraft(true);
+        window.location.reload(true);
       },
-      complete: function(e, value) {
-        // The ReviewRequestEditor is the interface that we use to modify
-        // a review request easily.
-        var editor, reviewRequest;
-        var id = $(this).data("id");
-        if (!editors[id]) {
-          reviewRequest = new RB.ReviewRequest({id: $(this).data("id")});
-          editor = new RB.ReviewRequestEditor({reviewRequest: reviewRequest});
-          editors[id] = editor;
-        } else {
-          editor = editors[id];
-        }
-
-        var originalContents = $(this).text();
-
-        var warning = $("#review-request-warning");
-        // For Mozilla, we sometimes use colons as a prefix for searching for
-        // IRC nicks - that's just a convention that has developed over time.
-        // Since IRC nicks are what MozReview recognizes, we need to be careful
-        // that the user hasn't actually included those colon prefixes, otherwise
-        // MozReview is going to complain that it doesn't recognize the user (since
-        // MozReview's notion of a username doesn't include the colon prefix).
-        var sanitized = value.split(" ").map(function(aName) {
-          var trimmed = aName.trim();
-          if (trimmed.indexOf(":") == 0) {
-            trimmed = trimmed.substring(1);
-          }
-          return trimmed;
-        });
-
-        // This sets the reviewers on the child review request.
-        editor.setDraftField(
-          "targetPeople",
-          sanitized.join(", "),
-          {
-            jsonFieldName: "target_people",
-            error: function(error) {
-              MozReview.parentEditor.decr("editCount");
-              console.error(error.errorText);
-
-              // This error display code is copied pretty much verbatim
-              // from Review Board core to match the behaviour of attempting
-              // to set a target reviewer to one or more users that does not
-              // exist.
-              warning
-                .delay(6000)
-                .fadeOut(400, function() {
-                  $(this).hide();
-                })
-                .show()
-                .html(error.errorText);
-
-              // Revert the list back to what we started with.
-              $(this).text(originalContents);
-            },
-            success: function() {
-              MozReview.parentEditor.decr("editCount");
-              MozReview.parentEditor.set('public', false);
-              // Our draft relies on a field that isn't part of RB's front-end
-              // model, so changes aren't picked up by the model automatically.
-              // Manually record a draft exists so the banner will be displayed.
-              var view = RB.PageManager.getPage().reviewRequestEditorView;
-              view.model.set("hasDraft", true);
-
-              MozReview.parentEditor.trigger('saved');
-
-            }
-          }, this);
+      error: function(xhr, textStatus, errorThrown) {
+        RB.setActivityIndicator(false, {});
+        showError(errorThrown, xhr);
       }
     });
+  }
+
+  function discardLocalDraft(silent) {
+    setLocalDraft(undefined);
+    if (!silent) {
+      $(".mozreview-child-reviewer-list").each(function() {
+        restoreOriginalReviewerState($(this));
+      });
+      hideLocalDraftBanner();
+    }
+  }
+
+  function restoreLocalDraftState($reviewer_list) {
+    var draft = getLocalDraft();
+    if (!$reviewer_list) {
+      $reviewer_list = $(".mozreview-child-reviewer-list");
+    }
+    $reviewer_list.each(function() {
+      var $this = $(this);
+      var rrid = $this.data("id");
+      if (draft[rrid]) {
+        saveOriginalReviewerState($this);
+        $this.html(draft[rrid].join(", "));
+      }
+    });
+  }
+
+  function showLocalDraftBanner() {
+    if (!hasLocalDraft()) {
+      $("#local-draft-banner").remove();
+      return;
+    }
+    if ($("#local-draft-banner").length) {
+      return;
+    }
+    $("<div/>")
+      .attr("id", "local-draft-banner")
+      .addClass("banner")
+      .addClass("box-inner")
+      .append(
+        $("<p>")
+          .text("You have pending changes to this review.")
+      )
+      .append(
+        $("<span/>")
+          .addClass("banner-actions")
+          .append(
+            $("<input/>")
+              .attr("type", "button")
+              .addClass("publish-button")
+              .val("Publish")
+              .click(function(event) {
+                event.preventDefault();
+                publishLocalDraft();
+              })
+          )
+          .append(" ")
+          .append(
+            $("<input/>")
+              .attr("type", "button")
+              .addClass("discard-button")
+              .val("Discard")
+              .click(function(event) {
+                event.preventDefault();
+                discardLocalDraft();
+              })
+          )
+      )
+      .insertBefore("#mozreview-child-requests");
+      RB.PageManager.getPage().reviewRequestEditorView._scheduleResizeLayout();
+  }
+
+  function hideLocalDraftBanner() {
+    $("#local-draft-banner").remove();
+    RB.PageManager.getPage().reviewRequestEditorView._scheduleResizeLayout();
+  }
+
+  function saveOriginalReviewerState($reviewer_list) {
+    if (!$reviewer_list.data("orig-html")) {
+      $reviewer_list.data("orig-html", $reviewer_list.html().trim());
+      var reviewers = $reviewer_list.find(".reviewer-name")
+                                    .map(function() { return $(this).text(); })
+                                    .sort();
+      $reviewer_list.data("orig-reviewers", $.makeArray(reviewers));
+    }
+  }
+
+  function restoreOriginalReviewerState($reviewer_list) {
+    if ($reviewer_list.data("orig-html")) {
+      $reviewer_list.html($reviewer_list.data("orig-html"));
+    }
+  }
+
+  function ensureNativeDrafts() {
+    RB.setActivityIndicator(true, {});
+    $.ajax({
+      type: "POST",
+      data: {
+        parent_request_id: $("#mozreview-parent-request").data("id")
+      },
+      url: "/api/extensions/mozreview.extension.MozReviewExtension/ensure-drafts/",
+      success: function(rsp) {
+        RB.setActivityIndicator(false, {});
+      },
+      error: function(xhr, textStatus, errorThrown) {
+        RB.setActivityIndicator(false, {});
+        showError(errorThrown, xhr);
+      }
+    });
+  }
+
+  function augmentNativeBanner() {
+    if (!MozReview.isParent) {
+      // Unfortunately we cannot publish from children, so provide a link
+      // to the parent instead.
+      var parent_rrid = $("#mozreview-parent-request").data("id");
+      $("#draft-banner").append(
+          $('<a href="../' + parent_rrid + '/" title="You can only Publish or Discard when ' +
+            'viewing the \'Review Summary / Parent\'.">Publish or Discard my changes.</a>'));
+    }
+  }
+
+  var editors = {};
+
+  function updateReviewers($reviewer_list, value) {
+    var rrid = $reviewer_list.data("id");
+
+    // Parse updated reviewer list.
+    var reviewers = value.split(/[ ,]+/)
+      .map(function(name) {
+        name = name.trim();
+        if (name.substr(name, 0, 1) === ":") {
+          name = name.substring(1);
+        }
+        return name;
+      })
+      .filter(function(name) {
+        return name !== "";
+      })
+      .sort();
+
+
+    // No need to do anything if nothing is changed.
+    if (arraysEqualsCI($reviewer_list.data("orig-reviewers"), reviewers)) {
+      $reviewer_list.html($reviewer_list.data("orig-html"));
+      return;
+    }
+
+    // TODO retain reviewer background status colour after an edit
+    $reviewer_list.text(reviewers.join(" , "));
+
+    if (MozReview.isSubmitter) {
+      // When the submitter updates reviewers, use RB's native drafts.
+      var editor;
+      if (!editors[rrid]) {
+        var rr = new RB.ReviewRequest({ id: rrid });
+        editor = new RB.ReviewRequestEditor({ reviewRequest: rr });
+        editors[rrid] = editor;
+      } else {
+        editor = editors[rrid];
+      }
+
+      editor.setDraftField(
+        "targetPeople",
+        reviewers.join(","),
+        {
+          jsonFieldName: "target_people",
+          error: function(error) {
+            showError(error.errorText);
+            restoreOriginalReviewerState($reviewer_list);
+          },
+          success: function() {
+            MozReview.reviewEditor.set("public", false);
+            // Our draft relies on a field that isn't part of RB's front-end
+            // model, so changes aren't picked up by the model automatically.
+            // Manually record a draft exists so the banner will be displayed.
+            var view = RB.PageManager.getPage().reviewRequestEditorView;
+            view.model.set("hasDraft", true);
+            MozReview.reviewEditor.trigger("saved");
+            // Extend the draft to encompass the parent and all children, so
+            // the draft banner is visible on all review requests in the set.
+            ensureNativeDrafts();
+            augmentNativeBanner();
+          }
+        }, this);
+
+    } else {
+      // Otherwise use our local draft.
+
+      RB.setActivityIndicator(true, {});
+      $.ajax({
+        type: "POST",
+        data: { reviewers: reviewers.join(",") },
+        url: "/api/extensions/mozreview.extension.MozReviewExtension/verify-reviewers/",
+        success: function(rsp) {
+          RB.setActivityIndicator(false, {});
+          // All reviewrs ok - create fake draft in localStorage.
+          var localDraft = getLocalDraft();
+          localDraft[rrid] = reviewers;
+          setLocalDraft(localDraft);
+          showLocalDraftBanner();
+        },
+        error: function(xhr, textStatus, errorThrown) {
+          RB.setActivityIndicator(false, {});
+          restoreLocalDraftState($reviewer_list);
+          showError(errorThrown, xhr);
+        }
+      });
+    }
+  }
+
+  $(".mozreview-child-reviewer-list")
+    .inlineEditor({
+      editIconClass: "rb-icon rb-icon-edit",
+      useEditIconOnly: true,
+      enabled: true,
+      setFieldValue: function(editor, value) {
+        editor._field.val(value.trim());
+      }
+    })
+    .on({
+      beginEdit: function() {
+        $reviewer_list = $(this);
+        // Store the original html and reviewer list so we can restore later.
+        saveOriginalReviewerState($reviewer_list);
+        // store the current edit to support cancelling
+        $reviewer_list.data("prior", $reviewer_list.html());
+        // Inc editCount to enable "leave this page" warning.
+        MozReview.reviewEditor.incr("editCount");
+      },
+      cancel: function() {
+        $reviewer_list = $(this);
+        // restoreOriginalReviewerState($reviewer_list);
+        $reviewer_list.html($reviewer_list.data("prior"));
+        $reviewer_list.data("prior", "");
+        MozReview.reviewEditor.decr("editCount");
+      },
+      complete: function(e, value) {
+        $reviewer_list = $(this);
+        $reviewer_list.data("prior", "");
+        MozReview.reviewEditor.decr("editCount");
+        updateReviewers($reviewer_list, value);
+      }
+    });
+
+  // Update UI if there's an existing draft.
+  if (MozReview.isSubmitter) {
+    augmentNativeBanner();
+  } else if (hasLocalDraft()) {
+    showLocalDraftBanner();
+    restoreLocalDraftState();
   }
 
   // This next bit sets up the autocomplete popups for reviewers. This
@@ -200,10 +429,8 @@ $(document).on("mozreview_ready", function() {
     formatItem: function(data) {
       var s = data[acOptions.nameKey];
       if (acOptions.descKey && data[acOptions.descKey]) {
-        s += ' <span>(' + _.escape(data[acOptions.descKey]) +
-             ')</span>';
+        s += " <span>(" + _.escape(data[acOptions.descKey]) + ")</span>";
       }
-
       return s;
     },
     matchCase: false,
@@ -229,18 +456,12 @@ $(document).on("mozreview_ready", function() {
       return parsed;
     },
     url: SITE_ROOT +
-         "api/" + (acOptions.resourceName || acOptions.fieldName) + '/',
+         "api/" + (acOptions.resourceName || acOptions.fieldName) + "/",
     extraParams: acOptions.extraParams,
     cmp: acOptions.cmp,
     width: 350,
     error: function(xhr) {
-      var text;
-      try {
-        text = $.parseJSON(xhr.responseText).err.msg;
-      } catch (e) {
-        text = 'HTTP ' + xhr.status + ' ' + xhr.statusText;
-      }
-      reportError(text);
+      showError(xhr.statusText, xhr);
     }
   }).on("autocompleteshow", function() {
     /*
@@ -253,14 +474,13 @@ $(document).on("mozreview_ready", function() {
      * a footer.
      */
 
-    var resultsPane = $('.ui-autocomplete-results:not(' +
-                        ':has(.ui-autocomplete-footer))');
+    var resultsPane = $(".ui-autocomplete-results:not(" +
+                        ":has(.ui-autocomplete-footer))");
     if (resultsPane.length > 0) {
-      $('<div/>')
-        .addClass('ui-autocomplete-footer')
-        .text(gettext('Press Tab to auto-complete.'))
+      $("<div/>")
+        .addClass("ui-autocomplete-footer")
+        .text(gettext("Press Tab to auto-complete."))
         .appendTo(resultsPane);
     }
   });
-
 });
