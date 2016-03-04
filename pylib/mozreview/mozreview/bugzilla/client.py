@@ -143,12 +143,11 @@ class BugzillaAttachmentUpdates(object):
             })
 
         if rb_attachment:
-            params['ids'] = [rb_attachment['id']]
+            params['attachment_id'] = rb_attachment['id']
 
             if rb_attachment['is_obsolete']:
                 params['is_obsolete'] = False
         else:
-            params['ids'] = [self.bug_id]
             params['data'] = url
             params['content_type'] = 'text/x-review-board-request'
 
@@ -169,31 +168,53 @@ class BugzillaAttachmentUpdates(object):
         This is called when review requests are discarded or deleted. We don't
         want to leave any lingering references in Bugzilla.
         """
-        params = {'ids': [], 'is_obsolete': True}
-
         self._update_attachments()
 
         for a in self.attachments:
             if (self.bugzilla._rb_attach_url_matches(a.get('data'), rb_url) and
                     not a.get('is_obsolete')):
-                params['ids'].append(a['id'])
-
-        if params['ids']:
-            logger.info('Obsoleting attachments on bug %d: %s' % (
-                        self.bug_id, params['ids']))
-            self.updates.append(params)
+                logger.info('Obsoleting attachment %s on bug %d:' % (
+                            a['id'], self.bug_id))
+                self.updates.append({
+                    'attachment_id': a['id'],
+                    'is_obsolete': True
+                })
 
     @xmlrpc_to_bugzilla_errors
     def do_updates(self):
-        for params in self.creates:
-            self.bugzilla.proxy.Bug.add_attachment(
-                self.bugzilla._auth_params(params))
-            self.creates = self.creates[1:]
+        logger.info('Doing attachment updates for bug %s' % self.bug_id)
+        params = self.bugzilla._auth_params({
+            'bug_id': self.bug_id,
+            'attachments': self.creates + self.updates,
+        })
 
-        for params in self.updates:
-            self.bugzilla.proxy.Bug.update_attachment(
-                self.bugzilla._auth_params(params))
-            self.updates = self.updates[1:]
+        results = self.bugzilla.proxy.MozReview.attachments(params)
+
+        # The above Bugzilla call is wrapped in a single database transaction
+        # and should thus either succeed in creating and updating all
+        # attachments or will throw an exception and roll back all changes.
+        # However, just to be sure, we check the results.  There's not much
+        # we can do in this case, but we'll log an error for investigative
+        # purposes.
+        # TODO: Display an error in the UI (no easy way to do this without
+        # failing the publish).
+
+        ids_to_update = set(u['attachment_id'] for u in self.updates)
+        ids_to_update.difference_update(results['attachments_modified'].keys())
+
+        if ids_to_update:
+            logger.error('Failed to update the following attachments: %s' %
+                         ids_to_update)
+
+        num_to_create = len(self.creates)
+        num_created = len(results['attachments_created'])
+
+        if num_to_create != num_created:
+            logger.error('Tried to create %s attachments but %s reported as '
+                         'created.' % (num_to_create, num_created))
+
+        self.creates = []
+        self.updates = []
 
     def _update_attachments(self):
         if not self.attachments:
