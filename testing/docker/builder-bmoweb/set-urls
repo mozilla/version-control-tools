@@ -5,22 +5,29 @@
 
 from __future__ import print_function, unicode_literals
 
-import os
+import hashlib
 import sys
 
 import psutil
 
 pf = '/var/lib/bugzilla/bugzilla/data/params'
 
-rburl = sys.argv[1]
+mr_url = sys.argv[1]
+mr_cb_url = '%smozreview/bmo_auth_callback/' % mr_url
+
+# MozReview app ID is the SHA of the callback URL + key description
+# ("mozreview").  This is needed to use MozReview-specific BMO APIs.
+mr_app_id = hashlib.sha256('%smozreview' % mr_cb_url).hexdigest()
 
 params_lines = open(pf, 'r').readlines()
 with open(pf, 'w') as fh:
     for line in params_lines:
         if "'mozreview_base_url' =>" in line:
-            line = "           'mozreview_base_url' => '%s',\n" % rburl
+            line = "           'mozreview_base_url' => '%s',\n" % mr_url
         elif "'mozreview_auth_callback_url' =>" in line:
-            line = "           'mozreview_auth_callback_url' => '%smozreview/bmo_auth_callback/',\n" % rburl
+            line = "           'mozreview_auth_callback_url' => '%s',\n" % mr_cb_url
+        elif "'mozreview_app_id' =>" in line:
+            line = "           'mozreview_app_id' => '%s',\n" % mr_app_id
 
         fh.write(line)
 
