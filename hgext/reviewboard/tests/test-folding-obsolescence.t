@@ -66,22 +66,15 @@
   $ hg commit -A -m 'Bug 1 - Foo 5'
   adding foo5
 
-  $ hg histedit 0b3e14fe3ff1 --commands - 2>&1 <<EOF
+  $ cat > commands << EOF
   > pick 0b3e14fe3ff1 Foo 1
   > fold 713878e22d95 Foo 3
   > pick bce658a3f6d6 Foo 2
   > fold 4d0f846364eb Foo 4
   > pick 4e50148c492d Foo 5
   > EOF
-  0 files updated, 0 files merged, 4 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 2 files removed, 0 files unresolved
-  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 2 files removed, 0 files unresolved
-  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg histedit 0b3e14fe3ff1 --commands commands | grep -v 'files updated'
+  [1]
 
   $ rbmanage publish 1
   $ hg push --config reviewboard.autopublish=false

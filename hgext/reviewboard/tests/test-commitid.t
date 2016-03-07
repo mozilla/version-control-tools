@@ -85,10 +85,7 @@ Histedit should preserve commit ids when changesets are updated
   > p bb89e4592815
   > EOF
 
-  $ hg histedit -r 4a17019033eb --commands commands
-  1 files updated, 0 files merged, 1 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg histedit -r 4a17019033eb --commands commands | grep -v 'files updated'
   saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/bb89e4592815-c4460a5c-backup.hg (glob)
 
   $ hg log -G -T '{rev}:{node|short} {desc}\n' -r '::.'
