@@ -39,7 +39,7 @@ Create and publish a review for SnarkBot
   $ echo foo2 > foo2
   $ hg add foo2
   $ hg commit -m 'Bug 1 - Foo 2'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/a4f23bfb8f88-0ce7b28d-addcommitid.hg (glob)

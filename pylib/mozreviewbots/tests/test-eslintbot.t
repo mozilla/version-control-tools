@@ -38,7 +38,7 @@ Create a review request with some busted Javascript in it
   adding .eslintrc
   adding mach
   adding test.js
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
   $ rbmanage publish 1
 
   $ python -m eslintbot --config-path ../eslintbot.ini

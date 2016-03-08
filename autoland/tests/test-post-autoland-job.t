@@ -18,7 +18,7 @@ Create a commit to test on Try
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - some stuff; r?cthulhu'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/633b0929fc18-25aef645-addcommitid.hg (glob)
@@ -85,7 +85,7 @@ Post a job using a bookmark
 
   $ echo foo2 > foo
   $ hg commit -m 'Bug 1 - more goodness; r?cthulhu'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -120,7 +120,7 @@ Post a job with unicode commit descriptions to be rewritten
 
   $ echo foo3 > foo
   $ hg commit --encoding utf-8 -m 'Bug 1 - こんにちは; r?cthulhu'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets

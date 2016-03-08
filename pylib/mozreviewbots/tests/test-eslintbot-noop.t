@@ -33,7 +33,7 @@ Create a review request that doesn't touch any Javascript files
   $ bugzilla create-bug TestProduct TestComponent bug1
   $ echo irrelevant > foo
   $ hg commit -m 'Bug 1 - No Javascript changes'
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
   $ rbmanage publish 1
 
   $ python -m eslintbot --config-path ../eslintbot.ini

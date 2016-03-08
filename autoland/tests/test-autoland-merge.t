@@ -18,7 +18,7 @@ Create a commit to test on Try
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - some stuff; r?cthulhu'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/633b0929fc18-25aef645-addcommitid.hg (glob)
@@ -54,7 +54,8 @@ Post a job with a bad merge
   $ mozreview exec autoland "bash -c cd /repos/inbound-test-repo/ && hg commit -m \"trouble\""
   $ echo foo3 > foo
   $ hg commit -m 'Bug 1 - more stuff; r?cthulhu'
-  $ hg push
+  $ hg push --config reviewboard.autopublish=false
+
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets

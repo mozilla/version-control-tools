@@ -9,7 +9,7 @@ Create a review request that doesn't touch any Python files
   $ bugzilla create-bug TestProduct TestComponent bug1
   $ echo irrelevant > foo
   $ hg commit -m 'Bug 1 - No Python changes'
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
   $ rbmanage publish 1
 
 No review should be left if no Python files were changed.
@@ -67,7 +67,7 @@ If only changes are deletions, then no review should be posted
   $ hg rm test.py
   $ hg commit -m 'Bug 2 - Delete test.py'
 
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
   $ rbmanage publish 3
 
   $ python -m pylintbot --config-path ../pylintbot.ini

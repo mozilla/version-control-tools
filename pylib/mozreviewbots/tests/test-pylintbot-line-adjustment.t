@@ -77,7 +77,7 @@ Line numbers for these failures should be adjusted -= 1 and cover 2 lines
   $ hg -q commit -A -m 'Bug 1 - Line adjustment minus 1'
   $ bugzilla create-bug TestProduct TestComponent bug1
 
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
   $ rbmanage publish 1
 
   $ python -m pylintbot --config-path ../pylintbot.ini
@@ -286,7 +286,7 @@ Create tests for line -= 2
   $ hg -q commit -A -m 'Bug 2 - Line adjustment minus 2'
   $ bugzilla create-bug TestProduct TestComponent bug2
 
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
   $ rbmanage publish 3
   $ python -m pylintbot --config-path ../pylintbot.ini
   INFO:mozreviewbot:reviewing revision: 51dfa0ded22a (review request: 4)

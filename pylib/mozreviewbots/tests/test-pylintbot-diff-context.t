@@ -30,7 +30,7 @@ be ignored
 
   $ hg commit -m 'Bug 1 - Verify diff context'
   $ bugzilla create-bug TestProduct TestComponent bug1
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
   $ rbmanage publish 1
 
   $ python -m pylintbot --config-path ../pylintbot.ini

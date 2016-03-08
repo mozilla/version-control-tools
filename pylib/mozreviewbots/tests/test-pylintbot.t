@@ -17,7 +17,7 @@ Create a review with Python style violations
   > EOF
 
   $ hg -q commit -A -m 'Bug 1 - Bad Python'
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
   $ rbmanage publish 1
   $ python -m pylintbot --config-path ../pylintbot.ini
   INFO:mozreviewbot:reviewing revision: 1978e5417012 (review request: 2)
@@ -123,7 +123,7 @@ Ensure pyflakes warnings are handled
 
   $ hg -q commit -A -m 'Bug 2 - pyflakes'
   $ bugzilla create-bug TestProduct TestComponent bug1
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
 
   $ rbmanage publish 3
 
