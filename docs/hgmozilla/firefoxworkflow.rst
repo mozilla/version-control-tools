@@ -155,10 +155,39 @@ Once all the changes are made, you'll want to submit for review again::
 
 Then we're back to waiting.
 
-Reviewer Attribution and Landing
---------------------------------
+Autolanding
+-----------
 
 You finally get review and can land your changes!
+
+The easiest way to do this is through the use of Autoland. You can access
+Autoland through the ``Land Commits`` option of the ``Automation`` menu.
+Clicking this button displays a dialog containing a list of commits to be
+landed. MozReview will attempt to automatically rewrite the commit messages
+to reflect who reviewed which commit. If everything looks good, click the
+``OK`` button and the autolander will land your commits for you.
+
+Autoland will attempt to rebase you commits on the head of mozilla-inbound
+for you automatically. If a manual rebase is required, an error will be
+displayed in MozReview and you will have to rebase yourself.
+
+.. note::
+
+   We do not currently have plans to support an integration branch other
+   that ``mozilla-inbound``. In the future, we hope to remove integration
+   branches so we end up with a merge free history.
+
+If Autoland succeeds, *Pulsebot* will comment in your bug that your
+changes have landed. Unfortunately, there is not currently any notification
+that Autoland has failed outside of MozReview, so if the trees are open
+and your changes have not landed within a few minutes, please check back
+in MozReview to see if any errors have occurred.
+
+
+Manual Reviewer Attribution and Landing
+--------------------------------
+
+Unable to use Autoland? Follow these instructions.
 
 Update to the tip-most changeset that will land (often a head) after
 finding the changesets using the technique in the previous section::
@@ -182,7 +211,3 @@ update commit messages accordingly.
 And finally we land::
 
    $ hg push -r . inbound
-
-.. note::
-
-   MozReview will eventually perform the landing for you.
