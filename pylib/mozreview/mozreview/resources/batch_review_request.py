@@ -24,6 +24,9 @@ from mozautomation.commitparser import (
 from reviewboard.accounts.backends import (
     get_enabled_auth_backends,
 )
+from reviewboard.accounts.errors import (
+    UserQueryError,
+)
 from reviewboard.diffviewer.models import (
     DiffSet,
 )
@@ -340,6 +343,9 @@ class BatchReviewRequestResource(WebAPIResource):
         except SubmissionException as e:
             logger.exception('submission exception')
             return e.value
+        except UserQueryError as e:
+            logger.exception(e)
+            return LOGIN_FAILED.with_message(str(e))
 
     def _process_submission(self, request, local_site, user, privileged_user,
                             repo, identifier, commits):

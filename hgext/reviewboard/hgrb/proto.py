@@ -48,7 +48,8 @@ class AuthorizationError(Exception):
             return 'web login needed; log in at %s then try again' % self.login_url
 
         if self.apikey:
-            return 'invalid Bugzilla API key; visit Bugzilla to obtain a new API key'
+            return("%s\nLog out and back in to Review Board then try again"
+                   % str(self.e))
         else:
             return 'unknown failure'
 
