@@ -131,8 +131,8 @@ def get_file_chunks_in_range_custom(context, filediff, interfilediff,
 
 def render_equal_chunk(chunk, parser):
     indents = chunk['meta'].get('indentation_changes', {})
-    lines = [] # Rendered lines.
-    indent_count = 0 # How many indentation lines have we seen in a row.
+    lines = []  # Rendered lines.
+    indent_count = 0  # How many indentation lines have we seen in a row.
 
     for line in chunk['lines']:
         indent_key = "%s-%s" % (line[1], line[4])
@@ -175,13 +175,13 @@ def render_equal_chunk(chunk, parser):
 
         # Parse the indentation characters
         while index < len(chars):
-            if chars[index] == "&" and chars[index + 1] == "g": # "&gt;".
+            if chars[index] == "&" and chars[index + 1] == "g":  # "&gt;".
                 # Space character
-                replace_chars.append(" ");
+                replace_chars.append(" ")
                 current_width += 1
                 index += 4
 
-            elif chars[index] == "&" and chars[index + 1] == "m": # "&mdash;".
+            elif chars[index] == "&" and chars[index + 1] == "m":  # "&mdash;".
                 # One of the spaces we translated before
                 # was actually part of this tab we've
                 # found
@@ -228,6 +228,7 @@ def render_equal_chunk(chunk, parser):
         lines.append(add_line)
 
     return lines
+
 
 def render_comment_plain(comment, context, is_reply):
     if is_reply:
