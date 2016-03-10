@@ -45,7 +45,7 @@ a shipit.
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
   $ rbmanage list-reviewers 2
@@ -81,7 +81,7 @@ There are no warnings for reviewers who haved granted a ship-it when using r=
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
   $ rbmanage list-reviewers 2
@@ -121,7 +121,7 @@ using r=.
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
   $ rbmanage list-reviewers 2

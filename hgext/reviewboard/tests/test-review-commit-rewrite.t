@@ -42,7 +42,7 @@ Create bug and review
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
   $ rbmanage add-reviewer 2 --user reviewer
   1 people listed on review request

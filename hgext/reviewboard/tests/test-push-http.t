@@ -352,7 +352,7 @@ Test creating a review via HTTP
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
   $ rbmanage dumpreview 1

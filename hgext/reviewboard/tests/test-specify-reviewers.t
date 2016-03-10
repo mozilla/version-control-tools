@@ -203,7 +203,7 @@ Publishing series during push works
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
   [1]
 
@@ -317,7 +317,7 @@ code path.
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
  
   $ rbmanage list-reviewers 11
@@ -379,7 +379,7 @@ again.
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
   [1]
   $ rbmanage list-reviewers 11
@@ -449,7 +449,7 @@ and pushed with no reviewers specified.
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
   $ rbmanage list-reviewers 11
@@ -517,7 +517,7 @@ those specified in the commit summary.
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
   $ rbmanage list-reviewers 11
@@ -548,7 +548,7 @@ Unrecognized reviewers should be ignored
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/12 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 12)
   $ rbmanage list-reviewers 12
   
@@ -574,7 +574,7 @@ Reviewer identification should be case insensitive.
   review id:  bz://2/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/12 (draft)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 12)
 
   $ rbmanage list-reviewers 14
