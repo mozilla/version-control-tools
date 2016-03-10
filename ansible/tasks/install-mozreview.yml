@@ -39,5 +39,8 @@
 - name: install rbmotd egg
   shell: "{{ easy_install }} -U dist/*.egg chdir={{ rb_vct }}/pylib/rbmotd"
 
+- name: Generate static Review Board files from extensions
+  command: "{{ rbsite }} manage {{ sitehome }} -- install-extension-media --force"
+
 - name: Generate static Review Board files
   command: "{{ rbsite }} manage {{ sitehome }} -- collectstatic --noinput"
