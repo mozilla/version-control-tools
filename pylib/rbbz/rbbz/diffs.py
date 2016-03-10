@@ -250,6 +250,19 @@ def render_comment_plain(comment, context, is_reply):
 
         return "\n".join(lines)
 
+    # If the reviewer selected a single line, comment with
+    # 5 lines of context.
+    if comment.num_lines == 1:
+        if comment.first_line < 6:
+            first_line = 1
+            num_lines = comment.first_line
+        else:
+            first_line = comment.first_line - 5
+            num_lines = 6
+    else:
+        first_line = comment.first_line
+        num_lines = comment.num_lines
+
     # This is the base comment of a review, so we
     # should quote the code the comment is adressing.
     parser = HTMLParser.HTMLParser()
@@ -257,8 +270,8 @@ def render_comment_plain(comment, context, is_reply):
         context,
         comment.filediff,
         comment.interfilediff,
-        comment.first_line,
-        comment.num_lines))
+        first_line,
+        num_lines))
 
     dest_lineno = None
     for chunk in chunks:
