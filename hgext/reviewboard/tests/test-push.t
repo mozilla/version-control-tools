@@ -447,7 +447,7 @@ You can choose to publish automatically without a prompt
   
   changeset:  5:6b33f0dbef02
   summary:    anonymous head
-  review:     http://*:$HGPORT1/r/2
+  review:     http://*:$HGPORT1/r/2 (glob)
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
