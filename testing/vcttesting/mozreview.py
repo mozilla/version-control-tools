@@ -288,7 +288,7 @@ class MozReview(object):
             e.submit(self._docker.execute, mr_info['web_id'],
                      ['/set-urls', self.reviewboard_url])
 
-        self.create_user_api_key(bugzilla.username)
+        self.create_user_api_key(bugzilla.username, description='mozreview')
 
         hg_ssh_host_key = self._docker.get_file_content(
                 mr_info['hgrb_id'],
@@ -508,7 +508,8 @@ class MozReview(object):
                                         bugzilla_username=bugzilla_username,
                                         bugzilla_apikey=bugzilla_apikey)
 
-    def create_user_api_key(self, email, sync_to_reviewboard=True):
+    def create_user_api_key(self, email, sync_to_reviewboard=True,
+                            description=''):
         """Creates an API key for the given user.
 
         This creates an API key in Bugzilla and then triggers the
@@ -520,7 +521,7 @@ class MozReview(object):
         api_key = self._docker.execute(
             self.bmoweb_id,
             ['/var/lib/bugzilla/bugzilla/scripts/issue-api-key.pl',
-             email], stdout=True).strip()
+             email, description], stdout=True).strip()
 
         assert len(api_key) == 40
 
@@ -592,7 +593,8 @@ class MozReview(object):
             b.add_user_to_group(email, g)
 
         if api_key:
-            res['bugzilla']['api_key'] = self.create_user_api_key(email)
+            res['bugzilla']['api_key'] = self.create_user_api_key(
+                email, description='mozreview')
 
         # Create an LDAP account as well.
         if uid:

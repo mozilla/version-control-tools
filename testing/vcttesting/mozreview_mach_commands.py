@@ -256,9 +256,12 @@ class MozReviewCommands(object):
                      help='Directory of MozReview instance')
     @CommandArgument('email',
                      help='Bugzilla account to create API key for')
-    def create_api_key(self, where, email):
+    @CommandArgument('--description',
+                     help='Optional API key description, e.g. "mozreview"')
+    def create_api_key(self, where, email, description=''):
         mr = self._get_mozreview(where)
-        print(mr.create_user_api_key(email, sync_to_reviewboard=False))
+        print(mr.create_user_api_key(email, sync_to_reviewboard=False,
+                                     description=description))
 
     @Command('exec', category='mozreview',
              description='Execute a command in a Docker container')
