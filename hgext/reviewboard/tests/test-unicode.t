@@ -136,7 +136,7 @@ Put some wonky byte sequences in the diff
   ...     fh.write(b'hello world \xe3\x81\x93\xe3\x82\x93\xe3\x81\xab\xe3\x81\xa1\xe3\x81\xaf\xe4\xb8\x96\xe7\x95\x8c\n')
   $ hg commit -m 'Bug 2 - tip'
 
-  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push -r 2::
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} --config reviewboard.autopublish=false push -r 2::
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
