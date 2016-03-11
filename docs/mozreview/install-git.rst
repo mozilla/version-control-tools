@@ -130,6 +130,12 @@ repository is simple::
 
    $ git mozreview configure
 
+.. important::
+
+   MozReview only works with Git repository cloned from the Mercurial upstream.
+   `Documentation is available <https://github.com/glandium/git-cinnabar/wiki/Mozilla:-Using-a-git-clone-of-gecko%E2%80%90dev-to-push-to-mercurial#switching-to-git-cinnabar>`_
+   on how to switch a clone of ``gecko-dev`` mirror to ``hg.mozilla.org`` upstreams.
+
 If you manually configured global settings above, this command should
 complete automatically. If not, it will prompt you for e.g. your
 Bugzilla access credentials.

@@ -613,6 +613,12 @@ def configure_command(args):
 
     # Define the default remote url to use for pushing to MozReview.
     if 'mozreview.remote' not in git_config:
+        res, output = get_output(['git', 'for-each-ref', 'refs/cinnabar'])
+        if res or output == '':
+            raise AbortError('A non-cinnabar clone is detected; '
+                             'please clone the repository from the Mercurial upstream '
+                             'with git-cinnabar, instead of from a Git mirror.')
+
         ui.write('searching for appropriate review repository...\n')
         # Query the special "autoreview" repo for the list of review repos.
         url = '%s/autoreview/mozreviewreviewrepos' % args.mercurial_url
