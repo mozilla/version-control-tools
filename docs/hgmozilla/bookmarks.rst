@@ -67,39 +67,14 @@ or the *scm-prompt.sh* script from Facebook's
 
 Sharing Changesets
 ==================
+
 Once you have a changeset (or several!) that you'd like to get checked into
 a Mozilla repository, you'll need to share them with others in order to get
 them reviewed and landed.
 
-When working with mozilla-central, if you have at least `level 1 commit
-access <https://www.mozilla.org/en-US/about/governance/policies/commit/>`_,
-pushing your changesets to MozReview is the primary method of sharing. See
-the :ref:`MozReview documentation <mozreview>` for more information.
-
-If you do not have at least level 1 commit access, you will be unable to
-push to MozReview for the time being. In this case, you will be uploading
-patches to Bugzilla directly.
-
-Exporting patch files
----------------------
-The preferred method for exporting patch files to Bugzilla is with the bzexport
-extension. The ``./mach mercurial-setup`` command should enable this for you.
-
-With the changeset you'd like to share checked out, run the ``hg bzexport``
-command - you will be prompted for the information required to post this
-changeset to its associated bug.
-
-To streamline this process even further, you can properly
-format the changeset summary (i.e. ``Bug <bug-number> - <changeset-summary>``)
-to avoid being prompted and have this information
-parsed instead. You can also :ref:`specify your bugzilla credentials in your hgrc
-<hgmozilla_finding_bugzilla_credentials>` to avoid being prompted for those.
-
-bzexport contains many flags for modifying the bug associated with the
-changeset: see ``hg help bzexport`` for more information.
-
-If you need to export a patch that you don't want to directly upload to
-Bugzilla, try the ``hg export`` command.
+When working with mozilla-central, pushing your changesets to MozReview is
+the primary method of sharing. See the
+:ref:`MozReview documentation <mozreview>` for more information.
 
 Collaborating / Sharing Bookmarks
 =================================
@@ -116,8 +91,13 @@ to hold your bookmarks.
 If you don't have Mozilla commit access or don't want to use a user
 repository, you can create a repository on Bitbucket.
 
-If neither of these options work for you, you can always run your own
-Mercurial server.
+.. warning::
+
+   The Firefox repository may be larger than what Bitbucket allows you to
+   store. If you want to share bookmarks for the Firefox repository,
+   a user repository is your best bet.
+
+If neither of these options work for you, you can run your own Mercurial server.
 
 Pushing and Pulling Bookmarks
 -----------------------------
