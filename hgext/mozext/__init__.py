@@ -343,10 +343,9 @@ finally:
 
 bz_available = False
 
-testedwith = '3.1 3.2 3.3 3.4 3.5 3.6'
+testedwith = '3.4 3.5 3.6 3.7'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20mozext'
 
-commands.norepo += ' cloneunified moztrees treestatus'
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
@@ -478,7 +477,7 @@ def critique(ui, repo, entire=False, node=None, **kwargs):
     demandimport.enable()
 
 
-@command('moztrees', [], _('hg moztrees'))
+@command('moztrees', [], _('hg moztrees'), norepo=True)
 def moztrees(ui, **opts):
     """Show information about Mozilla source trees."""
     longest = max(len(tree) for tree in REPOS.keys())
@@ -497,7 +496,7 @@ def moztrees(ui, **opts):
             ', '.join(sorted(aliases))))
 
 
-@command('cloneunified', [], _('hg cloneunified [DEST]'))
+@command('cloneunified', [], _('hg cloneunified [DEST]'), norepo=True)
 def cloneunified(ui, dest='gecko', **opts):
     """Clone main Mozilla repositories into a unified local repository.
 
@@ -529,7 +528,7 @@ def cloneunified(ui, dest='gecko', **opts):
             shutil.rmtree(path)
 
 
-@command('treestatus', [], _('hg treestatus [TREE] ...'))
+@command('treestatus', [], _('hg treestatus [TREE] ...'), norepo=True)
 def treestatus(ui, *trees, **opts):
     """Show the status of the Mozilla repositories.
 
