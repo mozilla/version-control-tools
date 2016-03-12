@@ -5,7 +5,12 @@
 
 import sys
 
-from boto.s3.connection import S3Connection
+from boto.exception import (
+    S3ResponseError,
+)
+from boto.s3.connection import (
+    S3Connection,
+)
 
 
 BUCKETS = (
@@ -22,7 +27,13 @@ def get_s3_daily_totals(day):
         path = 's3/hg-bundles/%s' % day
         key = b.get_key(path, validate=False)
 
-        data = key.get_contents_as_string()
+        try:
+            data = key.get_contents_as_string()
+        except S3ResponseError as e:
+            if e.error_code != 'NoSuchKey':
+                raise
+            continue
+
         for line in data.splitlines():
             parts = line.split(' ')
             if parts[7] != 'REST.GET.OBJECT':
