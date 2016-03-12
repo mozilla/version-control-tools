@@ -24,13 +24,32 @@ if not getattr(cmdutil, 'bailifchanged', None):
 if 'mercurial.scmutil' not in sys.modules:
     import mercurial.cmdutil as scmutil
 
-testedwith = '3.1 3.2 3.3 3.4 3.5 3.6'
+testedwith = '3.4 3.5 3.6 3.7'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qbackout'
+
+cmdtable = {}
+command = cmdutil.command(cmdtable)
 
 backout_re = re.compile(r'[bB]ack(?:ed)?(?: ?out) (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})')
 reapply_re = re.compile(r'Reapplied (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})')
 
 
+@command('qbackout', [
+    ('r', 'rev', [], _('revisions to backout')),
+    ('n', 'name', '', _('name of patch file'), _('NAME')),
+    ('s', 'single', None, _('fold all backed out changes into a single changeset')),
+    ('f', 'force', None, _('skip check for outstanding uncommitted changes')),
+    ('e', 'edit', None, _('edit commit messages')),
+    ('m', 'message', '', _('use text as commit message'), _('TEXT')),
+    ('U', 'currentuser', None, _('add "From: <current user>" to patch')),
+    ('u', 'user', '',
+     _('add "From: <USER>" to patch'), _('USER')),
+    ('D', 'currentdate', None, _('add "Date: <current date>" to patch')),
+    ('d', 'date', '',
+     _('add "Date: <DATE>" to patch'), _('DATE')),
+    ('', 'apply', False, _('re-apply a change instead of backing out')),
+    ('', 'nopush', False, _('do not push patches (useful when they do not apply properly)'))],
+    _('hg qbackout -r REVS [-f] [-n NAME] [qnew options]'))
 def qbackout(ui, repo, rev, **opts):
     """backout a change or set of changes
 
@@ -239,6 +258,19 @@ def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, revers
         commit_change(ui, repo, desc['name'], revisions=rev, force_name=opts.get('name'), **new_opts)
 
 
+@command('oops', [
+    ('r', 'rev', [], _('revisions to backout')),
+    ('s', 'single', None, _('fold all backed out changes into a single changeset')),
+    ('f', 'force', None, _('skip check for outstanding uncommitted changes')),
+    ('e', 'edit', None, _('edit commit messages')),
+    ('m', 'message', '', _('use text as commit message'), _('TEXT')),
+    ('U', 'currentuser', None, _('add "From: <current user>" to patch')),
+    ('u', 'user', '',
+     _('add "From: <USER>" to patch'), _('USER')),
+    ('D', 'currentdate', None, _('add "Date: <current date>" to patch')),
+    ('d', 'date', '',
+     _('add "Date: <DATE>" to patch'), _('DATE'))],
+    _('hg oops -r REVS [-f] [commit options]'))
 def oops(ui, repo, rev, **opts):
     """backout a change or set of changes
 
@@ -278,40 +310,3 @@ def oops(ui, repo, rev, **opts):
                handle_change, commit_change,
                use_mq=True, reverse_order=(not opts.get('apply')),
                **opts)
-
-cmdtable = {
-    'qbackout':
-        (qbackout,
-         [('r', 'rev', [], _('revisions to backout')),
-          ('n', 'name', '', _('name of patch file'), _('NAME')),
-          ('s', 'single', None, _('fold all backed out changes into a single changeset')),
-          ('f', 'force', None, _('skip check for outstanding uncommitted changes')),
-          ('e', 'edit', None, _('edit commit messages')),
-          ('m', 'message', '', _('use text as commit message'), _('TEXT')),
-          ('U', 'currentuser', None, _('add "From: <current user>" to patch')),
-          ('u', 'user', '',
-           _('add "From: <USER>" to patch'), _('USER')),
-          ('D', 'currentdate', None, _('add "Date: <current date>" to patch')),
-          ('d', 'date', '',
-           _('add "Date: <DATE>" to patch'), _('DATE')),
-          ('', 'apply', False, _('re-apply a change instead of backing out')),
-          ('', 'nopush', False, _('do not push patches (useful when they do not apply properly)')),
-          ],
-         ('hg qbackout -r REVS [-f] [-n NAME] [qnew options]')),
-
-    'oops':
-        (oops,
-         [('r', 'rev', [], _('revisions to backout')),
-          ('s', 'single', None, _('fold all backed out changes into a single changeset')),
-          ('f', 'force', None, _('skip check for outstanding uncommitted changes')),
-          ('e', 'edit', None, _('edit commit messages')),
-          ('m', 'message', '', _('use text as commit message'), _('TEXT')),
-          ('U', 'currentuser', None, _('add "From: <current user>" to patch')),
-          ('u', 'user', '',
-           _('add "From: <USER>" to patch'), _('USER')),
-          ('D', 'currentdate', None, _('add "Date: <current date>" to patch')),
-          ('d', 'date', '',
-           _('add "Date: <DATE>" to patch'), _('DATE')),
-          ],
-         ('hg oops -r REVS [-f] [commit options]')),
-}
