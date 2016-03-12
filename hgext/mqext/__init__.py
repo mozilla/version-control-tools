@@ -75,7 +75,7 @@ the -Q option to all relevant commands in your ~/.hgrc::
   qimport = -Q
 '''
 
-testedwith = '3.2 3.3 3.3 3.4 3.5'
+testedwith = '3.4 3.5 3.6 3.7'
 
 import os
 import re
@@ -106,8 +106,14 @@ except:
 
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
 
+cmdtable = {}
+command = cmdutil.command(cmdtable)
+
 bugzilla_jsonrpc_url = "https://bugzilla.mozilla.org/jsonrpc.cgi"
 
+@command('qshow', [
+    ('', 'stat', None, 'output diffstat-style summary of changes')],
+    ('hg qshow [patch]'))
 def qshow(ui, repo, patchspec=None, **opts):
     '''display a patch
 
@@ -251,6 +257,12 @@ fileRe = re.compile(r"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
 suckerRe = re.compile(r"[^s-]r=(\w+)")
 supersuckerRe = re.compile(r"sr=(\w+)")
 
+@command('reviewers', [
+    ('f', 'file', [], 'see reviewers for FILE', 'FILE'),
+    ('r', 'rev', [], 'see reviewers for revisions', 'REVS'),
+    ('l', 'limit', 200, 'how many revisions back to scan', 'LIMIT'),
+    ('', 'brief', False, 'shorter output')],
+    _('hg reviewers [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]'))
 def reviewers(ui, repo, patchfile=None, **opts):
     '''Suggest a reviewer for a patch
 
@@ -363,6 +375,12 @@ def fetch_bugs(url, ui, bugs):
 
     return buginfo['result']['bugs']
 
+@command('components', [
+    ('f', 'file', [], 'see components for FILE', 'FILE'),
+    ('r', 'rev', [], 'see reviewers for revisions', 'REVS'),
+    ('l', 'limit', 25, 'how many revisions back to scan', 'LIMIT'),
+    ('', 'brief', False, 'shorter output')],
+    _('hg components [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]'))
 def bzcomponents(ui, repo, patchfile=None, **opts):
     '''Suggest a bugzilla product and component for a patch
 
@@ -415,6 +433,10 @@ def bzcomponents(ui, repo, patchfile=None, **opts):
         for (comp, count) in components.most_common(5):
             ui.write("  %s: %d\n" % (comp, count))
 
+@command('bugs', [
+    ('f', 'file', [], 'see bugs for FILE', 'FILE'),
+    ('l', 'limit', 100, 'how many revisions back to scan', 'LIMIT')],
+    _('hg bugs [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]'))
 def bzbugs(ui, repo, patchfile=None, **opts):
     '''List the bugs that have modified the files in a patch
 
@@ -440,6 +462,10 @@ def bzbugs(ui, repo, patchfile=None, **opts):
     else:
         ui.write("No bugs found\n")
 
+@command('qtouched', [
+    ('a', 'applied', None, 'only consider applied patches'),
+    ('p', 'patch', '', 'restrict to given patch')],
+    _('hg touched [-a] [-p PATCH] [FILE]'))
 def touched(ui, repo, sourcefile=None, **opts):
     '''Show what files are touched by what patches
 
@@ -472,6 +498,7 @@ def touched(ui, repo, sourcefile=None, **opts):
 qparent_re = re.compile('^qparent: (\S+)$', re.M)
 top_re = re.compile('^top: (\S+)$', re.M)
 
+@command('qrevert', [], _('hg qrevert REV'))
 def qrevert(ui, repo, rev, **opts):
     '''
     Revert to a past mq state. This updates both the main checkout as well as
@@ -686,6 +713,12 @@ def qdelete_wrapper(orig, self, repo, *patches, **opts):
                                            '[]': patchnames })
         commands.commit(r.ui, r, message=mqmessage)
 
+@command('urls', [
+    ('d', 'date', '', _('show revisions matching date spec'), _('DATE')),
+    ('r', 'rev', [], _('show the specified revision or range'), _('REV')),
+    ('u', 'user', [], _('revisions committed by user'), _('USER')),
+    ] + commands.logopts,
+    _('hg urls [-l LIMIT] [NAME]'))
 def urls(ui, repo, *paths, **opts):
     '''Display a list of urls for the last several commits.
     These are merely heuristic guesses and are intended for pasting into
@@ -757,58 +790,6 @@ def qcrecord_wrapper(orig, self, repo, patchfn, *pats, **opts):
         mqmessage = substitute_mqmessage(mqmessage, repo, { 'p': patchfn,
                                                             'a': 'NEW' })
         commands.commit(r.ui, r, message=mqmessage)
-
-cmdtable = {
-    'qshow': (qshow,
-              [('', 'stat', None, 'output diffstat-style summary of changes'),
-               ],
-              ('hg qshow [patch]')),
-
-    'reviewers':
-        (reviewers,
-         [('f', 'file', [], 'see reviewers for FILE', 'FILE'),
-          ('r', 'rev', [], 'see reviewers for revisions', 'REVS'),
-          ('l', 'limit', 200, 'how many revisions back to scan', 'LIMIT'),
-          ('', 'brief', False, 'shorter output'),
-          ],
-         ('hg reviewers [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]')),
-
-    'bugs':
-        (bzbugs,
-         [('f', 'file', [], 'see bugs for FILE', 'FILE'),
-          ('l', 'limit', 100, 'how many revisions back to scan', 'LIMIT')
-          ],
-         ('hg bugs [-f FILE1 -f FILE2...] [-l LIMIT] [PATCH]')),
-
-    'components':
-        (bzcomponents,
-         [('f', 'file', [], 'see components for FILE', 'FILE'),
-          ('r', 'rev', [], 'see reviewers for revisions', 'REVS'),
-          ('l', 'limit', 25, 'how many revisions back to scan', 'LIMIT'),
-          ('', 'brief', False, 'shorter output'),
-          ],
-         ('hg components [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]')),
-
-    'qtouched':
-        (touched,
-         [('a', 'applied', None, 'only consider applied patches'),
-          ('p', 'patch', '', 'restrict to given patch')
-          ],
-         ('hg touched [-a] [-p PATCH] [FILE]')),
-
-    'urls':
-        (urls,
-         [('d', 'date', '', _('show revisions matching date spec'), _('DATE')),
-          ('r', 'rev', [], _('show the specified revision or range'), _('REV')),
-          ('u', 'user', [], _('revisions committed by user'), _('USER')),
-          ] + commands.logopts,
-         ('hg urls [-l LIMIT] [NAME]')),
-
-    'qrevert':
-        (qrevert,
-         [],
-         ('hg qrevert REV')),
-}
 
 def uisetup(ui):
     try:
