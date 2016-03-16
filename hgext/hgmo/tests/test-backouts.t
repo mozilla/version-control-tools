@@ -36,3 +36,15 @@ Backout commit links to backed out commit
   $ http http://localhost:$HGPORT/rev/f8c8d5d22c7d --body-file body > /dev/null
   $ grep '<td>backs out' body
   <tr><td>backs out</td><td><a style="font-family: monospace" href="/rev/6c9721b3b4df">6c9721b3b4df</a></td></tr>
+
+Reference a backed out node that doesn't exist
+
+  $ hg -q up -r 0
+  $ echo badnode > foo
+  $ hg commit -m 'Backed out changeset deadbeefbead (bug 123)'
+  created new head
+  $ hg -q push -f
+
+  $ http http://localhost:$HGPORT/rev/bdfc7e1edbe7 --body-file body > /dev/null
+  $ grep 'unknown revision' body
+  unknown revision 'deadbeefbead'
