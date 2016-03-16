@@ -133,7 +133,7 @@ def addmetadata(repo, ctx, d, onlycheap=False):
             try:
                 bctx = repo[node]
                 d['backsoutnodes'].append({'node': bctx.hex()})
-            except error.LookupError:
+            except error.RepoLookupError:
                 pass
 
     # Repositories can define which TreeHerder repository they are associated

@@ -37,7 +37,7 @@ Backout commit links to backed out commit
   $ grep '<td>backs out' body
   <tr><td>backs out</td><td><a style="font-family: monospace" href="/rev/6c9721b3b4df">6c9721b3b4df</a></td></tr>
 
-Reference a backed out node that doesn't exist
+Reference a backed out node that doesn't exist (bug 1257152)
 
   $ hg -q up -r 0
   $ echo badnode > foo
@@ -47,4 +47,7 @@ Reference a backed out node that doesn't exist
 
   $ http http://localhost:$HGPORT/rev/bdfc7e1edbe7 --body-file body > /dev/null
   $ grep 'unknown revision' body
-  unknown revision 'deadbeefbead'
+  [1]
+
+  $ grep 'backs out' body
+  [1]
