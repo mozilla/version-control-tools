@@ -9,6 +9,7 @@ import argparse
 import datetime
 import errno
 import os
+import shutil
 import subprocess
 
 from boto.s3.connection import S3Connection
@@ -148,8 +149,30 @@ def generate_bundle(repo, temp_path, final_path, extra_args):
     os.rename(temp_path, final_path)
 
 
-def generate_bundles(repo, upload=True, bzip2=False):
+def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
     """Generate bundle files for a repository at a path."""
+    # Copy manifest files from the source repository listed. Don't return
+    # anything because we don't need to list bundles since this repo isn't
+    # canonical.
+    if copyfrom:
+        # We assume all paths are pinned from a common root.
+        assert not os.path.isabs(copyfrom)
+        source_repo = os.path.join('/repo/hg/mozilla', copyfrom)
+        dest_repo = os.path.join('/repo/hg/mozilla', repo)
+        for p in ('bundleclone.manifest', 'clonebundles.manifest'):
+            source = os.path.join(source_repo, '.hg', p)
+            dest = os.path.join(dest_repo, '.hg', p)
+
+            print('copying %s -> %s' % (source, dest))
+
+            # copy2 copies metadata.
+            shutil.copy2(source, dest)
+
+        # Replicate manifest to mirrors.
+        subprocess.check_call(['/repo/hg/scripts/push-repo.sh'], cwd=dest_repo)
+
+        return {}
+
     assert not os.path.isabs(repo)
     repo_full = os.path.join('/repo/hg/mozilla', repo)
 
