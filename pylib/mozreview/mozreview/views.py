@@ -95,13 +95,13 @@ def get_bmo_auth_callback(request):
                      'parameters.')
         return show_error_page(request)
 
-    parsed = urlparse.urlparse(redirect)
+    parsed = None if not redirect else urlparse.urlparse(redirect)
 
     # Enforce relative redirects; we don't want people crafting auth links
     # that redirect to other sites.  We check the scheme as well as the netloc
     # to catch data, file, and other such server-less URIs.
 
-    if parsed.scheme or parsed.netloc:
+    if not parsed or parsed.scheme or parsed.netloc:
         redirect = '/'
 
     unverified_keys = UnverifiedBugzillaApiKey.objects.filter(
