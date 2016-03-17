@@ -358,12 +358,22 @@ if __name__ == '__main__':
     args, remaining = parser.parse_known_args()
     if args.f:
         with open(args.f, 'rb') as fh:
-            for line in fh:
-                fields = line.strip().split()
-                repos.append((fields[0], {x: True for x in fields[1:]}))
+            items = [l.rstrip() for l in fh]
+    else:
+        items = remaining
 
-    for repo in remaining:
-        repos.append((repo, {}))
+    for item in items:
+        attrs = {}
+        fields = item.split()
+        # fields[0] is the repo path.
+        for field in fields[1:]:
+            vals = field.split('=', 1)
+            if len(vals) == 2:
+                attrs[vals[0]] = vals[1]
+            else:
+                attrs[vals[0]] = True
+
+        repos.append((fields[0], attrs))
 
     upload = not args.no_upload
 
