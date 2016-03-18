@@ -6,6 +6,10 @@ import os
 
 from django.conf.urls import include, patterns, url
 
+from reviewboard.diffviewer.opcode_generator import (
+    get_diff_opcode_generator_class,
+    set_diff_opcode_generator_class,
+)
 from reviewboard.extensions.base import Extension, JSExtension
 from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
                                           HostingServiceHook,
@@ -30,6 +34,9 @@ from mozreview.autoland.resources import (
 )
 from mozreview.batchreview.resources import (
     batch_review_resource,
+)
+from mozreview.diffviewer.opcode_generator import (
+    NoFilterDiffOpcodeGenerator
 )
 from mozreview.extra_data import (
     is_parent,
@@ -167,6 +174,9 @@ class MozReviewExtension(Extension):
     ]
 
     def initialize(self):
+        self.original_opcode_generator = get_diff_opcode_generator_class()
+        set_diff_opcode_generator_class(NoFilterDiffOpcodeGenerator)
+
         initialize_pulse_handlers(self)
 
         URLHook(self,
@@ -284,6 +294,9 @@ class MozReviewExtension(Extension):
         HostingServiceHook(self, HMORepository)
 
     def shutdown(self):
+        # Restore the built-in opcode generator.
+        set_diff_opcode_generator_class(self.original_opcode_generator)
+
         # We have to put the TestingDone field back before we shut down
         # in order to get the instance back to its original state.
         main_fieldset = get_review_request_fieldset('main')
