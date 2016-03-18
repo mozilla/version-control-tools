@@ -231,7 +231,8 @@ Disabling a user in Bugzilla will prevent them from using Review Board
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: invalid Bugzilla API key; visit Bugzilla to obtain a new API key
+  abort: The username or password was not correct (HTTP 401, API Error 104)
+  Log out and back in to Review Board then try again
   [255]
 
 Re-enabling a disabled user will allow them to use Review Board
