@@ -131,16 +131,22 @@ class BugzillaAttachmentUpdates(object):
             break
 
         # Add flags for new reviewers.
-
-        # Sorted so behavior is deterministic (this mucks with test output
-        # otherwise).
-        for r in sorted(reviewers.keys()):
-            flags.append({
-                'name': 'review',
-                'status': '?',
-                'requestee': r,
-                'new': True
-            })
+        # We can't set a missing r+ (if it was manually removed) except in the
+        # trivial (and useless) case that the setter and the requestee are the
+        # same person.  We could set r? again, but in the event that the
+        # reviewer is not accepting review requests, this will block
+        # publishing, with no way for the author to fix it.  So we'll just
+        # ignore manually removed r+s.
+        # This is sorted so behavior is deterministic (this mucks with test
+        # output otherwise).
+        for reviewer, rplus in sorted(reviewers.iteritems()):
+            if not rplus:
+                flags.append({
+                    'name': 'review',
+                    'status': '?',
+                    'requestee': reviewer,
+                    'new': True
+                })
 
         if rb_attachment:
             params['attachment_id'] = rb_attachment['id']
