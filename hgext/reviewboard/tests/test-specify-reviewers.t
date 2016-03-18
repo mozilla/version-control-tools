@@ -580,6 +580,33 @@ Reviewer identification should be case insensitive.
   $ rbmanage list-reviewers 14
   RyanVM
 
+Reviewer deduction can be disabled with a config option.
+
+  $ echo blah >> foo
+  $ hg commit -m 'Bug 2 - awesome stuff; r?remus'
+  $ hg push -c 29 --config reviewboard.deduce-reviewers=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+  submitting 1 changesets for review
+  
+  changeset:  29:df9e974cc15e
+  summary:    Bug 2 - awesome stuff; r?remus
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/15 (draft)
+  
+  review id:  bz://2/mynick
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/12 (draft)
+  (review requests lack reviewers; visit review url to assign reviewers)
+  
+  publish these review requests now (Yn)?  y
+  (published review request 12)
+
+  $ rbmanage list-reviewers 15
+  
 
 Cleanup
 

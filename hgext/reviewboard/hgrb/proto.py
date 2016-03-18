@@ -297,6 +297,12 @@ def _processpushreview(repo, req, ldap_username):
             base_commit_id = base_ctx.hex()
 
         summary = encoding.fromlocal(ctx.description().splitlines()[0])
+        if req.get('deduce-reviewers', True):
+            reviewers = list(commitparser.parse_rquestion_reviewers(summary))
+            requal_reviewers = list(commitparser.parse_requal_reviewers(summary))
+        else:
+            reviewers = []
+            requal_reviewers = []
         commits['individual'].append({
             'id': node,
             'precursors': precursors.get(node, []),
@@ -309,8 +315,8 @@ def _processpushreview(repo, req, ldap_username):
             'bug': str(reviewid.bug),
             'base_commit_id': base_commit_id,
             'first_public_ancestor': first_public_ancestor,
-            'reviewers': list(commitparser.parse_rquestion_reviewers(summary)),
-            'requal_reviewers': list(commitparser.parse_requal_reviewers(summary))
+            'reviewers': reviewers,
+            'requal_reviewers': requal_reviewers
         })
 
     squashed_diff = b''.join(patch.diff(repo,

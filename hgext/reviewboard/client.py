@@ -547,6 +547,7 @@ def doreview(repo, ui, remote, nodes):
     req['identifier'] = identifier.full
     req['changesets'] = []
     req['obsolescence'] = obsolete.isenabled(repo, obsolete.createmarkersopt)
+    req['deduce-reviewers'] = ui.configbool('reviewboard', 'deduce-reviewers', True)
 
     reviews = repo.reviews
     oldparentid = reviews.findparentreview(identifier=identifier.full)
