@@ -332,6 +332,12 @@ def upload_index(repos):
 
     for repo in sorted(repos):
         p = repos[repo]
+
+        # Should only be for bundles with copyfrom.
+        if 'gzip' not in p:
+            print('ignoring repo %s in index because no gzip bundle' % repo)
+            continue
+
         basename = os.path.basename(p['gzip'][0])
 
         opts = dict(
