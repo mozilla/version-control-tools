@@ -30,6 +30,7 @@ Last changeset
 
   $ python -m json.tool < body
   {
+      "backedoutby": "",
       "bookmarks": [],
       "branch": "default",
       "date": [

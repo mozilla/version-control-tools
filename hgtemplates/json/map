@@ -46,6 +46,7 @@ changeset = '\{
   "node": {node|json},
   "date": {date|json},
   "desc": {desc|json},
+  "backedoutby": {if(backedoutbynode, backedoutbynode|json, ""|json)},
   "branch": {if(branch, branch%changesetbranch, "default"|json)},
   "bookmarks": [{join(changesetbookmark, ", ")}],
   "tags": [{join(changesettag, ", ")}],
