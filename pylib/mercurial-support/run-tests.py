@@ -784,6 +784,7 @@ class Test(unittest.TestCase):
         env["HGUSER"]   = "test"
         env["HGENCODING"] = "ascii"
         env["HGENCODINGMODE"] = "strict"
+        env["ERR_FILE"] = self.errpath
 
         # Reset some environment variables to well-known values so that
         # the tests produce repeatable output.

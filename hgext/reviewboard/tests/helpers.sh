@@ -52,7 +52,8 @@ alias rbmanage='$TESTDIR/reviewboard'
 alias http='$TESTDIR/testing/http-request.py'
 
 commonenv() {
-  mozreview start `pwd` \
+  mr_output=$( \
+    mozreview start `pwd` \
     --mercurial-port $HGPORT \
     --reviewboard-port $HGPORT1 \
     --bugzilla-port $HGPORT2 \
@@ -62,10 +63,12 @@ commonenv() {
     --ssh-port $HGPORT6 \
     --hgweb-port $HGPORT7 \
     --treestatus-port $HGPORT8 \
-    > /dev/null
+    2>&1
+  )
 
   # MozReview randomly fails to start. Handle it elegantly.
   if [ $? -ne 0 ]; then
+    echo "$mr_output" >$ERR_FILE
     exit 80
   fi
 
