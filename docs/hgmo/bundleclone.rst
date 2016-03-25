@@ -166,7 +166,11 @@ bundles. While they take several more minutes of CPU time to apply, this
 could be cancelled out from the shorter time required to download them.
 To prefer bzip2 bundles::
 
-   # clone bundles config
+   # clone bundles config (3.7+)
+   [ui]
+   clonebundleprefers = COMPRESSION=bzip2
+
+   # clone bundles config (3.6)
    [experimental]
    clonebundleprefers = COMPRESSION=bzip2
 
@@ -180,9 +184,15 @@ average, but will require almost no CPU to apply. If you can fetch from
 S3 or CloudFront at 1 Gbps speeds, you should be able to clone Firefox
 in under 60s.::
 
+   # HG 3.7+
+   [ui]
+   clonebundleprefers = VERSION=packed1
+
+   # HG 3.6
    [experimental]
    clonebundleprefers = VERSION=packed1
 
+   # bundleclone extension
    [bundleclone]
    prefers = stream=revlogv1
 
