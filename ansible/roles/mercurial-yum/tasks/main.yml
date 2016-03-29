@@ -3,13 +3,13 @@
 # yum will incur network traffic when URLs are specified. Download the
 # package locally first so we can run offline after initial bootstrap.
 - name: download Mercurial package
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/mercurial-3.7.2-1.x86_64.rpm
-           dest=/var/tmp/mercurial-3.7.2-1.x86_64.rpm
-           sha256sum=cc67d5809571e706268a675d6bae9d1dc6baa2f4fda0d94dd2b90b8f8421d510
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/mercurial-3.7.3-1.x86_64.rpm
+           dest=/var/tmp/mercurial-3.7.3-1.x86_64.rpm
+           sha256sum=924a8828cfe53901db1366115d927b958f35f5e6a9c418cbc670c5e19137c090
 
 - name: Install patch package
   yum: name=patch state=present
 
 # The yum module is slow. Run commands manually.
 - name: installed Mercurial
-  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-3.7.2-1.x86_64.rpm
+  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-3.7.3-1.x86_64.rpm

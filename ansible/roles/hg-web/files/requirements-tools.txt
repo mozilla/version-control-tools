@@ -1,8 +1,8 @@
 futures==3.0.3 \
     --hash=sha256:04afa2a06ab7dcca9d81717b420a7a14826061e9b2614a5c77dd24c75ccf97e4
 
-Mercurial==3.7.2 \
-    --hash=sha256:5ba9438d6ab0db93f7b0786ba632138eb64a9dc0d93e30dde2b17b328fdc6d7a
+Mercurial==3.7.3 \
+    --hash=sha256:c099c42d74e2d520b61dd372cd996b0fa7605c06617834fd7b13c79b9a9a5b30
 
 tabulate==0.7.5 \
     --hash=sha256:9071aacbd97a9a915096c1aaf0dc684ac2672904cd876db5904085d6dac9810e

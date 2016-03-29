@@ -12,7 +12,7 @@
            dest=/var/tmp/{{ item.path }}
            sha256sum={{ item.sha256 }}
   with_items:
-    - { path: mercurial-3.7.2-1.x86_64.rpm, sha256: cc67d5809571e706268a675d6bae9d1dc6baa2f4fda0d94dd2b90b8f8421d510 }
+    - { path: mercurial-3.7.3-1.x86_64.rpm, sha256: 924a8828cfe53901db1366115d927b958f35f5e6a9c418cbc670c5e19137c090 }
 
 - name: system packages installed
   yum: name={{ item }} state=present
@@ -32,7 +32,7 @@
     - sudo
 
 - name: local RPMs installed
-  command: /usr/bin/yum -y localinstall /var/tmp/mercurial-3.7.2-1.x86_64.rpm
+  command: /usr/bin/yum -y localinstall /var/tmp/mercurial-3.7.3-1.x86_64.rpm
 
 - name: Source code groups
   group: name={{ item.name }} gid={{ item.gid }}

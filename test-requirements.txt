@@ -120,8 +120,8 @@ mccabe==0.3.1 \
 mechanize==0.2.5 \
     --hash=sha256:2e67b20d107b30c00ad814891a095048c35d9d8cb9541801cebe85684cc84766
 
-Mercurial==3.7.2 \
-    --hash=sha256:5ba9438d6ab0db93f7b0786ba632138eb64a9dc0d93e30dde2b17b328fdc6d7a
+Mercurial==3.7.3 \
+    --hash=sha256:c099c42d74e2d520b61dd372cd996b0fa7605c06617834fd7b13c79b9a9a5b30
 
 mimeparse==0.1.3 \
     --hash=sha256:534ff6feefe1cd03984f444e6415aacc79c0a85f3b868ec41a2fd5003004c31e

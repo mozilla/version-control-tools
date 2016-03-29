@@ -11,7 +11,7 @@ RUN yum install -y createrepo gcc gettext make mercurial python-devel python-doc
 RUN hg clone https://selenic.com/repo/hg /hg
 RUN mkdir /hg-packages
 
-ENV HG_VERSIONS 3.7.2
+ENV HG_VERSIONS 3.7.3
 
 ADD entrypoint.sh /entrypoint.sh
 ADD rpmserver.py /rpmserver.py
