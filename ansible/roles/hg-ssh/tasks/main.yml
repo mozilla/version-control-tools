@@ -102,7 +102,6 @@
   file: path={{ item }} state=directory mode=0775
   with_items:
     - /repo/hg/mozilla
-    - /repo/hg/extensions
     - /var/hg
 
 - name: User repository directories are present
