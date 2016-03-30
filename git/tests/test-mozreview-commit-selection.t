@@ -44,7 +44,7 @@ Single commit on topic branch will submit 1 commit
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 Additional commit on topic branch will submit 2 commits
@@ -71,7 +71,7 @@ Additional commit on topic branch will submit 2 commits
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 Topic branch on top of existing topic branch will submit all commits
@@ -105,7 +105,7 @@ branch-based development model a bit better)
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 Submitting commits referencing multiple bugs is refused
@@ -146,7 +146,7 @@ Specifying a refspec to review works
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 
@@ -165,7 +165,7 @@ Specifying a single commit on bottom of stack works
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 Specifying a single commit in middle of stack works
@@ -183,7 +183,7 @@ Specifying a single commit in middle of stack works
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 Specifying a single commit on top of stack works
@@ -206,7 +206,7 @@ Specifying a single commit on top of stack works
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 5)
 
 We don't review merge commits
