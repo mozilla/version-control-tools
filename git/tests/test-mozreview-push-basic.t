@@ -52,7 +52,7 @@ mozreview push will submit for code review
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 Reviews should be published and Bugzilla attachments should be present
@@ -234,7 +234,7 @@ Pushing from a worktree works
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 hg:// URLs work
@@ -256,7 +256,7 @@ hg:// URLs work
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 Old configuration using an actual git remote works gracefully
@@ -279,7 +279,7 @@ Old configuration using an actual git remote works gracefully
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 No "mozreview.remote" defaults to "review"
@@ -301,7 +301,7 @@ No "mozreview.remote" defaults to "review"
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 No "mozreview.remote" and no remote tells to run configure
