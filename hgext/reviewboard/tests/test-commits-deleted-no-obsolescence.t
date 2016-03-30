@@ -248,6 +248,7 @@ Review 6 should be marked as discarded
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 4e50148c492dde95397cd666f2d4e4ad4fd2176f
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
@@ -321,6 +322,7 @@ The review request corresponding to the dropped commit has no draft
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 0b3e14fe3ff19019110705e72dcf563c0ef551f6
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick

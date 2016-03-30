@@ -227,6 +227,7 @@ Publishing series during push works
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 214fce3608426755a50ae60ae8645eb9bc1f7537
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick

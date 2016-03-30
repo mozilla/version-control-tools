@@ -60,6 +60,7 @@ Create a review request from an L1 user
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -106,6 +107,7 @@ Have an L1 user provide a ship it review which should not grant approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -160,6 +162,7 @@ Have an L3 user provide a ship it review which should grant approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -218,6 +221,7 @@ Posting a new review without ship it should cancel the previous approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -283,6 +287,7 @@ One more ship it should switch it back to approved
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -356,6 +361,7 @@ Even though the author is L1, adding a new diff will not cancel approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -440,6 +446,7 @@ A new ship-it from L3 should give approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -535,6 +542,7 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -643,6 +651,7 @@ Fixing the issue should restore approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -759,6 +768,7 @@ Review requests created by L3 users
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: b366ef9913208b4030857319aa20520f229a74f3
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
@@ -805,6 +815,7 @@ Even a ship-it from an L1 user will give approval to an L3 author
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: b366ef9913208b4030857319aa20520f229a74f3
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
@@ -862,6 +873,7 @@ ship-its. Posting a new diff should not clear approval
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: bedcf57f515ad540f582962e37ecd424d82424fd
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick

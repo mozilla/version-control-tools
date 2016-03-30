@@ -14,6 +14,7 @@ from reviewboard.reviews.models import ReviewRequest, ReviewRequestDraft
 
 from mozreview.autoland.models import AutolandEventLogEntry, AutolandRequest
 from mozreview.extra_data import (
+    AUTHOR_KEY,
     BASE_COMMIT_KEY,
     COMMIT_ID_KEY,
     COMMITS_KEY,
@@ -44,6 +45,11 @@ class CommitDataBackedField(BaseReviewRequestField):
     request fields but stores its data in CommitData.extra_data
     and CommitData.draft_extra_data instead of the built-in
     extra_data fields on ReviewRequest and ReviewRequestDraft.
+
+    Unlike built-in extra data fields, these values will not be
+    automatically copied from draft_extra_data to extra_data. If
+    that behaviour is desired, the field id should be added to
+    DRAFTED_EXTRA_DATA_KEYS (defined in extra_data.py).
     """
 
     def load_value(self, review_request_details):
@@ -207,6 +213,18 @@ class PullCommitField(BaseReviewRequestField):
                 'repo_path': repo_path,
         }))
 
+
+class CommitAuthorField(CommitDataBackedField):
+    """Field for the author of the review request's commit"""
+    field_id = AUTHOR_KEY
+    label = _("Author")
+
+    def should_render(self, value):
+        # Only show this for child review requests as for parent review
+        # requests different constituent commits can have different authors.
+        # Also, do not show it if it's empty, because review requests created
+        # before the author field was introduced will not have this information.
+        return not is_parent(self.review_request_details) and value
 
 class BaseCommitField(CommitDataBackedField):
     """Field for the commit a review request is based on.

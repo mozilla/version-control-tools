@@ -53,6 +53,7 @@ The globbing is patching over a bug in mach
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 86ab97a5dd61e8ec7ff3c23212db732e3531af01
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
@@ -190,6 +191,7 @@ Put some wonky byte sequences in the diff
     extra: {}
     commit_extra_data:
       p2rb: true
+      p2rb.author: test
       p2rb.commit_id: 78025579528e119adf8ccc61727fccc1e23bda1c
       p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
       p2rb.identifier: bz://2/mynick
@@ -241,6 +243,7 @@ Put some wonky byte sequences in the diff
     extra: {}
     commit_extra_data:
       p2rb: true
+      p2rb.author: test
       p2rb.commit_id: 6204fc917b213cf88051df32860d62ca91ae1422
       p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
       p2rb.identifier: bz://2/mynick

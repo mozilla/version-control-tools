@@ -22,6 +22,7 @@ MOZREVIEW_KEY = 'p2rb'
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
 
 # CommitData field keys:
+AUTHOR_KEY = MOZREVIEW_KEY + '.author'
 BASE_COMMIT_KEY = MOZREVIEW_KEY + '.base_commit'
 COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
 COMMITS_KEY = MOZREVIEW_KEY + '.commits'
@@ -34,6 +35,7 @@ UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
 # CommitData fields which should be automatically copied from
 # draft_extra_data to extra_data when a review request is published.
 DRAFTED_COMMIT_DATA_KEYS = (
+    AUTHOR_KEY,
     FIRST_PUBLIC_ANCESTOR_KEY,
     IDENTIFIER_KEY,
     COMMIT_ID_KEY,

@@ -90,6 +90,7 @@ Publishing the parent should succeed.
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick

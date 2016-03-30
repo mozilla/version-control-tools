@@ -353,6 +353,7 @@ Review 6 should be marked as discarded
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 4e50148c492dde95397cd666f2d4e4ad4fd2176f
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
@@ -573,6 +574,7 @@ The dropped commit should now be discarded
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 0b3e14fe3ff19019110705e72dcf563c0ef551f6
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
@@ -994,6 +996,7 @@ Review request 5 (whose commit was deleted) should be discarded
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: a27a94c54524d4331dec2f92f647067bfd6dfbd4
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
@@ -1072,6 +1075,7 @@ Review request 5 (whose commit was deleted) should be discarded
     extra: {}
     commit_extra_data:
       p2rb: true
+      p2rb.author: test
       p2rb.commit_id: 3b99865d1bab8480235d913f4bcfc951fd9e3032
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       p2rb.identifier: bz://1/mynick

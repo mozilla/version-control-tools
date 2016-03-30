@@ -48,6 +48,7 @@ from reviewboard.webapi.resources import (
 )
 
 from mozreview.extra_data import (
+    AUTHOR_KEY,
     BASE_COMMIT_KEY,
     COMMITS_KEY,
     COMMIT_ID_KEY,
@@ -111,6 +112,7 @@ class BatchReviewRequestResource(WebAPIResource):
             'individual': [
                 {
                     'id': <commit-id>,
+                    'author': <commit-author>,
                     'precursors': [<previous changeset>],
                     'message': <commit-message>,
                     'diff_b64': <diff encoded as base64>,
@@ -670,6 +672,7 @@ class BatchReviewRequestResource(WebAPIResource):
                 SQUASHED_KEY: False,
             })
             commit_data.draft_extra_data.update({
+                AUTHOR_KEY: commit['author'],
                 IDENTIFIER_KEY: identifier,
             })
             commit_data.save(
@@ -913,6 +916,7 @@ def update_review_request(local_site, request, privileged_user, reviewer_cache,
 
     commit_data = fetch_commit_data(draft)
     commit_data.draft_extra_data.update({
+        AUTHOR_KEY: commit['author'],
         COMMIT_ID_KEY: commit['id'],
         FIRST_PUBLIC_ANCESTOR_KEY: commit['first_public_ancestor'],
     })

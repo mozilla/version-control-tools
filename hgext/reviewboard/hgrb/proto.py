@@ -305,6 +305,7 @@ def _processpushreview(repo, req, ldap_username):
             requal_reviewers = []
         commits['individual'].append({
             'id': node,
+            'author': encoding.fromlocal(ctx.user()),
             'precursors': precursors.get(node, []),
             'message': encoding.fromlocal(ctx.description()),
             # Diffs are arbitrary byte sequences. json.dump() will try to

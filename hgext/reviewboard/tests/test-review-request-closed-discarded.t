@@ -172,6 +172,7 @@ Child review request with ID 2 should be closed as discarded...
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -213,6 +214,7 @@ Child review request with ID 3 should be closed as discarded...
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -382,6 +384,7 @@ Child review request with ID 2 should be re-opened...
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -416,6 +419,7 @@ Child review request with ID 2 should be re-opened...
       calculated_trophies: true
     commit_extra_data:
       p2rb: true
+      p2rb.author: test
       p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
@@ -442,6 +446,7 @@ Child review request with ID 3 should be re-opened...
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -476,6 +481,7 @@ Child review request with ID 3 should be re-opened...
       calculated_trophies: true
     commit_extra_data:
       p2rb: true
+      p2rb.author: test
       p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
@@ -608,6 +614,7 @@ Child review request with ID 2 should be published.
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -649,6 +656,7 @@ Child review request with ID 3 should be published.
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
