@@ -104,6 +104,7 @@
     - /repo/hg/mozilla
     - /repo/hg/extensions
     - /repo/hg/scripts
+    - /var/hg
 
 - name: User repository directories are present
   file: path=/repo/hg/mozilla/users state=directory mode=0775 owner=hg group=scm_level_1
