@@ -302,17 +302,10 @@
 # rotation for /var/log/hg/parsed.YYYY-MM-DD, so logrotate doesn't work as a
 # tool. We've written out own script to do the compression and deletion.
 
-- name: install parsed hg logs cleanup script
-  copy: src=cleanup-parsed-hg-logs
-        dest=/repo/hg/scripts/cleanup-parsed-hg-logs
-        owner=root
-        group=root
-        mode=0755
-
 - name: create CRON to compress and delete old parsed Mercurial log files
   cron: name='Clean old parsed Mercurial logs'
         user=root
-        job='/var/hg/version-control-tools/scripts/outputif /repo/hg/scripts/cleanup-parsed-hg-logs'
+        job='/var/hg/version-control-tools/scripts/outputif /var/hg/version-control-tools/scripts/cleanup-parsed-hg-logs'
         day=*
         month=*
         minute=12
