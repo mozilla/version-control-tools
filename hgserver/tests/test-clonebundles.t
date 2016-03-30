@@ -16,6 +16,64 @@ Create and seed repository
   $ hg push > /dev/null
   $ cd ..
 
+Ensure bundle creation script raises during bundle generation
+
+  $ hgmo exec hgssh sudo -u hg /repo/hg/venv_tools/bin/python /repo/hg/version-control-tools/scripts/generate-hg-s3-bundles missing
+  Traceback (most recent call last):
+    File "/repo/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in <module> (re)
+      paths[repo] = generate_bundles(repo, upload=upload, **opts)
+    File "/repo/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in generate_bundles (re)
+      hg_stat = os.stat(os.path.join(repo_full, '.hg'))
+  OSError: [Errno 2] No such file or directory: '/repo/hg/mozilla/missing/.hg'
+  [1]
+
+And raises during upload since we don't have credentials in the test env
+
+  $ hgmo exec hgssh sudo -u hg /repo/hg/venv_tools/bin/python /repo/hg/version-control-tools/scripts/generate-hg-s3-bundles mozilla-central
+  writing /repo/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.stream-legacy.hg.tmp
+  stream bundle file written successully.
+  include the following in its manifest entry:
+  stream=revlogv1
+  writing 328 bytes for 3 files
+  bundle requirements: revlogv1
+  1 changesets found
+  tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
+  uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.stream-legacy.hg
+  uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
+  uploading to s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
+  uploading to s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.stream-legacy.hg
+  uploading to s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
+  uploading to s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
+  uploading to s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.stream-legacy.hg
+  uploading to s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
+  Traceback (most recent call last):
+    File "/repo/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in <module> (re)
+      paths[repo] = generate_bundles(repo, upload=upload, **opts)
+    File "/repo/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in generate_bundles (re)
+      f.result()
+    File "/repo/hg/venv_tools/lib/python2.7/site-packages/concurrent/futures/_base.py", line \d+, in result (re)
+      return self.__get_result()
+    File "/repo/hg/venv_tools/lib/python2.7/site-packages/concurrent/futures/thread.py", line \d+, in run (re)
+      result = self.fn(*self.args, **self.kwargs)
+    File "/repo/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in upload_to_s3 (re)
+      c = S3Connection(host=host)
+    File "/repo/hg/venv_tools/lib/python2.7/site-packages/boto/s3/connection.py", line \d+, in __init__ (re)
+      validate_certs=validate_certs, profile_name=profile_name)
+    File "/repo/hg/venv_tools/lib/python2.7/site-packages/boto/connection.py", line \d+, in __init__ (re)
+      host, config, self.provider, self._required_auth_capability())
+    File "/repo/hg/venv_tools/lib/python2.7/site-packages/boto/auth.py", line \d+, in get_auth_handler (re)
+      'Check your credentials' % (len(names), str(names)))
+  boto.exception.NoAuthHandlerFound: No handler was ready to authenticate. 1 handlers were checked. ['HmacAuthV1Handler'] Check your credentials
+  [1]
+
+The manifest should be empty because there were no successful uploads
+
+  $ http --no-headers ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
+  200
+  
+  
+
 Create a clonebundles manifest
 
   $ hgmo exec hgssh sudo -u hg /repo/hg/venv_tools/bin/python /repo/hg/version-control-tools/scripts/generate-hg-s3-bundles --no-upload mozilla-central &> /dev/null

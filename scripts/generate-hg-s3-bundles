@@ -219,6 +219,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
     # This is because an aborted bundle process may result in a partial file,
     # which may confuse our don't-write-if-file-exists logic.
 
+    fs = []
     with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
         for t, args in CREATES:
             if t == 'bzip2' and not bzip2:
@@ -231,7 +232,12 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
                 print('bundle already exists, skipping: %s' % final_path)
                 continue
 
-            e.submit(generate_bundle, repo_full, temp_path, final_path, args)
+            fs.append(e.submit(generate_bundle, repo_full, temp_path,
+                               final_path, args))
+
+    for f in fs:
+        # Will re-raise exceptions.
+        f.result()
 
     # Object path is keyed off the repository name so we can easily see what
     # is taking up space on the server.
@@ -255,6 +261,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
     # generally like operations to complete faster, we choose to simply
     # upload the bundle to multiple regions instead of employ COPY.
     if upload:
+        fs = []
         with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
             for host, bucket, name in HOSTS:
                 for t, _args in CREATES:
@@ -264,7 +271,13 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
                     final_path, remote_path = bundle_paths(bundle_path, repo,
                                                            tip, t)
                     print('uploading to %s/%s/%s' % (host, bucket, remote_path))
-                    e.submit(upload_to_s3, host, bucket, final_path, remote_path)
+                    fs.append(e.submit(upload_to_s3, host, bucket, final_path, remote_path))
+
+        # Future.result() will raise if a future raised. This will
+        # abort script execution, which is fine since failure should
+        # be rare given how reliable S3 is.
+        for f in fs:
+            f.result()
 
     # Now assemble a manifest listing each bundle.
     paths = {}
