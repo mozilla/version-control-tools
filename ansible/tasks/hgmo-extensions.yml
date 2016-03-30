@@ -14,4 +14,3 @@
         mode=0755
   with_items:
     - aggregate-s3-bucket-logs
-    - outputif
