@@ -252,6 +252,3 @@
         group=root
         mode=0644
 
-# Pull in tasks shared between hg-ssh and hg-web.
-# This should run last to ensure all preconditions are met.
-- include: ../../../tasks/hgmo-extensions.yml
