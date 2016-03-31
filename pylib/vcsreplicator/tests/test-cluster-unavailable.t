@@ -14,7 +14,7 @@
   $ hg -q commit -A -m initial
   $ hg -q push
 
-  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg sendheartbeat
   sending heartbeat to partition 0
   sending heartbeat to partition 1
   sending heartbeat to partition 2
@@ -30,7 +30,7 @@ Disabling a single Kafka node should still allow push to go through
   $ hgmo exec hgweb0 /usr/bin/supervisorctl stop kafka
   kafka: stopped
 
-  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg sendheartbeat
   sending heartbeat to partition 0
   sending heartbeat to partition 1
   sending heartbeat to partition 2
@@ -60,7 +60,7 @@ Disabling 2 Kafka nodes should result in no quorum and failure to push
 
   $ hgmo exec hgweb1 /usr/bin/supervisorctl stop kafka
   kafka: stopped
-  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg sendheartbeat
   sending heartbeat to partition 0
   abort: error sending heartbeat: UNKNOWN
   [255]
@@ -81,7 +81,7 @@ Adding node back in should result in being able to push again
   kafka: started
   $ hgmo exec hgweb1 /usr/bin/supervisorctl start kafka
   kafka: started
-  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg sendheartbeat
   sending heartbeat to partition 0
   sending heartbeat to partition 1
   sending heartbeat to partition 2
@@ -155,7 +155,7 @@ Stopping Kafka on hgssh node doesn't break pushes
   $ hgmo exec hgssh /usr/bin/supervisorctl stop kafka
   kafka: stopped
 
-  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg sendheartbeat
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg sendheartbeat
   sending heartbeat to partition 0
   sending heartbeat to partition 1
   sending heartbeat to partition 2

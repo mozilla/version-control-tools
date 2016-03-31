@@ -188,7 +188,7 @@ static int call_mozbuildinfo(void* repo_path) {
                  /* repository paths inside and outside chroot are the same */
                  "-R", (char*)repo_path,
                  /* hgmo extension provides mozbuildinfo command */
-                 "--config", "extensions.hgmo=/repo/hg/version-control-tools/hgext/hgmo",
+                 "--config", "extensions.hgmo=/var/hg/version-control-tools/hgext/hgmo",
                  /* --pipemode pulls arguments from JSON over stdin */
                  "mozbuildinfo", "--pipemode",
                  NULL,

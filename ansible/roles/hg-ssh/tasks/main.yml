@@ -111,12 +111,12 @@
 
 - name: create virtualenv for pash
   include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_pash
+           venv=/var/hg/venv_pash
            requirements=../roles/hg-ssh/files/requirements-pash.txt
 
 - name: create virtualenv for tools
   include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_tools
+           venv=/var/hg/venv_tools
            requirements=../roles/hg-ssh/files/requirements-tools.txt
 
 
@@ -128,8 +128,8 @@
 # The vcsreplicator Python package contains support code for managing
 # replication. Also add it to the virtualenv.
 - name: add packages to virtualenvs
-  copy: dest=/repo/hg/{{ item.venv }}/lib/python2.7/site-packages/{{ item.pth }}.pth
-        content=/repo/hg/version-control-tools/{{ item.path }}
+  copy: dest=/var/hg/{{ item.venv }}/lib/python2.7/site-packages/{{ item.pth }}.pth
+        content=/var/hg/version-control-tools/{{ item.path }}
         owner=root
         group=root
         mode=0644
@@ -140,23 +140,23 @@
     - { venv: venv_tools, path: pylib/vcsreplicator, pth: vcsreplicator }
 
 - name: set up version-control-tools repo (server only)
-  command: /repo/hg/venv_tools/bin/hg --config extensions.vcsreplicator=! -R /repo/hg/version-control-tools pull https://hg.mozilla.org/hgcustom/version-control-tools
+  command: /var/hg/venv_tools/bin/hg --config extensions.vcsreplicator=! -R /var/hg/version-control-tools pull https://hg.mozilla.org/hgcustom/version-control-tools
   when: vct_dir.stat.exists == False
 
 - name: update version-control-tools repo (server only)
-  command: /repo/hg/venv_tools/bin/hg -R /repo/hg/version-control-tools up -r {{ lookup('file', '../../../../.vctnode') }}
+  command: /var/hg/venv_tools/bin/hg -R /var/hg/version-control-tools up -r {{ lookup('file', '../../../../.vctnode') }}
   when: vct_dir.stat.exists == False
 
 - name: delete ignored files from version-control-tools repo
-  command: /repo/hg/venv_tools/bin/hg --config extensions.purge= -R /repo/hg/version-control-tools purge --all
+  command: /var/hg/venv_tools/bin/hg --config extensions.purge= -R /var/hg/version-control-tools purge --all
   when: vct_dir.stat.exists == False
 
 - name: rsync version-control-tools repo (Docker only)
-  command: /usr/bin/rsync -a --delete-after /vct/ /repo/hg/version-control-tools/
+  command: /usr/bin/rsync -a --delete-after /vct/ /var/hg/version-control-tools/
   when: vct_dir.stat.exists == True
 
 - name: ensure version-control-tools permissions are sane (Docker only)
-  command: /bin/chmod -R a+r /repo/hg/version-control-tools
+  command: /bin/chmod -R a+r /var/hg/version-control-tools
   when: vct_dir.stat.exists == True
 
 - name: install rsyslog policy for hg

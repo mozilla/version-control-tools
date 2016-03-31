@@ -60,12 +60,12 @@
 
 - name: create virtualenv for hgweb
   include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_hgweb
+           venv=/var/hg/venv_hgweb
            requirements=../roles/hg-reviewboard/files/requirements-hgweb.txt
 
 - name: create virtualenv for pash
   include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_pash
+           venv=/var/hg/venv_pash
            requirements=../roles/hg-reviewboard/files/requirements-pash.txt
 
 - name: install pash configuration file
@@ -77,7 +77,7 @@
 
 - name: set up version-control-tools repo (server only)
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
-      dest=/repo/hg/version-control-tools
+      dest=/var/hg/version-control-tools
       revision={{ lookup('file', '../../../../.vctnode') }}
       force=yes
       purge=yes
@@ -86,12 +86,12 @@
 # The hg module's purge doesn't delete ignored files. Boo. Force that
 # because old .pyc files may cause chaos.
 - name: delete ignored files from version-control-tools repo
-  command: hg --config extensions.purge= -R /repo/hg/version-control-tools purge --all
+  command: hg --config extensions.purge= -R /var/hg/version-control-tools purge --all
   when: vct_dir.stat.exists == False
 
 - name: synchronize version-control-tools (Docker only)
   synchronize: src={{ vct | mandatory }}/
-               dest=/repo/hg/version-control-tools/
+               dest=/var/hg/version-control-tools/
                recursive=yes
                delete=yes
   when: vct_dir.stat.exists == True
@@ -141,7 +141,7 @@
             mode=0644
 
 - name: install wsgi config
-  copy: content="LoadModule wsgi_module /repo/hg/venv_hgweb/lib/python2.7/site-packages/mod_wsgi/server/mod_wsgi-py27.so"
+  copy: content="LoadModule wsgi_module /var/hg/venv_hgweb/lib/python2.7/site-packages/mod_wsgi/server/mod_wsgi-py27.so"
         dest=/etc/httpd/conf.d/wsgi.conf
         owner=root
         group=root

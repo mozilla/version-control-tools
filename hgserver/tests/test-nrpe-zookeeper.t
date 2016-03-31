@@ -5,7 +5,7 @@
 
 check_zookeeper without any arguments will error
 
-  $ alias check_zk='hgmo exec hgssh /repo/hg/version-control-tools/scripts/check_zookeeper'
+  $ alias check_zk='hgmo exec hgssh /var/hg/version-control-tools/scripts/check_zookeeper'
 
   $ check_zk
   ERROR: must specify -H or -c

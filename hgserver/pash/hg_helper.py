@@ -25,8 +25,8 @@ from sh_helper import (
 Popen = subprocess.Popen
 PIPE = subprocess.PIPE
 
-HG = '/repo/hg/venv_pash/bin/hg'
-MR_ASSOCIATE_LDAP = '/repo/hg/version-control-tools/scripts/mozreview-associate-ldap'
+HG = '/var/hg/venv_pash/bin/hg'
+MR_ASSOCIATE_LDAP = '/var/hg/version-control-tools/scripts/mozreview-associate-ldap'
 
 SUCCESSFUL_AUTH = '''
 A SSH connection has been successfully established.
@@ -199,7 +199,7 @@ def fix_user_repo_perms(repo_name):
     user_repo_dir = user.replace('@', '_')
     print "Fixing permissions, don't interrupt."
     try:
-        run_command('/repo/hg/version-control-tools/scripts/repo-permissions %s/users/%s/%s %s scm_level_1 wwr' %
+        run_command('/var/hg/version-control-tools/scripts/repo-permissions %s/users/%s/%s %s scm_level_1 wwr' %
                     (DOC_ROOT, user_repo_dir, repo_name, user))
     except Exception, e:
         print "Exception %s" % (e)
@@ -548,7 +548,7 @@ def mozreview_ldap_associate(args):
 
     print('associating LDAP account %s with Bugzilla account %s...' % (
         ldap_username, user))
-    proc = subprocess.Popen(['/repo/hg/venv_pash/bin/python2.7', MR_ASSOCIATE_LDAP],
+    proc = subprocess.Popen(['/var/hg/venv_pash/bin/python2.7', MR_ASSOCIATE_LDAP],
                             stdin=PIPE, stderr=subprocess.STDOUT, cwd='/')
     proc.communicate(data)
     ret = proc.poll()

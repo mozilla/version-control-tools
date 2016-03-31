@@ -89,7 +89,7 @@ workaround to an unidentified root problem.
 
 hg createrepomanifest will create and print a manifest of review repos
 
-  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ${PUSHPREFIX}/
+  $ mozreview exec hgrb /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ${PUSHPREFIX}/
   36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://$DOCKER_HOSTNAME:$HGPORT/b ssh://$DOCKER_HOSTNAME:$HGPORT6/b
   4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://$DOCKER_HOSTNAME:$HGPORT/a ssh://$DOCKER_HOSTNAME:$HGPORT6/a
 
@@ -157,7 +157,7 @@ Pushing to autodiscover repo should redirect
 
 Redirecting to different hostname should be disallowed (security protection)
 
-  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ssh://bad.host/
+  $ mozreview exec hgrb /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ssh://bad.host/
   36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://$DOCKER_HOSTNAME:$HGPORT/b ssh://bad.host/b
   4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://$DOCKER_HOSTNAME:$HGPORT/a ssh://bad.host/a
 
@@ -175,7 +175,7 @@ Redirecting to different hostname should be disallowed (security protection)
 
 Redirecting works when pushing over HTTP
 
-  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ${PUSHPREFIX}/
+  $ mozreview exec hgrb /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ${PUSHPREFIX}/
   36d47cf7c6cbd312de3aeb3b2f770c650b014053 http://$DOCKER_HOSTNAME:$HGPORT/b ssh://$DOCKER_HOSTNAME:$HGPORT6/b
   4016108b6e06add4c0ddde40dee8c7b9aa410f58 http://$DOCKER_HOSTNAME:$HGPORT/a ssh://$DOCKER_HOSTNAME:$HGPORT6/a
 

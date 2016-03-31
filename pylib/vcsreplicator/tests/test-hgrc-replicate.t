@@ -9,7 +9,7 @@
 hgrc file content is sent in a message
 
   $ hgmo exec hgssh /activate-hook mozilla-central dummy value
-  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
 
   $ consumer --dump --partition 2
@@ -37,7 +37,7 @@ hgrc should have been written on client
 Replicating hgrc without hgrc file will delete file
 
   $ hgmo exec hgssh rm /repo/hg/mozilla/mozilla-central/.hg/hgrc
-  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
 
   $ consumer --dump --partition 2
@@ -69,7 +69,7 @@ Unicode in hgrc is preserved
 
   $ docker exec ${SSH_CID} /activate-hook mozilla-central dummy 'こんにちは'
 
-  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
 
   $ consumer --dump --partition 2

@@ -70,7 +70,7 @@
   remote: recorded changegroup in replication log in \d\.\d+s (re)
   exporting bookmark bm2
 
-  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
 Bookmarks get replicated to mirrors
 
@@ -117,7 +117,7 @@ Push a bookmark update
   remote: recorded changegroup in replication log in \d\.\d+s (re)
   updating bookmark bm2
 
-  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-bookmarks
   200
@@ -149,7 +149,7 @@ Push a non-forward bookmark update
   updating bookmark bm2
   [1]
 
-  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-bookmarks
   200
@@ -178,7 +178,7 @@ Push a bookmark delete
   deleting remote bookmark bm1
   [1]
 
-  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-bookmarks
   200
@@ -203,7 +203,7 @@ Remove all bookmarks
   deleting remote bookmark bm2
   [1]
 
-  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-bookmarks
   200

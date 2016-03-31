@@ -38,5 +38,5 @@ EOF
   hg phase --public -r .
   hg -q push --noreview
 
-  mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ssh://${HGSSH_HOST}:${HGSSH_PORT}/ > /dev/null
+  mozreview exec hgrb /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ssh://${HGSSH_HOST}:${HGSSH_PORT}/ > /dev/null
 }

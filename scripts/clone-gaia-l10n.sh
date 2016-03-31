@@ -11,7 +11,7 @@ MIRRORS=/etc/mercurial/mirrors
 SRC=/repo/hg/mozilla/gaia-l10n
 DEST=/repo/hg/mozilla/releases/gaia-l10n
 WSGI=/repo/hg/webroot_wsgi/releases/gaia-l10n
-venv=/repo/hg/venv_tools
+venv=/var/hg/venv_tools
 
 usage() {
     echo "Usage: $0 [-cn] -v VERSION list of locales in quotes"
@@ -55,7 +55,7 @@ basic_repo_setup() {
 pretxnchangegroup.a_singlehead = python:mozhghooks.single_head_per_branch.hook
 EOF
     ec=$?
-    /repo/hg/version-control-tools/scripts/repo-permissions $loc hg scm_l10n wwr || ec=$?
+    /var/hg/version-control-tools/scripts/repo-permissions $loc hg scm_l10n wwr || ec=$?
     pushd ${loc} >/dev/null
     echo "Doing initial push to webheads for ${loc}"
     /repo/hg/scripts/push-repo.sh || ec=$?

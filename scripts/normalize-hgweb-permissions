@@ -7,7 +7,7 @@
 
 set -e
 
-vct=/repo/hg/version-control-tools
+vct=/var/hg/version-control-tools
 root=$1
 
 for repo in `${vct}/scripts/find-hg-repos.py ${root}/ | sort`; do

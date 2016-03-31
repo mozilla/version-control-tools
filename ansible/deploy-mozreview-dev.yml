@@ -39,12 +39,12 @@
 
   - name: create virtualenv for hgweb
     include: tasks/virtualenv.yml
-             venv=/repo/hg/venv_hgweb
+             venv=/var/hg/venv_hgweb
              requirements=../roles/hg-reviewboard/files/requirements-hgweb.txt
 
   - name: create virtualenv for pash
     include: tasks/virtualenv.yml
-             venv=/repo/hg/venv_pash
+             venv=/var/hg/venv_pash
              requirements=../roles/hg-reviewboard/files/requirements-pash.txt
 
   # pash is a collection of Python files handling SSH connections. They behave
@@ -82,10 +82,10 @@
 
   - name: update v-c-t repo
     hg: repo={{ repo }}
-        dest=/repo/hg/version-control-tools
+        dest=/var/hg/version-control-tools
         revision={{ rev }}
         force=yes
         purge=yes
 
   - name: delete ignored files from version-control-tools repo
-    command: "{{ venv }}/bin/hg --config extensions.purge= -R /repo/hg/version-control-tools purge --all"
+    command: "{{ venv }}/bin/hg --config extensions.purge= -R /var/hg/version-control-tools purge --all"

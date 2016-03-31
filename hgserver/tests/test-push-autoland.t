@@ -14,7 +14,7 @@ Create repository and user
   > ssh = ssh -o "SendEnv AUTOLAND_REQUEST_USER" -F `pwd`/ssh_config -i `pwd`/autoland -l bind-autoland@mozilla.com
   > EOF
 
-  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
 Pushing a commit to a repo works
 
@@ -41,7 +41,7 @@ Pushing a commit to a repo works
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
-  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
 Pushlog should be replicated
 

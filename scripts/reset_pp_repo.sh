@@ -60,7 +60,7 @@ for hgweb in $(cat ${MIRRORS}); do ssh ${hgweb} "mv ${PROJECTS}/${TARGET} ${PROJ
 HGOPTS="--config hooks.changegroup.mirrorpush= --config hooks.changegroup.recordlogs="
 
 cd ${PROJECTS} && mv ${TARGET} ${TARGET}-old
-/repo/hg/venv_tools/bin/hg ${HGOPTS} clone --pull -U ${SOURCE} ${TARGET}
+/var/hg/venv_tools/bin/hg ${HGOPTS} clone --pull -U ${SOURCE} ${TARGET}
 cd ${PROJECTS}/${TARGET}/.hg
 
 cat <<HGRC > ${PROJECTS}/${TARGET}/.hg/hgrc
@@ -73,7 +73,7 @@ changegroup.push_printurls = python:mozhghooks.push_printurls.hook
 HGRC
 
 echo "Setting permissions"
-/repo/hg/version-control-tools/scripts/repo-permissions ${PROJECTS}/${TARGET} hg scm_level_2 wwr
+/var/hg/version-control-tools/scripts/repo-permissions ${PROJECTS}/${TARGET} hg scm_level_2 wwr
 
 echo "Updating web heads"
 (cd ${PROJECTS}/${TARGET} && /repo/hg/scripts/push-repo.sh)

@@ -1,5 +1,5 @@
 WSGISocketPrefix /var/run/wsgi
-WSGIPythonHome /repo/hg/venv_hgweb
+WSGIPythonHome /var/hg/venv_hgweb
 
 <VirtualHost *:80>
     ServerName {{ domain | mandatory }}
@@ -34,7 +34,7 @@ WSGIPythonHome /repo/hg/venv_hgweb
     # GET and HEAD methods.
     # TODO require TLS for pushing, since a credential leak could ensue.
     # Bug 1210177.
-    DefineExternalAuth bmoapikey pipe "/usr/bin/python2.7 /repo/hg/version-control-tools/scripts/httpd-authn-bugzilla-key {{ bugzilla_url | mandatory }}"
+    DefineExternalAuth bmoapikey pipe "/usr/bin/python2.7 /var/hg/version-control-tools/scripts/httpd-authn-bugzilla-key {{ bugzilla_url | mandatory }}"
     <Directory />
         Order allow,deny
         Allow from all

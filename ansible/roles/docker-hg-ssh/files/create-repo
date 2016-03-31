@@ -27,7 +27,7 @@ if [ -n "${GENERALDELTA}" ]; then
   INITFLAGS="--config format.generaldelta=true"
 fi
 
-/repo/hg/venv_tools/bin/hg init /repo/hg/mozilla/${REPO} ${INITFLAGS}
+/var/hg/venv_tools/bin/hg init /repo/hg/mozilla/${REPO} ${INITFLAGS}
 chown -R hg:${GROUP} /repo/hg/mozilla/${REPO}
 find /repo/hg/mozilla/${REPO} | xargs chmod g+w
 find /repo/hg/mozilla/${REPO} -type d | xargs chmod g+s

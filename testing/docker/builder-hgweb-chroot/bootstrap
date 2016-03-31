@@ -8,7 +8,7 @@
 
 set -e
 
-VCT=/python/repo/hg/version-control-tools
+VCT=/python/var/hg/version-control-tools
 
 mkdir -p /python/repo/hg
 /usr/bin/rsync -a --delete-after /vct-mount/ ${VCT}/

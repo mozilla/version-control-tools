@@ -1,4 +1,4 @@
-#!/repo/hg/venv_tools/bin/python2.7
+#!/var/hg/venv_tools/bin/python2.7
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -14,7 +14,7 @@ from kafka.client import KafkaClient
 from kafka.common import KafkaError
 import vcsreplicator.producer as vcsrproducer
 
-HG = '/repo/hg/venv_tools/bin/hg'
+HG = '/var/hg/venv_tools/bin/hg'
 
 # Prevent "No handlers could be found" warnings.
 kafkalogger = logging.getLogger('kafka')

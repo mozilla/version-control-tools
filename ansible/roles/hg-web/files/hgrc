@@ -38,12 +38,12 @@ unified = 8
 highlight =
 clonebundles =
 
-bundleclone = /repo/hg/version-control-tools/hgext/bundleclone
-pushlog-feed = /repo/hg/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py
-pushlog = /repo/hg/version-control-tools/hgext/pushlog
-buglink = /repo/hg/version-control-tools/hgext/pushlog-legacy/buglink.py
-serverlog = /repo/hg/version-control-tools/hgext/serverlog
-hgmo = /repo/hg/version-control-tools/hgext/hgmo
+bundleclone = /var/hg/version-control-tools/hgext/bundleclone
+pushlog-feed = /var/hg/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py
+pushlog = /var/hg/version-control-tools/hgext/pushlog
+buglink = /var/hg/version-control-tools/hgext/pushlog-legacy/buglink.py
+serverlog = /var/hg/version-control-tools/hgext/serverlog
+hgmo = /var/hg/version-control-tools/hgext/hgmo
 
 [interhg]
 a_httplinks = s|(https?://\S+)|<a href="\1">\1</a>|i

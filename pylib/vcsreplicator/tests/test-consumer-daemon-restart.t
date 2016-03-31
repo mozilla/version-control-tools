@@ -33,7 +33,7 @@ Gracefully shut down a consumer daemon
   * vcsreplicator.consumer exiting gracefully (glob)
   * kafka.conn Unable to receive data from Kafka (glob)
   Traceback (most recent call last):
-    File "/repo/hg/venv_replication/lib/python2.7/site-packages/kafka/conn.py", line 97, in _read_bytes
+    File "/var/hg/venv_replication/lib/python2.7/site-packages/kafka/conn.py", line 97, in _read_bytes
       data = self._sock.recv(min(bytes_left, 4096))
   error: [Errno 4] Interrupted system call
   * kafka.client ConnectionError attempting to receive a response to request * from server BrokerMetadata(nodeId=*, host='*', port=*): Kafka @ * went away (glob)
@@ -44,7 +44,7 @@ Gracefully shut down a consumer daemon
 Send a message to the replication system
 
   $ hgmo exec hgssh /activate-hook mozilla-central dummy value
-  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
 
 Start consumer daemon and verify it picks up where it left off

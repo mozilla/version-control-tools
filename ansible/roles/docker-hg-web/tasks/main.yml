@@ -22,6 +22,6 @@
 
 - name: create virtualenv for moz.build info
   include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_mozbuild
+           venv=/var/hg/venv_mozbuild
            requirements=../roles/docker-hg-web/files/requirements-mozbuild.txt
 

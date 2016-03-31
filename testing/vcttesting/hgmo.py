@@ -55,10 +55,10 @@ class HgCluster(object):
     hg.mozilla.org server configuration.
     """
     MASTER_FILE_MAP = {
-        'hgext/pushlog-legacy/buglink.py': '/repo/hg/version-control-tools/hgext/pushlog-legacy/buglink.py',
-        'hgext/pushlog-legacy/pushlog-feed.py': '/repo/hg/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py',
-        'hgext/pushlog/__init__.py': '/repo/hg/version-control-tools/hgext/pushlog/__init__.py',
-        'hgext/serverlog/__init__.py': '/repo/hg/version-control-tools/hgext/serverlog/__init__.py',
+        'hgext/pushlog-legacy/buglink.py': '/var/hg/version-control-tools/hgext/pushlog-legacy/buglink.py',
+        'hgext/pushlog-legacy/pushlog-feed.py': '/var/hg/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py',
+        'hgext/pushlog/__init__.py': '/var/hg/version-control-tools/hgext/pushlog/__init__.py',
+        'hgext/serverlog/__init__.py': '/var/hg/version-control-tools/hgext/serverlog/__init__.py',
         'hgserver/pash/pash.py': '/usr/local/bin/pash.py',
         'hgserver/pash/hg_helper.py': '/usr/local/bin/hg_helper.py',
         'hgserver/pash/ldap_helper.py': '/usr/local/bin/ldap_helper.py',

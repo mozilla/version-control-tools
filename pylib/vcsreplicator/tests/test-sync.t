@@ -10,7 +10,7 @@
 
   $ hgmo exec hgssh /activate-hook mozilla-central foo bar
 
-  $ hgmo exec hgssh /repo/hg/venv_tools/bin/hg -R /repo/hg/mozilla/mozilla-central replicatesync
+  $ hgmo exec hgssh /var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/mozilla-central replicatesync
   wrote synchronization message into replication log
 
   $ consumer --dump --partition 2

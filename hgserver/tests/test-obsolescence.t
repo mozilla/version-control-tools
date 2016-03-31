@@ -51,8 +51,8 @@ Enable obsolescence on the repo
   
   Enjoy living on the edge.
 
-  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ hgmo exec hgweb0 cat /repo/hg/mozilla/users/user_example.com/repo-1/.hg/hgrc
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 cat /var/hg/mozilla/users/user_example.com/repo-1/.hg/hgrc
   [phases]
   publish = False
   

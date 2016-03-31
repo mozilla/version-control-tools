@@ -25,10 +25,10 @@ for r in REPOS:
     with open(os.path.join(root, '.hg/hgrc'), 'wb') as fh:
         fh.write(b'[hgmo]\n')
         fh.write(b'mozbuildinfoenabled = True\n')
-        fh.write(b'mozbuildinfowrapper = /repo/hg/venv_mozbuild/bin/hg mozbuildinfo --pipemode\n')
+        fh.write(b'mozbuildinfowrapper = /var/hg/venv_mozbuild/bin/hg mozbuildinfo --pipemode\n')
 
     subprocess.check_call([
-        '/repo/hg/version-control-tools/scripts/repo-permissions',
+        '/var/hg/version-control-tools/scripts/repo-permissions',
         root, 'hg', 'hg', 'wwr'])
 
 # Disable ZooKeeper and Kafka.

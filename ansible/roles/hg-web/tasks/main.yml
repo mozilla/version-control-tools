@@ -134,37 +134,37 @@
 # are supported to do Python.
 - name: create virtualenv for hgweb
   include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_hgweb
+           venv=/var/hg/venv_hgweb
            requirements=../roles/hg-web/files/requirements-hgweb.txt
 
 - name: create virtualenv for replication
   include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_replication
+           venv=/var/hg/venv_replication
            requirements=../roles/hg-web/files/requirements-replication.txt
 
 - name: create virtualenv for tools
   include: ../../../tasks/virtualenv.yml
-           venv=/repo/hg/venv_tools
+           venv=/var/hg/venv_tools
            requirements=../roles/hg-web/files/requirements-tools.txt
 
 
 - name: set up version-control-tools repo (server only)
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
-      dest=/repo/hg/version-control-tools
+      dest=/var/hg/version-control-tools
       revision={{ lookup('file', '../../../../.vctnode') }}
       force=yes
       purge=yes
-      executable=/repo/hg/venv_hgweb/bin/hg
+      executable=/var/hg/venv_hgweb/bin/hg
   when: vct_dir.stat.exists == False
 
 # The hg module's purge doesn't delete ignored files. Boo. Force that
 # because old .pyc files may cause chaos.
 - name: delete ignored files from version-control-tools repo
-  command: /repo/hg/venv_hgweb/bin/hg --config extensions.purge= -R /repo/hg/version-control-tools purge --all
+  command: /var/hg/venv_hgweb/bin/hg --config extensions.purge= -R /var/hg/version-control-tools purge --all
   when: vct_dir.stat.exists == False
 
 - name: rsync version-control-tools repo (Docker only)
-  command: /usr/bin/rsync -a --delete-after /vct/ /repo/hg/version-control-tools/
+  command: /usr/bin/rsync -a --delete-after /vct/ /var/hg/version-control-tools/
   when: vct_dir.stat.exists == True
 
 # pip doesn't reinstall the same version unless --upgrade is passed.
@@ -173,14 +173,14 @@
 # pip secures download of 3rd party packages.
 # --force-reinstall is there for completeness.
 - name: install vcsreplicator into virtualenv
-  command: /repo/hg/venv_replication/bin/pip install --upgrade --no-deps --force-reinstall /repo/hg/version-control-tools/pylib/vcsreplicator
+  command: /var/hg/venv_replication/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
 
 # Various hgrc files reference hooks via "python:mozhghooks.*". Install
 # a link in the replication virtualenv to the path to these hooks inside
 # the version-control-tools checkout.
 - name: add mozhghooks to virtualens
-  copy: dest=/repo/hg/{{ item }}/lib/python2.7/site-packages/mozhghooks.pth
-        content=/repo/hg/version-control-tools/hghooks
+  copy: dest=/var/hg/{{ item }}/lib/python2.7/site-packages/mozhghooks.pth
+        content=/var/hg/version-control-tools/hghooks
         owner=root
         group=root
         mode=0644
@@ -211,7 +211,7 @@
 
 # Install and manage the mod_wsgi config file
 - name: install wsgi config
-  copy: content="LoadModule wsgi_module /repo/hg/venv_hgweb/lib/python2.7/site-packages/mod_wsgi/server/mod_wsgi-py27.so" dest=/etc/httpd/conf.d/wsgi.conf
+  copy: content="LoadModule wsgi_module /var/hg/venv_hgweb/lib/python2.7/site-packages/mod_wsgi/server/mod_wsgi-py27.so" dest=/etc/httpd/conf.d/wsgi.conf
 
 - name: directory for httpd logs
   file: path=/var/log/httpd/hg.mozilla.org
@@ -261,7 +261,7 @@
 # version-control-tools. The content of the users/ directory is generated
 # by a CRON that runs every few minutes.
 - name: synchronize wsgi files
-  command: /usr/bin/rsync -a --delete --filter='P users/' /repo/hg/version-control-tools/hgwsgi/ /repo/hg/webroot_wsgi/
+  command: /usr/bin/rsync -a --delete --filter='P users/' /var/hg/version-control-tools/hgwsgi/ /repo/hg/webroot_wsgi/
 
 - name: set ownership of wsgi files
   command: /bin/chown -R hg:hg /repo/hg/webroot_wsgi
@@ -292,7 +292,7 @@
 - name: create CRON to generate daily Mercurial log files
   cron: name='Daily Mercurial log data'
         user=root
-        job='/bin/nice -n 10 /repo/hg/scripts/outputif /repo/hg/version-control-tools/hgext/serverlog/scripts/generate-daily-logs.py'
+        job='/bin/nice -n 10 /repo/hg/scripts/outputif /var/hg/version-control-tools/hgext/serverlog/scripts/generate-daily-logs.py'
         day=*
         month=*
         minute=0

@@ -28,7 +28,7 @@ if not os.path.exists(repo_permissions):
 
 # We need to use the hg that is configured for replication otherwise
 # hooks and other Python dependencies may not load properly.
-HG = '/repo/hg/venv_replication/bin/hg'
+HG = '/var/hg/venv_replication/bin/hg'
 if not os.path.exists(HG):
     raise Exception('could not find %s' % HG)
 

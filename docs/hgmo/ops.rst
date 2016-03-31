@@ -117,7 +117,7 @@ hg replicatesync
 
 .. important::
 
-   You will need to run ``/repo/hg/venv_tools/bin/hg`` instead of
+   You will need to run ``/var/hg/venv_tools/bin/hg`` instead of
    ``/usr/bin/hg`` so Python package dependencies required for
    replication are loaded.
 
@@ -406,7 +406,7 @@ We don't yet know of correctable conditions causing endless loops. So,
 for now the best we can do is skip the message and hope the condition
 doesn't come back::
 
-   $ /repo/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --skip
+   $ /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --skip
 
 .. important::
 

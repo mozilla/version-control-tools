@@ -16,7 +16,7 @@ from boto.s3.connection import S3Connection
 import concurrent.futures as futures
 
 
-HG = '/repo/hg/venv_tools/bin/hg'
+HG = '/var/hg/venv_tools/bin/hg'
 
 # The types of bundles to generate.
 #

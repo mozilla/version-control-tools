@@ -38,7 +38,7 @@ Create a repository
   remote:   https://hg.mozilla.org/mozilla-central/rev/eefea2647aef
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
-  $ hgmo exec hgweb0 /repo/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/file/eefea2647aef/foo.js | grep 'href="#l'
   <a href="#l1"></a><span id="l1"><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="s2">&quot;bar&quot;</span><span class="p">;</span></span>

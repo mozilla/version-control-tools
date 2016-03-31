@@ -8,7 +8,7 @@ Create the repository and push a change
   $ hgmo exec hgssh /create-repo mozilla-central scm_level_1 --non-publishing
   (recorded repository creation in replication log)
   marking repo as non-publishing
-  $ hgmo exec hgssh /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
   $ standarduser
   $ consumer --onetime

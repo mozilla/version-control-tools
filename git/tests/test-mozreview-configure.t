@@ -16,7 +16,7 @@
 
 Create autoreview repo manifest
 
-  $ mozreview exec hgrb /repo/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ssh://${HGSSH_HOST}:${HGSSH_PORT}/
+  $ mozreview exec hgrb /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/autoreview createrepomanifest ${MERCURIAL_URL} ssh://${HGSSH_HOST}:${HGSSH_PORT}/
   96ee1d7354c4ad7372047672c36a1f561e3a6a4c http://$DOCKER_HOSTNAME:$HGPORT/test-repo ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
 
   $ git -c fetch.prune=true clone hg::${MERCURIAL_URL}test-repo gitrepo
