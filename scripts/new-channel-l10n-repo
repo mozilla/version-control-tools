@@ -1,0 +1,108 @@
+#!/bin/bash
+
+VERBOSE=
+venv=/repo/hg/venv_tools
+repo_root=/repo/hg/mozilla/releases/l10n
+repo_owner=hg
+repo_group=scm_l10n
+
+# print the given message to stderr and exit
+die() {
+    msg=$1
+    echo $msg 1>&2
+    exit 1
+}
+
+# print the given message if verbose mode is enabled
+log() {
+    test -n "$VERBOSE" && echo $@
+}
+
+# Create a repository in the given path.
+# Installs the single_head_per_branch hook
+create() {
+    repo=$1
+    log "Creating repo at $repo"
+    test -e $repo && die "$repo already exists, ABORTING"
+    $venv/bin/hg init $repo || die "hg init failed for $repo, ABORTING"
+    log " + Setting up hooks"
+    cat <<EOF > $repo/.hg/hgrc
+[hooks]
+pretxnchangegroup.a_singlehead = python:mozhghooks.single_head_per_branch.hook
+EOF
+    log " + Setting up ownership"
+    /repo/hg/version-control-tools/scripts/repo-permissions $repo $repo_owner $repo_group wwr
+    log " + Updating web heads"
+    (cd $repo && /repo/hg/scripts/push-repo.sh)
+    (cd $repo && sudo -u hg /usr/local/bin/repo-push.sh $repo --hgrc)
+}
+
+# Clone the given repository to the given destination
+clone() {
+    die "clone functionality not yet implemented"
+}
+
+# show help
+usage() {
+    echo "new-channel-l10n-repo [options] <repo> <channel> [channel...]"
+    echo "Options:"
+    echo -e " -v, --verbose:\t\t\tVerbose execution"
+    echo -e " -c <src>, --clone <src>\tClone from src"
+    echo -e " -C, --channels\t\t\tPrint the known channels"
+}
+
+# Print the channels we know about.
+show_channels() {
+    (cd /repo/hg/mozilla/releases/l10n/; ls -1d mozilla*)
+}
+
+# Ensure venv_tools virtualenv exists
+if [ \! -d "$venv" ]; then
+    die "Missing venv_tools virtualenv!"
+fi
+
+# The "main" program starts here.
+TEMP=`getopt -o vhCc: --long verbose,help,channels,clone: \
+    -n "new-channel-l10n-repo" -- "$@"`
+[ $? == 0 ] || die "Getopt failed. Terminating..."
+eval set -- "$TEMP"
+
+while true; do
+    case $1 in
+        -v|--verbose) VERBOSE=1 ; shift ;;
+        -c|--clone) CLONE_FROM=$2; shift 2 ;;
+        -C|--channels) show_channels; exit 0 ;;
+        -h|--help) usage ; exit 0 ;;
+        --) shift ; break ;;
+        *) die "wot?" ;;
+    esac
+done
+
+repo_name=$1 ; shift
+if [ -z "$repo_name" ] || [ $# == 0 ]; then
+    usage
+    die "ERROR: Need a repo name and some channels."
+fi
+
+# For each channel given, create or clone the target repository
+while true; do
+    channel=$1
+    if [ -n "$channel" ] && [ -d $repo_root/$channel ]; then
+        repo_path=$repo_root/$channel/$repo_name
+        if [ -z "$CLONE_FROM" ]; then
+            create $repo_path
+        else
+            clone $CLONE_FROM $repo_path
+        fi
+    else
+        die "$repo_root/$channel doesn't exist. ABORTING"
+    fi
+    shift || break
+    [ $# == 0 ] && break
+done
+
+# Local variables:
+# mode: shell-script
+# tab-width: 4
+# indent-tabs-mode: nil
+# end:
