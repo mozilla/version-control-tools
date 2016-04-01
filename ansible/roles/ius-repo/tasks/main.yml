@@ -13,7 +13,7 @@
   with_items:
     - { name: epel-release-6-5.noarch.rpm, dest: epel-release-6-5.noarch.rpm, sha256: 1eac9bf24ae252ae4117a309391b532da3f139e4d0eb8ab384a08f5fc0526593 }
     - { name: ius-release-1.0-14.ius.el6.noarch.rpm, dest: ius-release-1.0-14.rpm, sha256: 147b8d584cff9cb4abc6332999998dc24873fddb0a28b7f505fe993e6331e67c }
-  when: ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == 'Red Hat Enterprise Linux' and ansible_distribution_major_version == '6'
 
 - name: download IUS community configuration RPMs (CentOS 6)
   get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/{{ item.name }}
@@ -22,12 +22,13 @@
   with_items:
     - { name: epel-release-6-5.20150727.noarch.rpm, dest: epel-release-6-5.noarch.rpm, sha256: 0c42f55f719419fb61caa82fd61ad48b2d32d43bf8c3274197e2506302497b0b }
     - { name: ius-release-1.0-14.20150727.ius.centos6.noarch.rpm, dest: ius-release-1.0-14.rpm, sha256: 331d255903875f47dac8b6acaf299097e70ace2ef55405efc5adb90f1a61158e }
-  when: ansible_distribution == 'CentOS'
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6'
 
 - name: ensure yum package database up to date
   command: yum search python
+  when: ansible_distribution_major_version == '6'
 
 - name: configure IUS Community Repos
   command: yum localinstall -y /var/tmp/epel-release-6-5.noarch.rpm /var/tmp/ius-release-1.0-14.rpm
-
+  when: ansible_distribution_major_version == '6'
 
