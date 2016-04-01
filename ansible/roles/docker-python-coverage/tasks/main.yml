@@ -1,12 +1,25 @@
 ---
-- name: Prerequisites to install Python code coverage tools
+- name: prerequisites to install Python code coverage tools
   yum: name=python-devel state=present
 
-- name: Python code coverage module installed
+- name: python code coverage module installed
   pip: name=coverage state=latest
 
-- name: Code coverage directory present
+- name: code coverage directory present
   file: path=/coverage state=directory mode=0777
 
-- name: Install custom sitecustomize.py
+- name: determine if Python 2.6 installed
+  stat: path=/usr/lib/python2.6
+  register: python26
+
+- name: determine if Python 2.7 installed
+  stat: path=/usr/lib/python2.7
+  register: python27
+
+- name: install custom sitecustomize.py (Python 2.6)
   copy: src=sitecustomize.py dest=/usr/lib/python2.6/site-packages/sitecustomize.py
+  when: python26.stat.exists == True
+
+- name: install custom sitecustomize.py (Python 2.7)
+  copy: src=sitecustomize.py dest=/usr/lib/python2.7/site-packages/sitecustomize.py
+  when: python27.stat.exists == True
