@@ -221,7 +221,6 @@
         group=root
         mode=0755
   with_items:
-    - push-repo.sh
     - record-pushes.sh
 
 - name: ensure bundles directory exists

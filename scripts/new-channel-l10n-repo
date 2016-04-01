@@ -34,7 +34,7 @@ EOF
     log " + Setting up ownership"
     /var/hg/version-control-tools/scripts/repo-permissions $repo $repo_owner $repo_group wwr
     log " + Updating web heads"
-    (cd $repo && /repo/hg/scripts/push-repo.sh)
+    (cd $repo && /var/hg/version-control-tools/scripts/push-repo.sh)
     (cd $repo && sudo -u hg /usr/local/bin/repo-push.sh $repo --hgrc)
 }
 

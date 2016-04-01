@@ -58,7 +58,7 @@ EOF
     /var/hg/version-control-tools/scripts/repo-permissions $loc hg scm_l10n wwr || ec=$?
     pushd ${loc} >/dev/null
     echo "Doing initial push to webheads for ${loc}"
-    /repo/hg/scripts/push-repo.sh || ec=$?
+    /var/hg/version-control-tools/scripts/push-repo.sh || ec=$?
     sudo -u hg /usr/local/bin/repo-push.sh ${loc} --hgrc
     popd >/dev/null
     test ${ec} -eq 0 ||

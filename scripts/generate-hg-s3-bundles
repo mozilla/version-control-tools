@@ -17,6 +17,7 @@ import concurrent.futures as futures
 
 
 HG = '/var/hg/venv_tools/bin/hg'
+PUSH_REPO = '/var/hg/version-control-tools/scripts/push-repo.sh'
 
 # The types of bundles to generate.
 #
@@ -169,7 +170,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
             shutil.copy2(source, dest)
 
         # Replicate manifest to mirrors.
-        subprocess.check_call(['/repo/hg/scripts/push-repo.sh'], cwd=dest_repo)
+        subprocess.check_call([PUSH_REPO], cwd=dest_repo)
 
         return {}
 
@@ -334,7 +335,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
     os.chmod(clonebundles_path, 0664)
 
     # Replicate manifest to mirrors.
-    subprocess.check_call(['/repo/hg/scripts/push-repo.sh'], cwd=repo_full)
+    subprocess.check_call([PUSH_REPO], cwd=repo_full)
 
     return paths
 

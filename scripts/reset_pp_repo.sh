@@ -76,7 +76,7 @@ echo "Setting permissions"
 /var/hg/version-control-tools/scripts/repo-permissions ${PROJECTS}/${TARGET} hg scm_level_2 wwr
 
 echo "Updating web heads"
-(cd ${PROJECTS}/${TARGET} && /repo/hg/scripts/push-repo.sh)
+(cd ${PROJECTS}/${TARGET} && /var/hg/version-control-tools/scripts/push-repo.sh)
 (cd $repo && sudo -u hg /usr/local/bin/repo-push.sh $repo --hgrc)
 
 echo "Clean up"
