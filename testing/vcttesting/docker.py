@@ -503,12 +503,12 @@ class Docker(object):
         if not missing:
             return images
 
-        ma = {k: ansibles[k] for k in missing if k in ansibles}
+        missing_ansibles = {k: ansibles[k] for k in missing if k in ansibles}
         start_images = {}
         for image in self._get_sorted_images():
             for repotag in image['RepoTags']:
                 repo, tag = repotag.split(':', 1)
-                if repo in ma:
+                if repo in missing_ansibles:
                     start_images[repo] = image['Id']
 
         def build(name, **kwargs):
