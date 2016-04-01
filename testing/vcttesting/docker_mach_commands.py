@@ -111,9 +111,11 @@ class DockerCommands(object):
 
     @Command('build-mercurial-rpms', category='docker',
         description='Build RPMs for Mercurial')
+    @CommandArgument('distro', help='Distro/builder to use',
+                     choices={'centos6', 'centos7'})
     @CommandArgument('destdir', help='Directory in which to save RPMs')
-    def build_rpms(self, destdir):
-        for filename, data in self.d.build_mercurial_rpms().items():
+    def build_rpms(self, distro, destdir):
+        for filename, data in self.d.build_mercurial_rpms(distro).items():
             outfile = os.path.join(destdir, filename)
             with open(outfile, 'wb') as fh:
                 fh.write(data)
