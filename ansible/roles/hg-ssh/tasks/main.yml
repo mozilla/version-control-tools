@@ -214,15 +214,6 @@
         group=root
         mode=0755
 
-- name: install push scripts
-  copy: src={{ vct }}/scripts/{{ item }}
-        dest=/repo/hg/scripts/{{ item }}
-        owner=root
-        group=root
-        mode=0755
-  with_items:
-    - record-pushes.sh
-
 - name: ensure bundles directory exists
   file: path=/repo/bundles
         state=directory

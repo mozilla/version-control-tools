@@ -57,7 +57,7 @@ Blackbox logging recorded appropriate entries
   * user1@example.com (*)> pythonhook-pretxnclose: hgext_vcsreplicator.pretxnclosehook finished in * seconds (glob)
   * user1@example.com (*)> pythonhook-pushkey: hgext_vcsreplicator.pushkeyhook finished in * seconds (glob)
   * user1@example.com (*)> pythonhook-txnclose: hgext_vcsreplicator.txnclosehook finished in * seconds (glob)
-  * user1@example.com (*)> exthook-changegroup.a_recordlogs: /repo/hg/scripts/record-pushes.sh finished in * seconds (glob)
+  * user1@example.com (*)> exthook-changegroup.a_recordlogs: /var/hg/version-control-tools/scripts/record-pushes.sh finished in * seconds (glob)
   * user1@example.com (*)> pythonhook-changegroup: mozhghooks.push_printurls.hook finished in * seconds (glob)
   * user1@example.com (*)> pythonhook-changegroup: hgext_vcsreplicator.changegrouphook finished in * seconds (glob)
   * user1@example.com (*)> 1 incoming changes - new heads: 77538e1ce4be (glob)
