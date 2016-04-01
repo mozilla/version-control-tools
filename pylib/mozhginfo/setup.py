@@ -6,7 +6,8 @@ setup(
     packages=find_packages(),
 
     install_requires=[
-        'requests>=2.8.1'
+        'requests>=2.8.1',
+        'redo>=1.5'
     ],
 
     # Meta-data for upload to PyPI

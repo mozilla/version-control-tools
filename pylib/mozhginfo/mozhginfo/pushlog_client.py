@@ -20,6 +20,7 @@ import logging
 import requests
 
 from push import Push
+from redo import retry
 
 
 LOG = logging.getLogger('pushlog_client')
@@ -64,7 +65,7 @@ def query_pushes_by_revision_range(repo_url, from_revision, to_revision, version
         url += '&tipsonly=1'
 
     LOG.debug("About to fetch %s" % url)
-    req = requests.get(url)
+    req = retry(requests.get, args=(url,))
     pushes = req.json()["pushes"]
     # json-pushes does not include the starting revision
     push_list.append(query_push_by_revision(repo_url, from_revision))
@@ -99,7 +100,7 @@ def query_pushes_by_pushid_range(repo_url, start_id, end_id, version=VERSION,
         version
     )
     LOG.debug("About to fetch %s" % url)
-    req = requests.get(url)
+    req = retry(requests.get, args=(url,))
     pushes = req.json()["pushes"]
 
     for push_id in sorted(pushes.keys()):
@@ -155,7 +156,7 @@ def query_push_by_revision(repo_url, revision, full=False, return_revision_list=
     if full:
         url += "&full=1"
     LOG.debug("About to fetch %s" % url)
-    req = requests.get(url)
+    req = retry(requests.get, args=(url,))
     data = req.json()
     assert len(data) == 1, "We should only have information about one push"
 
@@ -175,7 +176,7 @@ def query_push_by_revision(repo_url, revision, full=False, return_revision_list=
 def query_repo_tip(repo_url):
     """Return the tip of a branch URL."""
     url = "%s?tipsonly=1" % (JSON_PUSHES % {"repo_url": repo_url})
-    recent_commits = requests.get(url).json()
+    recent_commits = retry(requests.get, args=(url,)).json()
     tip_id = sorted(recent_commits.keys())[-1]
     return Push(push_id=tip_id, push_info=recent_commits[tip_id])
 
@@ -192,7 +193,7 @@ def valid_revision(repo_url, revision):
         JSON_PUSHES % {"repo_url": repo_url},
         revision
     )
-    data = requests.get(url).json()
+    data = retry(requests.get, args=(url,)).json()
     ret = True
 
     # A valid revision will return a dictionary with information about exactly one revision
