@@ -1,15 +1,30 @@
 ---
+# We assume in various places in this file that we only run on RHEL/CentOS.
 - name: determine if running in Docker
   stat: path=/vct
   register: vct_dir
 
+# Install from RPM on RHEL/CentOS 6 because its supervisor is ancient.
 - name: obtain supervisor RPM
   get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/supervisor-3.1.3-2.el6.noarch.rpm
            dest=/var/tmp/supervisor-3.1.3-2.el6.noarch.rpm
            sha256sum=236c9f3f1b4204c6a38d9604a64539332cb6c3204fb00973c282b6d169f4ca17
+  when: ansible_distribution_major_version == '6'
 
 - name: install supervisor
   command: yum localinstall -y /var/tmp/supervisor-3.1.3-2.el6.noarch.rpm
+  when: ansible_distribution_major_version == '6'
+
+
+- name: install epel package repository (CentOS 7 only)
+  yum: name=epel-release
+       state=present
+  when: ansible_distribution_major_version == '7'
+
+- name: install supervisor
+  yum: name=supervisor
+       state=present
+  when: ansible_distribution_major_version == '7'
 
 - name: create supervisor config directory
   file: path=/etc/supervisor.d
@@ -27,6 +42,7 @@
 
 - name: configure supervisor to run at system startup
   command: /sbin/chkconfig --level 2345 supervisord on
+  when: ansible_distribution_major_version == '6'
 
 - name: ensure supervisor service is started
   service: name=supervisord
