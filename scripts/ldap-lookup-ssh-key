@@ -1,0 +1,72 @@
+#!/var/hg/venv_pash/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script looks up and prints SSH public keys for the user specified as
+# the command argument.
+
+from __future__ import absolute_import, print_function, unicode_literals
+
+import base64
+import json
+import struct
+import sys
+
+import ldap
+
+
+SETTINGS_PATH = '/etc/mercurial/ldap.json'
+UID_ATTRIBUTE = b'mail'
+SSH_KEY_ATTRIBUTE = b'sshPublicKey'
+
+def main(user):
+    with open(SETTINGS_PATH, 'rb') as fh:
+        settings = json.load(fh)
+
+    conn = ldap.initialize(settings['url'])
+    conn.simple_bind_s(settings['username'], settings['password'])
+
+    result = conn.search_s(b'dc=mozilla', ldap.SCOPE_SUBTREE,
+                           b'(%s=%s)' % (UID_ATTRIBUTE, user),
+                           [SSH_KEY_ATTRIBUTE])
+
+    if not result:
+        print('user not found', file=sys.stderr)
+        return 1
+
+    if len(result) > 1:
+        print('multiple LDAP entries found; weird', file=sys.stderr)
+        return 1
+
+    result = result[0]
+    if SSH_KEY_ATTRIBUTE not in result[1]:
+        print('no SSH keys found for user', file=sys.stderr)
+        return 1
+
+    keys = result[1][SSH_KEY_ATTRIBUTE]
+
+    # Ignore DSA keys. The server shouldn't support these anyway. Defense
+    # in depth.
+    keys = [k for k in keys if not k.startswith('ssh-dss')]
+
+    if not keys:
+        print('no valid SSH keys found for user', file=sys.stderr)
+        return 1
+
+    for key in keys:
+        print(key)
+
+    return 0
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print('usage: %s <user>' % sys.argv[0], file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        sys.exit(main(sys.argv[1]))
+    except Exception:
+        print('error', file=sys.stderr)
+        sys.exit(1)
