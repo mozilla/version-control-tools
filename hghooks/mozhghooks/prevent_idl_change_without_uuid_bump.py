@@ -48,6 +48,8 @@ ILD_RE = re.compile(
         IDL_MATCH_INTERFACE_BODY_AND_CAPTURE_NAME_PATTERN + r')',
     re.DOTALL | re.IGNORECASE)
 
+IDL_WHITESPACE_RE = re.compile(r'\s+')
+
 def check_unbumped_idl_interfaces(old_idl, new_idl):
     """Compares the interfaces in old_idl and new_idl and returns the names
     of the interfaces that need a UUID bump. Any non-comment change in the
@@ -57,6 +59,7 @@ def check_unbumped_idl_interfaces(old_idl, new_idl):
         # Strip away comments first.
         idl = IDL_MULTI_LINE_COMMENT_RE.sub('', idl)
         idl = IDL_SINGLE_LINE_COMMENT_RE.sub('', idl)
+        idl = IDL_WHITESPACE_RE.sub(' ', idl)
         return dict((name, {'uuid': uuid, 'body': body})
                         for body, uuid, name in ILD_RE.findall(idl))
     old_interfaces = parse(old_idl)

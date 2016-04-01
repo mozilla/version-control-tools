@@ -1,0 +1,4 @@
+DELETE FROM mysql.user;
+CREATE USER 'root'@'%' IDENTIFIED BY 'password';
+GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;

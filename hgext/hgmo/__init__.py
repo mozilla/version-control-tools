@@ -69,6 +69,7 @@ string. Of course, no security will be provided.
 import json
 import os
 import subprocess
+import types
 
 from mercurial.i18n import _
 from mercurial.node import bin, short
@@ -82,12 +83,18 @@ from mercurial import (
     hg,
     revset,
     util,
+    wireproto,
 )
 from mercurial.hgweb import (
     webcommands,
     webutil,
 )
-from mercurial.hgweb.common import HTTP_OK
+from mercurial.hgweb.common import (
+    HTTP_OK,
+)
+from mercurial.hgweb.protocol import (
+    webproto,
+)
 
 
 OUR_DIR = os.path.dirname(__file__)
@@ -126,7 +133,7 @@ def addmetadata(repo, ctx, d, onlycheap=False):
             try:
                 bctx = repo[node]
                 d['backsoutnodes'].append({'node': bctx.hex()})
-            except error.LookupError:
+            except error.RepoLookupError:
                 pass
 
     # Repositories can define which TreeHerder repository they are associated
@@ -359,6 +366,49 @@ def headdivergencewebcommand(web, req, tmpl):
                 filemerges=filemerges, filemergesignored=filemergesignored)
 
 
+def automationrelevancewebcommand(web, req, tmpl):
+    if 'node' not in req.form:
+        return tmpl('error', error={'error': "missing parameter 'node'"})
+
+    repo = web.repo
+    deletefields = set([
+        'bookmarks',
+        'branch',
+        'branches',
+        'changelogtag',
+        'child',
+        'inbranch',
+        'phase',
+        'tags',
+    ])
+
+    csets = []
+    for ctx in repo.set('automationrelevant(%r)', req.form['node'][0]):
+        entry = webutil.changelistentry(web, ctx, tmpl)
+        # Some items in changelistentry are generators, which json.dumps()
+        # can't handle. So we expand them.
+        for k, v in entry.items():
+            # "files" is a generator that attempts to call a template.
+            # Don't even bother and just repopulate it.
+            if k == 'files':
+                entry['files'] = sorted(ctx.files())
+            # "parent" is a generator in 3.6 and a lambda in 3.7+.
+            elif k == 'parent' and not isinstance(v, types.GeneratorType):
+                entry['parent'] = list(v())
+            # These aren't interesting to us, so prune them. The
+            # original impetus for this was because "changelogtag"
+            # isn't part of the json template and adding it is non-trivial.
+            elif k in deletefields:
+                del entry[k]
+            elif isinstance(v, types.GeneratorType):
+                entry[k] = list(v)
+
+        csets.append(entry)
+
+    req.respond(HTTP_OK, 'application/json')
+    return json.dumps({'changesets': csets}, indent=2, sort_keys=True)
+
+
 def revset_reviewer(repo, subset, x):
     """``reviewer(REVIEWER)``
 
@@ -377,6 +427,39 @@ def revset_reviewer(repo, subset, x):
         return False
 
     return subset.filter(hasreviewer)
+
+
+def revset_automationrelevant(repo, subset, x):
+    """``automationrelevant(set)``
+
+    Changesets relevant to scheduling in automation.
+
+    Given a revset that evaluates to a single revision, will return that
+    revision and any ancestors that are part of the same push unioned with
+    non-public ancestors.
+    """
+    s = revset.getset(repo, revset.fullreposet(repo), x)
+    if len(s) > 1:
+        raise util.Abort('can only evaluate single changeset')
+
+    ctx = repo[s.first()]
+    revs = set([ctx.rev()])
+
+    # The pushlog is used to get revisions part of the same push as
+    # the requested revision.
+    pushlog = getattr(repo, 'pushlog', None)
+    if pushlog:
+        pushinfo = repo.pushlog.pushfromchangeset(ctx)
+        for n in pushinfo[3]:
+            pctx = repo[n]
+            if pctx.rev() <= ctx.rev():
+                revs.add(pctx.rev())
+
+    # Union with non-public ancestors.
+    for rev in repo.revs('::%d & not public()', ctx.rev()):
+        revs.add(rev)
+
+    return subset & revset.baseset(revs)
 
 
 def bmupdatefromremote(orig, ui, repo, remotemarks, path, trfunc, explicit=()):
@@ -459,13 +542,156 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
     return
 
 
+def clonebundleswireproto(orig, repo, proto):
+    """Wraps wireproto.clonebundles."""
+    return processbundlesmanifest(repo, proto, orig(repo, proto))
+
+
+def bundleclonewireproto(orig, repo, proto):
+    """Wraps wireproto.bundles."""
+    return processbundlesmanifest(repo, proto, orig(repo, proto))
+
+
+def processbundlesmanifest(repo, proto, manifest):
+    """Processes a bundleclone/clonebundles manifest.
+
+    We examine source IP addresses and advertise URLs for the same
+    AWS region if the source is in AWS.
+    """
+    # Delay import because this extension can be run on local
+    # developer machines.
+    import ipaddress
+
+    if not isinstance(proto, webproto):
+        return manifest
+
+    awspath = repo.ui.config('hgmo', 'awsippath')
+    if not awspath:
+        return manifest
+
+    # Mozilla's load balancers add a X-Cluster-Client-IP header to identify the
+    # actual source IP, so prefer it.
+    sourceip = proto.req.env.get('HTTP_X_CLUSTER_CLIENT_IP',
+                                 proto.req.env.get('REMOTE_ADDR'))
+    if not sourceip:
+        return manifest
+
+    origlines = [l for l in manifest.splitlines()]
+    # ec2 region not listed in any manifest entries. This is weird but it means
+    # there is nothing for us to do.
+    if not any('ec2region=' in l for l in origlines):
+        return manifest
+
+    try:
+        # constructor insists on unicode instances.
+        sourceip = ipaddress.IPv4Address(sourceip.decode('ascii'))
+
+        with open(awspath, 'rb') as fh:
+            awsdata = json.load(fh)
+
+        for ipentry in awsdata['prefixes']:
+            network = ipaddress.IPv4Network(ipentry['ip_prefix'])
+
+            if sourceip not in network:
+                continue
+
+            region = ipentry['region']
+
+            filtered = [l for l in origlines if 'ec2region=%s' % region in l]
+            # No manifest entries for this region. Ignore match and try others.
+            if not filtered:
+                continue
+
+            # We prioritize stream clone bundles to AWS clients because they are
+            # the fastest way to clone and we want our automation to be fast.
+            def mancmp(a, b):
+                packed = 'BUNDLESPEC=none-packed1'
+                stream = 'stream='
+
+                if packed in a and packed not in b:
+                    return -1
+                if packed in b and packed not in a:
+                    return 1
+
+                if stream in a and stream not in b:
+                    return -1
+                if stream in b and stream not in a:
+                    return 1
+
+                return 0
+
+            filtered = sorted(filtered, cmp=mancmp)
+
+            # We got a match. Write out the filtered manifest (with a trailing newline).
+            filtered.append('')
+            return '\n'.join(filtered)
+
+        return manifest
+
+    except Exception as e:
+        repo.ui.log('hgmo', 'exception filtering bundle source IPs: %s\n', e)
+        return manifest
+
+
+def filelog(orig, web, req, tmpl):
+    """Wraps webcommands.filelog to provide pushlog metadata to template."""
+
+    if hasattr(web.repo, 'pushlog'):
+
+        class _tmpl(object):
+
+            def __init__(self):
+                self.defaults = tmpl.defaults
+
+            def __call__(self, *args, **kwargs):
+                self.args = args
+                self.kwargs = kwargs
+                return self
+
+        class _ctx(object):
+
+            def __init__(self, hex):
+                self._hex = hex
+
+            def hex(self):
+                return self._hex
+
+        t = orig(web, req, _tmpl())
+        for entry in t.kwargs['entries']:
+            pushinfo = web.repo.pushlog.pushfromchangeset(_ctx(entry['node']))
+            if pushinfo:
+                entry['pushid'] = pushinfo[0]
+                entry['pushdate'] = util.makedate(pushinfo[2])
+            else:
+                entry['pushid'] = None
+                entry['pushdate'] = None
+
+        return tmpl(*t.args, **t.kwargs)
+    else:
+        return orig(web, req, tmpl)
+
+
 def extsetup(ui):
     extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
     extensions.wrapfunction(webutil, 'changelistentry', changelistentry)
     extensions.wrapfunction(bookmarks, 'updatefromremote', bmupdatefromremote)
+    extensions.wrapfunction(webcommands, 'filelog', filelog)
 
     revset.symbols['reviewer'] = revset_reviewer
     revset.safesymbols.add('reviewer')
+
+    revset.symbols['automationrelevant'] = revset_automationrelevant
+    revset.safesymbols.add('automationrelevant')
+
+    # Install IP filtering for bundle URLs.
+
+    # Build-in command from core Mercurial.
+    extensions.wrapcommand(wireproto.commands, 'clonebundles', clonebundleswireproto)
+
+    # Legacy bundleclone command. Need to support until all clients run
+    # 3.6+.
+    if 'bundles' in wireproto.commands:
+        extensions.wrapcommand(wireproto.commands, 'bundles', bundleclonewireproto)
 
     entry = extensions.wrapcommand(commands.table, 'serve', servehgmo)
     entry[1].append(('', 'hgmo', False,
@@ -484,3 +710,6 @@ def extsetup(ui):
 
     setattr(webcommands, 'headdivergence', headdivergencewebcommand)
     webcommands.__all__.append('headdivergence')
+
+    setattr(webcommands, 'automationrelevance', automationrelevancewebcommand)
+    webcommands.__all__.append('automationrelevance')

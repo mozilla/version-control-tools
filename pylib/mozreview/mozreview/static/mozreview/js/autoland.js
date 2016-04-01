@@ -32,12 +32,10 @@ $(document).on("mozreview_ready", function() {
       .show();
   }
 
-  if (!MozReview.hasTryRepository) {
+  if (!MozReview.autolandingToTryEnabled) {
     try_trigger.attr('title', 'Try builds cannot be triggered for this repository');
   } else if ($("#draft-banner").is(":visible")) {
     try_trigger.attr('title', 'Try builds cannot be triggered on draft review requests');
-  } else if (!MozReview.currentIsMutableByUser) {
-    try_trigger.attr('title', 'Only the author may trigger a try build at this time');
   } else if (!MozReview.hasScmLevel1) {
     try_trigger.attr('title', 'You do not have the required scm level to trigger a try build');
   } else if (!MozReview.reviewRequestPending) {
@@ -142,7 +140,7 @@ $(document).on("mozreview_ready", function() {
       .modalBox({
         title: "Land Commits",
         buttons: [
-          $('<input type="button"/>')
+          $('<input type="button" id="autoland-cancel"/>')
             .val(gettext("Cancel")),
           $('<input type="button" id="autoland-submit" disabled/>')
             .val("Land")
@@ -183,6 +181,16 @@ $(document).on("mozreview_ready", function() {
                   $('<span/>')
                     .addClass('autoland-commit-reviewers')
                     .text('reviewers: ' + this.reviewers.join(', '))));
+          if (this.shipit_carryforward === true) {
+            $('#autoland-commits')
+              .append(
+                $('<span/>')
+                  .addClass('rb-icon rb-icon-warning'))
+              .append(
+                $('<span/>')
+                  .addClass('autoland-commit-warning')
+                  .text('Warning: commit has changed since review was granted'));
+          }
           // store commit descriptions in a form ready to pass to autoland
           commit_descriptions[this.commit.substr(0, 12)] = this.summary;
         });
@@ -250,16 +258,14 @@ $(document).on("mozreview_ready", function() {
     });
   }
 
-  if (MozReview.landingRepository === '') {
+  if (!MozReview.autolandingEnabled) {
     autoland_trigger.attr('title', 'Landing is not supported for this repository');
   } else if ($("#draft-banner").is(":visible")) {
     autoland_trigger.attr('title', 'Draft review requests cannot be landed');
   } else if (!MozReview.hasScmLevel3) {
     autoland_trigger.attr('title', 'You must have scm_level_3 access to land');
-  } else if (!MozReview.currentIsMutableByUser) {
-    autoland_trigger.attr('title', 'Only the author may land commits at this time');
   } else if (!MozReview.reviewRequestPending) {
-    try_trigger.attr('title', 'You can not autoland from a closed review request');
+    autoland_trigger.attr('title', 'You can not autoland from a closed review request');
   } else {
     MozReview.parentReviewRequest.ready({
       error: function () {

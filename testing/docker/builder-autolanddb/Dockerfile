@@ -5,13 +5,16 @@
 # This is a docker container for running a postgres server suitable for
 # powering a autoland instance.
 
-FROM postgres:9.4.3
+FROM postgres:9.5.0
 
 # override this variable to store data inside the container rather than on a
 # mounted volume.
 ENV PGDATA /postgresql-data
 RUN mkdir $PGDATA
 
+# use autoland as default database
+ENV POSTGRES_DB autoland
+
 # %include autoland/sql/schema.sql
 ADD extra/vct/autoland/sql/schema.sql /docker-entrypoint-initdb.d/schema.sql
-ADD createdb.sh /docker-entrypoint-initdb.d/createdb.sh
+ADD createdb.sql /docker-entrypoint-initdb.d/createdb.sql

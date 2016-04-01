@@ -39,8 +39,8 @@ Create and publish a review for SnarkBot
   $ echo foo2 > foo2
   $ hg add foo2
   $ hg commit -m 'Bug 1 - Foo 2'
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/a4f23bfb8f88-0ce7b28d-addcommitid.hg (glob)
   searching for changes
@@ -51,29 +51,29 @@ Create and publish a review for SnarkBot
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:93b21e22593f
+  changeset:  1:729692c35796
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:10c6acff83c0
+  changeset:  2:fb16157e773b
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
   $ rbmanage publish 1
   $ python -m snarkbot --config-path ../snarkbot.ini
-  INFO:mozreviewbot:reviewing commit: 93b21e22593f for review request: 2 diff_revision: 1
+  INFO:mozreviewbot:reviewing commit: 729692c35796 for review request: 2 diff_revision: 1
   INFO:mozreviewbot:looking at file: foo (foo)
   INFO:mozreviewbot:foo1
   
   INFO:mozreviewbot:looking at file: foo1 (foo1)
   INFO:mozreviewbot:foo1
   
-  INFO:mozreviewbot:reviewing commit: 10c6acff83c0 for review request: 3 diff_revision: 1
+  INFO:mozreviewbot:reviewing commit: fb16157e773b for review request: 3 diff_revision: 1
   INFO:mozreviewbot:looking at file: foo (foo)
   INFO:mozreviewbot:foo2
   
@@ -89,14 +89,39 @@ Create and publish a review for SnarkBot
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 1
-  description: Bug 1 - Foo 1
+  description:
+  - Bug 1 - Foo 1
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
+    calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 93b21e22593fc0a96331d5357aa5835b7db407e3
+    p2rb.commit_id: 729692c35796d9cbd453ccef97ee0d14139c4a09
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo0
+    - +foo1
+    - diff --git a/foo1 b/foo1
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/foo1
+    - '@@ -0,0 +1,1 @@'
+    - +foo1
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1
@@ -134,4 +159,4 @@ Create and publish a review for SnarkBot
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

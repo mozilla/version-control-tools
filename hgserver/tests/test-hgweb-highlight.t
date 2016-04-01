@@ -25,7 +25,7 @@ Create a repository
   $ hg -q commit -A -m js-files
 
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests

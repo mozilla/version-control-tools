@@ -1,21 +1,40 @@
-import logging
+from __future__ import absolute_import
 
 from django import template
+from django.contrib.auth.models import User
+
+from mozreview.extra_data import (
+    COMMIT_ID_KEY,
+    fetch_commit_data,
+    is_parent,
+    is_pushed,
+)
+from mozreview.review_helpers import get_reviewers_status
 
 register = template.Library()
 
 
 @register.filter()
-def isSquashed(aReviewRequest):
-    return str(aReviewRequest.extra_data.get('p2rb.is_squashed', 'False')).lower() == 'true'
+def isSquashed(review_request):
+    return is_parent(review_request)
+
 
 @register.filter()
-def isPush(aReviewRequest):
-    return str(aReviewRequest.extra_data.get('p2rb', 'False')).lower() == 'true'
+def isPush(review_request):
+    return is_pushed(review_request)
+
+
+@register.filter()
+def commit_id(review_request_details):
+    """Return the commit id of a review request or review request draft"""
+    commit_data = fetch_commit_data(review_request_details)
+    return str(commit_data.get_for(review_request_details, COMMIT_ID_KEY))
+
 
 def reviewer_list(review_request):
     return ', '.join([user.username
                       for user in review_request.target_people.all()])
+
 
 @register.filter()
 def extra_data(review_request, key):
@@ -41,9 +60,18 @@ def required_ldap_group(repository):
 
 
 @register.filter()
-def has_try_repository(repository):
+def autolanding_to_try_enabled(repository):
     try:
-        return ('true' if repository.extra_data['try_repository_url']
+        return ('true' if repository.extra_data['autolanding_to_try_enabled']
+                else 'false')
+    except (AttributeError, KeyError):
+        return 'false'
+
+
+@register.filter()
+def autolanding_enabled(repository):
+    try:
+        return ('true' if repository.extra_data['autolanding_enabled']
                 else 'false')
     except (AttributeError, KeyError):
         return 'false'
@@ -68,6 +96,7 @@ def treeherder_repo(landing_url):
 
     return mapping.get(landing_url.rstrip('/'), '')
 
+
 @register.filter()
 def mercurial_repo_name(landing_url):
     return landing_url.rstrip('/').split('/')[-1]
@@ -76,3 +105,16 @@ def mercurial_repo_name(landing_url):
 @register.filter()
 def ssh_to_https(landing_url):
     return landing_url.rstrip('/').replace('ssh://', 'https://')
+
+
+@register.filter()
+def reviewers_status(review_request):
+    return get_reviewers_status(review_request).items()
+
+
+@register.filter()
+def userid_to_user(user_id):
+    try:
+        return User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return 'Unknown user'

@@ -97,10 +97,10 @@ def getbugzillaauth(ui, require=False, profile=None):
             break
 
     if not username:
-        username = ui.prompt(_('Bugzilla username:'), None)
+        username = ui.prompt(_('Bugzilla username:'), '')
 
     if not password:
-        password = ui.getpass(_('Bugzilla password: '), None)
+        password = ui.getpass(_('Bugzilla password: '), '')
 
     if username and password:
         return BugzillaAuth(username=username, password=password)

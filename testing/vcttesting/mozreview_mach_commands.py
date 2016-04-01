@@ -18,7 +18,6 @@ class MozReviewCommands(object):
         if not where and 'MOZREVIEW_HOME' in os.environ:
             where = os.environ['MOZREVIEW_HOME']
 
-        db_image = os.environ.get('DOCKER_BMO_DB_IMAGE')
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
         hgrb_image = os.environ.get('DOCKER_HGRB_IMAGE')
         ldap_image = os.environ.get('DOCKER_LDAP_IMAGE')
@@ -30,7 +29,7 @@ class MozReviewCommands(object):
         treestatus_image = os.environ.get('DOCKER_TREESTATUS_IMAGE')
 
         from vcttesting.mozreview import MozReview
-        return MozReview(where, db_image=db_image, web_image=web_image,
+        return MozReview(where, web_image=web_image,
                          hgrb_image=hgrb_image, ldap_image=ldap_image,
                          pulse_image=pulse_image, rbweb_image=rbweb_image,
                          autolanddb_image=autolanddb_image,
@@ -257,9 +256,12 @@ class MozReviewCommands(object):
                      help='Directory of MozReview instance')
     @CommandArgument('email',
                      help='Bugzilla account to create API key for')
-    def create_api_key(self, where, email):
+    @CommandArgument('--description',
+                     help='Optional API key description, e.g. "mozreview"')
+    def create_api_key(self, where, email, description=''):
         mr = self._get_mozreview(where)
-        print(mr.create_user_api_key(email, sync_to_reviewboard=False))
+        print(mr.create_user_api_key(email, sync_to_reviewboard=False,
+                                     description=description))
 
     @Command('exec', category='mozreview',
              description='Execute a command in a Docker container')

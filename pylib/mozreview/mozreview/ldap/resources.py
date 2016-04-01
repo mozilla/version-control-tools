@@ -16,6 +16,9 @@ from reviewboard.webapi.resources.user import UserResource
 from mozreview.models import get_profile
 
 
+logger = logging.getLogger(__name__)
+
+
 class LDAPAssociationResource(WebAPIResource):
     """Resource for updating or retrieving the ldap username for a user."""
 
@@ -138,20 +141,26 @@ class LDAPAssociationResource(WebAPIResource):
         represents that the Review Board user has been proven to own the ldap
         account.
         """
+        logger.info('Request to update ldap association made by user: %s' % (
+                    request.user.id))
         if not request.user.has_perm('mozreview.modify_ldap_association'):
+            logger.info('Could not update ldap association: permission '
+                        'denied for user: %s' % (request.user.id))
             return PERMISSION_DENIED
 
         try:
             user = resources.user.get_object(request, *args, **kwargs)
         except ObjectDoesNotExist:
+            logger.info('Could not update ldap association: target user %s '
+                        'does not exist.' % (user))
             return DOES_NOT_EXIST
 
         mozreview_profile = get_profile(user)
         mozreview_profile.ldap_username = ldap_username
         mozreview_profile.save()
 
-        logging.info('associating user: %s with ldap_username: %s' % (user,
-            ldap_username))
+        logger.info('Associating user: %s with ldap_username: %s' % (user,
+                    ldap_username))
 
         return 200, self.create_item_payload(request, user, mozreview_profile)
 

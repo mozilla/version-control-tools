@@ -22,7 +22,7 @@ Verify hooks are working by pushing something that should be rejected
   $ touch foo
   $ hg -q commit -A -m 'This is a bad commit message'
   $ hg push ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests

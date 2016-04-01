@@ -77,11 +77,11 @@ Line numbers for these failures should be adjusted -= 1 and cover 2 lines
   $ hg -q commit -A -m 'Bug 1 - Line adjustment minus 1'
   $ bugzilla create-bug TestProduct TestComponent bug1
 
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
   $ rbmanage publish 1
 
   $ python -m pylintbot --config-path ../pylintbot.ini
-  INFO:mozreviewbot:reviewing revision: 5eedd6ade4e7 (review request: 2)
+  INFO:mozreviewbot:reviewing revision: c45aead0c4d6 (review request: 2)
 
   $ rbmanage dumpreview 2
   id: 2
@@ -92,14 +92,79 @@ Line numbers for these failures should be adjusted -= 1 and cover 2 lines
   commit: null
   submitter: default+5
   summary: Bug 1 - Line adjustment minus 1
-  description: Bug 1 - Line adjustment minus 1
+  description:
+  - Bug 1 - Line adjustment minus 1
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
+    calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 5eedd6ade4e72a9bec6dd82ef5b566337a44adcf
+    p2rb.commit_id: c45aead0c4d66a05a22fce427658fba6f3e20f9c
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/e121.py b/e121.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e121.py
+    - '@@ -0,0 +1,2 @@'
+    - +sorted(
+    - +  [1, 2])
+    - diff --git a/e122.py b/e122.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e122.py
+    - '@@ -0,0 +1,2 @@'
+    - +sorted(
+    - +[1, 2])
+    - diff --git a/e126.py b/e126.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e126.py
+    - '@@ -0,0 +1,2 @@'
+    - +sorted(
+    - +        [1, 2])
+    - diff --git a/e127.py b/e127.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e127.py
+    - '@@ -0,0 +1,2 @@'
+    - +sorted([1, 2],
+    - +        cmp=None)
+    - diff --git a/e128.py b/e128.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e128.py
+    - '@@ -0,0 +1,2 @@'
+    - +sorted([1, 2],
+    - +    cmp=None)
+    - diff --git a/e131.py b/e131.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e131.py
+    - '@@ -0,0 +1,3 @@'
+    - +l = [
+    - +    1,
+    - +   2]
+    - diff --git a/e301.py b/e301.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e301.py
+    - '@@ -0,0 +1,4 @@'
+    - '+class Foo(object):'
+    - +    x = None
+    - '+    def foo():'
+    - +        pass
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1
@@ -221,10 +286,10 @@ Create tests for line -= 2
   $ hg -q commit -A -m 'Bug 2 - Line adjustment minus 2'
   $ bugzilla create-bug TestProduct TestComponent bug2
 
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
   $ rbmanage publish 3
   $ python -m pylintbot --config-path ../pylintbot.ini
-  INFO:mozreviewbot:reviewing revision: 8da44ae24d46 (review request: 4)
+  INFO:mozreviewbot:reviewing revision: 51dfa0ded22a (review request: 4)
 
   $ rbmanage dumpreview 4
   id: 4
@@ -235,14 +300,37 @@ Create tests for line -= 2
   commit: null
   submitter: default+5
   summary: Bug 2 - Line adjustment minus 2
-  description: Bug 2 - Line adjustment minus 2
+  description:
+  - Bug 2 - Line adjustment minus 2
+  - ''
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people: []
   extra_data:
+    calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 8da44ae24d4625e0339ed0287a6c61f7288ad5d5
+    p2rb.commit_id: 51dfa0ded22aa53d3e7c3d7b5342ba8734c4c6ce
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 4
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/e302.py b/e302.py
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/e302.py
+    - '@@ -0,0 +1,5 @@'
+    - '+def foo():'
+    - +    pass
+    - +
+    - '+def bar():'
+    - +    pass
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1
@@ -276,4 +364,4 @@ Create tests for line -= 2
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

@@ -4,11 +4,6 @@
 
 import json
 import logging
-import os
-import shutil
-import tempfile
-
-from contextlib import contextmanager
 
 from rbtools.api.client import RBClient
 
@@ -16,16 +11,11 @@ from rbtools.api.client import RBClient
 logger = logging.getLogger(__name__)
 
 
-@contextmanager
 def ReviewBoardClient(url, username, password):
-    tempd = tempfile.mkdtemp()
-    try:
-        cookie_file = os.path.join(tempd, 'cookies')
-        rbclient = RBClient(url, cookie_file=cookie_file,
-                            username=username, password=password)
-        yield rbclient
-    finally:
-        shutil.rmtree(tempd)
+
+    return RBClient(url, save_cookies=False,
+                    allow_caching=False,
+                    username=username, password=password)
 
 
 class MozReviewBoard(object):
@@ -45,8 +35,7 @@ class MozReviewBoard(object):
 
     def login_user(self, username, password):
         """Log in the specified user to Review Board."""
-        with ReviewBoardClient(self.url, username, password) as c:
-            c.get_root()
+        ReviewBoardClient(self.url, username, password).get_root()
 
     def add_repository(self, name, url, bugzilla_url,
                        username='admin@example.com',
@@ -55,24 +44,24 @@ class MozReviewBoard(object):
         bugzilla_url = bugzilla_url.rstrip('/')
         bug_url = '%s/show_bug.cgi?id=%%s' % bugzilla_url
 
-        with ReviewBoardClient(self.url, username, password) as c:
-            root = c.get_root()
-            repos = root.get_repositories()
-            repo = repos.create(name=name, path=url, tool='Mercurial',
-                                bug_tracker=bug_url)
+        c = ReviewBoardClient(self.url, username, password)
+        root = c.get_root()
+        repos = root.get_repositories()
+        repo = repos.create(name=name, path=url, tool='Mercurial',
+                            bug_tracker=bug_url)
 
-            # This should arguaby be a separate API. But for now we in-line
-            # review group and default reviewers because every repo on
-            # MozReview is configured that way.
-            groups = root.get_groups()
-            group = groups.create(display_name=name, name=name, visible=True,
-                                  invite_only=False)
+        # This should arguaby be a separate API. But for now we in-line
+        # review group and default reviewers because every repo on
+        # MozReview is configured that way.
+        groups = root.get_groups()
+        group = groups.create(display_name=name, name=name, visible=True,
+                              invite_only=False)
 
-            reviewers = root.get_default_reviewers()
-            reviewers.create(name=name, file_regex='.*', groups=name,
-                             repositories=str(repo.id))
+        reviewers = root.get_default_reviewers()
+        reviewers.create(name=name, file_regex='.*', groups=name,
+                         repositories=str(repo.id))
 
-            return repo.id
+        return repo.id
 
     def make_admin(self, email):
         """Make the user with the specified email an admin.

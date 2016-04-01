@@ -34,7 +34,7 @@ A push works
   $ touch foo
   $ hg -q commit -A -m initial
   $ hg push ssh://$SSH_SERVER:$HGPORT/repo1
-  pushing to ssh://*:$HGPORT/repo1 (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/repo1
   searching for changes
   remote: adding changesets
   remote: adding manifests

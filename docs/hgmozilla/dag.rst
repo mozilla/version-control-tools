@@ -346,7 +346,7 @@ and isolated units of change. These are often referred to as
 *feature branches* because each DAG branch consists of a specific
 feature. For more, see :ref:`hgmozilla_workflows`.
 
-It's worth nothing that ``hg commit`` **always** produces a new head
+It's worth noting that ``hg commit`` **always** produces a new head
 node because the node being created never has any children. However,
 it may not create a new DAG branch: a new DAG branch is only created
 when the parent node of the commit isn't a head node.

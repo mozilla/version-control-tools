@@ -22,8 +22,8 @@ Create bug and review
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
   $ echo bug > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=$l3key --config reviewboard.autopublish=true push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=$l3key push
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/*-addcommitid.hg (glob)
   searching for changes
@@ -34,15 +34,15 @@ Create bug and review
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:04d9ab193e26
+  changeset:  1:63c61970184b
   summary:    Bug 1 - Initial commit to review
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
   $ rbmanage add-reviewer 2 --user reviewer
   1 people listed on review request
@@ -58,21 +58,27 @@ Check for rewrite on parent
 
   $ rbmanage dump-rewrite-commit 1
   commits:
-  - commit: 04d9ab193e26da839c4addacfc5ce68f62696300
+  - commit: 63c61970184bac9e9ae1660344e26e98587b0103
     id: 2
     reviewers:
     - reviewer
-    summary: Bug 1 - Initial commit to review r=reviewer
+    summary:
+    - Bug 1 - Initial commit to review r=reviewer
+    - ''
+    - 'MozReview-Commit-ID: 124Bxg'
 
 Rewriting on a child should work against the parent
 
   $ rbmanage dump-rewrite-commit 2
   commits:
-  - commit: 04d9ab193e26da839c4addacfc5ce68f62696300
+  - commit: 63c61970184bac9e9ae1660344e26e98587b0103
     id: 2
     reviewers:
     - reviewer
-    summary: Bug 1 - Initial commit to review r=reviewer
+    summary:
+    - Bug 1 - Initial commit to review r=reviewer
+    - ''
+    - 'MozReview-Commit-ID: 124Bxg'
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

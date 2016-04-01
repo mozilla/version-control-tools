@@ -9,7 +9,7 @@
   $ hg commit -A -m 'root commit'
   adding foo
   $ hg push --noreview
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -22,8 +22,8 @@
   $ hg commit -m 'Bug 1 - Foo 1'
   $ echo 'foo2' > foo
   $ hg commit -m 'Bug 1 - Foo 2'
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/61e2e5c813d2*-addcommitid.hg (glob)
   searching for changes
@@ -34,16 +34,16 @@
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:233b570e5356
+  changeset:  2:3a446ae43820
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -51,8 +51,8 @@ Adding commits to old reviews should create new reviews
 
   $ echo 'foo3' > foo
   $ hg commit -m 'Bug 1 - Foo 3'
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -61,20 +61,20 @@ Adding commits to old reviews should create new reviews
   remote: recorded push in pushlog
   submitting 3 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:233b570e5356
+  changeset:  2:3a446ae43820
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  3:4cb601f74de5
+  changeset:  3:1ec9946fd47f
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -90,13 +90,15 @@ The parent review should have its description updated.
   summary: ''
   description: ''
   target_people: []
-  extra_data:
+  extra_data: {}
+  commit_extra_data:
     p2rb: true
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[2, 3, 4]'
+  diffs: []
   approved: false
   approval_failure: The review request is not public.
   draft:
@@ -107,20 +109,23 @@ The parent review should have its description updated.
     description: This is the parent review request
     target_people: []
     extra:
+      p2rb.reviewer_map: '{"3": [], "2": []}'
+    commit_extra_data:
       p2rb: true
       p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-      p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
-        3], ["4cb601f74de529935048816623637fb0ca2812a4", 4]]'
+      p2rb.commits: '[["98467d80785ec84dd871f213c167ed704a6d974d", 2], ["3a446ae4382006c43cdfa5aa33c494f582736f35",
+        3], ["1ec9946fd47ff9b5cb07e9d9c8b4d393b688e01b", 4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
-      p2rb.reviewer_map: '{"3": [], "2": []}'
       p2rb.unpublished_rids: '[]'
     diffs:
     - id: 4
       revision: 1
       base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+      name: diff
+      extra: {}
       patch:
       - diff --git a/foo b/foo
       - '--- a/foo'
@@ -136,8 +141,8 @@ rids to be strings and then pushing a new commit.
   $ rbmanage convert-draft-rids-to-str 1
   $ echo 'foo4' > foo
   $ hg commit -m 'Bug 1 - Foo 4'
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -146,28 +151,28 @@ rids to be strings and then pushing a new commit.
   remote: recorded push in pushlog
   submitting 4 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:233b570e5356
+  changeset:  2:3a446ae43820
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  3:4cb601f74de5
+  changeset:  3:1ec9946fd47f
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
-  changeset:  4:fea02e8114c8
+  changeset:  4:6b1149879047
   summary:    Bug 1 - Foo 4
-  review:     http://*:$HGPORT1/r/5 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

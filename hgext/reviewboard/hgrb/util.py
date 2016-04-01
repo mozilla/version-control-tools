@@ -1,7 +1,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import errno
 import random
+import re
 import time
 
 from mercurial import util
@@ -63,7 +65,7 @@ BASE62_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 # (datetime.datetime(2000, 1, 1, 0, 0, 0, 0) - datetime.datetime.utcfromtimestamp(0)).total_seconds()
 EPOCH = 946684800
 
-def genid(repo):
+def genid(repo=None, fakeidpath=None):
     """Generate a unique identifier.
 
     Unique identifiers are treated as a black box. But under the hood, they
@@ -86,8 +88,19 @@ def genid(repo):
     # testing purposes because tests want constant output. And since
     # commit IDs go into the commit and are part of the SHA-1, they need
     # to be deterministic.
-    if repo.ui.configbool('reviewboard', 'fakeids'):
-        data = repo.vfs.tryread('genid')
+    if repo and repo.ui.configbool('reviewboard', 'fakeids'):
+        fakeidpath = repo.vfs.join('genid')
+
+    if fakeidpath:
+        try:
+            with open(fakeidpath, 'rb') as fh:
+                data = fh.read()
+        except IOError as e:
+            if e.errno != errno.ENOENT:
+                raise
+
+            data = None
+
         if data:
             n = int(data)
         else:
@@ -95,7 +108,8 @@ def genid(repo):
 
         seconds = EPOCH
         rnd = n
-        repo.vfs.write('genid', str(n + 1))
+        with open(fakeidpath, 'wb') as fh:
+            fh.write(str(n + 1))
     else:
         now = int(time.time())
         # May 5, 2015 sometime.
@@ -114,3 +128,29 @@ def genid(repo):
         value = quot
 
     return ''.join(reversed(chars))
+
+
+def addcommitid(msg, repo=None, fakeidpath=None):
+    """Add a commit ID to a commit message."""
+    lines = msg.splitlines()
+
+    # Prune blank lines at the end.
+    while lines and not lines[-1].strip():
+        lines.pop()
+
+    if not lines:
+        return msg, False
+
+    if any(l.startswith('MozReview-Commit-ID: ') for l in lines):
+        return msg, False
+
+    # Insert empty line between main commit message and metadata.
+    # Metadata lines are have-defined keys and values not containing
+    # whitespaces.
+    if not re.match('^[a-zA-Z-]+: \S+$', lines[-1]) or len(lines) == 1:
+        lines.append('')
+
+    cid = genid(repo=repo, fakeidpath=fakeidpath)
+    lines.append('MozReview-Commit-ID: %s' % cid)
+
+    return '\n'.join(lines), True

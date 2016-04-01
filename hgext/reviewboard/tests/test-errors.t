@@ -120,7 +120,7 @@ Attempt to push with Bugzilla not configured will result in a warning
   remote: adding manifests
   remote: adding file changes
   remote: added 2 changesets with 1 changes to 1 files (+1 heads)
-  Bugzilla username: None
+  Bugzilla username: 
   Bugzilla credentials not available. Not submitting review.
 
 Configure authentication
@@ -170,14 +170,11 @@ Pushing multiple heads is rejected
   $ hg push -r 0:tip --reviewid bz://784841 http://localhost:$HGPORT
   pushing to http://localhost:$HGPORT/
   (adding commit id to 1 changesets)
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/2e92ee1083e0*-addcommitid.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/d7b7d7300bc6-3588c900-addcommitid.hg (glob)
   searching for changes
   abort: cannot push multiple heads to remote; limit pushed revisions using the -r argument.
   [255]
 
-Ensure bad imports are detected
-
-  $ hg --config extensions.findbadimports=$TESTDIR/testing/find-bad-imports.py findbadimports
   $ cd ..
 
 Client failing to meet server capabilities is detected

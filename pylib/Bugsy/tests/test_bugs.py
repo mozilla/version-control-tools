@@ -7,13 +7,13 @@ from bugsy import Bugsy, Bug
 from bugsy.errors import (BugsyException, BugException)
 
 example_return = {u'faults': [], u'bugs': [{u'cf_tracking_firefox29': u'---', u'classification': u'Other', u'creator': u'jgriffin@mozilla.com', u'cf_status_firefox30':
-u'---', u'depends_on': [], u'cf_status_firefox32': u'---', u'creation_time': u'2014-05-28T23:57:58Z', u'product': u'Release Engineering', u'cf_user_story': u'', u'dupe_of': None, u'cf_tracking_firefox_relnote': u'---', u'keywords': [], u'cf_tracking_b2g18': u'---', u'summary': u'Schedule Mn tests on o\
+u'---', u'depends_on': [123456], u'cf_status_firefox32': u'---', u'creation_time': u'2014-05-28T23:57:58Z', u'product': u'Release Engineering', u'cf_user_story': u'', u'dupe_of': None, u'cf_tracking_firefox_relnote': u'---', u'keywords': [u'regression'], u'cf_tracking_b2g18': u'---', u'summary': u'Schedule Mn tests on o\
 pt Linux builds on cedar', u'id': 1017315, u'assigned_to_detail': {u'id': 347295, u'email': u'jgriffin@mozilla.com', u'name': u'jgriffin@mozilla.com',
 u'real_name': u'Jonathan Griffin (:jgriffin)'}, u'severity': u'normal', u'is_confirmed': True, u'is_creator_accessible': True, u'cf_status_b2g_1_1_hd':
  u'---', u'qa_contact_detail': {u'id': 20203, u'email': u'catlee@mozilla.com', u'name': u'catlee@mozilla.com', u'real_name': u'Chris AtLee [:catlee]'},
  u'priority': u'--', u'platform': u'All', u'cf_crash_signature': u'', u'version': u'unspecified', u'cf_qa_whiteboard': u'', u'cf_status_b2g_1_3t': u'--\
 -', u'cf_status_firefox31': u'---', u'is_open': False, u'cf_blocking_fx': u'---', u'status': u'RESOLVED', u'cf_tracking_relnote_b2g': u'---', u'cf_stat\
-us_firefox29': u'---', u'blocks': [], u'qa_contact': u'catlee@mozilla.com', u'see_also': [], u'component': u'General Automation', u'cf_tracking_firefox\
+us_firefox29': u'---', u'blocks': [654321], u'qa_contact': u'catlee@mozilla.com', u'see_also': [], u'component': u'General Automation', u'cf_tracking_firefox\
 32': u'---', u'cf_tracking_firefox31': u'---', u'cf_tracking_firefox30': u'---', u'op_sys': u'All', u'groups': [], u'cf_blocking_b2g': u'---', u'target\
 _milestone': u'---', u'is_cc_accessible': True, u'cf_tracking_firefox_esr24': u'---', u'cf_status_b2g_1_2': u'---', u'cf_status_b2g_1_3': u'---', u'cf_\
 status_b2g18': u'---', u'cf_status_b2g_1_4': u'---', u'url': u'', u'creator_detail': {u'id': 347295, u'email': u'jgriffin@mozilla.com', u'name': u'jgri\
@@ -72,7 +72,7 @@ def test_we_cant_set_status_unless_there_is_a_bug_id():
     try:
         bug.status = 'RESOLVED'
     except BugException as e:
-        assert str(e) == "Message: Can not set status unless there is a bug id. Please call Update() before setting"
+        assert str(e) == "Message: Can not set status unless there is a bug id. Please call Update() before setting Code: None"
 
 def test_we_can_get_OS_set_from_default():
     bug = Bug()
@@ -86,9 +86,22 @@ def test_we_can_get_Product_set_from_default():
     bug = Bug()
     assert bug.product == "core"
 
+def test_we_can_get_get_the_keywords():
+    bug = Bug(**example_return['bugs'][0])
+    keywords = bug.keywords
+    assert [u'regression'] == keywords
+
 def test_we_can_get_Product_we_set():
     bug = Bug(product="firefox")
     assert bug.product == "firefox"
+
+def test_we_can_get_get_cc_list():
+    bug = Bug(**example_return['bugs'][0])
+    cced = bug.cc
+    assert isinstance(cced, list)
+    assert [u"coop@mozilla.com", u"dburns@mozilla.com",
+            u"jlund@mozilla.com", u"mdas@mozilla.com"] == cced
+
 
 def test_we_throw_an_error_for_invalid_status_types():
     bug = Bug(**example_return['bugs'][0])
@@ -96,7 +109,7 @@ def test_we_throw_an_error_for_invalid_status_types():
         bug.status = "foo"
         assert 1 == 0, "Should have thrown an error about invalid type"
     except BugException as e:
-        assert str(e) == "Message: Invalid status type was used"
+        assert str(e) == "Message: Invalid status type was used Code: None"
 
 def test_we_can_get_the_resolution():
     bug = Bug(**example_return['bugs'][0])
@@ -113,7 +126,7 @@ def test_we_cant_set_the_resolution_when_not_valid():
         bug.resolution = 'FOO'
         assert 1==0, "Should thrown an error"
     except BugException as e:
-        assert str(e) == "Message: Invalid resolution type was used"
+        assert str(e) == "Message: Invalid resolution type was used Code: None"
 
 def test_we_can_pass_in_dict_and_get_a_bug():
     bug = Bug(**example_return['bugs'][0])
@@ -126,6 +139,18 @@ def test_we_can_get_a_dict_version_of_the_bug():
     bug = Bug(**example_return['bugs'][0])
     result = bug.to_dict()
     assert example_return['bugs'][0]['id'] == result['id']
+
+def test_we_can_get_depends_on_list():
+    bug = Bug(**example_return['bugs'][0])
+    depends_on = bug.depends_on
+    assert isinstance(depends_on, list)
+    assert depends_on == [123456]
+
+def test_we_can_get_blocks_list():
+    bug = Bug(**example_return['bugs'][0])
+    blocks = bug.blocks
+    assert isinstance(blocks, list)
+    assert blocks == [654321]
 
 @responses.activate
 def test_we_can_update_a_bug_from_bugzilla():
@@ -149,7 +174,7 @@ def test_we_cant_update_unless_we_have_a_bug_id():
     try:
         bug.update()
     except BugException as e:
-        assert str(e) == "Message: Unable to update bug that isn't in Bugzilla"
+        assert str(e) == "Message: Unable to update bug that isn't in Bugzilla Code: None"
 
 @responses.activate
 def test_we_can_update_a_bug_with_login_token():
@@ -268,7 +293,7 @@ def test_we_raise_an_exception_when_getting_comments_and_bugzilla_errors():
         comments = bug.get_comments()
         assert False, "Should have raised an BugException for the bug not existing"
     except BugsyException as e:
-        assert str(e) == "Message: The requested method 'Bug.comments' was not found."
+        assert str(e) == "Message: The requested method 'Bug.comments' was not found. Code: 67399"
 
 @responses.activate
 def test_we_raise_an_exception_if_commenting_on_a_bug_that_returns_an_error():
@@ -295,7 +320,7 @@ def test_we_raise_an_exception_if_commenting_on_a_bug_that_returns_an_error():
         bug.add_comment("I like sausages")
         assert False, "Should have raised an BugException for the bug not existing"
     except BugsyException as e:
-        assert str(e) == "Message: Bug 1017315 does not exist."
+        assert str(e) == "Message: Bug 1017315 does not exist. Code: 101"
 
     assert len(responses.calls) == 3
 

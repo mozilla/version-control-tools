@@ -4,6 +4,8 @@
 
 from __future__ import absolute_import, unicode_literals
 
+from reviewboard.reviews.models import ReviewRequestDraft
+
 from mozreview.models import get_profile
 
 
@@ -68,6 +70,57 @@ def has_l3_shipit(review_request):
     for review in gen_latest_reviews(review_request):
         if not review.ship_it:
             continue
+        if get_profile(review.user).has_scm_ldap_group('scm_level_3'):
+            return True
+
+    return False
+
+
+def get_reviewers_status(review_request, reviewers=None):
+    """Returns the latest review status for each reviewer."""
+    if not reviewers:
+        reviewers = review_request.target_people.all()
+    reviewers_status = dict()
+
+    for r in reviewers:
+        reviewers_status[r.username] = {'ship_it': False}
+
+    # Don't show any status on drafts.
+    if type(review_request) == ReviewRequestDraft:
+        return reviewers_status
+
+    for review in gen_latest_reviews(review_request):
+
+        if review.user.username in reviewers_status:
+            reviewers_status[review.user.username]['ship_it'] = review.ship_it
+
+    return reviewers_status
+
+
+def has_shipit_carryforward(review_request):
+    """Return whether the review request has a carried forward ship-it
+
+    A ship-it is considered carried forward if the commit for which it was
+    granted has been amended since the ship-it was granted. This returns
+    True if a ship-it was carried forward, and false if no ship-its are
+    present or none have been carried forward.
+    """
+    diffset_history = review_request.diffset_history
+
+    if not diffset_history:
+        # There aren't any published diffs so we should just consider
+        # any ship-its meaningless.
+        return False
+
+    if not diffset_history.last_diff_updated:
+        # Although I'm not certain when this field will be empty
+        # it has "blank=true, null=True" - we'll assume there is
+        # no published diff.
+        return False
+
+    for review in gen_latest_reviews(review_request):
+        if not review.ship_it:
+            continue
 
         # TODO: We might want to add a required delay between when the
         # diff is posted and when a review is published - this would
@@ -75,9 +128,6 @@ def has_l3_shipit(review_request):
         # before a reviewer publishes a ship-it on the previous diff
         # (Making it look like the ship-it came after the new diff)
         if review.timestamp <= diffset_history.last_diff_updated:
-            continue
-
-        if get_profile(review.user).has_scm_ldap_group('scm_level_3'):
             return True
 
     return False

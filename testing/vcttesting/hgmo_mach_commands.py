@@ -153,11 +153,13 @@ class HgmoCommands(object):
             print('invalid name. must be "hgssh" or "hgwebN"')
             return 1
 
-        args = '' if 'TESTTMP' in os.environ else '-it'
+        cmd = ['docker', 'exec']
+        if 'TESTTMP' not in os.environ:
+            cmd.append('-it')
         if detach:
-            args += ' -d '
-        args = args.strip()
+            cmd.append('-d')
 
-        return subprocess.call('docker exec %s %s %s' % (
-                               args, cid, ' '.join(command)),
-                               shell=True)
+        cmd.append(cid)
+        cmd.extend(command)
+
+        return subprocess.call(cmd)

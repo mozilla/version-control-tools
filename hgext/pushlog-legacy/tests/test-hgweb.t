@@ -17,7 +17,7 @@ Sanity check the html output
   content-type: text/html; charset=ascii
 
   $ grep 427bfb5defee body
-  <tr class="pushlogentry parity0  id21"><td><cite>luser<br/><span class="date">Thu Nov 20 15:53:42 2008 +0000</span></cite></td><td class="age"><a href="/rev/427bfb5defee">427bfb5defee</a></td><td><strong>Ted Mielczarek &mdash; checkin 41</strong> <span class="logtags"><span class="tagtag" title="tip">tip</span> </span></td></tr>
+  <tr class="pushlogentry parity0  id21"><td><cite>luser<br/><span class="date">Thu Nov 20 15:53:42 2008 +0000</span></cite></td><td><a href="/rev/427bfb5defee">427bfb5defee</a></td><td><strong>Ted Mielczarek &mdash; checkin 41</strong> <span class="logtags"><span class="tagtag" title="tip">tip</span> </span></td></tr>
 
 Get all JSON data
 

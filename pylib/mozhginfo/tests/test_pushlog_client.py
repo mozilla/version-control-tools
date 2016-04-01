@@ -100,6 +100,22 @@ class TestQueries(unittest.TestCase):
                                   '724f0a71d62171da1357e6c1f93453359e54206b']
 
     @patch('requests.get', return_value=mock_response(LIST_REVISION, 200))
+    @patch('mozhginfo.pushlog_client.query_push_by_revision',
+           return_value=push)
+    def test_query_pushes_by_revision_range_return_changesets(self, get, query_push_by_revision):
+        changesets = query_pushes_by_revision_range(repo_url=self.repo_url,
+                                                    from_revision=self.start_revision,
+                                                    to_revision=self.end_revision,
+                                                    version=2, tipsonly=1,
+                                                    return_revision_list=True)
+
+        assert len(changesets) == 4
+        assert changesets == ['71e69424094d2f86c51ba544fd861d65a578a0f2',
+                              'eb15e3f893453d6a4472f8905271aba33f8b68d5',
+                              '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
+                              '724f0a71d62171da1357e6c1f93453359e54206b']
+
+    @patch('requests.get', return_value=mock_response(LIST_REVISION, 200))
     def test_query_pushes_by_pushid_range(self, get):
         pushes = query_pushes_by_pushid_range(repo_url=self.repo_url, start_id=55560,
                                               end_id=55564)
@@ -116,6 +132,15 @@ class TestQueries(unittest.TestCase):
         assert changeset_list == ['eb15e3f893453d6a4472f8905271aba33f8b68d5',
                                   '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
                                   '724f0a71d62171da1357e6c1f93453359e54206b']
+
+    @patch('requests.get', return_value=mock_response(LIST_REVISION, 200))
+    def test_query_pushes_by_pushid_range_return_changesets(self, get):
+        changesets = query_pushes_by_pushid_range(repo_url=self.repo_url, start_id=55560,
+                                                  end_id=55564, return_revision_list=True)
+        assert len(changesets) == 3
+        assert changesets == ['eb15e3f893453d6a4472f8905271aba33f8b68d5',
+                              '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
+                              '724f0a71d62171da1357e6c1f93453359e54206b']
 
     @patch('requests.get', return_value=mock_response(LIST_REVISION, 200))
     @patch('mozhginfo.pushlog_client.query_push_by_revision', return_value=push)
@@ -138,6 +163,19 @@ class TestQueries(unittest.TestCase):
                                   '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
                                   '724f0a71d62171da1357e6c1f93453359e54206b']
 
+    @patch('requests.get', return_value=mock_response(LIST_REVISION, 200))
+    @patch('mozhginfo.pushlog_client.query_push_by_revision', return_value=push)
+    def test_query_pushes_by_specified_revision_range_return_changesets(self, get,
+                                                                        query_push_by_revision):
+        changesets = query_pushes_by_specified_revision_range(repo_url=self.repo_url,
+                                                              revision=self.revision,
+                                                              before=1, after=1,
+                                                              return_revision_list=True)
+        assert len(changesets) == 3
+        assert changesets == ['eb15e3f893453d6a4472f8905271aba33f8b68d5',
+                              '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
+                              '724f0a71d62171da1357e6c1f93453359e54206b']
+
     @patch('requests.get', return_value=mock_response(REVISION_INFO_REPOSITORIES, 200))
     def test_query_push_by_revision(self, get):
         push = query_push_by_revision(repo_url=self.repo_url, revision=self.revision)
@@ -146,6 +184,12 @@ class TestQueries(unittest.TestCase):
         assert len(push.changesets) == 1
         changeset = push.changesets[0]
         assert changeset.node == "71e69424094d2f86c51ba544fd861d65a578a0f2"
+
+    @patch('requests.get', return_value=mock_response(REVISION_INFO_REPOSITORIES, 200))
+    def test_query_push_by_revision_return_changesets(self, get):
+        changset = query_push_by_revision(repo_url=self.repo_url,
+                                          revision=self.revision, return_revision_list=True)
+        assert changset == "71e69424094d2f86c51ba544fd861d65a578a0f2"
 
     @patch('requests.get', return_value=mock_response(MOCK_PUSH, 200))
     def test_query_repo_tip(self, get):

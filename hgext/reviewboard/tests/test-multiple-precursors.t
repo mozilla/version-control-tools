@@ -15,7 +15,7 @@
   $ hg commit -A -m 'root commit'
   adding foo0
   $ hg push --noreview
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -27,8 +27,8 @@
   $ echo 'foo1' > foo1
   $ hg commit -A -m 'Bug 1 - Foo 1'
   adding foo1
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   searching for changes
   remote: adding changesets
@@ -38,12 +38,12 @@
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  2:6bd3fbee3dfa
+  changeset:  2:0b3e14fe3ff1
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -58,11 +58,11 @@ Splitting the changeset results in multiple reviews
   $ echo 'foo3' > foo3
   $ hg commit -A -m 'Bug 1 - Foo 3'
   adding foo3
-  $ hg debugobsolete -d '0 0' c5b850e249510046906bcb24f774635c4521a4a9 05451502b94b2b05f1dd640074d4c0aa7985f52f 9d5db6367f324fad46508f44086ddbc7c79eda0e
+  $ hg debugobsolete -d '0 0' 0b3e14fe3ff19019110705e72dcf563c0ef551f6 8cfe623ffa827c2382e41f8cd479005984c94e76 02a9514408b763f7534d4f250046b513799ffe4c
 
   $ rbmanage publish 1
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -71,20 +71,20 @@ Splitting the changeset results in multiple reviews
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  3:c5bd6809e957
+  changeset:  3:8cfe623ffa82
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  4:f142ef54f825
+  changeset:  4:02a9514408b7
   summary:    Bug 1 - Foo 3
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

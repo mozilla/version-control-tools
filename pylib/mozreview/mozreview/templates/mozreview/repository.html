@@ -1,6 +1,7 @@
 {% load mozreview %}
 <div id="repository"
   data-required-ldap-group="{{ review_request.repository|required_ldap_group }}"
-  data-has-try-repository="{{ review_request.repository|has_try_repository }}"
+  data-autolanding-to-try-enabled="{{ review_request.repository|autolanding_to_try_enabled }}"
+  data-autolanding-enabled="{{ review_request.repository|autolanding_enabled }}"
   data-landing-repository="{{ review_request.repository|landing_repository }}">
 </div>

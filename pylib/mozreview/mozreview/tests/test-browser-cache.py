@@ -36,7 +36,7 @@ class BrowserCacheTest(MozReviewWebDriverTest):
             lr.run(['commit', '-m', 'Bug 1 - Commit 1. r?user2'])
             lr.write('foo', 'second change')
             lr.run(['commit', '-m', 'Bug 1 - Commit 2. r?user2'])
-            lr.run(['push', '--config', 'reviewboard.autopublish=true'])
+            lr.run(['push'])
         except Exception:
             MozReviewWebDriverTest.tearDownClass()
             raise

@@ -16,7 +16,7 @@
   $ touch foo
   $ hg -q commit -A -m initial
   $ hg push
-  pushing to ssh://*:$HGPORT/hgcustom/version-control-tools (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/hgcustom/version-control-tools
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -299,7 +299,7 @@ We are able to push to the new user repo
   $ echo commit2 > foo
   $ hg commit -m 'commit 2'
   $ hg push ssh://${SSH_SERVER}:${HGPORT}/users/user_example.com/repo-1
-  pushing to ssh://*:$HGPORT/users/user_example.com/repo-1 (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/users/user_example.com/repo-1
   searching for changes
   remote: adding changesets
   remote: adding manifests

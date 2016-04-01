@@ -3,6 +3,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import json
 import os
 import sys
 
@@ -58,23 +59,24 @@ sc.set('auth_bz_xmlrpc_url', '%s/xmlrpc.cgi' % bugzilla_url)
 sc.save()
 
 # Define MozReview settings.
-from djblets.extensions.models import RegisteredExtension
-mre = RegisteredExtension.objects.get(class_name='mozreview.extension.MozReviewExtension')
-mre.settings['enabled'] = True
-mre.settings['pulse_host'] = os.environ['PULSE_PORT_5672_TCP_ADDR']
-mre.settings['pulse_port'] = int(os.environ['PULSE_PORT_5672_TCP_PORT'])
-mre.settings['pulse_user'] = 'guest'
-mre.settings['pulse_password'] = 'guest'
-mre.settings['pulse_ssl'] = False
-mre.settings['autoland_try_ui_enabled'] = True
-mre.settings['autoland_url'] = autoland_url
-mre.settings['autoland_user'] = 'autoland'
-mre.settings['autoland_password'] = 'autoland'
-mre.settings['autoland_testing'] = True
-mre.settings['autoland_import_pullrequest_ui_enabled'] = True
-mre.settings['ldap_url'] = ldap_url
-mre.settings['ldap_user'] = 'uid=bind-mozreview,ou=logins,dc=mozilla'
-mre.settings['ldap_password'] = 'password'
-mre.save()
+settings = {}
+settings['enabled'] = True
+settings['pulse_host'] = os.environ['PULSE_PORT_5672_TCP_ADDR']
+settings['pulse_port'] = int(os.environ['PULSE_PORT_5672_TCP_PORT'])
+settings['pulse_user'] = 'guest'
+settings['pulse_password'] = 'guest'
+settings['pulse_ssl'] = False
+settings['autoland_try_ui_enabled'] = True
+settings['autoland_url'] = autoland_url
+settings['autoland_user'] = 'autoland'
+settings['autoland_password'] = 'autoland'
+settings['autoland_testing'] = True
+settings['autoland_import_pullrequest_ui_enabled'] = True
+settings['ldap_url'] = ldap_url
+settings['ldap_user'] = 'uid=bind-mozreview,ou=logins,dc=mozilla'
+settings['ldap_password'] = 'password'
+settings_path = os.path.join('/', 'mozreview-settings.json')
+with open (settings_path, 'w') as f:
+    json.dump(settings, f, sort_keys=True)
 
 os.execl(sys.argv[1], *sys.argv[1:])

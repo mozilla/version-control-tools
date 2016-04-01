@@ -17,7 +17,7 @@
 Pushing with a password results in server rejection
 
   $ hg --config bugzilla.username=unknown --config bugzilla.password=irrelevant --config bugzilla.apikey= push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/737709d9e5f4*-addcommitid.hg (glob)
   searching for changes
@@ -27,23 +27,23 @@ Pushing with a password results in server rejection
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
   submitting 1 changesets for review
-  abort: Bugzilla API keys are now used by MozReview; see https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html#bugzilla-credentials for instructions on how to configure your client
+  abort: Bugzilla API keys not configured; see https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html#bugzilla-credentials for instructions on how to configure your client
   [255]
 
 Pushing with a cookie results in server rejection
 
   $ hg --config bugzilla.userid=baduserid --config bugzilla.cookie=irrelevant --config bugzilla.apikey= push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: Bugzilla API keys are now used by MozReview; see https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html#bugzilla-credentials for instructions on how to configure your client
+  abort: Bugzilla API keys not configured; see https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html#bugzilla-credentials for instructions on how to configure your client
   [255]
 
 Pushing with unknown username with API key results in sane failure
 
   $ hg --config bugzilla.username=unknown --config bugzilla.apikey=irrelevant push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -58,7 +58,7 @@ created in Review Board.
   created user 6
 
   $ hg --config bugzilla.username=apikey1@example.com --config bugzilla.apikey=badkey push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
@@ -69,11 +69,11 @@ User must log in via web interface before pushing with an API key
 
   $ apikey=`mozreview create-api-key apikey1@example.com`
   $ hg --config bugzilla.username=apikey1@example.com --config bugzilla.apikey=${apikey} push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: web login needed; log in at http://*:$HGPORT1/account/login then try again (glob)
+  abort: web login needed; log in at http://$DOCKER_HOSTNAME:$HGPORT1/account/login then try again
   [255]
 
 User in database without API key requires web login
@@ -86,11 +86,11 @@ User in database without API key requires web login
     username: apikey2
   $ apikey=`mozreview create-api-key apikey2@example.com`
   $ hg --config bugzilla.username=apikey2@example.com --config bugzilla.apikey=${apikey} push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: web login needed; log in at http://*:$HGPORT1/account/login then try again (glob)
+  abort: web login needed; log in at http://$DOCKER_HOSTNAME:$HGPORT1/account/login then try again
   [255]
 
 Usernames for users without the IRC nick syntax are based on email fragment and BZ user id
@@ -159,18 +159,18 @@ Changing the IRC nickname in Bugzilla will update the RB username
   updated user 9
 
   $ exportbzauth user2@example.com password2
-  $ hg push --reviewid bz://1/user2newnick
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --reviewid bz://1/user2newnick --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:d97f9c20be62
+  changeset:  1:bb2efc8efdd7
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/user2newnick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -191,18 +191,18 @@ Changing the email address in Bugzilla will update the RB email
   $ adminbugzilla update-user-email user2@example.com user2-new@example.com
   updated user 9
   $ exportbzauth user2-new@example.com password2
-  $ SSH_KEYNAME=user2@example.com hg push --reviewid bz://1/user2newemail
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ SSH_KEYNAME=user2@example.com hg push --reviewid bz://1/user2newemail --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:d97f9c20be62
+  changeset:  1:bb2efc8efdd7
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
   review id:  bz://1/user2newemail
-  review url: http://*:$HGPORT1/r/3 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -227,11 +227,12 @@ Disabling a user in Bugzilla will prevent them from using Review Board
   $ exportbzauth user1@example.com
   $ user1key=`mozreview create-api-key user1@example.com`
   $ hg --config bugzilla.username=user1@example.com --config bugzilla.apikey=${user1key} push --reviewid bz://1/disableduser
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: invalid Bugzilla API key; visit Bugzilla to obtain a new API key
+  abort: The username or password was not correct (HTTP 401, API Error 104)
+  Log out and back in to Review Board then try again
   [255]
 
 Re-enabling a disabled user will allow them to use Review Board
@@ -239,18 +240,18 @@ Re-enabling a disabled user will allow them to use Review Board
   $ adminbugzilla update-user-login-denied-text user1@example.com ''
   updated user 8
   $ exportbzauth user1@example.com password1
-  $ hg push --config bugzilla.username=user1@example.com --config bugzilla.apikey=${user1key} --reviewid bz://1/undisableduser
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --config bugzilla.username=user1@example.com --config bugzilla.apikey=${user1key} --reviewid bz://1/undisableduser --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  1:d97f9c20be62
+  changeset:  1:bb2efc8efdd7
   summary:    Bug 1 - Testing 1 2 3
-  review:     http://*:$HGPORT1/r/6 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
   
   review id:  bz://1/undisableduser
-  review url: http://*:$HGPORT1/r/5 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -352,4 +353,4 @@ user, they will be assigned the email+id username.
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

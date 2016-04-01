@@ -20,7 +20,8 @@ $(document).ready(function() {
 
   // Whether or not the repository has associated try and landing repositories
   // is in an invisible div.
-  MozReview.hasTryRepository = $("#repository").data("has-try-repository");
+  MozReview.autolandingToTryEnabled = $("#repository").data("autolanding-to-try-enabled");
+  MozReview.autolandingEnabled = $("#repository").data("autolanding-enabled");
   MozReview.landingRepository = $("#repository").data("landing-repository");
 
   console.log("Found parent review request ID: " + parentID);

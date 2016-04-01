@@ -36,7 +36,15 @@ class AutolandTryTest(MozReviewWebDriverTest):
             lr = self.create_basic_repo('mjane@example.com', 'mjane')
             lr.write('foo', 'first change')
             lr.run(['commit', '-m', 'Bug 1 - Test try'])
-            lr.run(['push'])
+            lr.run(['push', '--config', 'reviewboard.autopublish=false'])
+
+            # jsmith needs to push for the ldap association magic to happen
+            self.create_ldap(b'jsmith@example.com', b'jsmith', 2002, b'Jeremy')
+            lr = self.create_basic_repo('jsmith@example.com', 'jsmith',
+                                        'test_repo2')
+            lr.write('foo', 'first change')
+            lr.run(['commit', '-m', 'Bug 1 - Test try'])
+            lr.run(['push', '--config', 'reviewboard.autopublish=false'])
         except Exception:
             MozReviewWebDriverTest.tearDownClass()
             raise
@@ -45,23 +53,22 @@ class AutolandTryTest(MozReviewWebDriverTest):
         # We currently have four conditions for enabling the 'automation' menu
         # and try button (see static/mozreview/js/autoland.js):
         # 1. The review must be published
-        # 2. The review must be mutable by the current user
-        # 3. The user must have scm_level_1 or higher
-        # 4. The repository must have an associated try repository
+        # 2. The user must have scm_level_1 or higher
+        # 3. The repository must have an associated try repository
         # TODO: Ideally we'd test these conditions independently to ensure that
         #       the 'try' button will only show up when all four are met
         #       and not otherwise.
 
-        # We should not be able to trigger a Try run without a HostingService
-        # with an associated try repository.
+        # We should not be able to trigger a Try run unless try is enabled
+        # for this repository.
         self.reviewboard_login('mjane@example.com', 'password2')
         self.load_rburl('r/1')
         try_btn = self.browser.find_element_by_id('autoland-try-trigger')
         self.assertEqual(
-            try_btn.value_of_css_property('opacity'), '0.5')
+            try_btn.get_attribute('title'),
+            'Try builds cannot be triggered for this repository')
         self.add_hostingservice(1, 'Sirius Black', 'scm_level_1',
-                                'ssh://hg.example.com/try',
-                                'ssh://hg.example.com/mainline', '')
+                                True, 'try', True, 'inbound', '')
 
         # We should also not be able to trigger a Try run unless the review is
         # published.
@@ -69,7 +76,8 @@ class AutolandTryTest(MozReviewWebDriverTest):
         self.load_rburl('r/1')
         try_btn = self.browser.find_element_by_id('autoland-try-trigger')
         self.assertEqual(
-            try_btn.value_of_css_property('opacity'), '0.5')
+            try_btn.get_attribute('title'),
+            'Try builds cannot be triggered on draft review requests')
         self.assign_reviewer(0, 'jsmith')
         publish_btn = WebDriverWait(self.browser, 3).until(
             EC.visibility_of_element_located((By.ID,
@@ -79,16 +87,45 @@ class AutolandTryTest(MozReviewWebDriverTest):
         WebDriverWait(self.browser, 10).until(
             EC.invisibility_of_element_located((By.ID, 'draft-banner')))
 
-        # Attempt to make intermittent failure with opacity of 'try' button
-        # less common. See Bug 1220733.
-        self.load_rburl('r/2')
+        automation_menu = self.browser.find_element_by_id('automation-menu')
+        automation_menu.click()
+        try_btn = self.browser.find_element_by_id('autoland-try-trigger')
+        self.assertEqual(try_btn.get_attribute('title'), '')
+
+        # Clicking the button should display a trychooser dialog
+        try_btn.click()
+        try_text = WebDriverWait(self.browser, 3).until(
+            EC.visibility_of_element_located((By.ID,
+            'mozreview-autoland-try-syntax')))
+        try_text.send_keys('try: stuff')
+        try_submit = self.browser.find_element_by_xpath('//input[@value="Submit"]')
+
+        # clicking the Submit button should display an activity indicator
+        try_submit.click()
+
+        # the try job should eventually create a new change description
+        WebDriverWait(self.browser, 10).until(
+            EC.visibility_of_element_located((By.CLASS_NAME, 'changedesc'))
+        )
+
+        time.sleep(10)
+        self.browser.refresh()
+        changedesc = self.browser.find_elements_by_class_name('changedesc')[1]
+        self.assertTrue('https://treeherder.mozilla.org/'
+            in changedesc.get_attribute('innerHTML'))
+
+        # We should not have closed the review automatically
+        with self.assertRaises(NoSuchElementException):
+            self.browser.find_element_by_id('submitted-banner')
+
+        # We should be able to trigger a Try run for another user.
+        self.reviewboard_login('jsmith@example.com', 'password1')
         self.load_rburl('r/1')
 
         automation_menu = self.browser.find_element_by_id('automation-menu')
         automation_menu.click()
         try_btn = self.browser.find_element_by_id('autoland-try-trigger')
-        self.assertEqual(
-            try_btn.value_of_css_property('opacity'), '1')
+        self.assertEqual(try_btn.get_attribute('title'), '')
 
         # Clicking the button should display a trychooser dialog
         try_btn.click()
@@ -126,9 +163,3 @@ class AutolandTryTest(MozReviewWebDriverTest):
         # We should not have closed the review automatically
         with self.assertRaises(NoSuchElementException):
             self.browser.find_element_by_id('submitted-banner')
-
-        # We should not be able to trigger a Try run for another user.
-        self.reviewboard_login('jsmith@example.com', 'password1')
-        self.load_rburl('r/1')
-        with self.assertRaises(NoSuchElementException):
-            self.browser.find_element_by_id('mozreview-autoland-try-trigger')

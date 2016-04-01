@@ -38,11 +38,11 @@ Create a review request with some busted Javascript in it
   adding .eslintrc
   adding mach
   adding test.js
-  $ hg push > /dev/null
+  $ hg push --config reviewboard.autopublish=false > /dev/null
   $ rbmanage publish 1
 
   $ python -m eslintbot --config-path ../eslintbot.ini
-  INFO:mozreviewbot:reviewing revision: 265cd5106b1c (review request: 2)
+  INFO:mozreviewbot:reviewing revision: 719ed7ed9e3e (review request: 2)
 
   $ rbmanage dumpreview 2
   id: 2
@@ -53,14 +53,46 @@ Create a review request with some busted Javascript in it
   commit: null
   submitter: default+5
   summary: Bug 1 - Some busted Javascript
-  description: Bug 1 - Some busted Javascript
+  description:
+  - Bug 1 - Some busted Javascript
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
+    calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 265cd5106b1c8895cad7b3772214fca31619d65b
+    p2rb.commit_id: 719ed7ed9e3e1a340f443981aa91125b68598369
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/.eslintrc b/.eslintrc
+    - new file mode 100644
+    - diff --git a/mach b/mach
+    - new file mode 100755
+    - '--- /dev/null'
+    - +++ b/mach
+    - '@@ -0,0 +1,4 @@'
+    - +#!/usr/bin/env python
+    - +import sys
+    - +import subprocess
+    - +subprocess.call(["eslint"] + sys.argv[1:])
+    - diff --git a/test.js b/test.js
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/test.js
+    - '@@ -0,0 +1,3 @@'
+    - +if (foo {
+    - +  var bar
+    - +}
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1
@@ -92,4 +124,4 @@ Create a review request with some busted Javascript in it
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

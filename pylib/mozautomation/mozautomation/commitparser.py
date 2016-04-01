@@ -33,17 +33,20 @@ RQUESTION_SPECIFIER_RE = re.compile(r'r\?')
 LIST = r'[;,\/\\]\s*'
 LIST_RE = re.compile(LIST)
 
-REVIEWER = r'[a-zA-Z0-9\-\_]+'         # this needs to match irc nicks
+# Note that we only allows a subset of legal IRC-nick characters.
+# Specifically we not allow [ \ ] ^ ` { | }
+IRC_NICK = r'[a-zA-Z0-9\-\_]+'          # this needs to match irc nicks
+BMO_IRC_NICK_RE = re.compile(r':(' + IRC_NICK + r')')
 
 REVIEWERS_RE = re.compile(
     r'([\s\(\.\[;,])' +                 # before 'r' delimiter
     r'(' + SPECIFIER + r')' +           # flag
     r'(' +                              # capture all reviewers
-        REVIEWER +                      # reviewer
+        IRC_NICK +                      # reviewer
         r'(?:' +                        # additional reviewers
             LIST +                      # delimiter
             r'(?![a-z0-9\.\-]+[=?])' +  # don't extend match into next flag
-            REVIEWER +                  # reviewer
+            IRC_NICK +                  # reviewer
         r')*' +
     r')')                               # noqa
 
@@ -58,6 +61,8 @@ DIGIT_RE = re.compile('#?\d+')
 
 BACK_OUT_MULTIPLE_RE = re.compile(
     '^back(?:ed)? out \d+ changesets \(bug ', re.I)
+
+METADATA_RE = re.compile('^[a-zA-Z-]+: ')
 
 
 def parse_bugs(s):
@@ -191,3 +196,38 @@ def parse_backouts(s):
             return nodes, parse_bugs(s)
 
     return None
+
+
+def strip_commit_metadata(s):
+    """Strips metadata related to commit tracking.
+
+    Will strip lines like "MozReview-Commit-ID: foo" from the commit
+    message.
+    """
+    # TODO this parsing is overly simplied. There is room to handle
+    # empty lines before the metadata.
+    lines = [l for l in s.splitlines() if not METADATA_RE.match(l)]
+
+    while lines and not lines[-1].strip():
+        lines.pop(-1)
+
+    if type(s) == str:
+        joiner = b'\n'
+    elif type(s) == unicode:
+        joiner = u'\n'
+    else:
+        raise TypeError('do not know type of commit message: %s' % type(s))
+
+    return joiner.join(lines)
+
+
+def parse_commit_id(s):
+    """Parse a MozReview-Commit-ID value out of a string.
+
+    Returns None if the commit ID is not found.
+    """
+    m = re.search('^MozReview-Commit-ID: ([a-zA-Z0-9]+)$', s, re.MULTILINE)
+    if not m:
+        return None
+
+    return m.group(1)

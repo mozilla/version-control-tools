@@ -1,0 +1,10 @@
+#!/bin/sh
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2 or any later version.
+
+# commit-msg hook for MozReview configured repositories that inserts a
+# random/unique identifier in the commit message to help identify commits
+# across rewriting.
+
+git mozreview commit-msg-hook "$@"
+exit $?

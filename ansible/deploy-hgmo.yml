@@ -1,5 +1,5 @@
 ---
-- hosts: hgssh1.dmz.scl3.mozilla.com
+- hosts: hgssh2.dmz.scl3.mozilla.com
   gather_facts: no
   tasks:
     - name: verify deploying changeset is available on server
@@ -49,8 +49,8 @@
         # We have to use hostvars to reference variables on other hosts.
         # slurp captures content in base64 encoded form. Decode it
         # before it is passed in.
-        mirror_private_key: "{{ hostvars['hgssh1.dmz.scl3.mozilla.com'].mirror_private_key.content | b64decode }}",
-        mirror_host_key: "{{ hostvars['hgssh1.dmz.scl3.mozilla.com'].mirror_host_key.content | b64decode }}",
+        mirror_private_key: "{{ hostvars['hgssh2.dmz.scl3.mozilla.com'].mirror_private_key.content | b64decode }}",
+        mirror_host_key: "{{ hostvars['hgssh2.dmz.scl3.mozilla.com'].mirror_host_key.content | b64decode }}",
         # hg-zlb.vips.scl3.mozilla.com resolves to multiple IPs.
         mirror_ips: ["63.245.215.25", "63.245.215.102"],
         vct_node: "{{ lookup('file', '../.vctnode') }}",
@@ -80,7 +80,7 @@
     # Install CRON to generate Mercurial bundle files. This only needs
     # to run on the master.
     - include: tasks/hgmo-bundle-cron.yml
-      when: ansible_hostname == "hgssh1"
+      when: ansible_hostname == "hgssh2"
 
     - name: discover kafka topics
       command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --list
@@ -101,7 +101,7 @@
             owner=root
             group=root
             mode=0644
-      when: ansible_hostname == 'hgssh1'
+      when: ansible_hostname == 'hgssh2'
 
     - name: notify IRC of deployment
       irc: server=irc.mozilla.org

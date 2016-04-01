@@ -45,6 +45,14 @@ as installing the required package, e.g., on Ubuntu,
 
 You can also install the very latest release `directly from Docker <http://docs.docker.com/linux/step_one/>`_.
 
+On Linux, it is necessary to configure Docker to listen on a tcp socket
+rather than the default configuration, which uses an unix domain socket,
+in order to get test results which match the expected results. This can be
+done by editing your configuration file to start docker with the following
+option:
+
+  -H tcp://127.0.0.1:4243
+
 For OS X, you will need to install and start up docker-machine; see
 the official `installation instructions
 <https://docs.docker.com/installation/mac/>`_.  Make sure you specify
@@ -102,7 +110,7 @@ Now, you can create and start a MozReview instance::
   (valid container names include: rbweb, bmoweb, hgrb, autoland)
 
 You should be able to load the printed URLs in your browser and see a
-working site. If you don't, `file a bug! <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview>`_
+working site. If you don't, `file a bug! <https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Testing%20%2F%20Development%20Environment>`_
 
 .. warning::
 
@@ -449,8 +457,8 @@ Filing Bugs
 ===========
 
 Found a bug in MozReview or want to create a bug to track an
-improvement? File bugs against ``Developer Services :: MozReview``
-at https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview.
+improvement? File bugs against ``MozReview :: General``
+at https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Testing%20%2F%20Development%20Environment.
 
 Discussion
 ==========

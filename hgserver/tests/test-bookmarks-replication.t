@@ -42,7 +42,7 @@
   
 
   $ hg push -B bm1
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -57,7 +57,7 @@
   exporting bookmark bm1
 
   $ hg push -B bm2
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -104,7 +104,7 @@ Push a bookmark update
   
 
   $ hg push -B bm2
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -142,7 +142,7 @@ Push a non-forward bookmark update
   (leaving bookmark bm2)
   $ hg bookmark -f bm2
   $ hg push -B bm2
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   no changes found
   remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
@@ -171,7 +171,7 @@ Push a bookmark delete
 
   $ hg bookmark -d bm1
   $ hg push -B bm1
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   no changes found
   remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
@@ -196,7 +196,7 @@ Remove all bookmarks
 
   $ hg bookmark -d bm2
   $ hg push -B bm2
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   no changes found
   remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)

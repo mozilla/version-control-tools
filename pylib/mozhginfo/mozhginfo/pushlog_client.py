@@ -25,29 +25,44 @@ from push import Push
 LOG = logging.getLogger('pushlog_client')
 JSON_PUSHES = "%(repo_url)s/json-pushes"
 VALID_CACHE = {}
+VERSION = 2
 
 
 class PushlogError(Exception):
     pass
 
 
-def query_pushes_by_revision_range(repo_url, from_revision, to_revision, version=2, tipsonly=1):
+def _pushes_to_list(pushes):
+    """accept a list of push objects and return a list of revisions"""
+    revisions = []
+    for push in pushes:
+        revisions = revisions + [changeset.node for changeset in push.changesets]
+    return revisions
+
+
+def query_pushes_by_revision_range(repo_url, from_revision, to_revision, version=VERSION,
+                                   tipsonly=True, return_revision_list=False):
     """
     Return an ordered list of pushes (by date - oldest (starting) first).
 
-    repo_url      - represents the URL to clone a repo
-    from_revision - from which revision to start with (oldest)
-    to_revision   - from which revision to end with (newest)
-    version       - version of json-pushes to use (see docs)
+    repo_url                - represents the URL to clone a repo
+    from_revision           - from which revision to start with (oldest)
+    to_revision             - from which revision to end with (newest)
+    version                 - version of json-pushes to use (see docs)
+    tipsonly                - only return the tip most push been returned if it's True
+    return_revision_list    - return a list of revisions if it's True
     """
     push_list = []
-    url = "%s?fromchange=%s&tochange=%s&version=%d&tipsonly=%d" % (
+    url = "%s?fromchange=%s&tochange=%s&version=%d" % (
         JSON_PUSHES % {"repo_url": repo_url},
         from_revision,
         to_revision,
-        version,
-        tipsonly
+        version
     )
+
+    if tipsonly:
+        url += '&tipsonly=1'
+
     LOG.debug("About to fetch %s" % url)
     req = requests.get(url)
     pushes = req.json()["pushes"]
@@ -59,18 +74,22 @@ def query_pushes_by_revision_range(repo_url, from_revision, to_revision, version
         # not guaranteed (due to system clock skew)
         # We can interact with self-serve with the full char representation
         push_list.append(Push(push_id=push_id, push_info=pushes[push_id]))
+    if return_revision_list:
+        return _pushes_to_list(push_list)
 
     return push_list
 
 
-def query_pushes_by_pushid_range(repo_url, start_id, end_id, version=2):
+def query_pushes_by_pushid_range(repo_url, start_id, end_id, version=VERSION,
+                                 return_revision_list=False):
     """
     Return an ordered list of pushes (oldest first).
 
-    repo_url - represents the URL to clone a repo
-    start_id - from which pushid to start with (oldest)
-    end_id   - from which pushid to end with (most recent)
-    version  - version of json-pushes to use (see docs)
+    repo_url               - represents the URL to clone a repo
+    start_id               - from which pushid to start with (oldest)
+    end_id                 - from which pushid to end with (most recent)
+    version                - version of json-pushes to use (see docs)
+    return_revision_list   - return a list of revisions if it's True
     """
     push_list = []
     url = "%s?startID=%s&endID=%s&version=%s&tipsonly=1" % (
@@ -88,18 +107,22 @@ def query_pushes_by_pushid_range(repo_url, start_id, end_id, version=2):
         # not guaranteed (due to system clock skew)
         # We can interact with self-serve with the 12 char representation
         push_list.append(Push(push_id=push_id, push_info=pushes[push_id]))
+    if return_revision_list:
+        return _pushes_to_list(push_list)
 
     return push_list
 
 
-def query_pushes_by_specified_revision_range(repo_url, revision, before, after):
+def query_pushes_by_specified_revision_range(repo_url, revision, before, after,
+                                             return_revision_list=False):
     """
     Get the start and end revisions' pushlog based on the number of revisions before and after.
     Raises PushlogError if pushlog data cannot be retrieved.
-    repo_url - represents the URL to clone a rep
-    revision - the revision used to set the query range
-    before   - the number before the revision given
-    after    - the number after the revision given
+    repo_url               - represents the URL to clone a rep
+    revision               - the revision used to set the query range
+    before                 - the number before the revision given
+    after                  - the number after the revision given
+    return_revision_list   - return a list of revisions if it's True
     """
     try:
         push = query_push_by_revision(repo_url, revision)
@@ -110,16 +133,23 @@ def query_pushes_by_specified_revision_range(repo_url, revision, before, after):
     except:
         raise PushlogError('Unable to retrieve pushlog data. '
                            'Please check repo_url and revision specified.')
+    if return_revision_list:
+        return _pushes_to_list(push_list)
+
     return push_list
 
 
-def query_push_by_revision(repo_url, revision, full=False):
+def query_push_by_revision(repo_url, revision, full=False, return_revision_list=False):
     """
     Return a dictionary with meta-data about a push including:
 
         * changesets
         * date
         * user
+    repo_url               - represents the URL to clone a rep
+    revision               - the revision used to set the query range
+    full                   - query whole information of a push if it's True
+    return_revision_list   - return a list of revisions if it's True
     """
     url = "%s?changeset=%s&tipsonly=1" % (JSON_PUSHES % {"repo_url": repo_url}, revision)
     if full:
@@ -136,6 +166,9 @@ def query_push_by_revision(repo_url, revision, full=False):
     else:
         LOG.debug("Requesting the info with full=1 can yield too much unnecessary output "
                   "to debug anything properly")
+    if return_revision_list:
+        return push.changesets[0].node
+
     return push
 
 

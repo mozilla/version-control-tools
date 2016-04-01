@@ -25,11 +25,11 @@ class HostingServiceTest(MozReviewWebDriverTest):
         lr = self.create_basic_repo('mjane@example.com', 'mjane')
         lr.write('foo', 'first change')
         lr.run(['commit', '-m', 'Bug 1 - Test try'])
-        lr.run(['push'])
+        lr.run(['push', '--config', 'reviewboard.autopublish=false'])
 
         self.add_hostingservice(1, 'Sirius Black', 'scm_level_3',
-                                'ssh://hg.example.com/try',
-                                'ssh://hg.example.com/mainline', '')
+                                True, 'ssh://hg.example.com/try',
+                                True, 'ssh://hg.example.com/mainline', '')
 
         # If we visit the review url, we should be able to find repository
         # information
@@ -45,7 +45,7 @@ class HostingServiceTest(MozReviewWebDriverTest):
         # Make sure that diffs work as expected
         lr.write('foo', 'second change')
         lr.run(['commit', '-m', 'Bug 1 - Test try'])
-        lr.run(['push'])
+        lr.run(['push', '--config', 'reviewboard.autopublish=false'])
 
         self.load_rburl('r/3/diff')
         diff_box = self.browser.find_element_by_class_name('diff-box')
@@ -73,8 +73,14 @@ class HostingServiceTest(MozReviewWebDriverTest):
         el = self.browser.find_element_by_id('id_repository_url')
         el.send_keys('https://new-repo.example.com')
 
+        el = self.browser.find_element_by_id('id_autolanding_to_try_enabled')
+        el.click()
+
         el = self.browser.find_element_by_id('id_try_repository_url')
         el.send_keys('https://new-try-repo.example.com')
+
+        el = self.browser.find_element_by_id('id_autolanding_enabled')
+        el.click()
 
         el = self.browser.find_element_by_id('id_landing_repository_url')
         el.send_keys('https://new-landing-repo.example.com')

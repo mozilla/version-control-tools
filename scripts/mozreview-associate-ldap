@@ -1,0 +1,43 @@
+#!/usr/bin/env python2.7
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script associates an LDAP and MozReview account together by
+# posting into a MozReview HTTP API. Parameters are passed in via
+# JSON on stdin.
+
+import json
+import os
+import sys
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+ROOT = os.path.normpath(os.path.join(HERE, '..'))
+
+sys.path.insert(0, os.path.join(ROOT, 'pylib/reviewboardmods'))
+
+from reviewboardmods.pushhooks import (
+    associate_ldap_username,
+)
+
+
+if __name__ == '__main__':
+    # Read arguments from stdin because content is sensitive.
+    data = json.loads(sys.stdin.read(), encoding='utf-8')
+
+    url = data['rb_url']
+    rb_username = data['rb_username']
+    rb_password = data['rb_password']
+    ldap_username = data['ldap_username']
+    bz_username = data['bz_username']
+    bz_apikey = data['bz_apikey']
+
+    if associate_ldap_username(url,
+                               ldap_username=ldap_username,
+                               privileged_username=rb_username,
+                               privileged_password=rb_password,
+                               username=bz_username,
+                               apikey=bz_apikey):
+        sys.exit(0)
+
+    sys.exit(1)

@@ -13,14 +13,21 @@ from reviewboard.reviews.models import ReviewRequest
 from reviewboard.webapi.encoder import status_to_string
 from reviewboard.webapi.resources import WebAPIResource
 
-from mozreview.extra_data import (COMMITS_KEY,
-                                  COMMIT_ID_KEY,
-                                  MOZREVIEW_KEY,
-                                  gen_child_rrs,
-                                  get_parent_rr)
-from mozreview.models import BugzillaUserMap
+from mozreview.extra_data import (
+    COMMITS_KEY,
+    COMMIT_ID_KEY,
+    MOZREVIEW_KEY,
+    fetch_commit_data,
+    gen_child_rrs,
+    get_parent_rr,
+)
+from mozreview.models import (
+    BugzillaUserMap,
+    CommitData,
+)
 from mozreview.errors import NOT_PARENT
 from mozreview.extra_data import is_parent
+from mozreview.review_helpers import get_reviewers_status
 
 
 class ReviewRequestSummaryResource(WebAPIResource):
@@ -45,7 +52,8 @@ class ReviewRequestSummaryResource(WebAPIResource):
         Note that this presumes that bugs_closed only ever contains one
         bug, which in MozReview, at the moment, is always true.
         """
-        q = Q(extra_data__contains=MOZREVIEW_KEY)
+        q = Q(id__in=CommitData.objects.filter(
+            extra_data__contains=MOZREVIEW_KEY))
 
         # TODO: Then may get slow as the db size increase, particularly
         # when we support multiple bugs in one parent.  We should use a
@@ -55,12 +63,9 @@ class ReviewRequestSummaryResource(WebAPIResource):
             if 'bug' in request.GET:
                 q = q & Q(bugs_closed=request.GET.get('bug'))
 
-        queryset = ReviewRequest.objects.public(
+        return ReviewRequest.objects.public(
             status=None,
-            extra_query=q
-        )
-
-        return queryset
+            extra_query=q)
 
     @webapi_response_errors(DOES_NOT_EXIST, INVALID_ATTRIBUTE, NOT_LOGGED_IN,
                             NOT_PARENT, PERMISSION_DENIED)
@@ -130,9 +135,12 @@ class ReviewRequestSummaryResource(WebAPIResource):
         # have the same bug ID; we skip this part if we can't get COMMITS_KEY
         # out of the parent's extra_data.
         for parent_id, family in families.iteritems():
-            if family['parent'] and COMMITS_KEY in family['parent'].extra_data:
-                commit_tuples = json.loads(
-                    family['parent'].extra_data[COMMITS_KEY])
+            parent_commit_data = fetch_commit_data(family['parent'])
+            commits_json = parent_commit_data.get_for(family['parent'],
+                                                      COMMITS_KEY)
+
+            if family['parent'] and commits_json is not None:
+                commit_tuples = json.loads(commits_json)
                 [missing_rrids.add(child_rrid) for sha, child_rrid in
                  commit_tuples if child_rrid not in family['children']]
             else:
@@ -208,6 +216,11 @@ class ReviewRequestSummaryResource(WebAPIResource):
             'reviewers': [
                 'jrandom'
             ],
+            'reviewers_status': {
+                'jrandom': {
+                    'ship_it': True
+                }
+            },
             'status': 'pending',
             'submitter': 'mcote',
             'summary': 'Bug 1 - Update README.md.'
@@ -226,8 +239,12 @@ class ReviewRequestSummaryResource(WebAPIResource):
         d['submitter_bmo_id'] = BugzillaUserMap.objects.get(
             user_id=review_request.submitter.id).bugzilla_user_id
         d['status'] = status_to_string(review_request.status)
-
         d['reviewers'] = [reviewer.username for reviewer in reviewers]
+
+        # If we have a commit (i.e. we are on a child) add reviewer_status.
+        if commit:
+            d['reviewers_status'] = get_reviewers_status(review_request,
+                                                         reviewers)
         d['reviewers_bmo_ids'] = [bzuser.bugzilla_user_id for bzuser in
                                   BugzillaUserMap.objects.filter(user_id__in=[
                                       reviewer.id for reviewer in reviewers])]
@@ -257,7 +274,8 @@ class ReviewRequestSummaryResource(WebAPIResource):
         for family in families.itervalues():
             child_rrids = [
                 int(rrid) for commit_id, rrid in
-                json.loads(family['parent'].extra_data[COMMITS_KEY])
+                json.loads(fetch_commit_data(family['parent']).get_for(
+                    family['parent'], COMMITS_KEY))
             ]
             summaries.append({
                 'parent': self._summarize_review_request(
@@ -266,10 +284,12 @@ class ReviewRequestSummaryResource(WebAPIResource):
                     self._summarize_review_request(
                         request,
                         family['children'][child_rrid],
-                        family['children'][child_rrid].extra_data[
-                            COMMIT_ID_KEY]
+                        fetch_commit_data(
+                            family['children'][child_rrid]
+                        ).extra_data[COMMIT_ID_KEY]
                     )
                     for child_rrid in child_rrids
+                    if child_rrid in family['children']
                 ]
             })
 

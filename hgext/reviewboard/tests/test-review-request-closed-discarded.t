@@ -8,7 +8,7 @@
   $ hg commit -A -m 'root commit'
   adding foo
   $ hg push --noreview
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -21,8 +21,8 @@
   $ hg commit -m 'Bug 1 - Foo 1'
   $ echo 'foo2' > foo
   $ hg commit -m 'Bug 1 - Foo 2'
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/61e2e5c813d2*-addcommitid.hg (glob)
   searching for changes
@@ -33,16 +33,16 @@
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  2:233b570e5356
+  changeset:  2:3a446ae43820
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -52,7 +52,7 @@
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -62,7 +62,7 @@
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -84,8 +84,8 @@
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
       tags: []
@@ -93,8 +93,8 @@
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -124,18 +124,33 @@ no Commit ID set.
   target_people: []
   extra_data:
     calculated_trophies: true
+    p2rb.reviewer_map: '{}'
+  commit_extra_data:
     p2rb: true
     p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
+    p2rb.commits: '[["98467d80785ec84dd871f213c167ed704a6d974d", 2], ["3a446ae4382006c43cdfa5aa33c494f582736f35",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
-    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo0
+    - +foo2
+    - ''
   approved: false
-  approval_failure: Commit a92d53c0ffc7df0517397a77980e62332552d812 is not approved.
+  approval_failure: Commit 98467d80785ec84dd871f213c167ed704a6d974d is not approved.
 
 Child review request with ID 2 should be closed as discarded...
 
@@ -148,15 +163,33 @@ Child review request with ID 2 should be closed as discarded...
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 1
-  description: Bug 1 - Foo 1
+  description:
+  - Bug 1 - Foo 1
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
+    p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo0
+    - +foo1
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
@@ -171,15 +204,33 @@ Child review request with ID 3 should be closed as discarded...
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 2
-  description: Bug 1 - Foo 2
+  description:
+  - Bug 1 - Foo 2
+  - ''
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people: []
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
+    p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 3
+    revision: 1
+    base_commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo1
+    - +foo2
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
@@ -190,7 +241,7 @@ The review attachment should be marked as obsolete
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -200,7 +251,7 @@ The review attachment should be marked as obsolete
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -222,8 +273,8 @@ The review attachment should be marked as obsolete
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
       tags: []
@@ -231,8 +282,8 @@ The review attachment should be marked as obsolete
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -262,16 +313,31 @@ Commit ID re-instated.
   target_people: []
   extra_data:
     calculated_trophies: true
+    p2rb.reviewer_map: '{}'
+  commit_extra_data:
     p2rb: true
     p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
+    p2rb.commits: '[["98467d80785ec84dd871f213c167ed704a6d974d", 2], ["3a446ae4382006c43cdfa5aa33c494f582736f35",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
-    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo0
+    - +foo2
+    - ''
   approved: false
   approval_failure: The review request is not public.
   draft:
@@ -283,15 +349,16 @@ Commit ID re-instated.
     target_people: []
     extra:
       calculated_trophies: true
+      p2rb.reviewer_map: '{}'
+    commit_extra_data:
       p2rb: true
       p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-      p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
+      p2rb.commits: '[["98467d80785ec84dd871f213c167ed704a6d974d", 2], ["3a446ae4382006c43cdfa5aa33c494f582736f35",
         3]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
-      p2rb.reviewer_map: '{}'
       p2rb.unpublished_rids: '[]'
     diffs: []
 
@@ -306,15 +373,33 @@ Child review request with ID 2 should be re-opened...
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 1
-  description: Bug 1 - Foo 1
+  description:
+  - Bug 1 - Foo 1
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
+    p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo0
+    - +foo1
+    - ''
   approved: false
   approval_failure: The review request is not public.
   draft:
@@ -322,12 +407,16 @@ Child review request with ID 2 should be re-opened...
     - '1'
     commit: null
     summary: Bug 1 - Foo 1
-    description: Bug 1 - Foo 1
+    description:
+    - Bug 1 - Foo 1
+    - ''
+    - 'MozReview-Commit-ID: 124Bxg'
     target_people: []
     extra:
       calculated_trophies: true
+    commit_extra_data:
       p2rb: true
-      p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
+      p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
@@ -344,15 +433,33 @@ Child review request with ID 3 should be re-opened...
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 2
-  description: Bug 1 - Foo 2
+  description:
+  - Bug 1 - Foo 2
+  - ''
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people: []
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
+    p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 3
+    revision: 1
+    base_commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo1
+    - +foo2
+    - ''
   approved: false
   approval_failure: The review request is not public.
   draft:
@@ -360,12 +467,16 @@ Child review request with ID 3 should be re-opened...
     - '1'
     commit: null
     summary: Bug 1 - Foo 2
-    description: Bug 1 - Foo 2
+    description:
+    - Bug 1 - Foo 2
+    - ''
+    - 'MozReview-Commit-ID: 5ijR9k'
     target_people: []
     extra:
       calculated_trophies: true
+    commit_extra_data:
       p2rb: true
-      p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
+      p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
@@ -378,7 +489,7 @@ There should still not be a visible attachment on the bug
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -388,7 +499,7 @@ There should still not be a visible attachment on the bug
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -410,8 +521,8 @@ There should still not be a visible attachment on the bug
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
       tags: []
@@ -419,8 +530,8 @@ There should still not be a visible attachment on the bug
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -449,18 +560,33 @@ Squashed review request should be published.
   target_people: []
   extra_data:
     calculated_trophies: true
+    p2rb.reviewer_map: '{}'
+  commit_extra_data:
     p2rb: true
     p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
-    p2rb.commits: '[["a92d53c0ffc7df0517397a77980e62332552d812", 2], ["233b570e5356d0c84bcbf0633de446172012b3b3",
+    p2rb.commits: '[["98467d80785ec84dd871f213c167ed704a6d974d", 2], ["3a446ae4382006c43cdfa5aa33c494f582736f35",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
-    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo0
+    - +foo2
+    - ''
   approved: false
-  approval_failure: Commit a92d53c0ffc7df0517397a77980e62332552d812 is not approved.
+  approval_failure: Commit 98467d80785ec84dd871f213c167ed704a6d974d is not approved.
 
 Child review request with ID 2 should be published.
 
@@ -473,15 +599,33 @@ Child review request with ID 2 should be published.
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 1
-  description: Bug 1 - Foo 1
+  description:
+  - Bug 1 - Foo 1
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people: []
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: a92d53c0ffc7df0517397a77980e62332552d812
+    p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo0
+    - +foo1
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
@@ -496,15 +640,33 @@ Child review request with ID 3 should be published.
   commit: null
   submitter: default+5
   summary: Bug 1 - Foo 2
-  description: Bug 1 - Foo 2
+  description:
+  - Bug 1 - Foo 2
+  - ''
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people: []
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 233b570e5356d0c84bcbf0633de446172012b3b3
+    p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 3
+    revision: 1
+    base_commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo1
+    - +foo2
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
@@ -515,7 +677,7 @@ The attachment for the review request should be unobsoleted
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -525,7 +687,7 @@ The attachment for the review request should be unobsoleted
       summary: 'MozReview Request: Bug 1 - Foo 1'
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/3/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 2'
       file_name: reviewboard-3-url.txt
       flags: []
@@ -547,8 +709,8 @@ The attachment for the review request should be unobsoleted
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
       tags: []
@@ -556,24 +718,238 @@ The attachment for the review request should be unobsoleted
       - Created attachment 2
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/3/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/3/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: summary
+
+Pushing to a discarded review series will create a new series
+
+  $ rbmanage closediscarded 1
+
+  $ echo foo3 > foo
+  $ hg commit -m 'Bug 1 - Foo 3'
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+  submitting 3 changesets for review
+  
+  changeset:  1:98467d80785e
+  summary:    Bug 1 - Foo 1
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
+  
+  changeset:  2:3a446ae43820
+  summary:    Bug 1 - Foo 2
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/6 (draft)
+  
+  changeset:  3:1ec9946fd47f
+  summary:    Bug 1 - Foo 3
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7 (draft)
+  
+  review id:  bz://1/mynick
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
+  (review requests lack reviewers; visit review url to assign reviewers)
+  (visit review url to publish these review requests so others can see them)
+
+  $ rbmanage publish 4
+
+  $ rbmanage dumpreview 1
+  id: 1
+  status: discarded
+  public: true
+  bugs:
+  - '1'
+  commit: null
+  submitter: default+5
+  summary: bz://1/mynick
+  description: This is the parent review request
+  target_people: []
+  extra_data:
+    calculated_trophies: true
+    p2rb.reviewer_map: '{}'
+  commit_extra_data:
+    p2rb: true
+    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    p2rb.commits: '[["98467d80785ec84dd871f213c167ed704a6d974d", 2], ["3a446ae4382006c43cdfa5aa33c494f582736f35",
+      3]]'
+    p2rb.discard_on_publish_rids: '[]'
+    p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    p2rb.identifier: bz://1/mynick
+    p2rb.is_squashed: true
+    p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo0
+    - +foo2
+    - ''
+  approved: false
+  approval_failure: Commit 98467d80785ec84dd871f213c167ed704a6d974d is not approved.
+
+  $ rbmanage dumpreview 4
+  id: 4
+  status: pending
+  public: true
+  bugs:
+  - '1'
+  commit: bz://1/mynick
+  submitter: default+5
+  summary: bz://1/mynick
+  description: This is the parent review request
+  target_people: []
+  extra_data:
+    calculated_trophies: true
+    p2rb.reviewer_map: '{}'
+  commit_extra_data:
+    p2rb: true
+    p2rb.base_commit: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    p2rb.commits: '[["98467d80785ec84dd871f213c167ed704a6d974d", 5], ["3a446ae4382006c43cdfa5aa33c494f582736f35",
+      6], ["1ec9946fd47ff9b5cb07e9d9c8b4d393b688e01b", 7]]'
+    p2rb.discard_on_publish_rids: '[]'
+    p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    p2rb.identifier: bz://1/mynick
+    p2rb.is_squashed: true
+    p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 4
+    revision: 1
+    base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo0
+    - +foo3
+    - ''
+  approved: false
+  approval_failure: Commit 98467d80785ec84dd871f213c167ed704a6d974d is not approved.
+
+  $ bugzilla dump-bug 1
+  Bug 1:
+    attachments:
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
+      description: 'MozReview Request: Bug 1 - Foo 1'
+      file_name: reviewboard-2-url.txt
+      flags: []
+      id: 1
+      is_obsolete: true
+      is_patch: false
+      summary: 'MozReview Request: Bug 1 - Foo 1'
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
+      description: 'MozReview Request: Bug 1 - Foo 2'
+      file_name: reviewboard-3-url.txt
+      flags: []
+      id: 2
+      is_obsolete: true
+      is_patch: false
+      summary: 'MozReview Request: Bug 1 - Foo 2'
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/5/diff/#index_header
+      description: 'MozReview Request: Bug 1 - Foo 1'
+      file_name: reviewboard-5-url.txt
+      flags: []
+      id: 3
+      is_obsolete: false
+      is_patch: false
+      summary: 'MozReview Request: Bug 1 - Foo 1'
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header
+      description: 'MozReview Request: Bug 1 - Foo 2'
+      file_name: reviewboard-6-url.txt
+      flags: []
+      id: 4
+      is_obsolete: false
+      is_patch: false
+      summary: 'MozReview Request: Bug 1 - Foo 2'
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/7/diff/#index_header
+      description: 'MozReview Request: Bug 1 - Foo 3'
+      file_name: reviewboard-7-url.txt
+      flags: []
+      id: 5
+      is_obsolete: false
+      is_patch: false
+      summary: 'MozReview Request: Bug 1 - Foo 3'
+    blocks: []
+    cc: []
+    comments:
+    - author: default@example.com
+      id: 1
+      tags: []
+      text: ''
+    - author: default@example.com
+      id: 2
+      tags: []
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Foo 1'
+      - ''
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
+    - author: default@example.com
+      id: 3
+      tags: []
+      text:
+      - Created attachment 2
+      - 'MozReview Request: Bug 1 - Foo 2'
+      - ''
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
     - author: default@example.com
       id: 4
       tags: []
       text:
-      - Comment on attachment 1
+      - Created attachment 3
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review request updated; see interdiff: http://*/r/2/diff/1-2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/5/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/5/'
     - author: default@example.com
       id: 5
       tags: []
       text:
-      - Comment on attachment 2
+      - Created attachment 4
       - 'MozReview Request: Bug 1 - Foo 2'
       - ''
-      - 'Review request updated; see interdiff: http://*/r/3/diff/1-2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
+    - author: default@example.com
+      id: 6
+      tags: []
+      text:
+      - Created attachment 5
+      - 'MozReview Request: Bug 1 - Foo 3'
+      - ''
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/7/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/7/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -585,4 +961,4 @@ The attachment for the review request should be unobsoleted
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

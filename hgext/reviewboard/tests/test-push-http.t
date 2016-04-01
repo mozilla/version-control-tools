@@ -10,7 +10,7 @@ Seed repository on server
   $ hg -q commit -A -m initial
   $ hg phase --public -r .
   $ hg push --noreview
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -31,6 +31,29 @@ A HTTP GET request should not require authentication
   
   {"1": {"changesets": ["96ee1d7354c4ad7372047672c36a1f561e3a6a4c"], "date": *, "user": "default@example.com"}} (glob)
 
+Capabilities are exposed via JSON API
+
+  $ http --no-headers ${MERCURIAL_URL}test-repo/json-mozreviewcapabilities
+  200
+  
+  {
+    "reviewcaps": [
+      "publish", 
+      "publishhttp", 
+      "pullreviews", 
+      "pushreview", 
+      "submithttp"
+    ], 
+    "reviewrequires": [
+      "bzapikeys", 
+      "commitid", 
+      "jsonproto", 
+      "listreviewdata", 
+      "listreviewrepos", 
+      "proto1"
+    ]
+  }
+
 hg pull does not require authentication
 
   $ hg --config extensions.strip= strip -r tip
@@ -38,7 +61,7 @@ hg pull does not require authentication
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/96ee1d7354c4-05cd9e87-backup.hg (glob)
 
   $ hg pull ${MERCURIAL_URL}test-repo
-  pulling from http://*:$HGPORT/test-repo (glob)
+  pulling from http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   requesting all changes
   adding changesets
   adding manifests
@@ -57,7 +80,7 @@ Issuing a POST to the Mercurial server requires authentication
   content-type: text/html; charset=iso-8859-1
   date: * (glob)
   server: Apache
-  www-authenticate: Basic realm="http://*:$HGPORT2/ username and API Key" (glob)
+  www-authenticate: Basic realm="http://$DOCKER_HOSTNAME:$HGPORT2/ username and API Key"
   
   <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
   <html><head>
@@ -82,7 +105,7 @@ Invalid credentials should result in 401
   content-type: text/html; charset=iso-8859-1
   date: * (glob)
   server: Apache
-  www-authenticate: Basic realm="http://*:$HGPORT2/ username and API Key" (glob)
+  www-authenticate: Basic realm="http://$DOCKER_HOSTNAME:$HGPORT2/ username and API Key"
   
   <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
   <html><head>
@@ -108,7 +131,7 @@ Valid API key with wrong username should result in 401
   content-type: text/html; charset=iso-8859-1
   date: * (glob)
   server: Apache
-  www-authenticate: Basic realm="http://*:$HGPORT2/ username and API Key" (glob)
+  www-authenticate: Basic realm="http://$DOCKER_HOSTNAME:$HGPORT2/ username and API Key"
   
   <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
   <html><head>
@@ -142,20 +165,20 @@ Vanilla push over HTTP should require authorization
   $ echo http1 > foo
   $ hg commit -m 'non review push over http'
   $ hg push ${MERCURIAL_URL}test-repo
-  pushing to http://*:$HGPORT/test-repo (glob)
+  pushing to http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/1b5eacce6121-7f714e89-addcommitid.hg (glob)
   searching for changes
-  abort: http authorization required for http://*:$HGPORT/test-repo (glob)
+  abort: http authorization required for http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   [255]
 
 Vanilla push will prompt for credentials
 
   $ hg --config ui.interactive=true push ${MERCURIAL_URL}test-repo
-  pushing to http://*:$HGPORT/test-repo (glob)
+  pushing to http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   searching for changes
-  http authorization required for http://*:$HGPORT/test-repo (glob)
-  realm: http://*:$HGPORT2/ username and API Key (glob)
+  http authorization required for http://$DOCKER_HOSTNAME:$HGPORT/test-repo
+  realm: http://$DOCKER_HOSTNAME:$HGPORT2/ username and API Key
   user: abort: response expected
   [255]
 
@@ -166,7 +189,7 @@ Credentials are automagically found if [bugzilla] configs are defined
   $ hg commit -m 'auto find bugzilla credentials'
   created new head
   $ hg --config mozilla.trustedbmoapikeyservices=${MERCURIAL_URL} push ${MERCURIAL_URL}test-repo --noreview -r .
-  pushing to http://*:$HGPORT/test-repo (glob)
+  pushing to http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -186,7 +209,7 @@ Vanilla push with invalid credentials fails
   > EOF
 
   $ hg push ${MERCURIAL_URL}test-repo
-  pushing to http://*:$HGPORT/test-repo (glob)
+  pushing to http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   searching for changes
   abort: authorization failed
   [255]
@@ -198,7 +221,7 @@ Vanilla push with proper credentials works
   > EOF
 
   $ hg push ${MERCURIAL_URL}test-repo --noreview -r .
-  pushing to http://*:$HGPORT/test-repo (glob)
+  pushing to http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -229,7 +252,7 @@ The Bugzilla user should have been recorded in the pushlog
       },
       "3": {
           "changesets": [
-              "7e2199dc77b02fc9b43dcf0a7faf18e6051025fc"
+              "6ab4007f52489a76cbff3f80e3d7baa5d99fbb3c"
           ],
           "date": *, (glob)
           "user": "bmo:default@example.com"
@@ -252,7 +275,7 @@ Test with a second user, just so we are comprehensive
   > EOF
 
   $ hg push --noreview ${MERCURIAL_URL}test-repo -r .
-  pushing to http://*:$HGPORT/test-repo (glob)
+  pushing to http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -281,14 +304,14 @@ Test with a second user, just so we are comprehensive
       },
       "3": {
           "changesets": [
-              "7e2199dc77b02fc9b43dcf0a7faf18e6051025fc"
+              "6ab4007f52489a76cbff3f80e3d7baa5d99fbb3c"
           ],
           "date": *, (glob)
           "user": "bmo:default@example.com"
       },
       "4": {
           "changesets": [
-              "6432ccd4579e0fdc337b6dc55b827cbcc7fee397"
+              "8d7f5c4152d8f67d67500d3b92903e365c0122f1"
           ],
           "date": *, (glob)
           "user": "bmo:user2@example.com"
@@ -306,10 +329,10 @@ Test creating a review via HTTP
   $ mozreview create-user reviewer@example.com password 'Reviewer :reviewer'
   Created user 7
 
-  $ hg --config bugzilla.username=user2@example.com --config bugzilla.apikey=${user2key} --config reviewboard.autopublish=true push ${MERCURIAL_URL}test-repo
-  pushing to http://*:$HGPORT/test-repo (glob)
+  $ hg --config bugzilla.username=user2@example.com --config bugzilla.apikey=${user2key} push ${MERCURIAL_URL}test-repo
+  pushing to http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   (adding commit id to 2 changesets)
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/e9bba109755f-920db7c0-addcommitid.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/e528ead97c56-8d25fba9-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -318,18 +341,18 @@ Test creating a review via HTTP
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  4:9a6457fbda8f
+  changeset:  4:9d326020e0dc
   summary:    Bug 1 - Review 1; r?reviewer
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  5:b41b3bd650cb
+  changeset:  5:c6548fe14585
   summary:    Bug 1 - Review 2; r?reviewer
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
   $ rbmanage dumpreview 1
@@ -346,18 +369,33 @@ Test creating a review via HTTP
   - reviewer
   extra_data:
     calculated_trophies: true
+    p2rb.reviewer_map: '{}'
+  commit_extra_data:
     p2rb: true
-    p2rb.base_commit: 6432ccd4579e0fdc337b6dc55b827cbcc7fee397
-    p2rb.commits: '[["9a6457fbda8fb4e5afaa3e0ab831f34a3de285af", 2], ["b41b3bd650cb5b456e611e2eeb77705e4c41cb83",
+    p2rb.base_commit: 8d7f5c4152d8f67d67500d3b92903e365c0122f1
+    p2rb.commits: '[["9d326020e0dcd3e421680e4b78bf80c9e30df0e6", 2], ["c6548fe145857055779b23d94ef3f911e8d261b0",
       3]]'
     p2rb.discard_on_publish_rids: '[]'
-    p2rb.first_public_ancestor: 6432ccd4579e0fdc337b6dc55b827cbcc7fee397
+    p2rb.first_public_ancestor: 8d7f5c4152d8f67d67500d3b92903e365c0122f1
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
-    p2rb.reviewer_map: '{}'
     p2rb.unpublished_rids: '[]'
+  diffs:
+  - id: 1
+    revision: 1
+    base_commit_id: 8d7f5c4152d8f67d67500d3b92903e365c0122f1
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -user2
+    - +review2
+    - ''
   approved: false
-  approval_failure: Commit 9a6457fbda8fb4e5afaa3e0ab831f34a3de285af is not approved.
+  approval_failure: Commit 9d326020e0dcd3e421680e4b78bf80c9e30df0e6 is not approved.
 
   $ rbmanage dump-user user2
   4:
@@ -377,4 +415,4 @@ which actually does create an LDAP user: we're just not using it here.)
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

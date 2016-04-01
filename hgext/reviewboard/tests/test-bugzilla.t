@@ -16,8 +16,8 @@ Pushing a review should not touch Bugzilla
 
   $ echo foo1 > foo
   $ hg commit -m 'Bug 1 - Foo 1'
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/24417bc94b2c*-addcommitid.hg (glob)
   searching for changes
@@ -28,12 +28,12 @@ Pushing a review should not touch Bugzilla
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:a92d53c0ffc7
+  changeset:  1:98467d80785e
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -62,7 +62,7 @@ Publishing the review will add an attachment to the bug
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -84,8 +84,8 @@ Publishing the review will add an attachment to the bug
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -99,9 +99,9 @@ published.
 
   $ echo foo1 >> foo
   $ hg commit --amend
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/a92d53c0ffc7-1dd3de76-amend-backup.hg (glob)
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/98467d80785e-96ff1ede-amend-backup.hg (glob)
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -110,12 +110,12 @@ published.
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:ad7618cd44de
+  changeset:  1:c84f52fcaead
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -125,7 +125,7 @@ published.
     attachments:
     - attacher: default@example.com
       content_type: text/x-review-board-request
-      data: http://*:$HGPORT1/r/2/diff/#index_header (glob)
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Foo 1'
       file_name: reviewboard-2-url.txt
       flags: []
@@ -147,8 +147,8 @@ published.
       - Created attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review commit: http://*:$HGPORT1/r/2/diff/#index_header' (glob)
-      - 'See other reviews: http://*:$HGPORT1/r/2/' (glob)
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 4
       tags: []
@@ -156,7 +156,66 @@ published.
       - Comment on attachment 1
       - 'MozReview Request: Bug 1 - Foo 1'
       - ''
-      - 'Review request updated; see interdiff: http://*/r/2/diff/1-2/' (glob)
+      - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/1-2/'
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: bug1
+
+We should not post an interdiff link if there are no code changes. This
+can happen if a reviewer is manually added (see Bug 1229789).
+
+  $ mozreview create-user reviewer@example.com password1 'Mozilla Reviewer [:reviewer]' --bugzilla-group editbugs
+  Created user 6
+  $ rbmanage add-reviewer 2 --user reviewer
+  1 people listed on review request
+  $ rbmanage publish 1
+  $ bugzilla dump-bug 1
+  Bug 1:
+    attachments:
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
+      description: 'MozReview Request: Bug 1 - Foo 1'
+      file_name: reviewboard-2-url.txt
+      flags:
+      - id: 1
+        name: review
+        requestee: reviewer@example.com
+        setter: default@example.com
+        status: '?'
+      id: 1
+      is_obsolete: false
+      is_patch: false
+      summary: 'MozReview Request: Bug 1 - Foo 1'
+    blocks: []
+    cc:
+    - reviewer@example.com
+    comments:
+    - author: default@example.com
+      id: 1
+      tags: []
+      text: ''
+    - author: default@example.com
+      id: 3
+      tags: []
+      text:
+      - Created attachment 1
+      - 'MozReview Request: Bug 1 - Foo 1'
+      - ''
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
+    - author: default@example.com
+      id: 4
+      tags: []
+      text:
+      - Comment on attachment 1
+      - 'MozReview Request: Bug 1 - Foo 1'
+      - ''
+      - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/1-2/'
     component: TestComponent
     depends_on: []
     platform: All
@@ -166,4 +225,4 @@ published.
     summary: bug1
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

@@ -3,20 +3,15 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import datetime
-import re
+import logging
 
 from django.contrib.auth.models import User
 from django.db import models, transaction
+from mozautomation.commitparser import BMO_IRC_NICK_RE
 from reviewboard.accounts.models import Profile
 from reviewboard.reviews.models import ReviewRequest
 
-
-# Note that Review Board only allows a subset of legal IRC-nick characters.
-# Specifically, Review Board does not allow [ \ ] ^ ` { | }
-# Anyone with those in their :ircnicks will have them truncated at the last
-# legal character.  Not great, but we can later implement a UI for letting
-# people change their usernames in Review Board.
-BZ_IRCNICK_RE = re.compile(':([A-Za-z0-9_\-\.]+)')
+logger = logging.getLogger(__name__)
 
 
 class BugzillaUserMap(models.Model):
@@ -63,7 +58,7 @@ def get_or_create_bugzilla_users(user_data):
         real_name = user['real_name']
         can_login = user['can_login']
 
-        ircnick_match = BZ_IRCNICK_RE.search(real_name)
+        ircnick_match = BMO_IRC_NICK_RE.search(real_name)
 
         if ircnick_match:
             username = ircnick_match.group(1)
@@ -74,15 +69,26 @@ def get_or_create_bugzilla_users(user_data):
             bugzilla_user_map = BugzillaUserMap.objects.get(
                 bugzilla_user_id=bz_user_id)
         except BugzillaUserMap.DoesNotExist:
+            logger.info('bugzilla user %s/%s not present; creating %s' % (
+                        bz_user_id, email, username))
             user = User(username=username, password='!', first_name=real_name,
                         email=email, is_active=can_login)
 
             try:
-                user.save()
+                # Django kind of "corrupts" the DB transaction when an
+                # integrity error occurs. So, we need to wrap in a
+                # sub-transaction to prevent the "corruption" from
+                # tainting the outer transaction.
+                with transaction.atomic():
+                    user.save()
             except:
                 # Blanket exceptions are terrible, but there appears to
-                # be no way to catch a generic IntegrityError.
+                # be no way to catch a generic IntegrityError since SQLite
+                # and MySQL apparently share different exception class
+                # hierarchies?!
                 user.username = placeholder_username(email, bz_user_id)
+                logger.info('could not create user %s; trying %s' % (
+                            username, user.username))
                 user.save()
 
             bugzilla_user_map = BugzillaUserMap(user=user,
@@ -93,19 +99,51 @@ def get_or_create_bugzilla_users(user_data):
             if not profile.is_private:
                 profile.is_private = True
                 profile.save()
+
+            logger.info('created user %s:%s from bugzilla user %s/%s/%s' % (
+                user.id, user.username,
+                bz_user_id, email, real_name
+            ))
         else:
             modified = False
             user = bugzilla_user_map.user
+            old_username = user.username
 
             if user.username != username:
+                logger.info('updating username of %s from %s to %s' % (
+                    user.id, user.username, username
+                ))
                 user.username = username
-                modified = True
+
+                try:
+                    with transaction.atomic():
+                        user.save()
+                except:
+                    # Blanket exceptions are terrible.
+                    new_username = placeholder_username(email, bz_user_id)
+                    if new_username != old_username:
+                        logger.info('could not set preferred username to %s; '
+                                    'updating username of %s from %s to %s' % (
+                                        username, user.id, old_username,
+                                        new_username))
+                        user.username = new_username
+                        user.save()
+                    else:
+                        logger.info('could not update username of %s; keeping '
+                                    'as %s' % (user.id, old_username))
+                        user.username = old_username
 
             if user.email != email:
+                logger.info('updating email of %s:%s from %s to %s' % (
+                    user.id, user.username, user.email, email
+                ))
                 user.email = email
                 modified = True
 
             if user.first_name != real_name:
+                logger.info('updating first name of %s:%s from %s to %s' % (
+                    user.id, user.username, user.first_name, real_name
+                ))
                 user.first_name = real_name
                 modified = True
 
@@ -114,17 +152,14 @@ def get_or_create_bugzilla_users(user_data):
             # we can't tell if this was a result of can_login going False
             # at some previous time or the action of a Review Board admin.
             if user.is_active != can_login:
+                logger.info('updating active of %s:%s to %s' % (
+                    user.id, user.username, can_login
+                ))
                 user.is_active = can_login
                 modified = True
 
             if modified:
-                try:
-                    user.save()
-                except:
-                    # Blanket exceptions are terrible, but there appears to
-                    # be no way to catch a generic IntegrityError.
-                    user.username = placeholder_username(email, bz_user_id)
-                    user.save()
+                user.save()
 
         users.append(user)
     return users
@@ -148,6 +183,9 @@ def set_bugzilla_api_key(user, api_key):
     bugzilla_user_map = BugzillaUserMap.objects.get(user=user)
     if bugzilla_user_map.api_key != api_key:
         bugzilla_user_map.api_key = api_key
+        logger.info('updating bugzilla api key for %s:%s' % (
+            user.id, user.username
+        ))
         bugzilla_user_map.save()
 
 
@@ -164,7 +202,7 @@ def prune_inactive_users(commit=False, verbose=False):
     commit the user deletion to the database if the commit argument
     is True.
     """
-    MAX_LOGIN_DIFFERENCE = datetime.timedelta(0,1) # 1 second
+    MAX_LOGIN_DIFFERENCE = datetime.timedelta(0, 1)  # 1 second
     SPECIAL_USERNAMES = [
         'admin',
         'mozreview',

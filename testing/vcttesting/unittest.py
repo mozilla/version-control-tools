@@ -10,14 +10,17 @@ import subprocess
 import tempfile
 import time
 import unittest
+from contextlib import contextmanager
 from urllib import urlencode
 
 from selenium import webdriver
 import selenium.webdriver.support.expected_conditions as EC
+from selenium.common.exceptions import ElementNotVisibleException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.remote.switch_to import SwitchTo
+from selenium.webdriver.support.expected_conditions import staleness_of
 from selenium.webdriver.support.wait import WebDriverWait
 
 from vcttesting.docker import DockerNotAvailable
@@ -27,7 +30,7 @@ from vcttesting.mozreview import MozReview
 # The environment variables should be set by the test runner. If
 # they aren't set, you are likely invoking the tests wrong.
 def start_mozreview(mr):
-    mr.start(db_image=os.environ['DOCKER_BMO_DB_IMAGE'],
+    mr.start(
          web_image=os.environ['DOCKER_BMO_WEB_IMAGE'],
          ldap_image=os.environ['DOCKER_LDAP_IMAGE'],
          pulse_image=os.environ['DOCKER_PULSE_IMAGE'],
@@ -223,10 +226,10 @@ class MozReviewWebDriverTest(MozReviewTest):
         """Obtain a Bugzilla handle for a given user, specified by email address."""
         return self.bugzilla(username=email, password=self.users[email][0])
 
-    def create_basic_repo(self, email, nick):
-        self.mr.create_repository('test_repo')
+    def create_basic_repo(self, email, nick, name='test_repo'):
+        self.mr.create_repository(name)
         lr = self.mr.get_local_repository(
-            'test_repo',
+            name,
             ircnick=nick,
             bugzilla_username=email,
             bugzilla_apikey=self.users[email][2])
@@ -289,6 +292,36 @@ class MozReviewWebDriverTest(MozReviewTest):
         # get an error. It works from Selenium. Strange.
         autocomplete.send_keys(Keys.ENTER)
 
+    @contextmanager
+    def wait_for_page_load(self, timeout=30):
+        old_page = self.browser.find_element_by_tag_name('html')
+        yield
+        WebDriverWait(self.browser, timeout).until(
+            staleness_of(old_page)
+        )
+
+    def add_review(self, review_request_id, text='', ship_it=False):
+        self.load_rburl('r/{0}'.format(review_request_id))
+        self.browser.find_element_by_id('review-link').click()
+        WebDriverWait(self.browser, 10).until(
+            EC.visibility_of_element_located(
+                (By.ID, 'review-form-comments')))
+        if ship_it:
+            self.browser.find_element_by_id('id_shipit').click()
+
+        if text:
+            text_editor = WebDriverWait(self.browser, 10).until(
+                EC.visibility_of_element_located(
+                    (By.CSS_SELECTOR, "div.CodeMirror")))
+            self.browser.execute_script(
+                'arguments[0].CodeMirror.setValue("'+text+'");',
+                text_editor)
+
+        with self.wait_for_page_load(timeout=10):
+            publish_button = self.browser.find_element_by_css_selector(
+                "div.modalbox-buttons > input[type=button][value='Publish Review']")
+            publish_button.click()
+
     def dump_autoland_log(self):
         subprocess.call('docker exec %s cat /home/ubuntu/autoland.log' %
                         self.mr.autoland_id, shell=True)
@@ -300,7 +333,8 @@ class MozReviewWebDriverTest(MozReviewTest):
                         self.mr.rbweb_id, shell=True)
 
     def add_hostingservice(self, repo, account_username, required_ldap_group,
-                           try_repository_url, landing_repository_url,
+                           autolanding_to_try_enabled, try_repository_url,
+                           autolanding_enabled, landing_repository_url,
                            landing_bookmark):
         """This adds a hosting service to an existing account"""
 
@@ -323,8 +357,16 @@ class MozReviewWebDriverTest(MozReviewTest):
         el = self.browser.find_element_by_id('id_repository_url')
         el.send_keys(path)
 
+        el = self.browser.find_element_by_id('id_autolanding_to_try_enabled')
+        if el.get_attribute('checked') != autolanding_to_try_enabled:
+            el.click()
+
         el = self.browser.find_element_by_id('id_try_repository_url')
         el.send_keys(try_repository_url)
+
+        el = self.browser.find_element_by_id('id_autolanding_enabled')
+        if el.get_attribute('checked') != autolanding_enabled:
+            el.click()
 
         el = self.browser.find_element_by_id('id_landing_repository_url')
         el.send_keys(landing_repository_url)

@@ -31,7 +31,7 @@ class AutocompleteTest(MozReviewWebDriverTest):
         lr.run(['commit', '-m', 'Bug 1 - Test autocomplete'])
         lr.write('foo', 'second change\n')
         lr.run(['commit', '-m', 'This is the second commit'])
-        lr.run(['push'])
+        lr.run(['push', '--config', 'reviewboard.autopublish=false'])
 
         self.reviewboard_login('mjane@example.com', 'password2')
 

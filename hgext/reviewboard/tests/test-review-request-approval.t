@@ -49,17 +49,35 @@ Create a review request from an L1 user
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
+    p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
@@ -77,17 +95,35 @@ Have an L1 user provide a ship it review which should not grant approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
+    p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 1
@@ -113,17 +149,35 @@ Have an L3 user provide a ship it review which should grant approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
+    p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: true
   approval_failure: null
   review_count: 2
@@ -153,17 +207,35 @@ Posting a new review without ship it should cancel the previous approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
+    p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
   review_count: 3
@@ -200,17 +272,35 @@ One more ship it should switch it back to approved
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 86a712c7f0187fed4c00b99131838610c76e6cc0
+    p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
   approved: true
   approval_failure: null
   review_count: 4
@@ -240,7 +330,7 @@ One more ship it should switch it back to approved
     body_top_text_type: plain
     diff_comments: []
 
-Since the author is L1, adding a new diff should cancel approval
+Even though the author is L1, adding a new diff will not cancel approval
 
   $ echo modified > foo
   $ hg commit --amend > /dev/null
@@ -255,19 +345,50 @@ Since the author is L1, adding a new diff should cancel approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
+    p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
-  approved: false
-  approval_failure: A suitable reviewer has not given a "Ship It!"
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
+  - id: 4
+    revision: 2
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +modified
+    - ''
+  approved: true
+  approval_failure: null
   review_count: 4
   reviews:
   - id: 1
@@ -308,17 +429,48 @@ A new ship-it from L3 should give approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
+    p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
+  - id: 4
+    revision: 2
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +modified
+    - ''
   approved: true
   approval_failure: null
   review_count: 5
@@ -372,17 +524,48 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
+    p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
+  - id: 4
+    revision: 2
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +modified
+    - ''
   approved: false
   approval_failure: The review request has open issues.
   review_count: 6
@@ -449,17 +632,48 @@ Fixing the issue should restore approval
   commit: null
   submitter: level1a
   summary: Bug 1 - Initial commit to review
-  description: Bug 1 - Initial commit to review
+  description:
+  - Bug 1 - Initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: 124Bxg'
   target_people:
   - level1b
   - level3
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: 473206d1f704058758360f38c6fbf9c557bac746
+    p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 2
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +initial
+    - ''
+  - id: 4
+    revision: 2
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +modified
+    - ''
   approved: true
   approval_failure: null
   review_count: 6
@@ -534,17 +748,35 @@ Review requests created by L3 users
   commit: null
   submitter: level3
   summary: Bug 2 - initial commit to review
-  description: Bug 2 - initial commit to review
+  description:
+  - Bug 2 - initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: F63vXs'
   target_people:
   - level1a
   - level1b
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: c1ebcda638274d5217801b7f05e33b848ff39be1
+    p2rb.commit_id: b366ef9913208b4030857319aa20520f229a74f3
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 6
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +author2
+    - ''
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
@@ -562,17 +794,35 @@ Even a ship-it from an L1 user will give approval to an L3 author
   commit: null
   submitter: level3
   summary: Bug 2 - initial commit to review
-  description: Bug 2 - initial commit to review
+  description:
+  - Bug 2 - initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: F63vXs'
   target_people:
   - level1a
   - level1b
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: c1ebcda638274d5217801b7f05e33b848ff39be1
+    p2rb.commit_id: b366ef9913208b4030857319aa20520f229a74f3
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 6
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +author2
+    - ''
   approved: true
   approval_failure: null
   review_count: 1
@@ -601,17 +851,48 @@ ship-its. Posting a new diff should not clear approval
   commit: null
   submitter: level3
   summary: Bug 2 - initial commit to review
-  description: Bug 2 - initial commit to review
+  description:
+  - Bug 2 - initial commit to review
+  - ''
+  - 'MozReview-Commit-ID: F63vXs'
   target_people:
   - level1a
   - level1b
   extra_data:
     calculated_trophies: true
+  commit_extra_data:
     p2rb: true
-    p2rb.commit_id: bccc4c4e590eeefbb42491f1bb061143a49bdaf8
+    p2rb.commit_id: bedcf57f515ad540f582962e37ecd424d82424fd
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
+  diffs:
+  - id: 6
+    revision: 1
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +author2
+    - ''
+  - id: 8
+    revision: 2
+    base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
+    name: diff
+    extra: {}
+    patch:
+    - diff --git a/foo b/foo
+    - '--- a/foo'
+    - +++ b/foo
+    - '@@ -1,1 +1,1 @@'
+    - -foo
+    - +modified2
+    - ''
   approved: true
   approval_failure: null
   review_count: 1
@@ -628,4 +909,4 @@ ship-its. Posting a new diff should not clear approval
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

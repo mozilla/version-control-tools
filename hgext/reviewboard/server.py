@@ -19,6 +19,7 @@ url is commonly defined in the global hgrc whereas repoid is repository
 local.
 """
 
+import json
 import os
 import sys
 
@@ -38,19 +39,24 @@ from mercurial.node import (
     hex,
     nullid,
 )
+from mercurial.hgweb import (
+    webcommands,
+)
+from mercurial.hgweb.common import (
+    HTTP_OK,
+)
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
-demandimport.disable()
-try:
-    import hgrb.proto
-except ImportError:
-    sys.path.insert(0, OUR_DIR)
-    import hgrb.proto
-demandimport.enable()
+with demandimport.deactivated():
+    try:
+        import hgrb.proto
+    except ImportError:
+        sys.path.insert(0, OUR_DIR)
+        import hgrb.proto
 
-testedwith = '3.3 3.4 3.5'
+testedwith = '3.3 3.4 3.5 3.6'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
@@ -69,6 +75,10 @@ requirecaps = set([
     'bzapikeys',
     # Client knows how to perform autodiscovery of review repos.
     'listreviewrepos',
+    # client-server exchange uses JSON.
+    'jsonproto',
+    # Client writes MozReview-Commit-ID in commit message
+    'commitid',
 ])
 
 
@@ -84,6 +94,23 @@ See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/in
 for instructions on how to configure your machine to use MozReview.
 '''
 
+def reviewcapabilities(repo):
+    """Obtain the set of review capabilities for a repo."""
+    caps = set()
+
+    if repo.ui.configint('reviewboard', 'repoid', None):
+        caps.add('pushreview')
+        caps.add('pullreviews')
+        caps.add('publish')
+        caps.add('submithttp')
+        caps.add('publishhttp')
+
+    if repo.ui.config('reviewboard', 'isdiscoveryrepo', None):
+        caps.add('listreviewrepos2')
+
+    return caps
+
+
 def capabilities(orig, repo, proto):
     """Wraps wireproto._capabilities to advertise reviewboard support."""
     caps = orig(repo, proto)
@@ -93,19 +120,12 @@ def capabilities(orig, repo, proto):
     # capability.
     #
     # We keep the old style around for a while until all clients have upgraded.
-    reviewcaps = set()
+    reviewcaps = reviewcapabilities(repo)
 
     if repo.ui.configint('reviewboard', 'repoid', None):
-        reviewcaps.add('pushreview')
-        reviewcaps.add('pullreviews')
-        reviewcaps.add('publish')
-
         # Deprecated.
         caps.append('reviewboard')
         caps.append('pullreviews')
-
-    if repo.ui.config('reviewboard', 'isdiscoveryrepo', None):
-        reviewcaps.add('listreviewrepos2')
 
     if reviewcaps:
         caps.append('mozreview=%s' % ','.join(sorted(reviewcaps)))
@@ -187,24 +207,26 @@ def listreviewrepos(repo):
 
 
 def getreposfromreviewboard(repo):
-    from reviewboardmods.pushhooks import ReviewBoardClient
+    # Workaround an issue with "import _imp" in pkg_resources.
+    with demandimport.deactivated():
+        from reviewboardmods.pushhooks import ReviewBoardClient
 
-    with ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/')) as client:
-        root = client.get_root()
-        urls = set()
+    client = ReviewBoardClient(repo.ui.config('reviewboard', 'url').rstrip('/'))
+    root = client.get_root()
+    urls = set()
 
-        repos = root.get_repositories(max_results=250, tool='Mercurial')
-        try:
-            while True:
-                for r in repos:
-                    urls.add(r.path)
+    repos = root.get_repositories(max_results=250, tool='Mercurial')
+    try:
+        while True:
+            for r in repos:
+                urls.add(r.path)
 
-                repos = repos.get_next()
+            repos = repos.get_next()
 
-        except StopIteration:
-            pass
+    except StopIteration:
+        pass
 
-        return urls
+    return urls
 
 
 def wrappedwireprotoheads(orig, repo, proto, *args, **kwargs):
@@ -228,6 +250,26 @@ def wrappedwireprotoheads(orig, repo, proto, *args, **kwargs):
         return orig(repo, proto, *args, **kwargs)
 
     return wireproto.ooberror(nopushdiscoveryrepos)
+
+
+def sendjsonresponse(req, obj):
+    req.respond(HTTP_OK, 'application/json')
+    return [json.dumps(obj, indent=2, sort_keys=True, encoding='utf-8')]
+
+
+class InvalidRequestException(Exception):
+    """Represents in invalid request payload."""
+
+
+def parsejsonpayload(req):
+    body = req.read()
+    if not body:
+        raise InvalidRequestException('request payload missing')
+
+    try:
+        return json.loads(body, encoding='utf-8')
+    except ValueError:
+        raise InvalidRequestException('malformed JSON')
 
 
 @command('createrepomanifest', [
@@ -262,12 +304,90 @@ def createrepomanifest(ui, repo, search=None, replace=None):
     ui.write(data)
 
 
+def submitserieswebcommand(web, req, tmpl):
+    """Submit changesets to MozReview for review.
+
+    The HTTP request body is a JSON object describing what to submit. The
+    object has the following keys:
+
+    bzusername
+       The Bugzilla username to use for authentication
+    bzapikey
+       The Bugzilla API key to use for authentication
+    identifier
+       The review identifier creating/updating. This is effectively the series
+       ID.
+    changesets
+       An array of objects describing the changesets being submitted for
+       review. See the section below on the format of each object.
+    obsolescence (optional)
+       Bool indicating whether the client supports obsolescence.
+
+    Each changeset object has the following keys:
+
+    node
+       40 character hex SHA-1 of changeset being reviewed
+    precursors
+       Array of 40 character hex SHA-1 strings corresponding to precursors
+       of this node.
+
+       This array is populated by users with obsolescence enabled. It can be
+       used to map old commits to new commits.
+    """
+    repo = web.repo
+
+    try:
+        body = parsejsonpayload(req)
+    except InvalidRequestException as e:
+        return sendjsonresponse(req, {'error': e.args[0]})
+
+    res = hgrb.proto._processpushreview(repo, body, ldap_username=None)
+    return sendjsonresponse(req, res)
+
+
+def publishwebcommand(web, req, tmpl):
+    repo = web.repo
+
+    try:
+        body = parsejsonpayload(req)
+    except InvalidRequestException as e:
+        return sendjsonresponse(req, {'error': e.args[0]})
+
+    res = hgrb.proto._processpublishreview(repo, body)
+    return sendjsonresponse(req, res)
+
+
+def reviewreposwebcommand(web, req, tmpl):
+    return sendjsonresponse(req, listreviewrepos(web.repo))
+
+
+def capabilitieswebcommand(web, req, tmpl):
+    """Obtain the review capabilities for this repo."""
+    return sendjsonresponse(req, {
+        'reviewcaps': sorted(reviewcapabilities(web.repo)),
+        'reviewrequires': sorted(requirecaps),
+    })
+
+
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     pushkey.register('strip', pushstrip, liststrip)
 
     # To short circuit operations with discovery repos.
     extensions.wrapcommand(wireproto.commands, 'heads', wrappedwireprotoheads)
+
+    setattr(webcommands, 'mozreviewcapabilities', capabilitieswebcommand)
+    webcommands.__all__.append('mozreviewcapabilities')
+
+    setattr(webcommands, 'mozreviewsubmitseries', submitserieswebcommand)
+    webcommands.__all__.append('mozreviewsubmitseries')
+
+    setattr(webcommands, 'mozreviewpublish', publishwebcommand)
+    webcommands.__all__.append('mozreviewpublish')
+
+    setattr(webcommands, 'mozreviewreviewrepos', reviewreposwebcommand)
+    webcommands.__all__.append('mozreviewreviewrepos')
+
 
 def reposetup(ui, repo):
     if not repo.local():

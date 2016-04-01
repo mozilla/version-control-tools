@@ -4,53 +4,113 @@
 
 import json
 import logging
+import re
 
 from reviewboard.changedescs.models import ChangeDescription
-from reviewboard.reviews.models import ReviewRequest
+from reviewboard.reviews.models import (
+    ReviewRequest,
+    ReviewRequestDraft,
+)
+
+from mozreview.models import (
+    CommitData,
+)
 
 MOZREVIEW_KEY = 'p2rb'
 
-COMMITS_KEY = MOZREVIEW_KEY + '.commits'
-COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
-IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
+# Built-in extra_data keys:
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
-UNPUBLISHED_RRIDS_KEY = MOZREVIEW_KEY + '.unpublished_rids'
+
+# CommitData field keys:
+BASE_COMMIT_KEY = MOZREVIEW_KEY + '.base_commit'
+COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
+COMMITS_KEY = MOZREVIEW_KEY + '.commits'
+DISCARD_ON_PUBLISH_KEY = MOZREVIEW_KEY + '.discard_on_publish_rids'
+FIRST_PUBLIC_ANCESTOR_KEY = MOZREVIEW_KEY + '.first_public_ancestor'
+IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
+SQUASHED_KEY = MOZREVIEW_KEY + '.is_squashed'
+UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
+
+# CommitData fields which should be automatically copied from
+# draft_extra_data to extra_data when a review request is published.
+DRAFTED_COMMIT_DATA_KEYS = (
+    FIRST_PUBLIC_ANCESTOR_KEY,
+    IDENTIFIER_KEY,
+    COMMIT_ID_KEY,
+)
+
+REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')
+
+logger = logging.getLogger(__name__)
 
 
-def is_pushed(review_request):
+def fetch_commit_data(review_request_details, commit_data=None):
+    """fetch the CommitData object associated with a review request details
+
+    If a CommitData object is also provided we will verify that it represents
+    the provided review_request_details.
+    """
+    is_draft = isinstance(review_request_details, ReviewRequestDraft)
+
+    if commit_data is None and is_draft:
+        commit_data = CommitData.objects.get_or_create(
+            review_request_id=review_request_details.review_request_id)[0]
+    elif commit_data is None:
+        commit_data = CommitData.objects.get_or_create(
+            review_request_id=review_request_details.id)[0]
+    elif is_draft:
+        assert (commit_data.review_request_id ==
+                review_request_details.review_request_id)
+    else:
+        assert commit_data.review_request_id == review_request_details.id
+
+    return commit_data
+
+
+def is_pushed(review_request, commit_data=None):
     """Is this a review request that was pushed to MozReview."""
-    return IDENTIFIER_KEY in review_request.extra_data
+    commit_data = fetch_commit_data(review_request, commit_data=commit_data)
+
+    is_draft = isinstance(review_request, ReviewRequestDraft)
+    return ((not is_draft and IDENTIFIER_KEY in commit_data.extra_data) or
+            (is_draft and IDENTIFIER_KEY in commit_data.draft_extra_data))
 
 
-def is_parent(review_request):
+def is_parent(review_request, commit_data=None):
     """Is this a MozReview 'parent' review request.
 
     If this review request represents the folded diff parent of each child
     review request we will return True. This will return false on each of the
     child review requests (or a request which was not pushed).
     """
-    return str(review_request.extra_data.get(
-        'p2rb.is_squashed', False)).lower() == 'true'
+    commit_data = fetch_commit_data(review_request, commit_data=commit_data)
+
+    return str(commit_data.extra_data.get(
+        SQUASHED_KEY, False)).lower() == 'true'
 
 
-def get_parent_rr(review_request):
+def get_parent_rr(review_request_details, commit_data=None):
     """Retrieve the `review_request` parent.
 
     If `review_request` is a parent, return it directly.
     Otherwise return its parent based on the identifier in extra_data.
     """
-    if not is_pushed(review_request):
+    commit_data = fetch_commit_data(review_request_details, commit_data)
+
+    if not is_pushed(review_request_details, commit_data):
         return None
 
-    if is_parent(review_request):
-        return review_request
+    if is_parent(review_request_details, commit_data):
+        return review_request_details
+
+    identifier = commit_data.get_for(review_request_details, IDENTIFIER_KEY)
 
     return ReviewRequest.objects.get(
-        commit_id=review_request.extra_data[IDENTIFIER_KEY],
-        repository=review_request.repository)
+        commit_id=identifier,
+        repository=review_request_details.repository)
 
 
-def gen_child_rrs(review_request, user=None):
+def gen_child_rrs(review_request_details, user=None, commit_data=None):
     """ Generate child review requests.
 
     For some review request (draft or normal) that has a p2rb.commits
@@ -64,10 +124,13 @@ def gen_child_rrs(review_request, user=None):
     If a review request is not found for the listed ID, get_rr_for_id will
     log this, and we'll skip that ID.
     """
-    if COMMITS_KEY not in review_request.extra_data:
+    commit_data = fetch_commit_data(review_request_details, commit_data)
+    commits_json = commit_data.get_for(review_request_details, COMMITS_KEY)
+
+    if commits_json is None:
         return
 
-    commit_tuples = json.loads(review_request.extra_data[COMMITS_KEY])
+    commit_tuples = json.loads(commits_json)
     for commit_tuple in commit_tuples:
         child = get_rr_for_id(commit_tuple[1])
 
@@ -83,11 +146,14 @@ def gen_child_rrs(review_request, user=None):
             yield child.get_draft(user) or child
 
 
-def gen_rrs_by_extra_data_key(review_request, key):
-    if key not in review_request.extra_data:
+def gen_rrs_by_extra_data_key(review_request_details, key, commit_data=None):
+    commit_data = fetch_commit_data(review_request_details, commit_data)
+    rrs_json = commit_data.get_for(review_request_details, key)
+
+    if key is None:
         return
 
-    return gen_rrs_by_rids(json.loads(review_request.extra_data[key]))
+    return gen_rrs_by_rids(json.loads(rrs_json))
 
 
 def gen_rrs_by_rids(rrids):
@@ -101,9 +167,9 @@ def get_rr_for_id(id):
     try:
         return ReviewRequest.objects.get(pk=id)
     except ReviewRequest.DoesNotExist:
-        logging.error('Could not retrieve child review request with '
-                      'id %s because it does not appear to exist.'
-                      % id)
+        logger.error('Could not retrieve child review request with '
+                     'id %s because it does not appear to exist.'
+                     % id)
 
 
 def update_parent_rr_reviewers(parent_rr_draft):

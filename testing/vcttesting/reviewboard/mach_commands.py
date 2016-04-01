@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import sys
 from collections import OrderedDict
 
 from mach.decorators import (
@@ -28,7 +29,18 @@ def _serialize_text(s):
     return s
 
 
-def serialize_review_requests(rr):
+def dict_from_diff(diff):
+    d = OrderedDict()
+    d['id'] = diff.id
+    d['revision'] = diff.revision
+    d['base_commit_id'] = diff.base_commit_id
+    d['name'] = diff.name
+    d['extra'] = dict(diff.extra_data.iteritems())
+    d['patch'] = diff.get_patch().data.splitlines()
+    return d
+
+
+def serialize_review_requests(api_client, rr):
     from rbtools.api.errors import APIError
     d = OrderedDict()
     d['id'] = rr.id
@@ -41,6 +53,16 @@ def serialize_review_requests(rr):
     d['description'] = _serialize_text(rr.description)
     d['target_people'] = [p.get().username for p in rr.target_people]
     d['extra_data'] = dict(rr.extra_data.iteritems())
+
+    commit_data = api_client.get_path(
+        '/extensions/mozreview.extension.MozReviewExtension/commit-data/%s/' %
+        rr.id)
+    d['commit_extra_data'] = dict(commit_data.extra_data.iteritems())
+
+    d['diffs'] = []
+    for diff in rr.get_diffs():
+        d['diffs'].append(dict_from_diff(diff))
+
     d['approved'] = rr.approved
     d['approval_failure'] = rr.approval_failure
 
@@ -109,15 +131,12 @@ def serialize_review_requests(rr):
         ddraft['description'] = _serialize_text(draft.description)
         ddraft['target_people'] = [p.get().username for p in draft.target_people]
         ddraft['extra'] = dict(draft.extra_data.iteritems())
+        ddraft['commit_extra_data'] = dict(
+            commit_data.draft_extra_data.iteritems())
 
         ddraft['diffs'] = []
         for diff in draft.get_draft_diffs():
-            diffd = OrderedDict()
-            diffd['id'] = diff.id
-            diffd['revision'] = diff.revision
-            diffd['base_commit_id'] = diff.base_commit_id
-            diffd['patch'] = diff.get_patch().data.splitlines()
-            ddraft['diffs'].append(diffd)
+            ddraft['diffs'].append(dict_from_diff(diff))
 
     except APIError:
         pass
@@ -136,6 +155,10 @@ def short_review_request_dict(rr):
 
     d['reviewers'] = [x for x in rr['reviewers']]
 
+    if 'reviewers_status' in rr:
+        d['reviewers_status'] = dict()
+        for reviewer, status in rr[u'reviewers_status'].iteritems():
+            d['reviewers_status'][reviewer] = dict(status.iteritems())
     return d
 
 
@@ -148,7 +171,7 @@ class ReviewBoardCommands(object):
         else:
             self.mr = None
 
-    def _get_client(self, username=None, password=None):
+    def _get_client(self, username=None, password=None, anonymous=False):
         from rbtools.api.client import RBClient
         from rbtools.api.transport.sync import SyncTransport
 
@@ -174,11 +197,16 @@ class ReviewBoardCommands(object):
         except Exception:
             pass
 
+        if anonymous:
+            return RBClient(self.mr.reviewboard_url,
+                            transport_cls=NoCacheTransport)
+
         return RBClient(self.mr.reviewboard_url, username=username,
                         password=password, transport_cls=NoCacheTransport)
 
-    def _get_root(self, username=None, password=None):
-        return self._get_client(username=username, password=password).get_root()
+    def _get_root(self, username=None, password=None, anonymous=False):
+        return self._get_client(username=username, password=password,
+                                anonymous=anonymous).get_root()
 
     def _get_rb(self, path=None):
         from vcttesting.reviewboard import MozReviewBoard
@@ -200,9 +228,40 @@ class ReviewBoardCommands(object):
         description='Print a representation of a review request.')
     @CommandArgument('rrid', help='Review request id to dump')
     def dumpreview(self, rrid):
-        root = self._get_root()
+        client = self._get_client()
+        root = client.get_root()
         r = root.get_review_request(review_request_id=rrid)
-        print(serialize_review_requests(r))
+        print(serialize_review_requests(client, r))
+
+    @Command('dump-raw-diff', category='reviewboard',
+             description='Dump the raw content of a diff from the server')
+    @CommandArgument('rrid', help='Review request id of diffs to dump')
+    def dump_raw_diff(self, rrid):
+        from rbtools.api.errors import APIError
+
+        client = self._get_client()
+        root = client.get_root()
+        rr = root.get_review_request(review_request_id=rrid)
+
+        # mach wraps sys.stdout with a transparent UTF-8 writer. This
+        # will interfere with our printing of raw data. So bypass it.
+        stdout = os.fdopen(sys.stdout.fileno(), 'w')
+
+        for diff in rr.get_diffs():
+            stdout.write(b'ID: %d\n' % diff.id)
+            stdout.write(diff.get_patch().data)
+            stdout.write(b'\n')
+
+        try:
+            draft = rr.get_draft()
+            for diff in draft.get_draft_diffs():
+                stdout.write(b'ID: %d (draft)\n' % diff.id)
+                stdout.write(diff.get_patch().data)
+                stdout.write(b'\n')
+        except APIError:
+            pass
+
+        stdout.close()
 
     @Command('add-reviewer', category='reviewboard',
         description='Add a reviewer to a review request')
@@ -289,6 +348,32 @@ class ReviewBoardCommands(object):
             # TODO: Dump the response code?
         except APIError as e:
             print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                e.rsp['err']['msg']))
+            return 1
+
+    @Command(
+        'upload-diff',
+        category='reviewboard',
+        description='Upload a diff, read from stdin, to a review request')
+    @CommandArgument(
+        'rrid',
+        help='Review request id to upload diff to')
+    @CommandArgument(
+        '--base-commit',
+        help='Base commit id to apply diff to')
+    def upload_diff(self, rrid, base_commit=None):
+        from rbtools.api.errors import APIError
+        root = self._get_root()
+        diffs = root.get_diffs(only_fields='', review_request_id=rrid)
+
+        try:
+            diffs.upload_diff(
+                sys.stdin.read(),
+                base_commit_id=base_commit)
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (
+                e.http_status,
+                e.error_code,
                 e.rsp['err']['msg']))
             return 1
 
@@ -521,15 +606,35 @@ class ReviewBoardCommands(object):
         description='Associate an LDAP email address with a user.')
     @CommandArgument('username', help='Username to associate with ldap')
     @CommandArgument('email', help='LDAP email to associate')
-    def associate_ldap_user(self, username, email):
-        # We use the "mozreview" account which has the special permission
-        # to read / associate ldap email addresses.
-        root = self._get_root(username="mozreview", password="mrpassword")
+    @CommandArgument('--request-username',
+                     default='mozreview',
+                     help='Username to make request with')
+    @CommandArgument('--request-password',
+                     default='mrpassword',
+                     help='Password to make request with')
+    @CommandArgument('--anonymous',
+                     action='store_true',
+                     default=False,
+                     help='Make the request anonymously')
+    def associate_ldap_user(self, username, email, request_username,
+                            request_password, anonymous):
+        from rbtools.api.errors import APIError
+
+        # We use the "mozreview" account by default which has the special
+        # permission to read / associate ldap email addresses.
+        root = self._get_root(username=request_username,
+                              password=request_password,
+                              anonymous=anonymous)
         ext = root.get_extension(
             extension_name='mozreview.extension.MozReviewExtension')
 
-        association = ext.get_ldap_associations().get_item(username)
-        association.update(ldap_username=email)
+        try:
+            association = ext.get_ldap_associations().get_item(username)
+            association.update(ldap_username=email)
+        except APIError as e:
+            print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                e.rsp['err']['msg']))
+            return 1
 
         print('%s associated with %s' % (email, username))
 

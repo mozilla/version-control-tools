@@ -15,6 +15,9 @@ from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
 from mozreview.bugzilla.transports import bugzilla_transport
 
 
+logger = logging.getLogger(__name__)
+
+
 @simple_decorator
 def xmlrpc_to_bugzilla_errors(func):
     def _transform_errors(*args, **kwargs):
@@ -44,6 +47,184 @@ def xmlrpc_to_bugzilla_errors(func):
 
             raise BugzillaError('IOError: %s' % msg)
     return _transform_errors
+
+
+class BugzillaAttachmentUpdates(object):
+    """Create and update attachments.
+
+    This class provides methods to queue up a series of operations on one
+    or more attachments and then execute them all together.  It caches
+    attachment information to avoid repeatedly polling Bugzilla.
+
+    All attachments to be created or updated must belong to the same bug.
+    """
+
+    def __init__(self, bugzilla, bug_id):
+        self.bugzilla = bugzilla
+        self.bug_id = bug_id
+        self.attachments = []
+        self.updates = []
+        self.creates = []
+
+    def create_or_update_attachment(self, review_request_id, summary,
+                                    comment, url, reviewers):
+        """Creates or updates an attachment containing a review-request URL.
+
+        The reviewers argument should be a dictionary mapping reviewer email
+        to a boolean indicating if that reviewer has given an r+ on the
+        attachment in the past that should be left untouched.
+        """
+
+        logger.info('Posting review request %s to bug %d.' %
+                    (review_request_id, self.bug_id))
+        # Copy because we modify it.
+        reviewers = reviewers.copy()
+        params = {}
+        flags = []
+        rb_attachment = None
+
+        self._update_attachments()
+
+        # Find the associated attachment, then go through the review flags.
+        for a in self.attachments:
+
+            # Make sure we check for old-style URLs as well.
+            if not self.bugzilla._rb_attach_url_matches(a['data'], url):
+                continue
+
+            rb_attachment = a
+
+            for f in a.get('flags', []):
+                if f['name'] not in ['review', 'feedback']:
+                    # We only care about review and feedback flags.
+                    continue
+                elif f['name'] == 'feedback':
+                    # We always clear feedback flags.
+                    flags.append({'id': f['id'], 'status': 'X'})
+                elif f['status'] == '+' and f['setter'] not in reviewers:
+                    # This r+ flag was set manually on bugzilla rather
+                    # then through a review on Review Board. Always
+                    # clear these flags.
+                    flags.append({'id': f['id'], 'status': 'X'})
+                elif f['status'] == '+':
+                    if not reviewers[f['setter']]:
+                        # We should not carry this r+ forward so
+                        # re-request review.
+                        flags.append({
+                            'id': f['id'],
+                            'name': 'review',
+                            'status': '?',
+                            'requestee': f['setter']
+                        })
+
+                    reviewers.pop(f['setter'])
+                elif 'requestee' not in f or f['requestee'] not in reviewers:
+                    # We clear review flags where the requestee is not
+                    # a reviewer or someone has manually set r- on the
+                    # attachment.
+                    flags.append({'id': f['id'], 'status': 'X'})
+                elif f['requestee'] in reviewers:
+                    # We're already waiting for a review from this user
+                    # so don't touch the flag.
+                    reviewers.pop(f['requestee'])
+
+            break
+
+        # Add flags for new reviewers.
+        # We can't set a missing r+ (if it was manually removed) except in the
+        # trivial (and useless) case that the setter and the requestee are the
+        # same person.  We could set r? again, but in the event that the
+        # reviewer is not accepting review requests, this will block
+        # publishing, with no way for the author to fix it.  So we'll just
+        # ignore manually removed r+s.
+        # This is sorted so behavior is deterministic (this mucks with test
+        # output otherwise).
+        for reviewer, rplus in sorted(reviewers.iteritems()):
+            if not rplus:
+                flags.append({
+                    'name': 'review',
+                    'status': '?',
+                    'requestee': reviewer,
+                    'new': True
+                })
+
+        if rb_attachment:
+            params['attachment_id'] = rb_attachment['id']
+
+            if rb_attachment['is_obsolete']:
+                params['is_obsolete'] = False
+        else:
+            params['data'] = url
+            params['content_type'] = 'text/x-review-board-request'
+
+        params['file_name'] = 'reviewboard-%d-url.txt' % review_request_id
+        params['summary'] = "MozReview Request: %s" % summary
+        params['comment'] = comment
+        if flags:
+            params['flags'] = flags
+
+        if rb_attachment:
+            self.updates.append(params)
+        else:
+            self.creates.append(params)
+
+    def obsolete_review_attachments(self, rb_url):
+        """Mark any attachments for a given bug and review request as obsolete.
+
+        This is called when review requests are discarded or deleted. We don't
+        want to leave any lingering references in Bugzilla.
+        """
+        self._update_attachments()
+
+        for a in self.attachments:
+            if (self.bugzilla._rb_attach_url_matches(a.get('data'), rb_url) and
+                    not a.get('is_obsolete')):
+                logger.info('Obsoleting attachment %s on bug %d:' % (
+                            a['id'], self.bug_id))
+                self.updates.append({
+                    'attachment_id': a['id'],
+                    'is_obsolete': True
+                })
+
+    @xmlrpc_to_bugzilla_errors
+    def do_updates(self):
+        logger.info('Doing attachment updates for bug %s' % self.bug_id)
+        params = self.bugzilla._auth_params({
+            'bug_id': self.bug_id,
+            'attachments': self.creates + self.updates,
+        })
+
+        results = self.bugzilla.proxy.MozReview.attachments(params)
+
+        # The above Bugzilla call is wrapped in a single database transaction
+        # and should thus either succeed in creating and updating all
+        # attachments or will throw an exception and roll back all changes.
+        # However, just to be sure, we check the results.  There's not much
+        # we can do in this case, but we'll log an error for investigative
+        # purposes.
+        # TODO: Display an error in the UI (no easy way to do this without
+        # failing the publish).
+
+        ids_to_update = set(u['attachment_id'] for u in self.updates)
+        ids_to_update.difference_update(results['attachments_modified'].keys())
+
+        if ids_to_update:
+            logger.error('Failed to update the following attachments: %s' %
+                         ids_to_update)
+
+        num_to_create = len(self.creates)
+        num_created = len(results['attachments_created'])
+
+        if num_to_create != num_created:
+            logger.error('Tried to create %s attachments but %s reported as '
+                         'created.' % (num_to_create, num_created))
+
+        self.creates = []
+        self.updates = []
+
+    def _update_attachments(self):
+        if not self.attachments:
+            self.attachments = self.bugzilla.get_rb_attachments(self.bug_id)
 
 
 class Bugzilla(object):
@@ -94,12 +275,12 @@ class Bugzilla(object):
                                                 'password': password})
             except xmlrpclib.Fault as e:
                 if e.faultCode == 300:
-                    logging.error('Login failure for user %s: '
-                                  'invalid username or password.' % username)
+                    logger.error('Login failure for user %s: '
+                                 'invalid username or password.' % username)
                     return None
                 elif e.faultCode == 301:
-                    logging.error('Login failure for user %s: '
-                                  'user is disabled.' % username)
+                    logger.error('Login failure for user %s: '
+                                 'user is disabled.' % username)
                     return None
                 raise
 
@@ -146,6 +327,7 @@ class Bugzilla(object):
             'id': bug_id,
             'comment': comment
         })
+        logger.info('Posting comment on bug %d.' % bug_id)
         return self.proxy.Bug.add_comment(params)
 
     @xmlrpc_to_bugzilla_errors
@@ -154,109 +336,17 @@ class Bugzilla(object):
         # that itself means it's confidential.
         params = {'ids': [bug_id], 'include_fields': ['groups']}
 
+        logger.info('Checking if bug %d is confidential.' % bug_id)
         try:
             groups = self.proxy.Bug.get(params)['bugs'][0]['groups']
         except xmlrpclib.Fault as e:
             if e.faultCode == 102:
+                logger.info('Bug %d is confidential.' % bug_id)
                 return True
             raise
 
+        logger.info('Bug %d confidential: %s.' % (bug_id, bool(groups)))
         return bool(groups)
-
-    @xmlrpc_to_bugzilla_errors
-    def post_rb_url(self, bug_id, review_id, summary, comment, url,
-                    reviewers):
-        """Creates or updates an attachment containing a review-request URL.
-
-        The reviewers argument should be a dictionary mapping reviewer email
-        to a boolean indicating if that reviewer has given an r+ on the
-        attachment in the past that should be left untouched.
-        """
-
-        # Copy because we modify it.
-        reviewers = reviewers.copy()
-        params = self._auth_params({})
-        flags = []
-        rb_attachment = None
-        attachments = self.get_rb_attachments(bug_id)
-
-        # Find the associated attachment, then go through the review flags.
-        for a in attachments:
-
-            # Make sure we check for old-style URLs as well.
-            if not self._rb_attach_url_matches(a['data'], url):
-                continue
-
-            rb_attachment = a
-
-            for f in a.get('flags', []):
-                if f['name'] not in ['review', 'feedback']:
-                    # We only care about review and feedback flags.
-                    continue
-                elif f['name'] == 'feedback':
-                    # We always clear feedback flags.
-                    flags.append({'id': f['id'], 'status': 'X'})
-                elif f['status'] == '+' and f['setter'] not in reviewers:
-                    # This r+ flag was set manually on bugzilla rather
-                    # then through a review on Review Board. Always
-                    # clear these flags.
-                    flags.append({'id': f['id'], 'status': 'X'})
-                elif f['status'] == '+':
-                    if not reviewers[f['setter']]:
-                        # We should not carry this r+ forward so
-                        # re-request review.
-                        flags.append({
-                            'id': f['id'],
-                            'name': 'review',
-                            'status': '?',
-                            'requestee': f['setter']
-                        })
-
-                    reviewers.pop(f['setter'])
-                elif 'requestee' not in f or f['requestee'] not in reviewers:
-                    # We clear review flags where the requestee is not
-                    # a reviewer or someone has manually set r- on the
-                    # attachment.
-                    flags.append({'id': f['id'], 'status': 'X'})
-                elif f['requestee'] in reviewers:
-                    # We're already waiting for a review from this user
-                    # so don't touch the flag.
-                    reviewers.pop(f['requestee'])
-
-            break
-
-        # Add flags for new reviewers.
-
-        # Sorted so behavior is deterministic (this mucks with test output
-        # otherwise).
-        for r in sorted(reviewers.keys()):
-            flags.append({
-                'name': 'review',
-                'status': '?',
-                'requestee': r,
-                'new': True
-            })
-
-        if rb_attachment:
-            params['ids'] = [rb_attachment['id']]
-
-            if rb_attachment['is_obsolete']:
-                params['is_obsolete'] = False
-        else:
-            params['ids'] = [bug_id]
-            params['data'] = url
-            params['content_type'] = 'text/x-review-board-request'
-
-        params['file_name'] = 'reviewboard-%d-url.txt' % review_id
-        params['summary'] = "MozReview Request: %s" % summary
-        params['comment'] = comment
-        if flags:
-            params['flags'] = flags
-
-        if rb_attachment:
-            self.proxy.Bug.update_attachment(params)
-        else:
-            self.proxy.Bug.add_attachment(params)
 
     @xmlrpc_to_bugzilla_errors
     def get_rb_attachments(self, bug_id):
@@ -296,12 +386,12 @@ class Bugzilla(object):
         We return a boolean indicating whether we r+ed the attachment.
         """
 
-        logging.info('r+ from %s on bug %d.' % (reviewer, bug_id))
+        logger.info('r+ from %s on bug %d.' % (reviewer, bug_id))
 
         rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
         if not rb_attachment:
-            logging.error('Could not find attachment for Review Board URL %s '
-                          'in bug %s.' % (rb_url, bug_id))
+            logger.error('Could not find attachment for Review Board URL %s '
+                         'in bug %s.' % (rb_url, bug_id))
             return False
 
         flags = rb_attachment.get('flags', [])
@@ -313,7 +403,7 @@ class Bugzilla(object):
                 break
             elif (f['name'] == 'review' and f.get('setter') == reviewer and
                   f['status'] == '+'):
-                logging.info('r+ already set.')
+                logger.info('r+ already set.')
                 return False
         else:
             flag['new'] = True
@@ -338,8 +428,8 @@ class Bugzilla(object):
         This is so callers can do something with the comment (which won't get
         posted unless the review flag was cleared).
         """
-        logging.info('maybe cancelling r? from %s on bug %d.' % (reviewer,
-                                                                 bug_id))
+        logger.info('maybe cancelling r? from %s on bug %d.' % (reviewer,
+                                                                bug_id))
 
         rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
 
@@ -350,7 +440,7 @@ class Bugzilla(object):
         flag = {'name': 'review', 'status': 'X'}
 
         for f in flags:
-            logging.info("Flag %s" % f)
+            logger.info("Flag %s" % f)
             if f['name'] == 'review' and (f.get('requestee') == reviewer or
                                           (f.get('setter') == reviewer and
                                            f.get('status') == '+')):
@@ -369,26 +459,6 @@ class Bugzilla(object):
 
         self.proxy.Bug.update_attachment(params)
         return True
-
-    @xmlrpc_to_bugzilla_errors
-    def obsolete_review_attachments(self, bug_id, rb_url):
-        """Mark any attachments for a given bug and review request as obsolete.
-
-        This is called when review requests are discarded or deleted. We don't
-        want to leave any lingering references in Bugzilla.
-        """
-        params = self._auth_params({
-            'ids': [],
-            'is_obsolete': True,
-        })
-
-        for a in self.get_rb_attachments(bug_id):
-            if (self._rb_attach_url_matches(a.get('data'), rb_url) and
-                not a.get('is_obsolete')):
-                params['ids'].append(a['id'])
-
-        if params['ids']:
-            self.proxy.Bug.update_attachment(params)
 
     @xmlrpc_to_bugzilla_errors
     def valid_api_key(self, username, api_key):

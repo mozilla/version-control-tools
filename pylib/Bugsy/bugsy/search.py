@@ -177,8 +177,9 @@ class Search(object):
             if self._change_history.get('value', None):
                 params['chfieldvalue'] = self._change_history['value']
 
-            results = self._bugsy.request('bug', params=params)
-            error = results.get("error", None)
-            if error:
-                raise SearchException(results['message'])
+            try:
+                results = self._bugsy.request('bug', params=params)
+            except Exception as e:
+                raise SearchException(e.msg, e.code)
+
             return [Bug(self._bugsy, **bug) for bug in results['bugs']]

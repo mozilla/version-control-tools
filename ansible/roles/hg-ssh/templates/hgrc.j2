@@ -67,3 +67,8 @@ partitionmap.2main = 0,1,2,3:.*
 
 [replicationpathrewrites]
 /repo/hg/mozilla/ = {moz}/
+
+# Disable new repos being created with generaldelta because it can cause
+# performance issues when serving large repos to old clients.
+[format]
+usegeneraldelta=false

@@ -23,7 +23,13 @@ Recommended Versions
 Mozilla recommends running the latest stable release of Mercurial. The
 latest stable release is always listed at
 `https://www.mercurial-scm.org/ <https://www.mercurial-scm.org/>`_.
-**As of November 2015, the latest stable release is 3.6.**
+**As of March 2016, the latest stable release is 3.7.**
+
+.. danger::
+
+   Mercurial versions before 3.7.3 have known vulnerabilities that can
+   lead to arbitrary code execution when pulling from repositories.
+   Version 3.7.3 should always be used.
 
 Mercurial makes a major *X.Y* release every three months, typically around
 the first of the month. Release months are February, May, August, and
@@ -100,7 +106,7 @@ out the version you wish to install::
 
   $ hg clone https://selenic.com/repo/hg
   $ cd hg
-  $ hg up 3.6.1
+  $ hg up 3.7.3
 
 Once you have the source code, run ``make`` to install Mercurial::
 
@@ -151,7 +157,14 @@ General Advice
 Mercurial releases tend to be faster and have fewer bugs than previous
 releases. These are compelling reasons to stay up to date.
 
-Avoid Mercurial versions older than 3.5 due to issues below.
+Avoid Mercurial versions older than 3.7.3 due to issues below.
+
+Security Issues
+---------------
+
+Versions of Mercurial before 3.7.3 are vulnerable to multiple security
+issues that can lead to executing arbitrary code when cloning or
+pulling from repositories. Avoid versions older than 3.7.3!
 
 Cloning and Pulling Performance
 -------------------------------

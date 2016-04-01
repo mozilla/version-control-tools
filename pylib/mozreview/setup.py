@@ -12,7 +12,8 @@ setup(
     description='MozReview extension to Review Board',
     packages=find_packages(),
     install_requires=[
-        'MozillaPulse'
+        'MozillaPulse',
+        'mozautomation>=0.2'
     ],
     classifiers=[
         'Intended Audience :: Developers',

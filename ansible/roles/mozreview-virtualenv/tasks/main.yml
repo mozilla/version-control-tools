@@ -12,11 +12,13 @@
 - name: install dependency packages
   yum: name={{ item }}
   with_items:
+    - httpd-devel
     - libjpeg-turbo-devel
     - mysql-devel
     - nodejs
     - python-devel
     - openldap-devel
+    - python27
     - tar
     - zlib-devel
 
@@ -27,19 +29,33 @@
   command: /usr/bin/npm install -g less uglify-js
            creates=/usr/bin/lessc
 
-- name: download virtualenv package
-  get_url: url=https://pypi.python.org/packages/source/v/virtualenv/virtualenv-12.0.7.tar.gz
-           dest=/var/tmp/virtualenv-12.0.7.tar.gz
-           sha256sum=d681db1766cdc8aa1b37eb18252c264b775f971166c2bf658a9618c1f3d28741
+# TODO all this code can change to use virtualenv.yml once we switch to
+# Python 2.7.
+
+- name: download python packaging tools
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/{{ item.path }}
+           dest=/var/tmp/{{ item.path }}
+           sha256sum={{ item.shasum }}
+  with_items:
+    - { path: get-pip-8.0.3.py, shasum: 85a499fbd52603045812df8ca1c0491483e5f28eca15a3b3025507a66f225acf }
+    - { path: virtualenv-14.0.6.tar.gz, shasum: 1ffb6a02d8999e9c97ad8f04b1d2ba44421dfb8f8a98b54aea5c6fdfb53bc526 }
 
 - name: extract virtualenv package
-  command: /bin/tar -xzf virtualenv-12.0.7.tar.gz
-           chdir=/var/tmp
-           creates=/var/tmp/virtualenv-12.0.7
+  unarchive: src=/var/tmp/virtualenv-14.0.6.tar.gz
+             dest=/var/tmp
+             copy=no
+
+- name: install latest packaging wheels to virtualenv package
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/{{ item.path }}
+           dest=/var/tmp/virtualenv-14.0.6/virtualenv_support/{{ item.path }}
+           sha256sum={{ item.shasum }}
+  with_items:
+    - { path: pip-8.0.3-py2.py3-none-any.whl, shasum: b0335bc837f9edb5aad03bd43d0973b084a1cbe616f8188dc23ba13234dbd552 }
+    - { path: setuptools-20.1.1-py2.py3-none-any.whl, shasum: dfdbc643f8900d9e617e48a42ae389aa18fd6fbd2846f24f2a4678b8d9412acb }
 
 - name: install virtualenv package
   command: /usr/bin/python setup.py install
-           chdir=/var/tmp/virtualenv-12.0.7
+           chdir=/var/tmp/virtualenv-14.0.6
            creates=/usr/bin/virtualenv
 
 - name: create directory structure
@@ -51,19 +67,8 @@
 - name: create virtualenv
   command: /usr/bin/virtualenv {{ venv }} creates={{ venv }}/bin/python
 
-# peep is copied from our local copy because it is secure and is known
-# to work.
-- name: install peep
-  copy: src=files/peep.py
-        dest={{ venv }}/bin/peep
-        mode=0755
-        owner=root
-        group=root
-
-- name: configure shebang in peep
-  replace: dest={{ venv }}/bin/peep
-           regexp='^#!\/usr\/bin\/env python$'
-           replace='#!{{ venv }}/bin/python'
+- name: upgrade python packaging packages
+  command: "{{ venv }}/bin/python /var/tmp/get-pip-8.0.3.py --upgrade --no-index --find-links /var/tmp/virtualenv-14.0.6/virtualenv_support pip setuptools wheel"
 
 - name: copy requirements.txt
   copy: src=requirements.txt
@@ -72,10 +77,4 @@
         group=root
 
 - name: populate virtualenv
-  pip: virtualenv={{ venv }}
-       requirements={{ venv }}/requirements.txt
-       executable={{ venv }}/bin/peep
-
-# Install a custom Pygments distribution. See pygments.yml for reasons.
-- include: ../../../tasks/pygments.yml
-           pip={{ venv }}/bin/pip
+  command: "{{ venv }}/bin/pip install --require-hashes -r {{ venv }}/requirements.txt"

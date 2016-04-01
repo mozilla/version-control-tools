@@ -27,6 +27,7 @@ PYTHON_COVERAGE_DIRS = (
 # Directories containing Python unit tests.
 UNIT_TEST_DIRS = [
     'autoland/tests',
+    'git/tests',
     'hgserver/tests',
     'pylib',
 ]
@@ -210,7 +211,6 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
         if not hgmo:
             env['DOCKER_HGWEB_IMAGE'] = mr_images['hgweb']
         if not bmo:
-            env['DOCKER_BMO_DB_IMAGE'] = mr_images['bmodb']
             env['DOCKER_BMO_WEB_IMAGE'] = mr_images['bmoweb']
 
     if hgmo:
@@ -219,7 +219,6 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
         env['DOCKER_LDAP_IMAGE'] = hgmo_images['ldap']
 
     if bmo:
-        env['DOCKER_BMO_DB_IMAGE'] = bmo_images['bmodb']
         env['DOCKER_BMO_WEB_IMAGE'] = bmo_images['bmoweb']
 
     return env

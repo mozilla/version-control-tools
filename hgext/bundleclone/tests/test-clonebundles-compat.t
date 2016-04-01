@@ -1,3 +1,5 @@
+#require no-hg37+
+
   $ . $TESTDIR/hgext/bundleclone/tests/helpers.sh
 
   $ cat >> $HGRCPATH << EOF

@@ -16,7 +16,7 @@
   $ hg commit -A -m 'root commit'
   adding foo0
   $ hg push --noreview
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -32,8 +32,8 @@
   $ hg commit -A -m 'Bug 1 - Foo 2'
   adding foo2
 
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 2 changesets)
   searching for changes
   remote: adding changesets
@@ -43,16 +43,16 @@
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  3:6bd3fbee3dfa
+  changeset:  3:0b3e14fe3ff1
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  4:dfe48634934b
+  changeset:  4:bce658a3f6d6
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -66,26 +66,19 @@
   $ hg commit -A -m 'Bug 1 - Foo 5'
   adding foo5
 
-  $ hg histedit 6bd3fbee3dfa --commands - 2>&1 <<EOF
-  > pick 6bd3fbee3dfa Foo 1
-  > fold d751d4c04967 Foo 3
-  > pick dfe48634934b Foo 2
-  > fold 98dd6a7335db Foo 4
-  > pick 76088734e3cb Foo 5
+  $ cat > commands << EOF
+  > pick 0b3e14fe3ff1 Foo 1
+  > fold 713878e22d95 Foo 3
+  > pick bce658a3f6d6 Foo 2
+  > fold 4d0f846364eb Foo 4
+  > pick 4e50148c492d Foo 5
   > EOF
-  0 files updated, 0 files merged, 4 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 2 files removed, 0 files unresolved
-  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 2 files removed, 0 files unresolved
-  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg histedit 0b3e14fe3ff1 --commands commands | grep -v 'files updated'
+  [1]
 
   $ rbmanage publish 1
-  $ hg push
-  pushing to ssh://*:$HGPORT6/test-repo (glob)
+  $ hg push --config reviewboard.autopublish=false
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -94,24 +87,24 @@
   remote: recorded push in pushlog
   submitting 3 changesets for review
   
-  changeset:  9:dac4214a563a
+  changeset:  9:0a7aec47f105
   summary:    Bug 1 - Foo 1
-  review:     http://*:$HGPORT1/r/2 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  12:5b936d238262
+  changeset:  12:88139569a7a8
   summary:    Bug 1 - Foo 2
-  review:     http://*:$HGPORT1/r/3 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  13:ae82743c8863
+  changeset:  13:6e19c778ea00
   summary:    Bug 1 - Foo 5
-  review:     http://*:$HGPORT1/r/4 (draft) (glob)
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   
   review id:  bz://1/mynick
-  review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
 Cleanup
 
   $ mozreview stop
-  stopped 10 containers
+  stopped 9 containers

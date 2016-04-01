@@ -62,14 +62,35 @@ import bzauth
 import bz
 from mozautomation.commitparser import BUG_RE
 
-testedwith = '3.1 3.2 3.3 3.4 3.5 3.6'
+testedwith = '3.4 3.5 3.6 3.7'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bzexport'
+
+cmdtable = {}
+command = cmdutil.command(cmdtable)
 
 review_re = re.compile(r'[ra][=?]+(\w[^ ]+)')
 
 BINARY_CACHE_FILENAME = ".bzexport.cache"
 INI_CACHE_FILENAME = ".bzexport"
 
+newbug_opts = [
+    ('t', 'title', '',
+     'New bug title'),
+    ('', 'product', '',
+     'New bug product'),
+    ('C', 'component', '',
+     'New bug component'),
+    ('', 'prodversion', '',
+     'New bug product version'),
+    ('', 'cc', '',
+     'List of users to CC on the bug (comma-separated search strings)'),
+    ('D', 'depends', '',
+     'Make new bug depend on given bug number'),
+    ('B', 'blocks', '',
+     'Comma-separated list of bugs that should depend on this one'),
+    ('P', 'ffprofile', '',
+     'Name of Firefox profile to pull bugzilla cookies from'),
+]
 
 def get_default_version(ui, api_server, product):
     c = bzauth.load_configuration(ui, api_server, BINARY_CACHE_FILENAME)
@@ -777,6 +798,39 @@ def create_attachment(ui, api_server, auth, bug,
                                 **opts)
 
 
+@command('bzexport', [
+         ('d', 'description', '', 'Bugzilla attachment description'),
+         ('c', 'comment', '', 'Comment to add with the attachment'),
+         ('e', 'edit', False,
+          'Open a text editor to modify bug fields'),
+         ('r', 'review', '',
+          'List of users to request review from (comma-separated search strings),'
+          'or "auto" to parse the reviewers out of the patch comment'),
+         ('F', 'feedback', '',
+          'List of users to request feedback from (comma-separated search strings)'),
+         ('', 'cc', '',
+          'List of users to CC on the bug (comma-separated search strings)'),
+         ('', 'new', False,
+          'Create a new bug'),
+         ('i', 'interactive', False,
+          'Interactive -- request confirmation before any permanent action'),
+         ('', 'no-take-bug', False,
+          'Do not assign bug to myself'),
+         ('', 'bug-description', '',
+          'New bug description (aka comment 0)'),
+         ('u', 'update', None,
+          'Update patch name and description to include bug number (only valid with --new)'),
+         ('', 'no-update', None,
+          'Suppress patch name/description update (override config file)'),
+         ('', 'number', '',
+          'When posting, prefix the patch description with "Patch <number> - "'),
+         # The following option is passed through directly to patch.diffopts
+         ('w', 'ignore_all_space', False,
+          'Generate a diff that ignores whitespace changes'),
+         ('f', 'force', False,
+          'Proceed even if the working directory contains changes'),
+         ] + newbug_opts,
+        _('hg bzexport [options] [REV] [BUG]'))
 def bzexport(ui, repo, *args, **opts):
     """
     Export changesets to bugzilla attachments.
@@ -1085,7 +1139,18 @@ def bzexport(ui, repo, *args, **opts):
             except Exception as e:
                 raise util.Abort(e.message)
 
-
+@command('newbug', [
+        ('c', 'comment', '', 'Comment to add with the bug'),
+         ('e', 'edit', False,
+          'Open a text editor to modify bug fields'),
+         ('i', 'interactive', False,
+          'Interactive -- request confirmation before any permanent action'),
+         ('f', 'force', False,
+          'Proceed even if the working directory contains changes'),
+         ('', 'take-bug', False,
+          'Assign bug to myself'),
+         ] + newbug_opts,
+        _('hg newbug [-e] [[-t] TITLE] [[-c] COMMENT]'))
 def newbug(ui, repo, *args, **opts):
     """
     Create a new bug in bugzilla
@@ -1165,73 +1230,3 @@ def newbug(ui, repo, *args, **opts):
 
     bug = result['id']
     ui.write("Created bug %s at %sshow_bug.cgi?id=%s\n" % (bug, bugzilla, bug))
-
-newbug_opts = [
-    ('t', 'title', '',
-     'New bug title'),
-    ('', 'product', '',
-     'New bug product'),
-    ('C', 'component', '',
-     'New bug component'),
-    ('', 'prodversion', '',
-     'New bug product version'),
-    ('', 'cc', '',
-     'List of users to CC on the bug (comma-separated search strings)'),
-    ('D', 'depends', '',
-     'Make new bug depend on given bug number'),
-    ('B', 'blocks', '',
-     'Comma-separated list of bugs that should depend on this one'),
-    ('P', 'ffprofile', '',
-     'Name of Firefox profile to pull bugzilla cookies from'),
-]
-
-cmdtable = {
-    'bzexport':
-    (bzexport,
-        [('d', 'description', '', 'Bugzilla attachment description'),
-         ('c', 'comment', '', 'Comment to add with the attachment'),
-         ('e', 'edit', False,
-          'Open a text editor to modify bug fields'),
-         ('r', 'review', '',
-          'List of users to request review from (comma-separated search strings),'
-          'or "auto" to parse the reviewers out of the patch comment'),
-         ('F', 'feedback', '',
-          'List of users to request feedback from (comma-separated search strings)'),
-         ('', 'cc', '',
-          'List of users to CC on the bug (comma-separated search strings)'),
-         ('', 'new', False,
-          'Create a new bug'),
-         ('i', 'interactive', False,
-          'Interactive -- request confirmation before any permanent action'),
-         ('', 'no-take-bug', False,
-          'Do not assign bug to myself'),
-         ('', 'bug-description', '',
-          'New bug description (aka comment 0)'),
-         ('u', 'update', None,
-          'Update patch name and description to include bug number (only valid with --new)'),
-         ('', 'no-update', None,
-          'Suppress patch name/description update (override config file)'),
-         ('', 'number', '',
-          'When posting, prefix the patch description with "Patch <number> - "'),
-         # The following option is passed through directly to patch.diffopts
-         ('w', 'ignore_all_space', False,
-          'Generate a diff that ignores whitespace changes'),
-         ('f', 'force', False,
-          'Proceed even if the working directory contains changes'),
-         ] + newbug_opts,
-        _('hg bzexport [options] [REV] [BUG]')),
-
-    'newbug':
-    (newbug,
-        [('c', 'comment', '', 'Comment to add with the bug'),
-         ('e', 'edit', False,
-          'Open a text editor to modify bug fields'),
-         ('i', 'interactive', False,
-          'Interactive -- request confirmation before any permanent action'),
-         ('f', 'force', False,
-          'Proceed even if the working directory contains changes'),
-         ('', 'take-bug', False,
-          'Assign bug to myself'),
-         ] + newbug_opts,
-        _('hg newbug [-e] [[-t] TITLE] [[-c] COMMENT]')),
-}

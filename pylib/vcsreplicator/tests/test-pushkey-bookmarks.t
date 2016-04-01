@@ -17,7 +17,7 @@ Create the repository and push a change
   $ touch foo
   $ hg -q commit -A -m initial
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -48,14 +48,14 @@ Phases should be updated on normal push
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  * vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
   * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
 Creating a bookmark will write a pushkey message
 
   $ hg bookmark my-bookmark
   $ hg push -B my-bookmark
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   no changes found
   remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
@@ -94,7 +94,7 @@ We send a changegroup and a pushkey but don't process them immediately
   $ echo laggy-mirror > foo
   $ hg commit -m 'simulate laggy mirror'
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -126,7 +126,7 @@ Mirror gets bookmark updates when pulling the changegroup.
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  * vcsreplicator.consumer pulling 1 heads (2777163b593873bfa63c7129e02a21becc299ff0) and 1 nodes from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 1 heads (2777163b593873bfa63c7129e02a21becc299ff0) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
   * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
@@ -182,7 +182,7 @@ the bookmark.
      my-bookmark               1:2777163b5938
 
   $ consumer --onetime
-  * vcsreplicator.consumer pulling 1 heads (031adcaa8ee7e23dd05ce5900645e771a3637682) and 1 nodes from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 1 heads (031adcaa8ee7e23dd05ce5900645e771a3637682) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
   * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
@@ -193,7 +193,7 @@ But processing the next changegroup message should advance the bookmark by 1
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
-  * vcsreplicator.consumer pulling 1 heads (e20ecd72ffa991598a1b26333788345377318231) and 1 nodes from ssh://*:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
+  * vcsreplicator.consumer pulling 1 heads (e20ecd72ffa991598a1b26333788345377318231) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central (glob)
   * vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central (glob)
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks

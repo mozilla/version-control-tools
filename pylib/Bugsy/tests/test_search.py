@@ -434,4 +434,4 @@ def test_we_can_handle_errors_coming_back_from_search():
                 .timeframe('2014-12-01', '2014-12-05')\
                 .search()
     except SearchException as e:
-        assert str(e) == "Message: Can't use [Bug Creation] as a field name."
+        assert str(e) == "Message: Can't use [Bug Creation] as a field name. Code: 108"

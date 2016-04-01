@@ -1,0 +1,6 @@
+---
+- name: install system packages
+  yum: name={{ item }}
+  with_items:
+    - python27
+    - python27-devel

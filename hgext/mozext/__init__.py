@@ -273,17 +273,8 @@ import datetime
 import errno
 import os
 import shutil
-import sys
 
 from operator import methodcaller
-
-from mercurial import (
-    exchange,
-    revset,
-    templatefilters,
-    templatekw,
-    templater,
-)
 
 from mercurial.i18n import _
 from mercurial.error import (
@@ -294,6 +285,7 @@ from mercurial.localrepo import (
     repofilecache,
 )
 from mercurial.node import (
+    bin,
     hex,
     short,
 )
@@ -303,46 +295,57 @@ from mercurial import (
     demandimport,
     encoding,
     error,
+    exchange,
     extensions,
     hg,
+    revset,
     scmutil,
+    sshpeer,
+    templatefilters,
+    templatekw,
+    templater,
     util,
 )
 
-OUR_DIR = os.path.dirname(__file__)
-REPO_ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
-PYLIB = os.path.join(REPO_ROOT, 'pylib')
-for p in ('flake8', 'mccabe', 'mozautomation', 'pep8', 'pyflakes'):
-    sys.path.insert(0, os.path.join(PYLIB, p))
+
+OUR_DIR = os.path.normpath(os.path.dirname(__file__))
+execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 
-from mozautomation.changetracker import (
-    ChangeTracker,
-)
+# Disable demand importing for mozautomation because "requests" doesn't
+# play nice with the demand importer.
+demandenabled = demandimport.isenabled()
+try:
+    demandimport.disable()
 
-from mozautomation.commitparser import (
-    parse_bugs,
-    parse_reviewers,
-)
+    from mozautomation.changetracker import (
+        ChangeTracker,
+    )
 
-from mozautomation.repository import (
-    MercurialRepository,
-    RELEASE_TREES,
-    REPOS,
-    resolve_trees_to_official,
-    resolve_trees_to_uris,
-    resolve_uri_to_tree,
-    treeherder_url,
-    TREE_ALIASES,
-)
+    from mozautomation.commitparser import (
+        parse_bugs,
+        parse_reviewers,
+    )
 
+    from mozautomation.repository import (
+        MercurialRepository,
+        RELEASE_TREES,
+        REPOS,
+        resolve_trees_to_official,
+        resolve_trees_to_uris,
+        resolve_uri_to_tree,
+        treeherder_url,
+        TREE_ALIASES,
+    )
+finally:
+    if demandenabled:
+        demandimport.enable()
 
 bz_available = False
 
-testedwith = '3.1 3.2 3.3 3.4 3.5 3.6'
+testedwith = '3.4 3.5 3.6 3.7'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20mozext'
 
-commands.norepo += ' cloneunified moztrees treestatus'
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
@@ -398,8 +401,50 @@ def exchangepullpushlog(orig, pullop):
     if not tree or not repo.changetracker or tree == "try":
         return res
 
-    repo.ui.status('fetching pushlog\n')
-    repo.changetracker.load_pushlog(tree)
+    # Calling wire protocol commands via SSH requires the server-side wire
+    # protocol code to be known by the client. The server-side code is defined
+    # by the pushlog extension, so we effectively need the pushlog extension
+    # enabled to call the wire protocol method when pulling via SSH. We don't
+    # (yet) recommend installing the pushlog extension locally. Furthermore,
+    # pulls from hg.mozilla.org should be performed via https://, not ssh://.
+    # So just bail on pushlog fetching if pulling via ssh://.
+    if isinstance(pullop.remote, sshpeer.sshpeer):
+        pullop.repo.ui.warn('cannot fetch pushlog when pulling via ssh://; '
+                            'you should be pulling via https://\n')
+        return res
+
+    lastpushid = repo.changetracker.last_push_id(tree)
+    fetchfrom = lastpushid + 1 if lastpushid is not None else 0
+
+    lines = pullop.remote._call('pushlog', firstpush=str(fetchfrom))
+    lines = iter(lines.splitlines())
+
+    statusline = lines.next()
+    if statusline[0] == '0':
+        raise error.Abort('remote error fetching pushlog: %s' % lines.next())
+    elif statusline != '1':
+        raise error.Abort('error fetching pushlog: unexpected response: %s\n' %
+            statusline)
+
+    pushes = []
+    for line in lines:
+        pushid, who, when, nodes = line.split(' ', 3)
+        nodes = [bin(n) for n in nodes.split()]
+
+        # Verify incoming changesets are known and stop processing when we see
+        # an unknown changeset. This can happen when we're pulling a former
+        # head instead of all changesets.
+        try:
+            [repo[n] for n in nodes]
+        except error.RepoLookupError:
+            repo.ui.warn('received pushlog entry for unknown changeset; ignoring\n')
+            break
+
+        pushes.append((int(pushid), who, int(when), nodes))
+
+    if pushes:
+        repo.changetracker.add_pushes(tree, pushes)
+        repo.ui.status('added %d pushes\n' % len(pushes))
 
     return res
 
@@ -432,7 +477,7 @@ def critique(ui, repo, entire=False, node=None, **kwargs):
     demandimport.enable()
 
 
-@command('moztrees', [], _('hg moztrees'))
+@command('moztrees', [], _('hg moztrees'), norepo=True)
 def moztrees(ui, **opts):
     """Show information about Mozilla source trees."""
     longest = max(len(tree) for tree in REPOS.keys())
@@ -451,7 +496,7 @@ def moztrees(ui, **opts):
             ', '.join(sorted(aliases))))
 
 
-@command('cloneunified', [], _('hg cloneunified [DEST]'))
+@command('cloneunified', [], _('hg cloneunified [DEST]'), norepo=True)
 def cloneunified(ui, dest='gecko', **opts):
     """Clone main Mozilla repositories into a unified local repository.
 
@@ -483,7 +528,7 @@ def cloneunified(ui, dest='gecko', **opts):
             shutil.rmtree(path)
 
 
-@command('treestatus', [], _('hg treestatus [TREE] ...'))
+@command('treestatus', [], _('hg treestatus [TREE] ...'), norepo=True)
 def treestatus(ui, *trees, **opts):
     """Show the status of the Mozilla repositories.
 
@@ -503,9 +548,10 @@ def treestatus(ui, *trees, **opts):
     trees = resolve_trees_to_official(trees)
 
     if trees:
-        irrelevant = [k for k in status if k not in trees]
-        for k in irrelevant:
+        for k in set(status.keys()) - set(trees):
             del status[k]
+    if not status:
+        raise util.Abort('No status info found.')
 
     longest = max(len(s) for s in status)
 
@@ -759,8 +805,6 @@ def pull(orig, repo, remote, *args, **kwargs):
 
         if tree:
             repo._update_remote_refs(remote, tree)
-            if repo.changetracker:
-                repo.changetracker.load_pushlog(tree)
 
         # Sync bug info.
         for rev in repo.changelog.revs(old_rev + 1):
@@ -835,18 +879,20 @@ def revset_bug(repo, subset, x):
     except Exception:
         raise ParseError(err)
 
-    # We do a simple string test first because avoiding regular expressions
-    # is good for performance.
-    return [r for r in subset
-            if bugstring in repo[r].description() and
-                bug in parse_bugs(repo[r].description())]
+    def fltr(x):
+        # We do a simple string test first because avoiding regular expressions
+        # is good for performance.
+        desc = repo[x].description()
+        return bugstring in desc and bug in parse_bugs(desc)
+
+    return subset.filter(fltr)
 
 
 def revset_dontbuild(repo, subset, x):
     if x:
         raise ParseError(_('dontbuild() does not take any arguments'))
 
-    return [r for r in subset if 'DONTBUILD' in repo[r].description()]
+    return subset.filter(lambda x: 'DONTBUILD' in repo[x].description())
 
 
 def revset_me(repo, subset, x):
@@ -865,26 +911,21 @@ def revset_me(repo, subset, x):
     n = encoding.lower(me)
     kind, pattern, matcher = revset._substringmatcher(n)
 
-    revs = []
-
-    for r in subset:
-        ctx = repo[r]
+    def fltr(x):
+        ctx = repo[x]
         if matcher(encoding.lower(ctx.user())):
-            revs.append(r)
-            continue
+            return True
 
-        if ircnick in parse_reviewers(ctx.description()):
-            revs.append(r)
-            continue
+        return ircnick in parse_reviewers(ctx.description())
 
-    return revs
+    return subset.filter(fltr)
 
 
 def revset_nobug(repo, subset, x):
     if x:
         raise ParseError(_('nobug() does not take any arguments'))
 
-    return [r for r in subset if not parse_bugs(repo[r].description())]
+    return subset.filter(lambda x: not parse_bugs(repo[x].description()))
 
 
 def revset_tree(repo, subset, x):
@@ -905,7 +946,7 @@ def revset_tree(repo, subset, x):
     head = repo[ref].rev()
     ancestors = set(repo.changelog.ancestors([head], inclusive=True))
 
-    return [r for r in subset if r in ancestors]
+    return subset & revset.baseset(ancestors)
 
 
 def revset_firstpushdate(repo, subset, x):
@@ -915,20 +956,17 @@ def revset_firstpushdate(repo, subset, x):
     ds = revset.getstring(x, _('firstpushdate() requires a string'))
     dm = util.matchdate(ds)
 
-    revs = []
-
-    for rev in subset:
-        pushes = list(repo.changetracker.pushes_for_changeset(repo[rev].node()))
+    def fltr(x):
+        pushes = list(repo.changetracker.pushes_for_changeset(repo[x].node()))
 
         if not pushes:
-            continue
+            return False
 
         when = pushes[0][2]
 
-        if dm(when):
-            revs.append(rev)
+        return dm(when)
 
-    return revs
+    return subset.filter(fltr)
 
 
 def revset_firstpushtree(repo, subset, x):
@@ -941,19 +979,16 @@ def revset_firstpushtree(repo, subset, x):
     if not uri:
         raise util.Abort(_("Don't know about tree: %s") % tree)
 
-    revs = []
-
-    for rev in subset:
+    def fltr(x):
         pushes = list(repo.changetracker.pushes_for_changeset(
-            repo[rev].node()))
+            repo[x].node()))
 
         if not pushes:
-            continue
+            return False
 
-        if pushes[0][0] == tree:
-            revs.append(rev)
+        return pushes[0][0] == tree
 
-    return revs
+    return subset.filter(fltr)
 
 
 def revset_pushdate(repo, subset, x):
@@ -965,17 +1000,16 @@ def revset_pushdate(repo, subset, x):
     ds = revset.getstring(x, _('pushdate() requires a string'))
     dm = util.matchdate(ds)
 
-    revs = []
-
-    for rev in subset:
-        for push in repo.changetracker.pushes_for_changeset(repo[rev].node()):
+    def fltr(x):
+        for push in repo.changetracker.pushes_for_changeset(repo[x].node()):
             when = push[2]
 
             if dm(when):
-                revs.append(rev)
-                break
+                return True
 
-    return revs
+        return False
+
+    return subset.filter(fltr)
 
 
 def revset_pushhead(repo, subset, x):
@@ -1031,7 +1065,7 @@ def revset_reviewer(repo, subset, x):
     """
     n = revset.getstring(x, _('reviewer() requires a string argument.'))
 
-    return [r for r in subset if n in parse_reviewers(repo[r].description())]
+    return subset.filter(lambda x: n in parse_reviewers(repo[x].description()))
 
 
 def revset_reviewed(repo, subset, x):
@@ -1041,7 +1075,7 @@ def revset_reviewed(repo, subset, x):
     if x:
         raise ParseError(_('reviewed() does not take an argument'))
 
-    return [r for r in subset if list(parse_reviewers(repo[r].description()))]
+    return subset.filter(lambda x: list(parse_reviewers(repo[x].description())))
 
 
 def template_bug(repo, ctx, **args):
@@ -1497,7 +1531,16 @@ def reposetup(ui, repo):
                 ui.warn('Removing bookmark %s\n' % bm)
                 del self._bookmarks[bm]
 
-            self._bookmarks.write()
+            lock = self.lock()
+            try:
+                tr = repo.transaction('prunerelbranch')
+                try:
+                    self._bookmarks.recordchange(tr)
+                    tr.close()
+                finally:
+                    tr.release()
+            finally:
+                lock.release()
 
             todelete = [ref for ref in self.remoterefs.keys()
                         if ref.endswith('RELBRANCH')]

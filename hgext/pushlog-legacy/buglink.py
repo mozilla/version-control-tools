@@ -6,6 +6,8 @@
 import re
 from mercurial import templatefilters
 
+testedwith = '3.6'
+
 bug_re = re.compile(r'''# bug followed by any sequence of numbers, or
                         # a standalone sequence of numbers
                      (

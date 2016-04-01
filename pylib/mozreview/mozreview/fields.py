@@ -14,13 +14,20 @@ from reviewboard.reviews.models import ReviewRequest, ReviewRequestDraft
 
 from mozreview.autoland.models import AutolandEventLogEntry, AutolandRequest
 from mozreview.extra_data import (
+    BASE_COMMIT_KEY,
     COMMIT_ID_KEY,
+    COMMITS_KEY,
+    fetch_commit_data,
     gen_child_rrs,
     get_parent_rr,
     is_parent,
     is_pushed,
+    REVIEWER_MAP_KEY,
 )
 from mozreview.file_diff_reviewer.models import FileDiffReviewer
+
+
+logger = logging.getLogger(__name__)
 
 
 def ensure_review_request(review_request_details):
@@ -30,9 +37,31 @@ def ensure_review_request(review_request_details):
     return review_request_details
 
 
+class CommitDataBackedField(BaseReviewRequestField):
+    """Base class field backed by CommitData rather then built-in extra_data.
+
+    This Field class will emulate the behavior of normal review
+    request fields but stores its data in CommitData.extra_data
+    and CommitData.draft_extra_data instead of the built-in
+    extra_data fields on ReviewRequest and ReviewRequestDraft.
+    """
+
+    def load_value(self, review_request_details):
+        # This must use a CommitData for ``review_request_details`` instead
+        # of the one stored in ``self.commit_data``. See comment on
+        # BaseReviewRequestField
+        commit_data = fetch_commit_data(review_request_details)
+        return commit_data.get_for(review_request_details, self.field_id)
+
+    def save_value(self, value):
+        commit_data = fetch_commit_data(self.review_request_details)
+        commit_data.set_for(self.review_request_details, self.field_id, value)
+        commit_data.save(update_fields=['extra_data', 'draft_extra_data'])
+
+
 class CombinedReviewersField(BaseReviewRequestField):
     """ This field allows for empty pushes on the parent request"""
-    field_id = "p2rb.reviewer_map"
+    field_id = REVIEWER_MAP_KEY
     is_editable = True
     can_record_change_entry = True
 
@@ -46,13 +75,13 @@ class CombinedReviewersField(BaseReviewRequestField):
         }]
 
 
-class CommitsListField(BaseReviewRequestField):
+class CommitsListField(CommitDataBackedField):
     """The commits list field for review requests.
 
     This field is injected in the details of a review request that
     is a "push" based review request.
     """
-    field_id = "p2rb.commits"
+    field_id = COMMITS_KEY
     label = _("Commits")
 
     can_record_change_entry = True
@@ -79,7 +108,7 @@ class CommitsListField(BaseReviewRequestField):
         # accessible anyways in case it has been restricted for other
         # reasons.
         children_details = [
-            child for child in gen_child_rrs(parent_details, user)
+            child for child in gen_child_rrs(parent_details, user=user)
             if child.is_accessible_by(user)]
 
         autoland_requests = AutolandRequest.objects.filter(
@@ -112,16 +141,22 @@ class ImportCommitField(BaseReviewRequestField):
     field_id = "p2rb.ImportCommitField"
     label = _("Import")
 
+    def __init__(self, review_request_details, *args, **kwargs):
+        self.commit_data = fetch_commit_data(review_request_details)
+
+        super(ImportCommitField, self).__init__(review_request_details,
+                                                *args, **kwargs)
+
     def should_render(self, value):
-        return not is_parent(self.review_request_details)
+        return not is_parent(self.review_request_details, self.commit_data)
 
     def as_html(self):
-        commit_id = self.review_request_details.extra_data.get(COMMIT_ID_KEY)
+        commit_id = self.commit_data.extra_data.get(COMMIT_ID_KEY)
         review_request = self.review_request_details.get_review_request()
         repo_path = review_request.repository.path
 
         if not commit_id:
-            logging.error('No commit_id for review request: %d' % (
+            logger.error('No commit_id for review request: %d' % (
                 review_request.id))
             return ''
 
@@ -137,23 +172,33 @@ class PullCommitField(BaseReviewRequestField):
     field_id = "p2rb.PullCommitField"
     label = _("Pull")
 
-    def as_html(self):
-        commit_id = self.review_request_details.extra_data.get(COMMIT_ID_KEY)
+    def __init__(self, review_request_details, *args, **kwargs):
+        self.commit_data = fetch_commit_data(review_request_details)
 
-        if is_parent(self.review_request_details):
+        super(PullCommitField, self).__init__(review_request_details,
+                                              *args, **kwargs)
+
+    def as_html(self):
+        commit_id = self.commit_data.extra_data.get(COMMIT_ID_KEY)
+
+        if is_parent(self.review_request_details, self.commit_data):
             user = self.request.user
-            parent = get_parent_rr(self.review_request_details.get_review_request())
+            parent = get_parent_rr(
+                self.review_request_details.get_review_request(),
+                self.commit_data)
             parent_details = parent.get_draft() or parent
             children = [
-                child for child in gen_child_rrs(parent_details, user)
+                child for child in gen_child_rrs(parent_details, user=user)
                 if child.is_accessible_by(user)]
-            commit_id = children[-1].extra_data.get(COMMIT_ID_KEY)
+
+            commit_data = fetch_commit_data(children[-1])
+            commit_id = commit_data.extra_data.get(COMMIT_ID_KEY)
 
         review_request = self.review_request_details.get_review_request()
         repo_path = review_request.repository.path
 
         if not commit_id:
-            logging.error('No commit_id for review request: %d' % (
+            logger.error('No commit_id for review request: %d' % (
                 review_request.id))
             return ''
 
@@ -163,7 +208,7 @@ class PullCommitField(BaseReviewRequestField):
         }))
 
 
-class BaseCommitField(BaseReviewRequestField):
+class BaseCommitField(CommitDataBackedField):
     """Field for the commit a review request is based on.
 
     This field stores the base commit that a parent review request is
@@ -173,7 +218,7 @@ class BaseCommitField(BaseReviewRequestField):
     has been rebased or some of the commits in the request have been
     landed/submitted.
     """
-    field_id = "p2rb.base_commit"
+    field_id = BASE_COMMIT_KEY
     label = _("Base Commit")
     can_record_change_entry = True
 
@@ -267,14 +312,14 @@ class TryField(BaseReviewRequestField):
             # changedescription. This either means we have a serious bug or
             # someone was attempting to change the field themselves (possibly
             # maliciously).
-            logging.error('A malformed autoland_id was detected: %s' %
-                          info['new'][0])
+            logger.error('A malformed autoland_id was detected: %s' %
+                         info['new'][0])
             return self._retrieve_error_txt
 
         try:
             ar = AutolandRequest.objects.get(pk=autoland_id)
         except:
-            logging.error('An unknown autoland_id was detected: %s' %
+            logger.error('An unknown autoland_id was detected: %s' %
                 info['new'][0])
             return self._retrieve_error_txt
 
@@ -307,7 +352,8 @@ class FileDiffReviewerField(BaseReviewRequestField):
             'id', flat=True
         )
 
-        if user.is_authenticated():
+        if (user.is_authenticated() and
+                isinstance(self.review_request_details, ReviewRequest)):
             diffsets = self.review_request_details.get_diffsets()
             # Merge all the FileDiffs together
             files = sum([list(diff.files.all()) for diff in diffsets], [])

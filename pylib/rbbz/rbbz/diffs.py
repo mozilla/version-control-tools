@@ -131,8 +131,8 @@ def get_file_chunks_in_range_custom(context, filediff, interfilediff,
 
 def render_equal_chunk(chunk, parser):
     indents = chunk['meta'].get('indentation_changes', {})
-    lines = [] # Rendered lines.
-    indent_count = 0 # How many indentation lines have we seen in a row.
+    lines = []  # Rendered lines.
+    indent_count = 0  # How many indentation lines have we seen in a row.
 
     for line in chunk['lines']:
         indent_key = "%s-%s" % (line[1], line[4])
@@ -175,13 +175,13 @@ def render_equal_chunk(chunk, parser):
 
         # Parse the indentation characters
         while index < len(chars):
-            if chars[index] == "&" and chars[index + 1] == "g": # "&gt;".
+            if chars[index] == "&" and chars[index + 1] == "g":  # "&gt;".
                 # Space character
-                replace_chars.append(" ");
+                replace_chars.append(" ")
                 current_width += 1
                 index += 4
 
-            elif chars[index] == "&" and chars[index + 1] == "m": # "&mdash;".
+            elif chars[index] == "&" and chars[index + 1] == "m":  # "&mdash;".
                 # One of the spaces we translated before
                 # was actually part of this tab we've
                 # found
@@ -229,6 +229,7 @@ def render_equal_chunk(chunk, parser):
 
     return lines
 
+
 def render_comment_plain(comment, context, is_reply):
     if is_reply:
         parent_comment = comment.reply_to
@@ -249,6 +250,19 @@ def render_comment_plain(comment, context, is_reply):
 
         return "\n".join(lines)
 
+    # If the reviewer selected a single line, comment with
+    # 5 lines of context.
+    if comment.num_lines == 1:
+        if comment.first_line < 6:
+            first_line = 1
+            num_lines = comment.first_line
+        else:
+            first_line = comment.first_line - 5
+            num_lines = 6
+    else:
+        first_line = comment.first_line
+        num_lines = comment.num_lines
+
     # This is the base comment of a review, so we
     # should quote the code the comment is adressing.
     parser = HTMLParser.HTMLParser()
@@ -256,8 +270,8 @@ def render_comment_plain(comment, context, is_reply):
         context,
         comment.filediff,
         comment.interfilediff,
-        comment.first_line,
-        comment.num_lines))
+        first_line,
+        num_lines))
 
     dest_lineno = None
     for chunk in chunks:

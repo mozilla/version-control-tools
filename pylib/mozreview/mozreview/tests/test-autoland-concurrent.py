@@ -5,6 +5,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import time
+import unittest
 
 import requests
 import selenium.webdriver.support.expected_conditions as EC
@@ -52,6 +53,7 @@ def close_tree(treestatus_url, tree, user='sheriff@example.com', password='passw
     r.raise_for_status()
 
 
+@unittest.skip('Skipped due to Bug 1246950')
 class AutolandConcurrentTest(MozReviewWebDriverTest):
     @classmethod
     def setUpClass(cls):
@@ -72,7 +74,7 @@ class AutolandConcurrentTest(MozReviewWebDriverTest):
             lr = self.create_basic_repo('mjane@example.com', 'mjane')
             lr.write('foo', 'first change')
             lr.run(['commit', '-m', 'Bug 1 - Test try'])
-            lr.run(['push'])
+            lr.run(['push', '--config', 'reviewboard.autopublish=false'])
 
             # create try tree
             add_tree(self.mr.treestatus_url, 'try')
@@ -121,8 +123,8 @@ class AutolandConcurrentTest(MozReviewWebDriverTest):
         self.assertEqual(
             try_btn.value_of_css_property('opacity'), '0.5')
         self.add_hostingservice(1, 'Sirius Black', 'scm_level_1',
-                                'ssh://hg.example.com/try',
-                                'ssh://hg.example.com/mainline', '')
+                                True, 'ssh://hg.example.com/try',
+                                True, 'ssh://hg.example.com/mainline', '')
 
         # We should also not be able to trigger a Try run unless the review is
         # published.

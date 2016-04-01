@@ -18,6 +18,18 @@ class ParentShipItError(PublishError):
                               'requests are not allowed.  Please review '
                               'individual commits.')
 
+
+class InvalidBugIdError(PublishError):
+    def __init__(self, bug_id):
+        PublishError.__init__(self, 'Invalid bug ID "%s".' % bug_id)
+
+
+class ConfidentialBugError(PublishError):
+    def __init__(self):
+        PublishError.__init__(self, 'This bug is confidential; please attach '
+                              'the patch directly to the bug.')
+
+
 NOT_PARENT = WebAPIError(
     1001,
     "Review request is not a parent",

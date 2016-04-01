@@ -15,7 +15,7 @@ def test_an_exception_is_raised_when_we_hit_an_error():
     bugzilla = Bugsy()
     with pytest.raises(BugsyException) as e:
         bugzilla.get(1017315)
-    assert str(e.value) == "Message: We received a 500 error with the following: It's all broken"
+    assert str(e.value) == "Message: We received a 500 error with the following: It's all broken Code: None"
 
 
 @responses.activate
@@ -26,7 +26,7 @@ def test_bugsyexception_raised_for_http_502_when_retrieving_bugs():
     bugzilla = Bugsy()
     with pytest.raises(BugsyException) as e:
         r = bugzilla.get(123456)
-    assert str(e.value) == "Message: We received a 502 error with the following: Bad Gateway"
+    assert str(e.value) == "Message: We received a 502 error with the following: Bad Gateway Code: None"
 
 
 @responses.activate
@@ -35,7 +35,7 @@ def test_bugsyexception_raised_for_http_503_when_verifying_api_key():
                   body='Service Unavailable', status=503, content_type='text/html')
     with pytest.raises(BugsyException) as e:
         Bugsy(username='foo', api_key='goodkey')
-    assert str(e.value) == "Message: We received a 503 error with the following: Service Unavailable"
+    assert str(e.value) == "Message: We received a 503 error with the following: Service Unavailable Code: None"
 
 
 @responses.activate
@@ -54,7 +54,7 @@ def test_bugsyexception_raised_for_http_500_when_commenting_on_a_bug():
                       content_type='text/html', match_querystring=True)
     with pytest.raises(BugsyException) as e:
         bug.add_comment("I like sausages")
-    assert str(e.value) == "Message: We received a 500 error with the following: Internal Server Error"
+    assert str(e.value) == "Message: We received a 500 error with the following: Internal Server Error Code: None"
 
 
 @responses.activate
@@ -80,4 +80,4 @@ def test_bugsyexception_raised_for_http_500_when_adding_tags_to_bug_comments():
                     content_type='text/html', match_querystring=True)
     with pytest.raises(BugsyException) as e:
         comments[0].add_tags("foo")
-    assert str(e.value) == "Message: We received a 500 error with the following: Internal Server Error"
+    assert str(e.value) == "Message: We received a 500 error with the following: Internal Server Error Code: None"

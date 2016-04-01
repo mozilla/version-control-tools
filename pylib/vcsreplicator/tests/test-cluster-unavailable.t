@@ -44,7 +44,7 @@ Disabling a single Kafka node should still allow push to go through
   $ echo 1 > foo
   $ hg commit -m 'disabled 1/3 nodes'
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -68,7 +68,7 @@ Disabling 2 Kafka nodes should result in no quorum and failure to push
   $ echo 2 > foo
   $ hg commit -m 'disabled 2/3 nodes'
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: replication log not available; all writes disabled
   remote: pretxnopen.vcsreplicator hook failed
@@ -93,7 +93,7 @@ Adding node back in should result in being able to push again
   wrote heartbeat message into 8 partitions
 
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -117,7 +117,7 @@ Fully stopping the cluster shoud result in sane error message
   $ echo 3 > foo
   $ hg commit -m 'full stop'
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: replication log not available; all writes disabled
   remote: pretxnopen.vcsreplicator hook failed
@@ -137,7 +137,7 @@ clean shutdown (which there was).
   $ sleep 3
 
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -169,7 +169,7 @@ Stopping Kafka on hgssh node doesn't break pushes
   $ echo disabled-hgssh > foo
   $ hg commit -m 'disabled hgssh'
   $ hg push
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests

@@ -30,7 +30,7 @@ Pushing a commit to a repo works
   $ touch foo
   $ hg -q commit -A -m initial
   $ hg push ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -74,12 +74,16 @@ It got replicated to mirrors
   "node": "77538e1ce4bec5f7aac58a7ceca2da0e38e90a72",
   "date": [0.0, 0],
   "desc": "initial",
+  "backedoutby": "",
   "branch": "default",
   "bookmarks": [],
   "tags": ["tip"],
   "user": "Test User \u003csomeone@example.com\u003e",
   "parents": [],
-  "phase": "public"
+  "phase": "public",
+  "pushid": 1,
+  "pushdate": [*, 0], (glob)
+  "pushuser": "user1@example.com"
   }
 
   $ http --no-headers ${HGWEB_1_URL}mozilla-central/json-rev/77538e1ce4be
@@ -89,12 +93,16 @@ It got replicated to mirrors
   "node": "77538e1ce4bec5f7aac58a7ceca2da0e38e90a72",
   "date": [0.0, 0],
   "desc": "initial",
+  "backedoutby": "",
   "branch": "default",
   "bookmarks": [],
   "tags": ["tip"],
   "user": "Test User \u003csomeone@example.com\u003e",
   "parents": [],
-  "phase": "public"
+  "phase": "public",
+  "pushid": 1,
+  "pushdate": [*, 0], (glob)
+  "pushuser": "user1@example.com"
   }
 
 Pushlog should be replicated
@@ -109,7 +117,7 @@ Upgrade notice is advertised to clients not running bundle2
   $ echo upgrade > foo
   $ hg commit -m 'upgrade notice'
   $ hg --config experimental.bundle2-exp=false push ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
-  pushing to ssh://*:$HGPORT/mozilla-central (glob)
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests

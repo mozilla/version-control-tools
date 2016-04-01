@@ -21,15 +21,18 @@ This extension adds new options to the `push` command:
 """
 
 import errno
+import json
 import os
 import sys
 import urllib
+import urllib2
 
 from mercurial import (
     cmdutil,
     commands,
     context,
     demandimport,
+    encoding,
     error,
     exchange,
     extensions,
@@ -41,6 +44,7 @@ from mercurial import (
     scmutil,
     sshpeer,
     templatekw,
+    url as urlmod,
     util,
 )
 from mercurial.i18n import _
@@ -59,11 +63,14 @@ except ImportError:
 demandimport.enable()
 
 from hgrb.util import (
-    genid,
+    addcommitid,
     ReviewID,
 )
 
-from mozautomation.commitparser import parse_bugs
+from mozautomation.commitparser import (
+    parse_bugs,
+    parse_commit_id,
+)
 from mozhg.auth import (
     getbugzillaauth,
     configureautobmoapikeyauth,
@@ -74,7 +81,7 @@ from mozhg.rewrite import (
 )
 
 testedwith = '3.3 3.4 3.5 3.6'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=MozReview'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Integration%3A%20Mercurial'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
@@ -85,57 +92,37 @@ clientcapabilities = {
     'listreviewdata',
     'listreviewrepos',
     'bzapikeys',
+    'jsonproto',
+    'commitid',
 }
 
-def decodepossiblelistvalue(v):
-    """Decode a wire protocol value that may be a list.
+def calljsoncommand(ui, remote, command, data=None, httpcap=None, httpcommand=None):
+    """Call a wire protocol command parse the response as JSON."""
+    if data:
+        data = json.dumps(data, sort_keys=True, encoding='utf-8')
 
-    Values are URL encoded. Lists have literal "," separating elements.
-    """
-    if ',' in v:
-        return [urllib.unquote(p) for p in v.split(',')]
+    if (httpcap and httpcommand and httpcap in getreviewcaps(remote) and
+        isinstance(remote, httppeer.httppeer)):
+        url = '%s/%s' % (remote._url, httpcommand)
+        request = remote.requestbuilder(url, data=data,
+                                        headers={'Content-Type': 'application/json'})
+        fh = remote.urlopener.open(request)
+        res = fh.read()
     else:
-        return urllib.unquote(v)
+        res = remote._call(command, data=data)
 
-PROTOVERSION = 1
+    return json.loads(res)
 
 
-def commonrequestlines(ui, bzauth=None):
-    """Obtain a list of lines common in protocol requests."""
-    lines = ['%d' % PROTOVERSION]
+def commonrequestdict(ui, bzauth=None):
+    """Obtain a request dict with common keys set."""
+    r = {}
+    for p in ('username', 'apikey'):
+        if util.safehasattr(bzauth, p):
+            r['bz%s' % p] = getattr(bzauth, p)
 
-    # Tell the server we support examining capabilities.
-    #
-    # This is behind a config flag to facilitate testing.
-    if ui.configbool('reviewboard', 'supportscaps', True):
-        lines.append('supportscaps 1')
+    return r
 
-    for p in ('username', 'password', 'userid', 'cookie', 'apikey'):
-        if getattr(bzauth, p, None):
-            lines.append('bz%s %s' % (p, urllib.quote(getattr(bzauth, p))))
-
-    return lines
-
-def getpayload(s):
-    """Obtain the payload of a response from the server.
-
-    All responses begin with the protocol version followed by a newline.
-    Currently, we only support version 1.
-
-    Returns a list of lines in the response.
-    """
-    try:
-        off = s.index('\n')
-        version = int(s[0:off])
-
-        if version != PROTOVERSION:
-            raise util.Abort(_('unrecognized protocol version from server'))
-    except ValueError:
-        raise util.Abort(_('invalid response from server'))
-
-    assert version == PROTOVERSION
-    lines = s.split('\n')[1:]
-    return lines
 
 def getreviewcaps(remote):
     """Obtain a set of review capabilities from the server.
@@ -161,25 +148,6 @@ def getreviewcaps(remote):
         caps = ''
 
     return set(caps.split(','))
-
-
-def rebasecommand(orig, ui, repo, *args, **kwargs):
-    """Wraps rebase command to preserve commit id across rebases.
-
-    Mercurial doesn't preserve all "extra" fields from changectx during
-    rebase by default. However, the rebase command takes a hidden named
-    argument that specifies a function to be called to carry over extras.
-    We hook into this mechanism.
-    """
-    def extrafn(ctx, extra):
-        # Make sure to call original one, if defined.
-        if 'extrafn' in kwargs:
-            kwargs['extrafn'](ctx, extra)
-
-        if 'commitid' in ctx.extra():
-            extra['commitid'] = ctx.extra()['commitid']
-
-    return orig(ui, repo, extrafn=extrafn, *args, **kwargs)
 
 
 def pushcommand(orig, ui, repo, *args, **kwargs):
@@ -228,10 +196,10 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
         rootnode = repo[0].hex()
 
         repo.ui.status(_('searching for appropriate review repository\n'))
-        for line in remote._call('listreviewrepos').splitlines():
-            node, urls = line.split(' ', 1)
+        data = calljsoncommand(repo.ui, remote, 'listreviewrepos')
+        for node, urls in data.iteritems():
             if node == rootnode:
-                newurls = urls.split(' ')
+                newurls = urls
                 break
         else:
             raise util.Abort(_('no review repository found'))
@@ -434,27 +402,27 @@ def wrappedpushdiscovery(orig, pushop):
     replacenodes = []
     for node in nodes:
         ctx = repo[node]
-        if 'commitid' not in ctx.extra():
+        if not parse_commit_id(encoding.fromlocal(ctx.description())):
             replacenodes.append(node)
 
-    def addcommitid(repo, ctx, revmap, copyfilectxfn):
+    def makememctx(repo, ctx, revmap, copyfilectxfn):
         parents = newparents(repo, ctx, revmap)
         # Need to make a copy otherwise modification is made on original,
         # which is just plain wrong.
-        extra = dict(ctx.extra())
-        assert 'commitid' not in extra
-        extra['commitid'] = genid(repo)
+        msg = encoding.fromlocal(ctx.description())
+        new_msg, changed = addcommitid(msg, repo=repo)
+
         memctx = context.memctx(repo, parents,
-                                ctx.description(), ctx.files(),
+                                encoding.tolocal(new_msg), ctx.files(),
                                 copyfilectxfn, user=ctx.user(),
-                                date=ctx.date(), extra=extra)
+                                date=ctx.date(), extra=dict(ctx.extra()))
 
         return memctx
 
     if replacenodes:
         ui.status(_('(adding commit id to %d changesets)\n') %
                   (len(replacenodes)))
-        nodemap = replacechangesets(repo, replacenodes, addcommitid,
+        nodemap = replacechangesets(repo, replacenodes, makememctx,
                                     backuptopic='addcommitid')
 
         # Since we're in the middle of an operation, update references
@@ -536,12 +504,18 @@ def doreview(repo, ui, remote, nodes):
     #    identifier = repo.dirstate.branch()
 
     if not identifier:
+        identifiers = set()
         for node in nodes:
             ctx = repo[node]
-            bugs = parse_bugs(ctx.description())
+            bugs = parse_bugs(ctx.description().split('\n')[0])
             if bugs:
                 identifier = 'bz://%s' % bugs[0]
-                break
+                identifiers.add(identifier)
+
+        if len(identifiers) > 1:
+            raise util.Abort('cannot submit reviews referencing multiple '
+                             'bugs', hint='limit reviewed changesets '
+                             'with "-c" or "-r" arguments')
 
     identifier = ReviewID(identifier)
 
@@ -569,8 +543,11 @@ def doreview(repo, ui, remote, nodes):
                     'http://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview-user.html)\n'))
                 break
 
-    lines = commonrequestlines(ui, bzauth)
-    lines.append('reviewidentifier %s' % urllib.quote(identifier.full))
+    req = commonrequestdict(ui, bzauth)
+    req['identifier'] = identifier.full
+    req['changesets'] = []
+    req['obsolescence'] = obsolete.isenabled(repo, obsolete.createmarkersopt)
+    req['deduce-reviewers'] = ui.configbool('reviewboard', 'deduce-reviewers', True)
 
     reviews = repo.reviews
     oldparentid = reviews.findparentreview(identifier=identifier.full)
@@ -578,40 +555,41 @@ def doreview(repo, ui, remote, nodes):
     # Include obsolescence data so server can make intelligent decisions.
     obsstore = repo.obsstore
     for node in nodes:
-        lines.append('csetreview %s' % hex(node))
         precursors = [hex(n) for n in obsolete.allprecursors(obsstore, [node])]
-        lines.append('precursors %s %s' % (hex(node), ' '.join(precursors)))
+        req['changesets'].append({
+            'node': hex(node),
+            'precursors': precursors,
+        })
 
     ui.write(_('submitting %d changesets for review\n') % len(nodes))
 
-    res = remote._call('pushreview', data='\n'.join(lines))
-    lines = getpayload(res)
+    res = calljsoncommand(ui, remote, 'pushreview', data=req, httpcap='submithttp',
+                          httpcommand='mozreviewsubmitseries')
+    if 'error' in res:
+        raise error.Abort(res['error'])
 
-    newparentid = None
+    for w in res['display']:
+        ui.write('%s\n' % w)
+
+    reviews.baseurl = res['rburl']
+    newparentid = res['parentrrid']
+    reviews.addparentreview(identifier.full, newparentid)
+
     nodereviews = {}
     reviewdata = {}
 
-    for line in lines:
-        t, d = line.split(' ', 1)
-
-        if t == 'display':
-            ui.write('%s\n' % d)
-        elif t == 'error':
-            raise util.Abort(d)
-        elif t == 'parentreview':
-            newparentid = d
-            reviews.addparentreview(identifier.full, newparentid)
-            reviewdata[newparentid] = {}
-        elif t == 'csetreview':
-            node, rid = d.split(' ', 1)
-            node = bin(node)
-            reviewdata[rid] = {}
+    for rid, info in sorted(res['reviewrequests'].iteritems()):
+        if 'node' in info:
+            node = bin(info['node'])
             nodereviews[node] = rid
-        elif t == 'reviewdata':
-            rid, field, value = d.split(' ', 2)
-            reviewdata[rid][field] = decodepossiblelistvalue(value)
-        elif t == 'rburl':
-            reviews.baseurl = d
+
+        reviewdata[rid] = {
+            'status': info['status'],
+            'public': info['public'],
+        }
+
+        if 'reviewers' in info:
+            reviewdata[rid]['reviewers'] = info['reviewers']
 
     reviews.remoteurl = remote.url()
 
@@ -632,14 +610,14 @@ def doreview(repo, ui, remote, nodes):
         ui.write('changeset:  %s:%s\n' % (ctx.rev(), ctx.hex()[0:12]))
         ui.write('summary:    %s\n' % ctx.description().splitlines()[0])
         ui.write('review:     %s' % reviews.reviewurl(rid))
-        if reviewdata[rid].get('public') == 'False':
+        if not reviewdata[rid].get('public'):
             havedraft = True
             ui.write(' (draft)')
         ui.write('\n\n')
 
     ui.write(_('review id:  %s\n') % identifier.full)
     ui.write(_('review url: %s') % reviews.parentreviewurl(identifier.full))
-    if reviewdata[newparentid].get('public', None) == 'False':
+    if not reviewdata[newparentid].get('public'):
         havedraft = True
         ui.write(' (draft)')
     ui.write('\n')
@@ -656,44 +634,45 @@ def doreview(repo, ui, remote, nodes):
     # Make it clear to the user that they need to take action in order for
     # others to see this review series.
     if havedraft:
-        # At some point we may want an yes/no/prompt option for autopublish
-        # but for safety reasons we only allow no/prompt for now.
-        if ui.configbool('reviewboard', 'autopublish', True):
+        # If there is no configuration value specified for
+        # reviewboard.autopublish, prompt the user. Otherwise, publish
+        # automatically or not based on this value.
+        if ui.config('reviewboard', 'autopublish', None) is None:
             ui.write('\n')
-            publish = ui.promptchoice(
-                _('publish these review requests now (Yn)? $$ &Yes $$ &No'))
-            if publish == 0:
-                publishreviewrequests(ui, remote, bzauth, [newparentid])
-            else:
-                ui.status(_('(visit review url to publish these review '
-                            'requests so others can see them)\n'))
+            publish = ui.promptchoice(_('publish these review '
+                                        'requests now (Yn)? '
+                                        '$$ &Yes $$ &No')) == 0
         else:
-            ui.status(_('(visit review url to publish these review requests '
-                        'so others can see them)\n'))
+            publish = ui.configbool('reviewboard', 'autopublish')
+
+        if publish:
+            publishreviewrequests(ui, remote, bzauth, [newparentid])
+        else:
+            ui.status(_('(visit review url to publish these review '
+                        'requests so others can see them)\n'))
+
 
 def publishreviewrequests(ui, remote, bzauth, rrids):
     """Publish an iterable of review requests."""
-    lines = commonrequestlines(ui, bzauth)
-    for rrid in rrids:
-        lines.append('reviewid %s' % rrid)
+    req = commonrequestdict(ui, bzauth)
+    req['rrids'] = [str(rrid) for rrid in rrids]
 
-    res = remote._call('publishreviewrequests', data='\n'.join(lines))
-    lines = getpayload(res)
+    res = calljsoncommand(ui, remote, 'publishreviewrequests', data=req,
+                          httpcap='publishhttp', httpcommand='mozreviewpublish')
+
     errored = False
-
-    for line in lines:
-        k, v = line.split(' ', 1)
-        if k == 'success':
-            ui.status(_('(published review request %s)\n') % v)
-        elif k == 'error':
+    for item in res['results']:
+        if 'success' in item:
+            ui.status(_('(published review request %s)\n') % item['rrid'])
+        elif 'error' in item:
             errored = True
-            rrid, errstr = v.split(' ', 1)
             ui.warn(_('error publishing review request %s: %s\n') %
-                    (rrid, errstr))
+                    (item['rrid'], item['error']))
 
     if errored:
         ui.warn(_('(review requests not published; visit review url to '
                   'attempt publishing there)\n'))
+
 
 def _pullreviews(repo):
     reviews = repo.reviews
@@ -724,36 +703,15 @@ def _pullreviewidentifiers(repo, identifiers):
         raise util.Abort('cannot pull code review metadata; '
                          'server lacks necessary features')
 
-    lines = commonrequestlines(repo.ui)
-    for identifier in identifiers:
-        lines.append('reviewid %s' % identifier)
+    req = commonrequestdict(repo.ui)
+    req['identifiers'] = [str(i) for i in identifiers]
+    res = calljsoncommand(repo.ui, remote, 'pullreviews', data=req)
 
-    res = remote._call('pullreviews', data='\n'.join(lines))
-    lines = getpayload(res)
-
-    reviewdata = {}
-
-    for line in lines:
-        t, d = line.split(' ', 1)
-
-        if t == 'parentreview':
-            identifier, parentid = map(urllib.unquote, d.split(' ', 2))
-            reviewdata[parentid] = {}
-        elif t == 'csetreview':
-            parentid, node, rid = map(urllib.unquote, d.split(' ', 3))
-            reviewdata[rid] = {}
-        elif t == 'reviewdata':
-            rid, field, value = map(urllib.unquote, d.split(' ', 3))
-            reviewdata.setdefault(rid, {})[field] = decodepossiblelistvalue(value)
-        elif t == 'error':
-            raise util.Abort(d)
-        else:
-            raise util.Abort(_('unknown value in response payload: %s') % t)
-
-    for rid, data in reviewdata.iteritems():
+    for rid, data in sorted(res['reviewrequests'].iteritems()):
         reviews.savereviewrequest(rid, data)
 
-    return reviewdata
+    return res['reviewrequests']
+
 
 class identifierrecord(object):
     """Describes a review identifier in the context of the store."""
@@ -894,6 +852,8 @@ class reviewstore(object):
             if isinstance(v, list):
                 parts = [urllib.quote(p) for p in v]
                 lines.append('%s %s' % (k, ','.join(parts)))
+            elif isinstance(v, bool):
+                lines.append('%s %s' % (k, v))
             else:
                 lines.append('%s %s' % (k, urllib.quote(v)))
 
@@ -1040,24 +1000,6 @@ def extsetup(ui):
     entry[1].append(('c', 'changeset', '',
                     _('Review this specific changeset only')))
 
-    # Value may be empty. So check config source to see if key is present.
-    if (ui.configsource('extensions', 'rebase') != 'none' and
-        ui.config('extensions', 'rebase') != '!'):
-        # The extensions.afterloaded mechanism is busted. So we can't
-        # reliably wrap the rebase command in case it hasn't loaded yet. So
-        # just load the rebase extension and wrap the function directly
-        # from its commands table.
-        try:
-            cmdutil.findcmd('rebase', commands.table, strict=True)
-        except error.UnknownCommand:
-            extensions.load(ui, 'rebase', '')
-
-        # Extensions' cmdtable entries aren't merged with commands.table.
-        # Instead, dispatch just looks at each module. So it is safe to wrap
-        # the command on the extension module.
-        rebase = extensions.find('rebase')
-        extensions.wrapcommand(rebase.cmdtable, 'rebase', rebasecommand)
-
     templatekw.keywords['reviews'] = template_reviews
 
 def reposetup(ui, repo):
@@ -1076,18 +1018,17 @@ def reposetup(ui, repo):
             history rewrites, including grafting. This is used as an index
             of sorts in the review tool.
             """
-            # Some callers of commit() may not pass named arguments. Slurp
-            # extra from positional arguments.
-            if len(args) == 7:
-                assert 'extra' not in kwargs
-                kwargs['extra'] = args[6]
-                args = tuple(args[0:6])
+            msg = ''
+            if args:
+                msg = args[0]
+            elif kwargs and 'text' in kwargs:
+                msg = kwargs['text']
+                del kwargs['text']
 
-            extra = kwargs.setdefault('extra', {})
-            if 'commitid' not in extra and self.reviews.remoteurl:
-                extra['commitid'] = genid(self)
+            if self.reviews.remoteurl and msg:
+                msg, changed = addcommitid(msg, repo=self)
 
-            return super(reviewboardrepo, self).commit(*args, **kwargs)
+            return super(reviewboardrepo, self).commit(msg, *args[1:], **kwargs)
 
     repo.__class__ = reviewboardrepo
     repo.noreviewboardpush = False
