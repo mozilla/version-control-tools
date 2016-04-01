@@ -103,7 +103,6 @@
   with_items:
     - /repo/hg/mozilla
     - /repo/hg/extensions
-    - /repo/hg/scripts
     - /var/hg
 
 - name: User repository directories are present
