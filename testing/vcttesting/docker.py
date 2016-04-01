@@ -1306,7 +1306,7 @@ class Docker(object):
         return files
 
     def build_mercurial_rpms(self):
-        return self._get_files_from_http_container('hgrpm',
+        return self._get_files_from_http_container('hgrpm-centos6',
             'Generating RPMs...')
 
     def get_full_image(self, image):
