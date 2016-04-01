@@ -98,9 +98,6 @@
   tags:
     - docker-refresh
 
-#- name: hg scripts are in place
-#  hg: dest=/repo/hg/scripts repo=https://hg.mozilla.org/hgcustom/hgscripts
-
 - name: Global hgrc installed
   template: src=hgrc.j2 dest=/etc/mercurial/hgrc mode=0444
 
