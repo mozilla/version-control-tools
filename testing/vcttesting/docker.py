@@ -10,6 +10,7 @@ from __future__ import absolute_import
 import base64
 from collections import deque
 import docker
+import errno
 import hashlib
 import json
 import os
@@ -110,6 +111,10 @@ class Docker(object):
         self.state = {
             'clobber-bmobootstrap': None,
             'clobber-bmofetch': None,
+            'clobber-hgweb': None,
+            'clobber-hgmaster': None,
+            'clobber-hgrb': None,
+            'clobber-rbweb': None,
             'images': {},
             'containers': {},
             'last-bmoweb-id': None,
@@ -134,6 +139,10 @@ class Docker(object):
         keys = (
             'clobber-bmobootstrap',
             'clobber-bmofetch',
+            'clobber-hgweb',
+            'clobber-hgmaster',
+            'clobber-hgrb',
+            'clobber-rbweb',
             'last-bmoweb-id',
             'last-pulse-id',
             'last-rbweb-id',
@@ -229,11 +238,24 @@ class Docker(object):
 
         This function answers the question of whether a clobber is required
         for a given action. Returns True if yes, False otherwise.
+
+        If a clobber file doesn't exist, a clobber is never needed.
         """
         path = os.path.join(ROOT, 'testing', 'clobber.%s' % name)
         key = 'clobber-%s' % name
-        oldmtime = self.state[key]
-        newmtime = os.path.getmtime(path)
+
+        try:
+            oldmtime = self.state[key]
+        except KeyError:
+            oldmtime = None
+
+        try:
+            newmtime = os.path.getmtime(path)
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
+            # No clobber file means no clobber needed.
+            return False
 
         if oldmtime is None or newmtime > oldmtime:
             self.state[key] = int(time.time())
@@ -545,7 +567,13 @@ class Docker(object):
                     playbook, builder = ansibles[n]
                     start_image = start_images.get(n)
                     if start_image:
-                        builder = None
+                        # If a clobber is needed, ignore the base image
+                        # and always use the builder. If no clobber needed,
+                        # always use the base image.
+                        if self.clobber_needed(n):
+                            start_image = None
+                        else:
+                            builder = None
 
                     # Builders may be shared across images. This code it to
                     # ensure we only build the builder image once.
