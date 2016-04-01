@@ -27,12 +27,38 @@ In your SSH config (likely ``~/.ssh/config``), add the following::
    LDAP account that is configured for SSH access to Mercurial.
 
 The first time you connect, you will be asked to verify the host SSH
-key. The host key fingerprints are:
+key.
 
-* hg.mozilla.org RSA: ``SHA256:usOyGXYDSaMWHhfvVeySzUD0yYxzmAvT+dVziygWsVQ.``
-* hg.mozilla.org RSA: ``MD5:fa:e8:5a:cc:de:02:e0:c7:6e:ff:14:92:90:b9:12:be``
-* reviewboard-hg.mozilla.org RSA: ``SHA256:O6C9zLi4leD/mb4lPNmR50R1ampZgeEi7StDEbZDmyA``
-* reviewboard-hg.mozilla.org RSA: ``MD5:a6:13:ae:35:2c:20:2b:8d:f4:8d:8e:d7:a8:55:67:97``
+The fingerprints of the host keys for ``hg.mozilla.org`` are as follows:
+
+.. code::
+
+   ED25519 (server preferred key)
+   256 SHA256:7MBAdqLe8+aSYkv+5/2LUUxd+WdgYcVSV+ZQVEKA7jA hg.mozilla.org
+   256 SHA1:Ft++OU96cvaREKNFCJ6AiuCpGac hg.mozilla.org
+   256 MD5:96:eb:3b:78:f5:ca:19:e2:0c:a0:95:ea:04:28:7d:26 hg.mozilla.org
+
+   RSA
+   4096 SHA256:RX2OK8A1KNWdxyu6ibIPeEGLBzc5vyQW/wd7RKjBehc hg.mozilla.org
+   4096 SHA1:p2MGe4wSw8ZnQ5J9ShBk/6VA+Co hg.mozilla.org
+   4096 MD5:1c:f9:cf:76:de:b8:46:d6:5a:a3:00:8d:3b:0c:53:77 hg.mozilla.org
+
+And for ``reviewboard-hg.mozilla.org``:
+
+.. code::
+
+   RSA
+
+   SHA256:O6C9zLi4leD/mb4lPNmR50R1ampZgeEi7StDEbZDmyA
+   MD5:a6:13:ae:35:2c:20:2b:8d:f4:8d:8e:d7:a8:55:67:97
+
+A GPG signed document stating asserting the validity of these keys can
+be verified:
+
+.. code-block:: bash
+
+   curl https://hg.mozilla.org/hgcustom/version-control-tools/raw-file/tip/docs/vcs-server-info.asc > mozilla-vcs-info.asc
+   gpg --verify mozilla-vcs-info.asc
 
 Verify your SSH settings are working by attempting to SSH into a server.
 Your terminal output should resemble the following::
