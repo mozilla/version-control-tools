@@ -1,14 +1,16 @@
 ---
 zk_servers: {
-  "hgssh1.dmz.scl3.mozilla.com": 1,
+  # hgssh1 was decommed on 2016-04-01.
+  # "hgssh1.dmz.scl3.mozilla.com": 1,
   "hgssh2.dmz.scl3.mozilla.com": 2,
   # hgweb9 and 10 are beefier and will likely stick around longer.
   # ZK likes clusters of odd numbers. So through hgweb1 in as well.
   "hgweb9.dmz.scl3.mozilla.com": 3,
   "hgweb10.dmz.scl3.mozilla.com": 4,
   "hgweb1.dmz.scl3.mozilla.com": 5,
+  "hgssh3.dmz.scl3.mozilla.com": 6,
 }
-kafka_zookeeper_connect: "hgssh1.dmz.scl3.mozilla.com:2181/hgmoreplication,hgssh2.dmz.scl3.mozilla.com:2181/hgmoreplication"
+kafka_zookeeper_connect: "hgssh3.dmz.scl3.mozilla.com:2181/hgmoreplication,hgssh2.dmz.scl3.mozilla.com:2181/hgmoreplication"
 
 kafka_replication_factor: 5
 kafka_min_insync_replicas: 3

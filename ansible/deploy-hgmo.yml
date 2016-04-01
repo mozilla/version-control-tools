@@ -57,7 +57,6 @@
       }
 
 - hosts:
-    - hgssh1.dmz.scl3.mozilla.com
     - hgssh2.dmz.scl3.mozilla.com
 
   pre_tasks:
