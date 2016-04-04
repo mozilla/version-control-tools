@@ -2,37 +2,9 @@
 - hosts: hgssh3.dmz.scl3.mozilla.com
   gather_facts: no
   tasks:
-    - name: verify deploying changeset is available on server
-      command: hg -R {{ vct }} log -r {{ lookup('file', '../.vctnode') }} -T '{phase}'
-      register: vct_node_phase
-      delegate_to: 127.0.0.1
-
-    - name: require public vct node
-      fail: msg='the v-c-t changeset being deployed is not public; cannot continue'
-      when: vct_node_phase.stdout != 'public'
-
     - name: obtain previously-deployed changeset
       slurp: src=/etc/mercurial/deployed_vct_changeset
       register: previous_vct_node
-
-    - name: capture changes since last time
-      command: hg --cwd {{ vct }} log -r {{ previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
-      register: vct_changes
-      delegate_to: 127.0.0.1
-
-    #- name: print changes since last time
-    #  debug: msg={{ vct_changes.stdout }}
-
-    - name: notify IRC of deployment
-      irc: server=irc.mozilla.org
-           port=6697
-           use_ssl=true
-           channel="#vcs"
-           nick=hg-deploy-bot
-           color=red
-           msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ previous_vct_node.content | b64decode }}"
-      delegate_to: 127.0.0.1
-      run_once: true
 
     # We need to write this out on clients.
     - name: capture mirror key
@@ -42,6 +14,31 @@
     - name: capture host key
       slurp: src=/etc/mercurial/ssh/ssh_host_rsa_key.pub
       register: mirror_host_key
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: verify deploying changeset is available on server
+      command: hg -R {{ vct }} log -r {{ lookup('file', '../.vctnode') }} -T '{phase}'
+      register: vct_node_phase
+
+    - name: require public vct node
+      fail: msg='the v-c-t changeset being deployed is not public; cannot continue'
+      when: vct_node_phase.stdout != 'public'
+
+    - name: capture changes since last time
+      local_action: command hg --cwd {{ vct }} log -r {{ hostvars['hgssh3.dmz.scl3.mozilla.com'].previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
+      register: vct_changes
+
+    - name: notify IRC of deployment
+      irc: server=irc.mozilla.org
+           port=6697
+           use_ssl=true
+           channel="#vcs"
+           nick=hg-deploy-bot
+           color=red
+           msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars['hgssh3.dmz.scl3.mozilla.com'].previous_vct_node.content | b64decode }}"
+      run_once: true
 
 - hosts: hgweb-prod
   roles:
@@ -100,6 +97,9 @@
             mode=0644
       when: ansible_hostname == 'hgssh3'
 
+- hosts: localhost
+  gather_facts: no
+  tasks:
     - name: notify IRC of deployment
       irc: server=irc.mozilla.org
            port=6697
@@ -108,5 +108,4 @@
            nick=hg-deploy-bot
            color=red
            msg="Finished deploy of hooks and extensions to hg.mozilla.org"
-      delegate_to: 127.0.0.1
       run_once: true
