@@ -20,7 +20,8 @@ hgmoenv() {
   $(hgmo shellinit)
 
   cat > ssh-known-hosts << EOF
-${SSH_SERVER} ssh-rsa ${SSH_HOST_KEY}
+${SSH_SERVER} ssh-rsa ${SSH_HOST_RSA_KEY}
+${SSH_SERVER} ssh-ed25519 ${SSH_HOST_ED25519_KEY}
 EOF
 
   cat > ssh_config << EOF

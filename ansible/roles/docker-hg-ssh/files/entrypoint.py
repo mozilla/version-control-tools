@@ -25,14 +25,14 @@ ldap_hostname = os.environ['LDAP_PORT_389_TCP_ADDR']
 ldap_port = os.environ['LDAP_PORT_389_TCP_PORT']
 ldap_uri = 'ldap://%s:%s/' % (ldap_hostname, ldap_port)
 
-# Generate host SSH keys.
-if not os.path.exists('/etc/ssh/ssh_host_dsa_key'):
-    subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'dsa',
-                           '-f', '/etc/ssh/ssh_host_dsa_key'])
+# Generate host SSH keys for hg.
+if not os.path.exists('/etc/mercurial/ssh/ssh_host_ed25519_key'):
+    subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'ed25519',
+                           '-f', '/etc/mercurial/ssh/ssh_host_ed25519_key', '-N', ''])
 
-if not os.path.exists('/etc/ssh/ssh_host_rsa_key'):
-    subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'rsa', '-b', '2048',
-                           '-f', '/etc/ssh/ssh_host_rsa_key'])
+if not os.path.exists('/etc/mercurial/ssh/ssh_host_rsa_key'):
+    subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'rsa', '-b', '4096',
+                           '-f', '/etc/mercurial/ssh/ssh_host_rsa_key', '-N', ''])
 
 ldap_conf = open('/etc/mercurial/ldap.json', 'rb').readlines()
 with open('/etc/mercurial/ldap.json', 'wb') as fh:
@@ -65,7 +65,5 @@ with open('/etc/mercurial/hgrc', 'wb') as fh:
             line = 'hosts = %s\n' % ', '.join(kafka_servers)
 
         fh.write(line)
-
-subprocess.check_call(['/sbin/service', 'rsyslog', 'start'])
 
 os.execl(sys.argv[1], *sys.argv[1:])

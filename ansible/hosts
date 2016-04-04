@@ -9,7 +9,9 @@ reviewboard[1:2].webapp.scl3.mozilla.com ansible_ssh_user=root
 hgweb[1:10].dmz.scl3.mozilla.com ansible_ssh_user=root
 
 [hgssh-prod]
-hgssh[1:2].dmz.scl3.mozilla.com ansible_ssh_user=root
+# disabled because hg-ssh role is tailored towards CentOS 7 now
+#hgssh2.dmz.scl3.mozilla.com ansible_ssh_user=root
+hgssh3.dmz.scl3.mozilla.com ansible_sudo=yes
 
 [hgssh-stage]
 hgssh.stage.dmz.scl3.mozilla.com ansible_ssh_user=root

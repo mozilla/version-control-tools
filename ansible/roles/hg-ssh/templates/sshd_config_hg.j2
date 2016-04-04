@@ -1,0 +1,62 @@
+# This is the sshd config for the Mercurial server. It is integrated with
+# LDAP and dispatches logins to the pash tool.
+
+# Logs SSH key on login, which is used to establish a better audit
+# trail.
+LogLevel VERBOSE
+SyslogFacility AUTHPRIV
+
+# No root for the hg ssh daemon
+PermitRootLogin no
+
+# Only allow public key auth.
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+Protocol 2
+PidFile /var/run/sshd_hg.pid
+
+Port {{ sshd_hg_port | default(222) }}
+
+# We have no need for an SSH agent, so don't accept it.
+AllowAgentForwarding no
+
+# We have no need for TCP forwarding, so disable it.
+AllowTcpForwarding no
+
+# Use a separate set of keys from the host SSH.
+# Keys are in order of preference.
+HostKey /etc/mercurial/ssh/ssh_host_ed25519_key
+HostKey /etc/mercurial/ssh/ssh_host_rsa_key
+
+# Keep in sync with "modern" settings from
+# https://wiki.mozilla.org/Security/Guidelines/OpenSSH
+KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+
+UsePrivilegeSeparation sandbox
+
+# AUTOLAND_REQUEST_USER is set by autoland to "spoof" the pushlog
+# user. pash verifies only the special autoland account can perform
+# the spoofing.
+AcceptEnv AUTOLAND_REQUEST_USER LANG LC_ALL LC_MESSAGES
+
+# We search for SSH keys for the requested user in LDAP using
+# an external program.
+# TODO establish dedicated user for LDAP lookups
+AuthorizedKeysCommand /usr/local/bin/ldap-lookup-ssh-key
+AuthorizedKeysCommandUser hg
+
+# Handles launching HG and perform other admin related
+# tasks, such as modifying user repos.
+ForceCommand /usr/local/bin/pash_wrapper
+
+# TODO enable ChrootDirectory and run SSH sessions in a
+# limited environment.
+
+# By default, SSH limits to 10 concurrent connections for
+# individual users. This may interfere with replication if
+# multiple replication events are in progress. So we up the limit.
+# See bug 1038478.
+MaxStartups 50
+MaxSessions 50

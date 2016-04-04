@@ -203,12 +203,15 @@ mozreview-ldap-associate isn't enabled on hgssh
   mozreview-ldap-associate command not available
   [1]
 
-Failure to connect to LDAP mirror is fatal
+Failure to connect to LDAP mirror locks us out
+What happens here is nscd caches the valid passwd entry lookup for the user.
+However, the SSH key lookup via LDAP fails and this manifests as no public keys
+available.
 
   $ hgmo exec hgssh /set-ldap-property url ldap://localhost:6000
   $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER
-  Could not connect to the LDAP server at ldap://localhost:6000
-  [1]
+  Permission denied (publickey).\r (esc)
+  [255]
 
   $ hgmo exec hgssh /set-ldap-property url real
 

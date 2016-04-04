@@ -7,6 +7,7 @@ dependencies:
   # Something similar applies to ZooKeeper and Kafka settings.
   - {
       role: hg-ssh,
+      sshd_hg_port: 22,
       hgweb_hosts: [],
       kafka_broker_id: 1024,
       kafka_host_name: dummyhost,

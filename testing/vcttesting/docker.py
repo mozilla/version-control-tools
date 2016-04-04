@@ -694,7 +694,7 @@ class Docker(object):
         images = self.ensure_images_built([
             'ldap',
         ], ansibles={
-            'hgmaster': ('docker-hgmaster', 'centos6'),
+            'hgmaster': ('docker-hgmaster', 'centos7'),
             'hgweb': ('docker-hgweb', 'centos6'),
         }, existing=images, verbose=verbose, use_last=use_last)
 
@@ -1251,7 +1251,7 @@ class Docker(object):
             docker_images |= {
                 'ldap',
             }
-            ansible_images['hgmaster'] = ('docker-hgmaster', 'centos6')
+            ansible_images['hgmaster'] = ('docker-hgmaster', 'centos7')
             ansible_images['hgweb'] = ('docker-hgweb', 'centos6')
 
         if bmo:

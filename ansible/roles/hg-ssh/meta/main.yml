@@ -1,19 +1,10 @@
 ---
 dependencies:
-  - ius-repo
-  - supervisor
   - {
-      role: openssh-lpk,
-      home_attribute: fakeHome,
-      accept_env: "AUTOLAND_REQUEST_USER LANG LC_ALL LC_MESSAGES",
-      force_command: /usr/local/bin/pash_wrapper,
-      # By default, SSH limits to 10 concurrent connections for
-      # individual users. This may interfere with replication if
-      # multiple replication events are in progress. So we up the limit.
-      # See bug 1038478.
-      max_startups: 50,
-      max_sessions: 50,
+      role: ius-repo,
+      when: "{{ ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6' }}"
     }
+  - supervisor
   - {
       role: kafka-broker,
       kafka_host_name: "{{ inventory_hostname }}",

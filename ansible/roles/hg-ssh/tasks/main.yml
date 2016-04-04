@@ -3,14 +3,25 @@
   stat: path=/vct
   register: vct_dir
 
+# This is needed so authconfig can have the appropriate ldap_uri at container
+# start time, which results in /etc/openldap/ldap.conf getting updated
+# appropriately, which is necessary for nscd and `ldapsearch` to
+# "just work."
+- name: find LDAP URI in Docker
+  set_fact: ldap_uri=ldap://{{ ansible_env.LDAP_PORT_389_TCP_ADDR }}:{{ ansible_env.LDAP_PORT_389_TCP_PORT }}/
+  when: ansible_env.LDAP_PORT_389_TCP_ADDR is defined
+  tags: docker-startup
+
 - name: Install packages required to run a Mercurial server
   yum: name={{ item }} state=present
   with_items:
+    - authconfig
+    - nss-pam-ldapd
+    - openldap-clients
     # Needed to build python-ldap package for virtualenv.
     - openldap-devel
-    - python27
-    - python27-devel
-    - python-ldap
+    - openssh-server
+    - python-devel
     - sudo
     - rsyslog
     - tar
@@ -18,14 +29,47 @@
 # yum will incur network traffic when URLs are specified. Download the
 # package locally first so we can run offline after initial bootstrap.
 - name: download Mozilla rpms
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/{{ item.path }}
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/{{ item.path }}
            dest=/var/tmp/{{ item.path }}
            sha256sum={{ item.sha256 }}
   with_items:
-    - { path: mercurial-3.7.3-1.x86_64.rpm, sha256: 924a8828cfe53901db1366115d927b958f35f5e6a9c418cbc670c5e19137c090 }
+    - { path: mercurial-3.7.3-1.x86_64.rpm, sha256: 7cdd06e8fb5266fe9bd726c79db6040b68053a601daecb2418820c1d3e4f56a2 }
 
 - name: install Mozilla rpms
   command: yum localinstall -y /var/tmp/mercurial-3.7.3-1.x86_64.rpm
+
+- name: create directory for LDAP certificates
+  file: path=/etc/openldap/cacerts
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
+- name: install Mozilla certificates
+  copy: src={{ item.src }}
+        dest=/etc/openldap/cacerts/{{ item.dest }}
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - { src: files/mozilla-root-ca.crt, dest: mozilla.crt }
+    - { src: files/mozilla-root-certificate-services.crt, dest: ca.crt }
+
+- name: configure system authentication settings
+  template: src=nslcd.conf.j2
+            dest=/etc/nslcd.conf
+  notify: run authconfig
+  tags: docker-startup
+
+- name: configure sshd
+  file: src=sshd_config
+        dest=/etc/ssh/sshd_config
+  notify: restart sshd
+  tags: docker-startup
+
+- name: generate SSH host keys (Docker only)
+  command: /usr/bin/ssh-keygen -A -N ''
+  when: vct_dir.stat.exists == True
 
 - name: install global ssh config
   copy: src=ssh_config
@@ -54,8 +98,51 @@
 - name: hg user ssh config is prepared
   file: path=/home/hg/.ssh state=directory mode=0775 owner=hg group=hg
 
-- name: Mercurial config directory is present
-  file: path=/etc/mercurial state=directory mode=0775
+- name: mercurial config directory is present
+  file: path=/etc/mercurial state=directory mode=0755
+
+- name: directory for hg sshd files
+  file: path=/etc/mercurial/ssh
+        state=directory
+        owner=root
+        group=root
+        mode=0750
+
+- name: sshd config for hg server
+  template: src=sshd_config_hg.j2
+            dest=/etc/mercurial/ssh/sshd_config
+            owner=root
+            group=root
+            mode=0640
+
+# entrypoint.py from the docker container will generate these keys. But there is
+# a race condition between it and the startup code in hgmo.py wanting to copy
+# the file. So generate the cert at image build time to be on the safe side.
+- name: generate hg ED25519 host key (Docker only)
+  command: /usr/bin/ssh-keygen -t ed25519 -N '' -f /etc/mercurial/ssh/ssh_host_ed25519_key creates=/etc/mercurial/ssh/ssh_host_ed25519_key.pub
+
+- name: generate hg RSA host key (Docker only)
+  command: /usr/bin/ssh-keygen -t rsa -b 4096 -N '' -f /etc/mercurial/ssh/ssh_host_rsa_key creates=/etc/mercurial/ssh/ssh_host_rsa_key.pub
+
+# In order to be used as an AuthorizedKeysCommand in sshd, the
+# file has to be in a tree that is root:root 0755 all the way to /.
+- name: install ldap ssh key lookup script
+  copy: src={{ vct }}/scripts/ldap-lookup-ssh-key
+        dest=/usr/local/bin/ldap-lookup-ssh-key
+        owner=root
+        group=root
+        mode=0755
+
+- name: systemd service file for hg sshd
+  copy: src=sshd_hg.service
+        dest=/etc/systemd/system/sshd_hg.service
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
+
+- name: ensure hg sshd runs on startup
+  command: /usr/bin/systemctl enable sshd_hg.service
 
 - name: directories for support tools is present
   file: path=/usr/local/bin
@@ -72,7 +159,7 @@
             mode=0644
 
 - name: replication SSH key is present
-  command: /usr/bin/ssh-keygen -b 2048 -f /etc/mercurial/mirror -t rsa creates=/etc/mercurial/mirror
+  command: /usr/bin/ssh-keygen -b 4096 -f /etc/mercurial/mirror -t rsa -N '' creates=/etc/mercurial/mirror
 
 - name: capture content of replication SSH key
   slurp: src=/etc/mercurial/mirror.pub
@@ -86,7 +173,7 @@
 
 - name: hg user has replication key configured in authorized_keys
   copy: dest=/home/hg/.ssh/authorized_keys
-        content={{ mirror_ssh_key_public.content | b64decode }}
+        content="{{ mirror_ssh_key_public.content | b64decode }}"
         owner=hg
         group=hg
         mode=0640
@@ -136,6 +223,8 @@
     - { venv: venv_tools, path: hghooks, pth: mozhghooks }
     - { venv: venv_pash, path: pylib/vcsreplicator, pth: vcsreplicator }
     - { venv: venv_tools, path: pylib/vcsreplicator, pth: vcsreplicator }
+
+# TODO need to ensure /var/hg/version-control-tools exists
 
 - name: set up version-control-tools repo (server only)
   command: /var/hg/venv_tools/bin/hg --config extensions.vcsreplicator=! -R /var/hg/version-control-tools pull https://hg.mozilla.org/hgcustom/version-control-tools
@@ -204,6 +293,16 @@
     - pash_wrapper
     - repo_group.py
     - sh_helper.py
+
+# Until reviewboard-hg switches to CentOS 7, pash.py's shebang needs to be
+# adjusted to run from the virtualenv. We purposefully use /usr/bin/python
+# in the shebang by default because we can't rely on the virtualenv being
+# present during fresh installs. If we didn't do this, we'd easily lock
+# ourselves out of root login.
+- name: replace shebang in pash.py
+  replace: dest=/usr/local/bin/pash.py
+           regexp='^#! \/usr\/bin\/python'
+           replace='#!/var/hg/venv_pash/bin/python'
 
 - name: install repo-push script
   copy: src={{ vct }}/scripts/repo-push.sh

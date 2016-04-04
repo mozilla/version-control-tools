@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenSSH server daemon for Mercurial
+Documentation=man:sshd(8) man:sshd_config(5)
+After=network.target syslog.target
+
+[Service]
+ExecStart=/usr/sbin/sshd -D -f /etc/mercurial/ssh/sshd_config
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartSec=42s
+
+[Install]
+WantedBy=multi-user.target

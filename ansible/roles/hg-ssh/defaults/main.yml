@@ -1,2 +1,5 @@
 ---
+basedn: "dc=mozilla"
 pash_hostname: "hg.mozilla.org"
+home_attribute: "fakeHome"
+uid_attribute: "mail"

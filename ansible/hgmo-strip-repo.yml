@@ -1,5 +1,5 @@
 ---
-- hosts: hgssh1.dmz.scl3.mozilla.com
+- hosts: hgssh3.dmz.scl3.mozilla.com
   gather_facts: no
   tasks:
     - name: Strip repo on master

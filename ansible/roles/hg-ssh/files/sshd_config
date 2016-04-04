@@ -1,0 +1,23 @@
+# This is the system level sshd. It is *not* the sshd used by Mercurial. See
+# the sshd_config_hg file for that.
+
+SyslogFacility AUTHPRIV
+LogLevel VERBOSE
+PermitRootLogin no
+PasswordAuthentication no
+# TODO hook up 2FA (bug 1259231)
+ChallengeResponseAuthentication no
+Protocol 2
+UsePrivilegeSeparation sandbox
+
+# The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
+# but this is overridden so installations will only check .ssh/authorized_keys
+AuthorizedKeysFile .ssh/authorized_keys
+
+AllowAgentForwarding no
+
+AcceptEnv LANG LC_ALL LC_MESSAGES
+
+# Add extra logging to enable forensics.
+Subsystem sftp /usr/libexec/openssh/sftp-server -f AUTHPRIV -l INFO
+

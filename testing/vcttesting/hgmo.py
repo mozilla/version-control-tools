@@ -87,7 +87,8 @@ class HgCluster(object):
             self.ldap_uri = None
             self.master_ssh_hostname = None
             self.master_ssh_port = None
-            self.master_host_key = None
+            self.master_host_rsa_key = None
+            self.master_host_ed25519_key = None
             self.web_urls = []
             self.kafka_hostports = []
             self.zookeeper_connect = None
@@ -202,16 +203,20 @@ class HgCluster(object):
 
         # Obtain replication SSH key from master. This key is random since it
         # is generated at container build time.
-        with futures.ThreadPoolExecutor(3) as e:
+        with futures.ThreadPoolExecutor(4) as e:
             f_private_key = e.submit(self._d.get_file_content, master_id, '/etc/mercurial/mirror')
             f_public_key = e.submit(self._d.get_file_content, master_id, '/etc/mercurial/mirror.pub')
-            f_master_host_key = e.submit(self._d.get_file_content, master_id,
-                                         '/etc/ssh/ssh_host_rsa_key.pub')
+            f_master_host_ed25519_key = e.submit(self._d.get_file_content, master_id,
+                                                 '/etc/mercurial/ssh/ssh_host_ed25519_key.pub')
+            f_master_host_rsa_key = e.submit(self._d.get_file_content, master_id,
+                                             '/etc/mercurial/ssh/ssh_host_rsa_key.pub')
 
         mirror_private_key = f_private_key.result()
         mirror_public_key = f_public_key.result()
-        master_host_key = f_master_host_key.result()
-        master_host_key = ' '.join(master_host_key.split()[0:2])
+        master_host_rsa_key = f_master_host_rsa_key.result()
+        master_host_rsa_key = ' '.join(master_host_rsa_key.split()[0:2])
+        master_host_ed25519_key = f_master_host_ed25519_key.result()
+        master_host_ed25519_key = ' '.join(master_host_ed25519_key.split()[0:2])
 
         f_mirror_host_keys = []
 
@@ -222,7 +227,8 @@ class HgCluster(object):
                 mirror_private_key,
                 mirror_public_key,
                 master_state['NetworkSettings']['IPAddress'],
-                master_host_key,
+                # FUTURE this will need updated once hgweb supports ed25519 keys
+                master_host_rsa_key,
             ]
             for i in web_ids:
                 e.submit(self._d.execute(i, cmd))
@@ -265,7 +271,8 @@ class HgCluster(object):
         self.web_ids = web_ids
         self.master_ssh_hostname = master_ssh_hostname
         self.master_ssh_port = master_ssh_hostport
-        self.master_host_key = master_host_key
+        self.master_host_rsa_key = master_host_rsa_key
+        self.master_host_ed25519_key = master_host_ed25519_key
         self.web_urls = []
         self.kafka_hostports = []
         for s in all_states:
@@ -330,7 +337,8 @@ class HgCluster(object):
                 'ldap_uri': self.ldap_uri,
                 'master_ssh_hostname': self.master_ssh_hostname,
                 'master_ssh_port': self.master_ssh_port,
-                'master_host_key': self.master_host_key,
+                'master_host_rsa_key': self.master_host_rsa_key,
+                'master_host_ed25519_key': self.master_host_ed25519_key,
                 'web_urls': self.web_urls,
                 'kafka_hostports': self.kafka_hostports,
                 'zookeeper_connect': self.zookeeper_connect,

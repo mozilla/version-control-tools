@@ -62,7 +62,8 @@ class HgmoCommands(object):
         print('export SSH_SERVER=%s' % self.c.master_ssh_hostname)
         print('export SSH_PORT=%d' % self.c.master_ssh_port)
         # Don't export the full value because spaces.
-        print('export SSH_HOST_KEY=%s' % self.c.master_host_key.split()[1])
+        print('export SSH_HOST_RSA_KEY=%s' % self.c.master_host_rsa_key.split()[1])
+        print('export SSH_HOST_ED25519_KEY=%s' % self.c.master_host_ed25519_key.split()[1])
         for i, url in enumerate(self.c.web_urls):
             print('export HGWEB_%d_URL=%s' % (i, url))
         for i, cid in enumerate(self.c.web_ids):
