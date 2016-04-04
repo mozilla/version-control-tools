@@ -32,7 +32,12 @@ HostKey /etc/mercurial/ssh/ssh_host_rsa_key
 # https://wiki.mozilla.org/Security/Guidelines/OpenSSH
 KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
 Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+
+# hmac-ripemd160,hmac-ripemd160@openssh.com are legacy and were
+# added to support a legacy OpenSSH distributed in MozillaBuild.
+# We can likely remove them once MozillaBuild's SSH package is
+# updated.
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com,hmac-ripemd160,hmac-ripemd160@openssh.com
 
 UsePrivilegeSeparation sandbox
 
