@@ -5,6 +5,7 @@ from mock import patch, Mock
 from mozhginfo import pushlog_client
 from mozhginfo.push import Push
 from mozhginfo.pushlog_client import (
+    PushlogError,
     query_pushes_by_specified_revision_range,
     query_pushes_by_pushid_range,
     query_pushes_by_revision_range,
@@ -175,6 +176,23 @@ class TestQueries(unittest.TestCase):
         assert changesets == ['eb15e3f893453d6a4472f8905271aba33f8b68d5',
                               '1c5b4332e2f1b73fe03977b69371e9a08503bff3',
                               '724f0a71d62171da1357e6c1f93453359e54206b']
+
+    @patch('mozhginfo.pushlog_client.query_push_by_revision', side_effect=Exception("foo"))
+    def test_query_pushes_by_specified_revision_range_raises_exception(self,
+                                                                       query_push_by_revision):
+        '''
+        We tell query_push_by_revision() to raise an Exception while
+        query_pushes_by_specified_revision_range() raises a PushlogError
+        '''
+        # The values passed to query_pushes_by_specified_revision_range() are irrelvant
+        self.assertRaises(
+            PushlogError,
+            query_pushes_by_specified_revision_range,
+            repo_url='foo',
+            revision='foo',
+            before='foo',
+            after='foo',
+        )
 
     @patch('requests.get', return_value=mock_response(REVISION_INFO_REPOSITORIES, 200))
     def test_query_push_by_revision(self, get):

@@ -131,9 +131,11 @@ def query_pushes_by_specified_revision_range(repo_url, revision, before, after,
         start_id = pushid - before
         end_id = pushid + after
         push_list = query_pushes_by_pushid_range(repo_url, start_id, end_id)
-    except:
+    except Exception as e:
+        LOG.exception(e)
         raise PushlogError('Unable to retrieve pushlog data. '
                            'Please check repo_url and revision specified.')
+
     if return_revision_list:
         return _pushes_to_list(push_list)
 
