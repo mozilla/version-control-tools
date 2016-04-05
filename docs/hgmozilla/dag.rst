@@ -243,7 +243,7 @@ see two entries::
    file
 
 The ``.hg`` directory contains all the files managed by Mercurial. It should
-be treated as a block box.
+be treated as a black box.
 
 Everything else in this directory (currently just the ``file`` file and
 the current directory) is referred to as the *working directory* or
@@ -296,7 +296,7 @@ Let's do something a bit more advanced. We start by switching the
    |
    o  8febb2b7339e A
 
-(Note how ``@`` - the representation of the active changenode/node
+(Note how ``@`` - the representation of the active changeset/node
 in the *working directory* - moved from ``D`` to ``B``)
 
 Now let's commit a new changeset/node::
@@ -374,7 +374,7 @@ Merging DAG Branches
 ====================
 
 Now that we have multiple DAG branches, it is sometimes desirable to
-*merge* them back into a 1. The Mercurial command for performing this
+*merge* them back into one. The Mercurial command for performing this
 action is ``hg merge``.
 
 Let's change our working directory to the changeset that we want to

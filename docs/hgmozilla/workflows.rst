@@ -160,7 +160,7 @@ label/bookmark automatically moves to the just-committed changeset.
 
 For more on bookmarks, see :ref:`hgmozilla_bookmarks`.
 
-Bookmarks users may find the ``hg bookmarks`` command useful,
+Bookmark users may find the ``hg bookmarks`` command useful,
 as it prints a concise summary of all bookmarks. This is arguably
 a better version of ``hg heads``, which we learned about above.
 However, a downside of ``hg bookmarks`` is that it only shows the
@@ -172,7 +172,7 @@ Branches
 --------
 
 Mercurial branches (not to be confused with generic *DAG branches*)
-are a more heavyweight label that can be applies to changesets.
+are a more heavyweight label that can be applied to changesets.
 Unlike bookmarks whose labels move as changesets are committed,
 branches are stored inside the changeset itself and are permanent.
 

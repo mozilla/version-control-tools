@@ -230,7 +230,7 @@ pulls more efficiently.
 Cloning from Pre-Generated Bundle Files
 ---------------------------------------
 
-Mercurial 3.6 supports transparently cloning from pre-generated bunle
+Mercurial 3.6 supports transparently cloning from pre-generated bundle
 files. When you clone from hg.mozilla.org, many of the larger
 repositories will be served from a CDN. This results in a faster
 and more reliable clone.
