@@ -22,4 +22,34 @@ $(document).on("mozreview_ready", function() {
   if (MozReview.isParent) {
     $('#review_request_extra').prepend(MRParents.parentWarning);
   }
+
+  var reviewRequest = RB.PageManager.getPage().reviewRequest;
+  RB.apiCall({
+    type: 'GET',
+    prefix: reviewRequest.get('sitePrefix'),
+    noActivityIndicator: true,
+    url: '/api/review-requests/'+reviewRequest.get('id')+'/reviews/'
+       + '?max-results=200',
+    success: function(data) {
+      console.log(data);
+      _.forEach(data.reviews, function(item) {
+        var flag = item.extra_data['p2rb.review_flag'];
+        var flagDesc = '';
+        var reviewText = $('#review'+item.id+' .body');
+        switch(flag){
+          case ' ':
+            flagDesc = 'Review flag cleared';
+            break;
+          case 'r-':
+          case 'r+':
+          case 'r?':
+            flagDesc = 'Review flag: '+flag;
+            break;
+        }
+        $(reviewText).prepend(
+          $('<h4 class="body_top">'+flagDesc+'</h4>')
+        );
+      })
+    }
+  });
 });
