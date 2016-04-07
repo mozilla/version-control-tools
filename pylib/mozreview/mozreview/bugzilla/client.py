@@ -376,6 +376,95 @@ class Bugzilla(object):
         return None
 
     @xmlrpc_to_bugzilla_errors
+    def set_review_flag(self, bug_id, flag, reviewer, rb_url, comment=None):
+        """Create, update or clear a review flag.
+
+        Does nothing if the reviewer has already set the given review flag
+        on the attachment.
+
+        Returns a boolean indicating whether we added/cleared a review flag
+        on the attachment or not.
+        """
+
+        logger.info('%s from %s on bug %d.' % (flag or 'Clearing flag',
+                                               reviewer, bug_id))
+
+        flag = flag.strip()
+
+        allowed_flags = {
+            'r+': '+',
+            'r?': '?',
+            'r-': '-',
+            '': 'X'
+        }
+        if flag not in allowed_flags:
+            logger.error('Flag change not allowed, flag must be one of '
+                         '%s.' % str(allowed_flags))
+            return False
+
+        # Convert the flag to its bugzilla-friendly version.
+        flag = allowed_flags[flag]
+
+        rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
+        if not rb_attachment:
+            logger.error('Could not find attachment for Review Board URL %s '
+                         'in bug %s.' % (rb_url, bug_id))
+            return False
+
+        flag_list = rb_attachment.get('flags', [])
+        flag_obj = {'name': 'review', 'status': flag}
+
+        # Only keep review flags.
+        review_flags = [f for f in flag_list if f['name'] == 'review']
+
+        for f in review_flags:
+            # Bugzilla attachments have a requestee only if the status is `?`.
+            # In the other cases requestee == setter.
+            if ((reviewer == f.get('requestee') and f['status'] == '?')  or
+                    (reviewer == f.get('setter') and f['status'] != '?')):
+
+                # Always clear the flag if desired status is not r+.
+                if flag == '?':
+                    flag_obj['status'] = 'X'
+
+                # Flag is already set, don't change it.
+                elif f['status'] == flag:
+                    logger.info('r%s already set.' % flag)
+                    return False
+
+                flag_obj['id'] = f['id']
+                break
+        else:
+            # The reviewer did not have a flag on the attachment.
+            if flag == 'X':
+                # This shouldn't happen under normal circumstances, but if it
+                # does log it.
+                logger.info('No flag to clear for %s on %s' % (
+                    reviewer, rb_attachment
+                ))
+                return False
+            elif flag not in ('+', '-'):
+                # If the reviewer has no +/- set and they submit a comment
+                # don't create any flag.
+                return False
+
+            # Flag not found, let's create a new one.
+            flag_obj['new'] = True
+
+        logging.info('sending flag: %s' % flag_obj)
+
+        params = self._auth_params({
+            'ids': [rb_attachment['id']],
+            'flags': [flag_obj],
+        })
+
+        if comment:
+            params['comment'] = comment
+
+        self.proxy.Bug.update_attachment(params)
+        return True
+
+    @xmlrpc_to_bugzilla_errors
     def r_plus_attachment(self, bug_id, reviewer, rb_url, comment=None):
         """Set a review flag to "+".
 
@@ -386,39 +475,7 @@ class Bugzilla(object):
         We return a boolean indicating whether we r+ed the attachment.
         """
 
-        logger.info('r+ from %s on bug %d.' % (reviewer, bug_id))
-
-        rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
-        if not rb_attachment:
-            logger.error('Could not find attachment for Review Board URL %s '
-                         'in bug %s.' % (rb_url, bug_id))
-            return False
-
-        flags = rb_attachment.get('flags', [])
-        flag = {'name': 'review', 'status': '+'}
-
-        for f in flags:
-            if f['name'] == 'review' and f.get('requestee') == reviewer:
-                flag['id'] = f['id']
-                break
-            elif (f['name'] == 'review' and f.get('setter') == reviewer and
-                  f['status'] == '+'):
-                logger.info('r+ already set.')
-                return False
-        else:
-            flag['new'] = True
-            flag['requestee'] = reviewer
-
-        params = self._auth_params({
-            'ids': [rb_attachment['id']],
-            'flags': [flag],
-        })
-
-        if comment:
-            params['comment'] = comment
-
-        self.proxy.Bug.update_attachment(params)
-        return True
+        return self.set_review_flag(bug_id, 'r+', reviewer, rb_url, comment)
 
     @xmlrpc_to_bugzilla_errors
     def cancel_review_request(self, bug_id, reviewer, rb_url, comment=None):
@@ -430,35 +487,7 @@ class Bugzilla(object):
         """
         logger.info('maybe cancelling r? from %s on bug %d.' % (reviewer,
                                                                 bug_id))
-
-        rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
-
-        if not rb_attachment:
-            return False
-
-        flags = rb_attachment.get('flags', [])
-        flag = {'name': 'review', 'status': 'X'}
-
-        for f in flags:
-            logger.info("Flag %s" % f)
-            if f['name'] == 'review' and (f.get('requestee') == reviewer or
-                                          (f.get('setter') == reviewer and
-                                           f.get('status') == '+')):
-                flag['id'] = f['id']
-                break
-        else:
-            return False
-
-        params = self._auth_params({
-            'ids': [rb_attachment['id']],
-            'flags': [flag],
-        })
-
-        if comment:
-            params['comment'] = comment
-
-        self.proxy.Bug.update_attachment(params)
-        return True
+        return self.set_review_flag(bug_id, '', reviewer, rb_url, comment)
 
     @xmlrpc_to_bugzilla_errors
     def valid_api_key(self, username, api_key):
