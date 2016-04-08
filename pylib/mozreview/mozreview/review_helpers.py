@@ -6,6 +6,7 @@ from __future__ import absolute_import, unicode_literals
 
 from reviewboard.reviews.models import ReviewRequestDraft
 
+from mozreview.extra_data import REVIEW_FLAG_KEY
 from mozreview.models import get_profile
 
 
@@ -78,21 +79,29 @@ def has_l3_shipit(review_request):
 
 def get_reviewers_status(review_request, reviewers=None):
     """Returns the latest review status for each reviewer."""
+
+    # Don't show any status on drafts.
+    if type(review_request) == ReviewRequestDraft:
+        return {}
+
     if not reviewers:
         reviewers = review_request.target_people.all()
     reviewers_status = dict()
 
     for r in reviewers:
-        reviewers_status[r.username] = {'ship_it': False}
-
-    # Don't show any status on drafts.
-    if type(review_request) == ReviewRequestDraft:
-        return reviewers_status
+        # The initial state is r?
+        reviewers_status[r.username] = {
+            'ship_it': False,
+            'review_flag': 'r?',
+        }
 
     for review in gen_latest_reviews(review_request):
-
-        if review.user.username in reviewers_status:
-            reviewers_status[review.user.username]['ship_it'] = review.ship_it
+        review_flag = review.extra_data.get(REVIEW_FLAG_KEY)
+        user = review.user.username
+        if user in reviewers_status:
+            reviewers_status[user]['ship_it'] = review.ship_it
+            if review_flag:
+                reviewers_status[user]['review_flag'] = review_flag
 
     return reviewers_status
 

@@ -85,6 +85,21 @@
           padding: 1px 5px;
           .border-radius(2px);
         }
+        &.review-pending::after {
+          content: " (r?)";
+        }
+        &.review-granted::after {
+          content: " (r+)";
+        }
+        &.review-denied::after {
+          content: " (r-)";
+        }
+        &.review-cleared{
+          color: grey;
+        }
+        &.review-cleared::after {
+          content: " (r? cleared)";
+        }
       }
     }
   }

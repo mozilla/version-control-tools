@@ -69,6 +69,7 @@
     - reviewer
     reviewers_status:
       reviewer:
+        review_flag: r?
         ship_it: false
   - summary: Bug 1 - Foo 2
     id: 3
@@ -115,6 +116,7 @@ Opening an issue should be reflected in the summary.
     - reviewer
     reviewers_status:
       reviewer:
+        review_flag: r?
         ship_it: false
   - summary: Bug 1 - Foo 2
     id: 3
@@ -150,6 +152,7 @@ Resolving an issue should decrement the issue count.
     - reviewer
     reviewers_status:
       reviewer:
+        review_flag: r?
         ship_it: false
   - summary: Bug 1 - Foo 2
     id: 3
@@ -186,6 +189,7 @@ Giving a ship-it should result in a change in the reviewer status
     - reviewer
     reviewers_status:
       reviewer:
+        review_flag: r+
         ship_it: true
   - summary: Bug 1 - Foo 2
     id: 3
@@ -222,6 +226,7 @@ Verify we can also get the summaries by bug, including closed ones.
       - reviewer
       reviewers_status:
         reviewer:
+          review_flag: r+
           ship_it: true
     - summary: Bug 1 - Foo 2
       id: 3

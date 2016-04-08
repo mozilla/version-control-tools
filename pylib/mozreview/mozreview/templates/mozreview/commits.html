@@ -58,7 +58,7 @@ This is the template for the "Commits" list in a push-based review request.
               data-id="{{child_details.get_review_request.id}}">
           {% for reviewer, status in child_details|reviewers_status %}
             {% if not forloop.first %}, {% endif %}
-            <span class="reviewer-name{% if status.ship_it %} reviewer-ship-it{% endif %}">{{ reviewer }}</span>
+            <span class="reviewer-name{% if status.ship_it %} reviewer-ship-it{% endif %} {{status.review_flag|review_flag_class}}">{{ reviewer }}</span>
           {% endfor %}
         </span>
       </td>

@@ -118,3 +118,14 @@ def userid_to_user(user_id):
         return User.objects.get(pk=user_id)
     except User.DoesNotExist:
         return 'Unknown user'
+
+
+@register.filter()
+def review_flag_class(review_flag):
+    reviewer_status_class_map = {
+        'r?': 'review-pending',
+        'r+': 'review-granted',
+        'r-': 'review-denied',
+        ' ': 'review-cleared'
+    }
+    return reviewer_status_class_map.get(review_flag)
