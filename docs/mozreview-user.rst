@@ -26,6 +26,7 @@ Please drill down into one of the following sections to continue.
    mozreview/commits
    mozreview/reviewboard
    mozreview/bugzilla
+   mozreview/autoland
 
 Filing Bugs
 ===========
