@@ -52,7 +52,7 @@ Create bug and review
   API Error: 405: 1008: Unable to continue as the review has not been approved.
   [1]
   $ exportbzauth reviewer@example.com password
-  $ rbmanage create-review 2 --body-top "Ship-it!" --public --ship-it
+  $ rbmanage create-review 2 --body-top "Ship-it!" --public --review-flag='r+'
   created review 1
 
 Check for rewrite on parent

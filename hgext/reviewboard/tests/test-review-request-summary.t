@@ -163,7 +163,7 @@ Resolving an issue should decrement the issue count.
 Giving a ship-it should result in a change in the reviewer status
 
   $ exportbzauth reviewer@example.com password1
-  $ rbmanage create-review 2 --ship-it --public
+  $ rbmanage create-review 2 --review-flag='r+' --public
   created review 2
 
   $ rbmanage dump-summary 1

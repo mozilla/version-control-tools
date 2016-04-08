@@ -413,16 +413,21 @@ class ReviewBoardCommands(object):
             help='Review content above comments')
     @CommandArgument('--public', action='store_true',
             help='Whether to make this review public')
-    @CommandArgument('--ship-it', action='store_true',
-            help='Whether to mark the review "Ship It"')
+    @CommandArgument('--review-flag', action='store',
+            help='Bugzilla-style review flag to set')
     def create_review(self, rrid, body_bottom=None, body_top=None, public=False,
-            ship_it=False):
+            review_flag=None):
         from rbtools.api.errors import APIError
         root = self._get_root()
         reviews = root.get_reviews(review_request_id=rrid)
         # rbtools will convert body_* to str() and insert "None" if we pass
         # an argument.
-        args = {'public': public, 'ship_it': ship_it}
+        args = {'public': public}
+
+        if review_flag:
+            args['ship_it'] = (review_flag == 'r+')
+            args['extra_data.p2rb.review_flag'] = review_flag
+
         if body_bottom:
             args['body_bottom'] = body_bottom
         if body_top:

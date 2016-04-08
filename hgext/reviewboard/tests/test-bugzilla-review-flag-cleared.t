@@ -188,7 +188,7 @@ Posting a non Ship It review without a review flag adds a comment
 
 Posting a Ship It review will add an r+
 
-  $ rbmanage create-review 2 --body-top LGTM --public --ship-it
+  $ rbmanage create-review 2 --body-top LGTM --public --review-flag='r+'
   created review 3
 
   $ bugzilla dump-bug 1
@@ -414,7 +414,7 @@ Sanity check to ensure we have an r? flag
 Post a Ship It review so we can carry it forward
 
   $ exportbzauth reviewer@example.com password
-  $ rbmanage create-review 4 --body-top LGTM --public --ship-it
+  $ rbmanage create-review 4 --body-top LGTM --public --review-flag='r+'
   created review 4
 
 Sanity check to ensure we have an r+ flag set

@@ -81,7 +81,7 @@ Adding a reviewer should result in a r? flag being set
 Adding a "Ship It" review will grant r+
 
   $ exportbzauth reviewer@example.com password
-  $ rbmanage create-review 2 --body-top LGTM --public --ship-it
+  $ rbmanage create-review 2 --body-top LGTM --public --review-flag='r+'
   created review 1
 
   $ bugzilla dump-bug 1
@@ -392,7 +392,7 @@ review? sticks around when 1 person grants review
   $ rbmanage publish 5
 
   $ exportbzauth reviewer@example.com password
-  $ rbmanage create-review 6 --body-top 'land it!' --public --ship-it
+  $ rbmanage create-review 6 --body-top 'land it!' --public --review-flag='r+'
   created review 3
 
   $ bugzilla dump-bug 3
@@ -472,7 +472,7 @@ Random users can come along and grant review
   $ rbmanage publish 7
 
   $ exportbzauth troll@example.com password
-  $ rbmanage create-review 8 --body-top 'I am always watching' --public --ship-it
+  $ rbmanage create-review 8 --body-top 'I am always watching' --public --review-flag='r+'
   created review 4
 
   $ bugzilla dump-bug 4
@@ -669,7 +669,7 @@ Test interaction with multiple commits.
 
 Verify that a single ship-it r+s only that attachment.
 
-  $ rbmanage create-review 11 --body-top 'land it!' --public --ship-it
+  $ rbmanage create-review 11 --body-top 'land it!' --public --review-flag='r+'
   created review 5
 
   $ bugzilla dump-bug 5
@@ -791,7 +791,7 @@ Verify that a single ship-it r+s only that attachment.
 
 Ship-it reviews are not allowed on the parent.
 
-  $ rbmanage create-review 9 --body-top 'all good!' --public --ship-it
+  $ rbmanage create-review 9 --body-top 'all good!' --public --review-flag='r+'
   API Error: 500: 225: Error publishing: "Ship it" reviews on parent review requests are not allowed.  Please review individual commits.
   [1]
 

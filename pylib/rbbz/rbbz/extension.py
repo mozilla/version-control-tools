@@ -25,6 +25,7 @@ from mozreview.errors import (
 from mozreview.extra_data import (
     is_parent,
     is_pushed,
+    REVIEW_FLAG_KEY
 )
 from mozreview.models import (
     get_bugzilla_api_key,
@@ -101,9 +102,10 @@ def on_review_publishing(user, review, **kwargs):
     # now because we have to potentially mix changing and creating flags.
 
     if is_parent(review_request):
-        # Mirror the comment to the bug, unless it's a ship-it, in which
-        # case throw an error.  Ship-its are allowed only on child commits.
-        if review.ship_it:
+        # Mirror the comment to the bug, unless it's a ship-it or the review
+        # flag was set, in which case throw an error.
+        # Ship-its and review flags are allowed only on child commits.
+        if review.ship_it or review.extra_data.get(REVIEW_FLAG_KEY):
             raise ParentShipItError
 
         [b.post_comment(int(bug_id), comment) for bug_id in
@@ -112,12 +114,23 @@ def on_review_publishing(user, review, **kwargs):
         diff_url = '%sdiff/#index_header' % get_obj_url(review_request)
         bug_id = int(review_request.get_bug_list()[0])
 
-        if review.ship_it:
-            commented = b.r_plus_attachment(bug_id, review.user.email,
-                                            diff_url, comment)
+        commented = False
+        flag = review.extra_data.get(REVIEW_FLAG_KEY)
+
+        if flag is not None:
+            commented = b.set_review_flag(bug_id, flag, review.user.email,
+                                              diff_url, comment)
         else:
-            commented = b.cancel_review_request(bug_id, review.user.email,
+            # If for some reasons we don't have the flag set in extra_data,
+            # fall back to ship_it
+            logger.warning('Review flag not set on review %s, '
+                           'updating attachment based on ship_it' % review.id)
+            if review.ship_it:
+                commented = b.r_plus_attachment(bug_id, review.user.email,
                                                 diff_url, comment)
+            else:
+                commented = b.cancel_review_request(bug_id, review.user.email,
+                                                    diff_url, comment)
 
         if comment and not commented:
             b.post_comment(bug_id, comment)

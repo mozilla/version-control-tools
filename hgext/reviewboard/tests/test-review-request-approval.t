@@ -85,7 +85,7 @@ Create a review request from an L1 user
 Have an L1 user provide a ship it review which should not grant approval
 
   $ exportbzauth l1b@example.com password
-  $ rbmanage create-review 2 --body-top "Ship-it!" --public --ship-it
+  $ rbmanage create-review 2 --body-top "Ship-it!" --public --review-flag='r+'
   created review 1
   $ rbmanage dumpreview 2
   id: 2
@@ -133,6 +133,8 @@ Have an L1 user provide a ship it review which should not grant approval
   - id: 1
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
@@ -140,7 +142,7 @@ Have an L1 user provide a ship it review which should not grant approval
 Have an L3 user provide a ship it review which should grant approval
 
   $ exportbzauth l3@example.com password
-  $ rbmanage create-review 2 --body-top "Ship-it!" --public --ship-it
+  $ rbmanage create-review 2 --body-top "Ship-it!" --public --review-flag='r+'
   created review 2
   $ rbmanage dumpreview 2
   id: 2
@@ -188,12 +190,16 @@ Have an L3 user provide a ship it review which should grant approval
   - id: 1
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 2
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
@@ -247,25 +253,31 @@ Posting a new review without ship it should cancel the previous approval
   - id: 1
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 2
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 3
     public: true
     ship_it: false
+    extra_data:
+      p2rb.review_flag: ' '
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
 
 One more ship it should switch it back to approved
 
-  $ rbmanage create-review 2 --body-top "NVM, Ship-it!" --public --ship-it
+  $ rbmanage create-review 2 --body-top "NVM, Ship-it!" --public --review-flag='r+'
   created review 4
   $ rbmanage dumpreview 2
   id: 2
@@ -313,24 +325,32 @@ One more ship it should switch it back to approved
   - id: 1
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 2
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 3
     public: true
     ship_it: false
+    extra_data:
+      p2rb.review_flag: ' '
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
   - id: 4
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: NVM, Ship-it!
     body_top_text_type: plain
     diff_comments: []
@@ -400,31 +420,39 @@ Even though the author is L1, adding a new diff will not cancel approval
   - id: 1
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 2
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 3
     public: true
     ship_it: false
+    extra_data:
+      p2rb.review_flag: ' '
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
   - id: 4
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: NVM, Ship-it!
     body_top_text_type: plain
     diff_comments: []
 
 A new ship-it from L3 should give approval
 
-  $ rbmanage create-review 2 --body-top "Update looks good!" --public --ship-it
+  $ rbmanage create-review 2 --body-top "Update looks good!" --public --review-flag='r+'
   created review 5
   $ rbmanage dumpreview 2
   id: 2
@@ -485,30 +513,40 @@ A new ship-it from L3 should give approval
   - id: 1
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 2
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 3
     public: true
     ship_it: false
+    extra_data:
+      p2rb.review_flag: ' '
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
   - id: 4
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: NVM, Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 5
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Update looks good!
     body_top_text_type: plain
     diff_comments: []
@@ -581,36 +619,48 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
   - id: 1
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 2
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 3
     public: true
     ship_it: false
+    extra_data:
+      p2rb.review_flag: ' '
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
   - id: 4
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: NVM, Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 5
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Update looks good!
     body_top_text_type: plain
     diff_comments: []
   - id: 6
     public: true
     ship_it: false
+    extra_data:
+      p2rb.review_flag: ' '
     body_top: I found issues
     body_top_text_type: plain
     diff_comments:
@@ -690,36 +740,48 @@ Fixing the issue should restore approval
   - id: 1
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 2
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 3
     public: true
     ship_it: false
+    extra_data:
+      p2rb.review_flag: ' '
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
   - id: 4
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: NVM, Ship-it!
     body_top_text_type: plain
     diff_comments: []
   - id: 5
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Update looks good!
     body_top_text_type: plain
     diff_comments: []
   - id: 6
     public: true
     ship_it: false
+    extra_data:
+      p2rb.review_flag: ' '
     body_top: I found issues
     body_top_text_type: plain
     diff_comments:
@@ -793,7 +855,7 @@ Review requests created by L3 users
 Even a ship-it from an L1 user will give approval to an L3 author
 
   $ exportbzauth l1a@example.com password
-  $ rbmanage create-review 4 --body-top "Ship-it!" --public --ship-it
+  $ rbmanage create-review 4 --body-top "Ship-it!" --public --review-flag='r+'
   created review 7
   $ rbmanage dumpreview 4
   id: 4
@@ -841,6 +903,8 @@ Even a ship-it from an L1 user will give approval to an L3 author
   - id: 7
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []
@@ -912,6 +976,8 @@ ship-its. Posting a new diff should not clear approval
   - id: 7
     public: true
     ship_it: true
+    extra_data:
+      p2rb.review_flag: r+
     body_top: Ship-it!
     body_top_text_type: plain
     diff_comments: []

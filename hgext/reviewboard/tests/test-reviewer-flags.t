@@ -54,7 +54,7 @@ a shipit.
 There are no warnings for reviewers who haved granted a ship-it when using r=
 
   $ exportbzauth cthulhu@example.com password
-  $ rbmanage create-review 2 --body-top "Ship-it!" --public --ship-it
+  $ rbmanage create-review 2 --body-top "Ship-it!" --public --review-flag='r+'
   created review 1
   $ exportbzauth default@example.com password
   $ echo foo >> foo

@@ -20,6 +20,7 @@ MOZREVIEW_KEY = 'p2rb'
 
 # Built-in extra_data keys:
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
+REVIEW_FLAG_KEY = MOZREVIEW_KEY + '.review_flag'
 
 # CommitData field keys:
 AUTHOR_KEY = MOZREVIEW_KEY + '.author'

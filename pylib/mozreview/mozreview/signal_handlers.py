@@ -7,6 +7,7 @@ import logging
 from django.db.models.signals import (
     post_save,
     pre_delete,
+    pre_save,
 )
 
 from djblets.siteconfig.models import (
@@ -19,6 +20,7 @@ from reviewboard.extensions.hooks import (
     SignalHook,
 )
 from reviewboard.reviews.models import (
+    Review,
     ReviewRequest,
     ReviewRequestDraft,
 )
@@ -56,6 +58,7 @@ from mozreview.extra_data import (
     is_parent,
     is_pushed,
     REVIEWID_RE,
+    REVIEW_FLAG_KEY,
     UNPUBLISHED_KEY,
     update_parent_rr_reviewers,
 )
@@ -123,6 +126,12 @@ def initialize_signal_handlers(extension):
         review_request_publishing,
         on_review_request_publishing,
         sandbox_errors=False)
+
+    SignalHook(
+        extension,
+        pre_save,
+        pre_save_review,
+        sender=Review)
 
 
 def post_save_review_request_draft(sender, **kwargs):
@@ -544,3 +553,24 @@ def _close_child_review_requests(user, review_request, status,
     commit_data.extra_data[UNPUBLISHED_KEY] = '[]'
     commit_data.extra_data[DISCARD_ON_PUBLISH_KEY] = '[]'
     commit_data.save(update_fields=['extra_data'])
+
+
+def pre_save_review(sender, *args, **kwargs):
+    """Handle pre_save for a Review.
+
+    This is needed to give a default value to the REVIEW_FLAG_KEY
+    extra_data key.
+    """
+    review = kwargs["instance"]
+
+    if (REVIEW_FLAG_KEY not in review.extra_data and
+            not is_parent(review.review_request)):
+        if review.pk:
+            # The review create endpoint calls save twice: the first time it
+            # gets or creates the review and the second time it updates the
+            # object retrieved/created. This condition let us execute the code
+            # below only when all the fields are set.
+            if review.ship_it:
+                review.extra_data[REVIEW_FLAG_KEY] = 'r+'
+            else:
+                review.extra_data[REVIEW_FLAG_KEY] = ' '
