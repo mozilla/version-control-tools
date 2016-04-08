@@ -72,7 +72,7 @@ Sanity check to ensure we have a review flag set
     status: UNCONFIRMED
     summary: First Bug
 
-Publishing a review will clear the r? flag
+Publishing a non-'clear-the-flag' review will not clear the r? flag
 
   $ exportbzauth reviewer@example.com password
   $ rbmanage create-review 2 --body-top 'I have reservations' --public
@@ -86,7 +86,12 @@ Publishing a review will clear the r? flag
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
-      flags: []
+      flags:
+      - id: 1
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
       id: 1
       is_obsolete: false
       is_patch: false
@@ -112,9 +117,6 @@ Publishing a review will clear the r? flag
       id: 3
       tags: []
       text:
-      - Comment on attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
-      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
@@ -126,7 +128,7 @@ Publishing a review will clear the r? flag
     status: UNCONFIRMED
     summary: First Bug
 
-Posting a non Ship It review without a review flag adds a comment
+Posting an r? review with a comment only adds a comment
 
   $ rbmanage create-review 2 --body-top 'One more thing...' --public
   created review 2
@@ -139,7 +141,12 @@ Posting a non Ship It review without a review flag adds a comment
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
-      flags: []
+      flags:
+      - id: 1
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
       id: 1
       is_obsolete: false
       is_patch: false
@@ -165,9 +172,6 @@ Posting a non Ship It review without a review flag adds a comment
       id: 3
       tags: []
       text:
-      - Comment on attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
-      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
@@ -186,7 +190,7 @@ Posting a non Ship It review without a review flag adds a comment
     status: UNCONFIRMED
     summary: First Bug
 
-Posting a Ship It review will add an r+
+Posting a r+ review will add a '+' review flag
 
   $ rbmanage create-review 2 --body-top LGTM --public --review-flag='r+'
   created review 3
@@ -200,7 +204,7 @@ Posting a Ship It review will add an r+
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
-      - id: 2
+      - id: 1
         name: review
         requestee: null
         setter: reviewer@example.com
@@ -230,9 +234,6 @@ Posting a Ship It review will add an r+
       id: 3
       tags: []
       text:
-      - Comment on attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
-      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
@@ -278,7 +279,7 @@ Updating the review request as an L1 author will not re-request review
       description: 'MozReview Request: Bug 1 - Initial commit to review'
       file_name: reviewboard-2-url.txt
       flags:
-      - id: 2
+      - id: 1
         name: review
         requestee: null
         setter: reviewer@example.com
@@ -308,9 +309,6 @@ Updating the review request as an L1 author will not re-request review
       id: 3
       tags: []
       text:
-      - Comment on attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
-      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
@@ -377,7 +375,7 @@ Sanity check to ensure we have an r? flag
       description: 'MozReview Request: Bug 2 - Initial commit to review'
       file_name: reviewboard-4-url.txt
       flags:
-      - id: 3
+      - id: 2
         name: review
         requestee: reviewer@example.com
         setter: l3author@example.com
@@ -428,7 +426,7 @@ Sanity check to ensure we have an r+ flag set
       description: 'MozReview Request: Bug 2 - Initial commit to review'
       file_name: reviewboard-4-url.txt
       flags:
-      - id: 3
+      - id: 2
         name: review
         requestee: null
         setter: reviewer@example.com
@@ -493,7 +491,7 @@ We should have an r+ flag already set.
       description: 'MozReview Request: Bug 2 - Modified commit to review'
       file_name: reviewboard-4-url.txt
       flags:
-      - id: 3
+      - id: 2
         name: review
         requestee: null
         setter: reviewer@example.com
@@ -537,6 +535,86 @@ We should have an r+ flag already set.
       - 'MozReview Request: Bug 2 - Modified commit to review'
       - ''
       - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/1-2/'
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
+    summary: Second Bug
+
+Posting a r- review will add a '-' review flag
+
+  $ rbmanage create-review 4 --body-top 'I changed my mind' --public --review-flag='r-'
+  created review 5
+  $ bugzilla dump-bug 2
+  Bug 2:
+    attachments:
+    - attacher: l3author@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
+      description: 'MozReview Request: Bug 2 - Modified commit to review'
+      file_name: reviewboard-4-url.txt
+      flags:
+      - id: 2
+        name: review
+        requestee: null
+        setter: reviewer@example.com
+        status: +
+      - id: 3
+        name: review
+        requestee: null
+        setter: l3author@example.com
+        status: '-'
+      id: 2
+      is_obsolete: false
+      is_patch: false
+      summary: 'MozReview Request: Bug 2 - Modified commit to review'
+    blocks: []
+    cc:
+    - reviewer@example.com
+    comments:
+    - author: l3author@example.com
+      id: 7
+      tags: []
+      text: ''
+    - author: l3author@example.com
+      id: 8
+      tags: []
+      text:
+      - Created attachment 2
+      - 'MozReview Request: Bug 2 - Modified commit to review'
+      - ''
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
+    - author: reviewer@example.com
+      id: 9
+      tags: []
+      text:
+      - Comment on attachment 2
+      - 'MozReview Request: Bug 2 - Modified commit to review'
+      - ''
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/4/#review4
+      - ''
+      - LGTM
+    - author: l3author@example.com
+      id: 10
+      tags: []
+      text:
+      - Comment on attachment 2
+      - 'MozReview Request: Bug 2 - Modified commit to review'
+      - ''
+      - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/1-2/'
+    - author: l3author@example.com
+      id: 11
+      tags: []
+      text:
+      - Comment on attachment 2
+      - 'MozReview Request: Bug 2 - Modified commit to review'
+      - ''
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/4/#review5
+      - ''
+      - I changed my mind
     component: TestComponent
     depends_on: []
     platform: All

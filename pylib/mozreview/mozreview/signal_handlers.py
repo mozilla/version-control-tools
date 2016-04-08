@@ -570,7 +570,4 @@ def pre_save_review(sender, *args, **kwargs):
             # gets or creates the review and the second time it updates the
             # object retrieved/created. This condition let us execute the code
             # below only when all the fields are set.
-            if review.ship_it:
-                review.extra_data[REVIEW_FLAG_KEY] = 'r+'
-            else:
-                review.extra_data[REVIEW_FLAG_KEY] = ' '
+            review.extra_data[REVIEW_FLAG_KEY] = 'r?'

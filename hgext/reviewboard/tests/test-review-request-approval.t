@@ -82,7 +82,7 @@ Create a review request from an L1 user
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
-Have an L1 user provide a ship it review which should not grant approval
+Have an L1 user provide a r+ review which should not grant approval
 
   $ exportbzauth l1b@example.com password
   $ rbmanage create-review 2 --body-top "Ship-it!" --public --review-flag='r+'
@@ -139,7 +139,7 @@ Have an L1 user provide a ship it review which should not grant approval
     body_top_text_type: plain
     diff_comments: []
 
-Have an L3 user provide a ship it review which should grant approval
+Have an L3 user provide a r+ review which should grant approval
 
   $ exportbzauth l3@example.com password
   $ rbmanage create-review 2 --body-top "Ship-it!" --public --review-flag='r+'
@@ -204,7 +204,7 @@ Have an L3 user provide a ship it review which should grant approval
     body_top_text_type: plain
     diff_comments: []
 
-Posting a new review without ship it should cancel the previous approval
+Posting a new review without r+ should cancel the previous approval
   $ rbmanage create-review 2 --body-top "Don't Land it!" --public
   created review 3
   $ rbmanage dumpreview 2
@@ -270,12 +270,12 @@ Posting a new review without ship it should cancel the previous approval
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: ' '
+      p2rb.review_flag: r?
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
 
-One more ship it should switch it back to approved
+One more r+ should switch it back to approved
 
   $ rbmanage create-review 2 --body-top "NVM, Ship-it!" --public --review-flag='r+'
   created review 4
@@ -342,7 +342,7 @@ One more ship it should switch it back to approved
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: ' '
+      p2rb.review_flag: r?
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
@@ -437,7 +437,7 @@ Even though the author is L1, adding a new diff will not cancel approval
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: ' '
+      p2rb.review_flag: r?
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
@@ -450,7 +450,7 @@ Even though the author is L1, adding a new diff will not cancel approval
     body_top_text_type: plain
     diff_comments: []
 
-A new ship-it from L3 should give approval
+A new r+ from L3 should give approval
 
   $ rbmanage create-review 2 --body-top "Update looks good!" --public --review-flag='r+'
   created review 5
@@ -530,7 +530,7 @@ A new ship-it from L3 should give approval
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: ' '
+      p2rb.review_flag: r?
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
@@ -636,7 +636,7 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: ' '
+      p2rb.review_flag: r?
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
@@ -660,7 +660,7 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: ' '
+      p2rb.review_flag: r?
     body_top: I found issues
     body_top_text_type: plain
     diff_comments:
@@ -757,7 +757,7 @@ Fixing the issue should restore approval
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: ' '
+      p2rb.review_flag: r?
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
@@ -781,7 +781,7 @@ Fixing the issue should restore approval
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: ' '
+      p2rb.review_flag: r?
     body_top: I found issues
     body_top_text_type: plain
     diff_comments:

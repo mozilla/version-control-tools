@@ -78,7 +78,7 @@ Adding a reviewer should result in a r? flag being set
     status: UNCONFIRMED
     summary: First Bug
 
-Adding a "Ship It" review will grant r+
+Adding a r+ review will grant a '+' review flag on bugzilla
 
   $ exportbzauth reviewer@example.com password
   $ rbmanage create-review 2 --body-top LGTM --public --review-flag='r+'
@@ -667,7 +667,7 @@ Test interaction with multiple commits.
 
   $ exportbzauth reviewer@example.com password
 
-Verify that a single ship-it r+s only that attachment.
+Verify that a single r+ affects only that attachment.
 
   $ rbmanage create-review 11 --body-top 'land it!' --public --review-flag='r+'
   created review 5
@@ -789,13 +789,13 @@ Verify that a single ship-it r+s only that attachment.
     status: UNCONFIRMED
     summary: Parent Reviews
 
-Ship-it reviews are not allowed on the parent.
+r+ reviews are not allowed on the parent.
 
   $ rbmanage create-review 9 --body-top 'all good!' --public --review-flag='r+'
   API Error: 500: 225: Error publishing: "Ship it" reviews on parent review requests are not allowed.  Please review individual commits.
   [1]
 
-A non-ship-it review on a child should clear only that attachment's r+.
+A non 'clear flag' review shouldn't clear the attachment's review flag.
 
   $ rbmanage create-review 11 --body-top 'there is a problem' --public
   created review 7
@@ -833,6 +833,11 @@ A non-ship-it review on a child should clear only that attachment's r+.
         name: review
         requestee: reviewer2@example.com
         setter: author@example.com
+        status: '?'
+      - id: 11
+        name: review
+        requestee: reviewer@example.com
+        setter: reviewer@example.com
         status: '?'
       id: 6
       is_obsolete: false
@@ -922,10 +927,10 @@ A non-ship-it review on a child should clear only that attachment's r+.
     status: UNCONFIRMED
     summary: Parent Reviews
 
-A non-ship-it review on a child should also clear the attachment's r?.
+A 'clear flag' review on a child should also clear the attachment's r?.
 
   $ exportbzauth reviewer2@example.com password
-  $ rbmanage create-review 10 --body-top 'this is not good' --public
+  $ rbmanage create-review 10 --body-top 'this is not good' --public --review-flag=' '
   created review 8
 
   $ bugzilla dump-bug 5
@@ -956,6 +961,11 @@ A non-ship-it review on a child should also clear the attachment's r?.
         name: review
         requestee: reviewer2@example.com
         setter: author@example.com
+        status: '?'
+      - id: 11
+        name: review
+        requestee: reviewer@example.com
+        setter: reviewer@example.com
         status: '?'
       id: 6
       is_obsolete: false
@@ -1055,7 +1065,7 @@ A non-ship-it review on a child should also clear the attachment's r?.
     status: UNCONFIRMED
     summary: Parent Reviews
 
-A non-ship-it review on a parent should post a comment only.
+A non-r+ review on a parent should post a comment only.
 
   $ exportbzauth reviewer2@example.com password
   $ rbmanage create-review 9 --body-top 'actually none of this is good' --public
@@ -1089,6 +1099,11 @@ A non-ship-it review on a parent should post a comment only.
         name: review
         requestee: reviewer2@example.com
         setter: author@example.com
+        status: '?'
+      - id: 11
+        name: review
+        requestee: reviewer@example.com
+        setter: reviewer@example.com
         status: '?'
       id: 6
       is_obsolete: false

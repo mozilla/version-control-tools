@@ -423,12 +423,8 @@ class Bugzilla(object):
             if ((reviewer == f.get('requestee') and f['status'] == '?')  or
                     (reviewer == f.get('setter') and f['status'] != '?')):
 
-                # Always clear the flag if desired status is not r+.
-                if flag == '?':
-                    flag_obj['status'] = 'X'
-
                 # Flag is already set, don't change it.
-                elif f['status'] == flag:
+                if f['status'] == flag:
                     logger.info('r%s already set.' % flag)
                     return False
 
@@ -443,13 +439,14 @@ class Bugzilla(object):
                     reviewer, rb_attachment
                 ))
                 return False
-            elif flag not in ('+', '-'):
-                # If the reviewer has no +/- set and they submit a comment
-                # don't create any flag.
-                return False
 
             # Flag not found, let's create a new one.
             flag_obj['new'] = True
+
+        # If the reviewer is setting the flag back to ?,
+        # they will then be both the setter and the requestee
+        if flag == '?':
+            flag_obj['requestee'] = reviewer
 
         logging.info('sending flag: %s' % flag_obj)
 
