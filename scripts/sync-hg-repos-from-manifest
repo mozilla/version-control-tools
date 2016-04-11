@@ -55,7 +55,9 @@ def clone_or_pull(rel, path, requires, url, user, group):
             print('creating empty repo: %s' % path)
             subprocess.check_output(args, cwd='/', stderr=subprocess.STDOUT)
 
-        args = [HG, '-R', path, 'pull', url]
+        # Disable clonebundles to ensure the client doesn't use stream clone and
+        # recreates the store and revlogs from scratch.
+        args = [HG, '--config', 'ui.clonebundles=false', '-R', path, 'pull', url]
         subprocess.check_output(args, cwd='/', stderr=subprocess.STDOUT)
 
         # Synchronize hgrc file via mirror-pull.
