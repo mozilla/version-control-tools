@@ -205,10 +205,6 @@
 - name: install httpd.conf file
   template: src=httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
 
-# Install the vhost.conf file for hg.mozilla.org
-- name: install vhost config
-  template: src=vhost.conf.j2 dest=/etc/httpd/conf.d/hg-vhost.conf
-
 - name: directory for httpd logs
   file: path=/var/log/httpd/hg.mozilla.org
         state=directory

@@ -57,8 +57,6 @@ LoadModule version_module modules/mod_version.so
 
 LoadModule wsgi_module /var/hg/venv_hgweb/lib/python2.7/site-packages/mod_wsgi/server/mod_wsgi-py27.so
 
-Include conf.d/*.conf
-
 ExtendedStatus On
 
 User apache
@@ -227,3 +225,6 @@ BrowserMatch "^WebDAVFS/1.[0123]" redirect-carefully
 BrowserMatch "^gnome-vfs/1.0" redirect-carefully
 BrowserMatch "^XML Spy" redirect-carefully
 BrowserMatch "^Dreamweaver-WebDAV-SCM1" redirect-carefully
+
+# Include the hg.mozilla.org vhost template.
+{% include 'vhost.conf.j2' %}
