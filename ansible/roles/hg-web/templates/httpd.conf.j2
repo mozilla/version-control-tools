@@ -71,7 +71,6 @@ LoadModule proxy_connect_module modules/mod_proxy_connect.so
 LoadModule cache_module modules/mod_cache.so
 LoadModule suexec_module modules/mod_suexec.so
 LoadModule disk_cache_module modules/mod_disk_cache.so
-LoadModule cgi_module modules/mod_cgi.so
 LoadModule version_module modules/mod_version.so
 
 Include conf.d/*.conf
@@ -136,16 +135,6 @@ Alias /icons/ "/var/www/icons/"
 <Directory "/var/www/icons">
     Options Indexes MultiViews FollowSymLinks
     AllowOverride None
-    Order allow,deny
-    Allow from all
-</Directory>
-
-
-ScriptAlias /cgi-bin/ "/var/www/cgi-bin/"
-
-<Directory "/var/www/cgi-bin">
-    AllowOverride None
-    Options None
     Order allow,deny
     Allow from all
 </Directory>
