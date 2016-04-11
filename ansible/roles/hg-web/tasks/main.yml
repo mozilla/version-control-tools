@@ -209,10 +209,6 @@
 - name: install vhost config
   template: src=vhost.conf.j2 dest=/etc/httpd/conf.d/hg-vhost.conf
 
-# Install and manage the mod_wsgi config file
-- name: install wsgi config
-  copy: content="LoadModule wsgi_module /var/hg/venv_hgweb/lib/python2.7/site-packages/mod_wsgi/server/mod_wsgi-py27.so" dest=/etc/httpd/conf.d/wsgi.conf
-
 - name: directory for httpd logs
   file: path=/var/log/httpd/hg.mozilla.org
         state=directory
