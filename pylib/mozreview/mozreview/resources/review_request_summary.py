@@ -204,6 +204,7 @@ class ReviewRequestSummaryResource(WebAPIResource):
 
         {
             'commit': 'ece2029d013af68f9f32aa0a6199fcb2201d5aae',
+            'has_draft': False,
             'id': 3,
             'issue_open_count': 0,
             'last_updated': '2015-04-13T18:58:25Z',
@@ -253,6 +254,8 @@ class ReviewRequestSummaryResource(WebAPIResource):
 
         if commit:
             d['commit'] = commit
+
+        d['has_draft'] = review_request.get_draft() is not None
 
         return d
 

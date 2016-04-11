@@ -56,6 +56,7 @@
     submitter: default+5
     issue_open_count: 0
     status: pending
+    has_draft: false
     reviewers:
     - reviewer
   children:
@@ -65,6 +66,7 @@
     submitter: default+5
     issue_open_count: 0
     status: pending
+    has_draft: false
     reviewers:
     - reviewer
     reviewers_status:
@@ -77,6 +79,7 @@
     submitter: default+5
     issue_open_count: 0
     status: pending
+    has_draft: false
     reviewers: []
     reviewers_status: {}
 
@@ -103,6 +106,7 @@ Opening an issue should be reflected in the summary.
     submitter: default+5
     issue_open_count: 0
     status: pending
+    has_draft: false
     reviewers:
     - reviewer
   children:
@@ -112,6 +116,7 @@ Opening an issue should be reflected in the summary.
     submitter: default+5
     issue_open_count: 1
     status: pending
+    has_draft: false
     reviewers:
     - reviewer
     reviewers_status:
@@ -124,6 +129,7 @@ Opening an issue should be reflected in the summary.
     submitter: default+5
     issue_open_count: 0
     status: pending
+    has_draft: false
     reviewers: []
     reviewers_status: {}
 
@@ -139,6 +145,7 @@ Resolving an issue should decrement the issue count.
     submitter: default+5
     issue_open_count: 0
     status: pending
+    has_draft: false
     reviewers:
     - reviewer
   children:
@@ -148,6 +155,7 @@ Resolving an issue should decrement the issue count.
     submitter: default+5
     issue_open_count: 0
     status: pending
+    has_draft: false
     reviewers:
     - reviewer
     reviewers_status:
@@ -160,6 +168,7 @@ Resolving an issue should decrement the issue count.
     submitter: default+5
     issue_open_count: 0
     status: pending
+    has_draft: false
     reviewers: []
     reviewers_status: {}
 
@@ -176,6 +185,7 @@ Giving a ship-it should result in a change in the reviewer status
     submitter: default+5
     issue_open_count: 0
     status: pending
+    has_draft: false
     reviewers:
     - reviewer
   children:
@@ -185,6 +195,7 @@ Giving a ship-it should result in a change in the reviewer status
     submitter: default+5
     issue_open_count: 0
     status: pending
+    has_draft: false
     reviewers:
     - reviewer
     reviewers_status:
@@ -197,6 +208,7 @@ Giving a ship-it should result in a change in the reviewer status
     submitter: default+5
     issue_open_count: 0
     status: pending
+    has_draft: false
     reviewers: []
     reviewers_status: {}
 
@@ -213,6 +225,7 @@ Verify we can also get the summaries by bug, including closed ones.
       submitter: default+5
       issue_open_count: 0
       status: pending
+      has_draft: false
       reviewers:
       - reviewer
     children:
@@ -222,6 +235,7 @@ Verify we can also get the summaries by bug, including closed ones.
       submitter: default+5
       issue_open_count: 0
       status: submitted
+      has_draft: false
       reviewers:
       - reviewer
       reviewers_status:
@@ -234,6 +248,7 @@ Verify we can also get the summaries by bug, including closed ones.
       submitter: default+5
       issue_open_count: 0
       status: pending
+      has_draft: false
       reviewers: []
       reviewers_status: {}
 

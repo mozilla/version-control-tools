@@ -149,7 +149,8 @@ def short_review_request_dict(rr):
     d = OrderedDict()
     d['summary'] = _serialize_text(rr['summary'])
 
-    for k in ('id', 'commit', 'submitter', 'issue_open_count', 'status'):
+    for k in ('id', 'commit', 'submitter', 'issue_open_count', 'status',
+              'has_draft'):
         if k in rr:
             d[k] = rr[k]
 
@@ -669,7 +670,7 @@ class ReviewBoardCommands(object):
                            '/summary/%s/' % rrid)
         except APIError as e:
             print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
-                e.rsp['err']['msg']))
+                  e.rsp['err']['msg']))
             return 1
 
         d = OrderedDict()
