@@ -81,6 +81,4 @@ with open('/home/hg/.ssh/known_hosts', 'wb') as fh:
 
 subprocess.check_call(['/entrypoint-kafkabroker'])
 
-subprocess.check_call(['/sbin/service', 'rsyslog', 'start'])
-
 os.execl(sys.argv[1], *sys.argv[1:])
