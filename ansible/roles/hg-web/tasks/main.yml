@@ -23,6 +23,7 @@
     # system Python.
     - python27
     - python27-devel
+    - rsync
     # Needed for hg user to execute mozbuild-eval as root.
     - rsyslog
     - sudo
