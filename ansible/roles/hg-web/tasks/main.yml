@@ -398,7 +398,7 @@
   when: vct_dir.stat.exists == False
 
 - name: synchronize hg templates
-  synchronize: src={{ vct }}/hgtemplates/ dest=/repo/hg/hg_templates/ recursive=yes delete=yes
+  command: /usr/bin/rsync -a --delete-after /var/hg/version-control-tools/hgtemplates/ /repo/hg/hg_templates/
 
 - name: advertise current v-c-t changeset in hgweb
   replace: dest=/repo/hg/hg_templates/gitweb_mozilla/footer.tmpl
