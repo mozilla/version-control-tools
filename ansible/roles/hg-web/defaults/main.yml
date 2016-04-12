@@ -13,3 +13,7 @@ mirror_ssh_user: vcs-sync@mozilla.com
 mirror_ips: []
 mirror_host_key: "undefined"
 mirror_private_key: "undefined"
+
+# Assume the chroot files aren't available unless told otherwise (since
+# it is uncommon to deploy them).
+chroot_mozbuild_exists: False

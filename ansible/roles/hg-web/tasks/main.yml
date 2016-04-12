@@ -372,17 +372,12 @@
   with_items:
     - /repo/hg/chroot_mozbuild
 
-- name: check if chroot is available
-  stat: path={{ vct }}/chroot_mozbuild/chroot.tar.gz
-  register: chroot_mozbuild
-  delegate_to: 127.0.0.1
-
 # Files dropped from the chroot will still exist. This shouldn't be
 # problematic. Ignore it until it becomes a problem.
 - name: upload and extract chroot archive
   unarchive: src={{ vct }}/chroot_mozbuild/chroot.tar.gz
              dest=/repo/hg/chroot_mozbuild
-  when: chroot_mozbuild.stat.exists
+  when: chroot_mozbuild_exists
 
 # It is important for this binary to be located *outside* the chroot
 # because if code inside the chroot is able to modify the binary, it
@@ -393,7 +388,7 @@
         owner=root
         group=root
         mode=0755
-  when: chroot_mozbuild.stat.exists
+  when: chroot_mozbuild_exists
 
 - name: install sudoers policy for mozbuild-eval
   copy: src=sudoers-mozbuild-eval
