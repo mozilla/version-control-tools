@@ -4,7 +4,7 @@
 
 # Builds a Python chroot suitable for hgweb.
 
-FROM secure:mozsecure:centos6:sha256 88cc1475bd58f6ff6f41d50b813c9998c4d3a7167a8a45f8bd0b4a8342dec0db:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-6-20150615_2019-docker.tar.xz
+FROM secure:mozsecure:centos7:sha256 e1bf9ab86e38f94acae9f84fa3b63c349f4eb0be3f29e92da0eb382e43626f8c:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-7-20160329-docker.tar.xz
 
 RUN yum update -y
 
@@ -52,7 +52,9 @@ RUN cp \
        /lib64/libkeyutils.so.1 \
        /lib64/libkrb5.so.3 \
        /lib64/libkrb5support.so.0 \
+       /lib64/liblzma.so.5 \
        /lib64/libm.so.6 \
+       /lib64/libpcre.so.1 \
        /lib64/libpthread.so.0 \
        /lib64/libresolv.so.2 \
        /lib64/libselinux.so.1 \
