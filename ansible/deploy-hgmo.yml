@@ -55,7 +55,7 @@
         # hg-zlb.vips.scl3.mozilla.com resolves to multiple IPs.
         mirror_ips: ["63.245.215.25", "63.245.215.102"],
         vct_node: "{{ lookup('file', '../.vctnode') }}",
-        chroot_mozbuild_exists: chroot_mozbuild.stat.exists,
+        chroot_mozbuild_exists: "{{ hostvars['localhost'].chroot_mozbuild.stat.exists }}",
       }
 
 - hosts: hgssh-prod
