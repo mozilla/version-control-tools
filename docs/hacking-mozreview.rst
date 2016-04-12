@@ -39,7 +39,7 @@ from your machine. This will give you an environment that should behave
 like production.
 
 You will need Docker installed. On Linux, this is generally as simple
-as installing the required package, e.g., on Ubuntu,
+as installing the required package, e.g., on Ubuntu::
 
   $ sudo apt-get install docker.io
 
@@ -49,7 +49,7 @@ On Linux, it is necessary to configure Docker to listen on a tcp socket
 rather than the default configuration, which uses an unix domain socket,
 in order to get test results which match the expected results. This can be
 done by editing your configuration file to start docker with the following
-option:
+option::
 
   -H tcp://127.0.0.1:4243
 
@@ -59,7 +59,7 @@ the official `installation instructions
 more than the default 1024 MB of RAM, which is insufficient for a
 local MozReview installation, given the number of containers that are
 created.  If you're using VirtualBox as your driver, this should work
-(creating a docker machine called "default"):
+(creating a docker machine called "default")::
 
   docker-machine create --driver virtualbox --virtualbox-memory 4096 default
 
