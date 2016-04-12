@@ -47,12 +47,11 @@ LimitRequestFields 250
         SetHandler server-status
         Order deny,allow
         Deny from all
-        Allow from 127.0.0.1
-        Allow from 10.2.74.123
-        Allow from 10.8.32.5
-        Allow from 10.8.75.19
-        Allow from 10.22.75.42
-        Allow from 10.8.81.5
+
+        {% for ip in httpd_server_status_allow %}
+        Allow from {{ ip }}
+        {% endfor %}
+
     </Location>
 
     #LogLevel debug

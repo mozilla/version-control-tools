@@ -1,2 +1,12 @@
 ---
 vct: /vct
+
+# Hosts to allow connecting to the httpd server-status handler
+# to inspect server state.
+httpd_server_status_allow:
+  - 127.0.0.1
+  - 10.2.74.123
+  - 10.8.32.5
+  - 10.8.75.19
+  - 10.22.75.42
+  - 10.8.81.5
