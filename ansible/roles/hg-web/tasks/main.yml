@@ -18,26 +18,46 @@
     - logrotate
     - openssh-clients
     - openssh-server
-    # Machines are RHEL 6 or CentOS 6, which has Python 2.6 installed by
-    # default. The Python 2.7 packages from IUS don't conflict with the
-    # system Python.
-    - python27
-    - python27-devel
+    - python-devel
     - rsync
     # Needed for hg user to execute mozbuild-eval as root.
     - rsyslog
     - sudo
     - tar
 
+- name: install system packages (CentOS 6)
+  yum: name={{ item }} state=present
+  with_items:
+    # RHEL 6 and CentOS 6 have Python 2.6 installed by default. The Python 2.7 packages
+    # from IUS don't conflict with the system Python.
+    - python27
+    - python27-devel
+  when: ansible_distribution_major_version == '6'
+
+- name: install system packages (CentOS 7)
+  yum: name={{ item }} state=present
+  with_items:
+    - libcgroup-tools
+  when: ansible_distribution_major_version == '7'
+
 # Some packages aren't available on an public yum repo. Fetch them from
 # a public server and install them manually. This is a bit hacky, but it
 # gets the job done.
-- name: download Mozilla rpms
+- name: download Mozilla rpms (CentOS 6)
   get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/{{ item.path }}
            dest=/var/tmp/{{ item.path}}
            sha256sum={{ item.sha256 }}
   with_items:
     - { path: mercurial-3.7.3-1.x86_64.rpm, sha256: 924a8828cfe53901db1366115d927b958f35f5e6a9c418cbc670c5e19137c090 }
+  when: ansible_distribution_major_version == '6'
+
+- name: download Mozilla rpms (CentOS 7)
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/{{ item.path }}
+           dest=/var/tmp/{{ item.path}}
+           sha256sum={{ item.sha256 }}
+  with_items:
+    - { path: mercurial-3.7.3-1.x86_64.rpm, sha256: 7cdd06e8fb5266fe9bd726c79db6040b68053a601daecb2418820c1d3e4f56a2 }
+  when: ansible_distribution_major_version == '7'
 
 - name: install Mozilla rpms
   command: yum localinstall -y /var/tmp/mercurial-3.7.3-1.x86_64.rpm
@@ -213,8 +233,13 @@
         group=root
         mode=0755
 
-- name: configure httpd to start at system startup
+- name: configure httpd to start at system startup (CentOS 6)
   command: /sbin/chkconfig --level 2345 httpd on
+  when: ansible_distribution_major_version == '6'
+
+- name: configure httpd to run at system startup (CentOS 7)
+  command: /usr/bin/systemctl enable httpd.service
+  when: ansible_distribution_major_version == '7'
 
 - name: install mirror-pull script
   template: src=mirror-pull.j2
@@ -322,10 +347,14 @@
         group=root
         mode=0664
 
-- name: configure cgconfig to run at system startup
+- name: configure cgconfig to run at system startup (CentOS 6)
   command: /sbin/chkconfig --level 2345 cgconfig on
   notify: restart cgconfig
-  when: vct_dir.stat.exists == False
+  when: vct_dir.stat.exists == False and ansible_distribution_major_version == '6'
+
+- name: configure cgconfig to run at system startup (CentOS 7)
+  command: /usr/bin/systemctl enable cgconfig.service
+  when: vct_dir.stat.exists == False and ansible_distribution_major_version == '7'
 
 - name: install control group rules
   copy: src=cgrules.conf

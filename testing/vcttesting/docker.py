@@ -695,7 +695,7 @@ class Docker(object):
             'ldap',
         ], ansibles={
             'hgmaster': ('docker-hgmaster', 'centos7'),
-            'hgweb': ('docker-hgweb', 'centos6'),
+            'hgweb': ('docker-hgweb', 'centos7'),
         }, existing=images, verbose=verbose, use_last=use_last)
 
         self.state['last-hgmaster-id'] = images['hgmaster']
@@ -1245,14 +1245,14 @@ class Docker(object):
             }
             ansible_images['hgrb'] = ('docker-hgrb', 'centos6')
             ansible_images['rbweb'] = ('docker-rbweb', 'centos6')
-            ansible_images['hgweb'] = ('docker-hgweb', 'centos6')
+            ansible_images['hgweb'] = ('docker-hgweb', 'centos7')
 
         if hgmo:
             docker_images |= {
                 'ldap',
             }
             ansible_images['hgmaster'] = ('docker-hgmaster', 'centos7')
-            ansible_images['hgweb'] = ('docker-hgweb', 'centos6')
+            ansible_images['hgweb'] = ('docker-hgweb', 'centos7')
 
         if bmo:
             docker_images |= {

@@ -19,13 +19,13 @@ if 'MASTER_PORT_22_TCP_ADDR' not in os.environ:
 ssh_hostname = os.environ['MASTER_PORT_22_TCP_ADDR']
 hostname = socket.gethostname()
 
-if not os.path.exists('/etc/ssh/ssh_host_dsa_key'):
-    subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'dsa',
-                           '-f', '/etc/ssh/ssh_host_dsa_key'])
+if not os.path.exists('/etc/ssh/ssh_host_ed25519_key'):
+    subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'ed25519',
+                           '-f', '/etc/ssh/ssh_host_ed25519_key', '-N', ''])
 
 if not os.path.exists('/etc/ssh/ssh_host_rsa_key'):
     subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'rsa', '-b', '2048',
-                           '-f', '/etc/ssh/ssh_host_rsa_key'])
+                           '-f', '/etc/ssh/ssh_host_rsa_key', '-N', ''])
 
 REPLACEMENTS = {
     '@mirror_source@': ssh_hostname,
