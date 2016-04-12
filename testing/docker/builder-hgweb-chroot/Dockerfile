@@ -9,7 +9,7 @@ FROM secure:mozsecure:centos6:sha256 88cc1475bd58f6ff6f41d50b813c9998c4d3a7167a8
 RUN yum update -y
 
 # Install build dependencies.
-RUN yum install -y bzip2-devel gcc libcgroup-devel make openssl-devel rsync tar wget zlib-devel
+RUN yum install -y bzip2-devel gcc libcgroup-devel make openssl-devel rsync sqlite-devel tar wget zlib-devel
 
 # Download and verify Python source code.
 RUN wget https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz
@@ -56,6 +56,7 @@ RUN cp \
        /lib64/libpthread.so.0 \
        /lib64/libresolv.so.2 \
        /lib64/libselinux.so.1 \
+       /lib64/libsqlite3.so.0 \
        /lib64/libutil.so.1 \
        /lib64/libz.so.1 \
        /python/lib64/
