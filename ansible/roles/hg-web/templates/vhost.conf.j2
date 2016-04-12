@@ -39,12 +39,18 @@ LimitRequestFields 250
 
     <Location /users>
         Options +Indexes
+        {% if ansible_distribution_major_version == '6' %}
         Order allow,deny
         Allow from all
+        {% else %}
+        Require all granted
+        {% endif %}
     </Location>
 
     <Location /server-status>
         SetHandler server-status
+
+        {% if ansible_distribution_major_version == '6' %}
         Order deny,allow
         Deny from all
 
@@ -52,6 +58,13 @@ LimitRequestFields 250
         Allow from {{ ip }}
         {% endfor %}
 
+        {% else %}
+
+        {% for ip in httpd_server_status_allow %}
+        Require ip {{ ip }}
+        {% endfor %}
+
+        {% endif %}
     </Location>
 
     #LogLevel debug

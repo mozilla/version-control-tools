@@ -21,13 +21,19 @@ MaxRequestsPerChild  4000
 
 Listen 80
 
+{% if ansible_distribution_major_version == '6' %}
 LoadModule authn_default_module modules/mod_authn_default.so
-LoadModule authz_host_module modules/mod_authz_host.so
 LoadModule authz_default_module modules/mod_authz_default.so
+{% else %}
+LoadModule authz_core_module modules/mod_authz_core.so
+LoadModule unixd_module modules/mod_unixd.so
+{% endif %}
+LoadModule authz_host_module modules/mod_authz_host.so
 LoadModule include_module modules/mod_include.so
 LoadModule log_config_module modules/mod_log_config.so
 LoadModule logio_module modules/mod_logio.so
 LoadModule env_module modules/mod_env.so
+LoadModule filter_module modules/mod_filter.so
 LoadModule ext_filter_module modules/mod_ext_filter.so
 LoadModule mime_magic_module modules/mod_mime_magic.so
 LoadModule expires_module modules/mod_expires.so
@@ -50,6 +56,11 @@ LoadModule version_module modules/mod_version.so
 
 LoadModule wsgi_module /var/hg/venv_hgweb/lib/python2.7/site-packages/mod_wsgi/server/mod_wsgi-py27.so
 
+{% if ansible_distribution_major_version == '7' %}
+LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
+LoadModule systemd_module modules/mod_systemd.so
+{% endif %}
+
 ExtendedStatus On
 
 User apache
@@ -68,8 +79,12 @@ DocumentRoot "/var/www/html"
 <Directory "/var/www/html">
     Options Indexes FollowSymLinks
     AllowOverride None
+    {% if ansible_distribution_major_version == '6' %}
     Order allow,deny
     Allow from all
+    {% else %}
+    Require all granted
+    {% endif %}
 </Directory>
 
 DirectoryIndex index.html index.html.var
@@ -77,9 +92,13 @@ DirectoryIndex index.html index.html.var
 AccessFileName .htaccess
 
 <Files ~ "^\.ht">
+    {% if ansible_distribution_major_version == '6' %}
     Order allow,deny
     Deny from all
     Satisfy All
+    {% else %}
+    Require all denied
+    {% endif %}
 </Files>
 
 TypesConfig /etc/mime.types
@@ -108,8 +127,13 @@ Alias /icons/ "/var/www/icons/"
 <Directory "/var/www/icons">
     Options Indexes MultiViews FollowSymLinks
     AllowOverride None
+
+    {% if ansible_distribution_major_version == '6' %}
     Order allow,deny
     Allow from all
+    {% else %}
+    Require all granted
+    {% endif %}
 </Directory>
 
 IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
@@ -199,8 +223,12 @@ Alias /error/ "/var/www/error/"
     Options IncludesNoExec
     AddOutputFilter Includes html
     AddHandler type-map var
+    {% if ansible_distribution_major_version == '6' %}
     Order allow,deny
     Allow from all
+    {% else %}
+    Require all granted
+    {% endif %}
     LanguagePriority en es de fr
     ForceLanguagePriority Prefer Fallback
 </Directory>
