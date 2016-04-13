@@ -185,6 +185,13 @@
             group=hg
             mode=0660
 
+- name: list of mirrors file is populated
+  template: src=mirrors.j2
+            dest=/etc/mercurial/mirrors
+            owner=root
+            group=root
+            mode=0644
+
 - name: Mercurial repository directories are present
   file: path={{ item }} state=directory mode=0775
   with_items:

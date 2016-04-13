@@ -1,0 +1,5 @@
+{% for host in hgweb_hosts %}
+{% if hostvars[host] is defined %}
+{{ host }}
+{% endif %}
+{% endfor %}
