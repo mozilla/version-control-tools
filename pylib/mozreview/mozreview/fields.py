@@ -138,6 +138,7 @@ class CommitsListField(CommitDataBackedField):
             'parent_details': parent_details,
             'children_details': children_details,
             'latest_autoland_requests': latest_autoland_requests,
+            'user': user
         }))
 
 

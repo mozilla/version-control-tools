@@ -77,27 +77,41 @@ def has_l3_shipit(review_request):
     return False
 
 
-def get_reviewers_status(review_request, reviewers=None):
-    """Returns the latest review status for each reviewer."""
+def get_reviewers_status(review_request, reviewers=None, include_drive_by=False):
+    """Returns the latest review status for each reviewer.
+
+    If include_drive_by is False, only reviewers nominated by the reviewee are
+    considered. Set it to True to also report the status of `drive_by`
+    reviewers.
+
+    If a list of reviewers is provided, the returned dictionary will contain
+    those reviewers regardless the value of include_drive_by
+    """
 
     # Don't show any status on drafts.
     if type(review_request) == ReviewRequestDraft:
         return {}
 
+    designated_reviewers = review_request.target_people.all()
     if not reviewers:
-        reviewers = review_request.target_people.all()
+        reviewers = designated_reviewers
+
     reviewers_status = dict()
 
     for r in reviewers:
         # The initial state is r?
         reviewers_status[r.username] = {
             'ship_it': False,
-            'review_flag': 'r?',
+            'review_flag': 'r?' if r in designated_reviewers else ' ',
         }
 
     for review in gen_latest_reviews(review_request):
         review_flag = review.extra_data.get(REVIEW_FLAG_KEY)
         user = review.user.username
+
+        if (user not in reviewers_status) and include_drive_by:
+            reviewers_status[user] = {}
+
         if user in reviewers_status:
             reviewers_status[user]['ship_it'] = review.ship_it
             if review_flag:

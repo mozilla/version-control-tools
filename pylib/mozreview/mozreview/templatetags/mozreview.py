@@ -113,6 +113,13 @@ def reviewers_status(review_request):
 
 
 @register.filter()
+def reviewer_status_with_drive_by(review_request, reviewer):
+    reviewer_status = get_reviewers_status(review_request, reviewers=[reviewer],
+                                           include_drive_by=True)
+    return reviewer_status[reviewer.username]
+
+
+@register.filter()
 def userid_to_user(user_id):
     try:
         return User.objects.get(pk=user_id)

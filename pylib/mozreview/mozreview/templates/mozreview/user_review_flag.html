@@ -1,0 +1,6 @@
+{% load mozreview %}
+{% if user.is_authenticated %}
+  {% with status=review_request_details.get_review_request|reviewer_status_with_drive_by:user %}
+    <div id="user-review-flag" data-reviewer-flag="{{status.review_flag}}"></div>
+  {% endwith %}
+{% endif %}

@@ -31,7 +31,6 @@ $(document).on("mozreview_ready", function() {
     url: '/api/review-requests/'+reviewRequest.get('id')+'/reviews/'
        + '?max-results=200',
     success: function(data) {
-      console.log(data);
       _.forEach(data.reviews, function(item) {
         var flag = item.extra_data['p2rb.review_flag'];
         var flagDesc = '';

@@ -205,7 +205,7 @@ Have an L3 user provide a r+ review which should grant approval
     diff_comments: []
 
 Posting a new review without r+ should cancel the previous approval
-  $ rbmanage create-review 2 --body-top "Don't Land it!" --public
+  $ rbmanage create-review 2 --body-top "Don't Land it!" --public --review-flag='r-'
   created review 3
   $ rbmanage dumpreview 2
   id: 2
@@ -270,7 +270,7 @@ Posting a new review without r+ should cancel the previous approval
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: r?
+      p2rb.review_flag: r-
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
@@ -342,7 +342,7 @@ One more r+ should switch it back to approved
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: r?
+      p2rb.review_flag: r-
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
@@ -437,7 +437,7 @@ Even though the author is L1, adding a new diff will not cancel approval
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: r?
+      p2rb.review_flag: r-
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
@@ -530,7 +530,7 @@ A new r+ from L3 should give approval
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: r?
+      p2rb.review_flag: r-
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
@@ -554,7 +554,7 @@ A new r+ from L3 should give approval
 Opening issues, even from an L1 user, should revoke approval until they're fixed
 
   $ exportbzauth l1b@example.com password
-  $ rbmanage create-review 2 --body-top "I found issues"
+  $ rbmanage create-review 2 --body-top "I found issues" --review-flag="r-"
   created review 6
   $ rbmanage create-diff-comment 2 6 foo 1 "Issue Text" --open-issue
   created diff comment 1
@@ -636,7 +636,7 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: r?
+      p2rb.review_flag: r-
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
@@ -660,7 +660,7 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: r?
+      p2rb.review_flag: r-
     body_top: I found issues
     body_top_text_type: plain
     diff_comments:
@@ -757,7 +757,7 @@ Fixing the issue should restore approval
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: r?
+      p2rb.review_flag: r-
     body_top: Don't Land it!
     body_top_text_type: plain
     diff_comments: []
@@ -781,7 +781,7 @@ Fixing the issue should restore approval
     public: true
     ship_it: false
     extra_data:
-      p2rb.review_flag: r?
+      p2rb.review_flag: r-
     body_top: I found issues
     body_top_text_type: plain
     diff_comments:

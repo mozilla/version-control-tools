@@ -279,6 +279,8 @@ class MozReviewExtension(Extension):
                      'mozreview/scm_level.html')
         TemplateHook(self, 'base-after-content',
                      'mozreview/repository.html')
+        TemplateHook(self, 'base-after-content',
+                     'mozreview/user_review_flag.html')
 
         ReviewRequestFieldsHook(self, 'main', [CommitsListField])
         # This forces the Commits field to be the top item.

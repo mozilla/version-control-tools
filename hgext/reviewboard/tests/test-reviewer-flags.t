@@ -92,7 +92,7 @@ There are warnings for reviewers who haved granted a non ship-it review when
 using r=.
 
   $ exportbzauth cthulhu@example.com password
-  $ rbmanage create-review 2 --body-top "No way you should ship-it!" --public
+  $ rbmanage create-review 2 --body-top "No way you should ship-it!" --public --review-flag='r-'
   created review 2
 
   $ exportbzauth default@example.com password

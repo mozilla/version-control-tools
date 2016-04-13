@@ -76,6 +76,9 @@ from mozreview.models import (
 from mozreview.rb_utils import (
     get_obj_url,
 )
+from mozreview.review_helpers import (
+    get_reviewers_status,
+)
 from mozreview.signals import (
     commit_request_publishing,
 )
@@ -559,15 +562,25 @@ def pre_save_review(sender, *args, **kwargs):
     """Handle pre_save for a Review.
 
     This is needed to give a default value to the REVIEW_FLAG_KEY
-    extra_data key.
+    extra_data key. It tries to retrieve the last known review status,
+    falling back to r? if no status is found.
     """
     review = kwargs["instance"]
+    if review.pk:
+        # The review create endpoint calls save twice: the first time it
+        # gets or creates the review and the second time it updates the
+        # object retrieved/created. This condition let us execute the code
+        # below only once.
 
-    if (REVIEW_FLAG_KEY not in review.extra_data and
-            not is_parent(review.review_request)):
-        if review.pk:
-            # The review create endpoint calls save twice: the first time it
-            # gets or creates the review and the second time it updates the
-            # object retrieved/created. This condition let us execute the code
-            # below only when all the fields are set.
-            review.extra_data[REVIEW_FLAG_KEY] = 'r?'
+        if not is_parent(review.review_request):
+
+            if REVIEW_FLAG_KEY not in review.extra_data:
+                # TODO: we should use a different query than going through
+                # all the reviews, which is what get_reviewers_status does.
+                reviewers_status = get_reviewers_status(review.review_request,
+                                                        reviewers=[review.user])
+                user = review.user.username
+                flag = reviewers_status.get(user, {}).get('review_flag', ' ')
+                review.extra_data[REVIEW_FLAG_KEY] = flag
+
+            review.ship_it = (review.extra_data[REVIEW_FLAG_KEY] == 'r+')

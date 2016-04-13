@@ -61,9 +61,16 @@ MRReviewFlag.View = Backbone.View.extend({
   },
 
   render: function() {
+    var lastKnownFlag = ' ';
+    var userReviewFlag = $('#user-review-flag');
+
+    if (userReviewFlag.length == 1) {
+      lastKnownFlag = $('#user-review-flag').data('reviewer-flag');
+    }
+
     this.$el.html(this.template({
       states: this.states,
-      val: this.model.get('extraData')[this.key] || 'r?'
+      val: this.model.get('extraData')[this.key] || lastKnownFlag
     }));
     return this;
   },
@@ -76,7 +83,6 @@ MRReviewFlag.View = Backbone.View.extend({
         val = ' ';
     }
     this.model.get('extraData')[this.key] = val;
-    $('#id_shipit').prop('checked', (val == 'r+'));
     this.save()
   }
 });

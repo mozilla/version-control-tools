@@ -795,9 +795,9 @@ r+ reviews are not allowed on the parent.
   API Error: 500: 225: Error publishing: "Ship it" reviews on parent review requests are not allowed.  Please review individual commits.
   [1]
 
-A non 'clear flag' review shouldn't clear the attachment's review flag.
+A comment-only review shouldn't change the review flag.
 
-  $ rbmanage create-review 11 --body-top 'there is a problem' --public
+  $ rbmanage create-review 11 --body-top 'I have another comment' --public
   created review 7
 
   $ bugzilla dump-bug 5
@@ -836,9 +836,9 @@ A non 'clear flag' review shouldn't clear the attachment's review flag.
         status: '?'
       - id: 11
         name: review
-        requestee: reviewer@example.com
+        requestee: null
         setter: reviewer@example.com
-        status: '?'
+        status: +
       id: 6
       is_obsolete: false
       is_patch: false
@@ -913,12 +913,9 @@ A non 'clear flag' review shouldn't clear the attachment's review flag.
       id: 18
       tags: []
       text:
-      - Comment on attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
-      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review7
       - ''
-      - there is a problem
+      - I have another comment
     component: TestComponent
     depends_on: []
     platform: All
@@ -964,9 +961,9 @@ A 'clear flag' review on a child should also clear the attachment's r?.
         status: '?'
       - id: 11
         name: review
-        requestee: reviewer@example.com
+        requestee: null
         setter: reviewer@example.com
-        status: '?'
+        status: +
       id: 6
       is_obsolete: false
       is_patch: false
@@ -1041,12 +1038,9 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       id: 18
       tags: []
       text:
-      - Comment on attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
-      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review7
       - ''
-      - there is a problem
+      - I have another comment
     - author: reviewer2@example.com
       id: 19
       tags: []
@@ -1102,9 +1096,9 @@ A non-r+ review on a parent should post a comment only.
         status: '?'
       - id: 11
         name: review
-        requestee: reviewer@example.com
+        requestee: null
         setter: reviewer@example.com
-        status: '?'
+        status: +
       id: 6
       is_obsolete: false
       is_patch: false
@@ -1179,12 +1173,9 @@ A non-r+ review on a parent should post a comment only.
       id: 18
       tags: []
       text:
-      - Comment on attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
-      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review7
       - ''
-      - there is a problem
+      - I have another comment
     - author: reviewer2@example.com
       id: 19
       tags: []
