@@ -338,6 +338,16 @@
         group=hg
         mode=0644
 
+- name: install repo unify config files
+  copy: src={{ item }}
+        dest=/etc/mercurial/{{ item }}
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - unify-firefox-unified.ini
+    - unify-firefox-unified-b2g.ini
+
 - name: sysconfig file for unify repo daemon
   copy: src=sysconfig-unifyrepo
         dest=/etc/sysconfig/unifyrepo
