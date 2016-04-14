@@ -17,11 +17,203 @@ them locally. This has several benefits:
 * You only have to fetch the data associated with each commit exactly once
   (with separate repositories, you transfer down each commit *N* times).
 
-Creating a Unified Repository
-=============================
+Creating a Unified Repository with firefoxtree
+==============================================
 
-The recommended method to create a unified Firefox repository is documented as
-part of the :ref:`firefoxtree extension documentation <firefoxtree>`.
+The historical, stable method to create a unified Firefox repository is
+documented as part of the
+:ref:`firefoxtree extension documentation <firefoxtree>`.
+
+.. _hgmozilla_unified_server:
+
+Experimental Unified Repositories on the Server
+===============================================
+
+There are 2 **experimental** unified Firefox repositories on hg.mozilla.org:
+
+* https://hg.mozilla.org/experimental/firefox-unified
+* https://hg.mozilla.org/experimental/firefox-unified-b2g
+
+Both of these repositories contain all commits on the ``default`` branch of
+the various Firefox repositories (mozilla-central, inbound, aurora, beta,
+release, esr, etc) in chronological order by push time.
+
+Advantages of these Repositories
+--------------------------------
+
+These experimental unified repositories are **smaller than
+mozilla-central** despite containing more data. This is because they
+are using a more efficient storage mechanism (*generaldelta*) on the
+server.
+
+Because the data is smaller and more optimally encoded, these
+repositories are **faster to clone and pull from**.
+
+If you are already using a unified repository workflow (such as with
+the :ref:`firefoxtree extension <firefoxtree>`, ``hg pull`` will
+complete quicker because you are pulling from 1 repository instead
+of *N*. This also means less overall work for the server.
+
+These repositories **do not include extra branches**, notable the
+``*_RELBRANCH`` branches. If you've ever pulled the mozilla-beta
+or mozilla-release repositories, you know how annoying the presence
+of these branches can be.
+
+These repositories feature **bookmarks that track each canonical
+repository's head**. For example, the ``central`` bookmark tracks the
+current head of mozilla-central. If you naively pulled all the Firefox
+repositories into a local Mercurial repository, you would have multiple
+*anonymous* heads on the ``default`` branch and you wouldn't know which
+head belonged to which Firefox repository. The bookmarks solve this
+problem.
+
+In a nutshell, these unified repositories solve many of the problems
+with Firefox's multi repository management model in a way that doesn't
+require client-side workarounds like the
+:ref:`firefoxtree extension <firefoxtree>`.
+
+What Does *Experimental* Mean?
+------------------------------
+
+These unified repositories are *experimental*. In terms of behavior:
+
+* There is no SLA. Repositories may not update for hours at a time or
+  the update lag may be longer than desirable.
+* The repository may be deleted or not updated in the future.
+* The order of changesets in the repository and pushlog may change.
+* The behavior of bookmarks and how repos/heads are tracked may change.
+
+You should **not**:
+
+* Rely on these repositories existing, staying up to date, or having
+  consistent behavior for all of time.
+* Consume these repositories from Firefox automation.
+* Become too attached to these repositories or their behavior.
+
+These repositories are effectively the result of running ``hg pull``
+plus ``hg bookmark`` against the canonical Firefox repositories. If
+these experimental repositories go down or fail to update, you should
+be able to fall back to using :ref:`firefoxtree <firefoxtree>` to do
+something similar.
+
+Working with the Experimental Unified Repos
+-------------------------------------------
+
+Here is the basic workflow for interacting with an experimental unified
+repo.
+
+First, clone the repo::
+
+   $ hg clone https://hg.mozilla.org/experimental/firefox-unified
+
+Update to a bookmark you want to base work off of::
+
+   $ hg up central
+   42 files updated, 0 files merged, 0 files removed, 0 files unresolved
+   (activating bookmark central)
+
+Then start a new bookmark to track your work::
+
+   $ hg bookmark myfeature
+
+Then make changes and commit::
+
+   <edit some files>
+   $ hg commit
+
+If you want to rebase::
+
+   $ hg pull
+   $ hg rebase -b myfeature -d central
+
+Be sure you've activated your own bookmark or deactivated the Firefox bookmark
+before committing or you may move the bookmark from the server. The easiest
+way to do this is::
+
+   $ hg up .
+   (leaving bookmark central)
+
+.. tip::
+
+   Facebook's `scm-prompt.sh <https://bitbucket.org/facebook/hg-experimental/src/default/scripts/scm-prompt.sh?at=default&fileviewer=file-view-default>`_
+   implements shell prompt integration for both Mercurial and Git. It displays
+   the currently active bookmark, which is useful to prevent accidentally
+   committing on bookmark belonging to a Firefox repo.
+
+generaldelta and the Experimental Repos
+---------------------------------------
+
+The experimental repositories are encoded using Mercurial's *generaldelta*
+storage mechanism. This results in smaller repositories and faster
+repository operations.
+
+.. important::
+
+   Mercurial repositories created before Mercurial 3.7 did not use
+   generaldelta by default. Pulling from the experimental repositories
+   to a non-generaldelta clone will result in **slower** operations.
+
+   It is highly recommended to create a new clone of the experimental
+   unified repositories with Mercurial 3.7+ to ensure your client is
+   using generaldelta.
+
+To check whether your existing Firefox clone is using generaldelta::
+
+   $ grep generaldelta .hg/requires
+
+If there is no ``generaldelta`` entry in that file, you will need to
+create a new repo that has generaldelta enabled. **Adding
+``generaldelta`` to the requires file does not enable generaldelta on an
+existing repo, so don't do it.**
+
+If you have an existing, non-generaldelta repository with work in progress
+commits, you can *convert* to generaldelta by doing something like the
+following.
+
+Create a new clone of the unified repo::
+
+   $ hg clone -U --uncompressed https://hg.mozilla.org/experimental/firefox-unified
+   $ cd firefox-unified
+
+Now set your new repositoriy to non-publishing (this means commits pushed to it
+won't be marked as public and will still be mutable)::
+
+   $ hg config -l
+   [phases]
+   publish = false
+
+Finally, go to your existing repo and push your work-in-progress changesets::
+
+   $ cd /existing/repo
+   $ hg push -f -r 'not public()' /path/to/firefox-unified
+
+
+incompatible Mercurial client; bundle2 required
+-----------------------------------------------
+
+Does this happen to you?::
+
+   $ hg clone https://hg.mozilla.org/experimental/firefox-unified
+   destination directory: firefox-unified
+   requesting all changes
+   abort: remote error:
+   incompatible Mercurial client; bundle2 required
+   (see https://www.mercurial-scm.org/wiki/IncompatibleClient)
+
+This message occurs when the Mercurial client is not speaking the modern
+*bundle2* protocol with the server. For performance reasons, we require
+*bundle2* to clone or pull the experimental unified repositories. This
+decision is non-negotiable because removing this restriction could
+result in excessive CPU usage on the server to serve data to legacy
+clients.
+
+If you see this message, one of the following is true:
+
+* Your Mercurial client is too old. You should
+  :ref:`upgrade <hgmozilla_installing>`.
+* You are using git-cinnabar. git-cinnabar doesn't currently support
+  bundle2 but support is
+  `tracked on GitHub <https://github.com/glandium/git-cinnabar/issues/64>`_.
 
 Uplifting / Backporting Commits
 ===============================
