@@ -57,8 +57,8 @@ django-multiselectfield==0.1.3 \
 django-pipeline==1.3.27 \
     --hash=sha256:71add26f682c2e7652c43d01ab6ac1b1c693d869f663142f5f7c37b00788d162
 
-Djblets==0.9.2 \
-    --hash=sha256:35282652ab3a68709a118cf1228c3c8d1022dc7fa9d74d4a1251bf434178e9d3
+Djblets==0.9.3 \
+    --hash=sha256:be1f5ca56681f6feee6ec02cab9d74ffb9e1875f64e4125659b690a8f40d4e16
 
 docker-py==1.6.0 \
     --hash=sha256:35fef7379d5937983d645f3a15baa4874e3d512ee15f376d92131ad27c276a99
@@ -208,8 +208,8 @@ recaptcha-client==1.0.6 \
 responses==0.3.0 \
     --hash=sha256:6c5eb915bcf763b677b8e51cdb68c8474127a9b60e49e6e240b05ec5e449c43b
 
-ReviewBoard==2.5.2 \
-    --hash=sha256:c44cc140f12a12ad2976ec20052a927392c9f549d7d19f84e62a23f6f4858ccc
+ReviewBoard==2.5.4 \
+    --hash=sha256:342c9d89b6a5c23e381ccca2a12fb69ae7718f57d5976e47c1fcef8a925f0e99
 
 selenium==2.48.0 \
     --hash=sha256:30b97338c0d9f1e60e72ecee0579b0f0845d55025342c3d5ccb224fb8a07b787

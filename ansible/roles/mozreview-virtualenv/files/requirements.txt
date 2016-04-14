@@ -30,8 +30,8 @@ django-haystack==2.3.1 \
 django-multiselectfield==0.1.3 \
     --hash=sha256:3b7e950323d477e40660d737bf79777d9122c3962a55af5bd60819e40472fc6c
 
-Djblets==0.9.2 \
-    --hash=sha256:35282652ab3a68709a118cf1228c3c8d1022dc7fa9d74d4a1251bf434178e9d3
+Djblets==0.9.3 \
+    --hash=sha256:be1f5ca56681f6feee6ec02cab9d74ffb9e1875f64e4125659b690a8f40d4e16
 
 docutils==0.12 \
     --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
@@ -105,8 +105,8 @@ pycrypto==2.6.1 \
 RBTools==0.7.5 \
     --hash=sha256:28809def27e530ba5c13d37be8eb9ca31a24786cc0d0bd6d682f0009d94891a4
 
-ReviewBoard==2.5.2 \
-    --hash=sha256:c44cc140f12a12ad2976ec20052a927392c9f549d7d19f84e62a23f6f4858ccc
+ReviewBoard==2.5.4 \
+    --hash=sha256:342c9d89b6a5c23e381ccca2a12fb69ae7718f57d5976e47c1fcef8a925f0e99
 
 requests==2.4.3 \
     --hash=sha256:124890f41723c85aa82dfe0807432aea46d24aeb0dafce340969d2089548c2c3
