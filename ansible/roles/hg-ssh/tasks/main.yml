@@ -338,6 +338,21 @@
         group=hg
         mode=0644
 
+- name: sysconfig file for unify repo daemon
+  copy: src=sysconfig-unifyrepo
+        dest=/etc/sysconfig/unifyrepo
+        owner=root
+        group=root
+        mode=0644
+
+- name: systemd service file for unify repo daemon
+  copy: src=unifyrepo.service
+        dest=/etc/systemd/system/unifyrepo.service
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
+
 - name: create directory for Nagios files
   file: path={{ item }}
         state=directory
