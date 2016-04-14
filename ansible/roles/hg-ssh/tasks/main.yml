@@ -88,12 +88,18 @@
     - { name: 'scm_l10n_infra', gid: 680 }
     - { name: 'scm_sec_sensitive', gid: 686 }
     - { name: 'scm_ecmascript', gid: 687 }
+    - { name: 'hg-aggregate', gid: 5601 }
 
 - name: Create hg group
   group: name=hg
 
 - name: Create hg user
   user: name=hg group=hg
+
+- name: create hg-aggregate user
+  user: name=hg-aggregate
+        group=hg-aggregate
+        uid=5601
 
 - name: hg user ssh config is prepared
   file: path=/home/hg/.ssh state=directory mode=0775 owner=hg group=hg
