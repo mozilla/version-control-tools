@@ -150,8 +150,8 @@ ndg-httpsclient==0.4.0 \
 nose==1.3.4 \
     --hash=sha256:78b03116badd0dbb2ed4dedc96a4a3d42138b94bb89fc2eb99f7f3bdfd199f56
 
-paramiko==1.15.2 \
-    --hash=sha256:c675558ea457c1475c7b82f4ae404bdf56c4463f6f262665a31bdf8b9c9a859c
+paramiko==1.16.0 \
+    --hash=sha256:4ea4b9dd79beabd0301277a26d5e8b54ab8f41ed12414a35f1e00ae08cf06127
 
 pep8==1.5.7 \
     --hash=sha256:62e87fd54535fb932b4a4d94868db523257a1031c8bc6bd358c2015433e646db
@@ -214,8 +214,8 @@ ReviewBoard==2.5.4 \
 selenium==2.48.0 \
     --hash=sha256:30b97338c0d9f1e60e72ecee0579b0f0845d55025342c3d5ccb224fb8a07b787
 
-setuptools==20.1.1 \
-    --hash=sha256:dfdbc643f8900d9e617e48a42ae389aa18fd6fbd2846f24f2a4678b8d9412acb
+setuptools==20.8.1 \
+    --hash=sha256:d5bbc1929feeaa81233bdadc0c720d35ac27a3ca7a1f9641f632af822419114d
 
 six==1.10.0 \
     --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
