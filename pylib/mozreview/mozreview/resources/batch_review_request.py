@@ -971,7 +971,7 @@ def update_review_request(local_site, request, privileged_user, reviewer_cache,
         DiffSetVerification(diffset=diffset).save(
             authorized_user=privileged_user, force_insert=True)
     except Exception:
-        logger.exeption('error processing diff')
+        logger.exception('error processing diff')
         raise DiffProcessingException()
 
     update_review_request_draft_diffset(rr, diffset, draft=draft)
