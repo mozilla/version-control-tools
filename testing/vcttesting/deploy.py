@@ -10,7 +10,9 @@ import os
 from pipes import quote
 import subprocess
 
-from .util import get_and_write_vct_node
+from .vctutil import (
+    get_and_write_vct_node,
+)
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
