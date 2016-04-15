@@ -115,19 +115,27 @@ def parse_events(fh, onlydate=None):
         date = None
         host = None
         if ' hgweb: ' in line:
-            date = line[0:15]
-            if date[4] == ' ':
-                date = date[0:4] + '0' + date[5:]
+            # Legacy logs: Apr 14 20:17:43
+            # New logs: 2016-04-14T20:17:44.250678+00:00
+            if line.startswith('20'):
+                assert line[26:32] == '+00:00'
+                date = datetime.datetime.strptime(line[0:26], '%Y-%m-%dT%H:%M:%S.%f')
+                hostaction, line = line[33:].split(':', 1)
+                host, action = hostaction.split()
+            else:
+                date = line[0:15]
+                if date[4] == ' ':
+                    date = date[0:4] + '0' + date[5:]
 
-            # Year isn't in the logs and Python defaults to 1900.
-            # This can cause a problem during leap years because strptime
-            # will raise a "ValueError: day is out of range for month" for
-            # Feb 29. So we add the year to the string before parsing.
-            date = '%d %s' % (thisyear, date)
-            date = datetime.datetime.strptime(date, '%Y %b %d %H:%M:%S')
+                # Year isn't in the logs and Python defaults to 1900.
+                # This can cause a problem during leap years because strptime
+                # will raise a "ValueError: day is out of range for month" for
+                # Feb 29. So we add the year to the string before parsing.
+                date = '%d %s' % (thisyear, date)
+                date = datetime.datetime.strptime(date, '%Y %b %d %H:%M:%S')
 
-            hostaction, line = line[16:].split(':', 1)
-            host, action = hostaction.split()
+                hostaction, line = line[16:].split(':', 1)
+                host, action = hostaction.split()
 
             line = line.strip()
         parts = line.rstrip().split()
