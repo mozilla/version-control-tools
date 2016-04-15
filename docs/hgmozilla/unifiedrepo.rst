@@ -185,7 +185,7 @@ Create a new clone of the unified repo::
    $ hg clone -U --uncompressed https://hg.mozilla.org/experimental/firefox-unified
    $ cd firefox-unified
 
-Now set your new repositoriy to non-publishing (this means commits pushed to it
+Now set your new repository to non-publishing (this means commits pushed to it
 won't be marked as public and will still be mutable)::
 
    $ hg config -l
