@@ -347,6 +347,7 @@
   with_items:
     - unify-firefox-unified.ini
     - unify-firefox-unified-b2g.ini
+    - unify-mozilla-central-gd.ini
 
 - name: sysconfig file for unify repo daemon
   copy: src=sysconfig-unifyrepo
