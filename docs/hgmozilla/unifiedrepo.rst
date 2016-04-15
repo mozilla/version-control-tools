@@ -140,6 +140,16 @@ way to do this is::
    the currently active bookmark, which is useful to prevent accidentally
    committing on bookmark belonging to a Firefox repo.
 
+Interactions with firefoxtree
+-----------------------------
+
+There are known issues between the *firefoxtree* extension and the
+unified repositories, notably around the area of conflicts between
+bookmarks and *fxtree* namespace labels.
+
+`bug 1264814 <https://bugzilla.mozilla.org/show_bug.cgi?id=1264814>`_
+tracks improvements.
+
 generaldelta and the Experimental Repos
 ---------------------------------------
 
