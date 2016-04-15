@@ -13,7 +13,10 @@ def bundle_times_by_hour(fh):
         parts = line.rstrip().split()
 
         date, repo, ip, command, size, t_wall, t_cpu = parts
-        date = datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
+        try:
+            date = datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%f')
+        except ValueError:
+            date = datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
         size = int(size)
         t_wall = float(t_wall)
         t_cpu = float(t_cpu)

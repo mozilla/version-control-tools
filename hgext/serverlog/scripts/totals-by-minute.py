@@ -14,7 +14,10 @@ def totals_by_minute(fh):
 
         try:
             when, repo, ip, command, size, t_wall, t_cpu = parts
-            when = datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M:%S')
+            try:
+                when = datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M:%S.%f')
+            except ValueError:
+                when = datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M:%S')
         except (TypeError, ValueError):
             continue
 
