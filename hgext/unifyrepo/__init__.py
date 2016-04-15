@@ -420,9 +420,9 @@ def unifyrepo(ui, settings):
     stagepeer = hg.peer(ui, {}, conf.stagepath)
 
     for node in pullnodes:
-        # TODO we should update bookmarks when we pull. Otherwise the
-        # changesets will get replicated without a bookmark and any
-        # poor soul who pulls will see a nameless head.
+        # TODO Bug 1265002 - we should update bookmarks when we pull.
+        # Otherwise the changesets will get replicated without a bookmark
+        # and any poor soul who pulls will see a nameless head.
         exchange.pull(destrepo, stagepeer, heads=[node])
         # For some reason there is a massive memory leak (10+ MB per
         # iteration on Firefox repos) if we don't gc here.
