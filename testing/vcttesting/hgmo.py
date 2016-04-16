@@ -190,6 +190,7 @@ class HgCluster(object):
                   for s in [master_state] + web_states]
         zookeeper_hostports = ['%s:2888:3888' % ip for ip in zk_ips]
         zookeeper_connect = ','.join('%s:2181/hgmoreplication' % ip for ip in zk_ips)
+        web_hostnames = [s['Config']['Hostname'] for s in web_states]
 
         with futures.ThreadPoolExecutor(web_count + 1) as e:
             for s in all_states:
@@ -198,6 +199,7 @@ class HgCluster(object):
                     '/set-kafka-servers',
                     host,
                     str(port),
+                    ','.join(web_hostnames),
                 ] + zookeeper_hostports
                 e.submit(self._d.execute, s['Id'], command)
 

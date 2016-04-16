@@ -39,7 +39,8 @@ print('read server info file')
 
 advertise_host = lines[0]
 advertise_port = lines[1]
-servers = lines[2:]
+consumer_hostnames = lines[2]
+servers = lines[3:]
 hostnames = [s.split(':')[0] for s in servers]
 
 # Tell ZooKeeper what the servers are.

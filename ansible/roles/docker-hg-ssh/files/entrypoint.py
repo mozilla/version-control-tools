@@ -54,7 +54,7 @@ else:
 subprocess.check_call(['/entrypoint-kafkabroker'])
 
 # Update the Kafka connect servers in the vcsreplicator config.
-kafka_servers = open('/kafka-servers', 'rb').read().splitlines()[2:]
+kafka_servers = open('/kafka-servers', 'rb').read().splitlines()[3:]
 kafka_servers = ['%s:9092' % s.split(':')[0] for s in kafka_servers]
 hgrc_lines = open('/etc/mercurial/hgrc', 'rb').readlines()
 with open('/etc/mercurial/hgrc', 'wb') as fh:
