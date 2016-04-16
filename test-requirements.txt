@@ -4,14 +4,13 @@
 --find-links https://downloads.reviewboard.org/releases/RBTools/0.6/
 --find-links https://downloads.reviewboard.org/releases/ReviewBoard/2.5/
 
+-r deploy-requirements.txt
+
 alabaster==0.7.3 \
     --hash=sha256:0703c1ea5a6af0bb6d0cec24708301334949d56ebc7f95c64028d9c66f9d8d5d
 
 amqp==1.4.8 \
     --hash=sha256:94d2a68227e7984bd40f5f71c6839730622aff8a4633f29ede1ffdd0d240795e
-
-ansible==1.9.0.1 \
-    --hash=sha256:b2193fd9a4061ab624fa67311796419a759de06b4f321d37169b22ba3831331c
 
 anyjson==0.3.3 \
     --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba
@@ -27,9 +26,6 @@ backports.ssl-match-hostname==3.4.0.2 \
 
 beautifulsoup4==4.3.2 \
     --hash=sha256:a2b29bd048ca2fe54a046b29770964738872a9747003a371344a93eedf7ad58e
-
-blessings==1.6 \
-    --hash=sha256:edc5713061f10966048bf6b40d9a514b381e0ba849c64e034c4ef6c1847d3007
 
 cffi==1.3.1 \
     --hash=sha256:d45dd39a770b4afb591c82555f6a8bbc1ac7eb019eda9b621eee1a0a72201220 \
@@ -66,9 +62,6 @@ docker-py==1.6.0 \
 docutils==0.12 \
     --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
 
-ecdsa==0.13 \
-    --hash=sha256:40d002cf360d0e035cf2cb985e1308d41aaa087cbfc135b2dc2d844296ea546c
-
 enum34==1.1.1 \
     --hash=sha256:9d4a9220e4ebabd7ff60d853e69c3dd89debad5ddeb9ac5e768af811ece7708e
 
@@ -90,9 +83,6 @@ idna==2.0 \
 ipaddress==1.0.16 \
     --hash=sha256:935712800ce4760701d89ad677666cd52691fd2f6f0b340c8b4239a3c17988a5
 
-Jinja2==2.7.3 \
-    --hash=sha256:2e24ac5d004db5714976a04ac0e80c6df6e47e98c354cb2c0d82f8879d4f8fdb
-
 kafka-python==0.9.4 \
     --hash=sha256:6cd463b688d98fec1c1f602e316eb7745aef0e55dc57fe9ff2f203cf0865c8c7
 
@@ -105,23 +95,14 @@ lockfile==0.10.2 \
 lxml==3.5.0 \
     --hash=sha256:349f93e3a4b09cc59418854ab8013d027d246757c51744bf20069bc89016f578
 
-mach==0.5.1 \
-    --hash=sha256:61bda1a1033c110f781427c479dd151a45fc45e46ce28e37fabf0d3cc2edf91e
-
 Markdown==2.4.1 \
     --hash=sha256:812ec5249f45edc31330b7fb06e52aaf6ab2d83aa27047df7cb6837ef2d269b6
-
-MarkupSafe==0.23 \
-    --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3
 
 mccabe==0.3.1 \
     --hash=sha256:bd6c080fb372aebcb0ce19e35ddac744f2abf5a7befa207db2d1097d48efe63a
 
 mechanize==0.2.5 \
     --hash=sha256:2e67b20d107b30c00ad814891a095048c35d9d8cb9541801cebe85684cc84766
-
-Mercurial==3.7.3 \
-    --hash=sha256:c099c42d74e2d520b61dd372cd996b0fa7605c06617834fd7b13c79b9a9a5b30
 
 mimeparse==0.1.3 \
     --hash=sha256:534ff6feefe1cd03984f444e6415aacc79c0a85f3b868ec41a2fd5003004c31e
@@ -132,26 +113,14 @@ mock==1.0.1 \
 mozbuild==0.2 \
     --hash=sha256:24227608fc3c735fbb5c629d0540a600368c1d5e57013dd39272a0a5c9cccb13
 
-mozfile==1.1 \
-    --hash=sha256:e1d8505c9d575051e0831ee659a982a2bbfaec37013dc946d60a3071a442888e
-
-mozinfo==0.7 \
-    --hash=sha256:d27f75b668614f28df2e61b8aa4beb6f68f3c9936fc9139fae755728f2b4844a
-
 mozlog==2.2 \
     --hash=sha256:01008861cca0afb69cd30dcd389843feb817e7b9d146d5345029544cf03bde72
-
-mozprocess==0.22 \
-    --hash=sha256:2d56e015a3594f06130e8c015f7ca87f3f8d83d9c4bf54588f077ce9bad9a08b
 
 ndg-httpsclient==0.4.0 \
     --hash=sha256:e8c155fdebd9c4bcb0810b4ed01ae1987554b1ee034dd7532d7b8fdae38a6274
 
 nose==1.3.4 \
     --hash=sha256:78b03116badd0dbb2ed4dedc96a4a3d42138b94bb89fc2eb99f7f3bdfd199f56
-
-paramiko==1.16.0 \
-    --hash=sha256:4ea4b9dd79beabd0301277a26d5e8b54ab8f41ed12414a35f1e00ae08cf06127
 
 pep8==1.5.7 \
     --hash=sha256:62e87fd54535fb932b4a4d94868db523257a1031c8bc6bd358c2015433e646db
@@ -168,9 +137,6 @@ pyasn1==0.1.9 \
 
 pycparser==2.14 \
     --hash=sha256:7959b4a74abdc27b312fed1c21e6caf9309ce0b29ea86b591fd2e99ecdf27f73
-
-pycrypto==2.6.1 \
-    --hash=sha256:f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c
 
 pyflakes==0.8.1 \
     --hash=sha256:ac4571695c10ce1536bcdba1a294b9f2d3e6cc9d0ea171b67d50a0864ce3e042
@@ -196,9 +162,6 @@ python-memcached==1.54 \
 pytz==2015.7 \
     --hash=sha256:3ede470d3d17ba3c07638dfa0d10452bc1b6e5ad326127a65ba77e6aaeb11bec
 
-PyYAML==3.11 \
-    --hash=sha256:c36c938a872e5ff494938b33b14aaa156cb439ec67548fcab3535bb78b0846e8
-
 RBTools==0.7.5 \
     --hash=sha256:28809def27e530ba5c13d37be8eb9ca31a24786cc0d0bd6d682f0009d94891a4
 
@@ -213,9 +176,6 @@ ReviewBoard==2.5.4 \
 
 selenium==2.48.0 \
     --hash=sha256:30b97338c0d9f1e60e72ecee0579b0f0845d55025342c3d5ccb224fb8a07b787
-
-setuptools==20.8.1 \
-    --hash=sha256:d5bbc1929feeaa81233bdadc0c720d35ac27a3ca7a1f9641f632af822419114d
 
 six==1.10.0 \
     --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
