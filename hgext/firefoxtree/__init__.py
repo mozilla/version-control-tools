@@ -318,12 +318,19 @@ def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
 
     return res
 
-def prepushoutgoinghook(local, remote, outgoing):
+def prepushoutgoinghook(*args):
     """Hook that prevents us from attempting to push multiple heads.
 
     Firefox repos have hooks that prevent receiving multiple heads. Waiting
     for the hook to fire on the remote wastes time. Implement it locally.
     """
+    # Mercurial 3.8 switched from local, remote, outgoing to a pushop arg
+    if len(args) == 1:
+        remote = args[0].remote
+        outgoing = args[0].outgoing
+    else:
+        remote, outgoing = args[1:]
+
     tree = resolve_uri_to_tree(remote.url())
     if not tree or tree == 'try':
         return

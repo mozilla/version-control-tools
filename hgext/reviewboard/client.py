@@ -1034,7 +1034,15 @@ def reposetup(ui, repo):
     repo.noreviewboardpush = False
     repo.reviewid = None
 
-    def prepushoutgoinghook(local, remote, outgoing):
+    def prepushoutgoinghook(*args):
+        # Mercurial 3.8 switched from local, remote, outgoing to a pushop arg
+        if len(args) == 1:
+            local = args[0].repo
+            remote = args[0].remote
+            outgoing = args[0].outgoing
+        else:
+            local, remote, outgoing = args
+
         if 'pushreview' in getreviewcaps(remote):
             # We can't simply look at outgoing.missingheads here because
             # Mercurial treats all revisions to `hg push` as "heads" in the
