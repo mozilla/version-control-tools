@@ -173,7 +173,7 @@ Advanced Diff Viewer and Commenting
    When writing comments on reviews, Review Board allows you to open an
    *Issue*.
 
-   Issues are important comments that are explcitly tracked by
+   Issues are important comments that are explicitly tracked by
    Review Board.
 
    When you view a review request, a table of issues is presented. This
