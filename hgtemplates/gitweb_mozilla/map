@@ -315,7 +315,7 @@ indexentry = '
       </a>
     </td>
     <td>{description}</td>
-    <td class="age">at {lastchange|date}</td>
+    <td class="age">at {lastchange|rfc3339date}</td>
     <td class="indexlinks">{archives%indexarchiveentry}</td>
     <td>{if(isdirectory, '',
             '<div class="rss_logo">
