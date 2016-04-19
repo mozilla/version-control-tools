@@ -53,9 +53,13 @@ else:
 
 subprocess.check_call(['/entrypoint-kafkabroker'])
 
+kafka_state = open('/kafka-servers', 'rb').read().splitlines()
+
 # Update the Kafka connect servers in the vcsreplicator config.
-kafka_servers = open('/kafka-servers', 'rb').read().splitlines()[3:]
+monitor_groups = kafka_state[2].split(',')
+kafka_servers = kafka_state[3:]
 kafka_servers = ['%s:9092' % s.split(':')[0] for s in kafka_servers]
+
 hgrc_lines = open('/etc/mercurial/hgrc', 'rb').readlines()
 with open('/etc/mercurial/hgrc', 'wb') as fh:
     for line in hgrc_lines:
@@ -65,5 +69,16 @@ with open('/etc/mercurial/hgrc', 'wb') as fh:
             line = 'hosts = %s\n' % ', '.join(kafka_servers)
 
         fh.write(line)
+
+pushdataaggregator_lines = open('/etc/mercurial/pushdataaggregator.ini', 'rb').readlines()
+with open('/etc/mercurial/pushdataaggregator.ini', 'wb') as fh:
+    for line in pushdataaggregator_lines:
+        if line.startswith('hosts ='):
+            line = 'hosts = %s\n' % ', '.join(kafka_servers)
+
+        fh.write(line)
+
+with open('/etc/mercurial/pushdataaggregator_groups', 'wb') as fh:
+    fh.write('\n'.join(monitor_groups))
 
 os.execl(sys.argv[1], *sys.argv[1:])

@@ -23,6 +23,17 @@ group = ttest
 {moz} = ssh://${SSH_SERVER}:${SSH_PORT}
 EOF
 
+  cat >> pushdataaggregator-consumer.ini << EOF
+[consumer]
+hosts = ${KAFKA_0_HOSTPORT}, ${KAFKA_1_HOSTPORT}, ${KAFKA_2_HOSTPORT}
+connect_timeout = 5
+poll_timeout = 0.2
+client_id = pushdataaggregatorlocal
+topic = replicatedpushdata
+group = pushdataaggregatorlocal
+EOF
+
 }
 
 alias consumer='vcsreplicator-consumer $TESTTMP/vcsreplicator.ini'
+alias paconsumer='vcsreplicator-consumer $TESTTMP/pushdataaggregator-consumer.ini'

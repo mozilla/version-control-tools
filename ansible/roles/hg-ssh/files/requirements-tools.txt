@@ -10,6 +10,9 @@ kafka-python==0.9.4 \
 Mercurial==3.7.3 \
     --hash=sha256:c099c42d74e2d520b61dd372cd996b0fa7605c06617834fd7b13c79b9a9a5b30
 
+python-hglib==1.9 \
+    --hash=sha256:f4302892b2b8287cf326586c7280b9eadfc3d0c7cd3feba957429a8d9b1a60ce
+
 six==1.9.0 \
     --hash=sha256:418a93c397a7edab23e5588dbc067ac74a723edb3d541bd4936f79476e7645da
 

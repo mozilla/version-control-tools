@@ -259,6 +259,9 @@
   command: /bin/chmod -R a+r /var/hg/version-control-tools
   when: vct_dir.stat.exists == True
 
+- name: install vcsreplicator into virtualenv
+  command: /var/hg/venv_tools/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
+
 - name: install rsyslog policy for hg
   copy: src=rsyslog-hg.conf
         dest=/etc/rsyslog.d/hg.conf
@@ -283,12 +286,15 @@
 - name: sudoers policy for repo-push is in place
   copy: src=repo-push.sudoers dest=/etc/sudoers.d/repo-push
 
-- name: global Mercurial config is in place
-  template: src=hgrc.j2
-            dest=/etc/mercurial/hgrc
+- name: global Mercurial configs are in place
+  template: src={{ item }}.j2
+            dest=/etc/mercurial/{{ item }}
             mode=0664
             owner=root
             group=root
+  with_items:
+    - hgrc
+    - pushdataaggregator.ini
 
 # pash is a collection of Python files handling SSH connections. They behave
 # like a Python module but are installed not as such for historical reasons.
@@ -387,4 +393,12 @@
         owner=root
         group=root
         mode=0644
+
+- name: systemd service file for push data aggregation daemon
+  copy: src=unifyrepo.service
+        dest=/etc/systemd/system/pushdataaggregator.service
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
 

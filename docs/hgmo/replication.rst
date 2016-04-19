@@ -137,6 +137,18 @@ concurrent consumption on clients (as opposed to having 1 process that
 consumes 1 message at a time) without having to invent a message
 acknowledgement and ordering system in addition to what Kafka supports.
 
+Replicated Data Topic
+---------------------
+
+Replication data may be written into multiple partitions. Furthermore,
+mirrors may acknowledge replicated messages at different times. There
+are a class of consumers that want to react to a single stream of
+replication events once they are acknowledged by all active mirrors.
+
+There exists a unified replicated data topic exposing a single partition
+for this stream of messages. A daemon process effectively copies messages
+that have been acknowledged by all active mirrors into this topic.
+
 Known Deficiencies
 ------------------
 
@@ -446,3 +458,30 @@ of a repository later.
    from is unfortunate. Ideally all repository data would be
    self-contained within the log itself. Look for a future feature
    addition to vcsreplicator to provide self-contained logs.
+
+Aggregator Config File
+----------------------
+
+The aggregator daemon (the entity that copies fully acknowledged messages
+into a new topic) has its own config file.
+
+All config options are located in the ``[aggregator]`` section. The following
+config options are defined.
+
+hosts
+   Comma delimited list of ``host:port`` strings indicating Kafka hosts.
+client_id
+   Unique identifier for this client.
+connect_timeout
+   Timeout in milliseconds for connecting to Kafka.
+monitor_topic
+   The Kafka topic that will be monitored (messages will be copied from).
+monitor_groups_file
+   Path to a file listing the Kafka groups whose consumer offsets will be
+   monitored to determine the most recent acknowledged offset. Each line
+   in the file is the name of a Kafka consumer group.
+ack_group
+   The consumer group to use in ``monitor_topic`` that the aggregator
+   daemon will use to record which messages it has copied.
+aggregate_topic
+   The Kafka topic that messages from ``monitor_topic`` will be copied to.
