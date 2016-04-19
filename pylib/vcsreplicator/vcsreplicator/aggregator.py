@@ -118,7 +118,7 @@ def copy_messages(client, consumer_topic, consumer_group, counts,
 
     consumer = Consumer(client, consumer_group, consumer_topic, counts.keys())
     producer = Producer(client, producer_topic, batch_send=False,
-                        req_acks=-1, ack_timeout=30.0)
+                        req_acks=-1, ack_timeout=30000)
 
     # Our strategy is to retrieve messages from the partitions that we need
     # to copy from. When the count of unacked messages in a partition reaches
