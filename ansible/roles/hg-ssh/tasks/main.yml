@@ -395,7 +395,7 @@
         mode=0644
 
 - name: systemd service file for push data aggregation daemon
-  copy: src=unifyrepo.service
+  copy: src=pushdataaggregator.service
         dest=/etc/systemd/system/pushdataaggregator.service
         owner=root
         group=root
