@@ -13,7 +13,7 @@ import sys
 
 def find_hg_repos(path):
     for root, dirs, files in os.walk(path):
-        for d in dirs:
+        for d in sorted(dirs):
             if d == '.hg':
                 yield root
 
