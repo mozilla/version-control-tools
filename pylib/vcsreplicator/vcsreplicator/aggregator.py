@@ -213,6 +213,15 @@ def cli():
     ack_group = config.c.get('aggregator', 'ack_group')
     aggregate_topic = config.c.get('aggregator', 'aggregate_topic')
 
+    root = logging.getLogger()
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter(
+            '%(asctime)s %(process)d %(name)s %(message)s',
+            '%Y-%m-%dT%H:%M:%SZ')
+    formatter.converter = time.gmtime
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
+
     try:
         run_aggregator(client=client,
                        consumer_topic=topic,
