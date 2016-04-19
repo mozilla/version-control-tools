@@ -17,7 +17,7 @@ def find_hg_repos(path):
             if d == '.hg':
                 yield root
 
-        dirs[:] = [d for d in dirs if d != '.hg']
+        dirs[:] = [d for d in sorted(dirs) if d != '.hg']
 
 
 if __name__ == '__main__':
