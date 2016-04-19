@@ -93,9 +93,10 @@ def params_from_env(env):
 
         # Hostnames will attempt to be verified by default. We don't know what
         # the hostname should be, so don't attempt it.
-        tls = docker.tls.TLSConfig(client_cert=(tls_cert_path, tls_key_path),
-                ssl_version=ssl.PROTOCOL_TLSv1, ca_cert=ca_path, verify=True,
-                assert_hostname=False)
+        tls = docker.tls.TLSConfig(
+            client_cert=(tls_cert_path, tls_key_path),
+            ssl_version=ssl.PROTOCOL_TLSv1, ca_cert=ca_path, verify=True,
+            assert_hostname=False)
 
     # docker-py expects the protocol to have something TLS in it. tcp:// won't
     # work. Hack around it until docker-py works as expected.
@@ -307,9 +308,9 @@ class Docker(object):
             # Verify content before doing anything with it.
             # (This is the part Docker gets wrong.)
             if digester.hexdigest() != digest:
-                raise Exception('downloaded Docker image does not match digest: '
-                                '%s; got %s expected %s' % (url,
-                                digester.hexdigest(), digest))
+                raise Exception('downloaded Docker image does not match '
+                                'digest:  %s; got %s expected %s'
+                                % (url, digester.hexdigest(), digest))
 
             fh.flush()
             fh.seek(0)
@@ -319,8 +320,8 @@ class Docker(object):
             if url.endswith('.xz'):
                 fh = lzma.decompress(fh.read())
 
-            res = self.client.import_image_from_data(fh,
-                    repository=repository, tag=tag)
+            res = self.client.import_image_from_data(
+                fh, repository=repository, tag=tag)
             # docker-py doesn't parse the JSON response in what is almost
             # certainly a bug. Do it ourselves.
             return json.loads(res.strip())['status']
@@ -396,7 +397,7 @@ class Docker(object):
                     raise Exception('.dockerignore not currently supported!')
 
                 full = os.path.join(root, f)
-                rel = full[len(p)+1:]
+                rel = full[len(p) + 1:]
 
                 ti = tar.gettarinfo(full, arcname=rel)
 
@@ -558,7 +559,8 @@ class Docker(object):
                                                 verbose=verbose)
             return repository, image
 
-        with self.vct_container(verbose=verbose) as vct_state, futures.ThreadPoolExecutor(len(missing)) as e:
+        with self.vct_container(verbose=verbose) as vct_state, \
+                futures.ThreadPoolExecutor(len(missing)) as e:
             vct_cid = vct_state['Id']
             fs = []
             builder_fs = {}
@@ -593,7 +595,6 @@ class Docker(object):
                                        repository=n, builder=builder,
                                        start_image=start_image,
                                        verbose=verbose))
-
 
             for f in futures.as_completed(fs):
                 name, image = f.result()
@@ -660,7 +661,8 @@ class Docker(object):
                 if base['CreatedBy'].startswith('/sync-and-build'):
                     start_image = base['Id']
 
-        with self.vct_container(image=vct_image, cid=vct_cid, verbose=verbose) as vct_state:
+        with self.vct_container(image=vct_image, cid=vct_cid, verbose=verbose) \
+                as vct_state:
             cmd = ['/sync-and-build', '%s.yml' % playbook]
             with self.create_container(start_image, command=cmd) as cid:
                 output = deque(maxlen=20)
@@ -668,9 +670,10 @@ class Docker(object):
 
                 for s in self.client.attach(cid, stream=True, logs=True):
                     for line in s.splitlines():
-                        output.append(line)
-                        if verbose:
-                            print('%s> %s' % (repository, line))
+                        if line != '':
+                            output.append(line)
+                            if verbose:
+                                print('%s> %s' % (repository, line))
 
                 state = self.client.inspect_container(cid)
                 if state['State']['ExitCode']:
@@ -682,7 +685,8 @@ class Docker(object):
 
                 tag = str(uuid.uuid1())
 
-                iid = self.client.commit(cid['Id'], repository=repository, tag=tag)['Id']
+                iid = self.client.commit(cid['Id'], repository=repository,
+                                         tag=tag)['Id']
                 iid = self.get_full_image(iid)
                 return iid, repository, tag
 
@@ -721,8 +725,8 @@ class Docker(object):
         # The keys for the bootstrapped images are derived from the base
         # images they depend on. This means that if we regenerate a new
         # base image, the bootstrapped images will be regenerated.
-        bmoweb_bootstrapped_key = 'bmoweb-bootstrapped:%s' % (
-                bmo_images['bmoweb'])
+        bmoweb_bootstrapped_key = 'bmoweb-bootstrapped:%s' % \
+            bmo_images['bmoweb']
 
         bmoweb_bootstrap = state_images.get(bmoweb_bootstrapped_key)
 
@@ -738,7 +742,7 @@ class Docker(object):
         self.save_state()
 
         return {
-                'bmoweb': bmoweb_bootstrap,
+            'bmoweb': bmoweb_bootstrap,
         }
 
     def build_mozreview(self, images=None, verbose=False, use_last=False,
@@ -752,7 +756,6 @@ class Docker(object):
         spin up multiple bmoweb containers very quickly.
         """
         images = images or {}
-        state_images = self.state['images']
 
         # Building BMO images is a 2 phase step: image build + bootstrap.
         # Because bootstrap can occur concurrently with other image
@@ -761,7 +764,7 @@ class Docker(object):
         with futures.ThreadPoolExecutor(2) as e:
             if build_bmo:
                 f_bmo_images = e.submit(self.build_bmo, images=images,
-                        verbose=verbose)
+                                        verbose=verbose)
 
             ansibles = {
                 'hgrb': ('docker-hgrb', 'centos6'),
@@ -770,14 +773,17 @@ class Docker(object):
             if build_hgweb:
                 ansibles['hgweb'] = ('docker-hgweb', 'centos6')
 
-            f_images = e.submit(self.ensure_images_built, [
-                'autolanddb',
-                'autoland',
-                'ldap',
-                'pulse',
-                'treestatus',
-            ], ansibles=ansibles,
-            existing=images, verbose=verbose, use_last=use_last)
+            f_images = e.submit(
+                self.ensure_images_built,
+                [
+                    'autolanddb',
+                    'autoland',
+                    'ldap',
+                    'pulse',
+                    'treestatus',
+                ],
+                ansibles=ansibles, existing=images, verbose=verbose,
+                use_last=use_last)
 
             if build_bmo:
                 bmo_images = f_bmo_images.result()
@@ -825,17 +831,22 @@ class Docker(object):
         if 'FETCH_BMO' in os.environ or self.clobber_needed('bmofetch'):
             web_environ['FETCH_BMO'] = '1'
 
-        web_id = self.client.create_container(web_image,
-                                              environment=web_environ,
-                                              labels=['bmoweb-bootstrapping'])['Id']
+        web_id = self.client.create_container(
+            web_image,
+            environment=web_environ,
+            labels=['bmoweb-bootstrapping'])['Id']
 
         web_params = {
             'port_bindings': {80: None},
         }
         with self.start_container(web_id, **web_params) as web_state:
-            web_hostname, web_port = self._get_host_hostname_port(web_state, '80/tcp')
-            wait_for_http(web_hostname, web_port, path='xmlrpc.cgi',
-                          extra_check_fn=self._get_assert_container_running_fn(web_id))
+            web_hostname, web_port = self._get_host_hostname_port(
+                web_state, '80/tcp')
+            wait_for_http(
+                web_hostname,
+                web_port,
+                path='xmlrpc.cgi',
+                extra_check_fn=self._get_assert_container_running_fn(web_id))
 
         web_unique_id = str(uuid.uuid1())
 
@@ -845,9 +856,8 @@ class Docker(object):
         # Docker will forget the repository name if a name image has only a
         # repository name as well.
 
-        web_bootstrap = self.client.commit( web_id,
-                              repository='bmoweb-bootstrapped',
-                              tag=web_unique_id)['Id']
+        web_bootstrap = self.client.commit(
+            web_id, repository='bmoweb-bootstrapped', tag=web_unique_id)['Id']
 
         self.client.remove_container(web_id, v=True)
 
@@ -871,22 +881,21 @@ class Docker(object):
 
         bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
         web_id = self.client.create_container(
-                web_image, environment={'BMO_URL': bmo_url},
-                labels=['bmoweb'])['Id']
+            web_image, environment={'BMO_URL': bmo_url},
+            labels=['bmoweb'])['Id']
         containers.append(web_id)
-        self.client.start(web_id,
-                port_bindings={80: http_port})
+        self.client.start(web_id, port_bindings={80: http_port})
         web_state = self.client.inspect_container(web_id)
 
         self.save_state()
 
-        hostname, hostport = \
-                self._get_host_hostname_port(web_state, '80/tcp')
+        hostname, hostport = self._get_host_hostname_port(web_state, '80/tcp')
         bmo_url = 'http://%s:%d/' % (hostname, hostport)
 
         print('waiting for Bugzilla to start')
-        wait_for_http(hostname, hostport,
-                      extra_check_fn=self._get_assert_container_running_fn(web_id))
+        wait_for_http(
+            hostname, hostport,
+            extra_check_fn=self._get_assert_container_running_fn(web_id))
         print('Bugzilla accessible on %s' % bmo_url)
 
         return {
@@ -894,7 +903,8 @@ class Docker(object):
             'web_id': web_id,
         }
 
-    def start_mozreview(self, cluster, http_port=80,
+    def start_mozreview(
+            self, cluster, http_port=80,
             hgrb_image=None, ldap_image=None, ldap_port=None, pulse_port=None,
             rbweb_port=None, web_image=None, pulse_image=None,
             rbweb_image=None, ssh_port=None, hg_port=None,
@@ -972,59 +982,75 @@ class Docker(object):
 
         with futures.ThreadPoolExecutor(10) as e:
             if start_pulse:
-                f_pulse_create = e.submit(self.client.create_container,
-                        pulse_image, labels=['pulse'])
+                f_pulse_create = e.submit(
+                    self.client.create_container,
+                    pulse_image,
+                    labels=['pulse'])
 
             bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
 
-            f_web_create = e.submit(self.client.create_container,
-                    web_image, environment={'BMO_URL': bmo_url},
-                    labels=['bmoweb'])
+            f_web_create = e.submit(
+                self.client.create_container,
+                web_image,
+                environment={'BMO_URL': bmo_url},
+                labels=['bmoweb'])
 
             if start_rbweb:
-                f_rbweb_create = e.submit(self.client.create_container,
-                                          rbweb_image,
-                                          command=['/run'],
-                                          entrypoint=['/entrypoint.py'],
-                                          ports=[80],
-                                          labels=['rbweb'])
+                f_rbweb_create = e.submit(
+                    self.client.create_container,
+                    rbweb_image,
+                    command=['/run'],
+                    entrypoint=['/entrypoint.py'],
+                    ports=[80],
+                    labels=['rbweb'])
 
             if start_ldap:
-                f_ldap_create = e.submit(self.client.create_container,
-                                         ldap_image,
-                                         labels=['ldap'])
+                f_ldap_create = e.submit(
+                    self.client.create_container,
+                    ldap_image,
+                    labels=['ldap'])
 
             if start_hgrb:
-                f_hgrb_create = e.submit(self.client.create_container,
-                                         hgrb_image,
-                                         ports=[22, 80],
-                                         entrypoint=['/entrypoint.py'],
-                                         command=['/usr/bin/supervisord', '-n'],
-                                         labels=['hgrb'])
+                f_hgrb_create = e.submit(
+                    self.client.create_container,
+                    hgrb_image,
+                    ports=[22, 80],
+                    entrypoint=['/entrypoint.py'],
+                    command=['/usr/bin/supervisord', '-n'],
+                    labels=['hgrb'])
 
             if start_hgweb:
-                f_hgweb_create = e.submit(self.client.create_container,
-                                          hgweb_image,
-                                          ports=[80],
-                                          entrypoint=['/entrypoint-solo'],
-                                          command=['/usr/bin/supervisord', '-n'])
+                f_hgweb_create = e.submit(
+                    self.client.create_container,
+                    hgweb_image,
+                    ports=[80],
+                    entrypoint=['/entrypoint-solo'],
+                    command=['/usr/bin/supervisord', '-n'],
+                    labels=['hgweb'])
 
             if start_autoland:
-                f_autolanddb_create = e.submit(self.client.create_container,
-                        autolanddb_image, labels=['autolanddb'])
+                f_autolanddb_create = e.submit(
+                    self.client.create_container,
+                    autolanddb_image,
+                    labels=['autolanddb'])
 
-                f_autoland_create = e.submit(self.client.create_container,
-                        autoland_image, labels=['autolandweb'])
+                f_autoland_create = e.submit(
+                    self.client.create_container,
+                    autoland_image,
+                    labels=['autolandweb'])
 
             if start_treestatus:
-                f_treestatus_create = e.submit(self.client.create_container,
-                                               treestatus_image,
-                                               labels=['treestatus'])
+                f_treestatus_create = e.submit(
+                    self.client.create_container,
+                    treestatus_image,
+                    labels=['treestatus'])
 
             if start_autoland:
                 autolanddb_id = f_autolanddb_create.result()['Id']
                 containers.append(autolanddb_id)
-                f_start_autolanddb = e.submit(self.client.start, autolanddb_id)
+                f_start_autolanddb = e.submit(
+                    self.client.start,
+                    autolanddb_id)
 
             # RabbitMQ takes a while to start up. Start it before other
             # containers. (We probably could have a callback-driven mechanism
@@ -1032,14 +1058,18 @@ class Docker(object):
             if start_pulse:
                 pulse_id = f_pulse_create.result()['Id']
                 containers.append(pulse_id)
-                f_start_pulse = e.submit(self.client.start, pulse_id,
-                                         port_bindings={5672: pulse_port})
+                f_start_pulse = e.submit(
+                    self.client.start,
+                    pulse_id,
+                    port_bindings={5672: pulse_port})
 
             if start_ldap:
                 ldap_id = f_ldap_create.result()['Id']
                 containers.append(ldap_id)
-                f_start_ldap = e.submit(self.client.start, ldap_id,
-                                        port_bindings={389: ldap_port})
+                f_start_ldap = e.submit(
+                    self.client.start,
+                    ldap_id,
+                    port_bindings={389: ldap_port})
 
             web_id = f_web_create.result()['Id']
             containers.append(web_id)
@@ -1070,8 +1100,10 @@ class Docker(object):
             # At this point, all containers have been created.
             self.save_state()
 
-            f_start_web = e.submit(self.client.start, web_id,
-                    port_bindings={80: http_port})
+            f_start_web = e.submit(
+                self.client.start,
+                web_id,
+                port_bindings={80: http_port})
             f_start_web.result()
             web_state = self.client.inspect_container(web_id)
 
@@ -1103,29 +1135,31 @@ class Docker(object):
             if start_autoland:
                 assert start_hgrb
                 assert start_treestatus
-                f_start_autoland = e.submit(self.client.start, autoland_id,
-                        links=[(autolanddb_state['Name'], 'db'),
-                               (web_state['Name'], 'bmoweb'),
-                               (hgrb_state['Name'], 'hgrb'),
-                               (treestatus_state['Name'], 'treestatus')],
-                        port_bindings={80: autoland_port})
+                f_start_autoland = e.submit(
+                    self.client.start,
+                    autoland_id,
+                    links=[(autolanddb_state['Name'], 'db'),
+                           (web_state['Name'], 'bmoweb'),
+                           (hgrb_state['Name'], 'hgrb'),
+                           (treestatus_state['Name'], 'treestatus')],
+                    port_bindings={80: autoland_port})
                 f_start_autoland.result()
                 autoland_state = self.client.inspect_container(autoland_id)
 
             if start_rbweb:
                 assert start_autoland
-                self.client.start(rbweb_id,
-                                  links=[(web_state['Name'], 'bmoweb'),
-                                         (pulse_state['Name'], 'pulse'),
-                                         (hgrb_state['Name'], 'hgrb'),
-                                         (autoland_state['Name'], 'autoland'),
-                                         (ldap_state['Name'], 'ldap')
-                                  ],
-                                  port_bindings={80: rbweb_port})
+                self.client.start(
+                    rbweb_id,
+                    links=[(web_state['Name'], 'bmoweb'),
+                           (pulse_state['Name'], 'pulse'),
+                           (hgrb_state['Name'], 'hgrb'),
+                           (autoland_state['Name'], 'autoland'),
+                           (ldap_state['Name'], 'ldap')],
+                    port_bindings={80: rbweb_port})
                 rbweb_state = self.client.inspect_container(rbweb_id)
 
         bmoweb_hostname, bmoweb_hostport = \
-                self._get_host_hostname_port(web_state, '80/tcp')
+            self._get_host_hostname_port(web_state, '80/tcp')
         bmo_url = 'http://%s:%d/' % (bmoweb_hostname, bmoweb_hostport)
 
         if start_pulse:
@@ -1160,28 +1194,35 @@ class Docker(object):
                 fs.append(e.submit(
                     wait_for_amqp, rabbit_hostname, rabbit_hostport,
                     'guest', 'guest',
-                    extra_check_fn=self._get_assert_container_running_fn(pulse_id)))
+                    extra_check_fn=self._get_assert_container_running_fn(
+                        pulse_id)))
             if start_hgrb:
                 fs.append(e.submit(
                     wait_for_ssh, hgssh_hostname, hgssh_hostport,
-                    extra_check_fn=self._get_assert_container_running_fn(hgrb_id)))
+                    extra_check_fn=self._get_assert_container_running_fn(
+                        hgrb_id)))
                 fs.append(e.submit(
                     wait_for_http, hgrbweb_hostname, hgrbweb_hostport,
-                    extra_check_fn=self._get_assert_container_running_fn(hgrb_id)))
+                    extra_check_fn=self._get_assert_container_running_fn(
+                        hgrb_id)))
 
             if start_rbweb:
-                e.submit(wait_for_http, rbweb_hostname, rbweb_hostport,
-                         extra_check_fn=self._get_assert_container_running_fn(rbweb_id))
+                e.submit(
+                    wait_for_http, rbweb_hostname, rbweb_hostport,
+                    extra_check_fn=self._get_assert_container_running_fn(
+                        rbweb_id))
 
             if start_hgweb:
                 fs.append(e.submit(
                     wait_for_http, hgweb_hostname, hgweb_hostport,
-                    extra_check_fn=self._get_assert_container_running_fn(hgweb_id)))
+                    extra_check_fn=self._get_assert_container_running_fn(
+                        hgweb_id)))
 
             if start_treestatus:
                 fs.append(e.submit(
                     wait_for_http, treestatus_hostname, treestatus_hostport,
-                    extra_check_fn=self._get_assert_container_running_fn(treestatus_id)))
+                    extra_check_fn=self._get_assert_container_running_fn(
+                        treestatus_id)))
 
         [f.result() for f in fs]
 
@@ -1194,7 +1235,7 @@ class Docker(object):
             result['autolanddb_id'] = autolanddb_id
             result['autoland_id'] = autoland_id
             autoland_hostname, autoland_hostport = \
-                    self._get_host_hostname_port(autoland_state, '80/tcp')
+                self._get_host_hostname_port(autoland_state, '80/tcp')
             result['autoland_url'] = 'http://%s:%d/' % (autoland_hostname,
                                                         autoland_hostport)
 
@@ -1205,7 +1246,7 @@ class Docker(object):
 
         if start_ldap:
             ldap_hostname, ldap_hostport = \
-                    self._get_host_hostname_port(ldap_state, '389/tcp')
+                self._get_host_hostname_port(ldap_state, '389/tcp')
             result['ldap_id'] = ldap_id
             result['ldap_uri'] = 'ldap://%s:%d/' % (ldap_hostname,
                                                     ldap_hostport)
@@ -1223,11 +1264,13 @@ class Docker(object):
 
         if start_hgweb:
             result['hgweb_id'] = hgweb_id
-            result['hgweb_url'] = 'http://%s:%d/' % (hgweb_hostname, hgweb_hostport)
+            result['hgweb_url'] = 'http://%s:%d/' % (hgweb_hostname,
+                                                     hgweb_hostport)
 
         if start_treestatus:
             result['treestatus_id'] = treestatus_id
-            result['treestatus_url'] = 'http://%s:%d/' % (treestatus_hostname, treestatus_hostport)
+            result['treestatus_url'] = 'http://%s:%d/' % (treestatus_hostname,
+                                                          treestatus_hostport)
 
         return result
 
@@ -1280,21 +1323,31 @@ class Docker(object):
             }
 
         images = self.ensure_images_built(docker_images,
-                ansibles=ansible_images, verbose=verbose, use_last=use_last)
+                                          ansibles=ansible_images,
+                                          verbose=verbose,
+                                          use_last=use_last)
 
         with futures.ThreadPoolExecutor(3) as e:
             if mozreview:
-                f_mr = e.submit(self.build_mozreview, images=images,
-                                verbose=verbose, use_last=use_last,
-                                build_hgweb=not hgmo,
-                                build_bmo=not bmo)
+                f_mr = e.submit(
+                    self.build_mozreview,
+                    images=images,
+                    verbose=verbose,
+                    use_last=use_last,
+                    build_hgweb=not hgmo,
+                    build_bmo=not bmo)
             if hgmo:
-                f_hgmo = e.submit(self.build_hgmo, images=images, verbose=verbose,
-                                  use_last=use_last)
+                f_hgmo = e.submit(
+                    self.build_hgmo,
+                    images=images,
+                    verbose=verbose,
+                    use_last=use_last)
 
             if bmo:
-                f_bmo = e.submit(self.build_bmo, images=images,
-                                 verbose=verbose)
+                f_bmo = e.submit(
+                    self.build_bmo,
+                    images=images,
+                    verbose=verbose)
 
         mr_result = f_mr.result() if mozreview else None
         hgmo_result = f_hgmo.result() if hgmo else None
@@ -1308,12 +1361,18 @@ class Docker(object):
         image = self.ensure_built(builder, verbose=True)
         container = self.client.create_container(image)['Id']
 
-        with self.start_container(container, port_bindings={80: None}) as state:
-            port = int(state['NetworkSettings']['Ports']['80/tcp'][0]['HostPort'])
+        with self.start_container(container,
+                                  port_bindings={80: None}) as state:
+            port = int(state['NetworkSettings']['Ports']['80/tcp'][0]
+                       ['HostPort'])
 
             print(message)
-            wait_for_http(self.docker_hostname, port, timeout=120,
-                          extra_check_fn=self._get_assert_container_running_fn(container))
+            wait_for_http(
+                self.docker_hostname,
+                port,
+                timeout=120,
+                extra_check_fn=self._get_assert_container_running_fn(container)
+            )
 
             res = requests.get('http://%s:%s/' % (self.docker_hostname, port))
 
@@ -1327,7 +1386,7 @@ class Docker(object):
 
     def build_mercurial_rpms(self, distro):
         return self._get_files_from_http_container('hgrpm-%s' % distro,
-            'Generating RPMs...')
+                                                   'Generating RPMs...')
 
     def get_full_image(self, image):
         for i in self.client.images():
@@ -1422,8 +1481,8 @@ class Docker(object):
     def start_container(self, cid, **kwargs):
         """Context manager for starting and stopping a Docker container.
 
-        The container with id ``cid`` will be started when the context manager is
-        entered and stopped when the context manager is execited.
+        The container with id ``cid`` will be started when the context manager
+        is entered and stopped when the context manager is execited.
 
         The context manager receives the inspected state of the container,
         immediately after it is started.
@@ -1507,7 +1566,8 @@ class Docker(object):
             if start:
                 self.client.start(cid, port_bindings={873: None})
                 state = self.client.inspect_container(cid)
-                port = state['NetworkSettings']['Ports']['873/tcp'][0]['HostPort']
+                ports = state['NetworkSettings']['Ports']
+                port = ports['873/tcp'][0]['HostPort']
                 url = 'rsync://%s:%s/vct-mount/' % (self.docker_hostname, port)
 
                 get_and_write_vct_node()
@@ -1518,7 +1578,8 @@ class Docker(object):
                     fh.write('.vctnode\n')
                     fh.flush()
 
-                    rsync('-a', '--delete-before', '--files-from', fh.name, ROOT, url)
+                    rsync('-a', '--delete-before', '--files-from', fh.name,
+                          ROOT, url)
 
                 self.state['last-vct-id'] = image
                 self.state['vct-cid'] = cid
@@ -1663,7 +1724,8 @@ class Docker(object):
         return gateway, host_port
 
     def _get_assert_container_running_fn(self, cid):
-        """Obtain a function that raises during invocation if a container stops."""
+        """Obtain a function that raises during invocation if a container
+        stops."""
         def assert_running():
             try:
                 info = self.client.inspect_container(cid)
