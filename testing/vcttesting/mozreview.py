@@ -366,7 +366,10 @@ class MozReview(object):
                                            stderr=verbose, stdout=verbose)
                 for msg in res:
                     if verbose:
-                        print('%s> %s' % (name, msg), end='')
+                        msg = msg.rstrip().lstrip('\n')
+                        for line in msg.splitlines():
+                            if line != '':
+                                print('%s> %s' % (name, line))
 
             def refresh(name, cid):
                 execute(name, cid, ['/refresh', url])
