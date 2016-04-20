@@ -217,6 +217,7 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
         env['DOCKER_HGMASTER_IMAGE'] = hgmo_images['hgmaster']
         env['DOCKER_HGWEB_IMAGE'] = hgmo_images['hgweb']
         env['DOCKER_LDAP_IMAGE'] = hgmo_images['ldap']
+        env['DOCKER_PULSE_IMAGE'] = hgmo_images['pulse']
 
     if bmo:
         env['DOCKER_BMO_WEB_IMAGE'] = bmo_images['bmoweb']

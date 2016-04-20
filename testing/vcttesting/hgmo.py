@@ -13,6 +13,7 @@ import concurrent.futures as futures
 
 from .ldap import LDAP
 from .util import (
+    wait_for_amqp,
     wait_for_kafka,
     wait_for_ssh,
 )
@@ -67,7 +68,7 @@ class HgCluster(object):
     }
 
     def __init__(self, docker, state_path=None, ldap_image=None,
-                 master_image=None, web_image=None):
+                 master_image=None, web_image=None, pulse_image=None):
         self._d = docker
         self._dc = docker.client
         self.state_path = state_path
@@ -81,10 +82,13 @@ class HgCluster(object):
             self.ldap_image = ldap_image
             self.master_image = master_image
             self.web_image = web_image
+            self.pulse_image = pulse_image
             self.ldap_id = None
             self.master_id = None
             self.web_ids = []
             self.ldap_uri = None
+            self.pulse_hostname = None
+            self.pulse_hostport = None
             self.master_ssh_hostname = None
             self.master_ssh_port = None
             self.master_host_rsa_key = None
@@ -94,7 +98,7 @@ class HgCluster(object):
             self.zookeeper_connect = None
 
     def start(self, ldap_port=None, master_ssh_port=None, web_count=2,
-              coverage=False):
+              pulse_port=None, coverage=False):
         """Start the cluster.
 
         If ``coverage`` is True, code coverage for Python executions will be
@@ -104,17 +108,20 @@ class HgCluster(object):
         ldap_image = self.ldap_image
         master_image = self.master_image
         web_image = self.web_image
+        pulse_image = self.pulse_image
 
-        if not ldap_image or not master_image or not web_image:
+        if not ldap_image or not master_image or not web_image or not pulse_image:
             images = self._d.build_hgmo(verbose=True)
             master_image = images['hgmaster']
             web_image = images['hgweb']
             ldap_image = images['ldap']
+            pulse_image = images['pulse']
 
         zookeeper_id = 0
 
-        with futures.ThreadPoolExecutor(4) as e:
+        with futures.ThreadPoolExecutor(5) as e:
             f_ldap_create = e.submit(self._dc.create_container, ldap_image)
+            f_pulse_create = e.submit(self._dc.create_container, pulse_image)
 
             env = {
                 'ZOOKEEPER_ID': '%d' % zookeeper_id,
@@ -146,15 +153,24 @@ class HgCluster(object):
                                               command=['/usr/bin/supervisord', '-n']))
 
             ldap_id = f_ldap_create.result()['Id']
+            pulse_id = f_pulse_create.result()['Id']
             master_id = f_master_create.result()['Id']
 
-            # Start LDAP first because we need to link it to all the hg
+            # Start LDAP and Pulse first because we need to link it to hg
             # containers.
-            self._dc.start(ldap_id, port_bindings={389: ldap_port})
+            f_ldap_start = e.submit(self._dc.start, ldap_id,
+                                    port_bindings={389: ldap_port})
+            f_pulse_start = e.submit(self._dc.start, pulse_id,
+                                     port_bindings={5672: pulse_port})
+            f_ldap_start.result()
+            f_pulse_start.result()
+
             ldap_state = self._dc.inspect_container(ldap_id)
+            pulse_state = self._dc.inspect_container(pulse_id)
 
             self._dc.start(master_id,
-                           links=[(ldap_state['Name'], 'ldap')],
+                           links=[(ldap_state['Name'], 'ldap'),
+                                  (pulse_state['Name'], 'pulse')],
                            port_bindings={
                                22: master_ssh_port,
                                9092: None,
@@ -254,11 +270,14 @@ class HgCluster(object):
                 self._d._get_host_hostname_port(ldap_state, '389/tcp')
         master_ssh_hostname, master_ssh_hostport = \
                 self._d._get_host_hostname_port(master_state, '22/tcp')
+        pulse_hostname, pulse_hostport = \
+                self._d._get_host_hostname_port(pulse_state, '5672/tcp')
 
         self.ldap_uri = 'ldap://%s:%d/' % (ldap_hostname,
                                            ldap_hostport)
         with futures.ThreadPoolExecutor(4) as e:
             e.submit(self.ldap.create_vcs_sync_login, mirror_public_key)
+            e.submit(wait_for_amqp, pulse_hostname, pulse_hostport)
             e.submit(wait_for_ssh, master_ssh_hostname, master_ssh_hostport)
 
             for s in all_states:
@@ -268,9 +287,13 @@ class HgCluster(object):
         self.ldap_image = ldap_image
         self.master_image = master_image
         self.web_image = web_image
+        self.pulse_image = pulse_image
         self.ldap_id = ldap_id
+        self.pulse_id = pulse_id
         self.master_id = master_id
         self.web_ids = web_ids
+        self.pulse_hostname = pulse_hostname
+        self.pulse_hostport = pulse_hostport
         self.master_ssh_hostname = master_ssh_hostname
         self.master_ssh_port = master_ssh_hostport
         self.master_host_rsa_key = master_host_rsa_key
@@ -293,9 +316,10 @@ class HgCluster(object):
         Containers will be shut down gracefully.
         """
         c = self._d.client
-        with futures.ThreadPoolExecutor(4) as e:
+        with futures.ThreadPoolExecutor(5) as e:
             e.submit(c.stop, self.master_id)
             e.submit(c.stop, self.ldap_id)
+            e.submit(c.stop, self.pulse_id)
             for i in self.web_ids:
                 e.submit(c.stop, i)
 
@@ -309,6 +333,7 @@ class HgCluster(object):
         with futures.ThreadPoolExecutor(4) as e:
             e.submit(c.remove_container, self.master_id, force=True, v=True)
             e.submit(c.remove_container, self.ldap_id, force=True, v=True)
+            e.submit(c.remove_container, self.pulse_id, force=True, v=True)
             for i in self.web_ids:
                 e.submit(c.remove_container, i, force=True, v=True)
 
@@ -319,9 +344,12 @@ class HgCluster(object):
                 raise
 
         self.ldap_id = None
+        self.pulse_id = None
         self.master_id = None
         self.web_ids = []
         self.ldap_uri = None
+        self.pulse_hostname = None
+        self.pulse_hostport = None
         self.master_ssh_hostname = None
         self.master_ssh_port = None
         self.kafka_hostports = []
@@ -333,10 +361,14 @@ class HgCluster(object):
                 'ldap_image': self.ldap_image,
                 'master_image': self.master_image,
                 'web_image': self.web_image,
+                'pulse_image': self.pulse_image,
                 'ldap_id': self.ldap_id,
+                'pulse_id': self.pulse_id,
                 'master_id': self.master_id,
                 'web_ids': self.web_ids,
                 'ldap_uri': self.ldap_uri,
+                'pulse_hostname': self.pulse_hostname,
+                'pulse_hostport': self.pulse_hostport,
                 'master_ssh_hostname': self.master_ssh_hostname,
                 'master_ssh_port': self.master_ssh_port,
                 'master_host_rsa_key': self.master_host_rsa_key,

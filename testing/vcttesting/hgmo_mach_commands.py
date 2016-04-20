@@ -40,7 +40,8 @@ class HgmoCommands(object):
         self.c = HgCluster(docker, os.environ['HGMO_STATE_FILE'],
                            ldap_image=os.environ.get('DOCKER_LDAP_IMAGE'),
                            master_image=os.environ.get('DOCKER_HGMASTER_IMAGE'),
-                           web_image=os.environ.get('DOCKER_HGWEB_IMAGE'))
+                           web_image=os.environ.get('DOCKER_HGWEB_IMAGE'),
+                           pulse_image=os.environ.get('DOCKER_PULSE_IMAGE'))
 
     @Command('start', category='hgmo',
              description='Start a hg.mozilla.org cluster')
@@ -54,11 +55,14 @@ class HgmoCommands(object):
         print('LDAP URI: %s' % s['ldap_uri'])
         for url in s['web_urls']:
             print('Web URL: %s' % url)
+        print('Pulse: %s:%d' % (s['pulse_hostname'], s['pulse_hostport']))
 
     @Command('shellinit', category='hgmo',
              description='Print shell commands to export variables')
     def shellinit(self):
         print('export SSH_CID=%s' % self.c.master_id)
+        print('export PULSE_HOST=%s' % self.c.pulse_hostname)
+        print('export PULSE_PORT=%s' % self.c.pulse_hostport)
         print('export SSH_SERVER=%s' % self.c.master_ssh_hostname)
         print('export SSH_PORT=%d' % self.c.master_ssh_port)
         # Don't export the full value because spaces.

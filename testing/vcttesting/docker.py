@@ -695,6 +695,7 @@ class Docker(object):
         """
         images = self.ensure_images_built([
             'ldap',
+            'pulse',
         ], ansibles={
             'hgmaster': ('docker-hgmaster', 'centos7'),
             'hgweb': ('docker-hgweb', 'centos7'),
@@ -703,6 +704,7 @@ class Docker(object):
         self.state['last-hgmaster-id'] = images['hgmaster']
         self.state['last-hgweb-id'] = images['hgweb']
         self.state['last-ldap-id'] = images['ldap']
+        self.state['last-pulse-id'] = images['pulse']
 
         return images
 
