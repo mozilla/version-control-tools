@@ -5,12 +5,14 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
-import signal
 import sys
 import time
 
 from .config import Config
 from .consumer import Consumer
+from .daemon import (
+    run_in_loop,
+)
 from .producer import Producer
 from .util import consumer_offsets
 
@@ -18,39 +20,35 @@ from .util import consumer_offsets
 logger = logging.getLogger('vcsreplicator.aggregator')
 
 
-def run_aggregation(client, consumer_topic, consumer_groups_path, ack_group,
-                    producer_topic, alive, poll_interval=1.0, onetime=False):
-    while alive[0]:
-        # We read the consumer groups file on every iteration so the set of
-        # consumers can be dynamic. This allows consumers to be marked as
-        # offline without causing a stall in message copying.
-        consumer_groups = []
-        with open(consumer_groups_path, 'rb') as fh:
-            for line in fh:
-                line = line.strip()
-                if line:
-                    consumer_groups.append(line)
+def _run_aggregation(client, consumer_topic, consumer_groups_path, ack_group,
+                    producer_topic, alive, poll_interval=1.0):
+    # We read the consumer groups file on every iteration so the set of
+    # consumers can be dynamic. This allows consumers to be marked as
+    # offline without causing a stall in message copying.
+    consumer_groups = []
+    with open(consumer_groups_path, 'rb') as fh:
+        for line in fh:
+            line = line.strip()
+            if line:
+                consumer_groups.append(line)
 
-        count = synchronize_fully_consumed_messages(
-            client=client,
-            consumer_topic=consumer_topic,
-            consumer_groups=consumer_groups,
-            ack_group=ack_group,
-            producer_topic=producer_topic,
-            alive=alive)
+    count = synchronize_fully_consumed_messages(
+        client=client,
+        consumer_topic=consumer_topic,
+        consumer_groups=consumer_groups,
+        ack_group=ack_group,
+        producer_topic=producer_topic,
+        alive=alive)
 
-        if onetime:
-            break
+    if not alive[0]:
+        return
 
-        if not alive[0]:
-            break
-
-        # If we didn't have any unacked messages, we don't want to busy
-        # loop polling for offsets. So add a delay. Ideally we would wait on
-        # a message to arrive and react to that instantly. For now, a small
-        # polling interval should be sufficient.
-        if not count:
-            time.sleep(poll_interval)
+    # If we didn't have any unacked messages, we don't want to busy
+    # loop polling for offsets. So add a delay. Ideally we would wait on
+    # a message to arrive and react to that instantly. For now, a small
+    # polling interval should be sufficient.
+    if not count:
+        time.sleep(poll_interval)
 
 
 def synchronize_fully_consumed_messages(client, consumer_topic, consumer_groups,
@@ -106,6 +104,7 @@ def synchronize_fully_consumed_messages(client, consumer_topic, consumer_groups,
 
     return unacked_count
 
+
 def copy_messages(client, consumer_topic, consumer_group, counts,
                   producer_topic, alive):
     """Record all unacked messages in another topic.
@@ -154,50 +153,6 @@ def copy_messages(client, consumer_topic, consumer_group, counts,
             del consumer.fetch_offsets[partition]
 
 
-def run_aggregator(client, consumer_topic, consumer_groups_path, ack_group,
-                   aggregate_topic, onetime=False):
-    """Run an aggregation daemon.
-
-    When the process receives a SIGINT or SIGTERM, it will be gracefully
-    aborted. Otherwise, run to infinity or first exception. If ``onetime``
-    is set, will run once then exit.
-    """
-    signal_count = [0]
-    alive = [True]
-
-    def signal_exit(signum, frame):
-        logger.warn('received signal %d' % signum)
-        signal_count[0] += 1
-        alive[0] = False
-
-        if signal_count[0] == 1:
-            logger.warn('exiting gracefully')
-            return
-
-        # If this is a subsequent signal, convert to forceful exit.
-        logger.warn('already received exit signal; forcefully aborting')
-        sys.exit(1)
-
-    oldint = signal.signal(signal.SIGINT, signal_exit)
-    oldterm = signal.signal(signal.SIGTERM, signal_exit)
-
-    try:
-        run_aggregation(client,
-                        consumer_topic=consumer_topic,
-                        consumer_groups_path=consumer_groups_path,
-                        ack_group=ack_group,
-                        producer_topic=aggregate_topic,
-                        alive=alive,
-                        onetime=onetime)
-
-        if not onetime:
-            logger.warn('main aggregation loop returned')
-
-    finally:
-        signal.signal(signal.SIGINT, oldint)
-        signal.signal(signal.SIGTERM, oldterm)
-
-
 def cli():
     """Command line interface to run the aggregator."""
     import argparse
@@ -225,12 +180,12 @@ def cli():
     root.addHandler(handler)
 
     try:
-        run_aggregator(client=client,
-                       consumer_topic=topic,
-                       consumer_groups_path=groups_path,
-                       ack_group=ack_group,
-                       aggregate_topic=aggregate_topic,
-                       onetime=args.onetime)
+        run_in_loop(logger, _run_aggregation, onetime=args.onetime,
+                    client=client,
+                    consumer_topic=topic,
+                    consumer_groups_path=groups_path,
+                    ack_group=ack_group,
+                    producer_topic=aggregate_topic)
     except BaseException:
         logger.error('exiting main consume loop with error')
         raise
