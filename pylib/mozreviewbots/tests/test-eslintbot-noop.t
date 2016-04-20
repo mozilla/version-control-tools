@@ -58,6 +58,7 @@ Create a review request that doesn't touch any Javascript files
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 27ed10e6e90a514ad461a5a7147a9134de0ca799
     p2rb.first_public_ancestor: dc42edca6edd9dd5a8346b1a881281263d3a10ad
     p2rb.identifier: bz://1/mynick

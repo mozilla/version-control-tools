@@ -36,6 +36,7 @@ No review should be left if no Python files were changed.
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 97bc3c7259dfe4c83e2d1ac3e6b252a5331da9cd
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick

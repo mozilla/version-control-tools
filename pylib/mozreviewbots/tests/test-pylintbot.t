@@ -40,6 +40,7 @@ Create a review with Python style violations
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 1978e5417012a5f63128d09cfd52c52077c761cb
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -148,6 +149,7 @@ Ensure pyflakes warnings are handled
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: c768227fc261de5a93e0c813e0ba4a54e24d2697
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://2/mynick

@@ -54,6 +54,7 @@ be ignored
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 3a773b9e226cc5486fdd724372938f77204ff12c
     p2rb.first_public_ancestor: 3edbb5ae6222fc9890db26538597a9b417cb7b94
     p2rb.identifier: bz://1/mynick

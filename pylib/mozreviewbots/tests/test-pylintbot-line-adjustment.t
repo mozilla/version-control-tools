@@ -101,6 +101,7 @@ Line numbers for these failures should be adjusted -= 1 and cover 2 lines
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: c45aead0c4d66a05a22fce427658fba6f3e20f9c
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -309,6 +310,7 @@ Create tests for line -= 2
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 51dfa0ded22aa53d3e7c3d7b5342ba8734c4c6ce
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://2/mynick

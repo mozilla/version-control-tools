@@ -62,6 +62,7 @@ Create a review request with some busted Javascript in it
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test
     p2rb.commit_id: 719ed7ed9e3e1a340f443981aa91125b68598369
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
@@ -115,7 +116,7 @@ Create a review request with some busted Javascript in it
       issue_status: open
       first_line: 1
       num_lines: 1
-      text: 'Error - Parsing error: Unexpected token { (column 10)'
+      text: 'Error - Parsing error: Unexpected token { (column 9)'
       text_type: plain
       diff_id: 6
       diff_dest_file: test.js
