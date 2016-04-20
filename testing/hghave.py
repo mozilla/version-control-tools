@@ -53,6 +53,11 @@ def has_hgmodocker():
 def has_mozreviewdocker():
     return has_docker()
 
+@check('eslint', 'Require eslint')
+def has_eslint():
+    from distutils.spawn import find_executable
+    return find_executable('eslint') is not None
+
 @check('bmodocker', 'Require BMO Docker pieces')
 def has_bmodocker():
     return has_docker()

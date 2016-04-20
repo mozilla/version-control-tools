@@ -1,4 +1,4 @@
-#require mozreviewdocker
+#require mozreviewdocker eslint
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ . $TESTDIR/pylib/mozreviewbots/tests/helpers.sh
   $ commonenv rb-test-eslintbot
