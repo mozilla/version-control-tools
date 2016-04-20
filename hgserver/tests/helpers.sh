@@ -8,6 +8,7 @@ export HGUSER='Test User <someone@example.com>'
 
 alias hgmo='$TESTDIR/hgmo'
 alias http=$TESTDIR/testing/http-request.py
+alias pulse='$TESTDIR/pulse'
 
 hgmoenv() {
   export DOCKER_STATE_FILE=`pwd`/.dockerstate

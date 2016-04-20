@@ -1,3 +1,9 @@
+amqp==1.4.9 \
+    --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908
+
+anyjson==0.3.3 \
+    --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba
+
 boto==2.38.0 \
     --hash=sha256:758498c77f16e26b8b61af26f8d0dbb119b713f2d8d166681ec892311f3520c4
 
@@ -6,6 +12,9 @@ futures==3.0.3 \
 
 kafka-python==0.9.4 \
     --hash=sha256:6cd463b688d98fec1c1f602e316eb7745aef0e55dc57fe9ff2f203cf0865c8c7
+
+kombu==3.0.35 \
+    --hash=sha256:2c59a5e087d5895675cdb4d6a38a0aa147f0411366e68330a76e480ba3b25727
 
 Mercurial==3.7.3 \
     --hash=sha256:c099c42d74e2d520b61dd372cd996b0fa7605c06617834fd7b13c79b9a9a5b30

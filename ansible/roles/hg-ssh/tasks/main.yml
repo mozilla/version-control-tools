@@ -217,7 +217,6 @@
            venv=/var/hg/venv_tools
            requirements=../roles/hg-ssh/files/requirements-tools.txt
 
-
 # Hooks are referenced in various hgrc files via "python:mozhghooks.*".
 # This means they are imported as Python modules from the "mozhghooks"
 # package. We create a .pth file telling the virtualenv that
@@ -294,6 +293,7 @@
             group=root
   with_items:
     - hgrc
+    - notifications.ini
     - pushdataaggregator.ini
 
 # pash is a collection of Python files handling SSH connections. They behave
@@ -397,6 +397,14 @@
 - name: systemd service file for push data aggregation daemon
   copy: src=pushdataaggregator.service
         dest=/etc/systemd/system/pushdataaggregator.service
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
+
+- name: systemd service file for pulse notification daemon
+  copy: src=pulsenotifier.service
+        dest=/etc/systemd/system/pulsenotifier.service
         owner=root
         group=root
         mode=0644

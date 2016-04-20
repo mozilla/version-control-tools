@@ -1,0 +1,23 @@
+[path_rewrites]
+{moz}/ = /repo/hg/mozilla/
+
+[public_url_rewrites]
+{moz}/ = https://hg.mozilla.org/
+
+[pulseconsumer]
+hosts = {% for host in zk_servers %}{{ host }}:9092{% if not loop.last%}, {% endif %}{% endfor %}
+
+client_id = pulsenotifier
+topic = replicatedpushdata
+group = pulsenotifier
+
+[pulse]
+hostname = pulse.mozilla.org
+port = 5671
+connect_timeout = 5
+userid = {{ pulse_user | default("guest") }}
+password = {{ pulse_password | default("guest") }}
+exchange = exchange/hg/
+routing_key = hg.push.1
+virtual_host = /
+ssl = true

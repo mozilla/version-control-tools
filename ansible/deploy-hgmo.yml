@@ -66,6 +66,11 @@
       slurp: src=/etc/mercurial/ldap.json
       register: ldap_config
 
+    # Ditto for the Pulse config.
+    - name: capture Pulse config
+      slurp: src=/etc/mercurial/pulse.json
+      register: pulse_config
+
   roles:
     - {
         role: hg-ssh,
@@ -73,6 +78,8 @@
         bind_pw: "{{ (ldap_config.content | b64decode | from_json).password }}",
         ldap_uri: "{{ (ldap_config.content | b64decode | from_json).url }}",
         hgweb_hosts: "{{ groups['hgweb-prod'] }}",
+        pulse_user: "{{ pulse_config.content | b64decode | from_json).user }}",
+        pulse_password: "{{ pulse_config.content | b64decode | from_json).password }}",
       }
 
   tasks:

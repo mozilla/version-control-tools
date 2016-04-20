@@ -11,6 +11,10 @@ if 'LDAP_PORT_389_TCP_ADDR' not in os.environ:
     print('error: container invoked improperly. please link to an ldap container')
     sys.exit(1)
 
+if 'PULSE_PORT_5672_TCP_ADDR' not in os.environ:
+    print('error: container invoked improperly. please link to a pulse container')
+    sys.exit(1)
+
 os.environ['DOCKER_ENTRYPOINT'] = '1'
 
 subprocess.check_call([
@@ -24,6 +28,9 @@ del os.environ['DOCKER_ENTRYPOINT']
 ldap_hostname = os.environ['LDAP_PORT_389_TCP_ADDR']
 ldap_port = os.environ['LDAP_PORT_389_TCP_PORT']
 ldap_uri = 'ldap://%s:%s/' % (ldap_hostname, ldap_port)
+
+pulse_hostname = os.environ['PULSE_PORT_5672_TCP_ADDR']
+pulse_port = int(os.environ['PULSE_PORT_5672_TCP_PORT'])
 
 # Generate host SSH keys for hg.
 if not os.path.exists('/etc/mercurial/ssh/ssh_host_ed25519_key'):
@@ -80,5 +87,28 @@ with open('/etc/mercurial/pushdataaggregator.ini', 'wb') as fh:
 
 with open('/etc/mercurial/pushdataaggregator_groups', 'wb') as fh:
     fh.write('\n'.join(monitor_groups))
+
+# Update the notification daemon settings.
+notification_lines = open('/etc/mercurial/notifications.ini', 'rb').readlines()
+with open('/etc/mercurial/notifications.ini', 'wb') as fh:
+    section = None
+    for line in notification_lines:
+        if line.startswith('['):
+            section = line.strip()[1:-1]
+
+        if section == 'pulseconsumer':
+            if line.startswith('hosts ='):
+                line = 'hosts = %s\n' % ', '.join(kafka_servers)
+
+        if section == 'pulse':
+            if line.startswith('hostname ='):
+                line = 'hostname = %s\n' % pulse_hostname
+            elif line.startswith('port ='):
+                line = 'port = %d\n' % pulse_port
+            # SSL isn't enabled in Docker.
+            elif line.startswith('ssl ='):
+                line = 'ssl = false\n'
+
+        fh.write(line)
 
 os.execl(sys.argv[1], *sys.argv[1:])

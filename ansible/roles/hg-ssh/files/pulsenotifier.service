@@ -1,0 +1,19 @@
+[Unit]
+Description=Notify Pulse about Mercurial pushes
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+WorkingDirectory=/
+User=hg
+Group=hg
+PrivateTmp=true
+
+ExecStart=/var/hg/venv_tools/bin/vcsreplicator-pulse-notifier /etc/mercurial/notifications.ini
+Restart=always
+TimeoutStopSec=60
+
+SyslogIdentifier=pulsenotifier
+SyslogFacility=local2
+
+[Install]
+WantedBy=multi-user.target
