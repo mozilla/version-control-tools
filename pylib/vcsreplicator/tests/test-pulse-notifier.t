@@ -3,7 +3,7 @@
   $ . $TESTDIR/pylib/vcsreplicator/tests/helpers.sh
   $ vcsrenv
 
-  $ pulse create-queue exchange/hg/ all
+  $ pulse create-queue exchange/hgpushes/v1 all
 
 Create a repository
 
@@ -33,9 +33,9 @@ Create a repository
 
   $ pulseconsumer --wait-for-no-lag
 
-  $ pulse dump-messages exchange/hg/ all
+  $ pulse dump-messages exchange/hgpushes/v1 all
   - _meta:
-      exchange: exchange/hg/
+      exchange: exchange/hgpushes/v1
       routing_key: hg.push.1
     heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
