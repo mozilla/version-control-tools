@@ -92,7 +92,7 @@ def synchronize_fully_consumed_messages(client, consumer_topic, consumer_groups,
         return 0
 
     unacked_count = sum(unacked_partition_counts.values())
-    logger.info('%d unacked messages in %d partition: [%s]' % (
+    logger.warn('%d unacked messages in %d partition: [%s]' % (
                 unacked_count, len(unacked_partition_counts),
                 ', '.join(map(str, sorted(unacked_partition_counts.keys())))))
 
@@ -126,10 +126,12 @@ def copy_messages(client, consumer_topic, consumer_group, counts,
     while counts and alive[0]:
         r = consumer.get_message(timeout=5.0)
         if not r:
-            logger.warning('unacked messages but retrieving message failed; weird')
+            logger.warn('unacked messages but retrieving message failed; weird')
             continue
 
         partition, message, payload = r
+
+        logger.warn('copying %s from partition %d' % (payload['name'], partition))
 
         payload['_original_created'] = payload['_created']
         payload['_original_partition'] = partition
