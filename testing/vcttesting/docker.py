@@ -215,13 +215,23 @@ class Docker(object):
         hg = os.path.join(ROOT, 'venv', 'bin', 'hg')
         env = dict(os.environ)
         env['HGRCPATH'] = '/dev/null'
-        args = [hg, '-R', ROOT, 'locate']
+        args = [hg, '-R', '.', 'locate']
         with open(os.devnull, 'wb') as null:
-            output = subprocess.check_output(args, env=env, cwd='/',
-                                             stderr=null)
+            files = subprocess.check_output(
+                args, env=env, cwd=ROOT, stderr=null).splitlines()
+
+        # Add files from the nested reviewboard-fork repo.
+        fork_path = os.path.join(ROOT, 'reviewboard-fork')
+        if os.path.exists(fork_path):
+            with open(os.devnull, 'wb') as null:
+                fork_files = subprocess.check_output(
+                    args, env=env, stderr=null, cwd=fork_path
+                ).splitlines()
+                for f in fork_files:
+                    files.append(os.path.join('reviewboard-fork', f))
 
         paths = {}
-        for f in output.splitlines():
+        for f in files:
             full = os.path.join(ROOT, f)
             # Filter out files that have been removed in the working
             # copy but haven't been committed.
