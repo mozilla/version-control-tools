@@ -58,6 +58,12 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
                 continue
 
             node, pushid, pushuser, pushtime = line.split('\0')
+            # Not all changegroup events have corresponding pushlog entries.
+            # This should be rare.
+            if not pushid:
+                logger.warn('pushlog data missing!')
+                continue
+
             pushid = int(pushid)
             pushtime = int(pushtime)
 
