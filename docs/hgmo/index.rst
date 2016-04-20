@@ -10,6 +10,7 @@ hg.mozilla.org
    architecture
    pushlog
    managing-repos
+   notifications
    bundleclone
    contributing
    mozbuildinfo
