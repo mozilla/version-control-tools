@@ -47,7 +47,7 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
     with hglib.open(local_path, encoding='utf-8') as hgclient:
         revs = [n.encode('latin1') for n in payload['nodes']]
         template = b'{node}\\0{pushid}\\0{pushuser}\\0{pushdate}\n'
-        args = hglib.util.cmdbuilder(b'log', r=revs, template=template)
+        args = hglib.util.cmdbuilder(b'log', b'--hidden', r=revs, template=template)
         out = hgclient.rawcommand(args)
 
         pushes = {}
