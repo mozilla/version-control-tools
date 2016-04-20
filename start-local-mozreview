@@ -27,12 +27,19 @@ $(./mozreview shellinit)
 
 ./mozreview create-user default@example.com password 'Default User :default' \
     --uid 2000 --scm-level 1 --bugzilla-group editbugs
+./reviewboard associate-ldap-user default default@example.com
+
 ./mozreview create-user level1@example.com password 'Level 1 User :level1' \
     --uid 2001 --scm-level 1 --bugzilla-group editbugs
+./reviewboard associate-ldap-user level1 level1@example.com
+
 ./mozreview create-user level2@example.com password 'Level 2 User :level2' \
     --uid 2002 --scm-level 2 --bugzilla-group editbugs
+./reviewboard associate-ldap-user level2 level2@example.com
+
 ./mozreview create-user level3@example.com password 'Level 3 User :level3' \
     --uid 2003 --scm-level 3 --bugzilla-group editbugs
+./reviewboard associate-ldap-user level3 level3@example.com
 
 rm -rf $REPO_PATH
 ./mozreview clone test-repo $REPO_PATH --user default@example.com
