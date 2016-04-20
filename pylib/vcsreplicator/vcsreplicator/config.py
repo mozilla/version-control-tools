@@ -37,6 +37,11 @@ class Config(object):
         else:
             self._pull_url_rewrites = []
 
+        if self.c.has_section('public_url_rewrites'):
+            self._public_url_rewrites = self.c.items('public_url_rewrites')
+        else:
+            self._public_url_rewrites = []
+
     def parse_wire_repo_path(self, path):
         """Parse a normalized repository path into a local path."""
         for source, dest in self._path_rewrites:
@@ -48,6 +53,14 @@ class Config(object):
     def get_pull_url_from_repo_path(self, path):
         """Obtain a URL to be used for pulling from a local repo path."""
         for source, dest in self._pull_url_rewrites:
+            if path.startswith(source):
+                return dest + path[len(source):]
+
+        return None
+
+    def get_public_url_from_wire_path(self, path):
+        """Obtain a URL to be used for public advertisement from a wire protocol path."""
+        for source, dest in self._public_url_rewrites:
             if path.startswith(source):
                 return dest + path[len(source):]
 
