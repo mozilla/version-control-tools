@@ -387,12 +387,15 @@
         group=root
         mode=0755
 
-- name: install NRPE check config
-  copy: src=check_kafka_hg_heartbeat.cfg
-        dest=/etc/nagios/nrpe.d/check_kafka_hg_heartbeat.cfg
+- name: install NRPE check configs
+  copy: src={{ item }}
+        dest=/etc/nagios/nrpe.d/{{ item }}
         owner=root
         group=root
         mode=0644
+  with_items:
+    - check_kafka_hg_heartbeat.cfg
+    - check_pulsenotifier_lag.cfg
 
 - name: systemd service file for push data aggregation daemon
   copy: src=pushdataaggregator.service
