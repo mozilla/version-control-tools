@@ -92,12 +92,12 @@
 
 - name: Create hg group
   group: name=hg
+         gid=500
 
 - name: Create hg user
   user: name=hg
         group=hg
         uid=500
-        gid=500
         shell=/bin/bash
         comment='Hg user'
 
