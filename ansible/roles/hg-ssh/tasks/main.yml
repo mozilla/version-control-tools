@@ -94,7 +94,12 @@
   group: name=hg
 
 - name: Create hg user
-  user: name=hg group=hg
+  user: name=hg
+        group=hg
+        uid=500
+        gid=500
+        shell=/bin/bash
+        comment='Hg user'
 
 - name: create hg-aggregate user
   user: name=hg-aggregate
