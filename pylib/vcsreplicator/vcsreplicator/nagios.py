@@ -17,6 +17,8 @@ def check_consumer_lag():
     parser = argparse.ArgumentParser()
     parser.add_argument('config',
             help='Path to config file to load')
+    parser.add_argument('--consumer-section', default='consumer',
+            help='Config section Kafka config should be read from')
     parser.add_argument('--warning-lag-count', default=5, type=int,
             help='Number of messages behind after which a warning will be '
                  'issued')
@@ -30,10 +32,12 @@ def check_consumer_lag():
 
     args = parser.parse_args()
 
+    consumer_section = args.consumer_section
+
     config = Config(filename=args.config)
-    client = config.get_client_from_section('consumer', timeout=5)
-    topic = config.c.get('consumer', 'topic')
-    group = config.c.get('consumer', 'group')
+    client = config.get_client_from_section(consumer_section, timeout=5)
+    topic = config.c.get(consumer_section, 'topic')
+    group = config.c.get(consumer_section, 'group')
 
     try:
         offsets = consumer_offsets_and_lag(client, topic, [group])[group]
