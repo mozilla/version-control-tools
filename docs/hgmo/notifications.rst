@@ -48,6 +48,9 @@ keys:
    it can be empty. If you see multiple entries, please say something
    in ``#vcs``.
 
+   The list should only be empty for special repositories, such as the
+   experimental unified repositories.
+
    The composition of this dict is described below.
 
 Each ``pushlog_pushes`` entry consists of the following keys:
