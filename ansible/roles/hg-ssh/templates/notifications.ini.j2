@@ -21,6 +21,7 @@ connect_timeout = 5
 userid = {{ pulse_user | default("guest") }}
 password = {{ pulse_password | default("guest") }}
 exchange = exchange/hgpushes/v1
-routing_key = hg.push.1
 virtual_host = /
 ssl = true
+
+routing_key_strip_prefix = https://hg.mozilla.org/

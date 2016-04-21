@@ -13,7 +13,9 @@ push is performed to the server.
 
 Pulse messages are written to the
 `exchange/hgpushes/v1 <https://tools.taskcluster.net/pulse-inspector/#!((exchange:exchange/hgpushes/v1,routingKeyPattern:%23>`_
-exchange under the ``hg.push.1`` routing key.
+exchange. The routing key for each message is the relative path of the
+repository on hg.mozilla.org (e.g. ``mozilla-central`` or
+``integration/mozilla-inbound``).
 
 Pulse messages are written after the push has been completely replicated to
 all active HTTPS replication mirrors.

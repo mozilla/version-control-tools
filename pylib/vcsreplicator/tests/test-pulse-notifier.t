@@ -36,7 +36,7 @@ Create a repository
   $ pulse dump-messages exchange/hgpushes/v1 all
   - _meta:
       exchange: exchange/hgpushes/v1
-      routing_key: hg.push.1
+      routing_key: mozilla-central
     heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
     pushlog_pushes:
@@ -63,6 +63,37 @@ Repos under ignore paths are ignored
 
   $ hgmo exec hgssh grep private /var/log/pulsenotifier.log
   vcsreplicator.pushnotifications ignoring repo because path in ignore list: {moz}/private/ignore
+
+  $ cd ..
+
+Routing keys with slashes and dashes and underscores work
+
+  $ hgmo create-repo integration/foo_Bar-baz 1
+  (recorded repository creation in replication log)
+  $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/integration/foo_Bar-baz
+  $ cd foo_Bar-baz
+  $ touch foo
+  $ hg -q commit -A -m initial
+  $ hg -q push
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
+  $ pulseconsumer --wait-for-no-lag
+
+  $ pulse dump-messages exchange/hgpushes/v1 all
+  - _meta:
+      exchange: exchange/hgpushes/v1
+      routing_key: integration/foo_Bar-baz
+    heads:
+    - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+    pushlog_pushes:
+    - push_full_json_url: https://hg.mozilla.org/integration/foo_Bar-baz/json-pushes?version=2&full=1&startID=0&endID=1
+      push_json_url: https://hg.mozilla.org/integration/foo_Bar-baz/json-pushes?version=2&startID=0&endID=1
+      pushid: 1
+      time: \d+ (re)
+      user: user@example.com
+    repo_url: https://hg.mozilla.org/integration/foo_Bar-baz
 
 Cleanup
 

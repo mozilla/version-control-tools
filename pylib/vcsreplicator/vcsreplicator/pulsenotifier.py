@@ -33,6 +33,13 @@ def on_push(config, repo_url, heads, source, pushlog_pushes):
 
     c = config.c
 
+    routing_key_strip_prefix = c.get('pulse', 'routing_key_strip_prefix')
+    if not repo_url.startswith(routing_key_strip_prefix):
+        raise Exception('repo URL does not being with %s: %s' % (
+                        routing_key_strip_prefix, repo_url))
+
+    routing_key = repo_url[len(routing_key_strip_prefix):]
+
     hostname = c.get('pulse', 'hostname')
     port = c.getint('pulse', 'port')
     userid = c.get('pulse', 'userid')
@@ -50,7 +57,7 @@ def on_push(config, repo_url, heads, source, pushlog_pushes):
     with conn:
         exchange = kombu.Exchange(c.get('pulse', 'exchange'), type='topic')
         producer = conn.Producer(exchange=exchange,
-                                 routing_key=c.get('pulse', 'routing_key'),
+                                 routing_key=routing_key,
                                  serializer='json')
 
         payload = {
@@ -61,7 +68,7 @@ def on_push(config, repo_url, heads, source, pushlog_pushes):
             },
             '_meta': {
                 'exchange': c.get('pulse', 'exchange'),
-                'routing_key': c.get('pulse', 'routing_key'),
+                'routing_key': routing_key,
                 'serializer': 'json',
                 'sent': datetime.datetime.utcnow().isoformat(),
             }
