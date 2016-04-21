@@ -7,7 +7,7 @@
 #  cronvar: user=hg name=MAILTO value=developer-services@mozilla.org
 
 # Schedule for when the sun is over the Pacific Ocean, as this is
-# when the fewest pushes occur. Also, hgssh1 is on PDT, not UTC.
+# when the fewest pushes occur.
 - name: create CRON to generate S3 bundles
   cron: name="Generate Mercurial bundles"
         user=hg
@@ -15,4 +15,4 @@
         day=*
         month=*
         minute=0
-        hour=21
+        hour=4
