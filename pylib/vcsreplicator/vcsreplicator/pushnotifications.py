@@ -39,6 +39,12 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
         logger.warn('no public URL could be resolved for %s; not sending notification' % path)
         return
 
+    if config.c.has_section('ignore_paths'):
+        for prefix, _ in config.c.items('ignore_paths'):
+            if path.startswith(prefix):
+                logger.warn('ignoring repo because path in ignore list: %s' % path)
+                return
+
     local_path = config.parse_wire_repo_path(path)
 
     logger.warn('querying pushlog data for %s' % local_path)

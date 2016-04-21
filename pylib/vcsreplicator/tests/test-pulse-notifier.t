@@ -47,6 +47,23 @@ Create a repository
       user: user@example.com
     repo_url: https://hg.mozilla.org/mozilla-central
 
+Repos under ignore paths are ignored
+
+  $ cd ..
+  $ hgmo create-repo private/ignore 1
+  (recorded repository creation in replication log)
+  $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/private/ignore
+  $ cd ignore
+  $ touch foo
+  $ hg -q commit -A -m initial
+  $ hg -q push
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
+  $ hgmo exec hgssh grep private /var/log/pulsenotifier.log
+  vcsreplicator.pushnotifications ignoring repo because path in ignore list: {moz}/private/ignore
+
 Cleanup
 
   $ hgmo clean
