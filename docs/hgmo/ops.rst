@@ -425,3 +425,52 @@ doesn't come back::
    `Developer Services :: hg.mozilla.org <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org>`_
    with details of the incident so the root cause can be tracked down
    and the underlying bug fixed.
+
+check_pulsenotifier_lag
+-----------------------
+
+``check_pulsenotifier_lag`` monitors the lag of Pulse
+:ref:`hgmo_notifications` in reaction to server events.
+
+The check is very similar to ``check_vcsreplicator_lag``. It monitors the
+same class of thing under the hood: that a Kafka consumer has read and
+acknowledged all available messages.
+
+For this check, the consumer daemon is the ``pulsenotifier`` service running
+on the master server. It is a systemd service (``pulsenotifier.service``). Its
+logs are in ``/var/log/pulsenotifier.log``.
+
+Expected Output
+^^^^^^^^^^^^^^^
+
+There is a single consumer and partition for the pulse notifier Kafka
+consumer. So, expected output is something like the following::
+
+   OK - 1/1 consumers completely in sync
+
+   OK - partition 0 is completely in sync (159580/159580)
+
+   See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+   for details about this check.
+
+Remediation to Check Failure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There are 3 main categories of check failure:
+
+1. pulse.mozilla.org is down
+2. The ``pulsenotifier`` daemon has crashed or wedged
+3. The hg.mozilla.org Kafka cluster is down
+
+Looking at the last few lines of ``/var/log/pulsenotifier.log`` should
+indicate reasons for the check failure.
+
+If Pulse is down, the check should be acked until Pulse service is restored.
+The Pulse notification daemon should recover on its own.
+
+If the ``pulsenotifier`` daemon has crashed, try restarting it::
+
+   $ systemctl restart pulsenotifier.service
+
+If the hg.mozilla.org Kafka cluster is down, lots of other alerts are
+likely firing. You should alert VCS on call.
