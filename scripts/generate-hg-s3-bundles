@@ -8,6 +8,7 @@ from __future__ import absolute_import
 import argparse
 import datetime
 import errno
+import json
 import os
 import shutil
 import subprocess
@@ -80,6 +81,10 @@ HTML_INDEX = '''
       The table below lists all available repositories and their bundles.
       Only the most recent bundle is shown. Previous bundles are expired 7 days
       after they are superseded.
+    </p>
+    <p>
+      A <a href="bundles.json">JSON document</a> exposes a machine-readable
+      representation of this data.
     </p>
     <p>
        For more, see
@@ -390,6 +395,28 @@ def upload_index(repos):
         k.set_contents_from_string(html)
 
 
+def upload_json_manifest(repos):
+    d = {}
+    for repo, bundles in repos.items():
+        if not bundles:
+            continue
+
+        d[repo] = {}
+        for t, (path, size) in bundles.items():
+            d[repo][t] = {
+                'path': path,
+                'size': size,
+            }
+
+    for host, bucket, region in HOSTS:
+        c = S3Connection(host=host)
+        b = c.get_bucket(bucket, validate=False)
+        k = b.get_key('bundles.json', validate=False)
+        k.content_type = 'application/json'
+        k.cache_control = 'max-age=60'
+        k.set_contents_from_string(json.dumps(d, sort_keys=True, indent=4))
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', help='file to read repository list from')
@@ -427,3 +454,4 @@ if __name__ == '__main__':
 
     if upload:
         upload_index(paths)
+        upload_json_manifest(paths)
