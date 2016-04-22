@@ -12,7 +12,7 @@ hg.mozilla.org guarantees at least once delivery of
 push is performed to the server.
 
 Pulse messages are written to the
-`exchange/hgpushes/v1 <https://tools.taskcluster.net/pulse-inspector/#!((exchange:exchange/hgpushes/v1,routingKeyPattern:%23>`_
+`exchange/hgpushes/v1 <https://tools.taskcluster.net/pulse-inspector/#!((exchange:exchange/hgpushes/v1,routingKeyPattern:%23))>`_
 exchange. The routing key for each message is the relative path of the
 repository on hg.mozilla.org (e.g. ``mozilla-central`` or
 ``integration/mozilla-inbound``).
