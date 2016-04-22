@@ -18,13 +18,13 @@ from mozhg.auth import getbugzillaauth
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
-commands.norepo += ' bzauth bzcreatecookie'
 
 @command('bzauth', [
     ('', 'require', False, 'Require auth'),
     ('', 'fakegetpass', '', 'Provide a fake getpass.getpass answer'),
     ('', 'ffprofile', '', 'Firefox profile to use'),
-    ], 'hg bzauth')
+    ], 'hg bzauth',
+    norepo=True)
 def bzauth(ui, require=False, fakegetpass=None, ffprofile=None):
     if fakegetpass:
         def newgetpass(arg):
@@ -41,7 +41,9 @@ def bzauth(ui, require=False, fakegetpass=None, ffprofile=None):
     else:
         ui.write('no auth\n')
 
-@command('bzcreatecookie', [], 'hg bzcreatecookie [profiledir] [url] [userid] [cookie]')
+@command('bzcreatecookie', [],
+         'hg bzcreatecookie [profiledir] [url] [userid] [cookie]',
+         norepo=True)
 def bzcreatecookie(ui, profiledir, url, userid, cookie):
     from mozhg.tests.test_auth import create_login_cookie
 
