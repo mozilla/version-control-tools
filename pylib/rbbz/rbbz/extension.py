@@ -19,6 +19,7 @@ from mozreview.bugzilla.client import Bugzilla
 from mozreview.bugzilla.errors import (
     bugzilla_to_publish_errors,
 )
+from mozreview.diffs import build_plaintext_review
 from mozreview.errors import (
     ParentShipItError,
 )
@@ -34,7 +35,6 @@ from mozreview.rb_utils import (
     get_obj_url,
 )
 from rbbz.auth import BugzillaBackend
-from rbbz.diffs import build_plaintext_review
 from rbbz.middleware import CorsHeaderMiddleware
 from rbbz.resources import bugzilla_cookie_login_resource
 
