@@ -398,6 +398,8 @@ def wrappedpushdiscovery(orig, pushop):
                     _('cannot review empty changeset %s') % ctx.hex()[:12],
                     hint=_('add files to or remove changeset'))
 
+    run_android_checkstyle(repo, nodes)
+
     # Ensure all reviewed changesets have commit IDs.
     replacenodes = []
     for node in nodes:
@@ -1063,3 +1065,53 @@ def reposetup(ui, repo):
     # Need to use baseui because peers inherit the non-repo ui and the peer's
     # ui is what Mercurial's built-in HTTP auth uses for lookups.
     configureautobmoapikeyauth(repo.baseui)
+
+def run_android_checkstyle(repo, nodes):
+    """
+    Runs checkstyle in mobile/android/ to ensure style consistency when
+    pushing to reviewboard. It will only run when mobile/android/ files
+    change. On failure, it will alert the developer of the style issues
+    but not block push.
+    """
+    if not is_firefox_repository(repo):
+        return
+
+    mobile_changed = set()
+    for node in nodes:
+        ctx = repo[node]
+        mobile_changed |= {f for f in ctx.files()
+                          if f.startswith('mobile/android/')}
+
+    if mobile_changed:
+        repo.ui.write('running checkstyle...')
+        # We run gradle directly (rather than the mach wrapper) to save
+        # (granted, very little) time on the python interpreter start-up.
+        import subprocess
+        binary = repo.root + '/gradlew'
+        try:
+            subprocess.check_output([binary, '--quiet', '--project-dir',
+                                     repo.root, 'app:checkstyle'],
+                                     stderr=subprocess.STDOUT)
+            repo.ui.write(' success!\n')
+        except subprocess.CalledProcessError as e:
+            # Users may not have Java installed, don't have front-end builds
+            # set up, etc. so we can't force all changes to be run through
+            # checkstyle. For correctness, we could whitelist all the errors we
+            # can ignore, but that would require us to chase a variety of
+            # changing error messages. For simplicity, we only alert the user
+            # if there is an actual style violation.
+            if 'Checkstyle rule violations were found' in e.output:
+                repo.ui.write('\n' + e.output +
+                              'Android style violation:\n'
+                              '    Please fix it before submitting your '
+                              'changes for review.\n'
+                              '    To run checkstyle locally: '
+                              '`./mach gradle app:checkstyle`\n')
+            else:
+                repo.ui.write(' failed (e.g. Java was not installed) - '
+                              'ignoring.\n')
+
+def is_firefox_repository(repo):
+    "A hack to figure out if we're in a firefox repository."
+    return len(repo) and \
+            repo[0].hex() == '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
