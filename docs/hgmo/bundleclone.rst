@@ -224,7 +224,8 @@ volume (in terms of repository size and clone frequency) or have a need
 for bundles.
 
 The list of repositories with bundles enabled can be found at
-https://hg.cdn.mozilla.net/.
+https://hg.cdn.mozilla.net/. A JSON document describing the
+bundles is available at https://hg.cdn.mozilla.net/bundles.json.
 
 If you think bundles should be made available for a particular
 repository, let a server operator know by filing a
