@@ -266,6 +266,11 @@ properties:
 node
    The 40 byte hex SHA-1 of the changeset.
 
+parents
+   An array of 1 or 2 elements containing the 40 byte hex SHA-1 of the
+   parent changesets. Merges have 2 entries. Root changesets have the
+   value ``0000000000000000000000000000000000000000``.
+
 author
    The author string from the changeset.
 
@@ -290,9 +295,12 @@ Here's an example::
      "branch": "default",
      "desc": "Bug 1110212 - Strong randomness for Android DNS resolver. r=sworkman",
      "files": [
-      "other-licenses/android/res_init.c"
+       "other-licenses/android/res_init.c"
      ],
      "node": "ee4fe2ec168e719e822dabcdd797c0cff9ce2407",
+     "parents": [
+       "803bc910c45a875d9d76dc689c45dd91a1e02e23"
+     ],
      "tags": []
    }
 

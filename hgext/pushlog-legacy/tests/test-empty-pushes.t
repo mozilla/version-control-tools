@@ -72,6 +72,9 @@ Full output should do the same
                       "foo"
                   ],
                   "node": "96ee1d7354c4ad7372047672c36a1f561e3a6a4c",
+                  "parents": [
+                      "0000000000000000000000000000000000000000"
+                  ],
                   "tags": []
               }
           ],
@@ -88,6 +91,9 @@ Full output should do the same
                       "foo"
                   ],
                   "node": "059b473c43d7e25d6b6f5070dfb1c468b0e9518c",
+                  "parents": [
+                      "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
+                  ],
                   "tags": [
                       "tip"
                   ]

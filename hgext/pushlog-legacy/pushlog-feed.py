@@ -418,6 +418,7 @@ def pushlogHTML(web, req, tmpl):
                      "files": listfilediffs(tmpl, ctx.files(), n),
                      "rev": ctx.rev(),
                      "node": hex(n),
+                     "parents": [c.hex() for c in ctx.parents()],
                      "tags": nodetagsdict(web.repo, n),
                      "branches": nodebranchdict(web.repo, ctx),
                      "inbranch": nodeinbranch(web.repo, ctx),
@@ -475,6 +476,7 @@ def pushes_worker(query, web = None):
                     "author": ctx.user(),
                     "desc": ctx.description(),
                     "branch": ctx.branch(),
+                    "parents": [c.hex() for c in ctx.parents()],
                     "tags": ctx.tags(),
                     "files": ctx.files()
                    }
