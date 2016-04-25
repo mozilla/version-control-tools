@@ -130,6 +130,15 @@ def copy_messages(client, consumer_topic, consumer_group, counts,
 
         partition, message, payload = r
 
+        # The Kafka consumer may fetch multiple messages and leave them in
+        # a buffer/queue. Below, we tell the consumer to stop fetching
+        # messages from certain partitions. However, it may have already fetched
+        # a message from a partition we are done with and will serve it up from
+        # its buffer/queue. If we get one of these messages, ignore it.
+        if partition not in counts:
+            logger.warn('got message from exhausted partition %d; ignoring' % partition)
+            continue
+
         logger.warn('copying %s from partition %d' % (payload['name'], partition))
 
         payload['_original_created'] = payload['_created']
