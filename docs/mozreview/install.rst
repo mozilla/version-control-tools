@@ -102,7 +102,7 @@ Successful association will resemble the following::
 
    Your SSH username for ``reviewboard-hg.mozilla.org`` is your Mozilla LDAP
    username, which is an e-mail address. You may need to specify the
-   ``-l`` argument to ``ssh` to specify a username. e.g.
+   ``-l`` argument to ``ssh`` to specify a username. e.g.
    ``ssh -l me@example.com reviewboard-hg.mozilla.org mozreview-ldap-associate``.
 
 Configuring Your Version Control Client
