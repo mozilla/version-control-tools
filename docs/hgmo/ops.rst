@@ -430,7 +430,7 @@ check_pulsenotifier_lag
 -----------------------
 
 ``check_pulsenotifier_lag`` monitors the lag of Pulse
-:ref:`hgmo_notifications` in reaction to server events.
+:ref:`hgmo_notification` in reaction to server events.
 
 The check is very similar to ``check_vcsreplicator_lag``. It monitors the
 same class of thing under the hood: that a Kafka consumer has read and
