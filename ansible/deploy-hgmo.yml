@@ -1,5 +1,5 @@
 ---
-- hosts: hgssh3.dmz.scl3.mozilla.com
+- hosts: hgssh-prod-master
   gather_facts: no
   tasks:
     - name: obtain previously-deployed changeset

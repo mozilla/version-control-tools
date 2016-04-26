@@ -12,6 +12,10 @@ hgweb[11:14].dmz.scl3.mozilla.com ansible_sudo=yes
 # disabled because hg-ssh role is tailored towards CentOS 7 now
 #hgssh2.dmz.scl3.mozilla.com ansible_ssh_user=root
 hgssh3.dmz.scl3.mozilla.com ansible_sudo=yes
+hgssh1.dmz.scl3.mozilla.com ansible_sudo=yes
+
+[hgssh-prod-master]
+hgssh3.dmz.scl3.mozilla.com
 
 [hgssh-stage]
 hgssh.stage.dmz.scl3.mozilla.com ansible_ssh_user=root
