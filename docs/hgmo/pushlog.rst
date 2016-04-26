@@ -311,15 +311,13 @@ It is common to want to write tools or services that consume pushlog
 data. For example, you may wish to perform processing of new commits as
 they arrive.
 
-In the ideal world, we would expose a notification service to enable
-near real-time consumption of this data. Until that service is built,
-clients will have to resort to polling the pushlog. Furthermore, the
-pushlog only exposes data for 1 repository at a time. If you are
-interested in consuming data for multiple repositories, you'll need
-to query each repository/pushlog separately.
+Before you consider using the pushlog for this, you should consider the
+:ref:`change notification services <hgmo_notification>` on hg.mozilla.org
+instead. If those aren't sufficient, you should request one that is.
 
-When implementing agents that consume pushlog data, please keep in mind
-the following best practices:
+If you must consume the pushlog for monitoring for new pushes, you
+will need to periodically poll each repository separately. The following
+best practices should be used:
 
 1. Query by push ID, not by changeset or date.
 2. Always specify a ``startID`` and ``endID``.
