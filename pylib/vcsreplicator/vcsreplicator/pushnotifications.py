@@ -5,6 +5,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+import os
 
 import hglib
 
@@ -48,6 +49,11 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
                 return
 
     local_path = config.parse_wire_repo_path(path)
+
+    if not os.path.exists(local_path):
+        logger.warn('repository %s does not exist; ignoring notification' % local_path)
+        consumer.commit(partitions=[partition])
+        return
 
     logger.warn('querying pushlog data for %s' % local_path)
 
