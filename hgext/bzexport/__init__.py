@@ -165,7 +165,7 @@ def choose_value(ui, desc, options, message="", usemenu=True):
 def multi_user_prompt(ui, desc, search_results):
     return prompt_menu(ui, desc, search_results['names'],
                        readable_values=search_results['real_names'],
-                       message="Multiple bugzilla users matching \"%s\":\n\n" % search_results["search_string"],
+                       message="Multiple bugzilla users matching \"%s\":\n\n" % search_results["search_string"].encode('utf-8', 'replace'),
                        allow_none=True)
 
 
