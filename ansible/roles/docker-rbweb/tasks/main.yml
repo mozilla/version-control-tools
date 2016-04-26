@@ -3,7 +3,7 @@
   user: name=reviewboard
 
 - name: System packages installed
-  command: /usr/bin/yum install -y memcached mod_wsgi patch
+  command: /usr/bin/yum install -y memcached mod_wsgi patch gettext
 
 # The kill-wsgi-procs support script requires psutil, which isn't part of
 # the MozReview virtualenv. Install it as a one-off
@@ -14,6 +14,13 @@
 
 - name: Synchronize version-control-tools
   synchronize: src={{ vct }}/ dest=/version-control-tools/ recursive=yes delete=yes
+
+- name: Install Djblets and Review Board
+  command: /venv/bin/python setup.py install
+           chdir=/version-control-tools/reviewboard-fork/{{ item }}
+  with_items:
+    - djblets
+    - reviewboard
 
 - name: Install python libraries
   command: /venv/bin/python setup.py install chdir=/version-control-tools/pylib/{{ item }}
