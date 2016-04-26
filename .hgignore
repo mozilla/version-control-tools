@@ -3,6 +3,7 @@ docs/_build/
 testing/bmoserver/.vagrant
 testing/puppet/files/Mozilla-Bugzilla-Public*
 testing/unifiedserver/.vagrant
+reviewboard-fork/
 venv/
 \.egg-info$
 \.pyc$

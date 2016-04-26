@@ -190,6 +190,10 @@ class MozReview(object):
         hgweb_image = hgweb_image or self.hgweb_image
         treestatus_image = treestatus_image or self.treestatus_image
 
+        if not os.path.exists(os.path.join(ROOT, 'reviewboard-fork')):
+            raise Exception('Failed to find reviewboard-fork. '
+                            'Please run create-test-environment.')
+
         self.started = True
         mr_info = self._docker.start_mozreview(
                 cluster=self._name,

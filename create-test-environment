@@ -8,6 +8,20 @@ if [ "x${vercheck}" != "xTrue" ]; then
   exit 1
 fi
 
+# We need node.js for tools required to package/install Review Board
+# (eg. lessc, uglifyjs)
+if ! type npm >/dev/null 2>&1; then
+  echo "npm not found.  Please install node.js."
+  exit 1
+fi
+# More annoyingly we need msgfmt which is part of gettext.
+if ! type msgfmt >/dev/null 2>&1; then
+  echo "msgfmt not found.  Please install the gettext package."
+  echo "On OSX you can use homebrew to install this:"
+  echo "  brew install gettext && brew link gettext --force"
+  exit 1
+fi
+
 ROOT=`pwd`
 VENV=${ROOT}/venv
 
@@ -51,6 +65,33 @@ python setup.py develop
 cd ../..
 
 pip install --upgrade --require-hashes -r test-requirements.txt
+
+if [ ! -d reviewboard-fork ]; then
+  echo "Cloning Review Board"
+  hg clone https://hg.mozilla.org/webtools/reviewboard reviewboard-fork
+fi
+
+if [ ! -d ${VENV}/node ]; then
+    mkdir ${VENV}/node
+fi
+cd ${VENV}/node
+npm init -y >/dev/null
+npm install less uglifyjs
+cd ${VENV}
+for FN in lessc uglifyjs; do
+    if [ ! -e bin/${FN} ]; then
+        ln -s ../node/node_modules/.bin/${FN} bin/${FN}
+    fi
+done
+cd ..
+
+cd reviewboard-fork
+hg pull -u
+cd djblets
+python setup.py develop
+cd ../reviewboard
+python setup.py develop
+cd ../..
 
 cd pylib/Bugsy
 python setup.py develop
