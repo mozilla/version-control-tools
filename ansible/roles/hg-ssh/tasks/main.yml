@@ -381,6 +381,14 @@
         mode=0644
   notify: systemd daemon reload
 
+- name: systemd service for bundle generation
+  copy: src=hg-bundle-generate.service
+        dest=/etc/systemd/system/hg-bundle-generate.service
+        owner=root
+        group=root
+        mode=0644
+  notify: system daemon reload
+
 - name: create directory for Nagios files
   file: path={{ item }}
         state=directory

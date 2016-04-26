@@ -1,0 +1,10 @@
+[Unit]
+Description=Generate and Upload Bundle Files for Mercurial repos
+After=network.target syslog.target
+
+[Service]
+ExecStart=/var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles -f /repo/bundles/repos
+Type=oneshot
+User=hg
+Group=hg
+Nice=10
