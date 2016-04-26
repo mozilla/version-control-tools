@@ -19,7 +19,9 @@ export MOZREVIEW_HOME=$TEST_MOZREVIEW_PATH
 . venv/bin/activate
 
 ./mozreview stop $TEST_MOZREVIEW_PATH
-./mozreview start --reviewboard-port=55556 $TEST_MOZREVIEW_PATH
+if ! ./mozreview start --reviewboard-port=55556 $TEST_MOZREVIEW_PATH; then
+    exit 1
+fi
 
 $(./mozreview shellinit)
 
