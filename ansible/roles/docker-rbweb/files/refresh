@@ -9,8 +9,13 @@ set -e
 chown -R root:root /vct
 /usr/bin/rsync -rlpt /vct/ /version-control-tools/
 
+TAGS='docker-refresh'
+if [ "$2" = "all" ]; then
+  TAGS="$TAGS,docker-reviewboard-refresh"
+fi
+
 cd /version-control-tools/ansible && /usr/bin/python -u \
-  /usr/bin/ansible-playbook docker-rbweb.yml -c local -t docker-refresh
+  /usr/bin/ansible-playbook docker-rbweb.yml -c local -t $TAGS
 
 # Need to kill WSGI processes to ensure Python code is current.
 /kill-wsgi-procs

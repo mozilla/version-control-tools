@@ -92,6 +92,8 @@ class MozReviewCommands(object):
         print('')
         print('Refresh code in the cluster by running:')
         print('  ./mozreview refresh')
+        print('  or, if you have changed reviewboard-fork/:')
+        print('  ./mozreview refresh --refresh-reviewboard')
         print('')
         print('Perform refreshing automatically by running:')
         print('  ./mozreview autorefresh')
@@ -136,9 +138,11 @@ class MozReviewCommands(object):
              description='Refresh a running MozReview cluster with latest code')
     @CommandArgument('where', nargs='?',
                      help='Directory of MozReview instance')
-    def refresh(self, where):
+    @CommandArgument('--refresh-reviewboard', action='store_true',
+                     help='Refresh changes from reviewboard-fork')
+    def refresh(self, where, refresh_reviewboard):
         mr = self._get_mozreview(where)
-        mr.refresh(verbose=True)
+        mr.refresh(verbose=True, refresh_reviewboard=refresh_reviewboard)
 
     @Command('autorefresh', category='mozreview',
              description='Automatically refresh containers when files change')

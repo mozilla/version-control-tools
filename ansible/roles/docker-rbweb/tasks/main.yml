@@ -21,6 +21,8 @@
   with_items:
     - djblets
     - reviewboard
+  tags:
+    - docker-reviewboard-refresh
 
 - name: Install python libraries
   command: /venv/bin/python setup.py install chdir=/version-control-tools/pylib/{{ item }}

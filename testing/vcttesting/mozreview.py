@@ -353,7 +353,7 @@ class MozReview(object):
                                  'mozreview-%s' % os.path.basename(self._path)],
                                 stdout=devnull, stderr=subprocess.STDOUT)
 
-    def refresh(self, verbose=False):
+    def refresh(self, verbose=False, refresh_reviewboard=False):
         """Refresh a running cluster with latest version of code.
 
         This only updates code from the v-c-t repo. Not all containers
@@ -376,7 +376,8 @@ class MozReview(object):
                                 print('%s> %s' % (name, line))
 
             def refresh(name, cid):
-                execute(name, cid, ['/refresh', url])
+                execute(name, cid, ['/refresh', url,
+                                    'all' if refresh_reviewboard else ''])
 
             with futures.ThreadPoolExecutor(4) as e:
                 e.submit(refresh, 'rbweb', self.rbweb_id)
