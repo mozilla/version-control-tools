@@ -19,6 +19,11 @@ baseurl = http://hg.mozilla.org/
 maxchanges = 20
 guessmime = True
 
+# We don't allow pushes over HTTP. But if this isn't set, pushing to https://
+# prints a "SSL required" message because the load balancer terminates TLS
+# and Mercurial thinks SSL isn't being used.
+push_ssl = false
+
 # Pygments does content based analysis to determine the language for
 # unknown file extensions. Unfortunately, it is overly aggressive about
 # matching and nearly any text will cause it to think it knows what the

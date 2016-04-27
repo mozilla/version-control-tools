@@ -18,7 +18,7 @@ TODO we should fix this in hgweb_dir or a hack of hgweb_dir, support for
 this is in Mercurial 3.6
   $ sleep 1
 
-Pushing a commit to a repo works
+Set up local clone
 
   $ hg clone ${HGWEB_0_URL}mozilla-central
   destination directory: mozilla-central
@@ -29,6 +29,17 @@ Pushing a commit to a repo works
   $ cd mozilla-central
   $ touch foo
   $ hg -q commit -A -m initial
+
+Pushing via http:// says pushing isn't allowed
+
+  $ hg push ${HGWEB_0_URL}mozilla-central
+  pushing to http://$DOCKER_HOSTNAME:32784/mozilla-central
+  searching for changes
+  abort: authorization failed
+  [255]
+
+Pushing via ssh:// works
+
   $ hg push ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
