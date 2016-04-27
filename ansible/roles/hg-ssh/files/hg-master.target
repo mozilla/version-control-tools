@@ -1,0 +1,10 @@
+[Unit]
+Description=Target holding all services that should run on the hg master server
+After=network.target remote-fs.target nss-lookup.target
+
+# We only want to have a single master at a time. Look for a file with the
+# current hostname in it indicating that we are the master.
+ConditionPathExists=/repo/hg/master.%H
+
+[Install]
+WantedBy=multi-user.target

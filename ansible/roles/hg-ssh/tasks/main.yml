@@ -121,6 +121,14 @@
     - { name: 'hg-aggregate', uid: 5601 }
     - { name: 'hg-notifier', uid: 5603 }
 
+- name: install hg-master.target systemd unit
+  copy: src=hg-master.target
+        dest=/etc/systemd/system/hg-master.target
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
+
 - name: hg user ssh config is prepared
   file: path=/home/hg/.ssh state=directory mode=0775 owner=hg group=hg
 
