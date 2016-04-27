@@ -7,4 +7,4 @@ Description=Schedules periodic generation of hg bundles
 OnCalendar=04:00
 
 [Install]
-WantedBy=timers.target
+WantedBy=hg-master.target

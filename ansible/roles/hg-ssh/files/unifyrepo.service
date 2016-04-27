@@ -16,4 +16,4 @@ SyslogFacility=local2
 PrivateTmp=true
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=hg-master.target

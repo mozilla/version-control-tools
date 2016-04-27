@@ -16,4 +16,4 @@ SyslogIdentifier=pushdataaggregator
 SyslogFacility=local2
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=hg-master.target
