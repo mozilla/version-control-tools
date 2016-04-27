@@ -66,6 +66,12 @@
   command: /usr/sbin/authconfig --enablemkhomedir --enableldap --enableldapauth --ldapserver={{ ldap_uri }} --ldapbasedn={{ basedn }} --updateall
   tags: docker-startup
 
+- name: ensure nslcd service enabled and running (server only)
+  service: name=nslcd.service
+           enabled=yes
+           state=started
+  when: vct_dir.stat.exists == False
+
 - name: configure sshd
   file: src=sshd_config
         dest=/etc/ssh/sshd_config
