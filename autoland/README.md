@@ -84,7 +84,7 @@ following:
     }
 
 
-[1] http://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview.html
+[1] https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview.html
 
 [2] http://hg.mozilla.org/try
 

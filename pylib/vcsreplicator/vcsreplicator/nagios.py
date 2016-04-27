@@ -115,7 +115,7 @@ def check_consumer_lag():
         print(m)
 
     print('')
-    print('See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html')
+    print('See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html')
     print('for details about this check.')
 
     sys.exit(exitcode)

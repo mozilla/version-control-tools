@@ -540,7 +540,7 @@ def doreview(repo, ui, remote, nodes):
                 ui.warn(_('(You are using mq to develop patches. For the best '
                     'code review experience, use bookmark-based development '
                     'with changeset evolution. Read more at '
-                    'http://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview-user.html)\n'))
+                    'https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview-user.html)\n'))
                 break
 
     req = commonrequestdict(ui, bzauth)

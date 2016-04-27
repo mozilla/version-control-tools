@@ -188,15 +188,15 @@ class MozReviewExtension(Extension):
             'items': [
                 {
                     'label': 'User Guide',
-                    'url': 'https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview-user.html',
+                    'url': 'https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview-user.html',
                 },
                 {
                     'label': 'Mercurial for Mozillians',
-                    'url': 'https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/index.html',
+                    'url': 'https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/index.html',
                 },
                 {
                     'label': 'Hacking MozReview',
-                    'url': 'https://mozilla-version-control-tools.readthedocs.org/en/latest/hacking-mozreview.html',
+                    'url': 'https://mozilla-version-control-tools.readthedocs.io/en/latest/hacking-mozreview.html',
                 },
                 {
                     'label': 'File a Bug',

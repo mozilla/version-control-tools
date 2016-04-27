@@ -90,7 +90,7 @@ You are likely seeing this error because:
 1) You do not have the appropriate Mercurial extension installed
 2) The extension is out of date
 
-See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html
+See https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html
 for instructions on how to configure your machine to use MozReview.
 '''
 

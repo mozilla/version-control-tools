@@ -23,7 +23,7 @@ from hgrb.util import ReviewID
 
 API_KEY_NEEDED = (
     'Bugzilla API keys are now used by MozReview; '
-    'see https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html#bugzilla-credentials '
+    'see https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html#bugzilla-credentials '
     'for instructions on how to configure your client')
 
 
@@ -205,7 +205,7 @@ def _processpushreview(repo, req, ldap_username):
 
     if not bzusername or not bzapikey:
         return errorresponse('Bugzilla API keys not configured; see '
-            'https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html#bugzilla-credentials '
+            'https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html#bugzilla-credentials '
             'for instructions on how to configure your client')
 
     identifier = req['identifier']

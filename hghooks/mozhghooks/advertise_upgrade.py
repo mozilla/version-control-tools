@@ -9,6 +9,6 @@ def hook(ui, repo, **kwargs):
         ui.write('YOU ARE PUSHING WITH AN OUT OF DATE MERCURIAL CLIENT!\n')
         ui.write('newer versions are faster and have numerous bug fixes\n')
         ui.write('upgrade instructions are at the following URL:\n')
-        ui.write('https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/installing.html\n')
+        ui.write('https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/installing.html\n')
 
     return 0

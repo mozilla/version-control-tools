@@ -2,7 +2,7 @@
 This helps us query information about Mozilla's Mercurial repositories.
 
 Documentation found in here:
-https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/pushlog.html
+https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/pushlog.html
 
 Important notes from the pushlog documentation::
 

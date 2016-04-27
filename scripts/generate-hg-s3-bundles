@@ -88,7 +88,7 @@ HTML_INDEX = '''
     </p>
     <p>
        For more, see
-       <a href="https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/bundleclone.html">the official docs</a>.
+       <a href="https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/bundleclone.html">the official docs</a>.
     </p>
     <table border="1">
       <tr>

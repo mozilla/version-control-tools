@@ -220,7 +220,7 @@ different)
   remote: 1) You do not have the appropriate Mercurial extension installed
   remote: 2) The extension is out of date
   remote: 
-  remote: See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html
+  remote: See https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html
   remote: for instructions on how to configure your machine to use MozReview.
   remote: 
   remote: -
@@ -246,7 +246,7 @@ different)
   1) You do not have the appropriate Mercurial extension installed
   2) The extension is out of date
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html
   for instructions on how to configure your machine to use MozReview.
   [255]
 
@@ -263,7 +263,7 @@ Pulling from autoreview repos also error
   remote: 1) You do not have the appropriate Mercurial extension installed
   remote: 2) The extension is out of date
   remote: 
-  remote: See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html
+  remote: See https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html
   remote: for instructions on how to configure your machine to use MozReview.
   remote: 
   remote: -
@@ -282,7 +282,7 @@ Pulling from autoreview repos also error
   1) You do not have the appropriate Mercurial extension installed
   2) The extension is out of date
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/mozreview/install.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html
   for instructions on how to configure your machine to use MozReview.
   [255]
 

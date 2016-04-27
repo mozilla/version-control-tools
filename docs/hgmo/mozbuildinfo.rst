@@ -5,7 +5,7 @@ moz.build Metadata
 ==================
 
 hg.mozilla.org has the ability to extract and render metadata from
-`moz.build files <https://gecko.readthedocs.org/en/latest/build/buildsystem/mozbuild-files.html>`_.
+`moz.build files <https://gecko.readthedocs.io/en/latest/build/buildsystem/mozbuild-files.html>`_.
 
 Web Command
 ===========

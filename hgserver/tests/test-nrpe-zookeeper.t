@@ -16,7 +16,7 @@ Should error connecting to non-listening port
   $ check_zk -H localhost:2182
   socket error connecting to localhost: [Errno 111] Connection refused
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for more info on monitor and alerts.
   [2]
 
@@ -25,7 +25,7 @@ Should be OK checking node itself
   $ check_zk -H localhost:2181
   zookeeper node OK
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for more info on monitor and alerts.
 
 Cluster should be healthy
@@ -33,7 +33,7 @@ Cluster should be healthy
   $ check_zk -c /etc/zookeeper/zoo.cfg
   zookeeper ensemble OK
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for more info on monitor and alerts.
 
 Node and cluster report as healthy
@@ -41,7 +41,7 @@ Node and cluster report as healthy
   $ check_zk -H localhost:2181 -c /etc/zookeeper/zoo.cfg
   zookeeper node and ensemble OK
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for more info on monitor and alerts.
 
 Stopping us should result in failure
@@ -51,7 +51,7 @@ Stopping us should result in failure
   $ check_zk -H localhost:2181
   socket error connecting to localhost: [Errno 111] Connection refused
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for more info on monitor and alerts.
   [2]
 
@@ -61,7 +61,7 @@ The cluster should report warning state
   ENSEMBLE WARNING - only have 1/2 expected followers
   ENSEMBLE WARNING - socket error connecting to *: [Errno 111] Connection refused (glob)
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for more info on monitor and alerts.
   [1]
 
@@ -72,7 +72,7 @@ Ensemble state should recover when zookeeper started
   $ check_zk -c /etc/zookeeper/zoo.cfg
   zookeeper ensemble OK
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for more info on monitor and alerts.
 
 Stopping a separate node should result in warning
@@ -83,7 +83,7 @@ Stopping a separate node should result in warning
   ENSEMBLE WARNING - only have 1/2 expected followers
   ENSEMBLE WARNING - socket error connecting to *: [Errno 111] Connection refused (glob)
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for more info on monitor and alerts.
   [1]
 
@@ -97,7 +97,7 @@ Stopping multiple nodes should result in loss of quorum
   ENSEMBLE WARNING - socket error connecting to *: [Errno 111] Connection refused (glob)
   ENSEMBLE WARNING - socket error connecting to *: [Errno 111] Connection refused (glob)
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for more info on monitor and alerts.
   [2]
 

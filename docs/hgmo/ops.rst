@@ -450,7 +450,7 @@ consumer. So, expected output is something like the following::
 
    OK - partition 0 is completely in sync (159580/159580)
 
-   See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+   See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
    for details about this check.
 
 Remediation to Check Failure

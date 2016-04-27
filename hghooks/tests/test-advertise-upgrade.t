@@ -32,7 +32,7 @@ Old client without bundle2 does
   YOU ARE PUSHING WITH AN OUT OF DATE MERCURIAL CLIENT!
   newer versions are faster and have numerous bug fixes
   upgrade instructions are at the following URL:
-  https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/installing.html
+  https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/installing.html
 #endif
 
 Modern hg without bundle2 gets message
@@ -52,4 +52,4 @@ it's acceptable)
   YOU ARE PUSHING WITH AN OUT OF DATE MERCURIAL CLIENT!
   newer versions are faster and have numerous bug fixes
   upgrade instructions are at the following URL:
-  https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/installing.html
+  https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/installing.html

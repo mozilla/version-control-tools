@@ -19,7 +19,7 @@ Check should be OK by default
   OK - partition 6 is completely in sync (0/0)
   OK - partition 7 is completely in sync (0/0)
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for details about this check.
 
 Stop the replication consumers to test failure scenarios
@@ -53,7 +53,7 @@ No issues reported when thresholds aren't met
   OK - partition 6 is completely in sync (0/0)
   OK - partition 7 is completely in sync (0/0)
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for details about this check.
 
 Warning reported when lag count hits threshold
@@ -72,7 +72,7 @@ Warning reported when lag count hits threshold
   OK - partition 6 is completely in sync (0/0)
   OK - partition 7 is completely in sync (0/0)
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for details about this check.
   [1]
 
@@ -92,7 +92,7 @@ Critical reported when lag count hits threshold
   OK - partition 6 is completely in sync (0/0)
   OK - partition 7 is completely in sync (0/0)
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for details about this check.
   [2]
 
@@ -114,7 +114,7 @@ Warning reported when lag time hits threshold
   OK - partition 6 is completely in sync (0/0)
   OK - partition 7 is completely in sync (0/0)
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for details about this check.
   [1]
 
@@ -134,7 +134,7 @@ Critical reported when lag time hits threshold
   OK - partition 6 is completely in sync (0/0)
   OK - partition 7 is completely in sync (0/0)
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for details about this check.
   [2]
 
@@ -162,7 +162,7 @@ Resuming consumers clears check
   OK - partition 6 is completely in sync (0/0)
   OK - partition 7 is completely in sync (0/0)
   
-  See https://mozilla-version-control-tools.readthedocs.org/en/latest/hgmo/ops.html
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for details about this check.
 
 Cleanup

@@ -4,7 +4,7 @@ setup(
     name='mozreviewbots',
     version='0.1',
     description='MozReview static analysis bots',
-    url='https://mozilla-version-control-tools.readthedocs.org/',
+    url='https://mozilla-version-control-tools.readthedocs.io/',
     author='Mozilla',
     author_email='dev-version-control@lists.mozilla.org',
     license='MPL 2.0',
