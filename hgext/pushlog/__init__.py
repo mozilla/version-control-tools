@@ -376,7 +376,7 @@ class pushlog(object):
             nodes = []
             for pushid, who, when, node in res:
                 who = who.encode('utf-8')
-                nodes.append(node)
+                nodes.append(node.encode('ascii'))
 
             return pushid, who, when, nodes
 
