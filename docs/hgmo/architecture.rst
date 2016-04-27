@@ -52,6 +52,25 @@ which is backed by an expensive network appliance. If the master SSH
 server goes down, the warm standby has immediate access to repository
 data.
 
+Push Data Aggregator and Notification Services
+==============================================
+
+When repositories are changed, change events are written into a
+replication log and replayed independently on each mirror.
+
+There is a service - the *push data aggregator* - running on the master
+server that monitors the replication state of all active mirrors.
+
+When a replication message has been acknowledge/replayed by all active
+mirrors, the *push data aggregator* copies this message into a
+different replication log. This log thus represents all events that
+are globally available.
+
+The log of fully replicated messages is used to power
+:ref:`notification services <hgmo_notification>`. Various services react
+to events posted in this new log and turn them into e.g. Pulse
+notifications.
+
 Handling High Clone Load
 ========================
 
