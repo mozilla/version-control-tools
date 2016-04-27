@@ -5,3 +5,6 @@ Description=Schedules periodic generation of hg bundles
 # Run when sun is over the Pacific Ocean as this is when the fewest
 # pushes occur.
 OnCalendar=04:00
+
+[Install]
+WantedBy=timers.target
