@@ -1,0 +1,91 @@
+#!/usr/bin/env python2.7
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+"""This script sends systemd unit output.
+
+Some environment variables are consulted:
+
+FROM
+   Who the email will be from
+TO
+   who to send the email to (comma delimited list)
+"""
+
+import argparse
+import datetime
+from email.mime.text import MIMEText
+import json
+import os
+import subprocess
+import sys
+
+
+def get_unit_journal_output(unit):
+    args = [
+        'journalctl',
+        '-o', 'json',
+        '--unit', unit,
+        # TODO make time configurable.
+        '--since', '-5m',
+    ]
+
+    items = []
+    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for l in p.stdout:
+        o = json.loads(l, encoding='utf-8')
+
+        if 'MESSAGE' not in o:
+            continue
+
+        # Timestamp is in number of microseconds since epoch.
+        ts = o['__REALTIME_TIMESTAMP']
+        pid = o['_PID']
+        s, us = divmod(int(ts), 1000000)
+        dt = datetime.datetime.utcfromtimestamp(float(s) + float(us) / 1000000)
+        items.append((dt, pid, o['MESSAGE']))
+
+    p.wait()
+
+    return items
+
+
+def send_email(unit, hostname, email_from, email_to):
+    body_lines = []
+    for dt, pid, message in get_unit_journal_output(unit):
+        body_lines.append('%s [%s] %s' % (dt.isoformat(), pid, message))
+
+    msg = MIMEText('\n'.join(body_lines), _charset='utf-8')
+    msg['From'] = email_from
+    msg['To'] = email_to
+    msg['Subject'] = '%s unit output for %s' % (hostname, unit)
+
+    # We just speak to sendmail because we're lazy. Plus we don't know
+    # for certain the local machine is running a SMTP server.
+    p = subprocess.Popen(['sendmail', email_to], stdin=subprocess.PIPE)
+    p.stdin.write(msg.as_string())
+    p.stdin.close()
+    p.communicate()
+    p.wait()
+
+    return p.returncode
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('unit', help='Unit whose output to report')
+    parser.add_argument('hostname', help='Hostname sending from')
+
+    args = parser.parse_args()
+
+    os.environ['ENCODING'] = 'utf-8'
+
+    email_from = os.environ.get('FROM', 'systemd-mailer@%s' % args.hostname)
+
+    if 'TO' not in os.environ:
+        print('do not know who to send mail to')
+        sys.exit(1)
+
+    sys.exit(send_email(args.unit, args.hostname,
+                        email_from, os.environ['TO']))
