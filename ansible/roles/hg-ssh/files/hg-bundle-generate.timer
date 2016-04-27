@@ -1,0 +1,7 @@
+[Unit]
+Description=Schedules periodic generation of hg bundles
+
+[Timer]
+# Run when sun is over the Pacific Ocean as this is when the fewest
+# pushes occur.
+OnCalendar=04:00

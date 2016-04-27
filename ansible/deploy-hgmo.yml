@@ -83,11 +83,6 @@
       }
 
   tasks:
-    # Install CRON to generate Mercurial bundle files. This only needs
-    # to run on the master.
-    - include: tasks/hgmo-bundle-cron.yml
-      when: ansible_hostname == "hgssh3"
-
     - name: discover kafka topics
       command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --list
       register: kafka_topics

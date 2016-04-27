@@ -384,12 +384,23 @@
   notify: systemd daemon reload
 
 - name: systemd service for bundle generation
-  copy: src=hg-bundle-generate.service
-        dest=/etc/systemd/system/hg-bundle-generate.service
+  copy: src=hg-bundle-generate.{{ item }}
+        dest=/etc/systemd/system/hg-bundle-generate.{{ item }}
         owner=root
         group=root
         mode=0644
-  notify: system daemon reload
+  with_items:
+    - service
+    - timer
+  notify: systemd daemon reload
+
+- name: install mail-unit-output override to configure hg-bundle-generate emails
+  copy: src=hg-bundle-generate-mail-unit-override.conf
+        dest=/etc/systemd/system/mail-unit-output@hg-bundle-generate.service.d/override.conf
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
 
 - name: create directory for Nagios files
   file: path={{ item }}
