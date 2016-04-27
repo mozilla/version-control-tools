@@ -406,7 +406,10 @@ def automationrelevancewebcommand(web, req, tmpl):
         csets.append(entry)
 
     req.respond(HTTP_OK, 'application/json')
-    return json.dumps({'changesets': csets}, indent=2, sort_keys=True)
+    # We use latin1 as the encoding here because all data should be treated as
+    # byte strings. ensure_ascii will escape non-ascii values using \uxxxx.
+    return json.dumps({'changesets': csets}, indent=2, sort_keys=True,
+                      encoding='latin1')
 
 
 def revset_reviewer(repo, subset, x):
