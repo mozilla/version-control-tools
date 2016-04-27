@@ -156,6 +156,80 @@ be printed to the user.
 
 .. _hgmo_ops_monitoring:
 
+SSH Server Services
+===================
+
+This section describes relevant services running on the SSH servers. There
+is a single master server at any given time and a hot standby ready to be
+promoted to master should the master go down.
+
+sshd_hg.service
+---------------
+
+This systemd service provides the SSH server for accepting external SSH
+connections that connect to Mercurial.
+
+This is different from the system's SSH service (``sshd.service``). The
+differences from a typical SSH service are as follows:
+
+* The service is running on port 222 (not port 22)
+* SSH authorized keys are looked up in LDAP (not using the system auth)
+* All logins are processed via ``pash``, a custom Python script that
+  dispatches to Mercurial or performs other adminstrative tasks.
+
+This service should always be running on all servers, even if they aren't
+the master.
+
+hg-bundle-generate.timer and hg-bundle-generate.service
+-------------------------------------------------------
+
+These systemd units are responsible for creating Mercurial bundles for
+popular repositories and uploading them to S3. The bundles it produces
+are also available on a CDN at https://hg.cdn.mozilla.net/.
+
+These bundles are advertised by Mercurial repositories to facilitate
+:ref:`bundle-based cloning <hgmo_bundleclone>`, which drastically reduces
+the load on the hg.mozilla.org servers.
+
+This service only runs on the master server.
+
+pushdataaggregator.service
+--------------------------
+
+This systemd service monitors the state of the replication mirrors and
+copies fully acknowledged/applied messages into a new Kafka topic
+(``replicatedpushdata``).
+
+The ``replicatedpushdata`` topic is watched by other services to react to
+repository events. So if this service stops working, other services
+will likely sit idle.
+
+This service only runs on the master server.
+
+``pulsenotifier.service``
+-------------------------
+
+This systemd service monitors the ``replicatedpushdata`` Kafka topic
+and sends messages to Pulse to advertise repository events.
+
+For more, see :ref:`hgmo_notification`.
+
+The Pulse notifications this service sends are relied upon by various
+applications at Mozilla. If it stops working, a lot of services don't
+get notifications and things stop working.
+
+This service only runs on the master server.
+
+``unifyrepo.service``
+---------------------
+
+This systemd service periodically aggregates the contents of various
+repositories into other repositories.
+
+This service and the repositories it writes to are currently experimental.
+
+This service only runs on the master server.
+
 Monitoring and Alerts
 =====================
 
