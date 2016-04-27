@@ -1,0 +1,15 @@
+---
+
+- name: install systemd-mail-unit-output script
+  copy: src=../files/systemd-mail-unit-output
+        dest=/usr/local/bin/systemd-mail-unit-output
+        owner=root
+        group=root
+        mode=0755
+
+- name: install systemd-mail-unit-output service
+  copy: src=../files/systemd-mail-unit-output@.service
+        dest=/etc/systemd/system/mail-unit-output@.service
+        owner=root
+        group=root
+        mode=0644

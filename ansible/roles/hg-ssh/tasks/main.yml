@@ -3,6 +3,8 @@
   stat: path=/vct
   register: vct_dir
 
+- include: ../../../tasks/systemd-mail-unit-output.yml
+
 # This is needed so authconfig can have the appropriate ldap_uri at container
 # start time, which results in /etc/openldap/ldap.conf getting updated
 # appropriately, which is necessary for nscd and `ldapsearch` to
