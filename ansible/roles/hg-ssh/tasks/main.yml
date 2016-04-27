@@ -60,7 +60,10 @@
 - name: configure system authentication settings
   template: src=nslcd.conf.j2
             dest=/etc/nslcd.conf
-  notify: run authconfig
+  tags: docker-startup
+
+- name: run authconfig
+  command: /usr/sbin/authconfig --enablemkhomedir --enableldap --enableldapauth --ldapserver={{ ldap_uri }} --ldapbasedn={{ basedn }} --updateall
   tags: docker-startup
 
 - name: configure sshd

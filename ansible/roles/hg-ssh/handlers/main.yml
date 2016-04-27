@@ -1,7 +1,4 @@
 ---
-- name: run authconfig
-  command: /usr/sbin/authconfig --enablemkhomedir --enableldap --enableldapauth --ldapserver={{ ldap_uri }} --ldapbasedn={{ basedn }} --updateall
-
 # TODO Ansible isn't recognizing systemd services?
 - name: restart rsyslogd
   service: name=rsyslog state=restarted
