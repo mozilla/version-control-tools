@@ -395,7 +395,7 @@
   notify: systemd daemon reload
 
 - name: install mail-unit-output override to configure hg-bundle-generate emails
-  copy: src=hg-bundle-generate-mail-unit-override.conf
+  copy: src=hg-bundle-generate-mail-unit-output-override.conf
         dest=/etc/systemd/system/mail-unit-output@hg-bundle-generate.service.d/override.conf
         owner=root
         group=root
