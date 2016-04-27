@@ -394,16 +394,21 @@
     - timer
   notify: systemd daemon reload
 
-- name: create directory hg-bundle-generate mail-unit-output override file
-  file: path=/etc/systemd/system/mail-unit-output@hg-bundle-generate.service.d
+# Ideally, we would have separate override files for each service. But
+# it doesn't appear systemd allows there to be a generic e.g.
+# mail-unit-output@.service and an instance e.g.
+# mail-unit-output@hg-bundle-generate.service.d
+
+- name: create directory mail-unit-output override file
+  file: path=/etc/systemd/system/mail-unit-output@.service.d
         state=directory
         owner=root
         group=root
         mode=0755
 
-- name: install mail-unit-output override to configure hg-bundle-generate emails
-  copy: src=hg-bundle-generate-mail-unit-output-override.conf
-        dest=/etc/systemd/system/mail-unit-output@hg-bundle-generate.service.d/override.conf
+- name: install mail-unit-output override
+  copy: src=mail-unit-output-override.conf
+        dest=/etc/systemd/system/mail-unit-output@.service.d/override.conf
         owner=root
         group=root
         mode=0644
