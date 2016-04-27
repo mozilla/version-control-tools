@@ -4,8 +4,8 @@ After=network.target remote-fs.target nss-lookup.target
 
 [Service]
 WorkingDirectory=/
-User=hg
-Group=hg
+User=hg-notifier
+Group=hg-notifier
 PrivateTmp=true
 
 ExecStart=/var/hg/venv_tools/bin/vcsreplicator-aggregator /etc/mercurial/pushdataaggregator.ini
