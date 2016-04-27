@@ -91,6 +91,7 @@
     - { name: 'scm_sec_sensitive', gid: 686 }
     - { name: 'scm_ecmascript', gid: 687 }
     - { name: 'hg-aggregate', gid: 5601 }
+    - { name: 'hg-notifier', gid: 5603 }
 
 - name: Create hg group
   group: name=hg
@@ -103,10 +104,13 @@
         shell=/bin/bash
         comment='Hg user'
 
-- name: create hg-aggregate user
-  user: name=hg-aggregate
-        group=hg-aggregate
-        uid=5601
+- name: create users for hg services
+  user: name={{ item.name }}
+        group={{ item.name }}
+        uid={{ item.uid }}
+  with_items:
+    - { name: 'hg-aggregate', uid: 5601 }
+    - { name: 'hg-notifier', uid: 5603 }
 
 - name: hg user ssh config is prepared
   file: path=/home/hg/.ssh state=directory mode=0775 owner=hg group=hg
