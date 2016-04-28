@@ -1026,8 +1026,7 @@ class Docker(object):
                     hgrb_image,
                     ports=[22, 80],
                     entrypoint=['/entrypoint.py'],
-                    command=['/usr/bin/supervisord', '-n'],
-                    labels=['hgrb'])
+                    command=['/usr/bin/supervisord', '-n'])
 
             if start_hgweb:
                 f_hgweb_create = e.submit(

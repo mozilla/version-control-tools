@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script is called by watchman (when using |mozreview autorefresh|).
+# It wraps around |mozreview refresh|, adding --refresh-reviewboard if
+# any files inside the reviewboard-fork/ directory were modified.
+
+import os
+import sys
+
+root = sys.argv[1]
+path = sys.argv[2]
+command = '%s/mozreview' % root
+args = [command, 'refresh', path]
+if os.getenv('WATCHMAN_FILES_OVERFLOW') or any(
+        file.startswith('reviewboard-fork/') for file in sys.argv[3:]):
+    args.append('--refresh-reviewboard')
+os.execv(command, args)

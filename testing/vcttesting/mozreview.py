@@ -401,16 +401,23 @@ class MozReview(object):
         subprocess.check_call([WATCHMAN, 'watch-project', ROOT])
         name = 'mozreview-%s' % os.path.basename(self._path)
 
+        expression = [
+            'anyof',
+            ['dirname', 'hgext/reviewboard'],
+            ['dirname', 'pylib/mozreview'],
+            ['dirname', 'pylib/rbbz'],
+            ['dirname', 'pylib/reviewboardmods'],
+            ['dirname', 'reviewboard-fork/djblets'],
+            ['dirname', 'reviewboard-fork/reviewboard'],
+        ]
+        command = ['%s/scripts/watchman-refresh-wrapper' % ROOT, ROOT,
+                   self._path]
         data = json.dumps(['trigger', ROOT, {
             'name': name,
             'chdir': ROOT,
-            'expression': ['anyof',
-                ['dirname', 'hgext/reviewboard'],
-                ['dirname', 'pylib/mozreview'],
-                ['dirname', 'pylib/rbbz'],
-                ['dirname', 'reviewboardmods'],
-            ],
-            'command': ['%s/mozreview' % ROOT, 'refresh', self._path],
+            'expression': expression,
+            'command': command,
+            'append_files': True,
         }])
         p = subprocess.Popen([WATCHMAN, '-j'], stdin=subprocess.PIPE)
         p.communicate(data)
