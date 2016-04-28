@@ -1,5 +1,6 @@
 ---
 dependencies:
+  - supervisor
   - docker-kafkabroker
   - docker-python-coverage
   # hgweb_hosts is used to populate SSH host keys. We don't know these
