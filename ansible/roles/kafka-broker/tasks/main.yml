@@ -110,12 +110,10 @@
     - kafka
     - zookeeper
 
-- name: install supervisor configs
-  copy: src=supervisor-{{ item }}.conf
-        dest=/etc/supervisor.d/{{ item }}.conf
-        owner=root
-        group=root
-        mode=0644
+# TODO delete this after a few weeks.
+- name: remove supervisor configs
+  file: path=/etc/supervisor.d/{{ item }}.conf
+        state=absent
   with_items:
     - kafka
     - zookeeper

@@ -32,10 +32,9 @@ for r in REPOS:
         root, 'hg', 'hg', 'wwr'])
 
 # Disable ZooKeeper and Kafka.
-for f in ('kafka.conf', 'zookeeper.conf'):
-    try:
-        os.unlink('/etc/supervisor.d/%s' % f)
-    except OSError:
-        pass
+try:
+    os.unlink('/etc/supervisor.d/docker-kafkabroker.conf')
+except OSError:
+    pass
 
 os.execl(sys.argv[1], *sys.argv[1:])
