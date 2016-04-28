@@ -446,7 +446,7 @@ Running Tests
 The MozReview tests are all defined as part of the Mercurial extension.
 To run the tests::
 
-   $ ./run-tests -j2 hgext/reviewboard/tests/ pylib/mozreview/mozreview/autoland/tests
+   $ ./run-tests -j2 hgext/reviewboard/tests/ autoland/tests/
 
 There are also some Selenium-based tests.  You'll need Firefox
 (release) installed to run them::
