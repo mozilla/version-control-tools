@@ -163,6 +163,16 @@ This section describes relevant services running on the SSH servers. There
 is a single master server at any given time and a hot standby ready to be
 promoted to master should the master go down.
 
+hg-master.target
+----------------
+
+This systemd target provides a common target for starting and stopping
+all systemd units that should only be running on the active master server.
+
+The unit only starts if the ``/repo/hg/master.<hostname>`` file is present.
+e.g. ``hgssh1.dmz.scl3.mozilla.com`` will only start the target if
+``/repo/hg/master.hgss1.dmz.scl3.mozilla.com`` is present.
+
 sshd_hg.service
 ---------------
 
