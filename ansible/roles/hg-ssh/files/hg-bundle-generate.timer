@@ -1,6 +1,10 @@
 [Unit]
 Description=Schedules periodic generation of hg bundles
 
+# We only want to have a single master at a time. Look for a file with the
+# current hostname in it indicating that we are the master.
+AssertPathExists=/repo/hg/master.%H
+
 [Timer]
 # Run when sun is over the Pacific Ocean as this is when the fewest
 # pushes occur.
