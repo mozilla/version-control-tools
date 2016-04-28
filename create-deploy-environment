@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Bail on any setup error
+set -eu
 
 ROOT=`pwd`
 VENV=${ROOT}/venv
@@ -26,8 +28,13 @@ if [ ! -d ${VENV} ]; then
   cd ${ROOT}
 fi
 
+# activate fails on read of PS1, which doesn't exist in non-interactive shell
+set +u
 source ${VENV}/bin/activate
+set -u
 
+# Note: pycrypto may not build on OSX with hombrew gmp unless you add:
+# export CFLAGS='-I/usr/local/include -L/usr/local/lib'
 pip install --upgrade --require-hashes -r deploy-requirements.txt
 
 cd testing
