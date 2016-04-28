@@ -33,7 +33,7 @@ Set up local clone
 Pushing via http:// says pushing isn't allowed
 
   $ hg push ${HGWEB_0_URL}mozilla-central
-  pushing to http://$DOCKER_HOSTNAME:32784/mozilla-central
+  pushing to http://$DOCKER_HOSTNAME:*/mozilla-central (glob)
   searching for changes
   abort: authorization failed
   [255]
