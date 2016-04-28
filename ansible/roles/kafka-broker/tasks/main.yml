@@ -99,6 +99,17 @@
         mode=0644
   when: zk_myid.stat.exists == False and inventory_hostname in zk_servers
 
+- name: install systemd service files for kafka and zookeeper
+  copy: src={{ item }}.service
+        dest=/etc/systemd/system/{{ item }}.service
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
+  with_items:
+    - kafka
+    - zookeeper
+
 - name: install supervisor configs
   copy: src=supervisor-{{ item }}.conf
         dest=/etc/supervisor.d/{{ item }}.conf
