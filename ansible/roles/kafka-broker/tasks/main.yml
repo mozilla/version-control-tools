@@ -1,4 +1,8 @@
 ---
+- name: determine if running in Docker
+  stat: path=/vct
+  register: vct_dir
+
 - name: install system packages
   yum: name={{ item }} state=present
   with_items:
@@ -109,6 +113,17 @@
   with_items:
     - kafka
     - zookeeper
+
+# We DON'T set state=started because starting kafka and zookeeper can be
+# dangerous since it may introduce nodes into a cluster at an unwanted
+# time.
+- name: ensure kafka and zookeeper start at boot (server only)
+  service: name={{ item }}.service
+           enabled=yes
+  with_items:
+    - kafka
+    - zookeeper
+  when: vct_dir.stat.exists == False
 
 # TODO delete this after a few weeks.
 - name: remove supervisor configs
