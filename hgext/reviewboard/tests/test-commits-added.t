@@ -78,7 +78,7 @@ Adding commits to old reviews should create new reviews
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
-The parent review should have its description updated.
+The parent review request should be updated with the new commits.
 
   $ rbmanage dumpreview 1
   id: 1
