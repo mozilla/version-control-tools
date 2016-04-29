@@ -16,5 +16,8 @@ UMask=002
 Restart=always
 TimeoutStopSec=60
 
+SyslogIdentifier=vcsreplicator
+SyslogFacility=local2
+
 [Install]
 WantedBy=multi-user.target
