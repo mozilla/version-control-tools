@@ -274,7 +274,7 @@ Saying "yes" to clone the repo will clone it.
   Repository marked as non-publishing: draft changesets will remain in the draft phase when pushed.
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ hgmo exec hgweb0 cat /var/hg/mozilla/users/user_example.com/repo-1/.hg/hgrc
+  $ hgmo exec hgweb0 cat /repo/hg/mozilla/users/user_example.com/repo-1/.hg/hgrc
   [phases]
   publish = False
   
@@ -383,7 +383,7 @@ We can create a new empty repo
   Repository marked as non-publishing: draft changesets will remain in the draft phase when pushed.
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ hgmo exec hgweb0 cat /var/hg/mozilla/users/user_example.com/empty-1/.hg/hgrc
+  $ hgmo exec hgweb0 cat /repo/hg/mozilla/users/user_example.com/empty-1/.hg/hgrc
   [phases]
   publish = False
   
