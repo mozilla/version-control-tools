@@ -461,14 +461,14 @@
   service: name=vcsreplicator@{{ item }}.service
            enabled=yes
   with_items:
-    - 0
-    - 1
-    - 2
-    - 3
-    - 4
-    - 5
-    - 6
-    - 7
+    - '0'
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+    - '6'
+    - '7'
   when: vct_dir.stat.exists == False
 
 # TODO remove after a few weeks.
