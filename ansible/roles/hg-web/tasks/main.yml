@@ -476,7 +476,9 @@
   file: path=/etc/supervisor.d/vcsreplicator.conf
         state=absent
 
-# TODO restart vcsreplicator daemon.
+- name: restart vcsreplicator daemons (server only)
+  command: /usr/bin/systemctl restart vcsreplicator@*.service
+  when: vct_dir.stat.exists == False
 
 - name: create Nagios config directory
   file: path=/etc/nagios/nrpe.d
