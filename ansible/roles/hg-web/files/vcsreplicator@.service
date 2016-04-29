@@ -1,0 +1,20 @@
+[Unit]
+Description=Mirror Mercurial changes
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+ExecStart=/var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --partition %i
+WorkingDirectory=/
+PrivateTmp=true
+User=hg
+Group=hg
+
+# We want new repos to be group writable by default. Default umask of
+# 022 prevents this.
+UMask=002
+
+Restart=always
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target

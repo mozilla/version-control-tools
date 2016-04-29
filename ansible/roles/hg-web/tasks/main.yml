@@ -449,13 +449,13 @@
         group=root
         mode=0755
 
-- name: add replication daemon config to supervisor
-  copy: src=supervisor-vcsreplicator.conf
-        dest=/etc/supervisor.d/vcsreplicator.conf
+- name: systemd service file for vcsreplicator
+  copy: src=vcsreplicator@.service
+        dest=/etc/systemd/system/vcsreplicator@.service
         owner=root
         group=root
         mode=0644
-  notify: reread supervisor
+  notify: systemd daemon reload
 
 # TODO restart vcsreplicator daemon.
 
