@@ -457,6 +457,25 @@
         mode=0644
   notify: systemd daemon reload
 
+- name: vcsreplicator service is enabled (server only)
+  service: name=vcsreplicator@{{ item }}.service
+           enabled=yes
+  with_items:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+  when: vct_dir.stat.exists == False
+
+# TODO remove after a few weeks.
+- name: remove supervisor configs
+  file: path=/etc/supervisor.d/vcsreplicator.conf
+        state=absent
+
 # TODO restart vcsreplicator daemon.
 
 - name: create Nagios config directory

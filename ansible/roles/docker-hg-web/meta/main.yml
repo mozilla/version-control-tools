@@ -1,5 +1,6 @@
 ---
 dependencies:
+  - supervisor
   - docker-kafkabroker
   # Docker startup routines plug in proper values for ZooKeeper and
   # Kafka settings.
