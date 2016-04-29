@@ -26,7 +26,7 @@ Creating a repository should record an event saying so
 
   $ consumer --onetime
   $ consumer --onetime
-  * vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central (glob)
+  vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central
 
   $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log
   No handlers could be found for logger "kafka.conn"
@@ -37,15 +37,15 @@ Creating a repository should record an event saying so
   No handlers could be found for logger "kafka.conn"
   No handlers could be found for logger "kafka.conn"
   No handlers could be found for logger "kafka.conn"
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
 
   $ hgmo exec hgweb0 ls /repo/hg/mozilla
   mozilla-central
@@ -78,7 +78,7 @@ generaldelta is preserved
 
   $ consumer --onetime
   $ consumer --onetime
-  * vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mcgd (glob)
+  vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mcgd
 
   $ hgmo exec hgweb0 cat /repo/hg/mozilla/mcgd/.hg/requires
   dotencode

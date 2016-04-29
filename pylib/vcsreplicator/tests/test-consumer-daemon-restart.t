@@ -20,26 +20,26 @@ Gracefully shut down a consumer daemon
   No handlers could be found for logger "kafka.conn"
   No handlers could be found for logger "kafka.conn"
   No handlers could be found for logger "kafka.conn"
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central (glob)
-  * vcsreplicator.consumer received signal 15 (glob)
-  * vcsreplicator.consumer exiting gracefully (glob)
-  * kafka.conn Unable to receive data from Kafka (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer received signal 15
+  vcsreplicator.consumer exiting gracefully
+  kafka.conn Unable to receive data from Kafka
   Traceback (most recent call last):
     File "/var/hg/venv_replication/lib/python2.7/site-packages/kafka/conn.py", line 97, in _read_bytes
       data = self._sock.recv(min(bytes_left, 4096))
   error: [Errno 4] Interrupted system call
-  * kafka.client ConnectionError attempting to receive a response to request * from server BrokerMetadata(nodeId=*, host='*', port=*): Kafka @ * went away (glob)
-  * kafka.consumer.simple FailedPayloadsError for pushdata:2 (glob)
-  * vcsreplicator.consumer exiting from main consume loop (glob)
-  * vcsreplicator.consumer process exiting gracefully (glob)
+  kafka.client ConnectionError attempting to receive a response to request * from server BrokerMetadata(nodeId=*, host='*', port=*): Kafka @ * went away (glob)
+  kafka.consumer.simple FailedPayloadsError for pushdata:2
+  vcsreplicator.consumer exiting from main consume loop
+  vcsreplicator.consumer process exiting gracefully
 
 Send a message to the replication system
 
@@ -54,9 +54,9 @@ Start consumer daemon and verify it picks up where it left off
 
   $ sleep 1
   $ hgmo exec hgweb0 tail -n 3 /var/log/vcsreplicator/consumer.log
-  * vcsreplicator.consumer process exiting gracefully (glob)
-  * vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  * vcsreplicator.consumer writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc (glob)
+  vcsreplicator.consumer process exiting gracefully
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc
 
 Cleanup
 

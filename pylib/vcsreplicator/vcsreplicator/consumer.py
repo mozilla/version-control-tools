@@ -444,9 +444,7 @@ def cli():
 
     root = logging.getLogger()
     handler = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter(
-            '%(asctime)s %(process)d %(name)s %(message)s',
-            '%Y-%m-%dT%H:%M:%SZ')
+    formatter = logging.Formatter('%(name)s %(message)s')
     formatter.converter = time.gmtime
     handler.setFormatter(formatter)
     root.addHandler(handler)
