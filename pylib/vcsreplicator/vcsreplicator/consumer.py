@@ -383,6 +383,12 @@ def cli():
     args = parser.parse_args()
 
     config = Config(filename=args.config)
+
+    # hglib will use 'hg' which relies on PATH being correct. Since we're
+    # running from a virtualenv, PATH may not be set unless the virtualenv
+    # is activated. Overwrite the hglib defaults with a value from the config.
+    hglib.HGPATH = config.hg_path
+
     client = config.get_client_from_section('consumer', timeout=30)
     topic = config.c.get('consumer', 'topic')
     group = config.c.get('consumer', 'group')

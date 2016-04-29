@@ -1,3 +1,6 @@
+[programs]
+hg = /var/hg/venv_replication/bin/hg
+
 [consumer]
 {% if zk_servers is defined %}
 hosts = {% for host in zk_servers %}{{ host }}:9092{% if not loop.last %}, {% endif %}{% endfor %}

@@ -42,6 +42,14 @@ class Config(object):
         else:
             self._public_url_rewrites = []
 
+    @property
+    def hg_path(self):
+        """Path to a hg executable."""
+        if self.c.has_section('programs') and self.c.has_option('programs', 'hg'):
+            return self.c.get('programs', 'hg')
+
+        return 'hg'
+
     def parse_wire_repo_path(self, path):
         """Parse a normalized repository path into a local path."""
         for source, dest in self._path_rewrites:
