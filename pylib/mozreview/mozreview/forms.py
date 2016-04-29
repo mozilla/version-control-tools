@@ -1,16 +1,15 @@
+import os
+
 from django import forms
 from django.utils.translation import ugettext as _
 from djblets.extensions.forms import SettingsForm
 from djblets.siteconfig.forms import SiteSettingsForm
 
-import mozreview.extension
-
-
 class MozReviewSettingsForm(SettingsForm):
     config = forms.CharField(
         required=False,
         help_text=_('Configure this extension by editing ' +
-                    mozreview.extension.SETTINGS_PATH)
+                    os.path.join('/', 'mozreview-settings.json'))
     )
 
 

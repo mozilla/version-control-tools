@@ -9,7 +9,7 @@ from django.contrib.sites.models import Site
 from djblets.siteconfig.models import SiteConfiguration
 
 from reviewboard.extensions.base import Extension
-from reviewboard.extensions.hooks import AuthBackendHook, SignalHook
+from reviewboard.extensions.hooks import SignalHook
 from reviewboard.reviews.signals import (
     reply_publishing,
     review_publishing,
@@ -34,8 +34,6 @@ from mozreview.models import (
 from mozreview.rb_utils import (
     get_obj_url,
 )
-from rbbz.auth import BugzillaBackend
-
 
 logger = logging.getLogger(__name__)
 
@@ -43,8 +41,6 @@ logger = logging.getLogger(__name__)
 class BugzillaExtension(Extension):
 
     def initialize(self):
-        AuthBackendHook(self, BugzillaBackend)
-
         # Any abortable signal hooks that talk to Bugzilla should have
         # sandbox_errors=False, since we don't want to complete the action if
         # updating Bugzilla failed for any reason.

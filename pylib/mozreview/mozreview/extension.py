@@ -11,7 +11,8 @@ from reviewboard.diffviewer.opcode_generator import (
     set_diff_opcode_generator_class,
 )
 from reviewboard.extensions.base import Extension, JSExtension
-from reviewboard.extensions.hooks import (HeaderDropdownActionHook,
+from reviewboard.extensions.hooks import (AuthBackendHook,
+                                          HeaderDropdownActionHook,
                                           HostingServiceHook,
                                           ReviewRequestDropdownActionHook,
                                           ReviewRequestFieldsHook,
@@ -35,6 +36,7 @@ from mozreview.autoland.resources import (
 from mozreview.batchreview.resources import (
     batch_review_resource,
 )
+from mozreview.bugzilla.auth import BugzillaBackend
 from mozreview.diffviewer.opcode_generator import (
     NoFilterDiffOpcodeGenerator
 )
@@ -205,6 +207,8 @@ class MozReviewExtension(Extension):
     ]
 
     def initialize(self):
+        AuthBackendHook(self, BugzillaBackend)
+
         self.original_opcode_generator = get_diff_opcode_generator_class()
         set_diff_opcode_generator_class(NoFilterDiffOpcodeGenerator)
 

@@ -241,7 +241,7 @@ def get_bmo_auth_callback(request):
     except Exception:
         logger.exception('Error while performing LDAP association')
 
-    user.backend = 'rbbz.auth.BugzillaBackend'
+    user.backend = 'mozreview.bugzilla.auth.BugzillaBackend'
     logger.info('BMO Auth callback succeeded for user: %s' % bmo_username)
     login(request, user)
     response = HttpResponseRedirect(redirect)

@@ -78,7 +78,7 @@ def auth_api_key(request, username, api_key):
                                    extra_params=extra)
 
     # Django housekeeping.
-    user.backend = 'rbbz.auth.BugzillaBackend'
+    user.backend = 'mozreview.bugzilla.auth.BugzillaBackend'
     return user
 
 
