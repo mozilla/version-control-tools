@@ -48,7 +48,7 @@ def main(user):
 
     # Ignore DSA keys. The server shouldn't support these anyway. Defense
     # in depth.
-    # keys = [k for k in keys if not k.startswith('ssh-dss')]
+    keys = [k for k in keys if not k.startswith('ssh-dss')]
 
     if not keys:
         print('no valid SSH keys found for user', file=sys.stderr)
