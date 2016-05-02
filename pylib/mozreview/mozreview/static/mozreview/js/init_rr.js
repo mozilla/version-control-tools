@@ -53,7 +53,7 @@ $(document).ready(function() {
   // review request model so we extend it and use our own model
   // for the parent so we can access it.
   var patchedRR = RB.ReviewRequest.extend({
-    defaults: function () {
+    defaults: function() {
       return _.defaults({
         approved: false,
         approvalFailure: null

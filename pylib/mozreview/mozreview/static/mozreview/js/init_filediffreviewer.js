@@ -35,13 +35,13 @@ $(document).ready(function() {
     });
     observer.observe(document.querySelector('#diffs'),
                      { childList: true, subtree: true });
-  } catch(e) {
+  } catch (e) {
     // we don't care if this fails
   }
 
   var FileDiffReviewerData = $('#file-diff-reviewer-data')
                              .data('file-diff-reviewer');
-  var fileDiffReviewerModels = FileDiffReviewerData.map(function(item){
+  var fileDiffReviewerModels = FileDiffReviewerData.map(function(item) {
     return new RB.FileDiffReviewerModel(item);
   });
   var fileDiffReviewerCollection = new RB.FileDiffReviewerCollection(
@@ -56,9 +56,9 @@ $(document).ready(function() {
     }
   };
 
-  var renderDiffButton = function(){
-    $.funcQueue('diff_files').add(function(){
-      fileDiffReviewerCollection.each(function(elem){
+  var renderDiffButton = function() {
+    $.funcQueue('diff_files').add(function() {
+      fileDiffReviewerCollection.each(function(elem) {
         var diff_box_table = document.getElementById(
           'file' + elem.get('file_diff_id')
         );
@@ -73,15 +73,15 @@ $(document).ready(function() {
             reviewButton.classList.add('reviewed');
           }
 
-          reviewButton.addEventListener('click', function(event){
+          reviewButton.addEventListener('click', function(event) {
             reviewButton.disabled = true;
-            elem.save({'reviewed': !elem.get('reviewed')},{
-              success: function(){
+            elem.save({ reviewed: !elem.get('reviewed') },{
+              success: function() {
                 reviewButton.disabled = false;
                 reviewButton.textContent = getButtonText(elem);
                 reviewButton.classList.toggle('reviewed');
               },
-              error: function(model, response){
+              error: function(model, response) {
                 reviewButton.disabled = false;
               }
             });

@@ -95,7 +95,7 @@ $(document).on("mozreview_ready", function() {
                       try_syntax: trySyntax
                     }
                   })
-                  .done(function(){
+                  .done(function() {
                     // There may be a better way to get the review request updates
                     // but this is probably good enough for now
                     window.location.reload();
@@ -105,7 +105,7 @@ $(document).on("mozreview_ready", function() {
                     tryInput.enable(true);
                     try {
                       show_error(jQuery.parseJSON(jqXHR.responseText).err.msg);
-                    } catch(e) {
+                    } catch (e) {
                       show_error(jqXHR.responseText);
                     }
                   });
@@ -202,7 +202,7 @@ $(document).on("mozreview_ready", function() {
         box.modalBox('destroy');
         try {
           show_error(jQuery.parseJSON(res.responseText).err.msg);
-        } catch(e) {
+        } catch (e) {
           show_error(res.responseText);
         }
       }
@@ -226,17 +226,17 @@ $(document).on("mozreview_ready", function() {
               $('#autoland-submit').data('commits'))
       }
     })
-    .done(function(){
+    .done(function() {
       // There may be a better way to get the review request updates
       // but this is probably good enough for now
       window.location.reload();
     })
-    .fail(function(jqXHR, textStatus, errorThrown){
+    .fail(function(jqXHR, textStatus, errorThrown) {
       var error_text = "";
 
       try {
         error_text = jQuery.parseJSON(jqXHR.responseText).err.msg;
-      } catch(e) {
+      } catch (e) {
         error_text = jqXHR.responseText;
       }
 
@@ -268,10 +268,10 @@ $(document).on("mozreview_ready", function() {
     autoland_trigger.attr('title', 'You can not autoland from a closed review request');
   } else {
     MozReview.parentReviewRequest.ready({
-      error: function () {
+      error: function() {
         autoland_trigger.attr('title', 'Error determining approval');
       },
-      ready: function () {
+      ready: function() {
         if (!MozReview.parentReviewRequest.get('approved')) {
           autoland_trigger.attr(
             'title',
@@ -285,7 +285,7 @@ $(document).on("mozreview_ready", function() {
     });
   }
 
-  $('.action-landed[data-repository][data-revision]').each(function(index, elem){
+  $('.action-landed[data-repository][data-revision]').each(function(index, elem) {
     var repository = $(elem).data('repository');
     var revision = $(elem).data('revision');
     var actionHeading = $(elem).find('.action-info > .action-heading')[0];
@@ -304,7 +304,7 @@ $(document).on("mozreview_ready", function() {
         var resultset = response.results[0];
         $.ajax({
           url: 'https://treeherder.mozilla.org/api/project/'+repository+'/resultset/'+resultset.id+'/status/'
-        }).done(function(status){
+        }).done(function(status) {
           if (status.testfailed || status.busted || status.exception) {
             $(actionHeading).text('Some jobs failed on ' + repository);
             $(elem).addClass('action-failure');
@@ -323,7 +323,7 @@ $(document).on("mozreview_ready", function() {
           $(actionMeta).text(actionMetaText.join());
         });
       }
-        $( this ).addClass( "done" );
+        $(this).addClass("done");
     });
 
   });

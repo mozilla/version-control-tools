@@ -73,7 +73,7 @@ $(document).on("mozreview_ready", function() {
   var reviewerList = $(".mozreview-child-reviewer-list");
   var editors = {};
 
-  if(MozReview.currentIsMutableByUser){
+  if (MozReview.currentIsMutableByUser) {
   var reviewerListEditors = reviewerList
     .inlineEditor(editorOptions)
     .on({

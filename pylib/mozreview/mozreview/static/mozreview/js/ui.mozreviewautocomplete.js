@@ -4,7 +4,7 @@
  * Copyright (c) 2007, 2008 Dylan Verheul, Dan G. Switzer, Anjesh Tuladhar, Jörn Zaefferer
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
- * 
+ *
  * http://docs.jquery.com/UI/Autocomplete
  *
  * Depends:
@@ -69,7 +69,7 @@ $.widget("ui.mozreviewautocomplete", {
             lastKeyPressCode,
             select = $.ui.mozreviewautocomplete.select(options, input, selectCurrent, config);
 
-        if(options.result) {
+        if (options.result) {
             $input.bind('result.mozreviewautocomplete', options.result);
         }
 
@@ -85,11 +85,11 @@ $.widget("ui.mozreviewautocomplete", {
         $input.bind(($.browser.opera ? "keypress" : "keydown") + ".mozreviewautocomplete", function(event) {
             // track last key pressed
             lastKeyPressCode = event.keyCode;
-            switch(event.keyCode) {
+            switch (event.keyCode) {
 
                 case KEY.UP:
                     event.preventDefault();
-                    if ( select.visible() ) {
+                    if (select.visible()) {
                         select.prev();
                     } else {
                         onChange(0, true);
@@ -98,7 +98,7 @@ $.widget("ui.mozreviewautocomplete", {
 
                 case KEY.DOWN:
                     event.preventDefault();
-                    if ( select.visible() ) {
+                    if (select.visible()) {
                         select.next();
                     } else {
                         onChange(0, true);
@@ -107,7 +107,7 @@ $.widget("ui.mozreviewautocomplete", {
 
                 case KEY.PAGE_UP:
                     event.preventDefault();
-                    if ( select.visible() ) {
+                    if (select.visible()) {
                         select.pageUp();
                     } else {
                         onChange(0, true);
@@ -116,7 +116,7 @@ $.widget("ui.mozreviewautocomplete", {
 
                 case KEY.PAGE_DOWN:
                     event.preventDefault();
-                    if ( select.visible() ) {
+                    if (select.visible()) {
                         select.pageDown();
                     } else {
                         onChange(0, true);
@@ -127,10 +127,10 @@ $.widget("ui.mozreviewautocomplete", {
                 case options.multiple && $.trim(options.multipleSeparator) == "," && KEY.COMMA:
                 case KEY.TAB:
                 case KEY.ENTER:
-                    if (options.enterToURL && select.current()){
+                    if (options.enterToURL && select.current()) {
                         select.current().click();
                     }
-                    if( selectCurrent() ) {
+                    if (selectCurrent()) {
                         // stop default to prevent a form submit, Opera needs special handling
                         event.preventDefault();
                         blockSubmit = true;
@@ -147,7 +147,7 @@ $.widget("ui.mozreviewautocomplete", {
                     timeout = setTimeout(onChange, options.delay);
                     break;
             }
-        }).focus(function(){
+        }).focus(function() {
             // track whether the field has focus, we shouldn't process any
             // results if the field no longer has focus
             hasFocus++;
@@ -158,7 +158,7 @@ $.widget("ui.mozreviewautocomplete", {
             }
         }).click(function() {
             // show select when clicking in a focused field
-            if ( hasFocus++ > 1 && !select.visible() ) {
+            if (hasFocus++ > 1 && !select.visible()) {
                 onChange(0, true);
             }
         }).bind("search", function() {
@@ -166,15 +166,15 @@ $.widget("ui.mozreviewautocomplete", {
             var fn = (arguments.length > 1) ? arguments[1] : null;
             function findValueCallback(q, data) {
                 var result;
-                if( data && data.length ) {
+                if (data && data.length) {
                     for (var i=0; i < data.length; i++) {
-                        if( data[i].result.toLowerCase() == q.toLowerCase() ) {
+                        if (data[i].result.toLowerCase() == q.toLowerCase()) {
                             result = data[i];
                             break;
                         }
                     }
                 }
-                if( typeof fn == "function" ) fn(result);
+                if (typeof fn == "function") fn(result);
                 else $input.trigger("result", result && [result.data, result.value]);
             }
             $.each(trimWords($input.val()), function(i, value) {
@@ -185,7 +185,7 @@ $.widget("ui.mozreviewautocomplete", {
         }).bind("setOptions", function() {
             $.extend(options, arguments[1]);
             // if we've updated the data, repopulate
-            if ( "data" in arguments[1] )
+            if ("data" in arguments[1])
                 cache.populate();
         }).bind("unautocomplete", function() {
             select.unbind();
@@ -198,17 +198,17 @@ $.widget("ui.mozreviewautocomplete", {
         function selectCurrent() {
             var selected = select.selected();
 
-            if ( !selected || !matchCurrent(selected) )
+            if (!selected || !matchCurrent(selected))
                 return false;
 
             var v = selected.result;
             previousValue = v;
 
-            if ( options.multiple ) {
+            if (options.multiple) {
                 var words = trimWords($input.val());
 
-                if ( words.length > 1 ) {
-                    v = words.slice(0, words.length - 1).join( options.multipleSeparator ) + options.multipleSeparator + v;
+                if (words.length > 1) {
+                    v = words.slice(0, words.length - 1).join(options.multipleSeparator) + options.multipleSeparator + v;
                 }
                 v += options.multipleSeparator;
             }
@@ -241,9 +241,9 @@ $.widget("ui.mozreviewautocomplete", {
                 }
 
                 if (options.matchContains)
-                    matched = match.indexOf(currentValue) >= 0
+                    matched = match.indexOf(currentValue) >= 0;
                 else // check if prefix
-                    matched = match.indexOf(currentValue) === 0
+                    matched = match.indexOf(currentValue) === 0;
             }
 
             return matched;
@@ -252,13 +252,13 @@ $.widget("ui.mozreviewautocomplete", {
         function onChange(crap, skipPrevCheck) {
             var currentValue = $input.val();
 
-            if ( !skipPrevCheck && currentValue == previousValue )
+            if (!skipPrevCheck && currentValue == previousValue)
                 return;
 
             previousValue = currentValue;
 
             currentValue = lastWord(currentValue);
-            if ( currentValue.length >= options.minChars) {
+            if (currentValue.length >= options.minChars) {
                 $input.addClass(options.loadingClass);
                 if (!options.matchCase)
                     currentValue = currentValue.toLowerCase();
@@ -270,13 +270,13 @@ $.widget("ui.mozreviewautocomplete", {
         };
 
         function trimWords(value) {
-            if ( !value ) {
+            if (!value) {
                 return [""];
             }
-            if ( !options.multiple ) {
+            if (!options.multiple) {
                 return [value];
             }
-            var words = value.split( options.multipleSeparator );
+            var words = value.split(options.multipleSeparator);
             var result = [];
             $.each(words, function(i, value) {
                 var trimmed = $.trim(value);
@@ -297,10 +297,10 @@ $.widget("ui.mozreviewautocomplete", {
         // fills in the input box w/the first match (assumed to be the best match)
         // q: the term entered
         // sValue: the first matching result
-        function autoFill(q, sValue){
+        function autoFill(q, sValue) {
             // autofill in the complete box w/the first match as long as the user hasn't entered in more data
             // if the last user key pressed was backspace, don't autofill
-            if( options.autoFill && (lastWord($input.val()).toLowerCase() == q.toLowerCase()) && lastKeyPressCode != $.ui.keyCode.BACKSPACE ) {
+            if (options.autoFill && (lastWord($input.val()).toLowerCase() == q.toLowerCase()) && lastKeyPressCode != $.ui.keyCode.BACKSPACE) {
                 // fill in the value (keep the case the user has typed)
                 $input.val($input.val() + sValue.substring(lastWord(previousValue).length));
                 // select the portion of the value not typed by the user (so the next character will erase)
@@ -320,15 +320,15 @@ $.widget("ui.mozreviewautocomplete", {
             stopLoading();
             if (options.mustMatch) {
                 // call search and run callback
-                $input.mozreviewautocomplete("search", function (result){
+                $input.mozreviewautocomplete("search", function(result) {
                         // if no value found, clear the input box
-                        if( !result ) {
+                        if (!result) {
                             if (options.multiple) {
                                 var words = trimWords($input.val()).slice(0, -1);
-                                $input.val( words.join(options.multipleSeparator) + (words.length ? options.multipleSeparator : "") );
+                                $input.val(words.join(options.multipleSeparator) + (words.length ? options.multipleSeparator : ""));
                             }
                             else
-                                $input.val( "" );
+                                $input.val("");
                         }
                     }
                 );
@@ -339,7 +339,7 @@ $.widget("ui.mozreviewautocomplete", {
         };
 
         function receiveData(q, data) {
-            if ( data && data.length && hasFocus ) {
+            if (data && data.length && hasFocus) {
                 stopLoading();
                 select.display(data, q);
                 autoFill(q, data[0].value);
@@ -358,7 +358,7 @@ $.widget("ui.mozreviewautocomplete", {
                 success(term, data);
             // if an AJAX url has been supplied, try loading the data now
 
-            } else if( (typeof options.url == "string") && (options.url.length > 0) ){
+            } else if ((typeof options.url == "string") && (options.url.length > 0)) {
 
                 var extraParams = {
                     timestamp: +new Date()
@@ -447,7 +447,7 @@ $.widget("ui.mozreviewautocomplete", {
     flushCache: function() {
         return this.element.trigger("flushCache");
     },
-    setData: function(key, value){
+    setData: function(key, value) {
         return this.element.trigger("setOptions", [{ key: value }]);
     },
     destroy: function() {
@@ -484,40 +484,40 @@ $.ui.mozreviewautocomplete.cache = function(options) {
     };
 
     function add(q, value) {
-        if (length > options.cacheLength){
+        if (length > options.cacheLength) {
             flush();
         }
-        if (!data[q]){ 
+        if (!data[q]) {
             length++;
         }
         data[q] = value;
     }
 
-    function populate(){
-        if( !options.data ) return false;
+    function populate() {
+        if (!options.data) return false;
         // track the matches
         var stMatchSets = {},
             nullData = 0;
 
         // no url was specified, we need to adjust the cache length to make sure it fits the local data store
-        if( !options.url ) options.cacheLength = 1;
+        if (!options.url) options.cacheLength = 1;
 
         // track all options for minChars = 0
         stMatchSets[""] = [];
 
         // loop through the array and create a lookup structure
-        for ( var i = 0, ol = options.data.length; i < ol; i++ ) {
+        for (var i = 0, ol = options.data.length; i < ol; i++) {
             var rawValue = options.data[i];
             // if rawValue is a string, make an array otherwise just reference the array
             rawValue = (typeof rawValue == "string") ? [rawValue] : rawValue;
 
             var value = options.formatMatch(rawValue, i+1, options.data.length);
-            if ( value === false )
+            if (value === false)
                 continue;
 
             var firstChar = value.charAt(0).toLowerCase();
             // if no lookup array for this character exists, look it up now
-            if( !stMatchSets[firstChar] )
+            if (!stMatchSets[firstChar])
                 stMatchSets[firstChar] = [];
 
             // if the match is a string
@@ -531,7 +531,7 @@ $.ui.mozreviewautocomplete.cache = function(options) {
             stMatchSets[firstChar].push(row);
 
             // keep track of minChars zero items
-            if ( nullData++ < options.max ) {
+            if (nullData++ < options.max) {
                 stMatchSets[""].push(row);
             }
         };
@@ -548,7 +548,7 @@ $.ui.mozreviewautocomplete.cache = function(options) {
     // populate any existing data
     setTimeout(populate, 25);
 
-    function flush(){
+    function flush() {
         data = {};
         length = 0;
     }
@@ -560,18 +560,18 @@ $.ui.mozreviewautocomplete.cache = function(options) {
         load: function(q) {
             if (!options.cacheLength || !length)
                 return null;
-            /* 
+            /*
              * if dealing w/local data and matchContains than we must make sure
              * to loop through all the data collections looking for matches
              */
-            if( !options.url && options.matchContains ){
+            if (!options.url && options.matchContains) {
                 // track all matches
                 var csub = [];
                 // loop through all the data grids for matches
-                for( var k in data ){
+                for (var k in data) {
                     // don't search through the stMatchSets[""] (minChars: 0) cache
                     // this prevents duplicates
-                    if( k.length > 0 ){
+                    if (k.length > 0) {
                         var c = data[k];
                         $.each(c, function(i, x) {
                             // if we've got a match, add it to the array
@@ -582,9 +582,9 @@ $.ui.mozreviewautocomplete.cache = function(options) {
                     }
                 }
                 return csub;
-            } else 
+            } else
             // if the exact item exists, use it
-            if (data[q]){
+            if (data[q]) {
                 return data[q];
             } else
             if (options.matchSubset) {
@@ -606,7 +606,7 @@ $.ui.mozreviewautocomplete.cache = function(options) {
     };
 };
 
-$.ui.mozreviewautocomplete.select = function (options, input, select, config) {
+$.ui.mozreviewautocomplete.select = function(options, input, select, config) {
     var CLASSES = {
         ACTIVE: "ui-autocomplete-over"
     };
@@ -629,8 +629,8 @@ $.ui.mozreviewautocomplete.select = function (options, input, select, config) {
         .css("position", "absolute")
         .appendTo(document.body);
 
-        list = $("<ul/>").appendTo(element).mouseover( function(event) {
-            if(target(event).nodeName && target(event).nodeName.toUpperCase() == 'LI') {
+        list = $("<ul/>").appendTo(element).mouseover(function(event) {
+            if (target(event).nodeName && target(event).nodeName.toUpperCase() == 'LI') {
                 active = $("li", list).removeClass(CLASSES.ACTIVE).index(target(event));
                 $(target(event)).addClass(CLASSES.ACTIVE);
             }
@@ -646,18 +646,18 @@ $.ui.mozreviewautocomplete.select = function (options, input, select, config) {
             config.mouseDownOnSelect = false;
         });
 
-        if( options.width > 0 )
+        if (options.width > 0)
             element.css("width", options.width);
 
         needsInit = false;
-    } 
+    }
 
     function target(event) {
         var element = event.target;
-        while(element && element.tagName != "LI")
+        while (element && element.tagName != "LI")
             element = element.parentNode;
         // more fun with IE, sometimes event.target is empty, just ignore it then
-        if(!element)
+        if (!element)
             return [];
         return element;
     }
@@ -666,14 +666,14 @@ $.ui.mozreviewautocomplete.select = function (options, input, select, config) {
         listItems.slice(active, active + 1).removeClass(CLASSES.ACTIVE);
         movePosition(step);
         var activeItem = listItems.slice(active, active + 1).addClass(CLASSES.ACTIVE);
-        if(options.scroll) {
+        if (options.scroll) {
             var offset = 0;
             listItems.slice(0, active).each(function() {
                 offset += this.offsetHeight;
             });
-            if((offset + activeItem[0].offsetHeight - list.scrollTop()) > list[0].clientHeight) {
+            if ((offset + activeItem[0].offsetHeight - list.scrollTop()) > list[0].clientHeight) {
                 list.scrollTop(offset + activeItem[0].offsetHeight - list.innerHeight());
-            } else if(offset < list.scrollTop()) {
+            } else if (offset < list.scrollTop()) {
                 list.scrollTop(offset);
             }
         }
@@ -718,7 +718,7 @@ $.ui.mozreviewautocomplete.select = function (options, input, select, config) {
             if (!data[i])
                 continue;
             var formatted = options.formatItem(data[i].data, i+1, max, data[i].value, term);
-            if ( formatted === false )
+            if (formatted === false)
                 continue;
             var li = makeItem(data[i].data)
                 .html(options.highlight(formatted, term))
@@ -727,12 +727,12 @@ $.ui.mozreviewautocomplete.select = function (options, input, select, config) {
             $.data(li, "ui-autocomplete-data", data[i]);
         }
         listItems = list.find("li");
-        if ( options.selectFirst ) {
+        if (options.selectFirst) {
             listItems.slice(0, 1).addClass(CLASSES.ACTIVE);
             active = 0;
         }
         // apply bgiframe if available
-        if ( $.fn.bgiframe )
+        if ($.fn.bgiframe)
             list.bgiframe();
     }
 
@@ -751,21 +751,21 @@ $.ui.mozreviewautocomplete.select = function (options, input, select, config) {
         },
         pageUp: function() {
             if (active != 0 && active - 8 < 0) {
-                moveSelect( -active );
+                moveSelect(-active);
             } else {
                 moveSelect(-8);
             }
         },
         pageDown: function() {
             if (active != listItems.size() - 1 && active + 8 > listItems.size()) {
-                moveSelect( listItems.size() - 1 - active );
+                moveSelect(listItems.size() - 1 - active);
             } else {
                 moveSelect(8);
             }
         },
         hide: function() {
             element && element.hide();
-            listItems && listItems.removeClass(CLASSES.ACTIVE)
+            listItems && listItems.removeClass(CLASSES.ACTIVE);
             active = -1;
             $(input).triggerHandler("autocompletehide", [{}, { options: options }], options["hide"]);
         },
@@ -787,23 +787,23 @@ $.ui.mozreviewautocomplete.select = function (options, input, select, config) {
                 width,
                 height;
 
-            if(options.scroll) {
+            if (options.scroll) {
                 list.scrollTop(0);
                 list.css({
                     maxHeight: options.scrollHeight,
                     overflow: 'auto'
                 });
 
-                if($.browser.msie && typeof document.body.style.maxHeight === "undefined") {
+                if ($.browser.msie && typeof document.body.style.maxHeight === "undefined") {
                     var listHeight = 0;
                     listItems.each(function() {
                         listHeight += this.offsetHeight;
                     });
                     var scrollbarsVisible = listHeight > options.scrollHeight;
-                    list.css('height', scrollbarsVisible ? options.scrollHeight : listHeight );
+                    list.css('height', scrollbarsVisible ? options.scrollHeight : listHeight);
                     if (!scrollbarsVisible) {
                         // IE doesn't recalculate width when scrollbar disappears
-                        listItems.width( list.width() - parseInt(listItems.css("padding-left")) - parseInt(listItems.css("padding-right")) );
+                        listItems.width(list.width() - parseInt(listItems.css("padding-left")) - parseInt(listItems.css("padding-right")));
                     }
                 }
 
@@ -835,7 +835,7 @@ $.ui.mozreviewautocomplete.select = function (options, input, select, config) {
             var selected = listItems && listItems.filter("." + CLASSES.ACTIVE).removeClass(CLASSES.ACTIVE);
             return selected && selected.length && $.data(selected[0], "ui-autocomplete-data");
         },
-        emptyList: function (){
+        emptyList: function() {
             list && list.empty();
         },
         unbind: function() {
@@ -845,16 +845,16 @@ $.ui.mozreviewautocomplete.select = function (options, input, select, config) {
 };
 
 $.ui.mozreviewautocomplete.selection = function(field, start, end) {
-    if( field.createTextRange ){
+    if (field.createTextRange) {
         var selRange = field.createTextRange();
         selRange.collapse(true);
         selRange.moveStart("character", start);
         selRange.moveEnd("character", end);
         selRange.select();
-    } else if( field.setSelectionRange ){
+    } else if (field.setSelectionRange) {
         field.setSelectionRange(start, end);
     } else {
-        if( field.selectionStart ){
+        if (field.selectionStart) {
             field.selectionStart = start;
             field.selectionEnd = end;
         }
