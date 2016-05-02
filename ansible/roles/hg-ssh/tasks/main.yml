@@ -461,6 +461,7 @@
   with_items:
     - check_kafka_hg_heartbeat.cfg
     - check_pulsenotifier_lag.cfg
+    - check_pushdataaggregator_lag.cfg
 
 - name: systemd service file for push data aggregation daemon
   copy: src=pushdataaggregator.service
