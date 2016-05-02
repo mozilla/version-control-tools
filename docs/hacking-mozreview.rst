@@ -63,6 +63,12 @@ created.  If you're using VirtualBox as your driver, this should work
 
   docker-machine create --driver virtualbox --virtualbox-memory 4096 default
 
+Some MozReview developers have experienced stability problems using Virtualbox
+and have found that using VMWare as the docker-machine driver results in a
+better development experience.  If you are setting repeated errors from Docker
+when creating a local environment or running tests, consider switching to
+VMWare.
+
 Running a local MozReview instance in Windows is not yet supported,
 but if you get it working, please :ref:`let us know! <mozreview_getting_in_touch>`
 
