@@ -20,17 +20,23 @@ from .util import consumer_offsets
 logger = logging.getLogger('vcsreplicator.aggregator')
 
 
+def read_consumer_groups(path):
+    consumer_groups = []
+    with open(path, 'rb') as fh:
+        for line in fh:
+            line = line.strip()
+            if line:
+                consumer_groups.append(line)
+
+    return consumer_groups
+
+
 def _run_aggregation(client, consumer_topic, consumer_groups_path, ack_group,
                     producer_topic, alive, poll_interval=1.0):
     # We read the consumer groups file on every iteration so the set of
     # consumers can be dynamic. This allows consumers to be marked as
     # offline without causing a stall in message copying.
-    consumer_groups = []
-    with open(consumer_groups_path, 'rb') as fh:
-        for line in fh:
-            line = line.strip()
-            if line:
-                consumer_groups.append(line)
+    consumer_groups = read_consumer_groups(consumer_groups_path)
 
     count = synchronize_fully_consumed_messages(
         client=client,
