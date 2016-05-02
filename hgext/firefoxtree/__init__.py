@@ -401,8 +401,7 @@ def wrappedpullobsolete(orig, pullop):
 
             between = None
             if tag in oldtags:
-                between = len(list(repo.revs('%s::%s' % (
-                    hex(oldtags[tag]), hex(node))))) - 1
+                between = len(repo.revs('%n::%n', oldtags[tag], node)) - 1
 
                 if not between:
                     continue
