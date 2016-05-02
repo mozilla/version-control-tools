@@ -339,54 +339,53 @@ def prepushoutgoinghook(*args):
         raise util.Abort(_('cannot push multiple heads to a Firefox tree; '
             'limit pushed revisions using the -r argument'))
 
-def pull(orig, repo, remote, *args, **kwargs):
-    old_rev = len(repo)
-    res = orig(repo, remote, *args, **kwargs)
+def wrappedpullobsolete(orig, pullop):
+    res = orig(pullop)
+
+    repo = pullop.repo
+    remote = pullop.remote
 
     if not isfirefoxrepo(repo):
         return res
 
-    lock = repo.lock()
-    try:
-        if remote.capable('firefoxtrees'):
-            lines = remote._call('firefoxtrees').splitlines()
-            oldtags = {}
-            for tag, node, tree, uri in get_firefoxtrees(repo):
-                oldtags[tag] = node
-            newtags = {}
-            for line in lines:
-                tag, node = line.split()
-                newtags[tag] = node
 
-                node = bin(node)
+    if remote.capable('firefoxtrees'):
+        lines = remote._call('firefoxtrees').splitlines()
+        oldtags = {}
+        for tag, node, tree, uri in get_firefoxtrees(repo):
+            oldtags[tag] = node
+        newtags = {}
+        for line in lines:
+            tag, node = line.split()
+            newtags[tag] = node
 
-                if oldtags.get(tag, None) == node:
+            node = bin(node)
+
+            if oldtags.get(tag, None) == node:
+                continue
+
+            repo.firefoxtrees[tag] = node
+
+            between = None
+            if tag in oldtags:
+                between = len(list(repo.revs('%s::%s' % (
+                    hex(oldtags[tag]), hex(node))))) - 1
+
+                if not between:
                     continue
 
-                repo.firefoxtrees[tag] = node
+            msg = _('updated firefox tree tag %s') % tag
+            if between:
+                msg += _(' (+%d commits)') % between
+            msg += '\n'
+            repo.ui.status(msg)
 
-                between = None
-                if tag in oldtags:
-                    between = len(list(repo.revs('%s::%s' % (
-                        hex(oldtags[tag]), hex(node))))) - 1
+        writefirefoxtrees(repo)
 
-                    if not between:
-                        continue
-
-                msg = _('updated firefox tree tag %s') % tag
-                if between:
-                    msg += _(' (+%d commits)') % between
-                msg += '\n'
-                repo.ui.status(msg)
-
-            writefirefoxtrees(repo)
-
-        tree = resolve_uri_to_tree(remote.url())
-        if tree:
-            tree = tree.encode('utf-8')
-            updateremoterefs(repo, remote, tree)
-    finally:
-        lock.release()
+    tree = resolve_uri_to_tree(remote.url())
+    if tree:
+        tree = tree.encode('utf-8')
+        updateremoterefs(repo, remote, tree)
 
     return res
 
@@ -543,7 +542,7 @@ def extsetup(ui):
     extensions.wrapfunction(hg, '_peerorrepo', peerorrepo)
     extensions.wrapfunction(hg, 'share', share)
     extensions.wrapfunction(exchange, 'push', push)
-    extensions.wrapfunction(exchange, 'pull', pull)
+    extensions.wrapfunction(exchange, '_pullobsolete', wrappedpullobsolete)
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     extensions.wrapcommand(commands.table, 'outgoing', outgoingcommand)
     extensions.wrapcommand(commands.table, 'pull', pullcommand)
