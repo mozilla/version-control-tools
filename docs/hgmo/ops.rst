@@ -510,6 +510,80 @@ doesn't come back::
    with details of the incident so the root cause can be tracked down
    and the underlying bug fixed.
 
+check_pushdataaggregator_lag
+----------------------------
+
+``check_pushdataaggregator_lag`` monitors the lag of the aggregated replication
+log (the ``pushdataaggregator.service`` systemd service).
+
+The check verifies that the aggregator service has copied all fully
+replicated messages to the unified, aggregate Kafka topic.
+
+The check will alert if the number of outstanding ready-to-copy messages
+exceeds configured thresholds.
+
+.. important::
+
+   If messages aren't being copied into the aggregated message log, derived
+   services such as Pulse notification won't be writing data.
+
+Expected Output
+^^^^^^^^^^^^^^^
+
+Normal output will say that all messages have been copied and all partitions
+are in sync or within thresholds::
+
+   OK - aggregator has copied all fully replicated messages
+
+   OK - partition 0 is completely in sync (1/1)
+   OK - partition 1 is completely in sync (1/1)
+   OK - partition 2 is completely in sync (1/1)
+   OK - partition 3 is completely in sync (1/1)
+   OK - partition 4 is completely in sync (1/1)
+   OK - partition 5 is completely in sync (1/1)
+   OK - partition 6 is completely in sync (1/1)
+   OK - partition 7 is completely in sync (1/1)
+
+Failure Output
+^^^^^^^^^^^^^^
+
+The check will print a summary line indicating total number of messages
+behind and a per-partition breakdown of where that lag is. e.g.::
+
+   CRITICAL - 2 messages from 2 partitions behind
+
+   CRITICAL - partition 0 is 1 messages behind (1/2)
+   OK - partition 1 is completely in sync (1/1)
+   CRITICAL - partition 2 is 1 messages behind (1/2)
+   OK - partition 3 is completely in sync (1/1)
+   OK - partition 4 is completely in sync (1/1)
+   OK - partition 5 is completely in sync (1/1)
+   OK - partition 6 is completely in sync (1/1)
+   OK - partition 7 is completely in sync (1/1)
+
+   See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
+   for details about this check.
+
+Remediation to Check Failure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If the check is failing, first verify the Kafka cluster is operating as
+expected. If it isn't, other alerts on the hg machines should be firing.
+**Failures in this check can likely be ignored if the Kafka cluster is in
+a known bad state.**
+
+If there are no other alerts, there is a chance the daemon process has
+become wedged. Try bouncing the daemon::
+
+   $ systemctl restart pushdataaggregator.service
+
+Then wait a few minutes to see if the lag decreased. You can also look at
+the journal to see what the daemon is doing::
+
+   $ journalctl -f --unit pushdataaggregator.service
+
+If things are failing, escalate to VCS on call.
+
 check_pulsenotifier_lag
 -----------------------
 
