@@ -31,6 +31,9 @@ trees by setting ``firefoxtree.servetagsfrombookmarks``. When true,
 firefox tree tags will be obtained from bookmarks instead of the
 firefoxtrees file.
 
+If a client pulls down a Firefox tree "tag" matching a bookmark of the
+same name, the local bookmark will be deleted.
+
 Pre-defined Repository Paths
 ============================
 
@@ -92,6 +95,7 @@ from mercurial.i18n import _
 from mercurial.node import (
     bin,
     hex,
+    short,
 )
 
 OUR_DIR = os.path.dirname(__file__)
@@ -365,6 +369,7 @@ def wrappedpullobsolete(orig, pullop):
 
 
     if remote.capable('firefoxtrees'):
+        bmstore = bookmarks.bmstore(repo)
         lines = remote._call('firefoxtrees').splitlines()
         oldtags = {}
         for tag, node, tree, uri in get_firefoxtrees(repo):
@@ -375,6 +380,19 @@ def wrappedpullobsolete(orig, pullop):
             newtags[tag] = node
 
             node = bin(node)
+
+            # A local bookmark of the incoming tag name is already set.
+            # Wipe it out - the server takes precedence.
+            if tag in bmstore:
+                oldtags[tag] = bmstore[tag]
+                repo.ui.status('(removing bookmark on %s matching firefoxtree %s)\n' %
+                               (short(bmstore[tag]), tag))
+                del bmstore[tag]
+                bmstore.recordchange(pullop.trmanager.transaction())
+
+                if bmstore.active == tag:
+                    repo.ui.status('(deactivating bookmark %s)\n' % tag)
+                    bookmarks.deactivate(repo)
 
             if oldtags.get(tag, None) == node:
                 continue

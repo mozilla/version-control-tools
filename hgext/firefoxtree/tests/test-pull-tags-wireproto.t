@@ -136,3 +136,25 @@ A bookmark not a firefox tree should still come through
 
   $ hg bookmarks
      foobar                    1:994ec05999da
+
+Local bookmarks matching incoming firefox tree tags should be deleted
+
+  $ hg book -r 994ec05999daf04fb3c01a8cb0dea1458a7d4d3d central
+  $ hg book -r a4521c3750458afd82406ac87977b3fdc2fdc62a fx-team
+  $ hg book -r 388ff24b5456e83175491ae321bceb89aad2259f inbound
+
+  $ hg up central
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (activating bookmark central)
+
+  $ hg pull http://localhost:$HGPORT/unified
+  pulling from http://localhost:$HGPORT/unified
+  searching for changes
+  no changes found
+  (removing bookmark on 994ec05999da matching firefoxtree central)
+  (deactivating bookmark central)
+  (removing bookmark on a4521c375045 matching firefoxtree fx-team)
+  (removing bookmark on 388ff24b5456 matching firefoxtree inbound)
+
+  $ hg bookmarks
+     foobar                    1:994ec05999da
