@@ -172,6 +172,10 @@ RBTools==0.7.5 \
 recaptcha-client==1.0.6 \
     --hash=sha256:28c6853c1d13d365b7dc71a6b05e5ffb56471f70a850de318af50d3d7c0dea2f
 
+requests==2.10.0 \
+    --hash=sha256:09bc1b5f3a56cd8c48d433213a8cba51a67d12936568f73b5f1793fcb0c0979e \
+    --hash=sha256:63f1815788157130cee16a933b2ee184038e975f0017306d723ac326b5525b54
+
 responses==0.3.0 \
     --hash=sha256:6c5eb915bcf763b677b8e51cdb68c8474127a9b60e49e6e240b05ec5e449c43b
 
