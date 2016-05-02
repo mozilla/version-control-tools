@@ -57,6 +57,35 @@ def _run_aggregation(client, consumer_topic, consumer_groups_path, ack_group,
         time.sleep(poll_interval)
 
 
+def get_aggregation_counts(client, consumer_topic, consumer_groups,
+                                 ack_group):
+    """Obtain consumer and aggregation state of a topic.
+
+    Returns a 3-tuple of (consumed_offsets, acked_offsets, unacked_counts).
+    """
+    groups = [ack_group] + consumer_groups
+    offsets = consumer_offsets(client, consumer_topic, groups)
+
+    fully_consumed_offsets = {}
+    for partition in offsets['available']:
+        consumed_offsets = [offsets['group'][g][partition]
+                            for g in consumer_groups]
+
+        # The fully consumed offset is defined as the offset that all consumer
+        # groups have acknowledged.
+        fully_consumed_offsets[partition] = min(consumed_offsets)
+
+    acked_offsets = offsets['group'][ack_group]
+
+    unacked_partition_counts = {}  # partition -> count
+    for partition, consumed_offset in sorted(fully_consumed_offsets.items()):
+        acked_offset = acked_offsets[partition]
+        if consumed_offset > acked_offset:
+            unacked_partition_counts[partition] = consumed_offset - acked_offset
+
+    return fully_consumed_offsets, acked_offsets, unacked_partition_counts
+
+
 def synchronize_fully_consumed_messages(client, consumer_topic, consumer_groups,
                                         ack_group, producer_topic, alive):
     """Replay messages of a monitored topic when all consumers have acked them.
@@ -71,25 +100,11 @@ def synchronize_fully_consumed_messages(client, consumer_topic, consumer_groups,
     This function should be called repeatedly to ensure the destination topic
     remains up to date.
     """
-    groups = [ack_group] + consumer_groups
-    offsets = consumer_offsets(client, consumer_topic, groups)
-
-    acked_offsets = offsets['group'][ack_group]
-
-    fully_consumed_offsets = {}
-    for partition in offsets['available']:
-        consumed_offsets = [offsets['group'][g][partition]
-                            for g in consumer_groups]
-
-        # The fully consumed offset is defined as the offset that all consumer
-        # groups have acknowledged.
-        fully_consumed_offsets[partition] = min(consumed_offsets)
-
-    unacked_partition_counts = {}  # partition -> count
-    for partition, consumed_offset in sorted(fully_consumed_offsets.items()):
-        acked_offset = acked_offsets[partition]
-        if consumed_offset > acked_offset:
-            unacked_partition_counts[partition] = consumed_offset - acked_offset
+    unacked_partition_counts = get_aggregation_counts(
+        client=client,
+        consumer_topic=consumer_topic,
+        consumer_groups=consumer_groups,
+        ack_group=ack_group)[2]
 
     # All fully consumed messages have been written to ack topic.
     if not unacked_partition_counts:
