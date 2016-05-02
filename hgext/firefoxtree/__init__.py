@@ -26,6 +26,11 @@ Servers can optionally enable serving these tags by setting
 ``firefoxtree.servetags`` to True. When clients perform a pull, they will
 download and apply these tags automatically.
 
+Servers can optionally serve bookmarks that match the names of known
+trees by setting ``firefoxtree.servetagsfrombookmarks``. When true,
+firefox tree tags will be obtained from bookmarks instead of the
+firefoxtrees file.
+
 Pre-defined Repository Paths
 ============================
 
@@ -69,6 +74,7 @@ list of the last-known commits for the Firefox repositories.
 import os
 
 from mercurial import (
+    bookmarks,
     cmdutil,
     commands,
     exchange,
@@ -287,10 +293,19 @@ def get_firefoxtrees(repo):
 def firefoxtrees(repo, proto):
     lines = []
 
-    for tag, node, tree, uri in get_firefoxtrees(repo):
-        lines.append('%s %s' % (tag, hex(node)))
+    if repo.ui.configbool('firefoxtree', 'servetagsfrombookmarks'):
+        for name, hnode in sorted(bookmarks.listbookmarks(repo).items()):
+            tree, uri = resolve_trees_to_uris([name])[0]
+            if not uri:
+                continue
+
+            lines.append('%s %s' % (tree.encode('ascii'), hnode))
+    else:
+        for tag, node, tree, uri in get_firefoxtrees(repo):
+            lines.append('%s %s' % (tag, hex(node)))
 
     return '\n'.join(lines)
+
 
 def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     # If no arguments are specified to `hg push`, Mercurial's default
@@ -388,6 +403,26 @@ def wrappedpullobsolete(orig, pullop):
         updateremoterefs(repo, remote, tree)
 
     return res
+
+
+def wrappedpullbookmarks(orig, pullop):
+    """Wraps exchange._pullbookmarks.
+
+    We remove remote bookmarks that match firefox tree tags when pulling
+    from a repo that advertises the firefox tree tags in its own namespace.
+
+    This is meant for the special unified repo that advertises heads as
+    bookmarks. By filtering out the bookmarks to clients running this extension,
+    they'll never pull down the bookmarks version of the tags.
+    """
+    repo = pullop.repo
+
+    if isfirefoxrepo(repo) and pullop.remote.capable('firefoxtrees'):
+        pullop.remotebookmarks = {k: v for k, v in pullop.remotebookmarks.items()
+                                  if not resolve_trees_to_uris([k])[0][1]}
+
+    return orig(pullop)
+
 
 def updateremoterefs(repo, remote, tree):
     """Update the remote refs for a Firefox repository.
@@ -543,6 +578,7 @@ def extsetup(ui):
     extensions.wrapfunction(hg, 'share', share)
     extensions.wrapfunction(exchange, 'push', push)
     extensions.wrapfunction(exchange, '_pullobsolete', wrappedpullobsolete)
+    extensions.wrapfunction(exchange, '_pullbookmarks', wrappedpullbookmarks)
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     extensions.wrapcommand(commands.table, 'outgoing', outgoingcommand)
     extensions.wrapcommand(commands.table, 'pull', pullcommand)
