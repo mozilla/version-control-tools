@@ -11,3 +11,8 @@
 - name: systemd daemon reload
   command: /usr/bin/systemctl daemon-reload
   ignore_errors: True
+
+- name: restart nrpe.service
+  service: name=nrpe.service
+           state=restarted
+  ignore_errors: True
