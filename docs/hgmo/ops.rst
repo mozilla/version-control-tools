@@ -449,26 +449,21 @@ load, slow network, etc) and it will catch up over time.
 
 In some rare scenarios, there may be a bug in the consumer daemon that
 has caused it to crash or enter a endless loop or some such. To check
-for this, first look at *supervisor* to see if all the consumer daemons
+for this, first look at systemd to see if all the consumer daemons
 are running::
 
-   $ supervisorctl status vcsreplicator:*
-   vcsreplicator:0    RUNNING   pid 32217, uptime 4 days, 21:59:24
-   vcsreplicator:1    RUNNING   pid 32216, uptime 4 days, 21:59:24
-   vcsreplicator:2    RUNNING   pid 32219, uptime 4 days, 21:59:23
-   vcsreplicator:3    RUNNING   pid 32218, uptime 4 days, 21:59:24
-   vcsreplicator:4    RUNNING   pid 32221, uptime 4 days, 21:59:23
-   vcsreplicator:5    RUNNING   pid 16430, uptime 4 days, 21:30:44
-   vcsreplicator:6    RUNNING   pid 1809, uptime 4 days, 21:50:55
-   vcsreplicator:7    RUNNING   pid 14568, uptime 4 days, 21:36:29
+   $ systemctl status vcsreplicator@*.service
 
-If any of the processes aren't in the ``RUNNING`` state, the consumer
-for that partition has crashed for some reason. Try to start it back up:
+If any of the processes aren't in the ``active (running)`` state, the
+consumer for that partition has crashed for some reason. Try to start it
+back up:
 
-   $ supervisorctl start vcsreplicator:*
+   $ systemctl start vcsreplicator@*.service
 
-You might want to take a look at the logs in ``/var/log/vcsreplicator`` to
-make sure the process is happy.
+You might want to take a look at the logs in the journal to make sure the
+process is happy:
+
+   $ journalctl -f --unit vcsreplicator@*.service
 
 If there are errors starting the consumer process (including if the
 consumer process keeps restarting due to crashing applying the next
