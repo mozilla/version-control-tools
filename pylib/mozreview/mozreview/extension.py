@@ -102,6 +102,11 @@ class ParentJSExtension(JSExtension):
     apply_to = review_request_url_names
 
 
+class MRReviewFlagExtension(JSExtension):
+    model_class = 'MRReviewFlag.Extension'
+    apply_to = review_request_url_names
+
+
 class MozReviewExtension(Extension):
     metadata = {
         'Name': 'mozreview',
@@ -112,7 +117,10 @@ class MozReviewExtension(Extension):
 
     is_configurable = True
 
-    js_extensions = [ParentJSExtension]
+    js_extensions = [
+        MRReviewFlagExtension,
+        ParentJSExtension,
+    ]
 
     css_bundles = {
         'default': {
@@ -146,7 +154,10 @@ class MozReviewExtension(Extension):
                                  'mozreview/js/commits.js',
                                  'mozreview/js/review.js',
                                  'mozreview/js/autoland.js',
-                                 'mozreview/js/ui.mozreviewautocomplete.js',]
+                                 'mozreview/js/ui.mozreviewautocomplete.js',
+                                 'mozreview/js/review_flag.js',
+                                 ],
+            'apply_to': review_request_url_names,
         },
         'parent-review-requests': {
             'source_filenames': ['mozreview/js/parents.js'],

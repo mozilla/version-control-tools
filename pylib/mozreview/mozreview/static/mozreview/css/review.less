@@ -124,13 +124,6 @@ label[for="mozreview-autoland-try-syntax"] {
   color: red;
 }
 
-.parent-request {
-  #id_shipit,
-  label[for="id_shipit"] {
-    display: none;
-  }
-}
-
 .parent-request #review-form .edit-field {
   // Without the Ship It checkbox, the edit field gets squished up
   // with the Markdown Reference link unless we clear the latter's float.
@@ -150,4 +143,11 @@ label[for="mozreview-autoland-try-syntax"] {
   padding-left: 10px;
   padding-right: 10px;
   font-size: 10pt;
+}
+
+// Hide the "Ship it" checkbox, since we use the r?, r+, r- flags provided
+// by MRReviewFlag.
+#id_shipit,
+label[for="id_shipit"] {
+  display: none;
 }
