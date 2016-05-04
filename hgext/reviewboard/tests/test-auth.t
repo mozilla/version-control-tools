@@ -27,7 +27,7 @@ Pushing with a password results in server rejection
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
   submitting 1 changesets for review
-  abort: Bugzilla API keys not configured; see https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html#bugzilla-credentials for instructions on how to configure your client
+  abort: Bugzilla API keys not configured; see https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html#obtaining-accounts-credentials-and-privileges for instructions on how to configure your client
   [255]
 
 Pushing with a cookie results in server rejection
@@ -37,7 +37,7 @@ Pushing with a cookie results in server rejection
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: Bugzilla API keys not configured; see https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html#bugzilla-credentials for instructions on how to configure your client
+  abort: Bugzilla API keys not configured; see https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html#obtaining-accounts-credentials-and-privileges for instructions on how to configure your client
   [255]
 
 Pushing with unknown username with API key results in sane failure
@@ -47,7 +47,7 @@ Pushing with unknown username with API key results in sane failure
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: Bugzilla API keys are now used by MozReview; see https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html#bugzilla-credentials for instructions on how to configure your client
+  abort: Bugzilla API keys are now used by MozReview; see https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html#obtaining-accounts-credentials-and-privileges for instructions on how to configure your client
   [255]
 
 Pushing with invalid API key results in sane failure
@@ -62,7 +62,7 @@ created in Review Board.
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: Bugzilla API keys are now used by MozReview; see https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html#bugzilla-credentials for instructions on how to configure your client
+  abort: Bugzilla API keys are now used by MozReview; see https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview/install.html#obtaining-accounts-credentials-and-privileges for instructions on how to configure your client
   [255]
 
 User must log in via web interface before pushing with an API key
