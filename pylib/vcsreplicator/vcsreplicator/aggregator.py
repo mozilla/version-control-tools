@@ -207,13 +207,11 @@ def cli():
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
-    try:
-        run_in_loop(logger, _run_aggregation, onetime=args.onetime,
-                    client=client,
-                    consumer_topic=topic,
-                    consumer_groups_path=groups_path,
-                    ack_group=ack_group,
-                    producer_topic=aggregate_topic)
-    except BaseException:
-        logger.error('exiting main consume loop with error')
-        raise
+    res = run_in_loop(logger, _run_aggregation, onetime=args.onetime,
+                      client=client,
+                      consumer_topic=topic,
+                      consumer_groups_path=groups_path,
+                      ack_group=ack_group,
+                      producer_topic=aggregate_topic)
+    logger.warn('process exiting code %s' % res)
+    sys.exit(res)

@@ -106,5 +106,7 @@ def cli():
     cbkwargs = {
         'config': config,
     }
-    run_in_loop(logger, consume_one, config=config, consumer=consumer,
-                cb=on_push, cbkwargs=cbkwargs)
+    res = run_in_loop(logger, consume_one, config=config, consumer=consumer,
+                      cb=on_push, cbkwargs=cbkwargs)
+    logger.warn('process exiting code %s' % res)
+    sys.exit(res)

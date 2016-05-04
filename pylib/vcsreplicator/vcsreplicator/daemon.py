@@ -41,12 +41,18 @@ def run_in_loop(logger, fn, onetime=False, **kwargs):
     oldterm = signal.signal(signal.SIGTERM, signal_exit)
     try:
         while alive[0]:
-            fn(alive=alive, **kwargs)
+            try:
+                fn(alive=alive, **kwargs)
+            except Exception:
+                logger.error('exception in daemon loop function')
+                logger.warn('executing loop exiting after error')
+                return 1
 
             if onetime:
                 break
 
         logger.warn('executing loop exiting gracefully')
+        return 0
     finally:
         signal.signal(signal.SIGINT, oldint)
         signal.signal(signal.SIGTERM, oldterm)
