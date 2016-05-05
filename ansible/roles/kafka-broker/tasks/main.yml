@@ -103,7 +103,7 @@
         mode=0644
   when: zk_myid.stat.exists == False and inventory_hostname in zk_servers
 
-- name: install systemd service files for kafka and zookeeper
+- name: install systemd service files for kafka and zookeeper (server only)
   copy: src={{ item }}.service
         dest=/etc/systemd/system/{{ item }}.service
         owner=root
@@ -113,6 +113,7 @@
   with_items:
     - kafka
     - zookeeper
+  when: vct_dir.stat.exists == False
 
 # We DON'T set state=started because starting kafka and zookeeper can be
 # dangerous since it may introduce nodes into a cluster at an unwanted
