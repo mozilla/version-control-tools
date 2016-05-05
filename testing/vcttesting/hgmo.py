@@ -293,6 +293,32 @@ class HgCluster(object):
         for f in fs:
             f.result()
 
+        # Create Kafka topics.
+        TOPICS = [
+            ('pushdata', '8'),
+            ('replicatedpushdata', '1'),
+        ]
+        fs = []
+        with futures.ThreadPoolExecutor(2) as e:
+            for topic, partitions in TOPICS:
+                cmd = [
+                    '/opt/kafka/bin/kafka-topics.sh',
+                    '--create',
+                    '--topic', topic,
+                    '--partitions', partitions,
+                    '--replication-factor', '3',
+                    '--config', 'min.insync.replicas=2',
+                    '--config', 'unclean.leader.election.enable=false',
+                    '--config', 'max.message.bytes=104857600',
+                    '--zookeeper', zookeeper_connect,
+                ]
+                fs.append(e.submit(self._d.execute, master_id, cmd,
+                                   stdout=True))
+
+        for f in futures.as_completed(fs):
+            if 'Created topic' not in f.result():
+                raise Exception('kafka topic not created')
+
         self.ldap_image = ldap_image
         self.master_image = master_image
         self.web_image = web_image
