@@ -7,6 +7,8 @@
   vars:
     repo: https://hg.mozilla.org/hgcustom/version-control-tools
     rev: "@"
+    rb_repo: https://hg.mozilla.org/webtools/reviewboard
+    rb_rev: "@"
     rb_vct: /data/reviewboard/src/version-control-tools
     venv: /data/reviewboard/src/reviewboard.mozilla.org/venv
     python: /data/reviewboard/src/reviewboard.mozilla.org/venv/bin/python

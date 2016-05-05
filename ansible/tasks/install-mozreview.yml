@@ -1,4 +1,25 @@
 ---
+-name: prepare reviewboard-fork repo
+  hg: repo={{ rb_repo }}
+      dest={{ rb_vct }}/reviewboard-fork
+      revision={{ rb_rev }}
+      force=yes
+      purge=yes
+      executable={{ venv }}/bin/hg
+
+# The hg module's purge doesn't delete ignored files. Boo. Force that
+# because old files may cause chaos.
+- name: delete ignored files from reviewboard-fork repo
+  command: "{{ venv }}/bin/hg --config extensions.purge= -R {{ rb_vct }}/reviewboard-fork purge --all"
+
+- name: install djblets fork
+  command: {{ python }} setup.py install
+           chdir={{ rb_vct }}/reviewboard-fork/djblets
+
+- name: install reviewboard fork
+  command: {{ python }} setup.py install
+           chdir={{ rb_vct }}/reviewboard-fork/reviewboard
+
 - name: prepare v-c-t repo
   hg: repo={{ repo }}
       dest={{ rb_vct }}
@@ -7,8 +28,7 @@
       purge=yes
       executable={{ venv }}/bin/hg
 
-# The hg module's purge doesn't delete ignored files. Boo. Force that
-# because old files may cause chaos.
+# Delete ignored filed to avoid chaos.
 - name: delete ignored files from version-control-tools repo
   command: "{{ venv }}/bin/hg --config extensions.purge= -R {{ rb_vct }} purge --all"
 
