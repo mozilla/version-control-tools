@@ -275,14 +275,23 @@ class HgCluster(object):
 
         self.ldap_uri = 'ldap://%s:%d/' % (ldap_hostname,
                                            ldap_hostport)
+
+        fs = []
         with futures.ThreadPoolExecutor(4) as e:
-            e.submit(self.ldap.create_vcs_sync_login, mirror_public_key)
-            e.submit(wait_for_amqp, pulse_hostname, pulse_hostport)
-            e.submit(wait_for_ssh, master_ssh_hostname, master_ssh_hostport)
+            fs.append(e.submit(self.ldap.create_vcs_sync_login,
+                               mirror_public_key))
+            fs.append(e.submit(wait_for_amqp, pulse_hostname,
+                               pulse_hostport, 'guest', 'guest'))
+            fs.append(e.submit(wait_for_ssh, master_ssh_hostname,
+                               master_ssh_hostport))
 
             for s in all_states:
-                hostname, hostport = self._d._get_host_hostname_port(s, '9092/tcp')
-                e.submit(wait_for_kafka, '%s:%s' % (hostname, hostport), 20)
+                h, p = self._d._get_host_hostname_port(s, '9092/tcp')
+                fs.append(e.submit(wait_for_kafka, '%s:%s' % (h, p), 20))
+
+        # Will re-raise exceptions.
+        for f in fs:
+            f.result()
 
         self.ldap_image = ldap_image
         self.master_image = master_image
