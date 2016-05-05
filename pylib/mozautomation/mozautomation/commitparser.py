@@ -62,7 +62,9 @@ DIGIT_RE = re.compile('#?\d+')
 BACK_OUT_MULTIPLE_RE = re.compile(
     '^back(?:ed)? out \d+ changesets \(bug ', re.I)
 
-METADATA_RE = re.compile('^[a-zA-Z-]+: ')
+# Strip out a white-list of metadata prefixes.
+# Currently just MozReview-Commit-ID
+METADATA_RE = re.compile('^MozReview-Commit-ID: ')
 
 
 def parse_bugs(s):

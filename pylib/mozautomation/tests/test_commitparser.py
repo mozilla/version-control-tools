@@ -365,7 +365,7 @@ class TestBugParsing(unittest.TestCase):
 
         self.assertEqual(strip_commit_metadata(
             'Bug 1 - foo\n\nMore description\n\nFoo-Bar: baz\n\n'),
-            'Bug 1 - foo\n\nMore description')
+            'Bug 1 - foo\n\nMore description\n\nFoo-Bar: baz')
 
         self.assertEqual(strip_commit_metadata(
             'Bug 1 - foo\n\nMozReview-Commit-ID: abcdef\n\nTrailing desc'),
