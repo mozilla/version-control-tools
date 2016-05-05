@@ -249,7 +249,7 @@ class HgCluster(object):
                 master_host_rsa_key,
             ]
             for i in web_ids:
-                e.submit(self._d.execute(i, cmd))
+                e.submit(self._d.execute, i, cmd)
 
             # Obtain host keys from mirrors.
             for s in web_states:
