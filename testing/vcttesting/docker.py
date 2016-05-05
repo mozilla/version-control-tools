@@ -1144,30 +1144,39 @@ class Docker(object):
             treestatus_hostname, treestatus_hostport = \
                 self._get_host_hostname_port(treestatus_state, '80/tcp')
 
+        fs = []
         with futures.ThreadPoolExecutor(7) as e:
-            e.submit(wait_for_http, bmoweb_hostname, bmoweb_hostport,
-                     extra_check_fn=self._get_assert_container_running_fn(web_id))
+            fs.append(e.submit(
+                wait_for_http, bmoweb_hostname, bmoweb_hostport,
+                extra_check_fn=self._get_assert_container_running_fn(web_id)))
             if start_pulse:
-                e.submit(wait_for_amqp, rabbit_hostname, rabbit_hostport,
-                         'guest', 'guest',
-                         extra_check_fn=self._get_assert_container_running_fn(pulse_id))
+                fs.append(e.submit(
+                    wait_for_amqp, rabbit_hostname, rabbit_hostport,
+                    'guest', 'guest',
+                    extra_check_fn=self._get_assert_container_running_fn(pulse_id)))
             if start_hgrb:
-                e.submit(wait_for_ssh, hgssh_hostname, hgssh_hostport,
-                         extra_check_fn=self._get_assert_container_running_fn(hgrb_id))
-                e.submit(wait_for_http, hgrbweb_hostname, hgrbweb_hostport,
-                         extra_check_fn=self._get_assert_container_running_fn(hgrb_id))
+                fs.append(e.submit(
+                    wait_for_ssh, hgssh_hostname, hgssh_hostport,
+                    extra_check_fn=self._get_assert_container_running_fn(hgrb_id)))
+                fs.append(e.submit(
+                    wait_for_http, hgrbweb_hostname, hgrbweb_hostport,
+                    extra_check_fn=self._get_assert_container_running_fn(hgrb_id)))
 
             if start_rbweb:
                 e.submit(wait_for_http, rbweb_hostname, rbweb_hostport,
                          extra_check_fn=self._get_assert_container_running_fn(rbweb_id))
 
             if start_hgweb:
-                e.submit(wait_for_http, hgweb_hostname, hgweb_hostport,
-                         extra_check_fn=self._get_assert_container_running_fn(hgweb_id))
+                fs.append(e.submit(
+                    wait_for_http, hgweb_hostname, hgweb_hostport,
+                    extra_check_fn=self._get_assert_container_running_fn(hgweb_id)))
 
             if start_treestatus:
-                e.submit(wait_for_http, treestatus_hostname, treestatus_hostport,
-                         extra_check_fn=self._get_assert_container_running_fn(treestatus_id))
+                fs.append(e.submit(
+                    wait_for_http, treestatus_hostname, treestatus_hostport,
+                    extra_check_fn=self._get_assert_container_running_fn(treestatus_id)))
+
+        [f.result() for f in fs]
 
         result = {
             'bugzilla_url': bmo_url,
