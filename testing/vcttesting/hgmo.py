@@ -36,7 +36,7 @@ def get_hgweb_mozbuild_chroot(d):
     # The chroot archive contains a copy of version-control-tools. Need to
     # attach a vct container so we can rsync it over.
     with d.vct_container(verbose=True) as vct_state:
-        with d.create_container(image) as state:
+        with d.create_container(image, labels=['hgweb-chroot']) as state:
             cid = state['Id']
             d.client.start(cid, volumes_from=[vct_state['Name']])
 
@@ -120,8 +120,10 @@ class HgCluster(object):
         zookeeper_id = 0
 
         with futures.ThreadPoolExecutor(5) as e:
-            f_ldap_create = e.submit(self._dc.create_container, ldap_image)
-            f_pulse_create = e.submit(self._dc.create_container, pulse_image)
+            f_ldap_create = e.submit(self._dc.create_container, ldap_image,
+                                     labels=['ldap'])
+            f_pulse_create = e.submit(self._dc.create_container, pulse_image,
+                                      labels=['pulse'])
 
             env = {
                 'ZOOKEEPER_ID': '%d' % zookeeper_id,
@@ -137,7 +139,8 @@ class HgCluster(object):
                                        environment=env,
                                        entrypoint=['/entrypoint.py'],
                                        command=['/usr/bin/supervisord', '-n'],
-                                       ports=[22, 2181, 2888, 3888, 9092])
+                                       ports=[22, 2181, 2888, 3888, 9092],
+                                       labels=['hgssh'])
             f_web_creates = []
             for i in range(web_count):
                 env = {
@@ -150,7 +153,8 @@ class HgCluster(object):
                                               environment=env,
                                               ports=[22, 80, 2181, 2888, 3888, 9092],
                                               entrypoint=['/entrypoint.py'],
-                                              command=['/usr/bin/supervisord', '-n']))
+                                              command=['/usr/bin/supervisord', '-n'],
+                                              labels=['hgweb', 'hgweb%d' % i]))
 
             ldap_id = f_ldap_create.result()['Id']
             pulse_id = f_pulse_create.result()['Id']

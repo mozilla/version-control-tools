@@ -826,7 +826,8 @@ class Docker(object):
             web_environ['FETCH_BMO'] = '1'
 
         web_id = self.client.create_container(web_image,
-                                              environment=web_environ)['Id']
+                                              environment=web_environ,
+                                              labels=['bmoweb-bootstrapping'])['Id']
 
         web_params = {
             'port_bindings': {80: None},
@@ -870,7 +871,8 @@ class Docker(object):
 
         bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
         web_id = self.client.create_container(
-                web_image, environment={'BMO_URL': bmo_url})['Id']
+                web_image, environment={'BMO_URL': bmo_url},
+                labels=['bmoweb'])['Id']
         containers.append(web_id)
         self.client.start(web_id,
                 port_bindings={80: http_port})
@@ -971,30 +973,34 @@ class Docker(object):
         with futures.ThreadPoolExecutor(10) as e:
             if start_pulse:
                 f_pulse_create = e.submit(self.client.create_container,
-                        pulse_image)
+                        pulse_image, labels=['pulse'])
 
             bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
 
             f_web_create = e.submit(self.client.create_container,
-                    web_image, environment={'BMO_URL': bmo_url})
+                    web_image, environment={'BMO_URL': bmo_url},
+                    labels=['bmoweb'])
 
             if start_rbweb:
                 f_rbweb_create = e.submit(self.client.create_container,
                                           rbweb_image,
                                           command=['/run'],
                                           entrypoint=['/entrypoint.py'],
-                                          ports=[80])
+                                          ports=[80],
+                                          labels=['rbweb'])
 
             if start_ldap:
                 f_ldap_create = e.submit(self.client.create_container,
-                                         ldap_image)
+                                         ldap_image,
+                                         labels=['ldap'])
 
             if start_hgrb:
                 f_hgrb_create = e.submit(self.client.create_container,
                                          hgrb_image,
                                          ports=[22, 80],
                                          entrypoint=['/entrypoint.py'],
-                                         command=['/usr/bin/supervisord', '-n'])
+                                         command=['/usr/bin/supervisord', '-n'],
+                                         labels=['hgrb'])
 
             if start_hgweb:
                 f_hgweb_create = e.submit(self.client.create_container,
@@ -1005,14 +1011,15 @@ class Docker(object):
 
             if start_autoland:
                 f_autolanddb_create = e.submit(self.client.create_container,
-                        autolanddb_image)
+                        autolanddb_image, labels=['autolanddb'])
 
                 f_autoland_create = e.submit(self.client.create_container,
-                        autoland_image)
+                        autoland_image, labels=['autolandweb'])
 
             if start_treestatus:
                 f_treestatus_create = e.submit(self.client.create_container,
-                                               treestatus_image)
+                                               treestatus_image,
+                                               labels=['treestatus'])
 
             if start_autoland:
                 autolanddb_id = f_autolanddb_create.result()['Id']
@@ -1490,7 +1497,8 @@ class Docker(object):
         else:
             cid = self.client.create_container(image,
                                                volumes=['/vct-mount'],
-                                               ports=[873])['Id']
+                                               ports=[873],
+                                               labels=['vct'])['Id']
             start = True
 
         try:
