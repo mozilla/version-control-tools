@@ -43,6 +43,12 @@ class Consumer(SimpleConsumer):
 
         self.fetch_last_known_offsets(partitions)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.stop()
+
     def get_message(self, timeout=0.1):
         """Obtain and decode a message.
 

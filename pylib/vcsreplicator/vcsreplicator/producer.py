@@ -24,6 +24,12 @@ class Producer(KafkaProducer):
 
         self.topic = topic
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.stop()
+
     def send_message(self, o, partition):
         """Send a single message from a Python object.
 
