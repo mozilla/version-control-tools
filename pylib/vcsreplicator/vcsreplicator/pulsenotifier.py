@@ -101,12 +101,13 @@ def cli():
     root.addHandler(handler)
 
     client = config.get_client_from_section('pulseconsumer', timeout=5)
-    consumer = Consumer(client, group, topic, partitions=None)
 
-    cbkwargs = {
-        'config': config,
-    }
-    res = run_in_loop(logger, consume_one, config=config, consumer=consumer,
-                      cb=on_push, cbkwargs=cbkwargs)
+    with Consumer(client, group, topic, partitions=None) as consumer:
+        cbkwargs = {
+            'config': config,
+        }
+        res = run_in_loop(logger, consume_one, config=config, consumer=consumer,
+                          cb=on_push, cbkwargs=cbkwargs)
+
     logger.warn('process exiting code %s' % res)
     sys.exit(res)
