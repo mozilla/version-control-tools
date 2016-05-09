@@ -74,6 +74,7 @@ The `hg fxheads` command is a variation of `hg heads` that prints a concise
 list of the last-known commits for the Firefox repositories.
 """
 
+import errno
 import os
 
 from mercurial import (
@@ -207,47 +208,6 @@ def capabilities(orig, repo, proto):
     return caps
 
 
-def _firefoxtreesrepo(repo):
-    """Obtain a repo that can open the firefoxtrees file.
-
-    Will return the passed ``repo`` in most cases. But if ``repo``
-    is shared, we may return the repo from the share source.
-    """
-    shared = {s.strip() for s in repo.vfs.tryread('shared').splitlines()}
-
-    if 'firefoxtrees' in shared and repo.sharedpath != repo.path:
-        source = repo.vfs.split(repo.sharedpath)[0]
-        srcurl, branches = hg.parseurl(source)
-        return hg.repository(repo.ui, srcurl)
-    else:
-        return repo
-
-
-def readfirefoxtrees(repo):
-    """Read the firefoxtrees node mapping from the filesystem."""
-    repo = _firefoxtreesrepo(repo)
-
-    trees = {}
-    data = repo.vfs.tryread('firefoxtrees')
-    if not data:
-        return trees
-
-    for line in data.splitlines():
-        line = line.strip()
-        if not line:
-            continue
-
-        tree, hexnode = line.split()
-
-        # Filter out try repos because they are special.
-        if tree in TRY_TREES:
-            continue
-
-        trees[tree] = bin(hexnode)
-
-    return trees
-
-
 def writefirefoxtrees(repo):
     """Write the firefoxtrees node mapping to the filesystem."""
     lines = []
@@ -261,7 +221,8 @@ def writefirefoxtrees(repo):
         lines.append('%s %s' % (tree, hex(node)))
         trees[tree] = hex(node)
 
-    _firefoxtreesrepo(repo).vfs.write('firefoxtrees', '\n'.join(lines))
+    with open(repo._firefoxtreespath, 'wb') as fh:
+        fh.write('\n'.join(lines))
 
     # Old versions of firefoxtrees stored labels in the localtags file. Since
     # this file is read by Mercurial and has no relevance to us any more, we
@@ -368,7 +329,6 @@ def wrappedpullobsolete(orig, pullop):
     if not isfirefoxrepo(repo):
         return res
 
-
     if remote.capable('firefoxtrees'):
         bmstore = bookmarks.bmstore(repo)
         lines = remote._call('firefoxtrees').splitlines()
@@ -448,12 +408,6 @@ def updateremoterefs(repo, remote, tree):
     This is called during pull to create the remote tracking tags for
     Firefox repos.
     """
-    # TODO Somehow the custom repo class is lost and the firefoxtrees attribute
-    # isn't accessible. This is possibly a result of repo filter and/or clone
-    # bundles interaction. See bug 1234396.
-    if getattr(repo, 'firefoxtrees', None) is None:
-        return
-
     # Ignore try repos because they are special.
     if tree in TRY_TREES:
         return
@@ -618,14 +572,55 @@ def reposetup(ui, repo):
     if not repo.local():
         return
 
+    class firefoxtreesrepo(repo.__class__):
+        @util.propertycache
+        def firefoxtrees(self):
+            trees = {}
+
+            try:
+                with open(self._firefoxtreespath, 'rb') as fh:
+                    data = fh.read()
+            except IOError as e:
+                if e.errno != errno.ENOENT:
+                    raise
+
+                data = None
+
+            if not data:
+                return trees
+
+            for line in data.splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+
+                tree, hexnode = line.split()
+
+                # Filter out try repos because they are special.
+                if tree in TRY_TREES:
+                    continue
+
+                trees[tree] = bin(hexnode)
+
+            return trees
+
+        @property
+        def _firefoxtreespath(self):
+            shared = {s.strip() for s in repo.vfs.tryread('shared').splitlines()}
+
+            if 'firefoxtrees' in shared and repo.sharedpath != repo.path:
+                return os.path.join(repo.sharedpath, 'firefoxtrees')
+            else:
+                return self.vfs.join('firefoxtrees')
+
+    repo.__class__ = firefoxtreesrepo
+
     # Only change behavior on repositories that are clones of a Firefox
     # repository.
     if not isfirefoxrepo(repo):
         return
 
     repo.prepushoutgoinghooks.add('firefoxtree', prepushoutgoinghook)
-
-    repo.firefoxtrees = readfirefoxtrees(repo)
 
     def listnames(r):
         return r.firefoxtrees.keys()
