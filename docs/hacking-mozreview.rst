@@ -470,7 +470,10 @@ Discussion
 ==========
 
 General discussion on MozReview development and direction occurs on
-our mailing list, `mozilla-code-review@googlegroups.com <mailto:mozilla-code-review@googlegroups.com>`_.
+the ``mozilla.dev.version-control`` group, which is available via
+`mailing list <https://lists.mozilla.org/listinfo/dev-version-control>`_,
+`Google Group <https://groups.google.com/forum/#!forum/mozilla.dev.version-control>`_,
+or `NNTP <news://news.mozilla.org:119/mozilla.dev.version-control>`_.
 
 Submitting Changes
 ==================
