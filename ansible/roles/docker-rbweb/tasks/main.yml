@@ -35,6 +35,7 @@
   with_items:
     - rbbz
     - rbmotd
+    - pygments_override
   tags:
     - docker-refresh
 
@@ -43,6 +44,7 @@
   with_items:
     - rbbz
     - rbmotd
+    - pygments_override
   tags:
     - docker-refresh
 
