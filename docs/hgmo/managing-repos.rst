@@ -159,6 +159,8 @@ There are downsides to enabling obsolescence:
    You do not need to enable obsolescence unless a user of your repository is
    using the *evolve* extension.
 
+.. _hgmo_delete_user_repo:
+
 Deleting a User Repository
 ==========================
 

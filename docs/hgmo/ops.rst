@@ -154,6 +154,21 @@ To mark all repositories on hg.mozilla.org as read-only, create the
 ``/etc/mercurial/readonlyreason`` file. If the file has content, it will
 be printed to the user.
 
+Retiring Repositories
+=====================
+
+Users can :ref:`delete their own repositories <hgmo_delete_user_repo>` - this section applies only to
+non-user repositories.
+
+Convention is to retire (aka delete) repositories by moving them out of
+the user accessible spaces on the master and deleting from webheads.
+
+This can be done via ansible playbook in the version-control-tools
+repository::
+
+  $ cd ansible
+  $ ansible-playbook -i hosts -e repo=relative/path/on/server hgmo-retire-repo.yml
+
 .. _hgmo_ops_monitoring:
 
 SSH Server Services

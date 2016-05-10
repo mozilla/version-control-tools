@@ -1,0 +1,30 @@
+# retire per procedure at
+# https://mana.mozilla.org/wiki/display/DEVSERVICES/Mercurial+-+Common+Repository+Operations#Mercurial-CommonRepositoryOperations-Retiring(akaDeleting)aRepository
+
+---
+- hosts: hgssh-prod-master
+  gather_facts: no
+  become_user: root
+  tasks:
+    - name: Ensure repo exists on server
+      command:  ls -ld /repo/hg/mozilla/{{ repo | mandatory }}
+      changed_when: false
+    - name: Get parent name
+      # bug in ansible 1.9.x prevents running this locally, see
+      # https://github.com/ansible/ansible/issues/10906
+      become: no
+      command: dirname {{ repo }}
+      register: dirname
+      changed_when: false
+    - set_fact: parent_dir={{ dirname.stdout }}
+    - name: Make container directory
+      file: state=directory path=/repo/hg/retired_repos/{{ parent_dir }}
+    - name: Retire repo on master
+      command:  mv -i /repo/hg/mozilla/{{ repo }} /repo/hg/retired_repos/{{ parent_dir }}/
+
+- hosts: hgweb-prod
+  gather_facts: no
+  become_user: root
+  tasks:
+    - name: Remove repository on mirrors
+      file: state=absent path=/repo/hg/mozilla/{{ repo }}
