@@ -481,6 +481,14 @@ def doreview(repo, ui, remote, nodes):
     assert nodes
     assert 'pushreview' in getreviewcaps(remote)
 
+    # Ensure a color for ui.warning is defined.
+    try:
+        color = extensions.find('color')
+        if 'ui.warning' not in color._styles:
+            color._styles['ui.warning'] = 'red'
+    except Exception:
+        pass
+
     bzauth = getbugzillaauth(ui)
     if not bzauth:
         ui.warn(_('Bugzilla credentials not available. Not submitting review.\n'))
@@ -629,8 +637,9 @@ def doreview(repo, ui, remote, nodes):
     for node in nodes:
         rd = reviewdata[nodereviews[node]]
         if not rd.get('reviewers', None):
-            ui.status(_('(review requests lack reviewers; visit review url '
-                        'to assign reviewers)\n'))
+            ui.write('\n')
+            ui.warn(_('(review requests lack reviewers; visit review url '
+                      'to assign reviewers)\n'))
             break
 
     # Make it clear to the user that they need to take action in order for
