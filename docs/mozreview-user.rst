@@ -57,8 +57,11 @@ touch with us!
 
 If you prefer IRC, join ``#mozreview`` ``irc.mozilla.org``.
 
-If you prefer email, send one to
-`mozilla-code-review@googlegroups.com <mailto:mozilla-code-review@googlegroups.com>`_.
+If you prefer email or newsgroups, please use ``mozilla.dev.version-control``,
+which is available via
+`mailing list <https://lists.mozilla.org/listinfo/dev-version-control>`_,
+`Google Group <https://groups.google.com/forum/#!forum/mozilla.dev.version-control>`_,
+or `NNTP <news://news.mozilla.org:119/mozilla.dev.version-control>`_.
 This is also our general development mailing list.
 
 Adding Review Repositories
