@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from datetime import timedelta
 import json
 import logging
 import urlparse
@@ -10,6 +11,7 @@ from django.http import (HttpResponse, HttpResponseRedirect,
                          HttpResponseNotAllowed)
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
+from django.utils import timezone
 
 from mozreview.bugzilla.client import Bugzilla
 from mozreview.bugzilla.errors import BugzillaError
@@ -94,6 +96,10 @@ def get_bmo_auth_callback(request):
         logger.error('Bugzilla auth callback called without required '
                      'parameters.')
         return show_error_page(request)
+
+    # Delete expired unverified keys (5 minute lifetime).
+    UnverifiedBugzillaApiKey.objects.filter(
+        timestamp__lte=timezone.now() - timedelta(minutes=5)).delete()
 
     parsed = None if not redirect else urlparse.urlparse(redirect)
 
