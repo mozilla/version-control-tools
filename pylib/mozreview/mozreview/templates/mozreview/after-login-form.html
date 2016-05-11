@@ -10,7 +10,7 @@
          logging back in.</p>
     {% else %}
       <p>You are being redirected to
-        <a href="{% bugzilla_auth_uri %}">Bugzilla</a> to log in...
+        <a href="//{{ request.get_host }}/mozreview/login/">Bugzilla</a> to log in...
       </p>
     {% endif %}
   </div>

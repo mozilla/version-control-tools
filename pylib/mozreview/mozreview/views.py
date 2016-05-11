@@ -3,15 +3,21 @@ from __future__ import unicode_literals
 from datetime import timedelta
 import json
 import logging
-import urlparse
+import posixpath
+from random import getrandbits
+from urllib import urlencode
+from urlparse import urljoin, urlparse, urlunparse
 import uuid
 
 from django.contrib.auth import login
+from django.core.urlresolvers import reverse
 from django.http import (HttpResponse, HttpResponseRedirect,
                          HttpResponseNotAllowed)
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils import timezone
+
+from djblets.siteconfig.models import SiteConfiguration
 
 from mozreview.bugzilla.client import Bugzilla
 from mozreview.bugzilla.errors import BugzillaError
@@ -41,8 +47,49 @@ def bmo_auth_callback(request):
         return HttpResponseNotAllowed(['GET'], ['POST'])
 
 
-def post_bmo_auth_callback(request):
+def bmo_login(request):
     """Handler for the first part of the Bugzilla auth-delegation process.
+
+    Generate a secret, store it in a cookie, and redirect the client
+    to Bugzilla.
+
+    The secret will be echoed back to us in a later phase, where is it
+    checked aginst the client's cookie to ensure the request and response
+    are bound to the same client.
+    """
+    # TODO: We only store the XML-RPC URL in our settings, but we need
+    # the auth URL.  Ideally we'd store just the root Bugzilla URL
+    # and modify it where appropriate, but we'll be switching to REST at
+    # some point so we might as well fix it then.
+    redirect = request.GET.get('next')
+    callback_uri = request.build_absolute_uri(reverse('bmo-auth-callback'))
+    params = {'secret': '%0x' % getrandbits(16 * 4)}
+    if redirect:
+        params['redirect'] = redirect
+    callback_uri += '?' + urlencode(params)
+
+    logging.info('callback_uri: %s' % callback_uri)
+
+    siteconfig = SiteConfiguration.objects.get_current()
+    xmlrpc_url = siteconfig.get('auth_bz_xmlrpc_url')
+    u = urlparse(xmlrpc_url)
+    bugzilla_root = posixpath.dirname(u.path).rstrip('/') + '/'
+    query_dict = {'description': 'mozreview', 'callback': callback_uri}
+
+    url = urlunparse((u.scheme, u.netloc, urljoin(bugzilla_root, 'auth.cgi'),
+                      '', urlencode(query_dict), ''))
+
+    # The bmo_auth_secret is stored in a cookie on the client as well as
+    # passed to Bugzilla.  We verify they match when BMO redirects to our
+    # callback URI to ensure the request and response are bound to the same
+    # client.
+    response = HttpResponseRedirect(url)
+    response.set_cookie('bmo_auth_secret', params['secret'], max_age=300)
+    return response
+
+
+def post_bmo_auth_callback(request):
+    """Handler for the second part of the Bugzilla auth-delegation process.
 
     After the user is directed to Bugzilla and logs in, Bugzilla sends a
     POST request to this callback with the API key and Bugzilla username.
@@ -58,9 +105,8 @@ def post_bmo_auth_callback(request):
     if not (bmo_username and bmo_api_key):
         logger.error('Bugzilla auth callback called without required '
                      'parameters.')
-        return show_error_page(request)
-
-    logger.info('Received unverified apikey for user: %s' % bmo_username)
+        return HttpResponse('Authentication request rejected.',
+                            mimetype='text/plain')
 
     unverified_key = UnverifiedBugzillaApiKey(
         bmo_username=bmo_username,
@@ -75,7 +121,7 @@ def post_bmo_auth_callback(request):
 
 
 def get_bmo_auth_callback(request):
-    """Handler for the second part of the Bugzilla auth-delegation process.
+    """Handler for the third part of the Bugzilla auth-delegation process.
 
     After the above POST call is executed, Bugzilla then redirects back to
     this view, passing the return value of the POST handler, as
@@ -91,6 +137,7 @@ def get_bmo_auth_callback(request):
     bmo_username = request.GET.get('client_api_login', None)
     callback_result = request.GET.get('callback_result', None)
     redirect = request.GET.get('redirect', None)
+    secret = request.GET.get('secret', None)
 
     if not (bmo_username and callback_result):
         logger.error('Bugzilla auth callback called without required '
@@ -101,7 +148,7 @@ def get_bmo_auth_callback(request):
     UnverifiedBugzillaApiKey.objects.filter(
         timestamp__lte=timezone.now() - timedelta(minutes=5)).delete()
 
-    parsed = None if not redirect else urlparse.urlparse(redirect)
+    parsed = None if not redirect else urlparse(redirect)
 
     # Enforce relative redirects; we don't want people crafting auth links
     # that redirect to other sites.  We check the scheme as well as the netloc
@@ -123,10 +170,15 @@ def get_bmo_auth_callback(request):
     if len(unverified_keys) > 1:
         logger.warning('Multiple unverified keys on file for BMO user %s. '
                        'Using most recent, from %s.' %
-                        (bmo_username, unverified_key.timestamp))
+                       (bmo_username, unverified_key.timestamp))
 
     if callback_result != unverified_key.callback_result:
         logger.error('Callback result does not match for BMO user %s.' %
+                     bmo_username)
+        return show_error_page(request)
+
+    if secret is None or request.COOKIES['bmo_auth_secret'] != secret:
+        logger.error('Callback secret does not match cookie for user %s.' %
                      bmo_username)
         return show_error_page(request)
 
@@ -175,4 +227,6 @@ def get_bmo_auth_callback(request):
     user.backend = 'rbbz.auth.BugzillaBackend'
     logger.info('BMO Auth callback succeeded for user: %s' % bmo_username)
     login(request, user)
-    return HttpResponseRedirect(redirect)
+    response = HttpResponseRedirect(redirect)
+    response.delete_cookie('bmo_auth_secret')
+    return response

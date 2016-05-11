@@ -542,10 +542,16 @@ class MozReview(object):
             raise Exception('Failed to successfully run the BMO auth POST '
                             'callback.')
 
-        params = {'client_api_login': email, 'callback_result': result}
+        params = {
+            'client_api_login': email,
+            'callback_result': result,
+            'secret': 'mozreview',
+        }
+        cookies = {'bmo_auth_secret': params['secret']}
 
         for i in range(3):
-            if requests.get(url, params=params).status_code == 200:
+            if requests.get(url, params=params,
+                            cookies=cookies).status_code == 200:
                 break
         else:
             raise Exception('Failed to successfully run the BMO auth GET '
