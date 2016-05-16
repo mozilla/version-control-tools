@@ -39,6 +39,12 @@
 - name: install rbmotd egg
   shell: "{{ easy_install }} -U dist/*.egg chdir={{ rb_vct }}/pylib/rbmotd"
 
+- name: build pygments_override egg
+  command: "{{ python }} setup.py bdist_egg chdir={{ rb_vct }}/pylib/pygments_override"
+
+- name: install pygments_override egg
+  shell: "{{ easy_install }} -U dist/*.egg chdir={{ rb_vct }}/pylib/pygments_override"
+
 - name: Generate static Review Board files from extensions
   command: "{{ rbsite }} manage {{ sitehome }} -- install-extension-media --force"
 
