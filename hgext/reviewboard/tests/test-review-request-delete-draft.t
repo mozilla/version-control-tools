@@ -35,6 +35,7 @@
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -59,6 +60,7 @@ Now publish the review and create a new draft
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

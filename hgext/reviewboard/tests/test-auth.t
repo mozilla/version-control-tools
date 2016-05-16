@@ -171,6 +171,7 @@ Changing the IRC nickname in Bugzilla will update the RB username
   
   review id:  bz://1/user2newnick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -203,6 +204,7 @@ Changing the email address in Bugzilla will update the RB email
   
   review id:  bz://1/user2newemail
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -252,6 +254,7 @@ Re-enabling a disabled user will allow them to use Review Board
   
   review id:  bz://1/undisableduser
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]

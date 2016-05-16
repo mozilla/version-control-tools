@@ -68,6 +68,7 @@
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -101,6 +102,7 @@ Popping the last commit truncates the review set
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -299,6 +301,7 @@ appropriate review requests
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -519,6 +522,7 @@ Try removing a commit in the middle.
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -714,6 +718,7 @@ recycling behavior when commit IDs are present.
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

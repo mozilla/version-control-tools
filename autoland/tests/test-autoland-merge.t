@@ -55,7 +55,6 @@ Post a job with a bad merge
   $ echo foo3 > foo
   $ hg commit -m 'Bug 1 - more stuff; r?cthulhu'
   $ hg push --config reviewboard.autopublish=false
-
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   remote: adding changesets
@@ -79,13 +78,14 @@ Post a job with a bad merge
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   $ REV=`hg log -r . --template "{node|short}"`
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - more stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 2\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 2 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "5d8686a5858e": "Bug 1 - more stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "We\'re sorry, Autoland could not rebase your commits for you automatically. Please manually rebase your commits and try again.\\n\\nhg error in cmd: hg rewritecommitdescriptions --descriptions=/tmp/tmpgE0EJ7 5d8686a5858e: rebasing 4:1fa31b8c94db \\"Bug 1 - more stuff; r=cthulhu\\" (tip)\\nmerging foo\\nwarning: conflicts while merging foo! (edit, then use \'hg resolve --mark\')\\nunresolved conflicts (see hg resolve, then hg rebase --continue)\\n", \n  "landed": false, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "", \n  "rev": "5d8686a5858e", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
+  (200, u'{\n  "commit_descriptions": {\n    "5d8686a5858e": "Bug 1 - more stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "We\'re sorry, Autoland could not rebase your commits for you automatically. Please manually rebase your commits and try again.\\\n\\\nhg error in cmd: hg rewritecommitdescriptions --descriptions=/tmp/tmp?????? 5d8686a5858e: rebasing 4:1fa31b8c94db \\\"Bug 1 - more stuff; r=cthulhu\\\" (tip)\\\nmerging foo\\\nwarning: conflicts while merging foo! (edit, then use \'hg resolve --mark\')\\\nunresolved conflicts (see hg resolve, then hg rebase --continue)\\\n", \n  "landed": false, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "", \n  "rev": "5d8686a5858e", \n  "tree": "test-repo", \n  "trysyntax": ""\n}') (glob)
 
   $ mozreview exec autoland hg log /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   0:Bug 1 - some stuff; r=cthulhu:public

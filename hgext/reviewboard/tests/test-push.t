@@ -88,6 +88,7 @@ Pushing a single changeset will initiate a single review (no children)
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -111,6 +112,7 @@ Pushing no changesets will do a re-review
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -133,6 +135,7 @@ created if all the review requests didn't change
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -158,6 +161,7 @@ Pushing patches from mq will result in a warning
   
   review id:  bz://2/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -179,6 +183,7 @@ Custom identifier will create a new review from same changesets.
   
   review id:  bz://3/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/5 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -205,6 +210,7 @@ rest of the test.)
   
   review id:  bz://4/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/7 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -222,6 +228,7 @@ Specifying multiple -r for the same head works
   
   review id:  bz://5/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/9 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -240,6 +247,7 @@ Specifying a revision range works
   
   review id:  bz://6/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -306,6 +314,7 @@ Specifying a base revision limits reviewed changesets
   
   review id:  bz://7/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/13 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -331,6 +340,7 @@ Specifying multiple -r arguments selects base and tip
   
   review id:  bz://8/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/17 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -357,6 +367,7 @@ Specifying multiple -r in reverse order still works
   
   review id:  bz://9/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/21 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -381,6 +392,7 @@ Specifying multiple -r in reverse order still works
   
   review id:  bz://11/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/25 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
   [1]
@@ -451,6 +463,7 @@ You can choose to publish automatically without a prompt
   
   review id:  bz://1/mynick
   review url: http://*:$HGPORT1/r/1 (draft) (glob)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (published review request 1)
   [1]

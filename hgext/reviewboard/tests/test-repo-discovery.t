@@ -150,6 +150,7 @@ Pushing to autodiscover repo should redirect
   
   review id:  bz://1/dummy
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 
@@ -203,6 +204,7 @@ Redirecting works when pushing over HTTP
   
   review id:  bz://1/dummy
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

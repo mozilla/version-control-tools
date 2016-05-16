@@ -21,7 +21,7 @@ Create a review
 
   $ echo bug > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push > /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push &> /dev/null
 
   $ rbmanage add-reviewer 2 --user reviewer
   1 people listed on review request
@@ -360,7 +360,7 @@ Create a review
   $ bugzilla create-bug TestProduct TestComponent 'Second Bug'
 
   $ hg commit --amend -m 'Bug 2 - Initial commit to review' > /dev/null
-  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=${l3key} push > /dev/null
+  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=${l3key} push &> /dev/null
 
   $ rbmanage add-reviewer 4 --user reviewer
   1 people listed on review request

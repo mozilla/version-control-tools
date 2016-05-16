@@ -19,7 +19,7 @@ Create a review request
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
   $ echo initial > foo
   $ hg --encoding utf-8 commit -m 'Bug 1 - Initial commit to review ’ こ'
-  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} --config reviewboard.autopublish=false push > /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} --config reviewboard.autopublish=false push &> /dev/null
   $ rbmanage publish 1
 
 Add a comment with unicode
@@ -157,6 +157,7 @@ Put some wonky byte sequences in the diff
   
   review id:  bz://2/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
 

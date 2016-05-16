@@ -40,6 +40,7 @@ Create bug and review
   
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   
   publish these review requests now (Yn)?  y

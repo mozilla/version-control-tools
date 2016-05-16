@@ -547,6 +547,7 @@ Unrecognized reviewers should be ignored
   
   review id:  bz://2/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/12 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   
   publish these review requests now (Yn)?  y
@@ -601,6 +602,7 @@ Reviewer deduction can be disabled with a config option.
   
   review id:  bz://2/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/12 (draft)
+  
   (review requests lack reviewers; visit review url to assign reviewers)
   
   publish these review requests now (Yn)?  y
