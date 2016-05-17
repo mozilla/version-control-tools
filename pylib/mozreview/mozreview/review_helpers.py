@@ -116,6 +116,12 @@ def get_reviewers_status(review_request, reviewers=None, include_drive_by=False)
             reviewers_status[user]['ship_it'] = review.ship_it
             if review_flag:
                 reviewers_status[user]['review_flag'] = review_flag
+            else:
+                # For backwards compatibility.
+                if review.ship_it:
+                    reviewers_status[user]['review_flag'] = 'r+'
+                else:
+                    reviewers_status[user]['review_flag'] = ' '
 
     return reviewers_status
 
