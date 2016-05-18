@@ -51,11 +51,14 @@ MRReviewFlag.View = Backbone.View.extend({
   /**
   *  Under some circumstances a model save will replace the comment textarea
   *  with a 'Add text' link. This is a hack to circumvent that problem.
+  *  See bug 1273954.
   */
   save: function(){
     this.model.save({
       success: _.bind(function(){
-        $('#review-form-comments .body-top a.add-link').click();
+        window.setTimeout(function () {
+          $('#review-form-comments .body-top a.add-link').click();
+        }, 0);
       }, this)
     });
   },
