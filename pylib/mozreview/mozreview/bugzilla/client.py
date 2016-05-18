@@ -67,18 +67,18 @@ class BugzillaAttachmentUpdates(object):
         self.creates = []
 
     def create_or_update_attachment(self, review_request_id, summary,
-                                    comment, url, reviewers):
+                                    comment, url, carry_forward):
         """Creates or updates an attachment containing a review-request URL.
 
-        The reviewers argument should be a dictionary mapping reviewer email
-        to a boolean indicating if that reviewer has given an r+ on the
-        attachment in the past that should be left untouched.
+        The carry_forward argument should be a dictionary mapping reviewer
+        email to a boolean indicating if that reviewer's flag should be left
+        untouched.
         """
 
         logger.info('Posting review request %s to bug %d.' %
                     (review_request_id, self.bug_id))
         # Copy because we modify it.
-        reviewers = reviewers.copy()
+        carry_forward = carry_forward.copy()
         params = {}
         flags = []
         rb_attachment = None
@@ -101,14 +101,14 @@ class BugzillaAttachmentUpdates(object):
                 elif f['name'] == 'feedback':
                     # We always clear feedback flags.
                     flags.append({'id': f['id'], 'status': 'X'})
-                elif f['status'] == '+' and f['setter'] not in reviewers:
+                elif f['status'] == '+' and f['setter'] not in carry_forward:
                     # This r+ flag was set manually on bugzilla rather
                     # then through a review on Review Board. Always
                     # clear these flags.
                     flags.append({'id': f['id'], 'status': 'X'})
-                elif f['status'] == '+':
-                    if not reviewers[f['setter']]:
-                        # We should not carry this r+ forward so
+                elif f['status'] == '+' or f['status'] == '-':
+                    if not carry_forward[f['setter']]:
+                        # We should not carry this r+/r- forward so
                         # re-request review.
                         flags.append({
                             'id': f['id'],
@@ -117,16 +117,17 @@ class BugzillaAttachmentUpdates(object):
                             'requestee': f['setter']
                         })
 
-                    reviewers.pop(f['setter'])
-                elif 'requestee' not in f or f['requestee'] not in reviewers:
+                    carry_forward.pop(f['setter'])
+                elif ('requestee' not in f or
+                      f['requestee'] not in carry_forward):
                     # We clear review flags where the requestee is not
                     # a reviewer or someone has manually set r- on the
                     # attachment.
                     flags.append({'id': f['id'], 'status': 'X'})
-                elif f['requestee'] in reviewers:
+                elif f['requestee'] in carry_forward:
                     # We're already waiting for a review from this user
                     # so don't touch the flag.
-                    reviewers.pop(f['requestee'])
+                    carry_forward.pop(f['requestee'])
 
             break
 
@@ -139,8 +140,8 @@ class BugzillaAttachmentUpdates(object):
         # ignore manually removed r+s.
         # This is sorted so behavior is deterministic (this mucks with test
         # output otherwise).
-        for reviewer, rplus in sorted(reviewers.iteritems()):
-            if not rplus:
+        for reviewer, keep in sorted(carry_forward.iteritems()):
+            if not keep:
                 flags.append({
                     'name': 'review',
                     'status': '?',
@@ -420,7 +421,7 @@ class Bugzilla(object):
         for f in review_flags:
             # Bugzilla attachments have a requestee only if the status is `?`.
             # In the other cases requestee == setter.
-            if ((reviewer == f.get('requestee') and f['status'] == '?')  or
+            if ((reviewer == f.get('requestee') and f['status'] == '?') or
                     (reviewer == f.get('setter') and f['status'] != '?')):
 
                 # Flag is already set, don't change it.

@@ -623,9 +623,163 @@ Posting a r- review will add a '-' review flag
     status: UNCONFIRMED
     summary: Second Bug
 
-  $ cd ..
+Adding a reviewer should leave r- untouched
+
+  $ mozreview create-user reviewer2@example.com password 'Mozilla Reviewer 2 [:reviewer2]' --bugzilla-group editbugs
+  Created user 9
+
+  $ exportbzauth author@example.com password
+  $ bugzilla create-bug TestProduct TestComponent 'Third Bug'
+
+  $ echo bug3 > foo
+  $ hg commit -m 'Bug 3 - Initial commit to review'
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push -c . &> /dev/null
+  $ rbmanage add-reviewer 6 --user reviewer
+  1 people listed on review request
+  $ rbmanage publish 5
+
+  $ exportbzauth reviewer@example.com password
+  $ rbmanage create-review 6 --body-top 'This is all wrong' --public --review-flag='r-'
+  created review 6
+
+  $ exportbzauth author@example.com password
+  $ rbmanage add-reviewer 6 --user reviewer2
+  2 people listed on review request
+  $ rbmanage publish 5
+  $ bugzilla dump-bug 3
+  Bug 3:
+    attachments:
+    - attacher: author@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header
+      description: 'MozReview Request: Bug 3 - Initial commit to review'
+      file_name: reviewboard-6-url.txt
+      flags:
+      - id: 4
+        name: review
+        requestee: null
+        setter: reviewer@example.com
+        status: '-'
+      - id: 5
+        name: review
+        requestee: reviewer2@example.com
+        setter: author@example.com
+        status: '?'
+      id: 3
+      is_obsolete: false
+      is_patch: false
+      summary: 'MozReview Request: Bug 3 - Initial commit to review'
+    blocks: []
+    cc:
+    - reviewer2@example.com
+    - reviewer@example.com
+    comments:
+    - author: author@example.com
+      id: 12
+      tags: []
+      text: ''
+    - author: author@example.com
+      id: 13
+      tags: []
+      text:
+      - Created attachment 3
+      - 'MozReview Request: Bug 3 - Initial commit to review'
+      - ''
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
+    - author: reviewer@example.com
+      id: 14
+      tags: []
+      text:
+      - Comment on attachment 3
+      - 'MozReview Request: Bug 3 - Initial commit to review'
+      - ''
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/6/#review6
+      - ''
+      - This is all wrong
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
+    summary: Third Bug
+
+Publishing a new revision should reset r- to r?, and carry forward r+
+
+  $ exportbzauth author@example.com password
+  $ echo updated >> foo
+  $ hg commit --amend -m 'Bug 3 - Modified commit to review' > /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push -c . &> /dev/null
+  $ bugzilla dump-bug 3
+  Bug 3:
+    attachments:
+    - attacher: author@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header
+      description: 'MozReview Request: Bug 3 - Modified commit to review'
+      file_name: reviewboard-6-url.txt
+      flags:
+      - id: 4
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
+      - id: 5
+        name: review
+        requestee: reviewer2@example.com
+        setter: author@example.com
+        status: '?'
+      id: 3
+      is_obsolete: false
+      is_patch: false
+      summary: 'MozReview Request: Bug 3 - Modified commit to review'
+    blocks: []
+    cc:
+    - reviewer2@example.com
+    - reviewer@example.com
+    comments:
+    - author: author@example.com
+      id: 12
+      tags: []
+      text: ''
+    - author: author@example.com
+      id: 13
+      tags: []
+      text:
+      - Created attachment 3
+      - 'MozReview Request: Bug 3 - Modified commit to review'
+      - ''
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
+    - author: reviewer@example.com
+      id: 14
+      tags: []
+      text:
+      - Comment on attachment 3
+      - 'MozReview Request: Bug 3 - Modified commit to review'
+      - ''
+      - http://$DOCKER_HOSTNAME:$HGPORT1/r/6/#review6
+      - ''
+      - This is all wrong
+    - author: author@example.com
+      id: 15
+      tags: []
+      text:
+      - Comment on attachment 3
+      - 'MozReview Request: Bug 3 - Modified commit to review'
+      - ''
+      - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/1-2/'
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
+    summary: Third Bug
 
 Cleanup
 
+  $ cd ..
   $ mozreview stop
   stopped 9 containers

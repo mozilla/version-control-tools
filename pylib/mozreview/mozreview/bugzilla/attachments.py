@@ -7,6 +7,9 @@ from mozautomation.commitparser import (
 from mozreview.bugzilla.client import (
     BugzillaAttachmentUpdates,
 )
+from mozreview.extra_data import (
+    REVIEW_FLAG_KEY,
+)
 from mozreview.models import (
     BugzillaUserMap,
     get_or_create_bugzilla_users,
@@ -15,7 +18,7 @@ from mozreview.rb_utils import (
     get_obj_url,
 )
 from mozreview.review_helpers import (
-    gen_latest_reviews
+    gen_latest_reviews,
 )
 
 
@@ -50,7 +53,7 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
     user_email_cache = {}
 
     for review_request_draft, review_request in children_to_post:
-        reviewers = {}
+        carry_forward = {}
 
         for u in review_request_draft.target_people.all():
             bum = BugzillaUserMap.objects.get(user=u)
@@ -65,16 +68,21 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
                 email = users[0].email
                 user_email_cache[bum.bugzilla_user_id] = email
 
-            reviewers[email] = False
+            carry_forward[email] = False
 
         for review in gen_latest_reviews(review_request):
-            # The last review given by this reviewer had a ship-it, so we
-            # will carry their r+ forward. If someone had manually changed
-            # their flag on bugzilla, we may be setting it back to r+, but
-            # we will consider the manual flag change on bugzilla user
-            # error for now.
-            if review.ship_it:
-                reviewers[review.user.email] = True
+            # Determine which flags should be carried forward.
+            # If the code (diffset) hasn't been changed by this draft (ie. this
+            # is a change to meta data only), then carry forward all flags.
+            # If the diffset was updated, carry forward just r+'s.  All other
+            # flags should be reset to r?.
+            if review_request_draft.diffset:
+                review_flag = review.extra_data.get(REVIEW_FLAG_KEY)
+                carry_forward[review.user.email] = review_flag == 'r+' or (
+                    # Older reviews didn't set review_flag.
+                    review_flag is None and review.ship_it)
+            else:
+                carry_forward[review.user.email] = True
 
         rr_url = get_obj_url(review_request)
         diff_url = '%sdiff/#index_header' % rr_url
@@ -110,6 +118,6 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
             review_request_draft.summary,
             comment,
             diff_url,
-            reviewers)
+            carry_forward)
 
     attachment_updates.do_updates()
