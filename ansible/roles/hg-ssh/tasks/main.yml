@@ -73,7 +73,7 @@
   when: vct_dir.stat.exists == False
 
 - name: configure sshd
-  file: src=sshd_config
+  copy: src=sshd_config
         dest=/etc/ssh/sshd_config
   notify: restart sshd
   tags: docker-startup
