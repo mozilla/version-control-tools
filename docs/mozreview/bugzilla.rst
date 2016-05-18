@@ -12,8 +12,11 @@ Shared User Database and Authentication
 
 Review Board shares its user database with Bugzilla.
 
-Your Review Board login credentials are your Bugzilla email address and
-password.
+Logging into Review Board is done through Bugzilla.  The *Log in* link
+in Review Board will redirect you to Bugzilla, where you should
+provide your usual Bugzilla credentials. Note that if you have an
+active Bugzilla session, you will automatically be redirected back to
+Review Board without having to provide your credentials again.
 
 Your Review Board username is derived from your name in Bugzilla. If you
 are using the ``Firsname Lastname [:ircnick]`` convention, your Review
@@ -31,8 +34,17 @@ request review from the specified user. Clicking on the attachment in
 the Bugzilla user interface or following the link to the review will
 redirect you to Review Board.
 
-If someone gives a *Ship It* on a review request, a ``review+`` will be
-set in Bugzilla.
+When someone leaves a review on a review request, the chosen flag
+value will be set in Bugzilla (or cleared if the empty value is
+chosen).
+
+If a new revision of a commit is pushed up to MozReview, a new
+attachment will not be created. Rather, any ``r-`` and cleared review
+flags on the original Bugzilla attachment will be reset to ``r?``.
+Any existing ``r+`` flags will be left as is, that is, the review is
+carried forward. This last part is under discussion and may change in
+the future. There is also work under way to allow explicitly
+re-requesting review even if a ``r+`` has previously been granted.
 
 Review Comments
 ===============

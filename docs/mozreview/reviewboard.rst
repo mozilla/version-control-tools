@@ -198,27 +198,31 @@ Conversion to Bugzilla Comments
    to offer little value over just going to Review Board and looking at
    the original comments there.)
 
-Granting Review via Ship It
-   There is a **Ship It** checkbox in the reviewer interface of each
-   commit review request. This is Review Board's way of granting
-   review (``r+`` in Bugzilla terminology). Since each commit has an
-   associated attachment with review flags in Bugzilla, they need to
-   be reviewed separately.
+Granting, Denying, and Clearing Reviews
+   There is a dropdown containing standard Bugzilla review flags
+   (``r?``, ``r+``, and ``r-``) in the **Finish Review** dialog in
+   each commit review request. The selected value will be set on the
+   corresponding attachment in Bugzilla when the review is
+   published. There is also a blank value, which will clear the review
+   flag. Since each commit has an associated attachment with review
+   flags in Bugzilla, they need to be reviewed separately.
+
+   Note that, if a reviewer has previously left a ``r+`` or ``r-``
+   review, or has cleared the review, resetting it to ``r?`` will
+   cause the review flag in Bugzilla to be both set and directed to
+   the reviewer, since a user cannot set a review flag as someone
+   else. If the original ``r?`` has never been changed, then it will
+   be left as is, i.e., set by the commit author.
 
    While the parent review request (available from the **Review
    Summary** link on any commit review request) provides a collapsed
    view of all commits and can be useful to get a global view of the
    whole commit series, reviewers should generally not leave reviews
-   on it.
+   on it. Correspondingly, the review-flag dropdown is disabled on
+   parent review requests.
 
    There is currently no equivalent to ``feedback+``. This workflow is
    still being discussed.
-
-Cancelling Reviews
-   If a reviewer leaves a review without a **Ship It**, an existing
-   ``r?`` or ``r+`` flag on the commit attachment will be cleared. The
-   flag will still be cleared even if the review does not open any
-   issues.
 
 Working With "Patches"
 ----------------------
