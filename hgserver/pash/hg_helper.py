@@ -152,7 +152,7 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
     if not os.path.exists(userdir):
         run_command('mkdir %s' % userdir)
     print 'Please wait.  Cloning /%s to %s' % (source_repo_path, dest_url)
-    run_command('nohup %s init %s' % (HG, dest_dir))
+    run_command('nohup %s --config format.usegeneraldelta=true init %s' % (HG, dest_dir))
     run_command('nohup %s -R %s pull %s/%s' % (HG, dest_dir, DOC_ROOT, source_repo_path))
     run_command('nohup %s -R %s replicatesync' % (HG, dest_dir))
     # TODO ensure user WSGI files are in place on hgweb machine.
@@ -290,7 +290,7 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=''):
                 except Exception, e:
                     print "Exception %s" % (e)
 
-            run_command('/usr/bin/nohup %s init %s/users/%s/%s' % (HG, DOC_ROOT, user_repo_dir, repo_name))
+            run_command('/usr/bin/nohup %s --config format.usegeneraldelta=true init %s/users/%s/%s' % (HG, DOC_ROOT, user_repo_dir, repo_name))
     fix_user_repo_perms(repo_name)
     # New user repositories are non-publishing by default.
     set_repo_publishing(repo_name, False)
