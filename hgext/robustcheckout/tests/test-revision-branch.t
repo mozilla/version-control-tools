@@ -12,6 +12,24 @@ Only 1 of revision and branch can be specified
   abort: cannot specify both --revision and --branch
   [255]
 
+A SHA-1 fragment is required in --revision argument
+
+  $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision default
+  abort: --revision must be a SHA-1 fragment 12-40 characters long
+  [255]
+
+It must be 12+ characters long
+
+  $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 0123456789a
+  abort: --revision must be a SHA-1 fragment 12-40 characters long
+  [255]
+
+It can't be more than 40 characters
+
+  $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 01234567890123456789012345678901234567890
+  abort: --revision must be a SHA-1 fragment 12-40 characters long
+  [255]
+
 Specifying branch argument will checkout branch
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --branch default
@@ -56,3 +74,22 @@ Specifying revision will switch away from branch
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
+
+Create a branch that looks like a SHA-1 but isn't and verify we refuse to accept
+updating to it
+
+  $ cd dest
+  $ hg branch abcdef0123456
+  marked working directory as branch abcdef0123456
+  $ echo nosha1 > foo
+  $ hg commit -m 'ambiguous branch'
+  $ cd ..
+
+  $ hg robustcheckout http://localhost:$HGPORT/repo0 ambiguous --revision abcdef0123456
+  ensuring http://localhost:$HGPORT/repo0@abcdef0123456 is available at ambiguous
+  (sharing from existing pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
+  searching for changes
+  no changes found
+  abort: --revision argument is ambiguous
+  (must be the first 12+ characters of a SHA-1 fragment)
+  [255]
