@@ -1,0 +1,136 @@
+#!/usr/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# There is a race condition between starting Zookeeper and Kafka at
+# the same time. This script exists to delay the start of Kafka until
+# Zookeeper is ready.
+
+from __future__ import absolute_import, unicode_literals
+
+import os
+import socket
+import time
+
+def send_zk_command(host, port, command):
+    """Send a ZooKeeper 4 letter command to a host:port."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(5.0)
+    s.connect((host, int(port)))
+    result = []
+    try:
+        s.sendall(command)
+        s.shutdown(socket.SHUT_WR)
+
+        while True:
+            data = s.recv(4096)
+            if not data:
+                break
+            result.append(data)
+    finally:
+        s.close()
+
+    return ''.join(result)
+
+
+with open('/kafka-servers', 'rb') as fh:
+    lines = fh.read().splitlines()
+
+servers = lines[3:]
+hostnames = [s.split(':')[0] for s in servers]
+
+timeout = 20.0
+start = time.time()
+
+# Do one pass until all sockets start listening.
+for hostname in hostnames:
+    while True:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(1.0)
+            s.connect((hostname, 2181))
+            break
+        except socket.error:
+            if time.time() - start > timeout:
+                raise Exception('timeout reached waiting for ZooKeeper socket')
+
+            time.sleep(0.1)
+
+# Do another pass to query cluster state.
+for hostname in hostnames:
+    while True:
+        try:
+            res = send_zk_command(hostname, 2181, 'ruok')
+            if res == 'imok':
+                break
+        except Exception:
+            if time.time() - start > timeout:
+                raise Exception('timeout')
+            time.sleep(0.1)
+
+    while True:
+        try:
+            res = send_zk_command(hostname, 2181, 'isro')
+            if res == 'rw':
+                break
+        except Exception:
+            if time.time() - start > timeout:
+                raise Exception('timeout')
+            time.sleep(0.1)
+
+# And wait until all followers are present.
+for hostname in hostnames:
+    while True:
+        try:
+            res = send_zk_command(hostname, 2181, 'mntr').rstrip()
+            attrs = {}
+            for line in res.splitlines():
+                k, v = line.split('\t')
+
+                if k not in ('zk_version', 'zk_server_state'):
+                    v = int(v)
+
+                attrs[k] = v
+
+            if attrs['zk_server_state'] != 'leader':
+                break
+
+            if attrs['zk_followers'] == len(hostnames) - 1:
+                break
+
+            raise Exception('expected followers count wrong')
+
+        except Exception:
+            if time.time() - start > timeout:
+                raise Exception('timeout')
+
+            time.sleep(0.1)
+
+command = [
+    '/usr/bin/java',
+    '-Xmx1G',
+    '-Xms1G',
+    '-server',
+    '-XX:+UseParNewGC',
+    '-XX:+UseConcMarkSweepGC',
+    '-XX:+CMSClassUnloadingEnabled',
+    '-XX:+CMSScavengeBeforeRemark',
+    '-XX:+DisableExplicitGC',
+    '-Djava.awt.headless=true',
+    '-Xloggc:/var/log/kafka/server-gc.log',
+    '-verbose:gc',
+    '-XX:+PrintGCDetails',
+    '-XX:+PrintGCDateStamps',
+    '-XX:+PrintGCTimeStamps',
+    '-Dcom.sun.management.jmxremote',
+    '-Dcom.sun.management.jmxremote.authenticate=false',
+    '-Dcom.sun.management.jmxremote.ssl=false',
+    '-Dlog4j.configuration=file:/etc/kafka/log4j.properties',
+    '-cp',
+    ':/opt/kafka/libs/jopt-simple-3.2.jar:/opt/kafka/libs/kafka_2.10-0.8.2.2.jar:/opt/kafka/libs/kafka_2.10-0.8.2.2-javadoc.jar:/opt/kafka/libs/kafka_2.10-0.8.2.2-scaladoc.jar:/opt/kafka/libs/kafka_2.10-0.8.2.2-sources.jar:/opt/kafka/libs/kafka_2.10-0.8.2.2-test.jar:/opt/kafka/libs/kafka-clients-0.8.2.2.jar:/opt/kafka/libs/log4j-1.2.16.jar:/opt/kafka/libs/lz4-1.2.0.jar:/opt/kafka/libs/metrics-core-2.2.0.jar:/opt/kafka/libs/scala-library-2.10.4.jar:/opt/kafka/libs/slf4j-api-1.7.6.jar:/opt/kafka/libs/slf4j-log4j12-1.6.1.jar:/opt/kafka/libs/snappy-java-1.1.1.6.jar:/opt/kafka/libs/zkclient-0.3.jar:/opt/kafka/libs/zookeeper-3.4.6.jar:/opt/kafka/core/build/libs/kafka_2.10*.jar',
+    'kafka.Kafka',
+    '/etc/kafka/server.properties',
+]
+
+os.execl(command[0], *command)

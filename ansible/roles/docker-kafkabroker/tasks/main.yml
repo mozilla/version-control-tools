@@ -8,3 +8,4 @@
   with_items:
     - entrypoint-kafkabroker
     - set-kafka-servers
+    - start-kafka
