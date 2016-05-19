@@ -53,6 +53,7 @@ with open(zoo_cfg, 'rb') as fh:
 for i, server in enumerate(servers):
     line = 'server.%d=%s' % (i, server)
     lines.append(line.encode('utf-8'))
+lines.append(b'')
 
 with open(zoo_cfg, 'wb') as fh:
     fh.write(b'\n'.join(lines))
@@ -88,6 +89,7 @@ hostports = ['%s:2181/hgmoreplication' % h for h in hostnames]
 connect = ','.join(hostports)
 connect = connect.encode('utf-8')
 lines.append(b'zookeeper.connect=' + connect)
+lines.append(b'')
 
 with open(server_properties, 'wb') as fh:
     fh.write(b'\n'.join(lines))
