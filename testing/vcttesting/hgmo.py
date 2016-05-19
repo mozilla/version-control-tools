@@ -214,11 +214,10 @@ class HgCluster(object):
 
         with futures.ThreadPoolExecutor(web_count + 1) as e:
             for s in all_states:
-                host, port = self._d._get_host_hostname_port(s, '9092/tcp')
                 command = [
                     '/set-kafka-servers',
-                    host,
-                    str(port),
+                    s['NetworkSettings']['IPAddress'],
+                    '9092',
                     ','.join(web_hostnames),
                 ] + zookeeper_hostports
                 e.submit(self._d.execute, s['Id'], command)
