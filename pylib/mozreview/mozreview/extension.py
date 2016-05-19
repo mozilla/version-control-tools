@@ -280,7 +280,8 @@ class MozReviewExtension(Extension):
         TemplateHook(self, 'base-after-content',
                      'mozreview/repository.html')
         TemplateHook(self, 'base-after-content',
-                     'mozreview/user_review_flag.html')
+                     'mozreview/user_review_flag.html',
+                     apply_to=review_request_url_names)
 
         ReviewRequestFieldsHook(self, 'main', [CommitsListField])
         # This forces the Commits field to be the top item.
