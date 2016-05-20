@@ -655,8 +655,8 @@ def configure_command(args):
     # Not all environments invoke `git` with the user's custom PATH. e.g.
     # Xcode. To avoid issues where the environment does have the PATH
     # set properly, encode the full path to `git-mozreview` in the hook.
-    source_content = re.sub('^git mozreview', __file__, source_content,
-                            flags=re.MULTILINE)
+    source_content = re.sub('^git mozreview', __file__.replace('\\', '/'),
+                            source_content, flags=re.MULTILINE)
 
     if os.path.exists(dest_hook):
         with open(dest_hook, 'rb') as fh:
