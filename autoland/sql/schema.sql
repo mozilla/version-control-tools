@@ -10,6 +10,7 @@ create table Transplant (
     landed boolean,
     result text,
     last_updated timestamp,
+    created timestamp not null default current_timestamp,
     primary key(id)
 );
 grant all privileges on table Transplant to autoland;

@@ -38,10 +38,11 @@ def handle_pending_transplants(logger, dbconn):
     cursor = dbconn.cursor()
     now = datetime.datetime.now()
     query = """
-        select id, destination, request
-        from Transplant
-        where landed is null and (last_updated is null
-            or last_updated<=%(time)s)
+        SELECT id, destination, request
+        FROM Transplant
+        WHERE landed IS NULL
+              AND (last_updated IS NULL OR last_updated<=%(time)s)
+        ORDER BY created
     """
     transplant_retry_delay = TRANSPLANT_RETRY_DELAY
     if config.testing():
