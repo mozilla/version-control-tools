@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import argparse
-import bugsy
 import config
 import datetime
 import json
@@ -13,9 +12,10 @@ import time
 import traceback
 
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.normpath(
-                os.path.abspath(os.path.dirname(__file__))), '..', '..',
-                'pylib', 'mozautomation')))
-from mozautomation.commitparser import parse_bugs
+                os.path.abspath(os.path.dirname(__file__))), '..',
+                                                             '..',
+                                                             'pylib',
+                                                             'mozautomation')))
 
 import transplant
 import treestatus
@@ -92,8 +92,8 @@ def handle_pending_transplants(logger, dbconn):
         push_bookmark = request.get('push_bookmark', '')
         pingback_url = request.get('pingback_url', '')
         commit_descriptions = request.get('commit_descriptions')
-        tree_open = current_treestatus.setdefault(destination,
-                                                  treestatus.tree_is_open(destination))
+        tree_open = current_treestatus.setdefault(
+            destination, treestatus.tree_is_open(destination))
 
         if not tree_open:
             handle_treeclosed(transplant_id, tree, rev, destination,
@@ -249,6 +249,7 @@ def handle_pending_mozreview_updates(logger, dbconn):
 
     return all_posted
 
+
 def get_dbconn(dsn):
     dbconn = None
     while not dbconn:
@@ -272,7 +273,8 @@ def main():
 
     logging.basicConfig(filename=args.log_path,
                         filemode='a',
-                        format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                        format='%(asctime)s,%(msecs)d %(name)s '
+                               '%(levelname)s %(message)s',
                         datefmt='%H:%M:%S',
                         level=logging.DEBUG)
     logger = logging.getLogger('autoland')

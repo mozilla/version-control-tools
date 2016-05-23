@@ -2,7 +2,6 @@
 import config
 import json
 import logging
-import os
 import psycopg2
 import urlparse
 
@@ -69,7 +68,7 @@ def autoland():
 
     for field in ['ldap_username', 'tree', 'rev', 'destination',
                   'pingback_url']:
-        if not field in request.json:
+        if field not in request.json:
             error = 'Bad request: missing json field: %s' % field
             return make_response(jsonify({'error': error}), 400)
 
@@ -164,7 +163,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8000,
                         help='Port on which to listen')
-    commandline.add_logging_group(parser)
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO)
