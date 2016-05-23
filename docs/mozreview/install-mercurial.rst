@@ -107,7 +107,7 @@ to configure a review path/remote for each clone: you simply define an
 alias to the ``autoreview`` repository in your global Mercurial
 configuration file and it should *just work*.
 
-Using ``hg config -e -g`` to edit your global Mercurial configuration
+Using ``hg config -e`` to edit your global Mercurial configuration
 file, add an entry under the ``[paths]`` section like so (be sure to use
 the appropriate HTTP or SSH URL depending on what you have configured)::
 
