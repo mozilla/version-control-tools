@@ -20,13 +20,16 @@ class LDAP(object):
             self.c.simple_bind_s(username, password)
 
     def create_user(self, email, username, uid, fullname,
-                         key_filename=None, scm_level=None,
-                         hg_access=True, hg_enabled=True):
+                    key_filename=None, scm_level=None, hg_access=True,
+                    hg_enabled=True, bugzilla_email=None):
         """Create a new user in LDAP.
 
         The user has an ``email`` address, a full ``name``, a
         ``username`` (for system accounts) and a numeric ``uid``.
         """
+
+        if not bugzilla_email:
+            bugzilla_email = email
 
         dn = 'mail=%s,o=com,dc=mozilla' % email
 
@@ -36,6 +39,7 @@ class LDAP(object):
                 b'organizationalPerson',
                 b'person',
                 b'posixAccount',
+                b'bugzillaAccount',
                 b'top',
             ]),
             (b'cn', [fullname]),
@@ -44,6 +48,7 @@ class LDAP(object):
             (b'sn', [fullname.split()[-1]]),
             (b'uid', [username]),
             (b'uidNumber', [str(uid)]),
+            (b'bugzillaEmail', [bugzilla_email]),
         ]
 
         if hg_access:
@@ -92,6 +97,20 @@ class LDAP(object):
                 res['ldap_groups'].add(group)
 
         return res
+
+    def delete_user(self, email):
+        """ Deletes the specified user from LDAP. """
+
+        # Remove from all groups.
+        results = self.c.search_s(
+            'ou=groups,dc=mozilla', ldap.SCOPE_SUBTREE,
+            '(memberUid=%s)' % email, [b'cn'])
+        for result in results:
+            self.c.modify_s(result[0],
+                            [(ldap.MOD_DELETE, b'memberUid', email)])
+
+        # Delete the user entry.
+        self.c.delete_s('mail=%s,o=com,dc=mozilla' % email)
 
     def create_vcs_sync_login(self, pubkey):
         dn = 'uid=vcs-sync,ou=logins,dc=mozilla'

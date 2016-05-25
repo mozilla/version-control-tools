@@ -264,6 +264,75 @@ Specifying a valid username and API Key will associate LDAP account
   $ rbmanage dump-user-ldap user3
   ldap username: user3@example.com
 
+Create another user
+
+  $ mozreview create-user user4@example.com user4password 'User Four [:user4]' --uid 2003 --scm-level 1
+  Created user 9
+
+Dump the user so it gets mirrored over to Review Board
+
+  $ rbmanage dump-user user4 > /dev/null
+
+The user should not have an ldap username associated with them
+
+  $ rbmanage dump-user-ldap user4
+  no ldap username associated with user4
+
+Trigger automatic association
+
+  $ rbmanage associate-employee-ldap --email user4@example.com
+  user4@example.com associated with user4@example.com
+
+The user should now have an associated ldap_username with appropriate logs
+
+  $ rbmanage dump-user-ldap user4
+  ldap username: user4@example.com
+  $ mozreview exec rbweb grep -i ldap /reviewboard/logs/reviewboard.log | tail -n 1
+  ????-??-?? ??:??:??,??? - INFO -  - Associating user: user4@example.com with ldap_username: user4@example.com (glob)
+
+Create another user, where their username is different from their Bugzilla address
+
+  $ mozreview create-user user5@example.com user5password 'User Five [:user5]' --uid 2004 --scm-level 1
+  Created user 10
+  $ rbmanage dump-user user5 > /dev/null
+  $ mozreview delete-ldap-user user5@example.com
+  $ mozreview create-ldap-user me@example.org user5 2004 'User Five [:user5]' --scm-level 1 --bugzilla-email=user5@example.com
+
+Trigger automatic association
+
+  $ rbmanage associate-employee-ldap --email user5@example.com
+  user5@example.com associated with me@example.org
+  $ mozreview exec rbweb grep -i ldap /reviewboard/logs/reviewboard.log | tail -n 1
+  ????-??-?? ??:??:??,??? - INFO -  - Associating user: user5@example.com with ldap_username: me@example.org (glob)
+
+Update Bugzilla address and reassociate
+
+  $ mozreview delete-ldap-user me@example.org
+  $ mozreview create-ldap-user you@example.org user5 2004 'User Five [:user5]' --scm-level 1 --bugzilla-email=user5@example.com
+  $ rbmanage associate-employee-ldap --email user5@example.com
+  user5@example.com associated with you@example.org
+  $ mozreview exec rbweb grep -i ldap /reviewboard/logs/reviewboard.log | tail -n 1
+  ????-??-?? ??:??:??,??? - INFO -  - Existing ldap association 'me@example.org' replaced by 'you@example.org' (glob)
+
+Create two users with the same Bugzilla address
+
+  $ mozreview create-user user6@example.com user6password 'User Six [:user6]' --uid 2005 --scm-level 1 --bugzilla-email conflict@example.com
+  Created user 11
+  $ mozreview create-user conflict@example.com conflictpassword 'Conflict [:conflict]' --uid 2006 --scm-level 1
+  Created user 12
+
+Dump the users so they are mirrored over to Review Board
+
+  $ rbmanage dump-user user6 > /dev/null
+  $ rbmanage dump-user conflict > /dev/null
+
+Trigger automatic association and check the logs
+
+  $ rbmanage associate-employee-ldap --email conflict@example.com
+  LDAP association failed.
+  $ mozreview exec rbweb grep -i ldap /reviewboard/logs/reviewboard.log | tail -n 1
+  ????-??-?? ??:??:??,??? - INFO -  - Could not update ldap association: More than one match for conflict@example.com (glob)
+
 Cleanup
 
   $ mozreview stop

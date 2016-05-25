@@ -214,13 +214,16 @@ class MozReviewCommands(object):
                      help='Source code access level to grant to user')
     @CommandArgument('--bugzilla-group', action='append',
                      help='Bugzilla group to add user to.')
+    @CommandArgument('--bugzilla-email',
+                     help='Use the specified email address as the '
+                          'bugzillaEmail attribute in LDAP')
     @CommandArgument('--no-api-key', action='store_true',
                      help='Do not create an API key for this user.')
     @CommandArgument('--print-api-key', action='store_true',
                      help='Print the created API key')
     def create_user(self, where, email, password, fullname, uid=None,
                     username=None, key_file=None, scm_level=None,
-                    bugzilla_group=None, no_api_key=False,
+                    bugzilla_group=None, no_api_key=False, bugzilla_email=None,
                     print_api_key=False):
         mr = self._get_mozreview(where)
         u = mr.create_user(email, password, fullname,
@@ -229,6 +232,7 @@ class MozReviewCommands(object):
                            key_filename=key_file,
                            scm_level=scm_level,
                            bugzilla_groups=bugzilla_group,
+                           bugzilla_email=bugzilla_email,
                            api_key=not no_api_key)
         print('Created user %s' % u['bugzilla']['id'])
 
@@ -251,11 +255,25 @@ class MozReviewCommands(object):
                      help='Path to SSH key to use or create (if missing)')
     @CommandArgument('--scm-level', type=int, choices=(1, 2, 3),
                      help='Source code level access to grant to the user')
+    @CommandArgument('--bugzilla-email',
+                     help='Use the specified email address as the '
+                          'bugzillaEmail attribute in LDAP')
     def create_ldap_user(self, where, email, username, uid, fullname,
-                         key_file=None, scm_level=None):
+                         key_file=None, scm_level=None, bugzilla_email=None):
         mr = self._get_mozreview(where)
         mr.get_ldap().create_user(email, username, uid, fullname,
-                                  key_filename=key_file, scm_level=scm_level)
+                                  key_filename=key_file, scm_level=scm_level,
+                                  bugzilla_email=bugzilla_email)
+
+    @Command('delete-ldap-user', category='mozreview',
+             description='Delete the user from the LDAP server')
+    @CommandArgument('where', nargs='?',
+                     help='Directory of MozReview instance')
+    @CommandArgument('email',
+                     help='Email address associated with user')
+    def delete_ldap_user(self, where, email):
+        mr = self._get_mozreview(where)
+        mr.get_ldap().delete_user(email)
 
     @Command('create-api-key', category='mozreview',
              description='Create a Bugzilla API key for a user')

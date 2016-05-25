@@ -576,8 +576,8 @@ class MozReview(object):
         return api_key
 
     def create_user(self, email, password, fullname, bugzilla_groups=None,
-                    uid=None, username=None, key_filename=None,
-                    scm_level=None, api_key=True):
+                    uid=None, username=None, key_filename=None, scm_level=None,
+                    api_key=True, bugzilla_email=None):
         """Create a new user.
 
         This will create a user in at least Bugzilla. If the ``uid`` argument
@@ -599,6 +599,8 @@ class MozReview(object):
         ``scm_level`` defines the source code level access to grant to this
         user. Supported levels are ``1``, ``2``, and ``3``. If not specified,
         the user won't be able to push to any repos.
+        ``bugzilla_email`` set the bugzillaEmail LDAP attribute to this instead
+        of ``email``.
         """
         bugzilla_groups = bugzilla_groups or []
 
@@ -626,7 +628,8 @@ class MozReview(object):
             lr = self.get_ldap().create_user(email, username, uid,
                                              fullname,
                                              key_filename=key_filename,
-                                             scm_level=scm_level)
+                                             scm_level=scm_level,
+                                             bugzilla_email=bugzilla_email)
 
             res.update(lr)
 
