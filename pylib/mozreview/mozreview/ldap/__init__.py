@@ -1,13 +1,19 @@
 from __future__ import unicode_literals
 
 import logging
-
 import ldap
-from reviewboard.extensions.base import get_extension_manager
+
+from reviewboard.extensions.base import (
+    get_extension_manager,
+)
 
 
 LDAP_QUERY_TIMEOUT = 5
 logger = logging.getLogger(__name__)
+
+
+class LDAPAssociationException(Exception):
+    pass
 
 
 def get_ldap_connection():
@@ -96,3 +102,44 @@ def find_employee_ldap(address, ldap_connection=None):
     except ldap.LDAPError:
         logger.exception('Failed to query ldap for employee address')
         return None
+
+
+def associate_employee_ldap(user, ldap_connection=None):
+    """Assoicate the user if we find them in the employee LDAP scope.
+
+    For the given user object, find a matching Mozilla employee's
+    LDAP address (both the mail and bugzillaEmail LDAP attributes will be
+    checked), and associate the user to LDAP.
+
+    Raises an exception if no matches or multiple matches were found.
+    Returns the found LDAP username, and a boolean indicating if the user
+    was updated.
+    """
+
+    from mozreview.models import get_profile
+    ldap_users = find_employee_ldap(user.email, ldap_connection)
+
+    if not ldap_users:
+        raise LDAPAssociationException(
+            'Failed to find match for %s' % user.email)
+
+    if len(ldap_users) > 1:
+        raise LDAPAssociationException(
+            'More than one match for %s' % user.email)
+
+    ldap_username = ldap_users[0]
+    updated = False
+    mozreview_profile = get_profile(user)
+    if mozreview_profile.ldap_username != ldap_username:
+        if mozreview_profile.ldap_username:
+            logging.info("Existing ldap association '%s' replaced by '%s'"
+                         % (mozreview_profile.ldap_username, ldap_username))
+        else:
+            logging.info('Associating user: %s with ldap_username: %s'
+                         % (user.email, ldap_username))
+
+        mozreview_profile.ldap_username = ldap_username
+        mozreview_profile.save()
+        updated = True
+
+    return ldap_username, updated

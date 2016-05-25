@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User
 from django.utils import six
 from djblets.webapi.decorators import (webapi_login_required,
                                        webapi_request_fields,
@@ -13,7 +14,15 @@ from djblets.webapi.errors import (DOES_NOT_EXIST,
 from reviewboard.webapi.resources import resources, WebAPIResource
 from reviewboard.webapi.resources.user import UserResource
 
-from mozreview.models import get_profile
+from mozreview.ldap import (
+    associate_employee_ldap,
+    get_ldap_connection,
+    LDAPAssociationException,
+)
+from mozreview.models import (
+    get_profile,
+    MozReviewUserProfile,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -164,5 +173,103 @@ class LDAPAssociationResource(WebAPIResource):
 
         return 200, self.create_item_payload(request, user, mozreview_profile)
 
-
 ldap_association_resource = LDAPAssociationResource()
+
+
+class EmployeeLDAPAssociationResource(WebAPIResource):
+    """Resource for updating ldap usernames for all users.
+
+    If a Review Board user's email address is provided via the email
+    field, then only that user will be updated.  Without an email
+    field all users will be updated.
+
+    Updating a user involves searching Mozilla employee's LDAP entries for
+    those that match exactly either the 'mail' or 'bugzillaEmail' attributes.
+    When a single match is found, the association between Review Board and
+    LDAP is created or updated.
+    """
+
+    name = 'employee_ldap_association'
+    allowed_methods = ('GET', 'POST',)
+
+    def has_access_permissions(self, request, *args, **kwargs):
+        return request.user.is_authenticated() and (
+            request.user.has_perm('mozreview.modify_ldap_association'))
+
+    def has_list_access_permissions(self, request, *args, **kwargs):
+        return request.user.is_authenticated() and (
+            request.user.has_perm('mozreview.modify_ldap_association'))
+
+    @webapi_login_required
+    @webapi_response_errors(NOT_LOGGED_IN, PERMISSION_DENIED, DOES_NOT_EXIST)
+    @webapi_request_fields(
+        optional={
+            'email': {
+                'type': six.text_type,
+                'description': 'Only update this user instead of all users.',
+            }
+        }
+    )
+    def create(self, request, email='', *args, **kwargs):
+        if not request.user.has_perm('mozreview.modify_ldap_association'):
+            logger.info('Could not update ldap association: permission '
+                        'denied for user: %s' % (request.user.id))
+            return PERMISSION_DENIED
+
+        ldap_connection = get_ldap_connection()
+        if not ldap_connection:
+            raise Exception('Failed to connect to LDAP')
+
+        result = {
+            'links': self.get_links(self.list_child_resources,
+                                    obj=True, request=request),
+            'updated': 0,
+            'skipped': 0,
+            'errors': 0,
+        }
+
+        if email:
+            verbose_logging = True
+            try:
+                user_ids = [User.objects.get(email=email).id]
+            except ObjectDoesNotExist:
+                logger.info('Could not update ldap association: target user '
+                            '%s does not exist.' % email)
+                return DOES_NOT_EXIST
+
+        else:
+            # This is designed to be run from cron, so there's minimal logging
+            # and results.
+            verbose_logging = False
+            user_ids = MozReviewUserProfile.objects.values_list('user_id',
+                                                                flat=True)
+
+        for user_id in user_ids:
+            try:
+                user = User.objects.get(id=user_id)
+                ldap_username, updated = associate_employee_ldap(
+                    user, ldap_connection)
+
+                # When called for a single user, return the ldap_username.
+                if email:
+                    result['ldap_username'] = [ldap_username]
+
+                if updated:
+                    result['updated'] = result['updated'] + 1
+
+                else:
+                    result['skipped'] = result['skipped'] + 1
+                    if verbose_logging:
+                        logging.info(
+                            'Associating user: %s already associated with '
+                            'ldap_username: %s' % (user.email, ldap_username))
+
+            except LDAPAssociationException as e:
+                result['errors'] = result['errors'] + 1
+                if verbose_logging:
+                    logger.info('Could not update ldap association: %s'
+                                % str(e))
+
+        return 200, result
+
+employee_ldap_association_resource = EmployeeLDAPAssociationResource()

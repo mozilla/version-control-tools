@@ -64,6 +64,7 @@ from mozreview.hostingservice.hmo_repository import (
     HMORepository,
 )
 from mozreview.ldap.resources import (
+    employee_ldap_association_resource,
     ldap_association_resource,
 )
 from mozreview.middleware import (
@@ -186,6 +187,7 @@ class MozReviewExtension(Extension):
         bugzilla_api_key_login_resource,
         commit_data_resource,
         commit_rewrite_resource,
+        employee_ldap_association_resource,
         ensure_drafts_resource,
         file_diff_reviewer_resource,
         ldap_association_resource,
