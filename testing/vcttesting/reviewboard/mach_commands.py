@@ -644,6 +644,53 @@ class ReviewBoardCommands(object):
 
         print('%s associated with %s' % (email, username))
 
+    @Command('associate-employee-ldap', category='reviewboard',
+             description='Associate LDAP for Mozilla employees.')
+    @CommandArgument('--request-username',
+                     default='mozreview',
+                     help='Username to make request with')
+    @CommandArgument('--request-password',
+                     default='mrpassword',
+                     help='Password to make request with')
+    @CommandArgument('--email',
+                     default='',
+                     help='LDAP email to associate')
+    def associate_employee_ldap(self, email,
+                                request_username, request_password):
+        from rbtools.api.errors import APIError
+
+        # We use the "mozreview" account by default which has the special
+        # permission to read / associate ldap email addresses.
+        root = self._get_root(username=request_username,
+                              password=request_password)
+        ext = root.get_extension(
+            extension_name='mozreview.extension.MozReviewExtension')
+
+        try:
+            assoc = ext.get_employee_ldap_associations()
+            r = assoc.create(email=email)
+
+            if email:
+                if r['errors']:
+                    print('LDAP association failed.')
+                elif r['updated']:
+                    print('%s associated with %s'
+                          % (email, r['ldap_username'][0]))
+                else:
+                    print('%s already associated with %s'
+                          % (email, r['ldap_username'][0]))
+
+            else:
+                print('updated: %s\nskipped: %s\nerrors: %s' %
+                      (r['updated'], r['skipped'], r['errors']))
+
+        except APIError as e:
+            if e.rsp:
+                print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
+                      e.rsp['err']['msg']))
+            else:
+                print('API Error: %s' % e.http_status)
+
     @Command('dump-autoland-requests', category='reviewboard',
              description='Dump the table of autoland requests.')
     def dump_autoland_requests(self):
