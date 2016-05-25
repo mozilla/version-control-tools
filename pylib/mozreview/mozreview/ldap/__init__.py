@@ -46,7 +46,7 @@ def query_scm_group(username, group):
     failed to actually query ldap for the group membership.
     """
     logger.info('Querying ldap group association: %s in %s' % (
-                 username, group))
+                username, group))
     l = get_ldap_connection()
 
     if not l:
@@ -66,3 +66,33 @@ def query_scm_group(username, group):
     except ldap.LDAPError as e:
         logger.error('Failed to query ldap for group membership: %s' % e)
         return False
+
+
+def find_employee_ldap(address, ldap_connection=None):
+    """Find matching Mozilla employees.
+
+    For the given email address, return a matching Mozilla employee's
+    LDAP address (if found).  Both the mail and bugzillaEmail LDAP
+    attributes will be checked.
+    """
+
+    try:
+        if not ldap_connection:
+            ldap_connection = get_ldap_connection()
+
+        escaped = ldap.filter.escape_filter_chars(address)
+        results = ldap_connection.search_ext_s(
+            'o=com,dc=mozilla',
+            ldap.SCOPE_SUBTREE,
+            '(|(bugzillaEmail=%s)(mail=%s))' % (escaped, escaped),
+            [b'mail'],
+            timeout=LDAP_QUERY_TIMEOUT)
+
+        matches = []
+        for result in results:
+            matches.append(result[1]['mail'][0])
+
+        return matches
+    except ldap.LDAPError:
+        logger.exception('Failed to query ldap for employee address')
+        return None
