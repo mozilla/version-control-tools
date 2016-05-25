@@ -64,13 +64,13 @@ Publishing the review will add an attachment to the bug
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 1'
+      description: Bug 1 - Foo 1
       file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 1'
+      summary: Bug 1 - Foo 1
     blocks: []
     cc: []
     comments:
@@ -83,7 +83,7 @@ Publishing the review will add an attachment to the bug
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -128,13 +128,13 @@ published.
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 1'
+      description: Bug 1 - Foo 1
       file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 1'
+      summary: Bug 1 - Foo 1
     blocks: []
     cc: []
     comments:
@@ -147,7 +147,7 @@ published.
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -156,7 +156,7 @@ published.
       tags: []
       text:
       - Comment on attachment 1
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/1-2/'
     component: TestComponent
@@ -181,7 +181,7 @@ can happen if a reviewer is manually added (see Bug 1229789).
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 1'
+      description: Bug 1 - Foo 1
       file_name: reviewboard-2-url.txt
       flags:
       - id: 1
@@ -192,7 +192,7 @@ can happen if a reviewer is manually added (see Bug 1229789).
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 1'
+      summary: Bug 1 - Foo 1
     blocks: []
     cc:
     - reviewer@example.com
@@ -206,7 +206,7 @@ can happen if a reviewer is manually added (see Bug 1229789).
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -215,7 +215,7 @@ can happen if a reviewer is manually added (see Bug 1229789).
       tags: []
       text:
       - Comment on attachment 1
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/1-2/'
     component: TestComponent
@@ -225,6 +225,71 @@ can happen if a reviewer is manually added (see Bug 1229789).
     resolution: ''
     status: NEW
     summary: bug1
+
+Ensure r? in the commit description sets a review flag when pushing
+
+  $ echo foo2 > foo
+  $ hg commit -m 'Bug 2 - Foo 1 r?reviewer'
+  $ hg push --config reviewboard.autopublish=true -c .
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+  submitting 1 changesets for review
+  
+  changeset:  2:b1aa746bcb39
+  summary:    Bug 2 - Foo 1 r?reviewer
+  review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
+  
+  review id:  bz://2/mynick
+  review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
+  (published review request 3)
+
+  $ bugzilla dump-bug 2
+  Bug 2:
+    attachments:
+    - attacher: default@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
+      description: Bug 2 - Foo 1 r?reviewer
+      file_name: reviewboard-4-url.txt
+      flags:
+      - id: 2
+        name: review
+        requestee: reviewer@example.com
+        setter: default@example.com
+        status: '?'
+      id: 2
+      is_obsolete: false
+      is_patch: false
+      summary: Bug 2 - Foo 1 r?reviewer
+    blocks: []
+    cc:
+    - reviewer@example.com
+    comments:
+    - author: default@example.com
+      id: 2
+      tags: []
+      text: ''
+    - author: default@example.com
+      id: 5
+      tags: []
+      text:
+      - Created attachment 2
+      - Bug 2 - Foo 1 r?reviewer
+      - ''
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: NEW
+    summary: bug2
 
   $ mozreview stop
   stopped 9 containers

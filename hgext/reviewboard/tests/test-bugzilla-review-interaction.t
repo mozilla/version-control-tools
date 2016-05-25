@@ -41,7 +41,7 @@ Adding a reviewer should result in a r? flag being set
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      description: Bug 1 - Initial commit to review
       file_name: reviewboard-2-url.txt
       flags:
       - id: 1
@@ -52,7 +52,7 @@ Adding a reviewer should result in a r? flag being set
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: Bug 1 - Initial commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -66,7 +66,7 @@ Adding a reviewer should result in a r? flag being set
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -90,7 +90,7 @@ Adding a r+ review will grant a '+' review flag on bugzilla
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      description: Bug 1 - Initial commit to review
       file_name: reviewboard-2-url.txt
       flags:
       - id: 1
@@ -101,7 +101,7 @@ Adding a r+ review will grant a '+' review flag on bugzilla
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: Bug 1 - Initial commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -115,7 +115,7 @@ Adding a r+ review will grant a '+' review flag on bugzilla
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -124,7 +124,7 @@ Adding a r+ review will grant a '+' review flag on bugzilla
       tags: []
       text:
       - Comment on attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
@@ -149,7 +149,7 @@ Adding a reply to the review will add a comment to Bugzilla
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      description: Bug 1 - Initial commit to review
       file_name: reviewboard-2-url.txt
       flags:
       - id: 1
@@ -160,7 +160,7 @@ Adding a reply to the review will add a comment to Bugzilla
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: Bug 1 - Initial commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -174,7 +174,7 @@ Adding a reply to the review will add a comment to Bugzilla
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -183,7 +183,7 @@ Adding a reply to the review will add a comment to Bugzilla
       tags: []
       text:
       - Comment on attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
@@ -230,7 +230,7 @@ in the tests.
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
-      description: 'MozReview Request: Bug 2 - Multiple reviewers'
+      description: Bug 2 - Multiple reviewers
       file_name: reviewboard-4-url.txt
       flags:
       - id: 2
@@ -246,7 +246,7 @@ in the tests.
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 2 - Multiple reviewers'
+      summary: Bug 2 - Multiple reviewers
     blocks: []
     cc:
     - reviewer2@example.com
@@ -261,7 +261,7 @@ in the tests.
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 2 - Multiple reviewers'
+      - Bug 2 - Multiple reviewers
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
@@ -288,7 +288,7 @@ Removing a reviewer should remove their review flag
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
-      description: 'MozReview Request: Bug 2 - Multiple reviewers'
+      description: Bug 2 - Multiple reviewers
       file_name: reviewboard-4-url.txt
       flags:
       - id: 3
@@ -299,7 +299,7 @@ Removing a reviewer should remove their review flag
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 2 - Multiple reviewers'
+      summary: Bug 2 - Multiple reviewers
     blocks: []
     cc:
     - reviewer2@example.com
@@ -314,7 +314,7 @@ Removing a reviewer should remove their review flag
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 2 - Multiple reviewers'
+      - Bug 2 - Multiple reviewers
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
@@ -341,13 +341,13 @@ Removing all reviewers should remove all flags
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
-      description: 'MozReview Request: Bug 2 - Multiple reviewers'
+      description: Bug 2 - Multiple reviewers
       file_name: reviewboard-4-url.txt
       flags: []
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 2 - Multiple reviewers'
+      summary: Bug 2 - Multiple reviewers
     blocks: []
     cc:
     - reviewer2@example.com
@@ -362,7 +362,7 @@ Removing all reviewers should remove all flags
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 2 - Multiple reviewers'
+      - Bug 2 - Multiple reviewers
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
@@ -401,7 +401,7 @@ review? sticks around when 1 person grants review
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header
-      description: 'MozReview Request: Bug 3 - More multiple reviewers'
+      description: Bug 3 - More multiple reviewers
       file_name: reviewboard-6-url.txt
       flags:
       - id: 4
@@ -417,7 +417,7 @@ review? sticks around when 1 person grants review
       id: 3
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 3 - More multiple reviewers'
+      summary: Bug 3 - More multiple reviewers
     blocks: []
     cc:
     - reviewer2@example.com
@@ -432,7 +432,7 @@ review? sticks around when 1 person grants review
       tags: []
       text:
       - Created attachment 3
-      - 'MozReview Request: Bug 3 - More multiple reviewers'
+      - Bug 3 - More multiple reviewers
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
@@ -441,7 +441,7 @@ review? sticks around when 1 person grants review
       tags: []
       text:
       - Comment on attachment 3
-      - 'MozReview Request: Bug 3 - More multiple reviewers'
+      - Bug 3 - More multiple reviewers
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/6/#review3
       - ''
@@ -481,7 +481,7 @@ Random users can come along and grant review
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/8/diff/#index_header
-      description: 'MozReview Request: Bug 4 - Unrelated Reviewers'
+      description: Bug 4 - Unrelated Reviewers
       file_name: reviewboard-8-url.txt
       flags:
       - id: 6
@@ -497,7 +497,7 @@ Random users can come along and grant review
       id: 4
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 4 - Unrelated Reviewers'
+      summary: Bug 4 - Unrelated Reviewers
     blocks: []
     cc:
     - reviewer@example.com
@@ -511,7 +511,7 @@ Random users can come along and grant review
       tags: []
       text:
       - Created attachment 4
-      - 'MozReview Request: Bug 4 - Unrelated Reviewers'
+      - Bug 4 - Unrelated Reviewers
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/8/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/8/'
@@ -520,7 +520,7 @@ Random users can come along and grant review
       tags: []
       text:
       - Comment on attachment 4
-      - 'MozReview Request: Bug 4 - Unrelated Reviewers'
+      - Bug 4 - Unrelated Reviewers
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/8/#review4
       - ''
@@ -564,7 +564,7 @@ Test interaction with multiple commits.
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews'
+      description: Bug 5 - Parent reviews
       file_name: reviewboard-10-url.txt
       flags:
       - id: 8
@@ -580,11 +580,11 @@ Test interaction with multiple commits.
       id: 5
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews'
+      summary: Bug 5 - Parent reviews
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      description: Bug 5 - Parent reviews, second commit
       file_name: reviewboard-11-url.txt
       flags:
       - id: 10
@@ -600,11 +600,11 @@ Test interaction with multiple commits.
       id: 6
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      summary: Bug 5 - Parent reviews, second commit
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      description: Bug 5 - Parent reviews, third commit
       file_name: reviewboard-12-url.txt
       flags:
       - id: 12
@@ -620,7 +620,7 @@ Test interaction with multiple commits.
       id: 7
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      summary: Bug 5 - Parent reviews, third commit
     blocks: []
     cc:
     - reviewer2@example.com
@@ -635,7 +635,7 @@ Test interaction with multiple commits.
       tags: []
       text:
       - Created attachment 5
-      - 'MozReview Request: Bug 5 - Parent reviews'
+      - Bug 5 - Parent reviews
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
@@ -644,7 +644,7 @@ Test interaction with multiple commits.
       tags: []
       text:
       - Created attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - Bug 5 - Parent reviews, second commit
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
@@ -653,7 +653,7 @@ Test interaction with multiple commits.
       tags: []
       text:
       - Created attachment 7
-      - 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      - Bug 5 - Parent reviews, third commit
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
@@ -678,7 +678,7 @@ Verify that a single r+ affects only that attachment.
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews'
+      description: Bug 5 - Parent reviews
       file_name: reviewboard-10-url.txt
       flags:
       - id: 8
@@ -694,11 +694,11 @@ Verify that a single r+ affects only that attachment.
       id: 5
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews'
+      summary: Bug 5 - Parent reviews
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      description: Bug 5 - Parent reviews, second commit
       file_name: reviewboard-11-url.txt
       flags:
       - id: 10
@@ -714,11 +714,11 @@ Verify that a single r+ affects only that attachment.
       id: 6
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      summary: Bug 5 - Parent reviews, second commit
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      description: Bug 5 - Parent reviews, third commit
       file_name: reviewboard-12-url.txt
       flags:
       - id: 12
@@ -734,7 +734,7 @@ Verify that a single r+ affects only that attachment.
       id: 7
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      summary: Bug 5 - Parent reviews, third commit
     blocks: []
     cc:
     - reviewer2@example.com
@@ -749,7 +749,7 @@ Verify that a single r+ affects only that attachment.
       tags: []
       text:
       - Created attachment 5
-      - 'MozReview Request: Bug 5 - Parent reviews'
+      - Bug 5 - Parent reviews
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
@@ -758,7 +758,7 @@ Verify that a single r+ affects only that attachment.
       tags: []
       text:
       - Created attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - Bug 5 - Parent reviews, second commit
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
@@ -767,7 +767,7 @@ Verify that a single r+ affects only that attachment.
       tags: []
       text:
       - Created attachment 7
-      - 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      - Bug 5 - Parent reviews, third commit
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
@@ -776,7 +776,7 @@ Verify that a single r+ affects only that attachment.
       tags: []
       text:
       - Comment on attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - Bug 5 - Parent reviews, second commit
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review5
       - ''
@@ -806,7 +806,7 @@ A comment-only review shouldn't change the review flag.
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews'
+      description: Bug 5 - Parent reviews
       file_name: reviewboard-10-url.txt
       flags:
       - id: 8
@@ -822,11 +822,11 @@ A comment-only review shouldn't change the review flag.
       id: 5
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews'
+      summary: Bug 5 - Parent reviews
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      description: Bug 5 - Parent reviews, second commit
       file_name: reviewboard-11-url.txt
       flags:
       - id: 10
@@ -842,11 +842,11 @@ A comment-only review shouldn't change the review flag.
       id: 6
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      summary: Bug 5 - Parent reviews, second commit
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      description: Bug 5 - Parent reviews, third commit
       file_name: reviewboard-12-url.txt
       flags:
       - id: 12
@@ -862,7 +862,7 @@ A comment-only review shouldn't change the review flag.
       id: 7
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      summary: Bug 5 - Parent reviews, third commit
     blocks: []
     cc:
     - reviewer2@example.com
@@ -877,7 +877,7 @@ A comment-only review shouldn't change the review flag.
       tags: []
       text:
       - Created attachment 5
-      - 'MozReview Request: Bug 5 - Parent reviews'
+      - Bug 5 - Parent reviews
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
@@ -886,7 +886,7 @@ A comment-only review shouldn't change the review flag.
       tags: []
       text:
       - Created attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - Bug 5 - Parent reviews, second commit
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
@@ -895,7 +895,7 @@ A comment-only review shouldn't change the review flag.
       tags: []
       text:
       - Created attachment 7
-      - 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      - Bug 5 - Parent reviews, third commit
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
@@ -904,7 +904,7 @@ A comment-only review shouldn't change the review flag.
       tags: []
       text:
       - Comment on attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - Bug 5 - Parent reviews, second commit
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review5
       - ''
@@ -936,7 +936,7 @@ A 'clear flag' review on a child should also clear the attachment's r?.
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews'
+      description: Bug 5 - Parent reviews
       file_name: reviewboard-10-url.txt
       flags:
       - id: 9
@@ -947,11 +947,11 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       id: 5
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews'
+      summary: Bug 5 - Parent reviews
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      description: Bug 5 - Parent reviews, second commit
       file_name: reviewboard-11-url.txt
       flags:
       - id: 10
@@ -967,11 +967,11 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       id: 6
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      summary: Bug 5 - Parent reviews, second commit
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      description: Bug 5 - Parent reviews, third commit
       file_name: reviewboard-12-url.txt
       flags:
       - id: 12
@@ -987,7 +987,7 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       id: 7
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      summary: Bug 5 - Parent reviews, third commit
     blocks: []
     cc:
     - reviewer2@example.com
@@ -1002,7 +1002,7 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       tags: []
       text:
       - Created attachment 5
-      - 'MozReview Request: Bug 5 - Parent reviews'
+      - Bug 5 - Parent reviews
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
@@ -1011,7 +1011,7 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       tags: []
       text:
       - Created attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - Bug 5 - Parent reviews, second commit
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
@@ -1020,7 +1020,7 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       tags: []
       text:
       - Created attachment 7
-      - 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      - Bug 5 - Parent reviews, third commit
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
@@ -1029,7 +1029,7 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       tags: []
       text:
       - Comment on attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - Bug 5 - Parent reviews, second commit
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review5
       - ''
@@ -1046,7 +1046,7 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       tags: []
       text:
       - Comment on attachment 5
-      - 'MozReview Request: Bug 5 - Parent reviews'
+      - Bug 5 - Parent reviews
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/10/#review8
       - ''
@@ -1071,7 +1071,7 @@ A non-r+ review on a parent should post a comment only.
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews'
+      description: Bug 5 - Parent reviews
       file_name: reviewboard-10-url.txt
       flags:
       - id: 9
@@ -1082,11 +1082,11 @@ A non-r+ review on a parent should post a comment only.
       id: 5
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews'
+      summary: Bug 5 - Parent reviews
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      description: Bug 5 - Parent reviews, second commit
       file_name: reviewboard-11-url.txt
       flags:
       - id: 10
@@ -1102,11 +1102,11 @@ A non-r+ review on a parent should post a comment only.
       id: 6
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      summary: Bug 5 - Parent reviews, second commit
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header
-      description: 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      description: Bug 5 - Parent reviews, third commit
       file_name: reviewboard-12-url.txt
       flags:
       - id: 12
@@ -1122,7 +1122,7 @@ A non-r+ review on a parent should post a comment only.
       id: 7
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      summary: Bug 5 - Parent reviews, third commit
     blocks: []
     cc:
     - reviewer2@example.com
@@ -1137,7 +1137,7 @@ A non-r+ review on a parent should post a comment only.
       tags: []
       text:
       - Created attachment 5
-      - 'MozReview Request: Bug 5 - Parent reviews'
+      - Bug 5 - Parent reviews
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
@@ -1146,7 +1146,7 @@ A non-r+ review on a parent should post a comment only.
       tags: []
       text:
       - Created attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - Bug 5 - Parent reviews, second commit
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
@@ -1155,7 +1155,7 @@ A non-r+ review on a parent should post a comment only.
       tags: []
       text:
       - Created attachment 7
-      - 'MozReview Request: Bug 5 - Parent reviews, third commit'
+      - Bug 5 - Parent reviews, third commit
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
@@ -1164,7 +1164,7 @@ A non-r+ review on a parent should post a comment only.
       tags: []
       text:
       - Comment on attachment 6
-      - 'MozReview Request: Bug 5 - Parent reviews, second commit'
+      - Bug 5 - Parent reviews, second commit
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review5
       - ''
@@ -1181,7 +1181,7 @@ A non-r+ review on a parent should post a comment only.
       tags: []
       text:
       - Comment on attachment 5
-      - 'MozReview Request: Bug 5 - Parent reviews'
+      - Bug 5 - Parent reviews
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/10/#review8
       - ''

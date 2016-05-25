@@ -141,23 +141,23 @@ Reviews should be published and Bugzilla attachments should be present
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 1'
+      description: Bug 1 - Foo 1
       file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 1'
+      summary: Bug 1 - Foo 1
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 2'
+      description: Bug 1 - Foo 2
       file_name: reviewboard-3-url.txt
       flags: []
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 2'
+      summary: Bug 1 - Foo 2
     blocks: []
     cc: []
     comments:
@@ -170,7 +170,7 @@ Reviews should be published and Bugzilla attachments should be present
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -179,7 +179,7 @@ Reviews should be published and Bugzilla attachments should be present
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 1 - Foo 2'
+      - Bug 1 - Foo 2
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'

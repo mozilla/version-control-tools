@@ -35,7 +35,7 @@ Sanity check to ensure we have a review flag set
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      description: Bug 1 - Initial commit to review
       file_name: reviewboard-2-url.txt
       flags:
       - id: 1
@@ -46,7 +46,7 @@ Sanity check to ensure we have a review flag set
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: Bug 1 - Initial commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -60,7 +60,7 @@ Sanity check to ensure we have a review flag set
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -84,7 +84,7 @@ Publishing a non-'clear-the-flag' review will not clear the r? flag
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      description: Bug 1 - Initial commit to review
       file_name: reviewboard-2-url.txt
       flags:
       - id: 1
@@ -95,7 +95,7 @@ Publishing a non-'clear-the-flag' review will not clear the r? flag
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: Bug 1 - Initial commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -109,7 +109,7 @@ Publishing a non-'clear-the-flag' review will not clear the r? flag
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -139,7 +139,7 @@ Posting an r? review with a comment only adds a comment
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      description: Bug 1 - Initial commit to review
       file_name: reviewboard-2-url.txt
       flags:
       - id: 1
@@ -150,7 +150,7 @@ Posting an r? review with a comment only adds a comment
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: Bug 1 - Initial commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -164,7 +164,7 @@ Posting an r? review with a comment only adds a comment
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -201,7 +201,7 @@ Posting a r+ review will add a '+' review flag
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      description: Bug 1 - Initial commit to review
       file_name: reviewboard-2-url.txt
       flags:
       - id: 1
@@ -212,7 +212,7 @@ Posting a r+ review will add a '+' review flag
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: Bug 1 - Initial commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -226,7 +226,7 @@ Posting a r+ review will add a '+' review flag
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -249,7 +249,7 @@ Posting a r+ review will add a '+' review flag
       tags: []
       text:
       - Comment on attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review3
       - ''
@@ -276,7 +276,7 @@ Updating the review request as an L1 author will not re-request review
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Initial commit to review'
+      description: Bug 1 - Initial commit to review
       file_name: reviewboard-2-url.txt
       flags:
       - id: 1
@@ -287,7 +287,7 @@ Updating the review request as an L1 author will not re-request review
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Initial commit to review'
+      summary: Bug 1 - Initial commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -301,7 +301,7 @@ Updating the review request as an L1 author will not re-request review
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -324,7 +324,7 @@ Updating the review request as an L1 author will not re-request review
       tags: []
       text:
       - Comment on attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review3
       - ''
@@ -334,7 +334,7 @@ Updating the review request as an L1 author will not re-request review
       tags: []
       text:
       - Comment on attachment 1
-      - 'MozReview Request: Bug 1 - Initial commit to review'
+      - Bug 1 - Initial commit to review
       - ''
       - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/1-2/'
     component: TestComponent
@@ -372,7 +372,7 @@ Sanity check to ensure we have an r? flag
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
-      description: 'MozReview Request: Bug 2 - Initial commit to review'
+      description: Bug 2 - Initial commit to review
       file_name: reviewboard-4-url.txt
       flags:
       - id: 2
@@ -383,7 +383,7 @@ Sanity check to ensure we have an r? flag
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 2 - Initial commit to review'
+      summary: Bug 2 - Initial commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -397,7 +397,7 @@ Sanity check to ensure we have an r? flag
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 2 - Initial commit to review'
+      - Bug 2 - Initial commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
@@ -423,7 +423,7 @@ Sanity check to ensure we have an r+ flag set
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
-      description: 'MozReview Request: Bug 2 - Initial commit to review'
+      description: Bug 2 - Initial commit to review
       file_name: reviewboard-4-url.txt
       flags:
       - id: 2
@@ -434,7 +434,7 @@ Sanity check to ensure we have an r+ flag set
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 2 - Initial commit to review'
+      summary: Bug 2 - Initial commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -448,7 +448,7 @@ Sanity check to ensure we have an r+ flag set
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 2 - Initial commit to review'
+      - Bug 2 - Initial commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
@@ -457,7 +457,7 @@ Sanity check to ensure we have an r+ flag set
       tags: []
       text:
       - Comment on attachment 2
-      - 'MozReview Request: Bug 2 - Initial commit to review'
+      - Bug 2 - Initial commit to review
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/4/#review4
       - ''
@@ -488,7 +488,7 @@ We should have an r+ flag already set.
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
-      description: 'MozReview Request: Bug 2 - Modified commit to review'
+      description: Bug 2 - Modified commit to review
       file_name: reviewboard-4-url.txt
       flags:
       - id: 2
@@ -499,7 +499,7 @@ We should have an r+ flag already set.
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 2 - Modified commit to review'
+      summary: Bug 2 - Modified commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -513,7 +513,7 @@ We should have an r+ flag already set.
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 2 - Modified commit to review'
+      - Bug 2 - Modified commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
@@ -522,7 +522,7 @@ We should have an r+ flag already set.
       tags: []
       text:
       - Comment on attachment 2
-      - 'MozReview Request: Bug 2 - Modified commit to review'
+      - Bug 2 - Modified commit to review
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/4/#review4
       - ''
@@ -532,7 +532,7 @@ We should have an r+ flag already set.
       tags: []
       text:
       - Comment on attachment 2
-      - 'MozReview Request: Bug 2 - Modified commit to review'
+      - Bug 2 - Modified commit to review
       - ''
       - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/1-2/'
     component: TestComponent
@@ -553,7 +553,7 @@ Posting a r- review will add a '-' review flag
     - attacher: l3author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
-      description: 'MozReview Request: Bug 2 - Modified commit to review'
+      description: Bug 2 - Modified commit to review
       file_name: reviewboard-4-url.txt
       flags:
       - id: 2
@@ -569,7 +569,7 @@ Posting a r- review will add a '-' review flag
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 2 - Modified commit to review'
+      summary: Bug 2 - Modified commit to review
     blocks: []
     cc:
     - reviewer@example.com
@@ -583,7 +583,7 @@ Posting a r- review will add a '-' review flag
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 2 - Modified commit to review'
+      - Bug 2 - Modified commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
@@ -592,7 +592,7 @@ Posting a r- review will add a '-' review flag
       tags: []
       text:
       - Comment on attachment 2
-      - 'MozReview Request: Bug 2 - Modified commit to review'
+      - Bug 2 - Modified commit to review
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/4/#review4
       - ''
@@ -602,7 +602,7 @@ Posting a r- review will add a '-' review flag
       tags: []
       text:
       - Comment on attachment 2
-      - 'MozReview Request: Bug 2 - Modified commit to review'
+      - Bug 2 - Modified commit to review
       - ''
       - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/1-2/'
     - author: l3author@example.com
@@ -610,7 +610,7 @@ Posting a r- review will add a '-' review flag
       tags: []
       text:
       - Comment on attachment 2
-      - 'MozReview Request: Bug 2 - Modified commit to review'
+      - Bug 2 - Modified commit to review
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/4/#review5
       - ''

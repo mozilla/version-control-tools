@@ -81,13 +81,13 @@ The globbing is patching over a bug in mach
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: "MozReview Request: Bug 1 - Initial commit to review \u2019 \u3053"
+      description: "Bug 1 - Initial commit to review \u2019 \u3053"
       file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: "MozReview Request: Bug 1 - Initial commit to review \u2019 \u3053"
+      summary: "Bug 1 - Initial commit to review \u2019 \u3053"
     blocks: []
     cc: []
     comments:
@@ -100,7 +100,7 @@ The globbing is patching over a bug in mach
       tags: []
       text:
       - Created attachment 1
-      - "MozReview Request: Bug 1 - Initial commit to review \u2019 \u3053"
+      - "Bug 1 - Initial commit to review \u2019 \u3053"
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'

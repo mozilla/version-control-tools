@@ -54,23 +54,23 @@
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 1'
+      description: Bug 1 - Foo 1
       file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 1'
+      summary: Bug 1 - Foo 1
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 2'
+      description: Bug 1 - Foo 2
       file_name: reviewboard-3-url.txt
       flags: []
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 2'
+      summary: Bug 1 - Foo 2
     blocks: []
     cc: []
     comments:
@@ -83,7 +83,7 @@
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -92,7 +92,7 @@
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 1 - Foo 2'
+      - Bug 1 - Foo 2
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
@@ -245,23 +245,23 @@ The review attachment should be marked as obsolete
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 1'
+      description: Bug 1 - Foo 1
       file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: true
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 1'
+      summary: Bug 1 - Foo 1
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 2'
+      description: Bug 1 - Foo 2
       file_name: reviewboard-3-url.txt
       flags: []
       id: 2
       is_obsolete: true
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 2'
+      summary: Bug 1 - Foo 2
     blocks: []
     cc: []
     comments:
@@ -274,7 +274,7 @@ The review attachment should be marked as obsolete
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -283,7 +283,7 @@ The review attachment should be marked as obsolete
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 1 - Foo 2'
+      - Bug 1 - Foo 2
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
@@ -497,23 +497,23 @@ There should still not be a visible attachment on the bug
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 1'
+      description: Bug 1 - Foo 1
       file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: true
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 1'
+      summary: Bug 1 - Foo 1
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 2'
+      description: Bug 1 - Foo 2
       file_name: reviewboard-3-url.txt
       flags: []
       id: 2
       is_obsolete: true
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 2'
+      summary: Bug 1 - Foo 2
     blocks: []
     cc: []
     comments:
@@ -526,7 +526,7 @@ There should still not be a visible attachment on the bug
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -535,7 +535,7 @@ There should still not be a visible attachment on the bug
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 1 - Foo 2'
+      - Bug 1 - Foo 2
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
@@ -687,23 +687,23 @@ The attachment for the review request should be unobsoleted
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 1'
+      description: Bug 1 - Foo 1
       file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 1'
+      summary: Bug 1 - Foo 1
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 2'
+      description: Bug 1 - Foo 2
       file_name: reviewboard-3-url.txt
       flags: []
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 2'
+      summary: Bug 1 - Foo 2
     blocks: []
     cc: []
     comments:
@@ -716,7 +716,7 @@ The attachment for the review request should be unobsoleted
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -725,7 +725,7 @@ The attachment for the review request should be unobsoleted
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 1 - Foo 2'
+      - Bug 1 - Foo 2
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
@@ -861,53 +861,53 @@ Pushing to a discarded review series will create a new series
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 1'
+      description: Bug 1 - Foo 1
       file_name: reviewboard-2-url.txt
       flags: []
       id: 1
       is_obsolete: true
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 1'
+      summary: Bug 1 - Foo 1
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 2'
+      description: Bug 1 - Foo 2
       file_name: reviewboard-3-url.txt
       flags: []
       id: 2
       is_obsolete: true
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 2'
+      summary: Bug 1 - Foo 2
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/5/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 1'
+      description: Bug 1 - Foo 1
       file_name: reviewboard-5-url.txt
       flags: []
       id: 3
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 1'
+      summary: Bug 1 - Foo 1
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 2'
+      description: Bug 1 - Foo 2
       file_name: reviewboard-6-url.txt
       flags: []
       id: 4
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 2'
+      summary: Bug 1 - Foo 2
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/7/diff/#index_header
-      description: 'MozReview Request: Bug 1 - Foo 3'
+      description: Bug 1 - Foo 3
       file_name: reviewboard-7-url.txt
       flags: []
       id: 5
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 1 - Foo 3'
+      summary: Bug 1 - Foo 3
     blocks: []
     cc: []
     comments:
@@ -920,7 +920,7 @@ Pushing to a discarded review series will create a new series
       tags: []
       text:
       - Created attachment 1
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
@@ -929,7 +929,7 @@ Pushing to a discarded review series will create a new series
       tags: []
       text:
       - Created attachment 2
-      - 'MozReview Request: Bug 1 - Foo 2'
+      - Bug 1 - Foo 2
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
@@ -938,7 +938,7 @@ Pushing to a discarded review series will create a new series
       tags: []
       text:
       - Created attachment 3
-      - 'MozReview Request: Bug 1 - Foo 1'
+      - Bug 1 - Foo 1
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/5/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/5/'
@@ -947,7 +947,7 @@ Pushing to a discarded review series will create a new series
       tags: []
       text:
       - Created attachment 4
-      - 'MozReview Request: Bug 1 - Foo 2'
+      - Bug 1 - Foo 2
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
@@ -956,7 +956,7 @@ Pushing to a discarded review series will create a new series
       tags: []
       text:
       - Created attachment 5
-      - 'MozReview Request: Bug 1 - Foo 3'
+      - Bug 1 - Foo 3
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/7/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/7/'

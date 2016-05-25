@@ -159,7 +159,7 @@ class BugzillaAttachmentUpdates(object):
             params['content_type'] = 'text/x-review-board-request'
 
         params['file_name'] = 'reviewboard-%d-url.txt' % review_request_id
-        params['summary'] = "MozReview Request: %s" % summary
+        params['summary'] = summary
         params['comment'] = comment
         if flags:
             params['flags'] = flags
