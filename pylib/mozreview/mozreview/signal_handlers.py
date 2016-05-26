@@ -4,6 +4,9 @@ import copy
 import json
 import logging
 
+from django.contrib.sites.models import (
+    Site
+)
 from django.contrib.auth.models import (
     User,
 )
@@ -29,6 +32,7 @@ from reviewboard.reviews.models import (
     ReviewRequestDraft,
 )
 from reviewboard.reviews.signals import (
+    review_publishing,
     review_request_closed,
     review_request_publishing,
     review_request_reopened,
@@ -45,10 +49,14 @@ from mozreview.bugzilla.errors import (
     BugzillaError,
     bugzilla_to_publish_errors,
 )
+from mozreview.diffs import (
+    build_plaintext_review,
+)
 from mozreview.errors import (
     CommitPublishProhibited,
     ConfidentialBugError,
     InvalidBugIdError,
+    ParentShipItError,
 )
 from mozreview.extra_data import (
     DISCARD_ON_PUBLISH_KEY,
@@ -140,6 +148,12 @@ def initialize_signal_handlers(extension):
         pre_save,
         pre_save_review,
         sender=Review)
+
+    SignalHook(
+        extension,
+        review_publishing,
+        on_review_publishing,
+        sandbox_errors=False)
 
 
 def post_save_review_request_draft(sender, **kwargs):
@@ -600,3 +614,66 @@ def pre_save_review(sender, *args, **kwargs):
                 review.extra_data[REVIEW_FLAG_KEY] = flag
 
             review.ship_it = (review.extra_data[REVIEW_FLAG_KEY] == 'r+')
+
+
+@bugzilla_to_publish_errors
+def on_review_publishing(user, review, **kwargs):
+    """Comment in the bug and potentially r+ or clear a review flag.
+
+    Note that a reviewer *must* have editbugs to set an attachment flag on
+    someone else's attachment (i.e. the standard BMO review process).
+
+    TODO: Report lack-of-editbugs properly; see bug 1119065.
+    """
+    review_request = review.review_request
+    logger.info('Publishing review for user: %s review id: %s '
+                'review request id: %s' % (user, review.id,
+                                            review_request.id))
+
+    # skip review requests that were not pushed
+    if not is_pushed(review_request):
+        logger.info('Did not publish review: %s: for user: %d: review not '
+                    'pushed.' % (user, review.id))
+        return
+
+    site = Site.objects.get_current()
+    siteconfig = SiteConfiguration.objects.get_current()
+    comment = build_plaintext_review(review,
+                                     get_obj_url(review, site,
+                                                 siteconfig),
+                                     {"user": user})
+    b = Bugzilla(get_bugzilla_api_key(user))
+
+    if is_parent(review_request):
+        # Mirror the comment to the bug, unless it's a ship-it or the review
+        # flag was set, in which case throw an error.
+        # Ship-its and review flags are allowed only on child commits.
+        if review.ship_it or review.extra_data.get(REVIEW_FLAG_KEY):
+            raise ParentShipItError
+
+        [b.post_comment(int(bug_id), comment) for bug_id in
+         review_request.get_bug_list()]
+    else:
+        diff_url = '%sdiff/#index_header' % get_obj_url(review_request)
+        bug_id = int(review_request.get_bug_list()[0])
+
+        commented = False
+        flag = review.extra_data.get(REVIEW_FLAG_KEY)
+
+        if flag is not None:
+            commented = b.set_review_flag(bug_id, flag, review.user.email,
+                                              diff_url, comment)
+        else:
+            # If for some reasons we don't have the flag set in extra_data,
+            # fall back to ship_it
+            logger.warning('Review flag not set on review %s, '
+                           'updating attachment based on ship_it' % review.id)
+            if review.ship_it:
+                commented = b.r_plus_attachment(bug_id, review.user.email,
+                                                diff_url, comment)
+            else:
+                commented = b.cancel_review_request(bug_id, review.user.email,
+                                                    diff_url, comment)
+
+        if comment and not commented:
+            b.post_comment(bug_id, comment)
