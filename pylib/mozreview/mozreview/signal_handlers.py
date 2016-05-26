@@ -32,6 +32,7 @@ from reviewboard.reviews.models import (
     ReviewRequestDraft,
 )
 from reviewboard.reviews.signals import (
+    reply_publishing,
     review_publishing,
     review_request_closed,
     review_request_publishing,
@@ -153,6 +154,12 @@ def initialize_signal_handlers(extension):
         extension,
         review_publishing,
         on_review_publishing,
+        sandbox_errors=False)
+
+    SignalHook(
+        extension,
+        reply_publishing,
+        on_reply_publishing,
         sandbox_errors=False)
 
 
@@ -677,3 +684,30 @@ def on_review_publishing(user, review, **kwargs):
 
         if comment and not commented:
             b.post_comment(bug_id, comment)
+
+
+def get_reply_url(reply, site=None, siteconfig=None):
+    """ Get the URL for a reply to a review.
+
+    Since replies can have multiple comments, we can't link to a specific
+    comment, so we link to the parent review which the reply is targeted at.
+    """
+    return get_obj_url(reply.base_reply_to, site=site, siteconfig=siteconfig)
+
+
+@bugzilla_to_publish_errors
+def on_reply_publishing(user, reply, **kwargs):
+    review_request = reply.review_request
+    logger.info('Posting bugzilla reply for review request %s' % (
+                review_request.id))
+
+    # skip review requests that were not pushed
+    if not is_pushed(review_request):
+        return
+
+    bug_id = int(review_request.get_bug_list()[0])
+    b = Bugzilla(get_bugzilla_api_key(user))
+
+    url = get_reply_url(reply)
+    comment = build_plaintext_review(reply, url, {"user": user})
+    b.post_comment(bug_id, comment)
