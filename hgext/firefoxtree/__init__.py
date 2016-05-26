@@ -329,7 +329,13 @@ def wrappedpullobsolete(orig, pullop):
 
     if remote.capable('firefoxtrees'):
         bmstore = bookmarks.bmstore(repo)
-        lines = remote._call('firefoxtrees').splitlines()
+        # remote.local() returns a localrepository or None. If local,
+        # just pass it into the wire protocol command/function to simulate
+        # the remote command call.
+        if remote.local():
+            lines = firefoxtrees(remote.local(), None).splitlines()
+        else:
+            lines = remote._call('firefoxtrees').splitlines()
         oldtags = {}
         for tag, node, tree, uri in get_firefoxtrees(repo):
             oldtags[tag] = node
@@ -566,6 +572,16 @@ def reposetup(ui, repo):
         return
 
     class firefoxtreesrepo(repo.__class__):
+        # Wrap _restrictcapabilities so capabilities are exposed to local peers.
+        def _restrictcapabilities(self, caps):
+            caps = super(firefoxtreesrepo, self)._restrictcapabilities(caps)
+
+            if (isfirefoxrepo(self) and
+                    self.ui.configbool('firefoxtree', 'servetags', False)):
+                caps.add('firefoxtrees')
+
+            return caps
+
         @util.propertycache
         def firefoxtrees(self):
             trees = {}

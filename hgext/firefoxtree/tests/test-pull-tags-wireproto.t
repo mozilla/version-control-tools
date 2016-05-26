@@ -96,6 +96,29 @@ Doing an incremental pull will print commit count change
   fx-team a4521c3750458afd82406ac87977b3fdc2fdc62a
   inbound 388ff24b5456e83175491ae321bceb89aad2259f (no-eol)
 
+Local filesystem pull should retrieve tree tags
+
+  $ cd ..
+  $ hg init localpull
+  $ cd localpull
+  $ touch .hg/IS_FIREFOX_REPO
+  $ hg pull ../root/unified
+  pulling from ../root/unified
+  requesting all changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 8 changesets with 8 changes to 2 files (+1 heads)
+  updated firefox tree tag central
+  updated firefox tree tag fx-team
+  updated firefox tree tag inbound
+  (run 'hg heads' to see heads, 'hg merge' to merge)
+
+  $ cat .hg/firefoxtrees
+  central 994ec05999daf04fb3c01a8cb0dea1458a7d4d3d
+  fx-team a4521c3750458afd82406ac87977b3fdc2fdc62a
+  inbound 388ff24b5456e83175491ae321bceb89aad2259f (no-eol)
+
 Serve firefoxtree tags from bookmarks
 
   $ cd $TESTTMP/root/unified
