@@ -406,7 +406,6 @@ class MozReview(object):
             'anyof',
             ['dirname', 'hgext/reviewboard'],
             ['dirname', 'pylib/mozreview'],
-            ['dirname', 'pylib/rbbz'],
             ['dirname', 'pylib/reviewboardmods'],
             ['dirname', 'reviewboard-fork/djblets'],
             ['dirname', 'reviewboard-fork/reviewboard'],

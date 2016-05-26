@@ -42,7 +42,6 @@
 - name: Build other extension
   command: /venv/bin/python setup.py bdist_egg chdir=/version-control-tools/pylib/{{ item }}
   with_items:
-    - rbbz
     - rbmotd
     - pygments_override
   tags:
@@ -51,7 +50,6 @@
 - name: Install other extensions
   shell: /venv/bin/easy_install -U dist/*.egg chdir=/version-control-tools/pylib/{{ item }}
   with_items:
-    - rbbz
     - rbmotd
     - pygments_override
   tags:

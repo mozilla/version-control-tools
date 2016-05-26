@@ -67,10 +67,6 @@ with Files('hgwsgi/**'):
     BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
     FINAL = True
 
-with Files('pylib/rbbz/**'):
-    BUG_COMPONENT = ('Developer Services', 'MozReview')
-    FINAL = True
-
 with Files('pylib/reviewboardmods/**'):
     BUG_COMPONENT = ('Developer Services', 'MozReview')
     FINAL = True

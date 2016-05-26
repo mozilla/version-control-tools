@@ -145,10 +145,6 @@ cd pylib/mozreviewbots
 python setup.py develop
 cd ../..
 
-cd pylib/rbbz
-python setup.py develop
-cd ../..
-
 cd pylib/vcsreplicator
 python setup.py develop
 cd ../..

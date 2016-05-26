@@ -36,20 +36,11 @@
 - name: install mozautomation egg
   command: "{{ venv }}/bin/pip install --upgrade --no-deps --force-reinstall {{ rb_vct }}/pylib/mozautomation"
 
-# rbbz imports from mozreview package. So, we need to install mozreview before
-# rbbz can be built.
-
 - name: build mozreview egg
   command: "{{ python }} setup.py bdist_egg chdir={{ rb_vct }}/pylib/mozreview"
 
 - name: install mozreview egg
   shell: "{{ easy_install }} -U dist/*.egg chdir={{ rb_vct }}/pylib/mozreview"
-
-- name: build rbbz egg
-  command: "{{ python }} setup.py bdist_egg chdir={{ rb_vct }}/pylib/rbbz"
-
-- name: install rbbz egg
-  shell: "{{ easy_install }} -U dist/*.egg chdir={{ rb_vct }}/pylib/rbbz"
 
 - name: build rbmotd egg
   command: "{{ python }} setup.py bdist_egg chdir={{ rb_vct }}/pylib/rbmotd"
