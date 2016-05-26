@@ -14,6 +14,8 @@ from djblets.util.decorators import simple_decorator
 from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
 from mozreview.bugzilla.transports import bugzilla_transport
 
+from mozautomation.commitparser import replace_reviewers
+
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +161,7 @@ class BugzillaAttachmentUpdates(object):
             params['content_type'] = 'text/x-review-board-request'
 
         params['file_name'] = 'reviewboard-%d-url.txt' % review_request_id
-        params['summary'] = summary
+        params['summary'] = replace_reviewers(summary, None)
         params['comment'] = comment
         if flags:
             params['flags'] = flags

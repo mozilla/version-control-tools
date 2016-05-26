@@ -254,7 +254,7 @@ Ensure r? in the commit description sets a review flag when pushing
     - attacher: default@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header
-      description: Bug 2 - Foo 1 r?reviewer
+      description: Bug 2 - Foo 1
       file_name: reviewboard-4-url.txt
       flags:
       - id: 2
@@ -265,7 +265,7 @@ Ensure r? in the commit description sets a review flag when pushing
       id: 2
       is_obsolete: false
       is_patch: false
-      summary: Bug 2 - Foo 1 r?reviewer
+      summary: Bug 2 - Foo 1
     blocks: []
     cc:
     - reviewer@example.com
@@ -279,7 +279,7 @@ Ensure r? in the commit description sets a review flag when pushing
       tags: []
       text:
       - Created attachment 2
-      - Bug 2 - Foo 1 r?reviewer
+      - Bug 2 - Foo 1
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'

@@ -119,15 +119,16 @@ def parse_rquestion_reviewers(commit_description):
 
 def replace_reviewers(commit_description, reviewers):
     if not reviewers:
-        return commit_description
-    reviewers = 'r=' + ','.join(reviewers)
+        reviewers_str = ''
+    else:
+        reviewers_str = 'r=' + ','.join(reviewers)
 
     commit_description = commit_description.splitlines()
     commit_summary = commit_description.pop(0)
     commit_description = '\n'.join(commit_description)
 
     if not R_SPECIFIER_RE.search(commit_summary):
-        commit_summary += ' ' + reviewers
+        commit_summary += ' ' + reviewers_str
     else:
         # replace the first r? with the reviewer list, and all subsequent
         # occurences with a marker to mark the blocks we need to remove
@@ -138,7 +139,7 @@ def replace_reviewers(commit_description, reviewers):
             if R_SPECIFIER_RE.match(matchobj.group(2)):
                 if d['first']:
                     d['first'] = False
-                    return matchobj.group(1) + reviewers
+                    return matchobj.group(1) + reviewers_str
                 else:
                     return '\0'
             else:
