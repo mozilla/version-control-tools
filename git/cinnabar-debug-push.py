@@ -21,17 +21,17 @@ from cinnabar.bundle import (
     PushStore,
 )
 
-from mercurial import (
-    hg,
-)
-
 try:
     from cinnabar.util import init_logging
 except ImportError:
     def init_logging(): pass
 
 try:
-    from cinnabar.hg import passwordmgr
+    from cinnabar.hg import (
+        get_repo,
+        passwordmgr,
+        Remote,
+    )
 except ImportError:
     passwordmgr = False
 
@@ -53,13 +53,17 @@ def main(args):
 
     init_logging()
 
-    ui = get_ui()
+    if passwordmgr:
+        repo = get_repo(Remote('hg::%s' % url, url))
+    else:
+        from mercurial import hg
 
-    if not passwordmgr:
+        ui = get_ui()
+
         for p in args.config_file or []:
             ui.readconfig(p, trust=True)
 
-    repo = hg.peer(ui, {}, url)
+        repo = hg.peer(ui, {}, url)
 
     heads = (hexlify(h) for h in repo.heads())
     store = PushStore()
