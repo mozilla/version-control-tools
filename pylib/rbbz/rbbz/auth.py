@@ -24,7 +24,7 @@ from mozreview.errors import (
     BugzillaAPIKeyNeededError,
     WebLoginNeededError,
 )
-from rbbz.forms import BugzillaAuthSettingsForm
+from mozreview.forms import BugzillaAuthSettingsForm
 
 
 logger = logging.getLogger(__name__)
