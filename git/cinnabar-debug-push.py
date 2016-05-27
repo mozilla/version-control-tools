@@ -30,6 +30,11 @@ try:
 except ImportError:
     def init_logging(): pass
 
+try:
+    from cinnabar.hg import passwordmgr
+except ImportError:
+    passwordmgr = False
+
 # Disable progress printing otherwise output can be a bit wonky.
 cinnabar.util.progress = False
 
@@ -50,8 +55,9 @@ def main(args):
 
     ui = get_ui()
 
-    for p in args.config_file or []:
-        ui.readconfig(p, trust=True)
+    if not passwordmgr:
+        for p in args.config_file or []:
+            ui.readconfig(p, trust=True)
 
     repo = hg.peer(ui, {}, url)
 

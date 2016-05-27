@@ -361,6 +361,7 @@ def push_command(args):
 
         push_args = [
             'git',
+            '-c', 'credential.helper=!git mozreview credentials',
             'cinnabar',
             'python',
             os.path.join(ROOT, 'git', 'cinnabar-debug-push.py'),
@@ -733,6 +734,35 @@ def commit_msg_hook(args):
     return 0
 
 
+def credentials(args):
+    """git credentials helper that returns the credentials for mozreview."""
+
+    if args.helper_command != 'get':
+        # From api-credentials.txt:
+        # For a `store` or `erase` operation, the helper's output is ignored.
+        # If it fails to perform the requested operation, it may complain to
+        # stderr to inform the user. If it does not support the requested
+        # operation (e.g., a read-only store), it should silently ignore the
+        # request.
+        return 0
+
+    git_config = get_git_config()
+
+    for k in ('bz.username', 'bz.apikey'):
+        if k not in git_config:
+            raise AbortError('%s config variable must be defined; '
+                             'run `git mozreview configure`' % k)
+
+    username = git_config['bz.username']
+    apikey = git_config['bz.apikey']
+
+    for line in sys.stdin:
+        print(line.rstrip('\n'))
+    print('username=%s' % username)
+    print('password=%s' % apikey)
+    return 0
+
+
 def main(args):
     if sys.platform == 'win32':
         import msvcrt
@@ -771,6 +801,13 @@ def main(args):
             'path',
             help='File containing commit message')
 
+    sp = subparsers.add_parser(
+            'credentials',
+            help='git credentials helper')
+    sp.add_argument(
+            'helper_command',
+            help='helper command')
+
     args = parser.parse_args(args)
 
     command = args.command
@@ -798,6 +835,8 @@ def main(args):
             return configure_command(args)
         elif command == 'commit-msg-hook':
             return commit_msg_hook(args)
+        elif command == 'credentials':
+            return credentials(args)
         else:
             print('error: unknown command: %s' % command)
             return 1
