@@ -376,27 +376,34 @@ def push_command(args):
         cdup = subprocess.check_output(
             ['git', 'rev-parse', '--show-cdup']).strip() or None
 
-        res, output = get_output(push_args, cwd=cdup)
+        commits = []
+
+        try:
+            proc = subprocess.Popen(push_args, cwd=cdup,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT)
+
+            # Filter "remote: REVIEWBOARD: " lines from output because they are
+            # the server advertisement about requiring a special client
+            # extension to push and we satisfy those requirements.
+            for l in proc.stdout:
+                if l.startswith('>result> '):
+                    commits.append(l.split()[1:])
+                elif not l.startswith('remote: REVIEWBOARD: '):
+                    ui.write(l)
+
+            res = proc.wait()
+        except Exception as e:
+            raise AbortError('error while performing cinnabar push: %s' %
+                             e.message)
     finally:
         os.unlink(path)
 
     if res:
         raise AbortError('error performing cinnabar push; '
-                         'please report this bug: %s' % output)
+                         'please report this bug')
 
-    output = json.loads(output, encoding='utf-8')
-
-    if 'error' in output:
-        raise AbortError('error performing cinnabar push: %s' % output['error'])
-
-    # Filter "remote: REVIEWBOARD: " lines from output because they are the
-    # server advertisement about requiring a special client extension to push
-    # and we satisfy those requirements.
-    for l in output['output'].splitlines():
-        if not l.startswith('remote: REVIEWBOARD: '):
-            ui.write('%s\n' % l)
-
-    if not output['commits']:
+    if not commits:
         raise AbortError('no commits pushed; '
                          '`git checkout` to the commit to review')
 
@@ -404,12 +411,12 @@ def push_command(args):
 
     # Filter commits against what user requested.
     review_commits = []
-    for git_commit, hg_changeset, new_data in output['commits']:
+    for git_commit, hg_changeset, new_data in commits:
         if requested_commits and git_commit not in requested_commits:
             continue
 
         # A ref was already on file for the pushed commit. Don't review it.
-        if not new_data:
+        if new_data != 'True':
             continue
 
         review_commits.append(git_commit)
@@ -423,7 +430,7 @@ def push_command(args):
 
     hg2git = collections.OrderedDict(
         (hg_changeset, git_commit)
-        for git_commit, hg_changeset, new_data in output['commits']
+        for git_commit, hg_changeset, new_data in commits
         if git_commit in review_commits
     )
     hg_changesets = hg2git.keys()

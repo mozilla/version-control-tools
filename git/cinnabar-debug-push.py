@@ -55,14 +55,9 @@ def main(args):
 
     repo = hg.peer(ui, {}, url)
 
-    # Buffer output.
-    repo.ui.pushbuffer(error=True, subproc=True)
-
     heads = (hexlify(h) for h in repo.heads())
     store = PushStore()
     pushed = push(repo, store, {commit: (None, False)}, heads, ())
-
-    push_output = repo.ui.popbuffer()
 
     commits = []
     if pushed:
@@ -73,19 +68,17 @@ def main(args):
 
             commits.append([commit, changeset, new_data])
 
-    print(json.dumps({
-        'output': push_output,
-        'commits': commits,
-    }, sort_keys=True, encoding='utf-8', indent=2))
+    # By now, cinnabar or its subprocesses should not be writing anything to
+    # either stdout or stderr. Ensure stderr is flushed for _this_ process,
+    # since git-mozreview uses the same file descriptor for both stdout and
+    # stderr, and we want to try to avoid mixed output.
+    sys.stderr.flush()
+    for commit, changeset, new_data in commits:
+        print('>result>', commit, changeset, new_data)
+    sys.stdout.flush()
 
     return 0
 
 
 if __name__ == '__main__':
-    try:
-        sys.exit(main(sys.argv[1:]))
-    except Exception as e:
-        print(json.dumps({
-            'error': str(e),
-        }))
-        sys.exit(0)
+    sys.exit(main(sys.argv[1:]))
