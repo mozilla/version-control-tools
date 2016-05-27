@@ -25,6 +25,11 @@ from mercurial import (
     hg,
 )
 
+try:
+    from cinnabar.util import init_logging
+except ImportError:
+    def init_logging(): pass
+
 # Disable progress printing otherwise output can be a bit wonky.
 cinnabar.util.progress = False
 
@@ -40,6 +45,8 @@ def main(args):
 
     url = args.url
     commit = args.commit
+
+    init_logging()
 
     ui = get_ui()
 
