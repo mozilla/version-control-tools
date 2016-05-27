@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from mozreview.models import get_profile, MozReviewUserProfile
 
 
@@ -39,4 +41,13 @@ class MozReviewCacheDisableMiddleware(object):
             # Clear the etag Review Board generated
             del response['ETag']
 
+        return response
+
+
+class CorsHeaderMiddleware(object):
+    """Add a CORS header if running in debug mode."""
+
+    def process_response(self, request, response):
+        if settings.DEBUG:
+            response['Access-Control-Allow-Origin'] = '*'
         return response

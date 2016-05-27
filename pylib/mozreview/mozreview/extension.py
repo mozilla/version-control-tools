@@ -68,6 +68,7 @@ from mozreview.ldap.resources import (
     ldap_association_resource,
 )
 from mozreview.middleware import (
+    CorsHeaderMiddleware,
     MozReviewCacheDisableMiddleware,
     MozReviewUserProfileMiddleware,
 )
@@ -198,6 +199,7 @@ class MozReviewExtension(Extension):
     ]
 
     middleware = [
+        CorsHeaderMiddleware,
         MozReviewCacheDisableMiddleware,
         MozReviewUserProfileMiddleware,
     ]

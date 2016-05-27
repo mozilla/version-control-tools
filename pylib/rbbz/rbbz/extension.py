@@ -35,7 +35,6 @@ from mozreview.rb_utils import (
     get_obj_url,
 )
 from rbbz.auth import BugzillaBackend
-from rbbz.middleware import CorsHeaderMiddleware
 from rbbz.resources import bugzilla_cookie_login_resource
 
 
@@ -43,8 +42,6 @@ logger = logging.getLogger(__name__)
 
 
 class BugzillaExtension(Extension):
-    middleware = [CorsHeaderMiddleware]
-
     resources = [
         bugzilla_cookie_login_resource,
     ]
