@@ -11,8 +11,11 @@ import uuid
 
 from django.contrib.auth import login
 from django.core.urlresolvers import reverse
-from django.http import (HttpResponse, HttpResponseRedirect,
-                         HttpResponseNotAllowed)
+from django.http import (
+    HttpResponse,
+    HttpResponseRedirect,
+    HttpResponseNotAllowed,
+)
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils import timezone
@@ -21,9 +24,15 @@ from djblets.siteconfig.models import SiteConfiguration
 
 from mozreview.bugzilla.client import Bugzilla
 from mozreview.bugzilla.errors import BugzillaError
-from mozreview.models import (get_or_create_bugzilla_users,
-                              set_bugzilla_api_key,
-                              UnverifiedBugzillaApiKey)
+from mozreview.ldap import (
+    associate_employee_ldap,
+    LDAPAssociationException,
+)
+from mozreview.models import (
+    get_or_create_bugzilla_users,
+    set_bugzilla_api_key,
+    UnverifiedBugzillaApiKey,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -224,6 +233,14 @@ def get_bmo_auth_callback(request):
         return show_error_page(request)
 
     set_bugzilla_api_key(user, bmo_api_key)
+
+    try:
+        associate_employee_ldap(user)
+    except LDAPAssociationException as e:
+        logger.info('LDAP association failed: %s' % str(e))
+    except Exception:
+        logger.exception('Error while performing LDAP association')
+
     user.backend = 'rbbz.auth.BugzillaBackend'
     logger.info('BMO Auth callback succeeded for user: %s' % bmo_username)
     login(request, user)
