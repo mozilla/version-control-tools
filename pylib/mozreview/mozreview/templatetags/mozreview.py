@@ -11,6 +11,11 @@ from mozreview.extra_data import (
 )
 from mozreview.review_helpers import get_reviewers_status
 
+from reviewboard.reviews.models import (
+    ReviewRequestDraft,
+)
+
+
 register = template.Library()
 
 
@@ -22,6 +27,11 @@ def isSquashed(review_request):
 @register.filter()
 def isPush(review_request):
     return is_pushed(review_request)
+
+
+@register.filter()
+def isDraft(review_request):
+    return isinstance(review_request, ReviewRequestDraft)
 
 
 @register.filter()
@@ -114,7 +124,8 @@ def reviewers_status(review_request):
 
 @register.filter()
 def reviewer_status_with_drive_by(review_request, reviewer):
-    reviewer_status = get_reviewers_status(review_request, reviewers=[reviewer],
+    reviewer_status = get_reviewers_status(review_request,
+                                           reviewers=[reviewer],
                                            include_drive_by=True)
     return reviewer_status[reviewer.username]
 

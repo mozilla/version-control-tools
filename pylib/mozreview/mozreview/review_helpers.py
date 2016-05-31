@@ -77,7 +77,8 @@ def has_l3_shipit(review_request):
     return False
 
 
-def get_reviewers_status(review_request, reviewers=None, include_drive_by=False):
+def get_reviewers_status(review_request, reviewers=None,
+                         include_drive_by=False):
     """Returns the latest review status for each reviewer.
 
     If include_drive_by is False, only reviewers nominated by the reviewee are
@@ -88,13 +89,13 @@ def get_reviewers_status(review_request, reviewers=None, include_drive_by=False)
     those reviewers regardless the value of include_drive_by
     """
 
-    # Don't show any status on drafts.
-    if type(review_request) == ReviewRequestDraft:
-        return {}
-
     designated_reviewers = review_request.target_people.all()
     if not reviewers:
         reviewers = designated_reviewers
+
+    # We need to grab the reviews and statuses off the non-draft.
+    if isinstance(review_request, ReviewRequestDraft):
+        review_request = review_request.review_request
 
     reviewers_status = dict()
 
