@@ -57,6 +57,9 @@ from mozreview.file_diff_reviewer.resources import (
 from mozreview.hooks import (
     MozReviewApprovalHook,
 )
+from mozreview.hostingservice.bmo_bugtracker import (
+    BMOBugTracker,
+)
 from mozreview.hostingservice.hmo_repository import (
     HMORepository,
 )
@@ -308,6 +311,7 @@ class MozReviewExtension(Extension):
         initialize_signal_handlers(self)
 
         HostingServiceHook(self, HMORepository)
+        HostingServiceHook(self, BMOBugTracker)
 
     def shutdown(self):
         # Restore the built-in opcode generator.
