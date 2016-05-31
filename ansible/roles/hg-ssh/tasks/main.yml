@@ -4,6 +4,7 @@
   register: vct_dir
 
 - include: ../../../tasks/systemd-mail-unit-output.yml
+  when: vct_dir.stat.exists == False
 
 # This is needed so authconfig can have the appropriate ldap_uri at container
 # start time, which results in /etc/openldap/ldap.conf getting updated
@@ -128,6 +129,7 @@
         group=root
         mode=0644
   notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
 
 - name: hg user ssh config is prepared
   file: path=/home/hg/.ssh state=directory mode=0775 owner=hg group=hg
@@ -174,6 +176,7 @@
         group=root
         mode=0644
   notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
 
 - name: ensure hg sshd runs on startup
   command: /usr/bin/systemctl enable sshd_hg.service
@@ -403,6 +406,7 @@
         group=root
         mode=0644
   notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
 
 - name: systemd service for bundle generation
   copy: src=hg-bundle-generate.{{ item }}
@@ -414,6 +418,7 @@
     - service
     - timer
   notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
 
 # Ideally, we would have separate override files for each service. But
 # it doesn't appear systemd allows there to be a generic e.g.
@@ -434,6 +439,7 @@
         group=root
         mode=0644
   notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
 
 - name: create directory for Nagios files
   file: path={{ item }}
@@ -471,6 +477,7 @@
         group=root
         mode=0644
   notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
 
 - name: systemd service file for pulse notification daemon
   copy: src=pulsenotifier.service
@@ -479,4 +486,4 @@
         group=root
         mode=0644
   notify: systemd daemon reload
-
+  when: vct_dir.stat.exists == False
