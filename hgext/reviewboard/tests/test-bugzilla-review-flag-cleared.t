@@ -652,7 +652,7 @@ Adding a reviewer should leave r- untouched
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header
-      description: 'MozReview Request: Bug 3 - Initial commit to review'
+      description: Bug 3 - Initial commit to review
       file_name: reviewboard-6-url.txt
       flags:
       - id: 4
@@ -668,7 +668,7 @@ Adding a reviewer should leave r- untouched
       id: 3
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 3 - Initial commit to review'
+      summary: Bug 3 - Initial commit to review
     blocks: []
     cc:
     - reviewer2@example.com
@@ -683,7 +683,7 @@ Adding a reviewer should leave r- untouched
       tags: []
       text:
       - Created attachment 3
-      - 'MozReview Request: Bug 3 - Initial commit to review'
+      - Bug 3 - Initial commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
@@ -692,7 +692,7 @@ Adding a reviewer should leave r- untouched
       tags: []
       text:
       - Comment on attachment 3
-      - 'MozReview Request: Bug 3 - Initial commit to review'
+      - Bug 3 - Initial commit to review
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/6/#review6
       - ''
@@ -717,7 +717,7 @@ Publishing a new revision should reset r- to r?, and carry forward r+
     - attacher: author@example.com
       content_type: text/x-review-board-request
       data: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header
-      description: 'MozReview Request: Bug 3 - Modified commit to review'
+      description: Bug 3 - Modified commit to review
       file_name: reviewboard-6-url.txt
       flags:
       - id: 4
@@ -733,7 +733,7 @@ Publishing a new revision should reset r- to r?, and carry forward r+
       id: 3
       is_obsolete: false
       is_patch: false
-      summary: 'MozReview Request: Bug 3 - Modified commit to review'
+      summary: Bug 3 - Modified commit to review
     blocks: []
     cc:
     - reviewer2@example.com
@@ -748,7 +748,7 @@ Publishing a new revision should reset r- to r?, and carry forward r+
       tags: []
       text:
       - Created attachment 3
-      - 'MozReview Request: Bug 3 - Modified commit to review'
+      - Bug 3 - Modified commit to review
       - ''
       - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/#index_header'
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
@@ -757,7 +757,7 @@ Publishing a new revision should reset r- to r?, and carry forward r+
       tags: []
       text:
       - Comment on attachment 3
-      - 'MozReview Request: Bug 3 - Modified commit to review'
+      - Bug 3 - Modified commit to review
       - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/6/#review6
       - ''
@@ -767,7 +767,7 @@ Publishing a new revision should reset r- to r?, and carry forward r+
       tags: []
       text:
       - Comment on attachment 3
-      - 'MozReview Request: Bug 3 - Modified commit to review'
+      - Bug 3 - Modified commit to review
       - ''
       - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/diff/1-2/'
     component: TestComponent
