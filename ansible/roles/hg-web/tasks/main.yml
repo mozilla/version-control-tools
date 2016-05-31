@@ -456,6 +456,7 @@
         group=root
         mode=0644
   notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
 
 - name: vcsreplicator service is enabled (server only)
   service: name=vcsreplicator@{{ item }}.service
