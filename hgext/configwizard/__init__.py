@@ -79,6 +79,7 @@ wizardsteps = {
     'hgversion',
     'username',
     'diff',
+    'color',
     'configchange',
 }
 
@@ -112,6 +113,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'diff' in runsteps:
         _checkdiffsettings(ui, cw)
+
+    if 'color' in runsteps:
+        _promptnativeextension(ui, cw, 'color', 'Enable color output to your terminal')
 
     if 'configchange' in runsteps:
         return _handleconfigchange(ui, cw)
@@ -191,6 +195,17 @@ def _checkdiffsettings(ui, cw):
 
         cw.c['diff']['git'] = 'true'
         cw.c['diff']['showfunc'] = 'true'
+
+
+def _promptnativeextension(ui, cw, ext, msg):
+    if ui.hasconfig('extensions', ext):
+        return
+
+    if not ui.promptchoice('%s (Yn) $$ &Yes $$ &No' % msg):
+        if 'extensions' not in cw.c:
+            cw.c['extensions'] = {}
+
+        cw.c['extensions'][ext] = ''
 
 
 def _handleconfigchange(ui, cw):
