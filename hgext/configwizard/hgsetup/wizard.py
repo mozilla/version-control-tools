@@ -32,31 +32,6 @@ Your Mercurial should now be properly configured and recommended extensions
 should be up to date!
 '''.strip()
 
-WIP_INFO = '''
-It is common to want a quick view of changesets that are in progress.
-
-The ``hg wip`` command provides should a view.
-
-Example Usage:
-
-  $ hg wip
-  o   4084:fcfa34d0387b dminor  @
-  |  mozreview: use repository name when displaying treeherder results (bug 1230548) r=mcote
-  | @   4083:786baf6d476a gps
-  | |  mozreview: create child review requests from batch API
-  | o   4082:3f100fa4a94f gps
-  | |  mozreview: copy more read-only processing code; r?smacleod
-  | o   4081:939417680cbe gps
-  |/   mozreview: add web API to submit an entire series of commits (bug 1229468); r?smacleod
-
-(Not shown are the colors that help denote the state each changeset
-is in.)
-
-(Relevant config options: alias.wip, revsetalias.wip, templates.wip)
-
-Would you like to install the `hg wip` alias?
-'''.strip()
-
 FILE_PERMISSIONS_WARNING = '''
 Your hgrc file is currently readable by others.
 
@@ -102,10 +77,6 @@ class MercurialSetupWizard(object):
         self.updater.update_all()
 
         hg_version = get_hg_version(hg)
-
-        if not c.have_wip():
-            if self._prompt_yn(WIP_INFO):
-                c.install_wip_alias()
 
         # Look for and clean up old extensions.
         for ext in {'bzexport', 'qimportbz', 'mqext'}:

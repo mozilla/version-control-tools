@@ -94,6 +94,31 @@ repository.
 Please upgrade to Mercurial 3.8+ so this feature is available.
 '''.lstrip()
 
+WIP_INFO = '''
+It is common to want a quick view of changesets that are in progress.
+
+The ``hg wip`` command provides such a view.
+
+Example Usage:
+
+  $ hg wip
+  o   4084:fcfa34d0387b dminor @
+  |  mozreview: use repository name when displaying treeherder results (bug 1230548) r=mcote
+  | @   4083:786baf6d476a gps
+  | |  mozreview: create child review requests from batch API
+  | o   4082:3f100fa4a94f gps
+  | |  mozreview: copy more read-only processing code; r?smacleod
+  | o   4081:939417680cbe gps
+  |/   mozreview: add web API to submit an entire series of commits (bug 1229468); r?smacleod
+
+(Not shown are the colors that help denote the state each changeset
+is in.)
+
+(Relevant config options: alias.wip, revsetalias.wip, templates.wip)
+
+Would you like to install the `hg wip` alias (Yn)? $$ &Yes $$ &No
+'''.lstrip()
+
 FIREFOXTREE_INFO = '''
 The firefoxtree extension makes interacting with the multiple Firefox
 repositories easier:
@@ -189,6 +214,7 @@ wizardsteps = {
     'color',
     'historyediting',
     'fsmonitor',
+    'wip',
     'firefoxtree',
     'codereview',
     'pushtotry',
@@ -234,6 +260,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'fsmonitor' in runsteps:
         _checkfsmonitor(ui, cw, hgversion)
+
+    if 'wip' in runsteps:
+        _checkwip(ui, cw)
 
     if 'firefoxtree' in runsteps:
         _promptvctextension(ui, cw, 'firefoxtree', FIREFOXTREE_INFO)
@@ -407,6 +436,47 @@ def _checkfsmonitor(ui, cw, hgversion):
         _promptnativeextension(ui, cw, 'fsmonitor', FSMONITOR_INFO)
     else:
         ui.write(FSMONITOR_NOT_AVAILABLE)
+
+
+def _checkwip(ui, cw):
+    havewip = ui.hasconfig('alias', 'wip')
+
+    if not havewip and ui.promptchoice(WIP_INFO):
+        return
+
+    # The wip configuration changes over time. Ensure it is up to date.
+    cw.c.setdefault('alias', {})
+    cw.c.setdefault('revsetalias', {})
+    cw.c.setdefault('templates', {})
+
+    cw.c['alias']['wip'] = 'log --graph --rev=wip --template=wip'
+
+    cw.c['revsetalias']['wip'] = ('('
+                'parents(not public()) '
+                'or not public() '
+                'or . '
+                'or (head() and branch(default))'
+            ') and (not obsolete() or unstable()^) '
+            'and not closed()')
+
+    cw.c['templates']['wip'] = ("'"
+            # prefix with branch name
+            '{label("log.branch", branches)} '
+            # rev:node
+            '{label("changeset.{phase}", rev)}'
+            '{label("changeset.{phase}", ":")}'
+            '{label("changeset.{phase}", short(node))} '
+            # just the username part of the author, for brevity
+            '{label("grep.user", author|user)}'
+            # tags and bookmarks
+            '{label("log.tag", if(tags," {tags}"))}'
+            '{label("log.tag", if(fxheads," {fxheads}"))} '
+            '{label("log.bookmark", if(bookmarks," {bookmarks}"))}'
+            '\\n'
+            # first line of commit message
+            '{label(ifcontains(rev, revset("."), "desc.here"),desc|firstline)}'
+            "'"
+        )
 
 
 def _checkcodereview(ui, cw):
