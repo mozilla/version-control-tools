@@ -6,6 +6,8 @@
 import difflib
 import io
 import os
+import subprocess
+import sys
 import uuid
 
 from mercurial import (
@@ -92,6 +94,30 @@ repository.
 Please upgrade to Mercurial 3.8+ so this feature is available.
 '''.lstrip()
 
+FIREFOXTREE_INFO = '''
+The firefoxtree extension makes interacting with the multiple Firefox
+repositories easier:
+
+* Aliases for common trees are pre-defined. e.g. `hg pull central`
+* Pulling from known Firefox trees will create "remote refs" appearing as
+  tags. e.g. pulling from fx-team will produce a "fx-team" tag.
+* The `hg fxheads` command will list the heads of all pulled Firefox repos
+  for easy reference.
+* `hg push` will limit itself to pushing a single head when pushing to
+  Firefox repos.
+* A pre-push hook will prevent you from pushing multiple heads to known
+  Firefox repos. This acts quicker than a server-side hook.
+
+The firefoxtree extension is *strongly* recommended if you:
+
+a) aggregate multiple Firefox repositories into a single local repo
+b) perform head/bookmark-based development (as opposed to mq)
+
+(Relevant config option: extensions.firefoxtree)
+
+Would you like to activate firefoxtree (Yn)? $$ &Yes $$ &No
+'''.strip()
+
 testedwith = '3.5 3.6 3.7 3.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
 
@@ -105,6 +131,7 @@ wizardsteps = {
     'color',
     'historyediting',
     'fsmonitor',
+    'firefoxtree',
     'configchange',
 }
 
@@ -147,6 +174,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'fsmonitor' in runsteps:
         _checkfsmonitor(ui, cw, hgversion)
+
+    if 'firefoxtree' in runsteps:
+        _promptvctextension(ui, cw, 'firefoxtree', FIREFOXTREE_INFO)
 
     if 'configchange' in runsteps:
         return _handleconfigchange(ui, cw)
@@ -237,6 +267,32 @@ def _promptnativeextension(ui, cw, ext, msg):
             cw.c['extensions'] = {}
 
         cw.c['extensions'][ext] = ''
+
+
+def _promptvctextension(ui, cw, ext, msg):
+    if ui.hasconfig('extensions', ext):
+        return
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    ext_dir = os.path.normpath(os.path.join(here, '..'))
+    ext_path = os.path.join(ext_dir, ext)
+
+    # Verify the extension loads before prompting to enable it. This is
+    # done out of paranoia.
+    result = subprocess.check_output([sys.argv[0],
+                                      '--config', 'extensions.testmodule=%s' % ext_path,
+                                      '--config', 'ui.traceback=true'],
+                                     stderr=subprocess.STDOUT)
+    if 'Traceback' in result:
+        return
+
+    if uipromptchoice(ui, '%s (Yn) $$ &Yes $$ &No' % msg):
+        return
+
+    if 'extensions' not in cw.c:
+        cw.c['extensions'] = {}
+
+    cw.c['extensions'][ext] = ext_path
 
 
 def _checkhistoryediting(ui, cw):

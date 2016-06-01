@@ -86,32 +86,6 @@ if you have enabled 2 Factor Authentication in Bugzilla.
 All consumers formerly looking at these options should support API Keys.
 '''.lstrip()
 
-FIREFOXTREE_MINIMUM_VERSION = LooseVersion('3.5')
-
-FIREFOXTREE_INFO = '''
-The firefoxtree extension makes interacting with the multiple Firefox
-repositories easier:
-
-* Aliases for common trees are pre-defined. e.g. `hg pull central`
-* Pulling from known Firefox trees will create "remote refs" appearing as
-  tags. e.g. pulling from fx-team will produce a "fx-team" tag.
-* The `hg fxheads` command will list the heads of all pulled Firefox repos
-  for easy reference.
-* `hg push` will limit itself to pushing a single head when pushing to
-  Firefox repos.
-* A pre-push hook will prevent you from pushing multiple heads to known
-  Firefox repos. This acts quicker than a server-side hook.
-
-The firefoxtree extension is *strongly* recommended if you:
-
-a) aggregate multiple Firefox repositories into a single local repo
-b) perform head/bookmark-based development (as opposed to mq)
-
-(Relevant config option: extensions.firefoxtree)
-
-Would you like to activate firefoxtree
-'''.strip()
-
 PUSHTOTRY_MINIMUM_VERSION = LooseVersion('3.5')
 
 PUSHTOTRY_INFO = '''
@@ -209,9 +183,6 @@ class MercurialSetupWizard(object):
                     path=p)
 
         self.prompt_external_extension(c, 'bzexport', BZEXPORT_INFO)
-
-        if hg_version >= FIREFOXTREE_MINIMUM_VERSION:
-            self.prompt_external_extension(c, 'firefoxtree', FIREFOXTREE_INFO)
 
         if hg_version >= PUSHTOTRY_MINIMUM_VERSION:
             self.prompt_external_extension(c, 'push-to-try', PUSHTOTRY_INFO)
