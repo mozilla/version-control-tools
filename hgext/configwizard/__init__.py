@@ -118,6 +118,52 @@ b) perform head/bookmark-based development (as opposed to mq)
 Would you like to activate firefoxtree (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+CODEREVIEW_INFO = '''
+Commits to Mozilla projects are typically sent to MozReview. This is the
+preferred code review tool at Mozilla.
+
+Some still practice a legacy code review workflow that uploads patches
+to Bugzilla.
+
+1. MozReview only (preferred)
+2. Both MozReview and Bugzilla
+3. Bugzilla only
+
+Which code review tools will you be submitting code to? $$ &1 $$ &2 $$ &3
+'''.strip()
+
+MISSING_BUGZILLA_CREDENTIALS = '''
+You do not have a Bugzilla API Key defined in your Mercurial config.
+
+In order to communicate with Bugzilla and services (like MozReview) that
+use Bugzilla for authentication, you'll need to supply an API Key.
+
+The Bugzilla API Key is optional. However, if you don't supply one,
+certain features may not work and/or you'll be prompted for one.
+
+You should only need to configure a Bugzilla API Key once.
+'''.lstrip()
+
+BUGZILLA_API_KEY_INSTRUCTIONS = '''
+Bugzilla API Keys can only be obtained through the Bugzilla web interface.
+
+Please perform the following steps:
+
+  1) Open https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey
+  2) Generate a new API Key
+  3) Copy the generated key and paste it here
+'''.lstrip()
+
+LEGACY_BUGZILLA_CREDENTIALS_DETECTED = '''
+Your existing Mercurial config uses a legacy method for defining Bugzilla
+credentials. Bugzilla API Keys are the most secure and preferred method
+for defining Bugzilla credentials. Bugzilla API Keys are also required
+if you have enabled 2 Factor Authentication in Bugzilla.
+
+For security reasons, the legacy credentials are being removed from the
+config.
+'''.lstrip()
+
 testedwith = '3.5 3.6 3.7 3.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
 
@@ -132,6 +178,7 @@ wizardsteps = {
     'historyediting',
     'fsmonitor',
     'firefoxtree',
+    'codereview',
     'configchange',
 }
 
@@ -178,6 +225,9 @@ def configwizard(ui, repo, statedir=None, **opts):
     if 'firefoxtree' in runsteps:
         _promptvctextension(ui, cw, 'firefoxtree', FIREFOXTREE_INFO)
 
+    if 'codereview' in runsteps:
+        _checkcodereview(ui, cw)
+
     if 'configchange' in runsteps:
         return _handleconfigchange(ui, cw)
 
@@ -213,10 +263,10 @@ def uiprompt(ui, msg, default=None):
     return ui.prompt(lines[-1], default=default)
 
 
-def uipromptchoice(ui, msg):
+def uipromptchoice(ui, msg, default=0):
     lines = msg.splitlines(True)
     ui.write(''.join(lines[0:-1]))
-    return ui.promptchoice(lines[-1])
+    return ui.promptchoice(lines[-1], default=default)
 
 
 def _checkusername(ui, cw):
@@ -269,13 +319,28 @@ def _promptnativeextension(ui, cw, ext, msg):
         cw.c['extensions'][ext] = ''
 
 
+def _vctextpath(ext, path=None):
+    here = os.path.dirname(os.path.abspath(__file__))
+    ext_dir = os.path.normpath(os.path.join(here, '..'))
+    ext_path = os.path.join(ext_dir, ext)
+    if path:
+        ext_path = os.path.join(ext_path, path)
+
+    return ext_path
+
+
+def _enableext(cw, name, value):
+    if 'extensions' not in cw.c:
+        cw.c['extensions'] = {}
+
+    cw.c['extensions'][name] = value
+
+
 def _promptvctextension(ui, cw, ext, msg):
     if ui.hasconfig('extensions', ext):
         return
 
-    here = os.path.dirname(os.path.abspath(__file__))
-    ext_dir = os.path.normpath(os.path.join(here, '..'))
-    ext_path = os.path.join(ext_dir, ext)
+    ext_path = _vctextpath(ext)
 
     # Verify the extension loads before prompting to enable it. This is
     # done out of paranoia.
@@ -289,10 +354,7 @@ def _promptvctextension(ui, cw, ext, msg):
     if uipromptchoice(ui, '%s (Yn) $$ &Yes $$ &No' % msg):
         return
 
-    if 'extensions' not in cw.c:
-        cw.c['extensions'] = {}
-
-    cw.c['extensions'][ext] = ext_path
+    _enableext(cw, ext, ext_path)
 
 
 def _checkhistoryediting(ui, cw):
@@ -330,6 +392,58 @@ def _checkfsmonitor(ui, cw, hgversion):
     else:
         ui.write(FSMONITOR_NOT_AVAILABLE)
 
+
+def _checkcodereview(ui, cw):
+    # We don't check for bzexport if reviewboard is enabled because
+    # bzexport is legacy.
+    if ui.hasconfig('extensions', 'reviewboard'):
+        return
+
+    if ui.promptchoice('Will you be submitting commits to Mozilla (Yn)? $$ &Yes $$ &No'):
+        return
+
+    confrb = False
+    answer = uipromptchoice(ui, CODEREVIEW_INFO, default=0) + 1
+    if answer in (1, 2):
+        _enableext(cw, 'reviewboard', _vctextpath('reviewboard', 'client.py'))
+        confrb = True
+
+    if answer in (2, 3):
+        _enableext(cw, 'bzexport', _vctextpath('bzexport'))
+
+    # Now verify Bugzilla credentials and other config foo is set.
+    bzuser = ui.config('bugzilla', 'username')
+    bzapikey = ui.config('bugzilla', 'apikey')
+
+    if not bzuser or not bzapikey:
+        ui.write(MISSING_BUGZILLA_CREDENTIALS)
+
+    if not bzuser:
+        bzuser = ui.prompt('What is your Bugzilla email address? (optional)', default='')
+
+    if bzuser and not bzapikey:
+        ui.write(BUGZILLA_API_KEY_INSTRUCTIONS)
+        bzapikey = ui.prompt('Please enter a Bugzilla API Key: (optional)', default='')
+
+    if bzuser or bzapikey:
+        if 'bugzilla' not in cw.c:
+            cw.c['bugzilla'] = {}
+
+    if bzuser:
+        cw.c['bugzilla']['username'] = bzuser
+    if bzapikey:
+        cw.c['bugzilla']['apikey'] = bzapikey
+
+    if any(ui.hasconfig('bugzilla', c) for c in ('password', 'userid', 'cookie')):
+        ui.write(LEGACY_BUGZILLA_CREDENTIALS_DETECTED)
+
+    for c in ('password', 'userid', 'cookie'):
+        try:
+            del cw.c['bugzilla'][c]
+        except KeyError:
+            pass
+
+    # TODO configure mozilla.ircnick and the "review" path
 
 def _handleconfigchange(ui, cw):
     # Obtain the old and new content so we can show a diff.

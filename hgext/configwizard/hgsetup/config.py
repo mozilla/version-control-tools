@@ -45,35 +45,6 @@ class MercurialConfig(object):
 
         self._c['extensions'][name] = path
 
-    def get_bugzilla_credentials(self):
-        if 'bugzilla' not in self._c:
-            return None, None, None, None, None
-
-        b = self._c['bugzilla']
-        return (
-            b.get('username', None),
-            b.get('password', None),
-            b.get('userid', None),
-            b.get('cookie', None),
-            b.get('apikey', None),
-        )
-
-    def set_bugzilla_credentials(self, username, api_key):
-        b = self._c.setdefault('bugzilla', {})
-        if username:
-            b['username'] = username
-        if api_key:
-            b['apikey'] = api_key
-
-    def clear_legacy_bugzilla_credentials(self):
-        if 'bugzilla' not in self._c:
-            return
-
-        b = self._c['bugzilla']
-        for k in ('password', 'userid', 'cookie'):
-            if k in b:
-                del b[k]
-
     def have_wip(self):
         return 'wip' in self._c.get('alias', {})
 

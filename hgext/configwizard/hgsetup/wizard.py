@@ -27,64 +27,10 @@ from .config import (
     ParseException,
 )
 
-
-BZEXPORT_INFO = '''
-If you plan on uploading patches to Mozilla, there is an extension called
-bzexport that makes it easy to upload patches from the command line via the
-|hg bzexport| command. More info is available at
-https://hg.mozilla.org/hgcustom/version-control-tools/file/default/hgext/bzexport/README
-
-(Relevant config option: extensions.bzexport)
-
-Would you like to activate bzexport
-'''.strip()
-
 FINISHED = '''
 Your Mercurial should now be properly configured and recommended extensions
 should be up to date!
 '''.strip()
-
-REVIEWBOARD_MINIMUM_VERSION = LooseVersion('3.5')
-
-REVIEWBOARD_INCOMPATIBLE = '''
-Your Mercurial is too old to use the reviewboard extension, which is necessary
-to conduct code review.
-
-Please upgrade to Mercurial %s or newer to use this extension.
-'''.strip()
-
-MISSING_BUGZILLA_CREDENTIALS = '''
-You do not have your Bugzilla API Key defined in your Mercurial config.
-
-Various extensions make use of a Bugzilla API Key to interface with
-Bugzilla to enrich your development experience.
-
-The Bugzilla API Key is optional. If you do not provide one, associated
-functionality will not be enabled, we will attempt to find a Bugzilla cookie
-from a Firefox profile, or you will be prompted for your Bugzilla credentials
-when they are needed.
-
-You should only need to configure a Bugzilla API Key once.
-'''.lstrip()
-
-BUGZILLA_API_KEY_INSTRUCTIONS = '''
-Bugzilla API Keys can only be obtained through the Bugzilla web interface.
-
-Please perform the following steps:
-
-  1) Open https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey
-  2) Generate a new API Key
-  3) Copy the generated key and paste it here
-'''.lstrip()
-
-LEGACY_BUGZILLA_CREDENTIALS_DETECTED = '''
-Your existing Mercurial config uses a legacy method for defining Bugzilla
-credentials. Bugzilla API Keys are the most secure and preferred method
-for defining Bugzilla credentials. Bugzilla API Keys are also required
-if you have enabled 2 Factor Authentication in Bugzilla.
-
-All consumers formerly looking at these options should support API Keys.
-'''.lstrip()
 
 PUSHTOTRY_MINIMUM_VERSION = LooseVersion('3.5')
 
@@ -170,55 +116,12 @@ class MercurialSetupWizard(object):
 
         hg_version = get_hg_version(hg)
 
-        if 'reviewboard' not in c.extensions:
-            if hg_version < REVIEWBOARD_MINIMUM_VERSION:
-                print(REVIEWBOARD_INCOMPATIBLE % REVIEWBOARD_MINIMUM_VERSION)
-            else:
-                p = os.path.join(self.vcs_tools_dir, 'hgext', 'reviewboard',
-                    'client.py')
-                self.prompt_external_extension(c, 'reviewboard',
-                    'Would you like to enable the reviewboard extension so '
-                    'you can easily initiate code reviews against Mozilla '
-                    'projects',
-                    path=p)
-
-        self.prompt_external_extension(c, 'bzexport', BZEXPORT_INFO)
-
         if hg_version >= PUSHTOTRY_MINIMUM_VERSION:
             self.prompt_external_extension(c, 'push-to-try', PUSHTOTRY_INFO)
 
         if not c.have_wip():
             if self._prompt_yn(WIP_INFO):
                 c.install_wip_alias()
-
-        if 'reviewboard' in c.extensions:
-            bzuser, bzpass, bzuserid, bzcookie, bzapikey = c.get_bugzilla_credentials()
-
-            if not bzuser or not bzapikey:
-                print(MISSING_BUGZILLA_CREDENTIALS)
-
-            if not bzuser:
-                bzuser = self._prompt('What is your Bugzilla email address? (optional)',
-                    allow_empty=True)
-
-            if bzuser and not bzapikey:
-                print(BUGZILLA_API_KEY_INSTRUCTIONS)
-                bzapikey = self._prompt('Please enter a Bugzilla API Key: (optional)',
-                    allow_empty=True)
-
-            if bzuser or bzapikey:
-                c.set_bugzilla_credentials(bzuser, bzapikey)
-
-            if bzpass or bzuserid or bzcookie:
-                print(LEGACY_BUGZILLA_CREDENTIALS_DETECTED)
-
-                # Clear legacy credentials automatically if an API Key is
-                # found as it supercedes all other credentials.
-                if bzapikey:
-                    print('The legacy credentials have been removed.\n')
-                    c.clear_legacy_bugzilla_credentials()
-                elif self._prompt_yn('Remove legacy credentials'):
-                    c.clear_legacy_bugzilla_credentials()
 
         # Look for and clean up old extensions.
         for ext in {'bzexport', 'qimportbz', 'mqext'}:
