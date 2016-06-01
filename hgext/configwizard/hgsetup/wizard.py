@@ -136,27 +136,6 @@ they can push to try without depending on mq or other workarounds.
 Would you like to activate push-to-try
 '''.strip()
 
-CLONEBUNDLES_INFO = '''
-Mercurial 3.6 and hg.mozilla.org support transparently cloning from a CDN,
-making clones faster and more reliable.
-
-(Relevant config option: experimental.clonebundles)
-
-Would you like to activate this feature and have faster clones
-'''.strip()
-
-BUNDLECLONE_MINIMUM_VERSION = LooseVersion('3.1')
-
-BUNDLECLONE_INFO = '''
-The bundleclone extension makes cloning faster and saves server resources.
-
-We highly recommend you activate this extension.
-
-(Relevant config option: extensions.bundleclone)
-
-Would you like to activate bundleclone
-'''.strip()
-
 WIP_INFO = '''
 It is common to want a quick view of changesets that are in progress.
 
@@ -285,15 +264,6 @@ class MercurialSetupWizard(object):
 
         if hg_version >= FIREFOXTREE_MINIMUM_VERSION:
             self.prompt_external_extension(c, 'firefoxtree', FIREFOXTREE_INFO)
-
-        # Functionality from bundleclone is experimental in Mercurial 3.6.
-        # There was a bug in 3.6, so look for 3.6.1.
-        if hg_version >= LooseVersion('3.6.1'):
-            if not c.have_clonebundles() and self._prompt_yn(CLONEBUNDLES_INFO):
-                c.activate_clonebundles()
-                print('Enabled the clonebundles feature.\n')
-        elif hg_version >= BUNDLECLONE_MINIMUM_VERSION:
-            self.prompt_external_extension(c, 'bundleclone', BUNDLECLONE_INFO)
 
         if hg_version >= PUSHTOTRY_MINIMUM_VERSION:
             self.prompt_external_extension(c, 'push-to-try', PUSHTOTRY_INFO)

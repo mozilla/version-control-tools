@@ -74,21 +74,6 @@ class MercurialConfig(object):
             if k in b:
                 del b[k]
 
-    def have_clonebundles(self):
-        return 'clonebundles' in self._c.get('experimental', {})
-
-    def activate_clonebundles(self):
-        exp = self._c.setdefault('experimental', {})
-        exp['clonebundles'] = 'true'
-
-        # bundleclone is redundant with clonebundles. Remove it if it
-        # is installed.
-        ext = self._c.get('extensions', {})
-        try:
-            del ext['bundleclone']
-        except KeyError:
-            pass
-
     def have_wip(self):
         return 'wip' in self._c.get('alias', {})
 
