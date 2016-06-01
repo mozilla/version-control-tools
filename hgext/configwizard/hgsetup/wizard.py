@@ -87,21 +87,6 @@ class MercurialSetupWizard(object):
                     print('Cleaning up old repository: %s' % path)
                     shutil.rmtree(path)
 
-        # Python + Mercurial didn't have terrific TLS handling until Python
-        # 2.7.9 and Mercurial 3.4. For this reason, it was recommended to pin
-        # certificates in Mercurial config files. In modern versions of
-        # Mercurial, the system CA store is used and old, legacy TLS protocols
-        # are disabled. The default connection/security setting should
-        # be sufficient and pinning certificates is no longer needed.
-        have_modern_ssl = hasattr(ssl, 'SSLContext')
-        if hg_version < LooseVersion('3.4') or not have_modern_ssl:
-            c.add_mozilla_host_fingerprints()
-
-        # We always update fingerprints if they are present. We /could/ offer to
-        # remove fingerprints if running modern Python and Mercurial. But that
-        # just adds more UI complexity and isn't worth it.
-        c.update_mozilla_host_fingerprints()
-
         # References to multiple version-control-tools checkouts can confuse
         # version-control-tools, since various Mercurial extensions resolve
         # dependencies via __file__ and repos could reference another copy.

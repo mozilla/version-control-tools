@@ -23,6 +23,13 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 from configobj import ConfigObj
 
+
+HOST_FINGERPRINTS = {
+    'bitbucket.org': '3f:d3:c5:17:23:3c:cd:f5:2d:17:76:06:93:7e:ee:97:42:21:14:aa',
+    'bugzilla.mozilla.org': '7c:7a:c4:6c:91:3b:6b:89:cf:f2:8c:13:b8:02:c4:25:bd:1e:25:17',
+    'hg.mozilla.org': 'af:27:b9:34:47:4e:e5:98:01:f6:83:2b:51:c9:aa:d8:df:fb:1a:27',
+}
+
 INITIAL_MESSAGE = '''
 This wizard will guide you through configuring Mercurial for an optimal
 experience contributing to Mozilla projects.
@@ -215,6 +222,7 @@ wizardsteps = {
     'historyediting',
     'fsmonitor',
     'wip',
+    'security',
     'firefoxtree',
     'codereview',
     'pushtotry',
@@ -263,6 +271,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'wip' in runsteps:
         _checkwip(ui, cw)
+
+    if 'security' in runsteps:
+        _checksecurity(ui, cw, hgversion)
 
     if 'firefoxtree' in runsteps:
         _promptvctextension(ui, cw, 'firefoxtree', FIREFOXTREE_INFO)
@@ -477,6 +488,30 @@ def _checkwip(ui, cw):
             '{label(ifcontains(rev, revset("."), "desc.here"),desc|firstline)}'
             "'"
         )
+
+
+def _checksecurity(ui, cw, hgversion):
+    import ssl
+
+    # Python + Mercurial didn't have terrific TLS handling until Python
+    # 2.7.9 and Mercurial 3.4. For this reason, it was recommended to pin
+    # certificates in Mercurial config files. In modern versions of
+    # Mercurial, the system CA store is used and old, legacy TLS protocols
+    # are disabled. The default connection/security setting should
+    # be sufficient and pinning certificates is no longer needed.
+    modernssl = hasattr(ssl, 'SSLContext')
+    if not modernssl:
+        cw.c.setdefault('hostfingerprints', {})
+        # Need to process in sorted order for tests to be deterministic.
+        for k, v in sorted(HOST_FINGERPRINTS.items()):
+            cw.c['hostfingerprints'][k] = v
+
+    # We always update fingerprints if they are present. We /could/ offer to
+    # remove fingerprints if running modern Python and Mercurial. But that
+    # just adds more UI complexity and isn't worth it.
+    if 'hostfingerprints' in cw.c:
+        for k, v in sorted(HOST_FINGERPRINTS.items()):
+            cw.c['hostfingerprints'][k] = v
 
 
 def _checkcodereview(ui, cw):
