@@ -255,20 +255,6 @@ class MercurialSetupWizard(object):
         hg = get_hg_path()
         config_path = config_file(config_paths)
 
-        try:
-            c = MercurialConfig(config_path)
-        except ConfigObjError as e:
-            print('Error importing existing Mercurial config: %s\n' % config_path)
-            for error in e.errors:
-                print(error.message)
-
-            return 1
-        except ParseException as e:
-            print('Error importing existing Mercurial config: %s\n' % config_path)
-            print('Line %d: %s' % (e.line, e.message))
-
-            return 1
-
         self.updater.update_all()
 
         hg_version = get_hg_version(hg)

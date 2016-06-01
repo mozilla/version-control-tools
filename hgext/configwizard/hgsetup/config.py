@@ -4,12 +4,6 @@
 
 from __future__ import unicode_literals
 
-from configobj import ConfigObj
-import codecs
-import re
-import os
-
-
 HOST_FINGERPRINTS = {
     'bitbucket.org': '3f:d3:c5:17:23:3c:cd:f5:2d:17:76:06:93:7e:ee:97:42:21:14:aa',
     'bugzilla.mozilla.org': '7c:7a:c4:6c:91:3b:6b:89:cf:f2:8c:13:b8:02:c4:25:bd:1e:25:17',
@@ -17,65 +11,8 @@ HOST_FINGERPRINTS = {
 }
 
 
-def config_file(files):
-    """Select the most appropriate config file from a list."""
-    if not files:
-        return None
-
-    if len(files) > 1:
-        picky = [(os.path.getsize(f), f) for f in files if os.path.isfile(f)]
-        if picky:
-            return max(picky)[1]
-
-    return files[0]
-
-
-class ParseException(Exception):
-    def __init__(self, line, msg):
-        self.line = line
-        super(Exception, self).__init__(msg)
-
-
 class MercurialConfig(object):
     """Interface for manipulating a Mercurial config file."""
-
-    def __init__(self, path=None):
-        """Create a new instance, optionally from an existing hgrc file."""
-
-        self.config_path = path
-
-        # Mercurial configuration files allow an %include directive to include
-        # other files, this is not supported by ConfigObj, so throw a useful
-        # error saying this.
-        if os.path.exists(path):
-            with codecs.open(path, 'r', encoding='utf-8') as f:
-                for i, line in enumerate(f):
-                    if line.startswith('%include'):
-                        raise ParseException(i + 1,
-                            '%include directive is not supported by MercurialConfig')
-                    if line.startswith(';'):
-                        raise ParseException(i + 1,
-                            'semicolon (;) comments are not supported; '
-                            'use # instead')
-
-        # write_empty_values is necessary to prevent built-in extensions (which
-        # have no value) from being dropped on write.
-        # list_values aren't needed by Mercurial and disabling them prevents
-        # quotes from being added.
-        self._c = ConfigObj(infile=path, encoding='utf-8',
-            write_empty_values=True, list_values=False)
-
-    @property
-    def config(self):
-        return self._c
-
-    @property
-    def extensions(self):
-        """Returns the set of currently enabled extensions (by name)."""
-        return set(self._c.get('extensions', {}).keys())
-
-    def write(self, fh):
-        return self._c.write(fh)
 
     def have_valid_username(self):
         if 'ui' not in self._c:
