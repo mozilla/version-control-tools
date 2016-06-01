@@ -6,6 +6,7 @@
 import difflib
 import io
 import os
+import stat
 import subprocess
 import sys
 import uuid
@@ -207,6 +208,15 @@ they can push to try without depending on mq or other workarounds.
 Would you like to activate push-to-try (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+FILE_PERMISSIONS_WARNING = '''
+Your hgrc file is currently readable by others.
+
+Sensitive information such as your Bugzilla credentials could be
+stolen if others have access to this file/machine.
+
+Would you like to fix the file permissions (Yn) $$ &Yes $$ &No
+'''.strip()
+
 
 testedwith = '3.5 3.6 3.7 3.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
@@ -227,6 +237,7 @@ wizardsteps = {
     'codereview',
     'pushtotry',
     'configchange',
+    'permissions',
 }
 
 @command('configwizard', [
@@ -285,7 +296,10 @@ def configwizard(ui, repo, statedir=None, **opts):
         _promptvctextension(ui, cw, 'push-to-try', PUSHTOTRY_INFO)
 
     if 'configchange' in runsteps:
-        return _handleconfigchange(ui, cw)
+        _handleconfigchange(ui, cw)
+
+    if 'permissions' in runsteps:
+        _checkpermissions(ui, cw)
 
     return 0
 
@@ -595,6 +609,24 @@ def _handleconfigchange(ui, cw):
             ui.write('config changes not written; we would have written the following:\n')
             ui.write(newbuf.getvalue())
             return 1
+
+
+def _checkpermissions(ui, cw):
+    # Config file may contain sensitive content, such as API keys. Prompt to
+    # remove global permissions.
+    if sys.platform == 'win32':
+        return
+
+    mode = os.stat(cw.path).st_mode
+    if mode & (stat.S_IRWXG | stat.S_IRWXO):
+        if uipromptchoice(ui, FILE_PERMISSIONS_WARNING):
+            return
+
+        # We don't care about sticky and set UID bits because
+        # this is a regular file.
+        mode = mode & stat.S_IRWXU
+        ui.write('Changing permissions of %s\n' % cw.path)
+        os.chmod(cw.path, mode)
 
 
 class configobjwrapper(object):
