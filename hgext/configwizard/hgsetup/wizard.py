@@ -86,17 +86,6 @@ if you have enabled 2 Factor Authentication in Bugzilla.
 All consumers formerly looking at these options should support API Keys.
 '''.lstrip()
 
-BZPOST_MINIMUM_VERSION = LooseVersion('3.5')
-
-BZPOST_INFO = '''
-The bzpost extension automatically records the URLs of pushed commits to
-referenced Bugzilla bugs after push.
-
-(Relevant config option: extensions.bzpost)
-
-Would you like to activate bzpost
-'''.strip()
-
 FIREFOXTREE_MINIMUM_VERSION = LooseVersion('3.5')
 
 FIREFOXTREE_INFO = '''
@@ -221,9 +210,6 @@ class MercurialSetupWizard(object):
 
         self.prompt_external_extension(c, 'bzexport', BZEXPORT_INFO)
 
-        if hg_version >= BZPOST_MINIMUM_VERSION:
-            self.prompt_external_extension(c, 'bzpost', BZPOST_INFO)
-
         if hg_version >= FIREFOXTREE_MINIMUM_VERSION:
             self.prompt_external_extension(c, 'firefoxtree', FIREFOXTREE_INFO)
 
@@ -234,7 +220,7 @@ class MercurialSetupWizard(object):
             if self._prompt_yn(WIP_INFO):
                 c.install_wip_alias()
 
-        if 'reviewboard' in c.extensions or 'bzpost' in c.extensions:
+        if 'reviewboard' in c.extensions:
             bzuser, bzpass, bzuserid, bzcookie, bzapikey = c.get_bugzilla_credentials()
 
             if not bzuser or not bzapikey:
