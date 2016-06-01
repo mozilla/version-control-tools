@@ -208,6 +208,20 @@ they can push to try without depending on mq or other workarounds.
 Would you like to activate push-to-try (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+MULTIPLE_VCT = '''
+*** WARNING ***
+
+Multiple version-control-tools repositories are referenced in your
+Mercurial config. Extensions and other code within the
+version-control-tools repository could run with inconsistent results.
+
+Please manually edit the following file to reference a single
+version-control-tools repository:
+
+    %s
+
+'''.lstrip()
+
 FILE_PERMISSIONS_WARNING = '''
 Your hgrc file is currently readable by others.
 
@@ -236,6 +250,7 @@ wizardsteps = {
     'firefoxtree',
     'codereview',
     'pushtotry',
+    'multiplevct',
     'configchange',
     'permissions',
 }
@@ -294,6 +309,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'pushtotry' in runsteps:
         _promptvctextension(ui, cw, 'push-to-try', PUSHTOTRY_INFO)
+
+    if 'multiplevct' in runsteps:
+        _checkmultiplevct(ui, cw)
 
     if 'configchange' in runsteps:
         _handleconfigchange(ui, cw)
@@ -579,6 +597,25 @@ def _checkcodereview(ui, cw):
             pass
 
     # TODO configure mozilla.ircnick and the "review" path
+
+
+def _checkmultiplevct(ui, cw):
+    # References to multiple version-control-tools checkouts can confuse
+    # version-control-tools since various Mercurial extensions resolve
+    # dependencies via __file__. Files from different revisions could lead
+    # to unexpected environments and break things.
+    seenvct = set()
+    for k, v in ui.configitems('extensions'):
+        if 'version-control-tools' not in v:
+            continue
+
+        i = v.index('version-control-tools')
+        vct = v[0:i + len('version-control-tools')]
+        seenvct.add(os.path.realpath(os.path.expanduser(vct)))
+
+    if len(seenvct) > 1:
+        ui.write(MULTIPLE_VCT % cw.path)
+
 
 def _handleconfigchange(ui, cw):
     # Obtain the old and new content so we can show a diff.
