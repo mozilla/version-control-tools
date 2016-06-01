@@ -244,11 +244,6 @@ class MercurialSetupWizard(object):
 
         hg_version = get_hg_version(hg)
 
-        # Progress is built into core and enabled by default in Mercurial 3.5.
-        if hg_version < LooseVersion('3.5'):
-            self.prompt_native_extension(c, 'progress',
-                'Would you like to see progress bars during Mercurial operations')
-
         # hgwatchman is provided by MozillaBuild and we don't yet support
         # Linux/BSD.
         if ('hgwatchman' not in c.extensions
@@ -393,14 +388,6 @@ class MercurialSetupWizard(object):
 
         print(FINISHED)
         return 0
-
-    def prompt_native_extension(self, c, name, prompt_text):
-        # Ask the user if the specified extension bundled with Mercurial should be enabled.
-        if name in c.extensions:
-            return
-        if self._prompt_yn(prompt_text):
-            c.activate_extension(name)
-            print('Activated %s extension.\n' % name)
 
     def can_use_extension(self, c, name, path=None):
         # Load extension to hg and search stdout for printed exceptions
