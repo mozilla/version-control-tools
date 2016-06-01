@@ -1,11 +1,16 @@
 from __future__ import unicode_literals
 
 import json
+import time
 
 from reviewboard.admin.server import get_server_url
 from reviewboard.extensions.hooks import SignalHook
 from reviewboard.reviews.models import ReviewRequest
-from reviewboard.reviews.signals import review_request_published
+from reviewboard.reviews.signals import (
+    reply_published,
+    review_published,
+    review_request_published,
+)
 
 from mozillapulse import publishers
 from mozillapulse.messages import base
@@ -20,8 +25,66 @@ from mozreview.extra_data import (
 
 
 def initialize_pulse_handlers(extension):
+    SignalHook(extension, reply_published, handle_reply_published)
+    SignalHook(extension, review_published, handle_review_published)
     SignalHook(extension, review_request_published,
                handle_commits_published)
+
+
+@if_ext_enabled
+def handle_reply_published(extension=None, **kwargs):
+    """Handle sending a message when a review reply is published."""
+    reply = kwargs.get('reply')
+    if not reply:
+        return
+
+    # A review reply is a special kind of a review. So use the same code path.
+    _send_message_from_review(extension, reply)
+
+
+@if_ext_enabled
+def handle_review_published(extension=None, **kwargs):
+    """Handle sending a message when a review is published."""
+    review = kwargs.get('review')
+    if not review:
+        return
+
+    _send_message_from_review(extension, review)
+
+def _send_message_from_review(extension, review):
+    rr = review.review_request
+    repository = rr.repository
+
+    target_people = [u.username for u in rr.target_people.all()]
+    participants = set(p.username for p in rr.participants)
+
+    msg = base.GenericMessage()
+    msg.routing_parts.append('mozreview.review.published')
+
+    # Try to limit this to data that:
+    # * doesn't have an unbound size (like commit messages or diffs)
+    # * is useful for consumers to perform quick screening based on state
+    #
+    # In general, we prefer consumers call the web API to get additional
+    # details.
+    msg.data['review_id'] = review.id
+    msg.data['review_time'] = int(time.mktime(review.timestamp.utctimetuple()))
+    msg.data['review_username'] = review.user.username
+    msg.data['review_request_id'] = rr.id
+    msg.data['review_request_bugs'] = rr.get_bug_list()
+    msg.data['review_request_participants'] = sorted(participants)
+    msg.data['review_request_submitter'] = rr.submitter.username
+    msg.data['review_request_target_people'] = sorted(target_people)
+    msg.data['repository_id'] = repository.id
+    msg.data['repository_bugtracker_url'] = repository.bug_tracker
+    msg.data['repository_url'] = repository.path
+    # TODO consider adding participants for this specific thing (e.g. if this
+    # is a reply should participants for the review being replied to).
+
+    # TODO make work with RB localsites.
+    msg.data['review_board_url'] = get_server_url()
+
+    publish_message(extension, msg)
 
 
 @if_ext_enabled

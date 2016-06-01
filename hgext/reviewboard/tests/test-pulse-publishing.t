@@ -9,6 +9,11 @@
   $ hg phase --public -r .
   $ hg push --noreview > /dev/null
 
+  $ mozreview create-user reviewer1@example.com r1password 'Mozilla Reviewer [:reviewer1]' --bugzilla-group editbugs
+  Created user 6
+  $ mozreview create-user reviewer2@example.com r2password 'Mozilla Reviewer2 [:reviewer2]' --bugzilla-group editbugs
+  Created user 7
+
 Pushing a review should not publish to Pulse
 
   $ bugzilla create-bug TestProduct TestComponent bug1
@@ -66,6 +71,57 @@ details from the parent review request
     parent_review_request_id: 1
     repository_url: http://$DOCKER_HOSTNAME:$HGPORT/test-repo
     review_board_url: http://$DOCKER_HOSTNAME:$HGPORT1/
+
+Creating a review will send a Pulse message
+
+  $ exportbzauth reviewer1@example.com r1password
+  $ rbmanage create-review 2 --body-top LGTM --public --review-flag='r+'
+  created review 1
+
+  $ pulse dump-messages exchange/mozreview/ all
+  - _meta:
+      exchange: exchange/mozreview/
+      routing_key: mozreview.review.published
+    repository_bugtracker_url: http://$DOCKER_HOSTNAME:$HGPORT2/show_bug.cgi?id=%s
+    repository_id: 1
+    repository_url: http://$DOCKER_HOSTNAME:$HGPORT/test-repo
+    review_board_url: http://$DOCKER_HOSTNAME:$HGPORT1/
+    review_id: 1
+    review_request_bugs:
+    - '1'
+    review_request_id: 2
+    review_request_participants:
+    - reviewer1
+    review_request_submitter: default+5
+    review_request_target_people: []
+    review_time: \d+ (re)
+    review_username: reviewer1
+
+Creating a reply will send a Pulse message
+
+  $ exportbzauth reviewer2@example.com r2password
+  $ rbmanage create-review-reply 2 1 --body-bottom 'I agree' --public
+  created review reply 2
+
+  $ pulse dump-messages exchange/mozreview/ all
+  - _meta:
+      exchange: exchange/mozreview/
+      routing_key: mozreview.review.published
+    repository_bugtracker_url: http://$DOCKER_HOSTNAME:$HGPORT2/show_bug.cgi?id=%s
+    repository_id: 1
+    repository_url: http://$DOCKER_HOSTNAME:$HGPORT/test-repo
+    review_board_url: http://$DOCKER_HOSTNAME:$HGPORT1/
+    review_id: 2
+    review_request_bugs:
+    - '1'
+    review_request_id: 2
+    review_request_participants:
+    - reviewer1
+    - reviewer2
+    review_request_submitter: default+5
+    review_request_target_people: []
+    review_time: \d+ (re)
+    review_username: reviewer2
 
 Cleanup
 
