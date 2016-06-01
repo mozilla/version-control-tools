@@ -298,6 +298,15 @@ def has_ssl():
     except ImportError:
         return False
 
+@check("sslcontext", "python >= 2.7.9 ssl")
+def has_sslcontext():
+    try:
+        import ssl
+        ssl.SSLContext
+        return True
+    except (ImportError, AttributeError):
+        return False
+
 @check("windows", "Windows")
 def has_windows():
     return os.name == 'nt'
