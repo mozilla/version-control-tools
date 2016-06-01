@@ -28,34 +28,6 @@ from .config import (
 )
 
 
-INITIAL_MESSAGE = '''
-I'm going to help you ensure your Mercurial is configured for optimal
-development on Mozilla projects.
-
-If your environment is missing some recommended settings, I'm going to prompt
-you whether you want me to make changes: I won't change anything you might not
-want me changing without your permission!
-
-If your config is up-to-date, I'm just going to ensure all 3rd party extensions
-are up to date and you won't have to do anything.
-
-To begin, press the enter/return key.
-'''.strip()
-
-# This should match MODERN_MERCURIAL_VERSION in
-# python/mozboot/mozboot/base.py.
-OLDEST_NON_LEGACY_VERSION = LooseVersion('3.7.3')
-LEGACY_MERCURIAL = '''
-You are running an out of date Mercurial client (%s).
-
-For a faster and better Mercurial experience, we HIGHLY recommend you
-upgrade.
-
-Legacy versions of Mercurial have known security vulnerabilities. Failure
-to upgrade may leave you exposed. You are highly encouraged to upgrade
-in case you aren't running a patched version.
-'''.strip()
-
 MISSING_USERNAME = '''
 You don't have a username defined in your Mercurial config file. In order to
 send patches to Mozilla, you'll need to attach a name and email address. If you
@@ -299,26 +271,7 @@ class MercurialSetupWizard(object):
 
         self.updater.update_all()
 
-        print(INITIAL_MESSAGE)
-        raw_input()
-
         hg_version = get_hg_version(hg)
-        if hg_version < OLDEST_NON_LEGACY_VERSION:
-            print(LEGACY_MERCURIAL % hg_version)
-            print('')
-
-            if os.name == 'nt':
-                print('Please upgrade to the latest MozillaBuild to upgrade '
-                    'your Mercurial install.')
-                print('')
-            else:
-                print('Please run |mach bootstrap| to upgrade your Mercurial '
-                    'install.')
-                print('')
-
-            if not self._prompt_yn('Would you like to continue using an old '
-                'Mercurial version'):
-                return 1
 
         if not c.have_valid_username():
             print(MISSING_USERNAME)
