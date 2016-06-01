@@ -80,6 +80,7 @@ wizardsteps = {
     'username',
     'diff',
     'color',
+    'historyediting',
     'configchange',
 }
 
@@ -116,6 +117,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'color' in runsteps:
         _promptnativeextension(ui, cw, 'color', 'Enable color output to your terminal')
+
+    if 'historyediting' in runsteps:
+        _checkhistoryediting(ui, cw)
 
     if 'configchange' in runsteps:
         return _handleconfigchange(ui, cw)
@@ -206,6 +210,20 @@ def _promptnativeextension(ui, cw, ext, msg):
             cw.c['extensions'] = {}
 
         cw.c['extensions'][ext] = ''
+
+
+def _checkhistoryediting(ui, cw):
+    if all(ui.hasconfig('extensions', e) for e in ('histedit', 'rebase')):
+        return
+
+    if ui.promptchoice('Enable history rewriting commands (Yn)? $$ &Yes $$ &No'):
+        return
+
+    if 'extensions' not in cw.c:
+        cw.c['extensions'] = {}
+
+    cw.c['extensions']['histedit'] = ''
+    cw.c['extensions']['rebase'] = ''
 
 
 def _handleconfigchange(ui, cw):

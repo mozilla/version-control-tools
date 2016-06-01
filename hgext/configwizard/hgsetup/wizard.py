@@ -249,18 +249,6 @@ class MercurialSetupWizard(object):
             self.prompt_native_extension(c, 'progress',
                 'Would you like to see progress bars during Mercurial operations')
 
-        self.prompt_native_extension(c, 'color',
-            'Would you like Mercurial to colorize output to your terminal')
-
-        self.prompt_native_extension(c, 'rebase',
-            'Would you like to enable the rebase extension to allow you to move'
-            ' changesets around (which can help maintain a linear history)')
-
-        self.prompt_native_extension(c, 'histedit',
-            'Would you like to enable the histedit extension to allow history '
-            'rewriting via the "histedit" command (similar to '
-            '`git rebase -i`)')
-
         # hgwatchman is provided by MozillaBuild and we don't yet support
         # Linux/BSD.
         if ('hgwatchman' not in c.extensions
