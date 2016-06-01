@@ -164,6 +164,18 @@ For security reasons, the legacy credentials are being removed from the
 config.
 '''.lstrip()
 
+PUSHTOTRY_INFO = '''
+The push-to-try extension generates a temporary commit with a given
+try syntax and pushes it to the try server. The extension is intended
+to be used in concert with other tools generating try syntax so that
+they can push to try without depending on mq or other workarounds.
+
+(Relevant config option: extensions.push-to-try)
+
+Would you like to activate push-to-try (Yn)? $$ &Yes $$ &No
+'''.strip()
+
+
 testedwith = '3.5 3.6 3.7 3.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
 
@@ -179,6 +191,7 @@ wizardsteps = {
     'fsmonitor',
     'firefoxtree',
     'codereview',
+    'pushtotry',
     'configchange',
 }
 
@@ -227,6 +240,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'codereview' in runsteps:
         _checkcodereview(ui, cw)
+
+    if 'pushtotry' in runsteps:
+        _promptvctextension(ui, cw, 'push-to-try', PUSHTOTRY_INFO)
 
     if 'configchange' in runsteps:
         return _handleconfigchange(ui, cw)

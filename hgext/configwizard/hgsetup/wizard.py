@@ -32,19 +32,6 @@ Your Mercurial should now be properly configured and recommended extensions
 should be up to date!
 '''.strip()
 
-PUSHTOTRY_MINIMUM_VERSION = LooseVersion('3.5')
-
-PUSHTOTRY_INFO = '''
-The push-to-try extension generates a temporary commit with a given
-try syntax and pushes it to the try server. The extension is intended
-to be used in concert with other tools generating try syntax so that
-they can push to try without depending on mq or other workarounds.
-
-(Relevant config option: extensions.push-to-try)
-
-Would you like to activate push-to-try
-'''.strip()
-
 WIP_INFO = '''
 It is common to want a quick view of changesets that are in progress.
 
@@ -115,9 +102,6 @@ class MercurialSetupWizard(object):
         self.updater.update_all()
 
         hg_version = get_hg_version(hg)
-
-        if hg_version >= PUSHTOTRY_MINIMUM_VERSION:
-            self.prompt_external_extension(c, 'push-to-try', PUSHTOTRY_INFO)
 
         if not c.have_wip():
             if self._prompt_yn(WIP_INFO):
