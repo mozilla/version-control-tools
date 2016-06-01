@@ -69,6 +69,29 @@ Mercurial is not configured to produce diffs in a more readable format.
 Would you like to change this (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+FSMONITOR_INFO = '''
+The fsmonitor extension integrates the watchman filesystem watching tool
+with Mercurial. Commands like `hg status`, `hg diff`, and `hg commit`
+(which need to examine filesystem state) can query watchman to obtain
+this state, allowing these commands to complete much quicker.
+
+When installed, the fsmonitor extension will automatically launch a
+background watchman daemon for accessed Mercurial repositories. It
+should "just work."
+
+Would you like to enable fsmonitor (Yn)? $$ &Yes $$ &No
+'''.strip()
+
+FSMONITOR_NOT_AVAILABLE = '''
+Newer versions of Mercurial have built-in support for integrating with
+filesystem watching services to make common operations faster.
+
+This integration is STRONGLY RECOMMENDED when using the Firefox
+repository.
+
+Please upgrade to Mercurial 3.8+ so this feature is available.
+'''.lstrip()
+
 testedwith = '3.5 3.6 3.7 3.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
 
@@ -81,6 +104,7 @@ wizardsteps = {
     'diff',
     'color',
     'historyediting',
+    'fsmonitor',
     'configchange',
 }
 
@@ -120,6 +144,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'historyediting' in runsteps:
         _checkhistoryediting(ui, cw)
+
+    if 'fsmonitor' in runsteps:
+        _checkfsmonitor(ui, cw, hgversion)
 
     if 'configchange' in runsteps:
         return _handleconfigchange(ui, cw)
@@ -205,7 +232,7 @@ def _promptnativeextension(ui, cw, ext, msg):
     if ui.hasconfig('extensions', ext):
         return
 
-    if not ui.promptchoice('%s (Yn) $$ &Yes $$ &No' % msg):
+    if not uipromptchoice(ui, '%s (Yn) $$ &Yes $$ &No' % msg):
         if 'extensions' not in cw.c:
             cw.c['extensions'] = {}
 
@@ -224,6 +251,28 @@ def _checkhistoryediting(ui, cw):
 
     cw.c['extensions']['histedit'] = ''
     cw.c['extensions']['rebase'] = ''
+
+
+def _checkfsmonitor(ui, cw, hgversion):
+    # fsmonitor came into existence in Mercurial 3.8. Before that, it
+    # was the "hgwatchman" extension from a 3rd party repository.
+    # Instead of dealing with installing hgwatchman, we version sniff
+    # and print a message about wanting a more modern Mercurial version.
+
+    if ui.hasconfig('extensions', 'fsmonitor'):
+        try:
+            del cw.c['extensions']['hgwatchman']
+            ui.write('Removing extensions.hgwatchman because fsmonitor is installed\n')
+        except KeyError:
+            pass
+
+        return
+
+    # Mercurial 3.8+ has fsmonitor built-in.
+    if hgversion >= (3, 8, 0):
+        _promptnativeextension(ui, cw, 'fsmonitor', FSMONITOR_INFO)
+    else:
+        ui.write(FSMONITOR_NOT_AVAILABLE)
 
 
 def _handleconfigchange(ui, cw):
