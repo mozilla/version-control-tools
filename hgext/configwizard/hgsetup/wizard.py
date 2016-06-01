@@ -28,13 +28,6 @@ from .config import (
 )
 
 
-BAD_DIFF_SETTINGS = '''
-Mozilla developers produce patches in a standard format, but your Mercurial is
-not configured to produce patches in that format.
-
-(Relevant config options: diff.git, diff.showfunc, diff.unified)
-'''.strip()
-
 BZEXPORT_INFO = '''
 If you plan on uploading patches to Mozilla, there is an extension called
 bzexport that makes it easy to upload patches from the command line via the
@@ -250,14 +243,6 @@ class MercurialSetupWizard(object):
         self.updater.update_all()
 
         hg_version = get_hg_version(hg)
-
-        if not c.have_recommended_diff_settings():
-            print(BAD_DIFF_SETTINGS)
-            print('')
-            if self._prompt_yn('Would you like me to fix this for you'):
-                c.ensure_recommended_diff_settings()
-                print('Fixed patch settings.')
-                print('')
 
         # Progress is built into core and enabled by default in Mercurial 3.5.
         if hg_version < LooseVersion('3.5'):

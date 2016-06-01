@@ -63,6 +63,12 @@ acceptable.
 (Relevant config option: ui.username)
 '''.lstrip()
 
+BAD_DIFF_SETTINGS = '''
+Mercurial is not configured to produce diffs in a more readable format.
+
+Would you like to change this (Yn)? $$ &Yes $$ &No
+'''.strip()
+
 testedwith = '3.5 3.6 3.7 3.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
 
@@ -72,6 +78,7 @@ command = cmdutil.command(cmdtable)
 wizardsteps = {
     'hgversion',
     'username',
+    'diff',
     'configchange',
 }
 
@@ -102,6 +109,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'username' in runsteps:
         _checkusername(ui, cw)
+
+    if 'diff' in runsteps:
+        _checkdiffsettings(ui, cw)
 
     if 'configchange' in runsteps:
         return _handleconfigchange(ui, cw)
@@ -138,6 +148,12 @@ def uiprompt(ui, msg, default=None):
     return ui.prompt(lines[-1], default=default)
 
 
+def uipromptchoice(ui, msg):
+    lines = msg.splitlines(True)
+    ui.write(''.join(lines[0:-1]))
+    return ui.promptchoice(lines[-1])
+
+
 def _checkusername(ui, cw):
     if ui.config('ui', 'username'):
         return
@@ -160,6 +176,21 @@ def _checkusername(ui, cw):
     else:
         ui.warn('Unable to set username; You will be unable to author '
                 'commits\n\n')
+
+
+def _checkdiffsettings(ui, cw):
+    git = ui.configbool('diff', 'git')
+    showfunc = ui.configbool('diff', 'showfunc')
+
+    if git and showfunc:
+        return
+
+    if not uipromptchoice(ui, BAD_DIFF_SETTINGS):
+        if 'diff' not in cw.c:
+            cw.c['diff'] = {}
+
+        cw.c['diff']['git'] = 'true'
+        cw.c['diff']['showfunc'] = 'true'
 
 
 def _handleconfigchange(ui, cw):

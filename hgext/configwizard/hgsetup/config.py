@@ -45,27 +45,6 @@ class MercurialConfig(object):
 
         self._c['extensions'][name] = path
 
-    def have_recommended_diff_settings(self):
-        if 'diff' not in self._c:
-            return False
-
-        old = dict(self._c['diff'])
-        try:
-            self.ensure_recommended_diff_settings()
-        finally:
-            self._c['diff'].update(old)
-
-        return self._c['diff'] == old
-
-    def ensure_recommended_diff_settings(self):
-        if 'diff' not in self._c:
-            self._c['diff'] = {}
-
-        d = self._c['diff']
-        d['git'] = 1
-        d['showfunc'] = 1
-        d['unified'] = 8
-
     def get_bugzilla_credentials(self):
         if 'bugzilla' not in self._c:
             return None, None, None, None, None
