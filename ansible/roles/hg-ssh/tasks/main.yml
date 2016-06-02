@@ -180,6 +180,7 @@
 
 - name: ensure hg sshd runs on startup
   command: /usr/bin/systemctl enable sshd_hg.service
+  when: vct_dir.stat.exists == False
 
 - name: directories for support tools is present
   file: path=/usr/local/bin
