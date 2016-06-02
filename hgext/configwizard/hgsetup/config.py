@@ -14,17 +14,6 @@ HOST_FINGERPRINTS = {
 class MercurialConfig(object):
     """Interface for manipulating a Mercurial config file."""
 
-    def have_valid_username(self):
-        if 'ui' not in self._c:
-            return False
-
-        if 'username' not in self._c['ui']:
-            return False
-
-        # TODO perform actual validation here.
-
-        return True
-
     def add_mozilla_host_fingerprints(self):
         """Add host fingerprints so SSL connections don't warn."""
         if 'hostfingerprints' not in self._c:
@@ -41,19 +30,6 @@ class MercurialConfig(object):
         for k, v in HOST_FINGERPRINTS.items():
             if k in self._c['hostfingerprints']:
                 self._c['hostfingerprints'][k] = v
-
-    def set_username(self, name, email):
-        """Set the username to use for commits.
-
-        The username consists of a name (typically <firstname> <lastname>) and
-        a well-formed e-mail address.
-        """
-        if 'ui' not in self._c:
-            self._c['ui'] = {}
-
-        username = '%s <%s>' % (name, email)
-
-        self._c['ui']['username'] = username.strip()
 
     def activate_extension(self, name, path=None):
         """Activate an extension.

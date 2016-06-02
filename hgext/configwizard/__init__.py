@@ -3,17 +3,23 @@
 
 """Manage Mercurial configuration in a Mozilla-tailored way."""
 
+import difflib
+import io
 import os
+import uuid
 
 from mercurial import (
     cmdutil,
     error,
+    scmutil,
     util,
 )
 from mercurial.i18n import _
 
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+
+from configobj import ConfigObj
 
 INITIAL_MESSAGE = '''
 This wizard will guide you through configuring Mercurial for an optimal
@@ -46,6 +52,16 @@ to upgrade may leave you exposed. You are highly encouraged to upgrade in
 case you aren't running a patched version.
 '''.lstrip()
 
+MISSING_USERNAME = '''
+You don't have a username defined in your Mercurial config file. In order
+to author commits, you'll need to define a name and e-mail address.
+
+This data will be publicly available when you send commits/patches to others.
+If you aren't comfortable giving us your full name, pseudonames are
+acceptable.
+
+(Relevant config option: ui.username)
+'''.lstrip()
 
 testedwith = '3.5 3.6 3.7 3.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
@@ -55,6 +71,8 @@ command = cmdutil.command(cmdtable)
 
 wizardsteps = {
     'hgversion',
+    'username',
+    'configchange',
 }
 
 @command('configwizard', [
@@ -74,9 +92,21 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     uiprompt(ui, INITIAL_MESSAGE, default='<RETURN>')
 
+    configpaths = [p for p in scmutil.userrcpath() if os.path.exists(p)]
+    path = configpaths[0] if configpaths else scmutil.userrcpath()[0]
+    cw = configobjwrapper(path)
+
     if 'hgversion' in runsteps:
         if _checkhgversion(ui, hgversion):
             return 1
+
+    if 'username' in runsteps:
+        _checkusername(ui, cw)
+
+    if 'configchange' in runsteps:
+        return _handleconfigchange(ui, cw)
+
+    return 0
 
 
 def _checkhgversion(ui, hgversion):
@@ -106,3 +136,102 @@ def uiprompt(ui, msg, default=None):
     lines = msg.splitlines(True)
     ui.write(''.join(lines[0:-1]))
     return ui.prompt(lines[-1], default=default)
+
+
+def _checkusername(ui, cw):
+    if ui.config('ui', 'username'):
+        return
+
+    ui.write(MISSING_USERNAME)
+
+    name, email = None, None
+
+    name = ui.prompt('What is your name?', '')
+    if name:
+        email = ui.prompt('What is your e-mail address?', '')
+
+    if name and email:
+        username = '%s <%s>' % (name, email)
+        if 'ui' not in cw.c:
+            cw.c['ui'] = {}
+        cw.c['ui']['username'] = username.strip()
+
+        ui.write('setting ui.username=%s\n\n' % username)
+    else:
+        ui.warn('Unable to set username; You will be unable to author '
+                'commits\n\n')
+
+
+def _handleconfigchange(ui, cw):
+    # Obtain the old and new content so we can show a diff.
+    newbuf = io.BytesIO()
+    cw.write(newbuf)
+    newbuf.seek(0)
+    newlines = [l.rstrip() for l in newbuf.readlines()]
+    oldlines = []
+    if os.path.exists(cw.path):
+        with open(cw.path, 'rb') as fh:
+            oldlines = [l.rstrip() for l in fh.readlines()]
+
+    diff = list(difflib.unified_diff(oldlines, newlines,
+                                     'hgrc.old', 'hgrc.new',
+                                     lineterm=''))
+
+    if len(diff):
+        ui.write('Your config file needs updating.\n')
+        if not ui.promptchoice('Would you like to see a diff of the changes first (Yn)? $$ &Yes $$ &No'):
+            for line in diff:
+                ui.write('%s\n' % line)
+            ui.write('\n')
+
+        if not ui.promptchoice('Write changes to hgrc file (Yn)? $$ &Yes $$ &No'):
+            with open(cw.path, 'wb') as fh:
+                fh.write(newbuf.getvalue())
+        else:
+            ui.write('config changes not written; we would have written the following:\n')
+            ui.write(newbuf.getvalue())
+            return 1
+
+
+class configobjwrapper(object):
+    """Manipulate config files with ConfigObj.
+
+    Mercurial doesn't support writing config files. ConfigObj does. ConfigObj
+    also supports preserving comments in config files, which is user friendly.
+
+    This class provides a mechanism to load and write config files with
+    ConfigObj.
+    """
+    def __init__(self, path):
+        self.path = path
+        self._random = str(uuid.uuid4())
+
+        lines = []
+
+        if os.path.exists(path):
+            with open(path, 'rb') as fh:
+                for line in fh:
+                    # Mercurial has special syntax to include other files.
+                    # ConfigObj doesn't recognize it. Normalize on read and
+                    # restore on write to preserve it.
+                    if line.startswith('%include'):
+                        line = '#%s %s' % (self._random, line)
+
+                    if line.startswith(';'):
+                        raise error.Abort('semicolon (;) comments in config '
+                                          'files not supported',
+                                          hint='use # for comments')
+
+                    lines.append(line)
+
+        self.c = ConfigObj(infile=lines, encoding='utf-8',
+                           write_empty_values=True, list_values=False)
+
+    def write(self, fh):
+        lines = self.c.write()
+        for line in lines:
+            if line.startswith('#%s ' % self._random):
+                line = line[2 + len(self._random):]
+
+            fh.write('%s\n' % line)
+

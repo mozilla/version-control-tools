@@ -28,14 +28,6 @@ from .config import (
 )
 
 
-MISSING_USERNAME = '''
-You don't have a username defined in your Mercurial config file. In order to
-send patches to Mozilla, you'll need to attach a name and email address. If you
-aren't comfortable giving us your full name, pseudonames are acceptable.
-
-(Relevant config option: ui.username)
-'''.strip()
-
 BAD_DIFF_SETTINGS = '''
 Mozilla developers produce patches in a standard format, but your Mercurial is
 not configured to produce patches in that format.
@@ -259,16 +251,6 @@ class MercurialSetupWizard(object):
 
         hg_version = get_hg_version(hg)
 
-        if not c.have_valid_username():
-            print(MISSING_USERNAME)
-            print('')
-
-            name = self._prompt('What is your name?')
-            email = self._prompt('What is your email address?')
-            c.set_username(name, email)
-            print('Updated your username.')
-            print('')
-
         if not c.have_recommended_diff_settings():
             print(BAD_DIFF_SETTINGS)
             print('')
@@ -421,38 +403,6 @@ class MercurialSetupWizard(object):
             print(MULTIPLE_VCT % c.config_path)
 
         # At this point the config should be finalized.
-
-        b = StringIO()
-        c.write(b)
-        new_lines = [line.rstrip() for line in b.getvalue().splitlines()]
-        old_lines = []
-
-        config_path = c.config_path
-        if os.path.exists(config_path):
-            with open(config_path, 'rt') as fh:
-                old_lines = [line.rstrip() for line in fh.readlines()]
-
-        diff = list(difflib.unified_diff(old_lines, new_lines,
-            'hgrc.old', 'hgrc.new'))
-
-        if len(diff):
-            print('Your Mercurial config file needs updating. I can do this '
-                'for you if you like!')
-            if self._prompt_yn('Would you like to see a diff of the changes '
-                'first'):
-                for line in diff:
-                    print(line)
-                print('')
-
-            if self._prompt_yn('Would you like me to update your hgrc file'):
-                with open(config_path, 'wt') as fh:
-                    c.write(fh)
-                print('Wrote changes to %s.' % config_path)
-            else:
-                print('hgrc changes not written to file. I would have '
-                    'written the following:\n')
-                c.write(sys.stdout)
-                return 1
 
         if sys.platform != 'win32':
             # Config file may contain sensitive content, such as passwords.
