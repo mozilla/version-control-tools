@@ -27,11 +27,9 @@ class PygmentsOverride(Extension):
     def initialize(self):
         self._original_chunk_generator_class = get_diff_chunk_generator_class()
         set_diff_chunk_generator_class(OverridableDiffChunkGenerator)
-        logger.info('overridable diff chunk generator class set!')
 
     def shutdown(self):
         set_diff_chunk_generator_class(self._original_chunk_generator_class)
-        logger.info('original diff chunk generator class restored!')
         super(PygmentsOverride, self).shutdown()
 
     def get_overrides_map(self):
