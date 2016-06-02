@@ -239,7 +239,7 @@
 
 - name: configure httpd to run at system startup (CentOS 7)
   command: /usr/bin/systemctl enable httpd.service
-  when: ansible_distribution_major_version == '7'
+  when: vct_dir.stat.exists == False and ansible_distribution_major_version == '7'
 
 - name: install mirror-pull script
   template: src=mirror-pull.j2
