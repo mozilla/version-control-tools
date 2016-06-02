@@ -340,7 +340,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
     os.chmod(clonebundles_path, 0664)
 
     # Replicate manifest to mirrors.
-    subprocess.check_call([PUSH_REPO], cwd=repo_full)
+    subprocess.check_call([HG, 'replicatesync'], cwd=repo_full)
 
     return paths
 

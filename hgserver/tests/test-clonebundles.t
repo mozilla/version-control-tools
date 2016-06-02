@@ -76,7 +76,8 @@ The manifest should be empty because there were no successful uploads
 
 Create a clonebundles manifest
 
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles --no-upload mozilla-central &> /dev/null
+  $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles --no-upload mozilla-central >/dev/null
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
 Cloning will fetch bundle
 
