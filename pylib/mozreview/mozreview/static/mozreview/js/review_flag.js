@@ -21,7 +21,7 @@ MRReviewFlag.View = Backbone.View.extend({
   states: [' ', 'r?', 'r+', 'r-'],
 
   template: _.template([
-      '<label for="mr-review-flag">Review state:</label>',
+      '<label for="mr-review-flag">Review state:</label> ',
       '<select id="mr-review-flag">',
       '<% _(states).each(function(state) { %>',
       '  <option <% if (state === val) { %> selected <% } %> >',
