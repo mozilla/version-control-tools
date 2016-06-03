@@ -24,10 +24,12 @@ PUSH_REPO = '/var/hg/version-control-tools/scripts/push-repo.sh'
 #
 # Define in order bundles should be listed in manifest.
 CREATES = [
-    ('gzip', ['bundle', '-a', '-t', 'gzip-v1']),
-    ('bzip2', ['bundle', '-a', '-t', 'bzip2-v1']),
-    ('stream-legacy', ['streambundle']),
-    ('packed1', ['streambundle', '--type', 's1']),
+    ('gzip', ['bundle', '-a', '-t', 'gzip-v1'], {}),
+    ('gzip-v2', ['bundle', '-a', '-t', 'gzip-v2'], {'gd': True}),
+    ('bzip2', ['bundle', '-a', '-t', 'bzip2-v1'], {}),
+    ('stream-legacy', ['streambundle'], {}),
+    ('packed1', ['streambundle', '--type', 's1'], {}),
+    ('packed1-gd', ['streambundle', '--type', 's1'], {'gd': True}),
 ]
 
 BUNDLECLONE_ORDER = [
@@ -37,8 +39,10 @@ BUNDLECLONE_ORDER = [
 ]
 
 CLONEBUNDLES_ORDER = [
+    ('gzip-v2', 'BUNDLESPEC=gzip-v2'),
     ('gzip', 'BUNDLESPEC=gzip-v1'),
     ('bzip2', 'BUNDLESPEC=bzip2-v1'),
+    ('packed1-gd', 'BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1'),
     ('packed1', 'BUNDLESPEC=none-packed1;requirements%3Drevlogv1'),
 ]
 
@@ -94,8 +98,10 @@ HTML_INDEX = '''
       <tr>
         <th>Repository</th>
         <th>gzip (v1)</th>
+        <th>gzip (v2)</th>
         <th>bz2 (v1)</th>
         <th>stream</th>
+        <th>stream (generaldelta)</th>
         <th>stream-legacy</th>
       </tr>
       %s
@@ -108,9 +114,11 @@ HTML_INDEX = '''
 HTML_ENTRY = '''
 <tr>
   <td>{repo}</td>
-  <td class="numeric"><a href="{gzip_path}">{gzip_size:,}</a></td>
+  <td class="numeric">{gzip_entry}</td>
+  <td class="numeric">{gzip_v2_entry}</td>
   <td class="numeric">{bzip2_entry}</td>
-  <td class="numeric"><a href="{packed1_path}">{packed1_size:,}</a></td>
+  <td class="numeric">{packed1_entry}</a></td>
+  <td class="numeric">{packed1_gd_entry}</td>
   <td class="numeric"<{stream_legacy_entry}</td>
 </tr>
 '''.strip()
@@ -199,6 +207,12 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
     tip = subprocess.check_output([HG, '-R', repo_full, 'log', '-r', 'tip', '-T', '{node}'])
     print('tip is %s' % tip)
 
+    generaldelta = False
+    with open(os.path.join(repo_full, '.hg', 'requires'), 'rb') as fh:
+        for line in fh:
+            if line.strip() == 'generaldelta':
+                generaldelta = True
+
     bundle_path = os.path.join(BUNDLE_ROOT, repo)
 
     # Create directory to hold bundle files.
@@ -235,11 +249,20 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
     bundles = []
     fs = []
     with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
-        for t, args in CREATES:
+        for t, args, opts in CREATES:
             if t == 'bzip2' and not bzip2:
                 continue
 
             if t == 'stream-legacy' and not legacy_stream:
+                continue
+
+            # When the repo is generaldelta, only allow generation of
+            # bundles that are compatible with generaldelta. If we don't do
+            # this, CPU usage could blow up attempting to convert a
+            # generaldelta repo to a non-generaldelta compatible bundle.
+            if generaldelta and not opts.get('gd'):
+                continue
+            elif not generaldelta and opts.get('gd'):
                 continue
 
             final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
@@ -360,7 +383,7 @@ def upload_index(repos):
         p = repos[repo]
 
         # Should only be for bundles with copyfrom.
-        if 'gzip' not in p:
+        if 'gzip' not in p and 'gzip-v2' not in p:
             print('ignoring repo %s in index because no gzip bundle' % repo)
             continue
 
@@ -369,13 +392,9 @@ def upload_index(repos):
         opts = dict(
             repo=repo,
             basename=basename,
-            gzip_path=p['gzip'][0],
-            gzip_size=p['gzip'][1],
-            packed1_path=p['packed1'][0],
-            packed1_size=p['packed1'][1],
         )
 
-        for k in ('bzip2', 'stream-legacy'):
+        for k in ('bzip2', 'gzip', 'gzip-v2', 'packed1', 'packed1-gd', 'stream-legacy'):
             key = '%s_entry' % k.replace('-', '_')
             if k in p:
                 opts[key] = '<a href="{path}"{size:,}</a>'.format(

@@ -230,4 +230,26 @@ Legacy stream bundles only generated when requested
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=us-west-1 stream=revlogv1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=us-east-1 stream=revlogv1
 
+Generaldelta repos should create gzip-v2 and streamclone bundles only
+
+  $ hgmo create-repo generaldelta 1 --generaldelta
+  (recorded repository creation in replication log)
+  $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/generaldelta
+  $ cd generaldelta
+  $ touch foo
+  $ hg -q commit -A -m initial
+  $ hg push > /dev/null
+  $ cd ..
+
+  $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles 'generaldelta' --no-upload > /dev/null
+  $ hgmo exec hgssh cat /repo/hg/mozilla/generaldelta/.hg/clonebundles.manifest
+  https://hg.cdn.mozilla.net/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-east-1
+  https://hg.cdn.mozilla.net/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-east-1 (no-eol)
+
   $ hgmo clean
