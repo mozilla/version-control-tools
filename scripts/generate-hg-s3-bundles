@@ -225,6 +225,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
     # This is because an aborted bundle process may result in a partial file,
     # which may confuse our don't-write-if-file-exists logic.
 
+    bundles = []
     fs = []
     with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
         for t, args in CREATES:
@@ -233,6 +234,9 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
 
             final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
             temp_path = '%s.tmp' % final_path
+
+            # Record that this bundle is relevant.
+            bundles.append((t, final_path, remote_path))
 
             if os.path.exists(final_path):
                 print('bundle already exists, skipping: %s' % final_path)
@@ -270,12 +274,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
         fs = []
         with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
             for host, bucket, name in HOSTS:
-                for t, _args in CREATES:
-                    if t == 'bzip2' and not bzip2:
-                        continue
-
-                    final_path, remote_path = bundle_paths(bundle_path, repo,
-                                                           tip, t)
+                for t, bundle_path, remote_path in bundles:
                     print('uploading to %s/%s/%s' % (host, bucket, remote_path))
                     fs.append(e.submit(upload_to_s3, host, bucket, final_path, remote_path))
 
@@ -287,16 +286,14 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
 
     # Now assemble a manifest listing each bundle.
     paths = {}
-    for t, _args in CREATES:
-        if t == 'bzip2' and not bzip2:
-            continue
-
-        final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
+    for t, final_path, remote_path in bundles:
         paths[t] = (remote_path, os.path.getsize(final_path))
+
+    bundle_types = set(t[0] for t in bundles)
 
     bundleclone_manifest = []
     for t, params in BUNDLECLONE_ORDER:
-        if t == 'bzip2' and not bzip2:
+        if t not in bundle_types:
             continue
 
         final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
@@ -311,7 +308,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
 
     clonebundles_manifest = []
     for t, params in CLONEBUNDLES_ORDER:
-        if t == 'bzip2' and not bzip2:
+        if t not in bundle_types:
             continue
 
         final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
