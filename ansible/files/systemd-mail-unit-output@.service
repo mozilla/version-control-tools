@@ -3,6 +3,6 @@ Description=Send email with unit status updates
 After=network.target
 
 [Service]
-type=simple
+Type=simple
 ExecStart=/usr/local/bin/systemd-mail-unit-output %I %H
 Environment=FROM=%I@%H
