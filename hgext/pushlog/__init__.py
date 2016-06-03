@@ -27,7 +27,7 @@ from mercurial.error import (
 )
 from mercurial.node import bin
 
-testedwith = '3.4 3.5 3.6'
+testedwith = '3.7'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
