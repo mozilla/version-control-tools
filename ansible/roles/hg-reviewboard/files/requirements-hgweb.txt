@@ -3,8 +3,8 @@
 
 --find-links https://downloads.reviewboard.org/releases/RBTools/0.7/
 
-Mercurial==3.7.3 \
-    --hash=sha256:c099c42d74e2d520b61dd372cd996b0fa7605c06617834fd7b13c79b9a9a5b30
+Mercurial==3.8.4 \
+    --hash=sha256:4b2e3ef19d34fa1d781cb7425506a05d4b6b1172bab69d6ea78874175fdf3da6
 
 mod-wsgi==4.4.11 \
     --hash=sha256:7dd9540db9797f2a5b491eaff6344643050553ebcbb62f775762cbe3a0343c25

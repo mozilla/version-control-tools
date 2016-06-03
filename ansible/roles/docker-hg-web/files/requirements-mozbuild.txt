@@ -1,8 +1,8 @@
 jsmin==2.1.2 \
     --hash=sha256:5e710e9db14f210dfd55ebec43bca5c812d34c5b6179dbcba2e61d9f965bf4e1
 
-Mercurial==3.7.3 \
-    --hash=sha256:c099c42d74e2d520b61dd372cd996b0fa7605c06617834fd7b13c79b9a9a5b30
+Mercurial==3.8.4 \
+    --hash=sha256:4b2e3ef19d34fa1d781cb7425506a05d4b6b1172bab69d6ea78874175fdf3da6
 
 mozbuild==0.2 \
     --hash=sha256:24227608fc3c735fbb5c629d0540a600368c1d5e57013dd39272a0a5c9cccb13
