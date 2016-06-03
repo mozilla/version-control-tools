@@ -111,7 +111,7 @@ HTML_ENTRY = '''
   <td class="numeric"><a href="{gzip_path}">{gzip_size:,}</a></td>
   <td class="numeric">{bzip2_entry}</td>
   <td class="numeric"><a href="{packed1_path}">{packed1_size:,}</a></td>
-  <td class="numeric"><a href="{stream_path}">{stream_size:,}</a></td>
+  <td class="numeric"<{stream_legacy_entry}</td>
 </tr>
 '''.strip()
 
@@ -155,8 +155,15 @@ def generate_bundle(repo, temp_path, final_path, extra_args):
     os.rename(temp_path, final_path)
 
 
-def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
-    """Generate bundle files for a repository at a path."""
+def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
+                     legacy_stream=False):
+    """Generate bundle files for a repository at a path.
+
+    ``bzip2`` denotes whether to generate bzip2 bundles.
+    ``legacy_stream`` denotes whether to generate legacy stream bundles
+    (required for compatibility with the "bundleclone" extension, which
+    pre-dated Mercurial's built-in support for "clonebundles.").
+    """
     # Copy manifest files from the source repository listed. Don't return
     # anything because we don't need to list bundles since this repo isn't
     # canonical.
@@ -230,6 +237,9 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None):
     with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
         for t, args in CREATES:
             if t == 'bzip2' and not bzip2:
+                continue
+
+            if t == 'stream-legacy' and not legacy_stream:
                 continue
 
             final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
@@ -363,17 +373,17 @@ def upload_index(repos):
             gzip_size=p['gzip'][1],
             packed1_path=p['packed1'][0],
             packed1_size=p['packed1'][1],
-            stream_path=p['stream-legacy'][0],
-            stream_size=p['stream-legacy'][1],
         )
 
-        if 'bzip2' in p:
-            opts['bzip2_entry'] = '<a href="{path}">{size:,}</a>'.format(
-                path=p['bzip2'][0],
-                size=p['bzip2'][1],
-            )
-        else:
-            opts['bzip2_entry'] = '-'
+        for k in ('bzip2', 'stream-legacy'):
+            key = '%s_entry' % k.replace('-', '_')
+            if k in p:
+                opts[key] = '<a href="{path}"{size:,}</a>'.format(
+                    path=p[k][0],
+                    size=p[k][1],
+                )
+            else:
+                opts[key] = '-'
 
         entries.append(HTML_ENTRY.format(**opts))
 
