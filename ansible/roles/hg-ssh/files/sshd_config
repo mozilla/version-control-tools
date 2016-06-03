@@ -21,3 +21,7 @@ AcceptEnv LANG LC_ALL LC_MESSAGES
 # Add extra logging to enable forensics.
 Subsystem sftp /usr/libexec/openssh/sftp-server -f AUTHPRIV -l INFO
 
+Match User asset_discovery Address 10.22.75.131,10.22.75.168,10.22.75.170
+   PubkeyAuthentication yes
+Match user asset_discovery
+   PubkeyAuthentication no
