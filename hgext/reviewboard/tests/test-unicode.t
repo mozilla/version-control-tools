@@ -19,7 +19,7 @@ Create a review request
   $ bugzilla create-bug TestProduct TestComponent 'First Bug'
   $ echo initial > foo
   $ hg --encoding utf-8 commit -m 'Bug 1 - Initial commit to review ’ こ'
-  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} --config reviewboard.autopublish=false push &> /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} --config reviewboard.autopublish=false push > /dev/null 2>&1
   $ rbmanage publish 1
 
 Add a comment with unicode

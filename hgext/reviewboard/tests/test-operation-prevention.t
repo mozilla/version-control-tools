@@ -20,7 +20,7 @@ Create a review request from a regular user
 
   $ echo initial > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} --config reviewboard.autopublish=false push &> /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} --config reviewboard.autopublish=false push > /dev/null 2>&1
 
 Attempting to publish a commit review request should fail.
 

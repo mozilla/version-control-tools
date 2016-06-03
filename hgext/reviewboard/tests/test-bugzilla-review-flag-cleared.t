@@ -21,7 +21,7 @@ Create a review
 
   $ echo bug > foo
   $ hg commit -m 'Bug 1 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push &> /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push > /dev/null 2>&1
 
   $ rbmanage add-reviewer 2 --user reviewer
   1 people listed on review request
@@ -358,7 +358,7 @@ Create a review
   $ bugzilla create-bug TestProduct TestComponent 'Second Bug'
 
   $ hg commit --amend -m 'Bug 2 - Initial commit to review' > /dev/null
-  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=${l3key} push &> /dev/null
+  $ hg --config bugzilla.username=l3author@example.com --config bugzilla.apikey=${l3key} push > /dev/null 2>&1
 
   $ rbmanage add-reviewer 4 --user reviewer
   1 people listed on review request
@@ -633,7 +633,7 @@ Adding a reviewer should leave r- untouched
 
   $ echo bug3 > foo
   $ hg commit -m 'Bug 3 - Initial commit to review'
-  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push -c . &> /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push -c . > /dev/null 2>&1
   $ rbmanage add-reviewer 6 --user reviewer
   1 people listed on review request
   $ rbmanage publish 5
@@ -710,7 +710,7 @@ Publishing a new revision should reset r- to r?, and carry forward r+
   $ exportbzauth author@example.com password
   $ echo updated >> foo
   $ hg commit --amend -m 'Bug 3 - Modified commit to review' > /dev/null
-  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push -c . &> /dev/null
+  $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} push -c . > /dev/null 2>&1
   $ bugzilla dump-bug 3
   Bug 3:
     attachments:
