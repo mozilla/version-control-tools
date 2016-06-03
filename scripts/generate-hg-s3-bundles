@@ -93,8 +93,8 @@ HTML_INDEX = '''
     <table border="1">
       <tr>
         <th>Repository</th>
-        <th>gzip</th>
-        <th>bz2</th>
+        <th>gzip (v1)</th>
+        <th>bz2 (v1)</th>
         <th>stream</th>
         <th>stream-legacy</th>
       </tr>
