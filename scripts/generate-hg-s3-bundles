@@ -392,7 +392,7 @@ def upload_index(repos):
         for k in ('bzip2', 'gzip', 'gzip-v2', 'packed1', 'packed1-gd', 'stream-legacy'):
             key = '%s_entry' % k.replace('-', '_')
             if k in p:
-                opts[key] = '<a href="{path}"{size:,}</a>'.format(
+                opts[key] = '<a href="{path}">{size:,}</a>'.format(
                     path=p[k][0],
                     size=p[k][1],
                 )
