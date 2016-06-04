@@ -119,7 +119,7 @@ HTML_ENTRY = '''
   <td class="numeric">{bzip2_entry}</td>
   <td class="numeric">{packed1_entry}</a></td>
   <td class="numeric">{packed1_gd_entry}</td>
-  <td class="numeric"<{stream_legacy_entry}</td>
+  <td class="numeric">{stream_legacy_entry}</td>
 </tr>
 '''.strip()
 
