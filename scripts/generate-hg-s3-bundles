@@ -387,12 +387,7 @@ def upload_index(repos):
             print('ignoring repo %s in index because no gzip bundle' % repo)
             continue
 
-        basename = os.path.basename(p['gzip'][0])
-
-        opts = dict(
-            repo=repo,
-            basename=basename,
-        )
+        opts = {'repo': repo}
 
         for k in ('bzip2', 'gzip', 'gzip-v2', 'packed1', 'packed1-gd', 'stream-legacy'):
             key = '%s_entry' % k.replace('-', '_')
@@ -401,6 +396,7 @@ def upload_index(repos):
                     path=p[k][0],
                     size=p[k][1],
                 )
+                opts['basename'] = os.path.basename(p[k][0])
             else:
                 opts[key] = '-'
 
