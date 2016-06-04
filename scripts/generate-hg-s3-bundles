@@ -309,7 +309,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
             for host, bucket, name in HOSTS:
                 for t, bundle_path, remote_path in bundles:
                     print('uploading to %s/%s/%s' % (host, bucket, remote_path))
-                    fs.append(e.submit(upload_to_s3, host, bucket, final_path, remote_path))
+                    fs.append(e.submit(upload_to_s3, host, bucket, bundle_path, remote_path))
 
         # Future.result() will raise if a future raised. This will
         # abort script execution, which is fine since failure should
