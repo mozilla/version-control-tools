@@ -5,6 +5,7 @@ SyslogFacility AUTHPRIV
 LogLevel VERBOSE
 PermitRootLogin no
 PasswordAuthentication no
+UsePAM yes
 # TODO hook up 2FA (bug 1259231)
 ChallengeResponseAuthentication no
 Protocol 2
