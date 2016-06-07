@@ -71,17 +71,26 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
             carry_forward[email] = False
 
         for review in gen_latest_reviews(review_request):
-            # Determine which flags should be carried forward.
-            # If the code (diffset) hasn't been changed by this draft (ie. this
-            # is a change to meta data only), then carry forward all flags.
-            # If the diffset was updated, carry forward just r+'s.  All other
-            # flags should be reset to r?.
             if review_request_draft.diffset:
+                # The code has changed, we need to determine what needs to
+                # happen to the flags.
+
+                # Don't set carry_forward values for reviewers that are not in
+                # the target_people list (eg. impromptu reviews).  This will
+                # result in the attachment flag being cleared in Bugzilla.
+                if review.user.email not in carry_forward:
+                    continue
+
+                # Carry forward just r+'s.  All other flags should be reset
+                # to r?.
                 review_flag = review.extra_data.get(REVIEW_FLAG_KEY)
                 carry_forward[review.user.email] = review_flag == 'r+' or (
                     # Older reviews didn't set review_flag.
                     review_flag is None and review.ship_it)
+
             else:
+                # This is a meta data only change, don't touch any existing
+                # flags.
                 carry_forward[review.user.email] = True
 
         rr_url = get_obj_url(review_request)
