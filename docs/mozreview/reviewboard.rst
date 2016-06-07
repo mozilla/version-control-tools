@@ -16,7 +16,7 @@ Before we go on to describe how to use Review Board, it is important
 to have a brief understanding of how Review Board works.
 
 For the patient, a read of the
-`Review Board User Guide <https://www.reviewboard.org/docs/manual/2.0/users/>`_
+`Review Board User Guide <https://www.reviewboard.org/docs/manual/2.5/users/>`_
 is recommended.
 
 For the impatient, some terminology. Note that some of these terms
@@ -138,13 +138,13 @@ to the right place to learn.
 
 Mozilla hasn't customized the review interface of Review Board
 significantly. So, the
-`Review Board User Guide <https://www.reviewboard.org/docs/manual/2.0/users/>`_,
+`Review Board User Guide <https://www.reviewboard.org/docs/manual/2.5/users/>`_,
 particularly the section on
-`Reviewing <https://www.reviewboard.org/docs/manual/2.0/users/reviews/>`_,
+`Reviewing <https://www.reviewboard.org/docs/manual/2.5/users/reviews/>`_,
 is almost completely applicable to MozReview!
 
 We **highly** recommend reading the
-`Reviewing <https://www.reviewboard.org/docs/manual/2.0/users/reviews/>`_
+`Reviewing <https://www.reviewboard.org/docs/manual/2.5/users/reviews/>`_
 section of the Review Board User Guide before conducting review. When
 reading, you may want to pay attention to the following, which may be
 new concepts if you are coming from Bugzilla code reviews:
@@ -169,7 +169,7 @@ Advanced Diff Viewer and Commenting
    Interdiff (showing the diff between multiple versions of the diff)
    works.
 
-`Issue Tracking <https://www.reviewboard.org/docs/manual/2.0/users/reviews/issue-tracking/>`_
+`Issue Tracking <https://www.reviewboard.org/docs/manual/2.5/users/reviews/issue-tracking/>`_
    When writing comments on reviews, Review Board allows you to open an
    *Issue*.
 
@@ -180,7 +180,7 @@ Advanced Diff Viewer and Commenting
    allows reviewer and code author to track the progress of a review over
    multiple iterations.
 
-`Markdown <https://www.reviewboard.org/docs/manual/2.0/users/markdown/>`_
+`Markdown <https://www.reviewboard.org/docs/manual/2.5/users/markdown/>`_
    Review Board supports Markdown in many of its multi-line text fields.
    This includes review comments. Use the power responsibly.
 
