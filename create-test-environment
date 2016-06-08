@@ -2,6 +2,13 @@
 
 set -e
 
+if [ -n "$MOZREVIEW_BUILD_FORKS" ]; then
+    # include --forks switch to build scripts
+    FORKS="--forks=$MOZREVIEW_BUILD_FORKS"
+else
+    FORKS=''
+fi
+
 vercheck=`python -c 'import sys; print(sys.version_info[0:3] >= (2, 7, 9))'`
 if [ "x${vercheck}" != "xTrue" ]; then
   echo "Python version too old. Test environment requires 2.7.9+"
@@ -223,7 +230,7 @@ echo "Building Docker images."
 echo "This could take a while and may consume a lot of internet bandwidth."
 echo "If you don't want Docker images, it is safe to hit CTRL+c to abort this."
 
-./d0cker build-all || {
+./d0cker build-all $FORKS || {
   echo "You will not be able to run tests that require Docker.";
   echo "Please see https://docs.docker.com/installation/ for how to install Docker.";
   echo "When Docker is installed, re-run this script";

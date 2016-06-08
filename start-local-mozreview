@@ -6,6 +6,13 @@
 
 set -eo pipefail
 
+if [ -n "$MOZREVIEW_BUILD_FORKS" ]; then
+    # include --forks switch to build scripts
+    FORKS="--forks=$MOZREVIEW_BUILD_FORKS"
+else
+    FORKS=''
+fi
+
 TEST_MOZREVIEW_NAME=mozreview-test
 TEST_REPO_NAME=local-mozreview-test-repo
 
@@ -22,7 +29,7 @@ export MOZREVIEW_HOME=$TEST_MOZREVIEW_PATH
 
 ./mozreview stop $TEST_MOZREVIEW_PATH
 
-./mozreview start --reviewboard-port=55556 $TEST_MOZREVIEW_PATH
+./mozreview start --reviewboard-port=55556 $FORKS $TEST_MOZREVIEW_PATH
 
 $(./mozreview shellinit)
 
