@@ -59,21 +59,24 @@ class MozReviewCommands(object):
                      help='Port hg.mo HTTP server should listen on.')
     @CommandArgument('--treestatus-port', type=int,
                      help='Port treestatus HTTP server should listen on.')
+    @CommandArgument('--forks', type=int,
+                     help='Number of parallel build processes to use. (default=unlimited)')
     def start(self, where, bugzilla_port=None, reviewboard_port=None,
             mercurial_port=None, pulse_port=None, autoland_port=None,
             ldap_port=None, ssh_port=None, hgweb_port=None,
-            treestatus_port=None):
+            treestatus_port=None, forks=None):
         mr = self._get_mozreview(where)
         mr.start(bugzilla_port=bugzilla_port,
-                reviewboard_port=reviewboard_port,
-                mercurial_port=mercurial_port,
-                pulse_port=pulse_port,
-                autoland_port=autoland_port,
-                ldap_port=ldap_port,
-                ssh_port=ssh_port,
-                hgweb_port=hgweb_port,
-                treestatus_port=treestatus_port,
-                verbose=True)
+                 reviewboard_port=reviewboard_port,
+                 mercurial_port=mercurial_port,
+                 pulse_port=pulse_port,
+                 autoland_port=autoland_port,
+                 ldap_port=ldap_port,
+                 ssh_port=ssh_port,
+                 hgweb_port=hgweb_port,
+                 treestatus_port=treestatus_port,
+                 max_workers=forks,
+                 verbose=True)
 
         print('Bugzilla URL: %s' % mr.bugzilla_url)
         print('Review Board URL: %s' % mr.reviewboard_url)

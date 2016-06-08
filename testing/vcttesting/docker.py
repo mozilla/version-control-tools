@@ -40,6 +40,7 @@ import concurrent.futures as futures
 from coverage.data import CoverageData
 
 from .util import (
+    limited_threadpoolexecutor,
     wait_for_amqp,
     wait_for_http,
     wait_for_ssh,
@@ -337,7 +338,8 @@ class Docker(object):
             return json.loads(res.strip())['status']
 
     def ensure_built(self, name, verbose=False, use_last=False):
-        """Ensure a Docker image from a builder directory is built and up to date.
+        """Ensure a Docker image from a builder directory is built and up to
+        date.
 
         This function is docker build++. Under the hood, it talks to the same
         ``build`` Docker API. However, it does one important thing differently:
@@ -501,7 +503,7 @@ class Docker(object):
         raise Exception('Unable to confirm image was built: %s' % name)
 
     def ensure_images_built(self, names, ansibles=None, existing=None,
-                            verbose=False, use_last=False):
+                            verbose=False, use_last=False, max_workers=None):
         """Ensure that multiple images are built.
 
         ``names`` is a list of Docker images to build.
@@ -512,6 +514,11 @@ class Docker(object):
 
         If ``use_last`` is true, we will use the last built image instead
         of building a new one.
+
+        If ``max_workers`` is less than 1 or is None, use the default number
+        of worker threads to perform I/O intensive tasks.  Otherwise use the
+        specified number of threads.  Useful for debugging and reducing
+        load on resource-constrained machines.
         """
         ansibles = ansibles or {}
         existing = existing or {}
@@ -570,7 +577,7 @@ class Docker(object):
             return repository, image
 
         with self.vct_container(verbose=verbose) as vct_state, \
-                futures.ThreadPoolExecutor(len(missing)) as e:
+                limited_threadpoolexecutor(len(missing), max_workers) as e:
             vct_cid = vct_state['Id']
             fs = []
             builder_fs = {}
@@ -756,7 +763,7 @@ class Docker(object):
         }
 
     def build_mozreview(self, images=None, verbose=False, use_last=False,
-                        build_hgweb=True, build_bmo=True):
+                        build_hgweb=True, build_bmo=True, max_workers=None):
         """Ensure the images for a MozReview service are built.
 
         bmoweb's entrypoint does a lot of setup on first run. This takes many
@@ -771,7 +778,7 @@ class Docker(object):
         # Because bootstrap can occur concurrently with other image
         # building, we build BMO images separately and initiate bootstrap
         # as soon as it is ready.
-        with futures.ThreadPoolExecutor(2) as e:
+        with limited_threadpoolexecutor(2, max_workers) as e:
             if build_bmo:
                 f_bmo_images = e.submit(self.build_bmo, images=images,
                                         verbose=verbose)
@@ -783,17 +790,18 @@ class Docker(object):
             if build_hgweb:
                 ansibles['hgweb'] = ('docker-hgweb', 'centos6')
 
-            f_images = e.submit(
-                self.ensure_images_built,
-                [
-                    'autolanddb',
-                    'autoland',
-                    'ldap',
-                    'pulse',
-                    'treestatus',
-                ],
-                ansibles=ansibles, existing=images, verbose=verbose,
-                use_last=use_last)
+            f_images = e.submit(self.ensure_images_built, [
+                'autolanddb',
+                'autoland',
+                'ldap',
+                'pulse',
+                'treestatus',
+            ],
+                ansibles=ansibles,
+                existing=images,
+                verbose=verbose,
+                use_last=use_last,
+                max_workers=max_workers)
 
             if build_bmo:
                 bmo_images = f_bmo_images.result()
@@ -921,7 +929,7 @@ class Docker(object):
             autolanddb_image=None, autoland_image=None, autoland_port=None,
             hgweb_image=None, hgweb_port=None,
             treestatus_image=None, treestatus_port=None,
-            verbose=False):
+            max_workers=None, verbose=False):
 
         start_ldap = False
         if ldap_port:
@@ -977,7 +985,8 @@ class Docker(object):
                 or not pulse_image or not autolanddb_image
                 or not autoland_image or not rbweb_image or not hgweb_image
                 or not treestatus_image):
-            images = self.build_mozreview(verbose=verbose)
+            images = self.build_mozreview(
+                max_workers=max_workers, verbose=verbose)
             autolanddb_image = images['autolanddb']
             autoland_image = images['autoland']
             hgrb_image = images['hgrb']
@@ -990,7 +999,7 @@ class Docker(object):
 
         containers = self.state['containers'].setdefault(cluster, [])
 
-        with futures.ThreadPoolExecutor(10) as e:
+        with limited_threadpoolexecutor(10, max_workers) as e:
             if start_pulse:
                 f_pulse_create = e.submit(
                     self.client.create_container,
@@ -1195,7 +1204,7 @@ class Docker(object):
                 self._get_host_hostname_port(treestatus_state, '80/tcp')
 
         fs = []
-        with futures.ThreadPoolExecutor(7) as e:
+        with limited_threadpoolexecutor(7, max_workers) as e:
             fs.append(e.submit(
                 wait_for_http, bmoweb_hostname, bmoweb_hostport,
                 extra_check_fn=self._get_assert_container_running_fn(web_id)))
@@ -1303,7 +1312,7 @@ class Docker(object):
             pass
 
     def build_all_images(self, verbose=False, use_last=False, mozreview=True,
-                         hgmo=True, bmo=True):
+                         hgmo=True, bmo=True, max_workers=None):
         docker_images = set()
         ansible_images = {}
         if mozreview:
@@ -1336,15 +1345,13 @@ class Docker(object):
                                           verbose=verbose,
                                           use_last=use_last)
 
-        with futures.ThreadPoolExecutor(3) as e:
+        with limited_threadpoolexecutor(3, max_workers) as e:
             if mozreview:
-                f_mr = e.submit(
-                    self.build_mozreview,
-                    images=images,
-                    verbose=verbose,
-                    use_last=use_last,
-                    build_hgweb=not hgmo,
-                    build_bmo=not bmo)
+                f_mr = e.submit(self.build_mozreview, images=images,
+                                verbose=verbose, use_last=use_last,
+                                build_hgweb=not hgmo,
+                                build_bmo=not bmo,
+                                max_workers=max_workers)
             if hgmo:
                 f_hgmo = e.submit(
                     self.build_hgmo,

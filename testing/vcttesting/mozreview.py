@@ -24,7 +24,7 @@ from vcttesting.docker import (
 from vcttesting.reviewboard import MozReviewBoard
 
 from .ldap import LDAP
-from .util import get_available_port
+from .util import get_available_port, limited_threadpoolexecutor
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
@@ -150,13 +150,13 @@ class MozReview(object):
         return LDAP(self.ldap_uri, 'cn=admin,dc=mozilla', 'password')
 
     def start(self, bugzilla_port=None, reviewboard_port=None,
-            mercurial_port=None, pulse_port=None, verbose=False,
-            web_image=None, hgrb_image=None,
-            ldap_image=None, ldap_port=None, pulse_image=None,
-            rbweb_image=None, ssh_port=None,
-            hgweb_image=None, hgweb_port=None,
-            autolanddb_image=None, autoland_image=None, autoland_port=None,
-            treestatus_image=None, treestatus_port=None):
+              mercurial_port=None, pulse_port=None, verbose=False,
+              web_image=None, hgrb_image=None,
+              ldap_image=None, ldap_port=None, pulse_image=None,
+              rbweb_image=None, ssh_port=None,
+              hgweb_image=None, hgweb_port=None,
+              autolanddb_image=None, autoland_image=None, autoland_port=None,
+              treestatus_image=None, treestatus_port=None, max_workers=None):
         """Start a MozReview instance."""
         if self.started:
             raise Exception('MozReview instance has already been started')
@@ -215,6 +215,7 @@ class MozReview(object):
                 hgweb_port=hgweb_port,
                 treestatus_image=treestatus_image,
                 treestatus_port=treestatus_port,
+                max_workers=max_workers,
                 verbose=verbose)
 
         self.bmoweb_id = mr_info['web_id']
@@ -264,7 +265,7 @@ class MozReview(object):
         rb.create_local_user(self.hg_rb_username, self.hg_rb_email,
                              self.hg_rb_password)
 
-        with futures.ThreadPoolExecutor(7) as e:
+        with limited_threadpoolexecutor(7, max_workers) as e:
             # Ensure admin user had admin privileges.
             e.submit(rb.make_admin, bugzilla.username)
 

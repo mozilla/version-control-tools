@@ -51,8 +51,11 @@ class DockerCommands(object):
 
     @Command('build-mozreview', category='docker',
         description='Build Docker images required for MozReview')
-    def build_mozreview(self):
-        self.d.build_mozreview(verbose=True)
+    @CommandArgument('--forks', type=int,
+                     help='Number of parallel build processes to use. '
+                          '(default=unlimited)')
+    def build_mozreview(self, forks=None):
+        self.d.build_mozreview(verbose=True, max_workers=forks)
 
     @Command('start-bmo', category='docker',
         description='Start a bugzilla.mozilla.org instance')
@@ -86,8 +89,11 @@ class DockerCommands(object):
 
     @Command('build-all', category='docker',
              description='Build all images')
-    def build_all(self):
-        self.d.build_all_images(verbose=True)
+    @CommandArgument('--forks', type=int,
+                     help='Number of parallel build processes to use. '
+                          '(default=unlimited)')
+    def build_all(self, forks=None):
+        self.d.build_all_images(verbose=True, max_workers=forks)
 
     @Command('run-ansible', category='docker',
              description='Run Ansible to produce a Docker image')

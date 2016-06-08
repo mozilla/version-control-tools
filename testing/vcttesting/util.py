@@ -8,6 +8,7 @@ import os
 import socket
 import time
 
+import concurrent.futures as futures
 from kafka.client import KafkaClient
 import kombu
 import paramiko
@@ -125,3 +126,32 @@ def wait_for_kafka(hostport, timeout=60):
             raise Exception('Timeout reached waiting for Kafka')
 
         time.sleep(0.1)
+
+
+def limited_threadpoolexecutor(wanted_workers, max_workers=None):
+    """Return a ThreadPoolExecutor with up to ``max_workers`` executors.
+
+    Call with ``wanted_workers`` equal to None to ask for the default number
+    of workers, which is the number of processors on the machine multiplied
+    by 5.
+
+    Call with ``max_workers`` less than 1 or ``max_workers=None`` to specify
+    no limit on worker threads.
+
+    See https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor
+    """
+    # Are we trying to ask for default workers, which is the "number of
+    # processors on the machine, multiplied by 5"?
+    # See https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor
+    wants_unlimited = (wanted_workers is None) or (wanted_workers < 1)
+
+    max_unlimited = (max_workers is None) or (max_workers < 1)
+
+    if max_unlimited:
+        workers = wanted_workers
+    elif wants_unlimited:
+        workers = max_workers
+    else:
+        workers = min(wanted_workers, max_workers)
+
+    return futures.ThreadPoolExecutor(workers)
