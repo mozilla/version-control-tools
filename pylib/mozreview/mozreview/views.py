@@ -15,6 +15,7 @@ from django.http import (
     HttpResponse,
     HttpResponseRedirect,
     HttpResponseNotAllowed,
+    HttpResponseNotFound,
 )
 from django.shortcuts import render
 from django.utils import timezone
@@ -32,6 +33,14 @@ from mozreview.models import (
     set_bugzilla_api_key,
     UnverifiedBugzillaApiKey,
 )
+from mozreview.extra_data import (
+    COMMITS_KEY,
+    fetch_commit_data,
+    is_parent,
+    gen_child_rrs,
+)
+
+from reviewboard.reviews.models import ReviewRequest
 
 
 logger = logging.getLogger(__name__)
@@ -242,3 +251,53 @@ def get_bmo_auth_callback(request):
     response = HttpResponseRedirect(redirect)
     response.delete_cookie('bmo_auth_secret')
     return response
+
+
+def commits_summary_table_fragment(request, parent_id=None, child_id=None):
+    """Return the #mozreview-child-requests table."""
+
+    # Load the parent.
+
+    try:
+        parent_request = ReviewRequest.objects.get(id=parent_id)
+    except ReviewRequest.DoesNotExist:
+        return HttpResponseNotFound('Parent Not Found')
+    if not parent_request.is_accessible_by(request.user):
+        return HttpResponseNotAllowed('Permission denied')
+
+    commit_data = fetch_commit_data(parent_request)
+
+    # Sanity check parent.
+
+    if not is_parent(parent_request, commit_data):
+        return HttpResponseNotAllowed('Invalid parent')
+    if COMMITS_KEY not in commit_data.extra_data:
+        logging.error('Parent review request %s missing COMMITS_KEY'
+                      % parent_request.id)
+        return HttpResponseNotAllowed('Invalid parent')
+
+    # Load the current child.
+
+    try:
+        child_request = ReviewRequest.objects.get(id=child_id)
+    except ReviewRequest.DoesNotExist:
+        return HttpResponseNotFound('Child Not Found')
+
+    # Sanity check child.
+
+    if is_parent(child_request):
+        return HttpResponseNotAllowed('Invalid child')
+
+    # Load all other children and ensure requested child matches parent.
+
+    children_details = list(gen_child_rrs(parent_request, user=request.user))
+    if not any(r for r in children_details if r.id == child_request.id):
+        return HttpResponseNotAllowed('Invalid child')
+
+    # Return rendered template.
+
+    return render(request, 'mozreview/commits-requests.html', {
+        'user': request.user,
+        'review_request_details': child_request,
+        'children_details': children_details,
+    })
