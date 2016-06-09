@@ -1490,7 +1490,9 @@ class Docker(object):
         if cid:
             state = self.client.inspect_container(cid)
             if not state['State']['Running']:
-                raise Exception('Passed container ID is not running')
+                raise RuntimeError(
+                    "Container '%s' should have been started by the calling "
+                    "function, but is not running" % cid)
         elif existing_cid:
             cid = existing_cid
             start = True
