@@ -13,6 +13,7 @@ developer productivity.
 
    mozreview-user
    hacking-mozreview
+   mozreview/notifications
 
 Known Issues and Limitations
 ============================
