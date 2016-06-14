@@ -79,6 +79,20 @@ Mercurial is not configured to produce diffs in a more readable format.
 Would you like to change this (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+PAGER_INFO = '''
+The "pager" extension transparently redirects command output to a pager
+program (like "less") so command output can be more easily consumed
+(e.g. output longer than the terminal can be scrolled).
+
+Please select one of the following for configuring pager:
+
+  1. Enable pager and configure with recommended settings (preferred)
+  2. Enable pager with default configuration
+  3. Don't enable pager
+
+Which option would you like? $$ &1 $$ &2 $$ &3
+'''.strip()
+
 FSMONITOR_INFO = '''
 The fsmonitor extension integrates the watchman filesystem watching tool
 with Mercurial. Commands like `hg status`, `hg diff`, and `hg commit`
@@ -243,6 +257,7 @@ wizardsteps = {
     'username',
     'diff',
     'color',
+    'pager',
     'historyediting',
     'fsmonitor',
     'blackbox',
@@ -289,6 +304,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'color' in runsteps:
         _promptnativeextension(ui, cw, 'color', 'Enable color output to your terminal')
+
+    if 'pager' in runsteps:
+        _checkpager(ui, cw)
 
     if 'historyediting' in runsteps:
         _checkhistoryediting(ui, cw)
@@ -451,6 +469,49 @@ def _promptvctextension(ui, cw, ext, msg):
     _enableext(cw, ext, ext_path)
 
 
+def _checkpager(ui, cw):
+    haveext = ui.hasconfig('extensions', 'pager')
+    attends = {
+        'help',
+        'incoming',
+        'outgoing',
+        'status',
+    }
+
+    haveattends = all(ui.hasconfig('pager', 'attend-%s' % a) for a in attends)
+    haveconfig = ui.hasconfig('pager', 'pager')
+
+    if haveext and haveattends and haveconfig:
+        return
+
+    answer = uipromptchoice(ui, PAGER_INFO, default=0) + 1
+    if answer == 3:
+        return
+
+    cw.c.setdefault('extensions', {})
+    cw.c['extensions']['pager'] = ''
+
+    if answer == 2:
+        return
+
+    cw.c.setdefault('pager', {})
+
+    # Set the pager invocation to a more reasonable default than Mercurial's.
+    # Don't overwrite user-specified value.
+    #
+    # -F quit if one screen
+    # -R raw control chars
+    # -S chop long lines instead of wrap
+    # -Q quiet (no terminal bell)
+    # -X no termcap init/deinit (won't clear screen afterwards)
+    if not haveconfig:
+        cw.c['pager']['pager'] = 'LESS=FRSXQ less'
+
+    for a in sorted(attends):
+        if not ui.hasconfig('pager', 'attend-%s' % a):
+            cw.c['pager']['attend-%s' % a] = 'true'
+
+
 def _checkhistoryediting(ui, cw):
     if all(ui.hasconfig('extensions', e) for e in ('histedit', 'rebase')):
         return
@@ -526,6 +587,11 @@ def _checkwip(ui, cw):
             '{label(ifcontains(rev, revset("."), "desc.here"),desc|firstline)}'
             "'"
         )
+
+    # Ensure pager is configured for wip alias if pager is configured.
+    if ui.hasconfig('extensions', 'pager') or 'pager' in cw.c.get('extensions', {}):
+        cw.c.setdefault('pager', {})
+        cw.c['pager']['attend-wip'] = 'true'
 
 
 def _checksecurity(ui, cw, hgversion):
