@@ -53,6 +53,15 @@ user will almost always want to install the following extensions:
 color
    This extension adds colorized output to commands, making output
    easier to read.
+fsmonitor
+   Monitor the filesystem for changes using so operations querying
+   filesystem state complete faster.
+
+.. important::
+
+   fsmonitor is highly recommended when interacting with the Firefox
+   repository. It will make Mercurial commands faster.
+
 pager
    Enable command output to go to a pager (such as less).
 progress
@@ -114,24 +123,6 @@ shelve
 
 3rd Party Extensions You Should Highly Consider
 ===============================================
-
-hgwatchman
-----------
-
-`hgwatchman <https://bitbucket.org/facebook/hgwatchman>`_ integrates the
-`watchman <https://github.com/facebook/watchman>`_ filesystem watching tool
-into Mercurial.
-
-Typically, commands like ``hg status`` need to perform a lot of queries
-against the filesystem. With hgwatchman, filesystem notifications are
-processed by a background daemon as they occur and commands like
-``hg status`` can complete by asking watchman what has changed since last
-time. This can potentially shave seconds off command execution time.
-
-.. important::
-
-   hgwatchman is highly recommended when interacting with the Firefox
-   repository. It will make Mercurial commands faster.
 
 chg
 ---
