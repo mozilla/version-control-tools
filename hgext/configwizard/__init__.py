@@ -668,7 +668,13 @@ def _checkcodereview(ui, cw):
         except KeyError:
             pass
 
-    # TODO configure mozilla.ircnick and the "review" path
+    prompt = ('Configure the "review" path so you can `hg push review` commits to '
+             'Mozilla for review (Yn)? $$ &Yes $$ &No')
+    if not ui.config('paths', 'review') and not ui.promptchoice(prompt):
+        cw.c.setdefault('paths', {})
+        cw.c['paths']['review'] = 'https://reviewboard-hg.mozilla.org/autoreview'
+
+    # TODO configure mozilla.ircnick
 
 
 def _checkmultiplevct(ui, cw):

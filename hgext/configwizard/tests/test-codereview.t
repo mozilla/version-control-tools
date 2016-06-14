@@ -58,19 +58,24 @@ reviewboard is enabled when requested
   
   You should only need to configure a Bugzilla API Key once.
   What is your Bugzilla email address? (optional) 
+  Configure the "review" path so you can `hg push review` commits to Mozilla for review (Yn)?  y
   Your config file needs updating.
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -0,0 +1,2 @@
+  @@ -0,0 +1,4 @@
   +[extensions]
   +reviewboard = */hgext/reviewboard/client.py (glob)
+  +[paths]
+  +review = https://reviewboard-hg.mozilla.org/autoreview
   
   Write changes to hgrc file (Yn)?  y
 
   $ cat .hgrc
   [extensions]
   reviewboard = */hgext/reviewboard/client.py (glob)
+  [paths]
+  review = https://reviewboard-hg.mozilla.org/autoreview
 
 only bzexport can be enabled when requested
 
@@ -80,6 +85,7 @@ only bzexport can be enabled when requested
   > 3
   > someone@example.com
   > apikey
+  > y
   > y
   > y
   > EOF
@@ -120,14 +126,17 @@ only bzexport can be enabled when requested
     2) Generate a new API Key
     3) Copy the generated key and paste it here
   Please enter a Bugzilla API Key: (optional) apikey
+  Configure the "review" path so you can `hg push review` commits to Mozilla for review (Yn)?  y
   Your config file needs updating.
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -1,2 +1,6 @@
+  @@ -1,4 +1,8 @@
    [extensions]
    reviewboard = */hgext/reviewboard/client.py (glob)
   +bzexport = */hgext/bzexport (glob)
+   [paths]
+   review = https://reviewboard-hg.mozilla.org/autoreview
   +[bugzilla]
   +username = someone@example.com
   +apikey = apikey
@@ -138,6 +147,8 @@ only bzexport can be enabled when requested
   [extensions]
   reviewboard = */hgext/reviewboard/client.py (glob)
   bzexport = */hgext/bzexport (glob)
+  [paths]
+  review = https://reviewboard-hg.mozilla.org/autoreview
   [bugzilla]
   username = someone@example.com
   apikey = apikey
@@ -154,6 +165,7 @@ Legacy credentials are removed from config file
   > 3
   > someone2@example.com
   > apikey2
+  > y
   > y
   > y
   > EOF
@@ -201,13 +213,14 @@ Legacy credentials are removed from config file
   
   For security reasons, the legacy credentials are being removed from the
   config.
+  Configure the "review" path so you can `hg push review` commits to Mozilla for review (Yn)?  y
   Your config file needs updating.
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -2,6 +2,5 @@
-   reviewboard = */hgext/reviewboard/client.py (glob)
-   bzexport = */hgext/bzexport (glob)
+  @@ -4,6 +4,5 @@
+   [paths]
+   review = https://reviewboard-hg.mozilla.org/autoreview
    [bugzilla]
   -username = someone@example.com
   -apikey = apikey
