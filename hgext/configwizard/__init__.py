@@ -13,6 +13,7 @@ import uuid
 
 from mercurial import (
     cmdutil,
+    demandimport,
     error,
     scmutil,
     util,
@@ -91,6 +92,13 @@ Please select one of the following for configuring pager:
   3. Don't enable pager
 
 Which option would you like? $$ &1 $$ &2 $$ &3
+'''.strip()
+
+CURSES_INFO = '''
+Mercurial can provide richer terminal interactions for some operations
+by using the popular "curses" library.
+
+Would you like to enable "curses" interfaces (Yn)? $$ &Yes $$ &No
 '''.strip()
 
 FSMONITOR_INFO = '''
@@ -258,6 +266,7 @@ wizardsteps = {
     'diff',
     'color',
     'pager',
+    'curses',
     'historyediting',
     'fsmonitor',
     'blackbox',
@@ -307,6 +316,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'pager' in runsteps:
         _checkpager(ui, cw)
+
+    if 'curses' in runsteps:
+        _checkcurses(ui, cw)
 
     if 'historyediting' in runsteps:
         _checkhistoryediting(ui, cw)
@@ -360,7 +372,7 @@ def _checkhgversion(ui, hgversion):
         ui.warn('Please run `mach bootstrap` to upgrade your Mercurial '
                 'install.\n\n')
 
-    if ui.promptchoice('Would you like to continue using an old Mercurial version (Yn)? $$ &Yes $$ &No'):
+    if uipromptchoice(ui, 'Would you like to continue using an old Mercurial version (Yn)? $$ &Yes $$ &No'):
         return 1
 
 
@@ -510,6 +522,28 @@ def _checkpager(ui, cw):
     for a in sorted(attends):
         if not ui.hasconfig('pager', 'attend-%s' % a):
             cw.c['pager']['attend-%s' % a] = 'true'
+
+
+def _checkcurses(ui, cw):
+    if ui.hasconfig('ui', 'interface'):
+        return
+
+    # curses isn't available on all platforms. Don't prompt if not
+    # available.
+    with demandimport.deactivated():
+        try:
+            import curses
+        except Exception:
+            try:
+                import wcurses
+            except Exception:
+                return
+
+    if ui.promptchoice(CURSES_INFO):
+        return
+
+    cw.c.setdefault('ui', {})
+    cw.c['ui']['interface'] = 'curses'
 
 
 def _checkhistoryediting(ui, cw):
