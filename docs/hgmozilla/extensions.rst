@@ -108,9 +108,6 @@ Core Extensions to Enable Different Workflows
 Mercurial ships with some extensions that enable alternate workflows.
 These include:
 
-mq
-   Treat commits like a stack of patches and work on single patches at a
-   time.
 shelve
    Enables uncommitted work to be saved to a standalone file without
    being committed to the repository.
