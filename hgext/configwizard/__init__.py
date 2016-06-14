@@ -245,6 +245,7 @@ wizardsteps = {
     'color',
     'historyediting',
     'fsmonitor',
+    'blackbox',
     'wip',
     'security',
     'firefoxtree',
@@ -294,6 +295,11 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'fsmonitor' in runsteps:
         _checkfsmonitor(ui, cw, hgversion)
+
+    if 'blackbox' in runsteps:
+        _promptnativeextension(ui, cw, 'blackbox',
+                               'Enable logging of commands to help diagnose bugs '
+                               'and performance problems')
 
     if 'wip' in runsteps:
         _checkwip(ui, cw)
