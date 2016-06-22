@@ -96,6 +96,13 @@ class BugzillaAttachmentUpdates(object):
 
             rb_attachment = a
 
+            # FIXME: There's some redundancy between here and
+            # attachments.update_bugzilla_attachment().  The latter decides
+            # which flags to carry forward based on their type and value, but
+            # we also check flag types and variables here to decide, in turn,
+            # if we should even check the carry_forward dict.  This should be
+            # unified and clarified somehow.
+
             for f in a.get('flags', []):
                 if f['name'] not in ['review', 'feedback']:
                     # We only care about review and feedback flags.
@@ -103,28 +110,36 @@ class BugzillaAttachmentUpdates(object):
                 elif f['name'] == 'feedback':
                     # We always clear feedback flags.
                     flags.append({'id': f['id'], 'status': 'X'})
-                elif f['status'] == '+' and f['setter'] not in carry_forward:
-                    # This r+ flag was set manually on bugzilla rather
-                    # then through a review on Review Board. Always
-                    # clear these flags.
-                    flags.append({'id': f['id'], 'status': 'X'})
                 elif f['status'] == '+' or f['status'] == '-':
-                    if not carry_forward[f['setter']]:
-                        # We should not carry this r+/r- forward so
-                        # re-request review.
-                        flags.append({
-                            'id': f['id'],
-                            'name': 'review',
-                            'status': '?',
-                            'requestee': f['setter']
-                        })
+                    # A reviewer has left a review, either in Review Board or
+                    # in Bugzilla.
+                    if f['setter'] not in carry_forward:
+                        # This flag was set manually in Bugzilla rather
+                        # then through a review on Review Board. Always
+                        # clear these flags.
+                        flags.append({'id': f['id'], 'status': 'X'})
+                    else:
+                        # This flag was set through Review Board; see if
+                        # we should carry it forward.
+                        if not carry_forward[f['setter']]:
+                            # We should not carry this r+/r- forward so
+                            # re-request review.
+                            flags.append({
+                                'id': f['id'],
+                                'name': 'review',
+                                'status': '?',
+                                'requestee': f['setter']
+                            })
+                        # else we leave the flag alone, carrying it forward.
 
-                    carry_forward.pop(f['setter'])
+                        # In either case, we've dealt with this reviewer, so
+                        # remove it from the carry_forward dict.
+                        carry_forward.pop(f['setter'])
                 elif ('requestee' not in f or
                       f['requestee'] not in carry_forward):
                     # We clear review flags where the requestee is not
-                    # a reviewer or someone has manually set r- on the
-                    # attachment.
+                    # a reviewer, or if there is some (possibly future) flag
+                    # other than + or - that does not have a 'requestee' field.
                     flags.append({'id': f['id'], 'status': 'X'})
                 elif f['requestee'] in carry_forward:
                     # We're already waiting for a review from this user
