@@ -165,6 +165,7 @@ echo "If you don't want Docker images, it is safe to hit CTRL+c to abort this."
   echo "You will not be able to run tests that require Docker.";
   echo "Please see https://docs.docker.com/installation/ for how to install Docker.";
   echo "When Docker is installed, re-run this script";
+  exit 1
 }
 
 echo finished creating test environment
