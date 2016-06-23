@@ -25,6 +25,9 @@ backports.ssl-match-hostname==3.4.0.2 \
 beautifulsoup4==4.3.2 \
     --hash=sha256:a2b29bd048ca2fe54a046b29770964738872a9747003a371344a93eedf7ad58e
 
+boto==2.40.0 \
+    --hash=sha256:8a76f6874de4b3b09a1ed6d8840294954e7d4c19c0a3ef1e91e0622281e04bf1
+
 cffi==1.6.0 \
     --hash=sha256:8bda493420381be722ef68a9e100983f5e45d278d08ca244f450e76867592979 \
     --hash=sha256:a7f75c4ef2362c0a0e54657add0a6c509fecbfa3b3807bc0925f5cb1c9f927db
@@ -50,6 +53,9 @@ django-multiselectfield==0.1.3 \
 
 django-pipeline==1.3.27 \
     --hash=sha256:71add26f682c2e7652c43d01ab6ac1b1c693d869f663142f5f7c37b00788d162
+
+django-storages==1.4.1 \
+    --hash=sha256:0ad7049caa7148b846906a7e114e5d245dba714a7a1ef895150234ae25788c46
 
 docker-py==1.6.0 \
     --hash=sha256:35fef7379d5937983d645f3a15baa4874e3d512ee15f376d92131ad27c276a99

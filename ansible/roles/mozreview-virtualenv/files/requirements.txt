@@ -13,6 +13,9 @@ anyjson==0.3.3 \
 argparse==1.3.0 \
     --hash=sha256:d01978e9a8c51ea7b34ec71f3fced1326437cd366b9c2e19265ace050924e0e2
 
+boto==2.40.0 \
+    --hash=sha256:8a76f6874de4b3b09a1ed6d8840294954e7d4c19c0a3ef1e91e0622281e04bf1
+
 Django==1.6.11.3 \
     --hash=sha256:49161983509d84668ed9972db15d89d455a7bb79bb93290749f087f08923eaaf
 
@@ -27,6 +30,9 @@ django-haystack==2.3.1 \
 
 django-multiselectfield==0.1.3 \
     --hash=sha256:3b7e950323d477e40660d737bf79777d9122c3962a55af5bd60819e40472fc6c
+
+django-storages==1.4.1 \
+    --hash=sha256:0ad7049caa7148b846906a7e114e5d245dba714a7a1ef895150234ae25788c46
 
 docutils==0.12 \
     --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
