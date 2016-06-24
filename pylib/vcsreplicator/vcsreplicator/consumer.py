@@ -129,7 +129,7 @@ def process_message(config, payload):
     elif name == 'hg-changegroup-1':
         return process_hg_changegroup(config, payload['path'],
                                       payload['source'],
-                                      payload['nodes'],
+                                      len(payload['nodes']),
                                       payload['heads'])
     elif name == 'hg-pushkey-1':
         return process_hg_pushkey(config, payload['path'],
@@ -181,7 +181,7 @@ def process_hg_hgrc_update(config, path, content):
     update_hgrc(path, content)
 
 
-def process_hg_changegroup(config, path, source, nodes, heads):
+def process_hg_changegroup(config, path, source, node_count, heads):
     local_path = config.parse_wire_repo_path(path)
     url = config.get_pull_url_from_repo_path(path)
 
@@ -189,14 +189,14 @@ def process_hg_changegroup(config, path, source, nodes, heads):
         oldtip = int(c.log('tip')[0].rev)
 
         logger.warn('pulling %d heads (%s) and %d nodes from %s into %s' % (
-            len(heads), ', '.join(heads), len(nodes), url, local_path))
+            len(heads), ', '.join(heads), node_count, url, local_path))
 
         c.pull(source=url or 'default', rev=heads)
         newtip = int(c.log('tip')[0].rev)
 
-        if newtip - oldtip != len(nodes):
+        if newtip - oldtip != node_count:
             logger.warn('mismatch between expected and actual changeset count: '
-                        'expected %d, got %d' % (len(nodes), newtip - oldtip))
+                        'expected %d, got %d' % (node_count, newtip - oldtip))
 
         logger.warn('pulled %d changesets into %s' % (newtip - oldtip,
                                                       local_path))
