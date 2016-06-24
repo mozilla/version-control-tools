@@ -61,7 +61,6 @@ Replicating hgrc without hgrc file will delete file
 
   $ hgmo exec hgweb0 ls /repo/hg/mozilla/mozilla-central/.hg
   00changelog.i
-  pushlog2.db
   requires
   store
 
