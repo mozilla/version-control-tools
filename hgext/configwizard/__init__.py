@@ -16,6 +16,7 @@ from mercurial import (
     demandimport,
     error,
     scmutil,
+    ui as uimod,
     util,
 )
 from mercurial.i18n import _
@@ -820,3 +821,15 @@ class configobjwrapper(object):
 
             fh.write('%s\n' % line)
 
+
+def uisetup(ui):
+    # hasconfig() was added in 3.7. Backport until we require 3.7.
+    if util.safehasattr(ui, 'hasconfig'):
+        return
+
+    class configui(ui.__class__):
+        def hasconfig(self, section, name, untrusted=False):
+            return name in self._data(untrusted)._data.get(section, {})
+
+    ui.__class__ = configui
+    uimod.ui = configui
