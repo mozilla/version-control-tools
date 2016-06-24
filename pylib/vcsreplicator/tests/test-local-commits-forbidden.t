@@ -10,7 +10,7 @@ Create the repository
 
 Adding a commit locally is not allowed
 
-  $ hgmo exec hgssh touch /var/hg/mozilla/mozilla-central/foo
+  $ hgmo exec hgssh touch /repo/hg/mozilla/mozilla-central/foo
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central add
   adding ../repo/hg/mozilla/mozilla-central/foo
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central commit -m initial
