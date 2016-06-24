@@ -833,3 +833,35 @@ def uisetup(ui):
 
     ui.__class__ = configui
     uimod.ui = configui
+
+
+def extsetup(ui):
+    # util.versiontuple was added in 3.6. Backport it.
+    def versiontuple(v=None, n=4):
+        if not v:
+            v = util.version()
+        parts = v.split('+', 1)
+        if len(parts) == 1:
+            vparts, extra = parts[0], None
+        else:
+            vparts, extra = parts
+
+        vints = []
+        for i in vparts.split('.'):
+            try:
+                vints.append(int(i))
+            except ValueError:
+                break
+        # (3, 6) -> (3, 6, None)
+        while len(vints) < 3:
+            vints.append(None)
+
+        if n == 2:
+            return (vints[0], vints[1])
+        if n == 3:
+            return (vints[0], vints[1], vints[2])
+        if n == 4:
+            return (vints[0], vints[1], vints[2], extra)
+
+    if not util.safehasattr(util, 'versiontuple'):
+        util.versiontuple = versiontuple
