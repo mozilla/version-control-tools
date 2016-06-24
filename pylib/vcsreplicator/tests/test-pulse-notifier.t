@@ -30,7 +30,7 @@ Create a repository
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-
+  $ sleep 2
   $ pulseconsumer --wait-for-no-lag
 
   $ pulse dump-messages exchange/hgpushes/v1 all
@@ -60,6 +60,8 @@ Repos under ignore paths are ignored
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ sleep 2
+  $ pulseconsumer --wait-for-no-lag
 
   $ hgmo exec hgssh grep private /var/log/pulsenotifier.log
   vcsreplicator.pushnotifications ignoring repo because path in ignore list: {moz}/private/ignore
@@ -78,7 +80,7 @@ Routing keys with slashes and dashes and underscores work
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-
+  $ sleep 2
   $ pulseconsumer --wait-for-no-lag
 
   $ pulse dump-messages exchange/hgpushes/v1 all
