@@ -48,6 +48,7 @@ The aggregate topic should contain a changegroup message
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ sleep 2
 
   $ paconsumer --dump --start-from 2
   - _created: \d+\.\d+ (re)
