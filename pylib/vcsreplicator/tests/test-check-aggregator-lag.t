@@ -10,6 +10,10 @@ Check should be OK by default
   $ hgmo exec hgssh /usr/lib64/nagios/plugins/custom/check_kafka_hg_heartbeat
   OK - heartbeat message sent to 8/8 partitions successfully
 
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ sleep 2
+
   $ check
   OK - aggregator has copied all fully replicated messages
   
