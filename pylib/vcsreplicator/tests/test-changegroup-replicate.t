@@ -42,9 +42,8 @@ Pushing the initial commit will result in replication messages
   - _created: \d+\.\d+ (re)
     heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
-    name: hg-changegroup-1
-    nodes:
-    - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+    name: hg-changegroup-2
+    nodecount: 1
     path: '{moz}/mozilla-central'
     source: serve
 
@@ -108,11 +107,8 @@ Pushing multiple commits results in sane behavior
   - _created: \d+\.\d+ (re)
     heads:
     - 4f52aeca631dfa94331d93cfeaf069526926385a
-    name: hg-changegroup-1
-    nodes:
-    - e325efa1b1fb7cb9e7f231851436db4de63e0a26
-    - e79f1fe30cb27c83477cbb2880367ca8ed54367e
-    - 4f52aeca631dfa94331d93cfeaf069526926385a
+    name: hg-changegroup-2
+    nodecount: 3
     path: '{moz}/mozilla-central'
     source: serve
 
@@ -187,12 +183,8 @@ Pushing multiple heads results in appropriate behavior
     heads:
     - 4c9443886fe84db9a4a5f29a5777517d2890d308
     - 4b11352745a6b3eb429ca8cd486dfdc221a4bc62
-    name: hg-changegroup-1
-    nodes:
-    - 5d9ed3f8efffe0777be762f2a35927cc3be3eeef
-    - 4c9443886fe84db9a4a5f29a5777517d2890d308
-    - a7e1131c1b7cda934c8eef30932718654c7b4671
-    - 4b11352745a6b3eb429ca8cd486dfdc221a4bc62
+    name: hg-changegroup-2
+    nodecount: 4
     path: '{moz}/mozilla-central'
     source: serve
 

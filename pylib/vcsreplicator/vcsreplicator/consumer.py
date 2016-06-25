@@ -131,6 +131,11 @@ def process_message(config, payload):
                                       payload['source'],
                                       len(payload['nodes']),
                                       payload['heads'])
+    elif name == 'hg-changegroup-2':
+        return process_hg_changegroup(config, payload['path'],
+                                      payload['source'],
+                                      payload['nodecount'],
+                                      payload['heads'])
     elif name == 'hg-pushkey-1':
         return process_hg_pushkey(config, payload['path'],
                                   payload['namespace'],

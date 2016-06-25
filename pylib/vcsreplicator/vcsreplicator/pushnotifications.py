@@ -28,7 +28,7 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
 
     # We're only interested in changegroup messages because they correspond
     # to pushes. Ack all messages that aren't relevant.
-    if name != 'hg-changegroup-1':
+    if name not in ('hg-changegroup-1', 'hg-changegroup-2'):
         logger.warn('%s message not relevant to push notifier; ignoring' % name)
         consumer.commit(partitions=[partition])
         return
@@ -59,7 +59,14 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
 
     # Resolve the push IDs for these changesets.
     with hglib.open(local_path, encoding='utf-8') as hgclient:
-        revs = [n.encode('latin1') for n in payload['nodes']]
+        # We cheat and only request pushlog entries for heads. There may be
+        # some scenarios where we want pushlog entries for all nodes. But as
+        # of hg-changegroup-2 messages we don't record every node in the
+        # changegroup (just the count), so the full set of nodes isn't
+        # available. We shouldn't be seeing too many changegroup messages
+        # where a message doesn't correspond to a single push, so this shortcut
+        # should be acceptable.
+        revs = [n.encode('latin1') for n in payload['heads']]
         template = b'{node}\\0{pushid}\\0{pushuser}\\0{pushdate}\n'
         args = hglib.util.cmdbuilder(b'log', b'--hidden', r=revs, template=template)
         out = hgclient.rawcommand(args)

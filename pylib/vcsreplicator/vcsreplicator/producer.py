@@ -96,10 +96,10 @@ def record_hg_changegroup(producer, path, source, nodes, heads,
     and the source of the changesets (as reported by Mercurial).
     """
     return producer.send_message({
-        'name': 'hg-changegroup-1',
+        'name': 'hg-changegroup-2',
         'path': path,
         'source': source,
-        'nodes': nodes,
+        'nodecount': len(nodes),
         'heads': heads,
     }, partition=partition)
 

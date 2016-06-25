@@ -51,9 +51,8 @@ There should be no pushkey on a push with a draft changeset
   - _created: \d+\.\d+ (re)
     heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
-    name: hg-changegroup-1
-    nodes:
-    - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+    name: hg-changegroup-2
+    nodecount: 1
     path: '{moz}/mozilla-central'
     source: serve
 
@@ -129,10 +128,8 @@ processing on the mirror.
   - _created: \d+\.\d+ (re)
     heads:
     - fde0c41176556d1ec1bcf85e66706e5e76012508
-    name: hg-changegroup-1
-    nodes:
-    - 7dea706c17247788835d1987dc7103ffc365c338
-    - fde0c41176556d1ec1bcf85e66706e5e76012508
+    name: hg-changegroup-2
+    nodecount: 2
     path: '{moz}/mozilla-central'
     source: serve
 
@@ -170,9 +167,8 @@ Now simulate a consumer that is multiple pushes behind
   - _created: \d+\.\d+ (re)
     heads:
     - 58017affcc6559ab3237457a5fb1e0e3bde306b1
-    name: hg-changegroup-1
-    nodes:
-    - 58017affcc6559ab3237457a5fb1e0e3bde306b1
+    name: hg-changegroup-2
+    nodecount: 1
     path: '{moz}/mozilla-central'
     source: serve
   - _created: \d+\.\d+ (re)
@@ -182,9 +178,8 @@ Now simulate a consumer that is multiple pushes behind
   - _created: \d+\.\d+ (re)
     heads:
     - 601c8c0d17b02057475d528f022cf5d85da89825
-    name: hg-changegroup-1
-    nodes:
-    - 601c8c0d17b02057475d528f022cf5d85da89825
+    name: hg-changegroup-2
+    nodecount: 1
     path: '{moz}/mozilla-central'
     source: serve
 

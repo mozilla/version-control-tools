@@ -39,9 +39,8 @@ Pulling into corrupt repo should result in abort
   - _created: \d+\.\d+ (re)
     heads:
     - 0c6b2090d458675af812e445c8ab9b809e321f57
-    name: hg-changegroup-1
-    nodes:
-    - 0c6b2090d458675af812e445c8ab9b809e321f57
+    name: hg-changegroup-2
+    nodecount: 1
     path: '{moz}/mozilla-central'
     source: serve
 
@@ -74,9 +73,8 @@ And the message should still be not consumed
   - _created: \d+\.\d+ (re)
     heads:
     - 0c6b2090d458675af812e445c8ab9b809e321f57
-    name: hg-changegroup-1
-    nodes:
-    - 0c6b2090d458675af812e445c8ab9b809e321f57
+    name: hg-changegroup-2
+    nodecount: 1
     path: '{moz}/mozilla-central'
     source: serve
 
