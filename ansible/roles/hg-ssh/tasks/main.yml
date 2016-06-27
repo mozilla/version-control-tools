@@ -389,10 +389,10 @@
         group=root
         mode=0644
   with_items:
-    - unify-firefox.ini
     - unify-firefox-unified.ini
     - unify-firefox-unified-b2g.ini
     - unify-mozilla-central-gd.ini
+    - unify-mozilla-unified.ini
 
 - name: sysconfig file for unify repo daemon
   copy: src=sysconfig-unifyrepo
