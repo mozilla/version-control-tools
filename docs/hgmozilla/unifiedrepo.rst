@@ -17,34 +17,20 @@ them locally. This has several benefits:
 * You only have to fetch the data associated with each commit exactly once
   (with separate repositories, you transfer down each commit *N* times).
 
-Creating a Unified Repository with firefoxtree
-==============================================
+Unified Repository on hg.mozilla.org
+====================================
 
-The historical, stable method to create a unified Firefox repository is
-documented as part of the
-:ref:`firefoxtree extension documentation <firefoxtree>`.
+``https://hg.mozilla.org/mozilla-unified`` is a *read-only* unified
+repository containing all of the commits on the ``default`` branch of
+the various Firefox repositories (mozilla-central, inbound, aurora,
+beta, release, esr, etc) in chronological order by push time.
 
-.. _hgmozilla_unified_server:
+Advantages of the Unified Repo
+------------------------------
 
-Experimental Unified Repositories on the Server
-===============================================
-
-There are 2 **experimental** unified Firefox repositories on hg.mozilla.org:
-
-* https://hg.mozilla.org/experimental/firefox-unified
-* https://hg.mozilla.org/experimental/firefox-unified-b2g
-
-Both of these repositories contain all commits on the ``default`` branch of
-the various Firefox repositories (mozilla-central, inbound, aurora, beta,
-release, esr, etc) in chronological order by push time.
-
-Advantages of these Repositories
---------------------------------
-
-These experimental unified repositories are **smaller than
-mozilla-central** despite containing more data. This is because they
-are using a more efficient storage mechanism (*generaldelta*) on the
-server.
+The unified repository is **smaller than mozilla-central** despite
+containing more data. This is because they are using a more
+efficient storage mechanism (*generaldelta*) on the server.
 
 Because the data is smaller and more optimally encoded, these
 repositories are **faster to clone and pull from**.
@@ -72,39 +58,15 @@ with Firefox's multi repository management model in a way that doesn't
 require client-side workarounds like the
 :ref:`firefoxtree extension <firefoxtree>`.
 
-What Does *Experimental* Mean?
-------------------------------
+Working with the Unified Repo
+-----------------------------
 
-These unified repositories are *experimental*. In terms of behavior:
-
-* There is no SLA. Repositories may not update for hours at a time or
-  the update lag may be longer than desirable.
-* The repository may be deleted or not updated in the future.
-* The order of changesets in the repository and pushlog may change.
-* The behavior of bookmarks and how repos/heads are tracked may change.
-
-You should **not**:
-
-* Rely on these repositories existing, staying up to date, or having
-  consistent behavior for all of time.
-* Consume these repositories from Firefox automation.
-* Become too attached to these repositories or their behavior.
-
-These repositories are effectively the result of running ``hg pull``
-plus ``hg bookmark`` against the canonical Firefox repositories. If
-these experimental repositories go down or fail to update, you should
-be able to fall back to using :ref:`firefoxtree <firefoxtree>` to do
-something similar.
-
-Working with the Experimental Unified Repos
--------------------------------------------
-
-Here is the basic workflow for interacting with an experimental unified
+Here is the basic workflow for interacting with the unified
 repo.
 
 First, clone the repo::
 
-   $ hg clone https://hg.mozilla.org/experimental/firefox-unified
+   $ hg clone --uncompressed https://hg.mozilla.org/mozilla-unified
 
 Update to a bookmark you want to base work off of::
 
@@ -144,27 +106,27 @@ Interactions with firefoxtree
 -----------------------------
 
 There are known issues between the *firefoxtree* extension and the
-unified repositories, notably around the area of conflicts between
+unified repository, notably around the area of conflicts between
 bookmarks and *fxtree* namespace labels.
 
 `bug 1264814 <https://bugzilla.mozilla.org/show_bug.cgi?id=1264814>`_
 tracks improvements.
 
-generaldelta and the Experimental Repos
----------------------------------------
+generaldelta and the Unified Repo
+---------------------------------
 
-The experimental repositories are encoded using Mercurial's *generaldelta*
+The unified repository is encoded using Mercurial's *generaldelta*
 storage mechanism. This results in smaller repositories and faster
 repository operations.
 
 .. important::
 
    Mercurial repositories created before Mercurial 3.7 did not use
-   generaldelta by default. Pulling from the experimental repositories
+   generaldelta by default. Pulling from the repository
    to a non-generaldelta clone will result in **slower** operations.
 
-   It is highly recommended to create a new clone of the experimental
-   unified repositories with Mercurial 3.7+ to ensure your client is
+   It is highly recommended to create a new clone of the unified
+   repository with Mercurial 3.7+ to ensure your client is
    using generaldelta.
 
 To check whether your existing Firefox clone is using generaldelta::
@@ -182,7 +144,7 @@ following.
 
 Create a new clone of the unified repo::
 
-   $ hg clone -U --uncompressed https://hg.mozilla.org/experimental/firefox-unified
+   $ hg clone -U --uncompressed https://hg.mozilla.org/mozilla-unified
    $ cd firefox-unified
 
 Now set your new repository to non-publishing (this means commits pushed to it
@@ -203,7 +165,7 @@ incompatible Mercurial client; bundle2 required
 
 Does this happen to you?::
 
-   $ hg clone https://hg.mozilla.org/experimental/firefox-unified
+   $ hg clone https://hg.mozilla.org/mozilla-unified
    destination directory: firefox-unified
    requesting all changes
    abort: remote error:
@@ -212,7 +174,7 @@ Does this happen to you?::
 
 This message occurs when the Mercurial client is not speaking the modern
 *bundle2* protocol with the server. For performance reasons, we require
-*bundle2* to clone or pull the experimental unified repositories. This
+*bundle2* to clone or pull the unified repository. This
 decision is non-negotiable because removing this restriction could
 result in excessive CPU usage on the server to serve data to legacy
 clients.
