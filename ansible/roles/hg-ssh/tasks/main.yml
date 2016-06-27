@@ -481,6 +481,11 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
+- name: restart pushdataaggregator.service (server only)
+  command: /usr/bin/systemctl restart pushdataaggregator.service
+  when: vct_dir.stat.exists == False
+  ignore_errors: True
+
 - name: systemd service file for pulse notification daemon
   copy: src=pulsenotifier.service
         dest=/etc/systemd/system/pulsenotifier.service
@@ -489,3 +494,8 @@
         mode=0644
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
+
+- name: restart pushdataaggregator.service (server only)
+  command: /usr/bin/systemctl restart pulsenotifier.service
+  when: vct_dir.stat.exists == False
+  ignore_errors: True
