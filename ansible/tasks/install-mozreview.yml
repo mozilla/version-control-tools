@@ -1,5 +1,5 @@
 ---
--name: prepare reviewboard-fork repo
+- name: prepare reviewboard-fork repo
   hg: repo={{ rb_repo }}
       dest={{ rb_vct }}/reviewboard-fork
       revision={{ rb_rev }}
@@ -13,12 +13,10 @@
   command: "{{ venv }}/bin/hg --config extensions.purge= -R {{ rb_vct }}/reviewboard-fork purge --all"
 
 - name: install djblets fork
-  command: {{ python }} setup.py install
-           chdir={{ rb_vct }}/reviewboard-fork/djblets
+  command: "{{ python }} setup.py install chdir={{ rb_vct }}/reviewboard-fork/djblets"
 
 - name: install reviewboard fork
-  command: {{ python }} setup.py install
-           chdir={{ rb_vct }}/reviewboard-fork/reviewboard
+  command: "{{ python }} setup.py install chdir={{ rb_vct }}/reviewboard-fork/reviewboard"
 
 - name: prepare v-c-t repo
   hg: repo={{ repo }}
