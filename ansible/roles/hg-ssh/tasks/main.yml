@@ -410,6 +410,11 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
+- name: restart unifyrepo.service (server only)
+  command: /usr/bin/systemctl restart unifyrepo.service
+  when: vct_dir.stat.exists == False
+  ignore_errors: True
+
 - name: systemd service for bundle generation
   copy: src=hg-bundle-generate.{{ item }}
         dest=/etc/systemd/system/hg-bundle-generate.{{ item }}
