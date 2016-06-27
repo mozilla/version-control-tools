@@ -472,11 +472,6 @@
     - '7'
   when: vct_dir.stat.exists == False
 
-# TODO remove after a few weeks.
-- name: remove supervisor configs
-  file: path=/etc/supervisor.d/vcsreplicator.conf
-        state=absent
-
 - name: restart vcsreplicator daemons (server only)
   command: /usr/bin/systemctl restart vcsreplicator@*.service
   when: vct_dir.stat.exists == False
