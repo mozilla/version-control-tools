@@ -56,12 +56,17 @@ def deploy_mozreview_dev(repo=None, rev=None, rb_repo=None, rb_rev=None,
                         verbosity=verbosity)
 
 
-def deploy_mozreview_prod(repo=None, rev=None, verbosity=0):
+def deploy_mozreview_prod(repo=None, rev=None, rb_repo=None, rb_rev=None,
+                          verbosity=0):
     extra = {'vct': ROOT}
     if repo:
         extra['repo'] = repo
     if rev:
         extra['rev'] = rev
+    if rb_repo:
+        extra['rb_repo'] = rb_repo
+    if rb_rev:
+        extra['rb_rev'] = rb_rev
 
     return run_playbook('deploy-mozreview-prod', extra_vars=extra,
                         verbosity=verbosity)
