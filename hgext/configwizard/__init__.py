@@ -272,7 +272,7 @@ try:
 except AttributeError:
     command = None
 
-wizardsteps = {
+wizardsteps = set([
     'hgversion',
     'username',
     'diff',
@@ -290,7 +290,7 @@ wizardsteps = {
     'multiplevct',
     'configchange',
     'permissions',
-}
+])
 
 
 def configwizard(ui, repo, statedir=None, **opts):
@@ -525,12 +525,12 @@ def _promptvctextension(ui, cw, ext, msg):
 
 def _checkpager(ui, cw):
     haveext = ui.hasconfig('extensions', 'pager')
-    attends = {
+    attends = set([
         'help',
         'incoming',
         'outgoing',
         'status',
-    }
+    ])
 
     haveattends = all(ui.hasconfig('pager', 'attend-%s' % a) for a in attends)
     haveconfig = ui.hasconfig('pager', 'pager')
