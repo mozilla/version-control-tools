@@ -52,11 +52,11 @@ def process_non_root_login(user):
 
     user_status = hg_helper.is_valid_user(user)
     if user_status == 2:
-        sys.stderr.write('Your mercurial account has been disabled due \
-                          to inactivity.\nPlease file a bug at \
-                          https://bugzilla.mozilla.org (or \
-                          http://tinyurl.com/njcfhma) to re-activate \
-                          your account.\n')
+        sys.stderr.write('Your mercurial account has been disabled due '
+                         'to inactivity.\nPlease file a bug at '
+                         'https://bugzilla.mozilla.org (or '
+                         'http://tinyurl.com/njcfhma) to re-activate '
+                         'your account.\n')
         sys.exit(0)
 
     elif user_status != 1:
