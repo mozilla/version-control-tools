@@ -259,7 +259,13 @@ testedwith = '3.5 3.6 3.7 3.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20configwizard'
 
 cmdtable = {}
-command = cmdutil.command(cmdtable)
+
+# We want the extension to load on ancient versions of Mercurial.
+# cmdutil.command was introduced in 1.9.
+try:
+    command = cmdutil.command(cmdtable)
+except AttributeError:
+    command = None
 
 wizardsteps = {
     'hgversion',
@@ -370,8 +376,21 @@ try:
                            optionalrepo=True)(configwizard)
 except TypeError:
     from mercurial import commands
-    configwizard = command('configwizard', cwargs, _('hg configwizard'))(configwizard)
-    commands.optionalrepo += ' configwizard'
+
+    # We can get TypeError for multiple reasons:
+    #
+    # 1. optionalrepo named argument not accepted
+    # 2. command is None
+
+    if command:
+        configwizard = command('configwizard', cwargs, _('hg configwizard'))(configwizard)
+        commands.optionalrepo += ' configwizard'
+    else:
+        commands.table['configwizard'] = (
+            configwizard, cwargs, _('hg configwizard')
+        )
+        commands.optionalrepo += ' configwizard'
+
 
 def _checkhgversion(ui, hgversion):
     if hgversion >= OLDEST_NON_LEGACY_VERSION:
