@@ -296,7 +296,12 @@ wizardsteps = set([
 def configwizard(ui, repo, statedir=None, **opts):
     """Ensure your Mercurial configuration is up to date."""
     runsteps = set(wizardsteps)
-    if ui.hasconfig('configwizard', 'steps'):
+
+    # Mercurial <1.7 had a bug where monkeypatching ui.__class__
+    # during uisetup() doesn't work. So we do our own ui.hasconfig()
+    # here. Other uses of ui.hasconfig() are allowed, as they will
+    # have a properly monkeypatched ui.__class__.
+    if 'steps' in ui._data(False)._data.get('configwizard', {}):
         runsteps = set(ui.configlist('configwizard', 'steps'))
 
     hgversion = util.versiontuple(n=3)
