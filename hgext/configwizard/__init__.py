@@ -518,7 +518,16 @@ def _checkpager(ui, cw):
     # -Q quiet (no terminal bell)
     # -X no termcap init/deinit (won't clear screen afterwards)
     if not haveconfig:
-        cw.c['pager']['pager'] = 'LESS=FRSXQ less'
+        # Pager on Windows doesn't like passing environment variables as
+        # part of the arguments. So pass explicit arguments there.
+        # TODO justify merits of using ``LESS`` at all. Does it provide
+        # any advantages?
+        if sys.platform.startswith(('win32', 'msys')):
+            value = 'less -FRSXQ'
+        else:
+            value = 'LESS=FRSXQ less'
+
+        cw.c['pager']['pager'] = value
 
     for a in sorted(attends):
         if not ui.hasconfig('pager', 'attend-%s' % a):
