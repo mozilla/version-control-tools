@@ -281,9 +281,7 @@ wizardsteps = {
     'permissions',
 }
 
-@command('configwizard', [
-    ('s', 'statedir', '', _('directory to store state')),
-    ], _('hg configwizard'), optionalrepo=True)
+
 def configwizard(ui, repo, statedir=None, **opts):
     """Ensure your Mercurial configuration is up to date."""
     runsteps = set(wizardsteps)
@@ -358,6 +356,22 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     return 0
 
+
+# Older versions of Mercurial don't support the "optionalrepo" named
+# argument on the command decorator. While we don't support these older
+# versions of Mercurial, this could cause extension loading to fail.
+# So we handle the error to enable the extension to load and the command
+# to run.
+cwargs = [
+    ('s', 'statedir', '', _('directory to store state')),
+]
+try:
+    configwizard = command('configwizard', cwargs, _('hg configwizard'),
+                           optionalrepo=True)(configwizard)
+except TypeError:
+    from mercurial import commands
+    configwizard = command('configwizard', cwargs, _('hg configwizard'))(configwizard)
+    commands.optionalrepo += ' configwizard'
 
 def _checkhgversion(ui, hgversion):
     if hgversion >= OLDEST_NON_LEGACY_VERSION:
