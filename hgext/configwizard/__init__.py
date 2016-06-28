@@ -47,10 +47,15 @@ MINIMUM_SUPPORTED_VERSION = (3, 5, 0)
 OLDEST_NON_LEGACY_VERSION = (3, 7, 3)
 
 VERSION_TOO_OLD = '''
-Your version of Mercurial is too old to run `hg configwizard`.
+Your version of Mercurial (%d.%d) is too old to run `hg configwizard`.
 
 Mozilla's Mercurial support policy is to support at most the past
 1 year of Mercurial releases (or 4 major Mercurial releases).
+
+Please upgrade to Mercurial %d.%d or newer and try again.
+
+See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/installing.html
+for Mozilla-tailored instructions for install Mercurial.
 '''.lstrip()
 
 LEGACY_MERCURIAL_MESSAGE = '''
@@ -297,7 +302,10 @@ def configwizard(ui, repo, statedir=None, **opts):
     hgversion = util.versiontuple(n=3)
 
     if hgversion < MINIMUM_SUPPORTED_VERSION:
-        ui.warn(VERSION_TOO_OLD)
+        ui.warn(VERSION_TOO_OLD % (
+            hgversion[0], hgversion[1],
+            MINIMUM_SUPPORTED_VERSION[0], MINIMUM_SUPPORTED_VERSION[1],
+        ))
         raise error.Abort('upgrade Mercurial then run again')
 
     uiprompt(ui, INITIAL_MESSAGE, default='<RETURN>')

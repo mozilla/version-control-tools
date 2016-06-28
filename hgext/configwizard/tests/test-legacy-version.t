@@ -81,9 +81,14 @@ Too old version will fail outright
   > EOF
 
   $ hg $FAKEVERSION --config configwizard.steps=hgversion configwizard
-  Your version of Mercurial is too old to run `hg configwizard`.
+  Your version of Mercurial (3.4) is too old to run `hg configwizard`.
   
   Mozilla's Mercurial support policy is to support at most the past
   1 year of Mercurial releases (or 4 major Mercurial releases).
+  
+  Please upgrade to Mercurial 3.5 or newer and try again.
+  
+  See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/installing.html
+  for Mozilla-tailored instructions for install Mercurial.
   abort: upgrade Mercurial then run again
   [255]
