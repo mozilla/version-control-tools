@@ -256,7 +256,7 @@ Would you like to fix the file permissions (Yn) $$ &Yes $$ &No
 
 
 testedwith = '3.5 3.6 3.7 3.8'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20configwizard'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
