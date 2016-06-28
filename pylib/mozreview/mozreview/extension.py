@@ -198,6 +198,7 @@ class MozReviewExtension(Extension):
                 patterns('', url(r'^mozreview/', include('mozreview.urls'))))
 
         HeaderDropdownActionHook(self, actions=[{
+            'id': 'nav-mozreview-menu',
             'label': 'MozReview',
             'items': [
                 {
