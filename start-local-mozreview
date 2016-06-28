@@ -4,6 +4,8 @@
 # You need to source this script (e.g. run with ". start-local-mozreview") in
 # order for the environment variables to be set correctly.
 
+set -eo pipefail
+
 TEST_MOZREVIEW_NAME=mozreview-test
 TEST_REPO_NAME=local-mozreview-test-repo
 
@@ -19,9 +21,8 @@ export MOZREVIEW_HOME=$TEST_MOZREVIEW_PATH
 . venv/bin/activate
 
 ./mozreview stop $TEST_MOZREVIEW_PATH
-if ! ./mozreview start --reviewboard-port=55556 $TEST_MOZREVIEW_PATH; then
-    exit 1
-fi
+
+./mozreview start --reviewboard-port=55556 $TEST_MOZREVIEW_PATH
 
 $(./mozreview shellinit)
 
