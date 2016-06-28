@@ -845,9 +845,15 @@ class configobjwrapper(object):
             fh.write('%s\n' % line)
 
 
+# Ancient versions of Mercurial lack util.safehasattr(). So implement it here.
+_notset = object()
+def safehasattr(thing, attr):
+    return getattr(thing, attr, _notset) is not _notset
+
+
 def uisetup(ui):
     # hasconfig() was added in 3.7. Backport until we require 3.7.
-    if util.safehasattr(ui, 'hasconfig'):
+    if safehasattr(ui, 'hasconfig'):
         return
 
     class configui(ui.__class__):
@@ -886,5 +892,5 @@ def extsetup(ui):
         if n == 4:
             return (vints[0], vints[1], vints[2], extra)
 
-    if not util.safehasattr(util, 'versiontuple'):
+    if not safehasattr(util, 'versiontuple'):
         util.versiontuple = versiontuple
