@@ -46,7 +46,7 @@ TREE_ALIASES = {
 
     'releases': ('esr38', 'esr45', 'b2g34', 'b2g37', 'b2g44', 'b2g-ota',
                  'release', 'beta', 'aurora', 'central'),
-    'integration': ('inbound', 'fx-team', 'b2ginbound'),
+    'integration': ('inbound', 'fx-team', 'b2ginbound', 'autoland'),
     'twigs': ('alder', 'ash', 'birch', 'cedar', 'cypress', 'date', 'elm',
               'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine'),
     'obsolete': ('esr10', 'esr17', 'b2g18', 'esr24', 'b2g26', 'b2g28',
@@ -85,6 +85,7 @@ REPOS = {
     'b2g-ota': 'releases/b2g-ota',
 
     # Integration repositories.
+    'autoland': 'integration/autoland',
     'b2ginbound': 'integration/b2g-inbound',
     'build': 'projects/build-system',
     'fx-team': 'integration/fx-team',
