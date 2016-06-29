@@ -437,7 +437,7 @@
 - name: hg-bundle-generate.timer is enabled (server only)
   service: name=hg-bundle-generate.timer
            enabled=yes
-  when: vct_dir_stat.exists == False
+  when: vct_dir.stat.exists == False
 
 # Ideally, we would have separate override files for each service. But
 # it doesn't appear systemd allows there to be a generic e.g.
