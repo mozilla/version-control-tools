@@ -57,9 +57,7 @@ HOSTS = (
 
 CDN = 'https://hg.cdn.mozilla.net'
 
-# We store bundles on the local filesystem because they may cause chaos
-# with volume snapshots. See bug 1167935.
-BUNDLE_ROOT = '/repo/bundles'
+BUNDLE_ROOT = '/repo/hg/bundles'
 
 CONCURRENT_THREADS = 4
 

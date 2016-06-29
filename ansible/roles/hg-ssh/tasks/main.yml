@@ -371,7 +371,7 @@
         mode=0755
 
 - name: ensure bundles directory exists
-  file: path=/repo/bundles
+  file: path=/repo/hg/bundles
         state=directory
         owner=hg
         group=hg
@@ -379,7 +379,7 @@
 
 - name: write list of repositories to generate bundles for
   copy: src=bundle-repos
-        dest=/repo/bundles/repos
+        dest=/repo/hg/bundles/repos
         owner=hg
         group=hg
         mode=0644
