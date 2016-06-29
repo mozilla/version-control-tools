@@ -29,11 +29,11 @@ Ensure bundle creation script raises during bundle generation
 
 And raises during upload since we don't have credentials in the test env
 
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles mozilla-central
+  $ hgmo exec hgssh sudo -u hg SINGLE_THREADED=1 /var/hg/venv_tools/bin/python -u /var/hg/version-control-tools/scripts/generate-hg-s3-bundles mozilla-central
+  tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  1 changesets found
   writing 328 bytes for 3 files
   bundle requirements: revlogv1
-  1 changesets found
-  tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
   uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
   uploading to s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
@@ -69,7 +69,7 @@ The manifest should be empty because there were no successful uploads
 
 An index.html and bundles.json document should be produced
 
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles mozilla-central --no-upload
+  $ hgmo exec hgssh sudo -u hg SINGLE_THREADED=1 /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles mozilla-central --no-upload
   wrote synchronization message into replication log
   tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   bundle already exists, skipping: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg

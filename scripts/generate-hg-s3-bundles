@@ -61,6 +61,10 @@ BUNDLE_ROOT = '/repo/hg/bundles'
 
 CONCURRENT_THREADS = 4
 
+# Testing backdoor so results are deterministic.
+if 'SINGLE_THREADED' in os.environ:
+    CONCURRENT_THREADS = 1
+
 HTML_INDEX = '''
 <html>
   <head>
