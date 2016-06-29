@@ -24,33 +24,33 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
 
     if num_changes <= 10:
         plural = 's' if num_changes > 1 else ''
-        print '\nView your change%s here:' % plural
+        ui.write('\nView your change%s here:\n' % plural)
 
         for i in xrange(rev, tip + 1):
             node = short(repo.changectx(i).node())
-            print '  %srev/%s' % (url, node)
+            ui.write('  %srev/%s\n' % (url, node))
     else:
-        print '\nView the pushlog for these changes here:'
-        print '  %spushloghtml?changeset=%s' % (url, tip_node)
+        ui.write('\nView the pushlog for these changes here:\n')
+        ui.write('  %spushloghtml?changeset=%s\n' % (url, tip_node))
 
     # For repositories that report CI results to Treeherder, also output a
     # Treeherder url.
     treeherder_repo = ui.config('mozilla', 'treeherder_repo')
     if treeherder_repo:
         treeherder_base_url = 'https://treeherder.mozilla.org'
-        print '\nFollow the progress of your build on Treeherder:'
-        print '  %s/#/jobs?repo=%s&revision=%s' % (treeherder_base_url,
-                                                   treeherder_repo,
-                                                   tip_node)
+        ui.write('\nFollow the progress of your build on Treeherder:\n')
+        ui.write('  %s/#/jobs?repo=%s&revision=%s\n' % (treeherder_base_url,
+                                                        treeherder_repo,
+                                                        tip_node))
         # if specifying a try build and talos jobs are enabled, suggest that
         # user use compareperf
         if treeherder_repo == 'try':
             msg = repo.changectx(tip).description()
             if ((' -t ' in msg or ' --talos ' in msg) and '-t none' not in msg
                 and '--talos none' not in msg):
-                print ('\nIt looks like this try push has talos jobs. Compare '
-                       'performance against a baseline revision:')
-                print ('  %s/perf.html#/comparechooser'
-                       '?newProject=try&newRevision=%s' % (
+                ui.write('\nIt looks like this try push has talos jobs. Compare '
+                       'performance against a baseline revision:\n')
+                ui.write('  %s/perf.html#/comparechooser'
+                       '?newProject=try&newRevision=%s\n' % (
                            treeherder_base_url, tip_node))
     return 0
