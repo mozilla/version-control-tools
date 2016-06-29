@@ -143,6 +143,17 @@ def addmetadata(repo, ctx, d, onlycheap=False):
         d['treeherderrepourl'] = 'https://treeherder.mozilla.org/#/jobs?repo=%s' % treeherder
         d['treeherderrepo'] = treeherder
 
+        pushinfo = repo.pushlog.pushfromchangeset(ctx)
+        if pushinfo and pushinfo[3]:
+            lastpushhead = repo[pushinfo[3][0]].hex()
+            d['perfherderurl'] = (
+                'https://treeherder.mozilla.org/perf.html#/compare?'
+                'originalProject=%s&'
+                'originalRevision=%s&'
+                'newProject=%s&'
+                'newRevision=%s') % (treeherder, pushinfo[3][-1],
+                                     treeherder, lastpushhead)
+
     if onlycheap:
         return
 
