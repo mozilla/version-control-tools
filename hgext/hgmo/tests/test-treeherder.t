@@ -20,7 +20,7 @@
 No Treeherder link unless the repository defines its Treeherder repo
 
   $ http http://localhost:$HGPORT/rev/be788785547b --body-file body > /dev/null
-  $ grep Treeherder body
+  $ grep '>treeherder' body
   [1]
 
 Configure the Treeherder repo
@@ -41,5 +41,5 @@ Treeherder results link should be exposed
 (Note the SHA-1 is different, as TreeHerder indexes by push head)
 
   $ http http://localhost:$HGPORT1/rev/be788785547b --body-file body > /dev/null
-  $ grep Treeherder body
-  <tr><td>Treeherder</td><td><a href="https://treeherder.mozilla.org/#/jobs?repo=mozilla-central&revision=0a37bfb47d98">results</a></td></tr>
+  $ grep '>treeherder' body
+  <tr><td>treeherder</td><td><a href="https://treeherder.mozilla.org/#/jobs?repo=mozilla-central&revision=0a37bfb47d98">mozilla-central@0a37bfb47d98</a></td></tr>

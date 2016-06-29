@@ -141,6 +141,7 @@ def addmetadata(repo, ctx, d, onlycheap=False):
     treeherder = repo.ui.config('mozilla', 'treeherder_repo')
     if treeherder:
         d['treeherderrepourl'] = 'https://treeherder.mozilla.org/#/jobs?repo=%s' % treeherder
+        d['treeherderrepo'] = treeherder
 
     if onlycheap:
         return
