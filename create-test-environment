@@ -14,6 +14,27 @@ if ! type npm >/dev/null 2>&1; then
   echo "npm not found.  Please install node.js."
   exit 1
 fi
+
+# Some Linux distros use 'nodejs' instead of 'node' as the executable
+if type node >/dev/null 2>&1; then
+    node_bin=node
+elif type nodejs >/dev/null 2>&1; then
+    node_bin=nodejs
+else
+    echo "Failed to determine node executable name."
+    exit 1
+fi
+
+# Check the node.js version - lessc needs 0.12
+function version {
+    echo "$@" | sed "s/^v//" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'
+}
+if [ $(version `${node_bin} -v`) -lt $(version "0.12") ]; then
+    echo "node.js is too old."
+    echo "Found $(${node_bin} -v), test environment requires v0.12+"
+    exit 1
+fi
+
 # More annoyingly we need msgfmt which is part of gettext.
 if ! type msgfmt >/dev/null 2>&1; then
   echo "msgfmt not found.  Please install the gettext package."
