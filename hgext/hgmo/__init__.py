@@ -111,23 +111,25 @@ command = cmdutil.command(cmdtable)
 
 def addmetadata(repo, ctx, d, onlycheap=False):
     """Add changeset metadata for hgweb templates."""
-    bugs = list(set(commitparser.parse_bugs(ctx.description())))
+    description = encoding.fromlocal(ctx.description())
+
+    bugs = list(set(commitparser.parse_bugs(description)))
     d['bugs'] = []
-    for bug in commitparser.parse_bugs(ctx.description()):
+    for bug in commitparser.parse_bugs(description):
         d['bugs'].append({
             'no': str(bug),
             'url': 'https://bugzilla.mozilla.org/show_bug.cgi?id=%s' % bug,
         })
 
     d['reviewers'] = []
-    for reviewer in commitparser.parse_reviewers(ctx.description()):
+    for reviewer in commitparser.parse_reviewers(description):
         d['reviewers'].append({
             'name': reviewer,
             'revset': 'reviewer(%s)' % reviewer,
         })
 
     d['backsoutnodes'] = []
-    backouts = commitparser.parse_backouts(ctx.description())
+    backouts = commitparser.parse_backouts(description)
     if backouts:
         for node in backouts[0]:
             try:
@@ -192,7 +194,8 @@ def addmetadata(repo, ctx, d, onlycheap=False):
         if count >= searchlimit:
             break
 
-        backouts = commitparser.parse_backouts(bctx.description())
+        backouts = commitparser.parse_backouts(
+            encoding.fromlocal(bctx.description()))
         if backouts and thisshort in backouts[0]:
             d['backedoutbynode'] = bctx.hex()
             break
