@@ -42,4 +42,4 @@ Treeherder results link should be exposed
 
   $ http http://localhost:$HGPORT1/rev/be788785547b --body-file body > /dev/null
   $ grep '>treeherder' body
-  <tr><td>treeherder</td><td><a href="https://treeherder.mozilla.org/#/jobs?repo=mozilla-central&revision=0a37bfb47d98">mozilla-central@0a37bfb47d98</a></td></tr>
+  <tr><td>treeherder</td><td>mozilla-central@0a37bfb47d98 [<a href="https://treeherder.mozilla.org/#/jobs?repo=mozilla-central&revision=0a37bfb47d98">default view</a>] [<a href="https://treeherder.mozilla.org/#/jobs?repo=mozilla-central&revision=0a37bfb47d98&filter-resultStatus=testfailed&filter-resultStatus=busted&filter-resultStatus=exception">failures only]</td></tr>
