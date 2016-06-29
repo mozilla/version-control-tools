@@ -113,7 +113,6 @@ def addmetadata(repo, ctx, d, onlycheap=False):
     """Add changeset metadata for hgweb templates."""
     description = encoding.fromlocal(ctx.description())
 
-    bugs = list(set(commitparser.parse_bugs(description)))
     d['bugs'] = []
     for bug in commitparser.parse_bugs(description):
         d['bugs'].append({
