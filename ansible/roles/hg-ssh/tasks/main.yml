@@ -412,6 +412,11 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
+- name: unifyrepo.service is enabled (server only)
+  service: name=unifyrepo.service
+           enabled=yes
+  when: vct_dir.stat.exists == False
+
 - name: restart unifyrepo.service (server only)
   command: /usr/bin/systemctl restart unifyrepo.service
   when: vct_dir.stat.exists == False
@@ -428,6 +433,11 @@
     - timer
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
+
+- name: hg-bundle-generate.timer is enabled (server only)
+  service: name=hg-bundle-generate.timer
+           enabled=yes
+  when: vct_dir_stat.exists == False
 
 # Ideally, we would have separate override files for each service. But
 # it doesn't appear systemd allows there to be a generic e.g.
@@ -488,6 +498,11 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
+- name: pushdataaggregator.service is enabled (server only)
+  service: name=pushdataaggregator.service
+           enabled=yes
+  when: vct_dir.stat.exists == False
+
 - name: restart pushdataaggregator.service (server only)
   command: /usr/bin/systemctl restart pushdataaggregator.service
   when: vct_dir.stat.exists == False
@@ -502,7 +517,13 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
+- name: pulsenotifier.service is enabled (server only)
+  service: name=pulsenotifier.service
+           enabled=yes
+  when: vct_dir.stat.exists == False
+
 - name: restart pulsenotifier.service (server only)
   command: /usr/bin/systemctl restart pulsenotifier.service
   when: vct_dir.stat.exists == False
   ignore_errors: True
+
