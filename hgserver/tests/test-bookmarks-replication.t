@@ -53,8 +53,7 @@
   remote: View your changes here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
   remote:   https://hg.mozilla.org/mozilla-central/rev/04da6c25817b
-  remote: 
-  remote: recorded changegroup in replication log in \d\.\d+s (re)
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
   exporting bookmark bm1
 
   $ hg push -B bm2
