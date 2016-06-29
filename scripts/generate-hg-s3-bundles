@@ -373,7 +373,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
     return paths
 
 
-def upload_index(repos):
+def generate_index(repos):
     """Upload an index HTML page describing available bundles."""
     entries = []
 
@@ -403,6 +403,15 @@ def upload_index(repos):
     html = HTML_INDEX % ('\n'.join(entries),
                          datetime.datetime.utcnow().isoformat())
 
+    # We rely on the mtime of this file for monitoring to ensure
+    # bundle generation is working.
+    with open(os.path.join(BUNDLE_ROOT, 'index.html'), 'wb') as fh:
+        fh.write(html)
+
+    return html
+
+
+def upload_index(html):
     for host, bucket, region in HOSTS:
         c = S3Connection(host=host)
         b = c.get_bucket(bucket, validate=False)
@@ -415,7 +424,7 @@ def upload_index(repos):
         k.set_contents_from_string(html)
 
 
-def upload_json_manifest(repos):
+def generate_json_manifest(repos):
     d = {}
     for repo, bundles in repos.items():
         if not bundles:
@@ -428,13 +437,21 @@ def upload_json_manifest(repos):
                 'size': size,
             }
 
+    data = json.dumps(d, sort_keys=True, indent=4)
+    with open(os.path.join(BUNDLE_ROOT, 'bundles.json'), 'wb') as fh:
+        fh.write(data)
+
+    return data
+
+
+def upload_json_manifest(data):
     for host, bucket, region in HOSTS:
         c = S3Connection(host=host)
         b = c.get_bucket(bucket, validate=False)
         k = b.get_key('bundles.json', validate=False)
         k.content_type = 'application/json'
         k.cache_control = 'max-age=60'
-        k.set_contents_from_string(json.dumps(d, sort_keys=True, indent=4))
+        k.set_contents_from_string(data)
 
 
 if __name__ == '__main__':
@@ -472,6 +489,9 @@ if __name__ == '__main__':
     for repo, opts in repos:
         paths[repo] = generate_bundles(repo, upload=upload, **opts)
 
+    html_index = generate_index(paths)
+    json_manifest = generate_json_manifest(paths)
+
     if upload:
-        upload_index(paths)
-        upload_json_manifest(paths)
+        upload_index(html_index)
+        upload_json_manifest(json_manifest)

@@ -67,6 +67,19 @@ The manifest should be empty because there were no successful uploads
   
   
 
+An index.html and bundles.json document should be produced
+
+  $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles mozilla-central --no-upload
+  wrote synchronization message into replication log
+  tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  bundle already exists, skipping: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
+  bundle already exists, skipping: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
+  $ hgmo exec hgssh ls /repo/hg/bundles
+  bundles.json
+  index.html
+  mozilla-central
+  repos
+
 Create a clonebundles manifest
 
   $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles --no-upload mozilla-central >/dev/null
@@ -169,6 +182,7 @@ The copyfrom=x field copies bundles from another repo
   $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles --no-upload 'try copyfrom=mozilla-central'
   copying /repo/hg/mozilla/mozilla-central/.hg/bundleclone.manifest -> /repo/hg/mozilla/try/.hg/bundleclone.manifest
   copying /repo/hg/mozilla/mozilla-central/.hg/clonebundles.manifest -> /repo/hg/mozilla/try/.hg/clonebundles.manifest
+  ignoring repo try in index because no gzip bundle
   $ http --no-headers ${HGWEB_0_URL}try?cmd=clonebundles
   200
   
