@@ -642,3 +642,167 @@ If the ``pulsenotifier`` daemon has crashed, try restarting it::
 
 If the hg.mozilla.org Kafka cluster is down, lots of other alerts are
 likely firing. You should alert VCS on call.
+
+Adding/Removing Nodes from Zookeeper and Kafka
+==============================================
+
+When new servers are added or removed, the Zookeeper and Kafka clusters
+may need to be *rebalanced*. This typically only happens when servers
+are replaced.
+
+The process is complicated and requires a number of manual steps. It
+shouldn't be performed frequently enough to justify automating it.
+
+Adding a new server to Zookeeper and Kafka
+------------------------------------------
+
+The first step is to assign a Zookeeper ID in Ansible. See
+https://hg.mozilla.org/hgcustom/version-control-tools/rev/da8687458cd1
+for an example commit. Find the next available integer **that hasn't been
+used before**. This is typically ``N+1`` where ``N`` is the last entry
+in that file.
+
+.. note::
+
+   Assigning a Zookeeper ID has the side-effect of enabling Zookeeper
+   and Kafka on the server. On the next deploy, Zookeeper and Kafka
+   will be installed.
+
+Deploy this change via ``./deploy hgmo``.
+
+During the deploy, some Nagios alerts may fire saying the Zookeeper
+ensemble is missing followers. e.g.::
+
+   hg is WARNING: ENSEMBLE WARNING - only have 4/5 expected followers
+
+This is because as the deploy is performed, we're adding references to
+the new Zookeeper server before it is actually started. These warnings
+should be safe to ignore.
+
+Once the deploy finishes, start Zookeeper on the new server::
+
+   $ systemctl start zookeeper.service
+
+Nagios alerts for the Zookeeper ensemble should clear after Zookeeper
+has started on the new server.
+
+Wait a minute or so then start Kafka on the new server::
+
+   $ systemctl start kafka.service
+
+At this point, Zookeeper and Kafka are both running and part of their
+respective clusters. Everything is in a mostly stable state at this
+point.
+
+Rebalancing Kafka Data to the New Server
+----------------------------------------
+
+When the new Kafka node comes online, it will be part of the Kafka
+cluster but it won't have any data. In other words, it won't
+really be used (unless a cluster event such as creation of a new
+topic causes data to be assigned to it).
+
+To have the new server actually do something, we'll need to run
+some Kafka tools to rebalance data.
+
+The tool used to rebalance data is
+``/opt/kafka/bin/kafka-reassign-partitions.sh``. It has 3 modes of operation,
+all of which we'll use:
+
+1. Generate a reassignment plan
+2. Execute a reassignment plan
+3. Verify reassignments have completed
+
+All command invocations require a ``--zookeeper`` argument defining
+the Zookeeper servers to connect to. The value for this argument should
+be the ``zookeeper.connect`` variable from ``/etc/kafka/server.properties``.
+e.g. ``hgssh4.dmz.scl3.mozilla.com:2181/hgmoreplication,hgweb11.dmz.scl3.mozilla.com:2181/hgmoreplication``.
+**If this value doesn't match exactly, things may not go as planned.**
+
+The first step is to generate a JSON document that will be used to perform
+data reassignment. To do this, we need a list of broker IDs to move data
+to and a JSON file listing the topics to move.
+
+The list of broker IDs is the set of Zookeeper IDs as defined in
+``ansible/group_vars/hgmo`` (this is the file you changed earlier to
+add the new server). Simply select the servers you wish for data to
+exist on. e.g. ``7,8,9,10,11``.
+
+The JSON file denotes which Kafka topics should be moved. Typically
+every known Kafka topic is moved. Use the following as a template::
+
+   {
+     "topics": [
+       {"topic": "pushdata"},
+       {"topic": "pushlog"},
+       {"topic": "replicatedpushdata"},
+       {"topic": "__consumer_offsets"}
+     ],
+     "version": 1
+   }
+
+Once you have all these pieces of data, you can run
+``kafka-reassign-partitions.sh`` to generate a proposed reassignment plan::
+
+   $ /opt/kafka/bin/kafka-reassign-partitions.sh \
+     --zookeeper <hosts> \
+     --generate \
+     --broker-list <list> \
+     --topics-to-move-json-file topics.json
+
+This will output 2 JSON blocks::
+
+   Current partition replica assignment
+
+   {...}
+   Proposed partition reassignment configuration
+
+   {...}
+
+You'll need to copy and paste the 2nd JSON block (the proposed reassignment)
+to a new file, let's say ``reassignments.json``.
+
+Then we can execute the data reassignment::
+
+   $ /opt/kafka/bin/kafka-reassign-partitions.sh \
+     --zookeeper <hosts> \
+     --execute \
+     --reassignment-json-file reassignments.json
+
+Data reassignment can take up to several minutes. We can see the status
+of the reassignment by running:
+
+   $ /opt/kafka/bin/kafka-reassign-partitions.sh \
+     --zookeeper <hosts> \
+     --verify \
+     --reassignment-json-file reassignments.json
+
+If your intent was to move Kafka data off a server, you can verify data
+has been removed by looking in the ``/var/lib/kafka/logs`` data on
+that server. If there is no topic/partition data, there should be no
+sub-directories in that directory. If there are sub-directories
+(they have the form ``topic-<N>``), adjust your ``topics.json``
+file, generate a new ``reassignments.json`` file and execute a
+reassignment.
+
+Removing an old Kafka Node
+--------------------------
+
+Once data has been removed from a Kafka node, it can safely be turned off.
+
+The first step is to remove the server from the Zookeeper/Kafka list
+in Ansible. See https://hg.mozilla.org/hgcustom/version-control-tools/rev/adc5024917c7
+for an example commit. Deploy this via ``./deploy hgmo``.
+
+Next, stop Kafka and Zookeeper from the server::
+
+   $ systemctl stop kafka.service
+   $ systemctl stop zookeeper.service
+
+At this point, the old Kafka/Zookeeper node is shut down and should no
+longer be referenced.
+
+Clean up by disabling the systemd services::
+
+   $ systemctl disable kafka.service
+   $ systemctl disable zookeeper.service
