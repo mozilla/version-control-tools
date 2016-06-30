@@ -14,6 +14,7 @@ zk_servers: {
   "hgweb12.dmz.scl3.mozilla.com": 8,
   "hgweb13.dmz.scl3.mozilla.com": 9,
   "hgweb14.dmz.scl3.mozilla.com": 10,
+  "hgssh4.dmz.scl3.mozilla.com": 11,
 }
 kafka_zookeeper_connect: "hgssh3.dmz.scl3.mozilla.com:2181/hgmoreplication,hgweb11.dmz.scl3.mozilla.com:2181/hgmoreplication"
 
