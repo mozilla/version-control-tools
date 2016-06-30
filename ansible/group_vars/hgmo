@@ -16,7 +16,14 @@ zk_servers: {
   "hgweb14.dmz.scl3.mozilla.com": 10,
   "hgssh4.dmz.scl3.mozilla.com": 11,
 }
-kafka_zookeeper_connect: "hgssh3.dmz.scl3.mozilla.com:2181/hgmoreplication,hgweb11.dmz.scl3.mozilla.com:2181/hgmoreplication"
+# The string used by zookeeper.connect is used both to connect to
+# Zookeeper *and* as a primary key of sorts to store data. If
+# we were to put actual hostnames in this string, the future removal
+# of the host may cause Kafka to blow up. It appears the best practice
+# is to always Zookeeper on the local machine and connect to
+# localhost:2181. This ensures that future host juggling continues
+# to work.
+kafka_zookeeper_connect: "localhost:2181/hgmoreplication"
 
 kafka_replication_factor: 5
 kafka_min_insync_replicas: 3
