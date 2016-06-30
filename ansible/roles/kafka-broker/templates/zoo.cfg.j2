@@ -17,10 +17,11 @@ autopurge.snapRetainCount = 5
 
 # We need to listen on all IPs inside Docker because otherwise Java
 # has a difficult time choosing which interface to bind to.
+# We leave clientPortAddress as the default (which is to listen on all
+# interfaces) because we need it to bind on both the network
+# interface and localhost because localhost is used by zookeeper.connect.
 {% if zk_listen_on_all_ips | default(False) %}
 quorumListenOnAllIPs = true
-{% else %}
-clientPortAddress = {{ inventory_hostname }}
 {% endif %}
 
 {% if zk_servers is defined %}
