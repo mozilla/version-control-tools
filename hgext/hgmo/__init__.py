@@ -144,7 +144,10 @@ def addmetadata(repo, ctx, d, onlycheap=False):
         d['treeherderrepo'] = treeherder
 
         pushinfo = repo.pushlog.pushfromchangeset(ctx)
-        if pushinfo and pushinfo[3]:
+        # Don't print Perfherder link on non-publishing repos (like Try)
+        # because the previous push likely has nothing to do with this
+        # push.
+        if pushinfo and pushinfo[3] and repo.ui.configbool('phases', 'publish', True):
             lastpushhead = repo[pushinfo[3][0]].hex()
             d['perfherderurl'] = (
                 'https://treeherder.mozilla.org/perf.html#/compare?'
