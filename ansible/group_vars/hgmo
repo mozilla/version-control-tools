@@ -16,7 +16,7 @@ zk_servers: {
   "hgweb14.dmz.scl3.mozilla.com": 10,
   "hgssh4.dmz.scl3.mozilla.com": 11,
 }
-kafka_zookeeper_connect: "hgssh3.dmz.scl3.mozilla.com:2181/hgmoreplication,hgweb11.dmz.scl3.mozilla.com:2181/hgmoreplication"
+kafka_zookeeper_connect: "hgssh3.dmz.scl3.mozilla.com:2181/hgmoreplication,hgweb11.dmz.scl3.mozilla.com:2181/hgmoreplication,hgweb12.dmz.scl3.mozilla.com:2181/hgmoreplication"
 
 kafka_replication_factor: 5
 kafka_min_insync_replicas: 3
