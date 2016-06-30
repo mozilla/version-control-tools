@@ -1,9 +1,12 @@
   $ . $TESTDIR/hgext/configwizard/tests/helpers.sh
 
-  $ mkdir -p version-control-tools/hgext/firefoxtree
-  $ touch version-control-tools/hgext/firefoxtree/__init__.py
+  $ mkdir -p a/version-control-tools/hgext/firefoxtree
+  $ mkdir -p b/version-control-tools/hgext/mozext
 
-  $ hg --config extensions.firefoxtree=$TESTTMP/version-control-tools/hgext/firefoxtree --config configwizard.steps=multiplevct configwizard
+  $ touch a/version-control-tools/hgext/firefoxtree/__init__.py
+  $ touch b/version-control-tools/hgext/mozext/__init__.py
+
+  $ hg --config extensions.firefoxtree=$TESTTMP/a/version-control-tools/hgext/firefoxtree --config extensions.mozext=$TESTTMP/b/version-control-tools/hgext/mozext --config configwizard.steps=multiplevct configwizard
   This wizard will guide you through configuring Mercurial for an optimal
   experience contributing to Mozilla projects.
   
