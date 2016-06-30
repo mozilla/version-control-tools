@@ -18,6 +18,7 @@ makefirefoxrepos() {
   makefirefoxrepo $1/releases/mozilla-release
   makefirefoxrepo $1/releases/mozilla-esr31
   makefirefoxrepo $1/releases/mozilla-esr38
+  makefirefoxrepo $1/integration/autoland
   makefirefoxrepo $1/integration/b2g-inbound
   makefirefoxrepo $1/integration/mozilla-inbound
   makefirefoxrepo $1/integration/fx-team

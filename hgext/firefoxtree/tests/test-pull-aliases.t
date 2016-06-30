@@ -32,6 +32,9 @@ We can pull from the special multiple tree aliases
   pulling from b2ginbound
   searching for changes
   no changes found
+  pulling from autoland
+  searching for changes
+  no changes found
 
   $ hg fxheads
   1:994ec05999da b2ginbound Bug 457 - second commit to m-c; r=ted
