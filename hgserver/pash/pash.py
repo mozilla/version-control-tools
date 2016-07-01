@@ -19,6 +19,20 @@ access:
     https://www.mozilla.org/en-US/about/governance/policies/commit/
 '''.lstrip()
 
+HG_ACCESS_DISABLED = '''
+A SSH connection has been established, your account (%s)
+was found in LDAP, and your account has been configured for Mercurial
+access.
+
+However, Mercurial access is currently disabled on your account.
+This commonly occurs due to account inactivity (you need to SSH
+into hg.mozilla.org every few months to keep your account active).
+
+To restore Mercurial access, please file a MOC Service Request
+bug (http://tinyurl.com/njcfhma) and request hg access be restored
+for %s.
+'''.lstrip()
+
 
 def QuoteForPOSIX(string):
     '''quote a string so it can be used as an argument in a  posix shell
@@ -52,11 +66,7 @@ def process_non_root_login(user):
 
     user_status = hg_helper.is_valid_user(user)
     if user_status == 2:
-        sys.stderr.write('Your mercurial account has been disabled due '
-                         'to inactivity.\nPlease file a bug at '
-                         'https://bugzilla.mozilla.org (or '
-                         'http://tinyurl.com/njcfhma) to re-activate '
-                         'your account.\n')
+        sys.stderr.write(HG_ACCESS_DISABLED % (user, user))
         sys.exit(0)
 
     elif user_status != 1:

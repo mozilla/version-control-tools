@@ -246,8 +246,17 @@ hgAccountDisabled=FALSE shows account disabled message
   # numEntries: 1
 
   $ ssh -T -F ssh_config -i key1 -l hgdisabled@example.com -p $HGPORT $SSH_SERVER
-  Your mercurial account has been disabled due to inactivity.
-  Please file a bug at https://bugzilla.mozilla.org (or http://tinyurl.com/njcfhma) to re-activate your account.
+  A SSH connection has been established, your account (hgdisabled@example.com)
+  was found in LDAP, and your account has been configured for Mercurial
+  access.
+  
+  However, Mercurial access is currently disabled on your account.
+  This commonly occurs due to account inactivity (you need to SSH
+  into hg.mozilla.org every few months to keep your account active).
+  
+  To restore Mercurial access, please file a MOC Service Request
+  bug (http://tinyurl.com/njcfhma) and request hg access be restored
+  for hgdisabled@example.com.
 
 mozreview-ldap-associate isn't enabled on hgssh
 
