@@ -21,7 +21,7 @@ class LDAP(object):
 
     def create_user(self, email, username, uid, fullname,
                          key_filename=None, scm_level=None,
-                         hg_access=True):
+                         hg_access=True, hg_enabled=True):
         """Create a new user in LDAP.
 
         The user has an ``email`` address, a full ``name``, a
@@ -48,9 +48,10 @@ class LDAP(object):
 
         if hg_access:
             r[0][1].append(b'hgAccount')
+            value = b'TRUE' if hg_enabled else b'FALSE'
             r.extend([
                 (b'fakeHome', [b'/tmp']),
-                (b'hgAccountEnabled', [b'TRUE']),
+                (b'hgAccountEnabled', [value]),
                 (b'hgHome', [b'/tmp']),
                 (b'hgShell', [b'/bin/sh']),
             ])

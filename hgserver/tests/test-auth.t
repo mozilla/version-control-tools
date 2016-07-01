@@ -197,6 +197,58 @@ Do another login to verify no pash errors are present
 
   $ hgmo exec hgssh cat /var/log/pash.log
 
+hgAccountDisabled=FALSE shows account disabled message
+
+  $ hgmo create-ldap-user --hg-disabled --key-file key1 hgdisabled@example.com hgdisabled 1002 'HgAccess Disabled'
+  $ hgmo exec hgssh /usr/bin/ldapsearch -b 'dc=mozilla' -s sub -x mail=hgdisabled@example.com
+  # extended LDIF
+  #
+  # LDAPv3
+  # base <dc=mozilla> with scope subtree
+  # filter: mail=hgdisabled@example.com
+  # requesting: ALL
+  #
+  
+  # hgdisabled@example.com, com, mozilla
+  dn: mail=hgdisabled@example.com,o=com,dc=mozilla
+  objectClass: inetOrgPerson
+  objectClass: organizationalPerson
+  objectClass: person
+  objectClass: posixAccount
+  objectClass: top
+  objectClass: hgAccount
+  objectClass: ldapPublicKey
+  cn: HgAccess Disabled
+  gidNumber: 100
+  homeDirectory: /home/hgdisabled
+  sn: Disabled
+  uid: hgdisabled
+  uidNumber: 1002
+  fakeHome: /tmp
+  hgAccountEnabled: FALSE
+  hgHome: /tmp
+  hgShell: /bin/sh
+  mail: hgdisabled@example.com
+  sshPublicKey:: * (glob)
+   * (glob)
+   * (glob)
+   * (glob)
+   * (glob)
+   * (glob)
+   * (glob)
+   * (glob)
+  
+  # search result
+  search: 2
+  result: 0 Success
+  
+  # numResponses: 2
+  # numEntries: 1
+
+  $ ssh -T -F ssh_config -i key1 -l hgdisabled@example.com -p $HGPORT $SSH_SERVER
+  Your mercurial account has been disabled due to inactivity.
+  Please file a bug at https://bugzilla.mozilla.org (or http://tinyurl.com/njcfhma) to re-activate your account.
+
 mozreview-ldap-associate isn't enabled on hgssh
 
   $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER mozreview-ldap-associate
