@@ -198,7 +198,7 @@ Conversion to Bugzilla Comments
    to offer little value over just going to Review Board and looking at
    the original comments there.)
 
-Granting, Denying, and Clearing Reviews
+Granting, Denying, Clearing, and Delegating Reviews
    There is a dropdown containing standard Bugzilla review flags
    (``r?``, ``r+``, and ``r-``) in the **Finish Review** dialog in
    each commit review request. The selected value will be set on the
@@ -213,6 +213,12 @@ Granting, Denying, and Clearing Reviews
    the reviewer, since a user cannot set a review flag as someone
    else. If the original ``r?`` has never been changed, then it will
    be left as is, i.e., set by the commit author.
+
+   The list of reviewers can be modified by anyone with permission
+   to change the attachment in Bugzilla; click on the edit/pencil icon
+   next to the reviewer list and update the reviewers using their IRC
+   nicks. Changes to the reviewer list need to be published using the
+   **Publish** button on the green notification bar.
 
    While the parent review request (available from the **Review
    Summary** link on any commit review request) provides a collapsed
