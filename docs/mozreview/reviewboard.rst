@@ -95,13 +95,6 @@ The metadata on the parent review request is derived from the content of
 commits you've pushed for review. You can see a list of commits and
 their summary lines that are part of the review.
 
-.. note::
-
-   There is a
-   `proposal <https://bugzilla.mozilla.org/show_bug.cgi?id=1039679>`_
-   to eliminate the parent review request for reviews only consisting of
-   a single commit.
-
 To publish the collection of review requests, you'll want to assign reviewers.
 
 Each commit has **Reviewers** line that shows the reviewer(s) for the commit.
