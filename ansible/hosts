@@ -16,7 +16,7 @@ hgssh1.dmz.scl3.mozilla.com ansible_sudo=yes
 hgssh[4:5].dmz.scl3.mozilla.com ansible_sudo=yes
 
 [hgssh-prod-master]
-hgssh3.dmz.scl3.mozilla.com
+hgssh4.dmz.scl3.mozilla.com
 
 [hgssh-stage]
 hgssh.stage.dmz.scl3.mozilla.com ansible_ssh_user=root

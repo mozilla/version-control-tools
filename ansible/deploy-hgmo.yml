@@ -27,7 +27,7 @@
       when: vct_node_phase.stdout != 'public'
 
     - name: capture changes since last time
-      local_action: command hg --cwd {{ vct }} log -r {{ hostvars['hgssh3.dmz.scl3.mozilla.com'].previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
+      local_action: command hg --cwd {{ vct }} log -r {{ hostvars['hgssh4.dmz.scl3.mozilla.com'].previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
       register: vct_changes
 
     - name: check if mozbuild chroot is available
@@ -41,7 +41,7 @@
            channel="#vcs"
            nick=hg-deploy-bot
            color=red
-           msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars['hgssh3.dmz.scl3.mozilla.com'].previous_vct_node.content | b64decode }}"
+           msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars['hgssh4.dmz.scl3.mozilla.com'].previous_vct_node.content | b64decode }}"
       run_once: true
 
 - hosts: hgweb-prod
@@ -50,8 +50,8 @@
         # We have to use hostvars to reference variables on other hosts.
         # slurp captures content in base64 encoded form. Decode it
         # before it is passed in.
-        mirror_private_key: "{{ hostvars['hgssh3.dmz.scl3.mozilla.com'].mirror_private_key.content | b64decode }}",
-        mirror_host_key: "{{ hostvars['hgssh3.dmz.scl3.mozilla.com'].mirror_host_key.content | b64decode }}",
+        mirror_private_key: "{{ hostvars['hgssh4.dmz.scl3.mozilla.com'].mirror_private_key.content | b64decode }}",
+        mirror_host_key: "{{ hostvars['hgssh4.dmz.scl3.mozilla.com'].mirror_host_key.content | b64decode }}",
         # hg-zlb.vips.scl3.mozilla.com resolves to multiple IPs.
         mirror_ips: ["63.245.215.25", "63.245.215.102"],
         vct_node: "{{ lookup('file', '../.vctnode') }}",
@@ -103,7 +103,7 @@
             owner=root
             group=root
             mode=0644
-      when: ansible_hostname == 'hgssh3'
+      when: ansible_hostname == 'hgssh4'
 
 - hosts: localhost
   gather_facts: no
