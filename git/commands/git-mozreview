@@ -386,7 +386,7 @@ def push_command(args):
             for l in proc.stdout:
                 if l.startswith('>result> '):
                     commits.append(l.split()[1:])
-                elif not l.startswith('remote: REVIEWBOARD: '):
+                elif 'REVIEWBOARD: ' not in l:
                     ui.write(l)
 
             res = proc.wait()
