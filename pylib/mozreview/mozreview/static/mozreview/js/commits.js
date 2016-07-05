@@ -251,7 +251,7 @@ $(document).on("mozreview_ready", function() {
       // to the parent instead.
       var parent_rrid = $("#mozreview-parent-request").data("id");
       $("#draft-banner").append(
-          $('<a href="../' + parent_rrid + '/" title="You can only Publish or Discard when ' +
+          $('<a href="/r/' + parent_rrid + '/" title="You can only Publish or Discard when ' +
             'viewing the \'Review Summary / Parent\'.">Publish or Discard my changes.</a>'));
     }
   }
