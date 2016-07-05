@@ -184,9 +184,9 @@ def get_git_config():
         raise AbortError('could not obtain git config')
 
     c = {}
-    for line in output.split('\0'):
+    for line in output.split(b'\0'):
         if line:
-            k, v = line.split('\n', 1)
+            k, v = line.split(b'\n', 1)
             c[k] = v
 
     return c
