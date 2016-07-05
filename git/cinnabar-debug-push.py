@@ -17,9 +17,10 @@ from cinnabar.hg import (
     get_ui,
     push,
 )
-from cinnabar.bundle import (
-    PushStore,
-)
+try:
+    from cinnabar.hg.bundle import PushStore
+except ImportError:
+    from cinnabar.bundle import PushStore
 
 try:
     from cinnabar.util import init_logging
