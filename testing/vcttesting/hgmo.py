@@ -252,6 +252,19 @@ class HgCluster(object):
             for i in web_ids:
                 e.submit(self._d.execute, i, cmd)
 
+        # The host SSH keys are populated during container start. There
+        # is a race between the keys being generated and us fetching them.
+        # Wait on a daemon in the container to become available before
+        # fetching host keys.
+        fs = []
+        with futures.ThreadPoolExecutor(web_count) as e:
+            for s in web_states:
+                h, p = self._d._get_host_hostname_port(s, '9092/tcp')
+                fs.append(e.submit(wait_for_kafka, '%s:%s' % (h, p), 20))
+
+        for f in fs:
+            f.result()
+
         f_mirror_host_keys = []
         with futures.ThreadPoolExecutor(web_count) as e:
             # Obtain host keys from mirrors.
@@ -287,10 +300,10 @@ class HgCluster(object):
                                pulse_hostport, 'guest', 'guest'))
             fs.append(e.submit(wait_for_ssh, master_ssh_hostname,
                                master_ssh_hostport))
-
-            for s in all_states:
-                h, p = self._d._get_host_hostname_port(s, '9092/tcp')
-                fs.append(e.submit(wait_for_kafka, '%s:%s' % (h, p), 20))
+            # We already waited on the web nodes above. So only need to
+            # wait on master here.
+            h, p = self._d._get_host_hostname_port(master_state, '9092/tcp')
+            fs.append(e.submit(wait_for_kafka, '%s:%s' % (h, p), 20))
 
         # Will re-raise exceptions.
         for f in fs:
