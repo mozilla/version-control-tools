@@ -51,8 +51,6 @@ def query_scm_group(username, group):
     We are cautious and will return false in cases where we
     failed to actually query ldap for the group membership.
     """
-    logger.info('Querying ldap group association: %s in %s' % (
-                username, group))
     l = get_ldap_connection()
 
     if not l:
@@ -65,10 +63,7 @@ def query_scm_group(username, group):
         # The memberUid attribute will only exist if there is
         # at least one member of the group.
         members = result[1][0][1].get('memberUid') or []
-        in_group = username in members
-        logger.info('Ldap group association: %s in %s: %s' % (
-                    username, group, in_group))
-        return in_group
+        return username in members
     except ldap.LDAPError as e:
         logger.error('Failed to query ldap for group membership: %s' % e)
         return False
