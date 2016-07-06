@@ -239,8 +239,6 @@ class HgCluster(object):
         master_host_ed25519_key = f_master_host_ed25519_key.result()
         master_host_ed25519_key = ' '.join(master_host_ed25519_key.split()[0:2])
 
-        f_mirror_host_keys = []
-
         with futures.ThreadPoolExecutor(web_count + 1) as e:
             # Set SSH keys on hgweb instances.
             cmd = [
@@ -254,6 +252,8 @@ class HgCluster(object):
             for i in web_ids:
                 e.submit(self._d.execute, i, cmd)
 
+        f_mirror_host_keys = []
+        with futures.ThreadPoolExecutor(web_count) as e:
             # Obtain host keys from mirrors.
             for s in web_states:
                 f_mirror_host_keys.append((
