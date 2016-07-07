@@ -50,6 +50,7 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
 
     for review_request_draft, review_request in children_to_post:
         carry_forward = {}
+        has_code_changes = review_request_draft.diffset is not None
 
         for u in review_request_draft.target_people.all():
             bum = BugzillaUserMap.objects.get(user=u)
@@ -67,7 +68,7 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
             carry_forward[email] = False
 
         for review in gen_latest_reviews(review_request):
-            if review_request_draft.diffset:
+            if has_code_changes:
                 # The code has changed, we need to determine what needs to
                 # happen to the flags.
 
@@ -98,9 +99,19 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
                 if f['name'] not in ['review', 'feedback']:
                     # We only care about review and feedback flags.
                     continue
-                elif f['name'] == 'feedback':
-                    # We always clear feedback flags.
-                    flags.append({'id': f['id'], 'status': 'X'})
+
+                # When a new patch is pushed, we need to mimic what
+                # happens to flags when a new attachment is created
+                # in Bugzilla:
+                # - carry forward r+'s
+                # - clear r-'s
+                # - clear feedback flags
+
+                if f['name'] == 'feedback':
+                    if has_code_changes:
+                        # We always clear feedback flags when the patch
+                        # is updated.
+                        flags.append({'id': f['id'], 'status': 'X'})
                 elif f['status'] == '+' or f['status'] == '-':
                     # A reviewer has left a review, either in Review Board or
                     # in Bugzilla.
