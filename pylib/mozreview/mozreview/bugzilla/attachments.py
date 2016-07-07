@@ -1,9 +1,5 @@
 from __future__ import unicode_literals
 
-from mozautomation.commitparser import (
-    strip_commit_metadata,
-)
-
 from mozreview.bugzilla.client import (
     BugzillaAttachmentUpdates,
 )
@@ -93,40 +89,73 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
                 # flags.
                 carry_forward[review.user.email] = True
 
-        rr_url = get_obj_url(review_request)
-        diff_url = '%sdiff/#index_header' % rr_url
+        flags = []
+        attachment = attachment_updates.get_attachment(review_request)
 
-        # Only post a comment if the diffset has actually changed
-        comment = ''
-        if review_request_draft.get_latest_diffset():
-            diffset_count = review_request.diffset_history.diffsets.count()
-            if diffset_count < 1:
-                # We don't need the first line, since it is also the attachment
-                # summary, which is displayed in the comment.
-                full_commit_msg = review_request_draft.description.partition(
-                    '\n')[2].strip()
+        if attachment:
+            # Update flags on an existing attachment.
+            for f in attachment.get('flags', []):
+                if f['name'] not in ['review', 'feedback']:
+                    # We only care about review and feedback flags.
+                    continue
+                elif f['name'] == 'feedback':
+                    # We always clear feedback flags.
+                    flags.append({'id': f['id'], 'status': 'X'})
+                elif f['status'] == '+' or f['status'] == '-':
+                    # A reviewer has left a review, either in Review Board or
+                    # in Bugzilla.
+                    if f['setter'] not in carry_forward:
+                        # This flag was set manually in Bugzilla rather
+                        # then through a review on Review Board. Always
+                        # clear these flags.
+                        flags.append({'id': f['id'], 'status': 'X'})
+                    else:
+                        # This flag was set through Review Board; see if
+                        # we should carry it forward.
+                        if not carry_forward[f['setter']]:
+                            # We should not carry this r+/r- forward so
+                            # re-request review.
+                            flags.append({
+                                'id': f['id'],
+                                'name': 'review',
+                                'status': '?',
+                                'requestee': f['setter']
+                            })
+                        # else we leave the flag alone, carrying it forward.
 
-                full_commit_msg = strip_commit_metadata(full_commit_msg)
+                        # In either case, we've dealt with this reviewer, so
+                        # remove it from the carry_forward dict.
+                        carry_forward.pop(f['setter'])
+                elif ('requestee' not in f or
+                      f['requestee'] not in carry_forward):
+                    # We clear review flags where the requestee is not
+                    # a reviewer, or if there is some (possibly future) flag
+                    # other than + or - that does not have a 'requestee' field.
+                    flags.append({'id': f['id'], 'status': 'X'})
+                elif f['requestee'] in carry_forward:
+                    # We're already waiting for a review from this user
+                    # so don't touch the flag.
+                    carry_forward.pop(f['requestee'])
 
-                if full_commit_msg:
-                    full_commit_msg += '\n\n'
-
-                comment = '%sReview commit: %s\nSee other reviews: %s' % (
-                    full_commit_msg,
-                    diff_url,
-                    rr_url
-                )
-            else:
-                comment = ('Review request updated; see interdiff: '
-                           '%sdiff/%d-%d/\n' % (rr_url,
-                                                diffset_count,
-                                                diffset_count + 1))
+        # Add flags for new reviewers.
+        # We can't set a missing r+ (if it was manually removed) except in the
+        # trivial (and useless) case that the setter and the requestee are the
+        # same person.  We could set r? again, but in the event that the
+        # reviewer is not accepting review requests, this will block
+        # publishing, with no way for the author to fix it.  So we'll just
+        # ignore manually removed r+s.
+        # This is sorted so behavior is deterministic (this mucks with test
+        # output otherwise).
+        for reviewer, keep in sorted(carry_forward.iteritems()):
+            if not keep:
+                flags.append({
+                    'name': 'review',
+                    'status': '?',
+                    'requestee': reviewer,
+                    'new': True
+                })
 
         attachment_updates.create_or_update_attachment(
-            review_request.id,
-            review_request_draft.summary,
-            comment,
-            diff_url,
-            carry_forward)
+            review_request, review_request_draft, flags)
 
     attachment_updates.do_updates()

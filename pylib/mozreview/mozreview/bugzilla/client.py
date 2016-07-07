@@ -15,8 +15,12 @@ from djblets.util.decorators import simple_decorator
 from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
 from mozreview.bugzilla.models import get_or_create_bugzilla_users
 from mozreview.bugzilla.transports import bugzilla_transport
+from mozreview.rb_utils import get_obj_url
 
-from mozautomation.commitparser import replace_reviewers
+from mozautomation.commitparser import (
+    replace_reviewers,
+    strip_commit_metadata,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -70,120 +74,79 @@ class BugzillaAttachmentUpdates(object):
         self.updates = []
         self.creates = []
 
-    def create_or_update_attachment(self, review_request_id, summary,
-                                    comment, url, carry_forward):
-        """Creates or updates an attachment containing a review-request URL.
+    def create_or_update_attachment(self, review_request, review_request_draft,
+                                    flags):
+        """Create or update the MozReview attachment using the provided flags.
 
-        The carry_forward argument should be a dictionary mapping reviewer
-        email to a boolean indicating if that reviewer's flag should be left
-        untouched.
+        The `flags` parameter is an array of flags to set/update/clear.  This
+        array matches the Bugzilla flag API:
+        Setting:
+            {
+                'id': flag.id
+                'name': 'review',
+                'status': '?',
+                'requestee': reviewer.email
+            }
+        Clearing:
+            {
+                'id': flag.id,
+                'status': 'X'
+            }
         """
 
         logger.info('Posting review request %s to bug %d.' %
-                    (review_request_id, self.bug_id))
-        # Copy because we modify it.
-        carry_forward = carry_forward.copy()
+                    (review_request.id, self.bug_id))
+
+        rr_url = get_obj_url(review_request)
+        diff_url = self._get_diff_url(review_request)
+
+        # Build the comment.  Only post a comment if the diffset has
+        # actually changed.
+        comment = ''
+        if review_request_draft.get_latest_diffset():
+            diffset_count = review_request.diffset_history.diffsets.count()
+            if diffset_count < 1:
+                # We don't need the first line, since it is also the attachment
+                # summary, which is displayed in the comment.
+                full_commit_msg = review_request_draft.description.partition(
+                    '\n')[2].strip()
+
+                full_commit_msg = strip_commit_metadata(full_commit_msg)
+
+                if full_commit_msg:
+                    full_commit_msg += '\n\n'
+
+                comment = '%sReview commit: %s\nSee other reviews: %s' % (
+                    full_commit_msg,
+                    diff_url,
+                    rr_url
+                )
+            else:
+                comment = ('Review request updated; see interdiff: '
+                           '%sdiff/%d-%d/\n' % (rr_url,
+                                                diffset_count,
+                                                diffset_count + 1))
+
+        # Set up attachment metadata.
+        attachment = self.get_attachment(review_request)
         params = {}
-        flags = []
-        rb_attachment = None
+        if attachment:
+            params['attachment_id'] = attachment['id']
 
-        self._update_attachments()
-
-        # Find the associated attachment, then go through the review flags.
-        for a in self.attachments:
-
-            # Make sure we check for old-style URLs as well.
-            if not self.bugzilla._rb_attach_url_matches(a['data'], url):
-                continue
-
-            rb_attachment = a
-
-            # FIXME: There's some redundancy between here and
-            # attachments.update_bugzilla_attachment().  The latter decides
-            # which flags to carry forward based on their type and value, but
-            # we also check flag types and variables here to decide, in turn,
-            # if we should even check the carry_forward dict.  This should be
-            # unified and clarified somehow.
-
-            for f in a.get('flags', []):
-                if f['name'] not in ['review', 'feedback']:
-                    # We only care about review and feedback flags.
-                    continue
-                elif f['name'] == 'feedback':
-                    # We always clear feedback flags.
-                    flags.append({'id': f['id'], 'status': 'X'})
-                elif f['status'] == '+' or f['status'] == '-':
-                    # A reviewer has left a review, either in Review Board or
-                    # in Bugzilla.
-                    if f['setter'] not in carry_forward:
-                        # This flag was set manually in Bugzilla rather
-                        # then through a review on Review Board. Always
-                        # clear these flags.
-                        flags.append({'id': f['id'], 'status': 'X'})
-                    else:
-                        # This flag was set through Review Board; see if
-                        # we should carry it forward.
-                        if not carry_forward[f['setter']]:
-                            # We should not carry this r+/r- forward so
-                            # re-request review.
-                            flags.append({
-                                'id': f['id'],
-                                'name': 'review',
-                                'status': '?',
-                                'requestee': f['setter']
-                            })
-                        # else we leave the flag alone, carrying it forward.
-
-                        # In either case, we've dealt with this reviewer, so
-                        # remove it from the carry_forward dict.
-                        carry_forward.pop(f['setter'])
-                elif ('requestee' not in f or
-                      f['requestee'] not in carry_forward):
-                    # We clear review flags where the requestee is not
-                    # a reviewer, or if there is some (possibly future) flag
-                    # other than + or - that does not have a 'requestee' field.
-                    flags.append({'id': f['id'], 'status': 'X'})
-                elif f['requestee'] in carry_forward:
-                    # We're already waiting for a review from this user
-                    # so don't touch the flag.
-                    carry_forward.pop(f['requestee'])
-
-            break
-
-        # Add flags for new reviewers.
-        # We can't set a missing r+ (if it was manually removed) except in the
-        # trivial (and useless) case that the setter and the requestee are the
-        # same person.  We could set r? again, but in the event that the
-        # reviewer is not accepting review requests, this will block
-        # publishing, with no way for the author to fix it.  So we'll just
-        # ignore manually removed r+s.
-        # This is sorted so behavior is deterministic (this mucks with test
-        # output otherwise).
-        for reviewer, keep in sorted(carry_forward.iteritems()):
-            if not keep:
-                flags.append({
-                    'name': 'review',
-                    'status': '?',
-                    'requestee': reviewer,
-                    'new': True
-                })
-
-        if rb_attachment:
-            params['attachment_id'] = rb_attachment['id']
-
-            if rb_attachment['is_obsolete']:
+            if attachment['is_obsolete']:
                 params['is_obsolete'] = False
         else:
-            params['data'] = url
+            params['data'] = diff_url
             params['content_type'] = 'text/x-review-board-request'
 
-        params['file_name'] = 'reviewboard-%d-url.txt' % review_request_id
-        params['summary'] = replace_reviewers(summary, None)
+        params['file_name'] = 'reviewboard-%d-url.txt' % review_request.id
+        params['summary'] = replace_reviewers(review_request_draft.summary,
+                                              None)
         params['comment'] = comment
         if flags:
             params['flags'] = flags
 
-        if rb_attachment:
+        if attachment:
             self.updates.append(params)
         else:
             self.creates.append(params)
@@ -242,9 +205,30 @@ class BugzillaAttachmentUpdates(object):
         self.creates = []
         self.updates = []
 
+    def get_attachment(self, review_request):
+        """Return the attachment for the specified review request.
+
+        Returns `None` if an attachment hasn't yet been created for the
+        review request.
+        """
+        self._update_attachments()
+        url = self._get_diff_url(review_request)
+
+        for a in self.attachments:
+            # Make sure we check for old-style URLs as well.
+            if not self.bugzilla._rb_attach_url_matches(a['data'], url):
+                continue
+
+            return a
+
+        return None
+
     def _update_attachments(self):
         if not self.attachments:
             self.attachments = self.bugzilla.get_rb_attachments(self.bug_id)
+
+    def _get_diff_url(self, review_request):
+        return '%sdiff/#index_header' % get_obj_url(review_request)
 
 
 class Bugzilla(object):
