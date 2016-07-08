@@ -107,6 +107,21 @@ by using the popular "curses" library.
 Would you like to enable "curses" interfaces (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+WATCHMAN_NOT_FOUND = '''
+The "watchman" filesystem watching tool could not be found or isn't
+working.
+
+Mercurial can leverage "watchman" to make many operations
+(like `hg status` and `hg diff`) much faster. Mozilla *highly*
+recommends installing "watchman" when working with the Firefox
+repository.
+
+Please see https://facebook.github.io/watchman/docs/install.html
+for instructions on installing watchman. Please ensure `watchman`
+is available on PATH (you should be able to run `watchman` from
+your shell).
+'''.lstrip()
+
 FSMONITOR_INFO = '''
 The fsmonitor extension integrates the watchman filesystem watching tool
 with Mercurial. Commands like `hg status`, `hg diff`, and `hg commit`
@@ -629,6 +644,18 @@ def _checkfsmonitor(ui, cw, hgversion):
     # was the "hgwatchman" extension from a 3rd party repository.
     # Instead of dealing with installing hgwatchman, we version sniff
     # and print a message about wanting a more modern Mercurial version.
+
+    watchman = 'watchman'
+    if sys.platform in ('win32', 'msys'):
+        watchman = 'watchman.exe'
+
+    try:
+        subprocess.check_output([watchman, '--version'],
+                                stderr=subprocess.STDOUT)
+    except Exception:
+        ui.write(WATCHMAN_NOT_FOUND)
+        ui.write('\n')
+        return
 
     if ui.hasconfig('extensions', 'fsmonitor'):
         try:
