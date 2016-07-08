@@ -14,8 +14,14 @@ This is the template for the "Commits" list in a push-based review request.
   <a href="#" id="error-stack-toggle">Stack</a>
   <a href="#" id="error-close">Close</a>
 </div>
+
+<div id="mozreview-data"
+  data-parent-review-id="{{ parent_details.get_review_request.id }}"
+  data-selected-review-id="{{ review_request_details.get_review_request.id }}"
+></div>
+
 <div id="mozreview-request-series">
-  <div id="mozreview-parent-request" data-id="{{parent_details.get_review_request.id}}">
+  <div id="mozreview-parent-request">
     <a href="{{parent_details.get_review_request.get_absolute_url}}">Review Summary</a>
     <a href="{{parent_details.get_review_request.get_absolute_url}}diff/#index_header">Squashed Diff</a>
   </div>

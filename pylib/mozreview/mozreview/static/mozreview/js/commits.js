@@ -90,14 +90,14 @@ $(document).on("mozreview_ready", function() {
   function getLocalDraft() {
     var localDrafts = window.localStorage.localDrafts ?
       JSON.parse(window.localStorage.localDrafts) : {};
-    var parent_rrid = $("#mozreview-parent-request").data("id");
+    var parent_rrid = $("#mozreview-data").data("parent-review-id");
     return localDrafts[parent_rrid] ? localDrafts[parent_rrid] : {};
   }
 
   function setLocalDraft(draft) {
     var localDrafts = window.localStorage.localDrafts ?
       JSON.parse(window.localStorage.localDrafts) : {};
-    var parent_rrid = $("#mozreview-parent-request").data("id");
+    var parent_rrid = $("#mozreview-data").data("parent-review-id");
     if (draft) {
       localDrafts[parent_rrid] = draft;
     }
@@ -121,7 +121,7 @@ $(document).on("mozreview_ready", function() {
     $.ajax({
       type: "POST",
       data: {
-        parent_request_id: $("#mozreview-parent-request").data("id"),
+        parent_request_id: $("#mozreview-data").data("parent-review-id"),
         reviewers: JSON.stringify(draft)
       },
       url: "/api/extensions/mozreview.extension.MozReviewExtension/modify-reviewers/",
@@ -232,7 +232,7 @@ $(document).on("mozreview_ready", function() {
     $.ajax({
       type: "POST",
       data: {
-        parent_request_id: $("#mozreview-parent-request").data("id")
+        parent_request_id: $("#mozreview-data").data("parent-review-id")
       },
       url: "/api/extensions/mozreview.extension.MozReviewExtension/ensure-drafts/",
       success: function(rsp) {
@@ -249,7 +249,7 @@ $(document).on("mozreview_ready", function() {
     if (!MozReview.isParent) {
       // Unfortunately we cannot publish from children, so provide a link
       // to the parent instead.
-      var parent_rrid = $("#mozreview-parent-request").data("id");
+      var parent_rrid = $("#mozreview-data").data("parent-review-id");
       $("#draft-banner").append(
           $('<a href="/r/' + parent_rrid + '/" title="You can only Publish or Discard when ' +
             'viewing the \'Review Summary / Parent\'.">Publish or Discard my changes.</a>'));
@@ -345,39 +345,42 @@ $(document).on("mozreview_ready", function() {
     }
   }
 
-  $(".mozreview-child-reviewer-list")
-    .inlineEditor({
-      editIconClass: "rb-icon rb-icon-edit",
-      useEditIconOnly: true,
-      enabled: true,
-      setFieldValue: function(editor, value) {
-        editor._field.val(value.trim());
-      }
-    })
-    .on({
-      beginEdit: function() {
-        $reviewer_list = $(this);
-        // Store the original html and reviewer list so we can restore later.
-        saveOriginalReviewerState($reviewer_list);
-        // store the current edit to support cancelling
-        $reviewer_list.data("prior", $reviewer_list.html());
-        // Inc editCount to enable "leave this page" warning.
-        MozReview.reviewEditor.incr("editCount");
-      },
-      cancel: function() {
-        $reviewer_list = $(this);
-        // restoreOriginalReviewerState($reviewer_list);
-        $reviewer_list.html($reviewer_list.data("prior"));
-        $reviewer_list.data("prior", "");
-        MozReview.reviewEditor.decr("editCount");
-      },
-      complete: function(e, value) {
-        $reviewer_list = $(this);
-        $reviewer_list.data("prior", "");
-        MozReview.reviewEditor.decr("editCount");
-        updateReviewers($reviewer_list, value);
-      }
-    });
+  $("#mozreview-child-requests").on("mr:commits_setup", function() {
+    $(".mozreview-child-reviewer-list")
+      .inlineEditor({
+        editIconClass: "rb-icon rb-icon-edit",
+        useEditIconOnly: true,
+        enabled: true,
+        setFieldValue: function(editor, value) {
+          editor._field.val(value.trim());
+        }
+      })
+      .on({
+        beginEdit: function() {
+          $reviewer_list = $(this);
+          // Store the original html and reviewer list so we can restore later.
+          saveOriginalReviewerState($reviewer_list);
+          // store the current edit to support cancelling
+          $reviewer_list.data("prior", $reviewer_list.html());
+          // Inc editCount to enable "leave this page" warning.
+          MozReview.reviewEditor.incr("editCount");
+        },
+        cancel: function() {
+          $reviewer_list = $(this);
+          // restoreOriginalReviewerState($reviewer_list);
+          $reviewer_list.html($reviewer_list.data("prior"));
+          $reviewer_list.data("prior", "");
+          MozReview.reviewEditor.decr("editCount");
+        },
+        complete: function(e, value) {
+          $reviewer_list = $(this);
+          $reviewer_list.data("prior", "");
+          MozReview.reviewEditor.decr("editCount");
+          updateReviewers($reviewer_list, value);
+        }
+      });
+  })
+  .trigger("mr:commits_setup");
 
   // Update UI if there's an existing draft.
   if (MozReview.isSubmitter) {
@@ -386,6 +389,26 @@ $(document).on("mozreview_ready", function() {
     showLocalDraftBanner();
     restoreLocalDraftState();
   }
+
+  // Update state when issues are fixed/dropped/reopened.
+  RB.PageManager.getPage().commentIssueManager.on('issueStatusUpdated',
+    function(comment) {
+      // Refresh the commits table.
+      var parent_rrid = $("#mozreview-data").data("parent-review-id");
+      var selected_rrid = $("#mozreview-data").data("selected-review-id");
+      $("#mozreview-child-requests")
+        .load("/mozreview/commits_summary_table/" + parent_rrid + "/" +
+              selected_rrid + "/", function() {
+          $(this).trigger('mr:commits_setup');
+        });
+
+      // Update the parentReviewRequest object, then update the autoland menu.
+      MozReview.parentReviewRequest.fetch({
+        success: function() {
+          $(document).trigger('mr:update_autoland_menuitem');
+        }
+      });
+    });
 
   // This next bit sets up the autocomplete popups for reviewers. This
   // code is mostly copied from Review Board itself - please see the

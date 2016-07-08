@@ -3,9 +3,9 @@ var MozReview = {};
 $(document).ready(function() {
   // The back-end should have already supplied us with the parent review
   // request ID (whether or not we're already looking at it), and set it as
-  // the data-id attribute on the mozreview-parent-request element. Let's get
+  // the parent-review-id attribute on the mozreview-data element. Let's get
   // that first - because if we can't get it, we're stuck.
-  MozReview.parentID = $("#mozreview-parent-request").data("id");
+  MozReview.parentID = $("#mozreview-data").data("parent-review-id");
 
   if (!MozReview.parentID) {
     console.error("Could not find a valid id for the parent review " +

@@ -288,18 +288,26 @@ $(document).on("mozreview_ready", function() {
         autoland_trigger.attr('title', 'Error determining approval');
       },
       ready: function() {
-        if (!MozReview.parentReviewRequest.get('approved')) {
-          autoland_trigger.attr(
-            'title',
-            'Review request not approved for landing: ' +
-            MozReview.parentReviewRequest.get('approvalFailure'));
-        } else {
-          autoland_trigger.css('opacity', '1');
-          autoland_trigger.click(autoland_confirm);
-        }
+        $(document).trigger('mr:update_autoland_menuitem');
       }
     });
   }
+
+  $(document).on('mr:update_autoland_menuitem', function() {
+    var $autoland_trigger = $('#autoland-trigger');
+    if (!MozReview.parentReviewRequest.get('approved')) {
+      $autoland_trigger
+        .attr('title', 'Review request not approved for landing: ' +
+          MozReview.parentReviewRequest.get('approvalFailure'))
+        .css('opacity', 0.5)
+        .off('click', autoland_confirm);
+    } else {
+      $autoland_trigger
+        .attr('title', '')
+        .css('opacity', 1)
+        .on('click', autoland_confirm);
+    }
+  });
 
   $('.action-landed[data-repository][data-revision]').each(function(index, elem) {
     var repository = $(elem).data('repository');
