@@ -6,7 +6,6 @@ import base64
 
 import bugsy
 import mechanize
-import requests
 import xmlrpclib
 import yaml
 
@@ -50,7 +49,7 @@ class Bugzilla(object):
 
     def create_bug(self, product, component, summary):
         bug = bugsy.Bug(self.client, product=product, component=component,
-                summary=summary)
+                        summary=summary)
         self.client.put(bug)
 
     def create_bug_range(self, product, component, total):
@@ -58,7 +57,7 @@ class Bugzilla(object):
         last = None
         for i in range(0, total):
             bug = bugsy.Bug(self.client, product=product, component=component,
-                    summary='Range %d' % (i + 1))
+                            summary='Range %d' % (i + 1))
             self.client.put(bug)
 
             if i == 0:
@@ -98,7 +97,7 @@ class Bugzilla(object):
         return self.proxy.User.update({
             'names': [email],
             'groups': {'add': [group]},
-            })
+        })
 
     def update_user_fullname(self, email, name):
         return self.proxy.User.update({
@@ -130,7 +129,8 @@ class Bugzilla(object):
         br.form['Bugzilla_password'] = self.password
         resp = br.submit()
         if resp.code != 200:
-            raise Exception('Non-200 response from Bugzilla. Proper credentials?')
+            raise Exception('Non-200 response from Bugzilla. '
+                            'Proper credentials?')
         # Is there a better way to extract cookies?
         cookies = br._ua_handlers['_cookies'].cookiejar
 
@@ -141,6 +141,15 @@ class Bugzilla(object):
         assert cookie, "Bugzilla_logincookie cookie not found"
 
         return login[0], cookie[0]
+
+    def set_attachment_flag(self, attach_id, flag_type, status, requestee):
+        flag = {'name': flag_type, 'status': status}
+        if status == '?' and requestee is not None:
+            flag['requestee'] = requestee
+        return self.proxy.Bug.update_attachment({
+            'ids': [attach_id],
+            'flags': [flag],
+        })
 
     def serialize_bugs(self, bugs):
         data = {}

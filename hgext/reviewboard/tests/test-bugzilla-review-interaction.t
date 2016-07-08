@@ -1201,6 +1201,124 @@ A non-r+ review on a parent should post a comment only.
     status: UNCONFIRMED
     summary: Parent Reviews
 
+Feedback flags should be kept when just a reviewer is changed, and removed
+when a revised patch is pushed.
+
+  $ exportbzauth author@example.com password
+  $ bugzilla create-bug TestProduct TestComponent 'Feedback Bug'
+
+  $ echo feedback > foo
+  $ hg commit -m 'Bug 6 - Initial commit to review'
+  $ hgauthor push -c . >/dev/null 2>&1
+  $ bugzilla set-attachment-flag --attach_id 8 --flag feedback
+  updated attach 8: set feedback?
+
+  $ rbmanage add-reviewer 14 --user reviewer
+  1 people listed on review request
+  $ rbmanage publish 13
+  $ bugzilla dump-bug 6
+  Bug 6:
+    attachments:
+    - attacher: author@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/14/diff/#index_header
+      description: Bug 6 - Initial commit to review
+      file_name: reviewboard-14-url.txt
+      flags:
+      - id: 14
+        name: feedback
+        requestee: null
+        setter: author@example.com
+        status: '?'
+      - id: 15
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
+      id: 8
+      is_obsolete: false
+      is_patch: false
+      summary: Bug 6 - Initial commit to review
+    blocks: []
+    cc:
+    - reviewer@example.com
+    comments:
+    - author: author@example.com
+      id: 21
+      tags: []
+      text: ''
+    - author: author@example.com
+      id: 22
+      tags: []
+      text:
+      - Created attachment 8
+      - Bug 6 - Initial commit to review
+      - ''
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/14/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/14/'
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
+    summary: Feedback Bug
+
+  $ echo feedback update > foo
+  $ hg commit --amend -m 'Bug 6 - Initial commit to review'
+  saved backup bundle to * (glob)
+  $ hgauthor push -c . >/dev/null 2>&1
+  $ bugzilla dump-bug 6
+  Bug 6:
+    attachments:
+    - attacher: author@example.com
+      content_type: text/x-review-board-request
+      data: http://$DOCKER_HOSTNAME:$HGPORT1/r/14/diff/#index_header
+      description: Bug 6 - Initial commit to review
+      file_name: reviewboard-14-url.txt
+      flags:
+      - id: 15
+        name: review
+        requestee: reviewer@example.com
+        setter: author@example.com
+        status: '?'
+      id: 8
+      is_obsolete: false
+      is_patch: false
+      summary: Bug 6 - Initial commit to review
+    blocks: []
+    cc:
+    - reviewer@example.com
+    comments:
+    - author: author@example.com
+      id: 21
+      tags: []
+      text: ''
+    - author: author@example.com
+      id: 22
+      tags: []
+      text:
+      - Created attachment 8
+      - Bug 6 - Initial commit to review
+      - ''
+      - 'Review commit: http://$DOCKER_HOSTNAME:$HGPORT1/r/14/diff/#index_header'
+      - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/14/'
+    - author: author@example.com
+      id: 23
+      tags: []
+      text:
+      - Comment on attachment 8
+      - Bug 6 - Initial commit to review
+      - ''
+      - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/14/diff/1-2/'
+    component: TestComponent
+    depends_on: []
+    platform: All
+    product: TestProduct
+    resolution: ''
+    status: UNCONFIRMED
+    summary: Feedback Bug
+
   $ cd ..
 
 Cleanup

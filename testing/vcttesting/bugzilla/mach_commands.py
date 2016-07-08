@@ -104,6 +104,22 @@ class BugzillaCommands(object):
         login, cookie = self.b.create_login_cookie()
         print('%s %s' % (login, cookie))
 
+    @Command('set-attachment-flag', category='bugzilla',
+             description='Set an attachment flag')
+    @CommandArgument('--attach_id', type=int, required=True,
+                     help='The ID of the attachment')
+    @CommandArgument('--flag', required=True,
+                     help='The flag type to set')
+    @CommandArgument('--status', default='?',
+                     help='Flag status ("?", "+", "-")')
+    @CommandArgument('--requestee',
+                     help='Flag requestee')
+    def set_attachment_flag(self, attach_id, flag, status, requestee):
+        self.b.set_attachment_flag(attach_id, flag, status, requestee)
+        print('updated attach %s: set %s%s%s' % (
+            attach_id, flag, status,
+            requestee if requestee is not None else ''))
+
     @Command('dump-bug', category='bugzilla',
             description='Dump a representation of a bug')
     @CommandArgument('bugs', nargs='+', help='Bugs to dump')
