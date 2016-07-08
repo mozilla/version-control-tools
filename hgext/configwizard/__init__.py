@@ -515,7 +515,15 @@ def _promptvctextension(ui, cw, ext, msg):
 
     # Verify the extension loads before prompting to enable it. This is
     # done out of paranoia.
-    result = subprocess.check_output([sys.argv[0],
+
+    # Even if we launch hg.exe, sys.argv[0] is "hg" on Windows. Since "hg" isn't
+    # a Windows application, we can't simply run it. So change to the ".exe"
+    # variant if necessary.
+    hg = sys.argv[0]
+    if sys.platform in ('win32', 'msys') and hg.endswith('hg'):
+        hg += '.exe'
+
+    result = subprocess.check_output([hg,
                                       '--config', 'extensions.testmodule=%s' % ext_path,
                                       '--config', 'ui.traceback=true'],
                                      stderr=subprocess.STDOUT)
