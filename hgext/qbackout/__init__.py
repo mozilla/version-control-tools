@@ -3,6 +3,8 @@
 This is a port of mak's mercurial backout script from
 https://wiki.mozilla.org/User:Mak77 to a mercurial extension.'''
 
+import gc
+
 from mercurial import scmutil, commands, cmdutil, patch, mdiff, util
 from mercurial.i18n import _
 from mercurial.node import nullid, short
@@ -250,6 +252,10 @@ def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, revers
             if user is not None:
                 new_opts['user'] = user
             commit_change(ui, repo, desc['name'], node=node, force_name=opts.get('name'), **new_opts)
+
+        # Iterations of this loop appear to leak memory for unknown reasons.
+        # Work around it by forcing a gc.
+        gc.collect()
 
     msg = ('%s %d changesets' % (desc['Actioned'], len(rev))) + bugs_suffix(allbugs) + '\n'
     messages.insert(0, msg)
