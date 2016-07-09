@@ -262,13 +262,23 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
 
     def filterwrite(messages):
         # Mercurial 3.5 sends the output as one string.
-        if messages[0].startswith('%sREVIEWBOARD' % _('remote: ')):
-            return True
+        tarMsg = '%sREVIEWBOARD' % _('remote: ')
+        try:
+            if messages[0].startswith(tarMsg):
+                return True
 
-        # Older versions have separate components.
-        if messages[0] == _('remote: ') and len(messages) >= 2 and \
-            messages[1].startswith('REVIEWBOARD: '):
-            return True
+            # Older versions have separate components.
+            if messages[0] == _('remote: ') and len(messages) >= 2 and \
+                messages[1].startswith('REVIEWBOARD: '):
+                return True
+        except UnicodeDecodeError:
+            if messages[0].startswith(tarMsg.decode('utf-8')):
+                return True
+
+            # Older versions have separate components.
+            if messages[0] == _('remote: ').decode('utf-8') and len(messages) >= 2 and \
+                messages[1].startswith(u'REVIEWBOARD: '):
+                return True
 
         return False
 
