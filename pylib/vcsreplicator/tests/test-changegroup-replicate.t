@@ -5,7 +5,7 @@
 
 Create the repository
 
-  $ hgmo create-repo mozilla-central 1
+  $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
   $ standarduser
 

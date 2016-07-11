@@ -7,7 +7,7 @@ Creating a repository should record an event saying so
 
   $ hgmo exec hgweb0 ls /repo/hg/mozilla
 
-  $ hgmo create-repo mozilla-central 3
+  $ hgmo create-repo mozilla-central scm_level_3
   (recorded repository creation in replication log)
 
   $ hgmo exec hgssh cat /repo/hg/mozilla/mozilla-central/.hg/requires
@@ -58,7 +58,7 @@ Creating a repository should record an event saying so
 
 generaldelta is preserved
 
-  $ hgmo create-repo mcgd 3 --generaldelta
+  $ hgmo create-repo mcgd scm_level_3 --generaldelta
   (recorded repository creation in replication log)
 
   $ hgmo exec hgssh cat /repo/hg/mozilla/mcgd/.hg/requires

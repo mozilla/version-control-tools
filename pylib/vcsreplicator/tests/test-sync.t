@@ -3,7 +3,7 @@
   $ . $TESTDIR/pylib/vcsreplicator/tests/helpers.sh
   $ vcsrenv
 
-  $ hgmo create-repo mozilla-central 3
+  $ hgmo create-repo mozilla-central scm_level_3
   (recorded repository creation in replication log)
 
 `hg replicatesync` will synchronize changes

@@ -7,7 +7,7 @@
 
 Create a repository
 
-  $ hgmo create-repo mozilla-central 1
+  $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
   $ standarduser
 
@@ -50,7 +50,7 @@ Create a repository
 Repos under ignore paths are ignored
 
   $ cd ..
-  $ hgmo create-repo private/ignore 1
+  $ hgmo create-repo private/ignore scm_level_1
   (recorded repository creation in replication log)
   $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/private/ignore
   $ cd ignore
@@ -70,7 +70,7 @@ Repos under ignore paths are ignored
 
 Routing keys with slashes and dashes and underscores work
 
-  $ hgmo create-repo integration/foo_Bar-baz 1
+  $ hgmo create-repo integration/foo_Bar-baz scm_level_1
   (recorded repository creation in replication log)
   $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/integration/foo_Bar-baz
   $ cd foo_Bar-baz

@@ -4,7 +4,7 @@
   $ hgmoenv
   $ standarduser
   $ hgmo exec hgssh /set-mirrors.py
-  $ hgmo create-repo users/user_example.com/repo-1 1
+  $ hgmo create-repo users/user_example.com/repo-1 scm_level_1
   (recorded repository creation in replication log)
 
   $ standarduserssh $SSH_SERVER edit repo-1 << EOF

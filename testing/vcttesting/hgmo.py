@@ -438,19 +438,15 @@ class HgCluster(object):
         assert self.ldap_uri
         return LDAP(self.ldap_uri, 'cn=admin,dc=mozilla', 'password')
 
-    def create_repo(self, name, level=1, generaldelta=False):
+    def create_repo(self, name, group='scm_level_1', generaldelta=False):
         """Create a repository on the cluster.
 
         ``path`` is the path fragment the repository would be accessed under
         at https://hg.mozilla.org. e.g. ``hgcustom/version-control-tools``.
 
-        The repository will be owned by an appropriate ``scm_level_N`` group
-        according to the ``level`` specified.
+        The repository will be owned by the specified ``group``.
         """
-        if level < 1 or level > 3:
-            raise ValueError('level must be between 1 and 3')
-
-        cmd = ['/create-repo', name, 'scm_level_%d' % level]
+        cmd = ['/create-repo', name, group]
 
         if generaldelta:
             cmd.append('--generaldelta')

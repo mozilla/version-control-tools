@@ -5,7 +5,7 @@
 
 Create the repository
 
-  $ hgmo create-repo mozilla-central 3
+  $ hgmo create-repo mozilla-central scm_level_3
   (recorded repository creation in replication log)
 
 Adding a commit locally is not allowed

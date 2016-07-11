@@ -36,7 +36,7 @@ Stop the replication consumers to test failure scenarios
 
 No issues reported when thresholds aren't met
 
-  $ hgmo exec hgssh /create-repo repo0 1
+  $ hgmo exec hgssh /create-repo repo0 scm_level_1
   (recorded repository creation in replication log)
 
   $ check

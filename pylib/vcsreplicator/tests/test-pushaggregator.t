@@ -5,7 +5,7 @@
 
 Create a repository
 
-  $ hgmo create-repo mozilla-central 1
+  $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
   $ standarduser
 
@@ -127,11 +127,11 @@ Aggregation of messages from multiple partitions works
   vcsreplicator:\d: stopped (re)
   vcsreplicator:\d: stopped (re)
 
-  $ hgmo create-repo mc2 1
+  $ hgmo create-repo mc2 scm_level_1
   (recorded repository creation in replication log)
-  $ hgmo create-repo try 1
+  $ hgmo create-repo try scm_level_1
   (recorded repository creation in replication log)
-  $ hgmo create-repo users/foo 1
+  $ hgmo create-repo users/foo scm_level_1
   (recorded repository creation in replication log)
 
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini

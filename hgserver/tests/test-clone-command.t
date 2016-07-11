@@ -4,11 +4,11 @@
   $ hgmoenv
   $ standarduser
 
-  $ hgmo create-repo mozilla-central 3
+  $ hgmo create-repo mozilla-central scm_level_3
   (recorded repository creation in replication log)
-  $ hgmo create-repo integration/mozilla-inbound 3
+  $ hgmo create-repo integration/mozilla-inbound scm_level_3
   (recorded repository creation in replication log)
-  $ hgmo create-repo hgcustom/version-control-tools 1
+  $ hgmo create-repo hgcustom/version-control-tools scm_level_1
   (recorded repository creation in replication log)
 
   $ hg -q clone ssh://$SSH_SERVER:$HGPORT/hgcustom/version-control-tools vct

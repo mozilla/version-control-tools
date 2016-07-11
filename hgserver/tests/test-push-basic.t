@@ -5,7 +5,7 @@
 
 Create repository and user
 
-  $ hgmo create-repo mozilla-central 3
+  $ hgmo create-repo mozilla-central scm_level_3
   (recorded repository creation in replication log)
   $ hgmo create-ldap-user user1@example.com user1 1500 'User 1' --scm-level 3 --key-file user1
   $ cat >> $HGRCPATH << EOF

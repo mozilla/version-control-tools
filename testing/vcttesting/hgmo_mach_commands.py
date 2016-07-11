@@ -126,12 +126,12 @@ class HgmoCommands(object):
              description='Create a repository in the cluster')
     @CommandArgument('name',
                      help='Name of repository to create')
-    @CommandArgument('level', type=int, choices=[1, 2, 3], default=1,
-                     help='SCM level access for this repository')
+    @CommandArgument('group', default='scm_level_1',
+                     help='LDAP group that owns repo')
     @CommandArgument('--generaldelta', action='store_true',
                      help='Create repository with generaldelta storage')
-    def create_repo(self, name, level, generaldelta=True):
-        out = self.c.create_repo(name, level=level, generaldelta=generaldelta)
+    def create_repo(self, name, group, generaldelta=True):
+        out = self.c.create_repo(name, group=group, generaldelta=generaldelta)
         if out:
             sys.stdout.write(out)
 

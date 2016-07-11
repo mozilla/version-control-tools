@@ -3,7 +3,7 @@
   $ . $TESTDIR/pylib/vcsreplicator/tests/helpers.sh
   $ vcsrenv
 
-  $ hgmo create-repo mozilla-central 1
+  $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini

@@ -12,7 +12,7 @@
 
 We are able to clone via SSH
 
-  $ hgmo create-repo repo1 1
+  $ hgmo create-repo repo1 scm_level_1
   (recorded repository creation in replication log)
   $ hg clone ssh://$SSH_SERVER:$HGPORT/repo1
   destination directory: repo1

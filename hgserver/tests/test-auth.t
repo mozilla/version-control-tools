@@ -294,7 +294,7 @@ Failure to connect to LDAP master server is not fatal
 
 Can pull when LDAP master is not available
 
-  $ hgmo create-repo mozilla-central 3
+  $ hgmo create-repo mozilla-central scm_level_3
   (recorded repository creation in replication log)
   $ cat >> $HGRCPATH << EOF
   > [ui]

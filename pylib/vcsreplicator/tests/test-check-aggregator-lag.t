@@ -36,7 +36,7 @@ Stop the aggregator so there is message lag
 
 No issues reported when thresholds aren't met
 
-  $ hgmo create-repo repo0 1
+  $ hgmo create-repo repo0 scm_level_1
   (recorded repository creation in replication log)
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini

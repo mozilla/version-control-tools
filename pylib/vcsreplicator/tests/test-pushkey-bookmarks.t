@@ -6,7 +6,7 @@
 
 Create the repository and push a change
 
-  $ hgmo create-repo mozilla-central 1
+  $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
   $ consumer --onetime
   $ consumer --onetime

@@ -6,7 +6,7 @@
 Create repository and user
 
   $ export AUTOLAND_REQUEST_USER="autolandrequester@example.com"
-  $ hgmo create-repo mozilla-central 3
+  $ hgmo create-repo mozilla-central scm_level_3
   (recorded repository creation in replication log)
   $ hgmo create-ldap-user bind-autoland@mozilla.com user1 1500 'Otto Land' --scm-level 3 --key-file autoland
   $ cat >> $HGRCPATH << EOF

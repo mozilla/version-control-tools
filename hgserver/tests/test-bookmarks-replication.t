@@ -4,7 +4,7 @@
   $ hgmoenv
   $ standarduser
 
-  $ hgmo create-repo mozilla-central 1
+  $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
   $ hg -q clone ssh://$SSH_SERVER:$HGPORT/mozilla-central
   $ cd mozilla-central
