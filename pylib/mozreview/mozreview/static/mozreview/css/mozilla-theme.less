@@ -1,0 +1,120 @@
+@import (reference) 'mozilla-theme-common.less';
+
+body {
+  background: @moz-blue-light;
+  font-size: 13px;
+  padding-top: 8px;
+}
+
+/* Logo and Title */
+#headerbar {
+  height: 18px;
+
+  #title a {
+    font-weight: bold;
+    font-size: 100%;
+  }
+
+  #rbinfo > a {
+      display: block;
+      width: 60px;
+      height: 60px;
+      background: url("../logo.svg") 3px -6px no-repeat;
+      background-size: cover;
+      position: absolute;
+      top: 0;
+      left: 8px;
+      z-index: 50;
+
+      img {
+          display: none;
+      }
+  }
+}
+
+@media screen and (max-width: 720px), screen and (max-device-width: 720px) and (orientation: landscape) {
+  #headerbar {
+    #rbinfo a {
+      display: none;
+    }
+
+    #nav_toggle {
+      top: -10px;
+    }
+
+    #search {
+      position: absolute;
+      top: -10px;
+      right: 0;
+      left: 60px;
+    }
+  }
+
+  #navbar-container {
+    display: none;
+  }
+
+  #headerbar, .reviewable-page #headerbar {
+    border-bottom-color: @moz-blue-dark;
+  }
+}
+
+/* Account Navigation */
+#accountnav li {
+  /* background colors on hover; set twice for reviewable-page :( */
+  &:hover,
+  &:hover > a,
+  ul,
+  ul:hover,
+  .reviewable-page &:hover,
+  .reviewable-page & ul {
+    background: #fff;
+    border-color: #fff;
+  }
+
+  ul {
+    .border-radius(0);
+    min-width: 150px;
+    border-color: @moz-blue-dark;
+  }
+
+  &:hover ul,
+  .reviewable-page &:hover ul {
+    margin-top: -1px;
+    border-color:@moz-blue-light;
+  }
+
+  .reviewable-page &:hover ul li:hover a,
+  &:hover ul li:hover a {
+    background: @moz-blue-dark;
+  }
+}
+
+/* Main Navigation */
+#navbar {
+  border-bottom: 0;
+}
+
+#navbar-container {
+  padding-bottom: 10px;
+}
+
+#topbar,
+#navbar-container,
+.reviewable-page #topbar,
+.reviewable-page #navbar-container {
+  background: inherit !important;
+}
+
+.reviewable-page #navbar-container,
+#navbar-container {
+  border-bottom: 1px solid @moz-blue-dark;
+}
+
+/* Search Bar */
+#headerbar #search input,
+.reviewable-page #headerbar #search input {
+  .border-radius(0);
+  padding: 3px 6px;
+  border-color: #bbb;
+}

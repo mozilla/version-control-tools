@@ -140,7 +140,8 @@ class MozReviewExtension(Extension):
 
     css_bundles = {
         'default': {
-            'source_filenames': ['mozreview/css/common.less'],
+            'source_filenames': ['mozreview/css/mozilla-theme.less',
+                                 'mozreview/css/common.less'],
         },
         'review': {
             'source_filenames': ['mozreview/css/review.less',
