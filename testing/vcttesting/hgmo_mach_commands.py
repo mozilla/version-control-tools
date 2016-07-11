@@ -122,6 +122,15 @@ class HgmoCommands(object):
             key = sys.stdin.read().strip().encode('utf-8')
         self.c.ldap.add_ssh_key(email, key)
 
+    @Command('add-user-to-group', category='hgmo',
+             description='Add a user to an LDAP group')
+    @CommandArgument('email',
+                     help='Email address of user to modify')
+    @CommandArgument('group',
+                     help='Name of LDAP group to add user to')
+    def add_user_to_group(self, email, group):
+        self.c.ldap.add_user_to_group(email, group)
+
     @Command('create-repo', category='hgmo',
              description='Create a repository in the cluster')
     @CommandArgument('name',
