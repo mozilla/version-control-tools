@@ -23,6 +23,7 @@ This extension adds new options to the `push` command:
 import errno
 import json
 import os
+import re
 import sys
 import urllib
 import urllib2
@@ -1087,9 +1088,13 @@ def run_android_checkstyle(repo, nodes):
 
     mobile_changed = set()
     for node in nodes:
+        # Checkstyle does not know how to read pre-processed files so don't
+        # include characters after '.java'.
+        java_filename_re = re.compile('^mobile/android/.+\.java$')
+
         ctx = repo[node]
         mobile_changed |= {f for f in ctx.files()
-                          if f.startswith('mobile/android/')}
+                          if java_filename_re.search(f)}
 
     if mobile_changed:
         repo.ui.write('running checkstyle...')
