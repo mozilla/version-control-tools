@@ -63,6 +63,12 @@ objectClass: posixGroup
 objectClass: top
 cn: scm_ecmascript
 
+dn: cn=scm_autoland,ou=groups,dc=mozilla
+gidNumber: 2346
+objectClass: posixGroup
+objectClass: top
+memberUid: autoland@example.com
+
 dn: uid=bind-mozreview,ou=logins,dc=mozilla
 objectClass: top
 objectClass: account
