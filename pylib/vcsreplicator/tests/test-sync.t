@@ -8,7 +8,7 @@
 
 `hg replicatesync` will synchronize changes
 
-  $ hgmo exec hgssh /activate-hook mozilla-central foo bar
+  $ hgmo exec hgssh /set-hgrc-option mozilla-central hooks foo bar
 
   $ hgmo exec hgssh /var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/mozilla-central replicatesync
   wrote synchronization message into replication log

@@ -43,7 +43,7 @@ Gracefully shut down a consumer daemon
 
 Send a message to the replication system
 
-  $ hgmo exec hgssh /activate-hook mozilla-central dummy value
+  $ hgmo exec hgssh /set-hgrc-option mozilla-central hooks dummy value
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
 

@@ -7,7 +7,7 @@ import ConfigParser
 import os
 import sys
 
-repo, key, value = sys.argv[1:]
+repo, section, key, value = sys.argv[1:]
 
 hgrc = '/repo/hg/mozilla/%s/.hg/hgrc' % repo
 
@@ -16,10 +16,10 @@ c = ConfigParser.ConfigParser()
 if os.path.exists(hgrc):
     c.read(hgrc)
 
-if not c.has_section('hooks'):
-    c.add_section('hooks')
+if not c.has_section(section):
+    c.add_section(section)
 
-c.set('hooks', key, value)
+c.set(section, key, value)
 
 with open(hgrc, 'wb') as fh:
     c.write(fh)

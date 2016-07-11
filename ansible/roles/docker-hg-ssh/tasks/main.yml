@@ -14,8 +14,8 @@
 - name: install support scripts
   copy: src={{ item }} dest=/{{ item }} mode=0755
   with_items:
-    - activate-hook
     - create-repo
+    - set-hgrc-option
     - set-ldap-property
     - set-mirrors.py
 

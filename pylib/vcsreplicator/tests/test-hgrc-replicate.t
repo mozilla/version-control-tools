@@ -8,7 +8,7 @@
 
 hgrc file content is sent in a message
 
-  $ hgmo exec hgssh /activate-hook mozilla-central dummy value
+  $ hgmo exec hgssh /set-hgrc-option mozilla-central hooks dummy value
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
 
@@ -66,7 +66,7 @@ Replicating hgrc without hgrc file will delete file
 
 Unicode in hgrc is preserved
 
-  $ docker exec ${SSH_CID} /activate-hook mozilla-central dummy 'こんにちは'
+  $ docker exec ${SSH_CID} /set-hgrc-option mozilla-central hooks dummy 'こんにちは'
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log

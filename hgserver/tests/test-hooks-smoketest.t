@@ -9,10 +9,10 @@
 
 Install hooks that mimic production
 
-  $ hgmo exec hgssh /activate-hook mozilla-central pretxnchangegroup.b_singlehead python:mozhghooks.single_head_per_branch.hook
-  $ hgmo exec hgssh /activate-hook mozilla-central pretxnchangegroup.c_commitmessage python:mozhghooks.commit-message.hook
-  $ hgmo exec hgssh /activate-hook mozilla-central pretxnchangegroup.d_webidl python:mozhghooks.prevent_webidl_changes.hook
-  $ hgmo exec hgssh /activate-hook mozilla-central pretxnchangegroup.e_idl_no_uuid python:mozhghooks.prevent_idl_change_without_uuid_bump.hook
+  $ hgmo exec hgssh /set-hgrc-option mozilla-central hooks pretxnchangegroup.b_singlehead python:mozhghooks.single_head_per_branch.hook
+  $ hgmo exec hgssh /set-hgrc-option mozilla-central hooks pretxnchangegroup.c_commitmessage python:mozhghooks.commit-message.hook
+  $ hgmo exec hgssh /set-hgrc-option mozilla-central hooks pretxnchangegroup.d_webidl python:mozhghooks.prevent_webidl_changes.hook
+  $ hgmo exec hgssh /set-hgrc-option mozilla-central hooks pretxnchangegroup.e_idl_no_uuid python:mozhghooks.prevent_idl_change_without_uuid_bump.hook
 
   $ hg -q clone ${HGWEB_0_URL}mozilla-central
   $ cd mozilla-central
