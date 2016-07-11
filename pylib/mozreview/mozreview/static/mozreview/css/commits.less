@@ -22,13 +22,25 @@
   margin-top:5px;
 }
 
+.help-icon {
+  display: inline-block;
+  text-align: center;
+  background-color: #D1D1D1;
+  border-radius: 50%;
+  height: 15px;
+  width: 15px;
+  border: 1px solid #3E3E3E;
+  cursor: default;
+  margin-top: -1px;
+}
+
 #mozreview-child-requests {
   width: 100%;
   table-layout: fixed;
   border-spacing: 0px;
   border-collapse: collapse;
   margin-top:10px;
-  min-width: 618px;
+  min-width: 653px;
   border-top: 1px solid #C1C1C1;
   border-right: 1px solid #C1C1C1;
 
@@ -46,29 +58,24 @@
       }
 
       & > .hg {
-        flex: 0 1;
+        flex: 0 0;
         min-width: 18px;
       }
 
       & > .diff {
-        flex: 0 1;
+        flex: 0 0;
         min-width: 100px;
       }
 
-      & > .status {
-        flex: 0 2;
-        min-width: 40px;
+      & > .reviews {
+        flex: 5 0;
+        min-width: 300px;
       }
 
       & > .truncate_text {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-      }
-
-      & > .reviews {
-        flex: 5 0;
-        min-width: 300px;
       }
 
       & > .reviewers {
@@ -102,6 +109,12 @@
           content: " (r? cleared)";
         }
       }
+
+      & > .status {
+        flex: 0 0 80px;
+        min-width: 80px;
+        white-space: nowrap;
+      }
     }
   }
 
@@ -133,7 +146,7 @@
     .issue-count,
     .no-approval,
     .shipit-count {
-      min-width: 38px;
+      min-width: 80px;
       text-align: center;
       display: inline-block;
       white-space: nowrap;

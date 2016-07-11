@@ -51,4 +51,16 @@ $(document).on("mozreview_ready", function() {
       })
     }
   });
+
+  // Tooltips for landable and "r?" cells
+  $('#mozreview-child-requests .help-tooltip, #mozreview-child-requests .status div').each(function() {
+     var $element = $(this);
+     var text = $element.attr('title');
+
+     $element.attr('title', '');
+
+     // Draw the tooltip title and text
+     var $tip = $('<div></div>').attr('class', 'review-tooltip').insertAfter($element);
+     $('<div></div>').attr('class', 'review-tooltip-text').text(text).appendTo($tip);
+  });
 });
