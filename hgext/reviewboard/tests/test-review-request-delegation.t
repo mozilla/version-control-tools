@@ -65,6 +65,9 @@ Change the reviewer while logged in as reviewer1
     reviewers:
     - reviewer1
     - reviewer2
+    diff:
+      delete: 1
+      insert: 2
   children:
   - summary: Bug 1 - Initial commit to review r?reviewer1
     id: 2
@@ -79,6 +82,9 @@ Change the reviewer while logged in as reviewer1
       reviewer2:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 1
+      insert: 1
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -92,6 +98,9 @@ Change the reviewer while logged in as reviewer1
       reviewer1:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 0
+      insert: 1
 
 Test multiple reviewers
 
@@ -107,6 +116,9 @@ Test multiple reviewers
     reviewers:
     - reviewer1
     - reviewer2
+    diff:
+      delete: 1
+      insert: 2
   children:
   - summary: Bug 1 - Initial commit to review r?reviewer1
     id: 2
@@ -125,6 +137,9 @@ Test multiple reviewers
       reviewer2:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 1
+      insert: 1
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -138,6 +153,9 @@ Test multiple reviewers
       reviewer1:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 0
+      insert: 1
 
 Test invalid reviewer
 
@@ -160,6 +178,9 @@ Change the reviewer while logged in as the submitter
     reviewers:
     - reviewer1
     - reviewer2
+    diff:
+      delete: 1
+      insert: 2
   children:
   - summary: Bug 1 - Initial commit to review r?reviewer1
     id: 2
@@ -174,6 +195,9 @@ Change the reviewer while logged in as the submitter
       reviewer2:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 1
+      insert: 1
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -187,6 +211,9 @@ Change the reviewer while logged in as the submitter
       reviewer1:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 0
+      insert: 1
 
 Test user without editbugs
 
@@ -222,6 +249,9 @@ Test ensure-drafts
     reviewers:
     - reviewer1
     - reviewer2
+    diff:
+      delete: 1
+      insert: 2
   children:
   - summary: Bug 1 - Initial commit to review r?reviewer1
     id: 2
@@ -236,6 +266,9 @@ Test ensure-drafts
       reviewer2:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 1
+      insert: 1
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -249,6 +282,9 @@ Test ensure-drafts
       reviewer1:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 0
+      insert: 1
   $ rbmanage ensure-drafts 1
   $ rbmanage dump-summary 1
   parent:
@@ -261,6 +297,9 @@ Test ensure-drafts
     reviewers:
     - reviewer1
     - reviewer2
+    diff:
+      delete: 1
+      insert: 2
   children:
   - summary: Bug 1 - Initial commit to review r?reviewer1
     id: 2
@@ -275,6 +314,9 @@ Test ensure-drafts
       reviewer2:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 1
+      insert: 1
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -288,6 +330,9 @@ Test ensure-drafts
       reviewer1:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 0
+      insert: 1
   $ rbmanage publish 1
   $ rbmanage dump-summary 1
   parent:
@@ -300,6 +345,9 @@ Test ensure-drafts
     reviewers:
     - reviewer1
     - reviewer2
+    diff:
+      delete: 1
+      insert: 2
   children:
   - summary: Bug 1 - Initial commit to review r?reviewer1
     id: 2
@@ -318,6 +366,9 @@ Test ensure-drafts
       reviewer2:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 1
+      insert: 1
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -331,3 +382,6 @@ Test ensure-drafts
       reviewer1:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 0
+      insert: 1

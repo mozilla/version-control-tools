@@ -160,6 +160,10 @@ def short_review_request_dict(rr):
         d['reviewers_status'] = dict()
         for reviewer, status in rr[u'reviewers_status'].iteritems():
             d['reviewers_status'][reviewer] = dict(status.iteritems())
+
+    if 'diff' in rr:
+        d['diff'] = dict(rr[u'diff'].iteritems())
+
     return d
 
 

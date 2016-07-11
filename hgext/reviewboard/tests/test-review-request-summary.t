@@ -59,6 +59,9 @@
     has_draft: false
     reviewers:
     - reviewer
+    diff:
+      delete: 1
+      insert: 1
   children:
   - summary: Bug 1 - Foo 1
     id: 2
@@ -73,6 +76,9 @@
       reviewer:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 1
+      insert: 1
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -82,6 +88,9 @@
     has_draft: false
     reviewers: []
     reviewers_status: {}
+    diff:
+      delete: 1
+      insert: 1
 
 Only parents have summaries.
 
@@ -109,6 +118,9 @@ Opening an issue should be reflected in the summary.
     has_draft: false
     reviewers:
     - reviewer
+    diff:
+      delete: 1
+      insert: 1
   children:
   - summary: Bug 1 - Foo 1
     id: 2
@@ -123,6 +135,9 @@ Opening an issue should be reflected in the summary.
       reviewer:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 1
+      insert: 1
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -132,6 +147,9 @@ Opening an issue should be reflected in the summary.
     has_draft: false
     reviewers: []
     reviewers_status: {}
+    diff:
+      delete: 1
+      insert: 1
 
 Resolving an issue should decrement the issue count.
 
@@ -148,6 +166,9 @@ Resolving an issue should decrement the issue count.
     has_draft: false
     reviewers:
     - reviewer
+    diff:
+      delete: 1
+      insert: 1
   children:
   - summary: Bug 1 - Foo 1
     id: 2
@@ -162,6 +183,9 @@ Resolving an issue should decrement the issue count.
       reviewer:
         review_flag: r?
         ship_it: false
+    diff:
+      delete: 1
+      insert: 1
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -171,6 +195,9 @@ Resolving an issue should decrement the issue count.
     has_draft: false
     reviewers: []
     reviewers_status: {}
+    diff:
+      delete: 1
+      insert: 1
 
 Giving a ship-it should result in a change in the reviewer status
 
@@ -188,6 +215,9 @@ Giving a ship-it should result in a change in the reviewer status
     has_draft: false
     reviewers:
     - reviewer
+    diff:
+      delete: 1
+      insert: 1
   children:
   - summary: Bug 1 - Foo 1
     id: 2
@@ -202,6 +232,9 @@ Giving a ship-it should result in a change in the reviewer status
       reviewer:
         review_flag: r+
         ship_it: true
+    diff:
+      delete: 1
+      insert: 1
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -211,6 +244,9 @@ Giving a ship-it should result in a change in the reviewer status
     has_draft: false
     reviewers: []
     reviewers_status: {}
+    diff:
+      delete: 1
+      insert: 1
 
   $ exportbzauth default@example.com password
 
@@ -228,6 +264,9 @@ Verify we can also get the summaries by bug, including closed ones.
       has_draft: false
       reviewers:
       - reviewer
+      diff:
+        delete: 1
+        insert: 1
     children:
     - summary: Bug 1 - Foo 1
       id: 2
@@ -242,6 +281,9 @@ Verify we can also get the summaries by bug, including closed ones.
         reviewer:
           review_flag: r+
           ship_it: true
+      diff:
+        delete: 1
+        insert: 1
     - summary: Bug 1 - Foo 2
       id: 3
       commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -251,6 +293,9 @@ Verify we can also get the summaries by bug, including closed ones.
       has_draft: false
       reviewers: []
       reviewers_status: {}
+      diff:
+        delete: 1
+        insert: 1
 
 Verify that we get nothing from non-existent bugs.
 
