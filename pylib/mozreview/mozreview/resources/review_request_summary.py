@@ -13,6 +13,9 @@ from reviewboard.reviews.models import ReviewRequest
 from reviewboard.webapi.encoder import status_to_string
 from reviewboard.webapi.resources import WebAPIResource
 
+from mozreview.diffviewer import (
+    get_diffstats,
+)
 from mozreview.extra_data import (
     COMMITS_KEY,
     COMMIT_ID_KEY,
@@ -204,6 +207,10 @@ class ReviewRequestSummaryResource(WebAPIResource):
 
         {
             'commit': 'ece2029d013af68f9f32aa0a6199fcb2201d5aae',
+            'diff': {
+                'insert': 15,
+                'delete': 20
+            },
             'has_draft': False,
             'id': 3,
             'issue_open_count': 0,
@@ -241,6 +248,7 @@ class ReviewRequestSummaryResource(WebAPIResource):
             user_id=review_request.submitter.id).bugzilla_user_id
         d['status'] = status_to_string(review_request.status)
         d['reviewers'] = [reviewer.username for reviewer in reviewers]
+        d['diff'] = get_diffstats(review_request, request.user)
 
         # If we have a commit (i.e. we are on a child) add reviewer_status.
         if commit:
