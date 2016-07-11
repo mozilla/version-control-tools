@@ -1,0 +1,88 @@
+@import (reference) 'mozilla-theme-common.less';
+
+/* Review Requests */
+.review-request {
+  .main {
+    background: #fff;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .content .field-container > pre {
+    border: 1px dashed #999;
+  }
+}
+
+.reviewable-page #mozreview-child-requests > thead > tr > .status,
+.reviewable-page #mozreview-child-requests > tbody > tr > .status {
+  min-width: 50px;
+}
+
+/* Review Actions Bar */
+.actions-container, .actions.page-tabs {
+  background: @moz-blue-dark;
+  border: 0;
+}
+
+.actions-container {
+  .border-radius(0);
+}
+
+.review-request-header,
+.actions.page-tabs li {
+  border-bottom: 0;
+}
+
+.actions.page-tabs li.active {
+  border: 0;
+}
+
+.actions.page-tabs {
+  .border-radius(0);
+}
+
+.actions-left li:hover,
+.actions li:hover,
+.actions .menu,
+.actions .menu li,
+.actions-right-container > li > .actions-right,
+.actions-right-container > li > .actions-right li {
+  background-color: @moz-blue-dark;
+}
+
+.actions-left .rb-icon.star {
+  margin: 8px 5px;
+}
+
+.actions-right-container > li > .actions-right {
+  border: 0;
+}
+
+.actions .menu li:hover,
+.actions-right-container > li > .actions-right li:hover {
+  background: @moz-blue-light;
+}
+
+.actions .menu {
+  border: 0;
+}
+
+/* Review Banners */
+.banner {
+  border-bottom: 0;
+}
+
+/* Review Comments */
+.box, .box-inner {
+  .border-radius(0);
+}
+
+#reviews {
+  .review .box-inner {
+    border: 1px @moz-blue-dark solid;
+  }
+
+  .box:before {
+    border-right-color: @moz-blue-dark;
+  }
+}

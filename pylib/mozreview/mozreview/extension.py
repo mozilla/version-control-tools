@@ -144,7 +144,8 @@ class MozReviewExtension(Extension):
                                  'mozreview/css/common.less'],
         },
         'review': {
-            'source_filenames': ['mozreview/css/review.less',
+            'source_filenames': ['mozreview/css/mozilla-theme-reviews.less',
+                                 'mozreview/css/review.less',
                                  'mozreview/css/commits.less'],
         },
         'viewdiff': {
