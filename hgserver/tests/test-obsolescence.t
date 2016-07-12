@@ -4,13 +4,6 @@
   $ hgmoenv
   $ standarduser
 
-TODO there appears to be a race condition on locking bug in Mercurial
-that triggers when replication of obsolescence markers is performed.
-http://bz.selenic.com/show_bug.cgi?id=4787. We disable replication
-as a workaround.
-
-  $ hgmo exec hgssh /set-mirrors.py
-
   $ hgmo create-repo users/user_example.com/repo-1 scm_level_1
   (recorded repository creation in replication log)
   $ hg -q clone ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
