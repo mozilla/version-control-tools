@@ -26,6 +26,7 @@ from mercurial import (
     extensions,
     hg,
     util,
+    wireproto,
 )
 
 testedwith = '3.6 3.7'
@@ -278,7 +279,45 @@ def replicatecommand(ui, repo):
     ui.status(_('wrote synchronization message into replication log\n'))
 
 
+def wireprotodispatch(orig, repo, proto, command):
+    """Wraps wireproto.dispatch() to allow operations on unfiltered repo.
+
+    Replication consumers need full access to the source repo. The
+    default implementation of ``wireproto.dispatch`` always operated on
+    the ``served`` repo filter, which doesn't expose hidden changesets.
+    This could cause replication mirrors referencing hidden changesets
+    to encounter errors.
+
+    If the current user is the configured user that can access unfiltered
+    repo views, we operate on the unfiltered repo.
+    """
+    unfiltereduser = repo.ui.config('replication', 'unfiltereduser')
+    if not unfiltereduser or unfiltereduser != os.environ.get('USER'):
+        return orig(repo, proto, command)
+
+    # We operate on the repo.unfiltered() instance because attempting
+    # to adjust the class on a repoview class can result in infinite recursion.
+    urepo = repo.unfiltered()
+    origclass = urepo.__class__
+
+    class unfilteroncerepo(origclass):
+        def filtered(self, name):
+            if name != 'served':
+                raise error.Abort('wtf: %s' % name)
+
+            unfiltered = self.unfiltered()
+            unfiltered.__class__ = origclass
+            return unfiltered
+
+    try:
+        urepo.__class__ = unfilteroncerepo
+        return orig(repo, proto, command)
+    finally:
+        urepo.__class__ = origclass
+
+
 def extsetup(ui):
+    extensions.wrapfunction(wireproto, 'dispatch', wireprotodispatch)
     extensions.wrapcommand(commands.table, 'init', initcommand)
 
     # Configure null handler for kafka.* loggers to prevent "No handlers could

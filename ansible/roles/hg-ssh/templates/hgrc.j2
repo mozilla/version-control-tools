@@ -48,6 +48,9 @@ validate = True
 [readonly]
 globalreasonfile = /etc/mercurial/readonlyreason
 
+[replication]
+unfiltereduser = vcs-sync@mozilla.com
+
 [replicationproducer]
 hosts = {% for host in zk_servers %}{{ host}}:9092{% if not loop.last%}, {% endif %}{% endfor %}
 
