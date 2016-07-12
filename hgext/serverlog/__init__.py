@@ -188,7 +188,6 @@ testedwith = '3.6'
 minimumhgversion = '3.6'
 
 origcall = protocol.call
-origdispatch = wireproto.dispatch
 
 def protocolcall(repo, req, cmd):
     """Wraps mercurial.hgweb.protocol to record requests."""
@@ -336,6 +335,8 @@ class sshserverwrapped(sshserver.sshserver):
 
     def serve_one(self):
         self._serverlog['requestid'] = str(uuid.uuid1())
+
+        origdispatch = wireproto.dispatch
 
         def dispatch(repo, proto, cmd):
             logsyslog(self._serverlog, 'BEGIN_SSH_COMMAND', cmd)
