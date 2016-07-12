@@ -136,4 +136,73 @@ Pulling should get the obsmarkers
 
   $ cd ..
 
+Obsolescence markers should have gotten pulled on hgweb mirror
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/users/user_example.com/repo-1 debugobsolete
+  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (* +0000) {'user': 'Test User <someone@example.com>'} (glob)
+
+Pushing a changeset then hiding it works
+
+  $ cd repo-1
+  $ hg -q up -r 5217e2ac5b15
+  $ touch file0
+  $ hg -q commit -A -m head1
+  $ hg -q up -r 5217e2ac5b15
+  $ touch file1
+  $ hg -q commit -A -m head2
+
+  $ hg push -r 8713015ee6f2 ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/users/user_example.com/repo-1
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: recorded push in pushlog
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/8713015ee6f2
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
+  $ hg push -f -r 6ddbc9389e71 ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/users/user_example.com/repo-1
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  remote: recorded push in pushlog
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/6ddbc9389e71
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
+
+  $ hg rebase -s 6ddbc9389e71 -d 8713015ee6f2
+  rebasing 5:6ddbc9389e71 "head2" (tip)
+  $ hg push -f ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/users/user_example.com/repo-1
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 0 changes to 1 files
+  remote: recorded push in pushlog
+  remote: 1 new obsolescence markers
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/042a67bdbae8
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
+
+  $ hg debugobsolete
+  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  6ddbc9389e710d9b4f3c880d7c99320f9581dbd5 042a67bdbae8a8b4c4b071303ad92484cf1746b0 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/users/user_example.com/repo-1 debugobsolete
+  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  6ddbc9389e710d9b4f3c880d7c99320f9581dbd5 042a67bdbae8a8b4c4b071303ad92484cf1746b0 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+
+  $ cd ..
+
   $ hgmo clean
