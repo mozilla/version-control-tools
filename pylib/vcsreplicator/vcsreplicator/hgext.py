@@ -28,7 +28,7 @@ from mercurial import (
     util,
 )
 
-testedwith = '3.6'
+testedwith = '3.6 3.7'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
