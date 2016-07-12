@@ -29,6 +29,7 @@ SSH as a valid user without proper key
   objectClass: organizationalPerson
   objectClass: person
   objectClass: posixAccount
+  objectClass: bugzillaAccount
   objectClass: top
   objectClass: hgAccount
   cn: Some User
@@ -37,6 +38,7 @@ SSH as a valid user without proper key
   sn: User
   uid: user1
   uidNumber: 1000
+  bugzillaEmail: user1@example.com
   fakeHome: /tmp
   hgAccountEnabled: TRUE
   hgHome: /tmp
@@ -98,6 +100,7 @@ Successful login should set hgAccessDate LDAP attribute
   objectClass: organizationalPerson
   objectClass: person
   objectClass: posixAccount
+  objectClass: bugzillaAccount
   objectClass: top
   objectClass: hgAccount
   objectClass: ldapPublicKey
@@ -107,6 +110,7 @@ Successful login should set hgAccessDate LDAP attribute
   sn: User
   uid: user1
   uidNumber: 1000
+  bugzillaEmail: user1@example.com
   fakeHome: /tmp
   hgAccountEnabled: TRUE
   hgHome: /tmp
@@ -145,6 +149,7 @@ No HG access prints helpful error message
   objectClass: organizationalPerson
   objectClass: person
   objectClass: posixAccount
+  objectClass: bugzillaAccount
   objectClass: top
   objectClass: ldapPublicKey
   cn: No HgAccess
@@ -153,6 +158,7 @@ No HG access prints helpful error message
   sn: HgAccess
   uid: nohgaccess
   uidNumber: 1001
+  bugzillaEmail: nohgaccess@example.com
   mail: nohgaccess@example.com
   sshPublicKey:* (glob)
    * (glob)
@@ -215,6 +221,7 @@ hgAccountDisabled=FALSE shows account disabled message
   objectClass: organizationalPerson
   objectClass: person
   objectClass: posixAccount
+  objectClass: bugzillaAccount
   objectClass: top
   objectClass: hgAccount
   objectClass: ldapPublicKey
@@ -224,6 +231,7 @@ hgAccountDisabled=FALSE shows account disabled message
   sn: Disabled
   uid: hgdisabled
   uidNumber: 1002
+  bugzillaEmail: hgdisabled@example.com
   fakeHome: /tmp
   hgAccountEnabled: FALSE
   hgHome: /tmp
