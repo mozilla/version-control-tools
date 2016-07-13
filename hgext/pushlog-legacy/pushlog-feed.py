@@ -78,7 +78,10 @@ class PushlogQuery(object):
     def DoQuery(self):
         """Figure out what the query parameters are, and query the database
         using those parameters."""
-        repo = self.repo
+        # Use an unfiltered repo because query parameters may reference hidden
+        # changesets. Hidden changesets are still in the pushlog. We'll
+        # treat them appropriately at the filter layer.
+        repo = self.repo.unfiltered()
         self.entries = []
         if not self.conn:
             # we didn't get a connection to the database, return empty

@@ -177,32 +177,134 @@ FIXME Hidden changesets handled properly on feed
   </feed>
   
 
-FIXME Specifying a fromchange with a hidden changeset works
+Specifying a fromchange with a hidden changeset works
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?fromchange=d313a202a85e"
-  404
-  "hidden revision 'd313a202a85e'"
+  200
+  {
+      "3": {
+          "changesets": [
+              "b3641753ee63b166fad7c5f10060b0cbbc8a86b0",
+              "62eebb2f0f00195f9d965f718090c678c4fa414d"
+          ],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      },
+      "4": {
+          "changesets": [
+              "418a63f508062fb2eb9130065c5ddc7908dd5949",
+              "d129109168f0ed985e51b0f86df256acdcfcfe45"
+          ],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      }
+  }
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?fromchange=d313a202a85e&full=1"
-  404
-  "hidden revision 'd313a202a85e'"
+  200
+  {
+      "3": {
+          "changesets": [
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file2",
+                  "files": [
+                      "file2"
+                  ],
+                  "node": "b3641753ee63b166fad7c5f10060b0cbbc8a86b0",
+                  "parents": [
+                      "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
+                  ],
+                  "tags": []
+              },
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file3",
+                  "files": [
+                      "file3"
+                  ],
+                  "node": "62eebb2f0f00195f9d965f718090c678c4fa414d",
+                  "parents": [
+                      "b3641753ee63b166fad7c5f10060b0cbbc8a86b0"
+                  ],
+                  "tags": []
+              }
+          ],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      },
+      "4": {
+          "changesets": [
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file0",
+                  "files": [
+                      "file0"
+                  ],
+                  "node": "418a63f508062fb2eb9130065c5ddc7908dd5949",
+                  "parents": [
+                      "62eebb2f0f00195f9d965f718090c678c4fa414d"
+                  ],
+                  "tags": []
+              },
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file1",
+                  "files": [
+                      "file1"
+                  ],
+                  "node": "d129109168f0ed985e51b0f86df256acdcfcfe45",
+                  "parents": [
+                      "418a63f508062fb2eb9130065c5ddc7908dd5949"
+                  ],
+                  "tags": [
+                      "tip"
+                  ]
+              }
+          ],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      }
+  }
 
-FIXME Specifying a tochange with a hidden changeset works
+Specifying a tochange with a hidden changeset works
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?startID=1&tochange=ae13d9da6966"
-  404
-  "hidden revision 'ae13d9da6966'"
+  200
+  {
+      "2": {
+          "changesets": [
+              "ae13d9da6966307c98b60987fb4fedc2e2f29736",
+              "d313a202a85e114000f669c2fcb49ad42376ac04"
+          ],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      }
+  }
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?startID=1&tochange=ae13d9da6966&full=1"
   404
-  "hidden revision 'ae13d9da6966'"
+  "hidden revision 'd313a202a85e114000f669c2fcb49ad42376ac04'"
 
-FIXME Specifying a hidden changeset works
+Specifying a hidden changeset works
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?changeset=ae13d9da6966"
-  404
-  "hidden revision 'ae13d9da6966'"
+  200
+  {
+      "2": {
+          "changesets": [
+              "ae13d9da6966307c98b60987fb4fedc2e2f29736",
+              "d313a202a85e114000f669c2fcb49ad42376ac04"
+          ],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      }
+  }
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?changeset=ae13d9da6966&full=1"
   404
-  "hidden revision 'ae13d9da6966'"
+  "hidden revision 'd313a202a85e114000f669c2fcb49ad42376ac04'"
