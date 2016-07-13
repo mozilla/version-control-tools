@@ -38,9 +38,6 @@ Last changeset
           0
       ],
       "desc": "NO BUG",
-      "files": [
-          "foo"
-      ],
       "node": "c761ad6d27c96f72f7e4637789e967c3f9730255",
       "parents": [
           "ef0e7ae3b607356f580e6d7671abea63db849cc2"
