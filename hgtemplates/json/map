@@ -49,6 +49,7 @@ changeset = '\{
   "backedoutby": {if(backedoutbynode, backedoutbynode|json, ""|json)},
   "branch": {if(branch, branch%changesetbranch, "default"|json)},
   "bookmarks": [{join(changesetbookmark, ", ")}],
+  "files": {files|json},
   "tags": [{join(changesettag, ", ")}],
   "user": {author|json},
   "parents": [{join(parent%changesetparent, ", ")}],

@@ -126,6 +126,8 @@ def addmetadata(repo, ctx, d, onlycheap=False):
             'revset': 'reviewer(%s)' % reviewer,
         })
 
+    d['files'] = ctx.files()
+
     d['backsoutnodes'] = []
     backouts = commitparser.parse_backouts(ctx.description())
     if backouts:
