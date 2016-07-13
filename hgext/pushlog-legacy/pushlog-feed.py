@@ -78,6 +78,7 @@ class PushlogQuery(object):
     def DoQuery(self):
         """Figure out what the query parameters are, and query the database
         using those parameters."""
+        repo = self.repo
         self.entries = []
         if not self.conn:
             # we didn't get a connection to the database, return empty
@@ -111,7 +112,7 @@ class PushlogQuery(object):
                 params['start_date'] = self.querystart_value
             elif self.querystart == QueryType.CHANGESET:
                 where.append("id > (select c.pushid from changesets c where c.node = :start_node)")
-                params['start_node'] = hex(self.repo.lookup(self.querystart_value))
+                params['start_node'] = hex(repo.lookup(self.querystart_value))
             elif self.querystart == QueryType.PUSHID:
                 where.append("id > :start_id")
                 params['start_id'] = self.querystart_value
@@ -121,7 +122,7 @@ class PushlogQuery(object):
                 params['end_date'] = self.queryend_value
             elif self.queryend == QueryType.CHANGESET:
                 where.append("id <= (select c.pushid from changesets c where c.node = :end_node)")
-                params['end_node'] = hex(self.repo.lookup(self.queryend_value))
+                params['end_node'] = hex(repo.lookup(self.queryend_value))
             elif self.queryend == QueryType.PUSHID:
                 where.append("id <= :end_id ")
                 params['end_id'] = self.queryend_value
@@ -140,7 +141,7 @@ class PushlogQuery(object):
                 subquery = []
                 for c in self.changesetquery:
                     subquery.append("id = (select c.pushid from changesets c where c.node = :node%s)" % i)
-                    params['node%d' % i] = hex(self.repo.lookup(c))
+                    params['node%d' % i] = hex(repo.lookup(c))
                     i += 1
                 where.append('(' + ' OR '.join(subquery) + ')')
 
