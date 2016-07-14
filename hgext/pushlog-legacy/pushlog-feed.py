@@ -462,14 +462,14 @@ def pushlogHTML(web, req, tmpl):
                 querydescription=query.description(),
                 archives=web.archivelist("tip"))
 
-def pushes_worker(query, web = None):
+def pushes_worker(query, repo, full):
     """Given a PushlogQuery, return a data structure mapping push IDs
     to a map of data about the push."""
     pushes = {}
     for id, user, date, node in query.entries:
         id = str(id)
-        if web:
-            ctx = web.repo[node]
+        if full:
+            ctx = repo[node]
             n = ctx.node()
             node = {"node": hex(n),
                     "author": ctx.user(),
@@ -492,8 +492,7 @@ def pushes_worker(query, web = None):
 def pushes(web, req, tmpl):
     """WebCommand to return a data structure containing pushes."""
     query = pushlogSetup(web.repo, req)
-
-    data = pushes_worker(query, 'full' in req.form and web)
+    data = pushes_worker(query, web.repo, 'full' in req.form)
 
     if query.formatversion == 1:
         return tmpl('pushes1', **data)
