@@ -472,6 +472,16 @@ def pushes_worker(query, repo, full):
     pushes = {}
     for id, user, date, node in query.entries:
         id = str(id)
+
+        # Create the pushes entry first. It is OK to have empty
+        # pushes if nodes from the pushlog no longer exist.
+        if id not in pushes:
+            pushes[id] = {
+                'user': user,
+                'date': date,
+                'changesets': [],
+            }
+
         if full:
             ctx = repo[node]
             node = {
@@ -483,13 +493,9 @@ def pushes_worker(query, repo, full):
                 'tags': ctx.tags(),
                 'files': ctx.files()
             }
-        if id in pushes:
-            # we get the pushes in reverse order
-            pushes[id]['changesets'].insert(0, node)
-        else:
-            pushes[id] = {'user': user,
-                          'date': date,
-                          'changesets': [node]}
+
+        # we get the pushes in reverse order
+        pushes[id]['changesets'].insert(0, node)
 
     return {'pushes': pushes, 'lastpushid': query.lastpushid}
 
