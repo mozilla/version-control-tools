@@ -388,7 +388,7 @@ def pushlogHTML(web, req, tmpl):
             nav.append({'page': query.page - 1, 'label': "Prev"})
         for i in range(start, end):
             nav.append({'page': i, 'label': str(i)})
-        
+
         if query.page != numpages:
             nav.append({'page': query.page + 1, 'label': "Next"})
             nav.append({'page': numpages, 'label': "Last"})
@@ -402,9 +402,7 @@ def pushlogHTML(web, req, tmpl):
         elif hasattr(web, 'listfilediffs'):
             listfilediffs = web.listfilediffs
 
-        allentries = []
         lastid = None
-        ch = None
         l = []
         mergehidden = ""
         p = 0
