@@ -17,11 +17,10 @@ from math import ceil
 
 sys.path.append(os.path.dirname(__file__))
 
-demandimport.disable()
-from parsedatetime import parsedatetime as pdt
+with demandimport.deactivated():
+    from parsedatetime import parsedatetime as pdt
 
 import sqlite3
-demandimport.enable()
 
 testedwith = '3.6 3.7'
 
