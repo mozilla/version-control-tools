@@ -1,26 +1,31 @@
+from datetime import datetime
+from math import ceil
+import os
+import re
+import sqlite3
+import sys
+import time
+
 import mercurial.hgweb.protocol as hgwebprotocol
 import mercurial.hgweb.webcommands as hgwebcommands
 import mercurial.hgweb.webutil as webutil
-from mercurial.templatefilters import xmlescape
 from mercurial.hgweb.common import (
     ErrorResponse,
     HTTP_OK,
     paritygen,
 )
 from mercurial.node import hex, nullid
-from mercurial import demandimport
-
-import sys, os.path, re
-from datetime import datetime
-import time
-from math import ceil
+from mercurial import (
+    demandimport,
+    templatefilters,
+)
 
 sys.path.append(os.path.dirname(__file__))
 
 with demandimport.deactivated():
     from parsedatetime import parsedatetime as pdt
 
-import sqlite3
+xmlescape = templatefilters.xmlescape
 
 testedwith = '3.6 3.7'
 
