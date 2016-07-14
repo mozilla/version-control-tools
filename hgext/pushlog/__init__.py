@@ -87,7 +87,13 @@ def pushlogwireproto(repo, proto, firstpush):
         return '\n'.join(['0', str(e)])
 
 def exchangepullpushlog(orig, pullop):
-    """This is called during pull to fetch pushlog data."""
+    """This is called during pull to fetch pushlog data.
+
+    The goal of this function is to replicate the entire pushlog. This is
+    in contrast to replicating only the pushlog data for changesets the
+    client has pulled. Put another way, this attempts complete replication
+    as opposed to partial, hole-y replication.
+    """
     # check stepsdone for future compatibility with bundle2 pushlog exchange.
     res = orig(pullop)
 
@@ -111,9 +117,20 @@ def exchangepullpushlog(orig, pullop):
         pushid, who, when, nodes = line.split(' ', 3)
         nodes = [bin(n) for n in nodes.split()]
 
-        # Verify incoming changesets are known and stop processing when we see
-        # an unknown changeset. This can happen when we're pulling a former
-        # head instead of all changesets.
+        # We stop processing if there is a reference to an unknown changeset.
+        # This can happen in a few scenarios.
+        #
+        # Since the server streams *all* pushlog entries (from a starting
+        # number), it could send pushlog entries for changesets the client
+        # didn't request or were pushed since the client started pulling.
+        #
+        # If the remote repo contains obsolete changesets, we may see a
+        # reference to a hidden changeset.
+        #
+        # This is arguably not the desirable behavior: pushlog replication
+        # should be robust. However, doing things this way helps defend
+        # against pushlog "corruption" since inserting references to unknown
+        # changesets into the database is dangerous.
         try:
             [repo[n] for n in nodes]
         except error.RepoLookupError:
