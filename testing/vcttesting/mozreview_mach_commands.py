@@ -12,11 +12,22 @@ from mach.decorators import (
     Command,
 )
 
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+
 @CommandProvider
 class MozReviewCommands(object):
     def _get_mozreview(self, where):
-        if not where and 'MOZREVIEW_HOME' in os.environ:
-            where = os.environ['MOZREVIEW_HOME']
+        if not where:
+            if 'MOZREVIEW_HOME' in os.environ:
+                where = os.environ['MOZREVIEW_HOME']
+            else:
+                # Check for the path used by start-local-mozreview
+                default_path = os.path.abspath(
+                    os.path.join(HERE, '..', '..', '..', 'mozreview-test'))
+                if os.path.isdir(default_path):
+                    where = default_path
 
         web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
         hgrb_image = os.environ.get('DOCKER_HGRB_IMAGE')

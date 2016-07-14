@@ -1,8 +1,6 @@
 #!/bin/bash
 # This script starts the mozreview servers, creates a default user, some bugs
 # and a properly configured mercurial repository for pushing reviews.
-# You need to source this script (e.g. run with ". start-local-mozreview") in
-# order for the environment variables to be set correctly.
 
 set -eo pipefail
 
@@ -24,7 +22,7 @@ cd $VCT_PATH
 REPO_PATH=$PARENT_PATH/$TEST_REPO_NAME
 TEST_MOZREVIEW_PATH=$PARENT_PATH/$TEST_MOZREVIEW_NAME
 
-export MOZREVIEW_HOME=$TEST_MOZREVIEW_PATH
+MOZREVIEW_HOME=$TEST_MOZREVIEW_PATH
 . venv/bin/activate
 
 ./mozreview stop $TEST_MOZREVIEW_PATH
@@ -62,3 +60,7 @@ apikey = $API_KEY
 " >> $REPO_PATH/.hg/hgrc
 
 BUGZILLA_USERNAME=admin@example.com BUGZILLA_PASSWORD=password ./bugzilla create-bug-range firefox general 11
+
+echo "Development environment created."
+echo "Run the following command to initialise your environment:"
+echo "eval \$(./mozreview shellinit)"
