@@ -18,6 +18,7 @@ from mercurial.node import hex, nullid
 from mercurial import (
     demandimport,
     error,
+    obsolete,
     templatefilters,
 )
 
@@ -480,6 +481,7 @@ def pushlogHTML(web, req, tmpl):
 def pushes_worker(query, repo, full):
     """Given a PushlogQuery, return a data structure mapping push IDs
     to a map of data about the push."""
+    haveobs = bool(repo.obsstore)
     pushes = {}
     for id, user, date, node in query.entries:
         id = str(id)
@@ -495,9 +497,16 @@ def pushes_worker(query, repo, full):
 
         try:
             ctx = repo[node]
+            nodekey = 'changesets'
         # Changeset is hidden
         except error.FilteredRepoLookupError:
-            continue
+            # Try to find the hidden changeset so its metadata can be used.
+            try:
+                ctx = repo.unfiltered()[node]
+            except error.LookupError:
+                continue
+
+            nodekey = 'obsoletechangesets'
 
         if full:
             node = {
@@ -510,8 +519,15 @@ def pushes_worker(query, repo, full):
                 'files': ctx.files()
             }
 
+            # Only expose obsolescence metadata if the repo has some.
+            if haveobs:
+                precursors = obsolete.precursormarkers(ctx)
+                precursors = [hex(m.precnode()) for m in precursors]
+                if precursors:
+                    node['precursors'] = precursors
+
         # we get the pushes in reverse order
-        pushes[id]['changesets'].insert(0, node)
+        pushes[id].setdefault(nodekey, []).insert(0, node)
 
     return {'pushes': pushes, 'lastpushid': query.lastpushid}
 

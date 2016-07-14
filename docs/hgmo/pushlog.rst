@@ -195,6 +195,9 @@ push. e.g.::
      }
    }
 
+An optional ``obsoletechangesets`` key may also be present in each push.
+Read below for more.
+
 Version 2
 ^^^^^^^^^
 
@@ -251,6 +254,16 @@ changesets
    The array may be empty. This can occur if changesets from this push
    are now hidden/obsolete.
 
+obsoletechangesets
+   (optional) An array of 40 character changeset SHA-1s of now obsolete
+   changesets included in the push.
+
+   The DAG order relationship between ``changesets`` and ``obsoletechangesets``
+   is strictly speaking undefined.
+
+   This key is only present if the repository has obsolescence data and the
+   push has changesets that are now obsolete.
+
 date
    Integer seconds since UNIX epoch that the push occurred.
 
@@ -266,9 +279,9 @@ date
 user
    The string username that performed the push.
 
-If ``full`` is specified, each entry in the ``changesets`` array will be
-an object instead of a string. Each object will have the following
-properties:
+If ``full`` is specified, each entry in the ``changesets`` and
+``obsoletechangesets`` array will be an object instead of a string.
+Each object will have the following properties:
 
 node
    The 40 byte hex SHA-1 of the changeset.
@@ -295,6 +308,19 @@ tags
 files
    An array of filenames that were changed by this changeset.
 
+precursors
+   (optional) An array of 40 character hex SHA-1 nodes identifying
+   *precursor* nodes.
+
+   *Precursor* nodes are essentially previously versions of this changeset.
+
+   Precursor nodes come from obsolescence data. This key won't exist if
+   there are no precursor nodes for this changeset.
+
+   The precursor changesets are hidden and not available to normal Mercurial
+   operations. However, querying the pushlog for their info *may* return
+   results.
+
 Here's an example::
 
    {
@@ -307,6 +333,9 @@ Here's an example::
      "node": "ee4fe2ec168e719e822dabcdd797c0cff9ce2407",
      "parents": [
        "803bc910c45a875d9d76dc689c45dd91a1e02e23"
+     ],
+     "precursors": [
+       "d313a202a85e114000f669c2fcb49ad42376ac04"
      ],
      "tags": []
    }

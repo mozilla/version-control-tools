@@ -65,7 +65,7 @@
   recorded push in pushlog
   2 new obsolescence markers
 
-FIXME Hidden changesets should not be exposed to version 1
+Hidden changesets exposed as list under obsoletechangesets in version 1
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?version=1"
   200
@@ -80,6 +80,10 @@ FIXME Hidden changesets should not be exposed to version 1
       "2": {
           "changesets": [],
           "date": \d+, (re)
+          "obsoletechangesets": [
+              "ae13d9da6966307c98b60987fb4fedc2e2f29736",
+              "d313a202a85e114000f669c2fcb49ad42376ac04"
+          ],
           "user": "user@example.com"
       },
       "3": {
@@ -99,6 +103,8 @@ FIXME Hidden changesets should not be exposed to version 1
           "user": "user@example.com"
       }
   }
+
+obsolete changeset metadata exposed under full with version 1
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?version=1&full=1"
   200
@@ -125,6 +131,34 @@ FIXME Hidden changesets should not be exposed to version 1
       "2": {
           "changesets": [],
           "date": \d+, (re)
+          "obsoletechangesets": [
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file0",
+                  "files": [
+                      "file0"
+                  ],
+                  "node": "ae13d9da6966307c98b60987fb4fedc2e2f29736",
+                  "parents": [
+                      "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
+                  ],
+                  "tags": []
+              },
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file1",
+                  "files": [
+                      "file1"
+                  ],
+                  "node": "d313a202a85e114000f669c2fcb49ad42376ac04",
+                  "parents": [
+                      "ae13d9da6966307c98b60987fb4fedc2e2f29736"
+                  ],
+                  "tags": []
+              }
+          ],
           "user": "user@example.com"
       },
       "3": {
@@ -172,6 +206,9 @@ FIXME Hidden changesets should not be exposed to version 1
                   "parents": [
                       "62eebb2f0f00195f9d965f718090c678c4fa414d"
                   ],
+                  "precursors": [
+                      "ae13d9da6966307c98b60987fb4fedc2e2f29736"
+                  ],
                   "tags": []
               },
               {
@@ -185,6 +222,9 @@ FIXME Hidden changesets should not be exposed to version 1
                   "parents": [
                       "418a63f508062fb2eb9130065c5ddc7908dd5949"
                   ],
+                  "precursors": [
+                      "d313a202a85e114000f669c2fcb49ad42376ac04"
+                  ],
                   "tags": [
                       "tip"
                   ]
@@ -195,7 +235,7 @@ FIXME Hidden changesets should not be exposed to version 1
       }
   }
 
-FIXME Hidden changesets should not be exposed to version 2
+Hidden changesets exposed as list with version 2
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?version=2"
   200
@@ -212,6 +252,10 @@ FIXME Hidden changesets should not be exposed to version 2
           "2": {
               "changesets": [],
               "date": \d+, (re)
+              "obsoletechangesets": [
+                  "ae13d9da6966307c98b60987fb4fedc2e2f29736",
+                  "d313a202a85e114000f669c2fcb49ad42376ac04"
+              ],
               "user": "user@example.com"
           },
           "3": {
@@ -232,6 +276,8 @@ FIXME Hidden changesets should not be exposed to version 2
           }
       }
   }
+
+Hidden changeset metadata exposed under version 2 with full
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?version=2&full=1"
   200
@@ -260,6 +306,34 @@ FIXME Hidden changesets should not be exposed to version 2
           "2": {
               "changesets": [],
               "date": \d+, (re)
+              "obsoletechangesets": [
+                  {
+                      "author": "test",
+                      "branch": "default",
+                      "desc": "file0",
+                      "files": [
+                          "file0"
+                      ],
+                      "node": "ae13d9da6966307c98b60987fb4fedc2e2f29736",
+                      "parents": [
+                          "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
+                      ],
+                      "tags": []
+                  },
+                  {
+                      "author": "test",
+                      "branch": "default",
+                      "desc": "file1",
+                      "files": [
+                          "file1"
+                      ],
+                      "node": "d313a202a85e114000f669c2fcb49ad42376ac04",
+                      "parents": [
+                          "ae13d9da6966307c98b60987fb4fedc2e2f29736"
+                      ],
+                      "tags": []
+                  }
+              ],
               "user": "user@example.com"
           },
           "3": {
@@ -307,6 +381,9 @@ FIXME Hidden changesets should not be exposed to version 2
                       "parents": [
                           "62eebb2f0f00195f9d965f718090c678c4fa414d"
                       ],
+                      "precursors": [
+                          "ae13d9da6966307c98b60987fb4fedc2e2f29736"
+                      ],
                       "tags": []
                   },
                   {
@@ -320,6 +397,9 @@ FIXME Hidden changesets should not be exposed to version 2
                       "parents": [
                           "418a63f508062fb2eb9130065c5ddc7908dd5949"
                       ],
+                      "precursors": [
+                          "d313a202a85e114000f669c2fcb49ad42376ac04"
+                      ],
                       "tags": [
                           "tip"
                       ]
@@ -331,7 +411,7 @@ FIXME Hidden changesets should not be exposed to version 2
       }
   }
 
-FIXME Hidden changesets handled properly on feed
+Hidden changesets dropped in feed
 
   $ http --no-headers "http://localhost:$HGPORT/atom-pushlog"
   200
@@ -516,6 +596,9 @@ Specifying a fromchange with a hidden changeset works
                   "parents": [
                       "62eebb2f0f00195f9d965f718090c678c4fa414d"
                   ],
+                  "precursors": [
+                      "ae13d9da6966307c98b60987fb4fedc2e2f29736"
+                  ],
                   "tags": []
               },
               {
@@ -528,6 +611,9 @@ Specifying a fromchange with a hidden changeset works
                   "node": "d129109168f0ed985e51b0f86df256acdcfcfe45",
                   "parents": [
                       "418a63f508062fb2eb9130065c5ddc7908dd5949"
+                  ],
+                  "precursors": [
+                      "d313a202a85e114000f669c2fcb49ad42376ac04"
                   ],
                   "tags": [
                       "tip"
@@ -547,6 +633,10 @@ Specifying a tochange with a hidden changeset works
       "2": {
           "changesets": [],
           "date": \d+, (re)
+          "obsoletechangesets": [
+              "ae13d9da6966307c98b60987fb4fedc2e2f29736",
+              "d313a202a85e114000f669c2fcb49ad42376ac04"
+          ],
           "user": "user@example.com"
       }
   }
@@ -557,6 +647,34 @@ Specifying a tochange with a hidden changeset works
       "2": {
           "changesets": [],
           "date": \d+, (re)
+          "obsoletechangesets": [
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file0",
+                  "files": [
+                      "file0"
+                  ],
+                  "node": "ae13d9da6966307c98b60987fb4fedc2e2f29736",
+                  "parents": [
+                      "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
+                  ],
+                  "tags": []
+              },
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file1",
+                  "files": [
+                      "file1"
+                  ],
+                  "node": "d313a202a85e114000f669c2fcb49ad42376ac04",
+                  "parents": [
+                      "ae13d9da6966307c98b60987fb4fedc2e2f29736"
+                  ],
+                  "tags": []
+              }
+          ],
           "user": "user@example.com"
       }
   }
@@ -569,6 +687,10 @@ Specifying a hidden changeset works
       "2": {
           "changesets": [],
           "date": \d+, (re)
+          "obsoletechangesets": [
+              "ae13d9da6966307c98b60987fb4fedc2e2f29736",
+              "d313a202a85e114000f669c2fcb49ad42376ac04"
+          ],
           "user": "user@example.com"
       }
   }
@@ -579,6 +701,34 @@ Specifying a hidden changeset works
       "2": {
           "changesets": [],
           "date": \d+, (re)
+          "obsoletechangesets": [
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file0",
+                  "files": [
+                      "file0"
+                  ],
+                  "node": "ae13d9da6966307c98b60987fb4fedc2e2f29736",
+                  "parents": [
+                      "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
+                  ],
+                  "tags": []
+              },
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file1",
+                  "files": [
+                      "file1"
+                  ],
+                  "node": "d313a202a85e114000f669c2fcb49ad42376ac04",
+                  "parents": [
+                      "ae13d9da6966307c98b60987fb4fedc2e2f29736"
+                  ],
+                  "tags": []
+              }
+          ],
           "user": "user@example.com"
       }
   }
