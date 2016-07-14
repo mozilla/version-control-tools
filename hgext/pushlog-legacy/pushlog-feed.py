@@ -471,15 +471,15 @@ def pushes_worker(query, repo, full):
         id = str(id)
         if full:
             ctx = repo[node]
-            n = ctx.node()
-            node = {"node": hex(n),
-                    "author": ctx.user(),
-                    "desc": ctx.description(),
-                    "branch": ctx.branch(),
-                    "parents": [c.hex() for c in ctx.parents()],
-                    "tags": ctx.tags(),
-                    "files": ctx.files()
-                   }
+            node = {
+                'node': ctx.hex(),
+                'author': ctx.user(),
+                'desc': ctx.description(),
+                'branch': ctx.branch(),
+                'parents': [c.hex() for c in ctx.parents()],
+                'tags': ctx.tags(),
+                'files': ctx.files()
+            }
         if id in pushes:
             # we get the pushes in reverse order
             pushes[id]['changesets'].insert(0, node)
