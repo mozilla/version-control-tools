@@ -20,10 +20,7 @@ sys.path.append(os.path.dirname(__file__))
 demandimport.disable()
 from parsedatetime import parsedatetime as pdt
 
-try:
-    import sqlite3 as sqlite
-except ImportError:
-    from pysqlite2 import dbapi2 as sqlite
+import sqlite3
 demandimport.enable()
 
 testedwith = '3.6 3.7'
@@ -97,7 +94,7 @@ class PushlogQuery(object):
                         self.entries.append((id,user,date,node))
                 # get count of pushes
                 self.totalentries = self.conn.execute("SELECT COUNT(*) FROM pushlog").fetchone()[0]
-            except sqlite.OperationalError:
+            except sqlite3.OperationalError:
                 # likely just an empty db, so return an empty result
                 pass
         else:
@@ -158,7 +155,7 @@ class PushlogQuery(object):
                         continue
                     self.entries.append((id,user,date,node))
                     lastid = id
-            except sqlite.OperationalError:
+            except sqlite3.OperationalError:
                 # likely just an empty db, so return an empty result
                 pass
 
@@ -167,7 +164,7 @@ class PushlogQuery(object):
             row = self.conn.execute(query).fetchone()
             if row:
                 self.lastpushid = row[0]
-        except sqlite.OperationalError:
+        except sqlite3.OperationalError:
             pass
 
     def description(self):
@@ -241,8 +238,8 @@ def pushlogSetup(repo, req):
     conn = None
     if os.path.isfile(pushdb):
         try:
-            conn = sqlite.connect(pushdb)
-        except sqlite.OperationalError:
+            conn = sqlite3.connect(pushdb)
+        except sqlite3.OperationalError:
             pass
 
     if 'node' in req.form:
