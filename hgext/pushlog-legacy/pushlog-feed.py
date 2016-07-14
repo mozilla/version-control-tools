@@ -340,7 +340,7 @@ def pushlogFeed(web, req, tmpl):
 
     entries = data['entries']
     for id, user, date, node in query.entries:
-        ctx = web.repo.changectx(node)
+        ctx = web.repo[node]
         entries.append({
             'node': node,
             'date': isotime(date),
@@ -410,7 +410,7 @@ def pushlogHTML(web, req, tmpl):
         for id, user, date, node in query.entries:
             if isinstance(node, unicode):
                 node = node.encode('utf-8')
-            ctx = web.repo.changectx(node)
+            ctx = web.repo[node]
             n = ctx.node()
             entry = {"author": ctx.user(),
                      "desc": ctx.description(),
@@ -469,7 +469,7 @@ def pushes_worker(query, web = None):
     for id, user, date, node in query.entries:
         id = str(id)
         if web:
-            ctx = web.repo.changectx(node)
+            ctx = web.repo[node]
             n = ctx.node()
             node = {"node": hex(n),
                     "author": ctx.user(),
