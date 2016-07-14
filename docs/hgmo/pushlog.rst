@@ -240,9 +240,16 @@ the push and the changesets therein.
 The following properties are always present:
 
 changesets
-   An array of 40 character changeset SHA-1s that were included in the
-   push. Changesets are included in DAG/revlog order. The tip-most
-   changeset is last.
+   An array of changeset entries.
+
+   By default, entries are 40 character changeset SHA-1s included in the
+   push. If ``full`` is specified, entries are objects containing
+   changeset metadata (see below).
+
+   Changesets are in DAG/revlog order with the tip-most changeset last.
+
+   The array may be empty. This can occur if changesets from this push
+   are now hidden/obsolete.
 
 date
    Integer seconds since UNIX epoch that the push occurred.

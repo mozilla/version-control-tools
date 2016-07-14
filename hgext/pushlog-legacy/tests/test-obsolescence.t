@@ -78,10 +78,7 @@ FIXME Hidden changesets should not be exposed to version 1
           "user": "user@example.com"
       },
       "2": {
-          "changesets": [
-              "ae13d9da6966307c98b60987fb4fedc2e2f29736",
-              "d313a202a85e114000f669c2fcb49ad42376ac04"
-          ],
+          "changesets": [],
           "date": \d+, (re)
           "user": "user@example.com"
       },
@@ -104,8 +101,99 @@ FIXME Hidden changesets should not be exposed to version 1
   }
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?version=1&full=1"
-  404
-  "hidden revision 'd313a202a85e114000f669c2fcb49ad42376ac04'"
+  200
+  {
+      "1": {
+          "changesets": [
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "initial",
+                  "files": [
+                      "foo"
+                  ],
+                  "node": "96ee1d7354c4ad7372047672c36a1f561e3a6a4c",
+                  "parents": [
+                      "0000000000000000000000000000000000000000"
+                  ],
+                  "tags": []
+              }
+          ],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      },
+      "2": {
+          "changesets": [],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      },
+      "3": {
+          "changesets": [
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file2",
+                  "files": [
+                      "file2"
+                  ],
+                  "node": "b3641753ee63b166fad7c5f10060b0cbbc8a86b0",
+                  "parents": [
+                      "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
+                  ],
+                  "tags": []
+              },
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file3",
+                  "files": [
+                      "file3"
+                  ],
+                  "node": "62eebb2f0f00195f9d965f718090c678c4fa414d",
+                  "parents": [
+                      "b3641753ee63b166fad7c5f10060b0cbbc8a86b0"
+                  ],
+                  "tags": []
+              }
+          ],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      },
+      "4": {
+          "changesets": [
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file0",
+                  "files": [
+                      "file0"
+                  ],
+                  "node": "418a63f508062fb2eb9130065c5ddc7908dd5949",
+                  "parents": [
+                      "62eebb2f0f00195f9d965f718090c678c4fa414d"
+                  ],
+                  "tags": []
+              },
+              {
+                  "author": "test",
+                  "branch": "default",
+                  "desc": "file1",
+                  "files": [
+                      "file1"
+                  ],
+                  "node": "d129109168f0ed985e51b0f86df256acdcfcfe45",
+                  "parents": [
+                      "418a63f508062fb2eb9130065c5ddc7908dd5949"
+                  ],
+                  "tags": [
+                      "tip"
+                  ]
+              }
+          ],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      }
+  }
 
 FIXME Hidden changesets should not be exposed to version 2
 
@@ -122,10 +210,7 @@ FIXME Hidden changesets should not be exposed to version 2
               "user": "user@example.com"
           },
           "2": {
-              "changesets": [
-                  "ae13d9da6966307c98b60987fb4fedc2e2f29736",
-                  "d313a202a85e114000f669c2fcb49ad42376ac04"
-              ],
+              "changesets": [],
               "date": \d+, (re)
               "user": "user@example.com"
           },
@@ -149,31 +234,214 @@ FIXME Hidden changesets should not be exposed to version 2
   }
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?version=2&full=1"
-  404
-  "hidden revision 'd313a202a85e114000f669c2fcb49ad42376ac04'"
+  200
+  {
+      "lastpushid": 4,
+      "pushes": {
+          "1": {
+              "changesets": [
+                  {
+                      "author": "test",
+                      "branch": "default",
+                      "desc": "initial",
+                      "files": [
+                          "foo"
+                      ],
+                      "node": "96ee1d7354c4ad7372047672c36a1f561e3a6a4c",
+                      "parents": [
+                          "0000000000000000000000000000000000000000"
+                      ],
+                      "tags": []
+                  }
+              ],
+              "date": \d+, (re)
+              "user": "user@example.com"
+          },
+          "2": {
+              "changesets": [],
+              "date": \d+, (re)
+              "user": "user@example.com"
+          },
+          "3": {
+              "changesets": [
+                  {
+                      "author": "test",
+                      "branch": "default",
+                      "desc": "file2",
+                      "files": [
+                          "file2"
+                      ],
+                      "node": "b3641753ee63b166fad7c5f10060b0cbbc8a86b0",
+                      "parents": [
+                          "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
+                      ],
+                      "tags": []
+                  },
+                  {
+                      "author": "test",
+                      "branch": "default",
+                      "desc": "file3",
+                      "files": [
+                          "file3"
+                      ],
+                      "node": "62eebb2f0f00195f9d965f718090c678c4fa414d",
+                      "parents": [
+                          "b3641753ee63b166fad7c5f10060b0cbbc8a86b0"
+                      ],
+                      "tags": []
+                  }
+              ],
+              "date": \d+, (re)
+              "user": "user@example.com"
+          },
+          "4": {
+              "changesets": [
+                  {
+                      "author": "test",
+                      "branch": "default",
+                      "desc": "file0",
+                      "files": [
+                          "file0"
+                      ],
+                      "node": "418a63f508062fb2eb9130065c5ddc7908dd5949",
+                      "parents": [
+                          "62eebb2f0f00195f9d965f718090c678c4fa414d"
+                      ],
+                      "tags": []
+                  },
+                  {
+                      "author": "test",
+                      "branch": "default",
+                      "desc": "file1",
+                      "files": [
+                          "file1"
+                      ],
+                      "node": "d129109168f0ed985e51b0f86df256acdcfcfe45",
+                      "parents": [
+                          "418a63f508062fb2eb9130065c5ddc7908dd5949"
+                      ],
+                      "tags": [
+                          "tip"
+                      ]
+                  }
+              ],
+              "date": \d+, (re)
+              "user": "user@example.com"
+          }
+      }
+  }
 
 FIXME Hidden changesets handled properly on feed
 
   $ http --no-headers "http://localhost:$HGPORT/atom-pushlog"
-  404
+  200
   
   <?xml version="1.0" encoding="ascii"?>
   <feed xmlns="http://www.w3.org/2005/Atom">
-   <!-- Error -->
-   <id>http://*:$HGPORT/</id> (glob)
-   <link rel="self" href="http://*:$HGPORT/atom-log"/> (glob)
-   <link rel="alternate" href="http://*:$HGPORT/"/> (glob)
-   <title>Error</title>
-   <updated>1970-01-01T00:00:00+00:00</updated>
+   <id>http://*:$HGPORT/pushlog</id> (glob)
+   <link rel="self" href="http://*:$HGPORT/pushlog"/> (glob)
+   <link rel="alternate" href="http://*:$HGPORT/pushloghtml"/> (glob)
+   <title>server Pushlog</title>
+   <updated>*Z</updated> (glob)
    <entry>
-    <title>Error</title>
-    <id>https://mercurial-scm.org/#error</id>
+    <title>Changeset d129109168f0ed985e51b0f86df256acdcfcfe45</title>
+    <id>http://www.selenic.com/mercurial/#changeset-d129109168f0ed985e51b0f86df256acdcfcfe45</id>
+    <link href="http://*:$HGPORT/rev/d129109168f0ed985e51b0f86df256acdcfcfe45"/> (glob)
+    <updated>*Z</updated> (glob)
     <author>
-      <name>mercurial</name>
+     <name>user@example.com</name>
     </author>
-    <updated>1970-01-01T00:00:00+00:00</updated>
-    <content type="text">hidden revision 'd313a202a85e114000f669c2fcb49ad42376ac04'</content>
+    <content type="xhtml">
+     <div xmlns="http://www.w3.org/1999/xhtml">
+      <ul class="filelist"><li class="file">file1</li></ul>
+     </div>
+    </content>
    </entry>
+   <entry>
+    <title>Changeset 418a63f508062fb2eb9130065c5ddc7908dd5949</title>
+    <id>http://www.selenic.com/mercurial/#changeset-418a63f508062fb2eb9130065c5ddc7908dd5949</id>
+    <link href="http://*:$HGPORT/rev/418a63f508062fb2eb9130065c5ddc7908dd5949"/> (glob)
+    <updated>*Z</updated> (glob)
+    <author>
+     <name>user@example.com</name>
+    </author>
+    <content type="xhtml">
+     <div xmlns="http://www.w3.org/1999/xhtml">
+      <ul class="filelist"><li class="file">file0</li></ul>
+     </div>
+    </content>
+   </entry>
+   <entry>
+    <title>Changeset 62eebb2f0f00195f9d965f718090c678c4fa414d</title>
+    <id>http://www.selenic.com/mercurial/#changeset-62eebb2f0f00195f9d965f718090c678c4fa414d</id>
+    <link href="http://*:$HGPORT/rev/62eebb2f0f00195f9d965f718090c678c4fa414d"/> (glob)
+    <updated>*Z</updated> (glob)
+    <author>
+     <name>user@example.com</name>
+    </author>
+    <content type="xhtml">
+     <div xmlns="http://www.w3.org/1999/xhtml">
+      <ul class="filelist"><li class="file">file3</li></ul>
+     </div>
+    </content>
+   </entry>
+   <entry>
+    <title>Changeset b3641753ee63b166fad7c5f10060b0cbbc8a86b0</title>
+    <id>http://www.selenic.com/mercurial/#changeset-b3641753ee63b166fad7c5f10060b0cbbc8a86b0</id>
+    <link href="http://*:$HGPORT/rev/b3641753ee63b166fad7c5f10060b0cbbc8a86b0"/> (glob)
+    <updated>*Z</updated> (glob)
+    <author>
+     <name>user@example.com</name>
+    </author>
+    <content type="xhtml">
+     <div xmlns="http://www.w3.org/1999/xhtml">
+      <ul class="filelist"><li class="file">file2</li></ul>
+     </div>
+    </content>
+   </entry>
+   <entry>
+    <title>Changeset d313a202a85e114000f669c2fcb49ad42376ac04</title>
+    <id>http://www.selenic.com/mercurial/#changeset-d313a202a85e114000f669c2fcb49ad42376ac04</id>
+    <link href="http://*:$HGPORT/rev/d313a202a85e114000f669c2fcb49ad42376ac04"/> (glob)
+    <updated>*Z</updated> (glob)
+    <author>
+     <name>user@example.com</name>
+    </author>
+    <content type="xhtml">
+     <div xmlns="http://www.w3.org/1999/xhtml">
+      <ul class="filelist"><li class="file">file2</li></ul>
+     </div>
+    </content>
+   </entry>
+   <entry>
+    <title>Changeset ae13d9da6966307c98b60987fb4fedc2e2f29736</title>
+    <id>http://www.selenic.com/mercurial/#changeset-ae13d9da6966307c98b60987fb4fedc2e2f29736</id>
+    <link href="http://*:$HGPORT/rev/ae13d9da6966307c98b60987fb4fedc2e2f29736"/> (glob)
+    <updated>*Z</updated> (glob)
+    <author>
+     <name>user@example.com</name>
+    </author>
+    <content type="xhtml">
+     <div xmlns="http://www.w3.org/1999/xhtml">
+      <ul class="filelist"><li class="file">file2</li></ul>
+     </div>
+    </content>
+   </entry>
+   <entry>
+    <title>Changeset 96ee1d7354c4ad7372047672c36a1f561e3a6a4c</title>
+    <id>http://www.selenic.com/mercurial/#changeset-96ee1d7354c4ad7372047672c36a1f561e3a6a4c</id>
+    <link href="*:$HGPORT/rev/96ee1d7354c4ad7372047672c36a1f561e3a6a4c"/> (glob)
+    <updated>*Z</updated> (glob)
+    <author>
+     <name>user@example.com</name>
+    </author>
+    <content type="xhtml">
+     <div xmlns="http://www.w3.org/1999/xhtml">
+      <ul class="filelist"><li class="file">foo</li></ul>
+     </div>
+    </content>
+   </entry>
+  
   </feed>
   
 
@@ -277,18 +545,21 @@ Specifying a tochange with a hidden changeset works
   200
   {
       "2": {
-          "changesets": [
-              "ae13d9da6966307c98b60987fb4fedc2e2f29736",
-              "d313a202a85e114000f669c2fcb49ad42376ac04"
-          ],
+          "changesets": [],
           "date": \d+, (re)
           "user": "user@example.com"
       }
   }
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?startID=1&tochange=ae13d9da6966&full=1"
-  404
-  "hidden revision 'd313a202a85e114000f669c2fcb49ad42376ac04'"
+  200
+  {
+      "2": {
+          "changesets": [],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      }
+  }
 
 Specifying a hidden changeset works
 
@@ -296,15 +567,18 @@ Specifying a hidden changeset works
   200
   {
       "2": {
-          "changesets": [
-              "ae13d9da6966307c98b60987fb4fedc2e2f29736",
-              "d313a202a85e114000f669c2fcb49ad42376ac04"
-          ],
+          "changesets": [],
           "date": \d+, (re)
           "user": "user@example.com"
       }
   }
 
   $ httpjson "http://localhost:$HGPORT/json-pushes?changeset=ae13d9da6966&full=1"
-  404
-  "hidden revision 'd313a202a85e114000f669c2fcb49ad42376ac04'"
+  200
+  {
+      "2": {
+          "changesets": [],
+          "date": \d+, (re)
+          "user": "user@example.com"
+      }
+  }

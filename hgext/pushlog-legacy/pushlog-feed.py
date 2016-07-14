@@ -17,6 +17,7 @@ from mercurial.hgweb.common import (
 from mercurial.node import hex, nullid
 from mercurial import (
     demandimport,
+    error,
     templatefilters,
 )
 
@@ -344,7 +345,12 @@ def pushlogFeed(web, req, tmpl):
 
     entries = data['entries']
     for id, user, date, node in query.entries:
-        ctx = web.repo[node]
+        try:
+            ctx = web.repo[node]
+        # Changeset is hidden.
+        except error.FilteredRepoLookupError:
+            pass
+
         entries.append({
             'node': node,
             'date': isotime(date),
@@ -414,7 +420,12 @@ def pushlogHTML(web, req, tmpl):
         for id, user, date, node in query.entries:
             if isinstance(node, unicode):
                 node = node.encode('utf-8')
-            ctx = web.repo[node]
+
+            try:
+                ctx = web.repo[node]
+            # Changeset is hidden.
+            except error.FilteredRepoLookupError:
+                continue
             n = ctx.node()
             entry = {"author": ctx.user(),
                      "desc": ctx.description(),
@@ -482,8 +493,13 @@ def pushes_worker(query, repo, full):
                 'changesets': [],
             }
 
-        if full:
+        try:
             ctx = repo[node]
+        # Changeset is hidden
+        except error.FilteredRepoLookupError:
+            continue
+
+        if full:
             node = {
                 'node': ctx.hex(),
                 'author': ctx.user(),
