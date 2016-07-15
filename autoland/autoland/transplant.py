@@ -158,13 +158,19 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
     if trysyntax:
         if not trysyntax.startswith("try: "):
             trysyntax = "try: %s" % trysyntax
-
-        cmds = [['--encoding=utf-8', '--config', 'ui.allowemptycommit=true', 'commit', '-m', trysyntax],
-                ['log', '-r', 'tip', '-T', '{node|short}'],
-                ['push', '-r', '.', '-f', 'try']]
+        cmds = [
+            [
+                '--encoding=utf-8',
+                '--config', 'ui.allowemptycommit=true',
+                'commit',
+                '-m', trysyntax
+            ],
+            ['log', '-r', 'tip', '-T', '{node|short}'],
+            ['push', '-r', '.', '-f', 'try']
+        ]
     elif push_bookmark:
-        cmds =  [['bookmark', push_bookmark],
-                 ['push', '-B', push_bookmark, destination]]
+        cmds = [['bookmark', push_bookmark],
+                ['push', '-B', push_bookmark, destination]]
     else:
         cmds = [['push', '-r', 'tip', destination]]
 
@@ -182,6 +188,5 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
         run_hg(['strip', '--no-backup', '-r', 'not public()'])
     except hglib.error.CommandError as e:
         pass
-
 
     return landed, result

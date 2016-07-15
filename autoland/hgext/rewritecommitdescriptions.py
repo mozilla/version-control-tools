@@ -2,7 +2,6 @@
 # GNU General Public License version 2 or any later version.
 import json
 import os
-import sys
 
 from mercurial import (context,
                        cmdutil,
@@ -32,7 +31,8 @@ def rewrite_commit_descriptions(ui, repo, node, descriptions=None):
     with open(descriptions, 'rb') as f:
         raw_descriptions = json.load(f)
         for k in raw_descriptions:
-            description_map[k[:12]] = encoding.tolocal(raw_descriptions[k].encode('utf-8'))
+            description_map[k[:12]] = encoding.tolocal(
+                raw_descriptions[k].encode('utf-8'))
 
     if not node:
         node = 'tip'
