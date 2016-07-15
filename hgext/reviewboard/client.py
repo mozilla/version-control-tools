@@ -1114,16 +1114,19 @@ def run_android_checkstyle(repo, nodes):
             # can ignore, but that would require us to chase a variety of
             # changing error messages. For simplicity, we only alert the user
             # if there is an actual style violation.
+            CHECKSTYLE_CMD_STR = '`./mach gradle checkstyle`'
             if 'Checkstyle rule violations were found' in e.output:
                 repo.ui.write('\n' + e.output +
                               'Android style violation:\n'
                               '    Please fix it before submitting your '
                               'changes for review.\n'
-                              '    To run checkstyle locally: '
-                              '`./mach gradle app:checkstyle`\n')
+                              '    To run checkstyle locally: ' +
+                              CHECKSTYLE_CMD_STR + '\n')
             else:
                 repo.ui.write(' failed (e.g. Java was not installed) - '
-                              'ignoring.\n')
+                              'ignoring.\n'
+                              '    To see full error output, run locally '
+                              'with: ' + CHECKSTYLE_CMD_STR + '\n')
 
 def is_firefox_repository(repo):
     "A hack to figure out if we're in a firefox repository."
