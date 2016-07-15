@@ -6,6 +6,7 @@
 
   $ hgmo create-repo users/user_example.com/repo-1 scm_level_1
   (recorded repository creation in replication log)
+
   $ hg -q clone ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
 
 Mark repo as non-publishing
@@ -247,6 +248,108 @@ Blowing away the repo on hgweb and re-cloning should retain pushlog and hidden c
   4:8713015ee6f2 3 user@example.com
   5:6ddbc9389e71 4 user@example.com
   6:042a67bdbae8 5 user@example.com
+
+  $ cd ..
+
+Create a repo that only has the createmarkers feature enabled
+
+  $ hgmo create-repo integration/autoland scm_level_1
+  (recorded repository creation in replication log)
+  $ hgmo exec hgssh /set-hgrc-option integration/autoland experimental evolution createmarkers
+  $ hgmo exec hgssh /set-hgrc-option integration/autoland phases publish false
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/integration/autoland replicatehgrc
+  recorded hgrc in replication log
+
+  $ hg -q clone ssh://$SSH_SERVER:$HGPORT/integration/autoland autoland
+  $ cd autoland
+  $ cat >> .hg/hgrc << EOF
+  > [experimental]
+  > evolution = all
+  > [extensions]
+  > rebase =
+  > EOF
+
+  $ touch foo
+  $ hg -q commit -A -m initial
+  $ hg -q push
+  $ touch file0
+  $ hg -q commit -A -m file0
+  $ hg -q push
+  $ hg -q up -r 0
+  $ touch file1
+  $ hg -q commit -A -m file1
+  $ hg -q push -f
+  $ hg rebase -s . -d 1
+  rebasing 2:5fb779ae39de "file1" (tip)
+
+Pushing should not send obsolescence markers because marker exchange isn't allowed
+and we're not in the allowed user list
+
+  $ hg push
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/integration/autoland
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 0 changes to 1 files
+  remote: recorded push in pushlog
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/integration/autoland/rev/d57129f00b2f
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
+
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/integration/autoland debugobsolete
+
+hgweb advertise marker exchange
+
+  $ http --no-headers "${HGWEB_0_URL}integration/autoland?cmd=capabilities"
+  200
+  
+  lookup changegroupsubset branchmap pushkey known getbundle unbundlehash batch stream bundle2=HG20%0Achangegroup%3D01%2C02%0Adigests%3Dmd5%2Csha1%2Csha512%0Aerror%3Dabort%2Cunsupportedcontent%2Cpushraced%2Cpushkey%0Ahgtagsfnodes%0Alistkeys%0Aobsmarkers%3DV0%2CV1%0Apushkey%0Aremote-changegroup%3Dhttp%2Chttps unbundle=HG10GZ,HG10BZ,HG10UN httpheader=6144 pushlog
+
+Allow this user to send obsolescence markers (since the per-repo hgrc will get replicated
+and take precedence on the mirror, we need to add the allowed user from the replication
+processes on both server and mirror)
+
+  $ hgmo exec hgssh /set-hgrc-option integration/autoland obshacks obsolescenceexchangeusers "user@example.com,vcs-sync@mozilla.com,hg"
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/integration/autoland replicatehgrc
+  recorded hgrc in replication log
+
+Pushing again should send obsolescence markers
+
+  $ hg rebase -s . -d 0
+  rebasing 3:d57129f00b2f "file1" (tip)
+  $ hg push -f
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/integration/autoland
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 0 changes to 1 files (+1 heads)
+  remote: recorded push in pushlog
+  remote: 2 new obsolescence markers
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/integration/autoland/rev/9e2d548e5f1f
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
+
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/integration/autoland debugobsolete
+  5fb779ae39de4af3229a53c35d46117e98fb5f83 d57129f00b2f329fc2cf3371a0c28796bcfbde1c 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  d57129f00b2f329fc2cf3371a0c28796bcfbde1c 9e2d548e5f1f94b9172cfeb77b53f5943722b594 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+
+And they should get replicated to mirrors
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/integration/autoland debugobsolete
+  5fb779ae39de4af3229a53c35d46117e98fb5f83 d57129f00b2f329fc2cf3371a0c28796bcfbde1c 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  d57129f00b2f329fc2cf3371a0c28796bcfbde1c 9e2d548e5f1f94b9172cfeb77b53f5943722b594 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+
+hgweb should still advertise marker exchange
+
+  $ http --no-headers "${HGWEB_0_URL}integration/autoland?cmd=capabilities"
+  200
+  
+  lookup changegroupsubset branchmap pushkey known getbundle unbundlehash batch stream bundle2=HG20%0Achangegroup%3D01%2C02%0Adigests%3Dmd5%2Csha1%2Csha512%0Aerror%3Dabort%2Cunsupportedcontent%2Cpushraced%2Cpushkey%0Ahgtagsfnodes%0Alistkeys%0Aobsmarkers%3DV0%2CV1%0Apushkey%0Aremote-changegroup%3Dhttp%2Chttps unbundle=HG10GZ,HG10BZ,HG10UN httpheader=6144 pushlog
 
   $ cd ..
 

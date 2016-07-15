@@ -44,6 +44,7 @@ highlight =
 clonebundles =
 
 bundleclone = /var/hg/version-control-tools/hgext/bundleclone
+obsolescencehacks = /var/hg/version-control-tools/hgext/obsolescencehacks
 pushlog-feed = /var/hg/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py
 pushlog = /var/hg/version-control-tools/hgext/pushlog
 buglink = /var/hg/version-control-tools/hgext/pushlog-legacy/buglink.py
@@ -59,6 +60,11 @@ bugzilla = s|((?:bug[\s#]*|b=#?|#)(\d{4,}))|<a href="https://bugzilla.mozilla.or
 
 [bundleclone]
 pullmanifest=True
+
+[obshacks]
+# Enable the user that runs hgweb and performs replication to exchange
+# obsolescence markers, even if not enabled for regular users.
+obsolescenceexchangeusers = hg
 
 [hgmo]
 mozbuildinfowrapper = /usr/bin/sudo /usr/local/bin/mozbuild-eval %repo%
