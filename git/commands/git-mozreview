@@ -171,8 +171,9 @@ def sendauthenticatedhttprequest(git_config, session, url, **kwargs):
 
 def get_output(args, cwd=None):
     try:
-        output = subprocess.check_output(args, stderr=subprocess.STDOUT,
-                                         cwd=cwd)
+        with open(os.devnull, 'w') as stderr:
+            output = subprocess.check_output(args, stderr=stderr,
+                                             cwd=cwd)
         return 0, output
     except subprocess.CalledProcessError as e:
         return e.returncode, e.output
