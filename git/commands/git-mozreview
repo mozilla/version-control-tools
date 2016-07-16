@@ -637,16 +637,18 @@ def configure_command(args):
             if res:
                 ui.warn('warning: error trying to resolve Mercurial changesets\n')
             else:
-                git_commits = output.strip().split()
-                for i, node in enumerate(git_commits):
-                    if node == b'0' * 40:
+                is_sha1 = re.compile('[0-9a-f]{40}$')
+                git_commits = (l.strip() for l in output.splitlines())
+                for node, hg_sha in zip(git_commits, hg_shas):
+                    if node == b'0' * 40 or not is_sha1.match(node.lower()):
                         continue
-                    remote_url = data[hg_shas[i]].split()[0]
+                    remote_url = data[hg_sha].split()[0]
                     remote_url = 'hg::%s' % remote_url
                     subprocess.check_call(['git', 'config', 'mozreview.remote',
                                            remote_url])
                     git_config['mozreview.remote'] = remote_url
                     ui.warn('using %s\n' % remote_url)
+                    break
         else:
             ui.warn('warning: unable to fetch list of review repos; '
                     'manual configuration of review remote will be required\n')
