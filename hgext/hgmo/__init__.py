@@ -400,7 +400,11 @@ def automationrelevancewebcommand(web, req, tmpl):
     ])
 
     csets = []
-    for ctx in repo.set('automationrelevant(%r)', req.form['node'][0]):
+    # Query an unfiltered repo because sometimes automation wants to run against
+    # changesets that have since become hidden. The response exposes whether the
+    # requested node is visible, so consumers can make intelligent decisions
+    # about what to do if the changeset isn't visible.
+    for ctx in repo.unfiltered().set('automationrelevant(%r)', req.form['node'][0]):
         entry = webutil.changelistentry(web, ctx, tmpl)
         # Some items in changelistentry are generators, which json.dumps()
         # can't handle. So we expand them.
