@@ -85,11 +85,9 @@ updating to it
   $ hg commit -m 'ambiguous branch'
   $ cd ..
 
-  $ hg robustcheckout http://localhost:$HGPORT/repo0 ambiguous --revision abcdef0123456
-  ensuring http://localhost:$HGPORT/repo0@abcdef0123456 is available at ambiguous
-  (sharing from existing pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
-  searching for changes
-  no changes found
+  $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision abcdef0123456
+  ensuring http://localhost:$HGPORT/repo0@abcdef0123456 is available at dest
+  (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   abort: --revision argument is ambiguous
   (must be the first 12+ characters of a SHA-1 fragment)
   [255]
