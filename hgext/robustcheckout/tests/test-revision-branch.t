@@ -91,3 +91,27 @@ updating to it
   abort: --revision argument is ambiguous
   (must be the first 12+ characters of a SHA-1 fragment)
   [255]
+
+Revision of branch from remote repo is used to resolve locally checkout out
+revision
+
+  $ cd dest
+  $ hg -q up -r 0
+  $ touch file0
+  $ hg -q commit -A -m 'default head 2'
+  $ cd ..
+
+  $ hg -R server/repo0 log -r default -T '{node}\n'
+  5d6cdc75a09bcccf76f9339a28e1d89360c59dce
+  $ hg -R dest log -r default -T '{node}\n'
+  6f89935a511842d2a7393cad33ef93bf793b1db2
+
+FIXME
+
+  $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --branch default
+  ensuring http://localhost:$HGPORT/repo0@default is available at dest
+  (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
+  (pulling to obtain default)
+  no changes found
+  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  updated to 6f89935a511842d2a7393cad33ef93bf793b1db2
