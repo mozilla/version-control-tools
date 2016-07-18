@@ -43,7 +43,8 @@ Specifying branch argument will checkout branch
   searching for changes
   no changes found
   (pulling to obtain default)
-  no changes found
+  (remote resolved default to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce; result is not deterministic)
+  (revision already present locally; not pulling)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
@@ -53,7 +54,8 @@ Specifying branch argument will always attempt to pull because branch revisions 
   ensuring http://localhost:$HGPORT/repo0@default is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (pulling to obtain default)
-  no changes found
+  (remote resolved default to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce; result is not deterministic)
+  (revision already present locally; not pulling)
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
@@ -63,7 +65,8 @@ Updating to another branch works
   ensuring http://localhost:$HGPORT/repo0@branch1 is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (pulling to obtain branch1)
-  no changes found
+  (remote resolved branch1 to aada1b3e573f7272bb2ef93b34acbf0f77c69d44; result is not deterministic)
+  (revision already present locally; not pulling)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to aada1b3e573f7272bb2ef93b34acbf0f77c69d44
 
@@ -106,12 +109,11 @@ revision
   $ hg -R dest log -r default -T '{node}\n'
   6f89935a511842d2a7393cad33ef93bf793b1db2
 
-FIXME
-
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --branch default
   ensuring http://localhost:$HGPORT/repo0@default is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (pulling to obtain default)
-  no changes found
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  updated to 6f89935a511842d2a7393cad33ef93bf793b1db2
+  (remote resolved default to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce; result is not deterministic)
+  (revision already present locally; not pulling)
+  1 files updated, 0 files merged, 1 files removed, 0 files unresolved
+  updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
