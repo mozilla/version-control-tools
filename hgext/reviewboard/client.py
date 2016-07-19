@@ -66,6 +66,7 @@ demandimport.enable()
 from hgrb.util import (
     addcommitid,
     ReviewID,
+    reencoderesponseinplace,
 )
 
 from mozautomation.commitparser import (
@@ -576,6 +577,11 @@ def doreview(repo, ui, remote, nodes):
 
     res = calljsoncommand(ui, remote, 'pushreview', data=req, httpcap='submithttp',
                           httpcommand='mozreviewsubmitseries')
+
+    # Re-encode all items in res from u'' to utf-8 byte str to avoid
+    # exceptions during str operations.
+    reencoderesponseinplace(res)
+
     if 'error' in res:
         raise error.Abort(res['error'])
 

@@ -154,3 +154,29 @@ def addcommitid(msg, repo=None, fakeidpath=None):
     lines.append('MozReview-Commit-ID: %s' % cid)
 
     return '\n'.join(lines), True
+
+def reencoderesponseinplace(response):
+    """
+    tuple is not handled by now.
+    """
+    def dicthandler(dictresponse):
+        for k, v in dictresponse.items():
+            nk = k.encode('utf-8') if isinstance(k, unicode) else k
+            dictresponse[nk] = dictresponse.pop(k)
+
+            if isinstance(v, unicode):
+                dictresponse[nk] = v.encode('utf-8')
+            else:
+                reencoderesponseinplace(v)
+
+    def listhandler(listresponse):
+        for idx in xrange(len(listresponse)):
+            if isinstance(listresponse[idx], unicode):
+                listresponse[idx] = listresponse[idx].encode('utf-8')
+            else:
+                reencoderesponseinplace(listresponse[idx])
+
+    if isinstance(response, dict):
+        dicthandler(response)
+    elif isinstance(response, list):
+        listhandler(response)
