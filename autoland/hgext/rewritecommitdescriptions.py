@@ -6,9 +6,9 @@ import os
 from mercurial import (context,
                        cmdutil,
                        encoding,
+                       error,
+                       extensions,
                        phases)
-
-from mercurial.i18n import _
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', '..', 'hgext', 'bootstrap.py'))
@@ -24,61 +24,62 @@ command = cmdutil.command(cmdtable)
 @command('rewritecommitdescriptions',
          [('', 'descriptions', '',
            'path to json file with new commit descriptions', 'string')],
-         _('hg rewritecommitdescriptions'))
-def rewrite_commit_descriptions(ui, repo, node, descriptions=None):
+         'hg rewritecommitdescriptions')
+def rewrite_commit_descriptions(ui, repo, base_node, descriptions=None):
 
+    def sha1_of(node):
+        return repo[node].hex()[:12]
+
+    # Rewriting fails if the evolve extension is enabled.
+    try:
+        extensions.find('evolve')
+        raise error.Abort('Cannot continue as the "evolve" extension is '
+                          'enabled.')
+    except KeyError:
+        pass
+
+    # Read commit descriptions map.
     description_map = {}
     with open(descriptions, 'rb') as f:
         raw_descriptions = json.load(f)
-        for k in raw_descriptions:
-            description_map[k[:12]] = encoding.tolocal(
-                raw_descriptions[k].encode('utf-8'))
+        for sha1 in raw_descriptions:
+            description_map[sha1[:12]] = encoding.tolocal(
+                raw_descriptions[sha1].encode('utf-8'))
 
-    if not node:
-        node = 'tip'
+    # Collect nodes listed by description_map.
+    nodes = []
 
-    ctx = repo[node]
-    nodes = [ctx.node()]
+    def add_node(ctx):
+        node = ctx.node()
+        if sha1_of(node) in description_map:
+            nodes.append(node)
+
+    ctx = repo[base_node]
+    add_node(ctx)
     for ancestor in ctx.ancestors():
-        ctx = repo[ancestor]
         if ctx.phase() != phases.draft:
             break
-        sha1 = repo[ctx.node()].hex()[:12]
-        if sha1 in description_map:
-            nodes.append(ctx.node())
+        add_node(repo[ancestor])
     nodes.reverse()
 
     if not nodes:
-        ui.write(_('no commits found to be rewritten\n'))
-        return 1
+        raise error.Abort('No commits found to be rewritten.')
 
-    oldest_relevant_commit = repo[nodes[0]].hex()[:12]
+    # We need to store the original sha1 values because we won't be able to
+    # look them up once they are rewritten.
+    original_sha1s = {}
+    for node in nodes:
+        original_sha1s[node] = sha1_of(node)
 
+    # Update changed nodes.
     def prune_unchanged(node):
-        sha1 = repo[node].hex()[:12]
-        description = repo[node].description()
-        revised_description = description_map.get(sha1, description)
-        if description == revised_description:
-            ui.write(_('not rewriting %s - description unchanged\n' % sha1))
-            return False
-        return True
+        return repo[node].description() != description_map[sha1_of(node)]
 
-    nodes = filter(prune_unchanged, nodes)
-    if not nodes:
-        ui.write(_('no commits found to be rewritten\n'))
-        # in this case, we need to output the sha1 of the oldest commit
-        # present in commit descriptions
-        ui.write('base: ' + oldest_relevant_commit + '\n')
-        return 0
-
-    def createfn(repo, ctx, revmap, filectxfn):
+    def create_func(repo, ctx, revmap, filectxfn):
         parents = rewrite.newparents(repo, ctx, revmap)
 
         sha1 = ctx.hex()[:12]
-        if sha1 in description_map:
-            description = description_map[sha1]
-        else:
-            description = ctx.description()
+        description = description_map[sha1]
 
         memctx = context.memctx(repo, parents, description,
                                 ctx.files(), filectxfn, user=ctx.user(),
@@ -90,7 +91,16 @@ def rewrite_commit_descriptions(ui, repo, node, descriptions=None):
 
         return memctx
 
-    # we output the sha1 of the oldest modified commit
-    nodemap = rewrite.replacechangesets(repo, nodes, createfn)
-    ui.write('base: ' + repo[nodemap[nodes[0]]].hex()[:12] + '\n')
-    return 0
+    node_map = {}
+    changed_nodes = filter(prune_unchanged, nodes)
+    if changed_nodes:
+        node_map = rewrite.replacechangesets(repo, changed_nodes, create_func)
+
+    # Output result.
+    for node in nodes:
+        original_sha1 = original_sha1s[node]
+        if node in node_map:
+            new_sha1 = sha1_of(node_map[node])
+        else:
+            new_sha1 = original_sha1s[node]
+        ui.write('rev: %s -> %s\n' % (original_sha1, new_sha1))

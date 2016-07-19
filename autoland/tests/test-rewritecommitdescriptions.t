@@ -26,9 +26,8 @@ We handle having no commits which match commit_descriptions properly
   > {"42": "non-existent commit"}
   > EOF
   $ hg rewritecommitdescriptions --descriptions descriptions.json .
-  not rewriting 10f03055d22c - description unchanged
-  no commits found to be rewritten
-  base: 10f03055d22c
+  abort: No commits found to be rewritten.
+  [255]
   $ hg --encoding utf-8 log
   changeset:   2:10f03055d22c
   tag:         tip
@@ -53,9 +52,7 @@ We handle having no commits to rewrite properly
   > {"$REV": "bug 1 - more stuff"}
   > EOF
   $ hg rewritecommitdescriptions --descriptions descriptions.json .
-  not rewriting 10f03055d22c - description unchanged
-  no commits found to be rewritten
-  base: 10f03055d22c
+  rev: 10f03055d22c -> 10f03055d22c
   $ hg --encoding utf-8 log
   changeset:   2:10f03055d22c
   tag:         tip
@@ -81,7 +78,8 @@ We handle unicode commit descriptions properly
   > EOF
   $ hg rewritecommitdescriptions --descriptions descriptions.json .
   saved backup bundle to $TESTTMP/clone/.hg/strip-backup/10f03055d22c-f5e0148f-replacing.hg (glob)
-  base: a1dea3050632
+  rev: 599eee383634 -> a1dea3050632
+  rev: 10f03055d22c -> 99d16379ed19
 
   $ hg --encoding utf-8 log
   changeset:   2:99d16379ed19
@@ -109,7 +107,7 @@ We handle long sha1s properly
   > EOF
   $ hg rewritecommitdescriptions --descriptions descriptions.json .
   saved backup bundle to $TESTTMP/clone/.hg/strip-backup/99d16379ed19-6e1da412-replacing.hg (glob)
-  base: 2c6f2ddf672a
+  rev: 99d16379ed19 -> 2c6f2ddf672a
 
   $ hg --encoding utf-8 log
   changeset:   2:2c6f2ddf672a

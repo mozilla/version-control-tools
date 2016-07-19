@@ -104,16 +104,20 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
             try:
                 cmd = ['rewritecommitdescriptions',
                        '--descriptions=%s' % f.name, rev]
-                base_revision = run_hg(cmd)
+                cmd_output = run_hg(cmd)
             except hglib.error.CommandError as e:
-                return False, formulate_hg_error(['hg'] + cmd, base_revision)
+                return False, formulate_hg_error(['hg'] + cmd, cmd_output)
 
-        m = re.search(r'base: ([0-9a-z]+)$', base_revision)
-        if not m or not m.groups():
+        for line in cmd_output.splitlines():
+            m = re.search(r'^rev: [0-9a-z]+ -> ([0-9a-z]+)', line)
+            if m and m.groups():
+                base_revision = m.groups()[0]
+                break
+
+        if not base_revision:
             return False, ('Could not determine base revision for rebase: ' +
-                           base_revision)
+                           cmd_output)
 
-        base_revision = m.groups()[0]
         logger.info('base revision: %s' % base_revision)
 
     if not trysyntax and not base_revision:
