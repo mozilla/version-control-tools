@@ -89,7 +89,7 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
   patchutils perlmagick pkg-config python3-mysql.connector \
   python-psutil supervisor unzip wget
 
-RUN git clone --depth 1 https://git.mozilla.org/webtools/bmo/bugzilla.git $BUGZILLA_HOME/bugzilla
+RUN git clone --depth 1 https://github.com/mozilla-bteam/bmo.git $BUGZILLA_HOME/bugzilla
 
 # cpanm has problems with some packages. Install them from the OS.
 RUN apt-get -y install \
