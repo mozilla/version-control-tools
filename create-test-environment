@@ -221,16 +221,20 @@ fi
 
 git -C venv/git-cinnabar pull
 
-echo ""
-echo "Building Docker images."
-echo "This could take a while and may consume a lot of internet bandwidth."
-echo "If you don't want Docker images, it is safe to hit CTRL+c to abort this."
+if [ -z "${NO_DOCKER}" ]; then
+  echo ""
+  echo "Building Docker images."
+  echo "This could take a while and may consume a lot of internet bandwidth."
+  echo "If you don't want Docker images, it is safe to hit CTRL+c to abort this."
 
-./d0cker build-all $FORKS || {
-  echo "You will not be able to run tests that require Docker.";
-  echo "Please see https://docs.docker.com/installation/ for how to install Docker.";
-  echo "When Docker is installed, re-run this script";
-  exit 1
-}
+  ./d0cker build-all $FORKS || {
+    echo "You will not be able to run tests that require Docker.";
+    echo "Please see https://docs.docker.com/installation/ for how to install Docker.";
+    echo "When Docker is installed, re-run this script";
+    exit 1
+  }
+else
+  echo "Not building Docker images because NO_DOCKER is set."
+fi
 
 echo finished creating test environment
