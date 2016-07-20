@@ -126,3 +126,33 @@ We handle long sha1s properly
   date:        Thu Jan 01 00:00:00 1970 +0000
   summary:     root commit
   
+We handle partial rewrites properly
+
+  $ cat > descriptions.json <<EOF
+  > {
+  > "a1dea3050632": "bug 1 - stuff++",
+  > "2c6f2ddf672a": "bug 1 - partial rewrite is ok"
+  > }
+  > EOF
+  $ hg rewritecommitdescriptions --descriptions descriptions.json .
+  saved backup bundle to $TESTTMP/clone/.hg/strip-backup/2c6f2ddf672a-c8370839-replacing.hg (glob)
+  rev: a1dea3050632 -> a1dea3050632
+  rev: 2c6f2ddf672a -> 515eca0c4333
+
+  $ hg --encoding utf-8 log
+  changeset:   2:515eca0c4333
+  tag:         tip
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     bug 1 - partial rewrite is ok
+  
+  changeset:   1:a1dea3050632
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     bug 1 - stuff++
+  
+  changeset:   0:3a9f6899ef84
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     root commit
+  
