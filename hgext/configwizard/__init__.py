@@ -658,11 +658,9 @@ def _checkfsmonitor(ui, cw, hgversion):
         return
 
     if ui.hasconfig('extensions', 'fsmonitor'):
-        try:
-            del cw.c['extensions']['hgwatchman']
+        ext = cw.c['extensions']
+        if any([ext.pop('hgwatchman', False), ext.pop('watchman', False)]):
             ui.write('Removing extensions.hgwatchman because fsmonitor is installed\n')
-        except KeyError:
-            pass
 
         return
 
