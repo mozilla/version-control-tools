@@ -97,9 +97,7 @@ AccessFileName .htaccess
 
 TypesConfig /etc/mime.types
 DefaultType text/plain
-<IfModule mod_mime_magic.c>
-    MIMEMagicFile conf/magic
-</IfModule>
+MIMEMagicFile conf/magic
 
 HostnameLookups Off
 
@@ -201,21 +199,16 @@ AddHandler type-map var
 
 Alias /error/ "/var/www/error/"
 
-<IfModule mod_negotiation.c>
-<IfModule mod_include.c>
-    <Directory "/var/www/error">
-        AllowOverride None
-        Options IncludesNoExec
-        AddOutputFilter Includes html
-        AddHandler type-map var
-        Order allow,deny
-        Allow from all
-        LanguagePriority en es de fr
-        ForceLanguagePriority Prefer Fallback
-    </Directory>
-
-</IfModule>
-</IfModule>
+<Directory "/var/www/error">
+    AllowOverride None
+    Options IncludesNoExec
+    AddOutputFilter Includes html
+    AddHandler type-map var
+    Order allow,deny
+    Allow from all
+    LanguagePriority en es de fr
+    ForceLanguagePriority Prefer Fallback
+</Directory>
 
 BrowserMatch "Mozilla/2" nokeepalive
 BrowserMatch "MSIE 4\.0b2;" nokeepalive downgrade-1.0 force-response-1.0
