@@ -101,9 +101,6 @@ class CommitsListField(CommitDataBackedField):
     def should_render(self, value):
         return is_pushed(self.review_request_details)
 
-    def get_change_entry_sections_html(self, info):
-        return []
-
     def as_html(self):
         user = self.request.user
         parent = get_parent_rr(self.review_request_details.get_review_request())
@@ -140,6 +137,29 @@ class CommitsListField(CommitDataBackedField):
             'latest_autoland_requests': latest_autoland_requests,
             'user': user
         }))
+
+    def render_change_entry_html(self, info):
+        old_value = json.loads(info.get('old', ['[]'])[0])
+        old_commits = [c for c, r in old_value]
+
+        new_value = json.loads(info.get('new', ['[]'])[0])
+        new_commits = [c for c, r in new_value]
+
+        # Pad the commit lists so they're equal in length.
+        max_len = max(len(old_commits), len(new_commits))
+        old_commits += [''] * (max_len - len(old_commits))
+        new_commits += [''] * (max_len - len(new_commits))
+
+        commit_changes = zip(old_commits, new_commits)
+
+        review_request = self.review_request_details.get_review_request()
+
+        return get_template('mozreview/commits_changedescription.html').render(
+            Context({
+                'commit_changes': commit_changes,
+                'review_request': review_request,
+                'repository_path': review_request.repository.path
+            }))
 
 
 class ImportCommitField(BaseReviewRequestField):

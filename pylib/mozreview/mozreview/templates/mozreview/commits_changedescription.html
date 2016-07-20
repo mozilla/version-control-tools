@@ -1,0 +1,35 @@
+{% comment %}
+This is the template for changes to the "Commits" list displayed in a
+changedescription.
+{% endcomment %}
+
+{% load i18n %}
+{% load djblets_utils %}
+{% load mozreview %}
+
+<table class="changed">
+  <thead>
+    <tr>
+      <th class="old-commits">{% trans "Old Commits" %}</th>
+      <th class="new-commits">{% trans "New Commits" %}</th>
+    </tr>
+  </thead>
+  {% for old_commit, new_commit in commit_changes %}
+  <tr>
+    <td class="old-value">
+      {% if old_commit %}
+      <a href="{{repository_path}}/rev/{{old_commit|slice:":12"}}">
+        {{old_commit|slice:":12"}}
+      </a>
+      {% endif %}
+    </td>
+    <td class="new-value">
+      {% if new_commit %}
+      <a href="{{repository_path}}/rev/{{new_commit|slice:":12"}}">
+        {{new_commit|slice:":12"}}
+      </a>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
