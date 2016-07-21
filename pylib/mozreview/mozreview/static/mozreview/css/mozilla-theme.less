@@ -118,3 +118,179 @@ body {
   padding: 3px 6px;
   border-color: #bbb;
 }
+
+/* Diff Tables and Data Grids */
+#page-container {
+  #page_sidebar {
+    .page-sidebar-items {
+      li.has-url {
+        &:hover {
+          .page-sidebar-row {
+            .border-radius(0);
+            background: @light-white;
+            border-color: transparent !important;
+          }
+        }
+      }
+
+      li.active {
+        .page-sidebar-row {
+          .border-radius(0);
+          border: 0 !important;
+        }
+      }
+
+      li.active.has-url {
+        &:hover {
+          .page-sidebar-row {
+            border: 0 !important;
+          }
+        }
+      }
+
+      li {
+        .page-sidebar-row {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .datagrid-header {
+    background: @moz-blue-dark;
+  }
+}
+
+body.datagrid-page {
+  #page-container {
+    .datagrid-main {
+      .border-radius(0);
+      border: 0 !important;
+    }
+
+    .datagrid-head {
+      .border-radius(0);
+      border-bottom: 0;
+    }
+
+    .datagrid-body {
+      .datagrid-headers {
+        .border-radius(0);
+        border-bottom: 0;
+      }
+    }
+
+    .datagrid-header {
+      &:first-child {
+        border-top-left-radius: 0;
+      }
+      &:last-child {
+        border-top-right-radius: 0;
+      }
+    }
+
+    .datagrid {
+      tbody {
+        td {
+          padding: 10px;
+        }
+        th {
+          padding: 10px;
+        }
+        tr {
+          &:hover {
+            background: @moz-blue-light;
+          }
+        }
+      }
+    }
+
+    .datagrid-wrapper {
+      .datagrid-titlebox {
+        margin-left: 0;
+      }
+    }
+
+
+    .datagrid-title-tabs .datagrid-tab {
+      border: 0;
+
+      &.active {
+        background: @moz-blue-dark;
+      }
+
+      &:first-child {
+        border-top-left-radius: 0;
+      }
+
+      &:last-child {
+        border-top-right-radius: 0;
+      }
+    }
+  }
+}
+
+.datagrid-header-drag.datagrid-header {
+  background: @moz-blue-dark;
+}
+
+.datagrid tr.datagrid-empty-row {
+  visibility: hidden;
+}
+
+.datagrid-titlebox ul li a, a.markdown-info {
+  color: #777;
+}
+
+.datagrid-header {
+  padding: 10px;
+}
+
+#view_controls {
+  font-size: 12px;
+}
+
+.review-request #review_request_details {
+  border-left: 1px solid @moz-blue-light;
+  padding: 0 20px;
+}
+
+/* Diffs in Reviews */
+#diffs .diff-box {
+  .border-radius(0);
+  border: 0;
+}
+
+.sidebyside thead {
+  .filename-row th {
+    background: @moz-blue-dark;
+  }
+
+  .revision-row th .rb-icon {
+    vertical-align: sub;
+  }
+}
+
+/* Dialogs */
+.modalbox-inner, .modalbox-title, .modalbox {
+  background-image: none;
+  .border-radius(0);
+}
+
+.modalbox-title {
+  background: @moz-blue-dark;
+  border-bottom-color: #888a85;
+}
+
+.modalbox-inner {
+  background: @moz-blue-light;
+}
+
+.modalbox-bg {
+  background: @light-white !important; /* overriding JS */
+}
+
+/* Comment Dialogs */
+.comment-dlg {
+  .border-radius(0);
+}
