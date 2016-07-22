@@ -42,7 +42,7 @@ def get_ldap_connection():
     return c
 
 
-def query_scm_group(username, group):
+def query_scm_group(username, group, ldap_connection=None):
     """Return true if the user is a member of the scm group.
 
     For scm_* groups, the ldap users mail attribute is added
@@ -51,14 +51,15 @@ def query_scm_group(username, group):
     We are cautious and will return false in cases where we
     failed to actually query ldap for the group membership.
     """
-    l = get_ldap_connection()
 
-    if not l:
+    ldap_connection = ldap_connection or get_ldap_connection()
+    if not ldap_connection:
         return False
 
     try:
-        l.search('dc=mozilla', ldap.SCOPE_SUBTREE, filterstr='cn=%s' % group)
-        result = l.result(timeout=LDAP_QUERY_TIMEOUT)
+        ldap_connection.search('dc=mozilla', ldap.SCOPE_SUBTREE,
+                               filterstr='cn=%s' % group)
+        result = ldap_connection.result(timeout=LDAP_QUERY_TIMEOUT)
 
         # The memberUid attribute will only exist if there is
         # at least one member of the group.
