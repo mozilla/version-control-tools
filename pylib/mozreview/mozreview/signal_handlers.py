@@ -653,14 +653,19 @@ def on_review_publishing(user, review, **kwargs):
     b = Bugzilla(get_bugzilla_api_key(user))
 
     if is_parent(review_request):
-        # Mirror the comment to the bug, unless it's a ship-it or the review
-        # flag was set, in which case throw an error.
-        # Ship-its and review flags are allowed only on child commits.
+        # We only support raw comments on parent review requests to prevent
+        # confusion.  If the ship-it flag or the review flag was set, throw
+        # an error.
+        # Otherwise, mirror the comment over, associating it with the first
+        # commit.
         if review.ship_it or review.extra_data.get(REVIEW_FLAG_KEY):
             raise ParentShipItError
 
-        [b.post_comment(int(bug_id), comment) for bug_id in
-         review_request.get_bug_list()]
+        # TODO: If we ever allow multiple bugs in a single series, and we want
+        # to continue to allow comments on parents, we'll have to pick one
+        # child for each unique bug.
+        first_child = list(gen_child_rrs(review_request))[0]
+        b.post_comment(int(first_child.get_bug_list()[0]), comment)
     else:
         diff_url = get_diff_url(review_request)
         bug_id = int(review_request.get_bug_list()[0])
