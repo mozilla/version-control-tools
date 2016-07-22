@@ -187,7 +187,7 @@ class pushlog(object):
         # greater than the repo's.
         self.repo = repo
 
-    def _getconn(self, readonly=False):
+    def _getconn(self, readonly=False, tr=None):
         """Get a SQLite connection to the pushlog.
 
         In normal operation, this will return a ``sqlite3.Connection``.
@@ -198,6 +198,11 @@ class pushlog(object):
         If ``readonly`` is truthy, ``None`` will be returned if the database
         file does not exist. This gives read-only consumers the opportunity to
         short-circuit if no data is available.
+
+        If ``tr`` is specified, it is a Mercurial transaction instance that
+        this connection will be tied to. The connection will be committed and
+        closed when the transaction is committed. The connection will roll back
+        and be closed if the transaction is aborted.
         """
         path = self.repo.vfs.join('pushlog2.db')
         create = False
@@ -213,6 +218,30 @@ class pushlog(object):
                 "SELECT COUNT(*) FROM SQLITE_MASTER WHERE name='pushlog'")
             if res.fetchone()[0] != 1:
                 create = True
+
+        # WARNING low-level hacks applied.
+        #
+        # The active transaction object provides various instance-specific
+        # internal callbacks. When we run, the transaction object comes from
+        # localrepository.transaction().
+        #
+        # The code here essentially ties transaction close/commit to DB
+        # commit + close and transaction abort/rollback to DB close.
+        # If the database is closed without a commit, the active database
+        # transaction (our changes) will be rolled back.
+
+        def onpostclose(tr):
+            conn.commit()
+            conn.close()
+
+        def onabort(tr):
+            if tr:
+                tr.report('rolling back pushlog\n')
+            conn.close()
+
+        if tr:
+            tr.addpostclose('pushlog', onpostclose)
+            tr.addabort('pushlog', onabort)
 
         if create:
             for sql in SCHEMA:
@@ -249,31 +278,7 @@ class pushlog(object):
         # UnicodeDecodeError.
         user.decode('utf-8', 'strict')
 
-        # WARNING low-level hacks applied.
-        #
-        # The active transaction object provides various instance-specific internal
-        # callbacks. When we run, the transaction object comes from
-        # localrepository.transaction().
-        #
-        # The code here essentially wraps transaction close/commit to DB
-        # commit + close and transaction abort/rollback to DB close.
-        # If the database is closed without a commit, the active database
-        # transaction (our inserts) will be rolled back.
-        tr = self.repo._transref()
-        c = self._getconn()
-
-        def onpostclose(tr):
-            c.commit()
-            c.close()
-
-        def onabort(tr):
-            # Only false when called from commit() below.
-            if tr:
-                tr.report('rolling back pushlog\n')
-            c.close()
-
-        tr.addpostclose('pushlog', onpostclose)
-        tr.addabort('pushlog', onabort)
+        c = self._getconn(tr=self.repo._transref())
 
         # Now that the hooks are installed, any exceptions will result in db
         # close via one of our abort handlers.
