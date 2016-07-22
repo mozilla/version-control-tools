@@ -436,10 +436,10 @@ def unifyrepo(ui, settings):
                           hint='is the pushlog extension loaded?')
 
     with destrepo.lock():
-        with destrepo.transaction('pushlog'):
+        with destrepo.transaction('pushlog') as tr:
             insertpushes = list(newpushes(destrepo, unifiedpushes))
             ui.write('inserting %d pushlog entries\n' % len(insertpushes))
-            pushlog.recordpushes(insertpushes)
+            pushlog.recordpushes(insertpushes, tr=tr)
 
     # Verify that pushlog time in revision order is always increasing.
     destnodepushtime = {}

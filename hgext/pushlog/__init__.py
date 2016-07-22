@@ -139,7 +139,7 @@ def exchangepullpushlog(orig, pullop):
 
         pushes.append((int(pushid), who, int(when), nodes))
 
-    repo.pushlog.recordpushes(pushes)
+    repo.pushlog.recordpushes(pushes, tr=pullop.trmanager.transaction())
     repo.ui.status('added %d pushes\n' % len(pushes))
 
     return res
@@ -286,7 +286,7 @@ class pushlog(object):
             c.execute('INSERT INTO changesets (pushid, rev, node) '
                     'VALUES (?, ?, ?)', (pushid, rev, node))
 
-    def recordpushes(self, pushes):
+    def recordpushes(self, pushes, tr):
         """Record multiple pushes.
 
         This is effectively a version of ``recordpush()`` that accepts multiple
@@ -298,25 +298,27 @@ class pushlog(object):
 
         Where ``nodes`` is an iterable of changeset identifiers (both bin and
         hex forms are accepted).
+
+        The ``tr`` argument defines a Mercurial transaction to tie this
+        operation to.
         """
-        with self.conn() as c:
-            for pushid, user, when, nodes in pushes:
-                if not isinstance(user, str):
-                    raise TypeError('Expected a str user. Got %s' % str(type(user)))
+        c = self._getconn(tr=tr)
 
-                user.decode('utf-8', 'strict')
+        for pushid, user, when, nodes in pushes:
+            if not isinstance(user, str):
+                raise TypeError('Expected a str user. Got %s' % str(type(user)))
 
-                c.execute('INSERT INTO pushlog (id, user, date) VALUES (?, ?, ?)',
-                    (pushid, user, when))
-                for n in nodes:
-                    ctx = self.repo[n]
-                    rev = ctx.rev()
-                    node = ctx.hex()
+            user.decode('utf-8', 'strict')
 
-                    c.execute('INSERT INTO changesets (pushid, rev, node) '
-                        'VALUES (?, ?, ?)', (pushid, rev, node))
+            c.execute('INSERT INTO pushlog (id, user, date) VALUES (?, ?, ?)',
+                (pushid, user, when))
+            for n in nodes:
+                ctx = self.repo[n]
+                rev = ctx.rev()
+                node = ctx.hex()
 
-            c.commit()
+                c.execute('INSERT INTO changesets (pushid, rev, node) '
+                    'VALUES (?, ?, ?)', (pushid, rev, node))
 
     def lastpushid(self):
         """Obtain the integer pushid of the last known push."""
