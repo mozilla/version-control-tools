@@ -145,12 +145,6 @@ def exchangepullpushlog(orig, pullop):
     return res
 
 
-def playback(orig, journal, report, *args, **kwargs):
-    report('rolling back pushlog\n')
-
-    return orig(journal, report, *args, **kwargs)
-
-
 def addpushmetadata(repo, ctx, d):
     if not hasattr(repo, 'pushlog'):
         return
@@ -679,10 +673,6 @@ def verifypushlog(ui, repo):
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
-
-    # Only for <3.3 support.
-    if not hasattr(transaction.transaction, 'addpostclose'):
-        extensions.wrapfunction(transaction, '_playback', playback)
 
     revset.symbols['pushhead'] = revset_pushhead
     revset.symbols['pushdate'] = revset_pushdate
