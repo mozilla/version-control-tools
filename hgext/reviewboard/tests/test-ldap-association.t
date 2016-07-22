@@ -321,10 +321,13 @@ Create two users with the same Bugzilla address
   $ mozreview create-user conflict@example.com conflictpassword 'Conflict [:conflict]' --uid 2006 --scm-level 1
   Created user 12
 
-Dump the users so they are mirrored over to Review Board
+Dump the users so they are mirrored over to Review Board, then delete the
+associations this created.
 
   $ rbmanage dump-user user6 > /dev/null
+  $ rbmanage associate-ldap-user user6 none > /dev/null
   $ rbmanage dump-user conflict > /dev/null
+  $ rbmanage associate-ldap-user conflict none > /dev/null
 
 Trigger automatic association and check the logs
 
@@ -332,6 +335,19 @@ Trigger automatic association and check the logs
   LDAP association failed.
   $ mozreview exec rbweb grep -i ldap /reviewboard/logs/reviewboard.log | tail -n 1
   ????-??-?? ??:??:??,??? - INFO -  - Could not update ldap association: More than one match for conflict@example.com (glob)
+
+Ensure automatic association doesn't overwrite existing valid associations.
+
+  $ mozreview create-user user7@example.com user7password 'User Seven [:user7]'
+  Created user 13
+  $ mozreview create-ldap-user uSeven@example.org uSeven 2007 'User Seven' --scm-level 1
+  $ rbmanage dump-user user7 > /dev/null
+  $ rbmanage associate-ldap-user user7 uSeven@example.org
+  uSeven@example.org associated with user7
+  $ rbmanage associate-employee-ldap --email user7@example.com
+  user7@example.com already associated with uSeven@example.org
+  $ mozreview exec rbweb grep -i ldap /reviewboard/logs/reviewboard.log | tail -n 1
+  ????-??-?? ??:??:??,??? - INFO -  - Associating user: user7@example.com already associated with ldap_username: uSeven@example.org (glob)
 
 Cleanup
 

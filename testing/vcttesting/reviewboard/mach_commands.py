@@ -613,9 +613,10 @@ class ReviewBoardCommands(object):
             print('no ldap username associated with %s' % username)
 
     @Command('associate-ldap-user', category='reviewboard',
-        description='Associate an LDAP email address with a user.')
+             description='Associate an LDAP email address with a user.')
     @CommandArgument('username', help='Username to associate with ldap')
-    @CommandArgument('email', help='LDAP email to associate')
+    @CommandArgument('email',
+                     help='LDAP email to associate, or "none" to clear')
     @CommandArgument('--request-username',
                      default='mozreview',
                      help='Username to make request with')
@@ -638,15 +639,21 @@ class ReviewBoardCommands(object):
         ext = root.get_extension(
             extension_name='mozreview.extension.MozReviewExtension')
 
+        if email == "none":
+            email = None
+
         try:
             association = ext.get_ldap_associations().get_item(username)
             association.update(ldap_username=email)
         except APIError as e:
             print('API Error: %s: %s: %s' % (e.http_status, e.error_code,
-                e.rsp['err']['msg']))
+                  e.rsp['err']['msg']))
             return 1
 
-        print('%s associated with %s' % (email, username))
+        if email is None:
+            print('association for %s cleared' % email)
+        else:
+            print('%s associated with %s' % (email, username))
 
     @Command('associate-employee-ldap', category='reviewboard',
              description='Associate LDAP for Mozilla employees.')
