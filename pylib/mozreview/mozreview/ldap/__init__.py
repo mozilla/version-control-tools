@@ -143,6 +143,13 @@ def associate_employee_ldap(user, ldap_connection=None):
     """
 
     from mozreview.models import get_profile
+    mozreview_profile = get_profile(user)
+
+    # Don't overwrite existing and valid associations.
+    if mozreview_profile.ldap_username and user_exists(
+            mozreview_profile.ldap_username, ldap_connection):
+        return mozreview_profile.ldap_username, False
+
     ldap_users = find_employee_ldap(user.email, ldap_connection)
 
     if not ldap_users:
@@ -155,7 +162,6 @@ def associate_employee_ldap(user, ldap_connection=None):
 
     ldap_username = ldap_users[0]
     updated = False
-    mozreview_profile = get_profile(user)
     if mozreview_profile.ldap_username != ldap_username:
         if mozreview_profile.ldap_username:
             logging.info("Existing ldap association '%s' replaced by '%s'"
