@@ -88,6 +88,7 @@ from mozreview.models import (
     get_bugzilla_api_key,
 )
 from mozreview.rb_utils import (
+    get_diff_url,
     get_obj_url,
 )
 from mozreview.review_helpers import (
@@ -545,9 +546,9 @@ def on_review_request_closed_discarded(user, review_request, type, **kwargs):
         # commit review requests.
         b = Bugzilla(get_bugzilla_api_key(user))
         bug = int(review_request.get_bug_list()[0])
-        diff_url = '%sdiff/#index_header' % get_obj_url(review_request)
         attachment_updates = BugzillaAttachmentUpdates(b, bug)
-        attachment_updates.obsolete_review_attachments(diff_url)
+        attachment_updates.obsolete_review_attachments(
+            get_diff_url(review_request))
         attachment_updates.do_updates()
 
 
@@ -661,7 +662,7 @@ def on_review_publishing(user, review, **kwargs):
         [b.post_comment(int(bug_id), comment) for bug_id in
          review_request.get_bug_list()]
     else:
-        diff_url = '%sdiff/#index_header' % get_obj_url(review_request)
+        diff_url = get_diff_url(review_request)
         bug_id = int(review_request.get_bug_list()[0])
 
         commented = False

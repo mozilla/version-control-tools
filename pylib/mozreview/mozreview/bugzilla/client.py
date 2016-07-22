@@ -15,7 +15,11 @@ from djblets.util.decorators import simple_decorator
 from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
 from mozreview.bugzilla.models import get_or_create_bugzilla_users
 from mozreview.bugzilla.transports import bugzilla_transport
-from mozreview.rb_utils import get_obj_url
+from mozreview.rb_utils import (
+    get_diff_url,
+    get_diff_url_from_rr_url,
+    get_obj_url,
+)
 
 from mozautomation.commitparser import (
     replace_reviewers,
@@ -98,7 +102,7 @@ class BugzillaAttachmentUpdates(object):
                     (review_request.id, self.bug_id))
 
         rr_url = get_obj_url(review_request)
-        diff_url = self._get_diff_url(review_request)
+        diff_url = get_diff_url(review_request)
 
         # Build the comment.  Only post a comment if the diffset has
         # actually changed.
@@ -212,7 +216,7 @@ class BugzillaAttachmentUpdates(object):
         review request.
         """
         self._update_attachments()
-        url = self._get_diff_url(review_request)
+        url = get_diff_url(review_request)
 
         for a in self.attachments:
             # Make sure we check for old-style URLs as well.
@@ -226,9 +230,6 @@ class BugzillaAttachmentUpdates(object):
     def _update_attachments(self):
         if not self.attachments:
             self.attachments = self.bugzilla.get_rb_attachments(self.bug_id)
-
-    def _get_diff_url(self, review_request):
-        return '%sdiff/#index_header' % get_obj_url(review_request)
 
 
 class Bugzilla(object):
@@ -378,7 +379,7 @@ class Bugzilla(object):
     def _rb_attach_url_matches(self, attach_url, rb_url):
         # Make sure we check for old-style URLs as well.
         return (attach_url == rb_url or
-                '%sdiff/#index_header' % attach_url == rb_url)
+                get_diff_url_from_rr_url(attach_url) == rb_url)
 
     def _get_review_request_attachment(self, bug_id, rb_url):
         """Obtain a Bugzilla attachment for a review request."""

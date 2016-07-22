@@ -23,3 +23,11 @@ def get_obj_url(obj, site=None, siteconfig=None):
         siteconfig.get('site_domain_method'), site.domain,
         local_site_reverse('root').rstrip('/'),
         obj.get_absolute_url())
+
+
+def get_diff_url_from_rr_url(rr_url):
+    return '%sdiff/#index_header' % rr_url
+
+
+def get_diff_url(review_request):
+    return get_diff_url_from_rr_url(get_obj_url(review_request))
