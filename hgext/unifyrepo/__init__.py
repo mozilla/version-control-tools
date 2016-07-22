@@ -435,9 +435,11 @@ def unifyrepo(ui, settings):
         raise error.Abort('pushlog API not available',
                           hint='is the pushlog extension loaded?')
 
-    insertpushes = list(newpushes(destrepo, unifiedpushes))
-    ui.write('inserting %d pushlog entries\n' % len(insertpushes))
-    pushlog.recordpushes(insertpushes)
+    with destrepo.lock():
+        with destrepo.transaction('pushlog'):
+            insertpushes = list(newpushes(destrepo, unifiedpushes))
+            ui.write('inserting %d pushlog entries\n' % len(insertpushes))
+            pushlog.recordpushes(insertpushes)
 
     # Verify that pushlog time in revision order is always increasing.
     destnodepushtime = {}
