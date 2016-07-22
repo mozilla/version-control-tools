@@ -246,6 +246,8 @@ class Bugzilla(object):
 
     user_fields = ['id', 'email', 'real_name', 'can_login']
     review_request_comment_tag = 'mozreview-request'
+    review_comment_tag = 'mozreview-review'
+    review_reply_comment_tag = 'mozreview-review-reply'
 
     def __init__(self, api_key=None, xmlrpc_url=None):
         self.api_key = api_key
@@ -338,13 +340,36 @@ class Bugzilla(object):
         raise User.DoesNotExist()
 
     @xmlrpc_to_bugzilla_errors
-    def post_comment(self, bug_id, comment):
+    def post_comment(self, bug_id, comment, rb_url, reply=False):
+        """Post a comment to a bug.
+
+        'rb_url' is required so that we can use the MozReview.attachments()
+        API, which allows mozreview-* tags to be added to comments even if
+        the current user does not belong to the editbugs group.
+
+        'reply' indicates whether this is a reply to a review (True) or just
+        a review (False).
+        """
+        rb_attachment = self._get_review_request_attachment(bug_id, rb_url)
+
+        if not rb_attachment:
+            logger.error('Could not find attachment for Review Board URL %s '
+                         'in bug %s in order to post comment.'
+                         % (rb_url, bug_id))
+            return None
+
         params = self._auth_params({
-            'id': bug_id,
-            'comment': comment
+            'bug_id': bug_id,
+            'attachments': [{
+                'attachment_id': rb_attachment['id'],
+                'comment': comment,
+            }],
+            'comment_tags': [self.review_reply_comment_tag if reply
+                             else self.review_comment_tag],
         })
+
         logger.info('Posting comment on bug %d.' % bug_id)
-        return self.proxy.Bug.add_comment(params)
+        return self.proxy.MozReview.attachments(params)
 
     @xmlrpc_to_bugzilla_errors
     def is_bug_confidential(self, bug_id):
@@ -467,14 +492,18 @@ class Bugzilla(object):
         logging.info('sending flag: %s' % flag_obj)
 
         params = self._auth_params({
-            'ids': [rb_attachment['id']],
-            'flags': [flag_obj],
+            'bug_id': bug_id,
+            'attachments': [{
+                'attachment_id': rb_attachment['id'],
+                'flags': [flag_obj],
+            }],
+            'comment_tags': ['mozreview-review'],
         })
 
         if comment:
-            params['comment'] = comment
+            params['attachments'][0]['comment'] = comment
 
-        self.proxy.Bug.update_attachment(params)
+        self.proxy.MozReview.attachments(params)
         return True
 
     @xmlrpc_to_bugzilla_errors

@@ -107,8 +107,12 @@ The globbing is patching over a bug in mach
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: author@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 1
+      - "Bug 1 - Initial commit to review \u2019 \u3053"
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/1/#review1
       - ''
       - '::: foo:1'

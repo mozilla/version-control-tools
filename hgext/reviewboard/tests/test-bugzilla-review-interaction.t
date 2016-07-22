@@ -123,7 +123,8 @@ Adding a r+ review will grant a '+' review flag on bugzilla
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 1
       - Bug 1 - Initial commit to review
@@ -183,7 +184,8 @@ Adding a reply to the review will add a comment to Bugzilla
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 1
       - Bug 1 - Initial commit to review
@@ -193,8 +195,12 @@ Adding a reply to the review will add a comment to Bugzilla
       - LGTM
     - author: author@example.com
       id: 4
-      tags: []
+      tags:
+      - mozreview-review-reply
       text:
+      - Comment on attachment 1
+      - Bug 1 - Initial commit to review
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - Thanks!
@@ -445,7 +451,8 @@ review? sticks around when 1 person grants review
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
     - author: reviewer@example.com
       id: 9
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 3
       - Bug 3 - More multiple reviewers
@@ -525,7 +532,8 @@ Random users can come along and grant review
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/8/'
     - author: troll@example.com
       id: 12
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 4
       - Bug 4 - Unrelated Reviewers
@@ -787,7 +795,8 @@ Verify that a single r+ affects only that attachment.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
     - author: reviewer@example.com
       id: 17
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 6
       - Bug 5 - Parent reviews, second commit
@@ -918,7 +927,8 @@ A comment-only review shouldn't change the review flag.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
     - author: reviewer@example.com
       id: 17
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 6
       - Bug 5 - Parent reviews, second commit
@@ -928,8 +938,12 @@ A comment-only review shouldn't change the review flag.
       - land it!
     - author: reviewer@example.com
       id: 18
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 6
+      - Bug 5 - Parent reviews, second commit
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review7
       - ''
       - I have another comment
@@ -1046,7 +1060,8 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
     - author: reviewer@example.com
       id: 17
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 6
       - Bug 5 - Parent reviews, second commit
@@ -1056,14 +1071,19 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       - land it!
     - author: reviewer@example.com
       id: 18
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 6
+      - Bug 5 - Parent reviews, second commit
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review7
       - ''
       - I have another comment
     - author: reviewer2@example.com
       id: 19
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 5
       - Bug 5 - Parent reviews
@@ -1184,7 +1204,8 @@ A non-r+ review on a parent should post a comment only.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/12/'
     - author: reviewer@example.com
       id: 17
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 6
       - Bug 5 - Parent reviews, second commit
@@ -1194,14 +1215,19 @@ A non-r+ review on a parent should post a comment only.
       - land it!
     - author: reviewer@example.com
       id: 18
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 6
+      - Bug 5 - Parent reviews, second commit
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/11/#review7
       - ''
       - I have another comment
     - author: reviewer2@example.com
       id: 19
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 5
       - Bug 5 - Parent reviews
@@ -1211,8 +1237,12 @@ A non-r+ review on a parent should post a comment only.
       - this is not good
     - author: reviewer2@example.com
       id: 20
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 5
+      - Bug 5 - Parent reviews
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/9/#review9
       - ''
       - actually none of this is good

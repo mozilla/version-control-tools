@@ -117,8 +117,12 @@ Publishing a non-'clear-the-flag' review will not clear the r? flag
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 1
+      - Bug 1 - Initial commit to review
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
@@ -173,15 +177,23 @@ Posting an r? review with a comment only adds a comment
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 1
+      - Bug 1 - Initial commit to review
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
     - author: reviewer@example.com
       id: 4
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 1
+      - Bug 1 - Initial commit to review
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review2
       - ''
       - One more thing...
@@ -236,21 +248,30 @@ Posting a r+ review will add a '+' review flag
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 1
+      - Bug 1 - Initial commit to review
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
     - author: reviewer@example.com
       id: 4
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 1
+      - Bug 1 - Initial commit to review
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review2
       - ''
       - One more thing...
     - author: reviewer@example.com
       id: 5
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 1
       - Bug 1 - Initial commit to review
@@ -312,21 +333,30 @@ Updating the review request as an L1 author will not re-request review
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: reviewer@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 1
+      - Bug 1 - Initial commit to review
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review1
       - ''
       - I have reservations
     - author: reviewer@example.com
       id: 4
-      tags: []
+      tags:
+      - mozreview-review
       text:
+      - Comment on attachment 1
+      - Bug 1 - Initial commit to review
+      - ''
       - http://$DOCKER_HOSTNAME:$HGPORT1/r/2/#review2
       - ''
       - One more thing...
     - author: reviewer@example.com
       id: 5
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 1
       - Bug 1 - Initial commit to review
@@ -462,7 +492,8 @@ Sanity check to ensure we have an r+ flag set
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
     - author: reviewer@example.com
       id: 9
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 2
       - Bug 2 - Initial commit to review
@@ -528,7 +559,8 @@ We should have an r+ flag already set.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
     - author: reviewer@example.com
       id: 9
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 2
       - Bug 2 - Modified commit to review
@@ -600,7 +632,8 @@ Posting a r- review will add a '-' review flag
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/'
     - author: reviewer@example.com
       id: 9
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 2
       - Bug 2 - Modified commit to review
@@ -619,7 +652,8 @@ Posting a r- review will add a '-' review flag
       - 'Review request updated; see interdiff: http://$DOCKER_HOSTNAME:$HGPORT1/r/4/diff/1-2/'
     - author: l3author@example.com
       id: 11
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 2
       - Bug 2 - Modified commit to review
@@ -702,7 +736,8 @@ Adding a reviewer should leave r- untouched
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
     - author: reviewer@example.com
       id: 14
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 3
       - Bug 3 - Initial commit to review
@@ -768,7 +803,8 @@ Publishing a new revision should reset r- to r?, and carry forward r+
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
     - author: reviewer@example.com
       id: 14
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 3
       - Bug 3 - Modified commit to review

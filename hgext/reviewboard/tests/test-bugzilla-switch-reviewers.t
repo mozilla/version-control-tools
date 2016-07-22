@@ -139,7 +139,8 @@ Leave both an r+ and an r-.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: plusreviewer@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 1
       - Bug 1 - Initial commit to review
@@ -149,7 +150,8 @@ Leave both an r+ and an r-.
       - lgtm
     - author: minusreviewer@example.com
       id: 4
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 1
       - Bug 1 - Initial commit to review
@@ -222,7 +224,8 @@ New r? should be added, old r+ and r- should be dropped.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: plusreviewer@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 1
       - Bug 1 - Initial commit to review
@@ -232,7 +235,8 @@ New r? should be added, old r+ and r- should be dropped.
       - lgtm
     - author: minusreviewer@example.com
       id: 4
-      tags: []
+      tags:
+      - mozreview-review
       text:
       - Comment on attachment 1
       - Bug 1 - Initial commit to review
