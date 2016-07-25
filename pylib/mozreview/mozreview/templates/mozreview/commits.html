@@ -24,6 +24,7 @@ This is the template for the "Commits" list in a push-based review request.
     <tr>
       <th class="hg">{% trans "Hg" %}</th>
       <th class="diff">{% trans "Diff" %}</th>
+      <th class="diffstat">{% trans "Changes" %}</th>
       <th class="reviews">{% trans "Reviews" %}</th>
       {% comment "TODO: show this column when the commit author will be available" %}
       <th class="submitter">{% trans "Submitter" %}</th>
@@ -47,6 +48,9 @@ This is the template for the "Commits" list in a push-based review request.
            class="commit_sha" href="{{child_details.get_review_request.get_absolute_url}}diff/#index_header">
           {{child_details|commit_id|slice:":12"}}
         </a>
+      </td>
+      <td class="diffstat truncate_text">
+          {{ child_details.get_review_request|diffstat_text:user }}
       </td>
       <td class="reviews truncate_text">
         <a class="mozreview_commit_summary" title="{{ child_details.summary}}" href="{{child_details.get_review_request.get_absolute_url}}">

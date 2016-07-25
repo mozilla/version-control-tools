@@ -2,7 +2,11 @@ from __future__ import absolute_import
 
 from django import template
 from django.contrib.auth.models import User
+from django.utils.safestring import SafeString
 
+from mozreview.diffviewer import (
+    get_diffstats,
+)
 from mozreview.extra_data import (
     COMMIT_ID_KEY,
     fetch_commit_data,
@@ -151,3 +155,31 @@ def review_flag_class(review_flag):
         ' ': 'review-cleared'
     }
     return reviewer_status_class_map.get(review_flag)
+
+
+@register.filter()
+def diffstat_text(review_request, user):
+    stat = get_diffstats(review_request, user)
+    insert = separator = delete = ''
+
+    if stat['insert'] != 0:
+        insert = diffstat_rounded_label(stat['insert'])
+
+    if stat['insert'] != 0 and stat['delete'] != 0:
+        separator = ' / '
+
+    if stat['delete'] != 0:
+        delete = diffstat_rounded_label(stat['delete'], False)
+
+    return SafeString('%s%s%s' % (insert, separator, delete))
+
+
+def diffstat_rounded_label(num, is_addition=True):
+    base = 1000
+    template = '<span class="diffstat-%s">%s%s</span>'
+    label = '%s' % (num if num < base else '%sK' % int(num / base))
+
+    if(is_addition):
+        return template % ('insert', '+', label)
+    else:
+        return template % ('delete', '-', label)
