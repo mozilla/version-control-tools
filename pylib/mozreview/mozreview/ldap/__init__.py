@@ -70,6 +70,36 @@ def query_scm_group(username, group, ldap_connection=None):
         return False
 
 
+def user_exists(username, ldap_connection=None):
+    """Returns true if a user exists in LDAP (MoCo, MoFo, or contrib)."""
+
+    ldap_connection = ldap_connection or get_ldap_connection()
+    if not ldap_connection:
+        raise Exception('Failed to connect to LDAP')
+
+    escaped = ldap.filter.escape_filter_chars(username)
+
+    try:
+        for org in ('com', 'org', 'net'):  # MoCo, MoFo, contributors.
+            try:
+                results = ldap_connection.search_ext_s(
+                    'o=%s,dc=mozilla' % org,
+                    ldap.SCOPE_SUBTREE,
+                    '(mail=%s)' % escaped,
+                    [b'mail'],
+                    timeout=LDAP_QUERY_TIMEOUT)
+                if results:
+                    return True
+            except ldap.NO_SUCH_OBJECT:
+                # Ignore errors about invalid bases.
+                pass
+        # User not found.
+        return False
+    except ldap.LDAPError as e:
+        logger.error('Failed to query ldap for user: %s' % e)
+        return False
+
+
 def find_employee_ldap(address, ldap_connection=None):
     """Find matching Mozilla employees.
 
