@@ -40,6 +40,8 @@ And raises during upload since we don't have credentials in the test env
   uploading to s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
   uploading to s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
   uploading to s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
+  uploading to s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
+  uploading to s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
   Traceback (most recent call last):
     File "/var/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in <module> (re)
       paths[repo] = generate_bundles(repo, upload=upload, **opts)
@@ -118,10 +120,12 @@ The full manifest is fetched normally
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=eu-central-1
   https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central?cmd=bundles
   200
@@ -130,6 +134,7 @@ The full manifest is fetched normally
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg ec2region=us-west-2 compression=gzip
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg ec2region=us-west-1 compression=gzip
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg ec2region=us-east-1 compression=gzip
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg ec2region=eu-central-1 compression=gzip
 
 Fetching with an AWS us-west-2 IP will limit to same region URLs
 
@@ -155,10 +160,12 @@ Fetching with an AWS IP from "other" region returns full list
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=eu-central-1
   https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1
 
   $ http --no-headers --request-header "X-Cluster-Client-IP: 54.248.220.10" ${HGWEB_0_URL}mozilla-central?cmd=bundles
   200
@@ -167,6 +174,7 @@ Fetching with an AWS IP from "other" region returns full list
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg ec2region=us-west-2 compression=gzip
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg ec2region=us-west-1 compression=gzip
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg ec2region=us-east-1 compression=gzip
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg ec2region=eu-central-1 compression=gzip
 
 The copyfrom=x field copies bundles from another repo
 
@@ -190,10 +198,12 @@ The copyfrom=x field copies bundles from another repo
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=eu-central-1
   https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1
 
 bzip2 bundles created when requested
 
@@ -212,14 +222,17 @@ bzip2 bundles created when requested
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.gzip.hg BUNDLESPEC=gzip-v1 ec2region=eu-central-1
   https://hg.cdn.mozilla.net/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.bzip2.hg BUNDLESPEC=bzip2-v1 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.bzip2.hg BUNDLESPEC=bzip2-v1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.bzip2.hg BUNDLESPEC=bzip2-v1 ec2region=us-west-1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.bzip2.hg BUNDLESPEC=bzip2-v1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.bzip2.hg BUNDLESPEC=bzip2-v1 ec2region=eu-central-1
   https://hg.cdn.mozilla.net/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1
 
 Legacy stream bundles only generated when requested
 
@@ -239,10 +252,12 @@ Legacy stream bundles only generated when requested
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.gzip.hg ec2region=us-west-2 compression=gzip
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.gzip.hg ec2region=us-west-1 compression=gzip
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.gzip.hg ec2region=us-east-1 compression=gzip
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.gzip.hg ec2region=eu-central-1 compression=gzip
   https://hg.cdn.mozilla.net/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg stream=revlogv1 cdn=true requiresni=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=us-west-2 stream=revlogv1
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=us-west-1 stream=revlogv1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=us-east-1 stream=revlogv1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=eu-central-1 stream=revlogv1
 
 Generaldelta repos should create gzip-v2 and streamclone bundles only
 
@@ -261,9 +276,11 @@ Generaldelta repos should create gzip-v2 and streamclone bundles only
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-1
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=eu-central-1
   https://hg.cdn.mozilla.net/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-east-1 (no-eol)
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=eu-central-1 (no-eol)
 
   $ hgmo clean

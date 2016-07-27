@@ -53,6 +53,7 @@ HOSTS = (
     ('s3-us-west-2.amazonaws.com', 'moz-hg-bundles-us-west-2', 'us-west-2'),
     ('s3-us-west-1.amazonaws.com', 'moz-hg-bundles-us-west-1', 'us-west-1'),
     ('s3-external-1.amazonaws.com', 'moz-hg-bundles-us-east-1', 'us-east-1'),
+    ('s3-eu-central-1.amazonaws.com', 'moz-hg-bundles-eu-central-1', 'eu-central-1'),
 )
 
 CDN = 'https://hg.cdn.mozilla.net'
