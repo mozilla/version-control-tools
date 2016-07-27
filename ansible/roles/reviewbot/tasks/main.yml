@@ -31,8 +31,7 @@
 - name: configure virtualenv
   pip: virtualenv=/home/reviewbot/venv
        requirements=/home/reviewbot/src/requirements.txt
-       # TODO require hashes once added upstream
-       #extra_args='--require-hashes'
+       extra_args='--require-hashes'
 
 - name: write .pth file so source directory is available to virtualenv sys.path
   file: path=/home/reviewbot/venv/lib/python3.5/site-packages/reviewbot.pth
