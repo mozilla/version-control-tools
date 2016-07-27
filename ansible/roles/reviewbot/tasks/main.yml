@@ -21,6 +21,7 @@
   git: repo=https://github.com/mozilla/reviewbot.git
        dest=/home/reviewbot/src
        version=master
+       force=yes
 
 # Ansible wants to use Python 2.7 to create the virtualenv.
 # If we upgrade to Ansible 2.0, we can use the virtualenv_python
