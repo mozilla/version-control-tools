@@ -1,0 +1,13 @@
+---
+- hosts: reviewbot
+  pre_tasks:
+    - name: capture secrets
+      slurp: src=/etc/reviewbot.json
+      register: reviewbot_config
+
+  roles:
+    - {
+        role: reviewbot,
+        pulse_username: "{{ (reviewbot_config.content | b64decode | from_json).pulse_username }}",
+        pulse_password: "{{ (reviewbot_config.content | b64decode | from_json).pulse_password }}",
+      }

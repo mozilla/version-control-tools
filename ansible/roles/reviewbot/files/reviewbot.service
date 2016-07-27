@@ -1,0 +1,16 @@
+[Unit]
+Description=reviewbot IRC bot
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+WorkingDirectory=/home/reviewbot/state
+User=reviewbot
+Group=reviewbot
+UMask=002
+ExecStart=/home/reviewbot/venv/bin/irc3 -v /home/reviewbot/bot.ini
+Restart=always
+SyslogIdentifier=reviewbot
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

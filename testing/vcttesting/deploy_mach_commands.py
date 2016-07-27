@@ -92,3 +92,11 @@ class DeployCommands(object):
             repo = open(repo_file, 'rb').read().splitlines()
 
         return reclone(repo)
+
+    @Command('reviewbot', category='deploy')
+    @CommandArgument('--verbosity', type=int, default=0,
+                     help='How verbose to be with output')
+    def reviewbot(self, verbosity=0):
+        from vcttesting.deploy import run_playbook
+
+        return run_playbook('deploy-reviewbot', verbosity=verbosity)

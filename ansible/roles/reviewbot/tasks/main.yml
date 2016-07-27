@@ -1,0 +1,69 @@
+---
+- name: ensure system packages are installed
+  apt: name={{ item }}
+       state=present
+  with_items:
+    - git
+    - python3.5-venv
+
+- name: create reviewbot group
+  group: name=reviewbot
+         gid=550
+
+- name: create reviewbot user
+  user: name=reviewbot
+        group=reviewbot
+        uid=550
+        shell=/bin/bash
+        comment='reviewbot user'
+
+- name: update Git repository
+  git: repo=https://github.com/mozilla/reviewbot.git
+       dest=/home/reviewbot/src
+       version=master
+
+# Ansible wants to use Python 2.7 to create the virtualenv.
+# If we upgrade to Ansible 2.0, we can use the virtualenv_python
+# argument to specify which Python interpreter is used. Until then...
+- name: create empty virtualenv
+  command: /usr/bin/python3.5 -m venv /home/reviewbot/venv creates=/home/reviewbot/venv
+
+- name: configure virtualenv
+  pip: virtualenv=/home/reviewbot/venv
+       requirements=/home/reviewbot/src/requirements.txt
+       # TODO require hashes once added upstream
+       #extra_args='--require-hashes'
+
+- name: write .pth file so source directory is available to virtualenv sys.path
+  file: path=/home/reviewbot/venv/lib/python3.5/site-packages/reviewbot.pth
+        content='/home/reviewbot/src'
+        owner=root
+        group=root
+        mode=0644
+
+- name: write config file
+  template: src=bot.ini.j2
+            dest=/home/reviewbot/bot.ini
+            mode=0640
+            owner=reviewbot
+            group=reviewbot
+
+- name: create directory for state
+  file: path=/home/reviewbot/state
+        state=directory
+        owner=reviewbot
+        group=reviewbot
+        mode=0775
+
+- name: systemd service file for reviewbot process
+  copy: src=reviewbot.service
+        dest=/etc/systemd/system/reviewbot.service
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
+
+- name: reviewbot.service is enabled
+  service: name=reviewbot.service
+           enabled=yes
+           state=restarted

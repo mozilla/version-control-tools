@@ -1,0 +1,35 @@
+[bot]
+nick = reviewbot
+username = reviewbot
+
+host = irc.mozilla.org
+port = 6697
+
+ssl = true
+
+includes =
+    irc3.plugins.command
+    reviewbot
+
+autojoins =
+    ${hash}reviewbot
+
+[irc3.plugins.command]
+cmd = !
+guard = irc3.plugins.command.mask_based_policy
+
+[reviewbot]
+pulse_host = {{ pulse_host | default('pulse.mozilla.org') }}
+pulse_port = {{ pulse_port | default(5671) }}
+pulse_username = {{ pulse_username | mandatory }}
+pulse_password = {{ pulse_password | mandatory }}
+pulse_ssl = true
+pulse_timeout = 0.5
+
+pulse_vhost = /
+pulse_routing_key = #
+pulse_exchange = exchange/mozreview/
+pulse_queue = queue/reviewbot/ircbot
+
+[irc3.plugins.command.masks]
+* = view
