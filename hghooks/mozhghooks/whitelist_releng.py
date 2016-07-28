@@ -27,6 +27,7 @@ import os
 
 ALLOWED_USERS = set([
     'Callek@gmail.com',
+    'asasaki@mozilla.com',
     'arich@mozilla.com',
     'bhearsum@mozilla.com',
     'catlee@mozilla.com',
@@ -45,7 +46,6 @@ ALLOWED_USERS = set([
     'selenamarie@gmail.com',
     'rthijssen@mozilla.com',
     'aselagea@mozilla.com',
-    'vciobancai@mozilla.com',
 ])
 
 
