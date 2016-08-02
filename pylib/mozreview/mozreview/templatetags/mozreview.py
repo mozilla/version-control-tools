@@ -177,9 +177,9 @@ def diffstat_text(review_request, user):
 def diffstat_rounded_label(num, is_addition=True):
     base = 1000
     template = '<span class="diffstat-%s">%s%s</span>'
-    label = '%s' % (num if num < base else '%sK' % int(num / base))
+    label = '%s' % (num if num < base else '%.1fk' % (float(num) / base))
 
-    if(is_addition):
+    if is_addition:
         return template % ('insert', '+', label)
     else:
         return template % ('delete', '-', label)
