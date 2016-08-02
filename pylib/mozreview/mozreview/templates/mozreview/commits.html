@@ -49,11 +49,11 @@ This is the template for the "Commits" list in a push-based review request.
           {{child_details|commit_id|slice:":12"}}
         </a>
       </td>
-      <td class="diffstat truncate_text">
-          {{ child_details.get_review_request|diffstat_text:user }}
+      <td class="diffstat">
+         <div class="truncate_text">{{ child_details.get_review_request|diffstat_text:user }}</div>
       </td>
-      <td class="reviews truncate_text">
-        <a class="mozreview_commit_summary" title="{{ child_details.summary}}" href="{{child_details.get_review_request.get_absolute_url}}">
+      <td class="reviews">
+        <a class="mozreview_commit_summary truncate_text" title="{{ child_details.summary}}" href="{{child_details.get_review_request.get_absolute_url}}">
           {{ child_details.summary }}
         </a>
       </td>

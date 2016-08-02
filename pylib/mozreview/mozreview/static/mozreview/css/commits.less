@@ -46,45 +46,37 @@
 
   & > thead,
   & > tbody {
-    display:block;
-
     & > tr {
-      display: flex;
       text-align: left;
 
-      & > td,
-      & > th {
-        display: inline-block;
-      }
-
       & > .hg {
-        flex: 0 0;
-        min-width: 18px;
+        width: 20px;
       }
 
       & > .diff {
-        flex: 0 0;
-        min-width: 100px;
+        width: 100px;
       }
 
       & > .diffstat {
-        flex: 0 0;
-        min-width: 140px;
+        width: 80px;
       }
 
       & > .reviews {
-        flex: 6 0;
         min-width: 300px;
       }
 
-      & > .truncate_text {
+      .mozreview_commit_summary {
+          display: inline-block;
+      }
+
+      .truncate_text {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        max-width: 100%;
       }
 
-      & > .reviewers {
-        flex: 5 1;
+      .mozreview-child-reviewer-list {
         min-width: 100px;
       }
 
@@ -116,8 +108,7 @@
       }
 
       & > .status {
-        flex: 0 0 80px;
-        min-width: 80px;
+        width: 90px;
         white-space: nowrap;
       }
     }
