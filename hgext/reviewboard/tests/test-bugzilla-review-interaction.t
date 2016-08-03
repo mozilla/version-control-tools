@@ -63,7 +63,8 @@ Adding a reviewer should result in a r? flag being set
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Initial commit to review
@@ -112,7 +113,8 @@ Adding a r+ review will grant a '+' review flag on bugzilla
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Initial commit to review
@@ -171,7 +173,8 @@ Adding a reply to the review will add a comment to Bugzilla
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Initial commit to review
@@ -258,7 +261,8 @@ in the tests.
       text: ''
     - author: author@example.com
       id: 6
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 2 - Multiple reviewers
@@ -311,7 +315,8 @@ Removing a reviewer should remove their review flag
       text: ''
     - author: author@example.com
       id: 6
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 2 - Multiple reviewers
@@ -359,7 +364,8 @@ Removing all reviewers should remove all flags
       text: ''
     - author: author@example.com
       id: 6
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 2 - Multiple reviewers
@@ -429,7 +435,8 @@ review? sticks around when 1 person grants review
       text: ''
     - author: author@example.com
       id: 8
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 3
       - Bug 3 - More multiple reviewers
@@ -508,7 +515,8 @@ Random users can come along and grant review
       text: ''
     - author: author@example.com
       id: 11
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 4
       - Bug 4 - Unrelated Reviewers
@@ -632,7 +640,8 @@ Test interaction with multiple commits.
       text: ''
     - author: author@example.com
       id: 14
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 5
       - Bug 5 - Parent reviews
@@ -641,7 +650,8 @@ Test interaction with multiple commits.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
     - author: author@example.com
       id: 15
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 6
       - Bug 5 - Parent reviews, second commit
@@ -650,7 +660,8 @@ Test interaction with multiple commits.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
     - author: author@example.com
       id: 16
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 7
       - Bug 5 - Parent reviews, third commit
@@ -746,7 +757,8 @@ Verify that a single r+ affects only that attachment.
       text: ''
     - author: author@example.com
       id: 14
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 5
       - Bug 5 - Parent reviews
@@ -755,7 +767,8 @@ Verify that a single r+ affects only that attachment.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
     - author: author@example.com
       id: 15
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 6
       - Bug 5 - Parent reviews, second commit
@@ -764,7 +777,8 @@ Verify that a single r+ affects only that attachment.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
     - author: author@example.com
       id: 16
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 7
       - Bug 5 - Parent reviews, third commit
@@ -874,7 +888,8 @@ A comment-only review shouldn't change the review flag.
       text: ''
     - author: author@example.com
       id: 14
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 5
       - Bug 5 - Parent reviews
@@ -883,7 +898,8 @@ A comment-only review shouldn't change the review flag.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
     - author: author@example.com
       id: 15
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 6
       - Bug 5 - Parent reviews, second commit
@@ -892,7 +908,8 @@ A comment-only review shouldn't change the review flag.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
     - author: author@example.com
       id: 16
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 7
       - Bug 5 - Parent reviews, third commit
@@ -999,7 +1016,8 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       text: ''
     - author: author@example.com
       id: 14
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 5
       - Bug 5 - Parent reviews
@@ -1008,7 +1026,8 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
     - author: author@example.com
       id: 15
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 6
       - Bug 5 - Parent reviews, second commit
@@ -1017,7 +1036,8 @@ A 'clear flag' review on a child should also clear the attachment's r?.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
     - author: author@example.com
       id: 16
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 7
       - Bug 5 - Parent reviews, third commit
@@ -1134,7 +1154,8 @@ A non-r+ review on a parent should post a comment only.
       text: ''
     - author: author@example.com
       id: 14
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 5
       - Bug 5 - Parent reviews
@@ -1143,7 +1164,8 @@ A non-r+ review on a parent should post a comment only.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/10/'
     - author: author@example.com
       id: 15
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 6
       - Bug 5 - Parent reviews, second commit
@@ -1152,7 +1174,8 @@ A non-r+ review on a parent should post a comment only.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/11/'
     - author: author@example.com
       id: 16
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 7
       - Bug 5 - Parent reviews, third commit
@@ -1249,7 +1272,8 @@ when a revised patch is pushed.
       text: ''
     - author: author@example.com
       id: 22
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 8
       - Bug 6 - Initial commit to review
@@ -1296,7 +1320,8 @@ when a revised patch is pushed.
       text: ''
     - author: author@example.com
       id: 22
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 8
       - Bug 6 - Initial commit to review
@@ -1305,7 +1330,8 @@ when a revised patch is pushed.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/14/'
     - author: author@example.com
       id: 23
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Comment on attachment 8
       - Bug 6 - Initial commit to review

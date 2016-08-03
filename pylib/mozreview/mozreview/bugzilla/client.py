@@ -179,6 +179,7 @@ class BugzillaAttachmentUpdates(object):
         params = self.bugzilla._auth_params({
             'bug_id': self.bug_id,
             'attachments': self.creates + self.updates,
+            'comment_tags': [self.bugzilla.review_request_comment_tag],
         })
 
         results = self.bugzilla.proxy.MozReview.attachments(params)
@@ -244,6 +245,7 @@ class Bugzilla(object):
     """
 
     user_fields = ['id', 'email', 'real_name', 'can_login']
+    review_request_comment_tag = 'mozreview-request'
 
     def __init__(self, api_key=None, xmlrpc_url=None):
         self.api_key = api_key

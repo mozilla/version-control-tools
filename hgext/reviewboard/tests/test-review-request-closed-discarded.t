@@ -80,7 +80,8 @@
       text: ''
     - author: default@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Foo 1
@@ -89,7 +90,8 @@
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 1 - Foo 2
@@ -271,7 +273,8 @@ The review attachment should be marked as obsolete
       text: ''
     - author: default@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Foo 1
@@ -280,7 +283,8 @@ The review attachment should be marked as obsolete
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 1 - Foo 2
@@ -523,7 +527,8 @@ There should still not be a visible attachment on the bug
       text: ''
     - author: default@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Foo 1
@@ -532,7 +537,8 @@ There should still not be a visible attachment on the bug
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 1 - Foo 2
@@ -713,7 +719,8 @@ The attachment for the review request should be unobsoleted
       text: ''
     - author: default@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Foo 1
@@ -722,7 +729,8 @@ The attachment for the review request should be unobsoleted
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 1 - Foo 2
@@ -917,7 +925,8 @@ Pushing to a discarded review series will create a new series
       text: ''
     - author: default@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Foo 1
@@ -926,7 +935,8 @@ Pushing to a discarded review series will create a new series
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 1 - Foo 2
@@ -935,7 +945,8 @@ Pushing to a discarded review series will create a new series
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/3/'
     - author: default@example.com
       id: 4
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 3
       - Bug 1 - Foo 1
@@ -944,7 +955,8 @@ Pushing to a discarded review series will create a new series
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/5/'
     - author: default@example.com
       id: 5
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 4
       - Bug 1 - Foo 2
@@ -953,7 +965,8 @@ Pushing to a discarded review series will create a new series
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/6/'
     - author: default@example.com
       id: 6
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 5
       - Bug 1 - Foo 3

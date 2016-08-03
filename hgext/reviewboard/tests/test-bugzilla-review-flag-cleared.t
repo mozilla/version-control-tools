@@ -57,7 +57,8 @@ Sanity check to ensure we have a review flag set
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Initial commit to review
@@ -106,7 +107,8 @@ Publishing a non-'clear-the-flag' review will not clear the r? flag
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Initial commit to review
@@ -161,7 +163,8 @@ Posting an r? review with a comment only adds a comment
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Initial commit to review
@@ -223,7 +226,8 @@ Posting a r+ review will add a '+' review flag
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Initial commit to review
@@ -298,7 +302,8 @@ Updating the review request as an L1 author will not re-request review
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Initial commit to review
@@ -331,7 +336,8 @@ Updating the review request as an L1 author will not re-request review
       - LGTM
     - author: author@example.com
       id: 6
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Comment on attachment 1
       - Bug 1 - Initial commit to review
@@ -394,7 +400,8 @@ Sanity check to ensure we have an r? flag
       text: ''
     - author: l3author@example.com
       id: 8
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 2 - Initial commit to review
@@ -445,7 +452,8 @@ Sanity check to ensure we have an r+ flag set
       text: ''
     - author: l3author@example.com
       id: 8
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 2 - Initial commit to review
@@ -510,7 +518,8 @@ We should have an r+ flag already set.
       text: ''
     - author: l3author@example.com
       id: 8
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 2 - Modified commit to review
@@ -529,7 +538,8 @@ We should have an r+ flag already set.
       - LGTM
     - author: l3author@example.com
       id: 10
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Comment on attachment 2
       - Bug 2 - Modified commit to review
@@ -580,7 +590,8 @@ Posting a r- review will add a '-' review flag
       text: ''
     - author: l3author@example.com
       id: 8
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 2 - Modified commit to review
@@ -599,7 +610,8 @@ Posting a r- review will add a '-' review flag
       - LGTM
     - author: l3author@example.com
       id: 10
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Comment on attachment 2
       - Bug 2 - Modified commit to review
@@ -680,7 +692,8 @@ Adding a reviewer should leave r- untouched
       text: ''
     - author: author@example.com
       id: 13
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 3
       - Bug 3 - Initial commit to review
@@ -745,7 +758,8 @@ Publishing a new revision should reset r- to r?, and carry forward r+
       text: ''
     - author: author@example.com
       id: 13
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 3
       - Bug 3 - Modified commit to review
@@ -764,7 +778,8 @@ Publishing a new revision should reset r- to r?, and carry forward r+
       - This is all wrong
     - author: author@example.com
       id: 15
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Comment on attachment 3
       - Bug 3 - Modified commit to review

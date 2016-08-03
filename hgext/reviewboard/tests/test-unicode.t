@@ -97,7 +97,8 @@ The globbing is patching over a bug in mach
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - "Bug 1 - Initial commit to review \u2019 \u3053"

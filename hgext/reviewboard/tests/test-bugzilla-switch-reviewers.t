@@ -69,7 +69,8 @@ Sanity check to ensure we have a review flag set
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Initial commit to review
@@ -128,7 +129,8 @@ Leave both an r+ and an r-.
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Initial commit to review
@@ -210,7 +212,8 @@ New r? should be added, old r+ and r- should be dropped.
       text: ''
     - author: author@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Initial commit to review
@@ -239,7 +242,8 @@ New r? should be added, old r+ and r- should be dropped.
       - there are problems
     - author: author@example.com
       id: 5
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Comment on attachment 1
       - Bug 1 - Initial commit to review

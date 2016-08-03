@@ -80,7 +80,8 @@ Publishing the review will add an attachment to the bug
       text: ''
     - author: default@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Foo 1
@@ -144,7 +145,8 @@ published.
       text: ''
     - author: default@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Foo 1
@@ -153,7 +155,8 @@ published.
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 4
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Comment on attachment 1
       - Bug 1 - Foo 1
@@ -203,7 +206,8 @@ can happen if a reviewer is manually added (see Bug 1229789).
       text: ''
     - author: default@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Foo 1
@@ -212,7 +216,8 @@ can happen if a reviewer is manually added (see Bug 1229789).
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 4
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Comment on attachment 1
       - Bug 1 - Foo 1
@@ -276,7 +281,8 @@ Ensure r? in the commit description sets a review flag when pushing
       text: ''
     - author: default@example.com
       id: 5
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 2 - Foo 1
