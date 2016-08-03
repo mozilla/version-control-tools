@@ -173,53 +173,29 @@
  }
 
  /* This was copied from the rb dashboard less file.*/
-  .approval,
-  .issue-count,
-  .no-approval,
-  .shipit-count {
+  .status {
     text-align: center;
-    display: block;
-    white-space: nowrap;
-    min-height: 10pt;
-    .border-radius(2px);
   }
 
   .no-approval {
-    background-repeat: no-repeat;
     cursor: default;
-    background-color: #DDD;
-    border: 1px solid #6F6F6F;
-    color: #151515;
-    font-size: 9pt;
-    font-family: monospace;
   }
 
   .approval {
-    background-repeat: no-repeat;
     cursor: default;
-    border: 1px solid @approval-border-color;
-    font-size: 9pt;
-    font-family: monospace;
-    background-repeat: no-repeat;
     background-color: @approval-bg;
-    color: #0A1B00;
+  }
+
+  .approval-issues {
+    background: #fff4B0;
+    position: relative;
   }
 
   .issue-count {
-    border: 1px darken(@issue-opened-bg, 50%) solid;
     text-decoration: none;
-    color: #205003;
-    background-repeat: no-repeat;
-    background-image: linear-gradient(#FFF49C, #FFF49C 25%, #FFE303);
-    font-size: 9pt;
-
-    .issue-icon {
-      color: darken(@issue-opened-bg, 60%);
-      display: inline-block;
-      padding: 0 3px 0 1px;
-      text-align: center;
-      font-weight: bold
-     }
+    color: inherit;
+    display: block;
+    padding: 10px 0;
    }
 
   .shipit-count {
