@@ -15,6 +15,8 @@
 
 /*******************************************************/
 
+@import (reference) 'mozilla-theme-common.less';
+
 @approval-bg: #DFFFD7;
 @approval-border-color: #478A06;
 
@@ -44,169 +46,190 @@
   border-top: 1px solid #C1C1C1;
   border-right: 1px solid #C1C1C1;
 
-  & > thead,
-  & > tbody {
-    & > tr {
-      text-align: left;
+  tr, td {
+    text-align: left;
+  }
 
-      & > .hg {
-        width: 20px;
-      }
+  .truncate_text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
 
-      & > .diff {
-        width: 100px;
-      }
+  .commits {
+    width: 60%;
 
-      & > .diffstat {
-        width: 80px;
-      }
+    ul {
+      font-size: 90%;
+      list-style-type: none;
+      margin: 0;
+      padding: 6px 0;
 
-      & > .reviews {
-        min-width: 300px;
-      }
-
-      .mozreview_commit_summary {
-          display: inline-block;
-      }
-
-      .truncate_text {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-      }
-
-      .mozreview-child-reviewer-list {
-        min-width: 100px;
-      }
-
-      & .reviewer-name {
-        min-height: 10px;
+      li {
         display: inline-block;
-
-        &.reviewer-ship-it {
-          background-color: @approval-bg;
-          border: 1px solid @approval-border-color;
-          padding: 1px 5px;
-          .border-radius(2px);
-        }
-        &.review-pending::after {
-          content: " (r?)";
-        }
-        &.review-granted::after {
-          content: " (r+)";
-        }
-        &.review-denied::after {
-          content: " (r-)";
-        }
-        &.review-cleared{
-          color: grey;
-        }
-        &.review-cleared::after {
-          content: " (r? cleared)";
-        }
+        padding-right: 10px;
+        margin-right: 10px;
       }
 
-      & > .status {
-        width: 90px;
-        white-space: nowrap;
+      a {
+        color: #666;
+        text-decoration: none;
+
+        &:hover, &:active, &:focus {
+          text-decoration: underline;
+        }
       }
     }
   }
 
-  & > tbody > tr {
-    background-color: #FFFFFF;
+  .mozreview-child-reviewer-list {
+    min-width: 100px;
+  }
 
-    & .diffstat {
-      font-size: 90%;
+  .reviewer-name {
+    min-height: 10px;
+    display: inline-block;
 
-      .diffstat-insert {
-        color: green;
-      }
-      .diffstat-delete {
-        color: #a02222;
-      }
+    &.reviewer-ship-it {
+      background-color: @approval-bg;
+      border: 1px solid @approval-border-color;
+      padding: 1px 5px;
+      .border-radius(2px);
     }
+    &.review-pending::after {
+      content: " (r?)";
+    }
+    &.review-granted::after {
+      content: " (r+)";
+    }
+    &.review-denied::after {
+      content: " (r-)";
+    }
+    &.review-cleared{
+      color: grey;
+    }
+    &.review-cleared::after {
+      content: " (r? cleared)";
+    }
+  }
+
+  .status {
+    width: 90px;
+    white-space: nowrap;
+  }
+
+  tbody > tr {
+    background: #fff;
+  }
+
+  .mozreview_commit_summary {
+    font-weight: bold;
+    text-decoration: none;
+
+    &:hover, &:active, &:focus {
+      text-decoration: underline;
+    }
+  }
+
+  .diffstat-insert {
+    color: green;
+  }
+
+  .diffstat-delete {
+    color: #a02222;
   }
 
   & > tbody > tr[current="true"],
   & > tbody > tr:hover {
-    background-color: #d4e0f3;
+    background-color: #eee;
   }
 
-   td,
-   th {
-     padding: 5px;
-     border-left: 1px solid #C1C1C1;
-     border-bottom: 1px solid #C1C1C1;
-   }
+ td,
+ th {
+   padding: 5px;
+   border-left: 1px solid #C1C1C1;
+   border-bottom: 1px solid #C1C1C1;
+ }
 
-   & > thead > tr {
-     background: transparent url("../header_bg.png") repeat-x scroll left bottom;
-   }
+ & > thead > tr {
+   background: @moz-blue-dark;
+ }
 
-   & > tbody td > a.commit_sha {
-     font-family: monospace
-   }
+ & > tbody td > a.commit_sha {
+   font-family: monospace;
+ }
 
-   /* This was copied from the rb dashboard less file.*/
-    .approval,
-    .issue-count,
-    .no-approval,
-    .shipit-count {
+ .reviewers {
+   .inline-editor-form {
+     white-space: normal;
+   }
+   input[type=text] {
+     min-width: 100px;
+   }
+   .buttons {
+     white-space: nowrap;
+   }
+ }
+
+ /* This was copied from the rb dashboard less file.*/
+  .approval,
+  .issue-count,
+  .no-approval,
+  .shipit-count {
+    text-align: center;
+    display: block;
+    white-space: nowrap;
+    min-height: 10pt;
+    .border-radius(2px);
+  }
+
+  .no-approval {
+    background-repeat: no-repeat;
+    cursor: default;
+    background-color: #DDD;
+    border: 1px solid #6F6F6F;
+    color: #151515;
+    font-size: 9pt;
+    font-family: monospace;
+  }
+
+  .approval {
+    background-repeat: no-repeat;
+    cursor: default;
+    border: 1px solid @approval-border-color;
+    font-size: 9pt;
+    font-family: monospace;
+    background-repeat: no-repeat;
+    background-color: @approval-bg;
+    color: #0A1B00;
+  }
+
+  .issue-count {
+    border: 1px darken(@issue-opened-bg, 50%) solid;
+    text-decoration: none;
+    color: #205003;
+    background-repeat: no-repeat;
+    background-image: linear-gradient(#FFF49C, #FFF49C 25%, #FFE303);
+    font-size: 9pt;
+
+    .issue-icon {
+      color: darken(@issue-opened-bg, 60%);
+      display: inline-block;
+      padding: 0 3px 0 1px;
       text-align: center;
-      display: block;
-      white-space: nowrap;
-      min-height: 10pt;
-      .border-radius(2px);
-    }
-
-    .no-approval {
-      background-repeat: no-repeat;
-      cursor: default;
-      background-color: #DDD;
-      border: 1px solid #6F6F6F;
-      color: #151515;
-      font-size: 9pt;
-      font-family: monospace;
-    }
-
-    .approval {
-      background-repeat: no-repeat;
-      cursor: default;
-      border: 1px solid @approval-border-color;
-      font-size: 9pt;
-      font-family: monospace;
-      background-repeat: no-repeat;
-      background-color: @approval-bg;
-      color: #0A1B00;
-    }
-
-    .issue-count {
-      border: 1px darken(@issue-opened-bg, 50%) solid;
-      text-decoration: none;
-      color: #205003;
-      background-repeat: no-repeat;
-      background-image: linear-gradient(#FFF49C, #FFF49C 25%, #FFE303);
-      font-size: 9pt;
-
-      .issue-icon {
-        color: darken(@issue-opened-bg, 60%);
-        display: inline-block;
-        padding: 0 3px 0 1px;
-        text-align: center;
-        font-weight: bold
-       }
+      font-weight: bold
      }
+   }
 
-    .shipit-count {
-      background-image: url("../shipit_bg.png");
-      background-position: top left;
-      background-repeat: repeat-x;
-      background-color: #6bc810;
-      border: 1px solid @approval-border-color;
-      color: #205003;
-    }
+  .shipit-count {
+    background-image: url("../shipit_bg.png");
+    background-position: top left;
+    background-repeat: repeat-x;
+    background-color: #6bc810;
+    border: 1px solid @approval-border-color;
+    color: #205003;
+  }
 }
 
 #error-container {
@@ -243,70 +266,70 @@
 
 
 #ci-actions {
-    border: 1px solid #B8B5A0;
-    margin-top: 20px;
-    padding: 5px;
-    background-color: #FFFFFF;
+  border: 1px solid #B8B5A0;
+  margin-top: 20px;
+  padding: 5px;
+  background-color: #FFFFFF;
 
-    .action{
+  .action {
 
-        & > .action-icon {
-            float: left;
-            margin-right: 5px;
-        }
-
-        & > .rounded-icon {
-            border-radius: 50%;
-            width: 10px;
-            height: 10px;
-            margin: 1px 3px 4px 0px;
-        }
-
-        &.action-success {
-            & > .rounded-icon {
-                background-color: #B0EFA0;
-                border: 1px solid @approval-border-color;
-            }
-        }
-
-        &.action-pending {
-            & > .rounded-icon {
-                background-color: #E6E316;
-                border: 1px solid #6F6F6F;
-            }
-        }
-
-        &.action-failure {
-            & > .rounded-icon {
-                background-color: #A9020C;
-                border: 1px solid #90010A;
-            }
-            & .action-heading {
-                color: #90010A;
-            }
-        }
-
-        & > .action-info {
-            a {
-                float:right;
-            }
-            h4 {
-                margin: 0;
-            }
-            span.action-meta {
-                display:block;
-                overflow:hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-        }
+    & > .action-icon {
+      float: left;
+      margin-right: 5px;
     }
 
-    .action-separator{
-        background-color: #E4E3DD;
-        height:1px;
-        margin: 5px;
+    & > .rounded-icon {
+      border-radius: 50%;
+      width: 10px;
+      height: 10px;
+      margin: 1px 3px 4px 0px;
     }
+
+    &.action-success {
+      & > .rounded-icon {
+        background-color: #B0EFA0;
+        border: 1px solid @approval-border-color;
+      }
+    }
+
+    &.action-pending {
+      & > .rounded-icon {
+        background-color: #E6E316;
+        border: 1px solid #6F6F6F;
+      }
+    }
+
+    &.action-failure {
+      & > .rounded-icon {
+        background-color: #A9020C;
+        border: 1px solid #90010A;
+      }
+      & .action-heading {
+        color: #90010A;
+      }
+    }
+
+    & > .action-info {
+      a {
+        float:right;
+      }
+      h4 {
+        margin: 0;
+      }
+      span.action-meta {
+        display:block;
+        overflow:hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .action-separator{
+    background-color: #E4E3DD;
+    height:1px;
+    margin: 5px;
+  }
 }
 
 #local-draft-banner {

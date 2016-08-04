@@ -22,10 +22,7 @@ This is the template for the "Commits" list in a push-based review request.
   <table id="mozreview-child-requests">
     <thead>
     <tr>
-      <th class="hg">{% trans "Hg" %}</th>
-      <th class="diff">{% trans "Diff" %}</th>
-      <th class="diffstat">{% trans "Changes" %}</th>
-      <th class="reviews">{% trans "Reviews" %}</th>
+      <th class="commits">{% trans "Commit" %}</th>
       {% comment "TODO: show this column when the commit author will be available" %}
       <th class="submitter">{% trans "Submitter" %}</th>
       {% endcomment %}
@@ -38,28 +35,33 @@ This is the template for the "Commits" list in a push-based review request.
     </thead>
     {% for child_details in children_details %}
     <tr {% if child_details.get_review_request.id = review_request_details.get_review_request.id %}current="true"{% endif %}>
-      <td class="hg">
-        <a href="{{child_details.get_review_request.repository.path}}/rev/{{child_details|commit_id|slice:":12"}}">
-          <div class="rb-icon rb-icon-jump-to"></div>
-        </a>
-      </td>
-      <td class="diff">
-        <a title="See diff for commit {{child_details|commit_id|slice:":12"}}"
-           class="commit_sha" href="{{child_details.get_review_request.get_absolute_url}}diff/#index_header">
-          {{child_details|commit_id|slice:":12"}}
-        </a>
-      </td>
-      <td class="diffstat">
-         <div class="truncate_text">{{ child_details.get_review_request|diffstat_text:user }}</div>
-      </td>
-      <td class="reviews">
-        <a class="mozreview_commit_summary truncate_text" title="{{ child_details.summary}}" href="{{child_details.get_review_request.get_absolute_url}}">
-          {{ child_details.summary }}
-        </a>
-      </td>
+
+    <td class="commits">
+      <div class="truncate_text">
+          <a class="mozreview_commit_summary" title="See diff for commit {{child_details|commit_id|slice:":12"}}"
+          href="{{child_details.get_review_request.get_absolute_url}}diff/#index_header">
+            {{ child_details.summary }}
+          </a>
+          <ul>
+            <li>
+              <a href="{{child_details.get_review_request.repository.path}}/raw-rev/{{child_details|commit_id|slice:":12"}}">
+                {% trans "View Raw" %}
+              </a>
+            </li><li>
+              <a href="{{child_details.get_review_request.get_absolute_url}}" title="{{ child_details.summary}}">
+                  {% trans "View Reviews" %}
+              </a>
+          </li><li class="diffstat" title="{% trans "Lines inserted / deleted" %}">
+              {{ child_details.get_review_request|diffstat_text:user }}
+            </li>
+          </ul>
+      </div>
+    </td>
+
       {% comment "TODO: show this column when the commit author will be available" %}
       <td>{{ child_details.submitter }}</td>
       {% endcomment %}
+
       <td class="reviewers">
         <span class="mozreview-child-reviewer-list"
               data-id="{{child_details.get_review_request.id}}">
