@@ -12,6 +12,7 @@ venv/
 \.t.err$
 ~$
 \.vagrant/*
+\.vagrantuser$
 \.dockerstate$
 \.vctnode$
 \.testtimes$

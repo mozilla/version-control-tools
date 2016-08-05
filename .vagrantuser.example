@@ -1,0 +1,37 @@
+# vim:ft=yaml:
+# Example .vagrantuser file for customizing the version-control-tools VM.
+# See the top of the project Vagrantfile for how to use this file.
+
+# The private IP the vagrant VM should use on startup.
+#private_ip: "192.168.33.33"
+
+# The number of CPUs to assign to the vagrant VM.
+#cpus: "2"
+
+# The amount of memory to assign to the vagrant VM.
+#memory: "2048"
+
+# Whether to display the GUI when running with VirtualBox.
+#vb_gui: false
+
+# The folder that should be synced into the vagrant VM at /home/vagrant/vct.
+# Defaults to the project root folder, '.'.
+#synced_folder: "."
+
+# The ansible playbook vagrant should run when configuring the development
+# machine.  You can override or augment the default vagrant guest configuration
+# by setting this to your custom playbook and using "- include:" to pull in the
+# default playbook.
+#
+# Note that this path is relative to the /vagrant synced directory on the
+# guest.  You will need to place your custom playbook under the project root
+# for it to get synced into the guest and called.
+#playbook: "testing/vagrant/configure.yml"
+
+# How verbose ansible should be while configuring the vagrant box.  Helpful for
+# debugging.
+#ansible_verbose: "vvv"
+
+# Extra ansible command-line args that override everything else.
+# See https://www.vagrantup.com/docs/provisioning/ansible_common.html#raw_arguments
+#ansible_args: ['--check']

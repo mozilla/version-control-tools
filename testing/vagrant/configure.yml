@@ -1,0 +1,11 @@
+# vim:ft=ansible:
+
+- name: configure a mozreview development environment on a guest machine
+  hosts: all
+  become: yes
+  vars:
+    # docker_listen_ip is passed to ansible by the Vagrant provisioner.
+    docker_listen: tcp://{{ docker_listen_ip }}:2375
+
+  roles:
+    - vct-dev-environment
