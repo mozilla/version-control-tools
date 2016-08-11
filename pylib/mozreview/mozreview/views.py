@@ -16,8 +16,7 @@ from django.http import (
     HttpResponseRedirect,
     HttpResponseNotAllowed,
 )
-from django.shortcuts import render_to_response
-from django.template.context import RequestContext
+from django.shortcuts import render
 from django.utils import timezone
 
 from djblets.siteconfig.models import SiteConfiguration
@@ -38,12 +37,10 @@ from mozreview.models import (
 logger = logging.getLogger(__name__)
 
 
-def show_error_page(request):
-    return render_to_response(
-        'mozreview/login-error.html', RequestContext(request, {
-            'login_error': 'An error occurred when trying to log you in.',
-        })
-    )
+def render_login_error(request):
+    return render(request, 'mozreview/login-error.html', {
+        'login_error': 'An error occurred when trying to log you in.',
+    })
 
 
 def bmo_auth_callback(request):
@@ -149,7 +146,7 @@ def get_bmo_auth_callback(request):
     if not (bmo_username and callback_result):
         logger.error('Bugzilla auth callback called without required '
                      'parameters.')
-        return show_error_page(request)
+        return render_login_error(request)
 
     # Delete expired unverified keys (5 minute lifetime).
     UnverifiedBugzillaApiKey.objects.filter(
@@ -170,7 +167,7 @@ def get_bmo_auth_callback(request):
     if not unverified_keys:
         logger.error('No unverified keys found for BMO user %s.' %
                      bmo_username)
-        return show_error_page(request)
+        return render_login_error(request)
 
     unverified_key = unverified_keys.last()
 
@@ -182,12 +179,12 @@ def get_bmo_auth_callback(request):
     if callback_result != unverified_key.callback_result:
         logger.error('Callback result does not match for BMO user %s.' %
                      bmo_username)
-        return show_error_page(request)
+        return render_login_error(request)
 
     if secret is None or request.COOKIES['bmo_auth_secret'] != secret:
         logger.error('Callback secret does not match cookie for user %s.' %
                      bmo_username)
-        return show_error_page(request)
+        return render_login_error(request)
 
     bmo_api_key = unverified_key.api_key
     unverified_key.delete()
@@ -197,10 +194,10 @@ def get_bmo_auth_callback(request):
     try:
         if not b.valid_api_key(bmo_username, bmo_api_key):
             logger.error('Invalid API key for %s.' % bmo_username)
-            return show_error_page(request)
+            return render_login_error(request)
     except BugzillaError as e:
         logger.error('Error validating API key: %s' % e.msg)
-        return show_error_page(request)
+        return render_login_error(request)
 
     b.api_key = bmo_api_key
 
@@ -208,19 +205,19 @@ def get_bmo_auth_callback(request):
         user_data = b.get_user(bmo_username)
     except BugzillaError as e:
         logger.error('Error getting user data: %s' % e.msg)
-        return show_error_page(request)
+        return render_login_error(request)
 
     if not user_data:
         logger.warning('Could not retrieve user info for %s after '
                        'validating API key.' % bmo_username)
-        return show_error_page(request)
+        return render_login_error(request)
 
     users = get_or_create_bugzilla_users(user_data)
 
     if not users:
         logger.warning('Failed to create user %s after validating API key.' %
                        bmo_username)
-        return show_error_page(request)
+        return render_login_error(request)
 
     user = users[0]
     assert user.email == bmo_username
@@ -228,7 +225,7 @@ def get_bmo_auth_callback(request):
     if not user.is_active:
         logger.warning('Validated API key but user %s is inactive.' %
                        bmo_username)
-        return show_error_page(request)
+        return render_login_error(request)
 
     set_bugzilla_api_key(user, bmo_api_key)
 
