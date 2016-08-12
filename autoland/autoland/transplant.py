@@ -106,7 +106,7 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
                        '--descriptions=%s' % f.name, rev]
                 cmd_output = run_hg(cmd)
             except hglib.error.CommandError as e:
-                return False, formulate_hg_error(['hg'] + cmd, cmd_output)
+                return False, formulate_hg_error(['hg'] + cmd, e.out.getvalue())
 
         for line in cmd_output.splitlines():
             m = re.search(r'^rev: [0-9a-z]+ -> ([0-9a-z]+)', line)
