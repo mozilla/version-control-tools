@@ -1,7 +1,8 @@
 {% load mozreview %}
 <div id="user_data"
   data-scm-level="{{ request.mozreview_profile|scm_level }}"
-  {% if request.user and review_request %}
+  {% if request.user.is_authenticated and review_request %}
+    data-last-reviewed-revision="{{ review_request|data_reviewed_revision:request.user }}"
     {% if review_request.submitter.id == request.user.id %}
       data-is-submitter="true"
     {% endif %}

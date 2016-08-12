@@ -4,6 +4,9 @@ from django import template
 from django.contrib.auth.models import User
 from django.utils.safestring import SafeString
 
+from mozreview.diffs import (
+    latest_revision_reviewed,
+)
 from mozreview.diffviewer import (
     get_diffstats,
 )
@@ -67,6 +70,16 @@ def scm_level(mozreview_profile):
         return '1'
     else:
         return ''
+
+
+@register.filter()
+def data_reviewed_revision(review_request, user):
+    """Return the latest diff revision a user reviewed.
+
+    `0`, a revision number which will never exist, is returned
+    if the user has not performed a review.
+    """
+    return latest_revision_reviewed(review_request, user=user) or 0
 
 
 @register.filter()

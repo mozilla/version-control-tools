@@ -159,10 +159,11 @@ class MozReviewExtension(Extension):
         'default': {
             'source_filenames': ['mozreview/js/default.js'],
         },
-        'filediffreviewer': {
+        'diffviewer': {
             'source_filenames': ['mozreview/js/models/filediffreviewermodel.js',
                                  'mozreview/js/collections/filediffreviewercollection.js',
-                                 'mozreview/js/init_filediffreviewer.js'],
+                                 'mozreview/js/init_filediffreviewer.js',
+                                 'mozreview/js/last_reviewed.js'],
             'apply_to': diffviewer_url_names,
         },
         'reviews': {

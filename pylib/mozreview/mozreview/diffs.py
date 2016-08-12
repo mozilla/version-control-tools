@@ -6,6 +6,9 @@ import HTMLParser
 
 from reviewboard.diffviewer.diffutils import (get_diff_files,
                                               populate_diff_chunks)
+from reviewboard.diffviewer.models import (
+    DiffSet,
+)
 
 
 def get_file_chunks_in_range_custom(context, filediff, interfilediff,
@@ -337,3 +340,58 @@ def build_plaintext_review(review, url, context):
         review_text.append(review.body_bottom)
 
     return "\n\n".join(review_text)
+
+
+def latest_revision_reviewed(review_request, user=None):
+    """Return the revision number a given user last reviewed.
+
+    If no user is provided, return the last diff revision that
+    any user has reviewed. If no review is present for the user
+    (or any user when user is None) return None.
+    """
+    # TODO: Bug 1296536
+    #
+    # There is a bit of complexity around identifying the revision
+    # that a user last reviewed. The current implementation identifies
+    # the latest diff revision that was published before the review. In
+    # most cases this is correct, but there are some problematic edge
+    # cases.
+    #
+    # Reviews themselves are not tied to an actual diff revision, rather
+    # they can post comments on any diff revision that exists, including
+    # interdiffs. This means that a reviewer may start their review when
+    # diff revision X is the latest, but the author may upload a new diff
+    # revision Y while they are reviewing. A reviewer could also leave
+    # their draft unpublished for a bit and many diff revisions could
+    # be uploaded in the meantime. If the reviewer were to publish their
+    # draft as-is in this case, it would indicate they had reviewed the
+    # latest revision, rather than the one they actually did.
+    #
+    # One solution to this problem would be to identify the latest diff
+    # revision that has a comment in the review and use that. This is
+    # problematic for reviews that don't leave an actual diff comment
+    # (e.g. leaving only an overall message in the review header).
+    #
+    # We should probably be more accurate here / adjust our messaging to be
+    # less problematic in the future.
+    reviews = review_request.get_public_reviews().order_by('-timestamp')
+
+    if user is not None and user.is_authenticated():
+        reviews = reviews.filter(user=user)
+
+    review = reviews.first()
+    if review is None:
+        return None
+
+    try:
+        revision = DiffSet.objects.filter(
+            history=review_request.diffset_history_id,
+            timestamp__lt=review.timestamp).latest().revision
+    except DiffSet.DoesNotExist:
+        # This would mean there were no diffs on the review request
+        # before the review was published, which should be impossible
+        # in standard Review Board. We'll return None just in case we
+        # modify things to add diffs after the fact.
+        return None
+
+    return revision
