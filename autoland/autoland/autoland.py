@@ -102,10 +102,12 @@ def handle_pending_transplants(logger, dbconn):
             continue
 
         attempts = 0
-        logger.info('initiating transplant from tree: %s rev: %s '
-                    'to destination: %s' % (tree, rev, destination))
         started = datetime.datetime.now()
         while attempts < MAX_TRANSPLANT_ATTEMPTS:
+            logger.info('initiating transplant from tree: %s rev: %s '
+                        'to destination: %s, attempt %s' % (
+                            tree, rev, destination, attempts + 1))
+
             # TODO: We should break the transplant call into two steps, one
             #       to pull down the commits to transplant, and another
             #       one to rebase it and attempt to push so we don't
@@ -117,6 +119,9 @@ def handle_pending_transplants(logger, dbconn):
                                                    trysyntax, push_bookmark,
                                                    commit_descriptions)
             del os.environ['AUTOLAND_REQUEST_USER']
+
+            logging.info('transplant from tree: %s rev: %s attempt: %s: %s' % (
+                tree, rev, attempts + 1, result))
 
             if landed or 'abort: push creates new remote head' not in result:
                 break
