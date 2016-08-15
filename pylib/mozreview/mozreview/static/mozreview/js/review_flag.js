@@ -53,15 +53,15 @@ MRReviewFlag.View = Backbone.View.extend({
   *  with a 'Add text' link. This is a hack to circumvent that problem.
   *  See bug 1273954.
   */
-  save: function(){
-      this.model.save({
-          attrs: ['extraData'],
-          success: function() {
-              if(RB.ReviewDialogView._instance) {
-                  setTimeout(function() { RB.ReviewDialogView._instance._bodyTopView.openEditor(); }, 0);
-              }
-          }
-      });
+  save: function() {
+    this.model.save({
+      attrs: ['extraData'],
+      success: function() {
+        if (RB.ReviewDialogView._instance) {
+          setTimeout(function() { RB.ReviewDialogView._instance._bodyTopView.openEditor(); }, 0);
+        }
+      }
+    });
   },
 
   render: function() {
@@ -84,10 +84,10 @@ MRReviewFlag.View = Backbone.View.extend({
     // We have to send the 'clear the flag' as a non empty string because
     // the api endpoint will ignore it otherwise.
     if (val === '') {
-        val = ' ';
+      val = ' ';
     }
     this.model.get('extraData')[this.key] = val;
-    this.save()
+    this.save();
   }
 });
 
@@ -95,7 +95,7 @@ MRReviewFlag.View = Backbone.View.extend({
 MRReviewFlag.Extension = RB.Extension.extend({
   initialize: function() {
     _super(this).initialize.call(this);
-    $(document).on("mozreview_ready", _.bind(function() {
+    $(document).on('mozreview_ready', _.bind(function() {
       if (!MozReview.isParent) {
         new RB.ReviewDialogHook({
           extension: this,
