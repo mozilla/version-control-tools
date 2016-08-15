@@ -807,12 +807,15 @@ def _checkmultiplevct(ui, cw):
     # to unexpected environments and break things.
     seenvct = set()
     for k, v in ui.configitems('extensions'):
+        # mercurial.extensions.loadpath() does variable and user expansion.
+        # We need to match behavior.
+        v = os.path.realpath(util.normpath(util.expandpath(v)))
+
         if 'version-control-tools' not in v:
             continue
-
         i = v.index('version-control-tools')
         vct = v[0:i + len('version-control-tools')]
-        seenvct.add(os.path.realpath(os.path.expanduser(vct)))
+        seenvct.add(vct)
 
     if len(seenvct) > 1:
         ui.write(MULTIPLE_VCT % cw.path)

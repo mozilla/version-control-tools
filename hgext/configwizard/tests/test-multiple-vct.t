@@ -38,3 +38,13 @@ Running extension from another v-c-t directory fails
   
       $TESTTMP/.hgrc
   
+Environment variable expansion works and doesn't trigger multiple vct
+
+  $ hg --config extensions.firefoxtree='$TESTDIR/hgext/firefoxtree' --config configwizard.steps=multiplevct configwizard
+  This wizard will guide you through configuring Mercurial for an optimal
+  experience contributing to Mozilla projects.
+  
+  The wizard makes no changes without your permission.
+  
+  To begin, press the enter/return key.
+   <RETURN>
