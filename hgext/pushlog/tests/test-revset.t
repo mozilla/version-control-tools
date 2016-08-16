@@ -91,3 +91,59 @@ pushuser() matching is case insensitive
   $ hg log -r 'pushuser(user2@EXAMPLE.COM)' -T '{rev}\n'
   1
   2
+
+pushid() requires an argument
+
+  $ hg log -r 'pushid()'
+  hg: parse error: pushid requires one argument
+  [255]
+
+pushid() requires an integer argument
+
+  $ hg log -r 'pushid("foo")'
+  hg: parse error: pushid expects a number
+  [255]
+
+pushid() returns revisions part of the specified push
+
+  $ hg log -r 'pushid(1)' -T '{rev}\n'
+  0
+  $ hg log -r 'pushid(2)' -T '{rev}\n'
+  1
+  2
+
+pushid() works with unknown pushid values
+
+  $ hg log -r 'pushid(3)' -T '{rev}\n'
+
+pushid() set intersection works
+
+  $ hg log -r '6c9721b3b4df & pushid(2)' -T '{rev}\n'
+  1
+
+pushrev() returns an empty set by default
+
+  $ hg log -r 'pushrev()'
+  hg: parse error: missing argument
+  [255]
+
+pushrev() returns values for single revision
+
+  $ hg log -r 'pushrev(55482a6fb4b1)' -T '{rev}\n'
+  0
+
+  $ hg log -r 'pushrev(6c9721b3b4df)' -T '{rev}\n'
+  1
+  2
+
+pushrev() returns values for multiple revisions
+
+  $ hg log -r 'pushrev(0:tip)' -T '{rev}\n'
+  0
+  1
+  2
+
+pushrev() set intersection works
+
+  $ hg log -r '6c9721b3b4df & pushrev(1)' -T '{rev}\n'
+  1

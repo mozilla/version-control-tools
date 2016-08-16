@@ -630,6 +630,46 @@ def revset_pushuser(repo, subset, x):
 
     return subset & revset.generatorset(getrevs())
 
+@revsetpredicate('pushid(int)')
+def revset_pushid(repo, subset, x):
+    """Changesets that were part of the specified numeric push id."""
+    l = revset.getargs(x, 1, 1, 'pushid requires one argument')
+    try:
+        pushid = int(revset.getstring(l[0], 'pushid requires a number'))
+    except (TypeError, ValueError):
+        raise error.ParseError('pushid expects a number')
+
+    with repo.pushlog.conn(readonly=True) as conn:
+        push = repo.pushlog.pushfromid(conn, pushid) if conn else None
+
+    if not push:
+        return revset.baseset()
+
+    pushrevs = set()
+    for node in push.nodes:
+        try:
+            pushrevs.add(repo[node].rev())
+        except RepoLookupError:
+            pass
+
+    return subset & pushrevs
+
+@revsetpredicate('pushrev(set)')
+def revset_pushrev(repo, subset, x):
+    """Changesets that were part of the same push as the specified changeset(s)."""
+    l = revset.getset(repo, subset, x)
+
+    # This isn't the most optimal implementation, especially if the input
+    # set is large. But it gets the job done.
+    revs = set()
+    for rev in l:
+        push = repo.pushlog.pushfromchangeset(repo[rev])
+        if push:
+            for node in push.nodes:
+                revs.add(repo[node].rev())
+
+    return subset.filter(revs.__contains__)
+
 # Again, for performance reasons we read the entire pushlog database and cache
 # the results. Again, this is unfortunate. But, the alternative is a potential
 # very expensive series of database lookups.
