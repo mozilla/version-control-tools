@@ -231,7 +231,7 @@ def newpushes(repo, unifiedpushes):
     destpushes = list(pushlog.pushes())
     destpushnodes = set()
     for push in destpushes:
-        destpushnodes |= set(bin(n) for n in push[3])
+        destpushnodes |= set(bin(n) for n in push.nodes)
 
     for source, pushid, who, when, nodes in unifiedpushes:
         missing = [n for n in nodes if n not in destpushnodes]
@@ -443,9 +443,9 @@ def unifyrepo(ui, settings):
 
     # Verify that pushlog time in revision order is always increasing.
     destnodepushtime = {}
-    for pushid, who, when, nodes in destrepo.pushlog.pushes():
-        for node in nodes:
-            destnodepushtime[bin(node)] = when
+    for push in destrepo.pushlog.pushes():
+        for node in push.nodes:
+            destnodepushtime[bin(node)] = push.when
 
     destcl = destrepo.changelog
     lastpushtime = 0
