@@ -105,6 +105,9 @@ import mozautomation.commitparser as commitparser
 import mozhg.mozbuildinfo as mozbuildinfo
 
 
+minimumhgversion = '3.8'
+testedwith = '3.8'
+
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
@@ -395,6 +398,7 @@ def automationrelevancewebcommand(web, req, tmpl):
         'changelogtag',
         'child',
         'inbranch',
+        'parent',
         'phase',
         'tags',
     ])
@@ -413,9 +417,9 @@ def automationrelevancewebcommand(web, req, tmpl):
             # Don't even bother and just repopulate it.
             if k == 'files':
                 entry['files'] = sorted(ctx.files())
-            # "parent" is a generator in 3.6 and a lambda in 3.7+.
-            elif k == 'parent' and not isinstance(v, types.GeneratorType):
-                entry['parent'] = list(v())
+            elif k == 'allparents':
+                entry['parents'] = [p['node'] for p in v()]
+                del entry['allparents']
             # These aren't interesting to us, so prune them. The
             # original impetus for this was because "changelogtag"
             # isn't part of the json template and adding it is non-trivial.

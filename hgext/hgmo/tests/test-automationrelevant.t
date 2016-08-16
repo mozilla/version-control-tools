@@ -134,7 +134,9 @@ web command for exposing automation relevance works
           "foo"
         ],
         "node": "0a971221ac36075c184743cba0490681eadca983",
-        "parent": [],
+        "parents": [
+          "55482a6fb4b1881fa8f746fd52cf6f096bb21c89"
+        ],
         "pushdate": [
           \d+, (re)
           0
@@ -165,7 +167,9 @@ web command for exposing automation relevance works
           "foo"
         ],
         "node": "cb5c79007e91b09a4ba7ebe9210311491d09e96e",
-        "parent": [],
+        "parents": [
+          "0a971221ac36075c184743cba0490681eadca983"
+        ],
         "pushdate": [
           \d+, (re)
           0
@@ -196,7 +200,9 @@ web command for exposing automation relevance works
           "foo"
         ],
         "node": "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
-        "parent": [],
+        "parents": [
+          "cb5c79007e91b09a4ba7ebe9210311491d09e96e"
+        ],
         "pushdate": [
           \d+, (re)
           0
@@ -228,7 +234,9 @@ web command for exposing automation relevance works
           "foo"
         ],
         "node": "66a66c6c6ae312ec88240754300468a6cea8f71d",
-        "parent": [],
+        "parents": [
+          "13855aae8fb3291c663ff46a8510c0e3fa673a4c"
+        ],
         "pushdate": [
           \d+, (re)
           0
@@ -260,7 +268,9 @@ web command for exposing automation relevance works
           "foo"
         ],
         "node": "5d04c4fd236c19e241d1587e120b39840344eee8",
-        "parent": [],
+        "parents": [
+          "66a66c6c6ae312ec88240754300468a6cea8f71d"
+        ],
         "pushdate": [
           \d+, (re)
           0

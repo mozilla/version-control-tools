@@ -102,7 +102,9 @@ Unless --hidden is used
           "file1"
         ],
         "node": "11743f8081842eb047711e85120177ed46be343e",
-        "parent": [],
+        "parents": [
+          "d406a5ad38f255efb8657338e56a2bd6b8149cca"
+        ],
         "pushdate": [
           \d+, (re)
           0
@@ -133,7 +135,9 @@ Unless --hidden is used
           "file1"
         ],
         "node": "3208166ea10954e86c390c32fe6f7166f06161b2",
-        "parent": [],
+        "parents": [
+          "11743f8081842eb047711e85120177ed46be343e"
+        ],
         "pushdate": [
           \d+, (re)
           0
