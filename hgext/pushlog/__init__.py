@@ -17,7 +17,6 @@ import mercurial.extensions as extensions
 import mercurial.hgweb.webutil as webutil
 import mercurial.revset as revset
 import mercurial.templatekw as templatekw
-import mercurial.transaction as transaction
 import mercurial.util as util
 import mercurial.wireproto as wireproto
 
