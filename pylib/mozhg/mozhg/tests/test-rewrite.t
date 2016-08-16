@@ -280,10 +280,10 @@ Children are rebased automatically
   |
   o  changeset:   5:9834cc961a26
   |  parent:      0:96ee1d7354c4
-  |  user:        test
-  |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     base
-  |
+  ~  user:        test
+     date:        Thu Jan 01 00:00:00 1970 +0000
+     summary:     base
+  
 
   $ hg rewritemessage 9834cc961a26::67fabc181c37
   saved backup bundle to $TESTTMP/repo/.hg/strip-backup/5658df40aea0*-replacing.hg (glob)
@@ -345,18 +345,18 @@ Children are rebased automatically
   |
   o  changeset:   5:f9d897b602f9832703568507b9c240f1cec64688
   |  phase:       draft
-  |  parent:      0:96ee1d7354c4ad7372047672c36a1f561e3a6a4c
-  |  parent:      -1:0000000000000000000000000000000000000000
-  |  manifest:    2:93c70231c88572966b1059f6d4b93c9fe6703310
-  |  user:        test
-  |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  files:       foo
-  |  extra:       branch=default
-  |  description:
-  |  base
-  |  0
-  |
-  |
+  ~  parent:      0:96ee1d7354c4ad7372047672c36a1f561e3a6a4c
+     parent:      -1:0000000000000000000000000000000000000000
+     manifest:    2:93c70231c88572966b1059f6d4b93c9fe6703310
+     user:        test
+     date:        Thu Jan 01 00:00:00 1970 +0000
+     files:       foo
+     extra:       branch=default
+     description:
+     base
+     0
+  
+  
 
 Working copy changes to rebased children cause abort
 
@@ -410,15 +410,15 @@ Obsolescence, not stripping, should occur when enabled
   |
   o  changeset:   14:bc9e3a9b7283
   |  parent:      0:96ee1d7354c4
+  ~  user:        test
+     date:        Thu Jan 01 00:00:00 1970 +0000
+     summary:     obsolete 1
+  
+  o  changeset:   11:c8bb49e22bd1
   |  user:        test
-  |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     obsolete 1
-  |
-  | o  changeset:   11:c8bb49e22bd1
-  | |  user:        test
-  | |  date:        Thu Jan 01 00:00:00 1970 +0000
-  | |  summary:     secret 2
-  | |
+  ~  date:        Thu Jan 01 00:00:00 1970 +0000
+     summary:     secret 2
+  
 
   $ hg --config extensions.obs=$TESTTMP/obs.py --hidden log -G -r 11:
   @  changeset:   15:fa1584f69cf7
@@ -429,26 +429,26 @@ Obsolescence, not stripping, should occur when enabled
   |
   o  changeset:   14:bc9e3a9b7283
   |  parent:      0:96ee1d7354c4
+  ~  user:        test
+     date:        Thu Jan 01 00:00:00 1970 +0000
+     summary:     obsolete 1
+  
+  x  changeset:   13:7ceaf29d1ae9
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     obsolete 1
+  |  summary:     obsolete 2
   |
-  | x  changeset:   13:7ceaf29d1ae9
-  | |  user:        test
-  | |  date:        Thu Jan 01 00:00:00 1970 +0000
-  | |  summary:     obsolete 2
-  | |
-  | x  changeset:   12:da0a718bed60
-  |/   parent:      0:96ee1d7354c4
-  |    user:        test
-  |    date:        Thu Jan 01 00:00:00 1970 +0000
-  |    summary:     obsolete 1
-  |
-  | o  changeset:   11:c8bb49e22bd1
-  | |  user:        test
-  | |  date:        Thu Jan 01 00:00:00 1970 +0000
-  | |  summary:     secret 2
-  | |
+  x  changeset:   12:da0a718bed60
+  |  parent:      0:96ee1d7354c4
+  ~  user:        test
+     date:        Thu Jan 01 00:00:00 1970 +0000
+     summary:     obsolete 1
+  
+  o  changeset:   11:c8bb49e22bd1
+  |  user:        test
+  ~  date:        Thu Jan 01 00:00:00 1970 +0000
+     summary:     secret 2
+  
 
   $ rm .hg/store/obsstore
 
@@ -525,11 +525,11 @@ Rewritten MQ patches should retain metadata
   |
   o  changeset:   20:8b138ced889d
   |  bookmark:    bm2
-  |  tag:         qparent
-  |  user:        test
-  |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     bm2 commit 2
-  |
+  ~  tag:         qparent
+     user:        test
+     date:        Thu Jan 01 00:00:00 1970 +0000
+     summary:     bm2 commit 2
+  
 
   $ hg rewritemessage ff479019e00d
   saved backup bundle to $TESTTMP/repo/.hg/strip-backup/cc52d46d2da7*-replacing.hg (glob)
@@ -552,11 +552,11 @@ Rewritten MQ patches should retain metadata
   |
   o  changeset:   20:8b138ced889d
   |  bookmark:    bm2
-  |  tag:         qparent
-  |  user:        test
-  |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     bm2 commit 2
-  |
+  ~  tag:         qparent
+     user:        test
+     date:        Thu Jan 01 00:00:00 1970 +0000
+     summary:     bm2 commit 2
+  
 
   $ cat .hg/patches/status
   40a869e5c384a7ca5fe8113e2fb47c80adf45a4c:patch-1
