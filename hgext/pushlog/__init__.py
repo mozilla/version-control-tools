@@ -3,28 +3,32 @@
 
 '''Record pushes to Mercurial repositories.'''
 
+from __future__ import absolute_import
+
 import contextlib
 import os
 import sqlite3
 import stat
 import time
 
-import mercurial.cmdutil as cmdutil
-import mercurial.encoding as encoding
-import mercurial.error as error
-import mercurial.exchange as exchange
-import mercurial.extensions as extensions
-import mercurial.hgweb.webutil as webutil
-import mercurial.revset as revset
-import mercurial.templatekw as templatekw
-import mercurial.util as util
-import mercurial.wireproto as wireproto
-
-from mercurial.error import (
-    Abort,
-    RepoLookupError,
-)
 from mercurial.node import bin
+from mercurial import (
+    cmdutil,
+    encoding,
+    error,
+    exchange,
+    extensions,
+    revset,
+    templatekw,
+    util,
+    wireproto,
+)
+from mercurial.hgweb import (
+    webutil,
+)
+
+Abort = error.Abort
+RepoLookupError = error.RepoLookupError
 
 testedwith = '3.7'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
