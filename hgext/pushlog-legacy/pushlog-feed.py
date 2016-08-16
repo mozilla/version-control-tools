@@ -95,13 +95,13 @@ class PushlogQuery(object):
                 res = self.conn.execute("SELECT id, user, date FROM pushlog ORDER BY date DESC LIMIT ? OFFSET ?",
                                         (self.querystart_value,
                                          (self.page - 1) * self.querystart_value))
-                for (id,user,date) in res:
+                for (id, user, date) in res:
                     limit = ""
                     if self.tipsonly:
                         limit = " LIMIT 1"
                     res2 = self.conn.execute("SELECT node FROM changesets WHERE pushid = ? ORDER BY rev DESC" + limit, (id,))
                     for node, in res2:
-                        self.entries.append((id,user,date,node))
+                        self.entries.append((id, user.encode('utf-8'), date, node.encode('utf-8')))
                 # get count of pushes
                 self.totalentries = self.conn.execute("SELECT COUNT(*) FROM pushlog").fetchone()[0]
             except sqlite3.OperationalError:
@@ -163,7 +163,7 @@ class PushlogQuery(object):
 
                     if self.tipsonly and id == lastid:
                         continue
-                    self.entries.append((id,user,date,node))
+                    self.entries.append((id, user.encode('utf-8'), date, node.encode('utf-8')))
                     lastid = id
             except sqlite3.OperationalError:
                 # likely just an empty db, so return an empty result
