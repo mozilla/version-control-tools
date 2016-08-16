@@ -5,6 +5,7 @@
 
 from __future__ import absolute_import
 
+import collections
 import contextlib
 import os
 import sqlite3
@@ -152,13 +153,13 @@ def addpushmetadata(repo, ctx, d):
     if not hasattr(repo, 'pushlog'):
         return
 
-    pushinfo = repo.pushlog.pushfromchangeset(ctx)
-    if pushinfo:
-        d['pushid'] = pushinfo[0]
-        d['pushuser'] = pushinfo[1]
-        d['pushdate'] = util.makedate(pushinfo[2])
-        d['pushnodes'] = pushinfo[3]
-        d['pushhead'] = pushinfo[3][-1]
+    push = repo.pushlog.pushfromchangeset(ctx)
+    if push:
+        d['pushid'] = push.pushid
+        d['pushuser'] = push.user
+        d['pushdate'] = util.makedate(push.when)
+        d['pushnodes'] = push.nodes
+        d['pushhead'] = push.nodes[-1]
 
 
 def changesetentry(orig, web, req, tmpl, ctx):
@@ -173,6 +174,9 @@ def changelistentry(orig, web, ctx, tmpl):
     d = orig(web, ctx, tmpl)
     addpushmetadata(web.repo, ctx, d)
     return d
+
+
+Push = collections.namedtuple('Push', ('pushid', 'user', 'when', 'nodes'))
 
 
 class pushlog(object):
@@ -334,8 +338,8 @@ class pushlog(object):
     def pushes(self, startid=1):
         """Return information about pushes to this repository.
 
-        This is a generator of tuples describing each push. Each tuple has the
-        form:
+        This is a generator of Push namedtuples describing each push. Each
+        tuple has the form:
 
             (pushid, who, when, [nodes])
 
@@ -365,11 +369,11 @@ class pushlog(object):
                     if current:
                         yield current
                     lastid = pushid
-                    current = (pushid, who, when, [])
+                    current = Push(pushid, who, when, [])
                     if node:
-                        current[3].append(node)
+                        current.nodes.append(node)
                 else:
-                    current[3].append(node)
+                    current.nodes.append(node)
 
             if current:
                 yield current
@@ -377,8 +381,8 @@ class pushlog(object):
     def pushfromchangeset(self, ctx):
         """Obtain info about a push that added the specified changeset.
 
-        Returns a tuple of (pushid, who, when, [nodes]) or None if there is
-        no pushlog info for this changeset.
+        Returns a Push namedtuple of (pushid, who, when, [nodes]) or None if
+        there is no pushlog info for this changeset.
         """
         with self.conn(readonly=True) as c:
             if not c:
@@ -399,7 +403,7 @@ class pushlog(object):
                 who = who.encode('utf-8')
                 nodes.append(node.encode('ascii'))
 
-            return pushid, who, when, nodes
+            return Push(pushid, who, when, nodes)
 
     def verify(self):
         # Attempt to create database (since .pushes below won't).
@@ -412,17 +416,17 @@ class pushlog(object):
         ret = 0
         seennodes = set()
         pushcount = 0
-        for pushcount, (pushid, who, when, nodes) in enumerate(self.pushes(), 1):
-            if not nodes:
-                ui.warn('pushlog entry has no nodes: #%s\n' % pushid)
+        for pushcount, push in enumerate(self.pushes(), 1):
+            if not push.nodes:
+                ui.warn('pushlog entry has no nodes: #%s\n' % push.pushid)
                 continue
 
-            for node in nodes:
+            for node in push.nodes:
                 try:
                     repo[node]
                 except RepoLookupError:
                     ui.warn('changeset in pushlog entry #%s does not exist: %s\n' %
-                        (pushid, node))
+                            (push.pushid, node))
                     ret = 1
 
                 seennodes.add(bin(node))
@@ -571,8 +575,8 @@ def revset_pushhead(repo, subset, x):
     # this optimal by batching SQL, but that adds complexity. For now,
     # simplicity wins.
     def getrevs():
-        for pushid, who, when, nodes in repo.pushlog.pushes():
-            yield repo[nodes[-1]].rev()
+        for push in repo.pushlog.pushes():
+            yield repo[push.nodes[-1]].rev()
 
     return subset & revset.generatorset(getrevs())
 
@@ -586,9 +590,9 @@ def revset_pushdate(repo, subset, x):
     dm = util.matchdate(ds)
 
     def getrevs():
-        for pushid, who, when, nodes in repo.pushlog.pushes():
-            if dm(when):
-                for node in nodes:
+        for push in repo.pushlog.pushes():
+            if dm(push.when):
+                for node in push.nodes:
                     yield repo[node].rev()
 
     return subset & revset.generatorset(getrevs())
@@ -608,9 +612,9 @@ def revset_pushuser(repo, subset, x):
     kind, pattern, matcher = revset._substringmatcher(n)
 
     def getrevs():
-        for pushid, who, when, nodes in repo.pushlog.pushes():
-            if matcher(encoding.lower(who)):
-                for node in nodes:
+        for push in repo.pushlog.pushes():
+            if matcher(encoding.lower(push.user)):
+                for node in push.nodes:
                     yield repo[node].rev()
 
     return subset & revset.generatorset(getrevs())
@@ -630,7 +634,7 @@ def _getpushinfo(repo, ctx, cache):
     if 'nodetopush' not in cache:
         nodetopush = {}
         for push in repo.pushlog.pushes():
-            for node in push[3]:
+            for node in push.nodes:
                 nodetopush[node] = push
 
         cache['nodetopush'] = nodetopush
