@@ -143,18 +143,18 @@ def addmetadata(repo, ctx, d, onlycheap=False):
         d['treeherderrepourl'] = 'https://treeherder.mozilla.org/#/jobs?repo=%s' % treeherder
         d['treeherderrepo'] = treeherder
 
-        pushinfo = repo.pushlog.pushfromchangeset(ctx)
+        push = repo.pushlog.pushfromchangeset(ctx)
         # Don't print Perfherder link on non-publishing repos (like Try)
         # because the previous push likely has nothing to do with this
         # push.
-        if pushinfo and pushinfo[3] and repo.ui.configbool('phases', 'publish', True):
-            lastpushhead = repo[pushinfo[3][0]].hex()
+        if push and push.nodes and repo.ui.configbool('phases', 'publish', True):
+            lastpushhead = repo[push.nodes[0]].hex()
             d['perfherderurl'] = (
                 'https://treeherder.mozilla.org/perf.html#/compare?'
                 'originalProject=%s&'
                 'originalRevision=%s&'
                 'newProject=%s&'
-                'newRevision=%s') % (treeherder, pushinfo[3][-1],
+                'newRevision=%s') % (treeherder, push.nodes[-1],
                                      treeherder, lastpushhead)
 
     if onlycheap:
@@ -467,8 +467,8 @@ def revset_automationrelevant(repo, subset, x):
     # the requested revision.
     pushlog = getattr(repo, 'pushlog', None)
     if pushlog:
-        pushinfo = repo.pushlog.pushfromchangeset(ctx)
-        for n in pushinfo[3]:
+        push = repo.pushlog.pushfromchangeset(ctx)
+        for n in push.nodes:
             pctx = repo[n]
             if pctx.rev() <= ctx.rev():
                 revs.add(pctx.rev())
@@ -676,10 +676,10 @@ def filelog(orig, web, req, tmpl):
 
         t = orig(web, req, _tmpl())
         for entry in t.kwargs['entries']:
-            pushinfo = web.repo.pushlog.pushfromchangeset(_ctx(entry['node']))
-            if pushinfo:
-                entry['pushid'] = pushinfo[0]
-                entry['pushdate'] = util.makedate(pushinfo[2])
+            push = web.repo.pushlog.pushfromchangeset(_ctx(entry['node']))
+            if push:
+                entry['pushid'] = push.pushid
+                entry['pushdate'] = util.makedate(push.when)
             else:
                 entry['pushid'] = None
                 entry['pushdate'] = None
