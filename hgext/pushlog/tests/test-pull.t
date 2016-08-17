@@ -68,7 +68,6 @@ Pulling from a remote that has pushlog will fetch pushlog data
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files
-  (not updating pushlog since changesets come from pull)
   added 2 pushes
   (run 'hg update' to get a working copy)
   $ dumppushlog client
@@ -113,7 +112,6 @@ Incremental pushlog fetch works over SSH
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  (not updating pushlog since changesets come from pull)
   added 1 pushes
   (run 'hg update' to get a working copy)
 
@@ -144,7 +142,6 @@ Pulling an old changeset only pulls relevant changesets
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  (not updating pushlog since changesets come from pull)
   received pushlog entry for unknown changeset; ignoring
   added 1 pushes
   (run 'hg update' to get a working copy)
@@ -156,7 +153,6 @@ Pulling an old changeset only pulls relevant changesets
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  (not updating pushlog since changesets come from pull)
   added 1 pushes
   (run 'hg update' to get a working copy)
 

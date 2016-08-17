@@ -17,13 +17,19 @@
 Introducing changesets via pulling does not run the pushlog hook
 
   $ cd client2
-  $ hg pull
+  $ hg --verbose pull
   pulling from $TESTTMP/server
   requesting all changes
+  1 changesets found
+  uncompressed size of bundle content:
+       182 (changelog)
+       165 (manifests)
+       115  foo
   adding changesets
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+  calling hook pretxnchangegroup.pushlog: hgext_pushlog.pretxnchangegrouphook
   (not updating pushlog since changesets come from pull)
   (run 'hg update' to get a working copy)
 

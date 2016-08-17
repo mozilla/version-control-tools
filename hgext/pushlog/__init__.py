@@ -510,7 +510,7 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
     # like this for backwards compatibility with the original intent of
     # pushlog.
     if source not in ('push', 'serve'):
-        ui.status('(not updating pushlog since changesets come from %s)\n' % source)
+        ui.note('(not updating pushlog since changesets come from %s)\n' % source)
         return 0
 
     # REMOTE_USER comes from authenticated Apache httpd request.
