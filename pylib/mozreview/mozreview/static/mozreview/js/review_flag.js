@@ -55,11 +55,12 @@ MRReviewFlag.View = Backbone.View.extend({
   */
   save: function(){
     this.model.save({
-      success: _.bind(function(){
-        window.setTimeout(function () {
-          $('#review-form-comments .body-top a.add-link').click();
-        }, 0);
-      }, this)
+      attrs: ['extra_data.' + this.key],
+      success: function() {
+        if (RB.ReviewDialogView._instance) {
+          setTimeout(function() { RB.ReviewDialogView._instance._bodyTopView.openEditor(); }, 0);
+        }
+      }
     });
   },
 
