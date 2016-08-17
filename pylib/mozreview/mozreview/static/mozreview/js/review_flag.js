@@ -53,14 +53,13 @@ MRReviewFlag.View = Backbone.View.extend({
   *  with a 'Add text' link. This is a hack to circumvent that problem.
   *  See bug 1273954.
   */
-  save: function() {
+  save: function(){
     this.model.save({
-      attrs: ['extraData'],
-      success: function() {
-        if (RB.ReviewDialogView._instance) {
-          setTimeout(function() { RB.ReviewDialogView._instance._bodyTopView.openEditor(); }, 0);
-        }
-      }
+      success: _.bind(function(){
+        window.setTimeout(function () {
+          $('#review-form-comments .body-top a.add-link').click();
+        }, 0);
+      }, this)
     });
   },
 
