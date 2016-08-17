@@ -31,11 +31,14 @@ from mercurial.hgweb import (
 Abort = error.Abort
 RepoLookupError = error.RepoLookupError
 
+minimumhgversion = '3.7'
 testedwith = '3.7'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
+
+revsetpredicate = revset.extpredicate()
 
 SCHEMA = [
     'CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)',
@@ -561,9 +564,9 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
 
     return 1
 
+@revsetpredicate('pushhead()')
 def revset_pushhead(repo, subset, x):
-    """``pushhead()``
-    Changesets that were heads when they were pushed.
+    """Changesets that were heads when they were pushed.
 
     A push head is a changeset that was a head at the time it was pushed.
     """
@@ -580,10 +583,9 @@ def revset_pushhead(repo, subset, x):
 
     return subset & revset.generatorset(getrevs())
 
+@revsetpredicate('pushdate(interval)')
 def revset_pushdate(repo, subset, x):
-    """``pushdate(interval)``
-    Changesets that were pushed within the interval, see :hg:`help dates`.
-    """
+    """Changesets that were pushed within the interval, see :hg:`help dates`."""
     l = revset.getargs(x, 1, 1, 'pushdate requires one argument')
 
     ds = revset.getstring(l[0], 'pushdate requires a string argument')
@@ -597,11 +599,11 @@ def revset_pushdate(repo, subset, x):
 
     return subset & revset.generatorset(getrevs())
 
+@revsetpredicate('pushuser(string)')
 def revset_pushuser(repo, subset, x):
-    """``pushuser(string)``
+    """User name that pushed the changeset contains string.
 
-    User name that pushed the changeset contains string. The match is
-    case-insensitive.
+    The match is case-insensitive.
 
     If `string` starts with `re:`, the remainder of the string is treated as
     a regular expression. To match a user that actually contains `re:`, use
@@ -683,9 +685,7 @@ def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
 
-    revset.symbols['pushhead'] = revset_pushhead
-    revset.symbols['pushdate'] = revset_pushdate
-    revset.symbols['pushuser'] = revset_pushuser
+    revsetpredicate.setup()
 
     keywords = {
         'pushid': template_pushid,
