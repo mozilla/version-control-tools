@@ -115,6 +115,12 @@ def landing_repository(repository):
     except (AttributeError, KeyError):
         return ''
 
+@register.filter()
+def trychooser_url(repository):
+    try:
+        return repository.extra_data['trychooser_url']
+    except (AttributeError, KeyError):
+        return ''
 
 @register.filter()
 def treeherder_repo(landing_url):

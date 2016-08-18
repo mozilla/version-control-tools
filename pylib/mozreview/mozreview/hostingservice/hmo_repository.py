@@ -26,6 +26,13 @@ class HMORepositoryForm(HostingServiceForm):
         widget=forms.TextInput(attrs={'size': '60'}),
         help_text=_('URL for associated Try repository (if any)'))
 
+    trychooser_url = forms.CharField(
+        label=_('Trychooser URL'),
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'size': '60'}),
+        help_text=_('URL for associated trychooser page (if any)'))
+
     autolanding_enabled = forms.BooleanField(
         initial=False,
         label=_('Autoland to landing repository'),
@@ -65,6 +72,7 @@ class HMORepository(HostingService):
         'Mercurial': {
             'path': '%(repository_url)s',
             'try_repository_url': '%(try_repository_url)s',
+            'trychooser_url': '%(trychooser_url)s',
             'landing_repository_url': '%(landing_repository_url)s',
             'landing_bookmark': '%(landing_bookmark)s',
             'required_ldap_group': '%(required_ldap_group)s',

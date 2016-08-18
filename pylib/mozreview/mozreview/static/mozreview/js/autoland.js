@@ -6,6 +6,7 @@ $(document).on("mozreview_ready", function() {
 
   var try_trigger = $("#autoland-try-trigger");
   var autoland_trigger = $("#autoland-trigger");
+  var trychooser_url = $('#repository').data('trychooser-url') || "";
 
   function show_error(error_text) {
     $("#activity-indicator")
@@ -54,9 +55,24 @@ $(document).on("mozreview_ready", function() {
       var html = [
         '<label for="mozreview-autoland-try-syntax">TryChooser Syntax</label>',
         '<textarea id="mozreview-autoland-try-syntax" name="mozreview-autoland-try-syntax" placeholder="try: -b do -p win32 -u all -t none"/>',
-        '<p>Enter TryChooser syntax here for your Try build. <a href="http://trychooser.pub.build.mozilla.org/" target="_blank">You can graphically build TryChooser syntax here.</a></p>',
-        '<span id="try-syntax-error">You have an error in your try syntax</span>'
+        '<p>Enter TryChooser syntax here for your Try build.</p>',
+        '<p><span id="try-syntax-error">You have an error in your try syntax</span></p>',
+        '<p><details id="mozreview-open-try"><summary>Graphically build syntax</summary><p><iframe id="mozreview-trychooser-iframe" src="' + trychooser_url + '"/></p></details></p>',
       ];
+
+      if (trychooser_url === "") {
+        html.pop();
+      } else {
+        window.onmessage = function(e) {
+          if (e.origin === new URL(trychooser_url).origin) {
+            if (e.data != "") {
+              $('#mozreview-autoland-try-syntax').val("try: " + e.data)
+            } else {
+              $('#mozreview-autoland-try-syntax').val("")
+            }
+          }
+        }
+      }
 
       for (var i = 0; i < html.length; ++i) {
         box.append($(html[i]).addClass("mozreview-autoland-try-chooser-element"));
