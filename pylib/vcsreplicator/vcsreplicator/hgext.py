@@ -173,6 +173,24 @@ def sendpushkeymessages(ui, repo):
                         namespace, duration))
 
 
+def sendreposyncmessage(ui, repo):
+    """Send a message to perform a full repository sync."""
+    if repo.vfs.exists('hgrc'):
+        hgrc = repo.vfs.read('hgrc')
+    else:
+        hgrc = None
+
+    heads = [repo[h].hex() for h in repo.heads()]
+
+    with ui.kafkainteraction():
+        repo.producerlog('SYNC_SENDING')
+        producer = ui.replicationproducer
+        vcsrproducer.record_hg_repo_sync(producer, repo.replicationwireprotopath,
+                                         hgrc, heads, repo.requirements,
+                                         partition=repo.replicationpartition)
+        repo.producerlog('SYNC_SENT')
+
+
 # Wraps ``hg init`` to send a replication event.
 def initcommand(orig, ui, dest, **opts):
     with ui.kafkainteraction():
@@ -262,20 +280,7 @@ def replicatecommand(ui, repo):
     If the replication system is working as intended, it should not need to be
     used.
     """
-    if repo.vfs.exists('hgrc'):
-        hgrc = repo.vfs.read('hgrc')
-    else:
-        hgrc = None
-
-    heads = [repo[h].hex() for h in repo.heads()]
-
-    with ui.kafkainteraction():
-        repo.producerlog('SYNC_SENDING')
-        producer = ui.replicationproducer
-        vcsrproducer.record_hg_repo_sync(producer, repo.replicationwireprotopath,
-                                         hgrc, heads, repo.requirements,
-                                         partition=repo.replicationpartition)
-        repo.producerlog('SYNC_SENT')
+    sendreposyncmessage(ui, repo)
     ui.status(_('wrote synchronization message into replication log\n'))
 
 
