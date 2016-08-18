@@ -12,6 +12,7 @@ from reviewboard.diffviewer.opcode_generator import (
 )
 from reviewboard.extensions.base import Extension, JSExtension
 from reviewboard.extensions.hooks import (AuthBackendHook,
+                                          DiffViewerDropdownActionHook,
                                           HeaderDropdownActionHook,
                                           HostingServiceHook,
                                           ReviewRequestDropdownActionHook,
@@ -243,24 +244,27 @@ class MozReviewExtension(Extension):
             ],
         }])
 
-        ReviewRequestDropdownActionHook(self, actions=[
-        {
-            'label': 'Automation',
-            'id': 'automation-menu',
-            'items': [
-                {
-                    'id': 'autoland-try-trigger',
-                    'label': 'Trigger a Try Build',
-                    'url': '#',
-                },
-                {
-                    'id': 'autoland-trigger',
-                    'label': 'Land Commits',
-                    'url': '#',
-                },
-            ],
-        },
-        ])
+        review_request_dropdown_actions = [
+            {
+                'label': 'Automation',
+                'id': 'automation-menu',
+                'items': [
+                    {
+                        'id': 'autoland-try-trigger',
+                        'label': 'Trigger a Try Build',
+                        'url': '#',
+                    },
+                    {
+                        'id': 'autoland-trigger',
+                        'label': 'Land Commits',
+                        'url': '#',
+                    },
+                ],
+            },
+        ]
+
+        ReviewRequestDropdownActionHook(self, actions=review_request_dropdown_actions)
+        DiffViewerDropdownActionHook(self, actions=review_request_dropdown_actions)
 
         # Hide fields from all review requests that are not used by Mozilla
         # developers.
