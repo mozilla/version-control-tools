@@ -1063,12 +1063,15 @@ class Docker(object):
                     host_config=hgrb_host_config)
 
             if start_hgweb:
+                hgweb_host_config = self.client.create_host_config(
+                    port_bindings={80: hgweb_port})
                 f_hgweb_create = e.submit(
                     self.client.create_container,
                     hgweb_image,
                     ports=[80],
                     entrypoint=['/entrypoint-solo'],
                     command=['/usr/bin/supervisord', '-n'],
+                    host_config=hgweb_host_config,
                     labels=['hgweb'])
 
             if start_autoland:
@@ -1162,8 +1165,7 @@ class Docker(object):
                 hgrb_state = self.client.inspect_container(hgrb_id)
 
             if start_hgweb:
-                self.client.start(hgweb_id,
-                                  port_bindings={80: hgweb_port})
+                self.client.start(hgweb_id)
                 hgweb_state = self.client.inspect_container(hgweb_id)
 
             if start_treestatus:
