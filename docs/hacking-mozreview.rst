@@ -115,6 +115,17 @@ Now, you can create and start a MozReview instance::
 
   (valid container names include: rbweb, bmoweb, hgrb, autoland)
 
+.. hint::
+
+   There is a helper script which will automatically create users, bugs, and
+   a repository, as well as a local clone of the repository that is
+   ready to push::
+
+    $ ./start-local-mozreview
+
+   This will use ``../mozreview-test`` as the instance path, and
+   locally clone the repository to ``../local-mozreview-test-repo``.
+
 You should be able to load the printed URLs in your browser and see a
 working site. If you don't, `file a bug! <https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Testing%20%2F%20Development%20Environment>`_
 
