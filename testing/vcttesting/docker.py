@@ -1043,9 +1043,12 @@ class Docker(object):
                     labels=['rbweb'])
 
             if start_ldap:
+                ldap_host_config = self.client.create_host_config(
+                    port_bindings={389: ldap_port})
                 f_ldap_create = e.submit(
                     self.client.create_container,
                     ldap_image,
+                    host_config=ldap_host_config,
                     labels=['ldap'])
 
             if start_hgrb:
@@ -1104,8 +1107,7 @@ class Docker(object):
                 containers.append(ldap_id)
                 f_start_ldap = e.submit(
                     self.client.start,
-                    ldap_id,
-                    port_bindings={389: ldap_port})
+                    ldap_id)
 
             web_id = f_web_create.result()['Id']
             containers.append(web_id)
