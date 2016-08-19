@@ -1572,15 +1572,19 @@ class Docker(object):
             cid = existing_cid
             start = True
         else:
+            host_config = self.client.create_host_config(
+                port_bindings={873: None})
+
             cid = self.client.create_container(image,
                                                volumes=['/vct-mount'],
                                                ports=[873],
+                                               host_config=host_config,
                                                labels=['vct'])['Id']
             start = True
 
         try:
             if start:
-                self.client.start(cid, port_bindings={873: None})
+                self.client.start(cid)
                 state = self.client.inspect_container(cid)
                 ports = state['NetworkSettings']['Ports']
                 port = ports['873/tcp'][0]['HostPort']
