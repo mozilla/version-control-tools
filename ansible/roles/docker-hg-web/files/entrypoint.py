@@ -12,11 +12,7 @@ import sys
 sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
 sys.stderr = sys.stdout
 
-if 'MASTER_PORT_22_TCP_ADDR' not in os.environ:
-    print('error: container invoked improperly. please link to a master container')
-    sys.exit(1)
-
-ssh_hostname = os.environ['MASTER_PORT_22_TCP_ADDR']
+ssh_hostname = 'hgssh'
 hostname = socket.gethostname()
 
 if not os.path.exists('/etc/ssh/ssh_host_ed25519_key'):

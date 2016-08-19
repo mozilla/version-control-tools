@@ -119,18 +119,32 @@ class HgCluster(object):
 
         zookeeper_id = 0
 
+        network_name = 'hgmo-%s' % uuid.uuid4()
+        self._dc.create_network(network_name, driver='bridge')
+
+        def network_config(alias):
+            return self._dc.create_networking_config(
+                endpoints_config={
+                    network_name: self._dc.create_endpoint_config(
+                        aliases=[alias],
+                    )
+                }
+            )
+
         with futures.ThreadPoolExecutor(5) as e:
             ldap_host_config = self._dc.create_host_config(
                 port_bindings={389: ldap_port})
             f_ldap_create = e.submit(self._dc.create_container, ldap_image,
                                      labels=['ldap'],
-                                     host_config=ldap_host_config)
+                                     host_config=ldap_host_config,
+                                     networking_config=network_config('ldap'))
 
             pulse_host_config = self._dc.create_host_config(
                 port_bindings={5672: pulse_port})
             f_pulse_create = e.submit(self._dc.create_container, pulse_image,
                                       labels=['pulse'],
-                                      host_config=pulse_host_config)
+                                      host_config=pulse_host_config,
+                                      networking_config=network_config('pulse'))
 
             env = {
                 'ZOOKEEPER_ID': '%d' % zookeeper_id,
@@ -155,10 +169,6 @@ class HgCluster(object):
             pulse_state = self._dc.inspect_container(pulse_id)
 
             master_host_config = self._dc.create_host_config(
-                links=[
-                    (ldap_state['Name'], 'ldap'),
-                    (pulse_state['Name'], 'pulse')
-                ],
                 port_bindings={
                     22: master_ssh_port,
                     9092: None,
@@ -172,7 +182,8 @@ class HgCluster(object):
                 command=['/usr/bin/supervisord', '-n'],
                 ports=[22, 2181, 2888, 3888, 9092],
                 host_config=master_host_config,
-                labels=['hgssh'])['Id']
+                labels=['hgssh'],
+                networking_config=network_config('hgssh'))['Id']
 
             self._dc.start(master_id)
 
@@ -187,7 +198,6 @@ class HgCluster(object):
                 zookeeper_id += 1
 
                 web_host_config = self._dc.create_host_config(
-                    links=[(master_state['Name'], 'master')],
                     port_bindings={
                         22: None,
                         80: None,
@@ -202,7 +212,8 @@ class HgCluster(object):
                                               entrypoint=['/entrypoint.py'],
                                               command=['/usr/bin/supervisord', '-n'],
                                               host_config=web_host_config,
-                                              labels=['hgweb', 'hgweb%d' % i]))
+                                              labels=['hgweb', 'hgweb%d' % i],
+                                              networking_config=network_config('hgweb%d' % i)))
 
             web_ids = [f.result()['Id'] for f in f_web_creates]
             fs = []
@@ -222,7 +233,7 @@ class HgCluster(object):
         # the cluster are known. The entrypoint script waits for a file created
         # by a process execution to come into existence before these daemons
         # are started. So do this early after startup.
-        zk_ips = [s['NetworkSettings']['IPAddress']
+        zk_ips = [s['NetworkSettings']['Networks'][network_name]['IPAddress']
                   for s in [master_state] + web_states]
         zookeeper_hostports = ['%s:2888:3888' % ip for ip in zk_ips]
         zookeeper_connect = ','.join('%s:2181/hgmoreplication' % ip for ip in zk_ips)
@@ -232,7 +243,7 @@ class HgCluster(object):
             for s in all_states:
                 command = [
                     '/set-kafka-servers',
-                    s['NetworkSettings']['IPAddress'],
+                    s['NetworkSettings']['Networks'][network_name]['IPAddress'],
                     '9092',
                     ','.join(web_hostnames),
                 ] + zookeeper_hostports
@@ -261,7 +272,7 @@ class HgCluster(object):
                 '/set-mirror-key.py',
                 mirror_private_key,
                 mirror_public_key,
-                master_state['NetworkSettings']['IPAddress'],
+                'hgssh',
                 # FUTURE this will need updated once hgweb supports ed25519 keys
                 master_host_rsa_key,
             ]
@@ -286,7 +297,7 @@ class HgCluster(object):
             # Obtain host keys from mirrors.
             for s in web_states:
                 f_mirror_host_keys.append((
-                    s['NetworkSettings']['IPAddress'],
+                    s['NetworkSettings']['Networks'][network_name]['IPAddress'],
                     e.submit(self._d.get_file_content, s['Id'],
                              '/etc/ssh/ssh_host_rsa_key.pub')))
 
@@ -397,12 +408,18 @@ class HgCluster(object):
         destroyed.
         """
         c = self._d.client
+
+        state = c.inspect_container(self.master_id)
+
         with futures.ThreadPoolExecutor(4) as e:
             e.submit(c.remove_container, self.master_id, force=True, v=True)
             e.submit(c.remove_container, self.ldap_id, force=True, v=True)
             e.submit(c.remove_container, self.pulse_id, force=True, v=True)
             for i in self.web_ids:
                 e.submit(c.remove_container, i, force=True, v=True)
+
+        for network in state['NetworkSettings']['Networks'].values():
+            c.remove_network(network['NetworkID'])
 
         try:
             os.unlink(self.state_path)

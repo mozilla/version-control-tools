@@ -6,15 +6,6 @@
 - include: ../../../tasks/systemd-mail-unit-output.yml
   when: vct_dir.stat.exists == False
 
-# This is needed so authconfig can have the appropriate ldap_uri at container
-# start time, which results in /etc/openldap/ldap.conf getting updated
-# appropriately, which is necessary for nscd and `ldapsearch` to
-# "just work."
-- name: find LDAP URI in Docker
-  set_fact: ldap_uri=ldap://{{ ansible_env.LDAP_PORT_389_TCP_ADDR }}:{{ ansible_env.LDAP_PORT_389_TCP_PORT }}/
-  when: ansible_env.LDAP_PORT_389_TCP_ADDR is defined
-  tags: docker-startup
-
 - name: Install packages required to run a Mercurial server
   yum: name={{ item }} state=present
   with_items:

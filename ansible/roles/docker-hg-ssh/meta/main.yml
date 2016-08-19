@@ -8,6 +8,7 @@ dependencies:
   # Something similar applies to ZooKeeper and Kafka settings.
   - {
       role: hg-ssh,
+      ldap_uri: 'ldap://ldap:389/',
       sshd_hg_port: 22,
       hgweb_hosts: [],
       kafka_broker_id: 1024,

@@ -11,8 +11,7 @@ import sys
 
 what, value = sys.argv[1:]
 
-real = 'ldap://%s:%s/' % (os.environ['LDAP_PORT_389_TCP_ADDR'],
-                          os.environ['LDAP_PORT_389_TCP_PORT'])
+real = 'ldap://ldap:389/'
 
 if value == 'real':
     value = real

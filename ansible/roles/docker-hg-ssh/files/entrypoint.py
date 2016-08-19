@@ -7,14 +7,6 @@ import os
 import subprocess
 import sys
 
-if 'LDAP_PORT_389_TCP_ADDR' not in os.environ:
-    print('error: container invoked improperly. please link to an ldap container')
-    sys.exit(1)
-
-if 'PULSE_PORT_5672_TCP_ADDR' not in os.environ:
-    print('error: container invoked improperly. please link to a pulse container')
-    sys.exit(1)
-
 os.environ['DOCKER_ENTRYPOINT'] = '1'
 
 subprocess.check_call([
@@ -25,12 +17,10 @@ subprocess.check_call([
 
 del os.environ['DOCKER_ENTRYPOINT']
 
-ldap_hostname = os.environ['LDAP_PORT_389_TCP_ADDR']
-ldap_port = os.environ['LDAP_PORT_389_TCP_PORT']
-ldap_uri = 'ldap://%s:%s/' % (ldap_hostname, ldap_port)
+ldap_uri = 'ldap://ldap:389/'
 
-pulse_hostname = os.environ['PULSE_PORT_5672_TCP_ADDR']
-pulse_port = int(os.environ['PULSE_PORT_5672_TCP_PORT'])
+pulse_hostname = 'pulse'
+pulse_port = 5672
 
 # Generate host SSH keys for hg.
 if not os.path.exists('/etc/mercurial/ssh/ssh_host_ed25519_key'):
