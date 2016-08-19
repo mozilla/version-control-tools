@@ -156,21 +156,26 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
 def sendpushkeymessages(ui, repo):
     """Send messages indicating updates to pushkey values."""
     for namespace, key, old, new, ret in repo._replicationinfo['pushkey']:
-        with ui.kafkainteraction():
-            repo.producerlog('PUSHKEY_SENDING')
-            start = time.time()
-            vcsrproducer.record_hg_pushkey(ui.replicationproducer,
-                                           repo.replicationwireprotopath,
-                                           namespace,
-                                           key,
-                                           old,
-                                           new,
-                                           ret,
-                                           partition=repo.replicationpartition)
-            duration = time.time() - start
-            repo.producerlog('PUSHKEY_SENT')
-            ui.status(_('recorded updates to %s in replication log in %.3fs\n') % (
-                        namespace, duration))
+        sendpushkeymessage(ui, repo, namespace, key, old, new, ret)
+
+
+def sendpushkeymessage(ui, repo, namespace, key, old, new, ret):
+    """Send a pushkey replication message."""
+    with ui.kafkainteraction():
+        repo.producerlog('PUSHKEY_SENDING')
+        start = time.time()
+        vcsrproducer.record_hg_pushkey(ui.replicationproducer,
+                                       repo.replicationwireprotopath,
+                                       namespace,
+                                       key,
+                                       old,
+                                       new,
+                                       ret,
+                                       partition=repo.replicationpartition)
+        duration = time.time() - start
+        repo.producerlog('PUSHKEY_SENT')
+        ui.status(_('recorded updates to %s in replication log in %.3fs\n') % (
+            namespace, duration))
 
 
 def sendreposyncmessage(ui, repo):
