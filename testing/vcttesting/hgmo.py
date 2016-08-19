@@ -141,31 +141,8 @@ class HgCluster(object):
             if coverage:
                 env['CODE_COVERAGE'] = '1'
 
-            f_master_create = e.submit(self._dc.create_container,
-                                       master_image,
-                                       environment=env,
-                                       entrypoint=['/entrypoint.py'],
-                                       command=['/usr/bin/supervisord', '-n'],
-                                       ports=[22, 2181, 2888, 3888, 9092],
-                                       labels=['hgssh'])
-            f_web_creates = []
-            for i in range(web_count):
-                env = {
-                    'ZOOKEEPER_ID': '%d' % zookeeper_id,
-                    'KAFKA_BROKER_ID': '%d' % zookeeper_id,
-                }
-                zookeeper_id += 1
-                f_web_creates.append(e.submit(self._dc.create_container,
-                                              web_image,
-                                              environment=env,
-                                              ports=[22, 80, 2181, 2888, 3888, 9092],
-                                              entrypoint=['/entrypoint.py'],
-                                              command=['/usr/bin/supervisord', '-n'],
-                                              labels=['hgweb', 'hgweb%d' % i]))
-
             ldap_id = f_ldap_create.result()['Id']
             pulse_id = f_pulse_create.result()['Id']
-            master_id = f_master_create.result()['Id']
 
             # Start LDAP and Pulse first because we need to link it to hg
             # containers.
@@ -177,26 +154,60 @@ class HgCluster(object):
             ldap_state = self._dc.inspect_container(ldap_id)
             pulse_state = self._dc.inspect_container(pulse_id)
 
-            self._dc.start(master_id,
-                           links=[(ldap_state['Name'], 'ldap'),
-                                  (pulse_state['Name'], 'pulse')],
-                           port_bindings={
-                               22: master_ssh_port,
-                               9092: None,
-                           })
+            master_host_config = self._dc.create_host_config(
+                links=[
+                    (ldap_state['Name'], 'ldap'),
+                    (pulse_state['Name'], 'pulse')
+                ],
+                port_bindings={
+                    22: master_ssh_port,
+                    9092: None,
+                },
+            )
+
+            master_id = self._dc.create_container(
+                master_image,
+                environment=env,
+                entrypoint=['/entrypoint.py'],
+                command=['/usr/bin/supervisord', '-n'],
+                ports=[22, 2181, 2888, 3888, 9092],
+                host_config=master_host_config,
+                labels=['hgssh'])['Id']
+
+            self._dc.start(master_id)
 
             master_state = self._dc.inspect_container(master_id)
+
+            f_web_creates = []
+            for i in range(web_count):
+                env = {
+                    'ZOOKEEPER_ID': '%d' % zookeeper_id,
+                    'KAFKA_BROKER_ID': '%d' % zookeeper_id,
+                }
+                zookeeper_id += 1
+
+                web_host_config = self._dc.create_host_config(
+                    links=[(master_state['Name'], 'master')],
+                    port_bindings={
+                        22: None,
+                        80: None,
+                        9092: None,
+                    },
+                )
+
+                f_web_creates.append(e.submit(self._dc.create_container,
+                                              web_image,
+                                              environment=env,
+                                              ports=[22, 80, 2181, 2888, 3888, 9092],
+                                              entrypoint=['/entrypoint.py'],
+                                              command=['/usr/bin/supervisord', '-n'],
+                                              host_config=web_host_config,
+                                              labels=['hgweb', 'hgweb%d' % i]))
 
             web_ids = [f.result()['Id'] for f in f_web_creates]
             fs = []
             for i in web_ids:
-                fs.append(e.submit(self._dc.start, i,
-                                   links=[(master_state['Name'], 'master')],
-                                   port_bindings={
-                                       22: None,
-                                       80: None,
-                                       9092: None,
-                                    }))
+                fs.append(e.submit(self._dc.start, i))
             [f.result() for f in fs]
 
             f_web_states = []
