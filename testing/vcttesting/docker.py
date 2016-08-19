@@ -1011,9 +1011,12 @@ class Docker(object):
 
         with limited_threadpoolexecutor(10, max_workers) as e:
             if start_pulse:
+                pulse_host_config = self.client.create_host_config(
+                    port_bindings={5672: pulse_port})
                 f_pulse_create = e.submit(
                     self.client.create_container,
                     pulse_image,
+                    host_config=pulse_host_config,
                     labels=['pulse'])
 
             bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
@@ -1088,8 +1091,7 @@ class Docker(object):
                 containers.append(pulse_id)
                 f_start_pulse = e.submit(
                     self.client.start,
-                    pulse_id,
-                    port_bindings={5672: pulse_port})
+                    pulse_id)
 
             if start_ldap:
                 ldap_id = f_ldap_create.result()['Id']
