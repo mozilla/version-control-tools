@@ -1052,12 +1052,15 @@ class Docker(object):
                     labels=['ldap'])
 
             if start_hgrb:
+                hgrb_host_config = self.client.create_host_config(
+                    port_bindings={22: ssh_port, 80: hg_port})
                 f_hgrb_create = e.submit(
                     self.client.create_container,
                     hgrb_image,
                     ports=[22, 80],
                     entrypoint=['/entrypoint.py'],
-                    command=['/usr/bin/supervisord', '-n'])
+                    command=['/usr/bin/supervisord', '-n'],
+                    host_config=hgrb_host_config)
 
             if start_hgweb:
                 f_hgweb_create = e.submit(
@@ -1155,8 +1158,7 @@ class Docker(object):
             # TODO: Use futures for hgrb, hgweb and treestatus
             if start_hgrb:
                 self.client.start(hgrb_id,
-                                  links=[(ldap_state['Name'], 'ldap')],
-                                  port_bindings={22: ssh_port, 80: hg_port})
+                                  links=[(ldap_state['Name'], 'ldap')])
                 hgrb_state = self.client.inspect_container(hgrb_id)
 
             if start_hgweb:
