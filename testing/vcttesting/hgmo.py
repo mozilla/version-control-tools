@@ -120,10 +120,17 @@ class HgCluster(object):
         zookeeper_id = 0
 
         with futures.ThreadPoolExecutor(5) as e:
+            ldap_host_config = self._dc.create_host_config(
+                port_bindings={389: ldap_port})
             f_ldap_create = e.submit(self._dc.create_container, ldap_image,
-                                     labels=['ldap'])
+                                     labels=['ldap'],
+                                     host_config=ldap_host_config)
+
+            pulse_host_config = self._dc.create_host_config(
+                port_bindings={5672: pulse_port})
             f_pulse_create = e.submit(self._dc.create_container, pulse_image,
-                                      labels=['pulse'])
+                                      labels=['pulse'],
+                                      host_config=pulse_host_config)
 
             env = {
                 'ZOOKEEPER_ID': '%d' % zookeeper_id,
@@ -162,10 +169,8 @@ class HgCluster(object):
 
             # Start LDAP and Pulse first because we need to link it to hg
             # containers.
-            f_ldap_start = e.submit(self._dc.start, ldap_id,
-                                    port_bindings={389: ldap_port})
-            f_pulse_start = e.submit(self._dc.start, pulse_id,
-                                     port_bindings={5672: pulse_port})
+            f_ldap_start = e.submit(self._dc.start, ldap_id)
+            f_pulse_start = e.submit(self._dc.start, pulse_id)
             f_ldap_start.result()
             f_pulse_start.result()
 
