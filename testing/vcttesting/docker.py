@@ -851,15 +851,16 @@ class Docker(object):
         if 'FETCH_BMO' in os.environ or self.clobber_needed('bmofetch'):
             web_environ['FETCH_BMO'] = '1'
 
+        host_config = self.client.create_host_config(
+            port_bindings={80: None})
+
         web_id = self.client.create_container(
             web_image,
             environment=web_environ,
+            host_config=host_config,
             labels=['bmoweb-bootstrapping'])['Id']
 
-        web_params = {
-            'port_bindings': {80: None},
-        }
-        with self.start_container(web_id, **web_params) as web_state:
+        with self.start_container(web_id) as web_state:
             web_hostname, web_port = self._get_host_hostname_port(
                 web_state, '80/tcp')
             wait_for_http(
