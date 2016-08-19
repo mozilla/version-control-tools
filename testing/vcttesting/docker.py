@@ -1086,9 +1086,12 @@ class Docker(object):
                     labels=['autolandweb'])
 
             if start_treestatus:
+                treestatus_host_config = self.client.create_host_config(
+                    port_bindings={80: treestatus_port})
                 f_treestatus_create = e.submit(
                     self.client.create_container,
                     treestatus_image,
+                    host_config=treestatus_host_config,
                     labels=['treestatus'])
 
             if start_autoland:
@@ -1169,8 +1172,7 @@ class Docker(object):
                 hgweb_state = self.client.inspect_container(hgweb_id)
 
             if start_treestatus:
-                self.client.start(treestatus_id,
-                                  port_bindings={80: treestatus_port})
+                self.client.start(treestatus_id)
                 treestatus_state = self.client.inspect_container(treestatus_id)
 
             if start_autoland:
