@@ -170,10 +170,10 @@ class Docker(object):
             self.client = None
             return
 
-        # We need API 1.20+ for the archive API.
-        if docker.utils.compare_version('1.20', self.client.api_version) < 0:
+        # We need API 1.22+ for some networking APIs.
+        if docker.utils.compare_version('1.22', self.client.api_version) < 0:
             warnings.warn('Warning: unable to speak to Docker servers older '
-                          'than Docker 1.8.x')
+                          'than Docker 1.10.x')
             self.client = None
             return
 
