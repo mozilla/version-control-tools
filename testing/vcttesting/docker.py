@@ -681,9 +681,11 @@ class Docker(object):
         with self.vct_container(image=vct_image, cid=vct_cid, verbose=verbose) \
                 as vct_state:
             cmd = ['/sync-and-build', '%s.yml' % playbook]
-            with self.create_container(start_image, command=cmd) as cid:
+            host_config = self.client.create_host_config(
+                volumes_from=[vct_state['Name']])
+            with self.create_container(start_image, command=cmd, host_config=host_config) as cid:
                 output = deque(maxlen=20)
-                self.client.start(cid, volumes_from=[vct_state['Name']])
+                self.client.start(cid)
 
                 for s in self.client.attach(cid, stream=True, logs=True):
                     for line in s.splitlines():
