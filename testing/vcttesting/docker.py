@@ -1080,9 +1080,12 @@ class Docker(object):
                     autolanddb_image,
                     labels=['autolanddb'])
 
+                autoland_host_config = self.client.create_host_config(
+                    port_bindings={80: autoland_port})
                 f_autoland_create = e.submit(
                     self.client.create_container,
                     autoland_image,
+                    host_config=autoland_host_config,
                     labels=['autolandweb'])
 
             if start_treestatus:
@@ -1184,8 +1187,7 @@ class Docker(object):
                     links=[(autolanddb_state['Name'], 'db'),
                            (web_state['Name'], 'bmoweb'),
                            (hgrb_state['Name'], 'hgrb'),
-                           (treestatus_state['Name'], 'treestatus')],
-                    port_bindings={80: autoland_port})
+                           (treestatus_state['Name'], 'treestatus')])
                 f_start_autoland.result()
                 autoland_state = self.client.inspect_container(autoland_id)
 
