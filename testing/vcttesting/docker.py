@@ -170,6 +170,13 @@ class Docker(object):
             self.client = None
             return
 
+        # We need API 1.20+ for the archive API.
+        if docker.utils.compare_version('1.20', self.client.api_version) < 0:
+            warnings.warn('Warning: unable to speak to Docker servers older '
+                          'than Docker 1.8.x')
+            self.client = None
+            return
+
         # Try to obtain a network hostname for the Docker server. We use this
         # for determining where to look for opened ports.
         # This is a bit complicated because Docker can be running from a local
