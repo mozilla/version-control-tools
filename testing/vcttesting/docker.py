@@ -1031,11 +1031,14 @@ class Docker(object):
                 labels=['bmoweb'])
 
             if start_rbweb:
+                rbweb_host_config = self.client.create_host_config(
+                    port_bindings={80: rbweb_port})
                 f_rbweb_create = e.submit(
                     self.client.create_container,
                     rbweb_image,
                     command=['/run'],
                     entrypoint=['/entrypoint.py'],
+                    host_config=rbweb_host_config,
                     ports=[80],
                     labels=['rbweb'])
 
@@ -1186,8 +1189,7 @@ class Docker(object):
                            (pulse_state['Name'], 'pulse'),
                            (hgrb_state['Name'], 'hgrb'),
                            (autoland_state['Name'], 'autoland'),
-                           (ldap_state['Name'], 'ldap')],
-                    port_bindings={80: rbweb_port})
+                           (ldap_state['Name'], 'ldap')])
                 rbweb_state = self.client.inspect_container(rbweb_id)
 
         bmoweb_hostname, bmoweb_hostport = \
