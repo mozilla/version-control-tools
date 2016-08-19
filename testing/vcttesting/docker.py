@@ -1656,7 +1656,7 @@ class Docker(object):
 
     def get_file_content(self, cid, path):
         """Get the contents of a file from a container."""
-        r = self.client.copy(cid, path)
+        r, stat = self.client.get_archive(cid, path)
         buf = BytesIO(r.read())
         buf.seek(0)
         t = tarfile.open(mode='r', fileobj=buf)
