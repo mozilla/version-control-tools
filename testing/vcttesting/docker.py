@@ -1021,10 +1021,13 @@ class Docker(object):
 
             bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
 
+            bmoweb_host_config = self.client.create_host_config(
+                port_bindings={80: http_port})
             f_web_create = e.submit(
                 self.client.create_container,
                 web_image,
                 environment={'BMO_URL': bmo_url},
+                host_config=bmoweb_host_config,
                 labels=['bmoweb'])
 
             if start_rbweb:
@@ -1132,8 +1135,7 @@ class Docker(object):
 
             f_start_web = e.submit(
                 self.client.start,
-                web_id,
-                port_bindings={80: http_port})
+                web_id)
             f_start_web.result()
             web_state = self.client.inspect_container(web_id)
 
