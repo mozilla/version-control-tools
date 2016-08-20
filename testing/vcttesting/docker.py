@@ -908,11 +908,15 @@ class Docker(object):
         containers = self.state['containers'].setdefault(cluster, [])
 
         bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
+        bmo_host_config = self.client.create_host_config(
+            port_bindings={80: http_port})
         web_id = self.client.create_container(
-            web_image, environment={'BMO_URL': bmo_url},
+            web_image,
+            environment={'BMO_URL': bmo_url},
+            host_config=bmo_host_config,
             labels=['bmoweb'])['Id']
         containers.append(web_id)
-        self.client.start(web_id, port_bindings={80: http_port})
+        self.client.start(web_id)
         web_state = self.client.inspect_container(web_id)
 
         self.save_state()
