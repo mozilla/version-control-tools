@@ -1644,6 +1644,7 @@ class Docker(object):
 
         containers = {c['Id'] for c in self.client.containers(all=True)}
         images = {i['Id'] for i in self.client.images(all=True)}
+        networks = {n['Id'] for n in self.client.networks()}
         try:
             yield
         finally:
@@ -1657,6 +1658,11 @@ class Docker(object):
                 for i in self.client.images(all=True):
                     if i['Id'] not in images:
                         e.submit(self.client.remove_image, c['Id'])
+
+            with futures.ThreadPoolExecutor(8) as e:
+                for n in self.client.networks():
+                    if n['Id'] not in networks:
+                        e.submit(self.client.remove_network, n['Id'])
 
     def execute(self, cid, cmd, stdout=False, stderr=False, stream=False,
                 detach=False):
