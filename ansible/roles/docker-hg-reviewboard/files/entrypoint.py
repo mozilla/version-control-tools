@@ -27,6 +27,4 @@ subprocess.check_call([
 
 del os.environ['DOCKER_ENTRYPOINT']
 
-subprocess.check_call(['/sbin/service', 'rsyslog', 'start'])
-
 os.execl(sys.argv[1], *sys.argv[1:])
