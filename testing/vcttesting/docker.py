@@ -1405,10 +1405,13 @@ class Docker(object):
 
     def _get_files_from_http_container(self, builder, message):
         image = self.ensure_built(builder, verbose=True)
-        container = self.client.create_container(image)['Id']
 
-        with self.start_container(container,
-                                  port_bindings={80: None}) as state:
+        host_config = self.client.create_host_config(
+            port_bindings={80: None})
+        container = self.client.create_container(image,
+                                                 host_config=host_config)['Id']
+
+        with self.start_container(container) as state:
             port = int(state['NetworkSettings']['Ports']['80/tcp'][0]
                        ['HostPort'])
 
