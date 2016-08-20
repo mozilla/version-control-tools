@@ -155,19 +155,6 @@ class HgCluster(object):
             if coverage:
                 env['CODE_COVERAGE'] = '1'
 
-            ldap_id = f_ldap_create.result()['Id']
-            pulse_id = f_pulse_create.result()['Id']
-
-            # Start LDAP and Pulse first because we need to link it to hg
-            # containers.
-            f_ldap_start = e.submit(self._dc.start, ldap_id)
-            f_pulse_start = e.submit(self._dc.start, pulse_id)
-            f_ldap_start.result()
-            f_pulse_start.result()
-
-            ldap_state = self._dc.inspect_container(ldap_id)
-            pulse_state = self._dc.inspect_container(pulse_id)
-
             master_host_config = self._dc.create_host_config(
                 port_bindings={
                     22: master_ssh_port,
@@ -175,7 +162,7 @@ class HgCluster(object):
                 },
             )
 
-            master_id = self._dc.create_container(
+            f_master_create = e.submit(self._dc.create_container,
                 master_image,
                 environment=env,
                 entrypoint=['/entrypoint.py'],
@@ -183,11 +170,7 @@ class HgCluster(object):
                 ports=[22, 2181, 2888, 3888, 9092],
                 host_config=master_host_config,
                 labels=['hgssh'],
-                networking_config=network_config('hgssh'))['Id']
-
-            self._dc.start(master_id)
-
-            master_state = self._dc.inspect_container(master_id)
+                networking_config=network_config('hgssh'))
 
             f_web_creates = []
             for i in range(web_count):
@@ -214,6 +197,23 @@ class HgCluster(object):
                                               host_config=web_host_config,
                                               labels=['hgweb', 'hgweb%d' % i],
                                               networking_config=network_config('hgweb%d' % i)))
+
+            ldap_id = f_ldap_create.result()['Id']
+            pulse_id = f_pulse_create.result()['Id']
+            master_id = f_master_create.result()['Id']
+
+            # Start LDAP and Pulse first because we need to link it to hg
+            # containers.
+            f_ldap_start = e.submit(self._dc.start, ldap_id)
+            f_pulse_start = e.submit(self._dc.start, pulse_id)
+            f_ldap_start.result()
+            f_pulse_start.result()
+
+            ldap_state = self._dc.inspect_container(ldap_id)
+            pulse_state = self._dc.inspect_container(pulse_id)
+
+            self._dc.start(master_id)
+            master_state = self._dc.inspect_container(master_id)
 
             web_ids = [f.result()['Id'] for f in f_web_creates]
             fs = []
