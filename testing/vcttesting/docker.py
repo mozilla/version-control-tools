@@ -183,7 +183,7 @@ class Docker(object):
         # socket or or another host via something like boot2docker.
         docker_url = urlparse.urlparse(self.client.base_url)
         self.docker_hostname = docker_url.hostname
-        if docker_url.hostname == 'localunixsocket':
+        if docker_url.hostname in ('localunixsocket', 'localhost', '127.0.0.1'):
             networks = self.client.networks()
             for network in networks:
                 if network['Name'] == 'bridge':
@@ -1724,8 +1724,12 @@ class Docker(object):
         if host_ip != '0.0.0.0':
             return host_ip, host_port
 
-        if self.docker_hostname != 'localhost':
+        if self.docker_hostname not in ('localhost', '127.0.0.1'):
             return self.docker_hostname, host_port
+
+        for network in state['NetworkSettings']['Networks'].values():
+            if network['Gateway']:
+                return network['Gateway'], host_port
 
         # This works when Docker is running locally, which is common. But it
         # is far from robust.
