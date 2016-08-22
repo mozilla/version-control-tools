@@ -25,6 +25,7 @@ from mercurial import (
     error,
     extensions,
     hg,
+    obsolete,
     util,
     wireproto,
 )
@@ -65,6 +66,7 @@ def pretxnopenhook(ui, repo, **kwargs):
     repo._replicationinfo = {
         'pushkey': [],
         'changegroup': False,
+        'obsolescence': {},
     }
 
 
@@ -85,6 +87,12 @@ def pushkeyhook(ui, repo, namespace=None, key=None, old=None, new=None,
     # consumers seeing updates they shouldn't. So, we queue our messages for
     # writing. They will get flushed when the transaction associated with
     # the low-level pushkey update completes.
+    #
+    # Obsolescence markers are handled via a separate mechanism. So ignore
+    # them.
+    if namespace == 'obsolescence':
+        return
+
     repo._replicationinfo['pushkey'].append(
         (namespace, key, old, new, ret))
 
@@ -116,11 +124,26 @@ def pretxnclosehook(ui, repo, **kwargs):
 
 
 def txnclosehook(ui, repo, **kwargs):
+    # Obtain obsolescence markers added as part of the transaction. These
+    # will be sent as pushkey messages later.
+    obscount = int(kwargs.get('new_obsmarkers', '0'))
+    if obscount:
+        markers = repo.obsstore._all[-obscount:]
+        repo._replicationinfo['obsolescence'] = obsolete._pushkeyescape(markers)
+
     # Only send messages if a changegroup isn't present. This is
     # because our changegroup message handler performs an `hg pull`,
     # which will pull in pushkey data automatically.
     if not repo._replicationinfo['changegroup']:
         sendpushkeymessages(ui, repo)
+
+        # Obsolescence markers may not arrive via pushkey and may not be
+        # recorded via the pushkey hooks mechanism. So send them manually.
+        #
+        # We send these markers during the changegroup hook if it fires,
+        # which should be after this hook.
+        for key, value in sorted(repo._replicationinfo['obsolescence'].iteritems()):
+            sendpushkeymessage(ui, repo, 'obsolete', key, '', value, 0)
 
 
 def changegrouphook(ui, repo, node=None, source=None, **kwargs):
@@ -151,6 +174,9 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
         repo.producerlog('CHANGEGROUPHOOK_SENT')
         ui.status(_('recorded changegroup in replication log in %.3fs\n') %
                     duration)
+
+        for key, value in sorted(repo._replicationinfo['obsolescence'].iteritems()):
+            sendpushkeymessage(ui, repo, 'obsolete', key, '', value, 0)
 
 
 def sendpushkeymessages(ui, repo):

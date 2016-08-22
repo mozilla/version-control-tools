@@ -127,6 +127,7 @@ Create some obsolescence markers
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/5217e2ac5b15
   remote: recorded changegroup in replication log in \d\.\d+s (re)
+  remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
   $ cd ..
 
 Pulling should get the obsmarkers
@@ -211,6 +212,7 @@ Pushing a changeset then hiding it works
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/042a67bdbae8
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
+  remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
   $ hg debugobsolete
   ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
@@ -332,6 +334,7 @@ Pushing again should send obsolescence markers
   remote: View your change here:
   remote:   https://hg.mozilla.org/integration/autoland/rev/9e2d548e5f1f
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
+  remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/integration/autoland debugobsolete
   5fb779ae39de4af3229a53c35d46117e98fb5f83 d57129f00b2f329fc2cf3371a0c28796bcfbde1c 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
