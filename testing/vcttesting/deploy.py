@@ -40,22 +40,6 @@ def run_playbook(name, extra_vars=None, verbosity=0):
     return subprocess.call(args, cwd=ANSIBLE)
 
 
-def deploy_mozreview_dev(repo=None, rev=None, rb_repo=None, rb_rev=None,
-                         verbosity=0):
-    extra = {'vct': ROOT}
-    if repo:
-        extra['repo'] = repo
-    if rev:
-        extra['rev'] = rev
-    if rb_repo:
-        extra['rb_repo'] = rb_repo
-    if rb_rev:
-        extra['rb_rev'] = rb_rev
-
-    return run_playbook('deploy-mozreview-dev', extra_vars=extra,
-                        verbosity=verbosity)
-
-
 def deploy_mozreview_prod(repo=None, rev=None, rb_repo=None, rb_rev=None,
                           verbosity=0):
     extra = {'vct': ROOT}
