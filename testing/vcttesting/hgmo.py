@@ -249,22 +249,9 @@ class HgCluster(object):
                 ] + zookeeper_hostports
                 e.submit(self._d.execute, s['Id'], command)
 
-        # Obtain replication SSH key from master. This key is random since it
-        # is generated at container build time.
-        with futures.ThreadPoolExecutor(4) as e:
-            f_private_key = e.submit(self._d.get_file_content, master_id, '/etc/mercurial/mirror')
-            f_public_key = e.submit(self._d.get_file_content, master_id, '/etc/mercurial/mirror.pub')
-            f_master_host_ed25519_key = e.submit(self._d.get_file_content, master_id,
-                                                 '/etc/mercurial/ssh/ssh_host_ed25519_key.pub')
-            f_master_host_rsa_key = e.submit(self._d.get_file_content, master_id,
-                                             '/etc/mercurial/ssh/ssh_host_rsa_key.pub')
-
-        mirror_private_key = f_private_key.result()
-        mirror_public_key = f_public_key.result()
-        master_host_rsa_key = f_master_host_rsa_key.result()
-        master_host_rsa_key = ' '.join(master_host_rsa_key.split()[0:2])
-        master_host_ed25519_key = f_master_host_ed25519_key.result()
-        master_host_ed25519_key = ' '.join(master_host_ed25519_key.split()[0:2])
+        # Obtain replication and host SSH keys.
+        mirror_private_key, mirror_public_key, master_host_ed25519_key, master_host_rsa_key = \
+            self.get_mirror_ssh_keys(master_id)
 
         with futures.ThreadPoolExecutor(web_count + 1) as e:
             # Set SSH keys on hgweb instances.
@@ -470,6 +457,24 @@ class HgCluster(object):
     def ldap(self):
         assert self.ldap_uri
         return LDAP(self.ldap_uri, 'cn=admin,dc=mozilla', 'password')
+
+    def get_mirror_ssh_keys(self, master_id=None):
+        master_id = master_id or self.master_id
+
+        with futures.ThreadPoolExecutor(4) as e:
+            f_private_key = e.submit(self._d.get_file_content, master_id,
+                                     '/etc/mercurial/mirror')
+            f_public_key = e.submit(self._d.get_file_content, master_id,
+                                    '/etc/mercurial/mirror.pub')
+            f_host_ed25519_key = e.submit(self._d.get_file_content, master_id,
+                                          '/etc/mercurial/ssh/ssh_host_ed25519_key.pub')
+            f_host_rsa_key = e.submit(self._d.get_file_content, master_id,
+                                      '/etc/mercurial/ssh/ssh_host_rsa_key.pub')
+
+        host_ed25519_key = ' '.join(f_host_ed25519_key.result().split()[0:2])
+        host_rsa_key = ' '.join(f_host_rsa_key.result().split()[0:2])
+
+        return f_private_key.result(), f_public_key.result(), host_ed25519_key, host_rsa_key
 
     def create_repo(self, name, group='scm_level_1', generaldelta=False):
         """Create a repository on the cluster.
