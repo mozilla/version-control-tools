@@ -199,6 +199,9 @@ def process_hg_changegroup(config, path, source, node_count, heads):
         c.pull(source=url or 'default', rev=heads)
         newtip = int(c.log('tip')[0].rev)
 
+        # This logic isn't always accurate. For example, if the real tip is
+        # hidden, 'tip' could be N-1. If a single changeset is pushed, it will
+        # have value N+1. 2 != 1 will trigger this warning incorrectly.
         if newtip - oldtip != node_count:
             logger.warn('mismatch between expected and actual changeset count: '
                         'expected %d, got %d' % (node_count, newtip - oldtip))
