@@ -7,6 +7,7 @@ from __future__ import print_function, unicode_literals
 import argparse
 import os
 import subprocess
+import stat
 import sys
 
 from mach.decorators import (
@@ -180,3 +181,17 @@ class HgmoCommands(object):
         cmd.extend(command)
 
         return subprocess.call(cmd)
+
+    @Command('download-mirror-ssh-keys', category='hgmo',
+             description='Downloads SSH keys used by mirrors')
+    @CommandArgument('out_dir', help='Directory in which to write the keys')
+    def download_mirror_ssh_keys(self, out_dir):
+        priv, pub = self.c.get_mirror_ssh_keys()[0:2]
+
+        with open(os.path.join(out_dir, 'mirror'), 'wb') as fh:
+            fh.write(priv)
+        os.chmod(os.path.join(out_dir, 'mirror'), stat.S_IRUSR | stat.S_IWUSR)
+
+        with open(os.path.join(out_dir, 'mirror.pub'), 'wb') as fh:
+            fh.write(pub)
+        print('SSH keys written to %s' % out_dir)
