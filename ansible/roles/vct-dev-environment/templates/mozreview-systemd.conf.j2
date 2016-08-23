@@ -1,0 +1,13 @@
+[Service]
+# Clear the default ExecStart setting before adding our own
+ExecStart=
+# Our docker wrapper and the docker client libraries need to use the
+# docker HTTP API, so we will add it to the default unix socket API.
+# Use the devicemapper storage driver to work around
+# https://github.com/docker/docker/issues/6980 on Ubuntu 14.04 host systems.
+# Use the devicemapper storage driver to work around ansible on overlay
+# driver: https://github.com/ansible/ansible/issues/10834
+ExecStart=/usr/bin/docker daemon -H unix:///var/run/docker.sock -H {{ docker_listen }} --storage-driver=devicemapper
+# Increase systemd resource pools to keep docker from crashing
+# See http://unix.stackexchange.com/a/255603
+TasksMax=1048576

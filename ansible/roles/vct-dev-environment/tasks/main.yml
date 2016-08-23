@@ -1,0 +1,26 @@
+# vim:ft=ansible:
+---
+
+- include: docker.yml
+- include: nodejs.yml
+
+# Grab virtualenv deps listed at http://mozilla-version-control-tools.readthedocs.io/en/latest/devguide/environment.html#ubuntu-requirements
+- name: install python and test env dependencies
+  yum: name={{ item }} state=present
+  with_items:
+    # mozreview virtualenv build dependencies
+    - "@development"
+    - python-devel
+    - python-virtualenv
+    - xz-devel
+    - libffi-devel
+    - libxml2-devel
+    - libxslt-devel
+    - openldap-devel
+    # mozreview test harness dependencies
+    - mercurial
+    - unzip
+    # convenient packages for debugging on the host
+    - htop
+    - vim-common
+    - python-pip

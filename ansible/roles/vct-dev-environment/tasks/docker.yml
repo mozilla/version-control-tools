@@ -1,0 +1,37 @@
+# vim:ft=ansible:
+---
+
+- name: enable docker vendor repo
+  copy: src=docker.repo dest=/etc/yum.repos.d/ owner=root group=root
+
+- name: install docker-engine
+  yum: name=docker-engine state=present
+
+# From https://docs.docker.com/engine/admin/systemd/#custom-docker-daemon-options
+- name: create docker systemd local config directory
+  file: path=/etc/systemd/system/docker.service.d
+        state=directory
+        owner=root
+        group=root
+
+- name: activate docker HTTP API and switch to devicemapper storage
+  template: src=mozreview-systemd.conf.j2
+            dest=/etc/systemd/system/docker.service.d/mozreview.conf
+            owner=root
+            group=root
+            mode=0644
+  notify:
+    - reload systemd
+    - restart docker
+
+# We need this environment variable to be present in the shell of any user
+# who wants to run the test suite (being a member of the docker system
+# group isn't enough).
+- name: add docker API address to user environment
+  lineinfile: dest=/home/{{ test_user }}/.bash_profile
+              regexp=DOCKER_HOST
+              state=present
+              create=yes
+              line='export DOCKER_HOST={{ docker_listen }}'
+              owner={{ test_user }}
+              group={{ test_user }}

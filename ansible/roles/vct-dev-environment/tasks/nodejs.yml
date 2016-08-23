@@ -1,0 +1,20 @@
+# vim:ft=ansible:
+---
+
+# nodejs is a reviewboard build dependency.
+
+# For nodejs and npm
+- name: enable epel-release repo
+  yum: name=epel-release state=present
+
+- name: install nodejs and npm
+  yum: name={{ item }} state=latest
+  with_items:
+    - nodejs
+    - npm
+
+# npm v1.3.6 halts waiting for user input, even with '-y'.  Upgrade to the
+# latest version so 'npm init -y' works properly.
+# FIXME: make this idempotent
+- name: upgrade npm
+  command: /usr/bin/npm -g install npm

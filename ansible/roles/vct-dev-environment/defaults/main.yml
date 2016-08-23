@@ -1,0 +1,9 @@
+---
+
+# The port that docker will listen for commands on.
+# WARNING: DO NOT OPEN THIS PORT ON A PUBLIC NETWORK.  IT IS NOT SECURE.
+# See https://docs.docker.com/engine/reference/commandline/dockerd/#bind-docker-to-another-host-port-or-a-unix-socket
+docker_listen: tcp://{{ ansible_default_ipv4.address }}:2375
+
+# The user that will run the test suite
+test_user: vagrant
