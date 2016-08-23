@@ -76,9 +76,10 @@ class PulseCommands(object):
             message.ack()
 
         with conn.Consumer([q], callbacks=[onmessage], auto_declare=False):
-            try:
-                conn.drain_events(timeout=0.1)
-            except socket.timeout:
-                pass
+            while True:
+                try:
+                    conn.drain_events(timeout=0.1)
+                except socket.timeout:
+                    break
 
         print(yaml.safe_dump(data, default_flow_style=False).rstrip())
