@@ -27,16 +27,20 @@ from .pushnotifications import (
 logger = logging.getLogger('vcsreplicator.pulsenotifier')
 
 
-def on_push(config, repo_url, heads, source, pushlog_pushes):
-    """Called when a push notification should be handled."""
-    logger.warn('sending pulse notification for %s' % repo_url)
+def send_pulse_message(config, exchange, repo_url, payload):
+    """Send a pulse message for a repository event.
 
+    The Pulse host configured by the config object will be connected to.
+    The routing key will be constructed from the repository URL.
+    The Pulse message will be constructed from the specified payload
+    and sent to the requested exchange.
+    """
     c = config.c
 
     routing_key_strip_prefix = c.get('pulse', 'routing_key_strip_prefix')
     if not repo_url.startswith(routing_key_strip_prefix):
-        raise Exception('repo URL does not being with %s: %s' % (
-                        routing_key_strip_prefix, repo_url))
+        raise Exception('repo URL does not begin with %s: %s' % (
+            routing_key_strip_prefix, repo_url))
 
     routing_key = repo_url[len(routing_key_strip_prefix):]
 
@@ -55,26 +59,36 @@ def on_push(config, repo_url, heads, source, pushlog_pushes):
                             connect_timeout=c.getint('pulse', 'connect_timeout'))
     conn.connect()
     with conn:
-        exchange = kombu.Exchange(c.get('pulse', 'exchange'), type='topic')
-        producer = conn.Producer(exchange=exchange,
+        ex = kombu.Exchange(exchange, type='topic')
+        producer = conn.Producer(exchange=ex,
                                  routing_key=routing_key,
                                  serializer='json')
 
-        payload = {
-            'payload': {
-                'repo_url': repo_url,
-                'heads': heads,
-                'pushlog_pushes': pushlog_pushes,
-            },
+        data = {
+            'payload': payload,
             '_meta': {
-                'exchange': c.get('pulse', 'exchange'),
+                'exchange': exchange,
                 'routing_key': routing_key,
                 'serializer': 'json',
                 'sent': datetime.datetime.utcnow().isoformat(),
             }
         }
-        producer.publish(payload)
+
+        producer.publish(data)
         logger.warn('published pulse notification for %s' % repo_url)
+
+
+def on_push(config, repo_url, heads, source, pushlog_pushes):
+    """Called when a push notification should be handled."""
+    logger.warn('sending pulse notification for %s' % repo_url)
+
+    exchange = config.c.get('pulse', 'exchange')
+
+    send_pulse_message(config, exchange, repo_url, {
+        'repo_url': repo_url,
+        'heads': heads,
+        'pushlog_pushes': pushlog_pushes,
+    })
 
 
 def cli():
