@@ -85,6 +85,7 @@ Repos under ignore paths are ignored
 
   $ hgmo exec hgssh grep private /var/log/pulsenotifier.log
   vcsreplicator.pushnotifications ignoring repo because path in ignore list: {moz}/private/ignore
+  vcsreplicator.pushnotifications ignoring repo because path in ignore list: {moz}/private/ignore
 
   $ cd ..
 

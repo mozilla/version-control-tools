@@ -26,13 +26,13 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
     partition, message, payload = r
     name = payload['name']
 
-    # We're only interested in changegroup messages because they correspond
-    # to pushes. Ack all messages that aren't relevant.
-    if name not in ('hg-changegroup-1', 'hg-changegroup-2'):
-        logger.warn('%s message not relevant to push notifier; ignoring' % name)
+    if name == 'heartbeat-1':
+        logger.warn('%s message not relevant; ignoring' % name)
         consumer.commit(partitions=[partition])
         return
 
+    # All other messages should be associated with a repo and have a "path"
+    # key.
     path = payload['path']
     public_url = config.get_public_url_from_wire_path(path)
 
@@ -50,8 +50,17 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
 
     local_path = config.parse_wire_repo_path(path)
 
+    # FUTURE if we ever write a "repo deleted" message, this should be updated to
+    # send the message through.
     if not os.path.exists(local_path):
         logger.warn('repository %s does not exist; ignoring notification' % local_path)
+        consumer.commit(partitions=[partition])
+        return
+
+    # We're only interested in changegroup messages because they correspond
+    # to pushes. Ack all messages that aren't relevant.
+    if name not in ('hg-changegroup-1', 'hg-changegroup-2'):
+        logger.warn('%s message not relevant to push notifier; ignoring' % name)
         consumer.commit(partitions=[partition])
         return
 
