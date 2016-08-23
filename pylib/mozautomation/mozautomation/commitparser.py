@@ -68,7 +68,10 @@ METADATA_RE = re.compile('^MozReview-Commit-ID: ')
 
 
 def parse_bugs(s):
-    bugs = [int(m[1]) for m in BUG_RE.findall(s)]
+    bugs_with_duplicates = [int(m[1]) for m in BUG_RE.findall(s)]
+    bugs_seen = set()
+    bugs_seen_add = bugs_seen.add
+    bugs = [x for x in bugs_with_duplicates if not (x in bugs_seen or bugs_seen_add(x))]
     return [bug for bug in bugs if bug < 100000000]
 
 

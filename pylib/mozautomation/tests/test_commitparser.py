@@ -36,6 +36,14 @@ class TestBugParsing(unittest.TestCase):
         self.assertEqual(parse_bugs('12345 is a bug'), [12345])
         self.assertEqual(parse_bugs(' 123456 whitespace!'), [123456])
 
+        # Duplicate bug numbers should be stripped.
+        msg = '''Bug 1235097 - Add support for overriding the site root
+
+On brasstacks, `web.ctx.home` is incorrect (see bug 1235097 comment 23), which
+means that the URL used by mohawk to verify the authenticated request hashes
+differs from that used to generate the hash.'''
+        self.assertEqual(parse_bugs(msg), [1235097])
+
     def test_reviewers(self):
 
         # first with r? reviewer request syntax
