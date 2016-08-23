@@ -99,10 +99,12 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
             })
 
     cbargs = {
-        'repo_url': public_url,
-        'heads': payload['heads'],
-        'source': payload['source'],
-        'pushlog_pushes': [v for k, v in sorted(pushes.items())],
+        'data': {
+            'repo_url': public_url,
+            'heads': payload['heads'],
+            'source': payload['source'],
+            'pushlog_pushes': [v for k, v in sorted(pushes.items())],
+        },
     }
 
     if cbkwargs:

@@ -78,17 +78,17 @@ def send_pulse_message(config, exchange, repo_url, payload):
         logger.warn('published pulse notification for %s' % repo_url)
 
 
-def on_push(config, repo_url, heads, source, pushlog_pushes):
+def on_push(config, data):
     """Called when a push notification should be handled."""
+    repo_url = data['repo_url']
     logger.warn('sending pulse notification for %s' % repo_url)
 
     exchange = config.c.get('pulse', 'exchange')
 
-    send_pulse_message(config, exchange, repo_url, {
-        'repo_url': repo_url,
-        'heads': heads,
-        'pushlog_pushes': pushlog_pushes,
-    })
+    # The source isn't relevant. So strip it.
+    del data['source']
+
+    send_pulse_message(config, exchange, repo_url, data)
 
 
 def cli():
