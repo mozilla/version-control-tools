@@ -71,6 +71,18 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
         cbargs['data'] = {
             'repo_url': public_url,
         }
+    elif name == 'hg-pushkey-1':
+        res = _get_pushkey_payload(local_path, public_url,
+                                   payload['namespace'],
+                                   payload['key'],
+                                   payload['old'],
+                                   payload['new'],
+                                   payload['ret'])
+        if res:
+            message_type, cbargs['data'] = res
+        else:
+            firecb = False
+
     else:
         # Ack unsupported messages.
         logger.warn('%s message not relevant to push notifier; ignoring' % name)
@@ -132,3 +144,12 @@ def _get_changegroup_payload(local_path, public_url, heads, source):
             'source': source,
             'pushlog_pushes': [v for k, v in sorted(pushes.items())],
         }
+
+
+def _get_pushkey_payload(local_path, public_url, namespace, key, old, new, ret):
+    """Turn a pushkey replication message into an event message.
+
+    Returns a 2-tuple of (message_type, data) on success or None if no message
+    is to be generated.
+    """
+    return None
