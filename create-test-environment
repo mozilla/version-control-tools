@@ -9,9 +9,18 @@ else
     FORKS=''
 fi
 
-vercheck=`python -c 'import sys; print(sys.version_info[0:3] >= (2, 7, 9))'`
-if [ "x${vercheck}" != "xTrue" ]; then
-  echo "Python version too old. Test environment requires 2.7.9+"
+set +e
+# Quick and dirty check for SSL support provided with this Python.  We check
+# this way because some distros have backported the necessary SSL support
+# into early Python versions, and we can't tell if we have what we need from
+# the Python version alone.
+python -c 'import ssl; ssl.SSLContext; ssl.PROTOCOL_TLSv1_2'
+sslcheck=$?
+set -e
+
+if [ "$sslcheck" -ne 0 ]; then
+  echo "Python version does not support verifying SSL certificates for secure"
+  echo "downloads!  Please upgrade your version of Python."
   exit 1
 fi
 
