@@ -100,6 +100,7 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
 
     cbargs = dict(cbkwargs or {})
 
+    cbargs['message_type'] = 'changegroup.1'
     cbargs['data'] = {
         'repo_url': public_url,
         'heads': payload['heads'],

@@ -78,7 +78,7 @@ def send_pulse_message(config, exchange, repo_url, payload):
         logger.warn('published pulse notification for %s' % repo_url)
 
 
-def on_push(config, data):
+def on_push(config, message_type, data):
     """Called when a push notification should be handled."""
     repo_url = data['repo_url']
     logger.warn('sending pulse notification for %s' % repo_url)
