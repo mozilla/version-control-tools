@@ -98,17 +98,14 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
                 'push_full_json_url': '%s/json-pushes?version=2&full=1&%s' % (public_url, q)
             })
 
-    cbargs = {
-        'data': {
-            'repo_url': public_url,
-            'heads': payload['heads'],
-            'source': payload['source'],
-            'pushlog_pushes': [v for k, v in sorted(pushes.items())],
-        },
-    }
+    cbargs = dict(cbkwargs or {})
 
-    if cbkwargs:
-        cbargs.update(cbkwargs)
+    cbargs['data'] = {
+        'repo_url': public_url,
+        'heads': payload['heads'],
+        'source': payload['source'],
+        'pushlog_pushes': [v for k, v in sorted(pushes.items())],
+    }
 
     cb(**cbargs)
     consumer.commit(partitions=[partition])
