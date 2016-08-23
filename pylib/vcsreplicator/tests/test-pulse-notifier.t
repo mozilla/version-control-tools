@@ -3,7 +3,8 @@
   $ . $TESTDIR/pylib/vcsreplicator/tests/helpers.sh
   $ vcsrenv
 
-  $ pulse create-queue exchange/hgpushes/v1 all
+  $ pulse create-queue exchange/hgpushes/v1 v1
+  $ pulse create-queue exchange/hgpushes/v2 v2
 
 Create a repository
 
@@ -33,7 +34,7 @@ Create a repository
   $ sleep 2
   $ pulseconsumer --wait-for-no-lag
 
-  $ pulse dump-messages exchange/hgpushes/v1 all
+  $ pulse dump-messages exchange/hgpushes/v1 v1
   - _meta:
       exchange: exchange/hgpushes/v1
       routing_key: mozilla-central
@@ -46,6 +47,24 @@ Create a repository
       time: \d+ (re)
       user: user@example.com
     repo_url: https://hg.mozilla.org/mozilla-central
+
+Message written to v2 with message type
+
+  $ pulse dump-messages exchange/hgpushes/v2 v2
+  - _meta:
+      exchange: exchange/hgpushes/v2
+      routing_key: mozilla-central
+    data:
+      heads:
+      - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+      pushlog_pushes:
+      - push_full_json_url: https://hg.mozilla.org/mozilla-central/json-pushes?version=2&full=1&startID=0&endID=1
+        push_json_url: https://hg.mozilla.org/mozilla-central/json-pushes?version=2&startID=0&endID=1
+        pushid: 1
+        time: \d+ (re)
+        user: user@example.com
+      repo_url: https://hg.mozilla.org/mozilla-central
+    type: changegroup.1
 
 Repos under ignore paths are ignored
 
@@ -83,7 +102,7 @@ Routing keys with slashes and dashes and underscores work
   $ sleep 2
   $ pulseconsumer --wait-for-no-lag
 
-  $ pulse dump-messages exchange/hgpushes/v1 all
+  $ pulse dump-messages exchange/hgpushes/v1 v1
   - _meta:
       exchange: exchange/hgpushes/v1
       routing_key: integration/foo_Bar-baz
@@ -96,6 +115,22 @@ Routing keys with slashes and dashes and underscores work
       time: \d+ (re)
       user: user@example.com
     repo_url: https://hg.mozilla.org/integration/foo_Bar-baz
+
+  $ pulse dump-messages exchange/hgpushes/v2 v2
+  - _meta:
+      exchange: exchange/hgpushes/v2
+      routing_key: integration/foo_Bar-baz
+    data:
+      heads:
+      - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+      pushlog_pushes:
+      - push_full_json_url: https://hg.mozilla.org/integration/foo_Bar-baz/json-pushes?version=2&full=1&startID=0&endID=1
+        push_json_url: https://hg.mozilla.org/integration/foo_Bar-baz/json-pushes?version=2&startID=0&endID=1
+        pushid: 1
+        time: \d+ (re)
+        user: user@example.com
+      repo_url: https://hg.mozilla.org/integration/foo_Bar-baz
+    type: changegroup.1
 
 Cleanup
 

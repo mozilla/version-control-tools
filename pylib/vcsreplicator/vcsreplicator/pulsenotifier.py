@@ -93,6 +93,27 @@ def on_event(config, message_type, data):
         exchange = config.c.get('pulse', 'exchange')
         send_pulse_message(config, exchange, repo_url, data)
 
+    # It's worth noting that we don't ack the message until sent to all
+    # exchanges. This means if there is success sending to a exchange and
+    # a failure occurs before sending to all exchanges, the message will
+    # almost certainly be re-processed later and there will be double delivery
+    # of the message to the early exchange(s). This is technically acceptable
+    # because we guarantee at-least-once delivery. However, not all downstream
+    # systems may appreciate the redundant copies. Having the latest version
+    # of the exchange last provides an incentive for consumers to move to it,
+    # as it will receive the fewest duplicate deliveries. However, that's not
+    # a great workaround. If duplicate deliveries become a problem, we should
+    # split the per-exchange delivery into separate mechanisms so each has an
+    # independent consumer+offset in Kafka.
+
+    # Version 2 of the exchange adds the message type to the payload so
+    # multiple message types can be published.
+    exchange2 = config.c.get('pulse', 'exchange2')
+    send_pulse_message(config, exchange2, repo_url, {
+        'type': message_type,
+        'data': data,
+    })
+
 
 def cli():
     """Command line interface to run the Pulse notification daemon."""
