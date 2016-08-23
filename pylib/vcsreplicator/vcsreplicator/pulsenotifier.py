@@ -78,8 +78,8 @@ def send_pulse_message(config, exchange, repo_url, payload):
         logger.warn('published pulse notification for %s' % repo_url)
 
 
-def on_push(config, message_type, data):
-    """Called when a push notification should be handled."""
+def on_event(config, message_type, data):
+    """Called when a replication message should be handled."""
     repo_url = data['repo_url']
     logger.warn('sending pulse notification for %s' % repo_url)
 
@@ -121,7 +121,7 @@ def cli():
             'config': config,
         }
         res = run_in_loop(logger, consume_one, config=config, consumer=consumer,
-                          cb=on_push, cbkwargs=cbkwargs)
+                          cb=on_event, cbkwargs=cbkwargs)
 
     logger.warn('process exiting code %s' % res)
     sys.exit(res)
