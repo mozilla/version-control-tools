@@ -57,20 +57,23 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
         consumer.commit(partitions=[partition])
         return
 
-    # We're only interested in changegroup messages because they correspond
-    # to pushes. Ack all messages that aren't relevant.
-    if name not in ('hg-changegroup-1', 'hg-changegroup-2'):
-        logger.warn('%s message not relevant to push notifier; ignoring' % name)
-        consumer.commit(partitions=[partition])
-        return
-
     cbargs = dict(cbkwargs or {})
+    firecb = True
 
-    cbargs['message_type'] = 'changegroup.1'
-    cbargs['data'] = _get_changegroup_payload(local_path, public_url,
-                                              payload['heads'], payload['source'])
+    if name in ('hg-changegroup-1', 'hg-changegroup-2'):
+        message_type = 'changegroup.1'
+        cbargs['data'] = _get_changegroup_payload(local_path,
+                                                  public_url,
+                                                  payload['heads'],
+                                                  payload['source'])
+    else:
+        # Ack unsupported messages.
+        logger.warn('%s message not relevant to push notifier; ignoring' % name)
+        firecb = False
 
-    cb(**cbargs)
+    if firecb:
+        cb(message_type=message_type, **cbargs)
+
     consumer.commit(partitions=[partition])
 
 
