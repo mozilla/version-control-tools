@@ -66,6 +66,15 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
 
     cbargs = dict(cbkwargs or {})
 
+    cbargs['message_type'] = 'changegroup.1'
+    cbargs['data'] = _get_changegroup_payload(local_path, public_url,
+                                              payload['heads'], payload['source'])
+
+    cb(**cbargs)
+    consumer.commit(partitions=[partition])
+
+
+def _get_changegroup_payload(local_path, public_url, heads, source):
     logger.warn('querying pushlog data for %s' % local_path)
 
     # Resolve the push IDs for these changesets.
@@ -77,7 +86,7 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
         # available. We shouldn't be seeing too many changegroup messages
         # where a message doesn't correspond to a single push, so this shortcut
         # should be acceptable.
-        revs = [n.encode('latin1') for n in payload['heads']]
+        revs = [n.encode('latin1') for n in heads]
         template = b'{node}\\0{pushid}\\0{pushuser}\\0{pushdate}\n'
         args = hglib.util.cmdbuilder(b'log', b'--hidden', r=revs, template=template)
         out = hgclient.rawcommand(args)
@@ -109,13 +118,9 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
                 'push_full_json_url': '%s/json-pushes?version=2&full=1&%s' % (public_url, q)
             })
 
-    cbargs['message_type'] = 'changegroup.1'
-    cbargs['data'] = {
-        'repo_url': public_url,
-        'heads': payload['heads'],
-        'source': payload['source'],
-        'pushlog_pushes': [v for k, v in sorted(pushes.items())],
-    }
-
-    cb(**cbargs)
-    consumer.commit(partitions=[partition])
+        return {
+            'repo_url': public_url,
+            'heads': heads,
+            'source': source,
+            'pushlog_pushes': [v for k, v in sorted(pushes.items())],
+        }
