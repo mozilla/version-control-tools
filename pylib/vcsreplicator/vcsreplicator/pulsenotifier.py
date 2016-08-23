@@ -8,6 +8,7 @@ import datetime
 import logging
 import sys
 
+import hglib
 import kombu
 
 from .config import (
@@ -137,6 +138,11 @@ def cli():
     formatter = logging.Formatter('%(name)s %(message)s')
     handler.setFormatter(formatter)
     root.addHandler(handler)
+
+    # hglib will use 'hg' which relies on PATH being correct. Since we're
+    # running from a virtualenv, PATH may not be set unless the virtualenv
+    # is activated. Overwrite the hglib defaults with a value from the config.
+    hglib.HGPATH = config.hg_path
 
     client = config.get_client_from_section('pulseconsumer', timeout=5)
 
