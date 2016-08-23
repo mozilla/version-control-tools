@@ -46,9 +46,8 @@ function version {
     echo "$@" | sed "s/^v//" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'
 }
 if [ $(version `${node_bin} -v`) -lt $(version "0.12") ]; then
-    echo "node.js is too old."
-    echo "Found $(${node_bin} -v), test environment requires v0.12+"
-    exit 1
+    echo "WARNING node.js is too old."
+    echo "WARNING Found $(${node_bin} -v), lessc wants v0.12+"
 fi
 
 # More annoyingly we need msgfmt which is part of gettext.
