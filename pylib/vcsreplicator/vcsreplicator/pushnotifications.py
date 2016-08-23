@@ -64,6 +64,8 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
         consumer.commit(partitions=[partition])
         return
 
+    cbargs = dict(cbkwargs or {})
+
     logger.warn('querying pushlog data for %s' % local_path)
 
     # Resolve the push IDs for these changesets.
@@ -106,8 +108,6 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
                 'push_json_url': '%s/json-pushes?version=2&%s' % (public_url, q),
                 'push_full_json_url': '%s/json-pushes?version=2&full=1&%s' % (public_url, q)
             })
-
-    cbargs = dict(cbkwargs or {})
 
     cbargs['message_type'] = 'changegroup.1'
     cbargs['data'] = {
