@@ -7,6 +7,7 @@ from __future__ import absolute_import
 
 import contextlib
 import hashlib
+import json
 import logging
 import os
 import re
@@ -19,7 +20,9 @@ import kafka.common as kafkacommon
 import vcsreplicator.producer as vcsrproducer
 
 from mercurial.i18n import _
+from mercurial.node import hex
 from mercurial import (
+    base85,
     cmdutil,
     commands,
     error,
@@ -313,6 +316,30 @@ def replicatecommand(ui, repo):
     """
     sendreposyncmessage(ui, repo)
     ui.status(_('wrote synchronization message into replication log\n'))
+
+
+@command('debugbase85obsmarkers', [], 'MARKERS', norepo=True)
+def debugbase85obsmarkers(ui, markers):
+    """Print information about base85 obsolescence markers."""
+    data = base85.b85decode(markers)
+    version, markers = obsolete._readmarkers(data)
+
+    out = []
+    for precursor, successors, flags, metadata, date, parents in markers:
+        if parents:
+            parents = [hex(n) for n in parents]
+
+        out.append({
+            'precursor': hex(precursor),
+            'successors': [hex(n) for n in successors],
+            'flags': flags,
+            'metadata': metadata,
+            'date': date,
+            'parents': parents,
+        })
+
+    # Ideally we'd use the templater. But we only need machine readable output.
+    ui.write(json.dumps(out, indent=4, sort_keys=True, separators=(',', ': ')))
 
 
 def wireprotodispatch(orig, repo, proto, command):
