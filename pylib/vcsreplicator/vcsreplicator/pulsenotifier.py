@@ -83,12 +83,15 @@ def on_event(config, message_type, data):
     repo_url = data['repo_url']
     logger.warn('sending pulse notification for %s' % repo_url)
 
-    exchange = config.c.get('pulse', 'exchange')
+    # v1 of the exchange only supported a single message type that corresponded
+    # to ``changegroup.1`` messages. So only send these messages to that
+    # exchange.
+    if message_type == 'changegroup.1':
+        # ``source`` wasn't sent to the v1 exchange. Strip it.
+        del data['source']
 
-    # The source isn't relevant. So strip it.
-    del data['source']
-
-    send_pulse_message(config, exchange, repo_url, data)
+        exchange = config.c.get('pulse', 'exchange')
+        send_pulse_message(config, exchange, repo_url, data)
 
 
 def cli():
