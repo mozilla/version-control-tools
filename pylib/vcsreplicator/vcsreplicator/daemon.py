@@ -44,7 +44,7 @@ def run_in_loop(logger, fn, onetime=False, **kwargs):
             try:
                 fn(alive=alive, **kwargs)
             except Exception:
-                logger.error('exception in daemon loop function')
+                logger.exception('exception in daemon loop function')
                 logger.warn('executing loop exiting after error')
                 return 1
 
