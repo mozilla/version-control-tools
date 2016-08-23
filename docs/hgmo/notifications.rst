@@ -106,6 +106,19 @@ Each ``pushlog_pushes`` entry consists of the following keys:
    (lists files that changed, etc). See :ref:`pushlog` for what the
    ``json-pushes`` JSON API returns.
 
+``newrepo.1``
+-------------
+
+This message is sent when a new repository is created.
+
+This message has the following fields:
+
+``repo_url``
+   URL of the created repository.
+
+Examples
+--------
+
 An example Pulse message payload for ``exchange/hgpushes/v2`` is as follows::
 
    {

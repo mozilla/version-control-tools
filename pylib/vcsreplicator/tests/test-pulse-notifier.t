@@ -55,6 +55,12 @@ Message written to v2 with message type
       exchange: exchange/hgpushes/v2
       routing_key: mozilla-central
     data:
+      repo_url: https://hg.mozilla.org/mozilla-central
+    type: newrepo.1
+  - _meta:
+      exchange: exchange/hgpushes/v2
+      routing_key: mozilla-central
+    data:
       heads:
       - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
       pushlog_pushes:
@@ -119,6 +125,12 @@ Routing keys with slashes and dashes and underscores work
     repo_url: https://hg.mozilla.org/integration/foo_Bar-baz
 
   $ pulse dump-messages exchange/hgpushes/v2 v2
+  - _meta:
+      exchange: exchange/hgpushes/v2
+      routing_key: integration/foo_Bar-baz
+    data:
+      repo_url: https://hg.mozilla.org/integration/foo_Bar-baz
+    type: newrepo.1
   - _meta:
       exchange: exchange/hgpushes/v2
       routing_key: integration/foo_Bar-baz

@@ -66,6 +66,11 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
                                                   public_url,
                                                   payload['heads'],
                                                   payload['source'])
+    elif name in ('hg-repo-init-1', 'hg-repo-init-2'):
+        message_type = 'newrepo.1'
+        cbargs['data'] = {
+            'repo_url': public_url,
+        }
     else:
         # Ack unsupported messages.
         logger.warn('%s message not relevant to push notifier; ignoring' % name)
