@@ -9,19 +9,16 @@ with the Firefox repository
 (`mozilla-central <https://hg.mozilla.org/mozilla-central>`_ and its
 derivatives).
 
-Install Recommended Extensions
-==============================
+Optimally Configure Mercurial
+=============================
 
-If you don't have Mercurial 3.7 or newer, install the
-:ref:`bundleclone extension <hgmo_bundleclone>` to make clones faster
-and more robust.
+When you run ``bootstrap.py`` or ``mach bootstrap`` (if you already have a
+clone), the bootstrapper will prompt you to run a Mercurial configuration
+wizard. You should run this wizard and make sure it is happy about your
+Mercurial state.
 
-Installing the
-`hgwatchman extension <https://bitbucket.org/facebook/hgwatchman>`_
-will yield significant speed-ups on Firefox repositories. 1+ second
-(70%) wall time reductions in ``hg status`` are common. This
-extension should be universally enabled for an optimal Mercurial
-experience.
+You should also run `mach bootstrap` periodically to ensure Mercurial
+support files are up-to-date.
 
 Cloning the Repository
 ======================
