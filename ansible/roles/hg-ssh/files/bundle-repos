@@ -1,4 +1,5 @@
 mozilla-central bzip2 legacy_stream
+experimental/mozilla-central-gd
 integration/fx-team
 integration/mozilla-inbound
 integration/b2g-inbound
