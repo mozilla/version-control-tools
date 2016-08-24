@@ -74,8 +74,8 @@ def send_pulse_message(config, exchange, repo_url, payload):
             }
         }
 
+        logger.warn('publishing message to %s#%s' % (exchange, routing_key))
         producer.publish(data)
-        logger.warn('published pulse notification for %s' % repo_url)
 
 
 def on_event(config, message_type, data):
