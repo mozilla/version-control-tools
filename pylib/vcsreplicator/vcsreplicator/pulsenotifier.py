@@ -87,11 +87,11 @@ def on_event(config, message_type, data):
     # to ``changegroup.1`` messages. So only send these messages to that
     # exchange.
     if message_type == 'changegroup.1':
-        # ``source`` wasn't sent to the v1 exchange. Strip it.
-        del data['source']
-
+        # Lock the old message type and prevent new keys from being added.
+        sanitized = {k: v for k, v in data.items()
+                     if k in ('repo_url', 'heads', 'pushlog_pushes')}
         exchange = config.c.get('pulse', 'exchange')
-        send_pulse_message(config, exchange, repo_url, data)
+        send_pulse_message(config, exchange, repo_url, sanitized)
 
     # It's worth noting that we don't ack the message until sent to all
     # exchanges. This means if there is success sending to a exchange and

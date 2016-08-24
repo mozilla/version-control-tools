@@ -64,6 +64,7 @@ Message written to v2 with message type
         time: \d+ (re)
         user: user@example.com
       repo_url: https://hg.mozilla.org/mozilla-central
+      source: serve
     type: changegroup.1
 
 Repos under ignore paths are ignored
@@ -130,6 +131,7 @@ Routing keys with slashes and dashes and underscores work
         time: \d+ (re)
         user: user@example.com
       repo_url: https://hg.mozilla.org/integration/foo_Bar-baz
+      source: serve
     type: changegroup.1
 
 Cleanup
