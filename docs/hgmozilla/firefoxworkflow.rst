@@ -154,15 +154,17 @@ landed. MozReview will attempt to automatically rewrite the commit messages
 to reflect who reviewed which commit. If everything looks good, click the
 ``OK`` button and the autolander will land your commits for you.
 
-Autoland will attempt to rebase you commits on the head of mozilla-inbound
-for you automatically. If a manual rebase is required, an error will be
-displayed in MozReview and you will have to rebase yourself.
+Autoland will attempt to rebase you commits on the head of the ``autoland``
+repo for you automatically. If it can't do this (say there was a file merge
+conflict during the base), an error will (eventually) be displayed in MozReview
+and you will have to rebase yourself and push the result back to MozReview
+and try the autoland request again.
 
 .. note::
 
-   We do not currently have plans to support an integration branch other
-   that ``mozilla-inbound``. In the future, we hope to remove integration
-   branches so we end up with a merge free history.
+   Only landing to the ``autoland`` repo is supported. This is because we
+   will be removing *integration repos* in the future so the history of
+   mozilla-central isn't linear and free of merge commits.
 
 If Autoland succeeds, *Pulsebot* will comment in your bug that your
 changes have landed. Unfortunately, there is not currently any notification
@@ -170,9 +172,8 @@ that Autoland has failed outside of MozReview, so if the trees are open
 and your changes have not landed within a few minutes, please check back
 in MozReview to see if any errors have occurred.
 
-
 Manual Reviewer Attribution and Landing
---------------------------------
+---------------------------------------
 
 Unable to use Autoland? Follow these instructions.
 
