@@ -122,9 +122,8 @@ Then squash the changesets together::
 
 .. note::
 
-   For ``hg histedit`` to work without arguments, you'll want to
-   set the ``histedit.defaultrev`` config option to
-   ``only(.)``.
+   For ``hg histedit`` to work without arguments, you'll need Mercurial
+   3.7 or newer.
 
 You'll then need to:
 
