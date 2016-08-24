@@ -6,8 +6,7 @@ Firefox Workflow
 
 This article outlines the **recommended** workflow for interacting
 with the Firefox repository
-(`mozilla-central <https://hg.mozilla.org/mozilla-central>`_ and its
-derivatives).
+(`mozilla-unified <https://hg.mozilla.org/mozilla-unified>`_.
 
 Optimally Configure Mercurial
 =============================
@@ -31,7 +30,7 @@ Cloning the Repository
 
 Clone the Firefox repository by running::
 
-   $ hg clone https://hg.mozilla.org/mozilla-central firefox
+   $ hg clone https://hg.mozilla.org/mozilla-unified firefox
    $ cd firefox
 
 Feature Development
