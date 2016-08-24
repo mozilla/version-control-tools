@@ -20,6 +20,12 @@ Mercurial state.
 You should also run `mach bootstrap` periodically to ensure Mercurial
 support files are up-to-date.
 
+.. important::
+
+   The instructions in this article assume the
+   :ref:`firefoxtree extension <firefoxtree>` is installed. Please activate
+   it when the wizard prompts you to!
+
 Cloning the Repository
 ======================
 
@@ -27,17 +33,6 @@ Clone the Firefox repository by running::
 
    $ hg clone https://hg.mozilla.org/mozilla-central firefox
    $ cd firefox
-
-Configuring Mercurial and the Clone
-===================================
-
-From your new clone, run ``./mach mercurial-setup`` to launch
-an interactive wizard that will help you optimally configure
-Mercurial for working with Firefox.
-
-When prompted, it is highly recommended to install the
-:ref:`firefoxtree extension <firefoxtree>`. The rest of these
-instructions assume the *firefoxtree* extension is active.
 
 Feature Development
 ===================
