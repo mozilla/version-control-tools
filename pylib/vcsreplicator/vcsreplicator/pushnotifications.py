@@ -4,6 +4,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import json
 import logging
 import os
 
@@ -157,5 +158,94 @@ def _get_pushkey_payload(local_path, public_url, namespace, key, old, new, ret):
     Returns a 2-tuple of (message_type, data) on success or None if no message
     is to be generated.
     """
+    if namespace == 'obsolete':
+        return _get_obsolete_pushkey_message(local_path, public_url, new)
+
     logger.warn('%s pushkey namespace not handled; ignoring' % namespace)
     return None
+
+
+def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
+    logger.warn('processing obsolete pushkey message for %s' % public_url)
+
+    # ASSERTION: vcsreplicator extension loaded in system/user config.
+    with hglib.open(local_path, encoding='utf-8') as hgclient:
+        out = hgclient.rawcommand([b'debugbase85obsmarkers', rawdata])
+        markers = json.loads(out)
+        logger.warn('processing %d obsolete markers' % len(markers))
+
+        def rev_info(node):
+            template = b'{node}\\0{desc}\\0{pushid}\n'
+            args = hglib.util.cmdbuilder(b'log', b'--hidden', r=node,
+                                         template=template)
+            out = hgclient.rawcommand(args)
+            lines = out.splitlines()
+            if lines:
+                return lines[0].strip().split(b'\0')
+            else:
+                return None
+
+        def node_payload(node):
+            assert len(node) == 40
+            if isinstance(node, unicode):
+                node = node.encode('latin1')
+
+            rev = rev_info(node)
+
+            # Determine if changeset is visible/hidden..
+            if rev:
+                args = hglib.util.cmdbuilder(b'log', r=node, template=b'{node}')
+                try:
+                    out = hgclient.rawcommand(args)
+                    visible = bool(out.strip())
+                except hglib.error.CommandError as e:
+                    if b'hidden revision' in e.err:
+                        visible = False
+                    else:
+                        visible = None
+            else:
+                visible = None
+
+            # Obtain pushlog entry for this node.
+            if rev and rev[2]:
+                pushes = _get_pushlog_info(hgclient, public_url, [node])
+                if pushes:
+                    push = pushes[int(rev[2])]
+                else:
+                    push = None
+            else:
+                push = None
+
+            return {
+                'node': node,
+                'known': bool(rev),
+                'visible': visible,
+                'desc': rev[1] if rev else None,
+                'push': push,
+            }
+
+        data = []
+
+        for marker in markers:
+            # We collect data about the new and old changesets (if available)
+            # because the repo may not expose information on hidden
+            # changesets to public consumers.
+            precursor = node_payload(marker['precursor'])
+            successors = [node_payload(node) for node in marker['successors']]
+
+            user = None
+            for m in marker['metadata']:
+                if m[0] == u'user':
+                    user = m[1].encode('utf-8')
+
+            data.append({
+                'precursor': precursor,
+                'successors': successors,
+                'user': user,
+                'time': marker['date'][0],
+            })
+
+    return 'obsolete.1', {
+        'repo_url': public_url,
+        'markers': data,
+    }

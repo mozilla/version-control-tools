@@ -116,6 +116,74 @@ This message has the following fields:
 ``repo_url``
    URL of the created repository.
 
+``obsolete.1``
+--------------
+
+This message describes obsolescence markers added on a repository.
+
+Obsolescence markers tell when a changeset was *obsoleted* and should
+no longer be exposed to the outside world, effectively hiding it from
+history.
+
+Essentially, an obsolescence marker contains a *precursor* node and a
+list of 0 or more *successor* nodes. The *precursor* node is hidden as
+a result of the creation of a marker. The *successor* nodes are the nodes
+that replaced the *precursor* node. If there is no replacement (the
+changeset was dropped), the list of *successors* is empty.
+
+This message has the following fields:
+
+markers
+   A list of dicts describing each obsolescence marker in detail. The
+   format of these entries is described below.
+repo_url
+   The URL of the repository this marker applies to.
+
+Each ``markers`` entry is a dict with the following fields:
+
+precursor
+   Dict describing the *precursor* node.
+successors
+   List of dicts describing the *successor* nodes.
+user
+   String user that produced this marker (this comes from Mercurial's
+   ``ui.username`` config option).
+time
+   Float corresponding to number of seconds since UNIX epoch time when
+   this marker was produced.
+
+The fields of a ``precursor`` or ``successors`` dict are as follows:
+
+node
+   40 character SHA-1 of changeset.
+known
+   Bool indicating whether the changeset is known to the repo. Sometimes
+   obsolescence markers reference changesets not pushed to the repo. This
+   flag helps consumers know whether they might be able to query the repo
+   for more info about this changeset.
+visible
+   Bool indicating whether the changeset is visible to the repository at the
+   time the message was created. If ``false``, the changeset is known but
+   hidden. Value is ``null`` if the changeset is known ``known``.
+
+   Even if the value is ``true``, there is no guarantee a consumer of this
+   message will be able to access changeset metadata from the repository,
+   as a subsequent obsolescence marker could have made this changeset
+   hidden by the time the consumer sees this message and queries the
+   repository. This is one reason why this data structure contains changeset
+   metadata that would normally be obtained by the consumer.
+desc
+   String of commit message for the changeset. May be null if the changeset
+   is not known to the repo.
+push
+   Dict describing the pushlog entry for this changeset.
+
+   Will be ``null`` if the changeset is not known or if there isn't a pushlog
+   entry for it.
+
+   The content of this dict matches the entries from ``pushlog_pushes``
+   from ``changeset.1`` messages.
+
 Examples
 --------
 
