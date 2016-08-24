@@ -42,16 +42,11 @@ for you.
 Start by obtaining the latest code so you aren't working on
 old and possibly stale code::
 
-   $ hg pull central
+   $ hg pull
 
 Then update to the tip of ``mozilla-central``::
 
    $ hg up central
-
-.. note::
-
-   These 2 commands require the *firefoxtree* extension to work
-   properly.
 
 Now, change some stuff. We assume you know how to do this.
 
@@ -75,9 +70,11 @@ Push your changes to MozReview to initiate code review::
    MozReview.
 
 OK. Progress on that feature is blocked waiting on review. It could
-take a while for that to happen. Let's start working on something else::
+take a while for that to happen. Let's start working on something else. We
+always start by pulling the latest code so our change isn't out of date before
+we've event started.::
 
-   $ hg pull central
+   $ hg pull
    $ hg up central
    <change stuff>
    $ hg commit
@@ -187,7 +184,7 @@ finding the changesets using the technique in the previous section::
 Before landing, we need to rebase our unlanded changesets on top of
 the latest changeset from an integration branch::
 
-   $ hg pull inbound
+   $ hg pull
    $ hg rebase -d inbound
 
 If you need to add ``r=`` reviewer attribution to the commit message,
