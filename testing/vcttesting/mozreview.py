@@ -53,6 +53,9 @@ for path in os.environ['PATH'].split(':'):
         WATCHMAN = c
         break
 
+# Allow reviewboard-fork to easily detect when running within the dev env.
+os.putenv('MOZREVIEW_DEV', '1')
+
 
 class MozReview(object):
     """Interface to MozService service.

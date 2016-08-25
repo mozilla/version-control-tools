@@ -23,6 +23,8 @@
     - reviewboard
   tags:
     - docker-reviewboard-refresh
+  environment:
+    MOZREVIEW_DEV: 1
 
 - name: Install python libraries
   command: /venv/bin/python setup.py install chdir=/version-control-tools/pylib/{{ item }}
