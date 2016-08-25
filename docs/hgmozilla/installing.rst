@@ -11,7 +11,7 @@ your tools.
 
 .. note::
 
-   Mercurial has a strong committment to backwards compatibility.
+   Mercurial has a strong commitment to backwards compatibility.
 
    If you are scared that upgrading will break workflows or command
    behavior, don't be. It is very rare for Mercurial to intentionally
@@ -23,7 +23,7 @@ Recommended Versions
 Mozilla recommends running the latest stable release of Mercurial. The
 latest stable release is always listed at
 `https://www.mercurial-scm.org/ <https://www.mercurial-scm.org/>`_.
-**As of June 2016, the latest stable release is 3.8.**
+**As of August 2016, the latest stable release is 3.9.**
 
 .. danger::
 
@@ -57,7 +57,7 @@ it from a package manager or install it from source.
 mach bootstrap
 --------------
 
-If you have a clone of a Firefox repository, simply run `mach bootstrap`
+If you have a clone of a Firefox repository, simply run ``mach bootstrap``
 to install/upgrade Mercurial. Keep in mind this will install all
 packages required for Firefox development. If this is not wanted,
 follow a set of instructions below.
@@ -106,7 +106,7 @@ out the version you wish to install::
 
   $ hg clone https://selenic.com/repo/hg
   $ cd hg
-  $ hg up 3.8.2
+  $ hg up 3.9
 
 Once you have the source code, run ``make`` to install Mercurial::
 
