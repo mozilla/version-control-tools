@@ -182,8 +182,12 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
             # 40 character hash that isn't known.
             try:
                 out = hgclient.rawcommand(args)
+                logger.warn('raw output: %s' % out)
                 lines = out.splitlines()
-                return lines[0].strip().split(b'\0')
+                if lines:
+                    return lines[0].strip().split(b'\0')
+                else:
+                    return None
             except hglib.error.CommandError as e:
                 if b'unknown revision' in e.err:
                     return None
