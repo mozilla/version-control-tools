@@ -94,56 +94,61 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
     consumer.commit(partitions=[partition])
 
 
+def _get_pushlog_info(hgclient, public_url, revs):
+    template = b'{node}\\0{pushid}\\0{pushuser}\\0{pushdate}\n'
+    args = hglib.util.cmdbuilder(b'log', b'--hidden', r=revs, template=template)
+    out = hgclient.rawcommand(args)
+
+    pushes = {}
+
+    for line in out.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+
+        node, pushid, pushuser, pushtime = line.split('\0')
+        # Not all changegroup events have corresponding pushlog entries.
+        # This should be rare.
+        if not pushid:
+            logger.warn('pushlog data missing!')
+            continue
+
+        pushid = int(pushid)
+        pushtime = int(pushtime)
+
+        q = 'startID=%d&endID=%d' % (pushid - 1, pushid)
+
+        pushes.setdefault(pushid, {
+            'pushid': pushid,
+            'user': pushuser,
+            'time': pushtime,
+            'push_json_url': '%s/json-pushes?version=2&%s' % (public_url, q),
+            'push_full_json_url': '%s/json-pushes?version=2&full=1&%s' % (public_url, q),
+        })
+
+    return pushes
+
+
 def _get_changegroup_payload(local_path, public_url, heads, source):
-    logger.warn('querying pushlog data for %s' % local_path)
-
     # Resolve the push IDs for these changesets.
+    # We cheat and only request pushlog entries for heads. There may be
+    # some scenarios where we want pushlog entries for all nodes. But as
+    # of hg-changegroup-2 messages we don't record every node in the
+    # changegroup (just the count), so the full set of nodes isn't
+    # available. We shouldn't be seeing too many changegroup messages
+    # where a message doesn't correspond to a single push, so this shortcut
+    # should be acceptable.
+    revs = [n.encode('latin1') for n in heads]
+    logger.warn('querying pushlog data for %s' % local_path)
     with hglib.open(local_path, encoding='utf-8') as hgclient:
-        # We cheat and only request pushlog entries for heads. There may be
-        # some scenarios where we want pushlog entries for all nodes. But as
-        # of hg-changegroup-2 messages we don't record every node in the
-        # changegroup (just the count), so the full set of nodes isn't
-        # available. We shouldn't be seeing too many changegroup messages
-        # where a message doesn't correspond to a single push, so this shortcut
-        # should be acceptable.
-        revs = [n.encode('latin1') for n in heads]
-        template = b'{node}\\0{pushid}\\0{pushuser}\\0{pushdate}\n'
-        args = hglib.util.cmdbuilder(b'log', b'--hidden', r=revs, template=template)
-        out = hgclient.rawcommand(args)
+        pushes = _get_pushlog_info(hgclient, public_url, revs)
 
-        pushes = {}
-
-        for line in out.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-
-            node, pushid, pushuser, pushtime = line.split('\0')
-            # Not all changegroup events have corresponding pushlog entries.
-            # This should be rare.
-            if not pushid:
-                logger.warn('pushlog data missing!')
-                continue
-
-            pushid = int(pushid)
-            pushtime = int(pushtime)
-
-            q = 'startID=%d&endID=%d' % (pushid - 1, pushid)
-
-            pushes.setdefault(pushid, {
-                'pushid': pushid,
-                'user': pushuser,
-                'time': pushtime,
-                'push_json_url': '%s/json-pushes?version=2&%s' % (public_url, q),
-                'push_full_json_url': '%s/json-pushes?version=2&full=1&%s' % (public_url, q)
-            })
-
-        return {
-            'repo_url': public_url,
-            'heads': heads,
-            'source': source,
-            'pushlog_pushes': [v for k, v in sorted(pushes.items())],
-        }
+    return {
+        'repo_url': public_url,
+        'heads': heads,
+        'source': source,
+        'pushlog_pushes': [v for k, v in sorted(pushes.items())],
+    }
 
 
 def _get_pushkey_payload(local_path, public_url, namespace, key, old, new, ret):
