@@ -75,7 +75,7 @@ Create an obsolescence marker on the server
   4da703b7f59b720f524f709aa07eed3182ba1acd 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
   7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2 0 (*) {'user': 'root@*'} (glob)
 
-Sending a precursor marker referencing a node unknown to the server
+Send a precursor marker referencing a node unknown to the server
 
   $ hg -q up -r 0
   $ touch precursor
@@ -94,6 +94,35 @@ Sending a precursor marker referencing a node unknown to the server
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/obs/rev/7066e27cce8c
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
+  remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
+
+Commit message with multiple lines works
+
+  $ hg -q up -r 0
+  $ cat > multiline << EOF
+  > first line
+  > second line
+  > third line
+  > EOF
+  $ hg -q commit -A -l multiline
+  $ cat >> multiline << EOF
+  > fourth line
+  > fifth line
+  > EOF
+  $ hg commit --amend -l multiline
+  $ hg push -f
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 2 files (+1 heads)
+  remote: recorded push in pushlog
+  remote: 2 new obsolescence markers
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/obs/rev/821cb8db7123
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
@@ -260,6 +289,64 @@ Sending a precursor marker referencing a node unknown to the server
           node: 506deb6d051199c92e6681021bd819fe7bf57ed0
           push: null
           visible: null
+        time: \d+\.\d+ (re)
+        user: Test User <someone@example.com>
+      repo_url: https://hg.mozilla.org/obs
+    type: obsolete.1
+  - _meta:
+      exchange: exchange/hgpushes/v2
+      routing_key: obs
+    data:
+      heads:
+      - 821cb8db71235562a3ee752f0b67502e93835a9f
+      pushlog_pushes:
+      - push_full_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&full=1&startID=4&endID=5
+        push_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&startID=4&endID=5
+        pushid: 5
+        time: \d+ (re)
+        user: user@example.com
+      repo_url: https://hg.mozilla.org/obs
+      source: serve
+    type: changegroup.1
+  - _meta:
+      exchange: exchange/hgpushes/v2
+      routing_key: obs
+    data:
+      markers:
+      - precursor:
+          desc: null
+          known: false
+          node: 0a1055f8c9cb8d183d9e5b843e182038f51cbe6e
+          push: null
+          visible: null
+        successors: []
+        time: \d+\.\d+ (re)
+        user: Test User <someone@example.com>
+      - precursor:
+          desc: null
+          known: false
+          node: 2d43215925d94eb9e5792ae70344b3c8be755e5f
+          push: null
+          visible: null
+        successors:
+        - desc: 'first line
+  
+            second line
+  
+            third line
+  
+            fourth line
+  
+            fifth line'
+          known: true
+          node: 821cb8db71235562a3ee752f0b67502e93835a9f
+          push:
+            push_full_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&full=1&startID=4&endID=5
+            push_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&startID=4&endID=5
+            pushid: 5
+            time: \d+ (re)
+            user: user@example.com
+          visible: true
         time: \d+\.\d+ (re)
         user: Test User <someone@example.com>
       repo_url: https://hg.mozilla.org/obs

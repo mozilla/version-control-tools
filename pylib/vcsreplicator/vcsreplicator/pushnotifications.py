@@ -175,19 +175,14 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
         logger.warn('processing %d obsolete markers' % len(markers))
 
         def rev_info(node):
-            template = b'{node}\\0{desc}\\0{pushid}\n'
+            template = b'{node}\\0{desc}\\0{pushid}'
             args = hglib.util.cmdbuilder(b'log', b'--hidden', r=node,
                                          template=template)
             # Mercurial will abort with "unknown revision" if you give it
             # 40 character hash that isn't known.
             try:
                 out = hgclient.rawcommand(args)
-                logger.warn('raw output: %s' % out)
-                lines = out.splitlines()
-                if lines:
-                    return lines[0].strip().split(b'\0')
-                else:
-                    return None
+                return out.split(b'\0')
             except hglib.error.CommandError as e:
                 if b'unknown revision' in e.err:
                     return None
