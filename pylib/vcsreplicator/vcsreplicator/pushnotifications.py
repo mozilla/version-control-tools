@@ -178,12 +178,17 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
             template = b'{node}\\0{desc}\\0{pushid}\n'
             args = hglib.util.cmdbuilder(b'log', b'--hidden', r=node,
                                          template=template)
-            out = hgclient.rawcommand(args)
-            lines = out.splitlines()
-            if lines:
+            # Mercurial will abort with "unknown revision" if you give it
+            # 40 character hash that isn't known.
+            try:
+                out = hgclient.rawcommand(args)
+                lines = out.splitlines()
                 return lines[0].strip().split(b'\0')
-            else:
-                return None
+            except hglib.error.CommandError as e:
+                if b'unknown revision' in e.err:
+                    return None
+                else:
+                    raise
 
         def node_payload(node):
             assert len(node) == 40

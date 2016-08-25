@@ -65,6 +65,8 @@ them. So disable the pulse consumer until all repo changes have been made.
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
+Create an obsolescence marker on the server
+
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs debugobsolete 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2
   no username found, using 'root@*' instead (glob)
   recorded updates to obsolete in replication log in \d+\.\d+s (re)
@@ -72,6 +74,28 @@ them. So disable the pulse consumer until all repo changes have been made.
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs debugobsolete
   4da703b7f59b720f524f709aa07eed3182ba1acd 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
   7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2 0 (*) {'user': 'root@*'} (glob)
+
+Sending a precursor marker referencing a node unknown to the server
+
+  $ hg -q up -r 0
+  $ touch precursor
+  $ hg -q commit -A -m 'obsolete never sent'
+  $ hg commit --amend -m 'first amend'
+  $ hg commit --amend -m 'second amend'
+  $ hg push -f
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 2 files (+1 heads)
+  remote: recorded push in pushlog
+  remote: 2 new obsolescence markers
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/obs/rev/7066e27cce8c
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
+  remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
@@ -183,6 +207,61 @@ them. So disable the pulse consumer until all repo changes have been made.
         successors: []
         time: \d+\.\d+ (re)
         user: root@* (glob)
+      repo_url: https://hg.mozilla.org/obs
+    type: obsolete.1
+  - _meta:
+      exchange: exchange/hgpushes/v2
+      routing_key: obs
+    data:
+      heads:
+      - 7066e27cce8ca811f9f80da78e330c72af5a49f8
+      pushlog_pushes:
+      - push_full_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&full=1&startID=3&endID=4
+        push_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&startID=3&endID=4
+        pushid: 4
+        time: \d+ (re)
+        user: user@example.com
+      repo_url: https://hg.mozilla.org/obs
+      source: serve
+    type: changegroup.1
+  - _meta:
+      exchange: exchange/hgpushes/v2
+      routing_key: obs
+    data:
+      markers:
+      - precursor:
+          desc: null
+          known: false
+          node: 506deb6d051199c92e6681021bd819fe7bf57ed0
+          push: null
+          visible: null
+        successors:
+        - desc: second amend
+          known: true
+          node: 7066e27cce8ca811f9f80da78e330c72af5a49f8
+          push:
+            push_full_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&full=1&startID=3&endID=4
+            push_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&startID=3&endID=4
+            pushid: 4
+            time: \d+ (re)
+            user: user@example.com
+          visible: true
+        time: \d+\.\d+ (re)
+        user: Test User <someone@example.com>
+      - precursor:
+          desc: null
+          known: false
+          node: 8e81a192ded91c8c10b727345689c8ab80448750
+          push: null
+          visible: null
+        successors:
+        - desc: null
+          known: false
+          node: 506deb6d051199c92e6681021bd819fe7bf57ed0
+          push: null
+          visible: null
+        time: \d+\.\d+ (re)
+        user: Test User <someone@example.com>
       repo_url: https://hg.mozilla.org/obs
     type: obsolete.1
 
