@@ -396,17 +396,26 @@ class pushlog(object):
             if not res:
                 return None
 
-            pushid = res[0]
+            return self.pushfromid(c, res[0])
 
-            res = c.execute('SELECT id, user, date, node from pushlog '
-                            'LEFT JOIN changesets on id=pushid '
-                            'WHERE id=? ORDER BY rev ASC', (pushid,))
-            nodes = []
-            for pushid, who, when, node in res:
-                who = who.encode('utf-8')
-                nodes.append(node.encode('ascii'))
+    def pushfromid(self, conn, pushid):
+        """Obtain a push from its numeric push id.
 
-            return Push(pushid, who, when, nodes)
+        Returns a Push namedtuple or None if there is no push with this push
+        id.
+        """
+        res = conn.execute('SELECT id, user, date, node from pushlog '
+                           'LEFT JOIN changesets on id=pushid '
+                           'WHERE id=? ORDER BY rev ASC', (pushid,))
+        nodes = []
+        for pushid, who, when, node in res:
+            who = who.encode('utf-8')
+            nodes.append(node.encode('ascii'))
+
+        if not nodes:
+            return None
+
+        return Push(pushid, who, when, nodes)
 
     def verify(self):
         # Attempt to create database (since .pushes below won't).
