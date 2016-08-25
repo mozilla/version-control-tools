@@ -88,14 +88,32 @@ Changing Code After Reviews
 A review comes back. Unfortunately review was not granted and you need
 to make changes. No worries.
 
-We need to find the changesets containing our feature so we can edit
-them. Find the SHA-1s from MozReview, use a command like
-``hg wip`` (see :ref:`hgmozilla_workflows`) to find them, or
-``hg up`` directly to the bookmark you've given to the head::
+We need to update the working directory to the changeset to be modified
+so we can edit them. How you do this depends on how you are *tracking*
+commits. For most workflows, we recommend
+``hg wip`` (see :ref:`hgmozilla_workflows` for more on this command) to
+find them. e.g.::
 
-   $ hg up <SHA-1 or label>
+   $ hg wip
+   o   6139:5060abe260e9 gps  vcsreplicator: explicitly record obsolescence markers in pushkey messages
+   : o   5940:e16f6960cdeb gps  hgmo: update automationrelevance for Mercurial 3.8; r?smacleod
+   : o   5939:e62f4eb60ef3 gps  mozhg: fix test output for Mercurial 3.8; r?glob
+   : o   5938:f71be022e59c gps  global: upgrade Mercurial to 3.8.3 (bug 1277714)
+   :/
+   o   5937:5a8623230b7a gps  pushlog: convert user and nodes to bytes (bug 1295724); r=smacleod
+   : o   5717:9c2ca05479e9 gps  hgmo: handle obsolete changesets (bug 1286426); r?glandium
 
-Now, you have several options available to you. If you know the changes
+If you want to edit ``e16f6960cdeb``, you would ``hg up e16f6960cdeb``.
+
+Or if you are using bookmarks, you can update directly to the bookmark::
+
+   $ hg up my-bookmark
+   4 files updated, 0 files merged, 0 files removed, 0 files unresolved
+   (activating bookmark my-bookmark)
+
+Now that your working directory is updated, you can start making changes.
+
+You have several options available to you. If you know the changes
 are small and won't conflict if reordered, go ahead and make them now
 and commit::
 
