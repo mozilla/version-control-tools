@@ -157,4 +157,5 @@ def _get_pushkey_payload(local_path, public_url, namespace, key, old, new, ret):
     Returns a 2-tuple of (message_type, data) on success or None if no message
     is to be generated.
     """
+    logger.warn('%s pushkey namespace not handled; ignoring' % namespace)
     return None
