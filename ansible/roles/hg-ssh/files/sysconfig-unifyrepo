@@ -1,1 +1,1 @@
-CONFIGS=/etc/mercurial/unify-mozilla-unified.ini /etc/mercurial/unify-firefox-unified.ini /etc/mercurial/unify-firefox-unified-b2g.ini /etc/mercurial/unify-mozilla-central-gd.ini
+CONFIGS=/etc/mercurial/unify-mozilla-unified.ini /etc/mercurial/unify-firefox-unified-b2g.ini /etc/mercurial/unify-mozilla-central-gd.ini
