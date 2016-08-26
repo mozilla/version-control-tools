@@ -900,12 +900,23 @@ class Docker(object):
         to wait for complete initialization before it is unblocked. We could
         probably factor functionality into smaller pieces.
         """
-
         if not web_image:
             images = self.build_bmo(verbose=verbose)
             web_image = images['bmoweb']
 
         containers = self.state['containers'].setdefault(cluster, [])
+
+        network_name = 'bmo-%s' % uuid.uuid4()
+        self.client.create_network(network_name, driver='bridge')
+
+        def network_config(alias):
+            return self.client.create_networking_config(
+                endpoints_config={
+                    network_name: self.client.create_endpoint_config(
+                        aliases=[alias],
+                    )
+                }
+            )
 
         bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
         bmo_host_config = self.client.create_host_config(
@@ -914,6 +925,7 @@ class Docker(object):
             web_image,
             environment={'BMO_URL': bmo_url},
             host_config=bmo_host_config,
+            networking_config=network_config('web'),
             labels=['bmoweb'])['Id']
         containers.append(web_id)
         self.client.start(web_id)
@@ -1310,12 +1322,26 @@ class Docker(object):
         count = 0
 
         ids = self.state['containers'].get(cluster, [])
+        networks = set()
 
         with futures.ThreadPoolExecutor(max(1, len(ids))) as e:
             for container in reversed(ids):
+                if count == 0:
+                    state = self.client.inspect_container(container)
+                    for network in state['NetworkSettings']['Networks'].values():
+                        networks.add(network['NetworkID'])
+
                 count += 1
                 e.submit(self.client.remove_container, container, force=True,
                          v=True)
+
+        # There should only be 1, so don't use a ThreadPoolExecutor.
+        for network in networks:
+            # TODO remove this lookup and check once using user-defined networks
+            # everywhere.
+            n = self.client.inspect_network(network)
+            if n['Name'] != 'bridge':
+                self.client.remove_network(network)
 
         print('stopped %d containers' % count)
 
