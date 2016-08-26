@@ -14,12 +14,13 @@ Running multiple extensions from same v-c-t checkout works
    <RETURN>
 
 Running extension from another v-c-t directory fails
-(configwizard runs from a v-c-t checkout so it should trigger detection itself)
 
   $ mkdir -p a/version-control-tools/hgext/firefoxtree
   $ touch a/version-control-tools/hgext/firefoxtree/__init__.py
+  $ mkdir -p b/version-control-tools/hgext/mozext
+  $ touch b/version-control-tools/hgext/mozext/__init__.py
 
-  $ hg --config extensions.firefoxtree=$TESTTMP/a/version-control-tools/hgext/firefoxtree --config configwizard.steps=multiplevct configwizard
+  $ hg --config extensions.firefoxtree=$TESTTMP/a/version-control-tools/hgext/firefoxtree --config extensions.mozext=$TESTTMP/b/version-control-tools/hgext/mozext --config configwizard.steps=multiplevct configwizard
   This wizard will guide you through configuring Mercurial for an optimal
   experience contributing to Mozilla projects.
   
