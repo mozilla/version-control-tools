@@ -16,3 +16,4 @@ hg.mozilla.org
    mozbuildinfo
    replication
    ops
+   upgrading
