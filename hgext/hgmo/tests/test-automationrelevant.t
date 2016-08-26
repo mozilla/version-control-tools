@@ -119,161 +119,161 @@ web command for exposing automation relevance works
   {
     "changesets": [
       {
-        "author": "test", 
-        "backsoutnodes": [], 
-        "bugs": [], 
+        "author": "test",
+        "backsoutnodes": [],
+        "bugs": [],
         "date": [
-          0.0, 
+          0.0,
           0
-        ], 
-        "desc": "push 1 commit 1", 
+        ],
+        "desc": "push 1 commit 1",
         "extra": {
           "branch": "default"
-        }, 
+        },
         "files": [
           "foo"
-        ], 
-        "node": "0a971221ac36075c184743cba0490681eadca983", 
-        "parent": [], 
+        ],
+        "node": "0a971221ac36075c184743cba0490681eadca983",
+        "parent": [],
         "pushdate": [
-          \d+,  (re)
+          \d+, (re)
           0
-        ], 
-        "pushhead": "cb5c79007e91b09a4ba7ebe9210311491d09e96e", 
-        "pushid": 2, 
+        ],
+        "pushhead": "cb5c79007e91b09a4ba7ebe9210311491d09e96e",
+        "pushid": 2,
         "pushnodes": [
-          "0a971221ac36075c184743cba0490681eadca983", 
+          "0a971221ac36075c184743cba0490681eadca983",
           "cb5c79007e91b09a4ba7ebe9210311491d09e96e"
-        ], 
-        "pushuser": "testuser", 
-        "rev": 1, 
+        ],
+        "pushuser": "testuser",
+        "rev": 1,
         "reviewers": []
-      }, 
+      },
       {
-        "author": "test", 
-        "backsoutnodes": [], 
-        "bugs": [], 
+        "author": "test",
+        "backsoutnodes": [],
+        "bugs": [],
         "date": [
-          0.0, 
+          0.0,
           0
-        ], 
-        "desc": "push 1 commit 2", 
+        ],
+        "desc": "push 1 commit 2",
         "extra": {
           "branch": "default"
-        }, 
+        },
         "files": [
           "foo"
-        ], 
-        "node": "cb5c79007e91b09a4ba7ebe9210311491d09e96e", 
-        "parent": [], 
+        ],
+        "node": "cb5c79007e91b09a4ba7ebe9210311491d09e96e",
+        "parent": [],
         "pushdate": [
-          \d+,  (re)
+          \d+, (re)
           0
-        ], 
-        "pushhead": "cb5c79007e91b09a4ba7ebe9210311491d09e96e", 
-        "pushid": 2, 
+        ],
+        "pushhead": "cb5c79007e91b09a4ba7ebe9210311491d09e96e",
+        "pushid": 2,
         "pushnodes": [
-          "0a971221ac36075c184743cba0490681eadca983", 
+          "0a971221ac36075c184743cba0490681eadca983",
           "cb5c79007e91b09a4ba7ebe9210311491d09e96e"
-        ], 
-        "pushuser": "testuser", 
-        "rev": 2, 
+        ],
+        "pushuser": "testuser",
+        "rev": 2,
         "reviewers": []
-      }, 
+      },
       {
-        "author": "test", 
-        "backsoutnodes": [], 
-        "bugs": [], 
+        "author": "test",
+        "backsoutnodes": [],
+        "bugs": [],
         "date": [
-          0.0, 
+          0.0,
           0
-        ], 
-        "desc": "push 2 commit 1", 
+        ],
+        "desc": "push 2 commit 1",
         "extra": {
           "branch": "default"
-        }, 
+        },
         "files": [
           "foo"
-        ], 
-        "node": "13855aae8fb3291c663ff46a8510c0e3fa673a4c", 
-        "parent": [], 
+        ],
+        "node": "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
+        "parent": [],
         "pushdate": [
-          \d+,  (re)
+          \d+, (re)
           0
-        ], 
-        "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8", 
-        "pushid": 3, 
+        ],
+        "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+        "pushid": 3,
         "pushnodes": [
-          "13855aae8fb3291c663ff46a8510c0e3fa673a4c", 
-          "66a66c6c6ae312ec88240754300468a6cea8f71d", 
+          "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
+          "66a66c6c6ae312ec88240754300468a6cea8f71d",
           "5d04c4fd236c19e241d1587e120b39840344eee8"
-        ], 
-        "pushuser": "testuser", 
-        "rev": 3, 
+        ],
+        "pushuser": "testuser",
+        "rev": 3,
         "reviewers": []
-      }, 
+      },
       {
-        "author": "test", 
-        "backsoutnodes": [], 
-        "bugs": [], 
+        "author": "test",
+        "backsoutnodes": [],
+        "bugs": [],
         "date": [
-          0.0, 
+          0.0,
           0
-        ], 
-        "desc": "push 2 commit 2", 
+        ],
+        "desc": "push 2 commit 2",
         "extra": {
           "branch": "default"
-        }, 
+        },
         "files": [
           "foo"
-        ], 
-        "node": "66a66c6c6ae312ec88240754300468a6cea8f71d", 
-        "parent": [], 
+        ],
+        "node": "66a66c6c6ae312ec88240754300468a6cea8f71d",
+        "parent": [],
         "pushdate": [
-          \d+,  (re)
+          \d+, (re)
           0
-        ], 
-        "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8", 
-        "pushid": 3, 
+        ],
+        "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+        "pushid": 3,
         "pushnodes": [
-          "13855aae8fb3291c663ff46a8510c0e3fa673a4c", 
-          "66a66c6c6ae312ec88240754300468a6cea8f71d", 
+          "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
+          "66a66c6c6ae312ec88240754300468a6cea8f71d",
           "5d04c4fd236c19e241d1587e120b39840344eee8"
-        ], 
-        "pushuser": "testuser", 
-        "rev": 4, 
+        ],
+        "pushuser": "testuser",
+        "rev": 4,
         "reviewers": []
-      }, 
+      },
       {
-        "author": "test", 
-        "backsoutnodes": [], 
-        "bugs": [], 
+        "author": "test",
+        "backsoutnodes": [],
+        "bugs": [],
         "date": [
-          0.0, 
+          0.0,
           0
-        ], 
-        "desc": "push 2 commit 3", 
+        ],
+        "desc": "push 2 commit 3",
         "extra": {
           "branch": "default"
-        }, 
+        },
         "files": [
           "foo"
-        ], 
-        "node": "5d04c4fd236c19e241d1587e120b39840344eee8", 
-        "parent": [], 
+        ],
+        "node": "5d04c4fd236c19e241d1587e120b39840344eee8",
+        "parent": [],
         "pushdate": [
-          \d+,  (re)
+          \d+, (re)
           0
-        ], 
-        "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8", 
-        "pushid": 3, 
+        ],
+        "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+        "pushid": 3,
         "pushnodes": [
-          "13855aae8fb3291c663ff46a8510c0e3fa673a4c", 
-          "66a66c6c6ae312ec88240754300468a6cea8f71d", 
+          "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
+          "66a66c6c6ae312ec88240754300468a6cea8f71d",
           "5d04c4fd236c19e241d1587e120b39840344eee8"
-        ], 
-        "pushuser": "testuser", 
-        "rev": 5, 
+        ],
+        "pushuser": "testuser",
+        "rev": 5,
         "reviewers": []
       }
     ]
