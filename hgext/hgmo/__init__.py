@@ -422,8 +422,15 @@ def automationrelevancewebcommand(web, req, tmpl):
 
         csets.append(entry)
 
+    # Advertise whether the requested revision is visible (non-obsolete).
+    if csets:
+        visible = csets[-1]['node'] in repo
+    else:
+        visible = None
+
     data = {
         'changesets': csets,
+        'visible': visible,
     }
 
     req.respond(HTTP_OK, 'application/json')

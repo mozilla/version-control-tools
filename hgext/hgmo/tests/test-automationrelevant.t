@@ -276,7 +276,8 @@ web command for exposing automation relevance works
         "rev": 5,
         "reviewers": []
       }
-    ]
+    ],
+    "visible": true
   }
 
   $ cat error.log
