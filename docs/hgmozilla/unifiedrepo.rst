@@ -144,8 +144,8 @@ following.
 
 Create a new clone of the unified repo::
 
-   $ hg clone -U --uncompressed https://hg.mozilla.org/mozilla-unified
-   $ cd firefox-unified
+   $ hg clone -U --uncompressed https://hg.mozilla.org/mozilla-unified firefox
+   $ cd firefox
 
 Now set your new repository to non-publishing (this means commits pushed to it
 won't be marked as public and will still be mutable)::
@@ -157,7 +157,7 @@ won't be marked as public and will still be mutable)::
 Finally, go to your existing repo and push your work-in-progress changesets::
 
    $ cd /existing/repo
-   $ hg push -f -r 'not public()' /path/to/firefox-unified
+   $ hg push -f -r 'not public()' /path/to/firefox
 
 
 incompatible Mercurial client; bundle2 required
@@ -165,8 +165,7 @@ incompatible Mercurial client; bundle2 required
 
 Does this happen to you?::
 
-   $ hg clone https://hg.mozilla.org/mozilla-unified
-   destination directory: firefox-unified
+   $ hg clone https://hg.mozilla.org/mozilla-unified firefox
    requesting all changes
    abort: remote error:
    incompatible Mercurial client; bundle2 required
