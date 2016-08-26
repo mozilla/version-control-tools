@@ -89,7 +89,7 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
   patchutils perlmagick pkg-config python3-mysql.connector \
   python-psutil supervisor unzip wget
 
-RUN git clone --depth 1 https://github.com/mozilla-bteam/bmo.git $BUGZILLA_HOME/bugzilla
+RUN git clone https://github.com/mozilla-bteam/bmo.git $BUGZILLA_HOME/bugzilla
 
 # cpanm has problems with some packages. Install them from the OS.
 RUN apt-get -y install \
@@ -143,3 +143,6 @@ EXPOSE 80
 
 ENTRYPOINT ["/bmoweb_entrypoint.py"]
 CMD ["/usr/bin/supervisord"]
+
+# Temporarily pin commit until bug 1298524 is resolved.
+ENV BMO_COMMIT 806f97062f7b45516d7b564b5f943d7353cbd946
