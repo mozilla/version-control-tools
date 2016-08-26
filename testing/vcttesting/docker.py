@@ -1387,40 +1387,6 @@ class Docker(object):
 
         return mr_result, hgmo_result, bmo_result
 
-    def _get_files_from_http_container(self, builder, message):
-        image = self.ensure_built(builder, verbose=True)
-
-        host_config = self.client.create_host_config(
-            port_bindings={80: None})
-        container = self.client.create_container(image,
-                                                 host_config=host_config)['Id']
-
-        with self.start_container(container) as state:
-            port = int(state['NetworkSettings']['Ports']['80/tcp'][0]
-                       ['HostPort'])
-
-            print(message)
-            wait_for_http(
-                self.docker_hostname,
-                port,
-                timeout=120,
-                extra_check_fn=self._get_assert_container_running_fn(container)
-            )
-
-            res = requests.get('http://%s:%s/' % (self.docker_hostname, port))
-
-            files = {}
-            for filename, data in res.json().items():
-                files[filename] = base64.b64decode(data)
-
-        self.client.remove_container(container, v=True)
-
-        return files
-
-    def build_mercurial_rpms(self, distro):
-        return self._get_files_from_http_container('hgrpm-%s' % distro,
-                                                   'Generating RPMs...')
-
     def get_full_image(self, image):
         for i in self.client.images():
             iid = i['Id']

@@ -115,18 +115,6 @@ class DockerCommands(object):
     def prune_images(self):
         self.d.prune_images()
 
-    @Command('build-mercurial-rpms', category='docker',
-        description='Build RPMs for Mercurial')
-    @CommandArgument('distro', help='Distro/builder to use',
-                     choices={'centos6', 'centos7'})
-    @CommandArgument('destdir', help='Directory in which to save RPMs')
-    def build_rpms(self, distro, destdir):
-        for filename, data in self.d.build_mercurial_rpms(distro).items():
-            outfile = os.path.join(destdir, filename)
-            with open(outfile, 'wb') as fh:
-                fh.write(data)
-            print('Wrote %s' % outfile)
-
     @Command('generate-hgweb-mozbuild-files', category='docker',
              description='Generate files for a moz.build evaluation environment')
     @CommandArgument('dest', help='Directory to write files to')
