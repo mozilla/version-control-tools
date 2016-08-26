@@ -422,11 +422,15 @@ def automationrelevancewebcommand(web, req, tmpl):
 
         csets.append(entry)
 
+    data = {
+        'changesets': csets,
+    }
+
     req.respond(HTTP_OK, 'application/json')
     # We use latin1 as the encoding here because all data should be treated as
     # byte strings. ensure_ascii will escape non-ascii values using \uxxxx.
-    return json.dumps({'changesets': csets}, indent=2, sort_keys=True,
-                      encoding='latin1', separators=(',', ': '))
+    return json.dumps(data, indent=2, sort_keys=True, encoding='latin1',
+                      separators=(',', ': '))
 
 
 def revset_reviewer(repo, subset, x):
