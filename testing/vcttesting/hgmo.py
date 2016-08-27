@@ -202,15 +202,8 @@ class HgCluster(object):
             pulse_id = f_pulse_create.result()['Id']
             master_id = f_master_create.result()['Id']
 
-            # Start LDAP and Pulse first because we need to link it to hg
-            # containers.
             f_ldap_start = e.submit(self._dc.start, ldap_id)
             f_pulse_start = e.submit(self._dc.start, pulse_id)
-            f_ldap_start.result()
-            f_pulse_start.result()
-
-            ldap_state = self._dc.inspect_container(ldap_id)
-            pulse_state = self._dc.inspect_container(pulse_id)
 
             self._dc.start(master_id)
             master_state = self._dc.inspect_container(master_id)
@@ -225,7 +218,14 @@ class HgCluster(object):
             for i in web_ids:
                 f_web_states.append(e.submit(self._dc.inspect_container, i))
 
+            f_ldap_start.result()
+            f_ldap_state = e.submit(self._dc.inspect_container, ldap_id)
+            f_pulse_start.result()
+            f_pulse_state = e.submit(self._dc.inspect_container, pulse_id)
+
             web_states = [f.result() for f in f_web_states]
+            ldap_state = f_ldap_state.result()
+            pulse_state = f_pulse_state.result()
 
         all_states = [master_state] + web_states
 
