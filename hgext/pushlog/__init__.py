@@ -19,6 +19,7 @@ from mercurial import (
     error,
     exchange,
     extensions,
+    registrar,
     revset,
     templatekw,
     util,
@@ -32,13 +33,17 @@ Abort = error.Abort
 RepoLookupError = error.RepoLookupError
 
 minimumhgversion = '3.7'
-testedwith = '3.7'
+testedwith = '3.7 3.8 3.9'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
-revsetpredicate = revset.extpredicate()
+# registrar.revsetpredicate replaces revset.extpredicate in Mercurial 3.8.
+if getattr(revset, 'extpredicate', None):
+    revsetpredicate = revset.extpredicate()
+else:
+    revsetpredicate = registrar.revsetpredicate()
 
 SCHEMA = [
     'CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)',
@@ -734,7 +739,8 @@ def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
 
-    revsetpredicate.setup()
+    if util.safehasattr(revsetpredicate, 'setup'):
+        revsetpredicate.setup()
 
     keywords = {
         'pushid': template_pushid,
