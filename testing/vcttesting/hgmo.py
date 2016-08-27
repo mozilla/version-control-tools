@@ -15,6 +15,7 @@ from .ldap import LDAP
 from .util import (
     wait_for_amqp,
     wait_for_kafka,
+    wait_for_kafka_topic,
     wait_for_ssh,
 )
 
@@ -348,6 +349,21 @@ class HgCluster(object):
         for f in futures.as_completed(fs):
             if 'Created topic' not in f.result():
                 raise Exception('kafka topic not created')
+
+        # There appears to be a race condition between the topic being
+        # created and the topic being available. So we explicitly wait
+        # for the topic to appear on all clients so processes within
+        # containers don't need to wait.
+        with futures.ThreadPoolExecutor(4) as e:
+            fs = []
+            for s in all_states:
+                h, p = self._d._get_host_hostname_port(s, '9092/tcp')
+                hostport = '%s:%s' % (h, p)
+                for topic in TOPICS:
+                    fs.append(e.submit(wait_for_kafka_topic, hostport,
+                                       topic[0]))
+
+            [f.result() for f in fs]
 
         self.ldap_image = ldap_image
         self.master_image = master_image

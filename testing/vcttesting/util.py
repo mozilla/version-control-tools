@@ -128,6 +128,18 @@ def wait_for_kafka(hostport, timeout=60):
         time.sleep(0.1)
 
 
+def wait_for_kafka_topic(hostport, topic, timeout=60):
+    """Wait for a Kafka topic to become available."""
+    start = time.time()
+    client = KafkaClient(hostport, client_id=b'dummy', timeout=1)
+    while not client.has_metadata_for_topic(topic):
+        if time.time() - start > timeout:
+            raise Exception('timeout reached waiting for topic')
+
+        time.sleep(0.1)
+        client.load_metadata_for_topics()
+
+
 def limited_threadpoolexecutor(wanted_workers, max_workers=None):
     """Return a ThreadPoolExecutor with up to ``max_workers`` executors.
 
