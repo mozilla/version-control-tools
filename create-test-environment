@@ -219,7 +219,11 @@ if [ ! -d venv/git-cinnabar ]; then
   git clone --branch release https://github.com/glandium/git-cinnabar.git venv/git-cinnabar
 fi
 
-git -C venv/git-cinnabar pull
+cd venv/git-cinnabar
+git pull
+git submodule update --init
+make -j4 helper
+cd ../..
 
 if [ -z "${NO_DOCKER}" ]; then
   echo ""
