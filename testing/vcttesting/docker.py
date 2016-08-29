@@ -909,15 +909,6 @@ class Docker(object):
         network_name = 'bmo-%s' % uuid.uuid4()
         self.client.create_network(network_name, driver='bridge')
 
-        def network_config(alias):
-            return self.client.create_networking_config(
-                endpoints_config={
-                    network_name: self.client.create_endpoint_config(
-                        aliases=[alias],
-                    )
-                }
-            )
-
         bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
         bmo_host_config = self.client.create_host_config(
             port_bindings={80: http_port})
@@ -925,7 +916,7 @@ class Docker(object):
             web_image,
             environment={'BMO_URL': bmo_url},
             host_config=bmo_host_config,
-            networking_config=network_config('web'),
+            networking_config=self.network_config(network_name, 'web'),
             labels=['bmoweb'])['Id']
         containers.append(web_id)
         self.client.start(web_id)
@@ -1350,6 +1341,16 @@ class Docker(object):
             self.save_state()
         except KeyError:
             pass
+
+    def network_config(self, network_name, alias):
+        """Obtain a networking config object."""
+        return self.client.create_networking_config(
+            endpoints_config={
+                network_name: self.client.create_endpoint_config(
+                    aliases=[alias],
+                )
+            }
+        )
 
     def build_all_images(self, verbose=False, use_last=False, mozreview=True,
                          hgmo=True, bmo=True, max_workers=None):
