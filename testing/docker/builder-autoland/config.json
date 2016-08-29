@@ -29,7 +29,7 @@
   "auth": {
     "autoland": "autoland"
   },
-  "database": "dbname=autoland user=postgres host=db",
+  "database": "dbname=autoland user=postgres host=autolanddb",
   "repos" : {
   }
 }

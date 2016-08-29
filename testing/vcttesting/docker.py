@@ -1173,7 +1173,7 @@ class Docker(object):
                 f_start_autoland = e.submit(
                     self.client.start,
                     autoland_id,
-                    links=[(autolanddb_state['Name'], 'db'),
+                    links=[(autolanddb_state['Name'], 'autolanddb'),
                            (web_state['Name'], 'bmoweb'),
                            (hgrb_state['Name'], 'hgrb'),
                            (treestatus_state['Name'], 'treestatus')],
