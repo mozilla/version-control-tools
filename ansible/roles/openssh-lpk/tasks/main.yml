@@ -1,10 +1,4 @@
 ---
-# This is to support executing in Docker.
-- name: Find LDAP URI
-  set_fact: ldap_uri=ldap://{{ ansible_env.LDAP_PORT_389_TCP_ADDR }}:{{ ansible_env.LDAP_PORT_389_TCP_PORT }}/
-  when: ansible_env.LDAP_PORT_389_TCP_ADDR is defined
-  tags: docker-startup
-
 # We don't use the yum module here because it is too slow.
 - name: Regular OpenSSH cannot be installed
   command: /usr/bin/yum remove -y openssh openssh-clients openssh-server
@@ -44,9 +38,7 @@
 - name: Configure system authentication settings
   template: src=nslcd.conf.j2 dest=/etc/nslcd.conf
   notify: run authconfig
-  tags: docker-startup
 
 - name: Configure sshd
   template: src=sshd_config.j2 dest=/etc/ssh/sshd_config
   notify: restart sshd
-  tags: docker-startup

@@ -1016,68 +1016,103 @@ class Docker(object):
 
         containers = self.state['containers'].setdefault(cluster, [])
 
+        network_name = 'mozreview-%s' % uuid.uuid4()
+        self.client.create_network(network_name, driver='bridge')
+
         with limited_threadpoolexecutor(10, max_workers) as e:
             if start_pulse:
+                pulse_host_config = self.client.create_host_config(
+                    port_bindings={5672: pulse_port})
                 f_pulse_create = e.submit(
                     self.client.create_container,
                     pulse_image,
+                    host_config=pulse_host_config,
+                    networking_config=self.network_config(network_name, 'pulse'),
                     labels=['pulse'])
 
             bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
 
+            bmoweb_host_config = self.client.create_host_config(
+                port_bindings={80: http_port})
             f_web_create = e.submit(
                 self.client.create_container,
                 web_image,
                 environment={'BMO_URL': bmo_url},
+                host_config=bmoweb_host_config,
+                networking_config=self.network_config(network_name, 'bmoweb'),
                 labels=['bmoweb'])
 
             if start_rbweb:
+                rbweb_host_config = self.client.create_host_config(
+                    port_bindings={80: rbweb_port})
                 f_rbweb_create = e.submit(
                     self.client.create_container,
                     rbweb_image,
                     command=['/run'],
                     entrypoint=['/entrypoint.py'],
+                    host_config=rbweb_host_config,
+                    networking_config=self.network_config(network_name, 'rbweb'),
                     ports=[80],
                     labels=['rbweb'])
 
             if start_ldap:
+                ldap_host_config = self.client.create_host_config(
+                    port_bindings={389: ldap_port})
                 f_ldap_create = e.submit(
                     self.client.create_container,
                     ldap_image,
+                    host_config=ldap_host_config,
+                    networking_config=self.network_config(network_name, 'ldap'),
                     labels=['ldap'])
 
             if start_hgrb:
+                hgrb_host_config = self.client.create_host_config(
+                    port_bindings={22: ssh_port, 80: hg_port})
                 f_hgrb_create = e.submit(
                     self.client.create_container,
                     hgrb_image,
                     ports=[22, 80],
-                    entrypoint=['/entrypoint.py'],
-                    command=['/usr/bin/supervisord', '-n'])
+                    command=['/usr/bin/supervisord', '-n'],
+                    host_config=hgrb_host_config,
+                    networking_config=self.network_config(network_name, 'hgrb'))
 
             if start_hgweb:
+                hgweb_host_config = self.client.create_host_config(
+                    port_bindings={80: hgweb_port})
                 f_hgweb_create = e.submit(
                     self.client.create_container,
                     hgweb_image,
                     ports=[80],
                     entrypoint=['/entrypoint-solo'],
                     command=['/usr/bin/supervisord', '-n'],
+                    host_config=hgweb_host_config,
+                    networking_config=self.network_config(network_name, 'hgweb'),
                     labels=['hgweb'])
 
             if start_autoland:
                 f_autolanddb_create = e.submit(
                     self.client.create_container,
                     autolanddb_image,
-                    labels=['autolanddb'])
+                    labels=['autolanddb'],
+                    networking_config=self.network_config(network_name, 'autolanddb'))
 
+                autoland_host_config = self.client.create_host_config(
+                    port_bindings={80: autoland_port})
                 f_autoland_create = e.submit(
                     self.client.create_container,
                     autoland_image,
+                    host_config=autoland_host_config,
+                    networking_config=self.network_config(network_name, 'autoland'),
                     labels=['autolandweb'])
 
             if start_treestatus:
+                treestatus_host_config = self.client.create_host_config(
+                    port_bindings={80: treestatus_port})
                 f_treestatus_create = e.submit(
                     self.client.create_container,
                     treestatus_image,
+                    host_config=treestatus_host_config,
+                    networking_config=self.network_config(network_name, 'treestatus'),
                     labels=['treestatus'])
 
             if start_autoland:
@@ -1095,16 +1130,14 @@ class Docker(object):
                 containers.append(pulse_id)
                 f_start_pulse = e.submit(
                     self.client.start,
-                    pulse_id,
-                    port_bindings={5672: pulse_port})
+                    pulse_id)
 
             if start_ldap:
                 ldap_id = f_ldap_create.result()['Id']
                 containers.append(ldap_id)
                 f_start_ldap = e.submit(
                     self.client.start,
-                    ldap_id,
-                    port_bindings={389: ldap_port})
+                    ldap_id)
 
             web_id = f_web_create.result()['Id']
             containers.append(web_id)
@@ -1137,8 +1170,7 @@ class Docker(object):
 
             f_start_web = e.submit(
                 self.client.start,
-                web_id,
-                port_bindings={80: http_port})
+                web_id)
             f_start_web.result()
             web_state = self.client.inspect_container(web_id)
 
@@ -1152,19 +1184,15 @@ class Docker(object):
 
             # TODO: Use futures for hgrb, hgweb and treestatus
             if start_hgrb:
-                self.client.start(hgrb_id,
-                                  links=[(ldap_state['Name'], 'ldap')],
-                                  port_bindings={22: ssh_port, 80: hg_port})
+                self.client.start(hgrb_id)
                 hgrb_state = self.client.inspect_container(hgrb_id)
 
             if start_hgweb:
-                self.client.start(hgweb_id,
-                                  port_bindings={80: hgweb_port})
+                self.client.start(hgweb_id)
                 hgweb_state = self.client.inspect_container(hgweb_id)
 
             if start_treestatus:
-                self.client.start(treestatus_id,
-                                  port_bindings={80: treestatus_port})
+                self.client.start(treestatus_id)
                 treestatus_state = self.client.inspect_container(treestatus_id)
 
             if start_autoland:
@@ -1172,25 +1200,14 @@ class Docker(object):
                 assert start_treestatus
                 f_start_autoland = e.submit(
                     self.client.start,
-                    autoland_id,
-                    links=[(autolanddb_state['Name'], 'autolanddb'),
-                           (web_state['Name'], 'bmoweb'),
-                           (hgrb_state['Name'], 'hgrb'),
-                           (treestatus_state['Name'], 'treestatus')],
-                    port_bindings={80: autoland_port})
+                    autoland_id)
                 f_start_autoland.result()
                 autoland_state = self.client.inspect_container(autoland_id)
 
             if start_rbweb:
                 assert start_autoland
                 self.client.start(
-                    rbweb_id,
-                    links=[(web_state['Name'], 'bmoweb'),
-                           (pulse_state['Name'], 'pulse'),
-                           (hgrb_state['Name'], 'hgrb'),
-                           (autoland_state['Name'], 'autoland'),
-                           (ldap_state['Name'], 'ldap')],
-                    port_bindings={80: rbweb_port})
+                    rbweb_id)
                 rbweb_state = self.client.inspect_container(rbweb_id)
 
         bmoweb_hostname, bmoweb_hostport = \
@@ -1328,11 +1345,7 @@ class Docker(object):
 
         # There should only be 1, so don't use a ThreadPoolExecutor.
         for network in networks:
-            # TODO remove this lookup and check once using user-defined networks
-            # everywhere.
-            n = self.client.inspect_network(network)
-            if n['Name'] != 'bridge':
-                self.client.remove_network(network)
+            self.client.remove_network(network)
 
         print('stopped %d containers' % count)
 

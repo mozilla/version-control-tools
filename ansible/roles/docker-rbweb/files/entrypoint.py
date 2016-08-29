@@ -8,30 +8,13 @@ import os
 import sys
 
 
-if 'BMOWEB_PORT_80_TCP_ADDR' not in os.environ:
-    print('error: container invoked without link to a bmoweb container')
-    sys.exit(1)
-
-if 'PULSE_PORT_5672_TCP_ADDR' not in os.environ:
-    print('error: container invoked without link to a pulse container')
-    sys.exit(1)
-
-if 'AUTOLAND_PORT_80_TCP_ADDR' not in os.environ:
-    print('error: container invoked without link to an autoland container')
-    sys.exit(1)
-
 execfile('/venv/bin/activate_this.py', dict(__file__='/venv/bin/activate_this.py'))
 sys.path.insert(0, '/reviewboard/conf')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'reviewboard.settings'
 
-bugzilla_url = 'http://%s:%s' % (os.environ['BMOWEB_PORT_80_TCP_ADDR'],
-                                 os.environ['BMOWEB_PORT_80_TCP_PORT'])
-
-autoland_url = 'http://%s:%s' % (os.environ['AUTOLAND_PORT_80_TCP_ADDR'],
-                                 os.environ['AUTOLAND_PORT_80_TCP_PORT'])
-
-ldap_url = 'ldap://%s:%s' % (os.environ['LDAP_PORT_389_TCP_ADDR'],
-                             os.environ['LDAP_PORT_389_TCP_PORT'])
+bugzilla_url = 'http://bmoweb'
+autoland_url = 'http://autoland'
+ldap_url = 'ldap://ldap:389'
 
 # siteconfig takes priority over settings_local.py. Ensure siteconfig
 # is up to date.
@@ -61,8 +44,8 @@ sc.save()
 # Define MozReview settings.
 settings = {}
 settings['enabled'] = True
-settings['pulse_host'] = os.environ['PULSE_PORT_5672_TCP_ADDR']
-settings['pulse_port'] = int(os.environ['PULSE_PORT_5672_TCP_PORT'])
+settings['pulse_host'] = 'pulse'
+settings['pulse_port'] = 5672
 settings['pulse_user'] = 'guest'
 settings['pulse_password'] = 'guest'
 settings['pulse_ssl'] = False
