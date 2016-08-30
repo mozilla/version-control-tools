@@ -31,6 +31,7 @@ be ignored
   $ hg commit -m 'Bug 1 - Verify diff context'
   $ bugzilla create-bug TestProduct TestComponent bug1
   $ hg push --config reviewboard.autopublish=false > /dev/null
+  (review requests lack reviewers; visit review url to assign reviewers)
   $ rbmanage publish 1
 
   $ python -m pylintbot --config-path ../pylintbot.ini
@@ -81,7 +82,9 @@ be ignored
   reviews:
   - id: 1
     public: true
-    ship_it: true
+    ship_it: false
+    extra_data:
+      p2rb.review_flag: ' '
     body_top:
     - And now for something completely different.
     - ''

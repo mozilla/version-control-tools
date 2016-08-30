@@ -131,6 +131,8 @@ Create and publish a review for SnarkBot
   - id: 1
     public: true
     ship_it: false
+    extra_data:
+      p2rb.review_flag: ' '
     body_top: 'This is what I think of your changes:'
     body_top_text_type: plain
     diff_comments:

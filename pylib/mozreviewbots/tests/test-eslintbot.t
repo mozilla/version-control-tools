@@ -39,6 +39,7 @@ Create a review request with some busted Javascript in it
   adding mach
   adding test.js
   $ hg push --config reviewboard.autopublish=false > /dev/null
+  (review requests lack reviewers; visit review url to assign reviewers)
   $ rbmanage publish 1
 
   $ python -m eslintbot --config-path ../eslintbot.ini
@@ -101,6 +102,8 @@ Create a review request with some busted Javascript in it
   - id: 1
     public: true
     ship_it: false
+    extra_data:
+      p2rb.review_flag: ' '
     body_top:
     - I analyzed your JS changes and found 1 errors.
     - ''
@@ -116,7 +119,7 @@ Create a review request with some busted Javascript in it
       issue_status: open
       first_line: 1
       num_lines: 1
-      text: 'Error - Parsing error: Unexpected token { (column 9)'
+      text: 'Error - Parsing error: Unexpected token { (column 10)'
       text_type: plain
       diff_id: 6
       diff_dest_file: test.js

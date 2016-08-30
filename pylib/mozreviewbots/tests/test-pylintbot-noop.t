@@ -10,6 +10,7 @@ Create a review request that doesn't touch any Python files
   $ echo irrelevant > foo
   $ hg commit -m 'Bug 1 - No Python changes'
   $ hg push --config reviewboard.autopublish=false > /dev/null
+  (review requests lack reviewers; visit review url to assign reviewers)
   $ rbmanage publish 1
 
 No review should be left if no Python files were changed.
@@ -69,6 +70,7 @@ If only changes are deletions, then no review should be posted
   $ hg commit -m 'Bug 2 - Delete test.py'
 
   $ hg push --config reviewboard.autopublish=false > /dev/null
+  (review requests lack reviewers; visit review url to assign reviewers)
   $ rbmanage publish 3
 
   $ python -m pylintbot --config-path ../pylintbot.ini

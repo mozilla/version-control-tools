@@ -34,6 +34,7 @@ Create a review request that doesn't touch any Javascript files
   $ echo irrelevant > foo
   $ hg commit -m 'Bug 1 - No Javascript changes'
   $ hg push --config reviewboard.autopublish=false > /dev/null
+  (review requests lack reviewers; visit review url to assign reviewers)
   $ rbmanage publish 1
 
   $ python -m eslintbot --config-path ../eslintbot.ini
