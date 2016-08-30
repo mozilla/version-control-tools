@@ -681,11 +681,13 @@ def publishreviewrequests(ui, remote, bzauth, rrids):
     errored = False
     for item in res['results']:
         if 'success' in item:
-            ui.status(_('(published review request %s)\n') % item['rrid'])
+            ui.status(_('(published review request %s)\n') %
+                      item['rrid'].encode(encoding.encoding, 'replace'))
         elif 'error' in item:
             errored = True
             ui.warn(_('error publishing review request %s: %s\n') %
-                    (item['rrid'], item['error']))
+                    (item['rrid'].encode(encoding.encoding, 'replace'),
+                     item['error'].encode(encoding.encoding, 'replace')))
 
     if errored:
         ui.warn(_('(review requests not published; visit review url to '
