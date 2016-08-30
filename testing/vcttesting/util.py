@@ -41,8 +41,9 @@ def wait_for_http(host, port, path='', timeout=240, extra_check_fn=None):
 
     while True:
         try:
-            requests.get('http://%s:%s/%s' % (host, port, path), timeout=1)
-            return
+            res = requests.get('http://%s:%s/%s' % (host, port, path), timeout=1)
+            if res.status_code == 200:
+                return
         except requests.exceptions.RequestException:
             pass
 
