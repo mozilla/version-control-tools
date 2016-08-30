@@ -23,7 +23,7 @@ Create the base repository
   $ hg -q pull integration
 
   $ hg fxheads
-  1:994ec05999da b2ginbound central Bug 457 - second commit to m-c; r=ted
+  1:994ec05999da central Bug 457 - second commit to m-c; r=ted
   4:3057abf99ee2 fx-team Bug 460 - Create bar on fx-team
   3:1b348279b0e9 inbound Bug 459 - Second commit to inbound
 
@@ -44,7 +44,7 @@ A repository sharing the store should inherit the tree tags
   firefoxtrees
 
   $ hg fxheads
-  1:994ec05999da b2ginbound central Bug 457 - second commit to m-c; r=ted
+  1:994ec05999da central Bug 457 - second commit to m-c; r=ted
   4:3057abf99ee2 fx-team Bug 460 - Create bar on fx-team
   3:1b348279b0e9 inbound Bug 459 - Second commit to inbound
 
@@ -58,7 +58,7 @@ Now pull another repo and verify firefoxtrees on the share source is updated
   $ firefoxtreesexists
   no firefoxtrees
   $ hg fxheads
-  1:994ec05999da b2ginbound beta central Bug 457 - second commit to m-c; r=ted
+  1:994ec05999da beta central Bug 457 - second commit to m-c; r=ted
   4:3057abf99ee2 fx-team Bug 460 - Create bar on fx-team
   3:1b348279b0e9 inbound Bug 459 - Second commit to inbound
 
@@ -76,6 +76,6 @@ Now do a variation that also shared bookmarks
   firefoxtrees
 
   $ hg fxheads
-  1:994ec05999da b2ginbound beta central Bug 457 - second commit to m-c; r=ted
+  1:994ec05999da beta central Bug 457 - second commit to m-c; r=ted
   4:3057abf99ee2 fx-team Bug 460 - Create bar on fx-team
   3:1b348279b0e9 inbound Bug 459 - Second commit to inbound
