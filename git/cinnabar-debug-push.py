@@ -68,7 +68,15 @@ def main(args):
 
     heads = (hexlify(h) for h in repo.heads())
     store = PushStore()
-    pushed = push(repo, store, {commit: (None, False)}, heads, ())
+    try:
+        pushed = push(repo, store, {commit: (None, False)}, heads, ())
+    except Exception as e:
+        # This is a common error. So rather than display the entire stack to
+        # the user, exit with a well-defined exit code so the caller can
+        # display a nice error message.
+        if e.args[0].startswith('Pushing merges is not supported yet'):
+            return 127
+        raise
 
     commits = []
     if pushed:

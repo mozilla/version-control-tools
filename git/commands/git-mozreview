@@ -397,7 +397,10 @@ def push_command(args):
     finally:
         os.unlink(path)
 
-    if res:
+    if res == 127:
+        raise AbortError('error performing cinnabar push; '
+                         'Pushing merges is not supported yet')
+    elif res:
         raise AbortError('error performing cinnabar push; '
                          'please report this bug')
 
