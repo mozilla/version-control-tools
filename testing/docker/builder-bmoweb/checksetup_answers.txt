@@ -1,7 +1,7 @@
 # entrypoint.py will add some values to this file. They include database
 # and admin info.
  $answer{'db_driver'} = 'mysql';
- $answer{'db_sock'}   = '/var/run/mysqld/mysqld.sock';
+ $answer{'db_sock'}   = '/dev/shm/mysqld.sock';
  $answer{'db_check'}  = 1;
  $answer{'db_mysql_ssl_ca_file'}     = '';
  $answer{'db_mysql_ssl_ca_path'}     = '';

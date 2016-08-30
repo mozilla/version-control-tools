@@ -129,7 +129,7 @@ while True:
         # and MySQL actually responding. So we wait on a successful MySQL
         # connection before continuing.
         mysql.connector.connect(user=db_user, password=db_pass,
-                                unix_socket='/var/run/mysqld/mysqld.sock')
+                                unix_socket='/dev/shm/mysqld.sock')
         print('connected to MySQL database as %s' % db_user)
         break
     except (ConnectionError, mysql.connector.errors.Error):
@@ -145,7 +145,7 @@ mysql_args = [
     '/usr/bin/mysql',
     '-u%s' % db_user,
     '-p%s' % db_pass,
-    '-S', '/var/run/mysqld/mysqld.sock',
+    '-S', '/dev/shm/mysqld.sock',
 ]
 
 fresh_database = bool(subprocess.call(mysql_args + ['bugs'],
