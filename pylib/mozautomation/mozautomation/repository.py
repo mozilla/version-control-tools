@@ -44,13 +44,13 @@ TREE_ALIASES = {
     'c-r': ('comm-release',),
     'cr': ('comm-release',),
 
-    'releases': ('esr38', 'esr45', 'b2g34', 'b2g37', 'b2g44', 'b2g-ota',
-                 'release', 'beta', 'aurora', 'central'),
-    'integration': ('inbound', 'fx-team', 'b2ginbound', 'autoland'),
+    'releases': ('esr45', 'release', 'beta', 'aurora', 'central'),
+    'integration': ('inbound', 'fx-team', 'autoland'),
     'twigs': ('alder', 'ash', 'birch', 'cedar', 'cypress', 'date', 'elm',
               'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine'),
-    'obsolete': ('esr10', 'esr17', 'b2g18', 'esr24', 'b2g26', 'b2g28',
-                 'b2g30', 'esr31', 'b2g32'),
+    'obsolete': ('esr10', 'esr17', 'b2ginbound', 'b2g18', 'esr24', 'esr31',
+                 'esr38', 'b2g26', 'b2g28', 'b2g30', 'b2g32', 'b2g34', 'b2g37',
+                 'b2g44', 'b2g-ota'),
 }
 
 # Aliases that map to multiple repositories.
