@@ -1019,314 +1019,314 @@ class Docker(object):
         network_name = 'mozreview-%s' % uuid.uuid4()
 
         client = self.client
+        if True:
+            client.create_network(network_name, driver='bridge')
 
-        client.create_network(network_name, driver='bridge')
+            with limited_threadpoolexecutor(10, max_workers) as e:
+                if start_pulse:
+                    pulse_host_config = client.create_host_config(
+                        port_bindings={5672: pulse_port})
+                    f_pulse_create = e.submit(
+                        client.create_container,
+                        pulse_image,
+                        host_config=pulse_host_config,
+                        networking_config=self.network_config(network_name, 'pulse'),
+                        labels=['pulse'])
 
-        with limited_threadpoolexecutor(10, max_workers) as e:
-            if start_pulse:
-                pulse_host_config = client.create_host_config(
-                    port_bindings={5672: pulse_port})
-                f_pulse_create = e.submit(
+                bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
+
+                bmoweb_host_config = client.create_host_config(
+                    port_bindings={80: http_port})
+                f_web_create = e.submit(
                     client.create_container,
-                    pulse_image,
-                    host_config=pulse_host_config,
-                    networking_config=self.network_config(network_name, 'pulse'),
-                    labels=['pulse'])
+                    web_image,
+                    environment={'BMO_URL': bmo_url},
+                    host_config=bmoweb_host_config,
+                    networking_config=self.network_config(network_name, 'bmoweb'),
+                    labels=['bmoweb'])
 
-            bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
+                if start_rbweb:
+                    rbweb_host_config = client.create_host_config(
+                        port_bindings={80: rbweb_port})
+                    f_rbweb_create = e.submit(
+                        client.create_container,
+                        rbweb_image,
+                        command=['/run'],
+                        entrypoint=['/entrypoint.py'],
+                        host_config=rbweb_host_config,
+                        networking_config=self.network_config(network_name, 'rbweb'),
+                        ports=[80],
+                        labels=['rbweb'])
 
-            bmoweb_host_config = client.create_host_config(
-                port_bindings={80: http_port})
-            f_web_create = e.submit(
-                client.create_container,
-                web_image,
-                environment={'BMO_URL': bmo_url},
-                host_config=bmoweb_host_config,
-                networking_config=self.network_config(network_name, 'bmoweb'),
-                labels=['bmoweb'])
+                if start_ldap:
+                    ldap_host_config = client.create_host_config(
+                        port_bindings={389: ldap_port})
+                    f_ldap_create = e.submit(
+                        client.create_container,
+                        ldap_image,
+                        host_config=ldap_host_config,
+                        networking_config=self.network_config(network_name, 'ldap'),
+                        labels=['ldap'])
+
+                if start_hgrb:
+                    hgrb_host_config = client.create_host_config(
+                        port_bindings={22: ssh_port, 80: hg_port})
+                    f_hgrb_create = e.submit(
+                        client.create_container,
+                        hgrb_image,
+                        ports=[22, 80],
+                        command=['/usr/bin/supervisord', '-n'],
+                        host_config=hgrb_host_config,
+                        networking_config=self.network_config(network_name, 'hgrb'))
+
+                if start_hgweb:
+                    hgweb_host_config = client.create_host_config(
+                        port_bindings={80: hgweb_port})
+                    f_hgweb_create = e.submit(
+                        client.create_container,
+                        hgweb_image,
+                        ports=[80],
+                        entrypoint=['/entrypoint-solo'],
+                        command=['/usr/bin/supervisord', '-n'],
+                        host_config=hgweb_host_config,
+                        networking_config=self.network_config(network_name, 'hgweb'),
+                        labels=['hgweb'])
+
+                if start_autoland:
+                    f_autolanddb_create = e.submit(
+                        client.create_container,
+                        autolanddb_image,
+                        labels=['autolanddb'],
+                        networking_config=self.network_config(network_name, 'autolanddb'))
+
+                    autoland_host_config = client.create_host_config(
+                        port_bindings={80: autoland_port})
+                    f_autoland_create = e.submit(
+                        client.create_container,
+                        autoland_image,
+                        host_config=autoland_host_config,
+                        networking_config=self.network_config(network_name, 'autoland'),
+                        labels=['autolandweb'])
+
+                if start_treestatus:
+                    treestatus_host_config = client.create_host_config(
+                        port_bindings={80: treestatus_port})
+                    f_treestatus_create = e.submit(
+                        client.create_container,
+                        treestatus_image,
+                        host_config=treestatus_host_config,
+                        networking_config=self.network_config(network_name, 'treestatus'),
+                        labels=['treestatus'])
+
+                if start_autoland:
+                    autolanddb_id = f_autolanddb_create.result()['Id']
+                    containers.append(autolanddb_id)
+                    f_start_autolanddb = e.submit(
+                        client.start,
+                        autolanddb_id)
+
+                # RabbitMQ takes a while to start up. Start it before other
+                # containers. (We probably could have a callback-driven mechanism
+                # here to ensure no time is lost. But that is more complex.)
+                if start_pulse:
+                    pulse_id = f_pulse_create.result()['Id']
+                    containers.append(pulse_id)
+                    f_start_pulse = e.submit(
+                        client.start,
+                        pulse_id)
+
+                if start_ldap:
+                    ldap_id = f_ldap_create.result()['Id']
+                    containers.append(ldap_id)
+                    f_start_ldap = e.submit(
+                        client.start,
+                        ldap_id)
+
+                web_id = f_web_create.result()['Id']
+                containers.append(web_id)
+
+                if start_autoland:
+                    f_start_autolanddb.result()
+                    autolanddb_state = client.inspect_container(autolanddb_id)
+                    autoland_id = f_autoland_create.result()['Id']
+                    containers.append(autoland_id)
+                    autoland_state = client.inspect_container(autoland_id)
+
+                if start_hgrb:
+                    hgrb_id = f_hgrb_create.result()['Id']
+                    containers.append(hgrb_id)
+
+                if start_rbweb:
+                    rbweb_id = f_rbweb_create.result()['Id']
+                    containers.append(rbweb_id)
+
+                if start_hgweb:
+                    hgweb_id = f_hgweb_create.result()['Id']
+                    containers.append(hgweb_id)
+
+                if start_treestatus:
+                    treestatus_id = f_treestatus_create.result()['Id']
+                    containers.append(treestatus_id)
+
+                # At this point, all containers have been created.
+                self.save_state()
+
+                f_start_web = e.submit(
+                    client.start,
+                    web_id)
+                f_start_web.result()
+                web_state = client.inspect_container(web_id)
+
+                if start_pulse:
+                    f_start_pulse.result()
+                    pulse_state = client.inspect_container(pulse_id)
+
+                if start_ldap:
+                    f_start_ldap.result()
+                    ldap_state = client.inspect_container(ldap_id)
+
+                # TODO: Use futures for hgrb, hgweb and treestatus
+                if start_hgrb:
+                    client.start(hgrb_id)
+                    hgrb_state = client.inspect_container(hgrb_id)
+
+                if start_hgweb:
+                    client.start(hgweb_id)
+                    hgweb_state = client.inspect_container(hgweb_id)
+
+                if start_treestatus:
+                    client.start(treestatus_id)
+                    treestatus_state = client.inspect_container(treestatus_id)
+
+                if start_autoland:
+                    assert start_hgrb
+                    assert start_treestatus
+                    f_start_autoland = e.submit(
+                        client.start,
+                        autoland_id)
+                    f_start_autoland.result()
+                    autoland_state = client.inspect_container(autoland_id)
+
+                if start_rbweb:
+                    assert start_autoland
+                    client.start(rbweb_id)
+                    rbweb_state = client.inspect_container(rbweb_id)
+
+            bmoweb_hostname, bmoweb_hostport = \
+                self._get_host_hostname_port(web_state, '80/tcp')
+            bmo_url = 'http://%s:%d/' % (bmoweb_hostname, bmoweb_hostport)
+
+            if start_pulse:
+                rabbit_hostname, rabbit_hostport = \
+                    self._get_host_hostname_port(pulse_state, '5672/tcp')
+
+            if start_hgrb:
+                hgssh_hostname, hgssh_hostport = \
+                    self._get_host_hostname_port(hgrb_state, '22/tcp')
+                hgrbweb_hostname, hgrbweb_hostport = \
+                    self._get_host_hostname_port(hgrb_state, '80/tcp')
 
             if start_rbweb:
-                rbweb_host_config = client.create_host_config(
-                    port_bindings={80: rbweb_port})
-                f_rbweb_create = e.submit(
-                    client.create_container,
-                    rbweb_image,
-                    command=['/run'],
-                    entrypoint=['/entrypoint.py'],
-                    host_config=rbweb_host_config,
-                    networking_config=self.network_config(network_name, 'rbweb'),
-                    ports=[80],
-                    labels=['rbweb'])
+                rbweb_hostname, rbweb_hostport = \
+                    self._get_host_hostname_port(rbweb_state, '80/tcp')
+                rbweb_url = 'http://%s:%s/' % (rbweb_hostname, rbweb_hostport)
+
+            if start_hgweb:
+                hgweb_hostname, hgweb_hostport = \
+                    self._get_host_hostname_port(hgweb_state, '80/tcp')
+
+            if start_treestatus:
+                treestatus_hostname, treestatus_hostport = \
+                    self._get_host_hostname_port(treestatus_state, '80/tcp')
+
+            fs = []
+            with limited_threadpoolexecutor(7, max_workers) as e:
+                fs.append(e.submit(
+                    wait_for_http, bmoweb_hostname, bmoweb_hostport,
+                    extra_check_fn=self._get_assert_container_running_fn(web_id)))
+                if start_pulse:
+                    fs.append(e.submit(
+                        wait_for_amqp, rabbit_hostname, rabbit_hostport,
+                        'guest', 'guest',
+                        extra_check_fn=self._get_assert_container_running_fn(
+                            pulse_id)))
+                if start_hgrb:
+                    fs.append(e.submit(
+                        wait_for_ssh, hgssh_hostname, hgssh_hostport,
+                        extra_check_fn=self._get_assert_container_running_fn(
+                            hgrb_id)))
+                    fs.append(e.submit(
+                        wait_for_http, hgrbweb_hostname, hgrbweb_hostport,
+                        extra_check_fn=self._get_assert_container_running_fn(
+                            hgrb_id)))
+
+                if start_rbweb:
+                    e.submit(
+                        wait_for_http, rbweb_hostname, rbweb_hostport,
+                        extra_check_fn=self._get_assert_container_running_fn(
+                            rbweb_id))
+
+                if start_hgweb:
+                    fs.append(e.submit(
+                        wait_for_http, hgweb_hostname, hgweb_hostport,
+                        extra_check_fn=self._get_assert_container_running_fn(
+                            hgweb_id)))
+
+                if start_treestatus:
+                    fs.append(e.submit(
+                        wait_for_http, treestatus_hostname, treestatus_hostport,
+                        extra_check_fn=self._get_assert_container_running_fn(
+                            treestatus_id)))
+
+            [f.result() for f in fs]
+
+            result = {
+                'bugzilla_url': bmo_url,
+                'web_id': web_id,
+            }
+
+            if start_autoland:
+                result['autolanddb_id'] = autolanddb_id
+                result['autoland_id'] = autoland_id
+                autoland_hostname, autoland_hostport = \
+                    self._get_host_hostname_port(autoland_state, '80/tcp')
+                result['autoland_url'] = 'http://%s:%d/' % (autoland_hostname,
+                                                            autoland_hostport)
+
+            if start_pulse:
+                result['pulse_id'] = pulse_id
+                result['pulse_host'] = rabbit_hostname
+                result['pulse_port'] = rabbit_hostport
 
             if start_ldap:
-                ldap_host_config = client.create_host_config(
-                    port_bindings={389: ldap_port})
-                f_ldap_create = e.submit(
-                    client.create_container,
-                    ldap_image,
-                    host_config=ldap_host_config,
-                    networking_config=self.network_config(network_name, 'ldap'),
-                    labels=['ldap'])
+                ldap_hostname, ldap_hostport = \
+                    self._get_host_hostname_port(ldap_state, '389/tcp')
+                result['ldap_id'] = ldap_id
+                result['ldap_uri'] = 'ldap://%s:%d/' % (ldap_hostname,
+                                                        ldap_hostport)
 
             if start_hgrb:
-                hgrb_host_config = client.create_host_config(
-                    port_bindings={22: ssh_port, 80: hg_port})
-                f_hgrb_create = e.submit(
-                    client.create_container,
-                    hgrb_image,
-                    ports=[22, 80],
-                    command=['/usr/bin/supervisord', '-n'],
-                    host_config=hgrb_host_config,
-                    networking_config=self.network_config(network_name, 'hgrb'))
-
-            if start_hgweb:
-                hgweb_host_config = client.create_host_config(
-                    port_bindings={80: hgweb_port})
-                f_hgweb_create = e.submit(
-                    client.create_container,
-                    hgweb_image,
-                    ports=[80],
-                    entrypoint=['/entrypoint-solo'],
-                    command=['/usr/bin/supervisord', '-n'],
-                    host_config=hgweb_host_config,
-                    networking_config=self.network_config(network_name, 'hgweb'),
-                    labels=['hgweb'])
-
-            if start_autoland:
-                f_autolanddb_create = e.submit(
-                    client.create_container,
-                    autolanddb_image,
-                    labels=['autolanddb'],
-                    networking_config=self.network_config(network_name, 'autolanddb'))
-
-                autoland_host_config = client.create_host_config(
-                    port_bindings={80: autoland_port})
-                f_autoland_create = e.submit(
-                    client.create_container,
-                    autoland_image,
-                    host_config=autoland_host_config,
-                    networking_config=self.network_config(network_name, 'autoland'),
-                    labels=['autolandweb'])
-
-            if start_treestatus:
-                treestatus_host_config = client.create_host_config(
-                    port_bindings={80: treestatus_port})
-                f_treestatus_create = e.submit(
-                    client.create_container,
-                    treestatus_image,
-                    host_config=treestatus_host_config,
-                    networking_config=self.network_config(network_name, 'treestatus'),
-                    labels=['treestatus'])
-
-            if start_autoland:
-                autolanddb_id = f_autolanddb_create.result()['Id']
-                containers.append(autolanddb_id)
-                f_start_autolanddb = e.submit(
-                    client.start,
-                    autolanddb_id)
-
-            # RabbitMQ takes a while to start up. Start it before other
-            # containers. (We probably could have a callback-driven mechanism
-            # here to ensure no time is lost. But that is more complex.)
-            if start_pulse:
-                pulse_id = f_pulse_create.result()['Id']
-                containers.append(pulse_id)
-                f_start_pulse = e.submit(
-                    client.start,
-                    pulse_id)
-
-            if start_ldap:
-                ldap_id = f_ldap_create.result()['Id']
-                containers.append(ldap_id)
-                f_start_ldap = e.submit(
-                    client.start,
-                    ldap_id)
-
-            web_id = f_web_create.result()['Id']
-            containers.append(web_id)
-
-            if start_autoland:
-                f_start_autolanddb.result()
-                autolanddb_state = client.inspect_container(autolanddb_id)
-                autoland_id = f_autoland_create.result()['Id']
-                containers.append(autoland_id)
-                autoland_state = client.inspect_container(autoland_id)
-
-            if start_hgrb:
-                hgrb_id = f_hgrb_create.result()['Id']
-                containers.append(hgrb_id)
+                result['hgrb_id'] = hgrb_id
+                result['ssh_hostname'] = hgssh_hostname
+                result['ssh_port'] = hgssh_hostport
+                result['mercurial_url'] = 'http://%s:%d/' % (hgrbweb_hostname,
+                                                             hgrbweb_hostport)
 
             if start_rbweb:
-                rbweb_id = f_rbweb_create.result()['Id']
-                containers.append(rbweb_id)
+                result['rbweb_id'] = rbweb_id
+                result['reviewboard_url'] = rbweb_url
 
             if start_hgweb:
-                hgweb_id = f_hgweb_create.result()['Id']
-                containers.append(hgweb_id)
+                result['hgweb_id'] = hgweb_id
+                result['hgweb_url'] = 'http://%s:%d/' % (hgweb_hostname,
+                                                         hgweb_hostport)
 
             if start_treestatus:
-                treestatus_id = f_treestatus_create.result()['Id']
-                containers.append(treestatus_id)
+                result['treestatus_id'] = treestatus_id
+                result['treestatus_url'] = 'http://%s:%d/' % (treestatus_hostname,
+                                                              treestatus_hostport)
 
-            # At this point, all containers have been created.
-            self.save_state()
-
-            f_start_web = e.submit(
-                client.start,
-                web_id)
-            f_start_web.result()
-            web_state = client.inspect_container(web_id)
-
-            if start_pulse:
-                f_start_pulse.result()
-                pulse_state = client.inspect_container(pulse_id)
-
-            if start_ldap:
-                f_start_ldap.result()
-                ldap_state = client.inspect_container(ldap_id)
-
-            # TODO: Use futures for hgrb, hgweb and treestatus
-            if start_hgrb:
-                client.start(hgrb_id)
-                hgrb_state = client.inspect_container(hgrb_id)
-
-            if start_hgweb:
-                client.start(hgweb_id)
-                hgweb_state = client.inspect_container(hgweb_id)
-
-            if start_treestatus:
-                client.start(treestatus_id)
-                treestatus_state = client.inspect_container(treestatus_id)
-
-            if start_autoland:
-                assert start_hgrb
-                assert start_treestatus
-                f_start_autoland = e.submit(
-                    client.start,
-                    autoland_id)
-                f_start_autoland.result()
-                autoland_state = client.inspect_container(autoland_id)
-
-            if start_rbweb:
-                assert start_autoland
-                client.start(rbweb_id)
-                rbweb_state = client.inspect_container(rbweb_id)
-
-        bmoweb_hostname, bmoweb_hostport = \
-            self._get_host_hostname_port(web_state, '80/tcp')
-        bmo_url = 'http://%s:%d/' % (bmoweb_hostname, bmoweb_hostport)
-
-        if start_pulse:
-            rabbit_hostname, rabbit_hostport = \
-                self._get_host_hostname_port(pulse_state, '5672/tcp')
-
-        if start_hgrb:
-            hgssh_hostname, hgssh_hostport = \
-                self._get_host_hostname_port(hgrb_state, '22/tcp')
-            hgrbweb_hostname, hgrbweb_hostport = \
-                self._get_host_hostname_port(hgrb_state, '80/tcp')
-
-        if start_rbweb:
-            rbweb_hostname, rbweb_hostport = \
-                self._get_host_hostname_port(rbweb_state, '80/tcp')
-            rbweb_url = 'http://%s:%s/' % (rbweb_hostname, rbweb_hostport)
-
-        if start_hgweb:
-            hgweb_hostname, hgweb_hostport = \
-                self._get_host_hostname_port(hgweb_state, '80/tcp')
-
-        if start_treestatus:
-            treestatus_hostname, treestatus_hostport = \
-                self._get_host_hostname_port(treestatus_state, '80/tcp')
-
-        fs = []
-        with limited_threadpoolexecutor(7, max_workers) as e:
-            fs.append(e.submit(
-                wait_for_http, bmoweb_hostname, bmoweb_hostport,
-                extra_check_fn=self._get_assert_container_running_fn(web_id)))
-            if start_pulse:
-                fs.append(e.submit(
-                    wait_for_amqp, rabbit_hostname, rabbit_hostport,
-                    'guest', 'guest',
-                    extra_check_fn=self._get_assert_container_running_fn(
-                        pulse_id)))
-            if start_hgrb:
-                fs.append(e.submit(
-                    wait_for_ssh, hgssh_hostname, hgssh_hostport,
-                    extra_check_fn=self._get_assert_container_running_fn(
-                        hgrb_id)))
-                fs.append(e.submit(
-                    wait_for_http, hgrbweb_hostname, hgrbweb_hostport,
-                    extra_check_fn=self._get_assert_container_running_fn(
-                        hgrb_id)))
-
-            if start_rbweb:
-                e.submit(
-                    wait_for_http, rbweb_hostname, rbweb_hostport,
-                    extra_check_fn=self._get_assert_container_running_fn(
-                        rbweb_id))
-
-            if start_hgweb:
-                fs.append(e.submit(
-                    wait_for_http, hgweb_hostname, hgweb_hostport,
-                    extra_check_fn=self._get_assert_container_running_fn(
-                        hgweb_id)))
-
-            if start_treestatus:
-                fs.append(e.submit(
-                    wait_for_http, treestatus_hostname, treestatus_hostport,
-                    extra_check_fn=self._get_assert_container_running_fn(
-                        treestatus_id)))
-
-        [f.result() for f in fs]
-
-        result = {
-            'bugzilla_url': bmo_url,
-            'web_id': web_id,
-        }
-
-        if start_autoland:
-            result['autolanddb_id'] = autolanddb_id
-            result['autoland_id'] = autoland_id
-            autoland_hostname, autoland_hostport = \
-                self._get_host_hostname_port(autoland_state, '80/tcp')
-            result['autoland_url'] = 'http://%s:%d/' % (autoland_hostname,
-                                                        autoland_hostport)
-
-        if start_pulse:
-            result['pulse_id'] = pulse_id
-            result['pulse_host'] = rabbit_hostname
-            result['pulse_port'] = rabbit_hostport
-
-        if start_ldap:
-            ldap_hostname, ldap_hostport = \
-                self._get_host_hostname_port(ldap_state, '389/tcp')
-            result['ldap_id'] = ldap_id
-            result['ldap_uri'] = 'ldap://%s:%d/' % (ldap_hostname,
-                                                    ldap_hostport)
-
-        if start_hgrb:
-            result['hgrb_id'] = hgrb_id
-            result['ssh_hostname'] = hgssh_hostname
-            result['ssh_port'] = hgssh_hostport
-            result['mercurial_url'] = 'http://%s:%d/' % (hgrbweb_hostname,
-                                                         hgrbweb_hostport)
-
-        if start_rbweb:
-            result['rbweb_id'] = rbweb_id
-            result['reviewboard_url'] = rbweb_url
-
-        if start_hgweb:
-            result['hgweb_id'] = hgweb_id
-            result['hgweb_url'] = 'http://%s:%d/' % (hgweb_hostname,
-                                                     hgweb_hostport)
-
-        if start_treestatus:
-            result['treestatus_id'] = treestatus_id
-            result['treestatus_url'] = 'http://%s:%d/' % (treestatus_hostname,
-                                                          treestatus_hostport)
-
-        return result
+            return result
 
     def stop_bmo(self, cluster):
         count = 0
