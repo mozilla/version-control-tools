@@ -108,6 +108,44 @@ def params_from_env(env):
     return host, tls
 
 
+@contextmanager
+def docker_rollback_on_error(client):
+    """Perform Docker operations as a transaction of sorts.
+
+    Returns a modified Docker client instance. Creation events performed
+    on the client while the context manager is active will be undone if
+    an exception occurs. This allows complex operations such as the creation
+    of multiple containers to be rolled back automatically if an error
+    occurs.
+    """
+    created_containers = set()
+    created_networks = set()
+
+    class ProxiedDockerClient(client.__class__):
+        def create_container(self, *args, **kwargs):
+            res = super(ProxiedDockerClient, self).create_container(*args, **kwargs)
+            created_containers.add(res['Id'])
+            return res
+
+        def create_network(self, *args, **kwargs):
+            res = super(ProxiedDockerClient, self).create_network(*args, **kwargs)
+            created_networks.add(res['Id'])
+            return res
+
+    old_class = client.__class__
+    try:
+        client.__class__ = ProxiedDockerClient
+        yield client
+    except Exception:
+        for cid in created_containers:
+            client.remove_container(cid, v=True, force=True)
+        for nid in created_networks:
+            client.remove_network(nid)
+        raise
+    finally:
+        client.__class__ = old_class
+
+
 class Docker(object):
     def __init__(self, state_path, url, tls=False):
         self._ddir = DOCKER_DIR
@@ -1018,8 +1056,7 @@ class Docker(object):
 
         network_name = 'mozreview-%s' % uuid.uuid4()
 
-        client = self.client
-        if True:
+        with docker_rollback_on_error(self.client) as client:
             client.create_network(network_name, driver='bridge')
 
             with limited_threadpoolexecutor(10, max_workers) as e:
