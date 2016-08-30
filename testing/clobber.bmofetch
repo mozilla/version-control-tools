@@ -19,3 +19,5 @@ patching since it accepts argument for admin email address.
 2015-05-24 - BMO modified the Docker data generation script in a way
 that caused one of our patches to fail to apply. We refreshed our
 patch, but it only applies against tip.
+
+2016-08-30 - generate_bmo_data.pl path changed.

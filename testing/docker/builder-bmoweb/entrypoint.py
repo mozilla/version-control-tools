@@ -168,7 +168,7 @@ if not os.path.exists(j(h, 'checksetup.done')):
     args = [
         'perl',
         '-I', j(b, 'lib'),
-        j(b, 'docker', 'generate_bmo_data.pl'),
+        j(b, 'scripts', 'generate_bmo_data.pl'),
         'admin@example.com',
     ]
 
