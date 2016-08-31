@@ -14,7 +14,7 @@ from mozhg.rewrite import preservefilectx
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
-testedwith = '3.3 3.4 3.5 3.6'
+testedwith = '3.6 3.7 3.8 3.9'
 
 @command('push-to-try', [
     ('m', 'message', '', 'commit message to use', 'MESSAGE'),

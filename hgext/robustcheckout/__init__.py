@@ -30,7 +30,7 @@ from mercurial import (
     util,
 )
 
-testedwith = '3.5 3.6 3.7 3.8'
+testedwith = '3.6 3.7 3.8 3.9'
 minimumhgversion = '3.7'
 
 cmdtable = {}

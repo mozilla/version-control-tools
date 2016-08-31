@@ -105,8 +105,8 @@ import mozautomation.commitparser as commitparser
 import mozhg.mozbuildinfo as mozbuildinfo
 
 
-minimumhgversion = '3.8'
-testedwith = '3.8'
+minimumhgversion = '3.9'
+testedwith = '3.9'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)

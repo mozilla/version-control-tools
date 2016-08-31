@@ -75,7 +75,7 @@ the -Q option to all relevant commands in your ~/.hgrc::
   qimport = -Q
 '''
 
-testedwith = '3.4 3.5 3.6 3.7'
+testedwith = '3.6 3.7 3.8 3.9'
 
 import os
 import re

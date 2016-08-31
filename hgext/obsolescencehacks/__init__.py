@@ -11,8 +11,8 @@ from mercurial import (
     obsolete,
 )
 
-testedwith = '3.7'
-minimumhgversion = '3.7'
+testedwith = '3.9'
+minimumhgversion = '3.9'
 
 
 def enableevolutionexchange(repo):

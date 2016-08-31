@@ -10,7 +10,8 @@ from mercurial import demandimport
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
-testedwith = '3.5 3.6'
+testedwith = '3.6 3.7 3.8 3.9'
+minimumhgversion = '3.6'
 
 def critique(ui, repo, entire=False, node=None, **kwargs):
     """Perform a critique of a changeset."""
