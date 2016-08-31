@@ -80,12 +80,12 @@ Bookmarks get replicated to mirrors
   {
   "node": "e7d8e0aefcf6bcc137a21978e9a431c5b0dafd86",
   "bookmarks": [{
-  "bookmark": "bm1",
-  "node": "04da6c25817b564b37238ee5144e5adf2af0cb5b",
-  "date": [0.0, 0]
-  }, {
   "bookmark": "bm2",
   "node": "e7d8e0aefcf6bcc137a21978e9a431c5b0dafd86",
+  "date": [0.0, 0]
+  }, {
+  "bookmark": "bm1",
+  "node": "04da6c25817b564b37238ee5144e5adf2af0cb5b",
   "date": [0.0, 0]
   }]
   }
@@ -125,12 +125,12 @@ Push a bookmark update
   {
   "node": "b222465a31a101470b94a950392809801a91d3da",
   "bookmarks": [{
-  "bookmark": "bm1",
-  "node": "04da6c25817b564b37238ee5144e5adf2af0cb5b",
-  "date": [0.0, 0]
-  }, {
   "bookmark": "bm2",
   "node": "b222465a31a101470b94a950392809801a91d3da",
+  "date": [0.0, 0]
+  }, {
+  "bookmark": "bm1",
+  "node": "04da6c25817b564b37238ee5144e5adf2af0cb5b",
   "date": [0.0, 0]
   }]
   }
@@ -157,11 +157,11 @@ Push a non-forward bookmark update
   {
   "node": "b222465a31a101470b94a950392809801a91d3da",
   "bookmarks": [{
-  "bookmark": "bm1",
+  "bookmark": "bm2",
   "node": "04da6c25817b564b37238ee5144e5adf2af0cb5b",
   "date": [0.0, 0]
   }, {
-  "bookmark": "bm2",
+  "bookmark": "bm1",
   "node": "04da6c25817b564b37238ee5144e5adf2af0cb5b",
   "date": [0.0, 0]
   }]
