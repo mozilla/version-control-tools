@@ -36,30 +36,31 @@ shortlog = changelist.tmpl
 changelistentry = '\{
   "node": {node|json},
   "date": {date|json},
-  "desc": {desc|json},
+  "desc": {desc|utf8|json},
   "bookmarks": [{join(bookmarks%changelistentryname, ", ")}],
   "tags": [{join(tags%changelistentryname, ", ")}],
-  "user": {author|json}
+  "user": {author|utf8|json},
+  "parents": [{join(allparents%changesetparent, ", ")}]
   }'
-changelistentryname = '{name|json}'
+changelistentryname = '{name|utf8|json}'
 changeset = '\{
   "node": {node|json},
   "date": {date|json},
-  "desc": {desc|json},
+  "desc": {desc|utf8|json},
   "backedoutby": {if(backedoutbynode, backedoutbynode|json, ""|json)},
   "branch": {if(branch, branch%changesetbranch, "default"|json)},
   "bookmarks": [{join(changesetbookmark, ", ")}],
   "tags": [{join(changesettag, ", ")}],
-  "user": {author|json},
+  "user": {author|utf8|json},
   "parents": [{join(parent%changesetparent, ", ")}],
   "phase": {phase|json},
   "pushid": {pushid|json},
   "pushdate": {pushdate|json},
   "pushuser": {pushuser|json}
   }'
-changesetbranch = '{name|json}'
-changesetbookmark = '{bookmark|json}'
-changesettag = '{tag|json}'
+changesetbranch = '{name|utf8|json}'
+changesetbookmark = '{bookmark|utf8|json}'
+changesettag = '{tag|utf8|json}'
 changesetparent = '{node|json}'
 manifest = '\{
   "node": {node|json},
@@ -69,7 +70,7 @@ manifest = '\{
   "bookmarks": [{join(bookmarks%name, ", ")}],
   "tags": [{join(tags%name, ", ")}]
   }'
-name = '{name|json}'
+name = '{name|utf8|json}'
 direntry = '\{
   "abspath": {path|json},
   "basename": {basename|json},
@@ -87,7 +88,7 @@ tags = '\{
   "tags": [{join(entriesnotip%tagentry, ", ")}]
   }'
 tagentry = '\{
-  "tag": {tag|json},
+  "tag": {tag|utf8|json},
   "node": {node|json},
   "date": {date|json}
   }'
@@ -96,7 +97,7 @@ bookmarks = '\{
   "bookmarks": [{join(entries%bookmarkentry, ", ")}]
   }'
 bookmarkentry = '\{
-  "bookmark": {bookmark|json},
+  "bookmark": {bookmark|utf8|json},
   "node": {node|json},
   "date": {date|json}
   }'
@@ -104,7 +105,7 @@ branches = '\{
   "branches": [{join(entries%branchentry, ", ")}]
   }'
 branchentry = '\{
-  "branch": {branch|json},
+  "branch": {branch|utf8|json},
   "node": {node|json},
   "date": {date|json},
   "status": {status|json}
@@ -114,8 +115,8 @@ filediff = '\{
   "path": {file|json},
   "node": {node|json},
   "date": {date|json},
-  "desc": {desc|json},
-  "author": {author|json},
+  "desc": {desc|utf8|json},
+  "author": {author|utf8|json},
   "parents": [{join(parent%changesetparent, ", ")}],
   "children": [{join(child%changesetparent, ", ")}],
   "diff": [{join(diff%diffblock, ", ")}]
@@ -148,8 +149,8 @@ filecomparison = '\{
   "path": {file|json},
   "node": {node|json},
   "date": {date|json},
-  "desc": {desc|json},
-  "author": {author|json},
+  "desc": {desc|utf8|json},
+  "author": {author|utf8|json},
   "parents": [{join(parent%changesetparent, ", ")}],
   "children": [{join(child%changesetparent, ", ")}],
   "leftnode": {leftnode|json},
@@ -169,9 +170,9 @@ comparisonline = '\{
 fileannotate = '\{
   "abspath": {file|json},
   "node": {node|json},
-  "author": {author|json},
+  "author": {author|utf8|json},
   "date": {date|json},
-  "desc": {desc|json},
+  "desc": {desc|utf8|json},
   "parents": [{join(parent%changesetparent, ", ")}],
   "children": [{join(child%changesetparent, ", ")}],
   "permissions": {permissions|json},
@@ -179,8 +180,8 @@ fileannotate = '\{
   }'
 fileannotation = '\{
   "node": {node|json},
-  "author": {author|json},
-  "desc": {desc|json},
+  "author": {author|utf8|json},
+  "desc": {desc|utf8|json},
   "abspath": {file|json},
   "targetline": {targetline|json},
   "line": {line|json},
@@ -206,12 +207,21 @@ helptopics = '\{
   "othercommands": [{join(othercommands%helptopicentry, ", ")}]
   }'
 helptopicentry = '\{
-  "topic": {topic|json},
-  "summary": {summary|json}
+  "topic": {topic|utf8|json},
+  "summary": {summary|utf8|json}
   }'
 help = '\{
-  "topic": {topic|json},
-  "rawdoc": {doc|json}
+  "topic": {topic|utf8|json},
+  "rawdoc": {doc|utf8|json}
   }'
 filenodelink = ''
 filenolink = ''
+index = '\{
+  "entries": [{join(entries%indexentry, ", ")}]
+  }'
+indexentry = '\{
+  "name": {name|utf8|json},
+  "description": {description|utf8|json},
+  "contact": {contact|utf8|json},
+  "lastchange": {lastchange|json}
+  }'
