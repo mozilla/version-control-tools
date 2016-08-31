@@ -29,10 +29,14 @@ from reviewboard.accounts.errors import (
 )
 from reviewboard.diffviewer.models import (
     DiffSet,
+    FileDiff,
 )
 from reviewboard.reviews.models import (
     ReviewRequest,
     ReviewRequestDraft,
+)
+from reviewboard.scmtools.core import (
+    PRE_CREATION,
 )
 from reviewboard.scmtools.models import (
     Repository,
@@ -55,12 +59,16 @@ from mozreview.extra_data import (
     BASE_COMMIT_KEY,
     COMMITS_KEY,
     COMMIT_ID_KEY,
+    COMMIT_MSG_FILEDIFF_IDS_KEY,
+    COMMIT_MSG_FILENAME_KEY,
     DISCARD_ON_PUBLISH_KEY,
     fetch_commit_data,
     FIRST_PUBLIC_ANCESTOR_KEY,
+    HAS_COMMIT_MSG_FILEDIFF_KEY,
     IDENTIFIER_KEY,
     MOZREVIEW_KEY,
     SQUASHED_KEY,
+    TEMP_DIFFSET_ID_KEY,
     UNPUBLISHED_KEY,
 )
 from mozreview.models import (
@@ -72,6 +80,14 @@ from mozreview.resources.bugzilla_login import (
 from mozreview.review_helpers import (
     gen_latest_reviews,
 )
+
+COMMIT_MSG_DIFF_FORMAT = """
+diff --git a/%(source_filename)s b/%(target_filename)s
+new file mode 100644
+--- /dev/null
++++ b/%(target_filename)s
+@@ -0,0 +1,%(num_lines)s @@
+%(diff)s""".lstrip()
 
 logger = logging.getLogger(__name__)
 
@@ -392,6 +408,7 @@ class BatchReviewRequestResource(WebAPIResource):
                 IDENTIFIER_KEY: identifier,
                 FIRST_PUBLIC_ANCESTOR_KEY: (
                     commits['squashed']['first_public_ancestor']),
+                HAS_COMMIT_MSG_FILEDIFF_KEY: True,
                 SQUASHED_KEY: True,
                 DISCARD_ON_PUBLISH_KEY: '[]',
                 UNPUBLISHED_KEY: '[]',
@@ -518,6 +535,12 @@ class BatchReviewRequestResource(WebAPIResource):
                     identifier, len(processed_nodes),
                     len(commits['individual'])))
 
+        # Commit msg FileDiff should be created only if this is a completely
+        # new ReviewRequest, or if the ReviewRequest we're updating
+        # already had commit message FileDiff.
+        create_comm_msg_filediff = squashed_commit_data.extra_data.get(
+            HAS_COMMIT_MSG_FILEDIFF_KEY, False)
+
         # Find commits that map to a previous version.
         for commit in commits['individual']:
             node = commit['id']
@@ -543,7 +566,8 @@ class BatchReviewRequestResource(WebAPIResource):
                 draft, warns = update_review_request(local_site, request,
                                                      privileged_user,
                                                      reviewer_cache, rr,
-                                                     commit)
+                                                     commit,
+                                                     create_comm_msg_filediff)
                 squashed_reviewers.update(u for u in draft.target_people.all())
                 warnings.extend(warns)
                 processed_nodes.add(node)
@@ -599,7 +623,8 @@ class BatchReviewRequestResource(WebAPIResource):
                 draft, warns = update_review_request(local_site, request,
                                                      privileged_user,
                                                      reviewer_cache, rr,
-                                                     commit)
+                                                     commit,
+                                                     create_comm_msg_filediff)
                 squashed_reviewers.update(u for u in draft.target_people.all())
                 warnings.extend(warns)
                 processed_nodes.add(node)
@@ -653,7 +678,8 @@ class BatchReviewRequestResource(WebAPIResource):
                 draft, warns = update_review_request(local_site, request,
                                                      privileged_user,
                                                      reviewer_cache, rr,
-                                                     commit)
+                                                     commit,
+                                                     create_comm_msg_filediff)
                 squashed_reviewers.update(u for u in draft.target_people.all())
                 warnings.extend(warns)
                 processed_nodes.add(commit['id'])
@@ -692,7 +718,8 @@ class BatchReviewRequestResource(WebAPIResource):
                         identifier, rr.id, node))
             draft, warns = update_review_request(local_site, request,
                                                  privileged_user,
-                                                 reviewer_cache, rr, commit)
+                                                 reviewer_cache, rr, commit,
+                                                 create_comm_msg_filediff)
             squashed_reviewers.update(u for u in draft.target_people.all())
             warnings.extend(warns)
             processed_nodes.add(commit['id'])
@@ -909,8 +936,31 @@ def resolve_reviewers(cache, requested_reviewers):
     return reviewers, unrecognized
 
 
+def get_temp_diffset(repository):
+    """Get or create a temporary diffset.
+
+    Creating a FileDiff requires an already existing DiffSet
+    (There is a non-nullable ForeignKey). Since we must
+    create a particular FileDiff before its DiffSet is created
+    we first create a temporary DiffSet to point at.
+
+    Create this temporary DiffSet, or return it if it has been
+    created in the past."""
+    id = repository.extra_data.get(TEMP_DIFFSET_ID_KEY, None)
+    if id:
+        return DiffSet.objects.get(pk=id)
+    diffset = DiffSet.objects.create(
+        name='temp diffset',
+        revision=0,
+        repository=repository
+    )
+    repository.extra_data[TEMP_DIFFSET_ID_KEY] = diffset.pk
+    repository.save(update_fields=['extra_data'])
+    return diffset
+
+
 def update_review_request(local_site, request, privileged_user, reviewer_cache,
-                          rr, commit):
+                          rr, commit, create_commit_msg_filediff):
     """Synchronize the state of a review request with a commit.
 
     Updates the commit message, refreshes the diff, etc.
@@ -925,13 +975,6 @@ def update_review_request(local_site, request, privileged_user, reviewer_cache,
     draft.bugs_closed = commit['bug']
 
     commit_data = fetch_commit_data(draft)
-    commit_data.draft_extra_data.update({
-        AUTHOR_KEY: commit['author'],
-        COMMIT_ID_KEY: commit['id'],
-        FIRST_PUBLIC_ANCESTOR_KEY: commit['first_public_ancestor'],
-    })
-    commit_data.save(
-        update_fields=['draft_extra_data'])
 
     reviewer_users, unrecognized_reviewers = \
         resolve_reviewers(reviewer_cache, commit.get('reviewers', []))
@@ -955,6 +998,46 @@ def update_review_request(local_site, request, privileged_user, reviewer_cache,
 
         reviewer_users |= requal_reviewer_users
 
+    # Commit message FileDiff creation.
+    base_commit_id = commit.get('base_commit_id')
+    commit_message_filediff = None
+
+    if create_commit_msg_filediff:
+        # Prepare commit message data
+        commit_message_name = commit_data.draft_extra_data.get(
+            COMMIT_MSG_FILENAME_KEY,
+            'commit-message-%s' % base_commit_id[0:5])
+        commit_message_lines = commit['message'].split('\n')
+        commit_message_diff = COMMIT_MSG_DIFF_FORMAT % {
+            'source_filename': commit_message_name,
+            'target_filename': commit_message_name,
+            'num_lines': len(commit_message_lines),
+            'diff': '%s\n' % '\n'.join(
+                ['+%s' % l for l in commit_message_lines])}
+
+        commit_data.extra_data[COMMIT_MSG_FILENAME_KEY] = commit_message_name
+
+        # Commit message FileDiff has to be displayed as the first one.
+        # Therefore it needs to be created before other FileDiffs in
+        # the DiffSet.
+        # FileDiff object has a required DiffSet field. Because target DiffSet
+        # is created along with other FileDiffs, there is a need to
+        # create a temporary one.
+        # Later in the code temporary DiffSet is replaced in the commit
+        # message FileDiff with the target one.
+        temp_diffset = get_temp_diffset(rr.repository)
+
+        commit_message_filediff = FileDiff.objects.create(
+            diffset=temp_diffset,
+            source_file=commit_message_name,
+            dest_file=commit_message_name,
+            source_revision=PRE_CREATION,
+            dest_detail='',
+            parent_diff='',
+            binary=False,
+            status='M',
+            diff=commit_message_diff)
+
     # Carry over from last time unless commit message overrules.
     if reviewer_users:
         draft.target_people.clear()
@@ -972,9 +1055,10 @@ def update_review_request(local_site, request, privileged_user, reviewer_cache,
             diffset_history=None,
             basedir='',
             request=request,
-            base_commit_id=commit.get('base_commit_id'),
+            base_commit_id=base_commit_id,
             save=True,
         )
+
         update_diffset_history(rr, diffset)
         diffset.save()
 
@@ -983,6 +1067,27 @@ def update_review_request(local_site, request, privileged_user, reviewer_cache,
     except Exception:
         logger.exception('error processing diff')
         raise DiffProcessingException()
+
+    # Now that the proper DiffSet has been created, re-assign
+    # the commit message FileDiff we created to the new DiffSet.
+    if commit_message_filediff:
+        commit_message_filediff.diffset = diffset
+        commit_message_filediff.save()
+
+        commit_msg_filediff_ids = json.loads(commit_data.draft_extra_data.get(
+            COMMIT_MSG_FILEDIFF_IDS_KEY, '{}'))
+        commit_msg_filediff_ids[
+            str(diffset.revision)] = commit_message_filediff.pk
+        # Store commit message FileDiffs ids in extra_data
+        commit_data.draft_extra_data[COMMIT_MSG_FILEDIFF_IDS_KEY] = json.dumps(
+            commit_msg_filediff_ids)
+
+    commit_data.draft_extra_data.update({
+        AUTHOR_KEY: commit['author'],
+        COMMIT_ID_KEY: commit['id'],
+        FIRST_PUBLIC_ANCESTOR_KEY: commit['first_public_ancestor'],
+    })
+    commit_data.save(update_fields=['draft_extra_data', 'extra_data'])
 
     update_review_request_draft_diffset(rr, diffset, draft=draft)
 

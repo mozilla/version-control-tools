@@ -131,6 +131,7 @@ Review request 6 should be added to the list of discard on publish rids.
       5], ["4e50148c492dde95397cd666f2d4e4ad4fd2176f", 6]]'
     p2rb.discard_on_publish_rids: '[6]'
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -192,11 +193,12 @@ Review request 6 should be added to the list of discard on publish rids.
         5]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+      p2rb.has_commit_message_filediff: true
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.unpublished_rids: '[]'
     diffs:
-    - id: 7
+    - id: 8
       revision: 2
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       name: diff
@@ -252,16 +254,26 @@ Review 6 should be marked as discarded
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 4e50148c492dde95397cd666f2d4e4ad4fd2176f
+    p2rb.commit_message_filediff_ids: '{"1": 14}'
+    p2rb.commit_message_filename: commit-message-4d0f8
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 6
+  - id: 7
     revision: 1
     base_commit_id: 4d0f846364eb509a1b6ae3294f05439101f6e7d3
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-4d0f8 b/commit-message-4d0f8
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-4d0f8
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Foo 5
+    - +
+    - '+MozReview-Commit-ID: JmjAjw'
     - diff --git a/foo5 b/foo5
     - new file mode 100644
     - '--- /dev/null'
@@ -327,16 +339,26 @@ The review request corresponding to the dropped commit has no draft
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 0b3e14fe3ff19019110705e72dcf563c0ef551f6
+    p2rb.commit_message_filediff_ids: '{"1": 6}'
+    p2rb.commit_message_filename: commit-message-93d94
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-93d94 b/commit-message-93d94
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-93d94
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Foo 1
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo1 b/foo1
     - new file mode 100644
     - '--- /dev/null'
@@ -371,6 +393,7 @@ Review request 2 should be marked as discard on publish
       5]]'
     p2rb.discard_on_publish_rids: '[2]'
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -412,7 +435,7 @@ Review request 2 should be marked as discard on publish
     - '@@ -0,0 +1,1 @@'
     - +foo5
     - ''
-  - id: 7
+  - id: 8
     revision: 2
     base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     name: diff
@@ -462,11 +485,12 @@ Review request 2 should be marked as discard on publish
         4], ["81ee86efd38ff60717aeeeff153292e84e58be0b", 5]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+      p2rb.has_commit_message_filediff: true
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.unpublished_rids: '[]'
     diffs:
-    - id: 8
+    - id: 9
       revision: 3
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       name: diff
@@ -549,6 +573,7 @@ The parent review should have been updated accordingly
       4], ["81ee86efd38ff60717aeeeff153292e84e58be0b", 5]]'
     p2rb.discard_on_publish_rids: '[4]'
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -590,7 +615,7 @@ The parent review should have been updated accordingly
     - '@@ -0,0 +1,1 @@'
     - +foo5
     - ''
-  - id: 7
+  - id: 8
     revision: 2
     base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     name: diff
@@ -621,7 +646,7 @@ The parent review should have been updated accordingly
     - '@@ -0,0 +1,1 @@'
     - +foo4
     - ''
-  - id: 8
+  - id: 9
     revision: 3
     base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     name: diff
@@ -665,11 +690,12 @@ The parent review should have been updated accordingly
         5]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+      p2rb.has_commit_message_filediff: true
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.unpublished_rids: '[]'
     diffs:
-    - id: 12
+    - id: 13
       revision: 4
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       name: diff
@@ -743,6 +769,7 @@ recycling behavior when commit IDs are present.
       4], ["81ee86efd38ff60717aeeeff153292e84e58be0b", 5]]'
     p2rb.discard_on_publish_rids: '[5]'
     p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -784,7 +811,7 @@ recycling behavior when commit IDs are present.
     - '@@ -0,0 +1,1 @@'
     - +foo5
     - ''
-  - id: 7
+  - id: 8
     revision: 2
     base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     name: diff
@@ -815,7 +842,7 @@ recycling behavior when commit IDs are present.
     - '@@ -0,0 +1,1 @@'
     - +foo4
     - ''
-  - id: 8
+  - id: 9
     revision: 3
     base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
     name: diff
@@ -859,11 +886,12 @@ recycling behavior when commit IDs are present.
         4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
+      p2rb.has_commit_message_filediff: true
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.unpublished_rids: '[]'
     diffs:
-    - id: 14
+    - id: 15
       revision: 4
       base_commit_id: 93d9429b41ecf0d2ad8c62b6ea26686dd20330f4
       name: diff

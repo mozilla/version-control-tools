@@ -52,6 +52,7 @@ Publishing the parent should succeed.
     p2rb.commits: '[["4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -92,16 +93,26 @@ Publishing the parent should succeed.
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo

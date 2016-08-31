@@ -86,6 +86,7 @@ We should have a disagreement between published and draft
     p2rb.commits: '[["65e5c536f9cc5816ef28ebaff6a0db47b9af0fee", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -121,11 +122,12 @@ We should have a disagreement between published and draft
       p2rb.commits: '[["2c68bc327689343c967bcb80b9a3fd8d9bc50eb4", 2]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
+      p2rb.has_commit_message_filediff: true
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.unpublished_rids: '[]'
     diffs:
-    - id: 3
+    - id: 4
       revision: 2
       base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
       name: diff
@@ -159,16 +161,26 @@ We should have a disagreement between published and draft
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 65e5c536f9cc5816ef28ebaff6a0db47b9af0fee
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -194,16 +206,26 @@ We should have a disagreement between published and draft
       p2rb: true
       p2rb.author: test
       p2rb.commit_id: 2c68bc327689343c967bcb80b9a3fd8d9bc50eb4
+      p2rb.commit_message_filediff_ids: '{"1": 2, "2": 5}'
+      p2rb.commit_message_filename: commit-message-3a9f6
       p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: false
     diffs:
-    - id: 4
+    - id: 5
       revision: 2
       base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
       name: diff
       extra: {}
       patch:
+      - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+      - new file mode 100644
+      - '--- /dev/null'
+      - +++ b/commit-message-3a9f6
+      - '@@ -0,0 +1,3 @@'
+      - +Bug 1 - Initial commit
+      - +
+      - '+MozReview-Commit-ID: 124Bxg'
       - diff --git a/foo b/foo
       - '--- a/foo'
       - +++ b/foo
@@ -237,6 +259,7 @@ Discarding the parent review request draft should discard draft on children
     p2rb.commits: '[["65e5c536f9cc5816ef28ebaff6a0db47b9af0fee", 2]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -277,16 +300,26 @@ Discarding the parent review request draft should discard draft on children
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 65e5c536f9cc5816ef28ebaff6a0db47b9af0fee
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo

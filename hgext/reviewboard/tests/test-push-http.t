@@ -377,6 +377,7 @@ Test creating a review via HTTP
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 8d7f5c4152d8f67d67500d3b92903e365c0122f1
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'

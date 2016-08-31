@@ -55,16 +55,26 @@ The globbing is patching over a bug in mach
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 86ab97a5dd61e8ec7ff3c23212db732e3531af01
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - "+Bug 1 - Initial commit to review \u2019 \u3053"
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -179,6 +189,7 @@ Put some wonky byte sequences in the diff
   extra_data: {}
   commit_extra_data:
     p2rb: true
+    p2rb.commit_message_filename: commit-message-86ab9
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
   diffs: []
@@ -199,16 +210,25 @@ Put some wonky byte sequences in the diff
       p2rb: true
       p2rb.author: test
       p2rb.commit_id: 78025579528e119adf8ccc61727fccc1e23bda1c
+      p2rb.commit_message_filediff_ids: '{"1": 5}'
       p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
       p2rb.identifier: bz://2/mynick
       p2rb.is_squashed: false
     diffs:
-    - id: 4
+    - id: 5
       revision: 1
       base_commit_id: 86ab97a5dd61e8ec7ff3c23212db732e3531af01
       name: diff
       extra: {}
       patch:
+      - diff --git a/commit-message-86ab9 b/commit-message-86ab9
+      - new file mode 100644
+      - '--- /dev/null'
+      - +++ b/commit-message-86ab9
+      - '@@ -0,0 +1,3 @@'
+      - +Bug 2 - base
+      - +
+      - '+MozReview-Commit-ID: 5ijR9k'
       - diff --git a/foo b/foo
       - '--- a/foo'
       - +++ b/foo
@@ -231,6 +251,7 @@ Put some wonky byte sequences in the diff
   extra_data: {}
   commit_extra_data:
     p2rb: true
+    p2rb.commit_message_filename: commit-message-78025
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
   diffs: []
@@ -251,16 +272,25 @@ Put some wonky byte sequences in the diff
       p2rb: true
       p2rb.author: test
       p2rb.commit_id: 6204fc917b213cf88051df32860d62ca91ae1422
+      p2rb.commit_message_filediff_ids: '{"1": 7}'
       p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
       p2rb.identifier: bz://2/mynick
       p2rb.is_squashed: false
     diffs:
-    - id: 5
+    - id: 6
       revision: 1
       base_commit_id: 78025579528e119adf8ccc61727fccc1e23bda1c
       name: diff
       extra: {}
       patch:
+      - diff --git a/commit-message-78025 b/commit-message-78025
+      - new file mode 100644
+      - '--- /dev/null'
+      - +++ b/commit-message-78025
+      - '@@ -0,0 +1,3 @@'
+      - +Bug 2 - tip
+      - +
+      - '+MozReview-Commit-ID: APOgLo'
       - diff --git a/foo b/foo
       - '--- a/foo'
       - +++ b/foo
@@ -273,7 +303,15 @@ Put some wonky byte sequences in the diff
 The raw diff demonstrates the original bytes are preserved
 
   $ rbmanage dump-raw-diff 4
-  ID: 4 (draft)
+  ID: 5 (draft)
+  diff --git a/commit-message-86ab9 b/commit-message-86ab9
+  new file mode 100644
+  --- /dev/null
+  +++ b/commit-message-86ab9
+  @@ -0,0 +1,3 @@
+  +Bug 2 - base
+  +
+  +MozReview-Commit-ID: 5ijR9k
   diff --git a/foo b/foo
   --- a/foo
   +++ b/foo
@@ -284,7 +322,15 @@ The raw diff demonstrates the original bytes are preserved
   
 
   $ rbmanage dump-raw-diff 5
-  ID: 5 (draft)
+  ID: 6 (draft)
+  diff --git a/commit-message-78025 b/commit-message-78025
+  new file mode 100644
+  --- /dev/null
+  +++ b/commit-message-78025
+  @@ -0,0 +1,3 @@
+  +Bug 2 - tip
+  +
+  +MozReview-Commit-ID: APOgLo
   diff --git a/foo b/foo
   --- a/foo
   +++ b/foo

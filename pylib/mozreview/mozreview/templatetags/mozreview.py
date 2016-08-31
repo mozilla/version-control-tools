@@ -12,6 +12,7 @@ from mozreview.diffviewer import (
 )
 from mozreview.extra_data import (
     COMMIT_ID_KEY,
+    COMMIT_MSG_FILEDIFF_IDS_KEY,
     fetch_commit_data,
     is_parent,
     is_pushed,
@@ -47,6 +48,14 @@ def commit_id(review_request_details):
     """Return the commit id of a review request or review request draft"""
     commit_data = fetch_commit_data(review_request_details)
     return str(commit_data.get_for(review_request_details, COMMIT_ID_KEY))
+
+
+@register.filter()
+def commit_message_filediff_ids(review_request_details):
+    """Return the commit message FileDiff ids of a ReviewRequest or Draft"""
+    commit_data = fetch_commit_data(review_request_details)
+    return commit_data.get_for(review_request_details,
+                               COMMIT_MSG_FILEDIFF_IDS_KEY, default='[]')
 
 
 def reviewer_list(review_request):

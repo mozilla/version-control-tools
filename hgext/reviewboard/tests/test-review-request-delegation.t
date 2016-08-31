@@ -84,7 +84,7 @@ Change the reviewer while logged in as reviewer1
         ship_it: false
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -100,7 +100,7 @@ Change the reviewer while logged in as reviewer1
         ship_it: false
     diff:
       delete: 0
-      insert: 1
+      insert: 4
 
 Test multiple reviewers
 
@@ -139,7 +139,7 @@ Test multiple reviewers
         ship_it: false
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -155,7 +155,7 @@ Test multiple reviewers
         ship_it: false
     diff:
       delete: 0
-      insert: 1
+      insert: 4
 
 Test invalid reviewer
 
@@ -197,7 +197,7 @@ Change the reviewer while logged in as the submitter
         ship_it: false
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -213,7 +213,7 @@ Change the reviewer while logged in as the submitter
         ship_it: false
     diff:
       delete: 0
-      insert: 1
+      insert: 4
 
 Test user without editbugs
 
@@ -268,7 +268,7 @@ Test ensure-drafts
         ship_it: false
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -284,7 +284,7 @@ Test ensure-drafts
         ship_it: false
     diff:
       delete: 0
-      insert: 1
+      insert: 4
   $ rbmanage ensure-drafts 1
   $ rbmanage dump-summary 1
   parent:
@@ -316,7 +316,7 @@ Test ensure-drafts
         ship_it: false
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -332,7 +332,7 @@ Test ensure-drafts
         ship_it: false
     diff:
       delete: 0
-      insert: 1
+      insert: 4
   $ rbmanage publish 1
   $ rbmanage dump-summary 1
   parent:
@@ -368,7 +368,7 @@ Test ensure-drafts
         ship_it: false
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Forgot water r?reviewer1
     id: 3
     commit: 4935598400374354824ffde84a8b6767823100d1
@@ -384,4 +384,4 @@ Test ensure-drafts
         ship_it: false
     diff:
       delete: 0
-      insert: 1
+      insert: 4

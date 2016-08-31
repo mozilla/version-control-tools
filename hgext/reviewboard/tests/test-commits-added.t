@@ -97,6 +97,7 @@ The parent review request should be updated with the new commits.
     p2rb: true
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[2, 3, 4]'
@@ -119,11 +120,12 @@ The parent review request should be updated with the new commits.
         3], ["1ec9946fd47ff9b5cb07e9d9c8b4d393b688e01b", 4]]'
       p2rb.discard_on_publish_rids: '[]'
       p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+      p2rb.has_commit_message_filediff: true
       p2rb.identifier: bz://1/mynick
       p2rb.is_squashed: true
       p2rb.unpublished_rids: '[]'
     diffs:
-    - id: 4
+    - id: 5
       revision: 1
       base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
       name: diff

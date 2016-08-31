@@ -78,7 +78,7 @@
         ship_it: false
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -90,7 +90,7 @@
     reviewers_status: {}
     diff:
       delete: 1
-      insert: 1
+      insert: 4
 
 Only parents have summaries.
 
@@ -137,7 +137,7 @@ Opening an issue should be reflected in the summary.
         ship_it: false
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -149,7 +149,7 @@ Opening an issue should be reflected in the summary.
     reviewers_status: {}
     diff:
       delete: 1
-      insert: 1
+      insert: 4
 
 Resolving an issue should decrement the issue count.
 
@@ -185,7 +185,7 @@ Resolving an issue should decrement the issue count.
         ship_it: false
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -197,7 +197,7 @@ Resolving an issue should decrement the issue count.
     reviewers_status: {}
     diff:
       delete: 1
-      insert: 1
+      insert: 4
 
 Giving a ship-it should result in a change in the reviewer status
 
@@ -234,7 +234,7 @@ Giving a ship-it should result in a change in the reviewer status
         ship_it: true
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -246,7 +246,7 @@ Giving a ship-it should result in a change in the reviewer status
     reviewers_status: {}
     diff:
       delete: 1
-      insert: 1
+      insert: 4
 
   $ exportbzauth default@example.com password
 
@@ -283,7 +283,7 @@ Verify we can also get the summaries by bug, including closed ones.
           ship_it: true
       diff:
         delete: 1
-        insert: 1
+        insert: 4
     - summary: Bug 1 - Foo 2
       id: 3
       commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -295,7 +295,7 @@ Verify we can also get the summaries by bug, including closed ones.
       reviewers_status: {}
       diff:
         delete: 1
-        insert: 1
+        insert: 4
 
 Verify that we get nothing from non-existent bugs.
 
@@ -364,7 +364,7 @@ Verify that requesting the summary as the submitter will show draft diffstats
         ship_it: true
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -376,7 +376,7 @@ Verify that requesting the summary as the submitter will show draft diffstats
     reviewers_status: {}
     diff:
       delete: 1
-      insert: 3
+      insert: 6
 
 Verify non-submitters will not see the draft diffstats
 
@@ -410,7 +410,7 @@ Verify non-submitters will not see the draft diffstats
         ship_it: true
     diff:
       delete: 1
-      insert: 1
+      insert: 4
   - summary: Bug 1 - Foo 2
     id: 3
     commit: 3a446ae4382006c43cdfa5aa33c494f582736f35
@@ -422,7 +422,7 @@ Verify non-submitters will not see the draft diffstats
     reviewers_status: {}
     diff:
       delete: 1
-      insert: 1
+      insert: 4
 
 Cleanup
 

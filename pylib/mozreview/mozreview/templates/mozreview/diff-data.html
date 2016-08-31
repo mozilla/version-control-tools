@@ -1,0 +1,5 @@
+{% load mozreview %}
+
+<div id="commit-message-filediff-data"
+  data-commit-message-ids='{{ review_request|commit_message_filediff_ids|safe }}'
+  data-current-revision-number={{ diffset.revision }}></div>

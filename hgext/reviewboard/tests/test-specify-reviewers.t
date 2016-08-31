@@ -229,16 +229,26 @@ Publishing series during push works
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 214fce3608426755a50ae60ae8645eb9bc1f7537
+    p2rb.commit_message_filediff_ids: '{"1": 18}'
+    p2rb.commit_message_filename: commit-message-ccfcf
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 10
+  - id: 11
     revision: 1
     base_commit_id: ccfcf9b70a65731d01240f24815edf0cf6b64739
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-ccfcf b/commit-message-ccfcf
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-ccfcf
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - More stuff; [r?remus, r?romulus]
+    - +
+    - '+MozReview-Commit-ID: cXO9WC'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo

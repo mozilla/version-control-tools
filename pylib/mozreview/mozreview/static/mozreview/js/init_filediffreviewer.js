@@ -108,4 +108,57 @@ $(document).ready(function() {
       page.model.get('files').once('update', renderDiffButton);
     }
   });
+
+  // Restyle and modify content if commit message FileDiff is present.
+  // commitMsgIds is an array holding a commit message FileDiff ids in
+  // relation to Revision numbers.
+  var commitMsgIds = [];
+  var commitMsgData = $('#commit-message-filediff-data');
+  var currentRevisionNumber = commitMsgData.data('currentRevisionNumber');
+  if (currentRevisionNumber) {
+    commitMsgIds = commitMsgData.data('commitMessageIds');
+  }
+
+  function changeCommitMsgIndexFileName() {
+    // Change the fileName of the first FileDiff index if commit msg
+    // FileDiff is present.
+    $('.with-commit-msg-filediff #diff_index tbody tr:first td a')
+      .text('commit-message');
+  }
+
+  function changeCommitMsgFileDiff(page) {
+    // Commit message FileDiff element is displayed only on the first page.
+    if (page !== 1) {
+      // Remove styling of the first FileDiff element
+      $('#review_request').removeClass('with-commit-msg-filediff');
+      return;
+    }
+    // Add styling of the first FileDiff element
+    $('#review_request').addClass('with-commit-msg-filediff');
+    // Set the diff_index's commit message fileName
+    changeCommitMsgIndexFileName();
+  }
+
+  function detectPageAndChangeCommitMsgFileDiff() {
+    var page;
+    if ($('#pagination1').children().length == 0) {
+      page = 1;
+    } else {
+      page = +$('#pagination1 span.paginate-current').text();
+    }
+    changeCommitMsgFileDiff(page);
+  }
+
+  // Old ReviewRequests don't have commit message FileDiff. In such case
+  // commitMsgIds is an empty array.
+  if (currentRevisionNumber && commitMsgIds[currentRevisionNumber]) {
+    // Check the initial stage of the pager.
+    detectPageAndChangeCommitMsgFileDiff();
+    // Listen to pagination events.
+    page._paginationView1.on('pageSelected', changeCommitMsgFileDiff);
+    page._paginationView2.on('pageSelected', changeCommitMsgFileDiff);
+    // Listen to context loaded event and change name if needed.
+    $(document).on('mr:diff-context-loaded',
+                   detectPageAndChangeCommitMsgFileDiff);
+  }
 });

@@ -106,3 +106,33 @@ span.ghost-commentflag {
 .comment-block-container-draft {
   border-top: 2px dotted #aceb6f;  // @comment-flag-draft-color;
 }
+
+/* Select commit message FileDiff.
+   We're adding a content of the commit message as a FileDiff. FileDiff's DOM
+   Element is a div.diff-container. Commit message element is displayed as
+   a first FileDiff in the series as a second child of #diffs, after
+   a div.diff-highlight. Due to a bug in Reviewboard, diff-highlight might not
+   be present and commit message FileDiff will become the first child of
+   the #diff.
+   See https://hellosplat.com/s/beanbag/tickets/4520/
+
+   We use an ugly CSS hack to remove "commit-message-[hash]" text from
+   sight and instead display "commit-message".
+ */
+.with-commit-msg-filediff {
+    .diff-container:first-child .sidebyside,
+    :not(.diff-container) + .diff-container .sidebyside {
+        .filename-row th {
+            color: transparent;
+            position: relative;
+        }
+
+       .filename-row th a:after{
+           content: "commit-message";
+           color: #000;
+           position: absolute;
+           font-weight: normal;
+           font-style: italic;
+       }
+    }
+}

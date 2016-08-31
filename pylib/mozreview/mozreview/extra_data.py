@@ -22,13 +22,19 @@ MOZREVIEW_KEY = 'p2rb'
 REVIEWER_MAP_KEY = MOZREVIEW_KEY + '.reviewer_map'
 REVIEW_FLAG_KEY = MOZREVIEW_KEY + '.review_flag'
 
+# Repository extra_data key:
+TEMP_DIFFSET_ID_KEY = MOZREVIEW_KEY + '.temp_diffset_id'
+
 # CommitData field keys:
 AUTHOR_KEY = MOZREVIEW_KEY + '.author'
 BASE_COMMIT_KEY = MOZREVIEW_KEY + '.base_commit'
 COMMIT_ID_KEY = MOZREVIEW_KEY + '.commit_id'
 COMMITS_KEY = MOZREVIEW_KEY + '.commits'
+COMMIT_MSG_FILEDIFF_IDS_KEY = MOZREVIEW_KEY + '.commit_message_filediff_ids'
+COMMIT_MSG_FILENAME_KEY = MOZREVIEW_KEY + '.commit_message_filename'
 DISCARD_ON_PUBLISH_KEY = MOZREVIEW_KEY + '.discard_on_publish_rids'
 FIRST_PUBLIC_ANCESTOR_KEY = MOZREVIEW_KEY + '.first_public_ancestor'
+HAS_COMMIT_MSG_FILEDIFF_KEY = MOZREVIEW_KEY + '.has_commit_message_filediff'
 IDENTIFIER_KEY = MOZREVIEW_KEY + '.identifier'
 SQUASHED_KEY = MOZREVIEW_KEY + '.is_squashed'
 UNPUBLISHED_KEY = MOZREVIEW_KEY + '.unpublished_rids'
@@ -38,9 +44,10 @@ PUBLISH_AS_KEY = MOZREVIEW_KEY + '.publish_as'
 # draft_extra_data to extra_data when a review request is published.
 DRAFTED_COMMIT_DATA_KEYS = (
     AUTHOR_KEY,
+    COMMIT_ID_KEY,
+    COMMIT_MSG_FILEDIFF_IDS_KEY,
     FIRST_PUBLIC_ANCESTOR_KEY,
     IDENTIFIER_KEY,
-    COMMIT_ID_KEY,
 )
 
 REVIEWID_RE = re.compile('bz://(\d+)/[^/]+')

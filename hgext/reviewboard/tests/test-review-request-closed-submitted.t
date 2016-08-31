@@ -77,6 +77,7 @@ Squashed review request with ID 1 should be closed as submitted...
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -119,16 +120,26 @@ Child review request with ID 2 should be closed as submitted...
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-7c5bd
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-7c5bd b/commit-message-7c5bd
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-7c5bd
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Foo 1
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -159,16 +170,26 @@ Child review request with ID 2 should be closed as submitted...
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
+    p2rb.commit_message_filediff_ids: '{"1": 4}'
+    p2rb.commit_message_filename: commit-message-98467
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 3
+  - id: 4
     revision: 1
     base_commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-98467 b/commit-message-98467
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-98467
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Foo 2
+    - +
+    - '+MozReview-Commit-ID: 5ijR9k'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -226,6 +247,7 @@ Squashed review request with ID 1 should be re-opened...
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -268,16 +290,26 @@ Child review request with ID 2 should be re-opened...
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-7c5bd
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-7c5bd b/commit-message-7c5bd
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-7c5bd
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Foo 1
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -310,16 +342,26 @@ Child review request with ID 3 should be re-opened...
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 3a446ae4382006c43cdfa5aa33c494f582736f35
+    p2rb.commit_message_filediff_ids: '{"1": 4}'
+    p2rb.commit_message_filename: commit-message-98467
     p2rb.first_public_ancestor: 7c5bdf0cec4a90edb36300f8f3679857f46db829
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 3
+  - id: 4
     revision: 1
     base_commit_id: 98467d80785ec84dd871f213c167ed704a6d974d
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-98467 b/commit-message-98467
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-98467
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Foo 2
+    - +
+    - '+MozReview-Commit-ID: 5ijR9k'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo

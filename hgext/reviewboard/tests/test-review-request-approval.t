@@ -62,16 +62,26 @@ Create a review request from an L1 user
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -109,16 +119,26 @@ Have an L1 user provide a r+ review which should not grant approval
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -166,16 +186,26 @@ Have an L3 user provide a r+ review which should grant approval
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -229,16 +259,26 @@ Posting a new review without r+ should cancel the previous approval
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -301,16 +341,26 @@ One more r+ should switch it back to approved
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: 4f4c73d9c6594a0a800a82758ceb6fb12a6b9f83
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -383,16 +433,26 @@ Even though the author is L1, adding a new diff will not cancel approval
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
+    p2rb.commit_message_filediff_ids: '{"1": 2, "2": 5}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -400,12 +460,20 @@ Even though the author is L1, adding a new diff will not cancel approval
     - -foo
     - +initial
     - ''
-  - id: 4
+  - id: 5
     revision: 2
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -476,16 +544,26 @@ A new r+ from L3 should give approval
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
+    p2rb.commit_message_filediff_ids: '{"1": 2, "2": 5}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -493,12 +571,20 @@ A new r+ from L3 should give approval
     - -foo
     - +initial
     - ''
-  - id: 4
+  - id: 5
     revision: 2
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -582,16 +668,26 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
+    p2rb.commit_message_filediff_ids: '{"1": 2, "2": 5}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -599,12 +695,20 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     - -foo
     - +initial
     - ''
-  - id: 4
+  - id: 5
     revision: 2
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -673,7 +777,7 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
       num_lines: 1
       text: Issue Text
       text_type: plain
-      diff_id: 4
+      diff_id: 6
       diff_dest_file: foo
     diff_count: 1
 
@@ -703,16 +807,26 @@ Fixing the issue should restore approval
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: f867b363f9fd58135c77672e3c34f222f16ff677
+    p2rb.commit_message_filediff_ids: '{"1": 2, "2": 5}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -720,12 +834,20 @@ Fixing the issue should restore approval
     - -foo
     - +initial
     - ''
-  - id: 4
+  - id: 5
     revision: 2
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 1 - Initial commit to review
+    - +
+    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -794,7 +916,7 @@ Fixing the issue should restore approval
       num_lines: 1
       text: Issue Text
       text_type: plain
-      diff_id: 4
+      diff_id: 6
       diff_dest_file: foo
     diff_count: 1
 
@@ -832,16 +954,26 @@ Review requests created by L3 users
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: b366ef9913208b4030857319aa20520f229a74f3
+    p2rb.commit_message_filediff_ids: '{"1": 8}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 6
+  - id: 7
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 2 - initial commit to review
+    - +
+    - '+MozReview-Commit-ID: F63vXs'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -879,16 +1011,26 @@ Even a ship-it from an L1 user will give approval to an L3 author
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: b366ef9913208b4030857319aa20520f229a74f3
+    p2rb.commit_message_filediff_ids: '{"1": 8}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 6
+  - id: 7
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 2 - initial commit to review
+    - +
+    - '+MozReview-Commit-ID: F63vXs'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -939,16 +1081,26 @@ ship-its. Posting a new diff should not clear approval
     p2rb: true
     p2rb.author: test
     p2rb.commit_id: bedcf57f515ad540f582962e37ecd424d82424fd
+    p2rb.commit_message_filediff_ids: '{"1": 8, "2": 11}'
+    p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
     p2rb.identifier: bz://2/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 6
+  - id: 7
     revision: 1
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 2 - initial commit to review
+    - +
+    - '+MozReview-Commit-ID: F63vXs'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -956,12 +1108,20 @@ ship-its. Posting a new diff should not clear approval
     - -foo
     - +author2
     - ''
-  - id: 8
+  - id: 9
     revision: 2
     base_commit_id: 3a9f6899ef84c99841f546030b036d0124a863cf
     name: diff
     extra: {}
     patch:
+    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
+    - new file mode 100644
+    - '--- /dev/null'
+    - +++ b/commit-message-3a9f6
+    - '@@ -0,0 +1,3 @@'
+    - +Bug 2 - initial commit to review
+    - +
+    - '+MozReview-Commit-ID: F63vXs'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
