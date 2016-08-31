@@ -797,7 +797,7 @@ class Docker(object):
                 'rbweb': ('docker-rbweb', 'centos6'),
             }
             if build_hgweb:
-                ansibles['hgweb'] = ('docker-hgweb', 'centos6')
+                ansibles['hgweb'] = ('docker-hgweb', 'centos7')
 
             f_images = e.submit(self.ensure_images_built, [
                 'autolanddb',
