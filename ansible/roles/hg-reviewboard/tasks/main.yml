@@ -5,15 +5,6 @@
   tags:
     - docker-refresh
 
-# yum will incur network traffic when URLs are specified. Download the
-# package locally first so we can run offline after initial bootstrap.
-- name: download RPMs
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/{{ item.path }}
-           dest=/var/tmp/{{ item.path }}
-           sha256sum={{ item.sha256 }}
-  with_items:
-    - { path: mercurial-3.7.3-1.x86_64.rpm, sha256: 924a8828cfe53901db1366115d927b958f35f5e6a9c418cbc670c5e19137c090 }
-
 - name: system packages installed
   yum: name={{ item }} state=present
   with_items:
@@ -30,9 +21,6 @@
     - python-ldap
     - rsyslog
     - sudo
-
-- name: local RPMs installed
-  command: /usr/bin/yum -y localinstall /var/tmp/mercurial-3.7.3-1.x86_64.rpm
 
 - name: Source code groups
   group: name={{ item.name }} gid={{ item.gid }}

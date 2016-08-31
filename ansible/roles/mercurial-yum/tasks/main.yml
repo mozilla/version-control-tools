@@ -2,10 +2,17 @@
 
 # yum will incur network traffic when URLs are specified. Download the
 # package locally first so we can run offline after initial bootstrap.
-- name: download Mercurial package
+- name: download Mercurial package (CentOS 6)
   get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/mercurial-3.7.3-1.x86_64.rpm
            dest=/var/tmp/mercurial-3.7.3-1.x86_64.rpm
            sha256sum=924a8828cfe53901db1366115d927b958f35f5e6a9c418cbc670c5e19137c090
+  when: ansible_distribution_major_version == '6'
+
+- name: download Mercurial package (CentOS 7)
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/mercurial-3.7.3-1.x86_64.rpm
+           dest=/var/tmp/mercurial-3.7.3-1.x86_64.rpm
+           sha256sum=7cdd06e8fb5266fe9bd726c79db6040b68053a601daecb2418820c1d3e4f56a2
+  when: ansible_distribution_major_version == '7'
 
 - name: Install patch package
   yum: name=patch state=present

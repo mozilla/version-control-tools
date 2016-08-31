@@ -20,18 +20,6 @@
     - rsyslog
     - tar
 
-# yum will incur network traffic when URLs are specified. Download the
-# package locally first so we can run offline after initial bootstrap.
-- name: download Mozilla rpms
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/{{ item.path }}
-           dest=/var/tmp/{{ item.path }}
-           sha256sum={{ item.sha256 }}
-  with_items:
-    - { path: mercurial-3.7.3-1.x86_64.rpm, sha256: 7cdd06e8fb5266fe9bd726c79db6040b68053a601daecb2418820c1d3e4f56a2 }
-
-- name: install Mozilla rpms
-  command: yum localinstall -y /var/tmp/mercurial-3.7.3-1.x86_64.rpm
-
 - name: create directory for LDAP certificates
   file: path=/etc/openldap/cacerts
         state=directory
