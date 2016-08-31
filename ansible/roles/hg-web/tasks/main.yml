@@ -25,20 +25,10 @@
     - sudo
     - tar
 
-- name: install system packages (CentOS 6)
-  yum: name={{ item }} state=present
-  with_items:
-    # RHEL 6 and CentOS 6 have Python 2.6 installed by default. The Python 2.7 packages
-    # from IUS don't conflict with the system Python.
-    - python27
-    - python27-devel
-  when: ansible_distribution_major_version == '6'
-
-- name: install system packages (CentOS 7)
+- name: install system packages
   yum: name={{ item }} state=present
   with_items:
     - libcgroup-tools
-  when: ansible_distribution_major_version == '7'
 
 - name: install global ssh config
   copy: src=ssh_config
@@ -211,13 +201,9 @@
         group=root
         mode=0755
 
-- name: configure httpd to start at system startup (CentOS 6)
-  command: /sbin/chkconfig --level 2345 httpd on
-  when: ansible_distribution_major_version == '6'
-
-- name: configure httpd to run at system startup (CentOS 7)
+- name: configure httpd to run at system startup
   command: /usr/bin/systemctl enable httpd.service
-  when: vct_dir.stat.exists == False and ansible_distribution_major_version == '7'
+  when: vct_dir.stat.exists == False
 
 - name: install mirror-pull script
   template: src=mirror-pull.j2
@@ -325,14 +311,9 @@
         group=root
         mode=0664
 
-- name: configure cgconfig to run at system startup (CentOS 6)
-  command: /sbin/chkconfig --level 2345 cgconfig on
-  notify: restart cgconfig
-  when: vct_dir.stat.exists == False and ansible_distribution_major_version == '6'
-
-- name: configure cgconfig to run at system startup (CentOS 7)
+- name: configure cgconfig to run at system startup
   command: /usr/bin/systemctl enable cgconfig.service
-  when: vct_dir.stat.exists == False and ansible_distribution_major_version == '7'
+  when: vct_dir.stat.exists == False
 
 - name: install control group rules
   copy: src=cgrules.conf
