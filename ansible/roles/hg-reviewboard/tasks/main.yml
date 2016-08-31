@@ -5,6 +5,12 @@
   tags:
     - docker-refresh
 
+# This is needed because the WSGI process needs to write to repos for
+# HTTP pushes.
+- name: add hg user to scm_* groups
+  user: name=hg
+        groups=hg,scm_level_1,scm_level_2,scm_level_3,scm_l10n,scm_l10n_infra
+
 - name: system packages installed
   yum: name={{ item }} state=present
   with_items:
@@ -13,48 +19,15 @@
     - httpd-devel
     # Used for validating Bugzilla API keys through HTTP pushes.
     - mod_authnz_external
-    # Needed to build python-ldap package for virtualenv.
-    - openldap-devel
-    - python27
-    - python27-devel
-    # Used by pash, since it doesn't yet run from Python 2.7 / virtualenv.
-    - python-ldap
-    - rsyslog
     - sudo
 
-- name: Source code groups
-  group: name={{ item.name }} gid={{ item.gid }}
-  with_items:
-    - { name: 'scm_level_1', gid: 673 }
-    - { name: 'scm_level_2', gid: 685 }
-    - { name: 'scm_level_3', gid: 679 }
-    - { name: 'scm_l10n', gid: 678 }
-    - { name: 'scm_l10n_infra', gid: 680 }
-    - { name: 'scm_sec_sensitive', gid: 686 }
-    - { name: 'scm_ecmascript', gid: 687 }
-
-- name: Create hg user
-  user: name=hg uid=500 shell=/bin/bash comment='Hg user' groups=scm_level_1,scm_level_2,scm_level_3,scm_l10n,scm_l10n_infra,scm_sec_sensitive
-
 - name: Repository directories present
-  file: path={{ item }} state=directory mode=0755
-  with_items:
-    - /repo
-    - /repo/hg
-    - /repo/hg/library
-    - /repo/hg/mozilla
-    - /repo/hg/webroot_wsgi
-    - /var/hg
+  file: path=/repo/hg/webroot_wsgi state=directory mode=0755
 
 - name: create virtualenv for hgweb
   include: ../../../tasks/virtualenv.yml
            venv=/var/hg/venv_hgweb
            requirements=../roles/hg-reviewboard/files/requirements-hgweb.txt
-
-- name: create virtualenv for pash
-  include: ../../../tasks/virtualenv.yml
-           venv=/var/hg/venv_pash
-           requirements=../roles/hg-reviewboard/files/requirements-pash.txt
 
 - name: install pash configuration file
   template: src=pash.json.j2
@@ -88,21 +61,6 @@
 
 - name: Global hgrc installed
   template: src=hgrc.j2 dest=/etc/mercurial/hgrc mode=0444
-
-- name: install pash
-  copy: src={{ vct }}/hgserver/pash/{{ item }}
-        dest=/usr/local/bin/{{ item }}
-        owner=root
-        group=root
-        mode=0755
-  with_items:
-    # Install pash.py first to ensure SSH root login works.
-    - pash.py
-    - hg_helper.py
-    - ldap_helper.py
-    - pash_wrapper
-    - repo_group.py
-    - sh_helper.py
 
 - name: hgweb wsgi and config in place
   copy: src={{ item }} dest=/repo/hg/webroot_wsgi/{{ item }}

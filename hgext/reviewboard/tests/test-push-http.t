@@ -73,10 +73,10 @@ hg pull does not require authentication
 
 Issuing a POST to the Mercurial server requires authentication
 
-  $ http --method POST ${MERCURIAL_URL}test-repo/json-pushes
+  $ http --method POST --request-header 'Content-Type: text/plain' ${MERCURIAL_URL}test-repo/json-pushes
   401
   connection: close
-  content-length: 401
+  content-length: 381
   content-type: text/html; charset=iso-8859-1
   date: * (glob)
   server: Apache
@@ -84,9 +84,9 @@ Issuing a POST to the Mercurial server requires authentication
   
   <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
   <html><head>
-  <title>401 Authorization Required</title>
+  <title>401 Unauthorized</title>
   </head><body>
-  <h1>Authorization Required</h1>
+  <h1>Unauthorized</h1>
   <p>This server could not verify that you
   are authorized to access the document
   requested.  Either you supplied the wrong
@@ -98,10 +98,10 @@ Issuing a POST to the Mercurial server requires authentication
 
 Invalid credentials should result in 401
 
-  $ http --method POST --basic-username default@example.com --basic-password invalid ${MERCURIAL_URL}test-repo/json-pushes
+  $ http --method POST --request-header 'Content-Type: text/plain' --basic-username default@example.com --basic-password invalid ${MERCURIAL_URL}test-repo/json-pushes
   401
   connection: close
-  content-length: 401
+  content-length: 381
   content-type: text/html; charset=iso-8859-1
   date: * (glob)
   server: Apache
@@ -109,9 +109,9 @@ Invalid credentials should result in 401
   
   <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
   <html><head>
-  <title>401 Authorization Required</title>
+  <title>401 Unauthorized</title>
   </head><body>
-  <h1>Authorization Required</h1>
+  <h1>Unauthorized</h1>
   <p>This server could not verify that you
   are authorized to access the document
   requested.  Either you supplied the wrong
@@ -124,10 +124,10 @@ Invalid credentials should result in 401
 Valid API key with wrong username should result in 401
 
   $ defaultkey=`mozreview create-api-key default@example.com`
-  $ http --method POST --basic-username invalid@example.com --basic-password ${defaultkey} ${MERCURIAL_URL}test-repo/json-pushes
+  $ http --method POST --request-header 'Content-Type: text/plain' --basic-username invalid@example.com --basic-password ${defaultkey} ${MERCURIAL_URL}test-repo/json-pushes
   401
   connection: close
-  content-length: 401
+  content-length: 381
   content-type: text/html; charset=iso-8859-1
   date: * (glob)
   server: Apache
@@ -135,9 +135,9 @@ Valid API key with wrong username should result in 401
   
   <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
   <html><head>
-  <title>401 Authorization Required</title>
+  <title>401 Unauthorized</title>
   </head><body>
-  <h1>Authorization Required</h1>
+  <h1>Unauthorized</h1>
   <p>This server could not verify that you
   are authorized to access the document
   requested.  Either you supplied the wrong
@@ -149,7 +149,7 @@ Valid API key with wrong username should result in 401
 
 Valid user and API key is authenticated properly
 
-  $ http --method POST --basic-username default@example.com --basic-password ${defaultkey} --request-header "Content-Type: text/plain" ${MERCURIAL_URL}test-repo/json-pushes
+  $ http --method POST --request-header 'Content-Type: text/plain' --basic-username default@example.com --basic-password ${defaultkey} --request-header "Content-Type: text/plain" ${MERCURIAL_URL}test-repo/json-pushes
   200
   connection: close
   content-type: application/json

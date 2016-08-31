@@ -30,7 +30,7 @@
     - name: stage code for deployment
       command: /usr/bin/rsync -aq --exclude '.git*' --exclude '.hg*' --delete /data/reviewboard/src/ /data/reviewboard/www/
 
-- hosts: reviewboard-hg1.dmz.scl3.mozilla.com
+- hosts: reviewboard-hg2.dmz.scl3.mozilla.com
   pre_tasks:
     # Until we integrate secrets with Ansible, the LDAP config is
     # pre-defined on the server.

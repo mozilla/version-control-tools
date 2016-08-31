@@ -36,16 +36,22 @@ WSGIPythonHome /var/hg/venv_hgweb
     # Bug 1210177.
     DefineExternalAuth bmoapikey pipe "/usr/bin/python2.7 /var/hg/version-control-tools/scripts/httpd-authn-bugzilla-key {{ bugzilla_url | mandatory }}"
     <Directory />
-        Order allow,deny
-        Allow from all
-        Deny from env=bad_bot
-
         AuthType Basic
         AuthName "{{ bugzilla_url | mandatory }} username and API Key"
         AuthBasicProvider external
         AuthExternal bmoapikey
-        <LimitExcept GET HEAD>
-            Require valid-user
-        </LimitExcept>
+
+        # Require HTTP auth on HTTP methods that aren't GET or HEAD.
+        <RequireAny>
+            <RequireAll>
+                Require method GET HEAD
+                Require not env bad_bot
+                Require all granted
+            </RequireAll>
+            <RequireAll>
+                Require not method GET HEAD
+                Require valid-user
+            </RequireAll>
+        </RequireAny>
     </Directory>
 </VirtualHost>

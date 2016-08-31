@@ -1,3 +1,5 @@
+--find-links https://downloads.reviewboard.org/releases/RBTools/0.7/
+
 # Kafka is in this virtualenv to support replication on the hg leader server.
 # It isn't needed on a standalone hg server. But installing it doesn't really
 # hurt.
@@ -9,6 +11,11 @@ Mercurial==3.9.1 \
 
 python-ldap==2.4.20 \
     --hash=sha256:4b8891539a3171d993cf7896b632ff088a4c707ae85ac3c77db1454f7949f3e2
+
+# RBTools is needed to support the MozReview server. It isn't needed by the
+# hg leader server. But installing it doesn't really hurt.
+RBTools==0.7.5 \
+    --hash=sha256:28809def27e530ba5c13d37be8eb9ca31a24786cc0d0bd6d682f0009d94891a4
 
 six==1.9.0 \
     --hash=sha256:418a93c397a7edab23e5588dbc067ac74a723edb3d541bd4936f79476e7645da

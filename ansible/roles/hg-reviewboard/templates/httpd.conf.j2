@@ -14,11 +14,12 @@ MaxRequestsPerChild  4000
 
 Listen 80
 
+LoadModule authn_core_module modules/mod_authn_core.so
+LoadModule authz_core_module modules/mod_authz_core.so
+LoadModule unixd_module modules/mod_unixd.so
 LoadModule auth_basic_module modules/mod_auth_basic.so
-LoadModule authn_default_module modules/mod_authn_default.so
 LoadModule authz_host_module modules/mod_authz_host.so
 LoadModule authz_user_module modules/mod_authz_user.so
-LoadModule authz_default_module modules/mod_authz_default.so
 LoadModule include_module modules/mod_include.so
 LoadModule log_config_module modules/mod_log_config.so
 LoadModule logio_module modules/mod_logio.so
@@ -45,6 +46,9 @@ LoadModule version_module modules/mod_version.so
 
 LoadModule authnz_external_module modules/mod_authnz_external.so
 
+LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
+LoadModule systemd_module modules/mod_systemd.so
+
 Include conf.d/*.conf
 
 ExtendedStatus On
@@ -64,17 +68,14 @@ DocumentRoot "/var/www/html"
 <Directory "/var/www/html">
     Options Indexes FollowSymLinks
     AllowOverride None
-    Order allow,deny
-    Allow from all
+    Require all granted
 </Directory>
 
 DirectoryIndex index.html index.html.var
 
 AccessFileName .htaccess
 <Files ~ "^\.ht">
-    Order allow,deny
-    Deny from all
-    Satisfy All
+    Require all denied
 </Files>
 
 TypesConfig /etc/mime.types
@@ -98,8 +99,7 @@ Alias /icons/ "/var/www/icons/"
 <Directory "/var/www/icons">
     Options Indexes MultiViews FollowSymLinks
     AllowOverride None
-    Order allow,deny
-    Allow from all
+    Require all granted
 </Directory>
 
 IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
@@ -186,8 +186,7 @@ Alias /error/ "/var/www/error/"
     Options IncludesNoExec
     AddOutputFilter Includes html
     AddHandler type-map var
-    Order allow,deny
-    Allow from all
+    Require all granted
     LanguagePriority en es de fr
     ForceLanguagePriority Prefer Fallback
 </Directory>

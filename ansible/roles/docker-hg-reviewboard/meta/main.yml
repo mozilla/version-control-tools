@@ -1,4 +1,4 @@
 ---
 dependencies:
   - supervisor
-  - { role: hg-reviewboard, wsgi_processes: 2 }
+  - { role: hg-reviewboard, sshd_hg_port: 22, wsgi_processes: 2 }

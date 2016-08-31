@@ -12,7 +12,6 @@ import subprocess
 import time
 
 import concurrent.futures as futures
-import paramiko
 import requests
 
 from vcttesting.bugzilla import Bugzilla
@@ -295,20 +294,22 @@ class MozReview(object):
 
         self.create_user_api_key(bugzilla.username, description='mozreview')
 
-        hg_ssh_host_key = self._docker.get_file_content(
-                mr_info['hgrb_id'],
-                '/etc/ssh/ssh_host_rsa_key.pub').rstrip()
-        key_type, key_key = hg_ssh_host_key.split()
+        with futures.ThreadPoolExecutor(2) as e:
+            f_ssh_ed25519_key = e.submit(self._docker.get_file_content,
+                                         mr_info['hgrb_id'],
+                                         '/etc/mercurial/ssh/ssh_host_ed25519_key.pub')
+            f_ssh_rsa_key = e.submit(self._docker.get_file_content,
+                                     mr_info['hgrb_id'],
+                                     '/etc/mercurial/ssh/ssh_host_rsa_key.pub')
 
-        assert key_type == 'ssh-rsa'
-        key = paramiko.rsakey.RSAKey(data=paramiko.py3compat.decodebytes(key_key))
+        ssh_ed25519_key = f_ssh_ed25519_key.result().split()[0:2]
+        ssh_rsa_key = f_ssh_rsa_key.result().split()[0:2]
 
         hostkeys_path = os.path.join(self._path, 'ssh-known-hosts')
-        load_path = hostkeys_path if os.path.exists(hostkeys_path) else None
-        hostkeys = paramiko.hostkeys.HostKeys(filename=load_path)
         hoststring = '[%s]:%d' % (mr_info['ssh_hostname'], mr_info['ssh_port'])
-        hostkeys.add(hoststring, key_type, key)
-        hostkeys.save(hostkeys_path)
+        with open(hostkeys_path, 'wb') as fh:
+            fh.write('%s %s %s\n' % (hoststring, ssh_ed25519_key[0], ssh_ed25519_key[1]))
+            fh.write('%s %s %s\n' % (hoststring, ssh_rsa_key[0], ssh_rsa_key[1]))
 
         with open(os.path.join(self._path, 'ssh_config'), 'wb') as fh:
             fh.write(SSH_CONFIG.format(

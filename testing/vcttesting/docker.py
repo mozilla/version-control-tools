@@ -831,7 +831,7 @@ class Docker(object):
                                         verbose=verbose)
 
             ansibles = {
-                'hgrb': ('docker-hgrb', 'centos6'),
+                'hgrb': ('docker-hgrb', 'centos7'),
                 'rbweb': ('docker-rbweb', 'centos6'),
             }
             if build_hgweb:
@@ -1417,7 +1417,7 @@ class Docker(object):
                 'pulse',
                 'treestatus',
             }
-            ansible_images['hgrb'] = ('docker-hgrb', 'centos6')
+            ansible_images['hgrb'] = ('docker-hgrb', 'centos7')
             ansible_images['rbweb'] = ('docker-rbweb', 'centos6')
             ansible_images['hgweb'] = ('docker-hgweb', 'centos7')
 
