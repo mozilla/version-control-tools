@@ -9,58 +9,12 @@
 - name: Install packages required to run a Mercurial server
   yum: name={{ item }} state=present
   with_items:
-    - authconfig
-    - nss-pam-ldapd
-    - openldap-clients
     # Needed to build python-ldap package for virtualenv.
     - openldap-devel
-    - openssh-server
     - python-devel
     - sudo
     - rsyslog
     - tar
-
-- name: create directory for LDAP certificates
-  file: path=/etc/openldap/cacerts
-        state=directory
-        owner=root
-        group=root
-        mode=0755
-
-- name: install Mozilla certificates
-  copy: src={{ item.src }}
-        dest=/etc/openldap/cacerts/{{ item.dest }}
-        owner=root
-        group=root
-        mode=0644
-  with_items:
-    - { src: files/mozilla-root-ca.crt, dest: mozilla.crt }
-    - { src: files/mozilla-root-certificate-services.crt, dest: ca.crt }
-
-- name: configure system authentication settings
-  template: src=nslcd.conf.j2
-            dest=/etc/nslcd.conf
-  tags: docker-startup
-
-- name: run authconfig
-  command: /usr/sbin/authconfig --enablemkhomedir --enableldap --enableldapauth --ldapserver={{ ldap_uri }} --ldapbasedn={{ basedn }} --updateall
-  tags: docker-startup
-
-- name: ensure nslcd service enabled and running (server only)
-  service: name=nslcd.service
-           enabled=yes
-           state=started
-  when: vct_dir.stat.exists == False
-
-- name: configure sshd
-  copy: src=sshd_config
-        dest=/etc/ssh/sshd_config
-  notify: restart sshd
-  tags: docker-startup
-
-- name: generate SSH host keys (Docker only)
-  command: /usr/bin/ssh-keygen -A -N ''
-  when: vct_dir.stat.exists == True
 
 - name: install global ssh config
   copy: src=ssh_config

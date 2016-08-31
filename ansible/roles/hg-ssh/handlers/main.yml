@@ -4,10 +4,6 @@
   service: name=rsyslog state=restarted
   ignore_errors: True
 
-- name: restart sshd
-  service: name=sshd state=restarted
-  ignore_errors: True
-
 - name: systemd daemon reload
   command: /usr/bin/systemctl daemon-reload
   ignore_errors: True
