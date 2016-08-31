@@ -1,7 +1,6 @@
 ---
 dependencies:
-  - ldap-system-auth
-  - mercurial-yum
+  - hg-ssh-server
   - {
       role: kafka-broker,
       kafka_host_name: "{{ inventory_hostname }}",

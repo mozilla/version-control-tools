@@ -1,0 +1,4 @@
+---
+dependencies:
+  - ldap-system-auth
+  - mercurial-yum

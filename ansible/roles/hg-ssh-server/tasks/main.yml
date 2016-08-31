@@ -1,0 +1,150 @@
+---
+- name: determine if running in Docker
+  stat: path=/vct
+  register: vct_dir
+
+- name: Create groups for SCM ACLs
+  group: name={{ item.name }} gid={{ item.gid }}
+  with_items:
+    - { name: 'scm_level_1', gid: 673 }
+    - { name: 'scm_level_2', gid: 685 }
+    - { name: 'scm_level_3', gid: 679 }
+    - { name: 'scm_l10n', gid: 678 }
+    - { name: 'scm_l10n_infra', gid: 680 }
+    - { name: 'scm_sec_sensitive', gid: 686 }
+    - { name: 'scm_ecmascript', gid: 687 }
+
+- name: Create hg group
+  group: name=hg
+         gid=500
+
+- name: Create hg user
+  user: name=hg
+        group=hg
+        uid=500
+        shell=/bin/bash
+        comment='Hg user'
+
+- name: Install packages required to run a Mercurial server
+  yum: name={{ item }} state=present
+  with_items:
+    # Needed to build python-ldap package for virtualenv.
+    - openldap-devel
+    - python-devel
+    - rsyslog
+
+- name: mercurial config directory is present
+  file: path=/etc/mercurial state=directory mode=0755
+
+- name: directory for hg sshd files
+  file: path=/etc/mercurial/ssh
+        state=directory
+        owner=root
+        group=root
+        mode=0750
+
+- name: sshd config for hg server
+  template: src=sshd_config_hg.j2
+            dest=/etc/mercurial/ssh/sshd_config
+            owner=root
+            group=root
+            mode=0640
+
+# entrypoint.py from the docker container will generate these keys. But there is
+# a race condition between it and the startup code in hgmo.py wanting to copy
+# the file. So generate the cert at image build time to be on the safe side.
+- name: generate hg ED25519 host key (Docker only)
+  command: /usr/bin/ssh-keygen -t ed25519 -N '' -f /etc/mercurial/ssh/ssh_host_ed25519_key creates=/etc/mercurial/ssh/ssh_host_ed25519_key.pub
+
+- name: generate hg RSA host key (Docker only)
+  command: /usr/bin/ssh-keygen -t rsa -b 4096 -N '' -f /etc/mercurial/ssh/ssh_host_rsa_key creates=/etc/mercurial/ssh/ssh_host_rsa_key.pub
+
+- name: directories for support tools is present
+  file: path=/usr/local/bin
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
+# In order to be used as an AuthorizedKeysCommand in sshd, the
+# file has to be in a tree that is root:root 0755 all the way to /.
+- name: install ldap ssh key lookup script
+  copy: src={{ vct }}/scripts/ldap-lookup-ssh-key
+        dest=/usr/local/bin/ldap-lookup-ssh-key
+        owner=root
+        group=root
+        mode=0755
+
+- name: systemd service file for hg sshd
+  copy: src=sshd_hg.service
+        dest=/etc/systemd/system/sshd_hg.service
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
+
+- name: ensure hg sshd runs on startup
+  service: name=sshd_hg.service
+           enabled=yes
+           state=started
+  when: vct_dir.stat.exists == False
+
+- name: Mercurial repository directories are present
+  file: path={{ item }} state=directory mode=0775
+  with_items:
+    - /repo/hg/mozilla
+    - /var/hg
+
+- name: create virtualenv for pash
+  include: ../../../tasks/virtualenv.yml
+           venv=/var/hg/venv_pash
+           requirements=../roles/hg-ssh-server/files/requirements-pash.txt
+
+# pash is a collection of Python files handling SSH connections. They behave
+# like a Python module but are installed not as such for historical reasons.
+- name: install pash
+  copy: src={{ vct }}/hgserver/pash/{{ item }}
+        dest=/usr/local/bin/{{ item }}
+        owner=root
+        group=root
+        mode=0755
+  with_items:
+    # Install pash.py first to ensure SSH root login works.
+    - pash.py
+    - hg_helper.py
+    - ldap_helper.py
+    - pash_wrapper
+    - repo_group.py
+    - sh_helper.py
+
+# Until reviewboard-hg switches to CentOS 7, pash.py's shebang needs to be
+# adjusted to run from the virtualenv. We purposefully use /usr/bin/python
+# in the shebang by default because we can't rely on the virtualenv being
+# present during fresh installs. If we didn't do this, we'd easily lock
+# ourselves out of root login.
+- name: replace shebang in pash.py
+  replace: dest=/usr/local/bin/pash.py
+           regexp='^#! \/usr\/bin\/python'
+           replace='#!/var/hg/venv_pash/bin/python'
+
+- name: install rsyslog policy for hg
+  copy: src=rsyslog-hg.conf
+        dest=/etc/rsyslog.d/hg.conf
+        owner=root
+        group=root
+        mode=0644
+  notify: restart rsyslogd
+
+- name: install logrotate config for hg
+  copy: src=logrotate-hg.conf
+        dest=/etc/logrotate.d/hg
+        owner=root
+        group=root
+        mode=0644
+
+- name: Mercurial log files are present and writable
+  file: path={{ item }} mode=0666 state=touch
+  with_items:
+    - /var/log/hg-push.log
+    - /var/log/pash.log
