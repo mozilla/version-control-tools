@@ -100,8 +100,10 @@
     - /etc/httpd/conf.d/authnz_external.conf
     - /etc/httpd/conf.d/welcome.conf
 
-- name: ensure httpd service is started
-  service: name=httpd state=started
+- name: enable and run httpd
+  service: name=httpd.service
+           enabled=yes
+           state=started
   # Don't do this on Docker because it has its own mechanism for
   # starting.
   when: vct_dir.stat.exists == False
