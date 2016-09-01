@@ -201,10 +201,6 @@
         group=root
         mode=0755
 
-- name: configure httpd to run at system startup
-  command: /usr/bin/systemctl enable httpd.service
-  when: vct_dir.stat.exists == False
-
 - name: install mirror-pull script
   template: src=mirror-pull.j2
             dest=/usr/local/bin/mirror-pull
@@ -452,9 +448,10 @@
 
 # Needs to come near end for fresh server provisioning scenario to work
 # right.
-- name: ensure httpd service is started
-  service: name=httpd state=started
+- name: ensure httpd service enabled and running (server only)
+  service: name=httpd.service
+           enabled=yes
+           state=started
   # Don't do this on Docker because it has its own mechanism for
   # starting.
   when: vct_dir.stat.exists == False
-
