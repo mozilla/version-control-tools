@@ -1,0 +1,26 @@
+# vim:ft=ansible:
+---
+
+- hosts: mozreview-ci
+  become: yes
+
+  pre_tasks:
+    # This is a hack to force the user to think about and set an appropriate
+    # admin user and password for the current environment.  This keeps us from
+    # accidentally deploying the Jenkins default admin username and default
+    # admin password.
+    - fail: msg="You must set the 'jenkins_admin_username_override' variable before running this playbook"
+      when: jenkins_admin_username_override is undefined
+
+    - fail: msg="You must set the 'jenkins_admin_password_override' variable before running this playbook"
+      when: jenkins_admin_password_override is undefined
+
+  roles:
+    - { role: geerlingguy.jenkins,
+        jenkins_http_port: 80,
+        jenkins_repo_url: "http://pkg.jenkins.io/redhat-stable/jenkins.repo",
+        jenkins_repo_key_url: "http://pkg.jenkins.io/redhat-stable/jenkins.io.key",
+        jenkins_admin_username: "{{ jenkins_admin_username_override }}",
+        jenkins_admin_password: "{{ jenkins_admin_password_override }}"}
+    - { role: vct-dev-environment,
+        test_user: jenkins }
