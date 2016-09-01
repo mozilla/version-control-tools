@@ -1,7 +1,0 @@
----
-- name: run authconfig
-  command: /usr/sbin/authconfig --enablemkhomedir --enableldap --enableldapauth --ldapserver={{ ldap_uri }} --ldapbasedn={{ basedn }} --updateall
-
-- name: restart sshd
-  service: name=sshd state=restarted
-  when: ansible_env.DOCKER_ENTRYPOINT is not defined
