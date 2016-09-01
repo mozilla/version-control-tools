@@ -16,8 +16,8 @@ mach==0.5.1 \
 MarkupSafe==0.23 \
     --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3
 
-Mercurial==3.8.4 \
-    --hash=sha256:4b2e3ef19d34fa1d781cb7425506a05d4b6b1172bab69d6ea78874175fdf3da6
+Mercurial==3.9.1 \
+    --hash=sha256:625e4fc7e85ec2278c2828bdc547fce74091b3bbe4d9eeeba2d61af51195df74
 
 mozfile==1.1 \
     --hash=sha256:e1d8505c9d575051e0831ee659a982a2bbfaec37013dc946d60a3071a442888e
