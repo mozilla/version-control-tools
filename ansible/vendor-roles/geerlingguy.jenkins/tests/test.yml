@@ -1,0 +1,6 @@
+---
+- hosts: all
+
+  roles:
+    - geerlingguy.java
+    - role_under_test
