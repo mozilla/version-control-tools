@@ -220,15 +220,12 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
-- name: unifyrepo.service is enabled (server only)
+- name: unifyrepo.service is enabled and restarted (server only)
   service: name=unifyrepo.service
            enabled=yes
-  when: vct_dir.stat.exists == False
-
-- name: restart unifyrepo.service (server only)
-  command: /usr/bin/systemctl restart unifyrepo.service
-  when: vct_dir.stat.exists == False
+           state=restarted
   ignore_errors: True
+  when: vct_dir.stat.exists == False
 
 - name: systemd service for bundle generation
   copy: src=hg-bundle-generate.{{ item }}
@@ -306,15 +303,12 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
-- name: pushdataaggregator.service is enabled (server only)
+- name: pushdataaggregator.service is enabled and restarted (server only)
   service: name=pushdataaggregator.service
            enabled=yes
-  when: vct_dir.stat.exists == False
-
-- name: restart pushdataaggregator.service (server only)
-  command: /usr/bin/systemctl restart pushdataaggregator.service
-  when: vct_dir.stat.exists == False
+           state=restarted
   ignore_errors: True
+  when: vct_dir.stat.exists == False
 
 - name: systemd service file for pulse notification daemon
   copy: src=pulsenotifier.service
@@ -325,13 +319,9 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
-- name: pulsenotifier.service is enabled (server only)
+- name: pulsenotifier.service is enabled and restarted (server only)
   service: name=pulsenotifier.service
            enabled=yes
-  when: vct_dir.stat.exists == False
-
-- name: restart pulsenotifier.service (server only)
-  command: /usr/bin/systemctl restart pulsenotifier.service
-  when: vct_dir.stat.exists == False
+           state=restarted
   ignore_errors: True
-
+  when: vct_dir.stat.exists == False
