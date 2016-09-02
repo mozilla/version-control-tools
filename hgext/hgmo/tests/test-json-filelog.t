@@ -26,80 +26,58 @@ Single file with 3 commits
   $ http "http://localhost:$HGPORT/json-filelog?file=foo&node=tip" --header content-type --body-file body
   200
   content-type: application/json
-  $ cat > rmpd << EOF
-  > import json
-  > with open('body') as fd:
-  >     data = json.load(fd)
-  > n = 0.
-  > for entry in data['entries']:
-  >     entry['pushdate'] = [n, 0]
-  >     n += 1
-  > print json.dumps(data, indent = 4, sort_keys = True)
-  > EOF
-  $ python rmpd
+  $ python -m json.tool < body
   {
       "entries": [
           {
-              "bookmarks": [], 
-              "branch": "default", 
+              "bookmarks": [],
+              "branch": "default",
               "date": [
-                  0.0, 
+                  0.0,
                   0
-              ], 
-              "desc": "NO BUG", 
-              "node": "313d9c157189179b5853d16831f80aa5ab609782", 
+              ],
+              "desc": "NO BUG",
+              "node": "313d9c157189179b5853d16831f80aa5ab609782",
               "parents": [
                   "ca92ee64ee5df95ce203c3a1ba6c72a6328963d1"
-              ], 
-              "phase": "public", 
-              "pushdate": [
-                  0.0, 
-                  0
-              ], 
-              "pushid": 3, 
+              ],
+              "phase": "public",
+              "pushid": 3,
               "tags": [
                   "tip"
-              ], 
+              ],
               "user": "test"
-          }, 
+          },
           {
-              "bookmarks": [], 
-              "branch": "default", 
+              "bookmarks": [],
+              "branch": "default",
               "date": [
-                  0.0, 
+                  0.0,
                   0
-              ], 
-              "desc": "Bug 159 - Do foo; r=calixte\n\nThis is related to bug 265.", 
-              "node": "ca92ee64ee5df95ce203c3a1ba6c72a6328963d1", 
+              ],
+              "desc": "Bug 159 - Do foo; r=calixte\n\nThis is related to bug 265.",
+              "node": "ca92ee64ee5df95ce203c3a1ba6c72a6328963d1",
               "parents": [
                   "4de9924f06f2d653b28fda17113787fcfffb03e0"
-              ], 
-              "phase": "public", 
-              "pushdate": [
-                  1.0, 
-                  0
-              ], 
-              "pushid": 2, 
-              "tags": [], 
+              ],
+              "phase": "public",
+              "pushid": 2,
+              "tags": [],
               "user": "test"
-          }, 
+          },
           {
-              "bookmarks": [], 
-              "branch": "default", 
+              "bookmarks": [],
+              "branch": "default",
               "date": [
-                  0.0, 
+                  0.0,
                   0
-              ], 
-              "desc": "Bug 314; r=calixte", 
-              "node": "4de9924f06f2d653b28fda17113787fcfffb03e0", 
-              "parents": [], 
-              "phase": "public", 
-              "pushdate": [
-                  2.0, 
-                  0
-              ], 
-              "pushid": 1, 
-              "tags": [], 
+              ],
+              "desc": "Bug 314; r=calixte",
+              "node": "4de9924f06f2d653b28fda17113787fcfffb03e0",
+              "parents": [],
+              "phase": "public",
+              "pushid": 1,
+              "tags": [],
               "user": "test"
           }
       ]
