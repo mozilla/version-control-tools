@@ -63,7 +63,8 @@ changelistentry = '\{
   "phase": {phase|json},
   "parents": [{if(allparents, join(allparents%changesetparent, ", "),
                   join(parent%changesetparent, ", "))}],
-  "pushid": {pushid|json}
+  "pushid": {pushid|json},
+  "pushdate": {pushdate|json}
   }'
 changelistentryname = '{name|utf8|json}'
 changeset = '\{

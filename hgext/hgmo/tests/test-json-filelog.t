@@ -42,6 +42,10 @@ Single file with 3 commits
                   "ca92ee64ee5df95ce203c3a1ba6c72a6328963d1"
               ],
               "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  \d+ (re)
+              ],
               "pushid": 3,
               "tags": [
                   "tip"
@@ -61,6 +65,10 @@ Single file with 3 commits
                   "4de9924f06f2d653b28fda17113787fcfffb03e0"
               ],
               "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  \d+ (re)
+              ],
               "pushid": 2,
               "tags": [],
               "user": "test"
@@ -76,6 +84,10 @@ Single file with 3 commits
               "node": "4de9924f06f2d653b28fda17113787fcfffb03e0",
               "parents": [],
               "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  \d+ (re)
+              ],
               "pushid": 1,
               "tags": [],
               "user": "test"
