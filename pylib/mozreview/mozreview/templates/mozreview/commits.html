@@ -45,7 +45,7 @@ This is the template for the "Commits" list in a push-based review request.
   {% include 'mozreview/commits-requests.html' %}
 
   {% if latest_autoland_requests %}
-  <div id="ci-actions">
+  <div id="ci-actions" data-try-syntax="{{try_syntax}}">
     {% for autoland_request in latest_autoland_requests %}
       {% if not forloop.first %}
       <div class="action-separator"></div>

@@ -67,6 +67,7 @@ class CommitContextTemplateHook(TemplateHook):
                           if cur_index - 1 >= 0 else None)
 
         latest_autoland_requests = []
+        try_syntax = ''
         repo_urls = set()
         autoland_requests = AutolandRequest.objects.filter(
             review_request_id=parent.id).order_by('-autoland_id')
@@ -79,6 +80,7 @@ class CommitContextTemplateHook(TemplateHook):
 
             repo_urls.add(request.repository_url)
             latest_autoland_requests.append(request)
+            try_syntax = try_syntax or request.extra_data.get('try_syntax', '')
 
         return {
             'review_request_details': review_request_details,
@@ -90,6 +92,7 @@ class CommitContextTemplateHook(TemplateHook):
             'prev_child': prev_child,
             'latest_autoland_requests': latest_autoland_requests,
             'user': user,
+            'try_syntax': 'try_syntax',
         }
 
 class MozReviewApprovalHook(ReviewRequestApprovalHook):

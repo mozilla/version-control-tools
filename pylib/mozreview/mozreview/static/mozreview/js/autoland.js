@@ -60,6 +60,18 @@ $(document).on("mozreview_ready", function() {
         '<p><details id="mozreview-open-try"><summary>Graphically build syntax</summary><p><iframe id="mozreview-trychooser-iframe" src="' + trychooser_url + '"/></p></details></p>',
       ];
 
+
+      var oldTrySyntax = $('#ci-actions').data('try-syntax');
+
+      if (oldTrySyntax !== undefined) {
+        box.find('#mozreview-autoland-try-syntax').val(oldTrySyntax);
+      }
+
+      box.find('#mozreview-autoland-try-syntax').on('change', function () {allowReset = true});
+
+      // in case there was no previous try push, allow the trychooser to reset
+      // the try syntax. Else, wait for it to be changed
+      var allowReset = oldTrySyntax === undefined || oldTrySyntax === "";
       if (trychooser_url === "") {
         html.pop();
       } else {
@@ -67,7 +79,10 @@ $(document).on("mozreview_ready", function() {
           if (e.origin === new URL(trychooser_url).origin) {
             if (e.data != "") {
               $('#mozreview-autoland-try-syntax').val("try: " + e.data)
-            } else {
+            } else if (allowReset) {
+              // We only reset the value if it has been changed since
+              // This prevents the first load of the page from overriding
+              // the try syntax input
               $('#mozreview-autoland-try-syntax').val("")
             }
           }
@@ -77,6 +92,8 @@ $(document).on("mozreview_ready", function() {
       for (var i = 0; i < html.length; ++i) {
         box.append($(html[i]).addClass("mozreview-autoland-try-chooser-element"));
       }
+
+
 
       box.modalBox({
           title: "Trigger a Try Build",
