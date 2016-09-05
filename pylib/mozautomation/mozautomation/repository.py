@@ -47,7 +47,8 @@ TREE_ALIASES = {
     'releases': ('esr45', 'release', 'beta', 'aurora', 'central'),
     'integration': ('inbound', 'fx-team', 'autoland'),
     'twigs': ('alder', 'ash', 'birch', 'cedar', 'cypress', 'date', 'elm',
-              'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine'),
+              'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine',
+              'stylo'),
     'obsolete': ('esr10', 'esr17', 'b2ginbound', 'b2g18', 'esr24', 'esr31',
                  'esr38', 'b2g26', 'b2g28', 'b2g30', 'b2g32', 'b2g34', 'b2g37',
                  'b2g44', 'b2g-ota'),
@@ -110,6 +111,7 @@ REPOS = {
     'maple': 'projects/maple',
     'oak': 'projects/oak',
     'pine': 'projects/pine',
+    'stylo': 'incubator/stylo',
 
     # Comm repositories.
     'comm': 'comm-central',
