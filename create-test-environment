@@ -230,7 +230,7 @@ fi
 cd venv/git-cinnabar
 git pull
 git submodule update --init
-make -j4 helper
+make -j4 helper NO_OPENSSL=1 NO_GETTEXT=1
 cd ../..
 
 if [ -z "${NO_DOCKER}" ]; then
