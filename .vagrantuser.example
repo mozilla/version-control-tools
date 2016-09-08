@@ -11,8 +11,8 @@
 # The amount of memory to assign to the vagrant VM.
 #memory: "2048"
 
-# Whether to display the GUI when running with VirtualBox.
-#vb_gui: false
+# Display the virtual machine management GUI on VM startup.
+#show_gui: false
 
 # The folder that should be synced into the vagrant VM at /home/vagrant/vct.
 # Defaults to the project root folder, '.'.

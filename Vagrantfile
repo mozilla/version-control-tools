@@ -25,7 +25,7 @@ Vagrant.configure(2) do |config|
     "private_ip" => "192.168.33.33",
     "cpus" => "2",
     "memory" => "2048",
-    "vb_gui" => false,
+    "show_gui" => false,
     "synced_folder" => ".",
     "playbook" => "testing/vagrant/configure.yml",
     "ansible_verbose" => "",
@@ -50,8 +50,20 @@ Vagrant.configure(2) do |config|
 
   config.vm.network "private_network", ip: config.user.private_ip
 
+  config.vm.provider "vmware_fusion" do |v|
+    v.gui = config.user.show_gui
+    v.vmx["memsize"] = config.user.memory
+    v.vmx["numvcpus"] = config.user.cpus
+  end
+
+  config.vm.provider "vmware_workstation" do |v|
+    v.gui = config.user.show_gui
+    v.vmx["memsize"] = config.user.memory
+    v.vmx["numvcpus"] = config.user.cpus
+  end
+
   config.vm.provider "virtualbox" do |vb|
-    vb.gui = config.user.vb_gui
+    vb.gui = config.user.show_gui
     vb.memory = config.user.memory
     vb.cpus = config.user.cpus
   end
