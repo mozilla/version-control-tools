@@ -78,12 +78,12 @@ b = j(h, 'bugzilla')
 answers = j(h, 'checksetup_answers.txt')
 
 if install_module:
-    cc([j(b, 'checksetup.pl'), '--cpanfile'], cwd=b)
-    cc(['cpanm', '--installdeps', '--with-recommends', '--with-all-features',
-        '--without-feature', 'oracle', '--without-feature', 'sqlite',
-        '--without-feature', 'pg', '--without-feature', 'elasticsearch',
-        '--notest',
-        '.'], cwd=b)
+    cc(['wget', '-q', '-O', 'vendor.tar.gz',
+        'http://s3.amazonaws.com/moz-devservices-bmocartons/mozreview/'
+        'vendor.tar.gz'],
+       cwd=b)
+    cc(['tar', 'zxf', 'vendor.tar.gz', '--transform', 's/mozreview\///'],
+       cwd=b)
 
 # We aren't allowed to embed environment variable references in Perl code in
 # checksetup_answers.txt because Perl executes that file in a sandbox. So we

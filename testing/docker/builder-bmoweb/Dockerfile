@@ -82,39 +82,20 @@ RUN echo "deb http://repo.mysql.com/apt/ubuntu/ trusty mysql-5.6" > /etc/apt/sou
 
 RUN apt-get update && apt-get --no-install-recommends -y install \
   apache2 build-essential cpanminus cvs g++ git graphviz \
-  libapache2-mod-perl2 \
-  libdaemon-generic-perl libfile-slurp-perl libdbd-mysql-perl \
+  libapache2-mod-perl2 libmysqlclient18 \
   libgd-dev libssl-dev \
   mysql-client mysql-server \
-  patchutils perlmagick pkg-config python3-mysql.connector \
+  patchutils pkg-config python3-mysql.connector \
   python-psutil supervisor unzip wget
 
 RUN git clone --depth 1 https://github.com/mozilla-bteam/bmo.git $BUGZILLA_HOME/bugzilla
 
-# cpanm has problems with some packages. Install them from the OS.
-RUN apt-get -y install \
-  libsoap-lite-perl \
-  libmath-bigint-gmp-perl \
-  libmath-mpfr-perl \
-  libmath-prime-util-gmp-perl
-
-RUN cd $BUGZILLA_HOME/bugzilla && ./checksetup.pl --cpanfile
-
-# Linux::Pid is a dependency for Apache::SizeLimit that for whatever
-# reason isn't detected by CPAN.
-# XPLRPC::Transport::HTTP is needed by xmlrpc.cgi. For whatever reason,
-# this dependency isn't installed.
-RUN cd $BUGZILLA_HOME/bugzilla && cpanm Linux::Pid XMLRPC::Transport::HTTP
-RUN cd $BUGZILLA_HOME/bugzilla && cpanm \
-  --installdeps \
-  --with-recommends \
-  --with-all-features \
-  --without-feature oracle --without-feature sqlite \
-  --without-feature pg --without-feature elasticsearch \
-  --notest \
-  .
+# BMO packages its dependencies in a carton bundle.  See
+# https://github.com/mozilla-bteam/carton-bundles for details.
+RUN cd $BUGZILLA_HOME/bugzilla && wget -q -O vendor.tar.gz http://s3.amazonaws.com/moz-devservices-bmocartons/mozreview/vendor.tar.gz && tar zxf vendor.tar.gz --transform 's/mozreview\///'
 
 ADD checksetup_answers.txt $BUGZILLA_HOME/checksetup_answers.txt
+RUN cd $BUGZILLA_HOME/bugzilla && perl checksetup.pl --check-modules
 
 # Configure MySQL
 RUN rm -rf /var/lib/mysql
