@@ -203,7 +203,7 @@ Do another login to verify no pash errors are present
 
   $ hgmo exec hgssh cat /var/log/pash.log
 
-hgAccountDisabled=FALSE shows account disabled message
+hgAccountEnabled=FALSE shows account disabled message
 
   $ hgmo create-ldap-user --hg-disabled --key-file key1 hgdisabled@example.com hgdisabled 1002 'HgAccess Disabled'
   $ hgmo exec hgssh /usr/bin/ldapsearch -b 'dc=mozilla' -s sub -x mail=hgdisabled@example.com
