@@ -13,6 +13,7 @@
     - python-devel
     - python-virtualenv
     - xz-devel
+    - libcurl-devel
     - libffi-devel
     - libxml2-devel
     - libxslt-devel
