@@ -37,9 +37,11 @@ def get_hgweb_mozbuild_chroot(d):
     # The chroot archive contains a copy of version-control-tools. Need to
     # attach a vct container so we can rsync it over.
     with d.vct_container(verbose=True) as vct_state:
-        with d.create_container(image, labels=['hgweb-chroot']) as state:
+        host_config = d.client.create_host_config(volumes_from=[vct_state['Name']])
+        with d.create_container(image, labels=['hgweb-chroot'],
+                                host_config=host_config) as state:
             cid = state['Id']
-            d.client.start(cid, volumes_from=[vct_state['Name']])
+            d.client.start(cid)
 
             for s in d.client.attach(cid, stream=True, logs=True):
                 print(s, end='')
