@@ -38,7 +38,9 @@ It is possible to run a fully isolated, fully local MozReview instance
 from your machine. This will give you an environment that should behave
 like production.
 
-You will need Docker installed. On Linux, this is generally as simple
+You will need to install the dependencies listed :ref:`here <devguide_environment>`.
+
+You will also need Docker installed. On Linux, this is generally as simple
 as installing the required package, e.g., on Ubuntu::
 
   $ sudo apt-get install docker.io
@@ -48,10 +50,15 @@ You can also install the very latest release `directly from Docker <http://docs.
 On Linux, it is necessary to configure Docker to listen on a tcp socket
 rather than the default configuration, which uses an unix domain socket,
 in order to get test results which match the expected results. This can be
-done by editing your configuration file to start docker with the following
-option::
+done by editing your configuration file (in ``/etc/default/docker`` for
+Ubuntu 14.04, see `the docs <https://docs.docker.com/engine/admin/systemd/#custom-docker-daemon-options>`_
+for more details) to start docker with the following option::
 
-  -H tcp://127.0.0.1:4243
+  -H tcp://127.0.0.1:2375
+
+You will also need to set the ``DOCKER_HOST`` variable::
+
+  $ export DOCKER_HOST=127.0.0.1:2375
 
 For OS X, you will need to install and start up docker-machine; see
 the official `installation instructions

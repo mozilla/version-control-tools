@@ -50,6 +50,25 @@ You can install these dependencies by running::
      python-dev python-virtualenv \
      zlib1g-dev
 
+On Ubuntu 16.04, the following packages are needed:
+
+* python-dev
+* npm
+* libxml2-dev
+* libxslt1-dev
+* libffi-dev
+* liblzma-dev
+* libsasl2-dev
+* libldap2-dev
+* libssl-dev
+* mercurial (to clone version-control-tools)
+
+which you can install by running::
+
+   $ sudo apt-get install python-dev npm libxml2-dev \
+     libxslt1-dev libffi-dev liblzma-dev libsasl2-dev \
+     libldap2-dev libssl-dev mercurial
+
 You will also need to install Docker for a number of test and dev
 environments to work. See the
 `official Docker instructions <https://docs.docker.com/installation/ubuntulinux/#installing-docker-on-ubuntu>`_
