@@ -266,8 +266,8 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
     def filterwrite(messages):
         # Mercurial 3.5 sends the output as one string.
         # Starting with Mercurial 3.9.1, the string is localized with
-        # _('remote %s\n').
-        if messages[0].startswith(_('remote: %s\n') % 'REVIEWBOARD'):
+        # _('remote: ').
+        if messages[0].startswith('%sREVIEWBOARD' % _('remote: ')):
             return True
 
         # Older versions have separate components.
