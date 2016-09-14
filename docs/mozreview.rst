@@ -25,13 +25,5 @@ Planned Features
 
 There are many features that we know people want and need. Many items
 are tracked in the `open bugs list <https://bugzilla.mozilla.org/buglist.cgi?resolution=---&product=MozReview&limit=0>`_.
-In addition, some high-level features that we want to build:
+In addition, we have a broad `road map <https://docs.google.com/document/d/1InULkB_8CaJ12pk5y_KqUJYEgoEQ15h-rfYEwKvL_8w>`_.
 
-* Git support. We only support Mercurial right now because it is the
-  canonical version control tool for Firefox and because it is easier to
-  extend Mercurial to perform productivity-enhancing magic.
-
-* Enhanced integration with Bugzilla. The two-way interaction between
-  Review Board and Bugzilla could be improved. For example, the comments
-  posted to Bugzilla could be better formatted and could contain better
-  details
