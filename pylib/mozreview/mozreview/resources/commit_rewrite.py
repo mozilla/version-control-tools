@@ -72,9 +72,8 @@ class CommitRewriteResource(WebAPIResource):
                 # This review request is approved (the repeated check is
                 # to ensure this is guaranteed if other parts of the code
                 # change) but we have an empty list of reviewers. We'll
-                # assume the author has just approved this themself and
-                # set r=me
-                reviewers.append('me')
+                # assume the author has just approved this themself.
+                reviewers.append(child_request.submitter.username)
 
             # Detect if the commit has been changed since the last review.
             shipit_carryforward = has_shipit_carryforward(child_request)
