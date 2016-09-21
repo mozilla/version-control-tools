@@ -29,7 +29,7 @@ mocking.**
 Running
 =======
 
-Tests are executed by running the following in an *activated*
+Tests are executed by running the following in a built
 :ref:`environment <devguide_create_env>`::
 
    $ ./run-tests
