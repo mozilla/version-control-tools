@@ -21,8 +21,8 @@ or greater, the top option, "Trigger a Try Build", will be enabled for
 you.  Note that it doesn't matter which review request in a given series
 you are on; all commits in the current series will be sent to Try.
 
-This option will open a dialog prompting for a Try string, with a link
-to the TryChooser Syntax Builder tool.  Once a build is started,
+This option will open a dialog prompting for a Try string, with an expandable
+panel for the TryChooser Syntax Builder tool.  Once a build is started,
 results will be visible under the commits table in all review requests
 in the series, with links to Mercurial and Treeherder.
 
