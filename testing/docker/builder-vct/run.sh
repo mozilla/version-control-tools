@@ -18,4 +18,5 @@ log file = /dev/stdout
   path = /vct-mount
 EOF
 
+rm -f /var/run/rsyncd.pid
 exec /usr/bin/rsync --no-detach --daemon --config /etc/rsyncd.conf "$@"
