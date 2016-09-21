@@ -33,6 +33,12 @@ HOST_FINGERPRINTS = {
     'hg.mozilla.org': 'af:27:b9:34:47:4e:e5:98:01:f6:83:2b:51:c9:aa:d8:df:fb:1a:27',
 }
 
+MODERN_FINGERPRINTS = {
+    'bitbucket.org': 'sha256:4e:65:3e:76:0f:81:59:85:5b:50:06:0c:c2:4d:3c:56:53:8b:83:3e:9b:fa:55:26:98:9a:ca:e2:25:03:92:47',
+    'bugzilla.mozilla.org': 'sha256:10:95:a8:c1:e1:c3:18:fa:e4:95:40:99:11:07:6d:e3:79:ab:e5:b0:29:50:ff:40:e8:e8:63:c4:fd:f3:9f:cb',
+    'hg.mozilla.org': 'sha256:81:3d:75:69:e3:76:f8:5b:31:1e:92:c9:cf:56:23:f6:4b:c2:82:77:e3:63:fb:7f:28:65:d0:9a:88:fb:be:b7',
+}
+
 INITIAL_MESSAGE = '''
 This wizard will guide you through configuring Mercurial for an optimal
 experience contributing to Mozilla projects.
@@ -726,19 +732,53 @@ def _checksecurity(ui, cw, hgversion):
     # Mercurial, the system CA store is used and old, legacy TLS protocols
     # are disabled. The default connection/security setting should
     # be sufficient and pinning certificates is no longer needed.
+
+    hg39 = util.versiontuple(n=2) >= (3, 9)
     modernssl = hasattr(ssl, 'SSLContext')
-    if not modernssl:
-        cw.c.setdefault('hostfingerprints', {})
+
+    def setfingerprints(porting=False):
         # Need to process in sorted order for tests to be deterministic.
-        for k, v in sorted(HOST_FINGERPRINTS.items()):
-            cw.c['hostfingerprints'][k] = v
+        if hg39:
+            cw.c.setdefault('hostsecurity', {})
+            for k, v in sorted(MODERN_FINGERPRINTS.items()):
+                if porting and k not in cw.c.get('hostfingerprints', {}):
+                    continue
+
+                cw.c['hostsecurity']['%s:fingerprints' % k] = v
+        else:
+            cw.c.setdefault('hostfingerprints', {})
+            for k, v in sorted(HOST_FINGERPRINTS.items()):
+                if porting and k not in cw.c['hostfingerprints']:
+                    continue
+
+                cw.c['hostfingerprints'][k] = v
+
+    if not modernssl:
+        setfingerprints()
 
     # We always update fingerprints if they are present. We /could/ offer to
     # remove fingerprints if running modern Python and Mercurial. But that
     # just adds more UI complexity and isn't worth it.
-    if 'hostfingerprints' in cw.c:
-        for k, v in sorted(HOST_FINGERPRINTS.items()):
-            cw.c['hostfingerprints'][k] = v
+    have_legacy = any(k in cw.c.get('hostfingerprints', {})
+                      for k in HOST_FINGERPRINTS)
+    have_modern = any('%s:fingerprints' % k in cw.c.get('hostsecurity', {})
+                      for k in MODERN_FINGERPRINTS)
+
+    if have_legacy or have_modern:
+        setfingerprints(porting=True)
+
+    # If we're using Mercurial 3.9, remove legacy fingerprints if they
+    # are present.
+    if have_legacy and hg39:
+        for k in HOST_FINGERPRINTS:
+            try:
+                del cw.c['hostfingerprints'][k]
+            except KeyError:
+                pass
+
+        # Delete empty config section.
+        if 'hostfingerprints' in cw.c and not cw.c['hostfingerprints']:
+            del cw.c['hostfingerprints']
 
 
 def _checkcodereview(ui, cw):
