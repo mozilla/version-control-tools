@@ -303,9 +303,9 @@ wizardsteps = set([
     'historyediting',
     'fsmonitor',
     'blackbox',
-    'wip',
     'security',
     'firefoxtree',
+    'wip',
     'codereview',
     'pushtotry',
     'multiplevct',
@@ -370,14 +370,14 @@ def configwizard(ui, repo, statedir=None, **opts):
                                'Enable logging of commands to help diagnose bugs '
                                'and performance problems')
 
-    if 'wip' in runsteps:
-        _checkwip(ui, cw)
-
     if 'security' in runsteps:
         _checksecurity(ui, cw, hgversion)
 
     if 'firefoxtree' in runsteps:
         _promptvctextension(ui, cw, 'firefoxtree', FIREFOXTREE_INFO)
+
+    if 'wip' in runsteps:
+        _checkwip(ui, cw)
 
     if 'codereview' in runsteps:
         _checkcodereview(ui, cw)
@@ -690,13 +690,28 @@ def _checkwip(ui, cw):
 
     cw.c['alias']['wip'] = 'log --graph --rev=wip --template=wip'
 
-    cw.c['revsetalias']['wip'] = ('('
+
+    wiprevset = ('('
                 'parents(not public()) '
                 'or not public() '
                 'or . '
                 'or (head() and branch(default))'
             ') and (not obsolete() or unstable()^) '
             'and not closed()')
+
+    if ui.hasconfig('extensions', 'firefoxtree') or 'firefoxtree' in cw.c.get('extensions', {}):
+        cw.c['revsetalias']['oldesrs'] = ('(' +
+            (" or ".join([
+                'esr10',
+                'esr17',
+                'esr24',
+                'esr31',
+                'esr38',
+            ])) + ')')
+        wiprevset += ' and not oldesrs'
+
+    cw.c['revsetalias']['wip'] = wiprevset
+
 
     cw.c['templates']['wip'] = ("'"
             # prefix with branch name
