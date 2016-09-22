@@ -77,8 +77,6 @@ def bmo_login(request):
         params['redirect'] = redirect
     callback_uri += '?' + urlencode(params)
 
-    logging.info('callback_uri: %s' % callback_uri)
-
     siteconfig = SiteConfiguration.objects.get_current()
     xmlrpc_url = siteconfig.get('auth_bz_xmlrpc_url')
     u = urlparse(xmlrpc_url)
