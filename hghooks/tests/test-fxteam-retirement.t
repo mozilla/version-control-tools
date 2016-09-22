@@ -23,6 +23,10 @@ A warning should be printed when pushing to the repo.
   
   Push access to this repository will be going away.
   
+  The repository will become read-only on October 3 except to
+  sheriffs and people who have pushed recently. The repository
+  will be read-only to everyone starting on November 1.
+  
   Please start changing your development workflow to base commits
   off of mozilla-central instead of fx-team.
   
@@ -44,6 +48,10 @@ A warning should be printed when pushing to the repo.
   The fx-team repository is in the process of being retired.
   
   Push access to this repository will be going away.
+  
+  The repository will become read-only on October 3 except to
+  sheriffs and people who have pushed recently. The repository
+  will be read-only to everyone starting on November 1.
   
   Please start changing your development workflow to base commits
   off of mozilla-central instead of fx-team.
