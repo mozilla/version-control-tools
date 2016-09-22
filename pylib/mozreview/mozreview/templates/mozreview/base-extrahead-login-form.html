@@ -2,5 +2,5 @@
 {% get_full as full %}
 
 {% if not full and not request.user.is_authenticated %}
-  <meta http-equiv="refresh" content="0;URL=//{{ request.get_host }}/mozreview/login/">
+  <meta http-equiv="refresh" content="0;URL=//{{ request.get_host }}/mozreview/login/?{{ request.META.QUERY_STRING }}">
 {% endif %}
