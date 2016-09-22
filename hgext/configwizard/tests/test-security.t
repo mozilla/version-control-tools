@@ -11,7 +11,7 @@
   To begin, press the enter/return key.
    <RETURN>
 
-#if !sslcontext
+#if no-sslcontext
 
   $ hg --config configwizard.steps=security,configchange configwizard
   This wizard will guide you through configuring Mercurial for an optimal
