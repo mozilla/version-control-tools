@@ -56,6 +56,17 @@
   }
 }
 
+// Hide the submitted actions on child requests.
+.commit-request {
+  #submitted-banner {
+    .banner-actions,
+    p,
+    pre {
+      display: none;
+    }
+  }
+}
+
 .actions {
   #close-review-request-link,
   #shipit-link,
