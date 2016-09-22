@@ -24,8 +24,8 @@ $(document).on("mozreview_ready", function() {
     type: 'GET',
     prefix: reviewRequest.get('sitePrefix'),
     noActivityIndicator: true,
-    url: '/api/review-requests/'+reviewRequest.get('id')+'/reviews/'
-       + '?max-results=200',
+    url: '/api/review-requests/'+reviewRequest.get('id')+'/reviews/' +
+         '?max-results=200',
     success: function(data) {
       _.forEach(data.reviews, function(item) {
         var flag = item.extra_data['p2rb.review_flag'];
@@ -44,7 +44,7 @@ $(document).on("mozreview_ready", function() {
         $(reviewText).prepend(
           $('<h4 class="body_top">'+flagDesc+'</h4>')
         );
-      })
+      });
     }
   });
 
@@ -61,4 +61,15 @@ $(document).on("mozreview_ready", function() {
      var $tip = $('<div></div>').attr('class', 'review-tooltip').appendTo($element);
      $('<div></div>').attr('class', 'review-tooltip-text').text(text).appendTo($tip);
   });
+
+  // Add a link to the parent on submitted children.
+  if (!MozReview.isParent) {
+    $('#submitted-banner').append(
+      $('<a></a>')
+        .addClass('reopen')
+        .attr('href', '/r/' + MozReview.parentID)
+        .attr('title', "You can only Reopen when viewing the 'Review Summary / Parent'")
+        .text('Reopen')
+    );
+  }
 });

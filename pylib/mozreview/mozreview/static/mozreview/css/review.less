@@ -56,13 +56,23 @@
   }
 }
 
-// Hide the submitted actions on child requests.
+// Hide the submitted actions on child requests,
+// and style the link to the parent.
 .commit-request {
   #submitted-banner {
     .banner-actions,
     p,
     pre {
       display: none;
+    }
+
+    .reopen {
+      &:hover {
+        text-decoration: underline;
+      }
+      margin-left: 1em;
+      color: #666;
+      text-decoration: none;
     }
   }
 }
