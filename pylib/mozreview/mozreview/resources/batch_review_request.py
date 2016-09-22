@@ -47,6 +47,9 @@ from reviewboard.webapi.resources import (
     WebAPIResource,
 )
 
+from mozreview.errors import (
+    REVIEW_REQUEST_UPDATE_NOT_ALLOWED,
+)
 from mozreview.extra_data import (
     AUTHOR_KEY,
     BASE_COMMIT_KEY,
@@ -71,6 +74,13 @@ from mozreview.review_helpers import (
 )
 
 logger = logging.getLogger(__name__)
+
+SUBMITTED_OR_DISCARDED_ERROR = '''
+Review request is submitted or discarded.
+You must reopen the review request before it can be updated.
+Review requests should only be reopened if your changes have not landed or have
+been backed out - file new bugs for follow-up work.
+'''.strip()
 
 
 class DiffProcessingException(Exception):
@@ -204,6 +214,7 @@ class BatchReviewRequestResource(WebAPIResource):
         LOGIN_FAILED,
         NOT_LOGGED_IN,
         PERMISSION_DENIED,
+        REVIEW_REQUEST_UPDATE_NOT_ALLOWED,
         SERVICE_NOT_CONFIGURED,
     )
     @webapi_request_fields(
@@ -364,10 +375,9 @@ class BatchReviewRequestResource(WebAPIResource):
             if squashed_rr.status != ReviewRequest.PENDING_REVIEW:
                 logger.warn('%s is not a pending review request; cannot edit' %
                             squashed_rr.id)
-                raise SubmissionException((INVALID_FORM_DATA, {
-                    'fields': {
-                        'identifier': ['Parent review request is '
-                               'submitted or discarded']}}))
+                raise SubmissionException(
+                    REVIEW_REQUEST_UPDATE_NOT_ALLOWED.with_message(
+                        SUBMITTED_OR_DISCARDED_ERROR))
 
             logger.info('using squashed review request %d' % squashed_rr.id)
 
