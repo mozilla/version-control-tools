@@ -5,9 +5,9 @@ $(document).ready(function() {
   // request ID (whether or not we're already looking at it), and set it as
   // the data-id attribute on the mozreview-parent-request element. Let's get
   // that first - because if we can't get it, we're stuck.
-  var parentID = $("#mozreview-parent-request").data("id");
+  MozReview.parentID = $("#mozreview-parent-request").data("id");
 
-  if (!parentID) {
+  if (!MozReview.parentID) {
     console.error("Could not find a valid id for the parent review " +
                   "request.");
     return;
@@ -32,7 +32,7 @@ $(document).ready(function() {
   // and commit review requests.
   var currentID = page.reviewRequest.id;
 
-  if (currentID == parentID) {
+  if (currentID == MozReview.parentID) {
       $("body").addClass("parent-request");
   } else {
       $("body").addClass("commit-request");
@@ -43,7 +43,7 @@ $(document).ready(function() {
   var pageView = page.reviewRequestEditorView;
 
   MozReview.currentIsMutableByUser = pageEditor.get("mutableByUser");
-  MozReview.isParent = (parentID == pageReviewRequest.id);
+  MozReview.isParent = (MozReview.parentID == pageReviewRequest.id);
   MozReview.reviewEditor = pageEditor;
   MozReview.parentView = MozReview.isParent ? pageView
                                             : null;
@@ -68,7 +68,7 @@ $(document).ready(function() {
       'approvalFailure'
     ].concat(RB.ReviewRequest.prototype.deserializedAttrs)
   });
-  MozReview.parentReviewRequest = new patchedRR({id: parentID});
+  MozReview.parentReviewRequest = new patchedRR({id: MozReview.parentID});
   // Kick off the fetch here so the data is ready ASAP,
   // we'll use it eventually.
   MozReview.parentReviewRequest.fetch();
