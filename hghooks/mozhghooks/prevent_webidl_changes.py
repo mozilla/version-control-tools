@@ -53,6 +53,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         'baku',             # Andrea Marchesini
         'ehsan',            # Ehsan Akhgari
         'bkelly',           # Ben Kelly
+        'billm',            # Bill McCloskey
 
         # Non-DOM peers who can review some WebIDL changes
         'hsinyi', 'htsai',  # Hsin-Yi Tsai for RIL APIs
@@ -75,6 +76,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         'ehsan.akhgari@gmail.com', # Ehsan Akhgari
         'bkelly@mozilla.com',      # Ben Kelly
         'ben@wanderview.com',      # Ben Kelly
+        'billm@mozilla.com',       # Bill McCloskey
     ]
     error = ""
     webidlReviewed = False
