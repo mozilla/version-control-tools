@@ -1,3 +1,5 @@
+#require watchman
+
   $ . $TESTDIR/hgext/configwizard/tests/helpers.sh
 
   $ cat > fakeversion.py << EOF
