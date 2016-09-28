@@ -246,14 +246,15 @@ $(document).on("mozreview_ready", function() {
   }
 
   function augmentNativeBanner() {
-    if (!MozReview.isParent) {
-      // Unfortunately we cannot publish from children, so provide a link
-      // to the parent instead.
-      var parent_rrid = $("#mozreview-data").data("parent-review-id");
-      $("#draft-banner").append(
-          $('<a href="/r/' + parent_rrid + '/" title="You can only Publish or Discard when ' +
-            'viewing the \'Review Summary / Parent\'.">Publish or Discard my changes.</a>'));
-    }
+    var $draftBanner = $("#draft-banner");
+    if (MozReview.isParent || $draftBanner.data("appended")) { return; }
+
+    // Unfortunately we cannot publish from children, so provide a link
+    // to the parent instead.
+    var parent_rrid = $("#mozreview-data").data("parent-review-id");
+    $draftBanner.data("appended", 1).append(
+        $('<a href="/r/' + parent_rrid + '/" title="You can only Publish or Discard when ' +
+          'viewing the \'Review Summary / Parent\'.">Publish or Discard my changes.</a>'));
   }
 
   var editors = {};
