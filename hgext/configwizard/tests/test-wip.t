@@ -220,7 +220,7 @@ wip alias ignores old esrs if using firefoxtree
    wip = '{label("log.branch", branches)} {label("changeset.{phase}", rev)}{label("changeset.{phase}", ":")}{label("changeset.{phase}", short(node))} {label("grep.user", author|user)}{label("log.tag", if(tags," {tags}"))}{label("log.tag", if(fxheads," {fxheads}"))} {label("log.bookmark", if(bookmarks," {bookmarks}"))}\n{label(ifcontains(rev, revset("."), "desc.here"),desc|firstline)}'
    [extensions]
    pager =
-  +firefoxtree = */version-control-tools/hgext/firefoxtree (glob)
+  +firefoxtree = */hgext/firefoxtree (glob)
    [pager]
    pager = LESS=FRSXQ less
    attend-help = true
