@@ -16,8 +16,9 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
 
     # All changesets from node to "tip" inclusive are part of this push.
     rev = repo.changectx(node).rev()
-    tip = repo.changectx('tip').rev()
-    tip_node = short(repo.changectx(tip).node())
+    tipctx = repo['tip']
+    tip = tipctx.rev()
+    tip_node = tipctx.hex()
 
     num_changes = tip + 1 - rev
     url = 'https://hg.mozilla.org/%s/' % repo_name
@@ -27,7 +28,7 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
         ui.write('\nView your change%s here:\n' % plural)
 
         for i in xrange(rev, tip + 1):
-            node = short(repo.changectx(i).node())
+            node = repo[i].hex()
             ui.write('  %srev/%s\n' % (url, node))
     else:
         ui.write('\nView the pushlog for these changes here:\n')
