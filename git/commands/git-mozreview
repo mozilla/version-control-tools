@@ -562,6 +562,45 @@ def push_command(args):
             ui.write('(visit review url to publish these review requests so others '
                   'can see them)\n')
 
+def fetch_command(args):
+    ui = gethgui()
+    git_config = get_git_config()
+
+    fetch_url = git_config["mozreview.remote"]
+    if not fetch_url:
+        ui.write('No mozreview.remote is configured')
+        return 1
+
+    if not args.revision:
+        ui.write('You must specify the revision to pull')
+        return 1
+
+    # Have cinnabar do the fetch. We do this directly via subprocess.call so
+    # the output from the command, including progress indicators, are seen
+    # by the user.
+    fetch_args = [
+        'git',
+        'cinnabar',
+        'fetch',
+        fetch_url,
+        args.revision,
+    ]
+    res = subprocess.call(fetch_args)
+    if res:
+        print('Failed to fetch the specified revision; aborting')
+        return 1
+
+    # it worked - so show some helpful advice.
+    ui.write('\nThe specific revisions can now be referenced via FETCH_HEAD.')
+    ui.write(' For example:\n')
+    ui.write('* You can check out the code to build by executing\n')
+    ui.write('  % git checkout FETCH_HEAD\n')
+    ui.write('* You can create a new branch from those revisions by executing\n')
+    ui.write('  % git checkout -b new-branch-name FETCH_HEAD\n')
+    ui.write('* You can merge the changes into your current branch by executing\n')
+    ui.write('  % git merge\n')
+    ui.write('See the git documentation for more information.\n')
+    return 0
 
 def configure_command(args):
     """Configure the local repository to submit to MozReview."""
@@ -785,6 +824,15 @@ def main(args):
             nargs='?')
 
     sp = subparsers.add_parser(
+            'fetch',
+            help='fetch MozReview commits into this repository. This is sugar'
+                 ' around |get cinnabar fetch'
+                 ' {reviewboard_url} {revision}|')
+    sp.add_argument(
+            'revision',
+            help='commit to fetch')
+
+    sp = subparsers.add_parser(
             'configure',
             help='configure mozreview integration for this repo')
     sp.add_argument(
@@ -833,6 +881,8 @@ def main(args):
 
         if command == 'push':
             return push_command(args)
+        elif command == 'fetch':
+            return fetch_command(args)
         elif command == 'configure':
             return configure_command(args)
         elif command == 'commit-msg-hook':
