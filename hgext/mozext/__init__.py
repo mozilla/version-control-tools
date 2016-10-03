@@ -592,7 +592,7 @@ def treeherder(ui, repo, tree=None, rev=None, **opts):
 
     push_node = push.last_node
 
-    url = treeherder_url(tree, push_node[0:12])
+    url = treeherder_url(tree, push_node)
 
     import webbrowser
     webbrowser.get('firefox').open(url)
@@ -681,7 +681,7 @@ def print_changeset_pushes(ui, repo, rev, all=False):
         if len(releases):
             release = sorted(releases)[0]
 
-        url = treeherder_url(tree, hex(head_node)[0:12])
+        url = treeherder_url(tree, hex(head_node))
         date = datetime.datetime.fromtimestamp(when)
         ui.write(release.ljust(8), tree.ljust(longest_tree), date.isoformat(),
             ' ', user.ljust(longest_user), url or '', '\n')
@@ -1258,7 +1258,7 @@ def template_firstpushtreeherder(repo, ctx, **args):
     push = pushes[0]
     tree, node = push[0], push[4]
 
-    return treeherder_url(tree, hex(node)[0:12])
+    return treeherder_url(tree, hex(node))
 
 
 def template_firstpushdate(repo, ctx, **args):
