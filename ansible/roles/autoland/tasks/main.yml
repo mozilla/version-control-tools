@@ -1,0 +1,114 @@
+---
+- include: repos.yml
+- include: packages.yml
+- include: ssh.yml
+
+- name: create autoland user
+  become: true
+  user: name=autoland
+        shell=/bin/bash
+        system=yes
+        state=present
+
+- name: create virtualenv for autoland
+  include: ../../../tasks/virtualenv.yml
+           venv=/home/autoland/autoland_venv
+           requirements=../files/requirements.txt
+
+- name: set up version-control-tools repo
+  become: true
+  become_user: autoland
+  hg: repo={{ vct_repo }}
+      dest=/home/autoland/version-control-tools
+      revision={{ rev }}
+      force=yes
+      purge=yes
+
+# Ansible hg module fails to delete ignored files so we do that here
+- name: delete ignored files from version-control-tools repo
+  become: true
+  become_user: autoland
+  command: hg --config extensions.purge= -R /home/autoland/version-control-tools purge --all
+
+- name: install autoland site hgrc
+  copy: src=/home/autoland/version-control-tools/autoland/hg/autoland_hgrc
+        dest=/home/autoland/.hgrc
+        owner=autoland
+        group=autoland
+        mode=0644
+        remote_src=yes
+
+- name: install config.json
+  template: src=config.json.j2
+            dest=/home/autoland/version-control-tools/autoland/autoland/config.json
+            owner=autoland
+            group=autoland
+            mode=0600
+  notify:
+    - restart autoland
+
+- name: link config.json
+  file: src=/home/autoland/version-control-tools/autoland/autoland/config.json
+        dest=/home/autoland/config.json
+        owner=autoland
+        group=autoland
+        mode=0600
+        state=link
+
+- name: install autoland service
+  copy: remote_src=yes
+        dest=/etc/systemd/system/autoland.service
+        src=/home/autoland/version-control-tools/autoland/systemd/autoland.service
+        mode=0664
+  notify:
+    - reload systemd
+
+- name: enable autoland service
+  service: name=autoland
+           state=started
+           enabled=yes
+
+- name: setup main conf file
+  copy: src=httpd.conf
+        dest=/etc/httpd/conf/httpd.conf
+  notify:
+    - restart apache
+
+- name: remove conf.d
+  file: path=/etc/httpd/conf.d/
+        state=absent
+
+- name: install autoland site
+  copy: src=/home/autoland/version-control-tools/autoland/apache/autoland.conf
+        dest=/etc/httpd/conf/autoland.conf
+        remote_src=yes
+  notify:
+    - restart apache
+
+- name: copy tls certs
+  copy: dest=/etc/pki/tls/certs/autoland.allizom.org.crt
+        src=/opt/secrets/autoland/ssl/{{ inventory_hostname }}.crt
+        remote_src=yes
+  notify:
+    - restart apache
+
+- name: copy tls key
+  copy: dest=/etc/pki/tls/private/autoland.allizom.org.key
+        src=/opt/secrets/autoland/ssl/{{ inventory_hostname }}.key
+        mode=600
+        remote_src=yes
+  notify:
+    - restart apache
+
+- name: copy tls CA chain file
+  copy: dest=/etc/pki/tls/certs/DigiCertCA.crt
+        src=/opt/secrets/autoland/ssl/DigiCertCA.crt
+        remote_src=yes
+  notify:
+    - restart apache
+
+- name: start apache
+  service: name=httpd
+           state=started
+           enabled=yes
+

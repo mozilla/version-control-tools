@@ -1,0 +1,35 @@
+---
+
+- include: packages.yml
+
+# Copy all plugins
+- name: copy plugins
+  copy: src={{ item }}
+        dest=/usr/lib64/nagios/plugins/
+        owner=root
+        group=root
+        mode=0755
+  with_fileglob:
+    - plugins/*
+
+# Setup base nrpe config
+- name: copy nrpe.cfg
+  copy: src=nrpe.cfg
+        dest=/etc/nagios/nrpe.cfg
+        owner=root
+        group=root
+        mode=0644
+  notify: restart nagios-nrpe-server
+
+- name: copy nrpe_commands.cfg
+  copy: src=nrpe_commands.cfg
+        dest=/etc/nrpe.d/nrpe_commands.cfg
+        owner=root
+        group=root
+        mode=0644
+  notify: restart nagios-nrpe-server
+
+- name: enable nrpe service
+  service: name=nrpe
+           state=started
+           enabled=yes

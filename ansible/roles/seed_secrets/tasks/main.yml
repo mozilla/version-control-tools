@@ -1,0 +1,22 @@
+---
+- name: create secrets dir
+  file: path=/opt/secrets/
+        state=directory
+        owner=root
+        group=root
+        mode=0700
+
+- name: seed secrets dir
+  copy: src={{ secrets_repo_path }}/ansible-vault/{{ inventory_hostname }}/{{ item }}
+               dest=/opt/secrets
+               force=yes
+  with_items: "{{ products }}"
+
+- name: set user and group
+  file: path=/opt/secrets/{{ item }}
+        owner=root
+        group=root
+        recurse=yes
+        mode="g-rwx,o-rwx"
+        state=directory
+  with_items: "{{ products }}"

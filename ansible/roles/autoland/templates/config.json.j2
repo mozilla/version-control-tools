@@ -1,0 +1,11 @@
+{
+  "auth": {
+    "mozreview": "{{ secrets.mozreview_token }}"
+  },
+  "bugzilla": {
+    "user": "{{ secrets.bugzilla_user }}",
+    "passwd": "{{ secrets.bugzilla_password  }}"
+  },
+  "database": "dbname={{ secrets.db_name }} user={{ secrets.db_user }} password={{ secrets.db_password }} host={{ secrets.db_host }}",
+  "repos" : {{ repos | to_json }}
+}

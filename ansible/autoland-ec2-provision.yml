@@ -1,0 +1,18 @@
+---
+- name: provision autoland instance
+  hosts: default
+  user: centos
+  become: true
+
+  pre_tasks:
+  - name: import autoland secrets
+    shell: cat /opt/secrets/autoland/autoland_vars.yml
+    register: autoland_vars
+
+  - name: set autoland secrets as yaml fact
+    set_fact: autoland_secrets="{{ autoland_vars.stdout | from_yaml }}"
+
+  roles:
+    - { role: common }
+    - { role: autoland, secrets: "{{ autoland_secrets }}" }
+    - { role: nrpe }

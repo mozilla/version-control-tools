@@ -1,0 +1,17 @@
+---
+    - name: Create tmp directory for packages
+      file: path=/var/tmp/custom_packages/
+            mode=0755
+            state=directory
+
+    - name: Download custom packages from s3
+      get_url: url=https://s3-us-west-2.amazonaws.com/moz-mozreview/repos/yum/centos7/x86_64/{{ item.name }}
+               dest=/var/tmp/custom_packages/{{ item.name }}
+               checksum={{ item.sha256sum }}
+      with_items: "{{ custom_packages }}"
+
+    - name: Install custom packages
+      yum: name=/var/tmp/custom_packages/{{ item.name }}
+           state=present
+      with_items: "{{ custom_packages }}"
+

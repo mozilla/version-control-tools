@@ -1,0 +1,6 @@
+---
+- include: yum_epel_update.yml
+- include: custom_packages.yml
+
+- name: set hostname
+  hostname: name={{ inventory_hostname }}

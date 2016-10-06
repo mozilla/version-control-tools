@@ -1,0 +1,28 @@
+---
+- name: install packages required by autoland
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+    - gcc
+    - openssh-clients
+    - postgresql
+    - python-devel
+    - python-pip
+    - libffi
+    - libffi-devel
+    - libpqxx-devel
+    - openssl-devel
+    - httpd
+    - mod_wsgi
+    - mod_ssl
+    - ca-certificates
+
+- name: download Mozilla rpms
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/{{ item.path }}
+           dest=/var/tmp/{{ item.path }}
+           sha256sum={{ item.sha256 }}
+  with_items:
+    - { path: mercurial-3.9.1-1.x86_64.rpm, sha256: 67543d6b8d855c7d4acf5adebf5ecda976a57edcf2c985410cf07fdba76e1aac }
+
+- name: install Mozilla rpms
+  command: yum localinstall -y /var/tmp/mercurial-3.9.1-1.x86_64.rpm
+

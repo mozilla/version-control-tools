@@ -1,0 +1,9 @@
+- name: install nrpe
+  become: true
+  yum: name=nrpe
+       state=present
+
+- name: install nagios-plugins-all
+  yum: name=nagios-plugins-all
+       state=present
+  notify: restart nagios-nrpe-server
