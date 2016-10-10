@@ -106,7 +106,7 @@ annotateline = '
         <div>
           <a href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}#l{targetline}">
             {node|short}</a>
-          {desc|escape|firstline}
+          {desc|escape|firstline|buglink}
         </div>
         <div><em>{author|obfuscate}</em></div>
         <div>parents: {parents%annotateparent}</div>
