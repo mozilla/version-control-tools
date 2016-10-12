@@ -38,25 +38,26 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         return 0
 
     DOM_peers = [
-        'jst',              # Johnny Stenback
-        'peterv',           # Peter Van der Beken
-        'bz', 'bzbarsky',   # Boris Zbarsky
-        'sicking', 'jonas', # Jonas Sicking
-        'smaug',            # Olli Pettay
-        'bent',             # Ben Turner
-        'mounir',           # Mounir Lamouri
-        'khuey',            # Kyle Huey
-        'jlebar',           # Justin Lebar
-        'hsivonen',         # Henri Sivonen
-        'mrbkap',           # Blake Kaplan
-        'bholley',          # Bobby Holley
-        'baku',             # Andrea Marchesini
-        'ehsan',            # Ehsan Akhgari
-        'bkelly',           # Ben Kelly
-        'billm',            # Bill McCloskey
+        'jst',               # Johnny Stenback
+        'peterv',            # Peter Van der Beken
+        'bz', 'bzbarsky',    # Boris Zbarsky
+        'sicking', 'jonas',  # Jonas Sicking
+        'smaug',             # Olli Pettay
+        'bent',              # Ben Turner
+        'mounir',            # Mounir Lamouri
+        'khuey',             # Kyle Huey
+        'jlebar',            # Justin Lebar
+        'hsivonen',          # Henri Sivonen
+        'mrbkap',            # Blake Kaplan
+        'bholley',           # Bobby Holley
+        'baku',              # Andrea Marchesini
+        'ehsan',             # Ehsan Akhgari
+        'bkelly',            # Ben Kelly
+        'billm',             # Bill McCloskey
+        'qdot', 'kmachulis', # Kyle Machulis
 
         # Non-DOM peers who can review some WebIDL changes
-        'hsinyi', 'htsai',  # Hsin-Yi Tsai for RIL APIs
+        'hsinyi', 'htsai',   # Hsin-Yi Tsai for RIL APIs
     ]
     DOM_authors = [
         'jst@mozilla.com',         # Johnny Stenback
@@ -76,7 +77,10 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         'ehsan.akhgari@gmail.com', # Ehsan Akhgari
         'bkelly@mozilla.com',      # Ben Kelly
         'ben@wanderview.com',      # Ben Kelly
-        'billm@mozilla.com',       # Bill McCloskey
+        'billm@mozilla.com',       # Bill McCloskey,
+        'qdot@mozilla.com',        # Kyle Machulis
+        'kmachulis@mozilla.com',   # Kyle Machulis
+        'kyle@nonpolynomial.com',  # Kyle Machulis
     ]
     error = ""
     webidlReviewed = False
