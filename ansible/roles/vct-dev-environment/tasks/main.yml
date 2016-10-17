@@ -18,6 +18,7 @@
     - libxml2-devel
     - libxslt-devel
     - openldap-devel
+    - openssl-devel
     # mozreview test harness dependencies
     - mercurial
     - unzip
