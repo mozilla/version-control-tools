@@ -3,18 +3,26 @@
 
 # nodejs is a reviewboard build dependency.
 
-# For nodejs and npm
+# Required for the nodesource packages
 - name: enable epel-release repo
   yum: name=epel-release state=present
 
-- name: install nodejs and npm
-  yum: name={{ item }} state=latest
-  with_items:
-    - nodejs
-    - npm
+- name: import the nodesource rpm key.
+  rpm_key:
+    key: https://rpm.nodesource.com/pub/el/NODESOURCE-GPG-SIGNING-KEY-EL
+    state: present
 
-# npm v1.3.6 halts waiting for user input, even with '-y'.  Upgrade to the
-# latest version so 'npm init -y' works properly.
-# FIXME: make this idempotent
-- name: upgrade npm
-  command: /usr/bin/npm -g install npm
+# Nodesource provides an installation shell script instead of a repo file.
+# Rather than running this larger script we'll just take the two main steps
+# for CentOS 7 and execute them directly.
+# URL pulled from script at: https://rpm.nodesource.com/setup_6.x
+- name: add the nodesource repositories.
+  yum:
+    name: "https://rpm.nodesource.com/pub_6.x/el/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/nodesource-release-el{{ ansible_distribution_major_version }}-1.noarch.rpm"
+    state: present
+
+- name: install nodejs and npm.
+  yum:
+    name: nodejs
+    state: present
+    enablerepo: "epel,nodesource"
