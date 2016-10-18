@@ -9,3 +9,8 @@
 # TODO hook up rb-site install/upgrade.
 # Be sure to use --copy-media because symlinks aren't portable with our
 # rsync setup.
+
+- name: create virtualenv for reviewboard-admin
+  include: ../../../tasks/virtualenv.yml
+           venv=/var/reviewboard/venv_rbadmin
+           requirements=../roles/reviewboard-admin/files/requirements-rbadmin.txt
