@@ -7,11 +7,11 @@
   $ hg -q clone server client
   $ cd client
 
-A warning should be printed when pushing to the repo.
+Users not in the list can't push
 
   $ touch file0
   $ hg -q commit -A -m initial
-  $ hg push
+  $ USER=someone@mozilla.com hg push
   pushing to $TESTTMP/server
   searching for changes
   adding changesets
@@ -23,7 +23,35 @@ A warning should be printed when pushing to the repo.
   
   Push access to this repository will be going away.
   
-  The repository will become read-only on October 3 except to
+  The repository became read-only on October 19 except to
+  sheriffs and people who have pushed recently. The repository
+  will be read-only to everyone starting on November 1.
+  
+  YOU NO LONGER HAVE PUSH ACCESS TO FX-TEAM.
+  
+  Please land commits via MozReview+Autoland. Or, use
+  mozilla-inbound (but it will be going away eventually too)
+  ************************************************************************
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.fxteam hook failed
+  [255]
+
+A warning should be printed when an allowed user pushes
+
+  $ USER=ahunt@mozilla.com hg push
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  ************************************************************************
+  The fx-team repository is in the process of being retired.
+  
+  Push access to this repository will be going away.
+  
+  The repository became read-only on October 19 except to
   sheriffs and people who have pushed recently. The repository
   will be read-only to everyone starting on November 1.
   
@@ -37,7 +65,7 @@ A warning should be printed when pushing to the repo.
 
   $ touch file1
   $ hg -q commit -A -m head1
-  $ hg push
+  $ USER=ahunt@mozilla.com hg push
   pushing to $TESTTMP/server
   searching for changes
   adding changesets
@@ -49,7 +77,7 @@ A warning should be printed when pushing to the repo.
   
   Push access to this repository will be going away.
   
-  The repository will become read-only on October 3 except to
+  The repository became read-only on October 19 except to
   sheriffs and people who have pushed recently. The repository
   will be read-only to everyone starting on November 1.
   
