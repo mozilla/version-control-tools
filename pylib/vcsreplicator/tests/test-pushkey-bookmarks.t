@@ -26,7 +26,7 @@ Create the repository and push a change
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
+  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
 Phases should be updated on normal push
@@ -102,7 +102,7 @@ We send a changegroup and a pushkey but don't process them immediately
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/2777163b5938
+  remote:   https://hg.mozilla.org/mozilla-central/rev/2777163b593873bfa63c7129e02a21becc299ff0
   remote: recorded changegroup in replication log in \d\.\d+s (re)
   updating bookmark my-bookmark
 

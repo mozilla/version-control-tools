@@ -48,7 +48,7 @@
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/obs/rev/77538e1ce4be
+  remote:   https://hg.mozilla.org/obs/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
   $ consumer --onetime
@@ -73,8 +73,8 @@ Pruning a changeset locally and pushing should result in obsolescence marker on 
   remote: recorded push in pushlog
   remote: 
   remote: View your changes here:
-  remote:   https://hg.mozilla.org/obs/rev/442ce5a124e0
-  remote:   https://hg.mozilla.org/obs/rev/11bec8a6b2a3
+  remote:   https://hg.mozilla.org/obs/rev/442ce5a124e001862e8bd6a8871d8b85e09bebd7
+  remote:   https://hg.mozilla.org/obs/rev/11bec8a6b2a30ac170575ecfd7a06af5a75e2d77
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
   $ consumer --onetime
@@ -103,8 +103,8 @@ Pruning a changeset locally and pushing should result in obsolescence marker on 
   remote: 1 new obsolescence markers
   remote: 
   remote: View your changes here:
-  remote:   https://hg.mozilla.org/obs/rev/5dfb8fc50086
-  remote:   https://hg.mozilla.org/obs/rev/67b45555a21f
+  remote:   https://hg.mozilla.org/obs/rev/5dfb8fc50086c183d1cbd067e48c58307db16dac
+  remote:   https://hg.mozilla.org/obs/rev/67b45555a21f4d9d470adc4f1ed3af63918f6414
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
@@ -196,7 +196,7 @@ Pushing obsolescence marker without bundle2 works
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/obs/rev/de9a6dc9203d
+  remote:   https://hg.mozilla.org/obs/rev/de9a6dc9203d34261c1e2bea219bdd6053d74dda
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
   $ consumer --dump --partition 2
@@ -231,7 +231,7 @@ Pushing obsolescence marker without bundle2 works
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/obs/rev/33e52188e177
+  remote:   https://hg.mozilla.org/obs/rev/33e52188e17750dee7ec7a6b05b5f707ebc2cba9
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
@@ -295,8 +295,8 @@ Now let's check what happens when replication is lagging
   remote: 2 new obsolescence markers
   remote: 
   remote: View your changes here:
-  remote:   https://hg.mozilla.org/obs/rev/274cd1d986ab
-  remote:   https://hg.mozilla.org/obs/rev/27eddb78301f
+  remote:   https://hg.mozilla.org/obs/rev/274cd1d986ab248aae0dfb9a902f7b6c823daec4
+  remote:   https://hg.mozilla.org/obs/rev/27eddb78301f686b0894dadaa2deb6dfbb080123
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
@@ -314,8 +314,8 @@ Now let's check what happens when replication is lagging
   remote: 2 new obsolescence markers
   remote: 
   remote: View your changes here:
-  remote:   https://hg.mozilla.org/obs/rev/4dabe70969ca
-  remote:   https://hg.mozilla.org/obs/rev/84b66e579087
+  remote:   https://hg.mozilla.org/obs/rev/4dabe70969cafe3378dd579fb186ce31d168ff0a
+  remote:   https://hg.mozilla.org/obs/rev/84b66e579087f83fdd8ea21456fe68a1c9b60cbe
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 

@@ -53,7 +53,7 @@ Disabling a single Kafka node should still allow push to go through
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/40a8cea9915c
+  remote:   https://hg.mozilla.org/mozilla-central/rev/40a8cea9915cba8d31ed63df374ae8847350a99b
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
 Disabling 2 Kafka nodes should result in no quorum and failure to push
@@ -102,7 +102,7 @@ Adding node back in should result in being able to push again
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/f783dc6187dd
+  remote:   https://hg.mozilla.org/mozilla-central/rev/f783dc6187dd50644a1db0d923e877cdac181f5b
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
 Fully stopping the cluster shoud result in sane error message
@@ -146,7 +146,7 @@ clean shutdown (which there was).
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/324ebd5068e8
+  remote:   https://hg.mozilla.org/mozilla-central/rev/324ebd5068e8c3efc0e493d3f4ce1b4012bec0ec
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
 Stopping Kafka on hgssh node doesn't break pushes
@@ -178,7 +178,7 @@ Stopping Kafka on hgssh node doesn't break pushes
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/145bfa9e3455
+  remote:   https://hg.mozilla.org/mozilla-central/rev/145bfa9e345587f76bb4967d00ad7e0204fd9dd0
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
 Cleanup

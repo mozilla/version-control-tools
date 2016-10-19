@@ -51,8 +51,8 @@
   remote: recorded push in pushlog
   remote: 
   remote: View your changes here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
-  remote:   https://hg.mozilla.org/mozilla-central/rev/04da6c25817b
+  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  remote:   https://hg.mozilla.org/mozilla-central/rev/04da6c25817b564b37238ee5144e5adf2af0cb5b
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
   exporting bookmark bm1
 
@@ -66,7 +66,7 @@
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/e7d8e0aefcf6
+  remote:   https://hg.mozilla.org/mozilla-central/rev/e7d8e0aefcf6bcc137a21978e9a431c5b0dafd86
   remote: recorded changegroup in replication log in \d\.\d+s (re)
   exporting bookmark bm2
 
@@ -113,7 +113,7 @@ Push a bookmark update
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/b222465a31a1
+  remote:   https://hg.mozilla.org/mozilla-central/rev/b222465a31a101470b94a950392809801a91d3da
   remote: recorded changegroup in replication log in \d\.\d+s (re)
   updating bookmark bm2
 

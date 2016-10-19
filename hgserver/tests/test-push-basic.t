@@ -50,7 +50,7 @@ Pushing via ssh:// works
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
+  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
 Blackbox logging recorded appropriate entries
@@ -137,7 +137,7 @@ Upgrade notice is advertised to clients not running bundle2
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/425a9d45c43d
+  remote:   https://hg.mozilla.org/mozilla-central/rev/425a9d45c43d833916e3c803300ba4488374ac0e
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
 Cleanup

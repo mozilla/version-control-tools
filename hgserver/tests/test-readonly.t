@@ -26,7 +26,7 @@ Pushing works as expected
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
+  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
 Marking individual repo as read-only works

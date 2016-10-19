@@ -43,7 +43,7 @@ A push works
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/repo1/rev/77538e1ce4be
+  remote:   https://hg.mozilla.org/repo1/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ hgmo clean

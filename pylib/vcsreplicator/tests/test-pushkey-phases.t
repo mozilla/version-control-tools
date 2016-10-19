@@ -35,7 +35,7 @@ Create the repository and push a change
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
+  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ hg log -T '{rev} {phase}\n'
@@ -116,8 +116,8 @@ processing on the mirror.
   remote: recorded push in pushlog
   remote: 
   remote: View your changes here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/7dea706c1724
-  remote:   https://hg.mozilla.org/mozilla-central/rev/fde0c4117655
+  remote:   https://hg.mozilla.org/mozilla-central/rev/7dea706c17247788835d1987dc7103ffc365c338
+  remote:   https://hg.mozilla.org/mozilla-central/rev/fde0c41176556d1ec1bcf85e66706e5e76012508
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ consumer --dump --partition 2

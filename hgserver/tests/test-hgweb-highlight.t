@@ -34,8 +34,8 @@ Create a repository
   remote: recorded push in pushlog
   remote: 
   remote: View your changes here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
-  remote:   https://hg.mozilla.org/mozilla-central/rev/eefea2647aef
+  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  remote:   https://hg.mozilla.org/mozilla-central/rev/eefea2647aef3c12004101eccb526a485b0144a4
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini

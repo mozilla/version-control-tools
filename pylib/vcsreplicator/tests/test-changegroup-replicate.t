@@ -27,7 +27,7 @@ Pushing the initial commit will result in replication messages
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4be
+  remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ consumer --dump --partition 2
@@ -96,9 +96,9 @@ Pushing multiple commits results in sane behavior
   remote: recorded push in pushlog
   remote: 
   remote: View your changes here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/e325efa1b1fb
-  remote:   https://hg.mozilla.org/mozilla-central/rev/e79f1fe30cb2
-  remote:   https://hg.mozilla.org/mozilla-central/rev/4f52aeca631d
+  remote:   https://hg.mozilla.org/mozilla-central/rev/e325efa1b1fb7cb9e7f231851436db4de63e0a26
+  remote:   https://hg.mozilla.org/mozilla-central/rev/e79f1fe30cb27c83477cbb2880367ca8ed54367e
+  remote:   https://hg.mozilla.org/mozilla-central/rev/4f52aeca631dfa94331d93cfeaf069526926385a
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ consumer --dump --partition 2 --start-from 5
@@ -170,10 +170,10 @@ Pushing multiple heads results in appropriate behavior
   remote: recorded push in pushlog
   remote: 
   remote: View your changes here:
-  remote:   https://hg.mozilla.org/mozilla-central/rev/5d9ed3f8efff
-  remote:   https://hg.mozilla.org/mozilla-central/rev/4c9443886fe8
-  remote:   https://hg.mozilla.org/mozilla-central/rev/a7e1131c1b7c
-  remote:   https://hg.mozilla.org/mozilla-central/rev/4b11352745a6
+  remote:   https://hg.mozilla.org/mozilla-central/rev/5d9ed3f8efffe0777be762f2a35927cc3be3eeef
+  remote:   https://hg.mozilla.org/mozilla-central/rev/4c9443886fe84db9a4a5f29a5777517d2890d308
+  remote:   https://hg.mozilla.org/mozilla-central/rev/a7e1131c1b7cda934c8eef30932718654c7b4671
+  remote:   https://hg.mozilla.org/mozilla-central/rev/4b11352745a6b3eb429ca8cd486dfdc221a4bc62
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
   $ consumer --dump --partition 2 --start-from 8

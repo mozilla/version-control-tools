@@ -83,9 +83,9 @@ Create initial repo content
   remote: recorded push in pushlog
   remote: 
   remote: View your changes here:
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/77538e1ce4be
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/ba1c6c2be69c
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/a9e729deb87c
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/ba1c6c2be69c46fed329d3795c9d906d252fdaf7
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/a9e729deb87c57f067a862aff25644d62d6bac16
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
 Verify pushlog state on hgweb machine
@@ -125,7 +125,7 @@ Create some obsolescence markers
   remote: 1 new obsolescence markers
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/5217e2ac5b15
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/5217e2ac5b1538d1630aa54377056dbfab270508
   remote: recorded changegroup in replication log in \d\.\d+s (re)
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
   $ cd ..
@@ -182,7 +182,7 @@ Pushing a changeset then hiding it works
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/8713015ee6f2
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/8713015ee6f2dc22a64a7821684d7119323dc119
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
   $ hg push -f -r 6ddbc9389e71 ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/users/user_example.com/repo-1
@@ -194,7 +194,7 @@ Pushing a changeset then hiding it works
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/6ddbc9389e71
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/6ddbc9389e710d9b4f3c880d7c99320f9581dbd5
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
   $ hg rebase -s 6ddbc9389e71 -d 8713015ee6f2
@@ -210,7 +210,7 @@ Pushing a changeset then hiding it works
   remote: 1 new obsolescence markers
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/042a67bdbae8
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/042a67bdbae8a8b4c4b071303ad92484cf1746b0
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
@@ -297,7 +297,7 @@ and we're not in the allowed user list
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/integration/autoland/rev/d57129f00b2f
+  remote:   https://hg.mozilla.org/integration/autoland/rev/d57129f00b2f329fc2cf3371a0c28796bcfbde1c
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/integration/autoland debugobsolete
@@ -332,7 +332,7 @@ Pushing again should send obsolescence markers
   remote: 2 new obsolescence markers
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/integration/autoland/rev/9e2d548e5f1f
+  remote:   https://hg.mozilla.org/integration/autoland/rev/9e2d548e5f1f94b9172cfeb77b53f5943722b594
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
