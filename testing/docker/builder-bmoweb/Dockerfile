@@ -88,7 +88,7 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
   patchutils pkg-config python3-mysql.connector \
   python-psutil supervisor unzip wget
 
-RUN git clone --depth 1 https://github.com/mozilla-bteam/bmo.git $BUGZILLA_HOME/bugzilla
+RUN git clone https://github.com/mozilla-bteam/bmo.git $BUGZILLA_HOME/bugzilla
 
 # BMO packages its dependencies in a carton bundle.  See
 # https://github.com/mozilla-bteam/carton-bundles for details.
@@ -124,3 +124,6 @@ EXPOSE 80
 
 ENTRYPOINT ["/bmoweb_entrypoint.py"]
 CMD ["/usr/bin/supervisord"]
+
+# Temporarily pin commit until bug 1311165 is resolved.
+ENV BMO_COMMIT 2f310fba9800f9d106ad8090cbbfb628c53599a1
