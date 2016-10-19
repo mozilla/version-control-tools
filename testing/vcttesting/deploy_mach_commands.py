@@ -43,6 +43,15 @@ class DeployCommands(object):
         from vcttesting.deploy import mozreview_create_repo as deploy
         return deploy(verbosity=verbosity)
 
+    @Command('github-webhooks', category='deploy',
+             description='GitHub Web Hooks Lambda functions')
+    def github_webhooks(self):
+        from vcttesting.deploy import github_webhook_lambda
+
+        password = raw_input('Please enter password for Pulse user: ')
+
+        github_webhook_lambda(password)
+
     @Command('hgmo', category='deploy',
              description='Deploy hg.mozilla.org')
     @CommandArgument('--verbosity', type=int,

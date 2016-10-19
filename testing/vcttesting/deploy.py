@@ -4,11 +4,17 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import io
 import json
 import logging
 import os
 from pipes import quote
+import shutil
 import subprocess
+import tempfile
+import zipfile
+
+import boto3
 
 from .vctutil import (
     get_and_write_vct_node,
@@ -85,3 +91,81 @@ def hgmo_reclone_repos(repos, verbosity=0):
 
     return run_playbook('hgmo-reclone-repos', extra_vars=extra,
                         verbosity=verbosity)
+
+def github_lambda_deploy_package(pulse_password):
+    """Obtain a .zip file for a deployment package for GitHub Lambda foo."""
+    d = tempfile.mkdtemp()
+
+    PIP = os.path.join(ROOT, 'venv', 'bin', 'pip')
+
+    try:
+        # Install Python packages.
+        subprocess.check_call([
+            PIP, 'install',
+            '-t', d,
+            '-r', os.path.join(ROOT, 'github-webhooks', 'lambda-requirements.txt'),
+            '--require-hashes',
+        ])
+
+        # Copy relevant files from the source directory.
+        for p in os.listdir(os.path.join(ROOT, 'github-webhooks')):
+            if not p.endswith('.py'):
+                continue
+
+            shutil.copyfile(os.path.join(ROOT, 'github-webhooks', p),
+                            os.path.join(d, p))
+
+        # Make a module containing credentials.
+        with open(os.path.join(d, 'mozilla_credentials.py'), 'wb') as fh:
+            fh.write('pulse_password = "%s"\n' % pulse_password)
+
+        # Now make a zip file.
+        zf = io.BytesIO()
+        with zipfile.ZipFile(zf, 'w') as z:
+            for root, dirs, files in os.walk(d):
+                for f in sorted(files):
+                    full = os.path.join(root, f)
+                    rel = os.path.relpath(full, d)
+
+                    z.write(full, rel)
+
+        return zf.getvalue()
+    finally:
+        shutil.rmtree(d)
+
+
+def github_webhook_lambda(pulse_password):
+    """Deploys code for GitHub WebHook processing in AWS Lambda."""
+    zip_content = github_lambda_deploy_package(pulse_password)
+
+    S3_BUCKET = 'moz-github-webhooks'
+    S3_KEY = 'github_lambda.zip'
+
+    # The code package is shared. So upload to S3 and reference it there.
+    s3 = boto3.client('s3')
+    s3.put_object(
+        Bucket=S3_BUCKET,
+        Key=S3_KEY,
+        Body=zip_content,
+        ContentType='application/zip',
+    )
+
+    client = boto3.client('lambda', region_name='us-west-2')
+
+    for fn in ('github-webhooks-receive', 'github-webhooks-pulse'):
+        res = client.update_function_code(
+            FunctionName=fn,
+            S3Bucket=S3_BUCKET,
+            S3Key=S3_KEY,
+            Publish=True,
+        )
+
+        # Lambda versions code/functions by default. So delete old versions
+        # as part of upload so old versions don't pile up.
+        for v in client.list_versions_by_function(FunctionName=fn)['Versions']:
+            if v['Version'] in (res['Version'], '$LATEST'):
+                continue
+
+            client.delete_function(
+                FunctionName=v['FunctionArn'],
+                Qualifier=v['Version'])
