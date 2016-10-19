@@ -60,9 +60,6 @@ django-storages==1.4.1 \
 docker-py==1.9.0 \
     --hash=sha256:f9adb14c40701844d53a7085904e4107952b1471aee8db91b4057b3d4d38e14a
 
-docutils==0.12 \
-    --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
-
 enum34==1.1.1 \
     --hash=sha256:9d4a9220e4ebabd7ff60d853e69c3dd89debad5ddeb9ac5e768af811ece7708e
 
@@ -82,9 +79,6 @@ feedparser==5.1.3 \
 
 jsmin==2.1.1 \
     --hash=sha256:582f70f5fef561c8d561271206f45258d0c420eec31a8628914e87c73a2192e1
-
-futures==3.0.5 \
-    --hash=sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b
 
 idna==2.0 \
     --hash=sha256:9b2fc50bd3c4ba306b9651b69411ef22026d4d8335b93afc2214cef1246ce707
@@ -167,9 +161,6 @@ pytest==3.0.2 \
 pytest-django==2.9.1 \
     --hash=sha256:743d0056e127ef424850ea76d93d45c92c313da0e56765806a59fc7680c25ab7
 
-python-dateutil==1.5 \
-    --hash=sha256:6f197348b46fb8cdf9f3fcfc2a7d5a97da95db3e2e8667cf657216274fe1b009
-
 python-hglib==1.7 \
     --hash=sha256:0dc087d15b774cda82d3c8096fb0e514caeb2ddb60eed38e9056b16e279ba3c5
 
@@ -197,9 +188,6 @@ responses==0.3.0 \
 
 selenium==2.48.0 \
     --hash=sha256:30b97338c0d9f1e60e72ecee0579b0f0845d55025342c3d5ccb224fb8a07b787
-
-six==1.10.0 \
-    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
 
 snowballstemmer==1.2.0 \
     --hash=sha256:6d54f350e7a0e48903a4e3b6b2cabd1b43e23765fbc975065402893692954191

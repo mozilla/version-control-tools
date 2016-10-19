@@ -4,11 +4,26 @@ ansible==1.9.0.1 \
 blessings==1.6 \
     --hash=sha256:edc5713061f10966048bf6b40d9a514b381e0ba849c64e034c4ef6c1847d3007
 
+botocore==1.4.63 \
+    --hash=sha256:34c3d5ae027fa5b4f8f732d1ef9a63b1e03d02b87ae2e77d9efcc725dfc53ef6
+
+boto3==1.4.1 \
+    --hash=sha256:0d5e1d546e3974437f3468ea96abac95ba99753830138c3fb14718c7fdf6121e
+
+docutils==0.12 \
+    --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
+
 ecdsa==0.13 \
     --hash=sha256:40d002cf360d0e035cf2cb985e1308d41aaa087cbfc135b2dc2d844296ea546c
 
+futures==3.0.5 \
+    --hash=sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b
+
 Jinja2==2.7.3 \
     --hash=sha256:2e24ac5d004db5714976a04ac0e80c6df6e47e98c354cb2c0d82f8879d4f8fdb
+
+jmespath==0.9.0 \
+    --hash=sha256:ade5261b0d7d34b6f53accc91e6881b579b40161ed575e6ac465de5edad32815
 
 mach==0.5.1 \
     --hash=sha256:61bda1a1033c110f781427c479dd151a45fc45e46ce28e37fabf0d3cc2edf91e
@@ -38,5 +53,14 @@ PyYAML==3.11 \
 pycrypto==2.6.1 \
     --hash=sha256:f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c
 
+python-dateutil==2.5.3 \
+    --hash=sha256:598499a75be2e5e18a66f12c00dd47a069de24794effeda4228bfc760f44f527
+
+s3transfer==0.1.8 \
+    --hash=sha256:2607489b0babc041e26a62b431b90fda7eb818af8aa99dbbbbba9cf087f9572b
+
 setuptools==20.8.1 \
     --hash=sha256:d5bbc1929feeaa81233bdadc0c720d35ac27a3ca7a1f9641f632af822419114d
+
+six==1.10.0 \
+    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
