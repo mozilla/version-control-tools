@@ -659,7 +659,7 @@ def print_changeset_pushes(ui, repo, rev, all=False):
     longest_tree = max(len(p[0]) for p in pushes) + 2
     longest_user = max(len(p[3]) for p in pushes) + 2
 
-    ui.write(ctx.rev(), ':', str(ctx), ' ', ctx.description(), '\n')
+    ui.write(str(ctx.rev()), ':', str(ctx), ' ', ctx.description(), '\n')
 
     ui.write('Release ', 'Tree'.ljust(longest_tree), 'Date'.ljust(20),
             'Username'.ljust(longest_user), 'Build Info\n')
