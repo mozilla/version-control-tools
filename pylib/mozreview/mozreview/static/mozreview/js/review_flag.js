@@ -21,7 +21,7 @@ MRReviewFlag.View = Backbone.View.extend({
   states: [' ', 'r?', 'r+', 'r-'],
 
   template: _.template([
-      '<label for="mr-review-flag">Review state:</label> ',
+      '<label for="mr-review-flag" hidden>Review state:</label> ',
       '<select id="mr-review-flag">',
       '<% _(states).each(function(state) { %>',
       '  <option <% if (state === val) { %> selected <% } %> >',
@@ -53,7 +53,7 @@ MRReviewFlag.View = Backbone.View.extend({
   *  with a 'Add text' link. This is a hack to circumvent that problem.
   *  See bug 1273954.
   */
-  save: function(){
+  save: function() {
     this.model.save({
       attrs: ['extra_data.' + this.key],
       success: function() {
@@ -76,6 +76,7 @@ MRReviewFlag.View = Backbone.View.extend({
       states: this.states,
       val: this.model.get('extraData')[this.key] || lastKnownFlag
     }));
+
     return this;
   },
 
@@ -97,11 +98,27 @@ MRReviewFlag.Extension = RB.Extension.extend({
     _super(this).initialize.call(this);
     $(document).on('mozreview_ready', _.bind(function() {
       if (!MozReview.isParent) {
-        new RB.ReviewDialogHook({
+        new RB.DraftDialogHook({
           extension: this,
           viewType: MRReviewFlag.View
         });
+        $(document).trigger('mozreview_review_flag_ready');
       }
     }, this));
+  }
+});
+
+
+RB.DraftDialogHook = RB.ExtensionHook.extend({
+  hookPoint: new RB.ExtensionHookPoint(),
+
+  defaults: _.defaults({
+    viewType: null
+  }, RB.ExtensionHook.prototype.defaults),
+
+  setUpHook: function() {
+    console.assert(this.get('viewType'),
+                   'DraftDialogHook instance does not have a ' +
+                   '"viewType" attribute set.');
   }
 });
