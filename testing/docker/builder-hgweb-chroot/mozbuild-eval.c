@@ -107,6 +107,9 @@ static int call_mozbuildinfo(void* repo_path) {
     while ((mnt = getmntent(fmount))) {
         /* These can't be deleted during our first pass because there
          * are child mounts. */
+        if (strcmp(mnt->mnt_dir, "/boot") == 0) {
+            continue;
+        }
         if (strcmp(mnt->mnt_dir, "/dev") == 0) {
             continue;
         }
@@ -146,6 +149,11 @@ static int call_mozbuildinfo(void* repo_path) {
     endmntent(fmount);
 
     /* Now unmount skips since children should be gone. */
+    if (umount2("/boot", 0)) {
+        fprintf(stderr, "unable to unmount /boot\n");
+        return 1;
+    }
+
     if (umount2("/dev", 0)) {
         fprintf(stderr, "unable to unmount /dev\n");
         return 1;
