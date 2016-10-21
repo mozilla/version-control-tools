@@ -12,16 +12,16 @@ RUN yum update -y
 RUN yum install -y bzip2-devel gcc libcgroup-devel make openssl-devel rsync sqlite-devel tar wget zlib-devel
 
 # Download and verify Python source code.
-RUN wget https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz
-ADD Python-2.7.10.tgz.asc /Python-2.7.10.tgz.asc
+RUN wget https://www.python.org/ftp/python/2.7.12/Python-2.7.12.tgz
+ADD Python-2.7.12.tgz.asc /Python-2.7.12.tgz.asc
 ADD signer.gpg /signer.gpg
 RUN gpg --import /signer.gpg
-RUN gpg --verify /Python-2.7.10.tgz.asc
+RUN gpg --verify /Python-2.7.12.tgz.asc
 
 # Compile and install Python into a directory that will become the
 # chroot.
-RUN tar -xzf /Python-2.7.10.tgz
-RUN cd /Python-2.7.10 && ./configure --prefix=/usr && make -j4 && make install DESTDIR=/python
+RUN tar -xzf /Python-2.7.12.tgz
+RUN cd /Python-2.7.12 && ./configure --prefix=/usr && make -j4 && make install DESTDIR=/python
 
 # %include scripts/download-verify
 ADD extra/vct/scripts/download-verify /var/tmp/download-verify
