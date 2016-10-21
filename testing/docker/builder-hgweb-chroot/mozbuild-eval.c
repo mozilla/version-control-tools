@@ -89,6 +89,12 @@ static int call_mozbuildinfo(void* repo_path) {
     }
     cgroup_free(&cg);
 
+    /* Mark everything as a slave so we don't propagate mount changes to real. */
+    if (mount(NULL, "/", NULL, MS_SLAVE | MS_REC, NULL) < 0) {
+        fprintf(stderr, "unable to mark mounts as slaves\n");
+        return 1;
+    }
+
     /* We have a separate mount namespace from the parent but we
      * inherited a copy. Clear out mounts because they only increase the
      * surface area for badness. */
@@ -107,6 +113,19 @@ static int call_mozbuildinfo(void* repo_path) {
         if (strcmp(mnt->mnt_dir, "/proc") == 0) {
             continue;
         }
+        /* We can't unmount /sys in first pass because cgroups are present. */
+        if (strcmp(mnt->mnt_dir, "/sys") == 0) {
+            continue;
+        }
+        /* Need to unmount cgroups namespaces first. */
+        if (strcmp(mnt->mnt_dir, "/sys/fs/cgroup") == 0) {
+            continue;
+        }
+        /* /run/user/1000 is mounted. Unmount /run explicitly later. */
+        if (strcmp(mnt->mnt_dir, "/run") == 0) {
+            continue;
+        }
+
         /* We need the root filesystem and the repo bind mount available
          * in order for the chroot to work. */
         if (strcmp(mnt->mnt_dir, "/") == 0) {
@@ -126,7 +145,7 @@ static int call_mozbuildinfo(void* repo_path) {
     /* Always returns 1. */
     endmntent(fmount);
 
-    /* Now unmount /dev and /proc since children should be gone. */
+    /* Now unmount skips since children should be gone. */
     if (umount2("/dev", 0)) {
         fprintf(stderr, "unable to unmount /dev\n");
         return 1;
@@ -137,6 +156,22 @@ static int call_mozbuildinfo(void* repo_path) {
      * bugs in procfs. */
     if (umount2("/proc", 0)) {
         fprintf(stderr, "unable to unmount /proc\n");
+        return 1;
+    }
+
+    /* /sys/fs/cgroup doesn't unmount cleanly, yielding EBUSY for unknown
+       reasons. MNT_DETACH works, however. */
+    if (umount2("/sys/fs/cgroup", MNT_DETACH)) {
+        fprintf(stderr, "unable to unmount /sys/fs/cgroup\n");
+        return 1;
+    }
+    if (umount2("/sys", 0)) {
+        fprintf(stderr, "unable to unmount /sys\n");
+        return 1;
+    }
+
+    if (umount2("/run", 0)) {
+        fprintf(stderr, "unable to unmount /run\n");
         return 1;
     }
 
