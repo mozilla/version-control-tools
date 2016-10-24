@@ -122,6 +122,8 @@ def cli():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('config', help='Path to config file to load')
+    parser.add_argument('--skip', action='store_true',
+                        help='Skip the consuming of the next message then exit')
     args = parser.parse_args()
 
     config = Config(filename=args.config)
@@ -147,6 +149,24 @@ def cli():
     client = config.get_client_from_section('pulseconsumer', timeout=5)
 
     with Consumer(client, group, topic, partitions=None) as consumer:
+        if args.skip:
+            r = consumer.get_message()
+            if not r:
+                print('no message available; nothing to skip')
+                sys.exit(1)
+
+            partition = r[0]
+
+            try:
+                message_type = r[2]['name']
+            except Exception:
+                message_type = 'UNKNOWN'
+
+            consumer.commit(partitions=[partition])
+            print('skipped %s message in partition %d for group %s' % (
+                message_type, partition, group))
+            sys.exit(0)
+
         cbkwargs = {
             'config': config,
         }

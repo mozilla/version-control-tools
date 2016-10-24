@@ -147,6 +147,29 @@ Routing keys with slashes and dashes and underscores work
       source: serve
     type: changegroup.1
 
+  $ cd ..
+
+Pulse client can skip messages
+
+  $ hgmo exec hgssh supervisorctl stop pulsenotifier
+  pulsenotifier: stopped
+
+  $ hgmo create-repo ignored-repo scm_level_1
+  (recorded repository creation in replication log)
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
+  $ hgmo exec hgssh /var/hg/venv_tools/bin/vcsreplicator-pulse-notifier --skip /etc/mercurial/notifications.ini
+  skipped heartbeat-1 message in partition 0 for group pulsenotifier
+  $ hgmo exec hgssh /var/hg/venv_tools/bin/vcsreplicator-pulse-notifier --skip /etc/mercurial/notifications.ini
+  skipped hg-repo-init-2 message in partition 0 for group pulsenotifier
+
+  $ pulseconsumer --wait-for-no-lag
+
+  $ pulse dump-messages exchange/hgpushes/v2 v2
+  []
+
 Cleanup
 
   $ hgmo clean

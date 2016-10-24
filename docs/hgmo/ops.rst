@@ -643,6 +643,34 @@ If the ``pulsenotifier`` daemon has crashed, try restarting it::
 If the hg.mozilla.org Kafka cluster is down, lots of other alerts are
 likely firing. You should alert VCS on call.
 
+In some cases, ``pulsenotifier`` may repeatedly crash due to a malformed input
+message, bad data, or some such. Essentially, the process encounters bad input,
+crashes, restarts via systemd, encounters the same message again, crashes, and
+the cycle repeats until systemd gives up. This scenario should be rare, which is
+why the daemon doesn't ignore *bad* messages (ignoring messages could lead to
+data loss).
+
+If the daemon becomes wedged on a specific message, you can tell the daemon to
+skip the next message by running::
+
+   $ /var/hg/venv_tools/bin/vcsreplicator-pulse-notifier --skip /etc/mercurial/notifications.ini
+
+This command will print a message like::
+
+   skipped hg-repo-init-2 message in partition 0 for group pulsenotifier
+
+Then exit. You can then restart the daemon (if necessary) via::
+
+   $ systemctl start pulsenotifier.service
+
+Repeat as many times as necessary to clear through the *bad* messages.
+
+.. important::
+
+   If you skip messages, please file a bug against
+   ``Developer Services :: hg.mozilla.org`` and include the systemd journal
+   output for ``pulsenotifier.service`` showing the error messages.
+
 Adding/Removing Nodes from Zookeeper and Kafka
 ==============================================
 
