@@ -31,6 +31,8 @@ def main(args):
         help='HTTP Basic auth password to add to request')
     parser.add_argument('--request-header', action='append', default=[],
         help='HTTP request header to add')
+    parser.add_argument('--agent',
+        help='HTTP User-Agent request header')
     parser.add_argument('url',
         help='URL to fetch')
 
@@ -59,6 +61,9 @@ def main(args):
         s = '%s:%s' % (args.basic_username, args.basic_password)
         s = base64.encodestring(s).replace('\n', '')
         headers['Authorization'] = 'Basic %s' % s
+
+    if args.agent:
+        headers['User-Agent'] = args.agent
 
     conn.request(args.method, path, headers=headers)
     response = conn.getresponse()
