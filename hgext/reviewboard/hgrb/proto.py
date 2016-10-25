@@ -45,11 +45,11 @@ class AuthorizationError(Exception):
             return API_KEY_NEEDED
 
         if self.web_login_needed:
-            return 'web login needed; log in at %s then try again' % self.login_url
+            return 'Web login needed; log in at %s then try again' % self.login_url
 
         if self.apikey:
             return("%s\nLog out and back in to Review Board then try again"
-                   % str(self.e))
+                   % self.e.args[0])
         else:
             return 'unknown failure'
 
@@ -61,13 +61,7 @@ class BadRequestError(Exception):
         self.e = e
 
     def __str__(self):
-        lines = str(self.e).splitlines()
-
-        s = lines[0]
-        if len(lines) > 1:
-            s += '; %s' % lines[-1].strip()
-
-        return 'reviewboard error: %s' % s
+        return self.e.args[0]
 
 
 class ServerError(Exception):

@@ -193,7 +193,7 @@ TODO Fix the error output (bug 1169664)
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
   submitting 3 changesets for review
-  abort: reviewboard error: One or more fields had errors (HTTP 400, API Error 105); identifier: Parent review request is submitted or discarded
+  abort: One or more fields had errors (HTTP 400, API Error 105); identifier: Parent review request is submitted or discarded
   [255]
 
 Re-opening the parent review request should re-open all of the children.

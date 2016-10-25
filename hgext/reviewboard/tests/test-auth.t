@@ -73,7 +73,7 @@ User must log in via web interface before pushing with an API key
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: web login needed; log in at http://$DOCKER_HOSTNAME:$HGPORT1/account/login then try again
+  abort: Web login needed; log in at http://$DOCKER_HOSTNAME:$HGPORT1/account/login then try again
   [255]
 
 User in database without API key requires web login
@@ -90,7 +90,7 @@ User in database without API key requires web login
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: web login needed; log in at http://$DOCKER_HOSTNAME:$HGPORT1/account/login then try again
+  abort: Web login needed; log in at http://$DOCKER_HOSTNAME:$HGPORT1/account/login then try again
   [255]
 
 Usernames for users without the IRC nick syntax are based on email fragment and BZ user id
@@ -233,7 +233,7 @@ Disabling a user in Bugzilla will prevent them from using Review Board
   searching for changes
   no changes found
   submitting 1 changesets for review
-  abort: The username or password was not correct (HTTP 401, API Error 104)
+  abort: The username or password was not correct
   Log out and back in to Review Board then try again
   [255]
 
