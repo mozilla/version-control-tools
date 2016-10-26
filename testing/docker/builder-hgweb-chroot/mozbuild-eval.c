@@ -18,6 +18,7 @@
 #include <sched.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/capability.h>
 #include <sys/mount.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -38,6 +39,16 @@ const char* chroot_env[] = {
 const char* hostname = "mozbuildeval";
 
 static char stack[1048576];
+
+static void drop_caps() {
+    struct __user_cap_header_struct header = { _LINUX_CAPABILITY_VERSION_3, 0 };
+    struct __user_cap_data_struct data[2] = { { 0 } };
+
+    if (-1 == capset(&header, data)) {
+        fprintf(stderr, "capset failed\n");
+        _exit(1);
+    }
+}
 
 /**
  * Child process that does all the work. This process is disassociated
@@ -217,6 +228,10 @@ static int call_mozbuildinfo(void* repo_path) {
         return 1;
     }
 
+    /* We're done performing privileged operations. Drop capabilities
+     * we won't need. */
+    drop_caps();
+
     /* And now that we've dropped all privileges, do our moz.build
      * evaluation. Since we are in a PID namespace and we are PID 1, we
      * do a fork first because PID 1 is special and we don't want our
@@ -298,6 +313,9 @@ int main(int argc, const char* argv[]) {
         fprintf(stderr, "clone failed\n");
         return 1;
     }
+
+    /* We don't need elevated capabilities to wait on the child. So drop. */
+    drop_caps();
 
     if (waitpid(pid, &child_status, 0) == -1) {
         fprintf(stderr, "failed to wait on child\n");
