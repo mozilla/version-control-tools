@@ -308,6 +308,7 @@
         owner=root
         group=root
         mode=0664
+  notify: restart cgconfig
 
 - name: configure cgconfig to run at system startup
   command: /usr/bin/systemctl enable cgconfig.service
