@@ -40,6 +40,7 @@ UNIT_TEST_IGNORES = (
     'pylib/pep8',
     'pylib/pyflakes',
     'pylib/requests',
+    'pylib/mozreview',
 )
 
 COVERAGE_OMIT = (
