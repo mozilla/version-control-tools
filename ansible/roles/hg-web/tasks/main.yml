@@ -337,11 +337,11 @@
 # It is important for this binary to be located *outside* the chroot
 # because if code inside the chroot is able to modify the binary, it
 # will be able to execute as root given the caps policy
+# Group ownership of "hg" allows hgweb processes to run executable.
 - name: upload chroot evaluator binary
   copy: src={{ vct }}/chroot_mozbuild/mozbuild-eval
         dest=/usr/local/bin/mozbuild-eval
         owner=root
-        # Group ownership allows hgweb processes to run.
         group=hg
         mode=0750
   when: chroot_mozbuild_exists
