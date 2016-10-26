@@ -351,9 +351,12 @@
 - name: give mozbuild-eval elevated privileges
   command: "/usr/sbin/setcap cap_sys_admin,cap_sys_chroot,cap_setuid,cap_setgid=+ep /usr/local/bin/mozbuild-eval"
 
-# TODO remove after it has been deployed.
-- name: remove old sudoers policy for mozbuild-eval
-  file: path=/etc/sudoers.d/mozbuild-eval state=absent
+- name: install sudoers policy for mozbuild-eval
+  copy: src=sudoers-mozbuild-eval
+        dest=/etc/sudoers.d/mozbuild-eval
+        owner=root
+        group=root
+        mode=0440
 
 - name: mount point for repos
   file: path={{ item }} state=directory owner=hg group=hg mode=0755
