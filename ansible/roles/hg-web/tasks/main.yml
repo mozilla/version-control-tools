@@ -12,6 +12,8 @@
     - httpd
     # To build mod_wsgi from source so it can be placed in virtualenvs.
     - httpd-devel
+    # Provides `setcap` utility.
+    - libcap
     # Secures processes, especially moz.build evaluation.
     - libcgroup
     # We use logrotate to control log files
