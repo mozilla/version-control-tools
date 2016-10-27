@@ -48,6 +48,7 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
     result = ''
 
     def run_hg(args):
+        logger.info('rev: %s: executing: %s' % (rev, args))
         out = hglib.util.BytesIO()
         out_channels = {b'o': out.write, b'e': out.write}
         ret = client.runcommand(args, {}, out_channels)

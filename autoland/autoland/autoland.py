@@ -123,7 +123,7 @@ def handle_pending_transplants(logger, dbconn):
                                                    commit_descriptions)
             del os.environ['AUTOLAND_REQUEST_USER']
 
-            logging.info('transplant from tree: %s rev: %s attempt: %s: %s' % (
+            logger.info('transplant from tree: %s rev: %s attempt: %s: %s' % (
                 tree, rev, attempts + 1, result))
 
             if landed or 'abort: push creates new remote head' not in result:
