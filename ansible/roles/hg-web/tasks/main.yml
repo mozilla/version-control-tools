@@ -351,6 +351,7 @@
 
 - name: give mozbuild-eval elevated privileges
   command: "/usr/sbin/setcap cap_sys_admin,cap_sys_chroot,cap_setuid,cap_setgid=+ep /usr/local/bin/mozbuild-eval"
+  when: chroot_mozbuild_exists
 
 - name: install sudoers policy for mozbuild-eval
   copy: src=sudoers-mozbuild-eval
