@@ -1,8 +1,10 @@
 ---
+# ignore_errors are present because many services aren't running in Docker.
+
 - name: restart cgconfig
   service: name=cgconfig state=restarted
+  ignore_errors: True
 
-# Fails in Docker.
 - name: restart nrpe
   service: name=nrpe
            state=restarted
