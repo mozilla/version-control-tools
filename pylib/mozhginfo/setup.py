@@ -7,7 +7,7 @@ required = [
 
 setup(
     name='pushlog_client',
-    version='0.5.0',
+    version='0.6.0',
     packages=find_packages(),
 
     install_requires=required,
