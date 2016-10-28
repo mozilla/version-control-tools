@@ -8,7 +8,22 @@ class Push(object):
 
         :param push_id:    The push id of this push.
         :type  push_id:    str
-        :param push_info:  Metadata about the push.
+        :param push_info:  Metadata about the push. For example:
+             {u'date': 1476374097,
+             u'changesets': [u'67ff6167e020cca50fa2a64c16c1e1074b8a2871'],
+             u'user': u'armenzg@mozilla.com'}
+
+             {u'date': 1441983569,
+             u'changesets': [{
+                 u'files': [u'main.cpp'],
+                 u'node': u'2dc063b51c0eea1b6b026253a2d8d3421716b197',
+                 u'tags': [u'test_tags'],
+                 u'author': u'Chris Peterson <cpeterson@mozilla.com>',
+                 u'branch': u'default',
+                 u'desc': u'try: -b do -p win32,win32-mulet,win64,win32_gecko '
+                           '-u all[Windows XP,Windows 7,Windows 8,b2g] -t none'
+             }],
+             u'user': u'nobody@mozilla.com'}
         :type  push_info:  dict
         """
         self._id = push_id
@@ -18,11 +33,15 @@ class Push(object):
             self._push['date'] = push_info.get('date', None)
             self._push['user'] = push_info.get('user', None)
             for changeset in push_info.get('changesets'):
-                # When query push date without 'full=1' option, the
-                # changeset we get will be a list string rather than a object.
+                # When we query push date without 'full=1' option, the changeset
+                # we get will be a list of strings rather than an object.
                 if isinstance(changeset, basestring):
+                    assert len(changeset) == 40, \
+                        'All changesets have to be of 40 chars in length.'
                     self._push['changesets'].append(Changeset(node=changeset))
                 else:
+                    assert len(changeset['node']) == 40, \
+                        'All changesets have to be of 40 chars in length.'
                     self._push['changesets'].append(Changeset(**changeset))
 
     def __repr__(self):

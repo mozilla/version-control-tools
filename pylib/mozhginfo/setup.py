@@ -1,14 +1,17 @@
 from setuptools import setup, find_packages
 
+required = [
+    'requests>=2.8.1',
+    'redo>=1.5'
+]
+
 setup(
     name='pushlog_client',
     version='0.5.0',
     packages=find_packages(),
 
-    install_requires=[
-        'requests>=2.8.1',
-        'redo>=1.5'
-    ],
+    install_requires=required,
+    tests_require=required + ['mock', 'pytest'],
 
     # Meta-data for upload to PyPI
     author='Armen Zambrano G.',
