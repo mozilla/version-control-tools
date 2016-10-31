@@ -60,7 +60,7 @@ LimitRequestFields 250
     <If "(%{QUERY_STRING} !~ /cmd=/) && (%{HTTP_USER_AGENT} !~ m#mercurial/proto#)">
         # TODO increase max-age once we confirm HSTS doesn't break anything in
         # production.
-        Header set Strict-Transport-Security max-age=3600
+        Header set Strict-Transport-Security max-age=86400
     </If>
 </VirtualHost>
 
