@@ -4,6 +4,8 @@ botocore==1.4.63 \
     --hash=sha256:34c3d5ae027fa5b4f8f732d1ef9a63b1e03d02b87ae2e77d9efcc725dfc53ef6
 colorama==0.3.7 \
     --hash=sha256:a4c0f5bc358a62849653471e309dcc991223cf86abafbec17cd8f41327279e89
+docutils==0.12 \
+    --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
 futures==3.0.5 \
     --hash=sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b
 jmespath==0.9.0 \
