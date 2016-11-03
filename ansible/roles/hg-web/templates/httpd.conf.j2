@@ -19,10 +19,6 @@ ServerLimit      {{ httpd_server_limit }}
 MaxClients       {{ httpd_max_clients }}
 MaxRequestsPerChild  4000
 
-# Default is 100. Mercurial encodes some arguments in HTTP request headers.
-# Repos with large numbers of heads (namely Try) run into these limits.
-LimitRequestFields 1000
-
 Listen 80
 
 LoadModule authz_core_module modules/mod_authz_core.so
