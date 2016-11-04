@@ -126,14 +126,16 @@ def _transplant(logger, client, tree, destination, rev, trysyntax=None,
     # Perform rebase if necessary
     if not trysyntax:
         try:
-            run_hg(['rebase', '-s', base_revision, '-d', remote_tip])
+            cmd = ['rebase', '-s', base_revision, '-d', remote_tip]
+            run_hg(cmd)
         except hglib.error.CommandError as e:
             output = e.out.getvalue()
             if 'nothing to rebase' not in output:
                 return False, formulate_hg_error(['hg'] + cmd, output)
 
         try:
-            result = run_hg(['log', '-r', 'tip', '-T', '{node|short}'])
+            cmd = ['log', '-r', 'tip', '-T', '{node|short}']
+            result = run_hg(cmd)
         except hglib.error.CommandError as e:
             output = e.out.getvalue()
             return False, formulate_hg_error(['hg'] + cmd, output)
