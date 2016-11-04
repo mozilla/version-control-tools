@@ -86,12 +86,15 @@ def handle_pending_transplants(logger, dbconn):
     for row in cursor.fetchall():
         transplant_id, destination, request = row
 
+        # Many of these values are used as command arguments. So convert
+        # to binary because command arguments aren't unicode.
+        destination = destination.encode('ascii')
         requester = request['ldap_username']
-        tree = request['tree']
-        rev = request['rev']
+        tree = request['tree'].encode('ascii')
+        rev = request['rev'].encode('ascii')
         trysyntax = request.get('trysyntax', '')
-        push_bookmark = request.get('push_bookmark', '')
-        pingback_url = request.get('pingback_url', '')
+        push_bookmark = request.get('push_bookmark', '').encode('ascii')
+        pingback_url = request.get('pingback_url', '').encode('ascii')
         commit_descriptions = request.get('commit_descriptions')
         tree_open = current_treestatus.setdefault(
             destination, treestatus.tree_is_open(destination))

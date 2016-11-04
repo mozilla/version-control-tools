@@ -26,6 +26,14 @@ def transplant(logger, tree, destination, rev, trysyntax=None,
     If ``trysyntax`` is specified, a Try commit will be created using the
     syntax specified.
     """
+    # These values can appear in command arguments. Don't let unicode leak
+    # into these.
+    assert isinstance(tree, str)
+    assert isinstance(destination, str)
+    assert isinstance(rev, str)
+    if push_bookmark:
+        assert isinstance(push_bookmark, str)
+
     path = get_repo_path(tree)
     configs = ['ui.interactive=False']
     with hglib.open(path, encoding='utf-8', configs=configs) as client:
