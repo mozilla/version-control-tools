@@ -69,6 +69,12 @@ objectClass: posixGroup
 objectClass: top
 memberUid: autoland@example.com
 
+dn: cn=scm_versioncontrol,ou=groups,dc=mozilla
+gidNumber: 690
+objectClass: posixGroup
+objectClass: top
+memberUid: autoland@example.com
+
 dn: uid=bind-mozreview,ou=logins,dc=mozilla
 objectClass: top
 objectClass: account

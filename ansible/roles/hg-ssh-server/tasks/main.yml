@@ -13,6 +13,8 @@
     - { name: 'scm_l10n_infra', gid: 680 }
     - { name: 'scm_sec_sensitive', gid: 686 }
     - { name: 'scm_ecmascript', gid: 687 }
+    - { name: 'scm_versioncontrol', gid: 690 }
+    - { name: 'scm_autoland', gid: 2346 }
 
 - name: Create hg group
   group: name=hg
