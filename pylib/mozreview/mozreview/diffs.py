@@ -155,8 +155,11 @@ def render_equal_chunk(chunk, parser):
         #    "   \t  "
         # it would result in the following data:
         #     (True, 6, 10)
-        # and it would appear in the line as:
-        #    <span class="indent">&gt;&gt;&gt;&gt;---|&gt;&gt;</span>
+        # and it would appear in the line as (all on one line, wrapped here
+        # for readability):
+        #    <span class="indent">
+        #       &gt;&gt;&gt;&mdash;&mdash;&mdash;&gt;|&gt;&gt;
+        #    </span>
         is_indent, num_chars, normalized_len = indents[indent_key]
 
         chars = None
@@ -177,34 +180,43 @@ def render_equal_chunk(chunk, parser):
         current_width = 0
 
         # Parse the indentation characters
-        while index < len(chars):
-            if chars[index] == "&" and chars[index + 1] == "g":  # "&gt;".
+        while index < len(chars) and chars[index] != "<":
+            if (chars[index:index + 11] == "&gt;&mdash;" or
+                    chars[index:index + 7] == "&mdash;"):
+                # >----| and ---->|
+
+                # Skip &gt; prefix.
+                if chars[index:index + 4] == "&gt;":
+                    current_width += 1
+                    index += 4
+
+                # Find the end of the tab.
+                while chars[index:index + 7] == "&mdash;":
+                    current_width += 1
+                    index += 7
+
+                # Skip &gt; suffix.
+                if chars[index:index + 4] == "&gt;":
+                    current_width += 1
+                    index += 4
+
+                replace_chars.append("\t")
+                current_width += 1
+                index += 1  # skip "|"
+
+            elif chars[index:index + 4] == "&gt;":
                 # Space character
                 replace_chars.append(" ")
                 current_width += 1
                 index += 4
-
-            elif chars[index] == "&" and chars[index + 1] == "m":  # "&mdash;".
-                # One of the spaces we translated before
-                # was actually part of this tab we've
-                # found
-                replace_chars.pop()
-
-                # find the end of the tab.
-                while chars[index] != "|":
-                    current_width += 1
-                    index += 7
-
-                replace_chars.append("\t")
-                current_width += 1
-                index += 1
 
             elif chars[index] == "|":
                 # We've hit an ambiguous case. The previous character might
                 # be a space or might be part of this tab. For now, lets just
                 # be stupid and assume it's part of the tab (mixed indentation
                 # is evil anyways).
-                replace_chars.pop()
+                if index > 0:
+                    replace_chars.pop()
                 replace_chars.append("\t")
                 current_width += 1
                 index += 1
