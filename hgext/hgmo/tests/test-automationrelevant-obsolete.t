@@ -70,6 +70,13 @@ Local revset evaluation against hidden changeset renders hidden message
 Unless --hidden is used
 
   $ hg --hidden log -r 'automationrelevant(3208166ea109)'
+  changeset:   4:3208166ea109
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     file1 2
+  
+
+  $ hg --hidden --config hgmo.automationrelevantdraftancestors=true log -r 'automationrelevant(3208166ea109)'
   changeset:   3:11743f808184
   user:        test
   date:        Thu Jan 01 00:00:00 1970 +0000

@@ -91,19 +91,31 @@ Push base to draft should still return entire push
   3 push 2 commit 1
   4 push 2 commit 2
 
-Previous push head to draft should add it to relevant list
+Draft from previous push head not included unless config option changes behavior
 
   $ hg phase -f --draft -r 2
+
   $ hg log -r 'automationrelevant(5)' -T '{rev} {desc}\n'
+  3 push 2 commit 1
+  4 push 2 commit 2
+  5 push 2 commit 3
+
+  $ hg --config hgmo.automationrelevantdraftancestors=true log -r 'automationrelevant(5)' -T '{rev} {desc}\n'
   2 push 1 commit 2
   3 push 2 commit 1
   4 push 2 commit 2
   5 push 2 commit 3
 
-Previous push base to draft should add it to relevant list
+Draft from previous push base not included unless config option changes behavior
 
   $ hg phase -f --draft -r 1
+
   $ hg log -r 'automationrelevant(5)' -T '{rev} {desc}\n'
+  3 push 2 commit 1
+  4 push 2 commit 2
+  5 push 2 commit 3
+
+  $ hg --config hgmo.automationrelevantdraftancestors=true log -r 'automationrelevant(5)' -T '{rev} {desc}\n'
   1 push 1 commit 1
   2 push 1 commit 2
   3 push 2 commit 1
@@ -118,72 +130,6 @@ web command for exposing automation relevance works
   
   {
     "changesets": [
-      {
-        "author": "test",
-        "backsoutnodes": [],
-        "bugs": [],
-        "date": [
-          0.0,
-          0
-        ],
-        "desc": "push 1 commit 1",
-        "extra": {
-          "branch": "default"
-        },
-        "files": [
-          "foo"
-        ],
-        "node": "0a971221ac36075c184743cba0490681eadca983",
-        "parents": [
-          "55482a6fb4b1881fa8f746fd52cf6f096bb21c89"
-        ],
-        "pushdate": [
-          \d+, (re)
-          0
-        ],
-        "pushhead": "cb5c79007e91b09a4ba7ebe9210311491d09e96e",
-        "pushid": 2,
-        "pushnodes": [
-          "0a971221ac36075c184743cba0490681eadca983",
-          "cb5c79007e91b09a4ba7ebe9210311491d09e96e"
-        ],
-        "pushuser": "testuser",
-        "rev": 1,
-        "reviewers": []
-      },
-      {
-        "author": "test",
-        "backsoutnodes": [],
-        "bugs": [],
-        "date": [
-          0.0,
-          0
-        ],
-        "desc": "push 1 commit 2",
-        "extra": {
-          "branch": "default"
-        },
-        "files": [
-          "foo"
-        ],
-        "node": "cb5c79007e91b09a4ba7ebe9210311491d09e96e",
-        "parents": [
-          "0a971221ac36075c184743cba0490681eadca983"
-        ],
-        "pushdate": [
-          \d+, (re)
-          0
-        ],
-        "pushhead": "cb5c79007e91b09a4ba7ebe9210311491d09e96e",
-        "pushid": 2,
-        "pushnodes": [
-          "0a971221ac36075c184743cba0490681eadca983",
-          "cb5c79007e91b09a4ba7ebe9210311491d09e96e"
-        ],
-        "pushuser": "testuser",
-        "rev": 2,
-        "reviewers": []
-      },
       {
         "author": "test",
         "backsoutnodes": [],

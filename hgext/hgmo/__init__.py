@@ -494,9 +494,13 @@ def revset_automationrelevant(repo, subset, x):
             if pctx.rev() <= ctx.rev():
                 revs.add(pctx.rev())
 
-    # Union with non-public ancestors.
-    for rev in repo.revs('::%d & not public()', ctx.rev()):
-        revs.add(rev)
+    # Union with non-public ancestors if configured. By default, we only
+    # consider changesets from the push. However, on special repositories
+    # (namely Try), we want changesets from previous pushes to come into
+    # play too.
+    if repo.ui.configbool('hgmo', 'automationrelevantdraftancestors', False):
+        for rev in repo.revs('::%d & not public()', ctx.rev()):
+            revs.add(rev)
 
     return subset & revset.baseset(revs)
 
