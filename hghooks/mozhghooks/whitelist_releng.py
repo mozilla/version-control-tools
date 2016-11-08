@@ -32,7 +32,6 @@ ALLOWED_USERS = set([
     'bhearsum@mozilla.com',
     'catlee@mozilla.com',
     'coop@mozilla.com',
-    'dmitchell@mozilla.com',
     'hwine@mozilla.com',
     'jlund@mozilla.com',
     'jwatkins@mozilla.com',
@@ -43,9 +42,9 @@ ALLOWED_USERS = set([
     'nthomas@mozilla.com',
     'qfortier@mozilla.com',
     'raliiev@mozilla.com',
-    'selenamarie@gmail.com',
     'rthijssen@mozilla.com',
     'aselagea@mozilla.com',
+    'mtabara@mozilla.com',
 ])
 
 
