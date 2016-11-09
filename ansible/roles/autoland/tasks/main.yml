@@ -1,7 +1,6 @@
 ---
 - include: repos.yml
 - include: packages.yml
-- include: ssh.yml
 
 - name: create autoland user
   become: true
@@ -9,6 +8,12 @@
         shell=/bin/bash
         system=yes
         state=present
+
+- name: chmod autoland home
+  file: path=/home/autoland
+        mode=0755
+
+- include: ssh.yml
 
 - name: create virtualenv for autoland
   include: ../../../tasks/virtualenv.yml
@@ -31,12 +36,11 @@
   command: hg --config extensions.purge= -R /home/autoland/version-control-tools purge --all
 
 - name: install autoland site hgrc
-  copy: src=/home/autoland/version-control-tools/autoland/hg/autoland_hgrc
+  copy: src=../files/autoland_hgrc
         dest=/home/autoland/.hgrc
         owner=autoland
         group=autoland
         mode=0644
-        remote_src=yes
 
 - name: install config.json
   template: src=config.json.j2
@@ -55,10 +59,25 @@
         mode=0600
         state=link
 
+- name: configure autoland log rotation
+  copy: dest=/etc/logrotate.d/autoland
+        src=../files/autoland_logrotate
+
+- name: set custom selinux rule for virtualenv
+  command: semanage fcontext -a -t httpd_sys_script_exec_t "/home/autoland/autoland_venv(/.*)?"
+
+- name: apply selinux policy to virtualenv
+  command: restorecon -Rv /home/autoland/autoland_venv/
+
+- name: set custom selinux rule for autoland
+  command: semanage fcontext -a -t httpd_sys_script_exec_t "/home/autoland/version-control-tools/autoland/autoland(/.*)?"
+
+- name: apply selinux policy to autoland
+  command: restorecon -Rv /home/autoland/version-control-tools/autoland/autoland/
+
 - name: install autoland service
-  copy: remote_src=yes
-        dest=/etc/systemd/system/autoland.service
-        src=/home/autoland/version-control-tools/autoland/systemd/autoland.service
+  copy: dest=/etc/systemd/system/autoland.service
+        src=../files/autoland.service
         mode=0664
   notify:
     - reload systemd
@@ -79,31 +98,8 @@
         state=absent
 
 - name: install autoland site
-  copy: src=/home/autoland/version-control-tools/autoland/apache/autoland.conf
+  copy: src=../files/autoland_httpd.conf
         dest=/etc/httpd/conf/autoland.conf
-        remote_src=yes
-  notify:
-    - restart apache
-
-- name: copy tls certs
-  copy: dest=/etc/pki/tls/certs/autoland.allizom.org.crt
-        src=/opt/secrets/autoland/ssl/{{ inventory_hostname }}.crt
-        remote_src=yes
-  notify:
-    - restart apache
-
-- name: copy tls key
-  copy: dest=/etc/pki/tls/private/autoland.allizom.org.key
-        src=/opt/secrets/autoland/ssl/{{ inventory_hostname }}.key
-        mode=600
-        remote_src=yes
-  notify:
-    - restart apache
-
-- name: copy tls CA chain file
-  copy: dest=/etc/pki/tls/certs/DigiCertCA.crt
-        src=/opt/secrets/autoland/ssl/DigiCertCA.crt
-        remote_src=yes
   notify:
     - restart apache
 
