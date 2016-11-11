@@ -29,9 +29,12 @@ Create a repository
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
-  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ sleep 2
+  $ paconsumer --wait-for-n 5
+  got a heartbeat-1 message
+  got a hg-repo-init-2 message
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a hg-changegroup-2 message
   $ pulseconsumer --wait-for-no-lag
 
   $ pulse dump-messages exchange/hgpushes/v1 v1
@@ -84,9 +87,12 @@ Repos under ignore paths are ignored
   $ hg -q commit -A -m initial
   $ hg -q push
 
-  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ sleep 2
+  $ paconsumer --start-from 5 --wait-for-n 5
+  got a heartbeat-1 message
+  got a hg-repo-init-2 message
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a hg-changegroup-2 message
   $ pulseconsumer --wait-for-no-lag
 
   $ hgmo exec hgssh grep private /var/log/pulsenotifier.log
@@ -105,9 +111,12 @@ Routing keys with slashes and dashes and underscores work
   $ hg -q commit -A -m initial
   $ hg -q push
 
-  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ sleep 2
+  $ paconsumer --start-from 10 --wait-for-n 5
+  got a heartbeat-1 message
+  got a hg-repo-init-2 message
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a hg-changegroup-2 message
   $ pulseconsumer --wait-for-no-lag
 
   $ pulse dump-messages exchange/hgpushes/v1 v1
@@ -157,8 +166,9 @@ Pulse client can skip messages
   $ hgmo create-repo ignored-repo scm_level_1
   (recorded repository creation in replication log)
 
-  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ paconsumer --start-from 15 --wait-for-n 2
+  got a heartbeat-1 message
+  got a hg-repo-init-2 message
 
   $ hgmo exec hgssh /var/hg/venv_tools/bin/vcsreplicator-pulse-notifier --skip /etc/mercurial/notifications.ini
   skipped heartbeat-1 message in partition 0 for group pulsenotifier

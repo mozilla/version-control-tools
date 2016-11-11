@@ -393,6 +393,8 @@ def cli():
             help='Skip the consuming of the next message then exit')
     parser.add_argument('--wait-for-no-lag', action='store_true',
             help='Wait for consumer lag to be 0 messages and exit')
+    parser.add_argument('--wait-for-n', type=int,
+            help='Wait for N messages to become available then exit')
 
     args = parser.parse_args()
 
@@ -432,6 +434,20 @@ def cli():
 
     if args.start_from:
         consumer.seek(args.start_from, 0)
+
+    if args.wait_for_n:
+        left = args.wait_for_n
+        while left > 0:
+            m = consumer.get_message()
+            if not m:
+                continue
+
+            name = m[2]['name']
+            print('got a %s message' % name)
+
+            left -= 1
+
+        sys.exit(0)
 
     if args.dump:
         messages = []

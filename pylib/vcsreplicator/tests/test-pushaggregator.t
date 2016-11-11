@@ -11,8 +11,9 @@ Create a repository
 
 The aggregate topic should contain a heartbeat and repo creation message
 
-  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ paconsumer --wait-for-n 2
+  got a heartbeat-1 message
+  got a hg-repo-init-2 message
 
   $ paconsumer --dump
   - _created: \d+\.\d+ (re)
@@ -46,9 +47,10 @@ The aggregate topic should contain a heartbeat and repo creation message
 
 The aggregate topic should contain a changegroup message
 
-  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ sleep 2
+  $ paconsumer --start-from 2 --wait-for-n 3
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a hg-changegroup-2 message
 
   $ paconsumer --dump --start-from 2
   - _created: \d+\.\d+ (re)
@@ -146,7 +148,13 @@ Aggregation of messages from multiple partitions works
   vcsreplicator:\d: started (re)
   vcsreplicator:\d: started (re)
 
-  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ paconsumer --start-from 8 --wait-for-n 6
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a hg-repo-init-2 message
+  got a hg-repo-init-2 message
+  got a hg-repo-init-2 message
 
   $ paconsumer --dump --start-from 8
   - _created: \d+\.\d+ (re)
