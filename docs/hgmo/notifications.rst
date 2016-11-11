@@ -19,22 +19,6 @@ Pulse messages are written to the following exchanges:
 The routing key for each message is the relative path of the repository
 on hg.mozilla.org (e.g. ``mozilla-central`` or ``integration/mozilla-inbound``).
 
-Pulse messages are written after the push has been completely replicated to
-all active HTTPS replication mirrors.
-
-.. note::
-
-   Unlike polling the pushlog, reacting to data advertised by Pulse events
-   is not susceptible to race conditions when one mirror may have replicated
-   data before another.
-
-hg.mozilla.org guarantees chronological writing of Pulse messages within
-individual repositories only. Assume we have 2 repositories, ``X`` and ``Y``
-with pushes occurring in the order of ``X1``, ``Y1``, ``X2``, ``Y2``. We only
-guarantee that ``X1`` is delivered before ``X2`` and ``Y1`` is delivered before
-``Y2``. In other words, it is possible for ``Y1`` (or even ``Y2``) to be
-delivered before ``X1`` (or ``X2``).
-
 The ``payload`` of the JSON messages published to Pulse depend on the exchange.
 
 The ``exchange/hgpushes/v1`` exchange only supported publishing *push events*
@@ -56,7 +40,29 @@ The ``exchange/hgpushes/v2`` exchange has a payload with the following keys:
 ``data``
    Dictionary holding details about the event.
 
-The message types and their data are described in the sections below.
+The message types and their data are described later in this document.
+
+Common Properties of Notifications
+==================================
+
+Notifications are sent after an event has been completely replicated to all
+active HTTPS replication mirrors.
+
+.. note::
+
+   Unlike polling the pushlog, reacting to data advertised by these
+   notifications is not susceptible to race conditions when one mirror
+   may have replicated data before another.
+
+hg.mozilla.org guarantees chronological writing of notifications within
+individual repositories only. Assume we have 2 repositories, ``X`` and ``Y``
+with pushes occurring in the order of ``X1``, ``Y1``, ``X2``, ``Y2``. We only
+guarantee that ``X1`` is delivered before ``X2`` and ``Y1`` is delivered before
+``Y2``. In other words, it is possible for ``Y1`` (or even ``Y2``) to be
+delivered before ``X1`` (or ``X2``).
+
+Delivered messages have a *type*. The sections that follow describe the
+format/schema of each message type.
 
 ``changegroup.1``
 -----------------
@@ -187,7 +193,7 @@ push
 Examples
 --------
 
-An example Pulse message payload for ``exchange/hgpushes/v2`` is as follows::
+An example message payload for is as follows::
 
    {
      "type": "changegroup.1",
