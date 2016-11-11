@@ -4,11 +4,23 @@ amqp==1.4.9 \
 anyjson==0.3.3 \
     --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba
 
+botocore==1.4.71 \
+    --hash=sha256:073beaa86567b4a3e9b9994794865931cc1a32803d5a53fcc35e6611dea7d0d4
+
+boto3==1.4.1 \
+    --hash=sha256:0d5e1d546e3974437f3468ea96abac95ba99753830138c3fb14718c7fdf6121e
+
 boto==2.38.0 \
     --hash=sha256:758498c77f16e26b8b61af26f8d0dbb119b713f2d8d166681ec892311f3520c4
 
+docutils==0.12 \
+    --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
+
 futures==3.0.3 \
     --hash=sha256:04afa2a06ab7dcca9d81717b420a7a14826061e9b2614a5c77dd24c75ccf97e4
+
+jmespath==0.9.0 \
+    --hash=sha256:ade5261b0d7d34b6f53accc91e6881b579b40161ed575e6ac465de5edad32815
 
 kafka-python==0.9.4 \
     --hash=sha256:6cd463b688d98fec1c1f602e316eb7745aef0e55dc57fe9ff2f203cf0865c8c7
@@ -19,8 +31,14 @@ kombu==3.0.35 \
 Mercurial==3.9.1 \
     --hash=sha256:625e4fc7e85ec2278c2828bdc547fce74091b3bbe4d9eeeba2d61af51195df74
 
+python-dateutil==2.5.3 \
+    --hash=sha256:598499a75be2e5e18a66f12c00dd47a069de24794effeda4228bfc760f44f527
+
 python-hglib==1.9 \
     --hash=sha256:f4302892b2b8287cf326586c7280b9eadfc3d0c7cd3feba957429a8d9b1a60ce
+
+s3transfer==0.1.9 \
+    --hash=sha256:17114f393101a6c4a49318429b9facede6183ec52fd14ca54e09aa496da56fbc
 
 six==1.9.0 \
     --hash=sha256:418a93c397a7edab23e5588dbc067ac74a723edb3d541bd4936f79476e7645da
