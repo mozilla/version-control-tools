@@ -8,20 +8,10 @@ import datetime
 import logging
 import sys
 
-import hglib
 import kombu
 
-from .config import (
-    Config,
-)
-from .consumer import (
-    Consumer,
-)
-from .daemon import (
-    run_in_loop,
-)
 from .pushnotifications import (
-    consume_one,
+    run_cli,
 )
 
 
@@ -118,60 +108,9 @@ def on_event(config, message_type, partition, message, created, data):
 
 def cli():
     """Command line interface to run the Pulse notification daemon."""
-    import argparse
+    def validate_config(config):
+        if not config.c.has_section('pulse'):
+            print('no [pulse] config section')
+            sys.exit(1)
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('config', help='Path to config file to load')
-    parser.add_argument('--skip', action='store_true',
-                        help='Skip the consuming of the next message then exit')
-    args = parser.parse_args()
-
-    config = Config(filename=args.config)
-
-    if not config.c.has_section('pulse'):
-        print('no [pulse] config section')
-        sys.exit(1)
-
-    group = config.c.get('pulseconsumer', 'group')
-    topic = config.c.get('pulseconsumer', 'topic')
-
-    root = logging.getLogger()
-    handler = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter('%(name)s %(message)s')
-    handler.setFormatter(formatter)
-    root.addHandler(handler)
-
-    # hglib will use 'hg' which relies on PATH being correct. Since we're
-    # running from a virtualenv, PATH may not be set unless the virtualenv
-    # is activated. Overwrite the hglib defaults with a value from the config.
-    hglib.HGPATH = config.hg_path
-
-    client = config.get_client_from_section('pulseconsumer', timeout=5)
-
-    with Consumer(client, group, topic, partitions=None) as consumer:
-        if args.skip:
-            r = consumer.get_message()
-            if not r:
-                print('no message available; nothing to skip')
-                sys.exit(1)
-
-            partition = r[0]
-
-            try:
-                message_type = r[2]['name']
-            except Exception:
-                message_type = 'UNKNOWN'
-
-            consumer.commit(partitions=[partition])
-            print('skipped %s message in partition %d for group %s' % (
-                message_type, partition, group))
-            sys.exit(0)
-
-        cbkwargs = {
-            'config': config,
-        }
-        res = run_in_loop(logger, consume_one, config=config, consumer=consumer,
-                          cb=on_event, cbkwargs=cbkwargs)
-
-    logger.warn('process exiting code %s' % res)
-    sys.exit(res)
+    return run_cli('pulseconsumer', on_event, validate_config=validate_config)

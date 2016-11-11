@@ -7,9 +7,19 @@ from __future__ import absolute_import, unicode_literals
 import json
 import logging
 import os
+import sys
 
 import hglib
 
+from .config import (
+    Config,
+)
+from .consumer import (
+    Consumer,
+)
+from .daemon import (
+    run_in_loop,
+)
 
 logger = logging.getLogger('vcsreplicator.pushnotifications')
 
@@ -254,3 +264,79 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
         'repo_url': public_url,
         'markers': data,
     }
+
+
+def run_cli(config_section, cb, validate_config=None):
+    """Runs a CLI notifier program.
+
+    All the CLI notifier programs have the same interface. They accept a
+    path to a config file. A function argument says which section in that
+    config file to load.
+
+    A ``cb`` function is called with the config, message_type, and message
+    data for each replication related message seen. This data has been
+    processed by ``consume_one``, so extra metdata from the VCS repository is
+    available.
+
+    If ``validate_config`` is defined, it will be called with the loaded
+    ``Config`` instance. This gives callers the opportunity to validate that a
+    config is correct. The called function should exit if the config is not
+    proper.
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('config', help='Path to config file to load')
+    parser.add_argument('--skip', action='store_true',
+                        help='Skip the consuming of the next message then exit')
+    args = parser.parse_args()
+
+    config = Config(filename=args.config)
+
+    if validate_config:
+        validate_config(config)
+
+    group = config.c.get(config_section, 'group')
+    topic = config.c.get(config_section, 'topic')
+
+    root = logging.getLogger()
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('%(name)s %(message)s')
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
+
+    # hglib will use 'hg' which relies on PATH being correct. Since we're
+    # running from a virtualenv, PATH may not be set unless the virtualenv
+    # is activated. Overwrite the hglib defaults with a value from the config.
+    hglib.HGPATH = config.hg_path
+
+    client = config.get_client_from_section(config_section, timeout=5)
+
+    with Consumer(client, group, topic, partitions=None) as consumer:
+        if args.skip:
+            r = consumer.get_message()
+            if not r:
+                print('no message available; nothing to skip')
+                sys.exit(1)
+
+            partition = r[0]
+
+            try:
+                message_type = r[2]['name']
+            except Exception:
+                message_type = 'UNKNOWN'
+
+            consumer.commit(partitions=[partition])
+            print('skipped %s message in partition %d for group %s' % (
+                message_type, partition, group))
+            sys.exit(0)
+
+        cbkwargs = {
+            'config': config,
+        }
+
+        res = run_in_loop(logger, consume_one, config=config, consumer=consumer,
+                          cb=cb, cbkwargs=cbkwargs)
+
+    logger.warn('process exiting code %s' % res)
+    sys.exit(res)
