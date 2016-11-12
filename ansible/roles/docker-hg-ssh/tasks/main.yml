@@ -32,3 +32,8 @@
 
 - name: Install entrypoint script
   copy: src=entrypoint.py dest=/entrypoint.py mode=0755
+
+- name: virtualenv to run test-specific processes
+  include: ../../../tasks/virtualenv.yml
+           venv=/var/hg/venv_testing
+           requirements=../roles/docker-hg-ssh/files/requirements-testing.txt
