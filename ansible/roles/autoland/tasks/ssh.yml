@@ -30,4 +30,9 @@
         mode=0644
         remote_src=yes
 
-# TODO: manage known host file
+- name: install system wide known_hosts
+  copy: src=../files/known_hosts
+        dest=/etc/ssh/ssh_known_hosts
+        owner=root
+        group=root
+        mode=0644
