@@ -71,6 +71,10 @@
       slurp: src=/etc/mercurial/pulse.json
       register: pulse_config
 
+    - name: capture aws events config
+      slurp: src=/etc/mercurial/awsevents.json
+      register: awsevents_config
+
   roles:
     - {
         role: hg-ssh,
@@ -80,6 +84,8 @@
         hgweb_hosts: "{{ groups['hgweb-prod'] }}",
         pulse_user: "{{ (pulse_config.content | b64decode | from_json).user }}",
         pulse_password: "{{ (pulse_config.content | b64decode | from_json).password }}",
+        awsevents_access_key_id: "{{ (awsevents_config.content | b64decode | from_json).access_key_id }}",
+        awsevents_secret_access_key: "{{ (awsevents_config.content | b64decode | from_json).secret_access_key }}",
       }
 
   tasks:

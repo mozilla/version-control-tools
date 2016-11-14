@@ -29,3 +29,24 @@ virtual_host = /
 ssl = true
 
 routing_key_strip_prefix = https://hg.mozilla.org/
+
+[snsconsumer]
+hosts = {% for host in zk_servers %}{{ host }}:9092{% if not loop.last%}, {% endif %}{% endfor %}
+
+client_id = snsnotifier
+topic = replicatedpushdata
+group = snsnotifier
+
+[awsevents]
+{% if s3_endpoint_url is defined %}
+s3_endpoint_url = {{ s3_endpoint_url }}
+{% endif %}
+{% if sns_endpoint_url is defined %}
+sns_endpoint_url = {{ sns_endpoint_url }}
+{% endif %}
+
+access_key_id = {{ awsevents_access_key_id | mandatory }}
+secret_access_key = {{ awsevents_secret_access_key | mandatory }}
+region = us-west-2
+topic_arn = arn:aws:sns:us-west-2:699292812394:hgmo-events
+bucket = moz-hg-events-us-west-2

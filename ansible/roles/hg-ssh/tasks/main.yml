@@ -292,6 +292,7 @@
     - check_kafka_hg_heartbeat.cfg
     - check_pulsenotifier_lag.cfg
     - check_pushdataaggregator_lag.cfg
+    - check_snsnotifier_lag.cfg
   notify: restart nrpe.service
 
 - name: systemd service file for push data aggregation daemon
@@ -321,6 +322,22 @@
 
 - name: pulsenotifier.service is enabled and restarted (server only)
   service: name=pulsenotifier.service
+           enabled=yes
+           state=restarted
+  ignore_errors: True
+  when: vct_dir.stat.exists == False
+
+- name: systemd service file for sns notification daemon
+  copy: src=snsnotifier.service
+        dest=/etc/systemd/system/snsnotifier.service
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
+
+- name: snsnotifier.service is enabled and restarted (server only)
+  service: name=snsnotifier.service
            enabled=yes
            state=restarted
   ignore_errors: True

@@ -42,6 +42,39 @@ The ``exchange/hgpushes/v2`` exchange has a payload with the following keys:
 
 The message types and their data are described later in this document.
 
+SNS Notifications
+=================
+
+Change events for hg.mozilla.org are published to
+`Amazon Simple Notification Service (SNS) <https://aws.amazon.com/sns/>`_.
+
+Messages are published to SNS topic
+``arn:aws:sns:us-west-2:699292812394:hgmo-events``.
+
+The message is JSON with the following keys:
+
+``type``
+   String denoting the message type.
+``data_url``
+   URL where JSON describing the event can be obtained.
+``data`` (optional)
+   Dictionary holding details about the event.
+``external`` (optional)
+   Boolean indicating whether data is only available externally.
+   If this key is present, ``data`` will not be present and the only
+   way to obtain data is to query ``data_url``.
+``repo_url`` (optional)
+   URL of repository from which this data originated. This key is only
+   present if ``data`` is not present, as this value is already recorded
+   inside ``data``. The main purpose of this key is to facilitate
+   message filtering without having to query ``data_url`` to determine
+   which repository the message belongs to.
+
+The message types and their data are described later in this document.
+
+At least once delivery is guaranteed. And, new message types may be
+introduced at any time.
+
 Common Properties of Notifications
 ==================================
 

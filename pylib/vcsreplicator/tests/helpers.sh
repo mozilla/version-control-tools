@@ -43,8 +43,19 @@ topic = replicatedpushdata
 group = pulsenotifier
 EOF
 
+cat >> sns-consumer.ini << EOF
+[consumer]
+hosts = ${KAFKA_0_HOSTPORT}, ${KAFKA_1_HOSTPORT}, ${KAFKA_2_HOSTPORT}
+connect_timeout = 5
+poll_timeout = 0.2
+client_id = snsnotifier-local
+topic = replicatedpushdata
+group = snsnotifier
+EOF
+
 }
 
 alias consumer='vcsreplicator-consumer $TESTTMP/vcsreplicator.ini'
 alias paconsumer='vcsreplicator-consumer $TESTTMP/pushdataaggregator-consumer.ini'
 alias pulseconsumer='vcsreplicator-consumer $TESTTMP/pulse-consumer.ini'
+alias snsconsumer='vcsreplicator-consumer $TESTTMP/sns-consumer.ini'

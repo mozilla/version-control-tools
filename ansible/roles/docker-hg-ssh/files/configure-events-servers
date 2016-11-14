@@ -6,6 +6,8 @@
 # This script creates an SNS topic for events on the fake "moto" SNS
 # server and sets up everything to use it.
 
+import subprocess
+
 import boto3
 
 bucket = 'moz-hg-events-us-west-2'
@@ -25,6 +27,21 @@ result = sns.create_topic(Name=topic)
 
 arn = result['TopicArn']
 print('created SNS topic %s (%s)' % (topic, arn))
+
+# Now update the notifications config with the correct ARN.
+
+with open('/etc/mercurial/notifications.ini', 'rb') as fh:
+    lines = fh.readlines()
+
+with open('/etc/mercurial/notifications.ini', 'wb') as fh:
+    for line in lines:
+        if line.startswith('topic_arn ='):
+            line = 'topic_arn = %s\n' % arn
+
+        fh.write(line)
+
+# And restart the SNS notifier so it picks up the config change.
+subprocess.call(['/usr/bin/supervisorctl', 'restart', 'snsnotifier'])
 
 # Tests need a way to see what was published to the topic. So set up
 # a subscription pointing to a local server that dumps data to a local

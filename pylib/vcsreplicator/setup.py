@@ -22,6 +22,7 @@ setup(
             'vcsreplicator-consumer=vcsreplicator.consumer:cli',
             'vcsreplicator-print-offsets=vcsreplicator.consumer:print_offsets',
             'vcsreplicator-pulse-notifier=vcsreplicator.pulsenotifier:cli',
+            'vcsreplicator-sns-notifier=vcsreplicator.snsnotifier:cli',
         ],
     },
     install_requires=['kafka-python', 'Mercurial'],

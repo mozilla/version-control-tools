@@ -14,5 +14,9 @@ dependencies:
       kafka_broker_id: 1024,
       kafka_host_name: dummyhost,
       kafka_zookeeper_connect: dummyhostports,
+      s3_endpoint_url: 'http://localhost:5001',
+      sns_endpoint_url: 'http://localhost:5002',
+      awsevents_access_key_id: docker_sns_access_key,
+      awsevents_secret_access_key: docker_sns_secret_access_key,
       zk_servers: { localhost: dummy }
     }

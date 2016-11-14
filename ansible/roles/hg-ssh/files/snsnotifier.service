@@ -1,0 +1,23 @@
+[Unit]
+Description=Notify SNS about Mercurial events
+After=network.target remote-fs.target nss-lookup.target
+
+# We only want to have a single master at a time. Look for a file with the
+# current hostname in it indicating that we are the master.
+AssertPathExists=/repo/hg/master.%H
+
+[Service]
+WorkingDirectory=/
+User=hg-notifier
+Group=hg-notifier
+PrivateTmp=true
+
+ExecStart=/var/hg/venv_tools/bin/vcsreplicator-sns-notifier /etc/mercurial/notifications.ini
+Restart=always
+TimeoutStopSec=60
+
+SyslogIdentifier=snsnotifier
+SyslogFacility=local2
+
+[Install]
+WantedBy=hg-master.target
