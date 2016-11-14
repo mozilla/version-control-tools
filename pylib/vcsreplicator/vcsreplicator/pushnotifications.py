@@ -90,7 +90,8 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
         firecb = False
 
     if firecb:
-        cb(message_type=message_type, **cbargs)
+        cb(message_type=message_type, partition=partition, message=message,
+           created=payload['_original_created'], **cbargs)
 
     consumer.commit(partitions=[partition])
 

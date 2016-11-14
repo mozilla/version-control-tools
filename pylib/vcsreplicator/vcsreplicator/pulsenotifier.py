@@ -79,7 +79,7 @@ def send_pulse_message(config, exchange, repo_url, payload):
         producer.publish(data)
 
 
-def on_event(config, message_type, data):
+def on_event(config, message_type, partition, message, created, data):
     """Called when a replication message should be handled."""
     repo_url = data['repo_url']
     logger.warn('sending pulse notification for %s' % repo_url)
