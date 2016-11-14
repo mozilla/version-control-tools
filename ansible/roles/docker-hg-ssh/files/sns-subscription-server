@@ -1,0 +1,33 @@
+#!/var/hg/venv_testing/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# Runs a simple HTTP server that records POSTed SNS subscription data
+# to a local file so tests can read it and verify content.
+
+import BaseHTTPServer
+import json
+import sys
+import urlparse
+
+
+class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    def do_POST(self):
+        cl = int(self.headers['content-length'])
+        body = self.rfile.read(cl)
+
+        data = urlparse.parse_qs(body)
+
+        with open('/sns-messages', 'ab') as fh:
+            fh.write('POST %s ' % self.path)
+            fh.write(json.dumps(data, indent=4, sort_keys=True,
+                                separators=(',', ': ')))
+            fh.write('\n')
+
+        self.send_response(200)
+        self.end_headers()
+
+
+httpd = BaseHTTPServer.HTTPServer(('', int(sys.argv[1])), RequestHandler)
+httpd.serve_forever()

@@ -14,10 +14,12 @@
 - name: install support scripts
   copy: src={{ item }} dest=/{{ item }} mode=0755
   with_items:
+    - configure-events-servers
     - create-repo
     - set-hgrc-option
     - set-ldap-property
     - set-mirrors.py
+    - sns-subscription-server
 
 # While this file contains credentials, it needs to be world readable
 # because pash is executed as a regular user, since it is what runs as

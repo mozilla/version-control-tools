@@ -1,0 +1,34 @@
+#!/var/hg/venv_tools/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script creates an SNS topic for events on the fake "moto" SNS
+# server and sets up everything to use it.
+
+import boto3
+
+bucket = 'moz-hg-events-us-west-2'
+topic = 'hgmo-events'
+
+session = boto3.Session(aws_access_key_id='irrelevant_key',
+                        aws_secret_access_key='irrelevant_secret',
+                        region_name='us-east-1')
+
+s3 = session.client('s3', endpoint_url='http://localhost:5001')
+s3.create_bucket(Bucket=bucket,
+                 ACL='public-read-write')
+print('created S3 bucket %s' % bucket)
+
+sns = session.client('sns', endpoint_url='http://localhost:5002')
+result = sns.create_topic(Name=topic)
+
+arn = result['TopicArn']
+print('created SNS topic %s (%s)' % (topic, arn))
+
+# Tests need a way to see what was published to the topic. So set up
+# a subscription pointing to a local server that dumps data to a local
+# file.
+sns.subscribe(TopicArn=arn,
+              Protocol='http',
+              Endpoint='http://localhost:5003/hgmo-events')
