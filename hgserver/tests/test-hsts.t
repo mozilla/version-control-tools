@@ -10,7 +10,7 @@ HSTS header should be present on normal HTTP requests
 
   $ http ${HGWEB_0_URL}mozilla-central --no-body --header strict-transport-security
   200
-  strict-transport-security: max-age=86400
+  strict-transport-security: max-age=31536000
 
 HSTS header absent on protocol requests
 

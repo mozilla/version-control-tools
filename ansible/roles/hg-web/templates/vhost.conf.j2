@@ -61,9 +61,7 @@ LimitRequestFields 1000
     # Enable HSTS. But don't enable it for wire protocol requests, as they are
     # not browsers and it just adds avoidable overhead.
     <If "(%{QUERY_STRING} !~ /cmd=/) && (%{HTTP_USER_AGENT} !~ m#mercurial/proto#)">
-        # TODO increase max-age once we confirm HSTS doesn't break anything in
-        # production.
-        Header set Strict-Transport-Security max-age=86400
+        Header set Strict-Transport-Security max-age=31536000
     </If>
 </VirtualHost>
 
