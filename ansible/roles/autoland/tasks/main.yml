@@ -75,6 +75,9 @@
 - name: apply selinux policy to autoland
   command: restorecon -Rv /home/autoland/version-control-tools/autoland/autoland/
 
+- name: set selinux to allow httpd connentions to rds
+  command: setsebool -P httpd_can_network_connect_db 1
+
 - name: install autoland service
   copy: dest=/etc/systemd/system/autoland.service
         src=../files/autoland.service
