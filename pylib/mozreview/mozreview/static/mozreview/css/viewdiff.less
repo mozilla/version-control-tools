@@ -69,10 +69,28 @@ button.diff-file-btn {
             }
         }
     }
+
     .moved-row {
-      th {
-        padding-right: 18px;
-      }
+        th {
+            padding-right: 18px;
+        }
+    }
+
+    /* Make the moved-from/to border thinner, and reposition code to prevent
+       incorrect indentation. */
+
+    .moved-from, .moved-to {
+        pre {
+            margin-left: -2px;
+        }
+    }
+
+    .moved-from {
+        border-left: 2px #b0d0ff solid !important;
+    }
+
+    .moved-to {
+        border-left: 2px #a1c7ff solid !important;
     }
 }
 
